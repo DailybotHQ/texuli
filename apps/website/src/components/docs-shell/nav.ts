@@ -67,6 +67,26 @@ export const DOCS_SECTIONS: readonly DocsNavSection[] = [
       },
     ],
   },
+  {
+    label: 'Editor',
+    items: [
+      {
+        href: '/editor-page/',
+        label: 'Editor overview',
+        summary: 'A live rich text editor, its nodes and marks, and the editor examples',
+      },
+      {
+        href: '/editor-page/#package-docs',
+        label: 'Editor package docs',
+        summary: 'Where the @texuli/editor docs live in the repository',
+      },
+      {
+        href: '/examples/editor-toolbar/',
+        label: 'Editor toolbar example',
+        summary: 'The formatting toolbar, the link dialog and the saved Markdown',
+      },
+    ],
+  },
 ];
 
 /** Flat reading order for previous / next. */

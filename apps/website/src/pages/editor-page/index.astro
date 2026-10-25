@@ -1,0 +1,207 @@
+---
+/**
+ * /editor-page/: the rich text editor area. A live RichTextEditor on a
+ * fictional document (toolbar, links at the untrusted tier, undo and redo),
+ * the closed node and mark vocabularies, the editor examples and the package
+ * docs. The editor runs in one client island; everything else is static HTML.
+ */
+import EditorLive from '../../components/editor-page/EditorLive.svelte';
+import {
+  EDITOR_DOCS,
+  EDITOR_EXAMPLES,
+  EDITOR_MARKS,
+  EDITOR_NODES,
+  editorExampleHref,
+} from '../../components/editor-page/editor.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL;
+const builderHref = `${base.replace(/\/+$/, '')}/builder/`;
+---
+
+<BaseLayout
+  title="Editor"
+  description="The Texuli rich text editor: a closed document model, a formatting toolbar, links checked by the URL policy, undo and redo, and Markdown in and out, with no HTML sinks."
+>
+  <h1>Editor</h1>
+  <p class="lead">
+    <code>@texuli/editor</code> edits rich text over a closed document model: every node and mark
+    renders through owned components, links pass the URL policy, and Markdown goes in and out. The
+    package is private and in development; it is not published to npm.
+  </p>
+
+  <nav class="toc" aria-label="On this page">
+    <ul>
+      <li><a href="#try-the-editor">Try the editor</a></li>
+      <li><a href="#vocabulary">Nodes and marks</a></li>
+      <li><a href="#in-the-builder">In the builder</a></li>
+      <li><a href="#examples">Examples</a></li>
+      <li><a href="#what-ships">What ships</a></li>
+      <li><a href="#package-docs">Package docs</a></li>
+    </ul>
+  </nav>
+
+  <section aria-labelledby="try-the-editor">
+    <h2 id="try-the-editor">Try the editor</h2>
+    <p>
+      A live <code>RichTextEditor</code>. The document loads from Markdown at the
+      <code>untrusted</code> tier, and the Markdown it saves as updates below it. It follows this
+      site's light or dark mode; the editor has no motion to reduce.
+    </p>
+    <ul class="keys">
+      <li><kbd>Ctrl</kbd> or <kbd>Cmd</kbd> + <kbd>B</kbd>, <kbd>I</kbd>: bold, italic</li>
+      <li><kbd>Ctrl</kbd> or <kbd>Cmd</kbd> + <kbd>K</kbd>: edit a link; an unsafe address such as <code>javascript:</code> is refused with a visible error</li>
+      <li><kbd>Ctrl</kbd> or <kbd>Cmd</kbd> + <kbd>Z</kbd>, and with <kbd>Shift</kbd>: undo, redo</li>
+      <li><kbd>Tab</kbd>: indent a list item; <kbd>Escape</kbd>, then <kbd>Tab</kbd>: leave the editor</li>
+    </ul>
+    <div class="live">
+      <EditorLive client:load />
+    </div>
+  </section>
+
+  <section aria-labelledby="vocabulary">
+    <h2 id="vocabulary">Nodes and marks</h2>
+    <p>
+      The vocabulary is closed: anything else in pasted HTML or loaded Markdown degrades to text with
+      a diagnostic. Nothing renders through an HTML sink.
+    </p>
+    <div class="table">
+      <table>
+        <caption>Block nodes</caption>
+        <thead><tr><th scope="col">Node</th><th scope="col">Renders as</th><th scope="col">Markdown</th></tr></thead>
+        <tbody>
+          {EDITOR_NODES.map((row) => (
+            <tr><th scope="row"><code>{row.name}</code></th><td>{row.renders}</td><td><code>{row.markdown}</code></td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <table>
+        <caption>Inline marks</caption>
+        <thead><tr><th scope="col">Mark</th><th scope="col">Renders as</th><th scope="col">Markdown</th></tr></thead>
+        <tbody>
+          {EDITOR_MARKS.map((row) => (
+            <tr><th scope="row"><code>{row.name}</code></th><td>{row.renders}</td><td><code>{row.markdown}</code></td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="in-the-builder">
+    <h2 id="in-the-builder">In the builder</h2>
+    <p>
+      The <a href={builderHref}>blueprint builder</a> edits the Markdown fields of text blocks (text,
+      quote and callout body) with this editor. The field still stores Markdown: the editor reads it,
+      reports what it could not keep, and writes the Markdown back on each edit. Text edits join one
+      labeled undo step in the builder history, and <kbd>Ctrl</kbd> or <kbd>Cmd</kbd> +
+      <kbd>Z</kbd> inside the editor undoes text first.
+    </p>
+  </section>
+
+  <section aria-labelledby="examples">
+    <h2 id="examples">Examples</h2>
+    <ul class="links">
+      {
+        EDITOR_EXAMPLES.map((example) => (
+          <li>
+            <a href={editorExampleHref(base, example.id)}>{example.title}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section aria-labelledby="what-ships">
+    <h2 id="what-ships">What ships</h2>
+    <ul>
+      <li>One labelled multiline textbox; every edit becomes a model transform, and input methods are diffed into one step.</li>
+      <li>A roving formatting toolbar with pressed states and shortcuts.</li>
+      <li>A link dialog that checks addresses with <code>safeHref</code> (<code>untrusted</code> by default).</li>
+      <li>Snapshot undo and redo, announced politely.</li>
+      <li>Paste as data: an owned HTML tokenizer and allowlist, every pasted link checked at the <code>untrusted</code> tier.</li>
+      <li>Markdown in and out, the same subset text blocks and the catalog's rich text parse.</li>
+    </ul>
+    <h3>Planned</h3>
+    <ul>
+      <li>Copy in the editor's own JSON format, and drop.</li>
+      <li>A block-type menu, drag handles and a “Paste as Markdown” command.</li>
+      <li>A browser behavior scenario, an axe sweep and measured long-document limits for the editor package.</li>
+      <li>The editor on list items in the builder (each item is a plain text field today).</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="package-docs">
+    <h2 id="package-docs">Package docs</h2>
+    <p>The site does not render the package docs yet. Read them in the repository:</p>
+    <ul class="docs">
+      {
+        EDITOR_DOCS.map((doc) => (
+          <li>
+            <code>{doc.path}</code>: {doc.summary}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-block: 0 0.25rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.15;
+  }
+  h2 {
+    margin-block: 2rem 0.5rem;
+  }
+  .lead {
+    margin-block: 0 1.5rem;
+    max-inline-size: 44rem;
+    color: var(--tx-muted-foreground);
+    font-size: 1.125rem;
+  }
+  .toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    list-style: none;
+  }
+  a {
+    color: var(--tx-link, LinkText);
+  }
+  .keys {
+    padding-inline-start: 1.25rem;
+  }
+  .live {
+    margin-block: 1rem;
+  }
+  .table {
+    margin-block: 1rem;
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  table {
+    border-collapse: collapse;
+    min-inline-size: 28rem;
+  }
+  caption {
+    text-align: start;
+    font-weight: 600;
+    padding-block-end: 0.35rem;
+  }
+  th,
+  td {
+    padding: 0.35rem 0.75rem;
+    border-block-end: 1px solid var(--tx-border);
+    text-align: start;
+    vertical-align: top;
+  }
+  .links li,
+  .docs li {
+    margin-block: 0.25rem;
+  }
+</style>

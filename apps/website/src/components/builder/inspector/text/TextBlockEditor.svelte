@@ -1,5 +1,6 @@
 <script lang="ts">
 import { listKeyboard } from '../../keyboard/list.ts';
+import MarkdownField from './MarkdownField.svelte';
 import {
   editableBlock,
   editItems,
@@ -21,8 +22,10 @@ import {
 /**
  * Structured editor for a `blocks-text` `block` prop: a type selector and
  * one field per schema field, with live limits, parser-checked errors and
- * URL-policy verdicts for links. Values render as text; nothing here is a
- * sink. Every change hands the whole block to the host as one edit.
+ * URL-policy verdicts for links. Markdown fields edit through the rich text
+ * editor (`MarkdownField`) and still store Markdown. Values render as text;
+ * nothing here is a sink. Every change hands the whole block to the host as
+ * one edit.
  */
 let {
   value,
@@ -167,19 +170,22 @@ function textMax(field: TextField): number {
     {:else}
       {@const text = stringOf(field.name)}
       {@const verdicts = field.kind === 'markdown' ? linkVerdicts(text) : []}
-      <label class="text-editor__field" for={fieldId(field.name)}>
-        <span>{field.label}{field.required ? ' · required' : ''}</span>
-        {#if field.kind === 'markdown'}
-          <textarea
+      {#if field.kind === 'markdown'}
+        <div class="text-editor__field">
+          <span id={`${fieldId(field.name)}-label`}>{field.label}{field.required ? ' · required' : ''}</span>
+          <MarkdownField
             id={fieldId(field.name)}
-            rows="4"
-            maxlength={textMax(field)}
+            labelId={`${fieldId(field.name)}-label`}
             value={text}
-            aria-invalid={issueFor(field.name) ? 'true' : undefined}
-            aria-describedby={describedBy(field.name, verdicts.length > 0)}
-            oninput={(event) => set(field.name, event.currentTarget.value)}
-          ></textarea>
-        {:else}
+            max={textMax(field)}
+            invalid={Boolean(issueFor(field.name))}
+            describedBy={describedBy(field.name, verdicts.length > 0)}
+            onchange={(markdown) => set(field.name, markdown)}
+          />
+        </div>
+      {:else}
+        <label class="text-editor__field" for={fieldId(field.name)}>
+          <span>{field.label}{field.required ? ' · required' : ''}</span>
           <input
             id={fieldId(field.name)}
             type="text"
@@ -189,8 +195,8 @@ function textMax(field: TextField): number {
             aria-describedby={describedBy(field.name)}
             oninput={(event) => set(field.name, event.currentTarget.value)}
           />
-        {/if}
-      </label>
+        </label>
+      {/if}
       <p id={`${fieldId(field.name)}-count`} class="text-editor__count">
         {remaining(text, textMax(field))} characters left{field.kind === 'markdown' ? ' · inline markdown' : ''}
       </p>

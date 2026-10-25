@@ -24,6 +24,9 @@ describe('docs shell nav', () => {
       '/slides-page/#package-docs',
       '/examples/slides-tour/',
       '/showcase/slide-deck/',
+      '/editor-page/',
+      '/editor-page/#package-docs',
+      '/examples/editor-toolbar/',
     ]);
   });
 
@@ -33,7 +36,8 @@ describe('docs shell nav', () => {
     expect(docsPager('/docs-shell/getting-started/').prev?.href).toBe('/docs-shell/');
     expect(docsPager('/docs-shell/getting-started/').next?.href).toBe('/docs-shell/navigation/');
     expect(docsPager('/docs-shell/navigation/').next?.href).toBe('/slides-page/');
-    expect(docsPager('/showcase/slide-deck/').next).toBeUndefined();
+    expect(docsPager('/showcase/slide-deck/').next?.href).toBe('/editor-page/');
+    expect(docsPager('/examples/editor-toolbar/').next).toBeUndefined();
     expect(docsPager('/unknown/').current).toBeUndefined();
   });
 });
