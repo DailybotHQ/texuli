@@ -81,8 +81,11 @@ The examples registry (`packages/examples/src/slides/`) renders each starter
 template in `DeckStage` (`slides-template-report`, `slides-template-pitch`,
 `slides-template-review`), a media deck in `DeckPrint` (`slides-media-deck`),
 a slide paused at reveal step 2 of 4 in `DeckStage` (`slides-fragments`), a
-slot-master deck in `DeckPrint` (`slides-slot-masters`), and the presenter
-view at a reveal step (`slides-presenter-screen`). Each has committed light and dark visual baselines on
+slot-master deck in `DeckPrint` (`slides-slot-masters`), the presenter
+view at a reveal step (`slides-presenter-screen`), and a tour deck of the
+stage (`slides-tour`). The website's slides area (`/slides-page/`,
+[site-slides-page](../../apps/website/docs/site-slides-page.md)) mounts the
+tour live and links every slides example. Each has committed light and dark visual baselines on
 desktop Chromium and the Pixel 7 (`pnpm visual -g slides-`). Like the rest of
 the suite, the baselines are recorded on macOS only.
 
@@ -96,7 +99,7 @@ numbers.
 ## Accessibility
 
 [docs/quality/a11y-slides.md](../../docs/quality/a11y-slides.md) records the
-slides accessibility sweep (`tests/e2e/a11y-slides.spec.ts`, run on the seven
+slides accessibility sweep (`tests/e2e/a11y-slides.spec.ts`, run on seven
 slides examples). It covers axe in light, dark, overview, presenter and
 forced-colors states, reflow at 320px, the keyboard map with focus movement,
 and reduced motion.

@@ -80,3 +80,14 @@ export const slidesPresenterScreenExample = defineExample({
   props: ['deck', 'initialSlideId', 'initialStep', 'presenter', 'loadTheme', 'mediaTrust'],
   load: () => import('./PresenterScreenDemo.svelte'),
 });
+
+export const slidesTourExample = defineExample({
+  id: 'slides-tour',
+  title: 'Slides tour',
+  description:
+    'One DeckStage deck that tours the stage: slot masters, reveal steps, code highlights, speaker notes for the presenter view, the overview and fullscreen. Fictional Example Co. content.',
+  tags: ['slides', 'deck', 'fragments', 'masters', 'presenter'],
+  component: 'slides/DeckStage',
+  props: ['deck', 'loadTheme', 'mediaTrust'],
+  load: () => import('./TourDeckDemo.svelte'),
+});

@@ -182,3 +182,92 @@ export function slotMastersDeck(): Deck {
   if (!parsed.success) throw new Error(parsed.issues[0]?.message ?? 'Invalid slot masters deck');
   return parsed.deck;
 }
+
+/**
+ * A tour of the stage in one deck: slot masters (title footer, two columns,
+ * quote and attribution), reveal steps (a stepped list, a callout, code
+ * highlights) and speaker notes for the presenter view. Opens on slide 1.
+ */
+export function tourDeck(): Deck {
+  const parsed = parseDeck({
+    meta: { title: 'Slides tour', aspect: '16:9', themeRef: 'ocean' },
+    masters: ['title', 'content', 'two-column', 'quote', 'closing'],
+    slides: [
+      {
+        id: 'cover',
+        title: 'Slides tour',
+        master: 'title',
+        notes: 'Press Right or Space to advance. P opens this presenter view.',
+        blocks: [
+          { type: 'heading', level: 3, text: 'A validated deck on the Texuli stage' },
+          { type: 'divider' },
+          { type: 'text', markdown: 'Fictional Example Co. content.' },
+        ],
+      },
+      {
+        id: 'reveal',
+        title: 'Reveal steps',
+        notes: 'Each press reveals one item, then the callout.',
+        blocks: [
+          {
+            type: 'list',
+            step: 1,
+            reveal: 'fade-up',
+            items: [{ text: 'Plan the pilot' }, { text: 'Open the beta' }, { text: 'Ship it' }],
+          },
+          { type: 'callout', tone: 'info', step: 4, body: 'Every step is one key press.' },
+        ],
+      },
+      {
+        id: 'compare',
+        title: 'Two columns',
+        master: 'two-column',
+        notes: 'Dividers split the blocks into the master slots.',
+        blocks: [
+          { type: 'heading', level: 3, text: 'Before' },
+          { type: 'text', markdown: 'Weekly status decks built by hand.' },
+          { type: 'divider' },
+          { type: 'heading', level: 3, text: 'After' },
+          { type: 'text', markdown: 'Agents draft the deck; people review it.' },
+          { type: 'divider' },
+          { type: 'text', markdown: 'Source: example.com team survey.' },
+        ],
+      },
+      {
+        id: 'code',
+        title: 'Code walk',
+        notes: 'Highlights move with the reveal steps.',
+        blocks: [
+          {
+            type: 'code',
+            lang: 'ts',
+            code: 'const deck = parseDeck(input);\nif (deck.success) present(deck.deck);',
+            highlights: ['1', '2'],
+          },
+        ],
+      },
+      {
+        id: 'voice',
+        title: 'Customer voice',
+        master: 'quote',
+        blocks: [
+          { type: 'quote', quote: 'Our Monday review takes ten minutes now.' },
+          { type: 'divider' },
+          { type: 'text', markdown: 'Operations lead, Example Freight' },
+        ],
+      },
+      {
+        id: 'close',
+        title: 'Thank you',
+        master: 'closing',
+        blocks: [
+          { type: 'text', markdown: 'Try F for fullscreen and O for the overview.' },
+          { type: 'divider' },
+          { type: 'text', markdown: 'slides@example.com' },
+        ],
+      },
+    ],
+  });
+  if (!parsed.success) throw new Error(parsed.issues[0]?.message ?? 'Invalid tour deck');
+  return parsed.deck;
+}

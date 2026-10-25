@@ -59,6 +59,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       { href: '/component-pages/', label: 'Overview' },
       { href: '/gallery-components/', label: 'Gallery' },
       { href: '/examples/', label: 'Examples' },
+      { href: '/slides-page/', label: 'Slides' },
     ],
     expand: 'components',
   },

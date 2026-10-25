@@ -42,6 +42,31 @@ export const DOCS_SECTIONS: readonly DocsNavSection[] = [
       },
     ],
   },
+  {
+    label: 'Slides',
+    items: [
+      {
+        href: '/slides-page/',
+        label: 'Slides overview',
+        summary: 'A live deck stage, the starter templates and the slides examples',
+      },
+      {
+        href: '/slides-page/#package-docs',
+        label: 'Slides package docs',
+        summary: 'Where the @texuli/slides docs live in the repository',
+      },
+      {
+        href: '/examples/slides-tour/',
+        label: 'Slides tour example',
+        summary: 'Reveal steps, slot masters, presenter view and fullscreen in one deck',
+      },
+      {
+        href: '/showcase/slide-deck/',
+        label: 'Slide deck showcase',
+        summary: 'A static showcase screen built from Texuli components',
+      },
+    ],
+  },
 ];
 
 /** Flat reading order for previous / next. */

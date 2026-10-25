@@ -1,0 +1,196 @@
+---
+/**
+ * /slides-page/: the slides area. A live DeckStage tour (reveal steps, slot
+ * masters, presenter view, overview, fullscreen), the starter templates, the
+ * other slides examples and the package docs. Decks load from the examples
+ * registry in client islands; everything else is static HTML.
+ */
+import ExampleHost from '../../components/examples/ExampleHost.svelte';
+import {
+  SLIDES_DOCS,
+  SLIDES_EXAMPLES,
+  SLIDES_TEMPLATES,
+  SLIDES_TOUR_ID,
+  slidesExampleHref,
+} from '../../components/slides-page/slides.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL;
+const href = (id: string) => slidesExampleHref(base, id);
+const showcaseHref = `${base.replace(/\/+$/, '')}/showcase/slide-deck/`;
+---
+
+<BaseLayout
+  title="Slides"
+  description="Texuli slides: validated decks on a Svelte stage with reveal steps, slot masters, a presenter view, fullscreen, print and PPTX export, and starter templates."
+>
+  <h1>Slides</h1>
+  <p class="lead">
+    <code>@texuli/slides</code> turns a validated deck of content blocks into a presentation: a
+    keyboard-driven stage with reveal steps, slot masters, a presenter view and fullscreen, plus
+    print and PPTX export and starter templates. The package is private and in development; it is
+    not published to npm.
+  </p>
+
+  <nav class="toc" aria-label="On this page">
+    <ul>
+      <li><a href="#try-the-deck">Try the deck</a></li>
+      <li><a href="#templates">Starter templates</a></li>
+      <li><a href="#examples">More examples</a></li>
+      <li><a href="#what-ships">What ships</a></li>
+      <li><a href="#package-docs">Package docs</a></li>
+    </ul>
+  </nav>
+
+  <section aria-labelledby="try-the-deck">
+    <h2 id="try-the-deck">Try the deck</h2>
+    <p>
+      A live <code>DeckStage</code>. Click a slide, then use the keyboard. It follows this site's light
+      or dark mode, and slide and reveal motion cuts when you prefer reduced motion.
+    </p>
+    <ul class="keys">
+      <li><kbd>Right</kbd> or <kbd>Space</kbd>: reveal the next step, then the next slide</li>
+      <li><kbd>Left</kbd>: hide the newest step, then the previous slide</li>
+      <li><kbd>P</kbd>: presenter view with speaker notes and step progress</li>
+      <li><kbd>O</kbd>: overview of slide titles</li>
+      <li><kbd>F</kbd>: fullscreen (or the whole window, with a note, when the browser has no fullscreen)</li>
+      <li><kbd>Escape</kbd>: close the overview, fullscreen, then the presenter view</li>
+    </ul>
+    <div class="stage">
+      <ExampleHost client:load id={SLIDES_TOUR_ID} eager listing={false} />
+    </div>
+    <p><a href={href(SLIDES_TOUR_ID)}>Open the slides tour example with its source</a></p>
+  </section>
+
+  <section aria-labelledby="templates">
+    <h2 id="templates">Starter templates</h2>
+    <p>
+      <code>createDeckFromTemplate</code> builds each starter deck. The previews below are not
+      interactive; open an example to present it.
+    </p>
+    <ul class="cards">
+      {
+        SLIDES_TEMPLATES.map((template) => (
+          <li class="card">
+            <h3>{template.title}</h3>
+            <p>{template.summary}</p>
+            <div class="preview">
+              <ExampleHost client:visible id={template.id} />
+            </div>
+            <a href={href(template.id)}>Open the {template.title.toLowerCase()} template</a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section aria-labelledby="examples">
+    <h2 id="examples">More examples</h2>
+    <ul class="links">
+      {
+        SLIDES_EXAMPLES.map((example) => (
+          <li>
+            <a href={href(example.id)}>{example.title}</a>: {example.summary}
+          </li>
+        ))
+      }
+    </ul>
+    <p>
+      The <a href={showcaseHref}>slide deck showcase screen</a> is a static mock-up built from
+      Texuli cards and buttons, not from <code>@texuli/slides</code>.
+    </p>
+  </section>
+
+  <section aria-labelledby="what-ships">
+    <h2 id="what-ships">What ships</h2>
+    <ul>
+      <li>A deck model with closed vocabularies, validation that never throws, and agent decks checked by <code>validateDeckDraft</code>.</li>
+      <li>Reveal steps on blocks, list items and code highlights.</li>
+      <li>Slot masters: top-level dividers split blocks into a master's named slots.</li>
+      <li>A presenter view, and a presenter screen in a second window of the same browser, linked over <code>BroadcastChannel</code> with no server.</li>
+      <li>Fullscreen with a visible window-filling fallback.</li>
+      <li>Print to PDF through the browser, and a local PPTX export of text, bullets and notes.</li>
+    </ul>
+    <h3>Planned</h3>
+    <ul>
+      <li>A presenter screen on another device.</li>
+      <li>A next-slide thumbnail and a wall clock in the presenter view.</li>
+      <li>A tool-side PDF exporter and deck video.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="package-docs">
+    <h2 id="package-docs">Package docs</h2>
+    <p>The site does not render the package docs yet. Read them in the repository:</p>
+    <ul class="docs">
+      {
+        SLIDES_DOCS.map((doc) => (
+          <li>
+            <code>{doc.path}</code>: {doc.summary}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-block: 0 0.25rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.15;
+  }
+  h2 {
+    margin-block: 2rem 0.5rem;
+  }
+  .lead {
+    margin-block: 0 1.5rem;
+    max-inline-size: 44rem;
+    color: var(--tx-muted-foreground);
+    font-size: 1.125rem;
+  }
+  .toc ul,
+  .cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    list-style: none;
+  }
+  a {
+    color: var(--tx-link, LinkText);
+  }
+  .keys {
+    padding-inline-start: 1.25rem;
+  }
+  .stage {
+    margin-block: 1rem;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: 1rem;
+  }
+  .card {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+    padding: 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.625rem);
+    min-inline-size: 0;
+  }
+  .card h3,
+  .card p {
+    margin: 0;
+  }
+  .preview {
+    max-block-size: 22rem;
+    overflow: hidden;
+  }
+  .links li,
+  .docs li {
+    margin-block: 0.25rem;
+  }
+</style>

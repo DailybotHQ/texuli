@@ -20,6 +20,10 @@ describe('docs shell nav', () => {
       '/docs-shell/',
       '/docs-shell/getting-started/',
       '/docs-shell/navigation/',
+      '/slides-page/',
+      '/slides-page/#package-docs',
+      '/examples/slides-tour/',
+      '/showcase/slide-deck/',
     ]);
   });
 
@@ -28,7 +32,8 @@ describe('docs shell nav', () => {
     expect(docsPager('/docs-shell/').next?.href).toBe('/docs-shell/getting-started/');
     expect(docsPager('/docs-shell/getting-started/').prev?.href).toBe('/docs-shell/');
     expect(docsPager('/docs-shell/getting-started/').next?.href).toBe('/docs-shell/navigation/');
-    expect(docsPager('/docs-shell/navigation/').next).toBeUndefined();
+    expect(docsPager('/docs-shell/navigation/').next?.href).toBe('/slides-page/');
+    expect(docsPager('/showcase/slide-deck/').next).toBeUndefined();
     expect(docsPager('/unknown/').current).toBeUndefined();
   });
 });

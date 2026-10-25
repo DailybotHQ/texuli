@@ -99,6 +99,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-seo](../apps/website/docs/site-seo.md) | texuli.com: SEO, social images and sitemap |
 | [site-showcase](../apps/website/docs/site-showcase.md) | Showcase: complete interfaces |
 | [site-sidebar-nav](../apps/website/docs/site-sidebar-nav.md) | Site navigation and docs layout |
+| [site-slides-page](../apps/website/docs/site-slides-page.md) | texuli.com: slides area |
 | [site-skill](../apps/website/docs/site-skill.md) | The Texuli skill page |
 | [site-theme-studio](../apps/website/docs/site-theme-studio.md) | Theme studio (texuli.com) |
 | [site-theme-swatches](../apps/website/docs/site-theme-swatches.md) | Theme swatches (own palette) |
