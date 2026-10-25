@@ -726,13 +726,16 @@ const interactionModules = $derived(
   .footer {
     margin-block-start: 0.5rem;
   }
+  /*
+   * Forced colors keep the series palette, as part-whole charts do: painting
+   * every mark CanvasText made series indistinguishable and left the legend
+   * colors matching nothing. Bars get Canvas separators so stacked segments
+   * and grouped bars stay apart.
+   */
   @media (forced-colors: active) {
-    .plot :global(svg path[data-line]) {
-      stroke: CanvasText;
-    }
-    .plot :global(svg rect) {
-      fill: CanvasText;
-      stroke: CanvasText;
+    .plot :global(svg rect[data-series]) {
+      stroke: Canvas;
+      stroke-width: 1.5;
     }
   }
   @media (forced-colors: active) {
