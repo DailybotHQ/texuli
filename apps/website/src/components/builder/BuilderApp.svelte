@@ -426,9 +426,8 @@ function reset() {
   .builder__toolbar { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
   .builder__status, .builder__hint { margin: 0; color: var(--tx-muted-foreground, GrayText); font-size: .875rem; }
   .builder__actions { display: flex; flex-wrap: wrap; gap: .5rem; }
-  .builder button, .builder input, .builder textarea { font: inherit; }
-  .builder button { border: 1px solid var(--tx-border, ButtonBorder); border-radius: .45rem; padding: .45rem .7rem; color: inherit; background: var(--tx-surface, Canvas); cursor: pointer; }
-  .builder button:focus-visible, .builder input:focus-visible, .builder textarea:focus-visible { outline: 3px solid var(--tx-ring, Highlight); outline-offset: 2px; }
+  .builder button { font: inherit; border: 1px solid var(--tx-border, ButtonBorder); border-radius: .45rem; padding: .45rem .7rem; color: inherit; background: var(--tx-surface, Canvas); cursor: pointer; }
+  .builder button:focus-visible { outline: 3px solid var(--tx-ring, Highlight); outline-offset: 2px; }
   .builder button:disabled { opacity: .55; cursor: not-allowed; }
   .builder__grid { display: grid; grid-template-columns: minmax(15rem, .9fr) minmax(20rem, 1.5fr) minmax(16rem, .9fr); align-items: start; gap: 1rem; }
   .builder__pane { min-inline-size: 0; border: 1px solid var(--tx-border, ButtonBorder); border-radius: .65rem; padding: 1rem; background: var(--tx-surface, Canvas); }
