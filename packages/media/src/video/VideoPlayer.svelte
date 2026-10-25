@@ -306,11 +306,20 @@ function onPlayerKeydown(event: KeyboardEvent): void {
     >
       <button
         type="button"
-        class="tx-video-player__button"
+        class="tx-video-player__play"
         aria-label={playing ? labels.pause : labels.play}
         aria-pressed={playing}
         onclick={togglePlayback}
-      >{playing ? labels.pause : labels.play}</button>
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+          {#if playing}
+            <rect x="6" y="5" width="4" height="14" fill="currentColor" />
+            <rect x="14" y="5" width="4" height="14" fill="currentColor" />
+          {:else}
+            <path d="M8 5v14l11-7z" fill="currentColor" />
+          {/if}
+        </svg>
+      </button>
       <input
         class="tx-video-player__seek"
         type="range"
@@ -328,6 +337,7 @@ function onPlayerKeydown(event: KeyboardEvent): void {
         <span>{labels.durationSeparator}</span>
         {formatVideoTime(duration)}
       </span>
+      <div class="tx-video-player__options">
       <label class="tx-video-player__rate">
         <span>{labels.playbackRate}</span>
         <select aria-label={labels.playbackRate} value={playbackRate} onchange={setRate}>
@@ -370,6 +380,7 @@ function onPlayerKeydown(event: KeyboardEvent): void {
         disabled={!pictureInPictureSupported}
         onclick={openPictureInPicture}
       >{labels.pictureInPicture}</button>
+      </div>
     </div>
     {#if CaptionsHost && hasTextTracks}
       <CaptionsHost
@@ -444,14 +455,44 @@ function onPlayerKeydown(event: KeyboardEvent): void {
       line-height: 1.35;
       text-align: center;
     }
+    /*
+     * Transport row (play, seek, time) first; the options (speed, captions,
+     * track, picture in picture) wrap onto their own row below it.
+     */
     .tx-video-player__controls {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem 0;
+      gap: 0.5rem 0.75rem;
+      padding-block: 0.35rem;
       color: var(--tx-foreground, CanvasText);
       background: var(--tx-background, Canvas);
+    }
+    .tx-video-player__options {
+      display: flex;
+      flex: 1 0 100%;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tx-video-player__play {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+      inline-size: 2.75rem;
+      block-size: 2.75rem;
+      border: 1px solid var(--tx-border, currentColor);
+      border-radius: var(--tx-radius-full, 9999px);
+      background-color: var(--tx-primary, Highlight);
+      color: var(--tx-primary-foreground, Canvas);
+      cursor: pointer;
+    }
+    .tx-video-player__play:focus-visible {
+      outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+      outline-offset: var(--tx-focus-ring-offset, 2px);
     }
     .tx-video-player__button,
     .tx-video-player__rate select {
@@ -463,6 +504,26 @@ function onPlayerKeydown(event: KeyboardEvent): void {
       background: var(--tx-background, Canvas);
       color: CanvasText;
       font: inherit;
+      font-size: var(--tx-font-size-sm, 0.875rem);
+    }
+    /* Selects match the buttons: no native chrome, a chevron drawn with gradients. */
+    .tx-video-player__rate select {
+      appearance: none;
+      padding-inline-end: 2rem;
+      background-image:
+        linear-gradient(45deg, transparent 50%, currentColor 50%),
+        linear-gradient(135deg, currentColor 50%, transparent 50%);
+      background-position:
+        calc(100% - 1rem) 50%,
+        calc(100% - 0.7rem) 50%;
+      background-size: 0.3rem 0.3rem;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+    .tx-video-player__rate select:dir(rtl) {
+      background-position:
+        0.7rem 50%,
+        1rem 50%;
     }
     .tx-video-player__button {
       cursor: pointer;
@@ -477,10 +538,55 @@ function onPlayerKeydown(event: KeyboardEvent): void {
       outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
       outline-offset: var(--tx-focus-ring-offset, 2px);
     }
+    /* A token-styled track with a 24px hit area (the native range was 16px tall). */
     .tx-video-player__seek {
-      flex: 1 1 10rem;
-      min-inline-size: 8rem;
-      accent-color: var(--tx-primary, Highlight);
+      flex: 1 1 8rem;
+      min-inline-size: 6rem;
+      block-size: 1.5rem;
+      margin: 0;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    .tx-video-player__seek:disabled {
+      cursor: not-allowed;
+    }
+    .tx-video-player__seek::-webkit-slider-runnable-track {
+      block-size: 0.375rem;
+      border-radius: var(--tx-radius-full, 9999px);
+      background: var(--tx-muted, color-mix(in oklab, CanvasText 15%, Canvas));
+    }
+    .tx-video-player__seek::-moz-range-track {
+      block-size: 0.375rem;
+      border-radius: var(--tx-radius-full, 9999px);
+      background: var(--tx-muted, color-mix(in oklab, CanvasText 15%, Canvas));
+    }
+    .tx-video-player__seek::-moz-range-progress {
+      block-size: 0.375rem;
+      border-radius: var(--tx-radius-full, 9999px);
+      background: var(--tx-primary, Highlight);
+    }
+    .tx-video-player__seek::-webkit-slider-thumb {
+      appearance: none;
+      inline-size: 1rem;
+      block-size: 1rem;
+      margin-block-start: -0.3125rem;
+      border: 2px solid var(--tx-background, Canvas);
+      border-radius: var(--tx-radius-full, 9999px);
+      background: var(--tx-primary, Highlight);
+    }
+    .tx-video-player__seek::-moz-range-thumb {
+      inline-size: 1rem;
+      block-size: 1rem;
+      border: 2px solid var(--tx-background, Canvas);
+      border-radius: var(--tx-radius-full, 9999px);
+      background: var(--tx-primary, Highlight);
+    }
+    .tx-video-player__seek:disabled::-webkit-slider-thumb {
+      background: var(--tx-muted-foreground, GrayText);
+    }
+    .tx-video-player__seek:disabled::-moz-range-thumb {
+      background: var(--tx-muted-foreground, GrayText);
     }
     .tx-video-player__time,
     .tx-video-player__rate {
@@ -554,12 +660,54 @@ function onPlayerKeydown(event: KeyboardEvent): void {
         outline-offset: 2px;
       }
 
-      .tx-video-player__seek {
-        accent-color: Highlight;
+      /* Gradient chevrons do not survive forced colors: use the native select. */
+      .tx-video-player__rate select {
+        appearance: auto;
+        padding-inline-end: 0.75rem;
+        background-image: none;
+      }
+
+      .tx-video-player__play {
+        border-color: ButtonText;
+        background: ButtonFace;
+        color: ButtonText;
+      }
+
+      .tx-video-player__play[aria-pressed='true'] {
+        border-color: Highlight;
+        background: SelectedItem;
+        color: SelectedItemText;
+      }
+
+      .tx-video-player__play:focus-visible {
+        outline: 3px solid Highlight;
+        outline-offset: 2px;
+      }
+
+      .tx-video-player__seek::-webkit-slider-runnable-track {
         border: 1px solid ButtonText;
         background: Canvas;
-        color: CanvasText;
-        forced-color-adjust: none;
+      }
+      .tx-video-player__seek::-moz-range-track {
+        border: 1px solid ButtonText;
+        background: Canvas;
+      }
+      .tx-video-player__seek::-moz-range-progress {
+        background: Highlight;
+      }
+      .tx-video-player__seek::-webkit-slider-thumb {
+        border-color: Canvas;
+        background: Highlight;
+      }
+      .tx-video-player__seek::-moz-range-thumb {
+        border-color: Canvas;
+        background: Highlight;
+      }
+      .tx-video-player__seek:disabled::-webkit-slider-thumb {
+        background: GrayText;
+      }
+      .tx-video-player__seek:disabled::-moz-range-thumb {
+        background: GrayText;
       }
 
       .tx-video-player__time,
