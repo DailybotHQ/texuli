@@ -82,6 +82,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-color-explorer](../apps/website/docs/site-color-explorer.md) | texuli.com: Color and token explorer |
 | [site-component-pages](../apps/website/docs/site-component-pages.md) | Component pages generator |
 | [site-docs-shell](../apps/website/docs/site-docs-shell.md) | Docs shell (texuli.com) |
+| [site-editor](../apps/website/docs/site-editor.md) | texuli.com: editor area and the builder's rich text fields |
 | [site-evidence](../apps/website/docs/site-evidence.md) | texuli.com: Evidence on every component page |
 | [site-examples](../apps/website/docs/site-examples.md) | texuli.com: live examples |
 | [site-foundation](../apps/website/docs/site-foundation.md) | texuli.com: site foundation |

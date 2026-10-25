@@ -215,6 +215,8 @@ schemas.
 | --- | --- |
 | `model.ts` | Framework-free: fields per type with the parser's limits, presets, type switching, list-item edits, validation and link verdicts. Imports only `@texuli/blocks` |
 | `TextBlockEditor.svelte` | The form |
+| `MarkdownField.svelte` | One Markdown field (text, quote, callout body) edited through the rich text editor, with a Markdown source toggle |
+| `richtext.ts` | Framework-free interchange: stored Markdown into the editor model (with notes for what it could not keep) and back |
 
 | Type | Fields |
 | --- | --- |
@@ -234,6 +236,17 @@ Every type also has a **Tone** (`neutral`, `accent`, `info`, `success`,
 - **Optional fields are removed when cleared**, so the payload stays minimal.
 - **Switching type keeps the text and tone.** A heading takes the first line;
   a list takes one item per line, up to 12.
+- **Markdown fields edit as rich text.** Text, quote and callout body use
+  `RichTextEditor` from `@texuli/editor` (reached through
+  `@texuli/examples/editor` until the website declares the package). The
+  field still stores Markdown: the editor reads it at the `untrusted` tier,
+  lists what it could not keep (a refused link keeps its text only) under
+  **Editor notes**, and writes the Markdown back on each edit. A pressed
+  **Markdown source** button swaps in the plain textarea for exact text.
+  List items stay plain text fields (planned: the editor there too). The
+  toolbar's heading and numbered-list names carry their visible glyph text
+  (`Heading 1, H1`, `Numbered list, 1.`), and its undo buttons are named
+  `Undo text` and `Redo text`.
 - **Links in markdown fields show their verdict** before they paint, from the
   same parse the renderer uses: kept links show their address, and refused
   ones say they will show as plain text. At the untrusted tier, relative
@@ -606,6 +619,11 @@ inserts, outline moves and removals, inspector writes, payload commits and
   on both buttons).
 - **Text fields keep their own undo.** In the JSON textarea and in text or
   number inputs, Cmd/Ctrl+Z is the browser's text undo, never a draft move.
+  In a rich text field, Cmd/Ctrl+Z is the editor's own undo (`ownsTextUndo`
+  is true for editable content). Each text edit is one prop change with the
+  block's coalesce key, so a run of typing joins one labeled builder step;
+  the builder's **Undo** takes it back whole and the editor reloads the
+  restored Markdown with a fresh text history.
 - **Announced.** The toolbar's polite status names what came back:
   `Undid: Remove Text blocks.` or `Redid: Remove Text blocks.`
 - **Redo is cleared by a new edit**, as in the edit core.
