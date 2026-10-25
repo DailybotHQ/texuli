@@ -120,6 +120,9 @@ importers:
       '@texuli/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@texuli/editor':
+        specifier: workspace:*
+        version: link:../../packages/editor
       '@texuli/examples':
         specifier: workspace:*
         version: link:../../packages/examples

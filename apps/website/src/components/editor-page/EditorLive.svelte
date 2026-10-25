@@ -1,7 +1,7 @@
 <script lang="ts">
 import { fromMarkdown, toMarkdown } from '@texuli/core/editor-markdown';
 import type { EditorDocument } from '@texuli/core/editor-model';
-import { RichTextEditor } from '@texuli/examples/editor';
+import { RichTextEditor } from '@texuli/editor/editor';
 import { EDITOR_DEMO_MARKDOWN, SITE_EDITOR_LABELS } from './editor.ts';
 
 /**

@@ -22,6 +22,7 @@
     "@texuli/chat": "workspace:*",
     "@texuli/core": "workspace:*",
     "@texuli/examples": "workspace:*",
+    "@texuli/editor": "workspace:*",
     "@texuli/media": "workspace:*",
     "@texuli/player": "workspace:*",
     "@texuli/tokens": "workspace:*",

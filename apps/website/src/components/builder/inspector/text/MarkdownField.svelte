@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { EditorDocument } from '@texuli/core/editor-model';
-import { RichTextEditor } from '@texuli/examples/editor';
+import { RichTextEditor } from '@texuli/editor/editor';
 import { untrack } from 'svelte';
 import { SITE_EDITOR_LABELS } from '../../../editor-page/editor.ts';
 import { readRichText, writeRichText } from './richtext.ts';

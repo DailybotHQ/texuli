@@ -31,15 +31,12 @@ follows the site's light or dark mode, and it has no motion to reduce.
 
 ### Reaching the editor package
 
-The website does not declare `@texuli/editor`. Adding it would change the
-website manifest and the lockfile, which the owner holds. Until then the
-islands import `RichTextEditor` from `@texuli/examples/editor`, a one-line
-re-export of the `@texuli/editor/editor` subpath in the examples package
-(which already depends on the editor). It re-exports that subpath only, not
-the barrel, which does not lazy-load. **Reversal:** once the owner adds the
-dependency, change the two imports (`EditorLive.svelte`,
-`MarkdownField.svelte`) to `@texuli/editor/editor` and delete
-`packages/examples/src/editor/site.ts` with its `./editor` export.
+The islands import `RichTextEditor` from the `@texuli/editor/editor`
+subpath (not the barrel, which does not lazy-load), through the website's
+own `@texuli/editor` dependency. Earlier the site reached the package
+through a one-line re-export in `@texuli/examples`; that interim bridge
+was removed when the dependency landed (owner-authorized install,
+2026-10-25).
 
 ### Toolbar names
 
