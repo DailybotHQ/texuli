@@ -197,6 +197,16 @@ describe('Waveform', () => {
     expect(onSeek).toHaveBeenLastCalledWith(1);
   });
 
+  // Audit P1-14: with the default aspect ratio the peaks drew as a ~150px strip.
+  it('stretches its peaks across the full box', () => {
+    const { getByRole } = render(Waveform, {
+      props: { peaks: [0.2, 0.8, 0.4], progress: 0, onSeek: vi.fn(), label: 'Clip waveform' },
+    });
+    expect(getByRole('slider', { name: 'Clip waveform' }).getAttribute('preserveAspectRatio')).toBe(
+      'none'
+    );
+  });
+
   it('ignores keyboard seek when disabled', async () => {
     const onSeek = vi.fn();
     const { getByRole } = render(Waveform, {

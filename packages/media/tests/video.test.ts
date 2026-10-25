@@ -152,6 +152,21 @@ describe('VideoPlayer', () => {
     expect(video?.playbackRate).toBe(1.5);
   });
 
+  // Audit P1-15: the controls were bare browser controls.
+  it('renders an icon play button and groups the options below the transport', () => {
+    const { container, getByRole } = render(VideoPlayer, {
+      src: 'blob:https://app.example.test/video-id',
+      title: 'Harbor clip',
+    });
+    const play = getByRole('button', { name: 'Play video' });
+    expect(play.classList.contains('tx-video-player__play')).toBe(true);
+    expect(play.querySelector('svg[aria-hidden="true"]')).toBeTruthy();
+    expect(play.textContent?.trim()).toBe('');
+    const options = container.querySelector('.tx-video-player__options');
+    expect(options?.contains(getByRole('combobox', { name: 'Playback speed' }))).toBe(true);
+    expect(options?.contains(getByRole('slider', { name: 'Seek video' }))).toBe(false);
+  });
+
   it('reports a rejected play request instead of leaving the user without feedback', async () => {
     const { container, getByRole } = render(VideoPlayer, {
       src: 'blob:https://app.example.test/video-id',
