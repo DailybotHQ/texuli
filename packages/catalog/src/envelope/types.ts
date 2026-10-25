@@ -1,0 +1,107 @@
+import type { EditOp } from '../edit/types.ts';
+import type { CatalogTreeInput, RenderTier } from '../render/renderer/types.ts';
+
+/** The envelope format tag and the version this package writes. */
+export const ENVELOPE_FORMAT = 'texuli-blueprint';
+export const ENVELOPE_VERSION = 1;
+
+/**
+ * The envelope versions this package reads. Today that is only the version
+ * it writes; if a later version still reads version 1, the list grows and
+ * `migrateEnvelope` moves stored data up. A newer version than the last
+ * entry is refused, never guessed at.
+ */
+export const SUPPORTED_ENVELOPE_VERSIONS = [ENVELOPE_VERSION] as const;
+
+/**
+ * Lifecycle: an agent or builder writes a `draft`; validation makes it
+ * `validated`; only the host's owner flow makes it `active`; a newer active
+ * version makes it `superseded`. A status read from untrusted input is
+ * never trusted (see `validateDraft`).
+ */
+export const ENVELOPE_STATUSES = ['draft', 'validated', 'active', 'superseded'] as const;
+export type EnvelopeStatus = (typeof ENVELOPE_STATUSES)[number];
+
+/** ADR-003 capability profile. Nothing is audited portable yet. */
+export type EnvelopeProfile = 'web' | 'portable';
+
+/** Who or what produced the draft. Display data, never authority. */
+export interface EnvelopeGenerator {
+  kind: 'agent' | 'person' | 'tool';
+  name: string;
+  /** The model label, for an agent. */
+  model?: string;
+}
+
+/** A source the data came from; `href` passes the untrusted URL policy. */
+export interface EnvelopeSource {
+  label: string;
+  href?: string;
+}
+
+/** Why the draft exists (scenario 4: "calendar: 60 min before the meeting"). */
+export interface EnvelopeTrigger {
+  kind: 'request' | 'schedule' | 'calendar' | 'event';
+  label: string;
+}
+
+/** The meeting a proactive draft was prepared for. */
+export interface EnvelopeMeetingRef {
+  id: string;
+  title?: string;
+  startsAt?: string;
+}
+
+/** The owner's activation of one immutable blueprint (digest). Host-written only. */
+export interface EnvelopeActivation {
+  by: string;
+  at: string;
+  /** `blueprintDigest(tree)` at activation. */
+  digest: string;
+}
+
+/** One recorded edit step: who changed the tree, when, and with which ops. */
+export interface ProvenanceEntry {
+  at: string;
+  actor: string;
+  kind: 'apply' | 'undo' | 'redo';
+  ops: readonly EditOp[];
+}
+
+/**
+ * The versioned blueprint envelope (ADR-003, audit G13): a catalog tree with
+ * its catalog binding, lifecycle status and provenance.
+ */
+export interface BlueprintEnvelope {
+  format: typeof ENVELOPE_FORMAT;
+  version: typeof ENVELOPE_VERSION;
+  /** Stable draft id: 1–128 characters of letters, digits, `.`, `_`, `:` or `-`. */
+  id: string;
+  /** The catalog build hash (64 lowercase hex) the tree was written against. */
+  catalog: string;
+  status: EnvelopeStatus;
+  createdAt: string;
+  updatedAt: string;
+  generator: EnvelopeGenerator;
+  /** The emit tier the producer declares. The host chooses the tier it validates with. */
+  tier?: RenderTier;
+  /** Default `web`. */
+  profile?: EnvelopeProfile;
+  /** When the data was current. */
+  asOf?: string;
+  sources?: readonly EnvelopeSource[];
+  trigger?: EnvelopeTrigger;
+  meetingRef?: EnvelopeMeetingRef;
+  activatedBy?: EnvelopeActivation;
+  /** Oldest first; at most `MAX_PROVENANCE` entries are kept. */
+  provenance?: readonly ProvenanceEntry[];
+  tree: CatalogTreeInput;
+}
+
+/** A problem found in the envelope fields (the tree has its own checks). */
+export interface EnvelopeIssue {
+  code: string;
+  path: string;
+  message: string;
+  severity: 'error' | 'warning';
+}

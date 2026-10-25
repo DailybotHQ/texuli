@@ -1,0 +1,265 @@
+{
+  "$comment": "Copied from the PLAN_002 expressiveness audit fixture of the same name. Fictional data only.",
+  "fixture": "07-report-on-demand",
+  "screen": "Weekly delivery report built from data: summary, KPIs, throughput charts, blocked-work table, risks, next steps.",
+  "tier": "untrusted",
+  "tree": {
+    "id": "layout-doc",
+    "props": {
+      "title": "Delivery report, week 42",
+      "toc": true
+    },
+    "children": [
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "heading",
+            "level": 2,
+            "text": "Summary"
+          }
+        }
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "text",
+            "markdown": "The team closed **38 of 44** planned items. Two items are blocked on external reviews; neither threatens the Friday release."
+          }
+        }
+      },
+      {
+        "id": "blocks-data",
+        "props": {
+          "block": {
+            "type": "kpi",
+            "items": [
+              {
+                "label": "Items closed",
+                "value": "38",
+                "delta": "+5",
+                "tone": "success"
+              },
+              {
+                "label": "Carry-over",
+                "value": "6",
+                "delta": "-2",
+                "tone": "success"
+              },
+              {
+                "label": "Blocked",
+                "value": "2",
+                "delta": "+1",
+                "tone": "warning"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "heading",
+            "level": 2,
+            "text": "Throughput"
+          }
+        }
+      },
+      {
+        "id": "charts-stacked-bar",
+        "props": {
+          "title": "Items closed per team",
+          "description": "Features and fixes closed per team in week 42",
+          "series": [
+            {
+              "id": "features",
+              "label": "Features",
+              "points": [
+                {
+                  "x": "Boards",
+                  "y": 9
+                },
+                {
+                  "x": "Search",
+                  "y": 6
+                },
+                {
+                  "x": "Mobile",
+                  "y": 5
+                }
+              ]
+            },
+            {
+              "id": "fixes",
+              "label": "Fixes",
+              "points": [
+                {
+                  "x": "Boards",
+                  "y": 7
+                },
+                {
+                  "x": "Search",
+                  "y": 4
+                },
+                {
+                  "x": "Mobile",
+                  "y": 7
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "blocks-data",
+        "props": {
+          "block": {
+            "type": "chart",
+            "kind": "line",
+            "title": "Items closed per week",
+            "description": "Items closed per week over the last six weeks",
+            "series": [
+              {
+                "id": "closed",
+                "label": "Closed",
+                "points": [
+                  {
+                    "x": "W37",
+                    "y": 29
+                  },
+                  {
+                    "x": "W38",
+                    "y": 31
+                  },
+                  {
+                    "x": "W39",
+                    "y": 30
+                  },
+                  {
+                    "x": "W40",
+                    "y": 33
+                  },
+                  {
+                    "x": "W41",
+                    "y": 33
+                  },
+                  {
+                    "x": "W42",
+                    "y": 38
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "heading",
+            "level": 2,
+            "text": "Blocked work"
+          }
+        }
+      },
+      {
+        "id": "blocks-data",
+        "props": {
+          "block": {
+            "type": "table",
+            "caption": "Blocked items",
+            "columns": [
+              {
+                "id": "ticket",
+                "label": "Ticket"
+              },
+              {
+                "id": "team",
+                "label": "Team"
+              },
+              {
+                "id": "waiting",
+                "label": "Waiting on"
+              },
+              {
+                "id": "days",
+                "label": "Days blocked"
+              }
+            ],
+            "rows": [
+              {
+                "ticket": "HB-4102",
+                "team": "Search",
+                "waiting": "Payments sandbox",
+                "days": 3
+              },
+              {
+                "ticket": "HB-4127",
+                "team": "Mobile",
+                "waiting": "Design review",
+                "days": 2
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "callout",
+            "tone": "warning",
+            "title": "Risk",
+            "body": "If design review slips past Wednesday, mobile check-ins move to week 44."
+          }
+        }
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "heading",
+            "level": 2,
+            "text": "Next week"
+          }
+        }
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "list",
+            "items": [
+              {
+                "text": "Ship mobile check-ins beta"
+              },
+              {
+                "text": "Close the payments sandbox dependency"
+              },
+              {
+                "text": "Start board permissions"
+              }
+            ],
+            "ordered": true
+          }
+        }
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "text",
+            "markdown": "Source data: [week 42 board export](https://example.com/reports/w42.csv)."
+          }
+        }
+      }
+    ]
+  },
+  "frame": {
+    "label": "Weekly delivery report (draft by agent)",
+    "source": "audit-fixture-07"
+  }
+}

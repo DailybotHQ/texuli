@@ -1,0 +1,88 @@
+---
+/**
+ * Compact live demos: real Card + Badge surfaces (same pattern as /foundation/).
+ */
+import { Badge } from 'texuli/badge';
+import { Button } from 'texuli/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardGrid,
+  CardHeader,
+  CardTitle,
+} from 'texuli/card';
+
+const demos = [
+  {
+    title: 'Actions',
+    status: 'Button',
+    body: 'Outline and ghost actions keep focus rings and loading states from owned primitives.',
+  },
+  {
+    title: 'Status',
+    status: 'Badge',
+    body: 'Badges mark release state and catalog tiers without custom HTML.',
+  },
+  {
+    title: 'Surfaces',
+    status: 'Card',
+    body: 'Cards group related content with header, body and footer slots on theme tokens.',
+  },
+] as const;
+---
+
+<section class="demos" aria-labelledby="demos-title">
+  <header>
+    <h2 id="demos-title">Live demos</h2>
+    <p>These are the same components your app imports—rendered at build time on this page.</p>
+  </header>
+
+  <CardGrid minItemWidth="16rem">
+    {
+      demos.map((demo) => (
+        <Card variant="flat">
+          <CardHeader>
+            <CardTitle level={3}>{demo.title}</CardTitle>
+            <CardDescription>
+              <Badge variant="secondary">{demo.status}</Badge>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>{demo.body}</p>
+          </CardContent>
+          <CardFooter>
+            <Button size="sm" variant="outline">
+              Explore
+            </Button>
+          </CardFooter>
+        </Card>
+      ))
+    }
+  </CardGrid>
+</section>
+
+<style>
+  .demos {
+    display: grid;
+    gap: 1.25rem;
+    margin-block: 2.5rem 1rem;
+  }
+  .demos header h2 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    color: var(--tx-foreground);
+  }
+  .demos header p {
+    margin: 0;
+    max-inline-size: 40rem;
+    color: var(--tx-foreground);
+  }
+  .demos :global(.tx-card__title),
+  .demos :global(.tx-card__content) p,
+  .demos :global([data-tx-button]),
+  .demos p {
+    margin: 0;
+  }
+</style>

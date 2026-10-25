@@ -1,0 +1,72 @@
+---
+/**
+ * Site footer: agent surfaces, changelog, MIT line for Dailybot, Inc.
+ */
+import { withBase } from './site.ts';
+
+const base = import.meta.env.BASE_URL;
+const links = [
+  { href: '/llms.txt', label: 'llms.txt' },
+  { href: '/skill/', label: 'Agent skill' },
+  { href: '/changelog/', label: 'Changelog' },
+  { href: '/guides/', label: 'Guides' },
+] as const;
+---
+
+<footer class="site-footer" data-tx-site-footer="">
+  <div class="site-footer__inner">
+    <nav aria-label="Footer">
+      <ul>
+        {
+          links.map((link) => (
+            <li>
+              <a href={withBase(base, link.href)}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <p>Texuli is MIT licensed, by Dailybot, Inc. In development, not released yet.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: 1.75rem;
+    padding-inline: 1rem;
+    border-block-start: 1px solid var(--tx-border);
+    color: var(--tx-muted-foreground);
+    font-size: 0.875rem;
+  }
+  .site-footer__inner {
+    display: grid;
+    gap: 0.75rem;
+    max-inline-size: 72rem;
+    margin-inline: auto;
+  }
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  a {
+    color: var(--tx-link);
+    text-decoration: none;
+    min-block-size: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  p {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,33 @@
+---
+/**
+ * Isolated example document for iframes and “Open the live example” links.
+ * Bare layout (no docs shell). noindex — not in the sitemap.
+ * mode/dir/embed are applied from the URL at runtime (see ExamplePreviewLayout
+ * and ExamplePreviewMount) because static builds cannot bake search params.
+ */
+import {
+  buildExampleCatalog,
+  getExampleCatalogItem,
+} from '../../../components/examples/catalog.ts';
+import ExamplePreviewMount from '../../../components/examples/ExamplePreviewMount.svelte';
+import ExamplePreviewLayout from '../../../layouts/ExamplePreviewLayout.astro';
+
+export function getStaticPaths() {
+  return buildExampleCatalog().map((item) => ({
+    params: { id: item.id },
+  }));
+}
+
+const id = Astro.params.id ?? '';
+const item = getExampleCatalogItem(id);
+if (!item) {
+  return new Response('Unknown example', {
+    status: 404,
+    headers: { 'content-type': 'text/plain' },
+  });
+}
+---
+
+<ExamplePreviewLayout title={item.title} description={item.description}>
+  <ExamplePreviewMount client:load id={item.id} />
+</ExamplePreviewLayout>

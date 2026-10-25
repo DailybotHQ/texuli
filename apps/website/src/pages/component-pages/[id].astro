@@ -1,0 +1,45 @@
+---
+/**
+ * /component-pages/<id>/ — one page per catalog manifest id (static paths).
+ */
+import ComponentPageBody from '../../components/component-pages/ComponentPageBody.astro';
+import {
+  COMPONENT_PAGES,
+  getComponentPage,
+} from '../../components/component-pages/load-manifests.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return COMPONENT_PAGES.map((entry) => ({
+    params: { id: entry.id },
+  }));
+}
+
+const { id } = Astro.params;
+if (!id) throw new Error('Missing component id');
+const entry = getComponentPage(id);
+if (!entry) throw new Error(`Unknown component page id: ${id}`);
+---
+
+<BaseLayout
+  title={entry.label}
+  description={`${entry.summary} Catalog id ${entry.id}.`}
+>
+  <p class="crumb">
+    <a href="/component-pages/">Components</a>
+    <span aria-hidden="true"> / </span>
+    <span>{entry.label}</span>
+  </p>
+  <ComponentPageBody entry={entry} />
+</BaseLayout>
+
+<style>
+  .crumb {
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    color: var(--tx-muted-foreground);
+  }
+  .crumb a {
+    color: inherit;
+  }
+</style>

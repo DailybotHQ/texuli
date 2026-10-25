@@ -1,0 +1,85 @@
+---
+/**
+ * /charts-page/ — every @texuli/charts family with contracts and live demos.
+ */
+import ChartFamilyFrame from '../../components/charts-page/ChartFamilyFrame.astro';
+import FamilyDemo from '../../components/charts-page/FamilyDemo.svelte';
+import { CHART_FAMILIES } from '../../components/charts-page/families.ts';
+import PageBanner from '../../components/landing/PageBanner.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Charts gallery"
+  description="Every Texuli chart family with interactive examples and data contracts. Static site, no runtime network."
+>
+  <div class="charts-page" data-tx-charts-page="">
+    <header class="charts-page__header">
+      <p class="eyebrow">@texuli/charts</p>
+      <PageBanner slot="page-charts" />
+  <h1>Charts gallery</h1>
+      <p class="lead">
+        Interactive examples for every chart family, each with its data contract. Fictional Harbor
+        Notes metrics only. Theme tokens drive light and dark; nothing leaves this origin.
+      </p>
+    </header>
+
+    <nav class="toc" aria-label="Chart families">
+      <ul>
+        {
+          CHART_FAMILIES.map((family) => (
+            <li>
+              <a href={`#family-${family.id}`}>{family.title}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    {
+      CHART_FAMILIES.map((family) => (
+        <ChartFamilyFrame family={family}>
+          <FamilyDemo id={family.id} client:visible />
+        </ChartFamilyFrame>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .charts-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+  .eyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0.5rem 0 0;
+    max-inline-size: 44rem;
+    color: var(--tx-foreground);
+    font-size: 1.0625rem;
+  }
+  .toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .toc a {
+    color: var(--tx-link, LinkText);
+  }
+</style>

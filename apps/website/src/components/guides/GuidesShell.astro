@@ -1,0 +1,125 @@
+---
+/**
+ * Guides page body (T-site-ia): the article header and content inside the
+ * site's docs shell, which supplies the sidebar (the guides are the "Get
+ * started" group), "On this page", the pager and "Copy page".
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { TocEntry } from './nav.ts';
+
+interface Props {
+  title: string;
+  description: string;
+  /**
+   * The page's sections. "On this page" reads the headings themselves; this
+   * list stays for pages that pass it.
+   */
+  toc?: readonly TocEntry[];
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="guides-article" data-tx-guides-shell="" data-tx-guides-article="">
+    <header class="guides-article__header">
+      <p class="guides-article__eyebrow">Guides</p>
+      <h1>{title}</h1>
+      <p class="guides-article__lead">{description}</p>
+    </header>
+    <div class="guides-article__body">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .guides-article__header {
+    margin-block-end: 1.25rem;
+  }
+  .guides-article__eyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  .guides-article h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    line-height: 1.2;
+    color: var(--tx-foreground);
+  }
+  .guides-article__lead {
+    margin: 0.5rem 0 0;
+    color: var(--tx-foreground);
+    font-size: 1.0625rem;
+  }
+  .guides-article__body :global(h2) {
+    margin-block: 1.75rem 0.5rem;
+    font-size: 1.25rem;
+    color: var(--tx-foreground);
+  }
+  .guides-article__body :global(h3) {
+    margin-block: 1.25rem 0.35rem;
+    font-size: 1.05rem;
+    color: var(--tx-foreground);
+  }
+  .guides-article__body :global(p),
+  .guides-article__body :global(li) {
+    color: var(--tx-foreground);
+  }
+  .guides-article__body :global(ul) {
+    padding-inline-start: 1.25rem;
+  }
+  .guides-article__body :global(pre) {
+    margin: 0.75rem 0 1.25rem;
+    padding: 0.85rem 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-muted, var(--tx-surface));
+    color: var(--tx-foreground);
+    font-family: var(--tx-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+  .guides-article__body :global(code) {
+    font-family: var(--tx-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 0.9em;
+    /* Long paths and identifiers must break instead of pushing the page wide. */
+    overflow-wrap: anywhere;
+  }
+  .guides-article__body :global(pre code) {
+    font-size: inherit;
+  }
+  .guides-article__body :global(.guide-live) {
+    scroll-margin-block: calc(var(--site-header-height) + 1rem);
+    display: grid;
+    gap: 0.75rem;
+    margin-block: 1rem 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, var(--tx-background));
+    color: var(--tx-foreground);
+    min-inline-size: 0;
+  }
+  .guides-article__body :global(.guide-live__label) {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  @media (forced-colors: active) {
+    .guides-article__body :global(pre),
+    .guides-article__body :global(.guide-live) {
+      border-color: ButtonText;
+      background: Canvas;
+      color: CanvasText;
+      forced-color-adjust: none;
+    }
+  }
+</style>

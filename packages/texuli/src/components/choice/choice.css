@@ -1,0 +1,356 @@
+/**
+ * Checkbox, Radio and Switch — styled choice controls on the token contract.
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  .tx-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-choice--switch {
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .tx-choice__hit {
+    display: flex;
+    align-items: center;
+    block-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .tx-choice__copy {
+    display: grid;
+    gap: 0.125rem;
+  }
+
+  .tx-choice--switch .tx-choice__copy {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .tx-choice__label {
+    margin: 0;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-weight: var(--tx-font-weight-medium, 500);
+    line-height: 1.25rem;
+    color: var(--tx-foreground, CanvasText);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .tx-choice__description {
+    margin: 0;
+    font-size: var(--tx-font-size-xs, 0.75rem);
+    line-height: 1.25;
+    color: var(--tx-muted-foreground, #575757);
+  }
+
+  /* Shared control chrome (checkbox / radio) */
+  .tx-choice-control {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--tx-border, currentColor);
+    border-radius: var(--tx-radius-sm, 0.25rem);
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-primary-foreground, Canvas);
+    cursor: pointer;
+    outline: none;
+    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 8%, transparent));
+    transition:
+      background-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease),
+      border-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
+  }
+
+  /* Invisible hit area: 44px touch, tighter on sm+ */
+  .tx-choice-control::before {
+    content: "";
+    position: absolute;
+    inset: -0.875rem;
+  }
+
+  @media (min-width: 40rem) {
+    .tx-choice-control::before {
+      inset: -0.25rem;
+    }
+  }
+
+  .tx-choice-control--sm {
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+  }
+
+  .tx-choice-control--md {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+
+  .tx-choice-control:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-choice-control[data-state="checked"],
+  .tx-choice-control[data-state="indeterminate"] {
+    border-color: var(--tx-primary, Highlight);
+    background-color: var(--tx-primary, Highlight);
+  }
+
+  .tx-choice-control[data-disabled],
+  .tx-choice-control:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .tx-choice-control[aria-invalid="true"] {
+    border-color: var(--tx-destructive, crimson);
+  }
+
+  .tx-choice-control__icon {
+    display: block;
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+    pointer-events: none;
+  }
+
+  .tx-choice-control--sm .tx-choice-control__icon {
+    inline-size: 0.625rem;
+    block-size: 0.625rem;
+  }
+
+  /* Radio is round */
+  .tx-choice-control--radio {
+    border-radius: var(--tx-radius-full, 9999px);
+  }
+
+  .tx-choice-control--radio[data-state="checked"] {
+    background-color: var(--tx-surface, Canvas);
+  }
+
+  .tx-choice-control__dot {
+    display: block;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: var(--tx-radius-full, 9999px);
+    background-color: var(--tx-primary, Highlight);
+  }
+
+  .tx-choice-control--sm .tx-choice-control__dot {
+    inline-size: 0.375rem;
+    block-size: 0.375rem;
+  }
+
+  /* Switch */
+  .tx-switch-control {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--tx-radius-full, 9999px);
+    background-color: var(--tx-input, var(--tx-muted, Canvas));
+    cursor: pointer;
+    outline: none;
+    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 8%, transparent));
+    transition: background-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
+  }
+
+  .tx-switch-control::before {
+    content: "";
+    position: absolute;
+    inset-inline: -0.25rem;
+    inset-block: -0.75rem;
+  }
+
+  @media (min-width: 40rem) {
+    .tx-switch-control::before {
+      inset-block: -0.25rem;
+    }
+  }
+
+  .tx-switch-control--sm {
+    inline-size: 1.75rem;
+    block-size: 1rem;
+  }
+
+  .tx-switch-control--md {
+    inline-size: 2.25rem;
+    block-size: 1.25rem;
+  }
+
+  .tx-switch-control:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-switch-control[data-state="checked"] {
+    background-color: var(--tx-primary, Highlight);
+  }
+
+  .tx-switch-control[data-disabled],
+  .tx-switch-control:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .tx-switch-thumb {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 0.125rem;
+    display: block;
+    border-radius: var(--tx-radius-full, 9999px);
+    background-color: var(--tx-surface, Canvas);
+    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 12%, transparent));
+    transform: translateY(-50%);
+    transition:
+      inset-inline-start var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease),
+      transform var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
+    pointer-events: none;
+  }
+
+  .tx-switch-control--sm .tx-switch-thumb {
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+  }
+
+  .tx-switch-control--md .tx-switch-thumb {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+
+  .tx-switch-control--sm[data-state="checked"] .tx-switch-thumb {
+    inset-inline-start: calc(100% - 0.875rem);
+  }
+
+  .tx-switch-control--md[data-state="checked"] .tx-switch-thumb {
+    inset-inline-start: calc(100% - 1.125rem);
+  }
+
+  /* Radio group */
+  .tx-radio-group {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .tx-radio-group--horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .tx-radio-group--card.tx-radio-group--vertical {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .tx-radio-group--card.tx-radio-group--horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .tx-radio-card {
+    position: relative;
+    display: flex;
+    inline-size: 100%;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-block: 0.875rem;
+    padding-inline: 0.875rem;
+    border: 1px solid var(--tx-border, currentColor);
+    border-radius: var(--tx-radius-xl, 0.75rem);
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    text-align: start;
+    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 8%, transparent));
+    cursor: pointer;
+    transition:
+      border-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease),
+      background-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
+  }
+
+  .tx-radio-group--horizontal .tx-radio-card {
+    min-inline-size: 12rem;
+    flex: 1;
+  }
+
+  .tx-radio-card:hover {
+    background-color: color-mix(in srgb, var(--tx-muted, Canvas) 60%, transparent);
+  }
+
+  .tx-radio-card:has([data-state="checked"]) {
+    border-color: var(--tx-primary, Highlight);
+    background-color: color-mix(in srgb, var(--tx-primary, Highlight) 8%, transparent);
+  }
+
+  .tx-radio-card:has(:focus-visible) {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-radio-card:has([data-disabled]),
+  .tx-radio-card:has(:disabled) {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .tx-radio-card__control {
+    margin-block-start: 0.125rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tx-choice-control,
+    .tx-switch-control,
+    .tx-switch-thumb,
+    .tx-radio-card {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tx-choice-control,
+    .tx-switch-control,
+    .tx-radio-card {
+      border: 1px solid ButtonText;
+    }
+
+    .tx-choice-control[data-state="checked"],
+    .tx-choice-control[data-state="indeterminate"],
+    .tx-switch-control[data-state="checked"] {
+      background-color: Highlight;
+      border-color: Highlight;
+      forced-color-adjust: none;
+    }
+
+    .tx-choice-control__dot {
+      background-color: Highlight;
+      forced-color-adjust: none;
+    }
+
+    .tx-switch-thumb {
+      background-color: Canvas;
+      forced-color-adjust: none;
+    }
+
+    .tx-radio-card:has([data-state="checked"]) {
+      border-color: Highlight;
+    }
+  }
+
+  /* Root shell when Checkbox/Switch has no visible field label (bind:ref target). */
+  .tx-choice__solo {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+  }
+}

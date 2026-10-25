@@ -1,0 +1,63 @@
+---
+/**
+ * /gallery-components/preview/?id=<catalog id> — the isolated preview
+ * document the gallery and component pages embed. One live stage, full page,
+ * with its own theme mode, direction, landmarks and overlays. No site chrome,
+ * out of search and the sitemap.
+ */
+import '../../styles/site-layers.css';
+import '@texuli/tokens/base.css';
+import { compileThemeCss } from '@texuli/tokens';
+import { loadLibraryTheme } from '@texuli/tokens/library';
+import { SITE_NAME, SITE_THEME } from '../../components/foundation/site.ts';
+import PreviewApp from '../../components/gallery-components/PreviewApp.svelte';
+import SeoHead from '../../components/seo/SeoHead.astro';
+
+const title = `Component preview · ${SITE_NAME}`;
+const description = 'An isolated live preview of one Texuli component.';
+const themeCss = compileThemeCss(await loadLibraryTheme(SITE_THEME));
+// Fixed script: applies ?mode= and ?dir= before first paint (only the two
+// allowed values of each; nothing from the URL is written as markup).
+const bootstrap = `(() => {
+  const query = new URLSearchParams(location.search);
+  const root = document.documentElement;
+  const mode = query.get('mode') === 'dark' ? 'dark' : 'light';
+  root.dataset.txMode = mode;
+  root.style.colorScheme = mode;
+  if (query.get('dir') === 'rtl') root.dir = 'rtl';
+})();`;
+---
+
+<!doctype html>
+<html lang="en" dir="ltr" data-tx-theme={SITE_THEME} data-tx-mode="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style is:inline>
+      @layer site-base, tx.base, tx.components, site-overrides;
+    </style>
+    <script is:inline set:html={bootstrap} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <SeoHead {title} {description} siteName={SITE_NAME} lang="en" noindex />
+    <style is:inline set:html={themeCss}></style>
+  </head>
+  <body>
+    <PreviewApp client:load />
+  </body>
+</html>
+
+<style is:global>
+  @layer site-base {
+    body {
+      margin: 0;
+      background: var(--tx-background);
+      color: var(--tx-foreground);
+      font-family: var(--tx-font-sans, ui-sans-serif, system-ui, sans-serif);
+      line-height: 1.5;
+    }
+    a {
+      color: var(--tx-link);
+    }
+  }
+</style>

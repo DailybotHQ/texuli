@@ -1,0 +1,7 @@
+export function run(el: HTMLElement, data: string): unknown {
+  el.innerHTML = data;
+  el.outerHTML += data;
+  el.insertAdjacentHTML('beforeend', data);
+  const value = eval(data);
+  return new Function('a', data) ?? value;
+}

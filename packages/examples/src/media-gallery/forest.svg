@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" width="800" height="1200" role="img">
+  <title>Fictional pine forest climbing a misty hillside</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9e4de"/>
+      <stop offset="1" stop-color="#7fb7a9"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1200" fill="url(#sky)"/>
+  <path d="M0 760 L120 520 L240 760Z M160 820 L320 470 L480 820Z M420 780 L560 540 L700 780Z M560 860 L700 600 L800 760 V860Z" fill="#2f6b55"/>
+  <path d="M0 900 L140 640 L280 900Z M240 980 L400 660 L560 980Z M500 940 L660 700 L800 900 V940Z" fill="#1d4b3b"/>
+  <rect y="940" width="800" height="260" fill="#163a2e"/>
+</svg>

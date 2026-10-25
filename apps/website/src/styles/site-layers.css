@@ -1,0 +1,169 @@
+/**
+ * texuli.com cascade layer contract (FIX-landing-a11y-layers).
+ *
+ * Declare the full order once, first, so later `@layer tx.base` / `tx.components`
+ * from `@texuli/tokens/base.css` and component CSS join this order:
+ *
+ *   site-base < tx.base < tx.components < site-overrides
+ *
+ * Note: CSS treats dotted names as *nested* layers (`site.base` is a child of
+ * `site`). Host layers that must wrap Texuli use hyphens so they stay
+ * top-level and can sit both before and after `tx.*`.
+ *
+ * Put element defaults and resets in `site-base` (before Texuli). Put site
+ * component/layout classes in `site-overrides` when they must beat Texuli.
+ * Never leave global `a { color }` unlayered — unlayered rules beat every layer.
+ */
+/* Order is also inlined first in BaseLayout <head>; keep this for non-layout entry. */
+@layer site-base, tx.base, tx.components, site-overrides;
+
+@layer site-base {
+  /*
+   * The slim header is sticky on every width: focused controls and in-page
+   * anchors scroll clear of it (WCAG 2.4.11 Focus Not Obscured).
+   */
+  html {
+    --site-header-height: 56px;
+    scroll-padding-top: calc(var(--site-header-height) + 0.75rem);
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 100dvh;
+    margin: 0;
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    font-family: var(--tx-font-sans, ui-sans-serif, system-ui, sans-serif);
+    line-height: 1.6;
+  }
+
+  main {
+    min-inline-size: 0;
+  }
+
+  /* Type scale and rhythm, at zero specificity so page styles still win. */
+  main :where(h1) {
+    margin-block: 0 0.5rem;
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  main :where(h1 + p) {
+    margin-block: 0 1.75rem;
+    color: var(--tx-muted-foreground);
+    font-size: 1.125rem;
+  }
+
+  main :where(h2) {
+    margin-block: 2.5rem 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+
+  main :where(h3) {
+    margin-block: 1.75rem 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  main :where(p, ul, ol) {
+    margin-block: 0 1rem;
+  }
+
+  main :where(hr) {
+    border: 0;
+    border-block-start: 1px solid var(--tx-border);
+  }
+
+  main :is(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])) {
+    scroll-margin-top: calc(var(--site-header-height) + 0.75rem);
+  }
+
+  main:focus {
+    outline: none;
+  }
+
+  /* Layered so Texuli button/link variants (tx.components) keep their token ink. */
+  a {
+    color: var(--tx-link);
+  }
+}
+
+@layer site-overrides {
+  /* The landing (`BaseLayout` with `landing`): a full-width main. */
+  .landing-main {
+    flex: 1 0 auto;
+  }
+
+  /* The docs shell: the sidebar column and the content column (T-site-ia). */
+  .site-shell {
+    display: block;
+    flex: 1 0 auto;
+  }
+
+  @media (min-width: 64rem) {
+    .site-shell {
+      display: grid;
+      grid-template-columns: 17rem minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .site-column {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    min-block-size: calc(100dvh - var(--site-header-height));
+  }
+
+  .site-content {
+    flex: 1 0 auto;
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(1.5rem, 5vw, 3rem) clamp(2rem, 6vw, 4rem);
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
+  }
+
+  /* Docs pages: a reading width, and "On this page" beside it on wide screens. */
+  .site-content[data-layout="docs"] {
+    max-inline-size: 60rem;
+  }
+
+  @media (min-width: 80rem) {
+    .site-content[data-layout="docs"] {
+      display: grid;
+      grid-template-columns: minmax(0, 46rem) 14rem;
+      justify-content: center;
+      align-items: start;
+      gap: 3rem;
+      max-inline-size: 70rem;
+    }
+  }
+
+  .site-content[data-layout="docs"] main {
+    max-inline-size: 46rem;
+  }
+
+  .skip-link {
+    position: absolute;
+    inset-inline-start: 0.5rem;
+    inset-block-start: -10rem;
+    z-index: 50;
+    padding: 0.5rem 0.75rem;
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    border: 2px solid var(--tx-ring);
+  }
+
+  .skip-link:focus {
+    inset-block-start: 0.5rem;
+  }
+}

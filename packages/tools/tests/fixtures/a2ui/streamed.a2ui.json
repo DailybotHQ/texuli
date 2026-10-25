@@ -1,0 +1,39 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": { "surfaceId": "s1", "catalogId": "catalog-example.json" }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "s1",
+      "components": [
+        { "id": "root", "component": "card", "children": ["body", "footer"] },
+        { "id": "body", "component": "text", "text": "Loading…" }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "other",
+      "components": [{ "id": "root", "component": "text", "text": "Another surface" }]
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": { "surfaceId": "s1", "path": "/user", "value": { "name": "Ada" } }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "s1",
+      "components": [
+        { "id": "body", "component": "text", "text": "Ready." },
+        { "id": "footer", "component": "button", "child": "label" },
+        { "id": "label", "component": "text", "text": "Open" },
+        { "id": "draft", "component": "text", "text": "Never placed" }
+      ]
+    }
+  }
+]

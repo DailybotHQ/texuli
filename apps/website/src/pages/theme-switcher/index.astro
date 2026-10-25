@@ -1,0 +1,37 @@
+---
+import { SITE_THEME } from '../../components/foundation/site.ts';
+import {
+  buildHighContrastModeCss,
+  buildThemeCatalog,
+  themeCssVariableNames,
+} from '../../components/theme-switcher/library.ts';
+import ThemeSwitcher from '../../components/theme-switcher/ThemeSwitcher.svelte';
+/**
+ * /theme-switcher/: pick any library theme and light / dark / high-contrast /
+ * system mode for the whole site. Each theme's CSS is a same-origin file loaded
+ * when the theme is chosen (T-site-perf); never another origin. The choice is cached for the no-flash
+ * bootstrap on every other page.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const catalog = await buildThemeCatalog();
+// The HTML carries the first themes and the site default; the island fetches
+// /theme-catalog.json for the rest (FIX-site-perf-routes).
+const INITIAL_THEMES = 24;
+const initial = catalog.slice(0, INITIAL_THEMES);
+const siteDefault = catalog.find((entry) => entry.id === SITE_THEME);
+if (siteDefault && !initial.includes(siteDefault)) initial.push(siteDefault);
+// Dark swatches come from /theme-catalog-dark.json, fetched only while the
+// site is dark: the server renders light swatches either way.
+const initialRows = initial.map(({ swatchesDark: _dark, ...row }) => row);
+const highContrastCss = buildHighContrastModeCss();
+const varNames = themeCssVariableNames();
+---
+
+<BaseLayout
+  title="Theme switcher"
+  description="Pick any Texuli library theme and light, dark, high-contrast or system mode. Persisted site-wide with no flash."
+>
+  <style is:inline set:html={highContrastCss}></style>
+  <ThemeSwitcher client:load themes={initialRows} total={catalog.length} {varNames} />
+</BaseLayout>

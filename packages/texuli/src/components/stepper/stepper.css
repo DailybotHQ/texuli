@@ -1,0 +1,286 @@
+/**
+ * Stepper and Wizard — @layer tx.components so consumer utilities can override.
+ * Logical properties only; token colors for AA pairs on step markers.
+ */
+@layer tx.components {
+  .tx-stepper {
+    display: block;
+  }
+
+  .tx-stepper__list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .tx-stepper--horizontal .tx-stepper__list {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.5rem;
+    overflow-x: auto;
+  }
+
+  .tx-stepper--vertical .tx-stepper__list {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .tx-stepper__item {
+    position: relative;
+    display: flex;
+    min-inline-size: 0;
+  }
+
+  .tx-stepper--horizontal .tx-stepper__item {
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tx-stepper--vertical .tx-stepper__item {
+    gap: 0.75rem;
+    padding-block-end: 1.5rem;
+  }
+
+  .tx-stepper--vertical .tx-stepper__item:last-child {
+    padding-block-end: 0;
+  }
+
+  .tx-stepper__connector {
+    position: absolute;
+    background-color: var(--tx-border, currentColor);
+    pointer-events: none;
+  }
+
+  .tx-stepper--horizontal .tx-stepper__connector {
+    inset-block-start: 1rem;
+    inset-inline-start: 2.5rem;
+    inset-inline-end: 0.25rem;
+    block-size: 1px;
+  }
+
+  .tx-stepper--vertical .tx-stepper__connector {
+    inset-block-start: 2rem;
+    inset-block-end: 0.25rem;
+    inset-inline-start: 0.9375rem;
+    inline-size: 1px;
+  }
+
+  .tx-stepper__connector[data-complete="true"] {
+    background-color: var(--tx-primary, Highlight);
+  }
+
+  .tx-stepper__trigger,
+  .tx-stepper__body {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+  }
+
+  .tx-stepper__trigger {
+    cursor: pointer;
+    border-radius: var(--tx-radius-md, 0.375rem);
+  }
+
+  .tx-stepper__trigger:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-stepper--horizontal .tx-stepper__trigger,
+  .tx-stepper--horizontal .tx-stepper__body {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .tx-stepper--horizontal .tx-stepper__trigger,
+    .tx-stepper--horizontal .tx-stepper__body {
+      flex-direction: row;
+      gap: 0.75rem;
+    }
+  }
+
+  .tx-stepper__marker {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: var(--tx-radius-full, 9999px);
+    border: 1px solid var(--tx-border, currentColor);
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: var(--tx-font-size-xs, 0.75rem);
+    font-weight: var(--tx-font-weight-semibold, 600);
+    font-variant-numeric: tabular-nums;
+    transition:
+      background-color var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease),
+      border-color var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease),
+      color var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease),
+      box-shadow var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease);
+  }
+
+  .tx-stepper__marker[data-state="complete"] {
+    border-color: var(--tx-primary, Highlight);
+    background-color: var(--tx-primary, Highlight);
+    color: var(--tx-primary-foreground, HighlightText);
+  }
+
+  .tx-stepper__marker[data-state="current"] {
+    border-color: var(--tx-primary, Highlight);
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-primary, Highlight);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--tx-primary, Highlight) 15%, transparent);
+  }
+
+  .tx-stepper__check {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+
+  .tx-stepper__text {
+    display: grid;
+    min-inline-size: 0;
+    gap: 0.125rem;
+  }
+
+  .tx-stepper--horizontal .tx-stepper__text {
+    /* Compact viewports: keep labels for AT only; show from sm. */
+  }
+
+  @media (max-width: 39.99rem) {
+    .tx-stepper--horizontal .tx-stepper__text {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+  }
+
+  .tx-stepper--vertical .tx-stepper__text {
+    padding-block-start: 0.375rem;
+  }
+
+  .tx-stepper__label {
+    margin: 0;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-weight: var(--tx-font-weight-medium, 500);
+    color: var(--tx-muted-foreground, GrayText);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tx-stepper__label[data-active="true"] {
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-stepper__description {
+    margin: 0;
+    font-size: var(--tx-font-size-xs, 0.75rem);
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-stepper__sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Wizard shell */
+  .tx-wizard {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .tx-wizard__panel {
+    outline: none;
+  }
+
+  .tx-wizard__error {
+    margin: 0;
+    border-radius: var(--tx-radius-md, 0.375rem);
+    border: 1px solid color-mix(in srgb, var(--tx-destructive, crimson) 40%, transparent);
+    background-color: color-mix(in srgb, var(--tx-destructive, crimson) 10%, transparent);
+    color: var(--tx-foreground, CanvasText);
+    padding-block: 0.5rem;
+    padding-inline: 0.75rem;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+  }
+
+  .tx-wizard__footer {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+    border-block-start: 1px solid var(--tx-border, currentColor);
+    padding-block-start: 1rem;
+  }
+
+  @media (min-width: 40rem) {
+    .tx-wizard__footer {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  .tx-wizard__secondary {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .tx-wizard__actions {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .tx-wizard__actions {
+      flex-direction: row;
+    }
+  }
+
+  .tx-wizard__chevron {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+
+  @media (forced-colors: active) {
+    .tx-stepper__marker {
+      border: 1px solid ButtonText;
+      forced-color-adjust: none;
+    }
+    .tx-stepper__marker[data-state="complete"],
+    .tx-stepper__marker[data-state="current"] {
+      border-color: Highlight;
+    }
+    .tx-stepper__connector[data-complete="true"] {
+      background-color: Highlight;
+    }
+  }
+}

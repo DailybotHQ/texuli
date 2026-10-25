@@ -1,0 +1,145 @@
+/**
+ * EmptyState and ErrorState — feedback surfaces on the token contract.
+ */
+@layer tx.components {
+  .tx-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-empty--md {
+    gap: 0.75rem;
+    padding-inline: 1.5rem;
+    padding-block: 3.5rem;
+  }
+
+  .tx-empty--sm {
+    gap: 0.5rem;
+    padding-inline: 1rem;
+    padding-block: 2rem;
+  }
+
+  .tx-empty__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--tx-radius-full, 9999px);
+    background-color: var(--tx-muted, Canvas);
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-empty--md .tx-empty__icon {
+    inline-size: 3rem;
+    block-size: 3rem;
+  }
+
+  .tx-empty--sm .tx-empty__icon {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+
+  .tx-empty__icon svg {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+  }
+
+  .tx-empty--sm .tx-empty__icon svg {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+  }
+
+  .tx-empty__copy {
+    display: grid;
+    gap: 0.25rem;
+    max-inline-size: 24rem;
+  }
+
+  .tx-empty__title {
+    margin: 0;
+    font-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
+    font-size: var(--tx-font-size-base, 1rem);
+    font-weight: var(--tx-font-weight-heading, 600);
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-empty__description {
+    margin: 0;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-empty__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+  }
+
+  .tx-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding-inline: 1.5rem;
+    padding-block: 3rem;
+    text-align: center;
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-error__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 3rem;
+    block-size: 3rem;
+    border-radius: var(--tx-radius-full, 9999px);
+    background-color: color-mix(in srgb, var(--tx-destructive, crimson) 12%, transparent);
+    color: var(--tx-destructive, crimson);
+  }
+
+  .tx-error__icon svg {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+  }
+
+  .tx-error__copy {
+    display: grid;
+    gap: 0.25rem;
+    max-inline-size: 24rem;
+  }
+
+  .tx-error__title {
+    margin: 0;
+    font-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
+    font-size: var(--tx-font-size-base, 1rem);
+    font-weight: var(--tx-font-weight-heading, 600);
+  }
+
+  .tx-error__message {
+    margin: 0;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-error__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+  }
+
+  @media (forced-colors: active) {
+    .tx-empty__icon,
+    .tx-error__icon {
+      border: 1px solid ButtonText;
+      forced-color-adjust: none;
+    }
+  }
+}

@@ -1,0 +1,118 @@
+---
+/**
+ * An anatomy diagram: the parts of a primitive as nested boxes, each box a
+ * part that contains the parts inside it. It is a nested list, so screen
+ * readers announce the same structure ("list, 3 items, level 2").
+ * The live demo marks the box of the part in use with `data-hot`.
+ */
+import { type AnatomyNode, type PrimitiveDoc, partLabel } from './primitives.ts';
+
+interface Props {
+  doc: PrimitiveDoc;
+  nodes?: readonly AnatomyNode[];
+  depth?: number;
+}
+
+const { doc, nodes = doc.anatomy, depth = 0 } = Astro.props;
+const Self = Astro.self;
+---
+
+{
+  depth === 0 ? (
+    <figure class="anatomy" data-anatomy={doc.id}>
+      <figcaption>{doc.name} anatomy: each box holds the parts inside it.</figcaption>
+      <ul class="anatomy__list" role="list">
+        {nodes.map((node) => (
+          <li class="anatomy__part" data-depth={depth} data-part={node.part}>
+            <span class="anatomy__label">
+              <code>{partLabel(doc, node.part)}</code>
+              {node.note && <span class="anatomy__note">{node.note}</span>}
+            </span>
+            {node.children && <Self doc={doc} nodes={node.children} depth={depth + 1} />}
+          </li>
+        ))}
+      </ul>
+    </figure>
+  ) : (
+    <ul class="anatomy__list" role="list">
+      {nodes.map((node) => (
+        <li class="anatomy__part" data-depth={depth} data-part={node.part}>
+          <span class="anatomy__label">
+            <code>{partLabel(doc, node.part)}</code>
+            {node.note && <span class="anatomy__note">{node.note}</span>}
+          </span>
+          {node.children && <Self doc={doc} nodes={node.children} depth={depth + 1} />}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .anatomy {
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  figcaption {
+    font-size: 0.875rem;
+    color: var(--tx-muted-foreground);
+  }
+  .anatomy__list {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .anatomy__part {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem 0.625rem;
+    border: 1px solid var(--tx-border-strong, var(--tx-border));
+    border-radius: 0.5rem;
+    background: var(--tx-surface, Canvas);
+    min-inline-size: 0;
+  }
+  /* Nested parts alternate surfaces so the containment reads at a glance. */
+  .anatomy__part .anatomy__part {
+    background: var(--tx-muted, Canvas);
+  }
+  .anatomy__part .anatomy__part .anatomy__part {
+    background: var(--tx-surface, Canvas);
+  }
+  .anatomy__label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.5rem;
+  }
+  .anatomy__label code {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .anatomy__note {
+    font-size: 0.8125rem;
+    color: var(--tx-muted-foreground);
+  }
+  /* The live demo highlights the box of the part being hovered or focused. */
+  .anatomy__part[data-hot] {
+    border-color: var(--tx-ring, Highlight);
+    box-shadow: 0 0 0 2px var(--tx-ring, Highlight);
+  }
+  .anatomy__part[data-hot] > .anatomy__label code {
+    color: var(--tx-primary, LinkText);
+  }
+  @media (forced-colors: active) {
+    .anatomy__part {
+      border-color: CanvasText;
+    }
+    .anatomy__part[data-hot] {
+      border-color: Highlight;
+      outline: 2px solid Highlight;
+    }
+    .anatomy__part[data-hot] > .anatomy__label code {
+      color: CanvasText;
+    }
+  }
+</style>

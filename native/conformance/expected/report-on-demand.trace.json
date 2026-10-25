@@ -1,0 +1,72 @@
+{
+  "golden": "report-on-demand",
+  "trace": [
+    {
+      "children": [
+        {
+          "id": "blocks-text",
+          "level": 2,
+          "name": "Summary",
+          "role": "heading"
+        },
+        {
+          "id": "blocks-text",
+          "role": "paragraph"
+        },
+        {
+          "id": "blocks-data",
+          "role": "group"
+        },
+        {
+          "id": "blocks-text",
+          "level": 2,
+          "name": "Throughput",
+          "role": "heading"
+        },
+        {
+          "id": "charts-stacked-bar",
+          "name": "Items closed per team",
+          "role": "figure"
+        },
+        {
+          "id": "blocks-data",
+          "name": "Items closed per week",
+          "role": "figure"
+        },
+        {
+          "id": "blocks-text",
+          "level": 2,
+          "name": "Blocked work",
+          "role": "heading"
+        },
+        {
+          "id": "blocks-data",
+          "name": "Blocked items",
+          "role": "table"
+        },
+        {
+          "id": "blocks-text",
+          "name": "Risk",
+          "role": "note"
+        },
+        {
+          "id": "blocks-text",
+          "level": 2,
+          "name": "Next week",
+          "role": "heading"
+        },
+        {
+          "id": "blocks-text",
+          "role": "list"
+        },
+        {
+          "id": "blocks-text",
+          "role": "paragraph"
+        }
+      ],
+      "id": "layout-doc",
+      "name": "Delivery report, week 42",
+      "role": "main"
+    }
+  ]
+}

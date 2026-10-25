@@ -1,0 +1,39 @@
+{
+  "name": "@texuli/core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Texels: framework-free behavior and policy that every Texuli component is built from.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./announcer": "./src/announcer/index.ts",
+    "./controllable": "./src/controllable/controllable-state.ts",
+    "./dir-locale": "./src/dir-locale/dir-locale.ts",
+    "./dismiss": "./src/dismiss/index.ts",
+    "./env": "./src/env/index.ts",
+    "./focus-scope": "./src/focus-scope/index.ts",
+    "./form-bridge": "./src/form-bridge/form-bridge.ts",
+    "./ids": "./src/ids/ids.ts",
+    "./inert": "./src/inert/index.ts",
+    "./keyboard": "./src/keyboard/index.ts",
+    "./layer-stack": "./src/layer-stack/index.ts",
+    "./lazy": "./src/lazy/index.ts",
+    "./overlay": "./src/overlay/index.ts",
+    "./overlay-core": "./src/overlay/core-entry.ts",
+    "./portal": "./src/portal/index.ts",
+    "./position-dom": "./src/position-dom/index.ts",
+    "./position-math": "./src/position-math/index.ts",
+    "./presence": "./src/presence/presence.ts",
+    "./roving": "./src/roving/index.ts",
+    "./scroll-lock": "./src/scroll-lock/scroll-lock.ts",
+    "./tabbable": "./src/tabbable/index.ts",
+    "./url-policy": "./src/url-policy/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

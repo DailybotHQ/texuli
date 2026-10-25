@@ -1,0 +1,189 @@
+---
+/**
+ * The slim sticky header, for global utilities only.
+ *
+ * - `docs` (every docs page): the menu button below 64rem (it opens the
+ *   sidebar as a drawer whose code loads on first press), the Texuli logo,
+ *   site search (an input-like trigger with the Cmd/Ctrl+K hint) and the
+ *   light/dark/system switch. Page links live in the sidebar.
+ * - `landing` (the home): the logo, a Docs link, search, the switch and a
+ *   Get started button (hidden on phones, where the hero's own call to action
+ *   sits right below).
+ */
+import { Button } from 'texuli/button';
+import BrandLogo from '../brand/BrandLogo.astro';
+import SiteSearch from '../search/SiteSearch.svelte';
+import { DOCS_HOME, GET_STARTED, SITE_NAME, withBase } from './site.ts';
+import ThemeSwitch from './ThemeSwitch.svelte';
+
+interface Props {
+  variant?: 'docs' | 'landing';
+}
+
+const { variant = 'docs' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<header class="site-header" data-tx-site-header="" data-variant={variant}>
+  {
+    variant === 'docs' && (
+      <button type="button" class="menu" aria-haspopup="dialog" aria-expanded="false" data-site-menu="">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <span class="menu__label">Menu</span>
+      </button>
+    )
+  }
+  <a class="brand" href={withBase(base, '/')} aria-label={`${SITE_NAME} home`}>
+    <BrandLogo height={24} />
+  </a>
+  {
+    variant === 'landing' && (
+      <a class="docs-link" href={withBase(base, DOCS_HOME)}>
+        Docs
+      </a>
+    )
+  }
+  <div class="tools">
+    <SiteSearch client:load base={base} compact />
+    <ThemeSwitch client:load />
+    {
+      variant === 'landing' && (
+        <Button href={withBase(base, GET_STARTED)} size="sm" class="get-started">
+          Get started
+        </Button>
+      )
+    }
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-sizing: border-box;
+    block-size: var(--site-header-height);
+    padding-inline: 1rem;
+    border-block-end: 1px solid var(--tx-border);
+    background: color-mix(in srgb, var(--tx-background) 92%, transparent);
+    backdrop-filter: blur(8px);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--tx-radius, 0.375rem);
+  }
+  .docs-link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.5rem;
+    padding-inline: 0.5rem;
+    border-radius: var(--tx-radius, 0.375rem);
+    color: var(--tx-foreground);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .docs-link:hover {
+    background: color-mix(in srgb, var(--tx-foreground) 6%, transparent);
+  }
+  @media (max-width: 40rem) {
+    .tools :global(.get-started) {
+      display: none;
+    }
+  }
+  .tools {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-inline-start: auto;
+    min-inline-size: 0;
+  }
+  .tools :global([data-tx-command-trigger]) {
+    min-inline-size: min(16rem, 40vw);
+  }
+  .menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-block-size: 2.5rem;
+    min-inline-size: 2.5rem;
+    padding-inline: 0.5rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.375rem);
+    background: transparent;
+    color: var(--tx-foreground);
+    font: inherit;
+    cursor: pointer;
+  }
+  .menu svg {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .menu__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .menu[aria-busy='true'] {
+    cursor: progress;
+  }
+  @media (min-width: 64rem) {
+    .menu {
+      display: none;
+    }
+  }
+  /* Narrow phones: the search trigger keeps its Cmd/Ctrl+K hint but shrinks. */
+  @media (max-width: 30rem) {
+    .tools :global([data-tx-command-trigger]) {
+      min-inline-size: 0;
+    }
+    .brand :global(.brand-logo) {
+      block-size: 20px;
+    }
+  }
+  .brand:focus-visible,
+  .docs-link:focus-visible,
+  .menu:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    .site-header {
+      background: Canvas;
+    }
+  }
+</style>
+
+<script>
+  // Phones: loads the drawer on the first press only (a lazy chunk), then reuses it.
+  import type { SiteDrawerHandle } from './site-drawer.ts';
+
+  const button = document.querySelector<HTMLButtonElement>('[data-site-menu]');
+  let drawer: Promise<SiteDrawerHandle> | undefined;
+  button?.addEventListener('click', async () => {
+    if (!drawer) {
+      button.setAttribute('aria-busy', 'true');
+      drawer = import('./site-drawer.ts').then(({ createSiteDrawer }) => createSiteDrawer(button));
+      drawer.catch(() => {
+        drawer = undefined;
+      });
+    }
+    try {
+      (await drawer).show();
+    } finally {
+      button.removeAttribute('aria-busy');
+    }
+  });
+</script>

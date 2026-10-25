@@ -1,0 +1,137 @@
+---
+/**
+ * "On this page" (80rem and up): built from the page's h2 and h3 headings by
+ * a small module script, with scroll-spy marking the section in view
+ * (IntersectionObserver). No island; nothing runs on narrower screens.
+ */
+---
+
+<nav class="page-toc" aria-labelledby="page-toc-title" data-page-toc="" hidden>
+  <p class="page-toc__title" id="page-toc-title">On this page</p>
+  <ul class="page-toc__list" data-page-toc-list=""></ul>
+</nav>
+
+<style>
+  .page-toc {
+    display: none;
+  }
+  @media (min-width: 80rem) {
+    .page-toc:not([hidden]) {
+      position: sticky;
+      inset-block-start: calc(var(--site-header-height) + 1.5rem);
+      display: block;
+      max-block-size: calc(100dvh - var(--site-header-height) - 3rem);
+      overflow-y: auto;
+      padding-inline-start: 1rem;
+      border-inline-start: 1px solid var(--tx-border);
+      font-size: 0.875rem;
+      /* Opaque so sticky TOC text never samples a light live-demo stage behind it. */
+      background: var(--tx-background, Canvas);
+      padding-block: 0.25rem;
+      padding-inline-end: 0.5rem;
+    }
+  }
+  .page-toc__title {
+    margin: 0 0 0.5rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .page-toc__list {
+    display: grid;
+    gap: 0.125rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .page-toc__list :global(a) {
+    display: block;
+    padding-block: 0.25rem;
+    /* The marker sits on the rail; the text lines up with the title. */
+    padding-inline-start: calc(1rem - 1px);
+    border-inline-start: 2px solid transparent;
+    margin-inline-start: calc(-1rem - 1px);
+    /* Foreground keeps ≥4.5:1 in light and dark (muted can fail on dark canvas). */
+    color: var(--tx-foreground);
+    text-decoration: none;
+  }
+  .page-toc__list :global(li[data-level='3'] a) {
+    padding-inline-start: calc(1.75rem - 1px);
+  }
+  .page-toc__list :global(a:hover) {
+    color: var(--tx-foreground);
+  }
+  .page-toc__list :global(a[aria-current]) {
+    border-inline-start-color: var(--tx-primary);
+    color: var(--tx-foreground);
+    font-weight: 600;
+  }
+  .page-toc__list :global(a:focus-visible) {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    .page-toc__list :global(a[aria-current]) {
+      border-inline-start-color: Highlight;
+    }
+  }
+</style>
+
+<script>
+  const toc = document.querySelector<HTMLElement>('[data-page-toc]');
+  const list = toc?.querySelector<HTMLUListElement>('[data-page-toc-list]');
+  const wide = matchMedia('(min-width: 80rem)');
+  let built = false;
+
+  const slug = (text: string) =>
+    text.toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '') || 'section';
+
+  function build(): void {
+    if (built || !toc || !list || !wide.matches) return;
+    built = true;
+    const headings = [...document.querySelectorAll<HTMLElement>('main h2, main h3')].filter(
+      (heading) => heading.textContent?.trim() && !heading.closest('[hidden], [aria-hidden="true"], dialog')
+    );
+    if (headings.length < 2) return;
+    const used = new Set<string>();
+    const links = new Map<Element, HTMLAnchorElement>();
+    for (const heading of headings) {
+      if (!heading.id) {
+        let id = slug(heading.textContent ?? '');
+        for (let n = 2; used.has(id) || document.getElementById(id); n += 1) id = `${slug(heading.textContent ?? '')}-${n}`;
+        heading.id = id;
+      }
+      used.add(heading.id);
+      const item = document.createElement('li');
+      item.dataset.level = heading.tagName === 'H3' ? '3' : '2';
+      const link = document.createElement('a');
+      link.href = `#${heading.id}`;
+      link.textContent = heading.textContent?.trim() ?? '';
+      item.append(link);
+      list.append(item);
+      links.set(heading, link);
+    }
+    toc.hidden = false;
+    // Scroll-spy: the last heading that crossed the top band is the current section.
+    const visible = new Set<Element>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target);
+          else visible.delete(entry.target);
+        }
+        const current = headings.find((heading) => visible.has(heading));
+        if (!current) return;
+        for (const link of links.values()) link.removeAttribute('aria-current');
+        links.get(current)?.setAttribute('aria-current', 'true');
+      },
+      { rootMargin: '-64px 0px -66% 0px' }
+    );
+    for (const heading of headings) observer.observe(heading);
+  }
+
+  build();
+  wide.addEventListener('change', build);
+</script>

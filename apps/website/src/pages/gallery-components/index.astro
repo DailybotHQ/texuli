@@ -1,0 +1,28 @@
+---
+/**
+ * /gallery-components/ — every catalog component, live. Each card embeds the
+ * real component in an isolated preview (`/gallery-components/preview/`)
+ * that loads when the card scrolls near. Filterable by category and tag.
+ * Static after build; no runtime network.
+ */
+import ComponentGallery from '../../components/gallery-components/ComponentGallery.svelte';
+import {
+  buildGalleryComponentCards,
+  galleryAllTags,
+  galleryCategories,
+} from '../../components/gallery-components/index.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const cards = buildGalleryComponentCards();
+// The island needs no example list: previews start from `initial`.
+const islandCards = cards.map(({ examples: _examples, ...card }) => ({ ...card, examples: [] }));
+const categories = galleryCategories(cards);
+const tags = galleryAllTags(cards);
+---
+
+<BaseLayout
+  title="Component gallery"
+  description="Every Texuli catalog component, live: real previews you can switch to dark or right to left, props you can edit and code you can copy."
+>
+  <ComponentGallery client:load cards={islandCards} {categories} {tags} />
+</BaseLayout>

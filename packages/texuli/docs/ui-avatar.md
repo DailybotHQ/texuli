@@ -1,0 +1,77 @@
+# Avatar and AvatarGroup
+
+**Package:** `texuli` · **Import:** `texuli/avatar`
+
+Styled avatars on the token contract, built on `@texuli/primitives/avatar`.
+Fallback initials, optional presence status, and stacked groups. Image URLs go
+through the primitive’s `safeImageSrc` policy.
+
+## Avatar
+
+```svelte
+<script lang="ts">
+  import { Avatar } from 'texuli/avatar';
+</script>
+
+<Avatar name="Ada Example" size="md" status="online" />
+<Avatar name="Bea Harbor" src="https://cdn.example/bea.webp" size="lg" />
+```
+
+| Prop | Default | Notes |
+| --- | --- | --- |
+| `name` | required | Initials, tone slot, default accessible name |
+| `src` | — | Optional image; unsafe schemes keep initials |
+| `srcTrust` | `untrusted` | URL policy trust |
+| `size` | `md` | `xs` \| `sm` \| `md` \| `lg` |
+| `status` | — | `online` \| `away` \| `busy` \| `offline` |
+| `decorative` | `false` | Hides the control from assistive tech |
+| `delayMs` | `0` | Primitive delay before revealing a loaded image |
+| `initials` | computed | Override the two-letter fallback |
+
+The root uses `role="img"` with an accessible name (`Name` or `Name, Online`).
+Decorative avatars set `aria-hidden` and omit the name (pair them with visible
+text). Status is a small corner dot; forced-colors maps it to system colors.
+
+**Initials contrast.** Initials are always `--tx-foreground` on `--tx-muted`.
+The token engine's AA gate guarantees that pair at 4.5:1 or better, and a unit
+test checks it in all 210 library themes, light and dark. The seeded tone
+(`data-tone`, from the name) is only a decorative inset ring in a chart color
+(`--tx-avatar-tone`), so it tells people apart without carrying the text
+contrast. Forced colors use `CanvasText` on `Canvas` and drop the ring.
+
+## AvatarGroup
+
+```svelte
+<script lang="ts">
+  import { AvatarGroup } from 'texuli/avatar';
+</script>
+
+<AvatarGroup
+  label="Harbor team"
+  max={3}
+  size="sm"
+  items={[
+    { name: 'Ada Example', status: 'online' },
+    { name: 'Bea Harbor' },
+    { name: 'Cal Orbit' },
+    { name: 'Dee Quill' },
+  ]}
+/>
+```
+
+| Prop | Default | Notes |
+| --- | --- | --- |
+| `items` | required | `{ name, src?, status?, decorative? }[]` |
+| `max` | all | Faces before a `+N` overflow chip |
+| `size` | `md` | Applied to every face |
+| `label` | — | `aria-label` on the group |
+| `overflowLabel` | `+{n}` | `{n}` → hidden count |
+
+Stacked faces use negative `margin-inline-start` and a ring from
+`--tx-background`. When `label` is set, faces default to `decorative` so the
+group owns the accessible name.
+
+## Examples
+
+Registered as `ui-avatar`, `ui-avatar-variants`, `ui-avatar-states`,
+`ui-avatar-rtl`, `ui-avatar-dark`.

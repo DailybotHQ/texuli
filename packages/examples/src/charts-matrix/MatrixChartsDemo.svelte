@@ -1,0 +1,97 @@
+<script lang="ts">
+import {
+  BubbleChart,
+  type HeatmapCell,
+  HeatmapChart,
+  ScatterChart,
+  type ScatterPoint,
+} from '@texuli/charts/matrix';
+
+const heatCells: HeatmapCell[] = [
+  { x: 'Mon', y: 'Design', value: 2 },
+  { x: 'Tue', y: 'Design', value: 5 },
+  { x: 'Wed', y: 'Design', value: 3 },
+  { x: 'Mon', y: 'Build', value: 4 },
+  { x: 'Tue', y: 'Build', value: 7 },
+  { x: 'Wed', y: 'Build', value: 6 },
+  { x: 'Mon', y: 'Review', value: 1 },
+  { x: 'Tue', y: 'Review', value: 2 },
+  { x: 'Wed', y: 'Review', value: 8 },
+];
+
+const scatter: ScatterPoint[] = [
+  { id: 's1', label: 'North desk', x: 12, y: 40, seriesId: 'on-site' },
+  { id: 's2', label: 'East desk', x: 28, y: 22, seriesId: 'on-site' },
+  { id: 's3', label: 'Remote A', x: 18, y: 55, seriesId: 'remote' },
+  { id: 's4', label: 'Remote B', x: 35, y: 48, seriesId: 'remote' },
+  { id: 's5', label: 'Lab', x: 8, y: 18, seriesId: 'on-site' },
+];
+
+const bubbles: ScatterPoint[] = [
+  { id: 'b1', label: 'Alpha', x: 10, y: 30, r: 4, seriesId: 'core' },
+  { id: 'b2', label: 'Beta', x: 25, y: 45, r: 9, seriesId: 'core' },
+  { id: 'b3', label: 'Gamma', x: 40, y: 20, r: 6, seriesId: 'edge' },
+  { id: 'b4', label: 'Delta', x: 32, y: 55, r: 12, seriesId: 'edge' },
+];
+</script>
+
+<div class="gallery" data-example="charts-matrix">
+  <HeatmapChart
+    title="Squad effort by day"
+    description="Relative story points completed by squad and weekday. Fictional planning data."
+    cells={heatCells}
+  />
+  <HeatmapChart
+    title="Squad effort (dark)"
+    description="Same heatmap on the dark token palette."
+    cells={heatCells}
+    mode="dark"
+  />
+  <ScatterChart
+    title="Latency versus throughput"
+    description="Sample desks plotted by requests per minute and p95 latency."
+    points={scatter}
+    series={[
+      { id: 'on-site', label: 'On-site' },
+      { id: 'remote', label: 'Remote' },
+    ]}
+  />
+  <ScatterChart
+    title="Latency versus throughput (dark)"
+    description="Scatter plot with dark chart tokens."
+    points={scatter}
+    series={[
+      { id: 'on-site', label: 'On-site' },
+      { id: 'remote', label: 'Remote' },
+    ]}
+    mode="dark"
+  />
+  <BubbleChart
+    title="Service footprint"
+    description="Services by error rate (x), traffic (y) and instance count (size)."
+    points={bubbles}
+    series={[
+      { id: 'core', label: 'Core' },
+      { id: 'edge', label: 'Edge' },
+    ]}
+  />
+  <BubbleChart
+    title="Service footprint (dark)"
+    description="Bubble chart on the dark token palette."
+    points={bubbles}
+    series={[
+      { id: 'core', label: 'Core' },
+      { id: 'edge', label: 'Edge' },
+    ]}
+    mode="dark"
+  />
+</div>
+
+<style>
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 28rem), 1fr));
+    gap: 2rem;
+    padding: 1rem;
+  }
+</style>

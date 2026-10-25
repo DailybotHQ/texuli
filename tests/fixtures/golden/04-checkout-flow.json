@@ -1,0 +1,289 @@
+{
+  "$comment": "PLAN_002 expressiveness-audit fixture. The wrapper is audit metadata only; it is NOT a proposed blueprint envelope (ADR-003 owns that). `tree` is a real CatalogTreeInput for the catalog build named in `catalog`. Probes are fragments expected to fail; each names the gap it evidences. Fictional data only.",
+  "fixture": "04-checkout-flow",
+  "catalog": "catalog-f4553b4eaced02c163f6606e53eb4dab1277345aa5247cbb57ceaac2c116c703.json",
+  "screen": "Checkout step 2 of 3: progress stepper, shipping form, billing-same-as-shipping toggle, order summary with total, continue action.",
+  "northStar": null,
+  "tier": "developer",
+  "capabilityTier": "unknown (ADR-003); payment entry must stay host-owned on every target",
+  "result": "single-step-snapshot-only",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Checkout",
+      "description": "Step 2 of 3: shipping"
+    },
+    "children": [
+      {
+        "id": "stepper",
+        "props": {
+          "steps": [
+            {
+              "id": "cart",
+              "label": "Cart"
+            },
+            {
+              "id": "ship",
+              "label": "Shipping"
+            },
+            {
+              "id": "pay",
+              "label": "Payment"
+            }
+          ],
+          "current": 1,
+          "completed": ["cart"],
+          "label": "Checkout progress"
+        }
+      },
+      {
+        "id": "callout",
+        "props": {
+          "tone": "info",
+          "title": "Free shipping",
+          "text": "Orders over $50 ship free."
+        }
+      },
+      {
+        "id": "layout-grid",
+        "props": {
+          "columns": 2
+        },
+        "children": [
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Shipping address"
+            },
+            "children": [
+              {
+                "id": "form",
+                "props": {
+                  "layout": "stack"
+                },
+                "children": [
+                  {
+                    "id": "field",
+                    "props": {
+                      "label": "Full name",
+                      "required": true
+                    },
+                    "children": [
+                      {
+                        "id": "input",
+                        "props": {
+                          "type": "text",
+                          "value": "Rae Example"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field",
+                    "props": {
+                      "label": "Street address",
+                      "required": true
+                    },
+                    "children": [
+                      {
+                        "id": "input",
+                        "props": {
+                          "type": "text",
+                          "value": "1 Harbor Way"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field",
+                    "props": {
+                      "label": "City",
+                      "required": true
+                    },
+                    "children": [
+                      {
+                        "id": "input",
+                        "props": {
+                          "type": "text",
+                          "value": "Example City"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "checkbox",
+                    "props": {
+                      "label": "Billing address is the same as shipping",
+                      "checked": true
+                    }
+                  },
+                  {
+                    "id": "button",
+                    "props": {
+                      "type": "submit",
+                      "variant": "default"
+                    },
+                    "children": [
+                      {
+                        "id": "blocks-text",
+                        "props": {
+                          "block": {
+                            "type": "text",
+                            "markdown": "Continue to payment"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Order summary"
+            },
+            "children": [
+              {
+                "id": "blocks-data",
+                "props": {
+                  "block": {
+                    "type": "table",
+                    "caption": "Items in your order",
+                    "columns": [
+                      {
+                        "id": "item",
+                        "label": "Item"
+                      },
+                      {
+                        "id": "qty",
+                        "label": "Qty"
+                      },
+                      {
+                        "id": "price",
+                        "label": "Price"
+                      }
+                    ],
+                    "rows": [
+                      {
+                        "item": "Harborline sticker pack",
+                        "qty": 2,
+                        "price": "$12.00"
+                      },
+                      {
+                        "item": "Team plan, 1 month, 5 seats",
+                        "qty": 1,
+                        "price": "$40.00"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "id": "blocks-data",
+                "props": {
+                  "block": {
+                    "type": "stat",
+                    "items": [
+                      {
+                        "label": "Total",
+                        "value": "$52.00",
+                        "hint": "Includes free shipping"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "probes": [
+    {
+      "gap": "G09",
+      "intent": "Express all three steps as a wizard whose step content comes from the tree",
+      "tree": {
+        "id": "layout-wizard",
+        "props": {
+          "steps": [
+            {
+              "id": "cart",
+              "label": "Cart"
+            }
+          ],
+          "current": 1,
+          "content": "shipping"
+        }
+      },
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G07",
+      "intent": "Show the billing card only when the checkbox is cleared",
+      "tree": {
+        "id": "layout-card",
+        "props": {
+          "title": "Billing address",
+          "when": "!sameAsShipping"
+        }
+      },
+      "tier": "untrusted",
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G05",
+      "intent": "Compute the total with a schema-valid `calculator` block (closed formula AST): it parses, but no catalog id renders the interactive family",
+      "tree": {
+        "id": "blocks-data",
+        "props": {
+          "block": {
+            "type": "calculator",
+            "title": "Total",
+            "inputs": [
+              {
+                "name": "subtotal",
+                "label": "Subtotal",
+                "default": 52
+              }
+            ],
+            "formula": {
+              "op": "var",
+              "name": "subtotal"
+            }
+          }
+        }
+      },
+      "expect": ["family-mismatch"]
+    },
+    {
+      "gap": "G18",
+      "intent": "Card-number entry declared in the tree",
+      "tree": {
+        "id": "input",
+        "props": {
+          "type": "text",
+          "autocomplete": "cc-number"
+        }
+      },
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G06",
+      "intent": "Checkout emitted by an untrusted agent",
+      "tier": "untrusted",
+      "tree": {
+        "id": "stepper",
+        "props": {
+          "steps": [],
+          "current": 0
+        }
+      },
+      "expect": ["tier-denied"]
+    }
+  ],
+  "gaps": ["G01", "G02", "G03", "G05", "G06", "G07", "G08", "G09", "G17", "G18"],
+  "notes": "One step renders as a static snapshot at the developer tier. The flow itself (step transitions, conditional billing region, computed totals, validation, a host-owned payment region) has no construct. The total is a literal string."
+}

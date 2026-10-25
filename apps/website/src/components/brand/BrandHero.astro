@@ -1,0 +1,56 @@
+---
+/**
+ * Home hero: tagline and short positioning.
+ */
+import { Button } from 'texuli/button';
+import { withBase } from '../foundation/site.ts';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <p class="hero__eyebrow">In development · not released yet</p>
+  <h1 id="hero-title">Texuli</h1>
+  <p class="hero__lead">Small pieces. Infinite possibilities.</p>
+  <p class="hero__body">
+    A Svelte 5 component library built from small units it owns end to end. People and agents
+    compose the same pieces into apps, dashboards, documents, slides, charts and media—with no
+    borrowed primitives and no HTML sinks.
+  </p>
+  <div class="hero__actions">
+    <Button href={withBase(base, '/foundation/')} variant="outline">See the foundation</Button>
+    <Button href={withBase(base, '/brand/')} variant="outline">Brand story</Button>
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    gap: 0.75rem;
+    max-inline-size: 42rem;
+    color: var(--tx-foreground);
+  }
+  .hero__eyebrow {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    line-height: 1.1;
+  }
+  .hero__lead {
+    margin: 0;
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+  }
+  .hero__body {
+    margin: 0;
+    max-inline-size: 38rem;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 0.5rem;
+  }
+</style>

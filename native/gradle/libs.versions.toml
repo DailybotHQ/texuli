@@ -1,0 +1,13 @@
+# Proposed toolchain pins (spec/Compose design open decision 5). Nothing is
+# published; the developer ratifies these before release.
+[versions]
+kotlin = "2.3.20"
+compose = "1.10.3"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+[plugins]
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

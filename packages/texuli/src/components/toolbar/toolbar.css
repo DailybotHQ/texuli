@@ -1,0 +1,176 @@
+/**
+ * Toolbar shell, buttons, groups and separators.
+ * @layer tx.components — consumer CSS wins. Logical properties only.
+ */
+@layer tx.components {
+  .tx-toolbar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: var(--tx-radius, 0.5rem);
+    color: var(--tx-foreground, CanvasText);
+    font-family: inherit;
+  }
+
+  .tx-toolbar--horizontal {
+    flex-direction: row;
+    /* A long toolbar wraps inside its container instead of widening the page. */
+    flex-wrap: wrap;
+    max-inline-size: 100%;
+  }
+
+  .tx-toolbar--vertical {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tx-toolbar--default {
+    background-color: var(--tx-muted, color-mix(in srgb, CanvasText 6%, Canvas));
+  }
+
+  .tx-toolbar--outline {
+    border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
+    background-color: var(--tx-surface, Canvas);
+  }
+
+  .tx-toolbar--ghost {
+    background-color: transparent;
+    padding-inline: 0;
+  }
+
+  .tx-toolbar--sm {
+    gap: 0.125rem;
+    padding: 0.15rem;
+  }
+
+  .tx-toolbar__button,
+  .tx-toolbar__link,
+  .tx-toolbar__group-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    margin: 0;
+    border: 0;
+    border-radius: calc(var(--tx-radius, 0.5rem) - 0.1rem);
+    background: transparent;
+    color: var(--tx-muted-foreground, GrayText);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition-property: color, background-color, box-shadow;
+    transition-duration: var(--tx-motion-base, 200ms);
+    transition-timing-function: var(--tx-motion-easing, ease);
+  }
+
+  .tx-toolbar__button--sm {
+    min-block-size: 1.75rem;
+    min-inline-size: 1.75rem;
+    padding-block: 0.2rem;
+    padding-inline: 0.4rem;
+    font-size: 0.8125rem;
+  }
+
+  .tx-toolbar__button--md {
+    min-block-size: 2rem;
+    min-inline-size: 2rem;
+    padding-block: 0.3rem;
+    padding-inline: 0.55rem;
+  }
+
+  .tx-toolbar__button:hover:not([aria-disabled="true"]):not([data-disabled]),
+  .tx-toolbar__link:hover:not([aria-disabled="true"]),
+  .tx-toolbar__group-item:hover:not([aria-disabled="true"]):not([data-disabled]) {
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-toolbar__button:focus-visible,
+  .tx-toolbar__link:focus-visible,
+  .tx-toolbar__group-item:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-toolbar__group-item[data-state="on"],
+  .tx-toolbar__button[data-state="on"] {
+    background-color: var(--tx-accent, var(--tx-primary, Highlight));
+    color: var(--tx-accent-foreground, var(--tx-primary-foreground, CanvasText));
+  }
+
+  .tx-toolbar__button[aria-disabled="true"],
+  .tx-toolbar__link[aria-disabled="true"],
+  .tx-toolbar__group-item[aria-disabled="true"],
+  .tx-toolbar__button[data-disabled],
+  .tx-toolbar__group-item[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .tx-toolbar__button :where(svg),
+  .tx-toolbar__link :where(svg),
+  .tx-toolbar__group-item :where(svg) {
+    inline-size: 1rem;
+    block-size: 1rem;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  .tx-toolbar__group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+    padding: 0.1rem;
+    border-radius: calc(var(--tx-radius, 0.5rem) - 0.05rem);
+    background-color: color-mix(in srgb, var(--tx-surface, Canvas) 70%, transparent);
+  }
+
+  .tx-toolbar--outline .tx-toolbar__group {
+    border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
+    background: transparent;
+  }
+
+  .tx-toolbar--vertical .tx-toolbar__group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tx-toolbar__separator {
+    flex-shrink: 0;
+    align-self: stretch;
+    background-color: var(--tx-border, ButtonBorder);
+  }
+
+  .tx-toolbar--horizontal .tx-toolbar__separator,
+  .tx-toolbar__separator[data-orientation="vertical"] {
+    inline-size: 1px;
+    min-block-size: 1.25rem;
+    margin-inline: 0.2rem;
+  }
+
+  .tx-toolbar--vertical .tx-toolbar__separator,
+  .tx-toolbar__separator[data-orientation="horizontal"] {
+    block-size: 1px;
+    min-inline-size: 1.25rem;
+    margin-block: 0.2rem;
+  }
+
+  @media (forced-colors: active) {
+    .tx-toolbar {
+      border: 1px solid ButtonText;
+      forced-color-adjust: none;
+    }
+    .tx-toolbar__group-item[data-state="on"] {
+      background: Highlight;
+      color: HighlightText;
+    }
+    .tx-toolbar__separator {
+      background: ButtonText;
+    }
+  }
+}

@@ -1,0 +1,264 @@
+/**
+ * Captions, chapters and transcript — token-styled media chrome.
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  .tx-captions {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--tx-border, currentColor);
+    border-radius: var(--tx-radius-lg, 0.5rem);
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    max-inline-size: 36rem;
+  }
+
+  .tx-captions[data-status="blocked"],
+  .tx-captions[data-status="error"] {
+    border-color: var(--tx-destructive, crimson);
+  }
+
+  .tx-captions__active {
+    margin: 0;
+    min-block-size: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--tx-radius-md, 0.375rem);
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    border: 1px solid var(--tx-border, ButtonBorder);
+    font-size: var(--tx-text-sm, 0.875rem);
+    line-height: 1.4;
+  }
+
+  .tx-captions__active:empty {
+    display: none;
+  }
+
+  .tx-captions__message {
+    margin: 0;
+    font-size: var(--tx-text-sm, 0.875rem);
+    color: CanvasText;
+  }
+
+  .tx-captions-chapters {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .tx-captions-chapters__title {
+    margin: 0;
+    font-size: var(--tx-text-sm, 0.875rem);
+    font-weight: 600;
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-captions-chapters__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .tx-captions-chapters__item {
+    margin: 0;
+  }
+
+  .tx-captions-chapters__button {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    inline-size: 100%;
+    margin: 0;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid transparent;
+    border-radius: var(--tx-radius-md, 0.375rem);
+    background: var(--tx-background, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .tx-captions-chapters__button:hover {
+    background-color: var(--tx-muted, color-mix(in oklab, CanvasText 10%, Canvas));
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-captions-chapters__button:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-captions-chapters__button[aria-current="true"] {
+    border-color: var(--tx-border, currentColor);
+    background-color: var(--tx-background, Canvas);
+    color: CanvasText;
+    font-weight: 600;
+  }
+
+  .tx-captions-chapters__button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .tx-captions-chapters__time,
+  .tx-captions-chapters__label {
+    color: inherit;
+  }
+
+  .tx-captions-chapters__time {
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    font-size: var(--tx-text-xs, 0.75rem);
+    color: CanvasText;
+  }
+
+  .tx-captions-transcript {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .tx-captions-transcript__title {
+    margin: 0;
+    font-size: var(--tx-text-sm, 0.875rem);
+    font-weight: 600;
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-captions-transcript__list {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem;
+    max-block-size: 14rem;
+    overflow: auto;
+    border: 1px solid var(--tx-border, currentColor);
+    border-radius: var(--tx-radius-md, 0.375rem);
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .tx-captions-transcript__item {
+    margin: 0;
+  }
+
+  .tx-captions-transcript__button {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    gap: 0.5rem;
+    inline-size: 100%;
+    margin: 0;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--tx-radius-sm, 0.25rem);
+    background: var(--tx-background, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .tx-captions-transcript__button:hover {
+    background-color: var(--tx-muted, color-mix(in oklab, CanvasText 10%, Canvas));
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-captions-transcript__button:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-captions-transcript__button[aria-current="true"] {
+    background-color: var(--tx-background, Canvas);
+    color: CanvasText;
+    font-weight: 600;
+  }
+
+  .tx-captions-transcript__button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .tx-captions-transcript__time,
+  .tx-captions-transcript__text {
+    color: inherit;
+  }
+
+  .tx-captions-transcript__time {
+    font-variant-numeric: tabular-nums;
+    font-size: var(--tx-text-xs, 0.75rem);
+    color: CanvasText;
+  }
+
+  .tx-captions-transcript__text {
+    font-size: var(--tx-text-sm, 0.875rem);
+    line-height: 1.35;
+  }
+
+  @media (forced-colors: active) {
+    .tx-captions,
+    .tx-captions-transcript__list,
+    .tx-captions-chapters {
+      border: 1px solid ButtonText;
+      background: Canvas;
+      color: CanvasText;
+      forced-color-adjust: none;
+    }
+
+    .tx-captions__active {
+      background: Canvas;
+      color: CanvasText;
+      border: 1px solid ButtonText;
+    }
+
+    .tx-captions__message {
+      color: GrayText;
+    }
+
+    .tx-captions-chapters__button,
+    .tx-captions-transcript__button {
+      border: 1px solid transparent;
+      background: Canvas;
+      color: ButtonText;
+    }
+
+    .tx-captions-chapters__button:hover,
+    .tx-captions-transcript__button:hover {
+      border-color: ButtonText;
+      background: ButtonFace;
+    }
+
+    .tx-captions-chapters__button:focus-visible,
+    .tx-captions-transcript__button:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .tx-captions-chapters__button[aria-current="true"],
+    .tx-captions-transcript__button[aria-current="true"] {
+      outline: 2px solid Highlight;
+      border-color: Highlight;
+      background: SelectedItem;
+      color: SelectedItemText;
+      forced-color-adjust: none;
+    }
+
+    .tx-captions-chapters__button:disabled,
+    .tx-captions-transcript__button:disabled {
+      opacity: 1;
+      color: GrayText;
+      border-color: GrayText;
+    }
+
+    .tx-captions-chapters__time,
+    .tx-captions-transcript__time,
+    .tx-captions-chapters__label,
+    .tx-captions-transcript__text {
+      color: inherit;
+    }
+  }
+}

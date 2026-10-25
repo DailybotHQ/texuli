@@ -1,0 +1,73 @@
+---
+/**
+ * /evidence/ — index of evidence methodology + sample of component evidence cards.
+ */
+import { COMPONENT_PAGES } from '../../components/component-pages/load-manifests.ts';
+import EvidencePanel from '../../components/evidence/EvidencePanel.astro';
+import { EVIDENCE_AS_OF } from '../../components/evidence/types.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const samples = COMPONENT_PAGES.filter((p) =>
+  ['button', 'dialog', 'badge', 'combobox', 'card'].includes(p.id)
+);
+---
+
+<BaseLayout
+  title="Evidence"
+  description="Behavior checks, gzip size, axe and browser matrix snapshots shown on every component page."
+>
+  <h1>Evidence</h1>
+  <p class="lead">
+    Every component page ends with a static evidence strip: behavior checks (when a scenario exists), gzip
+    budget and measured size, axe suites, and the Playwright browser matrix. Snapshots are as of {EVIDENCE_AS_OF} — not live CI.
+  </p>
+  <p class="lead">
+    Open any page under <a href="/component-pages/">Components</a> to see evidence for that id.
+  </p>
+
+  <section aria-labelledby="samples-title">
+    <h2 id="samples-title">Sample components</h2>
+    {
+      samples.map((entry) => (
+        <div class="sample">
+          <h3>
+            <a href={`/component-pages/${entry.id}/`}>
+              {entry.label} <code>{entry.id}</code>
+            </a>
+          </h3>
+          <EvidencePanel entry={entry} />
+        </div>
+      ))
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
+  .lead {
+    margin: 0 0 1rem;
+    max-inline-size: 44rem;
+    font-size: 1.1rem;
+  }
+  h2 {
+    margin: 2rem 0 1rem;
+    font-size: 1.35rem;
+  }
+  .sample {
+    display: grid;
+    gap: 0.5rem;
+    margin-block-end: 2rem;
+    padding-block-end: 1.5rem;
+    border-block-end: 1px solid var(--tx-border);
+  }
+  .sample h3 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  a {
+    color: inherit;
+  }
+</style>

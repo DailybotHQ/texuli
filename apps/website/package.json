@@ -1,0 +1,35 @@
+{
+  "name": "@texuli/website",
+  "version": "0.0.0",
+  "private": true,
+  "description": "texuli.com: the Texuli documentation, catalog and live examples, built with Astro.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "prebuild": "node ../../scripts/generate-examples-catalog.mjs",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check",
+    "check:csp": "tsx tests/csp-coverage.mts"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/svelte": "^9.1.0",
+    "@texuli/blocks": "workspace:*",
+    "@texuli/catalog": "workspace:*",
+    "@texuli/charts": "workspace:*",
+    "@texuli/chat": "workspace:*",
+    "@texuli/core": "workspace:*",
+    "@texuli/examples": "workspace:*",
+    "@texuli/media": "workspace:*",
+    "@texuli/player": "workspace:*",
+    "@texuli/tokens": "workspace:*",
+    "astro": "^7.4.0",
+    "svelte": "^5.57.2",
+    "texuli": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}

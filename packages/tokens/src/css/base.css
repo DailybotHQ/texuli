@@ -1,0 +1,163 @@
+/*
+ * Precompiled Texuli base styles. Import this file directly; it has no
+ * Tailwind directives or build-time plugin requirements.
+ *
+ * @import '@texuli/tokens/base.css';
+ */
+/* biome-ignore-all lint/complexity/noImportantStyles: system reduced-motion preferences must override component animation durations. */
+
+@layer tx.base, tx.components;
+
+@layer tx.base {
+  /*
+   * Host viewport contract (framed previews may override on a container):
+   * --tx-app-height: height of the app surface (default full dynamic viewport)
+   * --tx-safe-top/right/bottom/left: safe-area insets (default env(...))
+   * Shells and layouts must use these tokens — never raw 100dvh / env(safe-area-*).
+   */
+  :root {
+    color-scheme: light dark;
+    --tx-app-height: 100dvh;
+    --tx-app-shell-height: var(--tx-app-height);
+    --tx-safe-top: env(safe-area-inset-top, 0px);
+    --tx-safe-right: env(safe-area-inset-right, 0px);
+    --tx-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --tx-safe-left: env(safe-area-inset-left, 0px);
+    /* Logical aliases (LTR); hosts may override physical tokens only. */
+    --tx-safe-area-block-start: var(--tx-safe-top);
+    --tx-safe-area-block-end: var(--tx-safe-bottom);
+    --tx-safe-area-inline-start: var(--tx-safe-left);
+    --tx-safe-area-inline-end: var(--tx-safe-right);
+  }
+
+  :root:dir(rtl),
+  :dir(rtl) {
+    --tx-safe-area-inline-start: var(--tx-safe-right);
+    --tx-safe-area-inline-end: var(--tx-safe-left);
+  }
+
+  [data-tx-mode="light"] {
+    color-scheme: light;
+  }
+
+  [data-tx-mode="dark"] {
+    color-scheme: dark;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border-color: var(--tx-border, currentColor);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    min-block-size: var(--tx-app-height, 100dvh);
+    background-color: var(--tx-background, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    font-family: var(--tx-font-sans, system-ui, sans-serif);
+    font-size: var(--tx-font-size-base, 1rem);
+    font-weight: var(--tx-font-weight-body, 400);
+    letter-spacing: var(--tx-letter-spacing-body, 0);
+    font-synthesis: none;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
+    font-weight: var(--tx-font-weight-heading, 600);
+    letter-spacing: var(--tx-letter-spacing-heading, 0);
+    text-wrap: balance;
+  }
+
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+  }
+
+  :focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  ::selection {
+    background-color: var(--tx-selection, Highlight);
+    color: var(--tx-selection-foreground, HighlightText);
+  }
+
+  * {
+    scrollbar-color: color-mix(in srgb, var(--tx-muted-foreground, currentColor) 35%, transparent)
+      transparent;
+    scrollbar-width: thin;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      --tx-motion-fast: 0ms !important;
+      --tx-motion-base: 0ms !important;
+      --tx-motion-slow: 0ms !important;
+      --tx-motion-easing: linear !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  [data-tx-motion="reduce"],
+  [data-tx-motion="reduce"] *,
+  [data-tx-motion="reduce"] *::before,
+  [data-tx-motion="reduce"] *::after {
+    --tx-motion-fast: 0ms !important;
+    --tx-motion-base: 0ms !important;
+    --tx-motion-slow: 0ms !important;
+    --tx-motion-easing: linear !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    [data-tx-surface="glass"] {
+      --tx-surface-fill: color-mix(
+        in srgb,
+        var(--tx-surface, Canvas) var(--tx-glass-opacity, 82%),
+        transparent
+      );
+      --tx-elevated-fill: color-mix(
+        in srgb,
+        var(--tx-elevated, Canvas) var(--tx-glass-opacity, 82%),
+        transparent
+      );
+    }
+
+    [data-tx-surface="glass"] [data-tx-surface-layer] {
+      background-color: var(--tx-surface-fill);
+      backdrop-filter: blur(var(--tx-glass-blur, 16px));
+      -webkit-backdrop-filter: blur(var(--tx-glass-blur, 16px));
+    }
+  }
+}

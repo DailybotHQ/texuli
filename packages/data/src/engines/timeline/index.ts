@@ -1,0 +1,31 @@
+/**
+ * Scheduling for timelines and gantt charts:
+ * working-day calendars, FS / SS / FF / SF dependencies with lag, topological
+ * order with readable cycle errors (and a list schema that rejects
+ * cycles), the critical path with slack, and cascading a move to the
+ * successors it pushes. A view layer renders it.
+ */
+export {
+  type CascadeResult,
+  type CriticalPath,
+  cascade,
+  criticalPath,
+  cycleMessage,
+  DEPENDENCY_TYPES,
+  type Dependency,
+  DependencyListSchema,
+  DependencySchema,
+  type DependencyType,
+  durationDays,
+  type ScheduleInfo,
+  type ScheduleTask,
+  type TaskChange,
+  type TimelineItem,
+  type TimelineModel,
+  type TopoResult,
+  timelineModel,
+  topoOrder,
+  type WorkCalendar,
+  type WorkDays,
+  workDays,
+} from './schedule.ts';

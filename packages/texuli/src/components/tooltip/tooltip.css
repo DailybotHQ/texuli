@@ -1,0 +1,83 @@
+/**
+ * Styled tooltip. `@layer tx.components` so consumer CSS wins.
+ * Logical properties; inverted surface for contrast on chrome.
+ */
+
+@layer tx.components {
+  .tx-tooltip {
+    z-index: 50;
+    box-sizing: border-box;
+    max-inline-size: min(20rem, 90vw);
+    padding-block: 0.35rem;
+    padding-inline: 0.6rem;
+    border-radius: calc(var(--tx-radius, 0.625rem) * 0.55);
+    border: 1px solid color-mix(in srgb, var(--tx-foreground, CanvasText) 12%, transparent);
+    background-color: var(--tx-foreground, CanvasText);
+    color: var(--tx-background, Canvas);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.35;
+    box-shadow: var(--tx-shadow-float, 0 8px 24px color-mix(in srgb, CanvasText 18%, transparent));
+    pointer-events: auto;
+  }
+
+  .tx-tooltip__body {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .tx-tooltip__text {
+    min-inline-size: 0;
+  }
+
+  .tx-tooltip__shortcuts {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    align-items: center;
+  }
+
+  .tx-tooltip__shortcuts .tx-kbd {
+    border-color: color-mix(in srgb, currentColor 35%, transparent);
+    background-color: transparent;
+    color: inherit;
+    border-block-end-width: 1px;
+    min-block-size: 1.1rem;
+    min-inline-size: 1.1rem;
+    font-size: 0.65rem;
+  }
+
+  @media (forced-colors: active) {
+    .tx-tooltip {
+      border: 1px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+      forced-color-adjust: none;
+    }
+
+    .tx-tooltip__shortcuts .tx-kbd {
+      border: 1px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tx-tooltip[data-state="open"] {
+      animation: tx-tooltip-in var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease) both;
+    }
+  }
+
+  @keyframes tx-tooltip-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}

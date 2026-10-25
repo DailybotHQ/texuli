@@ -1,0 +1,89 @@
+---
+/**
+ * On-page table of contents. Links are in-page anchors only (no network).
+ */
+import type { TocEntry } from './nav.ts';
+
+interface Props {
+  entries: readonly TocEntry[];
+  label?: string;
+  /** Unique heading id when multiple TOCs appear on one page. */
+  titleId?: string;
+}
+
+const { entries, label = 'On this page', titleId = 'docs-toc-title' } = Astro.props;
+---
+
+{
+  entries.length > 0 && (
+    <nav class="docs-toc" aria-label={label} data-tx-docs-toc="">
+      <p class="docs-toc__title" id={titleId}>
+        {label}
+      </p>
+      <ol class="docs-toc__list" aria-labelledby={titleId}>
+        {entries.map((entry) => (
+          <li data-level={entry.level}>
+            <a href={`#${entry.id}`}>{entry.label}</a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
+
+<style>
+  .docs-toc {
+    position: sticky;
+    inset-block-start: 1rem;
+    padding: 0.75rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, var(--tx-background));
+    color: var(--tx-foreground);
+  }
+  .docs-toc__title {
+    margin: 0 0 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  .docs-toc__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.25rem;
+  }
+  .docs-toc__list a {
+    display: block;
+    padding-block: 0.25rem;
+    color: var(--tx-foreground);
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+  .docs-toc__list a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .docs-toc__list a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .docs-toc__list li[data-level='3'] a {
+    padding-inline-start: 0.75rem;
+    font-size: 0.8125rem;
+  }
+  @media (forced-colors: active) {
+    .docs-toc {
+      border-color: ButtonText;
+      background: Canvas;
+      color: CanvasText;
+      forced-color-adjust: none;
+    }
+    .docs-toc__list a {
+      color: LinkText;
+    }
+  }
+</style>

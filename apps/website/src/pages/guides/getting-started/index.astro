@@ -1,0 +1,51 @@
+---
+import GettingStartedLive from '../../../components/guides/GettingStartedLive.svelte';
+import GuideCode from '../../../components/guides/GuideCode.astro';
+import GuidesShell from '../../../components/guides/GuidesShell.astro';
+
+const toc = [
+  { id: 'install', label: 'Install', level: 2 as const },
+  { id: 'wire-tokens', label: 'Wire tokens', level: 2 as const },
+  { id: 'import-a-component', label: 'Import a component', level: 2 as const },
+  { id: 'live-example', label: 'Live example', level: 2 as const },
+];
+
+const installSnippet = `# From the Texuli monorepo (workspace packages)
+pnpm add texuli @texuli/tokens @texuli/primitives @texuli/core
+
+# Or copy components with the agent tools (local files only)
+pnpm exec texuli init --cwd path/to/app --theme enterprise-neutral`;
+
+const importSnippet = `import { Button } from 'texuli/button';
+import { Card, CardContent, CardHeader, CardTitle } from 'texuli/card';
+import '@texuli/tokens/base.css';`;
+---
+
+<GuidesShell
+  title="Getting started"
+  description="Add Texuli to a Vite, Astro or SvelteKit app — install packages or copy with texuli init."
+  {toc}
+>
+  <h2 id="install">Install</h2>
+  <p>
+    Prefer workspace packages while developing inside this monorepo. Consumers can install the
+    published names once they ship, or copy files with <code>texuli init</code> (no network; see <code>@texuli/tools/cli-init</code>).
+  </p>
+  <GuideCode code={installSnippet} label="Install commands" />
+
+  <h2 id="wire-tokens">Wire tokens</h2>
+  <p>
+    Every app needs the base stylesheet and a compiled theme on <code>&lt;html data-tx-theme&gt;</code>.
+    <code>texuli init</code> writes the stylesheet, the no-flash bootstrap and <code>texuli.config.json</code> for Vite, Astro or SvelteKit. Default theme: <code>enterprise-neutral</code>.
+  </p>
+
+  <h2 id="import-a-component">Import a component</h2>
+  <p>
+    Import through lazy subpaths — never a kitchen-sink root barrel for UI. Texels use <code>@texuli/core/&lt;name&gt;</code>.
+  </p>
+  <GuideCode code={importSnippet} label="Component imports" />
+
+  <h2 id="live-example">Live example</h2>
+  <p>The button below is a real <code>texuli/button</code> island on this static page.</p>
+  <GettingStartedLive client:load />
+</GuidesShell>

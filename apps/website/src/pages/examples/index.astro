@@ -1,0 +1,55 @@
+---
+import {
+  buildExampleCatalog,
+  listExampleKinds,
+  listExamplePackages,
+} from '../../components/examples/catalog.ts';
+/**
+ * /examples/ — every registered @texuli/examples demo, filterable, lazy-live.
+ * Page chrome (h1 + main) comes from BaseLayout: do not nest another main.
+ */
+import ExamplesBrowser from '../../components/examples/ExamplesBrowser.svelte';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const full = buildExampleCatalog();
+// Index island: metadata only (no source bodies) so the HTML payload stays small.
+const items = full.map(({ source: _source, ...rest }) => ({ ...rest, source: null }));
+const packages = listExamplePackages(full);
+const kinds = listExampleKinds(full);
+const base = import.meta.env.BASE_URL;
+const title = 'Examples';
+const description =
+  'Every registered Texuli example, live from the shared registry. Filter by package and kind. Static site, no foreign network.';
+---
+
+<BaseLayout title={title} description={description}>
+  <header class="examples-page-header">
+    <h1 id="examples-page-title">{title}</h1>
+    <p class="lead">{description}</p>
+  </header>
+  <ExamplesBrowser
+    client:load
+    items={items}
+    packages={packages}
+    kinds={kinds}
+    base={base}
+    listing={true}
+  />
+</BaseLayout>
+
+<style>
+  .examples-page-header {
+    margin-block-end: 1.25rem;
+  }
+  .examples-page-header h1 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0;
+    max-inline-size: 44rem;
+    color: var(--tx-foreground);
+    font-size: 1.05rem;
+  }
+</style>

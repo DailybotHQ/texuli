@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://texuli.example/spec/schemas/manifest.schema.json",
+  "title": "SpecManifest",
+  "description": "The spec version, the dialect and a SHA-256 for every normative file (manifest.json) or generated file (generated-manifest.json).",
+  "type": "object",
+  "properties": {
+    "specVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "dialect": {
+      "type": "string",
+      "const": "https://json-schema.org/draft/2020-12/schema"
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    }
+  },
+  "required": ["specVersion", "dialect", "files"],
+  "additionalProperties": false
+}

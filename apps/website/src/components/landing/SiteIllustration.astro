@@ -1,0 +1,147 @@
+---
+/**
+ * Reusable illustration slot: fixed aspect ratio, explicit width/height, lazy
+ * decode, required alt. When the WebP file is missing, a CSS gradient built
+ * from theme tokens fills the frame so layout never collapses.
+ */
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { illustrationFor, illustrationSrc } from './illustrations.ts';
+
+interface Props {
+  slot: string;
+  class?: string;
+  /** Override alt from the manifest when the surrounding context needs a different description. */
+  alt?: string;
+}
+
+const { slot, class: className = '', alt: altOverride } = Astro.props;
+const entry = illustrationFor(slot);
+if (!entry) {
+  throw new Error(`Unknown illustration slot "${slot}". Add it to src/data/illustrations.json.`);
+}
+
+const base = import.meta.env.BASE_URL;
+const publicFile = join(process.cwd(), 'apps/website/public/illustrations', entry.file);
+// When building from apps/website, cwd may already be the app root.
+const altPublic = join(process.cwd(), 'public/illustrations', entry.file);
+const hasFile = existsSync(publicFile) || existsSync(altPublic);
+const src = illustrationSrc(entry.file, base);
+const alt = altOverride ?? entry.alt;
+const ratio = `${entry.width} / ${entry.height}`;
+
+/**
+ * Until the artwork exists, the slot paints a texel mosaic: Texuli's own
+ * motif (small owned units composing a whole) in theme tones. The pattern is
+ * seeded by the slot name, so each banner is distinct and stable.
+ */
+let seed = 2166136261;
+for (const char of slot) seed = Math.imul(seed ^ char.charCodeAt(0), 16777619) >>> 0;
+const tiles = Array.from({ length: 48 }, (_, index) => {
+  seed = Math.imul(seed ^ (index + 1), 2654435761) >>> 0;
+  const roll = seed % 100;
+  // Mostly quiet ground, a few mid tones, rare strong texels.
+  return roll < 46 ? 0 : roll < 72 ? 1 : roll < 88 ? 2 : roll < 96 ? 3 : 4;
+});
+---
+
+<figure
+  class:list={['site-illustration', className, { 'site-illustration--fallback': !hasFile }]}
+  data-tx-illustration={slot}
+  data-tx-illustration-ready={hasFile ? 'file' : 'fallback'}
+  style={`--si-w:${entry.width};--si-h:${entry.height};--si-ratio:${ratio};`}
+>
+  {
+    hasFile ? (
+      <img
+        src={src}
+        alt={alt}
+        width={entry.width}
+        height={entry.height}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <div
+        class="site-illustration__fallback"
+        role="img"
+        aria-label={alt}
+        style={`aspect-ratio:${ratio};`}
+      >
+        <div class="site-illustration__texels" aria-hidden="true">
+          {tiles.map((tone) => <span class={`texel texel--${tone}`} />)}
+        </div>
+      </div>
+    )
+  }
+</figure>
+
+<style>
+  .site-illustration {
+    display: block;
+    margin: 0;
+    overflow: hidden;
+    border-radius: calc(var(--tx-radius, 0.5rem) * 1.25);
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    background: var(--tx-muted);
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+  .site-illustration img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: var(--si-ratio);
+    object-fit: cover;
+  }
+  .site-illustration__fallback {
+    position: relative;
+    inline-size: 100%;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        90% 120% at 100% 0%,
+        color-mix(in oklab, var(--tx-primary) 14%, transparent),
+        transparent 60%
+      ),
+      color-mix(in oklab, var(--tx-muted) 60%, var(--tx-background));
+  }
+  .site-illustration__texels {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-content: center;
+    gap: clamp(4px, 1.1vw, 10px);
+    padding: clamp(10px, 3vw, 28px);
+  }
+  .texel {
+    aspect-ratio: 1;
+    border-radius: 22%;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
+  }
+  .texel--1 {
+    background: color-mix(in oklab, var(--tx-primary) 12%, var(--tx-background));
+  }
+  .texel--2 {
+    background: color-mix(in oklab, var(--tx-primary) 32%, var(--tx-background));
+    border-color: transparent;
+  }
+  .texel--3 {
+    background: color-mix(in oklab, var(--tx-primary) 72%, var(--tx-background));
+    border-color: transparent;
+  }
+  .texel--4 {
+    background: var(--tx-accent-foreground, var(--tx-foreground));
+    border-color: transparent;
+  }
+  @media (forced-colors: active) {
+    .texel {
+      border-color: CanvasText;
+    }
+    .texel--3,
+    .texel--4 {
+      background: CanvasText;
+    }
+  }
+</style>

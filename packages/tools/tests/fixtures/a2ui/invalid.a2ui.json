@@ -1,0 +1,33 @@
+{
+  "wrong-version": [{ "version": "v0.8", "deleteSurface": { "surfaceId": "s" } }],
+  "two-message-keys": [
+    {
+      "version": "v0.9",
+      "deleteSurface": { "surfaceId": "s" },
+      "createSurface": { "surfaceId": "s", "catalogId": "c" }
+    }
+  ],
+  "extra-key": [{ "version": "v0.9", "deleteSurface": { "surfaceId": "s", "force": true } }],
+  "missing-catalog": [{ "version": "v0.9", "createSurface": { "surfaceId": "s" } }],
+  "empty-components": [
+    { "version": "v0.9", "updateComponents": { "surfaceId": "s", "components": [] } }
+  ],
+  "basic-catalog-name": [
+    {
+      "version": "v0.9",
+      "updateComponents": {
+        "surfaceId": "s",
+        "components": [{ "id": "root", "component": "Text", "text": "hi" }]
+      }
+    }
+  ],
+  "child-not-id": [
+    {
+      "version": "v0.9",
+      "updateComponents": {
+        "surfaceId": "s",
+        "components": [{ "id": "root", "component": "card", "children": [1] }]
+      }
+    }
+  ]
+}

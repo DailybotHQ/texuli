@@ -1,0 +1,161 @@
+{
+  "$comment": "PLAN_002 expressiveness-audit fixture. The wrapper is audit metadata only; it is NOT a proposed blueprint envelope (ADR-003 owns that). `tree` is a real CatalogTreeInput for the catalog build named in `catalog`. Probes are fragments expected to fail; each names the gap it evidences. Fictional data only.",
+  "fixture": "06-presentation-slide",
+  "catalog": "catalog-f4553b4eaced02c163f6606e53eb4dab1277345aa5247cbb57ceaac2c116c703.json",
+  "screen": "One presentation slide: title, three bullet points revealed in steps, a supporting bar chart.",
+  "northStar": "3 - slides on demand (one slide)",
+  "tier": "untrusted",
+  "capabilityTier": "unknown (ADR-003); audit candidate: portable core for slide content, presenter mode is target-specific",
+  "result": "content-expressible-presentation-not",
+  "tree": {
+    "id": "layout-deck",
+    "props": {
+      "title": "Harborline Q4 kickoff"
+    },
+    "children": [
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Where we are"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "items": [
+                  {
+                    "text": "Boards beta reached 1,200 teams"
+                  },
+                  {
+                    "text": "Median setup time is 6 minutes"
+                  },
+                  {
+                    "text": "Mobile check-ins ship in November"
+                  }
+                ],
+                "step": 1,
+                "reveal": "fade-up"
+              }
+            }
+          },
+          {
+            "id": "charts-bar",
+            "props": {
+              "title": "Teams onboarded per month",
+              "description": "Teams onboarded per month, July to October",
+              "series": [
+                {
+                  "id": "teams",
+                  "label": "Teams",
+                  "points": [
+                    {
+                      "x": "Jul",
+                      "y": 180
+                    },
+                    {
+                      "x": "Aug",
+                      "y": 260
+                    },
+                    {
+                      "x": "Sep",
+                      "y": 340
+                    },
+                    {
+                      "x": "Oct",
+                      "y": 420
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "probes": [
+    {
+      "gap": "G11",
+      "intent": "Speaker notes on the slide",
+      "tree": {
+        "id": "layout-card",
+        "props": {
+          "title": "Where we are",
+          "notes": "Mention the mobile date."
+        }
+      },
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G11",
+      "intent": "A deck-level transition",
+      "tree": {
+        "id": "layout-deck",
+        "props": {
+          "title": "Q4",
+          "transition": "slide"
+        }
+      },
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G11",
+      "intent": "`slides` is an untyped array: arbitrary items pass the renderer unchecked",
+      "tree": {
+        "id": "layout-deck",
+        "props": {
+          "title": "Q4",
+          "slides": [
+            {
+              "anything": true
+            }
+          ]
+        }
+      },
+      "expect": ["none"]
+    },
+    {
+      "gap": "G05",
+      "intent": "Two-column slide via the schema-valid `columns` block",
+      "tree": {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "columns",
+            "columns": [
+              [
+                {
+                  "type": "text",
+                  "markdown": "Left"
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "markdown": "Right"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "expect": ["family-mismatch"]
+    },
+    {
+      "gap": "G14",
+      "intent": "Pick a deck theme",
+      "tree": {
+        "id": "layout-deck",
+        "props": {
+          "title": "Q4",
+          "theme": "harbor"
+        }
+      },
+      "expect": ["invalid-prop"]
+    }
+  ],
+  "gaps": ["G05", "G11", "G14", "G16"],
+  "notes": "Slide content (title, stepped list, chart) validates. `step` and `reveal` exist in the blocks schema. No component in packages/ presents a deck: `layout-deck` is a manifest id whose painting is left to the host (the golden painter maps it to a static `main`)."
+}

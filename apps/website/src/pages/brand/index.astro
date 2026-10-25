@@ -1,0 +1,43 @@
+---
+/**
+ * /brand/: dedicated brand story page (same components as home, deeper framing).
+ */
+import LiveDemos from '../../components/brand/LiveDemos.astro';
+import StoryStrip from '../../components/brand/StoryStrip.astro';
+import WhySections from '../../components/brand/WhySections.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Brand"
+  description="The Texuli brand story: Texels to components to interfaces, owned primitives, and agents on a closed catalog."
+>
+  <p class="eyebrow">Brand</p>
+  <h1>Small pieces. Infinite possibilities.</h1>
+  <p class="lead">
+    Texuli is named for <em>texels</em>—the smallest owned units of behavior and design—and for the
+    interfaces those units become when people and agents compose them.
+  </p>
+  <StoryStrip />
+  <WhySections />
+  <LiveDemos />
+</BaseLayout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.35rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.875rem;
+  }
+  h1 {
+    margin: 0 0 0.5rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.15;
+  }
+  .lead {
+    margin: 0 0 0.5rem;
+    max-inline-size: 40rem;
+    color: var(--tx-muted-foreground);
+    font-size: 1.125rem;
+  }
+</style>

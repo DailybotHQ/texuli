@@ -1,0 +1,223 @@
+{
+  "$comment": "PLAN_002 expressiveness-audit fixture. The wrapper is audit metadata only; it is NOT a proposed blueprint envelope (ADR-003 owns that). `tree` is a real CatalogTreeInput for the catalog build named in `catalog`. Probes are fragments expected to fail; each names the gap it evidences. Fictional data only.",
+  "fixture": "02-dashboard",
+  "screen": "Operations dashboard: KPI row, four charts in a grid, a top-items table, a date-range filter and refresh.",
+  "northStar": "2 - dashboard on demand ('Monta un dashboard con estas caracteristicas')",
+  "catalog": "catalog-f4553b4eaced02c163f6606e53eb4dab1277345aa5247cbb57ceaac2c116c703.json",
+  "tier": "untrusted",
+  "capabilityTier": "unknown (ADR-003); audit candidate: portable core for blocks and charts semantics; `renderer: canvas` is a web-only rendering option",
+  "result": "expressible-as-static-snapshot",
+  "frame": { "label": "Support operations dashboard (draft)", "source": "audit-fixture-02" },
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Support operations, week 42",
+      "description": "Snapshot for the Harborline support team, 2026-10-12 to 2026-10-18."
+    },
+    "children": [
+      {
+        "id": "blocks-data",
+        "props": {
+          "block": {
+            "type": "kpi",
+            "items": [
+              { "label": "Tickets opened", "value": "1,284", "delta": "+6%", "tone": "warning" },
+              { "label": "Tickets solved", "value": "1,310", "delta": "+9%", "tone": "success" },
+              {
+                "label": "Median first response",
+                "value": "42 min",
+                "delta": "-8 min",
+                "tone": "success"
+              },
+              { "label": "Satisfaction", "value": "94%", "delta": "+1 pt", "tone": "success" }
+            ]
+          }
+        }
+      },
+      {
+        "id": "layout-grid",
+        "props": { "columns": 2 },
+        "children": [
+          {
+            "id": "layout-card",
+            "props": { "title": "Tickets per day" },
+            "children": [
+              {
+                "id": "charts-line",
+                "props": {
+                  "title": "Tickets per day",
+                  "description": "Opened and solved tickets per day for week 42",
+                  "series": [
+                    {
+                      "id": "opened",
+                      "label": "Opened",
+                      "points": [
+                        { "x": "Mon", "y": 210 },
+                        { "x": "Tue", "y": 198 },
+                        { "x": "Wed", "y": 187 },
+                        { "x": "Thu", "y": 176 },
+                        { "x": "Fri", "y": 169 },
+                        { "x": "Sat", "y": 172 },
+                        { "x": "Sun", "y": 172 }
+                      ]
+                    },
+                    {
+                      "id": "solved",
+                      "label": "Solved",
+                      "points": [
+                        { "x": "Mon", "y": 190 },
+                        { "x": "Tue", "y": 201 },
+                        { "x": "Wed", "y": 195 },
+                        { "x": "Thu", "y": 188 },
+                        { "x": "Fri", "y": 180 },
+                        { "x": "Sat", "y": 178 },
+                        { "x": "Sun", "y": 178 }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": { "title": "Channel mix" },
+            "children": [
+              {
+                "id": "charts-donut",
+                "props": {
+                  "title": "Tickets by channel",
+                  "description": "Share of week 42 tickets by channel",
+                  "data": [
+                    { "id": "email", "label": "Email", "value": 540 },
+                    { "id": "chat", "label": "Chat", "value": 486 },
+                    { "id": "phone", "label": "Phone", "value": 258 }
+                  ],
+                  "labels": { "table": "Data table", "category": "Channel", "value": "Tickets" }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": { "title": "Backlog by team" },
+            "children": [
+              {
+                "id": "charts-bar",
+                "props": {
+                  "title": "Open backlog by team",
+                  "description": "Open tickets per team at the end of week 42",
+                  "series": [
+                    {
+                      "id": "backlog",
+                      "label": "Open tickets",
+                      "points": [
+                        { "x": "Billing", "y": 64 },
+                        { "x": "Accounts", "y": 41 },
+                        { "x": "Integrations", "y": 88 }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": { "title": "Response-time target" },
+            "children": [
+              {
+                "id": "charts-gauge",
+                "props": {
+                  "label": "Tickets answered within 1 hour",
+                  "value": 87,
+                  "min": 0,
+                  "max": 100
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": { "title": "Oldest open tickets" },
+        "children": [
+          {
+            "id": "blocks-data",
+            "props": {
+              "block": {
+                "type": "table",
+                "caption": "Five oldest open tickets",
+                "columns": [
+                  { "id": "ticket", "label": "Ticket" },
+                  { "id": "team", "label": "Team" },
+                  { "id": "age", "label": "Age (days)" }
+                ],
+                "rows": [
+                  { "ticket": "HB-4102", "team": "Integrations", "age": 9 },
+                  { "ticket": "HB-4119", "team": "Billing", "age": 8 },
+                  { "ticket": "HB-4127", "team": "Integrations", "age": 7 },
+                  { "ticket": "HB-4133", "team": "Accounts", "age": 6 },
+                  { "ticket": "HB-4140", "team": "Billing", "age": 6 }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "probes": [
+    {
+      "gap": "G06",
+      "intent": "Date-range filter control in an agent-emitted dashboard",
+      "tree": {
+        "id": "radio-group",
+        "props": {
+          "items": [
+            { "label": "This week", "value": "w42" },
+            { "label": "Last week", "value": "w41" }
+          ]
+        }
+      },
+      "expect": ["tier-denied"]
+    },
+    {
+      "gap": "G01",
+      "intent": "Bind chart series to a live data source instead of inlining values",
+      "tree": {
+        "id": "charts-line",
+        "props": {
+          "title": "Tickets per day",
+          "description": "Live",
+          "series": { "$bind": "metrics.tickets.daily" }
+        }
+      },
+      "expect": ["schema-failure", "node-dropped"]
+    },
+    {
+      "gap": "G02",
+      "intent": "Drill-down on a bar click",
+      "tree": {
+        "id": "charts-bar",
+        "props": {
+          "title": "Backlog",
+          "description": "Backlog by team",
+          "series": [],
+          "onPointClick": "openTeam"
+        }
+      },
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G20",
+      "intent": "App dashboard grid layout (spans, sidebar) at developer tier needs a host `mountScreen` callback the tree cannot provide",
+      "tier": "developer",
+      "tree": { "id": "layout-dashboard-grid", "props": { "mountScreen": "home" } },
+      "expect": ["invalid-prop"]
+    }
+  ],
+  "gaps": ["G01", "G02", "G06", "G07", "G12", "G16", "G20", "G22", "G23"],
+  "notes": "A complete, honest static snapshot renders at the untrusted tier and inside an artifact frame. What a 'dashboard' implies beyond a snapshot (filter, refresh, live binding, drill-down, tile spans) is not expressible."
+}

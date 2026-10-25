@@ -1,0 +1,21 @@
+---
+import '@texuli/astro/styles.css';
+import ContentLayout from '@texuli/astro/layouts/ContentLayout';
+import Hero from '@texuli/astro/sections/Hero';
+import Section from '@texuli/astro/sections/Section';
+import Smoke from '../../../Smoke.svelte';
+---
+<ContentLayout
+  title="Astro plain consumer"
+  description="A clean Astro consumer for the packed Texuli integration."
+  theme="sky"
+  canonical="https://example.com/astro-consumer"
+>
+  <Hero eyebrow="Packed integration" title="Content without a client bundle" description="Static sections stay lightweight while Svelte islands hydrate only when requested." align="center">
+    <a href="https://example.com/stories">Read the stories</a>
+  </Hero>
+  <Section id="story" label="Consumer story" width="wide">
+    <p data-astro-content>Rendered by the Texuli Astro section.</p>
+  </Section>
+  <Smoke client:load />
+</ContentLayout>

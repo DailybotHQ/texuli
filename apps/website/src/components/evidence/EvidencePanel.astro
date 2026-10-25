@@ -1,0 +1,167 @@
+---
+/**
+ * Evidence strip: behavior checks, gzip, axe, browser matrix for one component.
+ * Plain text only — no HTML sinks.
+ */
+import { Badge } from 'texuli/badge';
+import { Card, CardContent, CardHeader, CardTitle } from 'texuli/card';
+import type { CatalogManifest } from '../../../../../packages/catalog/src/manifest/index.ts';
+import { evidenceFromManifest, formatBytes } from './load-evidence.ts';
+
+interface Props {
+  entry: Pick<CatalogManifest, 'id' | 'package' | 'label'>;
+}
+
+const { entry } = Astro.props;
+const evidence = evidenceFromManifest(entry);
+const sizeLine = [
+  evidence.size.entry,
+  evidence.size.gzipMeasured !== undefined
+    ? `measured ${formatBytes(evidence.size.gzipMeasured)}`
+    : null,
+  evidence.size.gzipBudget !== undefined ? `budget ${formatBytes(evidence.size.gzipBudget)}` : null,
+]
+  .filter(Boolean)
+  .join(' · ');
+---
+
+<section class="ev" aria-labelledby={`ev-title-${entry.id}`} data-tx-evidence={entry.id}>
+  <!-- The hidden suffix keeps each panel's landmark name unique on /evidence/. -->
+  <h2 id={`ev-title-${entry.id}`}>Evidence<span class="ev__sr-only"> for {entry.id}</span></h2>
+  <p class="ev__lead">
+    Latest committed gates for <code>{entry.id}</code> (as of {evidence.asOf}). Static snapshot —
+    not live CI.
+  </p>
+
+  <div class="ev__grid">
+    <Card variant="flat">
+      <CardHeader>
+        <CardTitle level={3}>Behavior</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p class="ev__row">
+          <Badge variant="secondary">{evidence.behavior.status}</Badge>
+          {
+            evidence.behavior.scenario ? (
+              <span>
+                scenario <code>{evidence.behavior.scenario}</code>
+              </span>
+            ) : (
+              <span>no behavior scenario</span>
+            )
+          }
+        </p>
+        {
+          evidence.behavior.checks !== undefined && evidence.behavior.checks > 0 && (
+            <p class="ev__meta">{evidence.behavior.checks} checks</p>
+          )
+        }
+        {evidence.behavior.note && <p class="ev__note">{evidence.behavior.note}</p>}
+      </CardContent>
+    </Card>
+
+    <Card variant="flat">
+      <CardHeader>
+        <CardTitle level={3}>Size (gzip)</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p class="ev__row">
+          <code>{sizeLine}</code>
+        </p>
+        {evidence.size.note && <p class="ev__note">{evidence.size.note}</p>}
+      </CardContent>
+    </Card>
+
+    <Card variant="flat">
+      <CardHeader>
+        <CardTitle level={3}>Axe</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p class="ev__row">
+          <Badge variant="secondary">{evidence.axe.status}</Badge>
+        </p>
+        <ul class="ev__list">
+          {evidence.axe.suites.map((suite) => (
+            <li>
+              <code>{suite}</code>
+            </li>
+          ))}
+        </ul>
+        {evidence.axe.note && <p class="ev__note">{evidence.axe.note}</p>}
+      </CardContent>
+    </Card>
+
+    <Card variant="flat">
+      <CardHeader>
+        <CardTitle level={3}>Browsers</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul class="ev__list">
+          {evidence.browsers.projects.map((project) => (
+            <li>
+              <code>{project}</code>
+            </li>
+          ))}
+        </ul>
+        {evidence.browsers.note && <p class="ev__note">{evidence.browsers.note}</p>}
+      </CardContent>
+    </Card>
+  </div>
+</section>
+
+<style>
+  .ev__sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .ev {
+    display: grid;
+    gap: 0.75rem;
+    color: var(--tx-foreground);
+  }
+  .ev h2 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+  .ev__lead {
+    margin: 0;
+    font-size: 0.95rem;
+    max-inline-size: 44rem;
+  }
+  .ev__grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .ev__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+  }
+  .ev__meta,
+  .ev__note {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+  }
+  .ev__list {
+    margin: 0.35rem 0 0;
+    padding-inline-start: 1.1rem;
+    font-size: 0.875rem;
+  }
+  .ev :global(.tx-card__title),
+  .ev :global(.tx-card__content) p,
+  .ev :global(.tx-card__content) li,
+  .ev :global([data-tx-badge]) {
+    color: var(--tx-foreground) !important;
+  }
+  .ev :global([data-tx-badge]) {
+    background: var(--tx-background) !important;
+    border: 1px solid var(--tx-border);
+  }
+</style>

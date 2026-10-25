@@ -1,0 +1,74 @@
+---
+/**
+ * Topic cards: catalog, tiers, renderer, MCP, CLI, golden set.
+ */
+import { Badge } from 'texuli/badge';
+import { Card, CardContent, CardDescription, CardGrid, CardHeader, CardTitle } from 'texuli/card';
+import { AGENT_TOPICS } from './agents.ts';
+---
+
+<section class="topics" aria-labelledby="topics-title">
+  <header>
+    <h2 id="topics-title">How agents build with Texuli</h2>
+    <p>Six surfaces every agent workflow should know before emitting UI.</p>
+  </header>
+  <CardGrid minItemWidth="16rem">
+    {
+      AGENT_TOPICS.map((topic) => (
+        <Card variant="flat" id={topic.id}>
+          <CardHeader>
+            <CardTitle level={3}>{topic.title}</CardTitle>
+            <CardDescription>
+              <Badge variant="secondary">{topic.badge}</Badge>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p class="summary">{topic.summary}</p>
+            <ul>
+              {topic.points.map((point) => (
+                <li>{point}</li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      ))
+    }
+  </CardGrid>
+</section>
+
+<style>
+  .topics {
+    display: grid;
+    gap: 1.25rem;
+    margin-block: 2rem;
+    color: var(--tx-foreground);
+  }
+  .topics header h2 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+  }
+  .topics header p {
+    margin: 0;
+    max-inline-size: 40rem;
+  }
+  .summary {
+    margin: 0 0 0.75rem;
+  }
+  ul {
+    margin: 0;
+    padding-inline-start: 1.15rem;
+  }
+  li {
+    margin-block: 0.25rem;
+  }
+  .topics :global(.tx-card__title),
+  .topics :global(.tx-card__content) p,
+  .topics :global(.tx-card__content) li,
+  .topics :global([data-tx-badge]) {
+    color: var(--tx-foreground) !important;
+  }
+  .topics :global([data-tx-badge]) {
+    background: var(--tx-background) !important;
+    border: 1px solid var(--tx-border);
+  }
+</style>

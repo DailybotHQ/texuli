@@ -1,0 +1,84 @@
+# Combobox and MultiSelect
+
+**Package:** `texuli`  
+**Import:** `import { Combobox, MultiSelect } from 'texuli/combobox'`  
+**Tests:** `packages/texuli/tests/combobox.test.ts`  
+**Example:** `texuli-combobox`
+
+## Contract
+
+Styled autocomplete on `@texuli/primitives/combobox`:
+
+| Part | Role |
+| --- | --- |
+| `Combobox.Root` | Single-select root (bind `value`, `inputValue`, `open`) |
+| `MultiSelect.Root` | Same API with `multiple` forced; chips for selections |
+| `Field` | Chrome around input + chips + trigger |
+| `Input` / `Trigger` | Combobox pattern; input keeps focus, `aria-busy` while loading |
+| `Portal` / `Content` / `Viewport` / `Item` | Floating listbox |
+| `Chips` / `Chip` | Multi-select tokens with remove |
+| `Loading` / `Empty` / `Error` | Async chrome; Error includes Retry |
+
+### Async states
+
+- `loadOptions(query, signal)` — honor abort; rejection → empty list + `Error`
+- `Loading` — `role="status"` + `aria-busy` on the input
+- `Empty` — no matches after filter/load
+- `Error` — failed load; Retry calls primitive `retry()`
+- Announcements via `@texuli/core/announcer` (polite for empty/loading, assertive for error)
+
+### Variants / sizes
+
+`variant`: `outline` \| `soft` · `size`: `sm` \| `md` \| `lg`
+
+## Usage
+
+```svelte
+<script lang="ts">
+  import { Combobox, MultiSelect } from 'texuli/combobox';
+  const people = [{ value: 'ada', label: 'Ada Example' }];
+  let assignee = $state('');
+  let tags = $state<string[]>([]);
+</script>
+
+<label for="assignee">Assignee</label>
+<Combobox.Root bind:value={assignee} items={people}>
+  <Combobox.Field>
+    <Combobox.Input id="assignee" placeholder="Search people" />
+    <Combobox.Trigger />
+  </Combobox.Field>
+  <Combobox.Portal>
+    <Combobox.Content>
+      <Combobox.Loading />
+      <Combobox.Empty />
+      <Combobox.Error />
+      <Combobox.Viewport>
+        {#snippet children(item)}
+          <Combobox.Item value={item.value} label={item.label}>{item.label}</Combobox.Item>
+        {/snippet}
+      </Combobox.Viewport>
+    </Combobox.Content>
+  </Combobox.Portal>
+</Combobox.Root>
+
+<MultiSelect.Root bind:value={tags} items={people}>
+  <MultiSelect.Field>
+    <MultiSelect.Chips>
+      {#each tags as tag (tag)}
+        <MultiSelect.Chip value={tag} />
+      {/each}
+    </MultiSelect.Chips>
+    <MultiSelect.Input placeholder="Add tag" />
+    <MultiSelect.Trigger />
+  </MultiSelect.Field>
+  <!-- portal same as Combobox -->
+</MultiSelect.Root>
+```
+
+Styles live in `@layer tx.components`. Logical properties; forced-colors borders.
+
+## Filtering and forms
+
+`Combobox.Root` and `MultiSelect.Root` pass every primitive prop through, including `filter`, `name`, `required`, `requiredMessage`, `form` and `disabled` (see `packages/primitives/docs/prim-combobox.md`). `texuli/combobox` also re-exports `createFoldedFilter`, `foldSearchText`, `defaultComboboxFilter` and the `ComboboxFilter` type. A MultiSelect with a `name` submits one entry per selected value.
+
+Size (gzip): `texuli/combobox` went from 19.33 to 20.30 KiB with this change; it is 20.42 KiB today (`pnpm size`, 2026-10-24; budget 28 KiB).

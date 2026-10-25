@@ -1,0 +1,48 @@
+---
+import FormsLive from '../../../components/guides/FormsLive.svelte';
+import GuideCode from '../../../components/guides/GuideCode.astro';
+import GuidesShell from '../../../components/guides/GuidesShell.astro';
+
+const toc = [
+  { id: 'field-and-input', label: 'Field and Input', level: 2 as const },
+  { id: 'validation', label: 'Validation', level: 2 as const },
+  { id: 'live-form', label: 'Live form', level: 2 as const },
+];
+
+const formSnippet = `import { Field, Form, fieldMessage, type FieldErrorMap } from 'texuli/field';
+import { Input } from 'texuli/input';
+
+let errors = $state<FieldErrorMap>({});
+
+<Form bind:errors noValidate onValidate={validate} onSubmitValues={save}>
+  <Field label="Email" error={fieldMessage(errors, 'email')} required>
+    {#snippet children(control)}
+      <Input {...control.props} name="email" type="email" bind:value={email} />
+    {/snippet}
+  </Field>
+</Form>`;
+---
+
+<GuidesShell
+  title="Forms"
+  description="Compose Field, Input and Form with associated labels, errors and a validate hook."
+  {toc}
+>
+  <h2 id="field-and-input">Field and Input</h2>
+  <p>
+    <code>Field</code> owns the label, description and error message and hands control props to any
+    input-like child. <code>Input</code> (and Textarea) live under <code>texuli/input</code>.
+  </p>
+
+  <h2 id="validation">Validation</h2>
+  <p>
+    <code>Form</code> accepts <code>onValidate</code> returning a field-error map and <code>onSubmitValues</code> when the map is empty. Use fictional <code>@example.com</code> addresses in demos — never real PII.
+  </p>
+  <GuideCode code={formSnippet} label="Form with validate" />
+
+  <h2 id="live-form">Live form</h2>
+  <p>
+    Submit empty fields to see errors; use a name of two or more characters and an <code>@example.com</code> email to save.
+  </p>
+  <FormsLive client:load />
+</GuidesShell>

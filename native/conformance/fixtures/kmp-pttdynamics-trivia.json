@@ -1,0 +1,41 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "kmp-pttdynamics-trivia-snapshot",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-25T12:00:00Z",
+  "updatedAt": "2026-10-25T12:00:00Z",
+  "generator": { "kind": "agent", "name": "Migration assistant", "model": "example-model" },
+  "tier": "untrusted",
+  "profile": "web",
+  "tree": {
+    "id": "layout-page",
+    "props": { "title": "Sample meetup — trivia" },
+    "children": [
+      {
+        "id": "blocks-text",
+        "props": { "block": { "type": "heading", "level": 2, "text": "Example question" } },
+        "slot": "children"
+      },
+      {
+        "id": "layout-card",
+        "props": { "title": "Which sample color appears in the prompt?" },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "ordered": false,
+                "items": [{ "text": "Blue" }, { "text": "Amber" }, { "text": "Green" }]
+              }
+            },
+            "slot": "children"
+          }
+        ],
+        "slot": "children"
+      }
+    ]
+  }
+}

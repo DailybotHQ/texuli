@@ -1,0 +1,19 @@
+{
+  "name": "@texuli/fixture-app",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The fixture app every browser check runs against: it renders registered examples and parity scenarios.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "node ../../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/core": "workspace:*",
+    "@texuli/data": "workspace:*",
+    "@texuli/examples": "workspace:*",
+    "@texuli/primitives": "workspace:*",
+    "@texuli/tokens": "workspace:*",
+    "texuli": "workspace:*"
+  }
+}

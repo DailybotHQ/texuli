@@ -1,0 +1,82 @@
+{
+  "golden": "dashboard",
+  "trace": [
+    {
+      "children": [
+        {
+          "id": "blocks-data",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "id": "charts-line",
+                  "name": "Tickets per day",
+                  "role": "figure"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Tickets per day",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "id": "charts-donut",
+                  "name": "Tickets by channel",
+                  "role": "figure"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Channel mix",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "id": "charts-bar",
+                  "name": "Open backlog by team",
+                  "role": "figure"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Backlog by team",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "id": "charts-gauge",
+                  "name": "Tickets answered within 1 hour",
+                  "role": "figure"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Response-time target",
+              "role": "group"
+            }
+          ],
+          "id": "layout-grid",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "blocks-data",
+              "name": "Five oldest open tickets",
+              "role": "table"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Oldest open tickets",
+          "role": "group"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Support operations, week 42",
+      "role": "main"
+    }
+  ]
+}

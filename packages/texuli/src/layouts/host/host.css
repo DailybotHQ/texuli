@@ -1,0 +1,308 @@
+/**
+ * LayoutHost chrome — token-styled frame.
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  .tx-layout-host {
+    position: relative;
+    min-inline-size: 0;
+    min-block-size: 100%;
+    color: var(--tx-foreground, CanvasText);
+    background-color: var(--tx-background, Canvas);
+  }
+
+  /* The routed screen's outlet shrinks inside a grid or flex slot. */
+  :where([data-tx-layout-screen]) {
+    min-inline-size: 0;
+  }
+
+  .tx-layout-host__fallback {
+    min-inline-size: 0;
+    min-block-size: 12rem;
+  }
+
+  .tx-layout-host__loading {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    min-block-size: 12rem;
+    background-color: color-mix(in oklab, var(--tx-background, Canvas) 70%, transparent);
+  }
+
+  .tx-layout-host__loading-label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .tx-layout-host__skeleton {
+    display: flex;
+    gap: 1rem;
+    min-block-size: 12rem;
+    padding: 1rem;
+  }
+
+  .tx-layout-host__skeleton-rail {
+    display: none;
+    inline-size: 14rem;
+    border-radius: var(--tx-radius-lg, 0.5rem);
+    background-color: var(--tx-muted, color-mix(in oklab, CanvasText 10%, Canvas));
+  }
+
+  @media (min-width: 64rem) {
+    .tx-layout-host__skeleton-rail {
+      display: block;
+    }
+  }
+
+  .tx-layout-host__skeleton-main {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .tx-layout-host__skeleton-bar {
+    block-size: 2.5rem;
+    border-radius: var(--tx-radius-lg, 0.5rem);
+    background-color: var(--tx-muted, color-mix(in oklab, CanvasText 10%, Canvas));
+  }
+
+  .tx-layout-host__skeleton-block {
+    block-size: 8rem;
+    border-radius: var(--tx-radius-lg, 0.5rem);
+    background-color: var(--tx-muted, color-mix(in oklab, CanvasText 10%, Canvas));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tx-layout-host__skeleton-rail,
+    .tx-layout-host__skeleton-bar,
+    .tx-layout-host__skeleton-block {
+      animation: tx-layout-pulse 1.4s ease-in-out infinite;
+    }
+  }
+
+  @keyframes tx-layout-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+
+  /* Chrome parts */
+  .tx-layout-chrome-skip {
+    position: absolute;
+    inset-inline-start: 0.75rem;
+    inset-block-start: 0.75rem;
+    z-index: 70;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--tx-radius-md, 0.375rem);
+    background-color: var(--tx-primary, Highlight);
+    color: var(--tx-primary-foreground, HighlightText);
+    font-size: var(--tx-text-sm, 0.875rem);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .tx-layout-chrome-skip:not(:focus) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .tx-layout-chrome-brand {
+    display: flex;
+    min-inline-size: 0;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: var(--tx-radius-md, 0.375rem);
+    color: inherit;
+    font-size: var(--tx-text-sm, 0.875rem);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .tx-layout-chrome-brand:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+
+  .tx-layout-chrome-brand[data-compact="true"] {
+    justify-content: center;
+  }
+
+  .tx-layout-chrome-brand__mark {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: var(--tx-radius-md, 0.375rem);
+    background-color: var(--tx-primary, Highlight);
+    color: var(--tx-primary-foreground, HighlightText);
+  }
+
+  .tx-layout-chrome-brand__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tx-layout-chrome-brand__label[data-compact="true"] {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .tx-layout-chrome-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tx-layout-chrome-actions[data-compact="true"] {
+    flex-direction: column;
+  }
+
+  .tx-layout-chrome-user {
+    display: flex;
+    min-inline-size: 0;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: var(--tx-radius-md, 0.375rem);
+    padding: 0.25rem;
+    color: inherit;
+    font-size: var(--tx-text-sm, 0.875rem);
+    text-decoration: none;
+  }
+
+  .tx-layout-chrome-user[data-compact="true"] {
+    justify-content: center;
+  }
+
+  .tx-layout-chrome-user:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+
+  .tx-layout-chrome-user__meta {
+    display: grid;
+    min-inline-size: 0;
+  }
+
+  .tx-layout-chrome-user__meta[data-compact="true"] {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .tx-layout-chrome-user__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .tx-layout-chrome-user__detail {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--tx-text-xs, 0.75rem);
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  /* Drawer */
+  .tx-layout-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: color-mix(in oklab, CanvasText 40%, transparent);
+  }
+
+  .tx-layout-drawer {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    inline-size: min(18rem, 85vw);
+    background-color: var(--tx-sidebar, var(--tx-surface, Canvas));
+    color: var(--tx-sidebar-foreground, var(--tx-foreground, CanvasText));
+    box-shadow: var(--tx-shadow-lg, 0 10px 30px color-mix(in oklab, CanvasText 20%, transparent));
+    outline: none;
+  }
+
+  .tx-layout-drawer__close {
+    position: absolute;
+    inset-inline-end: 0.5rem;
+    inset-block-start: max(0.5rem, var(--tx-safe-top, 0px));
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--tx-radius-md, 0.375rem);
+    background: transparent;
+    color: var(--tx-muted-foreground, GrayText);
+    cursor: pointer;
+  }
+
+  .tx-layout-drawer__close:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+
+  .tx-layout-drawer__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-block-size: 0;
+    padding-block: max(0.5rem, var(--tx-safe-top, 0px)) max(0.5rem, var(--tx-safe-bottom, 0px));
+    padding-inline: max(0.5rem, var(--tx-safe-left, 0px)) max(0.5rem, var(--tx-safe-right, 0px));
+  }
+
+  @media (forced-colors: active) {
+    .tx-layout-drawer {
+      border-inline-end: 1px solid ButtonText;
+    }
+    .tx-layout-drawer-overlay {
+      background: CanvasText;
+      opacity: 0.3;
+    }
+  }
+}

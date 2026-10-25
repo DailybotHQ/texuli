@@ -1,0 +1,152 @@
+# Texuli
+
+> Texuli is a Svelte 5 component system with a closed agent catalog and a sink-free renderer.
+
+This file is generated from catalog manifests. Prefer component pages under `components/` for props and examples.
+
+## Agent-emittable components
+
+Ids agents may emit into a catalog tree (subject to tier rules). Untrusted model output is limited further by the catalog build tiers.
+
+- [Code blocks](components/blocks-code.md): Validated, highlighted code.
+- [Data blocks](components/blocks-data.md): Validated tables, statistics, key metrics and chart content blocks.
+- [Diagram blocks](components/blocks-diagram.md): Validated flow, tree, board and terminal diagrams.
+- [Embed blocks](components/blocks-embed.md): Validated link previews (URL policy) and embed-app shells. Texuli never runs app JSON; hosts mount via mountEmbed with a sandboxed iframe contract.
+- [Interactive blocks](components/blocks-interactive.md): Validated polls, quizzes, calculators and checklists.
+- [Map blocks](components/blocks-map.md): Validated map points and routes.
+- [Media blocks](components/blocks-media.md): Validated image, figure, video and gallery content blocks.
+- [Structure blocks](components/blocks-structure.md): Validated layouts and calls to action.
+- [Text blocks](components/blocks-text.md): Validated heading, paragraph, list, quote and callout content.
+- [Area chart](components/charts-area.md): A categorical area chart with an accessible data table.
+- [Bar chart](components/charts-bar.md): A categorical bar chart with a zero baseline and accessible data table.
+- [Bubble chart](components/charts-bubble.md): A scatter plot where point size can encode another measure.
+- [Bullet chart](components/charts-bullet.md): A compact value, range and target comparison.
+- [Canvas chart renderer](components/charts-canvas-renderer.md): A low-level canvas mark renderer for dense chart series.
+- [Cartesian chart](components/charts-cartesian.md): The general line, area, bar, stacked bar or combo chart renderer.
+- [Combo chart](components/charts-combo.md): A categorical chart that combines bar and line series.
+- [Donut chart](components/charts-donut.md): A part-to-whole chart with a central opening and data table.
+- [Funnel chart](components/charts-funnel.md): A conversion funnel with step values and accessible table.
+- [Gauge chart](components/charts-gauge.md): A radial value gauge with thresholds and an accessible data table.
+- [Geographic map](components/charts-geo-map.md): A tiled geographic choropleth with a tabular data alternative.
+- [Geographic point map](components/charts-geo-point-map.md): Geographic points positioned on a tiled map.
+- [Heatmap](components/charts-heatmap.md): A matrix of labeled cells with an accessible data table.
+- [Line chart](components/charts-line.md): A categorical line chart with accessible values.
+- [Network graph](components/charts-network.md): A node and connection graph with an accessible table.
+- [Pie chart](components/charts-pie.md): A part-to-whole chart with an accessible data table.
+- [Progress ring](components/charts-progress-ring.md): A compact radial progress indicator with a data table.
+- [Sankey chart](components/charts-sankey.md): A weighted flow diagram with an accessible table.
+- [Scatter chart](components/charts-scatter.md): A quantitative scatter plot with an accessible data table.
+- [Sparkline](components/charts-sparkline.md): A compact line, area or bar trend chart.
+- [Stacked bar chart](components/charts-stacked-bar.md): A categorical stacked bar chart with accessible values.
+- [Sunburst chart](components/charts-sunburst.md): A hierarchical part-to-whole chart with an accessible table.
+- [Treemap chart](components/charts-treemap.md): A hierarchical part-to-whole chart with an accessible table.
+- [Deck slide](components/deck-slide.md): One slide in a deck: a title, content blocks and speaker notes.
+- [Card layout](components/layout-card.md): Content card frame for grouped agent-authored blocks.
+- [Deck layout](components/layout-deck.md): Slide deck frame for sequenced content.
+- [Doc layout](components/layout-doc.md): Document frame with optional table of contents.
+- [Grid layout](components/layout-grid.md): Responsive content grid for agent-authored tiles.
+- [Page layout](components/layout-page.md): Full page content frame for agent-authored documents.
+- [Canvas composition](components/media-composition-canvas.md): A validated layered composition rendered to a canvas.
+- [SVG composition](components/media-composition-svg.md): A validated, structured vector composition.
+- [Responsive image](components/media-image.md): A responsive image with URL validation, loading states and actions.
+
+## App and chrome components
+
+Developer-authored UI. Not agent-emittable by default (overlays, forms, display chrome).
+
+- [Alert](components/alert.md): Inline feedback for a page section (status or error).
+- [AlertDialog](components/alert-dialog.md): Modal confirm/cancel dialog for consequential actions.
+- [AnalyticsGrid](components/analytics-grid.md): Auto-fit KPI and widget grid for dashboard screens.
+- [AppNav](components/app-nav.md): Desktop sidebar shell with mobile sheet drawer and main slot.
+- [Badge](components/badge.md): A compact status or category label.
+- [Banner](components/banner.md): Full-width notice across a page or app shell.
+- [Breadcrumb](components/breadcrumb.md): Hierarchy trail with URL-policy links.
+- [Button](components/button.md): A pressable action control with loading and optional link rendering.
+- [ButtonGroup](components/button-group.md): Groups related buttons with shared borders and orientation.
+- [Callout](components/callout.md): Emphasized documentation-style tip with a strong start edge.
+- [Card](components/card.md): A surface for grouping related content with optional link behavior.
+- [Checkbox](components/checkbox.md): A binary or indeterminate checkbox with optional label.
+- [Chip](components/chip.md): A toggleable filter chip (pressed state).
+- [Code](components/code.md): Inline or block code with escaped text (no HTML).
+- [Combobox](components/combobox.md): A text input that filters a list of options, for one value or several.
+- [CommandPalette](components/command-palette.md): Dialog-hosted command palette with search and recent items.
+- [ContentLayout](components/content-layout.md): Shared docs/blog/editorial reading frame with optional TOC.
+- [ContextMenu](components/context-menu.md): Pointer-anchored menu (right-click, long-press, Menu key).
+- [ContextMenu.Trigger](components/context-menu-trigger.md): Region that opens the context menu.
+- [Description](components/description.md): Help text associated with a field control.
+- [DetailPanel](components/detail-panel.md): Non-modal detail panel alongside content.
+- [Dialog](components/dialog.md): Modal dialog with title, optional description, body and footer.
+- [Drawer](components/drawer.md): Bottom or edge drawer with optional drag dismiss.
+- [DropdownMenu](components/dropdown-menu.md): Menu button pattern with items, checkboxes, radios and submenus.
+- [DropdownMenu.Content](components/dropdown-menu-content.md): Floating menu surface for dropdown items.
+- [DropdownMenu.Item](components/dropdown-menu-item.md): Menu item with optional icon and shortcut chrome.
+- [DropdownMenu.Trigger](components/dropdown-menu-trigger.md): Styled button that opens a dropdown menu.
+- [Empty state](components/empty-state.md): Placeholder when a list or panel has nothing to show yet.
+- [Error state](components/error-state.md): Full-panel failure with optional retry.
+- [Field](components/field.md): Label, description and error wiring for a single control.
+- [FieldError](components/field-error.md): An alert-role error message for a field.
+- [Form](components/form.md): A form shell with layout, validation hook and error map.
+- [HoverCard](components/hover-card.md): Preview panel that opens on hover or focus.
+- [HoverCard.Content](components/hover-card-content.md): Styled hover-card surface.
+- [IconButton](components/icon-button.md): An icon-only button that requires an accessible name.
+- [Inline text](components/inline-text.md): A plain text run for the slot of a slot-only component (button, label, badge).
+- [Input](components/input.md): A single-line text (or file) control with optional clear.
+- [InputGroup](components/input-group.md): An input with start/end adornments and optional clear.
+- [Kbd](components/kbd.md): Inline keyboard key affordance.
+- [KPI](components/kpi.md): A formatted metric with unit, previous-period delta and optional link.
+- [Label](components/label.md): A form label with optional required marker and sr-only mode.
+- [Auth split layout](components/layout-auth-split.md): Sign-in form column plus brand panel.
+- [Blog layout](components/layout-blog.md): Blog/post reading layout (content-layout kind blog).
+- [LayoutChrome](components/layout-chrome.md): Shared brand, actions, user and skip-link chrome for desktop layouts.
+- [Dashboard grid layout](components/layout-dashboard-grid.md): Top chrome plus container-query widget grid.
+- [Docs layout](components/layout-docs.md): Documentation reading layout (content-layout kind docs).
+- [LayoutDrawer](components/layout-drawer.md): Mobile navigation drawer built on the dialog primitive.
+- [Dual sidebar layout](components/layout-dual-sidebar.md): Primary nav plus optional context aside.
+- [Editorial layout](components/layout-editorial.md): Long-read editorial layout (content-layout kind editorial).
+- [LayoutHost](components/layout-host.md): Resolves a layout id, applies width fallbacks, and keeps one stable screen outlet.
+- [Landing layout](components/layout-landing.md): Standalone marketing landing composition.
+- [Marketing layout](components/layout-marketing.md): Marketing page frame with hero, sections and footer slots.
+- [Pricing layout](components/layout-pricing.md): Pricing plans grid with title and footnote.
+- [Settings layout](components/layout-settings.md): Settings section list plus detail pane.
+- [Sidebar layout](components/layout-sidebar.md): App sidebar column with responsive drawer fallback.
+- [Top navigation layout](components/layout-top-nav.md): Horizontal top navigation with optional mobile menu.
+- [Wizard layout](components/layout-wizard.md): Centered onboarding wizard frame with steps.
+- [Menubar](components/menubar.md): Application menubar with roving top-level items.
+- [Menubar.Trigger](components/menubar-trigger.md): Top-level menubar item that opens a menu.
+- [MultiSelect](components/multi-select.md): A combobox for several values, shown as removable chips.
+- [NavIcon](components/nav-icon.md): Renders a nav model icon by name or component.
+- [NavigationMenu](components/navigation-menu.md): Site or app navigation with expandable triggers and links.
+- [Pagination](components/pagination.md): Page controls for long lists.
+- [Popover](components/popover.md): Non-modal floating panel anchored to a trigger.
+- [Popover.Content](components/popover-content.md): Styled popover surface with optional arrow.
+- [Radio](components/radio.md): One option inside a RadioGroup.
+- [RadioGroup](components/radio-group.md): A set of exclusive radio options with keyboard roving.
+- [ResponsiveModal](components/responsive-modal.md): Dialog on large screens, drawer/sheet on small screens.
+- [ScreenOutlet](components/screen-outlet.md): Stable screen mount point that survives layout switches.
+- [Select](components/select.md): A single-value select root with size and variant chrome.
+- [Select.Content](components/select-content.md): The positioned listbox surface for Select items.
+- [Select.Group](components/select-group.md): Groups related Select items under an optional label.
+- [Select.Item](components/select-item.md): One selectable option inside Select.Content.
+- [Select.Label](components/select-label.md): A non-interactive heading inside a Select group.
+- [Select.Portal](components/select-portal.md): Portals Select.Content out of overflow-clipped ancestors.
+- [Select.Separator](components/select-separator.md): A visual divider between Select groups or items.
+- [Select.Trigger](components/select-trigger.md): The button that opens a Select listbox.
+- [Select.Value](components/select-value.md): Shows the selected label or a placeholder inside the trigger.
+- [Select.Viewport](components/select-viewport.md): Scrollable viewport inside Select.Content.
+- [Sheet](components/sheet.md): Edge-anchored modal panel (drawer-like sheet).
+- [Sidebar](components/sidebar.md): Collapsible app rail with sections, badges and safe links.
+- [SplitView](components/split-view.md): Master-detail split with list and detail panes.
+- [Stat](components/stat.md): A single metric with optional delta, trend and sparkline slot.
+- [Stepper](components/stepper.md): Horizontal or vertical progress through ordered steps.
+- [Switch](components/switch.md): An immediate on/off setting control.
+- [Table](components/table.md): A responsive data table with density, stacking and sticky header options.
+- [Tag](components/tag.md): A labeled chip that can be removed.
+- [TextCounter](components/text-counter.md): An input or textarea that shows remaining characters near the limit.
+- [Textarea](components/textarea.md): A multi-line text control with optional autosize.
+- [Timeline](components/timeline.md): Vertical or horizontal chronological list of events.
+- [Toaster](components/toaster.md): Live region that renders toast notifications from the shared store.
+- [Tooltip](components/tooltip.md): Short delayed hint on hover or focus.
+
+## Optional
+
+- [Full catalog docs](llms-full.txt)

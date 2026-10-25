@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://texuli.example/spec/schemas/diagnostics.schema.json",
+  "title": "SpecValidation",
+  "description": "The stable result shape of validating a blueprint against the spec.",
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/diagnostic"
+      }
+    }
+  },
+  "required": ["ok", "diagnostics"],
+  "additionalProperties": false,
+  "$defs": {
+    "diagnostic": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/diagnosticCode"
+        },
+        "path": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["code", "path", "message"],
+      "additionalProperties": false
+    },
+    "diagnosticCode": {
+      "type": "string",
+      "enum": [
+        "schema",
+        "unknown-id",
+        "unknown-prop",
+        "prop-type",
+        "enum-value",
+        "missing-required",
+        "extension-prop",
+        "catalog-mismatch",
+        "unsupported-profile",
+        "unknown-slot"
+      ]
+    }
+  }
+}

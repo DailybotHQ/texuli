@@ -1,0 +1,365 @@
+{
+  "name": "texuli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Styled Texuli components, layouts and shells.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./alert": {
+      "types": "./src/components/alert/index.ts",
+      "svelte": "./src/components/alert/index.ts",
+      "default": "./src/components/alert/index.ts"
+    },
+    "./avatar": {
+      "types": "./src/components/avatar/index.ts",
+      "svelte": "./src/components/avatar/index.ts",
+      "default": "./src/components/avatar/index.ts"
+    },
+    "./badge": {
+      "types": "./src/components/badge/index.ts",
+      "svelte": "./src/components/badge/index.ts",
+      "default": "./src/components/badge/index.ts"
+    },
+    "./button": {
+      "types": "./src/components/button/index.ts",
+      "svelte": "./src/components/button/index.ts",
+      "default": "./src/components/button/index.ts"
+    },
+    "./card": {
+      "types": "./src/components/card/index.ts",
+      "svelte": "./src/components/card/index.ts",
+      "default": "./src/components/card/index.ts"
+    },
+    "./carousel": {
+      "types": "./src/components/carousel/index.ts",
+      "svelte": "./src/components/carousel/index.ts",
+      "default": "./src/components/carousel/index.ts"
+    },
+    "./choice": {
+      "types": "./src/components/choice/index.ts",
+      "svelte": "./src/components/choice/index.ts",
+      "default": "./src/components/choice/index.ts"
+    },
+    "./combobox": {
+      "types": "./src/components/combobox/index.ts",
+      "svelte": "./src/components/combobox/index.ts",
+      "default": "./src/components/combobox/index.ts"
+    },
+    "./command": {
+      "types": "./src/components/command/index.ts",
+      "svelte": "./src/components/command/index.ts",
+      "default": "./src/components/command/index.ts"
+    },
+    "./cx": "./src/internal/index.ts",
+    "./date": {
+      "types": "./src/components/date/index.ts",
+      "svelte": "./src/components/date/index.ts",
+      "default": "./src/components/date/index.ts"
+    },
+    "./dialog": {
+      "types": "./src/components/dialog/index.ts",
+      "svelte": "./src/components/dialog/index.ts",
+      "default": "./src/components/dialog/index.ts"
+    },
+    "./empty": {
+      "types": "./src/components/empty/index.ts",
+      "svelte": "./src/components/empty/index.ts",
+      "default": "./src/components/empty/index.ts"
+    },
+    "./feedback": {
+      "types": "./src/components/feedback/index.ts",
+      "svelte": "./src/components/feedback/index.ts",
+      "default": "./src/components/feedback/index.ts"
+    },
+    "./field": {
+      "types": "./src/components/field/index.ts",
+      "svelte": "./src/components/field/index.ts",
+      "default": "./src/components/field/index.ts"
+    },
+    "./file-upload": {
+      "types": "./src/components/file-upload/index.ts",
+      "svelte": "./src/components/file-upload/index.ts",
+      "default": "./src/components/file-upload/index.ts"
+    },
+    "./icons": {
+      "types": "./src/components/icons/index.ts",
+      "svelte": "./src/components/icons/index.ts",
+      "default": "./src/components/icons/index.ts"
+    },
+    "./icons/lucide": {
+      "types": "./src/components/icons/lucide.ts",
+      "svelte": "./src/components/icons/lucide.ts",
+      "default": "./src/components/icons/lucide.ts"
+    },
+    "./input": {
+      "types": "./src/components/input/index.ts",
+      "svelte": "./src/components/input/index.ts",
+      "default": "./src/components/input/index.ts"
+    },
+    "./kbd-code": {
+      "types": "./src/components/kbd-code/index.ts",
+      "svelte": "./src/components/kbd-code/index.ts",
+      "default": "./src/components/kbd-code/index.ts"
+    },
+    "./layouts/app": {
+      "types": "./src/layouts/app/entry.ts",
+      "svelte": "./src/layouts/app/entry.ts",
+      "default": "./src/layouts/app/entry.ts"
+    },
+    "./layouts/app/dual-sidebar": {
+      "types": "./src/layouts/app/DualSidebarLayout.svelte",
+      "svelte": "./src/layouts/app/DualSidebarLayout.svelte",
+      "default": "./src/layouts/app/DualSidebarLayout.svelte"
+    },
+    "./layouts/app/master-detail": {
+      "types": "./src/layouts/app/MasterDetailLayout.svelte",
+      "svelte": "./src/layouts/app/MasterDetailLayout.svelte",
+      "default": "./src/layouts/app/MasterDetailLayout.svelte"
+    },
+    "./layouts/app/rail": {
+      "types": "./src/layouts/app/RailLayout.svelte",
+      "svelte": "./src/layouts/app/RailLayout.svelte",
+      "default": "./src/layouts/app/RailLayout.svelte"
+    },
+    "./layouts/app/sidebar": {
+      "types": "./src/layouts/app/SidebarLayout.svelte",
+      "svelte": "./src/layouts/app/SidebarLayout.svelte",
+      "default": "./src/layouts/app/SidebarLayout.svelte"
+    },
+    "./layouts/app/split-view": {
+      "types": "./src/layouts/app/SplitView.svelte",
+      "svelte": "./src/layouts/app/SplitView.svelte",
+      "default": "./src/layouts/app/SplitView.svelte"
+    },
+    "./layouts/app/top-nav": {
+      "types": "./src/layouts/app/TopNavLayout.svelte",
+      "svelte": "./src/layouts/app/TopNavLayout.svelte",
+      "default": "./src/layouts/app/TopNavLayout.svelte"
+    },
+    "./layouts/auth-settings": {
+      "types": "./src/layouts/auth-settings/index.ts",
+      "svelte": "./src/layouts/auth-settings/index.ts",
+      "default": "./src/layouts/auth-settings/index.ts"
+    },
+    "./layouts/auth-settings/register": {
+      "types": "./src/layouts/auth-settings/register.ts",
+      "default": "./src/layouts/auth-settings/register.ts"
+    },
+    "./layouts/content/blog": {
+      "types": "./src/layouts/content/blog.ts",
+      "svelte": "./src/layouts/content/blog.ts",
+      "default": "./src/layouts/content/blog.ts"
+    },
+    "./layouts/content/docs": {
+      "types": "./src/layouts/content/docs.ts",
+      "svelte": "./src/layouts/content/docs.ts",
+      "default": "./src/layouts/content/docs.ts"
+    },
+    "./layouts/content/editorial": {
+      "types": "./src/layouts/content/editorial.ts",
+      "svelte": "./src/layouts/content/editorial.ts",
+      "default": "./src/layouts/content/editorial.ts"
+    },
+    "./layouts/dashboard": {
+      "types": "./src/layouts/dashboard/index.ts",
+      "svelte": "./src/layouts/dashboard/index.ts",
+      "default": "./src/layouts/dashboard/index.ts"
+    },
+    "./layouts/dashboard/register": {
+      "types": "./src/layouts/dashboard/register.ts",
+      "default": "./src/layouts/dashboard/register.ts"
+    },
+    "./layouts/host": {
+      "types": "./src/layouts/host/entry.ts",
+      "svelte": "./src/layouts/host/entry.ts",
+      "default": "./src/layouts/host/entry.ts"
+    },
+    "./layouts/host/chrome": {
+      "types": "./src/layouts/host/chrome.ts",
+      "svelte": "./src/layouts/host/chrome.ts",
+      "default": "./src/layouts/host/chrome.ts"
+    },
+    "./layouts/host/drawer": {
+      "types": "./src/layouts/host/drawer.ts",
+      "svelte": "./src/layouts/host/drawer.ts",
+      "default": "./src/layouts/host/drawer.ts"
+    },
+    "./layouts/marketing": {
+      "types": "./src/layouts/marketing/index.ts",
+      "svelte": "./src/layouts/marketing/index.ts",
+      "default": "./src/layouts/marketing/index.ts"
+    },
+    "./layouts/marketing/entry": {
+      "types": "./src/layouts/marketing/entry.ts",
+      "default": "./src/layouts/marketing/entry.ts"
+    },
+    "./layouts/marketing/landing": {
+      "types": "./src/layouts/marketing/landing.ts",
+      "svelte": "./src/layouts/marketing/landing.ts",
+      "default": "./src/layouts/marketing/landing.ts"
+    },
+    "./layouts/marketing/pricing": {
+      "types": "./src/layouts/marketing/pricing.ts",
+      "svelte": "./src/layouts/marketing/pricing.ts",
+      "default": "./src/layouts/marketing/pricing.ts"
+    },
+    "./layouts/marketing/register": {
+      "types": "./src/layouts/marketing/register.ts",
+      "default": "./src/layouts/marketing/register.ts"
+    },
+    "./layouts/marketing/section": {
+      "types": "./src/layouts/marketing/section.ts",
+      "svelte": "./src/layouts/marketing/section.ts",
+      "default": "./src/layouts/marketing/section.ts"
+    },
+    "./layouts/mobile": {
+      "types": "./src/layouts/mobile/index.ts",
+      "svelte": "./src/layouts/mobile/index.ts",
+      "default": "./src/layouts/mobile/index.ts"
+    },
+    "./layouts/mobile/register": {
+      "types": "./src/layouts/mobile/register.ts",
+      "default": "./src/layouts/mobile/register.ts"
+    },
+    "./layouts/shells": {
+      "types": "./src/layouts/shells/index.ts",
+      "svelte": "./src/layouts/shells/index.ts",
+      "default": "./src/layouts/shells/index.ts"
+    },
+    "./menus": {
+      "types": "./src/components/menus/index.ts",
+      "svelte": "./src/components/menus/index.ts",
+      "default": "./src/components/menus/index.ts"
+    },
+    "./navigation": {
+      "types": "./src/components/navigation/index.ts",
+      "svelte": "./src/components/navigation/index.ts",
+      "default": "./src/components/navigation/index.ts"
+    },
+    "./number-pin": {
+      "types": "./src/components/number-pin/index.ts",
+      "svelte": "./src/components/number-pin/index.ts",
+      "default": "./src/components/number-pin/index.ts"
+    },
+    "./popover": {
+      "types": "./src/components/popover/index.ts",
+      "svelte": "./src/components/popover/index.ts",
+      "default": "./src/components/popover/index.ts"
+    },
+    "./rating": {
+      "types": "./src/components/rating/index.ts",
+      "svelte": "./src/components/rating/index.ts",
+      "default": "./src/components/rating/index.ts"
+    },
+    "./resizable": {
+      "types": "./src/components/resizable/index.ts",
+      "svelte": "./src/components/resizable/index.ts",
+      "default": "./src/components/resizable/index.ts"
+    },
+    "./scroll-area": {
+      "types": "./src/components/scroll-area/index.ts",
+      "svelte": "./src/components/scroll-area/index.ts",
+      "default": "./src/components/scroll-area/index.ts"
+    },
+    "./select": {
+      "types": "./src/components/select/index.ts",
+      "svelte": "./src/components/select/index.ts",
+      "default": "./src/components/select/index.ts"
+    },
+    "./separator-aspect": {
+      "types": "./src/components/separator-aspect/index.ts",
+      "svelte": "./src/components/separator-aspect/index.ts",
+      "default": "./src/components/separator-aspect/index.ts"
+    },
+    "./sheet": {
+      "types": "./src/components/sheet/index.ts",
+      "svelte": "./src/components/sheet/index.ts",
+      "default": "./src/components/sheet/index.ts"
+    },
+    "./sidebar": {
+      "types": "./src/components/sidebar/index.ts",
+      "svelte": "./src/components/sidebar/index.ts",
+      "default": "./src/components/sidebar/index.ts"
+    },
+    "./slider": {
+      "types": "./src/components/slider/index.ts",
+      "svelte": "./src/components/slider/index.ts",
+      "default": "./src/components/slider/index.ts"
+    },
+    "./stat": {
+      "types": "./src/components/stat/index.ts",
+      "svelte": "./src/components/stat/index.ts",
+      "default": "./src/components/stat/index.ts"
+    },
+    "./stepper": {
+      "types": "./src/components/stepper/index.ts",
+      "svelte": "./src/components/stepper/index.ts",
+      "default": "./src/components/stepper/index.ts"
+    },
+    "./table": {
+      "types": "./src/components/table/index.ts",
+      "svelte": "./src/components/table/index.ts",
+      "default": "./src/components/table/index.ts"
+    },
+    "./tabs-accordion": {
+      "types": "./src/components/tabs-accordion/index.ts",
+      "svelte": "./src/components/tabs-accordion/index.ts",
+      "default": "./src/components/tabs-accordion/index.ts"
+    },
+    "./tags-color": {
+      "types": "./src/components/tags-color/index.ts",
+      "svelte": "./src/components/tags-color/index.ts",
+      "default": "./src/components/tags-color/index.ts"
+    },
+    "./timeline": {
+      "types": "./src/components/timeline/index.ts",
+      "svelte": "./src/components/timeline/index.ts",
+      "default": "./src/components/timeline/index.ts"
+    },
+    "./toast": {
+      "types": "./src/components/toast/index.ts",
+      "svelte": "./src/components/toast/index.ts",
+      "default": "./src/components/toast/index.ts"
+    },
+    "./toggle": {
+      "types": "./src/components/toggle/index.ts",
+      "svelte": "./src/components/toggle/index.ts",
+      "default": "./src/components/toggle/index.ts"
+    },
+    "./toolbar": {
+      "types": "./src/components/toolbar/index.ts",
+      "svelte": "./src/components/toolbar/index.ts",
+      "default": "./src/components/toolbar/index.ts"
+    },
+    "./tooltip": {
+      "types": "./src/components/tooltip/index.ts",
+      "svelte": "./src/components/tooltip/index.ts",
+      "default": "./src/components/tooltip/index.ts"
+    },
+    "./tree": {
+      "types": "./src/components/tree/index.ts",
+      "svelte": "./src/components/tree/index.ts",
+      "default": "./src/components/tree/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/core": "workspace:*",
+    "@texuli/primitives": "workspace:*",
+    "@texuli/tokens": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

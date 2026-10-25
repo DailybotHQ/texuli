@@ -1,0 +1,37 @@
+{
+  "name": "@texuli/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./aa-gate": "./src/aa-gate/index.ts",
+    "./aa-gate/components": "./src/aa-gate/components.ts",
+    "./base.css": {
+      "types": "./src/css/styles.ts",
+      "default": "./src/css/base.css"
+    },
+    "./build": "./src/build/index.ts",
+    "./contract": "./src/contract/index.ts",
+    "./css": "./src/css/index.ts",
+    "./forced-colors": "./src/forced-colors/index.ts",
+    "./forced-colors.css": "./src/forced-colors/forced-colors.css",
+    "./generator": "./src/generator/index.ts",
+    "./library": "./src/library-port/index.ts",
+    "./library-expand": "./src/library-expand/index.ts",
+    "./modes": "./src/modes/index.ts",
+    "./no-flash": "./src/no-flash/index.ts",
+    "./palette": "./src/palette/index.ts",
+    "./style-presets": "./src/style-presets/index.ts",
+    "./tailwind": "./src/tailwind/index.ts",
+    "./tailwind/preset.css": "./src/tailwind/preset.css"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

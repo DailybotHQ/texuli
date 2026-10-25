@@ -1,0 +1,152 @@
+{
+  "$comment": "PLAN_002 expressiveness-audit fixture. The wrapper is audit metadata only; it is NOT a proposed blueprint envelope (ADR-003 owns that). `tree` is a real CatalogTreeInput for the catalog build named in `catalog`. Probes are fragments expected to fail; each names the gap it evidences. Fictional data only.",
+  "fixture": "05-chat-thread",
+  "catalog": "catalog-f4553b4eaced02c163f6606e53eb4dab1277345aa5247cbb57ceaac2c116c703.json",
+  "screen": "Team chat thread with the Dailybot super agent: author/time per message, an agent reply carrying a small table artifact, a composer.",
+  "northStar": "context for 1-4: Dailybot delivers artifacts in one thread",
+  "tier": "untrusted",
+  "capabilityTier": "unknown (ADR-003); audit candidate: portable core once chat ids exist",
+  "result": "approximation-only",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Launch room",
+      "description": "Fictional thread between a team and its Dailybot agent"
+    },
+    "children": [
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Rae Example, 09:12"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "text",
+                "markdown": "@Dailybot what is still blocked for Friday?"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Dailybot, 09:12"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "text",
+                "markdown": "Two items are blocked. **HB-4102** waits on the payments sandbox; **HB-4127** waits on design review."
+              }
+            }
+          },
+          {
+            "id": "blocks-data",
+            "props": {
+              "block": {
+                "type": "table",
+                "caption": "Blocked items",
+                "columns": [
+                  {
+                    "id": "ticket",
+                    "label": "Ticket"
+                  },
+                  {
+                    "id": "owner",
+                    "label": "Owner"
+                  },
+                  {
+                    "id": "waiting",
+                    "label": "Waiting on"
+                  }
+                ],
+                "rows": [
+                  {
+                    "ticket": "HB-4102",
+                    "owner": "Mo Example",
+                    "waiting": "Payments sandbox"
+                  },
+                  {
+                    "ticket": "HB-4127",
+                    "owner": "Rae Example",
+                    "waiting": "Design review"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Mo Example, 09:15"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "text",
+                "markdown": "Sandbox access is approved; I will unblock HB-4102 today."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "probes": [
+    {
+      "gap": "G10",
+      "intent": "A real thread container",
+      "tree": {
+        "id": "chat-thread",
+        "props": {}
+      },
+      "expect": ["unknown-id"]
+    },
+    {
+      "gap": "G10",
+      "intent": "A real message with author, time and role",
+      "tree": {
+        "id": "chat-message",
+        "props": {
+          "author": "Dailybot",
+          "role": "agent",
+          "time": "09:12"
+        }
+      },
+      "expect": ["unknown-id"]
+    },
+    {
+      "gap": "G06",
+      "intent": "A composer (text entry) in an agent-emitted thread",
+      "tree": {
+        "id": "textarea",
+        "props": {
+          "rows": 2
+        }
+      },
+      "expect": ["tier-denied"]
+    },
+    {
+      "gap": "G10",
+      "intent": "A composer at the developer tier",
+      "tier": "developer",
+      "tree": {
+        "id": "chat-composer",
+        "props": {}
+      },
+      "expect": ["unknown-id"]
+    }
+  ],
+  "gaps": ["G10", "G06", "G21", "G22"],
+  "notes": "Messages are approximated as titled cards, which gives every message a heading and section semantics a thread should not have. `@texuli/chat` exists as a package (thread, message list, composer) but has no catalog manifests, so none of its parts are addressable. Streaming append and typing state have no construct."
+}

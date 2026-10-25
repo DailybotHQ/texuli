@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "@texuli/tokens/base.css";
+@import "@texuli/tokens/tailwind/preset.css";
+
+body {
+  @apply min-h-app;
+}

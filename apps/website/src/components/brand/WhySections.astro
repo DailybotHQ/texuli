@@ -1,0 +1,76 @@
+---
+/**
+ * Why Texuli exists: owned primitives and agents (Card + Badge, foundation pattern).
+ */
+import { Badge } from 'texuli/badge';
+import { Card, CardContent, CardDescription, CardGrid, CardHeader, CardTitle } from 'texuli/card';
+
+const pillars = [
+  {
+    title: 'What Texuli is',
+    badge: 'Library',
+    body: 'A Svelte 5 component system built from small units it owns end to end—tokens, texels, primitives and styled UI—with a closed agent catalog and a sink-free renderer.',
+  },
+  {
+    title: 'Why owned primitives',
+    badge: 'Owned',
+    body: 'Interaction is implemented in Texuli, not borrowed at runtime. Focus, dismiss, overlays and forms stay auditable, versioned and free of foreign dependency surface.',
+  },
+  {
+    title: 'Why agents',
+    badge: 'Catalog',
+    body: 'Agents and people share the same components. Manifests describe use-when rules; the renderer refuses HTML sinks, class/style passthrough and unknown ids.',
+  },
+  {
+    title: 'Real behavior',
+    badge: 'Static site',
+    body: 'This site is static HTML and CSS built with Texuli itself. No runtime network, no placeholder chrome—live buttons and cards in the brand story above.',
+  },
+] as const;
+---
+
+<section class="why" aria-labelledby="why-title">
+  <header>
+    <h2 id="why-title">Built for people and agents</h2>
+    <p>One catalog. One accessibility bar. Interfaces that stay honest about what they can do.</p>
+  </header>
+  <CardGrid minItemWidth="16rem">
+    {
+      pillars.map((pillar) => (
+        <Card variant="flat">
+          <CardHeader>
+            <CardTitle level={3}>{pillar.title}</CardTitle>
+            <CardDescription>
+              <Badge variant="secondary">{pillar.badge}</Badge>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>{pillar.body}</p>
+          </CardContent>
+        </Card>
+      ))
+    }
+  </CardGrid>
+</section>
+
+<style>
+  .why {
+    display: grid;
+    gap: 1.25rem;
+    margin-block: 2.5rem;
+    color: var(--tx-foreground);
+  }
+  .why header h2 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+  }
+  .why header p {
+    margin: 0;
+    max-inline-size: 40rem;
+  }
+  .why :global(.tx-card__title),
+  .why :global(.tx-card__content) p,
+  .why p {
+    margin: 0;
+  }
+</style>

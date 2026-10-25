@@ -1,0 +1,60 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "kmp-todo-list-screen",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-25T12:00:00Z",
+  "updatedAt": "2026-10-25T12:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Migration assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "KMP Todo",
+      "description": "Task list migration snapshot with fictional sample tasks."
+    },
+    "children": [
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "heading",
+            "level": 2,
+            "text": "Tasks"
+          }
+        },
+        "slot": "children"
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "All tasks"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "ordered": false,
+                "items": [
+                  { "text": "Review sample release notes — high priority, active" },
+                  { "text": "Water the balcony herbs — medium priority, active" },
+                  { "text": "Archive example meeting notes — low priority, complete" }
+                ]
+              }
+            },
+            "slot": "children"
+          }
+        ],
+        "slot": "children"
+      }
+    ]
+  }
+}

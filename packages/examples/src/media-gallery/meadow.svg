@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200" role="img">
+  <title>Fictional meadow with wildflowers and a lone oak tree</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#bfe0ff"/>
+      <stop offset="1" stop-color="#eaf6ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1200" fill="url(#sky)"/>
+  <rect y="720" width="1200" height="480" fill="#7fb35a"/>
+  <path d="M0 760 C300 690 700 700 1200 740 V820 H0Z" fill="#94c46c"/>
+  <rect x="770" y="520" width="44" height="240" fill="#6b4a2f"/>
+  <circle cx="792" cy="480" r="150" fill="#3f7a3a"/>
+  <g fill="#f2d14b"><circle cx="160" cy="930" r="10"/><circle cx="320" cy="1010" r="10"/><circle cx="520" cy="900" r="10"/><circle cx="980" cy="1040" r="10"/></g>
+  <g fill="#e2709a"><circle cx="240" cy="1080" r="10"/><circle cx="660" cy="1060" r="10"/><circle cx="1080" cy="920" r="10"/></g>
+</svg>

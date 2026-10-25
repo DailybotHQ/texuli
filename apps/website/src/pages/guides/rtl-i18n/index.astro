@@ -1,0 +1,41 @@
+---
+import GuideCode from '../../../components/guides/GuideCode.astro';
+import GuidesShell from '../../../components/guides/GuidesShell.astro';
+import RtlLive from '../../../components/guides/RtlLive.svelte';
+
+const toc = [
+  { id: 'logical-css', label: 'Logical CSS', level: 2 as const },
+  { id: 'dir-and-lang', label: 'dir and lang', level: 2 as const },
+  { id: 'live-rtl', label: 'Live RTL', level: 2 as const },
+];
+
+const dirSnippet = `<html lang="ar" dir="rtl">
+  <!-- or a subtree -->
+  <div dir="rtl" lang="ar">
+    <Field label="المدينة">…</Field>
+  </div>
+</html>`;
+---
+
+<GuidesShell
+  title="RTL and i18n"
+  description="Logical CSS properties, document direction and locale — one component tree for LTR and RTL."
+  {toc}
+>
+  <h2 id="logical-css">Logical CSS</h2>
+  <p>
+    Texuli styles use logical properties (<code>margin-inline</code>, <code>padding-block</code>, <code>inline-size</code>, <code>border-inline-start</code>). You do not maintain a mirrored
+    stylesheet for Arabic or Hebrew UIs.
+  </p>
+
+  <h2 id="dir-and-lang">dir and lang</h2>
+  <p>
+    Set <code>dir</code> and <code>lang</code> on the document or a subtree. Pass a <code>locale</code> into date and number components when they format text. Keep user-facing
+    strings translatable — no hard-coded direction in copy.
+  </p>
+  <GuideCode code={dirSnippet} label="Direction markup" />
+
+  <h2 id="live-rtl">Live RTL</h2>
+  <p>Toggle direction on the demo; the field label and description flip with the writing mode.</p>
+  <RtlLive client:load />
+</GuidesShell>

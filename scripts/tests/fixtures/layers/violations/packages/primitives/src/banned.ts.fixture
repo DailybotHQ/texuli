@@ -1,0 +1,5 @@
+import Dexie from 'dexie';
+import { Button } from '@protoyard/ui';
+export { Dexie, Button };
+export const db = () => import('dexie');
+export * from '@faker-js/faker';

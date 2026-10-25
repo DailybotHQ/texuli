@@ -1,0 +1,122 @@
+[
+  {
+    "slot": "hero-bg",
+    "file": "hero-bg.webp",
+    "width": 1440,
+    "height": 810,
+    "alt": "Abstract soft mesh of teal and sand surfaces suggesting stacked interface panels",
+    "prompt": "Wide soft abstract mesh of teal and sand geometric panels, no text, no logos, calm product UI atmosphere",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "feature-owned",
+    "file": "feature-owned.webp",
+    "width": 640,
+    "height": 400,
+    "alt": "Nested building blocks forming a single solid structure",
+    "prompt": "Nested geometric building blocks forming one solid structure, soft lighting, no text",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "feature-accessible",
+    "file": "feature-accessible.webp",
+    "width": 640,
+    "height": 400,
+    "alt": "Keyboard and focus ring shapes arranged as an open path",
+    "prompt": "Abstract keyboard keys and a glowing focus ring forming an open path, accessible design metaphor, no text",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "feature-agents",
+    "file": "feature-agents.webp",
+    "width": 640,
+    "height": 400,
+    "alt": "Catalog cards flowing into a safe composition grid",
+    "prompt": "Catalog cards flowing into a safe composition grid, agent-built interface metaphor, no text",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "page-components",
+    "file": "page-components.webp",
+    "width": 960,
+    "height": 320,
+    "alt": "Grid of interface tiles for components",
+    "prompt": "Wide banner of interface component tiles in soft teal, no text",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "page-primitives",
+    "file": "page-primitives.webp",
+    "width": 960,
+    "height": 320,
+    "alt": "Small foundation bricks under larger panels",
+    "prompt": "Foundation bricks supporting larger panels, wide banner, no text",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "page-themes",
+    "file": "page-themes.webp",
+    "width": 960,
+    "height": 320,
+    "alt": "Row of color swatches fading into a calm gradient",
+    "prompt": "Row of color swatches fading into a calm gradient, wide banner, no text",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "page-agents",
+    "file": "page-agents.webp",
+    "width": 960,
+    "height": 320,
+    "alt": "Pipeline from catalog to rendered interface",
+    "prompt": "Pipeline from catalog cards to a rendered interface frame, wide banner, no text",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "page-charts",
+    "file": "page-charts.webp",
+    "width": 960,
+    "height": 320,
+    "alt": "Soft chart lines and bars as abstract shapes",
+    "prompt": "Soft chart lines and bars as abstract shapes, wide banner, no text",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "page-media",
+    "file": "page-media.webp",
+    "width": 960,
+    "height": 320,
+    "alt": "Frames of media panels with waveform hints",
+    "prompt": "Media frames with soft waveform hints, wide banner, no text",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "page-guides",
+    "file": "page-guides.webp",
+    "width": 960,
+    "height": 320,
+    "alt": "Open guide pages with gentle depth",
+    "prompt": "Open guide pages with gentle depth, wide banner, no text",
+    "model": "",
+    "created": ""
+  },
+  {
+    "slot": "page-showcase",
+    "file": "page-showcase.webp",
+    "width": 960,
+    "height": 320,
+    "alt": "Product screens arranged as a showcase wall",
+    "prompt": "Product screens arranged as a showcase wall, wide banner, no text",
+    "model": "",
+    "created": ""
+  }
+]

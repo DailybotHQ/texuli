@@ -1,0 +1,328 @@
+/**
+ * Skeleton, Spinner and Progress — loading feedback on the token contract.
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  /* ── Skeleton ─────────────────────────────────────────────────────────── */
+  .tx-skeleton {
+    display: block;
+    border-radius: var(--tx-radius-md, 0.375rem);
+    background-color: var(--tx-muted, Canvas);
+    color: transparent;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .tx-skeleton--sm {
+    block-size: 0.75rem;
+  }
+  .tx-skeleton--md {
+    block-size: 1rem;
+  }
+  .tx-skeleton--lg {
+    block-size: 1.5rem;
+  }
+
+  .tx-skeleton--circle {
+    border-radius: var(--tx-radius-full, 9999px);
+    aspect-ratio: 1;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+
+  .tx-skeleton--circle.tx-skeleton--sm {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+  }
+  .tx-skeleton--circle.tx-skeleton--lg {
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tx-skeleton {
+      animation: tx-skeleton-pulse 1.4s ease-in-out infinite;
+    }
+  }
+
+  @keyframes tx-skeleton-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+
+  /* ── Spinner ──────────────────────────────────────────────────────────── */
+  .tx-spinner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tx-primary, Highlight);
+    vertical-align: middle;
+  }
+
+  .tx-spinner--primary {
+    color: var(--tx-primary, Highlight);
+  }
+  .tx-spinner--success {
+    color: var(--tx-success, green);
+  }
+  .tx-spinner--warning {
+    color: var(--tx-warning, orange);
+  }
+  .tx-spinner--destructive {
+    color: var(--tx-destructive, crimson);
+  }
+  .tx-spinner--info {
+    color: var(--tx-info, dodgerblue);
+  }
+  .tx-spinner--neutral {
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-spinner__icon {
+    display: block;
+    border-radius: 9999px;
+    border-style: solid;
+    border-color: color-mix(in srgb, currentColor 25%, transparent);
+    border-block-start-color: currentColor;
+    box-sizing: border-box;
+  }
+
+  .tx-spinner--sm .tx-spinner__icon {
+    inline-size: 1rem;
+    block-size: 1rem;
+    border-width: 2px;
+  }
+  .tx-spinner--md .tx-spinner__icon {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    border-width: 2px;
+  }
+  .tx-spinner--lg .tx-spinner__icon {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    border-width: 3px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tx-spinner__icon {
+      animation: tx-spinner-spin var(--tx-motion-slow, 0.75s) linear infinite;
+    }
+  }
+
+  @keyframes tx-spinner-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .tx-sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── Progress (linear + circular) ─────────────────────────────────────── */
+  .tx-progress {
+    display: grid;
+    gap: 0.375rem;
+    color: var(--tx-foreground, CanvasText);
+    min-inline-size: 0;
+  }
+
+  .tx-progress__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+  }
+
+  .tx-progress__label {
+    font-weight: var(--tx-font-weight-medium, 500);
+  }
+
+  .tx-progress__value {
+    margin-inline-start: auto;
+    font-variant-numeric: tabular-nums;
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-progress__track {
+    position: relative;
+    overflow: hidden;
+    inline-size: 100%;
+    border-radius: var(--tx-radius-full, 9999px);
+    background-color: var(--tx-muted, Canvas);
+  }
+
+  .tx-progress--sm .tx-progress__track {
+    block-size: 0.375rem;
+  }
+  .tx-progress--md .tx-progress__track {
+    block-size: 0.625rem;
+  }
+  .tx-progress--lg .tx-progress__track {
+    block-size: 0.875rem;
+  }
+
+  .tx-progress__indicator {
+    block-size: 100%;
+    border-radius: inherit;
+    background-color: var(--tx-progress-fill, var(--tx-primary, Highlight));
+    inline-size: var(--tx-progress-value, 0%);
+    max-inline-size: 100%;
+    transition: inline-size var(--tx-motion-base, 200ms) var(--tx-motion-easing, ease);
+  }
+
+  .tx-progress--primary {
+    --tx-progress-fill: var(--tx-primary, Highlight);
+  }
+  .tx-progress--success {
+    --tx-progress-fill: var(--tx-success, green);
+  }
+  .tx-progress--warning {
+    --tx-progress-fill: var(--tx-warning, orange);
+  }
+  .tx-progress--destructive {
+    --tx-progress-fill: var(--tx-destructive, crimson);
+  }
+  .tx-progress--info {
+    --tx-progress-fill: var(--tx-info, dodgerblue);
+  }
+  .tx-progress--neutral {
+    --tx-progress-fill: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-progress__indicator--indeterminate {
+    inline-size: 33%;
+    max-inline-size: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tx-progress__indicator--indeterminate {
+      animation: tx-progress-indeterminate 1.2s ease-in-out infinite;
+    }
+  }
+
+  @keyframes tx-progress-indeterminate {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(400%);
+    }
+  }
+
+  /* Circular */
+  .tx-progress--circular {
+    display: inline-grid;
+    justify-items: center;
+    gap: 0.5rem;
+  }
+
+  .tx-progress__circle-wrap {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+
+  .tx-progress__circle-host {
+    display: block;
+    line-height: 0;
+  }
+
+  .tx-progress__circle {
+    display: block;
+    transform: rotate(-90deg);
+  }
+
+  .tx-progress--sm .tx-progress__circle {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+  .tx-progress--md .tx-progress__circle {
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+  }
+  .tx-progress--lg .tx-progress__circle {
+    inline-size: 4.5rem;
+    block-size: 4.5rem;
+  }
+
+  .tx-progress__circle-track {
+    fill: none;
+    stroke: var(--tx-muted, Canvas);
+    stroke-width: 8;
+  }
+
+  .tx-progress__circle-meter {
+    fill: none;
+    stroke: var(--tx-progress-fill, var(--tx-primary, Highlight));
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: var(--tx-progress-circumference, 100);
+    stroke-dashoffset: var(--tx-progress-offset, 0);
+    transition: stroke-dashoffset var(--tx-motion-base, 200ms) var(--tx-motion-easing, ease);
+  }
+
+  .tx-progress__circle-meter--indeterminate {
+    stroke-dasharray: 40 200;
+    stroke-dashoffset: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tx-progress__circle-meter--indeterminate {
+      animation: tx-progress-circle-spin 1s linear infinite;
+    }
+  }
+
+  @keyframes tx-progress-circle-spin {
+    to {
+      stroke-dashoffset: -240;
+    }
+  }
+
+  .tx-progress__circle-center {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: var(--tx-font-size-xs, 0.75rem);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--tx-font-weight-medium, 500);
+    color: var(--tx-foreground, CanvasText);
+    pointer-events: none;
+  }
+
+  @media (forced-colors: active) {
+    .tx-skeleton {
+      border: 1px solid GrayText;
+      background-color: Canvas;
+    }
+    .tx-progress__track {
+      border: 1px solid ButtonText;
+      background-color: Canvas;
+    }
+    .tx-progress__indicator,
+    .tx-progress__circle-meter {
+      forced-color-adjust: none;
+      background-color: Highlight;
+      stroke: Highlight;
+    }
+    .tx-spinner__icon {
+      border-color: GrayText;
+      border-block-start-color: ButtonText;
+    }
+  }
+}

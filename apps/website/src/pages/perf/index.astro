@@ -1,0 +1,158 @@
+---
+import {
+  DEFAULT_BUDGET,
+  OUTPUT_ISLANDS,
+  ROUTE_BUDGET_OVERRIDES,
+  ROUTE_PREFIX_BUDGETS,
+  type RouteBudget,
+} from '../../components/perf/budgets.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+/**
+ * /perf/: the site's performance budgets (T-site-perf). Static: no islands of
+ * its own; the spec measures every route against these numbers.
+ */
+const columns: { key: keyof RouteBudget; label: string; unit: string }[] = [
+  { key: 'htmlRawKb', label: 'HTML', unit: 'KB raw' },
+  { key: 'htmlGzipKb', label: 'HTML', unit: 'KB gzip' },
+  { key: 'pageGzipKb', label: 'Page weight', unit: 'KB gzip' },
+  { key: 'jsGzipKb', label: 'JavaScript', unit: 'KB gzip' },
+  { key: 'cls', label: 'CLS', unit: '' },
+  { key: 'lcpMs', label: 'LCP (lab)', unit: 'ms' },
+];
+const rows = [
+  { route: 'Every other route', reason: 'The default budget.', budget: DEFAULT_BUDGET },
+  ...ROUTE_BUDGET_OVERRIDES.map((entry) => ({
+    route: entry.route,
+    reason: entry.reason,
+    budget: { ...DEFAULT_BUDGET, ...entry.budget },
+  })),
+  ...ROUTE_PREFIX_BUDGETS.map((entry) => ({
+    route: entry.label,
+    reason: entry.reason,
+    budget: { ...DEFAULT_BUDGET, ...entry.budget },
+  })),
+];
+---
+
+<BaseLayout
+  title="Performance budgets"
+  description="The lab budgets every texuli.com route is held to: HTML and page weight, JavaScript, layout shift and largest contentful paint."
+>
+  <h1>Performance budgets</h1>
+  <p class="lead">
+    Every route of this site is static HTML held to the budgets below. The end-to-end suite
+    measures the built site in a browser: no request may leave this origin, islands hydrate only
+    where there is something to operate, and each number stays under its limit.
+  </p>
+
+  <div class="table" role="region" aria-labelledby="budget-caption" tabindex="0">
+    <table>
+      <caption id="budget-caption">Budgets per route</caption>
+      <thead>
+        <tr>
+          <th scope="col">Route</th>
+          {columns.map((c) => <th scope="col">{c.label}{c.unit ? <span class="unit"> ({c.unit})</span> : null}</th>)}
+          <th scope="col">Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr>
+              <th scope="row" aria-label={row.route === '/' ? 'Home /' : row.route}>
+                <code>{row.route === '/' ? 'Home /' : row.route}</code>
+              </th>
+              {columns.map((c) => <td class="num">{row.budget[c.key]}</td>)}
+              <td>{row.reason}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2>How the heavy routes stay light</h2>
+  <ul>
+    <li>
+      The theme gallery, theme switcher and color explorer load each theme as its own same-origin
+      file, <code>/theme-css/&lt;id&gt;.css</code> and <code>/theme-data/&lt;id&gt;.json</code>,
+      only when it is on screen or chosen. They used to inline all 210 themes: 2.5 MB, 1.7 MB and
+      12.7 MB of HTML.
+    </li>
+    <li>The gallery renders 24 cards at a time, with a button to show more.</li>
+    <li>The app navigation's mobile drawer loads on first open, so wide screens never pay for it.</li>
+  </ul>
+
+  <h2>How it is measured</h2>
+  <ul>
+    <li>Sizes: the built files, gzipped at level 9, for every HTML route.</li>
+    <li>Page weight: every same-origin file a page loads until the network is idle.</li>
+    <li>
+      Islands: each hydrated island must contain something to operate. The only exceptions show
+      output for another control: {Object.entries(OUTPUT_ISLANDS).map(([name, why]) => <span><code>{name}</code> ({why})</span>)}
+    </li>
+    <li>CLS: layout-shift entries during load (Chromium engines).</li>
+    <li>LCP: the largest-contentful-paint entry, checked only when <code>TEXULI_PERF=1</code>, because wall-clock numbers vary with machine load.</li>
+  </ul>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-block: 0 0.25rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.15;
+  }
+  .lead {
+    margin-block: 0 1.5rem;
+    max-inline-size: 44rem;
+    color: var(--tx-muted-foreground);
+    font-size: 1.125rem;
+  }
+  .table {
+    overflow-x: auto;
+    margin-block-end: 2rem;
+    border-radius: var(--tx-radius, 0.5rem);
+  }
+  .table:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+  table {
+    inline-size: 100%;
+    /* On a phone the table scrolls sideways; its "Why" column stays readable. */
+    min-inline-size: 52rem;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  caption {
+    text-align: start;
+    font-weight: 600;
+    padding-block-end: 0.5rem;
+  }
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    border-block-end: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+    text-align: start;
+    vertical-align: top;
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+  .unit {
+    color: var(--tx-muted-foreground);
+    font-weight: 400;
+  }
+  h2 {
+    font-size: 1.25rem;
+    margin-block: 1.5rem 0.5rem;
+  }
+  ul {
+    display: grid;
+    gap: 0.375rem;
+    max-inline-size: 48rem;
+    padding-inline-start: 1.25rem;
+  }
+</style>

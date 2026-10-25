@@ -1,0 +1,31 @@
+{
+  "dialect": "https://json-schema.org/draft/2020-12/schema",
+  "files": {
+    "catalog/capabilities.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "catalog/components.json": "27c72412b2a73af1d67cfbbf6c219cf5ec85d5282089e5f54928a41b35019165",
+    "fixtures/golden/conditional-report.json": "61c8a66dc43e3b5cbc9b1c884551a07ce1577fb86160918482f24b6e2ad0171f",
+    "fixtures/golden/dashboard.json": "33ddd280521fcb89d27d188d24d6f08bff8cda227efa64025ca9dc6e6bdbbc7b",
+    "fixtures/golden/proactive-deck.json": "aadaced257ec67ba085ca479beda895d85b5f0c21372fa9c675cb1a3de8dda5d",
+    "fixtures/golden/report-on-demand.json": "01b5ff0907305286285b7aee824e0de923041dcc46bb8629c041a138b24aa154",
+    "fixtures/invalid/catalog-mismatch.json": "f59a790327f6b6c37f642e8231e6a90e749b7662645bd7d37e0d0e726bc99972",
+    "fixtures/invalid/condition-extra-field.json": "0a9c89ed17820bf3974ac628005a4c5efd7e973e5094db2aa7e8485a86fb431c",
+    "fixtures/invalid/condition-unknown-op.json": "e1b1fc06bd652c94e141e08310c3924e239fe7ddb607336557fe48b2631408fa",
+    "fixtures/invalid/enum-value.json": "ab3abb45aadcb2281c9c9b034dffee6fdbdeae19ac0c12e21a39e63a6006af71",
+    "fixtures/invalid/extension-prop.json": "f78094a4104eff529cc7f1179810118114f93b54c4a588a2f8ac563f55d9fec9",
+    "fixtures/invalid/missing-required.json": "853756d3bfb474063dfbed9dfd0f72f0cc87610ec801afdf05ba6efe8e8bbba4",
+    "fixtures/invalid/node-extra-field.json": "54aa5a0118fcd6b29e0ddc3a3140c89bd42d10f73bee5945f1ab681e86cd08f3",
+    "fixtures/invalid/portable-profile.json": "b101320fe4aad150f23ff089d9cbe99fe33283e92b693b5b4aa489a2618bffc5",
+    "fixtures/invalid/prop-type.json": "2ef4051c61035e717c38aa6c6d39359998738ba9fb1cbac8c8dd80ee0eecf87d",
+    "fixtures/invalid/unknown-envelope-field.json": "3a4b7a25a9a20097b4b1b76b4c58df0f6ea07e083d4aab00d8982df92ed47a41",
+    "fixtures/invalid/unknown-id.json": "e31128f6c9e6278f6d8342dada8d6d776059455832f94d8a55cfa15348dfe1f8",
+    "fixtures/invalid/unknown-prop.json": "fd325d10cdb08c83346c10c56e7c7cfd1135104d93b4309f25458eaa6e776ffa",
+    "fixtures/invalid/unknown-slot-root.json": "10f8ff4975132b421f694ae06c4141e9c783e55d28b11b7d126cf2c75a6ddb57",
+    "fixtures/invalid/unknown-slot.json": "e6922714cb164cefb3037884cd5de39d5c207621a85d52ebbc20838a145efa40",
+    "fixtures/invalid/unsupported-version.json": "59b2691c5437832212ada14f2237c892b96338e0c6b99bbd68a62368bdc2ea6a",
+    "schemas/blueprint.schema.json": "aa3e940c44da84b9a691b472008a3c7de71922fea3ff49edd3e16605f41cdd1e",
+    "schemas/catalog.schema.json": "08f7921e66a71576978efa521e861e9a63703114a8e43f1f1b194be80286efbe",
+    "schemas/diagnostics.schema.json": "fe1c4ce53fb29e577b813a2257730f32fffeb1928bf8d059ca470fffb05e652c",
+    "schemas/manifest.schema.json": "f9450e0a01268647d61b64a1834646663730fb07a0534167be0de50b39dc17ea"
+  },
+  "specVersion": "0.2.0"
+}

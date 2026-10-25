@@ -1,0 +1,192 @@
+{
+  "$comment": "PLAN_002 expressiveness-audit fixture. The wrapper is audit metadata only; it is NOT a proposed blueprint envelope (ADR-003 owns that). `tree` is a real CatalogTreeInput for the catalog build named in `catalog`. Probes are fragments expected to fail; each names the gap it evidences. Fictional data only.",
+  "fixture": "03-settings-form",
+  "catalog": "catalog-f4553b4eaced02c163f6606e53eb4dab1277345aa5247cbb57ceaac2c116c703.json",
+  "screen": "Account settings: section navigation, profile fields, notification toggles, digest-day choice, save action.",
+  "northStar": null,
+  "tier": "developer",
+  "capabilityTier": "unknown (ADR-003); audit candidate: portable core for field/switch/checkbox/radio semantics",
+  "result": "renders-but-inert",
+  "tree": {
+    "id": "layout-settings",
+    "props": {
+      "title": "Account settings",
+      "description": "Profile and notification preferences for ada@example.com",
+      "sections": [
+        {
+          "id": "profile",
+          "label": "Profile"
+        },
+        {
+          "id": "notifications",
+          "label": "Notifications"
+        }
+      ],
+      "active": "profile"
+    },
+    "children": [
+      {
+        "id": "form",
+        "props": {
+          "layout": "stack"
+        },
+        "children": [
+          {
+            "id": "field",
+            "props": {
+              "label": "Display name",
+              "required": true
+            },
+            "children": [
+              {
+                "id": "input",
+                "props": {
+                  "type": "text",
+                  "value": "Ada Example"
+                }
+              }
+            ]
+          },
+          {
+            "id": "field",
+            "props": {
+              "label": "Email",
+              "description": "Used for sign-in and weekly digests"
+            },
+            "children": [
+              {
+                "id": "input",
+                "props": {
+                  "type": "email",
+                  "value": "ada@example.com"
+                }
+              }
+            ]
+          },
+          {
+            "id": "switch",
+            "props": {
+              "label": "Weekly digest email",
+              "checked": true
+            }
+          },
+          {
+            "id": "checkbox",
+            "props": {
+              "label": "Notify me only when I am mentioned"
+            }
+          },
+          {
+            "id": "field",
+            "props": {
+              "label": "Digest day"
+            },
+            "children": [
+              {
+                "id": "radio-group",
+                "props": {
+                  "items": [
+                    {
+                      "label": "Monday",
+                      "value": "mon"
+                    },
+                    {
+                      "label": "Friday",
+                      "value": "fri"
+                    }
+                  ],
+                  "value": "fri",
+                  "orientation": "horizontal"
+                }
+              }
+            ]
+          },
+          {
+            "id": "button",
+            "props": {
+              "type": "submit",
+              "variant": "default"
+            },
+            "children": [
+              {
+                "id": "blocks-text",
+                "props": {
+                  "block": {
+                    "type": "text",
+                    "markdown": "Save changes"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "probes": [
+    {
+      "gap": "G06",
+      "intent": "The same settings form emitted by an untrusted agent",
+      "tier": "untrusted",
+      "tree": {
+        "id": "form",
+        "props": {
+          "layout": "stack"
+        }
+      },
+      "expect": ["tier-denied"]
+    },
+    {
+      "gap": "G02",
+      "intent": "Submit the form values to a declared action",
+      "tree": {
+        "id": "form",
+        "props": {
+          "layout": "stack",
+          "onSubmitValues": "saveProfile"
+        }
+      },
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G17",
+      "intent": "Give the input a form name so submitted values are keyed",
+      "tree": {
+        "id": "input",
+        "props": {
+          "type": "text",
+          "name": "displayName"
+        }
+      },
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G03",
+      "intent": "Give the button a plain-text label instead of a child block",
+      "tree": {
+        "id": "button",
+        "props": {
+          "type": "submit",
+          "label": "Save changes"
+        }
+      },
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G01",
+      "intent": "Bind the input value to account state",
+      "tree": {
+        "id": "input",
+        "props": {
+          "type": "text",
+          "value": {
+            "$bind": "account.displayName"
+          }
+        }
+      },
+      "expect": ["schema-failure", "node-dropped"]
+    }
+  ],
+  "gaps": ["G01", "G02", "G03", "G06", "G17", "G15"],
+  "notes": "Every node renders at the developer tier, but the result is a picture of a form: values are literals, change and submit events are refused, inputs carry no name, and the button label is a block-level paragraph inside the button (the only way to put text in a slot-only component). Section switching (`onSelect`) is an event and cannot come from the tree."
+}

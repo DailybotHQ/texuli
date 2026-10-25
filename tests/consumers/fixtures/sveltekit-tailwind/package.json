@@ -1,0 +1,29 @@
+{
+  "name": "@texuli-consumer/sveltekit-tailwind",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --strictPort",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.consumer.json"
+  },
+  "dependencies": {
+    "@texuli/core": "file:PLACEHOLDER_CORE",
+    "@texuli/data": "file:PLACEHOLDER_DATA",
+    "@texuli/primitives": "file:PLACEHOLDER_PRIMITIVES",
+    "@texuli/tokens": "file:PLACEHOLDER_TOKENS",
+    "texuli": "file:PLACEHOLDER_TEXULI"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "3.0.8",
+    "@sveltejs/kit": "2.70.3",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@tailwindcss/vite": "4.3.3",
+    "svelte": "5.57.2",
+    "tailwindcss": "4.3.3",
+    "vite": "8.3.4",
+    "svelte-check": "4.7.7",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "name": "@texuli/catalog",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The agent catalog and the renderer with no HTML sinks.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./build": {
+      "types": "./src/build/index.ts",
+      "default": "./src/build/index.ts"
+    },
+    "./build/node": {
+      "types": "./src/build/node.ts",
+      "default": "./src/build/node.ts"
+    },
+    "./edit": {
+      "types": "./src/edit/index.ts",
+      "default": "./src/edit/index.ts"
+    },
+    "./envelope": {
+      "types": "./src/envelope/index.ts",
+      "default": "./src/envelope/index.ts"
+    },
+    "./manifest": {
+      "types": "./src/manifest/index.ts",
+      "default": "./src/manifest/index.ts"
+    },
+    "./manifests/content": {
+      "types": "./src/manifests/content/index.ts",
+      "default": "./src/manifests/content/index.ts"
+    },
+    "./manifests/display": {
+      "types": "./src/manifests/display/index.ts",
+      "default": "./src/manifests/display/index.ts"
+    },
+    "./manifests/forms": {
+      "types": "./src/manifests/forms/index.ts",
+      "default": "./src/manifests/forms/index.ts"
+    },
+    "./manifests/layouts": {
+      "types": "./src/manifests/layouts/index.ts",
+      "default": "./src/manifests/layouts/index.ts"
+    },
+    "./manifests/overlays": {
+      "types": "./src/manifests/overlays/index.ts",
+      "default": "./src/manifests/overlays/index.ts"
+    },
+    "./player": {
+      "types": "./src/player/index.ts",
+      "default": "./src/player/index.ts"
+    },
+    "./render/frame": {
+      "types": "./src/render/frame/index.ts",
+      "default": "./src/render/frame/index.ts"
+    },
+    "./render/grammar": {
+      "types": "./src/render/grammar/index.ts",
+      "default": "./src/render/grammar/index.ts"
+    },
+    "./render/hostile": {
+      "types": "./src/render/hostile/index.ts",
+      "default": "./src/render/hostile/index.ts"
+    },
+    "./render/limits": {
+      "types": "./src/render/limits/index.ts",
+      "default": "./src/render/limits/index.ts"
+    },
+    "./render/conditions": {
+      "types": "./src/render/conditions/index.ts",
+      "default": "./src/render/conditions/index.ts"
+    },
+    "./render/renderer": {
+      "types": "./src/render/renderer/index.ts",
+      "default": "./src/render/renderer/index.ts"
+    },
+    "./render/richtext": {
+      "types": "./src/render/richtext/index.ts",
+      "default": "./src/render/richtext/index.ts"
+    },
+    "./validate": {
+      "types": "./src/validate/index.ts",
+      "default": "./src/validate/index.ts"
+    },
+    "./validate/blocks": {
+      "types": "./src/validate/blocks.ts",
+      "default": "./src/validate/blocks.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/core": "workspace:*",
+    "texuli": "workspace:*",
+    "@texuli/charts": "workspace:*",
+    "@texuli/data": "workspace:*",
+    "@texuli/blocks": "workspace:*",
+    "@texuli/media": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

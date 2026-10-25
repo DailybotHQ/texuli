@@ -1,0 +1,203 @@
+{
+  "$comment": "Golden hostile deck inputs: each case is a deck an agent could emit that must fail closed. Fictional data only; the hostile strings are inert test data.",
+  "golden": "deck-hostile",
+  "cases": [
+    {
+      "name": "bad-slide-id",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Bad ids" },
+        "children": [
+          {
+            "id": "deck-slide",
+            "props": { "slideId": "Opening Slide!", "title": "Opening" },
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplicate-slide-id",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Duplicates" },
+        "children": [
+          { "id": "deck-slide", "props": { "slideId": "one" }, "children": [] },
+          { "id": "deck-slide", "props": { "slideId": "one" }, "children": [] }
+        ]
+      }
+    },
+    {
+      "name": "missing-slide-id",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "No id" },
+        "children": [{ "id": "deck-slide", "props": { "title": "Anonymous" }, "children": [] }]
+      }
+    },
+    {
+      "name": "unknown-master",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Unknown master", "masters": ["title"] },
+        "children": [
+          { "id": "deck-slide", "props": { "slideId": "one", "master": "hero" }, "children": [] }
+        ]
+      }
+    },
+    {
+      "name": "undeclared-master",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Undeclared master", "masters": ["title"] },
+        "children": [
+          { "id": "deck-slide", "props": { "slideId": "one", "master": "quote" }, "children": [] }
+        ]
+      }
+    },
+    {
+      "name": "unknown-transition",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Spin" },
+        "children": [
+          {
+            "id": "deck-slide",
+            "props": { "slideId": "one", "transition": "spin-3d" },
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "bad-theme-ref",
+      "tree": {
+        "id": "layout-deck",
+        "props": {
+          "title": "Theme",
+          "themeRef": { "kind": "remote", "url": "https://example.com/theme.css" }
+        },
+        "children": [{ "id": "deck-slide", "props": { "slideId": "one" }, "children": [] }]
+      }
+    },
+    {
+      "name": "foreign-child",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Mixed children" },
+        "children": [
+          { "id": "deck-slide", "props": { "slideId": "one" }, "children": [] },
+          { "id": "layout-grid", "props": { "columns": 2 }, "children": [] }
+        ]
+      }
+    },
+    {
+      "name": "malformed-block",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Broken block" },
+        "children": [
+          {
+            "id": "deck-slide",
+            "props": { "slideId": "one" },
+            "children": [{ "id": "blocks-text", "props": { "block": { "type": "list" } } }]
+          }
+        ]
+      }
+    },
+    {
+      "name": "family-mismatch",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Wrong family" },
+        "children": [
+          {
+            "id": "deck-slide",
+            "props": { "slideId": "one" },
+            "children": [
+              {
+                "id": "blocks-code",
+                "props": { "block": { "type": "heading", "level": 2, "text": "Hi" } }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "script-url-image",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Script URL" },
+        "children": [
+          {
+            "id": "deck-slide",
+            "props": { "slideId": "one" },
+            "children": [
+              {
+                "id": "blocks-media",
+                "props": {
+                  "block": {
+                    "type": "image",
+                    "src": "javascript:alert(1)",
+                    "alt": "x",
+                    "width": 10,
+                    "height": 10
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "html-in-notes",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "HTML notes" },
+        "children": [
+          {
+            "id": "deck-slide",
+            "props": { "slideId": "one", "notes": "<img src=x onerror=alert(1)>" },
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "style-and-class-props",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Styled" },
+        "children": [
+          {
+            "id": "deck-slide",
+            "props": { "slideId": "one", "class": "evil", "style": "position:fixed" },
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "slides-and-children",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Two encodings", "slides": [{ "id": "x", "children": [] }] },
+        "children": [{ "id": "deck-slide", "props": { "slideId": "one" }, "children": [] }]
+      }
+    },
+    {
+      "name": "not-a-deck-root",
+      "tree": {
+        "id": "layout-page",
+        "props": { "title": "A page" },
+        "children": [{ "id": "deck-slide", "props": { "slideId": "one" }, "children": [] }]
+      }
+    },
+    {
+      "name": "empty-deck",
+      "tree": { "id": "layout-deck", "props": { "title": "Nothing" }, "children": [] }
+    }
+  ]
+}

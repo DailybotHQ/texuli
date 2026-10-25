@@ -1,0 +1,122 @@
+/**
+ * Badge, Tag and Chip — @layer tx.components so consumer utilities in later
+ * layers can override. Token pairs keep small text AA against the fill.
+ */
+@layer tx.components {
+  .tx-badge,
+  .tx-tag,
+  .tx-chip {
+    display: inline-flex;
+    inline-size: fit-content;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: var(--tx-radius-full, 9999px);
+    border: 1px solid transparent;
+    padding-block: 0.125rem;
+    padding-inline: 0.5rem;
+    font-size: var(--tx-font-size-xs, 0.75rem);
+    font-weight: var(--tx-font-weight-medium, 500);
+    line-height: 1.25;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .tx-badge :where(svg),
+  .tx-tag :where(svg),
+  .tx-chip :where(svg) {
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .tx-badge--default {
+    background-color: var(--tx-primary, Highlight);
+    color: var(--tx-primary-foreground, HighlightText);
+  }
+  .tx-badge--secondary {
+    background-color: var(--tx-secondary, Canvas);
+    color: var(--tx-secondary-foreground, CanvasText);
+  }
+  .tx-badge--outline {
+    border-color: var(--tx-border, currentColor);
+    background-color: transparent;
+    color: var(--tx-foreground, CanvasText);
+  }
+  .tx-badge--success {
+    background-color: var(--tx-success, green);
+    color: var(--tx-success-foreground, Canvas);
+  }
+  .tx-badge--warning {
+    background-color: var(--tx-warning, orange);
+    color: var(--tx-warning-foreground, CanvasText);
+  }
+  .tx-badge--destructive {
+    background-color: var(--tx-destructive, crimson);
+    color: var(--tx-destructive-foreground, Canvas);
+  }
+  .tx-badge--info {
+    background-color: var(--tx-info, dodgerblue);
+    color: var(--tx-info-foreground, Canvas);
+  }
+  .tx-badge--neutral {
+    background-color: var(--tx-muted, Canvas);
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-tag {
+    gap: 0.375rem;
+    padding-inline-end: 0.25rem;
+  }
+
+  .tx-tag__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0.125rem;
+    border: 0;
+    border-radius: var(--tx-radius-full, 9999px);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    line-height: 0;
+  }
+
+  .tx-tag__remove:hover {
+    background-color: color-mix(in srgb, currentColor 12%, transparent);
+  }
+
+  .tx-tag__remove:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 1px);
+  }
+
+  .tx-chip {
+    padding-block: 0.25rem;
+    padding-inline: 0.625rem;
+    font-weight: var(--tx-font-weight-semibold, 600);
+  }
+
+  .tx-chip[data-selected="true"] {
+    box-shadow: inset 0 0 0 1px var(--tx-ring, Highlight);
+  }
+
+  .tx-chip:disabled,
+  .tx-chip[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @media (forced-colors: active) {
+    .tx-badge,
+    .tx-tag,
+    .tx-chip {
+      border: 1px solid ButtonText;
+      forced-color-adjust: none;
+    }
+    .tx-badge--outline {
+      border-color: ButtonText;
+    }
+  }
+}

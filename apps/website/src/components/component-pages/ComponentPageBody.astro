@@ -1,0 +1,392 @@
+---
+/**
+ * Body of one component page: examples, code, props, keyboard, a11y, useWhen.
+ * All manifest strings are escaped; no HTML sinks.
+ */
+import { Badge } from 'texuli/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'texuli/card';
+import EvidencePanel from '../evidence/EvidencePanel.astro';
+import LiveDemo from '../live/LiveDemo.svelte';
+import { STAGE_CONTROLS } from '../live/stage-controls.ts';
+import { stageFor } from '../live/stage-map.ts';
+import {
+  a11yLines,
+  type ComponentPageEntry,
+  componentPagePath,
+  componentPager,
+  keyboardRows,
+} from './load-manifests.ts';
+
+interface Props {
+  entry: ComponentPageEntry;
+}
+
+const { entry } = Astro.props;
+const a11y = a11yLines(entry.a11y);
+const keys = keyboardRows(entry.a11y);
+const { prev, next } = componentPager(entry.id);
+// Resolved at build time so the live demo island ships no per-id tables.
+const stage = stageFor(entry.id);
+const EDITABLE = new Set(['string', 'number', 'boolean', 'enum']);
+// The island needs only editable props (for starting values and code
+// defaults); descriptions ride along only on the panel's own controls.
+const liveSchema = entry.props
+  .filter((prop) => EDITABLE.has(prop.kind))
+  .map((prop) => ({
+    name: prop.name,
+    kind: prop.kind,
+    ...(prop.enumValues ? { enumValues: prop.enumValues } : {}),
+    ...(prop.default !== undefined ? { default: prop.default } : {}),
+  }));
+const liveProps = {
+  family: stage?.family,
+  fullPage: stage?.isolate === true,
+  framed: stage?.framed === true,
+  height: stage?.height,
+  controls: stage
+    ? entry.props.filter((prop) => STAGE_CONTROLS[entry.id]?.includes(prop.name))
+    : undefined,
+  codeTarget: stage
+    ? { from: stage.from, name: stage.name, tag: stage.tag, children: stage.children }
+    : undefined,
+};
+---
+
+<article class="cp" data-tx-component-page={entry.id} data-group={entry.group}>
+  <header class="cp__header">
+    <p class="cp__eyebrow">
+      <Badge variant="secondary">{entry.group}</Badge>
+      <Badge variant="outline">{entry.package}</Badge>
+      {
+        entry.agentEmittable ? (
+          <Badge variant="secondary">agent-emittable</Badge>
+        ) : (
+          <Badge variant="outline">not agent-emittable</Badge>
+        )
+      }
+      <Badge variant="outline">{entry.tier}</Badge>
+    </p>
+    <h1>{entry.label}</h1>
+    <p class="cp__id">
+      <code>{entry.id}</code>
+    </p>
+    <p class="cp__lead">{entry.summary}</p>
+  </header>
+
+  <section class="cp__section" aria-labelledby="cp-examples">
+    <h2 id="cp-examples">Live examples</h2>
+    {
+      entry.examples.length === 0 ? (
+        <div class="cp__example">
+          <LiveDemo
+              client:visible={{ rootMargin: "200px" }}
+              componentId={entry.id}
+            packageName={entry.package}
+            schema={liveSchema}
+            {...liveProps}
+            eager
+          />
+        </div>
+      ) : (
+        entry.examples.map((example, index) => (
+          <div class="cp__example" data-example={example.id}>
+            {
+              example.description && (
+                <p class="muted">{example.description}</p>
+              )
+            }
+            <LiveDemo
+              client:visible={{ rootMargin: "200px" }}
+              componentId={entry.id}
+              packageName={entry.package}
+              schema={liveSchema}
+              {...liveProps}
+              example={{ id: example.id, title: example.title, props: example.props }}
+              eager={index === 0}
+            />
+          </div>
+        ))
+      )
+    }
+  </section>
+
+  <section class="cp__section" aria-labelledby="cp-props">
+    <h2 id="cp-props">Props</h2>
+    <div class="cp__table-wrap" role="region" aria-label={`${entry.label} props`} tabindex="0">
+      <table class="cp__table">
+        <caption class="sr-only">Public props for {entry.label}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Kind</th>
+            <th scope="col">Required</th>
+            <th scope="col">Default</th>
+            <th scope="col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            entry.props.map((prop) => (
+              <tr>
+                <th scope="row">
+                  <code>{prop.name}</code>
+                </th>
+                <td>
+                  <code>{prop.kind}</code>
+                  {prop.enumValues && prop.enumValues.length > 0 && (
+                    <span class="muted"> ({prop.enumValues.join(', ')})</span>
+                  )}
+                </td>
+                <td>{prop.required ? 'yes' : 'no'}</td>
+                <td>
+                  {prop.default !== undefined ? (
+                    <code>{JSON.stringify(prop.default)}</code>
+                  ) : (
+                    '—'
+                  )}
+                </td>
+                <td>{prop.description ?? '—'}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="cp__section" aria-labelledby="cp-keyboard">
+    <h2 id="cp-keyboard">Keyboard</h2>
+    <div class="cp__table-wrap" role="region" aria-label={`${entry.label} keyboard`} tabindex="0">
+      <table class="cp__table">
+        <caption class="sr-only">Keyboard behavior for {entry.label}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Key</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            keys.map((row) => (
+              <tr>
+                <th scope="row">
+                  <code>{row.key}</code>
+                </th>
+                <td>{row.action}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="cp__section" aria-labelledby="cp-a11y">
+    <h2 id="cp-a11y">Accessibility</h2>
+    <ul>
+      {a11y.map((line) => <li>{line}</li>)}
+    </ul>
+  </section>
+
+  <div class="cp__section">
+    <EvidencePanel entry={entry} />
+  </div>
+
+  <section class="cp__section" aria-labelledby="cp-when">
+    <h2 id="cp-when">When to use</h2>
+    <div class="cp__when">
+      <Card variant="flat">
+        <CardHeader>
+          <CardTitle level={3}>Use when</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul>
+            {entry.useWhen.map((line) => <li>{line}</li>)}
+          </ul>
+        </CardContent>
+      </Card>
+      <Card variant="flat">
+        <CardHeader>
+          <CardTitle level={3}>Don’t use when</CardTitle>
+          <CardDescription>Prefer another component</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul>
+            {entry.dontUseWhen.map((line) => <li>{line}</li>)}
+          </ul>
+        </CardContent>
+      </Card>
+    </div>
+  </section>
+
+  {
+    entry.related && entry.related.length > 0 && (
+      <section class="cp__section" aria-labelledby="cp-related">
+        <h2 id="cp-related">Related</h2>
+        <ul class="cp__related">
+          {entry.related.map((id) => (
+            <li>
+              <a href={componentPagePath(id)}>
+                <code>{id}</code>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <nav class="cp__pager" aria-label="Component pages">
+    {
+      prev ? (
+        <a class="cp__pager-link" href={componentPagePath(prev.id)}>
+          <span class="muted">Previous</span>
+          <span>{prev.label}</span>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+    {
+      next ? (
+        <a class="cp__pager-link cp__pager-link--next" href={componentPagePath(next.id)}>
+          <span class="muted">Next</span>
+          <span>{next.label}</span>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+  </nav>
+</article>
+
+<style>
+  .cp {
+    display: grid;
+    /* One column that may shrink below its widest code sample, which scrolls instead. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+  .cp__header {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .cp__eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.35rem);
+    line-height: 1.15;
+  }
+  .cp__id {
+    margin: 0;
+  }
+  .cp__lead {
+    margin: 0.25rem 0 0;
+    font-size: 1.1rem;
+    color: var(--tx-muted-foreground);
+    max-inline-size: 42rem;
+  }
+  .cp__section h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.25rem;
+  }
+  .cp__h3 {
+    margin: 0.75rem 0 0.35rem;
+    font-size: 0.95rem;
+  }
+  .cp__example {
+    display: grid;
+    gap: 0.5rem;
+    margin-block-end: 1.25rem;
+  }
+  .cp__code {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    overflow: auto;
+    border-radius: var(--tx-radius, 0.5rem);
+    border: 1px solid var(--tx-border);
+    background: var(--tx-surface, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+  /* Wide tables scroll inside a focusable region, so keyboards can scroll them too. */
+  .cp__table-wrap {
+    overflow: auto;
+  }
+  .cp__table-wrap:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .cp__table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .cp__table th,
+  .cp__table td {
+    text-align: start;
+    vertical-align: top;
+    padding: 0.5rem 0.4rem;
+    border-block-end: 1px solid var(--tx-border);
+  }
+  .cp__when {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 40rem) {
+    .cp__when {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .cp__when ul,
+  .cp__section ul {
+    margin: 0;
+    padding-inline-start: 1.15rem;
+  }
+  .cp__related {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .cp__pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-start: 1rem;
+    border-block-start: 1px solid var(--tx-border);
+  }
+  .cp__pager-link {
+    display: grid;
+    gap: 0.15rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .cp__pager-link--next {
+    text-align: end;
+    margin-inline-start: auto;
+  }
+  .muted {
+    color: var(--tx-foreground);
+  }
+  .sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

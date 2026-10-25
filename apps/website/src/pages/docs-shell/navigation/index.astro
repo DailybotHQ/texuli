@@ -1,0 +1,37 @@
+---
+import DocsShell from '../../../components/docs-shell/DocsShell.astro';
+
+const toc = [
+  { id: 'sidebar', label: 'Sidebar', level: 2 as const },
+  { id: 'mobile-menu', label: 'Mobile menu', level: 2 as const },
+  { id: 'pager', label: 'Previous and next', level: 2 as const },
+  { id: 'no-edit-link', label: 'No edit link', level: 3 as const },
+];
+---
+
+<DocsShell
+  title="Navigation"
+  description="How the docs shell exposes sidebar, mobile menu, and pager landmarks."
+  {toc}
+>
+  <h2 id="sidebar">Sidebar</h2>
+  <p>
+    From a wide viewport the sidebar stays visible and sticky. Sections group related pages. Links
+    use the site base path so previews under a sub-path still resolve.
+  </p>
+  <h2 id="mobile-menu">Mobile menu</h2>
+  <p>
+    Below the desktop breakpoint the sidebar hides and a native <code>details</code> menu lists the
+    same destinations. No extra network request is required to open it.
+  </p>
+  <h2 id="pager">Previous and next</h2>
+  <p>
+    The pager is a navigation region named “Page”. It mirrors the flat reading order of the docs
+    tree so keyboard and screen-reader users can move linearly.
+  </p>
+  <h3 id="no-edit-link">No edit link</h3>
+  <p>
+    Documentation is maintained in the monorepo. The shell does not deep-link to a hosted source
+    editor; contributors change files locally and open a normal review.
+  </p>
+</DocsShell>

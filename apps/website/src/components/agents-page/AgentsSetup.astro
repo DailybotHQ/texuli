@@ -1,0 +1,76 @@
+---
+/**
+ * Ordered MCP / catalog setup steps for agents.
+ */
+import { AGENT_SETUP_STEPS } from './agents.ts';
+---
+
+<section class="setup" aria-labelledby="setup-title">
+  <header>
+    <h2 id="setup-title">Setup order</h2>
+    <p>A practical sequence for coding agents working in this repository or a consumer app.</p>
+  </header>
+  <ol class="setup__list">
+    {
+      AGENT_SETUP_STEPS.map((step, index) => (
+        <li>
+          <span class="setup__num" aria-hidden="true">{index + 1}</span>
+          <div>
+            <h3>{step.title}</h3>
+            <p>{step.body}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .setup {
+    display: grid;
+    gap: 1.25rem;
+    margin-block: 2.5rem;
+    color: var(--tx-foreground);
+  }
+  .setup header h2 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+  }
+  .setup header p {
+    margin: 0;
+    max-inline-size: 40rem;
+  }
+  .setup__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .setup__list > li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.75rem 1rem;
+    padding: 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius-lg, 0.75rem);
+    background: var(--tx-background);
+  }
+  .setup__num {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: 999px;
+    border: 1px solid var(--tx-border);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1.05rem;
+  }
+  p {
+    margin: 0;
+  }
+</style>

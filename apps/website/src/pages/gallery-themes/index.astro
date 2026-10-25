@@ -1,0 +1,39 @@
+---
+import { buildGalleryThemeCards } from '../../components/gallery-themes/build.ts';
+import { GALLERY_PAGE_SIZE } from '../../components/gallery-themes/scores.ts';
+import ThemeGallery from '../../components/gallery-themes/ThemeGallery.svelte';
+/**
+ * /gallery-themes/: every library theme as a live preview card with palette
+ * swatches, WCAG AA scores (light / dark / high-contrast) and one-click apply.
+ * Each theme's CSS is a same-origin file loaded when its card is near the viewport (T-site-perf);
+ * the first 24 cards are in the HTML and the rest come from /theme-gallery.json (FIX-site-perf-routes).
+ */
+import PageBanner from '../../components/landing/PageBanner.astro';
+import {
+  buildHighContrastModeCss,
+  themeCssVariableNames,
+} from '../../components/theme-switcher/library.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const allCards = await buildGalleryThemeCards();
+// Only the first page ships in the HTML; the island fetches /theme-gallery.json for the rest.
+const cards = allCards.slice(0, GALLERY_PAGE_SIZE);
+const passTotal = allCards.filter((card) => card.pass).length;
+const highContrastCss = buildHighContrastModeCss();
+const varNames = themeCssVariableNames();
+---
+
+<BaseLayout
+  title="Theme gallery"
+  description="Browse every Texuli library theme with live previews, palette swatches and WCAG AA contrast scores. Apply one click site-wide."
+>
+  <style is:inline set:html={highContrastCss}></style>
+  <PageBanner slot="page-themes" />
+  <ThemeGallery
+    client:load
+    {cards}
+    total={allCards.length}
+    {passTotal}
+    {varNames}
+  />
+</BaseLayout>

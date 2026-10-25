@@ -1,0 +1,207 @@
+{
+  "$comment": "Copied from the PLAN_002 expressiveness audit fixture of the same name. Fictional data only.",
+  "fixture": "08-proactive-deck",
+  "screen": "Deck prepared before an afternoon planning meeting without being asked: agenda, progress since last meeting, burn-down, risks, decisions needed.",
+  "tier": "untrusted",
+  "tree": {
+    "id": "layout-deck",
+    "props": {
+      "title": "Afternoon planning, 2026-10-24"
+    },
+    "children": [
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Agenda"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "items": [
+                  {
+                    "text": "Progress since Tuesday"
+                  },
+                  {
+                    "text": "Burn-down"
+                  },
+                  {
+                    "text": "Risks"
+                  },
+                  {
+                    "text": "Decisions needed"
+                  }
+                ],
+                "ordered": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Since Tuesday"
+        },
+        "children": [
+          {
+            "id": "blocks-data",
+            "props": {
+              "block": {
+                "type": "stat",
+                "items": [
+                  {
+                    "label": "Items closed",
+                    "value": "14"
+                  },
+                  {
+                    "label": "New items",
+                    "value": "5"
+                  },
+                  {
+                    "label": "Blocked",
+                    "value": "2",
+                    "tone": "warning"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Burn-down"
+        },
+        "children": [
+          {
+            "id": "charts-line",
+            "props": {
+              "title": "Remaining items this sprint",
+              "description": "Remaining items per day against the ideal line",
+              "series": [
+                {
+                  "id": "remaining",
+                  "label": "Remaining",
+                  "points": [
+                    {
+                      "x": "Mon",
+                      "y": 44
+                    },
+                    {
+                      "x": "Tue",
+                      "y": 37
+                    },
+                    {
+                      "x": "Wed",
+                      "y": 30
+                    },
+                    {
+                      "x": "Thu",
+                      "y": null
+                    },
+                    {
+                      "x": "Fri",
+                      "y": null
+                    }
+                  ]
+                },
+                {
+                  "id": "ideal",
+                  "label": "Ideal",
+                  "points": [
+                    {
+                      "x": "Mon",
+                      "y": 44
+                    },
+                    {
+                      "x": "Tue",
+                      "y": 33
+                    },
+                    {
+                      "x": "Wed",
+                      "y": 22
+                    },
+                    {
+                      "x": "Thu",
+                      "y": 11
+                    },
+                    {
+                      "x": "Fri",
+                      "y": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Risks"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "callout",
+                "tone": "warning",
+                "title": "Design review",
+                "body": "Mobile check-ins wait on design review; a slip moves the beta one week."
+              }
+            }
+          },
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "items": [
+                  {
+                    "text": "Payments sandbox access approved this morning"
+                  }
+                ],
+                "step": 1,
+                "reveal": "fade"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Decisions needed"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "items": [
+                  {
+                    "text": "Keep the Friday beta date or move to week 44?"
+                  },
+                  {
+                    "text": "Who owns board permissions?"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "frame": {
+    "label": "Prepared for the 15:00 planning meeting (draft, not shared)",
+    "source": "audit-fixture-08"
+  }
+}

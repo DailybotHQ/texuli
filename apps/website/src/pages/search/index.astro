@@ -1,0 +1,127 @@
+---
+import { withBase } from '../../components/foundation/site.ts';
+import { SEARCH_INDEX, SEARCH_KIND_LABEL } from '../../components/search/index-data.ts';
+import SearchResults from '../../components/search/SearchResults.svelte';
+import type { SearchKind } from '../../components/search/types.ts';
+/**
+ * /search/ — static search page: browse the index, client `?q=` results, ⌘K via header.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL;
+const byKind = (kind: SearchKind) => SEARCH_INDEX.filter((e) => e.kind === kind).slice(0, 12);
+---
+
+<BaseLayout
+  title="Search"
+  description="Search Texuli docs, components, themes and examples. Static index, ⌘K palette, no runtime network."
+>
+  <div class="search-page" data-tx-search-page="">
+    <header class="search-page__header">
+      <h1>Search</h1>
+      <p class="lead">
+        A static index of this site. Press <kbd>⌘</kbd><kbd>K</kbd> (or <kbd>Ctrl</kbd><kbd>K</kbd>) or use Search in the header.
+      </p>
+    </header>
+
+    <SearchResults client:load base={base} />
+
+    <section class="search-page__browse" aria-label="Browse the index">
+      <h2>Browse</h2>
+      <p>A sample of each group when you are not filtering.</p>
+      {
+        (['page', 'docs', 'component', 'theme', 'example'] as const).map((kind) => (
+          <div class="search-page__group">
+            <h3>{SEARCH_KIND_LABEL[kind]}</h3>
+            <ul class="search-page__list">
+              {byKind(kind).map((entry) => (
+                <li>
+                  <a href={withBase(base, entry.href)}>
+                    <span class="title">{entry.title}</span>
+                    <span class="desc">{entry.description}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </section>
+
+    <noscript>
+      <p>
+        JavaScript is off: use the browse lists above. The ⌘K palette and live query results need a
+        small client island.
+      </p>
+    </noscript>
+  </div>
+</BaseLayout>
+
+<style>
+  .search-page {
+    display: grid;
+    gap: 2rem;
+  }
+  .search-page__header h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0.5rem 0 1rem;
+    max-inline-size: 40rem;
+    color: var(--tx-foreground);
+  }
+  kbd {
+    display: inline-block;
+    padding: 0.1rem 0.35rem;
+    border: 1px solid var(--tx-border);
+    border-radius: 0.25rem;
+    background: var(--tx-muted);
+    font-size: 0.8125rem;
+  }
+  .search-page h2,
+  .search-page h3 {
+    margin: 0 0 0.5rem;
+    color: var(--tx-foreground);
+  }
+  .search-page__group {
+    margin-block: 1.25rem;
+  }
+  .search-page__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+  }
+  .search-page__list a {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    text-decoration: none;
+  }
+  .search-page__list a:hover {
+    background: var(--tx-muted);
+  }
+  .search-page__list a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .title {
+    font-weight: 600;
+  }
+  .desc {
+    font-size: 0.875rem;
+  }
+  @media (forced-colors: active) {
+    .search-page__list a {
+      border-color: ButtonText;
+      forced-color-adjust: none;
+    }
+  }
+</style>

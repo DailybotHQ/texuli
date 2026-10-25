@@ -1,0 +1,150 @@
+/**
+ * Kbd, Code and CopyButton. `@layer tx.components` so consumer CSS wins.
+ * Logical properties; colors from `--tx-*`.
+ */
+
+@layer tx.components {
+  .tx-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.125rem;
+    min-inline-size: 1.25rem;
+    min-block-size: 1.25rem;
+    margin: 0;
+    padding-block: 0.125rem;
+    padding-inline: 0.35rem;
+    border-radius: calc(var(--tx-radius, 0.625rem) * 0.4);
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-block-end-width: 2px;
+    background-color: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+    color: var(--tx-muted-foreground, CanvasText);
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .tx-code {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.875em;
+    font-weight: 400;
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-code--inline {
+    display: inline;
+    padding-block: 0.1em;
+    padding-inline: 0.35em;
+    border-radius: calc(var(--tx-radius, 0.625rem) * 0.35);
+    background-color: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+    color: var(--tx-foreground, CanvasText);
+    word-break: break-word;
+  }
+
+  .tx-code--block {
+    display: block;
+    margin-block: 0.5rem;
+    margin-inline: 0;
+    padding-block: 0.75rem;
+    padding-inline: 1rem;
+    overflow-x: auto;
+    border-radius: var(--tx-radius, 0.625rem);
+    border: 1px solid var(--tx-border, ButtonBorder);
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    white-space: pre;
+    tab-size: 2;
+  }
+
+  .tx-code-block {
+    margin: 0;
+    max-inline-size: 100%;
+  }
+
+  .tx-copy-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    margin: 0;
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--tx-input, var(--tx-border, ButtonBorder));
+    border-radius: var(--tx-radius, 0.625rem);
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.25;
+    cursor: pointer;
+    transition-property: color, background-color, border-color, opacity;
+    transition-duration: var(--tx-motion-base, 200ms);
+    transition-timing-function: var(--tx-motion-easing, ease);
+  }
+
+  .tx-copy-button:hover:not(:disabled) {
+    background-color: var(--tx-muted, color-mix(in srgb, CanvasText 6%, Canvas));
+  }
+
+  .tx-copy-button:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-copy-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .tx-copy-button--sm {
+    min-block-size: 1.75rem;
+    padding-block: 0.15rem;
+    padding-inline: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .tx-copy-button--md {
+    min-block-size: 2.25rem;
+    padding-block: 0.35rem;
+    padding-inline: 0.75rem;
+  }
+
+  .tx-copy-button[data-state="copied"] {
+    border-color: var(--tx-success, var(--tx-border, ButtonBorder));
+    color: var(--tx-success, CanvasText);
+  }
+
+  .tx-copy-button__icon {
+    inline-size: 1rem;
+    block-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .tx-copy-button__sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  @media (forced-colors: active) {
+    .tx-kbd,
+    .tx-code--inline,
+    .tx-code--block,
+    .tx-copy-button {
+      border: 1px solid ButtonText;
+      forced-color-adjust: none;
+    }
+  }
+}

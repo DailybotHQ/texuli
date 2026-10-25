@@ -1,0 +1,12 @@
+packages:
+  - packages/*
+  - apps/*
+  - tests/fixtures/*
+allowBuilds:
+  # Native binaries pnpm would otherwise refuse to run.
+  esbuild: true
+  '@biomejs/biome': true
+
+# Several agents run scripts concurrently; never let `pnpm run` trigger an
+# implicit install (that rewrites the shared lockfile). Install explicitly.
+verifyDepsBeforeRun: false

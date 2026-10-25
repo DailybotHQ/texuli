@@ -1,0 +1,58 @@
+---
+/**
+ * The docs sidebar (64rem and up): Texuli's `Sidebar` rendered to static HTML
+ * (no island), grouped with quiet headings, with its own scroll under the
+ * header. A small module script scrolls the current item into view. Below
+ * 64rem the same navigation moves into the phone drawer while it is open.
+ */
+import { Sidebar } from 'texuli/sidebar';
+import { navSections } from './nav-data.ts';
+
+const base = import.meta.env.BASE_URL;
+const current = Astro.url.pathname.slice(base.replace(/\/+$/, '').length) || '/';
+const sections = navSections(base, current);
+---
+
+<div class="site-sidebar" data-tx-site-sidebar="">
+  <div class="site-sidebar__nav" data-site-nav="">
+    <Sidebar sections={sections} label="Primary" collapsible={false} showIcons={false} />
+  </div>
+</div>
+
+<style>
+  .site-sidebar {
+    display: none;
+  }
+  @media (min-width: 64rem) {
+    .site-sidebar {
+      position: sticky;
+      inset-block-start: var(--site-header-height);
+      display: block;
+      box-sizing: border-box;
+      block-size: calc(100dvh - var(--site-header-height));
+      padding-block: 1rem 2rem;
+      padding-inline: 0.75rem;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border-inline-end: 1px solid var(--tx-border);
+    }
+  }
+  /* The navigation scrolls inside the sidebar (or the drawer); no frame of its own. */
+  .site-sidebar__nav :global([data-tx-sidebar]) {
+    inline-size: 100%;
+    block-size: auto;
+    min-block-size: 0;
+    border: 0;
+    background: transparent;
+  }
+</style>
+
+<script>
+  // Keep the current page's link in view inside the sidebar's own scroll.
+  const sidebar = document.querySelector<HTMLElement>('[data-tx-site-sidebar]');
+  const active = sidebar?.querySelector<HTMLElement>('[aria-current="page"]');
+  if (sidebar && active && sidebar.offsetParent !== null) {
+    const top = active.offsetTop - sidebar.clientHeight / 2 + active.offsetHeight / 2;
+    sidebar.scrollTop = Math.max(0, top);
+  }
+</script>

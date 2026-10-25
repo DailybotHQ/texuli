@@ -1,0 +1,51 @@
+---
+import AccessibilityLive from '../../../components/guides/AccessibilityLive.svelte';
+import GuideCode from '../../../components/guides/GuideCode.astro';
+import GuidesShell from '../../../components/guides/GuidesShell.astro';
+
+const toc = [
+  { id: 'bar', label: 'The bar', level: 2 as const },
+  { id: 'labels', label: 'Labels and names', level: 2 as const },
+  { id: 'keyboard', label: 'Keyboard', level: 2 as const },
+  { id: 'live-controls', label: 'Live controls', level: 2 as const },
+];
+
+const fieldSnippet = `import { Field } from 'texuli/field';
+import { Input } from 'texuli/input';
+
+<Field label="Workspace name" description="Shown on invoices." required>
+  {#snippet children(control)}
+    <Input {...control.props} bind:value={name} />
+  {/snippet}
+</Field>`;
+---
+
+<GuidesShell
+  title="Accessibility"
+  description="Keyboard operation, associated labels, focus rings and WCAG 2.x contrast in light, dark and forced-colors."
+  {toc}
+>
+  <h2 id="bar">The bar</h2>
+  <p>
+    Texuli components target WCAG 2.1 A/AA. Contrast is measured with WCAG 2.x algorithms — APCA is
+    intentionally out of scope. Forced-colors maps use system keywords
+    (<code>CanvasText</code>, <code>ButtonText</code>, <code>Highlight</code>), not decorative yellows
+    that fail on Canvas.
+  </p>
+
+  <h2 id="labels">Labels and names</h2>
+  <p>
+    Prefer a visible label. When the control already has accessible text, do not add a conflicting <code>aria-label</code>. <code>Field</code> wires <code>id</code>, <code>aria-describedby</code> and <code>aria-invalid</code> for you.
+  </p>
+  <GuideCode code={fieldSnippet} label="Field with Input" />
+
+  <h2 id="keyboard">Keyboard</h2>
+  <p>
+    Every interactive control is reachable by Tab, activates with Enter or Space where expected, and
+    exposes a visible focus ring from <code>--tx-ring</code>. Composite widgets (menus, grids, tabs)
+    use roving tabindex from <code>@texuli/core/roving</code>.
+  </p>
+
+  <h2 id="live-controls">Live controls</h2>
+  <AccessibilityLive client:load />
+</GuidesShell>

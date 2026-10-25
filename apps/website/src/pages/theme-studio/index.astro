@@ -1,0 +1,51 @@
+---
+/**
+ * /theme-studio/ — generate, tune, preview, AA-check and export a theme.
+ */
+import ThemeStudio from '../../components/theme-studio/ThemeStudio.svelte';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Theme studio"
+  description="Build a Texuli theme from a color, mood words or a local image. Tune roles, check WCAG AA, export CSS and JSON. Static site, no runtime network."
+>
+  <div class="page" data-tx-theme-studio-page="">
+    <header class="page__header">
+      <p class="eyebrow">@texuli/tokens generator</p>
+      <h1>Theme studio</h1>
+      <p class="lead">
+        Generate a light and dark theme from one brand color, mood words, or a local image. Retune
+        roles, watch components update live, gate WCAG 2.x contrast, and export CSS or JSON. Nothing
+        leaves this origin.
+      </p>
+    </header>
+    <ThemeStudio client:load />
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .eyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0.5rem 0 0;
+    max-inline-size: 44rem;
+    color: var(--tx-foreground);
+    font-size: 1.0625rem;
+  }
+</style>

@@ -1,0 +1,12 @@
+/**
+ * Built-in icon chrome. Live in `@layer tx.components` so consumer CSS wins.
+ * Side-effect import from `iconClass` keeps recipe-only usage styled.
+ * Pixel size still comes from the SVG width/height attributes on Icon.
+ */
+@layer tx.components {
+  .tx-icon {
+    display: inline-block;
+    flex-shrink: 0;
+    vertical-align: middle;
+  }
+}

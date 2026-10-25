@@ -1,0 +1,410 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://texuli.example/spec/schemas/blueprint.schema.json",
+  "title": "BlueprintEnvelope",
+  "description": "Envelope version 1 around one catalog tree (ADR-003, audit G13). Mirrors what @texuli/catalog/envelope reads today; a declared status, activation or tier is display data, never authority. Planned minor additions: a spec version range, the native profile and several roots.",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "texuli-blueprint"
+    },
+    "version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+    },
+    "catalog": {
+      "description": "The catalog build hash the tree was written against.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "status": {
+      "$ref": "#/$defs/status"
+    },
+    "createdAt": {
+      "$ref": "#/$defs/time"
+    },
+    "updatedAt": {
+      "$ref": "#/$defs/time"
+    },
+    "generator": {
+      "$ref": "#/$defs/generator"
+    },
+    "tier": {
+      "$ref": "#/$defs/emitTier"
+    },
+    "profile": {
+      "$ref": "#/$defs/profile"
+    },
+    "asOf": {
+      "$ref": "#/$defs/time"
+    },
+    "sources": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "trigger": {
+      "$ref": "#/$defs/trigger"
+    },
+    "meetingRef": {
+      "$ref": "#/$defs/meetingRef"
+    },
+    "activatedBy": {
+      "$ref": "#/$defs/activation"
+    },
+    "provenance": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "$ref": "#/$defs/provenanceEntry"
+      }
+    },
+    "tree": {
+      "$ref": "#/$defs/node"
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "id",
+    "catalog",
+    "status",
+    "createdAt",
+    "updatedAt",
+    "generator",
+    "tree"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "status": {
+      "type": "string",
+      "enum": ["draft", "validated", "active", "superseded"]
+    },
+    "emitTier": {
+      "type": "string",
+      "enum": ["developer", "untrusted"]
+    },
+    "profile": {
+      "description": "ADR-003 capability profile; portable fails closed until ids are audited portable.",
+      "type": "string",
+      "enum": ["web", "portable"]
+    },
+    "time": {
+      "description": "ISO 8601 with a zone.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2}(\\.[0-9]{1,3})?)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "generator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["agent", "person", "tool"]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\\u0000-\\u0008\\u000b-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*$"
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\\u0000-\\u0008\\u000b-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*$"
+        }
+      },
+      "required": ["kind", "name"],
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\\u0000-\\u0008\\u000b-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*$"
+        },
+        "href": {
+          "description": "Must also pass the untrusted URL policy.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        }
+      },
+      "required": ["label"],
+      "additionalProperties": false
+    },
+    "trigger": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["request", "schedule", "calendar", "event"]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\\u0000-\\u0008\\u000b-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*$"
+        }
+      },
+      "required": ["kind", "label"],
+      "additionalProperties": false
+    },
+    "meetingRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\\u0000-\\u0008\\u000b-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*$"
+        },
+        "startsAt": {
+          "$ref": "#/$defs/time"
+        }
+      },
+      "required": ["id"],
+      "additionalProperties": false
+    },
+    "activation": {
+      "type": "object",
+      "properties": {
+        "by": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\\u0000-\\u0008\\u000b-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*$"
+        },
+        "at": {
+          "$ref": "#/$defs/time"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": ["by", "at", "digest"],
+      "additionalProperties": false
+    },
+    "provenanceEntry": {
+      "type": "object",
+      "properties": {
+        "at": {
+          "$ref": "#/$defs/time"
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\\u0000-\\u0008\\u000b-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["apply", "undo", "redo"]
+        },
+        "ops": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/editOp"
+          }
+        }
+      },
+      "required": ["at", "actor", "kind", "ops"],
+      "additionalProperties": false
+    },
+    "editOp": {
+      "description": "One edit op. The fields each op kind takes are checked by the edit parser.",
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": ["insert", "remove", "move", "setProp", "unsetProp", "replace", "replaceAll"]
+        },
+        "path": {
+          "$ref": "#/$defs/nodePath"
+        },
+        "parent": {
+          "$ref": "#/$defs/nodePath"
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+        },
+        "value": {
+          "description": "Any plain JSON value."
+        },
+        "node": {
+          "$ref": "#/$defs/node"
+        },
+        "tree": {
+          "$ref": "#/$defs/node"
+        }
+      },
+      "required": ["op"],
+      "additionalProperties": false
+    },
+    "nodePath": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "node": {
+      "description": "One catalog node: id, props, children, and an optional named slot and condition.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "A catalog component id.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+        },
+        "props": {
+          "description": "Props checked against the component's catalog entry.",
+          "type": "object",
+          "additionalProperties": {}
+        },
+        "children": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        },
+        "slot": {
+          "description": "The parent's named slot this node fills (audit G04): a slot prop of the parent's catalog entry. Omitted or \"children\" is the default slot.",
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9]*$",
+          "maxLength": 64
+        },
+        "when": {
+          "$ref": "#/$defs/condition"
+        }
+      },
+      "required": ["id"],
+      "additionalProperties": false
+    },
+    "condition": {
+      "description": "Shows the node when true (audit G07): the closed Condition AST of the blocks formula grammar. False or unknown hides the node. Structural shape only; which operands each op needs, and the size limits, are checked by the runtime formula parser.",
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": ["lt", "lte", "gt", "gte", "eq", "neq", "and", "or", "not"]
+        },
+        "left": {
+          "$ref": "#/$defs/numberFormula"
+        },
+        "right": {
+          "$ref": "#/$defs/numberFormula"
+        },
+        "args": {
+          "description": "The conditions of and / or.",
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "value": {
+          "$ref": "#/$defs/condition"
+        }
+      },
+      "required": ["op"],
+      "additionalProperties": false
+    },
+    "numberFormula": {
+      "description": "A number expression of the blocks formula grammar. Structural shape only; the runtime formula parser checks which operands each op needs.",
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": [
+            "num",
+            "var",
+            "add",
+            "sub",
+            "mul",
+            "div",
+            "pow",
+            "min",
+            "max",
+            "round",
+            "clamp",
+            "if"
+          ]
+        },
+        "value": {
+          "description": "A number for num; a number formula for round and clamp."
+        },
+        "name": {
+          "description": "The input a var reads.",
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]{0,31}$"
+        },
+        "left": {
+          "$ref": "#/$defs/numberFormula"
+        },
+        "right": {
+          "$ref": "#/$defs/numberFormula"
+        },
+        "base": {
+          "$ref": "#/$defs/numberFormula"
+        },
+        "exponent": {
+          "$ref": "#/$defs/numberFormula"
+        },
+        "args": {
+          "description": "The operands of min / max.",
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/numberFormula"
+          }
+        },
+        "digits": {
+          "type": "integer",
+          "minimum": -6,
+          "maximum": 6
+        },
+        "min": {
+          "$ref": "#/$defs/numberFormula"
+        },
+        "max": {
+          "$ref": "#/$defs/numberFormula"
+        },
+        "test": {
+          "$ref": "#/$defs/condition"
+        },
+        "ifTrue": {
+          "$ref": "#/$defs/numberFormula"
+        },
+        "ifFalse": {
+          "$ref": "#/$defs/numberFormula"
+        }
+      },
+      "required": ["op"],
+      "additionalProperties": false
+    }
+  }
+}

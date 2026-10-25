@@ -1,0 +1,52 @@
+// @ts-check
+import svelte from '@astrojs/svelte';
+import { defineConfig } from 'astro/config';
+import { copyPageIntegration } from './src/components/docs/integration.ts';
+import { cspIntegration } from './src/components/security/csp.ts';
+import { seoIntegration } from './src/components/seo/integration.ts';
+
+// texuli.com is a static site built with Texuli itself. Pages import the
+// workspace packages directly, so a broken component breaks the build.
+// TEXULI_SITE_BASE serves it under a sub-path (for example a preview host).
+const base = process.env.TEXULI_SITE_BASE ?? '/';
+
+/**
+ * Which stylesheets Astro inlines (other assets keep Vite's default). When
+ * Astro inlines a stylesheet, it stops linking it on the other pages that
+ * only reach it through a lazily loaded live demo, and those demos then
+ * render unstyled. So library CSS (any `.tx-` rule) always stays a file;
+ * site-owned CSS under 6 KB (the SEO head styles every page loads, page
+ * styles) is inlined, which saves 2 to 3 KB gzip per page over files. The
+ * limit keeps the HTML-only budgets of the largest pages.
+ * @param {string} file
+ * @param {Buffer} content
+ * @returns {boolean | undefined}
+ */
+function inlineSiteCss(file, content) {
+  if (!file.endsWith('.css')) return undefined;
+  return content.length < 6144 && !content.toString().includes('.tx-');
+}
+
+export default defineConfig({
+  site: 'https://texuli.com',
+  base,
+  output: 'static',
+  trailingSlash: 'ignore',
+  // The generator writes the agent index under /llms/; the llms.txt
+  // convention expects it at the root. One source of truth, redirected.
+  redirects: {
+    '/llms.txt': { status: 301, destination: '/llms/llms.txt' },
+  },
+  // Small site-owned stylesheets are inlined (see `inlineSiteCss`); library
+  // CSS stays a file, so every page that can lazily load a live demo links it.
+  build: { format: 'directory', inlineStylesheets: 'auto' },
+  // After the build: "Copy page" Markdown for docs pages, then the sitemap,
+  // robots and per-page social images.
+  integrations: [svelte(), copyPageIntegration(), seoIntegration(), cspIntegration()],
+  vite: {
+    // The workspace packages ship TypeScript and Svelte sources: compile them
+    // into the build instead of loading them from node_modules at render time.
+    ssr: { noExternal: ['texuli', /^@texuli\//] },
+    build: { assetsInlineLimit: inlineSiteCss },
+  },
+});

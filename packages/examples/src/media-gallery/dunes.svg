@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" role="img">
+  <title>Fictional desert dunes under a pale morning sky</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7d9a8"/>
+      <stop offset="1" stop-color="#f2b880"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#sky)"/>
+  <path d="M0 520 C240 420 420 470 600 540 S960 600 1200 500 V800 H0Z" fill="#d98c4a"/>
+  <path d="M0 640 C300 560 520 600 760 680 S1080 720 1200 650 V800 H0Z" fill="#b8672e"/>
+  <circle cx="930" cy="190" r="70" fill="#fff4d6"/>
+</svg>

@@ -1,0 +1,115 @@
+---
+/**
+ * Static documentation sidebar. Links stay on-origin; current page is marked.
+ */
+import { withBase } from '../foundation/site.ts';
+import { DOCS_SECTIONS, type DocsNavSection, normalizeDocsPath } from './nav.ts';
+
+interface Props {
+  currentPath: string;
+  label?: string;
+  /** Override the default docs-shell tree (guides, catalog sections, …). */
+  sections?: readonly DocsNavSection[];
+}
+
+const { currentPath, label = 'Documentation', sections = DOCS_SECTIONS } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const here = normalizeDocsPath(currentPath);
+---
+
+<nav class="docs-sidebar" aria-label={label} data-tx-docs-sidebar="">
+  {
+    sections.map((section) => (
+      <div class="docs-sidebar__section">
+        <p class="docs-sidebar__heading">{section.label}</p>
+        <ul class="docs-sidebar__list">
+          {section.items.map((item) => {
+            const active = normalizeDocsPath(item.href) === here;
+            return (
+              <li>
+                <a
+                  href={withBase(base, item.href)}
+                  aria-current={active ? 'page' : undefined}
+                  data-active={active ? 'true' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    ))
+  }
+</nav>
+
+<style>
+  .docs-sidebar {
+    display: none;
+    padding: 0.75rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, var(--tx-background));
+    color: var(--tx-foreground);
+  }
+  @media (min-width: 64rem) {
+    .docs-sidebar {
+      display: grid;
+      gap: 1.25rem;
+      position: sticky;
+      inset-block-start: 1rem;
+      align-self: start;
+    }
+  }
+  .docs-sidebar__heading {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .docs-sidebar__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.15rem;
+  }
+  .docs-sidebar a {
+    display: flex;
+    align-items: center;
+    min-block-size: 2.5rem;
+    padding-inline: 0.6rem;
+    border-radius: var(--tx-radius, 0.375rem);
+    color: var(--tx-foreground);
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+  .docs-sidebar a:hover {
+    background: var(--tx-muted);
+  }
+  .docs-sidebar a[aria-current='page'] {
+    background: var(--tx-primary);
+    color: var(--tx-primary-foreground);
+    font-weight: 600;
+  }
+  .docs-sidebar a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    .docs-sidebar {
+      border-color: ButtonText;
+      background: Canvas;
+      forced-color-adjust: none;
+    }
+    .docs-sidebar a {
+      color: ButtonText;
+    }
+    .docs-sidebar a[aria-current='page'] {
+      outline: 2px solid Highlight;
+      background: SelectedItem;
+      color: SelectedItemText;
+    }
+  }
+</style>

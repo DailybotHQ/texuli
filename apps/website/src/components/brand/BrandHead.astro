@@ -1,0 +1,17 @@
+---
+/**
+ * Favicons, the Apple touch icon, the web manifest and the browser theme color.
+ * The black mark serves light color schemes and the white mark dark ones.
+ */
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const asset = (file: string) => `${base}brand/${file}`;
+---
+
+<link rel="icon" type="image/png" sizes="32x32" href={asset('texuli-favicon-light-32.png')} media="(prefers-color-scheme: light)" />
+<link rel="icon" type="image/png" sizes="32x32" href={asset('texuli-favicon-dark-32.png')} media="(prefers-color-scheme: dark)" />
+<link rel="icon" type="image/png" sizes="16x16" href={asset('texuli-favicon-light-16.png')} media="(prefers-color-scheme: light)" />
+<link rel="icon" type="image/png" sizes="16x16" href={asset('texuli-favicon-dark-16.png')} media="(prefers-color-scheme: dark)" />
+<link rel="apple-touch-icon" sizes="180x180" href={asset('texuli-apple-touch-icon-light.png')} />
+<link rel="manifest" href={`${base}site.webmanifest`} />
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0b0b10" media="(prefers-color-scheme: dark)" />

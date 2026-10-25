@@ -1,0 +1,97 @@
+@layer tx.components {
+  .tx-block-interactive {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-radius, 0.625rem);
+    background: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    max-inline-size: 40rem;
+  }
+
+  .tx-block-interactive__title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .tx-block-interactive__prompt {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .tx-block-interactive__options {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .tx-block-interactive__option {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .tx-block-interactive__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tx-block-interactive__result {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .tx-block-interactive__bar {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .tx-block-interactive__bar-track {
+    block-size: 0.5rem;
+    border-radius: 999px;
+    background: var(--tx-muted, color-mix(in srgb, CanvasText 10%, Canvas));
+    overflow: hidden;
+  }
+
+  .tx-block-interactive__bar-fill {
+    block-size: 100%;
+    background: var(--tx-primary, Highlight);
+    inline-size: 0%;
+  }
+
+  .tx-block-interactive__inputs {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .tx-block-interactive__field {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .tx-block-interactive__field input {
+    min-block-size: 2.25rem;
+    padding-inline: 0.5rem;
+    border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
+    border-radius: calc(var(--tx-radius, 0.625rem) * 0.5);
+    background: var(--tx-background, Canvas);
+    color: inherit;
+    font: inherit;
+  }
+
+  .tx-block-invalid {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tx-destructive, Mark);
+    border-radius: var(--tx-radius, 0.5rem);
+  }
+
+  @media (forced-colors: active) {
+    .tx-block-interactive,
+    .tx-block-interactive__field input {
+      border: 1px solid ButtonText;
+    }
+  }
+}

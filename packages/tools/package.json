@@ -1,0 +1,62 @@
+{
+  "name": "@texuli/tools",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./a2ui": {
+      "types": "./src/a2ui/index.ts",
+      "default": "./src/a2ui/index.ts"
+    },
+    "./cli-add": {
+      "types": "./src/cli-add/index.ts",
+      "default": "./src/cli-add/index.ts"
+    },
+    "./cli-init": {
+      "types": "./src/cli-init/index.ts",
+      "default": "./src/cli-init/index.ts"
+    },
+    "./cli-update": {
+      "types": "./src/cli-update/index.ts",
+      "default": "./src/cli-update/index.ts"
+    },
+    "./llms": {
+      "types": "./src/llms/index.ts",
+      "default": "./src/llms/index.ts"
+    },
+    "./elements": {
+      "types": "./src/elements/index.ts",
+      "default": "./src/elements/index.ts"
+    },
+    "./golden": {
+      "types": "./src/golden/index.ts",
+      "default": "./src/golden/index.ts"
+    }
+  },
+  "bin": {
+    "texuli-add": "./src/cli-add/cli.ts",
+    "texuli-init": "./src/cli-init/cli.ts",
+    "texuli-llms": "./src/llms/cli.ts",
+    "texuli-update": "./src/cli-update/cli.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@texuli/core": "workspace:*",
+    "@texuli/catalog": "workspace:*",
+    "@texuli/tokens": "workspace:*",
+    "@texuli/blocks": "workspace:*",
+    "@texuli/charts": "workspace:*",
+    "@texuli/media": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

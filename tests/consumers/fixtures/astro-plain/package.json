@@ -1,0 +1,27 @@
+{
+  "name": "@texuli-consumer/astro-plain",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 127.0.0.1",
+    "build": "astro build",
+    "preview": "astro preview --host 127.0.0.1 --strictPort"
+  },
+  "dependencies": {
+    "@texuli/astro": "file:PLACEHOLDER_ASTRO",
+    "@texuli/blocks": "file:PLACEHOLDER_BLOCKS",
+    "@texuli/charts": "file:PLACEHOLDER_CHARTS",
+    "@texuli/core": "file:PLACEHOLDER_CORE",
+    "@texuli/data": "file:PLACEHOLDER_DATA",
+    "@texuli/media": "file:PLACEHOLDER_MEDIA",
+    "@texuli/primitives": "file:PLACEHOLDER_PRIMITIVES",
+    "@texuli/tokens": "file:PLACEHOLDER_TOKENS",
+    "texuli": "file:PLACEHOLDER_TEXULI"
+  },
+  "devDependencies": {
+    "@astrojs/svelte": "9.1.1",
+    "astro": "7.4.2",
+    "svelte": "5.57.2",
+    "typescript": "5.9.3"
+  }
+}

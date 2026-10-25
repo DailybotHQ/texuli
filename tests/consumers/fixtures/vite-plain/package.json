@@ -1,0 +1,26 @@
+{
+  "name": "@texuli-consumer/vite-plain",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 0",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --strictPort",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.consumer.json"
+  },
+  "dependencies": {
+    "texuli": "file:PLACEHOLDER_TEXULI",
+    "@texuli/charts": "file:PLACEHOLDER_CHARTS",
+    "@texuli/core": "file:PLACEHOLDER_CORE",
+    "@texuli/data": "file:PLACEHOLDER_DATA",
+    "@texuli/primitives": "file:PLACEHOLDER_PRIMITIVES",
+    "@texuli/tokens": "file:PLACEHOLDER_TOKENS"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "svelte": "5.57.2",
+    "vite": "8.3.4",
+    "svelte-check": "4.7.7",
+    "typescript": "5.9.3"
+  }
+}

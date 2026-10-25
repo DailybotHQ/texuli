@@ -1,0 +1,40 @@
+{
+  "name": "@texuli/examples",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The examples registry every component writes once for tests, visuals and the website (private).",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/blocks": "workspace:*",
+    "@texuli/charts": "workspace:*",
+    "@texuli/chat": "workspace:*",
+    "@texuli/core": "workspace:*",
+    "@texuli/data": "workspace:*",
+    "@texuli/media": "workspace:*",
+    "@texuli/player": "workspace:*",
+    "@texuli/primitives": "workspace:*",
+    "@texuli/slides": "workspace:*",
+    "@texuli/tokens": "workspace:*",
+    "texuli": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css",
+    "./src/index.ts",
+    "./src/**/entry.ts",
+    "./src/**/entries.ts"
+  ]
+}

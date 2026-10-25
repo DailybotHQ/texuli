@@ -1,0 +1,85 @@
+<script lang="ts">
+import type { SVGAttributes } from 'svelte/elements';
+import { type ClassValue } from '../../internal/cx.ts';
+import { ICON_SIZES, iconClass } from './icon-variants.ts';
+import { iconPath, isIconName } from './icons.ts';
+import type { IconComponentProps, IconRef, IconSize } from './types.ts';
+
+type Props = Omit<SVGAttributes<SVGSVGElement>, 'class' | 'color'> & {
+  /** One of the built-in icons or a Svelte SVG component (such as a Lucide icon). */
+  icon?: IconRef;
+  size?: IconSize;
+  /** Passed through to custom/Lucide components; Lucide accepts number | string. */
+  strokeWidth?: number | string;
+  /** Optional color; `null` is normalized away before spreading onto Lucide. */
+  color?: string | null;
+  class?: ClassValue;
+  /** Adds an accessible image name; without it the icon is decorative. */
+  label?: string;
+};
+
+let {
+  icon,
+  size = 'md',
+  strokeWidth = 2,
+  color = undefined,
+  label,
+  class: className,
+  'aria-label': ariaLabel,
+  ...rest
+}: Props = $props();
+
+const pixelSize = $derived(ICON_SIZES[size]);
+const name = $derived(typeof icon === 'string' && isIconName(icon) ? icon : undefined);
+const component = $derived(typeof icon === 'function' ? icon : undefined);
+const path = $derived(name ? iconPath(name) : undefined);
+const accessibleName = $derived(label ?? ariaLabel);
+const classes = $derived(iconClass({ size, class: className }));
+/** Lucide-safe color: drop null so Component props stay assignable. */
+const glyphColor = $derived(color === null || color === undefined ? undefined : color);
+
+/**
+ * Props for a custom Glyph. Built as a plain object so the spread stays a
+ * finite type (avoiding Svelte's "union too complex" on rest + overrides).
+ */
+const glyphProps = $derived({
+  ...rest,
+  class: classes,
+  size: pixelSize,
+  strokeWidth,
+  ...(glyphColor !== undefined ? { color: glyphColor } : {}),
+  focusable: 'false' as const,
+  'aria-hidden': accessibleName ? undefined : ('true' as const),
+  role: accessibleName ? ('img' as const) : undefined,
+  'aria-label': accessibleName,
+  'data-tx-icon': 'custom' as const,
+} satisfies IconComponentProps & {
+  class?: ClassValue;
+  'data-tx-icon'?: string;
+});
+</script>
+
+{#if path}
+  <svg
+    {...rest}
+    class={classes}
+    width={pixelSize}
+    height={pixelSize}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={glyphColor ?? 'currentColor'}
+    stroke-width={strokeWidth}
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    focusable="false"
+    aria-hidden={accessibleName ? undefined : 'true'}
+    role={accessibleName ? 'img' : undefined}
+    aria-label={accessibleName}
+    data-tx-icon={name}
+  >
+    <path d={path} />
+  </svg>
+{:else if component}
+  {@const Glyph = component}
+  <Glyph {...glyphProps} />
+{/if}

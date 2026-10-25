@@ -1,0 +1,82 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "kmp-voicechat-realtime-screen",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-25T09:00:00Z",
+  "updatedAt": "2026-10-25T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Migration assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Realtime voice"
+    },
+    "children": [
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "text",
+            "markdown": "Listening"
+          }
+        },
+        "slot": "children"
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "text",
+            "markdown": "Tap the microphone to stop."
+          }
+        },
+        "slot": "children"
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "You said"
+        },
+        "slot": "children",
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "text",
+                "markdown": "When does the next ferry leave?"
+              }
+            },
+            "slot": "children"
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Assistant"
+        },
+        "slot": "children",
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "text",
+                "markdown": "The next fictional ferry leaves at 10:30."
+              }
+            },
+            "slot": "children"
+          }
+        ]
+      }
+    ]
+  }
+}

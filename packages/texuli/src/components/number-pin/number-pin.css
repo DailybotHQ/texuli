@@ -1,0 +1,173 @@
+/** NumberField and PinInput — token styled controls. */
+@layer tx.components {
+  .tx-number-field {
+    display: inline-flex;
+    align-items: stretch;
+    min-inline-size: 0;
+    color: var(--tx-foreground, CanvasText);
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-radius-md, 0.5rem);
+    background: var(--tx-surface, Canvas);
+  }
+
+  .tx-number-field:focus-within,
+  .tx-pin-input:focus-within {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+
+  .tx-number-field[data-disabled] {
+    opacity: 0.6;
+  }
+
+  .tx-number-field__input {
+    inline-size: 8rem;
+    min-inline-size: 0;
+    border: 0;
+    border-radius: inherit;
+    padding-block: 0.5rem;
+    padding-inline: 0.75rem;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tx-number-field__input:focus-visible {
+    outline: none;
+  }
+
+  .tx-number-field__input:disabled,
+  .tx-number-field__input:read-only {
+    cursor: not-allowed;
+  }
+
+  .tx-number-field__stepper {
+    display: grid;
+    place-items: center;
+    min-inline-size: 2.25rem;
+    border: 0;
+    border-inline-start: 1px solid var(--tx-border, ButtonBorder);
+    color: var(--tx-foreground, CanvasText);
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .tx-number-field__stepper:hover:not(:disabled) {
+    background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+  }
+
+  .tx-number-field__stepper:disabled {
+    color: var(--tx-muted-foreground, GrayText);
+    cursor: not-allowed;
+  }
+
+  .tx-number-field--sm .tx-number-field__input {
+    inline-size: 6rem;
+    padding-block: 0.375rem;
+    padding-inline: 0.5rem;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+  }
+
+  .tx-number-field--sm .tx-number-field__stepper {
+    min-inline-size: 1.875rem;
+  }
+
+  .tx-number-field--lg .tx-number-field__input {
+    inline-size: 10rem;
+    padding-block: 0.75rem;
+    padding-inline: 1rem;
+    font-size: var(--tx-font-size-lg, 1.125rem);
+  }
+
+  .tx-number-field--lg .tx-number-field__stepper {
+    min-inline-size: 2.75rem;
+  }
+
+  .tx-pin-input {
+    position: relative;
+    display: inline-flex;
+    min-inline-size: 0;
+    padding: 0.125rem;
+    border-radius: var(--tx-radius-md, 0.5rem);
+  }
+
+  .tx-pin-input__cells {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .tx-pin-input__cell {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 3rem;
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-radius-md, 0.5rem);
+    color: var(--tx-foreground, CanvasText);
+    background: var(--tx-surface, Canvas);
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: var(--tx-font-size-lg, 1.125rem);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tx-pin-input__cell[data-active] {
+    border-color: var(--tx-ring, Highlight);
+    box-shadow: inset 0 0 0 1px var(--tx-ring, Highlight);
+  }
+
+  .tx-pin-input__cell[data-fake-caret]::after {
+    inline-size: 1px;
+    block-size: 1.25em;
+    background: currentColor;
+    content: "";
+    animation: tx-pin-caret 1s step-end infinite;
+  }
+
+  .tx-pin-input[data-disabled] {
+    opacity: 0.6;
+  }
+
+  .tx-pin-input--sm .tx-pin-input__cells {
+    gap: 0.375rem;
+  }
+
+  .tx-pin-input--sm .tx-pin-input__cell {
+    inline-size: 2.25rem;
+    block-size: 2.5rem;
+    font-size: var(--tx-font-size-md, 1rem);
+  }
+
+  .tx-pin-input--lg .tx-pin-input__cells {
+    gap: 0.75rem;
+  }
+
+  .tx-pin-input--lg .tx-pin-input__cell {
+    inline-size: 3.25rem;
+    block-size: 3.5rem;
+    font-size: var(--tx-font-size-xl, 1.25rem);
+  }
+
+  @keyframes tx-pin-caret {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tx-number-field,
+    .tx-number-field__stepper,
+    .tx-pin-input__cell {
+      border-color: CanvasText;
+      forced-color-adjust: none;
+    }
+
+    .tx-number-field__input,
+    .tx-number-field__stepper,
+    .tx-pin-input__cell {
+      color: CanvasText;
+      background: Canvas;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+---
+import DocsShell from '../../components/docs-shell/DocsShell.astro';
+
+const toc = [
+  { id: 'what-you-get', label: 'What you get', level: 2 as const },
+  { id: 'static-and-local', label: 'Static and local', level: 2 as const },
+  { id: 'reading-order', label: 'Reading order', level: 2 as const },
+];
+---
+
+<DocsShell
+  title="Docs shell"
+  description="Sidebar, table of contents, previous and next — a static documentation frame for texuli.com."
+  {toc}
+>
+  <h2 id="what-you-get">What you get</h2>
+  <p>
+    The docs shell is the layout every documentation page shares: a section sidebar, an on-page
+    table of contents, and previous/next links in reading order. There is no “edit on GitHub”
+    control — this site is built and reviewed locally.
+  </p>
+  <h2 id="static-and-local">Static and local</h2>
+  <p>
+    Pages are plain HTML and CSS after <code>pnpm build</code>. Navigation stays on the same origin.
+    The only client script on the site is the shared appearance switch in the header.
+  </p>
+  <h2 id="reading-order">Reading order</h2>
+  <p>
+    Use previous and next at the bottom of each page, or the sidebar, to move through the docs in a
+    fixed order. On narrow viewports, open the documentation menu to reach the same links.
+  </p>
+</DocsShell>

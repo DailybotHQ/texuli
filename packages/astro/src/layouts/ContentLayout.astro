@@ -1,0 +1,68 @@
+---
+import { safeHref } from '@texuli/core/url-policy';
+import type { TexuliDensityVariant, TexuliRadiusVariant } from '../integration/index.ts';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: string;
+  theme?: string;
+  canonical?: string;
+  /** Static token density variant; matches the integration's script-driven attribute. */
+  density?: TexuliDensityVariant;
+  /** Static token radius scale; matches the integration's script-driven attribute. */
+  radius?: TexuliRadiusVariant;
+  ogTitle?: string;
+  ogDescription?: string;
+  /** Open Graph image; rendered only when it passes the developer URL policy. */
+  ogImage?: string;
+  /** Asks crawlers to skip the page; use for drafts and staging mirrors. */
+  noindex?: boolean;
+}
+
+const DENSITIES: readonly TexuliDensityVariant[] = ['compact', 'comfortable', 'spacious'];
+const RADII: readonly TexuliRadiusVariant[] = ['compact', 'comfortable', 'rounded'];
+
+const {
+  title,
+  description,
+  lang = 'en',
+  theme = 'default',
+  canonical,
+  density,
+  radius,
+  ogTitle,
+  ogDescription,
+  ogImage,
+  noindex = false,
+} = Astro.props;
+
+if (density !== undefined && !DENSITIES.includes(density)) {
+  throw new TypeError('Density must be compact, comfortable, or spacious.');
+}
+if (radius !== undefined && !RADII.includes(radius)) {
+  throw new TypeError('Radius must be compact, comfortable, or rounded.');
+}
+
+const canonicalHref = safeHref(canonical, 'developer');
+const ogImageHref = safeHref(ogImage, 'developer');
+---
+
+<!doctype html>
+<html lang={lang} data-tx-theme={theme} data-tx-density={density} data-tx-radius={radius}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {canonicalHref && <link rel="canonical" href={canonicalHref} />}
+    {ogTitle && <meta property="og:title" content={ogTitle} />}
+    {ogDescription && <meta property="og:description" content={ogDescription} />}
+    {ogImageHref && <meta property="og:image" content={ogImageHref} />}
+    {noindex && <meta name="robots" content="noindex" />}
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

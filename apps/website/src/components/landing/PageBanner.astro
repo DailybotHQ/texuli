@@ -1,0 +1,25 @@
+---
+/**
+ * Section-page header art: one illustration slot above the page title.
+ */
+import SiteIllustration from './SiteIllustration.astro';
+
+interface Props {
+  slot: string;
+}
+
+const { slot } = Astro.props;
+---
+
+<div class="page-banner" data-tx-page-banner={slot}>
+  <SiteIllustration {slot} class="page-banner__art" />
+</div>
+
+<style>
+  .page-banner {
+    margin-block-end: 1.25rem;
+  }
+  .page-banner :global(.page-banner__art) {
+    max-inline-size: 48rem;
+  }
+</style>

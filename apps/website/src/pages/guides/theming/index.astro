@@ -1,0 +1,78 @@
+---
+import GuideCode from '../../../components/guides/GuideCode.astro';
+import GuidesShell from '../../../components/guides/GuidesShell.astro';
+import ThemingLive from '../../../components/guides/ThemingLive.svelte';
+
+const toc = [
+  { id: 'theme-ids', label: 'Theme ids', level: 2 as const },
+  { id: 'css-layers', label: 'CSS layers', level: 2 as const },
+  { id: 'using-with-your-css', label: 'Using Texuli with your own CSS', level: 2 as const },
+  { id: 'apply-a-theme', label: 'Apply a theme', level: 2 as const },
+  { id: 'live-tokens', label: 'Live tokens', level: 2 as const },
+];
+
+const themeSnippet = `import { compileThemeCss } from '@texuli/tokens';
+import { loadLibraryTheme } from '@texuli/tokens/library';
+import { noFlashScript } from '@texuli/tokens/no-flash';
+
+const theme = await loadLibraryTheme('enterprise-neutral');
+const css = compileThemeCss(theme);
+const bootstrap = noFlashScript('my-app', 'system');`;
+
+const layerSnippet = `/* Declare once, first — then import Texuli base + components.
+   Use hyphenated host layer names (site-base, site-overrides). Dotted names
+   nest in CSS (site.base is inside site), which would place overrides too early. */
+@layer site-base, tx.base, tx.components, site-overrides;
+
+@layer site-base {
+  /* Element defaults / resets (before Texuli) */
+  a { color: var(--tx-link); }
+}
+
+@layer site-overrides {
+  /* App classes that must beat tx.components */
+  .my-button { /* … */ }
+}`;
+---
+
+<GuidesShell
+  title="Theming"
+  description="Pick a library theme, compile CSS variables, and let consumer classes win through CSS layers."
+  {toc}
+>
+  <h2 id="theme-ids">Theme ids</h2>
+  <p>
+    Themes live in <code>@texuli/tokens</code>. This site uses <code>enterprise-neutral</code>. Browse and apply others with <code>texuli theme list</code> / <code>texuli theme apply &lt;id&gt;</code> after <code>texuli init</code>.
+  </p>
+  <GuideCode code={themeSnippet} label="Compile a theme" />
+
+  <h2 id="css-layers">CSS layers</h2>
+  <p>
+    Component styles ship in <code>@layer tx.components</code>. Put app utilities after <code>tx.base, tx.components</code> so your classes override without fighting specificity.
+  </p>
+  <GuideCode code={layerSnippet} label="Layer order" />
+
+  <h2 id="using-with-your-css">Using Texuli with your own CSS</h2>
+  <p>
+    Put resets and <strong>element</strong> defaults (<code>a</code>, <code>body</code>, …) in a
+    cascade layer declared <strong>before</strong> <code>tx.base</code>. Unlayered global element
+    rules beat every layered Texuli rule by CSS design — that is how anchor Buttons once painted
+    link ink on a primary fill. Declare <code>@layer site-base, tx.base, tx.components, site-overrides</code> once at the top of the
+    host stylesheet (this site does that in <code>styles/site-layers.css</code>), then import <code>@texuli/tokens/base.css</code>. Prefer hyphenated host layer names: dotted names nest
+    under a parent, so <code>site.overrides</code> would sit inside <code>site</code> and still
+    lose to <code>tx.components</code>. Put app component classes in <code>site-overrides</code> (or unlayered classes) when they must override Texuli. Do not pin library colors with
+    unlayered high-specificity <code>a.tx-button</code> rules in the package — consumers must still
+    win.
+  </p>
+
+  <h2 id="apply-a-theme">Apply a theme</h2>
+  <p>
+    Set <code>data-tx-theme</code> on <code>&lt;html&gt;</code>, inline the compiled CSS, and keep
+    the no-flash script first in <code>&lt;head&gt;</code>. Contrast gates are WCAG 2.x AA (APCA is
+    out of scope).
+  </p>
+
+  <h2 id="live-tokens">Live tokens</h2>
+  <p>Swatches read the CSS variables already on this page.</p>
+  <ThemingLive client:load />
+</GuidesShell>

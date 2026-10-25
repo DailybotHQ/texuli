@@ -1,0 +1,36 @@
+@import "@texuli/tokens/base.css";
+@import "@texuli/tokens/forced-colors.css";
+
+/* Integration-selected variants override per-theme density and shape scales. */
+:root[data-tx-density="compact"] {
+  --tx-density: 0.875;
+}
+
+:root[data-tx-density="comfortable"] {
+  --tx-density: 1;
+}
+
+:root[data-tx-density="spacious"] {
+  --tx-density: 1.125;
+}
+
+:root[data-tx-radius="compact"] {
+  --tx-radius-scale: 0.75;
+}
+
+:root[data-tx-radius="comfortable"] {
+  --tx-radius-scale: 1;
+}
+
+:root[data-tx-radius="rounded"] {
+  --tx-radius-scale: 1.25;
+}
+
+@media print {
+  :root {
+    color-scheme: light;
+    --tx-motion: 0;
+    --tx-shadow: transparent;
+    print-color-adjust: economy;
+  }
+}

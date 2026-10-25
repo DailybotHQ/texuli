@@ -1,0 +1,74 @@
+---
+/**
+ * /foundation/: what every texuli.com page is built on, rendered with
+ * Texuli's own components (server-rendered Svelte, no client JavaScript
+ * except the appearance switch in the header).
+ */
+import { Badge } from 'texuli/badge';
+import { Card, CardContent, CardDescription, CardGrid, CardHeader, CardTitle } from 'texuli/card';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const pillars = [
+  {
+    title: 'Static output',
+    status: 'Built',
+    body: 'Every page is HTML, CSS and a little JavaScript produced at build time. The site needs no server.',
+  },
+  {
+    title: 'No runtime network',
+    status: 'Checked',
+    body: 'Fonts, theme and scripts ship with the page. Nothing is fetched from another origin after load.',
+  },
+  {
+    title: 'Built with Texuli',
+    status: 'Dogfooded',
+    body: 'Cards, badges and the appearance switch are Texuli components on the token contract.',
+  },
+  {
+    title: 'Light, dark and system',
+    status: 'No flash',
+    body: 'An inline bootstrap applies the remembered or system appearance before the first paint.',
+  },
+];
+---
+
+<BaseLayout
+  title="Foundation"
+  description="How texuli.com is built: static Astro pages on Texuli components, with no runtime network."
+>
+  <h1>Foundation</h1>
+  <p class="lead">What every page of this site stands on.</p>
+  <CardGrid minItemWidth="16rem">
+    {
+      pillars.map((pillar) => (
+        <Card variant="flat">
+          <CardHeader>
+            <CardTitle level={2}>{pillar.title}</CardTitle>
+            <CardDescription>
+              <Badge variant="secondary">{pillar.status}</Badge>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>{pillar.body}</p>
+          </CardContent>
+        </Card>
+      ))
+    }
+  </CardGrid>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-block: 0 0.25rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.15;
+  }
+  .lead {
+    margin-block: 0 2rem;
+    color: var(--tx-muted-foreground);
+    font-size: 1.125rem;
+  }
+  p {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,119 @@
+<script lang="ts">
+import Axis from '../axis/Axis.svelte';
+import {
+  createHistogramLayout,
+  formatHistogramRange,
+  type HistogramTableLabels,
+  histogramLabels,
+} from './model.ts';
+
+type Props = {
+  title: string;
+  description: string;
+  values: readonly (number | null)[];
+  thresholds?: readonly number[];
+  binCount?: number;
+  domain?: readonly [number, number];
+  labels?: Partial<HistogramTableLabels>;
+  width?: number;
+  height?: number;
+};
+
+let {
+  title,
+  description,
+  values,
+  thresholds,
+  binCount,
+  domain,
+  labels,
+  width = 640,
+  height = 320,
+}: Props = $props();
+
+const uid = $props.id();
+const text = $derived(histogramLabels(labels));
+const layout = $derived(
+  createHistogramLayout(values, {
+    width,
+    height,
+    ...(thresholds === undefined ? {} : { thresholds }),
+    ...(binCount === undefined ? {} : { count: binCount }),
+    ...(domain === undefined ? {} : { domain }),
+  })
+);
+
+$effect(() => {
+  if (title.trim() === '') throw new TypeError('HistogramChart needs a non-empty title.');
+  if (description.trim() === '') {
+    throw new TypeError('HistogramChart needs an accessible description.');
+  }
+});
+</script>
+
+<figure class="histogram" data-kind="histogram">
+  <figcaption>
+    <h3 id="{uid}-heading">{title}</h3>
+    <p id="{uid}-description">{description}</p>
+  </figcaption>
+  <svg
+    direction="ltr"
+    viewBox="0 0 {layout.width} {layout.height}"
+    role="img"
+    aria-labelledby="{uid}-title {uid}-svg-description"
+  >
+    <title id="{uid}-title">{title}</title>
+    <desc id="{uid}-svg-description">{description}</desc>
+    <g transform="translate(36 16)">
+      <Axis
+        orientation="y"
+        ticks={layout.yTicks}
+        length={layout.baseline - 16}
+        gridLength={layout.width - 52}
+      />
+    </g>
+    <g transform="translate(36 {layout.baseline})">
+      <Axis orientation="x" ticks={layout.xTicks} length={layout.width - 52} />
+    </g>
+    {#each layout.bars as bar (`${bar.x0}:${bar.x1}`)}
+      <rect
+        data-bin="{bar.x0}:{bar.x1}"
+        x={bar.x}
+        y={bar.y}
+        width={bar.width}
+        height={bar.height}
+        aria-hidden="true"
+      >
+        <title>{formatHistogramRange(bar.x0, bar.x1)}: {bar.count}</title>
+      </rect>
+    {/each}
+  </svg>
+  <details class="data-table">
+    <summary>{text.table}</summary>
+    <table>
+      <caption>{title} data</caption>
+      <thead><tr><th scope="col">{text.range}</th><th scope="col">{text.count}</th></tr></thead>
+      <tbody>
+        {#each layout.bars as bar (`${bar.x0}:${bar.x1}`)}
+          <tr><th scope="row">{formatHistogramRange(bar.x0, bar.x1)}</th><td>{bar.count}</td></tr>
+        {/each}
+      </tbody>
+    </table>
+  </details>
+</figure>
+
+<style>
+  .histogram { color: var(--tx-foreground, CanvasText); margin: 0; max-inline-size: 100%; }
+  figcaption h3 { font-size: 1rem; margin-block: 0; }
+  figcaption p { color: var(--tx-muted-foreground, GrayText); margin-block: 0.25rem 0.75rem; }
+  svg { display: block; inline-size: 100%; max-block-size: 22rem; }
+  rect { fill: var(--tx-chart-1, var(--tx-primary, Highlight)); }
+  .data-table { margin-block-start: 0.75rem; }
+  summary { cursor: pointer; min-block-size: 2.75rem; align-content: center; }
+  table { border-collapse: collapse; inline-size: 100%; }
+  th, td { border: 1px solid var(--tx-chart-grid, var(--tx-border, GrayText)); padding: 0.375rem 0.5rem; text-align: start; }
+  @media (forced-colors: active) {
+    figcaption p { color: CanvasText; }
+    rect { fill: Highlight; stroke: CanvasText; }
+  }
+</style>

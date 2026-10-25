@@ -1,0 +1,65 @@
+---
+import { Badge } from 'texuli/badge';
+import { Card, CardContent, CardDescription, CardGrid, CardHeader, CardTitle } from 'texuli/card';
+import PageBanner from '../../components/landing/PageBanner.astro';
+import { SHOWCASE_SCREENS, showcasePath } from '../../components/showcase/showcase.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Showcase"
+  description="Complete interfaces built only with Texuli: dashboard, settings, inbox, kanban, docs, landing, checkout, media studio and slide deck."
+>
+  <PageBanner slot="page-showcase" />
+  <h1>Showcase</h1>
+  <p class="lead">
+    Full example screens dogfooding Texuli. Static HTML after build — no runtime network. Fictional
+    Harbor Notes data.
+  </p>
+  <CardGrid minItemWidth="15rem">
+    {
+      SHOWCASE_SCREENS.map((screen) => (
+        <a class="card-link" href={showcasePath(screen.id)}>
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle level={2}>{screen.title}</CardTitle>
+              <CardDescription>
+                <Badge variant="secondary">{screen.blurb}</Badge>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>{screen.description}</p>
+            </CardContent>
+          </Card>
+        </a>
+      ))
+    }
+  </CardGrid>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-block: 0 0.25rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.15;
+  }
+  .lead {
+    margin-block: 0 2rem;
+    color: var(--tx-muted-foreground);
+    font-size: 1.125rem;
+    max-inline-size: 40rem;
+  }
+  .card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--tx-radius-lg, 0.5rem);
+  }
+  .card-link:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 3px;
+  }
+  p {
+    margin: 0;
+  }
+</style>

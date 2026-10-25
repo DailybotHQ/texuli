@@ -1,0 +1,264 @@
+@layer tx.components {
+  .tx-content-layout {
+    display: block;
+    min-inline-size: 0;
+    min-block-size: 100%;
+    color: var(--tx-foreground, CanvasText);
+    background: var(--tx-background, Canvas);
+  }
+
+  .tx-content-layout__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-block-size: 3.5rem;
+    padding-inline: clamp(1rem, 4vw, 3rem);
+    border-block-end: 1px solid var(--tx-border, color-mix(in oklab, CanvasText 16%, Canvas));
+  }
+
+  .tx-content-layout__top-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-inline-start: auto;
+    overflow-x: auto;
+  }
+
+  .tx-content-layout__top-nav a,
+  .tx-content-layout__sections a,
+  .tx-content-layout__toc a {
+    color: var(--tx-muted-foreground, color-mix(in oklab, CanvasText 72%, Canvas));
+    text-decoration: none;
+  }
+
+  .tx-content-layout__top-nav a:hover,
+  .tx-content-layout__sections a:hover,
+  .tx-content-layout__toc a:hover {
+    color: var(--tx-primary, LinkText);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .tx-content-layout__top-nav a:focus-visible,
+  .tx-content-layout__sections a:focus-visible,
+  .tx-content-layout__toc a:focus-visible {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 3px;
+  }
+
+  .tx-content-layout__frame {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    inline-size: min(100%, 90rem);
+    margin-inline: auto;
+    padding: clamp(1.5rem, 4vw, 4rem) clamp(1rem, 4vw, 3rem);
+  }
+
+  .tx-content-layout__frame:focus-visible {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: -2px;
+  }
+
+  .tx-content-layout__frame[data-content-kind="docs"] {
+    grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr) minmax(12rem, 15rem);
+    gap: clamp(1.25rem, 3vw, 3rem);
+  }
+
+  .tx-content-layout__sections {
+    align-self: start;
+    position: sticky;
+    inset-block-start: 1rem;
+    max-block-size: calc(var(--tx-app-height, var(--tx-app-height, 100dvh)) - 2rem);
+    overflow: auto;
+    font-size: var(--tx-text-sm, 0.875rem);
+  }
+
+  .tx-content-layout__sections h2 {
+    margin-block: 0 0.5rem;
+    font-size: inherit;
+    font-weight: 650;
+  }
+
+  .tx-content-layout__sections ul {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0 0 1.25rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tx-content-layout__article {
+    /* With auto margins a grid item is not stretched: it would size to its
+       content and never below its widest child. Fill the track instead. */
+    inline-size: 100%;
+    min-inline-size: 0;
+    max-inline-size: 72ch;
+    margin-inline: auto;
+  }
+
+  .tx-content-layout[data-tx-content-layout="blog"] .tx-content-layout__article {
+    max-inline-size: 68ch;
+  }
+
+  .tx-content-layout[data-tx-content-layout="editorial"] .tx-content-layout__article {
+    max-inline-size: 76ch;
+  }
+
+  .tx-content-layout__intro {
+    margin-block-end: clamp(2rem, 6vw, 4rem);
+  }
+
+  .tx-content-layout__eyebrow {
+    margin-block: 0 0.75rem;
+    color: var(--tx-primary, LinkText);
+    font-size: var(--tx-text-sm, 0.875rem);
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .tx-content-layout__intro h1 {
+    margin-block: 0;
+    color: var(--tx-foreground, CanvasText);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .tx-content-layout__summary {
+    max-inline-size: 60ch;
+    margin-block: 1rem 0;
+    color: var(--tx-muted-foreground, color-mix(in oklab, CanvasText 72%, Canvas));
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    line-height: 1.6;
+  }
+
+  .tx-content-layout__byline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-block: 1.25rem 0;
+    color: var(--tx-muted-foreground, color-mix(in oklab, CanvasText 72%, Canvas));
+    font-size: var(--tx-text-sm, 0.875rem);
+  }
+
+  .tx-content-layout__main {
+    min-inline-size: 0;
+    outline: none;
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .tx-content-layout__main:focus-visible {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 4px;
+  }
+
+  .tx-content-layout__main :where(h2, h3) {
+    scroll-margin-block-start: 1.5rem;
+    color: var(--tx-foreground, CanvasText);
+    line-height: 1.25;
+    text-wrap: pretty;
+  }
+
+  .tx-content-layout__main :where(a) {
+    color: var(--tx-primary, LinkText);
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.18em;
+  }
+
+  .tx-content-layout__toc {
+    align-self: start;
+    position: sticky;
+    inset-block-start: 1rem;
+    max-block-size: calc(var(--tx-app-height, var(--tx-app-height, 100dvh)) - 2rem);
+    overflow: auto;
+    font-size: var(--tx-text-sm, 0.875rem);
+  }
+
+  .tx-content-layout__toc summary {
+    margin-block-end: 0.75rem;
+    color: var(--tx-foreground, CanvasText);
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .tx-content-layout__toc ol {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding-inline-start: 1rem;
+    list-style: none;
+  }
+
+  .tx-content-layout__toc li[data-level="3"] {
+    padding-inline-start: 0.75rem;
+  }
+
+  .tx-content-layout__toc a[aria-current="location"] {
+    color: var(--tx-primary, LinkText);
+    font-weight: 650;
+  }
+
+  .tx-content-layout__toc-empty {
+    color: var(--tx-muted-foreground, color-mix(in oklab, CanvasText 72%, Canvas));
+  }
+
+  @container (max-width: 56rem) {
+    .tx-content-layout__frame,
+    .tx-content-layout__frame[data-content-kind="docs"] {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.5rem;
+    }
+
+    .tx-content-layout__sections,
+    .tx-content-layout__toc {
+      position: static;
+      max-block-size: none;
+    }
+
+    .tx-content-layout__sections {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      padding-block-end: 0.75rem;
+      border-block-end: 1px solid var(--tx-border, color-mix(in oklab, CanvasText 16%, Canvas));
+    }
+
+    .tx-content-layout__sections h2 {
+      flex-basis: 100%;
+    }
+
+    .tx-content-layout__sections ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      margin: 0;
+    }
+
+    .tx-content-layout__toc ol {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tx-content-layout__top-nav a,
+    .tx-content-layout__sections a,
+    .tx-content-layout__toc a,
+    .tx-content-layout__summary,
+    .tx-content-layout__byline,
+    .tx-content-layout__toc-empty {
+      color: CanvasText;
+    }
+
+    .tx-content-layout__top-nav a:hover,
+    .tx-content-layout__sections a:hover,
+    .tx-content-layout__toc a:hover,
+    .tx-content-layout__toc a[aria-current="location"] {
+      color: LinkText;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+---
+/**
+ * texuli.com home: a minimal landing (T-site-ia). The landing header (logo,
+ * Docs, search, theme, Get started), one hero with live Texuli widgets, three
+ * feature cards, a short agents strip and the footer. Everything else lives
+ * in the docs, behind the sidebar.
+ */
+import AgentsSection from '../components/landing/AgentsSection.astro';
+import FeatureCards from '../components/landing/FeatureCards.astro';
+import LandingHero from '../components/landing/LandingHero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Texuli"
+  description="Interfaces from texels. Owned, accessible Svelte 5 components that people and agents can build anything with."
+  landing
+>
+  <div class="landing" data-tx-landing="">
+    <LandingHero />
+    <FeatureCards />
+    <AgentsSection />
+  </div>
+</BaseLayout>
+
+<style>
+  .landing {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    padding-block-end: clamp(2rem, 6vw, 4rem);
+  }
+</style>

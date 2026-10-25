@@ -1,0 +1,6 @@
+<script lang="ts">
+  let { html = '' }: { html?: string } = $props();
+</script>
+
+<div style="color: red">{@html html}</div>
+<p style='margin: 0'>{eval(html)}</p>

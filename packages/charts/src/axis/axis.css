@@ -1,0 +1,28 @@
+.tx-chart-axis__domain,
+.tx-chart-axis__tick {
+  stroke: var(--tx-chart-axis, var(--tx-border, GrayText));
+  vector-effect: non-scaling-stroke;
+}
+
+.tx-chart-axis__grid {
+  stroke: var(--tx-chart-grid, var(--tx-border, #aab2bd));
+  stroke-dasharray: 3 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.tx-chart-axis text {
+  fill: var(--tx-chart-axis, var(--tx-muted-foreground, GrayText));
+  font-size: 11px;
+}
+
+@media (forced-colors: active) {
+  .tx-chart-axis__domain,
+  .tx-chart-axis__tick,
+  .tx-chart-axis__grid {
+    stroke: CanvasText;
+  }
+
+  .tx-chart-axis text {
+    fill: CanvasText;
+  }
+}

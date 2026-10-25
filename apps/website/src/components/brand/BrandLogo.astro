@@ -1,0 +1,52 @@
+---
+/**
+ * The Texuli logo (texel "T" mark plus wordmark), black on light modes and
+ * white on dark ones. Both images are in the HTML, and only the visible one is
+ * in the accessibility tree. They load lazily: the visible one is on screen and
+ * loads at once, while the hidden one (display: none) is fetched only when the
+ * mode switches, so a page downloads one logo, not two.
+ */
+interface Props {
+  /** Rendered height in CSS pixels; the width follows the 3332:972 artwork. */
+  height?: number;
+  /** `logo` is mark plus wordmark; `isotype` is the mark alone. */
+  variant?: 'logo' | 'isotype';
+}
+
+const { height = 28, variant = 'logo' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const ratio = variant === 'logo' ? 3332 / 972 : 1;
+const width = Math.round(height * ratio);
+// Header-sized logos (24px tall or less) use a copy pre-scaled to 72px tall,
+// sharp up to 3x screens at about 4 KB, instead of the 3332x972 artwork
+// (11 to 13 KB) on every page (FIX-site-perf-routes).
+const small = variant === 'logo' && height <= 24;
+const file = (mode: 'light' | 'dark') =>
+  `${base}brand/texuli-${variant}-${mode}${small ? '-72' : ''}.png`;
+---
+
+<span class="brand-logo" style={`--brand-logo-h: ${height}px`}>
+  <img class="brand-logo__light" src={file('light')} alt="Texuli" {width} {height} loading="lazy" decoding="async" />
+  <img class="brand-logo__dark" src={file('dark')} alt="" aria-hidden="true" {width} {height} loading="lazy" decoding="async" />
+</span>
+
+<style>
+  .brand-logo {
+    display: inline-flex;
+    align-items: center;
+    block-size: var(--brand-logo-h);
+  }
+  .brand-logo img {
+    block-size: 100%;
+    inline-size: auto;
+  }
+  .brand-logo__dark {
+    display: none;
+  }
+  :global(:root[data-tx-mode='dark']) .brand-logo__light {
+    display: none;
+  }
+  :global(:root[data-tx-mode='dark']) .brand-logo__dark {
+    display: block;
+  }
+</style>

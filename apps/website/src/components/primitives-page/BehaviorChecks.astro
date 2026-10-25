@@ -1,0 +1,118 @@
+---
+/**
+ * The behavior checks of one primitive, from the committed behavior suite:
+ * what the scenario checks, and the absolute limits it is held to. A
+ * snapshot of the repository at build time, not a live CI result.
+ */
+import type { BehaviorEvidence } from './behavior.ts';
+import { kib, openToFocusLimit, primitiveBudget } from './sources.ts';
+
+interface Props {
+  evidence: BehaviorEvidence;
+  name: string;
+}
+
+const { evidence, name } = Astro.props;
+const budget = primitiveBudget(evidence.scenario);
+const focusLimit = openToFocusLimit(evidence.scenario);
+---
+
+<section class="behavior" aria-labelledby={`behavior-${evidence.scenario}`} data-behavior-kind={evidence.kind}>
+  <h2 id={`behavior-${evidence.scenario}`}>Behavior checks</h2>
+  {
+    evidence.kind === 'rows' && (
+      <>
+        <p>
+          <code>{evidence.file}</code> runs <strong>{evidence.rows.length} rows</strong> against the
+          {' '}{name} scenario on Chromium, WebKit and the Pixel 7. Each row asserts what a user or
+          assistive technology can observe, held to the WAI-ARIA Authoring Practices pattern.
+        </p>
+        <details class="behavior__rows">
+          <summary>All {evidence.rows.length} rows</summary>
+          <ol>
+            {evidence.rows.map((row) => (
+              <li data-row={row.id}>{row.title}</li>
+            ))}
+          </ol>
+        </details>
+      </>
+    )
+  }
+  {
+    evidence.kind === 'checks' && (
+      <>
+        <p>
+          <code>{evidence.file}</code> checks the {name} scenario in the browser (
+          <strong>{evidence.checks.length} checks</strong>) on Chromium, WebKit and the Pixel 7.
+        </p>
+        <ul class="behavior__list">
+          {evidence.checks.map((check) => (
+            <li>{check}</li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+  {evidence.kind === 'missing' && <p>No behavior scenario exists for {name} yet.</p>}
+  {
+    evidence.kind !== 'missing' && (
+      <>
+        <h3>Limits</h3>
+        <ul class="behavior__list" data-limits>
+          <li>
+            Every row passes on every project; a flaky row gets at most two retries.
+          </li>
+          <li>
+            Size: {budget === undefined ? 'no budget entry' : `at most ${kib(budget)} gzip`} for
+            {' '}<code>@texuli/primitives/{evidence.scenario}</code> (<code>pnpm size</code>).
+          </li>
+          {focusLimit !== undefined && (
+            <li>
+              Open-to-focus: p75 at most {focusLimit} ms (asserted with <code>TEXULI_PERF=1</code>).
+            </li>
+          )}
+        </ul>
+      </>
+    )
+  }
+</section>
+
+<style>
+  .behavior {
+    display: grid;
+    gap: 0.75rem;
+  }
+  h2,
+  h3 {
+    margin: 0.5rem 0 0;
+  }
+  h2 {
+    font-size: 1.35rem;
+  }
+  h3 {
+    font-size: 1.05rem;
+  }
+  p {
+    margin: 0;
+    max-inline-size: 48rem;
+  }
+  code {
+    overflow-wrap: anywhere;
+  }
+  .behavior__rows summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .behavior__rows ol {
+    display: grid;
+    gap: 0.25rem;
+    margin-block: 0.5rem 0;
+    padding-inline-start: 1.5rem;
+  }
+  .behavior__list {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+  }
+</style>

@@ -1,0 +1,241 @@
+{
+  "$comment": "PLAN_002 expressiveness-audit fixture. The wrapper is audit metadata only; it is NOT a proposed blueprint envelope (ADR-003 owns that). `tree` is a real CatalogTreeInput for the catalog build named in `catalog`. Probes are fragments expected to fail; each names the gap it evidences. Fictional data only.",
+  "fixture": "08-proactive-deck",
+  "catalog": "catalog-f4553b4eaced02c163f6606e53eb4dab1277345aa5247cbb57ceaac2c116c703.json",
+  "screen": "Deck prepared before an afternoon planning meeting without being asked: agenda, progress since last meeting, burn-down, risks, decisions needed.",
+  "northStar": "4 - proactive slides (Dailybot has the deck ready before being asked)",
+  "tier": "untrusted",
+  "capabilityTier": "unknown (ADR-003); audit candidate: portable core content, envelope fields planned in spec/",
+  "result": "content-expressible-draft-lifecycle-not",
+  "frame": {
+    "label": "Prepared for the 15:00 planning meeting (draft, not shared)",
+    "source": "audit-fixture-08"
+  },
+  "tree": {
+    "id": "layout-deck",
+    "props": {
+      "title": "Afternoon planning, 2026-10-24"
+    },
+    "children": [
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Agenda"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "items": [
+                  {
+                    "text": "Progress since Tuesday"
+                  },
+                  {
+                    "text": "Burn-down"
+                  },
+                  {
+                    "text": "Risks"
+                  },
+                  {
+                    "text": "Decisions needed"
+                  }
+                ],
+                "ordered": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Since Tuesday"
+        },
+        "children": [
+          {
+            "id": "blocks-data",
+            "props": {
+              "block": {
+                "type": "stat",
+                "items": [
+                  {
+                    "label": "Items closed",
+                    "value": "14"
+                  },
+                  {
+                    "label": "New items",
+                    "value": "5"
+                  },
+                  {
+                    "label": "Blocked",
+                    "value": "2",
+                    "tone": "warning"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Burn-down"
+        },
+        "children": [
+          {
+            "id": "charts-line",
+            "props": {
+              "title": "Remaining items this sprint",
+              "description": "Remaining items per day against the ideal line",
+              "series": [
+                {
+                  "id": "remaining",
+                  "label": "Remaining",
+                  "points": [
+                    {
+                      "x": "Mon",
+                      "y": 44
+                    },
+                    {
+                      "x": "Tue",
+                      "y": 37
+                    },
+                    {
+                      "x": "Wed",
+                      "y": 30
+                    },
+                    {
+                      "x": "Thu",
+                      "y": null
+                    },
+                    {
+                      "x": "Fri",
+                      "y": null
+                    }
+                  ]
+                },
+                {
+                  "id": "ideal",
+                  "label": "Ideal",
+                  "points": [
+                    {
+                      "x": "Mon",
+                      "y": 44
+                    },
+                    {
+                      "x": "Tue",
+                      "y": 33
+                    },
+                    {
+                      "x": "Wed",
+                      "y": 22
+                    },
+                    {
+                      "x": "Thu",
+                      "y": 11
+                    },
+                    {
+                      "x": "Fri",
+                      "y": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Risks"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "callout",
+                "tone": "warning",
+                "title": "Design review",
+                "body": "Mobile check-ins wait on design review; a slip moves the beta one week."
+              }
+            }
+          },
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "items": [
+                  {
+                    "text": "Payments sandbox access approved this morning"
+                  }
+                ],
+                "step": 1,
+                "reveal": "fade"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Decisions needed"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "items": [
+                  {
+                    "text": "Keep the Friday beta date or move to week 44?"
+                  },
+                  {
+                    "text": "Who owns board permissions?"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "probes": [
+    {
+      "gap": "G13",
+      "intent": "Draft status, trigger and meeting reference carried with the artifact",
+      "tree": {
+        "id": "layout-deck",
+        "props": {
+          "title": "P",
+          "status": "draft",
+          "trigger": "calendar:meeting-start-minus-60m",
+          "meetingRef": "evt-0001"
+        }
+      },
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G13",
+      "intent": "Owner activation recorded in the tree",
+      "tree": {
+        "id": "layout-deck",
+        "props": {
+          "title": "P",
+          "activatedBy": "owner@example.com"
+        }
+      },
+      "expect": ["invalid-prop"]
+    }
+  ],
+  "gaps": ["G11", "G13", "G01"],
+  "notes": "The deck content validates and renders inside a labelled artifact frame whose actions stay host-confirmed intents. The proactive part (why it was drafted, for which meeting, that it is a draft, who may activate it, when its data was taken) has no place in the tree. ADR-003 assigns that to the planned envelope."
+}

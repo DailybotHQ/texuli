@@ -1,0 +1,472 @@
+{
+  "$comment": "Gzip budgets for `pnpm size` (scripts/size.ts). Each export subpath of each package is built on its own (svelte external) and its initial JavaScript is measured with gzip -9; cssGzip is the CSS it emits. Exact ids win over `<package>/*` patterns. Budgets only shrink: `pnpm size --update` tightens them, and only `--update --allow-grow` (with a reason in the report) raises one. A `protoyard` baseline is the Protoyard package the entry replaces; the entry may not be larger (`pnpm size --protoyard <checkout>` re-measures it).",
+  "ignore": ["@texuli/tools", "@texuli/cli", "@texuli/mcp", "@texuli/examples"],
+  "budgets": {
+    "@texuli/blocks": {
+      "gzip": 32768,
+      "note": "Lead decision 2026-10-23: the package root barrel is a convenience aggregate of every view/family; first-load cost is controlled per subpath (each lazy entry has its own budget). Cap set at 32 KiB. Measured 21,764 B with text, media, data, diagram, code and embed."
+    },
+    "@texuli/blocks/*": {
+      "gzip": 20480,
+      "note": "Default per-family cap (lead decision 2026-10-23): each lazy block family ships its validators and views; measured structure 16,860 B, data and media similar."
+    },
+    "@texuli/blocks/code/renderers": {
+      "gzip": 12288,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
+    },
+    "@texuli/blocks/core": {
+      "gzip": 24576,
+      "note": "@texuli/blocks/core holds every family parser plus the catalog metadata by contract (hosts that parse arbitrary documents use it); renderers no longer bundle it. Measured 20.88 KiB."
+    },
+    "@texuli/blocks/data/renderers": {
+      "gzip": 12288,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
+    },
+    "@texuli/blocks/formula": {
+      "gzip": 4096,
+      "cssGzip": 0,
+      "note": "FIX-formula-subpath: pure TS closed calculator engine (parser, AST, evaluator, limits). No Svelte/DOM/renderers. Measured 3,762 B gzip on 2026-10-24."
+    },
+    "@texuli/blocks/interactive/renderers": {
+      "gzip": 20480,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. Interactive also carries the closed formula engine for calculators (measured 17.91 KiB)."
+    },
+    "@texuli/blocks/media/renderers": {
+      "gzip": 12288,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
+    },
+    "@texuli/blocks/structure/renderers": {
+      "gzip": 32768,
+      "note": "Eager structure renderers include the styled Tabs, Accordion and Card components and the nested-block host; measured 32,051 B. Hosts that care about first load use the lazy @texuli/blocks/structure entry (lead decision 2026-10-23)."
+    },
+    "@texuli/blocks/text/renderers": {
+      "gzip": 12288,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
+    },
+    "@texuli/catalog": {
+      "gzip": 49152,
+      "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23)."
+    },
+    "@texuli/catalog/*": {
+      "gzip": 8192,
+      "note": "Default per-subpath cap (lead decision 2026-10-23) so a new lazy entry is budgeted from its first commit; exact entries override it and `pnpm size --update` tightens."
+    },
+    "@texuli/catalog/manifest": {
+      "gzip": 8192,
+      "note": "Provisional cap for the catalog manifest subpath (measured 4,112 B gzip on 2026-10-23, when it landed)."
+    },
+    "@texuli/catalog/manifests/*": {
+      "gzip": 12288,
+      "note": "Authored manifest data (schemas, useWhen/dontUseWhen, a11y notes, examples) grows with each component group; measured forms 10,491 B (lead decision 2026-10-23)."
+    },
+    "@texuli/catalog/manifests/display": {
+      "gzip": 10240,
+      "note": "Authored manifest data (schemas, useWhen, examples) for display components; measured 8,989 B."
+    },
+    "@texuli/catalog/manifests/forms": {
+      "gzip": 12288,
+      "note": "Authored form manifests (26 components); measured 10,491 B (lead decision 2026-10-23)."
+    },
+    "@texuli/catalog/manifests/layouts": {
+      "gzip": 12288,
+      "note": "Authored layouts manifests; measured 9,359 B (26 manifests) (lead decision 2026-10-23). Explicit entry: the manifests/* pattern does not take precedence over @texuli/catalog/*."
+    },
+    "@texuli/catalog/manifests/overlays": {
+      "gzip": 12288,
+      "note": "Authored overlays manifests; measured 10,170 B (26 manifests) (lead decision 2026-10-23). Explicit entry: the manifests/* pattern does not take precedence over @texuli/catalog/*."
+    },
+    "@texuli/catalog/render/hostile": {
+      "gzip": 12288,
+      "note": "Hostile test corpus (16 attack samples: script URLs, fake dialogs, bidi, giant trees, injection) plus hardenInertRoots; loaded only by tests and security tooling, never by a renderer. Measured 9,247 B (lead decision 2026-10-23)."
+    },
+    "@texuli/charts": {
+      "gzip": 16384,
+      "note": "Provisional cap for the package root; chart families belong on their own subpaths. Add a protoyard baseline once EXTRACTION_MAP names the package it replaces."
+    },
+    "@texuli/charts/*": {
+      "gzip": 12288,
+      "note": "Default per-subpath cap (lead decision 2026-10-23) so a new lazy entry is budgeted from its first commit; exact entries override it and `pnpm size --update` tightens."
+    },
+    "@texuli/charts/math": {
+      "gzip": 12288,
+      "note": "Framework-free chart math (scales, shapes, layouts, LTTB) measured at 12,073 B; the Protoyard charts engine it ports had no separate baseline. Tighten with --update."
+    },
+    "@texuli/chat": {
+      "gzip": 16384,
+      "note": "Provisional cap for the chat barrel (Protoyard chat measured 5.9 KB gzip across 6 files). Tighten with --update."
+    },
+    "@texuli/chat/*": {
+      "gzip": 8192,
+      "note": "Default per-subpath cap (lead decision 2026-10-23) so a new lazy entry is budgeted from its first commit; exact entries override it and `pnpm size --update` tightens."
+    },
+    "@texuli/core": {
+      "gzip": 24576,
+      "note": "Root barrel bundling every texel for convenience (12 texels measured 9,877 B; 18 measured 16,190 B). Primitives must import per-texel subpaths (@texuli/core/<texel>), each budgeted at 4 KiB; this barrel is never a first-load cost of a component."
+    },
+    "@texuli/core/*": {
+      "gzip": 4096,
+      "note": "Per-texel subpath budget (lead decision 2026-10-23): primitives import texels through these subpaths, so each texel is a first-load cost only where used."
+    },
+    "@texuli/core/overlay": {
+      "gzip": 14336,
+      "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 13,972 B."
+    },
+    "@texuli/core/overlay-core": {
+      "gzip": 5632,
+      "note": "The per-feature overlay engine (layer stack, dismissal and presence; other texels opt in); measured 5.00 KiB (lead decision 2026-10-23)."
+    },
+    "@texuli/core/position-dom": {
+      "gzip": 6144,
+      "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 5,557 B."
+    },
+    "@texuli/data": {
+      "gzip": 81920,
+      "note": "Root barrel aggregate of every data view (13 views at plan end); first-load cost is per view subpath. Raised from 48 KiB at 60,860 B with 11 views (lead decision 2026-10-23)."
+    },
+    "@texuli/data/*": {
+      "gzip": 12288,
+      "note": "Default per-view cap (lead decision 2026-10-23): a data view ships its framework-free engine (sort, collation, filter compiler, validation) with its component; measured grid-core 10,342 B."
+    },
+    "@texuli/data/board/engine": {
+      "gzip": 3456,
+      "note": "FIX-board-engine-subpath: pure TypeScript board engine (ranks, WIP, keyboard moves); no Svelte. Measured 3,448 B."
+    },
+    "@texuli/data/grid-columns": {
+      "gzip": 16384,
+      "note": "Column operations compose the grid core (10.1 KiB) with resize, reorder, pinning, groups and a lazy column menu; measured 15,083 B (lead decision 2026-10-23)."
+    },
+    "@texuli/data/grid-editing": {
+      "gzip": 15360,
+      "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23)."
+    },
+    "@texuli/data/timeline": {
+      "gzip": 10240,
+      "note": "Lead decision 2026-10-23: the timeline/Gantt view with its engine measured 9,647 B; the 8 KiB default was provisional."
+    },
+    "@texuli/examples": {
+      "gzip": 16384,
+      "note": "Provisional cap for the private examples package root."
+    },
+    "@texuli/media": {
+      "gzip": 49152,
+      "note": "Root barrel aggregate of the media models and components; first-load cost is per component subpath. Raised from 32 KiB at 37,057 B (lead decision 2026-10-23)."
+    },
+    "@texuli/media/*": {
+      "gzip": 12288,
+      "note": "Default per-component cap for media (lead decision 2026-10-23), aligned with data and styled components: each entry ships its model (decode, peaks, formats) with its interface; measured audio 9,770 B."
+    },
+    "@texuli/media/gallery/lightbox": {
+      "gzip": 18432,
+      "note": "The standalone lightbox includes the Dialog primitive (11.3 KiB) for its modal; the gallery itself loads it lazily (lead decision 2026-10-23, measured 17,490 B)."
+    },
+    "@texuli/primitives": {
+      "gzip": 131072,
+      "note": "Root barrel aggregate of every primitive (41 when the plan finishes); consumers import per-primitive subpaths, each budgeted. Raised from 64 KiB at 71,064 B with 26 primitives (lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/*": {
+      "gzip": 4096,
+      "cssGzip": 1024,
+      "note": "Design target: a simple primitive is at most 4 KiB gzip and 1 KiB of CSS."
+    },
+    "@texuli/primitives/alert-dialog": {
+      "gzip": 13312,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/calendar": {
+      "gzip": 14336,
+      "cssGzip": 1024,
+      "note": "APG grid calendar on @internationalized/date (the one allowlisted runtime dependency: locales, calendars, time zones); measured 13,232 B against a 7 KiB plan target (lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/combobox": {
+      "gzip": 24576,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/command": {
+      "gzip": 20480,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/context-menu": {
+      "gzip": 22528,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/date-picker": {
+      "gzip": 29696,
+      "cssGzip": 1024,
+      "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 29,016 B. DatePicker composes DateField, Calendar (@internationalized/date) and a position-only Popover (modal features now load lazily); measured 28,354 B after FIX-popover-modal-lazy (was 31,938 B). The 24 KiB target is not met: Calendar and DateField carry the locale and calendar logic (lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/dialog": {
+      "gzip": 12288,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/hover-card": {
+      "gzip": 16384,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/menu": {
+      "gzip": 20480,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/menubar": {
+      "gzip": 22528,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/navigation-menu": {
+      "gzip": 20480,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/number-field": {
+      "gzip": 6144,
+      "cssGzip": 1024,
+      "note": "APG spinbutton with an owned locale-aware Intl number parser and the form bridge; measured 5,765 B (lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/popover": {
+      "gzip": 16384,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/radio-group": {
+      "gzip": 5120,
+      "cssGzip": 1024,
+      "note": "Roving focus and the native form bridge put this group primitive slightly over the 4 KiB default (lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/select": {
+      "gzip": 20480,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/sheet": {
+      "gzip": 16384,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/slider": {
+      "gzip": 4608,
+      "cssGzip": 1024,
+      "note": "APG composite with roving focus (and ticks for the slider); measured 4,257 B (lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/splitter": {
+      "gzip": 4608,
+      "cssGzip": 1024,
+      "note": "APG window splitter with drag, collapse, RTL and a persistence hook; measured 4,413 B (lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/tabs": {
+      "gzip": 4608,
+      "cssGzip": 1024,
+      "note": "APG composite with roving focus (and ticks for the slider); measured 4,274 B (lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/tags-input": {
+      "gzip": 4608,
+      "cssGzip": 1024,
+      "note": "TagsInput keeps the shared @texuli/core/form-bridge texel rather than a local copy (consistency over 535 B; lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/toast": {
+      "gzip": 16384,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/toggle": {
+      "gzip": 5120,
+      "cssGzip": 1024,
+      "note": "Roving focus and the native form bridge put this group primitive slightly over the 4 KiB default (lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/toolbar": {
+      "gzip": 5120,
+      "cssGzip": 1024,
+      "note": "Roving toolbar; measured 5,013 B of which 3,416 B is shared code (roving, keys, direction, typeahead, attachments) a page loads once (lead decision 2026-10-23)."
+    },
+    "@texuli/primitives/tooltip": {
+      "gzip": 16384,
+      "cssGzip": 1024,
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+    },
+    "@texuli/primitives/tree": {
+      "gzip": 5120,
+      "cssGzip": 1024,
+      "note": "APG tree with typeahead, lazy children and virtualization; the task set \u2264 5 KB (measured 4,211 B)."
+    },
+    "@texuli/tokens": {
+      "gzip": 50880,
+      "protoyard": {
+        "specifier": "@protoyard/themes",
+        "gzip": 50832,
+        "measured": "2026-10-23",
+        "revision": "c73e0445"
+      },
+      "note": "Ceiling: the Protoyard themes package it replaces."
+    },
+    "@texuli/tokens/*": {
+      "gzip": 8192,
+      "note": "Default per-subpath cap (lead decision 2026-10-23) so a new lazy entry is budgeted from its first commit; exact entries override it and `pnpm size --update` tightens."
+    },
+    "@texuli/tokens/aa-gate": {
+      "gzip": 10624,
+      "note": "FIX-port-compact / library quality: AA gate entry measured ~10.57 KiB. Checking tool only (never in components)."
+    },
+    "@texuli/tokens/build": {
+      "gzip": 5888,
+      "note": "FIX-port-compact: buildLibraryTheme without defineTheme in prod path. Measured ~5.71 KiB."
+    },
+    "@texuli/tokens/contract": {
+      "gzip": 7296,
+      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B."
+    },
+    "@texuli/tokens/css": {
+      "gzip": 5824,
+      "note": "FIX-tokens-entry-weight: applyTheme/compileThemeCss without library or generator. Measured 5,776 B."
+    },
+    "@texuli/tokens/library-expand": {
+      "gzip": 8832,
+      "note": "FIX-library-expand-quality + FIX-port-compact: expand meta carries neutral; measured ~8.58 KiB. Catalog listing only."
+    },
+    "@texuli/tokens/palette": {
+      "gzip": 4352,
+      "note": "FIX-tokens-palette-subpath: OKLCH/contrast/scale/chart derivation only; no library port/expand. Measured 4,283 B (pnpm size)."
+    },
+    "texuli": {
+      "gzip": 217920,
+      "protoyard": {
+        "specifier": "@protoyard/ui",
+        "gzip": 217881,
+        "measured": "2026-10-23",
+        "revision": "c73e0445"
+      },
+      "note": "Ceiling: the Protoyard ui package it replaces (its whole barrel, icons included). Expect to tighten well below it."
+    },
+    "texuli/*": {
+      "gzip": 12288,
+      "note": "Default per-subpath cap for styled components (lead decision 2026-10-23): most subpaths ship a family of related components with their CSS (choice: 4, tabs-accordion: 3); measured 9.9 and 10.25 KiB. Floating components have exact entries above."
+    },
+    "texuli/choice": {
+      "gzip": 10752,
+      "note": "Checkbox, Switch, Radio and RadioGroup with control-bound ARIA, id and form attributes (FIX-choice-aria: an unlabeled control must keep its aria-label); measured 10,353 B (lead decision 2026-10-24)."
+    },
+    "texuli/combobox": {
+      "gzip": 28672,
+      "note": "Styled component over the floating primitive(s) combobox: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+    },
+    "texuli/command": {
+      "gzip": 24576,
+      "note": "Styled component over the floating primitive(s) command: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+    },
+    "texuli/date": {
+      "gzip": 32768,
+      "note": "Styled Calendar, DatePicker and DateRangePicker over the 28 KiB DatePicker primitive plus presets and styling; measured 31,244 B (lead decision 2026-10-23)."
+    },
+    "texuli/dialog": {
+      "gzip": 17408,
+      "note": "Styled component over the floating primitive(s) dialog, alert-dialog: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+    },
+    "texuli/layouts/dashboard/register": {
+      "gzip": 1536,
+      "note": "FIX-layout-register-subpaths: register-only dashboard-grid."
+    },
+    "texuli/layouts/host/drawer": {
+      "gzip": 14336,
+      "note": "Layout drawer composes the Dialog primitive with the layout chrome CSS for mobile navigation; measured 13,240 B (lead decision 2026-10-23)."
+    },
+    "texuli/layouts/marketing/register": {
+      "gzip": 1536,
+      "note": "FIX-layout-register-subpaths: register-only marketing layout."
+    },
+    "texuli/layouts/mobile/register": {
+      "gzip": 2048,
+      "note": "FIX-layout-register-subpaths: register-only mobile layouts (2 dynamic imports)."
+    },
+    "texuli/menus": {
+      "gzip": 26624,
+      "note": "Styled component over the floating primitive(s) menu, context-menu, menubar: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+    },
+    "texuli/navigation": {
+      "gzip": 24576,
+      "note": "Styled component over the floating primitive(s) navigation-menu: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+    },
+    "texuli/popover": {
+      "gzip": 20480,
+      "note": "Styled component over the floating primitive(s) popover, hover-card: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+    },
+    "texuli/select": {
+      "gzip": 24576,
+      "note": "Styled component over the floating primitive(s) select: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+    },
+    "texuli/sheet": {
+      "gzip": 20480,
+      "note": "Styled component over the floating primitive(s) sheet: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+    },
+    "texuli/sidebar": {
+      "gzip": 24576,
+      "note": "Sidebar plus AppNav compose the Sheet (mobile drawer) and Tooltip (collapsed rail); measured 23,682 B (lead decision 2026-10-23). Loading the mobile drawer lazily is a follow-up in T-site-perf."
+    },
+    "texuli/toast": {
+      "gzip": 20480,
+      "note": "Styled component over the floating primitive(s) toast: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+    },
+    "texuli/tooltip": {
+      "gzip": 20480,
+      "note": "Styled component over the floating primitive(s) tooltip: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+    },
+    "@texuli/blocks/code/engine": {
+      "gzip": 8192,
+      "cssGzip": 0,
+      "note": "FIX-blocks-engine-subpaths: Svelte-free code family meta (grammars resolve, labels, checks). Tokenizer remains on code/tokenizer. Provisional cap."
+    },
+    "@texuli/blocks/code/tokenizer": {
+      "gzip": 16384,
+      "cssGzip": 0,
+      "note": "Owned linear-time tokenizer + all grammars (Svelte-free). Provisional if missing."
+    },
+    "@texuli/blocks/data/engine": {
+      "gzip": 12288,
+      "cssGzip": 0,
+      "note": "FIX-blocks-engine-subpaths: Svelte-free data parsers/labels. Provisional cap."
+    },
+    "@texuli/blocks/diagram/engine": {
+      "gzip": 12288,
+      "cssGzip": 0,
+      "note": "FIX-blocks-engine-subpaths: Svelte-free diagram models, DIAGRAM_LIMITS, layoutFlow and layout math. Provisional cap."
+    },
+    "@texuli/blocks/embed/engine": {
+      "gzip": 8192,
+      "cssGzip": 0,
+      "note": "FIX-blocks-engine-subpaths: Svelte-free embed sandbox helpers and parsers. Provisional cap."
+    },
+    "@texuli/blocks/interactive/engine": {
+      "gzip": 16384,
+      "cssGzip": 0,
+      "note": "FIX-blocks-engine-subpaths: Svelte-free interactive parsers + formula. Prefer formula for calculator-only. Provisional cap."
+    },
+    "@texuli/blocks/map/engine": {
+      "gzip": 12288,
+      "cssGzip": 0,
+      "note": "FIX-blocks-engine-subpaths: Svelte-free map parsers, limits, view-model. Provisional cap."
+    },
+    "@texuli/blocks/media/engine": {
+      "gzip": 8192,
+      "cssGzip": 0,
+      "note": "FIX-blocks-engine-subpaths: Svelte-free media guards, labels, URL resolve. Provisional cap."
+    },
+    "@texuli/blocks/structure/engine": {
+      "gzip": 16384,
+      "cssGzip": 0,
+      "note": "FIX-blocks-engine-subpaths: Svelte-free structure parsers/guards/labels. Provisional cap."
+    },
+    "@texuli/blocks/text/engine": {
+      "gzip": 8192,
+      "cssGzip": 0,
+      "note": "FIX-blocks-engine-subpaths: Svelte-free text family types, guards, labels. Provisional cap."
+    },
+    "@texuli/tokens/aa-gate/components": {
+      "gzip": 2048,
+      "cssGzip": 0,
+      "note": "FINAL-texuli-check: component chrome pair matrix split from aa-gate so the gate entry stays under budget after map marker pairs. Checking tool only."
+    }
+  }
+}

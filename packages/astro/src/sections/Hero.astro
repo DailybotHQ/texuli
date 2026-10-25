@@ -1,0 +1,34 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  align?: 'start' | 'center';
+  /** `lede` (default) for page tops; `compact` for sub-pages and nested views. */
+  size?: 'lede' | 'compact';
+}
+
+const { eyebrow, title, description, align = 'start', size = 'lede' } = Astro.props;
+---
+
+<header
+  class:list={['tx-astro-hero', `tx-astro-hero--${align}`, `tx-astro-hero--${size}`]}
+>
+  {eyebrow && <p class="tx-astro-hero__eyebrow">{eyebrow}</p>}
+  <h1>{title}</h1>
+  {description && <p class="tx-astro-hero__description">{description}</p>}
+  <div class="tx-astro-hero__actions"><slot /></div>
+</header>
+
+<style>
+  .tx-astro-hero { display: grid; gap: 1rem; padding-block: clamp(3rem, 9vw, 7rem); }
+  .tx-astro-hero--center { text-align: center; justify-items: center; }
+  .tx-astro-hero__eyebrow { color: var(--tx-color-accent-foreground, inherit); font-weight: 600; margin: 0; }
+  h1 { font-size: clamp(2.5rem, 7vw, 5rem); line-height: 1.05; max-inline-size: 16ch; margin: 0; }
+  .tx-astro-hero__description { color: var(--tx-color-muted-foreground, currentColor); font-size: 1.125rem; line-height: 1.6; max-inline-size: 62ch; margin: 0; }
+  .tx-astro-hero__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-block-start: 0.5rem; }
+
+  .tx-astro-hero--compact { gap: 0.75rem; padding-block: clamp(1.5rem, 5vw, 3rem); }
+  .tx-astro-hero--compact h1 { font-size: clamp(1.75rem, 4.5vw, 2.75rem); }
+  .tx-astro-hero--compact .tx-astro-hero__description { font-size: 1rem; }
+</style>

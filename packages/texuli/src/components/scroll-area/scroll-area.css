@@ -1,0 +1,76 @@
+/** ScrollArea — native viewport with optional decorative scrollbar chrome. */
+@layer tx.components {
+  .tx-scroll-area {
+    position: relative;
+    min-inline-size: 0;
+    color: var(--tx-foreground, CanvasText);
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-radius-md, 0.5rem);
+    background: var(--tx-surface, Canvas);
+  }
+
+  .tx-scroll-area--sm {
+    max-block-size: 8rem;
+  }
+
+  .tx-scroll-area--md {
+    max-block-size: 12rem;
+  }
+
+  .tx-scroll-area--lg {
+    max-block-size: 18rem;
+  }
+
+  .tx-scroll-area__viewport {
+    display: block;
+    max-block-size: inherit;
+    min-inline-size: 0;
+    border-radius: inherit;
+    padding: 0.75rem;
+    color: inherit;
+    scrollbar-color: transparent transparent;
+  }
+
+  .tx-scroll-area__viewport:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: -2px;
+  }
+
+  .tx-scroll-area__scrollbar {
+    position: absolute;
+    inset-block: 0.25rem;
+    inset-inline-end: 0.25rem;
+    inline-size: 0.625rem;
+    border-radius: var(--tx-radius-full, 9999px);
+    background: color-mix(in srgb, var(--tx-muted, Canvas) 65%, transparent);
+    pointer-events: none;
+  }
+
+  .tx-scroll-area__thumb {
+    position: absolute;
+    inset-block-start: var(--tx-sa-thumb-offset-y, 0%);
+    inset-inline: 0.125rem;
+    block-size: var(--tx-sa-thumb-size-y, 100%);
+    min-block-size: 1rem;
+    border-radius: inherit;
+    background: var(--tx-muted-foreground, GrayText);
+    pointer-events: auto;
+    touch-action: none;
+  }
+
+  @media (forced-colors: active) {
+    .tx-scroll-area {
+      border-color: CanvasText;
+      forced-color-adjust: none;
+    }
+
+    .tx-scroll-area__scrollbar {
+      border: 1px solid CanvasText;
+      background: Canvas;
+    }
+
+    .tx-scroll-area__thumb {
+      background: CanvasText;
+    }
+  }
+}

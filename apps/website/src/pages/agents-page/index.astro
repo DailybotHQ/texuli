@@ -1,0 +1,22 @@
+---
+/**
+ * /agents-page/ — how coding agents build with Texuli.
+ */
+import AgentsHero from '../../components/agents-page/AgentsHero.astro';
+import AgentsResources from '../../components/agents-page/AgentsResources.astro';
+import AgentsSetup from '../../components/agents-page/AgentsSetup.astro';
+import AgentsTopics from '../../components/agents-page/AgentsTopics.astro';
+import PageBanner from '../../components/landing/PageBanner.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="For agents"
+  description="How coding agents build with Texuli: closed catalog, emit tiers, sink-free renderer, MCP, CLI, golden set, llms.txt and catalog JSON."
+>
+  <PageBanner slot="page-agents" />
+  <AgentsHero />
+  <AgentsTopics />
+  <AgentsSetup />
+  <AgentsResources />
+</BaseLayout>

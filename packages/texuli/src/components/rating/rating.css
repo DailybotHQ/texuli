@@ -1,0 +1,176 @@
+/**
+ * Rating: star rating input and display on the token contract.
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  .tx-rating {
+    --tx-rating-star: 2.25rem;
+    --tx-rating-fill: var(--tx-warning, #b45309);
+    --tx-rating-empty: var(--tx-muted-foreground, #575757);
+    display: inline-grid;
+    gap: 0.375rem;
+    justify-items: start;
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-rating--sm {
+    --tx-rating-star: 1.5rem;
+  }
+
+  .tx-rating--lg {
+    --tx-rating-star: 3rem;
+  }
+
+  .tx-rating--primary {
+    --tx-rating-fill: var(--tx-primary, #1d4ed8);
+  }
+
+  .tx-rating--neutral {
+    --tx-rating-fill: var(--tx-foreground, CanvasText);
+  }
+
+  /*
+   * Half stars hold two targets: keep each at least 24px wide (WCAG 2.5.8).
+   * A separate variable: redefining --tx-rating-star from itself is a cycle.
+   */
+  .tx-rating--half {
+    --tx-rating-box: max(3rem, var(--tx-rating-star));
+  }
+
+  .tx-rating--display {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tx-rating--display.tx-rating--md {
+    --tx-rating-star: 1.25rem;
+  }
+
+  .tx-rating__label {
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-weight: var(--tx-font-weight-medium, 500);
+  }
+
+  .tx-rating__label--hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .tx-rating__stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+  }
+
+  .tx-rating__star {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    inline-size: var(--tx-rating-box, var(--tx-rating-star));
+    block-size: var(--tx-rating-box, var(--tx-rating-star));
+    border-radius: var(--tx-radius, 0.375rem);
+  }
+
+  .tx-rating__icon {
+    position: absolute;
+    inset-block-start: 10%;
+    inset-inline-start: 10%;
+    inline-size: calc(var(--tx-rating-box, var(--tx-rating-star)) * 0.8);
+    block-size: calc(var(--tx-rating-box, var(--tx-rating-star)) * 0.8);
+    pointer-events: none;
+  }
+
+  .tx-rating__outline {
+    fill: none;
+    stroke: var(--tx-rating-empty);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+
+  /* The filled star, clipped from the inline start, so halves mirror in RTL. */
+  .tx-rating__fill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .tx-rating__fill path {
+    fill: var(--tx-rating-fill);
+    stroke: var(--tx-rating-fill);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+
+  .tx-rating__hit {
+    position: absolute;
+    inset-block: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--tx-radius, 0.375rem);
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .tx-rating__hit--full {
+    inset-inline: 0;
+  }
+
+  .tx-rating__hit--start {
+    inset-inline-start: 0;
+    inline-size: 50%;
+  }
+
+  .tx-rating__hit--end {
+    inset-inline-end: 0;
+    inline-size: 50%;
+  }
+
+  .tx-rating__hit:focus-visible {
+    outline: none;
+  }
+
+  .tx-rating__star:has(.tx-rating__hit:focus-visible) {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-rating__hit:disabled,
+  .tx-rating[data-disabled] .tx-rating__hit {
+    cursor: not-allowed;
+  }
+
+  .tx-rating[data-disabled] .tx-rating__stars {
+    opacity: 0.55;
+  }
+
+  .tx-rating__value {
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-variant-numeric: tabular-nums;
+    color: var(--tx-muted-foreground, #575757);
+  }
+
+  @media (forced-colors: active) {
+    .tx-rating {
+      --tx-rating-fill: CanvasText;
+      --tx-rating-empty: CanvasText;
+    }
+
+    .tx-rating[data-disabled] .tx-rating__stars {
+      opacity: 1;
+      --tx-rating-fill: GrayText;
+      --tx-rating-empty: GrayText;
+    }
+
+    .tx-rating__star:has(.tx-rating__hit:focus-visible) {
+      outline-color: Highlight;
+    }
+  }
+}

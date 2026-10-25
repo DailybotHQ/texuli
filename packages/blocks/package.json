@@ -1,0 +1,166 @@
+{
+  "name": "@texuli/blocks",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Content blocks: closed vocabulary, untrusted guard, formula AST and catalog metadata for pages, documents and slides.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./code": {
+      "types": "./src/code/index.ts",
+      "default": "./src/code/index.ts"
+    },
+    "./code/engine": {
+      "types": "./src/code/engine-entry.ts",
+      "default": "./src/code/engine-entry.ts"
+    },
+    "./code/renderers": {
+      "types": "./src/code/renderers.ts",
+      "svelte": "./src/code/renderers.ts",
+      "default": "./src/code/renderers.ts"
+    },
+    "./code/tokenizer": {
+      "types": "./src/code/engine.ts",
+      "default": "./src/code/engine.ts"
+    },
+    "./core": {
+      "types": "./src/core/index.ts",
+      "default": "./src/core/index.ts"
+    },
+    "./data": {
+      "types": "./src/data/index.ts",
+      "default": "./src/data/index.ts"
+    },
+    "./data/engine": {
+      "types": "./src/data/engine.ts",
+      "default": "./src/data/engine.ts"
+    },
+    "./data/renderers": {
+      "types": "./src/data/renderers.ts",
+      "svelte": "./src/data/renderers.ts",
+      "default": "./src/data/renderers.ts"
+    },
+    "./diagram": {
+      "types": "./src/diagram/index.ts",
+      "default": "./src/diagram/index.ts"
+    },
+    "./diagram/engine": {
+      "types": "./src/diagram/engine.ts",
+      "default": "./src/diagram/engine.ts"
+    },
+    "./diagram/renderers": {
+      "types": "./src/diagram/DiagramFamily.svelte",
+      "svelte": "./src/diagram/DiagramFamily.svelte",
+      "default": "./src/diagram/DiagramFamily.svelte"
+    },
+    "./embed": {
+      "types": "./src/embed/index.ts",
+      "svelte": "./src/embed/index.ts",
+      "default": "./src/embed/index.ts"
+    },
+    "./embed/engine": {
+      "types": "./src/embed/engine.ts",
+      "default": "./src/embed/engine.ts"
+    },
+    "./embed/renderers": {
+      "types": "./src/embed/renderers.ts",
+      "svelte": "./src/embed/renderers.ts",
+      "default": "./src/embed/renderers.ts"
+    },
+    "./formula": {
+      "types": "./src/core/formula/index.ts",
+      "default": "./src/core/formula/index.ts"
+    },
+    "./interactive": {
+      "types": "./src/interactive/index.ts",
+      "default": "./src/interactive/index.ts"
+    },
+    "./interactive/engine": {
+      "types": "./src/interactive/engine.ts",
+      "default": "./src/interactive/engine.ts"
+    },
+    "./interactive/renderers": {
+      "types": "./src/interactive/renderers.ts",
+      "svelte": "./src/interactive/renderers.ts",
+      "default": "./src/interactive/renderers.ts"
+    },
+    "./map": {
+      "types": "./src/map/index.ts",
+      "default": "./src/map/index.ts"
+    },
+    "./map/engine": {
+      "types": "./src/map/engine.ts",
+      "default": "./src/map/engine.ts"
+    },
+    "./map/renderers": {
+      "types": "./src/map/renderers.ts",
+      "svelte": "./src/map/renderers.ts",
+      "default": "./src/map/renderers.ts"
+    },
+    "./media": {
+      "types": "./src/media/index.ts",
+      "default": "./src/media/index.ts"
+    },
+    "./media/engine": {
+      "types": "./src/media/engine.ts",
+      "default": "./src/media/engine.ts"
+    },
+    "./media/renderers": {
+      "types": "./src/media/renderers.ts",
+      "svelte": "./src/media/renderers.ts",
+      "default": "./src/media/renderers.ts"
+    },
+    "./structure": {
+      "types": "./src/structure/index.ts",
+      "default": "./src/structure/index.ts"
+    },
+    "./structure/engine": {
+      "types": "./src/structure/engine.ts",
+      "default": "./src/structure/engine.ts"
+    },
+    "./structure/renderers": {
+      "types": "./src/structure/renderers.ts",
+      "svelte": "./src/structure/renderers.ts",
+      "default": "./src/structure/renderers.ts"
+    },
+    "./text": {
+      "types": "./src/text/index.ts",
+      "default": "./src/text/index.ts"
+    },
+    "./text/engine": {
+      "types": "./src/text/engine.ts",
+      "default": "./src/text/engine.ts"
+    },
+    "./text/markdown": {
+      "types": "./src/text/markdown.ts",
+      "default": "./src/text/markdown.ts"
+    },
+    "./text/renderers": {
+      "types": "./src/text/renderers.ts",
+      "svelte": "./src/text/renderers.ts",
+      "default": "./src/text/renderers.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/core": "workspace:*",
+    "@texuli/tokens": "workspace:*",
+    "texuli": "workspace:*",
+    "@texuli/charts": "workspace:*",
+    "@texuli/data": "workspace:*",
+    "@texuli/media": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

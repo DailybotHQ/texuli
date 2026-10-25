@@ -1,0 +1,33 @@
+# build output
+dist
+.astro
+
+# dependencies
+node_modules/
+.pnpm-store/
+
+# logs
+*.log
+
+# test output
+coverage/
+test-results/
+playwright-report/
+
+# environment variables (examples stay tracked)
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Temporary workspace (agent outputs, scratch files)
+tmp/*
+!tmp/.gitkeep
+
+# Deep Work Plan working state (not tracked), except the addon registry
+.dwp/*
+!.dwp/config.json

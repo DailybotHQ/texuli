@@ -1,0 +1,42 @@
+---
+import GuideCode from '../../../components/guides/GuideCode.astro';
+import GuidesShell from '../../../components/guides/GuidesShell.astro';
+import PerformanceLive from '../../../components/guides/PerformanceLive.svelte';
+
+const toc = [
+  { id: 'subpaths', label: 'Subpath imports', level: 2 as const },
+  { id: 'budgets', label: 'Budgets', level: 2 as const },
+  { id: 'live-imports', label: 'Live imports', level: 2 as const },
+];
+
+const importSnippet = `// Good — one family per chunk
+import { Button } from 'texuli/button';
+import { createRovingFocus } from '@texuli/core/roving';
+
+// Avoid — root barrels pull unrelated code
+// import { Button } from 'texuli';
+// import { createRovingFocus } from '@texuli/core';`;
+---
+
+<GuidesShell
+  title="Performance"
+  description="Lazy subpath imports, measured gzip budgets and static pages that ship only what they use."
+  {toc}
+>
+  <h2 id="subpaths">Subpath imports</h2>
+  <p>
+    Every component family and texel is a separate export. Import <code>texuli/button</code>, <code>texuli/field</code>, <code>@texuli/core/roving</code> — not the
+    package root. The website build already tree-shakes Astro pages to the islands they mount.
+  </p>
+  <GuideCode code={importSnippet} label="Subpath imports" />
+
+  <h2 id="budgets">Budgets</h2>
+  <p>
+    <code>texuli.budgets.json</code> caps default <code>&lt;package&gt;/*</code> chunks. New lazy
+    subpaths inherit the default; package root barrels are aggregates with a tighter total. Report
+    measured gzip in task write-ups — do not invent splits to game the gate.
+  </p>
+
+  <h2 id="live-imports">Live imports</h2>
+  <PerformanceLive client:load />
+</GuidesShell>

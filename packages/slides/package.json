@@ -1,0 +1,52 @@
+{
+  "name": "@texuli/slides",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Presentation deck model, grammar, and responsive stage runtime.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./model": {
+      "types": "./src/model/index.ts",
+      "default": "./src/model/index.ts"
+    },
+    "./grammar": {
+      "types": "./src/grammar/index.ts",
+      "default": "./src/grammar/index.ts"
+    },
+    "./export": {
+      "types": "./src/export/index.ts",
+      "default": "./src/export/index.ts"
+    },
+    "./templates": {
+      "types": "./src/templates/index.ts",
+      "default": "./src/templates/index.ts"
+    },
+    "./stage": {
+      "types": "./src/stage/index.ts",
+      "svelte": "./src/stage/index.ts",
+      "default": "./src/stage/index.ts"
+    },
+    "./styles.css": "./src/styles.css"
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/blocks": "workspace:*",
+    "@texuli/catalog": "workspace:*",
+    "@texuli/media": "workspace:*",
+    "@texuli/tokens": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

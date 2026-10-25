@@ -1,0 +1,168 @@
+/** Styled TreeView — @layer tx.components, logical indentation, system-color fallbacks. */
+@layer tx.components {
+  .tx-tree {
+    --tx-tree-indent: 1.25rem;
+    --tx-tree-row-size: calc(2.25rem * var(--tx-density, 1));
+    display: grid;
+    gap: 0.125rem;
+    min-inline-size: 0;
+    padding: 0.25rem;
+    border-radius: var(--tx-radius-md, 0.5rem);
+    color: var(--tx-foreground, CanvasText);
+    background: var(--tx-background, Canvas);
+  }
+
+  .tx-tree--bordered {
+    border: 1px solid var(--tx-border, GrayText);
+  }
+
+  .tx-tree--compact {
+    --tx-tree-row-size: calc(1.75rem * var(--tx-density, 1));
+    --tx-tree-indent: 1rem;
+  }
+
+  .tx-tree--comfortable {
+    --tx-tree-row-size: calc(2.75rem * var(--tx-density, 1));
+    --tx-tree-indent: 1.5rem;
+  }
+
+  .tx-tree > [role="treeitem"] {
+    display: flex;
+    align-items: center;
+    min-inline-size: 0;
+    min-block-size: var(--tx-tree-row-size);
+    border-radius: var(--tx-radius-sm, 0.25rem);
+    outline: none;
+    cursor: default;
+    color: inherit;
+    background: transparent;
+  }
+
+  .tx-tree > [role="treeitem"]:hover {
+    background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+  }
+
+  .tx-tree > [role="treeitem"]:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 1px;
+  }
+
+  .tx-tree > [role="treeitem"][aria-selected="true"] {
+    color: CanvasText;
+    background: var(--tx-primary-subtle, color-mix(in srgb, Highlight 18%, Canvas));
+  }
+
+  .tx-tree > [role="treeitem"][data-disabled] {
+    cursor: not-allowed;
+  }
+
+  .tx-tree [data-tree-toggle] {
+    display: inline-grid;
+    flex: 0 0 1.25rem;
+    place-items: center;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    border-radius: var(--tx-radius-sm, 0.25rem);
+    color: var(--tx-muted-foreground, CanvasText);
+    cursor: pointer;
+  }
+
+  .tx-tree [data-tree-toggle]:hover {
+    color: var(--tx-foreground, CanvasText);
+    background: var(--tx-muted, color-mix(in srgb, CanvasText 10%, Canvas));
+  }
+
+  .tx-tree [data-tree-spacer] {
+    flex: 0 0 1.25rem;
+    inline-size: 1.25rem;
+  }
+
+  .tx-tree__row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-inline-size: 0;
+    inline-size: 100%;
+    padding-block: 0.25rem;
+    padding-inline-start: calc(var(--tx-tree-indent) * var(--tx-tree-depth, 0));
+    padding-inline-end: 0.5rem;
+  }
+
+  .tx-tree__checkbox {
+    display: inline-grid;
+    flex: 0 0 1rem;
+    place-items: center;
+    inline-size: 1rem;
+    block-size: 1rem;
+    border: 1px solid var(--tx-input-border, GrayText);
+    border-radius: var(--tx-radius-xs, 0.125rem);
+    color: var(--tx-primary-foreground, HighlightText);
+    background: var(--tx-background, Canvas);
+  }
+
+  .tx-tree__checkbox[data-checked="true"] {
+    border-color: var(--tx-primary, Highlight);
+    background: var(--tx-primary, Highlight);
+  }
+
+  .tx-tree__checkbox svg {
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+  }
+
+  .tx-tree__node-icon {
+    flex: 0 0 1.125rem;
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    fill: none;
+    stroke: var(--tx-muted-foreground, CanvasText);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
+  }
+
+  .tx-tree [aria-expanded="true"] .tx-tree__node-icon {
+    stroke: var(--tx-primary, Highlight);
+  }
+
+  .tx-tree__label {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .tx-tree > [role="treeitem"][data-disabled] .tx-tree__label {
+    text-decoration: line-through;
+  }
+
+  @media (forced-colors: active) {
+    .tx-tree > [role="treeitem"][aria-selected="true"] {
+      outline: 1px solid Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    .tx-tree__checkbox[data-checked="true"] {
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+
+    .tx-tree__node-icon {
+      stroke: CanvasText;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tx-tree [data-tree-toggle] {
+      transition:
+        background-color 120ms ease,
+        color 120ms ease;
+    }
+  }
+}

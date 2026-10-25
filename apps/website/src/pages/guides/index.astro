@@ -1,0 +1,49 @@
+---
+import GuideCode from '../../components/guides/GuideCode.astro';
+import GuidesShell from '../../components/guides/GuidesShell.astro';
+import PageBanner from '../../components/landing/PageBanner.astro';
+
+const toc = [
+  { id: 'what-you-get', label: 'What you get', level: 2 as const },
+  { id: 'how-to-read', label: 'How to read', level: 2 as const },
+  { id: 'static-and-local', label: 'Static and local', level: 2 as const },
+];
+
+const treeSnippet = `guides/
+  getting-started/   install or copy
+  theming/           themes and tokens
+  dark-mode/         light, dark, system
+  accessibility/     keyboard and contrast
+  rtl-i18n/          dir and locale
+  forms/             Field, Input, validate
+  performance/       subpaths and budgets`;
+---
+
+<GuidesShell
+  title="Guides"
+  description="Install Texuli, theme it, ship accessible forms, and keep bundles small — with live snippets on every page."
+  {toc}
+>
+  <PageBanner slot="page-guides" />
+  <h2 id="what-you-get">What you get</h2>
+  <p>
+    These guides are the practical path from a blank app to a product surface built with owned
+    primitives. Every page ships real Texuli components (SSR or a small island) so the snippet you
+    read is the snippet that runs.
+  </p>
+  <GuideCode code={treeSnippet} label="Guides outline" />
+
+  <h2 id="how-to-read">How to read</h2>
+  <p>
+    Start with <a href="./getting-started/">Getting started</a>, then appearance
+    (theming and dark mode), then inclusive UI (accessibility, RTL, forms), and finish with
+    performance. Use the sidebar, the mobile menu, or previous / next at the bottom of each page.
+  </p>
+
+  <h2 id="static-and-local">Static and local</h2>
+  <p>
+    After <code>pnpm build</code> the site is plain files. Guide pages make no request to another
+    origin. The shared appearance switch in the header is the only client control on most pages;
+    interactive demos that need state use a focused Svelte island.
+  </p>
+</GuidesShell>

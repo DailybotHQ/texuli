@@ -1,0 +1,1 @@
+{ "name": "@texuli/website", "private": true, "dependencies": { "texuli": "workspace:*" } }

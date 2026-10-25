@@ -1,0 +1,210 @@
+/*
+ * Texuli Tailwind 4 theme preset.
+ *
+ * Import AFTER `tailwindcss`, BEFORE or WITH the base layer stylesheet:
+ *
+ *   @import 'tailwindcss';
+ *   @import '@texuli/tokens/tailwind/preset.css';
+ *   @import '@texuli/tokens/base.css';
+ *
+ * Maps utilities to the `--tx-*` token contract. Theme values are written by
+ * `applyTheme` / `compileThemeCss`. Consumer classes win through
+ * `@layer tx.base, tx.components` in base.css.
+ */
+
+/* Dark mode: data attribute (modes) plus `.dark` for Tailwind compatibility. */
+@custom-variant dark (&:where([data-tx-mode="dark"], [data-tx-mode="dark"] *, .dark, .dark *));
+
+/*
+ * Logical safe-area insets: physical left/right env() values swap under :dir(rtl)
+ * so padding-inline-* utilities stay correct in RTL.
+ */
+:root {
+  /* Physical safe-area + app height (see tokens base.css host contract). */
+  --tx-safe-top: env(safe-area-inset-top, 0px);
+  --tx-safe-right: env(safe-area-inset-right, 0px);
+  --tx-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --tx-safe-left: env(safe-area-inset-left, 0px);
+  --tx-safe-area-inline-start: var(--tx-safe-left);
+  --tx-safe-area-inline-end: var(--tx-safe-right);
+  --tx-safe-area-block-start: var(--tx-safe-top);
+  --tx-safe-area-block-end: var(--tx-safe-bottom);
+  --tx-app-height: 100dvh;
+  --tx-app-shell-height: var(--tx-app-height);
+  --tx-target-size: 44px;
+}
+
+:root:dir(rtl),
+:dir(rtl) {
+  --tx-safe-area-inline-start: var(--tx-safe-right);
+  --tx-safe-area-inline-end: var(--tx-safe-left);
+}
+
+@theme inline {
+  /* Semantic colors (--tx-* from the contract). */
+  --color-background: var(--tx-background);
+  --color-foreground: var(--tx-foreground);
+  --color-surface: var(--tx-surface-fill, var(--tx-surface));
+  --color-surface-foreground: var(--tx-surface-foreground);
+  --color-elevated: var(--tx-elevated-fill, var(--tx-elevated));
+  --color-elevated-foreground: var(--tx-elevated-foreground);
+  --color-muted: var(--tx-muted);
+  --color-muted-foreground: var(--tx-muted-foreground);
+  --color-subtle: var(--tx-subtle);
+  --color-subtle-foreground: var(--tx-subtle-foreground);
+  --color-border: var(--tx-border);
+  --color-border-strong: var(--tx-border-strong);
+  --color-input: var(--tx-input);
+  --color-ring: var(--tx-ring);
+  --color-primary: var(--tx-primary);
+  --color-primary-foreground: var(--tx-primary-foreground);
+  --color-primary-soft: var(--tx-primary-soft);
+  --color-primary-soft-foreground: var(--tx-primary-soft-foreground);
+  --color-secondary: var(--tx-secondary);
+  --color-secondary-foreground: var(--tx-secondary-foreground);
+  --color-accent: var(--tx-accent);
+  --color-accent-foreground: var(--tx-accent-foreground);
+  --color-destructive: var(--tx-destructive);
+  --color-destructive-foreground: var(--tx-destructive-foreground);
+  --color-destructive-soft: var(--tx-destructive-soft);
+  --color-destructive-soft-foreground: var(--tx-destructive-soft-foreground);
+  --color-success: var(--tx-success);
+  --color-success-foreground: var(--tx-success-foreground);
+  --color-success-soft: var(--tx-success-soft);
+  --color-success-soft-foreground: var(--tx-success-soft-foreground);
+  --color-warning: var(--tx-warning);
+  --color-warning-foreground: var(--tx-warning-foreground);
+  --color-warning-soft: var(--tx-warning-soft);
+  --color-warning-soft-foreground: var(--tx-warning-soft-foreground);
+  --color-info: var(--tx-info);
+  --color-info-foreground: var(--tx-info-foreground);
+  --color-info-soft: var(--tx-info-soft);
+  --color-info-soft-foreground: var(--tx-info-soft-foreground);
+  --color-sidebar: var(--tx-sidebar);
+  --color-sidebar-foreground: var(--tx-sidebar-foreground);
+  --color-sidebar-border: var(--tx-sidebar-border);
+  --color-sidebar-primary: var(--tx-sidebar-primary);
+  --color-overlay: var(--tx-overlay);
+  --color-scrim: var(--tx-scrim);
+  --color-shadow: var(--tx-shadow);
+  --color-link: var(--tx-link);
+  --color-link-visited: var(--tx-link-visited);
+  --color-selection: var(--tx-selection);
+  --color-selection-foreground: var(--tx-selection-foreground);
+  --color-canvas: var(--tx-canvas);
+
+  /* Interaction states */
+  --color-primary-hover: var(--tx-primary-hover);
+  --color-primary-active: var(--tx-primary-active);
+  --color-primary-disabled: var(--tx-primary-disabled);
+  --color-primary-focus: var(--tx-primary-focus);
+  --color-secondary-hover: var(--tx-secondary-hover);
+  --color-destructive-hover: var(--tx-destructive-hover);
+  --color-destructive-active: var(--tx-destructive-active);
+  --color-accent-hover: var(--tx-accent-hover);
+  --color-success-hover: var(--tx-success-hover);
+  --color-warning-hover: var(--tx-warning-hover);
+  --color-info-hover: var(--tx-info-hover);
+  --color-muted-hover: var(--tx-muted-hover);
+  --color-link-hover: var(--tx-link-hover);
+
+  /* Charts */
+  --color-chart-1: var(--tx-chart-1);
+  --color-chart-2: var(--tx-chart-2);
+  --color-chart-3: var(--tx-chart-3);
+  --color-chart-4: var(--tx-chart-4);
+  --color-chart-5: var(--tx-chart-5);
+  --color-chart-6: var(--tx-chart-6, var(--tx-chart-1));
+  --color-chart-7: var(--tx-chart-7, var(--tx-chart-2));
+  --color-chart-8: var(--tx-chart-8, var(--tx-chart-3));
+  --color-chart-grid: var(--tx-chart-grid);
+  --color-chart-axis: var(--tx-chart-axis);
+
+  /* Radius */
+  --radius-xs: calc(var(--tx-radius) - var(--tx-radius-step-6, 6px));
+  --radius-sm: calc(var(--tx-radius) - var(--tx-radius-step-4, 4px));
+  --radius-md: calc(var(--tx-radius) - var(--tx-radius-step-2, 2px));
+  --radius-lg: var(--tx-radius);
+  --radius-xl: calc(var(--tx-radius) + var(--tx-radius-step-4, 4px));
+  --radius-2xl: calc(
+    var(--tx-radius) +
+    var(--tx-radius-step-6, 6px) +
+    var(--tx-radius-step-2, 2px)
+  );
+
+  /* Typography */
+  --font-sans: var(--tx-font-sans);
+  --font-heading: var(--tx-font-heading);
+  --font-mono: var(--tx-font-mono);
+  --font-weight-normal: var(--tx-font-weight-body, 400);
+  --font-weight-medium: var(--tx-font-weight-medium, 500);
+  --font-weight-semibold: var(--tx-font-weight-heading, 600);
+  --font-weight-bold: var(--tx-font-weight-bold, 700);
+  --tracking-body: var(--tx-letter-spacing-body, 0);
+  --tracking-heading: var(--tx-letter-spacing-heading, 0);
+
+  --text-xs: var(--tx-font-size-xs, 0.75rem);
+  --text-sm: var(--tx-font-size-sm, 0.875rem);
+  --text-base: var(--tx-font-size-base, 1rem);
+  --text-lg: var(--tx-font-size-lg, 1.125rem);
+  --text-xl: var(--tx-font-size-xl, 1.25rem);
+  --text-2xl: var(--tx-font-size-2xl, 1.5rem);
+  --text-3xl: var(--tx-font-size-3xl, 1.875rem);
+  --text-4xl: var(--tx-font-size-4xl, 2.25rem);
+  --text-5xl: var(--tx-font-size-5xl, 3rem);
+  --text-6xl: var(--tx-font-size-6xl, 3.75rem);
+  --text-7xl: var(--tx-font-size-7xl, 4.5rem);
+  --text-8xl: var(--tx-font-size-8xl, 6rem);
+  --text-9xl: var(--tx-font-size-9xl, 8rem);
+
+  /* Density scales the whole spacing system (compact … comfortable). */
+  --spacing: calc(0.25rem * var(--tx-density, 1));
+
+  --default-border-width: var(--tx-border-width, 1px);
+  --duration-fast: var(--tx-motion-fast, 150ms);
+  --duration-base: var(--tx-motion-base, 200ms);
+  --duration-slow: var(--tx-motion-slow, 300ms);
+  --default-transition-duration: var(--tx-motion-base, 200ms);
+  --default-transition-timing-function: var(--tx-motion-easing, cubic-bezier(0.4, 0, 0.2, 1));
+
+  --shadow-soft: var(--tx-shadow-soft, 0 1px 2px 0 var(--tx-shadow), 0 1px 3px 0 var(--tx-shadow));
+  --shadow-float: var(
+    --tx-shadow-float,
+    0 10px 30px -8px var(--tx-shadow),
+    0 4px 10px -4px var(--tx-shadow)
+  );
+}
+
+/* Safe-area helpers (logical properties; pair with viewport-fit=cover). */
+@utility pt-safe {
+  padding-block-start: max(var(--tx-safe-area-block-start), var(--tx-safe-block-start, 0px));
+}
+@utility pb-safe {
+  padding-block-end: max(var(--tx-safe-area-block-end), var(--tx-safe-block-end, 0px));
+}
+@utility ps-safe {
+  padding-inline-start: max(var(--tx-safe-area-inline-start), var(--tx-safe-inline-start, 0px));
+}
+@utility pe-safe {
+  padding-inline-end: max(var(--tx-safe-area-inline-end), var(--tx-safe-inline-end, 0px));
+}
+@utility px-safe {
+  padding-inline-start: max(var(--tx-safe-area-inline-start), var(--tx-safe-inline-start, 0px));
+  padding-inline-end: max(var(--tx-safe-area-inline-end), var(--tx-safe-inline-end, 0px));
+}
+@utility py-safe {
+  padding-block-start: max(var(--tx-safe-area-block-start), var(--tx-safe-block-start, 0px));
+  padding-block-end: max(var(--tx-safe-area-block-end), var(--tx-safe-block-end, 0px));
+}
+@utility h-app {
+  block-size: var(--tx-app-height, 100dvh);
+}
+@utility min-h-app {
+  min-block-size: var(--tx-app-height, 100dvh);
+}
+@utility max-h-app {
+  max-block-size: var(--tx-app-height, 100dvh);
+}
+@utility min-h-touch {
+  min-block-size: var(--tx-target-size, 44px);
+}

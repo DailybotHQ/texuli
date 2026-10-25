@@ -1,0 +1,66 @@
+---
+import BlockFrame from '../../components/blocks-page/BlockFrame.astro';
+import { PAGE_BLOCKS } from '../../components/blocks-page/blocks.ts';
+import AuthSection from '../../components/blocks-page/sections/AuthSection.svelte';
+import FaqSection from '../../components/blocks-page/sections/FaqSection.svelte';
+import FeaturesSection from '../../components/blocks-page/sections/FeaturesSection.svelte';
+import FooterSection from '../../components/blocks-page/sections/FooterSection.svelte';
+import HeroSection from '../../components/blocks-page/sections/HeroSection.svelte';
+import PricingSection from '../../components/blocks-page/sections/PricingSection.svelte';
+import { blockSource } from '../../components/blocks-page/sources.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const block = (id: string) => {
+  const found = PAGE_BLOCKS.find((b) => b.id === id);
+  if (!found) throw new Error(`Unknown block ${id}`);
+  return found;
+};
+---
+
+<BaseLayout
+  title="Blocks and templates"
+  description="Copy-ready page sections built with Texuli: hero, features, pricing, FAQ, sign in and footer, each with its texuli add command and source."
+>
+  <h1>Blocks and templates</h1>
+  <p class="lead">
+    Copy-ready page sections built only with Texuli. Each one shows the live result, the <code>texuli add</code> command for the components it uses, and its exact source. Fictional
+    Harbor Notes copy; static HTML with no runtime network.
+  </p>
+  <nav class="toc" aria-label="Blocks">
+    <ul>
+      {PAGE_BLOCKS.map((b) => <li><a href={`#block-${b.id}`}>{b.title}</a></li>)}
+    </ul>
+  </nav>
+
+  <BlockFrame block={block('hero')} source={blockSource('HeroSection.svelte')}><HeroSection /></BlockFrame>
+  <BlockFrame block={block('features')} source={blockSource('FeaturesSection.svelte')}><FeaturesSection /></BlockFrame>
+  <BlockFrame block={block('pricing')} source={blockSource('PricingSection.svelte')}><PricingSection /></BlockFrame>
+  <BlockFrame block={block('faq')} source={blockSource('FaqSection.svelte')}><FaqSection client:visible /></BlockFrame>
+  <BlockFrame block={block('auth')} source={blockSource('AuthSection.svelte')}><AuthSection client:visible /></BlockFrame>
+  <BlockFrame block={block('footer')} source={blockSource('FooterSection.svelte')}><FooterSection /></BlockFrame>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-block: 0 0.25rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.15;
+  }
+  .lead {
+    margin-block: 0 1.5rem;
+    max-inline-size: 44rem;
+    color: var(--tx-muted-foreground);
+    font-size: 1.125rem;
+  }
+  .toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    list-style: none;
+  }
+  .toc a {
+    color: var(--tx-link, LinkText);
+  }
+</style>

@@ -1,0 +1,407 @@
+@import "@texuli/tokens/base.css";
+
+.tx-deck-stage {
+  box-sizing: border-box;
+  display: grid;
+  gap: calc(1rem * var(--tx-density, 1));
+  inline-size: min(100%, 80rem);
+  margin-inline: auto;
+  padding: clamp(0.75rem, 2.4vw, 2rem);
+  color: var(--tx-foreground);
+  background: var(--tx-background);
+  border: 1px solid var(--tx-border);
+  border-radius: var(--tx-radius, 0.625rem);
+}
+
+.tx-deck-stage__toolbar,
+.tx-deck-stage__overview-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tx-deck-stage__toolbar {
+  justify-content: space-between;
+}
+
+.tx-deck-stage__control,
+.tx-deck-stage__overview-item {
+  min-block-size: 44px;
+  padding-block: 0.5rem;
+  padding-inline: 0.875rem;
+  color: var(--tx-foreground);
+  background: var(--tx-surface, var(--tx-background));
+  border: 1px solid var(--tx-border-strong, var(--tx-border));
+  border-radius: var(--tx-radius, 0.625rem);
+  font: inherit;
+  cursor: pointer;
+}
+
+.tx-deck-stage__control:focus-visible,
+.tx-deck-stage__overview-item:focus-visible {
+  outline: 2px solid var(--tx-ring);
+  outline-offset: 2px;
+}
+
+.tx-deck-stage__progress {
+  font-variant-numeric: tabular-nums;
+}
+
+.tx-deck-stage__slide {
+  display: grid;
+  align-content: start;
+  gap: calc(1rem * var(--tx-density, 1));
+  min-inline-size: 0;
+}
+
+.tx-deck-stage__slide[data-transition="fade"] {
+  animation: tx-deck-slide-fade var(--tx-motion-base, 180ms) ease-out both;
+}
+
+.tx-deck-stage__slide[data-transition="fade-up"] {
+  animation: tx-deck-slide-fade-up var(--tx-motion-base, 180ms) ease-out both;
+}
+
+@keyframes tx-deck-slide-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Block-axis offset only, so the motion reads the same in right-to-left layouts. */
+@keyframes tx-deck-slide-fade-up {
+  from {
+    opacity: 0;
+    translate: 0 0.35rem;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Slide master regions: DOM order is reading order; no visual reordering. */
+.tx-deck-stage__regions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: calc(1rem * var(--tx-density, 1));
+  min-inline-size: 0;
+}
+
+.tx-deck-stage__regions[data-arrangement="media-start"],
+.tx-deck-stage__regions[data-arrangement="media-end"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+@media (max-width: 40rem) {
+  .tx-deck-stage__regions[data-arrangement="media-start"],
+  .tx-deck-stage__regions[data-arrangement="media-end"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.tx-deck-stage__region {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: calc(1rem * var(--tx-density, 1));
+  min-inline-size: 0;
+}
+
+/* Media region images fill a bounded frame; body images are never cropped. */
+.tx-deck-stage__region[data-slot="media"] .tx-media-img {
+  inline-size: 100%;
+  block-size: min(60vh, 28rem);
+}
+
+.tx-deck-stage__region[data-slot="body"] .tx-media-img,
+.tx-deck-stage__region .tx-media-video {
+  max-block-size: min(50vh, 24rem);
+}
+
+.tx-deck-stage__media-refused {
+  margin: 0;
+  padding-block: 0.5rem;
+  padding-inline: 0.75rem;
+  color: var(--tx-muted-foreground, var(--tx-foreground));
+  border: 1px dashed var(--tx-border-strong, var(--tx-border));
+  border-radius: var(--tx-radius, 0.625rem);
+}
+
+.tx-deck-stage__slide-title {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2.75rem);
+  line-height: 1.15;
+}
+
+.tx-deck-stage__overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 0.75rem;
+}
+
+.tx-deck-stage__overview-item {
+  justify-content: flex-start;
+  text-align: start;
+}
+
+.tx-deck-stage__overview-number {
+  color: var(--tx-muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.tx-deck-stage__presenter {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(min(100%, 16rem), 1fr);
+  gap: calc(1rem * var(--tx-density, 1));
+  align-items: start;
+}
+
+@media (max-width: 48rem) {
+  .tx-deck-stage__presenter {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.tx-deck-stage__presenter-main {
+  min-inline-size: 0;
+}
+
+.tx-deck-stage__presenter-side {
+  display: grid;
+  gap: 0.75rem;
+  min-inline-size: 0;
+}
+
+.tx-deck-stage__timer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tx-deck-stage__timer-value {
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tx-deck-stage__notes,
+.tx-deck-stage__next {
+  padding-block: 0.75rem;
+  padding-inline: 0.875rem;
+  background: var(--tx-surface, var(--tx-background));
+  border: 1px solid var(--tx-border);
+  border-radius: var(--tx-radius, 0.625rem);
+}
+
+.tx-deck-stage__notes:focus-visible {
+  outline: 2px solid var(--tx-ring);
+  outline-offset: 2px;
+}
+
+.tx-deck-stage__pane-title {
+  margin-block: 0 0.5rem;
+  color: var(--tx-muted-foreground, var(--tx-foreground));
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.tx-deck-stage__notes-text,
+.tx-deck-stage__next-title {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.tx-deck-stage__notes-text {
+  white-space: pre-wrap;
+}
+
+.tx-deck-stage__loading,
+.tx-deck-stage__error,
+.tx-deck-stage__empty {
+  margin: 0;
+  color: var(--tx-muted-foreground, var(--tx-foreground));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tx-deck-stage,
+  .tx-deck-stage * {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+
+  .tx-deck-stage__slide[data-transition] {
+    animation: none;
+  }
+}
+
+.tx-deck-stage[data-motion="reduce"],
+.tx-deck-stage[data-motion="reduce"] * {
+  scroll-behavior: auto;
+  transition-duration: 0.01ms;
+  animation-duration: 0.01ms;
+  animation-iteration-count: 1;
+}
+
+.tx-deck-stage[data-motion="reduce"] .tx-deck-stage__slide[data-transition] {
+  animation: none;
+}
+
+:root[data-tx-motion="reduce"] .tx-deck-stage,
+:root[data-tx-motion="reduce"] .tx-deck-stage * {
+  scroll-behavior: auto;
+  transition-duration: 0.01ms;
+  animation-duration: 0.01ms;
+  animation-iteration-count: 1;
+}
+
+:root[data-tx-motion="reduce"] .tx-deck-stage__slide[data-transition] {
+  animation: none;
+}
+
+/* Print view: every slide on its own page, sized from the deck aspect. */
+@page tx-deck-16-9 {
+  size: 13.333in 7.5in;
+  margin: 0;
+}
+
+@page tx-deck-4-3 {
+  size: 10in 7.5in;
+  margin: 0;
+}
+
+@page tx-deck-1-1 {
+  size: 7.5in 7.5in;
+  margin: 0;
+}
+
+.tx-deck-print {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  color: var(--tx-foreground);
+  background: var(--tx-background);
+}
+
+.tx-deck-print[data-print-only="true"] {
+  display: none;
+}
+
+.tx-deck-print__slide {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: calc(1rem * var(--tx-density, 1));
+  aspect-ratio: 16 / 9;
+  inline-size: 100%;
+  /* Without this, the ratio turns a tall page's content height into a wider
+     minimum width and the page overflows a narrow viewport. */
+  min-inline-size: 0;
+  padding: 0.5in;
+  /* On screen a page keeps its aspect as a minimum and grows to fit its content
+     (aspect-ratio with visible overflow), so narrow previews never clip. */
+  color: var(--tx-foreground);
+  background: var(--tx-background);
+  border: 1px solid var(--tx-border);
+}
+
+.tx-deck-print__slide[data-aspect="4:3"] {
+  aspect-ratio: 4 / 3;
+}
+
+.tx-deck-print__slide[data-aspect="1:1"] {
+  aspect-ratio: 1 / 1;
+}
+
+.tx-deck-print__notes {
+  display: grid;
+  gap: 0.5rem;
+  break-inside: avoid;
+}
+
+.tx-deck-print__notes-title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+@media print {
+  .tx-deck-stage__toolbar,
+  .tx-deck-stage__presenter-side,
+  .tx-deck-stage__overview {
+    display: none;
+  }
+
+  .tx-deck-stage {
+    border: 0;
+  }
+
+  .tx-deck-print,
+  .tx-deck-print[data-print-only="true"] {
+    display: block;
+    print-color-adjust: exact;
+  }
+
+  :root:has(.tx-deck-print[data-print-only="true"]) .tx-deck-stage {
+    display: none;
+  }
+
+  .tx-deck-print__slide {
+    inline-size: auto;
+    block-size: 100vh;
+    aspect-ratio: auto;
+    overflow: hidden;
+    border: 0;
+    break-after: page;
+  }
+
+  .tx-deck-print__slide .tx-deck-stage__region[data-slot="media"] .tx-media-img {
+    block-size: 4.5in;
+  }
+
+  .tx-deck-print__slide .tx-deck-stage__region[data-slot="body"] .tx-media-img,
+  .tx-deck-print__slide .tx-media-video {
+    max-block-size: 4in;
+  }
+
+  .tx-deck-print__slide[data-aspect="16:9"] {
+    page: tx-deck-16-9;
+  }
+
+  .tx-deck-print__slide[data-aspect="4:3"] {
+    page: tx-deck-4-3;
+  }
+
+  .tx-deck-print__slide[data-aspect="1:1"] {
+    page: tx-deck-1-1;
+  }
+
+  .tx-deck-print__notes {
+    padding-block: 0.25in;
+    padding-inline: 0.5in;
+  }
+
+  .tx-deck-print[data-notes="appendix"] .tx-deck-print__notes:first-of-type {
+    break-before: page;
+  }
+}
+
+@media (forced-colors: active) {
+  .tx-deck-stage,
+  .tx-deck-stage__control,
+  .tx-deck-stage__overview-item,
+  .tx-deck-stage__notes,
+  .tx-deck-stage__next,
+  .tx-deck-stage__media-refused {
+    border-color: CanvasText;
+  }
+}

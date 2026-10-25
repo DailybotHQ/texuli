@@ -1,0 +1,171 @@
+---
+/**
+ * Frame for one chart family: heading, summary, data contract table, live demo slot.
+ */
+import type { ChartFamily } from './families.ts';
+import { familyPath } from './families.ts';
+
+type Props = {
+  family: ChartFamily;
+  /** When true, show a link to the dedicated family page. */
+  showPermalink?: boolean;
+  /** 1 on the family's own page (its title is the page heading), 2 in the gallery. */
+  headingLevel?: 1 | 2;
+};
+
+const { family, showPermalink = true, headingLevel = 2 } = Astro.props;
+const Heading = headingLevel === 1 ? 'h1' : 'h2';
+// Section headings sit one level below the family title.
+const SubHeading = headingLevel === 1 ? 'h2' : 'h3';
+const headingId = `chart-family-${family.id}`;
+const contractId = `chart-contract-${family.id}`;
+const previewId = `chart-preview-${family.id}`;
+---
+
+<section class="family" id={`family-${family.id}`} aria-labelledby={headingId} data-tx-chart-family={family.id}>
+  <header class="family__header">
+    <Heading id={headingId} class="family__title">{family.title}</Heading>
+    {
+      showPermalink ? (
+        <a class="family__link" href={familyPath(family.id)}>
+          Open {family.title} page
+        </a>
+      ) : null
+    }
+  </header>
+  <p class="family__summary">{family.summary}</p>
+  <p class="family__meta">
+    Import <code>{family.importPath}</code>
+    · Components: {family.components.join(', ')}
+  </p>
+  <p class="family__sample">{family.sampleNote}</p>
+
+  <div class="family__contract" aria-labelledby={contractId}>
+    <SubHeading id={contractId} class="family__subtitle">Data contract</SubHeading>
+    <div class="table-wrap" tabindex="0" role="region" aria-label={`${family.title} data contract`}>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Field</th>
+            <th scope="col">Type</th>
+            <th scope="col">Required</th>
+            <th scope="col">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            family.contract.map((row) => (
+              <tr>
+                <th scope="row"><code>{row.name}</code></th>
+                <td><code>{row.type}</code></td>
+                <td>{row.required ? 'yes' : '—'}</td>
+                <td>{row.notes ?? '—'}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="family__preview" aria-labelledby={previewId}>
+    <SubHeading id={previewId} class="family__subtitle">{family.title} examples</SubHeading>
+    <div class="family__live" role="region" aria-label={`${family.title} live charts`}>
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .family {
+    display: grid;
+    /* Never wider than the page column: a wide demo cannot widen the page. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    margin-block: 0 2.5rem;
+    padding-block-end: 2rem;
+    border-block-end: 1px solid var(--tx-border);
+  }
+  .family:last-of-type {
+    border-block-end: none;
+  }
+  .family__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+  .family__title {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--tx-foreground);
+  }
+  .family__subtitle {
+    margin: 0 0 0.5rem;
+    font-size: 1.05rem;
+    color: var(--tx-foreground);
+  }
+  .family__link {
+    color: var(--tx-link, LinkText);
+    font-size: 0.875rem;
+  }
+  .family__summary,
+  .family__meta,
+  .family__sample {
+    margin: 0;
+    max-inline-size: 48rem;
+    color: var(--tx-foreground);
+  }
+  .family__meta {
+    font-size: 0.875rem;
+  }
+  .family__sample {
+    font-size: 0.875rem;
+  }
+  .table-wrap {
+    overflow: auto;
+    max-inline-size: 100%;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+  }
+  .table-wrap:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+  }
+  th,
+  td {
+    padding: 0.5rem 0.65rem;
+    text-align: start;
+    border-block-end: 1px solid var(--tx-border);
+    color: var(--tx-foreground);
+    vertical-align: top;
+  }
+  thead th {
+    background: var(--tx-muted, var(--tx-surface, var(--tx-background)));
+    font-weight: 600;
+  }
+  code {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.8125em;
+  }
+  .family__live {
+    margin-block-start: 0.5rem;
+    padding: 1rem;
+    border: 1px dashed var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-background);
+  }
+  @media (forced-colors: active) {
+    .family,
+    .table-wrap,
+    .family__live {
+      border-color: CanvasText;
+    }
+  }
+</style>

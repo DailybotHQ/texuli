@@ -1,0 +1,98 @@
+{
+  "name": "@texuli/data",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Data views: grid, tree, board, calendar, timeline, map, activity and files.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./activity": {
+      "types": "./src/activity/index.ts",
+      "svelte": "./src/activity/index.ts",
+      "default": "./src/activity/index.ts"
+    },
+    "./activity/engine": "./src/engines/activity/index.ts",
+    "./board": {
+      "types": "./src/board/index.ts",
+      "svelte": "./src/board/index.ts",
+      "default": "./src/board/index.ts"
+    },
+    "./board/engine": "./src/engines/board/index.ts",
+    "./calendar": "./src/engines/calendar/index.ts",
+    "./files": {
+      "types": "./src/files/index.ts",
+      "svelte": "./src/files/index.ts",
+      "default": "./src/files/index.ts"
+    },
+    "./files/engine": "./src/engines/files/index.ts",
+    "./geo": "./src/engines/map/index.ts",
+    "./grid": "./src/engines/grid/index.ts",
+    "./grid-columns": {
+      "types": "./src/grid-columns/index.ts",
+      "svelte": "./src/grid-columns/index.ts",
+      "default": "./src/grid-columns/index.ts"
+    },
+    "./grid-core": {
+      "types": "./src/grid-core/index.ts",
+      "svelte": "./src/grid-core/index.ts",
+      "default": "./src/grid-core/index.ts"
+    },
+    "./grid-virtual": {
+      "types": "./src/grid-virtual/index.ts",
+      "svelte": "./src/grid-virtual/index.ts",
+      "default": "./src/grid-virtual/index.ts"
+    },
+    "./map": {
+      "types": "./src/map/index.ts",
+      "svelte": "./src/map/index.ts",
+      "default": "./src/map/index.ts"
+    },
+    "./timeline": {
+      "types": "./src/timeline/index.ts",
+      "svelte": "./src/timeline/index.ts",
+      "default": "./src/timeline/index.ts"
+    },
+    "./timeline/engine": "./src/engines/timeline/index.ts",
+    "./tree": "./src/engines/tree/index.ts",
+    "./tree-view": {
+      "types": "./src/tree-view/index.ts",
+      "svelte": "./src/tree-view/index.ts",
+      "default": "./src/tree-view/index.ts"
+    },
+    "./virtual-list": {
+      "types": "./src/virtual-list/index.ts",
+      "svelte": "./src/virtual-list/index.ts",
+      "default": "./src/virtual-list/index.ts"
+    },
+    "./calendar/view": {
+      "types": "./src/calendar/index.ts",
+      "svelte": "./src/calendar/index.ts",
+      "default": "./src/calendar/index.ts"
+    },
+    "./grid-editing": {
+      "types": "./src/grid-editing/index.ts",
+      "svelte": "./src/grid-editing/index.ts",
+      "default": "./src/grid-editing/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/core": "workspace:*",
+    "@texuli/primitives": "workspace:*",
+    "@texuli/tokens": "workspace:*",
+    "texuli": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

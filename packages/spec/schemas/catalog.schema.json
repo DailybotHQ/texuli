@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://texuli.example/spec/schemas/catalog.schema.json",
+  "title": "SpecCatalog",
+  "description": "The platform-neutral catalog vocabulary, bootstrapped from the built catalog. Placement, emission trust and portability are separate fields.",
+  "type": "object",
+  "properties": {
+    "catalogHash": {
+      "description": "The built catalog this vocabulary was projected from.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/component"
+      }
+    }
+  },
+  "required": ["catalogHash", "components"],
+  "additionalProperties": false,
+  "$defs": {
+    "component": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "group": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+        },
+        "placement": {
+          "description": "Product placement: the manifest tier.",
+          "type": "string",
+          "enum": ["app", "content"]
+        },
+        "emit": {
+          "description": "Emission trust: the tiers that may emit the id.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["developer", "untrusted"]
+          }
+        },
+        "capability": {
+          "description": "ADR-003 portability. unknown until audited.",
+          "type": "string",
+          "enum": ["portable-core", "web-only", "native-only", "unknown"]
+        },
+        "props": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/prop"
+          }
+        }
+      },
+      "required": ["id", "label", "summary", "group", "placement", "emit", "capability", "props"],
+      "additionalProperties": false
+    },
+    "prop": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "boolean",
+            "enum",
+            "array",
+            "object",
+            "slot",
+            "event",
+            "unknown"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "enumValues": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "extension": {
+          "description": "A named platform extension: the prop does not cross the shared boundary (slot, event and unknown kinds).",
+          "type": "string",
+          "enum": ["web"]
+        }
+      },
+      "required": ["name", "kind"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,219 @@
+/**
+ * Alert, Callout and Banner — token-tinted surfaces in @layer tx.components.
+ * Logical properties only; no static style attributes on hosts.
+ */
+@layer tx.components {
+  .tx-alert {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-radius: var(--tx-radius, 0.5rem);
+    border: var(--tx-border-width, 1px) solid transparent;
+    padding-block: 0.75rem;
+    padding-inline: 0.875rem;
+    color: var(--tx-foreground, CanvasText);
+    font-family: var(--tx-font-sans, system-ui, sans-serif);
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    line-height: 1.4;
+  }
+
+  .tx-alert--layout-callout {
+    gap: 0.625rem;
+    padding-block: 1rem;
+    padding-inline: 1rem;
+    border-inline-start-width: 0.25rem;
+  }
+
+  .tx-alert--layout-banner {
+    border-radius: 0;
+    inline-size: 100%;
+    padding-block: 0.625rem;
+    padding-inline: 1rem;
+  }
+
+  .tx-alert__row {
+    display: flex;
+    gap: 0.625rem;
+    align-items: flex-start;
+  }
+
+  .tx-alert__icon {
+    flex-shrink: 0;
+    margin-block-start: 0.125rem;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    color: var(--tx-alert-title, var(--tx-alert-accent, currentColor));
+  }
+
+  .tx-alert__icon :where(svg) {
+    inline-size: 100%;
+    block-size: 100%;
+    display: block;
+  }
+
+  .tx-alert__body {
+    min-inline-size: 0;
+    flex: 1 1 auto;
+  }
+
+  .tx-alert__title {
+    margin: 0;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-weight: var(--tx-font-weight-semibold, 600);
+    /* Soft title ink from the token engine (`*SoftForeground`), never color-mix. */
+    color: var(--tx-alert-title, var(--tx-alert-accent, inherit));
+  }
+
+  .tx-alert__text {
+    margin: 0;
+    color: var(--tx-alert-body, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-alert__content {
+    color: var(--tx-alert-body, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-alert__title + .tx-alert__text,
+  .tx-alert__title + .tx-alert__content,
+  .tx-alert__text + .tx-alert__content {
+    margin-block-start: 0.25rem;
+  }
+
+  .tx-alert__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding-inline-start: 1.875rem;
+  }
+
+  .tx-alert--layout-banner .tx-alert__actions {
+    padding-inline-start: 0;
+    margin-inline-start: auto;
+  }
+
+  .tx-alert--layout-banner .tx-alert__row {
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .tx-alert__dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    margin-inline-start: auto;
+    padding: 0.25rem;
+    border: 0;
+    border-radius: var(--tx-radius, 0.375rem);
+    background: transparent;
+    color: var(--tx-muted-foreground, GrayText);
+    cursor: pointer;
+    line-height: 0;
+  }
+
+  .tx-alert__dismiss:hover {
+    color: var(--tx-foreground, CanvasText);
+    background-color: color-mix(in oklab, currentColor 10%, transparent);
+  }
+
+  .tx-alert__dismiss:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  /*
+   * Tones: contract soft fills + soft title ink (AA-gated). Body uses
+   * --tx-foreground on the soft surface. No color-mix on title/body.
+   */
+  .tx-alert--info {
+    --tx-alert-title: var(--tx-info-soft-foreground, var(--tx-info, dodgerblue));
+    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-accent: var(--tx-alert-title);
+    border-color: var(--tx-info, dodgerblue);
+    background-color: var(
+      --tx-info-soft,
+      color-mix(in oklab, var(--tx-info, dodgerblue) 12%, var(--tx-background, Canvas))
+    );
+  }
+  .tx-alert--success {
+    --tx-alert-title: var(--tx-success-soft-foreground, var(--tx-success, green));
+    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-accent: var(--tx-alert-title);
+    border-color: var(--tx-success, green);
+    background-color: var(
+      --tx-success-soft,
+      color-mix(in oklab, var(--tx-success, green) 12%, var(--tx-background, Canvas))
+    );
+  }
+  .tx-alert--warning {
+    --tx-alert-title: var(--tx-warning-soft-foreground, var(--tx-warning, darkorange));
+    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-accent: var(--tx-alert-title);
+    border-color: var(--tx-warning, darkorange);
+    background-color: var(
+      --tx-warning-soft,
+      color-mix(in oklab, var(--tx-warning, darkorange) 12%, var(--tx-background, Canvas))
+    );
+  }
+  .tx-alert--error {
+    --tx-alert-title: var(--tx-destructive-soft-foreground, var(--tx-destructive, crimson));
+    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-accent: var(--tx-alert-title);
+    border-color: var(--tx-destructive, crimson);
+    background-color: var(
+      --tx-destructive-soft,
+      color-mix(in oklab, var(--tx-destructive, crimson) 12%, var(--tx-background, Canvas))
+    );
+  }
+  .tx-alert--brand {
+    --tx-alert-title: var(--tx-primary-soft-foreground, var(--tx-primary, Highlight));
+    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-accent: var(--tx-alert-title);
+    border-color: var(--tx-primary, Highlight);
+    background-color: var(
+      --tx-primary-soft,
+      color-mix(in oklab, var(--tx-primary, Highlight) 12%, var(--tx-background, Canvas))
+    );
+  }
+  .tx-alert--neutral {
+    --tx-alert-title: var(--tx-muted-foreground, GrayText);
+    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-accent: var(--tx-alert-title);
+    border-color: var(--tx-border, currentColor);
+    background-color: var(--tx-muted, Canvas);
+  }
+
+  .tx-alert--layout-callout.tx-alert--info {
+    border-inline-start-color: var(--tx-info, dodgerblue);
+  }
+  .tx-alert--layout-callout.tx-alert--success {
+    border-inline-start-color: var(--tx-success, green);
+  }
+  .tx-alert--layout-callout.tx-alert--warning {
+    border-inline-start-color: var(--tx-warning, darkorange);
+  }
+  .tx-alert--layout-callout.tx-alert--error {
+    border-inline-start-color: var(--tx-destructive, crimson);
+  }
+  .tx-alert--layout-callout.tx-alert--brand {
+    border-inline-start-color: var(--tx-primary, Highlight);
+  }
+  .tx-alert--layout-callout.tx-alert--neutral {
+    border-inline-start-color: var(--tx-border-strong, currentColor);
+  }
+
+  @media (forced-colors: active) {
+    .tx-alert {
+      border: 1px solid ButtonText;
+      forced-color-adjust: none;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .tx-alert__title,
+    .tx-alert__icon {
+      color: ButtonText;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$comment": "Every released spec version pinned to its spec digest (the digest every generated file is stamped with). A normative change needs a new version and a new pin; tests/versioning.test.ts fails otherwise. Policy: README, Versioning.",
+  "releases": [
+    {
+      "specVersion": "0.1.0",
+      "specDigest": null,
+      "change": "initial",
+      "summary": "Bootstrap spec. Its digest was not pinned and moved with later unversioned normative changes (last seen 8b6b22fd5914b5ac4aed056dbddb13d577a51d020cbfc4bb7f94f2b92cb20260 on dev 7401c16c)."
+    },
+    {
+      "specVersion": "0.2.0",
+      "specDigest": "d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f",
+      "change": "minor",
+      "summary": "Additive: node slot and when ($defs.condition, $defs.numberFormula), the unknown-slot diagnostic, catalog projection refreshes (inline-text, label props on button, badge and kbd, declarative chart formats), the conditional-report golden and the slot and condition invalid fixtures."
+    }
+  ]
+}

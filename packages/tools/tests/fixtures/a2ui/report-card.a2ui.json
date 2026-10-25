@@ -1,0 +1,37 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": { "surfaceId": "report", "catalogId": "catalog-example.json" }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "report",
+      "components": [
+        {
+          "id": "root",
+          "component": "card",
+          "title": "Weekly report",
+          "variant": "flat",
+          "children": ["n1", "n2", "n5"]
+        },
+        { "id": "n1", "component": "heading", "text": "Orders", "level": 2 },
+        { "id": "n2", "component": "stack", "children": ["n3", "n4"] },
+        { "id": "n3", "component": "stat", "label": "Shipped", "value": 1240, "delta": -0.5 },
+        {
+          "id": "n4",
+          "component": "stat",
+          "label": "Returned",
+          "value": 18,
+          "tags": ["ok", null, true]
+        },
+        {
+          "id": "n5",
+          "component": "text",
+          "text": "Numbers for acme.example, week 12.",
+          "meta": { "source": "demo" }
+        }
+      ]
+    }
+  }
+]

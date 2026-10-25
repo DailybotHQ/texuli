@@ -1,0 +1,110 @@
+{
+  "$comment": "Golden composition v2: a 6-second title sequence. A background plays throughout; a title group shows 0-2.5s; a lower-third group slides in from 2s to the end, nested two levels deep, with a masked logo. Fictional copy only.",
+  "golden": "lower-third",
+  "composition": {
+    "version": 2,
+    "width": 1280,
+    "height": 720,
+    "durationMs": 6000,
+    "layers": [
+      {
+        "id": "background",
+        "type": "shape",
+        "shape": "rectangle",
+        "frame": { "x": 0, "y": 0, "width": 1280, "height": 720 },
+        "fill": { "kind": "solid", "color": "#0b1d33" }
+      },
+      {
+        "id": "title-card",
+        "type": "group",
+        "timing": { "startMs": 0, "endMs": 2500 },
+        "children": [
+          {
+            "id": "title",
+            "type": "text",
+            "text": "Harbor Notes",
+            "paint": { "kind": "solid", "color": "#ffffff" },
+            "fontSize": 72,
+            "fontWeight": 700,
+            "align": "center",
+            "frame": { "x": 140, "y": 280, "width": 1000, "height": 96 }
+          },
+          {
+            "id": "subtitle",
+            "type": "text",
+            "text": "Weekly port update",
+            "paint": { "kind": "solid", "color": "#9fc7ff" },
+            "fontSize": 32,
+            "align": "center",
+            "timing": { "startMs": 800 },
+            "frame": { "x": 140, "y": 390, "width": 1000, "height": 48 }
+          }
+        ]
+      },
+      {
+        "id": "lower-third",
+        "type": "group",
+        "offset": { "x": 48, "y": 560 },
+        "timing": { "startMs": 2000 },
+        "children": [
+          {
+            "id": "bar",
+            "type": "shape",
+            "shape": "rectangle",
+            "frame": { "x": 0, "y": 0, "width": 640, "height": 112 },
+            "fill": { "kind": "solid", "color": "#1f6feb" }
+          },
+          {
+            "id": "speaker",
+            "type": "group",
+            "offset": { "x": 24, "y": 16 },
+            "opacity": 0.9,
+            "children": [
+              {
+                "id": "speaker-name",
+                "type": "text",
+                "text": "Avery Example",
+                "paint": { "kind": "solid", "color": "#ffffff" },
+                "fontSize": 36,
+                "fontWeight": 600,
+                "frame": { "x": 120, "y": 0, "width": 480, "height": 44 }
+              },
+              {
+                "id": "logo-shape",
+                "type": "shape",
+                "shape": "ellipse",
+                "frame": { "x": 0, "y": 0, "width": 80, "height": 80 },
+                "fill": { "kind": "solid", "color": "#ffffff" }
+              },
+              {
+                "id": "logo",
+                "type": "shape",
+                "shape": "rectangle",
+                "frame": { "x": 0, "y": 0, "width": 80, "height": 80 },
+                "fill": { "kind": "solid", "color": "#ffb000" },
+                "mask": { "layerId": "logo-shape", "mode": "alpha" }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "animation": {
+    "version": 1,
+    "durationMs": 6000,
+    "tracks": [
+      {
+        "layerId": "lower-third",
+        "keyframes": [
+          { "timeMs": 2000, "translateX": -640, "opacity": 0 },
+          { "timeMs": 2600, "translateX": 48, "opacity": 1, "easing": "ease-out" }
+        ]
+      },
+      {
+        "layerId": "title",
+        "keyframes": [{ "timeMs": 0, "opacity": 0 }, { "timeMs": 500, "opacity": 1 }]
+      }
+    ]
+  }
+}

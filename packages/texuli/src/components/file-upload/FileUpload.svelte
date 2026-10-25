@@ -1,0 +1,245 @@
+<script lang="ts">
+import { safeImageSrc } from '@texuli/core/url-policy';
+import {
+  FileDrop,
+  type FileDropRejection,
+  type FileDropRejectReason,
+} from '@texuli/primitives/file-drop';
+import type { HTMLAttributes } from 'svelte/elements';
+import { type ClassValue } from '../../internal/cx.ts';
+import type { FileUploadLabels, FileUploadProgressMap } from './types.ts';
+import { type FileUploadVariant, fileUploadClass } from './variants.ts';
+import './file-upload.css';
+
+type Props = Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'children' | 'ondragenter' | 'ondragover' | 'ondragleave' | 'ondrop'
+> & {
+  files?: File[];
+  rejects?: FileDropRejection[];
+  accept?: string;
+  maxSize?: number;
+  maxFiles?: number;
+  multiple?: boolean;
+  disabled?: boolean;
+  required?: boolean;
+  name?: string;
+  variant?: FileUploadVariant;
+  showPreviews?: boolean;
+  progress?: FileUploadProgressMap;
+  status?: Readonly<Record<string, 'pending' | 'uploading' | 'done' | 'error' | undefined>>;
+  labels?: Partial<FileUploadLabels>;
+  class?: ClassValue;
+};
+
+let {
+  files = $bindable<File[]>([]),
+  rejects = $bindable<FileDropRejection[]>([]),
+  accept,
+  maxSize,
+  maxFiles = Number.POSITIVE_INFINITY,
+  multiple = true,
+  disabled = false,
+  required = false,
+  name,
+  variant = 'default',
+  showPreviews = true,
+  progress = {},
+  status = {},
+  labels: labelOverrides,
+  class: className,
+  ...rest
+}: Props = $props();
+
+const labels = $derived<FileUploadLabels>({
+  label: 'Upload files',
+  inputLabel: 'Choose files to upload',
+  browse: 'Browse files',
+  description: 'Drop files here or browse. Only file names and sizes are checked.',
+  selectedList: 'Selected files',
+  remove: 'Remove',
+  rejectType: 'Unsupported type',
+  rejectSize: 'File too large',
+  rejectCount: 'Too many files',
+  empty: 'No files selected yet.',
+  ...labelOverrides,
+});
+
+const rootClass = $derived(
+  fileUploadClass({
+    variant,
+    class: className,
+  })
+);
+
+/** Object-URL map for image previews; keys match `fileKey`. Written only from the effect. */
+let previewUrls = $state<Record<string, string>>({});
+
+function fileKey(file: File): string {
+  return `${file.name}:${file.size}:${file.lastModified}`;
+}
+
+function formatBytes(size: number): string {
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function rejectMessage(rejection: FileDropRejection): string {
+  const map: Record<FileDropRejectReason, string> = {
+    type: labels.rejectType,
+    size: labels.rejectSize,
+    count: labels.rejectCount,
+  };
+  return map[rejection.reason] ?? rejection.reason;
+}
+
+function previewSrc(key: string): string | undefined {
+  const raw = previewUrls[key];
+  return raw ? safeImageSrc(raw, 'developer') : undefined;
+}
+
+function progressFillStyle(pct: number | null | undefined): string | undefined {
+  if (typeof pct !== 'number') return undefined;
+  const clamped = Math.min(100, Math.max(0, pct));
+  return `--tx-file-upload-progress: ${clamped}%`;
+}
+
+/**
+ * Build object URLs for image files. Capture `next` in cleanup only — never
+ * read `previewUrls` here, or the write retriggers the effect forever.
+ */
+$effect(() => {
+  const next: Record<string, string> = {};
+  const canPreview =
+    showPreviews && typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function';
+  if (canPreview) {
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        next[fileKey(file)] = URL.createObjectURL(file);
+      }
+    }
+  }
+  previewUrls = next;
+  return () => {
+    for (const url of Object.values(next)) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch {
+        // ignore revoke failures on already-released URLs
+      }
+    }
+  };
+});
+
+function itemStatus(file: File): 'pending' | 'uploading' | 'done' | 'error' {
+  const key = fileKey(file);
+  const override = status[key];
+  if (override) return override;
+  const p = progress[key];
+  if (p === null) return 'uploading';
+  if (typeof p === 'number') {
+    if (p >= 100) return 'done';
+    if (p >= 0) return 'uploading';
+  }
+  return 'pending';
+}
+
+// aria-* and data-* name and wire the file input (the focusable control);
+// handlers and layout hooks stay on the drop-zone wrapper.
+const inputAttrs = $derived(
+  Object.fromEntries(
+    Object.entries(rest).filter(([key]) => key.startsWith('aria-') || key.startsWith('data-'))
+  )
+);
+const wrapperAttrs = $derived(
+  Object.fromEntries(
+    Object.entries(rest).filter(([key]) => !key.startsWith('aria-') && !key.startsWith('data-'))
+  )
+);
+
+function itemProgress(file: File): number | null | undefined {
+  return progress[fileKey(file)];
+}
+</script>
+
+<div class={rootClass} data-tx-file-upload data-variant={variant} {...wrapperAttrs}>
+  <FileDrop.Root
+    bind:files
+    bind:rejects
+    {accept}
+    {maxSize}
+    {maxFiles}
+    {multiple}
+    {disabled}
+    {required}
+    {name}
+    label={labels.label}
+    inputLabel={labels.inputLabel}
+    browseLabel={labels.browse}
+    description={labels.description}
+    getRejectMessage={rejectMessage}
+    class="tx-file-upload__zone"
+    inputClass="tx-file-upload__input"
+  >
+    {#snippet child({ props })}
+      <label class="tx-file-upload__browse" for={String(props.id)}>{labels.browse}</label>
+      <input {...props} {...inputAttrs} class="tx-file-upload__input" />
+    {/snippet}
+
+    {#snippet children({ files: selected, removeFile })}
+      {#if selected.length === 0}
+        <p class="tx-file-upload__hint" data-tx-file-upload-empty>{labels.empty}</p>
+      {:else}
+        <ul class="tx-file-upload__list" aria-label={labels.selectedList} data-tx-file-upload-list>
+          {#each selected as file (fileKey(file))}
+            {@const key = fileKey(file)}
+            {@const st = itemStatus(file)}
+            {@const pct = itemProgress(file)}
+            {@const thumb = previewSrc(key)}
+            <li class="tx-file-upload__item" data-status={st} data-file-key={key}>
+              {#if thumb}
+                <img class="tx-file-upload__preview" src={thumb} alt="" />
+              {:else}
+                <div class="tx-file-upload__preview tx-file-upload__preview--icon" aria-hidden="true">
+                  {file.name.split('.').pop()?.slice(0, 4).toUpperCase() || 'FILE'}
+                </div>
+              {/if}
+              <div class="tx-file-upload__meta">
+                <p class="tx-file-upload__name">{file.name}</p>
+                <p class="tx-file-upload__size">{formatBytes(file.size)}</p>
+                {#if st === 'uploading' || typeof pct === 'number'}
+                  <div
+                    class="tx-file-upload__progress"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={typeof pct === 'number' ? Math.round(pct) : undefined}
+                    aria-label={`${file.name} upload progress`}
+                  >
+                    <div class="tx-file-upload__progress-track">
+                      <div
+                        class="tx-file-upload__progress-fill"
+                        data-indeterminate={pct === null || pct === undefined ? 'true' : undefined}
+                        style={progressFillStyle(pct)}
+                      ></div>
+                    </div>
+                  </div>
+                {/if}
+              </div>
+              <button
+                type="button"
+                class="tx-file-upload__remove"
+                disabled={disabled}
+                aria-label={`${labels.remove} ${file.name}`}
+                onclick={() => removeFile(file)}
+              >
+                ×
+              </button>
+            </li>
+          {/each}
+        </ul>
+      {/if}
+    {/snippet}
+  </FileDrop.Root>
+</div>

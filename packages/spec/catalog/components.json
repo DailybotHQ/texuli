@@ -1,0 +1,6223 @@
+{
+  "catalogHash": "b073e30b4c8b1a30b3ef3ccb372e552d2d88e584616b74591c6c32923b471376",
+  "components": [
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "alert",
+      "label": "Alert",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "actionHref"
+        },
+        {
+          "kind": "string",
+          "name": "actionLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "dismissLabel"
+        },
+        {
+          "kind": "boolean",
+          "name": "dismissible"
+        },
+        {
+          "kind": "boolean",
+          "name": "hideIcon"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "icon"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onAction"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onDismiss"
+        },
+        {
+          "kind": "string",
+          "name": "text"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        },
+        {
+          "enumValues": ["info", "success", "warning", "error", "brand", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "summary": "Inline feedback for a page section (status or error)."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "alert-dialog",
+      "label": "AlertDialog",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "cancelLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "confirmLabel"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "boolean",
+          "name": "destructive"
+        },
+        {
+          "kind": "string",
+          "name": "errorFallback"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onCancel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onConfirm"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onOpenChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "trigger"
+        }
+      ],
+      "summary": "Modal confirm/cancel dialog for consequential actions."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "analytics-grid",
+      "label": "AnalyticsGrid",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "number",
+          "name": "columns"
+        },
+        {
+          "kind": "boolean",
+          "name": "dense"
+        },
+        {
+          "kind": "string",
+          "name": "gap"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "number",
+          "name": "minItem"
+        }
+      ],
+      "summary": "Auto-fit KPI and widget grid for dashboard screens."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "app-nav",
+      "label": "AppNav",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "collapsed"
+        },
+        {
+          "kind": "boolean",
+          "name": "collapsible"
+        },
+        {
+          "kind": "string",
+          "name": "drawerTitle"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "footer"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "header"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "itemIcon"
+        },
+        {
+          "kind": "array",
+          "name": "items"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "menuLabel"
+        },
+        {
+          "kind": "boolean",
+          "name": "mobileOpen"
+        },
+        {
+          "kind": "array",
+          "name": "sections"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "topBar"
+        },
+        {
+          "enumValues": ["default", "inset"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "Desktop sidebar shell with mobile sheet drawer and main slot."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "badge",
+      "label": "Badge",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "enumValues": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A compact status or category label."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "banner",
+      "label": "Banner",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "actionHref"
+        },
+        {
+          "kind": "string",
+          "name": "actionLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "dismissLabel"
+        },
+        {
+          "kind": "boolean",
+          "name": "dismissible"
+        },
+        {
+          "kind": "boolean",
+          "name": "hideIcon"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "icon"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onAction"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onDismiss"
+        },
+        {
+          "kind": "string",
+          "name": "text"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        },
+        {
+          "enumValues": ["info", "success", "warning", "error", "brand", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "summary": "Full-width notice across a page or app shell."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "blocks-code",
+      "label": "Code blocks",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "block",
+          "required": true
+        },
+        {
+          "kind": "boolean",
+          "name": "copyable"
+        },
+        {
+          "kind": "array",
+          "name": "highlights"
+        },
+        {
+          "kind": "number",
+          "name": "hostStep"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "boolean",
+          "name": "lineNumbers"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "oninvalid"
+        },
+        {
+          "kind": "number",
+          "name": "step"
+        }
+      ],
+      "summary": "Validated, highlighted code."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "blocks-data",
+      "label": "Data blocks",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "block",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "enumValues": ["light", "dark"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "oninvalid"
+        }
+      ],
+      "summary": "Validated tables, statistics, key metrics and chart content blocks."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "blocks-diagram",
+      "label": "Diagram blocks",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "block",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "oninvalid"
+        }
+      ],
+      "summary": "Validated flow, tree, board and terminal diagrams."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "blocks-embed",
+      "label": "Embed blocks",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "block",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountEmbed"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "oninvalid"
+        }
+      ],
+      "summary": "Validated link previews (URL policy) and embed-app shells. Texuli never runs app JSON; hosts mount via mountEmbed with a sandboxed iframe contract."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "blocks-interactive",
+      "label": "Interactive blocks",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "block",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "oninvalid"
+        }
+      ],
+      "summary": "Validated polls, quizzes, calculators and checklists."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "blocks-map",
+      "label": "Map blocks",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "block",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "headingLevel"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "oninvalid"
+        }
+      ],
+      "summary": "Validated map points and routes."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "blocks-media",
+      "label": "Media blocks",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "block",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "oninvalid"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "resolveAvatar"
+        }
+      ],
+      "summary": "Validated image, figure, video and gallery content blocks."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "blocks-structure",
+      "label": "Structure blocks",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "block",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "oninvalid"
+        }
+      ],
+      "summary": "Validated layouts and calls to action."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "blocks-text",
+      "label": "Text blocks",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "block",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "oninvalid"
+        }
+      ],
+      "summary": "Validated heading, paragraph, list, quote and callout content."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "breadcrumb",
+      "label": "Breadcrumb",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "number",
+          "name": "maxItems"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "separator"
+        },
+        {
+          "kind": "string",
+          "name": "separatorLabel"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "summary": "Hierarchy trail with URL-policy links."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "button",
+      "label": "Button",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "autoLoading"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "href"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "boolean",
+          "name": "loading"
+        },
+        {
+          "kind": "string",
+          "name": "loadingLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onclick"
+        },
+        {
+          "enumValues": ["sm", "md", "lg", "icon"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["button", "submit", "reset"],
+          "kind": "enum",
+          "name": "type"
+        },
+        {
+          "enumValues": ["default", "secondary", "outline", "ghost", "destructive", "link"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A pressable action control with loading and optional link rendering."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "button-group",
+      "label": "ButtonGroup",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "attached"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "enumValues": ["horizontal", "vertical"],
+          "kind": "enum",
+          "name": "orientation"
+        }
+      ],
+      "summary": "Groups related buttons with shared borders and orientation."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "callout",
+      "label": "Callout",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "actionHref"
+        },
+        {
+          "kind": "string",
+          "name": "actionLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "dismissLabel"
+        },
+        {
+          "kind": "boolean",
+          "name": "dismissible"
+        },
+        {
+          "kind": "boolean",
+          "name": "hideIcon"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "icon"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onAction"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onDismiss"
+        },
+        {
+          "kind": "string",
+          "name": "text"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        },
+        {
+          "enumValues": ["info", "success", "warning", "error", "brand", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "summary": "Emphasized documentation-style tip with a strong start edge."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "card",
+      "label": "Card",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "href"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "kind": "string",
+          "name": "linkLabel"
+        },
+        {
+          "enumValues": ["elevated", "flat"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A surface for grouping related content with optional link behavior."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-area",
+      "label": "Area chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "annotations"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "fullDomain"
+        },
+        {
+          "kind": "string",
+          "name": "interactive"
+        },
+        {
+          "enumValues": ["light", "dark"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
+          "enumValues": ["svg", "canvas", "auto"],
+          "extension": "web",
+          "kind": "enum",
+          "name": "renderer"
+        },
+        {
+          "kind": "array",
+          "name": "series",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "visibleDomain"
+        }
+      ],
+      "summary": "A categorical area chart with an accessible data table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-bar",
+      "label": "Bar chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "annotations"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "fullDomain"
+        },
+        {
+          "kind": "string",
+          "name": "interactive"
+        },
+        {
+          "enumValues": ["light", "dark"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
+          "enumValues": ["svg", "canvas", "auto"],
+          "extension": "web",
+          "kind": "enum",
+          "name": "renderer"
+        },
+        {
+          "kind": "array",
+          "name": "series",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "visibleDomain"
+        }
+      ],
+      "summary": "A categorical bar chart with a zero baseline and accessible data table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-bubble",
+      "label": "Bubble chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "annotations"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "string",
+          "name": "interactive"
+        },
+        {
+          "enumValues": ["light", "dark"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
+          "kind": "array",
+          "name": "points",
+          "required": true
+        },
+        {
+          "kind": "array",
+          "name": "series"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "width"
+        }
+      ],
+      "summary": "A scatter plot where point size can encode another measure."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-bullet",
+      "label": "Bullet chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "object",
+          "name": "format"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "array",
+          "name": "ranges"
+        },
+        {
+          "kind": "number",
+          "name": "target"
+        },
+        {
+          "kind": "number",
+          "name": "value",
+          "required": true
+        }
+      ],
+      "summary": "A compact value, range and target comparison."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-canvas-renderer",
+      "label": "Canvas chart renderer",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "number",
+          "name": "height",
+          "required": true
+        },
+        {
+          "enumValues": ["line", "area", "bar", "stacked-bar", "combo"],
+          "kind": "enum",
+          "name": "kind",
+          "required": true
+        },
+        {
+          "kind": "array",
+          "name": "series",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "width",
+          "required": true
+        }
+      ],
+      "summary": "A low-level canvas mark renderer for dense chart series."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-cartesian",
+      "label": "Cartesian chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "annotations"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "fullDomain"
+        },
+        {
+          "kind": "string",
+          "name": "interactive"
+        },
+        {
+          "enumValues": ["line", "area", "bar", "stacked-bar", "combo"],
+          "kind": "enum",
+          "name": "kind",
+          "required": true
+        },
+        {
+          "enumValues": ["light", "dark"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
+          "enumValues": ["svg", "canvas", "auto"],
+          "extension": "web",
+          "kind": "enum",
+          "name": "renderer"
+        },
+        {
+          "kind": "array",
+          "name": "series",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "visibleDomain"
+        }
+      ],
+      "summary": "The general line, area, bar, stacked bar or combo chart renderer."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-combo",
+      "label": "Combo chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "annotations"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "fullDomain"
+        },
+        {
+          "kind": "string",
+          "name": "interactive"
+        },
+        {
+          "enumValues": ["light", "dark"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
+          "enumValues": ["svg", "canvas", "auto"],
+          "extension": "web",
+          "kind": "enum",
+          "name": "renderer"
+        },
+        {
+          "kind": "array",
+          "name": "series",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "visibleDomain"
+        }
+      ],
+      "summary": "A categorical chart that combines bar and line series."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-donut",
+      "label": "Donut chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "array",
+          "name": "data",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "innerRatio"
+        },
+        {
+          "kind": "object",
+          "name": "labels",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "padAngle"
+        },
+        {
+          "kind": "number",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        }
+      ],
+      "summary": "A part-to-whole chart with a central opening and data table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-funnel",
+      "label": "Funnel chart",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "enumValues": ["vertical", "horizontal"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "kind": "array",
+          "name": "steps",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "width"
+        }
+      ],
+      "summary": "A conversion funnel with step values and accessible table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-gauge",
+      "label": "Gauge chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "array",
+          "name": "bandLabels"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "object",
+          "name": "format"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "number",
+          "name": "min"
+        },
+        {
+          "kind": "number",
+          "name": "size"
+        },
+        {
+          "kind": "number",
+          "name": "thickness"
+        },
+        {
+          "kind": "array",
+          "name": "thresholds"
+        },
+        {
+          "kind": "number",
+          "name": "value",
+          "required": true
+        }
+      ],
+      "summary": "A radial value gauge with thresholds and an accessible data table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-geo-map",
+      "label": "Geographic map",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "data",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "array",
+          "name": "shape"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "width"
+        }
+      ],
+      "summary": "A tiled geographic choropleth with a tabular data alternative."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-geo-point-map",
+      "label": "Geographic point map",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "array",
+          "name": "points",
+          "required": true
+        },
+        {
+          "kind": "array",
+          "name": "shape"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "width"
+        }
+      ],
+      "summary": "Geographic points positioned on a tiled map."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-heatmap",
+      "label": "Heatmap",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "annotations"
+        },
+        {
+          "kind": "array",
+          "name": "cells",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "string",
+          "name": "interactive"
+        },
+        {
+          "enumValues": ["light", "dark"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "width"
+        }
+      ],
+      "summary": "A matrix of labeled cells with an accessible data table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-line",
+      "label": "Line chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "annotations"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "fullDomain"
+        },
+        {
+          "kind": "string",
+          "name": "interactive"
+        },
+        {
+          "enumValues": ["light", "dark"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
+          "enumValues": ["svg", "canvas", "auto"],
+          "extension": "web",
+          "kind": "enum",
+          "name": "renderer"
+        },
+        {
+          "kind": "array",
+          "name": "series",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "visibleDomain"
+        }
+      ],
+      "summary": "A categorical line chart with accessible values."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-network",
+      "label": "Network graph",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "array",
+          "name": "links",
+          "required": true
+        },
+        {
+          "kind": "array",
+          "name": "nodes",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "width"
+        }
+      ],
+      "summary": "A node and connection graph with an accessible table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-pie",
+      "label": "Pie chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "array",
+          "name": "data",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "innerRatio"
+        },
+        {
+          "kind": "object",
+          "name": "labels",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "padAngle"
+        },
+        {
+          "kind": "number",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        }
+      ],
+      "summary": "A part-to-whole chart with an accessible data table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-progress-ring",
+      "label": "Progress ring",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "object",
+          "name": "format"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "number",
+          "name": "size"
+        },
+        {
+          "kind": "number",
+          "name": "thickness"
+        },
+        {
+          "kind": "number",
+          "name": "value",
+          "required": true
+        }
+      ],
+      "summary": "A compact radial progress indicator with a data table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-sankey",
+      "label": "Sankey chart",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "array",
+          "name": "links",
+          "required": true
+        },
+        {
+          "kind": "array",
+          "name": "nodes",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "width"
+        }
+      ],
+      "summary": "A weighted flow diagram with an accessible table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-scatter",
+      "label": "Scatter chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "annotations"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "string",
+          "name": "interactive"
+        },
+        {
+          "enumValues": ["light", "dark"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
+          "kind": "array",
+          "name": "points",
+          "required": true
+        },
+        {
+          "kind": "array",
+          "name": "series"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "width"
+        }
+      ],
+      "summary": "A quantitative scatter plot with an accessible data table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-sparkline",
+      "label": "Sparkline",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "object",
+          "name": "format"
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "string",
+          "name": "period"
+        },
+        {
+          "kind": "boolean",
+          "name": "showLast"
+        },
+        {
+          "kind": "array",
+          "name": "values",
+          "required": true
+        },
+        {
+          "enumValues": ["line", "area", "bar"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A compact line, area or bar trend chart."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-stacked-bar",
+      "label": "Stacked bar chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "annotations"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "fullDomain"
+        },
+        {
+          "kind": "string",
+          "name": "interactive"
+        },
+        {
+          "enumValues": ["light", "dark"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
+          "enumValues": ["svg", "canvas", "auto"],
+          "extension": "web",
+          "kind": "enum",
+          "name": "renderer"
+        },
+        {
+          "kind": "array",
+          "name": "series",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "visibleDomain"
+        }
+      ],
+      "summary": "A categorical stacked bar chart with accessible values."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-sunburst",
+      "label": "Sunburst chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "innerRatio"
+        },
+        {
+          "kind": "object",
+          "name": "labels",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "padAngle"
+        },
+        {
+          "kind": "object",
+          "name": "root",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        }
+      ],
+      "summary": "A hierarchical part-to-whole chart with an accessible table."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "charts-treemap",
+      "label": "Treemap chart",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "object",
+          "name": "labels",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "padding"
+        },
+        {
+          "kind": "object",
+          "name": "root",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "width"
+        }
+      ],
+      "summary": "A hierarchical part-to-whole chart with an accessible table."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "checkbox",
+      "label": "Checkbox",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "checked"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "defaultChecked"
+        },
+        {
+          "kind": "boolean",
+          "name": "defaultIndeterminate"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "id"
+        },
+        {
+          "kind": "boolean",
+          "name": "indeterminate"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onCheckedChange"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onIndeterminateChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "enumValues": ["sm", "md"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "summary": "A binary or indeterminate checkbox with optional label."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "chip",
+      "label": "Chip",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "boolean",
+          "name": "selected"
+        },
+        {
+          "enumValues": ["button", "submit", "reset"],
+          "kind": "enum",
+          "name": "type"
+        },
+        {
+          "enumValues": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A toggleable filter chip (pressed state)."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "code",
+      "label": "Code",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "language"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        },
+        {
+          "enumValues": ["inline", "block"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "Inline or block code with escaped text (no HTML)."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "combobox",
+      "label": "Combobox",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "defaultInputValue"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "defaultValue"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "filter"
+        },
+        {
+          "kind": "string",
+          "name": "form"
+        },
+        {
+          "kind": "string",
+          "name": "inputValue"
+        },
+        {
+          "kind": "array",
+          "name": "items"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "loadOptions"
+        },
+        {
+          "kind": "boolean",
+          "name": "multiple"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onInputValueChange"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onOpenChange"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "string",
+          "name": "requiredMessage"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "value"
+        },
+        {
+          "enumValues": ["outline", "soft"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A text input that filters a list of options, for one value or several."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "command-palette",
+      "label": "CommandPalette",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "number",
+          "name": "debounceMs"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "string",
+          "name": "emptyLabel"
+        },
+        {
+          "kind": "string",
+          "name": "errorLabel"
+        },
+        {
+          "kind": "string",
+          "name": "loadingLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onOpenChange"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onSelect"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        },
+        {
+          "kind": "string",
+          "name": "placeholder"
+        },
+        {
+          "kind": "string",
+          "name": "recentEmptyLabel"
+        },
+        {
+          "kind": "array",
+          "name": "recentItems"
+        },
+        {
+          "kind": "string",
+          "name": "recentLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "search"
+        },
+        {
+          "kind": "boolean",
+          "name": "shortcut"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        },
+        {
+          "enumValues": ["outline", "soft"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "Dialog-hosted command palette with search and recent items."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "content-layout",
+      "label": "ContentLayout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "aside"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["docs", "blog", "editorial"],
+          "kind": "enum",
+          "name": "kind",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "kind": "object",
+          "name": "options"
+        },
+        {
+          "kind": "string",
+          "name": "path"
+        },
+        {
+          "kind": "string",
+          "name": "storageKey"
+        }
+      ],
+      "summary": "Shared docs/blog/editorial reading frame with optional TOC."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "context-menu",
+      "label": "ContextMenu",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        }
+      ],
+      "summary": "Pointer-anchored menu (right-click, long-press, Menu key)."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "context-menu-trigger",
+      "label": "ContextMenu.Trigger",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        }
+      ],
+      "summary": "Region that opens the context menu."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "layouts",
+      "id": "deck-slide",
+      "label": "Deck slide",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": [
+            "title",
+            "section",
+            "content",
+            "two-column",
+            "media-left",
+            "media-right",
+            "quote",
+            "closing"
+          ],
+          "kind": "enum",
+          "name": "master"
+        },
+        {
+          "kind": "string",
+          "name": "notes"
+        },
+        {
+          "kind": "string",
+          "name": "slideId",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "themeRef"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        },
+        {
+          "enumValues": ["none", "fade", "fade-up"],
+          "kind": "enum",
+          "name": "transition"
+        }
+      ],
+      "summary": "One slide in a deck: a title, content blocks and speaker notes."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "description",
+      "label": "Description",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        }
+      ],
+      "summary": "Help text associated with a field control."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "detail-panel",
+      "label": "DetailPanel",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "closeOnEscape"
+        },
+        {
+          "kind": "boolean",
+          "name": "dismissOutside"
+        },
+        {
+          "enumValues": ["top", "right", "bottom", "left", "start", "end", "center"],
+          "kind": "enum",
+          "name": "side"
+        },
+        {
+          "enumValues": ["sm", "md", "lg", "xl"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "summary": "Non-modal detail panel alongside content."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "dialog",
+      "label": "Dialog",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "closeLabel"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "footer"
+        },
+        {
+          "kind": "boolean",
+          "name": "hideClose"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onOpenChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        },
+        {
+          "enumValues": ["sm", "md", "lg", "xl"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "trigger"
+        }
+      ],
+      "summary": "Modal dialog with title, optional description, body and footer."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "drawer",
+      "label": "Drawer",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "closeOnEscape"
+        },
+        {
+          "kind": "boolean",
+          "name": "dismissOutside"
+        },
+        {
+          "enumValues": ["top", "right", "bottom", "left", "start", "end", "center"],
+          "kind": "enum",
+          "name": "side"
+        },
+        {
+          "enumValues": ["sm", "md", "lg", "xl"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "summary": "Bottom or edge drawer with optional drag dismiss."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "dropdown-menu",
+      "label": "DropdownMenu",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        }
+      ],
+      "summary": "Menu button pattern with items, checkboxes, radios and submenus."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "dropdown-menu-content",
+      "label": "DropdownMenu.Content",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["start", "center", "end"],
+          "kind": "enum",
+          "name": "align"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["top", "right", "bottom", "left"],
+          "kind": "enum",
+          "name": "side"
+        },
+        {
+          "kind": "number",
+          "name": "sideOffset"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["default", "soft"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "Floating menu surface for dropdown items."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "dropdown-menu-item",
+      "label": "DropdownMenu.Item",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "closeOnSelect"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "icon"
+        },
+        {
+          "kind": "boolean",
+          "name": "inset"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onSelect"
+        },
+        {
+          "kind": "string",
+          "name": "shortcut"
+        },
+        {
+          "kind": "string",
+          "name": "textValue"
+        }
+      ],
+      "summary": "Menu item with optional icon and shortcut chrome."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "dropdown-menu-trigger",
+      "label": "DropdownMenu.Trigger",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["default", "soft"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "Styled button that opens a dropdown menu."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "empty-state",
+      "label": "Empty state",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "action"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "illustration"
+        },
+        {
+          "enumValues": ["sm", "md"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        }
+      ],
+      "summary": "Placeholder when a list or panel has nothing to show yet."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "error-state",
+      "label": "Error state",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "action"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "message"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onRetry"
+        },
+        {
+          "kind": "string",
+          "name": "retryLabel"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        }
+      ],
+      "summary": "Full-panel failure with optional retry."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "field",
+      "label": "Field",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "error"
+        },
+        {
+          "kind": "boolean",
+          "name": "hideLabel"
+        },
+        {
+          "kind": "string",
+          "name": "id"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "enumValues": ["vertical", "horizontal"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        }
+      ],
+      "summary": "Label, description and error wiring for a single control."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "field-error",
+      "label": "FieldError",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "show"
+        }
+      ],
+      "summary": "An alert-role error message for a field."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "form",
+      "label": "Form",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "object",
+          "name": "errors"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "formError"
+        },
+        {
+          "enumValues": ["stack", "grid"],
+          "kind": "enum",
+          "name": "layout"
+        },
+        {
+          "kind": "boolean",
+          "name": "noValidate"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onErrorsChange"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onSubmitValues"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValidate"
+        }
+      ],
+      "summary": "A form shell with layout, validation hook and error map."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "hover-card",
+      "label": "HoverCard",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        }
+      ],
+      "summary": "Preview panel that opens on hover or focus."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "hover-card-content",
+      "label": "HoverCard.Content",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "arrow"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["elevated", "flat"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "Styled hover-card surface."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "icon-button",
+      "label": "IconButton",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "autoLoading"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "href"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "boolean",
+          "name": "loading"
+        },
+        {
+          "enumValues": ["default", "secondary", "outline", "ghost", "destructive", "link"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "An icon-only button that requires an accessible name."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "inline-text",
+      "label": "Inline text",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "text",
+          "required": true
+        }
+      ],
+      "summary": "A plain text run for the slot of a slot-only component (button, label, badge)."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "input",
+      "label": "Input",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "clearLabel"
+        },
+        {
+          "kind": "boolean",
+          "name": "clearable"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "files"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onClear"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "readonly"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "ref"
+        },
+        {
+          "kind": "string",
+          "name": "type"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "summary": "A single-line text (or file) control with optional clear."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "input-group",
+      "label": "InputGroup",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "clearLabel"
+        },
+        {
+          "kind": "boolean",
+          "name": "clearable"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "end"
+        },
+        {
+          "kind": "object",
+          "name": "inputProps"
+        },
+        {
+          "kind": "boolean",
+          "name": "invalid"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onClear"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "readonly"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "ref"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "start"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "summary": "An input with start/end adornments and optional clear."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "kbd",
+      "label": "Kbd",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        }
+      ],
+      "summary": "Inline keyboard key affordance."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "kpi",
+      "label": "KPI",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "comparisonLabel"
+        },
+        {
+          "kind": "string",
+          "name": "currency"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "empty"
+        },
+        {
+          "kind": "string",
+          "name": "href"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "boolean",
+          "name": "loading"
+        },
+        {
+          "enumValues": ["up", "down"],
+          "kind": "enum",
+          "name": "positive"
+        },
+        {
+          "kind": "number",
+          "name": "previous"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "sparkline"
+        },
+        {
+          "enumValues": ["number", "compact", "cents", "percent"],
+          "kind": "enum",
+          "name": "unit"
+        },
+        {
+          "kind": "number",
+          "name": "value"
+        },
+        {
+          "enumValues": ["elevated", "flat"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A formatted metric with unit, previous-period delta and optional link."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "label",
+      "label": "Label",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "enumValues": ["sm", "md"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "boolean",
+          "name": "srOnly"
+        }
+      ],
+      "summary": "A form label with optional required marker and sr-only mode."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-auth-split",
+      "label": "Auth split layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "brand"
+        },
+        {
+          "kind": "string",
+          "name": "brandDescription"
+        },
+        {
+          "kind": "string",
+          "name": "brandEyebrow"
+        },
+        {
+          "kind": "string",
+          "name": "brandTitle"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "form"
+        },
+        {
+          "kind": "string",
+          "name": "formLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "panel"
+        },
+        {
+          "kind": "string",
+          "name": "panelLabel"
+        }
+      ],
+      "summary": "Sign-in form column plus brand panel."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-blog",
+      "label": "Blog layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "aside"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "kind": "object",
+          "name": "options"
+        },
+        {
+          "kind": "string",
+          "name": "path"
+        },
+        {
+          "kind": "string",
+          "name": "storageKey"
+        }
+      ],
+      "summary": "Blog/post reading layout (content-layout kind blog)."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "layouts",
+      "id": "layout-card",
+      "label": "Card layout",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        }
+      ],
+      "summary": "Content card frame for grouped agent-authored blocks."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-chrome",
+      "label": "LayoutChrome",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "compact"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "kind": "string",
+          "name": "mainId"
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "enumValues": ["skip", "brand", "actions", "user"],
+          "kind": "enum",
+          "name": "part",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "skipLabel"
+        }
+      ],
+      "summary": "Shared brand, actions, user and skip-link chrome for desktop layouts."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-dashboard-grid",
+      "label": "Dashboard grid layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "aside"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "kind": "object",
+          "name": "options"
+        },
+        {
+          "kind": "string",
+          "name": "path"
+        },
+        {
+          "kind": "string",
+          "name": "storageKey"
+        }
+      ],
+      "summary": "Top chrome plus container-query widget grid."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "layouts",
+      "id": "layout-deck",
+      "label": "Deck layout",
+      "placement": "content",
+      "props": [
+        {
+          "enumValues": ["16:9", "4:3", "1:1"],
+          "kind": "enum",
+          "name": "aspect"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
+          "kind": "array",
+          "name": "masters"
+        },
+        {
+          "kind": "object",
+          "name": "settings"
+        },
+        {
+          "kind": "array",
+          "name": "slides"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "themeRef"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        }
+      ],
+      "summary": "Slide deck frame for sequenced content."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "layouts",
+      "id": "layout-doc",
+      "label": "Doc layout",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        },
+        {
+          "kind": "boolean",
+          "name": "toc"
+        }
+      ],
+      "summary": "Document frame with optional table of contents."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-docs",
+      "label": "Docs layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "aside"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "kind": "object",
+          "name": "options"
+        },
+        {
+          "kind": "string",
+          "name": "path"
+        },
+        {
+          "kind": "string",
+          "name": "storageKey"
+        }
+      ],
+      "summary": "Documentation reading layout (content-layout kind docs)."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-drawer",
+      "label": "LayoutDrawer",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "string",
+          "name": "closeLabel"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        }
+      ],
+      "summary": "Mobile navigation drawer built on the dialog primitive."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-dual-sidebar",
+      "label": "Dual sidebar layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "aside"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "closeLabel"
+        },
+        {
+          "kind": "string",
+          "name": "menuLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "kind": "object",
+          "name": "options"
+        },
+        {
+          "kind": "string",
+          "name": "path"
+        },
+        {
+          "kind": "string",
+          "name": "skipLabel"
+        },
+        {
+          "kind": "string",
+          "name": "storageKey"
+        }
+      ],
+      "summary": "Primary nav plus optional context aside."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-editorial",
+      "label": "Editorial layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "aside"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "kind": "object",
+          "name": "options"
+        },
+        {
+          "kind": "string",
+          "name": "path"
+        },
+        {
+          "kind": "string",
+          "name": "storageKey"
+        }
+      ],
+      "summary": "Long-read editorial layout (content-layout kind editorial)."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "layouts",
+      "id": "layout-grid",
+      "label": "Grid layout",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "number",
+          "name": "columns"
+        },
+        {
+          "kind": "string",
+          "name": "gap"
+        }
+      ],
+      "summary": "Responsive content grid for agent-authored tiles."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-host",
+      "label": "LayoutHost",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "aside"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["ltr", "rtl"],
+          "kind": "enum",
+          "name": "dir"
+        },
+        {
+          "enumValues": [
+            "sidebar",
+            "rail",
+            "top-nav",
+            "dual-sidebar",
+            "master-detail",
+            "dashboard-grid",
+            "docs",
+            "blog",
+            "editorial",
+            "marketing",
+            "mobile-tabs",
+            "mobile-drawer",
+            "wizard",
+            "auth-split",
+            "custom"
+          ],
+          "kind": "enum",
+          "name": "layout",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "loadingLabel"
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "kind": "object",
+          "name": "options"
+        },
+        {
+          "kind": "string",
+          "name": "path"
+        },
+        {
+          "kind": "string",
+          "name": "storageKey"
+        }
+      ],
+      "summary": "Resolves a layout id, applies width fallbacks, and keeps one stable screen outlet."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-landing",
+      "label": "Landing layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "actions"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "brand"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "footer"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "hero"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "navigation"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "sections"
+        }
+      ],
+      "summary": "Standalone marketing landing composition."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-marketing",
+      "label": "Marketing layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "actions"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "aside"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "brand"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "contentLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "footer"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "hero"
+        },
+        {
+          "kind": "string",
+          "name": "heroLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen"
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "navigation"
+        },
+        {
+          "kind": "string",
+          "name": "navigationLabel"
+        },
+        {
+          "kind": "object",
+          "name": "options"
+        },
+        {
+          "kind": "string",
+          "name": "path"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "sections"
+        },
+        {
+          "kind": "string",
+          "name": "storageKey"
+        }
+      ],
+      "summary": "Marketing page frame with hero, sections and footer slots."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "layouts",
+      "id": "layout-page",
+      "label": "Page layout",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        }
+      ],
+      "summary": "Full page content frame for agent-authored documents."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-pricing",
+      "label": "Pricing layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "string",
+          "name": "footnote"
+        },
+        {
+          "kind": "array",
+          "name": "plans"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        }
+      ],
+      "summary": "Pricing plans grid with title and footnote."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-settings",
+      "label": "Settings layout",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "active"
+        },
+        {
+          "kind": "string",
+          "name": "backLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen"
+        },
+        {
+          "kind": "string",
+          "name": "navLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onSelect"
+        },
+        {
+          "kind": "array",
+          "name": "sections",
+          "required": true
+        },
+        {
+          "kind": "boolean",
+          "name": "startWithList"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        }
+      ],
+      "summary": "Settings section list plus detail pane."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-sidebar",
+      "label": "Sidebar layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "aside"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "closeLabel"
+        },
+        {
+          "kind": "string",
+          "name": "menuLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "kind": "object",
+          "name": "options"
+        },
+        {
+          "kind": "string",
+          "name": "path"
+        },
+        {
+          "kind": "string",
+          "name": "skipLabel"
+        },
+        {
+          "kind": "string",
+          "name": "storageKey"
+        }
+      ],
+      "summary": "App sidebar column with responsive drawer fallback."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-top-nav",
+      "label": "Top navigation layout",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "aside"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "closeLabel"
+        },
+        {
+          "kind": "string",
+          "name": "menuLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "nav"
+        },
+        {
+          "kind": "object",
+          "name": "options"
+        },
+        {
+          "kind": "string",
+          "name": "path"
+        },
+        {
+          "kind": "string",
+          "name": "skipLabel"
+        },
+        {
+          "kind": "string",
+          "name": "storageKey"
+        }
+      ],
+      "summary": "Horizontal top navigation with optional mobile menu."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "layout-wizard",
+      "label": "Wizard layout",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "backLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "brand"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "canAdvance"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "content"
+        },
+        {
+          "kind": "number",
+          "name": "current"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "string",
+          "name": "finishLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "mountScreen"
+        },
+        {
+          "kind": "string",
+          "name": "nextLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onFinish"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onStepChange"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "secondaryActions"
+        },
+        {
+          "kind": "array",
+          "name": "steps"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "validate"
+        }
+      ],
+      "summary": "Centered onboarding wizard frame with steps."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "media-composition-canvas",
+      "label": "Canvas composition",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "background"
+        },
+        {
+          "kind": "object",
+          "name": "composition",
+          "required": true
+        },
+        {
+          "enumValues": ["ltr", "rtl"],
+          "kind": "enum",
+          "name": "dir"
+        },
+        {
+          "kind": "string",
+          "name": "fontFamily"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "loadImage"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onrender"
+        },
+        {
+          "kind": "number",
+          "name": "pixelRatio"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "trust"
+        }
+      ],
+      "summary": "A validated layered composition rendered to a canvas."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "media-composition-svg",
+      "label": "SVG composition",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "className"
+        },
+        {
+          "kind": "object",
+          "name": "composition",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "boolean",
+          "name": "focusable"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "trust"
+        },
+        {
+          "kind": "boolean",
+          "name": "validate"
+        }
+      ],
+      "summary": "A validated, structured vector composition."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "content",
+      "id": "media-image",
+      "label": "Responsive image",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "actionLabel"
+        },
+        {
+          "kind": "string",
+          "name": "alt",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["high", "low", "auto"],
+          "kind": "enum",
+          "name": "fetchPriority"
+        },
+        {
+          "enumValues": ["cover", "contain", "fill", "none", "scale-down"],
+          "kind": "enum",
+          "name": "fit"
+        },
+        {
+          "kind": "object",
+          "name": "focalPoint"
+        },
+        {
+          "kind": "number",
+          "name": "height"
+        },
+        {
+          "kind": "string",
+          "name": "href"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "loader"
+        },
+        {
+          "enumValues": ["eager", "lazy"],
+          "kind": "enum",
+          "name": "loading"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onactivate"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onerror"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onload"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onstatus"
+        },
+        {
+          "kind": "object",
+          "name": "placeholder"
+        },
+        {
+          "kind": "string",
+          "name": "sizes"
+        },
+        {
+          "kind": "string",
+          "name": "src",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "srcset"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "trust"
+        },
+        {
+          "kind": "number",
+          "name": "width"
+        },
+        {
+          "kind": "array",
+          "name": "widths"
+        }
+      ],
+      "summary": "A responsive image with URL validation, loading states and actions."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "menubar",
+      "label": "Menubar",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["ltr", "rtl"],
+          "kind": "enum",
+          "name": "dir"
+        },
+        {
+          "kind": "boolean",
+          "name": "loop"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "summary": "Application menubar with roving top-level items."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "menubar-trigger",
+      "label": "Menubar.Trigger",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["default", "soft"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "Top-level menubar item that opens a menu."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "multi-select",
+      "label": "MultiSelect",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "defaultInputValue"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "defaultValue"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "filter"
+        },
+        {
+          "kind": "string",
+          "name": "form"
+        },
+        {
+          "kind": "string",
+          "name": "inputValue"
+        },
+        {
+          "kind": "array",
+          "name": "items"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "loadOptions"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onInputValueChange"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onOpenChange"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "string",
+          "name": "requiredMessage"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "value"
+        },
+        {
+          "enumValues": ["outline", "soft"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A combobox for several values, shown as removable chips."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "nav-icon",
+      "label": "NavIcon",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "icon",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        }
+      ],
+      "summary": "Renders a nav model icon by name or component."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "navigation-menu",
+      "label": "NavigationMenu",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "number",
+          "name": "delayDuration"
+        },
+        {
+          "enumValues": ["ltr", "rtl"],
+          "kind": "enum",
+          "name": "dir"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "enumValues": ["horizontal", "vertical"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "summary": "Site or app navigation with expandable triggers and links."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "pagination",
+      "label": "Pagination",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onPageChange"
+        },
+        {
+          "kind": "number",
+          "name": "page"
+        },
+        {
+          "kind": "number",
+          "name": "pageCount",
+          "required": true
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["outline", "soft"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "Page controls for long lists."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "popover",
+      "label": "Popover",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onOpenChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        }
+      ],
+      "summary": "Non-modal floating panel anchored to a trigger."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "popover-content",
+      "label": "Popover.Content",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["start", "center", "end"],
+          "kind": "enum",
+          "name": "align"
+        },
+        {
+          "kind": "boolean",
+          "name": "arrow"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "initialFocus"
+        },
+        {
+          "enumValues": ["top", "right", "bottom", "left"],
+          "kind": "enum",
+          "name": "side"
+        },
+        {
+          "kind": "number",
+          "name": "sideOffset"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["elevated", "flat"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "Styled popover surface with optional arrow."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "radio",
+      "label": "Radio",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "card"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "id"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "enumValues": ["sm", "md"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "value",
+          "required": true
+        }
+      ],
+      "summary": "One option inside a RadioGroup."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "radio-group",
+      "label": "RadioGroup",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "array",
+          "name": "items"
+        },
+        {
+          "kind": "boolean",
+          "name": "loop"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "enumValues": ["vertical", "horizontal"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "kind": "boolean",
+          "name": "readonly"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "enumValues": ["sm", "md"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        },
+        {
+          "enumValues": ["default", "card"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A set of exclusive radio options with keyboard roving."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "responsive-modal",
+      "label": "ResponsiveModal",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["top", "right", "bottom", "left", "start", "end", "center"],
+          "kind": "enum",
+          "name": "side"
+        },
+        {
+          "enumValues": ["sm", "md", "lg", "xl"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "summary": "Dialog on large screens, drawer/sheet on small screens."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "screen-outlet",
+      "label": "ScreenOutlet",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onready"
+        }
+      ],
+      "summary": "Stable screen mount point that survives layout switches."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "select",
+      "label": "Select",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "string",
+          "name": "defaultValue"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "form"
+        },
+        {
+          "kind": "array",
+          "name": "items"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onOpenChange"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        },
+        {
+          "kind": "boolean",
+          "name": "positioning"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "number",
+          "name": "sideOffset"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["single"],
+          "kind": "enum",
+          "name": "type"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        },
+        {
+          "enumValues": ["outline", "soft"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A single-value select root with size and variant chrome."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "select-content",
+      "label": "Select.Content",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "summary": "The positioned listbox surface for Select items."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "select-group",
+      "label": "Select.Group",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        }
+      ],
+      "summary": "Groups related Select items under an optional label."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "select-item",
+      "label": "Select.Item",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "icon"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "value",
+          "required": true
+        }
+      ],
+      "summary": "One selectable option inside Select.Content."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "select-label",
+      "label": "Select.Label",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        }
+      ],
+      "summary": "A non-interactive heading inside a Select group."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "select-portal",
+      "label": "Select.Portal",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        }
+      ],
+      "summary": "Portals Select.Content out of overflow-clipped ancestors."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "select-separator",
+      "label": "Select.Separator",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        }
+      ],
+      "summary": "A visual divider between Select groups or items."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "select-trigger",
+      "label": "Select.Trigger",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["outline", "soft"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "The button that opens a Select listbox."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "select-value",
+      "label": "Select.Value",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "placeholder"
+        }
+      ],
+      "summary": "Shows the selected label or a placeholder inside the trigger."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "select-viewport",
+      "label": "Select.Viewport",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        }
+      ],
+      "summary": "Scrollable viewport inside Select.Content."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "sheet",
+      "label": "Sheet",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "closeOnEscape"
+        },
+        {
+          "kind": "boolean",
+          "name": "dismissOutside"
+        },
+        {
+          "kind": "boolean",
+          "name": "modal"
+        },
+        {
+          "enumValues": ["top", "right", "bottom", "left", "start", "end", "center"],
+          "kind": "enum",
+          "name": "side"
+        },
+        {
+          "enumValues": ["sm", "md", "lg", "xl"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "summary": "Edge-anchored modal panel (drawer-like sheet)."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "sidebar",
+      "label": "Sidebar",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "collapseLabel"
+        },
+        {
+          "kind": "boolean",
+          "name": "collapsed"
+        },
+        {
+          "kind": "boolean",
+          "name": "collapsible"
+        },
+        {
+          "kind": "boolean",
+          "name": "drawer"
+        },
+        {
+          "kind": "string",
+          "name": "expandLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "footer"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "header"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "itemIcon"
+        },
+        {
+          "kind": "array",
+          "name": "items"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "array",
+          "name": "sections"
+        },
+        {
+          "enumValues": ["default", "inset"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "Collapsible app rail with sections, badges and safe links."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "split-view",
+      "label": "SplitView",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "detail"
+        },
+        {
+          "kind": "boolean",
+          "name": "detailActive"
+        },
+        {
+          "kind": "string",
+          "name": "detailLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "empty"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "list",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "listLabel"
+        }
+      ],
+      "summary": "Master-detail split with list and detail panes."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "stat",
+      "label": "Stat",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "delta"
+        },
+        {
+          "kind": "string",
+          "name": "hint"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "icon"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "enumValues": ["up", "down"],
+          "kind": "enum",
+          "name": "positive"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "sparkline"
+        },
+        {
+          "enumValues": ["up", "down", "neutral"],
+          "kind": "enum",
+          "name": "trend"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "value",
+          "required": true
+        },
+        {
+          "enumValues": ["elevated", "flat"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A single metric with optional delta, trend and sparkline slot."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "stepper",
+      "label": "Stepper",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "array",
+          "name": "completed"
+        },
+        {
+          "kind": "number",
+          "name": "current",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onStepClick"
+        },
+        {
+          "enumValues": ["horizontal", "vertical"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "kind": "array",
+          "name": "steps",
+          "required": true
+        }
+      ],
+      "summary": "Horizontal or vertical progress through ordered steps."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "switch",
+      "label": "Switch",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "checked"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "defaultChecked"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "id"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onCheckedChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "enumValues": ["sm", "md"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "summary": "An immediate on/off setting control."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "table",
+      "label": "Table",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "busy"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["compact", "default", "comfortable"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "maxBlockSize"
+        },
+        {
+          "enumValues": ["never", "sm", "md"],
+          "kind": "enum",
+          "name": "stack"
+        },
+        {
+          "kind": "boolean",
+          "name": "stickyHeader"
+        },
+        {
+          "enumValues": ["plain", "striped", "grid"],
+          "kind": "enum",
+          "name": "variant"
+        },
+        {
+          "kind": "string",
+          "name": "wrapperClass"
+        }
+      ],
+      "summary": "A responsive data table with density, stacking and sticky header options."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "tag",
+      "label": "Tag",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onRemove"
+        },
+        {
+          "kind": "string",
+          "name": "removeLabel"
+        },
+        {
+          "enumValues": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A labeled chip that can be removed."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "text-counter",
+      "label": "TextCounter",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "autosize"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "id"
+        },
+        {
+          "kind": "boolean",
+          "name": "invalid"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "number",
+          "name": "maxlength"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "string",
+          "name": "placeholder"
+        },
+        {
+          "kind": "boolean",
+          "name": "readonly"
+        },
+        {
+          "kind": "string",
+          "name": "remainingLabel"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "number",
+          "name": "rows"
+        },
+        {
+          "kind": "number",
+          "name": "showAfter"
+        },
+        {
+          "enumValues": ["input", "textarea"],
+          "kind": "enum",
+          "name": "tag"
+        },
+        {
+          "kind": "string",
+          "name": "type"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "summary": "An input or textarea that shows remaining characters near the limit."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "textarea",
+      "label": "Textarea",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "autosize"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "readonly"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "ref"
+        },
+        {
+          "kind": "number",
+          "name": "rows"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "summary": "A multi-line text control with optional autosize."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "timeline",
+      "label": "Timeline",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "item"
+        },
+        {
+          "kind": "array",
+          "name": "items"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "object",
+          "name": "messages"
+        },
+        {
+          "enumValues": ["vertical", "horizontal"],
+          "kind": "enum",
+          "name": "orientation"
+        }
+      ],
+      "summary": "Vertical or horizontal chronological list of events."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "toaster",
+      "label": "Toaster",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "dismissLabel"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "offset"
+        },
+        {
+          "enumValues": [
+            "top-start",
+            "top-center",
+            "top-end",
+            "bottom-start",
+            "bottom-center",
+            "bottom-end"
+          ],
+          "kind": "enum",
+          "name": "position"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "store"
+        }
+      ],
+      "summary": "Live region that renders toast notifications from the shared store."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "overlays",
+      "id": "tooltip",
+      "label": "Tooltip",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["start", "center", "end"],
+          "kind": "enum",
+          "name": "align"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "content",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "delayDuration"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "boolean",
+          "name": "open"
+        },
+        {
+          "kind": "string",
+          "name": "shortcut"
+        },
+        {
+          "enumValues": ["top", "right", "bottom", "left"],
+          "kind": "enum",
+          "name": "side"
+        },
+        {
+          "kind": "number",
+          "name": "sideOffset"
+        }
+      ],
+      "summary": "Short delayed hint on hover or focus."
+    }
+  ]
+}

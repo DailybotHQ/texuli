@@ -1,0 +1,61 @@
+---
+import { buildExampleCatalog, getExampleCatalogItem } from '../../components/examples/catalog.ts';
+/**
+ * /examples/<id>/ — one registered example, eager live mount + source.
+ * Page h1 is static; BaseLayout owns the sole main landmark.
+ */
+import ExampleCard from '../../components/examples/ExampleCard.svelte';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return buildExampleCatalog().map((item) => ({
+    params: { id: item.id },
+  }));
+}
+
+const id = Astro.params.id ?? '';
+const item = getExampleCatalogItem(id);
+if (!item) {
+  return Astro.redirect('../');
+}
+const base = import.meta.env.BASE_URL;
+const indexHref = `${base.replace(/\/+$/, '')}/examples/`;
+---
+
+<BaseLayout title={item.title} description={item.description}>
+  <p class="back">
+    <a href={indexHref}>All examples</a>
+  </p>
+  <h1 id="example-detail-title">{item.title}</h1>
+  <p class="lead">{item.description}</p>
+  <ExampleCard
+    client:load
+    item={item}
+    detailHref={`${indexHref}${item.id}/`}
+    base={base}
+    listing={false}
+    headingLevel="none"
+  />
+</BaseLayout>
+
+<style>
+  .back {
+    margin: 0 0 0.75rem;
+  }
+  .back a {
+    color: var(--tx-link, var(--tx-foreground));
+    min-block-size: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+  }
+  h1 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0 0 1.25rem;
+    max-inline-size: 44rem;
+    color: var(--tx-foreground);
+  }
+</style>

@@ -1,0 +1,225 @@
+/** `@texuli/player` — Svelte paint for the framework-free catalog player. */
+
+export type {
+  PlayerStatus,
+  ValidationReceipt,
+} from '@texuli/catalog/player';
+export { createActionAccess } from './action-access.ts';
+export {
+  ACTION_GRAMMAR_ROLES,
+  ACTION_MANIFESTS,
+  actionFormManifest,
+  formFieldManifest,
+  formSubmitManifest,
+} from './action-manifests.ts';
+export {
+  ACTION_NAME,
+  type ActionHandler,
+  type ActionIntent,
+  type ActionResult,
+  type ActionStatus,
+  AUTOCOMPLETE_ALLOWLIST,
+  actionValues,
+  checkActionNodes,
+  FIELD_KINDS,
+  FIELD_PATTERNS,
+  type FieldKind,
+  type FieldRules,
+  MAX_ACTION_FIELDS,
+  MAX_ACTION_VALUE_LENGTH,
+  runAction,
+  validateFieldValue,
+} from './actions.ts';
+export {
+  type Announcement,
+  type AnnouncementLabels,
+  createAnnouncer,
+  formatAnnouncement,
+  type PaintSummary,
+  type Politeness,
+  paintAnnouncement,
+  selectionAnnouncement,
+} from './announcements.ts';
+export { createPlayerCatalog } from './catalog.ts';
+export {
+  CHAT_DISPLAY_MANIFESTS,
+  CHAT_MESSAGE_ROLES,
+  chatMessageManifest,
+  chatThreadManifest,
+} from './chat-manifests.ts';
+export {
+  CONTROL_GRAMMAR_ROLES,
+  CONTROL_MANIFESTS,
+  CONTROL_STATE_TYPES,
+  choiceControlManifest,
+  filterControlManifest,
+  isControlId,
+  sliderControlManifest,
+  toggleControlManifest,
+} from './control-manifests.ts';
+export {
+  createPlayerFrameClient,
+  normalizeParentOrigin,
+  type PlayerFrameClient,
+  type PlayerFrameClientOptions,
+} from './embed/client.ts';
+export {
+  createPlayerFrameHost,
+  type PlayerFrameHost,
+  type PlayerFrameHostOptions,
+} from './embed/host.ts';
+export {
+  frameDiagnostics,
+  PLAYER_FRAME_MAX_SIZE,
+  PLAYER_FRAME_PROTOCOL,
+  PLAYER_FRAME_REFERRER_POLICY,
+  PLAYER_FRAME_SANDBOX,
+  type PlayerFrameDiagnostics,
+  type PlayerFrameFlowChange,
+  type PlayerFrameHostMessage,
+  type PlayerFrameMessage,
+  type PlayerFrameOptions,
+  parseFrameMessage,
+  parseHostMessage,
+  sanitizeFrameOptions,
+} from './embed/protocol.ts';
+export type { PlayerDiagnosticsEvent, PlayerSize } from './embed/types.ts';
+export {
+  PLAYER_NODE_ERROR_CODES,
+  type PlayerNodeError,
+  type PlayerNodeErrorCode,
+  type PlayerNodeErrorPhase,
+  placeholderMessage,
+} from './errors.ts';
+export {
+  FLOW_GRAMMAR_ROLES,
+  FLOW_MANIFESTS,
+  flowActionManifest,
+  flowViewManifest,
+} from './flow-manifests.ts';
+export {
+  HOST_CHROME_IDS,
+  isHostChromeId,
+  withoutHostChrome,
+  withoutHostChromeLoaders,
+} from './host-chrome.ts';
+export {
+  applyHostData,
+  checkHostBoundWriters,
+  type DataSources,
+  hostBoundNames,
+  MAX_DATA_SOURCES,
+  sanitizeDataSources,
+} from './host-data.ts';
+export {
+  FRAME_ATTRIBUTE,
+  frameStops,
+  handleSurfaceKeydown,
+  navigableFrames,
+  normalizeTabOrder,
+  parentFrame,
+  type SurfaceKeyContext,
+} from './keyboard.ts';
+export {
+  DEFAULT_PLAYER_LABELS,
+  type PlayerLabelOverrides,
+  type PlayerLabels,
+  resolvePlayerLabels,
+  safeLang,
+} from './labels.ts';
+export {
+  G20_GRAMMAR_ROLES,
+  G20_LAYOUT_MANIFESTS,
+  LAYOUT_ALIGNS,
+  LAYOUT_GAPS,
+  PLAYER_GRAMMAR_ROLES,
+  rowLayoutManifest,
+  SPLIT_RATIOS,
+  splitLayoutManifest,
+  stackLayoutManifest,
+  tileLayoutManifest,
+} from './layout-manifests.ts';
+export {
+  CONTENT_LAYOUT_IDS,
+  type ContentLayoutId,
+  type FrameInfo,
+  isContentLayoutId,
+  planFrames,
+  type TocEntry,
+} from './layouts/outline.ts';
+export { PLAYER_LOADERS } from './loaders.ts';
+export {
+  applyMediaPolicy,
+  type MediaPolicyLabels,
+  TRUST_PINNED_IDS,
+} from './media-policy.ts';
+export {
+  type MountedPlayer,
+  type MountedPlayerFrame,
+  type MountPlayerFrameOptions,
+  mountPlayer,
+  mountPlayerFrame,
+  type PlayerProps,
+} from './mount.ts';
+export { default as Player } from './Player.svelte';
+export { default as PlayerFrame } from './PlayerFrame.svelte';
+export {
+  HOST_REGION_ID,
+  HOST_REGION_NAME,
+  hostRegionManifest,
+  isHostRegionName,
+  REGION_GRAMMAR_ROLES,
+  REGION_MANIFESTS,
+} from './region-manifests.ts';
+export {
+  applySelection,
+  EMPTY_SELECTION,
+  pruneSelection,
+  SELECTED_ATTRIBUTE,
+  type SelectionMode,
+  type SelectionState,
+} from './selection.ts';
+export {
+  DEFAULT_LOAD_TIMEOUT_MS,
+  type PlayerSkeletonFamily,
+  skeletonFamily,
+  withLoadTimeout,
+} from './skeletons.ts';
+export {
+  LOCAL_STATE_FORMAT,
+  LOCAL_STATE_VERSION,
+  resolveStateBindings,
+  STATE_BINDING_KEY,
+  type StatefulSplit,
+  splitStatefulBlueprint,
+} from './state/bind.ts';
+export { checkControlBindings } from './state/controls.ts';
+export {
+  checkFlowNodes,
+  FLOW_NAME,
+  type FlowDeclaration,
+  type FlowParse,
+  type FlowTransition,
+  MAX_FLOW_TRANSITIONS,
+  MAX_FLOW_VIEWS,
+  nextFlowView,
+  parseFlowDeclaration,
+} from './state/flow.ts';
+export {
+  coerceStateValue,
+  DATA_SOURCE_NAME,
+  DEFAULT_STRING_LENGTH,
+  initialSnapshot,
+  MAX_ENUM_VALUE_LENGTH,
+  MAX_ENUM_VALUES,
+  MAX_STATE_VARS,
+  MAX_STRING_LENGTH,
+  parseStateDeclarations,
+  type StateDeclaration,
+  type StateDeclarations,
+  type StateIssue,
+  type StateParse,
+  type StateSnapshot,
+  type StateValue,
+} from './state/schema.ts';
+export type { PlayerPaintNode } from './types.ts';

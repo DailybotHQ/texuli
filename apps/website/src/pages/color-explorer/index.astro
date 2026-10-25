@@ -1,0 +1,31 @@
+---
+/**
+ * /color-explorer/: OKLCH scales, semantic roles, contrast pairs and token export
+ * for any library theme. One theme's payload inline; others are same-origin files (T-site-perf).
+ */
+import { explorerTailwindEntries } from '../../components/color-explorer/build.ts';
+import ColorExplorer from '../../components/color-explorer/ColorExplorer.svelte';
+import { SITE_THEME } from '../../components/foundation/site.ts';
+import { buildExplorerThemeFile, explorerCatalog } from '../../components/perf/theme-build.ts';
+import {
+  buildHighContrastModeCss,
+  themeCssVariableNames,
+} from '../../components/theme-switcher/library.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// Only the theme list and the default theme's payload ship in the page; every
+// other theme's payload and CSS are same-origin files loaded on selection.
+const catalog = await explorerCatalog();
+const initial = await buildExplorerThemeFile(SITE_THEME);
+const tailwindEntries = explorerTailwindEntries();
+const highContrastCss = buildHighContrastModeCss();
+const varNames = themeCssVariableNames();
+---
+
+<BaseLayout
+  title="Color explorer"
+  description="Explore OKLCH scales, semantic roles, WCAG contrast pairs and export tokens as CSS, JSON or Tailwind for any Texuli theme."
+>
+  <style is:inline set:html={highContrastCss}></style>
+  <ColorExplorer client:load catalog={catalog} initial={initial} tailwindEntries={tailwindEntries} varNames={varNames} />
+</BaseLayout>

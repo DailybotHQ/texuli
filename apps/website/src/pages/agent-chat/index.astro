@@ -1,0 +1,35 @@
+---
+import AgentChat from '../../components/agent-chat/AgentChat.svelte';
+import { siteCatalogHash } from '../../components/agent-chat/catalog-hash.ts';
+import { agentEndpoint } from '../../components/agent-chat/client.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// Set at build time; unset means the agent is not offered (nothing is deployed today).
+const endpoint = agentEndpoint(import.meta.env.PUBLIC_TEXULI_AGENT_URL);
+const catalogHash = await siteCatalogHash();
+---
+
+<BaseLayout
+  title="Agent chat"
+  description="Ask the Texuli agent for a report, dashboard or deck and get back a validated, untrusted blueprint draft."
+>
+  <div class="agent-page" data-tx-agent-page>
+    <header class="agent-page__header">
+      <p class="eyebrow">Agent tools</p>
+      <h1>Agent chat</h1>
+      <p class="lead">
+        Describe an interface and the agent answers with a blueprint draft that the service validates
+        and your browser validates again before painting it. Drafts are never activated here.
+      </p>
+    </header>
+    <AgentChat client:load {endpoint} {catalogHash} />
+  </div>
+</BaseLayout>
+
+<style>
+  .agent-page { display: grid; gap: 1.5rem; }
+  .agent-page__header { display: grid; gap: 0.4rem; }
+  .eyebrow { margin: 0; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--tx-foreground); }
+  h1 { margin: 0; font-size: clamp(1.75rem, 4vw, 2.25rem); color: var(--tx-foreground); }
+  .lead { margin: 0; max-inline-size: 48rem; color: var(--tx-foreground); }
+</style>

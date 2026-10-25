@@ -1,0 +1,7847 @@
+# Texuli — full agent docs
+
+> Complete catalog documentation generated from manifests (133 components).
+
+---
+
+# Alert
+
+> Inline feedback for a page section (status or error).
+
+- **id:** `alert`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Report a result or problem next to the related content
+
+### Don't use when
+
+- A full-page failure (use error-state)
+- A quiet tip in docs (use callout)
+
+### Accessibility
+
+- error tone uses role=alert; other tones use role=status; dismiss is named.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `tone` | enum(info | success | warning | error | brand | neutral) | no | — | `"info"` | — |
+| `title` | string | no | — | — | Optional heading |
+| `text` | string | no | untrusted | — | Body copy |
+| `hideIcon` | boolean | no | — | `false` | — |
+| `icon` | slot | no | — | — | Custom icon snippet |
+| `actionLabel` | string | no | — | — | — |
+| `actionHref` | string | no | developer | — | Optional action link (URL policy) |
+| `onAction` | event | no | — | — | — |
+| `dismissible` | boolean | no | — | `false` | — |
+| `dismissLabel` | string | no | — | `"Dismiss"` | — |
+| `onDismiss` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Warning alert (`warning`)
+
+```json
+{
+  "tone": "warning",
+  "title": "Check inventory",
+  "text": "Three SKUs are low."
+}
+```
+
+### Related
+
+- [`callout`](components/callout.md)
+- [`banner`](components/banner.md)
+- [`error-state`](components/error-state.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# AlertDialog
+
+> Modal confirm/cancel dialog for consequential actions.
+
+- **id:** `alert-dialog`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Confirm delete or irreversible actions
+- Require an explicit choice
+
+### Don't use when
+
+- Informational copy without a choice (use dialog or toast)
+
+### Accessibility
+
+- Role alertdialog; focus trapped until confirm or cancel
+- Destructive mode styles the confirm action and warning icon
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `open` | boolean | no | — | `false` | — |
+| `title` | string | yes | — | — | — |
+| `description` | string | no | — | — | — |
+| `confirmLabel` | string | no | — | `"Confirm"` | — |
+| `cancelLabel` | string | no | — | `"Cancel"` | — |
+| `destructive` | boolean | no | — | `false` | — |
+| `onConfirm` | event | no | — | — | — |
+| `onCancel` | event | no | — | — | — |
+| `trigger` | slot | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `errorFallback` | string | no | — | — | — |
+| `onOpenChange` | event | no | — | — | — |
+
+### Examples
+
+#### Destructive confirm (`delete`)
+
+```json
+{
+  "title": "Delete note?",
+  "description": "This cannot be undone.",
+  "destructive": true,
+  "confirmLabel": "Delete",
+  "open": true
+}
+```
+
+### Related
+
+- [`dialog`](components/dialog.md)
+- [`toaster`](components/toaster.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# AnalyticsGrid
+
+> Auto-fit KPI and widget grid for dashboard screens.
+
+- **id:** `analytics-grid`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- KPI tiles and chart cards inside a dashboard
+
+### Don't use when
+
+- Single full-bleed chart
+
+### Accessibility
+
+- Optional region label names the metrics group.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `columns` | number | no | — | `3` | Preferred column count (1–4) |
+| `minItem` | number | no | — | `280` | — |
+| `gap` | string | no | — | `"1rem"` | — |
+| `dense` | boolean | no | — | `false` | — |
+| `label` | string | no | — | — | — |
+| `children` | slot | yes | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Three columns (`kpis`)
+
+```json
+{
+  "columns": 3,
+  "label": "Key metrics"
+}
+```
+
+### Related
+
+- [`layout-dashboard-grid`](components/layout-dashboard-grid.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# AppNav
+
+> Desktop sidebar shell with mobile sheet drawer and main slot.
+
+- **id:** `app-nav`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Full app chrome with responsive navigation
+
+### Don't use when
+
+- Sidebar alone inside a custom shell
+
+### Accessibility
+
+- Menu button opens a labelled sheet; main has a stable id.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `items` | array | no | — | — | — |
+| `sections` | array | no | — | — | — |
+| `collapsed` | boolean | no | — | `false` | — |
+| `collapsible` | boolean | no | — | `true` | — |
+| `variant` | enum(default | inset) | no | — | `"default"` | — |
+| `header` | slot | no | — | — | — |
+| `footer` | slot | no | — | — | — |
+| `itemIcon` | slot | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `topBar` | slot | no | — | — | — |
+| `label` | string | no | — | `"Main"` | — |
+| `menuLabel` | string | no | — | `"Open navigation"` | — |
+| `drawerTitle` | string | no | — | `"Navigation"` | — |
+| `hrefTrust` | enum(developer | untrusted) | no | developer | `"developer"` | — |
+| `mobileOpen` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### App shell (`shell`)
+
+```json
+{
+  "label": "Main"
+}
+```
+
+### Related
+
+- [`sidebar`](components/sidebar.md)
+- [`sheet`](components/sheet.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Badge
+
+> A compact status or category label.
+
+- **id:** `badge`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show a short status or category next to a title
+
+### Don't use when
+
+- A removable filter (use tag)
+- A toggleable filter chip (use chip)
+
+### Accessibility
+
+- Never convey meaning by color alone; pair with a word.
+- In a catalog tree, set label (or put the word in an inline-text child).
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | enum(default | secondary | outline | success | warning | destructive | info | neutral) | no | — | `"default"` | — |
+| `label` | string | no | — | — | Plain-text badge word, escaped; replaces children when both are given |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The badge word (an inline-text node in a tree) |
+
+### Examples
+
+#### Success badge (`success`)
+
+```json
+{
+  "variant": "success"
+}
+```
+
+#### Labelled badge (`labelled`)
+
+```json
+{
+  "variant": "info",
+  "label": "Shipped"
+}
+```
+
+### Related
+
+- [`tag`](components/tag.md)
+- [`chip`](components/chip.md)
+- [`inline-text`](components/inline-text.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Banner
+
+> Full-width notice across a page or app shell.
+
+- **id:** `banner`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Announce a global condition (maintenance, trial)
+
+### Don't use when
+
+- Inline field errors (use alert near the field)
+
+### Accessibility
+
+- Same tone roles as Alert; dismiss control is optional and named.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `tone` | enum(info | success | warning | error | brand | neutral) | no | — | `"info"` | — |
+| `title` | string | no | — | — | Optional heading |
+| `text` | string | no | untrusted | — | Body copy |
+| `hideIcon` | boolean | no | — | `false` | — |
+| `icon` | slot | no | — | — | Custom icon snippet |
+| `actionLabel` | string | no | — | — | — |
+| `actionHref` | string | no | developer | — | Optional action link (URL policy) |
+| `onAction` | event | no | — | — | — |
+| `dismissible` | boolean | no | — | `false` | — |
+| `dismissLabel` | string | no | — | `"Dismiss"` | — |
+| `onDismiss` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Brand banner (`brand`)
+
+```json
+{
+  "tone": "brand",
+  "title": "New workspace",
+  "text": "Invite teammates from Settings.",
+  "dismissible": true
+}
+```
+
+### Related
+
+- [`alert`](components/alert.md)
+- [`callout`](components/callout.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Code blocks
+
+> Validated, highlighted code.
+
+- **id:** `blocks-code`
+- **package:** `@texuli/blocks`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render code blocks from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `block` | object | yes | untrusted | — | Untrusted block data validated by the component before rendering. |
+| `labels` | object | no | — | — | — |
+| `oninvalid` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+| `lineNumbers` | boolean | no | — | — | — |
+| `highlights` | array | no | — | — | — |
+| `hostStep` | number | no | — | — | — |
+| `step` | number | no | — | — | — |
+| `copyable` | boolean | no | — | — | — |
+
+### Examples
+
+#### Code blocks example (`basic`)
+
+```json
+{
+  "block": {
+    "type": "code",
+    "code": "n = 1"
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Data blocks
+
+> Validated tables, statistics, key metrics and chart content blocks.
+
+- **id:** `blocks-data`
+- **package:** `@texuli/blocks`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render data blocks from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `block` | object | yes | untrusted | — | Untrusted block data validated by the component before rendering. |
+| `labels` | object | no | — | — | — |
+| `oninvalid` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+| `mode` | enum(light | dark) | no | — | — | — |
+
+### Examples
+
+#### Data blocks example (`basic`)
+
+```json
+{
+  "block": {
+    "type": "stat",
+    "items": [
+      {
+        "label": "Active",
+        "value": "128"
+      }
+    ]
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Diagram blocks
+
+> Validated flow, tree, board and terminal diagrams.
+
+- **id:** `blocks-diagram`
+- **package:** `@texuli/blocks`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render diagram blocks from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `block` | object | yes | untrusted | — | Untrusted block data validated by the component before rendering. |
+| `oninvalid` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+
+### Examples
+
+#### Diagram blocks example (`basic`)
+
+```json
+{
+  "block": {
+    "type": "flow",
+    "nodes": [
+      {
+        "id": "plan",
+        "label": "Plan"
+      }
+    ],
+    "edges": []
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Embed blocks
+
+> Validated link previews (URL policy) and embed-app shells. Texuli never runs app JSON; hosts mount via mountEmbed with a sandboxed iframe contract.
+
+- **id:** `blocks-embed`
+- **package:** `@texuli/blocks`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Show a deferred mini-app shell where the host mounts after user Start.
+- Show an offline link preview with HTTPS-only href (URL policy).
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+- Running untrusted app JSON with innerHTML, eval, or an unsandboxed iframe.
+- Relaxing iframe sandbox (especially adding allow-same-origin) or skipping CSP frame-src / postMessage origin checks.
+
+### Accessibility
+
+- Start control is a real button; nothing loads until activation.
+- Iframe title (when used) names the embedded app; host must keep keyboard access inside the frame.
+- Link previews use rel=noopener noreferrer on new-window links.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `block` | object | yes | untrusted | — | Untrusted block data validated by the component before rendering. |
+| `mountEmbed` | event | no | — | — | Host runtime after user Start. Prefer createSandboxedEmbedMount (sandbox without allow-same-origin, referrerpolicy=no-referrer, HTTPS allowlist). Host CSP frame-src + postMessage origin checks required; never relax sandbox or inject HTML from app data. |
+| `labels` | object | no | — | — | — |
+| `oninvalid` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+
+### Examples
+
+#### Embed blocks example (`basic`)
+
+```json
+{
+  "block": {
+    "type": "link-preview",
+    "href": "https://example.com/guide",
+    "title": "Product guide"
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Interactive blocks
+
+> Validated polls, quizzes, calculators and checklists.
+
+- **id:** `blocks-interactive`
+- **package:** `@texuli/blocks`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render interactive blocks from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `block` | object | yes | untrusted | — | Untrusted block data validated by the component before rendering. |
+| `labels` | object | no | — | — | — |
+| `oninvalid` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+
+### Examples
+
+#### Interactive blocks example (`basic`)
+
+```json
+{
+  "block": {
+    "type": "checklist",
+    "items": [
+      {
+        "id": "a",
+        "label": "Plan"
+      }
+    ]
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Map blocks
+
+> Validated map points and routes.
+
+- **id:** `blocks-map`
+- **package:** `@texuli/blocks`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render map blocks from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `block` | object | yes | untrusted | — | Untrusted block data validated by the component before rendering. |
+| `labels` | object | no | — | — | — |
+| `locale` | string | no | — | — | — |
+| `headingLevel` | number | no | — | — | — |
+| `oninvalid` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+
+### Examples
+
+#### Map blocks example (`basic`)
+
+```json
+{
+  "block": {
+    "type": "map",
+    "label": "Depot",
+    "points": [
+      {
+        "id": "a",
+        "label": "Depot",
+        "lng": 0,
+        "lat": 0
+      }
+    ]
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Media blocks
+
+> Validated image, figure, video and gallery content blocks.
+
+- **id:** `blocks-media`
+- **package:** `@texuli/blocks`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render media blocks from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `block` | object | yes | untrusted | — | Untrusted block data validated by the component before rendering. |
+| `labels` | object | no | — | — | — |
+| `resolveAvatar` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+| `oninvalid` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+
+### Examples
+
+#### Media blocks example (`basic`)
+
+```json
+{
+  "block": {
+    "type": "image",
+    "src": "images/team.webp",
+    "alt": "A team planning together",
+    "width": 960,
+    "height": 540
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Structure blocks
+
+> Validated layouts and calls to action.
+
+- **id:** `blocks-structure`
+- **package:** `@texuli/blocks`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render structure blocks from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `block` | object | yes | untrusted | — | Untrusted block data validated by the component before rendering. |
+| `labels` | object | no | — | — | — |
+| `oninvalid` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+
+### Examples
+
+#### Structure blocks example (`basic`)
+
+```json
+{
+  "block": {
+    "type": "cta",
+    "actions": [
+      {
+        "label": "Docs",
+        "href": "https://example.com"
+      }
+    ]
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Text blocks
+
+> Validated heading, paragraph, list, quote and callout content.
+
+- **id:** `blocks-text`
+- **package:** `@texuli/blocks`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render text blocks from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `block` | object | yes | untrusted | — | Untrusted block data validated by the component before rendering. |
+| `labels` | object | no | — | — | — |
+| `oninvalid` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+
+### Examples
+
+#### Text blocks example (`basic`)
+
+```json
+{
+  "block": {
+    "type": "heading",
+    "level": 2,
+    "text": "Quarterly update"
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Breadcrumb
+
+> Hierarchy trail with URL-policy links.
+
+- **id:** `breadcrumb`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Show location in a hierarchy
+
+### Don't use when
+
+- Primary navigation (use navigation-menu or sidebar)
+
+### Accessibility
+
+- nav landmark; current page is not a link.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `items` | array | yes | — | — | BreadcrumbItem[] |
+| `label` | string | no | — | `"Breadcrumb"` | — |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `separatorLabel` | string | no | — | `"Separator"` | — |
+| `separator` | slot | no | — | — | — |
+| `maxItems` | number | no | — | `0` | — |
+| `hrefTrust` | enum(developer | untrusted) | no | developer | `"developer"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Trail (`trail`)
+
+```json
+{
+  "items": [
+    {
+      "label": "Workspace",
+      "href": "https://example.com"
+    },
+    {
+      "label": "Notes",
+      "href": "https://example.com/notes"
+    },
+    {
+      "label": "Harbor"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`navigation-menu`](components/navigation-menu.md)
+- [`pagination`](components/pagination.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Button
+
+> A pressable action control with loading and optional link rendering.
+
+- **id:** `button`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Primary and secondary actions
+- Submit and reset controls in forms
+
+### Don't use when
+
+- An icon-only control (use icon-button)
+- A toggleable filter chip (use chip)
+- Navigation that is not an action (use a link or nav item)
+
+### Accessibility
+
+- Real button or link element with an accessible name
+- Busy state exposes aria-busy and disables further activation
+- Rejected href schemes render as a non-interactive control
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | enum(default | secondary | outline | ghost | destructive | link) | no | — | `"default"` | — |
+| `size` | enum(sm | md | lg | icon) | no | — | `"md"` | — |
+| `href` | string | no | developer | — | Optional link target (URL policy) |
+| `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
+| `type` | enum(button | submit | reset) | no | — | `"button"` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `loading` | boolean | no | — | `false` | — |
+| `loadingLabel` | string | no | — | — | Accessible name while loading |
+| `autoLoading` | boolean | no | — | `true` | Show pending when onclick returns a promise |
+| `label` | string | no | — | — | Plain-text label, escaped; replaces children when both are given |
+| `onclick` | event | no | — | — | Activated handler; may return a promise |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The visible label (an inline-text node in a tree) |
+
+### Examples
+
+#### Default button (`default`)
+
+```json
+{
+  "variant": "default"
+}
+```
+
+#### Loading button (`loading`)
+
+```json
+{
+  "loading": true,
+  "loadingLabel": "Saving"
+}
+```
+
+#### Labelled submit button (`labelled`)
+
+```json
+{
+  "type": "submit",
+  "label": "Save changes"
+}
+```
+
+### Related
+
+- [`icon-button`](components/icon-button.md)
+- [`button-group`](components/button-group.md)
+- [`form`](components/form.md)
+- [`inline-text`](components/inline-text.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# ButtonGroup
+
+> Groups related buttons with shared borders and orientation.
+
+- **id:** `button-group`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Cluster related actions that share a single decision
+
+### Don't use when
+
+- Unrelated actions across a toolbar (use a plain flex row)
+
+### Accessibility
+
+- role=group with an optional accessible label.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `orientation` | enum(horizontal | vertical) | no | — | `"horizontal"` | — |
+| `attached` | boolean | no | — | `true` | Share borders between buttons |
+| `label` | string | no | — | — | Accessible name for the group |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Attached horizontal group (`attached`)
+
+```json
+{
+  "orientation": "horizontal",
+  "attached": true,
+  "label": "View mode"
+}
+```
+
+### Related
+
+- [`button`](components/button.md)
+- [`icon-button`](components/icon-button.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Callout
+
+> Emphasized documentation-style tip with a strong start edge.
+
+- **id:** `callout`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Highlight a tip or note beside prose
+
+### Don't use when
+
+- A blocking error (use alert with error tone)
+- A site-wide notice (use banner)
+
+### Accessibility
+
+- Same tone roles as Alert; never color-only meaning.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `tone` | enum(info | success | warning | error | brand | neutral) | no | — | `"info"` | — |
+| `title` | string | no | — | — | Optional heading |
+| `text` | string | no | untrusted | — | Body copy |
+| `hideIcon` | boolean | no | — | `false` | — |
+| `icon` | slot | no | — | — | Custom icon snippet |
+| `actionLabel` | string | no | — | — | — |
+| `actionHref` | string | no | developer | — | Optional action link (URL policy) |
+| `onAction` | event | no | — | — | — |
+| `dismissible` | boolean | no | — | `false` | — |
+| `dismissLabel` | string | no | — | `"Dismiss"` | — |
+| `onDismiss` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Info callout (`info-tip`)
+
+```json
+{
+  "tone": "info",
+  "title": "Tip",
+  "text": "Export works offline in this prototype."
+}
+```
+
+### Related
+
+- [`alert`](components/alert.md)
+- [`banner`](components/banner.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Card
+
+> A surface for grouping related content with optional link behavior.
+
+- **id:** `card`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Group related content in a bordered surface
+- Make a whole tile a single link
+
+### Don't use when
+
+- A single line of chrome (use badge or button)
+- A data grid of many rows (use table)
+
+### Accessibility
+
+- When href is set, the card is a real link with an accessible name
+- Rejected href schemes render as a non-interactive surface
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | enum(elevated | flat) | no | — | `"elevated"` | Visual elevation |
+| `href` | string | no | developer | — | Optional link target (URL policy) |
+| `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
+| `linkLabel` | string | no | — | — | Accessible name when the card is a link |
+| `class` | string | no | — | — | Extra classes |
+
+### Examples
+
+#### Elevated card (`elevated`)
+
+```json
+{
+  "variant": "elevated"
+}
+```
+
+#### Linked card (`linked`)
+
+```json
+{
+  "variant": "flat",
+  "href": "https://example.com/docs",
+  "linkLabel": "Open documentation"
+}
+```
+
+### Related
+
+- [`button`](components/button.md)
+- [`stat`](components/stat.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Area chart
+
+> A categorical area chart with an accessible data table.
+
+- **id:** `charts-area`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render area chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `series` | array | yes | — | — | — |
+| `mode` | enum(light | dark) | no | — | — | — |
+| `renderer` | enum(svg | canvas | auto) | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `interactive` | string | no | — | — | — |
+| `fullDomain` | string | no | — | — | — |
+| `visibleDomain` | string | no | — | — | — |
+| `annotations` | string | no | — | — | — |
+
+### Examples
+
+#### Area chart example (`basic`)
+
+```json
+{
+  "title": "Weekly activity",
+  "description": "Activity by week",
+  "series": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Bar chart
+
+> A categorical bar chart with a zero baseline and accessible data table.
+
+- **id:** `charts-bar`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render bar chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `series` | array | yes | — | — | — |
+| `mode` | enum(light | dark) | no | — | — | — |
+| `renderer` | enum(svg | canvas | auto) | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `interactive` | string | no | — | — | — |
+| `fullDomain` | string | no | — | — | — |
+| `visibleDomain` | string | no | — | — | — |
+| `annotations` | string | no | — | — | — |
+
+### Examples
+
+#### Bar chart example (`basic`)
+
+```json
+{
+  "title": "Weekly activity",
+  "description": "Activity by week",
+  "series": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Bubble chart
+
+> A scatter plot where point size can encode another measure.
+
+- **id:** `charts-bubble`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render bubble chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `points` | array | yes | — | — | — |
+| `series` | array | no | — | — | — |
+| `mode` | enum(light | dark) | no | — | — | — |
+| `interactive` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `width` | number | no | — | — | — |
+| `height` | number | no | — | — | — |
+| `annotations` | string | no | — | — | — |
+
+### Examples
+
+#### Bubble chart example (`basic`)
+
+```json
+{
+  "title": "Usage and reach",
+  "description": "Usage compared with reach",
+  "points": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Bullet chart
+
+> A compact value, range and target comparison.
+
+- **id:** `charts-bullet`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render bullet chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | — | — | — |
+| `description` | string | no | — | — | — |
+| `value` | number | yes | — | — | — |
+| `max` | number | no | — | — | — |
+| `target` | number | no | — | — | — |
+| `ranges` | array | no | — | — | — |
+| `format` | object | no | — | — | — |
+| `labels` | object | no | — | — | — |
+
+### Examples
+
+#### Bullet chart example (`basic`)
+
+```json
+{
+  "label": "Release progress",
+  "value": 68,
+  "max": 100,
+  "target": 75
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Canvas chart renderer
+
+> A low-level canvas mark renderer for dense chart series.
+
+- **id:** `charts-canvas-renderer`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render canvas chart renderer from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `kind` | enum(line | area | bar | stacked-bar | combo) | yes | — | — | — |
+| `series` | array | yes | — | — | — |
+| `width` | number | yes | — | — | — |
+| `height` | number | yes | — | — | — |
+
+### Examples
+
+#### Canvas chart renderer example (`basic`)
+
+```json
+{
+  "kind": "line",
+  "series": [],
+  "width": 640,
+  "height": 320
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Cartesian chart
+
+> The general line, area, bar, stacked bar or combo chart renderer.
+
+- **id:** `charts-cartesian`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render cartesian chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `kind` | enum(line | area | bar | stacked-bar | combo) | yes | — | — | — |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `series` | array | yes | — | — | — |
+| `mode` | enum(light | dark) | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `renderer` | enum(svg | canvas | auto) | no | — | — | — |
+| `interactive` | string | no | — | — | — |
+| `fullDomain` | string | no | — | — | — |
+| `visibleDomain` | string | no | — | — | — |
+| `annotations` | string | no | — | — | — |
+
+### Examples
+
+#### Cartesian chart example (`basic`)
+
+```json
+{
+  "kind": "line",
+  "title": "Weekly activity",
+  "description": "Activity by week",
+  "series": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Combo chart
+
+> A categorical chart that combines bar and line series.
+
+- **id:** `charts-combo`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render combo chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `series` | array | yes | — | — | — |
+| `mode` | enum(light | dark) | no | — | — | — |
+| `renderer` | enum(svg | canvas | auto) | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `interactive` | string | no | — | — | — |
+| `fullDomain` | string | no | — | — | — |
+| `visibleDomain` | string | no | — | — | — |
+| `annotations` | string | no | — | — | — |
+
+### Examples
+
+#### Combo chart example (`basic`)
+
+```json
+{
+  "title": "Revenue and orders",
+  "description": "Revenue and orders by month",
+  "series": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Donut chart
+
+> A part-to-whole chart with a central opening and data table.
+
+- **id:** `charts-donut`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render donut chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `data` | array | yes | — | — | — |
+| `labels` | object | yes | — | — | — |
+| `size` | number | no | — | — | — |
+| `innerRatio` | string | no | — | — | — |
+| `padAngle` | string | no | — | — | — |
+
+### Examples
+
+#### Donut chart example (`basic`)
+
+```json
+{
+  "title": "Tickets by status",
+  "description": "Ticket distribution",
+  "data": [],
+  "labels": {}
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Funnel chart
+
+> A conversion funnel with step values and accessible table.
+
+- **id:** `charts-funnel`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render funnel chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | no | — | — | — |
+| `steps` | array | yes | — | — | — |
+| `orientation` | enum(vertical | horizontal) | no | — | — | — |
+| `width` | number | no | — | — | — |
+| `height` | number | no | — | — | — |
+| `labels` | object | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Funnel chart example (`basic`)
+
+```json
+{
+  "title": "Signup conversion",
+  "steps": [
+    {
+      "id": "visit",
+      "label": "Visits",
+      "value": 800
+    }
+  ]
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Gauge chart
+
+> A radial value gauge with thresholds and an accessible data table.
+
+- **id:** `charts-gauge`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render gauge chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | — | — | — |
+| `description` | string | no | — | — | — |
+| `value` | number | yes | — | — | — |
+| `min` | number | no | — | — | — |
+| `max` | number | no | — | — | — |
+| `thresholds` | array | no | — | — | — |
+| `bandLabels` | array | no | — | — | — |
+| `format` | object | no | — | — | — |
+| `size` | number | no | — | — | — |
+| `thickness` | number | no | — | — | — |
+| `labels` | object | no | — | — | — |
+
+### Examples
+
+#### Gauge chart example (`basic`)
+
+```json
+{
+  "label": "Service health",
+  "value": 92,
+  "min": 0,
+  "max": 100
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Geographic map
+
+> A tiled geographic choropleth with a tabular data alternative.
+
+- **id:** `charts-geo-map`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render geographic map from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `data` | object | yes | — | — | — |
+| `shape` | array | no | — | — | — |
+| `labels` | object | no | — | — | — |
+| `width` | number | no | — | — | — |
+| `height` | number | no | — | — | — |
+
+### Examples
+
+#### Geographic map example (`basic`)
+
+```json
+{
+  "title": "Orders by region",
+  "description": "Regional order totals",
+  "data": {}
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Geographic point map
+
+> Geographic points positioned on a tiled map.
+
+- **id:** `charts-geo-point-map`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render geographic point map from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `points` | array | yes | — | — | — |
+| `shape` | array | no | — | — | — |
+| `labels` | object | no | — | — | — |
+| `width` | number | no | — | — | — |
+| `height` | number | no | — | — | — |
+
+### Examples
+
+#### Geographic point map example (`basic`)
+
+```json
+{
+  "title": "Locations",
+  "description": "Sample locations",
+  "points": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Heatmap
+
+> A matrix of labeled cells with an accessible data table.
+
+- **id:** `charts-heatmap`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render heatmap from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `cells` | array | yes | — | — | — |
+| `mode` | enum(light | dark) | no | — | — | — |
+| `interactive` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `width` | number | no | — | — | — |
+| `height` | number | no | — | — | — |
+| `annotations` | string | no | — | — | — |
+
+### Examples
+
+#### Heatmap example (`basic`)
+
+```json
+{
+  "title": "Weekly volume",
+  "description": "Volume by day and hour",
+  "cells": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Line chart
+
+> A categorical line chart with accessible values.
+
+- **id:** `charts-line`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render line chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `series` | array | yes | — | — | — |
+| `mode` | enum(light | dark) | no | — | — | — |
+| `renderer` | enum(svg | canvas | auto) | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `interactive` | string | no | — | — | — |
+| `fullDomain` | string | no | — | — | — |
+| `visibleDomain` | string | no | — | — | — |
+| `annotations` | string | no | — | — | — |
+
+### Examples
+
+#### Line chart example (`basic`)
+
+```json
+{
+  "title": "Weekly activity",
+  "description": "Activity by week",
+  "series": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Network graph
+
+> A node and connection graph with an accessible table.
+
+- **id:** `charts-network`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render network graph from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | no | — | — | — |
+| `nodes` | array | yes | — | — | — |
+| `links` | array | yes | — | — | — |
+| `width` | number | no | — | — | — |
+| `height` | number | no | — | — | — |
+| `labels` | object | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Network graph example (`basic`)
+
+```json
+{
+  "title": "Team dependencies",
+  "nodes": [],
+  "links": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Pie chart
+
+> A part-to-whole chart with an accessible data table.
+
+- **id:** `charts-pie`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render pie chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `data` | array | yes | — | — | — |
+| `labels` | object | yes | — | — | — |
+| `size` | number | no | — | — | — |
+| `innerRatio` | string | no | — | — | — |
+| `padAngle` | string | no | — | — | — |
+
+### Examples
+
+#### Pie chart example (`basic`)
+
+```json
+{
+  "title": "Tickets by status",
+  "description": "Ticket distribution",
+  "data": [],
+  "labels": {}
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Progress ring
+
+> A compact radial progress indicator with a data table.
+
+- **id:** `charts-progress-ring`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render progress ring from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | — | — | — |
+| `description` | string | no | — | — | — |
+| `value` | number | yes | — | — | — |
+| `max` | number | no | — | — | — |
+| `format` | object | no | — | — | — |
+| `size` | number | no | — | — | — |
+| `thickness` | number | no | — | — | — |
+| `labels` | object | no | — | — | — |
+
+### Examples
+
+#### Progress ring example (`basic`)
+
+```json
+{
+  "label": "Tasks complete",
+  "value": 8,
+  "max": 10
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Sankey chart
+
+> A weighted flow diagram with an accessible table.
+
+- **id:** `charts-sankey`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render sankey chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | no | — | — | — |
+| `nodes` | array | yes | — | — | — |
+| `links` | array | yes | — | — | — |
+| `width` | number | no | — | — | — |
+| `height` | number | no | — | — | — |
+| `labels` | object | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Sankey chart example (`basic`)
+
+```json
+{
+  "title": "Traffic sources",
+  "nodes": [],
+  "links": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Scatter chart
+
+> A quantitative scatter plot with an accessible data table.
+
+- **id:** `charts-scatter`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render scatter chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `points` | array | yes | — | — | — |
+| `series` | array | no | — | — | — |
+| `mode` | enum(light | dark) | no | — | — | — |
+| `interactive` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `width` | number | no | — | — | — |
+| `height` | number | no | — | — | — |
+| `annotations` | string | no | — | — | — |
+
+### Examples
+
+#### Scatter chart example (`basic`)
+
+```json
+{
+  "title": "Usage and reach",
+  "description": "Usage compared with reach",
+  "points": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Sparkline
+
+> A compact line, area or bar trend chart.
+
+- **id:** `charts-sparkline`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render sparkline from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `values` | array | yes | — | — | — |
+| `label` | string | yes | — | — | — |
+| `description` | string | no | — | — | — |
+| `period` | string | no | — | — | — |
+| `variant` | enum(line | area | bar) | no | — | — | — |
+| `format` | object | no | — | — | — |
+| `height` | number | no | — | — | — |
+| `showLast` | boolean | no | — | — | — |
+| `labels` | object | no | — | — | — |
+
+### Examples
+
+#### Sparkline example (`basic`)
+
+```json
+{
+  "label": "Daily active users",
+  "values": [
+    18,
+    21,
+    19,
+    26
+  ]
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Stacked bar chart
+
+> A categorical stacked bar chart with accessible values.
+
+- **id:** `charts-stacked-bar`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render stacked bar chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `series` | array | yes | — | — | — |
+| `mode` | enum(light | dark) | no | — | — | — |
+| `renderer` | enum(svg | canvas | auto) | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `interactive` | string | no | — | — | — |
+| `fullDomain` | string | no | — | — | — |
+| `visibleDomain` | string | no | — | — | — |
+| `annotations` | string | no | — | — | — |
+
+### Examples
+
+#### Stacked bar chart example (`basic`)
+
+```json
+{
+  "title": "Weekly activity",
+  "description": "Activity by week",
+  "series": []
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Sunburst chart
+
+> A hierarchical part-to-whole chart with an accessible table.
+
+- **id:** `charts-sunburst`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render sunburst chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `root` | object | yes | — | — | — |
+| `labels` | object | yes | — | — | — |
+| `size` | number | no | — | — | — |
+| `innerRatio` | string | no | — | — | — |
+| `padAngle` | string | no | — | — | — |
+
+### Examples
+
+#### Sunburst chart example (`basic`)
+
+```json
+{
+  "title": "Revenue structure",
+  "description": "Revenue by product group",
+  "root": {
+    "id": "root",
+    "value": 0
+  },
+  "labels": {}
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Treemap chart
+
+> A hierarchical part-to-whole chart with an accessible table.
+
+- **id:** `charts-treemap`
+- **package:** `@texuli/charts`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render treemap chart from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | yes | — | — | — |
+| `root` | object | yes | — | — | — |
+| `labels` | object | yes | — | — | — |
+| `width` | number | no | — | — | — |
+| `height` | number | no | — | — | — |
+| `padding` | number | no | — | — | — |
+
+### Examples
+
+#### Treemap chart example (`basic`)
+
+```json
+{
+  "title": "Revenue structure",
+  "description": "Revenue by product group",
+  "root": {
+    "id": "root",
+    "value": 0
+  },
+  "labels": {}
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Checkbox
+
+> A binary or indeterminate checkbox with optional label.
+
+- **id:** `checkbox`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Independent on/off choices
+- Select-all with indeterminate
+
+### Don't use when
+
+- A single exclusive choice in a set (use radio-group)
+- A switch-style setting (use switch)
+
+### Accessibility
+
+- Visible label is wired with for; description uses aria-describedby.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `checked` | boolean | no | — | `false` | — |
+| `defaultChecked` | boolean | no | — | `false` | — |
+| `indeterminate` | boolean | no | — | `false` | — |
+| `defaultIndeterminate` | boolean | no | — | `false` | — |
+| `name` | string | no | — | — | — |
+| `value` | string | no | — | `"on"` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `required` | boolean | no | — | `false` | — |
+| `id` | string | no | — | — | — |
+| `label` | string | no | — | — | — |
+| `description` | string | no | — | — | — |
+| `size` | enum(sm | md) | no | — | `"md"` | — |
+| `onCheckedChange` | event | no | — | — | — |
+| `onIndeterminateChange` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Labeled checkbox (`labeled`)
+
+```json
+{
+  "label": "Subscribe to updates"
+}
+```
+
+#### Indeterminate (`indeterminate`)
+
+```json
+{
+  "indeterminate": true,
+  "label": "Select all"
+}
+```
+
+### Related
+
+- [`switch`](components/switch.md)
+- [`radio-group`](components/radio-group.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Chip
+
+> A toggleable filter chip (pressed state).
+
+- **id:** `chip`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Filter toggles in a toolbar or facet list
+
+### Don't use when
+
+- Navigation (use a link)
+- A one-shot action (use button)
+
+### Accessibility
+
+- Uses aria-pressed for selection; must be a real button.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | — | — | — |
+| `variant` | enum(default | secondary | outline | success | warning | destructive | info | neutral) | no | — | `"outline"` | — |
+| `selected` | boolean | no | — | `false` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `type` | enum(button | submit | reset) | no | — | `"button"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Selected chip (`selected`)
+
+```json
+{
+  "label": "Active",
+  "selected": true
+}
+```
+
+### Related
+
+- [`badge`](components/badge.md)
+- [`tag`](components/tag.md)
+- [`button`](components/button.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Code
+
+> Inline or block code with escaped text (no HTML).
+
+- **id:** `code`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show a short code sample or token
+
+### Don't use when
+
+- A full syntax-highlighted editor
+
+### Accessibility
+
+- Text is always escaped; language is display-only metadata.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | string | no | untrusted | — | Plain source (preferred for agent/user content) |
+| `variant` | enum(inline | block) | no | — | `"inline"` | — |
+| `language` | string | no | — | — | Optional language hint |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### TypeScript block (`block-ts`)
+
+```json
+{
+  "variant": "block",
+  "language": "ts",
+  "value": "const n = 1;"
+}
+```
+
+### Related
+
+- [`kbd`](components/kbd.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Combobox
+
+> A text input that filters a list of options, for one value or several.
+
+- **id:** `combobox`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Pick from a long list by typing to filter
+- Options loaded from a server as the user types
+
+### Don't use when
+
+- A short closed list (use select or radio-group)
+- Several values shown as chips (use multi-select)
+
+### Accessibility
+
+- The input keeps focus; aria-activedescendant tracks the highlighted option
+- Arrow keys move, Enter selects, Escape closes; empty, loading and error states are announced
+- With required, a rejected form moves focus to the input
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | unknown | no | — | — | Selected value (a string, or a string array when multiple) |
+| `defaultValue` | unknown | no | — | — | Starting selection; a form reset restores it |
+| `inputValue` | string | no | — | — | Text in the input (bindable) |
+| `defaultInputValue` | string | no | — | `""` | — |
+| `items` | array | no | — | — | Options as { value, label, disabled? } |
+| `loadOptions` | unknown | no | — | — | Function prop the host passes: (query, signal) => Promise<items> for remote options. Not agent-emittable (functions are not data). |
+| `filter` | unknown | no | — | — | Function prop the host passes: (item, query) => boolean. Replaces the default match (label contains the query, ignoring case); runs on the trimmed, non-empty query; unused with loadOptions. createFoldedFilter builds an accent-insensitive one. Not agent-emittable (functions are not data). |
+| `multiple` | boolean | no | — | `false` | — |
+| `disabled` | boolean | no | — | `false` | Not interactive, not submitted, not validated |
+| `name` | string | no | — | — | Form field name: submits the value (one entry per value when multiple) |
+| `required` | boolean | no | — | `false` | Blocks form submission until a value is selected |
+| `requiredMessage` | string | no | — | — | Translated message when required blocks submission (default: the browser message) |
+| `form` | string | no | — | — | Associated form id |
+| `open` | boolean | no | — | `false` | — |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `variant` | enum(outline | soft) | no | — | `"outline"` | — |
+| `class` | string | no | — | — | — |
+| `onValueChange` | event | no | — | — | — |
+| `onInputValueChange` | event | no | — | — | — |
+| `onOpenChange` | event | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Required form field (`form-field`)
+
+```json
+{
+  "name": "city",
+  "required": true,
+  "requiredMessage": "Choose a city.",
+  "size": "md"
+}
+```
+
+### Related
+
+- [`multi-select`](components/multi-select.md)
+- [`select`](components/select.md)
+- [`field`](components/field.md)
+- [`form`](components/form.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# CommandPalette
+
+> Dialog-hosted command palette with search and recent items.
+
+- **id:** `command-palette`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- App-wide jump-to and actions (⌘K)
+
+### Don't use when
+
+- Simple select lists (use select or combobox)
+
+### Accessibility
+
+- Dialog title/description; listbox keyboard for results.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `open` | boolean | no | — | `false` | — |
+| `onOpenChange` | event | no | — | — | — |
+| `search` | unknown | no | — | — | Sync or async search function |
+| `onSelect` | event | no | — | — | — |
+| `recentItems` | array | no | — | — | — |
+| `debounceMs` | number | no | — | — | — |
+| `placeholder` | string | no | — | — | — |
+| `shortcut` | boolean | no | — | `true` | — |
+| `recentLabel` | string | no | — | — | — |
+| `title` | string | no | — | — | — |
+| `description` | string | no | — | — | — |
+| `emptyLabel` | string | no | — | — | — |
+| `recentEmptyLabel` | string | no | — | — | — |
+| `loadingLabel` | string | no | — | — | — |
+| `errorLabel` | string | no | — | — | — |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `variant` | enum(outline | soft) | no | — | `"default"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Open palette (`palette`)
+
+```json
+{
+  "open": true,
+  "title": "Command palette",
+  "placeholder": "Search…"
+}
+```
+
+### Related
+
+- [`dialog`](components/dialog.md)
+- [`dropdown-menu`](components/dropdown-menu.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# ContentLayout
+
+> Shared docs/blog/editorial reading frame with optional TOC.
+
+- **id:** `content-layout`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Long-form content with a table of contents
+
+### Don't use when
+
+- App chrome shells
+
+### Accessibility
+
+- Main landmark holds the article
+- TOC links are in-page anchors
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `kind` | enum(docs | blog | editorial) | yes | — | — | — |
+| `mountScreen` | event | yes | — | — | Host callback that mounts the stable routed screen node |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `path` | string | no | — | — | Current hash path |
+| `options` | object | no | — | — | Flat data-only layout knobs |
+| `storageKey` | string | no | — | — | Scope for persisted UI flags |
+| `aside` | slot | no | — | — | Optional context panel |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Docs (`docs`)
+
+```json
+{
+  "kind": "docs",
+  "options": {
+    "title": "Guides"
+  }
+}
+```
+
+### Related
+
+- [`layout-docs`](components/layout-docs.md)
+- [`layout-blog`](components/layout-blog.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# ContextMenu
+
+> Pointer-anchored menu (right-click, long-press, Menu key).
+
+- **id:** `context-menu`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Actions on a canvas or list row via context click
+
+### Don't use when
+
+- A visible button trigger (use dropdown-menu)
+
+### Accessibility
+
+- Opens at the pointer; keyboard Menu/Shift+F10 supported on the region.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `open` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Context region (`region`)
+
+```json
+{}
+```
+
+### Related
+
+- [`dropdown-menu`](components/dropdown-menu.md)
+- [`context-menu-trigger`](components/context-menu-trigger.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# ContextMenu.Trigger
+
+> Region that opens the context menu.
+
+- **id:** `context-menu-trigger`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Define the hit target for a context menu
+
+### Don't use when
+
+- Button menus
+
+### Accessibility
+
+- Region text names the menu; long-press suppresses iOS callout.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `disabled` | boolean | no | — | `false` | — |
+
+### Examples
+
+#### Canvas region (`canvas`)
+
+```json
+{}
+```
+
+### Related
+
+- [`context-menu`](components/context-menu.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Deck slide
+
+> One slide in a deck: a title, content blocks and speaker notes.
+
+- **id:** `deck-slide`
+- **package:** `texuli`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `layouts`
+
+### Use when
+
+- Compose deck slide structure in agent-authored trees
+
+### Don't use when
+
+- App chrome shells (sidebar, top-nav, dialogs)
+
+### Accessibility
+
+- Structure is semantic regions the host maps to real layout components
+- No HTML strings; children are nested catalog nodes
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `slideId` | string | yes | — | — | Stable slide id (lowercase letters, digits and hyphens) |
+| `title` | string | no | untrusted | — | — |
+| `notes` | string | no | untrusted | — | Plain-text speaker notes |
+| `master` | enum(title | section | content | two-column | media-left | media-right | quote | closing) | no | — | — | — |
+| `transition` | enum(none | fade | fade-up) | no | — | — | — |
+| `themeRef` | unknown | no | — | — | Overrides the deck theme for this slide |
+| `children` | slot | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Deck slide (`basic`)
+
+```json
+{
+  "slideId": "opening",
+  "title": "Opening"
+}
+```
+
+### Related
+
+- [`layout-page`](components/layout-page.md)
+- [`layout-doc`](components/layout-doc.md)
+- [`layout-grid`](components/layout-grid.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Description
+
+> Help text associated with a field control.
+
+- **id:** `description`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Short guidance under a label
+
+### Don't use when
+
+- An error message (use field-error)
+
+### Accessibility
+
+- Wire via aria-describedby from Field or the host.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Help text (`help`)
+
+```json
+{}
+```
+
+### Related
+
+- [`field`](components/field.md)
+- [`label`](components/label.md)
+- [`field-error`](components/field-error.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# DetailPanel
+
+> Non-modal detail panel alongside content.
+
+- **id:** `detail-panel`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Inspect a selected row without leaving the list
+
+### Don't use when
+
+- Full-page blocking flows (use dialog)
+
+### Accessibility
+
+- Keep a visible heading; do not trap focus unless modal.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `size` | enum(sm | md | lg | xl) | no | — | `"md"` | — |
+| `side` | enum(top | right | bottom | left | start | end | center) | no | — | `"end"` | — |
+| `dismissOutside` | boolean | no | — | `false` | Non-modal only: close on a press or focus outside (never on the trigger) |
+| `closeOnEscape` | boolean | no | — | `false` | Non-modal only: close on Escape anywhere, not just from inside |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### End panel (`end`)
+
+```json
+{
+  "side": "end"
+}
+```
+
+### Related
+
+- [`sheet`](components/sheet.md)
+- [`drawer`](components/drawer.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Dialog
+
+> Modal dialog with title, optional description, body and footer.
+
+- **id:** `dialog`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Confirm multi-step flows
+- Show focused detail without leaving the page
+
+### Don't use when
+
+- A destructive confirm that must trap attention (use alert-dialog)
+- Non-modal hints (use popover or tooltip)
+
+### Accessibility
+
+- Focus moves into the dialog and returns on close
+- Title is required; Escape dismisses unless prevented
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `open` | boolean | no | — | `false` | — |
+| `title` | string | yes | — | — | Accessible dialog title |
+| `description` | string | no | — | — | — |
+| `size` | enum(sm | md | lg | xl) | no | — | `"md"` | — |
+| `trigger` | slot | no | — | — | Trigger snippet receiving { props } |
+| `footer` | slot | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `hideClose` | boolean | no | — | `false` | — |
+| `closeLabel` | string | no | — | `"Close"` | — |
+| `onOpenChange` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Basic dialog (`basic`)
+
+```json
+{
+  "title": "Edit note",
+  "description": "Harbor Notes settings",
+  "open": true
+}
+```
+
+### Related
+
+- [`alert-dialog`](components/alert-dialog.md)
+- [`sheet`](components/sheet.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Drawer
+
+> Bottom or edge drawer with optional drag dismiss.
+
+- **id:** `drawer`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Mobile sheets that feel like drawers
+
+### Don't use when
+
+- Desktop side navigation (use sidebar)
+
+### Accessibility
+
+- Same focus model as sheet; prefer labelled titles.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `size` | enum(sm | md | lg | xl) | no | — | `"md"` | — |
+| `side` | enum(top | right | bottom | left | start | end | center) | no | — | `"bottom"` | — |
+| `dismissOutside` | boolean | no | — | `false` | Non-modal panels only; a Drawer is modal and always dismisses outside |
+| `closeOnEscape` | boolean | no | — | `false` | Non-modal panels only; a Drawer is modal and always closes on Escape |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Bottom drawer (`bottom`)
+
+```json
+{
+  "side": "bottom"
+}
+```
+
+### Related
+
+- [`sheet`](components/sheet.md)
+- [`responsive-modal`](components/responsive-modal.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# DropdownMenu
+
+> Menu button pattern with items, checkboxes, radios and submenus.
+
+- **id:** `dropdown-menu`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Actions behind a button trigger
+- Menus with keyboard typeahead
+
+### Don't use when
+
+- Top-level app menus (use menubar)
+- Pointer-anchored region menus (use context-menu)
+
+### Accessibility
+
+- APG menu button: arrow keys, typeahead, Escape closes and restores focus.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `open` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Actions menu (`actions`)
+
+```json
+{
+  "open": true
+}
+```
+
+### Related
+
+- [`context-menu`](components/context-menu.md)
+- [`menubar`](components/menubar.md)
+- [`dropdown-menu-item`](components/dropdown-menu-item.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# DropdownMenu.Content
+
+> Floating menu surface for dropdown items.
+
+- **id:** `dropdown-menu-content`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Host menu items under a dropdown trigger
+
+### Don't use when
+
+- Non-menu floating panels (use popover)
+
+### Accessibility
+
+- role=menu; labelled by the trigger.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `variant` | enum(default | soft) | no | — | `"default"` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `side` | enum(top | right | bottom | left) | no | — | `"bottom"` | — |
+| `align` | enum(start | center | end) | no | — | `"start"` | — |
+| `sideOffset` | number | no | — | `4` | — |
+
+### Examples
+
+#### Content (`panel`)
+
+```json
+{
+  "size": "md"
+}
+```
+
+### Related
+
+- [`dropdown-menu`](components/dropdown-menu.md)
+- [`dropdown-menu-item`](components/dropdown-menu-item.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# DropdownMenu.Item
+
+> Menu item with optional icon and shortcut chrome.
+
+- **id:** `dropdown-menu-item`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- A single actionable row inside a menu
+
+### Don't use when
+
+- Standalone buttons outside a menu
+
+### Accessibility
+
+- role=menuitem; shortcuts are visual only.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `disabled` | boolean | no | — | `false` | — |
+| `textValue` | string | no | — | — | Typeahead text override |
+| `onSelect` | event | no | — | — | — |
+| `closeOnSelect` | boolean | no | — | `true` | — |
+| `icon` | slot | no | — | — | — |
+| `shortcut` | string | no | — | — | Displayed keyboard hint |
+| `inset` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Item with shortcut (`with-shortcut`)
+
+```json
+{
+  "shortcut": "⌘N"
+}
+```
+
+### Related
+
+- [`dropdown-menu`](components/dropdown-menu.md)
+- [`context-menu`](components/context-menu.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# DropdownMenu.Trigger
+
+> Styled button that opens a dropdown menu.
+
+- **id:** `dropdown-menu-trigger`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Label the control that opens DropdownMenu
+
+### Don't use when
+
+- Context or menubar triggers
+
+### Accessibility
+
+- aria-haspopup=menu and aria-expanded track open state.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `variant` | enum(default | soft) | no | — | `"default"` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Trigger (`default`)
+
+```json
+{
+  "variant": "default"
+}
+```
+
+### Related
+
+- [`dropdown-menu`](components/dropdown-menu.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Empty state
+
+> Placeholder when a list or panel has nothing to show yet.
+
+- **id:** `empty-state`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- First-run or filtered-empty lists
+
+### Don't use when
+
+- A failure after a request (use error-state)
+
+### Accessibility
+
+- Title is required text; illustration is decorative (aria-hidden).
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `description` | string | no | — | — | — |
+| `illustration` | slot | no | — | — | — |
+| `action` | slot | no | — | — | — |
+| `size` | enum(sm | md) | no | — | `"md"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### No orders (`no-orders`)
+
+```json
+{
+  "title": "No orders yet",
+  "description": "Create an order to get started.",
+  "size": "md"
+}
+```
+
+### Related
+
+- [`error-state`](components/error-state.md)
+- [`table`](components/table.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Error state
+
+> Full-panel failure with optional retry.
+
+- **id:** `error-state`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- A view failed to load and the user can retry
+
+### Don't use when
+
+- A soft warning inline (use alert)
+
+### Accessibility
+
+- Uses role=alert; retry is a real button with pending support.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | no | — | `"Something went wrong"` | — |
+| `message` | string | no | — | — | — |
+| `onRetry` | event | no | — | — | — |
+| `retryLabel` | string | no | — | `"Try again"` | — |
+| `action` | slot | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Retry error (`retry`)
+
+```json
+{
+  "title": "Could not load orders",
+  "message": "Check your connection.",
+  "retryLabel": "Retry"
+}
+```
+
+### Related
+
+- [`empty-state`](components/empty-state.md)
+- [`alert`](components/alert.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Field
+
+> Label, description and error wiring for a single control.
+
+- **id:** `field`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Compose a labeled control with optional help and error text
+
+### Don't use when
+
+- Standalone chrome without a form control
+
+### Accessibility
+
+- Generates id and aria-describedby for the control snippet
+- Marks aria-invalid when error is present
+- hideLabel keeps the label available to assistive tech
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | — | — | — |
+| `description` | string | no | — | — | — |
+| `error` | string | no | — | — | Error message; marks the control invalid |
+| `required` | boolean | no | — | `false` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `id` | string | no | — | — | — |
+| `hideLabel` | boolean | no | — | `false` | — |
+| `orientation` | enum(vertical | horizontal) | no | — | `"vertical"` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | yes | — | — | Control snippet receiving FieldControl |
+
+### Examples
+
+#### Vertical field (`vertical`)
+
+```json
+{
+  "label": "Email",
+  "description": "Work address",
+  "required": true
+}
+```
+
+### Related
+
+- [`label`](components/label.md)
+- [`description`](components/description.md)
+- [`field-error`](components/field-error.md)
+- [`form`](components/form.md)
+- [`input`](components/input.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# FieldError
+
+> An alert-role error message for a field.
+
+- **id:** `field-error`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Surface a validation error next to a control
+
+### Don't use when
+
+- Help text that is not an error (use description)
+
+### Accessibility
+
+- role=alert; show=false renders nothing while the host keeps aria wiring.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `show` | boolean | no | — | `true` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Error message (`message`)
+
+```json
+{
+  "show": true
+}
+```
+
+### Related
+
+- [`field`](components/field.md)
+- [`form`](components/form.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Form
+
+> A form shell with layout, validation hook and error map.
+
+- **id:** `form`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Collect and validate a set of fields before submit
+
+### Don't use when
+
+- A single control with no submit (use field alone)
+
+### Accessibility
+
+- Native constraint validation runs unless noValidate is set
+- Field errors map back onto controls after onValidate
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `layout` | enum(stack | grid) | no | — | `"stack"` | — |
+| `noValidate` | boolean | no | — | `false` | — |
+| `onValidate` | event | no | — | — | Return a field→message map (or Promise) to block submit |
+| `onSubmitValues` | event | no | — | — | Called after validation succeeds with FormData values |
+| `errors` | object | no | — | — | Controlled field→message map (bind:errors) |
+| `onErrorsChange` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `formError` | slot | no | — | — | Form-level error snippet (e.g. _form message) |
+
+### Examples
+
+#### Stacked form (`stack`)
+
+```json
+{
+  "layout": "stack"
+}
+```
+
+### Related
+
+- [`field`](components/field.md)
+- [`button`](components/button.md)
+- [`input`](components/input.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# HoverCard
+
+> Preview panel that opens on hover or focus.
+
+- **id:** `hover-card`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Rich previews without a click
+
+### Don't use when
+
+- Required interactions (use popover or dialog)
+
+### Accessibility
+
+- Opens on focus as well as hover; dismissible.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `open` | boolean | no | — | `false` | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Preview (`preview`)
+
+```json
+{}
+```
+
+### Related
+
+- [`popover`](components/popover.md)
+- [`tooltip`](components/tooltip.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# HoverCard.Content
+
+> Styled hover-card surface.
+
+- **id:** `hover-card-content`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Body of a hover card
+
+### Don't use when
+
+- Click-toggled panels (use popover-content)
+
+### Accessibility
+
+- Same surface tokens as popover for contrast.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | enum(elevated | flat) | no | — | `"elevated"` | — |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `arrow` | boolean | no | — | `true` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Content (`body`)
+
+```json
+{}
+```
+
+### Related
+
+- [`hover-card`](components/hover-card.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# IconButton
+
+> An icon-only button that requires an accessible name.
+
+- **id:** `icon-button`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Toolbar and dense chrome actions that are icon-only
+
+### Don't use when
+
+- Actions with a visible text label (use button)
+
+### Accessibility
+
+- label is required and becomes aria-label on the control.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | — | — | Accessible name |
+| `variant` | enum(default | secondary | outline | ghost | destructive | link) | no | — | `"ghost"` | — |
+| `href` | string | no | developer | — | — |
+| `loading` | boolean | no | — | `false` | — |
+| `autoLoading` | boolean | no | — | `true` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | Icon content |
+
+### Examples
+
+#### Close icon button (`close`)
+
+```json
+{
+  "label": "Close"
+}
+```
+
+### Related
+
+- [`button`](components/button.md)
+- [`button-group`](components/button-group.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Inline text
+
+> A plain text run for the slot of a slot-only component (button, label, badge).
+
+- **id:** `inline-text`
+- **package:** `@texuli/catalog`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Give a form label, description, field error or menu trigger its visible text
+- Text for a button, badge or kbd when the tree prefers a child to the label prop
+- Any slot that needs a short phrase rather than a block
+
+### Don't use when
+
+- A paragraph, heading or list (use blocks-text)
+- Text that needs formatting or links (use blocks-text)
+- A component that already has a label or title prop (set that prop)
+
+### Accessibility
+
+- Painted as one escaped text node, so it names the parent control (a button label)
+- A leaf: children are dropped
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `text` | string | yes | — | — | Plain text; the renderer refuses markup-like strings |
+
+### Examples
+
+#### Button label (`button-label`)
+
+```json
+{
+  "text": "Save changes"
+}
+```
+
+#### Badge word (`badge-word`)
+
+```json
+{
+  "text": "Shipped"
+}
+```
+
+### Related
+
+- [`button`](components/button.md)
+- [`label`](components/label.md)
+- [`badge`](components/badge.md)
+- [`kbd`](components/kbd.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Input
+
+> A single-line text (or file) control with optional clear.
+
+- **id:** `input`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Short free-text fields
+- Native file selection
+
+### Don't use when
+
+- Multi-line text (use textarea)
+- A labeled field with description and error (wrap in field)
+
+### Accessibility
+
+- Pair with Field or an external label via id/for
+- Clear control has an accessible name when clearable
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `type` | string | no | — | `"text"` | Native input type |
+| `value` | string | no | — | — | Controlled value (bind:value) |
+| `files` | unknown | no | — | — | FileList when type=file (bind:files) |
+| `ref` | unknown | no | — | — | Element ref for the native input |
+| `clearable` | boolean | no | — | `false` | — |
+| `clearLabel` | string | no | — | `"Clear"` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `readonly` | boolean | no | — | `false` | — |
+| `onValueChange` | event | no | — | — | — |
+| `onClear` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Text input (`text`)
+
+```json
+{
+  "type": "text",
+  "clearable": true
+}
+```
+
+#### Email input (`email`)
+
+```json
+{
+  "type": "email"
+}
+```
+
+### Related
+
+- [`input-group`](components/input-group.md)
+- [`textarea`](components/textarea.md)
+- [`field`](components/field.md)
+- [`text-counter`](components/text-counter.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# InputGroup
+
+> An input with start/end adornments and optional clear.
+
+- **id:** `input-group`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Inputs with a unit, icon or trailing action
+
+### Don't use when
+
+- A bare input with no adornment (use input)
+
+### Accessibility
+
+- Invalid state marks the control aria-invalid; clear has an accessible name.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `start` | slot | no | — | — | Start adornment |
+| `end` | slot | no | — | — | End adornment |
+| `inputProps` | object | no | — | — | Native attributes for the inner input |
+| `value` | string | no | — | — | — |
+| `ref` | unknown | no | — | — | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `readonly` | boolean | no | — | `false` | — |
+| `invalid` | boolean | no | — | `false` | — |
+| `clearable` | boolean | no | — | `false` | — |
+| `clearLabel` | string | no | — | `"Clear"` | — |
+| `onValueChange` | event | no | — | — | — |
+| `onClear` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Search group (`search`)
+
+```json
+{
+  "clearable": true
+}
+```
+
+### Related
+
+- [`input`](components/input.md)
+- [`field`](components/field.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Kbd
+
+> Inline keyboard key affordance.
+
+- **id:** `kbd`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Document a shortcut next to a control
+
+### Don't use when
+
+- Multi-line code (use code with variant block)
+
+### Accessibility
+
+- Rendered as a real kbd element; text is escaped.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | no | — | — | Plain-text key name, escaped; replaces children when both are given |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The key name (an inline-text node in a tree) |
+
+### Examples
+
+#### Save shortcut (`save`)
+
+```json
+{}
+```
+
+#### Labelled key (`labelled`)
+
+```json
+{
+  "label": "Ctrl"
+}
+```
+
+### Related
+
+- [`code`](components/code.md)
+- [`inline-text`](components/inline-text.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# KPI
+
+> A formatted metric with unit, previous-period delta and optional link.
+
+- **id:** `kpi`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show a numeric KPI with unit formatting and comparison
+
+### Don't use when
+
+- A free-form already-formatted string (use stat)
+
+### Accessibility
+
+- Loading and empty states are announced; linked tiles use real anchors after URL policy.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | — | — | — |
+| `value` | number | no | — | — | Current numeric value (nullable) |
+| `unit` | enum(number | compact | cents | percent) | no | — | `"number"` | — |
+| `currency` | string | no | — | — | ISO currency when unit is cents |
+| `previous` | number | no | — | — | — |
+| `comparisonLabel` | string | no | — | — | — |
+| `positive` | enum(up | down) | no | — | `"up"` | — |
+| `sparkline` | slot | no | — | — | — |
+| `href` | string | no | developer | — | — |
+| `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
+| `loading` | boolean | no | — | `false` | — |
+| `empty` | unknown | no | — | — | true or empty message string |
+| `variant` | enum(elevated | flat) | no | — | `"elevated"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Orders KPI (`orders`)
+
+```json
+{
+  "label": "Orders",
+  "value": 1280,
+  "unit": "compact",
+  "previous": 1100,
+  "comparisonLabel": "vs last week"
+}
+```
+
+### Related
+
+- [`stat`](components/stat.md)
+- [`card`](components/card.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Label
+
+> A form label with optional required marker and sr-only mode.
+
+- **id:** `label`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Label a control outside Field
+
+### Don't use when
+
+- A full field stack (use field)
+
+### Accessibility
+
+- srOnly keeps the label for assistive tech while hiding it visually.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `required` | boolean | no | — | `false` | — |
+| `size` | enum(sm | md) | no | — | `"md"` | — |
+| `srOnly` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The label text (an inline-text node in a tree) |
+
+### Examples
+
+#### Required label (`required`)
+
+```json
+{
+  "required": true
+}
+```
+
+### Related
+
+- [`field`](components/field.md)
+- [`description`](components/description.md)
+- [`inline-text`](components/inline-text.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Auth split layout
+
+> Sign-in form column plus brand panel.
+
+- **id:** `layout-auth-split`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Sign-in and account entry pages
+
+### Don't use when
+
+- Post-auth app chrome
+
+### Accessibility
+
+- Form and brand panels are labelled
+- Brand copy is author-provided
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `form` | slot | no | — | — | — |
+| `mountScreen` | event | no | — | — | — |
+| `brand` | slot | no | — | — | — |
+| `panel` | slot | no | — | — | — |
+| `brandTitle` | string | no | — | — | — |
+| `brandDescription` | string | no | — | — | — |
+| `brandEyebrow` | string | no | — | — | — |
+| `formLabel` | string | no | — | — | — |
+| `panelLabel` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Sign in (`sign-in`)
+
+```json
+{
+  "brandTitle": "Harbor",
+  "formLabel": "Sign in"
+}
+```
+
+### Related
+
+- [`layout-wizard`](components/layout-wizard.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Blog layout
+
+> Blog/post reading layout (content-layout kind blog).
+
+- **id:** `layout-blog`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Blog posts and field notes
+
+### Don't use when
+
+- Settings shells
+
+### Accessibility
+
+- Skip link targets main when chrome is present
+- Primary navigation is a labelled landmark
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `mountScreen` | event | yes | — | — | Host callback that mounts the stable routed screen node |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `path` | string | no | — | — | Current hash path |
+| `options` | object | no | — | — | Flat data-only layout knobs |
+| `storageKey` | string | no | — | — | Scope for persisted UI flags |
+| `aside` | slot | no | — | — | Optional context panel |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Blog layout (`default`)
+
+```json
+{
+  "options": {
+    "title": "Field notes",
+    "author": "Ada Example"
+  }
+}
+```
+
+### Related
+
+- [`layout-host`](components/layout-host.md)
+- [`layout-chrome`](components/layout-chrome.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Card layout
+
+> Content card frame for grouped agent-authored blocks.
+
+- **id:** `layout-card`
+- **package:** `texuli`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `layouts`
+
+### Use when
+
+- Compose card layout structure in agent-authored trees
+
+### Don't use when
+
+- App chrome shells (sidebar, top-nav, dialogs)
+
+### Accessibility
+
+- Structure is semantic regions the host maps to real layout components
+- No HTML strings; children are nested catalog nodes
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | no | untrusted | — | — |
+| `children` | slot | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Card layout (`basic`)
+
+```json
+{
+  "title": "Summary"
+}
+```
+
+### Related
+
+- [`layout-page`](components/layout-page.md)
+- [`layout-doc`](components/layout-doc.md)
+- [`layout-grid`](components/layout-grid.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# LayoutChrome
+
+> Shared brand, actions, user and skip-link chrome for desktop layouts.
+
+- **id:** `layout-chrome`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Layout frames that share brand and user chrome
+
+### Don't use when
+
+- Standalone navigation without a layout host
+
+### Accessibility
+
+- Skip link targets the main region
+- Every href passes the URL policy
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `part` | enum(skip | brand | actions | user) | yes | — | — | — |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `mainId` | string | no | — | — | Main region id for the skip link |
+| `compact` | boolean | no | — | `false` | — |
+| `hrefTrust` | enum(developer | untrusted) | no | developer | `"developer"` | — |
+| `skipLabel` | string | no | — | `"Skip to content"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Brand chrome (`brand`)
+
+```json
+{
+  "part": "brand"
+}
+```
+
+### Related
+
+- [`layout-host`](components/layout-host.md)
+- [`nav-icon`](components/nav-icon.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Dashboard grid layout
+
+> Top chrome plus container-query widget grid.
+
+- **id:** `layout-dashboard-grid`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Analytics and operations dashboards
+
+### Don't use when
+
+- Long-form reading
+
+### Accessibility
+
+- Skip link targets main when chrome is present
+- Primary navigation is a labelled landmark
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `mountScreen` | event | yes | — | — | Host callback that mounts the stable routed screen node |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `path` | string | no | — | — | Current hash path |
+| `options` | object | no | — | — | Flat data-only layout knobs |
+| `storageKey` | string | no | — | — | Scope for persisted UI flags |
+| `aside` | slot | no | — | — | Optional context panel |
+| `class` | string | no | — | — | — |
+| `hrefTrust` | enum(developer | untrusted) | no | developer | `"developer"` | — |
+
+### Examples
+
+#### Dashboard grid layout (`default`)
+
+```json
+{
+  "options": {
+    "title": "Overview",
+    "dense": false
+  }
+}
+```
+
+### Related
+
+- [`layout-host`](components/layout-host.md)
+- [`layout-chrome`](components/layout-chrome.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Deck layout
+
+> Slide deck frame for sequenced content.
+
+- **id:** `layout-deck`
+- **package:** `texuli`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `layouts`
+
+### Use when
+
+- Compose deck layout structure in agent-authored trees
+
+### Don't use when
+
+- App chrome shells (sidebar, top-nav, dialogs)
+
+### Accessibility
+
+- Structure is semantic regions the host maps to real layout components
+- No HTML strings; children are nested catalog nodes
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | no | untrusted | — | — |
+| `description` | string | no | untrusted | — | — |
+| `locale` | string | no | — | — | Language tag such as en or en-GB |
+| `aspect` | enum(16:9 | 4:3 | 1:1) | no | — | `"16:9"` | — |
+| `themeRef` | unknown | no | — | — | Catalog theme id, or a catalog or embedded theme reference object |
+| `masters` | array | no | — | — | Built-in slide master ids the slides may use |
+| `settings` | object | no | — | — | startIndex, loop, showProgress and defaultTransition |
+| `slides` | array | no | — | — | Structured slide objects (@texuli/slides grammar); prefer deck-slide children |
+| `children` | slot | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Deck layout (`basic`)
+
+```json
+{
+  "title": "Pitch",
+  "aspect": "16:9"
+}
+```
+
+### Related
+
+- [`layout-page`](components/layout-page.md)
+- [`layout-doc`](components/layout-doc.md)
+- [`layout-grid`](components/layout-grid.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Doc layout
+
+> Document frame with optional table of contents.
+
+- **id:** `layout-doc`
+- **package:** `texuli`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `layouts`
+
+### Use when
+
+- Compose doc layout structure in agent-authored trees
+
+### Don't use when
+
+- App chrome shells (sidebar, top-nav, dialogs)
+
+### Accessibility
+
+- Structure is semantic regions the host maps to real layout components
+- No HTML strings; children are nested catalog nodes
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | no | untrusted | — | — |
+| `toc` | boolean | no | — | `true` | — |
+| `children` | slot | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Doc layout (`basic`)
+
+```json
+{
+  "title": "Guide",
+  "toc": true
+}
+```
+
+### Related
+
+- [`layout-page`](components/layout-page.md)
+- [`layout-grid`](components/layout-grid.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Docs layout
+
+> Documentation reading layout (content-layout kind docs).
+
+- **id:** `layout-docs`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Product docs and guides
+
+### Don't use when
+
+- App dashboards
+
+### Accessibility
+
+- Skip link targets main when chrome is present
+- Primary navigation is a labelled landmark
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `mountScreen` | event | yes | — | — | Host callback that mounts the stable routed screen node |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `path` | string | no | — | — | Current hash path |
+| `options` | object | no | — | — | Flat data-only layout knobs |
+| `storageKey` | string | no | — | — | Scope for persisted UI flags |
+| `aside` | slot | no | — | — | Optional context panel |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Docs layout (`default`)
+
+```json
+{
+  "options": {
+    "title": "Guides"
+  }
+}
+```
+
+### Related
+
+- [`layout-host`](components/layout-host.md)
+- [`layout-chrome`](components/layout-chrome.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# LayoutDrawer
+
+> Mobile navigation drawer built on the dialog primitive.
+
+- **id:** `layout-drawer`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Narrow layouts that hide primary nav behind a menu
+
+### Don't use when
+
+- Desktop-only sidebars
+
+### Accessibility
+
+- Drawer is a labelled dialog
+- Close control is named
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `open` | boolean | no | — | `false` | — |
+| `label` | string | yes | — | — | Accessible drawer name |
+| `closeLabel` | string | no | — | `"Close navigation"` | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Open drawer (`open`)
+
+```json
+{
+  "open": true,
+  "label": "Navigation"
+}
+```
+
+### Related
+
+- [`layout-sidebar`](components/layout-sidebar.md)
+- [`dialog`](components/dialog.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Dual sidebar layout
+
+> Primary nav plus optional context aside.
+
+- **id:** `layout-dual-sidebar`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Tools that need nav and a context rail
+
+### Don't use when
+
+- Single-column reading layouts
+
+### Accessibility
+
+- Skip link targets main when chrome is present
+- Primary navigation is a labelled landmark
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `mountScreen` | event | yes | — | — | Host callback that mounts the stable routed screen node |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `path` | string | no | — | — | Current hash path |
+| `options` | object | no | — | — | Flat data-only layout knobs |
+| `storageKey` | string | no | — | — | Scope for persisted UI flags |
+| `aside` | slot | no | — | — | Optional context panel |
+| `class` | string | no | — | — | — |
+| `skipLabel` | string | no | — | — | — |
+| `menuLabel` | string | no | — | — | — |
+| `closeLabel` | string | no | — | — | — |
+
+### Examples
+
+#### Dual sidebar layout (`default`)
+
+```json
+{}
+```
+
+### Related
+
+- [`layout-host`](components/layout-host.md)
+- [`layout-chrome`](components/layout-chrome.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Editorial layout
+
+> Long-read editorial layout (content-layout kind editorial).
+
+- **id:** `layout-editorial`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Magazine-style long reads
+
+### Don't use when
+
+- Dense data grids
+
+### Accessibility
+
+- Skip link targets main when chrome is present
+- Primary navigation is a labelled landmark
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `mountScreen` | event | yes | — | — | Host callback that mounts the stable routed screen node |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `path` | string | no | — | — | Current hash path |
+| `options` | object | no | — | — | Flat data-only layout knobs |
+| `storageKey` | string | no | — | — | Scope for persisted UI flags |
+| `aside` | slot | no | — | — | Optional context panel |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Editorial layout (`default`)
+
+```json
+{
+  "options": {
+    "title": "The long read"
+  }
+}
+```
+
+### Related
+
+- [`layout-host`](components/layout-host.md)
+- [`layout-chrome`](components/layout-chrome.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Grid layout
+
+> Responsive content grid for agent-authored tiles.
+
+- **id:** `layout-grid`
+- **package:** `texuli`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `layouts`
+
+### Use when
+
+- Compose grid layout structure in agent-authored trees
+
+### Don't use when
+
+- App chrome shells (sidebar, top-nav, dialogs)
+
+### Accessibility
+
+- Structure is semantic regions the host maps to real layout components
+- No HTML strings; children are nested catalog nodes
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `columns` | number | no | — | `2` | — |
+| `gap` | string | no | — | `"1rem"` | — |
+| `children` | slot | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Grid layout (`basic`)
+
+```json
+{
+  "columns": 2,
+  "gap": "1rem"
+}
+```
+
+### Related
+
+- [`layout-page`](components/layout-page.md)
+- [`layout-doc`](components/layout-doc.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# LayoutHost
+
+> Resolves a layout id, applies width fallbacks, and keeps one stable screen outlet.
+
+- **id:** `layout-host`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Apps that switch between shared layouts without remounting the screen
+
+### Don't use when
+
+- A single fixed page frame with no layout catalog
+
+### Accessibility
+
+- Loading state is named for assistive tech
+- Screen outlet stays stable across layout switches
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `layout` | enum(sidebar | rail | top-nav | dual-sidebar | master-detail | dashboard-grid | docs | blog | editorial | marketing | mobile-tabs | mobile-drawer | wizard | auth-split | custom) | yes | — | — | Layout catalog id |
+| `children` | slot | yes | — | — | Screen content |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `path` | string | no | — | — | Current hash path |
+| `options` | object | no | — | — | Flat data-only layout knobs |
+| `storageKey` | string | no | — | — | Scope for persisted UI flags |
+| `aside` | slot | no | — | — | Optional context panel |
+| `dir` | enum(ltr | rtl) | no | — | — | Document direction |
+| `loadingLabel` | string | no | — | `"Loading layout"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Sidebar host (`sidebar`)
+
+```json
+{
+  "layout": "sidebar"
+}
+```
+
+### Related
+
+- [`layout-sidebar`](components/layout-sidebar.md)
+- [`layout-chrome`](components/layout-chrome.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Landing layout
+
+> Standalone marketing landing composition.
+
+- **id:** `layout-landing`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Static landing pages without LayoutHost
+
+### Don't use when
+
+- Routed app shells
+
+### Accessibility
+
+- Author-provided landmarks; no default product copy.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `brand` | slot | no | — | — | — |
+| `navigation` | slot | no | — | — | — |
+| `actions` | slot | no | — | — | — |
+| `hero` | slot | no | — | — | — |
+| `sections` | slot | no | — | — | — |
+| `footer` | slot | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Landing (`basic`)
+
+```json
+{}
+```
+
+### Related
+
+- [`layout-marketing`](components/layout-marketing.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Marketing layout
+
+> Marketing page frame with hero, sections and footer slots.
+
+- **id:** `layout-marketing`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Landing and product marketing pages
+
+### Don't use when
+
+- Authenticated app chrome
+
+### Accessibility
+
+- Hero and content regions can be labelled
+- Navigation is a landmark
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `mountScreen` | event | no | — | — | Optional LayoutHost screen mount |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `path` | string | no | — | — | Current hash path |
+| `options` | object | no | — | — | Flat data-only layout knobs |
+| `storageKey` | string | no | — | — | Scope for persisted UI flags |
+| `aside` | slot | no | — | — | Optional context panel |
+| `brand` | slot | no | — | — | — |
+| `navigation` | slot | no | — | — | — |
+| `actions` | slot | no | — | — | — |
+| `hero` | slot | no | — | — | — |
+| `sections` | slot | no | — | — | — |
+| `footer` | slot | no | — | — | — |
+| `navigationLabel` | string | no | — | — | — |
+| `heroLabel` | string | no | — | — | — |
+| `contentLabel` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Marketing (`landing`)
+
+```json
+{}
+```
+
+### Related
+
+- [`layout-landing`](components/layout-landing.md)
+- [`layout-pricing`](components/layout-pricing.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Page layout
+
+> Full page content frame for agent-authored documents.
+
+- **id:** `layout-page`
+- **package:** `texuli`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `layouts`
+
+### Use when
+
+- Compose page layout structure in agent-authored trees
+
+### Don't use when
+
+- App chrome shells (sidebar, top-nav, dialogs)
+
+### Accessibility
+
+- Structure is semantic regions the host maps to real layout components
+- No HTML strings; children are nested catalog nodes
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | no | untrusted | — | — |
+| `description` | string | no | untrusted | — | — |
+| `children` | slot | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Page layout (`basic`)
+
+```json
+{
+  "title": "Overview",
+  "description": "Quarterly update"
+}
+```
+
+### Related
+
+- [`layout-doc`](components/layout-doc.md)
+- [`layout-grid`](components/layout-grid.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Pricing layout
+
+> Pricing plans grid with title and footnote.
+
+- **id:** `layout-pricing`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Pricing tables on marketing pages
+
+### Don't use when
+
+- In-app billing settings (use settings layout)
+
+### Accessibility
+
+- Plans are a list of cards; title names the section.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | no | — | — | — |
+| `description` | string | no | — | — | — |
+| `plans` | array | no | — | — | Plan cards data |
+| `footnote` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Three plans (`plans`)
+
+```json
+{
+  "title": "Plans",
+  "plans": [
+    {
+      "id": "free",
+      "name": "Free"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`layout-marketing`](components/layout-marketing.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Settings layout
+
+> Settings section list plus detail pane.
+
+- **id:** `layout-settings`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Account and workspace settings
+
+### Don't use when
+
+- Primary app navigation
+
+### Accessibility
+
+- Section list is labelled
+- Phone back control is named
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | no | — | `"Settings"` | — |
+| `description` | string | no | — | — | — |
+| `sections` | array | yes | — | — | — |
+| `active` | string | no | — | — | — |
+| `onSelect` | event | no | — | — | — |
+| `startWithList` | boolean | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `mountScreen` | event | no | — | — | — |
+| `navLabel` | string | no | — | — | — |
+| `backLabel` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Account settings (`account`)
+
+```json
+{
+  "sections": [
+    {
+      "id": "profile",
+      "label": "Profile"
+    }
+  ],
+  "active": "profile"
+}
+```
+
+### Related
+
+- [`layout-wizard`](components/layout-wizard.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Sidebar layout
+
+> App sidebar column with responsive drawer fallback.
+
+- **id:** `layout-sidebar`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Desktop apps with persistent primary navigation
+
+### Don't use when
+
+- Marketing landing pages
+
+### Accessibility
+
+- Skip link targets main when chrome is present
+- Primary navigation is a labelled landmark
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `mountScreen` | event | yes | — | — | Host callback that mounts the stable routed screen node |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `path` | string | no | — | — | Current hash path |
+| `options` | object | no | — | — | Flat data-only layout knobs |
+| `storageKey` | string | no | — | — | Scope for persisted UI flags |
+| `aside` | slot | no | — | — | Optional context panel |
+| `class` | string | no | — | — | — |
+| `skipLabel` | string | no | — | — | — |
+| `menuLabel` | string | no | — | — | — |
+| `closeLabel` | string | no | — | — | — |
+
+### Examples
+
+#### Sidebar layout (`default`)
+
+```json
+{}
+```
+
+### Related
+
+- [`layout-host`](components/layout-host.md)
+- [`layout-chrome`](components/layout-chrome.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Top navigation layout
+
+> Horizontal top navigation with optional mobile menu.
+
+- **id:** `layout-top-nav`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Product shells with a top bar
+
+### Don't use when
+
+- Dense multi-section sidebars
+
+### Accessibility
+
+- Skip link targets main when chrome is present
+- Primary navigation is a labelled landmark
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `mountScreen` | event | yes | — | — | Host callback that mounts the stable routed screen node |
+| `nav` | object | no | — | — | NavModel for chrome links |
+| `path` | string | no | — | — | Current hash path |
+| `options` | object | no | — | — | Flat data-only layout knobs |
+| `storageKey` | string | no | — | — | Scope for persisted UI flags |
+| `aside` | slot | no | — | — | Optional context panel |
+| `class` | string | no | — | — | — |
+| `skipLabel` | string | no | — | — | — |
+| `menuLabel` | string | no | — | — | — |
+| `closeLabel` | string | no | — | — | — |
+
+### Examples
+
+#### Top navigation layout (`default`)
+
+```json
+{}
+```
+
+### Related
+
+- [`layout-host`](components/layout-host.md)
+- [`layout-chrome`](components/layout-chrome.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Wizard layout
+
+> Centered onboarding wizard frame with steps.
+
+- **id:** `layout-wizard`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Multi-step setup and onboarding
+
+### Don't use when
+
+- Single-page forms
+
+### Accessibility
+
+- Steps expose current position
+- Back and next controls are named
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `steps` | array | no | — | — | — |
+| `content` | slot | no | — | — | — |
+| `mountScreen` | event | no | — | — | — |
+| `current` | number | no | — | `0` | — |
+| `title` | string | no | — | — | — |
+| `description` | string | no | — | — | — |
+| `canAdvance` | event | no | — | — | — |
+| `validate` | event | no | — | — | — |
+| `onFinish` | event | no | — | — | — |
+| `onStepChange` | event | no | — | — | — |
+| `backLabel` | string | no | — | — | — |
+| `nextLabel` | string | no | — | — | — |
+| `finishLabel` | string | no | — | — | — |
+| `secondaryActions` | slot | no | — | — | — |
+| `brand` | slot | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Onboarding (`onboarding`)
+
+```json
+{
+  "title": "Welcome",
+  "steps": [
+    {
+      "id": "profile",
+      "label": "Profile"
+    }
+  ],
+  "current": 0
+}
+```
+
+### Related
+
+- [`layout-auth-split`](components/layout-auth-split.md)
+- [`layout-settings`](components/layout-settings.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Canvas composition
+
+> A validated layered composition rendered to a canvas.
+
+- **id:** `media-composition-canvas`
+- **package:** `@texuli/media`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render canvas composition from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `composition` | object | yes | — | — | — |
+| `trust` | enum(developer | untrusted) | no | — | — | — |
+| `label` | string | no | — | — | — |
+| `labels` | object | no | — | — | — |
+| `pixelRatio` | number | no | — | — | — |
+| `dir` | enum(ltr | rtl) | no | — | — | — |
+| `fontFamily` | string | no | — | — | — |
+| `background` | string | no | — | — | — |
+| `loadImage` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+| `onrender` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+
+### Examples
+
+#### Canvas composition example (`basic`)
+
+```json
+{
+  "composition": {
+    "width": 320,
+    "height": 180,
+    "layers": []
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# SVG composition
+
+> A validated, structured vector composition.
+
+- **id:** `media-composition-svg`
+- **package:** `@texuli/media`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render svg composition from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `composition` | object | yes | — | — | — |
+| `trust` | enum(developer | untrusted) | no | — | — | — |
+| `title` | string | no | — | — | — |
+| `description` | string | no | — | — | — |
+| `validate` | boolean | no | — | — | — |
+| `focusable` | boolean | no | — | — | — |
+| `className` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### SVG composition example (`basic`)
+
+```json
+{
+  "composition": {
+    "width": 320,
+    "height": 180,
+    "layers": []
+  }
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Responsive image
+
+> A responsive image with URL validation, loading states and actions.
+
+- **id:** `media-image`
+- **package:** `@texuli/media`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `content`
+
+### Use when
+
+- Render responsive image from structured content data.
+
+### Don't use when
+
+- Application navigation, account controls or mutations.
+
+### Accessibility
+
+- Provide the required accessible title, description or text alternatives.
+- Keep data available in the component-provided text or table alternative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `src` | string | yes | untrusted | — | URL input is checked by the package URL policy. |
+| `srcset` | string | no | — | — | — |
+| `sizes` | string | no | — | — | — |
+| `widths` | array | no | — | — | — |
+| `loader` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+| `alt` | string | yes | — | — | — |
+| `width` | number | no | — | — | — |
+| `height` | number | no | — | — | — |
+| `fit` | enum(cover | contain | fill | none | scale-down) | no | — | — | — |
+| `focalPoint` | object | no | — | — | — |
+| `placeholder` | object | no | — | — | — |
+| `loading` | enum(eager | lazy) | no | — | — | — |
+| `fetchPriority` | enum(high | low | auto) | no | — | — | — |
+| `trust` | enum(developer | untrusted) | no | — | — | — |
+| `href` | string | no | untrusted | — | URL input is checked by the package URL policy. |
+| `onactivate` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+| `actionLabel` | string | no | — | — | — |
+| `labels` | object | no | — | — | — |
+| `onload` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+| `onerror` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+| `onstatus` | event | no | — | — | Host-provided callback; omit when no host behavior is needed. |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Responsive image example (`basic`)
+
+```json
+{
+  "src": "images/team.webp",
+  "alt": "A team planning together"
+}
+```
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Menubar
+
+> Application menubar with roving top-level items.
+
+- **id:** `menubar`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Desktop-style File/Edit/View bars
+
+### Don't use when
+
+- A single actions button (use dropdown-menu)
+
+### Accessibility
+
+- role=menubar; one Tab stop; arrows move between menus.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | string | no | — | — | Open menu value or empty |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `loop` | boolean | no | — | `true` | — |
+| `dir` | enum(ltr | rtl) | no | — | — | — |
+
+### Examples
+
+#### Application bar (`app`)
+
+```json
+{
+  "value": "file"
+}
+```
+
+### Related
+
+- [`menubar-trigger`](components/menubar-trigger.md)
+- [`dropdown-menu`](components/dropdown-menu.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Menubar.Trigger
+
+> Top-level menubar item that opens a menu.
+
+- **id:** `menubar-trigger`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Label a menubar menu
+
+### Don't use when
+
+- Dropdown button triggers
+
+### Accessibility
+
+- role=menuitem with aria-haspopup=menu.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `variant` | enum(default | soft) | no | — | `"default"` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `disabled` | boolean | no | — | `false` | — |
+
+### Examples
+
+#### File (`file`)
+
+```json
+{}
+```
+
+### Related
+
+- [`menubar`](components/menubar.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# MultiSelect
+
+> A combobox for several values, shown as removable chips.
+
+- **id:** `multi-select`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Choose several values from a long list by typing
+
+### Don't use when
+
+- One value (use combobox or select)
+- A few independent options (use checkbox)
+
+### Accessibility
+
+- Chips can be removed with their button or Backspace from an empty input
+- Submits one form entry per selected value
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | unknown | no | — | — | Selected value (a string, or a string array when multiple) |
+| `defaultValue` | unknown | no | — | — | Starting selection; a form reset restores it |
+| `inputValue` | string | no | — | — | Text in the input (bindable) |
+| `defaultInputValue` | string | no | — | `""` | — |
+| `items` | array | no | — | — | Options as { value, label, disabled? } |
+| `loadOptions` | unknown | no | — | — | Function prop the host passes: (query, signal) => Promise<items> for remote options. Not agent-emittable (functions are not data). |
+| `filter` | unknown | no | — | — | Function prop the host passes: (item, query) => boolean. Replaces the default match (label contains the query, ignoring case); runs on the trimmed, non-empty query; unused with loadOptions. createFoldedFilter builds an accent-insensitive one. Not agent-emittable (functions are not data). |
+| `disabled` | boolean | no | — | `false` | Not interactive, not submitted, not validated |
+| `name` | string | no | — | — | Form field name: submits the value (one entry per value when multiple) |
+| `required` | boolean | no | — | `false` | Blocks form submission until a value is selected |
+| `requiredMessage` | string | no | — | — | Translated message when required blocks submission (default: the browser message) |
+| `form` | string | no | — | — | Associated form id |
+| `open` | boolean | no | — | `false` | — |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `variant` | enum(outline | soft) | no | — | `"outline"` | — |
+| `class` | string | no | — | — | — |
+| `onValueChange` | event | no | — | — | — |
+| `onInputValueChange` | event | no | — | — | — |
+| `onOpenChange` | event | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Tags field (`tags`)
+
+```json
+{
+  "name": "tags",
+  "variant": "outline",
+  "size": "md"
+}
+```
+
+### Related
+
+- [`combobox`](components/combobox.md)
+- [`checkbox`](components/checkbox.md)
+- [`field`](components/field.md)
+- [`form`](components/form.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# NavIcon
+
+> Renders a nav model icon by name or component.
+
+- **id:** `nav-icon`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Layout chrome needs a consistent nav icon
+
+### Don't use when
+
+- Arbitrary illustration outside nav
+
+### Accessibility
+
+- Decorative by default; pass label when the icon is the only name.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `icon` | unknown | yes | — | — | Icon name or component |
+| `class` | string | no | — | — | — |
+| `label` | string | no | — | — | — |
+
+### Examples
+
+#### Home icon (`home`)
+
+```json
+{
+  "icon": "home"
+}
+```
+
+### Related
+
+- [`layout-chrome`](components/layout-chrome.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# NavigationMenu
+
+> Site or app navigation with expandable triggers and links.
+
+- **id:** `navigation-menu`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Primary site navigation with flyouts
+
+### Don't use when
+
+- In-page tabs (use tabs)
+- App menubar (use menubar)
+
+### Accessibility
+
+- Landmarks and link semantics; triggers expose expanded state.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | string | no | — | — | — |
+| `orientation` | enum(horizontal | vertical) | no | — | `"horizontal"` | — |
+| `dir` | enum(ltr | rtl) | no | — | — | — |
+| `delayDuration` | number | no | — | — | — |
+| `onValueChange` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Main nav (`main`)
+
+```json
+{
+  "orientation": "horizontal"
+}
+```
+
+### Related
+
+- [`menubar`](components/menubar.md)
+- [`breadcrumb`](components/breadcrumb.md)
+- [`sidebar`](components/sidebar.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Pagination
+
+> Page controls for long lists.
+
+- **id:** `pagination`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Paging tables or search results
+
+### Don't use when
+
+- Infinite scroll only feeds
+
+### Accessibility
+
+- Named navigation; previous/next buttons disabled at ends.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `page` | number | no | — | `1` | — |
+| `pageCount` | number | yes | — | — | — |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `variant` | enum(outline | soft) | no | — | `"outline"` | — |
+| `onPageChange` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `label` | string | no | — | — | — |
+
+### Examples
+
+#### Twelve pages (`pages`)
+
+```json
+{
+  "page": 1,
+  "pageCount": 12
+}
+```
+
+### Related
+
+- [`breadcrumb`](components/breadcrumb.md)
+- [`table`](components/table.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Popover
+
+> Non-modal floating panel anchored to a trigger.
+
+- **id:** `popover`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Lightweight detail next to a control
+- Pickers that are not full dialogs
+
+### Don't use when
+
+- Modal workflows (use dialog)
+- Single-line hints (use tooltip)
+
+### Accessibility
+
+- Focus can move into the panel; Escape dismisses.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `open` | boolean | no | — | `false` | — |
+| `onOpenChange` | event | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Open popover (`open`)
+
+```json
+{
+  "open": true
+}
+```
+
+### Related
+
+- [`hover-card`](components/hover-card.md)
+- [`tooltip`](components/tooltip.md)
+- [`dialog`](components/dialog.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Popover.Content
+
+> Styled popover surface with optional arrow.
+
+- **id:** `popover-content`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Body of a popover
+
+### Don't use when
+
+- Menu lists (use dropdown-menu-content)
+
+### Accessibility
+
+- Provide a visible heading or aria-label when needed.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | enum(elevated | flat) | no | — | `"elevated"` | — |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `arrow` | boolean | no | — | `true` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+| `side` | enum(top | right | bottom | left) | no | — | `"bottom"` | — |
+| `align` | enum(start | center | end) | no | — | `"center"` | — |
+| `sideOffset` | number | no | — | `8` | — |
+| `initialFocus` | unknown | no | — | — | An element inside the content, or a function returning one, to focus on open (for example the selected date). Falls back to the first control, else the content. Host-only: not agent-emittable (elements and functions are not data). |
+
+### Examples
+
+#### Elevated (`elevated`)
+
+```json
+{
+  "variant": "elevated"
+}
+```
+
+### Related
+
+- [`popover`](components/popover.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Radio
+
+> One option inside a RadioGroup.
+
+- **id:** `radio`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- A single exclusive option inside radio-group
+
+### Don't use when
+
+- Independent toggles (use checkbox or switch)
+
+### Accessibility
+
+- value is required; card layout keeps the label associated with the control.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | string | yes | — | — | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `id` | string | no | — | — | — |
+| `label` | string | no | — | — | — |
+| `description` | string | no | — | — | — |
+| `size` | enum(sm | md) | no | — | `"md"` | — |
+| `card` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Radio option (`option`)
+
+```json
+{
+  "value": "mail",
+  "label": "Email"
+}
+```
+
+### Related
+
+- [`radio-group`](components/radio-group.md)
+- [`checkbox`](components/checkbox.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# RadioGroup
+
+> A set of exclusive radio options with keyboard roving.
+
+- **id:** `radio-group`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Pick exactly one option from a short closed set
+
+### Don't use when
+
+- Many options with search (use select or combobox)
+- Independent toggles
+
+### Accessibility
+
+- Arrow keys move focus; Space selects; loop wraps at the ends.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | string | no | — | — | — |
+| `onValueChange` | event | no | — | — | — |
+| `name` | string | no | — | — | — |
+| `required` | boolean | no | — | `false` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `readonly` | boolean | no | — | `false` | — |
+| `orientation` | enum(vertical | horizontal) | no | — | `"vertical"` | — |
+| `variant` | enum(default | card) | no | — | `"default"` | — |
+| `size` | enum(sm | md) | no | — | `"md"` | — |
+| `items` | array | no | — | — | Convenience option list; use children with Radio for custom layouts |
+| `loop` | boolean | no | — | `true` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Vertical group (`vertical`)
+
+```json
+{
+  "orientation": "vertical",
+  "items": [
+    {
+      "value": "mail",
+      "label": "Email"
+    },
+    {
+      "value": "sms",
+      "label": "SMS"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`radio`](components/radio.md)
+- [`select`](components/select.md)
+- [`checkbox`](components/checkbox.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# ResponsiveModal
+
+> Dialog on large screens, drawer/sheet on small screens.
+
+- **id:** `responsive-modal`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- One flow that should adapt across breakpoints
+
+### Don't use when
+
+- Fixed desktop-only dialogs
+
+### Accessibility
+
+- Preserves dialog semantics on large viewports.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `size` | enum(sm | md | lg | xl) | no | — | `"md"` | — |
+| `side` | enum(top | right | bottom | left | start | end | center) | no | — | `"bottom"` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Adaptive (`adaptive`)
+
+```json
+{
+  "size": "md"
+}
+```
+
+### Related
+
+- [`dialog`](components/dialog.md)
+- [`drawer`](components/drawer.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# ScreenOutlet
+
+> Stable screen mount point that survives layout switches.
+
+- **id:** `screen-outlet`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- LayoutHost needs a durable screen node
+
+### Don't use when
+
+- Static pages without layout switching
+
+### Accessibility
+
+- Outlet is a plain region; screen content supplies its own landmarks.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `children` | slot | yes | — | — | — |
+| `onready` | event | no | — | — | Fires with the outlet element |
+
+### Examples
+
+#### Outlet (`basic`)
+
+```json
+{}
+```
+
+### Related
+
+- [`layout-host`](components/layout-host.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Select
+
+> A single-value select root with size and variant chrome.
+
+- **id:** `select`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Pick one value from a moderate closed list
+
+### Don't use when
+
+- A short exclusive set that fits on the page (use radio-group)
+- Free text with suggestions (use combobox)
+
+### Accessibility
+
+- Trigger is a real button; listbox opens on ArrowDown/Enter/Space
+- Typeahead highlights matching items; Escape closes and restores focus
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `open` | boolean | no | — | `false` | — |
+| `value` | string | no | — | — | — |
+| `defaultValue` | string | no | — | — | — |
+| `name` | string | no | — | — | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `required` | boolean | no | — | `false` | — |
+| `form` | string | no | — | — | Associated form id |
+| `type` | enum(single) | no | — | `"single"` | — |
+| `items` | array | no | — | — | Optional value/label catalog when items are not registered by Select.Item |
+| `sideOffset` | number | no | — | `4` | — |
+| `positioning` | boolean | no | — | `true` | — |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `variant` | enum(outline | soft) | no | — | `"outline"` | — |
+| `onOpenChange` | event | no | — | — | — |
+| `onValueChange` | event | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Outline select (`outline`)
+
+```json
+{
+  "size": "md",
+  "variant": "outline",
+  "defaultValue": ""
+}
+```
+
+### Related
+
+- [`select-trigger`](components/select-trigger.md)
+- [`select-value`](components/select-value.md)
+- [`select-content`](components/select-content.md)
+- [`select-item`](components/select-item.md)
+- [`radio-group`](components/radio-group.md)
+- [`field`](components/field.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Select.Content
+
+> The positioned listbox surface for Select items.
+
+- **id:** `select-content`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Wrap Select items and groups
+
+### Don't use when
+
+- A free-floating popover (use popover)
+
+### Accessibility
+
+- role=listbox; focus stays in the trigger while the list is open.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Medium content (`md`)
+
+```json
+{
+  "size": "md"
+}
+```
+
+### Related
+
+- [`select`](components/select.md)
+- [`select-item`](components/select-item.md)
+- [`select-viewport`](components/select-viewport.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Select.Group
+
+> Groups related Select items under an optional label.
+
+- **id:** `select-group`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Cluster related options inside a long Select
+
+### Don't use when
+
+- A single flat list of options
+
+### Accessibility
+
+- role=group; pair with Select.Label for an accessible name.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Group (`group`)
+
+```json
+{}
+```
+
+### Related
+
+- [`select-label`](components/select-label.md)
+- [`select-item`](components/select-item.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Select.Item
+
+> One selectable option inside Select.Content.
+
+- **id:** `select-item`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Declare a Select option with value and label
+
+### Don't use when
+
+- A radio option outside Select (use radio)
+
+### Accessibility
+
+- role=option; disabled items are skipped by keyboard.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | string | yes | — | — | — |
+| `label` | string | no | — | — | Accessible and display label when children omitted |
+| `disabled` | boolean | no | — | `false` | — |
+| `icon` | slot | no | — | — | — |
+| `description` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Option (`option`)
+
+```json
+{
+  "value": "pro",
+  "label": "Pro",
+  "description": "For growing teams"
+}
+```
+
+### Related
+
+- [`select`](components/select.md)
+- [`select-content`](components/select-content.md)
+- [`select-group`](components/select-group.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Select.Label
+
+> A non-interactive heading inside a Select group.
+
+- **id:** `select-label`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Name a Select.Group
+
+### Don't use when
+
+- A selectable option (use select-item)
+
+### Accessibility
+
+- Not focusable; provides visible structure only.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Group label (`label`)
+
+```json
+{}
+```
+
+### Related
+
+- [`select-group`](components/select-group.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Select.Portal
+
+> Portals Select.Content out of overflow-clipped ancestors.
+
+- **id:** `select-portal`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Select must escape a scroll or overflow container
+
+### Don't use when
+
+- Inline content that fits in-flow
+
+### Accessibility
+
+- Does not change roles; children keep listbox semantics.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Portal (`portal`)
+
+```json
+{}
+```
+
+### Related
+
+- [`select-content`](components/select-content.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Select.Separator
+
+> A visual divider between Select groups or items.
+
+- **id:** `select-separator`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Separate option clusters inside Select
+
+### Don't use when
+
+- Page-level section breaks
+
+### Accessibility
+
+- Decorative separator; not in the tab order.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Divider (`divider`)
+
+```json
+{}
+```
+
+### Related
+
+- [`select-group`](components/select-group.md)
+- [`select-content`](components/select-content.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Select.Trigger
+
+> The button that opens a Select listbox.
+
+- **id:** `select-trigger`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Compose a Select with custom trigger content
+
+### Don't use when
+
+- A standalone button outside Select
+
+### Accessibility
+
+- aria-haspopup=listbox and aria-expanded reflect open state.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `variant` | enum(outline | soft) | no | — | `"outline"` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Default trigger (`default`)
+
+```json
+{
+  "size": "md",
+  "variant": "outline"
+}
+```
+
+### Related
+
+- [`select`](components/select.md)
+- [`select-value`](components/select-value.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Select.Value
+
+> Shows the selected label or a placeholder inside the trigger.
+
+- **id:** `select-value`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Display the current Select value
+
+### Don't use when
+
+- Static text outside Select
+
+### Accessibility
+
+- Placeholder is visible text inside the trigger name.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `placeholder` | string | no | — | `"Select…"` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Placeholder (`placeholder`)
+
+```json
+{
+  "placeholder": "Choose a plan"
+}
+```
+
+### Related
+
+- [`select`](components/select.md)
+- [`select-trigger`](components/select-trigger.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Select.Viewport
+
+> Scrollable viewport inside Select.Content.
+
+- **id:** `select-viewport`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Long option lists that need an internal scroll region
+
+### Don't use when
+
+- Short lists that fit without scrolling
+
+### Accessibility
+
+- Keeps option focus management inside the listbox.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Viewport (`viewport`)
+
+```json
+{}
+```
+
+### Related
+
+- [`select-content`](components/select-content.md)
+- [`select-item`](components/select-item.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Sheet
+
+> Edge-anchored modal panel (drawer-like sheet).
+
+- **id:** `sheet`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Mobile filters, detail rails, edge panels
+
+### Don't use when
+
+- Centered modal forms (use dialog)
+
+### Accessibility
+
+- Focus trapped while open; Escape dismisses.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `size` | enum(sm | md | lg | xl) | no | — | `"md"` | — |
+| `side` | enum(top | right | bottom | left | start | end | center) | no | — | `"start"` | — |
+| `modal` | boolean | no | — | `true` | false: a non-modal panel (no focus trap, inert or scroll lock) |
+| `dismissOutside` | boolean | no | — | `false` | Non-modal only: close on a press or focus outside (never on the trigger) |
+| `closeOnEscape` | boolean | no | — | `false` | Non-modal only: close on Escape anywhere, not just from inside |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Start edge (`start`)
+
+```json
+{
+  "side": "start",
+  "size": "md"
+}
+```
+
+### Related
+
+- [`drawer`](components/drawer.md)
+- [`dialog`](components/dialog.md)
+- [`sidebar`](components/sidebar.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Sidebar
+
+> Collapsible app rail with sections, badges and safe links.
+
+- **id:** `sidebar`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Primary app navigation rail
+
+### Don't use when
+
+- Marketing site nav (use navigation-menu)
+
+### Accessibility
+
+- nav landmark; collapsed items keep accessible names via tooltips.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `items` | array | no | — | — | — |
+| `sections` | array | no | — | — | — |
+| `collapsed` | boolean | no | — | `false` | — |
+| `collapsible` | boolean | no | — | `true` | — |
+| `drawer` | boolean | no | — | `false` | — |
+| `variant` | enum(default | inset) | no | — | `"default"` | — |
+| `header` | slot | no | — | — | — |
+| `footer` | slot | no | — | — | — |
+| `itemIcon` | slot | no | — | — | — |
+| `label` | string | no | — | `"Main"` | — |
+| `collapseLabel` | string | no | — | — | — |
+| `expandLabel` | string | no | — | — | — |
+| `hrefTrust` | enum(developer | untrusted) | no | developer | `"developer"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Workspace rail (`workspace`)
+
+```json
+{
+  "label": "Main",
+  "sections": [
+    {
+      "label": "Workspace",
+      "items": [
+        {
+          "label": "Inbox",
+          "href": "https://example.com/inbox",
+          "active": true
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Related
+
+- [`app-nav`](components/app-nav.md)
+- [`navigation-menu`](components/navigation-menu.md)
+- [`sheet`](components/sheet.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# SplitView
+
+> Master-detail split with list and detail panes.
+
+- **id:** `split-view`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- List/detail workflows on wide screens
+
+### Don't use when
+
+- Single-stream feeds
+
+### Accessibility
+
+- List and detail regions are labelled
+- Narrow containers show one pane at a time
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `list` | slot | yes | — | — | — |
+| `detail` | slot | no | — | — | — |
+| `empty` | slot | no | — | — | — |
+| `listLabel` | string | no | — | `"List"` | — |
+| `detailLabel` | string | no | — | `"Details"` | — |
+| `detailActive` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Split (`basic`)
+
+```json
+{
+  "listLabel": "Inbox"
+}
+```
+
+### Related
+
+- [`layout-dual-sidebar`](components/layout-dual-sidebar.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Stat
+
+> A single metric with optional delta, trend and sparkline slot.
+
+- **id:** `stat`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show one KPI with a human-formatted value
+
+### Don't use when
+
+- A currency/percent KPI with previous period math (use kpi)
+
+### Accessibility
+
+- Label and value are text; trend has a spoken word, not color alone.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | — | — | — |
+| `value` | unknown | yes | — | — | string or number |
+| `delta` | unknown | no | — | — | string or number change |
+| `trend` | enum(up | down | neutral) | no | — | — | — |
+| `positive` | enum(up | down) | no | — | `"up"` | Which direction is good |
+| `hint` | string | no | — | — | — |
+| `icon` | slot | no | — | — | — |
+| `sparkline` | slot | no | — | — | — |
+| `variant` | enum(elevated | flat) | no | — | `"elevated"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Revenue up (`revenue`)
+
+```json
+{
+  "label": "Revenue",
+  "value": "$12.4k",
+  "delta": "+8%",
+  "trend": "up"
+}
+```
+
+### Related
+
+- [`kpi`](components/kpi.md)
+- [`card`](components/card.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Stepper
+
+> Horizontal or vertical progress through ordered steps.
+
+- **id:** `stepper`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show multi-step onboarding or checkout progress
+
+### Don't use when
+
+- A chronological event log (use timeline)
+
+### Accessibility
+
+- nav with an accessible name; current step is announced; completed steps may be activatable.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `steps` | array | yes | — | — | Array of { id, label, description? } |
+| `current` | number | yes | — | — | 0-based active index |
+| `completed` | array | no | — | — | Ids of completed steps |
+| `orientation` | enum(horizontal | vertical) | no | — | `"horizontal"` | — |
+| `onStepClick` | event | no | — | — | — |
+| `label` | string | no | — | `"Progress"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Checkout steps (`checkout`)
+
+```json
+{
+  "current": 1,
+  "orientation": "horizontal",
+  "steps": [
+    {
+      "id": "cart",
+      "label": "Cart"
+    },
+    {
+      "id": "ship",
+      "label": "Shipping"
+    },
+    {
+      "id": "pay",
+      "label": "Payment"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`timeline`](components/timeline.md)
+- [`layout-wizard`](components/layout-wizard.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Switch
+
+> An immediate on/off setting control.
+
+- **id:** `switch`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Settings that take effect immediately
+
+### Don't use when
+
+- A form agreement that must be submitted (use checkbox)
+
+### Accessibility
+
+- role=switch with aria-checked; label wires the accessible name.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `checked` | boolean | no | — | `false` | — |
+| `defaultChecked` | boolean | no | — | `false` | — |
+| `name` | string | no | — | — | — |
+| `value` | string | no | — | `"on"` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `required` | boolean | no | — | `false` | — |
+| `id` | string | no | — | — | — |
+| `label` | string | no | — | — | — |
+| `description` | string | no | — | — | — |
+| `size` | enum(sm | md) | no | — | `"md"` | — |
+| `onCheckedChange` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Labeled switch (`labeled`)
+
+```json
+{
+  "label": "Dark mode",
+  "checked": true
+}
+```
+
+### Related
+
+- [`checkbox`](components/checkbox.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Table
+
+> A responsive data table with density, stacking and sticky header options.
+
+- **id:** `table`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Tabular comparison of many rows and columns
+
+### Don't use when
+
+- A single metric (use stat or kpi)
+- A free-form card layout
+
+### Accessibility
+
+- Real table markup with caption or label for the scroll region
+- Stacked mode keeps labels associated with cells
+- busy sets aria-busy on the table
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | enum(plain | striped | grid) | no | — | `"plain"` | — |
+| `density` | enum(compact | default | comfortable) | no | — | `"default"` | — |
+| `stack` | enum(never | sm | md) | no | — | `"never"` | Stack rows into labelled cards when the container is narrow |
+| `stickyHeader` | boolean | no | — | `false` | — |
+| `maxBlockSize` | string | no | — | — | CSS length capping height so the body scrolls |
+| `label` | string | no | — | — | Accessible name for the scroll area |
+| `busy` | boolean | no | — | `false` | — |
+| `wrapperClass` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Striped sticky header (`striped-sticky`)
+
+```json
+{
+  "variant": "striped",
+  "stickyHeader": true,
+  "stack": "sm",
+  "label": "Orders"
+}
+```
+
+### Related
+
+- [`stat`](components/stat.md)
+- [`empty-state`](components/empty-state.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Tag
+
+> A labeled chip that can be removed.
+
+- **id:** `tag`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show a selected filter or category the user can remove
+
+### Don't use when
+
+- Static status (use badge)
+- A pressed filter control (use chip)
+
+### Accessibility
+
+- Remove control has an accessible name; pending remove is disabled.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | — | — | Visible label |
+| `variant` | enum(default | secondary | outline | success | warning | destructive | info | neutral) | no | — | `"secondary"` | — |
+| `removeLabel` | string | no | — | `"Remove"` | — |
+| `onRemove` | event | no | — | — | Called when remove is activated |
+| `disabled` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Removable tag (`removable`)
+
+```json
+{
+  "label": "Logistics",
+  "variant": "info"
+}
+```
+
+### Related
+
+- [`badge`](components/badge.md)
+- [`chip`](components/chip.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# TextCounter
+
+> An input or textarea that shows remaining characters near the limit.
+
+- **id:** `text-counter`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Bounded free-text with a visible remaining count
+
+### Don't use when
+
+- Unbounded text without a max length
+
+### Accessibility
+
+- Remaining count is exposed via aria-describedby while focused near the limit.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | string | no | — | — | — |
+| `tag` | enum(input | textarea) | no | — | `"input"` | — |
+| `type` | string | no | — | `"text"` | — |
+| `id` | string | no | — | — | — |
+| `name` | string | no | — | — | — |
+| `label` | string | no | — | — | — |
+| `placeholder` | string | no | — | — | — |
+| `maxlength` | number | no | — | `256` | — |
+| `showAfter` | number | no | — | `20` | Show the count once this many characters remain |
+| `rows` | number | no | — | `3` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `readonly` | boolean | no | — | `false` | — |
+| `required` | boolean | no | — | `false` | — |
+| `invalid` | boolean | no | — | `false` | — |
+| `autosize` | boolean | no | — | `false` | — |
+| `remainingLabel` | string | no | — | `"characters left"` | — |
+| `onValueChange` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Near limit (`near-limit`)
+
+```json
+{
+  "maxlength": 80,
+  "showAfter": 20,
+  "label": "Summary"
+}
+```
+
+### Related
+
+- [`input`](components/input.md)
+- [`textarea`](components/textarea.md)
+- [`field`](components/field.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Textarea
+
+> A multi-line text control with optional autosize.
+
+- **id:** `textarea`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- Longer free-text fields (notes, comments, descriptions)
+
+### Don't use when
+
+- A single-line value (use input)
+
+### Accessibility
+
+- Pair with Field or an external label; autosize disables manual resize.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | string | no | — | — | — |
+| `ref` | unknown | no | — | — | — |
+| `autosize` | boolean | no | — | `false` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `readonly` | boolean | no | — | `false` | — |
+| `rows` | number | no | — | `3` | — |
+| `onValueChange` | event | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Autosize textarea (`autosize`)
+
+```json
+{
+  "autosize": true,
+  "rows": 3
+}
+```
+
+### Related
+
+- [`input`](components/input.md)
+- [`text-counter`](components/text-counter.md)
+- [`field`](components/field.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Timeline
+
+> Vertical or horizontal chronological list of events.
+
+- **id:** `timeline`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show a sequence of events with status
+
+### Don't use when
+
+- A Gantt schedule with dependencies (use @texuli/data/timeline)
+
+### Accessibility
+
+- Ordered list with an accessible name
+- Status has a spoken word and marker shape, not color alone
+- Item links pass the URL policy
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `items` | array | no | — | — | Data-driven items (or compose TimelineItem children) |
+| `orientation` | enum(vertical | horizontal) | no | — | `"vertical"` | — |
+| `label` | string | no | — | — | — |
+| `messages` | object | no | — | — | Localized label/status words |
+| `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
+| `item` | slot | no | — | — | Extra content under each data item |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Shipment timeline (`shipment`)
+
+```json
+{
+  "orientation": "vertical",
+  "items": [
+    {
+      "id": "1",
+      "title": "Packed",
+      "time": "Mon",
+      "status": "complete"
+    },
+    {
+      "id": "2",
+      "title": "In transit",
+      "time": "Tue",
+      "status": "current"
+    },
+    {
+      "id": "3",
+      "title": "Delivered",
+      "time": "Wed",
+      "status": "upcoming"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`stepper`](components/stepper.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Toaster
+
+> Live region that renders toast notifications from the shared store.
+
+- **id:** `toaster`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Transient success/error feedback after an action
+
+### Don't use when
+
+- Blocking errors that need a decision (use alert-dialog)
+
+### Accessibility
+
+- role=region with polite live updates; dismiss controls are labelled.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | no | — | `"Notifications"` | — |
+| `position` | enum(top-start | top-center | top-end | bottom-start | bottom-center | bottom-end) | no | — | `"bottom-end"` | Block edge and logical inline position; narrow screens center the stack |
+| `offset` | string | no | — | — | CSS length or px number from the stack edge |
+| `store` | unknown | no | — | — | Optional ToastStore inject (tests) |
+| `dismissLabel` | string | no | — | `"Dismiss notification"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Toaster region (`region`)
+
+```json
+{
+  "label": "Notifications"
+}
+```
+
+### Related
+
+- [`alert-dialog`](components/alert-dialog.md)
+- [`banner`](components/banner.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Tooltip
+
+> Short delayed hint on hover or focus.
+
+- **id:** `tooltip`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `overlays`
+
+### Use when
+
+- Icon-only controls need a name
+- Optional keyboard shortcut hints
+
+### Don't use when
+
+- Essential instructions (put them in visible copy)
+
+### Accessibility
+
+- Shows on focus; content is plain text or a snippet, never a sink.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `content` | string | yes | — | — | Hint text or rich snippet |
+| `children` | slot | yes | — | — | Trigger snippet { props } |
+| `shortcut` | string | no | — | — | Shortcut string or list shown as Kbd |
+| `side` | enum(top | right | bottom | left) | no | — | `"top"` | — |
+| `align` | enum(start | center | end) | no | — | `"center"` | — |
+| `sideOffset` | number | no | — | `6` | — |
+| `delayDuration` | number | no | — | `300` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `open` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Basic tooltip (`basic`)
+
+```json
+{
+  "content": "Save note",
+  "side": "top"
+}
+```
+
+### Related
+
+- [`popover`](components/popover.md)
+- [`hover-card`](components/hover-card.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---

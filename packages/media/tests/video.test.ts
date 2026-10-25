@@ -1,0 +1,259 @@
+import { fireEvent, render, waitFor } from '@testing-library/svelte';
+import { tick } from 'svelte';
+import { describe, expect, it, vi } from 'vitest';
+import { VideoPlayer } from '../src/video/entry.ts';
+import {
+  formatVideoTime,
+  normalizePlaybackRate,
+  pickDefaultTextTrack,
+  resolveVideoSources,
+  resolveVideoTextTracks,
+  VIDEO_PLAYBACK_RATES,
+} from '../src/video/index.ts';
+
+const CAPTIONS_VTT = `WEBVTT
+
+00:00:00.000 --> 00:00:02.000
+Welcome aboard.
+
+00:00:02.000 --> 00:00:05.000
+Watch the lighthouse.
+`;
+
+const CHAPTERS_VTT = `WEBVTT
+
+Chapter 1
+00:00:00.000 --> 00:00:00.000
+Departure
+
+Chapter 2
+00:00:30.000 --> 00:00:30.000
+Open water
+`;
+
+const ALT_CAPTIONS_VTT = `WEBVTT
+
+00:00:00.000 --> 00:00:03.000
+Alternate track line.
+`;
+
+describe('resolveVideoSources', () => {
+  it('requires an exact HTTPS origin for untrusted remote media', () => {
+    const src = 'https://media.example.test/clip.webm';
+    expect(resolveVideoSources({ src }).src).toBeUndefined();
+    expect(resolveVideoSources({ src, allowedOrigins: ['https://media.example.test'] })).toEqual({
+      src,
+      poster: undefined,
+      dropped: [],
+    });
+    expect(
+      resolveVideoSources({ src, allowedOrigins: ['https://media.example.test.evil.test'] }).src
+    ).toBeUndefined();
+  });
+
+  it('rejects unsafe schemes, credentials and data media, even for developer trust', () => {
+    for (const src of [
+      'javascript:alert(1)',
+      'data:video/webm;base64,AAAA',
+      'https://user:pass@media.example.test/clip.webm',
+      '//media.example.test/clip.webm',
+    ]) {
+      expect(resolveVideoSources({ src, trust: 'developer' }).src, src).toBeUndefined();
+    }
+  });
+
+  it('allows developer local assets and safe blob media but independently validates posters', () => {
+    const result = resolveVideoSources({
+      src: './clip.webm',
+      poster: 'javascript:alert(1)',
+      trust: 'developer',
+    });
+    expect(result).toEqual({ src: './clip.webm', poster: undefined, dropped: ['poster'] });
+    expect(resolveVideoSources({ src: 'blob:https://app.example.test/video-id' }).src).toBe(
+      'blob:https://app.example.test/video-id'
+    );
+  });
+});
+
+describe('resolveVideoTextTracks', () => {
+  it('keeps inline VTT and blocks unsafe remote tracks', () => {
+    const resolved = resolveVideoTextTracks([
+      { id: 'en', label: 'English', vtt: CAPTIONS_VTT, default: true },
+      { id: 'bad', label: 'Bad', src: 'javascript:alert(1)' },
+      { id: 'ok', label: 'Remote', src: 'https://cdn.example.com/en.vtt' },
+    ]);
+    expect(resolved).toHaveLength(3);
+    expect(resolved[0]?.vtt).toContain('WEBVTT');
+    expect(resolved[0]?.blocked).toBe(false);
+    expect(resolved[1]?.blocked).toBe(true);
+    expect(resolved[2]?.blocked).toBe(true);
+
+    const allowlisted = resolveVideoTextTracks(
+      [{ label: 'Remote', src: 'https://cdn.example.com/en.vtt' }],
+      'untrusted',
+      ['https://cdn.example.com']
+    );
+    expect(allowlisted[0]?.src).toBe('https://cdn.example.com/en.vtt');
+    expect(allowlisted[0]?.blocked).toBe(false);
+  });
+
+  it('picks the default caption track', () => {
+    const tracks = resolveVideoTextTracks([
+      { id: 'a', label: 'A', vtt: CAPTIONS_VTT },
+      { id: 'b', label: 'B', vtt: ALT_CAPTIONS_VTT, default: true },
+    ]);
+    expect(pickDefaultTextTrack(tracks, 'captions')?.id).toBe('b');
+  });
+});
+
+describe('video helpers', () => {
+  it('restricts playback rate to the supported presets', () => {
+    expect(VIDEO_PLAYBACK_RATES).toEqual([0.5, 0.75, 1, 1.25, 1.5, 2]);
+    expect(normalizePlaybackRate(1.5)).toBe(1.5);
+    expect(normalizePlaybackRate(8)).toBe(1);
+  });
+
+  it('formats finite time values without negative or non-finite output', () => {
+    expect(formatVideoTime(0)).toBe('0:00');
+    expect(formatVideoTime(65.9)).toBe('1:05');
+    expect(formatVideoTime(3661)).toBe('1:01:01');
+    expect(formatVideoTime(-5)).toBe('0:00');
+    expect(formatVideoTime(Number.NaN)).toBe('0:00');
+  });
+});
+
+describe('VideoPlayer', () => {
+  it('does not render a video element for a blocked source', () => {
+    const { container, getByRole } = render(VideoPlayer, {
+      src: 'javascript:alert(1)',
+      title: 'Unsafe clip',
+    });
+    expect(container.querySelector('video')).toBeNull();
+    expect(getByRole('alert').textContent).toContain('blocked');
+  });
+
+  it('renders safe controls, validates the poster and updates the playback rate', async () => {
+    const { container, getByRole } = render(VideoPlayer, {
+      src: 'blob:https://app.example.test/video-id',
+      poster: 'javascript:alert(1)',
+      title: 'Harbor clip',
+    });
+    const video = container.querySelector('video');
+    expect(video?.getAttribute('src')).toBe('blob:https://app.example.test/video-id');
+    expect(video?.hasAttribute('poster')).toBe(false);
+    expect(video?.getAttribute('aria-label')).toBe('Harbor clip');
+    expect(video?.hasAttribute('controls')).toBe(false);
+    expect(getByRole('slider', { name: 'Seek video' })).toBeTruthy();
+    expect(getByRole('button', { name: 'Picture in picture' }).hasAttribute('disabled')).toBe(true);
+
+    await fireEvent.change(getByRole('combobox', { name: 'Playback speed' }), {
+      target: { value: '1.5' },
+    });
+    expect(video?.playbackRate).toBe(1.5);
+  });
+
+  it('reports a rejected play request instead of leaving the user without feedback', async () => {
+    const { container, getByRole } = render(VideoPlayer, {
+      src: 'blob:https://app.example.test/video-id',
+      title: 'Harbor clip',
+    });
+    const video = container.querySelector('video') as HTMLVideoElement;
+    vi.spyOn(video, 'play').mockRejectedValue(new Error('Autoplay blocked'));
+    await fireEvent.click(getByRole('button', { name: 'Play video' }));
+    expect(getByRole('alert').textContent).toContain('playback failed');
+  });
+
+  it('toggles captions on and off and shows on-video cue text', async () => {
+    const { container, getByRole } = render(VideoPlayer, {
+      props: {
+        src: 'blob:https://app.example.test/video-id',
+        title: 'Harbor clip',
+        captionsDefault: true,
+        tracks: [
+          { id: 'en', label: 'English', vtt: CAPTIONS_VTT, default: true },
+          { id: 'chapters', label: 'Chapters', kind: 'chapters', vtt: CHAPTERS_VTT },
+        ],
+      },
+    });
+    await waitFor(() => {
+      expect(container.querySelector('[data-tx-video-captions]')).toBeTruthy();
+    });
+    const toggle = getByRole('button', { name: 'Captions' });
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+
+    // Drive time so the first cue is active.
+    const video = container.querySelector('video') as HTMLVideoElement;
+    Object.defineProperty(video, 'duration', { configurable: true, get: () => 120 });
+    video.currentTime = 0.5;
+    await fireEvent(video, new Event('timeupdate'));
+    await tick();
+    await waitFor(() => {
+      expect(container.querySelector('[data-tx-video-caption-text]')?.textContent).toContain(
+        'Welcome aboard'
+      );
+    });
+
+    await fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+    expect(container.querySelector('[data-tx-video-caption-text]')).toBeNull();
+
+    // Keyboard shortcut C toggles back on.
+    const root = container.querySelector('[data-tx-video-player]') as HTMLElement;
+    root.focus();
+    await fireEvent.keyDown(root, { key: 'c' });
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('switches caption tracks from the track picker', async () => {
+    const { container, getByRole } = render(VideoPlayer, {
+      props: {
+        src: 'blob:https://app.example.test/video-id',
+        title: 'Harbor clip',
+        tracks: [
+          { id: 'en', label: 'English', vtt: CAPTIONS_VTT, default: true },
+          { id: 'alt', label: 'Alternate', vtt: ALT_CAPTIONS_VTT },
+        ],
+      },
+    });
+    await waitFor(() => {
+      expect(container.querySelector('[data-tx-video-captions]')).toBeTruthy();
+    });
+    const picker = getByRole('combobox', { name: 'Caption track' });
+    await fireEvent.change(picker, { target: { value: 'alt' } });
+    const video = container.querySelector('video') as HTMLVideoElement;
+    Object.defineProperty(video, 'duration', { configurable: true, get: () => 60 });
+    video.currentTime = 1;
+    await fireEvent(video, new Event('timeupdate'));
+    await tick();
+    await waitFor(() => {
+      expect(container.querySelector('[data-tx-video-caption-text]')?.textContent).toContain(
+        'Alternate track line'
+      );
+    });
+  });
+
+  it('seeks the video when a chapter is chosen', async () => {
+    const { container, getAllByRole } = render(VideoPlayer, {
+      props: {
+        src: 'blob:https://app.example.test/video-id',
+        title: 'Harbor clip',
+        tracks: [
+          { id: 'en', label: 'English', vtt: CAPTIONS_VTT },
+          { id: 'chapters', label: 'Chapters', kind: 'chapters', vtt: CHAPTERS_VTT },
+        ],
+      },
+    });
+    await waitFor(() => {
+      expect(container.querySelector('[data-tx-captions-chapters]')).toBeTruthy();
+    });
+    const video = container.querySelector('video') as HTMLVideoElement;
+    Object.defineProperty(video, 'duration', { configurable: true, get: () => 120 });
+    video.currentTime = 0;
+    const chapterButtons = getAllByRole('button').filter((b) =>
+      b.hasAttribute('data-tx-chapter-button')
+    );
+    expect(chapterButtons.length).toBeGreaterThanOrEqual(2);
+    await fireEvent.click(chapterButtons[1]!);
+    expect(video.currentTime).toBe(30);
+  });
+});

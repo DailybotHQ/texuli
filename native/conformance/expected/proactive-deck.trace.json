@@ -1,0 +1,73 @@
+{
+  "golden": "proactive-deck",
+  "trace": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "id": "blocks-text",
+              "role": "list"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Agenda",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "blocks-data",
+              "role": "group"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Since Tuesday",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "charts-line",
+              "name": "Remaining items this sprint",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Burn-down",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "blocks-text",
+              "name": "Design review",
+              "role": "note"
+            },
+            {
+              "id": "blocks-text",
+              "role": "list"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Risks",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "blocks-text",
+              "role": "list"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Decisions needed",
+          "role": "group"
+        }
+      ],
+      "id": "layout-deck",
+      "name": "Afternoon planning, 2026-10-24",
+      "role": "main"
+    }
+  ]
+}

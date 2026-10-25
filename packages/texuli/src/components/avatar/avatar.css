@@ -1,0 +1,227 @@
+/**
+ * Avatar and AvatarGroup — @layer tx.components so consumer utilities win.
+ * Logical properties only; status dots use system colors under forced-colors.
+ */
+@layer tx.components {
+  .tx-avatar {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    vertical-align: middle;
+    user-select: none;
+  }
+
+  .tx-avatar__surface {
+    display: inline-flex;
+    inline-size: 100%;
+    block-size: 100%;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: var(--tx-radius-full, 9999px);
+    background-color: var(--tx-muted, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    font-weight: var(--tx-font-weight-semibold, 600);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .tx-avatar--xs {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    font-size: 0.55rem;
+  }
+  .tx-avatar--sm {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    font-size: 0.65rem;
+  }
+  .tx-avatar--md {
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    font-size: var(--tx-font-size-xs, 0.75rem);
+  }
+  .tx-avatar--lg {
+    inline-size: 3rem;
+    block-size: 3rem;
+    font-size: var(--tx-font-size-base, 1rem);
+  }
+
+  /*
+   * Initials: the text pair is always foreground on muted, a pair the token
+   * engine's AA gate guarantees (>= 4.5:1) in every library theme and mode.
+   * The seeded tone is decorative: an inset ring of a chart color, so it tells
+   * people apart without ever carrying the text contrast.
+   */
+  .tx-avatar__surface[data-tone] {
+    background-color: var(--tx-muted, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    box-shadow: inset 0 0 0 2px var(--tx-avatar-tone, transparent);
+  }
+  .tx-avatar__surface[data-tone="0"] {
+    --tx-avatar-tone: var(--tx-chart-1, transparent);
+  }
+  .tx-avatar__surface[data-tone="1"] {
+    --tx-avatar-tone: var(--tx-chart-2, transparent);
+  }
+  .tx-avatar__surface[data-tone="2"] {
+    --tx-avatar-tone: var(--tx-chart-3, transparent);
+  }
+  .tx-avatar__surface[data-tone="3"] {
+    --tx-avatar-tone: var(--tx-chart-4, transparent);
+  }
+  .tx-avatar__surface[data-tone="4"] {
+    --tx-avatar-tone: var(--tx-chart-5, transparent);
+  }
+  .tx-avatar__image {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .tx-avatar__fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  .tx-avatar__status {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-end: 0;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: var(--tx-radius-full, 9999px);
+    border: 2px solid var(--tx-background, Canvas);
+    box-sizing: content-box;
+    pointer-events: none;
+  }
+
+  .tx-avatar--xs .tx-avatar__status,
+  .tx-avatar--sm .tx-avatar__status {
+    inline-size: 0.375rem;
+    block-size: 0.375rem;
+    border-width: 1.5px;
+  }
+
+  .tx-avatar--lg .tx-avatar__status {
+    inline-size: 0.625rem;
+    block-size: 0.625rem;
+  }
+
+  .tx-avatar__status--online {
+    background-color: var(--tx-success, green);
+  }
+  .tx-avatar__status--away {
+    background-color: var(--tx-warning, orange);
+  }
+  .tx-avatar__status--busy {
+    background-color: var(--tx-destructive, crimson);
+  }
+  .tx-avatar__status--offline {
+    background-color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-avatar-group {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    isolation: isolate;
+  }
+
+  .tx-avatar-group .tx-avatar {
+    box-shadow: 0 0 0 2px var(--tx-background, Canvas);
+  }
+
+  .tx-avatar-group__overflow {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--tx-radius-full, 9999px);
+    background-color: var(--tx-muted, Canvas);
+    color: var(--tx-muted-foreground, GrayText);
+    font-weight: var(--tx-font-weight-semibold, 600);
+    font-size: var(--tx-font-size-xs, 0.75rem);
+    box-shadow: 0 0 0 2px var(--tx-background, Canvas);
+    line-height: 1;
+  }
+
+  .tx-avatar-group .tx-avatar + .tx-avatar,
+  .tx-avatar-group > .tx-avatar-group__overflow {
+    margin-inline-start: -0.5rem;
+  }
+
+  .tx-avatar-group--xs .tx-avatar + .tx-avatar,
+  .tx-avatar-group--xs > .tx-avatar-group__overflow {
+    margin-inline-start: -0.35rem;
+  }
+  .tx-avatar-group--sm .tx-avatar + .tx-avatar,
+  .tx-avatar-group--sm > .tx-avatar-group__overflow {
+    margin-inline-start: -0.4rem;
+  }
+  .tx-avatar-group--lg .tx-avatar + .tx-avatar,
+  .tx-avatar-group--lg > .tx-avatar-group__overflow {
+    margin-inline-start: -0.65rem;
+  }
+
+  .tx-avatar-group--xs > .tx-avatar-group__overflow {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    font-size: 0.55rem;
+  }
+  .tx-avatar-group--sm > .tx-avatar-group__overflow {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    font-size: 0.65rem;
+  }
+  .tx-avatar-group--md > .tx-avatar-group__overflow {
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+  }
+  .tx-avatar-group--lg > .tx-avatar-group__overflow {
+    inline-size: 3rem;
+    block-size: 3rem;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+  }
+
+  @media (forced-colors: active) {
+    .tx-avatar__surface,
+    .tx-avatar__surface[data-tone] {
+      border: 1px solid CanvasText;
+      background-color: Canvas;
+      color: CanvasText;
+      box-shadow: none;
+      forced-color-adjust: none;
+    }
+    .tx-avatar__status--online {
+      background-color: Highlight;
+    }
+    .tx-avatar__status--away,
+    .tx-avatar__status--busy {
+      background-color: Mark;
+    }
+    .tx-avatar__status--offline {
+      background-color: GrayText;
+    }
+    .tx-avatar__status {
+      border-color: Canvas;
+    }
+    .tx-avatar-group .tx-avatar,
+    .tx-avatar-group__overflow {
+      box-shadow: 0 0 0 2px Canvas;
+    }
+    .tx-avatar-group__overflow {
+      border: 1px solid CanvasText;
+      background-color: Canvas;
+      color: CanvasText;
+    }
+  }
+}

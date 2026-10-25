@@ -1,0 +1,42 @@
+---
+interface Props {
+  id?: string;
+  label?: string;
+  width?: 'reading' | 'wide' | 'full';
+  /** `surface` paints the theme's surface color behind the section. */
+  tone?: 'default' | 'surface';
+  /** `none` removes the responsive inline padding, for nesting sections. */
+  padding?: 'normal' | 'none';
+}
+
+const { id, label, width = 'reading', tone = 'default', padding = 'normal' } = Astro.props;
+---
+
+<section
+  id={id}
+  aria-label={label}
+  class:list={[
+    'tx-astro-section',
+    `tx-astro-section--${width}`,
+    `tx-astro-section--${tone}`,
+    `tx-astro-section--padding-${padding}`,
+  ]}
+>
+  <slot />
+</section>
+
+<style>
+  .tx-astro-section {
+    box-sizing: border-box;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+    inline-size: 100%;
+  }
+
+  .tx-astro-section--reading { max-inline-size: 72rem; }
+  .tx-astro-section--wide { max-inline-size: 88rem; }
+  .tx-astro-section--full { max-inline-size: none; }
+
+  .tx-astro-section--surface { background: var(--tx-surface); }
+  .tx-astro-section--padding-none { padding-inline: 0; }
+</style>

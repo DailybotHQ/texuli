@@ -1,0 +1,34 @@
+{
+  "name": "@texuli/astro",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Astro integration, content layouts and Svelte islands for Texuli sites.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./content": "./src/content/index.ts",
+    "./integration": "./src/integration/index.ts",
+    "./site": "./src/site/index.ts",
+    "./styles.css": "./src/styles.css",
+    "./layouts/ContentLayout": "./src/layouts/ContentLayout.ts",
+    "./sections/Hero": "./src/sections/Hero.ts",
+    "./sections/Section": "./src/sections/Section.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@texuli/blocks": "workspace:*",
+    "@texuli/core": "workspace:*",
+    "@texuli/tokens": "workspace:*",
+    "astro": "^7.4.0"
+  },
+  "peerDependencies": {
+    "@astrojs/svelte": "^9.1.0",
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

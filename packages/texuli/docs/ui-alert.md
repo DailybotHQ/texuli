@@ -1,0 +1,52 @@
+# Components: Alert, Callout and Banner
+
+**Package:** `texuli`  
+**Path:** `packages/texuli/src/components/alert/`  
+**Task:** T-ui-alert  
+**Import:** `import { Alert, Callout, Banner } from 'texuli/alert'`
+
+Token-tinted status surfaces. Shared chrome via `AlertSurface`; three layouts.
+Logical CSS. No static `style=`. Action links go through `Button` + URL policy.
+Built-in SVG tone glyphs (no icon package).
+
+## Exports
+
+| Export | Role |
+| --- | --- |
+| `Alert` | Compact inline notice (`layout="alert"`) |
+| `Callout` | Emphasized note with strong start border |
+| `Banner` | Full-width page/section banner |
+| `AlertSurface` | Shared host if you need a custom layout prop |
+| `ALERT_TONES` / `AlertTone` | `info` `success` `warning` `error` `brand` `neutral` |
+| `alertRole` | `error` → `role="alert"`, else `role="status"` |
+| `alertSurfaceClass` | `cx`/`variants` class composer |
+
+## Props (all three)
+
+| Prop | Notes |
+| --- | --- |
+| `tone` | Default `info` |
+| `title` / `text` | Plain strings |
+| `children` | Extra body snippet |
+| `hideIcon` / `icon` | Toggle or replace the tone glyph |
+| `actionLabel` + `actionHref` / `onAction` | Action via `Button` (promise → pending) |
+| `dismissible` + `dismissLabel` + `onDismiss` | Named dismiss control |
+| `class` | Consumer classes last |
+
+## A11y
+
+- Error tone uses `role="alert"`; other tones use `role="status"`.
+- Dismiss and action labels are required strings when those controls show.
+- Forced-colors: solid `ButtonText` border.
+
+## Example
+
+Registry id **`texuli-alert`**: default, every tone, error+action, dismissible,
+callout, banner, RTL, dark.
+
+## Testing
+
+```bash
+pnpm vitest run packages/texuli/tests/alert.test.ts
+TEXULI_E2E_PORT=4930 pnpm visual:update -g texuli-alert
+```

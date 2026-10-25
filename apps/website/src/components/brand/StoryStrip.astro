@@ -1,0 +1,219 @@
+---
+/**
+ * Texels → Texuli → Interfaces: the brand story as three stages.
+ * Stages 2–3 use real Texuli components (SSR). CSS motion respects reduced-motion.
+ */
+import { Badge } from 'texuli/badge';
+import { Button } from 'texuli/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'texuli/card';
+---
+
+<section class="story" aria-labelledby="story-title">
+  <header class="story__head">
+    <h2 id="story-title">Texels → Texuli → Interfaces</h2>
+    <p>
+      Small owned units compose into components. Components compose into anything you can
+      describe—by people or agents.
+    </p>
+  </header>
+
+  <ol class="story__stages">
+    <li class="stage stage--texels">
+      <div class="stage__visual" aria-hidden="true">
+        <div class="texel-grid">
+          {
+            Array.from({ length: 16 }, (_, i) => (
+              <span
+                class:list={{
+                  'texel-grid__cell': true,
+                  'texel-grid__cell--lit': [1, 6, 9, 12, 15].includes(i),
+                }}
+              />
+            ))
+          }
+        </div>
+      </div>
+      <h3>Texels</h3>
+      <p>Behavior, focus, tokens and policy—the smallest owned pieces.</p>
+    </li>
+
+    <li class="stage stage--texuli">
+      <div class="stage__visual stage__visual--live" aria-label="Live Texuli components">
+        <Card variant="flat" class="story-card">
+          <CardHeader>
+            <CardTitle level={3}>Texuli components</CardTitle>
+            <CardDescription>
+              <Badge variant="outline">Owned</Badge>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div class="live-row">
+              <Button variant="outline" size="md">Save draft</Button>
+              <Button variant="ghost" size="md">Cancel</Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      <h3>Texuli</h3>
+      <p>Styled, accessible components built only from those pieces—no borrowed primitives.</p>
+    </li>
+
+    <li class="stage stage--interfaces">
+      <div class="stage__visual stage__visual--live" aria-label="Live interface composition">
+        <Card variant="flat" class="story-card">
+          <CardHeader>
+            <CardTitle level={3}>Harbor Console</CardTitle>
+            <CardDescription>A fictional workspace panel</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p class="story-card__body">
+              Compose the same components into apps, docs, decks and dashboards.
+            </p>
+            <div class="live-row">
+              <Button size="sm" variant="outline">Open</Button>
+              <Badge variant="outline">Live</Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      <h3>Interfaces</h3>
+      <p>Anything you can describe: products, prototypes and agent-built surfaces.</p>
+    </li>
+  </ol>
+</section>
+
+<style>
+  .story {
+    display: grid;
+    gap: 1.5rem;
+    margin-block: 2.5rem;
+  }
+  .story__head h2 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    line-height: 1.25;
+  }
+  .story__head p {
+    margin: 0;
+    max-inline-size: 40rem;
+    color: var(--tx-foreground);
+  }
+  .story__stages {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .stage {
+    display: grid;
+    gap: 0.65rem;
+    align-content: start;
+    padding: 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius-lg, 0.75rem);
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+  }
+  .stage h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--tx-foreground);
+  }
+  .stage > p {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 0.9375rem;
+  }
+  .stage__visual {
+    display: grid;
+    place-items: center;
+    min-block-size: 7.5rem;
+    padding: 0.5rem;
+    border-radius: var(--tx-radius-md, 0.5rem);
+    background: var(--tx-background);
+    border: 1px dashed var(--tx-border);
+  }
+  .stage__visual--live {
+    place-items: stretch;
+    align-content: center;
+    border-style: solid;
+  }
+  .texel-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+    inline-size: min(100%, 6.5rem);
+    aspect-ratio: 1;
+  }
+  .texel-grid__cell {
+    border-radius: 0.25rem;
+    background: var(--tx-border);
+    animation: texel-pulse 2.8s ease-in-out infinite;
+  }
+  .texel-grid__cell--lit {
+    background: var(--tx-foreground);
+    animation-name: texel-pulse-lit;
+  }
+  .texel-grid__cell:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .texel-grid__cell:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .texel-grid__cell:nth-child(7) {
+    animation-delay: 0.45s;
+  }
+  .live-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .story-card {
+    margin: 0;
+    box-shadow: none;
+  }
+  /* Force AA on nested Texuli parts (theme muted tokens can sit under 4.5:1). */
+  .story-card :global(.tx-card__title),
+  .story-card :global(.tx-card__description),
+  .story-card__body {
+    color: var(--tx-foreground);
+  }
+  .story-card__body {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  @keyframes texel-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 0.95;
+    }
+  }
+  @keyframes texel-pulse-lit {
+    0%,
+    100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .story__stages {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .texel-grid__cell {
+      animation: none;
+    }
+  }
+</style>

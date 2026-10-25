@@ -1,0 +1,13 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "include": ["src", "vite.config.ts"],
+  "compilerOptions": {
+    "paths": {
+      "@texuli/charts/worker": ["../../../packages/charts/src/worker/index.ts"],
+      "@texuli/charts/worker/entry": ["../../../packages/charts/src/worker/entry.ts"],
+      "@texuli/charts/math/*": ["../../../packages/charts/src/math/*/index.ts"],
+      "@texuli/player": ["../../../packages/player/src/index.ts"],
+      "@texuli/media/timeline": ["../../../packages/media/src/timeline/index.ts"]
+    }
+  }
+}

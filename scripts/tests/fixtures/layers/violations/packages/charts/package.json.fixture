@@ -1,0 +1,1 @@
+{ "name": "@texuli/charts", "dependencies": { "@texuli/core": "workspace:*", "@texuli/data": "workspace:*" } }

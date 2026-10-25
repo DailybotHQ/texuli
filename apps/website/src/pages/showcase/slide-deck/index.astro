@@ -1,0 +1,11 @@
+---
+import ShowcaseChrome from '../../../components/showcase/ShowcaseChrome.svelte';
+import SlideDeckScreen from '../../../components/showcase/screens/SlideDeckScreen.svelte';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Slide deck" description="Presentation slides for a product walkthrough.">
+  <ShowcaseChrome title="Slide deck" description="Presentation slides for a product walkthrough.">
+    <SlideDeckScreen client:load />
+  </ShowcaseChrome>
+</BaseLayout>

@@ -1,0 +1,41 @@
+---
+import DarkModeLive from '../../../components/guides/DarkModeLive.svelte';
+import GuideCode from '../../../components/guides/GuideCode.astro';
+import GuidesShell from '../../../components/guides/GuidesShell.astro';
+
+const toc = [
+  { id: 'modes', label: 'Modes', level: 2 as const },
+  { id: 'no-flash', label: 'No flash', level: 2 as const },
+  { id: 'live-mode', label: 'Live mode', level: 2 as const },
+];
+
+const noFlashSnippet = `import { noFlashScript } from '@texuli/tokens/no-flash';
+
+// Inline first in <head> (Astro: is:inline)
+<script is:inline set:html={noFlashScript('my-app', 'system')} />
+<html data-tx-theme="enterprise-neutral" data-tx-mode="light">`;
+---
+
+<GuidesShell
+  title="Dark mode"
+  description="Light, dark and system preferences without a first-paint flash."
+  {toc}
+>
+  <h2 id="modes">Modes</h2>
+  <p>
+    Appearance is <code>light</code>, <code>dark</code> or <code>system</code>. The resolved mode is
+    written to <code>data-tx-mode</code> on the document element. Theme CSS defines both palettes;
+    the mode attribute selects which variables apply.
+  </p>
+
+  <h2 id="no-flash">No flash</h2>
+  <p>
+    <code>noFlashScript(namespace, default)</code> reads the stored preference synchronously and
+    sets mode before the first paint. Namespace it per product so sites do not clash in <code>localStorage</code>.
+  </p>
+  <GuideCode code={noFlashSnippet} label="No-flash bootstrap" />
+
+  <h2 id="live-mode">Live mode</h2>
+  <p>Change the control in the site header and watch the badge update.</p>
+  <DarkModeLive client:load />
+</GuidesShell>

@@ -1,0 +1,223 @@
+/// <reference types="node" />
+
+import { createReadStream, existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { createServer, type Server } from 'node:http';
+import type { AddressInfo } from 'node:net';
+import { extname, join, normalize, relative, resolve } from 'node:path';
+import { expect, type Page, test } from '@playwright/test';
+import { SITE_NAV_GROUPS } from '../../apps/website/src/components/foundation/nav-data.ts';
+import { GUIDES_SECTIONS } from '../../apps/website/src/components/guides/nav.ts';
+
+/*
+ * texuli.com information architecture (T-site-ia): a minimal landing on `/`
+ * and one docs shell everywhere else (left sidebar with all navigation, slim
+ * utility header, "On this page", pager, "Copy page"; a drawer on phones).
+ * Built static site only; run `pnpm build` first. axe for every page is in
+ * a11y-site.spec.ts; the sidebar details are in site-docs-nav.spec.ts.
+ */
+
+const DIST = resolve('apps/website/dist');
+const TYPES: Record<string, string> = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.json': 'application/json',
+  '.woff2': 'font/woff2',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+  '.webmanifest': 'application/manifest+json',
+};
+
+let server: Server;
+let origin = '';
+
+test.beforeAll(async () => {
+  if (!existsSync(join(DIST, 'index.html'))) throw new Error('Run `pnpm build` before this spec.');
+  server = createServer((request, response) => {
+    const path = decodeURIComponent(new URL(request.url ?? '/', 'http://local').pathname);
+    let file = normalize(join(DIST, path));
+    if (!file.startsWith(DIST)) {
+      response.writeHead(403).end();
+      return;
+    }
+    if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html');
+    if (!existsSync(file)) {
+      response.writeHead(404).end();
+      return;
+    }
+    response.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
+    createReadStream(file).pipe(response);
+  });
+  await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
+  origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+});
+test.afterAll(() => new Promise<void>((done) => server.close(() => done())));
+
+async function visit(page: Page, path: string): Promise<string[]> {
+  const foreign: string[] = [];
+  page.on('request', (request) => {
+    if (!request.url().startsWith(origin)) foreign.push(request.url());
+  });
+  await page.goto(`${origin}${path}`);
+  await page.waitForLoadState('networkidle');
+  return foreign;
+}
+
+/** Every built page route except the home and the 404. */
+function docsRoutes(dir = DIST): string[] {
+  return readdirSync(dir).flatMap((name) => {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) return docsRoutes(full);
+    if (name !== 'index.html' || dir === DIST) return [];
+    const route = `/${relative(DIST, dir).split('\\').join('/')}/`;
+    // Isolated preview documents (loaded inside iframes) are bare by design: no docs shell.
+    // /llms.txt/ is the built stub of the 301 redirect to /llms/llms.txt
+    // (astro.config.mjs redirects): an endpoint, bare by design too.
+    return /\/preview\//.test(route) || route === '/llms.txt/' ? [] : [route];
+  });
+}
+
+test.describe('landing', () => {
+  test('a slim header: logo, Docs, search, theme and Get started; no page links or sidebar', async ({
+    page,
+  }, info) => {
+    expect(await visit(page, '/')).toEqual([]);
+    const header = page.locator('[data-tx-site-header]');
+    await expect(header).toHaveAttribute('data-variant', 'landing');
+    await expect(header.getByRole('link', { name: 'Texuli home' })).toHaveAttribute('href', '/');
+    await expect(header.getByRole('link', { name: 'Docs', exact: true })).toHaveAttribute(
+      'href',
+      '/guides/'
+    );
+    await expect(header.locator('astro-island:not([ssr]) [data-tx-site-search]')).toBeVisible();
+    await expect(header.getByRole('group', { name: 'Appearance' })).toBeVisible();
+    const getStarted = header.getByRole('link', { name: 'Get started' });
+    if (info.project.name === 'mobile') {
+      // The hero's own call to action sits right below on phones.
+      await expect(getStarted).toBeHidden();
+    } else {
+      await expect(getStarted).toHaveAttribute('href', '/guides/getting-started/');
+    }
+    // Only global utilities: the header lists no pages and there is no docs chrome.
+    expect(await header.getByRole('link').count()).toBe(info.project.name === 'mobile' ? 2 : 3);
+    await expect(page.locator('[data-tx-site-sidebar]')).toHaveCount(0);
+    await expect(page.locator('[data-site-menu]')).toHaveCount(0);
+    await expect(page.getByRole('navigation', { name: 'Primary' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Copy page' })).toHaveCount(0);
+  });
+
+  test('one hero with live widgets, three feature cards, an agents strip and the footer', async ({
+    page,
+  }) => {
+    await visit(page, '/');
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { level: 1 })).toHaveText('Interfaces from texels.');
+    const hero = page.locator('[data-tx-landing-hero]');
+    await expect(hero.getByRole('link')).toHaveCount(2);
+
+    // The widgets are real Texuli components that respond.
+    const moments = page.locator('[data-tx-landing-moments]');
+    await expect(moments.locator('astro-island[ssr]')).toHaveCount(0);
+    const mute = moments.getByRole('button', { name: 'Mute output' });
+    await expect(mute).toHaveAttribute('aria-pressed', 'false');
+    await mute.click();
+    await expect(mute).toHaveAttribute('aria-pressed', 'true');
+    await expect(moments.getByRole('slider', { name: 'Volume' })).toBeDisabled();
+
+    const features = page.locator('[data-tx-landing-features]');
+    await expect(features.getByRole('heading', { level: 3 })).toHaveCount(3);
+    await expect(page.locator('[data-tx-landing-agents]')).toBeVisible();
+    await expect(page.getByRole('contentinfo')).toBeVisible();
+
+    // Nothing else on the home: these four sections and nothing between them.
+    const sections = await page
+      .locator('[data-tx-landing] > *')
+      .evaluateAll((nodes) => nodes.map((node) => node.tagName.toLowerCase()));
+    expect(sections).toEqual(['section', 'section', 'section']);
+  });
+
+  test('fits a phone with no horizontal scroll', async ({ page }, info) => {
+    test.skip(info.project.name !== 'mobile', 'a phone layout check');
+    await visit(page, '/');
+    const [scroll, viewport] = await page.evaluate(() => [
+      document.documentElement.scrollWidth,
+      window.innerWidth,
+    ]);
+    expect(scroll).toBeLessThanOrEqual(viewport);
+  });
+});
+
+test.describe('docs shell', () => {
+  test('every other page carries the shell: sidebar, utility header, menu', ({
+    browserName: _browser,
+  }, info) => {
+    test.skip(info.project.name !== 'chromium', 'reads the built HTML once');
+    const routes = docsRoutes();
+    expect(routes.length).toBeGreaterThan(150);
+    const missing: string[] = [];
+    for (const route of routes) {
+      const html = readFileSync(join(DIST, route, 'index.html'), 'utf8');
+      const header = html.match(/<header class="site-header"[\s\S]*?<\/header>/)?.[0] ?? '';
+      const ok =
+        html.includes('data-tx-site-sidebar') &&
+        header.includes('data-variant="docs"') &&
+        header.includes('data-site-menu') &&
+        !/<nav\b/.test(header);
+      if (!ok) missing.push(route);
+    }
+    expect(missing).toEqual([]);
+  });
+
+  test('the sidebar holds every group, with the guides in reading order', ({
+    browserName: _browser,
+  }, info) => {
+    test.skip(info.project.name !== 'chromium', 'data check');
+    expect(SITE_NAV_GROUPS.map((group) => group.label)).toEqual([
+      'Get started',
+      'Components',
+      'Primitives',
+      'Themes',
+      'Agents',
+      'Project',
+    ]);
+    const guides = GUIDES_SECTIONS.flatMap((section) => section.items).map((item) => item.href);
+    const getStarted = SITE_NAV_GROUPS[0]?.links.map((link) => link.href) ?? [];
+    expect(getStarted).toEqual([...guides, '/skill/']);
+  });
+
+  test('a guide lives in the shell: one navigation, its group open, the shared pager', async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name === 'mobile', 'the sidebar is for wide screens');
+    await page.setViewportSize({ width: 1440, height: 900 });
+    expect(await visit(page, '/guides/theming/')).toEqual([]);
+    await expect(page.getByRole('navigation', { name: 'Primary' })).toHaveCount(1);
+    await expect(page.getByRole('navigation', { name: /Guides/ })).toHaveCount(0);
+    const nav = page.getByRole('navigation', { name: 'Primary' });
+    await expect(nav.getByRole('list', { name: 'Get started' })).toBeVisible();
+    await expect(nav.locator('[aria-current="page"]')).toHaveText('Theming');
+    await expect(page.getByRole('navigation', { name: 'On this page' })).toBeVisible();
+    const pager = page.getByRole('navigation', { name: 'Previous and next pages' });
+    // The pager follows the sidebar's reading order; the why-svelte-kotlin
+    // guide sits in Start between Getting started and Theming.
+    await expect(pager.locator('a[rel="prev"]')).toHaveAttribute(
+      'href',
+      '/guides/why-svelte-kotlin/'
+    );
+    await expect(pager.locator('a[rel="next"]')).toHaveAttribute('href', '/guides/dark-mode/');
+    await expect(page.getByRole('button', { name: 'Copy page' })).toBeVisible();
+  });
+
+  test('phones open the same navigation in the drawer, from any docs page', async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== 'mobile', 'the drawer is the phone navigation');
+    await visit(page, '/primitives-page/');
+    await page.getByRole('button', { name: 'Menu' }).click();
+    const drawer = page.getByRole('dialog', { name: 'Navigation' });
+    await expect(drawer.getByRole('list', { name: 'Primitives' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+  });
+});

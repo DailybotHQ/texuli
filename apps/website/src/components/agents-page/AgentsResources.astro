@@ -1,0 +1,89 @@
+---
+/**
+ * Links to llms.txt, catalog JSON and related docs (same-origin static files).
+ */
+import { Badge } from 'texuli/badge';
+import { Card, CardContent, CardDescription, CardGrid, CardHeader, CardTitle } from 'texuli/card';
+import { withBase } from '../foundation/site.ts';
+import { AGENT_RESOURCES } from './agents.ts';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="resources" aria-labelledby="resources-title">
+  <header>
+    <h2 id="resources-title">Agent resources</h2>
+    <p>
+      These files ship with the static site build. No runtime network — open them from the same
+      origin as this page.
+    </p>
+  </header>
+  <CardGrid minItemWidth="15rem">
+    {
+      AGENT_RESOURCES.map((resource) => (
+        <a class="resource-link" href={withBase(base, resource.href)}>
+          <Card variant="flat">
+            <CardHeader>
+              <CardTitle level={3}>{resource.title}</CardTitle>
+              <CardDescription>
+                <Badge variant="secondary">{resource.download ? 'File' : 'Page'}</Badge>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>{resource.description}</p>
+              <p class="path">
+                <code>{resource.href}</code>
+              </p>
+            </CardContent>
+          </Card>
+        </a>
+      ))
+    }
+  </CardGrid>
+</section>
+
+<style>
+  .resources {
+    display: grid;
+    gap: 1.25rem;
+    margin-block: 2rem 1rem;
+    color: var(--tx-foreground);
+  }
+  .resources header h2 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+  }
+  .resources header p {
+    margin: 0;
+    max-inline-size: 40rem;
+  }
+  .resource-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--tx-radius-lg, 0.75rem);
+  }
+  .resource-link:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 3px;
+  }
+  .path {
+    margin-block-start: 0.75rem;
+    font-size: 0.875rem;
+  }
+  code {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+  }
+  .resources :global(.tx-card__title),
+  .resources :global(.tx-card__content) p,
+  .resources :global([data-tx-badge]) {
+    color: var(--tx-foreground) !important;
+  }
+  .resources :global([data-tx-badge]) {
+    background: var(--tx-background) !important;
+    border: 1px solid var(--tx-border);
+  }
+  p {
+    margin: 0;
+  }
+</style>

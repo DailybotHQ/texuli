@@ -1,0 +1,53 @@
+---
+/**
+ * The 404 page body (T-site-seo): a clear message, the requested path is
+ * not echoed (no reflected input), and links back into the site.
+ */
+import { withBase } from '../foundation/site.ts';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="not-found" aria-labelledby="not-found-title">
+  <p class="code">404</p>
+  <h1 id="not-found-title">Page not found</h1>
+  <p>The page you were looking for does not exist or has moved.</p>
+  <ul class="links">
+    <li><a href={withBase(base, '/')}>Home</a></li>
+    <li><a href={withBase(base, '/component-pages/')}>Components</a></li>
+    <li><a href={withBase(base, '/guides/')}>Guides</a></li>
+    <li><a href={withBase(base, '/search/')}>Search</a></li>
+  </ul>
+</section>
+
+<style>
+  .not-found {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+    max-inline-size: 40rem;
+  }
+  .code {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--tx-muted-foreground);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.1;
+  }
+  .not-found > p:not(.code) {
+    margin: 0;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1350" width="900" height="1350" role="img">
+  <title>Fictional red and white lighthouse on a rocky point</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9c8ef"/>
+      <stop offset="1" stop-color="#e8f1fb"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1350" fill="url(#sky)"/>
+  <rect y="1050" width="900" height="300" fill="#2b5b7a"/>
+  <path d="M120 1080 C260 980 520 960 760 1080Z" fill="#5a5148"/>
+  <path d="M390 560 L510 560 L540 1010 L360 1010Z" fill="#f4f1ea"/>
+  <path d="M378 760 L522 760 L530 860 L370 860Z M392 600 L508 600 L514 680 L386 680Z" fill="#c8402f"/>
+  <rect x="380" y="500" width="140" height="60" rx="8" fill="#2a2a2a"/>
+  <circle cx="450" cy="530" r="18" fill="#ffe08a"/>
+</svg>

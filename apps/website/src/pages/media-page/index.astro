@@ -1,0 +1,18 @@
+---
+/**
+ * /media-page/: media lab — image, video, audio, composition preview, and
+ * in-browser PNG/WebM export. Static build; client island for players/export.
+ * Same-origin and synthetic media only (no foreign network).
+ */
+import PageBanner from '../../components/landing/PageBanner.astro';
+import MediaLab from '../../components/media-page/MediaLab.svelte';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Media lab"
+  description="Texuli media lab: image, video, audio, compositions, and browser export to PNG and WebM. Static, no foreign network."
+>
+  <PageBanner slot="page-media" />
+  <MediaLab client:load />
+</BaseLayout>

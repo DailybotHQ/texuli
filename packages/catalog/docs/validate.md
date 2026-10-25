@@ -1,0 +1,139 @@
+# Draft validation
+
+**Package:** `@texuli/catalog`  
+**Import:** `@texuli/catalog/validate`  
+**Tests:** `packages/catalog/tests/validate-draft.test.ts`, `packages/catalog/tests/validate-family-blocks.test.ts`
+
+## Goal
+
+`validateDraft` is the single validation entry a host calls on untrusted
+blueprint JSON (an agent's output, a pasted tree, an imported file). The
+golden scorer, the edit history's commit gate and the planned player and
+agent service call it, so there is one pipeline, not one per host.
+
+It is runtime-neutral: no DOM and no Node APIs, so it runs in a browser, a
+Node service or an edge worker. It never throws: anything unexpected fails
+closed with an `internal-error` diagnostic.
+
+## Pipeline
+
+| Check | What it does | Stops the run |
+| --- | --- | --- |
+| `input` | Text: a byte cap before `JSON.parse` (`maxBytes` + 8 KiB), then parse. The value must be an object or an array | yes |
+| `envelope` | For a [blueprint envelope](./envelope.md): strict field rules, the catalog binding (`catalogHash`), and trust warnings for a declared status, activation or tier; then the tree runs the checks below. `skipped` for a bare tree | on an unsupported version or a missing tree |
+| `structure` | One iterative pass: prototype keys (`__proto__`, `constructor`, `prototype`) anywhere, values nested deeper than 128 levels, node fields other than `id`, `props`, `children`, `slot`, `when` | only on a depth bomb |
+| `sinks` | The raw sink scan (`scanSinks`): executable strings, HTML strings, `class` / `style` / `innerHTML` / `srcdoc` keys, `on…` keys, functions, bidi controls, and URLs the host tier's policy refuses for their kind of key (links through the link policy, `src` and `poster` through the image or media policy) | no |
+| `limits` | `validateCatalogTreeLimits` (depth, nodes, bytes, branching, roots) | yes |
+| `render` | `renderCatalogTree` at the host's tier: closed ids, tiers, prop schemas, the block family check, named slots and `when` conditions (with the host's `conditions` and `conditionInputs`; a `when` without a runtime is an error) | no |
+| `blocks` | The host's `checkBlock` on every `blocks-*` block (assemble one with `createFamilyBlockCheck` from `@texuli/catalog/validate/blocks`; see the Block families section); `skipped` without one | no |
+| `grammar` | `checkCompositionGrammar` with `defaultGrammarRoles` (or `roles`); warnings do not fail | no |
+| `root` | One component root whose id is a frame (`layout-page`, `layout-doc`, `layout-deck`); `frameRoots: false` turns it off | no |
+
+A draft is `ok` only with zero error diagnostics. `status` is `valid`,
+`invalid`, `parse` or `over-limits`. For envelope input, `envelope` carries
+the status validation earned (`validated` or `draft`). `draft` is the tree
+with only node fields (`null` when it could not be read), `roots` is the
+sink-free render tree to paint, and `checks` says which checks passed,
+failed or were skipped, for a validation receipt.
+
+The tier is chosen by the host, never by the draft: `untrusted` (the
+default) for agent output, `developer` for trees a person authored in a
+trusted tool.
+
+## Usage
+
+```ts
+import { buildCatalog } from '@texuli/catalog/build';
+import { renderCatalogFromBuild } from '@texuli/catalog/render/renderer';
+import { validateDraft } from '@texuli/catalog/validate';
+import { createFamilyBlockCheck } from '@texuli/catalog/validate/blocks';
+
+// The nine `@texuli/blocks/*/engine` parsers, injected so the entry stays
+// under its 8 KiB budget - the full recipe is in "Block families" below.
+const checkFamilyBlock = createFamilyBlockCheck(familyEngines);
+
+const catalog = renderCatalogFromBuild((await buildCatalog(groups)).catalog);
+const result = validateDraft(text, { catalog, checkBlock: checkFamilyBlock });
+if (!result.ok) {
+  // result.diagnostics: check, code, severity, path, message, id
+}
+```
+
+The block schema is an option, not a dependency: the block parsers are
+larger than this whole module.
+
+### Block families (`@texuli/catalog/validate/blocks`)
+
+`createFamilyBlockCheck(engines)` builds the `checkBlock` that checks each
+`blocks-*` node with the parser of the family that renders it (audit G05),
+the same parser the family component runs before it paints, so a draft it
+accepts does not paint an "invalid" notice. The check fails closed: a block
+another family renders, a block with no `type`, an id with no known block
+family or no injected engine (prototype names included) and a parser that
+throws are all refused. The returned checker never throws.
+
+The nine family parsers live in `@texuli/blocks/*/engine` and are injected,
+so the `validate/blocks` entry stays under its 8 KiB budget instead of
+bundling all nine engines:
+
+```ts
+import { checkCodeBlock } from '@texuli/blocks/code/engine';
+import { checkDataBlock } from '@texuli/blocks/data/engine';
+import { checkEmbedBlock } from '@texuli/blocks/embed/engine';
+import { checkInteractiveBlock } from '@texuli/blocks/interactive/engine';
+import { checkMapBlock } from '@texuli/blocks/map/engine';
+import { checkMediaBlock } from '@texuli/blocks/media/engine';
+import { checkStructureBlock } from '@texuli/blocks/structure/engine';
+import { checkTextBlock } from '@texuli/blocks/text/engine';
+import { createFamilyBlockCheck, diagramFamilyCheck } from '@texuli/catalog/validate/blocks';
+
+const checkFamilyBlock = createFamilyBlockCheck({
+  'blocks-code': checkCodeBlock,
+  'blocks-data': checkDataBlock,
+  'blocks-diagram': diagramFamilyCheck,
+  'blocks-embed': checkEmbedBlock,
+  'blocks-interactive': checkInteractiveBlock,
+  'blocks-map': checkMapBlock,
+  'blocks-media': checkMediaBlock,
+  'blocks-structure': checkStructureBlock,
+  'blocks-text': checkTextBlock,
+});
+```
+
+`diagramFamilyCheck` adapts the diagram engine's JSON paths to the prop
+paths the draft checks use. A host may inject fewer engines: every block id
+without one is refused, and a test keeps the golden scorer's assembly equal
+to the renderer's family table (`BLOCK_FAMILY_TYPES`) and the catalog's
+`blocks-*` ids.
+
+Prefer it to the core parser (`safeParseBlock` from `@texuli/blocks/core`).
+The core parser knows only the core block types: it refuses valid `flow`,
+`tree`, `board`, `terminal`, `link-preview`, `embed-app` and `map` blocks,
+and its rules for some shared types differ from the family that renders
+them.
+
+The renderer's own family check (`blockFamilyMismatch`, in the `render`
+check) also reads only its own keys, and refuses a `blocks-*` id with no
+known family instead of skipping it.
+
+## Edit history
+
+`draftCommitGate(options)` adapts `validateDraft` to the commit gate of
+`createEditHistory` (`@texuli/catalog/edit`). An edit that would leave the
+draft invalid is refused with `validation-failed` and the tree is unchanged.
+The history's default gate stays the tree limits; hosts opt in:
+
+```ts
+import { createEditHistory } from '@texuli/catalog/edit';
+import { draftCommitGate } from '@texuli/catalog/validate';
+
+const history = createEditHistory(tree, { validate: draftCommitGate({ catalog }) });
+```
+
+## Not covered
+
+- The golden `dontUseWhen` guidance detectors and `axe` stay in
+  `@texuli/tools/golden` (axe needs a DOM).
+- The website playground keeps its own preview pipeline for now; it renders
+  trees that fail validation on purpose, to show the diagnostics.
+- The envelope's JSON schema in the planned `spec/` (ADR-003).

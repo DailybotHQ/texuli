@@ -1,0 +1,25 @@
+{
+  "$comment": "Target-neutral semantic roles for the dual-target golden gate (spec/Compose design 7.2). Both the web trace (web/trace.ts) and the native trace (texuli-spec SemanticTrace.kt) apply these rules to a validated render tree. A rule names the role, the props tried in order for the accessible name, and, for headings, the prop holding the level.",
+  "version": 1,
+  "default": { "role": "generic" },
+  "components": [
+    { "id": "layout-page", "role": "main", "name": ["title"] },
+    { "id": "layout-doc", "role": "main", "name": ["title"] },
+    { "id": "layout-deck", "role": "main", "name": ["title"] },
+    { "id": "layout-card", "role": "group", "name": ["title"] },
+    { "id": "layout-grid", "role": "group" },
+    { "id": "media-image", "role": "img", "name": ["alt"] },
+    { "prefix": "charts-", "role": "figure", "name": ["title", "label"] }
+  ],
+  "blocks": {
+    "heading": { "role": "heading", "name": ["text"], "level": "level" },
+    "text": { "role": "paragraph" },
+    "list": { "role": "list" },
+    "quote": { "role": "blockquote" },
+    "callout": { "role": "note", "name": ["title"] },
+    "table": { "role": "table", "name": ["caption"] },
+    "stat": { "role": "group" },
+    "kpi": { "role": "group" },
+    "chart": { "role": "figure", "name": ["title"] }
+  }
+}

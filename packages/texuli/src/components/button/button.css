@@ -1,0 +1,283 @@
+/**
+ * Button family styles. Live in `@layer tx.components` so consumer CSS wins.
+ * Logical properties only; colors from `--tx-*` tokens.
+ */
+
+@layer tx.components {
+  .tx-button {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    block-size: auto;
+    margin: 0;
+    border-style: solid;
+    border-width: 0;
+    border-radius: var(--tx-radius, 0.625rem);
+    padding-block: 0;
+    padding-inline: 1rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+    cursor: pointer;
+    color: var(--tx-foreground, CanvasText);
+    background-color: transparent;
+    box-shadow: none;
+    transition-property: color, background-color, border-color, box-shadow, opacity;
+    transition-duration: var(--tx-motion-base, 200ms);
+    transition-timing-function: var(--tx-motion-easing, ease);
+  }
+
+  .tx-button:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-button:disabled,
+  .tx-button[aria-disabled="true"] {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .tx-button :where(svg) {
+    inline-size: 1rem;
+    block-size: 1rem;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  /* Variants */
+  .tx-button--default {
+    color: var(--tx-primary-foreground, CanvasText);
+    background-color: var(--tx-primary, Highlight);
+    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 12%, transparent));
+  }
+
+  .tx-button--default:hover:not(:disabled):not([aria-disabled="true"]) {
+    background-color: var(--tx-primary-hover, var(--tx-primary, Highlight));
+  }
+
+  .tx-button--secondary {
+    color: var(--tx-secondary-foreground, CanvasText);
+    background-color: var(--tx-secondary, ButtonFace);
+  }
+
+  .tx-button--secondary:hover:not(:disabled):not([aria-disabled="true"]) {
+    background-color: var(--tx-secondary-hover, var(--tx-secondary, ButtonFace));
+  }
+
+  .tx-button--outline {
+    border-width: 1px;
+    border-color: var(--tx-input, var(--tx-border, ButtonBorder));
+    color: var(--tx-foreground, CanvasText);
+    background-color: var(--tx-surface, Canvas);
+    box-shadow: var(--tx-shadow-soft, none);
+  }
+
+  .tx-button--outline:hover:not(:disabled):not([aria-disabled="true"]) {
+    background-color: var(--tx-muted, color-mix(in srgb, CanvasText 6%, Canvas));
+  }
+
+  .tx-button--ghost {
+    color: var(--tx-foreground, CanvasText);
+    background-color: transparent;
+  }
+
+  .tx-button--ghost:hover:not(:disabled):not([aria-disabled="true"]) {
+    background-color: var(--tx-muted, color-mix(in srgb, CanvasText 6%, Canvas));
+  }
+
+  .tx-button--destructive {
+    color: var(--tx-destructive-foreground, CanvasText);
+    background-color: var(--tx-destructive, Mark);
+    box-shadow: var(--tx-shadow-soft, none);
+  }
+
+  .tx-button--destructive:hover:not(:disabled):not([aria-disabled="true"]) {
+    background-color: var(--tx-destructive-hover, var(--tx-destructive, Mark));
+    color: var(--tx-destructive-foreground, CanvasText);
+  }
+
+  .tx-button--link {
+    /* `link` is AA-gated on background/surface/muted/elevated (not primary). */
+    color: var(--tx-link, LinkText);
+    background-color: transparent;
+    text-underline-offset: 4px;
+    box-shadow: none;
+  }
+
+  .tx-button--link:hover:not(:disabled):not([aria-disabled="true"]) {
+    text-decoration: underline;
+  }
+
+  .tx-button--link-size {
+    block-size: auto;
+    min-block-size: 0;
+    padding-inline: 0;
+    box-shadow: none;
+  }
+
+  /* Sizes — touch target ≥ 44px below sm; logical min-block-size */
+  .tx-button--sm {
+    min-block-size: 2rem;
+    padding-inline: 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .tx-button--md {
+    min-block-size: 2.25rem;
+    padding-inline: 1rem;
+  }
+
+  .tx-button--lg {
+    min-block-size: 2.75rem;
+    padding-inline: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .tx-button--icon {
+    inline-size: 2.25rem;
+    min-inline-size: 2.25rem;
+    min-block-size: 2.25rem;
+    padding-inline: 0;
+  }
+
+  @media (max-width: 639px) {
+    .tx-button--sm,
+    .tx-button--md,
+    .tx-button--icon {
+      min-block-size: max(2.75rem, 44px);
+    }
+
+    .tx-button--icon {
+      min-inline-size: max(2.75rem, 44px);
+    }
+  }
+
+  .tx-button__spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .tx-button__spinner-icon {
+    inline-size: 1rem;
+    block-size: 1rem;
+    border-radius: 9999px;
+    border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-block-start-color: currentColor;
+    animation: tx-button-spin var(--tx-motion-base, 200ms) linear infinite;
+  }
+
+  .tx-button__label--hidden {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: inherit;
+    opacity: 0;
+  }
+
+  .tx-button__sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  @keyframes tx-button-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tx-button__spinner-icon {
+      animation: none;
+      border-color: currentColor;
+      opacity: 0.7;
+    }
+  }
+
+  /* Button group */
+  .tx-button-group {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: stretch;
+    isolation: isolate;
+  }
+
+  .tx-button-group[data-orientation="vertical"] {
+    flex-direction: column;
+  }
+
+  .tx-button-group[data-attached="true"] > .tx-button {
+    border-radius: 0;
+  }
+
+  .tx-button-group[data-attached="true"][data-orientation="horizontal"] > .tx-button:first-child {
+    border-start-start-radius: var(--tx-radius, 0.625rem);
+    border-end-start-radius: var(--tx-radius, 0.625rem);
+  }
+
+  .tx-button-group[data-attached="true"][data-orientation="horizontal"] > .tx-button:last-child {
+    border-start-end-radius: var(--tx-radius, 0.625rem);
+    border-end-end-radius: var(--tx-radius, 0.625rem);
+  }
+
+  .tx-button-group[data-attached="true"][data-orientation="vertical"] > .tx-button:first-child {
+    border-start-start-radius: var(--tx-radius, 0.625rem);
+    border-start-end-radius: var(--tx-radius, 0.625rem);
+  }
+
+  .tx-button-group[data-attached="true"][data-orientation="vertical"] > .tx-button:last-child {
+    border-end-start-radius: var(--tx-radius, 0.625rem);
+    border-end-end-radius: var(--tx-radius, 0.625rem);
+  }
+
+  .tx-button-group[data-attached="true"][data-orientation="horizontal"]
+    > .tx-button:not(:first-child) {
+    margin-inline-start: -1px;
+  }
+
+  .tx-button-group[data-attached="true"][data-orientation="vertical"]
+    > .tx-button:not(:first-child) {
+    margin-block-start: -1px;
+  }
+
+  .tx-button-group[data-attached="true"] > .tx-button:focus-visible {
+    z-index: 1;
+  }
+
+  @media (forced-colors: active) {
+    .tx-button {
+      border: 1px solid ButtonText;
+      forced-color-adjust: none;
+    }
+
+    .tx-button:focus-visible {
+      outline: 2px solid Highlight;
+    }
+
+    .tx-button:disabled,
+    .tx-button[aria-disabled="true"] {
+      opacity: 1;
+      color: GrayText;
+      border-color: GrayText;
+    }
+  }
+}

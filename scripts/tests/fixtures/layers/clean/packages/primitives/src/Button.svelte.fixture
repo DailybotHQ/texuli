@@ -1,0 +1,15 @@
+<script lang="ts">
+  import { safeHref } from '@texuli/core';
+  import { safeHref as fromSubpath } from '@texuli/core/url';
+  let { width = 2, href = '' }: { width?: number; href?: string } = $props();
+  // A comment may say style="color: red" or {@html x} without failing.
+</script>
+
+<!-- A comment may say <div style="color: red"> and {@html x}. -->
+<a href={safeHref(href)} style:inline-size="{width}rem" style={`--w:${width}`}>
+  <span style="--w:{width}">{fromSubpath(href)}</span>
+</a>
+
+<style>
+  a { color: inherit; }
+</style>

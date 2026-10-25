@@ -1,0 +1,237 @@
+{
+  "name": "@texuli/primitives",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Owned, headless Svelte 5 primitives built on the texels.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./accordion": {
+      "types": "./src/accordion/index.ts",
+      "svelte": "./src/accordion/index.ts",
+      "default": "./src/accordion/index.ts"
+    },
+    "./alert-dialog": {
+      "types": "./src/alert-dialog/index.ts",
+      "svelte": "./src/alert-dialog/index.ts",
+      "default": "./src/alert-dialog/index.ts"
+    },
+    "./color-picker": {
+      "types": "./src/color-picker/index.ts",
+      "svelte": "./src/color-picker/index.ts",
+      "default": "./src/color-picker/index.ts"
+    },
+    "./context-menu": {
+      "types": "./src/context-menu/index.ts",
+      "svelte": "./src/context-menu/index.ts",
+      "default": "./src/context-menu/index.ts"
+    },
+    "./label": {
+      "types": "./src/label/index.ts",
+      "svelte": "./src/label/index.ts",
+      "default": "./src/label/index.ts"
+    },
+    "./number-field": {
+      "types": "./src/number-field/index.ts",
+      "svelte": "./src/number-field/index.ts",
+      "default": "./src/number-field/index.ts"
+    },
+    "./progress": {
+      "types": "./src/progress/index.ts",
+      "svelte": "./src/progress/index.ts",
+      "default": "./src/progress/index.ts"
+    },
+    "./separator": {
+      "types": "./src/separator/index.ts",
+      "svelte": "./src/separator/index.ts",
+      "default": "./src/separator/index.ts"
+    },
+    "./sheet": {
+      "types": "./src/sheet/index.ts",
+      "svelte": "./src/sheet/index.ts",
+      "default": "./src/sheet/index.ts"
+    },
+    "./slider": {
+      "types": "./src/slider/index.ts",
+      "svelte": "./src/slider/index.ts",
+      "default": "./src/slider/index.ts"
+    },
+    "./tags-input": {
+      "types": "./src/tags-input/index.ts",
+      "svelte": "./src/tags-input/index.ts",
+      "default": "./src/tags-input/index.ts"
+    },
+    "./toolbar": {
+      "types": "./src/toolbar/index.ts",
+      "svelte": "./src/toolbar/index.ts",
+      "default": "./src/toolbar/index.ts"
+    },
+    "./tooltip": {
+      "types": "./src/tooltip/index.ts",
+      "svelte": "./src/tooltip/index.ts",
+      "default": "./src/tooltip/index.ts"
+    },
+    "./collapsible": {
+      "types": "./src/collapsible/index.ts",
+      "svelte": "./src/collapsible/index.ts",
+      "default": "./src/collapsible/index.ts"
+    },
+    "./command": {
+      "types": "./src/command/index.ts",
+      "svelte": "./src/command/index.ts",
+      "default": "./src/command/index.ts"
+    },
+    "./date-picker": {
+      "types": "./src/date-picker/index.ts",
+      "svelte": "./src/date-picker/index.ts",
+      "default": "./src/date-picker/index.ts"
+    },
+    "./date-field": {
+      "types": "./src/date-field/index.ts",
+      "svelte": "./src/date-field/index.ts",
+      "import": "./src/date-field/index.ts",
+      "default": "./src/date-field/index.ts"
+    },
+    "./file-drop": {
+      "types": "./src/file-drop/index.ts",
+      "svelte": "./src/file-drop/index.ts",
+      "default": "./src/file-drop/index.ts"
+    },
+    "./radio-group": {
+      "types": "./src/radio-group/index.ts",
+      "svelte": "./src/radio-group/index.ts",
+      "default": "./src/radio-group/index.ts"
+    },
+    "./switch": {
+      "types": "./src/switch/index.ts",
+      "svelte": "./src/switch/index.ts",
+      "default": "./src/switch/index.ts"
+    },
+    "./checkbox": {
+      "types": "./src/checkbox/index.ts",
+      "svelte": "./src/checkbox/index.ts",
+      "import": "./src/checkbox/index.ts",
+      "default": "./src/checkbox/index.ts"
+    },
+    "./calendar": {
+      "types": "./src/calendar/index.ts",
+      "svelte": "./src/calendar/index.ts",
+      "default": "./src/calendar/index.ts"
+    },
+    "./toggle": {
+      "types": "./src/toggle/index.ts",
+      "svelte": "./src/toggle/index.ts",
+      "default": "./src/toggle/index.ts"
+    },
+    "./menu": {
+      "types": "./src/menu/index.ts",
+      "svelte": "./src/menu/index.ts",
+      "default": "./src/menu/index.ts"
+    },
+    "./menubar": {
+      "types": "./src/menubar/index.ts",
+      "svelte": "./src/menubar/index.ts",
+      "default": "./src/menubar/index.ts"
+    },
+    "./popover": {
+      "types": "./src/popover/index.ts",
+      "svelte": "./src/popover/index.ts",
+      "default": "./src/popover/index.ts"
+    },
+    "./tabs": {
+      "types": "./src/tabs/index.ts",
+      "svelte": "./src/tabs/index.ts",
+      "default": "./src/tabs/index.ts"
+    },
+    "./hover-card": {
+      "types": "./src/hover-card/index.ts",
+      "svelte": "./src/hover-card/index.ts",
+      "default": "./src/hover-card/index.ts"
+    },
+    "./tree": {
+      "types": "./src/tree/index.ts",
+      "svelte": "./src/tree/index.ts",
+      "default": "./src/tree/index.ts"
+    },
+    "./listbox": {
+      "types": "./src/listbox/index.ts",
+      "svelte": "./src/listbox/index.ts",
+      "default": "./src/listbox/index.ts"
+    },
+    "./select": {
+      "types": "./src/select/index.ts",
+      "svelte": "./src/select/index.ts",
+      "import": "./src/select/index.ts",
+      "default": "./src/select/index.ts"
+    },
+    "./splitter": {
+      "types": "./src/splitter/index.ts",
+      "svelte": "./src/splitter/index.ts",
+      "default": "./src/splitter/index.ts"
+    },
+    "./portal": {
+      "types": "./src/portal/index.ts",
+      "svelte": "./src/portal/index.ts",
+      "default": "./src/portal/index.ts"
+    },
+    "./navigation-menu": {
+      "types": "./src/navigation-menu/index.ts",
+      "svelte": "./src/navigation-menu/index.ts",
+      "default": "./src/navigation-menu/index.ts"
+    },
+    "./scroll-area": {
+      "types": "./src/scroll-area/index.ts",
+      "svelte": "./src/scroll-area/index.ts",
+      "default": "./src/scroll-area/index.ts"
+    },
+    "./pagination": {
+      "types": "./src/pagination/index.ts",
+      "svelte": "./src/pagination/index.ts",
+      "default": "./src/pagination/index.ts"
+    },
+    "./toast": {
+      "types": "./src/toast/index.ts",
+      "svelte": "./src/toast/index.ts",
+      "default": "./src/toast/index.ts"
+    },
+    "./dialog": {
+      "types": "./src/dialog/index.ts",
+      "svelte": "./src/dialog/index.ts",
+      "default": "./src/dialog/index.ts"
+    },
+    "./pin-input": {
+      "types": "./src/pin-input/index.ts",
+      "svelte": "./src/pin-input/index.ts",
+      "default": "./src/pin-input/index.ts"
+    },
+    "./combobox": {
+      "types": "./src/combobox/index.ts",
+      "svelte": "./src/combobox/index.ts",
+      "default": "./src/combobox/index.ts"
+    },
+    "./avatar": {
+      "types": "./src/avatar/index.ts",
+      "svelte": "./src/avatar/index.ts",
+      "default": "./src/avatar/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@internationalized/date": "^3.12.4",
+    "@texuli/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

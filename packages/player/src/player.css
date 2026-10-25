@@ -1,0 +1,614 @@
+/* biome-ignore-all lint/complexity/noImportantStyles: the reduced-motion policy must override painted components' animation durations (the tokens' base.css does the same). */
+.tx-player {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  color: var(--tx-foreground, CanvasText);
+  background: var(--tx-background, Canvas);
+  border: 1px solid var(--tx-border, ButtonBorder);
+  border-radius: var(--tx-radius-lg, 0.75rem);
+  font: inherit;
+}
+
+.tx-player *,
+.tx-player *::before,
+.tx-player *::after {
+  box-sizing: border-box;
+}
+
+.tx-player {
+  position: relative;
+}
+
+/* Visible only while focused (WCAG 2.4.1 bypass for embedded frames). */
+/*
+ * Visually hidden until focused, wherever the player sits on the page: a
+ * 1px clipped box, never an offset that could land on host content.
+ */
+.tx-player__skip {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  z-index: 1;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+  border-radius: var(--tx-radius, 0.5rem);
+  background: var(--tx-background, Canvas);
+  color: var(--tx-foreground, CanvasText);
+}
+
+.tx-player__skip:focus,
+.tx-player__skip:focus-visible {
+  inline-size: auto;
+  block-size: auto;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  overflow: visible;
+  clip-path: none;
+}
+
+.tx-player__skip:focus-visible,
+.tx-player__label:focus-visible,
+.tx-player__notice:focus-visible,
+.tx-player__end:focus-visible,
+.tx-player [data-tx-player-frame]:focus-visible,
+.tx-player__anchor:focus-visible {
+  outline: 2px solid var(--tx-ring, Highlight);
+  outline-offset: 2px;
+}
+
+.tx-player__end {
+  display: block;
+  block-size: 0;
+}
+
+.tx-player__surface[inert] {
+  opacity: 0.6;
+}
+
+.tx-player__chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-inline-size: 0;
+  padding: clamp(0.75rem, 2.5vw, 1.25rem);
+  border-block-end: 1px solid var(--tx-border, ButtonBorder);
+}
+
+.tx-player__label {
+  min-inline-size: 0;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.tx-player__badges {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.375rem;
+}
+
+.tx-player__trust {
+  padding: 0.25rem 0.65rem;
+  border: 1px dashed var(--tx-border, ButtonBorder);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tx-player__badge {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid var(--tx-border, ButtonBorder);
+  border-radius: 999px;
+  background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tx-player__badge[data-status="invalid"] {
+  border-color: var(--tx-danger, Mark);
+}
+
+.tx-player__surface {
+  min-inline-size: 0;
+  padding: clamp(0.75rem, 3vw, 1.5rem);
+  overflow-wrap: anywhere;
+}
+
+.tx-player__notice,
+.tx-player__preview-warning {
+  margin: clamp(0.75rem, 3vw, 1.5rem);
+  padding: 1rem;
+  border-inline-start: 0.25rem solid var(--tx-danger, Mark);
+  background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+}
+
+.tx-player__notice h3 {
+  margin-block: 0 0.5rem;
+  font-size: 1rem;
+}
+
+.tx-player__notice ul {
+  margin-block: 0;
+  padding-inline-start: 1.25rem;
+}
+
+.tx-player__preview-warning {
+  border-inline-start-color: var(--tx-warning, Mark);
+}
+
+.tx-player__placeholder,
+.tx-player__skeleton {
+  display: grid;
+  gap: 0.35rem;
+  min-inline-size: 0;
+  margin-block: 0.5rem;
+  padding: 0.875rem;
+  border: 1px dashed var(--tx-border, ButtonBorder);
+  border-radius: var(--tx-radius, 0.5rem);
+  color: var(--tx-muted-foreground, GrayText);
+  overflow-wrap: anywhere;
+}
+
+.tx-player__placeholder strong {
+  color: var(--tx-foreground, CanvasText);
+}
+
+.tx-player__placeholder[data-reason="node-error"] {
+  border-inline-start: 0.25rem solid var(--tx-danger, Mark);
+}
+
+.tx-player__placeholder-path {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tx-player__skeleton {
+  min-block-size: 3.5rem;
+  background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+}
+
+/* Static fallback shapes per family; no animation, so reduced motion holds. */
+.tx-player__skeleton-shape {
+  display: block;
+  block-size: 0.75rem;
+  inline-size: 100%;
+  border-radius: var(--tx-radius-sm, 0.25rem);
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.tx-player__skeleton-shape + .tx-player__skeleton-shape {
+  inline-size: 60%;
+}
+
+.tx-player__skeleton[data-family="layout"] {
+  min-block-size: 8rem;
+}
+
+.tx-player__skeleton[data-family="chart"],
+.tx-player__skeleton[data-family="media"] {
+  aspect-ratio: 16 / 9;
+  max-block-size: 18rem;
+  align-content: end;
+}
+
+.tx-player__skeleton[data-family="chart"] .tx-player__skeleton-shape:nth-child(2),
+.tx-player__skeleton[data-family="media"] .tx-player__skeleton-shape:nth-child(2) {
+  block-size: 100%;
+  min-block-size: 4rem;
+}
+
+.tx-player__visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.tx-player-layout {
+  min-inline-size: 0;
+}
+
+.tx-player-layout > :first-child {
+  margin-block-start: 0;
+}
+
+.tx-player-layout > :last-child {
+  margin-block-end: 0;
+}
+
+.tx-player-layout--card,
+.tx-player-layout--slide {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--tx-border, ButtonBorder);
+  border-radius: var(--tx-radius-lg, 0.75rem);
+  background: var(--tx-card, Canvas);
+}
+
+.tx-player-layout__title {
+  margin-block: 0 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.tx-player-layout--slide {
+  margin-block: 1rem;
+}
+
+.tx-player-layout--deck {
+  inline-size: min(100%, 72rem);
+  margin-inline: auto;
+}
+
+.tx-player-layout__toc {
+  margin-block: 0 1.5rem;
+  padding: 0.75rem 1rem;
+  border-inline-start: 0.25rem solid var(--tx-border, ButtonBorder);
+}
+
+.tx-player-layout__toc ol {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+}
+
+.tx-player-layout__toc li[data-level="3"] {
+  margin-inline-start: 1rem;
+}
+
+.tx-player-layout__toc li[data-level="4"],
+.tx-player-layout__toc li[data-level="5"],
+.tx-player-layout__toc li[data-level="6"] {
+  margin-inline-start: 2rem;
+}
+
+.tx-player-layout__notes {
+  margin-block-start: 1rem;
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+.tx-player-layout--page,
+.tx-player-layout--doc {
+  inline-size: min(100%, 72rem);
+  margin-inline: auto;
+}
+
+.tx-player-layout--page h1,
+.tx-player-layout--doc h1,
+.tx-player-layout--deck h1 {
+  margin-block: 0 0.5rem;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.tx-player-layout__description {
+  margin-block: 0 1.5rem;
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+.tx-player-layout--grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--tx-player-gap, clamp(0.75rem, 2vw, 1.5rem));
+}
+
+/* G20 layout vocabulary: gaps and ratios are closed tokens, never free text. */
+.tx-player-layout--stack,
+.tx-player-layout--row,
+.tx-player-layout--split {
+  --tx-player-gap-size: 1rem;
+  gap: var(--tx-player-gap-size);
+  min-inline-size: 0;
+}
+
+[data-gap="none"] {
+  --tx-player-gap-size: 0;
+}
+
+[data-gap="small"] {
+  --tx-player-gap-size: 0.5rem;
+}
+
+[data-gap="large"] {
+  --tx-player-gap-size: 2rem;
+}
+
+.tx-player-layout--stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.tx-player-layout--row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.tx-player-layout--row[data-wrap="false"] {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.tx-player-layout--row[data-align="start"] {
+  align-items: flex-start;
+}
+
+.tx-player-layout--row[data-align="center"] {
+  align-items: center;
+}
+
+.tx-player-layout--row[data-align="end"] {
+  align-items: flex-end;
+}
+
+.tx-player-layout--row > * {
+  flex: 1 1 12rem;
+  min-inline-size: 0;
+}
+
+/* Split: one column on narrow screens, the ratio from 40rem up. */
+.tx-player-layout--split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 40rem) {
+  .tx-player-layout--split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .tx-player-layout--split[data-ratio="1:2"] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+
+  .tx-player-layout--split[data-ratio="2:1"] {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+
+  .tx-player-layout--split[data-ratio="1:3"] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+  }
+
+  .tx-player-layout--split[data-ratio="3:1"] {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+  }
+}
+
+.tx-player-layout--tile {
+  min-inline-size: 0;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--tx-border, ButtonBorder);
+  border-radius: var(--tx-radius-lg, 0.75rem);
+  background: var(--tx-card, Canvas);
+}
+
+@media (min-width: 48rem) {
+  .tx-player-layout--grid {
+    grid-template-columns: repeat(var(--tx-player-columns, 2), minmax(0, 1fr));
+  }
+
+  /* A tile spans its columns and rows only where the grid has columns. */
+  .tx-player-layout--grid > .tx-player-layout--tile {
+    grid-column: span min(var(--tx-player-span, 1), var(--tx-player-columns, 2));
+    grid-row: span var(--tx-player-row-span, 1);
+  }
+}
+
+.tx-player-frame {
+  display: block;
+  inline-size: 100%;
+  border: 0;
+}
+
+.tx-player__host-chrome {
+  padding: clamp(0.75rem, 2.5vw, 1.25rem);
+  border-block-start: 1px solid var(--tx-border, ButtonBorder);
+}
+
+/* Selected frames (selectable players only): an outline plus a tint, not color alone. */
+.tx-player [data-tx-player-selected] {
+  outline: 2px dashed var(--tx-ring, Highlight);
+  outline-offset: 4px;
+  background: color-mix(in srgb, var(--tx-ring, Highlight) 8%, transparent);
+}
+
+/* Player-owned motion goes through the motion tokens, so the policy reaches it. */
+.tx-player [data-tx-player-frame] {
+  transition:
+    outline-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease),
+    background-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
+}
+
+.tx-player__surface[data-selectable] [data-tx-player-frame] {
+  cursor: default;
+}
+
+@media (forced-colors: active) {
+  .tx-player [data-tx-player-selected] {
+    outline-color: Highlight;
+  }
+}
+
+/* State-only controls (G06/D14). */
+.tx-player-control {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block: 0.25rem;
+  font: inherit;
+}
+
+.tx-player-control button,
+.tx-player-control input {
+  font: inherit;
+  color: inherit;
+}
+
+.tx-player-control--toggle {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--tx-border, ButtonBorder);
+  border-radius: 999px;
+  background: transparent;
+}
+
+.tx-player-control__track {
+  display: inline-block;
+  inline-size: 2rem;
+  block-size: 1rem;
+  border-radius: 999px;
+  background: var(--tx-muted, ButtonFace);
+}
+
+.tx-player-control__thumb {
+  display: block;
+  inline-size: 1rem;
+  block-size: 1rem;
+  border-radius: 999px;
+  background: var(--tx-foreground, CanvasText);
+}
+
+.tx-player-control--toggle[aria-checked="true"] .tx-player-control__thumb {
+  margin-inline-start: auto;
+  background: var(--tx-primary, Highlight);
+}
+
+.tx-player-control--choice button {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--tx-border, ButtonBorder);
+  background: transparent;
+}
+
+.tx-player-control--choice button[aria-checked="true"] {
+  background: var(--tx-primary, Highlight);
+  color: var(--tx-primary-foreground, HighlightText);
+}
+
+.tx-player-control :focus-visible {
+  outline: 2px solid var(--tx-ring, Highlight);
+  outline-offset: 2px;
+}
+
+.tx-player-flow-view:focus-visible {
+  outline: 2px solid var(--tx-ring, Highlight);
+  outline-offset: 2px;
+}
+
+.tx-player-flow-action[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Action forms (G17). */
+.tx-player-action-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-block: 1rem;
+}
+
+.tx-player-form-field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.tx-player-form-field input,
+.tx-player-form-field textarea {
+  font: inherit;
+  padding: 0.5rem;
+  border: 1px solid var(--tx-border, ButtonBorder);
+  border-radius: var(--tx-radius, 0.5rem);
+}
+
+.tx-player-form-field[data-invalid] input,
+.tx-player-form-field[data-invalid] textarea {
+  border-color: var(--tx-danger, Mark);
+}
+
+.tx-player-form-field__error {
+  margin: 0;
+  color: var(--tx-danger, Mark);
+  font-size: 0.875rem;
+}
+
+.tx-player-form-submit[aria-disabled="true"] {
+  opacity: 0.6;
+}
+
+/* Compact density for chat surfaces. */
+.tx-player[data-density="compact"] .tx-player__chrome {
+  padding: 0.5rem 0.75rem;
+}
+
+.tx-player[data-density="compact"] .tx-player__surface,
+.tx-player[data-density="compact"] .tx-player__host-chrome {
+  padding: 0.75rem;
+}
+
+.tx-player[data-density="compact"] .tx-player__notice,
+.tx-player[data-density="compact"] .tx-player__preview-warning {
+  margin: 0.75rem;
+  padding: 0.75rem;
+}
+
+@media (forced-colors: active) {
+  .tx-player,
+  .tx-player__badge,
+  .tx-player__trust,
+  .tx-player__placeholder,
+  .tx-player__skeleton,
+  .tx-player-layout--card {
+    border-color: CanvasText;
+  }
+}
+
+/*
+ * Motion policy, scoped to the player. The same contract as the tokens'
+ * base.css (`[data-tx-motion="reduce"]` and `prefers-reduced-motion`), so a
+ * host that does not load the tokens still gets no motion inside the player,
+ * and nothing outside the player is touched.
+ */
+.tx-player[data-tx-motion="reduce"],
+.tx-player[data-tx-motion="reduce"] *,
+.tx-player[data-tx-motion="reduce"] *::before,
+.tx-player[data-tx-motion="reduce"] *::after {
+  --tx-motion-fast: 0ms !important;
+  --tx-motion-base: 0ms !important;
+  --tx-motion-slow: 0ms !important;
+  --tx-motion-easing: linear !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tx-player,
+  .tx-player *,
+  .tx-player *::before,
+  .tx-player *::after {
+    --tx-motion-fast: 0ms !important;
+    --tx-motion-base: 0ms !important;
+    --tx-motion-slow: 0ms !important;
+    --tx-motion-easing: linear !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

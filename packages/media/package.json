@@ -1,0 +1,131 @@
+{
+  "name": "@texuli/media",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Media: images, galleries, video, audio and layered compositions.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./animation": {
+      "types": "./src/animation/index.ts",
+      "default": "./src/animation/index.ts"
+    },
+    "./animation/player": {
+      "types": "./src/animation/player.ts",
+      "svelte": "./src/animation/player.ts",
+      "default": "./src/animation/player.ts"
+    },
+    "./audio": {
+      "types": "./src/audio/entry.ts",
+      "svelte": "./src/audio/entry.ts",
+      "default": "./src/audio/entry.ts"
+    },
+    "./captions": {
+      "types": "./src/captions/entry.ts",
+      "svelte": "./src/captions/entry.ts",
+      "default": "./src/captions/entry.ts"
+    },
+    "./composition-canvas": {
+      "types": "./src/composition-canvas/index.ts",
+      "svelte": "./src/composition-canvas/index.ts",
+      "default": "./src/composition-canvas/index.ts"
+    },
+    "./composition-canvas/draw": {
+      "types": "./src/composition-canvas/pipeline.ts",
+      "default": "./src/composition-canvas/pipeline.ts"
+    },
+    "./composition-canvas/render": {
+      "types": "./src/composition-canvas/render.ts",
+      "default": "./src/composition-canvas/render.ts"
+    },
+    "./composition-model": {
+      "types": "./src/composition-model/index.ts",
+      "default": "./src/composition-model/index.ts"
+    },
+    "./composition-v2": {
+      "types": "./src/composition-v2/index.ts",
+      "default": "./src/composition-v2/index.ts"
+    },
+    "./composition-svg": {
+      "types": "./src/composition-svg/index.ts",
+      "svelte": "./src/composition-svg/index.ts",
+      "default": "./src/composition-svg/index.ts"
+    },
+    "./export": {
+      "types": "./src/export/index.ts",
+      "default": "./src/export/index.ts"
+    },
+    "./export/ui": {
+      "types": "./src/export/ui.ts",
+      "svelte": "./src/export/ui.ts",
+      "default": "./src/export/ui.ts"
+    },
+    "./gallery": {
+      "types": "./src/gallery/index.ts",
+      "svelte": "./src/gallery/index.ts",
+      "default": "./src/gallery/index.ts"
+    },
+    "./gallery/lightbox": {
+      "types": "./src/gallery/lightbox.ts",
+      "svelte": "./src/gallery/lightbox.ts",
+      "default": "./src/gallery/lightbox.ts"
+    },
+    "./generator-slot": {
+      "types": "./src/generator-slot/entry.ts",
+      "svelte": "./src/generator-slot/entry.ts",
+      "default": "./src/generator-slot/entry.ts"
+    },
+    "./image": {
+      "types": "./src/image/entry.ts",
+      "svelte": "./src/image/entry.ts",
+      "default": "./src/image/entry.ts"
+    },
+    "./image-editor": {
+      "types": "./src/image-editor/index.ts",
+      "svelte": "./src/image-editor/index.ts",
+      "default": "./src/image-editor/index.ts"
+    },
+    "./image-editor/model": {
+      "types": "./src/image-editor/model.ts",
+      "default": "./src/image-editor/model.ts"
+    },
+    "./image-editor/render": {
+      "types": "./src/image-editor/render.ts",
+      "default": "./src/image-editor/render.ts"
+    },
+    "./timeline": {
+      "types": "./src/timeline/index.ts",
+      "svelte": "./src/timeline/index.ts",
+      "default": "./src/timeline/index.ts"
+    },
+    "./timeline/model": {
+      "types": "./src/timeline/model-index.ts",
+      "default": "./src/timeline/model-index.ts"
+    },
+    "./video": {
+      "types": "./src/video/entry.ts",
+      "svelte": "./src/video/entry.ts",
+      "default": "./src/video/entry.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/core": "workspace:*",
+    "@texuli/primitives": "workspace:*",
+    "@texuli/tokens": "workspace:*",
+    "texuli": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

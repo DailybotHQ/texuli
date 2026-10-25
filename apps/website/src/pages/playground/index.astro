@@ -1,0 +1,50 @@
+---
+import PlaygroundApp from '../../components/playground/PlaygroundApp.svelte';
+/**
+ * /playground/ — agent catalog playground (sink-free renderer + hostile presets).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Agent playground"
+  description="Paste a catalog tree, run the sink-free renderer, inspect diagnostics, and try hostile presets. Static site, no runtime network."
+>
+  <div class="playground-page" data-tx-playground-page="">
+    <header class="playground-page__header">
+      <p class="eyebrow">Agent tools</p>
+      <h1>Agent playground</h1>
+      <p class="lead">
+        Edit untrusted catalog JSON and see what the sink-free renderer keeps. Hostile corpus
+        samples are available as presets. Nothing here executes agent HTML or loads remote code.
+      </p>
+    </header>
+    <PlaygroundApp client:load />
+  </div>
+</BaseLayout>
+
+<style>
+  .playground-page {
+    display: grid;
+    gap: 1.5rem;
+    min-inline-size: 0;
+  }
+  .eyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0.5rem 0 0;
+    max-inline-size: 44rem;
+    color: var(--tx-foreground);
+  }
+</style>

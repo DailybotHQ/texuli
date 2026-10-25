@@ -1,0 +1,78 @@
+---
+/**
+ * Previous and next pages in sidebar order, under docs and component pages.
+ * Static links; no script.
+ */
+import type { NavLink } from '../foundation/site.ts';
+import { withBase } from '../foundation/site.ts';
+
+interface Props {
+  previous?: (NavLink & { href: string }) | undefined;
+  next?: (NavLink & { href: string }) | undefined;
+}
+const { previous, next } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+{
+  (previous || next) && (
+    <nav class="pager" aria-label="Previous and next pages" data-docs-pager="">
+      {previous ? (
+        <a class="pager__link" href={withBase(base, previous.href)} rel="prev">
+          <span class="pager__hint">Previous</span>
+          <span class="pager__title">{previous.label}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+      {next && (
+        <a class="pager__link pager__link--next" href={withBase(base, next.href)} rel="next">
+          <span class="pager__hint">Next</span>
+          <span class="pager__title">{next.label}</span>
+        </a>
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .pager {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-block-start: 3rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--tx-border);
+  }
+  .pager__link {
+    display: grid;
+    gap: 0.125rem;
+    min-inline-size: 0;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius-lg, 0.75rem);
+    color: var(--tx-foreground);
+    text-decoration: none;
+  }
+  .pager__link--next {
+    grid-column: 2;
+    text-align: end;
+  }
+  .pager__link:hover {
+    border-color: var(--tx-border-strong, var(--tx-border));
+    background: var(--tx-muted);
+  }
+  .pager__link:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .pager__hint {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8125rem;
+  }
+  .pager__title {
+    font-weight: 600;
+    /* Long names (DropdownMenu.Content) break rather than widen the page. */
+    overflow-wrap: anywhere;
+  }
+</style>

@@ -1,0 +1,279 @@
+{
+  "$comment": "PLAN_002 expressiveness-audit fixture. The wrapper is audit metadata only; it is NOT a proposed blueprint envelope (ADR-003 owns that). `tree` is a real CatalogTreeInput for the catalog build named in `catalog`. Probes are fragments expected to fail; each names the gap it evidences. Fictional data only.",
+  "fixture": "01-landing-page",
+  "screen": "Marketing landing page: hero, primary calls to action, feature tiles, social proof, testimonial, plan summary, footer links.",
+  "northStar": null,
+  "catalog": "catalog-f4553b4eaced02c163f6606e53eb4dab1277345aa5247cbb57ceaac2c116c703.json",
+  "tier": "untrusted",
+  "capabilityTier": "unknown (ADR-003: no id is portable until audited); audit candidate: portable core",
+  "result": "expressible-with-compromises",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Harborline: shared boards for small teams",
+      "description": "Plan the week together, see who is blocked, and ship on time."
+    },
+    "children": [
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "heading",
+            "level": 2,
+            "eyebrow": "New: weekly digests",
+            "text": "One board for the whole team",
+            "subtitle": "Boards, check-ins and reports in one place. Free for teams up to five."
+          }
+        }
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "text",
+            "markdown": "**[Start a free trial](https://example.com/signup)** or [see pricing](https://example.com/pricing)."
+          }
+        }
+      },
+      {
+        "id": "media-image",
+        "props": {
+          "src": "https://example.com/assets/harborline-board.png",
+          "alt": "A Harborline board with three columns of task cards",
+          "width": 1200,
+          "height": 675,
+          "fit": "cover"
+        }
+      },
+      {
+        "id": "layout-grid",
+        "props": {
+          "columns": 3
+        },
+        "children": [
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Boards"
+            },
+            "children": [
+              {
+                "id": "blocks-text",
+                "props": {
+                  "block": {
+                    "type": "text",
+                    "markdown": "Drag work across columns and see the week at a glance."
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Check-ins"
+            },
+            "children": [
+              {
+                "id": "blocks-text",
+                "props": {
+                  "block": {
+                    "type": "text",
+                    "markdown": "Short async updates replace the daily status meeting."
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Reports"
+            },
+            "children": [
+              {
+                "id": "blocks-text",
+                "props": {
+                  "block": {
+                    "type": "text",
+                    "markdown": "Every Friday, a digest of what shipped and what is blocked."
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "blocks-data",
+        "props": {
+          "block": {
+            "type": "stat",
+            "items": [
+              {
+                "label": "Teams onboarded",
+                "value": "1,200"
+              },
+              {
+                "label": "Check-ins per week",
+                "value": "48k"
+              },
+              {
+                "label": "Median setup time",
+                "value": "6 min"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "quote",
+            "quote": "We cancelled two standing meetings in the first week.",
+            "cite": "Rae Example, Pebble Studio"
+          }
+        }
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Plans"
+        },
+        "children": [
+          {
+            "id": "blocks-data",
+            "props": {
+              "block": {
+                "type": "table",
+                "caption": "Harborline plans",
+                "columns": [
+                  {
+                    "id": "plan",
+                    "label": "Plan"
+                  },
+                  {
+                    "id": "price",
+                    "label": "Price per seat"
+                  },
+                  {
+                    "id": "seats",
+                    "label": "Seats"
+                  }
+                ],
+                "rows": [
+                  {
+                    "plan": "Free",
+                    "price": "$0",
+                    "seats": "Up to 5"
+                  },
+                  {
+                    "plan": "Team",
+                    "price": "$8",
+                    "seats": "Up to 50"
+                  },
+                  {
+                    "plan": "Business",
+                    "price": "$14",
+                    "seats": "Unlimited"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "text",
+            "markdown": "[Docs](https://example.com/docs) · [Changelog](https://example.com/changelog) · [Privacy](https://example.com/privacy)"
+          }
+        }
+      }
+    ]
+  },
+  "probes": [
+    {
+      "gap": "G05",
+      "intent": "Real call-to-action buttons via the schema-valid `cta` block",
+      "tree": {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "cta",
+            "actions": [
+              {
+                "label": "Start a free trial",
+                "href": "https://example.com/signup"
+              }
+            ]
+          }
+        }
+      },
+      "expect": ["family-mismatch"]
+    },
+    {
+      "gap": "G05",
+      "intent": "Feature tiles via the schema-valid `cards` block",
+      "tree": {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "cards",
+            "columns": 3,
+            "items": [
+              {
+                "title": "Boards",
+                "body": "See the week."
+              }
+            ]
+          }
+        }
+      },
+      "expect": ["family-mismatch"]
+    },
+    {
+      "gap": "G06",
+      "intent": "Marketing layout with hero/sections/footer regions under the untrusted tier",
+      "tree": {
+        "id": "layout-marketing",
+        "props": {}
+      },
+      "expect": ["tier-denied"]
+    },
+    {
+      "gap": "G04",
+      "intent": "Marketing layout at developer tier: hero and footer are slot props, so the tree cannot fill them",
+      "tier": "developer",
+      "tree": {
+        "id": "layout-marketing",
+        "props": {
+          "hero": "Hero"
+        }
+      },
+      "expect": ["invalid-prop"]
+    },
+    {
+      "gap": "G24",
+      "intent": "Hero image as a media block with a remote https URL",
+      "tree": {
+        "id": "blocks-media",
+        "props": {
+          "block": {
+            "type": "image",
+            "src": "https://example.com/assets/harborline-board.png",
+            "alt": "A Harborline board",
+            "width": 1200,
+            "height": 675
+          }
+        }
+      },
+      "expect": ["block-schema"]
+    }
+  ],
+  "gaps": ["G04", "G05", "G06", "G14", "G20", "G24"],
+  "notes": "Hero CTAs degrade to Markdown links; the footer degrades to a link row; no page header/navigation or footer landmark is expressible at the untrusted tier, and at the developer tier the marketing layouts take regions only as host slots. The hero image uses the `media-image` component because the `image` block refuses remote URLs."
+}

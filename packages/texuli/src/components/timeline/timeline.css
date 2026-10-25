@@ -1,0 +1,227 @@
+/**
+ * Timeline — @layer tx.components, logical properties only (it mirrors in
+ * right-to-left), token colors with system-color fallbacks. Status is a marker
+ * shape (filled with a check, ringed, hollow) and a spoken word; tone is color.
+ */
+@layer tx.components {
+  .tx-timeline {
+    --tx-timeline-marker: 1rem;
+    --tx-timeline-line: 2px;
+    --tx-timeline-gap: 1.5rem;
+    --tx-timeline-tone: var(--tx-primary, LinkText);
+    --tx-timeline-tone-foreground: var(--tx-primary-foreground, Canvas);
+    /*
+     * Follow currentColor so nested dark panels (color-scheme: dark; color: CanvasText)
+     * stay AA even when page-level --tx-foreground is still the light theme value.
+     */
+    --tx-timeline-muted: currentColor;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-timeline__item {
+    position: relative;
+    display: grid;
+    gap: 0.25rem 0.75rem;
+  }
+
+  /* The line to the next item (none after the last). */
+  .tx-timeline__item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    background-color: var(--tx-border, GrayText);
+  }
+
+  .tx-timeline__marker {
+    position: relative;
+    z-index: 1;
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--tx-timeline-marker);
+    block-size: var(--tx-timeline-marker);
+    border-radius: var(--tx-radius-full, 9999px);
+    border: var(--tx-timeline-line) solid var(--tx-timeline-tone);
+    background-color: var(--tx-background, Canvas);
+    color: var(--tx-timeline-tone-foreground);
+  }
+
+  .tx-timeline__marker :where(svg) {
+    inline-size: 0.625rem;
+    block-size: 0.625rem;
+  }
+
+  /* No status, or complete: filled. */
+  .tx-timeline__item:not([data-status]) .tx-timeline__marker,
+  .tx-timeline__item[data-status="complete"] .tx-timeline__marker {
+    background-color: var(--tx-timeline-tone);
+  }
+
+  /* Current: filled with a ring around it. */
+  .tx-timeline__item[data-status="current"] .tx-timeline__marker {
+    background-color: var(--tx-timeline-tone);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tx-timeline-tone) 30%, transparent);
+  }
+
+  /* Upcoming: hollow, and its line is dashed. */
+  .tx-timeline__item[data-status="upcoming"] .tx-timeline__marker {
+    background-color: var(--tx-background, Canvas);
+  }
+
+  .tx-timeline__content {
+    display: grid;
+    gap: 0.125rem;
+    min-inline-size: 0;
+  }
+
+  .tx-timeline__time {
+    font-size: var(--tx-font-size-xs, 0.75rem);
+    font-weight: var(--tx-font-weight-medium, 500);
+    color: var(--tx-timeline-muted);
+  }
+
+  .tx-timeline__title {
+    margin: 0;
+    font-weight: var(--tx-font-weight-medium, 500);
+  }
+
+  .tx-timeline__link {
+    /* currentColor stays AA on nested dark panels; underline carries the link cue. */
+    color: currentColor;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .tx-timeline__link:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+    border-radius: var(--tx-radius-step-2, 2px);
+  }
+
+  .tx-timeline__description {
+    margin: 0;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    color: var(--tx-timeline-muted);
+  }
+
+  .tx-timeline__sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Tones. */
+  .tx-timeline__item--success {
+    --tx-timeline-tone: var(--tx-success, green);
+    --tx-timeline-tone-foreground: var(--tx-success-foreground, Canvas);
+  }
+  .tx-timeline__item--warning {
+    --tx-timeline-tone: var(--tx-warning, orange);
+    --tx-timeline-tone-foreground: var(--tx-warning-foreground, CanvasText);
+  }
+  .tx-timeline__item--destructive {
+    --tx-timeline-tone: var(--tx-destructive, crimson);
+    --tx-timeline-tone-foreground: var(--tx-destructive-foreground, Canvas);
+  }
+  .tx-timeline__item--info {
+    --tx-timeline-tone: var(--tx-info, dodgerblue);
+    --tx-timeline-tone-foreground: var(--tx-info-foreground, Canvas);
+  }
+  .tx-timeline__item--neutral {
+    --tx-timeline-tone: var(--tx-timeline-muted);
+    --tx-timeline-tone-foreground: var(--tx-background, Canvas);
+  }
+
+  /* Vertical: marker column, content beside it, the line runs down the marker's center. */
+  .tx-timeline--vertical {
+    display: grid;
+    gap: var(--tx-timeline-gap);
+  }
+
+  .tx-timeline--vertical > .tx-timeline__item {
+    grid-template-columns: var(--tx-timeline-marker) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .tx-timeline--vertical > .tx-timeline__item > .tx-timeline__marker {
+    margin-block-start: 0.125rem;
+  }
+
+  .tx-timeline--vertical > .tx-timeline__item:not(:last-child)::after {
+    inset-block-start: calc(var(--tx-timeline-marker) + 0.125rem);
+    inset-block-end: calc(var(--tx-timeline-gap) * -1 - 0.125rem);
+    inset-inline-start: calc((var(--tx-timeline-marker) - var(--tx-timeline-line)) / 2);
+    inline-size: var(--tx-timeline-line);
+  }
+
+  /* Horizontal: a row that scrolls; the line runs along the marker row. */
+  .tx-timeline--horizontal {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(10rem, 1fr);
+    gap: var(--tx-timeline-gap);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding-block: 0.25rem;
+  }
+
+  .tx-timeline--horizontal:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-timeline--horizontal > .tx-timeline__item {
+    grid-template-rows: var(--tx-timeline-marker) auto;
+    align-content: start;
+  }
+
+  .tx-timeline--horizontal > .tx-timeline__item:not(:last-child)::after {
+    inset-block-start: calc((var(--tx-timeline-marker) - var(--tx-timeline-line)) / 2);
+    block-size: var(--tx-timeline-line);
+    inset-inline-start: var(--tx-timeline-marker);
+    inset-inline-end: calc(var(--tx-timeline-gap) * -1);
+  }
+
+  .tx-timeline__item[data-status="upcoming"]:not(:last-child)::after {
+    background-color: transparent;
+    border: 0 dashed var(--tx-border, GrayText);
+  }
+  .tx-timeline--vertical > .tx-timeline__item[data-status="upcoming"]:not(:last-child)::after {
+    border-inline-start-width: var(--tx-timeline-line);
+  }
+  .tx-timeline--horizontal > .tx-timeline__item[data-status="upcoming"]:not(:last-child)::after {
+    border-block-start-width: var(--tx-timeline-line);
+  }
+
+  @media (forced-colors: active) {
+    .tx-timeline__time,
+    .tx-timeline__description {
+      color: CanvasText;
+    }
+    .tx-timeline__marker {
+      border-color: CanvasText;
+      forced-color-adjust: none;
+    }
+    .tx-timeline__item:not([data-status]) .tx-timeline__marker,
+    .tx-timeline__item[data-status="complete"] .tx-timeline__marker,
+    .tx-timeline__item[data-status="current"] .tx-timeline__marker {
+      background-color: Highlight;
+      color: HighlightText;
+    }
+    .tx-timeline__item[data-status="upcoming"] .tx-timeline__marker {
+      background-color: Canvas;
+    }
+    .tx-timeline__item:not(:last-child)::after {
+      background-color: CanvasText;
+      border-color: CanvasText;
+      forced-color-adjust: none;
+    }
+  }
+}

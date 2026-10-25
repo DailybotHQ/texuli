@@ -1,0 +1,87 @@
+---
+import SiteIllustration from '../../components/landing/SiteIllustration.astro';
+/**
+ * Simple public changelog for texuli.com (linked from the landing footer).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const entries = [
+  {
+    version: '0.1',
+    date: '2026-10',
+    items: [
+      '41 owned primitives and the Texuli component layer on Svelte 5.',
+      'Theme engine with a 210-theme library target, token contract and CSS apply path.',
+      'Agent surfaces: catalog, safe renderer, skill pack and llms.txt.',
+      'Library landing on texuli.com with live interactive moments.',
+    ],
+  },
+] as const;
+---
+
+<BaseLayout
+  title="Changelog"
+  description="What shipped in Texuli — versions and highlights for people and agents."
+>
+  <header class="page-head">
+    <SiteIllustration slot="page-guides" class="page-head__art" />
+    <h1>Changelog</h1>
+    <p class="lead">
+      High-level notes for the public site. Detailed package history lives in the repository.
+    </p>
+  </header>
+
+  {
+    entries.map((entry) => (
+      <section class="release" aria-labelledby={`v-${entry.version}`}>
+        <h2 id={`v-${entry.version}`}>
+          Texuli {entry.version} <span class="when">{entry.date}</span>
+        </h2>
+        <ul>
+          {entry.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</BaseLayout>
+
+<style>
+  .page-head {
+    display: grid;
+    gap: 0.75rem;
+    margin-block-end: 2rem;
+  }
+  .page-head__art {
+    max-inline-size: 40rem;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+  }
+  .lead {
+    margin: 0;
+    max-inline-size: 40rem;
+    color: var(--tx-muted-foreground);
+  }
+  .release {
+    margin-block-end: 1.75rem;
+  }
+  .release h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+  }
+  .when {
+    color: var(--tx-muted-foreground);
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  ul {
+    margin: 0;
+    padding-inline-start: 1.2rem;
+  }
+  li {
+    margin-block: 0.35rem;
+  }
+</style>

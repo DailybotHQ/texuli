@@ -1,0 +1,52 @@
+---
+/**
+ * "Copy page": copies the page as Markdown for agents. The template holds
+ * the title line; `copyPageIntegration` appends the body, converted from the
+ * built page after `astro build`. A Texuli Button rendered as static HTML and a
+ * small module script: no island. The result is announced to screen readers.
+ */
+import { Button } from 'texuli/button';
+
+interface Props {
+  /** The title and source lines; the integration appends the body. */
+  head: string;
+}
+const { head } = Astro.props;
+---
+
+<div class="copy-page" data-copy-page="">
+  <Button variant="outline" size="sm" data-copy-page-button="">Copy page</Button>
+  <template data-page-markdown="">{head}</template>
+  <p class="copy-page__status" role="status" data-copy-page-status=""></p>
+</div>
+
+<style>
+  .copy-page {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  .copy-page__status {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.875rem;
+  }
+</style>
+
+<script>
+  for (const host of document.querySelectorAll<HTMLElement>('[data-copy-page]')) {
+    const button = host.querySelector<HTMLButtonElement>('[data-copy-page-button]');
+    const source = host.querySelector<HTMLTemplateElement>('[data-page-markdown]');
+    const status = host.querySelector<HTMLElement>('[data-copy-page-status]');
+    button?.addEventListener('click', async () => {
+      const text = source?.content.textContent ?? '';
+      try {
+        await navigator.clipboard.writeText(text);
+        if (status) status.textContent = 'Page copied as Markdown.';
+      } catch {
+        if (status) status.textContent = 'Copy failed: your browser blocked the clipboard.';
+      }
+    });
+  }
+</script>

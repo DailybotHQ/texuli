@@ -1,0 +1,278 @@
+/**
+ * Column grid: fixed column widths, sticky pinned columns, the resize edge,
+ * the drag drop marker, group headers, the column menu and the chooser.
+ * Builds on grid-core.css. @layer tx.components.
+ */
+@layer tx.components {
+  .tx-grid-columns__table {
+    table-layout: fixed;
+    max-inline-size: none;
+  }
+
+  .tx-grid-columns__table :is(th, td) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tx-grid-columns__head {
+    position: relative;
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  .tx-grid-columns__head-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-inline-size: 0;
+  }
+
+  .tx-grid-columns__head-inner > .tx-data-grid__sort,
+  .tx-grid-columns__label {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tx-grid-columns[data-dragging] .tx-grid-columns__head {
+    cursor: grabbing;
+  }
+
+  .tx-grid-columns__head[data-dragged] {
+    opacity: 0.6;
+  }
+
+  /* Drop marker: a bar on the side the dragged column will land. */
+  .tx-grid-columns__head[data-drop]::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inline-size: 3px;
+    background: var(--tx-primary, Highlight);
+  }
+  .tx-grid-columns__head[data-drop="before"]::after {
+    inset-inline-start: 0;
+  }
+  .tx-grid-columns__head[data-drop="after"]::after {
+    inset-inline-end: 0;
+  }
+
+  /* Pinned columns stick to their edge while the grid scrolls sideways. */
+  .tx-grid-columns [data-pin] {
+    position: sticky;
+    z-index: 2;
+  }
+  .tx-grid-columns td[data-pin] {
+    z-index: 1;
+    background-color: var(--tx-surface, Canvas);
+  }
+  .tx-grid-columns [data-pin="start"][data-pin-edge] {
+    box-shadow: inset calc(var(--tx-border-width, 1px) * -1) 0 0
+      var(--tx-border-strong, currentColor);
+  }
+  .tx-grid-columns [data-pin="end"][data-pin-edge] {
+    box-shadow: inset var(--tx-border-width, 1px) 0 0 var(--tx-border-strong, currentColor);
+  }
+  .tx-grid-columns:dir(rtl) [data-pin="start"][data-pin-edge] {
+    box-shadow: inset var(--tx-border-width, 1px) 0 0 var(--tx-border-strong, currentColor);
+  }
+  .tx-grid-columns:dir(rtl) [data-pin="end"][data-pin-edge] {
+    box-shadow: inset calc(var(--tx-border-width, 1px) * -1) 0 0
+      var(--tx-border-strong, currentColor);
+  }
+  .tx-grid-columns .tx-table-wrap--sticky .tx-table__head[data-pin] {
+    z-index: 3;
+  }
+
+  /* Pins that would cover most of a narrow grid scroll with the rest. */
+  .tx-grid-columns[data-pins="static"] [data-pin] {
+    position: static;
+    box-shadow: none;
+  }
+  .tx-grid-columns[data-pins="static"] .tx-table-wrap--sticky .tx-table__head[data-pin] {
+    position: sticky;
+  }
+
+  /* With group headers, the column header row sticks below the group row. */
+  /* Start-aligned, so a wide group's label stays in view when it scrolls. */
+  .tx-grid-columns__group-row .tx-table__head {
+    block-size: 2.25rem;
+    text-align: start;
+  }
+  .tx-grid-columns
+    .tx-table-wrap--sticky
+    .tx-grid-columns__group-row
+    + .tx-table__row
+    .tx-table__head {
+    inset-block-start: 2.25rem;
+  }
+  .tx-grid-columns__group {
+    border-inline-start: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  /* The resize edge: a wide hit area with a thin visible line. */
+  .tx-grid-columns__resize {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    inline-size: 0.625rem;
+    cursor: col-resize;
+    touch-action: none;
+  }
+  .tx-grid-columns__resize::after {
+    content: "";
+    position: absolute;
+    inset-block: 25%;
+    inset-inline-end: 0;
+    inline-size: 2px;
+    background: var(--tx-border-strong, currentColor);
+    opacity: 0.5;
+  }
+  .tx-grid-columns__resize:hover::after,
+  .tx-grid-columns__resize[data-active]::after {
+    inset-block: 0;
+    background: var(--tx-primary, Highlight);
+    opacity: 1;
+  }
+
+  .tx-grid-columns__menu-button {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    margin-inline-start: auto;
+    padding: 0;
+    border: 0;
+    border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+  .tx-grid-columns__menu-button svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+    fill: currentColor;
+  }
+  .tx-grid-columns__menu-button:hover,
+  .tx-grid-columns__menu-button[data-state="open"] {
+    background: var(--tx-accent, Highlight);
+    color: var(--tx-accent-foreground, HighlightText);
+  }
+  .tx-grid-columns__menu-button[aria-disabled="true"] {
+    cursor: progress;
+  }
+  .tx-grid-columns__menu-button:focus-visible,
+  .tx-grid-columns__menu-item:focus-visible,
+  .tx-grid-columns__chooser-toggle:focus-visible,
+  .tx-grid-columns__chooser-action:focus-visible,
+  .tx-grid-columns__chooser-item input:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  /* The menu shows in the top layer, outside the grid. */
+  .tx-grid-columns__menu {
+    min-inline-size: 11rem;
+    margin: 0;
+    padding: 0.25rem;
+    border: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-popover, Canvas);
+    color: var(--tx-popover-foreground, CanvasText);
+    box-shadow: var(--tx-shadow-md, 0 4px 12px rgb(0 0 0 / 0.15));
+    font-size: var(--tx-font-size-sm, 0.875rem);
+  }
+  .tx-grid-columns__menu-item {
+    display: flex;
+    align-items: center;
+    min-block-size: 2rem;
+    padding-inline: 0.625rem;
+    border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+    cursor: default;
+    outline: none;
+  }
+  .tx-grid-columns__menu-item[data-highlighted] {
+    background: var(--tx-accent, Highlight);
+    color: var(--tx-accent-foreground, HighlightText);
+  }
+  .tx-grid-columns__menu-item[data-disabled] {
+    color: var(--tx-muted-foreground, GrayText);
+    opacity: 0.7;
+  }
+  .tx-grid-columns__menu-separator {
+    block-size: 1px;
+    margin-block: 0.25rem;
+    background: var(--tx-border, currentColor);
+  }
+
+  .tx-grid-columns__chooser-toggle,
+  .tx-grid-columns__chooser-action {
+    min-block-size: var(--tx-target-size, 2.25rem);
+    padding-inline: 0.75rem;
+    border: var(--tx-border-width, 1px) solid var(--tx-input, currentColor);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, ButtonFace);
+    color: var(--tx-surface-foreground, ButtonText);
+    font: inherit;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    cursor: pointer;
+  }
+  .tx-grid-columns__chooser-toggle {
+    margin-inline-start: auto;
+  }
+  .tx-grid-columns__chooser-action:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+  .tx-grid-columns__chooser {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.75rem;
+    border: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+    border-radius: var(--tx-radius, 0.5rem);
+  }
+  .tx-grid-columns__chooser-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tx-grid-columns__chooser-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-block-size: 2rem;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+  }
+  .tx-grid-columns__chooser-item input {
+    inline-size: 1rem;
+    block-size: 1rem;
+    margin: 0;
+    accent-color: var(--tx-primary, AccentColor);
+  }
+  .tx-grid-columns__chooser-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  @media (forced-colors: active) {
+    .tx-grid-columns td[data-pin] {
+      background-color: Canvas;
+    }
+    .tx-grid-columns__head[data-drop]::after,
+    .tx-grid-columns__resize:hover::after,
+    .tx-grid-columns__resize[data-active]::after {
+      background: Highlight;
+    }
+    .tx-grid-columns__menu-item[data-highlighted] {
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+}

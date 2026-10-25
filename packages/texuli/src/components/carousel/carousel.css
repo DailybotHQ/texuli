@@ -1,0 +1,246 @@
+/**
+ * Carousel styles. Live in `@layer tx.components` so consumer CSS wins.
+ * Side-effect import from `carouselVariants` keeps recipe-only usage styled.
+ */
+
+@layer tx.components {
+  /* Only the carousel's own parts: slide content keeps the consumer's box model. */
+  .tx-carousel,
+  .tx-carousel-viewport,
+  .tx-carousel-track,
+  .tx-carousel-slide,
+  .tx-carousel-button,
+  .tx-carousel-dot,
+  .tx-carousel-dot::before {
+    box-sizing: border-box;
+  }
+  .tx-carousel {
+    --tx-carousel-sign: 1;
+    --tx-carousel-gap: calc(0.75rem * var(--tx-density, 1));
+    --tx-carousel-control-size: 2.5rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--tx-carousel-gap);
+    min-inline-size: 0;
+    color: var(--tx-foreground, CanvasText);
+    border-radius: var(--tx-radius, 0.5rem);
+    outline: none;
+  }
+  .tx-carousel:dir(rtl) {
+    --tx-carousel-sign: -1;
+  }
+  .tx-carousel:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-carousel-top {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .tx-carousel-stage {
+    position: relative;
+    min-inline-size: 0;
+  }
+
+  .tx-carousel-viewport {
+    overflow: hidden;
+    border-radius: var(--tx-radius, 0.5rem);
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  .tx-carousel-track {
+    display: flex;
+    transform: translateX(
+      calc(
+        var(--tx-carousel-index, 0) *
+        -100% *
+        var(--tx-carousel-sign) +
+        var(--tx-carousel-drag, 0px)
+      )
+    );
+    transition: transform var(--tx-motion-base, 300ms) var(--tx-motion-easing, ease-out);
+    will-change: transform;
+  }
+  .tx-carousel-track[data-dragging="true"] {
+    transition: none;
+  }
+
+  .tx-carousel-slide {
+    flex: 0 0 100%;
+    min-inline-size: 0;
+    padding-inline: 0.125rem;
+  }
+
+  .tx-carousel-fallback {
+    margin: 0;
+    padding: 1rem;
+    color: var(--tx-muted-foreground, light-dark(#52525b, #a1a1aa));
+  }
+
+  .tx-carousel-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--tx-carousel-gap);
+  }
+
+  .tx-carousel-buttons {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .tx-carousel-button {
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--tx-carousel-control-size);
+    block-size: var(--tx-carousel-control-size);
+    padding: 0;
+    border: var(--tx-border-width, 1px) solid var(--tx-border-strong, ButtonText);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    cursor: pointer;
+    transition: background-color var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease-out);
+  }
+  .tx-carousel-button:hover:not(:disabled) {
+    background: var(--tx-muted, light-dark(#f1f1f4, #26262c));
+  }
+  .tx-carousel-button:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+  .tx-carousel-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  .tx-carousel-button svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+    fill: currentColor;
+  }
+  .tx-carousel-button .tx-carousel-chevron {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tx-carousel-flip:dir(rtl) {
+    transform: scaleX(-1);
+  }
+
+  .tx-carousel-edge {
+    position: absolute;
+    inset-block-start: 50%;
+    z-index: 1;
+    translate: 0 -50%;
+    border-radius: 999px;
+    background: var(--tx-elevated, Canvas);
+    box-shadow: var(--tx-shadow-float, 0 2px 8px rgb(0 0 0 / 0.18));
+  }
+  .tx-carousel-edge[data-edge="start"] {
+    inset-inline-start: 0.5rem;
+  }
+  .tx-carousel-edge[data-edge="end"] {
+    inset-inline-end: 0.5rem;
+  }
+
+  .tx-carousel-dots {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+  .tx-carousel-dot {
+    position: relative;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .tx-carousel-dot::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    translate: -50% -50%;
+    border-radius: 999px;
+    background: var(--tx-muted-foreground, light-dark(#6b6b76, #a1a1aa));
+    transition:
+      inline-size var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease-out),
+      background-color var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease-out);
+  }
+  .tx-carousel-dot:dir(rtl)::before {
+    translate: 50% -50%;
+  }
+  .tx-carousel-dot[aria-selected="true"]::before {
+    inline-size: 1.25rem;
+    background: var(--tx-primary, light-dark(#5b21b6, #c4b5fd));
+  }
+  .tx-carousel-dot:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 0;
+    border-radius: 999px;
+  }
+
+  .tx-carousel-count {
+    min-inline-size: 3.5rem;
+    text-align: end;
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--tx-muted-foreground, light-dark(#52525b, #a1a1aa));
+  }
+
+  .tx-carousel-status {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tx-carousel-track,
+    .tx-carousel-dot::before,
+    .tx-carousel-button {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tx-carousel,
+    .tx-carousel-fallback,
+    .tx-carousel-count {
+      color: CanvasText;
+    }
+    .tx-carousel-button {
+      border-color: ButtonText;
+      background: ButtonFace;
+      color: ButtonText;
+    }
+    .tx-carousel-button:disabled {
+      border-color: GrayText;
+      color: GrayText;
+      opacity: 1;
+    }
+    .tx-carousel-dot::before {
+      background: CanvasText;
+    }
+    .tx-carousel-dot[aria-selected="true"]::before {
+      background: Highlight;
+    }
+  }
+}

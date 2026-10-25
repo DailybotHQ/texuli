@@ -1,0 +1,130 @@
+---
+import PageBanner from '../../components/landing/PageBanner.astro';
+/**
+ * /primitives-page/ — the headless primitives reference: every
+ * `@texuli/primitives` subpath with its pattern, parts and behavior checks.
+ */
+import {
+  anatomyParts,
+  PRIMITIVES,
+  primitivePath,
+} from '../../components/primitives-page/primitives.ts';
+import { primitiveBehavior } from '../../components/primitives-page/sources.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const cards = PRIMITIVES.map((doc) => ({
+  doc,
+  parts: new Set(anatomyParts(doc.anatomy)).size,
+  behavior: primitiveBehavior(doc.id),
+}));
+const checked = cards.filter((card) => card.behavior.kind !== 'missing');
+const checks = checked.reduce(
+  (sum, card) => sum + card.behavior.rows.length + card.behavior.checks.length,
+  0
+);
+---
+
+<BaseLayout
+  title="Primitives"
+  description="Headless, accessible Svelte 5 primitives: anatomy, APG pattern and the behavior checks for each one."
+>
+  <PageBanner slot="page-primitives" />
+  <h1>Primitives</h1>
+  <p class="lead">
+    <code>@texuli/primitives</code> is the unstyled layer under Texuli: behavior, keyboard, focus and
+    ARIA, with no styles of its own. Each primitive below shows its parts and how they nest, the
+    WAI-ARIA pattern it follows, and the behavior checks from the repository's behavior suite.
+  </p>
+  <p class="summary" data-summary>
+    {PRIMITIVES.length} primitives. {checked.length} have a behavior scenario ({checks} checks in
+    all), run on Chromium, WebKit and the Pixel 7.
+  </p>
+
+  <ul class="grid" role="list">
+    {
+      cards.map(({ doc, parts, behavior }) => (
+        <li class="card" data-primitive={doc.id}>
+          <h2>
+            <a href={primitivePath(doc.id)}>{doc.name}</a>
+          </h2>
+          <p>{doc.summary}</p>
+          <dl>
+            <dt>Import</dt>
+            <dd>
+              <code>@texuli/<wbr />primitives/<wbr />{doc.id}</code>
+            </dd>
+            <dt>Pattern</dt>
+            <dd>{doc.pattern.name}</dd>
+            <dt>Parts</dt>
+            <dd>{parts}</dd>
+            <dt>Behavior</dt>
+            <dd>
+              {behavior.kind === 'rows' && `${behavior.rows.length} rows`}
+              {behavior.kind === 'checks' && `${behavior.checks.length} checks`}
+              {behavior.kind === 'missing' && 'No scenario yet'}
+            </dd>
+          </dl>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
+  .lead {
+    margin: 0 0 0.75rem;
+    max-inline-size: 46rem;
+    font-size: 1.1rem;
+  }
+  .summary {
+    margin: 0 0 1.5rem;
+    color: var(--tx-muted-foreground);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius-lg, 0.75rem);
+    background: var(--tx-surface, Canvas);
+  }
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+  h2 a {
+    color: var(--tx-link, LinkText);
+  }
+  .card p {
+    margin: 0;
+  }
+  dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 0.75rem;
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  dt {
+    color: var(--tx-muted-foreground);
+  }
+  dd {
+    margin: 0;
+    min-inline-size: 0;
+    /* Long paths break at their slashes (<wbr>), not mid-word. */
+    overflow-wrap: break-word;
+  }
+</style>

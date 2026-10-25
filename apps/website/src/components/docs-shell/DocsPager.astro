@@ -1,0 +1,89 @@
+---
+import { withBase } from '../foundation/site.ts';
+/**
+ * Previous / next footer for docs pages. Local paths only; no edit link.
+ */
+import type { DocsNavLink } from './nav.ts';
+
+interface Props {
+  prev?: DocsNavLink;
+  next?: DocsNavLink;
+}
+
+const { prev, next } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+{
+  (prev || next) && (
+    <nav class="docs-pager" aria-label="Page">
+      <div class="docs-pager__item">
+        {prev ? (
+          <a class="docs-pager__link" href={withBase(base, prev.href)} rel="prev">
+            <span class="docs-pager__dir">Previous</span>
+            <span class="docs-pager__label">{prev.label}</span>
+          </a>
+        ) : (
+          <span class="docs-pager__empty" />
+        )}
+      </div>
+      <div class="docs-pager__item docs-pager__item--end">
+        {next ? (
+          <a class="docs-pager__link" href={withBase(base, next.href)} rel="next">
+            <span class="docs-pager__dir">Next</span>
+            <span class="docs-pager__label">{next.label}</span>
+          </a>
+        ) : (
+          <span class="docs-pager__empty" />
+        )}
+      </div>
+    </nav>
+  )
+}
+
+<style>
+  .docs-pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-block-start: 2.5rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--tx-border);
+  }
+  .docs-pager__item--end {
+    text-align: end;
+  }
+  .docs-pager__link {
+    display: grid;
+    gap: 0.15rem;
+    min-block-size: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    color: var(--tx-foreground);
+    text-decoration: none;
+    background: var(--tx-background);
+  }
+  .docs-pager__link:hover {
+    background: var(--tx-muted);
+  }
+  .docs-pager__link:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .docs-pager__dir {
+    font-size: 0.75rem;
+    color: var(--tx-foreground);
+  }
+  .docs-pager__label {
+    font-weight: 600;
+  }
+  @media (forced-colors: active) {
+    .docs-pager__link {
+      border-color: ButtonText;
+      background: Canvas;
+      color: CanvasText;
+      forced-color-adjust: none;
+    }
+  }
+</style>

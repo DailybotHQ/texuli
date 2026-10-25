@@ -1,0 +1,6 @@
+// Never call eval( or new Function( here, and never set el.innerHTML = data.
+/* {@html} is banned in markup; insertAdjacentHTML( too. */
+export const NOTE = 'eval(x) and el.innerHTML = y are only words in this string';
+export const TEMPLATE = `new Function(${'a'}) stays text`;
+export const evaluate = (scope: { evaluate(code: string): number }) => scope.evaluate('1');
+export { safeHref } from './url.ts';

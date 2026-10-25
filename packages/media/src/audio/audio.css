@@ -1,0 +1,120 @@
+/**
+ * Audio player and waveform — token-styled media chrome.
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  .tx-audio-player {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--tx-border, currentColor);
+    border-radius: var(--tx-radius-lg, 0.5rem);
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    max-inline-size: 28rem;
+  }
+
+  .tx-audio-player[data-status="blocked"],
+  .tx-audio-player[data-status="error"] {
+    border-color: var(--tx-destructive, crimson);
+  }
+
+  .tx-audio-player__row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .tx-audio-player__play {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1px solid var(--tx-border, currentColor);
+    border-radius: var(--tx-radius-full, 9999px);
+    background-color: var(--tx-primary, Highlight);
+    color: var(--tx-primary-foreground, Canvas);
+    cursor: pointer;
+    outline: none;
+  }
+
+  .tx-audio-player__play:focus-visible {
+    box-shadow: 0 0 0 var(--tx-focus-ring-width, 2px)
+      color-mix(in oklab, var(--tx-ring, Highlight) 40%, transparent);
+  }
+
+  .tx-audio-player__play:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .tx-audio-player__times {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-variant-numeric: tabular-nums;
+    color: var(--tx-muted-foreground, #575757);
+  }
+
+  .tx-audio-player__message {
+    margin: 0;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    color: var(--tx-muted-foreground, #575757);
+  }
+
+  .tx-audio-waveform {
+    display: block;
+    inline-size: 100%;
+    block-size: 3rem;
+    border-radius: var(--tx-radius-md, 0.375rem);
+    outline: none;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  .tx-audio-waveform:focus-visible {
+    box-shadow: 0 0 0 var(--tx-focus-ring-width, 2px)
+      color-mix(in oklab, var(--tx-ring, Highlight) 35%, transparent);
+  }
+
+  .tx-audio-waveform[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .tx-audio-waveform__bar {
+    fill: var(--tx-muted-foreground, #575757);
+  }
+
+  .tx-audio-waveform__bar--played {
+    fill: var(--tx-primary, Highlight);
+  }
+
+  @media (forced-colors: active) {
+    .tx-audio-player {
+      border: 1px solid ButtonText;
+    }
+
+    .tx-audio-player__play {
+      border: 1px solid ButtonText;
+      background: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+
+    .tx-audio-waveform__bar {
+      fill: GrayText;
+    }
+
+    .tx-audio-waveform__bar--played {
+      fill: Highlight;
+      forced-color-adjust: none;
+    }
+  }
+}

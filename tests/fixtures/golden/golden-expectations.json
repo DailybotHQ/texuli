@@ -1,0 +1,360 @@
+{
+  "$comment": "Golden expectations for the PLAN_002 expressiveness fixtures (tests/fixtures/golden/*.json), computed on 2026-10-24 at dev 746ed7fc from catalog build e82af62c (131 entries, default D5 developer view). catalogEntries moved to 132 on 2026-10-25 when T-p7-deck-grammar (G11) added the agent-emittable deck-slide layout; no fixture expectation changed. catalogEntries moved to 133 on 2026-10-25 when the catalog-side G03 follow-up added the app-tier inline-text display node (plain text for slot-only components); no fixture expectation changed (the 03 settings-form G03 probe stays tier-denied under D5). Reviewed again on 2026-10-25 when button, badge and kbd gained a plain-text label prop: catalogEntries stays 133 and no expectation changed, because the G03 probe (button with props.label) is still tier-denied at the D5 developer tier, where button is app chrome and not agentEmittable; it renders clean only for a host that passes developer: 'all'. Reviewed again on 2026-10-25 for the catalog G04/G07 follow-up (node-level slot and when): no expectation changed. The 01 G04 probe passes regions as slot props and the 04 G07 probe passes when as a prop string, the audit-day shapes, which stay refused; the node-level forms are covered by packages/catalog/tests/render-slots-conditions.test.ts. Recomputed by tests/fixtures/golden/suite.ts; the runner and the catalog gate test fail on any drift. Update this file deliberately when a behavior change is intended, and refresh the $comment.",
+  "catalogEntries": 133,
+  "fixtures": {
+    "01-landing-page": {
+      "tier": "untrusted",
+      "nodes": 16,
+      "components": 16,
+      "placeholders": 0,
+      "codes": [],
+      "grammar": [],
+      "sinks": [],
+      "guidance": [],
+      "cross": {
+        "tier": "developer",
+        "codes": [],
+        "placeholders": 0
+      },
+      "frame": null,
+      "probes": [
+        {
+          "gap": "G05",
+          "tier": "untrusted",
+          "codes": ["block-family-mismatch", "node-dropped", "schema-failure"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G05",
+          "tier": "untrusted",
+          "codes": ["block-family-mismatch", "node-dropped", "schema-failure"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G06",
+          "tier": "untrusted",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G04",
+          "tier": "developer",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G24",
+          "tier": "untrusted",
+          "codes": [],
+          "placeholders": 0
+        }
+      ]
+    },
+    "02-dashboard": {
+      "tier": "untrusted",
+      "nodes": 13,
+      "components": 13,
+      "placeholders": 0,
+      "codes": [],
+      "grammar": [],
+      "sinks": [],
+      "guidance": [],
+      "cross": {
+        "tier": "developer",
+        "codes": [],
+        "placeholders": 0
+      },
+      "frame": {
+        "ok": true,
+        "label": "Support operations dashboard (draft)",
+        "badge": "Untrusted content"
+      },
+      "probes": [
+        {
+          "gap": "G06",
+          "tier": "untrusted",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G01",
+          "tier": "untrusted",
+          "codes": ["node-dropped", "schema-failure"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G02",
+          "tier": "untrusted",
+          "codes": ["invalid-prop"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G20",
+          "tier": "developer",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        }
+      ]
+    },
+    "03-settings-form": {
+      "tier": "developer",
+      "nodes": 12,
+      "components": 0,
+      "placeholders": 1,
+      "codes": ["node-dropped", "tier-denied"],
+      "grammar": [],
+      "sinks": [],
+      "guidance": [],
+      "cross": {
+        "tier": "untrusted",
+        "codes": ["node-dropped", "tier-denied"],
+        "placeholders": 1
+      },
+      "frame": null,
+      "probes": [
+        {
+          "gap": "G06",
+          "tier": "untrusted",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G02",
+          "tier": "developer",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G17",
+          "tier": "developer",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G03",
+          "tier": "developer",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G01",
+          "tier": "developer",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        }
+      ]
+    },
+    "04-checkout-flow": {
+      "tier": "developer",
+      "nodes": 18,
+      "components": 6,
+      "placeholders": 3,
+      "codes": ["node-dropped", "tier-denied"],
+      "grammar": [],
+      "sinks": [],
+      "guidance": [],
+      "cross": {
+        "tier": "untrusted",
+        "codes": ["node-dropped", "tier-denied"],
+        "placeholders": 3
+      },
+      "frame": null,
+      "probes": [
+        {
+          "gap": "G09",
+          "tier": "developer",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G07",
+          "tier": "untrusted",
+          "codes": ["invalid-prop"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G05",
+          "tier": "developer",
+          "codes": ["block-family-mismatch", "node-dropped", "schema-failure"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G18",
+          "tier": "developer",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G06",
+          "tier": "untrusted",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        }
+      ]
+    },
+    "05-chat-thread": {
+      "tier": "untrusted",
+      "nodes": 8,
+      "components": 8,
+      "placeholders": 0,
+      "codes": [],
+      "grammar": [],
+      "sinks": [],
+      "guidance": [],
+      "cross": {
+        "tier": "developer",
+        "codes": [],
+        "placeholders": 0
+      },
+      "frame": null,
+      "probes": [
+        {
+          "gap": "G10",
+          "tier": "untrusted",
+          "codes": ["unknown-id"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G10",
+          "tier": "untrusted",
+          "codes": ["unknown-id"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G06",
+          "tier": "untrusted",
+          "codes": ["tier-denied"],
+          "placeholders": 1
+        },
+        {
+          "gap": "G10",
+          "tier": "developer",
+          "codes": ["unknown-id"],
+          "placeholders": 1
+        }
+      ]
+    },
+    "06-presentation-slide": {
+      "tier": "untrusted",
+      "nodes": 4,
+      "components": 4,
+      "placeholders": 0,
+      "codes": [],
+      "grammar": [],
+      "sinks": [],
+      "guidance": [],
+      "cross": {
+        "tier": "developer",
+        "codes": [],
+        "placeholders": 0
+      },
+      "frame": null,
+      "probes": [
+        {
+          "gap": "G11",
+          "tier": "untrusted",
+          "codes": ["invalid-prop"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G11",
+          "tier": "untrusted",
+          "codes": ["invalid-prop"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G11",
+          "tier": "untrusted",
+          "codes": [],
+          "placeholders": 0
+        },
+        {
+          "gap": "G05",
+          "tier": "untrusted",
+          "codes": ["block-family-mismatch", "node-dropped", "schema-failure"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G14",
+          "tier": "untrusted",
+          "codes": ["invalid-prop"],
+          "placeholders": 0
+        }
+      ]
+    },
+    "07-report-on-demand": {
+      "tier": "untrusted",
+      "nodes": 13,
+      "components": 13,
+      "placeholders": 0,
+      "codes": [],
+      "grammar": [],
+      "sinks": [],
+      "guidance": [],
+      "cross": {
+        "tier": "developer",
+        "codes": [],
+        "placeholders": 0
+      },
+      "frame": {
+        "ok": true,
+        "label": "Weekly delivery report (draft by agent)",
+        "badge": "Untrusted content"
+      },
+      "probes": [
+        {
+          "gap": "G15",
+          "tier": "untrusted",
+          "codes": [],
+          "placeholders": 0
+        },
+        {
+          "gap": "G13",
+          "tier": "untrusted",
+          "codes": ["invalid-prop"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G16",
+          "tier": "untrusted",
+          "codes": [],
+          "placeholders": 0
+        }
+      ]
+    },
+    "08-proactive-deck": {
+      "tier": "untrusted",
+      "nodes": 12,
+      "components": 12,
+      "placeholders": 0,
+      "codes": [],
+      "grammar": [],
+      "sinks": [],
+      "guidance": [],
+      "cross": {
+        "tier": "developer",
+        "codes": [],
+        "placeholders": 0
+      },
+      "frame": {
+        "ok": true,
+        "label": "Prepared for the 15:00 planning meeting (draft, not shared)",
+        "badge": "Untrusted content"
+      },
+      "probes": [
+        {
+          "gap": "G13",
+          "tier": "untrusted",
+          "codes": ["invalid-prop"],
+          "placeholders": 0
+        },
+        {
+          "gap": "G13",
+          "tier": "untrusted",
+          "codes": ["invalid-prop"],
+          "placeholders": 0
+        }
+      ]
+    }
+  }
+}

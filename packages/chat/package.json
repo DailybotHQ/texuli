@@ -1,0 +1,30 @@
+{
+  "name": "@texuli/chat",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Chat interfaces: thread, message list, composer and typing indicator, generic for people and agents.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/core": "workspace:*",
+    "@texuli/primitives": "workspace:*",
+    "@texuli/tokens": "workspace:*",
+    "texuli": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

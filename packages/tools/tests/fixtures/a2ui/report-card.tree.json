@@ -1,0 +1,18 @@
+{
+  "id": "card",
+  "props": { "title": "Weekly report", "variant": "flat" },
+  "children": [
+    { "id": "heading", "props": { "text": "Orders", "level": 2 } },
+    {
+      "id": "stack",
+      "children": [
+        { "id": "stat", "props": { "label": "Shipped", "value": 1240, "delta": -0.5 } },
+        { "id": "stat", "props": { "label": "Returned", "value": 18, "tags": ["ok", null, true] } }
+      ]
+    },
+    {
+      "id": "text",
+      "props": { "text": "Numbers for acme.example, week 12.", "meta": { "source": "demo" } }
+    }
+  ]
+}

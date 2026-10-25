@@ -1,0 +1,84 @@
+---
+/**
+ * Bare document for example previews loaded in an iframe.
+ * No site header, sidebar, footer or outer main — the demo owns landmarks.
+ * noindex keeps these out of the sitemap (a11y-site sweeps docs shell pages).
+ *
+ * mode/dir/embed come from the URL query at runtime (static HTML cannot bake
+ * search params). An inline boot script applies them before paint.
+ */
+import '../styles/site-layers.css';
+import '@texuli/tokens/base.css';
+import { compileThemeCss } from '@texuli/tokens';
+import { loadLibraryTheme } from '@texuli/tokens/library';
+import { SITE_THEME } from '../components/foundation/site.ts';
+import SeoHead from '../components/seo/SeoHead.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Isolated Texuli example preview.' } = Astro.props;
+
+const themeCss = compileThemeCss(await loadLibraryTheme(SITE_THEME));
+const fullTitle = `${title} · preview`;
+
+// Runtime query → html mode/dir (SSG pages share one HTML file per id).
+const queryBoot = `(function(){try{var q=new URLSearchParams(location.search);var mode=q.get('mode')==='dark'?'dark':'light';var dir=q.get('dir')==='rtl'?'rtl':'ltr';var root=document.documentElement;root.setAttribute('data-tx-mode',mode);root.setAttribute('dir',dir);root.classList.toggle('dark',mode==='dark');root.classList.toggle('light',mode==='light');root.style.colorScheme=mode;root.setAttribute('data-tx-theme','${SITE_THEME}');if(q.get('embed')==='1'){document.documentElement.setAttribute('data-tx-example-embed','1');}}catch(e){}})();`;
+---
+
+<!doctype html>
+<html
+  lang="en"
+  dir="ltr"
+  data-tx-theme={SITE_THEME}
+  data-tx-mode="light"
+  class="light"
+  style="color-scheme: light"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style is:inline>
+      @layer site-base, tx.base, tx.components, site-overrides;
+    </style>
+    <script is:inline set:html={queryBoot} />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <SeoHead
+      title={fullTitle}
+      description={description}
+      siteName="Texuli"
+      lang="en"
+      noindex={true}
+    />
+    <style is:inline set:html={themeCss}></style>
+    <style is:inline>
+      html,
+      body {
+        margin: 0;
+        min-block-size: 100%;
+        background: var(--tx-background);
+        color: var(--tx-foreground);
+        font-family: var(--tx-font-sans, system-ui, sans-serif);
+      }
+      body {
+        padding: 1rem;
+        box-sizing: border-box;
+      }
+      #preview-root {
+        min-block-size: 12rem;
+      }
+      /* Embed: paint only — no focusable tree for parent-page axe/keyboard. */
+      html[data-tx-example-embed='1'] body {
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body data-tx-example-preview="">
+    <div id="preview-root">
+      <slot />
+    </div>
+  </body>
+</html>

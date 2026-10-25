@@ -1,0 +1,257 @@
+/**
+ * Styled file upload. `@layer tx.components` so consumer CSS wins.
+ * Logical properties only.
+ */
+
+@layer tx.components {
+  .tx-file-upload {
+    display: grid;
+    gap: 0.75rem;
+    max-inline-size: 36rem;
+  }
+
+  .tx-file-upload__zone {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: center;
+    padding-block: 1.5rem;
+    padding-inline: 1rem;
+    border: 2px dashed var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-radius, 0.625rem);
+    background: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    text-align: center;
+    transition:
+      border-color var(--tx-motion-base, 200ms) ease,
+      background-color var(--tx-motion-base, 200ms) ease;
+  }
+
+  .tx-file-upload--compact .tx-file-upload__zone {
+    padding-block: 0.75rem;
+    padding-inline: 0.75rem;
+    justify-items: start;
+    text-align: start;
+  }
+
+  .tx-file-upload__zone[data-state="dragging"] {
+    border-color: var(--tx-primary, Highlight);
+    background: color-mix(in srgb, var(--tx-primary, Highlight) 8%, var(--tx-surface, Canvas));
+  }
+
+  .tx-file-upload__zone[data-state="disabled"] {
+    /* Keep full opacity so labels stay AA; disable interaction only. */
+    cursor: not-allowed;
+    background: var(--tx-muted, color-mix(in srgb, CanvasText 6%, Canvas));
+  }
+
+  .tx-file-upload__zone[data-state="disabled"] .tx-file-upload__browse {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .tx-file-upload__hint,
+  .tx-file-upload__zone > p {
+    margin: 0;
+    font-size: 0.8125rem;
+    /* Solid AA body color — muted token alone can fall below 4.5:1 on surface. */
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  /* Hide the primitive's plain browse label; the styled control is .tx-file-upload__browse. */
+  .tx-file-upload__zone > label:not(.tx-file-upload__browse) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .tx-file-upload__browse {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 2.25rem;
+    padding-inline: 0.85rem;
+    border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
+    border-radius: calc(var(--tx-radius, 0.625rem) * 0.7);
+    background: var(--tx-background, Canvas);
+    color: inherit;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .tx-file-upload__browse:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-file-upload__input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .tx-file-upload__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .tx-file-upload__item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.65rem;
+    align-items: center;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: calc(var(--tx-radius, 0.625rem) * 0.7);
+    background: var(--tx-elevated, var(--tx-surface, Canvas));
+  }
+
+  .tx-file-upload__item[data-status="error"] {
+    border-color: var(--tx-destructive, Mark);
+  }
+
+  .tx-file-upload__preview {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: calc(var(--tx-radius, 0.625rem) * 0.4);
+    object-fit: cover;
+    background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+  }
+
+  .tx-file-upload__preview--icon {
+    display: grid;
+    place-items: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--tx-muted-foreground, CanvasText);
+  }
+
+  .tx-file-upload__meta {
+    display: grid;
+    gap: 0.2rem;
+    min-inline-size: 0;
+  }
+
+  .tx-file-upload__name {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tx-file-upload__size {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--tx-muted-foreground, CanvasText);
+  }
+
+  .tx-file-upload__progress {
+    grid-column: 1 / -1;
+  }
+
+  .tx-file-upload__progress-track {
+    block-size: 0.35rem;
+    border-radius: 999px;
+    background: var(--tx-muted, color-mix(in srgb, CanvasText 10%, Canvas));
+    overflow: hidden;
+  }
+
+  .tx-file-upload__progress-fill {
+    block-size: 100%;
+    background: var(--tx-primary, Highlight);
+    inline-size: var(--tx-file-upload-progress, 0%);
+  }
+
+  .tx-file-upload__progress-fill[data-indeterminate="true"] {
+    inline-size: 40%;
+    animation: tx-file-upload-indeterminate 1s ease-in-out infinite alternate;
+  }
+
+  .tx-file-upload__zone [role="alert"] {
+    margin: 0;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--tx-destructive, Mark);
+    border-radius: calc(var(--tx-radius, 0.625rem) * 0.6);
+    background: color-mix(in srgb, var(--tx-destructive, Mark) 8%, var(--tx-surface, Canvas));
+    color: var(--tx-foreground, CanvasText);
+    font-size: 0.8125rem;
+    text-align: start;
+    inline-size: 100%;
+  }
+
+  .tx-file-upload__zone [role="alert"] ul {
+    margin: 0.25rem 0 0;
+    padding-inline-start: 1.1rem;
+  }
+
+  .tx-file-upload__remove {
+    min-block-size: 2rem;
+    min-inline-size: 2rem;
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: calc(var(--tx-radius, 0.625rem) * 0.5);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .tx-file-upload__remove:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+
+  @keyframes tx-file-upload-indeterminate {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: 150% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tx-file-upload__progress-fill[data-indeterminate="true"] {
+      animation: none;
+      inline-size: 100%;
+      opacity: 0.5;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tx-file-upload,
+    .tx-file-upload__zone,
+    .tx-file-upload__item,
+    .tx-file-upload__browse,
+    .tx-file-upload__remove,
+    .tx-file-upload__meta {
+      color: CanvasText;
+      forced-color-adjust: none;
+    }
+
+    .tx-file-upload__zone,
+    .tx-file-upload__item,
+    .tx-file-upload__browse,
+    .tx-file-upload__remove {
+      border: 1px solid ButtonText;
+      background: Canvas;
+    }
+  }
+}

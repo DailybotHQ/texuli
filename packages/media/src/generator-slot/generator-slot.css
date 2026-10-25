@@ -1,0 +1,231 @@
+/**
+ * Generator slot. @layer tx.components so consumer utilities win.
+ * Logical properties only. No model and no network in Texuli.
+ */
+
+@layer tx.components {
+  .tx-generator-slot {
+    display: grid;
+    gap: 0.75rem;
+    max-inline-size: 36rem;
+    padding: 0.75rem;
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    font-family: var(--tx-font-sans, system-ui, sans-serif);
+    font-size: var(--tx-font-size-sm, 0.875rem);
+  }
+
+  .tx-generator-slot__prompt-label {
+    display: grid;
+    gap: 0.35rem;
+    font-weight: 600;
+  }
+
+  .tx-generator-slot__prompt {
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-block-size: 4.5rem;
+    margin: 0;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
+    border-radius: var(--tx-radius, 0.375rem);
+    background: var(--tx-background, Canvas);
+    color: inherit;
+    font: inherit;
+    resize: vertical;
+  }
+
+  .tx-generator-slot__prompt:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+
+  .tx-generator-slot__prompt:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .tx-generator-slot__kinds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .tx-generator-slot__kind {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .tx-generator-slot__kind input {
+    accent-color: var(--tx-primary, Highlight);
+  }
+
+  .tx-generator-slot__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tx-generator-slot__button {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 44px;
+    padding-inline: 0.85rem;
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-radius, 0.375rem);
+    background: var(--tx-primary, Highlight);
+    color: var(--tx-primary-foreground, HighlightText);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .tx-generator-slot__button--secondary {
+    background: var(--tx-background, Canvas);
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-generator-slot__button:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+
+  .tx-generator-slot__button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .tx-generator-slot__status {
+    margin: 0;
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-generator-slot__status[data-tone="error"],
+  .tx-generator-slot__status[data-tone="blocked"] {
+    color: var(--tx-foreground, CanvasText);
+    padding-inline-start: 0.5rem;
+    border-inline-start: 3px solid var(--tx-destructive, Mark);
+  }
+
+  .tx-generator-slot__status[data-tone="ready"] {
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-generator-slot__result {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .tx-generator-slot__result-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--tx-radius, 0.375rem);
+    border: 1px solid var(--tx-border, ButtonBorder);
+    background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+    aspect-ratio: 16 / 9;
+  }
+
+  .tx-generator-slot__result-frame img,
+  .tx-generator-slot__result-frame video {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: contain;
+    background: var(--tx-background, Canvas);
+  }
+
+  .tx-generator-slot__result-caption {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-generator-slot__provenance {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    gap: 0.25rem 0.75rem;
+    margin: 0;
+    font-size: 0.8125rem;
+  }
+
+  .tx-generator-slot__provenance dt {
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-generator-slot__provenance dd {
+    min-inline-size: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .tx-generator-request {
+    box-sizing: border-box;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 0.35rem;
+    inline-size: min(100%, 48rem);
+    min-block-size: 8rem;
+    aspect-ratio: 16 / 9;
+    padding: clamp(0.75rem, 3vw, 2rem);
+    border: 1px dashed var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-radius, 0.5rem);
+    background-color: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+    color: var(--tx-foreground, CanvasText);
+    text-align: center;
+  }
+
+  .tx-generator-request[data-aspect-ratio="1:1"] {
+    aspect-ratio: 1;
+  }
+
+  .tx-generator-request[data-aspect-ratio="4:3"] {
+    aspect-ratio: 4 / 3;
+  }
+
+  .tx-generator-request[data-aspect-ratio="3:2"] {
+    aspect-ratio: 3 / 2;
+  }
+
+  .tx-generator-request[data-aspect-ratio="9:16"] {
+    aspect-ratio: 9 / 16;
+  }
+
+  .tx-generator-request__kind {
+    font-weight: 600;
+  }
+
+  .tx-generator-request__description,
+  .tx-generator-request__error {
+    margin: 0;
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  @media (forced-colors: active) {
+    .tx-generator-slot,
+    .tx-generator-slot__prompt,
+    .tx-generator-slot__button,
+    .tx-generator-slot__result-frame {
+      border: 1px solid ButtonText;
+    }
+
+    .tx-generator-request {
+      border-color: ButtonText;
+    }
+
+    .tx-generator-slot__status[data-tone="error"],
+    .tx-generator-slot__status[data-tone="blocked"] {
+      border-inline-start-color: CanvasText;
+    }
+  }
+}

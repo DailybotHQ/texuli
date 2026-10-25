@@ -1,0 +1,129 @@
+---
+/**
+ * Docs page chrome: static sidebar, mobile details menu, TOC, previous/next.
+ * Edit-free (no third-party edit links). Fully static except the site theme switch.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DocsMobileNav from './DocsMobileNav.astro';
+import DocsPager from './DocsPager.astro';
+import DocsSidebar from './DocsSidebar.astro';
+import DocsToc from './DocsToc.astro';
+import { docsPager, type TocEntry } from './nav.ts';
+
+interface Props {
+  title: string;
+  description: string;
+  toc?: readonly TocEntry[];
+}
+
+const { title, description, toc = [] } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const current = Astro.url.pathname.slice(base.replace(/\/+$/, '').length) || '/';
+const { prev, next } = docsPager(current);
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="docs-shell" data-tx-docs-shell="">
+    <DocsMobileNav currentPath={current} />
+    <div class="docs-shell__grid">
+      <DocsSidebar currentPath={current} />
+      <div class="docs-shell__main">
+        <article class="docs-article" data-tx-docs-article="">
+          <header class="docs-article__header">
+            <p class="docs-article__eyebrow">Documentation</p>
+            <h1>{title}</h1>
+            <p class="docs-article__lead">{description}</p>
+          </header>
+          {
+            toc.length > 0 && (
+              <div class="docs-article__toc-mobile">
+                <DocsToc entries={toc} titleId="docs-toc-title-mobile" />
+              </div>
+            )
+          }
+          <div class="docs-article__body">
+            <slot />
+          </div>
+          <DocsPager prev={prev} next={next} />
+        </article>
+      </div>
+      {
+        toc.length > 0 && (
+          <div class="docs-shell__toc">
+            <DocsToc entries={toc} titleId="docs-toc-title-desktop" />
+          </div>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* The site column already provides the page gutter: no bleed past it. */
+  .docs-shell {
+    margin-inline: 0;
+  }
+  .docs-shell__grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 64rem) {
+    .docs-shell__grid {
+      grid-template-columns: 14rem minmax(0, 1fr) 13rem;
+      align-items: start;
+    }
+    .docs-shell__toc {
+      display: block;
+    }
+    .docs-article__toc-mobile {
+      display: none;
+    }
+  }
+  .docs-shell__toc {
+    display: none;
+  }
+  .docs-article__header {
+    margin-block-end: 1.25rem;
+  }
+  .docs-article__eyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  .docs-article h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    line-height: 1.2;
+    color: var(--tx-foreground);
+  }
+  .docs-article__lead {
+    margin: 0.5rem 0 0;
+    color: var(--tx-foreground);
+    font-size: 1.0625rem;
+  }
+  .docs-article__body :global(h2) {
+    margin-block: 1.75rem 0.5rem;
+    font-size: 1.25rem;
+    color: var(--tx-foreground);
+    scroll-margin-block-start: 1rem;
+  }
+  .docs-article__body :global(h3) {
+    margin-block: 1.25rem 0.35rem;
+    font-size: 1.05rem;
+    color: var(--tx-foreground);
+    scroll-margin-block-start: 1rem;
+  }
+  .docs-article__body :global(p),
+  .docs-article__body :global(li) {
+    color: var(--tx-foreground);
+  }
+  .docs-article__body :global(ul) {
+    padding-inline-start: 1.25rem;
+  }
+  .docs-article__toc-mobile {
+    margin-block: 0 1.25rem;
+  }
+</style>

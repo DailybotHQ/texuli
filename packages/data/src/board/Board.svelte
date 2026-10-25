@@ -1,0 +1,701 @@
+<script lang="ts" generics="T">
+import { lazyChunk } from '@texuli/core/lazy';
+import { type Component, type Snippet, tick } from 'svelte';
+import { type ClassValue, cx, variants } from 'texuli/cx';
+import {
+  type BoardColumnDef,
+  type BoardLaneDef,
+  type BoardMove,
+  type BoardOptions,
+  evaluateWip,
+  groupBoard,
+  IDLE,
+  type KeyboardMoveState,
+  type MoveRules,
+  type MoveTarget,
+  moveIntent,
+  pickUp,
+  validateMove,
+} from '../engines/board/index.ts';
+import {
+  DRAG_THRESHOLD_PX,
+  indexFromPointer,
+  type MoveMenuDestination,
+  moveMenuDestinations,
+  placementsOf,
+} from './model.ts';
+import type { BoardLabels } from './types.ts';
+
+type MoveMenuProps = {
+  open?: boolean;
+  disabled?: boolean;
+  label: string;
+  menuLabel: string;
+  destinations: readonly MoveMenuDestination[];
+  onSelect: (destination: MoveMenuDestination) => void;
+  onOpenChange?: (open: boolean) => void;
+};
+
+interface BoardProps<T> {
+  columns: readonly BoardColumnDef[];
+  items: readonly T[];
+  lanes?: readonly BoardLaneDef[];
+  getId: (item: T) => string;
+  getColumn: (item: T) => string;
+  getLane?: (item: T) => string;
+  getRank: (item: T) => string;
+  getLabel?: (item: T) => string;
+  /** When true, the card cannot be dragged or moved via the menu (WCAG lock). */
+  isLocked?: (item: T) => boolean;
+  card: Snippet<[T, { pending: boolean }]>;
+  onMove: (move: BoardMove, item: T) => void | Promise<void>;
+  canMove?: MoveRules<T>['canMove'];
+  labels?: Partial<BoardLabels>;
+  density?: 'comfortable' | 'compact';
+  dir?: 'ltr' | 'rtl' | 'auto';
+  class?: ClassValue;
+}
+
+const rootClasses = variants({
+  base: 'tx-board',
+  variants: {
+    density: { comfortable: 'tx-board--comfortable', compact: 'tx-board--compact' },
+  },
+  defaultVariants: { density: 'comfortable' },
+});
+
+const DEFAULT_LABELS: BoardLabels = {
+  board: 'Board',
+  instructions:
+    'Focus a card handle and press Space or Enter to pick it up. Use the arrow keys to choose a position, then Space or Enter to drop. Press Escape to cancel. Or open Move on a card and choose a column and position from the menu.',
+  dragHandle: (label) => `Drag ${label}`,
+  moveMenu: (label) => `Move ${label}`,
+  moveMenuLabel: (label) => `Move ${label} to…`,
+  emptyCell: 'No cards',
+  unplaced: 'Cards outside configured columns',
+  savingMove: 'Saving move',
+  cardCount: (count, hardLimit) =>
+    `${count} card${count === 1 ? '' : 's'}${hardLimit === undefined ? '' : `, limit ${hardLimit}`}`,
+  announcement: (message) => message,
+};
+
+let {
+  columns,
+  items,
+  lanes,
+  getId,
+  getColumn,
+  getLane,
+  getRank,
+  getLabel = (item: T) => getId(item),
+  isLocked,
+  card,
+  onMove,
+  canMove,
+  labels: labelOverrides,
+  density = 'comfortable',
+  dir,
+  class: className,
+}: BoardProps<T> = $props();
+
+const uid = $props.id();
+const instructionsId = `board-${uid}-instructions`;
+const titleId = `board-${uid}-title`;
+const labels = $derived({ ...DEFAULT_LABELS, ...labelOverrides });
+let pending = $state<Record<string, boolean>>({});
+let held = $state<KeyboardMoveState>(IDLE);
+let announcement = $state('');
+let placements = $state<Record<string, ReturnType<typeof placementsOf>[string]>>({});
+/** Lazy DropdownMenu chunk — shared for every card after first open/prefetch. */
+let MoveMenu = $state.raw<Component<MoveMenuProps> | undefined>();
+let menuReady = $state(false);
+/** Which card’s move menu is open (`itemId`), once the lazy menu is mounted. */
+let openMenuId = $state<string | null>(null);
+let drag = $state<{
+  id: string;
+  pointerId: number;
+  x: number;
+  y: number;
+  active: boolean;
+  target: MoveTarget | null;
+} | null>(null);
+
+const options = $derived<BoardOptions<T>>({
+  columns,
+  ...(lanes?.length ? { lanes, lane: (item: T) => getLane?.(item) ?? '' } : {}),
+  id: getId,
+  column: (item: T) => placements[getId(item)]?.columnId ?? getColumn(item),
+  lane: (item: T) => placements[getId(item)]?.laneId ?? getLane?.(item) ?? '',
+  rank: (item: T) => placements[getId(item)]?.rank ?? getRank(item),
+  label: getLabel,
+});
+const rules = $derived<MoveRules<T>>(canMove ? { canMove } : {});
+const grid = $derived(groupBoard(items, options));
+
+$effect(() => {
+  const unresolved = Object.keys(placements).filter((id) => !pending[id]);
+  if (unresolved.length === 0) return;
+  const byId = new Map(items.map((item) => [getId(item), item]));
+  const settled = unresolved.filter((id) => {
+    const item = byId.get(id);
+    const placement = placements[id];
+    if (!item || !placement) return true;
+    const itemLane = lanes?.length ? (getLane?.(item) ?? '') : '';
+    const targetLane = lanes?.length ? placement.laneId : '';
+    return (
+      getColumn(item) === placement.columnId &&
+      itemLane === targetLane &&
+      getRank(item) === placement.rank
+    );
+  });
+  if (settled.length === 0) return;
+  const next = { ...placements };
+  for (const id of settled) delete next[id];
+  placements = next;
+});
+
+const shown = $derived.by(() => {
+  if (held.mode !== 'held') return grid;
+  const column = grid.columns[held.target.columnIndex];
+  const lane = grid.lanes[held.target.laneIndex];
+  if (!column || !lane) return grid;
+  const preview = validateMove(
+    grid,
+    held.itemId,
+    { columnId: column.id, laneId: lane.id, index: held.target.index },
+    rules
+  );
+  if (!preview.ok || preview.unchanged) return grid;
+  const previewPlacements = { ...placements, ...placementsOf(preview.move) };
+  return groupBoard(items, {
+    ...options,
+    column: (item: T) => previewPlacements[getId(item)]?.columnId ?? getColumn(item),
+    lane: (item: T) => previewPlacements[getId(item)]?.laneId ?? getLane?.(item) ?? '',
+    rank: (item: T) => previewPlacements[getId(item)]?.rank ?? getRank(item),
+  });
+});
+
+function announce(message: string | undefined): void {
+  if (message) announcement = labels.announcement(message);
+}
+
+function itemById(id: string): T | undefined {
+  return items.find((item) => getId(item) === id);
+}
+
+async function focusCard(id: string, prefer: 'menu' | 'handle' = 'handle'): Promise<void> {
+  await tick();
+  // Menu close + DOM reorder can lag one frame behind the placement update.
+  await new Promise<void>((resolve) => {
+    const win = document.defaultView;
+    if (win?.requestAnimationFrame) win.requestAnimationFrame(() => resolve());
+    else resolve();
+  });
+  const root = document.getElementById(`board-${uid}`);
+  const cardNode = [...(root?.querySelectorAll<HTMLElement>('[data-board-card]') ?? [])].find(
+    (node) => node.getAttribute('data-item-id') === id
+  );
+  if (!cardNode) return;
+  const menu = cardNode.querySelector<HTMLElement>('[data-board-move-menu]');
+  const handle = cardNode.querySelector<HTMLElement>('[data-board-handle]');
+  const target = prefer === 'menu' ? (menu ?? handle) : (handle ?? menu);
+  if (target && 'focus' in target && typeof target.focus === 'function') {
+    target.focus();
+  }
+}
+
+function cardLocked(item: T): boolean {
+  return Boolean(isLocked?.(item));
+}
+
+function destinationsFor(item: T): MoveMenuDestination[] {
+  return moveMenuDestinations(grid, getId(item), rules);
+}
+
+const MOVE_MENU_CHUNK = 'data:board:move-menu';
+
+function ensureMoveMenu(): Promise<Component<MoveMenuProps>> {
+  if (MoveMenu) return Promise.resolve(MoveMenu);
+  return lazyChunk(MOVE_MENU_CHUNK, () => import('./BoardMoveMenu.svelte')).then((module) => {
+    const component = module.default as unknown as Component<MoveMenuProps>;
+    MoveMenu = component;
+    menuReady = true;
+    return component;
+  });
+}
+
+/** Prefetch on focus/hover so the first open feels instant. */
+function prefetchMoveMenu(): void {
+  void ensureMoveMenu();
+}
+
+async function openMoveMenu(item: T): Promise<void> {
+  const id = getId(item);
+  if (pending[id] || cardLocked(item)) return;
+  await ensureMoveMenu();
+  // Wait a frame so the lazy MoveMenu replaces the light trigger before open.
+  await tick();
+  openMenuId = id;
+  await tick();
+}
+
+async function commit(
+  move: BoardMove,
+  item: T,
+  focus: 'menu' | 'handle' = 'handle'
+): Promise<void> {
+  const nextPlacements = placementsOf(move);
+  const oldPlacements = Object.fromEntries(
+    Object.keys(nextPlacements).map((id) => [id, placements[id]])
+  );
+  placements = { ...placements, ...nextPlacements };
+  pending = { ...pending, [move.itemId]: true };
+  try {
+    await onMove(move, item);
+    await focusCard(move.itemId, focus);
+  } catch {
+    const restored = { ...placements };
+    for (const [id, placement] of Object.entries(oldPlacements)) {
+      if (placement) restored[id] = placement;
+      else delete restored[id];
+    }
+    placements = restored;
+    announce(`${getLabel(item)} was not moved. It returned to its previous position.`);
+    await focusCard(move.itemId, focus);
+  } finally {
+    const { [move.itemId]: _done, ...remaining } = pending;
+    pending = remaining;
+  }
+}
+
+function moveTo(item: T, target: MoveTarget, focus: 'menu' | 'handle' = 'handle'): void {
+  if (cardLocked(item)) {
+    announce(`${getLabel(item)} is locked and cannot be moved.`);
+    return;
+  }
+  const result = validateMove(grid, getId(item), target, rules);
+  if (!result.ok) {
+    announce(result.reason);
+    return;
+  }
+  if (result.unchanged) return;
+  const column = columns.find((candidate) => candidate.id === result.move.columnId);
+  const position = result.move.index === 0 ? 'top' : 'bottom';
+  announce(
+    `Moved ${getLabel(item)} to ${column?.title ?? result.move.columnId} (${position}).${result.wip.status !== 'ok' ? ` ${result.wip.reason}` : ''}`
+  );
+  void commit(result.move, item, focus);
+}
+
+function onMenuSelect(item: T, destination: MoveMenuDestination): void {
+  if (destination.disabled) {
+    announce(destination.reason ?? `${getLabel(item)} cannot move there.`);
+    return;
+  }
+  moveTo(item, destination.target, 'menu');
+}
+
+function onCardKey(event: KeyboardEvent, item: T): void {
+  const id = getId(item);
+  if (pending[id] || cardLocked(item)) return;
+  if (held.mode !== 'held') {
+    if (event.key !== ' ' && event.key !== 'Spacebar' && event.key !== 'Enter') return;
+    event.preventDefault();
+    const result = pickUp(grid, id);
+    held = result.state;
+    announce(result.announcement);
+    return;
+  }
+  if (held.itemId !== id) return;
+  const currentTarget = event.currentTarget;
+  const isRtl =
+    dir === 'rtl' ||
+    (dir !== 'ltr' &&
+      currentTarget instanceof HTMLElement &&
+      currentTarget.ownerDocument.defaultView?.getComputedStyle(currentTarget).direction === 'rtl');
+  const key = isRtl
+    ? event.key === 'ArrowLeft'
+      ? 'ArrowRight'
+      : event.key === 'ArrowRight'
+        ? 'ArrowLeft'
+        : event.key
+    : event.key;
+  const result = moveIntent(grid, held, { key, shiftKey: event.shiftKey }, rules);
+  if (!result.handled) return;
+  event.preventDefault();
+  held = result.state;
+  announce(result.announcement);
+  if (result.commit) {
+    const itemToMove = itemById(result.commit.itemId);
+    if (itemToMove) void commit(result.commit, itemToMove);
+  }
+  void focusCard(id);
+}
+
+function onPointerDown(event: PointerEvent, item: T): void {
+  if (event.button !== 0 || pending[getId(item)] || held.mode === 'held' || cardLocked(item))
+    return;
+  if (event.target instanceof Element && event.target.closest('[data-board-no-drag]')) return;
+  drag = {
+    id: getId(item),
+    pointerId: event.pointerId,
+    x: event.clientX,
+    y: event.clientY,
+    active: false,
+    target: null,
+  };
+  (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
+}
+
+function targetAt(x: number, y: number, itemId: string): MoveTarget | null {
+  const root = document.getElementById(`board-${uid}`);
+  const cell = root?.ownerDocument
+    .elementFromPoint(x, y)
+    ?.closest<HTMLElement>('[data-board-cell]');
+  if (!cell) return null;
+  const cards = [...cell.querySelectorAll<HTMLElement>('[data-board-card]')].filter(
+    (element) => element.dataset.itemId !== itemId
+  );
+  const middles = cards.map((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.top + rect.height / 2;
+  });
+  return {
+    columnId: cell.dataset.columnId ?? '',
+    laneId: cell.dataset.laneId ?? '',
+    index: indexFromPointer(middles, y),
+  };
+}
+
+function onPointerMove(event: PointerEvent): void {
+  if (!drag || drag.pointerId !== event.pointerId) return;
+  const active =
+    drag.active || Math.hypot(event.clientX - drag.x, event.clientY - drag.y) >= DRAG_THRESHOLD_PX;
+  if (active && !drag.active) {
+    const item = itemById(drag.id);
+    if (item) announce(`Dragging ${getLabel(item)}.`);
+  }
+  drag = {
+    ...drag,
+    active,
+    target: active ? targetAt(event.clientX, event.clientY, drag.id) : drag.target,
+  };
+}
+
+function onPointerUp(event: PointerEvent): void {
+  if (!drag || drag.pointerId !== event.pointerId) return;
+  const current = drag;
+  drag = null;
+  if (event.target instanceof HTMLElement && event.target.hasPointerCapture?.(event.pointerId)) {
+    event.target.releasePointerCapture(event.pointerId);
+  }
+  if (!current.active) return;
+  const item = itemById(current.id);
+  const target = targetAt(event.clientX, event.clientY, current.id) ?? current.target;
+  if (item && target) moveTo(item, target);
+}
+
+function onPointerCancel(event: PointerEvent): void {
+  if (drag?.pointerId === event.pointerId) drag = null;
+}
+</script>
+
+<section
+  id="board-{uid}"
+  class={cx(rootClasses({ density, class: className }), drag?.active && 'tx-board--dragging')}
+  aria-labelledby={titleId}
+  dir={dir}
+  onpointermove={onPointerMove}
+  onpointerup={onPointerUp}
+  onpointercancel={onPointerCancel}
+>
+  <h2 id={titleId} class="tx-board__sr-only">{labels.board}</h2>
+  <p id={instructionsId} class="tx-board__sr-only">{labels.instructions}</p>
+  <div class="tx-board__scroller" data-board-scroller>
+    <div class="tx-board__columns">
+      {#each grid.columns as column, columnIndex (column.id)}
+        {@const count = shown.columnCounts.get(column.id) ?? 0}
+        {@const wip = evaluateWip(column, count)}
+        <section class="tx-board__column" data-wip={wip.status}>
+          <header class="tx-board__column-header">
+            <h3>{column.title}</h3>
+            <span class="tx-board__count" aria-label={labels.cardCount(count, column.wip?.hard)} dir="ltr">
+              <bdi>{new Intl.NumberFormat().format(count)}</bdi>{#if column.wip?.hard !== undefined}<span aria-hidden="true">/</span><bdi>{new Intl.NumberFormat().format(column.wip.hard)}</bdi>{/if}
+            </span>
+          </header>
+          {#each grid.lanes as lane, laneIndex (lane.id)}
+            {@const shownCell = shown.cells[laneIndex]?.[columnIndex]}
+            {@const cellLabel = `${column.title}${grid.lanes.length > 1 ? `, ${lane.title}` : ''}`}
+            <div
+              class="tx-board__cell"
+              role="list"
+              aria-label={cellLabel}
+              data-board-cell
+              data-column-id={column.id}
+              data-lane-id={lane.id}
+              data-drop-target={drag?.target?.columnId === column.id && drag.target.laneId === lane.id ? 'true' : undefined}
+            >
+              {#if grid.lanes.length > 1}<h4 class="tx-board__lane-title">{lane.title}</h4>{/if}
+              {#if shownCell?.items.length}
+                {#each shownCell.items as item (getId(item))}
+                  {@const id = getId(item)}
+                  {@const itemLabel = getLabel(item)}
+                  {@const locked = cardLocked(item)}
+                  {@const destinations = destinationsFor(item)}
+                  <div
+                    class={cx('tx-board__card', drag?.id === id && drag.active && 'tx-board__card--dragging', held.mode === 'held' && held.itemId === id && 'tx-board__card--held')}
+                    role="listitem"
+                    data-board-card
+                    data-item-id={id}
+                    data-locked={locked ? 'true' : undefined}
+                  >
+                    <div class="tx-board__card-actions">
+                      {#if MoveMenu}
+                        <MoveMenu
+                          open={openMenuId === id}
+                          disabled={pending[id] || locked}
+                          label={labels.moveMenu(itemLabel)}
+                          menuLabel={labels.moveMenuLabel(itemLabel)}
+                          {destinations}
+                          onSelect={(destination) => onMenuSelect(item, destination)}
+                          onOpenChange={(next) => {
+                            openMenuId = next ? id : openMenuId === id ? null : openMenuId;
+                          }}
+                        />
+                      {:else}
+                        <button
+                          type="button"
+                          class="tx-board__move-menu"
+                          data-board-move-menu
+                          aria-label={labels.moveMenu(itemLabel)}
+                          aria-haspopup="menu"
+                          aria-expanded="false"
+                          disabled={pending[id] || locked}
+                          onfocus={prefetchMoveMenu}
+                          onpointerenter={prefetchMoveMenu}
+                          onclick={() => void openMoveMenu(item)}
+                        >
+                          <span class="tx-board__move-menu-glyph" aria-hidden="true">⋮</span>
+                        </button>
+                      {/if}
+                      <button
+                        class="tx-board__handle"
+                        type="button"
+                        data-board-handle
+                        aria-label={labels.dragHandle(itemLabel)}
+                        aria-describedby={instructionsId}
+                        aria-pressed={held.mode === 'held' && held.itemId === id}
+                        disabled={pending[id] || locked}
+                        onkeydown={(event) => onCardKey(event, item)}
+                        onpointerdown={(event) => onPointerDown(event, item)}
+                      >
+                        <span class="tx-board__grip" aria-hidden="true">⠿</span>
+                      </button>
+                    </div>
+                    <div class="tx-board__content">
+                      {@render card(item, { pending: pending[id] ?? false })}
+                      {#if pending[id]}<span class="tx-board__pending" role="status">{labels.savingMove}</span>{/if}
+                    </div>
+                  </div>
+                {/each}
+              {:else}
+                <div class="tx-board__empty" role="listitem">{labels.emptyCell}</div>
+              {/if}
+            </div>
+          {/each}
+        </section>
+      {/each}
+    </div>
+  </div>
+  {#if grid.unplaced.length > 0}
+    <section class="tx-board__unplaced" aria-label={labels.unplaced}>
+      <h3>{labels.unplaced}</h3>
+      {#each grid.unplaced as item (getId(item))}
+        {@render card(item, { pending: false })}
+      {/each}
+    </section>
+  {/if}
+  <p class="tx-board__status" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
+  <!-- Tests await this once the lazy move-menu chunk has mounted. -->
+  {#if menuReady}
+    <span class="tx-board__sr-only" data-board-move-menu-chunk="" data-ready="">Move menu ready</span>
+  {/if}
+</section>
+
+<style>
+  @layer tx.components {
+    .tx-board {
+      color: var(--tx-foreground, var(--tx-text, CanvasText));
+      color-scheme: light dark;
+      min-inline-size: 0;
+    }
+
+    .tx-board__sr-only {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .tx-board__scroller {
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      padding: 0.25rem;
+    }
+
+    .tx-board__columns {
+      display: grid;
+      grid-auto-columns: minmax(15rem, 1fr);
+      grid-auto-flow: column;
+      align-items: start;
+      gap: 1rem;
+      min-inline-size: max-content;
+    }
+
+    .tx-board__column {
+      min-inline-size: 15rem;
+      border: 1px solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-radius-lg, 0.75rem);
+      background: var(--tx-muted, Canvas);
+    }
+
+    .tx-board__column[data-wip='warn'] .tx-board__column-header,
+    .tx-board__column[data-wip='blocked'] .tx-board__column-header {
+      border-block-end: 2px solid var(--tx-warning, CanvasText);
+    }
+
+    .tx-board__column[data-wip='blocked'] .tx-board__column-header {
+      border-block-end-color: var(--tx-danger, CanvasText);
+    }
+
+    .tx-board__column-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-block-end: 1px solid var(--tx-border, CanvasText);
+    }
+
+    .tx-board__column-header h3,
+    .tx-board__unplaced h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .tx-board__count {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.25em;
+    }
+
+    .tx-board__cell {
+      display: grid;
+      align-content: start;
+      min-block-size: 5rem;
+      padding: 0.5rem;
+    }
+
+    .tx-board__cell[data-drop-target='true'] {
+      outline: 2px dashed var(--tx-ring, Highlight);
+      outline-offset: -2px;
+    }
+
+    .tx-board--comfortable .tx-board__cell { gap: 0.5rem; }
+    .tx-board--compact .tx-board__cell { gap: 0.25rem; padding: 0.375rem; }
+
+    .tx-board__lane-title {
+      margin: 0;
+      font-size: 0.875rem;
+    }
+
+    .tx-board__card {
+      min-inline-size: 0;
+      border: 1px solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-radius-md, 0.5rem);
+      background: var(--tx-surface, Canvas);
+      box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 10%, transparent));
+    }
+
+    .tx-board__card--dragging,
+    .tx-board__card--held {
+      outline: 2px dashed var(--tx-ring, Highlight);
+      outline-offset: 2px;
+    }
+
+    .tx-board__card-actions {
+      display: flex;
+      float: inline-end;
+      align-items: center;
+      gap: 0.125rem;
+      padding-block-start: 0.25rem;
+      padding-inline-end: 0.25rem;
+    }
+
+    .tx-board__handle,
+    .tx-board__move-menu {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      inline-size: 2.75rem;
+      min-block-size: 2.75rem;
+      border: 0;
+      border-radius: var(--tx-radius-md, 0.5rem);
+      padding: 0.75rem;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .tx-board__handle {
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .tx-board__handle:active { cursor: grabbing; }
+    .tx-board__handle:disabled,
+    .tx-board__move-menu:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+    .tx-board__grip,
+    .tx-board__move-menu-glyph {
+      color: var(--tx-foreground, CanvasText);
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    .tx-board__scroller:focus-visible,
+    .tx-board__handle:focus-visible,
+    .tx-board__move-menu:focus-visible {
+      outline: 2px solid var(--tx-ring, Highlight);
+      outline-offset: 2px;
+    }
+    .tx-board__content { padding: 0.75rem; }
+    .tx-board__pending { display: block; margin-block-start: 0.5rem; font-size: 0.875rem; }
+    .tx-board__empty {
+      margin: 0;
+      padding: 0.75rem;
+      color: var(--tx-foreground, CanvasText);
+    }
+    .tx-board__unplaced { margin-block-start: 1rem; border: 1px solid var(--tx-danger, CanvasText); padding: 0.75rem; }
+    .tx-board__status { min-block-size: 1.5em; margin-block: 0.5rem 0; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .tx-board__card { transition: outline-color 120ms ease; }
+    }
+
+    @media (forced-colors: active) {
+      .tx-board__column,
+      .tx-board__column-header,
+      .tx-board__card,
+      .tx-board__unplaced { border-color: CanvasText; }
+      .tx-board__column[data-wip='warn'] .tx-board__column-header,
+      .tx-board__column[data-wip='blocked'] .tx-board__column-header { border-block-end-color: Highlight; }
+    }
+  }
+</style>

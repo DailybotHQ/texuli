@@ -1,0 +1,378 @@
+{
+  "$comment": "Golden hostile composition v2 inputs: each must fail closed with the pinned issues. Fictional data; the hostile strings are inert test data. A __proto__ key is tested from JSON text in composition-v2.test.ts, because a JSON module import would set the prototype instead.",
+  "golden": "composition-v2-hostile",
+  "cases": [
+    {
+      "name": "timing-without-duration",
+      "input": {
+        "version": 2,
+        "width": 100,
+        "height": 100,
+        "layers": [
+          {
+            "id": "a",
+            "type": "shape",
+            "shape": "rectangle",
+            "frame": {
+              "x": 0,
+              "y": 0,
+              "width": 10,
+              "height": 10
+            },
+            "fill": {
+              "kind": "solid",
+              "color": "#000"
+            },
+            "timing": {
+              "startMs": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "end-before-start",
+      "input": {
+        "version": 2,
+        "width": 100,
+        "height": 100,
+        "durationMs": 1000,
+        "layers": [
+          {
+            "id": "a",
+            "type": "shape",
+            "shape": "rectangle",
+            "frame": {
+              "x": 0,
+              "y": 0,
+              "width": 10,
+              "height": 10
+            },
+            "fill": {
+              "kind": "solid",
+              "color": "#000"
+            },
+            "timing": {
+              "startMs": 500,
+              "endMs": 400
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "end-past-duration",
+      "input": {
+        "version": 2,
+        "width": 100,
+        "height": 100,
+        "durationMs": 1000,
+        "layers": [
+          {
+            "id": "a",
+            "type": "shape",
+            "shape": "rectangle",
+            "frame": {
+              "x": 0,
+              "y": 0,
+              "width": 10,
+              "height": 10
+            },
+            "fill": {
+              "kind": "solid",
+              "color": "#000"
+            },
+            "timing": {
+              "startMs": 0,
+              "endMs": 1001
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "child-outside-group-window",
+      "input": {
+        "version": 2,
+        "width": 100,
+        "height": 100,
+        "durationMs": 1000,
+        "layers": [
+          {
+            "id": "g",
+            "type": "group",
+            "timing": {
+              "startMs": 0,
+              "endMs": 300
+            },
+            "children": [
+              {
+                "id": "a",
+                "type": "shape",
+                "shape": "rectangle",
+                "frame": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 10,
+                  "height": 10
+                },
+                "fill": {
+                  "kind": "solid",
+                  "color": "#000"
+                },
+                "timing": {
+                  "startMs": 500
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplicate-id-across-groups",
+      "input": {
+        "version": 2,
+        "width": 100,
+        "height": 100,
+        "layers": [
+          {
+            "id": "a",
+            "type": "shape",
+            "shape": "rectangle",
+            "frame": {
+              "x": 0,
+              "y": 0,
+              "width": 10,
+              "height": 10
+            },
+            "fill": {
+              "kind": "solid",
+              "color": "#000"
+            }
+          },
+          {
+            "id": "g",
+            "type": "group",
+            "children": [
+              {
+                "id": "a",
+                "type": "shape",
+                "shape": "ellipse",
+                "frame": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 10,
+                  "height": 10
+                },
+                "fill": {
+                  "kind": "solid",
+                  "color": "#fff"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "empty-group",
+      "input": {
+        "version": 2,
+        "width": 100,
+        "height": 100,
+        "layers": [
+          {
+            "id": "g",
+            "type": "group",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "group-with-transform-and-mask",
+      "input": {
+        "version": 2,
+        "width": 100,
+        "height": 100,
+        "layers": [
+          {
+            "id": "m",
+            "type": "shape",
+            "shape": "rectangle",
+            "frame": {
+              "x": 0,
+              "y": 0,
+              "width": 10,
+              "height": 10
+            },
+            "fill": {
+              "kind": "solid",
+              "color": "#000"
+            }
+          },
+          {
+            "id": "g",
+            "type": "group",
+            "transform": {
+              "rotateDeg": 45
+            },
+            "mask": {
+              "layerId": "m",
+              "mode": "alpha"
+            },
+            "children": [
+              {
+                "id": "a",
+                "type": "shape",
+                "shape": "rectangle",
+                "frame": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 10,
+                  "height": 10
+                },
+                "fill": {
+                  "kind": "solid",
+                  "color": "#000"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "mask-references-group",
+      "input": {
+        "version": 2,
+        "width": 100,
+        "height": 100,
+        "layers": [
+          {
+            "id": "g",
+            "type": "group",
+            "children": [
+              {
+                "id": "a",
+                "type": "shape",
+                "shape": "rectangle",
+                "frame": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 10,
+                  "height": 10
+                },
+                "fill": {
+                  "kind": "solid",
+                  "color": "#000"
+                }
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "type": "shape",
+            "shape": "rectangle",
+            "frame": {
+              "x": 0,
+              "y": 0,
+              "width": 10,
+              "height": 10
+            },
+            "fill": {
+              "kind": "solid",
+              "color": "#000"
+            },
+            "mask": {
+              "layerId": "g",
+              "mode": "alpha"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "unsafe-nested-image",
+      "input": {
+        "version": 2,
+        "width": 100,
+        "height": 100,
+        "layers": [
+          {
+            "id": "g",
+            "type": "group",
+            "children": [
+              {
+                "id": "ok",
+                "type": "shape",
+                "shape": "rectangle",
+                "frame": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 10,
+                  "height": 10
+                },
+                "fill": {
+                  "kind": "solid",
+                  "color": "#000"
+                }
+              },
+              {
+                "id": "pic",
+                "type": "image",
+                "src": "javascript:alert(1)",
+                "alt": "x",
+                "frame": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 10,
+                  "height": 10
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "v1-with-timing",
+      "input": {
+        "version": 1,
+        "width": 100,
+        "height": 100,
+        "durationMs": 1000,
+        "layers": [
+          {
+            "id": "a",
+            "type": "shape",
+            "shape": "rectangle",
+            "frame": {
+              "x": 0,
+              "y": 0,
+              "width": 10,
+              "height": 10
+            },
+            "fill": {
+              "kind": "solid",
+              "color": "#000"
+            },
+            "timing": {
+              "startMs": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "unknown-version",
+      "input": {
+        "version": 3,
+        "width": 100,
+        "height": 100,
+        "layers": []
+      }
+    }
+  ]
+}

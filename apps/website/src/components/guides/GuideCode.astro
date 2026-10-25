@@ -1,0 +1,14 @@
+---
+/**
+ * Static code sample. Text only — never {@html} or set:html from data.
+ */
+interface Props {
+  code: string;
+  /** Accessible name for the pre block. */
+  label?: string;
+}
+
+const { code, label = 'Code sample' } = Astro.props;
+---
+
+<pre class="guide-code" tabindex="0" role="region" aria-label={label}><code>{code}</code></pre>

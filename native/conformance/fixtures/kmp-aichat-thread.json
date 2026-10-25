@@ -1,0 +1,73 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "kmp-aichat-thread",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-25T12:00:00Z",
+  "updatedAt": "2026-10-25T12:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Migration assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "KMP AI Chat"
+    },
+    "children": [
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "text",
+            "markdown": "Demo only: replies come from a fictional assistant."
+          }
+        },
+        "slot": "children"
+      },
+      {
+        "id": "chat-thread",
+        "props": {
+          "label": "Conversation"
+        },
+        "slot": "children",
+        "children": [
+          {
+            "id": "chat-message",
+            "props": {
+              "author": "Fictional Person",
+              "role": "user",
+              "at": "2026-10-25T11:58:00Z",
+              "text": "What is on the team board today?"
+            },
+            "slot": "children"
+          },
+          {
+            "id": "chat-message",
+            "props": {
+              "author": "Fictional Agent",
+              "role": "agent",
+              "at": "2026-10-25T11:58:05Z",
+              "text": "Three items are open and one is **blocked** on review."
+            },
+            "slot": "children"
+          },
+          {
+            "id": "chat-message",
+            "props": {
+              "author": "Fictional Person",
+              "role": "user",
+              "at": "2026-10-25T11:59:00Z",
+              "text": "Which one is blocked?"
+            },
+            "slot": "children"
+          }
+        ]
+      }
+    ]
+  }
+}

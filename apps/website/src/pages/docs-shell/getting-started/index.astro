@@ -1,0 +1,30 @@
+---
+import DocsShell from '../../../components/docs-shell/DocsShell.astro';
+
+const toc = [
+  { id: 'open-a-page', label: 'Open a page', level: 2 as const },
+  { id: 'follow-the-outline', label: 'Follow the outline', level: 2 as const },
+  { id: 'move-on', label: 'Move on', level: 2 as const },
+];
+---
+
+<DocsShell
+  title="Getting started"
+  description="How to read a documentation page in this shell from top to bottom."
+  {toc}
+>
+  <h2 id="open-a-page">Open a page</h2>
+  <p>
+    Choose a topic in the sidebar (or the mobile menu). The current page is marked with <code>aria-current="page"</code> so assistive technology can announce it.
+  </p>
+  <h2 id="follow-the-outline">Follow the outline</h2>
+  <p>
+    The table of contents lists the headings on this page. Jump to a section without leaving the
+    origin — every link is an in-page anchor.
+  </p>
+  <h2 id="move-on">Move on</h2>
+  <p>
+    When you finish a page, use Next to continue the reading path, or Previous to go back. The
+    sequence is defined once for the whole docs area.
+  </p>
+</DocsShell>

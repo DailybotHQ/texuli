@@ -1,0 +1,47 @@
+/**
+ * Composition export control. @layer tx.components so consumer utilities win.
+ */
+@layer tx.components {
+  .tx-export {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .tx-export__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tx-export__note,
+  .tx-export__status {
+    margin: 0;
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    color: var(--tx-muted-foreground, CanvasText);
+  }
+
+  .tx-export__status:empty {
+    display: none;
+  }
+
+  .tx-export__status[data-tone="done"] {
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-export__status[data-tone="error"] {
+    color: var(--tx-foreground, CanvasText);
+    padding-inline-start: 0.5rem;
+    border-inline-start: 3px solid var(--tx-destructive, CanvasText);
+  }
+
+  .tx-export__progress {
+    inline-size: min(100%, 20rem);
+    accent-color: var(--tx-primary, Highlight);
+  }
+
+  @media (forced-colors: active) {
+    .tx-export__status[data-tone="error"] {
+      border-inline-start-color: CanvasText;
+    }
+  }
+}

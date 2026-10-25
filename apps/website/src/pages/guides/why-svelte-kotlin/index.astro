@@ -1,0 +1,93 @@
+---
+import GuideCode from '../../../components/guides/GuideCode.astro';
+import GuidesShell from '../../../components/guides/GuidesShell.astro';
+
+const toc = [
+  { id: 'why-svelte', label: 'Why Svelte', level: 2 as const },
+  { id: 'why-kotlin', label: 'Why Kotlin', level: 2 as const },
+  { id: 'one-catalog-two-runtimes', label: 'One catalog, two runtimes', level: 2 as const },
+  { id: 'what-exists-today', label: 'What exists today', level: 2 as const },
+];
+---
+
+<GuidesShell
+  title="Why Svelte and Kotlin"
+  description="The two technologies behind Texuli, what each one is responsible for, and how one contract serves both."
+  {toc}
+>
+  <p>
+    Texuli renders the web with <strong>Svelte 5</strong> and speaks to native platforms through
+    <strong>Kotlin</strong>. This page explains why both were chosen, what each owns, and how the
+    same component catalog drives the two runtimes.
+  </p>
+
+  <h2 id="why-svelte">Why Svelte</h2>
+  <p>
+    Texuli ships as compiled source, not as a runtime you download. Svelte is a compiler: a
+    component becomes plain JavaScript that touches the DOM directly, with no virtual DOM diffing
+    and no framework runtime carried in the bundle. That maps directly onto Texuli's promises:
+  </p>
+  <ul>
+    <li>
+      <strong>Performance is structural, not tuned.</strong> There is no reconciliation layer to
+      outgrow. Updates land on exactly the nodes that changed, which is what keeps dense surfaces —
+      grids, charts, decks — inside their size and interaction budgets.
+    </li>
+    <li>
+      <strong>Small bundles by default.</strong> Each subpath is budgeted in
+      <code>texuli.budgets.json</code> and measured by <code>pnpm size</code>; a compiler that
+      emits only what the component uses makes those budgets honest ones.
+    </li>
+    <li>
+      <strong>Runes make state explicit.</strong> Svelte 5's <code>$state</code>,
+      <code>$derived</code> and <code>$effect</code> put reactivity in the language surface, so
+      component contracts stay readable and auditable — important for a library that is designed to
+      be read, copied and owned by agents and humans alike.
+    </li>
+    <li>
+      <strong>Fewer ways to shoot yourself.</strong> Snippets over injection holes, no
+      <code>innerHTML</code> idiom in the mainstream path, and compile-time warnings on the
+      accessibility mistakes Texuli is held to anyway.
+    </li>
+  </ul>
+
+  <h2 id="why-kotlin">Why Kotlin</h2>
+  <p>
+    The web runtime cannot follow Texuli everywhere. Android applications, Compose surfaces, iOS
+    sharing and desktop tooling live in a world where a JavaScript bundle is the guest, not the
+    host. Kotlin Multiplatform is the bridge:
+  </p>
+  <ul>
+    <li>
+      <strong>One language across the native side.</strong> Shared data models, validation and
+      catalog logic compile once per platform instead of being re-written per target.
+    </li>
+    <li>
+      <strong>First-class tooling.</strong> Static typing, multiplatform libraries and IDE support
+      keep the native half held to the same bar as the web half.
+    </li>
+    <li>
+      <strong>It consumes the contract, not the web code.</strong> Kotlin never imports Svelte
+      packages; it reads the generated spec (see below). The layer graph stays one-directional.
+    </li>
+  </ul>
+
+  <h2 id="one-catalog-two-runtimes">One catalog, two runtimes</h2>
+  <p>
+    The seam between the two worlds is the <strong>catalog contract</strong>: every Texuli
+    component's props, kinds, enums and tiers are declared once in the manifests, and
+    <code>@texuli/spec</code> generates both a TypeScript and a Kotlin projection of that contract
+    (<code>packages/spec/generated/typescript/</code> and
+    <code>packages/spec/generated/kotlin/com/texuli/spec/</code>). Svelte components implement the
+    contract on the web; Kotlin consumes it wherever Svelte cannot go. Agent output rendered on
+    either runtime is validated against the same schema with the same URL policy tiers.
+  </p>
+
+  <h2 id="what-exists-today">What exists today</h2>
+  <p>
+    Honesty first: the web stack is the implemented one. The Svelte packages, the token engine, the
+    catalog, the spec generator and both generated projections are real and tested today; the
+    Kotlin Multiplatform runtime that would consume the Kotlin projection is planned work and not
+    yet released. Nothing is on npm, in Maven, or deployed.
+  </p>
+</GuidesShell>

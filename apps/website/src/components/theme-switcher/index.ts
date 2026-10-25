@@ -1,0 +1,26 @@
+export {
+  type ApplySiteAppearanceInput,
+  type ApplySiteAppearanceResult,
+  applyHighContrastVars,
+  applySiteAppearance,
+  captureThemeVars,
+  clearInlineThemeVars,
+  clearSiteAppearance,
+  isModeChoice,
+  isThemeId,
+  MODE_CHOICES,
+  type ModeChoice,
+  modePreferenceKey,
+  readCachedThemeId,
+  readModePreference,
+  resolveModeChoice,
+  writeModePreference,
+} from './appearance.ts';
+export {
+  buildHighContrastModeCss,
+  buildThemeCatalog,
+  buildThemeLibraryCss,
+  filterThemeCatalog,
+  type ThemeCatalogEntry,
+  themeCssVariableNames,
+} from './library.ts';
