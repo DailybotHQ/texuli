@@ -13,7 +13,8 @@
  *   main, with no sidebar.
  *
  * Everything is static: the theme CSS and the bootstrap script are inlined
- * at build time, so a page makes no network request it does not ship.
+ * at build time, so a page makes no network request it does not ship — the
+ * one exception is /tx-ready.js, shared and cached across pages.
  */
 /**
  * Layer order must load before Texuli base.css so `tx.*` join this stack
@@ -35,6 +36,14 @@ import SiteHeader from '../components/foundation/SiteHeader.astro';
 import SiteSidebar from '../components/foundation/SiteSidebar.astro';
 import { APPEARANCE_NAMESPACE, SITE_NAME, SITE_THEME } from '../components/foundation/site.ts';
 import SeoHead from '../components/seo/SeoHead.astro';
+
+/**
+ * Explicit page-readiness signal for E2E and prefetchers, served from
+ * /tx-ready.js (a cached same-origin file: per-page inline bytes would push
+ * tight document budgets over). The specs detect the tag's
+ * `data-tx-ready-script` marker to tell shell pages from standalone
+ * documents. See public/tx-ready.js for the contract.
+ */
 
 interface Props {
   title: string;
@@ -126,5 +135,6 @@ const markdownHead = docs
         </>
       )
     }
+    <script is:inline src={`${base}tx-ready.js`} data-tx-ready-script defer />
   </body>
 </html>
