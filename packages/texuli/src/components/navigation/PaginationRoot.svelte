@@ -68,7 +68,7 @@ function handlePageChange(next: number): void {
         {#each ctx.pages as token (token)}
           <li class={paginationItemClass()}>
             {#if typeof token === 'number'}
-              <Primitive.Page page={token} class={paginationButtonClass()} />
+              <Primitive.Page page={token} class={paginationButtonClass()}>{token}</Primitive.Page>
             {:else}
               <Primitive.Ellipsis class={paginationEllipsisClass()} />
             {/if}

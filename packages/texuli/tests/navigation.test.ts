@@ -9,6 +9,7 @@ import {
   paginationClass,
 } from '../src/components/navigation/index.ts';
 import NavigationFixture from './fixtures/NavigationFixture.svelte';
+import PaginationPageFixture from './fixtures/PaginationPageFixture.svelte';
 
 afterEach(() => {
   cleanup();
@@ -71,6 +72,24 @@ describe('Pagination', () => {
         'page'
       );
     });
+  });
+
+  // Audit P0-01: the default page buttons were empty boxes (named only by aria-label).
+  it('shows each page number as visible button text', () => {
+    render(NavigationFixture, { props: { page: 2 } });
+    const pages = screen.getAllByRole('button', { name: /^Page \d+$/ });
+    expect(pages.length).toBeGreaterThan(1);
+    for (const button of pages) {
+      expect(button.textContent?.trim()).toBe(
+        button.getAttribute('aria-label')?.replace('Page ', '')
+      );
+    }
+  });
+
+  it('defaults a composed Pagination.Page to its number and keeps custom content', () => {
+    render(PaginationPageFixture);
+    expect(screen.getByRole('button', { name: 'Page 1' }).textContent?.trim()).toBe('1');
+    expect(screen.getByRole('button', { name: 'Page 2' }).textContent?.trim()).toBe('Second');
   });
 
   it('applies soft variant class', () => {

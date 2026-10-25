@@ -19,5 +19,9 @@ let { children, class: className, page, ...rest }: Props = $props();
   })}
   {...rest}
 >
-  {@render children?.()}
+  {#if children}
+    {@render children()}
+  {:else}
+    {page}
+  {/if}
 </Primitive.Page>
