@@ -91,7 +91,7 @@ describe('editor inline content', () => {
 });
 
 describe('editor graphemes and words', () => {
-  const family = '👨‍👩‍👧';
+  const family = '👨\u200d👩\u200d👧';
   const text = `a${family}é b`;
 
   it('never splits a grapheme cluster', () => {
@@ -349,7 +349,7 @@ describe('editor selection', () => {
     blocks: [
       { id: 'a', type: 'paragraph', content: [t('one')] },
       { id: 'd', type: 'divider' },
-      { id: 'b', type: 'paragraph', content: [t('a👨‍👩‍👧b')] },
+      { id: 'b', type: 'paragraph', content: [t('a👨\u200d👩\u200d👧b')] },
     ],
   };
 

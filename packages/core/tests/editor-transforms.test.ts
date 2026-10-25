@@ -157,7 +157,7 @@ describe('Enter', () => {
 
 describe('Backspace and Delete', () => {
   it('deletes graphemes, words and lines', () => {
-    expect(text(ok(deleteBackward(at(md('a👨‍👩‍👧'), 0, 9))))).toBe('a');
+    expect(text(ok(deleteBackward(at(md('a👨\u200d👩\u200d👧'), 0, 9))))).toBe('a');
     expect(text(ok(deleteBackward(at(md('one two'), 0, 7), 'word')))).toBe('one');
     expect(text(ok(deleteForward(at(md('one two'), 0, 0), 'word')))).toBe('two');
     const line = ok(deleteBackward(at(md('ab\\\ncd'), 0, 5), 'line'));
