@@ -60,12 +60,15 @@ version.
 
 ## Workspace dependencies and consumers
 
-Task 172 converts source `workspace:*` dependencies into intentional semver
-ranges before the first publication wave. The choice of range is explicit per
-dependency: compatible internal releases may use a range, while compatibility
-that depends on an exact catalog/spec contract or prerelease requires an exact
-pin. The release packer and tarball checks must preserve those intended ranges;
-no published manifest may contain `workspace:*`, `link:`, or `0.0.0`.
+Task 172 made every published dependency an intentional semver range: the
+published package manifests pin internal `@texuli/*` dependencies to exact
+versions (prerelease compatibility between Texuli packages is exact, per
+"Independent package versions" above), while the private development
+manifests (`apps/website`, `packages/examples`, `packages/editor`) keep the
+pnpm `workspace:` protocol. The release packer enforces that boundary
+(`scripts/packages.ts` rewrites `workspace:` to the exact workspace version
+and fails the pack when a published manifest would still carry
+`workspace:*`, `link:`, `file:` or `0.0.0`).
 
 This changes consumers from workspace resolution to registry resolution.
 Applications such as Dailybot v4 and Protoyard must install published package
@@ -74,6 +77,26 @@ the packed artifacts in their own consumer gates. A local workspace install
 does not prove that a clean consumer can resolve the dependency graph. The
 workspace remains the development source; the published semver ranges define
 the package-to-package contract outside this repository.
+
+## Compatibility map: npm, spec and native
+
+| Surface | Version | Where it is pinned |
+| --- | --- | --- |
+| 15 npm packages | `0.1.0-next.1` (dist-tag `next`) | Each package manifest; published 2026-10-25 by the publish workflow (run 40238083612). |
+| Blueprint spec | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | `packages/spec/versions.json`; every generated file is stamped `// Spec 0.2.0, digest …`. |
+| `@texuli/spec` (npm) | `0.1.0-next.1` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
+| Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
+
+- A normative spec change takes a new spec version and a fresh digest pin in
+  `packages/spec/versions.json` (`tests/versioning.test.ts` enforces the pin);
+  regeneration re-stamps the generated TypeScript and Kotlin.
+- Consumers pin exact npm versions ("Dist-tags" above) and can assert the
+  contract they built against via the digest stamp in `@texuli/spec`'s
+  generated sources.
+- The native modules are compatible with exactly the spec version whose
+  generated Kotlin they consume — the conformance module tests against the
+  same committed sources, so there is no separate native version to track
+  until a Maven Central publication exists (owner GO; ADR-005).
 
 ## Publication waves
 
