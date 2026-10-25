@@ -8,6 +8,7 @@ import { expect, type Page, test } from '@playwright/test';
 
 /** Display chrome examples (token AA). */
 const DISPLAY_EXAMPLES = [
+  'texuli-alert',
   'texuli-badge',
   'texuli-card',
   'texuli-stat',
@@ -87,6 +88,47 @@ test.describe('a11y display · light and dark axe', () => {
       await axeExample(page, id);
     });
   }
+});
+
+/** WCAG contrast of an element's text against its own (opaque) background fill. */
+async function textContrast(page: Page, selector: string): Promise<number> {
+  return page
+    .locator(selector)
+    .first()
+    .evaluate((element) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1;
+      canvas.height = 1;
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      if (!context) throw new Error('no 2d context');
+      const rgb = (color: string): number[] => {
+        context.clearRect(0, 0, 1, 1);
+        context.fillStyle = color;
+        context.fillRect(0, 0, 1, 1);
+        return [...context.getImageData(0, 0, 1, 1).data.slice(0, 3)];
+      };
+      const luminance = (channels: number[]): number => {
+        const [r = 0, g = 0, b = 0] = channels.map((value) => {
+          const v = value / 255;
+          return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const alert = element.closest('.tx-alert') ?? element;
+      const fg = luminance(rgb(getComputedStyle(element).color));
+      const bg = luminance(rgb(getComputedStyle(alert).backgroundColor));
+      return (Math.max(fg, bg) + 0.05) / (Math.min(fg, bg) + 0.05);
+    });
+}
+
+// POLISH_AUDIT P1-02: an alert in a scoped dark section of a light page kept the
+// page's light soft fill under the section's light text (contrast 1.01). axe
+// does not flag it, so the pair is measured directly.
+test('texuli-alert keeps AA body contrast in its scoped dark section', async ({ page }) => {
+  await gotoFixture(page, 'texuli-alert', 'light');
+  const body = '.dark-panel .tx-alert__text';
+  await expect(page.locator('.dark-panel[data-tx-theme]')).toBeVisible();
+  expect(await textContrast(page, body)).toBeGreaterThanOrEqual(4.5);
 });
 
 test.describe('a11y display · forced-colors', () => {

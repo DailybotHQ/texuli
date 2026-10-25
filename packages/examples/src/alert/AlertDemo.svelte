@@ -1,5 +1,6 @@
 <script lang="ts">
 import { ALERT_TONES, Alert, type AlertTone, Banner, Callout } from 'texuli/alert';
+import { scopedTheme } from '../scoped-theme.ts';
 
 let dismissed = $state(false);
 
@@ -78,7 +79,7 @@ const toneTitle: Record<AlertTone, string> = {
     <Alert tone="success" title="تم الحفظ" text="المسودة محفوظة محلياً." actionLabel="عرض" />
   </section>
 
-  <section data-tx-mode="dark" class="dark-panel">
+  <section use:scopedTheme={'dark'} class="dark-panel">
     <h2>Dark</h2>
     <Alert tone="info" title="Dark mode" text="Token fills stay readable on the dark canvas." />
     <Callout tone="warning" title="Contrast" text="Forced-colors borders still outline the surface." />
@@ -113,32 +114,13 @@ const toneTitle: Record<AlertTone, string> = {
     color: var(--tx-muted-foreground, GrayText);
     font-size: 0.875rem;
   }
+  /* A real dark theme scope (scopedTheme): every token switches together. */
   .dark-panel {
     display: grid;
     gap: 0.5rem;
     padding: 0.75rem;
     border-radius: var(--tx-radius, 0.5rem);
-    background: #0f1115;
-    color: #f4f4f5;
-    --tx-background: #0f1115;
-    --tx-foreground: #f4f4f5;
-    --tx-muted-foreground: #c8cdd4;
-    --tx-border: #8394a5;
-    --tx-surface: #0f1115;
-  }
-
-  @media (forced-colors: active) {
-    .dark-panel, [data-tx-mode="dark"] {
-      background: Canvas !important;
-      color: CanvasText !important;
-      border-color: CanvasText !important;
-      --tx-background: Canvas;
-      --tx-foreground: CanvasText;
-      --tx-muted-foreground: CanvasText;
-      --tx-border: CanvasText;
-      --tx-surface: Canvas;
-      --tx-primary: Highlight;
-      --tx-primary-foreground: HighlightText;
-    }
+    background: var(--tx-background, Canvas);
+    color: var(--tx-foreground, CanvasText);
   }
 </style>
