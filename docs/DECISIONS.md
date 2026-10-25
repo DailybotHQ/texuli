@@ -56,3 +56,88 @@ reverse it. Newest last.
   browser coverage makes native recording insufficient. Swap the encoder
   boundary while preserving the frame-sampling, progress, cancellation and
   output contracts; an encoder dependency requires explicit developer GO.
+
+## ADR-003: Rich text editor architecture
+
+- **Date:** 2026-10-25 · **Ratification:** proposed by the editor lane of
+  PLAN_005 for the lead and the developer. Nothing is implemented yet; the
+  developer may override any part.
+- **Context:** Texuli has no rich text editor. The developer asked for one
+  built from scratch, with no editor dependency, that edits the same content
+  the sink-free renderers display (blocks `text` Markdown and catalog rich
+  text). Core (L0) is framework-free and cannot import blocks (L5) or catalog
+  (L6), and the CSP allows only the `svelte-trusted-html` Trusted Types
+  policy. The long-form contract, with the vocabularies, keyboard map and
+  tests, is [EDITOR_ARCHITECTURE](EDITOR_ARCHITECTURE.md).
+- **Options and choices,** one per contract. Each line gives the chosen
+  option, one rejected alternative, and how to reverse it:
+  - **Layers.** **Chosen:** editing texels in core (`text-segment`,
+    `input-intent`, `composition`, `editable-selection`), and a new L4
+    `@texuli/editor` with the framework-free `model` and `paste` subpaths, a
+    lazy entry and a `ui` chunk. Blocks and catalog import `model` downward;
+    chat (L4) gets a rich composer through the host `composer` snippet.
+    **Rejected:** the document model in core, which would make L0 a content
+    format. **Reverse:** move `model` into core, with a re-export at the same
+    subpath.
+  - **Document model.** **Chosen:** a versioned (`version: 1`) block tree
+    with flat text runs and mark sets. The closed node set is `paragraph`,
+    `heading` 1–4, `list` (bullet, ordered, todo), `code`, `quote`, `divider`
+    and `media` (a host-resolved reference). The closed mark set is `strong`,
+    `em`, `strike`, `code` and `link`. Any addition is a new version with a
+    migration. **Rejected:** a nested inline tree, which allows several
+    stored forms of the same text. **Reverse:** only the adapters see the
+    model from outside, so the internals can change behind them.
+  - **Selection.** **Chosen:** points made of a block id and a UTF-16
+    offset, snapped to graphemes, plus a node selection for void blocks.
+    **Rejected:** DOM ranges as the source of truth. **Reverse:** points
+    pass through one mapping module.
+  - **Transforms.** **Chosen:** pure `{ doc, selection }` to result
+    functions with refusal issues and structural sharing, validated by a
+    seeded random-edit test. **Rejected:** mutating the DOM and reading it
+    back. **Reverse:** a step log can wrap the same functions.
+  - **History.** **Chosen:** a snapshot stack (`past`, `present`, `future`,
+    at most 200 steps) with typing merges, like the image editor and timeline
+    histories. **Rejected:** inverse patches, which need a correct inverse
+    for every transform. **Reverse:** add invertible steps if collaborative
+    editing is planned; the host API stays.
+  - **Input and IME.** **Chosen:** `contenteditable`, with every cancelable
+    `beforeinput` handled as a command. During composition the DOM is left
+    alone, and at `compositionend` the change is diffed back as one edit.
+    The keyboard map and input rules are in the companion doc. **Rejected:**
+    a hidden textarea with a drawn caret, which loses input methods,
+    spellcheck and screen-reader editing. **Reverse:** the input layer is two
+    texels and can be replaced on its own.
+  - **Accessibility.** **Chosen:** a labelled `role="textbox"`
+    `aria-multiline` surface and a roving `role="toolbar"`. Polite,
+    translatable announcements cover mark, block and indent changes, undo,
+    paste results and refusals, but not characters. **Rejected:**
+    `role="application"`. **Reverse:** roles live only in the `ui` subpath.
+  - **Paste and links.** **Chosen:** an owned string tokenizer maps
+    clipboard HTML through an allowlist into the vocabulary and never builds
+    a DOM. Every href passes `safeHref`. Pasted and autolinked URLs are
+    always `untrusted`, and the `trust` prop defaults to `untrusted`.
+    **Rejected:** `DOMParser`, a Trusted Types sink that would need a new
+    policy. **Reverse:** the platform HTML Sanitizer, behind the same `paste`
+    subpath, once it passes the CSP matrix.
+  - **Interchange.** **Chosen:** the closed Markdown subset is the wire
+    format, through an owned `toMarkdown`/`fromMarkdown` codec. Tree adapters
+    live in blocks and catalog. Property tests assert parity with the blocks
+    parser and the catalog adapter. Strike degrades with a diagnostic until
+    catalog rich text adds it. **Rejected:** catalog `RichTextInline` as the
+    model, because it is upward, inline-only and has no strike. **Reverse:**
+    once blocks and catalog adopt the model, the adapters become re-exports.
+  - **Long documents and size.** **Chosen:** keyed full rendering with
+    `content-visibility: auto`. The budget posture is one frame per keystroke
+    at the planned 2,000-block limit, measured by the perf suite when the
+    editor lands; that is a target, not a measurement. Budget rows for the
+    new subpaths are added by the owner, and no existing budget is raised.
+    **Rejected:** windowed rendering, which breaks in-page search,
+    screen-reader browsing and long selections. **Reverse:** window with the
+    data package's virtual list, or lower the limit, as a new decision.
+- **Why:** the model stays the only source of truth, so behavior is
+  deterministic and testable without layout. Content never becomes HTML at
+  any step. The editor reuses the patterns the repository already proves (a
+  framework-free model with refusals and snapshot history, a lazy UI split,
+  and the URL policy tiers).
+- **Reverse when:** see each contract above. A reversal of the layer
+  placement or the wire format is a new ADR.
