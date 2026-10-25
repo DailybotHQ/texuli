@@ -117,7 +117,14 @@ async function visit(page: Page, path: string): Promise<Visit> {
     if (request.url().startsWith(origin)) result.files.add(new URL(request.url()).pathname);
   });
   await page.goto(`${origin}${path}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   return result;
 }
 
@@ -267,12 +274,12 @@ test.describe('texuli.com performance budgets', () => {
     await expect.poll(() => cssFiles().length).toBeGreaterThan(0);
     expect(cssFiles().length).toBeLessThanOrEqual(24);
     await expect(page.getByRole('status').first()).toContainText('showing 24 of 210');
-    await page.getByRole('button', { name: /Show 24 more themes/ }).click();
+    await page.getByRole('button', { name: 'Show 24 more', exact: true }).click();
     await expect(page.locator('[data-theme-id]')).toHaveCount(48);
     // Keyboard users continue from the first new card.
     await expect(page.locator('[data-theme-id]').nth(24).locator('button').first()).toBeFocused();
     await page.getByRole('searchbox', { name: 'Find a theme' }).fill('harbor');
-    await expect(page.getByRole('button', { name: /more themes/ })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /^Show \d+ more$/ })).toHaveCount(0);
   });
 
   test('applying a theme loads its CSS file first, then applies it site-wide', async ({ page }) => {

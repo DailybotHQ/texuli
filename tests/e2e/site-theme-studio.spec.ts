@@ -70,7 +70,14 @@ async function visit(page: Page, path: string) {
     if (isForeign(request.url(), origin)) foreign.push(request.url());
   });
   await page.goto(`${origin}${path}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   // Wait for the header script to publish a measured pixel height.
   await page.waitForFunction(() => {
     const raw = getComputedStyle(document.documentElement)
@@ -167,7 +174,14 @@ test.describe('texuli.com theme studio', () => {
       if (isForeign(request.url(), origin)) foreign.push(request.url());
     });
     await page.goto(`${origin}${PATH}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForFunction(
+      () =>
+        document.documentElement.dataset.txPageReady === 'true' ||
+        (!document.querySelector('script[data-tx-ready-script]') &&
+          document.readyState === 'complete'),
+      undefined,
+      { polling: 250 }
+    );
     await page.waitForFunction(() => {
       const raw = getComputedStyle(document.documentElement)
         .getPropertyValue('--site-header-height')

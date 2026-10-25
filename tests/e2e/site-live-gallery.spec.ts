@@ -75,7 +75,14 @@ async function visit(page: Page, path = GALLERY): Promise<string[]> {
     }
   });
   await page.goto(`${origin}${path}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   return foreign;
 }
 
@@ -353,7 +360,14 @@ test.describe('texuli.com living component gallery', () => {
       for (const id of links) {
         const theme = mode === 'dark' ? 'dark' : 'light';
         await page.goto(`${origin}/gallery-components/preview/?id=${id}&mode=${theme}&dir=ltr`);
-        await page.waitForLoadState('networkidle');
+        await page.waitForFunction(
+          () =>
+            document.documentElement.dataset.txPageReady === 'true' ||
+            (!document.querySelector('script[data-tx-ready-script]') &&
+              document.readyState === 'complete'),
+          undefined,
+          { polling: 250 }
+        );
         await expect(page.locator(`[data-tx-live-stage="${id}"]`)).toBeVisible();
         await expect(
           page.locator(`[data-tx-live-stage="${id}"]`).getByText(/^Loading (demo|layout)/)

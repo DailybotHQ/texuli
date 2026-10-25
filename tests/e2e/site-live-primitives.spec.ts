@@ -147,7 +147,14 @@ test('a demo loads only once it scrolls into view', async ({ page }, info) => {
     if (request.url().endsWith('.js')) scripts.push(new URL(request.url()).pathname);
   });
   await page.goto(`${origin}/primitives-page/dialog/`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   const live = page.locator('[data-live-demo="dialog"]');
   await expect(live).not.toHaveAttribute('data-ready', '');
   const before = scripts.length;
@@ -161,7 +168,14 @@ test('the preview follows the page mode before and after it hydrates', async ({ 
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.setViewportSize({ width: 1280, height: 240 });
   await page.goto(`${origin}/primitives-page/calendar/`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   const live = page.locator('[data-live-demo="calendar"]');
   const stage = live.locator('[data-live-stage]');
   const colors = () =>
@@ -404,7 +418,14 @@ async function weigh(
   } else {
     await page.goto(`${origin}/primitives-page/${id}/`);
   }
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   page.off('requestfinished', listener);
   let js = 0;
   let total = 0;

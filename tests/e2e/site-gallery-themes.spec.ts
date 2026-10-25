@@ -53,7 +53,14 @@ async function visit(page: Page, path = '/gallery-themes/') {
     if (!request.url().startsWith(origin)) foreign.push(request.url());
   });
   await page.goto(`${origin}${path}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   return foreign;
 }
 
@@ -135,7 +142,14 @@ test.describe('texuli.com theme gallery', () => {
       });
     });
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForFunction(
+      () =>
+        document.documentElement.dataset.txPageReady === 'true' ||
+        (!document.querySelector('script[data-tx-ready-script]') &&
+          document.readyState === 'complete'),
+      undefined,
+      { polling: 250 }
+    );
     const early = await page.evaluate(() => ({
       theme: (window as unknown as { earlyTheme?: string }).earlyTheme,
       mode: (window as unknown as { earlyMode?: string }).earlyMode,

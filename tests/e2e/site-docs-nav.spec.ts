@@ -63,7 +63,14 @@ test.afterAll(() => new Promise<void>((done) => server.close(() => done())));
 
 async function open(page: Page, path: string): Promise<void> {
   await page.goto(`${origin}${path}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
 }
 
 test.describe('navigation model', () => {

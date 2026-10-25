@@ -54,7 +54,14 @@ async function visit(page: Page, path = '/theme-switcher/') {
     if (!request.url().startsWith(origin)) foreign.push(request.url());
   });
   await page.goto(`${origin}${path}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   return foreign;
 }
 
@@ -107,12 +114,13 @@ test.describe('texuli.com theme switcher', () => {
     const violet = page.locator('[data-theme-id="violet"]');
     if ((await violet.count()) > 0) {
       await violet.click();
-      expect(await themeAttr(page)).toBe('violet');
+      // The island applies the theme after the click returns; poll for it.
+      await expect.poll(async () => themeAttr(page), { timeout: 15_000 }).toBe('violet');
     } else {
       const second = options.nth(1);
       const id = await second.getAttribute('data-theme-id');
       await second.click();
-      expect(await themeAttr(page)).toBe(id);
+      await expect.poll(async () => themeAttr(page), { timeout: 15_000 }).toBe(id);
     }
 
     await page.getByLabel('Find a theme').fill('enterprise');
@@ -124,10 +132,18 @@ test.describe('texuli.com theme switcher', () => {
     await page.emulateMedia({ colorScheme: 'light' });
     await visit(page);
     await clickMode(page, 'Dark');
-    const target = page.locator('[data-theme-id="ocean"]');
-    if ((await target.count()) > 0) await target.click();
-    else await page.getByRole('option').nth(2).click();
-    const chosenTheme = await themeAttr(page);
+    // The island re-renders the cards when the mode applies; settle it first.
+    await expect.poll(async () => modeAttr(page)).toBe('dark');
+    const ocean = page.locator('[data-theme-id="ocean"]');
+    const pick = (await ocean.count()) > 0 ? ocean : page.getByRole('option').nth(2);
+    await expect
+      .poll(async () => pick.getAttribute('data-theme-id'), { timeout: 15_000 })
+      .not.toBeNull();
+    const chosenTheme = await pick.getAttribute('data-theme-id');
+    await pick.click();
+    // The island applies the theme after the click returns; poll for it so a
+    // slow application can not split the attr read from the persisted value.
+    await expect.poll(async () => themeAttr(page), { timeout: 15_000 }).toBe(chosenTheme);
     expect(await modeAttr(page)).toBe('dark');
 
     await page.addInitScript(() => {
@@ -143,7 +159,14 @@ test.describe('texuli.com theme switcher', () => {
       });
     });
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForFunction(
+      () =>
+        document.documentElement.dataset.txPageReady === 'true' ||
+        (!document.querySelector('script[data-tx-ready-script]') &&
+          document.readyState === 'complete'),
+      undefined,
+      { polling: 250 }
+    );
     const early = await page.evaluate(() => ({
       theme: (window as unknown as { earlyTheme?: string }).earlyTheme,
       mode: (window as unknown as { earlyMode?: string }).earlyMode,

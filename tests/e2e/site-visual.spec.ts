@@ -89,7 +89,14 @@ test.afterAll(() => new Promise<void>((done) => server.close(() => done())));
 async function open(page: Page, path: string, mode: Mode): Promise<void> {
   await page.emulateMedia({ colorScheme: mode, reducedMotion: 'reduce' });
   await page.goto(`${origin}${path}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   await expect(page.locator('html')).toHaveAttribute('data-tx-mode', mode);
 }
 

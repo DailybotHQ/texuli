@@ -47,7 +47,14 @@ async function visit(page: Page) {
     if (!request.url().startsWith(origin)) foreign.push(request.url());
   });
   await page.goto(`${origin}/builder/`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   expect(foreign).toEqual([]);
 }
 

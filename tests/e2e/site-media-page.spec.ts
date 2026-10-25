@@ -61,7 +61,14 @@ async function visit(page: Page, path = '/media-page/') {
     if (!url.startsWith(origin)) foreign.push(url);
   });
   await page.goto(`${origin}${path}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 250 }
+  );
   return foreign;
 }
 
