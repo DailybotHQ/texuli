@@ -111,9 +111,10 @@ Both live in `packages/examples/src/blocks-text/` and have visual baselines.
 
 ## Limits
 
-- **Reveal is not implemented.** `step`, `reveal` and `tone` (other than on
-  callouts and quotes) are carried but not acted on; reveal is the host's
-  job (decks).
+- **Reveal is the host's job.** `step`, `reveal` and `tone` (other than on
+  callouts and quotes) are carried but not acted on here. `@texuli/slides`
+  plays `step` and `reveal` as deck reveal steps
+  ([slides model](../../slides/docs/model.md#reveal-steps-fragments)).
 - **The subset has no tables or images,** and no setext headings, reference
   links or HTML blocks. Those inputs render as text.
 - **Inline parsing is greedy-simple, not CommonMark-exact.** Delimiter runs

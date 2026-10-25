@@ -3,7 +3,7 @@ import type { Theme } from '@texuli/tokens/contract';
 import { defineTheme } from '@texuli/tokens/contract';
 import { onMount, tick, untrack } from 'svelte';
 import type { Deck, DeckSlide } from '../model/index.ts';
-import { resolveSlideTheme, resolveSlideTransition } from '../model/index.ts';
+import { resolveSlideTheme, resolveSlideTransition, slideStepCount } from '../model/index.ts';
 import type { DeckMediaTrust } from './media.ts';
 import type { SlideNavigationIntent } from './navigation.ts';
 import { createPresenterTimer, formatElapsed } from './presenter.ts';
@@ -19,6 +19,8 @@ import {
 interface Props {
   deck: Deck;
   initialSlideId?: string;
+  /** Open the initial slide at this reveal step, clamped to its steps (default 0). */
+  initialStep?: number;
   onSlideChange?: (intent: SlideNavigationIntent) => void;
   /** Presenter layout: current slide, speaker notes, next slide and elapsed timer. */
   presenter?: boolean;
@@ -40,6 +42,7 @@ interface Props {
 let {
   deck,
   initialSlideId,
+  initialStep = 0,
   onSlideChange,
   presenter = $bindable(false),
   onPresenterChange,
@@ -57,6 +60,18 @@ function initialIndexFor(currentDeck: Deck, slideId: string | undefined): number
 // valid when a consumer swaps the deck prop after mount.
 // svelte-ignore state_referenced_locally
 let activeIndex = $state(initialIndexFor(deck, initialSlideId));
+function initialStepFor(currentDeck: Deck, index: number, step: number): number {
+  const slide = currentDeck.slides[index];
+  if (!slide || !Number.isInteger(step)) return 0;
+  return Math.max(0, Math.min(step, slideStepCount(slide)));
+}
+
+// The active slide's reveal step: 0 shows its static blocks, `stepCount` all of them.
+// svelte-ignore state_referenced_locally
+let activeStep = $state(initialStepFor(deck, activeIndex, initialStep));
+// True while the current step was reached by stepping forward on this slide;
+// only those reveals animate.
+let revealing = $state(false);
 let overview = $state(false);
 let stageElement: HTMLElement | undefined = $state();
 let slideElement: HTMLElement | undefined = $state();
@@ -102,6 +117,12 @@ let themeStatus = $derived.by(() => {
   return catalogThemes[themeRef.id] ? 'applied' : 'unavailable';
 });
 let nextSlide = $derived(deck.slides[activeIndex + 1]);
+let stepCount = $derived(activeSlide ? slideStepCount(activeSlide) : 0);
+let revealTransition = $derived(
+  activeSlide && mounted && revealing
+    ? resolveSlideTransition(deck, activeSlide, { reducedMotion })
+    : 'none'
+);
 // No entry animation on the first paint, and a hard cut under reduced motion.
 // Only navigation to another slide animates. Re-mounting the same slide for
 // a layout change (presenter view, overview) must not replay its entrance:
@@ -114,7 +135,10 @@ let transition = $derived(
 );
 
 $effect(() => {
-  activeIndex = initialIndexFor(deck, initialSlideId);
+  const index = initialIndexFor(deck, initialSlideId);
+  activeIndex = index;
+  activeStep = initialStepFor(deck, index, initialStep);
+  revealing = false;
 });
 
 // Load every catalog theme the deck references once, so slide changes do not flash.
@@ -175,6 +199,7 @@ function setPresenter(open: boolean, focusSlide = false) {
   if (open === presenter) return;
   presenter = open;
   navigated = false;
+  revealing = false;
   onPresenterChange?.(open);
   // The slide re-mounts in the new layout: keep keyboard focus on it when the
   // toggle came from inside the slide, otherwise return to the toggle.
@@ -194,10 +219,14 @@ function resetTimer() {
   elapsed = timer.elapsed();
 }
 
-function setIndex(index: number, focusSlide = false) {
+/** Go to a slide at a reveal step: 0, or `final` for every step shown. */
+function setIndex(index: number, focusSlide = false, step: number | 'final' = 0) {
   const nextIndex = Math.max(0, Math.min(index, deck.slides.length - 1));
   const changed = nextIndex !== activeIndex;
+  const target = deck.slides[nextIndex];
   activeIndex = nextIndex;
+  activeStep = step === 'final' ? (target ? slideStepCount(target) : 0) : step;
+  revealing = false;
   overview = false;
   navigated = changed;
   if (changed) {
@@ -207,18 +236,29 @@ function setIndex(index: number, focusSlide = false) {
   if (focusSlide && changed) void tick().then(() => slideElement?.focus({ preventScroll: true }));
 }
 
-function previous() {
-  if (activeIndex > 0) setIndex(activeIndex - 1);
-  else if (deck.settings.loop) setIndex(deck.slides.length - 1);
+/** Hide the newest reveal, or go back to the previous slide fully revealed. */
+function previous(focusSlide = false) {
+  if (activeStep > 0) {
+    activeStep -= 1;
+    revealing = false;
+    overview = false;
+  } else if (activeIndex > 0) setIndex(activeIndex - 1, focusSlide, 'final');
+  else if (deck.settings.loop) setIndex(deck.slides.length - 1, focusSlide, 'final');
 }
 
-function next() {
-  if (activeIndex < deck.slides.length - 1) setIndex(activeIndex + 1);
-  else if (deck.settings.loop) setIndex(0);
+/** Reveal the next step, or go to the next slide at its first step. */
+function next(focusSlide = false) {
+  if (activeStep < stepCount) {
+    activeStep += 1;
+    revealing = true;
+    overview = false;
+  } else if (activeIndex < deck.slides.length - 1) setIndex(activeIndex + 1, focusSlide);
+  else if (deck.settings.loop) setIndex(0, focusSlide);
 }
 
 function toggleOverview(fromKeyboard = false) {
   navigated = false;
+  revealing = false;
   if (overview) {
     overview = false;
     overviewButtonElement?.focus();
@@ -235,7 +275,9 @@ function toggleOverview(fromKeyboard = false) {
 }
 
 function chooseOverviewSlide(index: number) {
-  setIndex(index);
+  // The current slide keeps its reveal progress; another opens at its first step.
+  if (index === activeIndex) overview = false;
+  else setIndex(index);
   overviewButtonElement?.focus();
 }
 
@@ -269,10 +311,7 @@ function onStageKeydown(event: KeyboardEvent) {
 
   if (event.key === 'ArrowLeft' || event.key === 'PageUp' || event.key === 'Backspace') {
     event.preventDefault();
-    setIndex(
-      activeIndex > 0 ? activeIndex - 1 : deck.settings.loop ? deck.slides.length - 1 : 0,
-      inSlide
-    );
+    previous(inSlide);
   } else if (
     event.key === 'ArrowRight' ||
     event.key === 'PageDown' ||
@@ -281,16 +320,13 @@ function onStageKeydown(event: KeyboardEvent) {
     event.key === 'Spacebar'
   ) {
     event.preventDefault();
-    setIndex(
-      activeIndex < deck.slides.length - 1 ? activeIndex + 1 : deck.settings.loop ? 0 : activeIndex,
-      inSlide
-    );
+    next(inSlide);
   } else if (event.key === 'Home') {
     event.preventDefault();
     setIndex(0, inSlide);
   } else if (event.key === 'End') {
     event.preventDefault();
-    setIndex(deck.slides.length - 1, inSlide);
+    setIndex(deck.slides.length - 1, inSlide, 'final');
   } else if (event.key.toLowerCase() === 'o') {
     event.preventDefault();
     toggleOverview(true);
@@ -305,6 +341,10 @@ function onStageKeydown(event: KeyboardEvent) {
 
 function slideLabel(slide: DeckSlide, index: number): string {
   return slide.title ?? `Slide ${index + 1}`;
+}
+
+function revealProgress(step: number, count: number): string {
+  return `${step} of ${count} revealed`;
 }
 
 onMount(() => {
@@ -362,13 +402,23 @@ onMount(() => {
   aria-label={`Presentation: ${deck.meta.title}`}
 >
   <div class="tx-deck-stage__toolbar" role="group" aria-label="Presentation controls">
-    <button type="button" class="tx-deck-stage__control" onclick={previous} aria-label="Previous slide">
+    <button
+      type="button"
+      class="tx-deck-stage__control"
+      onclick={() => previous()}
+      aria-label={activeStep > 0 ? 'Previous step' : 'Previous slide'}
+    >
       Previous
     </button>
     <span class="tx-deck-stage__progress" aria-live="polite" aria-atomic="true">
-      Slide {activeIndex + 1} of {deck.slides.length}: {activeSlide ? slideLabel(activeSlide, activeIndex) : ''}
+      Slide {activeIndex + 1} of {deck.slides.length}: {activeSlide ? slideLabel(activeSlide, activeIndex) : ''}{stepCount > 0 ? `, ${revealProgress(activeStep, stepCount)}` : ''}
     </span>
-    <button type="button" class="tx-deck-stage__control" onclick={next} aria-label="Next slide">
+    <button
+      type="button"
+      class="tx-deck-stage__control"
+      onclick={() => next()}
+      aria-label={activeStep < stepCount ? 'Next step' : 'Next slide'}
+    >
       Next
     </button>
     <button
@@ -413,6 +463,11 @@ onMount(() => {
           tabindex="-1"
         >
           <h2 class="tx-deck-stage__pane-title">Speaker notes</h2>
+          {#if stepCount > 0}
+            <p class="tx-deck-stage__step-progress">
+              Reveal step {activeStep} of {stepCount}
+            </p>
+          {/if}
           {#if activeSlide?.notes}
             <p class="tx-deck-stage__notes-text">{activeSlide.notes}</p>
           {:else}
@@ -422,7 +477,11 @@ onMount(() => {
         <section class="tx-deck-stage__next" aria-label="Up next">
           <h2 class="tx-deck-stage__pane-title">Up next</h2>
           <p class="tx-deck-stage__next-title">
-            {nextSlide ? slideLabel(nextSlide, activeIndex + 1) : 'End of presentation'}
+            {#if activeStep < stepCount}
+              Reveal step {activeStep + 1} of {stepCount} on this slide
+            {:else}
+              {nextSlide ? slideLabel(nextSlide, activeIndex + 1) : 'End of presentation'}
+            {/if}
           </p>
         </section>
       </div>
@@ -455,13 +514,21 @@ onMount(() => {
         class="tx-deck-stage__slide"
         data-slide-id={activeSlide.id}
         data-transition={transition}
+        data-step={activeStep}
+        data-step-count={stepCount}
         tabindex="-1"
         aria-label={slideLabel(activeSlide, activeIndex)}
       >
         {#if activeSlide.title}
           <h2 class="tx-deck-stage__slide-title">{activeSlide.title}</h2>
         {/if}
-        <SlideContent slide={activeSlide} {mediaTrust} {resolveAvatar} />
+        <SlideContent
+          slide={activeSlide}
+          {mediaTrust}
+          {resolveAvatar}
+          step={activeStep}
+          {revealTransition}
+        />
       </article>
     {/key}
   {/if}

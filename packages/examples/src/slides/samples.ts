@@ -87,3 +87,39 @@ export function mediaDeck(): Deck {
   if (!parsed.success) throw new Error(parsed.issues[0]?.message);
   return parsed.deck;
 }
+
+/**
+ * Reveal steps: a list revealing item by item from step 1, a struck-through
+ * line at step 2 and a callout at step 4. Shown at step 2 of 4.
+ */
+export function fragmentsDeck(): Deck {
+  const parsed = parseDeck({
+    meta: { title: 'Launch review', aspect: '16:9', themeRef: 'ocean' },
+    slides: [
+      { id: 'opening', title: 'Launch review', blocks: [] },
+      {
+        id: 'plan',
+        title: 'Launch plan',
+        notes: 'Reveal one stage at a time; strike the old plan before the date.',
+        blocks: [
+          { type: 'heading', level: 3, text: 'Three stages' },
+          {
+            type: 'list',
+            ordered: true,
+            step: 1,
+            reveal: 'fade-up',
+            items: [
+              { text: 'Pilot with two teams' },
+              { text: 'Open the beta' },
+              { text: 'General availability' },
+            ],
+          },
+          { type: 'text', markdown: 'Launch in a single region.', reveal: 'strike', step: 2 },
+          { type: 'callout', tone: 'info', step: 4, body: 'The beta opens on 2026-11-02.' },
+        ],
+      },
+    ],
+  });
+  if (!parsed.success) throw new Error(parsed.issues[0]?.message ?? 'Invalid fragments deck');
+  return parsed.deck;
+}

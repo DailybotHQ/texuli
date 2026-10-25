@@ -3,6 +3,7 @@ import { safeParseBlocks } from '@texuli/blocks/core';
 import type { Theme } from '@texuli/tokens/contract';
 import { defineTheme } from '@texuli/tokens/contract';
 import type { ColorMode } from '@texuli/tokens/modes';
+import { checkSlideFragments } from './fragments.ts';
 
 export const DECK_LIMITS = Object.freeze({
   slides: 120,
@@ -388,6 +389,8 @@ export function parseDeck(input: unknown): DeckParseResult {
         first?.message ?? 'Block data is invalid.'
       );
     }
+    const fragmentIssue = checkSlideFragments(parsedBlocks.data);
+    if (fragmentIssue) return issue(`${path}.blocks.${fragmentIssue.path}`, fragmentIssue.message);
     slides.push({
       id: value.id,
       ...(slideTitle !== undefined ? { title: slideTitle } : {}),
@@ -428,3 +431,18 @@ export {
   type SlideMediaType,
   type SlideRegion,
 } from './compose.ts';
+export {
+  blockFragment,
+  checkSlideFragments,
+  DECK_ENTRANCE_REVEALS,
+  DECK_FRAGMENT_KINDS,
+  DECK_MAX_SLIDE_STEPS,
+  type DeckEntranceReveal,
+  type DeckFragment,
+  type DeckFragmentIssue,
+  type DeckFragmentKind,
+  type DeckFragmentView,
+  fragmentView,
+  isEntranceReveal,
+  slideStepCount,
+} from './fragments.ts';

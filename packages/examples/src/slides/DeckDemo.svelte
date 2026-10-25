@@ -18,10 +18,12 @@ interface Props {
   /** `stage`: the interactive stage on one slide; `print`: every slide as pages. */
   view?: 'stage' | 'print';
   initialSlideId?: string;
+  /** The initial slide's reveal step. */
+  initialStep?: number;
   label: string;
 }
 
-let { deck, view = 'stage', initialSlideId, label }: Props = $props();
+let { deck, view = 'stage', initialSlideId, initialStep, label }: Props = $props();
 
 // App-authored demo decks: the developer tier lets the embedded swatches paint.
 const mediaTrust = 'developer';
@@ -82,7 +84,7 @@ onMount(() => {
     {#if view === 'print'}
       <DeckPrint {deck} {loadTheme} {mediaTrust} onReady={() => (printReady = true)} />
     {:else}
-      <DeckStage {deck} {loadTheme} {mediaTrust} {initialSlideId} />
+      <DeckStage {deck} {loadTheme} {mediaTrust} {initialSlideId} {initialStep} />
     {/if}
   </section>
 {/if}

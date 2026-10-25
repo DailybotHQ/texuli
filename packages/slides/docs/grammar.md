@@ -3,7 +3,8 @@
 **Import:** `@texuli/slides/grammar` (also re-exported from `@texuli/slides`)  
 **Source:** `packages/slides/src/grammar/`  
 **Tests:** `tests/deck.test.ts`, `tests/grammar-charts.test.ts`,
-`tests/render-tree.test.ts`, `tests/golden-decks.test.ts`
+`tests/render-tree.test.ts`, `tests/golden-decks.test.ts`,
+`tests/fragments-grammar.test.ts`
 
 Encodings between the deck model ([model.md](model.md)) and catalog trees,
 plus the single validation entry point for decks an agent returns.
@@ -70,7 +71,9 @@ by default) with:
 
 It then applies the deck rules the catalog cannot see, through
 `parseDeckRenderTree`: slide id syntax and uniqueness, declared masters,
-theme references and settings. A `layout-card` deck still projects through
+theme references, settings and the [reveal step
+rules](model.md#reveal-steps-fragments) (no `step` or `reveal` on nested
+blocks, at most 32 steps per slide). A `layout-card` deck still projects through
 `projectLegacyDeck`, with a `deck-legacy-cards` warning.
 `ValidateDeckDraftOptions` are the catalog's draft options plus
 `reducedMotion`.
@@ -84,10 +87,14 @@ The `DeckDraftResult` carries:
 - the validated `deck`, or `null`;
 - `slides` (`ResolvedDeckSlide`): per slide, the resolved master layout, the
   transition (every slide cuts with `reducedMotion: true`), the effective
-  theme reference, and `stepCount`, the highest block `step`.
+  theme reference, and `stepCount`, the slide's last reveal step
+  (`slideStepCount`: list items and code highlights count one step each).
 
-Block `step` and `reveal` are validated and kept, but `DeckStage` does not
-play reveal steps yet.
+Hostile reveal shapes fail closed with diagnostics and never throw: a
+negative, fractional, string or out-of-range `step` and an unknown or
+non-string `reveal` fail the block schema; a nested `step` or `reveal` and a
+slide past 32 steps fail the deck rules. `tests/fragments-grammar.test.ts`
+pins them.
 
 The golden decks in [`tests/golden/`](../tests/golden) pin this end to end:
 

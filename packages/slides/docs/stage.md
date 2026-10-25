@@ -2,7 +2,7 @@
 
 **Import:** `@texuli/slides/stage`  
 **Source:** `packages/slides/src/stage/`  
-**Tests:** `tests/stage.test.ts`, `tests/presenter.test.ts`,
+**Tests:** `tests/stage.test.ts`, `tests/fragments.test.ts`, `tests/presenter.test.ts`,
 `tests/transitions.test.ts`, `tests/theme.test.ts`, `tests/media.test.ts`,
 `tests/print.test.ts`, `tests/a11y.test.ts`; browser sweep
 `tests/e2e/a11y-slides.spec.ts`
@@ -29,6 +29,7 @@ interactive `DeckStage` and the all-pages `DeckPrint`. Import
 | --- | --- | --- |
 | `deck` | required | The validated `Deck` |
 | `initialSlideId` | `settings.startIndex` | Open on this slide; lets a host restore a slide from its own URL or history |
+| `initialStep` | `0` | Open the initial slide at this [reveal step](#reveal-steps), clamped to its steps |
 | `onSlideChange` | — | Receives a `SlideNavigationIntent` (`{ index, slideId }`) for the host to persist; the stage never changes the URL |
 | `presenter` | `false` | Bindable presenter mode |
 | `onPresenterChange` | — | Called with `open` when presenter mode toggles |
@@ -45,13 +46,16 @@ once on later slides.
 
 The stage is a region named “Presentation: <title>”. Its controls are a group
 named “Presentation controls”: Previous slide, Next slide, Overview and
-Presenter. A polite live region announces “Slide n of m: <title>”.
+Presenter. On a slide with [reveal steps](#reveal-steps), the first two are
+named Previous step and Next step while a step remains in that direction. A
+polite live region announces “Slide n of m: <title>”, followed by “, k of s
+revealed” on a slide with steps.
 
 | Key (focus inside the deck) | Action |
 | --- | --- |
-| Right, Page Down, Space, Enter | Next slide |
-| Left, Page Up, Backspace | Previous slide |
-| Home / End | First / last slide |
+| Right, Page Down, Space, Enter | Next step, or the next slide when every step shows |
+| Left, Page Up, Backspace | Hide the newest step, or the previous slide (fully revealed) at step 0 |
+| Home / End | First slide at step 0 / last slide fully revealed |
 | `o` | Toggle the overview; focus moves to the current slide's item |
 | `p` | Toggle presenter mode |
 | `s` | In presenter mode, focus the speaker notes |
@@ -63,6 +67,34 @@ their own Enter and Space; Escape still works there. Navigating from a slide mov
 Toggling presenter mode from a slide keeps focus on it. The deck loops only
 when `settings.loop` is set.
 
+### Reveal steps
+
+The stage plays the slide's reveal steps ([model.md](model.md#reveal-steps-fragments)).
+
+- **Forward:** advancing reveals the next step before it leaves the slide. A
+  slide opens at step 0, whether reached by going forward, from the overview
+  or by Home; the initial slide opens at `initialStep`.
+- **Backward:** going back hides steps in reverse, one per press. Going back
+  from step 0 opens the previous slide in its final state, as does End.
+- **Painting:** each revealing top-level block sits in a box-less
+  `tx-deck-stage__fragment` wrapper, so the layout matches the final state at
+  every step. Hidden blocks and list items use `visibility: hidden`: they keep
+  their space and leave the accessibility tree and the tab order. Code
+  highlights follow the step through the code family's `hostStep`. The
+  article carries `data-step` and `data-step-count`.
+- **Transitions per reveal:** only a forward step animates. The block's
+  entrance reveal (`fade`, `fade-up`, `grow`) wins; otherwise the slide's
+  transition (`resolveSlideTransition`) applies. A list animates only its
+  newest item. Stepping back, layout changes (presenter, overview) and
+  reduced motion cut.
+- **Overview:** it lists slide titles, not slide content, so no partial state
+  shows there. Choosing the current slide keeps its progress; another slide
+  opens at step 0. Print and PPTX export show every slide fully revealed
+  ([export.md](export.md)).
+
+`onSlideChange` still fires only when the slide changes and does not report
+steps; a host can restore a step it tracked itself with `initialStep`.
+
 ### Presenter view
 
 Presenter mode is a layout of the same deck; it never changes the deck data.
@@ -70,8 +102,9 @@ It shows the current slide with three panes, which stack below it on narrow
 viewports:
 
 - a “Speaker notes” complementary region (plain text, line breaks kept, never
-  HTML);
-- an “Up next” region with the next slide's title;
+  HTML), which starts with “Reveal step k of s” on a slide with steps;
+- an “Up next” region with the next slide's title, or “Reveal step k of s on
+  this slide” while a step remains;
 - an elapsed timer (`role="timer"`) with Pause/Resume and Reset.
 
 The timer is a local stopwatch: it starts when presenter mode opens, pauses
@@ -81,7 +114,7 @@ returns that `PresenterTimer` (`start`, `pause`, `reset`, `elapsed`,
 hosts that build their own presenter chrome.
 
 Planned: a second-window or second-screen presenter, a next-slide thumbnail,
-a wall clock, fullscreen, and reveal steps.
+a wall clock and fullscreen.
 
 ### Transitions and motion
 

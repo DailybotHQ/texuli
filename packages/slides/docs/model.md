@@ -2,7 +2,8 @@
 
 **Import:** `@texuli/slides/model` (also re-exported from `@texuli/slides`)  
 **Source:** `packages/slides/src/model/`  
-**Tests:** `tests/deck.test.ts`, `tests/transitions.test.ts`, `tests/media.test.ts`
+**Tests:** `tests/deck.test.ts`, `tests/transitions.test.ts`, `tests/media.test.ts`,
+`tests/fragments.test.ts`
 
 The framework-free deck model: validation, the closed vocabularies (aspects,
 masters, transitions), theme references, and the pure helpers the stage, the
@@ -54,7 +55,8 @@ A `Deck` holds:
 - `settings` (`DeckSettings`): `startIndex`, `loop`, `showProgress` and
   `defaultTransition`, normalized with defaults.
 
-Titles and notes refuse control and bidi-override characters. `DECK_LIMITS`
+Titles and notes refuse control and bidi-override characters. Block `step`
+and `reveal` must follow the [reveal step rules](#reveal-steps-fragments). `DECK_LIMITS`
 publishes the bounds: 120 slides, 48-character slide ids, 200-character
 titles, 500-character descriptions, 6,000-character notes and 2,000 blocks
 per slide.
@@ -115,6 +117,46 @@ the theme library to confirm that an id exists. Embedded themes pass through
 `defineTheme` from `@texuli/tokens/contract`. The optional `DeckThemeMode` is
 `light`, `dark`, `high-contrast` or `system`. The stage resolves and applies
 references (see [stage.md](stage.md)).
+
+## Reveal steps (fragments)
+
+A slide can reveal its content one step at a time. Steps use two closed
+fields every block already validates (`@texuli/blocks`): `step`, an integer
+from 0 to 32, and `reveal`, a `BLOCK_REVEALS` token (`fade`, `fade-up`,
+`grow`, `highlight`, `strike`). There is no free-form markup. A slide starts
+at step 0 and advances to its last step, `slideStepCount(slide)`, which is 0
+when nothing on it reveals.
+
+`blockFragment(block)` returns the `DeckFragment` a top-level block declares
+(its `kind`, first `step`, `lastStep` and `reveal`), or `null` for a static
+block. The `DeckFragmentKind` values, in `DECK_FRAGMENT_KINDS`, are checked in
+this order:
+
+| Kind | Declared by | At step `s` |
+| --- | --- | --- |
+| `emphasis` | `reveal: 'highlight'` or `'strike'` | Always shown; emphasized from `s ≥ step` (no `step` means from the start) |
+| `highlights` | A code block with `highlights` | Always shown; step `step + i` shows `highlights[i]` (no `step` means 0) |
+| `items` | A list with a `step` | Item `i` appears at step `step + i` |
+| `enter` | Any other block with `step` ≥ 1 | Hidden until `step` |
+
+A block without a `step` (or with `step: 0`) and without an emphasis reveal
+is static. Steps are absolute: two blocks with the same step reveal
+together. The entrance tokens `DECK_ENTRANCE_REVEALS` (`fade`, `fade-up`,
+`grow`, a `DeckEntranceReveal`, tested by `isEntranceReveal`) pick the
+animation; without one, the slide's transition animates the reveal (see
+[stage.md](stage.md#reveal-steps)).
+
+`fragmentView(fragment, step)` returns the `DeckFragmentView` the stage
+paints: `hidden`, the `visibleItems` of a list, the code `hostStep`,
+`emphasized`, and `current` (this step revealed it, or its newest item).
+
+`parseDeck` adds two rules the block schema cannot see, through
+`checkSlideFragments(blocks)`, which returns a `DeckFragmentIssue` or `null`:
+
+- `step` and `reveal` apply only to top-level slide blocks; on a block nested
+  in `columns` or `tabs` they fail validation (the stage would not play them);
+- a slide reaches at most `DECK_MAX_SLIDE_STEPS` (32) steps, so a list at step
+  31 holds at most two items.
 
 ## Transitions
 

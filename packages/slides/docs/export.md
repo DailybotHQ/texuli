@@ -39,6 +39,10 @@ not generate PDF bytes.
 `DeckPrint` ([stage.md](stage.md)) renders the planned pages and reports when
 they are ready to print.
 
+Reveal steps are flattened: each slide prints once, in its final state, with
+every fragment and list item shown, emphasis on, and code at its last
+highlight step. There are no per-step pages.
+
 ```svelte
 <DeckStage {deck} />
 <DeckPrint {deck} notes="appendix" printOnly onReady={(plan) => (printPlan = plan)} />
@@ -53,7 +57,7 @@ browser test yet. Named pages need a browser that supports the CSS `page`
 property; others print at their default size.
 
 Planned: a tool-side multi-page PDF exporter, a stills zip, deck video and
-step-aware printing.
+optional per-step pages.
 
 ## PowerPoint (PPTX)
 
@@ -78,7 +82,9 @@ Output is deterministic: the same deck gives the same bytes.
   - notes pages;
   - the deck title, description and language in the document properties.
 
-  Runs carry the deck locale.
+  Runs carry the deck locale. Reveal steps are flattened to the final state:
+  every block and list item is written, with no PowerPoint animations, and a
+  `strike` or `highlight` emphasis is not styled.
 - **What it leaves out:** media blocks and charts are not embedded, and blocks
   with no text form (table, stat, kpi, poll, quiz, calculator, checklist) have
   nothing to write. Each is reported in `omitted` as a `DeckPptxOmission`
@@ -87,7 +93,8 @@ Output is deterministic: the same deck gives the same bytes.
 - **Not mapped yet:** hyperlinks and CTA targets (only labels export, so no URL
   reaches the file), rich text styling, deck token themes (a fixed neutral
   Office theme is used), slide masters as layouts, title placeholders (so
-  PowerPoint's outline view does not list titles), and transitions.
+  PowerPoint's outline view does not list titles), transitions, and reveal
+  steps as animations.
 
 The output has not been opened in PowerPoint, Keynote or LibreOffice, or
 validated against the OOXML schemas, in this repository. Treat compatibility

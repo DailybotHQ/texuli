@@ -25,7 +25,7 @@ are never reordered visually; DOM order is reading order.
 | `tx-deck-stage__toolbar` | The “Presentation controls” group |
 | `tx-deck-stage__control` | Each toolbar and presenter button |
 | `tx-deck-stage__progress` | The polite “Slide n of m” text |
-| `tx-deck-stage__slide` | The active slide article |
+| `tx-deck-stage__slide` | The active slide article (`data-step`, `data-step-count`) |
 | `tx-deck-stage__slide-title` | A slide's h2 title (stage and print) |
 | `tx-deck-stage__regions` | A slide's region container (`data-master`, `data-arrangement`) |
 | `tx-deck-stage__region` | One region (`data-slot="media"` or `"body"`) |
@@ -45,6 +45,8 @@ are never reordered visually; DOM order is reading order.
 | `tx-deck-stage__empty` | “This slide has no content yet.” and “No notes for this slide.” |
 | `tx-deck-stage__loading` | A block family still loading |
 | `tx-deck-stage__error` | A block family that failed to load |
+| `tx-deck-stage__fragment` | A box-less (`display: contents`) wrapper around a top-level block that reveals (`data-fragment`, `data-fragment-step`, `data-fragment-state`, `data-visible-items`, `data-emphasis`, `data-reveal`) |
+| `tx-deck-stage__step-progress` | “Reveal step n of m” in the speaker notes pane |
 | `tx-deck-stage__media-refused` | The note shown for media the paint policy refused |
 | `tx-deck-print` | The print root (`data-aspect`, `data-notes`, `data-print-only`, `data-print-ready`) |
 | `tx-deck-print__slide` | One printed slide page |
@@ -56,6 +58,13 @@ are never reordered visually; DOM order is reading order.
 - **Transitions:** `data-transition="fade"` and `"fade-up"` on an entering
   slide animate for `--tx-motion-base` (180ms by default). `fade-up` rises
   along the block axis only, so it looks the same in right-to-left layouts.
+- **Reveal steps:** a fragment with `data-fragment-state="hidden"` and list
+  items past `data-visible-items` get `visibility: hidden`. They keep their
+  space, so the slide does not move as it reveals, and leave the accessibility
+  tree. `data-emphasis="highlight"` tints and outlines the block;
+  `data-emphasis="strike"` strikes it through and dims it. `data-reveal`
+  (`fade`, `fade-up`, `grow`) animates the fragment, or its newest list item,
+  for `--tx-motion-base`, only under `prefers-reduced-motion: no-preference`.
 - **Reduced motion:** under `prefers-reduced-motion: reduce`, on a stage with
   `data-motion="reduce"`, or under a root `data-tx-motion="reduce"`, slide
   animation is off, so CSS-only hosts get the cut too.
@@ -65,7 +74,8 @@ are never reordered visually; DOM order is reading order.
   height and never cropped.
 - **Presenter:** the panes sit beside the slide and stack below 48rem.
 - **Forced colors:** borders on the stage, controls, presenter panes and the
-  refused-media note use `CanvasText`.
+  refused-media note use `CanvasText`; a highlight emphasis uses `Mark` and
+  `MarkText`.
 
 ## Print
 

@@ -73,9 +73,11 @@ prototypes as real credentials.
 
 **Compose order:** deck model → validate with `parseDeck` → present with
 `DeckStage`. For agent output: emit the `deck-slide` tree → `validateDeckDraft`
-→ show diagnostics on a draft, never activate an invalid one. Reveal steps are
-validated block data, but the stage does not play them yet; fullscreen and a
-second-screen presenter are later phases: do not promise them.
+→ show diagnostics on a draft, never activate an invalid one. Reveal steps
+play on the stage: put `step` (and optionally `reveal`) on top-level slide
+blocks only; a list with a `step` reveals one item per step. Print and PPTX
+flatten them. Fullscreen and a second-screen presenter are later phases: do
+not promise them.
 
 ## 5. Media story
 

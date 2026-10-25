@@ -13,6 +13,8 @@ export interface DeckBlockRendererProps {
   block: unknown;
   /** Avatar adapter for the media family; other families ignore it. */
   resolveAvatar?: (id: string) => string | undefined;
+  /** The deck's reveal step; the code family steps its highlights by it, others ignore it. */
+  hostStep?: number;
 }
 
 type FamilyLoader = () => Promise<{ default: Component<DeckBlockRendererProps> }>;

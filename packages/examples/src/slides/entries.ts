@@ -1,6 +1,6 @@
 import { defineExample } from '../registry.ts';
 
-/** Slides examples (T-p7-deck-visual): the starter templates and a media deck. */
+/** Slides examples (T-p7-deck-visual): the starter templates, a media deck and reveal steps. */
 export const slidesReportExample = defineExample({
   id: 'slides-template-report',
   title: 'Report deck template',
@@ -43,4 +43,15 @@ export const slidesMediaDeckExample = defineExample({
   component: 'slides/DeckPrint',
   props: ['deck', 'loadTheme', 'mediaTrust', 'onReady'],
   load: () => import('./MediaDeckDemo.svelte'),
+});
+
+export const slidesFragmentsExample = defineExample({
+  id: 'slides-fragments',
+  title: 'Reveal steps (fragments)',
+  description:
+    'A DeckStage slide at reveal step 2 of 4: two of three list items shown, a line struck through, and a callout still hidden in its reserved space. Fictional launch plan.',
+  tags: ['slides', 'deck', 'fragments'],
+  component: 'slides/DeckStage',
+  props: ['deck', 'initialSlideId', 'initialStep', 'loadTheme', 'mediaTrust'],
+  load: () => import('./FragmentsDeckDemo.svelte'),
 });

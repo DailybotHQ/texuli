@@ -268,6 +268,163 @@
   animation: none;
 }
 
+/*
+ * Reveal steps. A fragment wrapper adds no box, so the slide layout matches
+ * its final state at every step: hidden blocks and list items keep their
+ * space and leave the accessibility tree (visibility: hidden).
+ */
+.tx-deck-stage__fragment {
+  display: contents;
+}
+
+.tx-deck-stage__fragment[data-fragment-state="hidden"] {
+  visibility: hidden;
+}
+
+/* List items past the revealed count (lists hold at most 12 items). */
+.tx-deck-stage__fragment[data-visible-items="0"] [data-tx-block="list"] > li:nth-child(n + 1) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="1"] [data-tx-block="list"] > li:nth-child(n + 2) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="2"] [data-tx-block="list"] > li:nth-child(n + 3) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="3"] [data-tx-block="list"] > li:nth-child(n + 4) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="4"] [data-tx-block="list"] > li:nth-child(n + 5) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="5"] [data-tx-block="list"] > li:nth-child(n + 6) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="6"] [data-tx-block="list"] > li:nth-child(n + 7) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="7"] [data-tx-block="list"] > li:nth-child(n + 8) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="8"] [data-tx-block="list"] > li:nth-child(n + 9) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="9"] [data-tx-block="list"] > li:nth-child(n + 10) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="10"] [data-tx-block="list"] > li:nth-child(n + 11) {
+  visibility: hidden;
+}
+
+.tx-deck-stage__fragment[data-visible-items="11"] [data-tx-block="list"] > li:nth-child(n + 12) {
+  visibility: hidden;
+}
+
+/* Emphasis reveals stay visible and change style in place. */
+:is(.tx-deck-stage, .tx-deck-print) .tx-deck-stage__fragment[data-emphasis="highlight"] > * {
+  background: color-mix(in oklch, var(--tx-primary, Highlight) 16%, transparent);
+  outline: 2px solid var(--tx-primary, Highlight);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+:is(.tx-deck-stage, .tx-deck-print) .tx-deck-stage__fragment[data-emphasis="strike"] > * {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* The fragment (or newest list item) a forward step revealed animates in. */
+.tx-deck-stage__fragment[data-reveal="fade-up"] {
+  --tx-deck-reveal: tx-deck-slide-fade-up;
+}
+
+.tx-deck-stage__fragment[data-reveal="fade"] {
+  --tx-deck-reveal: tx-deck-slide-fade;
+}
+
+.tx-deck-stage__fragment[data-reveal="grow"] {
+  --tx-deck-reveal: tx-deck-reveal-grow;
+}
+
+/* Reduced motion (the OS setting, or data-motion on the stage) cuts every reveal. */
+@media (prefers-reduced-motion: no-preference) {
+  .tx-deck-stage__fragment[data-reveal]:not([data-fragment="items"]) > *,
+  .tx-deck-stage__fragment[data-visible-items="1"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(1),
+  .tx-deck-stage__fragment[data-visible-items="2"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(2),
+  .tx-deck-stage__fragment[data-visible-items="3"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(3),
+  .tx-deck-stage__fragment[data-visible-items="4"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(4),
+  .tx-deck-stage__fragment[data-visible-items="5"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(5),
+  .tx-deck-stage__fragment[data-visible-items="6"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(6),
+  .tx-deck-stage__fragment[data-visible-items="7"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(7),
+  .tx-deck-stage__fragment[data-visible-items="8"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(8),
+  .tx-deck-stage__fragment[data-visible-items="9"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(9),
+  .tx-deck-stage__fragment[data-visible-items="10"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(10),
+  .tx-deck-stage__fragment[data-visible-items="11"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(11),
+  .tx-deck-stage__fragment[data-visible-items="12"][data-reveal]
+    [data-tx-block="list"]
+    > li:nth-child(12) {
+    animation: var(--tx-deck-reveal, none) var(--tx-motion-base, 180ms) ease-out both;
+  }
+}
+
+@keyframes tx-deck-reveal-grow {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@media (forced-colors: active) {
+  :is(.tx-deck-stage, .tx-deck-print) .tx-deck-stage__fragment[data-emphasis="highlight"] > * {
+    background: Mark;
+    color: MarkText;
+    outline-color: MarkText;
+  }
+}
+
+.tx-deck-stage__step-progress {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--tx-muted-foreground, var(--tx-foreground));
+}
+
 /* Print view: every slide on its own page, sized from the deck aspect. */
 @page tx-deck-16-9 {
   size: 13.333in 7.5in;

@@ -14,9 +14,11 @@ interface Props {
   /** URL policy tier for media sources at paint. */
   mediaTrust?: DeckMediaTrust;
   resolveAvatar?: (id: string) => string | undefined;
+  /** The deck's current reveal step, for families that step (code highlights). */
+  hostStep?: number;
 }
 
-let { block, mediaTrust = 'untrusted', resolveAvatar }: Props = $props();
+let { block, mediaTrust = 'untrusted', resolveAvatar, hostStep }: Props = $props();
 let gate = $derived(gateDeckMedia(block, { trust: mediaTrust, resolveAvatar }));
 let avatars = $derived(deckAvatarResolver(resolveAvatar));
 // Seeded from the cache so a re-mounted block paints on its first render.
@@ -55,7 +57,7 @@ $effect(() => {
   </p>
 {:else if Renderer}
   {@const LoadedRenderer = Renderer}
-  <LoadedRenderer block={gate.block} resolveAvatar={avatars} />
+  <LoadedRenderer block={gate.block} resolveAvatar={avatars} {hostStep} />
 {:else if failed}
   <p class="tx-deck-stage__error" role="alert">Slide content could not be loaded.</p>
 {:else}

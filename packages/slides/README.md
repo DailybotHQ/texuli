@@ -16,8 +16,12 @@ decks in [`tests/golden/`](tests/golden), the slides accessibility sweep, and
 visual baselines for the slides examples. Each subpath has a page in
 [`docs/`](docs).
 
-Not implemented yet: reveal steps (fragments) on the stage, fullscreen, a
-second-screen presenter, slot layout for the non-media masters, a tool-side
+Reveal steps (fragments) play on the stage: blocks, list items and code
+highlights reveal one step at a time ([model](docs/model.md#reveal-steps-fragments),
+[stage](docs/stage.md#reveal-steps)); print and PPTX export flatten them to
+the final state.
+
+Not implemented yet: fullscreen, a second-screen presenter, slot layout for the non-media masters, a tool-side
 PDF exporter, and deck video.
 
 ## Using the package
@@ -59,7 +63,7 @@ Decks an agent returns go through `validateDeckDraft` first
 
 | Import | What it does | Documentation |
 | --- | --- | --- |
-| `@texuli/slides/model` | `parseDeck`, the closed vocabularies (aspects, masters, transitions), theme references, master and media-region composition | [Deck model](docs/model.md) |
+| `@texuli/slides/model` | `parseDeck`, the closed vocabularies (aspects, masters, transitions), reveal steps, theme references, master and media-region composition | [Deck model](docs/model.md) |
 | `@texuli/slides/grammar` | Render tree, structured `slides[]` and legacy-card encodings; `validateDeckDraft` for agent decks | [Catalog grammar and agent decks](docs/grammar.md) |
 | `@texuli/slides/stage` | `DeckStage` (keyboard, overview, presenter view, themes, transitions, media) and `DeckPrint` | [Stage](docs/stage.md) |
 | `@texuli/slides/export` | Print plans and the PDF seam (browser print or a host exporter); local PPTX export; the XML and ZIP writers | [Print, PDF and PPTX export](docs/export.md) |
@@ -70,8 +74,9 @@ Decks an agent returns go through `validateDeckDraft` first
 
 The examples registry (`packages/examples/src/slides/`) renders each starter
 template in `DeckStage` (`slides-template-report`, `slides-template-pitch`,
-`slides-template-review`) and a media deck in `DeckPrint`
-(`slides-media-deck`). Each has committed light and dark visual baselines on
+`slides-template-review`), a media deck in `DeckPrint` (`slides-media-deck`),
+and a slide paused at reveal step 2 of 4 in `DeckStage`
+(`slides-fragments`). Each has committed light and dark visual baselines on
 desktop Chromium and the Pixel 7 (`pnpm visual -g slides-`). Like the rest of
 the suite, the baselines are recorded on macOS only.
 

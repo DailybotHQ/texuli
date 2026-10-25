@@ -1,4 +1,4 @@
-import { safeParseBlock, walkBlocks } from '@texuli/blocks/core';
+import { safeParseBlock } from '@texuli/blocks/core';
 import {
   type DraftDiagnostic,
   type DraftValidation,
@@ -14,6 +14,7 @@ import {
   resolveSlideTheme,
   resolveSlideTransition,
   type SlideMasterLayout,
+  slideStepCount,
 } from '../model/index.ts';
 import {
   DECK_ROOT_CATALOG_ID,
@@ -39,7 +40,10 @@ export interface ResolvedDeckSlide {
   master: SlideMasterLayout;
   transition: DeckTransition;
   themeRef: DeckThemeReference | undefined;
-  /** Highest block `step` on the slide (0 when no block declares one). */
+  /**
+   * The slide's last reveal step (`slideStepCount`): 0 when nothing reveals,
+   * counting list items and code highlights one step each.
+   */
   stepCount: number;
 }
 
@@ -137,7 +141,7 @@ export function validateDeckDraft(
             master: resolveSlideMaster(slide.master),
             transition: resolveSlideTransition(deck, slide, { reducedMotion }),
             themeRef: resolveSlideTheme(deck, slide),
-            stepCount: Math.max(0, ...walkBlocks(slide.blocks).map(({ block }) => block.step ?? 0)),
+            stepCount: slideStepCount(slide),
           }))
         : [],
   };
