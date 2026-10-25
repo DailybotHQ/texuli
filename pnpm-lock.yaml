@@ -306,6 +306,9 @@ importers:
       '@texuli/data':
         specifier: workspace:*
         version: link:../data
+      '@texuli/editor':
+        specifier: workspace:*
+        version: link:../editor
       '@texuli/media':
         specifier: workspace:*
         version: link:../media
