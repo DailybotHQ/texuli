@@ -481,8 +481,31 @@
       "note": "FINAL-texuli-check: component chrome pair matrix split from aa-gate so the gate entry stays under budget after map marker pairs. Checking tool only."
     },
     "@texuli/editor": {
-      "gzip": 1024,
-      "note": "Skeleton entry (index.ts placeholder ~0.1 KiB); the real per-subpath rows land with the editor package task via pnpm size --update. Owner consent 2026-10-25 (PLAN_005 autonomous continuation)."
+      "gzip": 34048,
+      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
+    },
+    "@texuli/editor/controller": {
+      "gzip": 18368,
+      "note": "The headless controller: history, commands, composition guard, paste; bundles the core editor model, transforms and history (measured 18,361 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
+    },
+    "@texuli/editor/editor": {
+      "gzip": 34624,
+      "cssGzip": 2240,
+      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
+    },
+    "@texuli/editor/link-dialog": {
+      "gzip": 1472,
+      "cssGzip": 1600,
+      "note": "The link dialog; addresses go through the controller and the URL policy (measured 1,469 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
+    },
+    "@texuli/editor/paste": {
+      "gzip": 7488,
+      "note": "Framework-free clipboard import: owned HTML tokenizer, allowlist and the untrusted loader (measured 7,429 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
+    },
+    "@texuli/editor/toolbar": {
+      "gzip": 6912,
+      "cssGzip": 2240,
+      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
     }
   }
 }
