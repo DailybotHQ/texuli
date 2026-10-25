@@ -52,7 +52,7 @@ jobs:
             local dir="$1" name version slug tarball
             name=$(node -p "require('./${dir}/package.json').name")
             version=$(node -p "require('./${dir}/package.json').version")
-            slug=${name#@/}; slug=${slug//\//-}
+            slug=${name#@}; slug=${slug//\//-}
             tarball="tmp/packages/tarballs/${slug}-${version}.tgz"
             test -s "$tarball"
             echo "Publishing ${name}@${version} (${tarball})"
