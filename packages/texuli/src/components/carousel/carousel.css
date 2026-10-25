@@ -45,7 +45,14 @@
     min-inline-size: 0;
   }
 
+  /*
+   * A carousel shows one slide at its own width: slide content never sizes
+   * it. Without inline-size containment, a wide slide's min-content (an
+   * image with an aspect ratio) widened the carousel past a phone viewport
+   * inside auto-sized grid or flex parents.
+   */
   .tx-carousel-viewport {
+    contain: inline-size;
     overflow: hidden;
     border-radius: var(--tx-radius, 0.5rem);
     touch-action: pan-y;
@@ -149,12 +156,18 @@
     inset-inline-end: 0.5rem;
   }
 
+  /*
+   * The dots wrap onto extra rows when the bar is narrow, so a long carousel
+   * never widens its bar (and the page) past the container on phones.
+   */
   .tx-carousel-dots {
     display: flex;
     flex: 1;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: 0.25rem;
+    min-inline-size: 0;
   }
   .tx-carousel-dot {
     position: relative;
