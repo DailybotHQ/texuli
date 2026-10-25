@@ -60,6 +60,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [a11y-site](quality/a11y-site.md) | Accessibility sweep: texuli.com |
 | [a11y-slides](quality/a11y-slides.md) | Accessibility sweep: slides |
 | [consumers](quality/consumers.md) | Consumer apps: Vite, Astro and SvelteKit |
+| [consumers-registry](quality/consumers-registry.md) | Consumer apps installing the published packages from the npm registry |
 | [csp](quality/csp.md) | Strict CSP and Trusted Types |
 | [packaging](quality/packaging.md) | Packaging, publint and attw |
 | [perf-builder](quality/perf-builder.md) | Blueprint builder performance at scale |

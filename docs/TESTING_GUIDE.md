@@ -37,6 +37,7 @@ lanes each use their own.
 | Visual, one example | `TEXULI_E2E_PORT=<port> pnpm visual -g texuli-toast` | 8 capture sets, no changes (12 s) |
 | Visual, everything | `TEXULI_E2E_PORT=<port> pnpm visual` (`pnpm visual:update` to rebaseline; review the PNGs) | not re-run for this guide |
 | Consumer apps (Vite, Astro, SvelteKit) | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/consumers/consumers.spec.ts --project=chromium` | 7 passed: Vite, Astro and SvelteKit × plain/Tailwind install the packed tarballs, build and render (2.4 min) |
+| Consumer apps against the npm registry | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/consumers/consumers-registry.spec.ts --project=chromium` | 7 passed: the six consumers install the published `0.1.0-next.1` from registry.npmjs.org, build and render (53 s; contacts the network) |
 | Strict CSP and Trusted Types | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/csp.spec.ts` | 406 passed, 0 failed, 2 skipped across the three projects (FIX-dev-red re-run) |
 | SSR and hydration | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/ssr.spec.ts --project=chromium` | 1 passed (21 s) |
 | Website build | `pnpm build` | exit 0: `astro check` 0 errors, then the static build (142 s) |
@@ -96,7 +97,7 @@ then the package, then its consumers (the layers above it).
 | `scripts/packages.ts` | `pnpm vitest run scripts/tests/packages.test.ts` | `pnpm verify:packages` |
 | `scripts/visual.ts`, `tests/visual/**` | `pnpm vitest run scripts/tests/visual.test.ts` | `pnpm visual -g <example-id>` |
 | `scripts/supply-chain.ts` | `pnpm vitest run scripts/tests/supply-chain.test.ts` | — |
-| `tests/consumers/**` | `pnpm vitest run scripts/tests/consumers-harness.test.ts` | `tests/consumers/consumers.spec.ts` |
+| `tests/consumers/**` | `pnpm vitest run scripts/tests/consumers-harness.test.ts` | `tests/consumers/consumers.spec.ts` and `tests/consumers/consumers-registry.spec.ts` |
 | `apps/website/src/components/<area>/`, `pages/<area>/` | `pnpm vitest run scripts/tests/site-<area>.test.ts` where one exists | `pnpm build`, then `tests/e2e/site-<area>.spec.ts` (every area has one; design notes in `apps/website/docs/site-<area>.md`) |
 | `apps/website` layout, nav, SEO (indexed pages only; previews are noindex), perf | `pnpm vitest run scripts/tests/docs-shell-nav.test.ts scripts/tests/guides-nav.test.ts` | `tests/e2e/site-{docs-shell,docs-nav,seo,perf}.spec.ts`; every page: `tests/e2e/a11y-site.spec.ts` |
 | root config (`package.json`, `tsconfig.base.json`, `biome.json`, `vitest.config.ts`, `playwright.config.ts`) | `pnpm check` | `pnpm build` and the smoke spec |
