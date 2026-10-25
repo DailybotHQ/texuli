@@ -1,5 +1,5 @@
 /**
- * Accessibility sweep: slides (T-p7-deck-a11y). The four slides examples are
+ * Accessibility sweep: slides (T-p7-deck-a11y). The seven slides examples are
  * the fixtures. axe with zero exclusions in light and dark (including a dark
  * host page on a light OS), presenter and overview states, forced colors,
  * 320px reflow, the deck keyboard map with focus movement, tab order, reduced
@@ -13,7 +13,13 @@ const TEMPLATES = [
   'slides-template-pitch',
   'slides-template-review',
 ] as const;
-const ALL = [...TEMPLATES, 'slides-media-deck'] as const;
+const ALL = [
+  ...TEMPLATES,
+  'slides-media-deck',
+  'slides-fragments',
+  'slides-slot-masters',
+  'slides-presenter-screen',
+] as const;
 type SlidesFixture = (typeof ALL)[number];
 
 async function gotoFixture(page: Page, id: SlidesFixture, mode: 'light' | 'dark' = 'light') {
@@ -100,6 +106,7 @@ test.describe('a11y slides · structure and names', () => {
       'Next',
       'Overview',
       'Presenter',
+      'Fullscreen',
     ]);
     await expect(controls.getByRole('button', { name: 'Previous slide' })).toBeVisible();
     await expect(controls.getByRole('button', { name: 'Next slide' })).toBeVisible();
@@ -111,7 +118,7 @@ test.describe('a11y slides · structure and names', () => {
     await expect(stage(page).getByRole('article', { name: 'Trend' })).toBeVisible();
   });
 
-  test('presenter panes are a complementary notes region, an up-next region and a timer', async ({
+  test('presenter panes are a complementary notes region and an up-next region, timer-free by default', async ({
     page,
   }) => {
     await gotoFixture(page, 'slides-template-pitch');
@@ -122,7 +129,7 @@ test.describe('a11y slides · structure and names', () => {
     );
     await expect(page.getByRole('complementary', { name: 'Speaker notes' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Up next' })).toContainText('Traction');
-    await expect(page.getByRole('timer', { name: 'Elapsed time' })).toBeVisible();
+    await expect(page.getByRole('timer')).toHaveCount(0);
     await expect(stage(page).getByRole('heading', { level: 2 })).toHaveText([
       'The solution',
       'Speaker notes',
@@ -212,7 +219,7 @@ test.describe('a11y slides · keyboard', () => {
     await page.getByRole('button', { name: 'Presenter' }).click();
     await page.getByRole('link', { name: 'All examples' }).focus();
     const order: string[] = [];
-    for (let index = 0; index < 8; index += 1) {
+    for (let index = 0; index < 7; index += 1) {
       await page.keyboard.press('Tab');
       order.push(
         await page.evaluate(() => {
@@ -228,10 +235,9 @@ test.describe('a11y slides · keyboard', () => {
       'Next slide',
       'Overview',
       'Presenter',
+      'Fullscreen',
       'Copy TS code',
       'region',
-      'Pause timer',
-      'Reset timer',
     ]);
   });
 
@@ -242,6 +248,78 @@ test.describe('a11y slides · keyboard', () => {
     await page.keyboard.press('o');
     await expect(progress(page)).toHaveText('Slide 4 of 6: Trend');
     await expect(page.getByRole('navigation', { name: 'Slides' })).toHaveCount(0);
+  });
+});
+
+test.describe('a11y slides · reveal steps, slots and fullscreen', () => {
+  test('arrow keys reveal and hide steps, and the position text reports them', async ({ page }) => {
+    await gotoFixture(page, 'slides-fragments');
+    await expect(progress(page)).toHaveText('Slide 2 of 2: Launch plan, 2 of 4 revealed');
+    await stage(page).getByRole('article', { name: 'Launch plan' }).focus();
+    await expect(stage(page).getByRole('button', { name: 'Next step' })).toBeVisible();
+    await expect(stage(page).getByText('Open the beta')).toBeVisible();
+    await expect(stage(page).getByText('General availability')).toBeHidden();
+    await page.keyboard.press('ArrowRight');
+    await expect(progress(page)).toHaveText('Slide 2 of 2: Launch plan, 3 of 4 revealed');
+    await expect(stage(page).getByText('General availability')).toBeVisible();
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft');
+    await expect(progress(page)).toHaveText('Slide 2 of 2: Launch plan, 1 of 4 revealed');
+    await expect(stage(page).getByText('Open the beta')).toBeHidden();
+    await expect(stage(page).getByRole('article', { name: 'Launch plan' })).toBeFocused();
+  });
+
+  test('the presenter screen shows the step progress and the next step', async ({ page }) => {
+    await gotoFixture(page, 'slides-presenter-screen');
+    await expect(page.getByRole('complementary', { name: 'Speaker notes' })).toContainText(
+      'Reveal step 1 of 4'
+    );
+    await expect(page.getByRole('region', { name: 'Up next' })).toContainText(
+      'Reveal step 2 of 4 on this slide'
+    );
+  });
+
+  test('slot masters print their slots in reading order with one h2 per page', async ({ page }) => {
+    await gotoFixture(page, 'slides-slot-masters');
+    const print = page.getByRole('document', { name: 'Print: Quarter in review' });
+    await expect(print.getByRole('heading', { level: 2 })).toHaveText([
+      'Quarter in review',
+      'Before and after',
+      'Customer voice',
+      'Thank you',
+    ]);
+    const slots = await print
+      .locator('.tx-deck-stage__region')
+      .evaluateAll((regions) => regions.map((region) => region.getAttribute('data-slot')));
+    expect(slots).toEqual([
+      'body',
+      'footer',
+      'contentStart',
+      'contentEnd',
+      'footer',
+      'quote',
+      'attribution',
+      'body',
+      'footer',
+    ]);
+  });
+
+  test('fullscreen opens natively or fills the window visibly, and closing returns focus', async ({
+    page,
+  }) => {
+    await gotoFixture(page, 'slides-template-report');
+    await page.getByRole('button', { name: 'Fullscreen' }).click();
+    await expect(stage(page)).toHaveAttribute('data-fullscreen', /^(native|viewport)$/);
+    const state = await stage(page).getAttribute('data-fullscreen');
+    expect(['native', 'viewport']).toContain(state);
+    if (state === 'viewport') {
+      await expect(stage(page).locator('.tx-deck-stage__fullscreen-note')).toBeVisible();
+    }
+    await expect(stage(page).getByRole('article', { name: 'Trend' })).toBeFocused();
+    const exit = page.getByRole('button', { name: 'Exit fullscreen' });
+    await exit.click();
+    await expect(stage(page)).not.toHaveAttribute('data-fullscreen', /.+/);
+    await expect(page.getByRole('button', { name: 'Fullscreen' })).toBeFocused();
   });
 });
 

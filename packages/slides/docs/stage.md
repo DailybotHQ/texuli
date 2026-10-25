@@ -2,7 +2,7 @@
 
 **Import:** `@texuli/slides/stage`  
 **Source:** `packages/slides/src/stage/`  
-**Tests:** `tests/stage.test.ts`, `tests/fragments.test.ts`, `tests/presenter.test.ts`,
+**Tests:** `tests/stage.test.ts`, `tests/fragments.test.ts`, `tests/stage-screen.test.ts`, `tests/presenter.test.ts`,
 `tests/transitions.test.ts`, `tests/theme.test.ts`, `tests/media.test.ts`,
 `tests/print.test.ts`, `tests/a11y.test.ts`; browser sweep
 `tests/e2e/a11y-slides.spec.ts`
@@ -31,8 +31,12 @@ interactive `DeckStage` and the all-pages `DeckPrint`. Import
 | `initialSlideId` | `settings.startIndex` | Open on this slide; lets a host restore a slide from its own URL or history |
 | `initialStep` | `0` | Open the initial slide at this [reveal step](#reveal-steps), clamped to its steps |
 | `onSlideChange` | — | Receives a `SlideNavigationIntent` (`{ index, slideId }`) for the host to persist; the stage never changes the URL |
+| `onStepChange` | — | Receives a `SlideStepIntent` (`{ index, slideId, step, stepCount }`) on every slide or reveal step change |
 | `presenter` | `false` | Bindable presenter mode |
 | `onPresenterChange` | — | Called with `open` when presenter mode toggles |
+| `presenterTimer` | `false` | Show the elapsed timer in the presenter view |
+| `onFullscreenChange` | — | Called with the `DeckFullscreenState` (`off`, `native`, `viewport`) when fullscreen changes |
+| `sync` | `null` | A `DeckSync` link that keeps this stage and another window's stage on one slide and step ([presenter screen](#presenter-screen)) |
 | `loadTheme` | `loadDeckLibraryTheme` | Resolves catalog theme ids; `null` leaves them to host CSS |
 | `mediaTrust` | `untrusted` | URL policy tier for media at paint (`DeckMediaTrust`) |
 | `resolveAvatar` | — | Host adapter for `avatar:` image ids |
@@ -45,8 +49,8 @@ once on later slides.
 ### Keyboard and focus
 
 The stage is a region named “Presentation: <title>”. Its controls are a group
-named “Presentation controls”: Previous slide, Next slide, Overview and
-Presenter. On a slide with [reveal steps](#reveal-steps), the first two are
+named “Presentation controls”: Previous slide, Next slide, Overview,
+Presenter and Fullscreen. On a slide with [reveal steps](#reveal-steps), the first two are
 named Previous step and Next step while a step remains in that direction. A
 polite live region announces “Slide n of m: <title>”, followed by “, k of s
 revealed” on a slide with steps.
@@ -59,7 +63,8 @@ revealed” on a slide with steps.
 | `o` | Toggle the overview; focus moves to the current slide's item |
 | `p` | Toggle presenter mode |
 | `s` | In presenter mode, focus the speaker notes |
-| Escape | Close the overview, then presenter mode, returning focus to its button |
+| `f` | Toggle [fullscreen](#fullscreen) |
+| Escape | Close the overview, then fullscreen, then presenter mode, returning focus to its button |
 
 Keys act only while focus is inside the deck. Navigation and letter keys are
 ignored while a button, link or text field inside it has focus, so those keep
@@ -92,29 +97,90 @@ The stage plays the slide's reveal steps ([model.md](model.md#reveal-steps-fragm
   opens at step 0. Print and PPTX export show every slide fully revealed
   ([export.md](export.md)).
 
-`onSlideChange` still fires only when the slide changes and does not report
-steps; a host can restore a step it tracked itself with `initialStep`.
+`onSlideChange` fires only when the slide changes, as before. `onStepChange`
+reports every position change, slide or step, as a `SlideStepIntent`; it
+does not fire for the first position. A host restores a step with
+`initialStep`.
+
+### Fullscreen
+
+The Fullscreen button and `f` toggle fullscreen.
+`canUseNativeFullscreen(element, document)` checks for the Fullscreen API
+(`requestFullscreen` and `fullscreenEnabled`).
+
+- **Native:** with the API, the stage element enters fullscreen
+  (`data-fullscreen="native"`). The browser's own exit (Escape, a system
+  gesture) closes it, and the stage follows the `fullscreenchange` event.
+- **Fallback:** without the API, or when the browser refuses, the stage fills
+  the window (`data-fullscreen="viewport"`: fixed, inset 0) and shows a
+  visible status note saying so, never a silent no-op. Escape exits. While
+  it fills the window, focus that leaves the stage returns to the slide; page
+  scroll is not locked, but `overscroll-behavior: contain` keeps wheel
+  scrolling inside the deck.
+- **Focus:** entering moves focus to the slide; leaving with Escape or the
+  button returns it to the Fullscreen button. Nothing animates on either
+  change, so reduced motion needs no special case.
+
+`onFullscreenChange` reports each state. The stage leaves native fullscreen
+when it unmounts.
 
 ### Presenter view
 
 Presenter mode is a layout of the same deck; it never changes the deck data.
-It shows the current slide with three panes, which stack below it on narrow
+It shows the current slide with its panes, which stack below it on narrow
 viewports:
 
 - a “Speaker notes” complementary region (plain text, line breaks kept, never
   HTML), which starts with “Reveal step k of s” on a slide with steps;
 - an “Up next” region with the next slide's title, or “Reveal step k of s on
   this slide” while a step remains;
-- an elapsed timer (`role="timer"`) with Pause/Resume and Reset.
+- with `presenterTimer`, an elapsed timer (`role="timer"`) with Pause/Resume
+  and Reset.
 
-The timer is a local stopwatch: it starts when presenter mode opens, pauses
-when it closes, and uses no network clock. `createPresenterTimer(now?)`
+The view is timer-free by default, so the same deck and position always
+render the same presenter view. With `presenterTimer`, the timer is a local
+stopwatch: it starts when presenter mode opens, pauses when it closes, and
+uses no network clock. `createPresenterTimer(now?)`
 returns that `PresenterTimer` (`start`, `pause`, `reset`, `elapsed`,
 `running`), and `formatElapsed(ms)` formats it as `m:ss` or `h:mm:ss`, for
 hosts that build their own presenter chrome.
 
-Planned: a second-window or second-screen presenter, a next-slide thumbnail,
-a wall clock and fullscreen.
+Planned: a next-slide thumbnail and a wall clock.
+
+### Presenter screen
+
+A presenter screen is a second `DeckStage` instance, in another window or tab
+of the same browser, driven by the same position over `BroadcastChannel`. No
+server is involved, so it works only within one origin on one device; it
+does not reach another computer or a phone.
+
+```ts
+import { createDeckSync } from '@texuli/slides/stage';
+
+// In both windows, with the same deck and the same key:
+const sync = createDeckSync({ deck: 'board-update-q3' });
+// Audience window: <DeckStage {deck} {sync} />
+// Presenter window (the host opens it): <DeckStage {deck} {sync} presenter />
+```
+
+- `createDeckSync(options)` (`DeckSyncOptions`: `deck` key, `channel` name,
+  optional `open` for a custom `DeckSyncChannel`) returns a `DeckSync`
+  (`post`, `hello`, `subscribe`, `close`), or `null` when the browser has no
+  `BroadcastChannel` or the key is unusable, so the host can say the
+  presenter screen is unavailable.
+- Messages (`DeckSyncMessage`, tagged `DECK_SYNC_PROTOCOL`) carry only a
+  `DeckSyncPosition`: a slide id and a reveal step. `parseDeckSyncMessage`
+  accepts only the closed shapes for the deck's key; extra fields, other
+  decks, bad ids and out-of-range steps are dropped. A position for a slide
+  the receiving deck lacks is ignored, and steps are clamped to the slide.
+- Either window can drive: each posts its position changes and follows the
+  other's, without echoing a received position back. A stage posts nothing
+  for its first position. When a stage connects it sends `hello`; a stage not
+  in presenter mode answers with its position, and a presenter screen answers
+  only after it has moved or followed, so a newly opened presenter screen
+  joins the audience's slide instead of moving it.
+- The host opens and closes the second window; the stage never calls
+  `window.open`.
 
 ### Transitions and motion
 

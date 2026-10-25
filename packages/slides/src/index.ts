@@ -76,6 +76,7 @@ export {
   resolveSlideMaster,
   resolveSlideTheme,
   resolveSlideTransition,
+  SLIDE_MASTER_CONTENT_SLOTS,
   SLIDE_MASTER_LAYOUTS,
   SLIDE_MASTERS,
   SLIDE_MEDIA_TYPES,
@@ -86,6 +87,7 @@ export {
   type SlideMasterSlot,
   type SlideMediaType,
   type SlideRegion,
+  type SlideRegionSlot,
   slideStepCount,
 } from './model/index.ts';
 export {

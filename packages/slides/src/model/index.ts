@@ -426,10 +426,12 @@ export {
   type ComposedSlide,
   composeSlide,
   isSlideMediaBlock,
+  SLIDE_MASTER_CONTENT_SLOTS,
   SLIDE_MEDIA_TYPES,
   SLIDE_REGION_FIT,
   type SlideMediaType,
   type SlideRegion,
+  type SlideRegionSlot,
 } from './compose.ts';
 export {
   blockFragment,

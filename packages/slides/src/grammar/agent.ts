@@ -6,6 +6,7 @@ import {
   validateDraft,
 } from '@texuli/catalog/validate';
 import {
+  composeSlide,
   type Deck,
   type DeckIssue,
   type DeckThemeReference,
@@ -14,6 +15,7 @@ import {
   resolveSlideTheme,
   resolveSlideTransition,
   type SlideMasterLayout,
+  type SlideRegionSlot,
   slideStepCount,
 } from '../model/index.ts';
 import {
@@ -38,6 +40,8 @@ export type DeckDraftDiagnostic = DraftDiagnostic | DeckDraftIssue;
 export interface ResolvedDeckSlide {
   slideId: string;
   master: SlideMasterLayout;
+  /** The slots the slide's blocks fill, in reading order (`composeSlide`). */
+  slots: readonly SlideRegionSlot[];
   transition: DeckTransition;
   themeRef: DeckThemeReference | undefined;
   /**
@@ -139,6 +143,7 @@ export function validateDeckDraft(
         ? deck.slides.map((slide) => ({
             slideId: slide.id,
             master: resolveSlideMaster(slide.master),
+            slots: composeSlide(slide).regions.map((region) => region.slot),
             transition: resolveSlideTransition(deck, slide, { reducedMotion }),
             themeRef: resolveSlideTheme(deck, slide),
             stepCount: slideStepCount(slide),

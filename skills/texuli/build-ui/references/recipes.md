@@ -66,7 +66,7 @@ prototypes as real credentials.
 | Agent catalog tree | `@texuli/slides/grammar` (`toDeckRenderTree`): `layout-deck` with one `deck-slide` child per slide (`slideId`, `title`, `notes`, `master`, `transition`, `themeRef`) and block-family children |
 | Validate agent output | `validateDeckDraft(input, { catalog })`: the catalog's `validateDraft` (ids, props, sinks, block schemas, grammar, `layout-deck` root) plus deck rules (slide ids, declared masters, theme references); returns the deck and per-slide master, transition, theme and step count |
 | Interchange / legacy | `toDeckGrammar` (structured `slides[]` prop; not checked node by node by the renderer); `projectLegacyDeck` reads the older deck-of-cards shape |
-| Present | `@texuli/slides/stage` (`DeckStage`, optional `@texuli/slides/styles.css`): one slide at a time, previous/next, Home/End, `o` overview, `p` presenter view (notes, next slide, elapsed timer), `fade`/`fade-up`/`none` transitions, reduced motion honoured |
+| Present | `@texuli/slides/stage` (`DeckStage`, optional `@texuli/slides/styles.css`): one slide at a time, previous/next, Home/End, `o` overview, `p` presenter view (notes, next slide or step; timer opt-in), `f` fullscreen (visible window-filling fallback), slot masters split at top-level dividers, `fade`/`fade-up`/`none` transitions, reduced motion honoured |
 | Print / export | `DeckPrint` + `requestDeckPdf` (browser print to PDF), `exportDeckPptx` (text, bullets and notes; media and charts are reported as omitted) |
 | Text | block content or plain text — not HTML strings |
 | Chrome | developer shell only outside the deck frame |
@@ -76,8 +76,8 @@ prototypes as real credentials.
 → show diagnostics on a draft, never activate an invalid one. Reveal steps
 play on the stage: put `step` (and optionally `reveal`) on top-level slide
 blocks only; a list with a `step` reveals one item per step. Print and PPTX
-flatten them. Fullscreen and a second-screen presenter are later phases: do
-not promise them.
+flatten them. A presenter screen is a second same-origin window linked with
+`createDeckSync` (BroadcastChannel, no server): do not promise another device.
 
 ## 5. Media story
 

@@ -3,11 +3,18 @@ import type { Theme } from '@texuli/tokens/contract';
 import { defineTheme } from '@texuli/tokens/contract';
 import { onMount, tick, untrack } from 'svelte';
 import type { Deck, DeckSlide } from '../model/index.ts';
-import { resolveSlideTheme, resolveSlideTransition, slideStepCount } from '../model/index.ts';
+import {
+  resolveSlideMaster,
+  resolveSlideTheme,
+  resolveSlideTransition,
+  slideStepCount,
+} from '../model/index.ts';
+import { canUseNativeFullscreen, type DeckFullscreenState } from './fullscreen.ts';
 import type { DeckMediaTrust } from './media.ts';
-import type { SlideNavigationIntent } from './navigation.ts';
+import type { SlideNavigationIntent, SlideStepIntent } from './navigation.ts';
 import { createPresenterTimer, formatElapsed } from './presenter.ts';
 import SlideContent from './SlideContent.svelte';
+import type { DeckSync, DeckSyncMessage } from './sync.ts';
 import {
   type DeckThemeLoader,
   deckCatalogThemeIds,
@@ -22,9 +29,20 @@ interface Props {
   /** Open the initial slide at this reveal step, clamped to its steps (default 0). */
   initialStep?: number;
   onSlideChange?: (intent: SlideNavigationIntent) => void;
-  /** Presenter layout: current slide, speaker notes, next slide and elapsed timer. */
+  /** Called on every slide or reveal step change, with the step it shows. */
+  onStepChange?: (intent: SlideStepIntent) => void;
+  /** Presenter layout: current slide, speaker notes, the next slide or step. */
   presenter?: boolean;
   onPresenterChange?: (open: boolean) => void;
+  /** Show the elapsed timer in the presenter view (off by default, so the view is deterministic). */
+  presenterTimer?: boolean;
+  /** Called with the new state when fullscreen opens, falls back or closes. */
+  onFullscreenChange?: (state: DeckFullscreenState) => void;
+  /**
+   * A same-origin link (`createDeckSync`) that keeps this stage and another
+   * window's stage on the same slide and step, for a presenter screen.
+   */
+  sync?: DeckSync | null;
   /**
    * Resolves catalog theme ids to token themes. Defaults to the token theme
    * library; pass `null` when the host loads matching theme CSS itself.
@@ -44,8 +62,12 @@ let {
   initialSlideId,
   initialStep = 0,
   onSlideChange,
+  onStepChange,
   presenter = $bindable(false),
   onPresenterChange,
+  presenterTimer = false,
+  onFullscreenChange,
+  sync = null,
   loadTheme = loadDeckLibraryTheme,
   mediaTrust = 'untrusted',
   resolveAvatar,
@@ -77,6 +99,10 @@ let stageElement: HTMLElement | undefined = $state();
 let slideElement: HTMLElement | undefined = $state();
 let overviewButtonElement: HTMLButtonElement | undefined = $state();
 let presenterButtonElement: HTMLButtonElement | undefined = $state();
+let fullscreenButtonElement: HTMLButtonElement | undefined = $state();
+let fullscreen = $state<DeckFullscreenState>('off');
+// Shown when fullscreen falls back to filling the window, so the degradation is visible.
+let fullscreenNote = $state<string | null>(null);
 let notesElement: HTMLElement | undefined = $state();
 const timer = createPresenterTimer();
 let elapsed = $state(0);
@@ -118,6 +144,7 @@ let themeStatus = $derived.by(() => {
 });
 let nextSlide = $derived(deck.slides[activeIndex + 1]);
 let stepCount = $derived(activeSlide ? slideStepCount(activeSlide) : 0);
+let arrangement = $derived(resolveSlideMaster(activeSlide?.master).arrangement);
 let revealTransition = $derived(
   activeSlide && mounted && revealing
     ? resolveSlideTransition(deck, activeSlide, { reducedMotion })
@@ -176,7 +203,7 @@ $effect(() => {
 
 // The timer runs while presenter mode is open and keeps its count when it closes.
 $effect(() => {
-  if (!presenter) {
+  if (!presenter || !presenterTimer) {
     timer.pause();
     timerRunning = false;
     elapsed = timer.elapsed();
@@ -188,12 +215,66 @@ $effect(() => {
 });
 
 $effect(() => {
-  if (!presenter || !timerRunning) return;
+  if (!presenter || !presenterTimer || !timerRunning) return;
   const interval = setInterval(() => {
     elapsed = timer.elapsed();
   }, 1000);
   return () => clearInterval(interval);
 });
+
+function focusSlideSoon() {
+  void tick().then(() => (slideElement ?? stageElement)?.focus({ preventScroll: true }));
+}
+
+function setFullscreen(state: DeckFullscreenState, note: string | null = null) {
+  fullscreen = state;
+  fullscreenNote = note;
+  onFullscreenChange?.(state);
+}
+
+async function enterFullscreen() {
+  const element = stageElement;
+  if (!element || fullscreen !== 'off') return;
+  let refused = false;
+  if (canUseNativeFullscreen(element, document)) {
+    try {
+      await element.requestFullscreen();
+      setFullscreen('native');
+      focusSlideSoon();
+      return;
+    } catch {
+      refused = true;
+    }
+  }
+  setFullscreen(
+    'viewport',
+    refused
+      ? 'The browser refused fullscreen, so the presentation fills the window. Press Escape to exit.'
+      : 'Fullscreen is not available here, so the presentation fills the window. Press Escape to exit.'
+  );
+  focusSlideSoon();
+}
+
+function exitFullscreen() {
+  if (fullscreen === 'off') return;
+  if (fullscreen === 'native' && document.fullscreenElement) {
+    void document.exitFullscreen?.().catch(() => undefined);
+  }
+  setFullscreen('off');
+  void tick().then(() => fullscreenButtonElement?.focus());
+}
+
+function toggleFullscreen() {
+  if (fullscreen === 'off') void enterFullscreen();
+  else exitFullscreen();
+}
+
+// In the window-filling fallback, focus that leaves the stage returns to the slide.
+function onStageFocusOut(event: FocusEvent) {
+  if (fullscreen !== 'viewport') return;
+  const next = event.relatedTarget;
+  if (next instanceof Node && !stageElement?.contains(next)) focusSlideSoon();
+}
 
 function setPresenter(open: boolean, focusSlide = false) {
   if (open === presenter) return;
@@ -295,6 +376,11 @@ function onStageKeydown(event: KeyboardEvent) {
     overviewButtonElement?.focus();
     return;
   }
+  if (event.key === 'Escape' && fullscreen !== 'off') {
+    event.preventDefault();
+    exitFullscreen();
+    return;
+  }
   if (event.key === 'Escape' && presenter) {
     event.preventDefault();
     setPresenter(false);
@@ -333,6 +419,9 @@ function onStageKeydown(event: KeyboardEvent) {
   } else if (event.key.toLowerCase() === 'p') {
     event.preventDefault();
     setPresenter(!presenter, inSlide);
+  } else if (event.key.toLowerCase() === 'f') {
+    event.preventDefault();
+    toggleFullscreen();
   } else if (event.key.toLowerCase() === 's' && presenter) {
     event.preventDefault();
     notesElement?.focus();
@@ -346,6 +435,81 @@ function slideLabel(slide: DeckSlide, index: number): string {
 function revealProgress(step: number, count: number): string {
   return `${step} of ${count} revealed`;
 }
+
+// Report every position change (slide or step) once; the first position is not a change.
+let reportedPosition = '';
+$effect(() => {
+  const slide = activeSlide;
+  const step = activeStep;
+  if (!slide) return;
+  const key = `${slide.id}:${step}`;
+  if (!reportedPosition || key === reportedPosition) {
+    reportedPosition = key;
+    return;
+  }
+  reportedPosition = key;
+  const count = slideStepCount(slide);
+  const index = activeIndex;
+  untrack(() => onStepChange?.({ index, slideId: slide.id, step, stepCount: count }));
+});
+
+// The position last received from a linked stage, so it is not posted back.
+let remotePosition: string | null = null;
+// The first position is not posted: a newly opened screen asks with `hello`
+// and follows the others instead of moving them to its own start.
+let postedOnce = false;
+// A presenter screen that just opened has no position worth sharing: it
+// answers `hello` only once it has moved or followed another stage.
+let established = false;
+
+function applyRemote(message: DeckSyncMessage) {
+  if (message.kind === 'hello') {
+    if (activeSlide && (!presenter || established)) {
+      sync?.post({ slideId: activeSlide.id, step: activeStep });
+    }
+    return;
+  }
+  established = true;
+  const index = deck.slides.findIndex((slide) => slide.id === message.slideId);
+  const slide = deck.slides[index];
+  if (!slide) return;
+  const step = Math.min(message.step, slideStepCount(slide));
+  if (index === activeIndex && step === activeStep) return;
+  remotePosition = `${slide.id}:${step}`;
+  if (index === activeIndex) {
+    revealing = step > activeStep;
+    activeStep = step;
+  } else {
+    setIndex(index, false, step);
+  }
+}
+
+$effect(() => {
+  const link = sync;
+  if (!link) return;
+  // Remote messages and posts never become dependencies of these effects.
+  const unsubscribe = link.subscribe((message) => untrack(() => applyRemote(message)));
+  untrack(() => link.hello());
+  return unsubscribe;
+});
+
+$effect(() => {
+  const link = sync;
+  const slide = activeSlide;
+  const step = activeStep;
+  if (!link || !slide) return;
+  const key = `${slide.id}:${step}`;
+  if (!postedOnce) {
+    postedOnce = true;
+    return;
+  }
+  if (key === remotePosition) {
+    remotePosition = null;
+    return;
+  }
+  established = true;
+  untrack(() => link.post({ slideId: slide.id, step }));
+});
 
 onMount(() => {
   const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -378,7 +542,18 @@ onMount(() => {
   colorPreference.addEventListener('change', updateColor);
   contrastPreference.addEventListener('change', updateColor);
   window.addEventListener('keydown', onStageKeydown);
+  // The browser leaves native fullscreen on its own (Escape, a system gesture).
+  const onFullscreenExit = () => {
+    if (fullscreen === 'native' && document.fullscreenElement !== stageElement) {
+      setFullscreen('off');
+    }
+  };
+  document.addEventListener('fullscreenchange', onFullscreenExit);
   return () => {
+    document.removeEventListener('fullscreenchange', onFullscreenExit);
+    if (fullscreen === 'native' && document.fullscreenElement === stageElement) {
+      void document.exitFullscreen?.().catch(() => undefined);
+    }
     motionPreference.removeEventListener('change', updateMotion);
     rootObserver.disconnect();
     colorPreference.removeEventListener('change', updateColor);
@@ -398,6 +573,8 @@ onMount(() => {
   data-theme-status={themeStatus}
   data-transition={transition}
   data-presenter={presenter ? 'true' : undefined}
+  data-fullscreen={fullscreen === 'off' ? undefined : fullscreen}
+  onfocusout={onStageFocusOut}
   role="region"
   aria-label={`Presentation: ${deck.meta.title}`}
 >
@@ -439,12 +616,25 @@ onMount(() => {
     >
       Presenter
     </button>
+    <button
+      bind:this={fullscreenButtonElement}
+      type="button"
+      class="tx-deck-stage__control"
+      aria-pressed={fullscreen !== 'off'}
+      onclick={toggleFullscreen}
+    >
+      {fullscreen === 'off' ? 'Fullscreen' : 'Exit fullscreen'}
+    </button>
   </div>
+  {#if fullscreenNote}
+    <p class="tx-deck-stage__fullscreen-note" role="status">{fullscreenNote}</p>
+  {/if}
 
   {#if presenter}
     <div class="tx-deck-stage__presenter">
       <div class="tx-deck-stage__presenter-main">{@render content()}</div>
       <div class="tx-deck-stage__presenter-side">
+        {#if presenterTimer}
         <div class="tx-deck-stage__timer">
           <span role="timer" aria-label="Elapsed time" class="tx-deck-stage__timer-value">
             {formatElapsed(elapsed)}
@@ -456,6 +646,7 @@ onMount(() => {
             Reset timer
           </button>
         </div>
+        {/if}
         <aside
           bind:this={notesElement}
           class="tx-deck-stage__notes"
@@ -514,6 +705,7 @@ onMount(() => {
         class="tx-deck-stage__slide"
         data-slide-id={activeSlide.id}
         data-transition={transition}
+        data-arrangement={arrangement}
         data-step={activeStep}
         data-step-count={stepCount}
         tabindex="-1"

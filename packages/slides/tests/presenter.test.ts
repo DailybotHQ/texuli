@@ -75,7 +75,7 @@ describe('presenter timer', () => {
 });
 
 describe('DeckStage presenter view', () => {
-  it('opens with P and shows notes as plain text, the next slide and the timer', async () => {
+  it('opens with P and shows notes as plain text and the next slide, with no timer by default', async () => {
     mockMediaPreferences();
     const onPresenterChange = vi.fn();
     const deck = makeDeck();
@@ -92,7 +92,8 @@ describe('DeckStage presenter view', () => {
     expect(notes.textContent).toContain('Welcome everyone.\nIntroduce the team.');
     expect(notes.querySelector('script, [onclick]')).toBeNull();
     expect(screen.getByRole('region', { name: 'Up next' }).textContent).toContain('Demo');
-    expect(screen.getByRole('timer', { name: 'Elapsed time' }).textContent?.trim()).toBe('0:00');
+    expect(screen.queryByRole('timer')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Pause timer' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Presenter' }).getAttribute('aria-pressed')).toBe(
       'true'
     );
@@ -125,7 +126,7 @@ describe('DeckStage presenter view', () => {
   it('counts elapsed time locally and supports pause and reset', async () => {
     vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
     mockMediaPreferences();
-    render(DeckStage, { props: { deck: makeDeck(), presenter: true } });
+    render(DeckStage, { props: { deck: makeDeck(), presenter: true, presenterTimer: true } });
     const value = () => screen.getByRole('timer', { name: 'Elapsed time' }).textContent?.trim();
 
     await vi.advanceTimersByTimeAsync(65_000);

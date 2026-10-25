@@ -47,6 +47,7 @@ function revealToken(fragment: DeckFragment): string | undefined {
   class="tx-deck-stage__regions"
   data-master={composed.master.id}
   data-arrangement={composed.master.arrangement}
+  data-slots={composed.regions.map((region) => region.slot).join(' ')}
 >
   {#each composed.regions as region (region.slot)}
     <div class="tx-deck-stage__region" data-slot={region.slot}>

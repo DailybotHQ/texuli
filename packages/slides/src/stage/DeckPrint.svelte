@@ -6,7 +6,7 @@ import type { Attachment } from 'svelte/attachments';
 import { type DeckPrintNotes, type DeckPrintPlan, planDeckPrint } from '../export/index.ts';
 import { catalogIdForBlock } from '../grammar/index.ts';
 import type { Deck, DeckThemeReference } from '../model/index.ts';
-import { resolveSlideTheme } from '../model/index.ts';
+import { resolveSlideMaster, resolveSlideTheme } from '../model/index.ts';
 import { loadDeckBlockFamily } from './loaders.ts';
 import { type DeckMediaTrust, settleDeckImages } from './media.ts';
 import SlideContent from './SlideContent.svelte';
@@ -139,6 +139,7 @@ $effect(() => {
         class="tx-deck-print__slide"
         data-slide-id={slide.id}
         data-aspect={plan.pageSize.aspect}
+        data-arrangement={resolveSlideMaster(slide.master).arrangement}
         data-tx-theme={themeId(ref)}
         data-tx-mode={printMode(ref)}
         aria-label={`Slide ${page.index + 1}: ${page.label}`}

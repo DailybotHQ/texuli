@@ -39,7 +39,8 @@ not generate PDF bytes.
 `DeckPrint` ([stage.md](stage.md)) renders the planned pages and reports when
 they are ready to print.
 
-Reveal steps are flattened: each slide prints once, in its final state, with
+Printed slides use the same slot layout as the stage
+([model.md](model.md#composition-slots-and-media-regions)). Reveal steps are flattened: each slide prints once, in its final state, with
 every fragment and list item shown, emphasis on, and code at its last
 highlight step. There are no per-step pages.
 
@@ -92,7 +93,8 @@ Output is deterministic: the same deck gives the same bytes.
   skipped silently.
 - **Not mapped yet:** hyperlinks and CTA targets (only labels export, so no URL
   reaches the file), rich text styling, deck token themes (a fixed neutral
-  Office theme is used), slide masters as layouts, title placeholders (so
+  Office theme is used), slide masters and their slots as layouts (slot blocks write in reading
+  order into the one content box), title placeholders (so
   PowerPoint's outline view does not list titles), transitions, and reveal
   steps as animations.
 

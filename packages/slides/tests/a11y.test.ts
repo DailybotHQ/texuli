@@ -75,7 +75,7 @@ describe('deck controls are a named group', () => {
       within(group)
         .getAllByRole('button')
         .map((button) => button.textContent?.trim())
-    ).toEqual(['Previous', 'Next', 'Overview', 'Presenter']);
+    ).toEqual(['Previous', 'Next', 'Overview', 'Presenter', 'Fullscreen']);
     expect(within(group).getByRole('button', { name: 'Previous slide' })).toBeTruthy();
     expect(within(group).getByRole('button', { name: 'Next slide' })).toBeTruthy();
   });

@@ -21,14 +21,15 @@ are never reordered visually; DOM order is reading order.
 
 | Class | Element |
 | --- | --- |
-| `tx-deck-stage` | The stage root (region “Presentation: <title>”) |
+| `tx-deck-stage` | The stage root (region “Presentation: <title>”; `data-fullscreen` when fullscreen) |
 | `tx-deck-stage__toolbar` | The “Presentation controls” group |
 | `tx-deck-stage__control` | Each toolbar and presenter button |
 | `tx-deck-stage__progress` | The polite “Slide n of m” text |
-| `tx-deck-stage__slide` | The active slide article (`data-step`, `data-step-count`) |
+| `tx-deck-stage__slide` | The active slide article (`data-arrangement`, `data-step`, `data-step-count`) |
+| `tx-deck-stage__fullscreen-note` | The visible status note when fullscreen falls back to filling the window |
 | `tx-deck-stage__slide-title` | A slide's h2 title (stage and print) |
-| `tx-deck-stage__regions` | A slide's region container (`data-master`, `data-arrangement`) |
-| `tx-deck-stage__region` | One region (`data-slot="media"` or `"body"`) |
+| `tx-deck-stage__regions` | A slide's region container (`data-master`, `data-arrangement`, `data-slots`) |
+| `tx-deck-stage__region` | One region (`data-slot`: `body`, `media`, `contentStart`, `contentEnd`, `quote`, `attribution` or `footer`) |
 | `tx-deck-stage__overview` | The overview navigation |
 | `tx-deck-stage__overview-item` | One overview button |
 | `tx-deck-stage__overview-number` | The slide number in an overview item |
@@ -49,7 +50,7 @@ are never reordered visually; DOM order is reading order.
 | `tx-deck-stage__step-progress` | “Reveal step n of m” in the speaker notes pane |
 | `tx-deck-stage__media-refused` | The note shown for media the paint policy refused |
 | `tx-deck-print` | The print root (`data-aspect`, `data-notes`, `data-print-only`, `data-print-ready`) |
-| `tx-deck-print__slide` | One printed slide page |
+| `tx-deck-print__slide` | One printed slide page (`data-arrangement`) |
 | `tx-deck-print__notes` | One notes page |
 | `tx-deck-print__notes-title` | A notes page heading |
 
@@ -72,6 +73,15 @@ are never reordered visually; DOM order is reading order.
   media and body regions side by side, stacking them below 40rem. An image in
   a media region fills a bounded frame. Body images and videos are capped in
   height and never cropped.
+- **Slot masters:** `data-arrangement="split"` with a `contentEnd` slot sets
+  two equal columns, stacking below 40rem; the columns follow the writing
+  direction. A `footer` region spans the slide, set smaller and muted above a
+  border. `centered` masters center their content and the slide title.
+  `quotation` limits the line length, enlarges the `quote` slot and aligns
+  the `attribution` to the inline end.
+- **Fullscreen:** `data-fullscreen` lets the stage scroll inside itself;
+  `data-fullscreen="viewport"` pins it over the window (`position: fixed`,
+  `inset: 0`).
 - **Presenter:** the panes sit beside the slide and stack below 48rem.
 - **Forced colors:** borders on the stage, controls, presenter panes and the
   refused-media note use `CanvasText`; a highlight emphasis uses `Mark` and

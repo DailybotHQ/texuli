@@ -1,6 +1,9 @@
 import { defineExample } from '../registry.ts';
 
-/** Slides examples (T-p7-deck-visual): the starter templates, a media deck and reveal steps. */
+/**
+ * Slides examples (T-p7-deck-visual): the starter templates, a media deck,
+ * reveal steps, slot masters and the presenter screen.
+ */
 export const slidesReportExample = defineExample({
   id: 'slides-template-report',
   title: 'Report deck template',
@@ -54,4 +57,26 @@ export const slidesFragmentsExample = defineExample({
   component: 'slides/DeckStage',
   props: ['deck', 'initialSlideId', 'initialStep', 'loadTheme', 'mediaTrust'],
   load: () => import('./FragmentsDeckDemo.svelte'),
+});
+
+export const slidesSlotMastersExample = defineExample({
+  id: 'slides-slot-masters',
+  title: 'Slot masters (print view)',
+  description:
+    'Every slide of a slot-master deck in DeckPrint: dividers split blocks into a title footer, two columns with a footer, and a quote with its attribution. Fictional Example Co. data.',
+  tags: ['slides', 'deck', 'masters', 'print'],
+  component: 'slides/DeckPrint',
+  props: ['deck', 'loadTheme', 'mediaTrust', 'onReady'],
+  load: () => import('./SlotMastersDeckDemo.svelte'),
+});
+
+export const slidesPresenterScreenExample = defineExample({
+  id: 'slides-presenter-screen',
+  title: 'Presenter screen',
+  description:
+    'DeckStage in presenter mode at reveal step 1 of 4: the slide, speaker notes with the step progress, and the next step. Timer-free, so the view is deterministic.',
+  tags: ['slides', 'deck', 'presenter'],
+  component: 'slides/DeckStage',
+  props: ['deck', 'initialSlideId', 'initialStep', 'presenter', 'loadTheme', 'mediaTrust'],
+  load: () => import('./PresenterScreenDemo.svelte'),
 });

@@ -21,8 +21,13 @@ highlights reveal one step at a time ([model](docs/model.md#reveal-steps-fragmen
 [stage](docs/stage.md#reveal-steps)); print and PPTX export flatten them to
 the final state.
 
-Not implemented yet: fullscreen, a second-screen presenter, slot layout for the non-media masters, a tool-side
-PDF exporter, and deck video.
+Fullscreen (with a visible window-filling fallback), a presenter screen in a
+second same-origin window ([stage](docs/stage.md#presenter-screen)) and slot
+layouts for every master ([model](docs/model.md#composition-slots-and-media-regions))
+are implemented.
+
+Not implemented yet: a presenter screen on another device, a tool-side PDF
+exporter, and deck video.
 
 ## Using the package
 
@@ -65,7 +70,7 @@ Decks an agent returns go through `validateDeckDraft` first
 | --- | --- | --- |
 | `@texuli/slides/model` | `parseDeck`, the closed vocabularies (aspects, masters, transitions), reveal steps, theme references, master and media-region composition | [Deck model](docs/model.md) |
 | `@texuli/slides/grammar` | Render tree, structured `slides[]` and legacy-card encodings; `validateDeckDraft` for agent decks | [Catalog grammar and agent decks](docs/grammar.md) |
-| `@texuli/slides/stage` | `DeckStage` (keyboard, overview, presenter view, themes, transitions, media) and `DeckPrint` | [Stage](docs/stage.md) |
+| `@texuli/slides/stage` | `DeckStage` (keyboard, overview, presenter view and screen, fullscreen, themes, transitions, media) and `DeckPrint` | [Stage](docs/stage.md) |
 | `@texuli/slides/export` | Print plans and the PDF seam (browser print or a host exporter); local PPTX export; the XML and ZIP writers | [Print, PDF and PPTX export](docs/export.md) |
 | `@texuli/slides/templates` | Report, pitch and review starter decks | [Starter templates](docs/templates.md) |
 | `@texuli/slides/styles.css` | Stage and print styles, named print pages, reduced-motion rules | [Stylesheet](docs/styles.md) |
@@ -75,8 +80,9 @@ Decks an agent returns go through `validateDeckDraft` first
 The examples registry (`packages/examples/src/slides/`) renders each starter
 template in `DeckStage` (`slides-template-report`, `slides-template-pitch`,
 `slides-template-review`), a media deck in `DeckPrint` (`slides-media-deck`),
-and a slide paused at reveal step 2 of 4 in `DeckStage`
-(`slides-fragments`). Each has committed light and dark visual baselines on
+a slide paused at reveal step 2 of 4 in `DeckStage` (`slides-fragments`), a
+slot-master deck in `DeckPrint` (`slides-slot-masters`), and the presenter
+view at a reveal step (`slides-presenter-screen`). Each has committed light and dark visual baselines on
 desktop Chromium and the Pixel 7 (`pnpm visual -g slides-`). Like the rest of
 the suite, the baselines are recorded on macOS only.
 
@@ -90,7 +96,7 @@ numbers.
 ## Accessibility
 
 [docs/quality/a11y-slides.md](../../docs/quality/a11y-slides.md) records the
-slides accessibility sweep (`tests/e2e/a11y-slides.spec.ts`, run on the four
+slides accessibility sweep (`tests/e2e/a11y-slides.spec.ts`, run on the seven
 slides examples). It covers axe in light, dark, overview, presenter and
 forced-colors states, reflow at 320px, the keyboard map with focus movement,
 and reduced motion.

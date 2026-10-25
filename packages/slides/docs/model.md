@@ -3,7 +3,7 @@
 **Import:** `@texuli/slides/model` (also re-exported from `@texuli/slides`)  
 **Source:** `packages/slides/src/model/`  
 **Tests:** `tests/deck.test.ts`, `tests/transitions.test.ts`, `tests/media.test.ts`,
-`tests/fragments.test.ts`
+`tests/fragments.test.ts`, `tests/stage-screen.test.ts`
 
 The framework-free deck model: validation, the closed vocabularies (aspects,
 masters, transitions), theme references, and the pure helpers the stage, the
@@ -82,22 +82,44 @@ to `content`. `resolveSlideMaster(id)` returns a `SlideMasterLayout` from
 (`SlideMasterSlot`: `title`, `body`, `contentStart`, `contentEnd`, `media`,
 `quote`, `attribution`, `footer`).
 
-The stage composes only the media masters into regions today (below). The
-other slots are model data that the stage does not lay out yet.
+The stage lays every master out into its slots (below). The `title` slot is
+the slide title itself.
 
-## Composition and media regions
+## Composition, slots and media regions
 
 `composeSlide(slide)` returns a `ComposedSlide`: the resolved master and its
-regions (`SlideRegion`, each a `slot` of `media` or `body` with its blocks) in
-reading order.
+regions (`SlideRegion`, each a `slot` of type `SlideRegionSlot` with its
+blocks) in reading order.
 
-- On `media-left` and `media-right` slides, the first top-level media block
-  (`isSlideMediaBlock`) moves into a `media` region, before or after the
-  `body` region.
-- Every other master keeps one `body` region.
-- `SLIDE_REGION_FIT` sets image fit per region: `cover` in a media region,
-  `contain` in the body. An authored `fit` on the block wins. Nested media,
-  such as images inside `columns`, keeps the block defaults.
+- **Slot masters.** `SLIDE_MASTER_CONTENT_SLOTS` is the closed list of content
+  slots per master:
+
+  | Master | Slots, in order |
+  | --- | --- |
+  | `title`, `content`, `closing` | `body`, `footer` |
+  | `section` | `body` |
+  | `two-column` | `contentStart`, `contentEnd`, `footer` |
+  | `quote` | `quote`, `attribution` |
+  | `media-left`, `media-right` | `body` (plus the `media` region below) |
+
+  Top-level `divider` blocks separate the slots: blocks before the first
+  divider fill the first slot, blocks after it the next, and so on. A divider
+  used as a separator is not painted, and its `step` or `reveal` does
+  nothing. Dividers past the last slot stay ordinary blocks, and empty slots
+  are left out, so a `two-column` slide without a divider is one
+  `contentStart` column. The rule needs no new block or catalog vocabulary:
+  agent decks express slots with blocks they can already emit.
+- **Media masters.** On `media-left` and `media-right` slides, the first
+  top-level media block (`isSlideMediaBlock`) moves into a `media` region,
+  before or after the `body` region. Dividers there stay ordinary blocks.
+- **Image fit.** `SLIDE_REGION_FIT` sets image fit per region: `cover` in a
+  media region, `contain` in every other region. An authored `fit` on the
+  block wins. Nested media, such as images inside `columns`, keeps the block
+  defaults.
+
+Slots carry no per-slide or per-block assignment field: a named-slot prop on
+the catalog's `deck-slide` would change the catalog and spec contract, which
+this layer does not own.
 
 The slide is not mutated.
 

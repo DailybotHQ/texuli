@@ -4,7 +4,7 @@
 **Unit tests:** `packages/slides/tests/a11y.test.ts`  
 **Transcripts:** [sr-transcripts-slides.md](sr-transcripts-slides.md)
 
-axe-core and keyboard checks for `DeckStage` and `DeckPrint`, using the four
+axe-core and keyboard checks for `DeckStage` and `DeckPrint`, using the seven
 slides examples as fixtures. Findings were fixed at the source; the gate
 disables no axe rules.
 
@@ -16,6 +16,9 @@ disables no axe rules.
 | `slides-template-pitch` | `DeckStage` on a media-right slide (list + image), notes on slide 2 |
 | `slides-template-review` | `DeckStage` on a media-left slide with a code block |
 | `slides-media-deck` | `DeckPrint`: three pages, figure, image and gallery |
+| `slides-fragments` | `DeckStage` on a slide at reveal step 2 of 4 (stepped list, strike emphasis, hidden callout) |
+| `slides-slot-masters` | `DeckPrint`: title and closing footers, two columns with a footer, quote and attribution |
+| `slides-presenter-screen` | `DeckStage` in presenter mode at reveal step 1 of 4, timer-free |
 
 ## What the gate checks
 
@@ -31,15 +34,26 @@ disables no axe rules.
    - the polite position text;
    - the outline: page h1, slide title h2, presenter pane h2s, one h2 and
      one region per print page;
-   - the complementary “Speaker notes”, the region “Up next” and the timer
-     “Elapsed time”.
+   - the complementary “Speaker notes” and the region “Up next”, with no
+     timer by default (the timer is opt-in, `presenterTimer`);
+   - the Fullscreen button in the controls group;
+   - the slot-masters print view: one h2 per page and the slots in reading
+     order.
 6. **Keyboard:**
    - Right/Left, Page Up, Space, Home and End change slides and move focus
      to the new slide, without wrapping when the deck doesn't loop;
    - `o` focuses the current overview item, and Escape returns focus to
      Overview;
    - `p`, `s` and Escape for the presenter view;
-   - tab order: controls, then slide content, then presenter panes;
+   - tab order: controls (including Fullscreen), then slide content, then
+     presenter panes;
+   - on `slides-fragments`, Right and Left reveal and hide steps, the
+     position text reports “k of s revealed”, hidden items are not visible,
+     and focus stays on the slide;
+   - the presenter screen shows “Reveal step k of s” in the notes and the
+     next step in “Up next”;
+   - Fullscreen opens natively or fills the window with a visible note, focus
+     moves to the slide, and Exit fullscreen returns focus to the button;
    - single-key shortcuts act only while focus is inside the deck.
 7. **Reduced motion:** with `prefers-reduced-motion: reduce`, an entering
    slide has `data-transition="none"`. Without it, the slide gets the deck's
@@ -59,6 +73,11 @@ disables no axe rules.
 
 ## Run
 
+On 2026-10-25, on branch `p005/slides-stage` (port 4872), the sweep with the
+seven fixtures passed 64/64 on `chromium` and `mobile` (Pixel 7). The
+earlier result below predates the reveal-step, slot-master and presenter
+fixtures.
+
 ```sh
 TEXULI_E2E_PORT=<lane-port> pnpm exec playwright test tests/e2e/a11y-slides.spec.ts --project chromium --project mobile
 pnpm vitest run packages/slides/tests/a11y.test.ts
@@ -76,4 +95,8 @@ slides-` reported no changes after the fixes.
 
 - A live screen-reader session; see the transcript method.
 - Firefox and WebKit automation (see above).
-- Reveal steps: validated block data that the stage does not play yet.
+- Escape inside native fullscreen: the browser handles it, so the gate exits
+  with the button; the unit tests cover the `fullscreenchange` path and the
+  Escape exit of the window-filling fallback.
+- The two-window presenter screen over `BroadcastChannel`: covered by unit
+  tests with an in-memory channel, not by a two-window browser run.

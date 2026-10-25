@@ -4,7 +4,7 @@
 **Source:** `packages/slides/src/grammar/`  
 **Tests:** `tests/deck.test.ts`, `tests/grammar-charts.test.ts`,
 `tests/render-tree.test.ts`, `tests/golden-decks.test.ts`,
-`tests/fragments-grammar.test.ts`
+`tests/fragments-grammar.test.ts`, `tests/slots-grammar.test.ts`
 
 Encodings between the deck model ([model.md](model.md)) and catalog trees,
 plus the single validation entry point for decks an agent returns.
@@ -86,6 +86,8 @@ The `DeckDraftResult` carries:
   (`DeckDraftIssue`, `check: 'deck'`);
 - the validated `deck`, or `null`;
 - `slides` (`ResolvedDeckSlide`): per slide, the resolved master layout, the
+  `slots` its blocks fill in reading order
+  ([slot masters](model.md#composition-slots-and-media-regions)), the
   transition (every slide cuts with `reducedMotion: true`), the effective
   theme reference, and `stepCount`, the slide's last reveal step
   (`slideStepCount`: list items and code highlights count one step each).

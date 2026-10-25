@@ -123,3 +123,62 @@ export function fragmentsDeck(): Deck {
   if (!parsed.success) throw new Error(parsed.issues[0]?.message ?? 'Invalid fragments deck');
   return parsed.deck;
 }
+
+/**
+ * Slot masters: dividers split blocks into a title footer, two columns with a
+ * footer, and a quote with its attribution.
+ */
+export function slotMastersDeck(): Deck {
+  const parsed = parseDeck({
+    meta: { title: 'Quarter in review', aspect: '16:9', themeRef: 'graphite' },
+    masters: ['title', 'two-column', 'quote', 'closing'],
+    slides: [
+      {
+        id: 'cover',
+        title: 'Quarter in review',
+        master: 'title',
+        blocks: [
+          { type: 'heading', level: 3, text: 'Example Co. · Q3' },
+          { type: 'divider' },
+          { type: 'text', markdown: 'Fictional figures for illustration.' },
+        ],
+      },
+      {
+        id: 'compare',
+        title: 'Before and after',
+        master: 'two-column',
+        blocks: [
+          { type: 'heading', level: 3, text: 'Last quarter' },
+          { type: 'list', items: [{ text: 'Manual exports' }, { text: 'Weekly reports' }] },
+          { type: 'divider' },
+          { type: 'heading', level: 3, text: 'This quarter' },
+          { type: 'list', items: [{ text: 'Scheduled exports' }, { text: 'Live dashboards' }] },
+          { type: 'divider' },
+          { type: 'text', markdown: 'Source: example.com internal metrics.' },
+        ],
+      },
+      {
+        id: 'voice',
+        title: 'Customer voice',
+        master: 'quote',
+        blocks: [
+          { type: 'quote', quote: 'Reporting went from a day to a minute.' },
+          { type: 'divider' },
+          { type: 'text', markdown: 'Finance lead, Example Freight' },
+        ],
+      },
+      {
+        id: 'close',
+        title: 'Thank you',
+        master: 'closing',
+        blocks: [
+          { type: 'text', markdown: 'Questions welcome.' },
+          { type: 'divider' },
+          { type: 'text', markdown: 'slides@example.com' },
+        ],
+      },
+    ],
+  });
+  if (!parsed.success) throw new Error(parsed.issues[0]?.message ?? 'Invalid slot masters deck');
+  return parsed.deck;
+}
