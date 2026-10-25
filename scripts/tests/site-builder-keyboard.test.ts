@@ -1,6 +1,9 @@
 // @vitest-environment happy-dom
 
+import type { CatalogTreeInput } from '@texuli/catalog/render/renderer';
+import { flushSync, mount, tick, unmount } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
+import BuilderApp from '../../apps/website/src/components/builder/BuilderApp.svelte';
 import {
   listAnnouncement,
   listFocusAfter,
@@ -302,5 +305,247 @@ describe('F6 pane cycling', () => {
     one.addEventListener('keydown', (event) => event.preventDefault(), { once: true });
     f6();
     expect(active()).toBe('One');
+  });
+});
+
+/**
+ * Outline multi-select and node operations (PLAN_005 task 4), on the mounted
+ * builder: Shift/Ctrl selection, group Alt+Arrow moves and Delete, and
+ * Ctrl/Cmd+D, C and V, each one labeled undo step. Pointer drags are
+ * asserted in the browser spec; happy-dom has no layout to drop onto.
+ */
+describe('outline node operations', () => {
+  const text = (markdown: string, id?: string): CatalogTreeInput => ({
+    id: 'blocks-text',
+    props: { block: id ? { type: 'text', id, markdown } : { type: 'text', markdown } },
+  });
+  const DRAFT: CatalogTreeInput = {
+    id: 'layout-page',
+    props: { title: 'Fictional pier notes' },
+    children: [
+      text('alpha'),
+      text('bravo', 'bravo'),
+      { id: 'layout-card', props: { title: 'Box' }, children: [text('charlie')] },
+      text('delta'),
+    ],
+  };
+
+  let app: ReturnType<typeof mount> | undefined;
+  afterEach(() => {
+    if (app) unmount(app);
+    app = undefined;
+    document.body.replaceChildren();
+  });
+
+  async function mountBuilder(initial: CatalogTreeInput = DRAFT, initialSelection = [0]) {
+    const target = document.createElement('div');
+    document.body.append(target);
+    app = mount(BuilderApp, { target, props: { initial, initialSelection } });
+    await flush();
+    return target;
+  }
+  const flush = async () => {
+    flushSync();
+    await tick();
+    await settle();
+  };
+  const row = (root: Element, key: string) => {
+    const element = root.querySelector<HTMLElement>(`[data-builder-row="${key}"]`);
+    if (!element) throw new Error(`no row ${key}`);
+    return element;
+  };
+  const selectedKeys = (root: Element) =>
+    [...root.querySelectorAll('[role="treeitem"][aria-selected="true"]')].map((element) =>
+      element.getAttribute('data-builder-row')
+    );
+  const draft = (root: Element): CatalogTreeInput =>
+    JSON.parse(
+      root.querySelector<HTMLTextAreaElement>('[data-builder-payload] textarea')?.value ?? '{}'
+    );
+  /** Reading-order markdown and block ids: what a structural op must change or keep. */
+  const texts = (tree: CatalogTreeInput): string[] => {
+    const out: string[] = [];
+    const visit = (node: CatalogTreeInput) => {
+      const block = node.props?.block as { markdown?: string; id?: string } | undefined;
+      if (block?.markdown) out.push(block.id ? `${block.markdown}#${block.id}` : block.markdown);
+      for (const child of node.children ?? []) visit(child);
+    };
+    visit(tree);
+    return out;
+  };
+  const outlineStatus = (root: Element) =>
+    root.querySelector('[data-outline-status]')?.textContent ?? '';
+  const button = (root: Element, name: string) => {
+    const found = [...root.querySelectorAll<HTMLButtonElement>('button')].find(
+      (element) => element.textContent?.trim() === name
+    );
+    if (!found) throw new Error(`no button ${name}`);
+    return found;
+  };
+  const undoTitle = (root: Element) => button(root, 'Undo').title;
+  const key = async (target: Element, name: string, init: KeyboardEventInit = {}) => {
+    press(target, name, init);
+    await flush();
+  };
+
+  it('extends with Shift+Arrow, toggles with Space and Ctrl+click, ranges with Shift+click', async () => {
+    const root = await mountBuilder();
+    expect(root.querySelector('[role="tree"]')?.getAttribute('aria-multiselectable')).toBe('true');
+    expect(selectedKeys(root)).toEqual(['0']);
+    await key(row(root, '0'), 'ArrowDown', { shiftKey: true });
+    expect(selectedKeys(root)).toEqual(['0', '1']);
+    expect(document.activeElement).toBe(row(root, '1'));
+    await key(row(root, '1'), ' ');
+    expect(selectedKeys(root)).toEqual(['0']);
+    row(root, '3').dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+    await flush();
+    expect(selectedKeys(root)).toEqual(['0', '3']);
+    row(root, '1').dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }));
+    await flush();
+    // The anchor is the last toggled row (3): the range runs 1 → 3 in reading order.
+    expect(selectedKeys(root)).toEqual(['1', '2', '2.0', '3']);
+    await key(row(root, '1'), 'Escape');
+    expect(selectedKeys(root)).toEqual(['1']);
+    await key(row(root, '1'), 'a', { ctrlKey: true });
+    expect(selectedKeys(root)).toHaveLength(6);
+    // A plain click collapses to one row again.
+    row(root, '3').click();
+    await flush();
+    expect(selectedKeys(root)).toEqual(['3']);
+  });
+
+  it('moves a selection with Alt+Arrow as one labeled step, and the selection follows', async () => {
+    const root = await mountBuilder();
+    await key(row(root, '0'), 'ArrowDown', { shiftKey: true });
+    await key(row(root, '1'), 'ArrowDown', { altKey: true });
+    expect(texts(draft(root))).toEqual(['charlie', 'alpha', 'bravo#bravo', 'delta']);
+    expect(outlineStatus(root)).toBe('Moved 2 components.');
+    expect(selectedKeys(root)).toEqual(['1', '2']);
+    expect(undoTitle(root)).toBe('Undo: Move Text blocks and 1 more');
+    // A second step, then all or nothing: once bravo is last, the group move down is refused.
+    await key(row(root, '1'), 'ArrowDown', { altKey: true });
+    expect(texts(draft(root))).toEqual(['charlie', 'delta', 'alpha', 'bravo#bravo']);
+    await key(row(root, '2'), 'ArrowDown', { altKey: true });
+    expect(outlineStatus(root)).toBe(
+      'One of the selected components is already last in its group.'
+    );
+    expect(texts(draft(root))).toEqual(['charlie', 'delta', 'alpha', 'bravo#bravo']);
+    button(root, 'Undo').click();
+    await flush();
+    button(root, 'Undo').click();
+    await flush();
+    expect(draft(root)).toEqual(DRAFT);
+    // Undo brings the whole group back selected.
+    expect(selectedKeys(root)).toEqual(['0', '1']);
+  });
+
+  it('deletes a selection as one undoable step', async () => {
+    const root = await mountBuilder();
+    await key(row(root, '0'), ' ');
+    row(root, '3').dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+    await flush();
+    row(root, '1').dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+    await flush();
+    expect(button(root, 'Remove 2 components').disabled).toBe(false);
+    await key(row(root, '1'), 'Delete');
+    expect(texts(draft(root))).toEqual(['alpha', 'charlie']);
+    expect(outlineStatus(root)).toBe('Removed 2 components.');
+    expect(undoTitle(root)).toBe('Undo: Remove Text blocks and 1 more');
+    button(root, 'Undo').click();
+    await flush();
+    expect(draft(root)).toEqual(DRAFT);
+    expect(selectedKeys(root)).toEqual(['1', '3']);
+  });
+
+  it('duplicates with Ctrl+D: right after each original, fresh block ids, selected, undoable', async () => {
+    const root = await mountBuilder(DRAFT, [1]);
+    await key(row(root, '1'), 'd', { ctrlKey: true });
+    expect(texts(draft(root))).toEqual([
+      'alpha',
+      'bravo#bravo',
+      'bravo#bravo-copy',
+      'charlie',
+      'delta',
+    ]);
+    expect(selectedKeys(root)).toEqual(['2']);
+    expect(document.activeElement).toBe(row(root, '2'));
+    expect(outlineStatus(root)).toBe('Duplicated Text blocks.');
+    expect(undoTitle(root)).toBe('Undo: Duplicate Text blocks');
+    // A group duplicate through the button: the card carries its child.
+    await key(row(root, '2'), 'ArrowDown', { shiftKey: true });
+    button(root, 'Duplicate').click();
+    await flush();
+    expect(texts(draft(root))).toEqual([
+      'alpha',
+      'bravo#bravo',
+      'bravo#bravo-copy',
+      'bravo#bravo-copy-2',
+      'charlie',
+      'charlie',
+      'delta',
+    ]);
+    expect(undoTitle(root)).toBe('Undo: Duplicate 2 components');
+    button(root, 'Undo').click();
+    await flush();
+    button(root, 'Undo').click();
+    await flush();
+    expect(draft(root)).toEqual(DRAFT);
+  });
+
+  it('copies with Ctrl+C and pastes with Ctrl+V inside a container or after a leaf', async () => {
+    const root = await mountBuilder(DRAFT, [1]);
+    expect(button(root, 'Paste').disabled).toBe(true);
+    await key(row(root, '1'), 'c', { ctrlKey: true });
+    expect(outlineStatus(root)).toContain('Copied Text blocks.');
+    // Copying changes nothing and adds no history step.
+    expect(draft(root)).toEqual(DRAFT);
+    expect(button(root, 'Undo').disabled).toBe(true);
+    expect(button(root, 'Paste').disabled).toBe(false);
+    row(root, '2').click();
+    await flush();
+    await key(row(root, '2'), 'v', { metaKey: true });
+    expect(texts(draft(root))).toEqual([
+      'alpha',
+      'bravo#bravo',
+      'charlie',
+      'bravo#bravo-copy',
+      'delta',
+    ]);
+    expect(selectedKeys(root)).toEqual(['2.1']);
+    expect(undoTitle(root)).toBe('Undo: Paste Text blocks');
+    // On a leaf, the paste lands right after it, with yet another fresh id.
+    await key(row(root, '2.1'), 'v', { ctrlKey: true });
+    expect(texts(draft(root))).toEqual([
+      'alpha',
+      'bravo#bravo',
+      'charlie',
+      'bravo#bravo-copy',
+      'bravo#bravo-copy-2',
+      'delta',
+    ]);
+  });
+
+  it('refuses a paste that breaks the page structure, visibly, without a history step', async () => {
+    // A doc layout nested in a page is already one structural error; a second one adds another.
+    const withDoc: CatalogTreeInput = {
+      id: 'layout-page',
+      props: { title: 'Fictional' },
+      children: [{ id: 'layout-doc', props: { title: 'Doc' }, children: [] }, text('alpha')],
+    };
+    const root = await mountBuilder(withDoc, [0]);
+    await key(row(root, '0'), 'c', { ctrlKey: true });
+    row(root, '1').click();
+    await flush();
+    await key(row(root, '1'), 'v', { ctrlKey: true });
+    expect(outlineStatus(root)).toBe(
+      'That change would break the page structure, so it was not applied.'
+    );
+    expect(draft(root)).toEqual(withDoc);
+    expect(button(root, 'Undo').disabled).toBe(true);
+    // Duplicating it is refused the same way.
+    row(root, '0').click();
+    await flush();
+    await key(row(root, '0'), 'd', { ctrlKey: true });
+    expect(draft(root)).toEqual(withDoc);
   });
 });

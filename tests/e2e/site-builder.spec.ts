@@ -288,16 +288,19 @@ test.describe('texuli.com blueprint builder', () => {
     await visit(page);
     await loadDraft(page);
     const row = page.locator('[data-builder-row="1"]');
-    await row.focus();
-    await row.evaluate((element) => {
-      element.dispatchEvent(
-        new DragEvent('dragstart', { bubbles: true, dataTransfer: new DataTransfer() })
-      );
-    });
+    await row.scrollIntoViewIfNeeded();
+    const box = await row.boundingBox();
+    if (!box) throw new Error('row has no box');
+    // A pointer press that travels past the drag threshold starts the drag.
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 + 12);
     await expect(row).toHaveClass(/outline__item--dragging/);
     await page.keyboard.press('Escape');
     await expect(row).not.toHaveClass(/outline__item--dragging/);
     await expect(page.locator('[data-outline-status]')).toHaveText('Move cancelled.');
+    await page.mouse.up();
+    expect(await markdownOrder(page)).toEqual(['one', 'two', 'three']);
   });
 
   test('builder uses no modal overlay state', async ({ page }) => {

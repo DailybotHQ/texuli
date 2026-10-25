@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { CatalogPropSchema } from '@texuli/catalog';
-import { applyEditOp } from '@texuli/catalog/edit';
+import { applyEditOps, type EditOp } from '@texuli/catalog/edit';
 import type { CatalogTreeInput } from '@texuli/catalog/render/renderer';
 import { TRUST_PINNED_IDS } from '@texuli/player';
 import { tick, untrack } from 'svelte';
@@ -33,6 +33,16 @@ import {
   flattenTree,
   inspectorFields,
 } from './model.ts';
+import {
+  copySubtrees,
+  duplicateOps,
+  GROUP_REFUSAL_TEXT,
+  groupName,
+  groupRemoveOps,
+  groupRoots,
+  pasteOps,
+  placedPaths,
+} from './outline/group.ts';
 import { moveKeepsStructure } from './outline/guard.ts';
 import { type MoveOp, manifestCanContain } from './outline/model.ts';
 import Outline from './outline/Outline.svelte';
@@ -60,6 +70,10 @@ let tree = $state<CatalogTreeInput>(history.tree);
 let historyView = $state(readHistory());
 let builderRoot = $state<HTMLElement | undefined>();
 let selected = $state<number[]>(untrack(() => [...initialSelection]));
+// The outline's multi-selection, as row keys; `selected` is the focused row the inspector shows.
+let selection = $state<string[]>(untrack(() => [initialSelection.join('.')]));
+// Copied subtrees live here only: no system clipboard, so nothing leaves the page.
+let clipboard = $state<CatalogTreeInput[]>([]);
 let diagnostic = $state('');
 let propDraft = $state<Record<string, string>>({});
 
@@ -99,7 +113,7 @@ function readHistory() {
   };
 }
 
-function apply(op: Parameters<typeof applyEditOp>[1], coalesceKey?: string) {
+function apply(op: EditOp | readonly EditOp[], coalesceKey?: string) {
   const result = history.apply(op, coalesceKey ? { coalesceKey } : undefined);
   if (!result.ok) {
     diagnostic = result.error.message;
@@ -121,7 +135,7 @@ async function insert(id: string) {
     index = tree.children?.length ?? 0;
   }
   if (apply({ op: 'insert', parent: parentPath, index, node: { id, props: {}, children: [] } })) {
-    selected = [...parentPath, index];
+    select([...parentPath, index]);
     await tick();
     document
       .querySelector<HTMLButtonElement>(`[data-builder-row="${selected.join('.')}" ]`)
@@ -129,18 +143,74 @@ async function insert(id: string) {
   }
 }
 
-/** Outline moves: refused when the edit core rejects them or they add structural errors. */
-function move(op: MoveOp): string | null {
-  const next = applyEditOp(tree, op);
-  if (!next.ok) return next.error.message;
-  if (!moveKeepsStructure(tree, next.tree)) {
-    return 'That move would break the page structure, so it was not applied.';
-  }
-  return apply(op) ? null : diagnostic;
+/** Select one row, dropping any multi-selection. */
+function select(path: number[]) {
+  selected = path;
+  selection = [path.join('.')];
 }
 
-function remove(path: number[]) {
-  if (apply({ op: 'remove', path })) selected = path.slice(0, -1);
+/**
+ * Structural outline edits (moves, duplicates, pastes) as one labeled step:
+ * refused when the edit core rejects them or they add structural errors,
+ * the same guard for keyboard, drag, group and paste.
+ */
+function applyStructural(ops: readonly EditOp[], label?: string): string | null {
+  const next = applyEditOps(tree, ops);
+  if (!next.ok) return next.error.message;
+  if (!moveKeepsStructure(tree, next.tree)) {
+    return 'That change would break the page structure, so it was not applied.';
+  }
+  const result = history.apply(ops, label ? { label } : undefined);
+  if (!result.ok) {
+    diagnostic = result.error.message;
+    return diagnostic;
+  }
+  tree = result.tree;
+  historyView = readHistory();
+  diagnostic = 'Draft updated.';
+  return null;
+}
+
+/** Outline moves, one node or a group. The outline moves the selection after. */
+function move(ops: MoveOp[]): string | null {
+  return applyStructural(ops);
+}
+
+/** Remove one or more subtrees (never the root) as one step; select the first one's parent. */
+function remove(paths: number[][]) {
+  const roots = groupRoots(paths);
+  if (roots.length > 0 && apply(groupRemoveOps(roots))) select(roots[0]?.slice(0, -1) ?? []);
+}
+
+function copy(paths: number[][]): string {
+  clipboard = copySubtrees(tree, paths);
+  return `Copied ${groupName(tree, paths, labelOf)}. Paste with Control or Command+V.`;
+}
+
+/** Duplicate or paste: insert ops, guarded and labeled, then select what was added. */
+function place(
+  result: ReturnType<typeof duplicateOps>,
+  verb: 'Duplicate' | 'Paste',
+  name: () => string
+): { ok: boolean; message: string } {
+  if (!result.ok) return { ok: false, message: GROUP_REFUSAL_TEXT[result.reason] };
+  const label = `${verb} ${name()}`;
+  const refused = applyStructural(result.ops, label);
+  if (refused) return { ok: false, message: refused };
+  selected = result.paths[0] ?? [];
+  selection = result.paths.map((path) => path.join('.'));
+  return { ok: true, message: `${verb === 'Duplicate' ? 'Duplicated' : 'Pasted'} ${name()}.` };
+}
+
+const duplicate = (paths: number[][]) =>
+  place(duplicateOps(tree, paths), 'Duplicate', () => groupName(tree, paths, labelOf));
+
+function paste(at: number[]) {
+  const pasted = $state.snapshot(clipboard) as CatalogTreeInput[];
+  const first = pasted[0];
+  const name = () =>
+    pasted.length === 1 && first ? labelOf(first.id) : `${pasted.length} components`;
+  return place(pasteOps(tree, pasted, at, canContain), 'Paste', name);
 }
 
 function updateProp(prop: CatalogPropSchema, value: unknown) {
@@ -158,7 +228,7 @@ function commitTree(next: CatalogTreeInput): string | null {
   if (!result.ok) return result.error.message;
   tree = result.tree;
   historyView = readHistory();
-  selected = [];
+  select([]);
   diagnostic = 'JSON committed. Canonical export is ready.';
   return null;
 }
@@ -167,7 +237,13 @@ function commitTree(next: CatalogTreeInput): string | null {
 function settle(move: HistoryMove | null) {
   if (!move) return;
   tree = move.tree;
-  selected = selectionAfterMove(move, selected);
+  select(selectionAfterMove(move, selected));
+  // A group step brings the whole group back selected.
+  const group = placedPaths(move.ops).filter((path) => atPath(path));
+  if (group.length > 1) {
+    selection = group.map((path) => path.join('.'));
+    if (!selection.includes(selected.join('.'))) selected = group[0] ?? selected;
+  }
   historyView = readHistory();
   diagnostic = announceMove(move);
 }
@@ -190,7 +266,7 @@ function reset() {
   if (history.apply({ op: 'replaceAll', tree: EMPTY_BLUEPRINT }, { label: 'New draft' }).ok) {
     tree = history.tree;
     historyView = readHistory();
-    selected = [];
+    select([]);
     diagnostic = 'Started a new draft.';
   }
 }
@@ -233,16 +309,25 @@ function reset() {
       <Outline
         {tree}
         {selected}
+        {selection}
         {labelOf}
         {canContain}
-        onselect={(path) => (selected = path)}
+        canPaste={clipboard.length > 0}
+        onselect={select}
+        onselectionchange={(keys, focus) => {
+          selection = keys;
+          selected = focus;
+        }}
         onmove={move}
         onremove={remove}
+        oncopy={copy}
+        onduplicate={duplicate}
+        onpaste={paste}
       />
       <PreviewPane
         {tree}
         labelOf={(path) => labelOf(atPath(path)?.id ?? '')}
-        onselect={(path) => (selected = path)}
+        onselect={select}
       />
     </section>
 

@@ -89,19 +89,23 @@ imports only `@texuli/catalog`, `@texuli/player` and Svelte.
 | File | Role |
 | --- | --- |
 | `model.ts` | Framework-free: tree → rows (`outlineRows`, with level, position and sibling count), and keyboard or drag intents → `move` edit ops (`keyboardMove`, `dropMove`). Ops use the edit core's addressing: the node is removed first, and `parent`/`index` address the tree after removal |
-| `guard.ts` | Refuses a move that adds structural errors, using the same `validateDraft` check the player runs |
+| `group.ts` | Framework-free group operations: multi-select (`toggleKey`, `rangeKeys`, `groupRoots`), group moves and drops (`groupKeyboardMove`, `groupDropMove`), group delete (`groupRemoveOps`), duplicate (`duplicateOps`), copy and paste (`copySubtrees`, `pasteOps`), and path bookkeeping (`pathAfterOp`, `placedPaths`) |
+| `guard.ts` | Refuses a change that adds structural errors, using the same `validateDraft` check the player runs |
 | `Outline.svelte` | The tree |
 
-Every move, by keyboard or by drag, becomes one `move` op that the builder
-applies through its undoable edit history. **Undo** reverses it. The edit
-core refuses impossible moves (into the node's own subtree), and the guard
-refuses moves that would break the page structure. A component can hold
+Every move, by keyboard or by drag, for one row or a whole selection,
+becomes `move` ops that the builder applies as one step of its undoable
+edit history. **Undo** reverses the step. The edit core refuses impossible
+moves (into the node's own subtree), and the guard refuses moves,
+duplicates and pastes that would break the page structure. A component can hold
 children only when its manifest declares a `children` slot: the page, doc,
 deck, card and grid layouts and the deck slide.
 
-**Keyboard and screen readers.** The outline is an APG single-select tree
-(selection follows focus, one Tab stop). Rows expose `aria-level`,
-`aria-setsize`, `aria-posinset` and, on parents, `aria-expanded`.
+**Keyboard and screen readers.** The outline is an APG multi-select tree
+(`aria-multiselectable`, one Tab stop). Plain arrows move focus and
+selection together; Shift and Ctrl/Cmd extend the selection. Rows expose
+`aria-level`, `aria-setsize`, `aria-posinset`, `aria-selected` and, on
+parents, `aria-expanded`. The inspector shows the focused row.
 
 | Key | Action |
 | --- | --- |
@@ -111,27 +115,66 @@ deck, card and grid layouts and the deck slide.
 | Alt+↑ / Alt+↓ | Move the component up or down among its siblings |
 | Alt+→ | Move it into the component above, as its last child |
 | Alt+← | Move it out of its group, just after its parent |
-| Delete / Backspace | Remove the component; focus moves to its parent |
+| Delete / Backspace | Remove the selected components; focus moves to the first one's parent |
+| Space | Add the row to the selection, or take it out |
+| Shift+Space / Shift+↓ / Shift+↑ | Select every row from the anchor (the last row toggled or reached with a plain key) |
+| Ctrl/Cmd+A | Select every row |
+| Escape | Keep only the focused row selected (during a drag, cancel the drag) |
+| Ctrl/Cmd+C | Copy the selected subtrees |
+| Ctrl/Cmd+V | Paste inside the focused row when it holds children (as its last children), otherwise right after it |
+| Ctrl/Cmd+D | Duplicate each selected subtree right after itself |
+
+The pointer follows the same rules: a click selects one row, Ctrl/Cmd+click
+toggles a row, and Shift+click selects the range from the anchor. Space and
+Shift+Space follow the data grid's selection keys.
 
 In a right-to-left page the horizontal keys swap, as the tree pattern
 expects: ← enters the first child, → returns to the parent, and Alt+→ moves
 the component out of its group.
 
-After a move, focus follows the moved row. A polite status announces each
-move, and explains each refused one ("Already first in its group.",
-"That component cannot hold other components.", …). Rows render manifest
+After a move, focus follows the moved row, and after a group move the whole
+group stays selected. A polite status announces each move, and explains
+each refused one ("Already first in its group.", "That component cannot
+hold other components.", …). Rows render manifest
 labels as text; they are never HTML sinks.
 
 **Removing.** The tree holds only treeitems, as the pattern requires. The
-**Remove** button below it acts on the selected row (it is disabled for the
-page root), and Delete does the same from the keyboard.
+**Remove**, **Duplicate**, **Copy** and **Paste** buttons below it act on
+the selection (the page root is never removed, duplicated or copied), and
+the keys above do the same from the keyboard.
 
-**Drag and drop.** Rows other than the root can be dragged. Dropping in the
-top or bottom quarter of a container row places the component before or
-after it; dropping in the middle places it inside, as the last child. Leaf
-rows take before or after. The drop line appears only where the outline
-model accepts a drop; the structure guard can still refuse it on drop, with
-a message.
+**Selections.** A group action acts on the selected rows; a row whose
+ancestor is also selected travels with that ancestor. Group moves are all
+or nothing: when one selected component cannot take the step (already
+first, no container above), none moves and the status says why. Each group
+action is one history step with its own label ("Move Text blocks and 1
+more", "Remove Text blocks and 2 more", "Duplicate 2 components"). Undo and
+redo bring the whole group back selected. Structural steps do not coalesce;
+each one undoes on its own.
+
+**Duplicate, copy and paste.** A duplicate or a paste is a deep copy of
+the subtree. Each content block `id` in it (a block's `id` becomes an HTML
+id, such as a heading anchor) is renamed deterministically, `intro` to
+`intro-copy` and then `intro-copy-2`, so no id repeats in the draft. Copied
+subtrees stay in the builder's own state: the system clipboard is never
+read or written, and **Copy JSON** in the toolbar is still the way to take
+the whole draft out. A paste goes through the same structure guard as a
+move, so a paste the composition grammar refuses changes nothing, adds no
+history step, and says why.
+
+**Drag and drop.** Rows other than the root can be dragged with pointer
+events, so mouse, pen and touch use one path. A touch drag starts on the
+row's grip handle (the rows themselves keep scrolling); the handle is
+hidden from assistive technology because Alt+Arrow keys do the same moves.
+A press becomes a drag after it travels 4 pixels. Dropping in the top or
+bottom quarter of a container row places the component before or after it;
+dropping in the middle places it inside, as the last child. Leaf rows take
+before or after. Dragging a row that is part of a multi-selection drags the
+whole selection, which lands together in reading order. The drop line
+appears where the outline model accepts a drop. A refused target is
+outlined as refused and its reason shows under the tree; dropping there, or
+outside the outline, moves nothing and announces why. The structure guard
+can still refuse a drop it accepts, with a message.
 
 ## Accessibility
 
@@ -467,6 +510,9 @@ steps each, with a small in-file mulberry32 generator and no new
 dependency. The steps are:
 - palette inserts with valid props;
 - outline Alt+Arrow moves, under the outline's structural guard;
+- outline node operations (PLAN_005 task 4): group Alt+Arrow moves, group
+  drops, group delete, duplicate and paste, through the same guard, each
+  one history step that a single undo restores;
 - removals;
 - inspector writes through the choice, number and text field models;
 - undo;
@@ -479,7 +525,9 @@ After every step it asserts:
   builder's `blueprintDigest` whenever the draft validates;
 - the outline rows rebuild the same structure;
 - every inspector field reads and writes back its value unchanged;
-- a refused step changes nothing.
+- a refused step changes nothing;
+- no content block id repeats (duplicates and pastes always take fresh
+  ones).
 
 Hostile commits cover unknown props, `on*` and `class`, unknown ids,
 truncated text, duplicate keys, extra node fields, a props array and a
@@ -526,7 +574,8 @@ The whole builder works from the keyboard (Task 75). Its parts:
     it moves focus.
 - **Inside panes:**
   - **Outline:** one Tab stop (roving `tabindex`): arrows move between rows,
-    Alt+Arrows move nodes, Delete removes a node.
+    Alt+Arrows move nodes, Delete removes them, Space and Shift extend the
+    selection, and Ctrl/Cmd+C, V and D copy, paste and duplicate.
   - **Palette:** arrows choose an option, Enter inserts it, Escape clears the
     search (nothing else to close, so nothing traps).
   - **Preview:** the player has its own "Skip past" link and keyboard (charts,
@@ -550,7 +599,13 @@ The whole builder works from the keyboard (Task 75). Its parts:
   - Nested lists handle their own keys.
 
 `site-builder-keyboard.test.ts` covers the focus rules, the list action on
-a DOM list and the pane cycle. The browser spec:
+a DOM list and the pane cycle. It also mounts the builder (happy-dom) for
+the outline's node operations: Shift, Space, Ctrl/Cmd+click, Shift+click,
+Ctrl/Cmd+A and Escape selection; group Alt+Arrow moves and Delete with
+their labels, undo and restored group selection; Ctrl/Cmd+D, C and V with
+fresh block ids; and a paste and a duplicate the structure guard refuses.
+Pointer drags are not asserted there (happy-dom has no layout); the browser
+spec drags. The browser spec:
 - walks Tab and Shift+Tab across the panes;
 - cycles them with F6 and Shift+F6, including restoring the last focus;
 - moves list items, gallery images and chart points from the keyboard.
@@ -587,8 +642,9 @@ The browser spec (`tests/e2e/site-builder.spec.ts`, 22 tests) covers:
 - **palette**: keyboard-only search, arrow selection and insert, and the
   disabled Tier U entries with their reasons;
 - **outline**: Alt+Arrow moves with their announcements, the swapped
-  horizontal keys in a right-to-left page, a drag into a card, and removal
-  by Delete and by the **Remove** button;
+  horizontal keys in a right-to-left page, a pointer drag into a card, a
+  drag cancelled with Escape, and removal by Delete and by the **Remove**
+  button;
 - **inspector**: a text block edited through its structured fields; refused
   enum and boolean values cleared and fixed; number fields with refused,
   out-of-range and unreadable values; structured props edited field by field
@@ -611,6 +667,7 @@ The browser spec (`tests/e2e/site-builder.spec.ts`, 22 tests) covers:
 - axe in light, dark and forced-colors modes.
 
 **Not covered yet:** collapsing outline branches, drag from the palette into
-the outline (planned), a screen-reader pass, and Firefox. WebKit runs of the
+the outline (planned), browser runs of multi-select, group drags, touch
+drags, duplicate and paste (planned for the site spec), a screen-reader pass, and Firefox. WebKit runs of the
 builder spec are not verified on the current machine (the browser does not
 launch).

@@ -3,6 +3,7 @@
 import type { CatalogPropSchema } from '@texuli/catalog';
 import {
   applyEditOp,
+  applyEditOps,
   blueprintDigest,
   canonicalBlueprintJson,
   type EditOp,
@@ -35,8 +36,18 @@ import {
   createBuilderHistory,
   validateBuilderTree,
 } from '../../apps/website/src/components/builder/model.ts';
+import {
+  blockIds,
+  copySubtrees,
+  duplicateOps,
+  groupDropMove,
+  groupKeyboardMove,
+  groupRemoveOps,
+  pasteOps,
+} from '../../apps/website/src/components/builder/outline/group.ts';
 import { moveKeepsStructure } from '../../apps/website/src/components/builder/outline/guard.ts';
 import {
+  type DropPosition,
   keyboardMove,
   type MoveIntent,
   manifestCanContain,
@@ -62,7 +73,10 @@ import { createPlayerCatalog } from '../../packages/player/src/catalog.ts';
  *   whenever the draft validates;
  * - the outline rows rebuild the same structure;
  * - every inspector field reads and writes back its value unchanged;
- * - a refused step leaves the tree untouched.
+ * - a refused step leaves the tree untouched;
+ * - no block id repeats (duplicates and pastes always take fresh ones).
+ * PLAN_005 task 4 adds the outline's group moves and drops, group delete,
+ * duplicate and paste, through the same guard the outline applies.
  * A failure message names the seed and the steps, so it replays exactly.
  */
 
@@ -104,8 +118,14 @@ function textBlock(rng: Rng): TextBlockValue {
 }
 
 /** Palette inserts: valid props for each id the generator places. */
+/** Block ids for inserted text blocks: unique per seed, so a repeat can only come from a copy. */
+let blockSerial = 0;
 const INSERTS: Readonly<Record<string, (rng: Rng) => Record<string, unknown>>> = {
-  'blocks-text': (rng) => ({ block: textBlock(rng) }),
+  'blocks-text': (rng) => {
+    if (!rng.chance(0.5)) return { block: textBlock(rng) };
+    blockSerial += 1;
+    return { block: { ...textBlock(rng), id: `b${blockSerial}` } };
+  },
   'layout-card': (rng) => (rng.chance(0.7) ? { title: phrase(rng) } : {}),
   'layout-grid': () => ({}),
   'charts-gauge': (rng) => ({ label: phrase(rng), value: rng.int(101) }),
@@ -185,6 +205,10 @@ async function assertInvariants(
   player.dispose();
 
   expect(treeFromRows(tree), `${where}: outline rows`).toEqual(skeleton(tree));
+
+  const ids: string[] = [];
+  for (const { node } of nodes(tree)) ids.push(...blockIds({ id: node.id, props: node.props }));
+  expect(new Set(ids).size, `${where}: block ids unique`).toBe(ids.length);
 
   for (const { node, path } of nodes(tree)) {
     for (const prop of fieldsOf(node.id)) {
@@ -313,8 +337,52 @@ function hostileJsonText(rng: Rng, tree: CatalogTreeInput): { text: string; kind
   }
 }
 
+/** A random selection of 1–3 non-root rows, as the outline's multi-select would hold. */
+function selection(rng: Rng, tree: CatalogTreeInput): number[][] {
+  const movable = nodes(tree).filter(({ path }) => path.length > 0);
+  const picked: number[][] = [];
+  for (let count = 1 + rng.int(3); count > 0 && movable.length > 0; count -= 1) {
+    picked.push(rng.pick(movable).path);
+  }
+  return picked;
+}
+
+/** One outline node operation: the ops the outline would send, or `null` when its model refuses. */
+function outlineOps(rng: Rng, tree: CatalogTreeInput, clipboard: CatalogTreeInput[]) {
+  const paths = selection(rng, tree);
+  if (paths.length === 0) return null;
+  const kind = rng.pick(['group-move', 'group-drop', 'group-remove', 'duplicate', 'paste']);
+  if (kind === 'group-remove') return { kind, ops: groupRemoveOps(paths) };
+  if (kind === 'paste') {
+    if (rng.chance(0.6) || clipboard.length === 0)
+      clipboard.splice(0, clipboard.length, ...copySubtrees(tree, paths));
+    const result = pasteOps(tree, clipboard, rng.pick(nodes(tree)).path, canContain);
+    return result.ok ? { kind, ops: result.ops } : null;
+  }
+  const result =
+    kind === 'duplicate'
+      ? duplicateOps(tree, paths)
+      : kind === 'group-move'
+        ? groupKeyboardMove(
+            tree,
+            paths,
+            rng.pick<MoveIntent>(['up', 'down', 'indent', 'outdent']),
+            canContain
+          )
+        : groupDropMove(
+            tree,
+            paths,
+            rng.pick(nodes(tree)).path,
+            rng.pick<DropPosition>(['before', 'after', 'inside']),
+            canContain
+          );
+  return result.ok ? { kind, ops: result.ops as EditOp[] } : null;
+}
+
 async function runSeed(seed: number, tally: Tally): Promise<void> {
   const rng = generator(seed);
+  blockSerial = 0;
+  const clipboard: CatalogTreeInput[] = [];
   const history = createBuilderHistory();
   const log: string[] = [];
   const where = () => `seed ${seed} after [${log.join(', ')}]`;
@@ -327,7 +395,7 @@ async function runSeed(seed: number, tally: Tally): Promise<void> {
       tally[kind] = (tally[kind] ?? 0) + 1;
       log.push(kind);
     };
-    if (roll < 28) {
+    if (roll < 24) {
       const containers = nodes(before).filter(({ node }) => canContain(node.id));
       const { node, path } = rng.pick(containers);
       const id = rng.pick(Object.keys(INSERTS));
@@ -343,12 +411,12 @@ async function runSeed(seed: number, tally: Tally): Promise<void> {
       });
       count(result.ok ? 'insert' : 'insert-refused');
       if (!result.ok) expect(history.tree, where()).toBe(before);
-    } else if (roll < 38) {
+    } else if (roll < 32) {
       const removable = nodes(before).filter(({ path }) => path.length > 0);
       if (removable.length === 0) continue;
       const result = history.apply({ op: 'remove', path: rng.pick(removable).path });
       count(result.ok ? 'remove' : 'remove-refused');
-    } else if (roll < 54) {
+    } else if (roll < 42) {
       const movable = nodes(before).filter(({ path }) => path.length > 0);
       if (movable.length === 0) continue;
       const intent = rng.pick<MoveIntent>(['up', 'down', 'indent', 'outdent']);
@@ -366,13 +434,37 @@ async function runSeed(seed: number, tally: Tally): Promise<void> {
       const result = history.apply(move.op);
       expect(result.ok, where()).toBe(true);
       count('move');
+    } else if (roll < 58) {
+      const planned = outlineOps(rng, before, clipboard);
+      if (!planned || planned.ops.length === 0) {
+        count('outline-impossible');
+        continue;
+      }
+      // The builder's applyStructural rule (removals go straight to the history, as in the outline).
+      const next = applyEditOps(before, planned.ops);
+      expect(next.ok, `${where()}: ${planned.kind} ops apply`).toBe(true);
+      if (!next.ok) continue;
+      if (planned.kind !== 'group-remove' && !moveKeepsStructure(before, next.tree)) {
+        count(`${planned.kind}-refused`);
+        expect(history.tree, where()).toBe(before);
+        continue;
+      }
+      const result = history.apply(planned.ops);
+      expect(result.ok, `${where()}: ${planned.kind}`).toBe(true);
+      // One step: a single undo restores the tree exactly.
+      if (rng.chance(0.25)) {
+        expect(history.undo(), where()).toBe(true);
+        expect(canonical(history.tree), `${where()}: ${planned.kind} undo`).toBe(canonical(before));
+        expect(history.redo(), where()).toBe(true);
+      }
+      count(planned.kind);
     } else if (roll < 76) {
       const op = inspectorOp(rng, before);
       if (!op) continue;
       const result = history.apply(op, { coalesceKey: `prop:${op.path.join('.')}:${op.name}` });
       count(result.ok ? 'inspector' : 'inspector-refused');
       if (!result.ok) expect(history.tree, where()).toBe(before);
-    } else if (roll < 82) {
+    } else if (roll < 81) {
       count(history.undo() ? 'undo' : 'undo-empty');
     } else if (roll < 92) {
       const text = validJsonText(rng, before);
@@ -412,7 +504,20 @@ describe('builder round-trip property (Task 72)', () => {
     // TEXULI_PROPERTY_TALLY=1 prints how often each step kind ran.
     if (process.env.TEXULI_PROPERTY_TALLY) console.log(JSON.stringify(tally));
     // The generator really exercised every kind of step (deterministic per seed set).
-    for (const kind of ['insert', 'remove', 'move', 'inspector', 'json', 'undo', 'playerValid']) {
+    for (const kind of [
+      'insert',
+      'remove',
+      'move',
+      'group-move',
+      'group-drop',
+      'group-remove',
+      'duplicate',
+      'paste',
+      'inspector',
+      'json',
+      'undo',
+      'playerValid',
+    ]) {
       expect(tally[kind] ?? 0, `${kind} ran`).toBeGreaterThan(0);
     }
     expect(
