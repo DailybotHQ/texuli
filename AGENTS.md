@@ -22,7 +22,8 @@ end to end and native for agents:
 
 **Status: in development, not released.** Package names are reserved on npm as
 `0.1.0-next.0` (dist-tag `next`, published by the owner); the workspace packages
-stay `private: true`, no stable release is out, and texuli.com is not deployed. See
+stay `private: true`, no stable release is out, and texuli.com deploys
+from `main` to Cloudflare Pages. See
 [docs/PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md) and
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
@@ -38,6 +39,7 @@ stay `private: true`, no stable release is out, and texuli.com is not deployed. 
 | Testing | [TESTING_GUIDE](docs/TESTING_GUIDE.md) | Every gate with verified results, source→test map, blind spots, posture |
 | Commands | [DEVELOPMENT_COMMANDS](docs/DEVELOPMENT_COMMANDS.md) | Every root and package script, scoped variants |
 | Security | [SECURITY](docs/SECURITY.md) | Threat model: URL policy, HTML sinks, untrusted agent output, CSP, supply chain |
+| CI | [CI](docs/CI.md) | GitHub Actions: checks, behavior suite, website, npm publishing waves, Cloudflare Pages deployment, tracked budget reds |
 | Accessibility | [ACCESSIBILITY](docs/ACCESSIBILITY.md) | The accessibility contract and its checks |
 | Performance | [PERFORMANCE](docs/PERFORMANCE.md) | Size budgets, measured numbers, perf tests |
 | Quality reports | [docs/quality/](docs/README.md#quality-reports-docsquality) | a11y sweeps, consumers, CSP, SSR, packaging, perf, supply chain, screen-reader transcripts |
@@ -69,6 +71,7 @@ texuli/
 │   ├── tools/           L7 @texuli/tools: CLI, llms, A2UI, custom elements, golden set, MCP     (README, docs/)
 │   └── examples/        @texuli/examples (private): the examples registry for tests, visuals and the site
 ├── apps/website/        @texuli/website: texuli.com, Astro 7 + Svelte islands                  (README, docs/)
+├── .github/workflows/   CI (checks, behavior, website, budget audits) and the npm publish workflow
 ├── skills/texuli/       the distributable agent skill (setup.sh, SHA256SUMS)
 ├── tests/
 │   ├── behavior/        primitives behavior suite (scenarios + rows, three projects)
@@ -163,7 +166,7 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The package names are reserved on npm as `0.1.0-next.0` (dist-tag `next`); no stable release is published and texuli.com is not deployed.
+    check results. The package names are reserved on npm as `0.1.0-next.0` (dist-tag `next`); no stable release is published. texuli.com deploys from `main` (Cloudflare Pages).
 13. **Scratch work** goes in `tmp/`. Plan artifacts go in
     `.dwp/plans/<plan>/analysis_results/`, never the repository root.
 14. **Progress reporting** (when a reporting tool is available) is

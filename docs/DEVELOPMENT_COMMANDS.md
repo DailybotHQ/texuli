@@ -95,5 +95,6 @@ own port; 4870 is the default.
 There are no release, publish or deploy commands. Packages are
 `private: true`; the npm names are reserved as `0.1.0-next.0` (dist-tag
 `next`) as name reservations, not supported releases. See [RELEASE](RELEASE.md)
-for the version and owner-GO policy. texuli.com is not deployed. Pushing
-and adding a remote are forbidden until the developer says so.
+for the version and owner-GO policy. texuli.com deploys from `main`
+(CI in [CI](CI.md)); pushing and adding a remote stay gated on the
+developer's instructions.

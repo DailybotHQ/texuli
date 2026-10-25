@@ -2,10 +2,9 @@
 
 > **Small pieces. Infinite possibilities.**
 >
-> Status on 2026-10-24: **pre-release.** The package names are reserved on
+> Status on 2026-10-25: **pre-release.** The package names are reserved on
 > npm as `0.1.0-next.0` (dist-tag `next`, published by the owner from a
-> packaging run); texuli.com is not deployed and the repository has no
-> remote. The
+> packaging run); texuli.com deploys from `main` to Cloudflare Pages. The
 > implementation itself is substantial: every layer from L0 texels to L7
 > tools exists in source with tests, all in this private workspace. The
 > "What exists today" table says exactly what is real.
@@ -79,9 +78,9 @@ closed, documented catalog that can be validated before anything renders.
 | Content blocks (L5) | **Exists**, private | [`packages/blocks`](../packages/blocks/README.md) |
 | Agent catalog and the sink-free renderer (L6) | **Exists**, private | [`packages/catalog`](../packages/catalog/README.md) |
 | Tools (L7): the copy-in CLIs (`texuli-add`, `texuli-init`, `texuli-update`, `texuli-llms`), A2UI, custom elements, the golden set, and the read-only local MCP server source | **Exists as source**, private; no published binaries | [`packages/tools`](../packages/tools/README.md) |
-| Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, not deployed | [`apps/website`](../apps/website/README.md) |
+| Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, deployed at https://texuli.com (Cloudflare Pages) | [`apps/website`](../apps/website/README.md) |
 | npm name reservation | **Done** — `0.1.0-next.0` with dist-tag `next` (owner-published) | — |
-| npm stable release, texuli.com deployment | Planned; needs the developer's explicit go | — |
+| npm stable release | Planned; needs the developer's explicit go. texuli.com deploys from `main` (Cloudflare Pages) | — |
 
 ## Success criteria
 
