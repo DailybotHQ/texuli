@@ -50,6 +50,7 @@ import './data-tree-view/entry.ts';
 import './data-virtual-list/entry.ts';
 import './date/entry.ts';
 import './dialog/entry.ts';
+import './editor/entries.ts';
 import './empty/entry.ts';
 import './core-safe-href/entry.ts';
 import './feedback/entry.ts';
