@@ -43,8 +43,16 @@ function overlayAttachment(node: HTMLDivElement) {
     if (node.contains(node.ownerDocument.activeElement)) context.trigger?.focus();
   };
   node.ownerDocument.addEventListener('keydown', onKeyDown, true);
+  // Flip and shift inside the viewport (8px inset), as Popover does: without
+  // them a card wider than the space beside its trigger left the screen.
   const position = context.trigger
-    ? positionFloating(context.trigger, node, { placement: 'bottom', offset: 6 })
+    ? positionFloating(context.trigger, node, {
+        placement: 'bottom',
+        offset: 6,
+        flip: true,
+        shift: true,
+        boundaryPadding: 8,
+      })
     : undefined;
 
   return () => {
