@@ -87,6 +87,14 @@
     translate: -50% -50%;
   }
 
+  /*
+   * Parts sit at inset-inline-start: <percent>, which counts from the right in
+   * RTL, so the centering translate flips with the direction there.
+   */
+  .tx-slider--horizontal .tx-slider__thumb:dir(rtl) {
+    translate: 50% -50%;
+  }
+
   .tx-slider--vertical .tx-slider__thumb {
     inset-inline-start: 50%;
     translate: -50% 50%;
@@ -130,6 +138,10 @@
     translate: -50% 0;
   }
 
+  .tx-slider--horizontal .tx-slider__tick:dir(rtl) {
+    translate: 50% 0;
+  }
+
   .tx-slider--vertical .tx-slider__tick {
     inset-inline-start: 100%;
     margin-inline-start: 0.25rem;
@@ -155,6 +167,10 @@
     inset-block-start: 0.5rem;
     inset-inline-start: 50%;
     translate: -50% 0;
+  }
+
+  .tx-slider--horizontal .tx-slider__mark-label:dir(rtl) {
+    translate: 50% 0;
   }
 
   .tx-slider--vertical .tx-slider__mark-label {
