@@ -89,19 +89,26 @@
     position: relative;
     display: inline-flex;
     min-inline-size: 0;
+    max-inline-size: 100%;
     padding: 0.125rem;
     border-radius: var(--tx-radius-md, 0.5rem);
   }
 
+  /*
+   * Cells shrink toward a 2rem floor when the row is narrower than their full
+   * size, so six cells fit a 320px phone instead of widening the page.
+   */
   .tx-pin-input__cells {
     display: flex;
     gap: 0.5rem;
+    min-inline-size: 0;
   }
 
   .tx-pin-input__cell {
     display: grid;
     place-items: center;
-    inline-size: 2.75rem;
+    flex: 0 1 2.75rem;
+    min-inline-size: 2rem;
     block-size: 3rem;
     border: 1px solid var(--tx-border, ButtonBorder);
     border-radius: var(--tx-radius-md, 0.5rem);
@@ -134,7 +141,8 @@
   }
 
   .tx-pin-input--sm .tx-pin-input__cell {
-    inline-size: 2.25rem;
+    flex-basis: 2.25rem;
+    min-inline-size: 1.75rem;
     block-size: 2.5rem;
     font-size: var(--tx-font-size-md, 1rem);
   }
@@ -144,7 +152,7 @@
   }
 
   .tx-pin-input--lg .tx-pin-input__cell {
-    inline-size: 3.25rem;
+    flex-basis: 3.25rem;
     block-size: 3.5rem;
     font-size: var(--tx-font-size-xl, 1.25rem);
   }
