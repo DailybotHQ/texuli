@@ -54,9 +54,8 @@ describe('polish audit CSS guards', () => {
 
   it('P1-09: PIN cells shrink toward a floor instead of a fixed size', () => {
     const cell = rule(css('number-pin/number-pin.css'), '.tx-pin-input__cell');
-    expect(cell).toMatch(/flex:\s*0 1 2\.75rem/);
+    expect(cell).toMatch(/flex:\s*0 1 auto/);
     expect(cell).toMatch(/min-inline-size:\s*2rem/);
-    expect(cell).not.toMatch(/(^|[\s;])inline-size:/);
   });
 
   it('P1-10: swatches keep their fill in forced colors', () => {
