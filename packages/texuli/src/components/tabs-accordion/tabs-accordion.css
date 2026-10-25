@@ -23,15 +23,11 @@
   /*
    * The scroller stays inside its container (no negative margin: that bled
    * past a flush edge and scrolled the page). Its clipping would cut an outer
-   * focus ring, so triggers inside it draw the ring inset.
+   * focus ring, so triggers inside it draw the ring inset (below).
    */
   .tx-tabs__scroller {
     overflow-x: auto;
     overflow-y: hidden;
-  }
-
-  .tx-tabs__scroller .tx-tabs__trigger:focus-visible {
-    outline-offset: calc(-1 * var(--tx-focus-ring-width, 2px));
   }
 
   .tx-tabs__list {
@@ -107,6 +103,10 @@
   .tx-tabs__trigger:focus-visible {
     outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
     outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-tabs__scroller .tx-tabs__trigger:focus-visible {
+    outline-offset: calc(-1 * var(--tx-focus-ring-width, 2px));
   }
 
   .tx-tabs__trigger[data-disabled],
