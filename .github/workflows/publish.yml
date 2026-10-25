@@ -1,0 +1,83 @@
+# Publishes the 15 packable packages to npm (docs/RELEASE.md).
+#
+# Trigger: a `v*` tag push, or a manual workflow_dispatch run against a
+# branch. The job rebuilds every tarball from source with
+# `pnpm verify:packages` (publint-strict, byte checks), then publishes the
+# freshly packed tarballs in the documented wave order with `--tag next`.
+# `latest` stays reserved for the 1.0.0 stable release.
+#
+# Requires one repository secret:
+#   NPM_TOKEN — a granular access token of the publishing account with
+#   read-and-write on the @texuli packages. CI tokens bypass 2FA OTP.
+#
+# Tarballs ship with npm provenance (signed, linked to this repository and
+# workflow through GitHub's OIDC token — the `id-token: write` permission).
+name: Publish packages
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Pack, verify and publish (dist-tag next)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: 'https://registry.npmjs.org'
+      - run: pnpm install --frozen-lockfile
+      # Packs the 15 tarballs into tmp/packages/tarballs/ and records
+      # SHA-256 digests; publint warnings fail the job.
+      - run: pnpm verify:packages
+      - name: Publish in wave order (docs/RELEASE.md)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          publish() {
+            local dir="$1" name version slug tarball
+            name=$(node -p "require('./${dir}/package.json').name")
+            version=$(node -p "require('./${dir}/package.json').version")
+            slug=${name#@/}; slug=${slug//\//-}
+            tarball="tmp/packages/tarballs/${slug}-${version}.tgz"
+            test -s "$tarball"
+            echo "Publishing ${name}@${version} (${tarball})"
+            npm publish "$tarball" --tag next --access public --provenance
+          }
+          # Wave 174 — the L0 texels and the L2 token engine.
+          publish packages/core
+          publish packages/tokens
+          # Wave 175 — L1 headless primitives.
+          publish packages/primitives
+          # Wave 176 — L3 styled components.
+          publish packages/texuli
+          # Wave 177 — L4 domain packages.
+          publish packages/charts
+          publish packages/data
+          publish packages/media
+          publish packages/chat
+          publish packages/blocks
+          # Wave 178 — L6/L7 and the newer surfaces.
+          publish packages/catalog
+          publish packages/tools
+          publish packages/astro
+          publish packages/player
+          publish packages/slides
+          publish packages/spec
+          echo "All 15 packages published under dist-tag next."
+      - name: Record digests
+        run: cat tmp/packages/SHA256SUMS

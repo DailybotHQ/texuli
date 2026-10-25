@@ -1,0 +1,117 @@
+# Texuli CI (docs/CI.md).
+#
+# Required checks on every push to main and every pull request:
+#   - check:     lint, typecheck, unit + component tests, layers, supply
+#                chain, docs links, agent skill.
+#   - behavior:  the primitives behavior suite on chromium, webkit and
+#                mobile (the suite's three projects).
+#   - website:   the website build (which runs `astro check`) plus the
+#                browser e2e suite except the budget tests.
+#   - audits:    size budgets and the site-perf budgets, allowed to fail
+#                while the tracked pre-existing reds stand (docs/CI.md).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Lint, types, unit tests, layers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm exec tsx scripts/supply-chain.ts
+      - run: pnpm exec tsx scripts/check-docs.ts
+      - run: pnpm check:skill
+
+  behavior:
+    name: Behavior suite (chromium, webkit, mobile)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium webkit
+      - run: TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/behavior
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: behavior-test-results
+          path: test-results
+          retention-days: 5
+
+  website:
+    name: Website build and site checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm --filter @texuli/website check:csp
+      # The two budget tests inside site-perf are tracked reds; the audit
+      # job below owns them.
+      - run: >-
+          TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e
+          --project chromium --grep-invert "performance budgets"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: website-test-results
+          path: test-results
+          retention-days: 5
+
+  audits:
+    name: Budget audits (tracked pre-existing reds)
+    runs-on: ubuntu-latest
+    # The package size and site-perf budgets carry documented pre-existing
+    # failures (docs/CI.md). They run here so the drift stays visible
+    # without blocking merges; fixing them retires this tolerance.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm size
+      - run: pnpm build
+      - run: TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e/site-perf.spec.ts --project chromium
+      - name: Report
+        if: always()
+        run: |
+          {
+            echo "## Budget audit (allowed to fail)"
+            echo ""
+            echo "Tracked pre-existing reds, documented in docs/CI.md:"
+            echo "- pnpm size: 18 no-budget rows (@texuli/astro, player, slides, spec) and 7 over-budget rows (catalog ×4, charts/math, data/grid-editing)."
+            echo "- site-perf: /charts-page, /color-explorer and /gallery-components document budgets plus the / page weight."
+            echo ""
+            echo "A NEW failure here is a regression — fix it, do not raise a budget."
+          } >> "$GITHUB_STEP_SUMMARY"
