@@ -12,7 +12,7 @@ project overview.
 | [RELEASE](RELEASE.md) | Independent package versions, prerelease and stable dist-tags, owner-GO publication waves |
 | [ARCHITECTURE](ARCHITECTURE.md) | The down-only layer graph, every package and its subpaths, the website, build and test shape |
 | [DECISIONS](DECISIONS.md) | Architecture decisions: options, choice, why, how to reverse |
-| [EDITOR_ARCHITECTURE](EDITOR_ARCHITECTURE.md) | The planned rich text editor's contracts (ADR-003): model, selection, history, keyboard, paste security, interchange; nothing implemented yet |
+| [EDITOR_ARCHITECTURE](EDITOR_ARCHITECTURE.md) | The rich text editor's contracts (ADR-003): model, selection, history, keyboard, paste security, interchange. The model exists as core texels; the editor package is planned |
 | [STANDARDS](STANDARDS.md) | TypeScript, Svelte 5, Astro, CSS, Biome, naming, accessibility |
 | [DESIGN_LANGUAGE](DESIGN_LANGUAGE.md) | The cross-surface visual contract: color roles and modes, spacing and density, shape and elevation, motion and reduced motion, focus, typography, direction |
 | [TESTING_GUIDE](TESTING_GUIDE.md) | Every gate, the source→test map, scoped commands, blind spots, posture |

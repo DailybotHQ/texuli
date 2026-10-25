@@ -18,6 +18,7 @@ rest.
 | Controllable state | `createControllableState` | [core-controllable](docs/core-controllable.md) |
 | Direction and locale | `directionOf`, `inlineSideToPhysical`, `createCollator`, `compareLocale`, `resolveMessages` | [core-dir-locale](docs/core-dir-locale.md) |
 | Dismiss | `bindDismissLayer`, `isPointerOutside`, `isFocusOutside`, `createDismissOutsideEvent`, `createOpenGestureGuard` | [core-dismiss](docs/core-dismiss.md) |
+| Editor model | `loadEditorDocument`, `normalizeDocument`, `validateEditorDocument`, `caret`, `clampSelection`, `inlineToTree`; transforms (`insertText`, `splitBlock`, `deleteBackward`, `toggleMark`, `setLink`, `replaceSelection`, `applyInputRules`…), `editorHistoryReducer`, `createEditorKeymap`, `fromMarkdown`/`toMarkdown` (subpaths `@texuli/core/editor-model`, `editor-transforms`, `editor-history`, `editor-keymap`, `editor-markdown`; not in the root barrel) | [core-editor](docs/core-editor.md) |
 | Environment | `isBrowser`, `getOwnerDocument`, `getOwnerWindow`, `listen`, `matchesMedia`, `requestFrame` | [core-env](docs/core-env.md) |
 | Focus scope | `createFocusScope` | [core-focus-scope](docs/core-focus-scope.md) |
 | Form bridge | `createFormBridge` | [core-form-bridge](docs/core-form-bridge.md) |
@@ -36,6 +37,13 @@ rest.
 | Tabbable | `isFocusable`, `isTabbable`, `getFocusableElements`, `getTabbableElements` | [core-tabbable](docs/core-tabbable.md) |
 | URL policy (links) | `safeHref`, `type HrefTrust` | [core-url-policy](docs/core-url-policy.md) |
 | URL policy (media) | `safeImageSrc`, `safeImageSrcset`, `safeMediaSrc`, `MAX_DATA_IMAGE_BYTES` | [core-url-policy](docs/core-url-policy.md) |
+
+The editor texels are not in the root barrel: the barrel measures 22.63 of
+its 24 KiB budget. `pnpm size --filter core/editor` (2026-10-25) measures
+`editor-history` at 754 B and `editor-keymap` at 2.49 KiB, both within the 4
+KiB per-texel default. `editor-markdown` (7.03 KiB), `editor-model` (7.81
+KiB) and `editor-transforms` (10.36 KiB) are over it, so their budget rows
+are pending with the owner.
 
 The tables above name the headline exports per texel, not the full surface:
 read `src/index.ts` (and the per-area `index.ts`) for every exported symbol
@@ -100,7 +108,7 @@ packages/core/
 ├── docs/            one contract doc per texel (core-*.md) + overlay-engine.md
 ├── src/index.ts     the public barrel (only what is exported here is public)
 ├── src/<area>/      one directory per texel (announcer, roving, layer-stack, …)
-└── tests/           22 test files, one or more per texel, including hostile
+└── tests/           26 test files, one or more per texel, including hostile
                      inputs for every policy that guards a sink
 ```
 

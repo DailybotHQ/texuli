@@ -1,11 +1,13 @@
 # Rich text editor architecture
 
-**Status: planned. Nothing in this document is implemented yet.** It is the
+**Status: the model is implemented; the editor is planned.** This is the
 long-form companion to
 [ADR-003](DECISIONS.md#adr-003-rich-text-editor-architecture) and fixes the
-contracts that the editor tasks implement. The `@texuli/editor` package, its
-subpaths and the editing texels described below do not exist in the
-repository today. Each section says what is fixed, the option chosen, one
+contracts that the editor tasks implement. The framework-free model exists
+as core texels: the document, selection, transforms, history, key intents
+and the Markdown codec ([core-editor](../packages/core/docs/core-editor.md)).
+The `@texuli/editor` package, the paste import, the DOM selection mapping
+and the editing surface do not exist yet. Each section says what is fixed, the option chosen, one
 rejected alternative, and how to reverse the choice.
 
 Texuli builds the editor from scratch, like every primitive: no editor
@@ -37,16 +39,22 @@ dependency, no other component library, and no HTML sinks
 
 **Fixed:**
 
-| Where | Planned subpath | What lives there |
-| --- | --- | --- |
-| L0 `@texuli/core` | `text-segment` | Grapheme and word boundaries (`Intl.Segmenter`, with a code-point fallback) used by caret movement and deletion |
-| L0 `@texuli/core` | `input-intent` | Maps `beforeinput` `inputType` values and key chords to editing intents, platform-aware (`Mod` is Cmd on Apple platforms, Ctrl elsewhere) |
-| L0 `@texuli/core` | `composition` | The input-method composition tracker (section 6) |
-| L0 `@texuli/core` | `editable-selection` | Maps DOM points to model points through `data-*` block markers, and back |
-| L4 `@texuli/editor` | `model` | Framework-free: document types, vocabulary, validation, normalization, transforms, history, the Markdown-subset codec and tree adapters |
-| L4 `@texuli/editor` | `paste` | Framework-free clipboard import (section 8) |
-| L4 `@texuli/editor` | `.` | `RichTextEditor`: a small entry that lazy-loads the editing UI chunk |
-| L4 `@texuli/editor` | `ui` | The editing surface, toolbar and link dialog (Svelte 5), built on primitives and texuli components |
+The model was first placed in `@texuli/editor/model`. The editor-texels task
+(PLAN_005 task 8) took this section's reversal path and moved it down into
+core, so blocks, catalog and chat-side hosts can all import it without
+waiting for a new package. The table shows where things live now.
+
+| Where | Subpath | What lives there | Status |
+| --- | --- | --- | --- |
+| L0 `@texuli/core` | `editor-model` | Document types and caps, the closed vocabularies, normalization, validation, the untrusted loader, selection, grapheme and word boundaries (`Intl.Segmenter`, with a code-point fallback), the nested inline interchange shape | Exists |
+| L0 `@texuli/core` | `editor-transforms` | Pure transforms, the composition diff and the Markdown input rules | Exists |
+| L0 `@texuli/core` | `editor-history` | The snapshot-stack history | Exists |
+| L0 `@texuli/core` | `editor-keymap` | Key chords and `beforeinput` input types to editing intents, platform-aware (`Mod` is Cmd on Apple platforms, Ctrl elsewhere) | Exists |
+| L0 `@texuli/core` | `editor-markdown` | The Markdown-subset codec | Exists |
+| L0 `@texuli/core` | `editable-selection` | Maps DOM points to model points through `data-*` block markers, and back | Planned |
+| L4 `@texuli/editor` | `paste` | Framework-free clipboard import (section 8) | Planned |
+| L4 `@texuli/editor` | `.` | `RichTextEditor`: a small entry that lazy-loads the editing UI chunk | Planned |
+| L4 `@texuli/editor` | `ui` | The editing surface, toolbar and link dialog (Svelte 5), built on primitives and texuli components | Planned |
 
 The editor package depends on core, primitives, tokens and texuli, like the
 other L4 packages. Adding the package and its `LAYERS` row in
@@ -54,8 +62,8 @@ other L4 packages. Adding the package and its `LAYERS` row in
 
 **Who uses it:**
 
-- **Blocks (L5)** and **catalog (L6)** sit above the editor. They may import
-  `@texuli/editor/model` and own the adapters to their own trees (section 9).
+- **Blocks (L5)** and **catalog (L6)** import the model from core and own the
+  adapters to their own trees (section 9).
 - **Chat (L4)** cannot import the editor. A rich composer reaches the thread
   through the existing host `composer` snippet of `ChatThread`
   ([chat composer](../packages/chat/docs/chat-composer.md)). The built-in
@@ -69,6 +77,8 @@ content vocabulary that only the editor, blocks and catalog use, and core
 would turn from behavior and policy into a content-format package.
 **Rejected:** defining the interchange types in catalog (L6). The editor
 cannot import upward.
+**Amended (task 8):** the model now lives in core after all, outside the
+root barrel, as the table above shows. The ADR-003 amendment records why.
 **Reverse:** if a package at L1–L3 needs the model, move `model` down into
 core as a texel subpath and keep `@texuli/editor/model` as a re-export so
 imports do not change. If chat needs a built-in rich composer, move chat to
@@ -178,7 +188,7 @@ type Selection =
 - `offset` counts UTF-16 code units in the text block's flattened text, the
   same units as JavaScript strings and DOM offsets. A `break` counts as one
   unit.
-- Transforms snap offsets to grapheme boundaries (`text-segment`), so a caret
+- Transforms snap offsets to grapheme boundaries (`editor-model`), so a caret
   never splits an emoji or a combining sequence.
 - On `selectionchange` the surface reads the DOM selection into a model
   selection (`editable-selection`). After each render it writes the model
@@ -214,7 +224,7 @@ the history entries.
   `removeLink`, `wrapInList`, `liftListItem`, `sinkListItem`,
   `toggleTodo`, `insertBreak`, `insertBlock` (divider or media) and
   `replaceSelection` (paste).
-- A command binds a transform to an intent from `input-intent`. The keyboard
+- A command binds a transform to an intent from `editor-keymap`. The keyboard
   map in section 6 is a table of intents and commands.
 
 **Chosen:** pure model-to-model functions with refusal results, the same
@@ -265,7 +275,7 @@ invertible steps into a log, and history replays inverses. The snapshot API
   selection.
 - Enter is ignored while composing (`isComposing`, or key code 229), as the
   chat composer already does.
-- At `compositionend`, the `composition` texel diffs the block's DOM text
+- At `compositionend`, `applyComposition` (`editor-transforms`) diffs the block's DOM text
   against its model text. It expects one contiguous change and applies it as
   a single `insertText` (merged in history). Then the block re-renders.
 - Input types that cannot be canceled, such as some mobile replacement and
@@ -280,7 +290,7 @@ invertible steps into a log, and history replays inverses. The snapshot API
 | Shift+Enter | A `break` in text blocks; a newline in code |
 | Backspace at block start | Heading, quote or list item: first lift it (to a paragraph, out of the quote, outdent). Paragraph: join with the previous text block. If the previous block is a divider or media block, select it (node selection); the next Backspace deletes it |
 | Delete at block end | Mirrors Backspace forward |
-| Word and line deletion | The native `deleteWordBackward`, `deleteSoftLineBackward` and related input types, with word boundaries from `text-segment` |
+| Word and line deletion | The native `deleteWordBackward`, `deleteSoftLineBackward` and related input types, with word boundaries from `editor-model` |
 | Tab / Shift+Tab | Indent or outdent inside list items only. Elsewhere, Tab moves focus as usual, so focus is never trapped |
 | Escape | Leaves the toolbar or link dialog back to the text. In the text, it arms a one-shot “Tab leaves the editor” state so Tab exits even from a list |
 | Mod+B / Mod+I / Mod+E / Mod+Shift+X | Toggle strong / em / code / strike |
@@ -304,7 +314,7 @@ a typed URL when the next character is a space. An autolinked URL passes
 the model as the source of truth. **Rejected:** a hidden textarea with a
 custom-drawn caret. It loses native input methods, spellcheck, selection
 handles on touch screens, and the screen reader's editing semantics.
-**Reverse:** the `input-intent` and `composition` texels keep the input layer
+**Reverse:** `editor-keymap` and `applyComposition` keep the input layer
 separate. A different input surface would replace them and keep the
 transforms, history and keyboard map.
 
@@ -428,7 +438,7 @@ behind `@texuli/editor/paste`. The allowlist mapping to the vocabulary stays.
 **Fixed:** the wire format is the closed Markdown subset. It is the string
 that blocks `text` fields and the catalog's rich text already parse.
 
-- **Markdown codec.** `@texuli/editor/model` exports `toMarkdown(doc)` and
+- **Markdown codec.** `@texuli/core/editor-markdown` exports `toMarkdown(doc)` and
   `fromMarkdown(source, { trust })`. It is an owned codec of the same subset
   as `@texuli/blocks/text/markdown`, with the same escapes, limits and
   literal-text rule for HTML.
@@ -517,8 +527,8 @@ can be lowered. Either change is a new decision.
 - **Hostile input.** Paste tests with the hostile fixtures: `javascript:`
   links, `<script>`, `<img onerror>`, deep nesting, bidi overrides and
   oversized clipboards.
-- **Texels.** Unit tests for the `input-intent` mapping and the
-  `composition` diff.
+- **Texels.** Unit tests for the `editor-keymap` mapping and the
+  `applyComposition` diff.
 - **Browser.** A behavior scenario in Chromium covering typing, Enter and
   Backspace semantics, list indentation, undo, IME composition through the
   Chrome DevTools Protocol, axe, forced colors and the CSP matrix. Visual

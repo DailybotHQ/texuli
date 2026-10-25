@@ -141,3 +141,12 @@ reverse it. Newest last.
   and the URL policy tiers).
 - **Reverse when:** see each contract above. A reversal of the layer
   placement or the wire format is a new ADR.
+- **Amendment (2026-10-25, PLAN_005 task 8):** the model took the layer
+  reversal path above. It lives in core as the `editor-model`,
+  `editor-transforms`, `editor-history`, `editor-keymap` and
+  `editor-markdown` subpaths ([core-editor](../packages/core/docs/core-editor.md)),
+  outside the root barrel. **Why:** the lead's task brief placed it in core,
+  and no new package (an owner approval) is needed before blocks and the
+  catalog can adopt it. The Svelte package, the paste import and the DOM
+  selection mapping stay planned at L4. **Reverse:** move the subpaths into
+  `@texuli/editor/model` and re-export them from core under the same names.

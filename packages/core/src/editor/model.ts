@@ -1,0 +1,93 @@
+/**
+ * `@texuli/core/editor-model`: the rich text editor document model (ADR-003).
+ * Types and caps, the closed vocabularies, constructors, normalization,
+ * validation, the untrusted loader, selection helpers, grapheme and word
+ * boundaries, and the nested inline interchange shape. Framework-free.
+ */
+export {
+  blockLength,
+  blockText,
+  createEditorIds,
+  type EditorAncestor,
+  type EditorIdSource,
+  type EditorLocation,
+  editorBlockCount,
+  editorCharCount,
+  editorLeaves,
+  editorPlainText,
+  emptyEditorDocument,
+  isTextBlock,
+  isVoidBlock,
+  locateBlock,
+  nextEditorId,
+  normalizeDocument,
+  paragraph,
+  removeBlocks,
+  replaceBlock,
+  replaceItem,
+  validateEditorDocument,
+} from './document.ts';
+export {
+  graphemeBoundaries,
+  nextGrapheme,
+  nextWord,
+  previousGrapheme,
+  previousWord,
+  snapToGrapheme,
+} from './graphemes.ts';
+export {
+  cleanText,
+  hasMark,
+  inheritedMarks,
+  inlineLength,
+  inlineText,
+  markKey,
+  normalizeInline,
+  sliceInline,
+  sortMarks,
+  textToInline,
+} from './inline.ts';
+export { type EditorLoadOptions, type EditorLoadResult, loadEditorDocument } from './load.ts';
+export {
+  caret,
+  clampSelection,
+  type EditorRangePoint,
+  isCollapsed,
+  nodeSelection,
+  selectAll,
+  selectionRange,
+  startSelection,
+  textSelection,
+} from './selection.ts';
+export { type EditorInlineNode, inlineFromTree, inlineToTree } from './tree.ts';
+export {
+  EDITOR_BLOCK_TYPES,
+  EDITOR_LIMITS,
+  EDITOR_MARK_ORDER,
+  type EditorBlock,
+  type EditorBlockId,
+  type EditorBlockType,
+  type EditorCodeBlock,
+  type EditorDivider,
+  type EditorDocument,
+  type EditorHeading,
+  type EditorHeadingLevel,
+  type EditorInline,
+  type EditorIssue,
+  type EditorIssueCode,
+  type EditorLimits,
+  type EditorList,
+  type EditorListItem,
+  type EditorListKind,
+  type EditorMark,
+  type EditorMarkType,
+  type EditorMedia,
+  type EditorParagraph,
+  type EditorPoint,
+  type EditorQuote,
+  type EditorRichBlock,
+  type EditorSelection,
+  type EditorState,
+  type EditorTextBlock,
+  type EditorTransformResult,
+} from './types.ts';
