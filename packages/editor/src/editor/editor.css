@@ -1,0 +1,324 @@
+/* @texuli/editor: the editing surface, toolbar slot and link dialog. Theme
+   through --tx-* tokens; logical properties only, so right-to-left text
+   follows the inherited `dir`. */
+
+.tx-editor {
+  display: grid;
+  gap: 0.5rem;
+  color: var(--tx-foreground, CanvasText);
+  font-family: var(--tx-font-sans, system-ui, sans-serif);
+}
+
+.tx-editor-surface {
+  min-block-size: 8rem;
+  padding-block: 0.75rem;
+  padding-inline: 1rem;
+  border: var(--tx-border-width, 1px) solid var(--tx-input, var(--tx-border, ButtonBorder));
+  border-radius: var(--tx-radius, 0.5rem);
+  background: var(--tx-surface, Canvas);
+  color: inherit;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  caret-color: currentColor;
+  outline: none;
+}
+
+.tx-editor-surface:focus-visible {
+  outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+  outline-offset: var(--tx-focus-ring-offset, 2px);
+}
+
+.tx-editor-surface[aria-readonly="true"] {
+  background: transparent;
+}
+
+/* Long documents: off-screen top-level blocks skip layout and paint but stay
+   in the DOM, so in-page search and screen readers still reach them. */
+.tx-editor-surface > * {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 1.6em;
+}
+
+.tx-editor-surface[data-empty][data-placeholder] > .tx-editor-paragraph:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--tx-muted-foreground, GrayText);
+  pointer-events: none;
+  float: inline-start;
+  block-size: 0;
+}
+
+.tx-editor-block {
+  margin-block: 0 0.5rem;
+  margin-inline: 0;
+  /* Typed spaces stay visible; only text blocks keep white space. */
+  white-space: pre-wrap;
+}
+
+.tx-editor-heading {
+  line-height: 1.25;
+  font-weight: 650;
+  margin-block: 0.75rem 0.5rem;
+}
+
+h1.tx-editor-heading {
+  font-size: 1.75rem;
+}
+
+h2.tx-editor-heading {
+  font-size: 1.4rem;
+}
+
+h3.tx-editor-heading {
+  font-size: 1.2rem;
+}
+
+h4.tx-editor-heading {
+  font-size: 1.05rem;
+}
+
+.tx-editor-pre {
+  padding-block: 0.5rem;
+  padding-inline: 0.75rem;
+  border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+  background: var(--tx-muted, color-mix(in oklab, CanvasText 6%, Canvas));
+  font-family: var(--tx-font-mono, ui-monospace, monospace);
+  font-size: 0.9em;
+  white-space: pre-wrap;
+  tab-size: 2;
+}
+
+.tx-editor-code {
+  padding-inline: 0.25em;
+  border-radius: 0.25rem;
+  background: var(--tx-muted, color-mix(in oklab, CanvasText 6%, Canvas));
+  font-family: var(--tx-font-mono, ui-monospace, monospace);
+  font-size: 0.9em;
+}
+
+.tx-editor-link {
+  color: var(--tx-primary, LinkText);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.tx-editor-link-rejected {
+  text-decoration: underline wavy var(--tx-destructive, Mark);
+}
+
+.tx-editor-quote {
+  margin-block: 0 0.5rem;
+  margin-inline: 0;
+  padding-inline-start: 0.875rem;
+  border-inline-start: 3px solid var(--tx-border, GrayText);
+  color: var(--tx-muted-foreground, inherit);
+}
+
+.tx-editor-list {
+  margin-block: 0 0.5rem;
+  padding-inline-start: 1.5rem;
+}
+
+.tx-editor-list[data-kind="todo"] {
+  list-style: none;
+  padding-inline-start: 0.25rem;
+}
+
+.tx-editor-item {
+  margin-block: 0.125rem;
+}
+
+.tx-editor-item > .tx-editor-item-body > .tx-editor-block {
+  margin-block-end: 0.125rem;
+}
+
+.tx-editor-list[data-kind="todo"] > .tx-editor-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.tx-editor-item-body {
+  min-inline-size: 0;
+  flex: 1;
+}
+
+.tx-editor-item[data-checked="true"] > .tx-editor-item-body > .tx-editor-block:first-child {
+  color: var(--tx-muted-foreground, GrayText);
+  text-decoration: line-through;
+}
+
+.tx-editor-check input {
+  inline-size: 1rem;
+  block-size: 1rem;
+  margin: 0;
+  accent-color: var(--tx-primary, AccentColor);
+}
+
+.tx-editor-check input:focus-visible {
+  outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+  outline-offset: 2px;
+}
+
+.tx-editor-void {
+  border-radius: 0.25rem;
+  user-select: none;
+}
+
+.tx-editor-divider {
+  margin-block: 0.75rem;
+  border: 0;
+  border-block-start: 1px solid var(--tx-border, GrayText);
+}
+
+.tx-editor-selected {
+  outline: 2px solid var(--tx-ring, Highlight);
+  outline-offset: 2px;
+}
+
+.tx-editor-media {
+  margin-block: 0 0.5rem;
+  margin-inline: 0;
+}
+
+.tx-editor-media-img {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+  border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+}
+
+.tx-editor-media-fallback {
+  display: inline-block;
+  padding-block: 0.5rem;
+  padding-inline: 0.75rem;
+  border: 1px dashed var(--tx-border, GrayText);
+  border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+.tx-editor-help {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Toolbar slot */
+.tx-editor-toolbar {
+  flex-wrap: wrap;
+}
+
+.tx-editor-glyph {
+  min-inline-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.tx-editor-glyph[data-glyph="em"] {
+  font-style: italic;
+  font-family: Georgia, serif;
+}
+
+.tx-editor-glyph[data-glyph="strike"] {
+  text-decoration: line-through;
+}
+
+.tx-editor-glyph[data-glyph="code"] {
+  font-family: var(--tx-font-mono, ui-monospace, monospace);
+}
+
+/* Link dialog */
+.tx-editor-link-form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tx-editor-link-dialog {
+  padding: 0.75rem;
+  border: var(--tx-border-width, 1px) solid var(--tx-border, ButtonBorder);
+  border-radius: var(--tx-radius, 0.5rem);
+  background: var(--tx-surface, Canvas);
+  box-shadow: var(--tx-shadow-soft, none);
+}
+
+.tx-editor-link-title {
+  margin: 0;
+  font-size: var(--tx-font-size-sm, 0.875rem);
+  font-weight: 600;
+}
+
+.tx-editor-link-field {
+  display: grid;
+  gap: 0.25rem;
+  font-size: var(--tx-font-size-sm, 0.875rem);
+}
+
+.tx-editor-link-input {
+  min-block-size: 2.25rem;
+  padding-inline: 0.625rem;
+  border: var(--tx-border-width, 1px) solid var(--tx-input, var(--tx-border, ButtonBorder));
+  border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+  background: var(--tx-surface, Field);
+  color: inherit;
+  font: inherit;
+}
+
+.tx-editor-link-input[aria-invalid="true"] {
+  border-color: var(--tx-destructive, Mark);
+}
+
+.tx-editor-link-input:focus-visible,
+.tx-editor-link-button:focus-visible {
+  outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+  outline-offset: var(--tx-focus-ring-offset, 2px);
+}
+
+.tx-editor-link-error {
+  margin: 0;
+  color: var(--tx-destructive, Mark);
+  font-size: var(--tx-font-size-sm, 0.875rem);
+}
+
+.tx-editor-link-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tx-editor-link-button {
+  min-block-size: 2.25rem;
+  padding-inline: 0.875rem;
+  border: var(--tx-border-width, 1px) solid var(--tx-border, ButtonBorder);
+  border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tx-editor-link-button[data-primary] {
+  border-color: transparent;
+  background: var(--tx-primary, ButtonText);
+  color: var(--tx-primary-foreground, ButtonFace);
+}
+
+@media (forced-colors: active) {
+  .tx-editor-surface,
+  .tx-editor-link-dialog,
+  .tx-editor-link-input,
+  .tx-editor-link-button {
+    border-color: CanvasText;
+  }
+
+  .tx-editor-surface:focus-visible,
+  .tx-editor-selected {
+    outline-color: Highlight;
+  }
+
+  .tx-editor-link-button[data-primary] {
+    background: ButtonText;
+    color: ButtonFace;
+  }
+}

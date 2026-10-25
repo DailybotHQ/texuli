@@ -29,6 +29,27 @@
       "types": "./src/index.ts",
       "svelte": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./controller": {
+      "types": "./src/controller/index.ts",
+      "svelte": "./src/controller/index.ts",
+      "default": "./src/controller/index.ts"
+    },
+    "./editor": {
+      "types": "./src/editor/index.ts",
+      "svelte": "./src/editor/index.ts",
+      "default": "./src/editor/index.ts"
+    },
+    "./link-dialog": {
+      "types": "./src/link-dialog/index.ts",
+      "svelte": "./src/link-dialog/index.ts",
+      "default": "./src/link-dialog/index.ts"
+    },
+    "./paste": "./src/paste/index.ts",
+    "./toolbar": {
+      "types": "./src/toolbar/index.ts",
+      "svelte": "./src/toolbar/index.ts",
+      "default": "./src/toolbar/index.ts"
     }
   },
   "scripts": {
