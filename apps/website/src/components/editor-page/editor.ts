@@ -53,7 +53,7 @@ export const EDITOR_NODES: readonly VocabularyRow[] = [
   { name: 'list (bullet)', renders: 'ul, li', markdown: '- item' },
   { name: 'list (ordered)', renders: 'ol, li', markdown: '1. item' },
   {
-    name: 'list (todo)',
+    name: 'list (checklist)',
     renders: 'ul, li with a checkbox outside the text',
     markdown: '- [ ] item',
   },

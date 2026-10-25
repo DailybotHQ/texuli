@@ -1,9 +1,14 @@
 <script lang="ts">
 import type { EditorDocument } from '@texuli/core/editor-model';
-import { RichTextEditor } from '@texuli/editor/editor';
 import { untrack } from 'svelte';
 import { SITE_EDITOR_LABELS } from '../../../editor-page/editor.ts';
 import { readRichText, writeRichText } from './richtext.ts';
+
+/**
+ * The editor loads as its own chunk when a text field first renders: the
+ * builder document stays within its budget and the code arrives on demand.
+ */
+const editorModule = import('@texuli/editor/editor');
 
 /**
  * One Markdown field of a text block, edited through the rich text editor.
@@ -77,13 +82,16 @@ function edited(next: EditorDocument) {
       oninput={(event) => onchange(event.currentTarget.value)}
     ></textarea>
   {:else}
-    <RichTextEditor
-      {id}
-      value={doc}
-      aria-labelledby={labelId}
-      labels={{ ...SITE_EDITOR_LABELS, undo: 'Undo text', redo: 'Redo text' }}
-      onChange={edited}
-    />
+    {#await editorModule then editor}
+      {@const Editor = editor.RichTextEditor}
+      <Editor
+        {id}
+        value={doc}
+        aria-labelledby={labelId}
+        labels={{ ...SITE_EDITOR_LABELS, undo: 'Undo text', redo: 'Redo text' }}
+        onChange={edited}
+      />
+    {/await}
     {#if notes.length}
       <ul class="markdown-field__notes" aria-label="Editor notes">
         {#each notes as note (note)}<li>{note}</li>{/each}
