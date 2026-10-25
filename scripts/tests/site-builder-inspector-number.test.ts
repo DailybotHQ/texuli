@@ -16,8 +16,13 @@ import {
 import {
   chartNumberHints,
   chartPropSchemas,
+  numberHints,
+  paintNumberHints,
 } from '../../apps/website/src/components/builder/inspector/number/sources.ts';
 import { BUILDER_MANIFESTS } from '../../apps/website/src/components/builder/manifest.ts';
+import { activeHighlightIndex } from '../../packages/blocks/src/code/token-styles.ts';
+import { canvasBackingSize } from '../../packages/media/src/composition-canvas/geometry.ts';
+import { IMAGE_LIMITS, intrinsicSize } from '../../packages/media/src/image/model.ts';
 
 /** Every number prop the builder can edit, from the real manifests. */
 const NUMBER_PROPS: { id: string; prop: NumberProp }[] = BUILDER_MANIFESTS.flatMap((manifest) =>
@@ -53,7 +58,8 @@ function oracle(value: unknown): 'unset' | 'set' | 'invalid' {
 
 describe('number props in the builder manifests', () => {
   it('covers every number prop the builder edits', () => {
-    expect(NUMBER_PROPS.length).toBe(44);
+    // PLAN_005 task 5 adds the grid tile's span and rowSpan.
+    expect(NUMBER_PROPS.length).toBe(46);
   });
 
   it('reads every value exactly as the renderer will: unset, accepted or refused', () => {
@@ -193,5 +199,85 @@ describe('controls and input', () => {
     expect(showRaw('12')).toBe('"12"');
     expect(showRaw(Number.POSITIVE_INFINITY)).toBe('null');
     expect([...showRaw('x'.repeat(10_000))].length).toBe(61);
+  });
+});
+
+describe('painting-code hints (PLAN_005 task 5)', () => {
+  const at = (id: string, name: string) => {
+    const entry = NUMBER_PROPS.find(
+      (candidate) => candidate.id === id && candidate.prop.name === name
+    );
+    if (!entry) throw new Error(`${id}.${name} missing`);
+    return entry.prop;
+  };
+
+  it('gives every builder number prop a documented range except the canvas renderer size', () => {
+    const bare = NUMBER_PROPS.filter(({ id, prop }) => !numberHints(id, prop.name)).map(
+      ({ id, prop }) => `${id}.${prop.name}`
+    );
+    // CanvasRenderer passes width and height straight to the canvas element: no rule to show.
+    expect(bare).toEqual(['charts-canvas-renderer.width', 'charts-canvas-renderer.height']);
+    // The chart schema wins wherever it has an entry.
+    for (const { id, prop } of NUMBER_PROPS) {
+      const chart = chartNumberHints(id, prop.name);
+      if (chart) expect(numberHints(id, prop.name)).toEqual(chart);
+    }
+  });
+
+  it('matches the clamps in the painting code', () => {
+    expect(paintNumberHints('layout-grid', 'columns')?.bounds).toEqual({
+      min: 1,
+      max: 4,
+      integer: true,
+    });
+    expect(paintNumberHints('layout-tile', 'span')?.bounds).toEqual({
+      min: 1,
+      max: 4,
+      integer: true,
+    });
+    expect(paintNumberHints('layout-tile', 'rowSpan')?.bounds).toEqual({
+      min: 1,
+      max: 2,
+      integer: true,
+    });
+    expect(paintNumberHints('blocks-map', 'headingLevel')?.bounds).toEqual({
+      min: 1,
+      max: 6,
+      integer: true,
+    });
+    // The image limit is the media package's own constant, and intrinsicSize enforces it.
+    expect(paintNumberHints('media-image', 'width')?.bounds?.max).toBe(IMAGE_LIMITS.dimension);
+    expect(intrinsicSize(IMAGE_LIMITS.dimension, 10)).toBeDefined();
+    expect(intrinsicSize(IMAGE_LIMITS.dimension + 1, 10)).toBeUndefined();
+    expect(intrinsicSize(0, 10)).toBeUndefined();
+    // The canvas caps its ratio at 4 and falls back to 1 at 0 or below.
+    expect(paintNumberHints('media-composition-canvas', 'pixelRatio')?.bounds).toEqual({
+      min: 0,
+      exclusive: true,
+      max: 4,
+    });
+    expect(canvasBackingSize(100, 100, 8)).toEqual(canvasBackingSize(100, 100, 4));
+    expect(canvasBackingSize(100, 100, 0)).toEqual(canvasBackingSize(100, 100, 1));
+    // Code steps count from 0: a negative step reads as the first one.
+    expect(activeHighlightIndex(3, -2)).toBe(0);
+    expect(paintNumberHints('blocks-code', 'step')?.bounds).toEqual({ min: 0, integer: true });
+  });
+
+  it('turns two-sided ranges into sliders and warns outside them', () => {
+    const columns = at('layout-grid', 'columns');
+    const hints = numberHints('layout-grid', 'columns');
+    expect(numberControl(hints)).toBe('slider');
+    expect(numberIssues(columns, 3, hints)).toEqual([]);
+    expect(numberIssues(columns, 6, hints)).toEqual([
+      {
+        severity: 'warning',
+        message:
+          'Outside the documented range (1 to 4, a whole number); it may not paint as intended.',
+      },
+    ]);
+    expect(numberControl(numberHints('media-composition-canvas', 'pixelRatio'))).toBe('input');
+    expect(shownDefault(at('layout-tile', 'rowSpan'), numberHints('layout-tile', 'rowSpan'))).toBe(
+      1
+    );
   });
 });

@@ -1,6 +1,7 @@
 import { canonicalBlueprintJson, createEditHistory } from '@texuli/catalog/edit';
 import { DEFAULT_TREE_LIMITS, validateCatalogTreeLimits } from '@texuli/catalog/render/limits';
 import type { CatalogTreeInput } from '@texuli/catalog/render/renderer';
+import { FORBIDDEN_PROP_NAMES } from '@texuli/catalog/render/renderer';
 import { BUILDER_MANIFEST_BY_ID } from './manifest.ts';
 
 export const EMPTY_BLUEPRINT: CatalogTreeInput = {
@@ -89,9 +90,13 @@ function idsAllowed(node: CatalogTreeInput): boolean {
   return (node.children ?? []).every(idsAllowed);
 }
 
-/** Prop names a blueprint never carries, whatever the manifest lists (`class`, `style`, `on*`). */
+/**
+ * Prop names a blueprint never carries, whatever the manifest lists: `on*`
+ * handlers and the renderer's own forbidden names (`class`, `className`,
+ * `style`, `html`, …), so no inspector field can only produce refusals.
+ */
 export function refusedPropName(name: string): boolean {
-  return name === 'class' || name === 'style' || name.startsWith('on');
+  return name.startsWith('on') || FORBIDDEN_PROP_NAMES.has(name);
 }
 
 /**

@@ -53,7 +53,7 @@ $effect(() => {
 
 function choose(entry: PaletteEntry) {
   if (entry.availability !== 'insertable') {
-    message = `${entry.label} cannot be inserted. ${AVAILABILITY_NOTES[entry.availability]}`;
+    message = `${entry.label} cannot be inserted. ${entry.note ?? AVAILABILITY_NOTES[entry.availability]}`;
     return;
   }
   message = `Inserted ${entry.label}.`;
@@ -141,7 +141,7 @@ function oninput() {
               </span>
             </span>
             {#if unavailable}
-              <span class="palette__note">{AVAILABILITY_NOTES[entry.availability as Exclude<typeof entry.availability, 'insertable'>]}</span>
+              <span class="palette__note" data-palette-note>Not available: {entry.note}</span>
             {/if}
           </div>
         {/each}

@@ -6,9 +6,15 @@ import {
   gridLayoutManifest,
   pageLayoutManifest,
 } from '@texuli/catalog/manifests/layouts';
-import { PLAYER_LOADERS } from '@texuli/player';
+import { G20_LAYOUT_MANIFESTS, PLAYER_LOADERS, REGION_MANIFESTS } from '@texuli/player';
 
-/** The B0 palette is the intersection of Tier U manifests and player loaders. */
+/**
+ * What the builder inserts: Tier U manifests the player paints and every
+ * prop of which has a working inspector field. Decks, controls, flows and
+ * action forms also need envelope declarations (slides, state, flows,
+ * actions) the builder cannot author, so the palette lists them as
+ * unavailable with that reason (`palette/sources.ts`).
+ */
 export const BUILDER_MANIFESTS: readonly CatalogManifest[] = Object.freeze(
   [
     ...CONTENT_MANIFESTS,
@@ -16,6 +22,8 @@ export const BUILDER_MANIFESTS: readonly CatalogManifest[] = Object.freeze(
     pageLayoutManifest,
     docLayoutManifest,
     gridLayoutManifest,
+    ...G20_LAYOUT_MANIFESTS,
+    ...REGION_MANIFESTS,
   ]
     .filter((manifest) => manifest.agentEmittable === true && manifest.id in PLAYER_LOADERS)
     .sort((left, right) => left.id.localeCompare(right.id, 'en'))

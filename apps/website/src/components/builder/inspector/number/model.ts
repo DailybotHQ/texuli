@@ -3,9 +3,10 @@
  *
  * Catalog manifests declare no ranges for number props (only `kind`,
  * sometimes `default`), and the renderer accepts any finite number. Ranges
- * and defaults come only from a real schema that declares them: today the
- * chart prop schemas (`@texuli/charts/schemas`), supplied by the host as
- * `NumberHints`. Nothing here invents a bound. Imports only
+ * and defaults come only from a source that enforces or declares them: the
+ * chart prop schemas (`@texuli/charts/schemas`) and the clamps in the
+ * painting code (`sources.ts`), supplied by the host as `NumberHints`.
+ * Nothing here invents a bound. Imports only
  * `@texuli/catalog`, so it can move into a future `@texuli/builder`.
  */
 import type { CatalogPropSchema } from '@texuli/catalog';
@@ -119,7 +120,7 @@ export function numberIssues(prop: NumberProp, value: unknown, hints?: NumberHin
     return [
       {
         severity: 'warning',
-        message: `Outside the documented range (${describeBounds(bounds ?? {})}); the chart may not draw as intended.`,
+        message: `Outside the documented range (${describeBounds(bounds ?? {})}); it may not paint as intended.`,
       },
     ];
   }

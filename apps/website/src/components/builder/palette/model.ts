@@ -10,6 +10,7 @@ export const PALETTE_GROUPS = [
   'Content blocks',
   'Charts',
   'Media',
+  'Interaction',
   'Chat display',
 ] as const;
 export type PaletteGroup = (typeof PALETTE_GROUPS)[number];
@@ -34,6 +35,8 @@ export interface PaletteEntry {
   requiredProps: number;
   useWhen: readonly string[];
   availability: PaletteAvailability;
+  /** Why an unavailable entry cannot be inserted here; `null` when it can. */
+  note: string | null;
 }
 
 export interface PaletteSources {
@@ -41,6 +44,8 @@ export interface PaletteSources {
   paintable: (id: string) => boolean;
   /** Ids the host can insert. */
   insertable: (id: string) => boolean;
+  /** The specific reason an id is unavailable, when the host knows one (else the generic note). */
+  reason?: (id: string) => string | undefined;
 }
 
 export const AVAILABILITY_NOTES: Readonly<
@@ -55,6 +60,7 @@ export function paletteGroup(manifest: Pick<CatalogManifest, 'id' | 'package'>):
   if (manifest.id.startsWith('charts-')) return 'Charts';
   if (manifest.id.startsWith('media-')) return 'Media';
   if (manifest.id.startsWith('chat-')) return 'Chat display';
+  if (/^(control|flow|action|form|host)-/.test(manifest.id)) return 'Interaction';
   return 'Content blocks';
 }
 
@@ -83,6 +89,10 @@ export function createPaletteEntries(
       requiredProps: manifest.props.filter((prop) => prop.required === true).length,
       useWhen: manifest.useWhen,
       availability,
+      note:
+        availability === 'insertable'
+          ? null
+          : (sources.reason?.(manifest.id) ?? AVAILABILITY_NOTES[availability]),
     });
   }
   return entries.sort(
@@ -93,14 +103,14 @@ export function createPaletteEntries(
 }
 
 /**
- * Case-insensitive search over label, id, summary and `useWhen` hints.
+ * Case-insensitive search over label, id, group, summary and `useWhen` hints.
  * Every whitespace-separated term must match somewhere; an empty query keeps all.
  */
 export function searchPalette(entries: readonly PaletteEntry[], query: string): PaletteEntry[] {
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
   if (terms.length === 0) return [...entries];
   return entries.filter((entry) => {
-    const haystack = [entry.label, entry.id, entry.summary, ...entry.useWhen]
+    const haystack = [entry.label, entry.id, entry.group, entry.summary, ...entry.useWhen]
       .join('\n')
       .toLowerCase();
     return terms.every((term) => haystack.includes(term));

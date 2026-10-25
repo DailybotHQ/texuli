@@ -201,8 +201,17 @@ test.describe('texuli.com blueprint builder', () => {
     await visit(page);
     const option = page.locator('[data-palette-option="chat-thread"]');
     await expect(option).toHaveAttribute('aria-disabled', 'true');
-    await expect(option).toContainText('the player has no painter for it here');
-    await expect(page.locator('[data-palette-option="layout-deck"]')).toHaveAttribute(
+    await expect(option).toContainText(
+      'Not available: The player has no painter for chat display ids'
+    );
+    const deck = page.locator('[data-palette-option="layout-deck"]');
+    await expect(deck).toHaveAttribute('aria-disabled', 'true');
+    await expect(deck).toContainText('Decks need slide, master and settings editing');
+    await expect(page.locator('[data-palette-option="control-toggle"]')).toContainText(
+      'state variable declared in the blueprint envelope'
+    );
+    // The G20 layouts and the host region are insertable.
+    await expect(page.locator('[data-palette-option="layout-tile"]')).not.toHaveAttribute(
       'aria-disabled',
       'true'
     );

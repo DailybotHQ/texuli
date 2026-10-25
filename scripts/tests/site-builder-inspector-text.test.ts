@@ -1,6 +1,18 @@
 // @vitest-environment node
 
 import { describe, expect, it } from 'vitest';
+import { fieldFamily } from '../../apps/website/src/components/builder/inspector/coverage.ts';
+import {
+  GRID_GAP,
+  isLocaleTag,
+  isStringProp,
+  REGION_NAME,
+  readString,
+  type StringProp,
+  stringInput,
+  stringIssues,
+  stringRule,
+} from '../../apps/website/src/components/builder/inspector/string/model.ts';
 import {
   BLOCK_CONTENT_LIMITS,
   editableBlock,
@@ -18,6 +30,9 @@ import {
   TONES,
   validateTextBlock,
 } from '../../apps/website/src/components/builder/inspector/text/model.ts';
+import { BUILDER_MANIFESTS } from '../../apps/website/src/components/builder/manifest.ts';
+import { inspectorFields } from '../../apps/website/src/components/builder/model.ts';
+import { HOST_REGION_NAME } from '../../packages/player/src/region-manifests.ts';
 
 // validateTextBlock runs the text family parser (`safeParseBlock`) itself.
 const parses = (block: TextBlockValue) => validateTextBlock(block).length === 0;
@@ -243,5 +258,87 @@ describe('link verdicts', () => {
 
   it('finds no links in plain prose or code', () => {
     expect(linkVerdicts('Just words, and `[not](https://example.com)` code.')).toEqual([]);
+  });
+});
+
+/** Every text prop the inspector edits as a text box, from the real manifests. */
+const STRING_PROPS: { id: string; prop: StringProp }[] = BUILDER_MANIFESTS.flatMap((manifest) =>
+  inspectorFields(manifest.props)
+    .filter((prop) => fieldFamily(manifest.id, prop) === 'string')
+    .filter(isStringProp)
+    .map((prop) => ({ id: manifest.id, prop }))
+);
+const propOf = (id: string, name: string): StringProp => {
+  const entry = STRING_PROPS.find(
+    (candidate) => candidate.id === id && candidate.prop.name === name
+  );
+  if (!entry) throw new Error(`${id}.${name} missing`);
+  return entry.prop;
+};
+
+describe('text box props (PLAN_005 task 5)', () => {
+  it('reads every value as the renderer will: text is kept, anything else is refused', () => {
+    expect(STRING_PROPS.length).toBeGreaterThan(50);
+    // The renderer forbids className like class, so the inspector never offers it.
+    expect(STRING_PROPS.some(({ prop }) => prop.name === 'className')).toBe(false);
+    for (const { id, prop } of STRING_PROPS) {
+      expect(readString(prop, undefined).state, `${id}.${prop.name}`).toBe('unset');
+      expect(readString(prop, 'Harbor notes').state, `${id}.${prop.name}`).toBe('set');
+      for (const hostile of [1, true, null, {}, ['a']]) {
+        const issues = stringIssues(prop, hostile);
+        expect(issues, `${id}.${prop.name}`).toHaveLength(1);
+        expect(issues[0]?.severity).toBe('error');
+        expect(issues[0]?.message).toContain('refused at paint');
+      }
+    }
+  });
+
+  it('flags a missing required text, and an empty box clears the prop', () => {
+    expect(stringIssues(propOf('host-region', 'label'), undefined)).toEqual([
+      { severity: 'error', message: 'Required: enter text.' },
+    ]);
+    expect(stringIssues(propOf('layout-page', 'title'), undefined)).toEqual([]);
+    expect(stringInput('')).toBeUndefined();
+    expect(stringInput(' a ')).toBe(' a ');
+  });
+
+  it('checks the grid gap against the player’s own length rule', () => {
+    const rule = stringRule('layout-grid', 'gap');
+    expect(rule?.source).toBe('player grid layout');
+    const gap = propOf('layout-grid', 'gap');
+    for (const ok of ['0', '1rem', '0.5em', '1.25rem', '12px', '999px']) {
+      expect(stringIssues(gap, ok, rule), ok).toEqual([]);
+    }
+    for (const ignored of ['1 rem', '100rem', '1000px', 'calc(1rem)', '1rem; color: red', 'red']) {
+      expect(stringIssues(gap, ignored, rule)[0]?.severity, ignored).toBe('warning');
+    }
+    expect(GRID_GAP.test('2.5rem')).toBe(true);
+  });
+
+  it('checks a host region name with the player’s rule, and a map locale with Intl', () => {
+    expect(REGION_NAME).toBe(HOST_REGION_NAME);
+    const name = propOf('host-region', 'name');
+    const region = stringRule('host-region', 'name');
+    expect(stringIssues(name, 'payment', region)).toEqual([]);
+    expect(stringIssues(name, 'Payment', region)[0]?.message).toContain(
+      'No host can claim this name'
+    );
+    const locale = propOf('blocks-map', 'locale');
+    const localeRule = stringRule('blocks-map', 'locale');
+    expect(stringIssues(locale, 'pt-BR', localeRule)).toEqual([]);
+    expect(stringIssues(locale, 'not a tag', localeRule)[0]).toMatchObject({ severity: 'error' });
+    expect(isLocaleTag('en-GB')).toBe(true);
+    expect(isLocaleTag('')).toBe(false);
+  });
+
+  it('applies the chart schemas’ non-empty rule to chart titles and nothing invented elsewhere', () => {
+    const title = propOf('charts-line', 'title');
+    const rule = stringRule('charts-line', 'title');
+    expect(rule?.source).toBe('LineChart chart schema');
+    expect(stringIssues(title, '   ', rule)[0]?.severity).toBe('error');
+    expect(stringIssues(title, 'Weekly activity', rule)).toEqual([]);
+    // Props with no published rule get the renderer's verdict only.
+    expect(stringRule('layout-page', 'title')).toBeUndefined();
+    expect(stringRule('charts-sparkline', 'period')).toBeUndefined();
   });
 });

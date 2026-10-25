@@ -50,8 +50,18 @@ function oracle(prop: ChoiceProp, value: unknown): 'unset' | 'set' | 'invalid' {
 
 describe('choice props in the builder manifests', () => {
   it('covers every enum and boolean prop the builder edits', () => {
-    expect(CHOICE_PROPS.length).toBe(33);
-    expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(6);
+    // PLAN_005 task 5 adds the G20 layouts: row align and wrap, stack, row and split gaps, split ratio.
+    expect(CHOICE_PROPS.length).toBe(39);
+    expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(7);
+    const ids = new Set(CHOICE_PROPS.map((entry) => `${entry.id}.${entry.prop.name}`));
+    for (const name of [
+      'layout-stack.gap',
+      'layout-row.align',
+      'layout-row.wrap',
+      'layout-split.ratio',
+    ]) {
+      expect(ids.has(name), name).toBe(true);
+    }
   });
 
   it('reads every value exactly as the renderer will: unset, accepted or refused', () => {
@@ -94,7 +104,7 @@ describe('choice props in the builder manifests', () => {
         (prop.enumValues?.[0] ?? '').toUpperCase(),
         ' x',
         '__proto__',
-      ]) {
+      ].filter((candidate) => !prop.enumValues?.includes(candidate))) {
         expect(enumInput(prop, outsider), `${id}.${prop.name} ${outsider}`).toEqual({ ok: false });
       }
       // "Not set" exists only for optional props.

@@ -14,13 +14,18 @@ import {
 } from './history/model.ts';
 import ChoiceField from './inspector/choice/ChoiceField.svelte';
 import { isChoiceProp } from './inspector/choice/model.ts';
+import { fieldFamily, unsupportedReason } from './inspector/coverage.ts';
+import JsonField from './inspector/json/JsonField.svelte';
+import { propExamples, schemaCheck } from './inspector/json/model.ts';
 import AltField from './inspector/media/AltField.svelte';
 import MediaBlockEditor from './inspector/media/MediaBlockEditor.svelte';
 import MediaUrlField from './inspector/media/MediaUrlField.svelte';
-import { isAltProp, urlRoleOf } from './inspector/media/model.ts';
+import { urlRoleOf } from './inspector/media/model.ts';
 import { isNumberProp } from './inspector/number/model.ts';
 import NumberField from './inspector/number/NumberField.svelte';
-import { chartNumberHints } from './inspector/number/sources.ts';
+import { numberHints } from './inspector/number/sources.ts';
+import { isStringProp, stringRule } from './inspector/string/model.ts';
+import StringField from './inspector/string/StringField.svelte';
 import StructProp from './inspector/struct/StructProp.svelte';
 import { chartStructSchema } from './inspector/struct/sources.ts';
 import TextBlockEditor from './inspector/text/TextBlockEditor.svelte';
@@ -48,7 +53,7 @@ import { type MoveOp, manifestCanContain } from './outline/model.ts';
 import Outline from './outline/Outline.svelte';
 import { createPaletteEntries } from './palette/model.ts';
 import Palette from './palette/Palette.svelte';
-import { PALETTE_MANIFESTS, playerPaints } from './palette/sources.ts';
+import { PALETTE_MANIFESTS, playerPaints, unavailableReason } from './palette/sources.ts';
 import PayloadPanel from './payload/PayloadPanel.svelte';
 import PreviewPane from './preview/PreviewPane.svelte';
 
@@ -75,12 +80,12 @@ let selection = $state<string[]>(untrack(() => [initialSelection.join('.')]));
 // Copied subtrees live here only: no system clipboard, so nothing leaves the page.
 let clipboard = $state<CatalogTreeInput[]>([]);
 let diagnostic = $state('');
-let propDraft = $state<Record<string, string>>({});
 
 // Tier U palette: the builder inserts its own manifests; other Tier U ids show as unavailable.
 const paletteEntries = createPaletteEntries(PALETTE_MANIFESTS, {
   paintable: playerPaints,
   insertable: (id) => BUILDER_MANIFEST_BY_ID.has(id),
+  reason: unavailableReason,
 });
 /** The value the player forces for a prop: media `trust` is always the host's tier, never the blueprint's. */
 const pinnedFor = (id: string, name: string) =>
@@ -96,7 +101,22 @@ let selectedEntry = $derived(flatNodes.find((entry) => entry.path.join('.') === 
 let selectedManifest = $derived(
   selectedEntry ? BUILDER_MANIFEST_BY_ID.get(selectedEntry.node.id) : undefined
 );
-let inspectorProps = $derived(selectedManifest ? inspectorFields(selectedManifest.props) : []);
+let inspectorProps = $derived(
+  selectedManifest
+    ? inspectorFields(selectedManifest.props).filter(
+        (prop) => !unsupportedReason(selectedManifest.id, prop)
+      )
+    : []
+);
+/** Props the inspector deliberately leaves out, each with its reason (inspector/coverage.ts). */
+let unsupportedProps = $derived(
+  selectedManifest
+    ? inspectorFields(selectedManifest.props).flatMap((prop) => {
+        const reason = unsupportedReason(selectedManifest.id, prop);
+        return reason ? [{ name: prop.name, reason }] : [];
+      })
+    : []
+);
 
 function atPath(path: number[]): CatalogTreeInput | undefined {
   let current: CatalogTreeInput | undefined = tree;
@@ -336,64 +356,57 @@ function reset() {
       {#if selectedEntry && selectedManifest}
         <h3>{selectedManifest.label}</h3>
         <p class="builder__hint">{selectedManifest.summary}</p>
+        {#key selectedKey}
         {#each inspectorProps as prop (prop.name)}
           {@const value = selectedEntry.node.props?.[prop.name]}
-          {@const struct = prop.kind === 'object' || prop.kind === 'array' ? chartStructSchema(selectedManifest.id, prop.name) : undefined}
-          {#if selectedManifest.id === 'blocks-text' && prop.name === 'block'}
+          {@const family = fieldFamily(selectedManifest.id, prop)}
+          {#if family === 'text-block'}
             <!-- G16: blocks-* props get structured editors from the blocks schemas. -->
             <TextBlockEditor {value} onchange={(block) => updateProp(prop, block)} />
-          {:else if selectedManifest.id === 'blocks-media' && prop.name === 'block'}
+          {:else if family === 'media-block'}
             <MediaBlockEditor {value} onchange={(block) => updateProp(prop, block)} />
-          {:else if urlRoleOf(selectedManifest.id, prop.name)}
+          {:else if family === 'url'}
             <MediaUrlField {prop} role={urlRoleOf(selectedManifest.id, prop.name) ?? 'image-src'} {value} onchange={(next) => updateProp(prop, next)} />
-          {:else if isAltProp(selectedManifest.id, prop.name)}
+          {:else if family === 'alt'}
             <AltField {prop} {value} onchange={(next) => updateProp(prop, next)} />
-          {:else if isChoiceProp(prop)}
+          {:else if family === 'choice' && isChoiceProp(prop)}
             <ChoiceField
               {prop}
               {value}
               pinned={pinnedFor(selectedManifest.id, prop.name)}
               onchange={(next) => updateProp(prop, next)}
             />
-          {:else if isNumberProp(prop)}
+          {:else if family === 'number' && isNumberProp(prop)}
             <NumberField
               {prop}
               {value}
-              hints={chartNumberHints(selectedManifest.id, prop.name)}
+              hints={numberHints(selectedManifest.id, prop.name)}
               onchange={(next) => updateProp(prop, next)}
             />
-          {:else if struct}
-            <StructProp {prop} {value} {struct} onchange={(next) => updateProp(prop, next)} />
+          {:else if family === 'struct'}
+            {@const struct = chartStructSchema(selectedManifest.id, prop.name)}
+            {#if struct}<StructProp {prop} {value} {struct} onchange={(next) => updateProp(prop, next)} />{/if}
+          {:else if family === 'string' && isStringProp(prop)}
+            <StringField {prop} {value} rule={stringRule(selectedManifest.id, prop.name)} onchange={(next) => updateProp(prop, next)} />
           {:else}
-          <label class="builder__field">
-            <span>{prop.name}{prop.required ? ' · required' : ''}</span>
-            {#if prop.kind === 'string'}
-              <input
-                type="text"
-                value={value === undefined ? '' : String(value)}
-                placeholder={prop.default === undefined ? '' : `Default: ${String(prop.default)}`}
-                aria-describedby={`prop-hint-${prop.name}`}
-                oninput={(event) => {
-                  const raw = event.currentTarget.value;
-                  updateProp(prop, raw === '' ? undefined : raw);
-                }}
-              />
-            {:else}
-              <textarea
-                rows="4"
-                value={propDraft[`${selectedKey}:${prop.name}`] ?? JSON.stringify(value ?? prop.default ?? null, null, 2)}
-                oninput={(event) => propDraft[`${selectedKey}:${prop.name}`] = event.currentTarget.value}
-                onblur={() => {
-                  const key = `${selectedKey}:${prop.name}`;
-                  try { updateProp(prop, JSON.parse(propDraft[key] ?? 'null')); }
-                  catch { diagnostic = `Invalid JSON for ${prop.name}; the draft was not changed.`; }
-                }}
-              ></textarea>
-            {/if}
-            <small id={`prop-hint-${prop.name}`}>{prop.description ?? (prop.default === undefined ? 'Optional value.' : `Default ${String(prop.default)} is a placeholder and is not saved.`)}{prop.kind === 'object' || prop.kind === 'array' ? ' No sub-field schema exists for this prop yet (G16), so it is edited as JSON; the renderer checks only that it is an object or a list.' : ''}</small>
-          </label>
+            <JsonField
+              {prop}
+              {value}
+              check={schemaCheck(selectedManifest.id, prop.name)}
+              examples={propExamples(selectedManifest, prop.name)}
+              onchange={(next) => updateProp(prop, next)}
+            />
           {/if}
         {/each}
+        {/key}
+        {#if unsupportedProps.length}
+          <div class="builder__unsupported" data-builder-unsupported>
+            <h4>Not editable here</h4>
+            <ul>
+              {#each unsupportedProps as item (item.name)}<li><code>{item.name}</code>: {item.reason}</li>{/each}
+            </ul>
+          </div>
+        {/if}
         <div class="builder__guidance">
           <h4>Use guidance</h4>
           <p>{selectedManifest.useWhen.join(' · ') || 'No use guidance in this manifest.'}</p>
@@ -420,10 +433,9 @@ function reset() {
   .builder__grid { display: grid; grid-template-columns: minmax(15rem, .9fr) minmax(20rem, 1.5fr) minmax(16rem, .9fr); align-items: start; gap: 1rem; }
   .builder__pane { min-inline-size: 0; border: 1px solid var(--tx-border, ButtonBorder); border-radius: .65rem; padding: 1rem; background: var(--tx-surface, Canvas); }
   .builder__pane h2 { margin: 0 0 .75rem; font-size: 1.1rem; }
-  .builder__field input:not([type='checkbox']), .builder__field textarea { box-sizing: border-box; inline-size: 100%; border: 1px solid var(--tx-border, ButtonBorder); border-radius: .4rem; padding: .55rem; color: inherit; background: var(--tx-background, Canvas); }
-  .builder__field { display: grid; gap: .35rem; margin-block: .75rem; font-size: .875rem; }
-  .builder__field small { color: var(--tx-muted-foreground, GrayText); font-size: .75rem; }
-  .builder__field span { font-weight: 600; }
+  .builder__unsupported { margin-block-start: 1rem; font-size: .8125rem; color: var(--tx-muted-foreground, GrayText); }
+  .builder__unsupported h4 { margin: 0 0 .35rem; color: var(--tx-foreground, CanvasText); }
+  .builder__unsupported ul { margin: 0; padding-inline-start: 1.1rem; }
   .builder__guidance { border-block-start: 1px solid var(--tx-border, ButtonBorder); margin-block-start: 1rem; padding-block-start: .75rem; font-size: .875rem; }
   .builder__guidance h4, .builder__guidance p { margin: 0 0 .4rem; }
   @media (max-width: 68rem) { .builder__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .builder__palette { grid-column: 1 / -1; } }

@@ -41,30 +41,37 @@ extracted yet.
 | File | Role |
 | --- | --- |
 | `model.ts` | Framework-free: manifests → entries (`createPaletteEntries`), search (`searchPalette`), grouping, the live count text and arrow movement |
-| `sources.ts` | The default manifests (content families, content layouts, chat display ids) and `playerPaints` (the player's loader map) |
+| `sources.ts` | The default manifests (every Tier U manifest in the player's catalog), `playerPaints` (the player's loader map) and `unavailableReason` (why a painted id is not insertable here) |
 | `Palette.svelte` | The searchable, keyboard-navigable list |
 
 **Contents: Tier U only.** An entry is any manifest with
 `agentEmittable: true`. Each shows its label, summary, a **Tier U** badge with
 the manifest's catalog tier (`content`), and how many props the manifest marks
-required. Entries are grouped as Layouts, Content blocks, Charts, Media and
-Chat display.
+required. Entries are grouped as Layouts, Content blocks, Charts, Media,
+Interaction and Chat display.
 
-**What can be inserted.** Every Tier U id the builder edits today is
-insertable, including the structure, interactive, code and map block
-families. The palette also lists, as disabled options with a reason, the
-Tier U ids the builder cannot insert yet:
-- `layout-deck` and `deck-slide`: the player paints them, but deck editing
-  is planned (builder phase B2);
-- `chat-thread` and `chat-message`: the player has no painter for them
-  without `@texuli/chat`.
+**What can be inserted.** Every Tier U id that the player paints and whose
+props all have a working inspector field is insertable (`manifest.ts`): the
+content block, chart and media families, the page, doc, card and grid
+layouts, the stack, row, split and grid tile layouts, and the host region.
+Every other Tier U id in the player's catalog is listed too, as a disabled
+option that says why it is not available, so nothing is silently missing:
+- `layout-deck` and `deck-slide`: the player paints them, but decks need
+  slide, master and settings editing, which is planned (builder phase B2);
+- the state-only controls (`control-toggle`, `control-choice`,
+  `control-slider`, `control-filter`), the flow ids (`flow-view`,
+  `flow-action`) and the action form ids (`action-form`, `form-field`,
+  `form-submit`): each needs a state, flow or action declaration in the
+  blueprint envelope, and this builder edits the tree only;
+- `chat-thread` and `chat-message`: the player has no painter for them.
 
-Form controls are not Tier U (`agentEmittable: false`), so the palette does
-not show them. The developer palette (the larger developer-tier set) is
-**planned**, pending the tier decision.
+The catalog's own form controls are not Tier U (`agentEmittable: false`), so
+the palette does not show them. The developer palette (the larger
+developer-tier set) is **planned**, pending the tier decision.
 
 **Search** matches every term, case-insensitively, against the label, id,
-summary and `useWhen` hints.
+group name, summary and `useWhen` hints. It finds unavailable entries too,
+and they keep their reason.
 
 **Keyboard and screen readers.** The search box is an APG editable combobox
 with list autocomplete and automatic selection. Its listbox is always shown,
@@ -260,35 +267,45 @@ manifests) are edited with closed choices
 
 ## Inspector: number props
 
-Number props (44 across the builder's manifests) are edited in
+Number props (46 across the builder's manifests) are edited in
 `src/components/builder/inspector/number/`.
 
 | File | Role |
 | --- | --- |
 | `model.ts` | Framework-free: reads a value as unset, accepted or refused, checks typed input, lists issues and picks the control. Imports only `@texuli/catalog` |
-| `sources.ts` | Ranges and defaults from the chart prop schemas (`@texuli/charts/schemas`) |
+| `sources.ts` | Ranges and defaults from the chart prop schemas (`@texuli/charts/schemas`), then from the clamps in the painting code (`paintNumberHints`) |
 | `NumberField.svelte` | The field |
 
 **Where ranges come from.** Catalog manifests declare no range for number
 props: only `kind`, and a `default` for `layout-grid` `columns`. The renderer
-accepts any finite number. The only schema that documents ranges today is the
-chart prop schemas. A `charts-*` prop with a chart schema gets its documented
-minimum and default from there (29 props, all one-sided, such as "greater
-than 0" for sizes). The other number props have no range, and the inspector
-invents none.
+accepts any finite number. Ranges come from two sources, and the inspector
+invents none:
+- the chart prop schemas: a `charts-*` prop with a chart schema gets its
+  documented minimum and default from there (29 props, all one-sided, such
+  as "greater than 0" for sizes);
+- the painting code, where it clamps or ignores a value: `layout-grid`
+  `columns` (1 to 4) and the grid tile's `span` (1 to 4) and `rowSpan` (1 or
+  2) in the player's layouts, `blocks-map` `headingLevel` (1 to 6, the title
+  is painted as `h1` to `h6`), `blocks-code` `step` and `hostStep` (whole
+  numbers from 0), `media-composition-canvas` `pixelRatio` (above 0, capped
+  at 4) and `media-image` `width` and `height` (1 to `IMAGE_LIMITS.dimension`,
+  16,384). A test checks each against the code that applies it.
+
+Only `charts-canvas-renderer` `width` and `height` have no range: the
+renderer passes them straight to the canvas element.
 
 - **Controls.** A number input (`type="number"`, any step). A slider
-  appears only when a schema documents both ends of the range. **No builder
-  prop does today**; pie and donut `innerRatio` (0 to 0.85 in the chart
-  schema) would be the first if the catalog manifests exposed it.
+  appears next to it when the range has both ends: grid columns, tile spans,
+  the map heading level and the image size.
 - **Refused values.** A value that is not a finite number (a string such as
   `"12"`, `null`, or `1e400`, which JSON reads as infinity) is read the way
   the renderer will read it (`sanitizeProps`). It shows the reason and the
   value as text, with **Clear invalid**. Typing an unreadable entry stores
   nothing and is reported when you leave the box.
 - **Out of range is a warning, not a refusal.** A value outside a chart
-  schema's range (a size of `-5`) still paints, so the inspector warns that
-  the chart may not draw as intended instead of calling it refused.
+  documented range (a size of `-5`, five grid columns) still reaches the
+  component, so the inspector warns that it may not paint as intended
+  instead of calling it refused.
 - **Defaults are placeholders.** The manifest default, else the chart
   schema's, shows as the placeholder and is never written. **Reset to
   default** removes a set optional value.
@@ -316,11 +333,16 @@ in the builder's manifests:
   records, the recursive `sunburst` and `treemap` `root`).
 - **9 `blocks-*` `block` props** are described by the blocks parsers.
   `blocks-text` and `blocks-media` have structured editors (see *Inspector:
-  text blocks* and *Inspector: media props*); the other 7 stay JSON.
-- **18 props have no sub-field schema anywhere** (blocks and media `labels`,
+  text blocks* and *Inspector: media props*); the other 7 are JSON fields
+  checked against their family's own check (see *Inspector: text and JSON
+  props*).
+- **2 composition props** (`media-composition-svg` and
+  `media-composition-canvas` `composition`) are JSON fields checked by the
+  composition validator.
+- **16 props have no sub-field schema anywhere** (blocks and media `labels`,
   `blocks-code` `highlights`, `charts-cartesian` and `charts-canvas-renderer`
-  `series`, `media-image` `widths`, `focalPoint` and `placeholder`, the media
-  composition props). They stay a JSON box, and its hint says so.
+  `series`, `media-image` `widths`, `focalPoint` and `placeholder`). They are
+  JSON fields that the renderer checks for kind only, and the hint says so.
 
 There are no layout spacing records in the manifests today.
 
@@ -402,9 +424,59 @@ Behavior:
   every field set parses back unchanged). The parser stops at its first
   problem, shown at the field it names. Galleries hold 1 to 12 images.
 
-**Not covered:** `media-image` `widths`, `focalPoint` and `placeholder`, and
-the media compositions, have no sub-field schema and stay JSON; their
-placeholder and composition image sources are judged only at paint.
+**Not covered:** `media-image` `widths`, `focalPoint` and `placeholder` have
+no sub-field schema and stay JSON; a placeholder image source is judged only
+at paint. Composition image sources are judged as you type, by the
+composition validator at the untrusted tier.
+
+## Inspector: text and JSON props
+
+Every prop the inspector offers lands on a working field, and one it cannot
+offer says why. `src/components/builder/inspector/coverage.ts` holds the one
+rule that picks a prop's editor (`fieldFamily`), which BuilderApp and the
+tests both use.
+
+| File | Role |
+| --- | --- |
+| `string/model.ts` | Framework-free text props: the renderer's verdict, a required check, and the prop's own rule (`stringRule`) where the painting code or a schema has one |
+| `string/StringField.svelte` | The text box, with the rule and its source in the hint and issues as you type |
+| `json/model.ts` | Object and list props without a sub-field editor: draft parsing, the renderer's kind rule, the component's own schema check (`schemaCheck`) and the manifest's examples |
+| `json/JsonField.svelte` | The JSON box: saves on leaving the box only when the text parses, lists issues by path, and offers **Use example** buttons |
+| `coverage.ts` | `fieldFamily` and `unsupportedReason` |
+
+**Text rules.** Text props get the renderer's verdict (anything that is not
+text is refused at paint), plus a rule only where one is applied:
+- `layout-grid` `gap`: the player's bounded length rule (`1rem`, `0.5em`,
+  `12px`, up to 99rem or 999px, or `0`). Anything else is a warning, because
+  the player ignores it and keeps the default gap;
+- `host-region` `name`: the player's `HOST_REGION_NAME`. A name no host can
+  claim is a warning, because the region then always paints its label;
+- `blocks-map` `locale`: a BCP 47 language tag, checked with
+  `Intl.getCanonicalLocales`, because the map's number formatting cannot use
+  anything else;
+- chart titles, labels and descriptions whose chart schema marks them
+  `nonEmpty`: blank text is an error.
+
+**JSON fields.** The seven remaining `blocks-*` `block` props (code, data,
+diagram, embed, interactive, map, structure) are checked with the same check
+each family runs before painting (`checkCodeBlock`, `parseDiagram`, …). The
+composition props are checked with `validateComposition` at the untrusted
+tier, the tier the player always paints compositions with, so an unsafe
+image source is reported while you type. Each manifest example for the prop
+is offered as **Use example**, a valid start. Text that does not parse is
+never stored; a value that parses is stored with its issues shown.
+Structured editors for these families are **planned**.
+
+**Props the inspector leaves out.** The renderer forbids `class`,
+`className`, `style` and the other names in `FORBIDDEN_PROP_NAMES`, and every
+`on*` handler, so the closed rule refuses them and the inspector never offers
+them. The inspector also leaves out 36 chart props that the catalog types as
+text while the chart schema expects another kind: `interactive` (a boolean),
+`fullDomain` and `visibleDomain` (a range), `annotations` (a list), and pie,
+donut and sunburst `innerRatio` and `padAngle` (numbers). The renderer
+accepts only text for them, and text is not what the chart reads, so no
+blueprint value can work. They are listed under **Not editable here** with
+that reason. Typing them correctly is a catalog change, outside the builder.
 
 ## Payload panel: JSON with a round-trip guarantee
 
