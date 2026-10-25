@@ -17,6 +17,7 @@ import {
 } from '../canvas/model.ts';
 import type { BrushRange, ChartFormatters, DomainPair, PlotSeries } from '../interaction/model.ts';
 import { bandScale, extent, linearScale, stack, ticks } from '../math/index.ts';
+import { fitChartWidth } from '../math/layout/fit-width.ts';
 import {
   assertCartesianSeries,
   type CartesianDomain,
@@ -75,16 +76,19 @@ let {
 }: Props = $props();
 
 const id = $props.id();
-const width = 640;
+// Laid out at the figure's measured width (up to 640), so text and margins keep
+// their pixel size on phones instead of shrinking with a fixed viewBox.
+let measuredWidth = $state(0);
+const width = $derived(fitChartWidth(measuredWidth, 640));
 const height = 320;
 const margin = { top: 18, right: 18, bottom: 48, left: 58 };
-const innerWidth = width - margin.left - margin.right;
-const plotRect = {
+const innerWidth = $derived(width - margin.left - margin.right);
+const plotRect = $derived({
   x: margin.left,
   y: margin.top,
   width: innerWidth,
   height: height - margin.top - margin.bottom,
-};
+});
 
 let tableOpen = $state(false);
 let hidden = $state(new Set<string>());
@@ -449,6 +453,7 @@ const interactionModules = $derived(
 </script>
 
 <figure
+  bind:clientWidth={measuredWidth}
   class="chart {className}"
   data-kind={kind}
   data-mode={mode}

@@ -1,5 +1,6 @@
 <script lang="ts">
 import { type ClassValue, cx } from 'texuli/cx';
+import { fitChartWidth } from '../math/layout/fit-width.ts';
 import FlowDataTable from './FlowDataTable.svelte';
 import {
   type FlowChartLabels,
@@ -27,11 +28,15 @@ let {
   description: customDescription,
   steps,
   orientation = 'vertical',
-  width = 640,
+  width: preferredWidth = 640,
   height = 320,
   labels,
   class: className,
 }: Props = $props();
+
+// Lays out at the figure's measured width, up to `width` (the preferred width).
+let measuredWidth = $state(0);
+const width = $derived(fitChartWidth(measuredWidth, preferredWidth));
 const uid = $props.id();
 const text = $derived(flowChartLabels(labels));
 const validDimensions = $derived(
@@ -46,7 +51,7 @@ const summary = $derived(
 );
 </script>
 
-<figure class={cx('flow-chart', className)}>
+<figure bind:clientWidth={measuredWidth} class={cx('flow-chart', className)}>
   <figcaption><h3>{title}</h3><p>{summary}</p></figcaption>
   {#if validDimensions}
     <svg direction="ltr" class="flow-svg" viewBox="0 0 {width} {height}" role="img" aria-labelledby="{uid}-title" aria-describedby="{uid}-description">
@@ -73,7 +78,8 @@ const summary = $derived(
   figcaption h3 { font-size: 1rem; margin-block: 0; }
   figcaption p { color: var(--tx-muted-foreground, CanvasText); margin-block: 0.25rem 0.75rem; }
   .flow-svg { display: block; inline-size: 100%; max-block-size: 32rem; overflow: visible; }
-  .flow-svg text { fill: var(--tx-foreground, CanvasText); font: 16px var(--tx-font-sans, system-ui, sans-serif); }
+  /* Token-sized labels: the chart lays out at its drawn width, so user units are pixels. */
+  .flow-svg text { fill: var(--tx-foreground, CanvasText); font: var(--tx-font-size-xs, 0.75rem) var(--tx-font-sans, system-ui, sans-serif); }
   @media (forced-colors: active) { .flow-svg rect { fill: Canvas; stroke: CanvasText; stroke-width: 2; } }
   @media (forced-colors: active) {
     figcaption h3, figcaption p { color: CanvasText; }

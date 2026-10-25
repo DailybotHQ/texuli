@@ -8,6 +8,7 @@ import {
 } from '../annotations/model.ts';
 import Axis from '../axis/Axis.svelte';
 import type { ChartFormatters } from '../interaction/model.ts';
+import { fitChartWidth } from '../math/layout/fit-width.ts';
 import MatrixFrame from './MatrixFrame.svelte';
 import MatrixPlot from './MatrixPlot.svelte';
 import {
@@ -38,11 +39,15 @@ let {
   cells,
   mode = 'light',
   class: className = '',
-  width = 640,
+  width: preferredWidth = 640,
   height = 360,
   interactive = false,
   annotations = [],
 }: Props = $props();
+
+// Lays out at the figure's measured width, up to `width` (the preferred width).
+let measuredWidth = $state(0);
+const width = $derived(fitChartWidth(measuredWidth, preferredWidth));
 
 const margin = { top: 16, right: 16, bottom: 48, left: 80 };
 const plot = $derived({
@@ -92,7 +97,7 @@ const interactionSeries = $derived(
 );
 </script>
 
-<MatrixFrame {title} {description} {mode} kind="heatmap" class={className}>
+<MatrixFrame bind:measuredWidth {title} {description} {mode} kind="heatmap" class={className}>
   <MatrixPlot
     label="{title}. {description}"
     series={interactionSeries}

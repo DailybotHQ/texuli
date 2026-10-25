@@ -1,5 +1,6 @@
 <script lang="ts">
 import { type ClassValue, cx } from 'texuli/cx';
+import { fitChartWidth } from '../math/layout/fit-width.ts';
 import FlowDataTable from './FlowDataTable.svelte';
 import {
   type FlowChartLabels,
@@ -27,11 +28,17 @@ let {
   description: customDescription,
   nodes,
   links,
-  width = 640,
+  width: preferredWidth = 640,
   height = 360,
   labels,
   class: className,
 }: Props = $props();
+
+const SANKEY_GUTTER = 16;
+
+// Lays out at the figure's measured width, up to `width` (the preferred width).
+let measuredWidth = $state(0);
+const width = $derived(fitChartWidth(measuredWidth, preferredWidth));
 const uid = $props.id();
 const text = $derived(flowChartLabels(labels));
 const graph = $derived.by(() => {
@@ -41,7 +48,9 @@ const graph = $derived.by(() => {
   try {
     return {
       value: sankey(nodes, links, {
-        width: Math.max(40, width - 120),
+        // A 16-unit inline gutter: node labels sit inside the plot (first and
+        // middle columns label to their end, the last column to its start).
+        width: Math.max(40, width - 2 * SANKEY_GUTTER),
         height,
         nodeWidth: 14,
         nodePadding: 12,
@@ -58,12 +67,12 @@ const summary = $derived(
 const nodeName = (id: string) => nodes.find((node) => node.id === id)?.label ?? id;
 </script>
 
-<figure class={cx('flow-chart', className)}>
+<figure bind:clientWidth={measuredWidth} class={cx('flow-chart', className)}>
   <figcaption><h3>{title}</h3><p>{summary}</p></figcaption>
   {#if graph.value}
     <svg direction="ltr" class="flow-svg" viewBox="0 0 {width} {height}" role="img" aria-labelledby="{uid}-title" aria-describedby="{uid}-description">
       <title id="{uid}-title">{title}</title><desc id="{uid}-description">{summary}</desc>
-      <g transform="translate(100 0)">
+      <g transform="translate({SANKEY_GUTTER} 0)">
         {#each graph.value.links as link, index (`${link.source}:${link.target}:${index}`)}
           <path data-flow="{link.source}>{link.target}" d={link.path} fill="none" stroke={flowColor(nodes.findIndex((node) => node.id === link.source))} stroke-width={Math.max(1, link.width)} stroke-opacity="0.45" />
         {/each}
@@ -89,7 +98,8 @@ const nodeName = (id: string) => nodes.find((node) => node.id === id)?.label ?? 
   figcaption h3 { font-size: 1rem; margin-block: 0; }
   figcaption p { color: var(--tx-muted-foreground, CanvasText); margin-block: 0.25rem 0.75rem; }
   .flow-svg { display: block; inline-size: 100%; max-block-size: 32rem; overflow: visible; }
-  .flow-svg text { fill: var(--tx-foreground, CanvasText); font: 16px var(--tx-font-sans, system-ui, sans-serif); }
+  /* Token-sized labels: the chart lays out at its drawn width, so user units are pixels. */
+  .flow-svg text { fill: var(--tx-foreground, CanvasText); font: var(--tx-font-size-xs, 0.75rem) var(--tx-font-sans, system-ui, sans-serif); }
   @media (forced-colors: active) { .flow-svg path { stroke: CanvasText; stroke-dasharray: 4 3; } .flow-svg rect { fill: Canvas; stroke: CanvasText; stroke-width: 2; } }
   @media (forced-colors: active) {
     figcaption h3, figcaption p { color: CanvasText; }

@@ -11,6 +11,8 @@ type Props = {
   legend?: Snippet;
   table?: Snippet;
   children?: Snippet;
+  /** The figure's measured width (bindable), for charts that lay out to fit it. */
+  measuredWidth?: number;
 };
 
 let {
@@ -22,6 +24,7 @@ let {
   legend,
   table,
   children,
+  measuredWidth = $bindable(0),
 }: Props = $props();
 
 const id = $props.id();
@@ -35,6 +38,7 @@ $effect(() => {
 </script>
 
 <figure
+  bind:clientWidth={measuredWidth}
   class="chart {className}"
   data-kind={kind}
   data-mode={mode}

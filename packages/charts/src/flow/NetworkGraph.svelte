@@ -1,5 +1,6 @@
 <script lang="ts">
 import { type ClassValue, cx } from 'texuli/cx';
+import { fitChartWidth } from '../math/layout/fit-width.ts';
 import FlowDataTable from './FlowDataTable.svelte';
 import {
   type FlowChartLabels,
@@ -27,11 +28,15 @@ let {
   description: customDescription,
   nodes,
   links,
-  width = 480,
+  width: preferredWidth = 480,
   height = 360,
   labels,
   class: className,
 }: Props = $props();
+
+// Lays out at the figure's measured width, up to `width` (the preferred width).
+let measuredWidth = $state(0);
+const width = $derived(fitChartWidth(measuredWidth, preferredWidth));
 const uid = $props.id();
 const text = $derived(flowChartLabels(labels));
 const graph = $derived.by(() => {
@@ -47,7 +52,7 @@ const summary = $derived(
 const nodeName = (id: string) => nodes.find((node) => node.id === id)?.label ?? id;
 </script>
 
-<figure class={cx('flow-chart', className)}>
+<figure bind:clientWidth={measuredWidth} class={cx('flow-chart', className)}>
   <figcaption><h3>{title}</h3><p>{summary}</p></figcaption>
   {#if graph.value}
     <svg direction="ltr" class="flow-svg" viewBox="0 0 {width} {height}" role="img" aria-labelledby="{uid}-title" aria-describedby="{uid}-description">
@@ -76,7 +81,8 @@ const nodeName = (id: string) => nodes.find((node) => node.id === id)?.label ?? 
   figcaption h3 { font-size: 1rem; margin-block: 0; }
   figcaption p { color: var(--tx-muted-foreground, CanvasText); margin-block: 0.25rem 0.75rem; }
   .flow-svg { display: block; inline-size: 100%; max-block-size: 32rem; overflow: visible; }
-  .flow-svg text { fill: var(--tx-foreground, CanvasText); font: 16px var(--tx-font-sans, system-ui, sans-serif); }
+  /* Token-sized labels: the chart lays out at its drawn width, so user units are pixels. */
+  .flow-svg text { fill: var(--tx-foreground, CanvasText); font: var(--tx-font-size-xs, 0.75rem) var(--tx-font-sans, system-ui, sans-serif); }
   @media (forced-colors: active) { .flow-svg path { stroke: CanvasText; stroke-dasharray: 4 3; } .flow-svg circle { fill: Canvas; stroke: CanvasText; stroke-width: 2; } }
   @media (forced-colors: active) {
     figcaption h3, figcaption p { color: CanvasText; }

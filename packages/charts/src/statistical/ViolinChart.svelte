@@ -1,4 +1,5 @@
 <script lang="ts">
+import { fitChartWidth } from '../math/layout/fit-width.ts';
 import {
   createViolinLayout,
   formatStatNumber,
@@ -26,9 +27,13 @@ let {
   bandwidth,
   domain,
   labels,
-  width = 640,
+  width: preferredWidth = 640,
   height = 320,
 }: Props = $props();
+
+// Lays out at the figure's measured width, up to `width` (the preferred width).
+let measuredWidth = $state(0);
+const width = $derived(fitChartWidth(measuredWidth, preferredWidth));
 
 const uid = $props.id();
 const text = $derived(statLabels(labels));
@@ -49,7 +54,7 @@ $effect(() => {
 });
 </script>
 
-<figure class="statistical" data-kind="violin">
+<figure bind:clientWidth={measuredWidth} class="statistical" data-kind="violin">
   <figcaption>
     <h3 id="{uid}-heading">{title}</h3>
     <p id="{uid}-description">{description}</p>
