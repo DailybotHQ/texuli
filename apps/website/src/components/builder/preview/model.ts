@@ -91,3 +91,61 @@ export function previewSummary(event: PlayerDiagnosticsEvent | null, issues: num
   if (issues === 0) return 'No issues: the draft passes validation.';
   return `${count} in the draft.`;
 }
+
+/** Preview stage widths: a phone, a tablet, or the pane's full width. */
+export const PREVIEW_WIDTHS = ['mobile', 'tablet', 'desktop'] as const;
+export type PreviewWidth = (typeof PREVIEW_WIDTHS)[number];
+export const PREVIEW_MODES = ['light', 'dark'] as const;
+export type PreviewMode = (typeof PREVIEW_MODES)[number];
+
+/** How the preview is shown. It travels with the draft in a share link, never inside the blueprint. */
+export interface PreviewView {
+  width: PreviewWidth;
+  mode: PreviewMode;
+}
+
+export const DEFAULT_PREVIEW_VIEW: PreviewView = Object.freeze({ width: 'desktop', mode: 'light' });
+
+/**
+ * The stage's real width in CSS pixels (`null`: the pane's width). The
+ * stage is a container of exactly this inline size, scrolled when the pane
+ * is narrower, never scaled: what fits at 390px is what a 390px container
+ * shows.
+ */
+export const PREVIEW_WIDTH_PX: Readonly<Record<PreviewWidth, number | null>> = Object.freeze({
+  mobile: 390,
+  tablet: 768,
+  desktop: null,
+});
+
+export const PREVIEW_WIDTH_LABELS: Readonly<Record<PreviewWidth, string>> = Object.freeze({
+  mobile: 'Mobile (390px)',
+  tablet: 'Tablet (768px)',
+  desktop: 'Desktop (full width)',
+});
+
+/** Classes for the stage: one per width and mode, so tests and styles read the same state. */
+export function stageClass(view: PreviewView): string {
+  return `builder-preview__stage builder-preview__stage--${view.width} builder-preview__stage--${view.mode}`;
+}
+
+/** The stage's inline size: a fixed width, or the whole pane. */
+export function stageInlineSize(width: PreviewWidth): string {
+  const px = PREVIEW_WIDTH_PX[width];
+  return px === null ? '100%' : `${px}px`;
+}
+
+/** `light desktop`: the view as share-link text. */
+export function viewText(view: PreviewView): string {
+  return `${view.mode} ${view.width}`;
+}
+
+/** Share-link text → a view, or `null` for anything but exactly a known mode and width. */
+export function parseView(text: string): PreviewView | null {
+  const parts = text.split(' ');
+  if (parts.length !== 2) return null;
+  const [mode, width] = parts;
+  if (!PREVIEW_MODES.includes(mode as PreviewMode)) return null;
+  if (!PREVIEW_WIDTHS.includes(width as PreviewWidth)) return null;
+  return { mode: mode as PreviewMode, width: width as PreviewWidth };
+}

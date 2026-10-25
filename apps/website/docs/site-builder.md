@@ -56,8 +56,12 @@ content block, chart and media families, the page, doc, card and grid
 layouts, the stack, row, split and grid tile layouts, and the host region.
 Every other Tier U id in the player's catalog is listed too, as a disabled
 option that says why it is not available, so nothing is silently missing:
-- `layout-deck` and `deck-slide`: the player paints them, but decks need
-  slide, master and settings editing, which is planned (builder phase B2);
+- `layout-deck`: a deck is a whole draft, so it is edited as the draft
+  root, started from the **Planning deck** starter (`BUILDER_ROOT_ONLY` in
+  `manifest.ts`); the palette never inserts one inside a draft. Its card
+  slides are edited like any card; its `masters`, `settings`, `slides` and
+  `themeRef` props are JSON fields with the renderer's kind check only;
+- `deck-slide`: slide editing is planned (builder phase B2);
 - the state-only controls (`control-toggle`, `control-choice`,
   `control-slider`, `control-filter`), the flow ids (`flow-view`,
   `flow-action`) and the action form ids (`action-form`, `form-field`,
@@ -522,8 +526,8 @@ committed, and the inspector flags them, as before.
 
 | File | Role |
 | --- | --- |
-| `model.ts` | Framework-free: player node paths → builder paths (`builderPathOf`), the issues list (`previewIssues`) and its summary line |
-| `PreviewPane.svelte` | The player and the **Draft issues** area |
+| `model.ts` | Framework-free: player node paths → builder paths (`builderPathOf`), the issues list (`previewIssues`) and its summary line, and the preview view (width and mode: `stageClass`, `stageInlineSize`, `viewText`, `parseView`) |
+| `PreviewPane.svelte` | The width and mode switchers, the player and the **Draft issues** area |
 
 - **The player is the one hosts get.** It runs at the untrusted tier with
   status `draft` and `invalidPolicy="preview"`, so an invalid draft still
@@ -540,6 +544,46 @@ committed, and the inspector flags them, as before.
   (`onNodeError`) reported since. Messages are text. An issue tied to a node
   has a **Select** button that selects its structure row and moves focus to
   it. A polite status summarizes the count.
+- **Widths.** **Mobile** (390px), **Tablet** (768px) and **Desktop** (the
+  pane's width) set the stage's real inline size; a stage wider than the
+  pane scrolls instead of shrinking. Nothing is scaled. The stage is a size
+  container (`container-type: inline-size`), so components that size from
+  their container respond; viewport media queries still read the browser
+  window, so they do not change with the switcher.
+- **Light and dark.** The mode switch re-themes the preview only. The stage
+  carries the host page's theme id with its own `data-tx-mode`, and applies
+  that theme's tokens for its mode (`applyTheme` from `@texuli/tokens`, with
+  the theme loaded from the library when the pane mounts), so it works
+  whether the host scoped both modes in CSS or applied one mode inline. The
+  preview starts in the page's mode and follows it until a mode is picked.
+
+## Share links and starters
+
+`src/components/builder/share/model.ts` and
+`src/components/builder/starters/model.ts`.
+
+- **Share link** (toolbar) writes the draft and the preview view into the
+  URL hash, `#draft=1.<base64url>`: a view line (`dark mobile`) and the
+  canonical JSON, compressed with the browser's `CompressionStream` (raw
+  deflate). Nothing is uploaded and no server is involved. The same draft
+  gives the same link from the same compressor, and key order never changes
+  it. The page shows the link in a read-only field and copies it when the
+  clipboard is available. A link carries the whole draft, so it is as long
+  as the draft needs; links over 262,144 characters are refused.
+- **Opening a link** runs the exact check a JSON commit runs
+  (`checkPayloadText`: size, duplicate keys, the closed rules) before
+  anything paints. Inflating stops past the draft size limit, so a
+  compressed bomb is refused early. A link that fails when the page loads
+  leaves the empty draft and the status says why; a link pasted later, in
+  the same tab, never replaces the current draft unless it passes. Opening
+  is one history step (**Undo: Open shared draft**).
+- **Starters** (**Start from**): **Empty page**, **Weekly report** (a
+  document), **Operations dashboard** (a page with a grid of chart cards)
+  and **Planning deck** (a deck of card slides). The three blueprints are the
+  player fixture blueprints from the examples registry (`@texuli/examples`,
+  fictional data), loaded only when one is picked. Each passes the JSON
+  commit check before it replaces the draft as one history step (**Undo:
+  Start from Operations dashboard**). The page opens on the empty draft.
 
 ## History: undo and redo
 
@@ -715,8 +759,14 @@ The browser spec (`tests/e2e/site-builder.spec.ts`, 22 tests) covers:
   disabled Tier U entries with their reasons;
 - **outline**: Alt+Arrow moves with their announcements, the swapped
   horizontal keys in a right-to-left page, a pointer drag into a card, a
-  drag cancelled with Escape, and removal by Delete and by the **Remove**
-  button;
+  drag cancelled with Escape, a multi-selection dragged into a card
+  together, a refused drop that changes nothing, a touch drag from the grip
+  handle, duplicate, copy and paste, and removal by Delete and by the
+  **Remove** button;
+- **preview, share and starters**: the width switcher's real stage widths,
+  the color mode re-theming the preview only, a share link that restores
+  the exact draft and view in a new page with no network request, damaged
+  and refused links, and the starters with their undo labels;
 - **inspector**: a text block edited through its structured fields; refused
   enum and boolean values cleared and fixed; number fields with refused,
   out-of-range and unreadable values; structured props edited field by field
@@ -739,7 +789,7 @@ The browser spec (`tests/e2e/site-builder.spec.ts`, 22 tests) covers:
 - axe in light, dark and forced-colors modes.
 
 **Not covered yet:** collapsing outline branches, drag from the palette into
-the outline (planned), browser runs of multi-select, group drags, touch
-drags, duplicate and paste (planned for the site spec), a screen-reader pass, and Firefox. WebKit runs of the
+the outline (planned), a real touchscreen (the touch drag test sends
+touch pointer events to the handle), a screen-reader pass, and Firefox. WebKit runs of the
 builder spec are not verified on the current machine (the browser does not
 launch).

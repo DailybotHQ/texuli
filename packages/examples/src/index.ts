@@ -122,6 +122,10 @@ export { mediaGeneratorSlotExample } from './media-generator-slot/entry.ts';
 export { mediaVideoExample } from './media-video/entry.ts';
 export { texuliMenusExample } from './menus/entry.ts';
 export { texuliNumberPinExample } from './number-pin/entry.ts';
+// The player fixture blueprints (fictional data): the website builder's starters.
+export { reportBlueprint } from './player-blueprint-preview/blueprint.ts';
+export { dashboardBlueprint } from './player-dashboard/blueprint.ts';
+export { deckBlueprint } from './player-deck/blueprint.ts';
 export {
   defineExample,
   getExample,

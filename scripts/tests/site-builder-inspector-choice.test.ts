@@ -51,7 +51,8 @@ function oracle(prop: ChoiceProp, value: unknown): 'unset' | 'set' | 'invalid' {
 describe('choice props in the builder manifests', () => {
   it('covers every enum and boolean prop the builder edits', () => {
     // PLAN_005 task 5 adds the G20 layouts: row align and wrap, stack, row and split gaps, split ratio.
-    expect(CHOICE_PROPS.length).toBe(39);
+    // PLAN_005 task 6: the deck root adds its aspect enum.
+    expect(CHOICE_PROPS.length).toBe(40);
     expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(7);
     const ids = new Set(CHOICE_PROPS.map((entry) => `${entry.id}.${entry.prop.name}`));
     for (const name of [

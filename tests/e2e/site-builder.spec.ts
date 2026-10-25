@@ -4,7 +4,7 @@ import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Locator, type Page, test } from '@playwright/test';
 
 const DIST = resolve('apps/website/dist');
 const TYPES: Record<string, string> = {
@@ -206,7 +206,7 @@ test.describe('texuli.com blueprint builder', () => {
     );
     const deck = page.locator('[data-palette-option="layout-deck"]');
     await expect(deck).toHaveAttribute('aria-disabled', 'true');
-    await expect(deck).toContainText('Decks need slide, master and settings editing');
+    await expect(deck).toContainText('start one from the Planning deck starter');
     await expect(page.locator('[data-palette-option="control-toggle"]')).toContainText(
       'state variable declared in the blueprint envelope'
     );
@@ -1173,5 +1173,260 @@ test.describe('texuli.com blueprint builder', () => {
     expect(await pane()).toBe('payload');
     await page.keyboard.press('Shift+F6');
     await expect(title).toBeFocused();
+  });
+});
+
+/** Commit any fictional draft through the JSON panel. */
+async function commitDraft(page: Page, value: unknown) {
+  await page.getByRole('textbox', { name: 'Blueprint JSON' }).fill(JSON.stringify(value));
+  await page.getByRole('button', { name: 'Commit JSON' }).click();
+}
+
+const textNode = (markdown: string) => ({
+  id: 'blocks-text',
+  props: { block: { type: 'text', markdown } },
+});
+
+/** Press on one element, travel past the drag threshold, release on another (real mouse events). */
+async function mouseDrag(page: Page, from: Locator, to: Locator) {
+  await from.scrollIntoViewIfNeeded();
+  const start = await from.boundingBox();
+  const end = await to.boundingBox();
+  if (!start || !end) throw new Error('drag ends have no box');
+  await page.mouse.move(start.x + start.width / 2, start.y + start.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(start.x + start.width / 2, start.y + start.height / 2 + 8, { steps: 2 });
+  await page.mouse.move(end.x + end.width / 2, end.y + end.height / 2, { steps: 6 });
+  await page.mouse.up();
+}
+
+test.describe('builder preview, share and starters (PLAN_005 task 6)', () => {
+  test('preview: the width switcher constrains a real container, never a zoom', async ({
+    page,
+  }) => {
+    await visit(page);
+    const stage = page.locator('[data-builder-preview-stage]');
+    const viewport = page.locator('[data-builder-preview-viewport]');
+    const widths = page.getByLabel('Preview width');
+    await expect(stage).toHaveClass(/builder-preview__stage--desktop/);
+    const pane = await viewport.boundingBox();
+    expect(Math.round((await stage.boundingBox())?.width ?? 0)).toBe(Math.round(pane?.width ?? -1));
+
+    await widths.getByText('Mobile', { exact: true }).click();
+    await expect(stage).toHaveClass(/builder-preview__stage--mobile/);
+    await expect(stage).toHaveAttribute('data-width', 'mobile');
+    expect(Math.round((await stage.boundingBox())?.width ?? 0)).toBe(390);
+    // No transform: the stage is laid out at that width, not scaled to it.
+    expect(await stage.evaluate((element) => getComputedStyle(element).transform)).toBe('none');
+
+    await widths.getByText('Tablet', { exact: true }).click();
+    expect(Math.round((await stage.boundingBox())?.width ?? 0)).toBe(768);
+    // Wider than the pane: the viewport scrolls instead of shrinking it.
+    const scroll = await viewport.evaluate((element) => element.scrollWidth - element.clientWidth);
+    if ((pane?.width ?? 0) < 768) expect(scroll).toBeGreaterThan(0);
+  });
+
+  test('preview: the color mode re-scopes the tokens in the preview only', async ({ page }) => {
+    await visit(page);
+    await page.locator('[data-builder-starter="report"]').click();
+    const stage = page.locator('[data-builder-preview-stage]');
+    await expect(stage).toContainText('Lighthouse weekly report');
+    const background = () => stage.evaluate((element) => getComputedStyle(element).backgroundColor);
+    const light = await background();
+    await page.getByLabel('Preview color mode').getByText('Dark', { exact: true }).click();
+    await expect(stage).toHaveAttribute('data-tx-mode', 'dark');
+    await expect.poll(background).not.toBe(light);
+    // The page itself keeps its own mode.
+    await expect(page.locator('html')).toHaveAttribute('data-tx-mode', 'light');
+    await page.getByLabel('Preview color mode').getByText('Light', { exact: true }).click();
+    await expect.poll(background).toBe(light);
+  });
+
+  test('share: the link restores the exact draft and preview view, with no network', async ({
+    page,
+    context,
+  }) => {
+    await visit(page);
+    await loadDraft(page);
+    await page.getByLabel('Preview width').getByText('Mobile', { exact: true }).click();
+    await page.getByLabel('Preview color mode').getByText('Dark', { exact: true }).click();
+    await page.getByRole('button', { name: 'Share link' }).click();
+    const field = page.locator('[data-builder-share-url]');
+    await expect(field).toBeVisible();
+    const url = await field.inputValue();
+    expect(new URL(url).hash).toMatch(/^#draft=1\.[A-Za-z0-9_-]+$/);
+    expect(page.url()).toBe(url);
+    const original = await draft(page);
+
+    const second = await context.newPage();
+    const foreign: string[] = [];
+    second.on('request', (request) => {
+      if (!request.url().startsWith(origin)) foreign.push(request.url());
+    });
+    await second.goto(url);
+    await second.waitForLoadState('networkidle');
+    await expect(second.locator('.builder__status')).toContainText('Opened the shared draft');
+    expect(await draft(second)).toEqual(original);
+    expect(await markdownOrder(second)).toEqual(['one', 'two', 'three']);
+    const stage = second.locator('[data-builder-preview-stage]');
+    await expect(stage).toHaveAttribute('data-width', 'mobile');
+    await expect(stage).toHaveAttribute('data-tx-mode', 'dark');
+    await expect(second.getByRole('button', { name: 'Undo' })).toHaveAttribute(
+      'title',
+      'Undo: Open shared draft'
+    );
+    expect(foreign).toEqual([]);
+    await second.close();
+  });
+
+  test('share: a damaged or refused link opens the empty draft and says why', async ({ page }) => {
+    await page.goto(`${origin}/builder/#draft=1.AAAA`);
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.builder__status')).toContainText('could not be opened');
+    await expect(page.locator('.builder__status')).toContainText('Started an empty draft');
+    await expect(page.getByRole('treeitem')).toHaveCount(1);
+
+    // A well-formed link whose draft the closed rules refuse (an id outside the palette).
+    const hostile = await page.evaluate(async () => {
+      const text = 'light desktop\n{"id":"dialog","props":{}}';
+      const stream = new Blob([new TextEncoder().encode(text)])
+        .stream()
+        .pipeThrough(new CompressionStream('deflate-raw'));
+      const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+      let binary = '';
+      for (const byte of bytes) binary += String.fromCharCode(byte);
+      return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    });
+    await page.goto(`${origin}/builder/#draft=1.${hostile}`);
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.builder__status')).toContainText('The shared draft was refused');
+    await expect(page.getByRole('treeitem')).toHaveCount(1);
+    await expect(page.locator('[data-builder-preview-stage]')).not.toContainText('dialog');
+  });
+
+  test('starters: each one replaces the draft as one undoable step', async ({ page }) => {
+    await visit(page);
+    await page.locator('[data-builder-starter="dashboard"]').click();
+    await expect(page.locator('.builder__status')).toContainText(
+      'Started from Operations dashboard'
+    );
+    await expect(page.locator('[data-builder-preview-stage]')).toContainText('Fleet operations');
+    expect(await page.getByRole('treeitem').count()).toBeGreaterThan(4);
+    await expect(page.getByRole('button', { name: 'Undo' })).toHaveAttribute(
+      'title',
+      'Undo: Start from Operations dashboard'
+    );
+    await page.getByRole('button', { name: 'Undo' }).click();
+    await expect(page.getByRole('treeitem')).toHaveCount(1);
+
+    await page.locator('[data-builder-starter="deck"]').click();
+    await expect(page.locator('[data-builder-row=""]')).toContainText('Deck layout');
+    await expect(page.locator('[data-builder-preview-stage]')).toContainText('Lighthouse planning');
+    await page.locator('[data-builder-starter="empty"]').click();
+    await expect(page.getByRole('treeitem')).toHaveCount(1);
+  });
+
+  test('outline pointer: a multi-selection drags into a card together', async ({ page }) => {
+    await visit(page);
+    await commitDraft(page, {
+      id: 'layout-page',
+      props: { title: 'Fictional pier notes' },
+      children: [
+        { id: 'layout-card', props: { title: 'Box' }, children: [] },
+        textNode('alpha'),
+        textNode('bravo'),
+      ],
+    });
+    await expect(page.locator('[data-builder-row="2"]')).toBeVisible();
+    await page.locator('[data-builder-row="1"]').click();
+    await page.locator('[data-builder-row="2"]').click({ modifiers: ['ControlOrMeta'] });
+    await expect(page.locator('[role="treeitem"][aria-selected="true"]')).toHaveCount(2);
+    await mouseDrag(
+      page,
+      page.locator('[data-builder-row="1"]'),
+      page.locator('[data-builder-row="0"]')
+    );
+    await expect(page.locator('[data-outline-status]')).toHaveText('Moved 2 components.');
+    expect(await childCounts(page)).toEqual([2]);
+    expect(await markdownOrder(page)).toEqual(['alpha', 'bravo']);
+    await expect(page.getByRole('button', { name: 'Undo' })).toHaveAttribute(
+      'title',
+      'Undo: Move Text blocks and 1 more'
+    );
+  });
+
+  test('outline pointer: a refused drop is shown and changes nothing', async ({ page }) => {
+    await visit(page);
+    await loadDraft(page);
+    const before = await draft(page);
+    // The card onto its own child: a component cannot move into itself.
+    await mouseDrag(
+      page,
+      page.locator('[data-builder-row="0"]'),
+      page.locator('[data-builder-row="0.1"]')
+    );
+    await expect(page.locator('[data-outline-status]')).toHaveText(
+      'A component cannot move into itself.'
+    );
+    expect(await draft(page)).toEqual(before);
+  });
+
+  test('outline: duplicate, copy and paste through the buttons and keys', async ({ page }) => {
+    await visit(page);
+    await loadDraft(page);
+    await page.locator('[data-builder-row="1"]').click();
+    await page.getByRole('button', { name: 'Duplicate', exact: true }).click();
+    expect(await markdownOrder(page)).toEqual(['one', 'two', 'three', 'three']);
+    await expect(page.locator('[data-outline-status]')).toHaveText('Duplicated Text blocks.');
+    await expect(page.getByRole('button', { name: 'Undo' })).toHaveAttribute(
+      'title',
+      'Undo: Duplicate Text blocks'
+    );
+
+    await page.locator('[data-builder-row="0.0"]').click();
+    await page.keyboard.press('Control+c');
+    await expect(page.locator('[data-outline-status]')).toContainText('Copied Text blocks.');
+    await page.locator('[data-builder-row="0"]').click();
+    await page.keyboard.press('Control+v');
+    expect(await childCounts(page)).toEqual([3, 0, 0]);
+    expect(await markdownOrder(page)).toEqual(['one', 'two', 'one', 'three', 'three']);
+    await expect(page.locator('[data-builder-row="0.2"]')).toHaveAttribute('aria-selected', 'true');
+    await page.getByRole('button', { name: 'Undo' }).click();
+    expect(await childCounts(page)).toEqual([2, 0, 0]);
+  });
+});
+
+test.describe('builder touch drag (PLAN_005 task 6)', () => {
+  test.use({ hasTouch: true });
+
+  test('a touch drag from the grip handle moves the row', async ({ page }) => {
+    await visit(page);
+    await loadDraft(page);
+    const handle = page.locator('[data-outline-row="1"] .outline__handle');
+    const card = page.locator('[data-builder-row="0"]');
+    await handle.scrollIntoViewIfNeeded();
+    const start = await handle.boundingBox();
+    const end = await card.boundingBox();
+    if (!start || !end) throw new Error('drag ends have no box');
+    // A touch pointer's events, as the browser sends them to the pressed handle.
+    const send = (type: string, x: number, y: number) =>
+      handle.dispatchEvent(type, {
+        pointerId: 7,
+        pointerType: 'touch',
+        isPrimary: true,
+        button: type === 'pointermove' ? -1 : 0,
+        clientX: x,
+        clientY: y,
+        bubbles: true,
+      });
+    await send('pointerdown', start.x + start.width / 2, start.y + start.height / 2);
+    await send('pointermove', start.x + start.width / 2, start.y + start.height / 2 + 10);
+    await send('pointermove', end.x + end.width / 2, end.y + end.height / 2);
+    await send('pointerup', end.x + end.width / 2, end.y + end.height / 2);
+    await expect(page.locator('[data-outline-status]')).toHaveText(
+      'Moved Text blocks into Card layout, position 3 of 3.'
+    );
+    expect(await childCounts(page)).toEqual([3]);
   });
 });

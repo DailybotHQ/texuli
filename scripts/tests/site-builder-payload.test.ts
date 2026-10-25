@@ -18,6 +18,18 @@ import {
   positionIndex,
   prettyBlueprintJson,
 } from '../../apps/website/src/components/builder/payload/model.ts';
+import {
+  decodeShare,
+  encodeShare,
+  isShareHash,
+  MAX_SHARE_CHARS,
+  SHARE_PREFIX,
+} from '../../apps/website/src/components/builder/share/model.ts';
+import {
+  loadStarter,
+  STARTER_IDS,
+  STARTERS,
+} from '../../apps/website/src/components/builder/starters/model.ts';
 
 /**
  * The builder's payload panel (builder design §6, Task 71): blueprint text and
@@ -245,6 +257,121 @@ describe('refused text is line-precise and never applied in part', () => {
       for (let offset = -2; offset <= text.length + 2; offset += 1) {
         expect(at(offset), `${JSON.stringify(text)} @ ${offset}`).toEqual(positionAt(text, offset));
       }
+    }
+  });
+});
+
+const SHARED: CatalogTreeInput = {
+  id: 'layout-page',
+  props: { title: 'Fictional harbor notes' },
+  children: [
+    {
+      id: 'blocks-text',
+      props: { block: { type: 'heading', level: 2, text: 'Pier 4 — überblick' } },
+    },
+    { id: 'layout-card', props: { title: 'Summary' }, children: [] },
+  ],
+};
+
+/** A hash whose payload is `text`, deflated the way the builder does it. */
+async function hashOf(text: string, version = '1'): Promise<string> {
+  const stream = new Blob([new TextEncoder().encode(text)])
+    .stream()
+    .pipeThrough(new CompressionStream('deflate-raw'));
+  const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  const data = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return `${SHARE_PREFIX}${version}.${data}`;
+}
+
+describe('share links (PLAN_005 task 6)', () => {
+  it('round-trips the exact draft and the preview view, deterministically', async () => {
+    const view = { width: 'mobile', mode: 'dark' } as const;
+    const hash = await encodeShare(SHARED, view);
+    expect(isShareHash(hash)).toBe(true);
+    expect(hash).toMatch(/^#draft=1\.[A-Za-z0-9_-]+$/);
+    expect(await encodeShare(SHARED, view)).toBe(hash);
+    const opened = await decodeShare(hash);
+    expect(opened.ok).toBe(true);
+    if (!opened.ok) return;
+    expect(canonicalBlueprintJson(opened.tree)).toBe(canonicalBlueprintJson(SHARED));
+    expect(await blueprintDigest(opened.tree)).toBe(await blueprintDigest(SHARED));
+    expect(opened.view).toEqual(view);
+    // Key order never changes the link: the draft is canonical JSON.
+    const reordered = JSON.parse(
+      JSON.stringify({ children: SHARED.children, props: SHARED.props, id: SHARED.id })
+    );
+    expect(await encodeShare(reordered, view)).toBe(hash);
+  });
+
+  it('refuses what a JSON commit refuses, before anything paints', async () => {
+    const hostile = [
+      ['unknown id', 'light desktop\n{"id":"dialog"}'],
+      ['handler prop', 'light desktop\n{"id":"layout-page","props":{"onclick":"x"}}'],
+      ['class prop', 'light desktop\n{"id":"layout-page","props":{"class":"x"}}'],
+      ['duplicate keys', 'light desktop\n{"id":"layout-page","id":"layout-doc"}'],
+      ['broken JSON', 'light desktop\n{"id":'],
+      ['bad view', 'sepia desktop\n{"id":"layout-page"}'],
+      ['no view line', '{"id":"layout-page"}'],
+    ] as const;
+    for (const [name, text] of hostile) {
+      const result = await decodeShare(await hashOf(text));
+      expect(result.ok, name).toBe(false);
+      if (!result.ok) expect(result.message.length, name).toBeGreaterThan(10);
+    }
+    const passes = await decodeShare(await hashOf('dark tablet\n{"id":"layout-page","props":{}}'));
+    expect(passes.ok).toBe(true);
+  });
+
+  it('refuses damaged, foreign, oversized and bomb-like links', async () => {
+    expect((await decodeShare('#other=1.abc')).ok).toBe(false);
+    expect((await decodeShare(`${SHARE_PREFIX}2.abc`)).ok).toBe(false);
+    expect((await decodeShare(`${SHARE_PREFIX}1.`)).ok).toBe(false);
+    expect((await decodeShare(`${SHARE_PREFIX}1.not*base64`)).ok).toBe(false);
+    expect((await decodeShare(`${SHARE_PREFIX}1.AAAA`)).ok).toBe(false);
+    expect((await decodeShare(`${SHARE_PREFIX}1.${'A'.repeat(MAX_SHARE_CHARS + 1)}`)).ok).toBe(
+      false
+    );
+    // Highly compressible text past the draft limit stops inflating at the cap.
+    const bomb = await hashOf(`light desktop\n${' '.repeat(5_000_000)}`);
+    expect(bomb.length).toBeLessThan(MAX_SHARE_CHARS);
+    const result = await decodeShare(bomb);
+    expect(result).toEqual({
+      ok: false,
+      message: 'The link is damaged or holds more than a draft can.',
+    });
+  });
+});
+
+describe('starter drafts (PLAN_005 task 6)', () => {
+  it('offers an empty page and three registry blueprints', () => {
+    expect(STARTER_IDS).toEqual(['empty', 'report', 'dashboard', 'deck']);
+    expect(STARTERS.map((starter) => starter.label)).toEqual([
+      'Empty page',
+      'Weekly report',
+      'Operations dashboard',
+      'Planning deck',
+    ]);
+  });
+
+  it('every starter passes the JSON commit check and the history, and is a fresh copy', async () => {
+    for (const id of STARTER_IDS) {
+      const tree = await loadStarter(id);
+      const checked = checkPayloadText(JSON.stringify(tree));
+      expect(checked.ok, `${id}: ${checked.ok ? '' : JSON.stringify(checked.issues)}`).toBe(true);
+      const history = createBuilderHistory();
+      const applied = history.apply({ op: 'replaceAll', tree });
+      expect(applied.ok, id).toBe(true);
+      expect(await loadStarter(id)).not.toBe(tree);
+    }
+    expect((await loadStarter('report')).id).toBe('layout-doc');
+    expect((await loadStarter('dashboard')).id).toBe('layout-page');
+    expect((await loadStarter('deck')).id).toBe('layout-deck');
+    // Fictional data only: no link leaves example.com.
+    for (const id of STARTER_IDS) {
+      const urls = JSON.stringify(await loadStarter(id)).match(/https?:\/\/[^"\s]+/g) ?? [];
+      for (const url of urls) expect(new URL(url).hostname.endsWith('example.com'), url).toBe(true);
     }
   });
 });

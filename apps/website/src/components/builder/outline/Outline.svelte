@@ -360,7 +360,11 @@ function onpointermove(event: PointerEvent) {
     dragKey = press.key;
     checked = new Map();
     message = '';
-    (event.currentTarget as Element | null)?.setPointerCapture?.(event.pointerId);
+    try {
+      (event.currentTarget as Element | null)?.setPointerCapture?.(event.pointerId);
+    } catch {
+      // A pointer the browser no longer tracks cannot be captured; the drag still follows its moves.
+    }
   }
   dropHint = hintAt(event.clientX, event.clientY);
 }

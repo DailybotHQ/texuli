@@ -15,6 +15,8 @@ import {
 import {
   BUILDER_MANIFEST_BY_ID,
   BUILDER_MANIFESTS,
+  BUILDER_ROOT_ONLY,
+  builderInsertable,
 } from '../../apps/website/src/components/builder/manifest.ts';
 import { inspectorFields } from '../../apps/website/src/components/builder/model.ts';
 import {
@@ -139,7 +141,7 @@ describe('builder palette search', () => {
 /** The palette the builder really shows: the real sources, as BuilderApp builds it. */
 const real = createPaletteEntries(PALETTE_MANIFESTS, {
   paintable: playerPaints,
-  insertable: (id) => BUILDER_MANIFEST_BY_ID.has(id),
+  insertable: builderInsertable,
   reason: unavailableReason,
 });
 const realById = new Map(real.map((entry) => [entry.id, entry]));
@@ -168,8 +170,10 @@ describe('the builder palette (PLAN_005 task 5)', () => {
   it('explains each painted id it cannot insert, specifically', () => {
     const note = (id: string) => realById.get(id)?.note ?? '';
     expect(realById.get('layout-deck')?.availability).toBe('not-in-host');
-    expect(note('layout-deck')).toContain('Decks need slide, master and settings editing');
-    expect(note('deck-slide')).toBe(note('layout-deck'));
+    // A deck is a whole draft (the deck starter); the palette never nests one.
+    expect(note('layout-deck')).toContain('start one from the Planning deck starter');
+    expect(BUILDER_MANIFEST_BY_ID.has('layout-deck')).toBe(true);
+    expect(note('deck-slide')).toContain('slide editor');
     for (const id of ['control-toggle', 'control-choice', 'control-slider', 'control-filter']) {
       expect(realById.get(id)?.availability, id).toBe('not-in-host');
       expect(note(id), id).toContain('state variable declared in the blueprint envelope');
@@ -229,7 +233,9 @@ describe('the builder palette (PLAN_005 task 5)', () => {
   it('every insertable entry is a builder manifest, and every prop it offers has a working field', () => {
     const insertable = real.filter((entry) => entry.availability === 'insertable');
     expect(insertable.map((entry) => entry.id).sort()).toEqual(
-      BUILDER_MANIFESTS.map((manifest) => manifest.id).sort()
+      BUILDER_MANIFESTS.map((manifest) => manifest.id)
+        .filter((id) => !BUILDER_ROOT_ONLY.has(id))
+        .sort()
     );
     const families: Record<string, number> = {};
     for (const manifest of BUILDER_MANIFESTS) {

@@ -30,7 +30,7 @@ import StructProp from './inspector/struct/StructProp.svelte';
 import { chartStructSchema } from './inspector/struct/sources.ts';
 import TextBlockEditor from './inspector/text/TextBlockEditor.svelte';
 import { paneCycle } from './keyboard/panes.ts';
-import { BUILDER_MANIFEST_BY_ID } from './manifest.ts';
+import { BUILDER_MANIFEST_BY_ID, builderInsertable } from './manifest.ts';
 import {
   canonicalJson,
   createBuilderHistory,
@@ -54,8 +54,12 @@ import Outline from './outline/Outline.svelte';
 import { createPaletteEntries } from './palette/model.ts';
 import Palette from './palette/Palette.svelte';
 import { PALETTE_MANIFESTS, playerPaints, unavailableReason } from './palette/sources.ts';
+import { checkPayloadText, describeIssue } from './payload/model.ts';
 import PayloadPanel from './payload/PayloadPanel.svelte';
+import { DEFAULT_PREVIEW_VIEW, type PreviewView } from './preview/model.ts';
 import PreviewPane from './preview/PreviewPane.svelte';
+import { decodeShare, encodeShare, isShareHash } from './share/model.ts';
+import { loadStarter, STARTERS, type StarterId } from './starters/model.ts';
 
 let {
   initial,
@@ -84,7 +88,7 @@ let diagnostic = $state('');
 // Tier U palette: the builder inserts its own manifests; other Tier U ids show as unavailable.
 const paletteEntries = createPaletteEntries(PALETTE_MANIFESTS, {
   paintable: playerPaints,
-  insertable: (id) => BUILDER_MANIFEST_BY_ID.has(id),
+  insertable: builderInsertable,
   reason: unavailableReason,
 });
 /** The value the player forces for a prop: media `trust` is always the host's tier, never the blueprint's. */
@@ -282,6 +286,106 @@ function onHistoryKey(event: KeyboardEvent) {
   else redo();
 }
 
+/** Replace the whole draft as one labeled, undoable step. */
+function replaceDraft(next: CatalogTreeInput, label: string): string | null {
+  const result = history.apply({ op: 'replaceAll', tree: next }, { label });
+  if (!result.ok) return result.error.message;
+  tree = result.tree;
+  historyView = readHistory();
+  select([]);
+  return null;
+}
+
+let view = $state<PreviewView>({ ...DEFAULT_PREVIEW_VIEW });
+/** Set once a mode is picked (or a link sets one): the preview stops following the page mode. */
+let modeTouched = false;
+
+function setView(next: PreviewView) {
+  if (next.mode !== view.mode) modeTouched = true;
+  view = next;
+}
+
+// The preview starts in the page's mode and follows it until a mode is picked.
+$effect(() => {
+  const root = document.documentElement;
+  const sync = () => {
+    if (!modeTouched) {
+      const mode = root.dataset.txMode === 'dark' ? 'dark' : 'light';
+      if (untrack(() => view.mode) !== mode) view = { ...untrack(() => view), mode };
+    }
+  };
+  sync();
+  const observer = new MutationObserver(sync);
+  observer.observe(root, { attributes: true, attributeFilter: ['data-tx-mode'] });
+  return () => observer.disconnect();
+});
+let shareUrl = $state('');
+/** The hash this page wrote itself, so it is not opened again as a pasted link. */
+let ownHash = '';
+
+/** Starters pass the same check as a JSON commit before they replace the draft. */
+async function start(id: StarterId) {
+  const starter = STARTERS.find((candidate) => candidate.id === id);
+  if (!starter) return;
+  const checked = checkPayloadText(JSON.stringify(await loadStarter(id)));
+  if (!checked.ok) {
+    diagnostic = `The ${starter.label} starter was refused: ${describeIssue(checked.issues[0] ?? { message: 'it did not pass the checks' })}`;
+    return;
+  }
+  const refused = replaceDraft(checked.tree, `Start from ${starter.label}`);
+  diagnostic = refused ?? `Started from ${starter.label}. Undo returns to the previous draft.`;
+}
+
+/** Put the draft and the preview view in the URL hash, and offer the link. */
+async function share() {
+  const hash = await encodeShare(tree, view);
+  ownHash = hash;
+  window.history.replaceState(window.history.state, '', hash);
+  shareUrl = window.location.href;
+  let copied = false;
+  try {
+    await navigator.clipboard?.writeText(shareUrl);
+    copied = navigator.clipboard !== undefined;
+  } catch {
+    copied = false;
+  }
+  diagnostic = copied
+    ? 'Share link copied. It holds the whole draft; nothing was uploaded.'
+    : 'Share link ready below. It holds the whole draft; nothing was uploaded.';
+}
+
+/**
+ * Open a draft from the link: it is checked like a JSON commit before
+ * anything paints. A link that fails at load leaves the empty draft and
+ * says why; a link pasted later never replaces the current draft unless it
+ * passes.
+ */
+async function openFromHash(hash: string, atLoad: boolean) {
+  if (!isShareHash(hash) || hash === ownHash) return;
+  const result = await decodeShare(hash);
+  if (!result.ok) {
+    if (atLoad) replaceDraft(EMPTY_BLUEPRINT, 'New draft');
+    diagnostic = `The shared link could not be opened: ${result.message}${atLoad ? ' Started an empty draft.' : ' The draft was not changed.'}`;
+    return;
+  }
+  const refused = replaceDraft(result.tree, 'Open shared draft');
+  if (refused) {
+    diagnostic = `The shared link could not be opened: ${refused}`;
+    return;
+  }
+  view = result.view;
+  modeTouched = true;
+  ownHash = hash;
+  diagnostic = 'Opened the shared draft. It was checked like a JSON commit before painting.';
+}
+
+$effect(() => {
+  untrack(() => void openFromHash(window.location.hash, true));
+  const onHash = () => void openFromHash(window.location.hash, false);
+  window.addEventListener('hashchange', onHash);
+  return () => window.removeEventListener('hashchange', onHash);
+});
+
 function reset() {
   if (history.apply({ op: 'replaceAll', tree: EMPTY_BLUEPRINT }, { label: 'New draft' }).ok) {
     tree = history.tree;
@@ -315,7 +419,20 @@ function reset() {
       >Redo</button>
       <button type="button" onclick={reset}>New draft</button>
       <button type="button" onclick={() => navigator.clipboard?.writeText(canonicalJson(tree))}>Copy JSON</button>
+      <button type="button" onclick={() => void share()} data-builder-share>Share link</button>
     </div>
+    <div class="builder__starters" role="group" aria-labelledby="builder-starters-label" data-builder-starters>
+      <span id="builder-starters-label" class="builder__starters-label">Start from</span>
+      {#each STARTERS as starter (starter.id)}
+        <button type="button" title={starter.summary} data-builder-starter={starter.id} onclick={() => void start(starter.id)}>{starter.label}</button>
+      {/each}
+    </div>
+    {#if shareUrl}
+      <label class="builder__share">
+        <span>Share link</span>
+        <input type="text" readonly value={shareUrl} data-builder-share-url onfocus={(event) => event.currentTarget.select()} />
+      </label>
+    {/if}
   </div>
 
   <div class="builder__grid">
@@ -346,6 +463,8 @@ function reset() {
       />
       <PreviewPane
         {tree}
+        {view}
+        onviewchange={setView}
         labelOf={(path) => labelOf(atPath(path)?.id ?? '')}
         onselect={select}
       />
@@ -424,6 +543,10 @@ function reset() {
 <style>
   .builder { display: grid; gap: 1rem; color: var(--tx-foreground, CanvasText); }
   .builder__toolbar { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+  .builder__starters { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; inline-size: 100%; }
+  .builder__starters-label { font-size: .875rem; font-weight: 600; }
+  .builder__share { display: grid; gap: .25rem; inline-size: 100%; font-size: .875rem; }
+  .builder__share input { box-sizing: border-box; inline-size: 100%; border: 1px solid var(--tx-border, ButtonBorder); border-radius: .4rem; padding: .45rem; color: inherit; background: var(--tx-background, Canvas); }
   .builder__status, .builder__hint { margin: 0; color: var(--tx-muted-foreground, GrayText); font-size: .875rem; }
   .builder__actions { display: flex; flex-wrap: wrap; gap: .5rem; }
   .builder button { font: inherit; border: 1px solid var(--tx-border, ButtonBorder); border-radius: .45rem; padding: .45rem .7rem; color: inherit; background: var(--tx-surface, Canvas); cursor: pointer; }

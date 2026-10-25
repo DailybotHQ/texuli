@@ -4,8 +4,14 @@ import type { PlayerDiagnosticsEvent } from '@texuli/player';
 import { describe, expect, it } from 'vitest';
 import {
   builderPathOf,
+  DEFAULT_PREVIEW_VIEW,
+  PREVIEW_WIDTH_PX,
+  parseView,
   previewIssues,
   previewSummary,
+  stageClass,
+  stageInlineSize,
+  viewText,
 } from '../../apps/website/src/components/builder/preview/model.ts';
 
 const event = (overrides: Partial<PlayerDiagnosticsEvent> = {}): PlayerDiagnosticsEvent => ({
@@ -79,5 +85,45 @@ describe('builder preview model', () => {
       'The draft cannot be previewed: 1 issue.'
     );
     expect(previewSummary(event(), 1)).toBe('1 issue in the draft.');
+  });
+});
+
+describe('preview breakpoints and color mode (PLAN_005 task 6)', () => {
+  it('constrains the stage to a real width per breakpoint, never a scale', () => {
+    expect(PREVIEW_WIDTH_PX).toEqual({ mobile: 390, tablet: 768, desktop: null });
+    expect(stageInlineSize('mobile')).toBe('390px');
+    expect(stageInlineSize('tablet')).toBe('768px');
+    expect(stageInlineSize('desktop')).toBe('100%');
+  });
+
+  it('names the width and mode in the stage classes', () => {
+    expect(stageClass(DEFAULT_PREVIEW_VIEW)).toBe(
+      'builder-preview__stage builder-preview__stage--desktop builder-preview__stage--light'
+    );
+    expect(stageClass({ width: 'mobile', mode: 'dark' })).toContain(
+      'builder-preview__stage--mobile'
+    );
+    expect(stageClass({ width: 'mobile', mode: 'dark' })).toContain('builder-preview__stage--dark');
+  });
+
+  it('writes and reads the view exactly, refusing anything else', () => {
+    for (const view of [
+      { width: 'mobile', mode: 'dark' },
+      { width: 'tablet', mode: 'light' },
+      DEFAULT_PREVIEW_VIEW,
+    ] as const) {
+      expect(parseView(viewText(view))).toEqual(view);
+    }
+    for (const bad of [
+      '',
+      'dark',
+      'dark  mobile',
+      'DARK mobile',
+      'dark mobile extra',
+      'sepia mobile',
+      'dark watch',
+    ]) {
+      expect(parseView(bad), bad).toBeNull();
+    }
   });
 });

@@ -46,7 +46,9 @@ export function playerPaints(id: string): boolean {
 }
 
 const DECK =
-  'Decks need slide, master and settings editing; this builder edits page trees only, so decks are not insertable yet.';
+  'A deck is a whole draft: start one from the Planning deck starter. The palette does not insert a deck inside a draft.';
+const SLIDE =
+  'Deck slides need the slide editor (planned); the deck starter uses card slides, which this builder edits.';
 const STATE =
   'Sets a state variable declared in the blueprint envelope; this builder edits the tree only and cannot declare state yet.';
 const FLOW =
@@ -57,7 +59,7 @@ const ACTION =
 /** Why a painted Tier U id is not insertable in this builder. */
 const UNAVAILABLE_REASONS: Readonly<Record<string, string>> = Object.freeze({
   'layout-deck': DECK,
-  'deck-slide': DECK,
+  'deck-slide': SLIDE,
   'control-toggle': STATE,
   'control-choice': STATE,
   'control-slider': STATE,

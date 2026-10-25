@@ -18,6 +18,7 @@ The registry API and a seed example (`core-safe-href` over `@texuli/core`
 | `listExamples(filter?)` | Stable id order; optional `tag` / `component` filters |
 | `listExampleIds()` | Ids only |
 | `ExampleMeta` / `ExampleEntry` / `ExampleFilter` | Types |
+| `reportBlueprint` / `dashboardBlueprint` / `deckBlueprint` | The player fixture blueprints (fictional data), plain JSON trees; the website builder uses them as starters |
 
 ```ts
 import { defineExample } from '@texuli/examples';
