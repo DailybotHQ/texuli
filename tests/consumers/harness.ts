@@ -178,6 +178,15 @@ function rewritePlaceholders(pkgJson: string, tarballs: TarballMap): string {
 }
 
 /**
+ * Point every Texuli dependency at one exact published version, so the
+ * install resolves from the npm registry (the consumers-matrix registry
+ * mode). Fails the gate honestly when that version is not published.
+ */
+export function rewritePlaceholdersToVersion(pkgJson: string, version: string): string {
+  return pkgJson.replaceAll(/file:PLACEHOLDER_[A-Z]+/g, version);
+}
+
+/**
  * Assert every Texuli dependency resolved from a local packed tarball (`file:`),
  * never the public registry.
  */
@@ -260,6 +269,39 @@ export function assertAstroInstalledFromTarball(consumerDir: string, tarballs: T
     }
     if (!existsSync(join(consumerDir, 'node_modules', ...name.split('/')))) {
       throw new Error(`Missing installed package ${name} in ${consumerDir}`);
+    }
+  }
+}
+
+/**
+ * Assert every Texuli dependency resolved from the npm registry at exactly
+ * `version` (the registry mode of the consumers matrix) — never a file:
+ * tarball and never a different version.
+ */
+export function assertInstalledFromRegistry(
+  consumerDir: string,
+  names: readonly string[],
+  version: string
+): void {
+  const lockPath = join(consumerDir, 'package-lock.json');
+  if (!existsSync(lockPath)) {
+    throw new Error(`Missing package-lock.json in ${consumerDir} after npm install`);
+  }
+  const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as {
+    packages?: Record<string, { resolved?: string; version?: string }>;
+  };
+  for (const name of names) {
+    const entry = lock.packages?.[`node_modules/${name}`];
+    if (!entry) throw new Error(`package-lock missing ${name}`);
+    const resolved = entry.resolved ?? '';
+    if (!resolved.startsWith('https://registry.npmjs.org/')) {
+      throw new Error(`${name} resolved to "${resolved || '(empty)'}" — expected the npm registry`);
+    }
+    if (entry.version !== version) {
+      throw new Error(`${name} installed ${entry.version ?? '(?)'}, expected ${version}`);
+    }
+    if (!existsSync(join(consumerDir, 'node_modules', ...name.split('/')))) {
+      throw new Error(`Missing installed package at ${name} in ${consumerDir}`);
     }
   }
 }
@@ -440,12 +482,17 @@ function walkLocalDts(dir: string): string[] {
 }
 
 /**
- * Copy a fixture into a temp dir, point deps at tarballs, npm install, build.
+ * Copy a fixture into a temp dir, point deps at tarballs (or at one exact
+ * published registry version), npm install, build.
  */
 export async function buildConsumer(
   consumer: ConsumerDef,
   tarballs: TarballMap,
-  options?: { workRoot?: string; typecheck?: boolean }
+  options?: {
+    workRoot?: string;
+    typecheck?: boolean;
+    source?: { kind: 'tarballs' } | { kind: 'registry'; version: string };
+  }
 ): Promise<{ dir: string; dist: string }> {
   const workRoot = options?.workRoot ?? join(REPO_ROOT, 'tmp/consumers');
   mkdirSync(workRoot, { recursive: true });
@@ -468,7 +515,12 @@ export async function buildConsumer(
   rewriteSmokeImports(join(dir, 'src/routes/+page.svelte'), '../../Smoke.svelte');
 
   const pkgPath = join(dir, 'package.json');
-  writeFileSync(pkgPath, rewritePlaceholders(readFileSync(pkgPath, 'utf8'), tarballs));
+  writeFileSync(
+    pkgPath,
+    options?.source?.kind === 'registry'
+      ? rewritePlaceholdersToVersion(readFileSync(pkgPath, 'utf8'), options.source.version)
+      : rewritePlaceholders(readFileSync(pkgPath, 'utf8'), tarballs)
+  );
 
   await execFileAsync(
     'npm',
@@ -480,8 +532,15 @@ export async function buildConsumer(
     }
   );
 
-  assertInstalledFromTarballs(dir, tarballs);
-  if (consumer.id === 'astro-plain') assertAstroInstalledFromTarball(dir, tarballs);
+  if (options?.source?.kind === 'registry') {
+    assertInstalledFromRegistry(dir, TEXULI_INSTALL_NAMES, options.source.version);
+    if (consumer.id === 'astro-plain') {
+      assertInstalledFromRegistry(dir, ASTRO_TRANSITIVE_PACKAGES, options.source.version);
+    }
+  } else {
+    assertInstalledFromTarballs(dir, tarballs);
+    if (consumer.id === 'astro-plain') assertAstroInstalledFromTarball(dir, tarballs);
+  }
 
   const shouldTypecheck =
     options?.typecheck ?? (TYPECHECK_FRAMEWORKS as readonly string[]).includes(consumer.framework);
