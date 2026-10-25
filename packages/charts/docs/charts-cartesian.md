@@ -17,6 +17,11 @@ axis. All five charts share one renderer (`CartesianChart`, which takes a
 | `StackedBarChart` | Stacked bars (diverging stack, so negatives stack below zero) |
 | `ComboChart` | The first series as bars, every other series as lines |
 
+**Layout width.** A cartesian chart lays out at its measured width, between
+240 and 640 pixels, so tick labels and margins keep their size in a narrow
+column instead of shrinking with the drawing. Wider boxes scale the 640-pixel
+layout up. A render with no measured box (server rendering) uses 640.
+
 Model helpers: `assertCartesianSeries` (throws on empty or duplicate ids,
 non-finite values, or mixed category and numeric x), `xDomain`,
 `windowCartesianSeries`, `createCartesianLayout`, `toInteractionSeries`,

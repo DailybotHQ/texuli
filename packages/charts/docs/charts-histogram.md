@@ -26,7 +26,7 @@ and count.
 | `binCount` | number (integer, ≥ 1) | no | — | blueprint | Requested positive integer bin count. |
 | `domain` | [number, number] | no | — | blueprint | Explicit numeric binning domain. |
 | `labels` | { table, range, count } | no | labels object | blueprint | Localized labels for the accessible data table and chart text. |
-| `width` | number (> 0) | no | `640` | blueprint | View-box width in pixels. |
+| `width` | number (> 0) | no | `640` | blueprint | Preferred layout width in pixels: the chart lays out at its measured width between 240 and this value, so text keeps its size in narrow columns; wider boxes scale this layout up. |
 | `height` | number (> 0) | no | `320` | blueprint | View-box height in pixels. |
 
 ## Tiers

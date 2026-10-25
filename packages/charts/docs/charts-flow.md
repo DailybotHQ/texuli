@@ -27,7 +27,7 @@ helpers: `FLOW_CHART_LABELS`, `flowChartLabels`, `flowColor`,
 | `description` | string | no | — | blueprint | Optional accessible summary; the component derives one when omitted. |
 | `steps` | { id, label?, value }[] | yes | — | blueprint | Ordered conversion steps. |
 | `orientation` | `'vertical'` \| `'horizontal'` | no | `"vertical"` | blueprint | Direction of the funnel. |
-| `width` | number (> 0) | no | `640` | blueprint | View-box width in pixels. |
+| `width` | number (> 0) | no | `640` | blueprint | Preferred layout width in pixels: the chart lays out at its measured width between 240 and this value, so text keeps its size in narrow columns; wider boxes scale this layout up. |
 | `height` | number (> 0) | no | `320` | blueprint | View-box height in pixels. |
 | `labels` | { tableSummary, step, count, conversion, from, to, value, node, connection } | no | labels object | blueprint | Localized labels for the accessible data table and chart text. |
 | `class` | string | no | — | developer | Application-authored class value. |
@@ -40,7 +40,7 @@ helpers: `FLOW_CHART_LABELS`, `flowChartLabels`, `flowColor`,
 | `description` | string | no | — | blueprint | Optional accessible summary; the component derives one when omitted. |
 | `nodes` | { id, label? }[] | yes | — | blueprint | Unique flow nodes. |
 | `links` | { source, target, value }[] | yes | — | blueprint | Weighted source-to-target flows. |
-| `width` | number (> 0) | no | `640` | blueprint | View-box width in pixels. |
+| `width` | number (> 0) | no | `640` | blueprint | Preferred layout width in pixels: the chart lays out at its measured width between 240 and this value, so text keeps its size in narrow columns; wider boxes scale this layout up. |
 | `height` | number (> 0) | no | `360` | blueprint | View-box height in pixels. |
 | `labels` | { tableSummary, step, count, conversion, from, to, value, node, connection } | no | labels object | blueprint | Localized labels for the accessible data table and chart text. |
 | `class` | string | no | — | developer | Application-authored class value. |
@@ -53,7 +53,7 @@ helpers: `FLOW_CHART_LABELS`, `flowChartLabels`, `flowColor`,
 | `description` | string | no | — | blueprint | Optional accessible summary; the component derives one when omitted. |
 | `nodes` | { id, label?, value? }[] | yes | — | blueprint | Unique graph nodes. |
 | `links` | { source, target, value? }[] | yes | — | blueprint | Source-to-target graph connections. |
-| `width` | number (> 0) | no | `480` | blueprint | View-box width in pixels. |
+| `width` | number (> 0) | no | `480` | blueprint | Preferred layout width in pixels: the chart lays out at its measured width between 240 and this value, so text keeps its size in narrow columns; wider boxes scale this layout up. |
 | `height` | number (> 0) | no | `360` | blueprint | View-box height in pixels. |
 | `labels` | { tableSummary, step, count, conversion, from, to, value, node, connection } | no | labels object | blueprint | Localized labels for the accessible data table and chart text. |
 | `class` | string | no | — | developer | Application-authored class value. |

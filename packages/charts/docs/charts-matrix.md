@@ -35,7 +35,7 @@ is `'light' | 'dark'` for chart token fallbacks.
 | `cells` | { x, y, value }[] | yes | — | blueprint | Matrix cells keyed by x and y categories. |
 | `mode` | `'light'` \| `'dark'` | no | `"light"` | blueprint | Color mode used by the chart frame. |
 | `class` | string | no | `""` | developer | Application-authored class value. |
-| `width` | number (> 0) | no | `640` | blueprint | View-box width in pixels. |
+| `width` | number (> 0) | no | `640` | blueprint | Preferred layout width in pixels: the chart lays out at its measured width between 240 and this value, so text keeps its size in narrow columns; wider boxes scale this layout up. |
 | `height` | number (> 0) | no | `360` | blueprint | View-box height in pixels. |
 | `interactive` | boolean | no | `false` | blueprint | Load keyboard navigation, snapped tooltip, and two-axis crosshair. |
 | `annotations` | annotation (`line`, `band`, `point`)[] (≤ 100) | no | `[]` | blueprint | Reference lines, range bands, and point callouts in chart data coordinates. |
@@ -50,7 +50,7 @@ is `'light' | 'dark'` for chart token fallbacks.
 | `series` | { id, label, color? }[] | no | `[]` | blueprint | Optional series labels and colors. |
 | `mode` | `'light'` \| `'dark'` | no | `"light"` | blueprint | Color mode used by the chart frame. |
 | `class` | string | no | `""` | developer | Application-authored class value. |
-| `width` | number (> 0) | no | `640` | blueprint | View-box width in pixels. |
+| `width` | number (> 0) | no | `640` | blueprint | Preferred layout width in pixels: the chart lays out at its measured width between 240 and this value, so text keeps its size in narrow columns; wider boxes scale this layout up. |
 | `height` | number (> 0) | no | `360` | blueprint | View-box height in pixels. |
 | `interactive` | boolean | no | `false` | blueprint | Load keyboard navigation, snapped tooltip, and two-axis crosshair. |
 | `annotations` | annotation (`line`, `band`, `point`)[] (≤ 100) | no | `[]` | blueprint | Reference lines, range bands, and point callouts in chart data coordinates. |
@@ -65,7 +65,7 @@ is `'light' | 'dark'` for chart token fallbacks.
 | `series` | { id, label, color? }[] | no | `[]` | blueprint | Optional series labels and colors. |
 | `mode` | `'light'` \| `'dark'` | no | `"light"` | blueprint | Color mode used by the chart frame. |
 | `class` | string | no | `""` | developer | Application-authored class value. |
-| `width` | number (> 0) | no | `640` | blueprint | View-box width in pixels. |
+| `width` | number (> 0) | no | `640` | blueprint | Preferred layout width in pixels: the chart lays out at its measured width between 240 and this value, so text keeps its size in narrow columns; wider boxes scale this layout up. |
 | `height` | number (> 0) | no | `360` | blueprint | View-box height in pixels. |
 | `interactive` | boolean | no | `false` | blueprint | Load keyboard navigation, snapped tooltip, and two-axis crosshair. |
 | `annotations` | annotation (`line`, `band`, `point`)[] (≤ 100) | no | `[]` | blueprint | Reference lines, range bands, and point callouts in chart data coordinates. |

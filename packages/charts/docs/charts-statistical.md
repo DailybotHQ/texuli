@@ -14,7 +14,10 @@ and `description`, and keeps an expandable data table.
 | `ViolinChart` | Mirrored Gaussian kernel density per group (`bandwidth`, default Silverman's rule) with a median rule; every violin shares one density scale, so wider means denser | Same quartile summary |
 | `EcdfChart` | Empirical cumulative distribution step line per series, with a legend when there are several | Value at the 25 %, 50 %, 75 % and 100 % shares per series |
 
-All three share one value axis across groups; `domain` fixes it.
+All three share one value axis across groups; `domain` fixes it. `width`
+(default 640) is the preferred layout width: each chart lays out at its
+measured width between 240 and that value, so labels keep their size in narrow
+columns; `height` (default 320) is fixed.
 
 ```ts
 import { BoxPlotChart } from '@texuli/charts/statistical';
