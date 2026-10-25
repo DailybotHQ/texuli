@@ -1,6 +1,7 @@
 /**
  * `pnpm verify:packages`: build, pack and check every publishable package.
- * Nothing is published, and every tarball stays `private: true`.
+ * Nothing is published here. The packed manifests are publish-ready: real
+ * versions, intentional dependency ranges, and no `private` flag.
  *
  * For each workspace package under `packages/` (except {@link NEVER_PACKED}):
  * 1. **Build** `src/` with `@sveltejs/package` into `tmp/packages/stage/<dir>/dist`,
@@ -147,11 +148,12 @@ function pinWorkspace(deps: unknown, versions: ReadonlyMap<string, string>, prob
   return out;
 }
 
-/** Fields copied verbatim from the source manifest, in this order. */
+/** Fields copied verbatim from the source manifest, in this order. `private`
+ * is deliberately absent: the packed manifest is publish-ready, and npm
+ * refuses to publish a package that carries `private: true`. */
 const KEPT_FIELDS = [
   'name',
   'version',
-  'private',
   'description',
   'keywords',
   'homepage',

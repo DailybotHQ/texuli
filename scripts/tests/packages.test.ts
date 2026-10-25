@@ -76,7 +76,6 @@ describe('publishManifest', () => {
     expect(manifest).toEqual({
       name: 'demo',
       version: '0.3.0',
-      private: true,
       license: 'MIT',
       type: 'module',
       sideEffects: ['**/*.css'],
