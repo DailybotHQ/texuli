@@ -154,20 +154,20 @@ async function retry(): Promise<void> {
 
 <style>
   .demo {
-    color: var(--tx-foreground, var(--tx-color-text, CanvasText));
+    color: var(--tx-foreground, CanvasText);
     inline-size: min(100%, 34rem);
   }
 
   .viewport {
     block-size: 20rem;
-    border: 1px solid var(--tx-color-border, #9ba6b8);
+    border: 1px solid var(--tx-border, ButtonBorder);
     border-radius: 0.5rem;
     overflow: auto;
     overscroll-behavior: contain;
   }
 
   .viewport:focus-visible {
-    outline: 2px solid var(--tx-color-focus, #075ea8);
+    outline: 2px solid var(--tx-ring, Highlight);
     outline-offset: 2px;
   }
 
@@ -183,7 +183,8 @@ async function retry(): Promise<void> {
     justify-content: center;
     gap: 0.25rem;
     box-sizing: border-box;
-    border-block-end: 1px solid var(--tx-color-border, #d6dbe4);
+    border-block-end: 1px solid var(--tx-border, ButtonBorder);
+    border-inline-start: 3px solid transparent;
     padding-inline: 0.75rem;
     padding-block: 0.5rem;
     overflow: hidden;
@@ -191,6 +192,17 @@ async function retry(): Promise<void> {
 
   .row span {
     color: var(--tx-foreground, CanvasText);
+  }
+
+  /* The active option (aria-activedescendant) is marked in every color mode. */
+  .row[aria-selected='true'] {
+    border-inline-start-color: var(--tx-primary, Highlight);
+    background: var(--tx-accent, SelectedItem);
+    color: var(--tx-accent-foreground, SelectedItemText);
+  }
+
+  .row[aria-selected='true'] span {
+    color: inherit;
   }
 
   .status {
@@ -201,6 +213,12 @@ async function retry(): Promise<void> {
     .viewport,
     .row {
       border-color: CanvasText;
+    }
+
+    .row[aria-selected='true'] {
+      border-inline-start-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
     }
   }
 </style>
