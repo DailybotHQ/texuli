@@ -19,8 +19,8 @@ Styled floating surfaces with an arrow, on the `--tx-*` token contract.
 <Popover.Root bind:open side="bottom" align="center">
   <Popover.Trigger>Account</Popover.Trigger>
   <Popover.Content aria-label="Account menu" variant="elevated" size="md">
-    <p class="tx-popover__title">Ada Lovelace</p>
-    <p class="tx-popover__description">ada@example.com</p>
+    <p class="tx-popover__title">Marta Ruiz</p>
+    <p class="tx-popover__description">marta@example.com</p>
     <Popover.Close>Close</Popover.Close>
   </Popover.Content>
 </Popover.Root>
@@ -42,9 +42,9 @@ Root also accepts primitive props: `open`, `modal`, `side`, `align`, `sideOffset
 </script>
 
 <HoverCard.Root openDelay={200} closeDelay={150}>
-  <HoverCard.Trigger>Grace Hopper</HoverCard.Trigger>
-  <HoverCard.Content aria-label="Grace Hopper">
-    <p class="tx-hover-card__title">Grace Hopper</p>
+  <HoverCard.Trigger>Jordan Lee</HoverCard.Trigger>
+  <HoverCard.Content aria-label="Jordan Lee">
+    <p class="tx-hover-card__title">Jordan Lee</p>
     <p class="tx-hover-card__description">example.com</p>
   </HoverCard.Content>
 </HoverCard.Root>

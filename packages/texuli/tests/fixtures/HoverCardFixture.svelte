@@ -4,7 +4,7 @@ import { HoverCard } from '../../src/components/popover/index.ts';
 let {
   openDelay = 0,
   closeDelay = 0,
-  label = 'Ada Lovelace',
+  label = 'Jordan Lee',
 }: {
   openDelay?: number;
   closeDelay?: number;

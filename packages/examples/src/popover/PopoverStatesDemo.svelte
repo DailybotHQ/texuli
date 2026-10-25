@@ -24,10 +24,10 @@ import { HoverCard, Popover } from 'texuli/popover';
     <div>
       <h3>Hover card (open)</h3>
       <HoverCard.Root open openDelay={0} closeDelay={0}>
-        <HoverCard.Trigger class="demo-trigger">Grace Hopper</HoverCard.Trigger>
-        <HoverCard.Content aria-label="Grace Hopper">
-          <p class="tx-hover-card__title">Grace Hopper</p>
-          <p class="tx-hover-card__description">Rear admiral · compiler pioneer · example.com</p>
+        <HoverCard.Trigger class="demo-trigger">Jordan Lee</HoverCard.Trigger>
+        <HoverCard.Content aria-label="Jordan Lee">
+          <p class="tx-hover-card__title">Jordan Lee</p>
+          <p class="tx-hover-card__description">Harbor Notes editor · jordan@example.com</p>
         </HoverCard.Content>
       </HoverCard.Root>
     </div>

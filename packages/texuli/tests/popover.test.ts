@@ -74,11 +74,11 @@ describe('Popover', () => {
 describe('HoverCard', () => {
   it('opens on pointer enter after delay and renders the arrow surface', async () => {
     render(HoverCardFixture, {
-      props: { openDelay: 0, closeDelay: 0, label: 'Ada Lovelace' },
+      props: { openDelay: 0, closeDelay: 0, label: 'Jordan Lee' },
     });
-    const trigger = screen.getByRole('button', { name: 'Ada Lovelace' });
+    const trigger = screen.getByRole('button', { name: 'Jordan Lee' });
     await fireEvent.pointerEnter(trigger);
-    const content = await screen.findByRole('dialog', { name: 'Ada Lovelace' });
+    const content = await screen.findByRole('dialog', { name: 'Jordan Lee' });
     expect(content.className).toContain('tx-hover-card');
     expect(content.querySelector('[data-tx-hover-card-arrow]')).toBeTruthy();
     expect(screen.getByText('Mathematician · example.com')).toBeTruthy();

@@ -11,8 +11,8 @@ let open = $state(true);
     <Popover.Trigger class="demo-trigger">Account</Popover.Trigger>
     <Popover.Content aria-label="Account menu">
       <div class="tx-popover__header">
-        <p class="tx-popover__title">Ada Lovelace</p>
-        <p class="tx-popover__description">ada@example.com · Workspace admin</p>
+        <p class="tx-popover__title">Marta Ruiz</p>
+        <p class="tx-popover__description">marta@example.com · Workspace admin</p>
       </div>
       <ul class="list">
         <li>Profile</li>

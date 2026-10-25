@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Input, InputGroup, Textarea, TextCounter } from 'texuli/input';
 
-let name = $state('Ada Lovelace');
+let name = $state('Marta Ruiz');
 let notes = $state('Draft notes for the quarterly review.');
 let amount = $state('1200');
 let bio = $state('');
