@@ -20,11 +20,18 @@
     align-items: flex-start;
   }
 
+  /*
+   * The scroller stays inside its container (no negative margin: that bled
+   * past a flush edge and scrolled the page). Its clipping would cut an outer
+   * focus ring, so triggers inside it draw the ring inset.
+   */
   .tx-tabs__scroller {
-    margin-inline: -0.25rem;
-    padding-inline: 0.25rem;
     overflow-x: auto;
     overflow-y: hidden;
+  }
+
+  .tx-tabs__scroller .tx-tabs__trigger:focus-visible {
+    outline-offset: calc(-1 * var(--tx-focus-ring-width, 2px));
   }
 
   .tx-tabs__list {
