@@ -91,7 +91,7 @@ function reschedule(change: CalendarChange<EventDetails>): void {
       <label>Direction<select aria-label="Calendar direction" bind:value={direction}><option value="ltr">Left to right</option><option value="rtl">Right to left</option></select></label>
     </div>
   </header>
-  <CalendarView {events} anchor="2026-04-15" now={NOW} bind:view locale="en-US" timeZone={zone} dir={direction} min="2026-04-01" max="2026-04-30" onChange={reschedule} onCreate={create} onOpen={(event) => (selected = `${event.data?.title ?? 'Event'} (${event.start})`)} />
+  <CalendarView {events} getTone={(occurrence) => occurrence.data?.tone ?? 'primary'} anchor="2026-04-15" now={NOW} bind:view locale="en-US" timeZone={zone} dir={direction} min="2026-04-01" max="2026-04-30" onChange={reschedule} onCreate={create} onOpen={(event) => (selected = `${event.data?.title ?? 'Event'} (${event.start})`)} />
   <p class="selected" role="status">{selected}</p>
 </section>
 

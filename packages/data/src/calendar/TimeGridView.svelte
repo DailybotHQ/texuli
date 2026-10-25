@@ -91,6 +91,12 @@ const allDay = $derived(
 const timed = $derived(dates.map((date) => layoutDay(items, { date, timeZone })));
 </script>
 
+<!--
+  One horizontal scroller for the day headings and the time grid, so on a
+  narrow screen they scroll together (the grid used to scroll under fixed
+  headings, which then named the wrong days).
+-->
+<div class="tx-calendar__time-view" style={`--tx-calendar-columns: ${dates.length}`} data-time-view>
 <div class="tx-calendar__time-header" style={`--tx-calendar-columns: ${dates.length}`}>
   <span aria-hidden="true"></span>
   {#each dates as date (date)}
@@ -160,6 +166,7 @@ const timed = $derived(dates.map((date) => layoutDay(items, { date, timeZone }))
     {/each}
   </div>
 </div>
+</div>
 
 <style>
   .tx-calendar__time-header, .tx-calendar__time-grid { display: grid; grid-template-columns: 3.5rem repeat(var(--tx-calendar-columns), minmax(0, 1fr)); }
@@ -179,6 +186,8 @@ const timed = $derived(dates.map((date) => layoutDay(items, { date, timeZone }))
   .tx-calendar__slot:focus-visible { border-color: var(--tx-ring, Highlight); background: color-mix(in srgb, var(--tx-primary, Highlight) 8%, transparent); outline: 2px solid var(--tx-ring, Highlight); outline-offset: 0; }
   .tx-calendar__positioned-event { position: absolute; overflow: hidden; padding-inline: .05rem; }
   .tx-calendar__positioned-event :global(.tx-calendar__event) { block-size: 100%; inline-size: 100%; }
-  @media (max-width: 40rem) { .tx-calendar__time-header, .tx-calendar__time-grid { min-inline-size: 34rem; } }
+  .tx-calendar__time-view { display: grid; min-inline-size: 0; overflow-x: auto; }
+  /* Phones: each day keeps a readable 5.5rem column and the view scrolls sideways. */
+  @media (max-width: 40rem) { .tx-calendar__time-header, .tx-calendar__time-grid { min-inline-size: calc(3.5rem + var(--tx-calendar-columns) * 5.5rem); } }
   @media (forced-colors: active) { .tx-calendar__now { background: Highlight; } .tx-calendar__day-column { background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(3rem - 1px), CanvasText calc(3rem - 1px), CanvasText 3rem); } }
 </style>

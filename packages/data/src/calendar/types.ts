@@ -118,12 +118,3 @@ export const DEFAULT_CALENDAR_LABELS: CalendarLabels = {
   addsEvent: 'Enter adds an event',
   addsAllDayEvent: 'Enter adds an all-day event',
 };
-
-export const TONE_CLASSES: Record<CalendarTone, string> = {
-  neutral: 'border-l-border bg-muted text-foreground',
-  primary: 'border-l-primary bg-primary/10 text-foreground',
-  info: 'border-l-info bg-info/10 text-foreground',
-  success: 'border-l-success bg-success/10 text-foreground',
-  warning: 'border-l-warning bg-warning/10 text-foreground',
-  danger: 'border-l-destructive bg-destructive/10 text-foreground',
-};
