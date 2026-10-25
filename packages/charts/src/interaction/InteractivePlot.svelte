@@ -398,7 +398,7 @@ const brushRect = $derived.by(() => {
 
 <div
   class="tx-chart-plot"
-  style={`inline-size: ${width}px; aspect-ratio: ${width} / ${height}`}
+  style={`max-inline-size: ${width}px; aspect-ratio: ${width} / ${height}`}
   data-chart-plot=""
   data-reduced-motion={reduceMotion ? 'true' : undefined}
 >

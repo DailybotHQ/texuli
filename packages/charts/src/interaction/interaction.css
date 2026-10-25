@@ -2,8 +2,13 @@
  * Chart interaction chrome — tooltips, legends, crosshair, brush.
  * Component-scoped tokens; consumers override via later layers.
  */
+/*
+ * The plot fills its container up to its own width (set inline). A fixed
+ * pixel inline-size widened auto-sized parents, and the page, on phones.
+ */
 .tx-chart-plot {
   position: relative;
+  inline-size: 100%;
   max-inline-size: 100%;
 }
 
