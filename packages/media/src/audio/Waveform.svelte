@@ -67,9 +67,15 @@ const height = 32;
 const gap = 0.35;
 </script>
 
+<!--
+  Stretched to the box (preserveAspectRatio none): the peaks span the player's
+  full width at any size. With the default (meet), the 100x32 viewBox under a
+  3rem block size capped the waveform at about 150px wide in every player.
+-->
 <svg
   class={['tx-audio-waveform', className]}
   viewBox="0 0 {width} {height}"
+  preserveAspectRatio="none"
   role="slider"
   aria-label={label}
   aria-valuemin={0}
