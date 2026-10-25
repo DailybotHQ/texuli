@@ -136,4 +136,4 @@ const history = createEditHistory(tree, { validate: draftCommitGate({ catalog })
   `@texuli/tools/golden` (axe needs a DOM).
 - The website playground keeps its own preview pipeline for now; it renders
   trees that fail validation on purpose, to show the diagnostics.
-- The envelope's JSON schema in the planned `spec/` (ADR-003).
+- The envelope's JSON schema in the planned `spec/` (ADR-004).

@@ -151,7 +151,7 @@ const history = createEditHistory(tree, { validate: draftCommitGate({ catalog })
   roots is refused (`replaceAll` with an array is `invalid-node`), even
   though `validateDraft` can check fragments.
 - **Positional paths.** Nodes have no stable ids yet, so concurrent editors
-  must rebase paths themselves. The shipped blueprint envelope (ADR-003)
+  must rebase paths themselves. The shipped blueprint envelope (ADR-004)
   does not lift this: its provenance records ops, not node ids, and stable
   node ids stay open there too ([envelope](./envelope.md#not-yet)).
 - **No merge.** There is no conflict resolution or operational transform.

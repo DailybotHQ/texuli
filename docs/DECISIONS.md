@@ -150,3 +150,44 @@ reverse it. Newest last.
   catalog can adopt it. The Svelte package, the paste import and the DOM
   selection mapping stay planned at L4. **Reverse:** move the subpaths into
   `@texuli/editor/model` and re-export them from core under the same names.
+
+## ADR-004: Versioned blueprint envelope with host-owned activation
+
+- **Date:** 2026-10-25 (retro-recorded; the envelope shipped with the
+  first version of the catalog) · **Ratification:** retro-recorded by the
+  PLAN_005 final review from the shipped `@texuli/catalog/envelope`
+  contract; the developer may override this decision.
+- **Numbering note:** the catalog docs and sources referenced this
+  decision as "ADR-003" from the first commit, expecting a DECISIONS.md
+  entry that was never written; the number was later taken by the rich
+  text editor ADR. This entry takes ADR-004 and the catalog references
+  were updated to it.
+- **Context:** the agent service emits blueprints a host must be able to
+  trust: what catalog they were written for, who produced them, their
+  lifecycle state and what edits were applied. The same artifact crosses
+  the untrusted/developer tier boundary, so self-declared trust fields
+  cannot be trusted from input.
+- **Options:** (1) a versioned envelope wrapping one catalog tree with
+  strict field rules, host-owned lifecycle and an edit-provenance log;
+  (2) trust the producer's declared status and activation — rejected
+  because producer-controlled status fields let an untrusted emitter mark
+  itself active; (3) no envelope, host-side metadata only — rejected
+  because the metadata must travel with the artifact and be validated by
+  the same sink-free pipeline.
+- **Choice:** the versioned envelope (`format: texuli-blueprint`,
+  `version: 1`) with: strict field validation (`unknown-field`,
+  `prototype-key`, display-string and URL-policy rules); lifecycle where
+  only validation earns `validated`, only the host's owner flow calls
+  `activateEnvelope` (digest-pinned to the reviewed tree), and any edit
+  returns the envelope to `draft` and drops activation provenance; a
+  provenance log capped at 500 entries; and a `profile` capability field
+  where `portable` fails closed (`unsupported-profile`) until an id is
+  audited portable. Declared `status`, `activatedBy` and `tier` are never
+  trusted from input (warnings `status-ignored`, `activation-ignored`,
+  `tier-ignored`); validation receipts are host records, not credentials.
+- **Why:** trust transitions stay host-owned and auditable, every field is
+  validated by the same closed pipeline that renders the tree, and the
+  artifact carries its provenance without gaining a say in its own trust.
+- **Reverse when:** a wire-format change is needed — a new `version` with
+  a migration, decided as a new ADR; the fail-closed portable profile
+  reverses by auditing and listing portable ids.

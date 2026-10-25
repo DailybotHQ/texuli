@@ -181,7 +181,7 @@ export function parseEnvelope(
   oneOf(root.tier, ['developer', 'untrusted'], '$.tier', true);
   oneOf(root.profile, ['web', 'portable'], '$.profile', true);
   if (root.profile === 'portable') {
-    // ADR-003: no id is audited portable yet, so a portable profile fails closed.
+    // ADR-004: no id is audited portable yet, so a portable profile fails closed.
     error(
       'unsupported-profile',
       '$.profile',

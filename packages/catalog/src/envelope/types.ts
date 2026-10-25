@@ -22,7 +22,7 @@ export const SUPPORTED_ENVELOPE_VERSIONS = [ENVELOPE_VERSION] as const;
 export const ENVELOPE_STATUSES = ['draft', 'validated', 'active', 'superseded'] as const;
 export type EnvelopeStatus = (typeof ENVELOPE_STATUSES)[number];
 
-/** ADR-003 capability profile. Nothing is audited portable yet. */
+/** ADR-004 capability profile. Nothing is audited portable yet. */
 export type EnvelopeProfile = 'web' | 'portable';
 
 /** Who or what produced the draft. Display data, never authority. */
@@ -69,7 +69,7 @@ export interface ProvenanceEntry {
 }
 
 /**
- * The versioned blueprint envelope (ADR-003, audit G13): a catalog tree with
+ * The versioned blueprint envelope (ADR-004, audit G13): a catalog tree with
  * its catalog binding, lifecycle status and provenance.
  */
 export interface BlueprintEnvelope {

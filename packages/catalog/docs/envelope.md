@@ -6,7 +6,7 @@
 
 ## Goal
 
-The versioned envelope (ADR-003, audit G13) wraps one catalog tree with what
+The versioned envelope (ADR-004, audit G13) wraps one catalog tree with what
 a host needs to trust it: the catalog it was written for, who produced it and
 why, the data's as-of time, its sources, its lifecycle status and its edit
 provenance. This is what the agent service emits and the player validates.
@@ -43,7 +43,7 @@ provenance. This is what the agent service emits and the player validates.
 | `createdAt`, `updatedAt`, `asOf`, `startsAt`, `at` | ISO 8601 with a zone |
 | `generator` | `kind` (`agent`, `person`, `tool`), `name`, optional `model` |
 | `tier` | The emit tier the producer declares; the host chooses the tier it validates with |
-| `profile` | `web` (default) or `portable`. `portable` fails closed (`unsupported-profile`): no id is audited portable yet (ADR-003) |
+| `profile` | `web` (default) or `portable`. `portable` fails closed (`unsupported-profile`): no id is audited portable yet (ADR-004) |
 | `sources` | At most 32; each `href` must pass the untrusted URL policy |
 | `trigger` | `kind` (`request`, `schedule`, `calendar`, `event`) and `label` |
 | `activatedBy` | `by`, `at`, `digest`; written by the host's owner flow only |
@@ -160,6 +160,6 @@ default D5 policy and the explicit trusted-host override.
 
 ## Not yet
 
-- The JSON schema for the envelope in the planned `spec/` (ADR-003).
+- The JSON schema for the envelope in the planned `spec/` (ADR-004).
 - Capability metadata per id, so a `portable` profile can pass.
 - Stable node ids for provenance that survives concurrent edits.

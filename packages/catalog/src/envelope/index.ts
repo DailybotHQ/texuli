@@ -1,5 +1,5 @@
 /**
- * `@texuli/catalog/envelope` — the versioned blueprint envelope (ADR-003,
+ * `@texuli/catalog/envelope` — the versioned blueprint envelope (ADR-004,
  * audit G13): catalog binding, lifecycle status (draft → validated → active
  * → superseded, with the owner activating), provenance from edit history,
  * and migration. `validateDraft` reads envelopes; the status an envelope
