@@ -20,10 +20,11 @@ end to end and native for agents:
   the components;
 - the **agent catalog** renders agent output with no HTML sinks.
 
-**Status: in development, not released.** Package names are reserved on npm as
-`0.1.0-next.0` (dist-tag `next`, published by the owner); the workspace packages
-stay `private: true`, no stable release is out, and texuli.com deploys
-from `main` to Cloudflare Pages. See
+**Status: in development, not released.** All 15 packages are published
+to npm as `0.1.0-next.1` under the `next` dist-tag by the publish
+workflow; the workspace packages stay `private: true`, no stable release
+is out (`latest` is reserved for 1.0.0), and texuli.com deploys from
+`main` to Cloudflare Pages. See
 [docs/PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md) and
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
@@ -166,7 +167,7 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The package names are reserved on npm as `0.1.0-next.0` (dist-tag `next`); no stable release is published. texuli.com deploys from `main` (Cloudflare Pages).
+    check results. All 15 packages are on npm as `0.1.0-next.1` (dist-tag `next`, published by CI with provenance); no stable release is published (`latest` stays reserved for 1.0.0). texuli.com deploys from `main` (Cloudflare Pages).
 13. **Scratch work** goes in `tmp/`. Plan artifacts go in
     `.dwp/plans/<plan>/analysis_results/`, never the repository root.
 14. **Progress reporting** (when a reporting tool is available) is

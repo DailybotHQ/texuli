@@ -5,12 +5,14 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-The owner published all 15 package names as `0.1.0-next.0` with the `next`
-dist-tag for name reservation. Workspace manifests remain `private: true`.
-This reservation is **not a supported release**: no package has been approved
-for general use, there is no stable release on `latest`, and the reservation
-does not authorize later publication waves. All package releases require a
-fresh, explicit developer GO for the exact wave and package set.
+All 15 packable packages are published to npm as `0.1.0-next.1` under the
+`next` dist-tag (2026-10-25, publish workflow run
+https://github.com/DailybotHQ/texuli/actions/runs/40238083612, from the
+verified tarballs with signed provenance). The `latest` dist-tag stays on
+`0.1.0-next.0` and is reserved for the 1.0.0 stable release. Workspace
+manifests remain `private: true`; the previews are not approved for
+general use, and every future version and wave requires a fresh, explicit
+developer GO. Publishing never overwrites a published version.
 
 ## Independent package versions
 

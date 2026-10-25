@@ -93,8 +93,9 @@ own port; 4870 is the default.
 ## Not available
 
 There are no release, publish or deploy commands. Packages are
-`private: true`; the npm names are reserved as `0.1.0-next.0` (dist-tag
-`next`) as name reservations, not supported releases. See [RELEASE](RELEASE.md)
+`private: true`; npm carries all 15 packages as `0.1.0-next.1` (dist-tag
+`next`) as CI-published previews, not supported releases — publishing runs
+through the publish workflow (see [CI](CI.md)). See [RELEASE](RELEASE.md)
 for the version and owner-GO policy. texuli.com deploys from `main`
 (CI in [CI](CI.md)); pushing and adding a remote stay gated on the
 developer's instructions.
