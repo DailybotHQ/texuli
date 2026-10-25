@@ -1,10 +1,28 @@
 {
   "name": "@texuli/catalog",
-  "version": "0.0.0",
+  "version": "0.1.0-next.1",
   "private": true,
   "description": "The agent catalog and the renderer with no HTML sinks.",
+  "keywords": [
+    "svelte",
+    "svelte-5",
+    "components",
+    "design-system",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
   "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/catalog"
+  },
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -96,17 +114,14 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "workspace:*",
-    "texuli": "workspace:*",
-    "@texuli/charts": "workspace:*",
-    "@texuli/data": "workspace:*",
-    "@texuli/blocks": "workspace:*",
-    "@texuli/media": "workspace:*"
+    "@texuli/core": "0.1.0-next.1",
+    "texuli": "0.1.0-next.1",
+    "@texuli/charts": "0.1.0-next.1",
+    "@texuli/data": "0.1.0-next.1",
+    "@texuli/blocks": "0.1.0-next.1",
+    "@texuli/media": "0.1.0-next.1"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"
-  },
-  "sideEffects": [
-    "**/*.css"
-  ]
+  }
 }

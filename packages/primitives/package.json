@@ -1,10 +1,28 @@
 {
   "name": "@texuli/primitives",
-  "version": "0.0.0",
+  "version": "0.1.0-next.1",
   "private": true,
   "description": "Owned, headless Svelte 5 primitives built on the texels.",
+  "keywords": [
+    "svelte",
+    "svelte-5",
+    "components",
+    "design-system",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
   "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/primitives"
+  },
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -226,12 +244,9 @@
   },
   "dependencies": {
     "@internationalized/date": "^3.12.4",
-    "@texuli/core": "workspace:*"
+    "@texuli/core": "0.1.0-next.1"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"
-  },
-  "sideEffects": [
-    "**/*.css"
-  ]
+  }
 }

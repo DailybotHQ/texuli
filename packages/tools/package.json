@@ -1,10 +1,28 @@
 {
   "name": "@texuli/tools",
-  "version": "0.0.0",
+  "version": "0.1.0-next.1",
   "private": true,
   "description": "Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set.",
+  "keywords": [
+    "svelte",
+    "svelte-5",
+    "components",
+    "design-system",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
   "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/tools"
+  },
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./a2ui": {
@@ -46,17 +64,14 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@texuli/core": "workspace:*",
-    "@texuli/catalog": "workspace:*",
-    "@texuli/tokens": "workspace:*",
-    "@texuli/blocks": "workspace:*",
-    "@texuli/charts": "workspace:*",
-    "@texuli/media": "workspace:*"
+    "@texuli/core": "0.1.0-next.1",
+    "@texuli/catalog": "0.1.0-next.1",
+    "@texuli/tokens": "0.1.0-next.1",
+    "@texuli/blocks": "0.1.0-next.1",
+    "@texuli/charts": "0.1.0-next.1",
+    "@texuli/media": "0.1.0-next.1"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"
-  },
-  "sideEffects": [
-    "**/*.css"
-  ]
+  }
 }

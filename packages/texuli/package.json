@@ -1,10 +1,28 @@
 {
   "name": "texuli",
-  "version": "0.0.0",
+  "version": "0.1.0-next.1",
   "private": true,
   "description": "Styled Texuli components, layouts and shells.",
+  "keywords": [
+    "svelte",
+    "svelte-5",
+    "components",
+    "design-system",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
   "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/texuli"
+  },
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -352,14 +370,11 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "workspace:*",
-    "@texuli/primitives": "workspace:*",
-    "@texuli/tokens": "workspace:*"
+    "@texuli/core": "0.1.0-next.1",
+    "@texuli/primitives": "0.1.0-next.1",
+    "@texuli/tokens": "0.1.0-next.1"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"
-  },
-  "sideEffects": [
-    "**/*.css"
-  ]
+  }
 }

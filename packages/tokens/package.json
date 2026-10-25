@@ -1,10 +1,28 @@
 {
   "name": "@texuli/tokens",
-  "version": "0.0.0",
+  "version": "0.1.0-next.1",
   "private": true,
   "description": "The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS.",
+  "keywords": [
+    "svelte",
+    "svelte-5",
+    "components",
+    "design-system",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
   "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/tokens"
+  },
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./aa-gate": "./src/aa-gate/index.ts",
@@ -30,8 +48,5 @@
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"
-  },
-  "sideEffects": [
-    "**/*.css"
-  ]
+  }
 }
