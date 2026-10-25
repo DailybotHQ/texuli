@@ -350,17 +350,66 @@ test.describe('texuli.com blueprint builder', () => {
     await expect(editor).toBeVisible();
     await expect(editor.getByLabel('Block type')).toHaveValue('text');
 
+    // Markdown fields edit through the rich text editor and still store Markdown.
     const body = editor.getByRole('textbox', { name: /^Text/ });
-    await body.fill('Fictional **launch** notes.');
+    await expect(body).toHaveAttribute('contenteditable', 'true');
+    await expect(body).toHaveText('one');
+    await body.click();
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.type('Fictional ');
+    const builderUndo = page.getByRole('button', { name: 'Undo', exact: true });
+    const firstStep = await builderUndo.getAttribute('title');
+    await page.keyboard.press('ControlOrMeta+b');
+    await expect(editor.getByRole('button', { name: 'Bold' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    await page.keyboard.type('launch');
+    await page.keyboard.press('ControlOrMeta+b');
+    await page.keyboard.type(' notes.');
     await expect(page.locator('[data-tx-player-surface]')).toContainText('launch notes');
     let node = (await draft(page)).children?.[0]?.children?.[0];
     expect(node?.props?.block).toEqual({ type: 'text', markdown: 'Fictional **launch** notes.' });
 
-    // A refused link is explained before it paints.
-    await body.fill('Read [this](javascript:alert(1)) first.');
+    // Text edits coalesce into one labeled builder step.
+    await expect(builderUndo).toHaveAttribute('title', firstStep ?? '');
+
+    // Cmd/Ctrl+Z inside the editor undoes text, not the whole builder step.
+    await page.keyboard.press('ControlOrMeta+z');
+    await expect(editor.getByRole('button', { name: 'Redo text' })).toBeEnabled();
+    node = (await draft(page)).children?.[0]?.children?.[0];
+    expect(node?.props?.block?.markdown).not.toBe('Fictional **launch** notes.');
+    expect(node?.props?.block?.markdown).not.toBe('one');
+    await editor.getByRole('button', { name: 'Redo text' }).click();
+    await expect
+      .poll(async () => (await draft(page)).children?.[0]?.children?.[0]?.props?.block?.markdown)
+      .toBe('Fictional **launch** notes.');
+
+    // The builder's Undo takes the whole text edit back, and the editor reloads it.
+    await builderUndo.click();
+    await expect(body).toHaveText('one');
+    node = (await draft(page)).children?.[0]?.children?.[0];
+    expect(node?.props?.block).toEqual({ type: 'text', markdown: 'one' });
+    await page.getByRole('button', { name: 'Redo', exact: true }).click();
+    await expect(editor.locator('strong')).toHaveText('launch');
+
+    // The Markdown source keeps exact text; a refused link is explained before it paints.
+    const sourceToggle = editor.getByRole('button', { name: 'Markdown source' });
+    await sourceToggle.click();
+    await expect(sourceToggle).toHaveAttribute('aria-pressed', 'true');
+    const source = editor.getByRole('textbox', { name: /^Text/ });
+    await expect(source).toHaveValue('Fictional **launch** notes.');
+    await source.fill('Read [this](javascript:alert(1)) first.');
     await expect(editor.locator('[data-link-kept="false"]')).toContainText(
       'refused by the URL policy'
     );
+    // Back in the editor, the refused link shows as text with a note.
+    await sourceToggle.click();
+    await expect(body).toHaveText('Read this first.');
+    await expect(editor.getByRole('list', { name: 'Editor notes' })).toContainText(
+      'refused by the URL policy'
+    );
+    await expect(body.getByRole('link')).toHaveCount(0);
 
     // Switching type keeps the text; list items are edited one by one.
     await editor.getByLabel('Block type').selectOption('list');
@@ -858,7 +907,7 @@ test.describe('texuli.com blueprint builder', () => {
     const player = page.locator('[data-builder-preview] [data-tx-player]');
     await player.evaluate((element) => element.setAttribute('data-test-mounted', 'first'));
     await page.locator('[data-builder-row="1"]').click();
-    await page.getByRole('button', { name: 'Undo' }).click();
+    await page.getByRole('button', { name: 'Undo', exact: true }).click();
     await expect(page.locator('[data-builder-preview] [data-tx-player-surface]')).not.toContainText(
       'Fictional outline'
     );
@@ -1271,7 +1320,7 @@ test.describe('builder preview, share and starters (PLAN_005 task 6)', () => {
     const stage = second.locator('[data-builder-preview-stage]');
     await expect(stage).toHaveAttribute('data-width', 'mobile');
     await expect(stage).toHaveAttribute('data-tx-mode', 'dark');
-    await expect(second.getByRole('button', { name: 'Undo' })).toHaveAttribute(
+    await expect(second.getByRole('button', { name: 'Undo', exact: true })).toHaveAttribute(
       'title',
       'Undo: Open shared draft'
     );
@@ -1313,11 +1362,11 @@ test.describe('builder preview, share and starters (PLAN_005 task 6)', () => {
     );
     await expect(page.locator('[data-builder-preview-stage]')).toContainText('Fleet operations');
     expect(await page.getByRole('treeitem').count()).toBeGreaterThan(4);
-    await expect(page.getByRole('button', { name: 'Undo' })).toHaveAttribute(
+    await expect(page.getByRole('button', { name: 'Undo', exact: true })).toHaveAttribute(
       'title',
       'Undo: Start from Operations dashboard'
     );
-    await page.getByRole('button', { name: 'Undo' }).click();
+    await page.getByRole('button', { name: 'Undo', exact: true }).click();
     await expect(page.getByRole('treeitem')).toHaveCount(1);
 
     await page.locator('[data-builder-starter="deck"]').click();
@@ -1350,7 +1399,7 @@ test.describe('builder preview, share and starters (PLAN_005 task 6)', () => {
     await expect(page.locator('[data-outline-status]')).toHaveText('Moved 2 components.');
     expect(await childCounts(page)).toEqual([2]);
     expect(await markdownOrder(page)).toEqual(['alpha', 'bravo']);
-    await expect(page.getByRole('button', { name: 'Undo' })).toHaveAttribute(
+    await expect(page.getByRole('button', { name: 'Undo', exact: true })).toHaveAttribute(
       'title',
       'Undo: Move Text blocks and 1 more'
     );
@@ -1379,7 +1428,7 @@ test.describe('builder preview, share and starters (PLAN_005 task 6)', () => {
     await page.getByRole('button', { name: 'Duplicate', exact: true }).click();
     expect(await markdownOrder(page)).toEqual(['one', 'two', 'three', 'three']);
     await expect(page.locator('[data-outline-status]')).toHaveText('Duplicated Text blocks.');
-    await expect(page.getByRole('button', { name: 'Undo' })).toHaveAttribute(
+    await expect(page.getByRole('button', { name: 'Undo', exact: true })).toHaveAttribute(
       'title',
       'Undo: Duplicate Text blocks'
     );
@@ -1392,7 +1441,7 @@ test.describe('builder preview, share and starters (PLAN_005 task 6)', () => {
     expect(await childCounts(page)).toEqual([3, 0, 0]);
     expect(await markdownOrder(page)).toEqual(['one', 'two', 'one', 'three', 'three']);
     await expect(page.locator('[data-builder-row="0.2"]')).toHaveAttribute('aria-selected', 'true');
-    await page.getByRole('button', { name: 'Undo' }).click();
+    await page.getByRole('button', { name: 'Undo', exact: true }).click();
     expect(await childCounts(page)).toEqual([2, 0, 0]);
   });
 });
