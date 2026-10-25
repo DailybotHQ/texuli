@@ -453,7 +453,6 @@ const interactionModules = $derived(
 </script>
 
 <figure
-  bind:clientWidth={measuredWidth}
   class="chart {className}"
   data-kind={kind}
   data-mode={mode}
@@ -465,6 +464,8 @@ const interactionModules = $derived(
     <h2 id="{id}-title">{title}</h2>
     <p id="{id}-description">{description}</p>
   </figcaption>
+  <!-- Zero-height width probe: it tracks the figure width, and the chart re-laying out (its height) never re-notifies it. -->
+  <div class="tx-chart-width-probe" aria-hidden="true" bind:clientWidth={measuredWidth}></div>
 
   {#if interactive && interactionModules}
     {#await interactionModules}

@@ -56,11 +56,13 @@ $effect(() => {
 });
 </script>
 
-<figure bind:clientWidth={measuredWidth} class="histogram" data-kind="histogram">
+<figure class="histogram" data-kind="histogram">
   <figcaption>
     <h3 id="{uid}-heading">{title}</h3>
     <p id="{uid}-description">{description}</p>
   </figcaption>
+  <!-- Zero-height width probe: it tracks the figure width, and the chart re-laying out (its height) never re-notifies it. -->
+  <div class="tx-chart-width-probe" aria-hidden="true" bind:clientWidth={measuredWidth}></div>
   <svg
     direction="ltr"
     viewBox="0 0 {layout.width} {layout.height}"

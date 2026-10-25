@@ -52,8 +52,10 @@ const summary = $derived(
 const nodeName = (id: string) => nodes.find((node) => node.id === id)?.label ?? id;
 </script>
 
-<figure bind:clientWidth={measuredWidth} class={cx('flow-chart', className)}>
+<figure class={cx('flow-chart', className)}>
   <figcaption><h3>{title}</h3><p>{summary}</p></figcaption>
+  <!-- Zero-height width probe: it tracks the figure width, and the chart re-laying out (its height) never re-notifies it. -->
+  <div class="tx-chart-width-probe" aria-hidden="true" bind:clientWidth={measuredWidth}></div>
   {#if graph.value}
     <svg direction="ltr" class="flow-svg" viewBox="0 0 {width} {height}" role="img" aria-labelledby="{uid}-title" aria-describedby="{uid}-description">
       <title id="{uid}-title">{title}</title><desc id="{uid}-description">{summary}</desc>
