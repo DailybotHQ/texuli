@@ -24,3 +24,10 @@ kotlin {
         }
     }
 }
+
+// Maven coordinates for the planned Central publication (decision ADR-005):
+// the group is the reverse-DNS of texuli.com, which Dailybot, Inc. owns.
+// Nothing is published; the module is consumed in place from this
+// repository, and the version mirrors the npm prerelease line it tracks.
+group = "com.texuli"
+version = "0.1.0-next.1"

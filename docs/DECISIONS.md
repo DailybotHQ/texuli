@@ -191,3 +191,26 @@ reverse it. Newest last.
 - **Reverse when:** a wire-format change is needed — a new `version` with
   a migration, decided as a new ADR; the fail-closed portable profile
   reverses by auditing and listing portable ids.
+
+## ADR-005: Maven coordinates `com.texuli` for the native modules
+
+- **Date:** 2026-10-25 · **Decided by:** the project owner.
+- **Context:** the native Gradle modules (`texuli-spec`, `texuli-compose`) are
+  consumed in place from this repository. A future Maven Central publication
+  needs coordinates fixed now so embedding code and docs can name them, and
+  immutable artifacts make late renames costly.
+- **Options:** (1) no coordinates — keep everything in-repo; (2) `com.texuli`
+  — the reverse-DNS of texuli.com, owned by Dailybot, Inc.; (3)
+  `io.github.dailybothq` — a GitHub-account namespace, verifiable without a
+  domain.
+- **Choice:** `com.texuli`, artifacts `texuli-spec` and `texuli-compose`,
+  versions tracking the npm prerelease line they mirror (`0.1.0-next.1`).
+- **Why:** texuli.com is owned and deployed, so the Central Portal can verify
+  the namespace by DNS, and the group matches the Kotlin package names the
+  sources already use (`com.texuli.spec.runtime`, `com.texuli.compose`).
+  `io.github.…` would name the host rather than the product.
+- **Reverse when:** before a first publication a rename is two lines per
+  build file and free. After a first Central release artifacts are immutable
+  — a rename lands as new coordinates, never an overwrite. Publication itself
+  (Central Portal account, GPG key, `maven-publish` wiring) remains planned
+  and needs an owner GO.

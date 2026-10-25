@@ -15,8 +15,11 @@ card, grid, and deck-slide content layouts are rendered; app-shell layouts and
 other chart families remain visible placeholders. This renderer support does
 not promote catalog capability claims: capabilities remain `unknown` until
 portable behavior is audited and cross-target conformance is established.
-Nothing is published. To embed the renderer, start with the
-[adoption guide](docs/ADOPTION.md).
+Nothing is published to Maven Central yet: both modules carry their planned
+coordinates (`com.texuli`, decision
+[ADR-005](../docs/DECISIONS.md#adr-005-maven-coordinates-comtexuli-for-the-native-modules))
+and are consumed in place from this repository. To embed the renderer, start
+with the [adoption guide](docs/ADOPTION.md).
 The native slice currently accepts only a documented subset of each compact
 chart's props; unsupported options (such as custom formatting, thresholds,
 localized labels, and bullet ranges) produce a visible invalid-chart
