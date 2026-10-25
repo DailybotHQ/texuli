@@ -7,7 +7,7 @@
 
 # Texuli
 
-### Small pieces. Build anything. Built for the age of agents.
+### Small pieces. Build anything. Built for the agentic era.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Svelte 5](https://img.shields.io/badge/Svelte_5-FF3E00?logo=svelte&logoColor=white)](package.json)
