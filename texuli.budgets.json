@@ -107,6 +107,18 @@
       "gzip": 4096,
       "note": "Per-texel subpath budget (lead decision 2026-10-23): primitives import texels through these subpaths, so each texel is a first-load cost only where used."
     },
+    "@texuli/core/editor-transforms": {
+      "gzip": 11264,
+      "note": "The editor transform set (every node/mark operation, refusal issues, structural sharing; measured 10,604 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package)."
+    },
+    "@texuli/core/editor-model": {
+      "gzip": 8704,
+      "note": "The editor document model, loader with hostile-input caps and grapheme selection (measured 7,995 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package)."
+    },
+    "@texuli/core/editor-markdown": {
+      "gzip": 7680,
+      "note": "The owned Markdown codec with precomputed closers and bracket pairs (measured 7,203 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package)."
+    },
     "@texuli/core/overlay": {
       "gzip": 14336,
       "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 13,972 B."
@@ -467,6 +479,10 @@
       "gzip": 2048,
       "cssGzip": 0,
       "note": "FINAL-texuli-check: component chrome pair matrix split from aa-gate so the gate entry stays under budget after map marker pairs. Checking tool only."
+    },
+    "@texuli/editor": {
+      "gzip": 1024,
+      "note": "Skeleton entry (index.ts placeholder ~0.1 KiB); the real per-subpath rows land with the editor package task via pnpm size --update. Owner consent 2026-10-25 (PLAN_005 autonomous continuation)."
     }
   }
 }

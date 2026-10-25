@@ -62,6 +62,9 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   texuli: [],
   '@texuli/charts': [],
   '@texuli/chat': [],
+  // @texuli/editor has only internal runtime deps; it stays private
+  // (NEVER_PACKED) until its own release.
+  '@texuli/editor': [],
   '@texuli/data': [],
   '@texuli/media': [],
   '@texuli/blocks': [],
@@ -270,7 +273,10 @@ export function checkRuntimeAllowlist(packages: readonly WorkspacePackage[]): Su
     }
     const deps = pkg.manifest.dependencies ?? {};
     for (const [dep, range] of Object.entries(deps)) {
-      if (isWorkspaceRange(range)) {
+      if (isWorkspaceRange(range) || isInternalName(dep)) {
+        // Internal deps may be pinned to exact reserved versions
+        // (0.1.0-next.1) instead of workspace: ranges; they are still
+        // workspace packages, resolved by the workspace, not externals.
         if (!isInternalName(dep) && !names.has(dep)) {
           findings.push({
             package: pkg.name,

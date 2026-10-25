@@ -41,8 +41,10 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-/** Workspace packages that are never packed: demo code, not a library. */
-export const NEVER_PACKED: readonly string[] = ['@texuli/examples'];
+/** Workspace packages that are never packed: demo code or an unreleased
+ * library. @texuli/editor stays private until its own release so the
+ * paused publish waves keep their byte-stable manifest set. */
+export const NEVER_PACKED: readonly string[] = ['@texuli/examples', '@texuli/editor'];
 
 /** attw resolution kinds outside the ESM-only support policy. */
 export const IGNORED_RESOLUTIONS: readonly string[] = ['node10', 'node16-cjs'];
