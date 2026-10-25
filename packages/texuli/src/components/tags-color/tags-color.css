@@ -284,5 +284,27 @@
       border: 1px solid ButtonText;
       forced-color-adjust: none;
     }
+
+    /*
+     * A swatch's fill is its content: keep it, frame it in system colors, and
+     * show selection and focus without box-shadow (forced colors drop it).
+     */
+    .tx-color-picker__swatch,
+    .tx-color-picker__preview {
+      forced-color-adjust: none;
+      border-color: CanvasText;
+    }
+
+    .tx-color-picker__swatch[data-state="selected"],
+    .tx-color-picker__swatch[aria-pressed="true"] {
+      border: 3px solid Highlight;
+      box-shadow: none;
+    }
+
+    .tx-color-picker__swatch:focus-visible {
+      outline: var(--tx-focus-ring-width, 2px) solid CanvasText;
+      outline-offset: 2px;
+      box-shadow: none;
+    }
   }
 }
