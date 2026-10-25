@@ -139,13 +139,21 @@ function pinWorkspace(deps: unknown, versions: ReadonlyMap<string, string>, prob
   const out: { [key: string]: Json } = {};
   for (const [name, range] of Object.entries(deps)) {
     if (typeof range !== 'string') continue;
-    if (!range.startsWith('workspace:')) {
-      out[name] = range;
-      continue;
+    let pinned = range;
+    if (range.startsWith('workspace:')) {
+      const version = versions.get(name);
+      if (version === undefined) problems.push(`manifest: ${name} is not a workspace package`);
+      pinned = version ?? range;
     }
-    const version = versions.get(name);
-    if (version === undefined) problems.push(`manifest: ${name} is not a workspace package`);
-    out[name] = version ?? range;
+    // RELEASE.md "Workspace dependencies and consumers": no published
+    // manifest may carry a workspace/link/file protocol or the 0.0.0
+    // placeholder — packed ranges are real semver ranges only.
+    if (/^(workspace|link|file):/.test(pinned) || pinned === '0.0.0') {
+      problems.push(
+        `manifest: ${name}: published range must be a real semver range, got "${pinned}"`
+      );
+    }
+    out[name] = pinned;
   }
   return out;
 }
