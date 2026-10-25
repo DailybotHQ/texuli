@@ -115,6 +115,18 @@ describe('CalendarView rescheduling: names and keys', () => {
     expect(chip('audit').hasAttribute('aria-describedby')).toBe(false);
   });
 
+  // Audit P1-16: tones were utility classes that rendered nothing without that
+  // utility CSS; day headings and the grid now share one horizontal scroller.
+  it('marks each chip with its tone and scrolls headings with the grid', async () => {
+    render(Harness, { props: { initial: events } });
+    await ready();
+    expect(chip('review').dataset.tone).toBe('primary');
+    expect(chip('review').className).not.toMatch(/\bbg-|border-l-/);
+    const view = document.querySelector('[data-time-view]');
+    expect(view?.querySelector('.tx-calendar__time-header')).toBeTruthy();
+    expect(view?.querySelector('[data-time-scroller]')).toBeTruthy();
+  });
+
   it('is read-only without onChange or with readOnly', async () => {
     render(Harness, { props: { initial: events, readOnly: true } });
     await ready();
