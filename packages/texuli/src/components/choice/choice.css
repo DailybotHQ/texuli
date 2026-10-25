@@ -70,16 +70,22 @@
       border-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
   }
 
-  /* Invisible hit area: 44px touch, tighter on sm+ */
+  /*
+   * Invisible hit area: 44px tall touch target, tighter on sm+. It grows on
+   * the block axis only: growing inline pushed past a flush inline edge and
+   * scrolled the page on phones. The inline axis already reaches the label,
+   * which activates the control (label for=).
+   */
   .tx-choice-control::before {
     content: "";
     position: absolute;
-    inset: -0.875rem;
+    inset-block: -0.875rem;
+    inset-inline: 0;
   }
 
   @media (min-width: 40rem) {
     .tx-choice-control::before {
-      inset: -0.25rem;
+      inset-block: -0.25rem;
     }
   }
 
@@ -168,7 +174,7 @@
   .tx-switch-control::before {
     content: "";
     position: absolute;
-    inset-inline: -0.25rem;
+    inset-inline: 0;
     inset-block: -0.75rem;
   }
 
