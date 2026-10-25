@@ -19,6 +19,7 @@ The registry API and a seed example (`core-safe-href` over `@texuli/core`
 | `listExampleIds()` | Ids only |
 | `ExampleMeta` / `ExampleEntry` / `ExampleFilter` | Types |
 | `reportBlueprint` / `dashboardBlueprint` / `deckBlueprint` | The player fixture blueprints (fictional data), plain JSON trees; the website builder uses them as starters |
+| `@texuli/examples/editor` | `RichTextEditor`, re-exported from `@texuli/editor/editor` for texuli.com islands. Interim: it goes away once the website declares `@texuli/editor` itself (an owner `pnpm install`) |
 
 ```ts
 import { defineExample } from '@texuli/examples';
