@@ -12,7 +12,7 @@ project overview.
 | [RELEASE](RELEASE.md) | Independent package versions, prerelease and stable dist-tags, owner-GO publication waves |
 | [ARCHITECTURE](ARCHITECTURE.md) | The down-only layer graph, every package and its subpaths, the website, build and test shape |
 | [DECISIONS](DECISIONS.md) | Architecture decisions: options, choice, why, how to reverse |
-| [EDITOR_ARCHITECTURE](EDITOR_ARCHITECTURE.md) | The rich text editor's contracts (ADR-003): model, selection, history, keyboard, paste security, interchange. The model exists as core texels; the editor package is planned |
+| [EDITOR_ARCHITECTURE](EDITOR_ARCHITECTURE.md) | The rich text editor's contracts (ADR-003): model, selection, history, keyboard, paste security, interchange. The model exists as core texels and the editor package implements the surface |
 | [STANDARDS](STANDARDS.md) | TypeScript, Svelte 5, Astro, CSS, Biome, naming, accessibility |
 | [DESIGN_LANGUAGE](DESIGN_LANGUAGE.md) | The cross-surface visual contract: color roles and modes, spacing and density, shape and elevation, motion and reduced motion, focus, typography, direction |
 | [TESTING_GUIDE](TESTING_GUIDE.md) | Every gate, the source→test map, scoped commands, blind spots, posture |
@@ -31,6 +31,7 @@ project overview.
 | `@texuli/catalog` | [packages/catalog/README.md](../packages/catalog/README.md): The agent catalog and the renderer with no HTML sinks. |
 | `@texuli/charts` | [packages/charts/README.md](../packages/charts/README.md): Chart math and every chart family, one lazy subpath per family. |
 | `@texuli/chat` | [packages/chat/README.md](../packages/chat/README.md): Chat interfaces: thread, message list, composer and typing indicator, generic for people and agents. |
+| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): The rich text editor surface, toolbar, link dialog and clipboard import on the core editor texels. |
 | `@texuli/core` | [packages/core/README.md](../packages/core/README.md): Texels: framework-free behavior and policy that every Texuli component is built from. |
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
@@ -144,6 +145,16 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | --- | --- |
 | [chat-composer](../packages/chat/docs/chat-composer.md) | Chat composer and typing indicator |
 | [chat-thread](../packages/chat/docs/chat-thread.md) | Chat thread and message list |
+
+### `@texuli/editor` (`packages/editor/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [editor-controller](../packages/editor/docs/editor-controller.md) | Editor controller |
+| [editor-link-dialog](../packages/editor/docs/editor-link-dialog.md) | Link dialog |
+| [editor-paste](../packages/editor/docs/editor-paste.md) | Clipboard import |
+| [editor-surface](../packages/editor/docs/editor-surface.md) | Editor surface |
+| [editor-toolbar](../packages/editor/docs/editor-toolbar.md) | Editor toolbar |
 
 ### `@texuli/core` (`packages/core/docs/`)
 

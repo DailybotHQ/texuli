@@ -1,13 +1,16 @@
 # Rich text editor architecture
 
-**Status: the model is implemented; the editor is planned.** This is the
-long-form companion to
+**Status: the model and the editor package are implemented, in development
+and unpublished.** This is the long-form companion to
 [ADR-003](DECISIONS.md#adr-003-rich-text-editor-architecture) and fixes the
 contracts that the editor tasks implement. The framework-free model exists
 as core texels: the document, selection, transforms, history, key intents
 and the Markdown codec ([core-editor](../packages/core/docs/core-editor.md)).
-The `@texuli/editor` package, the paste import, the DOM selection mapping
-and the editing surface do not exist yet. Each section says what is fixed, the option chosen, one
+The private `@texuli/editor` package holds the paste import, the DOM
+selection mapping and the Svelte 5 editing surface
+([packages/editor](../packages/editor/README.md)). The browser behavior
+scenario, CSP matrix row, perf limit and the blocks and catalog adapters are
+still planned. Each section says what is fixed, the option chosen, one
 rejected alternative, and how to reverse the choice.
 
 Texuli builds the editor from scratch, like every primitive: no editor
@@ -51,10 +54,11 @@ waiting for a new package. The table shows where things live now.
 | L0 `@texuli/core` | `editor-history` | The snapshot-stack history | Exists |
 | L0 `@texuli/core` | `editor-keymap` | Key chords and `beforeinput` input types to editing intents, platform-aware (`Mod` is Cmd on Apple platforms, Ctrl elsewhere) | Exists |
 | L0 `@texuli/core` | `editor-markdown` | The Markdown-subset codec | Exists |
-| L0 `@texuli/core` | `editable-selection` | Maps DOM points to model points through `data-*` block markers, and back | Planned |
-| L4 `@texuli/editor` | `paste` | Framework-free clipboard import (section 8) | Planned |
-| L4 `@texuli/editor` | `.` | `RichTextEditor`: a small entry that lazy-loads the editing UI chunk | Planned |
-| L4 `@texuli/editor` | `ui` | The editing surface, toolbar and link dialog (Svelte 5), built on primitives and texuli components | Planned |
+| L4 `@texuli/editor` | `paste` | Framework-free clipboard import (section 8) | Exists |
+| L4 `@texuli/editor` | `controller` | The headless editor: history, commands, composition guard, announcements | Exists |
+| L4 `@texuli/editor` | `editor` | `RichTextEditor` and `EditorSurface`, plus the DOM selection mapping through `data-*` block markers (the planned core `editable-selection` texel lives here) | Exists |
+| L4 `@texuli/editor` | `toolbar`, `link-dialog` | The formatting toolbar and the link dialog (Svelte 5), built on primitives and texuli components | Exists |
+| L4 `@texuli/editor` | `.` | The package barrel. It does not lazy-load the UI: the entry measures about 34 KiB gzip with the core texels bundled | Exists |
 
 The editor package depends on core, primitives, tokens and texuli, like the
 other L4 packages. Adding the package and its `LAYERS` row in

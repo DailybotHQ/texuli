@@ -28,6 +28,7 @@ packages in lower layers.
 | L4 | `@texuli/data` | Data views: grid (core, columns, editing, virtual), tree, board, calendar, timeline, map, activity, files, virtual list | core, primitives, tokens, texuli |
 | L4 | `@texuli/media` | Image, gallery, video, audio, captions, image editor, compositions, animation, export | core, primitives, tokens, texuli |
 | L4 | `@texuli/chat` | Thread, message list, composer, typing indicator | core, primitives, tokens, texuli |
+| L4 | `@texuli/editor` | Rich text editor surface, toolbar, link dialog, headless controller, clipboard import | core, primitives, tokens, texuli |
 | L5 | `@texuli/blocks` | Content blocks (text, code, data, diagram, embed, interactive, map, media, structure): closed vocabulary, untrusted guard, formula AST | core, tokens, texuli, charts, data, media |
 | L6 | `@texuli/catalog` | The agent catalog (manifests per group, build) and the renderer with no HTML sinks | core, texuli, charts, data, blocks, media |
 | L7 | `@texuli/slides` | Slide model, grammar, export and stage runtime | blocks, catalog, media, tokens |
@@ -82,6 +83,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/catalog` (private) | `.`, `build`, `build/node`, `edit`, `envelope`, `manifest`, `manifests/content`, `manifests/display`, `manifests/forms`, `manifests/layouts`, `manifests/overlays`, `player`, `render/frame`, `render/grammar`, `render/hostile`, `render/limits`, `render/renderer`, `render/richtext`, `validate`, `validate/blocks` |
 | `@texuli/charts` (private) | `.`, `canvas`, `colors`, `calendar`, `annotations`, `axis`, `cartesian`, `compact`, `flow`, `geo`, `histogram`, `interaction`, `math`, `math/scales`, `math/shapes`, `math/layout`, `math/downsample`, `math/color`, `matrix`, `part-whole`, `pack`, `statistical`, `streaming`, `schemas`, `worker`, `worker/entry` |
 | `@texuli/chat` (private) | `.` |
+| `@texuli/editor` (private) | `.`, `controller`, `editor`, `link-dialog`, `paste`, `toolbar` |
 | `@texuli/core` (private) | `.`, `announcer`, `controllable`, `dir-locale`, `dismiss`, `editor-history`, `editor-keymap`, `editor-markdown`, `editor-model`, `editor-transforms`, `env`, `focus-scope`, `form-bridge`, `ids`, `inert`, `keyboard`, `layer-stack`, `lazy`, `overlay`, `overlay-core`, `portal`, `position-dom`, `position-math`, `presence`, `roving`, `scroll-lock`, `tabbable`, `url-policy` |
 | `@texuli/data` (private) | `.`, `activity`, `activity/engine`, `board`, `board/engine`, `calendar`, `files`, `files/engine`, `geo`, `grid`, `grid-columns`, `grid-core`, `grid-virtual`, `map`, `timeline`, `timeline/engine`, `tree`, `tree-view`, `virtual-list`, `calendar/view`, `grid-editing` |
 | `@texuli/examples` (private) | `.` |
