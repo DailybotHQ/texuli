@@ -18,14 +18,16 @@
 **Small pieces. Infinite possibilities.** Texuli is an open-source Svelte 5
 component library, built from scratch and owned end to end. Framework-free
 *texels* compose into accessible headless primitives; with the OKLCH theme
-engine those become styled components and whole interfaces — apps,
-dashboards, data views, charts, media, chat, documents and slide decks.
+engine (a perceptual color space: lightness, chroma, hue) those become
+styled components and whole interfaces — apps, dashboards, data views,
+charts, media, chat, documents and slide decks.
 Agents get a catalog whose output renders through a sink-free renderer, so
 the same pieces are safe to hand to a machine.
 
 [Quickstart](#60-second-start) ·
 [The layers](#small-pieces-all-the-way-down) ·
 [What you can build](#what-you-can-build) ·
+[The Compose twin](#the-kotlin-multiplatform-twin) ·
 [Built for agents](#built-for-agents) ·
 [Quality](#measured-quality) ·
 [Honest boundaries](#honest-boundaries) ·
@@ -110,6 +112,38 @@ Every example in [`@texuli/examples`](packages/examples/README.md) is a
 registered fixture: it runs in unit tests, visual baselines, accessibility
 sweeps and the website.
 
+## The Kotlin Multiplatform twin
+
+The same interfaces render beyond the web. [`native/`](native/README.md) is a
+self-contained Gradle Kotlin Multiplatform build that consumes the blueprint
+contract from [`@texuli/spec`](packages/spec/README.md) — it never imports
+TypeScript or Svelte — and paints it with Compose.
+
+| Module | What it holds | Targets |
+| --- | --- | --- |
+| `texuli-spec` | Generated models, enums and decoders from the same spec codegen, the strict JSON reader, the validator (the twin of the web's `validateBlueprint`), the render plan and its tier gate | JVM, iOS (arm64 + simulator) |
+| `texuli-compose` | The token theme (`TexuliTheme`), the native registry, typed host intents, and Compose components: page, document, deck, card and bounded grid layouts, text blocks and lists, tables, static boards, media frames and a compact-chart slice | JVM (Compose Desktop) |
+| `conformance` | The native half of the dual-target golden gate and the KMP app migration checks | JVM tests |
+
+**One spec, two targets.** The golden gate is semantic, not pixel: every spec
+golden loads on the web and natively, and the native trace must equal the web
+trace — roles, accessible names, heading levels. Invalid blueprints are
+refused with exactly the TypeScript validator's codes. The same two-tier URL
+policy runs in common Kotlin, and a hostile-props matrix (wrong types,
+depth bombs, bidi, huge and deep containers) proves every projection stays
+in bounds and never throws. Anything the twin cannot paint yet becomes a
+visible placeholder, never a silent drop.
+
+Six real KMP test-bench apps are pinned by migration checks — a starter, a
+todo list, an AI chat, a voice chat, a live-room dynamics app and a duel
+game — each mapped to blueprints with every widget's status documented.
+
+**Status: in development, nothing published.** App-shell layouts and most
+chart families are still placeholders; media frames paint their aspect,
+caption and alt but no pixels yet, and video shows its poster. iOS compiles
+`texuli-spec` today (for a SwiftUI adapter); Android waits on a design
+decision — and the web stays Svelte.
+
 ## Built for agents
 
 Texuli is designed to be built *by* agents as much as by people.
@@ -139,6 +173,9 @@ every verified command.
   baselines in light/dark on desktop and mobile ([PERFORMANCE](docs/PERFORMANCE.md)).
 - **Strict, erasable TypeScript** and Biome across the workspace; packages
   export their TS source.
+- **A dual-target conformance gate.** The Compose twin must reproduce the
+  web's semantic traces and refusal codes for every spec golden
+  (`./gradlew -p native check` on JDK 21).
 - **A threat model that is tested, not just written** — hostile inputs ship
   as fixtures in the suites ([SECURITY](docs/SECURITY.md)).
 
@@ -149,10 +186,10 @@ every verified command.
   npm is not supported until the release waves run
   ([RELEASE](docs/RELEASE.md)).
 - **texuli.com is not deployed.** Run it locally with `pnpm dev`.
-- **Web first.** A Kotlin Multiplatform / Compose port of the theme system
-  and text primitives lives in [`native/`](native/README.md); it is early —
-  media paints a placeholder until a source resolves under the untrusted
-  policy.
+- **Web first, native in progress.** The Compose twin (see
+  [above](#the-kotlin-multiplatform-twin)) renders a real slice with visible
+  placeholders for the rest; nothing native is published and Android waits on
+  a design decision.
 - **Verified where it counts, not everywhere.** See what the gates do and do
   not cover in [TESTING_GUIDE](docs/TESTING_GUIDE.md).
 
