@@ -581,6 +581,30 @@ describe('pie and arcs', () => {
       arcCentroid({ innerRadius: 0, outerRadius: 10, startAngle: 0, endAngle: Math.PI })
     ).toEqual([5, 0]);
   });
+
+  it('keeps a positive slice visible when the pad angle would consume it', () => {
+    // A sliver next to a dominant slice: its own pad may never exceed half
+    // its sweep, so the slice still renders (the legend and table list it).
+    const slices = pie([1000, 1], { padAngle: 0.01 });
+    const sliver = slices[1] as { value: number; startAngle: number; endAngle: number; padAngle: number };
+    expect(sliver.value).toBe(1);
+    expect(sliver.padAngle).toBeGreaterThan(0);
+    expect(sliver.padAngle).toBeLessThanOrEqual((sliver.endAngle - sliver.startAngle) / 2);
+    expect(
+      arcPath({
+        innerRadius: 0,
+        outerRadius: 100,
+        startAngle: sliver.startAngle,
+        endAngle: sliver.endAngle,
+        padAngle: sliver.padAngle,
+      })
+    ).not.toBe('');
+    // Direct arcPath callers (sunburst arcs, gauge bands) get the same
+    // guarantee: padding trims at most half the span away.
+    expect(
+      arcPath({ innerRadius: 5, outerRadius: 10, startAngle: 0, endAngle: 0.004, padAngle: 0.01 })
+    ).not.toBe('');
+  });
 });
 
 describe('symbols', () => {

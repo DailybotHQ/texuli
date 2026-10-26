@@ -7,8 +7,9 @@
 `CalendarHeatmap` lays out an inclusive UTC `start` and `end` range with the
 public `calendarLayout` math. `values` maps `YYYY-MM-DD` dates to finite numbers;
 missing dates remain distinct from zero. Sequential `--tx-chart-*` tokens color
-the cells. The component requires a non-empty `title` and `description` and
-includes every day in its data table.
+the cells. The component requires a non-empty `title` and `description`,
+includes every day in its data table, and formats month ticks as localized
+short month and year labels in UTC.
 
 ## Props
 

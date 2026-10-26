@@ -77,6 +77,18 @@ export function formatCalendarDate(date: string): string {
   return formatDate(Date.parse(`${date}T00:00:00.000Z`));
 }
 
+/** Month tick labels use the host locale while keeping the chart's UTC calendar semantics. */
+export function formatCalendarMonth(month: string, locale?: string): string {
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return month;
+  const date = new Date(`${month}-01T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) return month;
+  return new Intl.DateTimeFormat(locale, {
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(date);
+}
+
 export function formatCalendarValue(value: number | null, noData = 'No data'): string {
   return value === null
     ? noData

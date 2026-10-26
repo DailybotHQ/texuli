@@ -2,6 +2,8 @@
 import Legend from '../interaction/Legend.svelte';
 import { arcPath, pie } from '../math/shapes/arc.ts';
 import {
+  assertPartWholeChrome,
+  centerTotalFits,
   formatPartWholeValue,
   type PartWholeDatum,
   type PartWholeTableLabels,
@@ -29,6 +31,10 @@ let {
   padAngle = 0.01,
 }: Props = $props();
 
+$effect.pre(() => {
+  assertPartWholeChrome(title, description);
+});
+
 const uid = $props.id();
 const center = $derived(size / 2);
 const radius = $derived(Math.max(0, size * 0.45));
@@ -54,6 +60,14 @@ const legendItems = $derived(
     color: partWholeColor(index),
     symbol: 'square' as const,
   }))
+);
+// The center total's font size, in the SVG's user units (0.8rem at the
+// default 240 viewBox): like the gauge's labels, it scales with the chart,
+// which keeps the fit check below exact.
+const centerFontSize = $derived(size * 0.0533);
+const totalText = $derived(formatPartWholeValue(total));
+const showCenterTotal = $derived(
+  innerRadius > 0 && centerTotalFits(totalText, innerRadius, centerFontSize)
 );
 </script>
 
@@ -92,12 +106,12 @@ const legendItems = $derived(
           </path>
         {/if}
       {/each}
-      {#if innerRadius > 0}
-        <text class="center-total" x="0" y="0" aria-hidden="true">{formatPartWholeValue(total)}</text>
+      {#if showCenterTotal}
+        <text class="center-total" x="0" y="0" font-size={centerFontSize} aria-hidden="true">{totalText}</text>
       {/if}
     </g>
   </svg>
-  <Legend items={legendItems} label="Chart categories" />
+  <Legend items={legendItems} label={labels.category} />
   <PartWholeDataTable {title} {labels} {rows} />
 </figure>
 
@@ -127,7 +141,7 @@ const legendItems = $derived(
 
   .center-total {
     fill: var(--tx-foreground, CanvasText);
-    font-size: 0.8rem;
+    /* Font size is the text's font-size attribute, in user units (CSS would override it). */
     font-variant-numeric: tabular-nums;
     text-anchor: middle;
     dominant-baseline: middle;

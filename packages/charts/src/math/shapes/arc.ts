@@ -52,7 +52,9 @@ export function pie(values: readonly (number | null)[], options: PieOptions = {}
       value: v,
       startAngle: angle,
       endAngle: angle + sweep,
-      padAngle: v > 0 ? pad : 0,
+      // A slice never hands over more pad than half its own sweep, so a
+      // sliver next to a dominant slice stays visible instead of vanishing.
+      padAngle: v > 0 ? Math.min(pad, sweep / 2) : 0,
     };
     angle += sweep;
   }
@@ -94,8 +96,11 @@ export function arcPath(options: ArcOptions): string {
 
   const pad = Math.max(0, options.padAngle ?? 0) / 2;
   if (pad > 0) {
-    a0 += pad;
-    a1 -= pad;
+    // Each side trims `pad`, so the cap is a quarter of the span: padding
+    // removes at most half of the arc, which never disappears altogether.
+    const trim = Math.min(pad, (a1 - a0) / 4);
+    a0 += trim;
+    a1 -= trim;
     if (a1 - a0 <= EPSILON) return '';
   }
   const span = a1 - a0;

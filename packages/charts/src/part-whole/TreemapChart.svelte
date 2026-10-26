@@ -2,6 +2,7 @@
 import Legend from '../interaction/Legend.svelte';
 import { treemap } from '../math/layout/treemap.ts';
 import {
+  assertPartWholeChrome,
   formatPartWholeValue,
   type PartWholeTableLabels,
   type PartWholeTree,
@@ -21,6 +22,11 @@ type Props = {
 };
 
 let { title, description, root, labels, width = 640, height = 360, padding = 2 }: Props = $props();
+
+$effect.pre(() => {
+  assertPartWholeChrome(title, description);
+});
+
 const uid = $props.id();
 const rects = $derived(treemap(root, { width, height, padding }));
 const leaves = $derived(rects.filter((rect) => rect.leaf && rect.value > 0));
@@ -37,8 +43,8 @@ const legendItems = $derived(
 
 <figure class="part-whole">
   <figcaption>
-    <h3>{title}</h3>
-    <p>{description}</p>
+    <h3 id="{uid}-title">{title}</h3>
+    <p id="{uid}-description">{description}</p>
   </figcaption>
   <svg
     direction="ltr"
@@ -47,8 +53,8 @@ const legendItems = $derived(
     aria-labelledby="{uid}-title {uid}-description"
     class="chart"
   >
-    <title id="{uid}-title">{title}</title>
-    <desc id="{uid}-description">{description}</desc>
+    <title>{title}</title>
+    <desc>{description}</desc>
     {#each leaves as rect, index (rect.id)}
       {@const label = rect.label ?? rect.id}
       <rect
@@ -67,7 +73,7 @@ const legendItems = $derived(
       </rect>
     {/each}
   </svg>
-  <Legend items={legendItems} label="Chart categories" />
+  <Legend items={legendItems} label={labels.category} />
   <PartWholeDataTable {title} {labels} {rows} />
 </figure>
 

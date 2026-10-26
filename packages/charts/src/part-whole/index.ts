@@ -1,5 +1,7 @@
 export { default as DonutChart } from './DonutChart.svelte';
 export {
+  assertPartWholeChrome,
+  centerTotalFits,
   formatPartWholeValue,
   type PartWholeDatum,
   type PartWholeTableLabels,

@@ -46,7 +46,7 @@ $effect(() => {
   aria-describedby="{id}-description"
 >
   <figcaption>
-    <h2 id="{id}-title">{title}</h2>
+    <h3 id="{id}-title">{title}</h3>
     <p id="{id}-description">{description}</p>
   </figcaption>
   <!-- Zero-height width probe: it tracks the figure width, and the chart re-laying out (its height) never re-notifies it. -->
@@ -88,7 +88,7 @@ $effect(() => {
     --chart-8: var(--tx-chart-8, #fdae6b);
   }
 
-  figcaption h2 {
+  figcaption h3 {
     margin: 0 0 0.25rem;
     font-size: 1rem;
     font-weight: 600;

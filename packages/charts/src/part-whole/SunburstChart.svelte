@@ -3,6 +3,7 @@ import Legend from '../interaction/Legend.svelte';
 import { sunburst } from '../math/layout/sunburst.ts';
 import { arcPath } from '../math/shapes/arc.ts';
 import {
+  assertPartWholeChrome,
   formatPartWholeValue,
   type PartWholeTableLabels,
   type PartWholeTree,
@@ -31,6 +32,10 @@ let {
   padAngle = 0.008,
 }: Props = $props();
 
+$effect.pre(() => {
+  assertPartWholeChrome(title, description);
+});
+
 const uid = $props.id();
 const center = $derived(size / 2);
 const radius = $derived(Math.max(0, size * 0.48));
@@ -51,8 +56,8 @@ const legendItems = $derived(
 
 <figure class="part-whole">
   <figcaption>
-    <h3>{title}</h3>
-    <p>{description}</p>
+    <h3 id="{uid}-title">{title}</h3>
+    <p id="{uid}-description">{description}</p>
   </figcaption>
   <svg
     direction="ltr"
@@ -61,8 +66,8 @@ const legendItems = $derived(
     aria-labelledby="{uid}-title {uid}-description"
     class="chart"
   >
-    <title id="{uid}-title">{title}</title>
-    <desc id="{uid}-description">{description}</desc>
+    <title>{title}</title>
+    <desc>{description}</desc>
     <g transform="translate({center},{center})">
       {#each visibleArcs as arc, index (`${arc.id}-${arc.depth}`)}
         {@const label = arc.label ?? arc.id}
@@ -87,7 +92,7 @@ const legendItems = $derived(
       {/each}
     </g>
   </svg>
-  <Legend items={legendItems} label="Chart categories" />
+  <Legend items={legendItems} label={labels.category} />
   <PartWholeDataTable {title} {labels} {rows} />
 </figure>
 

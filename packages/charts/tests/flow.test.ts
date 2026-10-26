@@ -1,4 +1,7 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
+import { compile } from 'svelte/compiler';
 import { afterEach, describe, expect, it } from 'vitest';
 import FunnelChart from '../src/flow/FunnelChart.svelte';
 import { networkLayout } from '../src/flow/model.ts';
@@ -104,5 +107,17 @@ describe('flow charts', () => {
       },
     });
     expect(screen.getByRole('alert').textContent).toContain('unknown node');
+  });
+});
+
+describe('flow data-table disclosure', () => {
+  // The matrix frame, histogram, pack, calendar and statistical tables all give
+  // their `details` summary the 2.75rem tap-target row; the flow table is the
+  // same disclosure and must not be the short stranger in the family.
+  it('gives the summary the family tap-target height', () => {
+    const source = readFileSync(resolve(__dirname, '../src/flow/FlowDataTable.svelte'), 'utf8');
+    const css = compile(source, { filename: 'FlowDataTable.svelte', css: 'external' }).css?.code;
+    expect(css).toContain('min-block-size: 2.75rem');
+    expect(css).toContain('align-content: center');
   });
 });

@@ -27,7 +27,7 @@ non-negative. Model helpers: `partWholeColor`, `formatPartWholeValue`,
 | `title` | string | yes | — | blueprint | Visible chart title and accessible name. |
 | `description` | string | yes | — | blueprint | Accessible summary of the chart and its main conclusion. |
 | `data` | { id, label, value }[] | yes | — | blueprint | Flat slice data. |
-| `labels` | { table, category, value } | yes | — | blueprint | Localized labels for the accessible data table. |
+| `labels` | { table, category, value } | yes | — | blueprint | Localized labels for the accessible data table and the legend group name. |
 | `size` | number (> 0) | no | `240` | blueprint | Square view-box size in pixels. |
 | `innerRatio` | number (0–0.85) | no | `0` | blueprint | Inner radius as a fraction of the outer radius. |
 | `padAngle` | number (≥ 0) | no | `0.01` | blueprint | Angular gap between slices in radians. |
@@ -39,7 +39,7 @@ non-negative. Model helpers: `partWholeColor`, `formatPartWholeValue`,
 | `title` | string | yes | — | blueprint | Visible chart title and accessible name. |
 | `description` | string | yes | — | blueprint | Accessible summary of the chart and its main conclusion. |
 | `data` | { id, label, value }[] | yes | — | blueprint | Flat slice data. |
-| `labels` | { table, category, value } | yes | — | blueprint | Localized labels for the accessible data table. |
+| `labels` | { table, category, value } | yes | — | blueprint | Localized labels for the accessible data table and the legend group name. |
 | `size` | number (> 0) | no | `240` | blueprint | Square view-box size in pixels. |
 | `innerRatio` | number (0–0.85) | no | `0.58` | blueprint | Inner radius as a fraction of the outer radius. |
 | `padAngle` | number (≥ 0) | no | `0.01` | blueprint | Angular gap between slices in radians. |
@@ -51,7 +51,7 @@ non-negative. Model helpers: `partWholeColor`, `formatPartWholeValue`,
 | `title` | string | yes | — | blueprint | Visible chart title and accessible name. |
 | `description` | string | yes | — | blueprint | Accessible summary of the chart and its main conclusion. |
 | `root` | tree node `{ id, label?, value?, children? }` | yes | — | blueprint | Recursive hierarchy rooted at this node. |
-| `labels` | { table, category, value } | yes | — | blueprint | Localized labels for the accessible data table. |
+| `labels` | { table, category, value } | yes | — | blueprint | Localized labels for the accessible data table and the legend group name. |
 | `size` | number (> 0) | no | `240` | blueprint | Square view-box size in pixels. |
 | `innerRatio` | number (0–0.75) | no | `0.24` | blueprint | Inner radius as a fraction of the outer radius. |
 | `padAngle` | number (≥ 0) | no | `0.008` | blueprint | Angular gap between hierarchy arcs in radians. |
@@ -63,20 +63,27 @@ non-negative. Model helpers: `partWholeColor`, `formatPartWholeValue`,
 | `title` | string | yes | — | blueprint | Visible chart title and accessible name. |
 | `description` | string | yes | — | blueprint | Accessible summary of the chart and its main conclusion. |
 | `root` | tree node `{ id, label?, value?, children? }` | yes | — | blueprint | Recursive hierarchy rooted at this node. |
-| `labels` | { table, category, value } | yes | — | blueprint | Localized labels for the accessible data table. |
+| `labels` | { table, category, value } | yes | — | blueprint | Localized labels for the accessible data table and the legend group name. |
 | `width` | number (> 0) | no | `640` | blueprint | View-box width in pixels. |
 | `height` | number (> 0) | no | `360` | blueprint | View-box height in pixels. |
 | `padding` | number (≥ 0) | no | `2` | blueprint | Inner padding in pixels. |
 
 `labels` is required on every part-whole chart: pass the three data-table
-strings (`table`, `category`, `value`). Chart blocks in `@texuli/blocks` fill
-English defaults for you.
+strings (`table`, `category`, `value`). The legend's accessible group name is
+`labels.category`. Chart blocks in `@texuli/blocks` fill English defaults for
+you.
 
 ## Scales and color
 
 No axes. Slice and tile colors come from the theme's `--tx-chart-1` …
 `--tx-chart-8` tokens, falling back to semantic tokens (primary, success, info,
 warning, destructive, secondary, accent, link) when a theme has no chart ramp.
+
+Every slice with a positive value renders: the pad angle never trims a slice
+away entirely, so a sliver next to a dominant slice stays visible next to its
+legend entry and table row. The donut draws the total in its center only when
+the text fits the inner hole; a total that would collide with the slices is
+omitted and stays in the data table.
 
 ## Tiers
 

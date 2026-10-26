@@ -98,6 +98,20 @@ describe('HeatmapChart', () => {
     expect(container.querySelector('[data-chart-axis="y"]')?.textContent).toContain('Alpha');
   });
 
+  it('keeps its figure heading at the sibling families level (h3)', () => {
+    // Histogram, pack, calendar, statistical, flow and geo captions all use h3;
+    // a matrix h2 skips outline levels when the families sit on one page.
+    const { container } = render(HeatmapChart, {
+      props: {
+        title: 'Team load',
+        description: 'Relative load by day and team.',
+        cells: heatCells,
+      },
+    });
+    expect(container.querySelector('figcaption h3')).toBeTruthy();
+    expect(container.querySelector('figcaption h2')).toBeNull();
+  });
+
   it('requires accessible title and description', () => {
     expect(() =>
       render(HeatmapChart, {

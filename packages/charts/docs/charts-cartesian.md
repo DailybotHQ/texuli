@@ -23,9 +23,9 @@ column instead of shrinking with the drawing. Wider boxes scale the 640-pixel
 layout up. A render with no measured box (server rendering) uses 640.
 
 Model helpers: `assertCartesianSeries` (throws on empty or duplicate ids,
-non-finite values, or mixed category and numeric x), `xDomain`,
-`windowCartesianSeries`, `createCartesianLayout`, `toInteractionSeries`,
-`lineCoordinates`.
+duplicate x values within a series, non-finite values, or mixed category and
+numeric x), `xDomain`, `windowCartesianSeries`, `createCartesianLayout`,
+`toInteractionSeries`, `lineCoordinates`.
 
 ## Props
 
