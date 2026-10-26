@@ -26,7 +26,7 @@ export interface ResolvedNavGroup {
 const byLabel = (a: NavLink, b: NavLink) => a.label.localeCompare(b.label, 'en');
 
 /** Families the component pages group into, in sidebar order. */
-const COMPONENT_FAMILIES: readonly {
+export const COMPONENT_FAMILIES: readonly {
   label: string;
   /** Landing page of the family, when it has one; otherwise a plain heading. */
   href?: string;

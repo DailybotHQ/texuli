@@ -49,6 +49,24 @@ pnpm exec tsx packages/tools/src/llms/cli.ts \
 | `--dry-run` | Plan paths only |
 | `--json` | Machine-readable summary |
 
+## Whole-site llms.txt
+
+`formatSiteLlmsTxt` renders the llmstxt.org convention for a caller-supplied
+route map — an H1, a blockquote summary, then H2 sections of
+`- [Title](href): one line` links. It takes no catalog input; the sections
+come from the consumer (texuli.com derives them from its nav in
+`apps/website/src/components/seo/llms-site.ts`):
+
+```ts
+import { formatSiteLlmsTxt, type SiteLlmsSection } from '@texuli/tools/llms';
+
+const body = formatSiteLlmsTxt({ title: 'Texuli', summary: '…', sections });
+```
+
+The website's committed copy is `apps/website/public/llms.txt`; regenerate it
+with `pnpm exec tsx scripts/generate-site-llms.ts` after nav or route changes
+(the `site-aeo` e2e spec fails on drift).
+
 ## Notes
 
 - Content is plain Markdown (no HTML sinks).

@@ -1,0 +1,83 @@
+# Texuli
+
+> Interfaces from texels. Owned, accessible Svelte 5 components that people and agents can build anything with.
+
+Texuli is an open-source (MIT) Svelte 5 component system built from scratch: framework-free texels compose into headless primitives, the token engine styles them, and a closed agent catalog renders agent output with no HTML sinks. A Kotlin Multiplatform renderer for the same interfaces is in development.
+
+## Start here
+
+What Texuli is and where to begin.
+
+- [Texuli](https://texuli.com/): The product landing.
+- [Introduction](https://texuli.com/guides/): The docs home and reading order.
+- [Getting started](https://texuli.com/guides/getting-started/)
+- [Skill](https://texuli.com/skill/): The distributable agent skill for building with Texuli.
+
+## Guides
+
+Task-first guides, in reading order.
+
+- [Getting started](https://texuli.com/guides/getting-started/)
+- [Why Svelte and Kotlin](https://texuli.com/guides/why-svelte-kotlin/)
+- [Theming](https://texuli.com/guides/theming/)
+- [Dark mode](https://texuli.com/guides/dark-mode/)
+- [Accessibility](https://texuli.com/guides/accessibility/)
+- [RTL and i18n](https://texuli.com/guides/rtl-i18n/)
+- [Forms](https://texuli.com/guides/forms/)
+- [Performance](https://texuli.com/guides/performance/)
+
+## Components
+
+Every styled component with live examples; each page documents props, behavior and accessibility.
+
+- [Overview](https://texuli.com/component-pages/)
+- [Gallery](https://texuli.com/gallery-components/)
+- [Examples](https://texuli.com/examples/)
+- [Slides](https://texuli.com/slides-page/)
+- [Editor](https://texuli.com/editor-page/)
+- [Blocks](https://texuli.com/blocks-page/)
+- [Charts](https://texuli.com/charts-page/)
+- [Media](https://texuli.com/media-page/)
+
+## Primitives
+
+The headless, APG-aligned primitives beneath the styled components; every primitive has its own page.
+
+- [Primitives overview](https://texuli.com/primitives-page/)
+
+## Themes
+
+The OKLCH theme engine and the interactive theme tools.
+
+- [Theme gallery](https://texuli.com/gallery-themes/)
+- [Switcher](https://texuli.com/theme-switcher/)
+- [Studio](https://texuli.com/theme-studio/)
+- [Colors](https://texuli.com/color-explorer/)
+
+## Agents
+
+The agent catalog, the sink-free renderer and the agent surfaces.
+
+- [Agents](https://texuli.com/agents-page/)
+- [Playground](https://texuli.com/playground/)
+- [Builder](https://texuli.com/builder/)
+- [Agent chat](https://texuli.com/agent-chat/)
+
+## Project
+
+Brand, foundation, evidence, performance and the changelog.
+
+- [Brand](https://texuli.com/brand/)
+- [Foundation](https://texuli.com/foundation/)
+- [Showcase](https://texuli.com/showcase/)
+- [Evidence](https://texuli.com/evidence/)
+- [Performance](https://texuli.com/perf/)
+- [Changelog](https://texuli.com/changelog/)
+
+## For agents
+
+Machine-readable documentation served as static files.
+
+- [Catalog llms.txt](https://texuli.com/llms/llms.txt): The agent-facing component index.
+- [Catalog llms-full.txt](https://texuli.com/llms/llms-full.txt): Every component doc in one file.
+- [Catalog JSON](https://texuli.com/catalog/catalog.json): The full catalog manifest as JSON.
