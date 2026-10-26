@@ -41,6 +41,31 @@ describe('Tabs', () => {
       view.unmount();
     }
   });
+
+  it('wraps arrow-key focus past the ends when loop is set (APG)', async () => {
+    const view = render(Tabs, {
+      props: {
+        items: [
+          { value: 'alpha', label: 'Alpha' },
+          { value: 'beta', label: 'Beta' },
+          { value: 'gamma', label: 'Gamma' },
+        ],
+        value: 'gamma',
+        label: 'Wrap',
+        loop: true,
+      },
+    });
+    const gamma = view.getByRole('tab', { name: 'Gamma' });
+    gamma.focus();
+    expect(document.activeElement).toBe(gamma);
+    await fireEvent.keyDown(gamma, { key: 'ArrowRight' });
+    // `loop` reaches the tabs primitive: focus wraps to the first tab …
+    const alpha = view.getByRole('tab', { name: 'Alpha' });
+    expect(document.activeElement).toBe(alpha);
+    // … and automatic activation follows the focus move.
+    expect(alpha.getAttribute('aria-selected')).toBe('true');
+    expect(gamma.getAttribute('aria-selected')).toBe('false');
+  });
 });
 
 describe('Accordion', () => {

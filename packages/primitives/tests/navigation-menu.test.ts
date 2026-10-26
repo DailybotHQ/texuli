@@ -259,6 +259,48 @@ describe('NavigationMenu', () => {
     expect(indicator.getAttribute('data-state')).toBe('visible');
   });
 
+  it('measures the indicator from the inline start, flipped in RTL', async () => {
+    // Stub rects: the list spans 0..400 inline; the Products trigger 100..160.
+    const stubRect = (element: Element, left: number, right: number, top = 0) => {
+      Object.defineProperty(element, 'getBoundingClientRect', {
+        configurable: true,
+        value: () =>
+          ({
+            left,
+            right,
+            top,
+            bottom: top + 24,
+            width: right - left,
+            height: 24,
+            x: left,
+            y: top,
+            toJSON: () => ({}),
+          }) as DOMRect,
+      });
+    };
+    const offsetOf = (indicator: Element): string | undefined =>
+      indicator
+        .getAttribute('style')
+        ?.match(/--tx-navigation-menu-indicator-offset:\s*(-?[\d.]+)px/)?.[1] ??
+      (indicator as HTMLElement).style.getPropertyValue('--tx-navigation-menu-indicator-offset') ??
+      undefined;
+
+    const ltr = render(Fixture);
+    stubRect(screen.getByRole('list'), 0, 400);
+    stubRect(trigger('Products'), 100, 160);
+    await fireEvent.click(trigger('Products'));
+    // LTR: the inline start edge is the left edge of the list.
+    expect(offsetOf(screen.getByTestId('indicator'))).toBe('100');
+    ltr.unmount();
+
+    render(Fixture, { props: { dir: 'rtl' } });
+    stubRect(screen.getByRole('list'), 0, 400);
+    stubRect(trigger('Products'), 100, 160);
+    await fireEvent.click(trigger('Products'));
+    // RTL: the inline start edge is the right edge, so the offset flips.
+    expect(offsetOf(screen.getByTestId('indicator'))).toBe('240');
+  });
+
   it('follows a controlled value', async () => {
     const view = render(Fixture, { props: { value: '' } });
     await view.rerender({ value: 'resources' });

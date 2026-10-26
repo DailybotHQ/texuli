@@ -217,8 +217,11 @@
     gap: 1.5rem;
   }
 
-  .tx-wizard__panel {
-    outline: none;
+  /* The panel takes programmatic focus on step change: show the family ring
+     on keyboard focus (same pattern as .tx-tabs__panel), never a mouse ring. */
+  .tx-wizard__panel:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
   }
 
   .tx-wizard__error {
@@ -268,6 +271,11 @@
   .tx-wizard__chevron {
     inline-size: 1rem;
     block-size: 1rem;
+  }
+
+  /* Back/Next chevrons encode a direction: mirror them in RTL. */
+  .tx-wizard:dir(rtl) .tx-wizard__chevron {
+    transform: scaleX(-1);
   }
 
   @media (forced-colors: active) {

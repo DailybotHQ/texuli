@@ -37,7 +37,7 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    color: var(--tx-muted-foreground, #575757);
+    color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-tabs--vertical .tx-tabs__list {
@@ -167,7 +167,7 @@
     background-color: var(--tx-background, Canvas);
     font-size: var(--tx-font-size-xs, 0.75rem);
     font-variant-numeric: tabular-nums;
-    color: var(--tx-muted-foreground, #575757);
+    color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-tabs__panel {
@@ -252,7 +252,7 @@
     inline-size: 1rem;
     block-size: 1rem;
     flex-shrink: 0;
-    color: var(--tx-muted-foreground, #575757);
+    color: var(--tx-muted-foreground, GrayText);
     transition: transform var(--tx-motion-base, 200ms) var(--tx-motion-easing, ease);
   }
 
@@ -263,7 +263,7 @@
   .tx-accordion__content {
     overflow: hidden;
     font-size: var(--tx-font-size-sm, 0.875rem);
-    color: var(--tx-muted-foreground, #575757);
+    color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-accordion__content-inner {
@@ -317,7 +317,7 @@
     display: block;
     inline-size: 1rem;
     block-size: 1rem;
-    color: var(--tx-muted-foreground, #575757);
+    color: var(--tx-muted-foreground, GrayText);
     transition: transform var(--tx-motion-base, 200ms) var(--tx-motion-easing, ease);
   }
 
@@ -327,7 +327,7 @@
 
   .tx-collapsible__content {
     font-size: var(--tx-font-size-sm, 0.875rem);
-    color: var(--tx-muted-foreground, #575757);
+    color: var(--tx-muted-foreground, GrayText);
   }
 
   @media (prefers-reduced-motion: reduce) {
