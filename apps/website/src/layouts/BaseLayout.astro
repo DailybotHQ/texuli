@@ -210,6 +210,10 @@ const markdownHead = docs
     gap: 0.5rem;
   }
   .crumbs__link {
+    /* A 24px target (WCAG 2.5.8); the 13px text alone was 21px (T-89). */
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
     color: var(--tx-muted-foreground);
     text-decoration-color: transparent;
   }

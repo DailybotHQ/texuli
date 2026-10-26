@@ -43,8 +43,8 @@ lists:
   (`/native/`). Flat, no expansion.
 - **Landing header** (`SiteHeader` `variant="landing"`): Docs, Web +
   native, Native and GitHub beside search, the theme switch and Get
-  started. Under 40rem the doors hide and the hero and footer carry the
-  paths.
+  started. GitHub and Get started hide up to 64rem and the platform doors
+  up to 48rem (T-89); the hero and footer carry the paths.
 - **Footer product row** (`SiteFooter`): Components, Primitives, Themes,
   Native, Agents, resolved from `NAV_GROUPS`; the platform group's door is
   the native landing.

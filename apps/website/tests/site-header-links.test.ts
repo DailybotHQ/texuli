@@ -1,9 +1,10 @@
 /**
  * T-84 (routed from T-79 core row 9): the landing header carries a GitHub
  * door next to the platform doors, through the URL policy at the developer
- * tier, from the same repository constant the footer uses. Under 40rem it
- * hides with the platform doors (the `platform-links` hook), so phones keep
- * only the logo and Docs (site-ia.spec.ts pins 6 desktop / 2 phone links).
+ * tier, from the same repository constant the footer uses. It hides up to
+ * 64rem (the `data-repo-door` hook) and the platform doors hide up to 48rem,
+ * so phones keep only the logo and Docs (site-ia.spec.ts pins 6 desktop / 2
+ * phone links; site-responsive.spec.ts walks the breakpoints).
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';

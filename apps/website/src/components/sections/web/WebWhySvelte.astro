@@ -148,6 +148,10 @@ const resolveHref = (href: string): string | undefined => {
     color: var(--tx-foreground);
   }
   .web-why__claim-link {
+    /* A 24px target (WCAG 2.5.8); the text alone was 23px (T-89). */
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
     color: var(--tx-primary);
     font-size: 0.9rem;
     text-decoration-thickness: from-font;

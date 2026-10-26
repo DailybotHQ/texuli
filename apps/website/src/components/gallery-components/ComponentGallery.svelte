@@ -278,6 +278,10 @@ const featuredTags = $derived(
     line-height: 1.25;
   }
   .title a {
+    /* A 24px target (WCAG 2.5.8); the heading text alone was 20px (T-89). */
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
     color: inherit;
     text-decoration: none;
   }

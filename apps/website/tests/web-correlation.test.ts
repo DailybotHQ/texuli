@@ -184,7 +184,7 @@ describe('the demo links the real rendered component', () => {
 
 describe('the section links the architecture page (T-84)', () => {
   it('names /web-and-native/ so phones keep a visible path to it', () => {
-    // Under 40rem the header hides its platform doors (subsite IA §1.3): the
+    // Up to 48rem the header hides its platform doors (subsite IA §1.3): the
     // page body must carry both platform paths itself.
     expect(WEB_CORR_ARCH_LINK.href).toBe('/web-and-native/');
     expect(

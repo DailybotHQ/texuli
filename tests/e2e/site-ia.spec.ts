@@ -106,9 +106,10 @@ test.describe('landing', () => {
       'href',
       '/guides/'
     );
-    // The platform doors (T-32) and the GitHub door (T-84). Under 40rem they
-    // hide (subsite IA §1.3): the hero and the web-and-native section carry
-    // the platform paths, and the footer carries GitHub.
+    // The platform doors (T-32) and the GitHub door (T-84). GitHub and Get
+    // started hide up to 64rem and the platform doors up to 48rem (T-89;
+    // subsite IA §1.3): the hero and the web-and-native section carry the
+    // platform paths, and the footer carries GitHub.
     const doors = [
       { name: 'Web + native', href: '/web-and-native/' },
       { name: 'Native', href: '/native/' },
@@ -141,7 +142,7 @@ test.describe('landing', () => {
       await expect(getStarted).toHaveAttribute('href', '/guides/getting-started/');
     }
     // Only global utilities: the header lists no pages beyond the platform
-    // doors and GitHub, and there is no docs chrome. Under 40rem only the
+    // doors and GitHub, and there is no docs chrome. Up to 48rem only the
     // logo and Docs remain visible (and so exposed as links).
     expect(await header.getByRole('link').count()).toBe(phone ? 2 : 6);
     await expect(page.locator('[data-tx-site-sidebar]')).toHaveCount(0);
