@@ -1,0 +1,187 @@
+---
+/**
+ * /native/ — evidence + roadmap section (PLAN_006 T-47).
+ *
+ * Evidence over adjectives: the real native modules with their repo paths,
+ * the shipped/planned split, and the planned items marked planned under the
+ * visible "Planned" heading convention the site already uses (see the
+ * slides and editor pages). All content comes from
+ * `./native-evidence-data.ts`, whose unit test pins every path and cited
+ * fact to the repository, so this section can only say what exists.
+ *
+ * A11y: one `section` landmark named by its `h2`; subsections stay `h3` so
+ * the page's `h1` → `h2` → `h3` order never skips a level. Paths are text
+ * (`code`), not links — the site does not mirror repository files — and the
+ * only links are on-site routes. Static markup, zero script, no motion, so
+ * reduced-motion and keyboard needs need nothing extra.
+ */
+import {
+  NATIVE_LINKS,
+  NATIVE_MODULES,
+  NATIVE_PLANNED,
+  NATIVE_SHIPPED,
+} from './native-evidence-data.ts';
+
+const titleId = 'native-evidence-title';
+const modulesTitleId = 'native-modules-title';
+const shippedTitleId = 'native-shipped-title';
+const plannedTitleId = 'native-planned-title';
+---
+
+<section class="native-evidence" aria-labelledby={titleId} data-tx-native-evidence="">
+  <h2 id={titleId}>What exists in this repository today</h2>
+  <p class="native-evidence__lead">
+    Every claim on this page maps to a path you can open. The native renderer is in development:
+    it runs from this source tree, it is conformance-tested against the web target&rsquo;s
+    semantic traces, and nothing is on Maven Central yet (ADR-005).
+  </p>
+
+  <h3 id={modulesTitleId}>The native modules</h3>
+  <dl class="native-evidence__modules">
+    {
+      NATIVE_MODULES.map((module) => (
+        <div class="native-evidence__module">
+          <dt>{module.name}</dt>
+          <dd>
+            <p>{module.role}</p>
+            <code>{module.path}</code>
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+
+  <div class="native-evidence__roadmap">
+    <div class="native-evidence__column">
+      <h3 id={shippedTitleId}>Shipped, in this repository</h3>
+      <ul class="native-evidence__list">
+        {NATIVE_SHIPPED.map((item) => <li data-status="shipped">{item}</li>)}
+      </ul>
+    </div>
+    <div class="native-evidence__column">
+      <h3 id={plannedTitleId}>Planned</h3>
+      <p class="native-evidence__planned-note">
+        Planned is not promised: each item lands when its design decision or review does — no
+        dates, no sign-ups.
+      </p>
+      <ul class="native-evidence__list">
+        {NATIVE_PLANNED.map((item) => <li data-status="planned">{item}</li>)}
+      </ul>
+    </div>
+  </div>
+
+  <ul class="native-evidence__links">
+    {
+      NATIVE_LINKS.map((link) => (
+        <li>
+          <a href={link.href}>{link.label}</a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .native-evidence {
+    display: grid;
+    gap: 1rem;
+    padding-block: clamp(2rem, 6vw, 4rem);
+    color: var(--tx-foreground);
+  }
+  .native-evidence h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    line-height: 1.2;
+  }
+  .native-evidence h3 {
+    margin: 0;
+    font-size: 1.125rem;
+  }
+  .native-evidence__lead {
+    margin: 0;
+    max-inline-size: 44rem;
+    color: var(--tx-muted-foreground);
+  }
+  .native-evidence__modules {
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
+  .native-evidence__module {
+    margin: 0;
+    display: grid;
+    gap: 0.375rem;
+    align-content: start;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding: 0.75rem 0.875rem;
+    background: var(--tx-surface);
+  }
+  .native-evidence__module dt {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-weight: 600;
+  }
+  .native-evidence__module dd {
+    margin: 0;
+  }
+  .native-evidence__module dd p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .native-evidence__module dd code {
+    font-size: 0.8rem;
+    color: var(--tx-muted-foreground);
+    overflow-wrap: anywhere;
+  }
+  .native-evidence__roadmap {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  }
+  .native-evidence__column {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+  }
+  .native-evidence__planned-note {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--tx-muted-foreground);
+  }
+  .native-evidence__list {
+    margin: 0;
+    padding-inline-start: 1.25rem;
+    display: grid;
+    gap: 0.375rem;
+    font-size: 0.9rem;
+  }
+  .native-evidence__list li::marker {
+    color: var(--tx-muted-foreground);
+  }
+  .native-evidence__links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+  }
+  .native-evidence__links a {
+    color: var(--tx-link, LinkText);
+    text-decoration-line: underline;
+    text-underline-offset: 0.2em;
+  }
+  .native-evidence__links a:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring);
+    outline-offset: 2px;
+    border-radius: var(--tx-radius, 0.25rem);
+  }
+  /* 22.5rem = 360px: the narrowest supported viewport collapses to one column. */
+  @media (max-width: 22.5rem) {
+    .native-evidence__modules,
+    .native-evidence__roadmap {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
