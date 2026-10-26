@@ -252,7 +252,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
         sources: [],
       },
       native: {
-        text: 'The web trace and the native trace apply these rules to a validated render tree — rule for rule.',
+        text: 'Texels do not cross: nothing in the native renderer ports @texuli/core. What both sides share is the semantic trace — the web trace and the native trace apply these rules to a validated render tree.',
         sources: [{ file: SEMANTICS, phrase: 'apply these rules to a validated render tree' }],
       },
     },

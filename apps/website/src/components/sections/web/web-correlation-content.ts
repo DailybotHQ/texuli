@@ -167,8 +167,8 @@ export const WEB_CORR_MOVES_TODAY: readonly string[] = [
 export const WEB_CORR_PLANNED: readonly string[] = [
   'Maven publication of the native modules under com.texuli is pending (ADR-005); nothing ' +
     'is on Maven Central yet.',
-  'The Compose renderer is in development: it consumes the generated Kotlin contract in ' +
-    'place, with documented per-component statuses.',
+  'A released Compose renderer: today it is in development, consuming the generated Kotlin ' +
+    'contract in place, with documented per-component statuses.',
   'A rendered native column in this demo is planned for when the renderer leaves development.',
 ];
 
@@ -176,6 +176,15 @@ export const WEB_CORR_PLANNED: readonly string[] = [
 export const WEB_CORR_DEMO_LINK = {
   href: '/component-pages/badge/',
   label: 'See the badge rendered on the web',
+} as const;
+
+/**
+ * The architecture page, from the section that tells its story. The header's
+ * platform doors hide under 40rem, so the page body carries this path too.
+ */
+export const WEB_CORR_ARCH_LINK = {
+  href: '/web-and-native/',
+  label: 'Read how web and native share one contract',
 } as const;
 
 /** Split code on the shared string: the template renders shared runs as `<mark>`. */

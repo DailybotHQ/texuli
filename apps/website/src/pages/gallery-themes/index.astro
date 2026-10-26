@@ -65,13 +65,16 @@ const varNames = themeCssVariableNames();
    */
   import { APPEARANCE_NAMESPACE, SITE_THEME } from '../../components/foundation/site.ts';
   import { ensureThemeCss } from '../../components/perf/theme-assets.ts';
-  import { applySiteAppearance } from '../../components/theme-switcher/appearance.ts';
+  import {
+    applySiteAppearance,
+    readModePreference,
+  } from '../../components/theme-switcher/appearance.ts';
   import {
     applyThemeFromLink,
     wireCopyLink,
     wireThemeLinkSync,
-    type ThemeLinkMode,
-  } from './theme-link.ts';
+    type ThemeLinkModeChoice,
+  } from '../../components/gallery-themes/theme-link.ts';
 
   const host = document.querySelector<HTMLElement>('[data-theme-linker]');
   if (host) {
@@ -92,7 +95,7 @@ const varNames = themeCssVariableNames();
     const replaceSearch = (search: string): void => {
       window.history.replaceState(null, '', `${window.location.pathname}${search}${window.location.hash}`);
     };
-    const apply = (themeId: string, mode: ThemeLinkMode): void => {
+    const apply = (themeId: string, mode: ThemeLinkModeChoice): void => {
       applySiteAppearance({ themeId, mode, varNames, namespace });
     };
 
@@ -104,6 +107,7 @@ const varNames = themeCssVariableNames();
       replaceSearch,
       ensureCss: (id) => ensureThemeCss(id),
       apply,
+      storedModeChoice: () => readModePreference(namespace),
     });
     wireThemeLinkSync({ document, defaultThemeId, currentSearch, replaceSearch });
 

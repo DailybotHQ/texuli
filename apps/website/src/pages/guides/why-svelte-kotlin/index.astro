@@ -84,9 +84,12 @@ const toc = [
 
   <h2 id="what-exists-today">What exists today</h2>
   <p>
-    Honesty first: the web stack is the implemented one. The Svelte packages, the token engine, the
-    catalog, the spec generator and both generated projections are real and tested today; the
-    Kotlin Multiplatform runtime that would consume the Kotlin projection is planned work and not
-    yet released. Nothing is on npm, in Maven, or deployed.
+    Honesty first: the web stack is the implemented one. The Svelte packages, the theme engine,
+    the catalog, the spec generator and both generated projections are real and tested. Every
+    package is on npm as <code>0.1.0-next.1</code> under the <code>next</code> dist-tag; there is
+    no stable release, and <code>latest</code> stays reserved for 1.0.0. texuli.com deploys from
+    the main branch. The Kotlin Multiplatform side is in development: the Compose renderer
+    consumes the Kotlin projection in place from this repository, and nothing is on Maven yet
+    (publication under <code>com.texuli</code> is planned in ADR-005).
   </p>
 </GuidesShell>

@@ -6,14 +6,16 @@
  *   sidebar as a drawer whose code loads on first press), the Texuli logo,
  *   site search (an input-like trigger with the Cmd/Ctrl+K hint) and the
  *   light/dark/system switch. Page links live in the sidebar.
- * - `landing` (the home): the logo, a Docs link, search, the switch and a
- *   Get started button (hidden on phones, where the hero's own call to action
- *   sits right below).
+ * - `landing` (the home): the logo, a Docs link, the platform doors (Web +
+ *   native, Native), a GitHub door, search, the switch and a Get started
+ *   button. Under 40rem the doors, GitHub and Get started hide: the page
+ *   body carries the platform paths and the footer carries GitHub.
  */
+import { safeHref } from '@texuli/core/url-policy';
 import { Button } from 'texuli/button';
 import BrandLogo from '../brand/BrandLogo.astro';
 import SiteSearch from '../search/SiteSearch.svelte';
-import { DOCS_HOME, GET_STARTED, SITE_NAME, withBase } from './site.ts';
+import { DOCS_HOME, GET_STARTED, REPOSITORY_URL, SITE_NAME, withBase } from './site.ts';
 import ThemeSwitch from './ThemeSwitch.svelte';
 
 interface Props {
@@ -22,6 +24,7 @@ interface Props {
 
 const { variant = 'docs' } = Astro.props;
 const base = import.meta.env.BASE_URL;
+const repositoryHref = safeHref(REPOSITORY_URL, 'developer');
 ---
 
 <header class="site-header" data-tx-site-header="" data-variant={variant}>
@@ -55,6 +58,12 @@ const base = import.meta.env.BASE_URL;
           Native
         </a>
       </nav>
+    )
+  }
+  {
+    variant === 'landing' && repositoryHref && (
+      // Reuses the platform-links hook: it hides under 40rem with the doors.
+      <span class="platform-links"><a class="docs-link" href={repositoryHref}>GitHub</a></span>
     )
   }
   <div class="tools">

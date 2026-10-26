@@ -2,9 +2,9 @@
 import { Badge } from 'texuli/badge';
 import { Card, CardContent, CardDescription, CardGrid, CardHeader, CardTitle } from 'texuli/card';
 import PageBanner from '../../components/landing/PageBanner.astro';
+import { heroScreens } from '../../components/showcase/hero-screens.ts';
 import { SHOWCASE_SCREENS, showcasePath } from '../../components/showcase/showcase.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { heroScreens } from './hero-screens.ts';
 
 const heroes = heroScreens(SHOWCASE_SCREENS);
 ---

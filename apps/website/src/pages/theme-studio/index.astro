@@ -17,8 +17,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <p class="lead">
         Generate a light and dark theme from one brand color, mood words, or a local image — or start
         from a preset seed or a library theme and make it yours. Retune roles, watch components update
-        live, gate WCAG 2.x contrast, and export CSS or JSON, then copy a link that rebuilds the theme
-        in any browser. Nothing leaves this origin.
+        live, gate WCAG 2.x contrast, and export CSS or JSON. A color, mood-word or library theme
+        also copies as a link that rebuilds it in any browser; an image theme stays on this device,
+        so export it instead. Nothing leaves this origin.
       </p>
     </header>
     <ThemeStudio base={import.meta.env.BASE_URL} client:load />

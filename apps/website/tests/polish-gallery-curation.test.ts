@@ -1,13 +1,13 @@
 /**
  * T-83 — gallery-area curation (PLAN_006 design-punchlist rows 1, 3 and 6).
  *
- * Three page-owned modules put curation on the proof surfaces without touching
+ * Three curation modules put curation on the proof surfaces without touching
  * another lane's islands:
  *
- * - `pages/showcase/hero-screens.ts` picks the "start here" screens of the
+ * - `components/showcase/hero-screens.ts` picks the "start here" screens of the
  *   showcase index and fails closed when a curated id stops existing;
- * - `pages/gallery-components/start-here.ts` picks the starter components;
- * - `pages/examples/lanes.ts` groups the 157-example catalog into curated
+ * - `components/gallery-components/start-here.ts` picks the starter components;
+ * - `components/examples/lanes.ts` groups the 157-example catalog into curated
  *   lanes and counts families.
  *
  * Each module runs against the real catalogs so a renamed id or a new example
@@ -18,10 +18,10 @@ import {
   buildExampleCatalog,
   type ExampleCatalogItem,
 } from '../src/components/examples/catalog.ts';
+import { exampleLanes, examplePackageCounts } from '../src/components/examples/lanes.ts';
+import { pickStartHere, START_HERE_IDS } from '../src/components/gallery-components/start-here.ts';
+import { HERO_IDS, heroScreens } from '../src/components/showcase/hero-screens.ts';
 import { SHOWCASE_SCREENS, showcasePath } from '../src/components/showcase/showcase.ts';
-import { exampleLanes, examplePackageCounts } from '../src/pages/examples/lanes.ts';
-import { pickStartHere, START_HERE_IDS } from '../src/pages/gallery-components/start-here.ts';
-import { HERO_IDS, heroScreens } from '../src/pages/showcase/hero-screens.ts';
 
 describe('showcase hero screens', () => {
   it('curates three screens that all exist, in a stable order', () => {

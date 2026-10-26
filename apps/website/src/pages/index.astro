@@ -57,7 +57,7 @@ const HOME_DESCRIPTION =
            `animation` shorthand plus `animation-timeline` into one
            shorthand Chromium rejects; without duration it cannot merge. */
         animation-name: landing-rise;
-        animation-timing-function: linear;
+        animation-timing-function: var(--site-motion-linked-easing);
         animation-fill-mode: both;
         animation-timeline: view();
         animation-range: entry 0% entry 60%;

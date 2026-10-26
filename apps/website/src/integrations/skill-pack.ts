@@ -6,8 +6,9 @@
  * The index lists every `SKILL.md` in the pack — the router and each
  * sub-skill — with the SHA-256 digest of the served file.
  */
-import { cpSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+
 import { createHash } from 'node:crypto';
+import { cpSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';

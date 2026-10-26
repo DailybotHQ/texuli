@@ -4,7 +4,7 @@
  * file; inside the showcase area this module picks which screens lead the
  * index and why, failing closed when a curated id stops existing.
  */
-import type { ShowcaseScreen } from '../../components/showcase/showcase.ts';
+import type { ShowcaseScreen } from './showcase.ts';
 
 /** The screens a first-time visitor should see first, in lead order. */
 export const HERO_IDS = ['dashboard', 'kanban', 'slide-deck'] as const;

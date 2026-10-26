@@ -165,8 +165,13 @@ describe('footer (rows 3, 4, 9, 14)', () => {
     ]) {
       expect(footer).toContain(`label: '${label}'`);
     }
-    expect(footer).toContain("const REPOSITORY = 'https://github.com/DailybotHQ/texuli'");
-    expect(footer).toContain('{REPOSITORY}/blob/main/LICENSE');
+    // One repository constant (site.ts) feeds the footer and the landing
+    // header's GitHub door (T-84), so the two can never drift apart.
+    expect(read('src/components/foundation/site.ts')).toContain(
+      "export const REPOSITORY_URL = 'https://github.com/DailybotHQ/texuli'"
+    );
+    expect(footer).toContain("{ href: REPOSITORY_URL, label: 'GitHub' }");
+    expect(footer).toContain('{REPOSITORY_URL}/blob/main/LICENSE');
     expect(existsSync(resolve(REPO_ROOT, 'LICENSE'))).toBe(true);
     expect(routeExists('/brand/')).toBe(true);
   });

@@ -2,7 +2,7 @@
  * T-83 — theme-gallery deep links (`?theme=<id>&mode=<mode>`).
  *
  * The share loop is page-owned (PLAN_006 design-punchlist gallery row 2): the
- * island is untouched, and `pages/gallery-themes/theme-link.ts` parses the
+ * island is untouched, and `components/gallery-themes/theme-link.ts` parses the
  * query, applies the linked appearance through the same site-appearance path
  * the island uses, mirrors the painted `data-tx-theme` / `data-tx-mode` back
  * into the address bar, and powers the copy-link button. These tests run the
@@ -18,7 +18,12 @@ import {
   themeLinkSearch,
   wireCopyLink,
   wireThemeLinkSync,
-} from '../src/pages/gallery-themes/theme-link.ts';
+} from '../src/components/gallery-themes/theme-link.ts';
+import {
+  applySiteAppearance,
+  readModePreference,
+  writeModePreference,
+} from '../src/components/theme-switcher/appearance.ts';
 
 const IDS = ['enterprise-neutral', 'violet', 'midnight-ocean'];
 
@@ -31,6 +36,7 @@ function baseEnv(overrides: Partial<ThemeLinkEnv> = {}): ThemeLinkEnv {
     replaceSearch: vi.fn(),
     ensureCss: vi.fn(() => Promise.resolve(true)),
     apply: vi.fn(),
+    storedModeChoice: () => 'system',
     ...overrides,
   };
 }
@@ -99,7 +105,12 @@ describe('applyThemeFromLink', () => {
     const ensureCss = vi.fn(() => Promise.resolve(true));
     const apply = vi.fn();
     const applied = await applyThemeFromLink(
-      baseEnv({ currentSearch: () => '?theme=violet', ensureCss, apply })
+      baseEnv({
+        currentSearch: () => '?theme=violet',
+        ensureCss,
+        apply,
+        storedModeChoice: () => 'dark',
+      })
     );
     expect(applied).toEqual({ themeId: 'violet', mode: null });
     expect(ensureCss).toHaveBeenCalledWith('violet');
@@ -107,6 +118,32 @@ describe('applyThemeFromLink', () => {
     const applyOrder = (apply as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0] ?? 0;
     expect(ensureOrder).toBeLessThan(applyOrder);
     expect(apply).toHaveBeenCalledWith('violet', 'dark');
+  });
+
+  it('keeps a "system" mode choice for a theme-only link instead of pinning the painted mode', async () => {
+    document.documentElement.dataset.txTheme = 'enterprise-neutral';
+    document.documentElement.dataset.txMode = 'dark';
+    const apply = vi.fn();
+    await applyThemeFromLink(baseEnv({ currentSearch: () => '?theme=violet', apply }));
+    expect(apply).toHaveBeenCalledWith('violet', 'system');
+  });
+
+  it('never rewrites the stored mode preference when a link names only a theme', async () => {
+    const namespace = 't84-theme-link';
+    writeModePreference('system', namespace);
+    document.documentElement.dataset.txTheme = 'enterprise-neutral';
+    document.documentElement.dataset.txMode = 'dark';
+    await applyThemeFromLink(
+      baseEnv({
+        currentSearch: () => '?theme=violet',
+        apply: (themeId, mode) => {
+          applySiteAppearance({ themeId, mode, varNames: [], namespace });
+        },
+        storedModeChoice: () => readModePreference(namespace),
+      })
+    );
+    expect(document.documentElement.dataset.txTheme).toBe('violet');
+    expect(readModePreference(namespace)).toBe('system');
   });
 
   it('applies the linked mode onto the painted theme', async () => {

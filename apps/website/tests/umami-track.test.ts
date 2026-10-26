@@ -115,7 +115,8 @@ describe('track() when analytics is enabled', () => {
     expect(umami.track).toHaveBeenCalledWith('component_demo_open', { component: 'button' });
   });
 
-  it('swallows emitter failures without console noise', async () => {    const { track } = await loadTrack(ENABLED);
+  it('swallows emitter failures without console noise', async () => {
+    const { track } = await loadTrack(ENABLED);
     const umami = stubUmami();
     umami.track.mockImplementation(() => {
       throw new Error('collector down');

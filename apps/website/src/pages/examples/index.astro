@@ -15,8 +15,8 @@ import {
  * (T-85/T-06) and are recorded, not built here.
  */
 import ExamplesBrowser from '../../components/examples/ExamplesBrowser.svelte';
+import { exampleLanes, examplePackageCounts } from '../../components/examples/lanes.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { exampleLanes, examplePackageCounts } from './lanes.ts';
 
 const full = buildExampleCatalog();
 // Index island: metadata only (no source bodies) so the HTML payload stays small.

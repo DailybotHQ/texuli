@@ -173,7 +173,7 @@ describe('section structure and landmarks', () => {
     expect(template).toContain('<h3>Define once</h3>');
     expect(template).toContain('<h3>Project twice</h3>');
     expect(template).toContain('<h3>Tokens cross</h3>');
-    expect(template).toContain('<h3>Behavior patterns cross</h3>');
+    expect(template).toContain('<h3>Semantic roles cross</h3>');
     expect(template).toContain('<h3 id={limitsTitleId}>What does not move today</h3>');
   });
 });

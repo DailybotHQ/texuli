@@ -5,7 +5,7 @@
  * server-rendered line, and curated ids that stop existing are skipped, never
  * rendered as dead links.
  */
-import type { GalleryComponentCard } from '../../components/gallery-components/catalog.ts';
+import type { GalleryComponentCard } from './catalog.ts';
 
 /** The starter set, in the order a newcomer meets them. */
 export const START_HERE_IDS = [

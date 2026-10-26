@@ -33,6 +33,8 @@ export interface NavGroup {
 export const DOCS_HOME = '/guides/';
 /** The landing's Get started call to action. */
 export const GET_STARTED = '/guides/getting-started/';
+/** The public source repository: the header's GitHub door and the footer's project row. */
+export const REPOSITORY_URL = 'https://github.com/DailybotHQ/texuli';
 
 /**
  * The site navigation, grouped for the docs sidebar. This is the single

@@ -19,6 +19,7 @@ import { dirname, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   highlightShared,
+  WEB_CORR_ARCH_LINK,
   WEB_CORR_CAPTION,
   WEB_CORR_DEMO_LINK,
   WEB_CORR_IDS,
@@ -178,6 +179,19 @@ describe('the demo links the real rendered component', () => {
     expect(readRepo('packages/catalog/src/manifests/display/manifests.ts')).toContain(
       "id: 'badge',"
     );
+  });
+});
+
+describe('the section links the architecture page (T-84)', () => {
+  it('names /web-and-native/ so phones keep a visible path to it', () => {
+    // Under 40rem the header hides its platform doors (subsite IA §1.3): the
+    // page body must carry both platform paths itself.
+    expect(WEB_CORR_ARCH_LINK.href).toBe('/web-and-native/');
+    expect(
+      existsSync(resolve(REPO_ROOT, 'apps/website/src/pages/web-and-native/index.astro'))
+    ).toBe(true);
+    const template = readRepo('apps/website/src/components/sections/web/WebCorrelation.astro');
+    expect(template).toContain('WEB_CORR_ARCH_LINK');
   });
 });
 

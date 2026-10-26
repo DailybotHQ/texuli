@@ -380,7 +380,20 @@ export type StudioShareState = {
   contrast: StudioContrast;
   mode: StudioMode;
   edits: readonly StudioShareEdit[];
+  /**
+   * The library theme the studio started from. A library theme is a palette,
+   * not a seed recipe, so the link names it and opening the link re-imports it.
+   */
+  library?: string;
 };
+
+/** Library ids a link may name: the kebab-case shape of `/theme-data/<id>.json`. */
+const SHARE_LIBRARY_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const MAX_SHARE_LIBRARY_ID = 64;
+
+function isShareLibraryId(id: string): boolean {
+  return id.length <= MAX_SHARE_LIBRARY_ID && SHARE_LIBRARY_ID.test(id);
+}
 
 const SOURCE_CODES = { color: 'c', words: 'w', image: 'i' } as const;
 const SOURCE_FROM_CODE: Record<string, StudioSource> = { c: 'color', w: 'words', i: 'image' };
@@ -421,6 +434,10 @@ export function encodeStudioShare(state: StudioShareState): string | null {
   if (state.neutral.trim()) params.set('n', state.neutral.trim());
   params.set('c', state.contrast);
   params.set('m', modeCode);
+  if (state.library !== undefined) {
+    if (!isShareLibraryId(state.library)) return null;
+    params.set('lib', state.library);
+  }
   let edits = 0;
   for (const edit of state.edits) {
     if (!isSemanticRole(edit.role)) continue;
@@ -480,6 +497,10 @@ export function decodeStudioShare(hash: string): StudioShareResult {
   if (rawWords.length > MAX_SHARE_WORDS) {
     return { ok: false, message: 'The mood words in the link are too long to open.' };
   }
+  const library = params.get('lib');
+  if (library !== null && !isShareLibraryId(library)) {
+    return { ok: false, message: 'The theme link names an unreadable library theme.' };
+  }
   const rawNeutral = params.get('n') ?? '';
   const neutral = isNeutralFamily(rawNeutral) ? rawNeutral : 'zinc';
   const edits: StudioShareEdit[] = [];
@@ -511,6 +532,85 @@ export function decodeStudioShare(hash: string): StudioShareResult {
       contrast,
       mode,
       edits,
+      ...(library !== null ? { library } : {}),
     },
   };
+}
+
+/** Where the studio's theme came from; it decides what a share link can carry. */
+export type StudioOrigin = { kind: 'recipe' } | { kind: 'library'; id: string } | { kind: 'image' };
+
+/**
+ * The share state for the theme on screen, or `null` when it cannot travel
+ * in a link. A recipe (seed or words) shares as itself; a library theme
+ * shares its id, because regenerating from its primary color would build a
+ * different palette; an image theme comes from pixels, which never go into
+ * links, so it has no link at all.
+ */
+export function studioShareFor(
+  origin: StudioOrigin,
+  recipe: Omit<StudioShareState, 'edits' | 'library'>,
+  edits: readonly StudioShareEdit[]
+): StudioShareState | null {
+  if (origin.kind === 'image') return null;
+  return {
+    ...recipe,
+    edits,
+    ...(origin.kind === 'library' ? { library: origin.id } : {}),
+  };
+}
+
+export type StudioSharedTheme =
+  | {
+      ok: true;
+      theme: Theme;
+      origin: StudioOrigin;
+      /** The role edits that applied, in link order (the next share carries them). */
+      edits: StudioShareEdit[];
+      skipped: number;
+    }
+  | { ok: false; message: string };
+
+/**
+ * Rebuild the theme a decoded link describes: re-import the named library
+ * theme (through `loadLibrary`, the site's `/theme-data/` loader) or
+ * regenerate the recipe, then re-apply the role edits. Unreadable edits are
+ * skipped and counted; a library theme that does not load fails closed.
+ */
+export async function themeFromShare(
+  share: StudioShareState,
+  loadLibrary: (id: string) => Promise<unknown>
+): Promise<StudioSharedTheme> {
+  let base: StudioGenerateResult;
+  let origin: StudioOrigin;
+  if (share.library !== undefined) {
+    const payload = isShareLibraryId(share.library) ? await loadLibrary(share.library) : null;
+    if (!payload) {
+      return { ok: false, message: 'The library theme in the link could not be loaded.' };
+    }
+    base = themeFromLibraryPayload(payload);
+    origin = { kind: 'library', id: share.library };
+  } else {
+    base = generateStudioTheme({
+      source: share.source,
+      seed: share.seed,
+      secondary: share.secondary || undefined,
+      words: share.words,
+      neutral: share.neutral as NeutralFamily,
+      contrast: share.contrast,
+      id: 'theme-studio',
+      name: 'Theme studio',
+    });
+    origin = { kind: 'recipe' };
+  }
+  if (!base.ok) return base;
+  let theme = base.theme;
+  const edits: StudioShareEdit[] = [];
+  for (const edit of share.edits) {
+    const applied = setRoleDefault(theme, edit.role, edit.hex, [edit.mode]);
+    if (!applied.ok) continue;
+    theme = applied.theme;
+    edits.push(edit);
+  }
+  return { ok: true, theme, origin, edits, skipped: share.edits.length - edits.length };
 }

@@ -161,8 +161,8 @@ export const PORTABILITY_STEPS: readonly PortabilityStep[] = [
     ],
   },
   {
-    title: 'Behavior patterns cross',
-    body: 'The same semantic rules — role, accessible name and, for headings, the level — hold on both sides: the web trace and the native trace apply these rules to a validated render tree. GoldenConformanceTest loads each golden with loadBlueprint, traces the plan, and must equal the web trace — so a pattern that passes on the web is the same pattern on native.',
+    title: 'Semantic roles cross',
+    body: 'The same semantic rules — role, accessible name and, for headings, the level — hold on both sides: the web trace and the native trace apply these rules to a validated render tree. GoldenConformanceTest loads each golden with loadBlueprint, traces the plan, and must equal the web trace — so on the spec goldens both renderers expose the same roles, names and heading levels. Keyboard, focus and interaction behavior are not part of the trace.',
     sources: [
       { file: SEMANTICS, phrase: 'apply these rules to a validated render tree' },
       {
@@ -218,6 +218,6 @@ export const PORTABILITY_LIMITS: readonly PortabilityPiece[] = [
 
 /** Real on-site routes; verified to exist at build time. */
 export const PORTABILITY_LINKS: readonly PortabilityLink[] = [
-  { href: '/component-pages/badge/', label: 'See the badge component rendered on the web' },
+  { href: '/component-pages/badge/', label: 'See the badge rendered on the web' },
   { href: '/guides/why-svelte-kotlin/', label: 'Read the deep dive: why Svelte and Kotlin' },
 ];

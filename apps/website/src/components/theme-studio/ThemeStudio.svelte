@@ -39,13 +39,16 @@ import {
   type StudioContrast,
   type StudioExportFormat,
   type StudioMode,
+  type StudioOrigin,
   type StudioSeedPreset,
   type StudioShareEdit,
   type StudioShareState,
   type StudioSource,
   setRoleDefault,
+  studioShareFor,
   TUNABLE_ROLES,
   themeFromLibraryPayload,
+  themeFromShare,
 } from './studio.ts';
 
 function initialTheme(): Theme | null {
@@ -86,6 +89,8 @@ let libraryLoading = $state<string | null>(null);
 let keysOpen = $state(false);
 /** Role edits that travel in a share link, newest last (punch-list row 8). */
 let roleEdits = $state<StudioShareEdit[]>([]);
+/** Where the theme on screen came from: it decides what its share link carries. */
+let origin = $state<StudioOrigin>({ kind: 'recipe' });
 let galleryHref = $state(withBase(base, 'gallery-themes/'));
 
 const summary = $derived(theme ? aaSummary(theme, contrast) : null);
@@ -125,7 +130,11 @@ function onRoleChange(event: Event): void {
   if (theme) tuneHex = roleDefault(theme, mode, role) || tuneHex;
 }
 
-function applyResult(result: ReturnType<typeof generateStudioTheme>, okMessage: string): void {
+function applyResult(
+  result: ReturnType<typeof generateStudioTheme>,
+  okMessage: string,
+  from: StudioOrigin = { kind: 'recipe' }
+): void {
   if (!result.ok) {
     error = result.message;
     status = 'Generation failed.';
@@ -133,6 +142,7 @@ function applyResult(result: ReturnType<typeof generateStudioTheme>, okMessage: 
   }
   error = null;
   theme = result.theme;
+  origin = from;
   roleEdits = [];
   tuneHex = roleDefault(result.theme, mode, tuneRole) || tuneHex;
   const aa = aaSummary(result.theme, contrast);
@@ -218,29 +228,27 @@ async function startFromLibrary(id: string): Promise<void> {
   secondary = '';
   applyResult(
     { ok: true, theme: result.theme },
-    `Started from ${result.theme.name}. Tune it, export it, or generate your own.`
+    `Started from ${result.theme.name}. Tune it, export it, or generate your own.`,
+    { kind: 'library', id }
   );
 }
 
 /* ── Theme-as-URL share links (punch-list row 8) ──────────────────────── */
 
-/** The current studio state, as a shareable recipe. Images stay local. */
-function studioShareState(): StudioShareState {
-  const primary = theme ? roleDefault(theme, 'light', 'primary') : '';
-  return {
-    source: source === 'image' ? 'color' : source,
-    seed: source === 'image' ? primary || seed : seed,
-    secondary: source === 'image' ? '' : secondary,
-    words: source === 'image' ? '' : words,
-    neutral,
-    contrast,
-    mode,
-    edits: roleEdits,
-  };
+/**
+ * The theme on screen, as a share link's state: a recipe as itself, a library
+ * theme by its id, and `null` for an image theme (pixels never go in links).
+ */
+function studioShareState(): StudioShareState | null {
+  return studioShareFor(
+    origin,
+    { source, seed, secondary, words, neutral, contrast, mode },
+    roleEdits
+  );
 }
 
-/** Open a `#theme=` hash: regenerate, then re-apply the link's role edits. */
-function openSharedTheme(hash: string): void {
+/** Open a `#theme=` hash: rebuild the recipe or re-import the library theme, then its edits. */
+async function openSharedTheme(hash: string): Promise<void> {
   const result = decodeStudioShare(hash);
   if (!result.ok) {
     error = result.message;
@@ -255,36 +263,19 @@ function openSharedTheme(hash: string): void {
   neutral = share.neutral;
   contrast = share.contrast;
   mode = share.mode;
-  const generated = generateStudioTheme({
-    source,
-    seed,
-    secondary: secondary || undefined,
-    words,
-    neutral: neutral as 'zinc',
-    contrast,
-    id: 'theme-studio',
-    name: 'Theme studio',
-  });
-  if (!generated.ok) {
-    error = generated.message;
+  const opened = await themeFromShare(share, (id) => loadThemeData<unknown>(id));
+  if (!opened.ok) {
+    error = opened.message;
     status = 'The theme link could not be opened.';
     return;
   }
-  theme = generated.theme;
-  roleEdits = [];
-  let skipped = 0;
-  for (const edit of share.edits) {
-    const applied = setRoleDefault(theme, edit.role, edit.hex, [edit.mode]);
-    if (!applied.ok) {
-      skipped += 1;
-      continue;
-    }
-    theme = applied.theme;
-    roleEdits = [...roleEdits, edit];
-  }
+  theme = opened.theme;
+  origin = opened.origin;
+  roleEdits = opened.edits;
   tuneHex = roleDefault(theme, mode, tuneRole) || tuneHex;
   error = null;
-  const skippedNote = skipped > 0 ? ` ${skipped} role edit(s) were unreadable and skipped.` : '';
+  const skippedNote =
+    opened.skipped > 0 ? ` ${opened.skipped} role edit(s) were unreadable and skipped.` : '';
   status = `Opened from a shared link; it was decoded in this page.${skippedNote} ${aaSummary(theme, contrast).passLabel}`;
 }
 
@@ -292,12 +283,17 @@ function openSharedTheme(hash: string): void {
 $effect(() => {
   untrack(() => {
     const hash = typeof window === 'undefined' ? '' : window.location.hash;
-    if (isStudioShareHash(hash)) openSharedTheme(hash);
+    if (isStudioShareHash(hash)) void openSharedTheme(hash);
   });
 });
 
 async function copyShare(): Promise<void> {
-  const hash = encodeStudioShare(studioShareState());
+  const state = studioShareState();
+  if (!state) {
+    copyStatus = 'Image themes stay on this device: export the CSS or JSON to share one';
+    return;
+  }
+  const hash = encodeStudioShare(state);
   if (!hash) {
     copyStatus = 'This state cannot be a link yet';
     return;
@@ -369,7 +365,7 @@ async function onImageChange(event: Event): Promise<void> {
         contrast,
         neutral: neutral as 'zinc',
       });
-      applyResult({ ok: true, theme: generated }, 'Theme from image ready.');
+      applyResult({ ok: true, theme: generated }, 'Theme from image ready.', { kind: 'image' });
     } catch (cause) {
       // Fall back to seed path if image generator throws on edge images.
       applyResult(
@@ -380,7 +376,8 @@ async function onImageChange(event: Event): Promise<void> {
           neutral: neutral as 'zinc',
           contrast,
         }),
-        'Theme from image seed ready.'
+        'Theme from image seed ready.',
+        { kind: 'image' }
       );
       if (!theme) {
         error = cause instanceof Error ? cause.message : 'Image theme failed.';

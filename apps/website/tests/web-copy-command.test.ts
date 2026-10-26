@@ -61,7 +61,10 @@ afterEach(() => {
 
 describe('a successful copy', () => {
   it('copies the command, reports through the status region, then tracks code_copy', async () => {
-    const writeText = vi.fn<(text: string) => Promise<void>>((text) => { void text; return Promise.resolve(); });
+    const writeText = vi.fn<(text: string) => Promise<void>>((text) => {
+      void text;
+      return Promise.resolve();
+    });
     stubClipboard(writeText);
     const umami = stubUmami();
     const { wireCopyCommand } = await loadModule();
@@ -118,7 +121,12 @@ describe('without analytics enabled', () => {
   it('the copy still succeeds: the event is a no-op, the status still reports', async () => {
     vi.resetModules();
     vi.unstubAllEnvs();
-    stubClipboard(vi.fn<(text: string) => Promise<void>>((text) => { void text; return Promise.resolve(); }));
+    stubClipboard(
+      vi.fn<(text: string) => Promise<void>>((text) => {
+        void text;
+        return Promise.resolve();
+      })
+    );
     const umami = stubUmami();
     const { wireCopyCommand } = await loadEnabledOffModule();
     const host = buildHost();

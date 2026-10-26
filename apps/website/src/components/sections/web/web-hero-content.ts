@@ -77,7 +77,7 @@ export const WEB_HERO_GRID_LINKS: readonly WebHeroLink[] = [
 
 /** Caption under the swatch grid: the moment is data, not a product shot. */
 export const WEB_HERO_GRID_CAPTION =
-  'Real data, no screenshots: these six themes are loaded from the token engine that styles ' +
+  'Real data, no screenshots: these six themes are loaded from the theme engine that styles ' +
   'every component — the same library the theme gallery serves.';
 
 /**

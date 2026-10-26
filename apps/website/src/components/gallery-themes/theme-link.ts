@@ -8,8 +8,9 @@
  * - parses and validates the query against the real library ids (fail closed:
  *   an unknown id or mode is ignored, never painted);
  * - applies a valid link through the same `applySiteAppearance` path the
- *   island uses, preserving the visitor's painted mode when the link names a
- *   theme only;
+ *   island uses, keeping the visitor's stored mode choice (including
+ *   `system`) when the link names a theme only, so opening a link never
+ *   rewrites their saved appearance;
  * - mirrors what the island writes on `<html>` (`data-tx-theme`,
  *   `data-tx-mode`) back into the query with `history.replaceState`, so every
  *   Apply produces a shareable URL; and
@@ -24,6 +25,9 @@
 
 /** Modes a share link may force; `system` never goes in a URL (it resolves per visitor). */
 export type ThemeLinkMode = 'light' | 'dark' | 'high-contrast';
+
+/** A visitor's stored mode choice: a link mode, or `system` (follow the OS). */
+export type ThemeLinkModeChoice = ThemeLinkMode | 'system';
 
 const LINK_MODES: readonly ThemeLinkMode[] = ['light', 'dark', 'high-contrast'];
 
@@ -90,7 +94,12 @@ export interface ThemeLinkEnv {
   /** Loads a theme's CSS; the page binds `ensureThemeCss`. Resolves false when it never loads. */
   ensureCss: (id: string) => Promise<boolean>;
   /** Applies the appearance; the page closes over `applySiteAppearance` with its var names. */
-  apply: (themeId: string, mode: ThemeLinkMode) => void;
+  apply: (themeId: string, mode: ThemeLinkModeChoice) => void;
+  /**
+   * The visitor's stored mode choice (the page binds `readModePreference`).
+   * A theme-only link re-applies it unchanged, so `system` stays `system`.
+   */
+  storedModeChoice: () => ThemeLinkModeChoice;
 }
 
 /** The mode painted on `<html>` (resolved light/dark/high-contrast), or light. */
@@ -102,8 +111,9 @@ function paintedMode(root: HTMLElement): ThemeLinkMode {
 
 /**
  * Apply the appearance a deep link asks for, exactly once, after its CSS is
- * in. A theme-only link keeps the visitor's painted mode; a mode-only link
- * keeps the painted theme. Returns the applied params, or null when the link
+ * in. A theme-only link keeps the visitor's stored mode choice (applying the
+ * resolved mode instead would save it as an explicit preference and replace
+ * `system` on every page); a mode-only link keeps the painted theme. Returns the applied params, or null when the link
  * was empty or its CSS never loaded (no apply, no repaint).
  */
 export async function applyThemeFromLink(env: ThemeLinkEnv): Promise<ThemeLinkParams | null> {
@@ -115,7 +125,7 @@ export async function applyThemeFromLink(env: ThemeLinkEnv): Promise<ThemeLinkPa
     if (!loaded) return null;
   }
   const themeId = parsed.themeId ?? root.dataset.txTheme ?? env.defaultThemeId;
-  const mode = parsed.mode ?? paintedMode(root);
+  const mode = parsed.mode ?? env.storedModeChoice();
   env.apply(themeId, mode);
   return parsed;
 }

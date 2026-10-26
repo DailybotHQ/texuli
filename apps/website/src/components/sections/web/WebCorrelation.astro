@@ -20,6 +20,7 @@ import { withBase } from '../../foundation/site.ts';
 import {
   dedent,
   highlightShared,
+  WEB_CORR_ARCH_LINK,
   WEB_CORR_CAPTION,
   WEB_CORR_DEMO_LINK,
   WEB_CORR_IDS,
@@ -74,8 +75,11 @@ const resolveHref = (href: string): string | undefined => {
     <p class="web-corr__chip" data-status="in-development">{WEB_CORR_STATUS_CHIP}</p>
     <p class="web-corr__link">
       {
-        [WEB_CORR_DEMO_LINK].map((link) => (
-          <a href={resolveHref(link.href)}>{link.label}</a>
+        [WEB_CORR_DEMO_LINK, WEB_CORR_ARCH_LINK].map((link, index) => (
+          <>
+            {index > 0 && <span aria-hidden="true"> · </span>}
+            <a href={resolveHref(link.href)}>{link.label}</a>
+          </>
         ))
       }
     </p>

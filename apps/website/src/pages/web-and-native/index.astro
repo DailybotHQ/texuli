@@ -43,12 +43,14 @@ const jsonLd = techArticleJsonLd(
   <ul>
     <li>
       <strong>Svelte 5 for the web.</strong> The compiler carries the framework: components
-      compile away, state is explicit through runes, and the output stays inside strict size
-      budgets — a runtime chosen with constrained devices, including phones, in mind.
+      compile away, state is explicit through runes, and size is budgeted — <code>pnpm size</code> and the
+      site-perf audit measure packages and pages, and the entries still over budget are tracked
+      in the open. A runtime chosen with constrained devices, including phones, in mind.
     </li>
     <li>
-      <strong>Kotlin and Compose Multiplatform for native.</strong> One language across
-      Android, desktop and iOS targets, on a UI toolkit built for phones first.
+      <strong>Kotlin Multiplatform and Compose for native.</strong> One language that can
+      reach desktop, iOS and Android. Today the Compose renderer runs on the JVM (desktop), the
+      spec models also compile for iOS, and Android is pending a decision.
     </li>
   </ul>
   <p>

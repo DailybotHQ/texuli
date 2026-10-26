@@ -106,7 +106,7 @@ export const WEB_WHY_STORY: readonly WhyClaim[] = [
   },
   {
     title: 'Small by budget',
-    body: 'Small bundles by default: every subpath ships under a budget measured by `pnpm size`, and the site publishes its own budgets on the performance page.',
+    body: 'Small bundles by default: `pnpm size` measures package subpaths against budgets, the site publishes its page budgets on the performance page, and the entries still over budget are tracked in the open.',
     href: '/perf/',
     label: 'See the published budgets',
     sources: [{ file: GUIDE, phrase: 'Small bundles by default' }],

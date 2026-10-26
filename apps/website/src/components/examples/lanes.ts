@@ -4,7 +4,7 @@
  * Pure and build-time only — the island below keeps its own filters, and
  * every lane item links to its real `/examples/<id>/` detail route.
  */
-import type { ExampleCatalogItem } from '../../components/examples/catalog.ts';
+import type { ExampleCatalogItem } from './catalog.ts';
 
 export interface ExampleLane {
   id: string;

@@ -190,7 +190,9 @@ test.describe('texuli.com landing', () => {
     const status = agents.locator('[data-copy-command-status]');
     await expect(status).toHaveText('');
     await copy.click();
-    await expect(status).toHaveText(/copy/i);
+    // Either outcome is announced: "Command copied." (clipboard allowed, e.g.
+    // WebKit) or "Copy failed: …" (clipboard denied, e.g. headless Chromium).
+    await expect(status).toHaveText(/^(Command copied\.|Copy failed: )/);
 
     await expect(page.getByText('One platform, two runtimes. Start today.')).toBeVisible();
 

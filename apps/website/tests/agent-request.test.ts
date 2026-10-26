@@ -32,7 +32,9 @@ describe('isAgentRequest', () => {
     [
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Chrome-Lighthouse',
     ],
-    ['Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/131.0.0.0 Safari/537.36 Chrome-Lighthouse'],
+    [
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/131.0.0.0 Safari/537.36 Chrome-Lighthouse',
+    ],
   ])('classifies %j as human', (userAgent) => {
     expect(isAgentRequest(userAgent)).toBe(false);
   });

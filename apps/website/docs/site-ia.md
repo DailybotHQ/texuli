@@ -13,19 +13,22 @@ everywhere else.
 `BaseLayout` with `landing`:
 
 - **Header** (`SiteHeader` `variant="landing"`): the Texuli logo (`BrandLogo`),
-  a Docs link (`/guides/`), search with the ⌘/Ctrl+K hint, the
-  light/dark/system switch and a Get started button
-  (`/guides/getting-started/`). Get started hides on phones, because the
-  hero's own call to action sits right below.
-- **Hero** (`landing/LandingHero.astro`): headline, one-line subhead, two calls
-  to action and a compact grid of live Texuli widgets (`HeroMoments`, one
-  island).
-- **Below the hero:** three feature cards (`FeatureCards`) and a short agents
-  strip (`AgentsSection`). Its playground hydrates when it scrolls into view.
+  a Docs link (`/guides/`), the platform doors (Web + native, Native), a
+  GitHub door, search with the ⌘/Ctrl+K hint, the light/dark/system switch
+  and a Get started button (`/guides/getting-started/`). Under 40rem the
+  doors, GitHub and Get started hide: the hero carries `/native/` and Get
+  started, the web-and-native section carries `/web-and-native/`, and the
+  footer carries GitHub. `site-ia.spec.ts` pins 6 header links on desktop
+  and 2 on phones.
+- **Sections** (`sections/web/*`, PLAN_006 T-44): `WebHero` (platform hero,
+  proof strip, theme swatches as data), `WebWhySvelte`, `WebCorrelation`
+  (one contract, two projections; links the badge page and
+  `/web-and-native/`) and `WebAgentsCta` (agents strip and closing call to
+  action). The home ships zero islands.
 - **Footer:** the site footer.
 
-There is no sidebar, no page links in the header and nothing else on the
-home.
+There is no sidebar and no page links in the header beyond the platform
+doors and GitHub. `/native/` uses the same landing shell.
 
 ## Docs shell (every other page)
 
@@ -85,10 +88,10 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-ia.spec.ts tests
 
 ## Limits
 
-- **Hero widgets load up front.** `HeroMoments` is above the fold and
-  hydrates on load. The home ships about 113 KB of JavaScript (gzip,
-  measured 2026-10-23 in `site-visual.md`), within its 116 KB landing
-  budget.
+- **The home is static.** The T-44 landing replaced the hero widget
+  islands (`HeroMoments`, `FeatureCards`, `AgentsSection`, deleted) with
+  four static sections; its page weight is tracked against the `/` budget
+  in `components/perf/budgets.ts` (a tracked red in `docs/CI.md`).
 - **Landing cleanup (T-site-theme-swatches):** `AnnouncementBanner`, `ThemesStripHost`,
   `ThemesStrip` and `theme-swatch.ts` were removed (nothing imported them after T-site-ia).
   landing color work in flight elsewhere settles.

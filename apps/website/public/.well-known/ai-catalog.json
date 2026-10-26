@@ -105,10 +105,7 @@
       "url": "https://www.npmjs.com/package/texuli",
       "description": "The Texuli package on npm (prerelease dist-tag next): styled components built on owned primitives, tokens and the agent catalog. Fourteen scoped @texuli/* packages ship alongside it.",
       "tags": ["npm", "svelte", "components", "prerelease"],
-      "representativeQueries": [
-        "install Texuli from npm",
-        "which @texuli packages exist on npm"
-      ]
+      "representativeQueries": ["install Texuli from npm", "which @texuli packages exist on npm"]
     }
   ]
 }

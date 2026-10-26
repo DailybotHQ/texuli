@@ -94,40 +94,56 @@ function landingRoutes(): string[] {
 }
 
 test.describe('landing', () => {
-  test('a slim header: logo, Docs, the platform doors, search, theme and Get started; no sidebar', async ({
+  test('a slim header: logo, Docs, the platform doors, GitHub, search, theme and Get started; no sidebar', async ({
     page,
   }, info) => {
     expect(await visit(page, '/')).toEqual([]);
     const header = page.locator('[data-tx-site-header]');
+    const phone = info.project.name === 'mobile';
     await expect(header).toHaveAttribute('data-variant', 'landing');
     await expect(header.getByRole('link', { name: 'Texuli home' })).toHaveAttribute('href', '/');
     await expect(header.getByRole('link', { name: 'Docs', exact: true })).toHaveAttribute(
       'href',
       '/guides/'
     );
-    // The platform doors (T-32): the native landing and the architecture page,
-    // hidden under 40rem where the hero calls to action carry the paths.
-    await expect(header.getByRole('link', { name: 'Native', exact: true })).toHaveAttribute(
-      'href',
-      '/native/'
-    );
-    await expect(header.getByRole('link', { name: 'Web + native', exact: true })).toHaveAttribute(
-      'href',
-      '/web-and-native/'
-    );
+    // The platform doors (T-32) and the GitHub door (T-84). Under 40rem they
+    // hide (subsite IA §1.3): the hero and the web-and-native section carry
+    // the platform paths, and the footer carries GitHub.
+    const doors = [
+      { name: 'Web + native', href: '/web-and-native/' },
+      { name: 'Native', href: '/native/' },
+      { name: 'GitHub', href: 'https://github.com/DailybotHQ/texuli' },
+    ];
+    for (const door of doors) {
+      // Located by href, not by role: a hidden link has no role to find.
+      const link = header.locator(`a[href="${door.href}"]`);
+      await expect(link).toHaveCount(1);
+      await expect(link).toHaveText(door.name);
+      if (phone) await expect(link).toBeHidden();
+      else await expect(link).toBeVisible();
+    }
+    if (phone) {
+      const main = page.locator('main');
+      for (const href of ['/native/', '/web-and-native/']) {
+        await expect(main.locator(`a[href="${href}"]`).first()).toBeVisible();
+      }
+      await expect(
+        page.locator('footer a[href="https://github.com/DailybotHQ/texuli"]')
+      ).toBeVisible();
+    }
     await expect(header.locator('astro-island:not([ssr]) [data-tx-site-search]')).toBeVisible();
     await expect(header.getByRole('group', { name: 'Appearance' })).toBeVisible();
     const getStarted = header.getByRole('link', { name: 'Get started' });
-    if (info.project.name === 'mobile') {
+    if (phone) {
       // The hero's own call to action sits right below on phones.
       await expect(getStarted).toBeHidden();
     } else {
       await expect(getStarted).toHaveAttribute('href', '/guides/getting-started/');
     }
     // Only global utilities: the header lists no pages beyond the platform
-    // doors and there is no docs chrome. Under 40rem only the logo and Docs
-    // remain (the hero calls to action carry the paths).
-    expect(await header.getByRole('link').count()).toBe(info.project.name === 'mobile' ? 2 : 5);
+    // doors and GitHub, and there is no docs chrome. Under 40rem only the
+    // logo and Docs remain visible (and so exposed as links).
+    expect(await header.getByRole('link').count()).toBe(phone ? 2 : 6);
     await expect(page.locator('[data-tx-site-sidebar]')).toHaveCount(0);
     await expect(page.locator('[data-site-menu]')).toHaveCount(0);
     await expect(page.getByRole('navigation', { name: 'Primary' })).toHaveCount(0);
@@ -145,9 +161,7 @@ test.describe('landing', () => {
     const sections = await page
       .locator('[data-tx-landing] > *')
       .evaluateAll((nodes) =>
-        nodes
-          .map((node) => node.tagName.toLowerCase())
-          .filter((tag) => tag !== 'script')
+        nodes.map((node) => node.tagName.toLowerCase()).filter((tag) => tag !== 'script')
       );
     expect(sections).toEqual(['section', 'section', 'section', 'section']);
     // The hero's theme moment is build-time data painted in the HTML.
