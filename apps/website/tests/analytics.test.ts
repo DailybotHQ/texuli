@@ -100,6 +100,17 @@ describe('ANALYTICS gating', () => {
     const without = await loadConstances({});
     expect(without.ANALYTICS.verification.bing).toBe('');
   });
+
+  it('reads the Google verification meta from the environment; both stay off by default', async () => {
+    const withKey = await loadConstances({
+      PUBLIC_GOOGLE_SITE_VERIFICATION: 'google-token',
+    });
+    expect(withKey.ANALYTICS.verification.google).toBe('google-token');
+
+    const without = await loadConstances({});
+    expect(without.ANALYTICS.verification.google).toBe('');
+    expect(without.ANALYTICS.verification.bing).toBe('');
+  });
 });
 
 describe('sanitizeEventData', () => {

@@ -16,6 +16,7 @@ import {
   buildSitemap,
   normalizePagePath,
   OG_IMAGE_WIDTH,
+  ogAreaFor,
   ogImageFile,
   ogImageSvg,
   readPageMeta,
@@ -131,6 +132,7 @@ export function seoIntegration(): AstroIntegration {
             description: meta.description,
             url: display,
             siteName: SITE_NAME,
+            area: ogAreaFor(path),
           });
           const png = await sharp.transform(
             new TextEncoder().encode(svg),

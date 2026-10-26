@@ -14,6 +14,7 @@ import {
   normalizePagePath,
   OG_IMAGE_HEIGHT,
   OG_IMAGE_WIDTH,
+  ogAreaFor,
   ogImageFile,
   ogImageSvg,
   readPageMeta,
@@ -169,6 +170,37 @@ test.describe('seo helpers', () => {
     expect(robots).not.toMatch(/^Content-Signal:/m);
   });
 
+  test('area art: routes map to areas and the badge changes the image', () => {
+    expect(ogAreaFor('/').label).toBe('');
+    expect(ogAreaFor('/guides/theming/').label).toBe('Guides');
+    expect(ogAreaFor('/component-pages/button/').label).toBe('Components');
+    expect(ogAreaFor('/primitives-page/accordion/').label).toBe('Primitives');
+    expect(ogAreaFor('/theme-studio/').label).toBe('Themes');
+    expect(ogAreaFor('/playground/').label).toBe('Agents');
+    const accents = new Set(
+      [
+        '/',
+        '/guides/x/',
+        '/component-pages/x/',
+        '/primitives-page/x/',
+        '/theme-studio/',
+        '/playground/',
+      ].map((path) => ogAreaFor(path).accent)
+    );
+    expect(accents.size).toBeGreaterThanOrEqual(5);
+    const base = {
+      title: 'Same title',
+      description: 'Same description text.',
+      url: 'texuli.com/x',
+      siteName: 'Texuli',
+    };
+    const plain = ogImageSvg(base);
+    const guides = ogImageSvg({ ...base, area: ogAreaFor('/guides/theming/') });
+    expect(guides).toContain('GUIDES');
+    expect(plain).not.toContain('GUIDES');
+    expect(guides).not.toBe(plain);
+  });
+
   test('read page meta, wrap text and escape hostile titles in the image', () => {
     const html =
       '<html><head><title>Tom &amp; Jerry &#183; Texuli</title><meta name="description" content="A &quot;quoted&quot; page"><meta name="robots" content="noindex"></head><body><title>ignored</title></body></html>';
@@ -238,6 +270,27 @@ test.describe('texuli.com SEO build output', () => {
     expect(locs.some((loc) => loc.includes('/examples/preview/'))).toBe(false);
   });
 
+  test('every area carries resolvable, alt-texted OG art', async ({ page, request }) => {
+    const samples = [
+      '/',
+      '/guides/theming/',
+      '/component-pages/button/',
+      '/primitives-page/accordion/',
+      '/theme-studio/',
+      '/playground/',
+    ];
+    for (const path of samples) {
+      await page.goto(`${origin}${path}`);
+      const image = await meta(page, 'og:image');
+      expect(image, `og:image on ${path}`).toBeTruthy();
+      expect(await meta(page, 'og:image:alt'), `og:image:alt on ${path}`).toBeTruthy();
+      expect(await meta(page, 'twitter:card', 'name')).toBe('summary_large_image');
+      const png = await request.get(image!);
+      expect(png.status(), `OG asset resolves for ${path}`).toBe(200);
+      expect(png.headers()['content-type']).toBe('image/png');
+    }
+  });
+
   test('example preview documents are noindex', () => {
     const previews = builtPages().filter((path) => path.startsWith('/examples/preview/'));
     expect(previews.length).toBeGreaterThan(0);
@@ -278,6 +331,10 @@ test.describe('texuli.com SEO build output', () => {
       expect(await meta(page, 'twitter:card', 'name')).toBe('summary_large_image');
       expect(await meta(page, 'twitter:image', 'name')).toBe(image);
       expect(await page.locator('head meta[name="robots"]').count()).toBe(0);
+      // Clean-env build: verification metas stay off until the owner
+      // provisions the tokens.
+      expect(await page.locator('head meta[name="google-site-verification"]').count()).toBe(0);
+      expect(await page.locator('head meta[name="msvalidate.01"]').count()).toBe(0);
       // The image the tags name is served by the static host.
       const png = await request.get(`${origin}/${ogImageFile(path)}`);
       expect(png.status()).toBe(200);

@@ -43,6 +43,7 @@ export const ANALYTICS = {
   /** Search-engine verification metas; empty means the meta is not rendered. */
   verification: {
     bing: (import.meta.env.PUBLIC_BING_SITE_VERIFICATION || '').trim(),
+    google: (import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION || '').trim(),
   },
 } as const;
 

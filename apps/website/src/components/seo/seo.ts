@@ -201,13 +201,67 @@ export interface OgImageInput {
   /** Shown in the footer, e.g. `texuli.com/guides/theming`. */
   url: string;
   siteName: string;
+  /** Area badge and accent (T-21); omitted = brand-only card. */
+  area?: OgArea;
+}
+
+/** One site area's share-art identity: a badge label and its accent. */
+export interface OgArea {
+  /** Badge text, uppercased in the art; empty = no badge. */
+  label: string;
+  accent: string;
+}
+
+/**
+ * The area a route belongs to (T-21) — the share art says where a link
+ * lands. Labels are section names, not claims: no metrics, no invented
+ * numbers. Areas that do not exist yet (native, architecture) are mapped
+ * ahead of the sub-site scaffold.
+ */
+const OG_AREAS: readonly (readonly [prefix: string, area: OgArea])[] = [
+  ['/native/', { label: 'Native', accent: '#fb923c' }],
+  ['/web-and-native/', { label: 'Architecture', accent: '#22d3ee' }],
+  ['/architecture/', { label: 'Architecture', accent: '#22d3ee' }],
+  ['/primitives-page/', { label: 'Primitives', accent: '#a78bfa' }],
+  ['/guides/', { label: 'Guides', accent: '#34d399' }],
+  ['/skill/', { label: 'Guides', accent: '#34d399' }],
+  ['/foundation/', { label: 'Guides', accent: '#34d399' }],
+  ['/component-pages/', { label: 'Components', accent: '#60a5fa' }],
+  ['/blocks-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/charts-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/media-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/gallery-components/', { label: 'Components', accent: '#60a5fa' }],
+  ['/examples/', { label: 'Components', accent: '#60a5fa' }],
+  ['/slides-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/editor-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/gallery-themes/', { label: 'Themes', accent: '#fbbf24' }],
+  ['/theme-switcher/', { label: 'Themes', accent: '#fbbf24' }],
+  ['/theme-studio/', { label: 'Themes', accent: '#fbbf24' }],
+  ['/color-explorer/', { label: 'Themes', accent: '#fbbf24' }],
+  ['/agents-page/', { label: 'Agents', accent: '#f472b6' }],
+  ['/playground/', { label: 'Agents', accent: '#f472b6' }],
+  ['/builder/', { label: 'Agents', accent: '#f472b6' }],
+  ['/agent-chat/', { label: 'Agents', accent: '#f472b6' }],
+  ['/brand/', { label: 'Project', accent: '#94a3b8' }],
+  ['/showcase/', { label: 'Project', accent: '#94a3b8' }],
+  ['/evidence/', { label: 'Project', accent: '#94a3b8' }],
+  ['/perf/', { label: 'Project', accent: '#94a3b8' }],
+  ['/changelog/', { label: 'Project', accent: '#94a3b8' }],
+];
+
+export function ogAreaFor(path: string): OgArea {
+  const page = normalizePagePath(path);
+  for (const [prefix, area] of OG_AREAS) if (page.startsWith(prefix)) return area;
+  return { label: '', accent: '#60a5fa' };
 }
 
 /**
  * The social image as SVG (1200 × 630). Every text is XML-escaped; the
  * colors pass WCAG AA on their backgrounds (white and slate on near-black).
+ * An area adds a top-right badge in the area accent and tints the footer
+ * rule with it.
  */
-export function ogImageSvg({ title, description, url, siteName }: OgImageInput): string {
+export function ogImageSvg({ title, description, url, siteName, area }: OgImageInput): string {
   const titleLines = wrapText(title, 28, 3);
   const descriptionLines = wrapText(description, 58, 3);
   const titleStart = 250;
@@ -217,6 +271,15 @@ export function ogImageSvg({ title, description, url, siteName }: OgImageInput):
     lines
       .map((line, i) => `<tspan x="${x}" y="${y + i * step}">${escapeXml(line)}</tspan>`)
       .join('');
+  const accent = area?.accent ?? '#60a5fa';
+  // Badge: uppercased label in an accent pill, right-aligned with the margin.
+  const badgeLabel = area?.label.toUpperCase() ?? '';
+  const badgeWidth = badgeLabel.length * 18 + 48;
+  const badgeX = OG_IMAGE_WIDTH - 80 - badgeWidth;
+  const badge = badgeLabel
+    ? `<rect x="${badgeX}" y="96" width="${badgeWidth}" height="56" rx="14" fill="${accent}"/>
+  <text x="${badgeX + badgeWidth / 2}" y="133" text-anchor="middle" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="2" fill="#0b1220">${escapeXml(badgeLabel)}</text>`
+    : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" viewBox="0 0 ${OG_IMAGE_WIDTH} ${OG_IMAGE_HEIGHT}">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -225,12 +288,13 @@ export function ogImageSvg({ title, description, url, siteName }: OgImageInput):
     </linearGradient>
   </defs>
   <rect width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" fill="url(#bg)"/>
-  <rect x="80" y="96" width="56" height="56" rx="14" fill="#60a5fa"/>
+  <rect x="80" y="96" width="56" height="56" rx="14" fill="${accent}"/>
   <rect x="96" y="112" width="24" height="24" rx="6" fill="#0b1220"/>
   <text x="156" y="138" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="38" font-weight="700" fill="#ffffff">${escapeXml(siteName)}</text>
+  ${badge}
   <text font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#ffffff">${tspans(titleLines, 80, titleStart, titleLineHeight)}</text>
   <text font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="30" fill="#cbd5e1">${tspans(descriptionLines, 80, descriptionStart, 42)}</text>
-  <rect x="80" y="548" width="1040" height="2" fill="#334155"/>
+  <rect x="80" y="548" width="1040" height="2" fill="${accent}"/>
   <text x="80" y="590" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" fill="#93c5fd">${escapeXml(url)}</text>
 </svg>`;
 }
