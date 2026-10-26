@@ -108,3 +108,18 @@ export function htmlToMarkdown(html: string): string {
     .replace(/\n{3,}/g, '\n\n')
     .trim()}\n`;
 }
+
+/**
+ * Root-relative links to absolute ones for the served `.md` twins (T-23):
+ * an agent fetching `guides/theming.md` from anywhere must be able to follow
+ * links without resolving a base. Fenced code is left untouched, so a code
+ * sample that shows Markdown keeps its shape.
+ */
+export function absolutizeMarkdownLinks(markdown: string, origin: string): string {
+  return markdown
+    .split(/(```[\s\S]*?```)/g)
+    .map((chunk) =>
+      chunk.startsWith('```') ? chunk : chunk.replace(/\]\((\/[^)]*)\)/g, `](${origin}$1)`)
+    )
+    .join('');
+}

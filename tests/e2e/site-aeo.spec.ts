@@ -1,9 +1,10 @@
 /// <reference types="node" />
-import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { extname, join, normalize, resolve } from 'node:path';
+import { extname, join, normalize, relative, resolve } from 'node:path';
 import { expect, test } from '@playwright/test';
+import { isDocsPath } from '../../apps/website/src/components/foundation/nav-data.ts';
 import { siteLlmsSections } from '../../apps/website/src/components/seo/llms-site.ts';
 import { formatSiteLlmsTxt } from '../../packages/tools/src/llms/site.ts';
 
@@ -20,6 +21,7 @@ const TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
   '.json': 'application/json',
+  '.md': 'text/markdown; charset=utf-8',
 };
 
 let server: Server;
@@ -99,4 +101,68 @@ test.describe('root llms.txt', () => {
       expect(response.status(), path).toBe(200);
     }
   });
+});
+
+test.describe('markdown twins (docs pages)', () => {
+  /** Every built docs-class page (`/guides/…`, `/component-pages/…`, …). */
+  function docsPages(): string[] {
+    const pages: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (entry.name === 'index.html' && isDocsPath(`/${relative(DIST, dir)}/`))
+          pages.push(`/${relative(DIST, dir)}/`);
+      }
+    };
+    walk(DIST);
+    return pages.sort();
+  }
+
+  test('every docs page has a markdown twin beside its HTML', () => {
+    const pages = docsPages();
+    expect(pages.length).toBeGreaterThan(50);
+    const missing = pages.filter((path) => !existsSync(join(DIST, `${path.slice(0, -1)}.md`)));
+    expect(missing, `twins missing for ${missing.length} of ${pages.length}`).toEqual([]);
+  });
+
+  test('the manifest records exactly the built twins', () => {
+    const manifest = JSON.parse(readFileSync(join(DIST, 'md-manifest.json'), 'utf8')) as {
+      twins: Record<string, string>;
+    };
+    const pages = docsPages();
+    expect(Object.keys(manifest.twins).sort()).toEqual(pages);
+    for (const [path, md] of Object.entries(manifest.twins))
+      expect(md).toBe(`${path.slice(0, -1)}.md`);
+  });
+
+  for (const path of [
+    '/guides/theming/',
+    '/guides/why-svelte-kotlin/',
+    '/component-pages/button/',
+    '/primitives-page/accordion/',
+    '/skill/',
+  ]) {
+    test(`the twin of ${path} is clean markdown: h1, fences, absolute links, no HTML`, async ({
+      request,
+    }) => {
+      const response = await request.get(`${origin}${path.slice(0, -1)}.md`);
+      expect(response.status()).toBe(200);
+      expect(response.headers()['content-type']).toBe('text/markdown; charset=utf-8');
+      const body = await response.text();
+      expect(body.startsWith('# ')).toBe(true);
+      expect(body, 'a source line naming the page URL').toContain(`Source: ${SITE}${path}`);
+      // Headings survived and code fences are balanced; links, when the page
+      // has any, are absolute (or in-page anchors).
+      expect(body).toMatch(/^## /m);
+      expect((body.match(/```/g) ?? []).length % 2).toBe(0);
+      for (const href of [...body.matchAll(/\]\(([^)]+)\)/g)].map((match) => match[1]))
+        expect(href.startsWith('/') && !href.startsWith('//'), href).toBe(false);
+      // No HTML tags outside code fences.
+      const outsideFences = body.split(/```[\s\S]*?```/g).join('');
+      expect(outsideFences).not.toMatch(
+        /<\/?(?:div|span|p|a|script|style|table|button|svg|img|template|pre|code)\b/i
+      );
+    });
+  }
 });
