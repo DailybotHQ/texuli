@@ -38,6 +38,9 @@ const TYPES: Record<string, string> = {
 /** Routes measured in the browser: every page family, the heavy routes and this page. */
 const BROWSER_ROUTES = [
   '/',
+  // PLAN_006 T-91: the new landings, static bodies with only the header islands.
+  '/native/',
+  '/web-and-native/',
   '/brand/',
   '/foundation/',
   '/showcase/',
@@ -199,6 +202,13 @@ test.describe('texuli.com performance budgets', () => {
     for (const route of BROWSER_ROUTES) {
       const { foreign, files } = await visit(page, route);
       expect(foreign, route).toEqual([]);
+      // The analytics loader is mounted in BaseLayout (T-39) and stays silent in
+      // the default build: no tag, no loader file, no proxy request (T-91).
+      expect(await page.locator('script[data-umami-loader]').count(), route).toBe(0);
+      expect(
+        [...files].filter((f) => /umami-loader\.js|\/api\/umami\//.test(f)),
+        route
+      ).toEqual([]);
       const budget = budgetFor(route);
       let total = 0;
       let js = 0;
