@@ -477,7 +477,7 @@ const surfaceHint = $derived(
       <p class="attribution">{basemap.attribution}</p>
     </div>
 
-    <aside class="location-panel" aria-label="Map locations">
+    <aside class="location-panel" aria-label={`${displayLabel} locations`}>
       <h3
         >Locations <span>{markers.length}</span>
         {#if routes.length > 0}<span class="meta">· {routes.length} routes</span>{/if}

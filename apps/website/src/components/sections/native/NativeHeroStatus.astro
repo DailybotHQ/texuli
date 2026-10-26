@@ -130,6 +130,16 @@ const base = import.meta.env.BASE_URL;
     outline: 2px solid var(--tx-ring);
     outline-offset: 2px;
   }
+  @media (forced-colors: active) {
+    /* Forced colors (T-87, axe color-contrast): the filled CTA's author
+       text color would sit on the forced Canvas, so name system colors. */
+    .native-hero__cta--primary,
+    .native-hero__cta--primary:hover {
+      border-color: LinkText;
+      background: Canvas;
+      color: LinkText;
+    }
+  }
   .native-status {
     display: grid;
     gap: 0.75rem;

@@ -83,3 +83,12 @@ Uses `--tx-border`, `--tx-foreground`, `--tx-surface`, `--tx-primary`,
 labels stay AA in every theme) and `--tx-ring`, each with system-color
 fallbacks; pressed zoom and toolbar buttons keep a Highlight state under
 `forced-colors: active`.
+
+On a critical bar, progress is a 3px stripe on the block-end edge in the
+contract foreground, never a tint behind the label: a tint would pull the fill
+toward the label color and break AA. Under `forced-colors: active` a critical
+bar is Canvas with CanvasText text and a 2px CanvasText border, and its
+progress stripe opts out of forcing (`forced-color-adjust: none`) so it stays
+visible. A critical bar with no progress is told apart from a normal bar by
+that heavier border alone; the critical-path mark in the task list
+(`labels.criticalPath`) names it for assistive technology.

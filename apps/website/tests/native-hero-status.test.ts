@@ -190,14 +190,30 @@ describe('native hero CSS: still, logical and token-driven', () => {
     expect(css).not.toMatch(/#[0-9a-f]{3,8}\b/i);
   });
 
-  it('is mobile-first: every media query widens, so 360px gets one column', () => {
+  it('is mobile-first: every responsive media query widens, so 360px gets one column', () => {
     const css = styleBlock();
     const queries = css.match(/@media[^{]+/g) ?? [];
-    expect(queries.length).toBeGreaterThan(0);
-    for (const query of queries) {
+    // Preference and mode queries (forced colors, reduced motion, color
+    // scheme) are not layout breakpoints; only width queries must widen.
+    const responsive = queries.filter(
+      (query) => !/\((forced-colors|prefers-[a-z-]+)\b/.test(query)
+    );
+    expect(responsive.length).toBeGreaterThan(0);
+    for (const query of responsive) {
       expect(query).toContain('min-width');
       expect(query).not.toContain('max-width');
     }
     expect(css).toMatch(/max-inline-size:/);
+  });
+
+  it('names system colors for the filled CTA under a plain forced-colors query (T-87)', () => {
+    const css = styleBlock();
+    const forced = css.slice(css.indexOf('@media (forced-colors: active)'));
+    expect(css).toContain('@media (forced-colors: active) {');
+    expect(forced).toMatch(
+      /\.native-hero__cta--primary[\s\S]*?background: Canvas;[\s\S]*?color: LinkText;/
+    );
+    // A width query that only exists to wrap a mode query is a workaround.
+    expect(css).not.toMatch(/min-width: 0\) and \(forced-colors/);
   });
 });

@@ -317,9 +317,15 @@ test.describe('texuli.com primitives reference: pages', () => {
       const path = primitivePath(doc.id);
       expect(await visit(page, path), path).toEqual([]);
       await expect(page.getByRole('heading', { level: 1, name: doc.name })).toBeVisible();
-      await expect(
-        page.getByRole('navigation', { name: 'Breadcrumb' }).getByRole('link')
-      ).toHaveAttribute('href', '/primitives-page/');
+      // The layout breadcrumb (T-19) is the page's only Breadcrumb nav:
+      // Home / Primitives / <name>, the last link marked as the page.
+      const crumbs = page.getByRole('navigation', { name: 'Breadcrumb' });
+      await expect(crumbs).toHaveCount(1);
+      await expect(crumbs.getByRole('link', { name: 'Primitives', exact: true })).toHaveAttribute(
+        'href',
+        '/primitives-page/'
+      );
+      await expect(crumbs.locator('[aria-current="page"]')).toHaveText(doc.name);
       await expect(page.locator('[data-import]')).toHaveText(importLine(doc));
       const budget = BUDGETS[`@texuli/primitives/${doc.id}`] ?? BUDGETS['@texuli/primitives/*'];
       await expect(page.locator('[data-budget]')).toHaveText(

@@ -317,5 +317,13 @@ const resolveHref = (href: string): string | undefined => {
     .hero-chip {
       border-color: CanvasText;
     }
+    /* Forced colors (T-87, axe color-contrast): the filled CTA's author
+       text color would sit on the forced Canvas, so name system colors. */
+    .web-hero__cta--primary,
+    .web-hero__cta--primary:hover {
+      border-color: LinkText;
+      background: Canvas;
+      color: LinkText;
+    }
   }
 </style>

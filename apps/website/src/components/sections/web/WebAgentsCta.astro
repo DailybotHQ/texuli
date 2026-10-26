@@ -253,6 +253,14 @@ const resolveHref = (href: string): string | undefined => {
     .web-agents__cta {
       border-color: ButtonText;
     }
+    /* Forced colors (T-87, axe color-contrast): the filled CTA's author
+       text color would sit on the forced Canvas, so name system colors. */
+    .web-agents__cta--primary,
+    .web-agents__cta--primary:hover {
+      border-color: LinkText;
+      background: Canvas;
+      color: LinkText;
+    }
   }
 </style>
 

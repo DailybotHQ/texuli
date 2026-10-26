@@ -769,8 +769,13 @@ function tickWidth(): number {
     background: color-mix(in srgb, var(--tx-tl-accent) 20%, transparent);
     pointer-events: none;
   }
+  /* On the solid critical fill, progress is a stripe on the block-end edge:
+     a tint behind the label would pull the fill toward the label color and
+     break AA (T-87). */
   .critical .progress {
-    background: color-mix(in srgb, var(--tx-tl-critical-fg) 25%, transparent);
+    inset-block: auto 0;
+    block-size: 3px;
+    background: var(--tx-tl-critical-fg);
   }
   .bar-label {
     position: relative;
@@ -803,6 +808,17 @@ function tickWidth(): number {
       border-color: Highlight;
       background: Highlight;
       color: HighlightText;
+    }
+    /* Critical stays distinguishable by a heavier system-color border; the
+       progress stripe opts out of forcing so it is not erased to Canvas. */
+    .task-bar.critical {
+      border: 2px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .critical .progress {
+      forced-color-adjust: none;
+      background: CanvasText;
     }
   }
   .notice,

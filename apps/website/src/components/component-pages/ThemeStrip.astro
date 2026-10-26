@@ -149,4 +149,27 @@ const swatchVars = (theme: (typeof themes)[number]) =>
     outline: 2px solid var(--tx-ring);
     outline-offset: 2px;
   }
+  /* Forced colors (T-87, axe color-contrast): the user's palette wins over
+     the card's theme. Without system colors a dark theme's light author
+     text sits on the forced Canvas. The swatch chips stay aria-hidden. */
+  @media (forced-colors: active) {
+    .cp-themes__card {
+      border-color: CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .cp-themes__meta {
+      color: CanvasText;
+    }
+    .cp-themes__aa {
+      border: 1px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .cp-themes__studio {
+      border: 1px solid LinkText;
+      background: Canvas;
+      color: LinkText;
+    }
+  }
 </style>

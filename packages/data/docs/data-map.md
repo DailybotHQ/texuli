@@ -145,6 +145,9 @@ Hosts can also listen with `onViewChange={({ center, zoom }) => …}`.
 - Routes and fences appear in the list as `Route: …` / `Fence: …`
 - List: virtualized `role="list"` with setsize/posinset, `data-list-item`, `aria-current`
 - Clustered points omit `data-marker` until the cluster is expanded
+- Location panel: a `complementary` landmark named `<label> locations` (the
+  `label` prop, else the basemap name), so two maps on one page keep distinct
+  landmark names; it was a fixed "Map locations" before 2026-10-26
 
 ## Deferred: fence editing
 

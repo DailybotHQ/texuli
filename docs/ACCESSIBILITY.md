@@ -49,6 +49,24 @@ top-layer order.
 WCAG 2.x contrast (AA) in light, dark and `forced-colors` is the repository
 contrast gate. APCA is out of scope (license).
 
+Under `forced-colors`, axe measures an element's author text color against
+the forced `Canvas`. Any surface painted from its own theme variables (a
+theme preview card, a filled call to action) therefore names system colors
+(`Canvas`, `CanvasText`, `LinkText`) inside `@media (forced-colors: active)`.
+Otherwise a dark theme's light text is measured on a white Canvas.
+
+## Site sweep
+
+`tests/e2e/a11y-site.spec.ts` runs axe with zero exclusions on every page of
+the built sitemap (light, dark, forced colors) and a keyboard-only walk.
+Findings in package code are fixed in the component, never excluded or
+overridden at page level.
+
+```sh
+pnpm build
+TEXULI_E2E_PORT=<lane-port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts --project=chromium
+```
+
 ## Related docs
 
 | Doc | Role |
