@@ -109,8 +109,14 @@ const KIND_MARK: Record<ToastKind, string> = {
 async function runAction(item: ToastItem): Promise<void> {
   const action = item.action;
   if (!action) return;
-  await action.onClick();
-  store.dismiss(item.id);
+  // The action owns its error surface; the toast always dismisses after it.
+  try {
+    await action.onClick();
+  } catch {
+    // Swallowed: a failing action reports through its own UI.
+  } finally {
+    store.dismiss(item.id);
+  }
 }
 </script>
 
@@ -150,7 +156,10 @@ async function runAction(item: ToastItem): Promise<void> {
                 {#if item.action}
                   <Toast.Action
                     class="tx-toast__action"
-                    onclick={() => {
+                    onclick={(event) => {
+                      // Keep the toast mounted while the action runs; the
+                      // primitive would dismiss it before the promise settles.
+                      event.preventDefault();
                       void runAction(item);
                     }}
                   >

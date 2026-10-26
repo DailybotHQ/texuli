@@ -93,6 +93,29 @@ describe('Toaster', () => {
       ).toBeNull()
     );
   });
+
+  it('keeps the toast mounted while an async action runs, then dismisses', async () => {
+    const store = createToastStore({ duration: 0 });
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    store.info('Archived', { action: { label: 'Undo', onClick: () => gate } });
+    const view = render(ToastHarness, { props: { store } });
+    await fireEvent.click(view.getByRole('button', { name: 'Undo' }));
+    // While the action promise is pending the toast stays interactive: not
+    // leaving, not inert, and its action control still reachable.
+    expect(
+      view.container.ownerDocument.querySelector('[data-tx-toast-root][data-leaving="true"]')
+    ).toBeNull();
+    expect(view.getByRole('button', { name: 'Undo' })).toBeTruthy();
+    release();
+    await waitFor(() =>
+      expect(
+        within(view.getByRole('region', { name: 'Notifications' })).queryByText('Archived')
+      ).toBeNull()
+    );
+  });
 });
 
 describe('Toaster viewport placement and motion', () => {
@@ -177,5 +200,26 @@ describe('Toaster viewport placement and motion', () => {
     expect(css).toMatch(/\[data-position\$=["']-center["']\]/);
     expect(css).toContain('margin-inline: auto;');
     expect(css).toMatch(/prefers-reduced-motion: reduce\)[^}]*\.tx-toast,[^}]*animation: none;/s);
+  });
+
+  it('keeps safe-area padding direction-independent (physical env insets, not inline slots)', () => {
+    const css = readFileSync(
+      join(import.meta.dirname, '../src/components/toast/toast.css'),
+      'utf8'
+    );
+    const viewport = css.slice(
+      css.indexOf('.tx-toaster__viewport {'),
+      css.indexOf('}', css.indexOf('.tx-toaster__viewport {'))
+    );
+    // env() safe-area insets are physical: the notch does not move with the
+    // reading direction. In a logical inline slot, the right-hand inset would
+    // guard the physical left edge in RTL and leave the real edge unprotected.
+    expect(viewport).not.toMatch(/padding-inline:[^;]*env\(/);
+    expect(viewport).toContain(
+      'padding-right: calc(var(--tx-toaster-edge) + env(safe-area-inset-right, 0px));'
+    );
+    expect(viewport).toContain(
+      'padding-left: calc(var(--tx-toaster-edge) + env(safe-area-inset-left, 0px));'
+    );
   });
 });
