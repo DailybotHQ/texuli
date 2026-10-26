@@ -107,4 +107,5 @@ server configured from the manifest) before trusting a preview.
 Before any deployment, confirm the chosen host supports one of the two
 artifacts or translate the manifest into that host's configuration, then
 verify both response headers and island behavior on the deployed preview.
-Nothing is deployed today.
+texuli.com deploys from `main` to Cloudflare Pages, which applies
+`dist/_headers`; re-verify both on the deployed origin after any CSP change.

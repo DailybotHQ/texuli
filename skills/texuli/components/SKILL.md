@@ -21,9 +21,12 @@ Use this sub-skill when a developer wants Texuli components **in an app**:
 consume the packages, or copy a styled component's source into the app and
 own it, then theme it, adjust it and keep it updatable.
 
-Everything here is **local**: the commands run from a Texuli monorepo
-checkout against folders on disk. Texuli is **not published to a registry
-yet**, so never suggest `npm install texuli` or a download URL.
+The copy path is **local**: its commands run from a Texuli monorepo checkout
+against folders on disk. The packages are npm previews: all 15 are on npm as
+`0.1.0-next.1` under the `next` dist-tag, with no stable release (`latest` is
+reserved for 1.0.0). Install them only with the `@next` tag
+(`pnpm add texuli@next`), never a bare `npm install texuli`, and never
+suggest a download URL.
 
 ## Choose a path
 

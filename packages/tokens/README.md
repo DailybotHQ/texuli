@@ -2,7 +2,10 @@
 
 **Layer L2: the OKLCH theme engine.** The `--tx-*` token contract, the theme
 library (210 themes) and the compiled CSS that every styled Texuli component
-consumes. Private workspace package (`"private": true`), not published.
+consumes. Published to npm as `0.1.0-next.1` under the `next`
+dist-tag (by CI, with provenance); no stable release (`latest` is reserved
+for 1.0.0), so install it with `@next`. The workspace package stays
+`"private": true`.
 
 ## What exists today
 

@@ -2,8 +2,11 @@
 
 **Layer L1: owned headless primitives.** 41 Svelte 5 primitives built from
 scratch on the `@texuli/core` texels, held to the WAI-ARIA Authoring
-Practices patterns. No styles, no other component library. Private workspace
-package (`"private": true`), not published.
+Practices patterns. No styles, no other component library.
+Published to npm as `0.1.0-next.1` under the `next`
+dist-tag (by CI, with provenance); no stable release (`latest` is reserved
+for 1.0.0), so install it with `@next`. The workspace package stays
+`"private": true`.
 
 ## What exists today
 

@@ -2,9 +2,11 @@
 
 **Layer L7: tools.** Agent and developer tooling over the library: the
 copy-in CLI, the agent docs bundle, the A2UI adapter, custom elements, the
-golden set and the read-only MCP server. Private workspace package
-(`"private": true`), not published: every bin below runs inside this
-repository only.
+golden set and the read-only MCP server. Published to npm as `0.1.0-next.1` under the `next`
+dist-tag (by CI, with provenance); no stable release (`latest` is reserved
+for 1.0.0), so install it with `@next`. The workspace package stays
+`"private": true`. The bins below are
+documented for use inside this repository.
 
 ## What exists today
 

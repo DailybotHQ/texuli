@@ -217,5 +217,8 @@ third-party component libraries in product docs.
 
 ## Reporting
 
-There is no public channel yet because the repository is not published.
-Report issues to the maintainers at Dailybot directly.
+The repository's remote is `https://github.com/DailybotHQ/texuli.git`
+(`git remote -v`), and GitHub reports it as public
+(`gh repo view DailybotHQ/texuli --json visibility`, 2026-10-26). There is no
+dedicated security reporting channel yet: report issues to the maintainers at
+Dailybot directly, not in public issues.

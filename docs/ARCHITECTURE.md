@@ -166,8 +166,9 @@ It imports the workspace packages directly, so a broken component breaks
   - `pnpm verify:packages` builds, packs and checks each library package the
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
-  - Workspace packages are `private: true`; the npm names are reserved as
-    `0.1.0-next.0` (dist-tag `next`, owner-published).
+  - Workspace packages stay `private: true`; the publish workflow publishes
+    all 15 packages to npm as `0.1.0-next.1` under the `next` dist-tag, with
+    provenance ([RELEASE](RELEASE.md)).
 - **Tests:**
   - **Unit:** Vitest (happy-dom) in `packages/*/tests/` and
     `scripts/tests/`, plus perf tests in `tests/perf/` (opt in with

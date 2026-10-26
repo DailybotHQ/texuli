@@ -1,8 +1,11 @@
 # @texuli/core
 
 **Layer L0: texels.** Framework-free TypeScript behavior and policy that every
-Texuli component is built from. No Svelte, no runtime dependencies. Private
-workspace package (`"private": true`), not published.
+Texuli component is built from. No Svelte, no runtime dependencies.
+Published to npm as `0.1.0-next.1` under the `next`
+dist-tag (by CI, with provenance); no stable release (`latest` is reserved
+for 1.0.0), so install it with `@next`. The workspace package stays
+`"private": true`.
 
 ## What exists today
 

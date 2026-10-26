@@ -144,8 +144,10 @@ Invalid drafts are refused by default. `invalidPolicy="preview"` shows
 placeholders behind a warning, and still offers no activation. The deck frame
 and intent controls are later phases. Doc: `packages/player/README.md`.
 
-On texuli.com (built locally, not deployed), `/builder/` composes and edits a
-draft with this player, and `/agent-chat/` talks to the agent service.
+On texuli.com (deployed from `main` to Cloudflare Pages), `/builder/`
+composes and edits a draft with this player. `/agent-chat/` talks to the
+agent service only when a build configures one; the agent service is not
+deployed, so run it locally.
 
 ## E — Agent service (`apps/agent`, `@texuli/agent`)
 

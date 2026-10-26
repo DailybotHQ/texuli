@@ -1,7 +1,10 @@
 # @texuli/charts
 
 **Layer L4: charts.** Chart math and every chart family, one lazy subpath
-per family. Private workspace package (`"private": true`), not published.
+per family. Published to npm as `0.1.0-next.1` under the `next`
+dist-tag (by CI, with provenance); no stable release (`latest` is reserved
+for 1.0.0), so install it with `@next`. The workspace package stays
+`"private": true`.
 
 ## What exists today
 

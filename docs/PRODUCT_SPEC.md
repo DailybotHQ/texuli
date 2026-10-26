@@ -110,11 +110,14 @@ closed, documented catalog that can be validated before anything renders.
 
 ## Honest boundaries
 
-- The implementation is pre-release. Workspace packages stay `private:
-  true`; the names are reserved on npm as `0.1.0-next.0` (dist-tag `next`,
-  owner-published reservation, not a supported release), texuli.com is not
-  deployed, and the repository has no remote. No production consumer runs on
-  Texuli yet.
+- The implementation is pre-release. All 15 packages are on npm as
+  `0.1.0-next.1` under the `next` dist-tag (published by CI with provenance;
+  previews, not a supported release; `latest` is reserved for 1.0.0), and the
+  workspace packages stay `private: true`. texuli.com deploys from `main` to
+  Cloudflare Pages. The repository's remote is
+  `https://github.com/DailybotHQ/texuli.git` (`git remote -v`), and GitHub
+  reports it as public (`gh repo view DailybotHQ/texuli --json visibility`,
+  2026-10-26). No production consumer runs on Texuli yet.
 - Package-level existence is not feature-level completeness: specific limits
   stay documented where they apply (for example, the data map accepts a host
   seam but does not draw fence-editing handles, and the blocks text renderer
