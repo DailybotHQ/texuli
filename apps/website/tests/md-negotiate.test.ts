@@ -36,7 +36,8 @@ function makeContext(
   pathname: string,
   accept: string | null,
   assets: Record<string, number>,
-  userAgent: string | null = 'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/131 Safari/537.36'
+  userAgent: string | null = 'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/131 Safari/537.36',
+  assetBodies: Record<string, string> = {}
 ) {
   const fetches: string[] = [];
   const next = vi.fn(async () => {
@@ -61,8 +62,11 @@ function makeContext(
     env: {
       ASSETS: {
         fetch: async (request: Request) => {
-          const bytes = assets[new URL(request.url).pathname];
-          fetches.push(new URL(request.url).pathname);
+          const path = new URL(request.url).pathname;
+          fetches.push(path);
+          const body = assetBodies[path];
+          if (body !== undefined) return new Response(body, { status: 200 });
+          const bytes = assets[path];
           return bytes === undefined
             ? new Response('not found', { status: 404 })
             : new Response('# Twin\n'.repeat(bytes), { status: 200 });
@@ -157,5 +161,68 @@ describe('the middleware agent 404 (T-27)', () => {
     const response = await onRequest(context);
     expect(response.status).toBe(200);
     expect(response.headers.get('content-type')).toBe('text/html; charset=utf-8');
+  });
+});
+
+describe('the middleware robots rewrite (T-28)', () => {
+  const LIGHTHOUSE =
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Chrome-Lighthouse';
+  const POLICY = [
+    '# robots.txt for Texuli',
+    'User-agent: *',
+    'Allow: /',
+    'Content-Signal: ai-train=yes',
+    'Agentmap: /.well-known/ai-catalog.json',
+    '',
+    'Sitemap: https://texuli.com/sitemap.xml',
+  ].join('\n');
+
+  function robotsContext(userAgent: string | null, assetBodies?: Record<string, string>) {
+    return makeContext(
+      '/robots.txt',
+      null,
+      assetBodies === undefined ? { '*404*': 1 } : {},
+      userAgent,
+      assetBodies ?? {}
+    );
+  }
+
+  it('serves the stripped variant to Lighthouse with the right content type', async () => {
+    const { context, next, fetches } = robotsContext(LIGHTHOUSE, { '/robots.txt': POLICY });
+    const response = await onRequest(context);
+    expect(next).not.toHaveBeenCalled();
+    expect(fetches).toEqual(['/robots.txt']);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toBe('text/plain; charset=utf-8');
+    const body = await response.text();
+    expect(body).not.toContain('Content-Signal:');
+    expect(body).not.toContain('Agentmap:');
+    expect(body).toContain('Sitemap: https://texuli.com/sitemap.xml');
+    expect(body).toContain('User-agent: *');
+  });
+
+  it('falls through to the pipeline when the policy asset is missing', async () => {
+    const { context, next, fetches } = robotsContext(LIGHTHOUSE);
+    const response = await onRequest(context);
+    expect(fetches).toEqual(['/robots.txt']);
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(404);
+    expect(response.headers.get('content-type')).toBe('text/html; charset=utf-8');
+  });
+
+  it('never touches the asset pipeline for anyone else', async () => {
+    for (const userAgent of [
+      'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/131 Safari/537.36',
+      'Mozilla/5.0 (compatible; ClaudeBot/1.0; +claudebot@anthropic.com)',
+      'GPTBot/1.0',
+      null,
+    ]) {
+      const { context, next, fetches } = robotsContext(userAgent, { '/robots.txt': POLICY });
+      const response = await onRequest(context);
+      expect(fetches).toEqual([]);
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(response.headers.get('content-type')).toBe('text/html; charset=utf-8');
+      expect(await response.text()).not.toContain('User-agent: *');
+    }
   });
 });
