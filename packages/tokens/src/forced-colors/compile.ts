@@ -82,11 +82,11 @@ ${chromeBlock}
     :root,
     [data-tx-theme] {
 ${chromeBlock}
-      --tx-border: var(--tx-border, CanvasText);
-      --tx-border-strong: var(--tx-border-strong, CanvasText);
-      --tx-ring: var(--tx-ring, Highlight);
-      --tx-selection: var(--tx-selection, Highlight);
-      --tx-selection-foreground: var(--tx-selection-foreground, HighlightText);
+      --tx-border: CanvasText;
+      --tx-border-strong: CanvasText;
+      --tx-ring: Highlight;
+      --tx-selection: Highlight;
+      --tx-selection-foreground: HighlightText;
     }
 
     :focus-visible {
