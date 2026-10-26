@@ -1,0 +1,45 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://texuli.com/",
+      "links": [
+        {
+          "rel": "service-doc",
+          "href": "https://texuli.com/llms.txt",
+          "type": "text/plain",
+          "title": "Texuli site guide for LLMs"
+        },
+        {
+          "rel": "service-doc",
+          "href": "https://texuli.com/llms/llms-full.txt",
+          "type": "text/plain",
+          "title": "Texuli full content corpus for LLMs"
+        },
+        {
+          "rel": "item",
+          "href": "https://texuli.com/catalog/catalog.json",
+          "type": "application/json",
+          "title": "Catalog manifest snapshot"
+        },
+        {
+          "rel": "item",
+          "href": "https://texuli.com/llms/llms.txt",
+          "type": "text/plain",
+          "title": "Component docs bundle index"
+        },
+        {
+          "rel": "item",
+          "href": "https://texuli.com/skill/",
+          "type": "text/html",
+          "title": "The Texuli skill"
+        },
+        {
+          "rel": "describedby",
+          "href": "https://texuli.com/.well-known/ai-catalog.json",
+          "type": "application/json",
+          "title": "Agent Readiness Descriptor"
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { createReadStream, existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, relative, resolve } from 'node:path';
@@ -57,6 +58,17 @@ function currentLlmsTxt(): string {
       'Texuli is an open-source (MIT) Svelte 5 component system built from scratch: framework-free texels compose into headless primitives, the token engine styles them, and a closed agent catalog renders agent output with no HTML sinks. A Kotlin Multiplatform renderer for the same interfaces is in development.',
     sections: siteLlmsSections(SITE),
   });
+}
+
+/** Whether a site URL exists in the build (files first, then directory HTML). */
+function builtPath(url: string): string | null {
+  if (!url.startsWith(`${SITE}/`)) return null;
+  const path = url.slice(SITE.length);
+  const file = normalize(join(DIST, path));
+  if (!file.startsWith(DIST)) return null;
+  if (existsSync(file) && statSync(file).isFile()) return file;
+  const dirIndex = join(file, 'index.html');
+  return existsSync(dirIndex) ? dirIndex : null;
 }
 
 test.describe('root llms.txt', () => {
@@ -186,10 +198,91 @@ test.describe('markdown twins (docs pages)', () => {
     const button = readFileSync(join(DIST, 'component-pages/button.md'), 'utf8');
     const lines = button.split('\n');
     const doubled = lines.filter(
-      (line, index) =>
-        /^\| --- /.test(line) && /^\| --- /.test(lines[index - 1] ?? '')
+      (line, index) => /^\| --- /.test(line) && /^\| --- /.test(lines[index - 1] ?? '')
     );
     expect(doubled).toEqual([]);
     expect((button.match(/^\| --- /gm) ?? []).length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+test.describe('.well-known agent discovery (T-25)', () => {
+  /** The four discovery documents, served and parsed. */
+  function fetchWellKnown() {
+    const read = (path: string) => JSON.parse(readFileSync(join(DIST, path), 'utf8')) as never;
+    return {
+      aiCatalog: read('.well-known/ai-catalog.json') as {
+        host: { displayName: string };
+        entries: { identifier: string; url: string; type: string }[];
+      },
+      apiCatalog: read('.well-known/api-catalog') as {
+        linkset: { anchor: string; links: { rel: string; href: string }[] }[];
+      },
+      serverCard: read('.well-known/mcp/server-card.json') as {
+        serverInfo: { name: string; version: string };
+        transport: { stdio: { launch: string } };
+        capabilities: string[];
+        tools: string[];
+      },
+      skillIndex: read('.well-known/agent-skills/index.json') as {
+        skills: { name: string; url: string; digest: string }[];
+      },
+    };
+  }
+
+  test('the quartet exists, parses and describes only real surfaces', () => {
+    const { aiCatalog, apiCatalog, serverCard } = fetchWellKnown();
+    expect(aiCatalog.host.displayName).toBe('Texuli');
+    expect(aiCatalog.entries.length).toBeGreaterThanOrEqual(6);
+    const identifiers = aiCatalog.entries.map((entry) => entry.identifier);
+    expect(new Set(identifiers).size).toBe(identifiers.length);
+    // Every texuli.com URL in the ARD and the linkset resolves in the build;
+    // the only off-site host allowed is the npm registry.
+    for (const url of [
+      ...aiCatalog.entries.map((entry) => entry.url),
+      ...apiCatalog.linkset.flatMap((set) => set.links.map((link) => link.href)),
+    ]) {
+      if (!url.startsWith(`${SITE}/`)) {
+        expect(url, 'off-site ARD URLs').toMatch(/^https:\/\/www\.npmjs\.com\//);
+        continue;
+      }
+      expect(builtPath(url), url).not.toBeNull();
+    }
+    // The server card describes the real stdio surface: the five shipped
+    // tools, launched from the tools package source, no hosted endpoint.
+    expect(serverCard.serverInfo.name).toBe('texuli');
+    expect(new Set(serverCard.tools)).toEqual(
+      new Set(['catalog', 'component', 'validate', 'example', 'theme'])
+    );
+    expect(serverCard.capabilities).toContain('tools');
+    expect(serverCard.transport.stdio.launch).toContain('tsx src/mcp/stdio.ts');
+    expect(JSON.stringify(serverCard)).not.toContain('"streamableHttp"');
+  });
+
+  test('the agent-skills index digests match the served skill pack', () => {
+    const { skillIndex } = fetchWellKnown();
+    expect(skillIndex.skills.length).toBeGreaterThanOrEqual(6);
+    for (const skill of skillIndex.skills) {
+      const file = builtPath(skill.url);
+      expect(file, skill.url).not.toBeNull();
+      expect(
+        createHash('sha256')
+          .update(readFileSync(file as string))
+          .digest('hex')
+      ).toBe(skill.digest.replace(/^sha256:/, ''));
+    }
+  });
+
+  test('the quartet is served with the right status from the static host', async ({ request }) => {
+    for (const path of [
+      '/.well-known/ai-catalog.json',
+      '/.well-known/api-catalog',
+      '/.well-known/mcp/server-card.json',
+      '/.well-known/agent-skills/index.json',
+      '/skill-pack/SKILL.md',
+      '/skill-pack/SHA256SUMS',
+    ]) {
+      const response = await request.get(`${origin}${path}`);
+      expect(response.status(), path).toBe(200);
+    }
   });
 });

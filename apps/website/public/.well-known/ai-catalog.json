@@ -1,0 +1,114 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Texuli",
+    "identifier": "did:web:texuli.com",
+    "documentationUrl": "https://texuli.com/docs/",
+    "logoUrl": "https://texuli.com/brand/logo.svg"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:texuli.com:content:llms-txt",
+      "displayName": "Texuli Site Guide for LLMs",
+      "type": "text/plain",
+      "url": "https://texuli.com/llms.txt",
+      "description": "Curated map of texuli.com for language models: getting started, guides, component families, primitives, themes and the agent surfaces, as Markdown links.",
+      "tags": ["llms-txt", "content", "navigation"],
+      "representativeQueries": [
+        "what is Texuli and what can I build with it",
+        "give me a map of the Texuli component families",
+        "how do Texuli web components relate to the Kotlin renderer"
+      ]
+    },
+    {
+      "identifier": "urn:air:texuli.com:content:llms-full-txt",
+      "displayName": "Texuli Full Content Corpus for LLMs",
+      "type": "text/plain",
+      "url": "https://texuli.com/llms/llms-full.txt",
+      "description": "Expanded llms.txt corpus with the catalog's component documentation for retrieval and grounding. Every docs page also has a Markdown twin at the same path plus .md (guides/theming.md beside guides/theming/).",
+      "tags": ["llms-txt", "content", "corpus", "markdown"],
+      "representativeQueries": [
+        "read the full Texuli component documentation for grounding",
+        "fetch the Markdown twin of the Button component page"
+      ]
+    },
+    {
+      "identifier": "urn:air:texuli.com:content:component-docs",
+      "displayName": "Texuli Component Docs Bundle",
+      "type": "text/plain",
+      "url": "https://texuli.com/llms/llms.txt",
+      "description": "The llms bundle index over one pre-rendered Markdown document per catalog component (133 today), each also served standalone at /llms/components/<id>.md.",
+      "tags": ["llms-txt", "components", "catalog"],
+      "representativeQueries": [
+        "list every Texuli component with its llms doc",
+        "open the llms doc for the dialog component"
+      ]
+    },
+    {
+      "identifier": "urn:air:texuli.com:data:catalog",
+      "displayName": "Texuli Catalog Manifest Snapshot",
+      "type": "application/json",
+      "url": "https://texuli.com/catalog/catalog.json",
+      "description": "The agent catalog snapshot: every component manifest with props, variants, examples, a11y notes and keyboard interactions — the data the sink-free renderer consumes. A README beside it names the content hash.",
+      "tags": ["catalog", "json", "components", "a2ui"],
+      "capabilities": [
+        "component manifests with prop schemas",
+        "examples as renderable props",
+        "a11y and keyboard documentation per component"
+      ],
+      "representativeQueries": [
+        "fetch the Texuli catalog snapshot as JSON",
+        "what props does the Texuli button component accept",
+        "which Texuli components are agent-emittable"
+      ]
+    },
+    {
+      "identifier": "urn:air:texuli.com:api:catalog",
+      "displayName": "Texuli API Catalog",
+      "type": "application/linkset+json",
+      "url": "https://texuli.com/.well-known/api-catalog",
+      "description": "RFC 9727 API catalog linkset pointing at the site's service documentation (llms.txt), the catalog snapshot, the component docs bundle and the skill.",
+      "tags": ["api-catalog", "rfc9727", "linkset"],
+      "representativeQueries": [
+        "where is the API catalog for texuli.com",
+        "find the service documentation for Texuli"
+      ]
+    },
+    {
+      "identifier": "urn:air:texuli.com:skills:agent-readiness",
+      "displayName": "Texuli Agent Skills Index",
+      "type": "application/agent-skills+json",
+      "url": "https://texuli.com/.well-known/agent-skills/index.json",
+      "description": "Agent Skills Discovery index listing every SKILL.md in the Texuli skill pack — the router and each sub-skill — served with the pack itself under /skill-pack/ and pinned by SHA-256 digest.",
+      "tags": ["agent-skills", "discovery", "well-known"],
+      "representativeQueries": [
+        "which agent skills does texuli.com publish",
+        "show the agent skills discovery index for Texuli"
+      ]
+    },
+    {
+      "identifier": "urn:air:texuli.com:skills:pack",
+      "displayName": "The Texuli Skill Pack",
+      "type": "text/markdown",
+      "url": "https://texuli.com/skill-pack/SKILL.md",
+      "description": "The distributable Texuli skill, served raw: a router that teaches coding agents to build with Texuli (components, themes, media, blueprints, contribution). Offline and install-free to read; the /skill/ page documents per-host installation and checksums.",
+      "tags": ["skill", "agents", "documentation"],
+      "representativeQueries": [
+        "read the Texuli skill router for coding agents",
+        "how do I install the Texuli skill in my coding agent"
+      ]
+    },
+    {
+      "identifier": "urn:air:texuli.com:package:npm",
+      "displayName": "Texuli on npm",
+      "type": "application/vnd.npm.package+json",
+      "url": "https://www.npmjs.com/package/texuli",
+      "description": "The Texuli package on npm (prerelease dist-tag next): styled components built on owned primitives, tokens and the agent catalog. Fourteen scoped @texuli/* packages ship alongside it.",
+      "tags": ["npm", "svelte", "components", "prerelease"],
+      "representativeQueries": [
+        "install Texuli from npm",
+        "which @texuli packages exist on npm"
+      ]
+    }
+  ]
+}

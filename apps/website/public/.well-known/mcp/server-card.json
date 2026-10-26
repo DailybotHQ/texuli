@@ -1,0 +1,18 @@
+{
+  "serverInfo": {
+    "name": "texuli",
+    "title": "Texuli MCP Server",
+    "version": "0.0.0",
+    "description": "Read-only MCP server over the Texuli catalog and themes: list catalog components, open one component's manifest, validate manifests, inspect examples and enumerate theme metadata. Local stdio transport from the repository source (packages/tools/src/mcp); there is no hosted endpoint and nothing is modified."
+  },
+  "transport": {
+    "stdio": {
+      "launch": "pnpm --filter @texuli/tools exec tsx src/mcp/stdio.ts",
+      "workingDirectory": "the texuli repository root",
+      "protocolVersion": "2025-06-18",
+      "authentication": "none"
+    }
+  },
+  "capabilities": ["tools"],
+  "tools": ["catalog", "component", "validate", "example", "theme"]
+}

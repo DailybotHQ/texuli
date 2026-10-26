@@ -4,6 +4,7 @@ import { defineConfig } from 'astro/config';
 import { copyPageIntegration } from './src/components/docs/integration.ts';
 import { cspIntegration } from './src/components/security/csp.ts';
 import { seoIntegration } from './src/components/seo/integration.ts';
+import { skillPackIntegration } from './src/integrations/skill-pack.ts';
 
 // texuli.com is a static site built with Texuli itself. Pages import the
 // workspace packages directly, so a broken component breaks the build.
@@ -40,7 +41,13 @@ export default defineConfig({
   build: { format: 'directory', inlineStylesheets: 'auto' },
   // After the build: "Copy page" Markdown for docs pages, then the sitemap,
   // robots and per-page social images.
-  integrations: [svelte(), copyPageIntegration(), seoIntegration(), cspIntegration()],
+  integrations: [
+    svelte(),
+    copyPageIntegration(),
+    skillPackIntegration(),
+    seoIntegration(),
+    cspIntegration(),
+  ],
   vite: {
     // The workspace packages ship TypeScript and Svelte sources: compile them
     // into the build instead of loading them from node_modules at render time.
