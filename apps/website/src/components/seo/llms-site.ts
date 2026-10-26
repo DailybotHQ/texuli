@@ -70,6 +70,11 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
       ],
     },
     {
+      name: 'Platform',
+      description: 'The two-runtimes story: the architecture page and the native landing.',
+      links: nav('platform'),
+    },
+    {
       name: 'Guides',
       description: 'Task-first guides, in reading order.',
       links: GUIDES_SECTIONS.flatMap((section) => section.items)

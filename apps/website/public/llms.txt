@@ -13,6 +13,13 @@ What Texuli is and where to begin.
 - [Getting started](https://texuli.com/guides/getting-started/)
 - [Skill](https://texuli.com/skill/): The distributable agent skill for building with Texuli.
 
+## Platform
+
+The two-runtimes story: the architecture page and the native landing.
+
+- [Web + native](https://texuli.com/web-and-native/)
+- [Native (Kotlin)](https://texuli.com/native/)
+
 ## Guides
 
 Task-first guides, in reading order.
