@@ -101,14 +101,23 @@
    * one line and the table scrolls sideways, instead of wrapping names over
    * three lines; edge shadows on the wrapper show there is more to scroll.
    * Keyboard focus scrolls cells into view natively (nothing is pinned over
-   * them). Virtualized grids keep their fixed-height rows (their row metrics
-   * and keyboard paging assume them).
+   * them).
    */
   @container tx-table (max-width: 40rem) {
-    .tx-data-grid:not([data-virtual]) .tx-table__head,
-    .tx-data-grid:not([data-virtual]) .tx-table__cell {
+    .tx-data-grid .tx-table__head,
+    .tx-data-grid .tx-table__cell {
       white-space: nowrap;
     }
+  }
+
+  /*
+   * Windowed grids at every width: row positions come from `rowSize`, and a
+   * wrapped row is taller than that, so its text never wraps — the table
+   * scrolls sideways instead (the spacers and keyboard paging assume it).
+   */
+  .tx-data-grid[data-virtual] .tx-table__head,
+  .tx-data-grid[data-virtual] .tx-table__cell {
+    white-space: nowrap;
   }
 
   .tx-data-grid .tx-table-wrap {

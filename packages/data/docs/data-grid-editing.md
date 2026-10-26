@@ -54,9 +54,10 @@ Inline cell editing on top of the grid core: typed drafts, validation, undo/redo
 - **Enter** or **F2** on a focused editable cell opens the editor (lazy-loaded).
 - **Escape** cancels; **Enter** in the editor saves.
 - **Double-click** starts an edit.
+- **Moving focus away** (Tab, a click elsewhere, blur) **saves the edit for every editor type** — text, select and switch alike — and closes the editor.
 - **Ctrl/Cmd+Z** undo, **Ctrl/Cmd+Shift+Z** or **Y** redo (needs `onApply` + `onCommit`).
-- **Ctrl/Cmd+C** copies the cell as TSV; **V** pastes a block from the anchor cell over editable targets.
-- Failed commits keep the previous value and show `role="alert"` under the cell.
+- **Ctrl/Cmd+C** copies the cell as TSV; **V** pastes a block from the anchor cell over editable targets, and the live region announces how many cells the paste wrote.
+- Failed commits keep the previous value and show `role="alert"` under the cell; reopening the editor exposes `aria-invalid` and describes the error through `aria-describedby`.
 - Toolbar exposes Undo / Redo with the same stack.
 
 ## Labels

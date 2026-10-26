@@ -419,8 +419,13 @@ function onPointerCancel(event: PointerEvent): void {
         <section class="tx-board__column" data-wip={wip.status}>
           <header class="tx-board__column-header">
             <h3>{column.title}</h3>
-            <span class="tx-board__count" aria-label={labels.cardCount(count, column.wip?.hard)} dir="ltr">
-              <bdi>{new Intl.NumberFormat().format(count)}</bdi>{#if column.wip?.hard !== undefined}<span aria-hidden="true">/</span><bdi>{new Intl.NumberFormat().format(column.wip.hard)}</bdi>{/if}
+            <span class="tx-board__count" dir="ltr">
+              <span aria-hidden="true"
+                ><bdi>{new Intl.NumberFormat().format(count)}</bdi>{#if column.wip?.hard
+                  !== undefined}<span>/</span
+                  ><bdi>{new Intl.NumberFormat().format(column.wip.hard)}</bdi>{/if}</span
+              >
+              <span class="tx-board__sr-only">{labels.cardCount(count, column.wip?.hard)}</span>
             </span>
           </header>
           {#each grid.lanes as lane, laneIndex (lane.id)}

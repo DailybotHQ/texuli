@@ -108,8 +108,9 @@ Markers, routes and fences use **strong** semantic tones only:
 
 `default` and `accent` are accepted aliases of `primary` (never soft accent surfaces).
 Marker fills and route/fence strokes are gated at **3:1** (UI) against the map plate
-in `COMPONENT_CONTRAST_PAIRS` (`map.marker.*`, `map.route.*`, `map.fence.*`) across
-the full theme library. Glyph text uses the matching `*Foreground` on the fill (AA text).
+in `COMPONENT_CONTRAST_PAIRS` (`map.marker.*`, `map.route.primary`,
+`map.fence.warning`) across the full theme library. Glyph text uses the matching
+`*Foreground` on the fill (AA text).
 
 Shapes: `circle` (default), `square`, `diamond`, `pin`. Glyph is one or two characters.
 

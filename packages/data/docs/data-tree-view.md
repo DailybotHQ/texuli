@@ -14,7 +14,8 @@ An outline / file-tree data view over flat `{ id, parentId, rank }` rows with:
 - Expand and collapse, keyboard roving focus (APG tree pattern)
 - Lazy children via `loadChildren` + host merge through `onChildrenLoaded`
 - Multi-select checkboxes (`selected` bindable)
-- Drag reorder and keyboard outline edits (Alt+Up/Down, Tab indent, Shift+Tab outdent)
+- Drag reorder and keyboard outline edits (Alt+Up/Down reorder, Alt+Right indent,
+  Alt+Left outdent — flipped under RTL; Tab stays free for focus movement)
 - RTL via `dir="rtl"` and logical CSS
 - Live region announcements for moves and load errors
 
@@ -73,5 +74,6 @@ An outline / file-tree data view over flat `{ id, parentId, rank }` rows with:
 
 ## Tokens
 
-Uses `--tx-border`, `--tx-text`, `--tx-surface`, `--tx-primary`, `--tx-ring`,
-`--tx-muted-foreground`, `--tx-danger` with system-color fallbacks for forced colors.
+Uses `--tx-border`, `--tx-foreground`, `--tx-surface`, `--tx-primary`,
+`--tx-primary-foreground`, `--tx-ring`, `--tx-muted-foreground`, `--tx-danger`
+and the `--tx-radius-*` scale, with system-color fallbacks for forced colors.

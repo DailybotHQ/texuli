@@ -64,7 +64,9 @@ const window = $derived(
   })
 );
 const headerSize = 40;
-const activeId = $derived(`tx-virtual-grid-${active.row}-${active.col}`);
+/** Prefix for cell ids: unique per component instance, as activedescendant requires. */
+const uid = $props.id();
+const activeId = $derived(`${uid}-vc-${active.row}-${active.col}`);
 
 function text(row: T, column: VirtualGridColumn): string {
   if (cellValue) return cellValue(row, column);
@@ -91,6 +93,7 @@ async function onKeydown(event: KeyboardEvent): Promise<void> {
     columns: columns.length,
     pageSize: Math.max(1, Math.floor((measuredHeight || viewportHeight) / rowSize)),
     rtl,
+    ctrl: event.ctrlKey || event.metaKey,
   });
   if (!next) return;
   event.preventDefault();
@@ -149,10 +152,13 @@ async function onKeydown(event: KeyboardEvent): Promise<void> {
             {@const column = columns[colItem.index]}
             {#if column}
               <div
-                id="tx-virtual-grid-{rowItem.index}-{colItem.index}"
+                id="{uid}-vc-{rowItem.index}-{colItem.index}"
                 class="tx-virtual-data-grid__cell"
                 role="gridcell"
                 aria-colindex={colItem.index + 1}
+                data-tx-active={active.row === rowItem.index && active.col === colItem.index
+                  ? 'true'
+                  : undefined}
                 style="inset-inline-start: {colItem.start}px; inline-size: {colItem.size}px; block-size: {rowItem.size}px"
               >{text(row, column)}</div>
             {/if}
@@ -188,7 +194,6 @@ async function onKeydown(event: KeyboardEvent): Promise<void> {
     }
     .tx-virtual-data-grid__header {
       position: sticky;
-      position: sticky;
       display: block;
       inset-block-start: 0;
       z-index: 2;
@@ -206,6 +211,11 @@ async function onKeydown(event: KeyboardEvent): Promise<void> {
       white-space: nowrap;
       text-overflow: ellipsis;
     }
+    /* The active cell of the activedescendant pattern, visible to keyboard users. */
+    .tx-virtual-data-grid__cell[data-tx-active="true"] {
+      outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+      outline-offset: -2px;
+    }
     .tx-virtual-data-grid__heading {
       position: absolute;
       inset-block-start: 0;
@@ -216,6 +226,7 @@ async function onKeydown(event: KeyboardEvent): Promise<void> {
     @media (forced-colors: active) {
       .tx-virtual-data-grid, .tx-virtual-data-grid__cell { border-color: CanvasText; }
       .tx-virtual-data-grid:focus-visible { outline-color: Highlight; }
+      .tx-virtual-data-grid__cell[data-tx-active="true"] { outline-color: Highlight; }
     }
   }
 </style>

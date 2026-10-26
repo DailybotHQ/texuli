@@ -510,6 +510,7 @@ function dropSide(key: string): 'before' | 'after' | undefined {
   data-tx-data-grid
   data-tx-grid-columns
   data-column-menu-ready={columnMenuReady ? 'true' : 'false'}
+  data-grouped={runs.length > 0 ? '' : undefined}
   data-dragging={dragging ? '' : undefined}
   data-resizing={resizing ? '' : undefined}
   data-pins={stickyPins ? undefined : 'static'}
@@ -648,7 +649,17 @@ function dropSide(key: string): 'before' | 'after' | undefined {
                   onclick={(event) => sortClick(event, def.key)}
                 >
                   {def.header}
-                  <span class="tx-data-grid__sort-icon" aria-hidden="true">{direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}</span>
+                  <span class="tx-data-grid__sort-icon" aria-hidden="true">
+                    <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                      {#if direction === 'asc'}
+                        <path d="M6 10V2M3 5l3-3 3 3" />
+                      {:else if direction === 'desc'}
+                        <path d="M6 2v8m-3-3 3 3 3-3" />
+                      {:else}
+                        <path d="M6 1.5v9m-2.5-6L6 2l2.5 2.5m-5 3L6 10l2.5-2.5" />
+                      {/if}
+                    </svg>
+                  </span>
                   {#if sort.length > 1 && direction}
                     <span class="tx-data-grid__sort-rank" aria-hidden="true">{sort.findIndex((entry) => entry.key === def.key) + 1}</span>
                   {/if}

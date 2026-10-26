@@ -77,7 +77,7 @@ const name = $derived(
   .tx-calendar__event[data-tone="warning"] { --tx-event-accent: var(--tx-warning, Highlight); --tx-event-fill: var(--tx-warning-soft, color-mix(in oklab, var(--tx-warning, Highlight) 12%, var(--tx-background, Canvas))); }
   .tx-calendar__event[data-tone="danger"] { --tx-event-accent: var(--tx-destructive, Mark); --tx-event-fill: var(--tx-destructive-soft, color-mix(in oklab, var(--tx-destructive, Mark) 12%, var(--tx-background, Canvas))); }
   .tx-calendar__event[data-movable] { cursor: grab; touch-action: none; }
-  .tx-calendar__event:global([data-dragging]) { position: relative; z-index: 2; cursor: grabbing; opacity: .85; box-shadow: 0 4px 12px rgb(0 0 0 / .18); translate: var(--tx-calendar-drag-x, 0) var(--tx-calendar-drag-y, 0); }
+  .tx-calendar__event:global([data-dragging]) { position: relative; z-index: 2; cursor: grabbing; opacity: .85; box-shadow: var(--tx-shadow-float, 0 4px 12px color-mix(in srgb, CanvasText 18%, transparent)); translate: var(--tx-calendar-drag-x, 0) var(--tx-calendar-drag-y, 0); }
   .tx-calendar__event[data-grabbed] { position: relative; z-index: 2; outline: 2px dashed var(--tx-ring, Highlight); outline-offset: 1px; }
   .tx-calendar__event:focus-visible { outline: 2px solid var(--tx-ring, Highlight); outline-offset: 2px; }
   .tx-calendar__event-title, .tx-calendar__event-time { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

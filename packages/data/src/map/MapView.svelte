@@ -563,7 +563,7 @@ const surfaceHint = $derived(
               </div>
             {/if}
           {:else}
-            <div class="empty" role="listitem" aria-setsize="0" aria-posinset="1">No locations</div>
+            <div class="empty" role="listitem">No locations</div>
           {/each}
         </div>
       </div>

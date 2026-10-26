@@ -47,8 +47,6 @@ const DEFAULT_LABELS: FileBrowserLabels = {
   empty: 'This folder is empty',
   preview: 'Preview',
   previewEmpty: 'Select a file to preview',
-  openFolder: (name) => `Open ${name}`,
-  selectItem: (name) => `Select ${name}`,
   size: 'Size',
   modified: 'Modified',
   kind: 'Kind',
@@ -273,10 +271,10 @@ function thumbSrc(entry: FileEntry): string {
     <div
       id={itemsId}
       class="tx-files__items"
-      role="listbox"
+      role={children.length === 0 ? 'group' : 'listbox'}
       aria-label={labels.items}
-      aria-multiselectable="true"
-      aria-orientation={layout === 'list' ? 'vertical' : 'horizontal'}
+      aria-multiselectable={children.length === 0 ? undefined : 'true'}
+      aria-orientation={children.length === 0 ? undefined : layout === 'list' ? 'vertical' : 'horizontal'}
     >
       {#if children.length === 0}
         <p class="tx-files__empty">{labels.empty}</p>
@@ -541,6 +539,7 @@ function thumbSrc(entry: FileEntry): string {
     }
 
     .tx-files__check {
+      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -555,10 +554,13 @@ function thumbSrc(entry: FileEntry): string {
       cursor: pointer;
     }
 
-    .tx-files__check[aria-pressed='true'] {
-      background: var(--tx-primary, Highlight);
-      border-color: var(--tx-primary, Highlight);
-      color: var(--tx-primary-foreground, Canvas);
+    /* Invisible hit-area ring: the pointer target is 24px while the visible
+       box stays 20px (no painted pixels, so visual baselines hold). */
+    .tx-files__check::after {
+      content: '';
+      position: absolute;
+      inset-block: -0.125rem;
+      inset-inline: -0.125rem;
     }
 
     .tx-files__check svg {

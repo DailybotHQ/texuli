@@ -84,7 +84,7 @@
 
   .tx-grid-edit__error {
     margin: 0;
-    color: var(--tx-destructive, var(--tx-color-danger, #dc2626));
+    color: var(--tx-destructive, CanvasText);
     font-size: var(--tx-font-size-xs, 0.75rem);
   }
 

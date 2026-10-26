@@ -340,6 +340,15 @@ describe('MapView', () => {
     expect(Number.isFinite(last.zoom)).toBe(true);
   });
 
+  it('keeps the empty place row out of the set bookkeeping', () => {
+    render(MapView, { props: { markers: [] } });
+    const empty = screen.getByText('No locations');
+    expect(empty.getAttribute('role')).toBe('listitem');
+    // "1 of 0" is nonsense bookkeeping for a row that is not a real entry.
+    expect(empty.getAttribute('aria-posinset')).toBeNull();
+    expect(empty.getAttribute('aria-setsize')).toBeNull();
+  });
+
   it('packs the header at the top when the host container is taller than the content', async () => {
     const { readFileSync } = await import('node:fs');
     const { resolve } = await import('node:path');

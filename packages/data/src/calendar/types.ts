@@ -39,6 +39,8 @@ export interface CalendarLabels {
   week: string;
   day: string;
   agenda: string;
+  /** Name of the month / week / day / agenda switcher group. */
+  viewModes: string;
   loading: string;
   empty: string;
   allDay: string;
@@ -68,6 +70,8 @@ export interface CalendarLabels {
   addsEvent: string;
   /** Appended to a date's name when activating it creates an all-day event. */
   addsAllDayEvent: string;
+  /** The note shown when the occurrence expansion cap is reached. */
+  truncationNote: (count: number) => string;
 }
 
 export interface CalendarDay {
@@ -84,6 +88,7 @@ export const DEFAULT_CALENDAR_LABELS: CalendarLabels = {
   week: 'Week',
   day: 'Day',
   agenda: 'Agenda',
+  viewModes: 'Calendar view',
   loading: 'Loading calendar view',
   empty: 'No events scheduled.',
   allDay: 'All day',
@@ -117,4 +122,6 @@ export const DEFAULT_CALENDAR_LABELS: CalendarLabels = {
   emptySlot: (when) => `Empty slot, ${when}`,
   addsEvent: 'Enter adds an event',
   addsAllDayEvent: 'Enter adds an all-day event',
+  truncationNote: (count) =>
+    `Showing the first ${count.toLocaleString('en-US')} matching event occurrences.`,
 };

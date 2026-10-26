@@ -304,6 +304,7 @@ async function pasteAt(anchor: {
   const anchorRowIndex = rows.findIndex((row) => getRowId(row) === getRowId(anchor.row));
   if (anchorRowIndex < 0) return;
 
+  let written = 0;
   for (const plan of plans) {
     const row = rows[anchorRowIndex + plan.rowOffset];
     const column = columns[anchor.colIndex + plan.colOffset];
@@ -327,11 +328,14 @@ async function pasteAt(anchor: {
         next: checked.value,
       });
       touchStack();
+      written += 1;
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : 'Not saved.';
       errors = { ...errors, [cellKey(getRowId(row), column.key)]: message };
     }
   }
+  // A paste changes many cells at once; the live region names the result.
+  if (written > 0) announce = editText.pasted(written);
 }
 
 /** Undo (or redo) the last edit and write it back through the host. */
@@ -413,6 +417,9 @@ async function runHistory(redo: boolean): Promise<void> {
           <CellEditor
             column={editable}
             draft={editing.draft}
+            saveLabel={editText.save}
+            invalid={Boolean(errors[key])}
+            describedBy={errors[key] ? `${id}--${editable.key}--error` : undefined}
             onDraft={(draft) => {
               if (editing) editing = { ...editing, draft };
             }}
@@ -423,7 +430,9 @@ async function runHistory(redo: boolean): Promise<void> {
           {displayCellText(row, editable, id, optimistic)}
         {/if}
         {#if errors[key]}
-          <p class="tx-grid-edit__error" role="alert">{errors[key]}</p>
+          <p id={`${id}--${editable.key}--error`} class="tx-grid-edit__error" role="alert">
+            {errors[key]}
+          </p>
         {/if}
       </div>
     {/snippet}

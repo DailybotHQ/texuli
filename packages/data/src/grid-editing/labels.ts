@@ -1,11 +1,16 @@
 export interface GridEditingLabels {
   invalidNumber: string;
+  invalidDate: string;
   invalidEnum: string;
   required: string;
   saved: string;
   notSaved: (header: string, message: string) => string;
+  /** Announced after a paste; the count is the cells written. */
+  pasted: (count: number) => string;
   undo: string;
   redo: string;
+  /** The boolean editor's confirm button. */
+  save: string;
   editInstructions: string;
   editorCouldNotLoad: string;
 }
@@ -15,12 +20,15 @@ export type GridEditingLabelOverrides = Partial<GridEditingLabels>;
 export const DEFAULT_GRID_EDITING_LABELS: Readonly<GridEditingLabels> =
   /* @__PURE__ */ Object.freeze({
     invalidNumber: 'Enter a valid number.',
+    invalidDate: 'Enter a valid date.',
     invalidEnum: 'Choose a listed option.',
     required: 'A value is required.',
     saved: 'Saved.',
     notSaved: (header: string, message: string) => `${header} was not saved: ${message}`,
+    pasted: (count: number) => `Pasted ${count} ${count === 1 ? 'cell' : 'cells'}.`,
     undo: 'Undo',
     redo: 'Redo',
+    save: 'Save',
     editInstructions:
       'Enter or F2 edits the cell. Escape cancels. Control or Command plus Z undoes; Shift plus Z or Y redoes. Control or Command plus C copies; V pastes.',
     editorCouldNotLoad: 'The cell editor could not load.',

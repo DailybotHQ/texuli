@@ -63,7 +63,89 @@ export function progressValue(value: number | undefined): number {
   return Math.max(0, Math.min(100, value));
 }
 
-/** Pixel position along the time axis; RTL mirrors from the inline-end edge. */
+/**
+ * Every user-facing string of the timeline view. Defaults are the original
+ * English strings; pass a partial `labels` prop to translate or reword.
+ */
+export interface TimelineLabels {
+  /** The toolbar toggle's label, off and on. */
+  milestonesOnly: string;
+  showAllTasks: string;
+  /** Name of the zoom button group. */
+  zoomGroup: string;
+  loading: string;
+  loadError: string;
+  retry: string;
+  /** The notice shown when rows were truncated to `maxRows`. */
+  truncated: (visible: number, total: number, hidden: number) => string;
+  /** The notice and its inline action while milestones-only is on. */
+  milestonesNotice: string;
+  showAll: string;
+  /** Name of the undated-tasks tray and its heading. */
+  unscheduledTray: string;
+  unscheduledHeading: string;
+  /** Column headers of the task table. */
+  columns: { task: string; start: string; end: string; duration: string };
+  /** Name of the task table ("Launch plan tasks"). */
+  tasksTable: (label: string) => string;
+  empty: string;
+  /** Live announcements around a reschedule. */
+  saving: string;
+  saved: (count: number) => string;
+  saveFailed: string;
+  cancelled: string;
+  pickedUp: (title: string) => string;
+  /** Dates arrive formatted for the locale ("June 2, 2026"). */
+  preview: (title: string, start: string, end: string) => string;
+  /** Visible chip on the today line. */
+  todayLabel: string;
+  /** Mark naming a task on the critical path. */
+  criticalPath: string;
+  /** `aria-roledescription` of a reschedulable task bar. */
+  reschedulableTask: string;
+  /** Bar suffixes: a milestone, and while its save is pending. */
+  milestoneSuffix: string;
+  savingSuffix: string;
+  /** The Duration cell; a milestone takes no days. */
+  duration: (days: number, milestone: boolean) => string;
+}
+
+export const DEFAULT_TIMELINE_LABELS: TimelineLabels = {
+  milestonesOnly: 'Milestones only',
+  showAllTasks: 'Show all tasks',
+  zoomGroup: 'Timeline zoom',
+  loading: 'Loading timeline…',
+  loadError: 'Could not load the timeline.',
+  retry: 'Retry',
+  truncated: (visible, total, hidden) =>
+    `Showing ${visible} of ${total} scheduled tasks; ${hidden} are hidden.`,
+  milestonesNotice: 'Showing only milestone tasks',
+  showAll: 'Show all',
+  unscheduledTray: 'Unscheduled tasks',
+  unscheduledHeading: 'Unscheduled',
+  columns: { task: 'Task', start: 'Start', end: 'End', duration: 'Duration' },
+  tasksTable: (label) => `${label} tasks`,
+  empty: 'No scheduled tasks in this range.',
+  saving: 'Saving schedule changes…',
+  saved: (count) => `Saved ${count} schedule change${count === 1 ? '' : 's'}.`,
+  saveFailed: 'The schedule was not saved; dates were restored.',
+  cancelled: 'Reschedule cancelled.',
+  pickedUp: (title) =>
+    `Picked up ${title}. Use arrow keys to adjust dates; Enter saves, Escape cancels.`,
+  preview: (title, start, end) => `${title} preview: ${start} to ${end}.`,
+  todayLabel: 'Today',
+  criticalPath: 'Critical path',
+  reschedulableTask: 'reschedulable task',
+  milestoneSuffix: 'milestone',
+  savingSuffix: 'saving',
+  duration: (days, milestone) => (milestone ? 'Milestone' : `${days} day${days === 1 ? '' : 's'}`),
+};
+
+/**
+ * Physical pixel position along the time axis for canvas and SVG drawing,
+ * which cannot mirror with `dir`: RTL mirrors from the inline-end edge. CSS
+ * insets use the logical properties and need no mirror.
+ */
 export function axisPixel(
   dayOffset: number,
   dayWidth: number,

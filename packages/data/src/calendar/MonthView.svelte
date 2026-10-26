@@ -95,7 +95,7 @@ const weekdays = $derived(weeks[0]?.map((cell) => fmt.weekday(cell.date)) ?? [])
   .tx-calendar__month-week { min-block-size: 6rem; border-block-end: 1px solid var(--tx-border, ButtonBorder); }
   .tx-calendar__month-cell { display: flex; min-inline-size: 0; flex-direction: column; gap: .2rem; overflow: hidden; border-inline-end: 1px solid var(--tx-border, ButtonBorder); padding: .25rem; }
   .tx-calendar__outside { background: color-mix(in srgb, var(--tx-muted, Canvas) 45%, transparent); }
-  .tx-calendar__date { align-self: start; min-inline-size: 1.75rem; border-radius: 999px; padding: .2rem; color: inherit; text-align: center; font-size: .75rem; }
+  .tx-calendar__date { align-self: start; min-inline-size: 1.75rem; min-block-size: 1.5rem; border-radius: 999px; padding: .2rem; color: inherit; text-align: center; font-size: .75rem; }
   .tx-calendar__date:focus-visible { outline: 2px solid var(--tx-ring, Highlight); outline-offset: 2px; }
   .tx-calendar__today { background: var(--tx-primary, Highlight); color: var(--tx-primary-foreground, HighlightText); }
   .tx-calendar__more { color: var(--tx-muted-foreground, GrayText); font-size: .7rem; }

@@ -53,12 +53,14 @@ describe('@texuli/data/board', () => {
   });
 
   it('keeps a hard WIP limit and explains the rejected keyboard drop', async () => {
-    const { container } = render(BoardHarness);
-    const count = container.querySelector('[aria-label="1 card, limit 1"]');
-    expect(count).not.toBeNull();
+    render(BoardHarness);
+    // The count must reach assistive tech as text, not as a label on a
+    // roleless span; the 1/1 fraction stays visual-only.
+    const announced = screen.getByText('1 card, limit 1');
+    expect(announced).toBeTruthy();
+    const count = announced.closest('.tx-board__count');
     expect(count?.getAttribute('dir')).toBe('ltr');
-    expect(count?.querySelectorAll('bdi')).toHaveLength(2);
-    expect([...count!.querySelectorAll('bdi')].map((part) => part.textContent)).toEqual(['1', '1']);
+    expect(count?.querySelector('[aria-hidden="true"]')?.textContent).toBe('1/1');
     const handle = screen.getByRole('button', { name: 'Drag Alpha task' });
 
     await fireEvent.keyDown(handle, { key: ' ' });

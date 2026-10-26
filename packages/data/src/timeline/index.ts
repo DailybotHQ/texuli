@@ -32,6 +32,7 @@ export {
 export {
   axisPixel,
   DAY_WIDTH,
+  DEFAULT_TIMELINE_LABELS,
   dateAtOffset,
   dateOffset,
   durationLabel,
@@ -39,6 +40,7 @@ export {
   progressValue,
   ROW_HEIGHT,
   TASK_COLUMN_WIDTH,
+  type TimelineLabels,
   type TimelineZoom,
   timelineRange,
   ZOOMS,

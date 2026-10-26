@@ -116,4 +116,40 @@ describe('FileBrowser', () => {
     await fireEvent.keyDown(brief, { key: 'Backspace' });
     await waitFor(() => expect(screen.getByLabelText('Folder id').textContent).toBe('root'));
   });
+
+  it('drops the listbox role on an empty folder so the empty text is not a listbox child', async () => {
+    render(FileBrowserHarness);
+    // A folder with children keeps the full listbox contract.
+    const filled = screen.getByRole('listbox', { name: 'Folder contents' });
+    expect(filled.getAttribute('aria-multiselectable')).toBe('true');
+    await fireEvent.click(screen.getByRole('option', { name: /Empty/ }));
+    await waitFor(() => expect(screen.getByLabelText('Folder id').textContent).toBe('empty'));
+    // listbox requires owned options; an empty folder renders a plain group.
+    const items = screen.getByRole('group', { name: 'Folder contents' });
+    expect(items.getAttribute('role')).toBe('group');
+    expect(items.getAttribute('aria-multiselectable')).toBeNull();
+    expect(items.getAttribute('aria-orientation')).toBeNull();
+    expect(screen.getByText('This folder is empty')).toBeTruthy();
+    // Going back to a populated folder restores the listbox.
+    await fireEvent.click(screen.getByRole('button', { name: 'All files' }));
+    await waitFor(() =>
+      expect(screen.getByRole('listbox', { name: 'Folder contents' })).toBeTruthy()
+    );
+  });
+
+  it('gives the selection check a 24px hit area without enlarging the visible 20px box', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { resolve } = await import('node:path');
+    const source = readFileSync(
+      resolve(process.cwd(), 'packages/data/src/files/FileBrowser.svelte'),
+      'utf8'
+    );
+    // Visible box stays 1.25rem; the invisible ::after ring widens the target to 1.5rem.
+    expect(source).toMatch(/\.tx-files__check\s*{[^}]*position:\s*relative/s);
+    expect(source).toMatch(
+      /\.tx-files__check::after\s*{[^}]*inset-block:\s*-0\.125rem;[^}]*inset-inline:\s*-0\.125rem;/s
+    );
+    // The dead selected-state rule (the span never gets aria-pressed) is gone.
+    expect(source).not.toMatch(/\.tx-files__check\[aria-pressed/);
+  });
 });
