@@ -28,6 +28,16 @@ Automated browser checks do not establish that announcements are spoken by
 assistive technology. Re-run a live VoiceOver pass on Safari or Chrome before
 a release that changes those primitives.
 
+The website's page classes (landing, native landing, architecture page, a
+guide and the studios) had an **accessibility-tree pass** on 2026-10-26, not a
+screen-reader session: [quality/sr-transcripts-site.md](quality/sr-transcripts-site.md)
+reads Playwright `ariaSnapshot()` trees of the built site and lists the three
+page-layer fixes it made. It also recorded four studio findings (theme-studio
+label in name; the playground's false preview status, long preset names and
+replaced Validation status), which T-88 fixed and pins in
+`apps/website/tests/theme-studio-label-in-name.test.ts` and
+`apps/website/tests/playground-sr.test.ts`. No screen reader was run for it.
+
 ## Focus performance
 
 The Dialog behavior scenario measures from the trigger activation to the first
@@ -67,11 +77,36 @@ pnpm build
 TEXULI_E2E_PORT=<lane-port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts --project=chromium
 ```
 
+## Keyboard
+
+`tests/e2e/site-keyboard.spec.ts` walks one page per page class (landing,
+native, architecture, a guide, a component page, a studio, the theme
+gallery, the 404) with Tab until focus wraps to the first stop or falls to
+`body`: the skip link lands in `main` and the walk ends without a trap. It
+then checks that Shift+Tab lands on the last stop and retraces the last 8
+stops before it (fewer on a page with fewer stops), not the whole walk.
+Because focus falling to `body` also ends the walk, a control that drops
+focus mid-page would end it early. Desktop Chromium only.
+
+The website's tool islands (theme studio, color explorer, playground) have
+single-key shortcuts. Per WCAG 2.1.4 they are **active only while the focus
+is inside the tool** (`apps/website/src/components/tool-keys.ts`). They never
+fire in a field or in a widget with typeahead (listbox, menu, tree, grid,
+combobox), never with Control, Meta or Alt, and never for a key press
+another handler already handled. A handled shortcut prevents the browser's
+default action.
+
+```sh
+pnpm build
+TEXULI_E2E_PORT=<lane-port> pnpm exec playwright test tests/e2e/site-keyboard.spec.ts --project=chromium
+```
+
 ## Related docs
 
 | Doc | Role |
 | --- | --- |
 | [quality/sr-transcripts.md](quality/sr-transcripts.md) | VoiceOver transcripts for the six release primitives |
+| [quality/sr-transcripts-site.md](quality/sr-transcripts-site.md) | Accessibility-tree readings of the website page classes (no screen reader run) |
 | [quality/perf-primitives.md](quality/perf-primitives.md) | Measured primitive sizes and open-to-focus |
 | [STANDARDS.md](STANDARDS.md) | Authoring rules (names, `aria-hidden`, keyboard) |
 | [TESTING_GUIDE.md](TESTING_GUIDE.md) | axe, behavior, visual and SR gates |

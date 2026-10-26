@@ -52,7 +52,7 @@ const base = import.meta.env.BASE_URL;
                 data-tx-planned={row.kind === 'planned' ? '' : undefined}
               >
                 {row.statusLabel}
-              </span>
+              </span><span class="native-status__sep">: </span>
               <span class="native-status__detail">{row.detail}</span>
             </dd>
           </div>
@@ -212,6 +212,17 @@ const base = import.meta.env.BASE_URL;
   .native-status__badge[data-tx-status-badge='planned'] {
     background: transparent;
     color: var(--tx-muted-foreground);
+  }
+  /* Screen readers read the badge and the detail as one run without it
+     ("Shipped All 15 packages…"); the hidden colon splits the phrases
+     (T-90). Out of the flex flow, so the visual gap is unchanged. */
+  .native-status__sep {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   .native-status__detail {
     color: var(--tx-muted-foreground);
