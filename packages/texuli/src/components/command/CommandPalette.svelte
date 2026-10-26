@@ -78,6 +78,19 @@ let loading = $state(false);
 let searchError = $state<string | null>(null);
 let requestVersion = 0;
 let returnFocusTo: HTMLElement | null = null;
+let wasOpen = false;
+
+// Remember who had focus on every closed -> open transition, also when a
+// parent opens the palette through bind:open (a header trigger, a deferred
+// first shortcut): closing must give focus back, never drop it (WCAG 2.4.3).
+// `$effect.pre` runs before the dialog mounts and moves focus.
+$effect.pre(() => {
+  if (open && !wasOpen && returnFocusTo === null) {
+    const active = document.activeElement;
+    returnFocusTo = active instanceof HTMLElement && active !== document.body ? active : null;
+  }
+  wasOpen = open;
+});
 
 const visibleItems = $derived(query.trim() ? results : [...recentItems]);
 const groupedItems = $derived.by(() => {

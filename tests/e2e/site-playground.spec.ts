@@ -78,7 +78,7 @@ test.describe('texuli.com agent playground', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Agent playground' })).toBeVisible();
     await expect(page.locator('[data-tx-playground]')).toBeVisible();
     await expect(page.getByLabel('Catalog tree JSON')).toBeVisible();
-    await expect(page.getByLabel('Preset')).toBeVisible();
+    await expect(page.getByLabel('Preset', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Render tree' })).toBeVisible();
   });
 
@@ -93,7 +93,7 @@ test.describe('texuli.com agent playground', () => {
 
   test('hostile dialog preset becomes a placeholder with diagnostics', async ({ page }) => {
     expect(await visit(page, '/playground/')).toEqual([]);
-    const select = page.getByLabel('Preset');
+    const select = page.getByLabel('Preset', { exact: true });
     // Prefer the fake-dialog sample when present.
     const options = await select
       .locator('option')

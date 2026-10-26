@@ -20,7 +20,7 @@ import { Input } from 'texuli/input';
 import { ToggleGroup, ToggleGroupItem } from 'texuli/toggle';
 import { withBase } from '../foundation/site.ts';
 import { loadThemeData } from '../perf/theme-assets.ts';
-import { type ToolShortcutMap, toolShortcut } from '../tool-keys.ts';
+import { runToolShortcut, type ToolShortcutMap } from '../tool-keys.ts';
 import PreviewKit from './PreviewKit.svelte';
 import {
   aaSummary,
@@ -319,9 +319,10 @@ async function copyShare(): Promise<void> {
 
 const STUDIO_KEYS: ToolShortcutMap = { g: 'generate', d: 'mode', c: 'copy', '?': 'keys' };
 
-function onStudioKey(event: KeyboardEvent): void {
-  const action = toolShortcut(event, event.target, STUDIO_KEYS);
-  if (!action) return;
+/** Shortcuts are active only while the focus is inside the studio (WCAG 2.1.4). */
+let toolRoot = $state<HTMLElement>();
+
+function onStudioAction(action: string): void {
   if (action === 'keys') {
     keysOpen = !keysOpen;
     return;
@@ -334,6 +335,10 @@ function onStudioKey(event: KeyboardEvent): void {
   } else if (action === 'copy') {
     void copyExport();
   }
+}
+
+function onStudioKey(event: KeyboardEvent): void {
+  runToolShortcut(event, toolRoot, STUDIO_KEYS, onStudioAction);
 }
 
 async function onImageChange(event: Event): Promise<void> {
@@ -411,7 +416,7 @@ async function copyExport(): Promise<void> {
 
 <svelte:window onkeydown={onStudioKey} />
 
-<div class="studio" data-tx-theme-studio="">
+<div class="studio" data-tx-theme-studio="" bind:this={toolRoot}>
   <div class="studio__controls">
     <section class="panel" aria-labelledby="studio-start-title">
       <h2 id="studio-start-title">Start from</h2>
@@ -477,11 +482,11 @@ async function copyExport(): Promise<void> {
           />
         </label>
         <label class="field">
-          <span class="field__label">Secondary (optional)</span>
+          <span class="field__label">Secondary color (optional)</span>
           <Input
             type="text"
             bind:value={secondary}
-            aria-label="Secondary color"
+            aria-label="Secondary color (optional)"
             placeholder="#e11d48"
           />
         </label>
@@ -554,7 +559,7 @@ async function copyExport(): Promise<void> {
       </label>
       <label class="field">
         <span class="field__label">Color for {mode} mode</span>
-        <Input type="text" bind:value={tuneHex} aria-label="Role color" placeholder="#rrggbb" />
+        <Input type="text" bind:value={tuneHex} aria-label={`Color for ${mode} mode`} placeholder="#rrggbb" />
       </label>
       <Button type="button" variant="outline" onclick={applyRole}>Apply role</Button>
     </section>
@@ -588,7 +593,8 @@ async function copyExport(): Promise<void> {
       <summary>Keyboard</summary>
       <p class="hint">
         Tab moves through the controls; the selects and toggle groups answer the arrow keys. The
-        shortcuts below do not fire while you type in a field.
+        shortcuts below work only while the focus is inside the studio, and they
+        do not fire while you type in a field.
       </p>
       <ul class="keys__list">
         <li><kbd>G</kbd> generate a theme from the current source</li>

@@ -63,6 +63,20 @@ describe('Command palette', () => {
     expect(screen.getByRole('option', { name: /Open inbox/i })).toBeTruthy();
   });
 
+  it('returns focus to the trigger when a parent-opened palette closes with Escape', async () => {
+    // WCAG 2.4.3 (PLAN_006 T-88 R1): opened through bind:open by its trigger,
+    // not by the palette's own shortcut, the palette must still give focus
+    // back to the element that had it, never drop it to the body.
+    render(CommandHarness, { props: { mode: 'palette', open: false, shortcut: false } });
+    const trigger = screen.getByRole('button', { name: /Search commands/i });
+    trigger.focus();
+    await fireEvent.click(trigger);
+    const dialog = await screen.findByRole('dialog', { name: 'Command palette' });
+    await fireEvent.keyDown(dialog, { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+  });
+
   it('runs search and selects a result', async () => {
     const onPaletteSelect = vi.fn();
     render(CommandHarness, {

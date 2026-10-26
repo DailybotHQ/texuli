@@ -18,7 +18,7 @@ import {
   readCachedThemeId,
   readModePreference,
 } from '../theme-switcher/appearance.ts';
-import { type ToolShortcutMap, toolShortcut } from '../tool-keys.ts';
+import { runToolShortcut, type ToolShortcutMap } from '../tool-keys.ts';
 import type { ExplorerThemePayload } from './build.ts';
 import { buildExportText, type ExportFormat } from './export-formats.ts';
 import { formatRatio } from './format.ts';
@@ -163,9 +163,15 @@ const EXPLORER_KEYS: ToolShortcutMap = {
   '?': 'keys',
 };
 
+/** Shortcuts are active only while the focus is inside the explorer (WCAG 2.1.4). */
+let toolRoot = $state<HTMLElement>();
+
 function onExplorerKey(event: KeyboardEvent): void {
-  const action = toolShortcut(event, event.target, EXPLORER_KEYS);
-  if (!action) return;
+  // The runner prevents the default, so `/` never also types into the filter.
+  runToolShortcut(event, toolRoot, EXPLORER_KEYS, onExplorerAction);
+}
+
+function onExplorerAction(action: string): void {
   if (action === 'keys') {
     keysOpen = !keysOpen;
     return;
@@ -182,7 +188,12 @@ function onExplorerKey(event: KeyboardEvent): void {
 
 <svelte:window onkeydown={onExplorerKey} />
 
-<section class="explorer" aria-labelledby="color-explorer-title" data-tx-color-explorer>
+<section
+  class="explorer"
+  aria-labelledby="color-explorer-title"
+  data-tx-color-explorer
+  bind:this={toolRoot}
+>
   <header class="intro">
     <h1 id="color-explorer-title">Color and token explorer</h1>
     <p class="lead">
@@ -204,8 +215,8 @@ function onExplorerKey(event: KeyboardEvent): void {
       <summary>Keyboard</summary>
       <p class="keys__hint">
         Tab reaches the theme list, the toggles and the export; the toggles answer the arrow keys,
-        and the pairs table scrolls with the keyboard once focused. These shortcuts do not fire
-        while you type in the filter.
+        and the pairs table scrolls with the keyboard once focused. These shortcuts work only while
+        the focus is inside the explorer, and do not fire while you type in the filter.
       </p>
       <ul class="keys__list">
         <li><kbd>/</kbd> jump to the theme filter</li>

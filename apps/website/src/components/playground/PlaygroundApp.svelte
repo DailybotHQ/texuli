@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { RenderNode } from '@texuli/catalog/render/renderer';
 import { Button } from 'texuli/button';
-import { type ToolShortcutMap, toolShortcut } from '../tool-keys.ts';
+import { runToolShortcut, type ToolShortcutMap } from '../tool-keys.ts';
 import { defaultEditorJson, PLAYGROUND_PRESETS, presetById } from './presets.ts';
 import { formatDiagnostics, type PlaygroundRunOk, runPlaygroundTree } from './run.ts';
 import TreePreview from './TreePreview.svelte';
@@ -61,6 +61,19 @@ function render(): void {
   diagnosticLines = formatDiagnostics(result);
 }
 
+// The first preset is pressed on load, so its sample has run: the preview and
+// the Validation status describe a real render, never an unrun tree (T-90).
+render();
+
+/** One persistent Validation status: its text changes, the live region stays. */
+const validationStatus = $derived.by(() => {
+  if (parseError) return 'The tree did not parse, so nothing was validated.';
+  if (!run) return 'Run Render tree to see diagnostics.';
+  const count = diagnosticLines.length;
+  if (count === 0) return 'No diagnostics. The tree is clean under the untrusted tier.';
+  return `${count} ${count === 1 ? 'diagnostic' : 'diagnostics'} under the untrusted tier, listed below.`;
+});
+
 function onPresetChange(event: Event): void {
   const value = (event.currentTarget as HTMLSelectElement).value;
   applyPreset(value);
@@ -70,38 +83,47 @@ function onPresetChange(event: Event): void {
 
 const PLAYGROUND_KEYS: ToolShortcutMap = { r: 'render', '?': 'keys' };
 
+/** Shortcuts are active only while the focus is inside the playground (WCAG 2.1.4). */
+let toolRoot = $state<HTMLElement>();
+
 function onPlaygroundKey(event: KeyboardEvent): void {
-  const action = toolShortcut(event, event.target, PLAYGROUND_KEYS);
-  if (!action) return;
-  if (action === 'keys') keysOpen = !keysOpen;
-  else if (action === 'render') render();
+  runToolShortcut(event, toolRoot, PLAYGROUND_KEYS, (action) => {
+    if (action === 'keys') keysOpen = !keysOpen;
+    else if (action === 'render') render();
+  });
 }
 </script>
 
 <svelte:window onkeydown={onPlaygroundKey} />
 
-<div class="playground" data-tx-playground="">
+<div class="playground" data-tx-playground="" bind:this={toolRoot}>
   <section class="playground__presets" aria-labelledby="playground-presets-heading">
     <h2 id="playground-presets-heading">Presets, and what each one proves</h2>
     <p class="playground__presets-lead">
       Every card loads its sample into the editor and runs it once. The hostile cards are the
-      corpus an agent host should expect; each caption states the property the neutralized output
-      demonstrates.
+      corpus an agent host should expect; each caption states what the rendered output keeps and
+      what the policy refuses.
     </p>
     <div class="presets" role="group" aria-label="Presets">
       {#each PLAYGROUND_PRESETS as preset (preset.id)}
-        <button
-          type="button"
-          class="preset"
-          class:preset--active={preset.id === presetId}
-          aria-pressed={preset.id === presetId}
-          data-tx-playground-preset={preset.id}
-          onclick={() => pickPreset(preset.id)}
-        >
-          <span class="preset__group" data-group={preset.group}>{preset.group}</span>
-          <span class="preset__label">{preset.label}</span>
-          <span class="preset__proves">{preset.proves}</span>
-        </button>
+        <!-- The button holds only the title (its name, WCAG 2.5.3); the tag and
+             the caption describe it, and its hit area stretches over the card. -->
+        <div class="preset" class:preset--active={preset.id === presetId}>
+          <span class="preset__group" id="playground-preset-{preset.id}-group" data-group={preset.group}
+            >{preset.group}</span
+          >
+          <button
+            type="button"
+            class="preset__label"
+            aria-pressed={preset.id === presetId}
+            aria-describedby="playground-preset-{preset.id}-group playground-preset-{preset.id}-proves"
+            data-tx-playground-preset={preset.id}
+            onclick={() => pickPreset(preset.id)}
+          >
+            {preset.label}
+          </button>
+          <span class="preset__proves" id="playground-preset-{preset.id}-proves">{preset.proves}</span>
+        </div>
       {/each}
     </div>
   </section>
@@ -144,7 +166,8 @@ function onPlaygroundKey(event: KeyboardEvent): void {
       <summary>Keyboard</summary>
       <p class="hint">
         The editor, select and buttons are ordinary controls: Tab moves between them and arrow keys
-        work inside the select. These shortcuts do not fire while you type in the editor.
+        work inside the select. These shortcuts work only while the focus is inside the playground,
+        and do not fire while you type in the editor.
       </p>
       <ul class="keys__list">
         <li><kbd>R</kbd> run the tree in the editor</li>
@@ -160,16 +183,20 @@ function onPlaygroundKey(event: KeyboardEvent): void {
         Output is plain data from the catalog renderer: components keep only sanitized props;
         unknown or tier-denied ids become placeholders. Nothing is executed as HTML.
       </p>
-      <TreePreview {roots} />
+      <TreePreview {roots} rendered={run !== null} />
     </section>
 
     <section class="panel" aria-labelledby="playground-diag-title">
       <h2 id="playground-diag-title">Validation</h2>
-      {#if !run && !parseError}
-        <p class="panel__lead" role="status">Run Render tree to see diagnostics.</p>
-      {:else if diagnosticLines.length === 0}
-        <p class="ok" role="status" data-tx-playground-ok="">No diagnostics. The tree is clean under the untrusted tier.</p>
-      {:else}
+      <p
+        class={run && diagnosticLines.length === 0 ? 'ok' : 'panel__lead'}
+        role="status"
+        data-tx-playground-status=""
+        data-tx-playground-ok={run && diagnosticLines.length === 0 ? '' : undefined}
+      >
+        {validationStatus}
+      </p>
+      {#if run && diagnosticLines.length > 0}
         <ul class="diag" data-tx-playground-diagnostics="">
           {#each diagnosticLines as line, i (i)}
             <li>{line}</li>
@@ -227,6 +254,7 @@ function onPlaygroundKey(event: KeyboardEvent): void {
     padding-block-end: 0.35rem;
   }
   .preset {
+    position: relative;
     display: grid;
     gap: 0.25rem;
     align-content: start;
@@ -235,9 +263,7 @@ function onPlaygroundKey(event: KeyboardEvent): void {
     border-radius: var(--tx-radius, 0.5rem);
     background: var(--tx-background);
     color: var(--tx-foreground);
-    font: inherit;
     text-align: start;
-    cursor: pointer;
     min-inline-size: 0;
   }
   .preset:hover {
@@ -247,7 +273,7 @@ function onPlaygroundKey(event: KeyboardEvent): void {
     border-color: var(--tx-ring);
     box-shadow: inset 0 0 0 1px var(--tx-ring);
   }
-  .preset:focus-visible {
+  .preset:has(.preset__label:focus-visible) {
     outline: 2px solid var(--tx-ring);
     outline-offset: 2px;
   }
@@ -265,9 +291,27 @@ function onPlaygroundKey(event: KeyboardEvent): void {
     border-color: var(--tx-success, var(--tx-border));
   }
   .preset__label {
+    justify-self: stretch;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
     font-weight: 600;
     font-size: 0.9375rem;
+    text-align: start;
     overflow-wrap: anywhere;
+    cursor: pointer;
+  }
+  /* The whole card is the hit area; the card draws the focus ring. */
+  .preset__label::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .preset__label:focus-visible {
+    outline: none;
   }
   .preset__proves {
     font-size: 0.8125rem;

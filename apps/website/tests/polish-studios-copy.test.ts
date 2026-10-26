@@ -61,7 +61,8 @@ describe('theme studio affordances (rows 2, 4, 8)', () => {
   it('documents the keyboard map in the UI', () => {
     expect(island).toContain('data-tx-studio-keys');
     expect(island).toContain('do not fire while you type in a field');
-    expect(island).toContain('toolShortcut');
+    expect(island).toContain('runToolShortcut');
+    expect(island).toContain('work only while the focus is inside the studio');
   });
 
   it('offers a local, decodes-locally share link', () => {
