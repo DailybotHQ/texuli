@@ -7,6 +7,7 @@ import {
   auditSite,
   canonicalOf,
   collectDist,
+  decodeEntities,
   isNoindex,
   jsonLdBlocks,
   metaContent,
@@ -126,6 +127,23 @@ describe('auditSite page checks', () => {
           finding.category === 'Canonical' && finding.detail.includes('does not self-reference')
       )
     ).toBe(true);
+  });
+
+  it('compares the decoded text: an escaped apostrophe in <title> matches the raw og:title', () => {
+    // Astro escapes `'` as `&#39;` in element text but not in attribute
+    // values; both mean the same string (T-98: /web-and-native/ false red).
+    const site = greenSite();
+    site.pages[1]!.html = site.pages[1]!.html.replace(
+      /<title>[^<]*<\/title>/,
+      '<title>Texuli&#39;s architecture &amp; seam · Texuli</title>'
+    ).replace(
+      /<meta property="og:title" content="[^"]*">/,
+      `<meta property="og:title" content="Texuli's architecture &amp; seam · Texuli">`
+    );
+    const opengraph = criticals(auditSite(site)).filter(
+      (finding) => finding.category === 'Open Graph'
+    );
+    expect(opengraph).toEqual([]);
   });
 
   it('flags missing description, missing og:image and a cross-bound og:title', () => {
@@ -307,6 +325,20 @@ describe('auditSite robots checks', () => {
 });
 
 describe('pure extractors', () => {
+  it('leaves character references beyond U+10FFFF undecoded instead of throwing (T-100 P2-4)', () => {
+    expect(() => decodeEntities('A &#x110000; B')).not.toThrow();
+    expect(decodeEntities('A &#x110000; B &#1114112; C')).toBe('A &#x110000; B &#1114112; C');
+    expect(decodeEntities('&#x10FFFF;')).toBe(String.fromCodePoint(0x10ffff));
+    expect(decodeEntities('&#39;&#x27;&amp;')).toBe("''&");
+    // One hostile reference in a title or meta must not abort the whole audit.
+    const site = greenSite();
+    site.pages[1]!.html = site.pages[1]!.html.replace('<title>', '<title>&#x110000; ').replace(
+      'content="A unique',
+      'content="&#x110000; A unique'
+    );
+    expect(() => auditSite(site)).not.toThrow();
+  });
+
   it('matches the shipped path and image conventions', () => {
     expect(normalizePagePath('guides/theming')).toBe('/guides/theming/');
     expect(normalizePagePath('/index.html')).toBe('/');

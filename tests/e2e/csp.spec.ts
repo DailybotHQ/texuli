@@ -521,11 +521,15 @@ test.describe('csp · built website', () => {
     expect(policy).toContain("require-trusted-types-for 'script'");
     expect(policy).not.toContain('unsafe-inline');
     expect(policy).not.toContain('unsafe-eval');
-    const button = page.locator('[data-tx-landing-agents-play] button');
-    await button.scrollIntoViewIfNeeded();
+    // The home's hydrated islands live in the header since T-44 retired the
+    // landing playground: drive the Appearance switch under the page policy.
+    const dark = page
+      .locator('[data-tx-site-header]')
+      .getByRole('group', { name: 'Appearance' })
+      .getByText('Dark', { exact: true });
     await settle(page);
-    await button.click();
-    await expect(button).toHaveAttribute('aria-pressed', 'true');
+    await dark.click();
+    await expect(page.locator('html')).toHaveAttribute('data-tx-mode', 'dark');
     expect(await pageViolations(page, findings)).toEqual([]);
   });
 

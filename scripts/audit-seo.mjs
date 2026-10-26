@@ -90,13 +90,34 @@ function escapeRe(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/** The `content` of the first meta tag carrying `name|property = key`. */
+const NAMED_ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+
+/**
+ * Decode the HTML character references a build emits, so values compare as
+ * the text a reader gets: Astro writes `'` as `&#39;` in element text but
+ * raw in attribute values, and both mean the same title.
+ */
+export function decodeEntities(text) {
+  return text.replace(/&(#x[0-9a-f]+|#[0-9]+|[a-z]+);/gi, (match, ref) => {
+    if (ref[0] === '#') {
+      const code =
+        ref[1] === 'x' || ref[1] === 'X' ? Number.parseInt(ref.slice(2), 16) : Number(ref.slice(1));
+      // Beyond U+10FFFF is no code point (fromCodePoint would throw): keep
+      // the reference as written so one hostile page cannot abort the audit.
+      return Number.isFinite(code) && code <= 0x10ffff ? String.fromCodePoint(code) : match;
+    }
+    return NAMED_ENTITIES[ref.toLowerCase()] ?? match;
+  });
+}
+
+/** The decoded `content` of the first meta tag carrying `name|property = key`. */
 export function metaContent(html, key) {
   const tag = new RegExp(`<meta[^>]*(?:name|property)="${escapeRe(key)}"[^>]*>`, 'i').exec(
     html
   )?.[0];
   if (tag === undefined) return null;
-  return /content="([^"]*)"/i.exec(tag)?.[1] ?? null;
+  const raw = /content="([^"]*)"/i.exec(tag)?.[1];
+  return raw === undefined ? null : decodeEntities(raw);
 }
 
 /** The `href` of the canonical link, or null. */
@@ -145,7 +166,7 @@ export function auditPage(page, config) {
     0,
     html.search(/<\/head>/i) === -1 ? html.length : html.search(/<\/head>/i)
   );
-  const title = /<title>([\s\S]*?)<\/title>/i.exec(head)?.[1]?.trim() ?? '';
+  const title = decodeEntities(/<title>([\s\S]*?)<\/title>/i.exec(head)?.[1]?.trim() ?? '');
   const description = metaContent(head, 'description') ?? '';
   if (title === '') add('critical', 'Meta', 'missing <title>');
   else if (title.length < config.title.min || title.length > config.title.max)
