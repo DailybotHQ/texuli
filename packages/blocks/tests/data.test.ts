@@ -147,4 +147,94 @@ describe('checkDataBlock + DataBlockView', () => {
     });
     expect(screen.getByRole('note').textContent).toMatch(/could not be shown/i);
   });
+
+  it('gives a captionless table an accessible name from the tableSummary label', () => {
+    render(DataBlockView, {
+      props: {
+        block: {
+          type: 'table',
+          columns: [{ id: 'name', label: 'Name' }],
+          rows: [{ name: 'Ada' }],
+        },
+      },
+    });
+    const table = document.querySelector('table[data-tx-table]');
+    expect(table?.getAttribute('aria-label')).toBe('Data table');
+  });
+
+  it('lets consumers override the table name and keeps a caption as the name', () => {
+    const overridden = render(DataBlockView, {
+      props: {
+        labels: { tableSummary: 'Tabla de datos' },
+        block: {
+          type: 'table',
+          columns: [{ id: 'name', label: 'Name' }],
+          rows: [{ name: 'Ada' }],
+        },
+      },
+    });
+    expect(
+      overridden.container.querySelector('table[data-tx-table]')?.getAttribute('aria-label')
+    ).toBe('Tabla de datos');
+    overridden.unmount();
+
+    const captioned = render(DataBlockView, {
+      props: {
+        block: {
+          type: 'table',
+          caption: 'Fictional scores',
+          columns: [{ id: 'name', label: 'Name' }],
+          rows: [{ name: 'Ada' }],
+        },
+      },
+    });
+    // The caption names the table; no duplicate aria-label.
+    expect(
+      captioned.container.querySelector('table[data-tx-table]')?.getAttribute('aria-label')
+    ).toBeNull();
+  });
+
+  it('announces stat and kpi groups with translatable labels', () => {
+    const stat = render(DataBlockView, {
+      props: {
+        block: { type: 'stat', items: [{ label: 'Active seats', value: '128' }] },
+      },
+    });
+    expect(screen.getByRole('group', { name: 'Statistics' })).toBeTruthy();
+    stat.unmount();
+
+    const kpi = render(DataBlockView, {
+      props: {
+        block: { type: 'kpi', items: [{ label: 'NPS', value: '54' }] },
+      },
+    });
+    expect(screen.getByRole('group', { name: 'Key performance indicators' })).toBeTruthy();
+    kpi.unmount();
+
+    render(DataBlockView, {
+      props: {
+        labels: { statGroup: 'Estadísticas', kpiGroup: 'Indicadores' },
+        block: { type: 'kpi', items: [{ label: 'NPS', value: '54' }] },
+      },
+    });
+    expect(screen.getByRole('group', { name: 'Indicadores' })).toBeTruthy();
+  });
+
+  it('surfaces validated item tones as data-tone on each stat', () => {
+    render(DataBlockView, {
+      props: {
+        block: {
+          type: 'stat',
+          items: [
+            { label: 'Active seats', value: '128', tone: 'success' },
+            { label: 'Median latency', value: '42 ms' },
+          ],
+        },
+      },
+    });
+    const stats = document.querySelectorAll('[data-tx-stat]');
+    expect(stats).toHaveLength(2);
+    expect(stats[0]?.getAttribute('data-tone')).toBe('success');
+    expect(stats[1]?.hasAttribute('data-tone')).toBe(false);
+  });
 });

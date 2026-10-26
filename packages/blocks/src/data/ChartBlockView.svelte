@@ -134,7 +134,7 @@ $effect(() => {
 <style>
   .tx-block-chart-title {
     margin: 0;
-    font-size: 1rem;
+    font-size: var(--tx-font-size-base, 1rem);
   }
   .tx-block-chart-description {
     margin-block: 0.25rem 0.75rem;
@@ -145,6 +145,6 @@ $effect(() => {
   .tx-block-chart-error {
     margin: 0;
     color: var(--tx-muted-foreground, GrayText);
-    font-size: 0.875rem;
+    font-size: var(--tx-font-size-sm, 0.875rem);
   }
 </style>

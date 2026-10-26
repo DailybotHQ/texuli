@@ -38,7 +38,10 @@ function cellText(value: string | number | null): string {
   {@const b = check.block}
   {#if b.type === 'table'}
     <div class="tx-block tx-block-table" data-tx-block="table" data-tone={b.tone}>
-      <Table>
+      <Table
+        label={b.caption ? undefined : text.tableSummary}
+        aria-label={b.caption ? undefined : text.tableSummary}
+      >
         {#if b.caption}
           <TableCaption>{b.caption}</TableCaption>
         {/if}
@@ -72,11 +75,17 @@ function cellText(value: string | number | null): string {
       data-tx-block={b.type}
       data-tone={b.tone}
       role="group"
-      aria-label={b.type === 'kpi' ? 'Key performance indicators' : 'Statistics'}
+      aria-label={b.type === 'kpi' ? text.kpiGroup : text.statGroup}
     >
       <div class="tx-stat-grid">
         {#each b.items as item, i (i)}
-          <Stat label={item.label} value={item.value} hint={item.hint} delta={item.delta} />
+          <Stat
+            label={item.label}
+            value={item.value}
+            hint={item.hint}
+            delta={item.delta}
+            data-tone={item.tone}
+          />
         {/each}
       </div>
     </div>
@@ -96,9 +105,14 @@ function cellText(value: string | number | null): string {
   .tx-block-chart {
     overflow-wrap: normal;
   }
+  /* Same notice grammar as the text, code, structure and media families. */
   .tx-block-invalid {
+    margin: 0;
+    padding: 0.5em 0.75em;
+    border: 1px dashed currentColor;
+    border-radius: 0.375em;
     color: var(--tx-muted-foreground, GrayText);
-    font-size: 0.875rem;
+    font-size: 0.875em;
   }
   .tx-stat-grid {
     display: grid;

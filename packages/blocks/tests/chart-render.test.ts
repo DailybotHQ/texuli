@@ -10,6 +10,9 @@ afterEach(() => cleanup());
 const base = { type: 'chart', title: 'Fictional chart', description: 'A fictional summary.' };
 const points = [{ id: 'a', label: 'Alpha', x: 1, y: 2, seriesId: 'core' }];
 
+/** Reads a family view source relative to the blocks package root. */
+const sourceOf = (relative: string) => readFileSync(resolve(__dirname, '../src', relative), 'utf8');
+
 describe('chart block rendering', () => {
   it('does not apply matrix frame SVG sizing to a chart legend symbol', () => {
     const source = readFileSync(
@@ -96,5 +99,61 @@ describe('chart block rendering', () => {
     await waitFor(() => expect(document.querySelector('circle[fill]')).not.toBeNull());
     const fill = document.querySelector('circle[fill]')?.getAttribute('fill') ?? '';
     expect(fill).toBe('var(--tx-chart-2, var(--tx-success, CanvasText))');
+  });
+
+  it('keeps the data invalid notice in the family grammar (dashed border, padding, em size)', () => {
+    // jsdom does not inject component styles, so cascade the compiled CSS by hand.
+    const style = document.createElement('style');
+    style.textContent =
+      compile(sourceOf('data/DataBlockView.svelte'), {
+        filename: 'DataBlockView.svelte',
+        css: 'external',
+      }).css?.code ?? '';
+    document.head.append(style);
+    const notice = document.createElement('p');
+    notice.className = 'tx-block tx-block-invalid';
+    const declarations = new Map<string, string>();
+    for (const rule of style.sheet?.cssRules ?? []) {
+      if (!('selectorText' in rule)) continue;
+      const cssRule = rule as CSSStyleRule;
+      const selector = cssRule.selectorText.replace(/\.svelte-[a-z0-9]+/g, '');
+      if (!notice.matches(selector)) continue;
+      for (const property of ['border-style', 'padding', 'border-radius', 'font-size']) {
+        const value = cssRule.style.getPropertyValue(property);
+        if (value) declarations.set(property, value);
+      }
+    }
+    style.remove();
+    // The text, code, structure and media families all paint the invalid
+    // notice with a dashed currentColor border, inner padding and an em size.
+    expect(declarations.get('border-style')).toBe('dashed');
+    expect(declarations.get('padding')).not.toBe('');
+    expect(declarations.get('border-radius')).not.toBe('');
+    expect(declarations.get('font-size')).toBe('0.875em');
+  });
+
+  it('routes standard text sizes through the font-size tokens like the sibling families', () => {
+    const raw: string[] = [];
+    const sources: Array<[string, string]> = [
+      [sourceOf('data/DataBlockView.svelte'), 'DataBlockView.svelte'],
+      [sourceOf('data/ChartBlockView.svelte'), 'ChartBlockView.svelte'],
+      [sourceOf('media/MediaBlockView.svelte'), 'MediaBlockView.svelte'],
+    ];
+    for (const [source, filename] of sources) {
+      const style = document.createElement('style');
+      style.textContent = compile(source, { filename, css: 'external' }).css?.code ?? '';
+      document.head.append(style);
+      for (const rule of style.sheet?.cssRules ?? []) {
+        if (!('selectorText' in rule)) continue;
+        const value = (rule as CSSStyleRule).style.getPropertyValue('font-size');
+        // 0.875rem and 1rem are the standard sm and base sizes; code, diagram
+        // and media route them through --tx-font-size-sm / --tx-font-size-base.
+        if (value === '0.875rem' || value === '1rem') {
+          raw.push(`${filename}: ${(rule as CSSStyleRule).selectorText} { font-size: ${value} }`);
+        }
+      }
+      style.remove();
+    }
+    expect(raw).toEqual([]);
   });
 });

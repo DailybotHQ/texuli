@@ -179,7 +179,7 @@
     padding-block: 0.5em;
     padding-inline: 0.75em;
     border: 1px dashed currentColor;
-    border-radius: 0.375em;
+    border-radius: var(--tx-radius, 0.375em);
     font-size: 0.875em;
   }
 

@@ -82,10 +82,12 @@ before any of this runs.
 
 - **Logical properties throughout.** Borders sit on `inline-start`, so RTL
   mirrors (checked in a browser).
-- **Tokens with fallbacks.** The custom properties are `--tx-color-accent`,
-  `--tx-color-info`, `--tx-color-success`, `--tx-color-warning`,
-  `--tx-color-danger`, `--tx-color-border`, `--tx-color-border-strong`,
-  `--tx-color-surface-muted`, `--tx-color-focus` and `--tx-font-mono`.
+- **Tokens with fallbacks.** The custom properties are the contract names the
+  token engine emits (`--tx-<role>`): `--tx-accent`, `--tx-info`,
+  `--tx-success`, `--tx-warning`, `--tx-destructive` (the `danger` tone),
+  `--tx-border`, `--tx-border-strong`, `--tx-muted` (inline code fills),
+  `--tx-ring` (focus outlines), `--tx-radius` (surface corners) and
+  `--tx-font-mono`.
 - **Tone colors mark borders and tints only.** The fallbacks reach at least
   3:1 against both white and #121212. Tone text inherits the page color, so
   callouts keep the host's contrast in any scheme.

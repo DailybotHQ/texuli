@@ -106,6 +106,12 @@ chart props (callbacks such as `onselect`, `brushInvert`, `format`, and
 
 ### Rendering notes
 
+- **Accessible names.** A table block without a `caption` is named from the
+  `tableSummary` label (default "Data table"); a caption names it instead.
+  Stat and KPI rows announce themselves as a group through the `statGroup` /
+  `kpiGroup` labels. All three join `invalid` and `emptyTable` in
+  `DataBlockLabels`, so hosts pass one `labels` object to translate the
+  family's announced strings.
 - **Compact kinds** (`sparkline`, `bullet`, `gauge`, `progress-ring`) use their
   `label` only as an accessible name, so `ChartBlockView` renders the block
   `title` as a visible `h3` and the `description` below it.

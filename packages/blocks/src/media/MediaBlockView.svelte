@@ -209,7 +209,7 @@ function imageAlt(decorative: boolean | undefined, alt: string | undefined): str
     border-radius: var(--tx-radius-md, 0.375rem);
     background-color: var(--tx-muted, Canvas);
     color: var(--tx-muted-foreground, GrayText);
-    font-size: 0.875rem;
+    font-size: var(--tx-font-size-sm, 0.875rem);
     text-align: center;
   }
 

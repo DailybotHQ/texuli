@@ -65,29 +65,32 @@ $effect(() => {
 
 <style>
   .tx-block {
-    --tx-block-tone: var(--tx-color-border-strong, currentColor);
+    --tx-block-tone: var(--tx-border-strong, currentColor);
     margin: 0;
     overflow-wrap: anywhere;
   }
   /*
    * Tone colors mark borders and tints only (non-text, 3:1 against both light
    * and dark surfaces); tone text inherits the page color, so a callout reads
-   * at the host's contrast in any scheme. Tokens override the fallbacks.
+   * at the host's contrast in any scheme. Tokens use the contract names the
+   * token engine emits (`--tx-<role>`); the hex fallbacks only paint for a
+   * host that loads no theme and reach 3:1 on white and #121212 (pinned by
+   * text.test.ts).
    */
   [data-tone='accent'] {
-    --tx-block-tone: var(--tx-color-accent, #7c3aed);
+    --tx-block-tone: var(--tx-accent, #7c3aed);
   }
   [data-tone='info'] {
-    --tx-block-tone: var(--tx-color-info, #2563eb);
+    --tx-block-tone: var(--tx-info, #2563eb);
   }
   [data-tone='success'] {
-    --tx-block-tone: var(--tx-color-success, #16a34a);
+    --tx-block-tone: var(--tx-success, #16a34a);
   }
   [data-tone='warning'] {
-    --tx-block-tone: var(--tx-color-warning, #d97706);
+    --tx-block-tone: var(--tx-warning, #d97706);
   }
   [data-tone='danger'] {
-    --tx-block-tone: var(--tx-color-danger, #dc2626);
+    --tx-block-tone: var(--tx-destructive, #dc2626);
   }
 
   .tx-heading-eyebrow {
@@ -142,7 +145,7 @@ $effect(() => {
     padding-inline: 1em;
     border: 1px solid color-mix(in srgb, var(--tx-block-tone) 45%, transparent);
     border-inline-start: 4px solid var(--tx-block-tone);
-    border-radius: 0.5em;
+    border-radius: var(--tx-radius, 0.5em);
     background: color-mix(in srgb, var(--tx-block-tone) 8%, transparent);
   }
   .tx-callout-head {
@@ -162,7 +165,7 @@ $effect(() => {
   .tx-block-invalid {
     padding: 0.5em 0.75em;
     border: 1px dashed currentColor;
-    border-radius: 0.375em;
+    border-radius: var(--tx-radius, 0.375em);
     font-size: 0.875em;
   }
 
