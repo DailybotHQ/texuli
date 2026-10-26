@@ -109,7 +109,8 @@ async function setMode(page: Page, mode: Mode) {
 test.describe('texuli.com landing', () => {
   test('the four sections mount in blueprint order and the CTAs work', async ({ page }) => {
     expect(await visit(page, '/')).toEqual([]);
-    await expect(page).toHaveTitle('Texuli');
+    // T-79 row 2: the title spends the SERP surface on the platform claim.
+    await expect(page).toHaveTitle('One component catalog for web and native · Texuli');
 
     // A minimal landing (T-site-ia): no announcement banner.
     await expect(page.getByRole('complementary', { name: 'Announcement' })).toHaveCount(0);
@@ -150,6 +151,19 @@ test.describe('texuli.com landing', () => {
     await expect(hero.getByRole('link', { name: 'Browse the theme gallery' })).toBeVisible();
     await expect(hero.getByRole('link', { name: 'Browse the component catalog' })).toBeVisible();
 
+    // T-79 row 6: the proof strip — real counts, each a link to its list.
+    const proof = hero.getByRole('list', { name: 'Texuli by the numbers' });
+    await expect(proof.getByRole('listitem')).toHaveCount(3);
+    for (const [id, href] of [
+      ['components', '/component-pages/'],
+      ['primitives', '/primitives-page/'],
+      ['examples', '/examples/'],
+    ] as const) {
+      const stat = proof.locator(`[data-tx-hero-proof="${id}"] a`);
+      await expect(stat).toHaveAttribute('href', href);
+      await expect(stat).toHaveText(/^\s*\d+\s/);
+    }
+
     // Why Svelte for the web: the ladder rungs render under the section h2.
     await expect(
       page.getByRole('heading', { level: 2, name: 'Why Svelte for the web' })
@@ -185,6 +199,36 @@ test.describe('texuli.com landing', () => {
     await expect(footer.getByRole('link', { name: 'Agent skill' })).toBeVisible();
     await expect(footer.getByRole('link', { name: 'Changelog' })).toBeVisible();
     await expect(footer.getByText(/Dailybot, Inc/)).toBeVisible();
+    // T-79 rows 3, 4, 9: the release truth and the project row.
+    const release = footer.locator('[data-tx-site-status]');
+    await expect(release).toContainText('Preview packages are on npm under the next tag');
+    await expect(release).toContainText('no stable release yet');
+    await expect(release).not.toContainText('not released yet');
+    await expect(footer.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/DailybotHQ/texuli'
+    );
+    await expect(footer.getByRole('link', { name: 'MIT license' })).toBeVisible();
+    await expect(footer.getByRole('link', { name: 'Brand' })).toHaveAttribute('href', '/brand/');
+  });
+
+  test('the scroll reveal is opt-in motion: none under reduced motion, never the hero', async ({
+    page,
+  }) => {
+    // T-79 row 13. Reduced motion: no band animates at all.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    expect(await visit(page, '/')).toEqual([]);
+    const animated = () =>
+      page.$$eval('[data-tx-landing] > section', (sections) =>
+        sections.map((section) => section.getAnimations().length)
+      );
+    expect(await animated()).toEqual([0, 0, 0, 0]);
+    // Motion allowed: the bands after the hero rise in; the hero never moves.
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    const counts = await animated();
+    expect(counts[0]).toBe(0);
+    const supported = await page.evaluate(() => CSS.supports('animation-timeline: view()'));
+    if (supported) expect(counts.slice(1).every((count) => count > 0)).toBe(true);
   });
 
   test('changelog page is reachable', async ({ page }) => {

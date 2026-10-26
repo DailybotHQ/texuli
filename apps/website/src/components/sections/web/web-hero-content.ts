@@ -124,3 +124,51 @@ export async function countAllThemes(): Promise<number> {
   const { getFullThemeLibraryMeta } = await import('@texuli/tokens/library-expand');
   return (await getFullThemeLibraryMeta()).length;
 }
+
+/** One proof-strip entry: a count read from the repository at build. */
+export interface HeroProofStat {
+  /** Stable hook for tests and the strip's `data-tx-hero-proof` attribute. */
+  id: 'components' | 'primitives' | 'examples';
+  value: number;
+  label: string;
+  /** The page that lists every item counted; app-authored site route. */
+  href: string;
+}
+
+/** The proof strip's accessible name (core punch list row 6). */
+export const WEB_HERO_PROOF_LABEL = 'Texuli by the numbers';
+
+/**
+ * The proof strip under the hero CTAs (core punch list row 6; blueprint §5
+ * s2): real counts only, each read at build from the same source the page
+ * it links to renders — the catalog manifests behind `/component-pages/`,
+ * the primitives reference behind `/primitives-page/`, and the examples
+ * snapshot behind `/examples/`. The theme count stays the visual's h2.
+ */
+export async function loadHeroProof(): Promise<readonly HeroProofStat[]> {
+  const [{ COMPONENT_PAGES }, { PRIMITIVES }, { buildExampleCatalog }] = await Promise.all([
+    import('../../component-pages/load-manifests.ts'),
+    import('../../primitives-page/primitives.ts'),
+    import('../../examples/catalog.ts'),
+  ]);
+  return [
+    {
+      id: 'components',
+      value: COMPONENT_PAGES.length,
+      label: 'catalog components',
+      href: '/component-pages/',
+    },
+    {
+      id: 'primitives',
+      value: PRIMITIVES.length,
+      label: 'owned primitives',
+      href: '/primitives-page/',
+    },
+    {
+      id: 'examples',
+      value: buildExampleCatalog().length,
+      label: 'examples',
+      href: '/examples/',
+    },
+  ];
+}

@@ -162,10 +162,13 @@ const base = import.meta.env.BASE_URL;
       display: none;
     }
   }
-  /* Narrow phones: the search trigger keeps its Cmd/Ctrl+K hint but shrinks. */
+  /* Narrow phones: the search trigger collapses to its glyph (the
+     component hides the label visually, keeping it as the accessible name,
+     and drops the Cmd/Ctrl+K hint, meaningless on touch). It keeps a
+     2.5rem target instead of shrinking to nothing (T-79, core row 12). */
   @media (max-width: 30rem) {
     .tools :global([data-tx-command-trigger]) {
-      min-inline-size: 0;
+      min-inline-size: 2.5rem;
     }
     .brand :global(.brand-logo) {
       block-size: 20px;
