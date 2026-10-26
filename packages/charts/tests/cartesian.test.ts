@@ -492,15 +492,15 @@ describe('Cartesian chart renderers', () => {
 });
 
 describe('Cartesian chart family cohesion', () => {
-  it('renders the family caption grammar: an h3 figure title, never an h2', () => {
+  it('renders the grammar-mandated h2 figure title', () => {
     const { container } = render(LineChart, {
       title: 'Weekly signups',
       description: 'Signups by day.',
       series: [series[0] as CartesianSeries],
       interactive: false,
     });
-    expect(container.querySelector('figcaption h3')).toBeTruthy();
-    expect(container.querySelector('figcaption h2')).toBeNull();
+    expect(container.querySelector('figcaption h2')).toBeTruthy();
+    expect(container.querySelector('figcaption h3')).toBeNull();
   });
 
   it('keeps the sibling caption styles for the figure title and description', () => {
@@ -512,10 +512,9 @@ describe('Cartesian chart family cohesion', () => {
       filename: 'CartesianChart.svelte',
       css: 'external',
     }).css?.code;
-    // Every other chart family styles its caption this way (see PieChart,
-    // HistogramChart, CalendarHeatmap): a 1rem h3 and a spaced description.
-    expect(css).toMatch(/figcaption[^{]*h3[^{]*\{[^}]*font-size:\s*1rem/);
-    expect(css).toMatch(/figcaption[^{]*h3[^{]*\{[^}]*margin-block:\s*0/);
+    // The grammar assigns Cartesian titles rank 2; keep the visual title size at 1rem.
+    expect(css).toMatch(/figcaption[^{]*h2[^{]*\{[^}]*font-size:\s*1rem/);
+    expect(css).toMatch(/figcaption[^{]*h2[^{]*\{[^}]*margin-block:\s*0/);
     expect(css).toMatch(/figcaption[^{]*p[^{]*\{[^}]*margin-block:\s*0\.25rem\s+0\.75rem/);
   });
 

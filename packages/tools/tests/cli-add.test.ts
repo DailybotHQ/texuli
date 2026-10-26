@@ -1,8 +1,10 @@
 /// <reference types="node" />
 import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
+import { isMainModule } from '../src/cli-add/cli.ts';
 import {
   type AddableComponent,
   addComponent,
@@ -23,6 +25,20 @@ const temps: string[] = [];
 
 afterEach(async () => {
   await Promise.all(temps.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
+});
+
+describe('CLI entry detection', () => {
+  it('normalizes a pnpm shim entry path containing a parent segment', () => {
+    const previous = process.argv[1];
+    process.argv[1] = `${process.cwd()}/packages/tools/src/cli-add/../cli-add/cli.ts`;
+    try {
+      const moduleUrl = pathToFileURL(resolve('packages/tools/src/cli-add/cli.ts')).href;
+      expect(isMainModule(moduleUrl)).toBe(true);
+    } finally {
+      if (previous === undefined) delete process.argv[1];
+      else process.argv[1] = previous;
+    }
+  });
 });
 
 async function tempDir(prefix: string): Promise<string> {
@@ -103,7 +119,7 @@ describe('provenance', () => {
     expect(provenanceHeader(meta, 'Button.svelte')).toContain('@texuli/add');
     expect(provenanceHeader(meta, 'index.ts')).toContain('/**');
     expect(provenanceHeader(meta, 'button.css')).toContain('version: 1.2.3');
-    expect(hasProvenance(provenanceHeader(meta, 'index.ts') + 'export {}')).toBe(true);
+    expect(hasProvenance(`${provenanceHeader(meta, 'index.ts')}export {}`)).toBe(true);
   });
 });
 

@@ -25,10 +25,8 @@ $effect(() => {
 });
 
 function cellText(value: string | number | null): string {
-  if (value === null) return '—';
-  return typeof value === 'number'
-    ? new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value)
-    : value;
+  if (typeof value !== 'number') return value ?? '—';
+  return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 </script>
 
@@ -98,7 +96,6 @@ function cellText(value: string | number | null): string {
 
 <style>
   .tx-block {
-    margin: 0;
     overflow-wrap: anywhere;
   }
   /* Breaking anywhere shrinks chart legends to one character per line. */

@@ -450,14 +450,14 @@ function onPlayerKeydown(event: KeyboardEvent): void {
       max-inline-size: 90%;
       padding: 0.35rem 0.75rem;
       border-radius: var(--tx-radius-md, 0.375rem);
-      /* Scrim over the picture: inverse pair stays readable on any frame. */
+      /* Keep the scrim and foreground in the same system-color scheme. */
       background-color: color-mix(
         in oklab,
-        var(--tx-background, Canvas) 18%,
+        Canvas 18%,
         CanvasText 82%
       );
-      color: var(--tx-background, Canvas);
-      border: 1px solid color-mix(in oklab, var(--tx-background, Canvas) 35%, transparent);
+      color: Canvas;
+      border: 1px solid CanvasText;
       font-size: var(--tx-text-sm, 0.875rem);
       line-height: 1.35;
       text-align: center;

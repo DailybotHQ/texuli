@@ -98,7 +98,7 @@ describe('Canvas chart rendering', () => {
     render(LineChart, {
       title: 'Dense measurements',
       description: 'Measurements sampled throughout the full reporting period.',
-      series: [{ id: 'measurements', label: 'Measurements', points }],
+      series: [{ id: 'measurements', label: 'Measurements', color: 'var(--brand, teal)', points }],
     });
 
     expect(screen.getByRole('img', { name: 'Dense measurements' })).toBeTruthy();
@@ -107,5 +107,6 @@ describe('Canvas chart rendering', () => {
     ).toBeTruthy();
     await waitFor(() => expect(document.querySelector('canvas.marks')).toBeTruthy());
     expect(context.stroke).toHaveBeenCalled();
+    expect(context.strokeStyle).toBe('teal');
   });
 });

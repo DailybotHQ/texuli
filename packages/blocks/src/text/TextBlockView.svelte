@@ -70,27 +70,38 @@ $effect(() => {
     overflow-wrap: anywhere;
   }
   /*
-   * Tone colors mark borders and tints only (non-text, 3:1 against both light
-   * and dark surfaces); tone text inherits the page color, so a callout reads
-   * at the host's contrast in any scheme. Tokens use the contract names the
+   * Tone colors mark borders and rules only (non-text, 3:1 against both light
+   * and dark surfaces); a callout fills with the role's soft surface and reads
+   * in its paired soft foreground. The accent tone draws with `--tx-primary`:
+   * `--tx-accent` is itself a soft fill and vanishes as a border. Tokens use the contract names the
    * token engine emits (`--tx-<role>`); the hex fallbacks only paint for a
    * host that loads no theme and reach 3:1 on white and #121212 (pinned by
    * text.test.ts).
    */
   [data-tone='accent'] {
-    --tx-block-tone: var(--tx-accent, #7c3aed);
+    --tx-block-tone: var(--tx-primary, #7c3aed);
+    --tx-block-soft: var(--tx-primary-soft, color-mix(in srgb, #7c3aed 12%, Canvas));
+    --tx-block-soft-foreground: var(--tx-primary-soft-foreground, var(--tx-foreground, CanvasText));
   }
   [data-tone='info'] {
     --tx-block-tone: var(--tx-info, #2563eb);
+    --tx-block-soft: var(--tx-info-soft, color-mix(in srgb, #2563eb 12%, Canvas));
+    --tx-block-soft-foreground: var(--tx-info-soft-foreground, var(--tx-foreground, CanvasText));
   }
   [data-tone='success'] {
     --tx-block-tone: var(--tx-success, #16a34a);
+    --tx-block-soft: var(--tx-success-soft, color-mix(in srgb, #16a34a 12%, Canvas));
+    --tx-block-soft-foreground: var(--tx-success-soft-foreground, var(--tx-foreground, CanvasText));
   }
   [data-tone='warning'] {
     --tx-block-tone: var(--tx-warning, #d97706);
+    --tx-block-soft: var(--tx-warning-soft, color-mix(in srgb, #d97706 12%, Canvas));
+    --tx-block-soft-foreground: var(--tx-warning-soft-foreground, var(--tx-foreground, CanvasText));
   }
   [data-tone='danger'] {
     --tx-block-tone: var(--tx-destructive, #dc2626);
+    --tx-block-soft: var(--tx-destructive-soft, color-mix(in srgb, #dc2626 12%, Canvas));
+    --tx-block-soft-foreground: var(--tx-destructive-soft-foreground, var(--tx-foreground, CanvasText));
   }
 
   .tx-heading-eyebrow {
@@ -143,10 +154,11 @@ $effect(() => {
   .tx-callout {
     padding-block: 0.75em;
     padding-inline: 1em;
-    border: 1px solid color-mix(in srgb, var(--tx-block-tone) 45%, transparent);
+    border: 1px solid var(--tx-block-tone);
     border-inline-start: 4px solid var(--tx-block-tone);
     border-radius: var(--tx-radius, 0.5em);
-    background: color-mix(in srgb, var(--tx-block-tone) 8%, transparent);
+    background: var(--tx-block-soft, transparent);
+    color: var(--tx-block-soft-foreground, inherit);
   }
   .tx-callout-head {
     display: flex;
@@ -175,6 +187,8 @@ $effect(() => {
     }
     .tx-callout {
       border-color: CanvasText;
+      background: Canvas;
+      color: CanvasText;
     }
   }
 </style>

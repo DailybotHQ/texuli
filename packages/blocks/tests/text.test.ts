@@ -335,7 +335,7 @@ describe('text family styles use the token contract', () => {
   it('draws each tone from its contract role with a >=3:1 fallback on light and dark surfaces', () => {
     const view = styleSource('text/TextBlockView.svelte');
     const roles: Record<string, string> = {
-      accent: '--tx-accent',
+      accent: '--tx-primary',
       info: '--tx-info',
       success: '--tx-success',
       warning: '--tx-warning',
@@ -350,6 +350,41 @@ describe('text family styles use the token contract', () => {
       expect(contrastRatio(fallback ?? '', '#ffffff')).toBeGreaterThanOrEqual(3);
       expect(contrastRatio(fallback ?? '', '#121212')).toBeGreaterThanOrEqual(3);
     }
+  });
+
+  it('uses paired semantic soft fills for callouts instead of near-transparent tone mixes', () => {
+    const view = styleSource('text/TextBlockView.svelte');
+    const fills: Record<string, string> = {
+      accent: '--tx-primary-soft',
+      info: '--tx-info-soft',
+      success: '--tx-success-soft',
+      warning: '--tx-warning-soft',
+      danger: '--tx-destructive-soft',
+    };
+    const foregrounds: Record<string, string> = {
+      accent: '--tx-primary-soft-foreground',
+      info: '--tx-info-soft-foreground',
+      success: '--tx-success-soft-foreground',
+      warning: '--tx-warning-soft-foreground',
+      danger: '--tx-destructive-soft-foreground',
+    };
+    for (const [tone, fill] of Object.entries(fills)) {
+      const rule = new RegExp(`\\[data-tone='${tone}'\\]\\s*\\{[^}]*\\}`).exec(view)?.[0] ?? '';
+      expect(rule, `${tone} maps to its semantic soft fill`).toContain(`var(${fill}`);
+      expect(rule, `${tone} maps to its paired soft foreground`).toContain(
+        `var(${foregrounds[tone]}`
+      );
+    }
+    expect(rulesOf(view, '\\.tx-callout')[0]).not.toContain('color-mix(');
+  });
+
+  it('draws the accent tone with the primary role, never the soft accent fill', () => {
+    // `--tx-accent` is a soft fill in the token contract (light in light mode),
+    // so as a border or rule color it is near-invisible on the page canvas.
+    const view = styleSource('text/TextBlockView.svelte');
+    const rule = /\[data-tone='accent'\]\s*\{[^}]*\}/.exec(view)?.[0] ?? '';
+    expect(rule).toMatch(/--tx-block-tone:\s*var\(--tx-primary\b/);
+    expect(rule).not.toContain('var(--tx-accent');
   });
 
   it('takes surface radii from the theme radius token like the code family does', () => {

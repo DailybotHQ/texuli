@@ -6,7 +6,7 @@ import { detectPlatform } from '@texuli/core/keyboard';
 import type { HrefTrust } from '@texuli/core/url-policy';
 import { untrack } from 'svelte';
 import { EditorController } from '../controller/controller.svelte.ts';
-import type { EditorLabels } from '../controller/labels.ts';
+import { DEFAULT_EDITOR_LABELS, type EditorLabels } from '../controller/labels.ts';
 import LinkDialog from '../link-dialog/LinkDialog.svelte';
 import EditorToolbar from '../toolbar/EditorToolbar.svelte';
 import EditorSurface from './EditorSurface.svelte';
@@ -80,6 +80,12 @@ const editor = untrack(
     })
 );
 
+$effect(() => {
+  if (external) return;
+  editor.trust = trust;
+  editor.labels = { ...DEFAULT_EDITOR_LABELS, ...labels };
+});
+
 // A document set from outside (not one the editor produced) restarts history.
 $effect(() => {
   if (!value || value === exchanged) return;
@@ -134,7 +140,7 @@ function closeLink() {
     aria-describedby={helpId}
     {placeholder}
     {readonly}
-    {trust}
+    trust={external ? external.trust : trust}
     {resolveMedia}
     onLinkRequest={openLink}
   />

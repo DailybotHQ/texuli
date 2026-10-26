@@ -81,6 +81,22 @@ describe('navigation lane CSS guards (T-57)', () => {
   });
 });
 
+describe('toolbar forced-colors state visibility', () => {
+  it('remaps the shared pressed button primitive to system highlight colors', () => {
+    const source = css('toolbar/toolbar.css');
+    const forced = source.slice(source.indexOf('@media (forced-colors: active)'));
+    expect(forced).toMatch(
+      /\.tx-toolbar__button\[data-state="on"\]\s*\{[^}]*background:\s*Highlight[^}]*color:\s*HighlightText/
+    );
+  });
+});
+
+describe('dialog token names', () => {
+  it('uses the emitted foreground role without a phantom variable alias', () => {
+    expect(css('dialog/dialog.css')).not.toContain('--tx-color-foreground');
+  });
+});
+
 describe('polish audit CSS guards', () => {
   it('P1-03: the tabs scroller has no negative inline margin', () => {
     const scroller = rule(css('tabs-accordion/tabs-accordion.css'), '.tx-tabs__scroller');

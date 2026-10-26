@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { resolve } from 'node:path';
 /// <reference types="node" />
 /**
  * `texuli add <component> [options]`
@@ -156,7 +157,7 @@ export function isMainModule(metaUrl: string): boolean {
   const entry = process.argv[1];
   if (!entry) return false;
   try {
-    return fileURLToPath(metaUrl) === entry || fileURLToPath(metaUrl) === fileURLToPath(entry);
+    return resolve(fileURLToPath(metaUrl)) === resolve(entry);
   } catch {
     return metaUrl.endsWith(entry.replace(/\\/g, '/'));
   }

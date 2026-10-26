@@ -297,6 +297,14 @@ describe('VideoPlayer', () => {
     expect(css).toMatch(/\.tx-video-player__caption-text\s*\{[^}]*(--tx-|CanvasText|Canvas)/s);
   });
 
+  it('keeps both sides of the caption scrim contrast pair in system colors', () => {
+    const css = styleBlock(videoPlayerSource);
+    expect(css).not.toMatch(
+      /\.tx-video-player__caption-text\s*\{[^}]*background-color:[^}]*var\(--tx-background[^}]*CanvasText/s
+    );
+    expect(css).toMatch(/\.tx-video-player__caption-text\s*\{[^}]*color:\s*Canvas\s*;/s);
+  });
+
   // T-68: captions load failure copy is a label, not a hardcoded English string.
   it('exposes captionsUnavailable on the labels contract', () => {
     expect(videoPlayerSource).toMatch(/captionsUnavailable:/);

@@ -197,6 +197,7 @@ function onclick(event: MouseEvent) {
   aria-label={labelledby ? undefined : (label ?? controller.labels.textbox)}
   aria-labelledby={labelledby}
   aria-describedby={describedby}
+  aria-placeholder={empty ? placeholder : undefined}
   aria-readonly={readonly ? 'true' : undefined}
   contenteditable={readonly ? 'false' : 'true'}
   tabindex="0"

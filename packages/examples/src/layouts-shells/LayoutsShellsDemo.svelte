@@ -1,30 +1,14 @@
 <script lang="ts">
 import { safeHref } from '@texuli/core/url-policy';
-import { onMount } from 'svelte';
 import { AppShell } from 'texuli/layouts/shells';
 
 const docsHref = safeHref('https://example.com/handbook', 'developer');
 const statusHref = safeHref('https://example.com/status', 'developer');
-let sidebarOpen = $state(true);
-let drawerReady = $state(false);
-
-onMount(() => {
-  const findDrawer = () => {
-    if (!document.querySelector('[data-tx-layout-drawer]')) return false;
-    drawerReady = true;
-    return true;
-  };
-  if (findDrawer()) return;
-  const observer = new MutationObserver(() => {
-    if (findDrawer()) observer.disconnect();
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-  return () => observer.disconnect();
-});
+// The drawer is modal: it opens only from the header toggle, never on load.
+let sidebarOpen = $state(false);
 </script>
 
 <section class="demo" aria-label="Responsive application shell examples">
-  {#if !drawerReady}<p role="status">Loading the narrow navigation drawer…</p>{/if}
   <h2>Wide workspace</h2>
   <AppShell mainElement="div" mainId="wide-shell-main" sidebarLabel="Workspace navigation">
     {#snippet sidebar()}
@@ -68,7 +52,11 @@ onMount(() => {
       {/snippet}
       {#snippet header()}
         <header class="header">
-          <button type="button" onclick={() => (sidebarOpen = !sidebarOpen)}>فتح التنقل</button>
+          <button
+            type="button"
+            aria-expanded={sidebarOpen}
+            onclick={() => (sidebarOpen = !sidebarOpen)}>فتح التنقل</button
+          >
           <span>مراجعة الإصدار</span>
         </header>
       {/snippet}

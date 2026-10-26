@@ -83,16 +83,20 @@ before any of this runs.
 - **Logical properties throughout.** Borders sit on `inline-start`, so RTL
   mirrors (checked in a browser).
 - **Tokens with fallbacks.** The custom properties are the contract names the
-  token engine emits (`--tx-<role>`): `--tx-accent`, `--tx-info`,
+  token engine emits (`--tx-<role>`): `--tx-primary` (the `accent` tone), `--tx-info`,
   `--tx-success`, `--tx-warning`, `--tx-destructive` (the `danger` tone),
   `--tx-border`, `--tx-border-strong`, `--tx-muted` (inline code fills),
   `--tx-ring` (focus outlines), `--tx-radius` (surface corners) and
   `--tx-font-mono`.
-- **Tone colors mark borders and tints only.** The fallbacks reach at least
-  3:1 against both white and #121212. Tone text inherits the page color, so
-  callouts keep the host's contrast in any scheme.
+- **Tone colors mark borders and rules only.** The fallbacks reach at least
+  3:1 against both white and #121212. A callout fills with its role's soft
+  surface (`--tx-primary-soft`, `--tx-info-soft`, `--tx-success-soft`,
+  `--tx-warning-soft`, `--tx-destructive-soft`) and reads in the paired
+  `*-soft-foreground`, the pairs the theme engine contrast-checks. The
+  `accent` tone draws with `--tx-primary` because `--tx-accent` is itself a
+  soft fill and would vanish as a border.
 - **Links** keep the host's or the UA's color and are always underlined.
-- **Forced colors:** borders become `CanvasText`.
+- **Forced colors:** borders become `CanvasText`; callouts paint `CanvasText` on `Canvas`.
 - **No motion,** so there is nothing to reduce.
 - **Keyboard:** code fences are focusable (`tabindex="0"`, named by
   `labels.codeBlock`) so wide code can scroll.

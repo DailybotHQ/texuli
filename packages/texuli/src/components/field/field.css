@@ -20,22 +20,8 @@
     align-items: start;
   }
 
-  .tx-field-root--horizontal .tx-label {
-    padding-block-start: 0.5rem;
-  }
-
-  .tx-field-root--horizontal .tx-description,
-  .tx-field-root--horizontal .tx-field-error,
-  .tx-field-root--horizontal .tx-field-control {
-    grid-column: 2;
-  }
-
-  .tx-field-root[data-invalid] .tx-label {
-    color: var(--tx-destructive, crimson);
-  }
-
   .tx-field-root[data-disabled] {
-    opacity: 0.6;
+    color: var(--tx-foreground, CanvasText);
   }
 
   .tx-field-control {
@@ -53,6 +39,10 @@
     font-weight: var(--tx-font-weight-medium, 500);
     line-height: 1.25;
     user-select: none;
+  }
+
+  .tx-field-root--horizontal .tx-label {
+    padding-block-start: 0.5rem;
   }
 
   .tx-label--sm {
@@ -81,6 +71,10 @@
     border-width: 0;
   }
 
+  .tx-field-root[data-invalid] .tx-label {
+    color: var(--tx-destructive, crimson);
+  }
+
   .tx-description {
     margin: 0;
     color: var(--tx-muted-foreground, GrayText);
@@ -94,6 +88,20 @@
     font-size: var(--tx-font-size-xs, 0.75rem);
     font-weight: var(--tx-font-weight-medium, 500);
     line-height: 1.35;
+  }
+
+  .tx-field-root--horizontal .tx-description,
+  .tx-field-root--horizontal .tx-field-error,
+  .tx-field-root--horizontal .tx-field-control {
+    grid-column: 2;
+  }
+
+  .tx-field-root[data-disabled] .tx-description {
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-field-root[data-disabled] .tx-field-control {
+    opacity: 0.6;
   }
 
   .tx-form {

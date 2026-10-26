@@ -30,13 +30,15 @@ function paint(): void {
 
   const computed = view?.getComputedStyle(canvas);
   const chartSeries = series.map((item, seriesIndex) => {
-    const cssColor = item.color.match(/^var\((--[\w-]+)\)$/)?.[1];
-    const color = cssColor ? computed?.getPropertyValue(cssColor).trim() : item.color;
+    const [, name, fallback] = item.color.match(/^var\((--[\w-]+)(?:,\s*(.+))?\)$/) ?? [];
+    const color = name
+      ? computed?.getPropertyValue(name).trim() || fallback || 'CanvasText'
+      : item.color;
     const isBar =
       kind === 'bar' || kind === 'stacked-bar' || (kind === 'combo' && seriesIndex === 0);
     return {
       ...item,
-      color: color || 'CanvasText',
+      color,
       points: isBar ? item.points : downsampleCanvasPoints(item.points, width),
     };
   });

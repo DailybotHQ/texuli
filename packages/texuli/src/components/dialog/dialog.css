@@ -5,11 +5,7 @@
 @layer tx.components {
   .tx-dialog__overlay {
     box-sizing: border-box;
-    background: color-mix(
-      in srgb,
-      var(--tx-color-foreground, var(--tx-foreground, CanvasText)) 45%,
-      transparent
-    );
+    background: color-mix(in srgb, var(--tx-foreground, CanvasText) 45%, transparent);
   }
 
   .tx-dialog,

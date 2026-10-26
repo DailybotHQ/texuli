@@ -53,6 +53,9 @@ describe('lane-requested example enrichments', () => {
     const buttonRender = render(button.default);
     expect(buttonRender.getByRole('button', { name: 'More actions, large' })).toBeTruthy();
     expect(buttonRender.container.querySelector('[data-axis="group-vertical"]')).not.toBeNull();
+    const darkScope = buttonRender.container.querySelector<HTMLElement>('[data-axis="dark"]');
+    expect(darkScope?.dataset.txMode).toBe('dark');
+    await waitFor(() => expect(darkScope?.style.getPropertyValue('--tx-primary')).not.toBe(''));
     buttonRender.unmount();
 
     const tableRender = render(table.default);
@@ -61,6 +64,9 @@ describe('lane-requested example enrichments', () => {
 
     const fieldRender = render(field.default);
     expect(fieldRender.getByLabelText('Workspace slug')).toHaveProperty('disabled', true);
+    const rtlField = fieldRender.container.querySelector<HTMLElement>('[dir="rtl"]');
+    expect(rtlField?.getAttribute('lang')).toBe('ar');
+    expect(rtlField?.textContent).toContain('اتجاه القراءة');
   });
 
   it('switches feedback from skeleton to content and supports the custom alert layout', async () => {

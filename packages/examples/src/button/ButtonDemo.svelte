@@ -1,5 +1,6 @@
 <script lang="ts">
 import { Button, ButtonGroup, IconButton } from 'texuli/button';
+import { scopedTheme } from '../scoped-theme.ts';
 
 let last = $state('idle');
 
@@ -81,7 +82,7 @@ async function slowSave(): Promise<void> {
   </div>
 
   <h3>Dark</h3>
-  <div class="row dark-panel" data-tx-mode="dark" data-axis="dark">
+  <div class="row dark-panel" use:scopedTheme={'dark'} data-axis="dark">
     <Button variant="default">Dark default</Button>
     <Button variant="secondary">Dark secondary</Button>
     <Button variant="outline">Dark outline</Button>
@@ -106,7 +107,5 @@ async function slowSave(): Promise<void> {
   .dark-panel {
     padding: 0.75rem;
     border-radius: var(--tx-radius, 0.5rem);
-    background: var(--tx-background, #0a0a0a);
-    color: var(--tx-foreground, #fafafa);
   }
 </style>
