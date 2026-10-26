@@ -3,8 +3,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { resetArtifactFrameIds } from '../src/render/frame/index.ts';
 import {
   assertInertRoots,
-  hardenInertRoots,
   HOSTILE_SAMPLES,
+  hardenInertRoots,
   hostileSamplesJson,
   looksExecutable,
   runHostileCorpus,

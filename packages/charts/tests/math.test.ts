@@ -586,7 +586,12 @@ describe('pie and arcs', () => {
     // A sliver next to a dominant slice: its own pad may never exceed half
     // its sweep, so the slice still renders (the legend and table list it).
     const slices = pie([1000, 1], { padAngle: 0.01 });
-    const sliver = slices[1] as { value: number; startAngle: number; endAngle: number; padAngle: number };
+    const sliver = slices[1] as {
+      value: number;
+      startAngle: number;
+      endAngle: number;
+      padAngle: number;
+    };
     expect(sliver.value).toBe(1);
     expect(sliver.padAngle).toBeGreaterThan(0);
     expect(sliver.padAngle).toBeLessThanOrEqual((sliver.endAngle - sliver.startAngle) / 2);
