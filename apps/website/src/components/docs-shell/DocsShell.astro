@@ -14,15 +14,17 @@ interface Props {
   title: string;
   description: string;
   toc?: readonly TocEntry[];
+  /** Optional JSON-LD graph, passed through to `BaseLayout` (T-52 TechArticle). */
+  jsonLd?: Record<string, unknown>;
 }
 
-const { title, description, toc = [] } = Astro.props;
+const { title, description, toc = [], jsonLd = undefined } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const current = Astro.url.pathname.slice(base.replace(/\/+$/, '').length) || '/';
 const { prev, next } = docsPager(current);
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
   <div class="docs-shell" data-tx-docs-shell="">
     <DocsMobileNav currentPath={current} />
     <div class="docs-shell__grid">

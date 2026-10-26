@@ -35,7 +35,12 @@ import { isDocsPath, pagerFor } from '../components/foundation/nav-data.ts';
 import SiteFooter from '../components/foundation/SiteFooter.astro';
 import SiteHeader from '../components/foundation/SiteHeader.astro';
 import SiteSidebar from '../components/foundation/SiteSidebar.astro';
-import { APPEARANCE_NAMESPACE, SITE_NAME, SITE_THEME } from '../components/foundation/site.ts';
+import {
+  APPEARANCE_NAMESPACE,
+  SITE_NAME,
+  SITE_THEME,
+  withBase,
+} from '../components/foundation/site.ts';
 import { breadcrumbJsonLd, breadcrumbTrail } from '../components/seo/breadcrumbs';
 import JsonLd from '../components/seo/JsonLd.astro';
 import SeoHead from '../components/seo/SeoHead.astro';
@@ -140,6 +145,32 @@ const markdownHead = docs
             <div class="site-column">
               <div class="site-content" data-layout={docs ? 'docs' : 'wide'}>
                 <main id="main" tabindex="-1">
+                  {
+                    docs && crumbs.length >= 2 && (
+                      <nav class="crumbs" aria-label="Breadcrumb" data-docs-crumbs="">
+                        <ol class="crumbs__list">
+                          {crumbs.map((entry, index) => (
+                            <li class="crumbs__item">
+                              <a
+                                class="crumbs__link"
+                                href={withBase(base, entry.href)}
+                                aria-current={
+                                  index === crumbs.length - 1 ? 'page' : undefined
+                                }
+                              >
+                                {entry.name}
+                              </a>
+                              {index < crumbs.length - 1 && (
+                                <span class="crumbs__sep" aria-hidden="true">
+                                  /
+                                </span>
+                              )}
+                            </li>
+                          ))}
+                        </ol>
+                      </nav>
+                    )
+                  }
                   {docs && <CopyPage head={markdownHead} />}
                   <Fragment set:html="<!--tx-page-body-->" />
                   <slot />
@@ -157,3 +188,44 @@ const markdownHead = docs
     <script is:inline src={`${base}tx-ready.js`} data-tx-ready-script defer />
   </body>
 </html>
+
+<style>
+  /* Visual breadcrumbs (T-80 row 6): the reading-shell half of the
+     BreadcrumbList data, same trail the JSON-LD above emits. */
+  .crumbs {
+    margin-block-end: 0.85rem;
+  }
+  .crumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.125rem 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+  }
+  .crumbs__item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .crumbs__link {
+    color: var(--tx-muted-foreground);
+    text-decoration-color: transparent;
+  }
+  .crumbs__link:hover {
+    color: var(--tx-foreground);
+    text-decoration: underline;
+  }
+  .crumbs__link[aria-current='page'] {
+    color: var(--tx-foreground);
+  }
+  .crumbs__link:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .crumbs__sep {
+    color: var(--tx-muted-foreground);
+    user-select: none;
+  }
+</style>

@@ -54,7 +54,7 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/',
     reason:
-      'The landing hydrates the hero live widgets (slider, tabs, date picker, lazy chart) on load: 144.5 KB page, 109.2 KB JS.',
+      'The unified landing (PLAN_006 T-44) ships zero islands; its module scripts wire the install copy command and the ready signal. The generous page and JS limits below are the old hero-widget floors, kept until T-93 right-sizes them.',
     budget: { pageGzipKb: 152, jsGzipKb: 116, lcpMs: 3000 },
   },
   {
@@ -72,43 +72,80 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/charts-page/',
     reason:
-      'Every chart family renders its SVG demo (37.7 KB) and accessible data table (28.4 KB) statically: 174.5 KB raw, 25.1 KB gzip of HTML.',
-    budget: { htmlGzipKb: 28 },
+      'Every chart family renders its SVG demo and accessible data table statically. Measured 25.1 KB gzip at FIX-site-perf-routes; the PLAN_006 design audit (T-64..T-66) enriched the family demos and cards: 29.1 KB gzip, limit 30.',
+    budget: { htmlGzipKb: 30 },
+  },
+  {
+    route: '/brand/',
+    reason:
+      'The brand page tells the identity story with the real marks: the four PNG assets (logo and isotype, light and dark) load on open. Measured 114.9 KB page after T-83, limit 120.',
+    budget: { pageGzipKb: 120 },
+  },
+  {
+    route: '/blocks-page/',
+    reason:
+      'The blocks families render their demos statically; the PLAN_006 blocks audit (T-72/T-73) enriched the text, code, media and data demos: measured 97.1 KB page, limit 100.',
+    budget: { pageGzipKb: 100 },
+  },
+  {
+    route: '/builder/',
+    reason:
+      'The builder page mounts the BuilderApp studio island (structure tree, props and theme controls) on open: measured 31.7 KB gzip of HTML after the PLAN_006 builder polish (T-82).',
+    budget: { htmlGzipKb: 34 },
+  },
+  {
+    route: '/component-pages/',
+    reason:
+      'The catalog index lists every component with its summary and authoring guidance; the PLAN_006 catalog audit (T-81) added per-component guidance: measured 24.3 KB gzip, limit 26.',
+    budget: { htmlGzipKb: 26 },
+  },
+  {
+    route: '/web-and-native/',
+    reason:
+      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26.',
+    budget: { htmlGzipKb: 26 },
   },
   {
     route: '/gallery-themes/',
     reason:
-      'The first 24 cards are in the HTML (18.8 KB gzip); the full 210-card list is fetched as /theme-gallery.json (17.9 KB) and each shown card loads its theme CSS: 129.8 KB page.',
-    budget: { pageGzipKb: 132 },
+      'The first 24 cards are in the HTML (18.8 KB gzip at FIX-site-perf-routes); the full 210-card list is fetched as /theme-gallery.json (17.9 KB) and each shown card loads its theme CSS. The PLAN_006 gallery audit (T-83) enriched the cards: 228.6 KB raw, 64.9 KB JS, limits 232 / 68.',
+    budget: { htmlRawKb: 232, pageGzipKb: 132, jsGzipKb: 68 },
   },
   {
     route: '/theme-switcher/',
     reason:
-      'The first themes are in the HTML (15.5 KB gzip); the full catalog is fetched as /theme-catalog.json (9.1 KB): 97.4 KB page.',
-    budget: { pageGzipKb: 100 },
+      'The first themes are in the HTML; the full catalog is fetched as /theme-catalog.json. The PLAN_006 gallery audit (T-83) enriched the cards: measured 103.2 KB page, limit 108.',
+    budget: { pageGzipKb: 108 },
+  },
+  {
+    route: '/playground/',
+    reason:
+      'The playground stage mounts on open; the PLAN_006 studio polish (T-82) extended the presets: measured 100.6 KB page / 69.6 KB JS, limits 104 / 72.',
+    budget: { pageGzipKb: 104, jsGzipKb: 72 },
+  },
+  {
+    route: '/search/',
+    reason:
+      'The results island ships the static search index; it grew with the site content (PLAN_006 T-80/T-83): measured 104.4 KB page / 75.1 KB JS, limits 108 / 80.',
+    budget: { jsGzipKb: 80, pageGzipKb: 108 },
   },
   {
     route: '/color-explorer/',
     reason:
-      'The theme list and one theme payload are inline (291.5 KB raw, 30.8 KB gzip); other payloads load as /theme-data/<id>.json on selection: 108 KB page. The docs sidebar (every component and primitive linked) added 5.9 KB raw / 1.3 KB gzip: measured 297.4 / 32.1.',
-    budget: { htmlRawKb: 304, htmlGzipKb: 34, pageGzipKb: 112 },
+      'The theme list and one theme payload are inline; other payloads load as /theme-data/<id>.json on selection. Measured 291.5 KB raw / 30.8 KB gzip before the docs sidebar; the PLAN_006 studio polish (T-82) enriched the controls: 311.2 KB raw / 34.1 KB gzip of HTML, 114.8 KB page / 64.8 KB JS, limits 316 / 36 / 120 / 68.',
+    budget: { htmlRawKb: 316, htmlGzipKb: 36, pageGzipKb: 120, jsGzipKb: 68 },
   },
   {
     route: '/gallery-components/',
     reason:
-      'The living gallery: 125 server-rendered cards, each with its preview frame, light/dark and RTL controls, props toggle and tag filters (845.8 KB raw, 46.4 KB gzip of HTML). Previews load in isolated iframes only as cards scroll near and the props panel on first open: 176.2 KB page, 84.6 KB JS.',
-    budget: { htmlRawKb: 880, htmlGzipKb: 48, pageGzipKb: 184, jsGzipKb: 88 },
+      'The living gallery: server-rendered cards, each with its preview frame, light/dark and RTL controls, props toggle and tag filters. Measured 845.8 KB raw / 46.4 KB gzip at FIX-site-perf-routes; the PLAN_006 gallery audit (T-83) added card content: 888.2 KB raw / 48.5 KB gzip of HTML and 90.1 KB JS, limits 892 / 50 / 92. T-93 still owns slimming the raw size.',
+    budget: { htmlRawKb: 892, htmlGzipKb: 50, pageGzipKb: 184, jsGzipKb: 92 },
   },
   {
     route: '/examples/',
     reason:
       'Every registered example as a card with its source (725.2 KB raw, 60.1 KB gzip of HTML); live demos mount as cards scroll into view: 196.3 KB page, 100 KB JS.',
     budget: { htmlRawKb: 736, htmlGzipKb: 64, pageGzipKb: 200, jsGzipKb: 104 },
-  },
-  {
-    route: '/search/',
-    reason: 'The results island ships the static search index: 64.7 KB JS.',
-    budget: { jsGzipKb: 68 },
   },
   // T-site-live-primitives: until its live demo scrolls into view a primitive
   // page's JavaScript stays within the default (tests/e2e/site-live-primitives.spec.ts

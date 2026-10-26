@@ -1,11 +1,18 @@
 ---
 /**
  * /brand/: dedicated brand story page (same components as home, deeper framing).
+ * T-83 adds the identity system the punch list asked for: mark construction,
+ * the OKLCH token story as the color idea, voice principles and downloadable
+ * assets — all static, all honest about what exists (gallery punch list row 4).
  */
 import LiveDemos from '../../components/brand/LiveDemos.astro';
 import StoryStrip from '../../components/brand/StoryStrip.astro';
 import WhySections from '../../components/brand/WhySections.astro';
+import { withBase } from '../../components/foundation/site.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL;
+const asset = (file: string) => withBase(base, `/brand/${file}`);
 ---
 
 <BaseLayout
@@ -21,6 +28,159 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <StoryStrip />
   <WhySections />
   <LiveDemos />
+
+  <section class="brand-section" aria-labelledby="mark-title">
+    <h2 id="mark-title">The mark: a T built from texels</h2>
+    <p>
+      The isotype draws a <strong>T</strong> as a grid of small rounded squares—texels—that read as
+      one solid piece, the way texels become components and components become interfaces. The
+      lockup sets the mark beside the wordmark; both ship in a light variant (for light
+      backgrounds) and a dark one (for dark backgrounds), picked automatically with the color
+      mode.
+    </p>
+    <ul class="mark-rules">
+      <li>Keep one tile of clear space around the mark; never crowd it.</li>
+      <li>Floors: the isotype stays legible from 24 px; use the lockup from 96 px wide.</li>
+      <li>Never recolor the mark—swap variants for the background, not the palette.</li>
+    </ul>
+    <div class="mark-grid">
+      <figure>
+        <img
+          src={asset('texuli-logo-light.png')}
+          alt="Texuli logo lockup, dark mark for light backgrounds"
+          width="480"
+          height="140"
+          loading="lazy"
+        />
+        <figcaption>Lockup · light backgrounds · 480 × 140</figcaption>
+      </figure>
+      <figure>
+        <img
+          src={asset('texuli-logo-dark.png')}
+          alt="Texuli logo lockup, white mark for dark backgrounds"
+          width="480"
+          height="140"
+          loading="lazy"
+        />
+        <figcaption>Lockup · dark backgrounds · 480 × 140</figcaption>
+      </figure>
+      <figure>
+        <img
+          src={asset('texuli-isotype-light.png')}
+          alt="Texuli isotype, the texel-built T mark for light backgrounds"
+          width="128"
+          height="128"
+          loading="lazy"
+        />
+        <figcaption>Isotype · light backgrounds · 128 × 128</figcaption>
+      </figure>
+      <figure>
+        <img
+          src={asset('texuli-isotype-dark.png')}
+          alt="Texuli isotype, the texel-built T mark for dark backgrounds"
+          width="128"
+          height="128"
+          loading="lazy"
+        />
+        <figcaption>Isotype · dark backgrounds · 128 × 128</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="brand-section" aria-labelledby="color-title">
+    <h2 id="color-title">Color is a token story</h2>
+    <p>
+      There is no fixed brand palette to break: every color on this site is an OKLCH token in the
+      <code>--tx-*</code> contract, and the same contract repaints every component. Pick any of the
+      210 library themes and the brand keeps its structure—only the palette changes. That is the
+      color idea: <strong>one system, every palette</strong>.
+    </p>
+    <div class="swatch-row" aria-hidden="true">
+      <span class="swatch swatch-primary"></span>
+      <span class="swatch swatch-accent"></span>
+      <span class="swatch swatch-muted"></span>
+      <span class="swatch swatch-border"></span>
+      <span class="swatch swatch-surface"></span>
+    </div>
+    <p class="swatch-note" aria-hidden="true">
+      Live tokens from this page's theme: primary, accent, muted, border, surface.
+    </p>
+    <p>
+      Browse the full library with contrast scores on the
+      <a href="/gallery-themes/">theme gallery</a>, or blend your own in the
+      <a href="/color-explorer/">color explorer</a>.
+    </p>
+  </section>
+
+  <section class="brand-section" aria-labelledby="voice-title">
+    <h2 id="voice-title">Voice</h2>
+    <dl class="voice">
+      <div>
+        <dt>Honest</dt>
+        <dd>
+          Docs say what works today; planned work stays marked planned. Fictional data is labeled
+          fictional.
+        </dd>
+      </div>
+      <div>
+        <dt>Measured</dt>
+        <dd>
+          Claims carry numbers and the gate that measured them—budgets, sweeps and sizes are
+          published, not asserted (<a href="/perf/">the rollup</a>).
+        </dd>
+      </div>
+      <div>
+        <dt>Ownable</dt>
+        <dd>
+          Every piece is built here, from texels to screens: small, accessible and free to compose.
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="brand-section" aria-labelledby="assets-title">
+    <h2 id="assets-title">Assets</h2>
+    <p>Download the marks as PNG. Favicon sizes from 16 to 512 px ship in <code>/brand/</code>.</p>
+    <div class="assets-table" role="region" aria-labelledby="assets-caption" tabindex="0">
+      <table>
+        <caption id="assets-caption">Downloadable brand assets</caption>
+        <thead>
+          <tr>
+            <th scope="col">Asset</th>
+            <th scope="col">Use</th>
+            <th scope="col">Download</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Logo lockup · light</th>
+            <td>Dark mark plus wordmark, for light backgrounds</td>
+            <td><a href={asset('texuli-logo-light.png')} download>PNG · 480 × 140</a></td>
+          </tr>
+          <tr>
+            <th scope="row">Logo lockup · dark</th>
+            <td>White mark plus wordmark, for dark backgrounds</td>
+            <td><a href={asset('texuli-logo-dark.png')} download>PNG · 480 × 140</a></td>
+          </tr>
+          <tr>
+            <th scope="row">Isotype · light</th>
+            <td>The mark alone, for light backgrounds</td>
+            <td><a href={asset('texuli-isotype-light.png')} download>PNG · 128 × 128</a></td>
+          </tr>
+          <tr>
+            <th scope="row">Isotype · dark</th>
+            <td>The mark alone, for dark backgrounds</td>
+            <td><a href={asset('texuli-isotype-dark.png')} download>PNG · 128 × 128</a></td>
+          </tr>
+          <tr>
+            <th scope="row">App and touch icons</th>
+            <td>Favicons 16–512 px and the 180 × 180 touch icon, per scheme</td>
+            <td><a href={asset('texuli-favicon-light-512.png')} download>PNG · 512 × 512</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
@@ -39,5 +199,118 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     max-inline-size: 40rem;
     color: var(--tx-muted-foreground);
     font-size: 1.125rem;
+  }
+  .brand-section {
+    margin-block-start: 2.75rem;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .brand-section h2 {
+    margin: 0;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    line-height: 1.25;
+  }
+  .brand-section p {
+    margin: 0;
+    max-inline-size: 44rem;
+  }
+  .mark-rules {
+    margin: 0;
+    padding-inline-start: 1.25rem;
+    display: grid;
+    gap: 0.3rem;
+    max-inline-size: 44rem;
+  }
+  .mark-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 1rem;
+    margin: 0.5rem 0 0;
+  }
+  figure {
+    margin: 0;
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+    padding: 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-background);
+  }
+  figure img {
+    inline-size: auto;
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+  figcaption {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8125rem;
+  }
+  .swatch-row {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .swatch {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--tx-border);
+  }
+  .swatch-primary {
+    background: var(--tx-primary);
+  }
+  .swatch-accent {
+    background: var(--tx-accent);
+  }
+  .swatch-muted {
+    background: var(--tx-muted);
+  }
+  .swatch-border {
+    background: var(--tx-border);
+  }
+  .swatch-surface {
+    background: var(--tx-surface, var(--tx-background));
+  }
+  .swatch-note {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8125rem;
+  }
+  .voice {
+    margin: 0;
+    display: grid;
+    gap: 0.85rem;
+    max-inline-size: 44rem;
+  }
+  .voice dt {
+    font-weight: 700;
+  }
+  .voice dd {
+    margin: 0.15rem 0 0;
+  }
+  .assets-table {
+    overflow-x: auto;
+    border-radius: var(--tx-radius, 0.5rem);
+  }
+  .assets-table:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+  table {
+    inline-size: 100%;
+    min-inline-size: 34rem;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  caption {
+    text-align: start;
+    font-weight: 600;
+    padding-block-end: 0.5rem;
+  }
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    border-block-end: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+    text-align: start;
+    vertical-align: top;
   }
 </style>

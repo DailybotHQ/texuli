@@ -15,6 +15,7 @@ const { head } = Astro.props;
 ---
 
 <div class="copy-page" data-copy-page="">
+  <p class="copy-page__hint">This page ships a Markdown twin for AI tools.</p>
   <Button variant="outline" size="sm" data-copy-page-button="">Copy page</Button>
   <template data-page-markdown="">{head}</template>
   <p class="copy-page__status" role="status" data-copy-page-status=""></p>
@@ -26,6 +27,18 @@ const { head } = Astro.props;
     align-items: center;
     justify-content: flex-end;
     gap: 0.5rem;
+  }
+  .copy-page__hint {
+    /* Pushes the button to the inline end while the hint stays at the start. */
+    margin: 0;
+    margin-inline-end: auto;
+    color: var(--tx-muted-foreground);
+    font-size: 0.8125rem;
+  }
+  @media (max-width: 48rem) {
+    .copy-page__hint {
+      display: none;
+    }
   }
   .copy-page__status {
     margin: 0;

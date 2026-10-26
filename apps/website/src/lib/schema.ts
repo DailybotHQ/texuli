@@ -75,3 +75,37 @@ export function libraryJsonLd(): { '@context': string; '@graph': Array<Record<st
     ],
   };
 }
+
+/**
+ * The TechArticle graph for the architecture reading page (PLAN_006 T-17
+ * contract, `subsite-ia-nav.md` §3): the page is a technical article about
+ * how one catalog contract serves two runtimes, part of the Texuli site,
+ * authored by the owner organization.
+ */
+export function techArticleJsonLd(headline: string, description: string, path: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'TechArticle',
+        headline,
+        description,
+        url: `${SITE_URL}${path}`,
+        inLanguage: 'en',
+        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_URL}/` },
+        author: { '@type': 'Organization', name: 'Dailybot, Inc.', url: 'https://dailybot.com/' },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Dailybot, Inc.',
+          url: 'https://dailybot.com/',
+        },
+        license: 'https://opensource.org/licenses/MIT',
+        about: [
+          'Svelte 5 web components',
+          'Kotlin Multiplatform renderer',
+          'agent catalog contract',
+        ],
+      },
+    ],
+  };
+}

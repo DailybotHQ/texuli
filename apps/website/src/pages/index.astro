@@ -1,13 +1,16 @@
 ---
+import WebAgentsCta from '../components/sections/web/WebAgentsCta.astro';
+import WebCorrelation from '../components/sections/web/WebCorrelation.astro';
+import WebHero from '../components/sections/web/WebHero.astro';
+import WebWhySvelte from '../components/sections/web/WebWhySvelte.astro';
 /**
- * texuli.com home: a minimal landing (T-site-ia). The landing header (logo,
- * Docs, search, theme, Get started), one hero with live Texuli widgets, three
- * feature cards, a short agents strip and the footer. Everything else lives
- * in the docs, behind the sidebar.
+ * texuli.com home (PLAN_006 T-44): the unified landing assembled from the
+ * four blueprint sections in order — hero, why Svelte for the web, the
+ * correlation demo, agents + closing CTA (narrative blueprint §5 s1..s4).
+ * The retired minimal-landing sections (LandingHero, FeatureCards,
+ * AgentsSection and their islands) are deleted with this integration.
+ * Metadata and JSON-LD per the T-site-ia contract, unchanged.
  */
-import AgentsSection from '../components/landing/AgentsSection.astro';
-import FeatureCards from '../components/landing/FeatureCards.astro';
-import LandingHero from '../components/landing/LandingHero.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { libraryJsonLd } from '../lib/schema';
 ---
@@ -19,16 +22,18 @@ import { libraryJsonLd } from '../lib/schema';
   jsonLd={libraryJsonLd()}
 >
   <div class="landing" data-tx-landing="">
-    <LandingHero />
-    <FeatureCards />
-    <AgentsSection />
+    <WebHero />
+    <WebWhySvelte />
+    <WebCorrelation />
+    <WebAgentsCta />
   </div>
 </BaseLayout>
 
 <style>
+  /* Each section carries its own block padding: they stack as full-width
+     bands, no extra gap. */
   .landing {
     display: grid;
-    gap: clamp(1.5rem, 4vw, 3rem);
-    padding-block-end: clamp(2rem, 6vw, 4rem);
+    gap: 0;
   }
 </style>

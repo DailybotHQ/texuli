@@ -4,6 +4,11 @@
  * real component in an isolated preview (`/gallery-components/preview/`)
  * that loads when the card scrolls near. Filterable by category and tag.
  * Static after build; no runtime network.
+ *
+ * T-83 adds a page-owned "start here" row (one server-rendered line) above
+ * the island. The page's byte problem stays routed to T-93 (budget stays,
+ * content defers): the raw budget is already red before this lane, so the
+ * strip is deliberately minimal.
  */
 import ComponentGallery from '../../components/gallery-components/ComponentGallery.svelte';
 import {
@@ -12,17 +17,51 @@ import {
   galleryCategories,
 } from '../../components/gallery-components/index.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { pickStartHere } from './start-here.ts';
 
 const cards = buildGalleryComponentCards();
 // The island needs no example list: previews start from `initial`.
 const islandCards = cards.map(({ examples: _examples, ...card }) => ({ ...card, examples: [] }));
 const categories = galleryCategories(cards);
 const tags = galleryAllTags(cards);
+const startHere = pickStartHere(cards);
 ---
 
 <BaseLayout
   title="Component gallery"
   description="Every Texuli catalog component, live: real previews you can switch to dark or right to left, props you can edit and code you can copy."
 >
+  <nav class="start-here" aria-label="Start here: everyday components">
+    <span class="start-here__label">Start here:</span>
+    {startHere.map((card, index) => (
+      <>
+        {index > 0 && <span class="start-here__sep" aria-hidden="true">·</span>}
+        <a href={card.href}>{card.label}</a>
+      </>
+    ))}
+  </nav>
   <ComponentGallery client:load cards={islandCards} {categories} {tags} />
 </BaseLayout>
+
+<style>
+  .start-here {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-block-end: 1.25rem;
+    font-size: 0.9375rem;
+  }
+  .start-here__label {
+    font-weight: 700;
+  }
+  .start-here__sep {
+    color: var(--tx-muted-foreground);
+  }
+  .start-here a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--tx-link, var(--tx-foreground));
+  }
+</style>

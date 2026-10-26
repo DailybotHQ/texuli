@@ -23,6 +23,7 @@ const builderHref = `${base.replace(/\/+$/, '')}/builder/`;
   title="Editor"
   description="The Texuli rich text editor: a closed document model, a formatting toolbar, links checked by the URL policy, undo and redo, and Markdown in and out, with no HTML sinks."
 >
+  <p class="eyebrow">Rich text</p>
   <h1>Editor</h1>
   <p class="lead">
     <code>@texuli/editor</code> edits rich text over a closed document model: every node and mark
@@ -152,6 +153,14 @@ const builderHref = `${base.replace(/\/+$/, '')}/builder/`;
     margin-block: 0 0.25rem;
     font-size: clamp(2rem, 6vw, 3rem);
     line-height: 1.15;
+  }
+  .eyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
   }
   h2 {
     margin-block: 2rem 0.5rem;

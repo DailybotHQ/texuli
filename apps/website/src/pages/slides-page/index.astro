@@ -24,6 +24,7 @@ const showcaseHref = `${base.replace(/\/+$/, '')}/showcase/slide-deck/`;
   title="Slides"
   description="Texuli slides: validated decks on a Svelte stage with reveal steps, slot masters, a presenter view, fullscreen, print and PPTX export, and starter templates."
 >
+  <p class="eyebrow">Presentations</p>
   <h1>Slides</h1>
   <p class="lead">
     <code>@texuli/slides</code> turns a validated deck of content blocks into a presentation: a
@@ -139,6 +140,14 @@ const showcaseHref = `${base.replace(/\/+$/, '')}/showcase/slide-deck/`;
     margin-block: 0 0.25rem;
     font-size: clamp(2rem, 6vw, 3rem);
     line-height: 1.15;
+  }
+  .eyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
   }
   h2 {
     margin-block: 2rem 0.5rem;

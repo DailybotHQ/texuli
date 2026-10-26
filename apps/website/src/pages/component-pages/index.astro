@@ -4,6 +4,7 @@
  */
 import { Badge } from 'texuli/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'texuli/card';
+import { familyNote } from '../../components/component-pages/family-notes.ts';
 import {
   COMPONENT_PAGES,
   componentPagePath,
@@ -33,6 +34,7 @@ const groups = [...byGroup.keys()].sort((a, b) => a.localeCompare(b, 'en'));
         <h2 id={`g-${group}`}>
           {group} <Badge variant="secondary">{byGroup.get(group)!.length}</Badge>
         </h2>
+        {familyNote(group) && <p class="family-note">{familyNote(group)?.headline}</p>}
         <ul class="grid">
           {byGroup.get(group)!.map((entry) => (
             <li>
@@ -79,6 +81,11 @@ const groups = [...byGroup.keys()].sort((a, b) => a.localeCompare(b, 'en'));
     margin: 0 0 0.75rem;
     font-size: 1.25rem;
     text-transform: capitalize;
+  }
+  .family-note {
+    margin: -0.35rem 0 0.75rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.95rem;
   }
   .grid {
     list-style: none;

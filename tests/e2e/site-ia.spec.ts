@@ -134,34 +134,30 @@ test.describe('landing', () => {
     await expect(page.getByRole('button', { name: 'Copy page' })).toHaveCount(0);
   });
 
-  test('one hero with live widgets, three feature cards, an agents strip and the footer', async ({
+  test('the four unified sections mount in order with the footer and zero islands', async ({
     page,
   }) => {
     await visit(page, '/');
     const main = page.getByRole('main');
     await expect(main.getByRole('heading', { level: 1 })).toHaveText('Interfaces from texels.');
-    const hero = page.locator('[data-tx-landing-hero]');
-    await expect(hero.getByRole('link')).toHaveCount(2);
-
-    // The widgets are real Texuli components that respond.
-    const moments = page.locator('[data-tx-landing-moments]');
-    await expect(moments.locator('astro-island[ssr]')).toHaveCount(0);
-    const mute = moments.getByRole('button', { name: 'Mute output' });
-    await expect(mute).toHaveAttribute('aria-pressed', 'false');
-    await mute.click();
-    await expect(mute).toHaveAttribute('aria-pressed', 'true');
-    await expect(moments.getByRole('slider', { name: 'Volume' })).toBeDisabled();
-
-    const features = page.locator('[data-tx-landing-features]');
-    await expect(features.getByRole('heading', { level: 3 })).toHaveCount(3);
-    await expect(page.locator('[data-tx-landing-agents]')).toBeVisible();
-    await expect(page.getByRole('contentinfo')).toBeVisible();
-
-    // Nothing else on the home: these four sections and nothing between them.
+    // The four blueprint sections (T-44) and nothing between them (the
+    // agents CTA's module script rides inside the grid and is not content).
     const sections = await page
       .locator('[data-tx-landing] > *')
-      .evaluateAll((nodes) => nodes.map((node) => node.tagName.toLowerCase()));
-    expect(sections).toEqual(['section', 'section', 'section']);
+      .evaluateAll((nodes) =>
+        nodes
+          .map((node) => node.tagName.toLowerCase())
+          .filter((tag) => tag !== 'script')
+      );
+    expect(sections).toEqual(['section', 'section', 'section', 'section']);
+    // The hero's theme moment is build-time data painted in the HTML.
+    await expect(page.locator('[data-tx-hero-theme]')).toHaveCount(6);
+    // No islands inside the landing content: the sections' scripts are
+    // module scripts. The header chrome (SiteSearch, ThemeSwitch) hydrates
+    // as on every page.
+    await expect(page.locator('[data-tx-landing] astro-island')).toHaveCount(0);
+    await expect(page.locator('[data-tx-web-agents]')).toBeVisible();
+    await expect(page.getByRole('contentinfo')).toBeVisible();
   });
 
   test('fits a phone with no horizontal scroll', async ({ page }, info) => {
@@ -249,7 +245,10 @@ test.describe('docs shell', () => {
       .getByRole('link', { name: 'Native', exact: true })
       .click();
     await expect(page).toHaveURL(/\/native\/$/);
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('native');
+    // The native hero's h1 is the one-contract claim (T-45's content decision).
+    await expect(page.locator('#native-hero-title')).toHaveText(
+      'The same catalog, rendered by Compose.'
+    );
   });
 
   test('a guide lives in the shell: one navigation, its group open, the shared pager', async ({

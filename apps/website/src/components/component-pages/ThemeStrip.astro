@@ -1,0 +1,152 @@
+---
+/**
+ * The "in your theme" strip on one component page (T-81, punch-list row 4):
+ * three themes from the real library with token values computed at build
+ * (`themes-sample.ts`), rendered as static HTML — no island, no extra
+ * requests. Each card overrides the core `--tx-*` surface variables on
+ * itself, so the card, its swatches, its "Aa" specimen and even its focus
+ * ring are painted by that theme's own tokens. No animation, so reduced
+ * motion holds by construction.
+ */
+import { SITE_THEME } from '../foundation/site.ts';
+import { libraryThemeCount, loadStripThemes, stripVarsStyle } from './themes-sample.ts';
+
+const [themes, themeCount] = await Promise.all([loadStripThemes(), libraryThemeCount()]);
+
+/** The swatches one card shows; the value rides the card's own variables. */
+const SWATCHES = ['--tx-background', '--tx-surface', '--tx-primary', '--tx-accent', '--tx-border'];
+const swatchVars = (theme: (typeof themes)[number]) =>
+  SWATCHES.map((name) => ({ name, value: theme.vars[name] ?? '' }));
+---
+<section class="cp-themes" aria-labelledby="cp-themes-title" data-tx-theme-strip>
+  <h2 id="cp-themes-title">In your theme</h2>
+  <p class="cp-themes__lead">
+    This page renders in the site theme, <code>{SITE_THEME}</code>. Every one of the
+    <strong data-theme-count>{themeCount}</strong> library themes re-colors every component
+    through the <code>--tx-*</code> contract. The three below carry real token values from
+    the library, rendered at build — no island, no extra requests.
+  </p>
+  <ul class="cp-themes__grid" role="list">
+    {
+      themes.map((theme) => (
+        <li class="cp-themes__card" style={stripVarsStyle(theme.vars)} data-tx-theme-card={theme.id}>
+          <p class="cp-themes__name">{theme.name}</p>
+          <p class="cp-themes__meta">
+            {theme.mode} mode · {theme.contrastLevel} contrast
+          </p>
+          <p class="cp-themes__specimen">
+            <span class="cp-themes__aa" aria-hidden="true">Aa</span>
+          </p>
+          <ul class="cp-themes__swatches" role="list">
+            {swatchVars(theme).map(({ name, value }) => (
+              <li>
+                <span class="cp-themes__chip-color" style={`background:${value}`} aria-hidden="true" />
+                <code>{name.replace('--tx-', '')}</code>
+              </li>
+            ))}
+          </ul>
+          <a class="cp-themes__studio" href="/theme-studio/">
+            Open Theme Studio
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .cp-themes {
+    display: grid;
+    gap: 0.75rem;
+  }
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+  .cp-themes__lead {
+    margin: 0;
+    max-inline-size: 44rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.95rem;
+  }
+  .cp-themes__grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* One theme's tokens override the core surface variables on the card itself. */
+  .cp-themes__card {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+    padding: 0.9rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius);
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+  }
+  .cp-themes__name {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 650;
+  }
+  .cp-themes__meta {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.85rem;
+  }
+  .cp-themes__specimen {
+    margin: 0;
+  }
+  .cp-themes__aa {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--tx-radius);
+    background: var(--tx-primary);
+    color: var(--tx-primary-foreground);
+    font-size: 1.05rem;
+    font-weight: 650;
+  }
+  .cp-themes__swatches {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .cp-themes__swatches li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-inline-size: 0;
+  }
+  .cp-themes__chip-color {
+    inline-size: 1rem;
+    block-size: 1rem;
+    flex: none;
+    border: 1px solid var(--tx-border-strong);
+    border-radius: 0.25rem;
+  }
+  .cp-themes__swatches code {
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+  .cp-themes__studio {
+    justify-self: start;
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--tx-radius);
+    background: var(--tx-primary);
+    color: var(--tx-primary-foreground);
+    text-decoration: none;
+    font-size: 0.85rem;
+  }
+  /* The themed focus ring: painted by the card's own theme, like the demo. */
+  .cp-themes__studio:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+</style>

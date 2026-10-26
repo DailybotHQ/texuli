@@ -22,6 +22,24 @@ const byKind = (kind: SearchKind) => SEARCH_INDEX.filter((e) => e.kind === kind)
       <p class="lead">
         A static index of this site. Press <kbd>⌘</kbd><kbd>K</kbd> (or <kbd>Ctrl</kbd><kbd>K</kbd>) or use Search in the header.
       </p>
+      <form class="search-page__form" method="get" action={withBase(base, 'search/')} role="search" aria-label="Site search">
+        <label class="search-page__form-label" for="search-page-q">Search the site</label>
+        <div class="search-page__form-row">
+          <input
+            id="search-page-q"
+            name="q"
+            type="search"
+            placeholder="Docs, components, themes, examples…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button type="submit">Search</button>
+        </div>
+        <p class="search-page__form-hint">
+          A plain form, so it works with JavaScript off; results render once the small results
+          island loads.
+        </p>
+      </form>
     </header>
 
     <SearchResults client:load base={base} />
@@ -79,6 +97,51 @@ const byKind = (kind: SearchKind) => SEARCH_INDEX.filter((e) => e.kind === kind)
     border-radius: 0.25rem;
     background: var(--tx-muted);
     font-size: 0.8125rem;
+  }
+  .search-page__form {
+    display: grid;
+    gap: 0.35rem;
+    max-inline-size: 34rem;
+  }
+  .search-page__form-label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--tx-foreground);
+  }
+  .search-page__form-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .search-page__form-row input {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    min-block-size: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    font: inherit;
+  }
+  .search-page__form-row input:focus-visible,
+  .search-page__form-row button:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .search-page__form-row button {
+    min-block-size: 2.75rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, var(--tx-background));
+    color: var(--tx-foreground);
+    font: inherit;
+    cursor: pointer;
+  }
+  .search-page__form-hint {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--tx-muted-foreground, var(--tx-foreground));
   }
   .search-page h2,
   .search-page h3 {

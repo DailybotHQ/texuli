@@ -1,0 +1,196 @@
+---
+/**
+ * /web-and-native/ — the web/native parity table section (PLAN_006 T-50).
+ *
+ * One real `<table>`: caption, four column headers, one row-header
+ * `scope="row"` per capability, and honest runtime statuses with a dedicated
+ * evidence column citing the repository surfaces they rest on. The
+ * planned marker follows the site convention the native evidence section
+ * uses: `data-status="planned"` plus the visible word, never color alone.
+ *
+ * Data comes from `./parity-data.ts`, whose unit test asserts every cited
+ * surface exists in the checkout, so the table can only say what is real.
+ *
+ * A11y: one `section` landmark named by its `h2`; the table lives in a
+ * keyboard-scrollable named region for narrow viewports; status is carried
+ * by text first. Static markup, zero script, no motion.
+ */
+import { PARITY_ROWS, STATUS_LABELS, STATUS_LEGEND } from './parity-data.ts';
+
+const titleId = 'arch-parity-title';
+---
+
+<section class="arch-parity" aria-labelledby={titleId} data-tx-arch-section="parity">
+  <h2 id={titleId}>The same catalog, capability by capability</h2>
+  <p class="arch-parity__lead">
+    The spec contract is one declaration with two consumers. This table states what each runtime
+    has today, honestly marked, and names the surface every status rests on — every path is in this
+    repository and opens.
+  </p>
+  <p class="arch-parity__legend">{STATUS_LEGEND}</p>
+
+  <div class="arch-parity__region" role="region" aria-label="Web and native parity table" tabindex="0">
+    <table class="arch-parity__table">
+      <caption>
+        Web and native status per capability, each citing the repository surface it rests on.
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Capability</th>
+          <th scope="col">Web runtime</th>
+          <th scope="col">Native runtime</th>
+          <th scope="col">Evidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          PARITY_ROWS.map((row) => (
+            <tr>
+              <th scope="row">{row.capability}</th>
+              <td>
+                <span class="arch-parity__status" data-status={row.web.status}>
+                  {STATUS_LABELS[row.web.status]}
+                </span>
+                <p class="arch-parity__detail">{row.web.detail}</p>
+              </td>
+              <td>
+                <span class="arch-parity__status" data-status={row.native.status}>
+                  {STATUS_LABELS[row.native.status]}
+                </span>
+                <p class="arch-parity__detail">{row.native.detail}</p>
+              </td>
+              <td class="arch-parity__evidence">
+                <div><span>Web</span><code>{row.web.surface}</code></div>
+                <div><span>Native</span><code>{row.native.surface}</code></div>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+  .arch-parity {
+    display: grid;
+    gap: 1rem;
+    padding-block: clamp(2rem, 6vw, 4rem);
+    color: var(--tx-foreground);
+  }
+  .arch-parity h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    line-height: 1.2;
+  }
+  .arch-parity__lead {
+    margin: 0;
+    max-inline-size: 46rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.6;
+  }
+  .arch-parity__legend {
+    margin: 0;
+    max-inline-size: 46rem;
+    font-size: 0.85rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.55;
+  }
+  .arch-parity__region {
+    overflow: auto;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, var(--tx-background));
+  }
+  .arch-parity__region:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .arch-parity__table {
+    min-inline-size: 42rem;
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .arch-parity__table caption {
+    caption-side: top;
+    text-align: start;
+    padding-block: 0.5rem;
+    padding-inline: 0.75rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.8rem;
+  }
+  .arch-parity__table th,
+  .arch-parity__table td {
+    border-block-start: var(--tx-border-width, 1px) solid var(--tx-border);
+    padding: 0.6rem 0.75rem;
+    text-align: start;
+    vertical-align: top;
+  }
+  .arch-parity__table thead th {
+    border-block-start: none;
+    color: var(--tx-muted-foreground);
+    font-weight: 600;
+  }
+  .arch-parity__table tbody th {
+    font-weight: 650;
+    min-inline-size: 9rem;
+  }
+  .arch-parity__status {
+    display: inline-block;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: 999px;
+    padding-block: 0.1rem;
+    padding-inline: 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .arch-parity__status[data-status='exists'] {
+    background: var(--tx-primary);
+    border-color: var(--tx-primary);
+    color: var(--tx-primary-foreground, var(--tx-background));
+  }
+  .arch-parity__status[data-status='in-repo'] {
+    background: color-mix(in oklab, var(--tx-muted) 55%, var(--tx-background));
+    color: var(--tx-foreground);
+  }
+  .arch-parity__status[data-status='planned'] {
+    background: transparent;
+    color: var(--tx-muted-foreground);
+  }
+  .arch-parity__detail {
+    margin: 0.4rem 0 0;
+    line-height: 1.5;
+  }
+  .arch-parity__evidence {
+    min-inline-size: 15rem;
+  }
+  .arch-parity__evidence div {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .arch-parity__evidence div + div {
+    margin-block-start: 0.55rem;
+  }
+  .arch-parity__evidence span {
+    color: var(--tx-muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .arch-parity__evidence code {
+    font-size: 0.75rem;
+    color: var(--tx-muted-foreground);
+    overflow-wrap: anywhere;
+  }
+  @media (forced-colors: active) {
+    .arch-parity__region,
+    .arch-parity__table th,
+    .arch-parity__table td,
+    .arch-parity__status {
+      border-color: CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+  }
+</style>

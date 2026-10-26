@@ -2,13 +2,13 @@
  * Build-time HTML to Markdown for "Copy page" (FIX-site-sidebar-nav): turns a
  * page's rendered main content into Markdown an agent can read. Runs only in
  * the Astro build on the site's own HTML. Text only: scripts, styles,
- * templates, SVG, navigation, forms and hidden content are dropped; nothing
- * is executed, and the result goes back into the page only as escaped text
+ * templates, SVG, navigation, forms, the copy-page hint and hidden content
+ * are dropped; nothing is executed, and the result goes back into the page only as escaped text
  * (`integration.ts`).
  */
 
 const DROP =
-  /<(script|style|template|svg|noscript|button|select|textarea|input|dialog|nav)\b[^>]*>[\s\S]*?<\/\1>|<(input|img|br|hr|meta|link)\b[^>]*\/?>/gi;
+  /<(script|style|template|svg|noscript|button|select|textarea|input|dialog|nav)\b[^>]*>[\s\S]*?<\/\1>|<(input|img|br|hr|meta|link)\b[^>]*\/?>|<p class="copy-page__hint">[\s\S]*?<\/p>/gi;
 
 const ENTITIES: Record<string, string> = {
   amp: '&',

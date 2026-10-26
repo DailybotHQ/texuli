@@ -37,6 +37,7 @@ import {
   EMPTY_BLUEPRINT,
   flattenTree,
   inspectorFields,
+  isBareDraft,
 } from './model.ts';
 import {
   copySubtrees,
@@ -433,6 +434,15 @@ function reset() {
         <input type="text" readonly value={shareUrl} data-builder-share-url onfocus={(event) => event.currentTarget.select()} />
       </label>
     {/if}
+    <details class="builder__keys" data-builder-keys>
+      <summary>Keyboard</summary>
+      <ul>
+        <li><kbd>F6</kbd> / <kbd>Shift</kbd>+<kbd>F6</kbd>: next / previous pane (toolbar, palette, structure, preview, inspector, payload)</li>
+        <li><kbd>Control</kbd> or <kbd>Cmd</kbd> + <kbd>Z</kbd>: undo; with <kbd>Shift</kbd> (or <kbd>Ctrl</kbd> + <kbd>Y</kbd>): redo. Text fields keep their own undo.</li>
+        <li>Structure rows: <kbd>Arrows</kbd> move focus, <kbd>Right</kbd> enters a child, <kbd>Left</kbd> goes to the parent; <kbd>Shift</kbd> + <kbd>Arrows</kbd> extends the selection; <kbd>Space</kbd> toggles a row; <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>A</kbd> / <kbd>C</kbd> / <kbd>V</kbd> / <kbd>D</kbd> selects all, copies, pastes, duplicates; <kbd>Delete</kbd> removes; <kbd>Escape</kbd> cancels a drag or clears the selection; <kbd>Alt</kbd> + <kbd>Arrows</kbd> move the row.</li>
+        <li>Inspector list items: <kbd>Alt</kbd> + <kbd>Arrows</kbd> move the item, with focus following it.</li>
+      </ul>
+    </details>
   </div>
 
   <div class="builder__grid">
@@ -442,6 +452,26 @@ function reset() {
 
     <section class="builder__pane builder__outline" aria-labelledby="outline-heading" data-builder-pane>
       <h2 id="outline-heading">Structure</h2>
+      {#if isBareDraft(tree)}
+        <div class="builder__firstrun" data-builder-firstrun>
+          <h3>Compose your first blueprint</h3>
+          <p>
+            Nothing is in the page yet. Insert a component from the palette, or start from a
+            fictional sample. A sample is checked like a JSON commit before it replaces this draft,
+            and undo brings the old draft back.
+          </p>
+          <div class="builder__firstrun-actions">
+            {#each STARTERS.filter((starter) => starter.id !== 'empty') as starter (starter.id)}
+              <button
+                type="button"
+                title={starter.summary}
+                data-builder-firstrun-starter={starter.id}
+                onclick={() => void start(starter.id)}
+              >{starter.label}</button>
+            {/each}
+          </div>
+        </div>
+      {/if}
       <p class="builder__hint">Select a row, then use the palette to insert a child.</p>
       <Outline
         {tree}
@@ -560,6 +590,14 @@ function reset() {
   .builder__unsupported ul { margin: 0; padding-inline-start: 1.1rem; }
   .builder__guidance { border-block-start: 1px solid var(--tx-border, ButtonBorder); margin-block-start: 1rem; padding-block-start: .75rem; font-size: .875rem; }
   .builder__guidance h4, .builder__guidance p { margin: 0 0 .4rem; }
+  .builder__firstrun { display: grid; gap: .5rem; margin-block-end: 1rem; padding: 1rem; border: 1px dashed var(--tx-border, ButtonBorder); border-radius: .65rem; background: var(--tx-surface, Canvas); }
+  .builder__firstrun h3 { margin: 0; font-size: 1rem; }
+  .builder__firstrun p { margin: 0; color: var(--tx-muted-foreground, GrayText); font-size: .875rem; }
+  .builder__firstrun-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .builder__keys { inline-size: 100%; font-size: .875rem; }
+  .builder__keys summary { cursor: pointer; font-weight: 600; }
+  .builder__keys ul { margin: .5rem 0 0; padding-inline-start: 1.1rem; display: grid; gap: .35rem; }
+  .builder__keys kbd { border: 1px solid var(--tx-border, ButtonBorder); border-radius: .3rem; padding: 0 .3rem; font-family: var(--tx-font-mono, ui-monospace, monospace); font-size: .8125rem; }
   @media (max-width: 68rem) { .builder__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .builder__palette { grid-column: 1 / -1; } }
   @media (max-width: 44rem) { .builder__grid { grid-template-columns: minmax(0, 1fr); } .builder__palette { grid-column: auto; } }
   @media (prefers-reduced-motion: reduce) { .builder *, .builder *::before, .builder *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }

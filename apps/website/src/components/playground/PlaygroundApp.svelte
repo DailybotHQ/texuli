@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { RenderNode } from '@texuli/catalog/render/renderer';
 import { Button } from 'texuli/button';
+import { type ToolShortcutMap, toolShortcut } from '../tool-keys.ts';
 import { defaultEditorJson, PLAYGROUND_PRESETS, presetById } from './presets.ts';
 import { formatDiagnostics, type PlaygroundRunOk, runPlaygroundTree } from './run.ts';
 import TreePreview from './TreePreview.svelte';
@@ -16,6 +17,7 @@ let parseError = $state<string | null>(null);
 let run = $state<PlaygroundRunOk | null>(null);
 let roots = $state<readonly RenderNode[]>([]);
 let diagnosticLines = $state<string[]>([]);
+let keysOpen = $state(false);
 
 const groups = $derived.by(() => {
   const map = new Map<string, typeof PLAYGROUND_PRESETS>();
@@ -38,6 +40,12 @@ function applyPreset(id: string): void {
   diagnosticLines = [];
 }
 
+/** A preset card: load the sample and run it, so the caption's proof is instant. */
+function pickPreset(id: string): void {
+  applyPreset(id);
+  render();
+}
+
 function render(): void {
   const result = runPlaygroundTree(source);
   if (!result.ok) {
@@ -57,10 +65,49 @@ function onPresetChange(event: Event): void {
   const value = (event.currentTarget as HTMLSelectElement).value;
   applyPreset(value);
 }
+
+/* ── Keyboard map (punch-list row 4) ──────────────────────────────────── */
+
+const PLAYGROUND_KEYS: ToolShortcutMap = { r: 'render', '?': 'keys' };
+
+function onPlaygroundKey(event: KeyboardEvent): void {
+  const action = toolShortcut(event, event.target, PLAYGROUND_KEYS);
+  if (!action) return;
+  if (action === 'keys') keysOpen = !keysOpen;
+  else if (action === 'render') render();
+}
 </script>
 
+<svelte:window onkeydown={onPlaygroundKey} />
+
 <div class="playground" data-tx-playground="">
-  <div class="playground__controls">
+  <section class="playground__presets" aria-labelledby="playground-presets-heading">
+    <h2 id="playground-presets-heading">Presets, and what each one proves</h2>
+    <p class="playground__presets-lead">
+      Every card loads its sample into the editor and runs it once. The hostile cards are the
+      corpus an agent host should expect; each caption states the property the neutralized output
+      demonstrates.
+    </p>
+    <div class="presets" role="group" aria-label="Presets">
+      {#each PLAYGROUND_PRESETS as preset (preset.id)}
+        <button
+          type="button"
+          class="preset"
+          class:preset--active={preset.id === presetId}
+          aria-pressed={preset.id === presetId}
+          data-tx-playground-preset={preset.id}
+          onclick={() => pickPreset(preset.id)}
+        >
+          <span class="preset__group" data-group={preset.group}>{preset.group}</span>
+          <span class="preset__label">{preset.label}</span>
+          <span class="preset__proves">{preset.proves}</span>
+        </button>
+      {/each}
+    </div>
+  </section>
+
+  <div class="playground__grid">
+    <div class="playground__controls">
     <label class="field">
       <span class="field__label">Preset</span>
       <select class="field__control" aria-label="Preset" value={presetId} onchange={onPresetChange}>
@@ -93,6 +140,17 @@ function onPresetChange(event: Event): void {
     {#if parseError}
       <p class="error" role="alert" data-tx-playground-parse-error="">{parseError}</p>
     {/if}
+    <details class="keys" data-tx-playground-keys bind:open={keysOpen}>
+      <summary>Keyboard</summary>
+      <p class="hint">
+        The editor, select and buttons are ordinary controls: Tab moves between them and arrow keys
+        work inside the select. These shortcuts do not fire while you type in the editor.
+      </p>
+      <ul class="keys__list">
+        <li><kbd>R</kbd> run the tree in the editor</li>
+        <li><kbd>?</kbd> show or hide this list</li>
+      </ul>
+    </details>
   </div>
 
   <div class="playground__output">
@@ -126,6 +184,7 @@ function onPresetChange(event: Event): void {
       {/if}
     </section>
   </div>
+  </div>
 </div>
 
 <style>
@@ -137,13 +196,86 @@ function onPresetChange(event: Event): void {
      intrinsic width is its widest option label, which would otherwise size
      every ancestor track past the viewport on small screens. */
   .playground,
+  .playground__grid,
   .playground__controls,
   .playground__output,
   .field {
     min-inline-size: 0;
   }
+  .playground__presets {
+    display: grid;
+    gap: 0.6rem;
+    min-inline-size: 0;
+  }
+  .playground__presets h2 {
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--tx-foreground);
+  }
+  .playground__presets-lead {
+    margin: 0;
+    font-size: 0.9375rem;
+    max-inline-size: 46rem;
+    color: var(--tx-foreground);
+  }
+  .presets {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(15rem, 18rem);
+    gap: 0.6rem;
+    overflow-x: auto;
+    padding-block-end: 0.35rem;
+  }
+  .preset {
+    display: grid;
+    gap: 0.25rem;
+    align-content: start;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    min-inline-size: 0;
+  }
+  .preset:hover {
+    background: var(--tx-muted, var(--tx-background));
+  }
+  .preset--active {
+    border-color: var(--tx-ring);
+    box-shadow: inset 0 0 0 1px var(--tx-ring);
+  }
+  .preset:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .preset__group {
+    justify-self: start;
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--tx-border);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .preset__group[data-group='safe'] {
+    border-color: var(--tx-success, var(--tx-border));
+  }
+  .preset__label {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    overflow-wrap: anywhere;
+  }
+  .preset__proves {
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
+  }
   @media (min-width: 64rem) {
-    .playground {
+    .playground__grid {
+      display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       align-items: start;
     }
@@ -232,12 +364,44 @@ function onPresetChange(event: Event): void {
     gap: 0.35rem;
     font-size: 0.875rem;
   }
+  .keys {
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding: 0.65rem 0.75rem;
+  }
+  .keys summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--tx-foreground);
+  }
+  .keys__list {
+    margin: 0.5rem 0 0;
+    padding-inline-start: 1.25rem;
+    display: grid;
+    gap: 0.3rem;
+    font-size: 0.875rem;
+  }
+  .keys kbd {
+    padding: 0.05rem 0.35rem;
+    border: 1px solid var(--tx-border);
+    border-radius: 0.25rem;
+    background: var(--tx-background);
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.8125rem;
+  }
   @media (forced-colors: active) {
     .field__control,
     .panel,
-    .error {
+    .error,
+    .preset,
+    .keys,
+    .keys kbd {
       border-color: ButtonText;
       forced-color-adjust: none;
+    }
+    .preset--active {
+      border-color: Highlight;
     }
   }
 </style>

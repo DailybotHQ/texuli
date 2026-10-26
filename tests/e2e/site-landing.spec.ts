@@ -1,8 +1,9 @@
 /// <reference types="node" />
 /**
- * texuli.com home landing (FIX-site-landing): sections, keyboard CTAs and hero
- * widgets, no foreign requests, axe zero exclusions light/dark/forced-colors
- * on desktop Chromium and Pixel 7.
+ * texuli.com home (PLAN_006 T-44): the unified landing — four blueprint
+ * sections in order, hero CTAs and the install copy interaction keyboard
+ * reachable, the correlation demo real, no foreign requests, axe zero
+ * exclusions light/dark/forced-colors on desktop Chromium and Pixel 7.
  */
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
@@ -106,86 +107,84 @@ async function setMode(page: Page, mode: Mode) {
 }
 
 test.describe('texuli.com landing', () => {
-  test('sections, CTAs and hero widgets are present and keyboard-reachable', async ({ page }) => {
+  test('the four sections mount in blueprint order and the CTAs work', async ({ page }) => {
     expect(await visit(page, '/')).toEqual([]);
     await expect(page).toHaveTitle('Texuli');
 
-    // A minimal landing (T-site-ia): no announcement banner or themes strip.
+    // A minimal landing (T-site-ia): no announcement banner.
     await expect(page.getByRole('complementary', { name: 'Announcement' })).toHaveCount(0);
 
+    // Blueprint order (T-44): hero → why Svelte → correlation → agents+CTA,
+    // read as document order of the four section landmarks.
+    const order = await page.$$eval(
+      '[data-tx-web-hero], [data-tx-web-why-svelte], [data-tx-web-correlation], [data-tx-web-agents]',
+      (sections) =>
+        sections.map((section) => {
+          const attributes = Array.from(section.attributes).map((attribute) => attribute.name);
+          if (attributes.includes('data-tx-web-hero')) return 'hero';
+          if (attributes.includes('data-tx-web-why-svelte')) return 'why';
+          if (attributes.includes('data-tx-web-correlation')) return 'correlation';
+          return 'agents';
+        })
+    );
+    expect(order).toEqual(['hero', 'why', 'correlation', 'agents']);
+
+    // Hero: earned h1, platform eyebrow, the real-theme moment.
     await expect(
       page.getByRole('heading', { level: 1, name: 'Interfaces from texels.' })
     ).toBeVisible();
-    const start = page.getByRole('link', { name: 'Start building' });
-    const browse = page.getByRole('link', { name: 'Browse components' });
+    await expect(page.getByText('One catalog · web and native')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: /themes, one engine/ })).toBeVisible();
+    await expect(page.locator('[data-tx-hero-theme]')).toHaveCount(6);
+
+    // The hero CTA pair and the gallery links behind the moment.
+    const hero = page.locator('[data-tx-web-hero]');
+    const start = hero.getByRole('link', { name: 'Start building' });
     await expect(start).toBeVisible();
-    await expect(browse).toBeVisible();
     await start.focus();
     await expect(start).toBeFocused();
-    await browse.focus();
-    await expect(browse).toBeFocused();
+    const native = hero.getByRole('link', { name: 'See the native story' });
+    await expect(native).toBeVisible();
+    await native.focus();
+    await expect(native).toBeFocused();
+    await expect(hero.getByRole('link', { name: 'Browse the theme gallery' })).toBeVisible();
+    await expect(hero.getByRole('link', { name: 'Browse the component catalog' })).toBeVisible();
 
-    await expect(page.getByRole('heading', { level: 2, name: 'Live moments' })).toBeVisible();
-    await expect(page.locator('[data-moment="media"]')).toBeVisible();
-    await expect(page.locator('[data-moment="thermostat"]')).toBeVisible();
-    await expect(page.locator('[data-moment="team"]')).toBeVisible();
-    await expect(page.locator('[data-moment="tasks"]')).toBeVisible();
-    await expect(page.locator('[data-moment="chart"]')).toBeVisible();
-    await expect(page.locator('[data-moment="date"]')).toBeVisible();
-
-    // Keyboard-operate hero controls.
-    test.setTimeout(90_000);
-    const volume = page.getByRole('slider', { name: /volume/i });
-    await volume.focus();
-    await expect(volume).toBeFocused();
-    await page.keyboard.press('ArrowRight');
-
-    const mute = page.getByRole('button', { name: /mute/i });
-    await mute.focus();
-    await page.keyboard.press('Enter');
-
-    const temp = page.getByRole('spinbutton', { name: /temperature/i });
-    await temp.focus();
-    await page.keyboard.press('ArrowUp');
-
-    // ToggleGroup items expose as buttons (toggle pattern).
-    const cool = page.getByRole('button', { name: 'Cool', exact: true });
-    await cool.focus();
-    await page.keyboard.press('Enter');
-
-    const taskTab = page.getByRole('tab', { name: /this week/i });
-    await taskTab.focus();
-    await page.keyboard.press('Enter');
-    await expect(taskTab).toHaveAttribute('aria-selected', 'true');
-
-    await expect(page.getByRole('heading', { level: 2, name: 'Why Texuli' })).toBeVisible();
+    // Why Svelte for the web: the ladder rungs render under the section h2.
     await expect(
-      page.getByRole('heading', { level: 2, name: /agents can ship UI safely/i })
+      page.getByRole('heading', { level: 2, name: 'Why Svelte for the web' })
     ).toBeVisible();
-    // The agents playground hydrates when it scrolls into view.
-    const agents = page.locator('[data-tx-landing-agents]');
-    await agents.scrollIntoViewIfNeeded();
-    await agents.locator('astro-island:not([ssr])').waitFor();
-    const open = agents.getByRole('button', { name: 'Open', exact: true });
-    await open.click();
-    await expect(page.getByRole('button', { name: 'Close', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Close', exact: true }).focus();
-    await expect(page.getByRole('button', { name: 'Close', exact: true })).toBeFocused();
+    await expect(page.locator('[data-tx-ladder-layer]').first()).toBeVisible();
 
-    // Minimal landing (T-site-ia): the themes strip lives in the theme docs now.
-    await expect(page.getByRole('heading', { level: 2, name: /Themes that stay/i })).toHaveCount(0);
+    // The correlation demo: three panels of the badge walk, the shared
+    // summary string visible in the projections.
+    await expect(
+      page.getByRole('heading', { level: 2, name: 'One line in, two languages out' })
+    ).toBeVisible();
+    await expect(page.locator('[data-tx-corr-panel]')).toHaveCount(3);
+    await expect(page.getByText('A compact status or category label.').first()).toBeVisible();
+
+    // Agents + closing CTA: the install copy works from the keyboard.
+    await expect(
+      page.getByRole('heading', { level: 2, name: 'Built for agents, too' })
+    ).toBeVisible();
+    const agents = page.locator('[data-tx-web-agents]');
+    const copy = agents.getByRole('button', { name: 'Copy install command' });
+    await copy.scrollIntoViewIfNeeded();
+    await copy.focus();
+    await expect(copy).toBeFocused();
+    const status = agents.locator('[data-copy-command-status]');
+    await expect(status).toHaveText('');
+    await copy.click();
+    await expect(status).toHaveText(/copy/i);
+
+    await expect(page.getByText('One platform, two runtimes. Start today.')).toBeVisible();
 
     const footer = page.getByRole('contentinfo');
     await expect(footer.getByRole('link', { name: 'llms.txt' })).toBeVisible();
     await expect(footer.getByRole('link', { name: 'Agent skill' })).toBeVisible();
     await expect(footer.getByRole('link', { name: 'Changelog' })).toBeVisible();
     await expect(footer.getByText(/Dailybot, Inc/)).toBeVisible();
-
-    // Illustration slots use fallback until art lands.
-    await expect(page.locator('[data-tx-illustration="hero-bg"]')).toHaveAttribute(
-      'data-tx-illustration-ready',
-      'fallback'
-    );
   });
 
   test('changelog page is reachable', async ({ page }) => {

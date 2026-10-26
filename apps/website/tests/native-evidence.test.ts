@@ -169,7 +169,9 @@ describe('native evidence: a11y template baseline', () => {
       expect(link.href.startsWith('/')).toBe(true);
       expect(link.href).not.toMatch(/^https?:/);
     }
-    expect(sectionTemplate).toContain('<a href={link.href}>{link.label}</a>');
+    expect(sectionTemplate).toContain(
+      '<a href={withBase(base, link.href)}>{link.label}</a>',
+    );
   });
 });
 

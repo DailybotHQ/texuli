@@ -15,12 +15,15 @@
  * only links are on-site routes. Static markup, zero script, no motion, so
  * reduced-motion and keyboard needs need nothing extra.
  */
+import { withBase } from '../../foundation/site.ts';
 import {
   NATIVE_LINKS,
   NATIVE_MODULES,
   NATIVE_PLANNED,
   NATIVE_SHIPPED,
 } from './native-evidence-data.ts';
+
+const base = import.meta.env.BASE_URL;
 
 const titleId = 'native-evidence-title';
 const modulesTitleId = 'native-modules-title';
@@ -74,7 +77,7 @@ const plannedTitleId = 'native-planned-title';
     {
       NATIVE_LINKS.map((link) => (
         <li>
-          <a href={link.href}>{link.label}</a>
+          <a href={withBase(base, link.href)}>{link.label}</a>
         </li>
       ))
     }

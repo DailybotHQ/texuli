@@ -1,7 +1,9 @@
 <script lang="ts">
 /**
- * Theme studio island: generate from color / words / image, tune roles,
- * live component preview, AA gate, export CSS and JSON. No runtime network.
+ * Theme studio island: generate from color / words / image, start from a
+ * preset seed or a library theme, tune roles, live component preview, AA
+ * gate, export CSS and JSON, share the recipe as a link. No runtime network
+ * beyond this origin's own theme files.
  */
 
 import type { SemanticRole, Theme } from '@texuli/tokens';
@@ -12,23 +14,38 @@ import {
   readImagePixels,
   seedsFromColors,
 } from '@texuli/tokens/generator';
+import { untrack } from 'svelte';
 import { Button } from 'texuli/button';
 import { Input } from 'texuli/input';
 import { ToggleGroup, ToggleGroupItem } from 'texuli/toggle';
+import { withBase } from '../foundation/site.ts';
+import { loadThemeData } from '../perf/theme-assets.ts';
+import { type ToolShortcutMap, toolShortcut } from '../tool-keys.ts';
 import PreviewKit from './PreviewKit.svelte';
 import {
   aaSummary,
   buildStudioExport,
+  decodeStudioShare,
+  encodeStudioShare,
+  FEATURED_LIBRARY_THEMES,
   generateStudioTheme,
+  humanizeThemeId,
+  isStudioShareHash,
+  normalizeHex,
   roleDefault,
   STUDIO_MOOD_WORDS,
   STUDIO_NEUTRALS,
+  STUDIO_SEED_PRESETS,
   type StudioContrast,
   type StudioExportFormat,
   type StudioMode,
+  type StudioSeedPreset,
+  type StudioShareEdit,
+  type StudioShareState,
   type StudioSource,
   setRoleDefault,
   TUNABLE_ROLES,
+  themeFromLibraryPayload,
 } from './studio.ts';
 
 function initialTheme(): Theme | null {
@@ -44,6 +61,8 @@ function initialTheme(): Theme | null {
 }
 
 const boot = initialTheme();
+
+let { base = '/' }: { base?: string } = $props();
 
 let source = $state<StudioSource>('color');
 let seed = $state('#2b6ce0');
@@ -63,6 +82,11 @@ let exportFormat = $state<StudioExportFormat>('css');
 let copyStatus = $state('');
 let imageNote = $state('');
 let previewEl = $state<HTMLElement | null>(null);
+let libraryLoading = $state<string | null>(null);
+let keysOpen = $state(false);
+/** Role edits that travel in a share link, newest last (punch-list row 8). */
+let roleEdits = $state<StudioShareEdit[]>([]);
+let galleryHref = $state(withBase(base, 'gallery-themes/'));
 
 const summary = $derived(theme ? aaSummary(theme, contrast) : null);
 const exportText = $derived(theme ? buildStudioExport(exportFormat, theme) : '');
@@ -109,6 +133,7 @@ function applyResult(result: ReturnType<typeof generateStudioTheme>, okMessage: 
   }
   error = null;
   theme = result.theme;
+  roleEdits = [];
   tuneHex = roleDefault(result.theme, mode, tuneRole) || tuneHex;
   const aa = aaSummary(result.theme, contrast);
   status = `${okMessage} ${aa.passLabel}`;
@@ -142,8 +167,177 @@ function applyRole(): void {
   }
   error = null;
   theme = result.theme;
+  const hex = normalizeHex(tuneHex);
+  if (hex) roleEdits = [...roleEdits, { role: tuneRole, mode, hex }];
   const aa = aaSummary(result.theme, contrast);
   status = `Updated ${tuneRole} (${mode}). ${aa.passLabel}`;
+}
+
+/* ── Starting points: preset seeds and library themes (punch-list row 2) ── */
+
+/** One-click seed: fill the color recipe and generate immediately. */
+function seedFromPreset(preset: StudioSeedPreset): void {
+  source = 'color';
+  seed = preset.hex;
+  secondary = '';
+  applyResult(
+    generateStudioTheme({
+      source,
+      seed,
+      neutral: neutral as 'zinc',
+      contrast,
+      id: 'theme-studio',
+      name: 'Theme studio',
+    }),
+    `Seeded from ${preset.label}.`
+  );
+}
+
+/** Import one library theme's payload from this site and hand it to the visitor. */
+async function startFromLibrary(id: string): Promise<void> {
+  libraryLoading = id;
+  let payload: unknown = null;
+  try {
+    payload = await loadThemeData<unknown>(id);
+  } finally {
+    if (libraryLoading === id) libraryLoading = null;
+  }
+  if (!payload) {
+    error = 'That theme could not be loaded from this site.';
+    status = 'The library theme could not be imported.';
+    return;
+  }
+  const result = themeFromLibraryPayload(payload);
+  if (!result.ok) {
+    error = result.message;
+    status = 'The library theme could not be imported.';
+    return;
+  }
+  source = 'color';
+  seed = roleDefault(result.theme, 'light', 'primary') || seed;
+  secondary = '';
+  applyResult(
+    { ok: true, theme: result.theme },
+    `Started from ${result.theme.name}. Tune it, export it, or generate your own.`
+  );
+}
+
+/* ── Theme-as-URL share links (punch-list row 8) ──────────────────────── */
+
+/** The current studio state, as a shareable recipe. Images stay local. */
+function studioShareState(): StudioShareState {
+  const primary = theme ? roleDefault(theme, 'light', 'primary') : '';
+  return {
+    source: source === 'image' ? 'color' : source,
+    seed: source === 'image' ? primary || seed : seed,
+    secondary: source === 'image' ? '' : secondary,
+    words: source === 'image' ? '' : words,
+    neutral,
+    contrast,
+    mode,
+    edits: roleEdits,
+  };
+}
+
+/** Open a `#theme=` hash: regenerate, then re-apply the link's role edits. */
+function openSharedTheme(hash: string): void {
+  const result = decodeStudioShare(hash);
+  if (!result.ok) {
+    error = result.message;
+    status = 'The theme link could not be opened.';
+    return;
+  }
+  const share = result.share;
+  source = share.source;
+  seed = share.seed;
+  secondary = share.secondary;
+  words = share.words;
+  neutral = share.neutral;
+  contrast = share.contrast;
+  mode = share.mode;
+  const generated = generateStudioTheme({
+    source,
+    seed,
+    secondary: secondary || undefined,
+    words,
+    neutral: neutral as 'zinc',
+    contrast,
+    id: 'theme-studio',
+    name: 'Theme studio',
+  });
+  if (!generated.ok) {
+    error = generated.message;
+    status = 'The theme link could not be opened.';
+    return;
+  }
+  theme = generated.theme;
+  roleEdits = [];
+  let skipped = 0;
+  for (const edit of share.edits) {
+    const applied = setRoleDefault(theme, edit.role, edit.hex, [edit.mode]);
+    if (!applied.ok) {
+      skipped += 1;
+      continue;
+    }
+    theme = applied.theme;
+    roleEdits = [...roleEdits, edit];
+  }
+  tuneHex = roleDefault(theme, mode, tuneRole) || tuneHex;
+  error = null;
+  const skippedNote = skipped > 0 ? ` ${skipped} role edit(s) were unreadable and skipped.` : '';
+  status = `Opened from a shared link; it was decoded in this page.${skippedNote} ${aaSummary(theme, contrast).passLabel}`;
+}
+
+// A link in the address bar opens at mount; nothing is fetched to decode it.
+$effect(() => {
+  untrack(() => {
+    const hash = typeof window === 'undefined' ? '' : window.location.hash;
+    if (isStudioShareHash(hash)) openSharedTheme(hash);
+  });
+});
+
+async function copyShare(): Promise<void> {
+  const hash = encodeStudioShare(studioShareState());
+  if (!hash) {
+    copyStatus = 'This state cannot be a link yet';
+    return;
+  }
+  window.history.replaceState(window.history.state, '', hash);
+  const link = window.location.href;
+  if (typeof navigator === 'undefined' || !navigator.clipboard) {
+    copyStatus = 'Share link is in the address bar';
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(link);
+    copyStatus = 'Share link copied';
+  } catch {
+    copyStatus = 'Share link is in the address bar';
+  }
+  window.setTimeout(() => {
+    copyStatus = '';
+  }, 2000);
+}
+
+/* ── Keyboard map (punch-list row 4) ──────────────────────────────────── */
+
+const STUDIO_KEYS: ToolShortcutMap = { g: 'generate', d: 'mode', c: 'copy', '?': 'keys' };
+
+function onStudioKey(event: KeyboardEvent): void {
+  const action = toolShortcut(event, event.target, STUDIO_KEYS);
+  if (!action) return;
+  if (action === 'keys') {
+    keysOpen = !keysOpen;
+    return;
+  }
+  if (action === 'generate') {
+    // The Generate button hides for the image source; the shortcut hides with it.
+    if (source !== 'image') generate();
+  } else if (action === 'mode') {
+    setMode(mode === 'light' ? 'dark' : 'light');
+  } else if (action === 'copy') {
+    void copyExport();
+  }
 }
 
 async function onImageChange(event: Event): Promise<void> {
@@ -218,8 +412,54 @@ async function copyExport(): Promise<void> {
 }
 </script>
 
+<svelte:window onkeydown={onStudioKey} />
+
 <div class="studio" data-tx-theme-studio="">
   <div class="studio__controls">
+    <section class="panel" aria-labelledby="studio-start-title">
+      <h2 id="studio-start-title">Start from</h2>
+      <p class="hint">
+        A preset seed or a library theme gets you a working palette in one click; the controls below
+        retune it.
+      </p>
+      <div class="seeds" role="group" aria-labelledby="studio-seeds-title">
+        <h3 id="studio-seeds-title" class="sub">Preset seeds</h3>
+        {#each STUDIO_SEED_PRESETS as preset (preset.id)}
+          <button
+            type="button"
+            class="seed"
+            data-tx-studio-seed-preset={preset.id}
+            onclick={() => seedFromPreset(preset)}
+          >
+            <span class="seed__chip" style:background={preset.hex} aria-hidden="true"></span>
+            <span class="seed__label">{preset.label}</span>
+            <span class="seed__hex">{preset.hex}</span>
+          </button>
+        {/each}
+      </div>
+      <div class="library" role="group" aria-labelledby="studio-library-title">
+        <h3 id="studio-library-title" class="sub">Library themes</h3>
+        <div class="library__grid">
+          {#each FEATURED_LIBRARY_THEMES as item (item.id)}
+            <button
+              type="button"
+              class="library__theme"
+              data-tx-studio-library={item.id}
+              disabled={libraryLoading !== null}
+              onclick={() => void startFromLibrary(item.id)}
+            >
+              <span class="library__name">{humanizeThemeId(item.id)}</span>
+              <span class="library__meta">{item.category}</span>
+            </button>
+          {/each}
+        </div>
+        <p class="hint">
+          {libraryLoading ? `Loading ${libraryLoading}…` : 'Loads that theme’s colors from this site into the studio.'}
+          The full library lives in the <a href={galleryHref}>theme gallery</a>.
+        </p>
+      </div>
+    </section>
+
     <section class="panel" aria-labelledby="studio-source-title">
       <h2 id="studio-source-title">Source</h2>
       <ToggleGroup type="single" value={source} onValueChange={setSource} aria-label="Theme source">
@@ -346,6 +586,20 @@ async function copyExport(): Promise<void> {
         {/if}
       {/if}
     </section>
+
+    <details class="keys" data-tx-studio-keys bind:open={keysOpen}>
+      <summary>Keyboard</summary>
+      <p class="hint">
+        Tab moves through the controls; the selects and toggle groups answer the arrow keys. The
+        shortcuts below do not fire while you type in a field.
+      </p>
+      <ul class="keys__list">
+        <li><kbd>G</kbd> generate a theme from the current source</li>
+        <li><kbd>D</kbd> switch the preview between light and dark</li>
+        <li><kbd>C</kbd> copy the export in the chosen format</li>
+        <li><kbd>?</kbd> show or hide this list</li>
+      </ul>
+    </details>
   </div>
 
   <div class="studio__preview">
@@ -391,10 +645,23 @@ async function copyExport(): Promise<void> {
         <Button type="button" variant="default" onclick={copyExport} disabled={!exportText}>
           Copy {exportFormat.toUpperCase()}
         </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onclick={() => void copyShare()}
+          disabled={!theme}
+          data-tx-studio-share=""
+        >
+          Copy share link
+        </Button>
         {#if copyStatus}
           <span class="copy" role="status">{copyStatus}</span>
         {/if}
       </div>
+      <p class="hint">
+        The share link holds the recipe — seed or words, contrast target and your role edits, never
+        an image — and decodes right here. Nothing is uploaded.
+      </p>
     </section>
   </div>
 </div>
@@ -513,12 +780,124 @@ async function copyExport(): Promise<void> {
     gap: 0.5rem;
     align-items: center;
   }
+  .sub {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+  .seeds,
+  .library {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .seeds {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .seed {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 0.5rem;
+    align-items: center;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .seed:hover {
+    background: var(--tx-muted, var(--tx-background));
+  }
+  .seed:focus-visible,
+  .library__theme:focus-visible,
+  .keys summary:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .seed__chip {
+    grid-row: 1 / span 2;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    border-radius: 0.3rem;
+    border: 1px solid var(--tx-border);
+  }
+  .seed__label {
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+  .seed__hex {
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .library__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  .library__theme {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .library__theme:hover:not(:disabled) {
+    background: var(--tx-muted, var(--tx-background));
+  }
+  .library__theme:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .library__name {
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+  .library__meta {
+    font-size: 0.75rem;
+  }
+  .keys {
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding: 0.65rem 0.75rem;
+  }
+  .keys summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+  .keys__list {
+    margin: 0.5rem 0 0;
+    padding-inline-start: 1.25rem;
+    display: grid;
+    gap: 0.3rem;
+    font-size: 0.875rem;
+  }
+  .keys kbd {
+    padding: 0.05rem 0.35rem;
+    border: 1px solid var(--tx-border);
+    border-radius: 0.25rem;
+    background: var(--tx-background);
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.8125rem;
+  }
   @media (forced-colors: active) {
     .panel,
     .select,
     .export,
     .preview-host,
-    .error {
+    .error,
+    .seed,
+    .seed__chip,
+    .library__theme,
+    .keys,
+    .keys kbd {
       border-color: CanvasText;
     }
   }

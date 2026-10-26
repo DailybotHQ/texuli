@@ -15,8 +15,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <p class="eyebrow">Agent tools</p>
       <h1>Agent playground</h1>
       <p class="lead">
-        Edit untrusted catalog JSON and see what the sink-free renderer keeps. Hostile corpus
-        samples are available as presets. Nothing here executes agent HTML or loads remote code.
+        Paste untrusted agent JSON and watch the sink-free renderer keep only what a safe host
+        would: script URLs dropped, fake dialogs turned into named placeholders, HTML strings left
+        inert, prompt injection rendered as plain copy. Every preset card states what its run
+        proves. Nothing here executes agent HTML or loads remote code.
       </p>
     </header>
     <PlaygroundApp client:load />

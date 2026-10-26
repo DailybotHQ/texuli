@@ -1,5 +1,4 @@
 <script lang="ts">
-import { untrack } from 'svelte';
 /**
  * Color and token explorer island: pick a library theme + light/dark, browse
  * OKLCH scales, semantic roles, WCAG pairs, and copy CSS / JSON / Tailwind.
@@ -7,6 +6,7 @@ import { untrack } from 'svelte';
  */
 
 import type { TailwindThemeEntry } from '@texuli/tokens/tailwind';
+import { untrack } from 'svelte';
 import { Button } from 'texuli/button';
 import { Input } from 'texuli/input';
 import { ToggleGroup, ToggleGroupItem } from 'texuli/toggle';
@@ -18,6 +18,7 @@ import {
   readCachedThemeId,
   readModePreference,
 } from '../theme-switcher/appearance.ts';
+import { type ToolShortcutMap, toolShortcut } from '../tool-keys.ts';
 import type { ExplorerThemePayload } from './build.ts';
 import { buildExportText, type ExportFormat } from './export-formats.ts';
 import { formatRatio } from './format.ts';
@@ -54,6 +55,7 @@ let mode = $state<'light' | 'dark'>('light');
 let exportFormat = $state<ExportFormat>('css');
 let copyStatus = $state('');
 let ready = $state(false);
+let keysOpen = $state(false);
 
 const filtered = $derived(
   (() => {
@@ -150,7 +152,35 @@ async function copyExport(): Promise<void> {
     copyStatus = '';
   }, 2000);
 }
+
+/* ── Keyboard map (punch-list row 4) ──────────────────────────────────── */
+
+const EXPLORER_KEYS: ToolShortcutMap = {
+  '/': 'filter',
+  l: 'light',
+  d: 'dark',
+  c: 'copy',
+  '?': 'keys',
+};
+
+function onExplorerKey(event: KeyboardEvent): void {
+  const action = toolShortcut(event, event.target, EXPLORER_KEYS);
+  if (!action) return;
+  if (action === 'keys') {
+    keysOpen = !keysOpen;
+    return;
+  }
+  if (action === 'filter') {
+    document.getElementById('color-explorer-filter')?.focus();
+    return;
+  }
+  if (action === 'light' && mode !== 'light') setMode('light');
+  else if (action === 'dark' && mode !== 'dark') setMode('dark');
+  else if (action === 'copy') void copyExport();
+}
 </script>
+
+<svelte:window onkeydown={onExplorerKey} />
 
 <section class="explorer" aria-labelledby="color-explorer-title" data-tx-color-explorer>
   <header class="intro">
@@ -170,6 +200,20 @@ async function copyExport(): Promise<void> {
         pass {active.contrastLevel}
       </p>
     {/if}
+    <details class="keys" data-tx-explorer-keys bind:open={keysOpen}>
+      <summary>Keyboard</summary>
+      <p class="keys__hint">
+        Tab reaches the theme list, the toggles and the export; the toggles answer the arrow keys,
+        and the pairs table scrolls with the keyboard once focused. These shortcuts do not fire
+        while you type in the filter.
+      </p>
+      <ul class="keys__list">
+        <li><kbd>/</kbd> jump to the theme filter</li>
+        <li><kbd>L</kbd> / <kbd>D</kbd> switch light and dark</li>
+        <li><kbd>C</kbd> copy the export in the chosen format</li>
+        <li><kbd>?</kbd> show or hide this list</li>
+      </ul>
+    </details>
   </header>
 
   <div class="toolbar" role="group" aria-label="Explorer controls">
@@ -313,7 +357,7 @@ async function copyExport(): Promise<void> {
             </Button>
             <span class="copy-status" role="status" aria-live="polite">{copyStatus}</span>
           </div>
-          <pre class="export" tabindex="0"><code>{exportText}</code></pre>
+          <pre class="export" tabindex="0" aria-label="Export output, scrollable"><code>{exportText}</code></pre>
         </section>
       </div>
     {/if}
@@ -339,6 +383,41 @@ async function copyExport(): Promise<void> {
   .status {
     margin-block: 0.75rem 0;
     font-size: 0.9375rem;
+  }
+  .keys {
+    margin-block-start: 0.75rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding: 0.65rem 0.75rem;
+    max-inline-size: 44rem;
+  }
+  .keys summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+  .keys summary:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .keys__hint {
+    margin: 0.5rem 0 0;
+    font-size: 0.875rem;
+  }
+  .keys__list {
+    margin: 0.5rem 0 0;
+    padding-inline-start: 1.25rem;
+    display: grid;
+    gap: 0.3rem;
+    font-size: 0.875rem;
+  }
+  .keys kbd {
+    padding: 0.05rem 0.35rem;
+    border: 1px solid var(--tx-border);
+    border-radius: 0.25rem;
+    background: var(--tx-background);
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.8125rem;
   }
   .toolbar {
     display: flex;
