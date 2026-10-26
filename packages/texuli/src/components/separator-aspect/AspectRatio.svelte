@@ -22,7 +22,14 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
 
 let { ratio = '16/9', custom, children, class: className, ...rest }: Props = $props();
 
-const isCustom = $derived(typeof custom === 'string' && custom.trim().length > 0);
+// Only a plain ratio (a number or `number / number`), so a caller cannot
+// inject other declarations into the style attribute — the same guard shape
+// as CardGrid's `minItemWidth` and the table's `maxBlockSize`.
+const SAFE_RATIO = /^\d*\.?\d+(?:\s*\/\s*\d*\.?\d+)?$/;
+const safeCustom = $derived(
+  typeof custom === 'string' && SAFE_RATIO.test(custom.trim()) ? custom.trim() : undefined
+);
+const isCustom = $derived(safeCustom !== undefined);
 
 const classes = $derived(
   isCustom
@@ -33,7 +40,7 @@ const classes = $derived(
       })
 );
 
-const customStyle = $derived(isCustom ? `--tx-aspect-ratio: ${custom}` : undefined);
+const customStyle = $derived(isCustom ? `--tx-aspect-ratio: ${safeCustom}` : undefined);
 </script>
 
 <div
