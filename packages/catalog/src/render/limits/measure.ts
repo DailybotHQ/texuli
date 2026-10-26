@@ -23,11 +23,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
  * Cycles, non-JSON values and values nested past the snapshot depth cap are
  * replaced with null so measurement always finishes.
  */
-export function canonicalTreeJson(
-  value: unknown,
-  seen = new WeakSet<object>(),
-  depth = 0
-): string {
+export function canonicalTreeJson(value: unknown, seen = new WeakSet<object>(), depth = 0): string {
   if (value === null) return 'null';
   if (depth > MAX_SNAPSHOT_DEPTH) return 'null';
   if (typeof value === 'string') return JSON.stringify(value);
@@ -156,25 +152,46 @@ function walkNode(
 
 /**
  * Deepest value nesting in the input, iteratively (so a depth bomb cannot
- * exhaust the stack), with the path that reached it.
+ * exhaust the stack), with the path that reached it. Each object is expanded
+ * per depth: a reference back to an object still on the current path is a
+ * cycle (reported, never followed), and a shared value is walked again only
+ * when reached deeper than before and within the value-depth limit, so the
+ * walk always finishes and sharing never hides depth.
  */
-function maxValueDepth(
-  input: unknown
-): { depth: number; path: string } {
+function maxValueDepth(input: unknown): {
+  depth: number;
+  path: string;
+  cyclePath: string | null;
+} {
   let max = 0;
   let maxPath = '';
-  const stack: { value: unknown; depth: number; path: string }[] = [
-    { value: input, depth: 0, path: '$' },
-  ];
+  let cyclePath: string | null = null;
+  const onPath = new WeakSet<object>();
+  const expandedAt = new WeakMap<object, number>();
+  type Frame = { value: unknown; depth: number; path: string; exit?: true };
+  const stack: Frame[] = [{ value: input, depth: 0, path: '$' }];
   while (stack.length > 0) {
     const current = stack.pop();
-    if (!current) return { depth: max, path: maxPath };
+    if (!current) break;
     const { value, depth, path } = current;
     if (value === null || typeof value !== 'object') continue;
+    if (current.exit) {
+      onPath.delete(value);
+      continue;
+    }
+    if (onPath.has(value)) {
+      cyclePath ??= path;
+      continue;
+    }
     if (depth > max) {
       max = depth;
       maxPath = path;
     }
+    const seenAt = expandedAt.get(value);
+    if (seenAt !== undefined && (depth <= seenAt || depth > MAX_VALUE_MEASURE_DEPTH)) continue;
+    expandedAt.set(value, depth);
+    onPath.add(value);
+    stack.push({ value, depth, path, exit: true });
     if (Array.isArray(value)) {
       value.forEach((item, index) => {
         stack.push({ value: item, depth: depth + 1, path: `${path}[${index}]` });
@@ -185,7 +202,7 @@ function maxValueDepth(
       }
     }
   }
-  return { depth: max, path: maxPath };
+  return { depth: max, path: maxPath, cyclePath };
 }
 
 export interface MeasureTreeResult {
@@ -238,6 +255,15 @@ export function measureCatalogTree(input: unknown, hardNodeCap = 10_000): Measur
       message: `Values nest deeper than ${MAX_VALUE_MEASURE_DEPTH} levels (observed ${valueDepth.depth}).`,
       limit: MAX_VALUE_MEASURE_DEPTH,
       observed: valueDepth.depth,
+    });
+  }
+  // A cycle is unbounded nesting: the renderer's recursive prop walk would
+  // never finish, so the budget refuses it (JSON input can never carry one).
+  if (valueDepth.cyclePath !== null) {
+    state.diagnostics.push({
+      code: 'value-cycle',
+      path: valueDepth.cyclePath,
+      message: 'A value refers back to one of its own ancestors (a cycle).',
     });
   }
 
