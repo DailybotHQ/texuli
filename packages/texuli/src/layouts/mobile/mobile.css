@@ -117,6 +117,12 @@
     outline: none;
   }
 
+  /* Skip link focuses main (tabindex="-1"); keep a keyboard-visible ring. */
+  .tx-mobile-layout__main:focus-visible {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 4px;
+  }
+
   .tx-mobile-layout__screen {
     display: flex;
     flex: 1;
