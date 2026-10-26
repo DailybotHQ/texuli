@@ -1,0 +1,17 @@
+---
+/**
+ * Structured data as an inline JSON-LD block (T-18). Data arrives
+ * type-checked from the schema module (code-authored constants — never
+ * page data or agent output) and is serialized once at build time. The CSP
+ * integration hashes every inline script in the built HTML, so the block
+ * is budgeted like the rest — `check:csp` proves coverage.
+ */
+interface Props {
+  /** A schema.org object, or an array of them; serialized as-is. */
+  data: Record<string, unknown>;
+}
+
+const { data } = Astro.props;
+---
+
+<script is:inline type="application/ld+json" set:html={JSON.stringify(data)} />

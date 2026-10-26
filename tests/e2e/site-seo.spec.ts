@@ -243,6 +243,53 @@ test.describe('texuli.com SEO build output', () => {
     });
   }
 
+  test('structured data on the home page: Organization, WebSite, SoftwareApplication', async ({
+    page,
+  }) => {
+    await page.goto(`${origin}/`);
+    const blocks = await page.locator('head script[type="application/ld+json"]').allTextContents();
+    expect(blocks.length, 'the home page embeds JSON-LD in its head').toBeGreaterThan(0);
+
+    const nodes: Array<Record<string, unknown>> = [];
+    for (const block of blocks) {
+      const parsed: unknown = JSON.parse(block);
+      const graph =
+        parsed &&
+        typeof parsed === 'object' &&
+        Array.isArray((parsed as { '@graph'?: unknown })['@graph'])
+          ? ((parsed as { '@graph': unknown[] })['@graph'] as Array<Record<string, unknown>>)
+          : [parsed as Record<string, unknown>];
+      nodes.push(...graph);
+    }
+    const byType = new Map(nodes.map((node) => [node['@type'], node]));
+
+    const org = byType.get('Organization') as Record<string, unknown> | undefined;
+    expect(org, 'Organization node present').toBeTruthy();
+    expect(org?.name).toBe('Dailybot, Inc.');
+    expect(org?.url).toMatch(/^https:\/\//);
+
+    const website = byType.get('WebSite') as Record<string, unknown> | undefined;
+    expect(website, 'WebSite node present').toBeTruthy();
+    expect(website?.name).toBe('Texuli');
+    expect(website?.url).toBe(`${SITE}/`);
+    const action = website?.potentialAction as Record<string, unknown> | undefined;
+    expect(action?.['@type']).toBe('SearchAction');
+    expect(JSON.stringify(action)).toContain('/search/?q={search_term_string}');
+
+    const app = byType.get('SoftwareApplication') as Record<string, unknown> | undefined;
+    expect(app, 'SoftwareApplication node present').toBeTruthy();
+    expect(app?.name).toBe('Texuli');
+    expect(app?.applicationCategory).toBe('DeveloperApplication');
+    // Preview reality: the npm dist-tag is `next`; a stable release would be a
+    // claim this site cannot make yet. The pattern fails the day the wording
+    // drifts from the published preview.
+    expect(app?.softwareVersion).toMatch(/^\d+\.\d+\.\d+-next\.\d+$/);
+    expect(app?.license).toBe('https://opensource.org/licenses/MIT');
+    expect(String(app?.description)).toContain('in development');
+    // Nothing is for sale: omitting offers is the honest state.
+    expect(app, 'no invented offers').not.toHaveProperty('offers');
+  });
+
   test('an unknown path gets the 404 page: noindex, no canonical, links home', async ({ page }) => {
     const { foreign, status } = await visit(page, '/no-such-page/');
     expect(status).toBe(404);

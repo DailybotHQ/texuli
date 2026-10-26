@@ -9,12 +9,14 @@ import AgentsSection from '../components/landing/AgentsSection.astro';
 import FeatureCards from '../components/landing/FeatureCards.astro';
 import LandingHero from '../components/landing/LandingHero.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { libraryJsonLd } from '../lib/schema';
 ---
 
 <BaseLayout
   title="Texuli"
   description="Interfaces from texels. Owned, accessible Svelte 5 components that people and agents can build anything with."
   landing
+  jsonLd={libraryJsonLd()}
 >
   <div class="landing" data-tx-landing="">
     <LandingHero />
