@@ -50,7 +50,7 @@ No lorem, no fake screenshots, no dates presented as promises, no
 
 - Title: `Texuli native — the same catalog, rendered by Compose`
 - Description: what the contract drives, in-development status named
-- Canonical self; OG set from SeoHead; OG art: native card (T-21, planned)
+- Canonical self; OG set from SeoHead; OG art: the Native badge from `ogAreaFor` (T-21)
 - JSON-LD: **Organization only** — nothing installable exists, so a
   SoftwareApplication node would be dishonest
 

@@ -12,8 +12,10 @@ no page asks another origin for anything.
 pnpm build      # astro check && astro build; the SEO integration runs at the end
 ```
 
-The build log reports the output:
-`[texuli-seo] sitemap.xml (163 pages), robots.txt and 163 social images written.`
+The build log reports the output in the form
+`[texuli-seo] sitemap.xml (<n> pages with lastmod), robots.txt and <n> social images written.`
+(the page count grows with the site; the T-29 audit run read 550 built
+pages, indexed and noindex together).
 
 ## Head metadata (`SeoHead.astro`)
 
@@ -54,8 +56,10 @@ For each page:
    `/component-pages/button/` → `og/component-pages/button.png`).
 
 Then it writes:
-- `dist/sitemap.xml`: every indexed page, absolute, sorted, deduplicated;
-- `dist/robots.txt`: allow everything, with the `Sitemap:` line.
+- `dist/sitemap.xml`: every indexed page, absolute, sorted, deduplicated,
+  each with a `<lastmod>` from git (PLAN_006 T-20, below);
+- `dist/robots.txt`: allow everything, the `Sitemap:` line and one
+  `Allow: /` group per AI crawler (T-20, below).
 
 The pure helpers live in `seo.ts`: path normalization, file names,
 absolute URLs, XML escaping, the sitemap and robots builders, meta
@@ -105,8 +109,24 @@ webkit and Pixel 7. The spec serves `dist/` like a static host, returning
 - **Fonts:** image text uses the build machine's system font through
   librsvg (Inter or Helvetica, falling back to Arial), so glyphs differ
   slightly between macOS and Linux builds.
-- **No `<lastmod>`** in the sitemap: build dates would change every page on
-  every build. `buildSitemap` accepts one if a reliable date becomes
-  available.
+- **`<lastmod>` comes from git, not the build date** (T-20): a build
+  outside a git checkout fails instead of shipping invented dates.
 - **The 404 relies on the host:** it must serve `404.html` for unknown
   paths, as Cloudflare Pages, Netlify and GitHub Pages do.
+
+## PLAN_006 additions (T-18..T-21, T-29)
+
+| Addition | Where | Pinned by |
+| --- | --- | --- |
+| **JSON-LD.** `JsonLd.astro` renders code-authored data only (never page data or agent output). `/` carries Organization, WebSite with a SearchAction and SoftwareApplication (`libraryJsonLd` in `src/lib/schema.ts`; the version is read from the installed `texuli` manifest, the description says "in development", no `offers`). `/web-and-native/` carries a TechArticle. The CSP integration hashes the inline blocks automatically | `src/components/seo/JsonLd.astro`, `src/lib/schema.ts`, `BaseLayout`'s `jsonLd` prop | `tests/e2e/site-seo.spec.ts` |
+| **BreadcrumbList** on nested pages from the sidebar nav, plus the visible trail on docs pages ([site-subsite.md](site-subsite.md)) | `src/components/seo/breadcrumbs.ts` | `tests/e2e/site-seo.spec.ts` |
+| **Per-page `<lastmod>`** from `git log -1 --format=%cs` of the route's source (component and primitive pages also follow their manifests and sources) | `src/components/seo/integration.ts` | `tests/e2e/site-seo.spec.ts` |
+| **AI-crawler robots policy.** 16 named crawlers (`AI_CRAWLERS`), each allowed; no `Disallow`, no static `Content-Signal` (a per-agent header a static file cannot serve). The edge variant for strict parsers is in [site-aeo.md](site-aeo.md) | `src/components/seo/seo.ts` | `tests/e2e/site-seo.spec.ts`, `apps/website/tests/robots-variants.test.ts` |
+| **Area badges on social images.** `ogAreaFor(path)` maps a route prefix to a section label and accent (Guides, Components, Primitives, Themes, Agents, Project, Native, Architecture); unmapped routes get the brand card. Labels only, no metrics | `src/components/seo/seo.ts` | `tests/e2e/site-seo.spec.ts` |
+| **Verification metas.** `google-site-verification` and `msvalidate.01` render only when `PUBLIC_GOOGLE_SITE_VERIFICATION` or `PUBLIC_BING_SITE_VERIFICATION` is set; absent by default | `src/lib/constances.ts`, `SeoHead.astro` | `apps/website/tests/analytics.test.ts`, `tests/e2e/site-seo.spec.ts` |
+| **Offline audit.** `node scripts/audit-seo.mjs --dist apps/website/dist` checks titles, descriptions, canonicals, the OG and Twitter sets, JSON-LD validity, the PNG art, sitemap equality and the robots shape; critical findings exit non-zero. Its T-29 run: 550 pages, 0 critical, 33 warning (length bands and one duplicate-description pair), 4 planned | `scripts/audit-seo.mjs` | `scripts/tests/audit-seo.test.ts` |
+
+**Planned, not shipped:** `twitter:site` and `twitter:creator` (no handle
+exists, so none is rendered), an image sitemap extension (graded optional
+by the SEO audit), and the other open audit rows the script reports as
+`planned`.
