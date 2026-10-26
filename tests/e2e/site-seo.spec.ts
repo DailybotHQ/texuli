@@ -290,6 +290,63 @@ test.describe('texuli.com SEO build output', () => {
     expect(app, 'no invented offers').not.toHaveProperty('offers');
   });
 
+  test('nested pages carry a BreadcrumbList derived from the site nav', async ({ page }) => {
+    const readCrumbs = async (path: string) => {
+      await page.goto(`${origin}${path}`);
+      const blocks = await page
+        .locator('head script[type="application/ld+json"]')
+        .allTextContents();
+      const nodes: Array<Record<string, unknown>> = [];
+      for (const block of blocks) {
+        const parsed: unknown = JSON.parse(block);
+        if (
+          parsed &&
+          typeof parsed === 'object' &&
+          (parsed as { '@type'?: unknown })['@type'] === 'BreadcrumbList'
+        )
+          nodes.push(parsed as Record<string, unknown>);
+      }
+      expect(nodes.length, `one BreadcrumbList on ${path}`).toBe(1);
+      return nodes[0] as {
+        itemListElement: Array<{ position: number; name: string; item: string }>;
+      };
+    };
+
+    // A guide: Home → Get started (its group landing) → the guide.
+    const guide = await readCrumbs('/guides/theming/');
+    expect(guide.itemListElement.map((entry) => entry.name)).toEqual([
+      'Home',
+      'Get started',
+      'Theming',
+    ]);
+
+    // A component page: Home → Components → the page (its family heading has
+    // no href, so it cannot be a breadcrumb entry).
+    const button = await readCrumbs('/component-pages/button/');
+    expect(button.itemListElement.map((entry) => entry.name)).toEqual([
+      'Home',
+      'Components',
+      'Button',
+    ]);
+
+    // Every entry: contiguous positions, an absolute https item URL, and the
+    // last item names the page itself.
+    for (const crumbs of [guide, button]) {
+      crumbs.itemListElement.forEach((entry, index) => {
+        expect(entry.position).toBe(index + 1);
+        expect(entry.item).toMatch(/^https:\/\/texuli\.com\//);
+      });
+      expect(crumbs.itemListElement.at(-1)?.item).toMatch(/\/$/);
+    }
+
+    // The landing has no parent chain: no BreadcrumbList there.
+    await page.goto(`${origin}/`);
+    const homeBlocks = await page
+      .locator('head script[type="application/ld+json"]')
+      .allTextContents();
+    for (const block of homeBlocks) expect(block).not.toContain('"BreadcrumbList"');
+  });
+
   test('an unknown path gets the 404 page: noindex, no canonical, links home', async ({ page }) => {
     const { foreign, status } = await visit(page, '/no-such-page/');
     expect(status).toBe(404);

@@ -30,12 +30,13 @@ import BrandHead from '../components/brand/BrandHead.astro';
 import CopyPage from '../components/docs/CopyPage.astro';
 import DocsPager from '../components/docs/DocsPager.astro';
 import PageToc from '../components/docs/PageToc.astro';
-import JsonLd from '../components/seo/JsonLd.astro';
 import { isDocsPath, pagerFor } from '../components/foundation/nav-data.ts';
 import SiteFooter from '../components/foundation/SiteFooter.astro';
 import SiteHeader from '../components/foundation/SiteHeader.astro';
 import SiteSidebar from '../components/foundation/SiteSidebar.astro';
 import { APPEARANCE_NAMESPACE, SITE_NAME, SITE_THEME } from '../components/foundation/site.ts';
+import { breadcrumbJsonLd, breadcrumbTrail } from '../components/seo/breadcrumbs';
+import JsonLd from '../components/seo/JsonLd.astro';
 import SeoHead from '../components/seo/SeoHead.astro';
 
 /**
@@ -78,6 +79,9 @@ const base = import.meta.env.BASE_URL;
 const current = Astro.url.pathname.slice(base.replace(/\/+$/, '').length) || '/';
 const docs = !landing && !noindex && isDocsPath(current);
 const pager = docs ? pagerFor(current) : {};
+// Nested listed pages announce their real nav hierarchy; unlisted pages get
+// no trail and no markup (see components/seo/breadcrumbs.ts).
+const crumbs = breadcrumbTrail(current);
 // "Copy page": the title line here; the body is converted from the built page,
 // between the markers below, by `copyPageIntegration` (rendering the slot twice
 // here would emit the island runtime into a string that never reaches the page).
@@ -105,6 +109,7 @@ const markdownHead = docs
     <SeoHead title={fullTitle} {description} siteName={SITE_NAME} {lang} {noindex} />
     <BrandHead />
     {jsonLd && <JsonLd data={jsonLd} />}
+    {crumbs.length >= 2 && <JsonLd data={breadcrumbJsonLd(crumbs)} />}
     <style is:inline set:html={themeCss}></style>
   </head>
   <body>
