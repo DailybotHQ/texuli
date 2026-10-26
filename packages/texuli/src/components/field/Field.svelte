@@ -53,11 +53,13 @@ const control: FieldControl = $derived({
   describedBy,
   invalid,
   required,
+  disabled,
   props: {
     id,
     'aria-describedby': describedBy,
     'aria-invalid': invalid || undefined,
     'aria-required': required || undefined,
+    disabled: disabled || undefined,
   },
 });
 

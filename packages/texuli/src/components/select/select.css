@@ -70,6 +70,16 @@
     opacity: 0.5;
   }
 
+  /* Invalid chrome mirrors the Input/Textarea field grammar. */
+  .tx-select-trigger[aria-invalid="true"] {
+    border-color: var(--tx-destructive, crimson);
+  }
+
+  .tx-select-trigger[aria-invalid="true"]:focus-visible {
+    box-shadow: 0 0 0 var(--tx-focus-ring-width, 2px)
+      color-mix(in oklab, var(--tx-destructive, crimson) 30%, transparent);
+  }
+
   .tx-select-trigger__chevron {
     flex: none;
     inline-size: 1rem;
@@ -217,5 +227,23 @@
     margin-inline: 0.35rem;
     background-color: var(--tx-border, ButtonBorder);
     border: 0;
+  }
+
+  /*
+   * Forced colors strip box-shadow and force backgrounds to Canvas, which
+   * erases both the trigger focus/open ring and the highlighted option;
+   * outlines survive forced colors, so restore them there.
+   */
+  @media (forced-colors: active) {
+    .tx-select-trigger:focus-visible,
+    .tx-select-trigger[data-state="open"] {
+      outline: var(--tx-focus-ring-width, 2px) solid Highlight;
+      outline-offset: var(--tx-focus-ring-offset, 2px);
+    }
+
+    .tx-select-item[data-highlighted],
+    .tx-select-item:hover:not(.tx-select-item--disabled) {
+      outline: 1px solid Highlight;
+    }
   }
 }

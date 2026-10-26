@@ -1,4 +1,5 @@
 <script lang="ts">
+import { getComboboxContext } from '@texuli/primitives/combobox';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
@@ -9,7 +10,8 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   children?: Snippet;
   size?: ComboboxSize;
   variant?: ComboboxVariant;
-  open?: boolean;
+  /** Override the open state; defaults to the combobox context. */
+  open?: boolean | undefined;
   disabled?: boolean;
   class?: ClassValue;
 };
@@ -18,11 +20,17 @@ let {
   children,
   size = 'md',
   variant = 'outline',
-  open = false,
+  open = undefined,
   disabled = false,
   class: className,
   ...rest
 }: Props = $props();
+
+const context = getComboboxContext();
+
+// Follow the combobox unless the consumer overrides: the docs pattern
+// renders <Combobox.Field> bare and still gets the open chrome.
+const isOpen = $derived(open ?? context.open);
 
 const classes = $derived(
   comboboxFieldClass({
@@ -38,7 +46,7 @@ const classes = $derived(
   data-tx-combobox-field
   data-size={size}
   data-variant={variant}
-  data-state={open ? 'open' : 'closed'}
+  data-state={isOpen ? 'open' : 'closed'}
   data-disabled={disabled ? '' : undefined}
   {...rest}
 >

@@ -263,4 +263,17 @@
     white-space: nowrap;
     border: 0;
   }
+
+  /*
+   * Forced colors strip box-shadow, which is how the field and group draw
+   * their focus ring; an outline survives forced colors, so keyboard focus
+   * stays visible there.
+   */
+  @media (forced-colors: active) {
+    .tx-field:focus-visible,
+    .tx-input-group:focus-within {
+      outline: var(--tx-focus-ring-width, 2px) solid Highlight;
+      outline-offset: var(--tx-focus-ring-offset, 2px);
+    }
+  }
 }
