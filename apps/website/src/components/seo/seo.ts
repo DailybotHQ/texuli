@@ -51,19 +51,83 @@ export function escapeXml(text: string): string {
   return text.replace(XML_FORBIDDEN, '').replace(/[&<>"']/g, (char) => XML_ESCAPES[char] ?? char);
 }
 
-/** A `sitemap.xml` for absolute page URLs, sorted, without duplicates. */
-export function buildSitemap(urls: readonly string[], lastmod?: string): string {
-  const unique = [...new Set(urls)].sort();
-  const entries = unique.map(
-    (url) =>
-      `  <url>\n    <loc>${escapeXml(url)}</loc>${lastmod ? `\n    <lastmod>${escapeXml(lastmod)}</lastmod>` : ''}\n  </url>`
-  );
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;
+export interface SitemapEntry {
+  loc: string;
+  /** W3C date (`YYYY-MM-DD`) of the page's last source change. */
+  lastmod?: string;
 }
 
-/** `robots.txt`: allow everything, point at the sitemap. */
+const W3C_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * A `sitemap.xml` for absolute page URLs — optionally with per-page lastmod
+ * dates (an entry without one, or a bare string, omits the element) — sorted,
+ * without duplicates. An invalid date fails the build: a sitemap that lies to
+ * crawlers is worse than one that says less.
+ */
+export function buildSitemap(entries: readonly (string | SitemapEntry)[]): string {
+  const unique = new Map<string, string | undefined>();
+  for (const item of entries) {
+    const entry: SitemapEntry = typeof item === 'string' ? { loc: item } : item;
+    if (entry.lastmod !== undefined && !W3C_DATE.test(entry.lastmod))
+      throw new Error(`invalid lastmod "${entry.lastmod}" for ${entry.loc}`);
+    if (!unique.has(entry.loc)) unique.set(entry.loc, entry.lastmod);
+  }
+  const urls = [...unique.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(
+      ([loc, lastmod]) =>
+        `  <url>\n    <loc>${escapeXml(loc)}</loc>${lastmod ? `\n    <lastmod>${escapeXml(lastmod)}</lastmod>` : ''}\n  </url>`
+    );
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;
+}
+
+/**
+ * AI/LLM crawlers explicitly allowed in robots.txt: the docs, the markdown
+ * twins and the agent catalog exist to be read by agents. The list follows
+ * the deepworkplan.com policy (the reference set from the SEO audit).
+ */
+export const AI_CRAWLERS = [
+  'GPTBot',
+  'ChatGPT-User',
+  'ClaudeBot',
+  'anthropic-ai',
+  'Google-Extended',
+  'Bytespider',
+  'CCBot',
+  'PerplexityBot',
+  'Applebot-Extended',
+  'Amazonbot',
+  'Meta-ExternalAgent',
+  'cohere-ai',
+  'OAI-SearchBot',
+  'DeepSeekBot',
+  'Claude-SearchBot',
+  'Perplexity-User',
+] as const;
+
+/**
+ * `robots.txt`: default allow, the sitemap, and explicit AI-crawler allows.
+ * No `Content-Signal` yet: that is a per-user-agent response header, which a
+ * static file cannot serve — it waits for the request-time rewrite.
+ */
 export function buildRobots(sitemapUrl: string): string {
-  return `User-agent: *\nAllow: /\n\nSitemap: ${sitemapUrl}\n`;
+  const lines = [
+    '# robots.txt for Texuli',
+    '# https://texuli.com',
+    '',
+    '# Default: every crawler may crawl everything public.',
+    'User-agent: *',
+    'Allow: /',
+    '',
+    `Sitemap: ${sitemapUrl}`,
+    '',
+    '# AI/LLM crawlers: explicitly welcome. Content-Signal needs per-agent',
+    '# responses (request-time middleware, planned); a static file cannot',
+    '# vary by user agent.',
+  ];
+  for (const crawler of AI_CRAWLERS) lines.push('', `User-agent: ${crawler}`, 'Allow: /');
+  return `${lines.join('\n')}\n`;
 }
 
 const ENTITIES: Record<string, string> = {

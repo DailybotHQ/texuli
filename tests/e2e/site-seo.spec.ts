@@ -6,6 +6,7 @@ import { extname, join, normalize, relative, resolve } from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import {
+  AI_CRAWLERS,
   absoluteUrl,
   buildRobots,
   buildSitemap,
@@ -140,14 +141,32 @@ test.describe('seo helpers', () => {
     expect(escapeXml(`a&b<c>"d"'e'${String.fromCharCode(1)}`)).toBe(
       'a&amp;b&lt;c&gt;&quot;d&quot;&apos;e&apos;'
     );
-    const xml = buildSitemap([`${SITE}/b/`, `${SITE}/`, `${SITE}/b/`, `${SITE}/a?x=1&y=2`]);
+    const xml = buildSitemap([
+      `${SITE}/b/`,
+      { loc: `${SITE}/`, lastmod: '2026-10-25' },
+      `${SITE}/b/`,
+      `${SITE}/a?x=1&y=2`,
+    ]);
     expect(xml.match(/<loc>/g)).toHaveLength(3);
     expect(xml.indexOf(`${SITE}/</loc>`)).toBeLessThan(xml.indexOf(`${SITE}/b/</loc>`));
     expect(xml).toContain('x=1&amp;y=2');
+    expect(xml).toContain('<lastmod>2026-10-25</lastmod>');
+    expect(xml.match(/<lastmod>/g)).toHaveLength(1);
     expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true);
-    expect(buildRobots(`${SITE}/sitemap.xml`)).toBe(
-      `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`
-    );
+    expect(() => buildSitemap([{ loc: `${SITE}/x/`, lastmod: 'not-a-date' }])).toThrow();
+
+    const robots = buildRobots(`${SITE}/sitemap.xml`);
+    expect(robots).toContain('User-agent: *\nAllow: /\n');
+    expect(robots).toContain(`Sitemap: ${SITE}/sitemap.xml\n`);
+    // Every AI crawler is welcomed by name; nothing is disallowed, and the
+    // Content-Signal header waits for the request-time rewrite (a static
+    // file cannot vary by user agent).
+    for (const crawler of AI_CRAWLERS)
+      expect(robots).toContain(`User-agent: ${crawler}\nAllow: /\n`);
+    expect(robots).not.toContain('Disallow');
+    // No Content-Signal *directive* (the comment that explains its absence
+    // may name it): the header needs per-agent responses.
+    expect(robots).not.toMatch(/^Content-Signal:/m);
   });
 
   test('read page meta, wrap text and escape hostile titles in the image', () => {
@@ -174,10 +193,33 @@ test.describe('seo helpers', () => {
 });
 
 test.describe('texuli.com SEO build output', () => {
-  test('robots.txt allows crawling and points at the sitemap', async ({ request }) => {
+  test('robots.txt allows crawling, points at the sitemap and welcomes AI crawlers', async ({
+    request,
+  }) => {
     const robots = await request.get(`${origin}/robots.txt`);
     expect(robots.status()).toBe(200);
-    expect(await robots.text()).toBe(`User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
+    const text = await robots.text();
+    expect(text).toBe(buildRobots(`${SITE}/sitemap.xml`));
+    expect(text).toContain('User-agent: *');
+    for (const crawler of AI_CRAWLERS) expect(text).toContain(`User-agent: ${crawler}`);
+    expect(text).not.toMatch(/^Content-Signal:/m);
+    expect(text).not.toContain('Disallow');
+  });
+
+  test('every sitemap url carries a valid lastmod date', async ({ request }) => {
+    const response = await request.get(`${origin}/sitemap.xml`);
+    expect(response.status()).toBe(200);
+    const xml = await response.text();
+    const blocks = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
+    expect(blocks.length).toBe(indexedPages().length);
+    for (const block of blocks) {
+      const loc = block.match(/<loc>([^<]+)<\/loc>/)?.[1] ?? '';
+      const match = block.match(/<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/);
+      expect(match, `lastmod present on ${loc}`).toBeTruthy();
+      const date = new Date(`${match![1]}T00:00:00Z`);
+      expect(date.getTime(), `lastmod parses on ${loc}`).not.toBeNaN();
+      expect(date.getTime(), `lastmod not in the future on ${loc}`).toBeLessThanOrEqual(Date.now());
+    }
   });
 
   test('the sitemap lists every indexed page once (not the 404 or noindex previews)', async ({
