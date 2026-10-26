@@ -19,6 +19,7 @@ export default defineConfig({
     setupFiles: ['./tests/setup/vitest.setup.ts'],
     include: [
       'packages/*/tests/**/*.test.ts',
+      'apps/website/tests/**/*.test.ts',
       'scripts/tests/**/*.test.ts',
       ...(perfRun ? ['tests/perf/**/*.test.ts'] : []),
     ],
