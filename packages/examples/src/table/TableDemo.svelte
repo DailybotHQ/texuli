@@ -108,7 +108,7 @@ const total = invoices.reduce((sum, invoice) => sum + invoice.amountCents, 0);
   </Table>
 
   <h3>Sticky header in a capped area</h3>
-  <Table stickyHeader maxBlockSize="12rem" label="Shipments, scrollable" busy={false}>
+  <Table stickyHeader maxBlockSize="12rem" label="Shipments, scrollable" busy>
     <TableCaption hidden>Shipments</TableCaption>
     <TableHeader>
       <TableRow>

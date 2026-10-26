@@ -17,6 +17,13 @@ function showAll(): void {
       },
     },
   });
+  store.info(
+    'A very long notification title that remains readable in a narrow notification corner',
+    {
+      description: 'Reference: https://example.com/workspaces/harbor-notes/notifications',
+      duration: 0,
+    }
+  );
 }
 
 function showPromise(): void {

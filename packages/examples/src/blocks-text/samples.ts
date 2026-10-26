@@ -43,6 +43,18 @@ export const TEXT_FAMILY_SAMPLES: readonly unknown[] = [
     title: 'Back up first',
     body: 'Export your workspace before you [change regions](https://example.com/regions).',
   },
+  {
+    type: 'callout',
+    tone: 'accent',
+    title: 'A new workspace accent',
+    body: 'This callout uses the theme accent token for a short product note.',
+  },
+  {
+    type: 'callout',
+    tone: 'danger',
+    title: 'Access paused',
+    body: 'Review the fictional workspace policy before restoring access.',
+  },
 ];
 
 /**

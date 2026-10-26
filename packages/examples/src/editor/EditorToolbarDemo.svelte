@@ -20,6 +20,11 @@ const markdown = $derived(toMarkdown(saved));
   />
   <h3 id="editor-toolbar-markdown">Saved as Markdown</h3>
   <pre class="markdown" aria-labelledby="editor-toolbar-markdown">{markdown}</pre>
+
+  <div class="narrow-rtl" dir="rtl" lang="ar" aria-label="Toolbar at a narrow RTL width">
+    <h3 id="editor-toolbar-rtl-title">محرر بعرض ضيق واتجاه RTL</h3>
+    <RichTextEditor value={initial} aria-labelledby="editor-toolbar-rtl-title" />
+  </div>
 </section>
 
 <style>
@@ -49,5 +54,14 @@ const markdown = $derived(toMarkdown(saved));
     font-family: var(--tx-font-mono, ui-monospace, monospace);
     font-size: 0.85rem;
     white-space: pre-wrap;
+  }
+
+  .narrow-rtl {
+    display: grid;
+    gap: 0.75rem;
+    inline-size: min(100%, 360px);
+    padding: 0.75rem;
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-radius, 0.5rem);
   }
 </style>

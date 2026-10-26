@@ -52,6 +52,13 @@ function validate(values: Record<string, string>): FieldErrorMap {
     </Field>
   </div>
 
+  <h3>Disabled field</h3>
+  <Field label="Workspace slug" description="Managed by the workspace owner." disabled>
+    {#snippet children(control)}
+      <Input {...control.props} value="harbor-notes" />
+    {/snippet}
+  </Field>
+
   <h3>Composed Label / Description / FieldError</h3>
   <div class="tx-field-root">
     <Label for="notes-demo">Notes</Label>
