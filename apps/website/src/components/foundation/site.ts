@@ -53,6 +53,14 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     expandAt: 1,
   },
   {
+    id: 'platform',
+    label: 'Platform',
+    links: [
+      { href: '/web-and-native/', label: 'Web + native' },
+      { href: '/native/', label: 'Native (Kotlin)' },
+    ],
+  },
+  {
     id: 'components',
     label: 'Components',
     links: [

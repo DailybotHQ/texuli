@@ -81,12 +81,20 @@ function docsRoutes(dir = DIST): string[] {
     // Isolated preview documents (loaded inside iframes) are bare by design: no docs shell.
     // /llms.txt/ is the built stub of the 301 redirect to /llms/llms.txt
     // (astro.config.mjs redirects): an endpoint, bare by design too.
-    return /\/preview\//.test(route) || route === '/llms.txt/' ? [] : [route];
+    // /native/ is the second landing-shell route (T-32), asserted separately.
+    return /\/preview\//.test(route) || route === '/llms.txt/' || landingRoutes().includes(route)
+      ? []
+      : [route];
   });
 }
 
+/** Landing-shell routes: the home and the native landing (T-32). */
+function landingRoutes(): string[] {
+  return ['/', '/native/'];
+}
+
 test.describe('landing', () => {
-  test('a slim header: logo, Docs, search, theme and Get started; no page links or sidebar', async ({
+  test('a slim header: logo, Docs, the platform doors, search, theme and Get started; no sidebar', async ({
     page,
   }, info) => {
     expect(await visit(page, '/')).toEqual([]);
@@ -97,6 +105,16 @@ test.describe('landing', () => {
       'href',
       '/guides/'
     );
+    // The platform doors (T-32): the native landing and the architecture page,
+    // hidden under 40rem where the hero calls to action carry the paths.
+    await expect(header.getByRole('link', { name: 'Native', exact: true })).toHaveAttribute(
+      'href',
+      '/native/'
+    );
+    await expect(header.getByRole('link', { name: 'Web + native', exact: true })).toHaveAttribute(
+      'href',
+      '/web-and-native/'
+    );
     await expect(header.locator('astro-island:not([ssr]) [data-tx-site-search]')).toBeVisible();
     await expect(header.getByRole('group', { name: 'Appearance' })).toBeVisible();
     const getStarted = header.getByRole('link', { name: 'Get started' });
@@ -106,8 +124,10 @@ test.describe('landing', () => {
     } else {
       await expect(getStarted).toHaveAttribute('href', '/guides/getting-started/');
     }
-    // Only global utilities: the header lists no pages and there is no docs chrome.
-    expect(await header.getByRole('link').count()).toBe(info.project.name === 'mobile' ? 2 : 3);
+    // Only global utilities: the header lists no pages beyond the platform
+    // doors and there is no docs chrome. Under 40rem only the logo and Docs
+    // remain (the hero calls to action carry the paths).
+    expect(await header.getByRole('link').count()).toBe(info.project.name === 'mobile' ? 2 : 5);
     await expect(page.locator('[data-tx-site-sidebar]')).toHaveCount(0);
     await expect(page.locator('[data-site-menu]')).toHaveCount(0);
     await expect(page.getByRole('navigation', { name: 'Primary' })).toHaveCount(0);
@@ -182,6 +202,7 @@ test.describe('docs shell', () => {
     test.skip(info.project.name !== 'chromium', 'data check');
     expect(SITE_NAV_GROUPS.map((group) => group.label)).toEqual([
       'Get started',
+      'Platform',
       'Components',
       'Primitives',
       'Themes',
@@ -191,6 +212,44 @@ test.describe('docs shell', () => {
     const guides = GUIDES_SECTIONS.flatMap((section) => section.items).map((item) => item.href);
     const getStarted = SITE_NAV_GROUPS[0]?.links.map((link) => link.href) ?? [];
     expect(getStarted).toEqual([...guides, '/skill/']);
+  });
+
+  test('the platform group holds the architecture page and the native landing', ({
+    browserName: _browser,
+  }, info) => {
+    test.skip(info.project.name !== 'chromium', 'data check');
+    const platform = SITE_NAV_GROUPS.find((group) => group.id === 'platform');
+    expect(platform?.links.map((link) => link.href)).toEqual(['/web-and-native/', '/native/']);
+    expect(platform?.expand).toBeUndefined();
+  });
+
+  test('every nav target resolves in the built site', ({ browserName: _browser }, info) => {
+    test.skip(info.project.name !== 'chromium', 'data check');
+    // Links without href are family headings; children nest one level.
+    const flat = SITE_NAV_GROUPS.flatMap((group) =>
+      group.links.flatMap((link) => [
+        ...(link.href ? [link.href] : []),
+        ...(link.children ?? []).flatMap((child) => (child.href ? [child.href] : [])),
+      ])
+    );
+    const unresolved: string[] = [];
+    for (const href of flat) {
+      const dir = join(DIST, href.replace(/^\/+/, ''));
+      if (!existsSync(join(dir, 'index.html')) && !existsSync(`${dir}.html`)) unresolved.push(href);
+    }
+    expect(unresolved).toEqual([]);
+  });
+
+  test('the native landing is one interaction from the home header', async ({ page }, info) => {
+    test.skip(info.project.name === 'mobile', 'the hero calls to action carry the paths');
+    await page.setViewportSize({ width: 1440, height: 900 });
+    expect(await visit(page, '/')).toEqual([]);
+    await page
+      .getByRole('navigation', { name: 'Platform' })
+      .getByRole('link', { name: 'Native', exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/native\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('native');
   });
 
   test('a guide lives in the shell: one navigation, its group open, the shared pager', async ({

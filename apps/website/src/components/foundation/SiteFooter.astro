@@ -1,8 +1,9 @@
 ---
 /**
- * Site footer: agent surfaces, changelog, MIT line for Dailybot, Inc.
+ * Site footer: the product row (derived from NAV_GROUPS, T-32), agent
+ * surfaces, changelog, MIT line for Dailybot, Inc.
  */
-import { withBase } from './site.ts';
+import { NAV_GROUPS, withBase } from './site.ts';
 
 const base = import.meta.env.BASE_URL;
 const links = [
@@ -11,11 +12,35 @@ const links = [
   { href: '/changelog/', label: 'Changelog' },
   { href: '/guides/', label: 'Guides' },
 ] as const;
+
+/**
+ * Product doors, one per nav group, resolved against NAV_GROUPS so the
+ * footer never drifts from the sidebar (T-32). The platform door is the
+ * native landing; everything else takes the group's first link under its
+ * group label.
+ */
+const PRODUCT_GROUP_IDS = ['components', 'primitives', 'themes', 'platform', 'agents'];
+const productLinks = PRODUCT_GROUP_IDS.flatMap((id) => {
+  const group = NAV_GROUPS.find((candidate) => candidate.id === id);
+  if (!group) return [];
+  const href = id === 'platform' ? '/native/' : (group.links[0]?.href ?? '');
+  const label = id === 'platform' ? 'Native' : group.label;
+  return href ? [{ href, label }] : [];
+});
 ---
 
 <footer class="site-footer" data-tx-site-footer="">
   <div class="site-footer__inner">
     <nav aria-label="Footer">
+      <ul class="site-footer__products">
+        {
+          productLinks.map((link) => (
+            <li>
+              <a href={withBase(base, link.href)}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
       <ul>
         {
           links.map((link) => (
@@ -51,6 +76,13 @@ const links = [
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+  .site-footer__products {
+    font-weight: 600;
+  }
+  nav {
+    display: grid;
+    gap: 0.35rem;
   }
   a {
     color: var(--tx-link);

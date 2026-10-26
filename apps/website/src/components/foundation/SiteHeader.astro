@@ -45,6 +45,18 @@ const base = import.meta.env.BASE_URL;
       </a>
     )
   }
+  {
+    variant === 'landing' && (
+      <nav class="platform-links" aria-label="Platform">
+        <a class="docs-link" href={withBase(base, '/web-and-native/')}>
+          Web + native
+        </a>
+        <a class="docs-link" href={withBase(base, '/native/')}>
+          Native
+        </a>
+      </nav>
+    )
+  }
   <div class="tools">
     <SiteSearch client:load base={base} compact />
     <ThemeSwitch client:load />
@@ -91,8 +103,14 @@ const base = import.meta.env.BASE_URL;
   .docs-link:hover {
     background: color-mix(in srgb, var(--tx-foreground) 6%, transparent);
   }
+  .platform-links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
   @media (max-width: 40rem) {
-    .tools :global(.get-started) {
+    .tools :global(.get-started),
+    .platform-links {
       display: none;
     }
   }
