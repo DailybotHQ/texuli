@@ -1,0 +1,54 @@
+---
+/**
+ * /web-and-native/ — the architecture and correlation page (sub-site IA
+ * decision 3, owned by analysis_results/subsite-ia-routes.md). A docs-shell
+ * reading page. T-32 adds the route to the docs-shell semantics
+ * (`isDocsPath`/`DOC_SHELL_ROUTES`) and the platform nav group; G8
+ * (T-49..T-52) writes the sections named in the slots. The sibling guide
+ * /guides/why-svelte-kotlin/ stays the technical deep-dive and is linked,
+ * not moved — no existing route moves (T-12).
+ *
+ * Metadata per the T-17 contract (analysis_results/subsite-ia-nav.md §3):
+ * the BreadcrumbList is emitted by the docs chrome; the TechArticle graph
+ * lands with the G8 integration task (T-52), which owns the page's final
+ * content. Canonical and the OG set are emitted by SeoHead; the sitemap
+ * picks the route up via the build pipeline.
+ */
+import DocsShell from '../../components/docs-shell/DocsShell.astro';
+
+const toc = [
+  { id: 'why-both', label: 'Why both technologies', level: 2 as const },
+  { id: 'one-contract', label: 'One contract, two projections', level: 2 as const },
+  { id: 'portability', label: 'Interface portability', level: 2 as const },
+  { id: 'what-exists-today', label: 'What exists today', level: 2 as const },
+];
+---
+
+<DocsShell
+  title="Web and native, one contract — Texuli's architecture"
+  description="One manifest projects to TypeScript and Kotlin: the spec seam that keeps web and native interfaces portable. What exists today, honestly."
+  {toc}
+>
+  <h2 id="why-both">Why both technologies</h2>
+  <!-- T-49 writes this section: Svelte for the web, Kotlin for native, and why each. -->
+  <p>
+    This section is being written. The technical deep-dive lives at
+    <a href="/guides/why-svelte-kotlin/">Why Svelte and Kotlin</a> in the meantime.
+  </p>
+
+  <h2 id="one-contract">One contract, two projections</h2>
+  <!-- T-50 writes this section: the spec manifest and its TS + Kotlin projections. -->
+  <p>This section is being written. The native story has its own landing at <a href="/native/">Texuli native</a>.</p>
+
+  <h2 id="portability">Interface portability</h2>
+  <!-- T-51 writes this section: what moving an interface between runtimes takes. -->
+  <p>This section is being written.</p>
+
+  <h2 id="what-exists-today">What exists today</h2>
+  <!-- T-52 writes this section and performs the page's final integration. -->
+  <p>
+    This section is being written. Status today: the web runtime ships — all 15 packages are on
+    npm as 0.1.0-next.1 under the dist-tag <code>next</code> — and the native Compose renderer is
+    in development.
+  </p>
+</DocsShell>
