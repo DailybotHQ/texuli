@@ -75,6 +75,33 @@ describe('chart block rendering', () => {
     expect(table).toBe('anywhere');
   });
 
+  it('shows the invalid notice for duplicate x instead of crashing the chart render', async () => {
+    const issues: unknown[] = [];
+    render(DataBlockView, {
+      props: {
+        block: {
+          ...base,
+          kind: 'bar',
+          series: [
+            {
+              id: 'signups',
+              label: 'Signups',
+              points: [
+                { x: 'Mon', y: 1 },
+                { x: 'Mon', y: 2 },
+              ],
+            },
+          ],
+        },
+        oninvalid: (found: unknown) => issues.push(found),
+      },
+    });
+    expect(await screen.findByRole('note')).toBeTruthy();
+    expect(document.querySelector('[data-tx-block="invalid"]')).not.toBeNull();
+    expect(document.querySelector('figure')).toBeNull();
+    expect(issues).toHaveLength(1);
+  });
+
   it('shows a visible title and description for compact kinds', async () => {
     render(DataBlockView, {
       props: {

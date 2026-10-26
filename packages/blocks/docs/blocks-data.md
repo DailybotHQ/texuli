@@ -79,6 +79,14 @@ Every `color` (series, points, annotations) must be a bare `var(--token)`
 reference. Series, series points, heatmap cells and scatter points are closed
 objects: unknown keys are rejected, not stripped.
 
+Cartesian `series` follow the renderer's x rules, so a block that validates
+always draws: each x appears once within a series (aggregate repeated
+measurements first), categories are non-empty, and x values are either all
+categories or all numbers across the chart. The same x in different series is
+fine (grouped and stacked bars). A block that breaks these rules is invalid:
+`DataBlockView` shows its invalid notice and calls `oninvalid` instead of
+rendering a chart.
+
 ```json
 {
   "type": "chart",

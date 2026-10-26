@@ -1,4 +1,5 @@
 import { cleanup, render, screen } from '@testing-library/svelte';
+import { assertCartesianSeries, type CartesianSeries } from '@texuli/charts/cartesian';
 import { chartPropSchemas } from '@texuli/charts/schemas';
 import { afterEach, describe, expect, it } from 'vitest';
 import { safeParseBlock } from '../src/core/index.ts';
@@ -251,6 +252,94 @@ describe('cartesian top-level series', () => {
     expect(parses([{ ...one, onclick: 'x' }])).toBe(false);
     expect(parses([{ ...one, points: [{ x: 'W1', y: 1, label: 'x' }] }])).toBe(false);
     expect(parses([one, one])).toBe(false);
+  });
+
+  it('rejects the x values the cartesian renderers refuse to draw', () => {
+    // Duplicate x within one series (the charts ask callers to aggregate first).
+    expect(
+      parses([
+        {
+          ...one,
+          points: [
+            { x: 'W1', y: 1 },
+            { x: 'W1', y: 2 },
+          ],
+        },
+      ])
+    ).toBe(false);
+    expect(
+      parses([
+        {
+          ...one,
+          points: [
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+            { x: 2, y: 3 },
+          ],
+        },
+      ])
+    ).toBe(false);
+    // Category and numeric x mixed in one series, or across the chart.
+    expect(
+      parses([
+        {
+          ...one,
+          points: [
+            { x: 'W1', y: 1 },
+            { x: 2, y: 2 },
+          ],
+        },
+      ])
+    ).toBe(false);
+    expect(parses([one, { id: 'b', label: 'B', points: [{ x: 1, y: 1 }] }])).toBe(false);
+  });
+
+  it('accepts the same x in different series (grouped and stacked bars)', () => {
+    expect(parses([one, { id: 'b', label: 'B', points: [{ x: 'W1', y: 3 }] }])).toBe(true);
+  });
+
+  it('agrees with the charts validator on every cartesian series sample', () => {
+    const samples: CartesianSeries[][] = [
+      [one],
+      [
+        {
+          ...one,
+          points: [
+            { x: 'W1', y: 1 },
+            { x: 'W1', y: 2 },
+          ],
+        },
+      ],
+      [
+        {
+          ...one,
+          points: [
+            { x: 3, y: 1 },
+            { x: 3, y: null },
+          ],
+        },
+      ],
+      [
+        {
+          ...one,
+          points: [
+            { x: 'W1', y: 1 },
+            { x: 2, y: 2 },
+          ],
+        },
+      ],
+      [one, { id: 'b', label: 'B', points: [{ x: 1, y: 1 }] }],
+      [one, { id: 'b', label: 'B', points: [{ x: 'W1', y: 3 }] }],
+    ];
+    for (const sample of samples) {
+      let rendered = true;
+      try {
+        assertCartesianSeries(sample);
+      } catch {
+        rendered = false;
+      }
+      expect(parses(sample), JSON.stringify(sample)).toBe(rendered);
+    }
   });
 });
 

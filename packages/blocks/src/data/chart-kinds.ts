@@ -478,7 +478,42 @@ export function parseInlineData(
             n: 8,
             m: 1,
           };
-  return parseValue(spec, value, path, { nodes: 0 }, 0);
+  const parsed = parseValue(spec, value, path, { nodes: 0 }, 0);
+  if (!parsed.success || kind === 'heatmap' || kind === 'scatter' || kind === 'bubble') {
+    return parsed;
+  }
+  return checkCartesianX(parsed.data as readonly CartesianSeriesData[], path) ?? parsed;
+}
+
+type CartesianSeriesData = { readonly points: readonly { readonly x: string | number }[] };
+
+/**
+ * The cartesian renderers draw one mark per x in a series and one x scale per
+ * chart, so they refuse a repeated x within a series, an empty category, and
+ * category x mixed with numeric x (`assertCartesianSeries` in
+ * `@texuli/charts/cartesian`). Refuse those here, so a block that validates
+ * always renders and never throws inside the chart.
+ */
+function checkCartesianX(
+  series: readonly CartesianSeriesData[],
+  path: Path
+): ParseResult<never> | null {
+  let xType: 'string' | 'number' | null = null;
+  for (const [seriesIndex, item] of series.entries()) {
+    const seen = new Set<string | number>();
+    for (const [pointIndex, { x }] of item.points.entries()) {
+      const at = [...path, seriesIndex, 'points', pointIndex, 'x'];
+      const type = typeof x === 'number' ? 'number' : 'string';
+      if (x === '') return fail(at, 'x must not be empty');
+      if (xType !== null && type !== xType) {
+        return fail(at, 'x values must be all categories or all numbers across the chart');
+      }
+      xType = type;
+      if (seen.has(x)) return fail(at, 'x must be unique within a series; aggregate repeats first');
+      seen.add(x);
+    }
+  }
+  return null;
 }
 
 export function isExtendedChartKind(kind: string): kind is ExtendedChartKind {
