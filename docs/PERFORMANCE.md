@@ -18,6 +18,21 @@ about 100), so wall times are upper bounds.
 | Scripts the landing references directly | 6 modules, 6,810 B gzip; their imports bring the page's JS to about 113 KB gzip (`site-perf.spec.ts`, 2026-10-23) | `grep -o '_astro/[^"]*\.js' apps/website/dist/index.html` |
 | Core unit tests | 22 files, 322 tests in about 6 s | `pnpm vitest run packages/core` |
 
+### Website assets (2026-10-26, PLAN_006 T-92)
+
+On dev after `f2a49551` with other lanes' uncommitted work present. Details
+and per-file numbers: the T-92 walk in the PLAN_006 plan folder
+(`analysis_results/walks/perf-assets.md`).
+
+| What | Value | How it was measured |
+| --- | --- | --- |
+| Checked-in brand and demo PNGs (17 files) | 67,933 B → 50,499 B, lossless (decoded pixels identical) | Sharp re-encode; RGBA comparison against `git show HEAD:<file>` |
+| Brand WebP copies (10 files, each with a PNG fallback in `<picture>`) | 24,982 B total | file sizes in `apps/website/dist/brand/` |
+| Header logo per page (gzip -9) | 3,754 B PNG → 1,149 B WebP on 1x screens (2,333 B on 2x, 3,275 B on 3x) | `gzip -9 -c <file> \| wc -c` |
+| Route page weight (site-perf method, Chromium 1x) | 2.5 to 2.6 KB lighter on every route with the header; `/web-and-native/` 96.6 → 94.1 KB (budget 96) | `tests/e2e/site-perf.spec.ts` (10 passed), same measurement as a script |
+| Font files and `@font-face` rules in the build | 0 and 0: system font stacks, no font requests | `find apps/website/dist -name '*.woff*'`; `grep -l '@font-face' apps/website/dist/_astro/*.css` |
+| OG images (398 PNG, 1200 px) | 12,712,517 B at Sharp palette effort 8 (effort 10: 838 B larger, 4.6 s slower, not adopted) | every page's OG SVG encoded at both settings |
+
 ### Charts large-data limits (2026-10-24)
 
 `TEXULI_PERF_REPORT=1 pnpm test:perf` on the lane worktree for task 106, one

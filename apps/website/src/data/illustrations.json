@@ -1,45 +1,5 @@
 [
   {
-    "slot": "hero-bg",
-    "file": "hero-bg.webp",
-    "width": 1440,
-    "height": 810,
-    "alt": "Abstract soft mesh of teal and sand surfaces suggesting stacked interface panels",
-    "prompt": "Wide soft abstract mesh of teal and sand geometric panels, no text, no logos, calm product UI atmosphere",
-    "model": "",
-    "created": ""
-  },
-  {
-    "slot": "feature-owned",
-    "file": "feature-owned.webp",
-    "width": 640,
-    "height": 400,
-    "alt": "Nested building blocks forming a single solid structure",
-    "prompt": "Nested geometric building blocks forming one solid structure, soft lighting, no text",
-    "model": "",
-    "created": ""
-  },
-  {
-    "slot": "feature-accessible",
-    "file": "feature-accessible.webp",
-    "width": 640,
-    "height": 400,
-    "alt": "Keyboard and focus ring shapes arranged as an open path",
-    "prompt": "Abstract keyboard keys and a glowing focus ring forming an open path, accessible design metaphor, no text",
-    "model": "",
-    "created": ""
-  },
-  {
-    "slot": "feature-agents",
-    "file": "feature-agents.webp",
-    "width": 640,
-    "height": 400,
-    "alt": "Catalog cards flowing into a safe composition grid",
-    "prompt": "Catalog cards flowing into a safe composition grid, agent-built interface metaphor, no text",
-    "model": "",
-    "created": ""
-  },
-  {
     "slot": "page-components",
     "file": "page-components.webp",
     "width": 960,

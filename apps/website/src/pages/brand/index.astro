@@ -45,43 +45,55 @@ const asset = (file: string) => withBase(base, `/brand/${file}`);
     </ul>
     <div class="mark-grid">
       <figure>
-        <img
-          src={asset('texuli-logo-light.png')}
-          alt="Texuli logo lockup, dark mark for light backgrounds"
-          width="480"
-          height="140"
-          loading="lazy"
-        />
+        <picture>
+          <source srcset={asset('texuli-logo-light.webp')} type="image/webp" />
+          <img
+            src={asset('texuli-logo-light.png')}
+            alt="Texuli logo lockup, dark mark for light backgrounds"
+            width="480"
+            height="140"
+            loading="lazy"
+          />
+        </picture>
         <figcaption>Lockup · light backgrounds · 480 × 140</figcaption>
       </figure>
       <figure>
-        <img
-          src={asset('texuli-logo-dark.png')}
-          alt="Texuli logo lockup, white mark for dark backgrounds"
-          width="480"
-          height="140"
-          loading="lazy"
-        />
+        <picture>
+          <source srcset={asset('texuli-logo-dark.webp')} type="image/webp" />
+          <img
+            src={asset('texuli-logo-dark.png')}
+            alt="Texuli logo lockup, white mark for dark backgrounds"
+            width="480"
+            height="140"
+            loading="lazy"
+          />
+        </picture>
         <figcaption>Lockup · dark backgrounds · 480 × 140</figcaption>
       </figure>
       <figure>
-        <img
-          src={asset('texuli-isotype-light.png')}
-          alt="Texuli isotype, the texel-built T mark for light backgrounds"
-          width="128"
-          height="128"
-          loading="lazy"
-        />
+        <picture>
+          <source srcset={asset('texuli-isotype-light.webp')} type="image/webp" />
+          <img
+            src={asset('texuli-isotype-light.png')}
+            alt="Texuli isotype, the texel-built T mark for light backgrounds"
+            width="128"
+            height="128"
+            loading="lazy"
+          />
+        </picture>
         <figcaption>Isotype · light backgrounds · 128 × 128</figcaption>
       </figure>
       <figure>
-        <img
-          src={asset('texuli-isotype-dark.png')}
-          alt="Texuli isotype, the texel-built T mark for dark backgrounds"
-          width="128"
-          height="128"
-          loading="lazy"
-        />
+        <picture>
+          <source srcset={asset('texuli-isotype-dark.webp')} type="image/webp" />
+          <img
+            src={asset('texuli-isotype-dark.png')}
+            alt="Texuli isotype, the texel-built T mark for dark backgrounds"
+            width="128"
+            height="128"
+            loading="lazy"
+          />
+        </picture>
         <figcaption>Isotype · dark backgrounds · 128 × 128</figcaption>
       </figure>
     </div>
