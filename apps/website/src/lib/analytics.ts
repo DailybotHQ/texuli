@@ -4,7 +4,9 @@
  * This module is deliberately the only place that knows event names and
  * payload rules. The loader component and the `track` functions are later
  * tasks; they must call `sanitizeEventData` on every payload — no event
- * leaves the site with a denylisted key in it.
+ * leaves the site with a denylisted key in it. String values are also
+ * scrubbed of email-shaped substrings: denylisted keys can be audited,
+ * free-text values (a search query, a pasted path) cannot.
  */
 
 /**
@@ -60,6 +62,39 @@ export const EVENTS = {
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS];
 
 /**
+ * Client-sent events with their payload shapes — the only names `track`
+ * accepts, so a typo is a type error, not a silently mangled dashboard.
+ * The reserved edge events (ai_bot_visit, unknown_bot_visit,
+ * markdown_request) are sent server-side and never through `track`.
+ */
+export type ClientEventName =
+  | 'theme_switch'
+  | 'code_copy'
+  | 'component_demo_open'
+  | 'studio_launch'
+  | 'outbound_doc_link'
+  | 'search';
+
+export interface EventPayloads {
+  theme_switch: { from: string; to: string };
+  code_copy: { page: string };
+  component_demo_open: { component: string };
+  studio_launch: { studio: string };
+  outbound_doc_link: { url: string };
+  search: { query: string; results: number };
+}
+
+/** Email-shaped substrings never leave the site, in any value. The
+ * character classes are the practical email shape — bounded, so a URL
+ * that merely contains an address is redacted at the address, not
+ * swallowed whole. */
+const EMAIL_VALUE_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
+
+function scrubValue(value: EventDataValue): EventDataValue {
+  return typeof value === 'string' ? value.replace(EMAIL_VALUE_RE, '[redacted]') : value;
+}
+
+/**
  * Strip denylisted keys from a payload before sending. Returns undefined
  * when nothing remains — callers must treat that as "send no data".
  */
@@ -71,7 +106,7 @@ export function sanitizeEventData(data?: EventData): EventData | undefined {
     const lower = key.toLowerCase();
     const denied = PII_DENYLIST_KEYS.some((bad) => lower.includes(bad));
     if (!denied) {
-      sanitized[key] = value;
+      sanitized[key] = scrubValue(value);
     }
   }
 

@@ -1,0 +1,31 @@
+---
+/**
+ * Umami analytics loader (T-34). Renders nothing unless analytics is
+ * enabled — with no `PUBLIC_UMAMI_WEBSITE_ID` the page ships zero
+ * analytics markup and can fire zero requests. When enabled, one
+ * same-origin loader script (`public/umami-loader.js`) injects the real
+ * script (first-party proxy `/api/umami/*` by default) with the id and
+ * collect endpoint as data attributes.
+ *
+ * Mounting on the stable shell is T-39's step, after its verification
+ * spec proves the off/proxy/skip behavior — this task ships the
+ * component, not the mount.
+ */
+import { ANALYTICS } from '../../lib/constances.ts';
+
+const umami = ANALYTICS.umami;
+---
+
+{
+  umami.enabled && (
+    <script
+      is:inline
+      src="/umami-loader.js"
+      data-umami-loader
+      data-script-src={umami.scriptUrl}
+      data-website-id={umami.websiteId}
+      data-host-url={umami.hostUrl}
+      defer
+    />
+  )
+}

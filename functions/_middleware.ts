@@ -1,16 +1,25 @@
 /**
- * Cloudflare Pages middleware (T-26, T-27, T-28): request shaping for
- * agents. A request that explicitly prefers `text/markdown` gets the docs
- * page's static twin from the build output (`/guides/theming.md` beside
+ * Cloudflare Pages middleware (T-26, T-27, T-28, T-37): request shaping
+ * for agents plus server-side analytics for automated consumers. A
+ * request that explicitly prefers `text/markdown` gets the docs page's
+ * static twin from the build output (`/guides/theming.md` beside
  * `/guides/theming/`); an automated consumer that misses gets RFC 9457
  * `application/problem+json` instead of the HTML 404; a strict-parser
- * auditing tool (Lighthouse family) gets the stripped robots variant; every
- * other request passes through untouched, so browsers never see raw twins,
- * machine errors or a policy meant for crawlers. The decisions are pure and
- * live in the website's lib — this file only fetches assets and shapes
- * responses. No secrets, no PII, no request bodies are read or logged.
+ * auditing tool (Lighthouse family) gets the stripped robots variant;
+ * counted bot page hits and served twins emit UA-class + path events
+ * through the same-origin Umami proxy via waitUntil (never blocking the
+ * response, silent unless `PUBLIC_UMAMI_WEBSITE_ID` is provisioned).
+ * Every decision is pure and lives in the website's lib — this file only
+ * fetches assets and shapes responses. No secrets, no PII, no request
+ * bodies are read or logged.
  */
 import { agentProblem, isAgentRequest } from '../apps/website/src/lib/agent-request.ts';
+import {
+  type BotEventName,
+  botEventFor,
+  buildBotEventBody,
+  buildBotEventRequest,
+} from '../apps/website/src/lib/bot-events.ts';
 import { negotiateTwin } from '../apps/website/src/lib/md-negotiate.ts';
 import {
   isStrictParserAudit,
@@ -20,6 +29,7 @@ import {
 /** The pieces of the Pages environment this middleware touches. */
 interface Env {
   ASSETS: { fetch: (request: Request) => Promise<Response> };
+  PUBLIC_UMAMI_WEBSITE_ID?: string;
 }
 
 /** The pieces of the Pages function context this middleware touches. */
@@ -27,6 +37,24 @@ interface Context {
   request: Request;
   next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
   env: Env;
+  waitUntil?: (promise: Promise<unknown>) => void;
+}
+
+/** Fire-and-forget: queue the send when waitUntil exists, drop otherwise. */
+function sendBotEvent(context: Context, event: BotEventName, pathname: string): void {
+  const url = new URL(context.request.url);
+  const body = buildBotEventBody(
+    event,
+    pathname,
+    context.env.PUBLIC_UMAMI_WEBSITE_ID,
+    url.hostname
+  );
+  if (!body) return;
+  const send = fetch(buildBotEventRequest(body, url.origin)).then(
+    () => undefined,
+    () => undefined
+  );
+  if (context.waitUntil) context.waitUntil(send);
 }
 
 export const onRequest = async (context: Context): Promise<Response> => {
@@ -53,10 +81,21 @@ export const onRequest = async (context: Context): Promise<Response> => {
     const response = await context.env.ASSETS.fetch(new Request(asset));
     // A twin that was not built falls through to the normal pipeline (the
     // site's own 404), never to a fabricated body.
-    if (response.ok) return new Response(response.body, { status: 200, headers: decision.headers });
+    if (response.ok) {
+      // Markdown twins are served to markdown-preferring consumers; the
+      // fetch itself is the event, whatever fetched it.
+      const twinEvent = botEventFor(userAgent, true);
+      if (twinEvent) sendBotEvent(context, twinEvent, url.pathname);
+      return new Response(response.body, { status: 200, headers: decision.headers });
+    }
   }
   const response = await context.next();
   const status = response.status;
+  // Bot page hits count by class; only real HTML pages, not assets or 404s.
+  const pageEvent = botEventFor(userAgent, false);
+  if (pageEvent && (response.headers.get('content-type') ?? '').includes('text/html')) {
+    sendBotEvent(context, pageEvent, url.pathname);
+  }
   if (status === 404 && isAgentRequest(userAgent)) {
     return new Response(JSON.stringify(agentProblem(url.pathname, url.origin)), {
       status: 404,

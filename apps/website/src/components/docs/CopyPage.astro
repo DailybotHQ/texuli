@@ -35,6 +35,9 @@ const { head } = Astro.props;
 </style>
 
 <script>
+  import { EVENTS } from '../../lib/analytics.ts';
+  import { track } from '../../lib/track.ts';
+
   for (const host of document.querySelectorAll<HTMLElement>('[data-copy-page]')) {
     const button = host.querySelector<HTMLButtonElement>('[data-copy-page-button]');
     const source = host.querySelector<HTMLTemplateElement>('[data-page-markdown]');
@@ -44,6 +47,7 @@ const { head } = Astro.props;
       try {
         await navigator.clipboard.writeText(text);
         if (status) status.textContent = 'Page copied as Markdown.';
+        track(EVENTS.CODE_COPY, { page: location.pathname });
       } catch {
         if (status) status.textContent = 'Copy failed: your browser blocked the clipboard.';
       }

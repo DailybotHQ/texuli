@@ -26,6 +26,7 @@ import '@texuli/tokens/base.css';
 import { compileThemeCss } from '@texuli/tokens';
 import { loadLibraryTheme } from '@texuli/tokens/library';
 import { noFlashScript } from '@texuli/tokens/no-flash';
+import UmamiLoader from '../components/analytics/UmamiLoader.astro';
 import BrandHead from '../components/brand/BrandHead.astro';
 import CopyPage from '../components/docs/CopyPage.astro';
 import DocsPager from '../components/docs/DocsPager.astro';
@@ -104,6 +105,12 @@ const markdownHead = docs
       @layer site-base, tx.base, tx.components, site-overrides;
     </style>
     <script is:inline set:html={bootstrap} />
+    <script>
+      // Outbound documentation link events (T-38): one delegated listener,
+      // idempotent, silent unless analytics is enabled. Bundled once.
+      import { setupOutboundDocTracking } from '../lib/outbound-links.ts';
+      setupOutboundDocTracking();
+    </script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <SeoHead title={fullTitle} {description} siteName={SITE_NAME} {lang} {noindex} />
@@ -111,6 +118,8 @@ const markdownHead = docs
     {jsonLd && <JsonLd data={jsonLd} />}
     {crumbs.length >= 2 && <JsonLd data={breadcrumbJsonLd(crumbs)} />}
     <style is:inline set:html={themeCss}></style>
+    {/* Analytics mounts here (T-39): renders nothing unless enabled. */}
+    <UmamiLoader />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
