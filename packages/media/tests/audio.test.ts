@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { fireEvent, render } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { describe, expect, it, vi } from 'vitest';
@@ -224,6 +225,14 @@ describe('Waveform', () => {
 });
 
 describe('AudioPlayer', () => {
+  // T-68: muted chrome fallbacks must be system colors, not a fixed grey hex.
+  it('avoids hardcoded hex greys in the audio stylesheet', () => {
+    const source = readFileSync('packages/media/src/audio/audio.css', 'utf8');
+    expect(source).not.toMatch(/#575757/);
+    expect(source).toMatch(/--tx-muted-foreground,\s*GrayText/);
+    expect(source).toMatch(/--tx-destructive,\s*Mark/);
+  });
+
   it('blocks an unsafe source and never mounts an audio element', async () => {
     const onError = vi.fn();
     const { container, getByRole } = render(AudioPlayer, {

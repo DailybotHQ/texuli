@@ -142,7 +142,11 @@ positions on the new output.
   `onstatus` reports `loading`, `ready`, `blocked` or `error`.
 - **Styles:** in `@layer tx.components`, with logical properties, tokens with
   `light-dark()` fallbacks, and system colors under `forced-colors`. Buttons
-  come from `texuli/button`.
+  come from `texuli/button`. The area outside the crop is dimmed with
+  `--tx-scrim`. The crop edge and handle sit on the photo rather than on a
+  theme surface, so they default to a white edge with a black handle ring.
+  Hosts can retune them with `--tx-image-editor-edge` and
+  `--tx-image-editor-edge-contrast`.
 
 ## Labels
 
@@ -152,14 +156,16 @@ key. Placeholders such as `{width}` are filled as plain text.
 
 ## Verified
 
-- `pnpm vitest run packages/media/tests/image-editor.test.ts`: 33 tests cover:
+- `pnpm vitest run packages/media/tests/image-editor.test.ts`: 37 tests (2026-10-26) cover:
   - the model, the history and the validator against hostile edits;
   - the filter math against the CSS definitions, and the blur;
   - a geometric property: the source region under the crop stays the same
     through every rotation and flip, measured from the transform recorded on
     a 2D context double;
   - loading and the URL policy, drawing, export failures;
-  - the component.
+  - the component;
+  - the stylesheet: chrome colors come only through `var()` tokens, and the
+    crop dims with `--tx-scrim`.
 
   Ten deliberate mutations of the implementation each fail a test.
 - In real Chromium, WebKit and Pixel 7 (2026-10-23), for the three examples

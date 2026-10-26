@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Component } from 'svelte';
 import type { ClassValue } from 'texuli/cx';
+import type { TimelineLabels } from './labels.ts';
 import type { TimelineDocument } from './model.ts';
 
 /**
@@ -17,6 +18,7 @@ type Props = {
   stepMs?: number;
   preview?: boolean;
   title?: string;
+  labels?: Partial<TimelineLabels>;
   class?: ClassValue;
 };
 
@@ -45,7 +47,7 @@ $effect(() => {
 {#if Editor}
   <Editor {...rest} bind:value bind:timeMs />
 {:else if failed}
-  <p role="alert">The animation timeline could not be loaded.</p>
+  <p role="alert">{rest.labels?.loadFailed ?? 'The animation timeline could not be loaded.'}</p>
 {:else}
-  <p role="status">Loading timeline…</p>
+  <p role="status">{rest.labels?.loadingTimeline ?? 'Loading timeline…'}</p>
 {/if}

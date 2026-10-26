@@ -16,7 +16,7 @@
 
   .tx-audio-player[data-status="blocked"],
   .tx-audio-player[data-status="error"] {
-    border-color: var(--tx-destructive, crimson);
+    border-color: var(--tx-destructive, Mark);
   }
 
   .tx-audio-player__row {
@@ -43,8 +43,8 @@
   }
 
   .tx-audio-player__play:focus-visible {
-    box-shadow: 0 0 0 var(--tx-focus-ring-width, 2px)
-      color-mix(in oklab, var(--tx-ring, Highlight) 40%, transparent);
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
   }
 
   .tx-audio-player__play:disabled {
@@ -59,13 +59,13 @@
     gap: 0.5rem;
     font-size: var(--tx-font-size-sm, 0.875rem);
     font-variant-numeric: tabular-nums;
-    color: var(--tx-muted-foreground, #575757);
+    color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-audio-player__message {
     margin: 0;
     font-size: var(--tx-font-size-sm, 0.875rem);
-    color: var(--tx-muted-foreground, #575757);
+    color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-audio-waveform {
@@ -79,8 +79,8 @@
   }
 
   .tx-audio-waveform:focus-visible {
-    box-shadow: 0 0 0 var(--tx-focus-ring-width, 2px)
-      color-mix(in oklab, var(--tx-ring, Highlight) 35%, transparent);
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
   }
 
   .tx-audio-waveform[aria-disabled="true"] {
@@ -89,7 +89,7 @@
   }
 
   .tx-audio-waveform__bar {
-    fill: var(--tx-muted-foreground, #575757);
+    fill: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-audio-waveform__bar--played {

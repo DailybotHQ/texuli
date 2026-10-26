@@ -4,6 +4,7 @@ import { type ClassValue, cx } from 'texuli/cx';
 import { EASING_NAMES, type EasingName } from '../animation/types.ts';
 import type { CompositionIssue } from '../composition-model/types.ts';
 import { sampleCompositionV2 } from '../composition-v2/animation.ts';
+import { DEFAULT_TIMELINE_LABELS, fillTimelineLabel, type TimelineLabels } from './labels.ts';
 import {
   createTimelineHistory,
   snapTime,
@@ -31,7 +32,10 @@ type Props = {
   stepMs?: number;
   /** Show a rendered preview of the frame at the playhead. */
   preview?: boolean;
+  /** The region name; defaults to `labels.title`. */
   title?: string;
+  /** Every visible and announced string; missing ones keep the English defaults. */
+  labels?: Partial<TimelineLabels>;
   class?: ClassValue;
 };
 
@@ -44,9 +48,13 @@ let {
   timeMs = $bindable(0),
   stepMs = 100,
   preview = true,
-  title = 'Animation timeline',
+  title: titleProp,
+  labels,
   class: className,
 }: Props = $props();
+
+let l = $derived<TimelineLabels>({ ...DEFAULT_TIMELINE_LABELS, ...labels });
+let title = $derived(titleProp ?? l.title);
 
 type Validated =
   | { ok: true; doc: TimelineDocument }
@@ -114,14 +122,14 @@ let selectedKeyframe = $derived.by(() => {
   return track?.keyframes[selected.index] ?? null;
 });
 
-const seconds = (ms: number) => `${(ms / 1000).toFixed(2)} s`;
+const seconds = (ms: number) => fillTimelineLabel(l.seconds, { value: (ms / 1000).toFixed(2) });
 const percent = (ms: number) => (durationMs > 0 ? (ms / durationMs) * 100 : 0);
 
 function dispatch(next: TimelineHistory, message: string) {
   const before = history;
   history = next;
   if (next.errors.length > 0 && next.present === before?.present) {
-    announcement = `Not applied: ${next.errors[0]?.message ?? 'invalid edit'}`;
+    announcement = fillTimelineLabel(l.notApplied, { reason: next.errors[0]?.message ?? '' });
     return;
   }
   if (next.present !== before?.present) {
@@ -136,11 +144,11 @@ function apply(action: TimelineAction, message: string) {
 }
 
 function undo() {
-  if (history) dispatch(timelineHistoryReducer(history, { type: 'undo' }), 'Undone.');
+  if (history) dispatch(timelineHistoryReducer(history, { type: 'undo' }), l.undone);
 }
 
 function redo() {
-  if (history) dispatch(timelineHistoryReducer(history, { type: 'redo' }), 'Redone.');
+  if (history) dispatch(timelineHistoryReducer(history, { type: 'redo' }), l.redone);
 }
 
 function onRootKeydown(event: KeyboardEvent) {
@@ -165,7 +173,11 @@ function setWindow(layerId: string, edge: 'start' | 'end', raw: number) {
   const endMs = edge === 'end' ? time : row.window.endMs;
   apply(
     { type: 'set-window', layerId, startMs, endMs },
-    `${row.label} shows from ${seconds(startMs)} to ${seconds(endMs)}.`
+    fillTimelineLabel(l.windowSet, {
+      layer: row.label,
+      start: seconds(startMs),
+      end: seconds(endMs),
+    })
   );
 }
 
@@ -174,7 +186,7 @@ function moveKeyframe(layerId: string, index: number, timeMsValue: number) {
   const time = snapTime(timeMsValue, 1, doc.animation.durationMs);
   apply(
     { type: 'move-keyframe', layerId, index, timeMs: time },
-    `Keyframe moved to ${seconds(time)}.`
+    fillTimelineLabel(l.keyframeMoved, { time: seconds(time) })
   );
   // Moving reorders the track: keep the selection on the moved keyframe.
   const track = history?.present.animation.tracks.find((t) => t.layerId === layerId);
@@ -193,7 +205,10 @@ function onKeyframeKeydown(event: KeyboardEvent, layerId: string, index: number,
     focusKeyframe(layerId);
   } else if (event.key === 'Delete' || event.key === 'Backspace') {
     event.preventDefault();
-    apply({ type: 'remove-keyframe', layerId, index }, `Keyframe at ${seconds(at)} removed.`);
+    apply(
+      { type: 'remove-keyframe', layerId, index },
+      fillTimelineLabel(l.keyframeRemoved, { time: seconds(at) })
+    );
     selected = null;
   }
 }
@@ -246,7 +261,7 @@ function onKeyframePointerUp() {
   onkeydown={onRootKeydown}
 >
   {#if loadErrors}
-    <p class="tx-animation-timeline__error" role="alert">This animation cannot be edited.</p>
+    <p class="tx-animation-timeline__error" role="alert">{l.cannotEdit}</p>
     <ul class="tx-animation-timeline__issues">
       {#each loadErrors as issue (issue.path + issue.message)}
         <li><code>{issue.path || 'doc'}</code>: {issue.message}</li>
@@ -256,28 +271,30 @@ function onKeyframePointerUp() {
     {#if preview}
       <div class="tx-animation-timeline__stage" data-tx-timeline-stage>
         {#if SvgHost && frame}
-          <SvgHost composition={frame} title={`${title} at ${seconds(timeMs)}`} {trust} validate={false} />
+          <SvgHost composition={frame} title={fillTimelineLabel(l.previewTitle, { title, time: seconds(timeMs) })} {trust} validate={false} />
         {:else}
-          <p role="status">Loading preview…</p>
+          <p role="status">{l.loadingPreview}</p>
         {/if}
       </div>
     {/if}
 
-    <div class="tx-animation-timeline__toolbar" role="group" aria-label="Timeline controls">
+    <div class="tx-animation-timeline__toolbar" role="group" aria-label={l.controls}>
       <button
         type="button"
         class="tx-animation-timeline__btn"
         disabled={(history?.past.length ?? 0) === 0}
-        onclick={undo}>Undo</button
+        aria-keyshortcuts="Control+Z Meta+Z"
+        onclick={undo}>{l.undo}</button
       >
       <button
         type="button"
         class="tx-animation-timeline__btn"
         disabled={(history?.future.length ?? 0) === 0}
-        onclick={redo}>Redo</button
+        aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
+        onclick={redo}>{l.redo}</button
       >
       <label class="tx-animation-timeline__playhead">
-        <span>Playhead</span>
+        <span>{l.playhead}</span>
         <input
           type="range"
           min="0"
@@ -301,17 +318,17 @@ function onKeyframePointerUp() {
     <div
       class="tx-animation-timeline__table-scroll"
       role="region"
-      aria-label="Layers, windows and keyframes"
+      aria-label={l.table}
       tabindex="0"
       data-tx-timeline-table-scroll
     >
     <table class="tx-animation-timeline__table">
-      <caption class="tx-animation-timeline__caption">Layers, windows and keyframes</caption>
+      <caption class="tx-animation-timeline__caption">{l.table}</caption>
       <thead>
         <tr>
-          <th scope="col">Layer</th>
-          <th scope="col">Window</th>
-          <th scope="col">Keyframes</th>
+          <th scope="col">{l.layer}</th>
+          <th scope="col">{l.window}</th>
+          <th scope="col">{l.keyframes}</th>
         </tr>
       </thead>
       <tbody>
@@ -330,28 +347,28 @@ function onKeyframePointerUp() {
               </div>
               {#if doc.composition.durationMs !== undefined}
                 <label class="tx-animation-timeline__edge">
-                  <span>Start</span>
+                  <span>{l.start}</span>
                   <input
                     type="range"
                     min="0"
                     max={doc.composition.durationMs}
                     step={stepMs}
                     value={row.window.startMs}
-                    aria-label={`Start of ${row.label}`}
+                    aria-label={fillTimelineLabel(l.startOf, { layer: row.label })}
                     aria-valuetext={seconds(row.window.startMs)}
                     data-tx-timeline-start={row.layerId}
                     onchange={(event) => setWindow(row.layerId, 'start', Number(event.currentTarget.value))}
                   />
                 </label>
                 <label class="tx-animation-timeline__edge">
-                  <span>End</span>
+                  <span>{l.end}</span>
                   <input
                     type="range"
                     min="0"
                     max={doc.composition.durationMs}
                     step={stepMs}
                     value={row.window.endMs}
-                    aria-label={`End of ${row.label}`}
+                    aria-label={fillTimelineLabel(l.endOf, { layer: row.label })}
                     aria-valuetext={seconds(row.window.endMs)}
                     data-tx-timeline-end={row.layerId}
                     onchange={(event) => setWindow(row.layerId, 'end', Number(event.currentTarget.value))}
@@ -361,14 +378,17 @@ function onKeyframePointerUp() {
                   <button
                     type="button"
                     class="tx-animation-timeline__btn"
-                    aria-label={`Show ${row.label} for the whole timeline`}
+                    aria-label={fillTimelineLabel(l.clearWindow, { layer: row.label })}
                     onclick={() =>
-                      apply({ type: 'clear-window', layerId: row.layerId }, `${row.label} shows for the whole timeline.`)}
-                    >Clear</button
+                      apply(
+                        { type: 'clear-window', layerId: row.layerId },
+                        fillTimelineLabel(l.windowCleared, { layer: row.label })
+                      )}
+                    >{l.clear}</button
                   >
                 {/if}
               {:else}
-                <span class="tx-animation-timeline__note">Static composition</span>
+                <span class="tx-animation-timeline__note">{l.staticComposition}</span>
               {/if}
             </td>
             <td class="tx-animation-timeline__keys">
@@ -378,7 +398,12 @@ function onKeyframePointerUp() {
                     type="button"
                     class="tx-animation-timeline__keyframe"
                     style={`inset-inline-start: ${percent(at)}%`}
-                    aria-label={`Keyframe ${index + 1} of ${row.keyframes.length} on ${row.label} at ${seconds(at)}`}
+                    aria-label={fillTimelineLabel(l.keyframe, {
+                      index: index + 1,
+                      count: row.keyframes.length,
+                      layer: row.label,
+                      time: seconds(at),
+                    })}
                     aria-pressed={selected?.layerId === row.layerId && selected.index === index}
                     data-tx-timeline-keyframe={`${row.layerId}:${index}`}
                     onclick={() => {
@@ -396,13 +421,13 @@ function onKeyframePointerUp() {
               <button
                 type="button"
                 class="tx-animation-timeline__btn"
-                aria-label={`Add a keyframe to ${row.label} at ${seconds(timeMs)}`}
+                aria-label={fillTimelineLabel(l.addKeyframeTo, { layer: row.label, time: seconds(timeMs) })}
                 data-tx-timeline-add={row.layerId}
                 onclick={() =>
                   apply(
                     { type: 'add-keyframe', layerId: row.layerId, timeMs: Math.round(Math.min(timeMs, doc?.animation.durationMs ?? 0)) },
-                    `Keyframe added to ${row.label} at ${seconds(timeMs)}.`
-                  )}>Add keyframe</button
+                    fillTimelineLabel(l.keyframeAdded, { layer: row.label, time: seconds(timeMs) })
+                  )}>{l.addKeyframe}</button
               >
             </td>
           </tr>
@@ -414,15 +439,20 @@ function onKeyframePointerUp() {
     {#if selected && selectedKeyframe}
       {@const current = selected}
       <fieldset class="tx-animation-timeline__inspector" data-tx-timeline-inspector>
-        <legend>Keyframe at {seconds(selectedKeyframe.timeMs)} on {rows.find((r) => r.layerId === current.layerId)?.label}</legend>
+        <legend>
+          {fillTimelineLabel(l.inspector, {
+            time: seconds(selectedKeyframe.timeMs),
+            layer: rows.find((r) => r.layerId === current.layerId)?.label ?? '',
+          })}
+        </legend>
         <label>
-          <span>Easing into this keyframe</span>
+          <span>{l.easing}</span>
           <select
             value={selectedKeyframe.easing ?? 'linear'}
             onchange={(event) =>
               apply(
                 { type: 'set-easing', layerId: current.layerId, index: current.index, easing: event.currentTarget.value as EasingName },
-                `Easing set to ${event.currentTarget.value}.`
+                fillTimelineLabel(l.easingSet, { easing: event.currentTarget.value })
               )}
           >
             {#each EASING_NAMES as easing (easing)}
@@ -431,7 +461,7 @@ function onKeyframePointerUp() {
           </select>
         </label>
         <label>
-          <span>Opacity</span>
+          <span>{l.opacity}</span>
           <input
             type="number"
             min="0"
@@ -439,10 +469,16 @@ function onKeyframePointerUp() {
             step="0.05"
             value={selectedKeyframe.opacity ?? ''}
             onchange={(event) => {
-              const opacity = Number(event.currentTarget.value);
+              const raw = event.currentTarget.value.trim();
+              // Number('') is 0: a cleared field is not an edit, so restore the shown value.
+              const opacity = raw === '' ? Number.NaN : Number(raw);
+              if (!Number.isFinite(opacity)) {
+                event.currentTarget.value = String(selectedKeyframe?.opacity ?? '');
+                return;
+              }
               apply(
                 { type: 'update-keyframe', layerId: current.layerId, index: current.index, values: { opacity } },
-                `Opacity set to ${opacity}.`
+                fillTimelineLabel(l.opacitySet, { value: opacity })
               );
             }}
           />
@@ -450,6 +486,6 @@ function onKeyframePointerUp() {
       </fieldset>
     {/if}
   {:else}
-    <p role="status">Loading timeline…</p>
+    <p role="status">{l.loadingTimeline}</p>
   {/if}
 </section>

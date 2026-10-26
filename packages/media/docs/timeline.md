@@ -95,7 +95,8 @@ chunks when it mounts.
 | `timeMs` | `0` | Bindable playhead |
 | `stepMs` | `100` | Keyboard and drag step; Shift moves ten steps |
 | `preview` | `true` | Render the frame at the playhead (`sampleCompositionV2` through `CompositionSvg`) |
-| `title` | `Animation timeline` | The region's name |
+| `title` | `labels.title` | The region's name |
+| `labels` | English defaults | Any subset of `TimelineLabels`; see Labels below |
 
 Structure and keyboard:
 
@@ -112,11 +113,24 @@ Structure and keyboard:
   to the step.
 - **Inspector:** the selected keyframe's easing and opacity.
 - **Undo and redo:** Ctrl/Cmd+Z undoes; Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes.
+  The Undo and Redo buttons carry these shortcuts in `aria-keyshortcuts`.
+- **Opacity field:** clearing it is not an edit; the field shows the current
+  value again.
 - **Announcements:** a polite status line announces each edit, or why it was
   not applied.
 
 Styles use the `--tx-*` tokens and logical properties, with a forced-colors
-mapping.
+mapping. Focus rings use `--tx-focus-ring-width` and `--tx-focus-ring-offset`.
+The keyframe diamond is 1rem, and its pointer target extends to 1.5rem (24px).
+
+## Labels
+
+Every visible and announced string is a `TimelineLabels` entry (the type is
+exported from `@texuli/media/timeline`). Pass any subset as `labels`; the rest
+keep their English defaults. Placeholders such as `{layer}` and `{time}` are
+filled as plain text, and `seconds` (`{value} s`) formats every time shown.
+Layer names and the model's refusal messages come from the document and the
+model, not from labels.
 
 ## Not covered yet
 
