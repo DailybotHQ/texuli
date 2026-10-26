@@ -32,18 +32,30 @@ describe('negotiateTwin', () => {
 });
 
 /** A context stub over an in-memory asset map, recording asset fetches. */
-function makeContext(pathname: string, accept: string | null, assets: Record<string, number>) {
+function makeContext(
+  pathname: string,
+  accept: string | null,
+  assets: Record<string, number>,
+  userAgent: string | null = 'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/131 Safari/537.36'
+) {
   const fetches: string[] = [];
-  const next = vi.fn(
-    async () =>
-      new Response('<!doctype html><html lang="en"><body>page</body></html>', {
-        status: 200,
+  const next = vi.fn(async () => {
+    if (assets['*404*'] !== undefined)
+      return new Response('<!doctype html><html lang="en"><body>404</body></html>', {
+        status: 404,
         headers: { 'content-type': 'text/html; charset=utf-8' },
-      })
-  );
+      });
+    return new Response('<!doctype html><html lang="en"><body>page</body></html>', {
+      status: 200,
+      headers: { 'content-type': 'text/html; charset=utf-8' },
+    });
+  });
   const context = {
     request: new Request(`https://texuli.com${pathname}`, {
-      headers: accept === null ? new Headers() : new Headers({ accept }),
+      headers: new Headers({
+        ...(accept === null ? {} : { accept }),
+        ...(userAgent === null ? {} : { 'user-agent': userAgent }),
+      }),
     }),
     next,
     env: {
@@ -98,5 +110,52 @@ describe('the middleware wrapper', () => {
     await onRequest(context);
     expect(next).toHaveBeenCalledTimes(1);
     expect(fetches).toEqual([]);
+  });
+});
+
+describe('the middleware agent 404 (T-27)', () => {
+  it('returns problem+json to an agent that misses', async () => {
+    const { context } = makeContext(
+      '/no/such/page/',
+      'text/html',
+      { '*404*': 1 },
+      'Mozilla/5.0 (compatible; ClaudeBot/1.0; +claudebot@anthropic.com)'
+    );
+    const response = await onRequest(context);
+    expect(response.status).toBe(404);
+    expect(response.headers.get('content-type')).toBe('application/problem+json');
+    const problem = (await response.json()) as Record<string, unknown>;
+    expect(problem).toMatchObject({
+      type: 'about:blank',
+      title: 'Not found',
+      status: 404,
+      instance: '/no/such/page/',
+      guide: 'https://texuli.com/llms.txt',
+    });
+  });
+
+  it('keeps the HTML 404 for humans and Lighthouse', async () => {
+    for (const userAgent of [
+      'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/131 Safari/537.36',
+      'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Chrome-Lighthouse',
+    ]) {
+      const { context } = makeContext('/no/such/page/', 'text/html', { '*404*': 1 }, userAgent);
+      const response = await onRequest(context);
+      expect(response.status).toBe(404);
+      expect(response.headers.get('content-type')).toBe('text/html; charset=utf-8');
+      expect(await response.text()).toContain('404');
+    }
+  });
+
+  it('does not shape successful responses, whatever the agent', async () => {
+    const { context } = makeContext(
+      '/guides/theming/',
+      'text/html',
+      {},
+      'GPTBot/1.0 (+https://openai.com/gptbot)'
+    );
+    const response = await onRequest(context);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toBe('text/html; charset=utf-8');
   });
 });
