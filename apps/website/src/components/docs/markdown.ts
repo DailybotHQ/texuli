@@ -72,23 +72,37 @@ export function htmlToMarkdown(html: string): string {
     );
     return `\uE000${blocks.length - 1}\uE000`;
   });
+  // Tables next, as one Markdown table per `<table>`: the separator belongs
+  // after the header row only, even when body rows use `th` row headers.
+  text = text.replace(/<table\b[^>]*>([\s\S]*?)<\/table>/gi, (_m, table: string) => {
+    const rows = [...table.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((row) =>
+      [...(row[1] ?? '').matchAll(/<(th|td)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map((cell) =>
+        inline(cell[2] ?? '')
+          .trim()
+          .replace(/\|/g, '\\|')
+      )
+    );
+    if (!rows.length) return '\n\n';
+    const width = Math.max(...rows.map((cells) => cells.length));
+    const pad = (cells: string[]) => {
+      const copy = [...cells];
+      while (copy.length < width) copy.push('');
+      return copy;
+    };
+    const separator = `|${Array.from({ length: width }, () => ' --- |').join('')}`;
+    const lines = [
+      `| ${pad(rows[0] ?? []).join(' | ')} |`,
+      separator,
+      ...rows.slice(1).map((cells) => `| ${pad(cells).join(' | ')} |`),
+    ];
+    return `\n\n${lines.join('\n')}\n\n`;
+  });
   text = text
     .replace(
       /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi,
       (_m, level: string, body: string) =>
         `\n\n${'#'.repeat(Number(level))} ${inline(body).trim()}\n\n`
     )
-    .replace(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi, (_m, row: string) => {
-      const cells = [...row.matchAll(/<t[hd]\b[^>]*>([\s\S]*?)<\/t[hd]>/gi)].map((cell) =>
-        inline(cell[1] ?? '')
-          .trim()
-          .replace(/\|/g, '\\|')
-      );
-      const header = /<th\b/i.test(row);
-      return `\n| ${cells.join(' | ')} |${header ? `\n|${cells.map(() => ' --- |').join('')}` : ''}`;
-    })
-    .replace(/<\/table>/gi, '\n\n')
-    .replace(/<li\b[^>]*>([\s\S]*?)<\/li>/gi, (_m, body: string) => `\n- ${inline(body).trim()}`)
     .replace(/<\/(ul|ol)>/gi, '\n\n')
     .replace(
       /<blockquote\b[^>]*>([\s\S]*?)<\/blockquote>/gi,

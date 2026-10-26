@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { absolutizeMarkdownLinks } from '../src/components/docs/markdown.ts';
+import { absolutizeMarkdownLinks, htmlToMarkdown } from '../src/components/docs/markdown.ts';
 import { markdownTwinFor, prefersMarkdown } from '../src/components/docs/markdown-negotiation.ts';
 
 describe('markdownTwinFor', () => {
@@ -47,6 +47,21 @@ describe('absolutizeMarkdownLinks', () => {
     const markdown = 'text\n\n```\n[link](/not/rewritten/)\n```\n\n[real](/guides/)\n';
     expect(absolutizeMarkdownLinks(markdown, 'https://texuli.com')).toBe(
       'text\n\n```\n[link](/not/rewritten/)\n```\n\n[real](https://texuli.com/guides/)\n'
+    );
+  });
+});
+
+describe('htmlToMarkdown tables', () => {
+  it('renders a props table with exactly one separator row', () => {
+    // Component pages mark every body row up with `th scope="row"`; the
+    // converter must emit the separator once, after the header row only.
+    const html =
+      '<table><thead><tr><th>Name</th><th>Kind</th></tr></thead><tbody>' +
+      '<tr><th scope="row">variant</th><td>enum</td></tr>' +
+      '<tr><th scope="row">size</th><td>enum</td></tr>' +
+      '</tbody></table>';
+    expect(htmlToMarkdown(html)).toBe(
+      '| Name | Kind |\n| --- | --- |\n| variant | enum |\n| size | enum |\n'
     );
   });
 });

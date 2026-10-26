@@ -165,4 +165,31 @@ test.describe('markdown twins (docs pages)', () => {
       );
     });
   }
+
+  test('every component page twin matches a component doc, and props tables are well-formed', () => {
+    const manifest = JSON.parse(readFileSync(join(DIST, 'md-manifest.json'), 'utf8')) as {
+      twins: Record<string, string>;
+    };
+    const componentTwins = Object.keys(manifest.twins)
+      .filter((path) => /^\/component-pages\/[^/]+\/$/.test(path))
+      .map((path) => path.replace('/component-pages', ''))
+      .sort();
+    const llmsIds = readdirSync(join(DIST, 'llms/components'))
+      .filter((file) => file.endsWith('.md'))
+      .map((file) => `/${file.slice(0, -3)}/`)
+      .sort();
+    expect(componentTwins.length).toBeGreaterThan(100);
+    expect(componentTwins).toEqual(llmsIds);
+    // Tables are well-formed: every separator row follows its header row —
+    // a separator after another separator is the th-row bug (this page has
+    // Props and Keyboard tables, each with one separator).
+    const button = readFileSync(join(DIST, 'component-pages/button.md'), 'utf8');
+    const lines = button.split('\n');
+    const doubled = lines.filter(
+      (line, index) =>
+        /^\| --- /.test(line) && /^\| --- /.test(lines[index - 1] ?? '')
+    );
+    expect(doubled).toEqual([]);
+    expect((button.match(/^\| --- /gm) ?? []).length).toBeGreaterThanOrEqual(1);
+  });
 });
