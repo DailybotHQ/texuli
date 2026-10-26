@@ -7,6 +7,7 @@
 
 export {
   canonicalTreeJson,
+  MAX_VALUE_MEASURE_DEPTH,
   type MeasureTreeResult,
   measureCatalogTree,
   utf8ByteLength,

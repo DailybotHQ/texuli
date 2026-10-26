@@ -46,6 +46,13 @@ function wide(count: number): Record<string, unknown> {
   };
 }
 
+/** A props value nested `levels` deep (iteratively built, as JSON.parse would deliver it). */
+function deepValue(levels: number): unknown {
+  let value: unknown = 'end';
+  for (let i = 0; i < levels; i += 1) value = [value];
+  return value;
+}
+
 describe('measureCatalogTree', () => {
   it('counts depth, nodes, branching and roots', () => {
     const { metrics } = measureCatalogTree(chain(4));
@@ -72,6 +79,18 @@ describe('measureCatalogTree', () => {
     const { metrics, snapshot } = measureCatalogTree(tree);
     expect(metrics.bytes).toBe(utf8ByteLength(snapshot));
     expect(snapshot).toContain('caf');
+  });
+
+  it('measures a value nested far past any limit without overflowing the stack', () => {
+    const tree = { id: 'card', props: { title: 'bomb', data: deepValue(100_000) } };
+    const { metrics, diagnostics } = measureCatalogTree(tree);
+    expect(metrics.nodes).toBe(1);
+    expect(diagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
+  });
+
+  it('caps the snapshot depth so byte measurement itself cannot recurse without bound', () => {
+    const { snapshot } = measureCatalogTree({ id: 'card', props: { data: deepValue(100_000) } });
+    expect(snapshot.length).toBeLessThan(10_000);
   });
 });
 
@@ -159,6 +178,14 @@ describe('renderCatalogTreeWithLimits', () => {
     if (result.roots[0]?.kind === 'component') {
       expect(result.roots[0].children).toHaveLength(3);
     }
+  });
+
+  it('survives a value nested far past any limit: the limits gate refuses, nothing renders', () => {
+    const tree = { id: 'card', props: { title: 'bomb', data: deepValue(100_000) } };
+    const result = renderCatalogTreeWithLimits(tree, { catalog, tier: 'untrusted' });
+    expect(result.withinLimits).toBe(false);
+    expect(result.roots).toEqual([]);
+    expect(result.limitDiagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
   });
 });
 

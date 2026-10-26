@@ -2,16 +2,34 @@ import type { LimitDiagnostic, TreeMetrics } from './types.ts';
 
 const ID_RE = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 
+/** Deepest node nesting the walker follows (well past `maxDepth`, far below stack limits). */
+const MAX_WALK_DEPTH = 1024;
+/** Deepest value nesting the snapshot encodes; deeper values become `null`, like cycles. */
+const MAX_SNAPSHOT_DEPTH = 256;
+/**
+ * Deepest value nesting a tree may carry (mirrors the validator's structural
+ * limit). Past it the measurer reports `value-depth-exceeded` so the budget
+ * fails and the sink-free renderer is never reached — its prop walk is
+ * recursive, so a deep enough value would exhaust the stack.
+ */
+export const MAX_VALUE_MEASURE_DEPTH = 128;
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 /**
  * Canonical JSON for byte budgets: sorted keys, no whitespace, finite numbers only.
- * Cycles and non-JSON values are replaced with null so measurement always finishes.
+ * Cycles, non-JSON values and values nested past the snapshot depth cap are
+ * replaced with null so measurement always finishes.
  */
-export function canonicalTreeJson(value: unknown, seen = new WeakSet<object>()): string {
+export function canonicalTreeJson(
+  value: unknown,
+  seen = new WeakSet<object>(),
+  depth = 0
+): string {
   if (value === null) return 'null';
+  if (depth > MAX_SNAPSHOT_DEPTH) return 'null';
   if (typeof value === 'string') return JSON.stringify(value);
   if (typeof value === 'number') {
     return Number.isFinite(value) ? JSON.stringify(value) : 'null';
@@ -25,14 +43,14 @@ export function canonicalTreeJson(value: unknown, seen = new WeakSet<object>()):
     if (seen.has(value)) return 'null';
     seen.add(value);
     if (Array.isArray(value)) {
-      const parts = value.map((item) => canonicalTreeJson(item, seen));
+      const parts = value.map((item) => canonicalTreeJson(item, seen, depth + 1));
       return `[${parts.join(',')}]`;
     }
     const record = value as Record<string, unknown>;
     const keys = Object.keys(record).sort();
     const parts = keys.map((key) => {
       const encodedKey = JSON.stringify(key);
-      const encodedValue = canonicalTreeJson(record[key], seen);
+      const encodedValue = canonicalTreeJson(record[key], seen, depth + 1);
       return `${encodedKey}:${encodedValue}`;
     });
     return `{${parts.join(',')}}`;
@@ -74,6 +92,16 @@ function walkNode(
   /** Hard stop so a malicious tree cannot hang the measurer. */
   hardNodeCap: number
 ): void {
+  if (depth > MAX_WALK_DEPTH) {
+    state.diagnostics.push({
+      code: 'depth-exceeded',
+      path,
+      message: `Stopped walking past ${MAX_WALK_DEPTH} levels of nodes.`,
+      limit: MAX_WALK_DEPTH,
+      observed: depth,
+    });
+    return;
+  }
   if (state.nodes >= hardNodeCap) {
     state.diagnostics.push({
       code: 'nodes-exceeded',
@@ -126,6 +154,40 @@ function walkNode(
   }
 }
 
+/**
+ * Deepest value nesting in the input, iteratively (so a depth bomb cannot
+ * exhaust the stack), with the path that reached it.
+ */
+function maxValueDepth(
+  input: unknown
+): { depth: number; path: string } {
+  let max = 0;
+  let maxPath = '';
+  const stack: { value: unknown; depth: number; path: string }[] = [
+    { value: input, depth: 0, path: '$' },
+  ];
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (!current) return { depth: max, path: maxPath };
+    const { value, depth, path } = current;
+    if (value === null || typeof value !== 'object') continue;
+    if (depth > max) {
+      max = depth;
+      maxPath = path;
+    }
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => {
+        stack.push({ value: item, depth: depth + 1, path: `${path}[${index}]` });
+      });
+    } else {
+      for (const [key, child] of Object.entries(value)) {
+        stack.push({ value: child, depth: depth + 1, path: `${path}.${key}` });
+      }
+    }
+  }
+  return { depth: max, path: maxPath };
+}
+
 export interface MeasureTreeResult {
   metrics: TreeMetrics;
   diagnostics: readonly LimitDiagnostic[];
@@ -165,6 +227,19 @@ export function measureCatalogTree(input: unknown, hardNodeCap = 10_000): Measur
 
   const snapshot = canonicalTreeJson(input ?? []);
   const bytes = utf8ByteLength(snapshot);
+
+  // Values nested past the structural limit are refused before rendering:
+  // the renderer's prop walk is recursive, so it must never see them.
+  const valueDepth = maxValueDepth(input);
+  if (valueDepth.depth > MAX_VALUE_MEASURE_DEPTH) {
+    state.diagnostics.push({
+      code: 'value-depth-exceeded',
+      path: valueDepth.path,
+      message: `Values nest deeper than ${MAX_VALUE_MEASURE_DEPTH} levels (observed ${valueDepth.depth}).`,
+      limit: MAX_VALUE_MEASURE_DEPTH,
+      observed: valueDepth.depth,
+    });
+  }
 
   const metrics: TreeMetrics = Object.freeze({
     depth: state.depth,

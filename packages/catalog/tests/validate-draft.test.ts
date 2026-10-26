@@ -227,6 +227,20 @@ describe('scanSinks', () => {
       'tree.props.imageSrc: a URL the untrusted URL policy refuses',
     ]);
   });
+
+  it('judges srcset candidates with the tier image policy, like the paint pass', () => {
+    const refused = scanSinks({
+      id: 'media-image',
+      props: { srcset: 'http://evil.example/track.webp 1x, http://evil.example/track2x.webp 2x' },
+    }).map((f) => `${f.path}: ${f.message}`);
+    expect(refused).toEqual(['tree.props.srcset: a URL the untrusted URL policy refuses']);
+
+    const kept = scanSinks({
+      id: 'media-image',
+      props: { srcset: 'https://example.com/a.webp 1x, https://example.com/a2x.webp 2x' },
+    });
+    expect(kept).toEqual([]);
+  });
 });
 
 describe('draftCommitGate', () => {

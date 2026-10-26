@@ -1,4 +1,4 @@
-import { safeHref, safeImageSrc, safeMediaSrc } from '@texuli/core/url-policy';
+import { safeHref, safeImageSrc, safeImageSrcset, safeMediaSrc } from '@texuli/core/url-policy';
 import { looksExecutable } from '../render/hostile/run.ts';
 
 /**
@@ -41,6 +41,7 @@ function isUrlKey(key: string): boolean {
     lower === 'poster' ||
     lower.endsWith('href') ||
     lower.endsWith('src') ||
+    lower.endsWith('srcset') ||
     lower.endsWith('url')
   );
 }
@@ -56,6 +57,7 @@ function urlKept(key: string, value: string, tier: SinkUrlTier): boolean {
   if (lower === 'href' || lower.endsWith('href') || lower.endsWith('url')) {
     return safeHref(value, tier) !== undefined;
   }
+  if (lower.endsWith('srcset')) return safeImageSrcset(value, tier) !== undefined;
   return safeImageSrc(value, tier) !== undefined || safeMediaSrc(value, tier) !== undefined;
 }
 

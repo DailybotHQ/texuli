@@ -200,7 +200,9 @@ function parseInline(
         } else {
           diagnostics.push({
             code: 'link-rejected',
-            message: `Link href rejected by the URL policy: ${summarize(link.href)}`,
+            // The refused URL is never echoed: diagnostics must not carry
+            // attacker-chosen text (the frame and sink scan follow the same rule).
+            message: 'Link href rejected by the URL policy.',
             offset: i,
           });
           // Keep the visible label as text (never the raw scheme).
@@ -364,10 +366,4 @@ function findClose(source: string, from: number, token: string): number | null {
     i += 1;
   }
   return null;
-}
-
-function summarize(value: string): string {
-  const trimmed = value.trim();
-  if (trimmed.length <= 48) return JSON.stringify(trimmed);
-  return `${JSON.stringify(trimmed.slice(0, 45))}…`;
 }

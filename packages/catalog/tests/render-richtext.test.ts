@@ -91,6 +91,16 @@ describe('renderRichText', () => {
     expect(JSON.stringify(nodes)).not.toMatch(/javascript:/i);
   });
 
+  it('never echoes a refused href into the link-rejected diagnostic', () => {
+    const bad = renderRichText('Pay [here](javascript:alert("\u202eevil.example/steal")).');
+    const diagnostic = bad.diagnostics.find((d) => d.code === 'link-rejected');
+    expect(diagnostic).toBeDefined();
+    const message = diagnostic?.message ?? '';
+    expect(message).not.toContain('javascript');
+    expect(message).not.toContain('evil.example');
+    expect(message).not.toMatch(/[\u202a-\u202e\u2066-\u2069]/);
+  });
+
   it('keeps raw HTML-like tags as literal text (never HTML sinks)', () => {
     const { document, diagnostics } = renderRichText(
       'Hello <script>alert(1)</script> and <b>bold</b>.'

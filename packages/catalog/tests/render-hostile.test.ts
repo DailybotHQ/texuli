@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { resetArtifactFrameIds } from '../src/render/frame/index.ts';
 import {
   assertInertRoots,
+  hardenInertRoots,
   HOSTILE_SAMPLES,
   hostileSamplesJson,
   looksExecutable,
@@ -78,6 +79,28 @@ describe('hostile helpers', () => {
     expect(Array.isArray(json)).toBe(true);
     expect(JSON.parse(JSON.stringify(json))).toEqual(json);
     expect(HOSTILE_SAMPLES.length).toBeGreaterThanOrEqual(12);
+  });
+
+  it('hardenInertRoots judges srcset by the untrusted image policy, like the paint pass', () => {
+    const hardened = hardenInertRoots([
+      {
+        kind: 'component',
+        id: 'media-image',
+        props: {
+          srcset: 'http://evil.example/track.webp 1x',
+          fallbackSrcset: 'https://example.com/a.webp 1x, https://example.com/a2x.webp 2x',
+        },
+        children: [],
+      },
+    ]);
+    const node = hardened[0];
+    expect(node?.kind).toBe('component');
+    if (node?.kind === 'component') {
+      expect(Object.hasOwn(node.props, 'srcset')).toBe(false);
+      expect(node.props.fallbackSrcset).toBe(
+        'https://example.com/a.webp 1x, https://example.com/a2x.webp 2x'
+      );
+    }
   });
 });
 

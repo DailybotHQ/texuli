@@ -48,6 +48,7 @@ export interface TreeMetrics {
 
 export type LimitIssueCode =
   | 'depth-exceeded'
+  | 'value-depth-exceeded'
   | 'nodes-exceeded'
   | 'bytes-exceeded'
   | 'branching-exceeded'
