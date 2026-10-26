@@ -32,7 +32,7 @@ Every root script, verbatim.
 | `pnpm test:e2e:install` | `playwright install chromium webkit` | Install the browsers |
 | `pnpm check:layers` | `tsx scripts/check-layers.ts` | Layer guard: down-only dependencies, no deep imports, no HTML/code sinks, no static `style=` |
 | `pnpm check:skill` | `tsx scripts/check-skill.ts` | Validate the `skills/texuli` agent skill: frontmatter, links, commands, CLI references, snippets, checksums |
-| `pnpm size` | `tsx scripts/size.ts` | Build every export subpath alone (Svelte external) and compare gzip against `texuli.budgets.json` |
+| `pnpm size` | `tsx scripts/size.ts` | Build every export subpath alone (Svelte external) and compare gzip against `texuli.budgets.json`. PLAN_006's result (T-93, 2026-10-26): 26 of 307 entries fail — 19 without a budget row, 7 over their cap — each an owner decision in the plan's `budget-proposal.md` |
 | `pnpm visual` | `tsx scripts/visual.ts` | Visual regression against `tests/visual/visual.spec.ts-snapshots` (light and dark, desktop and Pixel 7) |
 | `pnpm visual:update` | `tsx scripts/visual.ts --update` | Write new baselines (review the PNGs before committing) |
 | `pnpm test:perf` | `TEXULI_PERF=1 vitest run tests/perf packages/blocks/tests/code.test.ts packages/blocks/tests/text.test.ts` | Wall-clock and scale limits (opt-in; never in the default suite) |
@@ -59,6 +59,14 @@ Every root script, verbatim.
 `TEXULI_E2E_PORT` picks the fixture app's port. Every parallel lane uses its
 own port; 4870 is the default.
 
+After `pnpm build`, run the relevant website spec with
+`TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-<area>.spec.ts --project=chromium`.
+PLAN_006's SEO and agent-surface audits are separate, opt-in offline checks;
+their verified results and the analytics and platform-page browser specs are
+listed in [TESTING_GUIDE](TESTING_GUIDE.md). Website size and performance
+results for this plan: site-perf 10/10 (chromium) after T-91/T-92; `pnpm size`
+26 of 307 entries fail, recorded as owner decisions by T-93.
+
 ## Package scripts
 
 | Package | Script | Runs |
@@ -75,6 +83,11 @@ own port; 4870 is the default.
 | `pnpm exec tsx scripts/supply-chain.ts [--json]` | Supply-chain report and CycloneDX SBOM (`tmp/supply-chain/sbom.cdx.json`); gate: `pnpm vitest run scripts/tests/supply-chain.test.ts` |
 | `pnpm exec tsx scripts/check-docs.ts` | Every relative link in tracked Markdown resolves (headings included) and every documented `pnpm`/`npx`/`tsx`/`bash` command names a real script, package, binary or path; gate: `pnpm vitest run scripts/tests/check-docs.test.ts` |
 | `pnpm exec tsx scripts/check-css.ts` | No dead CSS in the package stylesheets: no repeated declaration in a rule, no rule identical to an earlier one, no declaration a later same-selector rule always overrides, and no `tx-*` class selector that no source file can produce (template-built classes count); gate: `pnpm vitest run scripts/tests/check-css.test.ts` |
+| `pnpm exec tsx scripts/check-llms-parity.ts` | Reconcile the component catalog, built Markdown twins, llms component docs and example registry; tests: `pnpm vitest run scripts/tests/check-llms-parity.test.ts`; T-24 recorded exit 0 (133 components, 157 examples, 108 directories) |
+| `node scripts/audit-seo.mjs --dist apps/website/dist` | Offline SEO audit of a completed website build; tests: `pnpm vitest run scripts/tests/audit-seo.test.ts`; T-29 recorded exit 0 (550 pages, 0 critical, 33 warnings, 4 planned). Opt-in |
+| `node scripts/audit-aeo.mjs --dist apps/website/dist` | Offline agent-surface audit of a completed website build; tests: `pnpm vitest run scripts/tests/audit-aeo.test.ts`; T-30 recorded exit 0 (26 top routes, 187 twins, 0 critical, 2 warnings, 3 planned). Opt-in |
+| `pnpm vitest run scripts/tests/theme-sweep.test.ts` | Test the deterministic theme sweep helpers. There is no durable sweep CLI; T-77 used a temporary runner. Results and limits are in `.dwp/plans/PLAN_006_website_marketing_seo_analytics/analysis_results/themes-sweep-findings.md` |
+| `pnpm exec tsx scripts/generate-site-llms.ts` | Regenerate the checked-in root `llms.txt`; its built-output freshness is asserted by `tests/e2e/site-aeo.spec.ts` |
 | `pnpm exec tsx tests/behavior/harness/limits-cli.ts [<primitive>] [--measure]` | Report the last behavior run against its limits |
 | `pnpm exec tsx scripts/check-skill.ts --write-sums` | Regenerate `skills/texuli/SHA256SUMS` after an intentional skill edit |
 | `./skills/texuli/setup.sh --verify [--expect-version <v>]` | Verify the skill pack checksums (pinned installs: `skills/texuli/setup/pinned-install.md`) |

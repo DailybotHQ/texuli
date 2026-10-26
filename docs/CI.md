@@ -29,6 +29,15 @@ integration.
   visible without blocking merges. A NEW failure here is a regression:
   fix it, do not raise a budget.
 
+The PLAN_006 offline site audits (`node scripts/audit-seo.mjs --dist
+apps/website/dist`, `node scripts/audit-aeo.mjs --dist apps/website/dist`)
+and the llms parity check (`pnpm exec tsx scripts/check-llms-parity.ts`)
+are documented opt-in developer gates; they are not separate CI jobs. The
+website job runs the site browser specs, including SEO, AEO, analytics and
+platform-page coverage. The theme sweep is a tested static helper with a
+temporary runner recorded in the plan findings; it is not a CI command or a
+browser visual test.
+
 ## Publishing to npm
 
 `publish.yml` rebuilds every tarball from source with
