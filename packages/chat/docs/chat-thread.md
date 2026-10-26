@@ -17,7 +17,8 @@ message at the top of the view in place, including while virtualized rows are
 still being measured, and it follows new messages when the reader is at the
 bottom.
 `ChatThread` composes the list with the existing composer; omit
-`onSend` for a read-only thread. `draft` can be bound by the parent, and
+`onSend` for a read-only thread. `label`, `virtualizeAfter`, and `overscan`
+pass through to the list. `draft` can be bound by the parent, and
 `typing`, `header`, and `body` support application-specific content.
 
 The default body renderer supports plain text, `**strong**`, `*emphasis*`,

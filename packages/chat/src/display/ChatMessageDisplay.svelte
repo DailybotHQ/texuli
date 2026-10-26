@@ -71,8 +71,8 @@ let roleLabel = $derived(CHAT_DISPLAY_ROLE_LABELS[role] ?? '');
     .tx-chat-display-message__meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; color: var(--tx-muted-foreground, GrayText); font-size: 0.75rem; }
     .tx-chat-display-message__author { color: var(--tx-foreground, CanvasText); font-weight: 600; }
     .tx-chat-display-message__role { border: 1px solid currentColor; border-radius: 999px; padding: 0 0.4em; }
-    .tx-chat-display-message__text { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; border-radius: 1rem 1rem 1rem 0.25rem; background: var(--tx-muted, ButtonFace); padding: 0.5rem 0.875rem; }
-    .tx-chat-display-message[data-role="user"] .tx-chat-display-message__text { border-radius: 1rem 1rem 0.25rem 1rem; background: var(--tx-primary, Highlight); color: var(--tx-primary-foreground, HighlightText); }
+    .tx-chat-display-message__text { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; border-radius: 1rem; border-end-start-radius: 0.25rem; background: var(--tx-muted, ButtonFace); padding: 0.5rem 0.875rem; }
+    .tx-chat-display-message[data-role="user"] .tx-chat-display-message__text { border-radius: 1rem; border-end-end-radius: 0.25rem; background: var(--tx-primary, Highlight); color: var(--tx-primary-foreground, HighlightText); }
     .tx-chat-display-message[data-role="system"] .tx-chat-display-message__text { background: transparent; font-style: italic; }
     .tx-chat-display-message__body { min-inline-size: 0; }
     @media (forced-colors: active) { .tx-chat-display-message__text { border: 1px solid CanvasText; } }
