@@ -2,13 +2,15 @@
 import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import Button from './Button.svelte';
-import type { ButtonVariant } from './button-variants.ts';
+import type { ButtonSize, ButtonVariant } from './button-variants.ts';
 
 type IconButtonProps = HTMLButtonAttributes &
   HTMLAnchorAttributes & {
     /** Required accessible name for the icon-only control. */
     label: string;
     variant?: ButtonVariant;
+    /** Defaults to the square `icon` size; larger sizes keep the square ratio. */
+    size?: ButtonSize;
     href?: string | null;
     loading?: boolean;
     autoLoading?: boolean;
@@ -22,6 +24,7 @@ type IconButtonProps = HTMLButtonAttributes &
 let {
   label,
   variant = 'ghost',
+  size = 'icon',
   loading = false,
   children,
   ref = $bindable(null),
@@ -33,8 +36,9 @@ let {
   {...rest}
   bind:ref
   {variant}
-  size="icon"
+  {size}
   {loading}
+  data-icon-only="true"
   aria-label={label}
   loadingLabel={label}
 >
