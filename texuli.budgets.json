@@ -643,12 +643,12 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 8,317 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 9,670 B + 4% headroom; manifests carry events, bindable and prop schemas, and each group ships the validator's checks."
     },
     "@texuli/catalog/player": {
-      "gzip": 19712,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 16,826 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 18,920 B + 4% headroom; the player manifests gained the spec 0.3.0 fields."
+      "gzip": 20992,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 16,826 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 18,920 B + 4% headroom; the player manifests gained the spec 0.3.0 fields. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 20,166 B + 4% headroom."
     },
     "@texuli/catalog/validate": {
-      "gzip": 16896,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate."
+      "gzip": 18240,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom."
     },
     "@texuli/player": {
       "gzip": 79808,
@@ -691,8 +691,12 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 3,266 B CSS, cap = measured + 4% headroom."
     },
     "@texuli/spec": {
-      "gzip": 10560,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 5,357 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec 0.3.0 adds the interaction contract (state, closed actions, bindings, events) to the root; workflow validation and migrations moved to on-demand subpaths; measured 10,101 B + 4% headroom."
+      "gzip": 11968,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 5,357 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec 0.3.0 adds the interaction contract (state, closed actions, bindings, events) to the root; workflow validation and migrations moved to on-demand subpaths; measured 10,101 B + 4% headroom. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 11,472 B + 4% headroom."
+    },
+    "@texuli/spec/surface": {
+      "gzip": 1728,
+      "note": "Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): the player's state-surface rules as a spec module, so a blueprint that validates always paints; measured 1,601 B + 4% headroom."
     },
     "@texuli/spec/workflow": {
       "gzip": 3648,
@@ -703,8 +707,8 @@
       "note": "Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec version migrations, loaded on demand; measured 503 B + 4% headroom."
     },
     "@texuli/spec/codegen": {
-      "gzip": 18624,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 10,644 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007 T-spec-standard): build-time only; 0.3.0 validators for the conformance harness; measured 17,904 B + 4% headroom."
+      "gzip": 19904,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 10,644 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007 T-spec-standard): build-time only; 0.3.0 validators for the conformance harness; measured 17,904 B + 4% headroom. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 19,098 B + 4% headroom."
     },
     "@texuli/charts/cartesian": {
       "gzip": 12736,
