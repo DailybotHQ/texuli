@@ -164,7 +164,7 @@ export function isItemDisabled(item: Element): boolean {
   {
     layer: 'primitive',
     name: '@texuli/primitives',
-    role: '41 owned headless primitives, one subpath each, held to the WAI-ARIA APG patterns: behavior and ARIA state computed in the open, with no styles to fight.',
+    role: '42 owned headless primitives, one subpath each, held to the WAI-ARIA APG patterns: behavior and ARIA state computed in the open, with no styles to fight.',
     href: '/primitives-page/',
     label: 'Browse the primitives',
     excerpt: {
@@ -187,7 +187,7 @@ export function isItemDisabled(item: Element): boolean {
 );`,
     },
     sources: [
-      { file: ARCHITECTURE, phrase: '41 owned headless primitives, one subpath each' },
+      { file: ARCHITECTURE, phrase: '42 owned headless primitives, one subpath each' },
       { file: ARCHITECTURE, phrase: 'held to the WAI-ARIA APG patterns' },
     ],
   },

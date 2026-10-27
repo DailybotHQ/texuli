@@ -68,7 +68,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     packages: [
       {
         name: '@texuli/primitives',
-        role: '41 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns',
+        role: '42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns',
         dependsOn: ['core', 'date', 'drag'],
       },
     ],
@@ -285,7 +285,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
   },
   {
     name: 'primitives',
-    role: 'Headless parts bound to texels and held to the WAI-ARIA Authoring Practices patterns — 41 owned headless primitives, one subpath each.',
+    role: 'Headless parts bound to texels and held to the WAI-ARIA Authoring Practices patterns — 42 owned headless primitives, one subpath each.',
     home: '@texuli/primitives',
     layer: 'L1',
     runtimes: {

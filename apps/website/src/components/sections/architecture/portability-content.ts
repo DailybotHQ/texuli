@@ -83,7 +83,7 @@ export const PORTABILITY_EXCERPTS: readonly PortabilityExcerpt[] = [
     file: MANIFEST_FILE,
     label: 'Declared once — the catalog manifest',
     segments: [
-      { text: "export const badgeManifest = defineCatalogManifest({\n  id: '" },
+      { text: "export const badgeManifest = /* @__PURE__ */ manifestData({\n  id: '" },
       { text: SHARED_ID, mark: true },
       { text: "',\n  package: PKG,\n  label: 'Badge',\n  summary: '" },
       { text: SHARED_SUMMARY, mark: true },
