@@ -78,14 +78,39 @@ async function axeExample(page: Page, id: FixtureId): Promise<void> {
   expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
 }
 
-test.describe('a11y display · light and dark axe', () => {
-  for (const id of ALL_SWEEP) {
-    test(`${id} passes axe in light and dark`, async ({ page }) => {
-      await gotoFixture(page, id, 'light');
-      await axeExample(page, id);
+/** Collects axe violations per example instead of stopping at the first one. */
+async function axeProblems(page: Page, id: FixtureId, label: string): Promise<string[]> {
+  const target =
+    (await page.locator(`[data-example="${id}"]`).count()) > 0
+      ? `[data-example="${id}"]`
+      : `[data-example-host="${id}"]`;
+  const results = await new AxeBuilder({ page }).include(target).analyze();
+  return results.violations.map(
+    (violation) =>
+      `${id} (${label}) ${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(' | ')}`
+  );
+}
 
-      await gotoFixture(page, id, 'dark');
-      await axeExample(page, id);
+const GROUPS = {
+  display: DISPLAY_EXAMPLES,
+  data: DATA_EXAMPLES,
+  charts: CHART_EXAMPLES,
+  media: MEDIA_EXAMPLES,
+} as const;
+
+test.describe('a11y display · light and dark axe', () => {
+  // One page session per group: every example, light then dark.
+  for (const [group, ids] of Object.entries(GROUPS)) {
+    test(`${group} examples pass axe in light and dark`, async ({ page }) => {
+      test.setTimeout(ids.length * 30_000);
+      const problems: string[] = [];
+      for (const id of ids) {
+        for (const mode of ['light', 'dark'] as const) {
+          await gotoFixture(page, id, mode);
+          problems.push(...(await axeProblems(page, id, mode)));
+        }
+      }
+      expect(problems).toEqual([]);
     });
   }
 });
@@ -150,105 +175,119 @@ test.describe('a11y display · forced-colors', () => {
     'media-video',
   ];
 
-  for (const id of FORCED) {
-    test(`${id} passes axe under forced-colors`, async ({ page }) => {
-      await page.emulateMedia({ forcedColors: 'active', colorScheme: 'light' });
+  test('every listed example passes axe under forced-colors', async ({ page }) => {
+    test.setTimeout(FORCED.length * 20_000);
+    await page.emulateMedia({ forcedColors: 'active', colorScheme: 'light' });
+    const problems: string[] = [];
+    for (const id of FORCED) {
       await gotoFixture(page, id, 'light');
-      await axeExample(page, id);
-    });
-  }
+      problems.push(...(await axeProblems(page, id, 'forced colors')));
+    }
+    expect(problems).toEqual([]);
+  });
 });
 
 test.describe('a11y display · 400% reflow (320 CSS px)', () => {
   const REFLOW: FixtureId[] = ['texuli-card', 'texuli-stat', 'charts-compact', 'media-audio'];
 
-  for (const id of REFLOW) {
-    test(`${id} stays usable at 320px width`, async ({ page }) => {
-      await page.setViewportSize({ width: 320, height: 640 });
+  test('every listed example stays usable at 320px width', async ({ page }) => {
+    test.setTimeout(REFLOW.length * 20_000);
+    await page.setViewportSize({ width: 320, height: 640 });
+    const problems: string[] = [];
+    for (const id of REFLOW) {
       await gotoFixture(page, id, 'light');
-      const host = page.locator(`[data-example-host="${id}"]`);
-      await expect(host).toBeVisible();
+      await expect(page.locator(`[data-example-host="${id}"]`)).toBeVisible();
       // No horizontal page scroll from the example host.
       const overflow = await page.evaluate(() => {
         const root = document.documentElement;
         return root.scrollWidth - root.clientWidth;
       });
-      expect(overflow).toBeLessThanOrEqual(1);
-      await axeExample(page, id);
-    });
-  }
+      if (overflow > 1) problems.push(`${id} overflows by ${overflow}px`);
+      problems.push(...(await axeProblems(page, id, '320px')));
+    }
+    expect(problems).toEqual([]);
+  });
 });
 
 test.describe('a11y display · keyboard and roles', () => {
-  test('data-grid-core exposes a named grid and moves focus with arrows', async ({ page }) => {
-    await gotoFixture(page, 'data-grid-core', 'light');
-    const host = page.locator('[data-example="data-grid-core"]');
-    const grid = host.getByRole('grid').first();
-    await expect(grid).toBeVisible();
-    await grid.focus();
-    await page.keyboard.press('ArrowDown');
-    await page.keyboard.press('ArrowRight');
-    await axeExample(page, 'data-grid-core');
-  });
-
-  test('charts-interaction explores points and toggles series from the keyboard', async ({
+  test('grid, chart explorer, video, gallery and carousel work from the keyboard and stay axe-clean', async ({
     page,
   }) => {
-    await gotoFixture(page, 'charts-interaction', 'light');
-    const host = page.locator('[data-example-host="charts-interaction"]');
-    const explorer = host.getByRole('application').first();
-    await expect(explorer).toBeVisible();
-    await explorer.focus();
-    const live = host.locator('[data-chart-live]').first();
-    await expect(live).toBeVisible();
-    await page.keyboard.press('ArrowRight');
-    await page.keyboard.press('PageDown');
-    await axeExample(page, 'charts-interaction');
-  });
-
-  test('media-video player controls are labelled and keyboard reachable', async ({ page }) => {
-    await gotoFixture(page, 'media-video', 'light');
-    const host = page.locator('[data-example="media-video"]');
-    await expect(host).toBeVisible();
-    const play = host.getByRole('button').first();
-    await expect(play).toBeVisible();
-    await play.focus();
-    await expect(play).toBeFocused();
-    await axeExample(page, 'media-video');
-  });
-
-  test('media-gallery exposes images with accessible names', async ({ page }) => {
-    await gotoFixture(page, 'media-gallery', 'light');
-    const host = page.locator('[data-example="media-gallery"]');
-    await expect(host).toBeVisible();
-    const images = host.getByRole('img');
-    await expect(images.first()).toBeVisible();
-    await axeExample(page, 'media-gallery');
-  });
-
-  test('ui-carousel moves slides with arrow keys when focused', async ({ page }) => {
-    await gotoFixture(page, 'ui-carousel', 'light');
-    const host = page.locator('[data-example="ui-carousel"], [data-example-host="ui-carousel"]');
-    await expect(host.first()).toBeVisible();
-    const region = host.getByRole('region').first().or(host.locator('[data-tx-carousel]').first());
-    if ((await region.count()) > 0) {
-      await region.first().focus();
+    test.setTimeout(150_000);
+    await test.step('data-grid-core exposes a named grid and moves focus with arrows', async () => {
+      await gotoFixture(page, 'data-grid-core', 'light');
+      const host = page.locator('[data-example="data-grid-core"]');
+      const grid = host.getByRole('grid').first();
+      await expect(grid).toBeVisible();
+      await grid.focus();
+      await page.keyboard.press('ArrowDown');
       await page.keyboard.press('ArrowRight');
-    }
-    await axeExample(page, 'ui-carousel');
+      await axeExample(page, 'data-grid-core');
+    });
+
+    await test.step('charts-interaction explores points and toggles series from the keyboard', async () => {
+      await gotoFixture(page, 'charts-interaction', 'light');
+      const host = page.locator('[data-example-host="charts-interaction"]');
+      const explorer = host.getByRole('application').first();
+      await expect(explorer).toBeVisible();
+      await explorer.focus();
+      const live = host.locator('[data-chart-live]').first();
+      await expect(live).toBeVisible();
+      await page.keyboard.press('ArrowRight');
+      await page.keyboard.press('PageDown');
+      await axeExample(page, 'charts-interaction');
+    });
+
+    await test.step('media-video player controls are labelled and keyboard reachable', async () => {
+      await gotoFixture(page, 'media-video', 'light');
+      const host = page.locator('[data-example="media-video"]');
+      await expect(host).toBeVisible();
+      const play = host.getByRole('button').first();
+      await expect(play).toBeVisible();
+      await play.focus();
+      await expect(play).toBeFocused();
+      await axeExample(page, 'media-video');
+    });
+
+    await test.step('media-gallery exposes images with accessible names', async () => {
+      await gotoFixture(page, 'media-gallery', 'light');
+      const host = page.locator('[data-example="media-gallery"]');
+      await expect(host).toBeVisible();
+      const images = host.getByRole('img');
+      await expect(images.first()).toBeVisible();
+      await axeExample(page, 'media-gallery');
+    });
+
+    await test.step('ui-carousel moves slides with arrow keys when focused', async () => {
+      await gotoFixture(page, 'ui-carousel', 'light');
+      const host = page.locator('[data-example="ui-carousel"], [data-example-host="ui-carousel"]');
+      await expect(host.first()).toBeVisible();
+      const region = host
+        .getByRole('region')
+        .first()
+        .or(host.locator('[data-tx-carousel]').first());
+      if ((await region.count()) > 0) {
+        await region.first().focus();
+        await page.keyboard.press('ArrowRight');
+      }
+      await axeExample(page, 'ui-carousel');
+    });
   });
 });
 
 test.describe('a11y display · RTL', () => {
   const RTL: FixtureId[] = ['ui-avatar', 'texuli-table', 'data-timeline', 'charts-compact'];
 
-  for (const id of RTL) {
-    test(`${id} passes axe with dir=rtl on the host`, async ({ page }) => {
+  test('every listed example passes axe with dir=rtl', async ({ page }) => {
+    test.setTimeout(RTL.length * 20_000);
+    const problems: string[] = [];
+    for (const id of RTL) {
       await gotoFixture(page, id, 'light');
       await page.evaluate(() => {
         document.documentElement.setAttribute('dir', 'rtl');
       });
-      await axeExample(page, id);
-    });
-  }
+      problems.push(...(await axeProblems(page, id, 'rtl')));
+    }
+    expect(problems).toEqual([]);
+  });
 });

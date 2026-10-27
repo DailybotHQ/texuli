@@ -25,11 +25,12 @@ let { children }: { children: Snippet } = $props();
     gap: 1rem;
     padding: 1rem;
   }
-  /* Native buttons on the test page (the frame's Before/After and headless
-     primitive parts) inherit the page text color on a transparent fill: in
-     dark mode WebKitGTK otherwise paints them a light native gray (#c0c0c0)
-     under white text, which fails AA in the Linux CI run. */
-  .behavior-frame :global(button) {
+  /* Native buttons and fields on the test page (the frame's Before/After,
+     headless primitive parts, and content portaled to the body outside this
+     frame) inherit the page text color on a transparent fill: in dark mode
+     WebKitGTK otherwise paints them a light native gray (#c0c0c0) under
+     white text, which fails AA in the Linux CI run. */
+  :global(body :is(button, input, select, textarea)) {
     border: 1px solid currentColor;
     background: transparent;
     color: inherit;

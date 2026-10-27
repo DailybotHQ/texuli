@@ -7,9 +7,11 @@ import { expect, type Page, test } from '@playwright/test';
 
 /**
  * Responsive sweep of the built site (PLAN_006 T-89, rubric dimension 2):
- * every page class at 360, 768 and 1280 CSS px, in light and dark, keeps the
+ * every page class at 360 and 768 CSS px, in light and dark, keeps the
  * page from scrolling sideways and keeps every element inside the viewport
- * (except inside its own scroll container). The landing header is also
+ * (except inside its own scroll container); one test per page class walks
+ * both widths. The desktop width (1280) is the page sweep's polish check in
+ * a11y-site.spec.ts, on every page. The landing header is also
  * walked across its breakpoints, and the standalone links the sweep found
  * under 24px are held to WCAG 2.5.8. The record is
  * `.dwp/plans/PLAN_006_website_marketing_seo_analytics/analysis_results/walks/responsive.md`.
@@ -48,7 +50,7 @@ const PAGES = [
   ['brand', '/brand/'],
   ['404', '/404.html'],
 ] as const;
-const WIDTHS = [360, 768, 1280] as const;
+const WIDTHS = [360, 768] as const;
 const MODES = ['light', 'dark'] as const;
 
 let server: Server;
@@ -131,19 +133,21 @@ async function overflow(page: Page): Promise<{ scroll: number; viewport: number;
 }
 
 for (const [pageClass, path] of PAGES) {
-  for (const width of WIDTHS) {
-    test(`${pageClass} (${path}) at ${width}px: no horizontal overflow in light and dark`, async ({
-      page,
-    }) => {
+  test(`${pageClass} (${path}) at ${WIDTHS.join(' and ')}px: no horizontal overflow in light and dark`, async ({
+    page,
+  }) => {
+    for (const width of WIDTHS) {
       await visit(page, path, width);
       for (const mode of MODES) {
         await setMode(page, mode);
         const result = await overflow(page);
-        expect(result.out, `${mode}: elements past the viewport`).toEqual([]);
-        expect(result.scroll, `${mode}: page scroll width`).toBeLessThanOrEqual(result.viewport);
+        expect(result.out, `${width}px ${mode}: elements past the viewport`).toEqual([]);
+        expect(result.scroll, `${width}px ${mode}: page scroll width`).toBeLessThanOrEqual(
+          result.viewport
+        );
       }
-    });
-  }
+    }
+  });
 }
 
 test('landing and native at 360px right-to-left: no horizontal overflow', async ({ page }) => {

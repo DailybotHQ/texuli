@@ -57,6 +57,9 @@ test.describe('the limits', () => {
 
 test.describe('the sample scenario', () => {
   test.describe.configure({ retries: 0 });
+  // The harness, not an engine, is under test: every real scenario already
+  // runs the oracle on WebKit and the Pixel 7.
+  test.skip(({ browserName, isMobile }) => browserName !== 'chromium' || isMobile, 'Chromium only');
 
   test('passes every row and records open-to-focus samples', async ({ page }) => {
     test.setTimeout(120_000);

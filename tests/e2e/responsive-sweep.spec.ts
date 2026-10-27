@@ -12,10 +12,11 @@ import { expect, type Page, test } from '@playwright/test';
  * `/agent-chat/` and `/builder/` pages. At each declared width, in both
  * directions: no horizontal page scroll and no element past the viewport
  * edge (except inside its own scroll container). In RTL, rows flow from the
- * right.
+ * right. One test per surface and direction walks every width.
  */
 
-const WIDTHS = [360, 400, 768, 1024, 1440] as const;
+// 360 stands for the small phones (400 was a near duplicate).
+const WIDTHS = [360, 768, 1024, 1440] as const;
 const DIRECTIONS = ['ltr', 'rtl'] as const;
 
 /** Elements that overflow the viewport and are not clipped by a scrolling or hidden ancestor. */
@@ -60,8 +61,9 @@ async function noHorizontalScroll(page: Page) {
 
 test.describe('responsive sweep · player and timeline surfaces', () => {
   for (const dir of DIRECTIONS) {
-    for (const width of WIDTHS) {
-      test(`${dir} at ${width}px`, async ({ page }) => {
+    test(`${dir} at ${WIDTHS.join(', ')}px`, async ({ page }) => {
+      test.setTimeout(WIDTHS.length * 30_000);
+      for (const width of WIDTHS) {
         await page.setViewportSize({ width, height: 1000 });
         await page.goto(`/responsive.html?dir=${dir}`);
         await expect(page.locator('#sweep-status')).toHaveText('Ready');
@@ -78,7 +80,7 @@ test.describe('responsive sweep · player and timeline surfaces', () => {
           timeout: 15_000,
         });
         await noHorizontalScroll(page);
-        expect(await overflowing(page, '#sweep')).toEqual([]);
+        expect(await overflowing(page, '#sweep'), `${width}px`).toEqual([]);
 
         // Rows flow along the inline axis: from the right in RTL once they are side by side.
         const cards = page
@@ -92,8 +94,8 @@ test.describe('responsive sweep · player and timeline surfaces', () => {
           if (dir === 'rtl') expect(first.x).toBeGreaterThan(second.x);
           else expect(first.x).toBeLessThan(second.x);
         }
-      });
-    }
+      }
+    });
   }
 });
 
@@ -135,18 +137,21 @@ test.describe('responsive sweep · built site pages', () => {
   test.afterAll(() => new Promise<void>((done) => server.close(() => done())));
 
   for (const route of ['/agent-chat/', '/builder/']) {
-    for (const dir of DIRECTIONS) {
+    test(`${route} in ltr and rtl at ${WIDTHS.join(', ')}px`, async ({ page }) => {
+      test.setTimeout(WIDTHS.length * 30_000);
       for (const width of WIDTHS) {
-        test(`${route} ${dir} at ${width}px`, async ({ page }) => {
-          await page.setViewportSize({ width, height: 1000 });
-          await page.goto(`${origin}${route}`);
-          await page.waitForLoadState('networkidle');
-          if (dir === 'rtl')
-            await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));
+        await page.setViewportSize({ width, height: 1000 });
+        await page.goto(`${origin}${route}`);
+        await page.waitForLoadState('networkidle');
+        for (const dir of DIRECTIONS) {
+          await page.evaluate(
+            (direction) => document.documentElement.setAttribute('dir', direction),
+            dir
+          );
           await noHorizontalScroll(page);
-          expect(await overflowing(page, 'main')).toEqual([]);
-        });
+          expect(await overflowing(page, 'main'), `${dir} at ${width}px`).toEqual([]);
+        }
       }
-    }
+    });
   }
 });

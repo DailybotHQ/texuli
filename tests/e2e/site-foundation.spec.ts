@@ -3,7 +3,6 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import { primaryNav } from './support/site-nav.ts';
 
@@ -134,16 +133,16 @@ test.describe('texuli.com foundation', () => {
     expect(missing?.status()).toBe(404);
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`follows the system ${scheme} scheme from the first paint`, async ({ page }) => {
+  test(`follows the system light and dark scheme from the first paint`, async ({ page }) => {
+    for (const scheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: scheme });
       await visit(page, '/');
       expect(await mode(page)).toBe(scheme);
       const luminance = await bodyLuminance(page);
       if (scheme === 'dark') expect(luminance).toBeLessThan(0.1);
       else expect(luminance).toBeGreaterThan(0.8);
-    });
-  }
+    }
+  });
 
   test('the appearance switch persists a choice with no flash, and System clears it', async ({
     page,
@@ -175,17 +174,6 @@ test.describe('texuli.com foundation', () => {
     expect(await mode(page)).toBe('light');
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on every page (${scheme})`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: scheme });
-      for (const path of ['/', '/foundation/']) {
-        await visit(page, path);
-        expect(await mode(page)).toBe(scheme);
-        const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-          .analyze();
-        expect(results.violations.map((violation) => `${path} ${violation.id}`)).toEqual([]);
-      }
-    });
-  }
+  // axe on / and /foundation/ in light and dark (zero exclusions) runs in the page sweep,
+  // a11y-site.spec.ts.
 });

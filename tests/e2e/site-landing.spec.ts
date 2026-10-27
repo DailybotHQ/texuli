@@ -9,7 +9,6 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 
 const DIST = resolve('apps/website/dist');
@@ -26,19 +25,6 @@ const TYPES: Record<string, string> = {
   '.txt': 'text/plain; charset=utf-8',
   '.ico': 'image/x-icon',
 };
-
-const AXE_TAGS = [
-  'wcag2a',
-  'wcag2aa',
-  'wcag21a',
-  'wcag21aa',
-  'wcag22a',
-  'wcag22aa',
-  'best-practice',
-] as const;
-
-const MODES = ['light', 'dark', 'high-contrast'] as const;
-type Mode = (typeof MODES)[number];
 
 let server: Server;
 let origin = '';
@@ -79,31 +65,6 @@ async function visit(page: Page, path = '/') {
     { polling: 250 }
   );
   return foreign;
-}
-
-async function setMode(page: Page, mode: Mode) {
-  await page.evaluate((next) => {
-    const root = document.documentElement;
-    if (next === 'high-contrast') {
-      root.setAttribute('data-tx-mode', 'light');
-      root.setAttribute('data-tx-forced-colors', 'true');
-      root.style.colorScheme = 'light';
-    } else {
-      root.removeAttribute('data-tx-forced-colors');
-      root.setAttribute('data-tx-mode', next);
-      root.style.colorScheme = next;
-    }
-  }, mode);
-  // Controls cross-fade their colors (`--tx-motion-base`, 200ms) when the mode
-  // changes, like a click on the site switch. Contrast is checked on the
-  // settled page, once every color transition has finished.
-  await page.waitForFunction(() =>
-    document
-      .getAnimations()
-      .every(
-        (animation) => !(animation instanceof CSSTransition) || animation.playState === 'finished'
-      )
-  );
 }
 
 test.describe('texuli.com landing', () => {
@@ -238,14 +199,6 @@ test.describe('texuli.com landing', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Changelog' })).toBeVisible();
   });
 
-  for (const mode of MODES) {
-    test(`axe zero exclusions on / (${mode})`, async ({ page }, info) => {
-      const mobile = info.project.name.includes('mobile');
-      if (mobile && mode !== 'light') test.skip();
-      expect(await visit(page, '/')).toEqual([]);
-      await setMode(page, mode);
-      const results = await new AxeBuilder({ page }).withTags([...AXE_TAGS]).analyze();
-      expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
-    });
-  }
+  // axe on / in light and dark (zero exclusions, the same tags) runs in the page
+  // sweep, a11y-site.spec.ts.
 });

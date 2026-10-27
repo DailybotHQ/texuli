@@ -44,16 +44,19 @@ test.describe('texuli polish · no sideways page scroll', () => {
     { id: 'texuli-rating', finding: 'P1-08', widths: [320], dirs: ['ltr', 'rtl'] },
     { id: 'texuli-number-pin', finding: 'P1-09', widths: [320], dirs: ['ltr', 'rtl'] },
   ];
-  for (const { id, finding, widths, dirs } of cases) {
-    for (const width of widths) {
-      for (const dir of dirs) {
-        test(`${id} (${finding}) at ${width}px ${dir}`, async ({ page }) => {
-          await openExample(page, id, width, dir);
-          await expectNoPageScroll(page);
-        });
+  test('every listed example keeps the page from scrolling sideways', async ({ page }) => {
+    test.setTimeout(60_000);
+    for (const { id, finding, widths, dirs } of cases) {
+      for (const width of widths) {
+        for (const dir of dirs) {
+          await test.step(`${id} (${finding}) at ${width}px ${dir}`, async () => {
+            await openExample(page, id, width, dir);
+            await expectNoPageScroll(page);
+          });
+        }
       }
     }
-  }
+  });
 });
 
 test('the open hover card stays inside a 320px viewport (P1-07)', async ({ page }) => {

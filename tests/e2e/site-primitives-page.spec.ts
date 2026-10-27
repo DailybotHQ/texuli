@@ -4,7 +4,6 @@ import { createReadStream, existsSync, readdirSync, readFileSync, statSync } fro
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { dirname, extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import {
   behaviorEvidence,
@@ -42,7 +41,6 @@ const TYPES: Record<string, string> = {
   '.png': 'image/png',
   '.ico': 'image/x-icon',
 };
-const PATHS = ['/primitives-page/', ...PRIMITIVES.map((doc) => primitivePath(doc.id))];
 const BUDGETS = (
   JSON.parse(readFileSync('texuli.budgets.json', 'utf8')) as {
     budgets: Record<string, { gzip?: number }>;
@@ -384,26 +382,7 @@ test.describe('texuli.com primitives reference: pages', () => {
     await expect(first).toBeVisible();
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on every primitives page with the rows open (${scheme})`, async ({ page }) => {
-      test.setTimeout(240_000);
-      await page.emulateMedia({ colorScheme: scheme });
-      for (const path of PATHS) {
-        expect(await visit(page, path), path).toEqual([]);
-        expect(await page.locator('html').getAttribute('data-tx-mode')).toBe(scheme);
-        await page.evaluate(() => {
-          for (const details of document.querySelectorAll('details')) details.open = true;
-        });
-        const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-          .analyze();
-        expect(
-          results.violations.map(
-            (v) => `${path} ${v.id}: ${v.help} ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`
-          ),
-          path
-        ).toEqual([]);
-      }
-    });
-  }
+  // axe on every primitives page with the rows open, in light, dark and forced
+  // colors, runs per primitive in site-live-primitives.spec.ts (the index in
+  // a11y-site.spec.ts).
 });

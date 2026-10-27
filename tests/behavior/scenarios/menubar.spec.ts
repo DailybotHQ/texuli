@@ -19,31 +19,13 @@ scenario(
   'menubar',
   defineRows([
     {
-      id: 'roles',
-      title: 'a named menubar of menuitems that open menus, collapsed',
+      id: 'roles-arrows-one-tab-stop',
+      title:
+        'a named menubar of collapsed menuitems that open menus; ArrowRight and ArrowLeft move between triggers, skipping the disabled one; the menubar is one Tab stop',
       async run({ page }) {
         await expect(page.getByRole('menubar', { name: 'Application' })).toBeVisible();
         await expect(trigger(page, 'File')).toHaveAttribute('aria-haspopup', 'menu');
         await expect(page.getByRole('menuitem', { name: 'File', expanded: false })).toBeVisible();
-      },
-    },
-    {
-      id: 'one-tab-stop',
-      title: 'the menubar is one Tab stop: Tab leaves it from any trigger',
-      async run({ page }) {
-        await trigger(page, 'File').focus();
-        await page.keyboard.press('ArrowRight');
-        await expectFocus(page, 'menuitem', 'Edit');
-        await page.keyboard.press(test.info().project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
-        await expect(trigger(page, 'View')).not.toBeFocused();
-        await expect(trigger(page, 'File')).not.toBeFocused();
-        await expect(trigger(page, 'Edit')).not.toBeFocused();
-      },
-    },
-    {
-      id: 'arrows-between-triggers',
-      title: 'ArrowRight and ArrowLeft move between triggers, skipping the disabled one',
-      async run({ page }) {
         await trigger(page, 'File').focus();
         await page.keyboard.press('ArrowRight');
         await expectFocus(page, 'menuitem', 'Edit');
@@ -52,22 +34,20 @@ scenario(
         await page.keyboard.press('ArrowLeft');
         await expectFocus(page, 'menuitem', 'Edit');
         await layerClosed(page);
+        await page.keyboard.press(test.info().project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
+        await expect(trigger(page, 'View')).not.toBeFocused();
+        await expect(trigger(page, 'File')).not.toBeFocused();
+        await expect(trigger(page, 'Edit')).not.toBeFocused();
       },
     },
     {
-      id: 'open-first-item',
-      title: 'Enter on a trigger opens its menu on the first item',
+      id: 'open-carry-submenu-escape',
+      title:
+        'Enter opens a menu on its first item; ArrowRight and ArrowLeft carry the open menu to the next and previous triggers; they open and close a submenu; Escape closes the menu and returns focus to its trigger',
       async run({ page }) {
         await openFile(page);
         await expectFocus(page, 'menuitem', 'New');
         await expect(expanded(page, 'File')).toBeVisible();
-      },
-    },
-    {
-      id: 'arrows-carry-menu',
-      title: 'in an open menu, ArrowRight and ArrowLeft open the next and previous menus',
-      async run({ page }) {
-        await openFile(page);
         await page.keyboard.press('ArrowRight');
         await expectFocus(page, 'menuitem', 'Undo');
         await expect(expanded(page, 'Edit')).toBeVisible();
@@ -75,13 +55,6 @@ scenario(
         await page.keyboard.press('ArrowLeft');
         await expectFocus(page, 'menuitem', 'New');
         await expect(expanded(page, 'File')).toBeVisible();
-      },
-    },
-    {
-      id: 'submenu',
-      title: 'ArrowRight on a submenu trigger opens the submenu; ArrowLeft closes it',
-      async run({ page }) {
-        await openFile(page);
         await page.keyboard.press('End');
         await expectFocus(page, 'menuitem', 'Share');
         await page.keyboard.press('ArrowRight');
@@ -89,16 +62,23 @@ scenario(
         await page.keyboard.press('ArrowLeft');
         await expectFocus(page, 'menuitem', 'Share');
         await expect(expanded(page, 'File')).toBeVisible();
-      },
-    },
-    {
-      id: 'escape',
-      title: 'Escape closes the menu and returns focus to its trigger',
-      async run({ page }) {
-        await openFile(page);
         await page.keyboard.press('Escape');
         await layerClosed(page);
         await expectFocus(page, 'menuitem', 'File');
+      },
+    },
+    {
+      id: 'outside-press-and-select',
+      title: 'a press outside closes the open menu; Enter on an item runs it and closes the menu',
+      async run({ page }) {
+        await openFile(page);
+        await pointerOutside(page);
+        await expect(menu(page)).toHaveCount(0);
+        await expect(page.getByRole('menuitem', { name: 'File', expanded: false })).toBeVisible();
+        await openFile(page);
+        await page.keyboard.press('Enter');
+        await layerClosed(page);
+        await expect.poll(() => eventNames(page)).toContain('select');
       },
     },
     {

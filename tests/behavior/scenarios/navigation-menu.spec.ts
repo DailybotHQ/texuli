@@ -23,67 +23,15 @@ scenario(
   'navigation-menu',
   defineRows([
     {
-      id: 'landmark-and-disclosures',
-      title: 'a named navigation landmark whose triggers are collapsed disclosure buttons',
+      id: 'landmark-triggers-arrows',
+      title:
+        'a named navigation landmark of collapsed disclosure buttons, the active link is the current page, and arrow keys move between the top-level triggers and links',
       async run({ page }) {
         await expect(nav(page)).toBeVisible();
         await expanded(page, 'Products', false);
         await expanded(page, 'Resources', false);
         await expect(link(page, 'Analytics')).toHaveCount(0);
-      },
-    },
-    {
-      id: 'click-toggles',
-      title: 'a click opens the item and a second click closes it',
-      async run({ page }) {
-        await trigger(page, 'Products').click();
-        await expanded(page, 'Products', true);
-        await expect(link(page, 'Analytics')).toBeVisible();
-        await trigger(page, 'Products').click();
-        await expanded(page, 'Products', false);
-        await expect(link(page, 'Analytics')).toHaveCount(0);
-      },
-    },
-    {
-      id: 'keyboard-opens',
-      title: 'Enter and Space open the item from the keyboard',
-      async run({ page }) {
-        await openWithKeyboard(page);
-        await page.keyboard.press('Enter');
-        await expanded(page, 'Products', false);
-        await page.keyboard.press(' ');
-        await expanded(page, 'Products', true);
-      },
-    },
-    {
-      id: 'escape-returns-focus',
-      title: 'Escape from inside the content closes it and returns focus to the trigger',
-      async run({ page }) {
-        await openWithKeyboard(page);
-        await page.keyboard.press('Tab');
-        await expectFocus(page, 'link', 'Analytics');
-        await page.keyboard.press('Escape');
-        await expanded(page, 'Products', false);
-        await expectFocus(page, 'button', 'Products');
-      },
-    },
-    {
-      id: 'tab-through-content',
-      title: 'Tab moves from the open trigger into its links, then on to the next trigger',
-      async run({ page }) {
-        await openWithKeyboard(page);
-        const stops: string[] = [];
-        for (let index = 0; index < 3; index += 1) {
-          await page.keyboard.press('Tab');
-          stops.push((await focusedElement(page)).name);
-        }
-        expect(stops).toEqual(['Analytics', 'Automation', 'Resources']);
-      },
-    },
-    {
-      id: 'arrows-between-triggers',
-      title: 'arrow keys move focus between the top-level triggers and links',
-      async run({ page }) {
+        await expect(link(page, 'Pricing')).toHaveAttribute('aria-current', 'page');
         await trigger(page, 'Products').focus();
         await page.keyboard.press('ArrowRight');
         await expectFocus(page, 'button', 'Resources');
@@ -94,50 +42,68 @@ scenario(
       },
     },
     {
-      id: 'outside-press-closes',
-      title: 'pressing outside the navigation closes the open item',
+      id: 'keyboard-open-escape-tab',
+      title:
+        'Enter and Space toggle the item; Escape from inside the content closes it and returns focus; Tab moves from the open trigger into its links, then on to the next trigger',
       async run({ page }) {
+        await openWithKeyboard(page);
+        await page.keyboard.press('Enter');
+        await expanded(page, 'Products', false);
+        await page.keyboard.press(' ');
+        await expanded(page, 'Products', true);
+        await page.keyboard.press('Tab');
+        await expectFocus(page, 'link', 'Analytics');
+        await page.keyboard.press('Escape');
+        await expanded(page, 'Products', false);
+        await expectFocus(page, 'button', 'Products');
+        await openWithKeyboard(page);
+        const stops: string[] = [];
+        for (let index = 0; index < 3; index += 1) {
+          await page.keyboard.press('Tab');
+          stops.push((await focusedElement(page)).name);
+        }
+        expect(stops).toEqual(['Analytics', 'Automation', 'Resources']);
+      },
+    },
+    {
+      id: 'pointer-toggle-outside-select-hover',
+      title:
+        'a click opens the item and a second click closes it; pressing outside closes it; choosing a link runs it and closes it; resting the pointer on a trigger opens its item',
+      async run({ page }) {
+        await trigger(page, 'Products').click();
+        await expanded(page, 'Products', true);
+        await expect(link(page, 'Analytics')).toBeVisible();
+        await trigger(page, 'Products').click();
+        await expanded(page, 'Products', false);
+        await expect(link(page, 'Analytics')).toHaveCount(0);
         await trigger(page, 'Products').click();
         await expanded(page, 'Products', true);
         await pointerOutside(page);
         await expanded(page, 'Products', false);
-      },
-    },
-    {
-      id: 'hover-opens',
-      title: 'resting the pointer on a trigger opens its item',
-      async run({ page }) {
+        await trigger(page, 'Products').click();
+        await link(page, 'Analytics').click();
+        await expanded(page, 'Products', false);
+        expect(await eventNames(page)).toContain('select');
         await trigger(page, 'Resources').hover();
         await expanded(page, 'Resources', true);
         await expect(link(page, 'Docs')).toBeVisible();
       },
     },
     {
-      id: 'link-select-closes',
-      title: 'choosing a link runs it and closes the item',
-      async run({ page }) {
-        await trigger(page, 'Products').click();
-        await link(page, 'Analytics').click();
-        await expanded(page, 'Products', false);
-        expect(await eventNames(page)).toContain('select');
-      },
-    },
-    {
-      id: 'current-page',
-      title: 'the active link is the current page',
-      async run({ page }) {
-        await expect(link(page, 'Pricing')).toHaveAttribute('aria-current', 'page');
-      },
-    },
-    {
-      id: 'axe-clean',
-      title: 'axe finds no violations with an item closed and open',
+      id: 'axe-clean-and-unsafe-href-blocked',
+      title:
+        'axe finds no violations with an item closed and open, and a javascript: href never reaches the DOM',
       async run({ page }) {
         const violations = async () =>
           (await new AxeBuilder({ page }).include('nav').analyze()).violations.map((v) => v.id);
         expect(await violations()).toEqual([]);
         await openWithKeyboard(page);
         expect(await violations()).toEqual([]);
+        await trigger(page, 'Resources').click();
+        const status = nav(page).getByText('Status', { exact: true });
+        await expect(status).toBeVisible();
+        const href = await status.getAttribute('href');
+        expect(href === null || !/^\s*javascript:/i.test(href)).toBe(true);
       },
     },
     {
@@ -152,17 +118,6 @@ scenario(
         await expect(link(page, 'Analytics')).toBeVisible();
         await press('Products');
         await expanded(page, 'Products', false);
-      },
-    },
-    {
-      id: 'unsafe-href-blocked',
-      title: 'a javascript: href never reaches the DOM',
-      async run({ page }) {
-        await trigger(page, 'Resources').click();
-        const status = nav(page).getByText('Status', { exact: true });
-        await expect(status).toBeVisible();
-        const href = await status.getAttribute('href');
-        expect(href === null || !/^\s*javascript:/i.test(href)).toBe(true);
       },
     },
   ])

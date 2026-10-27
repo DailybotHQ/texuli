@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
-import { defineRows, gotoScenario, scenario } from '../harness/index.ts';
+import { expect } from '@playwright/test';
+import { defineRows, scenario } from '../harness/index.ts';
 
 const input = (page: import('@playwright/test').Page) => page.getByLabel('Choose files');
 
@@ -33,69 +33,81 @@ scenario(
         await expect(page.getByText('notes.txt')).toBeVisible();
       },
     },
+    {
+      id: 'pointer-selects',
+      title: 'accepts pointer selection through its native input',
+      async run({ page }) {
+        const nativeInput = input(page);
+        const chooserPromise = page.waitForEvent('filechooser');
+        await nativeInput.click();
+        const chooser = await chooserPromise;
+        await chooser.setFiles({
+          name: 'pointer.txt',
+          mimeType: 'text/plain',
+          buffer: Buffer.from('pointer'),
+        });
+        await expect(page.getByText('pointer.txt')).toBeVisible();
+      },
+    },
+    {
+      id: 'drop-and-reject',
+      title: 'accepts dropped files and reports rejected files accessibly',
+      async run({ page }) {
+        const group = page.getByRole('group', { name: 'Attach documents' });
+        await group.evaluate((element) => {
+          const transfer = new DataTransfer();
+          transfer.items.add(new File(['notes'], 'notes.md', { type: 'text/markdown' }));
+          transfer.items.add(new File(['image'], 'image.png', { type: 'image/png' }));
+          const dragEnter = new DragEvent('dragenter', {
+            bubbles: true,
+            cancelable: true,
+            dataTransfer: transfer,
+          });
+          const dragOver = new DragEvent('dragover', {
+            bubbles: true,
+            cancelable: true,
+            dataTransfer: transfer,
+          });
+          const drop = new DragEvent('drop', {
+            bubbles: true,
+            cancelable: true,
+            dataTransfer: transfer,
+          });
+          element.dispatchEvent(dragEnter);
+          element.dispatchEvent(dragOver);
+          element.dispatchEvent(drop);
+        });
+
+        await expect(group).toHaveAttribute('data-state', 'idle');
+        await expect(page.getByRole('list', { name: 'Selected documents' })).toContainText(
+          'notes.md'
+        );
+        const alert = page.getByRole('alert');
+        await expect(alert).toContainText('image.png');
+        await expect(alert).toContainText('Unsupported file type');
+        await expect(input(page)).toHaveAttribute('aria-invalid', 'true');
+        const accessibility = await new AxeBuilder({ page })
+          .include('[aria-label="Attach documents"]')
+          .analyze();
+        expect(accessibility.violations).toEqual([]);
+      },
+    },
+    {
+      id: 'touch-opens-input',
+      title: 'native input opens from touch on the phone',
+      projects: ['mobile'],
+      async run({ page }) {
+        const nativeInput = input(page);
+        const chooserPromise = page.waitForEvent('filechooser');
+        await nativeInput.tap();
+        const chooser = await chooserPromise;
+        await chooser.setFiles({
+          name: 'touch.txt',
+          mimeType: 'text/plain',
+          buffer: Buffer.from('touch'),
+        });
+        await expect(page.getByText('touch.txt')).toBeVisible();
+      },
+    },
   ])
 );
-
-test('FileDrop accepts pointer selection through its native input', async ({ page }) => {
-  await gotoScenario(page, 'file-drop');
-  const nativeInput = input(page);
-  const chooserPromise = page.waitForEvent('filechooser');
-  await nativeInput.click();
-  const chooser = await chooserPromise;
-  await chooser.setFiles({
-    name: 'pointer.txt',
-    mimeType: 'text/plain',
-    buffer: Buffer.from('pointer'),
-  });
-  await expect(page.getByText('pointer.txt')).toBeVisible();
-});
-
-test('FileDrop accepts dropped files and reports rejected files accessibly', async ({ page }) => {
-  await gotoScenario(page, 'file-drop');
-  const group = page.getByRole('group', { name: 'Attach documents' });
-  await group.evaluate((element) => {
-    const transfer = new DataTransfer();
-    transfer.items.add(new File(['notes'], 'notes.md', { type: 'text/markdown' }));
-    transfer.items.add(new File(['image'], 'image.png', { type: 'image/png' }));
-    const dragEnter = new DragEvent('dragenter', {
-      bubbles: true,
-      cancelable: true,
-      dataTransfer: transfer,
-    });
-    const dragOver = new DragEvent('dragover', {
-      bubbles: true,
-      cancelable: true,
-      dataTransfer: transfer,
-    });
-    const drop = new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: transfer });
-    element.dispatchEvent(dragEnter);
-    element.dispatchEvent(dragOver);
-    element.dispatchEvent(drop);
-  });
-
-  await expect(group).toHaveAttribute('data-state', 'idle');
-  await expect(page.getByRole('list', { name: 'Selected documents' })).toContainText('notes.md');
-  const alert = page.getByRole('alert');
-  await expect(alert).toContainText('image.png');
-  await expect(alert).toContainText('Unsupported file type');
-  await expect(input(page)).toHaveAttribute('aria-invalid', 'true');
-  const accessibility = await new AxeBuilder({ page })
-    .include('[aria-label="Attach documents"]')
-    .analyze();
-  expect(accessibility.violations).toEqual([]);
-});
-
-test('FileDrop native input opens from touch on Pixel 7', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile', 'Touch input is exercised on the Pixel 7 project.');
-  await gotoScenario(page, 'file-drop');
-  const nativeInput = input(page);
-  const chooserPromise = page.waitForEvent('filechooser');
-  await nativeInput.tap();
-  const chooser = await chooserPromise;
-  await chooser.setFiles({
-    name: 'touch.txt',
-    mimeType: 'text/plain',
-    buffer: Buffer.from('touch'),
-  });
-  await expect(page.getByText('touch.txt')).toBeVisible();
-});

@@ -7,6 +7,7 @@ import { gzipSync } from 'node:zlib';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { budgetFor, DEFAULT_BUDGET } from '../../apps/website/src/components/perf/budgets.ts';
+import { polishProblems } from './support/site.ts';
 
 /*
  * Live primitive demos (T-site-live-primitives). Every /primitives-page/<id>/
@@ -16,6 +17,10 @@ import { budgetFor, DEFAULT_BUDGET } from '../../apps/website/src/components/per
  *
  * Each demo declares its own key and control checks (mirrored on the frame
  * as data attributes), so this spec runs exactly what the page promises.
+ * Two tests per primitive: the interactions (a fresh load each), and axe plus
+ * the polish check in light, dark and forced colors with the demo mounted
+ * and its floating content open (this is the page sweep for these routes;
+ * a11y-site.spec.ts skips them).
  * Chromium covers every primitive; WebKit and Pixel 7 cover a representative
  * set (overlay, form, composite and range primitives).
  */
@@ -203,6 +208,164 @@ test('the preview follows the page mode before and after it hydrates', async ({ 
   expect((await colors()).stage).toEqual(before.stage);
 });
 
+/** Controlled panel: a control outside the primitive changes its state. */
+async function checkControlled(live: Locator, id: string): Promise<void> {
+  const uncontrolled = live.locator('[data-demo-mode="uncontrolled"]');
+  const controlled = live.locator('[data-demo-mode="controlled"]');
+  await expect(uncontrolled).toBeVisible();
+  await expect(controlled).toBeVisible();
+  // The real primitive, styled: Texuli class recipes on its parts.
+  expect(
+    await live.locator('[data-demo-mode] [class*="tx-"]').count(),
+    'Texuli-styled parts'
+  ).toBeGreaterThan(0);
+  const control = JSON.parse(
+    (await live.getAttribute('data-control-check')) ?? '{}'
+  ) as ControlCheck;
+  await expect(controlled.locator('[data-demo-readout]').first()).toBeVisible();
+  await controlled.locator(control.act).first().click();
+  await expectState(controlled, control.expect, `${id} controlled`);
+}
+
+/** Keyboard hints describe keys that work and light up when pressed. */
+async function checkKeyHints(page: Page, live: Locator, id: string, project: string) {
+  const raw = await live.getAttribute('data-key-check');
+  const hints = live.locator('[data-key-hint]');
+  if (!raw) {
+    await expect(hints).toHaveCount(0);
+    return;
+  }
+  const check = JSON.parse(raw) as KeyCheck;
+  const panel = live.locator('[data-demo-mode="uncontrolled"]');
+  if (check.open) {
+    await panel
+      .locator(check.open)
+      .first()
+      .click(check.openWith === 'contextmenu' ? { button: 'right' } : {});
+  }
+  await panel.locator(check.focus).first().focus();
+  const key = check.press === ' ' ? 'Space' : check.press;
+  if (check.expect.fileChooser) {
+    // The key opens the system file chooser (Playwright intercepts it).
+    const chooser = page.waitForEvent('filechooser', { timeout: 10_000 });
+    await page.keyboard.press(key);
+    await chooser;
+  } else {
+    await page.keyboard.press(key);
+  }
+  await expectState(panel, check.expect, `${id} after ${check.press}`);
+  // The hint for that key lights up and the status names it.
+  expect(await hints.count()).toBeGreaterThan(0);
+  if (project !== 'webkit' || !check.open) {
+    await expect(live.locator('[data-key-hint][data-pressed]')).toHaveCount(1);
+    await expect(live.locator('.live__key-status')).toContainText('Pressed');
+  }
+}
+
+/** Anatomy parts highlight on hover and focus, both ways. */
+async function checkAnatomy(page: Page, live: Locator, id: string, isMobile: boolean) {
+  const figure = page.locator(`figure[data-anatomy="${id}"]`);
+  const anatomy = await figure
+    .locator('li[data-part]')
+    .evaluateAll((boxes) => boxes.map((box) => box.getAttribute('data-part') ?? ''));
+  const used = await live
+    .locator('[data-demo-part]')
+    .evaluateAll((parts) => [
+      ...new Set(parts.map((part) => part.getAttribute('data-demo-part') ?? '')),
+    ]);
+  expect(used.length, 'parts marked in the demo').toBeGreaterThan(0);
+  for (const part of used) expect(anatomy, `${part} is an anatomy part`).toContain(part);
+
+  // Parts that exist only once opened (a toast, a menu) are opened first.
+  const visibleParts = live.locator('[data-demo-mode="uncontrolled"] [data-demo-part]:visible');
+  if ((await visibleParts.count()) === 0) {
+    const raw = await live.getAttribute('data-key-check');
+    const check = raw ? (JSON.parse(raw) as KeyCheck) : undefined;
+    if (check?.open)
+      await live.locator('[data-demo-mode="uncontrolled"]').locator(check.open).first().click();
+  }
+  // Hover a part in the demo: the innermost part under the pointer and its
+  // diagram box are highlighted, and the part is named.
+  const first = live.locator('[data-demo-mode="uncontrolled"] [data-demo-part]:visible').first();
+  let name = (await first.getAttribute('data-demo-part')) ?? '';
+  if (!isMobile) {
+    await first.hover();
+    await expect(live.locator('[data-active-part]')).toHaveCount(1);
+    name = ((await live.locator('[data-active-part] code').textContent()) ?? '').trim();
+    expect(anatomy, `${name} is an anatomy part`).toContain(name);
+    expect(await live.locator(`[data-demo-part="${name}"][data-demo-hot]`).count()).toBe(1);
+    expect(await figure.locator(`li[data-part="${name}"][data-hot]`).count()).toBe(1);
+  }
+
+  // Focus a focusable part (keyboard users get the same bridge).
+  const focusable = live
+    .locator('[data-demo-mode="uncontrolled"]')
+    .locator('[data-demo-part]:is(button, input, a[href], [tabindex="0"], [role="slider"]):visible')
+    .first();
+  if ((await focusable.count()) > 0) {
+    // Move the pointer away first, so hover does not compete with focus.
+    if (!isMobile) await page.mouse.move(1, 1);
+    await focusable.focus();
+    // Focus may land on an inner element: the part reported is the innermost one.
+    await expect(live.locator('[data-active-part]')).toHaveCount(1);
+    const focusedPart = (
+      (await live.locator('[data-active-part] code').textContent()) ?? ''
+    ).trim();
+    expect(anatomy).toContain(focusedPart);
+    await expect(figure.locator(`li[data-part="${focusedPart}"][data-hot]`)).toHaveCount(1);
+  }
+
+  // Hover a diagram box: every instance of that part in the demo lights up.
+  if (!isMobile) {
+    await figure.locator(`li[data-part="${name}"] > .anatomy__label`).first().hover();
+    expect(await live.locator(`[data-demo-part="${name}"][data-demo-hot]`).count()).toBeGreaterThan(
+      0
+    );
+  }
+}
+
+/** Every prop, through its own control, changes the code sample. */
+async function checkPropsPanel(page: Page, live: Locator, id: string): Promise<void> {
+  const code = live.locator('[data-live-code]');
+  const before = (await code.textContent()) ?? '';
+  expect(before).toContain(`@texuli/primitives/${id}`);
+  const rows = live.locator('[data-props-panel] [data-prop]');
+  const count = await rows.count();
+  for (let index = 0; index < count; index += 1) {
+    const row = rows.nth(index);
+    const prop = (await row.getAttribute('data-prop')) ?? '';
+    const kind = await row.getAttribute('data-kind');
+    const previous = (await code.textContent()) ?? '';
+    if (kind === 'enum') {
+      await row.locator('[aria-pressed="false"]').first().click();
+    } else if (kind === 'boolean') {
+      await row.getByRole('switch').click();
+    } else if (kind === 'number') {
+      await row.getByRole('slider').focus();
+      const atEnd =
+        (await row.getByRole('slider').getAttribute('aria-valuenow')) ===
+        (await row.getByRole('slider').getAttribute('aria-valuemax'));
+      await page.keyboard.press(atEnd ? 'Home' : 'End');
+    } else {
+      await row.locator('input').fill('Example label');
+    }
+    await expect(code, `${id}: the ${prop} prop shows in the code`).not.toHaveText(previous);
+  }
+}
+
+/** The frame's light/dark and RTL toggles scope the preview (the same frame on every page). */
+async function checkToggles(live: Locator): Promise<void> {
+  const stage = live.locator('[data-live-stage]');
+  const background = () => stage.evaluate((node) => getComputedStyle(node).backgroundColor);
+  await expect(stage).toHaveAttribute('data-tx-mode', 'light');
+  const light = await background();
+  await live.getByRole('button', { name: 'Dark', exact: true }).click();
+  await expect(stage).toHaveAttribute('data-tx-mode', 'dark');
+  expect(await background()).not.toBe(light);
+  await live.getByRole('switch', { name: 'Right to left' }).click();
+  await expect(stage).toHaveAttribute('dir', 'rtl');
+}
+
 for (const id of IDS) {
   test.describe(`live ${id}`, () => {
     test.skip(
@@ -211,182 +374,39 @@ for (const id of IDS) {
       'Representative primitives only on this project'
     );
 
-    test('styled, interactive, with controlled and uncontrolled panels', async ({ page }) => {
-      const live = await openDemo(page, id);
-      const uncontrolled = live.locator('[data-demo-mode="uncontrolled"]');
-      const controlled = live.locator('[data-demo-mode="controlled"]');
-      await expect(uncontrolled).toBeVisible();
-      await expect(controlled).toBeVisible();
-      // The real primitive, styled: Texuli class recipes on its parts.
-      expect(
-        await live.locator('[data-demo-mode] [class*="tx-"]').count(),
-        'Texuli-styled parts'
-      ).toBeGreaterThan(0);
-
-      // Controlled: a control outside the primitive changes its state.
-      const control = JSON.parse(
-        (await live.getAttribute('data-control-check')) ?? '{}'
-      ) as ControlCheck;
-      await expect(controlled.locator('[data-demo-readout]').first()).toBeVisible();
-      await controlled.locator(control.act).first().click();
-      await expectState(controlled, control.expect, `${id} controlled`);
-    });
-
-    test('keyboard hints describe keys that work and light up when pressed', async ({
+    test('controlled and uncontrolled panels, keyboard hints, anatomy bridge, props panel', async ({
       page,
+      isMobile,
     }, info) => {
+      test.setTimeout(120_000);
+      // Each check may leave floating content open (a modal makes the rest of
+      // the page inert), so each starts from a fresh load of the same page;
+      // the page session keeps its cache, which makes the reloads cheap.
+      await checkControlled(await openDemo(page, id), id);
+      await checkKeyHints(page, await openDemo(page, id), id, info.project.name);
+      await checkAnatomy(page, await openDemo(page, id), id, isMobile);
       const live = await openDemo(page, id);
-      const raw = await live.getAttribute('data-key-check');
-      const hints = live.locator('[data-key-hint]');
-      if (!raw) {
-        await expect(hints).toHaveCount(0);
-        return;
-      }
-      const check = JSON.parse(raw) as KeyCheck;
-      const panel = live.locator('[data-demo-mode="uncontrolled"]');
-      if (check.open) {
-        await panel
-          .locator(check.open)
-          .first()
-          .click(check.openWith === 'contextmenu' ? { button: 'right' } : {});
-      }
-      await panel.locator(check.focus).first().focus();
-      const key = check.press === ' ' ? 'Space' : check.press;
-      if (check.expect.fileChooser) {
-        // The key opens the system file chooser (Playwright intercepts it).
-        const chooser = page.waitForEvent('filechooser', { timeout: 10_000 });
-        await page.keyboard.press(key);
-        await chooser;
-      } else {
-        await page.keyboard.press(key);
-      }
-      await expectState(panel, check.expect, `${id} after ${check.press}`);
-      // The hint for that key lights up and the status names it.
-      expect(await hints.count()).toBeGreaterThan(0);
-      if (info.project.name !== 'webkit' || !check.open) {
-        await expect(live.locator('[data-key-hint][data-pressed]')).toHaveCount(1);
-        await expect(live.locator('.live__key-status')).toContainText('Pressed');
-      }
+      await checkPropsPanel(page, live, id);
+      if (REPRESENTATIVE.has(id)) await checkToggles(live);
     });
 
-    test('anatomy parts highlight on hover and focus, both ways', async ({ page, isMobile }) => {
-      const live = await openDemo(page, id);
-      const figure = page.locator(`figure[data-anatomy="${id}"]`);
-      const anatomy = await figure
-        .locator('li[data-part]')
-        .evaluateAll((boxes) => boxes.map((box) => box.getAttribute('data-part') ?? ''));
-      const used = await live
-        .locator('[data-demo-part]')
-        .evaluateAll((parts) => [
-          ...new Set(parts.map((part) => part.getAttribute('data-demo-part') ?? '')),
-        ]);
-      expect(used.length, 'parts marked in the demo').toBeGreaterThan(0);
-      for (const part of used) expect(anatomy, `${part} is an anatomy part`).toContain(part);
-
-      // Parts that exist only once opened (a toast, a menu) are opened first.
-      const visibleParts = live.locator('[data-demo-mode="uncontrolled"] [data-demo-part]:visible');
-      if ((await visibleParts.count()) === 0) {
-        const raw = await live.getAttribute('data-key-check');
-        const check = raw ? (JSON.parse(raw) as KeyCheck) : undefined;
-        if (check?.open)
-          await live.locator('[data-demo-mode="uncontrolled"]').locator(check.open).first().click();
-      }
-      // Hover a part in the demo: the innermost part under the pointer and its
-      // diagram box are highlighted, and the part is named.
-      const first = live
-        .locator('[data-demo-mode="uncontrolled"] [data-demo-part]:visible')
-        .first();
-      let name = (await first.getAttribute('data-demo-part')) ?? '';
-      if (!isMobile) {
-        await first.hover();
-        await expect(live.locator('[data-active-part]')).toHaveCount(1);
-        name = ((await live.locator('[data-active-part] code').textContent()) ?? '').trim();
-        expect(anatomy, `${name} is an anatomy part`).toContain(name);
-        expect(await live.locator(`[data-demo-part="${name}"][data-demo-hot]`).count()).toBe(1);
-        expect(await figure.locator(`li[data-part="${name}"][data-hot]`).count()).toBe(1);
-      }
-
-      // Focus a focusable part (keyboard users get the same bridge).
-      const focusable = live
-        .locator('[data-demo-mode="uncontrolled"]')
-        .locator(
-          '[data-demo-part]:is(button, input, a[href], [tabindex="0"], [role="slider"]):visible'
-        )
-        .first();
-      if ((await focusable.count()) > 0) {
-        // Move the pointer away first, so hover does not compete with focus.
-        if (!isMobile) await page.mouse.move(1, 1);
-        await focusable.focus();
-        // Focus may land on an inner element: the part reported is the innermost one.
-        await expect(live.locator('[data-active-part]')).toHaveCount(1);
-        const focusedPart = (
-          (await live.locator('[data-active-part] code').textContent()) ?? ''
-        ).trim();
-        expect(anatomy).toContain(focusedPart);
-        await expect(figure.locator(`li[data-part="${focusedPart}"][data-hot]`)).toHaveCount(1);
-      }
-
-      // Hover a diagram box: every instance of that part in the demo lights up.
-      if (!isMobile) {
-        await figure.locator(`li[data-part="${name}"] > .anatomy__label`).first().hover();
-        expect(
-          await live.locator(`[data-demo-part="${name}"][data-demo-hot]`).count()
-        ).toBeGreaterThan(0);
-      }
-    });
-
-    test('the props panel drives the demo and its code sample', async ({ page }) => {
-      const live = await openDemo(page, id);
-      const code = live.locator('[data-live-code]');
-      const before = (await code.textContent()) ?? '';
-      expect(before).toContain(`@texuli/primitives/${id}`);
-      // Every prop, through its own control, changes the code sample.
-      const rows = live.locator('[data-props-panel] [data-prop]');
-      const count = await rows.count();
-      for (let index = 0; index < count; index += 1) {
-        const row = rows.nth(index);
-        const prop = (await row.getAttribute('data-prop')) ?? '';
-        const kind = await row.getAttribute('data-kind');
-        const previous = (await code.textContent()) ?? '';
-        if (kind === 'enum') {
-          await row.locator('[aria-pressed="false"]').first().click();
-        } else if (kind === 'boolean') {
-          await row.getByRole('switch').click();
-        } else if (kind === 'number') {
-          await row.getByRole('slider').focus();
-          const atEnd =
-            (await row.getByRole('slider').getAttribute('aria-valuenow')) ===
-            (await row.getByRole('slider').getAttribute('aria-valuemax'));
-          await page.keyboard.press(atEnd ? 'Home' : 'End');
-        } else {
-          await row.locator('input').fill('Example label');
-        }
-        await expect(code, `${id}: the ${prop} prop shows in the code`).not.toHaveText(previous);
-      }
-    });
-
-    test('light/dark and RTL toggles scope the preview', async ({ page }) => {
-      const live = await openDemo(page, id);
-      const stage = live.locator('[data-live-stage]');
-      const background = () => stage.evaluate((node) => getComputedStyle(node).backgroundColor);
-      await expect(stage).toHaveAttribute('data-tx-mode', 'light');
-      const light = await background();
-      await live.getByRole('button', { name: 'Dark', exact: true }).click();
-      await expect(stage).toHaveAttribute('data-tx-mode', 'dark');
-      expect(await background()).not.toBe(light);
-      await live.getByRole('switch', { name: 'Right to left' }).click();
-      await expect(stage).toHaveAttribute('dir', 'rtl');
-    });
-
-    for (const mode of ['light', 'dark', 'forced-colors'] as const) {
-      test(`axe, zero exclusions, ${mode}`, async ({ page }) => {
+    test('axe, zero exclusions, and polish in light, dark and forced colors', async ({ page }) => {
+      test.setTimeout(90_000);
+      for (const mode of ['light', 'dark', 'forced-colors'] as const) {
         await page.emulateMedia({
           colorScheme: mode === 'dark' ? 'dark' : 'light',
           forcedColors: mode === 'forced-colors' ? 'active' : 'none',
           reducedMotion: 'reduce',
         });
         const live = await openDemo(page, id);
-        expect(await axe(page)).toEqual([]);
+        // The API rows (details) are checked open (site-primitives-page.spec.ts).
+        await page.evaluate(() => {
+          for (const details of document.querySelectorAll('details')) details.open = true;
+        });
+        expect(await axe(page), `axe ${mode}`).toEqual([]);
+        if (mode !== 'forced-colors') {
+          expect(await polishProblems(page), `polish ${mode}`).toEqual([]);
+        }
         // Open floating content is checked too.
         const raw = await live.getAttribute('data-key-check');
         const check = raw ? (JSON.parse(raw) as KeyCheck) : undefined;
@@ -396,10 +416,10 @@ for (const id of IDS) {
             .locator(check.open)
             .first()
             .click(check.openWith === 'contextmenu' ? { button: 'right' } : {});
-          expect(await axe(page)).toEqual([]);
+          expect(await axe(page), `axe ${mode}, open`).toEqual([]);
         }
-      });
-    }
+      }
+    });
   });
 }
 
@@ -478,15 +498,20 @@ test('primitive routes stay within budget: the default until the demo is seen, t
 test.describe('live toasts on the toast pages (FIX-toaster-viewport)', () => {
   test.skip(({ isMobile, browserName }) => isMobile || browserName !== 'chromium', 'checked once');
 
-  for (const mode of ['light', 'dark', 'forced-colors'] as const) {
-    test(`the toast primitive page shows a placed toast on click, axe clean, ${mode}`, async ({
-      page,
-    }) => {
-      await page.emulateMedia({
-        colorScheme: mode === 'dark' ? 'dark' : 'light',
-        forcedColors: mode === 'forced-colors' ? 'active' : 'none',
-        reducedMotion: 'reduce',
-      });
+  const MODES = ['light', 'dark', 'forced-colors'] as const;
+  const emulate = (page: Page, mode: (typeof MODES)[number]) =>
+    page.emulateMedia({
+      colorScheme: mode === 'dark' ? 'dark' : 'light',
+      forcedColors: mode === 'forced-colors' ? 'active' : 'none',
+      reducedMotion: 'reduce',
+    });
+
+  test('the toast primitive page shows a placed toast on click, axe clean, in light, dark and forced colors', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    for (const mode of MODES) {
+      await emulate(page, mode);
       const live = await openDemo(page, 'toast');
       await live.locator('[data-demo-mode="uncontrolled"] [data-demo-act="show"]').click();
       const toast = live.locator('[data-demo-mode="uncontrolled"] [data-tx-toast-root]').first();
@@ -497,17 +522,16 @@ test.describe('live toasts on the toast pages (FIX-toaster-viewport)', () => {
       if (!box) throw new Error('toast not rendered');
       expect(size.height - (box.y + box.height)).toBeLessThan(48);
       expect(size.width - (box.x + box.width)).toBeLessThan(48);
-      expect(await axe(page)).toEqual([]);
-    });
+      expect(await axe(page), mode).toEqual([]);
+    }
+  });
 
-    test(`the Toaster component page shows live toasts on click, axe clean, ${mode}`, async ({
-      page,
-    }) => {
-      await page.emulateMedia({
-        colorScheme: mode === 'dark' ? 'dark' : 'light',
-        forcedColors: mode === 'forced-colors' ? 'active' : 'none',
-        reducedMotion: 'reduce',
-      });
+  test('the Toaster component page shows live toasts on click, axe clean, in light, dark and forced colors', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    for (const mode of MODES) {
+      await emulate(page, mode);
       await page.goto(`${origin}/component-pages/toaster/`);
       const stage = page.locator('[data-tx-toast-stage="toaster"]');
       await stage.scrollIntoViewIfNeeded();
@@ -518,9 +542,9 @@ test.describe('live toasts on the toast pages (FIX-toaster-viewport)', () => {
       const toasts = stage.locator('[data-tx-toast-root]');
       await expect(toasts).toHaveCount(4);
       await expect(toasts.first()).toBeVisible();
-      expect(await axe(page)).toEqual([]);
+      expect(await axe(page), mode).toEqual([]);
       await stage.getByRole('button', { name: 'Dismiss all' }).click();
       await expect(toasts).toHaveCount(0);
-    });
-  }
+    }
+  });
 });

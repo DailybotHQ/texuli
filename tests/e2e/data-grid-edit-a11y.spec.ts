@@ -57,8 +57,8 @@ for (const example of EXAMPLES) {
       await expect(editor(page)).toHaveValue(example.text);
     });
 
-    for (const mode of ['light', 'dark'] as const) {
-      test(`passes axe with an editor open (${mode})`, async ({ page }) => {
+    test(`passes axe with an editor open in light and dark`, async ({ page }) => {
+      for (const mode of ['light', 'dark'] as const) {
         await open(page, example.id, mode);
         await cell(page).click();
         await page.keyboard.press('Enter');
@@ -68,7 +68,7 @@ for (const example of EXAMPLES) {
           .withTags(AXE_TAGS)
           .analyze();
         expect(results.violations).toEqual([]);
-      });
-    }
+      }
+    });
   });
 }

@@ -27,49 +27,33 @@ scenario(
   'menu',
   defineRows([
     {
-      id: 'open-first-item',
-      title: 'Enter opens the menu on its first item; the trigger says it is expanded',
+      id: 'keyboard-open-move-close',
+      title:
+        'Enter opens the menu on its first item (the trigger says it is expanded); Home, End and typeahead move; Escape closes; ArrowUp opens it on its last item',
       async run({ page, recordOpenToFocus }) {
         await expect(trigger(page)).toHaveAttribute('aria-haspopup', 'menu');
         await openWithKeyboard(page);
         await expect(page.getByRole('button', { name: 'View', expanded: true })).toBeVisible();
+        await page.keyboard.press('End');
+        await expectFocus(page, 'menuitemradio', 'Spacious');
+        await page.keyboard.press('Home');
+        await expectFocus(page, 'menuitem', 'New file');
+        await page.keyboard.type('sh');
+        await expectFocus(page, 'menuitemcheckbox', 'Show grid');
+        await page.keyboard.press('Escape');
+        await layerClosed(page);
+        await trigger(page).focus();
+        await page.keyboard.press('ArrowUp');
+        await expectFocus(page, 'menuitemradio', 'Spacious');
         await page.keyboard.press('Escape');
         await layerClosed(page);
         recordOpenToFocus(await sampleOpenToFocus(page, trigger(page)));
       },
     },
     {
-      id: 'arrow-up-opens-on-last',
-      title: 'ArrowUp on the trigger opens the menu on its last item',
-      async run({ page }) {
-        await trigger(page).focus();
-        await page.keyboard.press('ArrowUp');
-        await expectFocus(page, 'menuitemradio', 'Spacious');
-      },
-    },
-    {
-      id: 'home-end',
-      title: 'Home and End move to the first and last items',
-      async run({ page }) {
-        await openWithKeyboard(page);
-        await page.keyboard.press('End');
-        await expectFocus(page, 'menuitemradio', 'Spacious');
-        await page.keyboard.press('Home');
-        await expectFocus(page, 'menuitem', 'New file');
-      },
-    },
-    {
-      id: 'typeahead',
-      title: 'typing letters moves to the matching item',
-      async run({ page }) {
-        await openWithKeyboard(page);
-        await page.keyboard.type('sh');
-        await expectFocus(page, 'menuitemcheckbox', 'Show grid');
-      },
-    },
-    {
-      id: 'checkbox-item',
-      title: 'a checkbox item toggles its checked state and keeps the menu open',
+      id: 'checkbox-and-radio-items',
+      title:
+        'a checkbox item toggles and keeps the menu open; radio items check one value in a group named by its heading',
       async run({ page }) {
         await openWithKeyboard(page);
         const grid = item(page, 'menuitemcheckbox', 'Show grid');
@@ -82,13 +66,6 @@ scenario(
         await grid.click();
         await expect(grid).toHaveAttribute('aria-checked', 'false');
         expect((await eventNames(page)).filter((name) => name === 'checked')).toHaveLength(2);
-      },
-    },
-    {
-      id: 'radio-items',
-      title: 'radio items check one value in a group named by its heading',
-      async run({ page }) {
-        await openWithKeyboard(page);
         await expect(menus(page).getByRole('group', { name: 'Density' })).toBeVisible();
         await expect(item(page, 'menuitemradio', 'Comfortable')).toHaveAttribute(
           'aria-checked',
@@ -108,30 +85,22 @@ scenario(
     },
     {
       id: 'submenu-keyboard',
-      title: 'ArrowRight opens the submenu on its first item; ArrowLeft returns to its trigger',
+      title:
+        'ArrowRight opens the submenu on its first item and ArrowLeft returns; Escape closes the submenu only; choosing a submenu item closes every menu and returns focus to the trigger',
       async run({ page }) {
         await openSubmenuWithKeyboard(page);
         await expect(item(page, 'menuitem', 'Export')).toHaveAttribute('aria-expanded', 'true');
         await page.keyboard.press('ArrowLeft');
         await expect(menus(page)).toHaveCount(1);
         await expectFocus(page, 'menuitem', 'Export');
-      },
-    },
-    {
-      id: 'submenu-escape',
-      title: 'Escape closes the submenu only and returns focus to its trigger',
-      async run({ page }) {
-        await openSubmenuWithKeyboard(page);
+        await page.keyboard.press('ArrowRight');
+        await expect(menus(page)).toHaveCount(2);
+        await expectFocus(page, 'menuitem', 'PNG');
         await page.keyboard.press('Escape');
         await expect(menus(page)).toHaveCount(1);
         await expectFocus(page, 'menuitem', 'Export');
-      },
-    },
-    {
-      id: 'submenu-select',
-      title: 'choosing a submenu item closes every menu and returns focus to the trigger',
-      async run({ page }) {
-        await openSubmenuWithKeyboard(page);
+        await page.keyboard.press('ArrowRight');
+        await expectFocus(page, 'menuitem', 'PNG');
         await page.keyboard.press('ArrowDown');
         await page.keyboard.press('Enter');
         await layerClosed(page);
@@ -141,20 +110,12 @@ scenario(
       },
     },
     {
-      id: 'submenu-pointer',
-      title: 'resting the pointer on the submenu trigger opens the submenu',
+      id: 'submenu-pointer-grace',
+      title:
+        'resting the pointer on the submenu trigger opens the submenu, and moving diagonally to it over another item keeps it open',
       async run({ page }) {
         await trigger(page).click();
         await expect(layer(page)).toBeVisible();
-        await item(page, 'menuitem', 'Export').hover();
-        await expect(menus(page)).toHaveCount(2);
-      },
-    },
-    {
-      id: 'submenu-grace',
-      title: 'moving diagonally to the submenu over another item keeps the submenu open',
-      async run({ page }) {
-        await trigger(page).click();
         const exportItem = item(page, 'menuitem', 'Export');
         const box = await exportItem.boundingBox();
         if (!box) throw new Error('no Export box');

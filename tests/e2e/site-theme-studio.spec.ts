@@ -272,9 +272,9 @@ test.describe('texuli.com theme studio', () => {
     expect(obscured).toEqual([]);
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on the theme studio (${scheme})`, async ({ page }) => {
-      test.setTimeout(90_000);
+  test(`passes axe on the theme studio in light and dark`, async ({ page }) => {
+    test.setTimeout(2 * 90_000);
+    for (const scheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: scheme });
       await visit(page, PATH);
       expect(await mode(page)).toBe(scheme);
@@ -283,6 +283,6 @@ test.describe('texuli.com theme studio', () => {
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
       expect(results.violations.map((v) => `${scheme} ${v.id}: ${v.help}`)).toEqual([]);
-    });
-  }
+    }
+  });
 });

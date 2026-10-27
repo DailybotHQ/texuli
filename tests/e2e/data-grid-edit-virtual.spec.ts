@@ -143,8 +143,8 @@ test.describe('data grid editing · 100,000 rows', () => {
     await expect(row(page, 2)).toBeInViewport();
   });
 
-  for (const mode of ['light', 'dark'] as const) {
-    test(`passes axe while windowed and scrolled (${mode})`, async ({ page }) => {
+  test(`passes axe while windowed and scrolled in light and dark`, async ({ page }) => {
+    for (const mode of ['light', 'dark'] as const) {
       await open(page, mode);
       await area(page).evaluate((element) => {
         element.scrollTop = 41 * 33_333;
@@ -155,6 +155,6 @@ test.describe('data grid editing · 100,000 rows', () => {
         .withTags(AXE_TAGS)
         .analyze();
       expect(results.violations).toEqual([]);
-    });
-  }
+    }
+  });
 });

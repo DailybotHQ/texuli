@@ -8,7 +8,7 @@ import { expect, test } from '@playwright/test';
 /*
  * texuli.com screen-reader text, on the built output (T-100 P2-6). The three
  * T-90 page-layer fixes (docs/quality/sr-transcripts-site.md) are pinned at
- * the source in apps/website/tests/a11y-sr-pass.test.ts; this spec checks
+ * the source in apps/website/tests/docs-reading.test.ts; this spec checks
  * what a reader actually gets after `astro build` and its HTML compression:
  *
  * 1. /web-and-native/ reads "the guide Why Svelte and Kotlin" with the space,

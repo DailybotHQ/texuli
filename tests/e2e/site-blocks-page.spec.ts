@@ -233,8 +233,11 @@ test.describe('texuli.com blocks and templates', () => {
     }
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on every blocks page with the sources open (${scheme})`, async ({ page }) => {
+  test(`passes axe on every blocks page with the sources open in light and dark`, async ({
+    page,
+  }) => {
+    test.setTimeout(180_000);
+    for (const scheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: scheme });
       for (const path of PATHS) {
         expect(await visit(page, path), path).toEqual([]);
@@ -252,6 +255,6 @@ test.describe('texuli.com blocks and templates', () => {
           path
         ).toEqual([]);
       }
-    });
-  }
+    }
+  });
 });

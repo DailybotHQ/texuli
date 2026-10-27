@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
-import { defineRows, gotoScenario, scenario } from '../harness/index.ts';
+import { expect } from '@playwright/test';
+import { defineRows, scenario } from '../harness/index.ts';
 
 const trigger = (page: import('@playwright/test').Page) =>
   page.getByRole('button', { name: 'Show shipping details' });
@@ -58,14 +58,16 @@ scenario(
         expect(result.violations).toEqual([]);
       },
     },
+    {
+      id: 'touch-toggles',
+      title: 'toggles through touch input on the phone',
+      projects: ['mobile'],
+      async run({ page }) {
+        const button = trigger(page);
+        await expect(button).toHaveAttribute('aria-expanded', 'false');
+        await button.tap();
+        await expect(button).toHaveAttribute('aria-expanded', 'true');
+      },
+    },
   ])
 );
-
-test('collapsible toggles through touch input on Pixel 7', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile', 'Touch input is exercised on the Pixel 7 project.');
-  await gotoScenario(page, 'collapsible');
-  const button = trigger(page);
-  await expect(button).toHaveAttribute('aria-expanded', 'false');
-  await button.tap();
-  await expect(button).toHaveAttribute('aria-expanded', 'true');
-});

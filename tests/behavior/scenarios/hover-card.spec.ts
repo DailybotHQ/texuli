@@ -12,6 +12,8 @@ scenario(
     {
       id: 'opens-after-hover-delay',
       title: 'hover opens the named preview after a delay',
+      // The installed clock is context-wide; the other rows need real time.
+      isolate: true,
       async run({ page }) {
         await page.clock.install();
         await trigger(page).hover();

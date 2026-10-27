@@ -51,15 +51,18 @@ test.describe('domain polish · chart text keeps its size on phones (P1-01)', ()
     'charts-canvas',
     'charts-flow',
   ];
-  for (const id of charts) {
-    test(`${id} at 320px`, async ({ page }) => {
+  test(`every chart family keeps its smallest text at 10px or more at 320px`, async ({ page }) => {
+    test.setTimeout(charts.length * 15_000);
+    for (const id of charts) {
       await openExample(page, id, 320);
       // Let measured layouts settle (a ResizeObserver tick after mount).
       await page.waitForTimeout(300);
       const smallest = await smallestSvgText(page, `[data-example-host="${id}"]`);
-      expect(smallest.px, `smallest chart text "${smallest.text}"`).toBeGreaterThanOrEqual(10);
-    });
-  }
+      expect(smallest.px, `${id}: smallest chart text "${smallest.text}"`).toBeGreaterThanOrEqual(
+        10
+      );
+    }
+  });
 });
 
 test('charts-interaction fits a 320px phone (P1-12)', async ({ page }) => {

@@ -149,9 +149,9 @@ test.describe('texuli.com examples', () => {
     expect(await visit(page)).toEqual([]);
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on examples index (${scheme})`, async ({ page }) => {
-      test.setTimeout(90_000);
+  test(`passes axe on examples index in light and dark`, async ({ page }) => {
+    test.setTimeout(2 * 90_000);
+    for (const scheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: scheme });
       await visit(page);
       await page.getByLabel('Find an example').fill('core-safe-href');
@@ -167,8 +167,8 @@ test.describe('texuli.com examples', () => {
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
       expect(results.violations.map((v) => v.id)).toEqual([]);
-    });
-  }
+    }
+  });
 
   test('passes axe on a detail page in forced-colors', async ({ page }) => {
     test.setTimeout(90_000);

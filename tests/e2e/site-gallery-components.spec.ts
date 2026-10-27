@@ -3,7 +3,6 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import { primaryNav } from './support/site-nav.ts';
 
@@ -66,8 +65,6 @@ async function visit(page: Page, path = '/gallery-components/') {
   return foreign;
 }
 
-const mode = (page: Page) => page.locator('html').getAttribute('data-tx-mode');
-
 test.describe('texuli.com component gallery', () => {
   test('lists components and primary nav marks Gallery', async ({ page }) => {
     expect(await visit(page)).toEqual([]);
@@ -104,17 +101,6 @@ test.describe('texuli.com component gallery', () => {
     expect(await visit(page)).toEqual([]);
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on the gallery (${scheme})`, async ({ page }) => {
-      // 125 live cards: axe needs about 30 s on a loaded machine (not a timing assertion).
-      test.setTimeout(120_000);
-      await page.emulateMedia({ colorScheme: scheme });
-      expect(await visit(page)).toEqual([]);
-      expect(await mode(page)).toBe(scheme);
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-      expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
-    });
-  }
+  // axe on this page in light and dark (zero exclusions) runs in the page sweep,
+  // a11y-site.spec.ts.
 });

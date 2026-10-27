@@ -6,7 +6,7 @@ asserts only what a user or assistive technology can observe, so a row stays
 true however the markup changes.
 
 ```bash
-# Every primitive on Chromium, WebKit and the Pixel 7 (set your lane port)
+# Every primitive on Chromium and WebKit, touch rows on the Pixel 7 (set your lane port)
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior
 
 # One primitive
@@ -46,8 +46,8 @@ It never reads DOM shape or class names.
 ## Pass rules (absolute limits)
 
 A primitive passes when:
-1. **every row passes**, on Chromium, WebKit and the Pixel 7. A flaky row gets
-   at most two retries;
+1. **every row passes**, on Chromium and WebKit, and on the Pixel 7 for the
+   phone-specific rows (below). A flaky row gets at most two retries;
 2. its subpath stays within its **`texuli.budgets.json` cap** (`pnpm size`);
 3. its **open-to-focus p75** stays within its limit in
    `OPEN_TO_FOCUS_P75_MS` (`harness/limits.ts`; 150 ms where none is
@@ -99,6 +99,26 @@ scenario(
 Rows are held to the WAI-ARIA Authoring Practices pattern for the primitive.
 Row ids are lowercase slugs, unique within a scenario.
 
+A scenario's rows run in **one Playwright test per primitive and project**:
+each row on the same page and browser context, navigated to a fresh scenario,
+after the mouse, keyboard, media and viewport are reset to the project's
+defaults and the context's web storage and permissions are cleared. The HTTP
+cache is kept, which is what makes it cheaper than one test per row. The test
+fails listing every failed row, and a flaky row is retried on a brand-new page.
+
+The Pixel 7 is Chromium again, so it runs only the **phone-specific** rows:
+those whose title or body uses touch (`tap`, `touch…`, `swipe`), branches on
+`project`, or reads the viewport (`runsOn` and `PHONE_SPECIFIC` in
+`harness/index.ts`). Keyboard, focus, role and axe rows run on Chromium and
+WebKit. Two options per row:
+- `projects: ['mobile']` runs a row only there (touch rows), and
+  `['chromium', 'webkit']` keeps it off the phone;
+- `isolate: true` gives a row its own test and browser context, for state
+  that is context-wide (an installed `page.clock`).
+
+Every spec registers its rows with `scenario()`; add a case as a row, not
+as a separate `test()`.
+
 ## The self test
 
 `harness/self.spec.ts` checks the harness itself:
@@ -108,3 +128,6 @@ Row ids are lowercase slugs, unique within a scenario.
 - a deliberately broken copy (focus not returned, scroll lock never released),
   which fails exactly the two rows that guard those bugs;
 - an unknown scenario, which reports an error instead of hanging.
+
+The sample-scenario checks run on Chromium only: they test the harness, and
+every real scenario already runs the oracle on WebKit and the Pixel 7.

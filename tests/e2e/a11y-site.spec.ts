@@ -1,114 +1,58 @@
-/// <reference types="node" />
-import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
-import { createServer, type Server } from 'node:http';
-import type { AddressInfo } from 'node:net';
-import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
+import { LIVE_MARKERS } from '../../apps/website/src/components/live/markers.ts';
+import { expectLiveStage, foreignRequests } from './support/live-stage.ts';
+import {
+  axeViolations,
+  expectMode,
+  polishProblems,
+  representatives,
+  serveDist,
+  settle,
+  sitePaths,
+} from './support/site.ts';
 
 /*
- * Accessibility sweep of texuli.com (T-quality-a11y-site). Every built page
- * (from dist/sitemap.xml, plus the 404) runs axe with ZERO exclusions (no
- * disabled rules, no excluded selectors) in light, dark and high contrast
- * (forced colors), and a keyboard-only walk: the skip link comes first,
- * every Tab stop is visible with a visible focus indicator, focus never
- * drops to the body and never gets trapped.
+ * The texuli.com page sweep (T-quality-a11y-site, T-site-visual-polish). One
+ * test per built page (dist/sitemap.xml, plus the 404), in one page session:
+ *  - light, then dark: axe with ZERO exclusions (no disabled rules, no
+ *    excluded selectors), and the polish check (no horizontal overflow, no
+ *    element escaping the viewport, no broken image, no stand-in copy);
+ *  - component pages also mount their real component on the live stage,
+ *    with no request to another origin.
+ * One page per route group (the same templates) also runs axe under forced
+ * colors (high contrast) and a keyboard-only walk: the skip link comes first,
+ * every Tab stop is visible with a focus indicator, focus never drops to the
+ * body and never gets trapped.
  *
- * Chromium sweeps every page; WebKit and Pixel 7 sweep one page per route
- * group (the same templates), which keeps the matrix tractable.
+ * `/primitives-page/<id>/` pages are swept by site-live-primitives.spec.ts,
+ * with the demo mounted and its floating content open, in light, dark and
+ * forced colors; here only the group's representative runs.
+ *
+ * Chromium sweeps every page; the Pixel 7 runs the polish check on every page
+ * and axe on the representatives; WebKit runs the representatives only.
+ * Run `pnpm build` first.
  */
-
-const DIST = resolve('apps/website/dist');
-const SITE = 'https://texuli.com';
-const AXE_TAGS = [
-  'wcag2a',
-  'wcag2aa',
-  'wcag21a',
-  'wcag21aa',
-  'wcag22a',
-  'wcag22aa',
-  'best-practice',
-];
-const MODES = ['light', 'dark', 'high-contrast'] as const;
-type Mode = (typeof MODES)[number];
-const TYPES: Record<string, string> = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.json': 'application/json',
-  '.xml': 'application/xml; charset=utf-8',
-  '.txt': 'text/plain; charset=utf-8',
-  '.png': 'image/png',
-  '.webp': 'image/webp',
-  '.woff2': 'font/woff2',
-  '.md': 'text/markdown; charset=utf-8',
-};
-
-/** Site paths from the built sitemap, plus the 404 (served for an unknown path). */
-function sitePaths(): string[] {
-  const sitemap = join(DIST, 'sitemap.xml');
-  if (!existsSync(sitemap)) return [];
-  const paths = [...readFileSync(sitemap, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =>
-    (match[1] as string).replace(SITE, '')
-  );
-  return [...paths.sort(), '/__missing__/'];
-}
-
-/** One representative page per route group (`/`, `/guides/…`, `/component-pages/…`). */
-function representatives(paths: readonly string[]): Set<string> {
-  const seen = new Map<string, string>();
-  for (const path of paths) {
-    const group = path.split('/')[1] ?? '';
-    if (!seen.has(group)) seen.set(group, path);
-  }
-  return new Set(seen.values());
-}
 
 const PATHS = sitePaths();
 const SAMPLE = representatives(PATHS);
+const origin = serveDist();
 
-let server: Server;
-let origin = '';
+/** Pages whose axe run needs more than the default time on a busy machine. */
+const LARGE_PAGES = new Set(['/gallery-components/', '/examples/', '/color-explorer/']);
 
-test.beforeAll(async () => {
-  if (!existsSync(join(DIST, 'index.html'))) throw new Error('Run `pnpm build` before this spec.');
-  server = createServer((request, response) => {
-    const path = decodeURIComponent(new URL(request.url ?? '/', 'http://site').pathname);
-    let file = normalize(join(DIST, path));
-    if (!file.startsWith(DIST)) file = join(DIST, '__outside__');
-    if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html');
-    if (!existsSync(file)) {
-      response.writeHead(404, { 'content-type': TYPES['.html'] });
-      createReadStream(join(DIST, '404.html')).pipe(response);
-      return;
-    }
-    response.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
-    createReadStream(file).pipe(response);
-  });
-  await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
-  origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-});
-test.afterAll(() => new Promise<void>((done) => server.close(() => done())));
-
-async function open(page: Page, path: string, mode: Mode): Promise<void> {
+async function open(
+  page: Page,
+  path: string,
+  mode: 'light' | 'dark' | 'high-contrast'
+): Promise<void> {
   await page.emulateMedia({
     colorScheme: mode === 'dark' ? 'dark' : 'light',
     forcedColors: mode === 'high-contrast' ? 'active' : 'none',
     reducedMotion: 'reduce',
   });
-  await page.goto(`${origin}${path}`);
-  await page.waitForLoadState('networkidle');
-  if (mode !== 'high-contrast')
-    await expect(page.locator('html')).toHaveAttribute('data-tx-mode', mode);
-}
-
-async function axeViolations(page: Page): Promise<string[]> {
-  const result = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
-  return result.violations.map(
-    (violation) =>
-      `${violation.id} (${violation.impact}): ${violation.nodes.map((node) => node.target.join(' ')).join(' | ')}`
-  );
+  await page.goto(`${origin()}${path}`);
+  await settle(page);
+  if (mode !== 'high-contrast') await expectMode(page, mode);
 }
 
 interface FocusStop {
@@ -153,56 +97,73 @@ async function tabStop(page: Page): Promise<FocusStop> {
   });
 }
 
-/** Pages whose axe run needs more than the default 30 s on a busy machine. */
-const LARGE_PAGES = new Set(['/gallery-components/', '/examples/', '/color-explorer/']);
+/** The keyboard-only walk, from the top of a freshly loaded page. */
+async function keyboardWalk(page: Page): Promise<void> {
+  const first = await tabStop(page);
+  expect(first.label, 'first Tab stop').toContain('Skip to content');
+  const problems: string[] = [];
+  const seen: string[] = [first.label];
+  for (let press = 0; press < 40; press += 1) {
+    const stop = await tabStop(page);
+    if (stop.body) break;
+    if (!stop.visible) problems.push(`not visible: ${stop.label}`);
+    if (!stop.indicator) problems.push(`no focus indicator: ${stop.label}`);
+    seen.push(stop.label);
+    // Cycling back to the skip link means the whole page was walked.
+    if (stop.label.includes('Skip to content')) break;
+  }
+  expect(problems, 'keyboard walk').toEqual([]);
+  // No trap: Shift+Tab walks back out of wherever focus ended.
+  await page.keyboard.press('Shift+Tab');
+  const back = await page.evaluate(() => document.activeElement?.tagName ?? '');
+  expect(back).not.toBe('');
+  expect(seen.length).toBeGreaterThan(1);
+}
 
-for (const path of PATHS) {
+/** `/component-pages/<id>/` → `<id>` when the page has a live stage. */
+function liveId(path: string): string | undefined {
+  const id = /^\/component-pages\/([^/]+)\/$/.exec(path)?.[1];
+  return id && LIVE_MARKERS[id] ? id : undefined;
+}
+
+const SWEPT = PATHS.filter(
+  (path) => !/^\/primitives-page\/[^/]+\/$/.test(path) || SAMPLE.has(path)
+);
+
+for (const path of SWEPT) {
   const name = path === '/__missing__/' ? '404' : path;
-  test.describe(`a11y ${name}`, () => {
-    // Every page on desktop Chromium; representative pages on WebKit and Pixel 7.
-    test.skip(
-      ({ browserName, isMobile }) => (browserName !== 'chromium' || isMobile) && !SAMPLE.has(path),
-      'Representative pages only on this project'
-    );
+  const sample = SAMPLE.has(path);
+  test(`site ${name}: axe and polish in light and dark${sample ? ', forced colors and keyboard walk' : ''}`, async ({
+    page,
+    browserName,
+    isMobile,
+  }) => {
+    test.skip(browserName === 'webkit' && !sample, 'One page per route group on WebKit');
+    // Large pages need more time, never an exclusion (the living gallery holds
+    // 125 interactive cards; axe takes about 30 s on a loaded machine).
+    test.setTimeout(LARGE_PAGES.has(path) ? 240_000 : 90_000);
+    const desktopChromium = browserName === 'chromium' && !isMobile;
+    const runAxe = desktopChromium || sample;
+    // The live stage is checked once, on desktop Chromium.
+    const live = desktopChromium ? liveId(path) : undefined;
 
-    for (const mode of MODES) {
-      test(`axe, zero exclusions, ${mode}`, async ({ page }) => {
-        // Large pages need more time, never an exclusion. The living gallery
-        // holds 125 interactive cards (axe about 30 s on a loaded machine);
-        // the examples index and the color explorer took 22 to 28 s on WebKit
-        // when measured alone, so a busy machine pushes them past 30 s.
-        if (LARGE_PAGES.has(path)) test.setTimeout(120_000);
-        await open(page, path, mode);
-        expect(await axeViolations(page)).toEqual([]);
-      });
+    for (const mode of ['light', 'dark'] as const) {
+      const foreign = await foreignRequests(page, origin(), () => open(page, path, mode));
+      if (live) expect(foreign, `${live}: requests to another origin`).toEqual([]);
+      if (runAxe) expect(await axeViolations(page), `axe ${mode}`).toEqual([]);
+      // Lazy demos and previews on screen settle before the check (axe takes longer).
+      if (!runAxe) await page.waitForTimeout(300);
+      expect(await polishProblems(page), `polish ${mode}`).toEqual([]);
+      if (live && mode === 'light') await expectLiveStage(page, live);
     }
 
-    test('keyboard only: skip link first, every stop visible with a focus indicator, no trap', async ({
-      page,
-    }, testInfo) => {
-      // WebKit's default Tab skips links and buttons (a macOS setting), so the
-      // keyboard walk runs on Chromium and Pixel 7.
-      test.skip(testInfo.project.name === 'webkit', 'WebKit Tab order depends on a system setting');
-      await open(page, path, 'light');
-      const first = await tabStop(page);
-      expect(first.label, 'first Tab stop').toContain('Skip to content');
-      const problems: string[] = [];
-      const seen: string[] = [first.label];
-      for (let press = 0; press < 40; press += 1) {
-        const stop = await tabStop(page);
-        if (stop.body) break;
-        if (!stop.visible) problems.push(`not visible: ${stop.label}`);
-        if (!stop.indicator) problems.push(`no focus indicator: ${stop.label}`);
-        seen.push(stop.label);
-        // Cycling back to the skip link means the whole page was walked.
-        if (stop.label.includes('Skip to content')) break;
-      }
-      expect(problems).toEqual([]);
-      // No trap: Shift+Tab walks back out of wherever focus ended.
-      await page.keyboard.press('Shift+Tab');
-      const back = await page.evaluate(() => document.activeElement?.tagName ?? '');
-      expect(back).not.toBe('');
-      expect(seen.length).toBeGreaterThan(1);
-    });
+    if (!sample) return;
+    await open(page, path, 'high-contrast');
+    expect(await axeViolations(page), 'axe forced colors').toEqual([]);
+    // WebKit's default Tab skips links and buttons (a macOS setting), so the
+    // keyboard walk runs on Chromium and the Pixel 7.
+    if (browserName === 'webkit') return;
+    await open(page, path, 'light');
+    await keyboardWalk(page);
   });
 }

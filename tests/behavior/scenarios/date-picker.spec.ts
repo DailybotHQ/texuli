@@ -24,9 +24,10 @@ scenario(
   'date-picker',
   defineRows([
     {
-      id: 'trigger-collapsed-expanded',
-      title: 'the calendar button is collapsed, then expanded while its calendar is open',
-      async run({ page }) {
+      id: 'open-named-dialog-grid-escape',
+      title:
+        'the calendar button is collapsed, then expanded; opening focuses the selected date in a grid named by its month, in a dialog named for choosing the date; PageDown moves a month; Escape closes without choosing and returns focus',
+      async run({ page, recordOpenToFocus }) {
         await expect(
           page.getByRole('button', { name: 'Choose due date', expanded: false })
         ).toBeVisible();
@@ -34,36 +35,31 @@ scenario(
         await expect(
           page.getByRole('button', { name: 'Choose due date', expanded: true })
         ).toBeVisible();
-      },
-    },
-    {
-      id: 'focus-selected-date',
-      title: 'opening the calendar focuses the selected date in a grid named by its month',
-      async run({ page, recordOpenToFocus }) {
-        await openDue(page);
+        await expect(page.getByRole('dialog', { name: 'Due date calendar' })).toBeVisible();
         await expect(dueGrid(page)).toHaveAccessibleName('March 2026');
         await expect(
           dueGrid(page).getByRole('gridcell', { name: 'Sunday, March 15, 2026' })
         ).toHaveAttribute('aria-selected', 'true');
+        await page.keyboard.press('PageDown');
+        await expectFocus(page, 'button', 'Wednesday, April 15, 2026');
+        await expect(dueGrid(page)).toHaveAccessibleName('April 2026');
         await page.keyboard.press('Escape');
         await layerClosed(page);
+        await expect(due(page)).toHaveText('2026-03-15');
+        await expectFocus(page, 'button', 'Choose due date');
         // Timed in the page, from the click to the first focus inside the calendar.
         recordOpenToFocus(await sampleOpenToFocus(page, dueTrigger(page)));
       },
     },
     {
-      id: 'dialog-named',
-      title: 'the calendar is a dialog named for choosing the date (APG date picker dialog)',
+      id: 'keyboard-choose-and-outside',
+      title:
+        'a pointer press outside closes the calendar without choosing; arrows move by day and Enter chooses: the dialog closes, the field updates, focus returns',
       async run({ page }) {
         await openDue(page);
-        await expect(page.getByRole('dialog', { name: 'Due date calendar' })).toBeVisible();
-      },
-    },
-    {
-      id: 'keyboard-choose',
-      title:
-        'arrows move by day, Enter chooses: the dialog closes, the field updates, focus returns',
-      async run({ page }) {
+        await page.mouse.click(4, 4);
+        await layerClosed(page);
+        await expect(due(page)).toHaveText('2026-03-15');
         await openDue(page);
         await page.keyboard.press('ArrowRight');
         await expectFocus(page, 'button', 'Monday, March 16, 2026');
@@ -73,28 +69,6 @@ scenario(
         await layerClosed(page);
         await expect(due(page)).toHaveText('2026-03-23');
         expect(await eventNames(page)).toContain('valueChange');
-        await expectFocus(page, 'button', 'Choose due date');
-      },
-    },
-    {
-      id: 'page-keys-change-month',
-      title: 'PageDown moves a month and the grid follows',
-      async run({ page }) {
-        await openDue(page);
-        await page.keyboard.press('PageDown');
-        await expectFocus(page, 'button', 'Wednesday, April 15, 2026');
-        await expect(dueGrid(page)).toHaveAccessibleName('April 2026');
-      },
-    },
-    {
-      id: 'escape-keeps-value',
-      title: 'Escape closes without choosing and returns focus to the button',
-      async run({ page }) {
-        await openDue(page);
-        await page.keyboard.press('ArrowRight');
-        await page.keyboard.press('Escape');
-        await layerClosed(page);
-        await expect(due(page)).toHaveText('2026-03-15');
         await expectFocus(page, 'button', 'Choose due date');
       },
     },
@@ -128,16 +102,6 @@ scenario(
         await expect(due(page)).toHaveText('2026-03-16');
         await dueTrigger(page).click();
         await expectFocus(page, 'button', 'Monday, March 16, 2026');
-      },
-    },
-    {
-      id: 'outside-pointer-closes',
-      title: 'a pointer press outside closes the calendar',
-      async run({ page }) {
-        await openDue(page);
-        await page.mouse.click(4, 4);
-        await layerClosed(page);
-        await expect(due(page)).toHaveText('2026-03-15');
       },
     },
     {
