@@ -89,3 +89,7 @@ npx biome check packages/examples
 - Dependencies point down only (`core`, later styled packages). No website import reverse.
 - No `{@html}`, `eval` or `innerHTML` in demos. Links and images go through `@texuli/core` URL helpers.
 - Lazy `load()` so unused demos stay out of first paint.
+
+---
+
+Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-examples).
