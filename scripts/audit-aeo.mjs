@@ -78,8 +78,17 @@ export function distPathFor(url, config) {
     return null;
   }
   if (parsed.origin !== config.site) return parsed.host ? `off-site:${parsed.host}` : null;
-  return decodeURIComponent(parsed.pathname);
+  try {
+    return decodeURIComponent(parsed.pathname);
+  } catch {
+    // A malformed % escape (URIError): no dist path can match it; callers
+    // report it as a critical finding instead of crashing the audit.
+    return `malformed:${parsed.pathname}`;
+  }
 }
+
+const isMalformed = (path) => typeof path === 'string' && path.startsWith('malformed:');
+const malformedDetail = (url) => `"${url}" carries a malformed percent escape`;
 
 /** The on-site dist path a URL must resolve to; null for off-site URLs. */
 export function onSitePathFor(url, config) {
@@ -197,7 +206,11 @@ export function auditAeo(surface, config = AEO_CONFIG) {
     for (const link of [...llms.matchAll(/\((https:\/\/[^)\s]+)\)/g)].map((match) => match[1])) {
       const path = onSitePathFor(link, config);
       if (path === null) continue; // off-site rows stay off-site
-      if (!exists(path))
+      if (isMalformed(path))
+        findings.push(
+          finding('critical', 'llms', path.slice('malformed:'.length), malformedDetail(link))
+        );
+      else if (!exists(path))
         findings.push(
           finding(
             'critical',
@@ -247,7 +260,16 @@ export function auditAeo(surface, config = AEO_CONFIG) {
     for (const entry of aiCatalog.entries ?? []) {
       const path = onSitePathFor(entry.url ?? '', config);
       if (path === null) continue;
-      if (!exists(path))
+      if (isMalformed(path))
+        findings.push(
+          finding(
+            'critical',
+            'well-known',
+            entry.identifier ?? entry.url,
+            malformedDetail(entry.url)
+          )
+        );
+      else if (!exists(path))
         findings.push(
           finding(
             'critical',
@@ -265,7 +287,9 @@ export function auditAeo(surface, config = AEO_CONFIG) {
     for (const set of linkset.linkset ?? [])
       for (const link of set.links ?? []) {
         const path = onSitePathFor(link.href ?? '', config);
-        if (path !== null && !exists(path))
+        if (isMalformed(path))
+          findings.push(finding('critical', 'well-known', link.rel, malformedDetail(link.href)));
+        else if (path !== null && !exists(path))
           findings.push(
             finding(
               'critical',
@@ -301,6 +325,12 @@ export function auditAeo(surface, config = AEO_CONFIG) {
     for (const skill of skills.skills ?? []) {
       const path = onSitePathFor(skill.url ?? '', config);
       if (path === null) continue;
+      if (isMalformed(path)) {
+        findings.push(
+          finding('critical', 'well-known', skill.name ?? skill.url, malformedDetail(skill.url))
+        );
+        continue;
+      }
       const bytes = surface.readBytes(path.replace(/^\/+/, ''));
       if (bytes === null)
         findings.push(

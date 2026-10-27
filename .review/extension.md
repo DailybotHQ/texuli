@@ -95,12 +95,17 @@ never claim more than exists.
 ## Test-strategy expectations
 
 - A new or changed texel needs tests in `packages/<pkg>/tests/<name>.test.ts`
-  that import through `../src/index.ts`; Vitest collects nothing outside
-  `packages/*/tests/**/*.test.ts`.
+  that import through `../src/index.ts`. Vitest collects
+  `packages/*/tests/**/*.test.ts`, `apps/website/tests/**/*.test.ts` and
+  `scripts/tests/**/*.test.ts` (plus `tests/perf/**` only with
+  `TEXULI_PERF=1` or an explicit path); a test anywhere else never runs. The
+  `apps/website/tests` entry was added to the owner-held `vitest.config.ts`
+  in commit `e6c5d205`; the owner's acknowledgement is pending.
 - Anything that guards a sink needs one hostile input per bypass class
   (mixed case, embedded tab or newline, leading control characters,
   protocol-relative and backslash URLs).
-- Website changes need `pnpm build` (`astro check` + `astro build`) to pass;
-  there are no website unit tests.
+- Website changes need `pnpm build` (`astro check` + `astro build`) to pass,
+  plus the website unit tests (`pnpm vitest run apps/website`) and the area's
+  `tests/e2e/site-*.spec.ts`.
 - Changes to `packages/core` or root configuration need
   `pnpm check && pnpm build`.

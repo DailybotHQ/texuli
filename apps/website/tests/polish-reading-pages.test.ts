@@ -10,6 +10,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { htmlToMarkdown } from '../src/components/docs/markdown.ts';
 import { flattenGuidesNav, GUIDES_SECTIONS } from '../src/components/guides/nav.ts';
 import { breadcrumbTrail } from '../src/components/seo/breadcrumbs.ts';
 
@@ -209,6 +210,13 @@ describe('row 9 — the Markdown twin is explained where it is offered', () => {
 
   it('keeps the hint out of the Markdown twin itself', () => {
     expect(markdown).toContain('copy-page__hint');
+    // Behavioral, with the scope attribute the build adds (W11; the full
+    // built markup is pinned in markdown-negotiation.test.ts).
+    const hint = copyPage.match(/<p class="copy-page__hint">([^<]+)<\/p>/)?.[1] ?? '';
+    expect(hint).not.toBe('');
+    expect(
+      htmlToMarkdown(`<p class="copy-page__hint" data-astro-cid-x>${hint}</p><p>Body.</p>`).trim()
+    ).toBe('Body.');
   });
 
   it('hides the hint on narrow viewports and uses logical spacing', () => {

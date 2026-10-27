@@ -7,14 +7,22 @@ results recorded are those runs. Browser commands need
 `TEXULI_E2E_PORT=<port>`: the fixture app's port (default 4870). Parallel
 lanes each use their own.
 
-PLAN_006 verification recorded on 2026-10-26 is called out separately below.
-The plan's per-task logs are under
-`.dwp/plans/PLAN_006_website_marketing_seo_analytics/analysis_results/`;
-`PROGRESS.md` records wave-level gates. Size and site performance (T-91..T-93,
-2026-10-26): `pnpm size` fails 26 of 307 entries (19 entries without a budget
-row and 7 over their cap, each explained in the plan's `budget-proposal.md`,
-an owner decision; `texuli.budgets.json` is unchanged), and site-perf passes
-10/10 on chromium after T-92's header-logo diet.
+PLAN_006 verification recorded on 2026-10-26 is called out separately below,
+with every number inline. The plan's per-task logs under
+`.dwp/plans/PLAN_006_website_marketing_seo_analytics/analysis_results/` and
+its `PROGRESS.md` are local plan evidence (git-ignored): they exist only in the
+checkout that ran the plan. Size and site performance (T-91..T-93 and T-98,
+2026-10-26): `pnpm size` fails 26 of 307 entries in the T-93 run and 27 in the
+T-98 run. 19 entries have no budget row (`@texuli/astro`, `@texuli/player`,
+`@texuli/slides`, `@texuli/spec`) and 7 are over their cap
+(`@texuli/catalog`, `/catalog/manifests/content`, `/catalog/player`,
+`/catalog/render/hostile`, `/catalog/validate`, `@texuli/charts/math`,
+`@texuli/data/grid-editing`); the T-98 run adds `@texuli/editor/controller`
+4 B over. The full list with sizes is in [CI](CI.md#tracked-budget-reds).
+These are owner decisions (the plan's `budget-proposal.md`, local plan
+evidence, git-ignored); `texuli.budgets.json` is unchanged. Site-perf passes
+10/10 on chromium after T-92's header-logo diet, and `/` weighs 83.8 KB
+against its 152 KB budget.
 
 ## 1. Gates
 
@@ -35,11 +43,11 @@ an owner decision; `texuli.budgets.json` is unchanged), and site-perf passes
 | Perf and scale limits (opt-in) | `pnpm test:perf` | 6 files, 128 passed (36 s under load, 2026-10-25) |
 | Supply chain + SBOM | `pnpm vitest run scripts/tests/supply-chain.test.ts` | 9 passed (2 s) |
 | Harness conformance | `bash .agents/skills/deepworkplan/verify/conformance.sh --repo-only` | 16 of 17 pass in a lane worktree; the one miss is `.dwp/plans`, which lives only in the main checkout (`.dwp/` is git-ignored) |
-| PLAN_006 SEO audit (opt-in, after build) | `node scripts/audit-seo.mjs --dist apps/website/dist` | T-29: exit 0; 550 pages, 0 critical, 33 warnings, 4 planned. Evidence: `analysis_results/29.task_seo-audit-script.md`; summary in `PROGRESS.md` |
-| PLAN_006 agent-surface audit (opt-in, after build) | `node scripts/audit-aeo.mjs --dist apps/website/dist` | T-30: exit 0; 26 top routes, 187 twins, 0 critical, 2 warnings, 3 planned. Evidence: `analysis_results/30.task_aeo-verify-script.md`; summary in `PROGRESS.md` |
-| PLAN_006 llms parity | `pnpm exec tsx scripts/check-llms-parity.ts` | T-24: exit 0; 133 component pages, 157 examples across 108 directories reconciled. Evidence: `analysis_results/24.task_aeo-markdown-catalog.md` |
-| PLAN_006 theme token sweep (static, opt-in) | `pnpm vitest run scripts/tests/theme-sweep.test.ts` | T-76 unit and lint gates passed; T-77's temporary runner reported 14/14 sample and 210/210 full cells with no red cells. It does not render components in a browser; see `analysis_results/themes-sweep-findings.md`. No durable sweep CLI exists yet |
-| PLAN_006 size and website performance | `pnpm size`; `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-perf.spec.ts --project=chromium` | **Pending T-93** for current plan measurements and budget disposition; do not treat historical numbers above or in `docs/PERFORMANCE.md` as T-93 results |
+| PLAN_006 SEO audit (opt-in, after build) | `node scripts/audit-seo.mjs --dist apps/website/dist` | T-29: exit 0; 550 pages, 0 critical, 33 warnings, 4 planned. Evidence (local plan evidence, git-ignored): `analysis_results/29.task_seo-audit-script.md` |
+| PLAN_006 agent-surface audit (opt-in, after build) | `node scripts/audit-aeo.mjs --dist apps/website/dist` | T-30: exit 0; 26 top routes, 187 twins, 0 critical, 2 warnings, 3 planned. Evidence (local plan evidence, git-ignored): `analysis_results/30.task_aeo-verify-script.md` |
+| PLAN_006 llms parity | `pnpm exec tsx scripts/check-llms-parity.ts` | T-24: exit 0; 133 component pages, 157 examples across 108 directories reconciled. Evidence (local plan evidence, git-ignored): `analysis_results/24.task_aeo-markdown-catalog.md` |
+| PLAN_006 theme token sweep (static, opt-in) | `pnpm vitest run scripts/tests/theme-sweep.test.ts` | T-76 unit and lint gates passed; T-77's temporary runner reported 14/14 sample and 210/210 full cells with no red cells. It does not render components in a browser (findings: `analysis_results/themes-sweep-findings.md`, local plan evidence, git-ignored). No durable sweep CLI exists yet |
+| PLAN_006 size and website performance | `pnpm size`; `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-perf.spec.ts --project=chromium` | 2026-10-26 (T-93, T-98): `pnpm size` exit 1, 26 then 27 of 307 entries fail (19 without a budget row, 7 over their cap, plus `@texuli/editor/controller` 4 B over in T-98; see [CI](CI.md#tracked-budget-reds)); budget rows are an owner decision. site-perf: 10 passed on chromium (T-98 run); `/` 83.8 KB against 152 KB |
 
 ### Browser gates (Playwright: Chromium, WebKit, Pixel 7)
 
@@ -63,18 +71,24 @@ PLAN_006 added and extended website browser coverage in these files:
 verification metadata), `site-aeo.spec.ts` (llms.txt, Markdown twins,
 parity-facing output and `.well-known` files), `site-ia.spec.ts`,
 `site-landing.spec.ts`, `site-native.spec.ts`, `site-architecture.spec.ts`,
-and `site-brand.spec.ts`. Analytics checks are in `analytics.spec.ts` and
-`analytics-fixture.spec.ts`; CSP coverage is in `csp.spec.ts` and
-`csp-report.spec.ts`. Run the relevant spec after `pnpm build`; the plan's
-individual gates and recorded results are in `PROGRESS.md` and the matching
-T-18–T-39 task logs under `.dwp/plans/PLAN_006_website_marketing_seo_analytics/`.
+`site-brand.spec.ts`, `site-keyboard.spec.ts` (keyboard walk per page class:
+20 passed in T-98) and `site-responsive.spec.ts` (overflow and target sizes at
+phone and desktop widths: 51 passed in T-98). Analytics checks are in
+`analytics.spec.ts`, `analytics-fixture.spec.ts` and `analytics-csp.spec.ts`
+(per-route Trusted Types policy names; its browser half needs a fixture
+build); CSP coverage is in `csp.spec.ts` and `csp-report.spec.ts`. Run the
+relevant spec after `pnpm build`. The plan's `PROGRESS.md` and T-18–T-39
+task logs under `.dwp/plans/PLAN_006_website_marketing_seo_analytics/` are
+local plan evidence (git-ignored); the results that matter are stated here.
 The analytics default-off check passed 5/5 routes with zero markup or requests;
 the enabled fixture passed 3/3. T-39 recorded site-perf at 13/15 with the same
 two known baseline failures; after T-91/T-92 (2026-10-26) site-perf passes 10/10
-on chromium with no budget value moved, and `pnpm size` results are owner
-decisions recorded in the plan's `budget-proposal.md`.
+on chromium with no budget value moved after them (the four route budgets
+were raised earlier in PLAN_006, commit `7996bbd7`), and the `pnpm size`
+reds above are owner decisions.
 These route-specific checks are opt-in locally and are run by CI's website job
-after its build.
+after its build, except site-perf's budget tests, which only the
+allowed-to-fail `audits` job runs (see [CI](CI.md)).
 
 `pnpm test:e2e` runs every browser check at once (e2e, behavior, visual,
 consumers). It is long; prefer the scoped specs below.
@@ -134,12 +148,12 @@ then the package, then its consumers (the layers above it).
 | `apps/website` layout, nav, SEO (indexed pages only; previews are noindex), perf | `pnpm vitest run scripts/tests/docs-shell-nav.test.ts scripts/tests/guides-nav.test.ts` | `tests/e2e/site-{docs-shell,docs-nav,seo,perf}.spec.ts`; every page: `tests/e2e/a11y-site.spec.ts` |
 | `apps/website` SEO metadata, sitemap, robots and OG output | `pnpm vitest run apps/website/tests/analytics.test.ts` (verification-meta and share-art unit coverage) | `tests/e2e/site-seo.spec.ts`; offline built-output audit: `node scripts/audit-seo.mjs --dist apps/website/dist` (T-29 exit 0; see the gate table above) |
 | `apps/website` agent discovery, llms.txt and Markdown twins | `pnpm vitest run apps/website` | `tests/e2e/site-aeo.spec.ts`; `pnpm exec tsx scripts/check-llms-parity.ts`; `node scripts/audit-aeo.mjs --dist apps/website/dist` (T-30 exit 0; both audits are opt-in after build) |
-| `apps/website` analytics loader, proxy and event wiring | `pnpm vitest run apps/website` | `tests/e2e/analytics.spec.ts` (default-off) and `tests/e2e/analytics-fixture.spec.ts` (enabled fixture); T-39 recorded 5/5 and 3/3 respectively. Fixture build requires `PUBLIC_UMAMI_WEBSITE_ID=fixture-analytics-id` |
-| `apps/website` landing and platform pages | `pnpm vitest run apps/website` | `tests/e2e/site-landing.spec.ts`, `tests/e2e/site-native.spec.ts`, `tests/e2e/site-architecture.spec.ts`, `tests/e2e/site-ia.spec.ts`, `tests/e2e/site-brand.spec.ts`; see T-31–T-33 and T-44/T-48/T-52 in plan `PROGRESS.md` |
+| `apps/website` analytics loader, proxy and event wiring | `pnpm vitest run apps/website` | `tests/e2e/analytics.spec.ts` (default-off) and `tests/e2e/analytics-fixture.spec.ts` (enabled fixture); T-39 recorded 5/5 and 3/3 respectively. `tests/e2e/analytics-csp.spec.ts` checks the Trusted Types policy names per route. Fixture build requires `PUBLIC_UMAMI_WEBSITE_ID=fixture-analytics-id` |
+| `apps/website` landing and platform pages | `pnpm vitest run apps/website` | `tests/e2e/site-landing.spec.ts`, `tests/e2e/site-native.spec.ts`, `tests/e2e/site-architecture.spec.ts`, `tests/e2e/site-ia.spec.ts`, `tests/e2e/site-brand.spec.ts`, `tests/e2e/site-keyboard.spec.ts`, `tests/e2e/site-responsive.spec.ts` |
 | `apps/website` CSP headers and reports | `pnpm vitest run apps/website` | `tests/e2e/csp.spec.ts`, `tests/e2e/csp-report.spec.ts`; CSP build integration also runs `pnpm --filter @texuli/website check:csp` |
-| `scripts/audit-seo.mjs`, `scripts/audit-aeo.mjs` | `pnpm vitest run scripts/tests/audit-seo.test.ts scripts/tests/audit-aeo.test.ts` | After a website build, run each offline audit against `apps/website/dist`; PLAN_006 real runs are recorded in `analysis_results/29.task_seo-audit-script.md` and `analysis_results/30.task_aeo-verify-script.md` |
+| `scripts/audit-seo.mjs`, `scripts/audit-aeo.mjs` | `pnpm vitest run scripts/tests/audit-seo.test.ts scripts/tests/audit-aeo.test.ts` | After a website build, run each offline audit against `apps/website/dist`; the PLAN_006 runs (results in the gate table above) are recorded in `analysis_results/29.task_seo-audit-script.md` and `analysis_results/30.task_aeo-verify-script.md` (local plan evidence, git-ignored) |
 | `scripts/check-llms-parity.ts` | `pnpm vitest run scripts/tests/check-llms-parity.test.ts` | `pnpm exec tsx scripts/check-llms-parity.ts`; T-24 recorded exit 0 and reconciled the component docs, twins and example registry |
-| `scripts/theme-sweep.ts` | `pnpm vitest run scripts/tests/theme-sweep.test.ts` | Static helper only; there is no durable CLI. T-77 used a temporary runner; findings and browser-measurement boundary are recorded in `analysis_results/themes-sweep-findings.md` |
+| `scripts/theme-sweep.ts` | `pnpm vitest run scripts/tests/theme-sweep.test.ts` | Static helper only; there is no durable CLI. T-77 used a temporary runner (14/14 sample and 210/210 full cells, no red cells); findings and the browser-measurement boundary are in `analysis_results/themes-sweep-findings.md` (local plan evidence, git-ignored) |
 | `scripts/generate-site-llms.ts` | `pnpm vitest run packages/tools/tests/llms-site.test.ts` | `pnpm exec tsx scripts/generate-site-llms.ts` regenerates the checked-in root `llms.txt`; built output freshness is checked by `tests/e2e/site-aeo.spec.ts` |
 | root config (`package.json`, `tsconfig.base.json`, `biome.json`, `vitest.config.ts`, `playwright.config.ts`) | `pnpm check` | `pnpm build` and the smoke spec |
 
@@ -157,9 +171,13 @@ suite and `pnpm build`.
 
 ## 3. Blind spots
 
-- **Vitest collects** `packages/*/tests/**/*.test.ts`, `scripts/tests/**/*.test.ts`
-  and, only with `TEXULI_PERF=1` or an explicit path, `tests/perf/**`. A test
-  in `src/` or named `*.spec.ts` outside Playwright's folders never runs.
+- **Vitest collects** `packages/*/tests/**/*.test.ts`,
+  `apps/website/tests/**/*.test.ts`, `scripts/tests/**/*.test.ts` and, only
+  with `TEXULI_PERF=1` or an explicit path, `tests/perf/**`. A test in `src/`
+  or named `*.spec.ts` outside Playwright's folders never runs. The
+  `apps/website/tests` entry was added to the owner-held `vitest.config.ts` in
+  commit `e6c5d205` (PLAN_006); the owner's acknowledgement of that change is
+  pending.
 - **happy-dom is not a browser:**
   - there's no layout, no top layer and no real focus movement on DOM moves;
   - focus order, top-layer stacking, hit testing and blur-on-move need a

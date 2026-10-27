@@ -243,6 +243,40 @@ describe('auditAeo red cases', () => {
   });
 });
 
+describe('auditAeo on malformed percent escapes (T-100 P2-4)', () => {
+  it('reports a critical finding per surface instead of throwing URIError', () => {
+    const surface = greenSurface();
+    surface.llmsTxt = '# Texuli\n\n- [x](https://texuli.com/guides/%E0%A4%A/)\n';
+    surface.wellKnown['ai-catalog.json'] = JSON.stringify({
+      host: { displayName: 'Texuli' },
+      entries: [{ identifier: 'broken', url: 'https://texuli.com/%zz/', type: 'x' }],
+    });
+    surface.wellKnown['api-catalog'] = JSON.stringify({
+      linkset: [
+        { anchor: 'https://texuli.com/', links: [{ rel: 'doc', href: 'https://texuli.com/%/' }] },
+      ],
+    });
+    surface.wellKnown['agent-skills/index.json'] = JSON.stringify({
+      skills: [{ name: 'broken-skill', url: 'https://texuli.com/skill-pack/%G0.md', digest: 'x' }],
+    });
+    let result: ReturnType<typeof auditAeo> | undefined;
+    expect(() => {
+      result = auditAeo(surface);
+    }).not.toThrow();
+    const malformed = criticals(result as ReturnType<typeof auditAeo>).filter((finding) =>
+      finding.detail.includes('malformed percent escape')
+    );
+    expect(malformed.map((finding) => finding.page).sort()).toEqual(
+      ['/guides/%E0%A4%A/', 'broken', 'broken-skill', 'doc'].sort()
+    );
+  });
+
+  it('marks a malformed on-site URL instead of throwing', () => {
+    expect(() => distPathFor('https://texuli.com/%zz/', AEO_CONFIG)).not.toThrow();
+    expect(distPathFor('https://texuli.com/%zz/', AEO_CONFIG)).toBe('malformed:/%zz/');
+  });
+});
+
 describe('pure helpers', () => {
   it('resolves on-site URLs to dist paths and marks off-site hosts', () => {
     expect(distPathFor('https://texuli.com/guides/', AEO_CONFIG)).toBe('/guides/');

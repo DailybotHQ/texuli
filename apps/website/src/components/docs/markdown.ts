@@ -7,8 +7,10 @@
  * (`integration.ts`).
  */
 
+// The copy-page hint matches by class token, whatever else the tag carries:
+// the build adds Astro's scope attribute (`data-astro-cid-…`) after it.
 const DROP =
-  /<(script|style|template|svg|noscript|button|select|textarea|input|dialog|nav)\b[^>]*>[\s\S]*?<\/\1>|<(input|img|br|hr|meta|link)\b[^>]*\/?>|<p class="copy-page__hint">[\s\S]*?<\/p>/gi;
+  /<(script|style|template|svg|noscript|button|select|textarea|input|dialog|nav)\b[^>]*>[\s\S]*?<\/\1>|<(input|img|br|hr|meta|link)\b[^>]*\/?>|<p\b[^>]*\sclass="(?:[^"]*\s)?copy-page__hint(?:\s[^"]*)?"[^>]*>[\s\S]*?<\/p>/gi;
 
 const ENTITIES: Record<string, string> = {
   amp: '&',

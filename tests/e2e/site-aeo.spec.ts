@@ -7,8 +7,7 @@ import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, relative, resolve } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { isDocsPath } from '../../apps/website/src/components/foundation/nav-data.ts';
-import { siteLlmsSections } from '../../apps/website/src/components/seo/llms-site.ts';
-import { formatSiteLlmsTxt } from '../../packages/tools/src/llms/site.ts';
+import { buildSiteLlmsTxt, SITE_URL } from '../../scripts/generate-site-llms.ts';
 
 /*
  * texuli.com AEO (T-22): the physical root llms.txt. The file is committed
@@ -18,7 +17,7 @@ import { formatSiteLlmsTxt } from '../../packages/tools/src/llms/site.ts';
  */
 
 const DIST = resolve('apps/website/dist');
-const SITE = 'https://texuli.com';
+const SITE = SITE_URL;
 const TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
@@ -49,16 +48,12 @@ test.beforeAll(async () => {
 });
 test.afterAll(() => new Promise<void>((done) => server.close(() => done())));
 
-/** The llms.txt as the generator would build it right now. */
+/**
+ * The llms.txt as the generator would build it right now: its own exported
+ * config (T-100 P2-5), never a hand copy of the title, summary or intro.
+ */
 function currentLlmsTxt(): string {
-  return formatSiteLlmsTxt({
-    title: 'Texuli',
-    summary:
-      'Interfaces from texels. Owned, accessible Svelte 5 components that people and agents can build anything with.',
-    intro:
-      'Texuli is an open-source (MIT) Svelte 5 component system built from scratch: framework-free texels compose into headless primitives, the token engine styles them, and a closed agent catalog renders agent output with no HTML sinks. A Kotlin Multiplatform renderer for the same interfaces is in development.',
-    sections: siteLlmsSections(SITE),
-  });
+  return buildSiteLlmsTxt(SITE);
 }
 
 /** Whether a site URL exists in the build (files first, then directory HTML). */
@@ -212,7 +207,7 @@ test.describe('.well-known agent discovery (T-25)', () => {
     const read = (path: string) => JSON.parse(readFileSync(join(DIST, path), 'utf8')) as never;
     return {
       aiCatalog: read('.well-known/ai-catalog.json') as {
-        host: { displayName: string };
+        host: { displayName: string; documentationUrl: string; logoUrl: string };
         entries: { identifier: string; url: string; type: string }[];
       },
       apiCatalog: read('.well-known/api-catalog') as {
@@ -257,6 +252,33 @@ test.describe('.well-known agent discovery (T-25)', () => {
     expect(serverCard.capabilities).toContain('tools');
     expect(serverCard.transport.stdio.launch).toContain('tsx src/mcp/stdio.ts');
     expect(JSON.stringify(serverCard)).not.toContain('"streamableHttp"');
+  });
+
+  test('the documentation URLs the ARD host and the skill pack advertise are built routes', () => {
+    const { aiCatalog } = fetchWellKnown();
+    // T-100 P1-4: https://texuli.com/docs/ was advertised but has no route.
+    for (const url of [aiCatalog.host.documentationUrl, aiCatalog.host.logoUrl])
+      expect(builtPath(url), url).not.toBeNull();
+    const skillPack = join(DIST, 'skill-pack');
+    const skillFiles = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory()
+          ? skillFiles(join(dir, entry.name))
+          : entry.name === 'SKILL.md'
+            ? [join(dir, entry.name)]
+            : []
+      );
+    const files = skillFiles(skillPack);
+    expect(files.length).toBeGreaterThanOrEqual(6);
+    for (const file of files) {
+      const head = readFileSync(file, 'utf8').split('\n---', 1)[0] ?? '';
+      const urls = [...head.matchAll(/^\s*(?:documentation_url|homepage):\s*(\S+)\s*$/gm)].map(
+        (match) => match[1] as string
+      );
+      expect(urls.length, `${relative(DIST, file)} names its documentation URL`).toBe(2);
+      for (const url of urls)
+        expect(builtPath(url), `${relative(DIST, file)}: ${url}`).not.toBeNull();
+    }
   });
 
   test('the agent-skills index digests match the served skill pack', () => {

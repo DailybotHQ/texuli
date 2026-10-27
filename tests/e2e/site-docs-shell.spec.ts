@@ -104,6 +104,18 @@ test.describe('texuli.com docs shell', () => {
     await expect(page.locator('#static-and-local')).toBeVisible();
   });
 
+  // PLAN_006 P2-3: the side-column TOC shows from 64rem (it never did: the
+  // base display:none rule came after the media query) and stays the only one.
+  for (const width of [1100, 1400]) {
+    test(`exactly one visible "On this page" navigation at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await visit(page, '/docs-shell/');
+      const tocs = page.getByRole('navigation', { name: 'On this page' });
+      await expect(tocs).toHaveCount(1);
+      await expect(tocs.first().locator('a[href="#static-and-local"]')).toBeVisible();
+    });
+  }
+
   test('mobile menu lists the same destinations without foreign requests', async ({
     page,
   }, testInfo) => {

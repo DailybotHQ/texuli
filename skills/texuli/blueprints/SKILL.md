@@ -2,13 +2,13 @@
 name: texuli-blueprints
 description: Validate, wrap, edit, paint and hand off untrusted agent blueprints offline — validateDraft, the envelope and its lifecycle, edit history, the player core and the Svelte player, the agent service and the spec contract. Agents draft, validation gates, the owner activates.
 version: "0.2.0"
-documentation_url: https://texuli.com/docs/
+documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
 metadata:
   openclaw:
     emoji: "▣"
-    homepage: https://texuli.com/docs/
+    homepage: https://texuli.com/guides/
     requires:
       anyBins:
         - bash

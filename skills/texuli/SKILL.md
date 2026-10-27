@@ -2,13 +2,13 @@
 name: texuli
 description: Build accessible, themed interfaces with Texuli by routing requests to local sub-skills for components, themes, media, installation, and contributions.
 version: "0.2.0"
-documentation_url: https://texuli.com/docs/
+documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
 metadata:
   openclaw:
     emoji: "▣"
-    homepage: https://texuli.com/docs/
+    homepage: https://texuli.com/guides/
     requires:
       anyBins:
         - bash
@@ -130,4 +130,4 @@ Then `./skills/texuli/setup.sh --verify` must exit 0.
 - [`router/routes.md`](router/routes.md) — intent → guide map
 - [`router/hosts.md`](router/hosts.md) — host skill folders
 - [`router/packages.md`](router/packages.md) — packages, layers and entries
-- Product docs (network): <https://texuli.com/docs/>
+- Product docs (network): <https://texuli.com/guides/>

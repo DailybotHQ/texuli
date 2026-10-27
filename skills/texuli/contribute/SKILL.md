@@ -2,13 +2,13 @@
 name: texuli-contribute
 description: Contribute a Texuli texel, primitive (with its behavior scenario), styled component, catalog manifest, examples and website page using the repository gates offline.
 version: "0.2.0"
-documentation_url: https://texuli.com/docs/
+documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
 metadata:
   openclaw:
     emoji: "▣"
-    homepage: https://texuli.com/docs/
+    homepage: https://texuli.com/guides/
     requires:
       anyBins:
         - bash

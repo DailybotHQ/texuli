@@ -6,6 +6,7 @@
 
 import type { HostileSample } from '@texuli/catalog/render/hostile';
 import { HOSTILE_SAMPLES } from '@texuli/catalog/render/hostile';
+import { safeHref } from '@texuli/core/url-policy';
 import { describe, expect, it } from 'vitest';
 import {
   HOSTILE_PROVES,
@@ -51,5 +52,49 @@ describe('playground presets', () => {
     const preset = presetById('safe-card');
     expect(preset?.proves).toBeTruthy();
     expect(presetById('does-not-exist')).toBeUndefined();
+  });
+});
+
+/**
+ * PLAN_006 W9: the `bidi` and `url-trick` captions said more than the code
+ * does. These pin the honest captions and the behavior each one states.
+ */
+describe('playground captions state what the renderer and URL policy do (W9)', () => {
+  const run = (id: string) => {
+    const preset = presetById(id);
+    if (!preset) throw new Error(`missing preset ${id}`);
+    const result = runPlaygroundTree(JSON.stringify(preset.tree));
+    if (!result.ok) throw new Error(`preset ${id} did not run`);
+    return result;
+  };
+
+  it('bidi: the caption says the characters are kept, and they are', () => {
+    expect(HOSTILE_PROVES.bidi).toBe(
+      'Bidi overrides and zero-width marks are not removed from text: the title renders as plain text with them kept, so it can still read reordered. What the untrusted URL policy refuses is a link that carries them.'
+    );
+    const root = run('hostile-bidi-override-title').roots[0];
+    expect(root?.kind).toBe('component');
+    expect(root?.kind === 'component' && root.props.title).toBe('Safe\u202Eexe.gpj\u202D file');
+    expect(safeHref('https://example.com/\u202Egpj.exe', 'untrusted')).toBeUndefined();
+  });
+
+  it('url-trick: the caption names what is refused and that any https: host passes', () => {
+    expect(HOSTILE_PROVES['url-trick']).toBe(
+      'Tabs, newlines and mixed case in a scheme cannot smuggle javascript: past the policy. The untrusted tier keeps only https:, mailto: and #fragment links and refuses protocol-relative (//host) links, relative paths and credentials before the host; any other https: host still passes.'
+    );
+    for (const id of [
+      'hostile-url-tab-split-scheme',
+      'hostile-url-newline-and-case',
+      'hostile-url-protocol-relative',
+      'hostile-url-developer-only-relative',
+      'hostile-url-credentials-host',
+    ]) {
+      const result = run(id);
+      const root = result.roots[0];
+      expect(root?.kind === 'component' && 'href' in root.props, id).toBe(false);
+      expect(formatDiagnostics(result).join(' '), id).toContain('href');
+    }
+    // Cross-origin https links are not refused: the policy is not an allowlist.
+    expect(safeHref('https://evil.example/steal', 'untrusted')).toBe('https://evil.example/steal');
   });
 });

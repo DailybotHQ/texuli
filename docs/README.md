@@ -69,6 +69,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [responsive-sweep](quality/responsive-sweep.md) | Responsive and right-to-left sweep: PLAN_004 surfaces |
 | [sr-transcripts](quality/sr-transcripts.md) | Screen-reader transcripts (VoiceOver, macOS) |
 | [sr-transcripts-slides](quality/sr-transcripts-slides.md) | Screen-reader transcripts: slides (VoiceOver, macOS) |
+| [sr-transcripts-site](quality/sr-transcripts-site.md) | Screen-reader transcripts: website (accessibility-tree pass, no screen reader run) |
 | [ssr](quality/ssr.md) | SSR and hydration smoke check |
 | [supply-chain](quality/supply-chain.md) | Supply chain and SBOM |
 

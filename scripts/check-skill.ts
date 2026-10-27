@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url';
 const SEMVER =
   /^\d+\.\d+\.\d+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 const SKILL_NAME = /^texuli(?:-[a-z0-9]+(?:-[a-z0-9]+)*)*$/;
-const DOCUMENTATION_URL = 'https://texuli.com/docs/';
+const DOCUMENTATION_URL = 'https://texuli.com/guides/';
 const ALLOWED_TOOLS = new Set(['Bash', 'Read', 'Grep', 'Glob', 'Edit', 'Write']);
 
 const REQUIRED_RELATIVE = [

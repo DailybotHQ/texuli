@@ -73,8 +73,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm --filter @texuli/website check:csp
-      # The two budget tests inside site-perf are tracked reds; the audit
-      # job below owns them.
+      # The site-perf budget tests ("performance budgets") run in the
+      # audits job below, not here.
       - run: >-
           TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e
           --project chromium --grep-invert "performance budgets"
@@ -88,9 +88,9 @@ jobs:
   audits:
     name: Budget audits (tracked pre-existing reds)
     runs-on: ubuntu-latest
-    # The package size and site-perf budgets carry documented pre-existing
-    # failures (docs/CI.md). They run here so the drift stays visible
-    # without blocking merges; fixing them retires this tolerance.
+    # pnpm size carries documented reds (docs/CI.md); site-perf passed
+    # 10/10 locally on 2026-10-26. They run here so the drift stays visible
+    # without blocking merges; fixing the size reds retires this tolerance.
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
@@ -109,9 +109,9 @@ jobs:
           {
             echo "## Budget audit (allowed to fail)"
             echo ""
-            echo "Tracked pre-existing reds, documented in docs/CI.md:"
-            echo "- pnpm size: 18 no-budget rows (@texuli/astro, player, slides, spec) and 7 over-budget rows (catalog ×4, charts/math, data/grid-editing)."
-            echo "- site-perf: /charts-page, /color-explorer and /gallery-components document budgets plus the / page weight."
+            echo "Tracked reds, documented in docs/CI.md (local run 2026-10-26):"
+            echo "- pnpm size: 19 no-budget rows (@texuli/astro, player, slides, spec) and 7 over-budget rows (catalog, catalog/manifests/content, catalog/player, catalog/render/hostile, catalog/validate, charts/math, data/grid-editing); budget rows are an owner decision."
+            echo "- site-perf: no tracked reds (10/10 passed locally after T-91/T-92)."
             echo ""
             echo "A NEW failure here is a regression — fix it, do not raise a budget."
           } >> "$GITHUB_STEP_SUMMARY"

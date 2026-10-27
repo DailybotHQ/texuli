@@ -27,7 +27,7 @@ export const HOSTILE_PROVES: Readonly<Record<HostileSample['category'], string>>
     'Executable URLs are refused: javascript:, vbscript: and data:text/html never render.',
   'fake-dialog':
     'Dialog and alert chrome are not emittable at the untrusted tier: fake confirms render as named placeholders.',
-  bidi: 'Bidi overrides and zero-width marks are neutralized, so titles cannot disguise their text.',
+  bidi: 'Bidi overrides and zero-width marks are not removed from text: the title renders as plain text with them kept, so it can still read reordered. What the untrusted URL policy refuses is a link that carries them.',
   'giant-tree': 'Depth and breadth limits refuse trees built to exhaust the renderer.',
   'prompt-injection':
     'Prompt text is only ever text: an injection renders as copy, never as instructions to a host.',
@@ -46,7 +46,7 @@ export const HOSTILE_PROVES: Readonly<Record<HostileSample['category'], string>>
   'duplicate-key':
     'Duplicate JSON keys resolve one way (last wins), so a tree cannot be two trees.',
   'url-trick':
-    'Whitespace, case and look-alike tricks in a scheme cannot smuggle a URL past the policy; cross-origin and credential-carrying links drop at the untrusted tier.',
+    'Tabs, newlines and mixed case in a scheme cannot smuggle javascript: past the policy. The untrusted tier keeps only https:, mailto: and #fragment links and refuses protocol-relative (//host) links, relative paths and credentials before the host; any other https: host still passes.',
 });
 
 const SAFE_PRESETS: readonly PlaygroundPreset[] = [

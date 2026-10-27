@@ -212,6 +212,19 @@ test.describe('architecture status and integration (T-52)', () => {
     );
   });
 
+  // PLAN_006 P2-3: the shell's side TOC shows from 64rem and yields to the
+  // layout's PageToc from 80rem, so exactly one "On this page" is exposed.
+  for (const width of [1100, 1400]) {
+    test(`exactly one visible "On this page" navigation at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await visit(page, '/web-and-native/');
+      const tocs = page.getByRole('navigation', { name: 'On this page' });
+      await expect(tocs).toHaveCount(1);
+      await expect(tocs.first()).toBeVisible();
+      await expect(tocs.first().locator('a[href="#why-both"]')).toBeVisible();
+    });
+  }
+
   test('the full page passes axe with zero exclusions', async ({ page }) => {
     await visit(page, '/web-and-native/');
     const results = await new AxeBuilder({ page })

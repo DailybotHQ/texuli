@@ -3,8 +3,8 @@
   "host": {
     "displayName": "Texuli",
     "identifier": "did:web:texuli.com",
-    "documentationUrl": "https://texuli.com/docs/",
-    "logoUrl": "https://texuli.com/brand/logo.svg"
+    "documentationUrl": "https://texuli.com/guides/",
+    "logoUrl": "https://texuli.com/brand/texuli-logo-light.png"
   },
   "entries": [
     {

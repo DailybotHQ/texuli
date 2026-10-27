@@ -18,8 +18,8 @@ the landing sections are in [site-landing.md](site-landing.md).
 - **Header** (`SiteHeader` `variant="landing"`): the Texuli logo (`BrandLogo`),
   a Docs link (`/guides/`), the platform doors (Web + native, Native), a
   GitHub door, search with the ⌘/Ctrl+K hint, the light/dark/system switch
-  and a Get started button (`/guides/getting-started/`). Under 40rem the
-  doors, GitHub and Get started hide: the hero carries `/native/` and Get
+  and a Get started button (`/guides/getting-started/`). GitHub and Get
+  started hide up to 64rem and the platform doors up to 48rem (T-89): the hero carries `/native/` and Get
   started, the web-and-native section carries `/web-and-native/`, and the
   footer carries GitHub. `site-ia.spec.ts` pins 6 header links on desktop
   and 2 on phones.
@@ -104,6 +104,7 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-ia.spec.ts tests
   islands (`HeroMoments` and `AgentsPlayground`)
   with four static sections; only the shared search and theme controls hydrate.
   Its page weight is tracked against the `/` budget
-  in `components/perf/budgets.ts` (a tracked red in `docs/CI.md`).
+  in `components/perf/budgets.ts`: 83.8 KB against 152 KB in the local
+  T-92 run (2026-10-26), so it is no longer a tracked red in `docs/CI.md`.
 - **Landing cleanup (T-site-theme-swatches):** `AnnouncementBanner`, `ThemesStripHost`,
   `ThemesStrip` and `theme-swatch.ts` were removed (nothing imported them after T-site-ia).

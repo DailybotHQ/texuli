@@ -56,7 +56,10 @@ policy.
 7. **Accessibility and CSS.** Focus order, Escape, `inert`, scroll lock and
    accessible names intact; logical CSS properties where direction matters.
 8. **Tests.** A behavior change carries a test that would have failed before,
-   in `packages/<pkg>/tests/*.test.ts` (Vitest collects nothing elsewhere).
+   in `packages/<pkg>/tests/*.test.ts`, `apps/website/tests/*.test.ts` or
+   `scripts/tests/*.test.ts` (Vitest collects only these, plus `tests/perf/**`
+   on request; the `apps/website/tests` entry, commit `e6c5d205`, awaits the
+   owner's acknowledgement).
 9. **Run the gates.** `npx biome check <paths>`, `pnpm vitest run <path>`
    (confirm a non-zero `passed` count), `pnpm --filter <package> typecheck`;
    core or root-config changes run `pnpm check && pnpm build`.

@@ -51,13 +51,13 @@ describe('skill frontmatter parser', () => {
 name: texuli
 description: Router skill.
 version: "0.1.0"
-documentation_url: https://texuli.com/docs/
+documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read
 metadata:
   openclaw:
     emoji: "▣"
-    homepage: https://texuli.com/docs/
+    homepage: https://texuli.com/guides/
     requires:
       anyBins:
         - bash
@@ -95,6 +95,34 @@ metadata:
     const issues = validateFrontmatterParsed('SKILL.md', parsed, 'texuli');
     expect(issues.some((i) => i.field === 'version')).toBe(true);
     expect(issues.some((i) => i.field === 'documentation_url')).toBe(true);
+  });
+
+  it('requires the built /guides/ route as documentation_url and homepage (T-100 P1-4)', () => {
+    const frontmatter = (url: string) => `---
+name: texuli
+description: x
+version: "0.1.0"
+documentation_url: ${url}
+user-invocable: true
+allowed-tools: Bash
+metadata:
+  openclaw:
+    emoji: x
+    homepage: ${url}
+    requires:
+      anyBins:
+        - bash
+---
+`;
+    const fields = (url: string) =>
+      validateFrontmatterParsed('SKILL.md', parseFrontmatter(frontmatter(url)), 'texuli').map(
+        (i) => i.field
+      );
+    expect(fields('https://texuli.com/guides/')).toEqual([]);
+    // texuli.com has no /docs/ route.
+    expect(fields('https://texuli.com/docs/')).toEqual(
+      expect.arrayContaining(['documentation_url', 'metadata.openclaw.homepage'])
+    );
   });
 
   it('maps nested skill folders to expected names', () => {
@@ -196,7 +224,6 @@ describe('skills/texuli pack (repository)', () => {
     expect(
       validateSkillLinks(skillRoot).filter((issue) => issue.file.startsWith('components/'))
     ).toEqual([]);
-    writeSkillChecksums(skillRoot);
     const sums = readFileSync(join(skillRoot, 'SHA256SUMS'), 'utf8');
     for (const file of [
       'SKILL.md',
@@ -229,7 +256,6 @@ describe('skills/texuli pack (repository)', () => {
     expect(
       validateSkillLinks(skillRoot).filter((issue) => issue.file.startsWith('evals/'))
     ).toEqual([]);
-    writeSkillChecksums(skillRoot);
     const sums = readFileSync(join(skillRoot, 'SHA256SUMS'), 'utf8');
     for (const file of [
       'SKILL.md',
@@ -269,14 +295,12 @@ describe('skills/texuli pack (repository)', () => {
   });
 
   it('SHA256SUMS lists contribute files', () => {
-    writeSkillChecksums(skillRoot);
     const sums = readFileSync(join(skillRoot, 'SHA256SUMS'), 'utf8');
     expect(sums).toContain('contribute/SKILL.md');
     expect(sums).toContain('contribute/references/gates.md');
   });
 
   it('SHA256SUMS lists media sub-skill files', () => {
-    writeSkillChecksums(skillRoot);
     const sums = readFileSync(join(skillRoot, 'SHA256SUMS'), 'utf8');
     expect(sums).toContain('media/SKILL.md');
     expect(sums).toContain('media/references/gates.md');
@@ -285,7 +309,6 @@ describe('skills/texuli pack (repository)', () => {
   });
 
   it('SHA256SUMS lists themes sub-skill files', () => {
-    writeSkillChecksums(skillRoot);
     const sums = readFileSync(join(skillRoot, 'SHA256SUMS'), 'utf8');
     expect(sums).toContain('themes/SKILL.md');
     expect(sums).toContain('themes/references/commands.md');
@@ -294,7 +317,6 @@ describe('skills/texuli pack (repository)', () => {
   });
 
   it('SHA256SUMS lists build-ui sub-skill files', () => {
-    writeSkillChecksums(skillRoot);
     const sums = readFileSync(join(skillRoot, 'SHA256SUMS'), 'utf8');
     expect(sums).toContain('build-ui/SKILL.md');
     expect(sums).toContain('build-ui/references/loop.md');
@@ -308,8 +330,9 @@ describe('skills/texuli pack (repository)', () => {
   });
 
   it('SHA256SUMS matches the pack (regenerate if this fails after intentional edits)', () => {
-    // Keep sums in sync with the tree for the gate.
-    writeSkillChecksums(skillRoot);
+    // Verify only: a test that rewrote the sums first could never fail, and
+    // it silently rewrote the committed file on every run (T-100 review).
+    // Regenerate with `pnpm exec tsx scripts/check-skill.ts --write-sums`.
     expect(verifySkillChecksums(skillRoot)).toEqual([]);
     const sums = readFileSync(join(skillRoot, 'SHA256SUMS'), 'utf8');
     expect(sums).toContain('SKILL.md');
@@ -317,8 +340,8 @@ describe('skills/texuli pack (repository)', () => {
     expect(sums).toContain('router/routes.md');
   });
 
-  it('checkSkillPack reports zero issues after sums are written', () => {
-    const issues = checkSkillPack(root, { writeSums: true });
+  it('checkSkillPack reports zero issues on the committed pack', () => {
+    const issues = checkSkillPack(root);
     expect(issues).toEqual([]);
   });
 
@@ -335,7 +358,6 @@ describe('skills/texuli pack (repository)', () => {
 
   it('setup.sh --verify succeeds against the pack checksums', async () => {
     const { execFileSync } = await import('node:child_process');
-    writeSkillChecksums(skillRoot);
     const out = execFileSync('bash', [join(skillRoot, 'setup.sh'), '--verify'], {
       encoding: 'utf8',
     });
@@ -485,7 +507,6 @@ describe('setup.sh pinning', () => {
   });
 
   it('--verify passes with the matching pin and refuses another version', async () => {
-    writeSkillChecksums(skillRoot);
     const ok = await run(['--verify', '--expect-version', version]);
     expect(ok.code, ok.out).toBe(0);
     expect(ok.out).toContain(`pinned version: ${version} (matches)`);

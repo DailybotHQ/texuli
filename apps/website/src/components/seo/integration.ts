@@ -43,13 +43,25 @@ const SITE_NAME = 'Texuli';
  */
 const sourceDates = new Map<string, string>();
 
+/**
+ * The last commit date (for `gitArgs`, e.g. `['--', path]`) as a UTC
+ * `YYYY-MM-DD`. `%cs` would be the committer's own calendar day, which runs
+ * up to 14 hours ahead of UTC; the sitemap gates compare lastmod with UTC, so
+ * the date is formatted in the local zone with `TZ=UTC` forced on the child.
+ */
+export function gitCommitDateUtc(gitArgs: readonly string[], cwd?: string): string {
+  return execFileSync(
+    'git',
+    ['log', '-1', '--date=format-local:%Y-%m-%d', '--format=%cd', ...gitArgs],
+    { encoding: 'utf8', cwd, env: { ...process.env, TZ: 'UTC' } }
+  ).trim();
+}
+
 function gitDate(path: string): string | undefined {
   if (!sourceDates.has(path)) {
     let date = '';
     try {
-      date = execFileSync('git', ['log', '-1', '--format=%cs', '--', path], {
-        encoding: 'utf8',
-      }).trim();
+      date = gitCommitDateUtc(['--', path]);
     } catch {
       date = '';
     }
@@ -60,7 +72,7 @@ function gitDate(path: string): string | undefined {
 
 /** HEAD's commit date; a non-git build fails loudly instead of lying. */
 function headDate(): string {
-  return execFileSync('git', ['log', '-1', '--format=%cs'], { encoding: 'utf8' }).trim();
+  return gitCommitDateUtc([]);
 }
 
 function routeLastmod(path: string): string {

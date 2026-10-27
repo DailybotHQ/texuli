@@ -44,7 +44,7 @@ const asset = (file: string) => withBase(base, `/brand/${file}`);
       <li>Never recolor the mark—swap variants for the background, not the palette.</li>
     </ul>
     <div class="mark-grid">
-      <figure>
+      <figure class="mark-on-light">
         <picture>
           <source srcset={asset('texuli-logo-light.webp')} type="image/webp" />
           <img
@@ -57,7 +57,7 @@ const asset = (file: string) => withBase(base, `/brand/${file}`);
         </picture>
         <figcaption>Lockup · light backgrounds · 480 × 140</figcaption>
       </figure>
-      <figure>
+      <figure class="mark-on-dark">
         <picture>
           <source srcset={asset('texuli-logo-dark.webp')} type="image/webp" />
           <img
@@ -70,7 +70,7 @@ const asset = (file: string) => withBase(base, `/brand/${file}`);
         </picture>
         <figcaption>Lockup · dark backgrounds · 480 × 140</figcaption>
       </figure>
-      <figure>
+      <figure class="mark-on-light">
         <picture>
           <source srcset={asset('texuli-isotype-light.webp')} type="image/webp" />
           <img
@@ -83,7 +83,7 @@ const asset = (file: string) => withBase(base, `/brand/${file}`);
         </picture>
         <figcaption>Isotype · light backgrounds · 128 × 128</figcaption>
       </figure>
-      <figure>
+      <figure class="mark-on-dark">
         <picture>
           <source srcset={asset('texuli-isotype-dark.webp')} type="image/webp" />
           <img
@@ -247,9 +247,26 @@ const asset = (file: string) => withBase(base, `/brand/${file}`);
     padding: 1rem;
     border: 1px solid var(--tx-border);
     border-radius: var(--tx-radius, 0.5rem);
-    background: var(--tx-background);
+  }
+  /* Each variant sits on the fixed surface it was drawn for, whatever the
+     site mode: the black mark on white, the white mark on near-black (W18).
+     Forced colors would repaint the surface as the system Canvas and hide
+     one mark, so the well keeps its colors; the figcaption stays outside it
+     on the theme colors. */
+  figure picture {
+    display: block;
+    padding: 0.75rem;
+    border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+    forced-color-adjust: none;
+  }
+  .mark-on-light picture {
+    background: #ffffff;
+  }
+  .mark-on-dark picture {
+    background: #111111;
   }
   figure img {
+    display: block;
     inline-size: auto;
     max-inline-size: 100%;
     block-size: auto;

@@ -70,4 +70,29 @@ const webp = (mode: Mode) =>
   :global(:root[data-tx-mode='dark']) .brand-logo__dark {
     display: block;
   }
+  /* Forced colors never recolor raster artwork, and the forced Canvas follows
+     the system palette, not the site mode: pick the variant from
+     prefers-color-scheme so a chosen Light mode on a dark forced palette
+     never draws the black logo on a black Canvas (PLAN_006 P2-6). The
+     :root[data-tx-mode] selectors match the site-mode rules' specificity. */
+  @media (forced-colors: active) {
+    .brand-logo__light,
+    :global(:root[data-tx-mode]) .brand-logo__light {
+      display: block;
+    }
+    .brand-logo__dark,
+    :global(:root[data-tx-mode]) .brand-logo__dark {
+      display: none;
+    }
+  }
+  @media (forced-colors: active) and (prefers-color-scheme: dark) {
+    .brand-logo__light,
+    :global(:root[data-tx-mode]) .brand-logo__light {
+      display: none;
+    }
+    .brand-logo__dark,
+    :global(:root[data-tx-mode]) .brand-logo__dark {
+      display: block;
+    }
+  }
 </style>
