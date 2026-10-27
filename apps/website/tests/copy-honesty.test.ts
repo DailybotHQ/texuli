@@ -121,8 +121,12 @@ describe('site copy honesty', () => {
 
   it('never calls a published package unpublished', () => {
     // The 16 packages of the 0.3.0 release, @texuli/date included, are on
-    // npm. Only the private 0.0.0 workspaces (editor, examples) are not.
+    // npm. Not on npm: the private 0.0.0 workspaces (editor, examples) and
+    // @texuli/drag and @texuli/workflows, which sit on the 0.3.0 line in the
+    // repository until an owner-approved publish wave (PLAN_007).
+    const NOT_YET_PUBLISHED = new Set(['drag', 'workflows']);
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
+      if (NOT_YET_PUBLISHED.has(dir)) return false;
       try {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')

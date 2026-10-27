@@ -64,6 +64,24 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 112, jsGzipKb: 76, cls: 0.15 },
   },
   {
+    route: '/drag-page/',
+    reason:
+      'PLAN_007: the first screen is the drag workbench, three sortable surfaces (list, board, tree) on one @texuli/drag engine; the other demos load on scroll. Measured 108.5 KB page, 71.9 KB JS at the ready signal (+4% headroom).',
+    budget: { pageGzipKb: 112, jsGzipKb: 76 },
+  },
+  {
+    route: '/workflows-page/',
+    reason:
+      'PLAN_007: the workflow editor is the subject of the page and sits in the first screen (editor plus the workflow model). Measured 126.5 KB page, 92.3 KB JS (+4% headroom).',
+    budget: { pageGzipKb: 132, jsGzipKb: 96 },
+  },
+  {
+    route: '/workflows-page/json/',
+    reason:
+      'PLAN_007: the JSON live preview paints a real player tree on open (player, controls, sortable, workflow graph and the catalog validator). Measured 227.7 KB page, 190.4 KB JS (+4% headroom).',
+    budget: { pageGzipKb: 236, jsGzipKb: 200 },
+  },
+  {
     route: '/component-pages/charts-pie/',
     reason:
       'The first live demo is a chart: the chart stage family and the part-whole chart chunk load on open: 113.9 KB page, 77.5 KB JS (104.4 KB JS before per-family stages); 124 KB page, 85.8 KB JS measured 2026-10-27, so the owner raised the caps to 132 and 92 (measured + 4%, rounded up to 4 KB; PLAN_006 follow-up).',
@@ -90,8 +108,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/builder/',
     reason:
-      'The builder page mounts the BuilderApp studio island (structure tree, props and theme controls) on open: measured 31.7 KB gzip of HTML after the PLAN_006 builder polish (T-82).',
-    budget: { htmlGzipKb: 34 },
+      'The builder page mounts the BuilderApp studio island (structure tree, props and theme controls) on open: measured 31.7 KB gzip of HTML after the PLAN_006 builder polish (T-82). PLAN_007: the palette now lists the data, chat, workflows and state groups of the 158-id catalog inline, measured 234.9 KB raw (+4% headroom).',
+    budget: { htmlGzipKb: 34, htmlRawKb: 248 },
   },
   {
     route: '/component-pages/',
@@ -102,8 +120,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/web-and-native/',
     reason:
-      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26.',
-    budget: { htmlGzipKb: 26 },
+      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom).',
+    budget: { htmlGzipKb: 26, pageGzipKb: 100 },
   },
   {
     route: '/gallery-themes/',

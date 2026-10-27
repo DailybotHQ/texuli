@@ -8,6 +8,7 @@
       "csp-report.spec.ts",
       "responsive-sweep.spec.ts",
       "site-docs-shell.spec.ts",
+      "site-drag-workflows.spec.ts",
       "site-editor.spec.ts",
       "texuli-polish.spec.ts"
     ],

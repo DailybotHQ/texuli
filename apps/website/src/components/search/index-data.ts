@@ -74,6 +74,33 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['charts', 'line', 'pie', 'heatmap', 'canvas', 'gallery'],
   },
   {
+    id: 'page-drag',
+    title: 'Drag and drop',
+    description:
+      'One general-purpose drag engine for sortable lists, boards, trees, canvases and graphs; keyboard and screen-reader ready.',
+    href: '/drag-page/',
+    kind: 'page',
+    keywords: ['drag', 'drop', 'sortable', 'board', 'tree', 'canvas', 'reorder'],
+  },
+  {
+    id: 'page-workflows',
+    title: 'Workflow editor',
+    description:
+      'An accessible workflow graph editor and viewer: typed ports, auto-layout, outline and minimap.',
+    href: '/workflows-page/',
+    kind: 'page',
+    keywords: ['workflow', 'graph', 'nodes', 'editor', 'pipeline', 'automation'],
+  },
+  {
+    id: 'page-json-preview',
+    title: 'JSON live preview',
+    description:
+      'Edit a blueprint, see validator diagnostics with paths, and render it at the untrusted tier.',
+    href: '/workflows-page/json/',
+    kind: 'page',
+    keywords: ['json', 'blueprint', 'player', 'validate', 'state', 'actions'],
+  },
+  {
     id: 'page-theme-studio',
     title: 'Theme studio',
     description: 'Generate a theme from color, words or image; tune roles; export CSS and JSON.',
