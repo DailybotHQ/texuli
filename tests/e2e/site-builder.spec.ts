@@ -165,12 +165,12 @@ test('keyboard: palette, JSON, outline moves, history, Tab order and F6 panes', 
   await expect(search).toHaveValue('');
   await expect(count).toHaveText(`${total} components`);
   // Growth the builder cannot insert is disabled, explained, and Enter inserts nothing.
-  await expect(page.locator('[data-palette-option="chat-thread"]')).toHaveAttribute(
+  await expect(page.locator('[data-palette-option="sortable-list"]')).toHaveAttribute(
     'aria-disabled',
     'true'
   );
   const rows = await page.getByRole('treeitem').count();
-  await search.fill('chat thread');
+  await search.fill('sortable list');
   await expect(search).not.toHaveAttribute('aria-activedescendant', /.+/);
   await search.press('ArrowDown');
   await search.press('Enter');
