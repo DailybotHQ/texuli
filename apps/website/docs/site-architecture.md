@@ -56,9 +56,15 @@ is in [site-subsite.md](site-subsite.md). Unit tests:
 ## Gates
 
 - `pnpm build` (website)
-- `tests/e2e/site-architecture.spec.ts`: metadata, docs shell, cross links,
-  every section (why both, the projections end to end, the layer diagrams,
-  portability, the honest status block and the TechArticle graph), the TOC
-  and axe with zero exclusions — no `test.fixme` left
-- IA reachability and docs-shell membership: `tests/e2e/site-ia.spec.ts`
-  (DOC_SHELL_ROUTES; every nav target resolves)
+- Content: `apps/website/tests/section-contracts.test.ts` (every cited claim
+  and excerpt is anchored in its file, the layer data matches the documented
+  and enforced graph, section links are real routes, honesty);
+  `apps/website/tests/site-build-guards.test.ts` (the TechArticle graph);
+  `apps/website/tests/docs-reading.test.ts` (one "On this page", no demo
+  navigation, reading text whole). The page has no spec of its own since the
+  2026-10-27 trim.
+- Built output: axe and polish in light and dark in the page sweep
+  (`tests/e2e/a11y-site.spec.ts`); its links in the built-site link audit and
+  its head in the SEO audit (`tests/e2e/site-seo.spec.ts`); docs-shell
+  membership in `tests/e2e/site-ia.spec.ts`; 360 and 768 px in
+  `tests/e2e/site-responsive.spec.ts`; a full Tab walk is not run on it

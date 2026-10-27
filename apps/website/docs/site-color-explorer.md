@@ -14,7 +14,7 @@ Explore any library theme’s:
 - **WCAG 2.x contrast pairs** (text 4.5:1 or 7:1 AAA, UI 3:1)
 - **Export** as CSS custom properties, JSON, or a Tailwind-oriented map
 
-Static after build. Theme CSS is inlined (same as the theme gallery). No runtime network. Axe clean in light and dark on desktop and Pixel 7.
+Static after build. Theme CSS is inlined (same as the theme gallery). No runtime network. Axe clean in light and dark (the page sweep).
 
 ## Components
 

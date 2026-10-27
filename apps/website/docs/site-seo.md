@@ -73,34 +73,34 @@ is reflected. Static hosts serve `404.html` for unknown paths.
 
 ## Verified
 
-`bash -c 'pnpm build && pnpm exec playwright test tests/e2e/site-seo.spec.ts'`
-(with `TEXULI_E2E_PORT` set to the lane port): **42 passed** on chromium,
-webkit and Pixel 7. The spec serves `dist/` like a static host, returning
-`404.html` with status 404 for unknown paths.
+`bash -c 'pnpm build && pnpm exec playwright test tests/e2e/site-seo.spec.ts --project chromium'`
+(with `TEXULI_E2E_PORT` set to the lane port): **2 passed** on chromium
+(2026-10-27, `ci/fast-5min`; before the trim: 20 tests per project). The
+spec serves `dist/` like a static host, returning `404.html` with status 404
+for unknown paths.
 
-- **Helpers** (run inside the spec):
+- **Helpers and builders** (Vitest, `apps/website/tests/site-build-guards.test.ts`):
   - path normalization with a base path; image file names; absolute URLs;
   - XML escaping, control characters included;
-  - the sitemap (sorted, deduplicated, escaped) and robots;
-  - meta reading with entities and `noindex`;
-  - wrapping with an ellipsis;
-  - hostile titles and descriptions produce no `<script>` or `<image>` in
-    the SVG.
-- **Output:**
-  - robots content;
-  - the sitemap equals the built pages minus the 404, exactly and once
-    each;
-  - every listed page has a real 1200 × 630 PNG (signature and IHDR
-    checked);
-  - head metadata on `/`, `/guides/theming/` and
-    `/component-pages/button/`: canonical, `og:*`, the twitter card, no
-    robots meta, the image served as `image/png`, no foreign requests.
-- **404:**
-  - an unknown path returns status 404 with the page;
-  - `noindex`, no canonical, no image tags; the path is not echoed;
-  - Home links to `/`; the skip link moves focus to `main`;
-  - axe is clean on the 404 and home pages in light and dark (scheme
-    emulated, `data-tx-mode` checked).
+  - the sitemap (sorted, deduplicated, escaped, lastmod validated) and robots;
+  - social-art areas; meta reading with entities and `noindex`; wrapping
+    with an ellipsis; hostile titles and descriptions produce no `<script>`
+    or `<image>` in the SVG;
+  - the library JSON-LD (Organization, WebSite with its SearchAction, a
+    pre-1.0 SoftwareApplication with no offers), the TechArticle graph, and
+    BreadcrumbList trails from the nav.
+- **Output** (the first test): `scripts/audit-seo.mjs` over the whole build
+  reports no critical finding (every indexed page's title, description,
+  canonical, Open Graph, Twitter card and JSON-LD; a real 1200 × 630 PNG per
+  page; the sitemap equals the indexed pages, with valid lastmod dates;
+  robots), `scripts/audit-aeo.mjs` likewise for the agent surfaces, and every
+  same-origin link in the built HTML resolves. The audits' rules are
+  unit-tested in `scripts/tests/audit-*.test.ts`.
+- **404** (the second test): an unknown path returns status 404 with the
+  page; `noindex`, no canonical, no image tags; the path is not echoed;
+  Home links to `/`; the skip link moves focus to `main`. axe on the 404
+  and home pages in light and dark runs in the page sweep
+  (`a11y-site.spec.ts`).
 
 ## Limits
 
@@ -118,12 +118,12 @@ webkit and Pixel 7. The spec serves `dist/` like a static host, returning
 
 | Addition | Where | Pinned by |
 | --- | --- | --- |
-| **JSON-LD.** `JsonLd.astro` renders code-authored data only (never page data or agent output). `/` carries Organization, WebSite with a SearchAction and SoftwareApplication (`libraryJsonLd` in `src/lib/schema.ts`; the version is read from the installed `texuli` manifest, the description says "in development", no `offers`). `/web-and-native/` carries a TechArticle. The CSP integration hashes the inline blocks automatically | `src/components/seo/JsonLd.astro`, `src/lib/schema.ts`, `BaseLayout`'s `jsonLd` prop | `tests/e2e/site-seo.spec.ts` |
-| **BreadcrumbList** on nested pages from the sidebar nav, plus the visible trail on docs pages ([site-subsite.md](site-subsite.md)) | `src/components/seo/breadcrumbs.ts` | `tests/e2e/site-seo.spec.ts` |
-| **Per-page `<lastmod>`** from `git log -1 --format=%cs` of the route's source (component and primitive pages also follow their manifests and sources) | `src/components/seo/integration.ts` | `tests/e2e/site-seo.spec.ts` |
-| **AI-crawler robots policy.** 16 named crawlers (`AI_CRAWLERS`), each allowed; no `Disallow`, no static `Content-Signal` (a per-agent header a static file cannot serve). The edge variant for strict parsers is in [site-aeo.md](site-aeo.md) | `src/components/seo/seo.ts` | `tests/e2e/site-seo.spec.ts`, `apps/website/tests/edge-middleware.test.ts` |
-| **Area badges on social images.** `ogAreaFor(path)` maps a route prefix to a section label and accent (Guides, Components, Primitives, Themes, Agents, Project, Native, Architecture); unmapped routes get the brand card. Labels only, no metrics | `src/components/seo/seo.ts` | `tests/e2e/site-seo.spec.ts` |
-| **Verification metas.** `google-site-verification` and `msvalidate.01` render only when `PUBLIC_GOOGLE_SITE_VERIFICATION` or `PUBLIC_BING_SITE_VERIFICATION` is set; absent by default | `src/lib/constances.ts`, `SeoHead.astro` | `apps/website/tests/analytics-client.test.ts`, `tests/e2e/site-seo.spec.ts` |
+| **JSON-LD.** `JsonLd.astro` renders code-authored data only (never page data or agent output). `/` carries Organization, WebSite with a SearchAction and SoftwareApplication (`libraryJsonLd` in `src/lib/schema.ts`; the version is read from the installed `texuli` manifest, the description says "in development", no `offers`). `/web-and-native/` carries a TechArticle. The CSP integration hashes the inline blocks automatically | `src/components/seo/JsonLd.astro`, `src/lib/schema.ts`, `BaseLayout`'s `jsonLd` prop | `apps/website/tests/site-build-guards.test.ts`; the SEO audit in `tests/e2e/site-seo.spec.ts` |
+| **BreadcrumbList** on nested pages from the sidebar nav, plus the visible trail on docs pages ([site-subsite.md](site-subsite.md)) | `src/components/seo/breadcrumbs.ts` | `apps/website/tests/site-build-guards.test.ts`, `apps/website/tests/docs-reading.test.ts` |
+| **Per-page `<lastmod>`** from `git log -1 --format=%cs` of the route's source (component and primitive pages also follow their manifests and sources) | `src/components/seo/integration.ts` | `apps/website/tests/site-build-guards.test.ts`; the SEO audit in `tests/e2e/site-seo.spec.ts` |
+| **AI-crawler robots policy.** 16 named crawlers (`AI_CRAWLERS`), each allowed; no `Disallow`, no static `Content-Signal` (a per-agent header a static file cannot serve). The edge variant for strict parsers is in [site-aeo.md](site-aeo.md) | `src/components/seo/seo.ts` | `apps/website/tests/site-build-guards.test.ts`, `apps/website/tests/edge-middleware.test.ts` |
+| **Area badges on social images.** `ogAreaFor(path)` maps a route prefix to a section label and accent (Guides, Components, Primitives, Themes, Agents, Project, Native, Architecture); unmapped routes get the brand card. Labels only, no metrics | `src/components/seo/seo.ts` | `apps/website/tests/site-build-guards.test.ts` |
+| **Verification metas.** `google-site-verification` and `msvalidate.01` render only when `PUBLIC_GOOGLE_SITE_VERIFICATION` or `PUBLIC_BING_SITE_VERIFICATION` is set; absent by default | `src/lib/constances.ts`, `SeoHead.astro` | `apps/website/tests/analytics-client.test.ts` |
 | **Offline audit.** `node scripts/audit-seo.mjs --dist apps/website/dist` checks titles, descriptions, canonicals, the OG and Twitter sets, JSON-LD validity, the PNG art, sitemap equality and the robots shape; critical findings exit non-zero. Its T-29 run: 550 pages, 0 critical, 33 warning (length bands and one duplicate-description pair), 4 planned | `scripts/audit-seo.mjs` | `scripts/tests/audit-seo.test.ts` |
 
 **Planned, not shipped:** `twitter:site` and `twitter:creator` (no handle

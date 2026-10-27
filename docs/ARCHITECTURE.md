@@ -223,7 +223,7 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
 | Change | Where | Gates |
 | --- | --- | --- |
 | A texel | `packages/core/src/<area>/` + `packages/core/tests/<area>.test.ts` | `pnpm check` (core is shared by every layer) |
-| A primitive | `packages/primitives/src/<name>/` + `tests/` + `tests/behavior/scenarios/<name>` | unit tests, behavior suite on three projects, `pnpm size` |
+| A primitive | `packages/primitives/src/<name>/` + `tests/` + `tests/behavior/scenarios/<name>` | unit tests, behavior suite on chromium and webkit (phone rows in a Pixel 7 context), `pnpm size` |
 | A styled component | `packages/texuli/src/components/<name>/` + an example in `packages/examples` + visual baselines | unit tests, `pnpm visual -g <example>` |
 | A website page | `apps/website/src/pages/`, `apps/website/src/components/` + `tests/e2e/site-*.spec.ts` | `pnpm build` + its site spec |
 | Edge behavior (middleware, analytics proxy) | `functions/` + its pure logic in `apps/website/src/lib/` + `apps/website/tests/` | `pnpm vitest run apps/website`, `pnpm build`, then a post-deploy header check |

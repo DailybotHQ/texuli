@@ -8,9 +8,9 @@
 (first-party proxy), `src/lib/bot-events.ts` + `functions/_middleware.ts`
 (server-side bot/markdown events), `src/lib/umami-skip.ts` (audit skip list)
 **Tasks:** PLAN_006 T-14 (config), T-34..T-39
-**Verification:** `tests/e2e/analytics.spec.ts` (default-off),
-`tests/e2e/analytics-fixture.spec.ts` (enabled path),
-`tests/e2e/analytics-csp.spec.ts` (enabled path under the enforced CSP)
+**Verification:** `tests/e2e/analytics.spec.ts` (two tests: default-off on
+every built route, and the enabled path under the enforced CSP against a
+fixture build)
 
 ## Purpose
 
@@ -118,24 +118,22 @@ path `/api/umami/script.js` with the collect endpoint `/api/umami`.
 ```bash
 pnpm build                     # default: analytics inert
 TEXULI_E2E_PORT=4939 pnpm exec playwright test tests/e2e/analytics.spec.ts --project=chromium
-PUBLIC_UMAMI_WEBSITE_ID=fixture-analytics-id pnpm build
-TEXULI_E2E_PORT=4942 pnpm exec playwright test tests/e2e/analytics-fixture.spec.ts --project=chromium
-pnpm build                     # restore the no-env dist
 
 # Enabled path under the enforced CSP, from a separate fixture build:
 PUBLIC_UMAMI_WEBSITE_ID=fixture-analytics-id pnpm --filter @texuli/website exec \
   astro build --outDir "$PWD/tmp/t100a-analytics-dist"
 TEXULI_ANALYTICS_DIST=tmp/t100a-analytics-dist TEXULI_E2E_PORT=4993 \
-  pnpm exec playwright test tests/e2e/analytics-csp.spec.ts --project=chromium
+  pnpm exec playwright test tests/e2e/analytics.spec.ts --project=chromium
 ```
 
-The fixture run proves: the mount tag carries the proxy src, a real
-browser injects from the same origin only, and the Lighthouse UA gets no
-injection. `analytics-csp.spec.ts` serves the build with its generated
-`_headers` policies. On a default build it proves that every route keeps
-`trusted-types svelte-trusted-html` only. On the fixture build it proves
-that the loader injects the tracker with zero CSP or Trusted Types
-violations and that the tracker runs.
+The spec serves the build with its generated `_headers` policies. On a
+default build it proves that no route mounts the loader or names
+`cloud.umami.is`, every route keeps `trusted-types svelte-trusted-html`
+only, and a real browser makes zero analytics requests (the enabled-path
+test skips). On the fixture build it proves that the mount tag carries the
+proxy attributes, the loader injects the tracker from the same origin with
+zero CSP or Trusted Types violations and the tracker runs, and the
+Lighthouse UA gets no injection.
 
 ## Ownership
 
@@ -159,9 +157,8 @@ violations and that the tracker runs.
 | Proxy allowlist, header stripping, 503 without an origin, 16 KB body cap, JSON-only beacons, no redirects followed | `apps/website/tests/umami-proxy.test.ts` |
 | Edge event classification, the silent default, 200-only page hits, path scrub and 256-character cap | `apps/website/tests/edge-middleware.test.ts` |
 | Surfaces wired to the catalog events | `apps/website/tests/umami-wiring.test.ts` |
-| Default build: zero analytics markup and requests | `tests/e2e/analytics.spec.ts` |
-| Fixture build: same-origin injection, Lighthouse skipped | `tests/e2e/analytics-fixture.spec.ts` |
-| Built headers: Trusted Types allowance follows the mount; fixture build: zero violations under the enforced CSP | `tests/e2e/analytics-csp.spec.ts` |
+| Built headers: Trusted Types allowance follows the mount; default build: zero analytics markup and requests | `tests/e2e/analytics.spec.ts` (first test) |
+| Fixture build: same-origin injection with zero violations under the enforced CSP, Lighthouse skipped | `tests/e2e/analytics.spec.ts` (second test) |
 
 ```bash
 pnpm vitest run apps/website/tests/analytics-client.test.ts apps/website/tests/umami-proxy.test.ts apps/website/tests/edge-middleware.test.ts

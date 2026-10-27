@@ -2,8 +2,9 @@
 
 **App:** `apps/website` + root `functions/`
 **Tasks:** PLAN_006 T-22..T-28 (surfaces), T-30 (audit)
-**Specs:** `tests/e2e/site-aeo.spec.ts` (built `dist/`), unit tests in
-`apps/website/tests/` (edge logic), `scripts/tests/audit-aeo.test.ts`
+**Specs:** `tests/e2e/site-seo.spec.ts` runs the AEO audit on the built
+`dist/`; unit tests in `apps/website/tests/` (edge logic, discovery files),
+`scripts/tests/audit-aeo.test.ts`
 
 ## Purpose
 
@@ -76,20 +77,24 @@ to every docs-class route that has a twin (see [site-csp.md](site-csp.md)).
 
 | Behavior | Pinned by |
 | --- | --- |
-| `/llms.txt` is a physical `text/plain` file that byte-equals the generator output; every area has a section; every link resolves | `tests/e2e/site-aeo.spec.ts` |
-| Every docs-class page has a twin; the manifest matches; sampled twins are well-formed Markdown with absolute links; component twin ids equal the llms component-doc ids | `tests/e2e/site-aeo.spec.ts` |
-| The `.well-known` files parse, their on-site URLs resolve, the server card names exactly the shipped tools, the skill digests match | `tests/e2e/site-aeo.spec.ts` |
+| `/llms.txt` byte-equals the generator output | `scripts/tests/site-loaders.test.ts` |
+| `/llms.txt` has a section per area; the built copy is a real file (not a redirect stub) and every link resolves | `apps/website/tests/site-build-guards.test.ts`; the AEO audit in `tests/e2e/site-seo.spec.ts` |
+| Every docs-class page has a twin and a manifest entry | the AEO audit in `tests/e2e/site-seo.spec.ts` |
+| The Markdown rendition keeps content, drops controls and hidden text, and writes one separator row per table | `apps/website/tests/docs-reading.test.ts`, `apps/website/tests/edge-middleware.test.ts` |
+| Component twin ids equal the llms component-doc ids | `scripts/tests/check-llms-parity.test.ts` |
+| The `.well-known` files describe only real surfaces and the server card names exactly the shipped tools | `apps/website/tests/site-build-guards.test.ts` |
+| The built `.well-known` files parse, their on-site URLs resolve and the skill digests match | the AEO audit in `tests/e2e/site-seo.spec.ts` |
 | Negotiation decision table, the middleware wrapper over a stubbed `ASSETS`, the untouched pass-through and the `_headers` `Vary: Accept` line | `apps/website/tests/edge-middleware.test.ts` |
 | Agent classification and problem JSON | `apps/website/tests/edge-middleware.test.ts` |
 | Robots variant stripping, pinned against the shipped `buildRobots` output | `apps/website/tests/edge-middleware.test.ts` |
-| The robots policy and the sitemap | `tests/e2e/site-seo.spec.ts` |
+| The robots policy and the sitemap | `apps/website/tests/site-build-guards.test.ts`; the SEO audit in `tests/e2e/site-seo.spec.ts` |
 | Offline audit of the whole surface (critical / warning / planned) | `scripts/tests/audit-aeo.test.ts`; real run below |
 | Catalog ids, twins, llms docs and examples reconcile | `scripts/tests/check-llms-parity.test.ts` |
 
 ```bash
 pnpm vitest run apps/website/tests/edge-middleware.test.ts
 pnpm build
-TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-aeo.spec.ts --project=chromium
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-seo.spec.ts --project=chromium
 pnpm exec tsx scripts/check-llms-parity.ts
 ```
 

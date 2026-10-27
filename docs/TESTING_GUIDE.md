@@ -50,30 +50,36 @@ against its 152 KB budget.
 
 | Gate | Command | Result on 2026-10-24 |
 | --- | --- | --- |
-| Smoke | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/smoke.spec.ts` | 3 passed, one per project (7 s) |
-| Behavior suite, one primitive | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/dialog.spec.ts` | 2 passed (Chromium and WebKit: one test per primitive and project runs its 5 rows), 1 skipped (the Pixel 7 runs only phone-specific rows) (5 s, 2026-10-27) |
-| Behavior suite, every primitive | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior` (add `TEXULI_PERF=1` for the open-to-focus limits; report with `pnpm exec tsx tests/behavior/harness/limits-cli.ts`) | 125 passed, 0 failed, 28 skipped by design (153 tests: one per primitive and project; 79 s on a 10-core machine, 2026-10-27, test trim) |
+| Behavior suite, one primitive | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/dialog.spec.ts` | 2 passed (Chromium and WebKit: one test per primitive and project runs its 5 rows; none is phone-specific, so no Pixel 7 rows) (2026-10-27) |
+| Behavior suite, every primitive | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior` (add `TEXULI_PERF=1` for the open-to-focus limits; report with `pnpm exec tsx tests/behavior/harness/limits-cli.ts`) | 91 passed, 0 failed, 0 skipped (47 Chromium, 44 WebKit: one test per primitive and project; the phone-specific rows run inside the Chromium test in a Pixel 7 context; the pure harness rules are Vitest, `scripts/tests/behavior-harness.test.ts`; 5.8 min at load average ~70 on a 10-core machine, 2026-10-27, `ci/fast-5min`). Before: 153 tests (125 passed, 28 skipped) |
 | Visual, one example | `TEXULI_E2E_PORT=<port> pnpm visual -g texuli-toast` | 8 capture sets, no changes (12 s) |
 | Visual, everything | `TEXULI_E2E_PORT=<port> pnpm visual` (`pnpm visual:update` to rebaseline; review the PNGs) | not re-run for this guide |
 | Consumer apps (Vite, Astro, SvelteKit) | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/consumers/consumers.spec.ts --project=chromium` | 7 passed: Vite, Astro and SvelteKit × plain/Tailwind install the packed tarballs, build and render (2.4 min) |
 | Consumer apps against the npm registry | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/consumers/consumers-registry.spec.ts --project=chromium` | 7 passed: the six consumers install the published `0.1.0-next.1` from registry.npmjs.org, build and render (53 s; contacts the network) |
-| Strict CSP and Trusted Types | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/csp.spec.ts` | 21 passed, 1 skipped (the WebKit-only canary) on chromium, every example in batches of 12 per test, in the full e2e run of 2026-10-27; WebKit and the Pixel 7 not re-run since the trim (earlier: 406 passed, 2 skipped across the three projects, FIX-dev-red re-run) |
+| Strict CSP and Trusted Types | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/csp.spec.ts --project chromium` | 6 passed on chromium (2026-10-27, `ci/fast-5min`): the enforcement probes (plus the WebKit select canary when run on WebKit), the built site's islands under their page policies, and every registered example in four batches, about 30 s each. The package-source sink scan moved to `scripts/tests/layers.test.ts`, the hash and route checks to `apps/website/tests/site-build-guards.test.ts`; every built route's headers are `pnpm --filter @texuli/website check:csp`. WebKit and the Pixel 7 not re-run since the trim (earlier: 406 passed, 2 skipped across the three projects, FIX-dev-red re-run) |
+| Fixture-app, a11y and security specs (everything in `tests/e2e` except `site-*.spec.ts`) | `TEXULI_E2E_PORT=<port> pnpm exec playwright test <the 18 spec files> --project chromium` (Playwright also takes a path regex that excludes `site-`) | 2026-10-27, `ci/fast-5min`, chromium: 38 passed, 1 skipped (the analytics enabled path, which needs a fixture build; it passed separately against one), 4.5 min wall while the load average rose from 25 to 87 on a 10-core machine (other lanes were running). Before the trim: 191 tests in 37 files. Each test walks several pages or examples in one page session; checks that need no browser moved to Vitest |
 | SSR and hydration | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/ssr.spec.ts --project=chromium` | 1 passed (21 s) |
 | Website build | `pnpm build` | exit 0: `astro check` 0 errors, then the static build (142 s) |
-| A website spec (after `pnpm build`) | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-seo.spec.ts --project=chromium` | 45 passed on the three projects (FIX-dev-red re-run) |
+| A website spec (after `pnpm build`) | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-seo.spec.ts --project=chromium` | 2 passed (2026-10-27, `ci/fast-5min`): the offline SEO and AEO audits of the whole build plus an internal-link check, and the 404 page |
+| Website specs (`site-*.spec.ts` except `site-perf`, after `pnpm build`) | `TEXULI_E2E_PORT=<port> pnpm exec playwright test <the 27 spec files> --project chromium` | 2026-10-27, `ci/fast-5min`, chromium: 35 passed in 27 files, 88 s wall with 5 local workers. Before the trim: 322 tests in 40 files. Each test walks one page session through its routes and states; static checks (content, metadata, JSON-LD, sitemap and robots helpers, discovery files, navigation data, reference-page data, skill-page parsing) moved to Vitest in `apps/website/tests/` |
 | Website budgets (after `pnpm build`) | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-perf.spec.ts --project=chromium` | 10 passed (34 s) |
 
-PLAN_006 added and extended website browser coverage in these files:
-`site-seo.spec.ts` (structured data, breadcrumbs, sitemap/robots, OG art and
-verification metadata), `site-aeo.spec.ts` (llms.txt, Markdown twins,
-parity-facing output and `.well-known` files), `site-ia.spec.ts`,
-`site-landing.spec.ts`, `site-native.spec.ts`, `site-architecture.spec.ts`,
-`site-brand.spec.ts`, `site-keyboard.spec.ts` (keyboard walk per page class:
-20 passed in T-98) and `site-responsive.spec.ts` (overflow and target sizes at
-phone and desktop widths: 51 passed in T-98). Analytics checks are in
-`analytics.spec.ts`, `analytics-fixture.spec.ts` and `analytics-csp.spec.ts`
-(per-route Trusted Types policy names; its browser half needs a fixture
-build); CSP coverage is in `csp.spec.ts` and `csp-report.spec.ts`. Run the
+Website browser coverage after the 2026-10-27 trim: `site-seo.spec.ts` runs
+the offline SEO and AEO audits (`scripts/audit-seo.mjs`, `scripts/audit-aeo.mjs`)
+on the whole build, so every indexed page's head, JSON-LD, social image,
+the sitemap, robots, llms.txt, the Markdown twins and the `.well-known` files
+are checked, plus every same-origin link in the built HTML; the helpers
+behind them are unit-tested in `apps/website/tests/site-build-guards.test.ts`.
+`site-ia.spec.ts`, `site-landing.spec.ts`, `site-keyboard.spec.ts` (a full Tab
+walk on five page classes and the tool shortcuts) and `site-responsive.spec.ts`
+(overflow at 360 and 768 px on 17 page classes, the landing header
+breakpoints and target sizes) hold the layout and keyboard checks; the native,
+architecture, brand, agents, evidence, showcase, skill and primitives
+reference pages have no spec of their own (their content and data are
+Vitest, their axe and polish run in `a11y-site.spec.ts`). Analytics checks are in
+`analytics.spec.ts` (per-route Trusted Types policy names and the default-off
+build; its enabled-path test needs a fixture build); CSP coverage is in
+`csp.spec.ts` and `csp-report.spec.ts`. Run the
 relevant spec after `pnpm build`. The plan's `PROGRESS.md` and T-18–T-39
 task logs under `.dwp/plans/PLAN_006_website_marketing_seo_analytics/` are
 local plan evidence (git-ignored); the results that matter are stated here.
@@ -147,11 +153,11 @@ then the package, then its consumers (the layers above it).
 | attributes of styled form components (`packages/texuli/src/internal/control-props.ts`) | `pnpm vitest run packages/texuli/tests/forms.test.ts -t control-aria` | `tests/e2e/a11y-forms.spec.ts` |
 | `packages/texuli/src/components/<name>/` | `pnpm vitest run packages/texuli -t '^<name> '` (forms, overlays, display, navigation, contracts) | `pnpm visual -g <example-id>` (the examples in `packages/examples/src/<name>/`); the a11y sweeps in `tests/e2e/a11y-{forms,display,overlays}.spec.ts` |
 | `packages/texuli/src/layouts/<layout>/` | `pnpm vitest run packages/texuli/tests/layouts.test.ts -t '^layouts-<layout> '` (or `-t '^layout-host'`) | `pnpm visual -g layouts-<layout>`; `tests/e2e/layouts-app.spec.ts` |
-| `packages/charts/src/<family>/` and `src/math/layout/` | `pnpm vitest run packages/charts/tests/<family>.test.ts packages/charts/tests/math.test.ts` | `tests/e2e/charts.spec.ts` and `tests/e2e/charts-families.spec.ts` (tooltips, legend toggles, `visibleDomain` windows, keyboard data tables, canvas renderer, RTL) and `tests/e2e/charts-worker.spec.ts`; `tests/e2e/domain-polish.spec.ts` (charts lay out at their measured width, phone widths); consumers: `vite-plain` builds the worker entry; `pnpm visual -g charts-<family>`; perf: `tests/perf/charts-large-data.test.ts` (`pnpm test:perf`) |
-| `packages/data/src/<view>/` | `pnpm vitest run packages/data/tests/<view>.test.ts` | `pnpm visual -g data-<view>`; `tests/e2e/a11y-display.spec.ts`; `tests/e2e/domain-polish.spec.ts` (calendar week view on phones, narrow grids); perf: `pnpm test:perf` |
-| `packages/media/src/<area>/` | `pnpm vitest run packages/media/tests/<area>.test.ts` | `pnpm visual -g media-<area>`; `tests/e2e/a11y-display.spec.ts -g media`; `tests/e2e/domain-polish.spec.ts` (waveform spans the player, video controls) |
+| `packages/charts/src/<family>/` and `src/math/layout/` | `pnpm vitest run packages/charts/tests/<family>.test.ts packages/charts/tests/math.test.ts` | `tests/e2e/charts.spec.ts` (pointer tooltips in LTR and RTL, RTL label geometry, forced colors, a real module worker; every family at 320px: text size and keyboard data tables) |
+| `packages/data/src/<view>/` | `pnpm vitest run packages/data/tests/<view>.test.ts` | `pnpm visual -g data-<view>`; `tests/e2e/a11y-display.spec.ts`; `tests/e2e/data.spec.ts` (grid editing and 100,000-row windowing under real scrolling, calendar pointer moves and first-frame scroll, phone layouts, board move menu); perf: `pnpm test:perf` |
+| `packages/media/src/<area>/` | `pnpm vitest run packages/media/tests/<area>.test.ts` | `pnpm visual -g media-<area>`; `tests/e2e/a11y-display.spec.ts`; `tests/e2e/texuli-polish.spec.ts` (waveform spans the player, video controls) |
 | `packages/editor/src/**` | `pnpm vitest run packages/editor` | `pnpm visual -g " editor-"`; `pnpm size --filter @texuli/editor` |
-| `packages/chat/src/**` | `pnpm vitest run packages/chat` | `tests/e2e/chat-thread.spec.ts`, `tests/e2e/chat-composer.spec.ts` |
+| `packages/chat/src/**` | `pnpm vitest run packages/chat` | `tests/e2e/chat.spec.ts` |
 | `packages/blocks/src/<family>/` | `pnpm vitest run packages/blocks/tests/<family>.test.ts` | `pnpm visual -g blocks-<family>`; perf: `pnpm test:perf` (code, text) |
 | `packages/slides/src/**` | `pnpm vitest run packages/slides` | `tests/e2e/a11y-slides.spec.ts`, `tests/e2e/site-slides.spec.ts` |
 | `packages/player/src/**` | `pnpm vitest run packages/player` | `tests/e2e/site-builder.spec.ts` |
@@ -168,12 +174,12 @@ then the package, then its consumers (the layers above it).
 | `scripts/visual.ts`, `tests/visual/**` | `pnpm vitest run scripts/tests/visual.test.ts` | `pnpm visual -g <example-id>` |
 | `scripts/supply-chain.ts` | `pnpm vitest run scripts/tests/supply-chain.test.ts` | — |
 | `tests/consumers/**` | `pnpm vitest run scripts/tests/consumers-harness.test.ts` | `tests/consumers/consumers.spec.ts` and `tests/consumers/consumers-registry.spec.ts` |
-| `apps/website/src/components/<area>/`, `pages/<area>/` | `pnpm vitest run scripts/tests/site-<area>.test.ts` where one exists, and `pnpm vitest run apps/website` | `pnpm build`, then `tests/e2e/site-<area>.spec.ts` (every area has one; design notes in `apps/website/docs/site-<area>.md`) |
+| `apps/website/src/components/<area>/`, `pages/<area>/` | `pnpm vitest run scripts/tests/site-<area>.test.ts` where one exists, and `pnpm vitest run apps/website` | `pnpm build`, then `tests/e2e/site-<area>.spec.ts` where the area has browser behavior (static pages have none: their data is Vitest and their axe runs in `tests/e2e/a11y-site.spec.ts`); design notes in `apps/website/docs/site-<area>.md` |
 | `apps/website` layout, nav, SEO (indexed pages only; previews are noindex), perf | `pnpm vitest run scripts/tests/site-loaders.test.ts apps/website/tests/docs-reading.test.ts` | `tests/e2e/site-{docs-shell,docs-nav,seo,perf}.spec.ts`; every page: `tests/e2e/a11y-site.spec.ts` |
-| `apps/website` SEO metadata, sitemap, robots and OG output | `pnpm vitest run apps/website/tests/analytics-client.test.ts apps/website/tests/site-build-guards.test.ts` (verification metas, JSON-LD escaping, sitemap lastmod) | `tests/e2e/site-seo.spec.ts`; offline built-output audit: `node scripts/audit-seo.mjs --dist apps/website/dist` (T-29 exit 0; see the gate table above) |
-| `apps/website` agent discovery, llms.txt and Markdown twins | `pnpm vitest run apps/website` | `tests/e2e/site-aeo.spec.ts`; `pnpm exec tsx scripts/check-llms-parity.ts`; `node scripts/audit-aeo.mjs --dist apps/website/dist` (T-30 exit 0; both audits are opt-in after build) |
-| `apps/website` analytics loader, proxy and event wiring | `pnpm vitest run apps/website` | `tests/e2e/analytics.spec.ts` (default-off) and `tests/e2e/analytics-fixture.spec.ts` (enabled fixture); T-39 recorded 5/5 and 3/3 respectively. `tests/e2e/analytics-csp.spec.ts` checks the Trusted Types policy names per route. Fixture build requires `PUBLIC_UMAMI_WEBSITE_ID=fixture-analytics-id` |
-| `apps/website` landing and platform pages | `pnpm vitest run apps/website` | `tests/e2e/site-landing.spec.ts`, `tests/e2e/site-native.spec.ts`, `tests/e2e/site-architecture.spec.ts`, `tests/e2e/site-ia.spec.ts`, `tests/e2e/site-brand.spec.ts`, `tests/e2e/site-keyboard.spec.ts`, `tests/e2e/site-responsive.spec.ts` |
+| `apps/website` SEO metadata, sitemap, robots and OG output | `pnpm vitest run apps/website/tests/analytics-client.test.ts apps/website/tests/site-build-guards.test.ts` (verification metas, JSON-LD builders and escaping, sitemap, robots and social-art helpers, sitemap lastmod) | `tests/e2e/site-seo.spec.ts` (runs `scripts/audit-seo.mjs` on the build); the same audit by hand: `node scripts/audit-seo.mjs --dist apps/website/dist` |
+| `apps/website` agent discovery, llms.txt and Markdown twins | `pnpm vitest run apps/website` (the committed `.well-known` files and llms.txt sections: `site-build-guards.test.ts`) | `tests/e2e/site-seo.spec.ts` (runs `scripts/audit-aeo.mjs` on the build); `pnpm exec tsx scripts/check-llms-parity.ts`; the same audit by hand: `node scripts/audit-aeo.mjs --dist apps/website/dist` |
+| `apps/website` analytics loader, proxy and event wiring | `pnpm vitest run apps/website` | `tests/e2e/analytics.spec.ts`: per-route Trusted Types policy names and the default-off build (no markup, no requests); its enabled-path test runs only against a fixture build (`PUBLIC_UMAMI_WEBSITE_ID=fixture-analytics-id`, see `apps/website/docs/site-analytics.md`) |
+| `apps/website` landing and platform pages | `pnpm vitest run apps/website` | `tests/e2e/site-landing.spec.ts`, `tests/e2e/site-ia.spec.ts`, `tests/e2e/site-keyboard.spec.ts`, `tests/e2e/site-responsive.spec.ts` (the native and architecture pages' content is `apps/website/tests/section-contracts.test.ts`) |
 | `functions/_middleware.ts`, `functions/api/umami/[[path]].ts`, `functions/_lib/` (Cloudflare Pages Functions) | `pnpm vitest run apps/website/tests/edge-middleware.test.ts apps/website/tests/umami-proxy.test.ts` | Type-checked through the website tests that import them (`pnpm --filter @texuli/website typecheck`); the real Pages runtime is checked only after a deploy ([CI](CI.md#website-deployment-texulicom)) |
 | `apps/agent/**` (agent service) | `pnpm --filter @texuli/agent exec vitest run` (not collected by `pnpm test`) | `pnpm --filter @texuli/agent typecheck`; `tests/e2e/site-agent-chat.spec.ts`; evals: `pnpm exec tsx apps/agent/evals/run.ts` |
 | `native/**` (Kotlin Multiplatform twin) | — | `./native/gradlew -p native check` (JDK 21; not in CI) |
@@ -181,7 +187,7 @@ then the package, then its consumers (the layers above it).
 | `scripts/audit-seo.mjs`, `scripts/audit-aeo.mjs` | `pnpm vitest run scripts/tests/audit-seo.test.ts scripts/tests/audit-aeo.test.ts` | After a website build, run each offline audit against `apps/website/dist`; the PLAN_006 runs (results in the gate table above) are recorded in `analysis_results/29.task_seo-audit-script.md` and `analysis_results/30.task_aeo-verify-script.md` (local plan evidence, git-ignored) |
 | `scripts/check-llms-parity.ts` | `pnpm vitest run scripts/tests/check-llms-parity.test.ts` | `pnpm exec tsx scripts/check-llms-parity.ts`; T-24 recorded exit 0 and reconciled the component docs, twins and example registry |
 | `scripts/theme-sweep.ts` | `pnpm vitest run scripts/tests/theme-sweep.test.ts` | Static helper only; there is no durable CLI. T-77 used a temporary runner (14/14 sample and 210/210 full cells, no red cells); findings and the browser-measurement boundary are in `analysis_results/themes-sweep-findings.md` (local plan evidence, git-ignored) |
-| `scripts/generate-site-llms.ts` | `pnpm vitest run packages/tools/tests/llms-site.test.ts` | `pnpm exec tsx scripts/generate-site-llms.ts` regenerates the checked-in root `llms.txt`; built output freshness is checked by `tests/e2e/site-aeo.spec.ts` |
+| `scripts/generate-site-llms.ts` | `pnpm vitest run packages/tools/tests/llms-site.test.ts` | `pnpm exec tsx scripts/generate-site-llms.ts` regenerates the checked-in root `llms.txt`; its freshness is checked by `scripts/tests/site-loaders.test.ts` and the built copy by the AEO audit in `tests/e2e/site-seo.spec.ts` |
 | root config (`package.json`, `tsconfig.base.json`, `biome.json`, `vitest.config.ts`, `playwright.config.ts`) | `pnpm check` | `pnpm build` and the smoke spec |
 
 ### Finding consumers
@@ -248,7 +254,7 @@ suite and `pnpm build`.
 | Code is clean | `pnpm lint` and `pnpm typecheck` exit 0 |
 | Behavior holds | `pnpm test` (or a scoped `pnpm vitest run <path>`) passes with a non-empty selection |
 | Layers hold | `pnpm check:layers` prints the ✓ line |
-| Primitives behave | `tests/behavior` passes on all three projects |
+| Primitives behave | `tests/behavior` passes (Chromium and WebKit, phone rows in a Pixel 7 context) |
 | Looks right | `pnpm visual` reports no changes |
 | Fits its budget | `pnpm size` reports every entry within budget |
 | Ships cleanly | `pnpm verify:packages` passes |

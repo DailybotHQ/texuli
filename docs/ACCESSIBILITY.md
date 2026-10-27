@@ -67,12 +67,13 @@ Otherwise a dark theme's light text is measured on a white Canvas.
 
 ## Site sweep
 
-`tests/e2e/a11y-site.spec.ts` runs axe with zero exclusions, in light and
-dark, on up to four evenly spaced pages of each route group of the built
-sitemap (the pages of a group share a template; the components of the large
-`/examples/…` and `/component-pages/…` groups are also checked by the
-fixture-app sweeps `a11y-*.spec.ts`); forced colors and a keyboard-only walk
-run on one page per route group.
+`tests/e2e/a11y-site.spec.ts` runs axe with zero exclusions in light, dark
+and forced colors, the polish check and a keyboard-only walk on one page of
+each route group of the built sitemap, plus the 404 (the pages of a group
+share a template; the components of the large `/examples/…` and
+`/component-pages/…` groups are also checked in light and dark by the
+fixture-app sweeps `a11y-*.spec.ts`, which axe every listed example in
+light and dark in a few tests, one page session each).
 Findings in package code are fixed in the component, never excluded or
 overridden at page level.
 

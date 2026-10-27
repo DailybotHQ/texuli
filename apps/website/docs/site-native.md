@@ -57,10 +57,13 @@ No lorem, no fake screenshots, no dates presented as promises, no
 ## Gates
 
 - `pnpm build` (website)
-- `tests/e2e/site-native.spec.ts`: real assertions since T-48 —
-  metadata, hero + status honesty, the runtime story, the spec seam and
-  roadmap, section order, the heading ladder and IA reachability, all
-  against the built HTML
+- Content: `apps/website/tests/section-contracts.test.ts` (the hero, status
+  ledger, runtime story and evidence content modules: claims anchored in
+  their files, links that are real routes, honesty); the status separator in
+  `apps/website/tests/docs-reading.test.ts`. The page has no spec of its own
+  since the 2026-10-27 trim; its head is in the SEO audit and its links in
+  the link audit (`tests/e2e/site-seo.spec.ts`), and it fits 360 and 768 px,
+  right to left too (`tests/e2e/site-responsive.spec.ts`)
 - IA reachability: `tests/e2e/site-ia.spec.ts` (landing-shell route #2;
   one interaction from the home header)
 - a11y: covered by the sitewide sweep (`tests/e2e/a11y-site.spec.ts`,

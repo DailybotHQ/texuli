@@ -4,7 +4,7 @@
  * pattern it follows. Build-time data only.
  *
  * Every part is the name you import: `Tooltip.Trigger` for a compound object,
- * or a named export such as `Root`. `tests/e2e/site-primitives-page.spec.ts`
+ * or a named export such as `Root`. `apps/website/tests/component-pages.test.ts`
  * resolves each one against the package's real exports, so an anatomy cannot
  * name a part that does not exist.
  */

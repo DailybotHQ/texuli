@@ -198,9 +198,10 @@ actions are keyboard-operable buttons that select and focus the matching
 outline row. For pane order, keyboard operation and focus restoration, see
 the Keyboard navigation section.
 
-Automated checks cover Chromium and the configured mobile browser project,
-including axe in light, dark and forced-colors modes. WebKit, Firefox and a
-recorded screen-reader transcript are not covered.
+Automated browser checks run on Chromium (the website suite's project),
+including axe in light, dark and forced-colors modes on the bare page (the
+page sweep) and on edited inspector states (the builder spec). WebKit,
+Firefox and a recorded screen-reader transcript are not covered.
 
 ## Inspector: text blocks
 
@@ -743,6 +744,63 @@ spec drags. The browser spec:
 - walks Tab and Shift+Tab across the panes;
 - cycles them with F6 and Shift+F6, including restoring the last focus;
 - moves list items, gallery images and chart points from the keyboard.
+
+**Not covered yet:** Home/End in the palette list, and a screen-reader pass
+of the announcements.
+
+## Visual baselines
+
+The builder island has visual baselines (Task 77): the `builder` and
+`builder-draft` fixture pages, in light and dark, on desktop and the Pixel 7,
+plus 360 px (see [tests/visual/README.md](../../../tests/visual/README.md)).
+`BuilderApp` takes optional `initial` (a draft) and `initialSelection` (a
+path) props for that fixture. The site page passes neither, so it still
+opens an empty draft.
+
+The baselines showed the inspector offering a `class` field, which the closed
+rule always refuses, so typing in it could only fail. `inspectorFields` (in
+`model.ts`) now hides slots, events and every name the rule refuses (`class`,
+`style`, `on*`).
+
+## Validation
+
+```bash
+pnpm vitest run scripts/tests/site-builder.test.ts scripts/tests/site-builder-dom.test.ts scripts/tests/site-builder-roundtrip.property.test.ts
+pnpm --filter @texuli/website typecheck
+pnpm build
+TEXULI_E2E_PORT=4898 pnpm exec playwright test tests/e2e/site-builder.spec.ts
+```
+
+The browser spec (`tests/e2e/site-builder.spec.ts`, 3 tests since the
+2026-10-27 trim, each a page session with a fresh load per segment) covers:
+- **keyboard**: palette search, arrow selection and insert, and the disabled
+  Tier U entries; Ctrl/Cmd+Enter committing canonical JSON to the player and
+  a parse error that changes nothing; Alt+Arrow outline moves with their
+  announcements and a refused move; Cmd/Ctrl+Z and Shift+Cmd/Ctrl+Z with
+  their announcements and the restored selection; the swapped horizontal
+  keys in a right-to-left page; the Tab order through the panes with no
+  trap or dead stop; F6 and Shift+F6 cycling the panes and restoring the
+  last focus; list items moved with Alt+Arrow, focus following the item;
+- **inspector and payload**: a text block edited through the rich text
+  editor (one coalesced undo step, a refused link explained), axe while it
+  is open; a refused text that names its line and moves the caret there;
+  uncommitted JSON surviving an outline edit; duplicate keys; player
+  diagnostics selecting their node; a refused boolean cleared, a refused
+  enum fixed, number fields with refused, out-of-range and non-finite values,
+  a chart structure edited field by field, and media URL verdicts at the
+  untrusted tier, with axe on the media inspector;
+- **pointer, preview and share**: a drag into a card, a drag cancelled with
+  Escape, a refused drop, duplicate, copy and paste, a multi-selection
+  dragged together, the starters as undoable steps with the mounted player
+  updated in place, the width switcher's real stage widths, the color mode
+  scoped to the preview, a share link restoring the exact draft and view in
+  a new page with no network request, a damaged link, and a touch drag from
+  the grip handle.
+
+The inspector rules for every field kind, the list focus rules, the F6
+order and the outline operations are unit-tested
+(`scripts/tests/site-builder*.test.ts`); axe on the bare page in light, dark
+and forced colors runs in the page sweep (`a11y-site.spec.ts`).
 
 **Not covered yet:** Home/End in the palette list, and a screen-reader pass
 of the announcements.

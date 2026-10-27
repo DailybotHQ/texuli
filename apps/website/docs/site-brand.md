@@ -3,7 +3,7 @@
 **App:** `apps/website`  
 **Pages:** `/` (home), `/brand/`  
 **Components:** `src/components/brand/`  
-**Tests:** `tests/e2e/site-brand.spec.ts`
+**Tests:** `apps/website/tests/brand.test.ts`; axe and polish in the page sweep, `tests/e2e/a11y-site.spec.ts`
 
 ## Goal
 
@@ -13,7 +13,7 @@ Home and brand pages tell the Texuli story:
 - **Texels → Texuli → Interfaces** with live Button, Badge and Card (SSR)
 - What Texuli is, why owned primitives, why agents
 - Live demos of real components
-- Static output, no runtime network, axe clean in light and dark (desktop + Pixel 7)
+- Static output, no runtime network, axe clean in light and dark (the page sweep)
 
 ## Components
 
@@ -33,7 +33,10 @@ Motion is CSS-only (`prefers-reduced-motion: reduce` disables it). No client isl
 ## Validation
 
 ```bash
-bash -c 'pnpm build && TEXULI_E2E_PORT=4930 pnpm exec playwright test tests/e2e/site-brand.spec.ts'
+pnpm vitest run apps/website/tests/brand.test.ts
+pnpm build
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts
 ```
 
-The spec serves `apps/website/dist` on a free port (same pattern as site-foundation).
+The brand page has no spec of its own since the 2026-10-27 trim: its assets and
+surfaces are unit-tested, and the sweep serves `apps/website/dist` for axe.

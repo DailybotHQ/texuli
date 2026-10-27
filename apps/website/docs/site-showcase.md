@@ -2,7 +2,7 @@
 
 **App:** `@texuli/website` (`apps/website`)  
 **Paths:** `/showcase/` and `/showcase/<screen>/`  
-**E2E:** `tests/e2e/site-showcase.spec.ts`
+**Tests:** `apps/website/tests/gallery.test.ts` (screens and hero curation); axe and polish in the page sweep, `tests/e2e/a11y-site.spec.ts`
 
 ## Goal
 
@@ -36,9 +36,9 @@ Static Astro output. Fictional Harbor Notes copy. **No runtime network** after l
 
 ```bash
 pnpm build
-TEXULI_E2E_PORT=4920 pnpm exec playwright test tests/e2e/site-showcase.spec.ts
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts
 ```
 
-The spec serves `apps/website/dist` on an ephemeral port, asserts routes, no
-foreign origins, and axe (WCAG 2.x A/AA) in light and dark on desktop Chromium
-and Pixel 7.
+The showcase has no spec of its own since the 2026-10-27 trim: the sweep runs
+axe (zero exclusions), the polish check in light and dark, forced colors and a
+keyboard walk on the showcase index (one page per route group), and `site-responsive.spec.ts` checks the index at 360 and 768 px.

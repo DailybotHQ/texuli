@@ -3,14 +3,14 @@
 **App:** `apps/website`  
 **Paths:** `/evidence/`, evidence strip on `/component-pages/<id>/`  
 **Surface:** `src/components/evidence/`, `src/pages/evidence/`  
-**E2E:** `tests/e2e/site-evidence.spec.ts`  
+**Tests:** `scripts/tests/site-loaders.test.ts` (evidence loaders); the strip renders on every component page the sweep visits, `tests/e2e/a11y-site.spec.ts`  
 **Unit:** `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
 Show **behavior checks**, **gzip size**, **axe**, and **browser matrix** on every
 component page from the latest committed gates. Static HTML after build. No
-runtime network. Axe clean in light and dark on desktop and Pixel 7.
+runtime network. Axe clean in light and dark (the page sweep).
 
 ## What each strip includes
 
@@ -39,5 +39,6 @@ Snapshots are dated (`EVIDENCE_AS_OF`). They are not live CI polling.
 
 ```bash
 pnpm vitest run scripts/tests/site-loaders.test.ts
-bash -c 'pnpm build && TEXULI_E2E_PORT=4930 pnpm exec playwright test tests/e2e/site-evidence.spec.ts'
+pnpm build
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts
 ```

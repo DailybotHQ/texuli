@@ -5,8 +5,8 @@
 `/web-and-native/` (architecture reading page)
 **Tasks:** PLAN_006 T-12 (routes), T-17 (nav, shell and metadata
 contract), T-19 (BreadcrumbList), T-31..T-33 (scaffold, nav, specs)
-**Specs:** `tests/e2e/site-ia.spec.ts`, `tests/e2e/site-native.spec.ts`,
-`tests/e2e/site-architecture.spec.ts`, `tests/e2e/site-seo.spec.ts`
+**Specs:** `tests/e2e/site-ia.spec.ts`, `tests/e2e/site-seo.spec.ts`; content
+in `apps/website/tests/section-contracts.test.ts`
 
 ## Purpose
 
@@ -93,11 +93,13 @@ without a real title and description.
 | Behavior | Pinned by |
 | --- | --- |
 | `/` and `/native/` use the landing shell; every other built page has the docs shell | `tests/e2e/site-ia.spec.ts` |
-| The platform group holds both routes; every nav target resolves; the native landing is one interaction from the home header | `tests/e2e/site-ia.spec.ts` |
+| The platform group holds both routes | `apps/website/tests/docs-reading.test.ts` |
+| Every nav target resolves | the link audit in `tests/e2e/site-seo.spec.ts` |
+| The native landing is one interaction from the home header | `tests/e2e/site-ia.spec.ts` |
 | Header and footer share the repository constant through `safeHref` | `apps/website/tests/landing.test.ts` |
-| `/native/` metadata, status honesty, section order | `tests/e2e/site-native.spec.ts` |
-| `/web-and-native/` metadata, docs shell, cross links, TechArticle | `tests/e2e/site-architecture.spec.ts` |
-| BreadcrumbList on nested pages, none on `/` | `tests/e2e/site-seo.spec.ts` |
+| `/native/` and `/web-and-native/` content, status honesty, cross links | `apps/website/tests/section-contracts.test.ts` |
+| Page metadata on both routes | the SEO audit in `tests/e2e/site-seo.spec.ts` |
+| The TechArticle graph; BreadcrumbList on nested pages, none on `/` | `apps/website/tests/site-build-guards.test.ts` |
 | Visible breadcrumbs share the BreadcrumbList trail | `apps/website/tests/docs-reading.test.ts` |
 
 ## How to extend

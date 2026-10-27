@@ -95,26 +95,22 @@ TEXULI_E2E_PORT=4874 pnpm exec playwright test tests/e2e/site-editor.spec.ts tes
 pnpm vitest run scripts/tests/site-builder.test.ts scripts/tests/site-loaders.test.ts
 ```
 
-`site-editor.spec.ts` serves `apps/website/dist` on a loopback port and
-checks:
+`site-editor.spec.ts` (one test since the 2026-10-27 trim) serves
+`apps/website/dist` on a loopback port and checks:
 
-- the h1, the section headings, both vocabulary tables and no foreign
-  network;
-- the demo renders every node as a real element inside the textbox
-  (heading, marks, the link with its address, quote, code, divider, todo
-  checkboxes) and shows its Markdown;
+- the demo loads the fictional document and its Markdown;
 - typing, a block type change by shortcut, Bold by shortcut with its pressed
   state, a `javascript:` link refused with a visible error and
   `aria-invalid`, a safe link kept, toolbar undo and redo, the keyboard undo,
   and reset with a fresh history;
-- the example, sidebar and docs-shell links;
-- axe (WCAG 2.1 A and AA) in light and dark.
+- no foreign network, and axe (WCAG 2.1 A and AA) on the mounted editor in
+  light and dark.
 
-The builder's text inspector case types through the editor, checks the
-saved Markdown, that typing coalesces into one builder step, that
-Cmd/Ctrl+Z in the editor undoes text only, that the builder's Undo restores
-the previous Markdown in the editor, the source toggle with the refused-link
-verdict, the editor note for that link, and axe.
+The area's links (examples, sidebar, docs shell) are checked by the built-site
+link audit in `site-seo.spec.ts`. The builder's text inspector case types
+through the editor, checks the saved Markdown and that typing coalesces into
+one builder step, that the builder's Undo restores the previous Markdown in
+the editor, the refused-link verdict, and axe.
 
 ## Not covered
 

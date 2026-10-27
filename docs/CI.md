@@ -15,8 +15,9 @@ integration.
 - **`check`** — `pnpm check` (Biome lint, typecheck, unit and component
   tests, layer guard) plus `scripts/supply-chain.ts`, `scripts/check-docs.ts`
   and `pnpm check:skill`.
-- **`behavior`** — the primitives behavior suite on all three projects
-  (chromium, webkit, mobile; the Pixel 7 runs the phone-specific rows, see
+- **`behavior`** — the primitives behavior suite on chromium and webkit
+  (the phone-specific rows run in a Pixel 7 context inside the chromium
+  test, see
   [tests/behavior/README.md](../tests/behavior/README.md)): `TEXULI_E2E_PORT=4870 pnpm exec playwright
   test tests/behavior`, after `pnpm exec playwright install --with-deps
   chromium webkit`. Failed runs upload `test-results/` as an artifact.

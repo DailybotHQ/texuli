@@ -3,7 +3,7 @@
 **App:** `apps/website`
 **Routes:** `/gallery-components/` and its isolated preview document `/gallery-components/preview/?id=<id>`
 **Components:** `src/components/gallery-components/`, with the shared live stages in `src/components/live/`
-**Tests:** `tests/e2e/site-live-gallery.spec.ts`, `tests/e2e/site-gallery-components.spec.ts`, `scripts/tests/site-loaders.test.ts`
+**Tests:** `tests/e2e/site-live-gallery.spec.ts`, `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
@@ -120,7 +120,12 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-live-gallery.spe
   browser spec's samples (button, alert, pagination), not by every id.
 - **Theme.** Previews use the site theme in light or dark. They do not follow
   a theme picked on `/theme-switcher/`.
-- **Full sweeps run on Chromium,** in four parallel chunks of cards (every
-  card mounted, axe on the page with its frames, light and dark). WebKit and the Pixel 7 run
-  the first chunk. Forced colors is checked on each full-page layout's own
-  document, not on every card.
+- **A sample, not every card.** Since the 2026-10-27 trim the spec mounts the
+  first card of each category and every sixteenth card in the grid, then runs
+  axe (zero exclusions) on each sampled preview's own document in light and
+  dark: WCAG rules for component fragments (a fragment has no h1 or landmarks
+  of its own), best practices too for full-page layouts, which also run in
+  forced colors. Every component's own axe and behavior run in the fixture
+  app (`a11y-*.spec.ts`, `tests/behavior`); the gallery page itself is in the
+  page sweep (`a11y-site.spec.ts`). Chromium only, like the rest of the
+  website suite.

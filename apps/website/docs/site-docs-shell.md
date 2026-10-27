@@ -14,7 +14,7 @@ A static documentation layout with:
 - **previous / next** pager
 - **edit-free** (no third-party edit links)
 - no runtime network beyond the page’s own assets
-- axe WCAG 2.1 A/AA in light and dark on desktop and Pixel 7
+- axe WCAG 2.1 A/AA in light and dark (the page sweep, `a11y-site.spec.ts`)
 
 ## Components
 
@@ -41,8 +41,10 @@ A static documentation layout with:
 bash -c 'pnpm build && TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-docs-shell.spec.ts'
 ```
 
-The spec serves `apps/website/dist` on a free port (same pattern as
-`site-foundation.spec.ts`).
+The spec (one test since the 2026-10-27 trim) serves `apps/website/dist` on a
+free port and checks the current page mark, the contents jump, the pager in
+reading order and, on a phone width, the `details` menu. The nav order is
+unit-tested in `scripts/tests/site-loaders.test.ts`.
 
 ## Limits
 

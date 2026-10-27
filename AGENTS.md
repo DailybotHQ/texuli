@@ -93,7 +93,7 @@ texuli/
 ├── .github/workflows/   CI (checks, behavior, website, budget audits) and the npm publish workflow
 ├── skills/texuli/       the distributable agent skill (setup.sh, SHA256SUMS)
 ├── tests/
-│   ├── behavior/        primitives behavior suite (scenarios + rows, three projects)
+│   ├── behavior/        primitives behavior suite (scenarios + rows, chromium and webkit)
 │   ├── e2e/             Playwright specs: a11y sweeps, CSP, SSR, site-*.spec.ts, components
 │   ├── visual/          visual baselines (light/dark, desktop/Pixel 7)
 │   ├── consumers/       Vite, Astro and SvelteKit apps installing the packed tarballs
@@ -287,7 +287,7 @@ review** (installed, Flow A; rules in [.review/extension.md](.review/extension.m
 | Code is clean | `pnpm lint` and `pnpm typecheck` exit 0 |
 | Behavior holds | `pnpm test` (or the scoped `pnpm vitest run <path>`) passes, with a non-empty selection |
 | Layers hold | `pnpm check:layers` prints its ✓ line |
-| Primitives behave | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior` passes on all three projects |
+| Primitives behave | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior` passes on chromium and webkit |
 | Looks right | `pnpm visual` reports no changes (new examples commit their baselines) |
 | Fits its budget | `pnpm size` reports every entry within budget |
 | Ships cleanly | `pnpm verify:packages` passes (packs; publishes nothing) |

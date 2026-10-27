@@ -125,7 +125,7 @@ pnpm --filter @texuli/website typecheck          # astro check, 0 errors
 pnpm vitest run apps/website                       # site unit tests
 pnpm build                                         # the build log lists the new route
 pnpm --filter @texuli/website check:csp            # every inline hash covered (after build)
-TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-seo.spec.ts tests/e2e/site-aeo.spec.ts tests/e2e/site-ia.spec.ts
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-seo.spec.ts tests/e2e/site-ia.spec.ts
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-<area>.spec.ts
 ```
 

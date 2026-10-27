@@ -2,7 +2,7 @@
 
 **App:** `@texuli/website` (`apps/website`)
 **Paths:** `/primitives-page/` (every primitive) and `/primitives-page/<id>/` (one per `@texuli/primitives` subpath)
-**E2E:** `tests/e2e/site-primitives-page.spec.ts`
+**Tests:** `apps/website/tests/component-pages.test.ts` (the reference data); `tests/e2e/site-live-primitives.spec.ts` (demos, the rows disclosure by keyboard)
 
 ## Goal
 
@@ -43,24 +43,24 @@ The spec fails when the data drifts from the code:
 - **Parser:** for every committed scenario it finds as many rows as the file contains, each with a title.
 - **Limits:** the parsed open-to-focus limits equal the suite's own exports.
 
-When you add a primitive, add its entry (and anatomy) to `primitives.ts`; the spec tells you if you forget.
+When you add a primitive, add its entry (and anatomy) to `primitives.ts`; the unit test tells you if you forget.
 
 ## Validate
 
 ```bash
+pnpm vitest run apps/website/tests/component-pages.test.ts
 pnpm build
-TEXULI_E2E_PORT=<your port> pnpm exec playwright test tests/e2e/site-primitives-page.spec.ts
+TEXULI_E2E_PORT=<your port> pnpm exec playwright test tests/e2e/site-live-primitives.spec.ts
 ```
 
-The spec covers:
-- the data checks (once, on Chromium);
-- the index and all 41 pages: the anatomy box count and nesting, the import line, and behavior checks and limits that match the scenario;
-- keyboard use of the rows disclosure;
-- no foreign requests;
-- axe (WCAG 2.1 A/AA) on every page in light and dark, with the disclosures open, on desktop Chromium, WebKit and the Pixel 7.
+The unit test covers every subpath documented once, every anatomy part a real
+export, the import line, the scenario parsing and the open-to-focus limits; the
+pages render that data. `site-live-primitives.spec.ts` opens the rows
+disclosure from the keyboard and runs axe with the disclosures open on the
+representative pages; the index is in the page sweep (`a11y-site.spec.ts`).
 
 ## Limits
 
 - **No live results:** the page shows what the behavior suite checks and its limits, not pass/fail results from a run, because no run results are committed.
 - **Budgets, not measurements:** sizes are budgets only. Measured sizes live in `docs/quality/perf-primitives.md` and `pnpm size`.
-- **Curated anatomy:** the nesting is curated. The spec proves the parts exist, not that they nest exactly as drawn; the primitive docs in `packages/primitives/docs/` remain the reference for composition.
+- **Curated anatomy:** the nesting is curated. The unit test proves the parts exist, not that they nest exactly as drawn; the primitive docs in `packages/primitives/docs/` remain the reference for composition.

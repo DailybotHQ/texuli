@@ -67,19 +67,18 @@ validated theme values), never from page data.
 bash -c 'pnpm build && TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-foundation.spec.ts'
 ```
 
-The spec serves `apps/website/dist` from its own static file server on a free
-port (the configured web server is the fixture app). On Chromium, WebKit and
-the Pixel 7 it checks:
-- the layout's landmarks, routing and `aria-current`;
-- Texuli components in the built page;
-- the canonical URL;
-- the skip link (desktop);
-- no request to any other origin, and a 404 for an unknown path;
+The spec (one test on Chromium since the 2026-10-27 trim) serves
+`apps/website/dist` from its own static file server and checks:
+- routing and `aria-current` in the sidebar;
+- the skip link moving focus to `main`;
+- no request to any other origin;
 - the theme following the system scheme in light and dark (background
   luminance);
 - the switch persisting Dark across a reload with `data-tx-mode` already set
-  before any script runs, and System clearing it;
-- axe WCAG 2.1 A/AA on every page in light and dark.
+  before any script runs, and System clearing it.
+
+axe on every page group in light and dark is the page sweep
+(`a11y-site.spec.ts`); an unknown path's 404 is `site-seo.spec.ts`.
 
 ## Limits
 

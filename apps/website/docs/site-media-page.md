@@ -9,7 +9,7 @@
 
 **Image**, **video**, **audio** and **composition** demos, including **exporting
 a composition to PNG and WebM in the browser**. Static output, no runtime
-network to other origins, axe clean in light and dark on desktop and Pixel 7.
+network to other origins, axe clean in light and dark (the page sweep).
 
 ## How it works
 
@@ -39,14 +39,16 @@ pnpm vitest run scripts/tests/site-loaders.test.ts
 bash -c 'pnpm build && TEXULI_E2E_PORT=4910 pnpm exec playwright test tests/e2e/site-media-page.spec.ts'
 ```
 
-The e2e spec serves `apps/website/dist` on a free loopback port and checks
-Chromium, WebKit and Pixel 7:
+The e2e spec (one test on Chromium since the 2026-10-27 trim) serves
+`apps/website/dist` on a free loopback port and checks:
 
-- sections for image, video, audio, composition;
-- export group present (PNG / SVG / WebM when supported);
-- PNG export produces a downloadable blob (chromium);
-- no foreign network;
-- axe WCAG 2.1 A/AA in light and dark.
+- sections for image, video, audio and composition, the image served from the
+  site;
+- a PNG export downloads a real PNG (signature checked);
+- a WebM recording downloads a real WebM (EBML header checked);
+- no foreign network.
+
+axe in light and dark runs in the page sweep (`a11y-site.spec.ts`).
 
 ## Limits
 

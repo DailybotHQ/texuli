@@ -81,22 +81,23 @@ pnpm build
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-ia.spec.ts tests/e2e/a11y-site.spec.ts
 ```
 
-`site-ia.spec.ts` checks:
-- **Landing header:** logo, Docs, the platform doors, GitHub, search, theme
-  and Get started, and nothing else. There is no sidebar, menu or Copy page
-  on the home.
-- **Landing sections:** exactly four sections in blueprint order plus the
-  footer, the build-time theme moment painted in the HTML, no
-  `astro-island` inside the landing content, and no horizontal scroll on
-  phones. `/native/` is checked as the second landing-shell route.
+`site-ia.spec.ts` (one test since the 2026-10-27 trim) checks:
 - **Every other page has the shell:** each built page (more than 150) has the
-  sidebar and the docs header, with no `nav` in the header.
-- **Sidebar groups:** they are in order, with the guides in reading order;
-  the platform group holds the architecture page and the native landing;
-  every nav target resolves in the built site.
-- **Guides:** a guide shows one navigation with its group open, "On this page",
-  the shared pager and Copy page.
-- **Phones:** the drawer opens the same navigation from any docs page.
+  sidebar and the docs header, with no `nav` in the header (read from the
+  built HTML).
+- **Landing header:** logo, Docs, the platform doors, GitHub, search, theme
+  and Get started, and nothing else, on a wide screen; logo and Docs only on
+  a phone, where the hero and footer carry the other paths. There is no
+  sidebar or Copy page on the home.
+- **The native door:** one click from the home header.
+- **Guides:** a guide shows one navigation with its group open and the
+  shared pager.
+
+The sidebar groups, the guides' reading order and the platform group are
+unit-tested in `apps/website/tests/docs-reading.test.ts`; every nav target
+resolving is the link audit in `site-seo.spec.ts`; the landing sections and
+their order are `site-landing.spec.ts`; the phone drawer is
+`site-docs-nav.spec.ts`.
 
 ## Limits
 

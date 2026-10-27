@@ -41,15 +41,19 @@ pnpm vitest run scripts/tests/site-loaders.test.ts
 bash -c 'pnpm build && TEXULI_E2E_PORT=4910 pnpm exec playwright test tests/e2e/site-examples.spec.ts'
 ```
 
-E2E (chromium / webkit / mobile Pixel 7):
+E2E (one test on Chromium since the 2026-10-27 trim):
 
-- index lists the full registry count;
-- package / kind / search filters reduce the list;
-- a live host mounts a real demo (button click);
-- frame light/dark and LTR/RTL toggles;
-- detail route eager-loads;
-- no foreign HTTP(S) network;
-- axe WCAG 2.1 A/AA in light, dark and forced-colors (zero exclusions).
+- the index lists the full registry count and the search filters it;
+- a card click-loads its isolated iframe, and the frame's Dark toggle passes
+  the mode to it; full-page examples stay link-only;
+- the detail route click-loads the same iframe;
+- the standalone preview document is interactive;
+- no foreign HTTP(S) network.
+
+Package and kind filters and the lanes are unit-tested
+(`scripts/tests/site-loaders.test.ts`, `apps/website/tests/gallery.test.ts`);
+axe (zero exclusions) in light, dark and forced colors runs on the index and a
+sample detail page in the page sweep (`a11y-site.spec.ts`).
 
 ## Budgets / performance
 

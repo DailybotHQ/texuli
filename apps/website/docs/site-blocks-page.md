@@ -55,26 +55,24 @@ the `contentinfo` landmark when it is the page's last child.
 ## Validate
 
 ```bash
+pnpm vitest run apps/website/tests/component-pages.test.ts
 pnpm build
 TEXULI_E2E_PORT=<your port> pnpm exec playwright test tests/e2e/site-blocks-page.spec.ts
 ```
 
-The spec serves `apps/website/dist` on an ephemeral port and checks:
-- **Install commands:** each lists exactly the `texuli/<id>` imports of its
-  source.
-- **Real CLI:** each `texuli add <id>` succeeds against the real CLI
-  (`packages/tools/src/cli-add/cli.ts --dry-run --json`) into a temporary
-  directory.
-- **Index:** every block shows its preview, command and byte-identical
-  source, and the primary nav marks Blocks.
-- **Copy buttons:** they put the command and the source on the clipboard
-  (Chromium and Pixel 7; WebKit refuses clipboard read to automation).
+The spec (one test since the 2026-10-27 trim) serves `apps/website/dist` on
+an ephemeral port and checks, in one page session:
+- **Copy buttons:** they put the command and the byte-identical source on the
+  clipboard.
 - **Interaction:** the FAQ accordion opens by keyboard, and the sign-in form
   shows its validation then a demo status without navigating.
-- **Template pages:** every block's template page renders.
-- **Network and axe:** no foreign network on any page, and axe (WCAG 2.x
-  A/AA) passes in light and dark with every source expanded, on Chromium,
-  WebKit and Pixel 7.
+- **Template pages:** every block's template page renders its preview.
+- **Network:** no request leaves the origin.
+
+The install commands against each source's imports and the add registry are
+unit-tested in `apps/website/tests/component-pages.test.ts` (the `texuli add`
+copy itself is tested in `packages/tools/tests/cli-add.test.ts`); axe in light
+and dark runs on the index in the page sweep (`a11y-site.spec.ts`).
 
 ## Limits
 

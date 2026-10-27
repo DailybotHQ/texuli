@@ -9,8 +9,8 @@
 
 Every library theme as a **live preview card** (light, dark, high contrast)
 with its **palette**, **WCAG 2.x AA contrast scores**, and **one-click apply**.
-Static output, no runtime network, axe clean in light and dark on desktop and
-Pixel 7.
+Static output, no runtime network, axe clean in light and dark (the page
+sweep).
 
 ## How it works
 
@@ -58,14 +58,19 @@ pnpm vitest run scripts/tests/site-loaders.test.ts
 bash -c 'pnpm build && TEXULI_E2E_PORT=4910 pnpm exec playwright test tests/e2e/site-gallery-themes.spec.ts'
 ```
 
-The e2e spec serves `apps/website/dist` on a free loopback port and checks
-Chromium, WebKit and Pixel 7:
+The e2e spec (one test on Chromium since the 2026-10-27 trim) serves
+`apps/website/dist` on a free loopback port and checks:
 
-- 200+ theme cards with live previews and score rows;
-- filter and AA status toggle;
-- Apply updates `data-tx-theme` / `data-tx-mode` and persists across reload;
-- no foreign network;
-- axe WCAG 2.1 A/AA in light and dark.
+- 24 cards at first with live previews and score rows, 24 more on request,
+  and the summary counting the whole library;
+- two cards painting two different primaries;
+- the card preview mode re-scoping the previews only, and the search filter;
+- Apply updating `data-tx-theme` / `data-tx-mode` and persisting across a
+  reload with no flash;
+- no foreign network.
+
+Scores, filters and deep links are unit-tested; axe in light and dark runs
+in the page sweep (`a11y-site.spec.ts`).
 
 ## Limits
 
