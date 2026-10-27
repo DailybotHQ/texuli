@@ -159,7 +159,14 @@ async function insert(id: string) {
     parentPath = [];
     index = tree.children?.length ?? 0;
   }
-  if (apply({ op: 'insert', parent: parentPath, index, node: { id, props: {}, children: [] } })) {
+  // A component whose required props are lists or records (data views,
+  // workflow graphs) starts from its manifest example, so it paints at once;
+  // everything else starts empty, as before.
+  const seeded = manifest.props.some(
+    (prop) => prop.required === true && (prop.kind === 'array' || prop.kind === 'object')
+  );
+  const props = seeded ? structuredClone({ ...(manifest.examples[0]?.props ?? {}) }) : {};
+  if (apply({ op: 'insert', parent: parentPath, index, node: { id, props, children: [] } })) {
     select([...parentPath, index]);
     await tick();
     document

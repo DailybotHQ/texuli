@@ -11,6 +11,13 @@
  * blueprint §6). No version number here, so it cannot drift from the
  * registry. External links (repository, license) pass the URL policy at
  * the developer tier; site routes take the base.
+ *
+ * PLAN_007 T-dailybot-credit: a subtle "Powered by Dailybot" credit after
+ * the status line, the muted kicker plus the horizontal Dailybot logo
+ * (black on light modes, white on dark ones, like BrandLogo). The link's
+ * name comes from aria-label; both images are decorative (alt="") and only
+ * one is displayed, so the other stays out of the accessibility tree. Same
+ * tab, like every other external link on the site.
  */
 import { safeHref } from '@texuli/core/url-policy';
 import { NAV_GROUPS, REPOSITORY_URL, withBase } from './site.ts';
@@ -27,6 +34,13 @@ const links = [
   { href: REPOSITORY_URL, label: 'GitHub' },
   { href: `${REPOSITORY_URL}/blob/main/LICENSE`, label: 'MIT license' },
 ] as const;
+
+/** The Dailybot credit: same link as the READMEs, tagged for this site. */
+const DAILYBOT_URL =
+  'https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-website';
+const dailybotHref = safeHref(DAILYBOT_URL, 'developer');
+const dailybotLogo = (tone: 'black' | 'white') =>
+  `${base.replace(/\/?$/, '/')}brand/dailybot/logo-horizontal-${tone}.svg`;
 
 const resolveHref = (href: string): string | undefined => {
   const safe = safeHref(href, 'developer');
@@ -76,6 +90,33 @@ const productLinks = PRODUCT_GROUP_IDS.flatMap((id) => {
       <strong>Texuli</strong> is MIT licensed, by Dailybot, Inc. Pre-1.0 packages are on
       npm; no stable release yet. The native renderer is in development.
     </p>
+    <a
+      class="site-footer__credit"
+      data-tx-site-credit=""
+      href={dailybotHref}
+      rel="noopener noreferrer"
+      aria-label="Powered by Dailybot"
+    >
+      <span class="site-footer__kicker">Powered by</span>
+      <img
+        class="site-footer__credit-light"
+        src={dailybotLogo('black')}
+        alt=""
+        width="82"
+        height="20"
+        loading="lazy"
+        decoding="async"
+      />
+      <img
+        class="site-footer__credit-dark"
+        src={dailybotLogo('white')}
+        alt=""
+        width="82"
+        height="20"
+        loading="lazy"
+        decoding="async"
+      />
+    </a>
   </div>
 </footer>
 
@@ -132,5 +173,59 @@ const productLinks = PRODUCT_GROUP_IDS.flatMap((id) => {
   }
   code {
     font-size: 0.85em;
+  }
+  /* The Dailybot credit: muted and small, wrapping under the status line. */
+  .site-footer__credit {
+    justify-self: start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    max-inline-size: 100%;
+    color: var(--tx-muted-foreground);
+  }
+  .site-footer__credit:hover {
+    text-decoration: none;
+    opacity: 0.8;
+  }
+  .site-footer__kicker {
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .site-footer__credit img {
+    block-size: 1.25rem;
+    inline-size: auto;
+    max-inline-size: 100%;
+  }
+  .site-footer__credit-dark {
+    display: none;
+  }
+  :global(:root[data-tx-mode='dark']) .site-footer__credit-light {
+    display: none;
+  }
+  :global(:root[data-tx-mode='dark']) .site-footer__credit-dark {
+    display: block;
+  }
+  /* Forced colors never recolor the SVG artwork and the forced Canvas follows
+     the system palette, not the site mode: pick the logo by
+     prefers-color-scheme, the BrandLogo rule (PLAN_006 P2-6). */
+  @media (forced-colors: active) {
+    .site-footer__credit-light,
+    :global(:root[data-tx-mode]) .site-footer__credit-light {
+      display: block;
+    }
+    .site-footer__credit-dark,
+    :global(:root[data-tx-mode]) .site-footer__credit-dark {
+      display: none;
+    }
+  }
+  @media (forced-colors: active) and (prefers-color-scheme: dark) {
+    .site-footer__credit-light,
+    :global(:root[data-tx-mode]) .site-footer__credit-light {
+      display: none;
+    }
+    .site-footer__credit-dark,
+    :global(:root[data-tx-mode]) .site-footer__credit-dark {
+      display: block;
+    }
   }
 </style>

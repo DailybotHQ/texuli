@@ -444,6 +444,21 @@ export const PRIMITIVES: readonly PrimitiveDoc[] = [
     anatomy: [n('Slider.Root', [n('Slider.Range'), n('Slider.Thumb'), n('Slider.Tick')])],
   },
   {
+    id: 'sortable',
+    name: 'Sortable',
+    summary:
+      'Reorder and move items by pointer, touch or keyboard: lists in every axis, boards, nested lists and trees, on the @texuli/drag engine.',
+    pattern: none(
+      'No APG pattern: keyboard drag and announcements follow the @texuli/drag contract'
+    ),
+    anatomy: [
+      n('Sortable.Root', [n('Sortable.List', [n('Sortable.Item', [n('Sortable.Handle')])])]),
+    ],
+    notes: [
+      'Groups move items between lists (pull, put or clone); locked items keep their place; Escape restores the position and focus.',
+    ],
+  },
+  {
     id: 'splitter',
     name: 'Splitter',
     summary: 'Resizable panes separated by keyboard-operable handles.',

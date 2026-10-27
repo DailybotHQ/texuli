@@ -1,5 +1,8 @@
 import type { CatalogManifest } from '@texuli/catalog';
+import { CHAT_MANIFESTS } from '@texuli/catalog/manifests/chat';
+import { COMPOSITION_MANIFESTS } from '@texuli/catalog/manifests/composition';
 import { CONTENT_MANIFESTS } from '@texuli/catalog/manifests/content';
+import { DATA_MANIFESTS } from '@texuli/catalog/manifests/data';
 import {
   cardLayoutManifest,
   deckLayoutManifest,
@@ -7,13 +10,15 @@ import {
   gridLayoutManifest,
   pageLayoutManifest,
 } from '@texuli/catalog/manifests/layouts';
-import { G20_LAYOUT_MANIFESTS, PLAYER_LOADERS, REGION_MANIFESTS } from '@texuli/player';
+import { hostRegionManifest } from '@texuli/catalog/manifests/state';
+import { WORKFLOWS_MANIFESTS } from '@texuli/catalog/manifests/workflows';
+import { PLAYER_LOADERS } from '@texuli/player';
 
 /**
  * What the builder edits: Tier U manifests the player paints and every
- * prop of which has a working inspector field. Controls, flows and action
- * forms also need envelope declarations (state, flows, actions) the builder
- * cannot author, and a deck slide needs the deck editor, so the palette
+ * prop of which has a working inspector field. Controls, flows, action
+ * forms and sortable lists also need envelope declarations (state, flows,
+ * actions) the builder cannot author, and a deck slide needs the deck editor, so the palette
  * lists them as unavailable with that reason (`palette/sources.ts`). A deck
  * is edited as a whole draft (`BUILDER_ROOT_ONLY`).
  */
@@ -25,8 +30,13 @@ export const BUILDER_MANIFESTS: readonly CatalogManifest[] = Object.freeze(
     docLayoutManifest,
     deckLayoutManifest,
     gridLayoutManifest,
-    ...G20_LAYOUT_MANIFESTS,
-    ...REGION_MANIFESTS,
+    ...COMPOSITION_MANIFESTS,
+    hostRegionManifest,
+    // Spec 0.3.0: chat display, data views and workflow graphs paint from
+    // plain props (list and record props get the JSON field).
+    ...CHAT_MANIFESTS,
+    ...DATA_MANIFESTS,
+    ...WORKFLOWS_MANIFESTS,
   ]
     .filter((manifest) => manifest.agentEmittable === true && manifest.id in PLAYER_LOADERS)
     .sort((left, right) => left.id.localeCompare(right.id, 'en'))

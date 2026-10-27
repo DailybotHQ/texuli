@@ -450,8 +450,9 @@ describe('inspector: choice', () => {
       {
         // PLAN_005 task 5 adds the G20 layouts: row align and wrap, stack, row and split gaps, split ratio.
         // PLAN_005 task 6: the deck root adds its aspect enum.
-        expect(CHOICE_PROPS.length).toBe(40);
-        expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(7);
+        // PLAN_007 T-player-parity: the data views, chat display and workflow graph add 15.
+        expect(CHOICE_PROPS.length).toBe(55);
+        expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(11);
         const ids = new Set(CHOICE_PROPS.map((entry) => `${entry.id}.${entry.prop.name}`));
         for (const name of [
           'layout-stack.gap',
@@ -2104,8 +2105,25 @@ describe('palette', () => {
         for (const id of ['action-form', 'form-field', 'form-submit']) {
           expect(note(id), id).toContain('action declared in the blueprint envelope');
         }
-        expect(realById.get('chat-thread')?.availability).toBe('no-painter');
-        expect(note('chat-thread')).toContain('no painter for chat display ids');
+        // Spec 0.3.0: chat display, data views and workflow graphs paint and insert.
+        for (const id of [
+          'chat-thread',
+          'chat-message',
+          'data-board',
+          'data-tree-view',
+          'data-calendar',
+          'data-grid',
+          'data-files',
+          'data-map',
+          'data-timeline',
+          'workflow-graph',
+        ]) {
+          expect(realById.get(id)?.availability, id).toBe('insertable');
+          expect(playerPaints(id), id).toBe(true);
+        }
+        // A sortable list reorders an envelope list variable the builder cannot declare yet.
+        expect(realById.get('sortable-list')?.availability).toBe('not-in-host');
+        expect(note('sortable-list')).toContain('list variable declared in the blueprint envelope');
         // No unavailable entry falls back to the generic note: every one has its own reason.
         const generic = new Set(Object.values(AVAILABILITY_NOTES));
         for (const entry of real.filter((candidate) => candidate.availability !== 'insertable')) {
@@ -2119,6 +2137,7 @@ describe('palette', () => {
           'Content blocks',
           'Charts',
           'Media',
+          'Data views',
           'Interaction',
           'Chat display',
         ]);
@@ -2134,6 +2153,7 @@ describe('palette', () => {
           'form-field',
           'form-submit',
           'host-region',
+          'sortable-list',
         ]);
       }
       // searches labels, ids and group names case-insensitively
@@ -2149,7 +2169,7 @@ describe('palette', () => {
         expect(searchPalette(real, 'layout-split').map((entry) => entry.id)).toEqual([
           'layout-split',
         ]);
-        expect(searchPalette(real, 'interaction').map((entry) => entry.id)).toHaveLength(10);
+        expect(searchPalette(real, 'interaction').map((entry) => entry.id)).toHaveLength(11);
         // A search can surface unavailable entries too; they keep their reason.
         const toggle = searchPalette(real, 'control-toggle')[0];
         expect(toggle?.availability).toBe('not-in-host');

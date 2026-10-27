@@ -8,6 +8,7 @@ This file is generated from catalog manifests. Prefer component pages under `com
 
 Ids agents may emit into a catalog tree (subject to tier rules). Untrusted model output is limited further by the catalog build tiers.
 
+- [Action form](components/action-form.md): Groups fields whose submit proposes one named action intent to the host.
 - [Code blocks](components/blocks-code.md): Validated, highlighted code.
 - [Data blocks](components/blocks-data.md): Validated tables, statistics, key metrics and chart content blocks.
 - [Diagram blocks](components/blocks-diagram.md): Validated flow, tree, board and terminal diagrams.
@@ -40,15 +41,39 @@ Ids agents may emit into a catalog tree (subject to tier rules). Untrusted model
 - [Stacked bar chart](components/charts-stacked-bar.md): A categorical stacked bar chart with accessible values.
 - [Sunburst chart](components/charts-sunburst.md): A hierarchical part-to-whole chart with an accessible table.
 - [Treemap chart](components/charts-treemap.md): A hierarchical part-to-whole chart with an accessible table.
+- [Chat message](components/chat-message.md): One display-only chat message: author, role, time, text and block children.
+- [Chat thread](components/chat-thread.md): Read-only conversation transcript of chat-message nodes, without a composer.
+- [Choice control](components/control-choice.md): A segmented choice that sets an enum state variable to one of its values.
+- [Filter control](components/control-filter.md): A text field that sets a string state variable, capped at its declared length.
+- [Slider control](components/control-slider.md): A range input that sets a number state variable within its declared min and max.
+- [Toggle control](components/control-toggle.md): A switch that sets a boolean state variable.
+- [Board](components/data-board.md): A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits.
+- [Calendar](components/data-calendar.md): Events on a month, week, day or agenda view; people open, and when allowed move, events.
+- [File browser](components/data-files.md): Folders and files in a grid or list with breadcrumbs, selection and type previews.
+- [Data grid](components/data-grid.md): A sortable, searchable grid of rows and typed columns; virtualized for long lists.
+- [Map](components/data-map.md): Places as markers on an offline vector basemap, clustered when close, with a place list beside it.
+- [Project timeline](components/data-timeline.md): Tasks as bars over days, weeks, months or quarters, with dependencies and progress.
+- [Tree view](components/data-tree-view.md): A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard.
 - [Deck slide](components/deck-slide.md): One slide in a deck: a title, content blocks and speaker notes.
+- [Flow action](components/flow-action.md): A button that fires one declared flow event, such as next or back.
+- [Flow view](components/flow-view.md): One named view of a multi-step flow; only the current view paints.
+- [Form field](components/form-field.md): A named, validated field bound to a declared local-state variable.
+- [Form submit](components/form-submit.md): Proposes the form's action with its fields' values; disabled while a receipt is pending.
+- [Host region](components/host-region.md): Reserves a named place where the host app mounts its own component.
 - [Card layout](components/layout-card.md): Content card frame for grouped agent-authored blocks.
 - [Deck layout](components/layout-deck.md): Slide deck frame for sequenced content.
 - [Doc layout](components/layout-doc.md): Document frame with optional table of contents.
 - [Grid layout](components/layout-grid.md): Responsive content grid for agent-authored tiles.
 - [Page layout](components/layout-page.md): Full page content frame for agent-authored documents.
+- [Row layout](components/layout-row.md): Children side by side, wrapping onto new lines when space runs out.
+- [Split layout](components/layout-split.md): Two panes side by side at a fixed ratio, stacked on narrow screens.
+- [Stack layout](components/layout-stack.md): Children in one column, in reading order, with a fixed gap.
+- [Grid tile](components/layout-tile.md): A titled tile inside layout-grid that can span several columns or rows.
 - [Canvas composition](components/media-composition-canvas.md): A validated layered composition rendered to a canvas.
 - [SVG composition](components/media-composition-svg.md): A validated, structured vector composition.
 - [Responsive image](components/media-image.md): A responsive image with URL validation, loading states and actions.
+- [Sortable list](components/sortable-list.md): A list whose items are a bound list variable; people reorder it by drag or keyboard, and lists sharing a group exchange items.
+- [Workflow graph](components/workflow-graph.md): A workflow of typed nodes and edges (automations, pipelines, approvals, state diagrams), read-only or editable.
 
 ## App and chrome components
 

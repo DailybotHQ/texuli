@@ -110,7 +110,7 @@ export const PORTABILITY_EXCERPTS: readonly PortabilityExcerpt[] = [
       { text: '",\n            label = "Badge",\n            summary = "' },
       { text: SHARED_SUMMARY, mark: true },
       {
-        text: '",\n            group = "display",\n            placement = SpecComponentPlacement.APP,\n            emit = listOf(),\n            capability = SpecComponentCapability.UNKNOWN,',
+        text: '",\n            group = "display",\n            placement = SpecComponentPlacement.APP,\n            emit = listOf(),\n            capability = SpecComponentCapability.WEB_ONLY,',
       },
     ],
   },

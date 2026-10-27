@@ -5,6 +5,8 @@
  * feeds them the files at build time.
  */
 
+import { REPOSITORY_URL } from '../foundation/site.ts';
+
 /** The `SKILL.md` frontmatter fields the page shows. */
 export interface SkillMeta {
   name: string;
@@ -120,4 +122,84 @@ export function subSkills(
           .map((file) => file.slice(`${folder}/references/`.length)),
       };
     });
+}
+
+/** The repository that hosts the pack, and the tag namespace of its releases. */
+export const SKILL_REPOSITORY = REPOSITORY_URL;
+export const SKILL_TAG_PREFIX = 'skill-v';
+
+/**
+ * The newest released version in the pack's Keep-a-Changelog file, or `''`.
+ * Only the skill release workflow writes a version section, in the commit it
+ * tags, so a section is the build-time proof that a release exists.
+ */
+export function latestRelease(changelog: string): string {
+  return /^## \[(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)\]/m.exec(changelog)?.[1] ?? '';
+}
+
+/** One way to install, update or remove the skill, with its exact commands. */
+export interface InstallRoute {
+  id: 'skills-cli' | 'openclaw' | 'checkout' | 'update' | 'uninstall';
+  title: string;
+  commands: string[];
+}
+
+/**
+ * The install, update and uninstall commands for one released version (or
+ * the `<version>` placeholder). docs/SKILL_INSTALLATION.md shows the same
+ * commands; scripts/tests/skill-release.test.ts keeps them in step.
+ */
+export function installRoutes(version: string): InstallRoute[] {
+  const tag = `${SKILL_TAG_PREFIX}${version}`;
+  const tree = `${SKILL_REPOSITORY}/tree/${tag}/skills/texuli`;
+  return [
+    {
+      id: 'skills-cli',
+      title: 'skills CLI, pinned to a release',
+      commands: [
+        `npx skills add ${tree} --skill texuli`,
+        `npx skills add ${tree} --skill texuli -g`,
+      ],
+    },
+    {
+      id: 'openclaw',
+      title: 'OpenClaw',
+      commands: [
+        'openclaw skills install texuli',
+        'mkdir -p ~/.openclaw/skills',
+        'cp -R texuli ~/.openclaw/skills/texuli',
+      ],
+    },
+    {
+      id: 'checkout',
+      title: 'Clone and setup.sh',
+      commands: [
+        `git clone --branch ${tag} --depth 1 ${SKILL_REPOSITORY}.git`,
+        'cd texuli',
+        `./skills/texuli/setup.sh --verify --expect-version ${version}`,
+        `./skills/texuli/setup.sh --host claude --expect-version ${version} --dry-run`,
+        `./skills/texuli/setup.sh --host claude --expect-version ${version}`,
+      ],
+    },
+    {
+      id: 'update',
+      title: 'Update to a newer release',
+      commands: [
+        `npx skills add ${tree} --skill texuli`,
+        `./skills/texuli/setup.sh --host claude --expect-version ${version} --replace --dry-run`,
+        `./skills/texuli/setup.sh --host claude --expect-version ${version} --replace`,
+        'openclaw skills update texuli',
+      ],
+    },
+    {
+      id: 'uninstall',
+      title: 'Uninstall',
+      commands: [
+        'npx skills remove texuli',
+        'npx skills remove texuli -g',
+        'rm -rf ~/.claude/skills/texuli',
+        'openclaw skills remove texuli',
+      ],
+    },
+  ];
 }

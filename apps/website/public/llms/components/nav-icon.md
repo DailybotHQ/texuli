@@ -25,7 +25,7 @@
 
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
-| `icon` | unknown | yes | — | — | Icon name or component |
+| `icon` | string | yes | — | — | Icon name (hosts may also pass a component in code) |
 | `class` | string | no | — | — | — |
 | `label` | string | no | — | — | — |
 
