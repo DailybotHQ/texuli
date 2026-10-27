@@ -58,10 +58,9 @@ Not layers, because they consume the library:
 (`NEVER_PACKED` in `scripts/packages.ts`). 16 packages are released on npm
 as `0.3.0`, the first release of `@texuli/date` (the previous release,
 `0.2.0`, had 15 packages). `@texuli/drag` and `@texuli/workflows` are in
-development (`0.0.0`, not on npm); a future wave publishes them before the
-packages that depend on them. Until then `pnpm verify:packages` refuses
-any package whose published manifest would carry a `0.0.0` dependency, such
-as `@texuli/primitives` on `@texuli/drag` ([RELEASE](RELEASE.md)).
+development: versioned `0.3.0` and in the `publish.yml` wave order ahead of
+their dependents, so `pnpm verify:packages` packs 18 packages, but not on
+npm until the next owner-run publish ([RELEASE](RELEASE.md)).
 
 ```text
 L8  tools · astro
@@ -222,8 +221,8 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 16 packable packages, `@texuli/date` included, to npm as the
-    `0.3.0` release (dist-tags `latest` and `next`), with provenance
+    the packable packages (16 on npm today, `@texuli/date` included; drag
+    and workflows are next) as the `0.3.0` release (dist-tags `latest` and `next`), with provenance
     ([RELEASE](RELEASE.md)).
 - **Tests:**
   - **Unit:** Vitest (happy-dom) in `packages/*/tests/`,

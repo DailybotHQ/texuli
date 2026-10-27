@@ -93,12 +93,11 @@ same versions: `latest` tracks the newest release (owner decision
 2026-10-27; both name `0.3.0` once the post-merge run publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
 GitHub's OIDC token (`id-token: write`).
 
-`publish.yml` does not list `@texuli/drag` or `@texuli/workflows` yet
-(both in development, `0.0.0`). Until a reviewed, owner-approved release
-adds them to the workflow ahead of their dependents, its
-`pnpm verify:packages` step fails on the packages that depend on them
-(`published range must be a real semver range, got "0.0.0"`), so a run
-stops before publishing anything; CI's own jobs do not run that step
+`publish.yml` lists `@texuli/drag` and `@texuli/workflows` (both in
+development, versioned `0.3.0`) ahead of the packages that depend on them
+(owner decision 2026-10-27). They are not on npm yet: the next `v*` tag or
+manual run publishes them. The publish loop skips versions npm already has,
+so a package changed since its published `0.3.0` needs a new version first
 ([RELEASE](RELEASE.md#publication-waves)).
 
 One-time setup, already done: the repository secret `NPM_TOKEN` holds a

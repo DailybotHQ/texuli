@@ -197,8 +197,9 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     released on npm as `0.3.0` (dist-tags `latest` and `next`, published by
     CI with provenance). `@texuli/editor`, `@texuli/examples`, the apps and
     `native/` publish nothing; `@texuli/drag` and `@texuli/workflows` are in
-    development and not on npm (a future wave publishes them before the
-    packages that depend on them; [RELEASE](docs/RELEASE.md)). 0.3.0 is a pre-1.0 release, not stable (1.0.0 will be the first
+    development and not on npm (versioned `0.3.0` and in the publish waves
+    ahead of the packages that depend on them; the next owner-run publish
+    publishes them; [RELEASE](docs/RELEASE.md)). 0.3.0 is a pre-1.0 release, not stable (1.0.0 will be the first
     stable release; `latest` tracks the newest release). texuli.com
     deploys from `main` (Cloudflare Pages); the agent service is not
     deployed.

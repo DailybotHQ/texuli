@@ -9,8 +9,9 @@ edits the graph without the canvas. It is part of
 [Texuli](https://texuli.com), "Small pieces. Infinite possibilities.": an
 MIT Svelte 5 component library by Dailybot, Inc.
 
-> **Status: in development.** `@texuli/workflows` is a private workspace
-> package (`0.0.0`) and is **not yet on npm**. Inside the Texuli repository
+> **Status: in development.** `@texuli/workflows` is versioned `0.3.0` and
+> listed in the publish waves, but is **not yet on npm** (it goes out with
+> the next owner-run publish). Inside the Texuli repository
 > it is the `workflow-graph` painter of `@texuli/player`, so an agent can
 > send a workflow as JSON. It will be published in a future release wave,
 > after `@texuli/drag` and `texuli` and before the packages that depend on
