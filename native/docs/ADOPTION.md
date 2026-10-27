@@ -53,9 +53,10 @@ chart families, `media-composition-svg` and `media-composition-canvas`, paint
 | `unsupported-gap`, `unsupported-deck-options` | Painting: grid gaps or deck options outside the supported set |
 | `unknown-block` | Painting: a `blocks-text` or `blocks-data` node without a `block`, or a `blocks-text` type other than heading, text, list, quote and callout |
 
-An id that is not in the spec vocabulary at all, such as `chat-thread`, is
-**refused** at validation (`unknown-id` diagnostic) before planning, so the
-whole blueprint does not load.
+An id that is not in the spec vocabulary at all is **refused** at validation
+(`unknown-id` diagnostic) before planning, so the whole blueprint does not
+load. `chat-thread` and `chat-message` were the worked example until spec
+0.3.0 added them; they now validate and paint `not-on-this-target`.
 
 ## Requirements
 
@@ -178,8 +179,8 @@ and a conformance test pins each widget's status:
 | --- | --- | --- |
 | KMPStarter | [kmp-starter-migration.md](kmp-starter-migration.md) | Text and image in a page; the button toggle stays app code |
 | KMPTodoApp | [kmp-todo-migration.md](kmp-todo-migration.md) | A static task list; editing controls stay app code |
-| KMPAIChat | [kmp-aichat-migration.md](kmp-aichat-migration.md) | The `chat-thread` form is refused (`unknown-id`); a text-block fallback loads |
-| KMPAIVoiceChat | [kmp-voicechat-migration.md](kmp-voicechat-migration.md) | Chat and realtime screens load; audio stays platform code |
+| KMPAIChat | [kmp-aichat-migration.md](kmp-aichat-migration.md) | The `chat-thread` form validates but has no native painter; a text-block fallback loads painted |
+| KMPAIVoiceChat | [kmp-voicechat-migration.md](kmp-voicechat-migration.md) | Chat and realtime screens load; the `chat-thread` form validates with roles mapped; audio stays platform code |
 | KMPPTTDynamics | [kmp-pttdynamics-migration.md](kmp-pttdynamics-migration.md) | Five room snapshots load; live controls and audio stay app code |
 | KMPTapDuelGame | [kmp-tapduel-migration.md](kmp-tapduel-migration.md) | A scoreboard snapshot loads; tap zones are `tier-denied`; the portable profile refuses it |
 
@@ -195,10 +196,13 @@ doc or the README records:
 - **Publishing.** Coordinates, versioning and a release, after the owner
   ratifies the pins (design decision 5).
 - **Targets.** Android and Compose iOS (design decision 3).
-- **Chat ids in the spec vocabulary.** `chat-thread` and `chat-message` are
-  catalog display ids, but the spec does not list them, so chat blueprints
-  are refused natively (KMPAIChat, KMPAIVoiceChat). Next would be a native
-  chat painter.
+- **A native chat painter.** Spec 0.3.0 lists `chat-thread` and
+  `chat-message` (both `web-only`), so chat blueprints
+  validate natively, but no native painter exists: they paint
+  `not-on-this-target` (KMPAIChat, KMPAIVoiceChat). Next would be a display
+  painter for the thread and message. The composer (text field and send)
+  is host chrome on every target: the web host or the native app provides
+  it, and it is not part of the blueprint.
 - **An audio surface.** No audio id or block type exists, and there is no
   native audio painter (KMPAIVoiceChat, KMPPTTDynamics).
 - **Portable core.** It is empty until ids pass the audit and cross-target

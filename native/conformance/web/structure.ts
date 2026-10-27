@@ -85,7 +85,7 @@ check(existsSync(join(SPEC_KT, 'com/texuli/spec/Blueprint.kt')), 'the generated 
 const kotlinFiles = walk(NATIVE).filter((f) => f.endsWith('.kt'));
 check(
   !kotlinFiles.some((f) =>
-    /\/com\/texuli\/spec\/(Blueprint|CatalogSchema|Diagnostics|Json|Manifest|Vocabulary)\.kt$/.test(
+    /\/com\/texuli\/spec\/(Blueprint|CatalogSchema|Diagnostics|Json|Manifest|Vocabulary|Workflow)\.kt$/.test(
       f
     )
   ),
@@ -171,6 +171,39 @@ for (const file of readdirSync(goldenDir).filter((f) => f.endsWith('.json'))) {
     `${file}: the native plan's trace equals the web trace`
   );
 }
+
+// 6. KMP chat migration parity: the chat-thread forms the Kotlin migration
+// tests load (KmpAiChatMigrationTest, KmpVoiceChatMigrationTest) validate
+// under the TypeScript validator too, and the transcript as the app models it
+// (no author, role "assistant") is refused with the same pinned diagnostics.
+const kmpFixture = (name: string) =>
+  readFileSync(join(NATIVE, 'conformance/fixtures', `${name}.json`), 'utf8');
+for (const name of ['kmp-aichat-thread', 'kmp-voicechat-thread']) {
+  const result = validateBlueprint(JSON.parse(kmpFixture(name)), { blueprintSchema, catalog });
+  check(
+    result.ok,
+    `${name}.json: valid under the spec validator (${result.diagnostics.map((d) => d.code).join(', ')})`
+  );
+}
+const unmapped = kmpFixture('kmp-voicechat-thread')
+  .replace('"author": "Fictional Person",', '')
+  .replace('"author": "Fictional Agent",', '')
+  .replace('"role": "agent"', '"role": "assistant"');
+check(
+  canonicalJson(
+    validateBlueprint(JSON.parse(unmapped), { blueprintSchema, catalog }).diagnostics.map((d) => [
+      d.code,
+      d.path,
+      d.id,
+    ])
+  ) ===
+    canonicalJson([
+      ['missing-required', '$.tree.children[1].children[0].props.author', 'chat-message'],
+      ['enum-value', '$.tree.children[1].children[1].props.role', 'chat-message'],
+      ['missing-required', '$.tree.children[1].children[1].props.author', 'chat-message'],
+    ]),
+  'the unmapped voice-chat transcript is refused with the diagnostics the Kotlin test pins'
+);
 
 if (failures.length > 0) {
   console.error(failures.map((f) => `✗ ${f}`).join('\n'));

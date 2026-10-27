@@ -121,7 +121,9 @@ targets apply them to all four spec goldens (`packages/spec/fixtures/golden`):
 - **Native:** `GoldenConformanceTest` loads each golden with `loadBlueprint`,
   traces the plan, and must equal the web trace.
   `InvalidFixtureParityTest` refuses every spec invalid fixture with exactly
-  the TypeScript validator's codes.
+  the TypeScript validator's codes, and `WorkflowFixtureParityTest` does the
+  same for the workflow graph fixtures (goldens validate, invalid graphs
+  fail with their codes).
 
 This is a semantic gate, not a pixel test.
 
@@ -139,8 +141,10 @@ the controls that remain app code.
 
 `KmpAiChatMigrationTest` does the same for the third app, KMPAIChat. Its
 intended chat form (`conformance/fixtures/kmp-aichat-thread.json`, with
-`chat-thread` and `chat-message`) is refused natively with `unknown-id`,
-because the spec vocabulary has no chat ids. Its fallback
+`chat-thread` and `chat-message`) validates on both targets now that spec
+0.3.0 carries the chat ids (`structure.ts` checks it under the TypeScript
+validator too), but there is no native chat painter, so those ids paint a
+`not-on-this-target` placeholder. Its fallback
 (`conformance/fixtures/kmp-aichat.json`, text blocks in a card) loads with
 every widget painted. See
 [docs/kmp-aichat-migration.md](docs/kmp-aichat-migration.md).
@@ -149,10 +153,12 @@ every widget painted. See
 Its chat and realtime screens, written in the portable vocabulary
 (`conformance/fixtures/kmp-voicechat-chat.json` and `kmp-voicechat-realtime.json`),
 load natively, and every widget is painted. The transcript in its natural
-`chat-thread` / `chat-message` form (`kmp-voicechat-thread.json`) is refused
-with three pinned `unknown-id` diagnostics, because those ids are web-player
-manifests and are not in the spec vocabulary. Audio capture and playback,
-the spinner and every control stay app code. The details are in
+`chat-thread` / `chat-message` form (`kmp-voicechat-thread.json`) validates
+on both targets once the app's roles are mapped (an author per message, the
+"assistant" turn as `agent`); the transcript as the app models it is refused
+with three pinned diagnostics on both. The chat ids still paint a placeholder
+natively. Audio capture and playback, the spinner and every control stay app
+code. The details are in
 [docs/kmp-voicechat-migration.md](docs/kmp-voicechat-migration.md).
 
 `KmpPttDynamicsMigrationTest` applies that check to fictional static snapshots
@@ -193,7 +199,8 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | Suite | Module | What it pins |
 | --- | --- | --- |
 | `JsonReaderTest` | `texuli-spec` | Strict JSON: every type, refusals of non-JSON, depth bombs and oversized text |
-| `SpecValidatorTest` | `texuli-spec` | `validateBlueprint` reports the TypeScript validator's codes, fails the portable profile closed, judges named slots |
+| `SpecValidatorTest` | `texuli-spec` | `validateBlueprint` reports the TypeScript validator's codes, fails the portable profile closed, judges named slots; spec 0.3.0 state, bindings, `bind`, `on` actions, property schemas and `deprecated` warnings with the TypeScript codes and paths |
+| `WorkflowValidatorTest` | `texuli-spec` | Workflow graph rules (ids, types, fields, ports, multiplicity, kinds, cycles), label control and bidi refusals, and the 500-node / 2,000-edge limits |
 | `RenderPlanTest` | `texuli-spec` | The render plan's tier gate: ids whose catalog `emit` list lacks the tier become `tier-denied` placeholders (default tier `untrusted`), checked for every catalog id |
 | `AccessibilityTest` | `texuli-compose` | Image alternatives (blank alt is decorative) and heading ranks clamped to 1-6 |
 | `ChartWidgetsTest` | `texuli-compose` | Compact chart props: gaps, variants, title-over-label naming, bounded scales, refusals |
@@ -204,10 +211,11 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `HostilePropsTest` | `texuli-compose` | The hostile matrix: every projection's props replaced by each value in `HOSTILE_VALUES` (wrong types, JSON null, non-finite and extreme numbers, huge, bidi, zero-width, control and surrogate strings, huge and deep containers) never throws and stays in bounds |
 | `GoldenConformanceTest` | `conformance` | Each spec golden's native trace equals the web trace; prints native coverage per id |
 | `InvalidFixtureParityTest` | `conformance` | Every spec invalid fixture is refused with exactly the TypeScript codes |
+| `WorkflowFixtureParityTest` | `conformance` | Every spec workflow golden validates and every workflow invalid fixture is refused with exactly the TypeScript codes |
 | `KmpStarterMigrationTest` | `conformance` | The KMPStarter blueprint loads natively and each widget keeps its documented status |
 | `KmpTodoMigrationTest` | `conformance` | The KMPTodoApp screen as a static fixture: registry statuses pinned, external app untouched |
-| `KmpAiChatMigrationTest` | `conformance` | The KMPAIChat screen: the chat form is refused (`unknown-id` for chat ids), the fallback loads |
-| `KmpVoiceChatMigrationTest` | `conformance` | Both KMPAIVoiceChat screens load; the `chat-thread` form is refused with three pinned diagnostics |
+| `KmpAiChatMigrationTest` | `conformance` | The KMPAIChat screen: the chat form validates and plans (no native chat painter yet), the fallback loads painted |
+| `KmpVoiceChatMigrationTest` | `conformance` | Both KMPAIVoiceChat screens load; the `chat-thread` form validates with roles mapped, the unmapped transcript is refused with three pinned diagnostics |
 | `KmpPttDynamicsMigrationTest` | `conformance` | Five fictional flagship-room snapshots load; controls and audio stay app code |
 | `KmpTapDuelMigrationTest` | `conformance` | A KMPTapDuelGame scoreboard snapshot loads painted; tap zones are `tier-denied`; the portable profile refuses it |
 
@@ -349,3 +357,7 @@ Compose Multiplatform 1.10.3. Ratifying them is design decision 5.
   fixture is picked up by `InvalidFixtureParityTest` without a code change.
   A new golden also needs its web trace and the golden count in
   `GoldenConformanceTest`.
+
+---
+
+Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-native).

@@ -39,16 +39,22 @@
           {
             "id": "chat-message",
             "props": {
+              "author": "Fictional Person",
               "role": "user",
+              "at": "2026-10-25T08:59:00Z",
               "text": "What is on the harbor schedule this week?"
-            }
+            },
+            "slot": "children"
           },
           {
             "id": "chat-message",
             "props": {
-              "role": "assistant",
+              "author": "Fictional Agent",
+              "role": "agent",
+              "at": "2026-10-25T08:59:04Z",
               "text": "Three fictional deliveries."
-            }
+            },
+            "slot": "children"
           }
         ]
       }
