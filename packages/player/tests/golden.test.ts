@@ -222,6 +222,10 @@ describe('the interactive goldens run their closed actions', () => {
     const { container } = paint(golden('workflow-builder'));
     await painted(container);
     expect(screen.getByRole('figure', { name: 'Expense approval preview' })).toBeTruthy();
-    expect(screen.getAllByText('Manager approval').length).toBeGreaterThanOrEqual(2);
+    // The editor loads lazily (edit mode only), so wait for its copy too.
+    await waitFor(
+      () => expect(screen.getAllByText('Manager approval').length).toBeGreaterThanOrEqual(2),
+      { timeout: 10_000 }
+    );
   });
 });

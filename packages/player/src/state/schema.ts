@@ -36,6 +36,7 @@ const MAX_ITEM_TEXT = 2000;
  * item never hides or reorders its text. ZWNJ and ZWJ stay allowed.
  */
 export const LIST_TEXT =
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: list item text refuses control characters
   /^[^\u0000-\u001f\u007f-\u009f\u061c\u180e\u200b\u200e\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]*$/u;
 
 /** One list item: an id and up to 16 scalar fields. */

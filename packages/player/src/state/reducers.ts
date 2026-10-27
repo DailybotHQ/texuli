@@ -201,6 +201,8 @@ export function runActions(
         const raw = action.values ?? {};
         if (!isBag(raw) || Object.keys(raw).length > MAX_EMIT_VALUES) return fail('values');
         for (const [key, entry] of Object.entries(raw)) {
+          // Value names follow the spec's intent-name pattern, like the intent.
+          if (!ACTION_NAME.test(key)) return fail('values');
           let value: unknown = entry;
           if (isBag(entry)) {
             const name = Object.keys(entry).length === 1 ? entry.$state : undefined;

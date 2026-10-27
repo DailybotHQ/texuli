@@ -132,6 +132,12 @@ describe('runActions', () => {
       ok: false,
       reason: 'values',
     });
+    // Value names follow the intent-name pattern, as the spec requires.
+    for (const name of ['__proto__', 'bad key <x>', '1st'])
+      expect(run([{ op: 'emit', intent: 'x', values: JSON.parse(`{"${name}":"y"}`) }])).toEqual({
+        ok: false,
+        reason: 'values',
+      });
   });
 });
 
@@ -246,6 +252,27 @@ describe('the player runs spec 0.3.0 interaction', () => {
     await waitFor(() =>
       expect(refused.container.querySelector('[data-status="invalid"]')).toBeTruthy()
     );
+  });
+
+  it('reads item fields as own properties only, never through the prototype', async () => {
+    render(Player, {
+      props: {
+        blueprint: envelope(
+          {
+            id: 'sortable-list',
+            props: {
+              label: 'Inherited',
+              itemLabel: 'constructor',
+              itemDetail: 'label',
+              reorder: { bind: { $state: 'tasks' } },
+            },
+          },
+          { state: { tasks: { type: 'list', initial: [{ id: 'a', label: 'Alpha' }] } } }
+        ),
+      },
+    });
+    expect(await screen.findByText('Alpha', {}, { timeout: 5000 })).toBeTruthy();
+    expect(screen.queryByText(/native code/)).toBeNull();
   });
 
   it('two-way binds a data view prop and runs on.change', async () => {

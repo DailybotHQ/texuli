@@ -52,8 +52,9 @@ const containers = $derived<SortableContainer[]>([
 
 const text = (id: string, field: string | undefined): string => {
   if (field === undefined) return '';
-  const value = byId.get(id)?.[field];
-  return value === undefined ? '' : String(value);
+  const item = byId.get(id);
+  // Own fields only: a field name never reads through the prototype.
+  return item === undefined || !Object.hasOwn(item, field) ? '' : String(item[field]);
 };
 
 function onMove(move: SortableMove): boolean {
