@@ -3,19 +3,31 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  BUNDLE_BUDGET,
+  checkBudgets,
   checkCliReferences,
   checkCommand,
+  checkMirror,
   checkRequiredFiles,
   checkSkillPack,
   checkSnippetImports,
+  checkVersionSync,
   cliCommands,
   codeBlocks,
   commandContext,
+  DESCRIPTION_MAX,
   expectedSkillName,
   findMarkdownLinks,
+  isPinnedNetworkCommand,
+  mirrorDifferences,
+  NAME_MAX,
   parseFrontmatter,
   repositoryRootFromHere,
+  SKILL_MD_BUDGET,
   sha256File,
+  skillBundles,
+  skillFolderHash,
+  skillMdPaths,
   validateFrontmatterParsed,
   validateSkillCommands,
   validateSkillFile,
@@ -46,8 +58,8 @@ function tempDir(): string {
 }
 
 describe('skill frontmatter parser', () => {
-  it('parses quoted SemVer and nested openclaw metadata; rejects unquoted version and wrong documentation_url; requires the built /guides/ route as documentation_url and homepage (T-100 P1-4); maps nested skill folders to expected names', () => {
-    // parses quoted SemVer and nested openclaw metadata
+  it('parses quoted SemVer and single-line JSON openclaw metadata; rejects unquoted version and wrong documentation_url; requires the built /guides/ route as documentation_url and homepage (T-100 P1-4); maps nested skill folders to expected names', () => {
+    // parses quoted SemVer and single-line JSON openclaw metadata
     {
       const source = `---
 name: texuli
@@ -56,14 +68,7 @@ version: "0.1.0"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read
-metadata:
-  openclaw:
-    emoji: "▣"
-    homepage: https://texuli.com/guides/
-    requires:
-      anyBins:
-        - bash
-        - git
+metadata: {"openclaw":{"emoji":"▣","homepage":"https://texuli.com/guides/","requires":{"anyBins":["bash","git"]}}}
 ---
 
 # Body
@@ -84,13 +89,7 @@ version: 0.1.0
 documentation_url: https://example.com/
 user-invocable: true
 allowed-tools: Bash
-metadata:
-  openclaw:
-    emoji: x
-    homepage: https://example.com/
-    requires:
-      anyBins:
-        - bash
+metadata: {"openclaw":{"emoji":"x","homepage":"https://example.com/","requires":{"anyBins":["bash"]}}}
 ---
 `;
       const parsed = parseFrontmatter(source);
@@ -107,13 +106,7 @@ version: "0.1.0"
 documentation_url: ${url}
 user-invocable: true
 allowed-tools: Bash
-metadata:
-  openclaw:
-    emoji: x
-    homepage: ${url}
-    requires:
-      anyBins:
-        - bash
+metadata: {"openclaw":{"emoji":"x","homepage":"${url}","requires":{"anyBins":["bash"]}}}
 ---
 `;
       const fields = (url: string) =>
@@ -547,4 +540,179 @@ describe('setup.sh pinning', () => {
       expect(out).toContain('--expect-version needs a version');
     }
   }, 30000);
+});
+
+describe('publishing standard (frontmatter limits, budgets, version, mirror)', () => {
+  const frontmatter = (fields: Record<string, string>) =>
+    `---\n${Object.entries({
+      name: 'texuli',
+      description: 'Router skill.',
+      version: '"0.1.0"',
+      documentation_url: 'https://texuli.com/guides/',
+      'user-invocable': 'true',
+      'allowed-tools': 'Bash, Read',
+      metadata:
+        '{"openclaw":{"emoji":"x","homepage":"https://texuli.com/guides/","requires":{"anyBins":["bash"]}}}',
+      ...fields,
+    })
+      .map(([key, value]) => `${key}: ${value}`)
+      .join('\n')}\n---\n`;
+
+  it('rejects nested YAML metadata, a name over 64 characters and a description over 1024', () => {
+    const fields = (source: string) =>
+      validateFrontmatterParsed('SKILL.md', parseFrontmatter(source)).map((i) => i.field);
+    expect(fields(frontmatter({}))).toEqual([]);
+    const nested = frontmatter({}).replace(
+      /^metadata: .*$/m,
+      'metadata:\n  openclaw:\n    emoji: x\n    homepage: https://texuli.com/guides/\n    requires:\n      anyBins:\n        - bash'
+    );
+    expect(fields(nested)).toEqual(['metadata']);
+    expect(fields(frontmatter({ name: `texuli-${'a'.repeat(NAME_MAX)}` }))).toEqual(['name']);
+    expect(fields(frontmatter({ description: 'x'.repeat(DESCRIPTION_MAX + 1) }))).toEqual([
+      'description',
+    ]);
+    expect(fields(frontmatter({ metadata: '{"openclaw": broken}' }))).toContain(
+      'metadata.openclaw'
+    );
+  });
+
+  it('keeps every SKILL.md and entry bundle within its byte budget, and every version on the router', () => {
+    // Measured 2026-10-27 at 0.2.0 (before T-skill-current): the largest
+    // SKILL.md was media/SKILL.md at 10,711 bytes and the largest bundle
+    // evals at 42,278 bytes. Raising a budget is a reviewed decision.
+    expect(SKILL_MD_BUDGET).toBe(16_384);
+    expect(BUNDLE_BUDGET).toBe(65_536);
+    expect(checkBudgets(skillRoot)).toEqual([]);
+    const bundles = skillBundles(skillRoot);
+    expect(bundles.map((bundle) => bundle.entry).sort()).toEqual(skillMdPaths(skillRoot).sort());
+    // Every pack file except the manifest and the changelog belongs to exactly one bundle.
+    const owned = bundles.flatMap((bundle) => bundle.files).sort();
+    expect(new Set(owned).size).toBe(owned.length);
+    expect(owned).toContain('router/routes.md');
+    expect(owned).toContain('upgrade/SKILL.md');
+    expect(owned).not.toContain('CHANGELOG.md');
+    // A temp pack over budget is reported for the SKILL.md and its bundle.
+    const pack = tempDir();
+    mkdirSync(join(pack, 'big', 'references'), { recursive: true });
+    writeFileSync(join(pack, 'SKILL.md'), 'x');
+    writeFileSync(join(pack, 'big', 'SKILL.md'), 'x'.repeat(SKILL_MD_BUDGET + 1));
+    writeFileSync(join(pack, 'big', 'references', 'a.md'), 'x'.repeat(BUNDLE_BUDGET));
+    expect(checkBudgets(pack).map((i) => `${i.file} ${i.field}`)).toEqual([
+      'big/SKILL.md budget',
+      'big/SKILL.md bundle',
+    ]);
+    expect(checkVersionSync(skillRoot)).toEqual([]);
+  });
+
+  it('keeps the dogfood mirror byte-identical to the pack, with its skills-lock.json hash', () => {
+    const mirror = join(root, '.agents', 'skills', 'texuli');
+    expect(mirrorDifferences(root)).toEqual([]);
+    expect(checkMirror(root)).toEqual([]);
+    const lock = JSON.parse(readFileSync(join(root, 'skills-lock.json'), 'utf8'));
+    expect(lock.skills.texuli).toMatchObject({
+      source: 'DailybotHQ/texuli',
+      skillPath: 'skills/texuli/SKILL.md',
+      computedHash: skillFolderHash(mirror),
+    });
+    // The algorithm reproduces an entry the real skills CLI wrote.
+    expect(skillFolderHash(join(root, '.agents', 'skills', 'ai-diff-reviewer'))).toBe(
+      lock.skills['ai-diff-reviewer'].computedHash
+    );
+  });
+
+  it('allows only pinned Texuli downloads, and only in the upgrade and pinned-install files', () => {
+    for (const line of [
+      "git ls-remote --tags --refs https://github.com/DailybotHQ/texuli.git 'skill-v*'",
+      'curl -fsSLO https://github.com/DailybotHQ/texuli/releases/download/skill-v<version>/texuli-skill-<version>.tar.gz',
+      'curl -fsSLO https://github.com/DailybotHQ/texuli/releases/download/skill-v0.3.0/SHA256SUMS',
+      'npx --yes skills add https://github.com/DailybotHQ/texuli/tree/skill-v0.3.0/skills/texuli --skill texuli -y',
+      'npx skills remove texuli -g',
+    ]) {
+      expect(isPinnedNetworkCommand(line), line).toBe(true);
+    }
+    for (const line of [
+      // The shorthand's ref can be ignored by the skills CLI.
+      'npx skills add DailybotHQ/texuli@skill-v0.3.0',
+      'npx skills add https://github.com/DailybotHQ/texuli/tree/main/skills/texuli',
+      'curl -fsSLO https://example.com/skill-v1.0.0/SHA256SUMS',
+      'git clone https://github.com/DailybotHQ/texuli.git',
+    ]) {
+      expect(isPinnedNetworkCommand(line), line).toBe(false);
+    }
+    const pack = tempDir();
+    const fence =
+      '```bash\ncurl -fsSLO https://github.com/DailybotHQ/texuli/releases/download/skill-v1.0.0/SHA256SUMS\n```\n';
+    mkdirSync(join(pack, 'upgrade'));
+    writeFileSync(join(pack, 'upgrade', 'SKILL.md'), fence);
+    writeFileSync(join(pack, 'GUIDE.md'), fence);
+    expect(validateSkillCommands(pack, root).map((i) => `${i.file} ${i.field}`)).toEqual([
+      'GUIDE.md command:2',
+    ]);
+  });
+
+  it('setup.sh installs into every host it lists, idempotently, under a temp home', async () => {
+    // The evidence behind the "install-tested" cells of docs/SKILL_COMPATIBILITY.md.
+    const { execFileSync, spawnSync } = await import('node:child_process');
+    const setup = join(skillRoot, 'setup.sh');
+    const hosts = execFileSync('bash', [setup, '--list-hosts'], { encoding: 'utf8' })
+      .trim()
+      .split('\n')
+      .map((line) => line.trim().split(/\s+/) as [string, string]);
+    expect(hosts.map(([host]) => host)).toEqual([
+      'claude',
+      'cursor',
+      'codex',
+      'gemini',
+      'copilot',
+      'opencode',
+      'windsurf',
+    ]);
+    const home = tempDir();
+    for (const [host, folder] of hosts) {
+      const target = join(home, folder.replace(/^~\//, ''));
+      const first = spawnSync('bash', [setup, '--host', host, '--home', home], {
+        encoding: 'utf8',
+      });
+      expect(first.status, `${host}: ${first.stderr}`).toBe(0);
+      expect(verifySkillChecksums(target), host).toEqual([]);
+      const again = spawnSync('bash', [setup, '--host', host, '--home', home], {
+        encoding: 'utf8',
+      });
+      expect(again.status, host).toBe(0);
+      expect(again.stdout, host).toContain('Already installed: no change.');
+    }
+    // Non-clobbering: an unrelated folder is refused (exit 3) and left as is;
+    // another Texuli version needs --replace, which keeps the old copy.
+    const other = tempDir();
+    const unrelated = join(other, '.claude', 'skills', 'texuli');
+    mkdirSync(unrelated, { recursive: true });
+    writeFileSync(join(unrelated, 'notes.txt'), 'mine\n');
+    const refused = spawnSync('bash', [setup, '--host', 'claude', '--home', other], {
+      encoding: 'utf8',
+    });
+    expect(refused.status).toBe(3);
+    expect(readdirSync(unrelated)).toEqual(['notes.txt']);
+    const older = join(home, '.claude', 'skills', 'texuli', 'SKILL.md');
+    writeFileSync(
+      older,
+      readFileSync(older, 'utf8').replace(/^version: ".*"$/m, 'version: "0.0.1"')
+    );
+    const blocked = spawnSync('bash', [setup, '--host', 'claude', '--home', home], {
+      encoding: 'utf8',
+    });
+    expect(blocked.status).toBe(3);
+    const replaced = spawnSync('bash', [setup, '--host', 'claude', '--home', home, '--replace'], {
+      encoding: 'utf8',
+    });
+    expect(replaced.status, replaced.stderr).toBe(0);
+    expect(verifySkillChecksums(join(home, '.claude', 'skills', 'texuli'))).toEqual([]);
+    const backups = readdirSync(join(home, '.texuli', 'skill-backups'));
+    expect(backups).toHaveLength(1);
+    expect(
+      readFileSync(
+        join(home, '.texuli', 'skill-backups', backups[0] as string, 'texuli', 'SKILL.md'),
+        'utf8'
+      )
+    ).toContain('version: "0.0.1"');
+  }, 60000);
 });

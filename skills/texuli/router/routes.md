@@ -6,7 +6,8 @@ when several intents appear in one request: pick the **narrowest** matching row.
 | Intent keywords | Guide | Notes |
 | --- | --- | --- |
 | install skill, setup.sh, host folder, checksums, verify skill | [`../setup.sh`](../setup.sh), [hosts.md](hosts.md) | Consent required before write; dry-run first |
-| trust, permissions, no network, consent | [`../TRUST.md`](../TRUST.md) | Always offline |
+| trust, permissions, no network, consent, provenance, signed | [`../TRUST.md`](../TRUST.md) | Always offline |
+| upgrade skill, update skill, newer skill version, latest skill release, skill changelog | [`../upgrade/SKILL.md`](../upgrade/SKILL.md) | Read-only tag check, consent, then a pinned `setup.sh --replace` |
 | button, input, dialog, layout, shell, component, dashboard, landing, form flow, slide deck, deck export, rich text editor, build UI | [`../build-ui/SKILL.md`](../build-ui/SKILL.md) | Catalog → pick → compose → validate → render |
 | theme, palette, dark mode, forced-colors, contrast, AA gate, theme CLI, theme MCP | [`../themes/SKILL.md`](../themes/SKILL.md) | Offline themes and color path |
 | image, video, audio, captions, waveform, gallery, composition, export, generator slot | [`../media/SKILL.md`](../media/SKILL.md) | Offline media build path |

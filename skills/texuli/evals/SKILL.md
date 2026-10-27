@@ -5,14 +5,7 @@ version: "0.2.0"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
-metadata:
-  openclaw:
-    emoji: "▣"
-    homepage: https://texuli.com/guides/
-    requires:
-      anyBins:
-        - bash
-        - git
+metadata: {"openclaw":{"emoji":"▣","homepage":"https://texuli.com/guides/","requires":{"anyBins":["bash","git"]}}}
 ---
 
 # Skill evals

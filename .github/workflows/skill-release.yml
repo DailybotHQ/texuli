@@ -1,0 +1,206 @@
+# Releases the agent skill (skills/texuli/) on its own tag namespace,
+# skill-vX.Y.Z (docs/RELEASE.md "Skill release").
+#
+# Trigger: the CI workflow completed successfully for a push to main. The
+# npm publish workflow triggers on `v*` tags; this one never triggers on a
+# tag, and its `skill-v*` tags never match `v*`.
+#
+# Skipped when the head commit is a release commit (`chore(release):`) or
+# carries `[skip release]`, and when no commit since the last skill-v tag
+# touches skills/texuli/.
+#
+# Steps (release job, the only job with contents: write):
+#   1. plan the version: the router's `version:` is the source; Conventional
+#      Commits touching skills/texuli/ since the last stable skill-v tag pick
+#      the bump (0.x: breaking -> minor);
+#   2. sync the version into every SKILL.md, stamp CHANGELOG.md (folding the
+#      hand-written [Unreleased] block), regenerate SHA256SUMS
+#      (check-skill --write-sums), refresh the .agents/skills/texuli mirror
+#      and validate the pack;
+#   3. commit and create the annotated tag locally;
+#   4. build texuli-skill-<v>.tar.gz from the tag (pack only) and a
+#      SHA256SUMS over the archive and every unpacked file; verify both;
+#   5. push the commit and the tag atomically (both land or neither does);
+#   6. publish the GitHub Release with the changelog section as notes.
+# The smoke job, read-only and without persisted credentials, then installs
+# the new tag with `npx skills add <tree URL>` into a temp project and
+# asserts the installed version and checksums.
+#
+# Needs AUTOMATION_GITHUB_TOKEN (allowed to push to a protected main) to
+# land the release commit; with the GITHUB_TOKEN fallback the atomic push is
+# rejected cleanly and nothing is published.
+name: Skill release
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: skill-release
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  release:
+    name: Version, tag and publish the skill
+    if: >-
+      github.event.workflow_run.conclusion == 'success'
+      && github.event.workflow_run.event == 'push'
+      && github.event.workflow_run.head_branch == 'main'
+      && !startsWith(github.event.workflow_run.head_commit.message, 'chore(release):')
+      && !contains(github.event.workflow_run.head_commit.message, '[skip release]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      released: ${{ steps.publish.outputs.released }}
+      version: ${{ steps.plan.outputs.version }}
+      tag: ${{ steps.plan.outputs.tag }}
+    steps:
+      # The exact commit CI passed; full history and tags for the bump base.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          token: ${{ secrets.AUTOMATION_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      # The checker validates commands against the workspace's binaries, so
+      # the workspace is installed, without running any install script in a
+      # job that holds a write token. Node runs the checker directly (it
+      # imports only node: builtins and uses erasable TypeScript).
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Plan the release
+        id: plan
+        run: node scripts/check-skill.ts --release-plan >> "$GITHUB_OUTPUT"
+
+      - name: Sync the version, stamp the changelog, write the sums
+        if: steps.plan.outputs.skip == 'false'
+        env:
+          VERSION: ${{ steps.plan.outputs.version }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'
+          node scripts/check-skill.ts --release "$VERSION" --date "$(date -u +%F)" \
+            --notes "$RUNNER_TEMP/RELEASE_NOTES.md"
+          # Regenerate SHA256SUMS over the stamped pack and validate it again.
+          node scripts/check-skill.ts --write-sums
+
+      - name: Commit and tag
+        if: steps.plan.outputs.skip == 'false'
+        env:
+          VERSION: ${{ steps.plan.outputs.version }}
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "::error::${TAG} already exists; refusing to move it."
+            exit 1
+          fi
+          git config user.name "Dailybot Automations"
+          git config user.email "ops@dailybot.com"
+          git add -- skills/texuli .agents/skills/texuli skills-lock.json
+          # Only the pack, its mirror and the lockfile may change.
+          git diff --exit-code
+          git commit -m "chore(release): texuli skill ${VERSION} [skip release]"
+          git tag -a "$TAG" -m "Texuli skill ${VERSION}"
+
+      - name: Build the archive and SHA256SUMS from the tag
+        id: assets
+        if: steps.plan.outputs.skip == 'false'
+        env:
+          VERSION: ${{ steps.plan.outputs.version }}
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/skill-release"
+          ARCHIVE="texuli-skill-${VERSION}.tar.gz"
+          mkdir -p "$OUT"
+          # The pack only, unpacking to texuli/, built from the tag.
+          git archive --format=tar.gz --prefix=texuli/ -o "$OUT/$ARCHIVE" "${TAG}:skills/texuli"
+          cd "$OUT"
+          tar -xzf "$ARCHIVE"
+          {
+            sha256sum "$ARCHIVE"
+            find texuli -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum
+          } > SHA256SUMS
+          sha256sum -c SHA256SUMS
+          bash texuli/setup.sh --verify --dir texuli --expect-version "$VERSION"
+          rm -rf texuli
+          echo "dir=$OUT" >> "$GITHUB_OUTPUT"
+          echo "archive=$ARCHIVE" >> "$GITHUB_OUTPUT"
+
+      # Both refs or neither: a rejected main (branch protection, or main
+      # moved on since CI ran) leaves no dangling tag. The next CI run on
+      # main plans the release again.
+      - name: Push the release commit and tag atomically
+        if: steps.plan.outputs.skip == 'false'
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: git push --atomic origin HEAD:refs/heads/main "refs/tags/${TAG}"
+
+      - name: Publish the GitHub Release
+        id: publish
+        if: steps.plan.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.AUTOMATION_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.plan.outputs.version }}
+          TAG: ${{ steps.plan.outputs.tag }}
+          DIR: ${{ steps.assets.outputs.dir }}
+          ARCHIVE: ${{ steps.assets.outputs.archive }}
+        run: |
+          set -euo pipefail
+          prerelease=()
+          case "$VERSION" in *-*) prerelease=(--prerelease) ;; esac
+          # --latest=false: the repository's "Latest" badge stays with the
+          # product; the skill's upgrade path reads the skill-v tags.
+          gh release create "$TAG" "$DIR/$ARCHIVE" "$DIR/SHA256SUMS" \
+            --verify-tag --latest=false "${prerelease[@]}" \
+            --title "Texuli skill ${VERSION}" \
+            --notes-file "$RUNNER_TEMP/RELEASE_NOTES.md"
+          echo "released=true" >> "$GITHUB_OUTPUT"
+
+  smoke:
+    name: Install the new tag with the skills CLI
+    needs: release
+    if: needs.release.outputs.released == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    # The third-party installer runs here, with no write token.
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: npx skills add <tree URL> into a temp project
+        env:
+          VERSION: ${{ needs.release.outputs.version }}
+          TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          # The REST surface behind the CLI can lag a just-pushed tag.
+          sleep 5
+          SMOKE=$(mktemp -d)
+          cd "$SMOKE"
+          git init -q
+          printf '%s\n' '{"name":"texuli-skill-smoke","private":true}' > package.json
+          # Pinned by the tree URL: the owner/repo@ref shorthand can install
+          # the default branch instead. Both -y flags are needed without a TTY.
+          npx --yes skills add "https://github.com/DailybotHQ/texuli/tree/${TAG}/skills/texuli" \
+            --skill texuli -y
+          INSTALLED=$(sed -nE 's/^version:[[:space:]]*"([^"]+)".*/\1/p' .agents/skills/texuli/SKILL.md | head -n1)
+          if [ "$INSTALLED" != "$VERSION" ]; then
+            echo "::error::installed version '${INSTALLED}', expected '${VERSION}' (${TAG})"
+            exit 1
+          fi
+          bash .agents/skills/texuli/setup.sh --verify --dir .agents/skills/texuli --expect-version "$VERSION"
+          echo "OK: ${TAG} installs with the skills CLI and matches its SHA256SUMS."
