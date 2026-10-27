@@ -169,3 +169,65 @@ stable 1.0.0 clear until the corresponding approved stable release actually
 exists. A passing pack gate proves only that a tarball
 was built and checked; it does not prove that it was published, supported, or
 usable by consumers.
+
+## Skill release
+
+The agent skill (`skills/texuli/`) is released apart from the npm packages,
+by `.github/workflows/skill-release.yml`. **No skill release has been cut
+yet**: the first one happens on the first push to `main` after this
+workflow lands, when the run's conditions below hold. Until then the pack
+is installed from a checkout ([SKILL_INSTALLATION](SKILL_INSTALLATION.md)).
+
+**Tags.** Skill releases are tagged `skill-vX.Y.Z`. The npm publish
+workflow triggers on `v*` tags; GitHub matches tag filters against the
+whole tag name, so `skill-v0.3.0` never starts an npm publish, and a
+package tag never starts a skill release (the skill workflow does not
+trigger on tags at all).
+
+**Trigger.** The workflow runs on `workflow_run` after the `CI` workflow
+completes for a push to `main`, and only when CI succeeded. It is skipped
+when the head commit is a release commit (`chore(release):`) or carries
+`[skip release]`, and when no commit since the last `skill-v` tag touches
+`skills/texuli/`.
+
+**Version.** The router's quoted `version:` in `skills/texuli/SKILL.md` is
+the only source; the release writes it into every `SKILL.md`
+(`pnpm check:skill` fails on a sub-skill that disagrees). The bump comes from
+the Conventional Commits that touch `skills/texuli/` since the last stable
+`skill-vX.Y.Z` tag: a breaking change (`type!:` or a `BREAKING CHANGE:`
+footer) is a major, `feat` a minor, anything else a patch. Before 1.0.0 a
+breaking change bumps the minor, as for the packages. When the router is
+already ahead of the last tag (the first release, or a deliberate 1.0.0
+set by hand in a reviewed commit), that version is released as written.
+
+**Steps.** With `contents: write` only in the release job:
+
+1. `pnpm exec tsx scripts/check-skill.ts --release-plan` decides the version
+   and tag; `--release <version>` syncs the version into every `SKILL.md`,
+   stamps `skills/texuli/CHANGELOG.md` (the commit subjects, then the folded
+   body of the hand-written `## [Unreleased]` block, which is left empty),
+   regenerates `SHA256SUMS` (`--write-sums`), refreshes the dogfood mirror
+   `.agents/skills/texuli/` and its `skills-lock.json` hash, and validates the
+   pack.
+2. The release commit `chore(release): texuli skill X.Y.Z [skip release]`
+   and the annotated tag `skill-vX.Y.Z` are pushed together with
+   `git push --atomic`: either both land or neither does, so a rejected push
+   (branch protection, or `main` moved on) leaves no dangling tag.
+3. `git archive` builds `texuli-skill-X.Y.Z.tar.gz` from the tag (the pack
+   only, unpacking to `texuli/`); `SHA256SUMS` lists the archive and every
+   unpacked file, and the job checks both with `sha256sum -c` and
+   `setup.sh --verify --dir … --expect-version` before publishing.
+4. `gh release create` publishes the GitHub Release with the stamped
+   changelog section as its notes and both assets.
+5. A separate job with read-only permissions and no persisted credentials
+   installs the new tag with the skills CLI, pinned by its tree URL, into a
+   temp project and asserts the installed version and checksums.
+
+Pushing the release commit to a protected `main` needs the
+`AUTOMATION_GITHUB_TOKEN` secret (a token allowed to bypass branch
+protection); without it the job falls back to `GITHUB_TOKEN` and the
+atomic push fails cleanly. Pre-releases of the skill are not automated.
+
+**Provenance.** Releases are checksummed, not signed. The pack's own
+`SHA256SUMS` travels with the files; only the release `SHA256SUMS` asset is
+independent provenance ([TRUST.md](../skills/texuli/TRUST.md#provenance)).

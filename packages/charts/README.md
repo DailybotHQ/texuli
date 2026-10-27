@@ -164,4 +164,4 @@ Contributions are welcome; start at the
 
 ## License
 
-MIT © Dailybot, Inc.
+MIT © Dailybot, Inc. Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-charts).

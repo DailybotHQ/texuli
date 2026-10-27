@@ -99,3 +99,7 @@ including hostile paste and link-policy cases, and the component). Examples:
   limit for the editor yet; the long-document posture is a design budget,
   not a measured result.
 - Tree adapters to blocks and the catalog are planned in those packages.
+
+---
+
+Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-editor).

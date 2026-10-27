@@ -21,19 +21,21 @@ packages in lower layers.
 | --- | --- | --- | --- |
 | L0 | `@texuli/core` | Texels: ids, keyboard intents, roving focus and typeahead, focus scope, inert, dismissable layers, layer stack, overlay engine, portal, positioning (math + DOM), presence, scroll lock, tabbable, form bridge, announcer, direction and locale, the URL policy | none |
 | L0 | `@texuli/date` | Framework-free Gregorian dates, arithmetic, locale week starts and time-zone-aware today | none |
+| L0 | `@texuli/drag` | In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing) | none |
 | L0 | `@texuli/spec` | Framework-free blueprint contract and code generation | none |
-| L1 | `@texuli/primitives` | 41 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core, date |
+| L1 | `@texuli/primitives` | 41 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core, date, drag |
 | L2 | `@texuli/tokens` | The OKLCH theme engine, the `--tx-*` token contract, 200+ themes, compiled CSS, forced colors, the AA gate, the Tailwind preset | none |
 | L3 | `texuli` | Styled components (Button … Tree), the class helpers (`cx`, `variants`), icons, layouts and app shells | core, primitives, tokens |
 | L4 | `@texuli/charts` | Chart math and every chart family, one lazy subpath per family | core, primitives, tokens, texuli |
-| L4 | `@texuli/data` | Data views: grid (core, columns, editing, virtual), tree, board, calendar, timeline, map, activity, files, virtual list | core, primitives, tokens, texuli |
+| L4 | `@texuli/data` | Data views: grid (core, columns, editing, virtual), tree, board, calendar, timeline, map, activity, files, virtual list | core, drag, primitives, tokens, texuli |
 | L4 | `@texuli/media` | Image, gallery, video, audio, captions, image editor, compositions, animation, export | core, primitives, tokens, texuli |
 | L4 | `@texuli/chat` | Thread, message list, composer, typing indicator | core, primitives, tokens, texuli |
 | L4 | `@texuli/editor` | Rich text editor surface, toolbar, link dialog, headless controller, clipboard import | core, primitives, tokens, texuli |
+| L4 | `@texuli/workflows` | In development: interactive, accessible workflow graph editor and viewer (model, layout, editor) | core, drag, primitives, tokens, texuli |
 | L5 | `@texuli/blocks` | Content blocks (text, code, data, diagram, embed, interactive, map, media, structure): closed vocabulary, untrusted guard, formula AST | core, tokens, texuli, charts, data, media |
-| L6 | `@texuli/catalog` | The agent catalog (manifests per group, build) and the renderer with no HTML sinks | core, texuli, charts, data, blocks, media |
+| L6 | `@texuli/catalog` | The agent catalog (manifests per group, build) and the renderer with no HTML sinks | core, spec, texuli, charts, data, blocks, media |
 | L7 | `@texuli/slides` | Slide model, grammar, export and stage runtime | blocks, catalog, media, tokens |
-| L7 | `@texuli/player` | Blueprint player runtime and styles | blocks, catalog, charts, media |
+| L7 | `@texuli/player` | Blueprint player runtime and styles | blocks, catalog, charts, chat, data, media, primitives, spec, texuli, workflows |
 | L8 | `@texuli/tools` | Copy-in CLI (`texuli-add`, `texuli-init`, `texuli-update`), `texuli-llms`, A2UI adapter, custom elements and the golden set | core, tokens, catalog, blocks, charts, media |
 | L8 | `@texuli/astro` | Astro integration, site helpers and content layouts | blocks, core, tokens |
 
@@ -102,6 +104,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/editor` (private) | `.`, `controller`, `editor`, `link-dialog`, `paste`, `toolbar` |
 | `@texuli/core` (private) | `.`, `announcer`, `controllable`, `dir-locale`, `dismiss`, `editor-history`, `editor-keymap`, `editor-markdown`, `editor-model`, `editor-transforms`, `env`, `focus-scope`, `form-bridge`, `ids`, `inert`, `keyboard`, `layer-stack`, `lazy`, `overlay`, `overlay-core`, `portal`, `position-dom`, `position-math`, `presence`, `roving`, `scroll-lock`, `tabbable`, `url-policy` |
 | `@texuli/date` (private) | `.`, `calendar` |
+| `@texuli/drag` (private, in development) | `.` |
 | `@texuli/data` (private) | `.`, `activity`, `activity/engine`, `board`, `board/engine`, `calendar`, `files`, `files/engine`, `geo`, `grid`, `grid-columns`, `grid-core`, `grid-virtual`, `map`, `timeline`, `timeline/engine`, `tree`, `tree-view`, `virtual-list`, `calendar/view`, `grid-editing` |
 | `@texuli/examples` (private) | `.` |
 | `@texuli/media` (private) | `.`, `animation`, `animation/player`, `audio`, `captions`, `composition-canvas`, `composition-canvas/draw`, `composition-canvas/render`, `composition-model`, `composition-svg`, `composition-v2`, `export`, `export/ui`, `gallery`, `gallery/lightbox`, `generator-slot`, `image`, `image-editor`, `image-editor/model`, `image-editor/render`, `timeline`, `timeline/model`, `video` |
@@ -109,6 +112,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/primitives` (private) | `.`, `accordion`, `alert-dialog`, `color-picker`, `context-menu`, `label`, `number-field`, `progress`, `separator`, `sheet`, `slider`, `tags-input`, `toolbar`, `tooltip`, `collapsible`, `command`, `date-picker`, `date-field`, `file-drop`, `radio-group`, `switch`, `checkbox`, `calendar`, `toggle`, `menu`, `menubar`, `popover`, `tabs`, `hover-card`, `tree`, `listbox`, `select`, `splitter`, `portal`, `navigation-menu`, `scroll-area`, `pagination`, `toast`, `dialog`, `pin-input`, `combobox`, `avatar` |
 | `@texuli/slides` (private) | `.`, `model`, `grammar`, `export`, `templates`, `stage`, `styles.css` |
 | `@texuli/spec` (private) | `.`, `codegen` |
+| `@texuli/workflows` (private, in development) | `.` |
 | `texuli` (private) | `.`, `alert`, `avatar`, `badge`, `button`, `card`, `carousel`, `choice`, `combobox`, `command`, `cx`, `date`, `dialog`, `empty`, `feedback`, `field`, `file-upload`, `icons`, `icons/lucide`, `input`, `kbd-code`, `layouts/app`, `layouts/app/dual-sidebar`, `layouts/app/master-detail`, `layouts/app/rail`, `layouts/app/sidebar`, `layouts/app/split-view`, `layouts/app/top-nav`, `layouts/auth-settings`, `layouts/auth-settings/register`, `layouts/content/blog`, `layouts/content/docs`, `layouts/content/editorial`, `layouts/dashboard`, `layouts/dashboard/register`, `layouts/host`, `layouts/host/chrome`, `layouts/host/drawer`, `layouts/marketing`, `layouts/marketing/entry`, `layouts/marketing/landing`, `layouts/marketing/pricing`, `layouts/marketing/register`, `layouts/marketing/section`, `layouts/mobile`, `layouts/mobile/register`, `layouts/shells`, `menus`, `navigation`, `number-pin`, `popover`, `rating`, `resizable`, `scroll-area`, `select`, `separator-aspect`, `sheet`, `sidebar`, `slider`, `stat`, `stepper`, `table`, `tabs-accordion`, `tags-color`, `timeline`, `toast`, `toggle`, `toolbar`, `tooltip`, `tree` |
 | `@texuli/tokens` (private) | `.`, `aa-gate`, `aa-gate/components`, `base.css`, `build`, `contract`, `css`, `forced-colors`, `forced-colors.css`, `generator`, `library`, `library-expand`, `modes`, `no-flash`, `palette`, `style-presets`, `tailwind`, `tailwind/preset.css` |
 | `@texuli/tools` (private) | `.`, `a2ui`, `cli-add`, `cli-init`, `cli-update`, `llms`, `elements`, `golden` |
