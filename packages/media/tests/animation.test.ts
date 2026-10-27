@@ -63,52 +63,57 @@ describe('applyEasing', () => {
 });
 
 describe('validateAnimation', () => {
-  it('accepts a valid animation bound to composition layers', () => {
-    const composition = validateComposition(compositionInput);
-    expect(composition.ok).toBe(true);
-    if (!composition.ok) return;
-    const result = validateAnimation(animationInput, { composition: composition.composition });
-    expect(result.ok).toBe(true);
-  });
+  it('accepts a valid animation bound to composition layers; rejects unknown layer ids, bad easing and hostile fields', async () => {
+    // accepts a valid animation bound to composition layers
+    await (async () => {
+      const composition = validateComposition(compositionInput);
+      expect(composition.ok).toBe(true);
+      if (!composition.ok) return;
+      const result = validateAnimation(animationInput, { composition: composition.composition });
+      expect(result.ok).toBe(true);
+    })();
+    cleanup();
+    vi.useRealTimers();
+    // rejects unknown layer ids, bad easing and hostile fields
+    await (async () => {
+      const composition = validateComposition(compositionInput);
+      expect(composition.ok).toBe(true);
+      if (!composition.ok) return;
 
-  it('rejects unknown layer ids, bad easing and hostile fields', () => {
-    const composition = validateComposition(compositionInput);
-    expect(composition.ok).toBe(true);
-    if (!composition.ok) return;
+      const missing = validateAnimation(
+        {
+          version: 1,
+          durationMs: 500,
+          tracks: [{ layerId: 'nope', keyframes: [{ timeMs: 0 }] }],
+        },
+        { composition: composition.composition }
+      );
+      expect(missing.ok).toBe(false);
 
-    const missing = validateAnimation(
-      {
+      const easing = validateAnimation({
         version: 1,
         durationMs: 500,
-        tracks: [{ layerId: 'nope', keyframes: [{ timeMs: 0 }] }],
-      },
-      { composition: composition.composition }
-    );
-    expect(missing.ok).toBe(false);
+        tracks: [
+          {
+            layerId: 'box',
+            keyframes: [{ timeMs: 0, easing: 'cubic-bezier(1,2,3,4)' }],
+          },
+        ],
+      });
+      expect(easing.ok).toBe(false);
 
-    const easing = validateAnimation({
-      version: 1,
-      durationMs: 500,
-      tracks: [
-        {
-          layerId: 'box',
-          keyframes: [{ timeMs: 0, easing: 'cubic-bezier(1,2,3,4)' }],
-        },
-      ],
-    });
-    expect(easing.ok).toBe(false);
-
-    const hostile = validateAnimation({
-      version: 1,
-      durationMs: 500,
-      tracks: [
-        {
-          layerId: 'box',
-          keyframes: [{ timeMs: 0, style: 'background:url(javascript:1)' }],
-        },
-      ],
-    });
-    expect(hostile.ok).toBe(false);
+      const hostile = validateAnimation({
+        version: 1,
+        durationMs: 500,
+        tracks: [
+          {
+            layerId: 'box',
+            keyframes: [{ timeMs: 0, style: 'background:url(javascript:1)' }],
+          },
+        ],
+      });
+      expect(hostile.ok).toBe(false);
+    })();
   });
 });
 
@@ -172,66 +177,73 @@ describe('createTimeline', () => {
 });
 
 describe('CompositionAnimationPlayer', () => {
-  it('renders a still under forced reduced motion with scrubber controls', async () => {
-    const { container, getByRole } = render(CompositionAnimationPlayer, {
-      props: {
-        composition: compositionInput,
-        animation: animationInput,
-        reducedMotion: true,
-        title: 'Anim demo',
-        initialTimeMs: 0,
-      },
-    });
+  it('renders a still under forced reduced motion with scrubber controls; allows play and scrub when motion is enabled; shows an alert for invalid animation documents', async () => {
+    // renders a still under forced reduced motion with scrubber controls
+    await (async () => {
+      const { container, getByRole } = render(CompositionAnimationPlayer, {
+        props: {
+          composition: compositionInput,
+          animation: animationInput,
+          reducedMotion: true,
+          title: 'Anim demo',
+          initialTimeMs: 0,
+        },
+      });
 
-    await vi.waitFor(() => {
-      expect(container.querySelector('[data-tx-animation-still]')).toBeTruthy();
-    });
-    const root = container.querySelector('[data-tx-composition-animation="true"]');
-    expect(root?.getAttribute('data-reduced-motion')).toBe('true');
-    await vi.waitFor(() => {
-      expect(container.querySelector('[data-tx-composition-svg="true"]')).toBeTruthy();
-    });
+      await vi.waitFor(() => {
+        expect(container.querySelector('[data-tx-animation-still]')).toBeTruthy();
+      });
+      const root = container.querySelector('[data-tx-composition-animation="true"]');
+      expect(root?.getAttribute('data-reduced-motion')).toBe('true');
+      await vi.waitFor(() => {
+        expect(container.querySelector('[data-tx-composition-svg="true"]')).toBeTruthy();
+      });
 
-    const play = getByRole('button', { name: 'Play' });
-    expect((play as HTMLButtonElement).disabled).toBe(true);
+      const play = getByRole('button', { name: 'Play' });
+      expect((play as HTMLButtonElement).disabled).toBe(true);
 
-    const scrubber = container.querySelector('[data-tx-animation-scrubber]') as HTMLInputElement;
-    expect(scrubber).toBeTruthy();
-    expect(scrubber.disabled).toBe(true);
-  });
+      const scrubber = container.querySelector('[data-tx-animation-scrubber]') as HTMLInputElement;
+      expect(scrubber).toBeTruthy();
+      expect(scrubber.disabled).toBe(true);
+    })();
+    cleanup();
+    vi.useRealTimers();
+    // allows play and scrub when motion is enabled
+    await (async () => {
+      const { getByRole, container } = render(CompositionAnimationPlayer, {
+        props: {
+          composition: compositionInput,
+          animation: animationInput,
+          reducedMotion: false,
+          autoplay: false,
+        },
+      });
+      await vi.waitFor(() => {
+        expect(getByRole('button', { name: 'Play' })).toBeTruthy();
+      });
+      const play = getByRole('button', { name: 'Play' });
+      await fireEvent.click(play);
+      expect((play as HTMLButtonElement).disabled).toBe(false);
 
-  it('allows play and scrub when motion is enabled', async () => {
-    const { getByRole, container } = render(CompositionAnimationPlayer, {
-      props: {
-        composition: compositionInput,
-        animation: animationInput,
-        reducedMotion: false,
-        autoplay: false,
-      },
-    });
-    await vi.waitFor(() => {
-      expect(getByRole('button', { name: 'Play' })).toBeTruthy();
-    });
-    const play = getByRole('button', { name: 'Play' });
-    await fireEvent.click(play);
-    expect((play as HTMLButtonElement).disabled).toBe(false);
-
-    const scrubber = container.querySelector('[data-tx-animation-scrubber]') as HTMLInputElement;
-    scrubber.value = '500';
-    await fireEvent.input(scrubber);
-    const time = container.querySelector('[data-tx-animation-time]');
-    expect(time?.textContent).toMatch(/0\.5s|1\.0s|0\.0s/);
-  });
-
-  it('shows an alert for invalid animation documents', async () => {
-    const { container } = render(CompositionAnimationPlayer, {
-      props: {
-        composition: compositionInput,
-        animation: { version: 1, durationMs: 100, tracks: [] },
-      },
-    });
-    await vi.waitFor(() => {
-      expect(container.querySelector('[role="alert"]')).toBeTruthy();
-    });
+      const scrubber = container.querySelector('[data-tx-animation-scrubber]') as HTMLInputElement;
+      scrubber.value = '500';
+      await fireEvent.input(scrubber);
+      const time = container.querySelector('[data-tx-animation-time]');
+      expect(time?.textContent).toMatch(/0\.5s|1\.0s|0\.0s/);
+    })();
+    cleanup();
+    vi.useRealTimers();
+    // shows an alert for invalid animation documents
+    await (async () => {
+      const { container } = render(CompositionAnimationPlayer, {
+        props: {
+          composition: compositionInput,
+          animation: { version: 1, durationMs: 100, tracks: [] },
+        },
+      });
+      await vi.waitFor(() => {
+        expect(container.querySelector('[role="alert"]')).toBeTruthy();
+      });
+    })();
   });
 });
