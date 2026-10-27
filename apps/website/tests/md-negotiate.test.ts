@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from 'vitest';
 import { onRequest } from '../../../functions/_middleware.ts';
+import { varyHeaderLine } from '../src/components/security/csp.ts';
 import { negotiateTwin } from '../src/lib/md-negotiate.ts';
 
 describe('negotiateTwin', () => {
@@ -117,49 +118,30 @@ describe('the middleware wrapper', () => {
   });
 });
 
-describe('the middleware Vary on negotiable HTML (PLAN_006 P2-4)', () => {
-  // A shared cache keyed only by URL could hand a markdown twin to a browser
-  // (or HTML to an agent) unless the HTML variant also declares Vary: Accept.
-  it('adds Vary: Accept to the HTML of a docs path, like its twin', async () => {
-    const { context } = makeContext('/guides/theming/', 'text/html', {});
-    const response = await onRequest(context);
-    expect(response.headers.get('content-type')).toBe('text/html; charset=utf-8');
-    expect(response.headers.get('vary')).toBe('Accept');
-    expect(await response.text()).toContain('page');
-  });
-
-  it('adds it when the twin was not built and the pipeline answers', async () => {
-    const { context } = makeContext('/web-and-native/', 'text/markdown', {});
-    const response = await onRequest(context);
-    expect(response.headers.get('vary')).toBe('Accept');
-  });
-
-  it('keeps an existing Vary and never duplicates Accept', async () => {
-    const { context, next } = makeContext('/guides/theming/', null, {});
-    next.mockImplementationOnce(
-      async () =>
-        new Response('<!doctype html><html lang="en"><body>page</body></html>', {
-          status: 200,
-          headers: { 'content-type': 'text/html; charset=utf-8', vary: 'Accept-Encoding' },
-        })
-    );
-    expect((await onRequest(context)).headers.get('vary')).toBe('Accept-Encoding, Accept');
-    const again = makeContext('/guides/theming/', null, {});
-    again.next.mockImplementationOnce(
-      async () =>
-        new Response('<!doctype html><html lang="en"><body>page</body></html>', {
-          status: 200,
-          headers: { 'content-type': 'text/html; charset=utf-8', vary: 'accept' },
-        })
-    );
-    expect((await onRequest(again.context)).headers.get('vary')).toBe('accept');
-  });
-
-  it('leaves non-negotiable pages without Vary: Accept', async () => {
-    for (const path of ['/', '/themes/']) {
-      const { context } = makeContext(path, 'text/html', {});
-      expect((await onRequest(context)).headers.get('vary')).toBeNull();
+describe('negotiable HTML keeps its host headers (PLAN_006 T-100 S-2)', () => {
+  // Cloudflare Pages applies `_headers` (the per-page CSP) only to the asset
+  // response itself: a Function that rebuilds the response drops the CSP.
+  // Production showed exactly that on /guides/getting-started/ once the
+  // middleware rebuilt docs HTML to add Vary. So the middleware returns the
+  // pipeline's response object untouched, and `Vary: Accept` for negotiable
+  // pages is declared in `_headers` next to the CSP.
+  it('returns the pipeline HTML response itself, never a rebuilt copy', async () => {
+    for (const path of ['/guides/theming/', '/web-and-native/', '/']) {
+      const { context, next } = makeContext(path, 'text/html', {});
+      const piped = new Response('<!doctype html><html lang="en"><body>page</body></html>', {
+        status: 200,
+        headers: { 'content-type': 'text/html; charset=utf-8' },
+      });
+      next.mockImplementationOnce(async () => piped);
+      expect(await onRequest(context), path).toBe(piped);
     }
+  });
+
+  it('declares Vary: Accept in the _headers rule of a page with a twin only', () => {
+    expect(varyHeaderLine('/guides/theming/')).toBe('\n  Vary: Accept');
+    expect(varyHeaderLine('/guides/theming/index.html')).toBe('\n  Vary: Accept');
+    expect(varyHeaderLine('/')).toBe('');
+    expect(varyHeaderLine('/theme-studio/')).toBe('');
   });
 });
 
