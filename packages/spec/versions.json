@@ -15,7 +15,7 @@
     },
     {
       "specVersion": "0.3.0",
-      "specDigest": "f543adeff6c2caf3b146b81ef33cb15bc6a7e996d6be4fbfdbe887ba6e7099dc",
+      "specDigest": "a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848",
       "change": "minor",
       "summary": "Additive: envelope spec/state/flow, node bind/on, $defs binding, stateDeclaration, flow, action (closed), eventMap, reorder; catalog events/bindable/propSchema/deprecated; warnings; schemas/workflow.schema.json; codes state, unknown-state, binding, action, unknown-event, workflow; migrations 0.2.0→0.3.0."
     }

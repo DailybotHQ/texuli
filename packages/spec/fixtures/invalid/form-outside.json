@@ -1,0 +1,48 @@
+{
+  "$comment": "Must fail spec validation with exactly these diagnostic codes, in order. A form field and a form submit sit outside any action-form, which the player refuses.",
+  "expect": ["action", "action"],
+  "blueprint": {
+    "format": "texuli-blueprint",
+    "version": 1,
+    "id": "bad-form-outside",
+    "catalog": "6389ff8dfd63e2b2e7cf5986be9f82fd72a3256e9e86fe634d066bbcd640ddd2",
+    "status": "draft",
+    "createdAt": "2026-10-27T09:00:00Z",
+    "updatedAt": "2026-10-27T09:00:00Z",
+    "generator": {
+      "kind": "agent",
+      "name": "Harbor assistant",
+      "model": "example-model"
+    },
+    "tier": "untrusted",
+    "profile": "web",
+    "spec": "0.3.0",
+    "state": {
+      "email": {
+        "type": "string"
+      }
+    },
+    "tree": {
+      "id": "layout-doc",
+      "props": {
+        "title": "Contact"
+      },
+      "children": [
+        {
+          "id": "form-field",
+          "props": {
+            "name": "email",
+            "label": "Email",
+            "state": "email"
+          }
+        },
+        {
+          "id": "form-submit",
+          "props": {
+            "label": "Send"
+          }
+        }
+      ]
+    }
+  }
+}

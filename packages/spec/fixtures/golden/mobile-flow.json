@@ -1,0 +1,319 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "mobile-flow-workshop-signup",
+  "catalog": "6389ff8dfd63e2b2e7cf5986be9f82fd72a3256e9e86fe634d066bbcd640ddd2",
+  "status": "draft",
+  "createdAt": "2026-10-27T09:00:00Z",
+  "updatedAt": "2026-10-27T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Harbor assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "asOf": "2026-10-26T23:59:00Z",
+  "sources": [
+    {
+      "label": "Harborline workspace",
+      "href": "https://example.com/workspace"
+    }
+  ],
+  "trigger": {
+    "kind": "request",
+    "label": "Workshop sign-up requested in chat"
+  },
+  "spec": "0.3.0",
+  "state": {
+    "fullName": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "email": {
+      "type": "string",
+      "maxLength": 254
+    },
+    "team": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "seats": {
+      "type": "number",
+      "min": 1,
+      "max": 6,
+      "initial": 1
+    },
+    "reminders": {
+      "type": "boolean",
+      "initial": true
+    }
+  },
+  "flow": {
+    "views": ["welcome", "details", "confirm", "done"],
+    "initial": "welcome",
+    "transitions": [
+      {
+        "from": "welcome",
+        "to": "details",
+        "on": "start"
+      },
+      {
+        "from": "details",
+        "to": "confirm",
+        "on": "next"
+      },
+      {
+        "from": "confirm",
+        "to": "details",
+        "on": "back"
+      },
+      {
+        "from": "confirm",
+        "to": "done",
+        "on": "submitted"
+      },
+      {
+        "from": "*",
+        "to": "welcome",
+        "on": "restart"
+      }
+    ]
+  },
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Workshop sign-up",
+      "description": "Reserve seats for the fictional Harborline onboarding workshop."
+    },
+    "children": [
+      {
+        "id": "layout-stack",
+        "props": {
+          "gap": "medium"
+        },
+        "children": [
+          {
+            "id": "flow-view",
+            "props": {
+              "name": "welcome",
+              "label": "Welcome"
+            },
+            "children": [
+              {
+                "id": "blocks-text",
+                "props": {
+                  "block": {
+                    "type": "text",
+                    "markdown": "A two-hour hands-on session for new workspace admins. Seats are limited."
+                  }
+                }
+              },
+              {
+                "id": "media-image",
+                "props": {
+                  "src": "https://example.com/images/workshop.jpg",
+                  "alt": "People working at a shared table",
+                  "width": 1200,
+                  "height": 675,
+                  "fit": "cover"
+                }
+              },
+              {
+                "id": "flow-action",
+                "props": {
+                  "event": "start",
+                  "label": "Start sign-up"
+                }
+              }
+            ]
+          },
+          {
+            "id": "flow-view",
+            "props": {
+              "name": "details",
+              "label": "Your details"
+            },
+            "children": [
+              {
+                "id": "action-form",
+                "props": {
+                  "action": "save-details",
+                  "label": "Your details"
+                },
+                "on": {
+                  "submit": [
+                    {
+                      "op": "flowGo",
+                      "event": "next"
+                    }
+                  ]
+                },
+                "children": [
+                  {
+                    "id": "form-field",
+                    "props": {
+                      "name": "fullName",
+                      "label": "Full name",
+                      "state": "fullName",
+                      "required": true,
+                      "autocomplete": "name",
+                      "maxLength": 120
+                    }
+                  },
+                  {
+                    "id": "form-field",
+                    "props": {
+                      "name": "email",
+                      "label": "Email",
+                      "state": "email",
+                      "required": true,
+                      "kind": "email",
+                      "autocomplete": "email",
+                      "pattern": "email",
+                      "placeholder": "name@example.com"
+                    }
+                  },
+                  {
+                    "id": "form-field",
+                    "props": {
+                      "name": "team",
+                      "label": "Team",
+                      "state": "team",
+                      "required": false,
+                      "autocomplete": "organization"
+                    }
+                  },
+                  {
+                    "id": "control-slider",
+                    "props": {
+                      "label": "Seats",
+                      "state": "seats"
+                    }
+                  },
+                  {
+                    "id": "form-submit",
+                    "props": {
+                      "label": "Review"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "flow-view",
+            "props": {
+              "name": "confirm",
+              "label": "Confirm"
+            },
+            "children": [
+              {
+                "id": "action-form",
+                "props": {
+                  "action": "reserve-seats",
+                  "label": "Reserve seats"
+                },
+                "on": {
+                  "submit": [
+                    {
+                      "op": "emit",
+                      "intent": "workshop-reserved",
+                      "values": {
+                        "email": {
+                          "$state": "email"
+                        },
+                        "seats": {
+                          "$state": "seats"
+                        },
+                        "reminders": {
+                          "$state": "reminders"
+                        }
+                      }
+                    },
+                    {
+                      "op": "flowGo",
+                      "event": "submitted"
+                    }
+                  ]
+                },
+                "children": [
+                  {
+                    "id": "form-field",
+                    "props": {
+                      "name": "fullName",
+                      "label": "Full name",
+                      "state": "fullName",
+                      "required": true,
+                      "autocomplete": "name",
+                      "maxLength": 120
+                    }
+                  },
+                  {
+                    "id": "form-field",
+                    "props": {
+                      "name": "email",
+                      "label": "Email",
+                      "state": "email",
+                      "required": true,
+                      "kind": "email",
+                      "autocomplete": "email",
+                      "pattern": "email"
+                    }
+                  },
+                  {
+                    "id": "control-toggle",
+                    "props": {
+                      "label": "Email reminders",
+                      "state": "reminders"
+                    }
+                  },
+                  {
+                    "id": "form-submit",
+                    "props": {
+                      "label": "Reserve seats"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "flow-action",
+                "props": {
+                  "event": "back",
+                  "label": "Back"
+                }
+              }
+            ]
+          },
+          {
+            "id": "flow-view",
+            "props": {
+              "name": "done",
+              "label": "Done"
+            },
+            "children": [
+              {
+                "id": "blocks-text",
+                "props": {
+                  "block": {
+                    "type": "callout",
+                    "tone": "success",
+                    "title": "Reserved",
+                    "body": "You are on the list. A confirmation is on its way to your inbox."
+                  }
+                }
+              },
+              {
+                "id": "flow-action",
+                "props": {
+                  "event": "restart",
+                  "label": "Sign up someone else"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

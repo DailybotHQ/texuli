@@ -62,6 +62,8 @@ fun validateBlueprint(
     }
     val state = checkStateDeclarations(envelope.state, out)
     val flow = checkFlow(envelope.flow, out)
+    // The state surface's node rules, as the player refuses them at paint time.
+    checkStateSurface(envelope.tree, surfaceInputs(envelope), out)
     val warnings = ArrayList<SpecWarning>()
     out += validateTree(
         envelope.tree,
@@ -215,6 +217,9 @@ fun listProblem(value: JsonValue, maxItems: Int): Pair<String, String>? {
                 else -> false
             }
             if (!ok) return "$at.$key" to "Item fields are named scalars (strings of at most 1000)."
+            if (field is JsonValue.Str && !SpecContract.LIST_TEXT.matches(field.value)) {
+                return "$at.$key" to "Item text cannot hold control, bidirectional or invisible formatting characters."
+            }
         }
     }
     return null

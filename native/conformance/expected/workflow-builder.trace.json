@@ -1,0 +1,50 @@
+{
+  "golden": "workflow-builder",
+  "trace": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "id": "workflow-graph",
+                  "role": "generic"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Editor",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "id": "workflow-graph",
+                      "role": "generic"
+                    }
+                  ],
+                  "id": "layout-card",
+                  "name": "Preview",
+                  "role": "group"
+                },
+                {
+                  "id": "blocks-text",
+                  "role": "list"
+                }
+              ],
+              "id": "layout-stack",
+              "role": "generic"
+            }
+          ],
+          "id": "layout-split",
+          "role": "generic"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Expense approval workflow",
+      "role": "main"
+    }
+  ]
+}

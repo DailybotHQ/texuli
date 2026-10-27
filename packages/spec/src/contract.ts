@@ -1,3 +1,4 @@
+import { LIST_TEXT_PATTERN } from './surface.ts';
 /**
  * The 0.3.0 interaction contract in code (ADR-008): the closed action set,
  * the closed event vocabulary, the state types, the limits and the name
@@ -115,6 +116,16 @@ export const SPEC_PATTERNS = Object.freeze({
   /** Multi-line display text (workflow string field values): tab and newline allowed. */
   workflowText: '^[^\\u0000-\\u0008\\u000b-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*$',
   workflowLabel: '^[^\\u0000-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*$',
+  /**
+   * List item text (list state fields): the workflowLabel rule (no C0 or C1
+   * controls, bidirectional overrides or isolates) plus the invisible
+   * formatting characters that hide or reorder text: the Arabic letter mark,
+   * the Mongolian vowel separator, zero-width space, the left-to-right and
+   * right-to-left marks, word joiner and invisible operators, and the byte
+   * order mark. ZWNJ and ZWJ (U+200C, U+200D) stay allowed: scripts such as
+   * Persian and Devanagari, and emoji sequences, need them.
+   */
+  listText: LIST_TEXT_PATTERN,
 });
 
 /**
@@ -126,6 +137,7 @@ export const SPEC_REGEX = Object.freeze({
   dataName: new RegExp(SPEC_PATTERNS.dataName, 'u'),
   intentName: new RegExp(SPEC_PATTERNS.intentName, 'u'),
   itemKey: new RegExp(SPEC_PATTERNS.itemKey, 'u'),
+  listText: new RegExp(SPEC_PATTERNS.listText, 'u'),
 });
 
 /**

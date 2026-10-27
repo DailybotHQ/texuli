@@ -39,6 +39,10 @@
     "./codegen": {
       "types": "./src/codegen/index.ts",
       "default": "./src/codegen/index.ts"
+    },
+    "./surface": {
+      "types": "./src/surface.ts",
+      "default": "./src/surface.ts"
     }
   },
   "scripts": {

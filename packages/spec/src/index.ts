@@ -58,6 +58,16 @@ export {
 } from './dialect.ts';
 export type { SpecMigration, SpecMigrationResult } from './migrations/types.ts';
 export {
+  checkStateSurface,
+  LIST_TEXT_PATTERN,
+  SPEC_CONTROL_STATE_TYPES,
+  SURFACE_PLAYER_CODES,
+  type SurfaceCode,
+  type SurfaceInputs,
+  type SurfaceIssue,
+  surfaceInputs,
+} from './surface.ts';
+export {
   type SpecDocuments,
   type SpecFlowInfo,
   type SpecStateVariable,

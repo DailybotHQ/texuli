@@ -112,7 +112,7 @@ the web is not a target, because the web stays Svelte.
 
 `conformance/semantics.json` holds the target-neutral semantic rules: role,
 accessible name and heading level per catalog id or block type. The two
-targets apply them to all four spec goldens (`packages/spec/fixtures/golden`):
+targets apply them to all nine spec goldens (`packages/spec/fixtures/golden`):
 
 - **Web:** `conformance/web/trace.ts` validates and renders each golden with
   `@texuli/catalog/validate` (untrusted tier) and writes

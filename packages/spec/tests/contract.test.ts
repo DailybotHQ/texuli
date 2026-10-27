@@ -2,8 +2,9 @@
 import { describe, expect, it } from 'vitest';
 import type { SpecCatalog, SpecComponent } from '../src/catalog.ts';
 import { checkConformance } from '../src/conformance.ts';
-import { contractRoot } from '../src/contract.ts';
+import { contractRoot, SPEC_PATTERNS } from '../src/contract.ts';
 import type { Schema } from '../src/dialect.ts';
+import { LIST_TEXT_PATTERN, SURFACE_INTENT_NAME } from '../src/surface.ts';
 import { type SpecDocuments, validateBlueprint, validateTree } from '../src/validate.ts';
 import { validateWorkflowGraph } from '../src/workflow.ts';
 import { committedOutputs, json, normative } from './helpers.ts';
@@ -71,7 +72,13 @@ const catalog: SpecCatalog = {
         { name: 'title', kind: 'string' },
       ],
     }),
-    component('action-form', { props: [{ name: 'children', kind: 'slot', extension: 'web' }] }),
+    component('action-form', {
+      props: [
+        { name: 'action', kind: 'string', required: true },
+        { name: 'children', kind: 'slot', extension: 'web' },
+        { name: 'label', kind: 'string', required: true },
+      ],
+    }),
     component('test-button', {
       events: ['press'],
       props: [{ name: 'label', kind: 'string', required: true }],
@@ -140,6 +147,7 @@ const tree = {
   children: [
     {
       id: 'action-form',
+      props: { action: 'save-board', label: 'Save' },
       children: [
         { id: 'test-button', props: { label: 'Save' }, on: { press: [{ op: 'submit' }] } },
       ],
@@ -597,5 +605,12 @@ describe('deprecation and catalog conformance', () => {
       ],
     ];
     for (const [label, files, expected] of cases) expect(checks(files), label).toEqual(expected);
+  });
+});
+
+describe('the state surface module', () => {
+  it('compiles the contract patterns it copies to stay import-free', () => {
+    expect(SURFACE_INTENT_NAME.source).toBe(SPEC_PATTERNS.intentName);
+    expect(LIST_TEXT_PATTERN).toBe(SPEC_PATTERNS.listText);
   });
 });

@@ -1,0 +1,472 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "app-dashboard-revenue-q4",
+  "catalog": "6389ff8dfd63e2b2e7cf5986be9f82fd72a3256e9e86fe634d066bbcd640ddd2",
+  "status": "draft",
+  "createdAt": "2026-10-27T09:00:00Z",
+  "updatedAt": "2026-10-27T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Harbor assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "asOf": "2026-10-26T23:59:00Z",
+  "sources": [
+    {
+      "label": "Harborline workspace",
+      "href": "https://example.com/workspace"
+    }
+  ],
+  "trigger": {
+    "kind": "request",
+    "label": "Revenue dashboard requested in chat"
+  },
+  "spec": "0.3.0",
+  "state": {
+    "region": {
+      "type": "enum",
+      "values": ["all", "north", "south", "west"],
+      "initial": "all"
+    },
+    "search": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "renewalsOnly": {
+      "type": "boolean",
+      "initial": false
+    }
+  },
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Revenue operations, week 43",
+      "description": "Pipeline and renewals for the fictional Harborline sales team."
+    },
+    "children": [
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Filters"
+        },
+        "children": [
+          {
+            "id": "layout-row",
+            "props": {
+              "gap": "medium",
+              "align": "end"
+            },
+            "children": [
+              {
+                "id": "control-choice",
+                "props": {
+                  "label": "Region",
+                  "state": "region"
+                },
+                "on": {
+                  "change": [
+                    {
+                      "op": "emit",
+                      "intent": "filter-accounts",
+                      "values": {
+                        "region": {
+                          "$state": "region"
+                        },
+                        "search": {
+                          "$state": "search"
+                        },
+                        "renewalsOnly": {
+                          "$state": "renewalsOnly"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "control-filter",
+                "props": {
+                  "label": "Search accounts",
+                  "placeholder": "Account name",
+                  "state": "search"
+                },
+                "on": {
+                  "change": [
+                    {
+                      "op": "emit",
+                      "intent": "filter-accounts",
+                      "values": {
+                        "region": {
+                          "$state": "region"
+                        },
+                        "search": {
+                          "$state": "search"
+                        },
+                        "renewalsOnly": {
+                          "$state": "renewalsOnly"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "control-toggle",
+                "props": {
+                  "label": "Renewals only",
+                  "state": "renewalsOnly"
+                },
+                "on": {
+                  "change": [
+                    {
+                      "op": "emit",
+                      "intent": "filter-accounts",
+                      "values": {
+                        "region": {
+                          "$state": "region"
+                        },
+                        "search": {
+                          "$state": "search"
+                        },
+                        "renewalsOnly": {
+                          "$state": "renewalsOnly"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "blocks-data",
+        "props": {
+          "block": {
+            "type": "kpi",
+            "items": [
+              {
+                "label": "Pipeline",
+                "value": "$412k",
+                "delta": "+7%",
+                "tone": "success"
+              },
+              {
+                "label": "Closed won",
+                "value": "$128k",
+                "delta": "+3%",
+                "tone": "success"
+              },
+              {
+                "label": "Win rate",
+                "value": "31%",
+                "delta": "-2 pts",
+                "tone": "warning"
+              },
+              {
+                "label": "Renewals due",
+                "value": "18",
+                "delta": "+4",
+                "tone": "neutral"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "layout-grid",
+        "props": {
+          "columns": 3
+        },
+        "children": [
+          {
+            "id": "layout-tile",
+            "props": {
+              "title": "Pipeline per day",
+              "span": 2
+            },
+            "children": [
+              {
+                "id": "charts-line",
+                "props": {
+                  "title": "Pipeline per day",
+                  "description": "New and closed pipeline per day, in thousands",
+                  "series": [
+                    {
+                      "id": "new",
+                      "label": "New",
+                      "points": [
+                        {
+                          "x": "Mon",
+                          "y": 48
+                        },
+                        {
+                          "x": "Tue",
+                          "y": 52
+                        },
+                        {
+                          "x": "Wed",
+                          "y": 61
+                        },
+                        {
+                          "x": "Thu",
+                          "y": 57
+                        },
+                        {
+                          "x": "Fri",
+                          "y": 66
+                        },
+                        {
+                          "x": "Sat",
+                          "y": 22
+                        },
+                        {
+                          "x": "Sun",
+                          "y": 18
+                        }
+                      ]
+                    },
+                    {
+                      "id": "closed",
+                      "label": "Closed",
+                      "points": [
+                        {
+                          "x": "Mon",
+                          "y": 21
+                        },
+                        {
+                          "x": "Tue",
+                          "y": 18
+                        },
+                        {
+                          "x": "Wed",
+                          "y": 25
+                        },
+                        {
+                          "x": "Thu",
+                          "y": 30
+                        },
+                        {
+                          "x": "Fri",
+                          "y": 27
+                        },
+                        {
+                          "x": "Sat",
+                          "y": 4
+                        },
+                        {
+                          "x": "Sun",
+                          "y": 3
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Deals by stage"
+            },
+            "children": [
+              {
+                "id": "charts-donut",
+                "props": {
+                  "title": "Deals by stage",
+                  "description": "Open deals per stage",
+                  "data": [
+                    {
+                      "id": "discovery",
+                      "label": "Discovery",
+                      "value": 24
+                    },
+                    {
+                      "id": "proposal",
+                      "label": "Proposal",
+                      "value": 15
+                    },
+                    {
+                      "id": "negotiation",
+                      "label": "Negotiation",
+                      "value": 9
+                    }
+                  ],
+                  "labels": {
+                    "table": "Data table",
+                    "category": "Stage",
+                    "value": "Deals"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Revenue by region"
+            },
+            "children": [
+              {
+                "id": "charts-bar",
+                "props": {
+                  "title": "Revenue by region",
+                  "description": "Closed revenue per region, in thousands",
+                  "series": [
+                    {
+                      "id": "revenue",
+                      "label": "Revenue",
+                      "points": [
+                        {
+                          "x": "North",
+                          "y": 52
+                        },
+                        {
+                          "x": "South",
+                          "y": 41
+                        },
+                        {
+                          "x": "West",
+                          "y": 35
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-tile",
+            "props": {
+              "title": "Quota attainment",
+              "span": 2
+            },
+            "children": [
+              {
+                "id": "charts-gauge",
+                "props": {
+                  "label": "Quarter quota attained",
+                  "value": 64,
+                  "min": 0,
+                  "max": 100
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Accounts"
+        },
+        "children": [
+          {
+            "id": "data-grid",
+            "props": {
+              "caption": "Accounts with open deals",
+              "density": "compact",
+              "searchable": true,
+              "selectable": true,
+              "columns": [
+                {
+                  "id": "account",
+                  "header": "Account",
+                  "sortable": true
+                },
+                {
+                  "id": "region",
+                  "header": "Region",
+                  "sortable": true
+                },
+                {
+                  "id": "stage",
+                  "header": "Stage"
+                },
+                {
+                  "id": "value",
+                  "header": "Value",
+                  "kind": "number",
+                  "align": "end",
+                  "sortable": true
+                },
+                {
+                  "id": "renewal",
+                  "header": "Renewal",
+                  "kind": "date",
+                  "sortable": true
+                }
+              ],
+              "rows": [
+                {
+                  "id": "acme",
+                  "cells": {
+                    "account": "Acme Rentals",
+                    "region": "North",
+                    "stage": "Proposal",
+                    "value": "42000",
+                    "renewal": "2026-11-30"
+                  }
+                },
+                {
+                  "id": "bluebay",
+                  "cells": {
+                    "account": "Bluebay Studio",
+                    "region": "South",
+                    "stage": "Discovery",
+                    "value": "18500",
+                    "renewal": "2027-01-15"
+                  }
+                },
+                {
+                  "id": "cedar",
+                  "cells": {
+                    "account": "Cedar Clinics",
+                    "region": "West",
+                    "stage": "Negotiation",
+                    "value": "67000",
+                    "renewal": "2026-12-01"
+                  }
+                },
+                {
+                  "id": "dune",
+                  "cells": {
+                    "account": "Dune Logistics",
+                    "region": "North",
+                    "stage": "Discovery",
+                    "value": "9800",
+                    "renewal": "2027-03-04"
+                  }
+                },
+                {
+                  "id": "ember",
+                  "cells": {
+                    "account": "Ember Foods",
+                    "region": "South",
+                    "stage": "Proposal",
+                    "value": "23100",
+                    "renewal": "2026-11-12"
+                  }
+                }
+              ]
+            },
+            "on": {
+              "select": [
+                {
+                  "op": "emit",
+                  "intent": "open-account"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "golden": "sortable-board",
+  "trace": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "id": "sortable-list",
+                  "role": "generic"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Templates",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "id": "sortable-list",
+                  "role": "generic"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Backlog",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "id": "sortable-list",
+                  "role": "generic"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Doing",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "id": "sortable-list",
+                  "role": "generic"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Done",
+              "role": "group"
+            }
+          ],
+          "id": "layout-grid",
+          "role": "group"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Sprint 44 board",
+      "role": "main"
+    }
+  ]
+}

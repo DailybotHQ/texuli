@@ -339,10 +339,15 @@ describe('conformance harness', () => {
     };
     const golden = Object.keys(normative).filter((p) => p.startsWith('fixtures/golden/'));
     expect(golden.sort()).toEqual([
+      'fixtures/golden/app-dashboard.json',
       'fixtures/golden/conditional-report.json',
       'fixtures/golden/dashboard.json',
+      'fixtures/golden/lego.json',
+      'fixtures/golden/mobile-flow.json',
       'fixtures/golden/proactive-deck.json',
       'fixtures/golden/report-on-demand.json',
+      'fixtures/golden/sortable-board.json',
+      'fixtures/golden/workflow-builder.json',
     ]);
     for (const path of golden) expect(validateBlueprint(json(path), documents).ok, path).toBe(true);
     const covered = new Set(
@@ -368,6 +373,10 @@ describe('conformance harness', () => {
       ['unknown-event', ['unknown-event']],
       ['action-fields', ['unknown-event', 'action']],
       ['spec-version', ['schema']],
+      // The state surface agrees with the player: list item text, forms, controls and flow nodes.
+      ['state-list-text', ['state']],
+      ['form-outside', ['action', 'action']],
+      ['surface-nodes', ['binding', 'state']],
     ] as const) {
       const fixture = json<{ expect: string[]; blueprint: unknown }>(
         `fixtures/invalid/${name}.json`
@@ -457,7 +466,19 @@ describe('migrations', () => {
       }
       return value;
     };
-    for (const path of Object.keys(normative).filter((p) => p.startsWith('fixtures/golden/'))) {
+    const goldens = Object.keys(normative).filter((p) => p.startsWith('fixtures/golden/'));
+    // Goldens written for 0.3.0 (they stamp `spec`) are already current: migration is a no-op.
+    const current = goldens.filter((p) => json<{ spec?: string }>(p).spec === SPEC_VERSION);
+    expect(current.length).toBeGreaterThan(0);
+    for (const path of current) {
+      const input = deepFreeze(json<Record<string, unknown>>(path));
+      const result = migrateBlueprint(input);
+      expect(result.applied, path).toEqual([]);
+      expect(result.blueprint, path).toBe(input);
+    }
+    const legacy = goldens.filter((p) => !current.includes(p));
+    expect(legacy.length).toBeGreaterThan(0);
+    for (const path of legacy) {
       const input = deepFreeze(json<Record<string, unknown>>(path));
       const result = migrateBlueprint(input);
       expect(result, path).toMatchObject({

@@ -8,8 +8,11 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { canonicalJson } from '../../../packages/spec/src/canonical.ts';
 import type { SpecCatalog } from '../../../packages/spec/src/catalog.ts';
+import { SPEC_PATTERNS } from '../../../packages/spec/src/contract.ts';
 import type { Schema } from '../../../packages/spec/src/dialect.ts';
+import { SPEC_CONTROL_STATE_TYPES } from '../../../packages/spec/src/surface.ts';
 import { validateBlueprint } from '../../../packages/spec/src/validate.ts';
+import { validateWorkflowGraph } from '../../../packages/spec/src/workflow.ts';
 import { traceNode } from './trace-rules.ts';
 
 const NATIVE = join(import.meta.dirname, '../..');
@@ -134,6 +137,10 @@ const catalog = JSON.parse(
 const blueprintSchema = JSON.parse(
   readFileSync(join(REPO, 'packages/spec/schemas/blueprint.schema.json'), 'utf8')
 ) as Schema;
+// Goldens with a workflow-graph need the workflow schema and its validator.
+const workflowSchema = JSON.parse(
+  readFileSync(join(REPO, 'packages/spec/schemas/workflow.schema.json'), 'utf8')
+) as Schema;
 const portable = new Map(
   catalog.components.map((c) => [
     c.id,
@@ -159,7 +166,8 @@ const goldenDir = join(REPO, 'packages/spec/fixtures/golden');
 for (const file of readdirSync(goldenDir).filter((f) => f.endsWith('.json'))) {
   const envelope = JSON.parse(readFileSync(join(goldenDir, file), 'utf8')) as { tree: Node };
   check(
-    validateBlueprint(envelope, { blueprintSchema, catalog }).ok,
+    validateBlueprint(envelope, { blueprintSchema, catalog, workflowSchema, validateWorkflowGraph })
+      .ok,
     `${file}: valid under the spec validator`
   );
   const expected = JSON.parse(
@@ -204,6 +212,35 @@ check(
     ]),
   'the unmapped voice-chat transcript is refused with the diagnostics the Kotlin test pins'
 );
+
+// 7. The hand-written Kotlin contract compiles the spec's patterns verbatim,
+// and its control state types are the spec's (state surface parity).
+const contractKt = readFileSync(
+  join(NATIVE, 'texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/Contract.kt'),
+  'utf8'
+);
+const ktRegex = (name: string): string | undefined => {
+  const match = new RegExp(`val ${name}: Regex = Regex\\("((?:[^"\\\\]|\\\\.)*)"\\)`).exec(
+    contractKt
+  );
+  return match?.[1]?.replace(/\\\$/g, '$').replace(/\\\\/g, '\\');
+};
+for (const [kt, pattern] of [
+  ['ITEM_KEY', SPEC_PATTERNS.itemKey],
+  ['INTENT_NAME', SPEC_PATTERNS.intentName],
+  ['WORKFLOW_LABEL', SPEC_PATTERNS.workflowLabel],
+  ['WORKFLOW_TEXT', SPEC_PATTERNS.workflowText],
+  ['LIST_TEXT', SPEC_PATTERNS.listText],
+] as const) {
+  check(ktRegex(kt) === pattern, `Contract.kt ${kt} is the spec pattern ${pattern}`);
+}
+const surfaceKt = readFileSync(
+  join(NATIVE, 'texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/Surface.kt'),
+  'utf8'
+);
+for (const [id, type] of Object.entries(SPEC_CONTROL_STATE_TYPES)) {
+  check(surfaceKt.includes(`"${id}" to "${type}"`), `Surface.kt maps ${id} to ${type}`);
+}
 
 if (failures.length > 0) {
   console.error(failures.map((f) => `✗ ${f}`).join('\n'));

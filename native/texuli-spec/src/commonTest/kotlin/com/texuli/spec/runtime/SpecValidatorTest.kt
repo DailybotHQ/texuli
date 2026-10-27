@@ -136,7 +136,13 @@ class SpecValidatorTest {
             events = listOf(SpecEventName.CHANGE, SpecEventName.MOVE, SpecEventName.PRESS, SpecEventName.SELECT),
             bindable = listOf("choice", "open", "title"),
         ),
-        component("action-form"),
+        component(
+            "action-form",
+            listOf(
+                SpecProp(name = "action", kind = SpecPropKind.STRING, required = true),
+                SpecProp(name = "label", kind = SpecPropKind.STRING, required = true),
+            ),
+        ),
         component("test-button", listOf(SpecProp(name = "label", kind = SpecPropKind.STRING, required = true)), events = listOf(SpecEventName.PRESS)),
         component("test-old", listOf(SpecProp(name = "note", kind = SpecPropKind.STRING, deprecated = SpecDeprecation(since = "0.3.0"))), deprecated = SpecDeprecation(since = "0.3.0")),
     )
@@ -181,7 +187,7 @@ class SpecValidatorTest {
                        {"op": "emit", "intent": "board-saved", "values": {"count": {"@state": "count"}, "ok": true}}],
              "select": [{"op": "setState", "state": "tab", "value": "b"}]
            },
-           "children": [{"id": "action-form", "children": [
+           "children": [{"id": "action-form", "props": {"action": "save-board", "label": "Save"}, "children": [
              {"id": "test-button", "props": {"label": "Save"}, "on": {"press": [{"op": "submit"}]}}]}]
          }}
         """.trimIndent().replace('@', '$'),

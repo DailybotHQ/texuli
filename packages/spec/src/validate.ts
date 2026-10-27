@@ -21,6 +21,7 @@ import {
   toDialectSchema,
 } from './contract.ts';
 import { isRecord, type Schema, type SchemaIssue, validateInstance } from './dialect.ts';
+import { checkStateSurface, surfaceInputs } from './surface.ts';
 
 export type { SpecDiagnostic, SpecDiagnosticCode, SpecValidation, SpecWarning };
 
@@ -129,6 +130,14 @@ export function validateBlueprint(
   const warnings: SpecWarning[] = [];
   const portable = input.profile === 'portable';
   if (isRecord(input.tree)) {
+    // The state surface's node rules, as the player refuses them at paint time.
+    for (const issue of checkStateSurface(input.tree, surfaceInputs(input))) {
+      diagnostics.push({
+        code: issue.code,
+        path: `$.tree${issue.at.map((index) => `.children[${index}]`).join('')}`,
+        message: issue.message,
+      });
+    }
     diagnostics.push(
       ...validateTree(input.tree, documents.catalog, {
         portable,
@@ -285,7 +294,8 @@ function readDeclaration(
 /**
  * A list value: at most `maxItems` items, each `{ id, ...fields }` with a
  * unique item key and at most 16 scalar fields (string ≤ 1000, finite
- * number, boolean) named like state variables.
+ * number, boolean) named like state variables. Strings follow the
+ * `listText` rule: a draggable item's text never hides or reorders itself.
  */
 export function listProblem(
   value: unknown,
@@ -316,6 +326,13 @@ export function listProblem(
         return {
           at: `${at}.${key}`,
           message: 'Item fields are named scalars (strings of at most 1000).',
+        };
+      }
+      if (typeof field === 'string' && !SPEC_REGEX.listText.test(field)) {
+        return {
+          at: `${at}.${key}`,
+          message:
+            'Item text cannot hold control, bidirectional or invisible formatting characters.',
         };
       }
     }

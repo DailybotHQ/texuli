@@ -1,0 +1,252 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "sortable-board-sprint-44",
+  "catalog": "6389ff8dfd63e2b2e7cf5986be9f82fd72a3256e9e86fe634d066bbcd640ddd2",
+  "status": "draft",
+  "createdAt": "2026-10-27T09:00:00Z",
+  "updatedAt": "2026-10-27T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Harbor assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "asOf": "2026-10-26T23:59:00Z",
+  "sources": [
+    {
+      "label": "Harborline workspace",
+      "href": "https://example.com/workspace"
+    }
+  ],
+  "trigger": {
+    "kind": "request",
+    "label": "Sprint board requested in chat"
+  },
+  "spec": "0.3.0",
+  "state": {
+    "templates": {
+      "type": "list",
+      "maxItems": 8,
+      "initial": [
+        {
+          "id": "tpl-bug",
+          "label": "Bug report",
+          "detail": "Template"
+        },
+        {
+          "id": "tpl-spike",
+          "label": "Research spike",
+          "detail": "Template"
+        }
+      ]
+    },
+    "backlog": {
+      "type": "list",
+      "maxItems": 40,
+      "initial": [
+        {
+          "id": "t-legal",
+          "label": "Legal review of terms",
+          "detail": "Locked by legal"
+        },
+        {
+          "id": "t-export",
+          "label": "CSV export for invoices",
+          "detail": "3 points"
+        },
+        {
+          "id": "t-search",
+          "label": "Search across projects",
+          "detail": "5 points"
+        }
+      ]
+    },
+    "doing": {
+      "type": "list",
+      "maxItems": 3,
+      "initial": [
+        {
+          "id": "t-sso",
+          "label": "Single sign-on settings",
+          "detail": "8 points"
+        }
+      ]
+    },
+    "done": {
+      "type": "list",
+      "maxItems": 40,
+      "initial": [
+        {
+          "id": "t-theme",
+          "label": "Dark theme for reports",
+          "detail": "2 points"
+        }
+      ]
+    }
+  },
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Sprint 44 board",
+      "description": "Drag cards between columns, or use the keyboard. Doing holds at most three."
+    },
+    "children": [
+      {
+        "id": "layout-grid",
+        "props": {
+          "columns": 4
+        },
+        "children": [
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Templates"
+            },
+            "children": [
+              {
+                "id": "sortable-list",
+                "props": {
+                  "label": "Templates",
+                  "itemLabel": "label",
+                  "itemDetail": "detail",
+                  "reorder": {
+                    "bind": {
+                      "$state": "templates"
+                    },
+                    "axis": "vertical",
+                    "group": "templates",
+                    "pull": "clone"
+                  }
+                },
+                "on": {
+                  "move": [
+                    {
+                      "op": "emit",
+                      "intent": "card-moved",
+                      "values": {
+                        "board": "sprint-44",
+                        "list": "Templates"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Backlog"
+            },
+            "children": [
+              {
+                "id": "sortable-list",
+                "props": {
+                  "label": "Backlog",
+                  "itemLabel": "label",
+                  "itemDetail": "detail",
+                  "reorder": {
+                    "bind": {
+                      "$state": "backlog"
+                    },
+                    "axis": "vertical",
+                    "group": "tasks",
+                    "accepts": ["tasks", "templates"],
+                    "locked": ["t-legal"]
+                  }
+                },
+                "on": {
+                  "move": [
+                    {
+                      "op": "emit",
+                      "intent": "card-moved",
+                      "values": {
+                        "board": "sprint-44",
+                        "list": "Backlog"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Doing"
+            },
+            "children": [
+              {
+                "id": "sortable-list",
+                "props": {
+                  "label": "Doing",
+                  "itemLabel": "label",
+                  "itemDetail": "detail",
+                  "reorder": {
+                    "bind": {
+                      "$state": "doing"
+                    },
+                    "axis": "vertical",
+                    "group": "tasks",
+                    "accepts": ["tasks"]
+                  }
+                },
+                "on": {
+                  "move": [
+                    {
+                      "op": "emit",
+                      "intent": "card-moved",
+                      "values": {
+                        "board": "sprint-44",
+                        "list": "Doing"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-card",
+            "props": {
+              "title": "Done"
+            },
+            "children": [
+              {
+                "id": "sortable-list",
+                "props": {
+                  "label": "Done",
+                  "itemLabel": "label",
+                  "itemDetail": "detail",
+                  "reorder": {
+                    "bind": {
+                      "$state": "done"
+                    },
+                    "axis": "vertical",
+                    "group": "tasks",
+                    "accepts": ["tasks"],
+                    "pull": "none"
+                  }
+                },
+                "on": {
+                  "move": [
+                    {
+                      "op": "emit",
+                      "intent": "card-moved",
+                      "values": {
+                        "board": "sprint-44",
+                        "list": "Done"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

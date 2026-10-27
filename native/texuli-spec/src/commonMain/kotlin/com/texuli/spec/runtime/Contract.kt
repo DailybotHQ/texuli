@@ -62,6 +62,14 @@ object SpecContract {
     /** Display text: no control characters and no bidirectional overrides or isolates. */
     val WORKFLOW_LABEL: Regex = Regex("^[^\\u0000-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*\$")
 
+    /**
+     * List item text (spec `listText`): the workflow label rule plus invisible
+     * formatting characters (Arabic letter mark, Mongolian vowel separator,
+     * zero-width space, direction marks, word joiner and invisible operators,
+     * byte order mark). ZWNJ and ZWJ stay allowed.
+     */
+    val LIST_TEXT: Regex = Regex("^[^\\u0000-\\u001f\\u007f-\\u009f\\u061c\\u180e\\u200b\\u200e\\u200f\\u202a-\\u202e\\u2060-\\u2064\\u2066-\\u2069\\ufeff]*\$")
+
     /** Multi-line display text: tab and newline allowed, other controls and bidi controls refused. */
     val WORKFLOW_TEXT: Regex = Regex("^[^\\u0000-\\u0008\\u000b-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*\$")
 }

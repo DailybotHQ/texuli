@@ -1,0 +1,52 @@
+{
+  "$comment": "Must fail spec validation with exactly these diagnostic codes, in order. A list item's text holds a right-to-left override (U+202E): draggable item text never reorders itself.",
+  "expect": ["state"],
+  "blueprint": {
+    "format": "texuli-blueprint",
+    "version": 1,
+    "id": "bad-list-text",
+    "catalog": "6389ff8dfd63e2b2e7cf5986be9f82fd72a3256e9e86fe634d066bbcd640ddd2",
+    "status": "draft",
+    "createdAt": "2026-10-27T09:00:00Z",
+    "updatedAt": "2026-10-27T09:00:00Z",
+    "generator": {
+      "kind": "agent",
+      "name": "Harbor assistant",
+      "model": "example-model"
+    },
+    "tier": "untrusted",
+    "profile": "web",
+    "spec": "0.3.0",
+    "state": {
+      "tasks": {
+        "type": "list",
+        "initial": [
+          {
+            "id": "t1",
+            "label": "Invoice \u202eexe.pdf"
+          }
+        ]
+      }
+    },
+    "tree": {
+      "id": "layout-doc",
+      "props": {
+        "title": "Tasks"
+      },
+      "children": [
+        {
+          "id": "sortable-list",
+          "props": {
+            "label": "Tasks",
+            "reorder": {
+              "bind": {
+                "$state": "tasks"
+              },
+              "group": "tasks"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
