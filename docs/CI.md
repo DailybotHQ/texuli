@@ -59,8 +59,9 @@ browser visual test.
 `publish.yml` rebuilds every tarball from source with
 `pnpm verify:packages` (publint strict, byte checks, SHA-256 recorded),
 then publishes the 15 packable packages in the wave order documented in
-[RELEASE](RELEASE.md), always `--tag next`. `latest` stays reserved for
-the 1.0.0 stable release. Tarballs ship with signed npm provenance via
+[RELEASE](RELEASE.md), always `--tag next`, then points `latest` at the
+same versions: until 1.0.0, `latest` tracks the newest preview (owner
+decision 2026-10-27), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
 GitHub's OIDC token (`id-token: write`).
 
 One-time setup, already done: the repository secret `NPM_TOKEN` holds a
