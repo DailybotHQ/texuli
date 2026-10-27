@@ -8,7 +8,12 @@
  * replaced by their first-paint values so the renderer checks the props a
  * person will actually see. Never evaluates anything.
  */
-import { checkStateSurface, LIST_TEXT_PATTERN, surfaceInputs } from '@texuli/spec/surface';
+import {
+  checkStateSurface,
+  LIST_TEXT_PATTERN,
+  SURFACE_INTENT_NAME,
+  surfaceInputs,
+} from '@texuli/spec/surface';
 import type { CatalogTreeInput, RenderCatalog } from '../render/renderer/types.ts';
 
 /** The closed action ops and the fields each takes (mirrors spec `ACTION_FIELDS`). */
@@ -176,6 +181,12 @@ export function resolveInteraction(
       }
       for (const key of ['state', 'from', 'to'] as const) {
         if (Object.hasOwn(action, key)) stateValue(action[key], `${here}.${key}`, id);
+      }
+      if (op === 'emit' && isBag(action.values)) {
+        for (const name of Object.keys(action.values)) {
+          if (!SURFACE_INTENT_NAME.test(name))
+            report('action', `${here}.values.${name}`, `"${name}" is not a value name.`, id);
+        }
       }
     });
   };

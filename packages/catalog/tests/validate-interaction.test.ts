@@ -196,6 +196,13 @@ describe('bindings, bind and on', () => {
       bad({
         id: 'flow-action',
         props: { event: 'e', label: 'L' },
+        on: { press: [{ op: 'emit', intent: 'save', values: { 'bad key <x>': 'y' } }] },
+      })
+    ).toEqual(['interaction:action']);
+    expect(
+      bad({
+        id: 'flow-action',
+        props: { event: 'e', label: 'L' },
         on: { press: [{ op: 'setState' }] },
       })
     ).toEqual(['interaction:action']);
