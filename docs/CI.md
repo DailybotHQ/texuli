@@ -72,6 +72,18 @@ To release: push a tag (`v0.1.0-next.2`) or run the workflow from the
 Actions tab against `main`. Never overwrite a published version; new
 content means a new version.
 
+The publish step is idempotent: it skips any `name@version` already on the
+registry and retries `npm publish` up to three times, because the
+provenance step can fail transiently reading the OIDC token
+(`IDENTITY_TOKEN_READ_ERROR`; the 2026-10-27 `0.1.0-next.2` run stopped at
+`@texuli/slides` that way). After a partial failure, re-run the workflow:
+it publishes only what is missing.
+
+Both workflows use the Node 24 action majors (`actions/checkout@v7`,
+`actions/setup-node@v7`, `pnpm/action-setup@v6`,
+`actions/upload-artifact@v7`); the v4 majors ran on the deprecated Node 20
+runtime.
+
 ## Website deployment (texuli.com)
 
 texuli.com is served by Cloudflare Pages from the Git repository. The
