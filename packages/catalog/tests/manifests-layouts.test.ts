@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { readdir } from 'node:fs/promises';
-import { describe, expect, it } from 'vitest';
+import { expect, it } from 'vitest';
 import { buildCatalog, isContentLayoutId, isTierU } from '../src/build/index.ts';
 import { discoverManifestGroups, MANIFESTS_DIR } from '../src/build/node.ts';
 import {
@@ -23,16 +23,17 @@ function expectPropsMatch(manifestId: LayoutsManifestId, names: readonly string[
   expect(schemaNames).toEqual([...names].sort());
 }
 
-describe('layouts manifests', () => {
-  it('validates every layout/shell manifest as a closed set', () => {
+it('layout manifests are a closed set: shells never emittable, content layouts emittable, schema parity, discovered without a build change', async () => {
+  // validates every layout/shell manifest as a closed set
+  {
     const result = validateCatalogManifests(LAYOUTS_MANIFESTS);
     expect(result.diagnostics, JSON.stringify(result.diagnostics, null, 2)).toEqual([]);
     expect(result.valid).toBe(true);
     expect(LAYOUTS_MANIFESTS.length).toBe(Object.keys(LAYOUTS_PROP_NAMES).length);
     expect(new Set(LAYOUTS_MANIFESTS.map((m) => m.id)).size).toBe(LAYOUTS_MANIFESTS.length);
-  });
-
-  it('keeps app shells frozen and never agent-emittable; content layouts emittable', () => {
+  }
+  // keeps app shells frozen and never agent-emittable; content layouts emittable
+  {
     const contentIds = new Set([
       'layout-card',
       'layout-page',
@@ -59,15 +60,12 @@ describe('layouts manifests', () => {
         expect(manifest.agentEmittable).toBe(false);
       }
     }
-  });
-
-  it('matches each component prop surface to its schema (type parity)', () => {
-    for (const [id, names] of Object.entries(LAYOUTS_PROP_NAMES)) {
-      expectPropsMatch(id as LayoutsManifestId, names);
-    }
-  });
-
-  it('documents LayoutHost props used by LayoutHost.svelte', () => {
+  }
+  for (const [id, names] of Object.entries(LAYOUTS_PROP_NAMES)) {
+    expectPropsMatch(id as LayoutsManifestId, names);
+  }
+  // documents LayoutHost props used by LayoutHost.svelte
+  {
     type HostProp = (typeof layoutHostPropNames)[number];
     const required: HostProp[] = [
       'layout',
@@ -82,9 +80,9 @@ describe('layouts manifests', () => {
       'class',
     ];
     expect(required).toEqual([...LAYOUTS_PROP_NAMES['layout-host']]);
-  });
-
-  it('rejects unknown example props against the schema', () => {
+  }
+  // rejects unknown example props against the schema
+  {
     const host = LAYOUTS_MANIFESTS.find((m) => m.id === 'layout-host')!;
     const broken = {
       ...host,
@@ -93,9 +91,9 @@ describe('layouts manifests', () => {
     const result = validateCatalogManifest(broken);
     expect(result.valid).toBe(false);
     expect(result.diagnostics.some((d) => d.code === 'unknown-prop')).toBe(true);
-  });
-
-  it('appears in discoverManifestGroups without changing the catalog build', async () => {
+  }
+  // appears in discoverManifestGroups without changing the catalog build
+  {
     const folders = (await readdir(MANIFESTS_DIR, { withFileTypes: true }))
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
@@ -132,5 +130,5 @@ describe('layouts manifests', () => {
     ]) {
       expect(build.catalog.tiers.untrusted).not.toContain(id);
     }
-  });
+  }
 });

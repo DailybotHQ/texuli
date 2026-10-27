@@ -49,114 +49,112 @@ function render(tree: unknown, catalog = chrome, tier: 'developer' | 'untrusted'
 }
 
 describe('inline-text (audit G03)', () => {
-  it('is a catalog entry with one required string prop', () => {
-    const entry = entries.find((e) => e.id === 'inline-text');
-    expect(entry).toMatchObject({ group: 'display', tier: 'app', agentEmittable: false });
-    expect(entry?.props).toEqual([
-      expect.objectContaining({ name: 'text', kind: 'string', required: true }),
-    ]);
-  });
-
-  it.each(TEXT_SLOT_IDS)('%s declares a children slot and takes inline text', (id) => {
-    const entry = entries.find((e) => e.id === id);
-    expect(entry, id).toBeDefined();
-    expect(entry?.props.find((p) => p.name === 'children')?.kind, id).toBe('slot');
-    const result = render({ id, props: {}, children: [text('Save changes')] });
-    expect(result.diagnostics, id).toEqual([]);
-    expect(result.roots[0]).toEqual({
-      kind: 'component',
-      id,
-      props: {},
-      children: [
-        { kind: 'component', id: 'inline-text', props: { text: 'Save changes' }, children: [] },
-      ],
-    });
-  });
-
-  it('gives the audit 03 settings button its label', () => {
-    const result = render({
-      id: 'button',
-      props: { type: 'submit' },
-      children: [text('Save changes')],
-    });
-    expect(result.diagnostics).toEqual([]);
-    const root = result.roots[0] as Extract<RenderNode, { kind: 'component' }>;
-    expect(root.children.map((c) => c.kind === 'component' && c.props.text)).toEqual([
-      'Save changes',
-    ]);
-  });
-
-  it('is a leaf: children are dropped with a diagnostic', () => {
-    const result = render({
-      id: 'inline-text',
-      props: { text: 'Save' },
-      children: [text('nested')],
-    });
-    expect(result.roots[0]).toMatchObject({ kind: 'component', children: [] });
-    expect(result.diagnostics).toEqual([
-      expect.objectContaining({ code: 'invalid-node', id: 'inline-text', path: '0' }),
-    ]);
-  });
-
-  it.each([
-    ['missing', undefined],
-    ['a number', 42],
-    ['markup', '<b>Save</b>'],
-  ])('drops a node whose text is %s', (_label, value) => {
-    const result = render({ id: 'button', props: {}, children: [text(value)] });
-    const root = result.roots[0] as Extract<RenderNode, { kind: 'component' }>;
-    expect(root.children).toEqual([]);
-    expect(result.diagnostics.map((d) => d.code)).toContain('schema-failure');
-  });
-
-  it('follows the tier contract like the components it labels', () => {
-    const tree = text('Save');
-    expect(render(tree, normative).roots[0]).toMatchObject({ reason: 'tier-denied' });
-    expect(render(tree, chrome, 'untrusted').roots[0]).toMatchObject({ reason: 'tier-denied' });
-    expect(render(tree, chrome).roots[0]).toMatchObject({ kind: 'component' });
+  it('inline-text is a required-string leaf that labels text slots, drops bad text and follows the tier contract', () => {
+    // is a catalog entry with one required string prop
+    {
+      const entry = entries.find((e) => e.id === 'inline-text');
+      expect(entry).toMatchObject({ group: 'display', tier: 'app', agentEmittable: false });
+      expect(entry?.props).toEqual([
+        expect.objectContaining({ name: 'text', kind: 'string', required: true }),
+      ]);
+    }
+    for (const id of TEXT_SLOT_IDS) {
+      const entry = entries.find((e) => e.id === id);
+      expect(entry, id).toBeDefined();
+      expect(entry?.props.find((p) => p.name === 'children')?.kind, id).toBe('slot');
+      const result = render({ id, props: {}, children: [text('Save changes')] });
+      expect(result.diagnostics, id).toEqual([]);
+      expect(result.roots[0]).toEqual({
+        kind: 'component',
+        id,
+        props: {},
+        children: [
+          { kind: 'component', id: 'inline-text', props: { text: 'Save changes' }, children: [] },
+        ],
+      });
+    }
+    // gives the audit 03 settings button its label
+    {
+      const result = render({
+        id: 'button',
+        props: { type: 'submit' },
+        children: [text('Save changes')],
+      });
+      expect(result.diagnostics).toEqual([]);
+      const root = result.roots[0] as Extract<RenderNode, { kind: 'component' }>;
+      expect(root.children.map((c) => c.kind === 'component' && c.props.text)).toEqual([
+        'Save changes',
+      ]);
+    }
+    // is a leaf: children are dropped with a diagnostic
+    {
+      const result = render({
+        id: 'inline-text',
+        props: { text: 'Save' },
+        children: [text('nested')],
+      });
+      expect(result.roots[0]).toMatchObject({ kind: 'component', children: [] });
+      expect(result.diagnostics).toEqual([
+        expect.objectContaining({ code: 'invalid-node', id: 'inline-text', path: '0' }),
+      ]);
+    }
+    for (const value of [undefined, 42, '<b>Save</b>']) {
+      const result = render({ id: 'button', props: {}, children: [text(value)] });
+      const root = result.roots[0] as Extract<RenderNode, { kind: 'component' }>;
+      expect(root.children, String(value)).toEqual([]);
+      expect(
+        result.diagnostics.map((d) => d.code),
+        String(value)
+      ).toContain('schema-failure');
+    }
+    // follows the tier contract like the components it labels
+    {
+      const tree = text('Save');
+      expect(render(tree, normative).roots[0]).toMatchObject({ reason: 'tier-denied' });
+      expect(render(tree, chrome, 'untrusted').roots[0]).toMatchObject({ reason: 'tier-denied' });
+      expect(render(tree, chrome).roots[0]).toMatchObject({ kind: 'component' });
+    }
   });
 });
 
 describe('the label prop on button, badge and kbd (G03)', () => {
-  it.each(['button', 'badge', 'kbd'])(
-    '%s declares an optional label string and keeps its slot',
-    (id) => {
+  it('button, badge and kbd take an optional plain label, admitted only where app chrome is', () => {
+    for (const id of ['button', 'badge', 'kbd']) {
       const entry = entries.find((e) => e.id === id);
       const label = entry?.props.find((p) => p.name === 'label');
       expect(label, id).toMatchObject({ kind: 'string' });
       expect(label?.required, id).toBeUndefined();
       expect(entry?.props.find((p) => p.name === 'children')?.kind, id).toBe('slot');
     }
-  );
-
-  it('accepts the audit 03 probe for a host that admits app chrome', () => {
-    const probe = { id: 'button', props: { type: 'submit', label: 'Save changes' } };
-    const result = render(probe);
-    expect(result.diagnostics).toEqual([]);
-    expect(result.roots[0]).toMatchObject({
-      kind: 'component',
-      props: { type: 'submit', label: 'Save changes' },
-    });
-  });
-
-  it('still denies the probe at the normative D5 developer tier and at untrusted', () => {
-    // button is app chrome, not agentEmittable: the label prop changes no tier.
-    const probe = { id: 'button', props: { type: 'submit', label: 'Save changes' } };
-    expect(render(probe, normative).roots[0]).toMatchObject({ reason: 'tier-denied' });
-    expect(render(probe, chrome, 'untrusted').roots[0]).toMatchObject({ reason: 'tier-denied' });
-  });
-
-  it.each([
-    ['badge', 'Shipped'],
-    ['kbd', 'Ctrl'],
-  ])('renders a %s label', (id, label) => {
-    const result = render({ id, props: { label } });
-    expect(result.diagnostics).toEqual([]);
-    expect(result.roots[0]).toMatchObject({ kind: 'component', props: { label } });
-  });
-
-  it('refuses a markup-like label', () => {
-    const result = render({ id: 'button', props: { label: '<b>Save</b>' } });
-    expect(result.diagnostics.map((d) => d.code)).toContain('schema-failure');
+    // accepts the audit 03 probe for a host that admits app chrome
+    {
+      const probe = { id: 'button', props: { type: 'submit', label: 'Save changes' } };
+      const result = render(probe);
+      expect(result.diagnostics).toEqual([]);
+      expect(result.roots[0]).toMatchObject({
+        kind: 'component',
+        props: { type: 'submit', label: 'Save changes' },
+      });
+    }
+    // still denies the probe at the normative D5 developer tier and at untrusted
+    {
+      // button is app chrome, not agentEmittable: the label prop changes no tier.
+      const probe = { id: 'button', props: { type: 'submit', label: 'Save changes' } };
+      expect(render(probe, normative).roots[0]).toMatchObject({ reason: 'tier-denied' });
+      expect(render(probe, chrome, 'untrusted').roots[0]).toMatchObject({ reason: 'tier-denied' });
+    }
+    for (const [id, label] of [
+      ['badge', 'Shipped'],
+      ['kbd', 'Ctrl'],
+    ]) {
+      const result = render({ id, props: { label } });
+      expect(result.diagnostics, id).toEqual([]);
+      expect(result.roots[0], id).toMatchObject({ kind: 'component', props: { label } });
+    }
+    // refuses a markup-like label
+    {
+      const result = render({ id: 'button', props: { label: '<b>Save</b>' } });
+      expect(result.diagnostics.map((d) => d.code)).toContain('schema-failure');
+    }
   });
 });

@@ -26,42 +26,45 @@ function component(
 const roles = defaultGrammarRoles;
 
 describe('heading outline', () => {
-  it('accepts a monotonic outline and rejects skips and multiple h1', () => {
-    const ok = checkCompositionGrammar(
-      [
-        component('heading', { level: 1 }),
-        component('heading', { level: 2 }),
-        component('heading', { level: 3 }),
-      ],
-      { roles }
-    );
-    expect(ok.ok).toBe(true);
-    expect(ok.issues).toEqual([]);
+  it('heading outline: monotonic levels, one h1, and clamping repairs', () => {
+    // accepts a monotonic outline and rejects skips and multiple h1
+    {
+      const ok = checkCompositionGrammar(
+        [
+          component('heading', { level: 1 }),
+          component('heading', { level: 2 }),
+          component('heading', { level: 3 }),
+        ],
+        { roles }
+      );
+      expect(ok.ok).toBe(true);
+      expect(ok.issues).toEqual([]);
 
-    const skip = checkCompositionGrammar(
-      [component('heading', { level: 1 }), component('heading', { level: 3 })],
-      { roles }
-    );
-    expect(skip.ok).toBe(false);
-    expect(skip.issues.some((i) => i.code === 'heading-skip')).toBe(true);
+      const skip = checkCompositionGrammar(
+        [component('heading', { level: 1 }), component('heading', { level: 3 })],
+        { roles }
+      );
+      expect(skip.ok).toBe(false);
+      expect(skip.issues.some((i) => i.code === 'heading-skip')).toBe(true);
 
-    const multi = checkCompositionGrammar(
-      [component('heading', { level: 1 }), component('heading', { level: 1 })],
-      { roles }
-    );
-    expect(multi.issues.some((i) => i.code === 'heading-multiple-h1')).toBe(true);
-  });
-
-  it('repairs skipped levels by clamping', () => {
-    const { roots, issues } = checkCompositionGrammar(
-      [component('heading', { level: 1 }), component('heading', { level: 4 })],
-      { roles, mode: 'repair' }
-    );
-    expect(issues.some((i) => i.code === 'heading-skip')).toBe(true);
-    const second = roots[1];
-    expect(second?.kind).toBe('component');
-    if (second?.kind === 'component') {
-      expect(second.props.level).toBe(2);
+      const multi = checkCompositionGrammar(
+        [component('heading', { level: 1 }), component('heading', { level: 1 })],
+        { roles }
+      );
+      expect(multi.issues.some((i) => i.code === 'heading-multiple-h1')).toBe(true);
+    }
+    // repairs skipped levels by clamping
+    {
+      const { roots, issues } = checkCompositionGrammar(
+        [component('heading', { level: 1 }), component('heading', { level: 4 })],
+        { roles, mode: 'repair' }
+      );
+      expect(issues.some((i) => i.code === 'heading-skip')).toBe(true);
+      const second = roots[1];
+      expect(second?.kind).toBe('component');
+      if (second?.kind === 'component') {
+        expect(second.props.level).toBe(2);
+      }
     }
   });
 });
@@ -195,127 +198,130 @@ describe('catalog ids in the default roles (G15)', () => {
   const codes = (tree: RenderNode[]) =>
     checkCompositionGrammar(tree, { roles }).issues.map((issue) => `${issue.path} ${issue.code}`);
 
-  it('reports two h1 text blocks and a skip under a titled doc', () => {
-    const tree = [
-      component('layout-doc', { title: 'Report' }, [
-        heading(1, 'A'),
-        heading(1, 'B'),
-        heading(4, 'C'),
-      ]),
-    ];
-    const result = checkCompositionGrammar(tree, { roles });
-    expect(result.ok).toBe(false);
-    expect(codes(tree)).toEqual([
-      '0.children.0 heading-multiple-h1',
-      '0.children.1 heading-multiple-h1',
-      '0.children.2 heading-skip',
-    ]);
-  });
-
-  it('accepts a doc title, h2 text blocks and titled cards one rank below their frame', () => {
-    const tree = [
-      component('layout-page', { title: 'Week 42' }, [
-        heading(2, 'Highlights'),
-        text({ type: 'text', markdown: 'Shipped on time.' }),
-        component('layout-grid', { columns: 2 }, [
-          component('layout-card', { title: 'Tickets' }, [
-            component('charts-line', { title: 'Tickets per day' }),
+  it('G15: catalog ids get heading ranks, the main landmark and in-block repairs', () => {
+    // reports two h1 text blocks and a skip under a titled doc
+    {
+      const tree = [
+        component('layout-doc', { title: 'Report' }, [
+          heading(1, 'A'),
+          heading(1, 'B'),
+          heading(4, 'C'),
+        ]),
+      ];
+      const result = checkCompositionGrammar(tree, { roles });
+      expect(result.ok).toBe(false);
+      expect(codes(tree)).toEqual([
+        '0.children.0 heading-multiple-h1',
+        '0.children.1 heading-multiple-h1',
+        '0.children.2 heading-skip',
+      ]);
+    }
+    // accepts a doc title, h2 text blocks and titled cards one rank below their frame
+    {
+      const tree = [
+        component('layout-page', { title: 'Week 42' }, [
+          heading(2, 'Highlights'),
+          text({ type: 'text', markdown: 'Shipped on time.' }),
+          component('layout-grid', { columns: 2 }, [
+            component('layout-card', { title: 'Tickets' }, [
+              component('charts-line', { title: 'Tickets per day' }),
+            ]),
+            component('layout-card', { title: 'Channels' }, [heading(3, 'Email')]),
           ]),
-          component('layout-card', { title: 'Channels' }, [heading(3, 'Email')]),
         ]),
-      ]),
-    ];
-    expect(codes(tree)).toEqual([]);
-  });
-
-  it('ranks a nested card below its titled card and sees chart title ranks', () => {
-    const skipped = [
-      component('layout-page', { title: 'Overview' }, [
-        component('charts-donut', { title: 'Channel mix' }),
-      ]),
-    ];
-    expect(codes(skipped)).toEqual(['0.children.0 heading-skip']);
-
-    const nested = [
-      component('layout-doc', { title: 'Guide' }, [
-        component('layout-card', { title: 'Setup' }, [
-          component('layout-card', { title: 'Accounts' }, [heading(5, 'Too deep')]),
+      ];
+      expect(codes(tree)).toEqual([]);
+    }
+    // ranks a nested card below its titled card and sees chart title ranks
+    {
+      const skipped = [
+        component('layout-page', { title: 'Overview' }, [
+          component('charts-donut', { title: 'Channel mix' }),
         ]),
-      ]),
-    ];
-    expect(codes(nested)).toEqual(['0.children.0.children.0.children.0 heading-skip']);
-  });
+      ];
+      expect(codes(skipped)).toEqual(['0.children.0 heading-skip']);
 
-  it('treats untitled frames and non-heading text blocks as no heading', () => {
-    const tree = [
-      component('layout-doc', {}, [
-        text({ type: 'callout', tone: 'info', text: 'Draft' }),
-        heading(1, 'Only title'),
-        heading(2, 'Section'),
-      ]),
-    ];
-    expect(codes(tree)).toEqual([]);
-  });
-
-  it('marks page, doc and deck as the main landmark', () => {
-    const tree = [component('layout-page', {}, [component('layout-doc', {})])];
-    expect(codes(tree)).toEqual(['0.children.0 landmark-multiple-main']);
-  });
-
-  it('repairs a text block heading level inside its block', () => {
-    const first = heading(1, 'A');
-    const tree = [component('layout-doc', { title: 'Report' }, [first, heading(4, 'B')])];
-    const repaired = checkCompositionGrammar(tree, { roles, mode: 'repair' });
-    const doc = repaired.roots[0];
-    const levels =
-      doc?.kind === 'component'
-        ? doc.children.map((child) =>
-            child.kind === 'component' ? (child.props.block as { level: number }).level : null
-          )
-        : [];
-    expect(levels).toEqual([2, 3]);
-    expect(first).toEqual(heading(1, 'A'));
+      const nested = [
+        component('layout-doc', { title: 'Guide' }, [
+          component('layout-card', { title: 'Setup' }, [
+            component('layout-card', { title: 'Accounts' }, [heading(5, 'Too deep')]),
+          ]),
+        ]),
+      ];
+      expect(codes(nested)).toEqual(['0.children.0.children.0.children.0 heading-skip']);
+    }
+    // treats untitled frames and non-heading text blocks as no heading
+    {
+      const tree = [
+        component('layout-doc', {}, [
+          text({ type: 'callout', tone: 'info', text: 'Draft' }),
+          heading(1, 'Only title'),
+          heading(2, 'Section'),
+        ]),
+      ];
+      expect(codes(tree)).toEqual([]);
+    }
+    // marks page, doc and deck as the main landmark
+    {
+      const tree = [component('layout-page', {}, [component('layout-doc', {})])];
+      expect(codes(tree)).toEqual(['0.children.0 landmark-multiple-main']);
+    }
+    // repairs a text block heading level inside its block
+    {
+      const first = heading(1, 'A');
+      const tree = [component('layout-doc', { title: 'Report' }, [first, heading(4, 'B')])];
+      const repaired = checkCompositionGrammar(tree, { roles, mode: 'repair' });
+      const doc = repaired.roots[0];
+      const levels =
+        doc?.kind === 'component'
+          ? doc.children.map((child) =>
+              child.kind === 'component' ? (child.props.block as { level: number }).level : null
+            )
+          : [];
+      expect(levels).toEqual([2, 3]);
+      expect(first).toEqual(heading(1, 'A'));
+    }
   });
 });
 
 describe('nested and derived roles (G15 v2)', () => {
-  it('treats a heading inside an interactive control as static text', () => {
-    const tree = component('layout-page', { title: 'Report' }, [
-      component('button', {}, [component('heading', { level: 1 }, [])]),
-    ]);
-    const result = checkCompositionGrammar([tree], { roles, mode: 'report' });
-    // The label heading must not count as a second level-1 heading.
-    expect(result.issues.map((issue) => issue.code)).not.toContain('heading-multiple-h1');
-    expect(result.ok).toBe(true);
-  });
-
-  it('derives a host role from a built-in id', () => {
-    const derived = grammarRolesFromList(
-      [{ id: 'my-alert', deriveFrom: 'heading' }],
-      defaultGrammarRoles
-    );
-    const tree = component('layout-page', { title: 'Report' }, [
-      component('my-alert', { level: 3 }, []),
-    ]);
-    const result = checkCompositionGrammar([tree], { roles: derived });
-    expect(result.issues.map((issue) => issue.code)).toContain('heading-skip');
-    // With the plain defaults the unknown id stays static: no skip is seen.
-    const plain = checkCompositionGrammar([tree], { roles });
-    expect(plain.issues.map((issue) => issue.code)).not.toContain('heading-skip');
-  });
-
-  it('falls back safely on derivation cycles and missing bases', () => {
-    const catalog = grammarRolesFromList([
-      { id: 'a', deriveFrom: 'b' },
-      { id: 'b', deriveFrom: 'a', landmark: 'search' },
-      { id: 'c', deriveFrom: 'missing' },
-    ]);
-    expect(catalog.get('a')?.role).toBe('static');
-    expect(catalog.get('b')?.landmark).toBe('search');
-    expect(catalog.get('c')?.role).toBe('static');
-  });
-
-  it('derives the built-in heading aliases and keeps their behavior', () => {
+  it('G15 v2: nested and derived roles fall back safely', () => {
+    // treats a heading inside an interactive control as static text
+    {
+      const tree = component('layout-page', { title: 'Report' }, [
+        component('button', {}, [component('heading', { level: 1 }, [])]),
+      ]);
+      const result = checkCompositionGrammar([tree], { roles, mode: 'report' });
+      // The label heading must not count as a second level-1 heading.
+      expect(result.issues.map((issue) => issue.code)).not.toContain('heading-multiple-h1');
+      expect(result.ok).toBe(true);
+    }
+    // derives a host role from a built-in id
+    {
+      const derived = grammarRolesFromList(
+        [{ id: 'my-alert', deriveFrom: 'heading' }],
+        defaultGrammarRoles
+      );
+      const tree = component('layout-page', { title: 'Report' }, [
+        component('my-alert', { level: 3 }, []),
+      ]);
+      const result = checkCompositionGrammar([tree], { roles: derived });
+      expect(result.issues.map((issue) => issue.code)).toContain('heading-skip');
+      // With the plain defaults the unknown id stays static: no skip is seen.
+      const plain = checkCompositionGrammar([tree], { roles });
+      expect(plain.issues.map((issue) => issue.code)).not.toContain('heading-skip');
+    }
+    // falls back safely on derivation cycles and missing bases
+    {
+      const catalog = grammarRolesFromList([
+        { id: 'a', deriveFrom: 'b' },
+        { id: 'b', deriveFrom: 'a', landmark: 'search' },
+        { id: 'c', deriveFrom: 'missing' },
+      ]);
+      expect(catalog.get('a')?.role).toBe('static');
+      expect(catalog.get('b')?.landmark).toBe('search');
+      expect(catalog.get('c')?.role).toBe('static');
+    }
     expect(defaultGrammarRoles.get('blocks-heading')?.role).toBe('heading');
     expect(defaultGrammarRoles.get('blocks-heading')?.headingLevelProp).toBe('level');
     expect(defaultGrammarRoles.get('text-heading')?.role).toBe('heading');
@@ -334,7 +340,7 @@ describe('deck grammar (G11)', () => {
   const issues = (tree: RenderNode[]) =>
     checkCompositionGrammar(tree, { roles }).issues.map((issue) => `${issue.path} ${issue.code}`);
 
-  it('publishes stable deck ids', () => {
+  it('deck grammar ranks slides under the deck title with one main landmark', () => {
     expect(DECK_GRAMMAR_IDS).toEqual({
       deck: 'layout-deck',
       slide: 'deck-slide',
@@ -344,70 +350,67 @@ describe('deck grammar (G11)', () => {
       upNext: 'deck-up-next',
     });
     expect(Object.isFrozen(DECK_GRAMMAR_IDS)).toBe(true);
-  });
+    // ranks each slide title one below the deck title, and slide headings below it
+    {
+      const deck = [
+        component(DECK_GRAMMAR_IDS.deck, { title: 'Quarterly review' }, [
+          slide('Opening', [heading(3, 'Three priorities')]),
+          slide('Numbers', [component('charts-line', { title: 'Revenue' })]),
+          slide(undefined, [heading(2, 'Untitled slide heading')]),
+        ]),
+      ];
+      expect(issues(deck)).toEqual([]);
 
-  it('ranks each slide title one below the deck title, and slide headings below it', () => {
-    const deck = [
-      component(DECK_GRAMMAR_IDS.deck, { title: 'Quarterly review' }, [
-        slide('Opening', [heading(3, 'Three priorities')]),
-        slide('Numbers', [component('charts-line', { title: 'Revenue' })]),
-        slide(undefined, [heading(2, 'Untitled slide heading')]),
-      ]),
-    ];
-    expect(issues(deck)).toEqual([]);
-
-    const skipped = [
-      component(DECK_GRAMMAR_IDS.deck, { title: 'Quarterly review' }, [
-        slide('Opening', [heading(4, 'Too deep')]),
-      ]),
-    ];
-    expect(issues(skipped)).toEqual(['0.children.0.children.0 heading-skip']);
-  });
-
-  it('derives the slide meta from the card meta', () => {
+      const skipped = [
+        component(DECK_GRAMMAR_IDS.deck, { title: 'Quarterly review' }, [
+          slide('Opening', [heading(4, 'Too deep')]),
+        ]),
+      ];
+      expect(issues(skipped)).toEqual(['0.children.0.children.0 heading-skip']);
+    }
     expect(roles.get(DECK_GRAMMAR_IDS.slide)).toMatchObject({
       role: 'container',
       titleHeading: 'nested',
     });
     expect(roles.get(DECK_GRAMMAR_IDS.slide)?.deriveFrom).toBeUndefined();
-  });
+    // treats presenter notes as a landmark only outside slides
+    {
+      const presenting = [
+        component(DECK_GRAMMAR_IDS.deck, { title: 'Pitch' }, [
+          component(DECK_GRAMMAR_IDS.controls, {}, [component('button', { variant: 'ghost' })]),
+          component(DECK_GRAMMAR_IDS.overview),
+          slide('Opening'),
+          component(DECK_GRAMMAR_IDS.notes),
+          component(DECK_GRAMMAR_IDS.upNext),
+        ]),
+      ];
+      expect(issues(presenting)).toEqual([]);
 
-  it('treats presenter notes as a landmark only outside slides', () => {
-    const presenting = [
-      component(DECK_GRAMMAR_IDS.deck, { title: 'Pitch' }, [
-        component(DECK_GRAMMAR_IDS.controls, {}, [component('button', { variant: 'ghost' })]),
-        component(DECK_GRAMMAR_IDS.overview),
-        slide('Opening'),
-        component(DECK_GRAMMAR_IDS.notes),
-        component(DECK_GRAMMAR_IDS.upNext),
-      ]),
-    ];
-    expect(issues(presenting)).toEqual([]);
+      const twoNotesSurfaces = [
+        component(DECK_GRAMMAR_IDS.deck, {}, [
+          component(DECK_GRAMMAR_IDS.notes),
+          component(DECK_GRAMMAR_IDS.notes),
+        ]),
+      ];
+      expect(issues(twoNotesSurfaces)).toEqual(['0.children.1 landmark-duplicate']);
 
-    const twoNotesSurfaces = [
-      component(DECK_GRAMMAR_IDS.deck, {}, [
-        component(DECK_GRAMMAR_IDS.notes),
-        component(DECK_GRAMMAR_IDS.notes),
-      ]),
-    ];
-    expect(issues(twoNotesSurfaces)).toEqual(['0.children.1 landmark-duplicate']);
-
-    const notesInSlides = [
-      component(DECK_GRAMMAR_IDS.deck, { title: 'Pitch' }, [
-        slide('One', [component(DECK_GRAMMAR_IDS.notes)]),
-        slide('Two', [component(DECK_GRAMMAR_IDS.notes)]),
-      ]),
-    ];
-    expect(issues(notesInSlides)).toEqual([]);
-  });
-
-  it('needs a deck title so slide titles are not each an h1', () => {
-    const untitled = [component(DECK_GRAMMAR_IDS.deck, {}, [slide('One'), slide('Two')])];
-    expect(issues(untitled)).toEqual(['0.children.1 heading-multiple-h1']);
-  });
-
-  it('keeps one main landmark per deck', () => {
-    const nested = [component(DECK_GRAMMAR_IDS.deck, {}, [component(DECK_GRAMMAR_IDS.deck)])];
-    expect(issues(nested)).toEqual(['0.children.0 landmark-multiple-main']);
+      const notesInSlides = [
+        component(DECK_GRAMMAR_IDS.deck, { title: 'Pitch' }, [
+          slide('One', [component(DECK_GRAMMAR_IDS.notes)]),
+          slide('Two', [component(DECK_GRAMMAR_IDS.notes)]),
+        ]),
+      ];
+      expect(issues(notesInSlides)).toEqual([]);
+    }
+    // needs a deck title so slide titles are not each an h1
+    {
+      const untitled = [component(DECK_GRAMMAR_IDS.deck, {}, [slide('One'), slide('Two')])];
+      expect(issues(untitled)).toEqual(['0.children.1 heading-multiple-h1']);
+    }
+    // keeps one main landmark per deck
+    {
+      const nested = [component(DECK_GRAMMAR_IDS.deck, {}, [component(DECK_GRAMMAR_IDS.deck)])];
+      expect(issues(nested)).toEqual(['0.children.0 landmark-multiple-main']);
+    }
   });
 });

@@ -58,97 +58,95 @@ describe('G04: slot-addressed children', () => {
     ],
   };
 
-  it('routes each child to the named slot it asks for', () => {
-    const result = renderCatalogTree(page, { catalog: chrome, tier: 'developer' });
-    expect(result.diagnostics).toEqual([]);
-    const root = result.roots[0] as Component;
-    expect(root.children.map((c) => c.slot)).toEqual(['hero', 'sections', 'footer', undefined]);
-    // The default slot is an ordinary child: no slot field at all.
-    expect(Object.hasOwn(root.children[3] as object, 'slot')).toBe(false);
-  });
-
-  it.each([
-    ['an unknown slot name', 'sidebar'],
-    ['a prop that is not a slot', 'title'],
-    ['a non-string slot', 3],
-  ])('drops a child that names %s', (_label, slot) => {
-    const result = renderCatalogTree(
-      { id: 'dialog', props: { title: 'Edit note' }, children: [{ ...paragraph('x'), slot }] },
-      { catalog: chrome, tier: 'developer' }
-    );
-    expect((result.roots[0] as Component).children).toEqual([]);
-    expect(result.diagnostics).toEqual([
-      expect.objectContaining({ code: 'invalid-slot', path: '0.children.0' }),
-    ]);
-    expect(result.diagnostics[0]?.message).toContain('trigger, footer, children');
-  });
-
-  it('ignores a slot on a root node and keeps the node', () => {
-    const result = renderCatalogTree(
-      { ...heading('Root'), slot: 'hero' },
-      { catalog: normative, tier: 'untrusted' }
-    );
-    expect(result.roots[0]).toMatchObject({ kind: 'component', id: 'blocks-text' });
-    expect(Object.hasOwn(result.roots[0] as object, 'slot')).toBe(false);
-    expect(codes(result)).toEqual(['invalid-slot']);
-  });
-
-  it('keeps the tier contract inside a slot: a denied child is a slotted placeholder', () => {
-    const result = renderCatalogTree(
-      {
-        id: 'layout-card',
-        props: { title: 'Summary' },
-        children: [{ id: 'dialog', props: { title: 'Delete?' }, slot: 'children' }],
-      },
-      { catalog: normative, tier: 'untrusted' }
-    );
-    expect((result.roots[0] as Component).children[0]).toMatchObject({
-      kind: 'placeholder',
-      reason: 'tier-denied',
-    });
-    const slotted = renderCatalogTree(
-      {
-        id: 'dialog',
-        props: { title: 'Edit note' },
-        children: [{ id: 'not-a-component', slot: 'footer' }],
-      },
-      { catalog: chrome, tier: 'developer' }
-    );
-    expect((slotted.roots[0] as Component).children[0]).toMatchObject({
-      kind: 'placeholder',
-      reason: 'unknown-id',
-      slot: 'footer',
-    });
-  });
-
-  it('counts slotted children against the tree limits like any child', () => {
-    const measured = measureCatalogTree(page);
-    expect(measured.metrics.nodes).toBe(5);
-  });
-
-  it('survives validateDraft, the edit shape check and the paint plan', () => {
-    const validation = validateDraft(page, {
-      catalog: chrome,
-      tier: 'developer',
-      frameRoots: false,
-    });
-    expect(validation.diagnostics.filter((d) => d.severity === 'error')).toEqual([]);
-    expect((validation.draft as CatalogTreeInput).children?.map((c) => c.slot)).toEqual([
-      'hero',
-      'sections',
-      'footer',
-      'children',
-    ]);
-    expect(isTreeNode(page)).toBe(true);
-    expect(isTreeNode({ id: 'layout-card', slot: 1 })).toBe(false);
-    const player = createPlayer({
-      blueprint: page,
-      catalog: chrome,
-      tier: 'developer',
-      frameRoots: false,
-    });
-    const plan = player.state.plan[0] as Extract<RenderNode, { kind: 'component' }>;
-    expect(plan.children.map((c) => c.slot)).toEqual(['hero', 'sections', 'footer', undefined]);
+  it('G04: slots route children, refuse bad slots, keep the tier contract and limits, and survive every stage', () => {
+    // routes each child to the named slot it asks for
+    {
+      const result = renderCatalogTree(page, { catalog: chrome, tier: 'developer' });
+      expect(result.diagnostics).toEqual([]);
+      const root = result.roots[0] as Component;
+      expect(root.children.map((c) => c.slot)).toEqual(['hero', 'sections', 'footer', undefined]);
+      // The default slot is an ordinary child: no slot field at all.
+      expect(Object.hasOwn(root.children[3] as object, 'slot')).toBe(false);
+    }
+    for (const slot of ['sidebar', 'title', 3]) {
+      const result = renderCatalogTree(
+        { id: 'dialog', props: { title: 'Edit note' }, children: [{ ...paragraph('x'), slot }] },
+        { catalog: chrome, tier: 'developer' }
+      );
+      expect((result.roots[0] as Component).children).toEqual([]);
+      expect(result.diagnostics).toEqual([
+        expect.objectContaining({ code: 'invalid-slot', path: '0.children.0' }),
+      ]);
+      expect(result.diagnostics[0]?.message).toContain('trigger, footer, children');
+    }
+    // ignores a slot on a root node and keeps the node
+    {
+      const result = renderCatalogTree(
+        { ...heading('Root'), slot: 'hero' },
+        { catalog: normative, tier: 'untrusted' }
+      );
+      expect(result.roots[0]).toMatchObject({ kind: 'component', id: 'blocks-text' });
+      expect(Object.hasOwn(result.roots[0] as object, 'slot')).toBe(false);
+      expect(codes(result)).toEqual(['invalid-slot']);
+    }
+    // keeps the tier contract inside a slot: a denied child is a slotted placeholder
+    {
+      const result = renderCatalogTree(
+        {
+          id: 'layout-card',
+          props: { title: 'Summary' },
+          children: [{ id: 'dialog', props: { title: 'Delete?' }, slot: 'children' }],
+        },
+        { catalog: normative, tier: 'untrusted' }
+      );
+      expect((result.roots[0] as Component).children[0]).toMatchObject({
+        kind: 'placeholder',
+        reason: 'tier-denied',
+      });
+      const slotted = renderCatalogTree(
+        {
+          id: 'dialog',
+          props: { title: 'Edit note' },
+          children: [{ id: 'not-a-component', slot: 'footer' }],
+        },
+        { catalog: chrome, tier: 'developer' }
+      );
+      expect((slotted.roots[0] as Component).children[0]).toMatchObject({
+        kind: 'placeholder',
+        reason: 'unknown-id',
+        slot: 'footer',
+      });
+    }
+    // counts slotted children against the tree limits like any child
+    {
+      const measured = measureCatalogTree(page);
+      expect(measured.metrics.nodes).toBe(5);
+    }
+    // survives validateDraft, the edit shape check and the paint plan
+    {
+      const validation = validateDraft(page, {
+        catalog: chrome,
+        tier: 'developer',
+        frameRoots: false,
+      });
+      expect(validation.diagnostics.filter((d) => d.severity === 'error')).toEqual([]);
+      expect((validation.draft as CatalogTreeInput).children?.map((c) => c.slot)).toEqual([
+        'hero',
+        'sections',
+        'footer',
+        'children',
+      ]);
+      expect(isTreeNode(page)).toBe(true);
+      expect(isTreeNode({ id: 'layout-card', slot: 1 })).toBe(false);
+      const player = createPlayer({
+        blueprint: page,
+        catalog: chrome,
+        tier: 'developer',
+        frameRoots: false,
+      });
+      const plan = player.state.plan[0] as Extract<RenderNode, { kind: 'component' }>;
+      expect(plan.children.map((c) => c.slot)).toEqual(['hero', 'sections', 'footer', undefined]);
+    }
   });
 });
 
@@ -166,30 +164,78 @@ describe('G07: conditional regions', () => {
       ...(conditionInputs ? { conditionInputs } : {}),
     });
 
-  it('shows the region when the condition holds for the host inputs', () => {
-    const result = render(report(totalAbove(0)), { total: 5 });
-    expect(result.diagnostics).toEqual([]);
-    expect((result.roots[0] as Component).children).toHaveLength(2);
+  it('G07: conditions show, hide, still check, refuse malformed conditions and fail closed without a runtime', () => {
+    // shows the region when the condition holds for the host inputs
+    {
+      const result = render(report(totalAbove(0)), { total: 5 });
+      expect(result.diagnostics).toEqual([]);
+      expect((result.roots[0] as Component).children).toHaveLength(2);
+    }
+    for (const inputs of [{ total: 0 }, undefined, { total: null }]) {
+      const result = render(report(totalAbove(0)), inputs);
+      expect(result.diagnostics, JSON.stringify(inputs)).toEqual([]);
+      expect((result.roots[0] as Component).children, JSON.stringify(inputs)).toHaveLength(1);
+    }
+    // still checks a hidden region: its diagnostics stand
+    {
+      const hidden = { id: 'not-a-component' };
+      const result = render(report(totalAbove(0), hidden as never), { total: 0 });
+      expect((result.roots[0] as Component).children).toHaveLength(1);
+      expect(codes(result)).toEqual(['unknown-id']);
+    }
+    for (const [label, when] of BAD_CONDITIONS) {
+      const result = render(report(when), { total: 5 });
+      expect((result.roots[0] as Component).children, label).toHaveLength(1);
+      expect(codes(result), label).toEqual(['invalid-condition']);
+    }
+    // fails closed without a condition runtime
+    {
+      const result = renderCatalogTree(report(totalAbove(0)), {
+        catalog: normative,
+        tier: 'untrusted',
+        conditionInputs: { total: 5 },
+      });
+      expect((result.roots[0] as Component).children).toHaveLength(1);
+      expect(result.diagnostics).toEqual([
+        expect.objectContaining({ code: 'invalid-condition', path: '0.children.1' }),
+      ]);
+    }
+    // ignores a condition on a root node and keeps the root
+    {
+      const result = render({ ...heading('Root'), when: totalAbove(0) }, { total: 0 });
+      expect(result.roots).toHaveLength(1);
+      expect(codes(result)).toEqual(['invalid-condition']);
+    }
+    // is an error in validateDraft without a runtime, and valid with one
+    {
+      const tree = report(totalAbove(0));
+      expect(validateDraft(tree, { catalog: normative }).ok).toBe(false);
+      const ok = validateDraft(tree, {
+        catalog: normative,
+        conditions: formulaConditions,
+        conditionInputs: { total: 1 },
+      });
+      expect(ok.ok).toBe(true);
+      expect((ok.draft as CatalogTreeInput).children?.[1]?.when).toEqual(totalAbove(0));
+      expect(isTreeNode(tree)).toBe(true);
+    }
+    // re-evaluates in the player when the host updates its inputs
+    {
+      const player = createPlayer({
+        blueprint: report(totalAbove(0)),
+        catalog: normative,
+        conditions: formulaConditions,
+        conditionInputs: { total: 0 },
+      });
+      const count = () => (player.state.plan[0] as Component).children.length;
+      expect(count()).toBe(1);
+      player.update({ conditionInputs: { total: 3 } });
+      expect(count()).toBe(2);
+      player.dispose();
+    }
   });
 
-  it.each([
-    ['false', { total: 0 }],
-    ['unknown (missing input)', undefined],
-    ['unknown (null input)', { total: null }],
-  ])('hides the region when the condition is %s, with no diagnostic', (_label, inputs) => {
-    const result = render(report(totalAbove(0)), inputs);
-    expect(result.diagnostics).toEqual([]);
-    expect((result.roots[0] as Component).children).toHaveLength(1);
-  });
-
-  it('still checks a hidden region: its diagnostics stand', () => {
-    const hidden = { id: 'not-a-component' };
-    const result = render(report(totalAbove(0), hidden as never), { total: 0 });
-    expect((result.roots[0] as Component).children).toHaveLength(1);
-    expect(codes(result)).toEqual(['unknown-id']);
-  });
-
-  it.each([
+  const BAD_CONDITIONS: ReadonlyArray<[string, unknown]> = [
     ['an unknown op', { op: 'exec', value: 'rm' }],
     ['a number formula, not a condition', { op: 'num', value: 1 }],
     ['a string', 'total > 0'],
@@ -197,54 +243,5 @@ describe('G07: conditional regions', () => {
       'an unsafe variable name',
       { op: 'gt', left: { op: 'var', name: 'constructor' }, right: { op: 'num', value: 0 } },
     ],
-  ])('drops a node whose condition is %s', (_label, when) => {
-    const result = render(report(when), { total: 5 });
-    expect((result.roots[0] as Component).children).toHaveLength(1);
-    expect(codes(result)).toEqual(['invalid-condition']);
-  });
-
-  it('fails closed without a condition runtime', () => {
-    const result = renderCatalogTree(report(totalAbove(0)), {
-      catalog: normative,
-      tier: 'untrusted',
-      conditionInputs: { total: 5 },
-    });
-    expect((result.roots[0] as Component).children).toHaveLength(1);
-    expect(result.diagnostics).toEqual([
-      expect.objectContaining({ code: 'invalid-condition', path: '0.children.1' }),
-    ]);
-  });
-
-  it('ignores a condition on a root node and keeps the root', () => {
-    const result = render({ ...heading('Root'), when: totalAbove(0) }, { total: 0 });
-    expect(result.roots).toHaveLength(1);
-    expect(codes(result)).toEqual(['invalid-condition']);
-  });
-
-  it('is an error in validateDraft without a runtime, and valid with one', () => {
-    const tree = report(totalAbove(0));
-    expect(validateDraft(tree, { catalog: normative }).ok).toBe(false);
-    const ok = validateDraft(tree, {
-      catalog: normative,
-      conditions: formulaConditions,
-      conditionInputs: { total: 1 },
-    });
-    expect(ok.ok).toBe(true);
-    expect((ok.draft as CatalogTreeInput).children?.[1]?.when).toEqual(totalAbove(0));
-    expect(isTreeNode(tree)).toBe(true);
-  });
-
-  it('re-evaluates in the player when the host updates its inputs', () => {
-    const player = createPlayer({
-      blueprint: report(totalAbove(0)),
-      catalog: normative,
-      conditions: formulaConditions,
-      conditionInputs: { total: 0 },
-    });
-    const count = () => (player.state.plan[0] as Component).children.length;
-    expect(count()).toBe(1);
-    player.update({ conditionInputs: { total: 3 } });
-    expect(count()).toBe(2);
-    player.dispose();
-  });
+  ];
 });

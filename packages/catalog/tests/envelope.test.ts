@@ -15,8 +15,9 @@ import {
   supersedeEnvelope,
   verifyActivation,
 } from '../src/envelope/index.ts';
+import { ENVELOPE_VERSION, SUPPORTED_ENVELOPE_VERSIONS } from '../src/envelope/types.ts';
 import type { CatalogTreeInput } from '../src/render/renderer/index.ts';
-import { renderCatalogFromBuild, renderCatalogTree } from '../src/render/renderer/index.ts';
+import { renderCatalogFromBuild } from '../src/render/renderer/index.ts';
 import { type DraftValidation, validateDraft } from '../src/validate/index.ts';
 
 const build = await buildCatalog(await discoverManifestGroups());
@@ -51,22 +52,23 @@ const prepared = (): BlueprintEnvelope =>
 const codes = (result: DraftValidation) =>
   result.diagnostics.map((d) => `${d.check}:${d.code}:${d.severity}`);
 
-describe('validateDraft with an envelope', () => {
-  it('validates the tree inside and earns the validated status', () => {
+it('validateDraft earns the validated status from the tree, never from declared fields, and refuses foreign or broken envelopes', () => {
+  // validates the tree inside and earns the validated status
+  {
     const result = validateDraft(prepared(), { catalog, catalogHash: HASH });
     expect(result.diagnostics).toEqual([]);
     expect(result.ok).toBe(true);
     expect(result.checks.envelope).toBe('pass');
     expect(result.envelope).toMatchObject({ status: 'validated', meetingRef: { id: 'mtg-4411' } });
     expect(result.draft).toEqual(tree);
-  });
-
-  it('reads envelope JSON text too', () => {
+  }
+  // reads envelope JSON text too
+  {
     const result = validateDraft(JSON.stringify(prepared()), { catalog, catalogHash: HASH });
     expect(result.ok).toBe(true);
-  });
-
-  it('never trusts a declared status, activation or tier', () => {
+  }
+  // never trusts a declared status, activation or tier
+  {
     const forged = {
       ...prepared(),
       status: 'active',
@@ -82,16 +84,16 @@ describe('validateDraft with an envelope', () => {
     expect(result.tier).toBe('untrusted');
     expect(result.envelope?.status).toBe('validated');
     expect(result.envelope?.activatedBy).toBeUndefined();
-  });
-
-  it('keeps an invalid draft a draft', () => {
+  }
+  // keeps an invalid draft a draft
+  {
     const bad = { ...prepared(), tree: { ...tree, children: [{ id: 'dialog', props: {} }] } };
     const result = validateDraft(bad, { catalog });
     expect(result.ok).toBe(false);
     expect(result.envelope?.status).toBe('draft');
-  });
-
-  it('refuses a draft written for another catalog', () => {
+  }
+  // refuses a draft written for another catalog
+  {
     const result = validateDraft(
       { ...prepared(), catalog: 'b'.repeat(64) },
       {
@@ -101,9 +103,9 @@ describe('validateDraft with an envelope', () => {
     );
     expect(codes(result)).toEqual(['envelope:catalog-mismatch:error']);
     expect(result.ok).toBe(false);
-  });
-
-  it('stops on an unsupported version or a missing tree', () => {
+  }
+  // stops on an unsupported version or a missing tree
+  {
     const future = validateDraft({ ...prepared(), version: 2 }, { catalog });
     expect(future).toMatchObject({ ok: false, status: 'parse', envelope: null });
     expect(codes(future)).toEqual(['envelope:unsupported-version:error']);
@@ -112,7 +114,7 @@ describe('validateDraft with an envelope', () => {
     expect(codes(validateDraft({ ...prepared(), tree: [tree] }, { catalog }))).toEqual([
       'envelope:missing-tree:error',
     ]);
-  });
+  }
 });
 
 describe('parseEnvelope: hostile fields', () => {
@@ -121,16 +123,16 @@ describe('parseEnvelope: hostile fields', () => {
       (i) => `${i.path} ${i.code}`
     );
 
-  it('refuses unknown and prototype fields at every level', () => {
-    expect(issues({ script: 'x' })).toEqual(['$.script unknown-field']);
-    const proto = JSON.parse('{"__proto__": {"admin": true}, "kind": "agent", "name": "A"}');
-    expect(issues({ generator: proto })).toEqual(['$.generator.__proto__ prototype-key']);
-    expect(issues({ trigger: { kind: 'calendar', label: 'x', run: 'now' } })).toEqual([
-      '$.trigger.run unknown-field',
-    ]);
-  });
-
-  it('refuses bad ids, hashes, times, enums, text and URLs', () => {
+  it('parseEnvelope refuses hostile fields, fails the portable profile closed and checks provenance ops', () => {
+    // refuses unknown and prototype fields at every level
+    {
+      expect(issues({ script: 'x' })).toEqual(['$.script unknown-field']);
+      const proto = JSON.parse('{"__proto__": {"admin": true}, "kind": "agent", "name": "A"}');
+      expect(issues({ generator: proto })).toEqual(['$.generator.__proto__ prototype-key']);
+      expect(issues({ trigger: { kind: 'calendar', label: 'x', run: 'now' } })).toEqual([
+        '$.trigger.run unknown-field',
+      ]);
+    }
     expect(issues({ id: '../etc/passwd' })).toEqual(['$.id invalid-id']);
     expect(issues({ catalog: 'latest' })).toEqual(['$.catalog invalid-catalog']);
     expect(issues({ createdAt: 'yesterday' })).toEqual(['$.createdAt invalid-time']);
@@ -148,24 +150,22 @@ describe('parseEnvelope: hostile fields', () => {
     expect(issues({ sources: new Array(33).fill({ label: 'x' }) })).toEqual([
       '$.sources invalid-field',
     ]);
-  });
-
-  it('fails closed on the portable profile until ids are audited portable', () => {
     expect(issues({ profile: 'portable' })).toEqual(['$.profile unsupported-profile']);
     expect(issues({ profile: 'web' })).toEqual([]);
-  });
-
-  it('checks provenance ops as untrusted edit ops', () => {
-    const entry = { at: AT, actor: 'agent', kind: 'apply', ops: [{ op: 'drop-table' }] };
-    expect(issues({ provenance: [entry] })).toEqual(['$.provenance[0].ops invalid-ops']);
-    expect(issues({ provenance: new Array(MAX_PROVENANCE + 1).fill(entry) })).toEqual([
-      '$.provenance invalid-field',
-    ]);
+    // checks provenance ops as untrusted edit ops
+    {
+      const entry = { at: AT, actor: 'agent', kind: 'apply', ops: [{ op: 'drop-table' }] };
+      expect(issues({ provenance: [entry] })).toEqual(['$.provenance[0].ops invalid-ops']);
+      expect(issues({ provenance: new Array(MAX_PROVENANCE + 1).fill(entry) })).toEqual([
+        '$.provenance invalid-field',
+      ]);
+    }
   });
 });
 
-describe('lifecycle: draft → validated → active → superseded', () => {
-  it('returns a receipt for each decoded validation transition, including refused drafts', () => {
+it('lifecycle receipts and activation of only a reviewed, validated envelope', async () => {
+  // returns a receipt for each decoded validation transition, including refused drafts
+  {
     const accepted = validateDraft(prepared(), { catalog, catalogHash: HASH });
     expect(accepted.envelope?.status).toBe('validated');
     expect(createValidationReceipt(accepted, AT)).toMatchObject({
@@ -192,9 +192,9 @@ describe('lifecycle: draft → validated → active → superseded', () => {
       checks: { render: 'fail' },
     });
     expect(createValidationReceipt(validateDraft('{', { catalog }), AT)).toBeNull();
-  });
-
-  it('activates only a validated envelope, with the digest the owner reviewed', async () => {
+  }
+  // activates only a validated envelope, with the digest the owner reviewed
+  {
     const draft = prepared();
     expect((await activateEnvelope(draft, { by: 'owner', reviewedDigest: 'x' })).ok).toBe(false);
     const validated = validateDraft(draft, { catalog, catalogHash: HASH }).envelope;
@@ -223,11 +223,12 @@ describe('lifecycle: draft → validated → active → superseded', () => {
       ok: true,
       envelope: { status: 'superseded' },
     });
-  });
+  }
 });
 
-describe('recordProvenance', () => {
-  it('records applies, undos and redos, and makes an edited blueprint a draft again', async () => {
+it('recordProvenance records edits, re-drafts an edited blueprint and keeps the last steps', async () => {
+  // records applies, undos and redos, and makes an edited blueprint a draft again
+  {
     const validated = validateDraft(prepared(), { catalog }).envelope as BlueprintEnvelope;
     const digest = await blueprintDigest(validated.tree);
     const active = await activateEnvelope(validated, { by: 'owner', reviewedDigest: digest });
@@ -250,9 +251,9 @@ describe('recordProvenance', () => {
     recorder.stop();
     history.undo();
     expect(recorder.envelope().provenance).toHaveLength(3);
-  });
-
-  it(`keeps only the last ${MAX_PROVENANCE} steps`, () => {
+  }
+  // keeps only the last ${MAX_PROVENANCE} steps
+  {
     const history = createEditHistory(tree);
     const recorder = recordProvenance(history, prepared(), 'agent', () => AT);
     for (let i = 0; i < MAX_PROVENANCE + 5; i += 1) {
@@ -261,10 +262,10 @@ describe('recordProvenance', () => {
     const provenance = recorder.envelope().provenance ?? [];
     expect(provenance).toHaveLength(MAX_PROVENANCE);
     expect(provenance.at(-1)?.ops[0]).toMatchObject({ value: `v${MAX_PROVENANCE + 4}` });
-  });
+  }
 });
 
-describe('migrateEnvelope', () => {
+describe('migrateEnvelope and the version policy', () => {
   const wrap = {
     id: 'legacy-1',
     catalog: HASH,
@@ -272,35 +273,30 @@ describe('migrateEnvelope', () => {
     at: AT,
   };
 
-  it('wraps a bare tree as a draft and passes version 1 through', () => {
+  it('reads version 1, wraps bare trees as drafts and refuses other formats, versions and values', () => {
+    expect(SUPPORTED_ENVELOPE_VERSIONS).toEqual([1]);
+    expect(ENVELOPE_VERSION).toBe(1);
     const migrated = migrateEnvelope(tree, wrap);
     expect(migrated).toMatchObject({ ok: true, migrated: true, envelope: { status: 'draft' } });
     if (migrated.ok) {
       expect(migrateEnvelope(migrated.envelope, wrap)).toMatchObject({ ok: true, migrated: false });
       expect(validateDraft(migrated.envelope, { catalog, catalogHash: HASH }).ok).toBe(true);
     }
-  });
-
-  it('refuses newer versions and non-trees', () => {
-    expect(migrateEnvelope({ ...prepared(), version: 9 }, wrap)).toMatchObject({
+    expect(migrateEnvelope({ ...prepared(), format: 'other-app' }, wrap)).toMatchObject({
       ok: false,
-      code: 'unsupported-version',
+      code: 'unknown-format',
     });
+    const { version: _omit, ...noVersion } = prepared();
+    void _omit;
+    expect(migrateEnvelope(noVersion, wrap)).toMatchObject({ ok: false, code: 'invalid-version' });
+    expect(parseEnvelope(noVersion).issues.map((issue) => issue.code)).toContain('invalid-version');
+    const newer = migrateEnvelope({ ...prepared(), version: 9 }, wrap);
+    expect(newer).toMatchObject({ ok: false, code: 'unsupported-version' });
+    if (!newer.ok) expect(newer.message).toContain('1');
+    const parsedNewer = parseEnvelope({ ...prepared(), version: 2 });
+    expect(parsedNewer.envelope).toBeNull();
+    expect(parsedNewer.issues.map((issue) => issue.code)).toContain('unsupported-version');
     expect(migrateEnvelope([tree], wrap)).toMatchObject({ ok: false, code: 'not-a-tree' });
-  });
-});
-
-describe('developer tier is normative (D5)', () => {
-  it('lets the developer tier emit only the build developer ids unless the host opts in', () => {
-    expect(build.catalog.tiers.developer).toContain('layout-deck');
-    expect(build.catalog.tiers.developer).not.toContain('dialog');
-    const dialog = { id: 'dialog', props: { title: 'Settings' } };
-    const strict = renderCatalogTree(dialog, { catalog, tier: 'developer' });
-    expect(strict.roots[0]).toMatchObject({ kind: 'placeholder', reason: 'tier-denied' });
-    const all = renderCatalogTree(dialog, {
-      catalog: renderCatalogFromBuild(build.catalog, { developer: 'all' }),
-      tier: 'developer',
-    });
-    expect(all.roots[0]).toMatchObject({ kind: 'component', id: 'dialog' });
+    expect(migrateEnvelope(null, wrap)).toMatchObject({ ok: false, code: 'not-a-tree' });
   });
 });

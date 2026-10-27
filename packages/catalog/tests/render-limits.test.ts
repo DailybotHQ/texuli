@@ -55,138 +55,147 @@ function deepValue(levels: number): unknown {
 }
 
 describe('measureCatalogTree', () => {
-  it('counts depth, nodes, branching and roots', () => {
-    const { metrics } = measureCatalogTree(chain(4));
-    expect(metrics.depth).toBe(4);
-    expect(metrics.nodes).toBe(4);
-    expect(metrics.branching).toBe(1);
-    expect(metrics.roots).toBe(1);
-    expect(metrics.bytes).toBeGreaterThan(0);
+  it('measureCatalogTree counts every dimension and survives values nested past any limit', () => {
+    // counts depth, nodes, branching and roots
+    {
+      const { metrics } = measureCatalogTree(chain(4));
+      expect(metrics.depth).toBe(4);
+      expect(metrics.nodes).toBe(4);
+      expect(metrics.branching).toBe(1);
+      expect(metrics.roots).toBe(1);
+      expect(metrics.bytes).toBeGreaterThan(0);
 
-    const manyRoots = measureCatalogTree([
-      { id: 'card', props: { title: 'a' } },
-      { id: 'card', props: { title: 'b' } },
-    ]);
-    expect(manyRoots.metrics.roots).toBe(2);
-    expect(manyRoots.metrics.nodes).toBe(2);
+      const manyRoots = measureCatalogTree([
+        { id: 'card', props: { title: 'a' } },
+        { id: 'card', props: { title: 'b' } },
+      ]);
+      expect(manyRoots.metrics.roots).toBe(2);
+      expect(manyRoots.metrics.nodes).toBe(2);
 
-    const w = measureCatalogTree(wide(5));
-    expect(w.metrics.branching).toBe(5);
-    expect(w.metrics.nodes).toBe(6);
-  });
-
-  it('byte budget matches UTF-8 length of the canonical snapshot', () => {
-    const tree = { id: 'card', props: { title: 'café' } };
-    const { metrics, snapshot } = measureCatalogTree(tree);
-    expect(metrics.bytes).toBe(utf8ByteLength(snapshot));
-    expect(snapshot).toContain('caf');
-  });
-
-  it('measures a value nested far past any limit without overflowing the stack', () => {
-    const tree = { id: 'card', props: { title: 'bomb', data: deepValue(100_000) } };
-    const { metrics, diagnostics } = measureCatalogTree(tree);
-    expect(metrics.nodes).toBe(1);
-    expect(diagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
-  });
-
-  it('caps the snapshot depth so byte measurement itself cannot recurse without bound', () => {
-    const { snapshot } = measureCatalogTree({ id: 'card', props: { data: deepValue(100_000) } });
-    expect(snapshot.length).toBeLessThan(10_000);
+      const w = measureCatalogTree(wide(5));
+      expect(w.metrics.branching).toBe(5);
+      expect(w.metrics.nodes).toBe(6);
+    }
+    // byte budget matches UTF-8 length of the canonical snapshot
+    {
+      const tree = { id: 'card', props: { title: 'café' } };
+      const { metrics, snapshot } = measureCatalogTree(tree);
+      expect(metrics.bytes).toBe(utf8ByteLength(snapshot));
+      expect(snapshot).toContain('caf');
+    }
+    // measures a value nested far past any limit without overflowing the stack
+    {
+      const tree = { id: 'card', props: { title: 'bomb', data: deepValue(100_000) } };
+      const { metrics, diagnostics } = measureCatalogTree(tree);
+      expect(metrics.nodes).toBe(1);
+      expect(diagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
+    }
+    // caps the snapshot depth so byte measurement itself cannot recurse without bound
+    {
+      const { snapshot } = measureCatalogTree({ id: 'card', props: { data: deepValue(100_000) } });
+      expect(snapshot.length).toBeLessThan(10_000);
+    }
   });
 });
 
 describe('validateCatalogTreeLimits', () => {
-  it('passes a small tree under defaults', () => {
-    const result = validateCatalogTreeLimits({
-      id: 'card',
-      props: { title: 'ok' },
-    });
-    expect(result.ok).toBe(true);
-    expect(result.limits.maxDepth).toBe(DEFAULT_TREE_LIMITS.maxDepth);
-    expect(result.diagnostics.filter((d) => d.code.endsWith('-exceeded'))).toEqual([]);
-  });
-
-  it('rejects over-deep trees', () => {
-    const result = validateCatalogTreeLimits(chain(5), { maxDepth: 3 });
-    expect(result.ok).toBe(false);
-    expect(result.diagnostics.some((d) => d.code === 'depth-exceeded')).toBe(true);
-    expect(result.metrics.depth).toBe(5);
-  });
-
-  it('rejects too many nodes', () => {
-    const result = validateCatalogTreeLimits(wide(10), { maxNodes: 5, maxBranching: 100 });
-    expect(result.ok).toBe(false);
-    expect(result.diagnostics.some((d) => d.code === 'nodes-exceeded')).toBe(true);
-  });
-
-  it('rejects excessive branching', () => {
-    const result = validateCatalogTreeLimits(wide(20), { maxBranching: 8, maxNodes: 1000 });
-    expect(result.ok).toBe(false);
-    expect(result.diagnostics.some((d) => d.code === 'branching-exceeded')).toBe(true);
-  });
-
-  it('rejects too many roots', () => {
-    const roots = Array.from({ length: 10 }, (_, i) => ({
-      id: 'card',
-      props: { title: `r${i}` },
-    }));
-    const result = validateCatalogTreeLimits(roots, { maxRoots: 3 });
-    expect(result.ok).toBe(false);
-    expect(result.diagnostics.some((d) => d.code === 'roots-exceeded')).toBe(true);
-  });
-
-  it('rejects oversized byte snapshots', () => {
-    const fat = {
-      id: 'card',
-      props: { title: 'x'.repeat(2000) },
-    };
-    const result = validateCatalogTreeLimits(fat, { maxBytes: 500 });
-    expect(result.ok).toBe(false);
-    expect(result.diagnostics.some((d) => d.code === 'bytes-exceeded')).toBe(true);
+  it('validateCatalogTreeLimits passes small trees and rejects every over-limit dimension', () => {
+    // passes a small tree under defaults
+    {
+      const result = validateCatalogTreeLimits({
+        id: 'card',
+        props: { title: 'ok' },
+      });
+      expect(result.ok).toBe(true);
+      expect(result.limits.maxDepth).toBe(DEFAULT_TREE_LIMITS.maxDepth);
+      expect(result.diagnostics.filter((d) => d.code.endsWith('-exceeded'))).toEqual([]);
+    }
+    // rejects over-deep trees
+    {
+      const result = validateCatalogTreeLimits(chain(5), { maxDepth: 3 });
+      expect(result.ok).toBe(false);
+      expect(result.diagnostics.some((d) => d.code === 'depth-exceeded')).toBe(true);
+      expect(result.metrics.depth).toBe(5);
+    }
+    // rejects too many nodes
+    {
+      const result = validateCatalogTreeLimits(wide(10), { maxNodes: 5, maxBranching: 100 });
+      expect(result.ok).toBe(false);
+      expect(result.diagnostics.some((d) => d.code === 'nodes-exceeded')).toBe(true);
+    }
+    // rejects excessive branching
+    {
+      const result = validateCatalogTreeLimits(wide(20), { maxBranching: 8, maxNodes: 1000 });
+      expect(result.ok).toBe(false);
+      expect(result.diagnostics.some((d) => d.code === 'branching-exceeded')).toBe(true);
+    }
+    // rejects too many roots
+    {
+      const roots = Array.from({ length: 10 }, (_, i) => ({
+        id: 'card',
+        props: { title: `r${i}` },
+      }));
+      const result = validateCatalogTreeLimits(roots, { maxRoots: 3 });
+      expect(result.ok).toBe(false);
+      expect(result.diagnostics.some((d) => d.code === 'roots-exceeded')).toBe(true);
+    }
+    // rejects oversized byte snapshots
+    {
+      const fat = {
+        id: 'card',
+        props: { title: 'x'.repeat(2000) },
+      };
+      const result = validateCatalogTreeLimits(fat, { maxBytes: 500 });
+      expect(result.ok).toBe(false);
+      expect(result.diagnostics.some((d) => d.code === 'bytes-exceeded')).toBe(true);
+    }
   });
 });
 
 describe('renderCatalogTreeWithLimits', () => {
-  it('renders when within limits', () => {
-    const result = renderCatalogTreeWithLimits(
-      { id: 'card', props: { title: 'Hello', variant: 'elevated' } },
-      { catalog, tier: 'untrusted' }
-    );
-    expect(result.withinLimits).toBe(true);
-    expect(result.roots).toHaveLength(1);
-    expect(result.roots[0]).toMatchObject({ kind: 'component', id: 'card' });
-  });
-
-  it('does not call through to a full render when limits fail', () => {
-    const result = renderCatalogTreeWithLimits(chain(20), {
-      catalog,
-      tier: 'untrusted',
-      limits: { maxDepth: 4 },
-    });
-    expect(result.withinLimits).toBe(false);
-    expect(result.roots).toEqual([]);
-    expect(result.limitDiagnostics.some((d) => d.code === 'depth-exceeded')).toBe(true);
-    expect(result.diagnostics.some((d) => d.message.includes('depth-exceeded'))).toBe(true);
-  });
-
-  it('uses maxBranching as the per-node child cap when maxChildren is omitted', () => {
-    const result = renderCatalogTreeWithLimits(wide(3), {
-      catalog,
-      limits: { maxBranching: 3, maxNodes: 100 },
-    });
-    expect(result.withinLimits).toBe(true);
-    expect(result.roots[0]).toMatchObject({ kind: 'component' });
-    if (result.roots[0]?.kind === 'component') {
-      expect(result.roots[0].children).toHaveLength(3);
+  it('renderCatalogTreeWithLimits renders within limits and never renders past them', () => {
+    // renders when within limits
+    {
+      const result = renderCatalogTreeWithLimits(
+        { id: 'card', props: { title: 'Hello', variant: 'elevated' } },
+        { catalog, tier: 'untrusted' }
+      );
+      expect(result.withinLimits).toBe(true);
+      expect(result.roots).toHaveLength(1);
+      expect(result.roots[0]).toMatchObject({ kind: 'component', id: 'card' });
     }
-  });
-
-  it('survives a value nested far past any limit: the limits gate refuses, nothing renders', () => {
-    const tree = { id: 'card', props: { title: 'bomb', data: deepValue(100_000) } };
-    const result = renderCatalogTreeWithLimits(tree, { catalog, tier: 'untrusted' });
-    expect(result.withinLimits).toBe(false);
-    expect(result.roots).toEqual([]);
-    expect(result.limitDiagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
+    // does not call through to a full render when limits fail
+    {
+      const result = renderCatalogTreeWithLimits(chain(20), {
+        catalog,
+        tier: 'untrusted',
+        limits: { maxDepth: 4 },
+      });
+      expect(result.withinLimits).toBe(false);
+      expect(result.roots).toEqual([]);
+      expect(result.limitDiagnostics.some((d) => d.code === 'depth-exceeded')).toBe(true);
+      expect(result.diagnostics.some((d) => d.message.includes('depth-exceeded'))).toBe(true);
+    }
+    // uses maxBranching as the per-node child cap when maxChildren is omitted
+    {
+      const result = renderCatalogTreeWithLimits(wide(3), {
+        catalog,
+        limits: { maxBranching: 3, maxNodes: 100 },
+      });
+      expect(result.withinLimits).toBe(true);
+      expect(result.roots[0]).toMatchObject({ kind: 'component' });
+      if (result.roots[0]?.kind === 'component') {
+        expect(result.roots[0].children).toHaveLength(3);
+      }
+    }
+    // survives a value nested far past any limit: the limits gate refuses, nothing renders
+    {
+      const tree = { id: 'card', props: { title: 'bomb', data: deepValue(100_000) } };
+      const result = renderCatalogTreeWithLimits(tree, { catalog, tier: 'untrusted' });
+      expect(result.withinLimits).toBe(false);
+      expect(result.roots).toEqual([]);
+      expect(result.limitDiagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
+    }
   });
 });
 
@@ -249,39 +258,42 @@ describe('cyclic values', () => {
     });
   }
 
-  it('refuses a cyclic tree with a value-cycle diagnostic instead of exhausting the heap', async () => {
-    const result = await measureCyclicInWorker();
-    expect(result.ok).toBe(false);
-    expect(result.codes).toContain('value-cycle');
-  });
-
-  it('refuses a cyclic tree at the render gate: nothing renders', () => {
-    const tree: Record<string, unknown> = { id: 'card', props: { title: 'loop' } };
-    (tree.props as Record<string, unknown>).self = tree;
-    const result = renderCatalogTreeWithLimits(tree, { catalog, tier: 'untrusted' });
-    expect(result.withinLimits).toBe(false);
-    expect(result.roots).toEqual([]);
-    expect(result.limitDiagnostics.some((d) => d.code === 'value-cycle')).toBe(true);
-  });
-
-  it('accepts a value shared by two props (a repeated reference is not a cycle)', () => {
-    const shared = { label: 'Shared' };
-    const tree = { id: 'card', props: { title: 'twice', first: shared, second: shared } };
-    const { diagnostics } = measureCatalogTree(tree);
-    expect(diagnostics.some((d) => d.code === 'value-cycle')).toBe(false);
-    expect(validateCatalogTreeLimits(tree).ok).toBe(true);
-  });
-
-  it('measures a shared value at its deepest reference, so sharing never hides depth', () => {
-    const shared = deepValue(100);
-    // Walked last-in first-out: `shallow` (depth 3) expands first, then the
-    // same value under `deep` sits 40 levels lower, past the 128 limit.
-    const tree = { id: 'card', props: { deep: deepValue(40), shallow: shared } };
-    let cursor = tree.props.deep as unknown[];
-    while (Array.isArray(cursor[0])) cursor = cursor[0] as unknown[];
-    cursor[0] = shared;
-    const { diagnostics } = measureCatalogTree(tree);
-    expect(diagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
-    expect(diagnostics.some((d) => d.code === 'value-cycle')).toBe(false);
+  it('cyclic values are refused while shared values are measured at their deepest reference', async () => {
+    // refuses a cyclic tree with a value-cycle diagnostic instead of exhausting the heap
+    {
+      const result = await measureCyclicInWorker();
+      expect(result.ok).toBe(false);
+      expect(result.codes).toContain('value-cycle');
+    }
+    // refuses a cyclic tree at the render gate: nothing renders
+    {
+      const tree: Record<string, unknown> = { id: 'card', props: { title: 'loop' } };
+      (tree.props as Record<string, unknown>).self = tree;
+      const result = renderCatalogTreeWithLimits(tree, { catalog, tier: 'untrusted' });
+      expect(result.withinLimits).toBe(false);
+      expect(result.roots).toEqual([]);
+      expect(result.limitDiagnostics.some((d) => d.code === 'value-cycle')).toBe(true);
+    }
+    // accepts a value shared by two props (a repeated reference is not a cycle)
+    {
+      const shared = { label: 'Shared' };
+      const tree = { id: 'card', props: { title: 'twice', first: shared, second: shared } };
+      const { diagnostics } = measureCatalogTree(tree);
+      expect(diagnostics.some((d) => d.code === 'value-cycle')).toBe(false);
+      expect(validateCatalogTreeLimits(tree).ok).toBe(true);
+    }
+    // measures a shared value at its deepest reference, so sharing never hides depth
+    {
+      const shared = deepValue(100);
+      // Walked last-in first-out: `shallow` (depth 3) expands first, then the
+      // same value under `deep` sits 40 levels lower, past the 128 limit.
+      const tree = { id: 'card', props: { deep: deepValue(40), shallow: shared } };
+      let cursor = tree.props.deep as unknown[];
+      while (Array.isArray(cursor[0])) cursor = cursor[0] as unknown[];
+      cursor[0] = shared;
+      const { diagnostics } = measureCatalogTree(tree);
+      expect(diagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
+      expect(diagnostics.some((d) => d.code === 'value-cycle')).toBe(false);
+    }
   });
 });
