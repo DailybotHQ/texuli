@@ -487,7 +487,12 @@ export class WorkflowController {
       !Array.isArray(fragment.groups)
     )
       return false;
-    return this.paste(fragment);
+    // A fragment with missing positions or endpoints is refused, never thrown.
+    try {
+      return this.paste(fragment);
+    } catch {
+      return false;
+    }
   }
 
   // -------------------------------------------------------------------------

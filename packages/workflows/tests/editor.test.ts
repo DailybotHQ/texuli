@@ -393,6 +393,11 @@ describe('WorkflowEditor', () => {
       ctl.pasteText(JSON.stringify({ [CLIPBOARD_KEY]: { ...hostile, nodes: [], script: 'x' } }))
     ).toBe(false);
     expect(ctl.pasteText('not json')).toBe(false);
+    // Missing positions or edge endpoints are refused, not thrown.
+    const missing = { nodes: [{ id: 'a' }], edges: [], groups: [] };
+    expect(ctl.pasteText(JSON.stringify({ [CLIPBOARD_KEY]: missing }))).toBe(false);
+    const dangling = { nodes: [], edges: [{ id: 'e', from: null, to: null }], groups: [] };
+    expect(ctl.pasteText(JSON.stringify({ [CLIPBOARD_KEY]: dangling }))).toBe(false);
     expect(ctl.pasteText('x'.repeat(1_000_001))).toBe(false);
     expect(graph().nodes).toHaveLength(count);
     const safe = {
