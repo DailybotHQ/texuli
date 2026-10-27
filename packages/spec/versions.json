@@ -1,5 +1,5 @@
 {
-  "$comment": "Every released spec version pinned to its spec digest (the digest every generated file is stamped with). A normative change needs a new version and a new pin; tests/versioning.test.ts fails otherwise. Policy: README, Versioning.",
+  "$comment": "Every released spec version pinned to its spec digest (the digest every generated file is stamped with). A normative change needs a new version and a new pin; tests/spec.test.ts fails otherwise. Policy: README, Versioning.",
   "releases": [
     {
       "specVersion": "0.1.0",
