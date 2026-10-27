@@ -66,6 +66,10 @@ load of the page for each), and axe plus the polish check in each mode:
 - **Frame** (the same frame on every page, checked on the representative
   set): the Dark toggle changes the stage's computed background, and the RTL
   switch sets `dir="rtl"`.
+- **Representative primitives only** (accordion, dialog, select, slider,
+  tabs, menu) for the demo interactions and axe; every primitive page is
+  still checked for its lazy demo island, and every primitive's keyboard,
+  pointer and axe contract runs in its behavior scenario (`tests/behavior`).
 - **axe, zero exclusions,** in light, dark and forced colors, with the demo
   mounted and the API rows (`details`) open, and again with floating content
   open where the demo has some. This is the page sweep for these routes:

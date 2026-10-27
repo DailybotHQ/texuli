@@ -16,9 +16,13 @@ bash -c 'pnpm build && TEXULI_E2E_PORT=<lane port> pnpm exec playwright test tes
 
 ## What the sweep checks
 
-- **Pages:** every URL in the built `dist/sitemap.xml` (383 URLs in the
-  2026-10-25 build), plus the 404 (an unknown path). The page list follows the
-  build, so new pages are swept with no change to the spec.
+- **Pages:** up to four evenly spaced pages of each route group of the
+  built `dist/sitemap.xml`, plus the 404 (an unknown path). The pages of a
+  group share a template; the components of the large groups (`/examples/…`
+  and `/component-pages/…`, about 300 pages) are also axe-checked by the
+  fixture-app sweeps. `sweepSample` in `tests/e2e/support/site.ts` picks them
+  from the build, so new groups join with no change to the spec
+  (2026-10-27: 358 pages swept became 51).
 - **Server:** `dist/` served like a static host (unknown paths get
   `404.html` with status 404).
 - **axe, zero exclusions:** tags `wcag2a`, `wcag2aa`, `wcag21a`,
@@ -47,9 +51,9 @@ bash -c 'pnpm build && TEXULI_E2E_PORT=<lane port> pnpm exec playwright test tes
   `site-live-components.spec.ts` used to run on separate loads.
 - **Primitive pages** (`/primitives-page/<id>/`) are swept by
   `site-live-primitives.spec.ts`, with the demo mounted, the API rows and
-  the demo's floating content open, in light, dark and forced colors; here
-  only the group's representative runs.
-- **Projects:** Chromium sweeps **every page**; the Pixel 7 runs the polish
+  the demo's floating content open, in light, dark and forced colors (the
+  representative primitives); here only the group's representative runs.
+- **Projects:** Chromium sweeps **every swept page**; the Pixel 7 runs the polish
   check on every page and axe on the representatives; WebKit runs the
   representatives only. WebKit's keyboard walk is skipped because its
   default Tab order skips links and buttons (a macOS setting); the walk

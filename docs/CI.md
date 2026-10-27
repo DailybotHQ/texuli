@@ -25,8 +25,8 @@ integration.
   `pnpm --filter @texuli/website check:csp`, then the browser e2e suite on
   chromium with the site-perf budget tests excluded (the audit job owns
   them). The job is a six-way matrix: each runner builds the site and runs
-  `--shard <n>/6` of the same suite (about two hours of summed test time,
-  the a11y page sweep over an hour of it); `check:csp` runs on shard 1.
+  `--shard <n>/6` of the same suite (about an hour of summed test time
+  after the 2026-10-27 trim of the page sweep); `check:csp` runs on shard 1.
 - **`audits`** — `pnpm size`, then `pnpm build` and the full
   `tests/e2e/site-perf.spec.ts`. It is a required job (no
   `continue-on-error`): a failure is a regression. Shrink the code; a
