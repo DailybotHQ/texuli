@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { Dependency, TimelineItem } from '../src/engines/timeline/schedule.ts';
+import { type Dependency, type TimelineItem } from '../src/engines/timeline/schedule.ts';
 import TimelineView from '../src/timeline/TimelineView.svelte';
 
 afterEach(cleanup);
@@ -37,37 +37,39 @@ const props = {
 };
 
 describe('timeline audit: labels contract', () => {
-  it('renders toolbar, columns and saving announcements through labels', async () => {
-    // A reschedule that stays pending, so the saving announcement is observable.
-    let settle: (() => void) | undefined;
-    const onReschedule = vi.fn(() => new Promise<void>((resolve) => (settle = resolve)));
-    render(TimelineView, {
-      props: {
-        ...props.props,
-        onReschedule,
-        labels: {
-          milestonesOnly: 'Nur Meilensteine',
-          zoomGroup: 'Zeitachse',
-          saving: 'Speichern…',
-          columns: { task: 'Aufgabe', start: 'Von', end: 'Bis', duration: 'Dauer' },
+  it('renders toolbar, columns and saving announcements through labels; keeps the default English strings byte-stable', async () => {
+    // renders toolbar, columns and saving announcements through labels
+    await (async () => {
+      // A reschedule that stays pending, so the saving announcement is observable.
+      let settle: (() => void) | undefined;
+      const onReschedule = vi.fn(() => new Promise<void>((resolve) => (settle = resolve)));
+      render(TimelineView, {
+        props: {
+          ...props.props,
+          onReschedule,
+          labels: {
+            milestonesOnly: 'Nur Meilensteine',
+            zoomGroup: 'Zeitachse',
+            saving: 'Speichern…',
+            columns: { task: 'Aufgabe', start: 'Von', end: 'Bis', duration: 'Dauer' },
+          },
         },
-      },
-    });
-    expect(screen.getByRole('button', { name: 'Nur Meilensteine' })).toBeTruthy();
-    expect(screen.getByRole('group', { name: 'Zeitachse' })).toBeTruthy();
-    expect(screen.getByText('Aufgabe')).toBeTruthy();
-    // The saving announcement goes through the same contract.
-    const bar = screen.getByRole('button', { name: /Design brief/ });
-    bar.focus();
-    await fireEvent.keyDown(bar, { key: ' ' });
-    await fireEvent.keyDown(bar, { key: 'ArrowRight' });
-    await fireEvent.keyDown(bar, { key: 'Enter' });
-    const note = document.querySelector('p[aria-live="polite"]');
-    await vi.waitFor(() => expect(note?.textContent).toBe('Speichern…'));
-    settle?.();
-  });
-
-  it('keeps the default English strings byte-stable', () => {
+      });
+      expect(screen.getByRole('button', { name: 'Nur Meilensteine' })).toBeTruthy();
+      expect(screen.getByRole('group', { name: 'Zeitachse' })).toBeTruthy();
+      expect(screen.getByText('Aufgabe')).toBeTruthy();
+      // The saving announcement goes through the same contract.
+      const bar = screen.getByRole('button', { name: /Design brief/ });
+      bar.focus();
+      await fireEvent.keyDown(bar, { key: ' ' });
+      await fireEvent.keyDown(bar, { key: 'ArrowRight' });
+      await fireEvent.keyDown(bar, { key: 'Enter' });
+      const note = document.querySelector('p[aria-live="polite"]');
+      await vi.waitFor(() => expect(note?.textContent).toBe('Speichern…'));
+      settle?.();
+    })();
+    cleanup();
+    // keeps the default English strings byte-stable
     render(TimelineView, props);
     expect(screen.getByRole('button', { name: 'Milestones only' })).toBeTruthy();
     expect(screen.getByRole('group', { name: 'Timeline zoom' })).toBeTruthy();
@@ -119,11 +121,11 @@ describe('timeline audit: honest table semantics', () => {
 });
 
 describe('timeline audit: token contract', () => {
-  it('has no hardcoded hex colors in its styles', () => {
+  it('has no hardcoded hex colors in its styles; keeps pressed zoom and toolbar buttons visible under forced colors', () => {
+    // has no hardcoded hex colors in its styles
     expect(source()).not.toMatch(/#[0-9a-fA-F]{3}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{8}\b/);
-  });
-
-  it('keeps pressed zoom and toolbar buttons visible under forced colors', () => {
+    cleanup();
+    // keeps pressed zoom and toolbar buttons visible under forced colors
     expect(source()).toMatch(
       /@media \(forced-colors: active\) \{[^@]*aria-pressed='true'[^@]*Highlight[^@]*\}/
     );
@@ -144,5 +146,53 @@ describe('timeline audit: responsive date columns', () => {
     // Every track shrinks (no fixed rem tracks) and the floor fits 360px.
     expect(mins.every((min) => Number.isFinite(min))).toBe(true);
     expect(mins.reduce((sum, min) => sum + min, 0)).toBeLessThanOrEqual(19);
+  });
+});
+
+describe('timeline critical contrast (F8)', () => {
+  // T-87 (PLAN_006 a11y sweep, finding F8): the critical task bar's label
+  // must sit on the solid destructive fill. The progress overlay used to tint
+  // the whole bar with 25% of the label color, which pulled the background
+  // toward the text (axe color-contrast 4.21:1 light, 3.67:1 dark).
+  const here = dirname(fileURLToPath(import.meta.url));
+  const source = readFileSync(join(here, '../src/timeline/TimelineView.svelte'), 'utf8');
+  const style = source.slice(source.lastIndexOf('<style'));
+
+  /** The declarations of the first rule whose selector is exactly `selector`. */
+  function rule(css: string, selector: string): string {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const match = new RegExp(`(^|\\n)\\s*${escaped}\\s*\\{([^}]*)\\}`).exec(css);
+    return match?.[2] ?? '';
+  }
+
+  describe('critical task bar contrast (F8)', () => {
+    it('paints the bar with the destructive contract pair, and 2 related cases', () => {
+      {
+        // paints the bar with the destructive contract pair
+        const bar = rule(style, '.task-bar.critical');
+        expect(bar).toContain('background: var(--tx-tl-critical)');
+        expect(bar).toContain('color: var(--tx-tl-critical-fg)');
+        expect(source).toContain('--tx-tl-critical: var(--tx-destructive');
+        expect(source).toContain('--tx-tl-critical-fg: var(--tx-destructive-foreground');
+      }
+      {
+        // draws critical progress as an edge stripe, never a tint behind the label
+        const progress = rule(style, '.critical .progress');
+        expect(progress).not.toBe('');
+        // A stripe pinned to the block end, a few pixels tall.
+        expect(progress).toMatch(/inset-block:\s*auto 0/);
+        expect(progress).toMatch(/block-size:\s*3px/);
+        // Never a translucent mix over the fill the label reads against.
+        expect(progress).not.toMatch(/color-mix|transparent/);
+      }
+      {
+        // keeps the critical bar and its stripe visible under forced colors
+        const forced = style.slice(style.indexOf('@media (forced-colors: active)'));
+        const block = forced.slice(0, forced.indexOf('\n  }\n') + 4);
+        expect(block).toContain('.task-bar.critical');
+        expect(block).toMatch(/\.critical \.progress[^}]*forced-color-adjust:\s*none/);
+        expect(block).toMatch(/\.critical \.progress[^}]*background:\s*CanvasText/);
+      }
+    });
   });
 });
