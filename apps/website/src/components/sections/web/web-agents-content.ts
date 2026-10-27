@@ -139,7 +139,7 @@ export const WEB_AGENTS_SURFACES: readonly AgentsSurface[] = [
 export const WEB_AGENTS_INSTALL = {
   command: 'pnpm add texuli@next',
   note:
-    'Installs the 0.1.0-next.1 preview from the next dist-tag. Nothing stable is published ' +
+    'Installs the 0.1.0-next.2 preview from the next dist-tag. Nothing stable is published ' +
     'yet: the latest tag is reserved for the 1.0.0 release.',
 } as const;
 

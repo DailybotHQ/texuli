@@ -2,7 +2,7 @@
 
 **Layer L4: data.** Data views: grid, tree, board, calendar, timeline, map,
 activity and files — each a framework-free engine (in `src/engines/`) with a
-Svelte 5 view on top. Published to npm as `0.1.0-next.1` under the `next`
+Svelte 5 view on top. Published to npm as `0.1.0-next.2` under the `next`
 dist-tag (by CI, with provenance); no stable release (`latest` is reserved
 for 1.0.0), so install it with `@next`. The workspace package stays
 `"private": true`.

@@ -37,7 +37,7 @@ the same pieces are safe to hand to a machine.
 
 > **Status: in development, no stable release.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 15
-> packable packages are on npm as `0.1.0-next.1` under the `next` dist-tag (published
+> packable packages are on npm as `0.1.0-next.2` under the `next` dist-tag (published
 > by CI with provenance); there is no stable release (`latest` is reserved for
 > 1.0.0), and the workspace packages stay `private: true`
 > ([RELEASE](docs/RELEASE.md)).
@@ -185,7 +185,7 @@ every verified command.
 
 ## Honest boundaries
 
-- **No stable release yet.** The 15 packable packages are on npm as `0.1.0-next.1`
+- **No stable release yet.** The 15 packable packages are on npm as `0.1.0-next.2`
   under the `next` dist-tag; install with `@next`. They are previews, not a
   supported release (`latest` is reserved for 1.0.0), and the workspace
   packages stay `private: true` ([RELEASE](docs/RELEASE.md)).

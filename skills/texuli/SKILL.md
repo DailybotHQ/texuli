@@ -46,7 +46,7 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 15 published packages are on npm as `0.1.0-next.1` under the `next`
+   All 15 published packages are on npm as `0.1.0-next.2` under the `next`
    dist-tag (published by CI with provenance; no stable release, `latest` is
    reserved for 1.0.0), so install them with `@next`; the workspace packages
    stay `private: true`. `@texuli/editor` (the rich text editor) is in

@@ -111,7 +111,7 @@ manifest entry or the `PRIMITIVES` row instead.
 12. **Content safety:** no `set:html` or `{@html}`; links built from data go
     through `safeHref` from `@texuli/core/url-policy`; fictional data only
     (`example.com`).
-13. **Honesty:** the packages are npm previews (`0.1.0-next.1` under
+13. **Honesty:** the packages are npm previews (`0.1.0-next.2` under
     `next`), not a stable release; the agent service and analytics are not
     provisioned in production. Copy states what ships today
     (`apps/website/tests/copy-honesty.test.ts` bans claims the repository

@@ -38,7 +38,7 @@ describe('guide code highlighting', () => {
     tokens.map((token) => token.text).join('');
 
   /** The install snippet shape (bash): comments, a command, dist-tag names. */
-  const INSTALL = `# Texuli is in development: every package ships as the 0.1.0-next.1 prerelease (dist-tag next) — there is no stable release yet.
+  const INSTALL = `# Texuli is in development: every package ships as the 0.1.0-next.2 prerelease (dist-tag next) — there is no stable release yet.
 pnpm add texuli@next @texuli/tokens@next @texuli/primitives@next @texuli/core@next`;
 
   /** The imports shape (TypeScript): keywords and strings. */
