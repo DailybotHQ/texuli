@@ -58,7 +58,7 @@ async function visit(page: Page) {
   expect(foreign).toEqual([]);
 }
 
-async function tabUntil(page: Page, selector: string, maximum = 500) {
+async function tabUntil(page: Page, selector: string, maximum = 500, key = 'Tab') {
   for (let index = 0; index < maximum; index += 1) {
     if (
       await page
@@ -67,7 +67,7 @@ async function tabUntil(page: Page, selector: string, maximum = 500) {
         .catch(() => false)
     )
       return;
-    await page.keyboard.press('Tab');
+    await page.keyboard.press(key);
   }
   const focused = await page.evaluate(() => document.activeElement?.outerHTML.slice(0, 200));
   throw new Error(`Keyboard traversal did not reach ${selector}; focused element: ${focused}`);
@@ -195,8 +195,9 @@ test.describe('texuli.com blueprint builder', () => {
     const row = page.getByRole('treeitem', { name: new RegExp(label) });
     await expect(row).toBeFocused();
 
-    // Escape clears the search and restores the full list.
-    await tabUntil(page, '#palette-search');
+    // Escape clears the search and restores the full list. The search comes
+    // before the outline, so walk back to it instead of around the page.
+    await tabUntil(page, '#palette-search', 100, 'Shift+Tab');
     await page.keyboard.press('Escape');
     await expect(search).toHaveValue('');
     await expect(count).toHaveText(`${total} components`);
