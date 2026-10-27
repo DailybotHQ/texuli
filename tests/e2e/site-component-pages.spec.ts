@@ -8,7 +8,7 @@ import { serveDist, settle } from './support/site.ts';
  * drives the live code sample, the dropdown menu stage is real Texuli menu
  * chrome, and a sample of one page per family passes axe under forced
  * colors. The per-page check (the stage is ready, its marker part is on
- * screen, axe in light and dark) runs in the page sweep, a11y-site.spec.ts;
+ * screen, axe in light and dark) runs in the page sweep, a11y-site-<n>.spec.ts;
  * the marker registry and the evidence loaders are unit-tested in
  * scripts/tests/site-loaders.test.ts, and the page sections and controls in
  * apps/website/tests/component-pages.test.ts.

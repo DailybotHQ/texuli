@@ -78,7 +78,7 @@ The spec (one test on Chromium since the 2026-10-27 trim) serves
   before any script runs, and System clearing it.
 
 axe on every page group in light and dark is the page sweep
-(`a11y-site.spec.ts`); an unknown path's 404 is `site-seo.spec.ts`.
+(`a11y-site-<n>.spec.ts`); an unknown path's 404 is `site-seo.spec.ts`.
 
 ## Limits
 

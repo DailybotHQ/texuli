@@ -85,7 +85,7 @@ required). The current home sections do not use it; `PageBanner` does
 | Banned claims the repository contradicts (size, native targets, parity) | `apps/website/tests/copy-honesty.test.ts` |
 | Four sections in blueprint order, no islands inside `[data-tx-landing]`, CTAs, the announced install copy, reveal under reduced motion | `tests/e2e/site-landing.spec.ts` |
 | Landing header on desktop and phone | `tests/e2e/site-ia.spec.ts` |
-| axe in light and dark | the page sweep, `tests/e2e/a11y-site.spec.ts` |
+| axe in light and dark | the page sweep, `tests/e2e/a11y-site-<n>.spec.ts` |
 | Phone width (360 and 768 px, right to left too) | `tests/e2e/site-responsive.spec.ts` |
 | Page weight against the `/` budget | `tests/e2e/site-perf.spec.ts` |
 

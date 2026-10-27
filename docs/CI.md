@@ -19,15 +19,26 @@ integration.
   (the phone-specific rows run in a Pixel 7 context inside the chromium
   test, see
   [tests/behavior/README.md](../tests/behavior/README.md)): `TEXULI_E2E_PORT=4870 pnpm exec playwright
-  test tests/behavior`, after `pnpm exec playwright install --with-deps
-  chromium webkit`. Failed runs upload `test-results/` as an artifact.
+  test tests/behavior`. Failed runs upload `test-results/` as an artifact.
 - **`website`** — `pnpm build` (which runs `astro check`, the examples
   catalog prebuild, sitemap/robots/social images and the CSP integration),
   `pnpm --filter @texuli/website check:csp`, then the browser e2e suite on
   chromium with the site-perf budget tests excluded (the audit job owns
   them). The job is a six-way matrix: each runner builds the site and runs
-  `--shard <n>/6` of the same suite (about an hour of summed test time
-  after the 2026-10-27 trim of the page sweep); `check:csp` runs on shard 1.
+  one shard of the same suite. `tests/e2e/shards.json` deals the spec files
+  by measured CI time (about 35 minutes of summed test time, about 1.5
+  minutes per shard on four workers); `scripts/tests/e2e-shards.test.ts`
+  fails when a spec is in no shard or in two, so a new spec must be added
+  to a shard. The a11y page sweep is three files (`a11y-site-1..3.spec.ts`)
+  so it spreads over shards. `check:csp` runs on shard 1. Locally,
+  `pnpm exec playwright test tests/e2e` runs every spec.
+- **Runners and browsers:** every job runs on `ubuntu-24.04` with a
+  `timeout-minutes` limit. `behavior`, `website` and `audits` run in
+  Playwright's image (`mcr.microsoft.com/playwright:v1.64.1-noble`, the
+  pinned `@playwright/test` version), which ships the browsers and their
+  system libraries, so no job installs them through apt; that step stalled
+  jobs for 10 to 22 minutes on the hosted runners. Bump the image tag
+  together with `@playwright/test`.
 - **`audits`** — `pnpm size`, then `pnpm build` and the full
   `tests/e2e/site-perf.spec.ts`. It is a required job (no
   `continue-on-error`): a failure is a regression. Shrink the code; a

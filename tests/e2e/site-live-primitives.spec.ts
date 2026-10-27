@@ -20,7 +20,7 @@ import { polishProblems } from './support/site.ts';
  * spec runs exactly what the page promises, on the representative set
  * (overlay, form, composite and range primitives): the pages share one
  * template, and every primitive's keyboard, pointer and axe contract runs in
- * its behavior scenario (tests/behavior). a11y-site.spec.ts skips these
+ * its behavior scenario (tests/behavior). a11y-site-<n>.spec.ts skips these
  * pages. Three sessions: the demo interactions (with lazy loading, the
  * pre-hydration mode and the reference's row list); axe plus the polish
  * check in light, dark and forced colors with floating content open; and

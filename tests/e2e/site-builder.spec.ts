@@ -10,7 +10,7 @@ import { serveDist } from './support/site.ts';
  * unit-tested in scripts/tests/site-builder*.test.ts; this is what needs a
  * real page: keyboard and focus, pointer and touch drags, the mounted
  * player, layout of the preview, the share link and axe on edited states.
- * axe on the bare page runs in the page sweep, a11y-site.spec.ts.
+ * axe on the bare page runs in the page sweep, a11y-site-<n>.spec.ts.
  */
 
 const origin = serveDist();

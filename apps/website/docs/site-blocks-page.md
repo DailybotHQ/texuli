@@ -72,7 +72,7 @@ an ephemeral port and checks, in one page session:
 The install commands against each source's imports and the add registry are
 unit-tested in `apps/website/tests/component-pages.test.ts` (the `texuli add`
 copy itself is tested in `packages/tools/tests/cli-add.test.ts`); axe in light
-and dark runs on the index in the page sweep (`a11y-site.spec.ts`).
+and dark runs on the index in the page sweep (`a11y-site-<n>.spec.ts`).
 
 ## Limits
 

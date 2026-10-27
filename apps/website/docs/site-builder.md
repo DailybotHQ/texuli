@@ -800,7 +800,7 @@ The browser spec (`tests/e2e/site-builder.spec.ts`, 3 tests since the
 The inspector rules for every field kind, the list focus rules, the F6
 order and the outline operations are unit-tested
 (`scripts/tests/site-builder*.test.ts`); axe on the bare page in light, dark
-and forced colors runs in the page sweep (`a11y-site.spec.ts`).
+and forced colors runs in the page sweep (`a11y-site-<n>.spec.ts`).
 
 **Not covered yet:** Home/End in the palette list, and a screen-reader pass
 of the announcements.

@@ -67,7 +67,7 @@ Otherwise a dark theme's light text is measured on a white Canvas.
 
 ## Site sweep
 
-`tests/e2e/a11y-site.spec.ts` runs axe with zero exclusions in light, dark
+`tests/e2e/a11y-site-<n>.spec.ts` runs axe with zero exclusions in light, dark
 and forced colors, the polish check and a keyboard-only walk on one page of
 each route group of the built sitemap, plus the 404 (the pages of a group
 share a template; the components of the large `/examples/…` and
@@ -79,7 +79,7 @@ overridden at page level.
 
 ```sh
 pnpm build
-TEXULI_E2E_PORT=<lane-port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts --project=chromium
+TEXULI_E2E_PORT=<lane-port> pnpm exec playwright test tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts --project=chromium
 ```
 
 ## Keyboard

@@ -14,7 +14,7 @@ A screenshot review of every route family found the issues below. The spec keeps
 
 ## What the spec checks
 
-**Every swept page** (one page of each route group of the sitemap, plus the 404), in light and dark. The per-page check runs in the page sweep, `tests/e2e/a11y-site.spec.ts`, on the same page loads as axe (primitive pages: `site-live-primitives.spec.ts`, with the demo mounted). The website suite runs on Chromium.
+**Every swept page** (one page of each route group of the sitemap, plus the 404), in light and dark. The per-page check runs in the page sweep, `tests/e2e/a11y-site-<n>.spec.ts`, on the same page loads as axe (primitive pages: `site-live-primitives.spec.ts`, with the demo mounted). The website suite runs on Chromium.
 
 | Check | Fails when |
 | --- | --- |
@@ -32,7 +32,7 @@ A screenshot review of every route family found the issues below. The spec keeps
 
 ```bash
 pnpm build
-TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts tests/e2e/site-visual.spec.ts
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts tests/e2e/site-visual.spec.ts
 ```
 
 ## What the review found, and the fixes

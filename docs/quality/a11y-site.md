@@ -1,6 +1,6 @@
 # Accessibility sweep: texuli.com
 
-**Task:** T-quality-a11y-site · **Spec:** `tests/e2e/a11y-site.spec.ts`
+**Task:** T-quality-a11y-site · **Spec:** `tests/e2e/a11y-site-<n>.spec.ts`
 
 One page of each route group of the built website runs axe with **zero
 exclusions** in light, dark and high contrast, the visual polish check
@@ -11,7 +11,7 @@ five tests, each walking its pages in one page session. Findings were fixed
 weakened.
 
 ```bash
-bash -c 'pnpm build && TEXULI_E2E_PORT=<lane port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts'
+bash -c 'pnpm build && TEXULI_E2E_PORT=<lane port> pnpm exec playwright test tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts'
 ```
 
 ## What the sweep checks

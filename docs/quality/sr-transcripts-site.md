@@ -36,7 +36,7 @@ on a lane port (never 4870, never the developer's `:4321` dev server), and run
 `locator('body').ariaSnapshot()` or open the browser's accessibility panel.
 
 Names, roles and contrast are also checked automatically by
-`TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts --project chromium`
+`TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts --project chromium`
 (axe, zero exclusions); the page-layer fixes from this pass are pinned by
 `pnpm vitest run apps/website/tests/docs-reading.test.ts`.
 
@@ -348,6 +348,6 @@ after the fix):**
 - WebKit/Safari and Firefox trees; mobile trees beyond the phone-width check
   of the architecture page's navigation.
 - Dark mode, forced colors and RTL trees (axe covers dark mode in
-  `tests/e2e/a11y-site.spec.ts`).
+  `tests/e2e/a11y-site-<n>.spec.ts`).
 - Interactive flows past the first state, except the playground's "Render
   tree" and one hostile preset.

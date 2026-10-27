@@ -26,11 +26,11 @@ The unit tests hold the page to the pack:
 ```bash
 pnpm vitest run apps/website/tests/site-build-guards.test.ts scripts/tests/skill.test.ts
 pnpm build
-TEXULI_E2E_PORT=<your port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts tests/e2e/site-responsive.spec.ts
+TEXULI_E2E_PORT=<your port> pnpm exec playwright test tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts tests/e2e/site-responsive.spec.ts
 ```
 
 In the browser (no spec of its own since the 2026-10-27 trim): axe and the
-polish check in light and dark in the page sweep (`a11y-site.spec.ts`), and no
+polish check in light and dark in the page sweep (`a11y-site-<n>.spec.ts`), and no
 horizontal scrolling at 360 and 768 px with the disclosures open
 (`site-responsive.spec.ts`).
 

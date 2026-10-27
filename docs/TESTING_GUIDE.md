@@ -76,7 +76,7 @@ walk on five page classes and the tool shortcuts) and `site-responsive.spec.ts`
 breakpoints and target sizes) hold the layout and keyboard checks; the native,
 architecture, brand, agents, evidence, showcase, skill and primitives
 reference pages have no spec of their own (their content and data are
-Vitest, their axe and polish run in `a11y-site.spec.ts`). Analytics checks are in
+Vitest, their axe and polish run in `a11y-site-<n>.spec.ts`). Analytics checks are in
 `analytics.spec.ts` (per-route Trusted Types policy names and the default-off
 build; its enabled-path test needs a fixture build); CSP coverage is in
 `csp.spec.ts` and `csp-report.spec.ts`. Run the
@@ -175,8 +175,8 @@ then the package, then its consumers (the layers above it).
 | `scripts/visual.ts`, `tests/visual/**` | `pnpm vitest run scripts/tests/visual.test.ts` | `pnpm visual -g <example-id>` |
 | `scripts/supply-chain.ts` | `pnpm vitest run scripts/tests/supply-chain.test.ts` | — |
 | `tests/consumers/**` | `pnpm vitest run scripts/tests/consumers-harness.test.ts` | `tests/consumers/consumers.spec.ts` and `tests/consumers/consumers-registry.spec.ts` |
-| `apps/website/src/components/<area>/`, `pages/<area>/` | `pnpm vitest run scripts/tests/site-<area>.test.ts` where one exists, and `pnpm vitest run apps/website` | `pnpm build`, then `tests/e2e/site-<area>.spec.ts` where the area has browser behavior (static pages have none: their data is Vitest and their axe runs in `tests/e2e/a11y-site.spec.ts`); design notes in `apps/website/docs/site-<area>.md` |
-| `apps/website` layout, nav, SEO (indexed pages only; previews are noindex), perf | `pnpm vitest run scripts/tests/site-loaders.test.ts apps/website/tests/docs-reading.test.ts` | `tests/e2e/site-{docs-shell,docs-nav,seo,perf}.spec.ts`; every page: `tests/e2e/a11y-site.spec.ts` |
+| `apps/website/src/components/<area>/`, `pages/<area>/` | `pnpm vitest run scripts/tests/site-<area>.test.ts` where one exists, and `pnpm vitest run apps/website` | `pnpm build`, then `tests/e2e/site-<area>.spec.ts` where the area has browser behavior (static pages have none: their data is Vitest and their axe runs in `tests/e2e/a11y-site-<n>.spec.ts`); design notes in `apps/website/docs/site-<area>.md` |
+| `apps/website` layout, nav, SEO (indexed pages only; previews are noindex), perf | `pnpm vitest run scripts/tests/site-loaders.test.ts apps/website/tests/docs-reading.test.ts` | `tests/e2e/site-{docs-shell,docs-nav,seo,perf}.spec.ts`; every page: `tests/e2e/a11y-site-<n>.spec.ts` |
 | `apps/website` SEO metadata, sitemap, robots and OG output | `pnpm vitest run apps/website/tests/analytics-client.test.ts apps/website/tests/site-build-guards.test.ts` (verification metas, JSON-LD builders and escaping, sitemap, robots and social-art helpers, sitemap lastmod) | `tests/e2e/site-seo.spec.ts` (runs `scripts/audit-seo.mjs` on the build); the same audit by hand: `node scripts/audit-seo.mjs --dist apps/website/dist` |
 | `apps/website` agent discovery, llms.txt and Markdown twins | `pnpm vitest run apps/website` (the committed `.well-known` files and llms.txt sections: `site-build-guards.test.ts`) | `tests/e2e/site-seo.spec.ts` (runs `scripts/audit-aeo.mjs` on the build); `pnpm exec tsx scripts/check-llms-parity.ts`; the same audit by hand: `node scripts/audit-aeo.mjs --dist apps/website/dist` |
 | `apps/website` analytics loader, proxy and event wiring | `pnpm vitest run apps/website` | `tests/e2e/analytics.spec.ts`: per-route Trusted Types policy names and the default-off build (no markup, no requests); its enabled-path test runs only against a fixture build (`PUBLIC_UMAMI_WEBSITE_ID=fixture-analytics-id`, see `apps/website/docs/site-analytics.md`) |

@@ -66,7 +66,7 @@ No lorem, no fake screenshots, no dates presented as promises, no
   right to left too (`tests/e2e/site-responsive.spec.ts`)
 - IA reachability: `tests/e2e/site-ia.spec.ts` (landing-shell route #2;
   one interaction from the home header)
-- a11y: covered by the sitewide sweep (`tests/e2e/a11y-site.spec.ts`,
+- a11y: covered by the sitewide sweep (`tests/e2e/a11y-site-<n>.spec.ts`,
   every built page)
 - Per-route a11y/site-perf budget registration for `/native/`:
   **planned** — the budgets file is owner-held, so the entry is proposed

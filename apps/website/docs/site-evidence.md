@@ -3,7 +3,7 @@
 **App:** `apps/website`  
 **Paths:** `/evidence/`, evidence strip on `/component-pages/<id>/`  
 **Surface:** `src/components/evidence/`, `src/pages/evidence/`  
-**Tests:** `scripts/tests/site-loaders.test.ts` (evidence loaders); the strip renders on every component page the sweep visits, `tests/e2e/a11y-site.spec.ts`  
+**Tests:** `scripts/tests/site-loaders.test.ts` (evidence loaders); the strip renders on every component page the sweep visits, `tests/e2e/a11y-site-<n>.spec.ts`  
 **Unit:** `scripts/tests/site-loaders.test.ts`
 
 ## Goal
@@ -40,5 +40,5 @@ Snapshots are dated (`EVIDENCE_AS_OF`). They are not live CI polling.
 ```bash
 pnpm vitest run scripts/tests/site-loaders.test.ts
 pnpm build
-TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts
 ```

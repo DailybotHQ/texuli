@@ -70,7 +70,7 @@ The e2e spec (one test on Chromium since the 2026-10-27 trim) serves
 - no foreign network.
 
 Scores, filters and deep links are unit-tested; axe in light and dark runs
-in the page sweep (`a11y-site.spec.ts`).
+in the page sweep (`a11y-site-<n>.spec.ts`).
 
 ## Limits
 

@@ -6,7 +6,7 @@ import { serveDist, settle } from './support/site.ts';
  * the island shows the honest "not running" state and sends nothing, at
  * every width, with 44px prompt targets. The available flow is covered
  * in-process by apps/agent/tests/island.test.ts; axe on this page runs in the
- * page sweep, a11y-site.spec.ts.
+ * page sweep, a11y-site-<n>.spec.ts.
  */
 
 const origin = serveDist();
