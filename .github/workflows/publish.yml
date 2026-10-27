@@ -1,4 +1,4 @@
-# Publishes the 15 packable packages to npm (docs/RELEASE.md).
+# Publishes the packable packages to npm (docs/RELEASE.md).
 #
 # Trigger: a `v*` tag push, or a manual workflow_dispatch run against a
 # branch. The job rebuilds every tarball from source with
@@ -42,7 +42,7 @@ jobs:
           cache: pnpm
           registry-url: 'https://registry.npmjs.org'
       - run: pnpm install --frozen-lockfile
-      # Packs the 15 tarballs into tmp/packages/tarballs/ and records
+      # Packs the tarballs into tmp/packages/tarballs/ and records
       # SHA-256 digests; publint warnings fail the job.
       - run: pnpm verify:packages
       - name: Publish in wave order (docs/RELEASE.md)
@@ -83,6 +83,7 @@ jobs:
           }
           # Wave 174 — the L0 texels and the L2 token engine.
           publish packages/core
+          publish packages/date
           publish packages/tokens
           # Wave 175 — L1 headless primitives.
           publish packages/primitives
@@ -101,13 +102,13 @@ jobs:
           publish packages/player
           publish packages/slides
           publish packages/spec
-          echo "All 15 packages published under dist-tag next."
+          echo "All packable packages published under dist-tag next."
       - name: Point latest at this release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          for dir in core tokens primitives texuli charts data media chat blocks catalog tools astro player slides spec; do
+          for dir in core date tokens primitives texuli charts data media chat blocks catalog tools astro player slides spec; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             npm dist-tag add "${name}@${version}" latest

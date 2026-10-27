@@ -17,8 +17,8 @@ keyboard exploration to that window.
 ```
 
 The `charts-windowed` example moves a 20-request window across a 200-point
-series; `tests/e2e/charts-families.spec.ts` checks that keyboard exploration
-follows the window.
+series; `packages/charts/tests/cartesian.test.ts` checks that keyboard
+exploration follows the window.
 
 `visibleDomain` is intended for numeric x values (including epoch-millisecond
 time series). It is optional; omitting it preserves the current full-domain

@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { defineRows, scenario } from '../harness/index.ts';
 import { focusedElement, pointerOutside } from '../harness/oracle.ts';
 import { eventNames, expectFocus } from './common.ts';
@@ -109,8 +109,7 @@ scenario(
     {
       id: 'touch-tap-toggles',
       title: 'on a touch screen, a tap opens the item and a second tap closes it',
-      async run({ page }) {
-        const touch = test.info().project.use.hasTouch === true;
+      async run({ page, touch }) {
         const press = (name: string) =>
           touch ? trigger(page, name).tap() : trigger(page, name).click();
         await press('Products');

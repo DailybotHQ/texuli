@@ -57,8 +57,9 @@ export const ALLOWED_LICENSES = new Set([
  */
 export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string[]>> = {
   '@texuli/core': [],
+  '@texuli/date': [],
   '@texuli/tokens': [],
-  '@texuli/primitives': ['@internationalized/date'],
+  '@texuli/primitives': [],
   texuli: [],
   '@texuli/charts': [],
   '@texuli/chat': [],
@@ -133,13 +134,6 @@ export type CycloneDxBom = {
   components: SbomComponent[];
   dependencies: Array<{ ref: string; dependsOn: string[] }>;
 };
-
-const DEPENDENCY_FIELDS = [
-  'dependencies',
-  'devDependencies',
-  'peerDependencies',
-  'optionalDependencies',
-] as const;
 
 export function isWorkspaceRange(range: string): boolean {
   return range === 'workspace:*' || range.startsWith('workspace:');
@@ -274,7 +268,7 @@ export function checkRuntimeAllowlist(packages: readonly WorkspacePackage[]): Su
     const deps = pkg.manifest.dependencies ?? {};
     for (const [dep, range] of Object.entries(deps)) {
       if (isWorkspaceRange(range) || isInternalName(dep)) {
-        // Internal deps may be pinned to exact versions (0.2.0)
+        // Internal deps may be pinned to exact versions (0.3.0)
         // instead of workspace: ranges; they are still
         // workspace packages, resolved by the workspace, not externals.
         if (!isInternalName(dep) && !names.has(dep)) {

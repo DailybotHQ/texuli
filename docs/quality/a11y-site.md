@@ -2,11 +2,11 @@
 
 **Task:** T-quality-a11y-site · **Spec:** `tests/e2e/a11y-site.spec.ts`
 
-Every page of the built website runs axe with **zero exclusions** in light
-and dark (one test per page, one page session), plus the visual polish check
-([site-visual](../../apps/website/docs/site-visual.md)) on the same loads;
-one page per route group also runs axe in high contrast and a keyboard-only
-walk. Findings were fixed
+One page of each route group of the built website runs axe with **zero
+exclusions** in light, dark and high contrast, the visual polish check
+([site-visual](../../apps/website/docs/site-visual.md)) on the light and
+dark loads, and a keyboard-only walk. The pages are dealt round robin into
+five tests, each walking its pages in one page session. Findings were fixed
 **at their source**; no rule is disabled, no selector excluded, no gate
 weakened.
 
@@ -16,13 +16,14 @@ bash -c 'pnpm build && TEXULI_E2E_PORT=<lane port> pnpm exec playwright test tes
 
 ## What the sweep checks
 
-- **Pages:** up to four evenly spaced pages of each route group of the
-  built `dist/sitemap.xml`, plus the 404 (an unknown path). The pages of a
-  group share a template; the components of the large groups (`/examples/…`
-  and `/component-pages/…`, about 300 pages) are also axe-checked by the
-  fixture-app sweeps. `sweepSample` in `tests/e2e/support/site.ts` picks them
-  from the build, so new groups join with no change to the spec
-  (2026-10-27: 358 pages swept became 51).
+- **Pages:** the first page of each route group of the built
+  `dist/sitemap.xml`, plus the 404 (an unknown path). The pages of a group
+  share a template; the components of the large groups (`/examples/…` and
+  `/component-pages/…`, about 300 pages) are also axe-checked in light and
+  dark by the fixture-app sweeps (`a11y-*.spec.ts`). `sweepSample` in
+  `tests/e2e/support/site.ts` picks them from the build, so new groups join
+  with no change to the spec (2026-10-27: 358 pages swept became 51, then
+  31 in 5 tests).
 - **Server:** `dist/` served like a static host (unknown paths get
   `404.html` with status 404).
 - **axe, zero exclusions:** tags `wcag2a`, `wcag2aa`, `wcag21a`,
@@ -44,8 +45,6 @@ bash -c 'pnpm build && TEXULI_E2E_PORT=<lane port> pnpm exec playwright test tes
     within 3 levels, for `:has(:focus-visible)` patterns);
   - focus never drops to `body` mid-walk;
   - Shift+Tab walks back out (no trap).
-- **High contrast and the keyboard walk** run on one page per route group
-  (the same templates: `/`, `/guides/…`, `/component-pages/…`, …).
 - **Component pages** also mount their live stage (the real component, its
   marker part on screen, no request to another origin), the check
   `site-live-components.spec.ts` used to run on separate loads.
@@ -53,11 +52,9 @@ bash -c 'pnpm build && TEXULI_E2E_PORT=<lane port> pnpm exec playwright test tes
   `site-live-primitives.spec.ts`, with the demo mounted, the API rows and
   the demo's floating content open, in light, dark and forced colors (the
   representative primitives); here only the group's representative runs.
-- **Projects:** Chromium sweeps **every swept page**; the Pixel 7 runs the polish
-  check on every page and axe on the representatives; WebKit runs the
-  representatives only. WebKit's keyboard walk is skipped because its
-  default Tab order skips links and buttons (a macOS setting); the walk
-  runs on Chromium and Pixel 7.
+- **Projects:** the e2e suite runs on Chromium (locally and in CI). Run on
+  WebKit, the keyboard walk is skipped because its default Tab order skips
+  links and buttons (a macOS setting).
 
 ## Findings and fixes (at the source)
 

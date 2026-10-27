@@ -5,28 +5,45 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-`0.2.0` is the current release of all 15 packable packages (owner decision
-2026-10-27; published from `main` by the publish workflow, from the verified
-tarballs with signed provenance). Both the `latest` and `next` dist-tags
-point to it, so a bare `npm install texuli` or `pnpm add texuli` gets it. It
-is the first non-prerelease `0.x` line, after the `0.1.0-next.0` through
-`0.1.0-next.3` previews: `0.1.0-next.0` was the name reservation,
-`0.1.0-next.1` went out on 2026-10-25 (run
-https://github.com/DailybotHQ/texuli/actions/runs/40238083612), and
-`0.1.0-next.2` (the PLAN_006 package fixes) and `0.1.0-next.3` (consumer
-READMEs and two CLI fixes) on 2026-10-27.
+`0.3.0` is the current release of all 16 packable packages (owner decision
+2026-10-27): the 15 packages of the `0.2.0` release plus `@texuli/date`,
+which is published for the first time in `0.3.0`. The publish workflow
+publishes it from `main` after the merge, from the verified tarballs with
+signed provenance, and moves both the `latest` and `next` dist-tags to it,
+so a bare `npm install texuli` or `pnpm add texuli` gets it.
 
-`0.2.0` is still pre-1.0, not a stable release: see "0.x versioning" below.
+`0.3.0` is a breaking `0.x` minor:
+
+- `@texuli/primitives` re-exports `CalendarDate` from `@texuli/date`
+  instead of `@internationalized/date`, which is no longer a dependency.
+- `CalendarIdentifier` is narrowed to `'gregory'`: only the Gregorian
+  calendar is supported.
+- The calendar entry fell from about 13.05 to 5.15 KiB gzip and the date
+  picker from about 28.60 to 20.26 KiB.
+
+`0.3.0` is still pre-1.0, not a stable release: see "0.x versioning" below.
 Workspace manifests remain `private: true`, and every future version and
 wave requires a fresh, explicit developer GO. Publishing never overwrites a
 published version.
 
+### History
+
+- `0.2.0` (2026-10-27): the first non-prerelease `0.x` line, for the 15
+  packages that were packable then. `@texuli/primitives@0.2.0` is immutable
+  and still depends on `@internationalized/date`; `0.3.0` replaces it with
+  `@texuli/date`.
+- `0.1.0-next.0` through `0.1.0-next.3` (previews): `0.1.0-next.0` was the
+  name reservation, `0.1.0-next.1` went out on 2026-10-25 (run
+  https://github.com/DailybotHQ/texuli/actions/runs/40238083612), and
+  `0.1.0-next.2` (the PLAN_006 package fixes) and `0.1.0-next.3` (consumer
+  READMEs and two CLI fixes) on 2026-10-27.
+
 ### 0.x versioning
 
-Until 1.0.0, a breaking change bumps the minor (`0.2.0` to `0.3.0`) and a
-fix bumps the patch (`0.2.0` to `0.2.1`). Consumers pin the exact version or
-use `~0.2.0` or `^0.2.0`; for a `0.x` version both ranges accept only
-`0.2.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
+Until 1.0.0, a breaking change bumps the minor (`0.3.0` to `0.4.0`) and a
+fix bumps the patch (`0.3.0` to `0.3.1`). Consumers pin the exact version or
+use `~0.3.0` or `^0.3.0`; for a `0.x` version both ranges accept only
+`0.3.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
 release.
 
 ## Independent package versions
@@ -50,8 +67,8 @@ Before a package reaches 1.0.0, its `0.x` minor is the API compatibility line:
   to `1.0.0` under a separate developer GO. Packages make that transition
   independently.
 
-For example, a fix candidate can progress from `0.2.1-next.0` to
-`0.2.1-next.1`; a new feature or breaking change starts `0.3.0-next.0`.
+For example, a fix candidate can progress from `0.3.1-next.0` to
+`0.3.1-next.1`; a new feature or breaking change starts `0.4.0-next.0`.
 Pre-release dependencies between Texuli packages use exact compatible
 pre-release versions. Ordinary ranges do not select prerelease versions by
 default.
@@ -61,12 +78,14 @@ default.
 - **`next`** points to the newest owner-approved version, including any
   future `0.x.y-next.N` or other pre-release. The publish workflow always
   publishes with `--tag next`, so it moves only with a new version and a
-  fresh GO. Today it names `0.2.0`.
+  fresh GO. It names `0.3.0` once the publish workflow runs after the merge
+  (`0.2.0` before that).
 - **`latest`** is npm's default install tag, and npm's package page shows
   the README of the version it names. It tracks the newest release, before
   and after 1.0.0: the publish workflow moves it together with `next`
   (owner decision 2026-10-27; before that, `latest` was reserved for 1.0.0
-  and stayed on the first upload, `0.1.0-next.0`). Today it names `0.2.0`.
+  and stayed on the first upload, `0.1.0-next.0`). It names `0.3.0` once the
+  publish workflow runs after the merge (`0.2.0` before that).
   The workflow moves `latest` on every run, so publishing a future
   pre-release without moving `latest` needs a workflow change first.
 - Dailybot v4 and other production consumers must pin exact package versions
@@ -81,7 +100,7 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (for `0.2.0`, every internal pin is exactly `0.2.0`; compatibility
+versions (for `0.3.0`, every internal pin is exactly `0.3.0`; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`, `packages/editor`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary
@@ -101,9 +120,10 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 15 npm packages | `0.2.0` (dist-tags `latest` and `next`) | Each package manifest; published by the publish workflow (previews before it: `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| 16 npm packages | `0.3.0` (dist-tags `latest` and `next`) | Each package manifest; published by the publish workflow after the merge (before it: `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| `@texuli/date` | `0.3.0` (first publication) | `packages/date/package.json`; published with the other 15 packages, before `@texuli/primitives`, which depends on it. |
 | Blueprint spec | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | `packages/spec/versions.json`; every generated file is stamped `// Spec 0.2.0, digest …`. |
-| `@texuli/spec` (npm) | `0.2.0` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
+| `@texuli/spec` (npm) | `0.3.0` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 
 - A normative spec change takes a new spec version and a fresh digest pin in
@@ -127,6 +147,7 @@ tag. Any GO for Task 170's name reservation covers only that reservation.
 | Task | Wave | Planned package order | Approval boundary |
 | --- | --- | --- | --- |
 | 174 | Foundations | `@texuli/core`, then `@texuli/tokens` | Fresh owner GO for the exact Task 174 package/version set after its release gates; core precedes tokens. |
+| 0.3.0 | Date foundation | `@texuli/date`, before `@texuli/primitives` (first published in `0.3.0`) | Fresh owner GO for the exact version; `@texuli/date` precedes the primitives that depend on it. |
 | 175 | Controls | `@texuli/primitives` | Fresh owner GO after its core dependency and behavior, accessibility, size, pack, and consumer gates pass. |
 | 176 | Styled package | `texuli` | Fresh owner GO after core, primitives, and tokens compatibility plus style and consumer gates pass. |
 | 177 | Domain packages | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/blocks` | Fresh owner GO for the exact ready set after dependency order, package checks, size, pack, and consumer gates pass. |
@@ -142,7 +163,7 @@ new version rather than reusing a published version.
 ## Honesty in documentation
 
 The npm name reservation (`0.1.0-next.0`) was a prerelease publication by
-the owner, not a supported product release. `0.2.0` is a release but not a
+the owner, not a supported product release. `0.3.0` is a release but not a
 stable one: keep `private: true`, the pre-1.0 status, and the absence of a
 stable 1.0.0 clear until the corresponding approved stable release actually
 exists. A passing pack gate proves only that a tarball

@@ -59,16 +59,21 @@ import {
 bash -c 'pnpm build && TEXULI_E2E_PORT=4910 pnpm exec playwright test tests/e2e/site-theme-switcher.spec.ts'
 ```
 
-The spec serves `apps/website/dist` on a free loopback port and checks, on
-Chromium, WebKit and Pixel 7:
+The spec (one test on Chromium since the 2026-10-27 trim) serves
+`apps/website/dist` on a free loopback port and checks:
 
-- the page builds and lists the library (200+ themes);
-- mode and theme changes update `data-tx-theme` / `data-tx-mode`;
-- dark mode lowers background luminance; light raises it;
-- high-contrast sets `data-tx-mode="high-contrast"`;
-- persistence: reload keeps theme and mode with no flash;
-- no request leaves the origin;
-- axe WCAG 2.1 A/AA in light and dark.
+- the page lists the library (200+ themes), and two cards paint two
+  different primaries in the active mode's palette;
+- mode and theme changes update `data-tx-theme` / `data-tx-mode`; dark mode
+  lowers the background luminance; high contrast sets
+  `data-tx-mode="high-contrast"`;
+- the search filter;
+- persistence: a reload keeps theme and mode with no flash;
+- no request leaves the origin.
+
+The catalog, filters and swatch colors are unit-tested
+(`scripts/tests/site-loaders.test.ts`); axe in light and dark runs in the page
+sweep (`a11y-site.spec.ts`).
 
 ## Limits
 

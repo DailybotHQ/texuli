@@ -26,7 +26,14 @@ describe('consumer harness matrix', () => {
     );
     expect(new Set(CONSUMERS.map((c) => c.framework)).size).toBe(3);
     expect(CONSUMERS.filter((c) => c.tailwind)).toHaveLength(3);
-    expect(CONSUMER_PACK_FILTER).toEqual(['core', 'tokens', 'primitives', 'texuli', 'data']);
+    expect(CONSUMER_PACK_FILTER).toEqual([
+      'core',
+      'date',
+      'tokens',
+      'primitives',
+      'texuli',
+      'data',
+    ]);
     expect([...TEXULI_INSTALL_NAMES]).toEqual([
       '@texuli/core',
       '@texuli/tokens',

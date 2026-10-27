@@ -27,7 +27,7 @@ applyTheme(document.documentElement, {
 });
 const behavior = params.get('behavior');
 // `?layout-slot=<layout id>` mounts one layout with a wide routed screen
-// (tests/e2e/layout-slot-minsize.spec.ts). It loads lazily too.
+// (tests/e2e/layouts-app.spec.ts). It loads lazily too.
 const layoutSlot = params.get('layout-slot');
 if (layoutSlot) {
   const { default: LayoutSlots } = await import('./LayoutSlots.svelte');

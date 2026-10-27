@@ -273,6 +273,25 @@ describe('Cartesian chart renderers', () => {
 
       cleanup();
     }
+    // keyboard exploration follows the visible window (moved from the browser suite)
+    {
+      const points = Array.from({ length: 200 }, (_, x) => ({ x, y: x % 7 }));
+      render(LineChart, {
+        title: 'Windowed latency',
+        description: 'Twenty requests of a longer series.',
+        series: [{ id: 'latency', label: 'Latency', points }],
+        visibleDomain: [40, 60],
+        renderer: 'svg',
+      });
+      const explorer = await screen.findByRole('application', {}, { timeout: 5_000 });
+      const live = () => document.querySelector('[data-chart-live]')?.textContent ?? '';
+      await fireEvent.focus(explorer);
+      // 21 in-window samples plus one neighbor on each side keep the line continuous.
+      expect(live()).toMatch(/Point 1 of 2[1-3]\./);
+      await fireEvent.keyDown(explorer, { key: 'End' });
+      expect(live()).toMatch(/Latency, (6[01]|59)\b/);
+      cleanup();
+    }
     cleanup();
     // renders with an accessible description, legend toggles and table fallback
     await (async () => {

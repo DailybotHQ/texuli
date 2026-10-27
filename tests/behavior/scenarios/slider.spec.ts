@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { defineRows, scenario } from '../harness/index.ts';
 import { eventNames, expectFocus } from './common.ts';
 
@@ -124,8 +124,8 @@ scenario(
     {
       id: 'touch',
       title: 'a tap on a touch screen moves the thumb',
+      projects: ['mobile'],
       async run({ page }) {
-        if (!test.info().project.use.hasTouch) return;
         const point = await trackPoint(page, 'volume', 0.6);
         await page.touchscreen.tap(point.x, point.y);
         await expect.poll(() => currentValue(page, 'Volume')).toBe(60);

@@ -14,9 +14,9 @@ which is built on these primitives. They are built from scratch on the
 not depend on any other component library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.2.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.3.0`) may contain breaking
-> changes, so pin the exact version or use `^0.2.0`, which accepts only 0.2.x.
+> published to npm as `0.3.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.4.0`) may contain breaking
+> changes, so pin the exact version or use `^0.3.0`, which accepts only 0.3.x.
 
 ## Install
 
@@ -103,6 +103,19 @@ from subpaths to keep bundles narrow.
   content.
 - **No HTML sinks.** Content renders through Svelte snippets and text,
   never `{@html}`.
+- **Dependency-free dates.** `calendar`, `date-field` and `date-picker`
+  compute dates with [`@texuli/date`](https://www.npmjs.com/package/@texuli/date)
+  and label them with `Intl.DateTimeFormat`. Only the Gregorian calendar is
+  supported; `CalendarDate` is re-exported from `@texuli/date`.
+
+### Breaking in 0.3.0
+
+`@texuli/primitives` no longer depends on `@internationalized/date`.
+`CalendarDate` now comes from `@texuli/date`, and `CalendarIdentifier` is
+narrowed to `'gregory'`, so code that passed another calendar system (or a
+`CalendarDate` built with `@internationalized/date`) must move to
+`@texuli/date`. The calendar entry fell from about 13.05 to 5.15 KiB gzip and
+the date picker from about 28.60 to 20.26 KiB.
 
 ## Documentation
 
@@ -113,6 +126,8 @@ from subpaths to keep bundles narrow.
   for example [prim-dialog.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-dialog.md),
   [prim-menu.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-menu.md)
   and [prim-combobox.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-combobox.md)
+- Dates: [prim-calendar.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-calendar.md)
+  and [prim-date-picker.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-date-picker.md)
 - Consumer ids: [consumer-ids.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/consumer-ids.md)
 - How the texels bind to Svelte 5 attachments: [svelte-attachments.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/svelte-attachments.md)
 - Accessibility contract: [ACCESSIBILITY.md](https://github.com/DailybotHQ/texuli/blob/main/docs/ACCESSIBILITY.md)
@@ -120,6 +135,7 @@ from subpaths to keep bundles narrow.
 ## Related packages
 
 - [`@texuli/core`](https://www.npmjs.com/package/@texuli/core): the framework-free behavior these primitives are built on.
+- [`@texuli/date`](https://www.npmjs.com/package/@texuli/date): the dependency-free Gregorian dates behind the calendar and date pickers.
 - [`texuli`](https://www.npmjs.com/package/texuli): styled components built on these primitives.
 - [`@texuli/tokens`](https://www.npmjs.com/package/@texuli/tokens): the theme engine and design tokens.
 

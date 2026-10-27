@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { defineRows, scenario } from '../harness/index.ts';
 import { behaviorEvents } from '../harness/oracle.ts';
 import { expectFocus } from './common.ts';
@@ -68,12 +68,12 @@ scenario(
     {
       id: 'pointer-focuses',
       title: 'a click or tap on the cells focuses the field',
-      async run({ page }) {
+      async run({ page, touch }) {
         const box = await page.locator('.behavior-pin').boundingBox();
         if (!box) throw new Error('no cells');
         const x = box.x + box.width * 0.6;
         const y = box.y + box.height / 2;
-        if (test.info().project.use.hasTouch) await page.touchscreen.tap(x, y);
+        if (touch) await page.touchscreen.tap(x, y);
         else await page.mouse.click(x, y);
         await expectFocus(page, 'textbox', 'Verification code');
         await page.keyboard.type('7');

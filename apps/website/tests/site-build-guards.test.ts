@@ -5,9 +5,17 @@
  * - sitemap lastmod is the commit's UTC day, not the committer's (T-100 P2-2);
  * - `src/pages` holds routes only: Astro treats every `.ts` file there as an
  *   endpoint, so a helper without a GET handler becomes a stray route;
+ * - the site layers its element defaults before Texuli's cascade layers;
  * - the page CSP names the `texuli-analytics` Trusted Types policy only on
- *   pages that mount the Umami loader (T-100 S-1);
- * - the skill pack is published from its SHA256SUMS allowlist only (S-8).
+ *   pages that mount the Umami loader (T-100 S-1), and hashes every inline
+ *   script, style element and style attribute (no `unsafe-inline`);
+ * - the skill pack is published from its SHA256SUMS allowlist only (S-8);
+ * - the SEO helpers (paths, sitemap, robots, social art) and the JSON-LD
+ *   builders state only what the repository backs;
+ * - the committed agent discovery files describe real surfaces only;
+ * - the skill page reads the pack exactly as setup.sh does.
+ * The built output itself (every page's head, the sitemap, the social
+ * images, the twins, internal links) is audited in tests/e2e/site-seo.spec.ts.
  */
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -25,10 +33,40 @@ import { tmpdir } from 'node:os';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { ANALYTICS_TRUSTED_TYPES_POLICY, pagePolicy } from '../src/components/security/csp.ts';
+import {
+  ANALYTICS_TRUSTED_TYPES_POLICY,
+  pagePolicy,
+  pageRoute,
+  reportOnlyPolicy,
+} from '../src/components/security/csp.ts';
+import { breadcrumbJsonLd, breadcrumbTrail } from '../src/components/seo/breadcrumbs.ts';
 import { gitCommitDateUtc } from '../src/components/seo/integration.ts';
 import { serializeJsonLd } from '../src/components/seo/json-ld.ts';
+import {
+  AI_CRAWLERS,
+  absoluteUrl,
+  buildRobots,
+  buildSitemap,
+  escapeXml,
+  normalizePagePath,
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_WIDTH,
+  ogAreaFor,
+  ogImageFile,
+  ogImageSvg,
+  readPageMeta,
+  wrapText,
+} from '../src/components/seo/seo.ts';
+import {
+  parseChecksums,
+  parseFrontmatter,
+  parseHostLabels,
+  parseSetupHosts,
+  skillHosts,
+  subSkills,
+} from '../src/components/skill/skill.ts';
 import { publishSkillPack } from '../src/integrations/skill-pack.ts';
+import { libraryJsonLd, techArticleJsonLd } from '../src/lib/schema.ts';
 
 const temps: string[] = [];
 function temp(prefix = 'texuli-site-guard-'): string {
@@ -124,7 +162,18 @@ describe('src/pages holds routes only', () => {
   });
 });
 
-describe('pagePolicy trusted-types (T-100 S-1)', () => {
+describe('site cascade layers', () => {
+  it('layers the site element defaults before Texuli, so Button colors win over a { color }', () => {
+    const layers = readFileSync(
+      fileURLToPath(new URL('../src/styles/site-layers.css', import.meta.url)),
+      'utf8'
+    );
+    expect(layers).toContain('@layer site-base, tx.base, tx.components, site-overrides');
+    expect(layers).toMatch(/@layer site-base\s*\{[\s\S]*\ba\s*\{/);
+  });
+});
+
+describe('pagePolicy: trusted types (T-100 S-1) and hashes', () => {
   const MOUNT =
     '<script src="/umami-loader.js" data-umami-loader data-script-src="/api/umami/script.js" data-website-id="fixture-id" data-host-url="/api/umami" defer></script>';
   const directive = (policy: string, name: string): string | undefined =>
@@ -149,6 +198,23 @@ describe('pagePolicy trusted-types (T-100 S-1)', () => {
     expect(directive(policy, 'require-trusted-types-for')).toBe("'script'");
     expect(directive(policy, 'script-src')).toBe("'self'");
     expect(policy).not.toContain("'allow-duplicates'");
+  });
+
+  it('hashes each inline source, so a changed script needs a new hash; maps files to routes; report-only adds its group', () => {
+    const sha = (source: string) =>
+      `'sha256-${createHash('sha256').update(source).digest('base64')}'`;
+    const html =
+      '<html><head><script>window.ready=1</script><script src="/a.js"></script><style>p{color:red}</style></head><body><p style="margin:0">x</p></body></html>';
+    const policy = pagePolicy(html);
+    expect(directive(policy, 'script-src')).toBe(`'self' ${sha('window.ready=1')}`);
+    expect(directive(policy, 'style-src')).toBe(`'self' ${sha('p{color:red}')}`);
+    expect(directive(policy, 'style-src-attr')).toBe(`'unsafe-hashes' ${sha('margin:0')}`);
+    expect(policy).not.toMatch(/'unsafe-(?:inline|eval)'/);
+    expect(pagePolicy(html.replace('ready=1', 'ready=2'))).not.toBe(policy);
+    expect(pageRoute('/dist', '/dist/docs/index.html')).toBe('/docs/');
+    expect(pageRoute('/dist', '/dist/index.html')).toBe('/');
+    expect(pageRoute('/dist', '/dist/404.html')).toBe('/404.html');
+    expect(reportOnlyPolicy(policy)).toBe(`${policy}; report-to texuli-csp`);
   });
 });
 
@@ -207,5 +273,253 @@ describe('publishSkillPack (S-8)', () => {
     mkdirSync(missing, { recursive: true });
     writeFileSync(join(missing, 'SHA256SUMS'), `${'0'.repeat(64)}  SKILL.md\n`);
     expect(() => publishSkillPack(missing, join(temp(), 'skill-pack'))).toThrow(/SKILL\.md/);
+  });
+});
+
+describe('SEO helpers', () => {
+  const SITE = 'https://texuli.com';
+
+  it('normalize paths, files and absolute URLs; escape XML; build the sitemap and robots', () => {
+    expect(normalizePagePath('/guides/theming')).toBe('/guides/theming/');
+    expect(normalizePagePath('guides/theming/index.html')).toBe('/guides/theming/');
+    expect(normalizePagePath('/preview/guides/', '/preview/')).toBe('/guides/');
+    expect(normalizePagePath('')).toBe('/');
+    expect(ogImageFile('/')).toBe('og/index.png');
+    expect(ogImageFile('/component-pages/button/')).toBe('og/component-pages/button.png');
+    expect(absoluteUrl(SITE, '/', '/guides/')).toBe('https://texuli.com/guides/');
+    expect(absoluteUrl(SITE, '/preview', 'og/index.png')).toBe(
+      'https://texuli.com/preview/og/index.png'
+    );
+    expect(escapeXml(`a&b<c>"d"'e'${String.fromCharCode(1)}`)).toBe(
+      'a&amp;b&lt;c&gt;&quot;d&quot;&apos;e&apos;'
+    );
+
+    const xml = buildSitemap([
+      `${SITE}/b/`,
+      { loc: `${SITE}/`, lastmod: '2026-10-25' },
+      `${SITE}/b/`,
+      `${SITE}/a?x=1&y=2`,
+    ]);
+    expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true);
+    expect(xml.match(/<loc>/g)).toHaveLength(3);
+    expect(xml.indexOf(`${SITE}/</loc>`)).toBeLessThan(xml.indexOf(`${SITE}/b/</loc>`));
+    expect(xml).toContain('x=1&amp;y=2');
+    expect(xml.match(/<lastmod>/g)).toEqual(['<lastmod>']);
+    expect(xml).toContain('<lastmod>2026-10-25</lastmod>');
+    expect(() => buildSitemap([{ loc: `${SITE}/x/`, lastmod: 'not-a-date' }])).toThrow();
+
+    // Every AI crawler is welcomed by name and nothing is disallowed; the
+    // Content-Signal header waits for the request-time rewrite (a static file
+    // cannot vary by user agent), so no directive line names it.
+    const robots = buildRobots(`${SITE}/sitemap.xml`);
+    expect(robots).toContain('User-agent: *\nAllow: /\n');
+    expect(robots).toContain(`Sitemap: ${SITE}/sitemap.xml\n`);
+    for (const crawler of AI_CRAWLERS)
+      expect(robots).toContain(`User-agent: ${crawler}\nAllow: /\n`);
+    expect(robots).not.toContain('Disallow');
+    expect(robots).not.toMatch(/^Content-Signal:/m);
+  });
+
+  it('maps routes to social-art areas, reads page meta, wraps text and escapes hostile titles', () => {
+    const labels: Array<[string, string]> = [
+      ['/', ''],
+      ['/guides/theming/', 'Guides'],
+      ['/component-pages/button/', 'Components'],
+      ['/primitives-page/accordion/', 'Primitives'],
+      ['/theme-studio/', 'Themes'],
+      ['/playground/', 'Agents'],
+    ];
+    for (const [path, label] of labels) expect(ogAreaFor(path).label, path).toBe(label);
+    expect(new Set(labels.map(([path]) => ogAreaFor(path).accent)).size).toBeGreaterThanOrEqual(5);
+    const base = {
+      title: 'Same title',
+      description: 'Same description text.',
+      url: 'texuli.com/x',
+      siteName: 'Texuli',
+    };
+    const plain = ogImageSvg(base);
+    const guides = ogImageSvg({ ...base, area: ogAreaFor('/guides/theming/') });
+    expect(guides).toContain('GUIDES');
+    expect(plain).not.toContain('GUIDES');
+
+    expect(
+      readPageMeta(
+        '<html><head><title>Tom &amp; Jerry &#183; Texuli</title><meta name="description" content="A &quot;quoted&quot; page"><meta name="robots" content="noindex"></head><body><title>ignored</title></body></html>'
+      )
+    ).toEqual({ title: 'Tom & Jerry · Texuli', description: 'A "quoted" page', noindex: true });
+    expect(wrapText('one two three four five six', 9, 2)).toEqual(['one two', 'three…']);
+    expect(wrapText('short', 20, 3)).toEqual(['short']);
+
+    const svg = ogImageSvg({
+      title: '<script>alert(1)</script> & "x"',
+      description: '</text><image href="https://evil.example/x.png"/>',
+      url: 'texuli.com/x',
+      siteName: 'Texuli',
+    });
+    expect(svg).not.toContain('<script');
+    expect(svg).not.toContain('<image');
+    expect(svg).toContain('&lt;script&gt;');
+    expect(svg).toContain(`width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}"`);
+  });
+});
+
+describe('JSON-LD builders', () => {
+  it('the library graph states the owner, the search action and a pre-1.0 release, with no offers', () => {
+    const graph = libraryJsonLd()['@graph'];
+    const byType = new Map(graph.map((node) => [node['@type'], node]));
+    expect(byType.get('Organization')).toMatchObject({ name: 'Dailybot, Inc.' });
+    const website = byType.get('WebSite') as Record<string, unknown>;
+    expect(website).toMatchObject({ name: 'Texuli', url: 'https://texuli.com/' });
+    expect(JSON.stringify(website.potentialAction)).toContain('/search/?q={search_term_string}');
+    const app = byType.get('SoftwareApplication') as Record<string, unknown>;
+    expect(app).toMatchObject({
+      name: 'Texuli',
+      applicationCategory: 'DeveloperApplication',
+      license: 'https://opensource.org/licenses/MIT',
+    });
+    // Pre-1.0 reality: the pattern fails the day the version leaves 0.x.
+    expect(app.softwareVersion).toMatch(/^0\.\d+\.\d+(?:-next\.\d+)?$/);
+    expect(String(app.description)).toContain('in development');
+    expect(app).not.toHaveProperty('offers');
+
+    const article = techArticleJsonLd('Headline', 'Description.', '/web-and-native/')['@graph'][0];
+    expect(article).toMatchObject({
+      '@type': 'TechArticle',
+      headline: 'Headline',
+      url: 'https://texuli.com/web-and-native/',
+    });
+  });
+
+  it('breadcrumbs follow the site nav: contiguous positions, absolute items, none on the landing', () => {
+    const names = (path: string) => breadcrumbTrail(path).map((entry) => entry.name);
+    expect(names('/guides/theming/')).toEqual(['Home', 'Get started', 'Theming']);
+    // The family heading has no href, so it cannot be a breadcrumb entry.
+    expect(names('/component-pages/button/')).toEqual(['Home', 'Components', 'Button']);
+    expect(breadcrumbTrail('/')).toEqual([]);
+    expect(breadcrumbTrail('/no-such-page/')).toEqual([]);
+    for (const path of ['/guides/theming/', '/component-pages/button/']) {
+      const list = breadcrumbJsonLd(breadcrumbTrail(path)).itemListElement;
+      list.forEach((entry, index) => {
+        expect(entry.position).toBe(index + 1);
+        expect(entry.item).toMatch(/^https:\/\/texuli\.com\/.*\/?$/);
+      });
+      expect(list.at(-1)?.item).toBe(`https://texuli.com${path}`);
+    }
+  });
+});
+
+describe('agent discovery files (public/.well-known, public/llms.txt)', () => {
+  const read = (path: string) =>
+    JSON.parse(
+      readFileSync(fileURLToPath(new URL(`../public/.well-known/${path}`, import.meta.url)), 'utf8')
+    );
+
+  it('describe only real surfaces: unique entries, texuli.com or npm URLs, the shipped stdio tools', () => {
+    const aiCatalog = read('ai-catalog.json') as {
+      host: { displayName: string; documentationUrl: string };
+      entries: { identifier: string; url: string }[];
+    };
+    const apiCatalog = read('api-catalog') as { linkset: { links: { href: string }[] }[] };
+    const card = read('mcp/server-card.json') as {
+      serverInfo: { name: string };
+      transport: { stdio: { launch: string } };
+      capabilities: string[];
+      tools: string[];
+    };
+    expect(aiCatalog.host.displayName).toBe('Texuli');
+    // T-100 P1-4: /docs/ was advertised but has no route.
+    expect(aiCatalog.host.documentationUrl).toBe('https://texuli.com/guides/');
+    const identifiers = aiCatalog.entries.map((entry) => entry.identifier);
+    expect(identifiers.length).toBeGreaterThanOrEqual(6);
+    expect(new Set(identifiers).size).toBe(identifiers.length);
+    for (const url of [
+      ...aiCatalog.entries.map((entry) => entry.url),
+      ...apiCatalog.linkset.flatMap((set) => set.links.map((link) => link.href)),
+    ])
+      expect(url).toMatch(/^https:\/\/(texuli\.com\/|www\.npmjs\.com\/)/);
+    expect(card.serverInfo.name).toBe('texuli');
+    expect(new Set(card.tools)).toEqual(
+      new Set(['catalog', 'component', 'validate', 'example', 'theme'])
+    );
+    expect(card.capabilities).toContain('tools');
+    expect(card.transport.stdio.launch).toContain('tsx src/mcp/stdio.ts');
+    expect(JSON.stringify(card)).not.toContain('"streamableHttp"');
+
+    // The root llms.txt (generated from the nav; its drift check is in
+    // scripts/tests/site-loaders.test.ts) has a section per site area.
+    const llms = readFileSync(
+      fileURLToPath(new URL('../public/llms.txt', import.meta.url)),
+      'utf8'
+    );
+    expect(llms.startsWith('# Texuli\n\n> ')).toBe(true);
+    for (const area of ['Guides', 'Components', 'Primitives', 'Themes', 'Agents', 'Project'])
+      expect(llms, area).toContain(`## ${area}\n`);
+    expect(llms.match(/^- \[[^\]]+\]\(https:\/\/texuli\.com[^)]*\)/gm)?.length).toBeGreaterThan(30);
+  });
+});
+
+describe('skill page data', () => {
+  const PACK = fileURLToPath(new URL('../../../skills/texuli', import.meta.url));
+  const read = (path: string) => readFileSync(join(PACK, path), 'utf8');
+
+  it('parses frontmatter, the host map and SHA256SUMS', () => {
+    expect(
+      parseFrontmatter(
+        '---\nname: demo\ndescription: Does a thing.\nversion: "1.2.3"\nallowed-tools: Bash, Read\nmetadata:\n  x: y\n---\n# Body'
+      )
+    ).toEqual({
+      name: 'demo',
+      description: 'Does a thing.',
+      version: '1.2.3',
+      allowedTools: ['Bash', 'Read'],
+    });
+    expect(
+      parseSetupHosts(
+        'HOSTS="a b"\nhost_dir() {\n  case "$1" in\n    a) echo ".a/skills" ;;\n    b) echo ".b/x" ;;\n  esac\n}\n'
+      )
+    ).toEqual([
+      { id: 'a', dir: '.a/skills' },
+      { id: 'b', dir: '.b/x' },
+    ]);
+    expect([
+      ...parseHostLabels(
+        '| Host | `setup.sh --host` | x |\n| Claude Code | `claude` | `~/.claude` |'
+      ),
+    ]).toEqual([['claude', 'Claude Code']]);
+    const hash = 'a'.repeat(64);
+    expect(parseChecksums(`${hash}  SKILL.md\n\nnot a line\n${hash} *setup.sh\n`)).toEqual([
+      { hash, path: 'SKILL.md' },
+      { hash, path: 'setup.sh' },
+    ]);
+  });
+
+  it('lists exactly the hosts setup.sh prints, and every sub-skill folder with its references', () => {
+    const hosts = skillHosts(read('setup.sh'), read('router/hosts.md'), 'texuli');
+    const listed = execFileSync('sh', [join(PACK, 'setup.sh'), '--list-hosts'], {
+      encoding: 'utf8',
+      timeout: 60_000,
+    })
+      .trim()
+      .split('\n')
+      .map((line) => line.trim().split(/\s+/));
+    expect(hosts.map((host) => [host.id, host.folder])).toEqual(listed);
+    for (const host of hosts) expect(host.label, host.id).not.toBe(host.id);
+
+    const router = parseFrontmatter(read('SKILL.md'));
+    const checksums = parseChecksums(read('SHA256SUMS'));
+    const files = new Map(checksums.map((sum) => [sum.path, read(sum.path)]));
+    const skills = subSkills(files, checksums);
+    const folders = readdirSync(PACK, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && existsSync(join(PACK, entry.name, 'SKILL.md')))
+      .map((entry) => entry.name)
+      .sort();
+    expect(skills.map((skill) => skill.folder)).toEqual(folders);
+    for (const skill of skills) {
+      expect(skill.name, skill.folder).toBe(`texuli-${skill.folder}`);
+      expect(skill.description, skill.folder).not.toBe('');
+      expect(skill.version, skill.folder).toBe(router.version);
+      const refs = join(PACK, skill.folder, 'references');
+      if (existsSync(refs)) expect([...skill.references].sort()).toEqual(readdirSync(refs).sort());
+    }
   });
 });

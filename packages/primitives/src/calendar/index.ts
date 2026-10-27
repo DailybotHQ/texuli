@@ -13,6 +13,6 @@ export const Calendar: {
   Grid: typeof Grid;
 } = { Root, Heading, PrevButton, NextButton, Grid };
 
-export type { CalendarIdentifier } from '@internationalized/date';
-export { CalendarDate } from '@internationalized/date';
+export type { CalendarIdentifier } from '@texuli/date';
+export { CalendarDate } from '@texuli/date';
 export { Grid, Heading, NextButton, PrevButton, Root };

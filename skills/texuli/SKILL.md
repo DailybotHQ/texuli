@@ -46,10 +46,10 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 15 published packages are on npm as `0.2.0` (published by CI with
+   All 16 published packages are on npm as `0.3.0` (published by CI with
    provenance; `latest` and `next` both point to it; pre-1.0, so a new minor
    may break and 1.0.0 will be the first stable release), so install them
-   plainly (`pnpm add texuli`) and pin `0.2.0` or `^0.2.0`; the workspace packages
+   plainly (`pnpm add texuli`) and pin `0.3.0` or `^0.3.0`; the workspace packages
    stay `private: true`. `@texuli/editor` (the rich text editor) is in
    development and not on npm: only a Texuli workspace can import it. The
    package and layer index is [`router/packages.md`](router/packages.md).

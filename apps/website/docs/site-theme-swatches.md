@@ -2,7 +2,7 @@
 
 **App:** `apps/website`  
 **Pages:** `/theme-switcher/`, `/gallery-themes/`  
-**Tests:** `scripts/tests/site-loaders.test.ts`, `tests/e2e/site-theme-swatches.spec.ts`
+**Tests:** `scripts/tests/site-loaders.test.ts`, `tests/e2e/site-theme-switcher.spec.ts` and `tests/e2e/site-gallery-themes.spec.ts` (two cards paint two different primaries)
 
 ## Goal
 
@@ -24,5 +24,5 @@ foreground — never the active site theme’s CSS variables.
 ```bash
 pnpm vitest run scripts/tests/site-loaders.test.ts
 pnpm build
-TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-theme-swatches.spec.ts
+TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-theme-switcher.spec.ts tests/e2e/site-gallery-themes.spec.ts
 ```

@@ -83,8 +83,10 @@ required). The current home sections do not use it; `PageBanner` does
 | Architecture sections | `apps/website/tests/section-contracts.test.ts` |
 | Proof-strip sources, home title band, motion rules, footer release truth | `apps/website/tests/landing.test.ts` |
 | Banned claims the repository contradicts (size, native targets, parity) | `apps/website/tests/copy-honesty.test.ts` |
-| Four sections in blueprint order, CTAs, reveal under reduced motion, axe in both modes | `tests/e2e/site-landing.spec.ts` |
-| Landing shell, no islands inside `[data-tx-landing]`, phone width | `tests/e2e/site-ia.spec.ts` |
+| Four sections in blueprint order, no islands inside `[data-tx-landing]`, CTAs, the announced install copy, reveal under reduced motion | `tests/e2e/site-landing.spec.ts` |
+| Landing header on desktop and phone | `tests/e2e/site-ia.spec.ts` |
+| axe in light and dark | the page sweep, `tests/e2e/a11y-site.spec.ts` |
+| Phone width (360 and 768 px, right to left too) | `tests/e2e/site-responsive.spec.ts` |
 | Page weight against the `/` budget | `tests/e2e/site-perf.spec.ts` |
 
 ```bash
@@ -99,8 +101,7 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-landing.spec.ts 
   the section test checks every target is a real route.
 - **A new section:** add the component + content module pair under
   `sections/<area>/`, mount it in the page, give it a unit test and update
-  the section-order assertions in `site-landing.spec.ts` and
-  `site-ia.spec.ts`. Keep it static; an island on the landing needs a
+  the section-order assertion in `site-landing.spec.ts`. Keep it static; an island on the landing needs a
   reason and a budget check.
 - **A new claim:** cite where the repository proves it. If the claim is
   planned, say so in the copy; add any phrase the repository contradicts

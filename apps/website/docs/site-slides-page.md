@@ -48,17 +48,20 @@ TEXULI_E2E_PORT=4872 pnpm exec playwright test tests/e2e/site-slides.spec.ts --p
 pnpm vitest run scripts/tests/site-loaders.test.ts
 ```
 
-The e2e spec serves `apps/website/dist` on a loopback port and checks:
+The e2e spec (one test since the 2026-10-27 trim) serves
+`apps/website/dist` on a loopback port and checks:
 
-- the h1, the section headings and no foreign network;
 - the stage: Next slide, then Next step reveals a list item, Right and Left
   reveal and hide from the keyboard, and the presenter view shows the step
   progress;
 - fullscreen opens natively or fills the window, and Exit fullscreen returns
   focus;
-- every template, example, docs-shell and showcase link resolves to a built
-  page with the expected h1;
-- axe WCAG 2.1 A/AA in light and dark, with every preview loaded.
+- axe WCAG 2.1 A/AA in light and dark, with every preview loaded;
+- no foreign network.
+
+Every template, example, docs-shell and showcase link resolving to a built
+page is the link audit in `site-seo.spec.ts`; the docs-shell order is
+unit-tested in `scripts/tests/site-loaders.test.ts`.
 
 ## Limits
 

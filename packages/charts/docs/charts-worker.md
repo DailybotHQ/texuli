@@ -57,7 +57,7 @@ budget; exact entries are proposed to the budget owner.
   with a `MessageChannel` standing in for the worker (real structured clone and
   transfer), plus the worker entry in a simulated worker scope, the error and
   creation fallbacks, and the small-input threshold.
-- Real browser: `tests/e2e/charts-worker.spec.ts` loads `worker.html` in the
+- Real browser: `tests/e2e/charts.spec.ts` (its worker step) loads `worker.html` in the
   fixture app, which creates a real module `Worker` with the documented
   `new Worker(new URL('@texuli/charts/worker/entry', import.meta.url), { type: 'module' })`
   pattern. It asserts that bin, LTTB and min-max equal the sync math and that a

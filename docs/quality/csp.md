@@ -39,9 +39,11 @@ trusted-types svelte-trusted-html
     `style.cssText` and Svelte's `style:` directive, which CSP allows.
 - **Built website islands:** Astro's inline bootstrap scripts are allowed by
   per-document SHA-256 hashes; the build emits an enforcing policy and a
-  report-only policy on each route. The CSP spec checks hash correspondence,
-  unsafe-directive absence, and home/theme island hydration under those
-  policies. Hashes authorize only the exact script bytes in each built page.
+  report-only policy on each route. `pnpm --filter @texuli/website check:csp`
+  checks hash correspondence and unsafe-directive absence on every built
+  route; the CSP spec checks home and theme island hydration under those
+  policies, and that both policies observe an unauthorized style. Hashes
+  authorize only the exact script bytes in each built page.
 - **Trusted Types:** the only allowed policy is Svelte's own
   `svelte-trusted-html`. Svelte 5 uses it to turn compiled templates into DOM.
   Texuli creates no policy of its own and never needs one.
@@ -71,12 +73,14 @@ trusted-types svelte-trusted-html
     each throw `TypeError`
   - `eval` and `new Function` throw `EvalError`
   - an injected `<style>` and a `style` attribute are not applied
-- **It checks every example.** The example list comes from the registry. Each
-  example must render and load, then the spec waits for the network to go
-  idle. The test fails on any `securitypolicyviolation` event, any CSP or
+- **It checks every example.** The example list comes from the registry,
+  dealt into four tests that each walk their examples in one page session
+  and run in parallel. Each example must render and load, then the spec
+  waits for the network to go idle. The test fails on any `securitypolicyviolation` event, any CSP or
   Trusted Types console message, or any page error.
-- **It scans the sources.** A test reads every `packages/*/src` file and fails
-  on any of these:
+- **The sources are scanned** by a Vitest test
+  (`scripts/tests/layers.test.ts`, "package sources under a strict CSP"),
+  which reads every `packages/*/src` file and fails on any of these:
   - a `style` attribute write
   - an HTML string sink
   - `document.write`
@@ -107,8 +111,8 @@ style.
 - **What the spec sets aside:** only that exact report, on WebKit, with
   `style-src-attr` as the directive, on a `SELECT` element that has no
   `style` attribute. Its console line is set aside too.
-- **The canary test:** it appends a bare `<select>` and asserts that WebKit
-  still reports it. When WebKit stops, the canary fails and the exception
+- **The canary:** on WebKit, the enforcement test appends a bare `<select>`
+  and asserts that WebKit still reports it. When WebKit stops, the canary fails and the exception
   should be removed.
 - **What stays the same:** the policy itself is never loosened.
 

@@ -1,4 +1,4 @@
-import type { CalendarDate } from '@internationalized/date';
+import type { CalendarDate } from '@texuli/date';
 import { getContext, setContext } from 'svelte';
 
 export const CALENDAR_CONTEXT = Symbol('texuli.calendar');

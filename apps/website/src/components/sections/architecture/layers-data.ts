@@ -46,6 +46,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         dependsOn: [],
       },
       {
+        name: '@texuli/date',
+        role: 'Framework-free Gregorian dates, arithmetic, locale week starts and time-zone-aware today',
+        dependsOn: [],
+      },
+      {
         name: '@texuli/spec',
         role: 'Framework-free blueprint contract and code generation',
         dependsOn: [],
@@ -59,7 +64,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/primitives',
         role: '41 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns',
-        dependsOn: ['core'],
+        dependsOn: ['core', 'date'],
       },
     ],
   },
@@ -280,7 +285,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
     layer: 'L3',
     runtimes: {
       web: {
-        text: 'Ships: styled components are published on npm as 0.2.0.',
+        text: 'Ships: styled components are published on npm as 0.3.0.',
         sources: [],
       },
       native: {

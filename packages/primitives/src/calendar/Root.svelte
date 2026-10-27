@@ -1,4 +1,5 @@
 <script lang="ts">
+import { directionOf } from '@texuli/core/dir-locale';
 import {
   type CalendarDate,
   type CalendarIdentifier,
@@ -11,8 +12,7 @@ import {
   startOfWeek,
   toCalendar,
   today,
-} from '@internationalized/date';
-import { directionOf } from '@texuli/core/dir-locale';
+} from '@texuli/date';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';

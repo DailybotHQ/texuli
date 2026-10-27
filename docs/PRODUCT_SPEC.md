@@ -2,10 +2,10 @@
 
 > **Small pieces. Infinite possibilities.**
 >
-> Status on 2026-10-27: **pre-1.0.** All 15 packable packages are on
-> npm as the `0.2.0` release (dist-tags `latest` and `next`; published by CI
-> from verified tarballs, with signed provenance); texuli.com deploys from
-> `main` to Cloudflare Pages. The
+> Status on 2026-10-27: **pre-1.0.** All 16 packable packages, including
+> the new `@texuli/date`, are released on npm as `0.3.0` (dist-tags `latest`
+> and `next`; published by CI from verified tarballs, with signed
+> provenance); texuli.com deploys from `main` to Cloudflare Pages. The
 > implementation itself is substantial: every layer from L0 texels to L8
 > tools exists in source with tests, all in this private workspace. The
 > "What exists today" table says exactly what is real.
@@ -72,6 +72,7 @@ closed, documented catalog that can be validated before anything renders.
 | --- | --- | --- |
 | Workspace (pnpm 11, TypeScript 6 strict + erasable, Biome 2.5, Vitest 5) | **Exists** | repository root |
 | L0 texels: the two-tier URL policy (`safeHref`, `safeImageSrc`, `safeMediaSrc`), ids, roving focus and typeahead, focus scope, the layer stack, scroll lock, positioning, dismissable layers, inert, portal, announcer, and the rest of `@texuli/core` | **Exists**, unit tests per texel | [`packages/core`](../packages/core/README.md) |
+| `@texuli/date` (L0): dependency-free Gregorian calendar dates for the calendar, date field and date picker | **Exists**, unit tests | [`packages/date`](../packages/date/README.md) |
 | `@texuli/primitives` (L1): 41 owned headless primitives and the behavior suite (42 scenario specs on chromium, webkit and a Pixel 7 profile) | **Exists**, private | [`packages/primitives`](../packages/primitives/README.md), [`tests/behavior`](../tests/behavior/README.md) |
 | Tokens + CSS, OKLCH theme engine (L2): the `--tx-*` contract, 210 themes, compiled CSS, forced colors, the AA gate, the Tailwind preset | **Exists**, private | [`packages/tokens`](../packages/tokens/README.md) |
 | `texuli` styled components, layouts and app shells (L3) | **Exists**, private | [`packages/texuli`](../packages/texuli/README.md) |
@@ -86,7 +87,7 @@ closed, documented catalog that can be validated before anything renders.
 | Agent service (prompt → validated blueprint draft) | **In development**, fake replay provider only, not deployed | [`apps/agent`](../apps/agent/README.md) |
 | Tools (L8): the copy-in CLIs (`texuli-add`, `texuli-init`, `texuli-update`, `texuli-llms`), A2UI, custom elements, the golden set, and the read-only local MCP server source | **Exists as source**, private; no published binaries | [`packages/tools`](../packages/tools/README.md) |
 | Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, deployed at https://texuli.com (Cloudflare Pages) with two Pages Functions (`functions/`: agent-facing request shaping and a same-origin Umami analytics proxy, off until the owner provisions it) | [`apps/website`](../apps/website/README.md) |
-| npm 0.x release | **Done** — all 15 packages as `0.2.0` (after the `0.1.0-next.0`–`next.3` previews), dist-tags `latest` and `next`, CI-published with provenance | [RELEASE](RELEASE.md) |
+| npm 0.x release | **Done** — all 16 packages as `0.3.0` (after `0.2.0` for 15 packages and the `0.1.0-next.0`–`next.3` previews), dist-tags `latest` and `next`, CI-published with provenance | [RELEASE](RELEASE.md) |
 | npm stable release (1.0.0) | Planned; needs the developer's explicit go. texuli.com deploys from `main` (Cloudflare Pages) | — |
 
 ## Success criteria
@@ -118,7 +119,7 @@ closed, documented catalog that can be validated before anything renders.
 
 ## Honest boundaries
 
-- The implementation is pre-1.0. All 15 packages are on npm as `0.2.0`
+- The implementation is pre-1.0. All 16 packages are on npm as `0.3.0`
   (published by CI with provenance; `latest` and `next` both point to it; not
   a stable release: under 0.x a new minor may contain breaking changes, and
   1.0.0 will be the first stable release), and the

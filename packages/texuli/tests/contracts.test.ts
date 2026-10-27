@@ -747,6 +747,13 @@ describe('button', () => {
         'uses logical properties only (no physical top/right/bottom/left)': () => {
           expect(buttonCss()).not.toMatch(/(^|[^-a-z])(top|right|bottom|left)\s*:/);
         },
+        // A host that layers its element defaults (`a { color }`) before
+        // Texuli's keeps Button colors; the cascade itself is measured in a
+        // browser by tests/e2e/texuli-polish.spec.ts.
+        'ships no unlayered anchor pin rules; every rule sits in tx.components': () => {
+          expect(buttonCss()).not.toMatch(/^\s*a\.tx-button/m);
+          expect(buttonCss()).toContain('@layer tx.components');
+        },
       });
     });
   });

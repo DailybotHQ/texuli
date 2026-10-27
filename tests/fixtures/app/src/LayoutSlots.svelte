@@ -4,7 +4,7 @@
  * 600 px wide element in its own horizontal scroller, the way an app shows a
  * wide table. The layout component is rendered directly, not through
  * LayoutHost, so a phone width does not swap it for its mobile fallback.
- * tests/e2e/layout-slot-minsize.spec.ts checks the layout never grows past
+ * tests/e2e/layouts-app.spec.ts checks the layout never grows past
  * the viewport: the screen slot shrinks and the wide element scrolls inside.
  */
 import type { Component } from 'svelte';

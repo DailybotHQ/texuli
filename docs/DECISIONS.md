@@ -5,6 +5,9 @@ reverse it. Newest last.
 
 ## ADR-001: Keep `@internationalized/date` for calendar and date math
 
+Superseded by ADR-006 as of the `0.3.0` release. The `0.2.0` packages still
+reflect this decision.
+
 - **Date:** 2026-10-23 · **Decided by:** the project owner.
 - **Context:** Texuli builds its components, primitives and charts from scratch
   and has no third-party runtime dependency except this one. The date
@@ -209,7 +212,7 @@ reverse it. Newest last.
   `io.github.dailybothq` — a GitHub-account namespace, verifiable without a
   domain.
 - **Choice:** `com.texuli`, artifacts `texuli-spec` and `texuli-compose`,
-  versions tracking the npm release line they mirror (`0.2.0`).
+  versions tracking the npm release line they mirror (`0.3.0`).
 - **Why:** texuli.com is owned and deployed, so the Central Portal can verify
   the namespace by DNS, and the group matches the Kotlin package names the
   sources already use (`com.texuli.spec.runtime`, `com.texuli.compose`).
@@ -219,3 +222,30 @@ reverse it. Newest last.
   — a rename lands as new coordinates, never an overwrite. Publication itself
   (Central Portal account, GPG key, `maven-publish` wiring) remains planned
   and needs an owner GO.
+
+## ADR-006: Own Gregorian date arithmetic in `@texuli/date`
+
+- **Date:** 2026-10-27 · **Decided by:** the project owner.
+- **Context:** `@internationalized/date` is the sole third-party runtime
+  dependency of Texuli's headless component packages. The owner prioritizes
+  owning this behavior and removing that dependency. Texuli's date picker
+  stores Gregorian ISO dates; the calendar primitive previously exposed
+  additional calendar systems through its `calendar` prop.
+- **Options:** (1) keep the external library; (2) implement the Gregorian
+  date-only contract in an owned framework-free package; (3) reproduce all
+  calendar systems and time-zone features of the external library.
+- **Choice:** add L0 `@texuli/date` with `CalendarDate`, Gregorian arithmetic,
+  ISO parsing, locale week starts, and time-zone-aware `today`. The calendar
+  component accepts `calendar="gregory"`; other calendar systems are not
+  supported in this contract. The change ships in the `0.3.0` release, the
+  first publication of `@texuli/date`; the `0.2.0` packages keep the
+  `@internationalized/date` behavior and dependency.
+- **Why:** this is the behavior the date picker uses today, and it eliminates
+  the runtime dependency without adopting the much larger maintenance scope
+  of 13 calendar systems. The public calendar restriction is a breaking
+  change, so it ships in a new pre-1.0 minor, `0.3.0`.
+- **Reverse when:** another calendar system becomes a product requirement.
+  Extend `@texuli/date` with a tested calendar implementation and widen the
+  `CalendarIdentifier` type, or make the additional implementation an
+  optional adapter. Reintroducing a third-party library requires a new
+  supply-chain decision.

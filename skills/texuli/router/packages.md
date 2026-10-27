@@ -2,8 +2,8 @@
 
 Every workspace package, its layer and its public entries. Layers point down
 only: a package imports only from lower layers (the repository's
-`scripts/check-layers.ts` enforces it). **15 of these 16 packages are on npm
-as `0.2.0`** (published by CI with provenance; `latest` and `next` both
+`scripts/check-layers.ts` enforces it). **16 of these 17 packages are on npm
+as `0.3.0`** (published by CI with provenance; `latest` and `next` both
 point to it; pre-1.0, not stable; the workspace packages stay
 `private: true`), so install them plainly (`pnpm add texuli`), import them in
 a Texuli workspace, or copy components with the CLI
@@ -20,6 +20,7 @@ rest.
 | Layer | Package | What it is | Public entries |
 | --- | --- | --- | --- |
 | L0 | `@texuli/core` | Texels: framework-free behavior and policy that every Texuli component is built from. | `@texuli/core`, `@texuli/core/announcer`, `@texuli/core/controllable`, `@texuli/core/dir-locale`, `@texuli/core/dismiss`, `@texuli/core/editor-history`, `@texuli/core/editor-keymap`, `@texuli/core/editor-markdown`, `@texuli/core/editor-model`, `@texuli/core/editor-transforms`, `@texuli/core/env`, `@texuli/core/focus-scope`, `@texuli/core/form-bridge`, `@texuli/core/ids`, … (28 entries) |
+| L0 | `@texuli/date` | Dependency-free Gregorian calendar dates (`CalendarDate`, month and week helpers) behind the calendar and date pickers; first published in `0.3.0`. | `@texuli/date`, `@texuli/date/calendar` |
 | L0 | `@texuli/spec` | The schema-first blueprint contract: JSON schemas, the catalog vocabulary, deterministic TypeScript and Kotlin projections, and the conformance harness. | `@texuli/spec`, `@texuli/spec/codegen` |
 | L1 | `@texuli/primitives` | Owned, headless Svelte 5 primitives built on the texels. | `@texuli/primitives`, `@texuli/primitives/accordion`, `@texuli/primitives/alert-dialog`, `@texuli/primitives/avatar`, `@texuli/primitives/calendar`, `@texuli/primitives/checkbox`, `@texuli/primitives/collapsible`, `@texuli/primitives/color-picker`, `@texuli/primitives/combobox`, `@texuli/primitives/command`, `@texuli/primitives/context-menu`, `@texuli/primitives/date-field`, `@texuli/primitives/date-picker`, `@texuli/primitives/dialog`, … (42 entries) |
 | L2 | `@texuli/tokens` | The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. | `@texuli/tokens`, `@texuli/tokens/aa-gate`, `@texuli/tokens/aa-gate/components`, `@texuli/tokens/base.css`, `@texuli/tokens/build`, `@texuli/tokens/contract`, `@texuli/tokens/css`, `@texuli/tokens/forced-colors`, `@texuli/tokens/forced-colors.css`, `@texuli/tokens/generator`, `@texuli/tokens/library`, `@texuli/tokens/library-expand`, `@texuli/tokens/modes`, `@texuli/tokens/no-flash`, … (18 entries) |

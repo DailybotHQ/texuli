@@ -7,13 +7,13 @@
     },
     "ai-diff-reviewer": {
       "enabled": true,
-      "note": "required local review: vendored skill (skills CLI, pinned v3.3.14, recorded in skills-lock.json) + repo-tailored .review/extension.md; Flow A (local) only - Flow B CI not installed",
-      "version": "v3.3.14"
+      "note": "required local review: vendored skill (skills CLI, pinned v3.3.16, recorded in skills-lock.json) + repo-tailored .review/extension.md; Flow A (local) only - Flow B CI not installed",
+      "version": "v3.3.16"
     },
     "herdr": {
       "enabled": true,
-      "note": "herdr-peers 1.0.0 (protocol 1) on this machine; delegation still needs each plan's agent_delegation grant",
-      "version": "v1.0.0"
+      "note": "herdr-peers 1.1.0 (protocol 1) on this machine; delegation still needs each plan's agent_delegation grant",
+      "version": "v1.1.0"
     }
   },
   "host": {

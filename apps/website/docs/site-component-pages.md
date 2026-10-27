@@ -4,7 +4,7 @@
 **Paths:** `/component-pages/`, `/component-pages/<id>/`  
 **Surface:** `src/components/component-pages/`, `src/pages/component-pages/`  
 **E2E:** `tests/e2e/site-component-pages.spec.ts`  
-**Unit:** `scripts/tests/site-loaders.test.ts`
+**Unit:** `scripts/tests/site-loaders.test.ts`, `apps/website/tests/component-pages.test.ts` (sections, controls, family notes)
 
 ## Goal
 
@@ -47,6 +47,11 @@ pnpm build
 pnpm vitest run scripts/tests/site-loaders.test.ts
 TEXULI_E2E_PORT=4920 pnpm exec playwright test tests/e2e/site-component-pages.spec.ts
 ```
+
+The spec (one test) drives the badge props panel into the live code sample,
+toggles the dropdown menu stage, and runs axe under forced colors on one page
+per family; every page's required sections are unit-tested, and axe in light
+and dark runs on a sample in the page sweep (`a11y-site.spec.ts`).
 
 ## Limits
 

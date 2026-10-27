@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { CalendarDate } from '@internationalized/date';
+import type { CalendarDate } from '@texuli/date';
 import type { Snippet } from 'svelte';
 import * as Popover from '../popover/index.ts';
 import {

@@ -14,7 +14,7 @@ A screenshot review of every route family found the issues below. The spec keeps
 
 ## What the spec checks
 
-**Every swept page** (up to four evenly spaced pages of each route group of the sitemap, plus the 404), in light and dark. The per-page check runs in the page sweep, `tests/e2e/a11y-site.spec.ts`, on the same page loads as axe (primitive pages: `site-live-primitives.spec.ts`, with the demo mounted). Chromium and the Pixel 7 walk every swept page; WebKit walks one page per route group.
+**Every swept page** (one page of each route group of the sitemap, plus the 404), in light and dark. The per-page check runs in the page sweep, `tests/e2e/a11y-site.spec.ts`, on the same page loads as axe (primitive pages: `site-live-primitives.spec.ts`, with the demo mounted). The website suite runs on Chromium.
 
 | Check | Fails when |
 | --- | --- |
@@ -24,8 +24,8 @@ A screenshot review of every route family found the issues below. The spec keeps
 | Broken images | A rendered `<img>` has no pixels |
 | Illustration fallbacks | A slot without artwork lacks its texel mosaic |
 
-**Targeted checks** (`tests/e2e/site-visual.spec.ts`):
-- **Theme swatches:** the switcher and the theme gallery paint the palette of the active mode (dark when the site is dark).
+**Targeted checks** (`tests/e2e/site-visual.spec.ts`, one test):
+- **Theme previews:** the theme gallery's previews paint the palette of the active mode (the switcher's swatches are checked in `site-theme-switcher.spec.ts`).
 - **Inline code** keeps the spaces around it (the guides).
 - **Demo frames** fit their column on a phone.
 - **Geo maps and heatmaps** paint a color scale, not one flat fill.
@@ -76,6 +76,6 @@ Measured on 2026-10-23 after merging dev (Chromium, every same-origin file, gzip
 ## Limits
 
 - **Visual design quality** beyond these checks is reviewed by eye, from screenshots. The spec catches regressions of the found classes, not taste.
-- **Sampling on WebKit:** one page per route group.
+- **Chromium only:** the website suite does not run WebKit or the Pixel 7; phone widths are checked by viewport size (`site-responsive.spec.ts`).
 - **The escaping-element check** ignores fixed elements and anything inside a scroll container. A panel clipped inside its own scroller can still need a screenshot to spot.
 - **Library CSS of other stage families** still loads on component pages (about 4 KB gzip: chart families, composition canvas, data blocks). Astro links a lazily reachable module's CSS on every page with a demo when that CSS is also server-rendered elsewhere on the site (the chart, media and blocks pages). `/blocks-page/` sits 0.2 KB under its page budget, `/theme-switcher/` 0.5 KB. Trimming the stage router's preload list (2 KB gzip) is not possible from the site config: Astro sets the client build's `modulePreload` itself.

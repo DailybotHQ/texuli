@@ -3,7 +3,7 @@
 **App:** `apps/website`  
 **Page:** `/agents-page/`  
 **Components:** `src/components/agents-page/`  
-**Tests:** `tests/e2e/site-agents-page.spec.ts`
+**Tests:** `scripts/tests/site-loaders.test.ts` (the committed catalog and llms snapshots); axe and polish in the page sweep, `tests/e2e/a11y-site.spec.ts`; links in the built-site audit, `tests/e2e/site-seo.spec.ts`
 
 ## Goal
 
@@ -17,7 +17,7 @@ Explain how coding agents build with Texuli:
 - **Golden set** quality gates
 - Same-origin links to **`/llms/llms.txt`**, **`/llms/llms-full.txt`**, **`/catalog/catalog.json`**
 
-Static HTML after build. No runtime network. Axe WCAG 2.1 A/AA in light and dark on desktop and Pixel 7.
+Static HTML after build. No runtime network. Axe WCAG 2.1 A/AA in light and dark (the page sweep).
 
 ## Components
 
@@ -52,5 +52,7 @@ longer matches the manifests.
 ## Validation
 
 ```bash
-bash -c 'pnpm build && TEXULI_E2E_PORT=4930 pnpm exec playwright test tests/e2e/site-agents-page.spec.ts'
+pnpm vitest run scripts/tests/site-loaders.test.ts
+pnpm build
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts tests/e2e/site-seo.spec.ts
 ```

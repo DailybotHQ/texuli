@@ -1,4 +1,4 @@
-import { type CalendarDate, parseDate } from '@internationalized/date';
+import { type CalendarDate, parseDate } from '@texuli/date';
 import { getContext, setContext } from 'svelte';
 
 /** A canonical `YYYY-MM-DD` string as a `CalendarDate`, or `null` when empty or invalid. */

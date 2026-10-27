@@ -3,7 +3,7 @@
 **App:** `apps/website`  
 **Routes:** `/component-pages/<id>/`  
 **Surface:** `src/components/live/`  
-**E2E:** `tests/e2e/site-live-components.spec.ts`  
+**E2E:** `tests/e2e/site-component-pages.spec.ts`  
 **Unit:** `scripts/tests/site-loaders.test.ts`  
 **A11y:** `tests/e2e/a11y-site.spec.ts` (zero exclusions on every built page)
 
@@ -77,14 +77,15 @@ and **no** excluded selectors. Fixes at source include:
 ```bash
 pnpm vitest run scripts/tests/site-loaders.test.ts
 pnpm build
-TEXULI_E2E_PORT=4920 pnpm exec playwright test tests/e2e/site-live-components.spec.ts
+TEXULI_E2E_PORT=4920 pnpm exec playwright test tests/e2e/site-component-pages.spec.ts
 TEXULI_E2E_PORT=4920 pnpm exec playwright test tests/e2e/a11y-site.spec.ts
 ```
 
 The per-id check (the live stage is ready, its marker is on screen, no request leaves the origin)
 runs on desktop Chromium inside the page sweep, `a11y-site`, on the same page loads as its axe in
-light and dark. `site-live-components` checks that the catalog covers every built page, the props
-panel, the menu chrome, and family axe under forced colors on the desktop projects.
+light and dark. `site-component-pages.spec.ts` checks the props panel, the menu chrome, and
+family axe under forced colors; the marker registry covering every catalog id is unit-tested in
+`scripts/tests/site-loaders.test.ts`.
 
 - Families load on first need via `@texuli/core/lazy`, one chunk per family.
 - Component pages mount layouts inline. The gallery mounts every preview in the isolated preview document, and full-page layouts render inert there with a link to their live document. See [site-gallery-components.md](site-gallery-components.md).

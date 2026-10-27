@@ -36,9 +36,10 @@ the same pieces are safe to hand to a machine.
 ![The Texuli website](docs/assets/screenshots/homepage.png)
 
 > **Status: in development, pre-1.0.** The screenshot above is the
-> texuli.com website, which deploys from `main` to Cloudflare Pages. The 15
-> packable packages are on npm as the `0.2.0` release (published by CI with
-> provenance; `latest` and `next` both point to it). It is not a stable
+> texuli.com website, which deploys from `main` to Cloudflare Pages. The 16
+> packable packages are released on npm as `0.3.0` (published by CI with
+> provenance; `latest` and `next` both point to it), including the first
+> release of `@texuli/date`. It is not a stable
 > release: under 0.x a new minor may contain breaking changes, and 1.0.0 will
 > be the first stable release. The workspace packages stay `private: true`
 > ([RELEASE](docs/RELEASE.md)).
@@ -88,6 +89,7 @@ Every layer is a package with one job, and every dependency points down only
 | Layer | Package | The small pieces |
 | --- | --- | --- |
 | L0 | [`@texuli/core`](packages/core/README.md) | **Texels**: framework-free behavior and policy — the overlay engine, roving focus, positioning, ids, the two-tier URL policy |
+| L0 | [`@texuli/date`](packages/date/README.md) | Dependency-free Gregorian calendar dates behind the calendar and date pickers |
 | L0 | [`@texuli/spec`](packages/spec/README.md) | The schema-first blueprint contract, with TypeScript and Kotlin projections |
 | L1 | [`@texuli/primitives`](packages/primitives/README.md) | 41 owned headless primitives, one subpath each, held to the APG patterns |
 | L2 | [`@texuli/tokens`](packages/tokens/README.md) | The OKLCH theme engine, the `--tx-*` token contract, 200+ themes, compiled CSS |
@@ -186,10 +188,10 @@ every verified command.
 
 ## Honest boundaries
 
-- **No stable release yet.** The 15 packable packages are on npm as `0.2.0`,
+- **No stable release yet.** The 16 packable packages are on npm as `0.3.0`,
   a pre-1.0 release (`npm install texuli`; `latest` and `next` both point to
-  it). Under 0.x a new minor (`0.3.0`) may contain breaking changes, so pin
-  the exact version or use `^0.2.0`; 1.0.0 will be the first stable release.
+  it). Under 0.x a new minor (`0.4.0`) may contain breaking changes, so pin
+  the exact version or use `^0.3.0`; 1.0.0 will be the first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with
   `pnpm dev`.

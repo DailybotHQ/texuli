@@ -176,8 +176,8 @@ form**; only its CI surface is optional.
 
 - Scope: an **opt-in** connection to the developer's **Dailybot team**. When
   accepted, it offers (never forces) install of the **Dailybot agent skill**
-  (`npx --yes skills add https://github.com/DailybotHQ/agent-skill/tree/v3.23.17 --skill dailybot -y`,
-  currently **3.23.17**; or OpenClaw `openclaw skills install dailybot`) and/or
+  (`npx --yes skills add https://github.com/DailybotHQ/agent-skill/tree/v3.23.20 --skill dailybot -y`,
+  currently **3.23.20**; or OpenClaw `openclaw skills install dailybot`) and/or
   the **Dailybot CLI** (`dailybot-cli >= 3.9.0`,
   via pip, Homebrew, or the Dailybot skill's SHA-256-verified installer flow —
   never a one-line remote-installer pipe); **defers all authentication** to the
@@ -291,7 +291,7 @@ form**; only its CI surface is optional.
 
 - **Required local review (baseline since standard 2.3.0).** The `onboard` flow
   **MUST** install the vendored coding-agent skill
-  (`npx --yes skills add https://github.com/DailybotHQ/ai-diff-reviewer/tree/v3.3.14 --skill ai-diff-reviewer -y`
+  (`npx --yes skills add https://github.com/DailybotHQ/ai-diff-reviewer/tree/v3.3.16 --skill ai-diff-reviewer -y`
   — **tag-pinned**, both `--yes` and `-y` required) and bootstrap a
   repo-tailored extension file (`.review/extension.md`, via the upstream
   `generate-extension` sub-skill) as part of the baseline scaffolding
@@ -348,14 +348,14 @@ form**; only its CI surface is optional.
 ### 6.6 Herdr (sixth addon — interactive delegation transport, thin integrator)
 
 An optional addon integrating **herdr-peers** (`DailybotHQ/herdr-peers`,
-MIT, its own release cycle) pinned at `v1.0.0` (protocol/interface `1`), as
+MIT, its own release cycle) pinned at `v1.1.0` (protocol/interface `1`), as
 the **interactive** transport of v7 delegation
 ([`V7_CONTRACT.md`](V7_CONTRACT.md)): one `herdr-peers ask` to a peer agent
 in a [Herdr](https://herdr.dev) pane on any reachable machine, recorded in
 the plan journal before the reply is relied on, the reply asserted until
 the plan's own gates observe the work. `onboard` Phase 7b offers it as an
 **explicit opt-in**; installs are the pinned skills
-(`herdr-peers@v1.0.0`, Herdr's official `herdr@v0.9.3`).
+(`herdr-peers@v1.1.0`, Herdr's official `herdr@v0.9.3`).
 
 Placement decision (revised for 7.0.0): the peer protocol — stamp, grant,
 reply, loop guard, depth limit 1, fan-out cap, scope — moved out of the
@@ -365,6 +365,13 @@ required**: a repository without Herdr runs every task in the current
 session and stays fully conformant. Full contract:
 [`SKILL.md`](../addons/herdr/SKILL.md), [`SPEC.md`](../addons/herdr/SPEC.md),
 `install.md`, `templates/INTEGRATION.md`.
+
+**Decision debates.** With the addon in use and `decisions.debate` at
+`auto` ([`CONFIG.md`](CONFIG.md) §3b), a plan settles each consequential
+decision through a herdr-peers *decide* debate planned as a decision task
+and approved with the plan; without any of its preconditions the decision
+is the agent's own record, and a debate never blocks
+([`SPEC.md`](../addons/herdr/SPEC.md) §6.4).
 
 ### 6.7 DeepWorkPlan Vim (seventh addon — optional terminal editor, thin integrator)
 
@@ -443,12 +450,12 @@ The shipped set:
 | key | product (pinned) | provides_abilities | requires_grants | transport |
 |---|---|---|---|---|
 | `agentkit` | `DailybotHQ/coding-agents-kit` `v1.0.1`, interface 1 | `subagents`, `cancel_children`, `model_routing` | `agent_delegation` | `headless` |
-| `ai-diff-reviewer` | `DailybotHQ/ai-diff-reviewer` `v3.3.14` | — | — | — |
-| `dailybot` | `DailybotHQ/agent-skill` `v3.23.17` | `telemetry` (reporting only, consent-gated) | — | — |
+| `ai-diff-reviewer` | `DailybotHQ/ai-diff-reviewer` `v3.3.16` | — | — | — |
+| `dailybot` | `DailybotHQ/agent-skill` `v3.23.20` | `telemetry` (reporting only, consent-gated) | — | — |
 | `dependency-upgrade` | in-pack only | — | — | — |
 | `design-system` | in-pack only | — | — | — |
 | `devcontainer` | `DailybotHQ/devcontainer-kit` `v1.0.1`, interface 2 | — | — | — |
-| `herdr` | `DailybotHQ/herdr-peers` `v1.0.0`, interface 1 | `subagents`, `cancel_children` | `agent_delegation` | `interactive` |
+| `herdr` | `DailybotHQ/herdr-peers` `v1.1.0`, interface 1 | `subagents`, `cancel_children` | `agent_delegation` | `interactive` |
 | `vim` | `DailybotHQ/deepworkplan-vim` `v1.0.0`, interface 1 | — | — | — |
 
 A descriptor is **data**: the pack executes nothing it names except its

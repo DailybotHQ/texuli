@@ -6,7 +6,7 @@ asserts only what a user or assistive technology can observe, so a row stays
 true however the markup changes.
 
 ```bash
-# Every primitive on Chromium and WebKit, touch rows on the Pixel 7 (set your lane port)
+# Every primitive on Chromium and WebKit, phone rows in a Pixel 7 context (set your lane port)
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior
 
 # One primitive
@@ -46,8 +46,8 @@ It never reads DOM shape or class names.
 ## Pass rules (absolute limits)
 
 A primitive passes when:
-1. **every row passes**, on Chromium and WebKit, and on the Pixel 7 for the
-   phone-specific rows (below). A flaky row gets at most two retries;
+1. **every row passes**, on Chromium and WebKit, and in the Pixel 7 context
+   for the phone-specific rows (below). A flaky row gets at most two retries;
 2. its subpath stays within its **`texuli.budgets.json` cap** (`pnpm size`);
 3. its **open-to-focus p75** stays within its limit in
    `OPEN_TO_FOCUS_P75_MS` (`harness/limits.ts`; 150 ms where none is
@@ -56,7 +56,8 @@ A primitive passes when:
 Timing is a wall-clock check, so it is asserted only with `TEXULI_PERF=1`.
 The samples are always written to `tmp/behavior-results/<project>/` for
 `limits-cli.ts`. The listed limits were measured with
-`limits-cli.ts --measure`: the worst p75 across the three projects, doubled
+`limits-cli.ts --measure`: the worst p75 across Chromium, WebKit and the
+Pixel 7 profile (`<project>` is `mobile` for phone rows), doubled
 and rounded up to 10 ms, with a 50 ms floor.
 
 ## Files
@@ -65,7 +66,7 @@ and rounded up to 10 ms, with a 50 ms floor.
 tests/behavior/scenarios/<primitive>/scenario.svelte   the scenario page (@texuli/primitives public API)
 tests/behavior/scenarios/<primitive>.spec.ts           the rows
 tests/behavior/scenarios/common.ts                     helpers the scenarios share
-tests/behavior/harness/                                 oracle, limits, row runner, self test, sample
+tests/behavior/harness/                                 oracle, limits, rows (pure rules), row runner, self test, sample
 tests/fixtures/behavior/                                the host and registry the fixture app mounts
 ```
 
@@ -106,13 +107,20 @@ defaults and the context's web storage and permissions are cleared. The HTTP
 cache is kept, which is what makes it cheaper than one test per row. The test
 fails listing every failed row, and a flaky row is retried on a brand-new page.
 
-The Pixel 7 is Chromium again, so it runs only the **phone-specific** rows:
-those whose title or body uses touch (`tap`, `touch…`, `swipe`), branches on
-`project`, or reads the viewport (`runsOn` and `PHONE_SPECIFIC` in
-`harness/index.ts`). Keyboard, focus, role and axe rows run on Chromium and
+The Pixel 7 is Chromium again, so the **phone-specific** rows run inside
+the Chromium project's test, after its desktop rows, in a second browser
+context with the Pixel 7 profile (touch, phone viewport, mobile user agent).
+The behavior suite therefore has two projects, Chromium and WebKit, and no
+skipped tests (`playwright.config.ts` keeps the `mobile` project out of
+`tests/behavior`; other suites still use it). A row is phone-specific when
+its title or body uses touch (`tap`, `touch…`, `swipe`), branches on
+`project`, or reads the viewport (`runsOn`, `rowsFor` and `PHONE_SPECIFIC` in
+`harness/rows.ts`). There it runs with `project: 'mobile'` and
+`touch: true`; read those from the row context, never from
+`test.info().project`. Keyboard, focus, role and axe rows run on Chromium and
 WebKit. Two options per row:
-- `projects: ['mobile']` runs a row only there (touch rows), and
-  `['chromium', 'webkit']` keeps it off the phone;
+- `projects: ['mobile']` runs a row only in the Pixel 7 context (touch rows),
+  and `['chromium', 'webkit']` keeps it off the phone;
 - `isolate: true` gives a row its own test and browser context, for state
   that is context-wide (an installed `page.clock`).
 
@@ -121,13 +129,15 @@ as a separate `test()`.
 
 ## The self test
 
-`harness/self.spec.ts` checks the harness itself:
-- the limit rules on fixed data;
+The pure rules (the limits on fixed data, row ids, and which rows run where)
+are Vitest tests in `scripts/tests/behavior-harness.test.ts`.
+`harness/self.spec.ts` checks the browser half of the harness:
 - the sample scenario (`harness/sample/`): every row passes, and the
   open-to-focus samples are recorded;
 - a deliberately broken copy (focus not returned, scroll lock never released),
   which fails exactly the two rows that guard those bugs;
 - an unknown scenario, which reports an error instead of hanging.
 
-The sample-scenario checks run on Chromium only: they test the harness, and
-every real scenario already runs the oracle on WebKit and the Pixel 7.
+The self test runs on Chromium only (`playwright.config.ts`): it tests the
+harness, and every real scenario already runs the oracle on WebKit and the
+Pixel 7 profile.

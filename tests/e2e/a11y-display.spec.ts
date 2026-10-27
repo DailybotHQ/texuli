@@ -1,7 +1,10 @@
 /**
  * Accessibility sweep: display components, data views, charts and media.
- * axe with zero exclusions in light and dark; forced-colors, keyboard, RTL and
- * 400% reflow on representative interactive fixtures. Fix findings at source.
+ * axe with zero exclusions on every example in light and dark (one page
+ * session per half of the list); forced colors, keyboard, RTL and 400%
+ * reflow on representative interactive fixtures in one more session. The
+ * smoke page (unsafe link blocked) and the icon glyphs ride along. Fix
+ * findings at source.
  */
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
@@ -18,6 +21,9 @@ const DISPLAY_EXAMPLES = [
   'texuli-timeline',
   'ui-avatar',
   'ui-carousel',
+  'texuli-icons',
+  'texuli-scroll-area',
+  'texuli-tree',
 ] as const;
 
 /** Data view examples (including FIX-a11y-deferred set). */
@@ -67,17 +73,6 @@ async function gotoFixture(
   }
 }
 
-async function axeExample(page: Page, id: FixtureId): Promise<void> {
-  const host = page.locator(`[data-example-host="${id}"]`);
-  const target =
-    (await page.locator(`[data-example="${id}"]`).count()) > 0
-      ? `[data-example="${id}"]`
-      : `[data-example-host="${id}"]`;
-  await expect(host).toBeVisible();
-  const results = await new AxeBuilder({ page }).include(target).analyze();
-  expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
-}
-
 /** Collects axe violations per example instead of stopping at the first one. */
 async function axeProblems(page: Page, id: FixtureId, label: string): Promise<string[]> {
   const target =
@@ -91,29 +86,25 @@ async function axeProblems(page: Page, id: FixtureId, label: string): Promise<st
   );
 }
 
-const GROUPS = {
-  display: DISPLAY_EXAMPLES,
-  data: DATA_EXAMPLES,
-  charts: CHART_EXAMPLES,
-  media: MEDIA_EXAMPLES,
-} as const;
+/** Two halves of the list, one page session each. */
+const HALVES = [
+  [...DISPLAY_EXAMPLES, ...MEDIA_EXAMPLES],
+  [...DATA_EXAMPLES, ...CHART_EXAMPLES],
+] as const;
 
-test.describe('a11y display · light and dark axe', () => {
-  // One page session per group: every example, light then dark.
-  for (const [group, ids] of Object.entries(GROUPS)) {
-    test(`${group} examples pass axe in light and dark`, async ({ page }) => {
-      test.setTimeout(ids.length * 30_000);
-      const problems: string[] = [];
-      for (const id of ids) {
-        for (const mode of ['light', 'dark'] as const) {
-          await gotoFixture(page, id, mode);
-          problems.push(...(await axeProblems(page, id, mode)));
-        }
+for (const ids of HALVES) {
+  test(`${ids[0]} … ${ids.at(-1)} pass axe in light and dark`, async ({ page }) => {
+    test.setTimeout(ids.length * 20_000);
+    const problems: string[] = [];
+    for (const id of ids) {
+      for (const mode of ['light', 'dark'] as const) {
+        await gotoFixture(page, id, mode);
+        problems.push(...(await axeProblems(page, id, mode)));
       }
-      expect(problems).toEqual([]);
-    });
-  }
-});
+    }
+    expect(problems).toEqual([]);
+  });
+}
 
 /** WCAG contrast of an element's text against its own (opaque) background fill. */
 async function textContrast(page: Page, selector: string): Promise<number> {
@@ -146,58 +137,142 @@ async function textContrast(page: Page, selector: string): Promise<number> {
     });
 }
 
-// POLISH_AUDIT P1-02: an alert in a scoped dark section of a light page kept the
-// page's light soft fill under the section's light text (contrast 1.01). axe
-// does not flag it, so the pair is measured directly.
-test('texuli-alert keeps AA body contrast in its scoped dark section', async ({ page }) => {
-  await gotoFixture(page, 'texuli-alert', 'light');
-  const body = '.dark-panel .tx-alert__text';
-  await expect(page.locator('.dark-panel[data-tx-theme]')).toBeVisible();
-  expect(await textContrast(page, body)).toBeGreaterThanOrEqual(4.5);
-});
+/** Stable set + every FIX-a11y-deferred fixture (light and dark are swept above). */
+const FORCED: FixtureId[] = [
+  'texuli-badge',
+  'texuli-table',
+  'texuli-timeline',
+  'data-grid-core',
+  'data-timeline',
+  'data-board',
+  'data-calendar',
+  'data-files',
+  'data-virtual-list',
+  'data-map',
+  'data-tree-view',
+  'charts-interaction',
+  'media-gallery',
+  'media-video',
+];
+const REFLOW: FixtureId[] = ['texuli-card', 'texuli-stat', 'charts-compact', 'media-audio'];
+const RTL: FixtureId[] = ['ui-avatar', 'texuli-table', 'data-timeline', 'charts-compact'];
 
-test.describe('a11y display · forced-colors', () => {
-  // Stable set + every FIX-a11y-deferred fixture (light/dark covered above).
-  const FORCED: FixtureId[] = [
-    'texuli-badge',
-    'texuli-table',
-    'texuli-timeline',
-    'data-grid-core',
-    'data-timeline',
-    'data-board',
-    'data-calendar',
-    'data-files',
-    'data-virtual-list',
-    'data-map',
-    'data-tree-view',
-    'charts-interaction',
-    'media-gallery',
-    'media-video',
-  ];
+test('forced colors, 320px reflow, RTL, keyboard, roles and the scoped dark alert', async ({
+  page,
+}) => {
+  test.setTimeout(240_000);
+  const problems: string[] = [];
 
-  test('every listed example passes axe under forced-colors', async ({ page }) => {
-    test.setTimeout(FORCED.length * 20_000);
+  await test.step('forced colors: every listed example passes axe', async () => {
     await page.emulateMedia({ forcedColors: 'active', colorScheme: 'light' });
-    const problems: string[] = [];
     for (const id of FORCED) {
       await gotoFixture(page, id, 'light');
       problems.push(...(await axeProblems(page, id, 'forced colors')));
     }
-    expect(problems).toEqual([]);
+    await page.emulateMedia({ forcedColors: 'none' });
   });
-});
 
-test.describe('a11y display · 400% reflow (320 CSS px)', () => {
-  const REFLOW: FixtureId[] = ['texuli-card', 'texuli-stat', 'charts-compact', 'media-audio'];
+  await test.step('RTL: every listed example passes axe with dir=rtl', async () => {
+    for (const id of RTL) {
+      await gotoFixture(page, id, 'light');
+      await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));
+      problems.push(...(await axeProblems(page, id, 'rtl')));
+    }
+  });
 
-  test('every listed example stays usable at 320px width', async ({ page }) => {
-    test.setTimeout(REFLOW.length * 20_000);
+  // POLISH_AUDIT P1-02: an alert in a scoped dark section of a light page kept
+  // the page's light soft fill under the section's light text (contrast 1.01).
+  // axe does not flag it, so the pair is measured directly.
+  await test.step('texuli-alert keeps AA body contrast in its scoped dark section', async () => {
+    await gotoFixture(page, 'texuli-alert', 'light');
+    await expect(page.locator('.dark-panel[data-tx-theme]')).toBeVisible();
+    expect(await textContrast(page, '.dark-panel .tx-alert__text')).toBeGreaterThanOrEqual(4.5);
+  });
+
+  await test.step('the smoke page blocks an unsafe link and the icons are named or hidden', async () => {
+    await page.goto('/?fixture=smoke');
+    await expect(page.getByRole('heading', { name: 'Texuli fixtures' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Documentation' })).toHaveAttribute(
+      'href',
+      'https://texuli.com/docs'
+    );
+    await expect(page.getByRole('link', { name: 'Unsafe link' })).toHaveCount(0);
+    await expect(page.locator('[data-blocked-link]')).toHaveText('Unsafe link');
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+
+    await gotoFixture(page, 'texuli-icons', 'light');
+    const icons = page.locator('[data-example-host="texuli-icons"]');
+    await expect(icons.getByRole('img', { name: 'Information' }).first()).toBeVisible();
+    await expect(icons.getByRole('img', { name: 'Favorite' }).first()).toBeVisible();
+    await expect(icons.locator('svg[aria-hidden="true"]').first()).toBeVisible();
+  });
+
+  await test.step('grid, tree, scroll area, video, gallery and carousel from the keyboard', async () => {
+    await gotoFixture(page, 'data-grid-core', 'light');
+    const grid = page.locator('[data-example="data-grid-core"]').getByRole('grid').first();
+    await grid.focus();
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowRight');
+
+    await gotoFixture(page, 'texuli-tree', 'light');
+    const tree = page
+      .locator('[data-example="texuli-tree"]')
+      .getByRole('tree', { name: 'Workspace pages', exact: true });
+    await expect(tree.getByRole('treeitem', { name: 'Archive' })).toHaveAttribute(
+      'data-disabled',
+      ''
+    );
+    await tree.focus();
+    await tree.press('ArrowDown');
+    await expect(tree).toHaveAttribute('aria-activedescendant', /item-guides/);
+
+    await gotoFixture(page, 'texuli-scroll-area', 'light');
+    const scrollArea = page.locator('[data-example="texuli-scroll-area"]');
+    await expect(scrollArea.getByRole('region', { name: 'Recent activity' })).toBeVisible();
+    await expect(scrollArea.locator('[data-tx-scroll-area-viewport]').first()).toHaveAttribute(
+      'tabindex',
+      '0'
+    );
+
+    await gotoFixture(page, 'media-video', 'light');
+    const play = page.locator('[data-example="media-video"]').getByRole('button').first();
+    await play.focus();
+    await expect(play).toBeFocused();
+
+    await gotoFixture(page, 'media-gallery', 'light');
+    await expect(
+      page.locator('[data-example="media-gallery"]').getByRole('img').first()
+    ).toBeVisible();
+
+    await gotoFixture(page, 'ui-carousel', 'light');
+    const carousel = page.locator(
+      '[data-example="ui-carousel"], [data-example-host="ui-carousel"]'
+    );
+    const region = carousel
+      .getByRole('region')
+      .first()
+      .or(carousel.locator('[data-tx-carousel]').first());
+    if ((await region.count()) > 0) {
+      await region.first().focus();
+      await page.keyboard.press('ArrowRight');
+    }
+    problems.push(...(await axeProblems(page, 'ui-carousel', 'after keyboard')));
+
+    // The chart explorer shows a tooltip while exploring: axe checks it too.
+    await gotoFixture(page, 'charts-interaction', 'light');
+    const host = page.locator('[data-example-host="charts-interaction"]');
+    await host.getByRole('application').first().focus();
+    await expect(host.locator('[data-chart-live]').first()).toBeVisible();
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('PageDown');
+    problems.push(...(await axeProblems(page, 'charts-interaction', 'exploring')));
+  });
+
+  await test.step('320px reflow: no page scroll and axe-clean', async () => {
     await page.setViewportSize({ width: 320, height: 640 });
-    const problems: string[] = [];
     for (const id of REFLOW) {
       await gotoFixture(page, id, 'light');
-      await expect(page.locator(`[data-example-host="${id}"]`)).toBeVisible();
-      // No horizontal page scroll from the example host.
       const overflow = await page.evaluate(() => {
         const root = document.documentElement;
         return root.scrollWidth - root.clientWidth;
@@ -205,89 +280,7 @@ test.describe('a11y display · 400% reflow (320 CSS px)', () => {
       if (overflow > 1) problems.push(`${id} overflows by ${overflow}px`);
       problems.push(...(await axeProblems(page, id, '320px')));
     }
-    expect(problems).toEqual([]);
   });
-});
 
-test.describe('a11y display · keyboard and roles', () => {
-  test('grid, chart explorer, video, gallery and carousel work from the keyboard and stay axe-clean', async ({
-    page,
-  }) => {
-    test.setTimeout(150_000);
-    await test.step('data-grid-core exposes a named grid and moves focus with arrows', async () => {
-      await gotoFixture(page, 'data-grid-core', 'light');
-      const host = page.locator('[data-example="data-grid-core"]');
-      const grid = host.getByRole('grid').first();
-      await expect(grid).toBeVisible();
-      await grid.focus();
-      await page.keyboard.press('ArrowDown');
-      await page.keyboard.press('ArrowRight');
-      await axeExample(page, 'data-grid-core');
-    });
-
-    await test.step('charts-interaction explores points and toggles series from the keyboard', async () => {
-      await gotoFixture(page, 'charts-interaction', 'light');
-      const host = page.locator('[data-example-host="charts-interaction"]');
-      const explorer = host.getByRole('application').first();
-      await expect(explorer).toBeVisible();
-      await explorer.focus();
-      const live = host.locator('[data-chart-live]').first();
-      await expect(live).toBeVisible();
-      await page.keyboard.press('ArrowRight');
-      await page.keyboard.press('PageDown');
-      await axeExample(page, 'charts-interaction');
-    });
-
-    await test.step('media-video player controls are labelled and keyboard reachable', async () => {
-      await gotoFixture(page, 'media-video', 'light');
-      const host = page.locator('[data-example="media-video"]');
-      await expect(host).toBeVisible();
-      const play = host.getByRole('button').first();
-      await expect(play).toBeVisible();
-      await play.focus();
-      await expect(play).toBeFocused();
-      await axeExample(page, 'media-video');
-    });
-
-    await test.step('media-gallery exposes images with accessible names', async () => {
-      await gotoFixture(page, 'media-gallery', 'light');
-      const host = page.locator('[data-example="media-gallery"]');
-      await expect(host).toBeVisible();
-      const images = host.getByRole('img');
-      await expect(images.first()).toBeVisible();
-      await axeExample(page, 'media-gallery');
-    });
-
-    await test.step('ui-carousel moves slides with arrow keys when focused', async () => {
-      await gotoFixture(page, 'ui-carousel', 'light');
-      const host = page.locator('[data-example="ui-carousel"], [data-example-host="ui-carousel"]');
-      await expect(host.first()).toBeVisible();
-      const region = host
-        .getByRole('region')
-        .first()
-        .or(host.locator('[data-tx-carousel]').first());
-      if ((await region.count()) > 0) {
-        await region.first().focus();
-        await page.keyboard.press('ArrowRight');
-      }
-      await axeExample(page, 'ui-carousel');
-    });
-  });
-});
-
-test.describe('a11y display · RTL', () => {
-  const RTL: FixtureId[] = ['ui-avatar', 'texuli-table', 'data-timeline', 'charts-compact'];
-
-  test('every listed example passes axe with dir=rtl', async ({ page }) => {
-    test.setTimeout(RTL.length * 20_000);
-    const problems: string[] = [];
-    for (const id of RTL) {
-      await gotoFixture(page, id, 'light');
-      await page.evaluate(() => {
-        document.documentElement.setAttribute('dir', 'rtl');
-      });
-      problems.push(...(await axeProblems(page, id, 'rtl')));
-    }
-    expect(problems).toEqual([]);
-  });
+  expect(problems).toEqual([]);
 });

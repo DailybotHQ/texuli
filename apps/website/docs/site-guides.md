@@ -9,8 +9,8 @@
 Product guides for getting started (install or copy), theming, dark mode,
 accessibility, RTL and i18n, forms and performance. Every page includes a
 **live** Texuli snippet that actually runs. Static output, no runtime network
-beyond the page’s own assets, axe WCAG 2.1 A/AA in light and dark on desktop
-and Pixel 7.
+beyond the page’s own assets, axe WCAG 2.1 A/AA in light and dark (the page
+sweep, `a11y-site.spec.ts`).
 
 ## Components
 
@@ -48,8 +48,11 @@ bash -c 'pnpm build && TEXULI_E2E_PORT=4940 pnpm exec playwright test tests/e2e/
 pnpm vitest run scripts/tests/site-loaders.test.ts
 ```
 
-The e2e spec serves `apps/website/dist` on a free port (same pattern as
-`site-docs-shell.spec.ts`).
+The e2e spec (one test since the 2026-10-27 trim) serves `apps/website/dist`
+on a free port: the sidebar marks the page, the pager walks the reading order,
+and the live snippets respond (a button, form validation, the direction
+switch). The reading order, the live islands and the contents are
+unit-tested in `apps/website/tests/docs-reading.test.ts`.
 
 ## Limits
 

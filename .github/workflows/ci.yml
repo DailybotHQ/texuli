@@ -3,8 +3,8 @@
 # Required checks on every push to main and every pull request:
 #   - check:     lint, typecheck, unit + component tests, layers, supply
 #                chain, docs links, agent skill.
-#   - behavior:  the primitives behavior suite on chromium, webkit and
-#                mobile (the suite's three projects).
+#   - behavior:  the primitives behavior suite on chromium and webkit
+#                (phone rows run in a Pixel 7 context inside chromium).
 #   - website:   the website build (which runs `astro check`) plus the
 #                browser e2e suite except the budget tests, in six shards.
 #   - audits:    size budgets and the site-perf budgets (docs/CI.md).
@@ -25,7 +25,8 @@ permissions:
 jobs:
   check:
     name: Lint, types, unit tests, layers
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       # Full history, so tests and scripts that read git (size revisions,
       # check-docs) see the same repository as a local clone.
@@ -44,8 +45,9 @@ jobs:
       - run: pnpm check:skill
 
   behavior:
-    name: Behavior suite (chromium, webkit, mobile)
-    runs-on: ubuntu-latest
+    name: Behavior suite (chromium, webkit)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -65,7 +67,8 @@ jobs:
 
   website:
     name: Website build and site checks (${{ matrix.shard }}/6)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     # Six runners each build the site and run one shard of the same e2e
     # suite (about an hour of summed test time after the 2026-10-27 trim).
     strategy:
@@ -102,7 +105,8 @@ jobs:
 
   audits:
     name: Budget audits (size and site-perf)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6

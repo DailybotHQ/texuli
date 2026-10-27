@@ -111,7 +111,7 @@ manifest entry or the `PRIMITIVES` row instead.
 12. **Content safety:** no `set:html` or `{@html}`; links built from data go
     through `safeHref` from `@texuli/core/url-policy`; fictional data only
     (`example.com`).
-13. **Honesty:** the packages are on npm as `0.2.0` (pre-1.0),
+13. **Honesty:** the packages are on npm as `0.3.0` (pre-1.0),
     not a stable release; the agent service and analytics are not
     provisioned in production. Copy states what ships today
     (`apps/website/tests/copy-honesty.test.ts` bans claims the repository
@@ -125,7 +125,7 @@ pnpm --filter @texuli/website typecheck          # astro check, 0 errors
 pnpm vitest run apps/website                       # site unit tests
 pnpm build                                         # the build log lists the new route
 pnpm --filter @texuli/website check:csp            # every inline hash covered (after build)
-TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-seo.spec.ts tests/e2e/site-aeo.spec.ts tests/e2e/site-ia.spec.ts
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-seo.spec.ts tests/e2e/site-ia.spec.ts
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-<area>.spec.ts
 ```
 

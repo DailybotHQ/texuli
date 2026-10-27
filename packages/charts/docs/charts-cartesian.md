@@ -88,6 +88,6 @@ and **`charts-interaction`** (the building blocks).
 
 ```bash
 pnpm vitest run packages/charts/tests/cartesian.test.ts
-TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e/charts.spec.ts tests/e2e/charts-families.spec.ts
+TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e/charts.spec.ts --project chromium
 TEXULI_E2E_PORT=4870 pnpm visual -g charts-cartesian
 ```

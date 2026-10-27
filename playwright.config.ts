@@ -34,10 +34,17 @@ export default defineConfig({
     baseURL: `http://127.0.0.1:${PORT}`,
     trace: 'retain-on-failure',
   },
+  // The behavior suite runs on chromium and webkit only: its phone rows run
+  // inside the chromium project in a Pixel 7 context (tests/behavior/README.md),
+  // and its harness self test is chromium only. Other suites keep all three.
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-    { name: 'mobile', use: { ...devices['Pixel 7'] } },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+      testIgnore: 'behavior/harness/self.spec.ts',
+    },
+    { name: 'mobile', use: { ...devices['Pixel 7'] }, testIgnore: 'behavior/**' },
   ],
   webServer: {
     command: `pnpm --dir tests/fixtures/app exec vite --host 127.0.0.1 --port ${PORT} --strictPort`,

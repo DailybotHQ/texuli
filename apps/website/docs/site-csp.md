@@ -39,7 +39,7 @@ pages, 2 492 script, 10 487 style and 862 attribute hashes covered.
 
 The browser side (hydration under the real headers, violation observers,
 Trusted Types enforcement) is proven separately by `tests/e2e/csp.spec.ts`.
-`tests/e2e/analytics-csp.spec.ts` checks every route's `trusted-types`
+`tests/e2e/analytics.spec.ts` checks every route's `trusted-types`
 against its HTML (the analytics name appears only where the loader is
 mounted). On an analytics fixture build it also loads the tracker under the
 enforced headers with zero violations (see

@@ -1,117 +1,78 @@
-/// <reference types="node" />
-import { createReadStream, existsSync, readdirSync, statSync } from 'node:fs';
-import { createServer, type Server } from 'node:http';
-import type { AddressInfo } from 'node:net';
-import { extname, join, normalize, resolve } from 'node:path';
-import { expect, type Page, test } from '@playwright/test';
-import { primaryNav } from './support/site-nav.ts';
+import AxeBuilder from '@axe-core/playwright';
+import { expect, test } from '@playwright/test';
+import { expectLiveStage } from './support/live-stage.ts';
+import { serveDist, settle } from './support/site.ts';
 
 /*
- * texuli.com component pages: static HTML from catalog manifests.
- * Run `pnpm build` first. Serves apps/website/dist on an ephemeral port.
+ * Component pages (/component-pages/<id>/), in the browser: the props panel
+ * drives the live code sample, the dropdown menu stage is real Texuli menu
+ * chrome, and a sample of one page per family passes axe under forced
+ * colors. The per-page check (the stage is ready, its marker part is on
+ * screen, axe in light and dark) runs in the page sweep, a11y-site.spec.ts;
+ * the marker registry and the evidence loaders are unit-tested in
+ * scripts/tests/site-loaders.test.ts, and the page sections and controls in
+ * apps/website/tests/component-pages.test.ts.
  */
 
-const DIST = resolve('apps/website/dist');
-const TYPES: Record<string, string> = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.json': 'application/json',
-  '.woff2': 'font/woff2',
-  '.png': 'image/png',
-  '.ico': 'image/x-icon',
-};
+const origin = serveDist();
+/** One component per family for the forced-colors sample. */
+const FAMILY_SAMPLES = [
+  'button',
+  'dropdown-menu',
+  'layout-sidebar',
+  'table',
+  'media-image',
+  'blocks-text',
+];
 
-let server: Server;
-let origin = '';
-let sampleIds: string[] = [];
-
-test.beforeAll(async () => {
-  if (!existsSync(join(DIST, 'index.html'))) {
-    throw new Error('Run `pnpm build` before this spec.');
-  }
-  const dir = join(DIST, 'component-pages');
-  if (!existsSync(join(dir, 'index.html'))) {
-    throw new Error('component-pages missing from dist — rebuild the website.');
-  }
-  sampleIds = readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort()
-    .slice(0, 12);
-  if (sampleIds.length < 3) {
-    throw new Error('Expected multiple generated component page folders in dist.');
-  }
-
-  server = createServer((request, response) => {
-    const path = decodeURIComponent(new URL(request.url ?? '/', 'http://site').pathname);
-    let file = normalize(join(DIST, path));
-    if (!file.startsWith(DIST)) file = join(DIST, '404');
-    if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html');
-    if (!existsSync(file)) {
-      response.writeHead(404, { 'content-type': 'text/plain' }).end('Not found');
-      return;
-    }
-    response.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
-    createReadStream(file).pipe(response);
-  });
-  await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
-  origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-});
-test.afterAll(() => new Promise<void>((done) => server.close(() => done())));
-
-async function visit(page: Page, path: string) {
+test('props panel drives the code, the menu stage is interactive, families pass axe in forced colors', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
   const foreign: string[] = [];
   page.on('request', (request) => {
-    if (!request.url().startsWith(origin)) foreign.push(request.url());
+    if (!request.url().startsWith(origin())) foreign.push(request.url());
   });
-  await page.goto(`${origin}${path}`);
-  await page.waitForFunction(
-    () =>
-      document.documentElement.dataset.txPageReady === 'true' ||
-      (!document.querySelector('script[data-tx-ready-script]') &&
-        document.readyState === 'complete'),
-    undefined,
-    { polling: 250 }
+  await page.goto(`${origin()}/component-pages/badge/`);
+  await settle(page);
+  const demo = page.locator('[data-tx-live-demo="badge"]').first();
+  // Wait for hydration: a click on the server-rendered panel is lost.
+  await expect(page.locator('astro-island[component-url*="LiveDemo"]:not([ssr])')).not.toHaveCount(
+    0
   );
-  return foreign;
-}
+  await demo
+    .getByRole('radio', { name: 'outline' })
+    .or(demo.getByRole('button', { name: 'outline' }))
+    .first()
+    .click();
+  await expect(demo.locator('[data-tx-code-sample] code')).toContainText('outline');
 
-test.describe('texuli.com component pages', () => {
-  test('index lists components and nav marks the components overview', async ({ page }) => {
-    expect(await visit(page, '/component-pages/')).toEqual([]);
-    await expect(page).toHaveTitle(/Components/);
-    await expect(page.getByRole('heading', { level: 1, name: 'Components' })).toBeVisible();
-    const primary = await primaryNav(page);
-    await expect(primary.getByRole('link', { name: 'Overview', exact: true })).toHaveAttribute(
-      'aria-current',
-      'page'
-    );
-    await expect(page.locator('[href^="/component-pages/"]').first()).toBeVisible();
-  });
+  await page.goto(`${origin()}/component-pages/dropdown-menu/`);
+  await expectLiveStage(page, 'dropdown-menu');
+  const trigger = page
+    .locator('[data-tx-live-stage="dropdown-menu"]')
+    .first()
+    .locator('[data-tx-dropdown-menu-trigger]')
+    .first();
+  await expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+  // The stage check may have opened it already: the trigger toggles either way.
+  const was = await trigger.getAttribute('aria-expanded');
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-expanded', was === 'true' ? 'false' : 'true');
+  if (was !== 'true') {
+    await expect(page.getByRole('menu')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  }
 
-  test('sample component pages expose required sections', async ({ page }) => {
-    for (const id of sampleIds.slice(0, 5)) {
-      const path = `/component-pages/${id}/`;
-      expect(await visit(page, path), path).toEqual([]);
-      await expect(page.locator(`[data-tx-component-page="${id}"]`)).toBeVisible();
-      await expect(page.getByRole('heading', { level: 2, name: 'Examples' })).toBeVisible();
-      await expect(page.getByRole('heading', { level: 2, name: 'Props' })).toBeVisible();
-      await expect(page.getByRole('heading', { level: 2, name: 'Keyboard' })).toBeVisible();
-      await expect(page.getByRole('heading', { level: 2, name: 'Accessibility' })).toBeVisible();
-      await expect(page.getByRole('heading', { level: 2, name: 'When to use' })).toBeVisible();
-      await expect(page.getByRole('table').first()).toBeVisible();
-    }
-  });
-
-  test('component routes stay on-origin', async ({ page }) => {
-    expect(await visit(page, '/component-pages/')).toEqual([]);
-    for (const id of sampleIds.slice(0, 8)) {
-      expect(await visit(page, `/component-pages/${id}/`), id).toEqual([]);
-    }
-  });
-
-  // axe on every component page in light and dark (zero exclusions) runs in the page
-  // sweep, a11y-site.spec.ts.
+  await page.emulateMedia({ colorScheme: 'light', forcedColors: 'active' });
+  for (const id of FAMILY_SAMPLES) {
+    await page.goto(`${origin()}/component-pages/${id}/`);
+    await expectLiveStage(page, id);
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .analyze();
+    expect(results.violations.map((v) => `${id} ${v.id}: ${v.help}`)).toEqual([]);
+  }
+  expect(foreign).toEqual([]);
 });

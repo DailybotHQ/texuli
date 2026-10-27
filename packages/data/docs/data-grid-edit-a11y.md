@@ -5,8 +5,8 @@
 **Tests:**
 - **Component:** `packages/data/tests/grid-edit-a11y.test.ts`, which
   covers the plain grid and the windowed one (100,000 rows).
-- **Browser:** `tests/e2e/data-grid-edit-a11y.spec.ts`, which covers both
-  editing examples.
+- **Browser:** `tests/e2e/data.spec.ts` (the data grid test), which covers
+  both editing examples.
 
 **Examples:** `data-grid-editing`, `data-grid-editing-virtual`
 

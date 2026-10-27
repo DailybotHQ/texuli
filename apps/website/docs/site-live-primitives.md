@@ -47,36 +47,39 @@ cannot drift from the behavior.
 
 ## What the spec checks
 
-For each primitive, on Chromium (all 41) and on WebKit and Pixel 7 (accordion,
-dialog, menu, select, slider, tabs), in two tests: the interactions (a fresh
-load of the page for each), and axe plus the polish check in each mode:
+On the representative primitives (accordion, dialog, menu, select, slider,
+tabs), on Chromium, in three tests since the 2026-10-27 trim: the
+interactions (a fresh load of the page for each), axe plus the polish check
+in each mode, and the toast pages plus the transfer budgets:
 
-- **Lazy loading:** the island is `client="visible"`, and with the demo off
-  screen it stays unloaded until scrolled into view.
+- **Lazy loading:** every primitive page's island is `client:visible`
+  (pinned in `apps/website/tests/component-pages.test.ts`); on a short
+  screen the demo stays unloaded until scrolled into view, and its
+  server-rendered stage already wears the page's dark tokens before it
+  hydrates.
 - **Styled and interactive:** both panels render with Texuli-styled parts.
   The controlled panel's outside control changes the primitive's state.
 - **Keyboard:** focus the declared part (opening floating content first when
   needed), press the declared key, and assert the resulting state. The
-  matching hint lights up and the status names it.
+  matching hint lights up and the status names it. The reference's rows
+  disclosure opens from the keyboard.
 - **Anatomy:** every `data-demo-part` is a real anatomy part. Hover and
   focus highlight the diagram box, and hovering the box highlights the
   demo parts.
-- **Props:** changing the first prop through its control changes the code
-  sample.
-- **Frame** (the same frame on every page, checked on the representative
-  set): the Dark toggle changes the stage's computed background, and the RTL
-  switch sets `dir="rtl"`.
-- **Representative primitives only** (accordion, dialog, select, slider,
-  tabs, menu) for the demo interactions and axe; every primitive page is
-  still checked for its lazy demo island, and every primitive's keyboard,
-  pointer and axe contract runs in its behavior scenario (`tests/behavior`).
+- **Props:** every prop, through its own control, changes the code sample.
+- **Frame:** the Dark toggle changes the stage's computed background, and
+  the RTL switch sets `dir="rtl"`.
 - **axe, zero exclusions,** in light, dark and forced colors, with the demo
   mounted and the API rows (`details`) open, and again with floating content
-  open where the demo has some. This is the page sweep for these routes:
-  the polish check of [site-visual](site-visual.md) runs here in light and
-  dark, and `a11y-site.spec.ts` skips them.
-- **Budget:** each route's JavaScript, measured with the demo loaded, stays
-  within `budgetFor(route)`.
+  open where the demo has some; the polish check of
+  [site-visual](site-visual.md) in light and dark. The other primitive pages
+  share the template; every primitive's keyboard, pointer and axe contract
+  runs in its behavior scenario (`tests/behavior`), and `a11y-site.spec.ts`
+  sweeps the group's representative page.
+- **Toasts:** the toast primitive page and the Toaster component page place
+  live toasts on click, axe clean in every mode.
+- **Budget:** each representative route stays within the site default
+  before its demo is seen and within `budgetFor(route)` with it loaded.
 
 ## Measured (2026-10-23, gzip)
 

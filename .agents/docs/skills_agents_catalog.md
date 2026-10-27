@@ -45,8 +45,8 @@ regenerate its checksums with
 
 | Skill | Sub-skills | Use for |
 | --- | --- | --- |
-| [deepworkplan](../skills/deepworkplan/SKILL.md) (7.8.1) | `deepworkplan-create`, `-execute`, `-refine`, `-resume`, `-status`, `-verify`, `-upgrade`, `-onboard`, `-author` | Deep Work Plans, repository conformance, authoring this kit |
-| [ai-diff-reviewer](../skills/ai-diff-reviewer/SKILL.md) (3.3.14) | `ai-diff-reviewer-setup`, `-generate-extension`, `-open-pr`, `-apply-review`, `-address-review` | Local diff review with `.review/extension.md` (Flow A only); PR drafting (no push without the developer's go) |
+| [deepworkplan](../skills/deepworkplan/SKILL.md) (7.10.0) | `deepworkplan-create`, `-execute`, `-refine`, `-resume`, `-status`, `-verify`, `-upgrade`, `-onboard`, `-author` | Deep Work Plans, repository conformance, authoring this kit |
+| [ai-diff-reviewer](../skills/ai-diff-reviewer/SKILL.md) (3.3.16) | `ai-diff-reviewer-setup`, `-generate-extension`, `-open-pr`, `-apply-review`, `-address-review` | Local diff review with `.review/extension.md` (Flow A only); PR drafting (no push without the developer's go) |
 
 Both are pinned in `skills-lock.json` at the repository root. The agentkit
 and Herdr addons enabled in `.dwp/config.json` are machine installs, not
