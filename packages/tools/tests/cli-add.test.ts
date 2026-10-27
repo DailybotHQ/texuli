@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promis
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, expect, it } from 'vitest';
 import { isMainModule } from '../src/cli-add/cli.ts';
 import {
   type AddableComponent,
@@ -20,25 +20,26 @@ import {
   runAddCli,
   validateRegistryEntry,
 } from '../src/cli-add/index.ts';
+import { scenario } from './scenario.ts';
 
 const temps: string[] = [];
 
-afterEach(async () => {
+/** Runs after every test and between the scenarios of a grouped test. */
+const reset = async () => {
   await Promise.all(temps.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
-});
+};
+afterEach(reset);
 
-describe('CLI entry detection', () => {
-  it('normalizes a pnpm shim entry path containing a parent segment', () => {
-    const previous = process.argv[1];
-    process.argv[1] = `${process.cwd()}/packages/tools/src/cli-add/../cli-add/cli.ts`;
-    try {
-      const moduleUrl = pathToFileURL(resolve('packages/tools/src/cli-add/cli.ts')).href;
-      expect(isMainModule(moduleUrl)).toBe(true);
-    } finally {
-      if (previous === undefined) delete process.argv[1];
-      else process.argv[1] = previous;
-    }
-  });
+it('normalizes a pnpm shim entry path containing a parent segment', () => {
+  const previous = process.argv[1];
+  process.argv[1] = `${process.cwd()}/packages/tools/src/cli-add/../cli-add/cli.ts`;
+  try {
+    const moduleUrl = pathToFileURL(resolve('packages/tools/src/cli-add/cli.ts')).href;
+    expect(isMainModule(moduleUrl)).toBe(true);
+  } finally {
+    if (previous === undefined) delete process.argv[1];
+    else process.argv[1] = previous;
+  }
 });
 
 async function tempDir(prefix: string): Promise<string> {
@@ -89,395 +90,442 @@ const fixtureRegistry: readonly AddableComponent[] = [
   },
 ];
 
-describe('registry', () => {
-  it('lists styled addables and looks up by id', () => {
-    const ids = listAddableIds();
-    expect(ids).toContain('button');
-    expect(ids).toContain('card');
-    expect(ids).not.toContain('dialog-root');
-    expect(getAddable('button')?.package).toBe('texuli');
-    expect(getAddable('nope')).toBeUndefined();
-  });
-
-  it('detects primitives paths', () => {
-    expect(isPrimitivesPath('/repo/packages/primitives/src/dialog/Root.svelte')).toBe(true);
-    expect(isPrimitivesPath('/repo/packages/texuli/src/components/button/Button.svelte')).toBe(
-      false
-    );
-  });
-});
-
-describe('provenance', () => {
-  it('stamps svelte, ts and css headers', () => {
-    const meta = {
-      id: 'button',
-      package: 'texuli',
-      version: '1.2.3',
-      source: 'packages/texuli/src/components/button/Button.svelte',
-    };
-    expect(provenanceHeader(meta, 'Button.svelte')).toContain('<!--');
-    expect(provenanceHeader(meta, 'Button.svelte')).toContain('@texuli/add');
-    expect(provenanceHeader(meta, 'index.ts')).toContain('/**');
-    expect(provenanceHeader(meta, 'button.css')).toContain('version: 1.2.3');
-    expect(hasProvenance(`${provenanceHeader(meta, 'index.ts')}export {}`)).toBe(true);
-  });
-});
-
-describe('parseAddArgs', () => {
-  it('parses flags and the component id', () => {
-    const args = parseAddArgs(
-      [
-        'add',
-        'button',
-        '--cwd',
-        '/app',
-        '--source-root',
-        '/repo',
-        '--json',
-        '--dry-run',
-        '--force',
-      ],
-      { cwd: '/default', sourceRoot: '/default' }
-    );
-    expect(args.id).toBe('button');
-    expect(args.cwd).toBe('/app');
-    expect(args.sourceRoot).toBe('/repo');
-    expect(args.json).toBe(true);
-    expect(args.dryRun).toBe(true);
-    expect(args.force).toBe(true);
-  });
-
-  it('rejects unknown flags', () => {
-    expect(() => parseAddArgs(['button', '--nope'])).toThrow(/Unknown option/);
-  });
-});
-
-describe('addComponent', () => {
-  it('copies styled source with provenance and refuses primitives', async () => {
-    const sourceRoot = await makeSourceRoot();
-    const cwd = await tempDir('texuli-add-app-');
-
-    const refused = await addComponent({
-      id: 'evil-primitive',
-      cwd,
-      sourceRoot,
-      registry: fixtureRegistry,
-    });
-    expect(refused.ok).toBe(false);
-    expect(refused.errors.join(' ')).toMatch(/primitives/i);
-
-    const unknown = await addComponent({
-      id: 'no-such',
-      cwd,
-      sourceRoot,
-      registry: fixtureRegistry,
-    });
-    expect(unknown.ok).toBe(false);
-
-    const dry = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot,
-      registry: fixtureRegistry,
-      dryRun: true,
-      version: '0.1.0',
-    });
-    expect(dry.ok).toBe(true);
-    expect(dry.dryRun).toBe(true);
-    expect(dry.files.every((f) => f.action === 'would-write')).toBe(true);
-
-    const written = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot,
-      registry: fixtureRegistry,
-      version: '0.1.0',
-    });
-    expect(written.ok).toBe(true);
-    expect(written.files.length).toBe(3);
-
-    const svelte = await readFile(join(cwd, 'src/components/texuli/button/Button.svelte'), 'utf8');
-    expect(svelte.startsWith('<!--')).toBe(true);
-    expect(svelte).toContain('@texuli/add');
-    expect(svelte).toContain('id: button');
-    expect(svelte).toContain('version: 0.1.0');
-    expect(svelte).toContain('<button type="button">');
-
-    const index = await readFile(join(cwd, 'src/components/texuli/button/index.ts'), 'utf8');
-    expect(index.startsWith('/**')).toBe(true);
-    expect(index).toContain('export { default as Button }');
-
-    const again = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot,
-      registry: fixtureRegistry,
-    });
-    expect(again.ok).toBe(false);
-    expect(again.errors.join(' ')).toMatch(/overwrite/i);
-
-    const forced = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot,
-      registry: fixtureRegistry,
-      force: true,
-    });
-    expect(forced.ok).toBe(true);
-  });
-
-  it('planAdd reports missing source roots', async () => {
-    const { result } = await planAdd({
-      id: 'button',
-      cwd: await tempDir('texuli-add-empty-'),
-      sourceRoot: join(tmpdir(), 'texuli-add-missing-root-xyz'),
-      registry: fixtureRegistry,
-    });
-    expect(result.ok).toBe(false);
-    expect(result.errors[0]).toMatch(/does not exist/);
-  });
-});
-
-describe('path containment', () => {
-  it('refuses ../ outDir', async () => {
-    const sourceRoot = await makeSourceRoot();
-    const cwd = await tempDir('texuli-add-out-');
-    const result = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot,
-      registry: fixtureRegistry,
-      outDir: '../escape',
-    });
-    expect(result.ok).toBe(false);
-    expect(result.errors.join(' ')).toMatch(/escapes the project root/);
-  });
-
-  it('refuses absolute outDir', async () => {
-    const sourceRoot = await makeSourceRoot();
-    const cwd = await tempDir('texuli-add-abs-');
-    const result = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot,
-      registry: fixtureRegistry,
-      outDir: join(tmpdir(), 'texuli-add-absolute-out'),
-    });
-    expect(result.ok).toBe(false);
-    expect(result.errors.join(' ')).toMatch(/absolute path/i);
-  });
-
-  it('refuses a symlinked destination file even with --force', async () => {
-    const sourceRoot = await makeSourceRoot();
-    const cwd = await tempDir('texuli-add-sl-file-');
-    const outDir = join(cwd, 'src', 'components', 'texuli', 'button');
-    await mkdir(outDir, { recursive: true });
-    const outside = join(cwd, 'secret.txt');
-    await writeFile(outside, 'secret\n', 'utf8');
-    await symlink(outside, join(outDir, 'Button.svelte'));
-
-    const result = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot,
-      registry: fixtureRegistry,
-      force: true,
-    });
-    expect(result.ok).toBe(false);
-    expect(result.errors.join(' ')).toMatch(/symlink/i);
-    expect(await readFile(outside, 'utf8')).toBe('secret\n');
-  });
-
-  it('refuses a symlinked parent directory even with --force', async () => {
-    const sourceRoot = await makeSourceRoot();
-    const cwd = await tempDir('texuli-add-sl-parent-');
-    const realParent = join(cwd, 'real-components');
-    await mkdir(realParent, { recursive: true });
-    const linkParent = join(cwd, 'src', 'components');
-    await mkdir(join(cwd, 'src'), { recursive: true });
-    await symlink(realParent, linkParent);
-
-    const result = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot,
-      registry: fixtureRegistry,
-      force: true,
-    });
-    expect(result.ok).toBe(false);
-    expect(result.errors.join(' ')).toMatch(/symlink/i);
-  });
-
-  it("refuses registry directory with '..' segments", async () => {
-    const sourceRoot = await makeSourceRoot();
-    const cwd = await tempDir('texuli-add-reg-dot-');
-    const bad: AddableComponent = {
-      id: 'button',
-      package: 'texuli',
-      directory: 'src/components/../../primitives/src/button',
-    };
-    expect(validateRegistryEntry(bad).ok).toBe(false);
-    const result = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot,
-      registry: [bad],
-    });
-    expect(result.ok).toBe(false);
-    expect(result.errors.join(' ')).toMatch(/\.\./);
-  });
-
-  it('refuses absolute registry directory', async () => {
-    const sourceRoot = await makeSourceRoot();
-    const cwd = await tempDir('texuli-add-reg-abs-');
-    const bad: AddableComponent = {
-      id: 'button',
-      package: 'texuli',
-      directory: join(sourceRoot, 'packages', 'texuli', 'src', 'components', 'button'),
-    };
-    expect(validateRegistryEntry(bad).ok).toBe(false);
-    const result = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot,
-      registry: [bad],
-    });
-    expect(result.ok).toBe(false);
-    expect(result.errors.join(' ')).toMatch(/absolute/i);
-  });
-});
-
-describe('runAddCli', () => {
-  it('prints json and supports --list', async () => {
-    const sourceRoot = await makeSourceRoot();
-    const cwd = await tempDir('texuli-add-cli-');
-
-    const logs: string[] = [];
-    const errors: string[] = [];
-    const originalLog = console.log;
-    const originalError = console.error;
-    console.log = (message?: unknown) => {
-      logs.push(String(message));
-    };
-    console.error = (message?: unknown) => {
-      errors.push(String(message));
-    };
-
-    try {
-      const listCode = await runAddCli(['--list', '--json'], { cwd, sourceRoot });
-      expect(listCode).toBe(0);
-      const listed = JSON.parse(logs.at(-1) ?? '{}') as { ids: string[] };
-      expect(listed.ids).toContain('button');
-
-      logs.length = 0;
-      const code = await runAddCli(
-        ['button', '--cwd', cwd, '--source-root', sourceRoot, '--json', '--version', '9.9.9'],
-        { cwd, sourceRoot }
+it('registry lookups, provenance headers and argument parsing', async () => {
+  await scenario(
+    'lists styled addables and looks up by id',
+    async () => {
+      const ids = listAddableIds();
+      expect(ids).toContain('button');
+      expect(ids).toContain('card');
+      expect(ids).not.toContain('dialog-root');
+      expect(getAddable('button')?.package).toBe('texuli');
+      expect(getAddable('nope')).toBeUndefined();
+    },
+    reset
+  );
+  await scenario(
+    'detects primitives paths',
+    async () => {
+      expect(isPrimitivesPath('/repo/packages/primitives/src/dialog/Root.svelte')).toBe(true);
+      expect(isPrimitivesPath('/repo/packages/texuli/src/components/button/Button.svelte')).toBe(
+        false
       );
-      // CLI uses the default registry; button exists there, but source is the fixture —
-      // default registry points at the same relative path, so it works with our fixture.
-      expect(code).toBe(0);
-      const payload = JSON.parse(logs.at(-1) ?? '{}') as {
-        ok: boolean;
-        id: string;
-        files: unknown[];
+    },
+    reset
+  );
+  await scenario(
+    'stamps svelte, ts and css headers',
+    async () => {
+      const meta = {
+        id: 'button',
+        package: 'texuli',
+        version: '1.2.3',
+        source: 'packages/texuli/src/components/button/Button.svelte',
       };
-      expect(payload.ok).toBe(true);
-      expect(payload.id).toBe('button');
-      expect(payload.files.length).toBeGreaterThan(0);
-
-      const missing = await runAddCli(['not-a-component', '--json'], { cwd, sourceRoot });
-      expect(missing).toBe(1);
-    } finally {
-      console.log = originalLog;
-      console.error = originalError;
-    }
-  });
+      expect(provenanceHeader(meta, 'Button.svelte')).toContain('<!--');
+      expect(provenanceHeader(meta, 'Button.svelte')).toContain('@texuli/add');
+      expect(provenanceHeader(meta, 'index.ts')).toContain('/**');
+      expect(provenanceHeader(meta, 'button.css')).toContain('version: 1.2.3');
+      expect(hasProvenance(`${provenanceHeader(meta, 'index.ts')}export {}`)).toBe(true);
+    },
+    reset
+  );
+  await scenario(
+    'parses flags and the component id',
+    async () => {
+      const args = parseAddArgs(
+        [
+          'add',
+          'button',
+          '--cwd',
+          '/app',
+          '--source-root',
+          '/repo',
+          '--json',
+          '--dry-run',
+          '--force',
+        ],
+        { cwd: '/default', sourceRoot: '/default' }
+      );
+      expect(args.id).toBe('button');
+      expect(args.cwd).toBe('/app');
+      expect(args.sourceRoot).toBe('/repo');
+      expect(args.json).toBe(true);
+      expect(args.dryRun).toBe(true);
+      expect(args.force).toBe(true);
+    },
+    reset
+  );
+  await scenario(
+    'rejects unknown flags',
+    async () => {
+      expect(() => parseAddArgs(['button', '--nope'])).toThrow(/Unknown option/);
+    },
+    reset
+  );
 });
 
-describe('provenance source paths', () => {
-  it('accepts only plain relative paths inside the root', () => {
-    expect(provenanceSource('packages/texuli/src/components/button', 'Button.svelte')).toBe(
-      'packages/texuli/src/components/button/Button.svelte'
-    );
-    for (const [dir, file] of [
-      ['../../private/var/x/packages/texuli', 'a.ts'],
-      ['/abs/packages', 'a.ts'],
-      ['C:/repo', 'a.ts'],
-      ['packages/./texuli', 'a.ts'],
-      ['packages//texuli', 'a.ts'],
-      ['packages\\texuli', 'a.ts'],
-      ['packages/texuli', 'a\nversion: 9.9.9'],
-      ['packages/texuli', 'a */ b.ts'],
-      ['packages/texuli', 'a --> b.svelte'],
-      ['', ''],
-    ] as const) {
-      expect(provenanceSource(dir, file), `${dir}/${file}`).toBeNull();
-    }
-    expect(isPlainSourcePath('a/b.ts')).toBe(true);
-  });
+it('addComponent copies styled source with provenance, refuses primitives and reports missing roots', async () => {
+  await scenario(
+    'copies styled source with provenance and refuses primitives',
+    async () => {
+      const sourceRoot = await makeSourceRoot();
+      const cwd = await tempDir('texuli-add-app-');
 
-  it('stamps the source relative to the real root when the root is a symlink', async () => {
-    const real = await makeSourceRoot();
-    const links = await tempDir('texuli-add-link-');
-    const linkedRoot = join(links, 'texuli-src');
-    await symlink(real, linkedRoot);
-    const cwd = await tempDir('texuli-add-app-');
-    const result = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot: linkedRoot,
-      registry: fixtureRegistry,
-    });
-    expect(result.ok).toBe(true);
-    for (const name of ['Button.svelte', 'index.ts', 'button.css']) {
-      const text = await readFile(join(cwd, 'src/components/texuli/button', name), 'utf8');
-      const source = /source: (.*)\n/.exec(text)?.[1];
-      expect(source, name).toBe(`packages/texuli/src/components/button/${name}`);
-      expect(source?.split('/')).not.toContain('..');
-      expect(text).not.toContain(real);
-    }
-  });
+      const refused = await addComponent({
+        id: 'evil-primitive',
+        cwd,
+        sourceRoot,
+        registry: fixtureRegistry,
+      });
+      expect(refused.ok).toBe(false);
+      expect(refused.errors.join(' ')).toMatch(/primitives/i);
 
-  it('refuses a source file whose name would break the header', async () => {
-    const root = await makeSourceRoot();
-    await writeFile(
-      join(root, 'packages/texuli/src/components/button/evil-->x.svelte'),
-      'export {};\n',
-      'utf8'
-    );
-    const cwd = await tempDir('texuli-add-app-');
-    const result = await addComponent({
-      id: 'button',
-      cwd,
-      sourceRoot: root,
-      registry: fixtureRegistry,
-    });
-    expect(result.ok).toBe(false);
-    expect(result.errors[0]).toContain('plain relative path');
-  });
+      const unknown = await addComponent({
+        id: 'no-such',
+        cwd,
+        sourceRoot,
+        registry: fixtureRegistry,
+      });
+      expect(unknown.ok).toBe(false);
+
+      const dry = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot,
+        registry: fixtureRegistry,
+        dryRun: true,
+        version: '0.1.0',
+      });
+      expect(dry.ok).toBe(true);
+      expect(dry.dryRun).toBe(true);
+      expect(dry.files.every((f) => f.action === 'would-write')).toBe(true);
+
+      const written = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot,
+        registry: fixtureRegistry,
+        version: '0.1.0',
+      });
+      expect(written.ok).toBe(true);
+      expect(written.files.length).toBe(3);
+
+      const svelte = await readFile(
+        join(cwd, 'src/components/texuli/button/Button.svelte'),
+        'utf8'
+      );
+      expect(svelte.startsWith('<!--')).toBe(true);
+      expect(svelte).toContain('@texuli/add');
+      expect(svelte).toContain('id: button');
+      expect(svelte).toContain('version: 0.1.0');
+      expect(svelte).toContain('<button type="button">');
+
+      const index = await readFile(join(cwd, 'src/components/texuli/button/index.ts'), 'utf8');
+      expect(index.startsWith('/**')).toBe(true);
+      expect(index).toContain('export { default as Button }');
+
+      const again = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot,
+        registry: fixtureRegistry,
+      });
+      expect(again.ok).toBe(false);
+      expect(again.errors.join(' ')).toMatch(/overwrite/i);
+
+      const forced = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot,
+        registry: fixtureRegistry,
+        force: true,
+      });
+      expect(forced.ok).toBe(true);
+    },
+    reset
+  );
+  await scenario(
+    'planAdd reports missing source roots',
+    async () => {
+      const { result } = await planAdd({
+        id: 'button',
+        cwd: await tempDir('texuli-add-empty-'),
+        sourceRoot: join(tmpdir(), 'texuli-add-missing-root-xyz'),
+        registry: fixtureRegistry,
+      });
+      expect(result.ok).toBe(false);
+      expect(result.errors[0]).toMatch(/does not exist/);
+    },
+    reset
+  );
 });
 
-describe('triple-slash directives', () => {
-  it('sit above every statement in the tools sources (TypeScript ignores them otherwise)', async () => {
-    const { readdir } = await import('node:fs/promises');
-    const root = resolve(import.meta.dirname, '../src');
-    const entries = await readdir(root, { recursive: true });
-    const misplaced: string[] = [];
-    for (const entry of entries) {
-      if (!entry.endsWith('.ts')) continue;
-      const lines = (await readFile(join(root, entry), 'utf8')).split('\n');
-      let seenStatement = false;
-      for (const line of lines) {
-        const text = line.trim();
-        if (text.startsWith('/// <reference')) {
-          if (seenStatement) misplaced.push(entry);
-          continue;
-        }
-        if (text === '' || text.startsWith('//') || text.startsWith('#!')) continue;
-        seenStatement = true;
+it('path containment refuses escaping, absolute and symlinked destinations and registry directories', async () => {
+  await scenario(
+    'refuses ../ outDir',
+    async () => {
+      const sourceRoot = await makeSourceRoot();
+      const cwd = await tempDir('texuli-add-out-');
+      const result = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot,
+        registry: fixtureRegistry,
+        outDir: '../escape',
+      });
+      expect(result.ok).toBe(false);
+      expect(result.errors.join(' ')).toMatch(/escapes the project root/);
+    },
+    reset
+  );
+  await scenario(
+    'refuses absolute outDir',
+    async () => {
+      const sourceRoot = await makeSourceRoot();
+      const cwd = await tempDir('texuli-add-abs-');
+      const result = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot,
+        registry: fixtureRegistry,
+        outDir: join(tmpdir(), 'texuli-add-absolute-out'),
+      });
+      expect(result.ok).toBe(false);
+      expect(result.errors.join(' ')).toMatch(/absolute path/i);
+    },
+    reset
+  );
+  await scenario(
+    'refuses a symlinked destination file even with --force',
+    async () => {
+      const sourceRoot = await makeSourceRoot();
+      const cwd = await tempDir('texuli-add-sl-file-');
+      const outDir = join(cwd, 'src', 'components', 'texuli', 'button');
+      await mkdir(outDir, { recursive: true });
+      const outside = join(cwd, 'secret.txt');
+      await writeFile(outside, 'secret\n', 'utf8');
+      await symlink(outside, join(outDir, 'Button.svelte'));
+
+      const result = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot,
+        registry: fixtureRegistry,
+        force: true,
+      });
+      expect(result.ok).toBe(false);
+      expect(result.errors.join(' ')).toMatch(/symlink/i);
+      expect(await readFile(outside, 'utf8')).toBe('secret\n');
+    },
+    reset
+  );
+  await scenario(
+    'refuses a symlinked parent directory even with --force',
+    async () => {
+      const sourceRoot = await makeSourceRoot();
+      const cwd = await tempDir('texuli-add-sl-parent-');
+      const realParent = join(cwd, 'real-components');
+      await mkdir(realParent, { recursive: true });
+      const linkParent = join(cwd, 'src', 'components');
+      await mkdir(join(cwd, 'src'), { recursive: true });
+      await symlink(realParent, linkParent);
+
+      const result = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot,
+        registry: fixtureRegistry,
+        force: true,
+      });
+      expect(result.ok).toBe(false);
+      expect(result.errors.join(' ')).toMatch(/symlink/i);
+    },
+    reset
+  );
+  await scenario(
+    "refuses registry directory with '..' segments",
+    async () => {
+      const sourceRoot = await makeSourceRoot();
+      const cwd = await tempDir('texuli-add-reg-dot-');
+      const bad: AddableComponent = {
+        id: 'button',
+        package: 'texuli',
+        directory: 'src/components/../../primitives/src/button',
+      };
+      expect(validateRegistryEntry(bad).ok).toBe(false);
+      const result = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot,
+        registry: [bad],
+      });
+      expect(result.ok).toBe(false);
+      expect(result.errors.join(' ')).toMatch(/\.\./);
+    },
+    reset
+  );
+  await scenario(
+    'refuses absolute registry directory',
+    async () => {
+      const sourceRoot = await makeSourceRoot();
+      const cwd = await tempDir('texuli-add-reg-abs-');
+      const bad: AddableComponent = {
+        id: 'button',
+        package: 'texuli',
+        directory: join(sourceRoot, 'packages', 'texuli', 'src', 'components', 'button'),
+      };
+      expect(validateRegistryEntry(bad).ok).toBe(false);
+      const result = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot,
+        registry: [bad],
+      });
+      expect(result.ok).toBe(false);
+      expect(result.errors.join(' ')).toMatch(/absolute/i);
+    },
+    reset
+  );
+});
+
+it('prints json and supports --list', async () => {
+  const sourceRoot = await makeSourceRoot();
+  const cwd = await tempDir('texuli-add-cli-');
+
+  const logs: string[] = [];
+  const errors: string[] = [];
+  const originalLog = console.log;
+  const originalError = console.error;
+  console.log = (message?: unknown) => {
+    logs.push(String(message));
+  };
+  console.error = (message?: unknown) => {
+    errors.push(String(message));
+  };
+
+  try {
+    const listCode = await runAddCli(['--list', '--json'], { cwd, sourceRoot });
+    expect(listCode).toBe(0);
+    const listed = JSON.parse(logs.at(-1) ?? '{}') as { ids: string[] };
+    expect(listed.ids).toContain('button');
+
+    logs.length = 0;
+    const code = await runAddCli(
+      ['button', '--cwd', cwd, '--source-root', sourceRoot, '--json', '--version', '9.9.9'],
+      { cwd, sourceRoot }
+    );
+    // CLI uses the default registry; button exists there, but source is the fixture —
+    // default registry points at the same relative path, so it works with our fixture.
+    expect(code).toBe(0);
+    const payload = JSON.parse(logs.at(-1) ?? '{}') as {
+      ok: boolean;
+      id: string;
+      files: unknown[];
+    };
+    expect(payload.ok).toBe(true);
+    expect(payload.id).toBe('button');
+    expect(payload.files.length).toBeGreaterThan(0);
+
+    const missing = await runAddCli(['not-a-component', '--json'], { cwd, sourceRoot });
+    expect(missing).toBe(1);
+  } finally {
+    console.log = originalLog;
+    console.error = originalError;
+  }
+});
+
+it('provenance source paths stay plain, relative to the real root, and header-safe', async () => {
+  await scenario(
+    'accepts only plain relative paths inside the root',
+    async () => {
+      expect(provenanceSource('packages/texuli/src/components/button', 'Button.svelte')).toBe(
+        'packages/texuli/src/components/button/Button.svelte'
+      );
+      for (const [dir, file] of [
+        ['../../private/var/x/packages/texuli', 'a.ts'],
+        ['/abs/packages', 'a.ts'],
+        ['C:/repo', 'a.ts'],
+        ['packages/./texuli', 'a.ts'],
+        ['packages//texuli', 'a.ts'],
+        ['packages\\texuli', 'a.ts'],
+        ['packages/texuli', 'a\nversion: 9.9.9'],
+        ['packages/texuli', 'a */ b.ts'],
+        ['packages/texuli', 'a --> b.svelte'],
+        ['', ''],
+      ] as const) {
+        expect(provenanceSource(dir, file), `${dir}/${file}`).toBeNull();
       }
+      expect(isPlainSourcePath('a/b.ts')).toBe(true);
+    },
+    reset
+  );
+  await scenario(
+    'stamps the source relative to the real root when the root is a symlink',
+    async () => {
+      const real = await makeSourceRoot();
+      const links = await tempDir('texuli-add-link-');
+      const linkedRoot = join(links, 'texuli-src');
+      await symlink(real, linkedRoot);
+      const cwd = await tempDir('texuli-add-app-');
+      const result = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot: linkedRoot,
+        registry: fixtureRegistry,
+      });
+      expect(result.ok).toBe(true);
+      for (const name of ['Button.svelte', 'index.ts', 'button.css']) {
+        const text = await readFile(join(cwd, 'src/components/texuli/button', name), 'utf8');
+        const source = /source: (.*)\n/.exec(text)?.[1];
+        expect(source, name).toBe(`packages/texuli/src/components/button/${name}`);
+        expect(source?.split('/')).not.toContain('..');
+        expect(text).not.toContain(real);
+      }
+    },
+    reset
+  );
+  await scenario(
+    'refuses a source file whose name would break the header',
+    async () => {
+      const root = await makeSourceRoot();
+      await writeFile(
+        join(root, 'packages/texuli/src/components/button/evil-->x.svelte'),
+        'export {};\n',
+        'utf8'
+      );
+      const cwd = await tempDir('texuli-add-app-');
+      const result = await addComponent({
+        id: 'button',
+        cwd,
+        sourceRoot: root,
+        registry: fixtureRegistry,
+      });
+      expect(result.ok).toBe(false);
+      expect(result.errors[0]).toContain('plain relative path');
+    },
+    reset
+  );
+});
+
+it('sit above every statement in the tools sources (TypeScript ignores them otherwise)', async () => {
+  const { readdir } = await import('node:fs/promises');
+  const root = resolve(import.meta.dirname, '../src');
+  const entries = await readdir(root, { recursive: true });
+  const misplaced: string[] = [];
+  for (const entry of entries) {
+    if (!entry.endsWith('.ts')) continue;
+    const lines = (await readFile(join(root, entry), 'utf8')).split('\n');
+    let seenStatement = false;
+    for (const line of lines) {
+      const text = line.trim();
+      if (text.startsWith('/// <reference')) {
+        if (seenStatement) misplaced.push(entry);
+        continue;
+      }
+      if (text === '' || text.startsWith('//') || text.startsWith('#!')) continue;
+      seenStatement = true;
     }
-    expect(misplaced).toEqual([]);
-  });
+  }
+  expect(misplaced).toEqual([]);
 });

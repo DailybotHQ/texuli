@@ -25,15 +25,18 @@ import {
   scoreGoldenRun,
   scoreGoldenTree,
 } from '../src/golden/index.ts';
+import { scenario } from './scenario.ts';
 
 // axe-core comes with the root's @axe-core/playwright; resolve it from there.
 const req = createRequire(import.meta.url);
 const axe = req(createRequire(req.resolve('@axe-core/playwright')).resolve('axe-core')) as AxeLike;
 const axeRunner = createAxeRunner(axe);
 
-afterEach(() => {
+/** Runs after every test and between the scenarios of a grouped test. */
+const reset = () => {
   document.body.replaceChildren();
-});
+};
+afterEach(reset);
 
 const task = (id: string): GoldenTask => {
   const found = goldenTask(id);
@@ -75,64 +78,80 @@ const list = (items: string[]): CatalogTreeInput => ({
   props: { block: { type: 'list', items: items.map((item) => ({ text: item })) } },
 });
 
-describe('golden set: the tasks', () => {
-  it('pre-registers 30 tasks with unique, stable ids and fictional briefs', () => {
-    expect(GOLDEN_TASKS).toHaveLength(30);
-    const ids = GOLDEN_TASKS.map((t) => t.id);
-    expect(new Set(ids).size).toBe(30);
-    GOLDEN_TASKS.forEach((t, index) => {
-      expect(t.id).toMatch(
-        new RegExp(`^g${String(index + 1).padStart(2, '0')}-[a-z0-9]+(?:-[a-z0-9]+)*$`)
-      );
-      expect(t.brief.length).toBeGreaterThan(40);
-      expect(t.tier).toBe('untrusted');
-      expect(Object.isFrozen(GOLDEN_TASKS)).toBe(true);
-    });
-  });
-
-  it('asks only for components agents may emit, and starts every reference from a frame', () => {
-    for (const t of GOLDEN_TASKS) {
-      for (const id of t.mustInclude) {
-        expect(goldenManifest(id)?.agentEmittable, `${t.id} needs ${id}`).toBe(true);
+it('the tasks: 30 stable fictional briefs over emittable ids, broad coverage and a detector for every trap', async () => {
+  await scenario(
+    'pre-registers 30 tasks with unique, stable ids and fictional briefs',
+    async () => {
+      expect(GOLDEN_TASKS).toHaveLength(30);
+      const ids = GOLDEN_TASKS.map((t) => t.id);
+      expect(new Set(ids).size).toBe(30);
+      GOLDEN_TASKS.forEach((t, index) => {
+        expect(t.id).toMatch(
+          new RegExp(`^g${String(index + 1).padStart(2, '0')}-[a-z0-9]+(?:-[a-z0-9]+)*$`)
+        );
+        expect(t.brief.length).toBeGreaterThan(40);
+        expect(t.tier).toBe('untrusted');
+        expect(Object.isFrozen(GOLDEN_TASKS)).toBe(true);
+      });
+    },
+    reset
+  );
+  await scenario(
+    'asks only for components agents may emit, and starts every reference from a frame',
+    async () => {
+      for (const t of GOLDEN_TASKS) {
+        for (const id of t.mustInclude) {
+          expect(goldenManifest(id)?.agentEmittable, `${t.id} needs ${id}`).toBe(true);
+        }
+        expect(GOLDEN_FRAME_IDS as readonly string[], t.id).toContain(t.reference.id);
       }
-      expect(GOLDEN_FRAME_IDS as readonly string[], t.id).toContain(t.reference.id);
-    }
-  });
-
-  it('covers the agent surface broadly (every frame and most content families)', () => {
-    const used = new Set<string>();
-    const visit = (node: CatalogTreeInput) => {
-      used.add(node.id);
-      node.children?.forEach(visit);
-    };
-    for (const t of GOLDEN_TASKS) visit(t.reference);
-    for (const id of ['layout-page', 'layout-doc', 'layout-deck', 'layout-card', 'layout-grid']) {
-      expect(used, id).toContain(id);
-    }
-    expect([...used].filter((id) => id.startsWith('charts-')).length).toBeGreaterThanOrEqual(15);
-  });
-
-  it('cites only real manifest guidance as traps, each with a detector', () => {
-    const lines = new Set(GOLDEN_MANIFESTS.flatMap((m) => m.dontUseWhen));
-    const detected = new Set(GUIDANCE_DETECTORS.map((d) => d.line));
-    const traps = GOLDEN_TASKS.flatMap((t) => t.traps);
-    expect(traps.length).toBeGreaterThanOrEqual(5);
-    for (const line of traps) {
-      expect(lines, line).toContain(line);
-      expect(detected, line).toContain(line);
-    }
-  });
-
-  it('has a detector for every dontUseWhen line of the agent surface (no silent drift)', () => {
-    const detected = new Set(GUIDANCE_DETECTORS.map((d) => d.line));
-    for (const manifest of GOLDEN_MANIFESTS) {
-      for (const line of manifest.dontUseWhen) {
-        expect(detected, `${manifest.id}: "${line}"`).toContain(line);
-        const detector = GUIDANCE_DETECTORS.find((d) => d.line === line);
-        expect(detector?.appliesTo(manifest.id), `${manifest.id}: "${line}"`).toBe(true);
+    },
+    reset
+  );
+  await scenario(
+    'covers the agent surface broadly (every frame and most content families)',
+    async () => {
+      const used = new Set<string>();
+      const visit = (node: CatalogTreeInput) => {
+        used.add(node.id);
+        node.children?.forEach(visit);
+      };
+      for (const t of GOLDEN_TASKS) visit(t.reference);
+      for (const id of ['layout-page', 'layout-doc', 'layout-deck', 'layout-card', 'layout-grid']) {
+        expect(used, id).toContain(id);
       }
-    }
-  });
+      expect([...used].filter((id) => id.startsWith('charts-')).length).toBeGreaterThanOrEqual(15);
+    },
+    reset
+  );
+  await scenario(
+    'cites only real manifest guidance as traps, each with a detector',
+    async () => {
+      const lines = new Set(GOLDEN_MANIFESTS.flatMap((m) => m.dontUseWhen));
+      const detected = new Set(GUIDANCE_DETECTORS.map((d) => d.line));
+      const traps = GOLDEN_TASKS.flatMap((t) => t.traps);
+      expect(traps.length).toBeGreaterThanOrEqual(5);
+      for (const line of traps) {
+        expect(lines, line).toContain(line);
+        expect(detected, line).toContain(line);
+      }
+    },
+    reset
+  );
+  await scenario(
+    'has a detector for every dontUseWhen line of the agent surface (no silent drift)',
+    async () => {
+      const detected = new Set(GUIDANCE_DETECTORS.map((d) => d.line));
+      for (const manifest of GOLDEN_MANIFESTS) {
+        for (const line of manifest.dontUseWhen) {
+          expect(detected, `${manifest.id}: "${line}"`).toContain(line);
+          const detector = GUIDANCE_DETECTORS.find((d) => d.line === line);
+          expect(detector?.appliesTo(manifest.id), `${manifest.id}: "${line}"`).toBe(true);
+        }
+      }
+    },
+    reset
+  );
 });
 
 describe('golden set: embed guidance detectors', () => {
@@ -179,355 +198,403 @@ describe('golden set: embed guidance detectors', () => {
   });
 });
 
-describe('golden set: every reference passes the scorer', () => {
+it('every reference passes all six checks, axe included', async () => {
   for (const t of GOLDEN_TASKS) {
-    it(`${t.id} passes all six checks, axe included`, async () => {
-      const score = await scoreGoldenTree(t, t.reference, { axe: axeRunner, document });
-      expect(score.checks.map((c) => c.check)).toEqual([...GOLDEN_CHECKS]);
-      for (const check of score.checks) {
-        expect(check.status, `${t.id} ${check.check}: ${check.issues.join(' | ')}`).toBe('pass');
-      }
-      expect(score.passed).toBe(true);
-      expect(score.score).toBe(1);
-    });
-  }
-
-  it('paints every content component for real, with the outline the grammar checked', async () => {
-    const catalog = goldenRenderCatalog();
-    for (const t of GOLDEN_TASKS) {
-      const { roots } = renderCatalogTree(t.reference, { catalog, tier: 'untrusted' });
-      const paint = await paintGoldenTree(roots, document, { title: t.title });
-      try {
-        expect(paint.issues, t.id).toEqual([]);
-        const targets = [...document.querySelectorAll('[data-golden-component]')];
-        expect(targets.length, t.id).toBeGreaterThan(0);
-        for (const target of targets) {
-          expect(
-            target.querySelector('*'),
-            `${t.id}: ${target.getAttribute('data-golden-component')} rendered nothing`
-          ).not.toBeNull();
-        }
-        // The painted headings, in document order, are the projected outline.
-        const painted = [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')].map((h) =>
-          Number(h.tagName.slice(1))
-        );
-        const projected: number[] = [];
-        const walk = (nodes: readonly RenderNode[]) => {
-          for (const node of nodes) {
-            if (node.kind !== 'component') continue;
-            if (node.id === 'golden-heading') projected.push(node.props.level as number);
-            walk(node.children);
-          }
-        };
-        walk(projectOutline(roots));
-        expect(painted, t.id).toEqual(projected);
-      } finally {
-        paint.destroy();
-      }
-    }
-  }, 120_000);
-
-  it('keeps the developer tier to emittable ids while retaining app chrome for tier-denied diagnostics', () => {
-    const catalog = goldenRenderCatalog();
-    expect(catalog.get('dialog')).toBeDefined();
-    expect(catalog.allows?.('dialog', 'developer')).toBe(false);
-    expect(catalog.allows?.('blocks-text', 'developer')).toBe(true);
-    expect(catalog.allows?.('blocks-text', 'untrusted')).toBe(true);
-  });
-});
-
-describe('golden scorer: each check fails on what it guards', () => {
-  it('schema: accepts a valid family-owned diagram block in a golden tree', async () => {
-    const tree = variant('g02-release-notes', (root) =>
-      root.children.push({
-        id: 'blocks-diagram',
-        props: {
-          block: {
-            type: 'flow',
-            nodes: [
-              { id: 'start', label: 'Collect brief' },
-              { id: 'ship', label: 'Ship prototype' },
-            ],
-          },
-        },
-      })
-    );
-    const score = await scoreGoldenTree(task('g02-release-notes'), tree);
-    expect(score.checks.find((check) => check.check === 'schema')).toEqual({
-      check: 'schema',
-      status: 'pass',
-      issues: [],
-    });
-  });
-
-  it('schema: not a tree, unknown and tier-denied ids, bad blocks, a non-frame root', async () => {
-    expect((await failing('g02-release-notes', 'just text')).failed).toContain('schema');
+    document.body.replaceChildren();
+    const score = await scoreGoldenTree(t, t.reference, { axe: axeRunner, document });
     expect(
-      (await failing('g02-release-notes', [task('g02-release-notes').reference])).failed
-    ).toContain('schema');
-    const unknown = await failing(
-      'g02-release-notes',
-      variant('g02-release-notes', (t) => t.children.push({ id: 'marquee', props: {} }))
-    );
-    expect(unknown.failed).toEqual(['schema']);
-    expect(unknown.issues('schema').join()).toContain('unknown-id');
-    const denied = await failing(
-      'g02-release-notes',
-      variant('g02-release-notes', (t) => t.children.push({ id: 'dialog', props: { title: 'Hi' } }))
-    );
-    expect(denied.issues('schema').join()).toContain('tier-denied');
-    const badBlock = await failing(
-      'g02-release-notes',
-      variant('g02-release-notes', (t) =>
-        t.children.push({
-          id: 'blocks-text',
-          props: { block: { type: 'heading', level: 9, text: 'x' } },
-        })
-      )
-    );
-    expect(badBlock.failed).toContain('schema');
-    expect(badBlock.issues('schema').join()).toMatch(/blocks-text: block/);
-    const bareRoot = await failing('g02-release-notes', text('Only a paragraph.'));
-    expect(bareRoot.issues('schema').join()).toContain('the root must be one of');
-    const deep: { id: string; props: Record<string, unknown>; children: CatalogTreeInput[] } = {
-      id: 'layout-page',
-      props: { title: 'Deep' },
-      children: [],
-    };
-    let cursor = deep;
-    for (let i = 0; i < 20; i += 1) {
-      const next: typeof deep = { id: 'layout-card', props: {}, children: [] };
-      cursor.children.push(next);
-      cursor = next;
+      score.checks.map((c) => c.check),
+      t.id
+    ).toEqual([...GOLDEN_CHECKS]);
+    for (const check of score.checks) {
+      expect(check.status, `${t.id} ${check.check}: ${check.issues.join(' | ')}`).toBe('pass');
     }
-    expect((await failing('g02-release-notes', deep)).issues('schema').join()).toContain(
-      'depth-exceeded'
-    );
-  });
+    expect(score.passed, t.id).toBe(true);
+    expect(score.score, t.id).toBe(1);
+  }
+}, 60_000);
 
-  it('dontUseWhen: a link menu, account links, call-to-action buttons and chrome layouts', async () => {
-    const menu = await failing(
-      'g03-onboarding-handbook',
-      variant('g03-onboarding-handbook', (t) =>
-        t.children.unshift(list(['[Home](/)', '[Docs](/docs)', '[Team](/team)']))
-      )
-    );
-    expect(menu.failed).toEqual(['dontUseWhen']);
-    expect(menu.issues('dontUseWhen').join()).toContain('application navigation');
-    const account = await failing(
-      'g17-service-status',
-      variant('g17-service-status', (t) =>
-        t.children.push(text('[Sign in](https://example.com/login) to subscribe.'))
-      )
-    );
-    expect(account.failed).toEqual(['dontUseWhen']);
-    expect(account.issues('dontUseWhen').join()).toContain('account control');
-    const buy = await failing(
-      'g06-plan-comparison',
-      variant('g06-plan-comparison', (t) =>
-        t.children.push(text('[Buy the Team plan](https://example.com/buy)'))
-      )
-    );
-    expect(buy.issues('dontUseWhen').join()).toContain('mutation');
-    const chrome = await failing(
-      'g30-feature-announcement',
-      variant('g30-feature-announcement', (t) =>
-        t.children.push({
-          id: 'layout-card',
-          props: { title: 'Sidebar' },
-          children: [text('Links')],
-        })
-      )
-    );
-    expect(chrome.failed).toEqual(['dontUseWhen']);
-    expect(chrome.issues('dontUseWhen').join()).toContain('app chrome');
-    // Every trap task has a baited variant its detectors catch.
-    for (const t of GOLDEN_TASKS.filter((g) => g.traps.length > 0)) {
-      const baited = variant(t.id, (tree) =>
-        tree.children.push(list(['[Home](/)', '[Pricing](/pricing)', '[Sign in](/login)']))
-      );
-      expect((await failing(t.id, baited)).failed, t.id).toContain('dontUseWhen');
-    }
-  });
+it('every reference paints for real, and the developer tier keeps app chrome for diagnostics', async () => {
+  await scenario(
+    'paints every content component for real, with the outline the grammar checked',
+    async () => {
+      const catalog = goldenRenderCatalog();
+      for (const t of GOLDEN_TASKS) {
+        const { roots } = renderCatalogTree(t.reference, { catalog, tier: 'untrusted' });
+        const paint = await paintGoldenTree(roots, document, { title: t.title });
+        try {
+          expect(paint.issues, t.id).toEqual([]);
+          const targets = [...document.querySelectorAll('[data-golden-component]')];
+          expect(targets.length, t.id).toBeGreaterThan(0);
+          for (const target of targets) {
+            expect(
+              target.querySelector('*'),
+              `${t.id}: ${target.getAttribute('data-golden-component')} rendered nothing`
+            ).not.toBeNull();
+          }
+          // The painted headings, in document order, are the projected outline.
+          const painted = [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')].map((h) =>
+            Number(h.tagName.slice(1))
+          );
+          const projected: number[] = [];
+          const walk = (nodes: readonly RenderNode[]) => {
+            for (const node of nodes) {
+              if (node.kind !== 'component') continue;
+              if (node.id === 'golden-heading') projected.push(node.props.level as number);
+              walk(node.children);
+            }
+          };
+          walk(projectOutline(roots));
+          expect(painted, t.id).toEqual(projected);
+        } finally {
+          paint.destroy();
+        }
+      }
+    },
+    reset
+  );
+  await scenario(
+    'keeps the developer tier to emittable ids while retaining app chrome for tier-denied diagnostics',
+    async () => {
+      const catalog = goldenRenderCatalog();
+      expect(catalog.get('dialog')).toBeDefined();
+      expect(catalog.allows?.('dialog', 'developer')).toBe(false);
+      expect(catalog.allows?.('blocks-text', 'developer')).toBe(true);
+      expect(catalog.allows?.('blocks-text', 'untrusted')).toBe(true);
+    },
+    reset
+  );
+}, 120000);
 
-  it('sinks: script URLs, HTML strings, style and class keys, handlers and bidi controls', async () => {
-    const cases: [
-      string,
-      (t: CatalogTreeInput & { children: CatalogTreeInput[] }) => void,
-      RegExp,
-    ][] = [
-      ['script link', (t) => t.children.push(text('[Open](javascript:alert(1))')), /executable/],
-      ['html', (t) => t.children.push(text('<img src=x onerror=alert(1)>')), /executable|HTML/],
-      [
-        'style',
-        (t) => Object.assign(t.props as object, { style: 'color: red' }),
-        /forbidden "style"/,
-      ],
-      ['class', (t) => Object.assign(t.props as object, { class: 'hero' }), /forbidden "class"/],
-      ['handler', (t) => Object.assign(t.props as object, { onClick: 'go()' }), /event handler/],
-      [
-        'bidi',
-        (t) => t.children.push(text(`Total ${String.fromCharCode(0x202e)}001$`)),
-        /bidi control/,
-      ],
-      [
-        'unsafe src',
-        (t) =>
-          t.children.push({ id: 'media-image', props: { src: 'data:text/html,hi', alt: 'x' } }),
-        /executable|URL policy/,
-      ],
-    ];
-    for (const [name, edit, pattern] of cases) {
-      const result = await failing('g11-team-photos', variant('g11-team-photos', edit));
-      expect(result.failed, name).toContain('sinks');
-      expect(result.issues('sinks').join(' '), name).toMatch(pattern);
-    }
-    // The raw output is judged, not the cleaned render: a script URL deep in a
-    // chart's data passes the renderer's top-level prop checks, not this one.
-    const hidden = variant('g09-hiring-funnel', (t) => {
-      const funnel = t.children[0]?.children?.[0] as unknown as {
-        props: { steps: { label: string }[] };
-      };
-      (funnel.props.steps[0] as { label: string }).label = 'javascript:alert(1)';
-    });
-    expect((await failing('g09-hiring-funnel', hidden)).failed).toEqual(['sinks']);
-  });
-
-  it('grammar: skipped heading ranks, a second h1 and a second main', async () => {
-    const skip = await failing(
-      'g02-release-notes',
-      variant('g02-release-notes', (t) =>
-        t.children.unshift({
-          id: 'blocks-text',
-          props: { block: { type: 'heading', level: 4, text: 'Deep' } },
-        })
-      )
-    );
-    expect(skip.failed).toEqual(['grammar']);
-    expect(skip.issues('grammar').join()).toContain('heading-skip');
-    const twoH1 = await failing(
-      'g02-release-notes',
-      variant('g02-release-notes', (t) =>
-        t.children.push({
-          id: 'blocks-text',
-          props: { block: { type: 'heading', level: 1, text: 'Again' } },
-        })
-      )
-    );
-    expect(twoH1.issues('grammar').join()).toContain('heading-multiple-h1');
-    const twoMains = await failing(
-      'g02-release-notes',
-      variant('g02-release-notes', (t) =>
-        t.children.push({ id: 'layout-doc', props: { title: 'Nested' }, children: [text('x')] })
-      )
-    );
-    expect(twoMains.issues('grammar').join()).toMatch(/landmark/);
-  });
-
-  it('axe: a painted heading-order break fails, and is skipped without a DOM runner', async () => {
-    // A part-whole chart renders an h3 title; directly under the page h1 that skips a rank.
-    const tree = variant('g19-survey-results', (t) => {
-      const pie = t.children[1]?.children?.[0] as CatalogTreeInput;
-      t.children = [pie];
-    });
-    const withAxe = await failing('g19-survey-results', tree, true);
-    expect(withAxe.failed).toContain('axe');
-    expect(withAxe.issues('axe').join()).toContain('heading-order');
-    expect(withAxe.failed).toContain('grammar');
-    const offline = await scoreGoldenTree(
-      task('g19-survey-results'),
-      task('g19-survey-results').reference
-    );
-    expect(offline.checks.find((c) => c.check === 'axe')?.status).toBe('skipped');
-    expect(offline.passed).toBe(true);
-    expect(offline.score).toBe(1);
-  });
-
-  it('axe: a component that refuses its props is a paint failure', async () => {
-    const tree = variant('g01-weekly-support-digest', (t) => {
-      t.children.push({
-        id: 'layout-card',
-        props: { title: 'Broken' },
-        children: [
-          {
-            id: 'charts-bar',
-            props: {
-              title: 'Bad',
-              description: 'Bad series',
-              series: [{ id: 'a', points: 'oops' }],
+it('schema, dontUseWhen and sinks checks fail on what they guard', async () => {
+  await scenario(
+    'schema: accepts a valid family-owned diagram block in a golden tree',
+    async () => {
+      const tree = variant('g02-release-notes', (root) =>
+        root.children.push({
+          id: 'blocks-diagram',
+          props: {
+            block: {
+              type: 'flow',
+              nodes: [
+                { id: 'start', label: 'Collect brief' },
+                { id: 'ship', label: 'Ship prototype' },
+              ],
             },
           },
-        ],
+        })
+      );
+      const score = await scoreGoldenTree(task('g02-release-notes'), tree);
+      expect(score.checks.find((check) => check.check === 'schema')).toEqual({
+        check: 'schema',
+        status: 'pass',
+        issues: [],
       });
-    });
-    const result = await failing('g01-weekly-support-digest', tree, true);
-    expect(result.failed).toContain('axe');
-  });
-
-  it('coverage: an interface missing a required component', async () => {
-    const result = await failing(
-      'g04-quarterly-revenue',
-      variant('g04-quarterly-revenue', (t) => {
-        t.children = t.children.slice(0, 2);
-      })
-    );
-    expect(result.failed).toEqual(['coverage']);
-    expect(result.issues('coverage')).toEqual(['missing a charts-donut component']);
-  });
+    },
+    reset
+  );
+  await scenario(
+    'schema: not a tree, unknown and tier-denied ids, bad blocks, a non-frame root',
+    async () => {
+      expect((await failing('g02-release-notes', 'just text')).failed).toContain('schema');
+      expect(
+        (await failing('g02-release-notes', [task('g02-release-notes').reference])).failed
+      ).toContain('schema');
+      const unknown = await failing(
+        'g02-release-notes',
+        variant('g02-release-notes', (t) => t.children.push({ id: 'marquee', props: {} }))
+      );
+      expect(unknown.failed).toEqual(['schema']);
+      expect(unknown.issues('schema').join()).toContain('unknown-id');
+      const denied = await failing(
+        'g02-release-notes',
+        variant('g02-release-notes', (t) =>
+          t.children.push({ id: 'dialog', props: { title: 'Hi' } })
+        )
+      );
+      expect(denied.issues('schema').join()).toContain('tier-denied');
+      const badBlock = await failing(
+        'g02-release-notes',
+        variant('g02-release-notes', (t) =>
+          t.children.push({
+            id: 'blocks-text',
+            props: { block: { type: 'heading', level: 9, text: 'x' } },
+          })
+        )
+      );
+      expect(badBlock.failed).toContain('schema');
+      expect(badBlock.issues('schema').join()).toMatch(/blocks-text: block/);
+      const bareRoot = await failing('g02-release-notes', text('Only a paragraph.'));
+      expect(bareRoot.issues('schema').join()).toContain('the root must be one of');
+      const deep: { id: string; props: Record<string, unknown>; children: CatalogTreeInput[] } = {
+        id: 'layout-page',
+        props: { title: 'Deep' },
+        children: [],
+      };
+      let cursor = deep;
+      for (let i = 0; i < 20; i += 1) {
+        const next: typeof deep = { id: 'layout-card', props: {}, children: [] };
+        cursor.children.push(next);
+        cursor = next;
+      }
+      expect((await failing('g02-release-notes', deep)).issues('schema').join()).toContain(
+        'depth-exceeded'
+      );
+    },
+    reset
+  );
+  await scenario(
+    'dontUseWhen: a link menu, account links, call-to-action buttons and chrome layouts',
+    async () => {
+      const menu = await failing(
+        'g03-onboarding-handbook',
+        variant('g03-onboarding-handbook', (t) =>
+          t.children.unshift(list(['[Home](/)', '[Docs](/docs)', '[Team](/team)']))
+        )
+      );
+      expect(menu.failed).toEqual(['dontUseWhen']);
+      expect(menu.issues('dontUseWhen').join()).toContain('application navigation');
+      const account = await failing(
+        'g17-service-status',
+        variant('g17-service-status', (t) =>
+          t.children.push(text('[Sign in](https://example.com/login) to subscribe.'))
+        )
+      );
+      expect(account.failed).toEqual(['dontUseWhen']);
+      expect(account.issues('dontUseWhen').join()).toContain('account control');
+      const buy = await failing(
+        'g06-plan-comparison',
+        variant('g06-plan-comparison', (t) =>
+          t.children.push(text('[Buy the Team plan](https://example.com/buy)'))
+        )
+      );
+      expect(buy.issues('dontUseWhen').join()).toContain('mutation');
+      const chrome = await failing(
+        'g30-feature-announcement',
+        variant('g30-feature-announcement', (t) =>
+          t.children.push({
+            id: 'layout-card',
+            props: { title: 'Sidebar' },
+            children: [text('Links')],
+          })
+        )
+      );
+      expect(chrome.failed).toEqual(['dontUseWhen']);
+      expect(chrome.issues('dontUseWhen').join()).toContain('app chrome');
+      // Every trap task has a baited variant its detectors catch.
+      for (const t of GOLDEN_TASKS.filter((g) => g.traps.length > 0)) {
+        const baited = variant(t.id, (tree) =>
+          tree.children.push(list(['[Home](/)', '[Pricing](/pricing)', '[Sign in](/login)']))
+        );
+        expect((await failing(t.id, baited)).failed, t.id).toContain('dontUseWhen');
+      }
+    },
+    reset
+  );
+  await scenario(
+    'sinks: script URLs, HTML strings, style and class keys, handlers and bidi controls',
+    async () => {
+      const cases: [
+        string,
+        (t: CatalogTreeInput & { children: CatalogTreeInput[] }) => void,
+        RegExp,
+      ][] = [
+        ['script link', (t) => t.children.push(text('[Open](javascript:alert(1))')), /executable/],
+        ['html', (t) => t.children.push(text('<img src=x onerror=alert(1)>')), /executable|HTML/],
+        [
+          'style',
+          (t) => Object.assign(t.props as object, { style: 'color: red' }),
+          /forbidden "style"/,
+        ],
+        ['class', (t) => Object.assign(t.props as object, { class: 'hero' }), /forbidden "class"/],
+        ['handler', (t) => Object.assign(t.props as object, { onClick: 'go()' }), /event handler/],
+        [
+          'bidi',
+          (t) => t.children.push(text(`Total ${String.fromCharCode(0x202e)}001$`)),
+          /bidi control/,
+        ],
+        [
+          'unsafe src',
+          (t) =>
+            t.children.push({ id: 'media-image', props: { src: 'data:text/html,hi', alt: 'x' } }),
+          /executable|URL policy/,
+        ],
+      ];
+      for (const [name, edit, pattern] of cases) {
+        const result = await failing('g11-team-photos', variant('g11-team-photos', edit));
+        expect(result.failed, name).toContain('sinks');
+        expect(result.issues('sinks').join(' '), name).toMatch(pattern);
+      }
+      // The raw output is judged, not the cleaned render: a script URL deep in a
+      // chart's data passes the renderer's top-level prop checks, not this one.
+      const hidden = variant('g09-hiring-funnel', (t) => {
+        const funnel = t.children[0]?.children?.[0] as unknown as {
+          props: { steps: { label: string }[] };
+        };
+        (funnel.props.steps[0] as { label: string }).label = 'javascript:alert(1)';
+      });
+      expect((await failing('g09-hiring-funnel', hidden)).failed).toEqual(['sinks']);
+    },
+    reset
+  );
 });
 
-describe('golden runs are report-only', () => {
-  it('scores a model run, counts missing and unknown outputs, and never throws', async () => {
-    const outputs: Record<string, unknown> = {};
-    for (const t of GOLDEN_TASKS.slice(0, 10)) outputs[t.id] = t.reference;
-    outputs['g11-team-photos'] = '<div>not a tree</div>';
-    outputs['g99-unknown'] = {};
-    const report = await scoreGoldenRun(outputs);
-    expect(report.total).toBe(30);
-    expect(report.passed).toBe(10);
-    expect(report.missing).toHaveLength(19);
-    expect(report.unknown).toEqual(['g99-unknown']);
-    expect(report.checks.schema).toEqual({ passed: 10, ran: 30 });
-    expect(report.checks.axe).toEqual({ passed: 0, ran: 0 });
-    // Missing and non-tree outputs skip the checks that need a tree.
-    expect(report.checks.grammar).toEqual({ passed: 10, ran: 10 });
-    expect(report.checks.sinks).toEqual({ passed: 10, ran: 10 });
-    const markdown = formatGoldenReport(report);
-    expect(markdown).toContain('**10 of 30** tasks passed every check that ran.');
-    expect(markdown).toContain('### g11-team-photos');
-    expect(markdown).toContain('Ignored keys: g99-unknown');
-    expect(markdown).not.toContain('### g30-feature-announcement');
-    for (const junk of [null, 42, 'text', [1, 2]]) {
-      await expect(scoreGoldenRun(junk)).resolves.toMatchObject({ passed: 0, total: 30 });
-    }
-  });
-
-  it('texuli-golden prints the report and exits 0 whatever the scores; unreadable input exits 2', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'texuli-golden-'));
-    const out: string[] = [];
-    const write = vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-      out.push(String(chunk));
-      return true;
-    });
-    const err = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
-    try {
-      const file = join(dir, 'run.json');
-      writeFileSync(
-        file,
-        JSON.stringify({ 'g02-release-notes': task('g02-release-notes').reference })
+it('grammar, axe and coverage checks fail on what they guard', async () => {
+  await scenario(
+    'grammar: skipped heading ranks, a second h1 and a second main',
+    async () => {
+      const skip = await failing(
+        'g02-release-notes',
+        variant('g02-release-notes', (t) =>
+          t.children.unshift({
+            id: 'blocks-text',
+            props: { block: { type: 'heading', level: 4, text: 'Deep' } },
+          })
+        )
       );
-      expect(await runGoldenCli([file])).toBe(0);
-      expect(out.join('')).toContain('**1 of 30** tasks passed');
-      out.length = 0;
-      expect(await runGoldenCli([file, '--json'])).toBe(0);
-      expect(JSON.parse(out.join('')).passed).toBe(1);
-      writeFileSync(file, '{ not json');
-      expect(await runGoldenCli([file])).toBe(2);
-      expect(await runGoldenCli([])).toBe(2);
-    } finally {
-      write.mockRestore();
-      err.mockRestore();
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
+      expect(skip.failed).toEqual(['grammar']);
+      expect(skip.issues('grammar').join()).toContain('heading-skip');
+      const twoH1 = await failing(
+        'g02-release-notes',
+        variant('g02-release-notes', (t) =>
+          t.children.push({
+            id: 'blocks-text',
+            props: { block: { type: 'heading', level: 1, text: 'Again' } },
+          })
+        )
+      );
+      expect(twoH1.issues('grammar').join()).toContain('heading-multiple-h1');
+      const twoMains = await failing(
+        'g02-release-notes',
+        variant('g02-release-notes', (t) =>
+          t.children.push({ id: 'layout-doc', props: { title: 'Nested' }, children: [text('x')] })
+        )
+      );
+      expect(twoMains.issues('grammar').join()).toMatch(/landmark/);
+    },
+    reset
+  );
+  await scenario(
+    'axe: a painted heading-order break fails, and is skipped without a DOM runner',
+    async () => {
+      // A part-whole chart renders an h3 title; directly under the page h1 that skips a rank.
+      const tree = variant('g19-survey-results', (t) => {
+        const pie = t.children[1]?.children?.[0] as CatalogTreeInput;
+        t.children = [pie];
+      });
+      const withAxe = await failing('g19-survey-results', tree, true);
+      expect(withAxe.failed).toContain('axe');
+      expect(withAxe.issues('axe').join()).toContain('heading-order');
+      expect(withAxe.failed).toContain('grammar');
+      const offline = await scoreGoldenTree(
+        task('g19-survey-results'),
+        task('g19-survey-results').reference
+      );
+      expect(offline.checks.find((c) => c.check === 'axe')?.status).toBe('skipped');
+      expect(offline.passed).toBe(true);
+      expect(offline.score).toBe(1);
+    },
+    reset
+  );
+  await scenario(
+    'axe: a component that refuses its props is a paint failure',
+    async () => {
+      const tree = variant('g01-weekly-support-digest', (t) => {
+        t.children.push({
+          id: 'layout-card',
+          props: { title: 'Broken' },
+          children: [
+            {
+              id: 'charts-bar',
+              props: {
+                title: 'Bad',
+                description: 'Bad series',
+                series: [{ id: 'a', points: 'oops' }],
+              },
+            },
+          ],
+        });
+      });
+      const result = await failing('g01-weekly-support-digest', tree, true);
+      expect(result.failed).toContain('axe');
+    },
+    reset
+  );
+  await scenario(
+    'coverage: an interface missing a required component',
+    async () => {
+      const result = await failing(
+        'g04-quarterly-revenue',
+        variant('g04-quarterly-revenue', (t) => {
+          t.children = t.children.slice(0, 2);
+        })
+      );
+      expect(result.failed).toEqual(['coverage']);
+      expect(result.issues('coverage')).toEqual(['missing a charts-donut component']);
+    },
+    reset
+  );
+});
+
+it('runs are report-only: a model run scores without throwing and the CLI exits 0, or 2 on unreadable input', async () => {
+  await scenario(
+    'scores a model run, counts missing and unknown outputs, and never throws',
+    async () => {
+      const outputs: Record<string, unknown> = {};
+      for (const t of GOLDEN_TASKS.slice(0, 10)) outputs[t.id] = t.reference;
+      outputs['g11-team-photos'] = '<div>not a tree</div>';
+      outputs['g99-unknown'] = {};
+      const report = await scoreGoldenRun(outputs);
+      expect(report.total).toBe(30);
+      expect(report.passed).toBe(10);
+      expect(report.missing).toHaveLength(19);
+      expect(report.unknown).toEqual(['g99-unknown']);
+      expect(report.checks.schema).toEqual({ passed: 10, ran: 30 });
+      expect(report.checks.axe).toEqual({ passed: 0, ran: 0 });
+      // Missing and non-tree outputs skip the checks that need a tree.
+      expect(report.checks.grammar).toEqual({ passed: 10, ran: 10 });
+      expect(report.checks.sinks).toEqual({ passed: 10, ran: 10 });
+      const markdown = formatGoldenReport(report);
+      expect(markdown).toContain('**10 of 30** tasks passed every check that ran.');
+      expect(markdown).toContain('### g11-team-photos');
+      expect(markdown).toContain('Ignored keys: g99-unknown');
+      expect(markdown).not.toContain('### g30-feature-announcement');
+      for (const junk of [null, 42, 'text', [1, 2]]) {
+        await expect(scoreGoldenRun(junk)).resolves.toMatchObject({ passed: 0, total: 30 });
+      }
+    },
+    reset
+  );
+  await scenario(
+    'texuli-golden prints the report and exits 0 whatever the scores; unreadable input exits 2',
+    async () => {
+      const dir = mkdtempSync(join(tmpdir(), 'texuli-golden-'));
+      const out: string[] = [];
+      const write = vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+        out.push(String(chunk));
+        return true;
+      });
+      const err = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+      try {
+        const file = join(dir, 'run.json');
+        writeFileSync(
+          file,
+          JSON.stringify({ 'g02-release-notes': task('g02-release-notes').reference })
+        );
+        expect(await runGoldenCli([file])).toBe(0);
+        expect(out.join('')).toContain('**1 of 30** tasks passed');
+        out.length = 0;
+        expect(await runGoldenCli([file, '--json'])).toBe(0);
+        expect(JSON.parse(out.join('')).passed).toBe(1);
+        writeFileSync(file, '{ not json');
+        expect(await runGoldenCli([file])).toBe(2);
+        expect(await runGoldenCli([])).toBe(2);
+      } finally {
+        write.mockRestore();
+        err.mockRestore();
+        rmSync(dir, { recursive: true, force: true });
+      }
+    },
+    reset
+  );
 });
