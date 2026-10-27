@@ -14,14 +14,15 @@ const readme = readFileSync(join(PACKAGE, 'README.md'), 'utf8');
 const docsPages = readdirSync(join(PACKAGE, 'docs')).filter((name) => name.endsWith('.md'));
 
 describe('README subpath coverage', () => {
-  it('mentions every export subpath', () => {
-    const publicNames = Object.keys(packageJson.exports)
-      .filter((key) => key !== '.')
-      .map((key) => `@texuli/blocks${key.slice(1)}`);
-    expect(publicNames.filter((name) => !readme.includes(name))).toEqual([]);
-  });
-
-  it('links every docs page', () => {
+  it('mentions every export subpath; links every docs page', () => {
+    {
+      // mentions every export subpath
+      const publicNames = Object.keys(packageJson.exports)
+        .filter((key) => key !== '.')
+        .map((key) => `@texuli/blocks${key.slice(1)}`);
+      expect(publicNames.filter((name) => !readme.includes(name))).toEqual([]);
+    }
+    // links every docs page
     expect(docsPages.filter((page) => !readme.includes(`docs/${page}`))).toEqual([]);
   });
 });

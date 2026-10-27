@@ -96,7 +96,8 @@ const cta = {
 };
 
 describe('structure block schemas', () => {
-  it('lists the structure family types', () => {
+  it('lists the structure family types, and 6 related cases', () => {
+    // lists the structure family types
     expect(STRUCTURE_BLOCK_TYPES).toEqual([
       'columns',
       'grid',
@@ -106,31 +107,30 @@ describe('structure block schemas', () => {
       'divider',
       'cta',
     ]);
-  });
-
-  it('parses columns, grid, tabs, accordion, cards, divider and cta', () => {
+    cleanup();
+    // parses columns, grid, tabs, accordion, cards, divider and cta
     for (const sample of [columns, grid, tabs, accordion, cards, divider, cta]) {
       const parsed = safeParseBlock(sample);
       expect(parsed.success, JSON.stringify(sample)).toBe(true);
       if (parsed.success) expect(isStructureFamilyBlock(parsed.data)).toBe(true);
     }
-  });
+    cleanup();
+    {
+      // rejects hostile text in accordion and grid bodies
+      const badAccordion = safeParseBlock({
+        type: 'accordion',
+        items: [{ id: 'x', title: 'Ok', body: `bad${String.fromCharCode(0)}body` }],
+      });
+      expect(badAccordion.success).toBe(false);
 
-  it('rejects hostile text in accordion and grid bodies', () => {
-    const badAccordion = safeParseBlock({
-      type: 'accordion',
-      items: [{ id: 'x', title: 'Ok', body: `bad${String.fromCharCode(0)}body` }],
-    });
-    expect(badAccordion.success).toBe(false);
-
-    const badGrid = safeParseBlock({
-      type: 'grid',
-      cells: [{ title: `bad${String.fromCharCode(0x202e)}title` }],
-    });
-    expect(badGrid.success).toBe(false);
-  });
-
-  it('rejects hostile and disallowed card hrefs', () => {
+      const badGrid = safeParseBlock({
+        type: 'grid',
+        cells: [{ title: `bad${String.fromCharCode(0x202e)}title` }],
+      });
+      expect(badGrid.success).toBe(false);
+    }
+    cleanup();
+    // rejects hostile and disallowed card hrefs
     expect(
       safeParseBlock({
         type: 'cards',
@@ -143,131 +143,138 @@ describe('structure block schemas', () => {
         items: [{ title: 'X', href: 'https://evil.example/x' }],
       }).success
     ).toBe(true);
-  });
+    cleanup();
+    {
+      // rejects oversized and invalid tabs
+      expect(
+        safeParseBlock({
+          type: 'tabs',
+          id: 't',
+          label: 'T',
+          panels: [{ id: 'a', label: 'A', blocks: [{ type: 'text', markdown: 'only' }] }],
+        }).success
+      ).toBe(false);
 
-  it('rejects oversized and invalid tabs', () => {
-    expect(
-      safeParseBlock({
+      const tooMany = safeParseBlock({
         type: 'tabs',
         id: 't',
         label: 'T',
-        panels: [{ id: 'a', label: 'A', blocks: [{ type: 'text', markdown: 'only' }] }],
-      }).success
-    ).toBe(false);
+        panels: Array.from({ length: BLOCK_CONTENT_LIMITS.tabPanels + 1 }, (_, i) => ({
+          id: `p${i}`,
+          label: `P${i}`,
+          blocks: [{ type: 'text', markdown: 'x' }],
+        })),
+      });
+      expect(tooMany.success).toBe(false);
 
-    const tooMany = safeParseBlock({
-      type: 'tabs',
-      id: 't',
-      label: 'T',
-      panels: Array.from({ length: BLOCK_CONTENT_LIMITS.tabPanels + 1 }, (_, i) => ({
-        id: `p${i}`,
-        label: `P${i}`,
-        blocks: [{ type: 'text', markdown: 'x' }],
-      })),
-    });
-    expect(tooMany.success).toBe(false);
+      expect(
+        safeParseBlock({
+          type: 'tabs',
+          id: 't',
+          label: 'T',
+          defaultPanel: 'missing',
+          panels: [
+            { id: 'a', label: 'A', blocks: [{ type: 'text', markdown: 'a' }] },
+            { id: 'b', label: 'B', blocks: [{ type: 'text', markdown: 'b' }] },
+          ],
+        }).success
+      ).toBe(false);
 
-    expect(
-      safeParseBlock({
-        type: 'tabs',
-        id: 't',
-        label: 'T',
-        defaultPanel: 'missing',
-        panels: [
-          { id: 'a', label: 'A', blocks: [{ type: 'text', markdown: 'a' }] },
-          { id: 'b', label: 'B', blocks: [{ type: 'text', markdown: 'b' }] },
-        ],
-      }).success
-    ).toBe(false);
-
-    expect(
-      safeParseBlock({
-        type: 'tabs',
-        id: 't',
-        label: 'T',
-        panels: [
-          { id: 'a', label: 'A', blocks: [{ type: 'text', markdown: 'a' }] },
-          { id: 'a', label: 'B', blocks: [{ type: 'text', markdown: 'b' }] },
-        ],
-      }).success
-    ).toBe(false);
-  });
-
-  it('rejects empty cards and grid cells without content', () => {
+      expect(
+        safeParseBlock({
+          type: 'tabs',
+          id: 't',
+          label: 'T',
+          panels: [
+            { id: 'a', label: 'A', blocks: [{ type: 'text', markdown: 'a' }] },
+            { id: 'a', label: 'B', blocks: [{ type: 'text', markdown: 'b' }] },
+          ],
+        }).success
+      ).toBe(false);
+    }
+    cleanup();
+    // rejects empty cards and grid cells without content
     expect(safeParseBlock({ type: 'cards', items: [] }).success).toBe(false);
     expect(safeParseBlock({ type: 'grid', cells: [{}] }).success).toBe(false);
     expect(safeParseBlock({ type: 'grid', cells: [] }).success).toBe(false);
-  });
-
-  it('checkStructureBlock accepts structure and rejects other families', () => {
-    const ok = checkStructureBlock(columns);
-    expect(ok.ok).toBe(true);
-    const other = checkStructureBlock({
-      type: 'table',
-      columns: [{ id: 'a', label: 'A' }],
-      rows: [],
-    });
-    expect(other.ok).toBe(false);
-    const hostile = checkStructureBlock({
-      type: 'accordion',
-      items: [{ id: 'x', title: `bad${String.fromCharCode(0)}` }],
-    });
-    expect(hostile.ok).toBe(false);
+    cleanup();
+    {
+      // checkStructureBlock accepts structure and rejects other families
+      const ok = checkStructureBlock(columns);
+      expect(ok.ok).toBe(true);
+      const other = checkStructureBlock({
+        type: 'table',
+        columns: [{ id: 'a', label: 'A' }],
+        rows: [],
+      });
+      expect(other.ok).toBe(false);
+      const hostile = checkStructureBlock({
+        type: 'accordion',
+        items: [{ id: 'x', title: `bad${String.fromCharCode(0)}` }],
+      });
+      expect(hostile.ok).toBe(false);
+    }
   });
 });
 
 describe('structure family renderer', () => {
-  it('renders columns, grid, cards, divider and cta', () => {
-    const { container: col } = render(StructureFamily, { props: { block: columns } });
-    expect(col.querySelector('[data-tx-block="columns"]')).toBeTruthy();
+  it('renders columns, grid, cards, divider and cta, and 3 related cases', async () => {
+    {
+      // renders columns, grid, cards, divider and cta
+      const { container: col } = render(StructureFamily, { props: { block: columns } });
+      expect(col.querySelector('[data-tx-block="columns"]')).toBeTruthy();
 
-    const { container: g } = render(StructureFamily, { props: { block: grid } });
-    expect(g.querySelector('[data-tx-block="grid"]')).toBeTruthy();
-    expect(screen.getByText('Harbor squads')).toBeTruthy();
-    expect(screen.getByText('Design')).toBeTruthy();
+      const { container: g } = render(StructureFamily, { props: { block: grid } });
+      expect(g.querySelector('[data-tx-block="grid"]')).toBeTruthy();
+      expect(screen.getByText('Harbor squads')).toBeTruthy();
+      expect(screen.getByText('Design')).toBeTruthy();
 
-    const { container: c } = render(StructureFamily, { props: { block: cards } });
-    expect(c.querySelector('[data-tx-block="cards"]')).toBeTruthy();
-    expect(c.querySelector('a[href="https://example.com/docs"]')).toBeTruthy();
+      const { container: c } = render(StructureFamily, { props: { block: cards } });
+      expect(c.querySelector('[data-tx-block="cards"]')).toBeTruthy();
+      expect(c.querySelector('a[href="https://example.com/docs"]')).toBeTruthy();
 
-    const { container: d } = render(StructureFamily, { props: { block: divider } });
-    expect(d.querySelector('[data-tx-block="divider"]')).toBeTruthy();
+      const { container: d } = render(StructureFamily, { props: { block: divider } });
+      expect(d.querySelector('[data-tx-block="divider"]')).toBeTruthy();
 
-    const { container: a } = render(StructureFamily, { props: { block: cta } });
-    expect(a.querySelector('[data-tx-block="cta"]')).toBeTruthy();
-    expect(a.querySelector('a[href="mailto:hello@example.com"]')).toBeTruthy();
-  });
+      const { container: a } = render(StructureFamily, { props: { block: cta } });
+      expect(a.querySelector('[data-tx-block="cta"]')).toBeTruthy();
+      expect(a.querySelector('a[href="mailto:hello@example.com"]')).toBeTruthy();
+    }
+    cleanup();
+    {
+      // renders tabs and accordion on the texuli primitives
+      const { container: t } = render(StructureFamily, { props: { block: tabs } });
+      expect(t.querySelector('[data-tx-block="tabs"]')).toBeTruthy();
+      expect(t.querySelector('[data-tx-tabs]')).toBeTruthy();
 
-  it('renders tabs and accordion on the texuli primitives', () => {
-    const { container: t } = render(StructureFamily, { props: { block: tabs } });
-    expect(t.querySelector('[data-tx-block="tabs"]')).toBeTruthy();
-    expect(t.querySelector('[data-tx-tabs]')).toBeTruthy();
-
-    const { container: acc } = render(StructureFamily, { props: { block: accordion } });
-    expect(acc.querySelector('[data-tx-block="accordion"]')).toBeTruthy();
-    expect(acc.querySelector('[data-tx-accordion]')).toBeTruthy();
-    expect(screen.getByText('What is Harbor?')).toBeTruthy();
-  });
-
-  it('shows an inert notice for hostile input and calls oninvalid', () => {
-    const issues: unknown[] = [];
-    const { container } = render(StructureFamily, {
-      props: {
-        block: {
-          type: 'cards',
-          items: [{ title: `bad${String.fromCharCode(0)}`, href: 'javascript:alert(1)' }],
+      const { container: acc } = render(StructureFamily, { props: { block: accordion } });
+      expect(acc.querySelector('[data-tx-block="accordion"]')).toBeTruthy();
+      expect(acc.querySelector('[data-tx-accordion]')).toBeTruthy();
+      expect(screen.getByText('What is Harbor?')).toBeTruthy();
+    }
+    cleanup();
+    {
+      // shows an inert notice for hostile input and calls oninvalid
+      const issues: unknown[] = [];
+      const { container } = render(StructureFamily, {
+        props: {
+          block: {
+            type: 'cards',
+            items: [{ title: `bad${String.fromCharCode(0)}`, href: 'javascript:alert(1)' }],
+          },
+          oninvalid: (list: FieldIssue[]) => {
+            issues.push(...list);
+          },
         },
-        oninvalid: (list: FieldIssue[]) => {
-          issues.push(...list);
-        },
-      },
-    });
-    expect(container.querySelector('[data-tx-block="invalid"]')).toBeTruthy();
-    expect(issues.length).toBeGreaterThan(0);
-  });
-
-  it('loadStructureFamily resolves the lazy renderer', async () => {
-    const mod = await loadStructureFamily();
-    expect(typeof mod.default).toBe('function');
+      });
+      expect(container.querySelector('[data-tx-block="invalid"]')).toBeTruthy();
+      expect(issues.length).toBeGreaterThan(0);
+    }
+    cleanup();
+    // loadStructureFamily resolves the lazy renderer
+    await (async () => {
+      const mod = await loadStructureFamily();
+      expect(typeof mod.default).toBe('function');
+    })();
   });
 });
