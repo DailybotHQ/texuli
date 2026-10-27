@@ -1,3 +1,4 @@
+// @vitest-environment node
 import {
   areaChartSchema,
   barChartSchema,
@@ -153,7 +154,8 @@ function assertPlainJson(value: unknown): asserts value is ChartSchemaJson {
 }
 
 describe('chart prop schemas', () => {
-  it('covers every blueprint-rendered chart and every chart family', () => {
+  it('covers every blueprint-rendered chart and every chart family, and 5 related cases', () => {
+    // covers every blueprint-rendered chart and every chart family
     expect(checkedComponentCount).toBe(24);
     expect(Object.keys(chartPropSchemas)).toHaveLength(24);
     expect(new Set(Object.values(chartPropSchemas).map((schema) => schema.family))).toEqual(
@@ -176,78 +178,77 @@ describe('chart prop schemas', () => {
       const names = schema.props.map((field) => field.name);
       expect(new Set(names).size).toBe(names.length);
     }
-  });
-
-  it('is plain JSON with no runtime values hidden in defaults or nested schemas', () => {
-    const bundle = { definitions: chartSchemaDefinitions, components: chartPropSchemas };
-    assertPlainJson(bundle);
-    expect(JSON.parse(JSON.stringify(bundle))).toEqual(bundle);
-    for (const schema of Object.values(chartPropSchemas)) {
-      for (const field of schema.props) {
-        expect(field.label).not.toBe('');
-        expect(field.description).not.toBe('');
-        assertNodeIsInspectable(field);
+    {
+      // is plain JSON with no runtime values hidden in defaults or nested schemas
+      const bundle = { definitions: chartSchemaDefinitions, components: chartPropSchemas };
+      assertPlainJson(bundle);
+      expect(JSON.parse(JSON.stringify(bundle))).toEqual(bundle);
+      for (const schema of Object.values(chartPropSchemas)) {
+        for (const field of schema.props) {
+          expect(field.label).not.toBe('');
+          expect(field.description).not.toBe('');
+          assertNodeIsInspectable(field);
+        }
       }
+      Object.values(chartSchemaDefinitions).forEach(assertNodeIsInspectable);
     }
-    Object.values(chartSchemaDefinitions).forEach(assertNodeIsInspectable);
-  });
-
-  it('describes nested series, axes, bins, records, and recursive layouts', () => {
-    const series = propValue('charts-line', 'series');
-    expect(series.kind).toBe('array');
-    expect(series.kind === 'array' && series.items.kind).toBe('object');
-    const seriesObject = series.kind === 'array' ? (series.items as ChartObjectSchema) : undefined;
-    const points = seriesObject?.properties.find((field) => field.name === 'points');
-    expect(points?.kind).toBe('array');
-    expect(propValue('charts-line', 'fullDomain')).toMatchObject({
-      kind: 'tuple',
-      items: [
-        { kind: 'number', constraints: { finite: true } },
-        { kind: 'number', constraints: { finite: true } },
-      ],
-    });
-    expect(propValue('charts-line', 'visibleDomain')).toMatchObject({
-      kind: 'tuple',
-      items: [
-        { kind: 'number', constraints: { finite: true } },
-        { kind: 'number', constraints: { finite: true } },
-      ],
-    });
-
-    const annotations = propValue('charts-line', 'annotations');
-    expect(annotations).toMatchObject({
-      kind: 'array',
-      constraints: { uniqueBy: 'id', maxItems: 100 },
-      items: {
-        kind: 'union',
-        variants: [
-          { kind: 'object' },
-          { kind: 'object' },
-          { kind: 'object' },
-          { kind: 'object' },
-          { kind: 'object' },
+    {
+      // describes nested series, axes, bins, records, and recursive layouts
+      const series = propValue('charts-line', 'series');
+      expect(series.kind).toBe('array');
+      expect(series.kind === 'array' && series.items.kind).toBe('object');
+      const seriesObject =
+        series.kind === 'array' ? (series.items as ChartObjectSchema) : undefined;
+      const points = seriesObject?.properties.find((field) => field.name === 'points');
+      expect(points?.kind).toBe('array');
+      expect(propValue('charts-line', 'fullDomain')).toMatchObject({
+        kind: 'tuple',
+        items: [
+          { kind: 'number', constraints: { finite: true } },
+          { kind: 'number', constraints: { finite: true } },
         ],
-      },
-    });
-    expect(propValue('charts-heatmap', 'annotations')).toMatchObject({
-      kind: 'array',
-      constraints: { uniqueBy: 'id', maxItems: 100 },
-    });
+      });
+      expect(propValue('charts-line', 'visibleDomain')).toMatchObject({
+        kind: 'tuple',
+        items: [
+          { kind: 'number', constraints: { finite: true } },
+          { kind: 'number', constraints: { finite: true } },
+        ],
+      });
 
-    expect(propValue('charts-histogram', 'thresholds').kind).toBe('array');
-    expect(propValue('charts-histogram', 'binCount')).toMatchObject({
-      kind: 'number',
-      constraints: { integer: true, minimum: 1 },
-    });
-    expect(propValue('charts-calendar', 'values').kind).toBe('record');
-    expect(propValue('charts-pack', 'root')).toMatchObject({
-      kind: 'reference',
-      ref: 'tree-node',
-    });
-    expect(chartSchemaDefinitions['tree-node']).toMatchObject({ kind: 'object' });
-  });
+      const annotations = propValue('charts-line', 'annotations');
+      expect(annotations).toMatchObject({
+        kind: 'array',
+        constraints: { uniqueBy: 'id', maxItems: 100 },
+        items: {
+          kind: 'union',
+          variants: [
+            { kind: 'object' },
+            { kind: 'object' },
+            { kind: 'object' },
+            { kind: 'object' },
+            { kind: 'object' },
+          ],
+        },
+      });
+      expect(propValue('charts-heatmap', 'annotations')).toMatchObject({
+        kind: 'array',
+        constraints: { uniqueBy: 'id', maxItems: 100 },
+      });
 
-  it('describes compact chart formatting as inspectable JSON rather than a callback event', () => {
+      expect(propValue('charts-histogram', 'thresholds').kind).toBe('array');
+      expect(propValue('charts-histogram', 'binCount')).toMatchObject({
+        kind: 'number',
+        constraints: { integer: true, minimum: 1 },
+      });
+      expect(propValue('charts-calendar', 'values').kind).toBe('record');
+      expect(propValue('charts-pack', 'root')).toMatchObject({
+        kind: 'reference',
+        ref: 'tree-node',
+      });
+      expect(chartSchemaDefinitions['tree-node']).toMatchObject({ kind: 'object' });
+    }
+    // describes compact chart formatting as inspectable JSON rather than a callback event
     for (const id of [
       'charts-sparkline',
       'charts-bullet',
@@ -265,59 +266,61 @@ describe('chart prop schemas', () => {
       expect(fields[0]).toContain('currency');
       expect(fields[1]).toContain('timeZone');
     }
-  });
+    {
+      // exposes editable object fields inside series, points, cells, and thresholds
+      const asObject = (value: ChartValueSchema): ChartObjectSchema => {
+        expect(value.kind).toBe('object');
+        if (value.kind !== 'object') throw new Error('Expected an object schema.');
+        return value;
+      };
+      const arrayItems = (schemaId: keyof typeof chartPropSchemas, name: string) => {
+        const value = propValue(schemaId, name);
+        expect(value.kind).toBe('array');
+        if (value.kind !== 'array') throw new Error(`Expected ${name} to be an array schema.`);
+        return value.items;
+      };
+      const fieldNames = (value: ChartValueSchema) =>
+        asObject(value).properties.map((field) => field.name);
 
-  it('exposes editable object fields inside series, points, cells, and thresholds', () => {
-    const asObject = (value: ChartValueSchema): ChartObjectSchema => {
-      expect(value.kind).toBe('object');
-      if (value.kind !== 'object') throw new Error('Expected an object schema.');
-      return value;
-    };
-    const arrayItems = (schemaId: keyof typeof chartPropSchemas, name: string) => {
-      const value = propValue(schemaId, name);
-      expect(value.kind).toBe('array');
-      if (value.kind !== 'array') throw new Error(`Expected ${name} to be an array schema.`);
-      return value.items;
-    };
-    const fieldNames = (value: ChartValueSchema) =>
-      asObject(value).properties.map((field) => field.name);
+      const series = asObject(arrayItems('charts-line', 'series'));
+      expect(fieldNames(series)).toEqual(
+        expect.arrayContaining(['id', 'label', 'points', 'color'])
+      );
 
-    const series = asObject(arrayItems('charts-line', 'series'));
-    expect(fieldNames(series)).toEqual(expect.arrayContaining(['id', 'label', 'points', 'color']));
+      const points = series.properties.find((field) => field.name === 'points');
+      expect(points?.kind).toBe('array');
+      if (points?.kind !== 'array') throw new Error('Expected series points to be an array.');
+      expect(fieldNames(points.items)).toEqual(expect.arrayContaining(['x', 'y']));
 
-    const points = series.properties.find((field) => field.name === 'points');
-    expect(points?.kind).toBe('array');
-    if (points?.kind !== 'array') throw new Error('Expected series points to be an array.');
-    expect(fieldNames(points.items)).toEqual(expect.arrayContaining(['x', 'y']));
+      expect(fieldNames(arrayItems('charts-heatmap', 'cells'))).toEqual(
+        expect.arrayContaining(['x', 'y', 'value'])
+      );
+      expect(arrayItems('charts-histogram', 'thresholds')).toMatchObject({
+        kind: 'number',
+        constraints: { finite: true },
+      });
+      expect(arrayItems('charts-gauge', 'thresholds')).toMatchObject({
+        kind: 'number',
+        constraints: { finite: true },
+      });
+    }
+    {
+      // publishes component defaults and marks callbacks as developer-only
+      const defaultFor = (id: keyof typeof chartPropSchemas, name: string) =>
+        chartPropSchemas[id].props.find((field) => field.name === name)?.default;
 
-    expect(fieldNames(arrayItems('charts-heatmap', 'cells'))).toEqual(
-      expect.arrayContaining(['x', 'y', 'value'])
-    );
-    expect(arrayItems('charts-histogram', 'thresholds')).toMatchObject({
-      kind: 'number',
-      constraints: { finite: true },
-    });
-    expect(arrayItems('charts-gauge', 'thresholds')).toMatchObject({
-      kind: 'number',
-      constraints: { finite: true },
-    });
-  });
+      expect(defaultFor('charts-line', 'renderer')).toBe('auto');
+      expect(defaultFor('charts-donut', 'innerRatio')).toBe(0.58);
+      expect(defaultFor('charts-gauge', 'size')).toBe(144);
+      expect(defaultFor('charts-funnel', 'orientation')).toBe('vertical');
+      expect(defaultFor('charts-histogram', 'width')).toBe(640);
+      expect(defaultFor('charts-calendar', 'weekStartsOn')).toBe(1);
 
-  it('publishes component defaults and marks callbacks as developer-only', () => {
-    const defaultFor = (id: keyof typeof chartPropSchemas, name: string) =>
-      chartPropSchemas[id].props.find((field) => field.name === name)?.default;
-
-    expect(defaultFor('charts-line', 'renderer')).toBe('auto');
-    expect(defaultFor('charts-donut', 'innerRatio')).toBe(0.58);
-    expect(defaultFor('charts-gauge', 'size')).toBe(144);
-    expect(defaultFor('charts-funnel', 'orientation')).toBe('vertical');
-    expect(defaultFor('charts-histogram', 'width')).toBe(640);
-    expect(defaultFor('charts-calendar', 'weekStartsOn')).toBe(1);
-
-    const callbacks = Object.values(chartPropSchemas).flatMap((schema) =>
-      schema.props.filter((field) => field.kind === 'event')
-    );
-    expect(callbacks.length).toBeGreaterThan(0);
-    expect(callbacks.every((field) => field.exposure === 'developer')).toBe(true);
+      const callbacks = Object.values(chartPropSchemas).flatMap((schema) =>
+        schema.props.filter((field) => field.kind === 'event')
+      );
+      expect(callbacks.length).toBeGreaterThan(0);
+      expect(callbacks.every((field) => field.exposure === 'developer')).toBe(true);
+    }
   });
 });

@@ -58,90 +58,94 @@ const values = Array.from({ length: 2_000 }, (_, i) =>
 const xs = values.map((_, i) => i);
 
 describe('chart offload contract', () => {
-  it('packs bins and gaps losslessly', () => {
-    const bins = bin(values, { count: 12 });
-    expect(unpackBins(packBins(bins))).toEqual(bins);
-    expect(Array.from(toFloat64([1, null, 3]))).toEqual([1, Number.NaN, 3]);
-  });
-
-  it('reports bad requests as errors instead of throwing', () => {
+  it('packs bins and gaps losslessly; reports bad requests as errors instead of throwing', () => {
+    {
+      // packs bins and gaps losslessly
+      const bins = bin(values, { count: 12 });
+      expect(unpackBins(packBins(bins))).toEqual(bins);
+      expect(Array.from(toFloat64([1, null, 3]))).toEqual([1, Number.NaN, 3]);
+    }
+    // reports bad requests as errors instead of throwing
     expect(handleChartOffload({ id: 7, op: 'nope' } as never)).toMatchObject({ id: 7, ok: false });
   });
 });
 
 describe('createChartOffload', () => {
-  it('runs on the main thread without a worker factory, matching the sync math exactly', async () => {
-    const offload = createChartOffload();
-    expect(offload.mode).toBe('main-thread');
-    expect(await offload.bin(values, { count: 20 })).toEqual(bin(values, { count: 20 }));
-    const ys = toFloat64(values);
-    expect(await offload.lttb(xs, values, 300)).toEqual(lttbIndices(xs, ys, 300));
-    expect(await offload.minMax(xs, values, 50)).toEqual(minMaxBuckets(xs, ys, { buckets: 50 }));
-  });
-
-  it('offloads to a worker with transferred buffers and identical results', async () => {
-    const log = { posts: 0, transferred: 0 };
-    const offload = createChartOffload({
-      createWorker: () => channelWorker(log),
-      minOffloadLength: 0,
-    });
-    expect(offload.mode).toBe('worker');
-    const [bins, sampled, buckets] = await Promise.all([
-      offload.bin(values, { count: 20 }),
-      offload.lttb(xs, values, 300),
-      offload.minMax(xs, values, 50),
-    ]);
-    const ys = toFloat64(values);
-    expect(bins).toEqual(bin(values, { count: 20 }));
-    expect(sampled).toEqual(lttbIndices(xs, ys, 300));
-    expect(buckets).toEqual(minMaxBuckets(xs, ys, { buckets: 50 }));
-    expect(log.posts).toBe(3);
-    // bin hands over one buffer; lttb and min-max hand over xs and ys.
-    expect(log.transferred).toBe(5);
-    offload.dispose();
-    expect(offload.mode).toBe('main-thread');
-  });
-
-  it('keeps small inputs on the main thread', async () => {
-    const log = { posts: 0, transferred: 0 };
-    const offload = createChartOffload({ createWorker: () => channelWorker(log) });
-    await offload.bin([1, 2, 3]);
-    expect(log.posts).toBe(0);
-    offload.dispose();
-  });
-
-  it('falls back to the main thread when the worker errors, finishing calls in flight', async () => {
-    let fireError: (event: unknown) => void = () => {};
-    const silent: ChartWorkerLike = {
-      postMessage() {
-        // Never answers; reports an error instead.
-        queueMicrotask(() => fireError(new Error('worker crashed')));
-      },
-      addEventListener(type: string, listener: (event: never) => void) {
-        if (type === 'error') fireError = listener as (event: unknown) => void;
-      },
-      terminate() {},
-    };
-    const offload = createChartOffload({ createWorker: () => silent, minOffloadLength: 0 });
-    expect(await offload.bin(values, { count: 10 })).toEqual(bin(values, { count: 10 }));
-    expect(offload.mode).toBe('main-thread');
-    expect(await offload.lttb(xs, values, 100)).toEqual(lttbIndices(xs, toFloat64(values), 100));
-  });
-
-  it('falls back when the worker cannot be created (SSR, blocked workers)', async () => {
-    const offload = createChartOffload({
-      createWorker: () => {
-        throw new Error('Worker is not defined');
-      },
-      minOffloadLength: 0,
-    });
-    expect(await offload.bin(values)).toEqual(bin(values));
-    expect(offload.mode).toBe('main-thread');
-  });
-
-  it('accepts a DOM Worker as a ChartWorkerLike (type-level check)', () => {
-    const accept = (worker: Worker): ChartWorkerLike => worker;
-    expect(typeof accept).toBe('function');
+  it('runs on the main thread without a worker factory, matching the sync math exactly, and 5 related cases', async () => {
+    // runs on the main thread without a worker factory, matching the sync math exactly
+    await (async () => {
+      const offload = createChartOffload();
+      expect(offload.mode).toBe('main-thread');
+      expect(await offload.bin(values, { count: 20 })).toEqual(bin(values, { count: 20 }));
+      const ys = toFloat64(values);
+      expect(await offload.lttb(xs, values, 300)).toEqual(lttbIndices(xs, ys, 300));
+      expect(await offload.minMax(xs, values, 50)).toEqual(minMaxBuckets(xs, ys, { buckets: 50 }));
+    })();
+    // offloads to a worker with transferred buffers and identical results
+    await (async () => {
+      const log = { posts: 0, transferred: 0 };
+      const offload = createChartOffload({
+        createWorker: () => channelWorker(log),
+        minOffloadLength: 0,
+      });
+      expect(offload.mode).toBe('worker');
+      const [bins, sampled, buckets] = await Promise.all([
+        offload.bin(values, { count: 20 }),
+        offload.lttb(xs, values, 300),
+        offload.minMax(xs, values, 50),
+      ]);
+      const ys = toFloat64(values);
+      expect(bins).toEqual(bin(values, { count: 20 }));
+      expect(sampled).toEqual(lttbIndices(xs, ys, 300));
+      expect(buckets).toEqual(minMaxBuckets(xs, ys, { buckets: 50 }));
+      expect(log.posts).toBe(3);
+      // bin hands over one buffer; lttb and min-max hand over xs and ys.
+      expect(log.transferred).toBe(5);
+      offload.dispose();
+      expect(offload.mode).toBe('main-thread');
+    })();
+    // keeps small inputs on the main thread
+    await (async () => {
+      const log = { posts: 0, transferred: 0 };
+      const offload = createChartOffload({ createWorker: () => channelWorker(log) });
+      await offload.bin([1, 2, 3]);
+      expect(log.posts).toBe(0);
+      offload.dispose();
+    })();
+    // falls back to the main thread when the worker errors, finishing calls in flight
+    await (async () => {
+      let fireError: (event: unknown) => void = () => {};
+      const silent: ChartWorkerLike = {
+        postMessage() {
+          // Never answers; reports an error instead.
+          queueMicrotask(() => fireError(new Error('worker crashed')));
+        },
+        addEventListener(type: string, listener: (event: never) => void) {
+          if (type === 'error') fireError = listener as (event: unknown) => void;
+        },
+        terminate() {},
+      };
+      const offload = createChartOffload({ createWorker: () => silent, minOffloadLength: 0 });
+      expect(await offload.bin(values, { count: 10 })).toEqual(bin(values, { count: 10 }));
+      expect(offload.mode).toBe('main-thread');
+      expect(await offload.lttb(xs, values, 100)).toEqual(lttbIndices(xs, toFloat64(values), 100));
+    })();
+    // falls back when the worker cannot be created (SSR, blocked workers)
+    await (async () => {
+      const offload = createChartOffload({
+        createWorker: () => {
+          throw new Error('Worker is not defined');
+        },
+        minOffloadLength: 0,
+      });
+      expect(await offload.bin(values)).toEqual(bin(values));
+      expect(offload.mode).toBe('main-thread');
+    })();
+    {
+      // accepts a DOM Worker as a ChartWorkerLike (type-level check)
+      const accept = (worker: Worker): ChartWorkerLike => worker;
+      expect(typeof accept).toBe('function');
+    }
   });
 });
 
