@@ -14,8 +14,6 @@
  * bodies are read or logged.
  */
 
-import { markdownTwinFor } from '../apps/website/src/components/docs/markdown-negotiation.ts';
-import { isDocsPath } from '../apps/website/src/components/foundation/nav-data.ts';
 import { agentProblem, isAgentRequest } from '../apps/website/src/lib/agent-request.ts';
 import {
   type BotEventName,
@@ -58,26 +56,6 @@ function sendBotEvent(context: Context, event: BotEventName, pathname: string): 
     () => undefined
   );
   if (context.waitUntil) context.waitUntil(send);
-}
-
-/**
- * The HTML of a negotiable docs path declares `Vary: Accept`, matching its
- * markdown twin, so a shared cache keyed by URL never hands one variant to
- * a consumer that asked for the other. An existing Vary is kept; Accept is
- * appended once. Headers are copied because pipeline responses can be
- * immutable.
- */
-function varyOnAccept(response: Response): Response {
-  const vary = response.headers.get('vary') ?? '';
-  const listed = vary.split(',').map((token) => token.trim().toLowerCase());
-  if (listed.includes('accept') || listed.includes('*')) return response;
-  const headers = new Headers(response.headers);
-  headers.set('vary', vary.trim() ? `${vary}, Accept` : 'Accept');
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
 }
 
 export const onRequest = async (context: Context): Promise<Response> => {
@@ -130,12 +108,9 @@ export const onRequest = async (context: Context): Promise<Response> => {
       headers: { 'content-type': 'application/problem+json' },
     });
   }
-  if (
-    (response.headers.get('content-type') ?? '').includes('text/html') &&
-    isDocsPath(url.pathname) &&
-    markdownTwinFor(url.pathname)
-  ) {
-    return varyOnAccept(response);
-  }
+  // Pass-through responses are returned as the very object the pipeline
+  // gave: Cloudflare applies `_headers` (the page CSP, and `Vary: Accept` on
+  // negotiable docs pages) only to that asset response, so a rebuilt copy
+  // would drop them (PLAN_006 T-100 S-2).
   return response;
 };
