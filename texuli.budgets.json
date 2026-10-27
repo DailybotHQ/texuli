@@ -190,6 +190,11 @@
       "cssGzip": 1024,
       "note": "APG grid calendar on @internationalized/date (the one allowlisted runtime dependency: locales, calendars, time zones); measured 13,232 B against a 7 KiB plan target (lead decision 2026-10-23)."
     },
+    "@texuli/primitives/color-picker": {
+      "gzip": 4352,
+      "cssGzip": 1024,
+      "note": "Was covered by the @texuli/primitives/* 4 KiB design target. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 4,134 B + 4% headroom so platform drift does not flip it."
+    },
     "@texuli/primitives/combobox": {
       "gzip": 24576,
       "cssGzip": 1024,
@@ -324,12 +329,12 @@
       "note": "FIX-port-compact / library quality: AA gate entry measured ~10.57 KiB. Checking tool only (never in components)."
     },
     "@texuli/tokens/build": {
-      "gzip": 5888,
-      "note": "FIX-port-compact: buildLibraryTheme without defineTheme in prod path. Measured ~5.71 KiB."
+      "gzip": 6144,
+      "note": "FIX-port-compact: buildLibraryTheme without defineTheme in prod path. Measured ~5.71 KiB. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 5,904 B + 4% headroom so platform drift does not flip it."
     },
     "@texuli/tokens/contract": {
-      "gzip": 7296,
-      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B."
+      "gzip": 7680,
+      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 7,347 B + 4% headroom so platform drift does not flip it."
     },
     "@texuli/tokens/css": {
       "gzip": 5824,
@@ -494,18 +499,18 @@
       "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it."
     },
     "@texuli/editor/link-dialog": {
-      "gzip": 1472,
+      "gzip": 1600,
       "cssGzip": 1600,
-      "note": "The link dialog; addresses go through the controller and the URL policy (measured 1,469 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
+      "note": "The link dialog; addresses go through the controller and the URL policy (measured 1,469 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 1,484 B + 4% headroom so platform drift does not flip it."
     },
     "@texuli/editor/paste": {
       "gzip": 7488,
       "note": "Framework-free clipboard import: owned HTML tokenizer, allowlist and the untrusted loader (measured 7,429 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
     },
     "@texuli/editor/toolbar": {
-      "gzip": 6912,
+      "gzip": 7232,
       "cssGzip": 2240,
-      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
+      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it."
     },
     "@texuli/astro": {
       "gzip": 18688,
