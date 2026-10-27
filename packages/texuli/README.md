@@ -1,123 +1,166 @@
 # texuli
 
-Styled Texuli components, layouts and shells: the L3 layer that composes
-`@texuli/primitives` behavior with the `@texuli/tokens` engine into
-ready-to-use Svelte 5 components. Published to npm as `0.1.0-next.2` under the `next`
-dist-tag (by CI, with provenance); no stable release (`latest` is reserved
-for 1.0.0), so install it with `@next`. The workspace package stays
-`"private": true`.
+Styled, accessible Svelte 5 components, layouts and app shells from
+[Texuli](https://texuli.com), an MIT-licensed component library by Dailybot,
+Inc. (*Small pieces. Infinite possibilities.*). Every component composes an
+owned headless primitive from
+[`@texuli/primitives`](https://www.npmjs.com/package/@texuli/primitives)
+with the theme engine in
+[`@texuli/tokens`](https://www.npmjs.com/package/@texuli/tokens), so you get
+keyboard support, focus management and theming out of the box.
 
-## Status
+Use it to build Svelte 5 apps, dashboards and sites without writing
+component behavior or design tokens yourself: 41 component families plus
+layouts for dashboards, marketing pages, auth and settings, content and
+mobile.
 
-Implemented in `src/` and exported through [`package.json`](package.json)
-(the root and 69 subpaths): 41 styled component families, the `cx`/variant helpers, the
-icon system, and the layout families listed below. They are covered by 205
-unit tests in 6 files (`pnpm vitest run packages/texuli`). Per-item notes
-live in [`docs/`](docs/) here until they are folded into this README.
+> **Status: preview.** Texuli is in development. The packages are published
+> to npm as prereleases under the `next` dist-tag, and there is no stable
+> release yet, so install with `@next`. APIs may still change between
+> previews.
 
-## Using the components
+## Install
 
-The package peers on Svelte 5 (`^5.57.2`); its `@texuli/*` dependencies are
-workspace links. Components style themselves on the `--tx-*` token contract
-inside `@layer tx.components`, so a page needs the token stylesheet first:
-
-```css
-@import '@texuli/tokens/base.css';
+```bash
+npm install texuli@next @texuli/tokens@next
 ```
+
+```bash
+pnpm add texuli@next @texuli/tokens@next
+# or
+yarn add texuli@next @texuli/tokens@next
+```
+
+- **Peer dependency:** `svelte` `^5.57.2`.
+- **Bundler:** the package ships Svelte components that import their own
+  CSS, so use a Svelte 5 aware setup: Vite with
+  `@sveltejs/vite-plugin-svelte`, SvelteKit, or Astro with `@astrojs/svelte`
+  (in Astro, add `vite.ssr.noExternal: ['texuli', /^@texuli\//]`).
+- **CSS:** import `@texuli/tokens/base.css` once and apply a theme (below).
+  Component styles load with each component.
+
+## Quick start
+
+Wire the tokens once, in your app's entry module:
+
+```ts
+import '@texuli/tokens/base.css';
+import { applyTheme } from '@texuli/tokens/css';
+import { loadLibraryTheme } from '@texuli/tokens/library';
+
+loadLibraryTheme('enterprise-neutral').then((theme) => {
+  applyTheme(document.documentElement, { theme, mode: 'light' });
+});
+```
+
+Then import components from their subpaths:
 
 ```svelte
 <script lang="ts">
   import { Button } from 'texuli/button';
-  import { cx } from 'texuli/cx';
+  import { Card, CardContent, CardHeader, CardTitle } from 'texuli/card';
 </script>
 
-<Button variant="outline" size="sm" onclick={() => {}}>Save draft</Button>
+<Card>
+  <CardHeader>
+    <CardTitle>Invoices</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Button variant="outline" size="sm" onclick={() => console.log('export')}>
+      Export
+    </Button>
+  </CardContent>
+</Card>
 ```
 
-Every component subpath follows the same shape: `texuli/<family>` exports the
-Svelte components, their variant constants, and the class helpers. The
-guides at the bottom of this page cover the class-value contract, CSS
-customization and the control-props convention.
+Each `texuli/<family>` subpath exports the family's Svelte components, its
+variant constants and its class helpers. The root entry (`texuli`)
+re-exports every family; subpaths keep bundles narrow.
 
-## Components
+## What's inside
 
-41 families, one subpath and one doc each:
+### Components
 
-| Import | Documentation |
+| Purpose | Subpaths |
 | --- | --- |
-| `texuli/alert` | [Alert, Callout and Banner](docs/ui-alert.md) |
-| `texuli/avatar` | [Avatar and AvatarGroup](docs/ui-avatar.md) |
-| `texuli/badge` | [Badge, Tag and Chip](docs/ui-badge.md) |
-| `texuli/button` | [Button, IconButton and ButtonGroup](docs/ui-button.md) |
-| `texuli/card` | [Card](docs/ui-card.md) |
-| `texuli/carousel` | [Carousel](docs/ui-carousel.md) |
-| `texuli/choice` | [Checkbox, Radio and Switch](docs/ui-choice.md) |
-| `texuli/combobox` | [Combobox and MultiSelect](docs/ui-combobox.md) |
-| `texuli/command` | [Command palette](docs/ui-command.md) |
-| `texuli/date` | [Calendar, DatePicker and DateRangePicker](docs/ui-date.md) |
-| `texuli/dialog` | [Dialog and AlertDialog](docs/ui-dialog.md) |
-| `texuli/empty` | [EmptyState and ErrorState](docs/ui-empty.md) |
-| `texuli/feedback` | [Skeleton, Spinner and Progress](docs/ui-feedback.md) |
-| `texuli/field` | [Field, Label, Description, FieldError and Form](docs/ui-field.md) |
-| `texuli/file-upload` | [FileUpload](docs/ui-file-upload.md) |
-| `texuli/icons` | [Icon system](docs/ui-icons.md) |
-| `texuli/input` | [Input, InputGroup and Textarea](docs/ui-input.md) |
-| `texuli/kbd-code` | [Kbd, Code and CopyButton](docs/ui-kbd-code.md) |
-| `texuli/menus` | [DropdownMenu, ContextMenu and Menubar](docs/ui-menus.md) |
-| `texuli/navigation` | [NavigationMenu, Breadcrumb and Pagination](docs/ui-navigation.md) |
-| `texuli/number-pin` | [NumberField and PinInput](docs/ui-number-pin.md) |
-| `texuli/popover` | [Popover and HoverCard](docs/ui-popover.md) |
-| `texuli/rating` | [Rating](docs/ui-rating.md) |
-| `texuli/resizable` | [Resizable panels](docs/ui-resizable.md) |
-| `texuli/scroll-area` | [ScrollArea](docs/ui-scroll-area.md) |
-| `texuli/select` | [Select](docs/ui-select.md) |
-| `texuli/separator-aspect` | [Separator, AspectRatio and VisuallyHidden](docs/ui-separator-aspect.md) |
-| `texuli/sheet` | [Sheet, Drawer, DetailPanel and ResponsiveModal](docs/ui-sheet.md) |
-| `texuli/sidebar` | [Sidebar and AppNav](docs/ui-sidebar.md) |
-| `texuli/slider` | [Slider](docs/ui-slider.md) |
-| `texuli/stat` | [Stat and KPI](docs/ui-stat.md) |
-| `texuli/stepper` | [Stepper and Wizard](docs/ui-stepper.md) |
-| `texuli/table` | [Table](docs/ui-table.md) |
-| `texuli/tabs-accordion` | [Tabs, Accordion and Collapsible](docs/ui-tabs-accordion.md) |
-| `texuli/tags-color` | [TagsInput and ColorPicker](docs/ui-tags-color.md) |
-| `texuli/timeline` | [Timeline](docs/ui-timeline.md) |
-| `texuli/toast` | [Toaster](docs/ui-toast.md) |
-| `texuli/toggle` | [Toggle and ToggleGroup](docs/ui-toggle.md) |
-| `texuli/toolbar` | [Toolbar](docs/ui-toolbar.md) |
-| `texuli/tooltip` | [Tooltip](docs/ui-tooltip.md) |
-| `texuli/tree` | [TreeView](docs/ui-tree.md) |
+| Actions | `button` (Button, IconButton, ButtonGroup), `toggle` (Toggle, ToggleGroup), `kbd-code` (Kbd, Code, CopyButton) |
+| Forms | `field` (Field, Label, Description, FieldError, Form), `input` (Input, InputGroup, Textarea), `choice` (Checkbox, Radio, Switch), `select`, `combobox` (Combobox, MultiSelect), `number-pin` (NumberField, PinInput), `slider`, `date` (Calendar, DatePicker, DateRangePicker), `tags-color` (TagsInput, ColorPicker), `file-upload`, `rating` |
+| Overlays | `dialog` (Dialog, AlertDialog), `sheet` (Sheet, Drawer, DetailPanel, ResponsiveModal), `popover` (Popover, HoverCard), `tooltip`, `toast` (Toaster), `menus` (DropdownMenu, ContextMenu, Menubar), `command` (command palette) |
+| Navigation | `navigation` (NavigationMenu, Breadcrumb, Pagination), `sidebar` (Sidebar, AppNav), `tabs-accordion` (Tabs, Accordion, Collapsible), `stepper` (Stepper, Wizard), `toolbar`, `tree` (TreeView) |
+| Display | `card`, `alert` (Alert, Callout, Banner), `badge` (Badge, Tag, Chip), `avatar` (Avatar, AvatarGroup), `stat` (Stat, KPI), `table`, `timeline`, `carousel`, `empty` (EmptyState, ErrorState), `feedback` (Skeleton, Spinner, Progress) |
+| Structure | `separator-aspect` (Separator, AspectRatio, VisuallyHidden), `scroll-area`, `resizable` (resizable panels) |
+| Icons | `icons` (ten built-in SVG icons and the `Icon` component), `icons/lucide` (optional bridge for apps that already use `@lucide/svelte`) |
 
-## Layouts, shells and the host kit
+### Layouts and shells
 
-| Import | Documentation |
+| Subpath | What it provides |
 | --- | --- |
-| `texuli/layouts/app/*` (`rail`, `master-detail`) | [Rail and master-detail](docs/layouts-rail-master-detail.md) |
-| `texuli/layouts/app/*` (`sidebar`, `dual-sidebar`, `split-view`, `top-nav`) | Exported and typed in source; per-family docs not written yet |
-| `texuli/layouts/auth-settings` (+ `/register`) | [Auth and settings layouts](docs/layouts-auth-settings.md) |
-| `texuli/layouts/content/*` (`blog`, `docs`, `editorial`) | Exported and typed in source; per-family docs not written yet |
-| `texuli/layouts/dashboard` (+ `/register`) | [Dashboard layout](docs/layouts-dashboard.md) |
-| `texuli/layouts/host` (+ `/chrome`, `/drawer`) | [Host layout kit](docs/layout-host.md) |
-| `texuli/layouts/marketing` (+ `/entry`, `/landing`, `/pricing`, `/register`, `/section`) | [Marketing layouts](docs/layouts-marketing.md) |
-| `texuli/layouts/mobile` (+ `/register`) | [Mobile layouts](docs/layouts-mobile.md) |
-| `texuli/layouts/shells` | [AppShell](docs/layouts-shells.md) |
-| register-only subpaths (cold-start registration) | [Layout register subpaths](docs/layout-register-subpaths.md) |
+| `layouts/shells` | `AppShell` and `DrawerScope` |
+| `layouts/app`, `layouts/app/{sidebar,dual-sidebar,rail,master-detail,split-view,top-nav}` | Application layouts |
+| `layouts/dashboard` | `DashboardGridLayout` and `AnalyticsGrid` |
+| `layouts/marketing` (plus `/landing`, `/pricing`, `/section`, `/entry`) | Marketing pages and sections |
+| `layouts/auth-settings` | Auth split, settings and wizard layouts |
+| `layouts/content/{blog,docs,editorial}` | Content page layouts |
+| `layouts/mobile` | Mobile tabs and drawer layouts (registered for the layout host) and their navigation model helpers |
+| `layouts/host` (plus `/chrome`, `/drawer`) | `LayoutHost`: lazy layout resolution with responsive fallbacks, shared chrome and a data-only nav model |
 
-## Helpers
+The `layouts/{mobile,dashboard,marketing,auth-settings}/register` subpaths
+register a layout family with the host without pulling its components into
+the initial chunk.
 
-| Import | Purpose | Documentation |
-| --- | --- | --- |
-| `texuli` | The public barrel re-exporting every family | — |
-| `texuli/cx` | `cx`, variant builders and control props | [Class values](docs/class-value.md), [variants in CSS](docs/variants-css.md), [control props](docs/control-props.md) |
-| `texuli/icons` | Ten owned SVG paths plus the consumer-supplied `Icon` component | [Icon system](docs/ui-icons.md) |
-| `texuli/icons/lucide` | Optional bridge types for hosts that use Lucide icon components; the host provides that package | [Icon system](docs/ui-icons.md) |
+### Helpers
 
-## Verification
+`texuli/cx` exports `cx` (class composition) and `variants` (typed variant
+recipes), so you can extend components without `clsx` or `tailwind-merge`.
 
-```bash
-pnpm vitest run packages/texuli     # 205 tests / 6 files
-pnpm --filter texuli typecheck      # exit 0
-npx biome check packages/texuli     # exit 0
-```
+## Key guarantees
 
-The website and the packed consumer fixtures exercise these components in a
-browser; see the repository's [testing guide](../../docs/TESTING_GUIDE.md).
+- **Accessible by construction.** Interactive components are built on
+  primitives that follow the WAI-ARIA Authoring Practices patterns for
+  roles, keyboard interaction and focus.
+- **Theming.** Components are styled on the `--tx-*` token contract, so any
+  of the 210 library themes, or one you generate, restyles them in light and
+  dark mode.
+- **Your CSS wins.** Component styles live in the `tx.components` cascade
+  layer; unlayered or later-layer app CSS overrides them without
+  `!important`.
+- **Forced colors and right-to-left.** Component stylesheets include
+  forced-colors rules, and layouts use logical CSS properties.
+- **URL policy.** Links and media (Button, Card, Breadcrumb, Sidebar and
+  others) pass the `@texuli/core` URL policy. App-authored props default to
+  the `developer` tier; set the `untrusted` tier (for example
+  `hrefTrust="untrusted"`) for agent or user content.
+- **No HTML sinks.** Components render text and Svelte snippets, never
+  `{@html}`.
+
+## Documentation
+
+- Website: [texuli.com](https://texuli.com), the
+  [getting started guide](https://texuli.com/guides/getting-started/), the
+  [component overview](https://texuli.com/component-pages/) and the
+  [examples](https://texuli.com/examples/)
+- Every component and layout: [packages/texuli/docs](https://github.com/DailybotHQ/texuli/tree/main/packages/texuli/docs),
+  for example [ui-button.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-button.md)
+  and [ui-dialog.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-dialog.md)
+- Using Texuli with your own CSS: [using-with-your-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/using-with-your-css.md)
+- Class values and variants: [class-value.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/class-value.md)
+  and [variants-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/variants-css.md)
+- Icons: [ui-icons.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)
+- Layouts: [layouts-shells.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-shells.md)
+  and [layouts-dashboard.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-dashboard.md)
+
+## Related packages
+
+- [`@texuli/tokens`](https://www.npmjs.com/package/@texuli/tokens): the theme engine and design tokens these components read.
+- [`@texuli/primitives`](https://www.npmjs.com/package/@texuli/primitives): the headless primitives underneath.
+- [`@texuli/core`](https://www.npmjs.com/package/@texuli/core): framework-free behavior and URL policy.
+
+## Contributing
+
+Source, issues and contribution guidelines live at
+[github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli). Report
+bugs at [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues).
+
+## License
+
+MIT © Dailybot, Inc.

@@ -1,144 +1,154 @@
 # @texuli/core
 
-**Layer L0: texels.** Framework-free TypeScript behavior and policy that every
-Texuli component is built from. No Svelte, no runtime dependencies.
-Published to npm as `0.1.0-next.2` under the `next`
-dist-tag (by CI, with provenance); no stable release (`latest` is reserved
-for 1.0.0), so install it with `@next`. The workspace package stays
-`"private": true`.
+The framework-free foundation of [Texuli](https://texuli.com), an MIT-licensed
+Svelte 5 component library by Dailybot, Inc. (*Small pieces. Infinite
+possibilities.*). `@texuli/core` holds the **texels**: small, tested
+TypeScript units of behavior and policy (focus management, roving focus,
+layering and Escape handling, positioning, ids, keyboard shortcuts, URL
+safety) that every Texuli primitive and component is built from.
 
-## What exists today
+Use it directly when you build your own components in any framework, or
+when you need Texuli's URL policy to sanitize links and media from agents
+or users. It has no runtime dependencies and imports no UI framework.
 
-Every texel in the table below is implemented, tested and documented in this
-package. The public API is exactly what the root barrel `src/index.ts`
-exports; each texel is also a per-area subpath export in `package.json`
-(`@texuli/core/<area>`), so consumers can import narrowly and tree-shake the
-rest.
+> **Status: preview.** Texuli is in development. The packages are published
+> to npm as prereleases under the `next` dist-tag, and there is no stable
+> release yet, so install with `@next`. APIs may still change between
+> previews.
 
-| Texel | Headline exports | Doc |
-| --- | --- | --- |
-| Announcer | `createAnnouncer`, `createLiveRegion`, `getAnnouncer`, `appendRegion` | [core-announcer](docs/core-announcer.md) |
-| Controllable state | `createControllableState` | [core-controllable](docs/core-controllable.md) |
-| Direction and locale | `directionOf`, `inlineSideToPhysical`, `createCollator`, `compareLocale`, `resolveMessages` | [core-dir-locale](docs/core-dir-locale.md) |
-| Dismiss | `bindDismissLayer`, `isPointerOutside`, `isFocusOutside`, `createDismissOutsideEvent`, `createOpenGestureGuard` | [core-dismiss](docs/core-dismiss.md) |
-| Editor model | `loadEditorDocument`, `normalizeDocument`, `validateEditorDocument`, `caret`, `clampSelection`, `inlineToTree`; transforms (`insertText`, `splitBlock`, `deleteBackward`, `toggleMark`, `setLink`, `replaceSelection`, `applyInputRules`…), `editorHistoryReducer`, `createEditorKeymap`, `fromMarkdown`/`toMarkdown` (subpaths `@texuli/core/editor-model`, `editor-transforms`, `editor-history`, `editor-keymap`, `editor-markdown`; not in the root barrel) | [core-editor](docs/core-editor.md) |
-| Environment | `isBrowser`, `getOwnerDocument`, `getOwnerWindow`, `listen`, `matchesMedia`, `requestFrame` | [core-env](docs/core-env.md) |
-| Focus scope | `createFocusScope` | [core-focus-scope](docs/core-focus-scope.md) |
-| Form bridge | `createFormBridge` | [core-form-bridge](docs/core-form-bridge.md) |
-| Ids | `createIdScope`, `createIdFamily`, `joinIds`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaControls`, `ensureElementId`, `sanitizeIdPart` | [core-ids](docs/core-ids.md) |
-| Inert | `createInertRegistry`, `getInertRegistry`, `computeInertTargets` | [core-inert](docs/core-inert.md) |
-| Keyboard | `parseShortcut`, `matchesShortcut`, `formatShortcut`, `createShortcutMap`, `getNavigationIntent`, `normalizeKey`, `detectPlatform` | [core-keyboard](docs/core-keyboard.md) |
-| Layer stack | `createLayerStack`, `getLayerStack`, `decideEscape`, `bindLayerStackDocument`, `layerReceivesEscape` | [core-layer-stack](docs/core-layer-stack.md) |
-| Lazy chunks | `lazyChunk`, `hasLazyChunk`, `clearLazyChunk(s)` (subpath `@texuli/core/lazy`; not in the root barrel) | — |
-| Overlay engine | `createOverlay` (`OVERLAY_MODE_ATTR`, `OVERLAY_Z_BASE`); the reduced surface is the `@texuli/core/overlay-core` subpath | [core-overlay-core](docs/core-overlay-core.md), [overlay-engine](docs/overlay-engine.md) |
-| Portal | `createPortal` | [core-portal](docs/core-portal.md) |
-| Positioning (DOM) | `positionFloating`, `applyPosition`, `autoUpdate`, `observeMove`, `cssAnchorDeclarations`, `supportsCssAnchorPositioning` | [core-position-dom](docs/core-position-dom.md) |
-| Positioning (math) | `computePosition`, `place`, `shiftIntoBoundary`, `sizeToAvailable`, `listPlacements`, `resolvePlacementForDirection`, `rect` | [core-position-math](docs/core-position-math.md) |
-| Presence | `createPresence`, `prefersReducedMotion`, `hasPendingMotion`, `parseCssTimeList` | [core-presence](docs/core-presence.md) |
-| Roving focus + typeahead | `createRovingFocus`, `createTypeahead`, `stepRovingIndex`, `setRovingTabIndex`, `indexOfSelected` | [core-roving](docs/core-roving.md) |
-| Scroll lock | `lockScroll` | [core-scroll-lock](docs/core-scroll-lock.md) |
-| Tabbable | `isFocusable`, `isTabbable`, `getFocusableElements`, `getTabbableElements` | [core-tabbable](docs/core-tabbable.md) |
-| URL policy (links) | `safeHref`, `type HrefTrust` | [core-url-policy](docs/core-url-policy.md) |
-| URL policy (media) | `safeImageSrc`, `safeImageSrcset`, `safeMediaSrc`, `MAX_DATA_IMAGE_BYTES` | [core-url-policy](docs/core-url-policy.md) |
-
-The editor texels are not in the root barrel: the barrel measures 22.64 of
-its 24 KiB budget. `pnpm size` (2026-10-26) measures `editor-history` at
-773 B and `editor-keymap` at 2.49 KiB, both within the 4 KiB per-texel
-default. `editor-markdown` (7.05 of 7.50 KiB), `editor-model` (7.83 of
-8.50 KiB) and `editor-transforms` (10.36 of 11 KiB) are over that default
-and carry their own budget rows; every entry is within budget.
-
-The tables above name the headline exports per texel, not the full surface:
-read `src/index.ts` (and the per-area `index.ts`) for every exported symbol
-and type. The threat model behind the URL policy lives in
-[docs/SECURITY.md](../../docs/SECURITY.md).
-
-## Examples
-
-```ts
-import {
-  safeHref,
-  createIdScope,
-  ariaLabelledBy,
-  getLayerStack,
-  decideEscape,
-  getTabbableElements,
-  isTabbable,
-} from '@texuli/core';
-
-safeHref('https://example.com/a');            // 'https://example.com/a'
-safeHref('http://example.com');               // undefined (untrusted is the default)
-safeHref('/docs/button', 'developer');        // '/docs/button'
-safeHref('javascript:alert(1)', 'developer'); // undefined in every tier
-
-const ids = createIdScope({ prefix: 'dialog' });
-const titleId = ids.next('title');            // scoped, SSR-stable
-ariaLabelledBy(titleId);                      // the id list for aria-labelledby
-
-const stack = getLayerStack();
-const layer = stack.register({ element: panelEl, label: 'dialog' });
-decideEscape(stack, { key: 'Escape' }); // reaches only the topmost layer
-layer.unregister();
-
-const stops = getTabbableElements(dialogElement);
-isTabbable(stops[0]!);                        // true
-```
-
-### URL policy tiers
-
-- **`untrusted`** (default, for agent or user content): only `https:`,
-  `mailto:` and `#fragment`.
-- **`developer`** (for app-authored props): anything except `javascript:`,
-  `vbscript:`, `data:` and any value opening with two slashes or
-  backslashes in any mix (`//host`, `/\host`, `\/host`, `\\host`) or with
-  any leading backslash, which browsers resolve off-origin.
-- Whitespace and ASCII control characters are stripped before the scheme is
-  read, so `java\tscript:` is caught.
-
-Images and media use the element-specific policies: `safeImageSrc` allows
-HTTPS and relative assets from either tier, plus (developer tier only) HTTP,
-valid blob URLs, and PNG, JPEG, GIF, WebP or AVIF base64 data images up to
-1 MiB decoded; SVG and non-image data URLs are always refused.
-`safeImageSrcset` accepts a comma-separated `srcset` only when every candidate
-is safe. `safeMediaSrc` restricts untrusted audio/video to blob URLs or exact
-origins from an HTTPS `allowedOrigins` list. Full contract:
-[core-url-policy](docs/core-url-policy.md).
-
-## Layout
-
-```text
-packages/core/
-├── package.json     exports "." and one subpath per texel; script: typecheck
-├── tsconfig.json    extends ../../tsconfig.base.json
-├── docs/            one contract doc per texel (core-*.md) + overlay-engine.md
-├── src/index.ts     the public barrel (only what is exported here is public)
-├── src/<area>/      one directory per texel (announcer, roving, layer-stack, …)
-└── tests/           26 test files, one or more per texel, including hostile
-                     inputs for every policy that guards a sink
-```
-
-## Rules
-
-- Framework-free: no Svelte or other UI framework imports; standard DOM types
-  are fine.
-- No runtime dependencies; no imports from any other workspace package (L0 is
-  the bottom layer).
-- Policy functions fail closed and document their contract in JSDoc.
-- Every export ships with tests in `tests/<name>.test.ts`, including hostile
-  inputs for anything that guards a sink.
-- Ids never use `Math.random` at module scope; scopes are per-root.
-
-## Testing
+## Install
 
 ```bash
-pnpm vitest run packages/core                    # every core texel test
-pnpm vitest run packages/core/tests/roving.test.ts   # one texel
-pnpm --filter @texuli/core typecheck             # tsc -p tsconfig.json
-npx biome check packages/core                    # lint + format
+npm install @texuli/core@next
 ```
 
-Core is shared by every layer above it, so a change here also runs
-`pnpm check`, the primitives behavior suite and `pnpm build`
-([TESTING_GUIDE](../../docs/TESTING_GUIDE.md)).
-To add a texel, follow
-[`.agents/skills/add-texel/SKILL.md`](../../.agents/skills/add-texel/SKILL.md).
+```bash
+pnpm add @texuli/core@next
+# or
+yarn add @texuli/core@next
+```
+
+No peer dependencies and no CSS. The package is ESM-only and ships
+TypeScript declarations.
+
+## Quick start
+
+```ts
+import { ariaLabelledBy, createIdScope, safeHref } from '@texuli/core';
+import { detectPlatform, matchesShortcut } from '@texuli/core/keyboard';
+
+// URL policy: untrusted (agent or user) content is the default tier.
+safeHref('https://example.com/report');        // 'https://example.com/report'
+safeHref('http://example.com');                // undefined (https only)
+safeHref('/docs/button', 'developer');         // '/docs/button'
+safeHref('javascript:alert(1)', 'developer');  // undefined in every tier
+
+// Ids that match on the server and the client.
+const ids = createIdScope({ prefix: 'dialog' });
+const titleId = ids.next('title');             // 'dialog-0-title'
+ariaLabelledBy(titleId);                       // 'dialog-0-title'
+
+// Keyboard shortcuts written as data; Mod is Cmd on Apple platforms, Ctrl elsewhere.
+const platform = detectPlatform(navigator);
+window.addEventListener('keydown', (event) => {
+  if (matchesShortcut(event, 'Mod+K', platform)) {
+    // open your command palette
+  }
+});
+```
+
+Everything in the table below is available from the root entry
+(`@texuli/core`) and from its own subpath (`@texuli/core/<subpath>`), except
+the editor and lazy-chunk texels, which are subpath-only. Import subpaths to
+keep bundles narrow.
+
+## What's inside
+
+| Texel | Subpath | Headline exports |
+| --- | --- | --- |
+| URL policy | `url-policy` | `safeHref`, `safeImageSrc`, `safeImageSrcset`, `safeMediaSrc` |
+| Ids | `ids` | `createIdScope`, `createIdFamily`, `ariaLabelledBy`, `ariaDescribedBy`, `ensureElementId` |
+| Keyboard | `keyboard` | `parseShortcut`, `matchesShortcut`, `formatShortcut`, `createShortcutMap`, `getNavigationIntent` |
+| Roving focus and typeahead | `roving` | `createRovingFocus`, `createTypeahead`, `setRovingTabIndex` |
+| Focus scope | `focus-scope` | `createFocusScope` (trap and restore focus) |
+| Tabbable | `tabbable` | `isFocusable`, `isTabbable`, `getTabbableElements` |
+| Layer stack | `layer-stack` | `getLayerStack`, `decideEscape` (Escape reaches only the topmost layer) |
+| Dismiss | `dismiss` | `bindDismissLayer`, `isPointerOutside`, `isFocusOutside` |
+| Inert | `inert` | `createInertRegistry`, `computeInertTargets` |
+| Scroll lock | `scroll-lock` | `lockScroll` |
+| Portal | `portal` | `createPortal` |
+| Overlay engine | `overlay`, `overlay-core` | `createOverlay` (combines the texels above for dialogs, popovers and menus); `createOverlayCore` is the reduced surface |
+| Positioning (math) | `position-math` | `computePosition`, `place`, `shiftIntoBoundary`, `resolvePlacementForDirection` |
+| Positioning (DOM) | `position-dom` | `positionFloating`, `autoUpdate`, `cssAnchorDeclarations` |
+| Presence | `presence` | `createPresence`, `prefersReducedMotion` (enter and exit animations) |
+| Announcer | `announcer` | `createAnnouncer`, `createLiveRegion` (screen reader announcements) |
+| Controllable state | `controllable` | `createControllableState` (controlled and uncontrolled values) |
+| Form bridge | `form-bridge` | `createFormBridge` (custom controls in native forms) |
+| Direction and locale | `dir-locale` | `directionOf`, `inlineSideToPhysical`, `createCollator`, `resolveMessages` |
+| Environment | `env` | `isBrowser`, `getOwnerDocument`, `listen`, `matchesMedia`, `requestFrame` |
+| Lazy chunks | `lazy` | `lazyChunk`, `hasLazyChunk` (subpath only) |
+| Rich text editor model | `editor-model`, `editor-transforms`, `editor-history`, `editor-keymap`, `editor-markdown` | Document model, transforms, undo history, keymap, Markdown import and export (subpath only) |
+
+The table names the headline exports; each subpath's TypeScript
+declarations list the full surface.
+
+## URL policy
+
+Every Texuli component that renders a link or a media source passes it
+through this policy, and you can use it the same way. Rejected values return
+`undefined` (the policy fails closed).
+
+- **`untrusted`** (the default, for agent or user content): only `https:`,
+  `mailto:` and `#fragment` links.
+- **`developer`** (for app-authored values): anything except `javascript:`,
+  `vbscript:`, `data:`, and values that start with two slashes or
+  backslashes in any mix, or with any backslash, which browsers resolve
+  off-origin.
+- Whitespace and ASCII control characters are stripped before the scheme is
+  read, so `java\tscript:` is caught.
+- `safeImageSrc` refuses SVG and non-image `data:` URLs in every tier;
+  `safeMediaSrc` limits untrusted audio and video to blob URLs or exact
+  HTTPS origins you allow.
+
+## Key guarantees
+
+- **Framework-free.** No Svelte, React or other UI framework imports, and no
+  runtime dependencies. Standard DOM types only.
+- **SSR-friendly ids.** Id scopes are per render root with no module-level
+  randomness, so the server and the client produce the same ids; `isBrowser`
+  and the owner-document helpers let code skip DOM work on the server.
+- **Accessibility building blocks.** Roving focus, focus scopes, inert
+  backgrounds and layered Escape handling implement the behavior the
+  WAI-ARIA Authoring Practices patterns require.
+- **Right-to-left aware.** Direction helpers map logical sides to physical
+  ones, and positioning resolves placements for the current direction.
+
+## Documentation
+
+- Website: [texuli.com](https://texuli.com) and the
+  [accessibility guide](https://texuli.com/guides/accessibility/)
+- URL policy contract: [core-url-policy.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-url-policy.md)
+- Overlay engine: [overlay-engine.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/overlay-engine.md)
+- Roving focus: [core-roving.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-roving.md)
+- Keyboard shortcuts: [core-keyboard.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-keyboard.md)
+- Positioning: [core-position-math.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-position-math.md)
+  and [core-position-dom.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-position-dom.md)
+- Rich text editor model: [core-editor.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-editor.md)
+- Every texel's contract: [packages/core/docs](https://github.com/DailybotHQ/texuli/tree/main/packages/core/docs)
+- Security model: [SECURITY.md](https://github.com/DailybotHQ/texuli/blob/main/docs/SECURITY.md)
+
+## Related packages
+
+- [`@texuli/primitives`](https://www.npmjs.com/package/@texuli/primitives): headless Svelte 5 primitives built on these texels.
+- [`texuli`](https://www.npmjs.com/package/texuli): styled, ready-to-use components.
+- [`@texuli/tokens`](https://www.npmjs.com/package/@texuli/tokens): the theme engine and design tokens.
+
+## Contributing
+
+Source, issues and contribution guidelines live at
+[github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli). Report
+bugs at [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues).
+
+## License
+
+MIT © Dailybot, Inc.

@@ -1,46 +1,38 @@
 # @texuli/slides
 
-**Layer L7: slides.** Validated presentation decks: a deck model of ordered slides holding
-`@texuli/blocks` content, catalog encodings and agent validation, a Svelte 5
-stage with a presenter view, print/PDF and PPTX export, and starter
-templates. Published to npm as `0.1.0-next.2` under the `next`
-dist-tag (by CI, with provenance); no stable release (`latest` is reserved
-for 1.0.0), so install it with `@next`. The workspace package stays
-`"private": true`.
+Presentation decks for [Texuli](https://texuli.com), an MIT-licensed Svelte 5
+component library by Dailybot, Inc. (*Small pieces. Infinite
+possibilities.*). Describe a deck as data (ordered slides holding Texuli
+content blocks), validate decks that an agent writes, and present them on a
+keyboard-driven Svelte 5 stage with a presenter view, fullscreen, themes and
+reveal steps. The same deck also prints to PDF through the browser and
+exports to PPTX locally.
 
-## Status
+> **Status: preview.** Texuli is in development. The packages are published
+> to npm as prereleases under the `next` dist-tag, and there is no stable
+> release yet, so install with `@next`. APIs may still change between
+> previews.
 
-Implemented in `src/` and exported through [`package.json`](package.json):
-six subpaths plus the root entry, which re-exports the model, grammar,
-templates and the main export functions. Covered by the unit and component
-tests in [`tests/`](tests) (`pnpm vitest run packages/slides`), the golden
-decks in [`tests/golden/`](tests/golden), the slides accessibility sweep, and
-visual baselines for the slides examples. Each subpath has a page in
-[`docs/`](docs).
+## Install
 
-Reveal steps (fragments) play on the stage: blocks, list items and code
-highlights reveal one step at a time ([model](docs/model.md#reveal-steps-fragments),
-[stage](docs/stage.md#reveal-steps)); print and PPTX export flatten them to
-the final state.
+```bash
+npm install @texuli/slides@next svelte
+```
 
-Fullscreen (with a visible window-filling fallback), a presenter screen in a
-second same-origin window ([stage](docs/stage.md#presenter-screen)) and slot
-layouts for every master ([model](docs/model.md#composition-slots-and-media-regions))
-are implemented.
+Svelte 5 (`^5.57.2`) is a peer dependency. Import the stage and print
+stylesheet once:
 
-Not implemented yet: a presenter screen on another device, a tool-side PDF
-exporter, and deck video.
+```ts
+import '@texuli/slides/styles.css';
+```
 
-## Using the package
-
-The package peers on Svelte 5 (`^5.57.2`); its `@texuli/*` dependencies are
-workspace links.
+## Quick start
 
 ```svelte
 <script lang="ts">
   import '@texuli/slides/styles.css';
-  import { DeckStage } from '@texuli/slides/stage';
   import { parseDeck } from '@texuli/slides/model';
+  import { DeckStage } from '@texuli/slides/stage';
 
   const result = parseDeck({
     meta: { title: 'Quarterly update', themeRef: 'ocean' },
@@ -62,62 +54,74 @@ workspace links.
 {/if}
 ```
 
-Decks an agent returns go through `validateDeckDraft` first
-([grammar](docs/grammar.md)). Media URLs are checked at paint at the
-`untrusted` tier by default ([stage](docs/stage.md#media)).
+Decks an agent returns go through `validateDeckDraft` from
+`@texuli/slides/grammar` first. It runs the catalog's draft validation at the
+`untrusted` tier by default, then the deck rules (slide ids, masters, theme
+references, reveal steps), and never throws.
 
-## Areas
+## What's inside
 
-| Import | What it does | Documentation |
-| --- | --- | --- |
-| `@texuli/slides/model` | `parseDeck`, the closed vocabularies (aspects, masters, transitions), reveal steps, theme references, master and media-region composition | [Deck model](docs/model.md) |
-| `@texuli/slides/grammar` | Render tree, structured `slides[]` and legacy-card encodings; `validateDeckDraft` for agent decks | [Catalog grammar and agent decks](docs/grammar.md) |
-| `@texuli/slides/stage` | `DeckStage` (keyboard, overview, presenter view and screen, fullscreen, themes, transitions, media) and `DeckPrint` | [Stage](docs/stage.md) |
-| `@texuli/slides/export` | Print plans and the PDF seam (browser print or a host exporter); local PPTX export; the XML and ZIP writers | [Print, PDF and PPTX export](docs/export.md) |
-| `@texuli/slides/templates` | Report, pitch and review starter decks | [Starter templates](docs/templates.md) |
-| `@texuli/slides/styles.css` | Stage and print styles, named print pages, reduced-motion rules | [Stylesheet](docs/styles.md) |
+The root entry, `@texuli/slides`, re-exports the model, grammar, templates
+and the main export functions.
 
-## Examples and baselines
+| Subpath | What it does |
+| --- | --- |
+| `@texuli/slides/model` | `parseDeck`, the closed vocabularies (aspects, masters, transitions), reveal steps, theme references and slot layouts |
+| `@texuli/slides/grammar` | Catalog encodings of decks and `validateDeckDraft` for agent decks |
+| `@texuli/slides/stage` | `DeckStage` (keyboard, overview, presenter view and screen, fullscreen, themes, transitions, media) and `DeckPrint` |
+| `@texuli/slides/export` | Print plans, a PDF seam (browser print or a host exporter) and local PPTX export |
+| `@texuli/slides/templates` | Report, pitch and review starter decks |
+| `@texuli/slides/styles.css` | Stage and print styles, named print pages and reduced-motion rules |
 
-The examples registry (`packages/examples/src/slides/`) renders each starter
-template in `DeckStage` (`slides-template-report`, `slides-template-pitch`,
-`slides-template-review`), a media deck in `DeckPrint` (`slides-media-deck`),
-a slide paused at reveal step 2 of 4 in `DeckStage` (`slides-fragments`), a
-slot-master deck in `DeckPrint` (`slides-slot-masters`), the presenter
-view at a reveal step (`slides-presenter-screen`), and a tour deck of the
-stage (`slides-tour`). The website's slides area (`/slides-page/`,
-[site-slides-page](../../apps/website/docs/site-slides-page.md)) mounts the
-tour live and links every slides example. Each has committed light and dark visual baselines on
-desktop Chromium and the Pixel 7 (`pnpm visual -g slides-`). Like the rest of
-the suite, the baselines are recorded on macOS only.
+## Features
 
-## Size
+- **Reveal steps.** Blocks, list items and code highlights reveal one step
+  at a time on the stage; print and PPTX export flatten them to the final
+  state.
+- **Presenter tools.** An overview grid, a presenter view with speaker
+  notes, and a presenter screen in a second same-origin window.
+- **Fullscreen** with a visible window-filling fallback.
+- **Slot layouts** for every master, including media regions.
+- **Starter templates** for a report, a pitch and a review.
 
-Every subpath has its own row in `texuli.budgets.json`, and `pnpm size`
-(2026-10-26) reports each within budget: the root entry measures 43.14 of
-44.88 KiB gzip and `./stage` 19.50 of 20.31 KiB (its deferred JavaScript is
-measured too). `pnpm size --filter slides` reports the numbers.
+Not built yet: a presenter screen on another device, a tool-side PDF
+exporter, and deck video.
 
-## Accessibility
+## Key guarantees
 
-[docs/quality/a11y-slides.md](../../docs/quality/a11y-slides.md) records the
-slides accessibility sweep (`tests/e2e/a11y-slides.spec.ts`, run on seven
-slides examples). It covers axe in light, dark, overview, presenter and
-forced-colors states, reflow at 320px, the keyboard map with focus movement,
-and reduced motion.
-[docs/quality/sr-transcripts-slides.md](../../docs/quality/sr-transcripts-slides.md)
-holds VoiceOver transcripts authored from the accessibility tree. The
-keyboard contract is in [docs/stage.md](docs/stage.md#keyboard-and-focus).
+- **Validated agent decks.** `validateDeckDraft` refuses hostile shapes with
+  diagnostics: unknown blocks, sinks, over-limit trees, bad slide ids,
+  undeclared masters and out-of-range reveal steps.
+- **URL policy at paint.** Media URLs are checked when they paint, at the
+  `untrusted` tier by default.
+- **Keyboard and screen readers.** The stage has a documented key map with
+  managed focus, honors reduced motion and supports forced colors.
+- **Local, deterministic export.** Export is framework-free and uploads
+  nothing; the same deck always gives the same PPTX bytes.
 
-## Checks
+## Documentation
 
-```bash
-pnpm vitest run packages/slides
-pnpm --filter @texuli/slides typecheck
-npx biome check packages/slides
-pnpm check:layers
-```
+- Website: [texuli.com](https://texuli.com) and the
+  [slides overview](https://texuli.com/slides-page/), with a live tour deck
+- Deck model: [model.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/model.md)
+- Catalog grammar and agent decks: [grammar.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/grammar.md)
+- Stage, keyboard and presenter screen: [stage.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/stage.md)
+- Print, PDF and PPTX export: [export.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/export.md)
+- Starter templates: [templates.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/templates.md)
+- Stylesheet hooks: [styles.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/styles.md)
 
-`tests/docs.test.ts` keeps these docs complete: every subpath needs a page
-linked here, and every exported name, stage prop and stylesheet hook must
-appear in its page.
+## Related packages
+
+- [`@texuli/blocks`](https://www.npmjs.com/package/@texuli/blocks): the content blocks slides are made of.
+- [`@texuli/catalog`](https://www.npmjs.com/package/@texuli/catalog): the validation that agent decks pass.
+- [`@texuli/player`](https://www.npmjs.com/package/@texuli/player): paints any validated blueprint, decks included, as a document.
+
+## Contributing
+
+Source, issues and contribution guidelines live at
+[github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli). Report
+bugs at [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues).
+
+## License
+
+MIT © Dailybot, Inc.

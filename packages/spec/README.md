@@ -1,173 +1,168 @@
 # @texuli/spec
 
-The schema-first blueprint contract (spec/Compose design, plan B1): the
-platform-neutral source of truth for blueprint structure, the catalog
-vocabulary, capability tiers and diagnostics. TypeScript and Kotlin are
-deterministic projections generated from it, and a conformance harness keeps
-everything from drifting.
+The blueprint contract of [Texuli](https://texuli.com), an MIT-licensed
+Svelte 5 component library by Dailybot, Inc. (*Small pieces. Infinite
+possibilities.*). A **blueprint** is a JSON document, usually written by an
+AI agent, that describes an interface as a tree of components from Texuli's
+closed catalog. `@texuli/spec` is the platform-neutral source of truth for
+that format: the generated TypeScript types, the closed component
+vocabulary, a target-neutral blueprint validator and deterministic hashing.
 
-**Status: in development.** Published to npm as `0.1.0-next.2` under the `next`
-dist-tag (by CI, with provenance); no stable release (`latest` is reserved
-for 1.0.0), so install it with `@next`. The workspace package stays
-`"private": true`. Layer 0, no dependencies,
-framework-free. Kotlin is generated as committed text by this package's
-TypeScript generator; no Kotlin toolchain runs here, and nothing is compiled
-or published to Maven.
+Use it when you generate, store, diff or check blueprints, or build a
+renderer for them. The same contract also generates the Kotlin models used
+by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
+DOM, no Svelte, no Node APIs and no runtime dependencies.
 
-The package tarball build compiles `generated/typescript/` into the matching
-`dist/generated/typescript/` location. The source stays beside `src/` so the
-spec generator and integrity manifest keep their established output paths;
-the packer maps runtime and declaration imports to emitted `.js` and `.d.ts`
-files there. Kotlin projections remain generated text and are not part of the
-TypeScript package output.
+> **Status: preview.** Texuli is in development. The packages are published
+> to npm as prereleases under the `next` dist-tag, and there is no stable
+> release yet, so install with `@next`. APIs may still change between
+> previews.
 
-## Layout
-
-| Path | What it holds |
-| --- | --- |
-| `schemas/` | The normative JSON schemas: `blueprint` (envelope v1 and the node tree), `catalog`, `diagnostics`, `manifest` |
-| `catalog/components.json` | The closed vocabulary, projected from the built catalog: id, label, summary, group, placement (`app`/`content`), emit tiers, capability and props |
-| `catalog/capabilities.json` | Reviewed capability claims. Empty: no id is audited portable yet, so every capability is `unknown` (ADR-003) |
-| `fixtures/golden/` | Blueprints that must validate: a report, a dashboard, a proactive deck and a report with a named slot and a `when` condition (fictional data) |
-| `fixtures/invalid/` | Blueprints that must fail with exact diagnostic codes, one or more per code, including slot and condition cases (an undeclared or root `slot`, an unknown condition `op`, an extra condition field) |
-| `manifest.json` | The spec version, the dialect and a SHA-256 per normative file |
-| `versions.json` | Every released spec version pinned to its spec digest (not normative: it pins the normative files) |
-| `generated/typescript/`, `generated/kotlin/` | The projections. Never edit them |
-| `generated-manifest.json` | A SHA-256 per generated file |
-
-## The dialect
-
-Schemas use a closed subset of JSON Schema 2020-12 (`DIALECT_KEYWORDS`):
-`type`, `properties`, `required`, `additionalProperties`, `items`, `enum`,
-`const`, string, number and array bounds, `pattern`, and local `$ref` /
-`$defs`. Objects must be closed (`additionalProperties: false`) or explicit
-maps. Anything else fails `checkSchemaDocument`, and generation refuses it.
-
-## Exports
-
-- `@texuli/spec`, the runtime half:
-  - the generated types (`BlueprintEnvelope`, `SpecCatalog`, `SpecValidation` …);
-  - `SPEC_COMPONENT_IDS` and `SpecComponentProps`;
-  - `validateInstance` (the dialect validator);
-  - `validateBlueprint` (the target-neutral blueprint check: envelope
-    schema, closed ids and props, prop kinds and enums, required props, no
-    platform-extension props from data, a node `slot` that names a slot prop
-    of its parent (`unknown-slot`), the portable profile failing closed,
-    and an optional catalog binding);
-  - `canonicalJson` and a synchronous `sha256`.
-- `@texuli/spec/codegen`, build time: `buildSpec`, `projectCatalog`,
-  `checkConformance`, `formatJson`.
-
-URL policy, tree limits, grammar and rendering stay in the runtime validator,
-`@texuli/catalog/validate`.
-
-## Projections
-
-- **Web extensions.** Props of kind `slot`, `event` or `unknown`, and the
-  `class`, `className`, `style` and chart `renderer` props, are marked
-  `extension: "web"`. They are left out of `SpecComponentProps`, and data
-  that sets them is refused.
-- **Kotlin** (`com.texuli.spec`, Kotlin 1.9+ for `entries` and
-  `data object`): data classes, closed enums and static decoders over a
-  generated `JsonValue` model, with no library dependency. Decoders check
-  JSON types, required and unknown fields, enums and constants. Patterns
-  and limits are the shared validator's job.
-- **Stamp.** Every generated file carries the spec version and a digest of
-  the normative files. There are no timestamps, and output is
-  byte-identical for the same inputs in any order.
-
-## Regenerate
+## Install
 
 ```bash
-pnpm exec tsx packages/spec/scripts/bootstrap-catalog.ts   # refresh catalog/components.json from the built catalog
-pnpm exec tsx packages/spec/scripts/generate.ts            # write manifests and projections
-pnpm exec tsx packages/spec/scripts/generate.ts --check    # fail on drift
+npm install @texuli/spec@next
 ```
 
-## Conformance
+```bash
+pnpm add @texuli/spec@next
+# or
+yarn add @texuli/spec@next
+```
 
-`pnpm vitest run packages/spec` runs the harness. Drift is a failed gate:
-- every schema stays in the dialect;
-- the manifest digests match the normative files;
-- regenerating gives byte-identical files, none missing or extra;
-- the golden fixtures validate and the invalid fixtures fail with exactly
-  their codes, covering every diagnostic code;
-- `components.json` equals the projection of the live catalog, and the
-  blueprint schema matches the envelope `@texuli/catalog` reads;
-- generation is deterministic and refuses schemas outside the dialect;
-- the Kotlin text declares its package, balances its brackets, defines
-  every type it references and decodes closed;
-- the spec version and digest match the newest release in `versions.json`.
+No peer dependencies and no CSS. The package is ESM-only and ships
+TypeScript declarations. The normative JSON documents (the blueprint
+schema, the component catalog and the fixtures) live in the
+[repository](https://github.com/DailybotHQ/texuli/tree/main/packages/spec);
+they are not part of the npm package.
 
-When the catalog changes, refresh `components.json`, regenerate and review
-the diff. Then classify the change, bump the version, and pin it (see
-Versioning).
+## Quick start
+
+```ts
+import {
+  canonicalJson,
+  type Schema,
+  SPEC_COMPONENT_IDS,
+  SPEC_VERSION,
+  sha256,
+  validateInstance,
+} from '@texuli/spec';
+
+SPEC_VERSION;                         // the spec version, e.g. '0.2.0'
+SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
+
+// The dialect validator: a closed subset of JSON Schema 2020-12.
+const schema: Schema = {
+  type: 'object',
+  properties: { title: { type: 'string', maxLength: 80 } },
+  required: ['title'],
+  additionalProperties: false,
+};
+validateInstance(schema, { title: 'Weekly report' }); // []
+validateInstance(schema, { title: 42, extra: true });
+// [{ code: 'type', path: '$.title', … }, { code: 'additional-property', path: '$.extra', … }]
+
+// Deterministic serialization and hashing, identical in every runtime.
+const digest = sha256(canonicalJson({ b: 1, a: [true, null] }));
+```
+
+To check a whole blueprint, pass the blueprint schema and catalog documents
+from the repository's `packages/spec/schemas/blueprint.schema.json` and
+`packages/spec/catalog/components.json`:
+
+```ts
+import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
+
+const result = validateBlueprint(blueprint, {
+  blueprintSchema: blueprintSchemaJson as Schema,
+  catalog: componentsJson as SpecCatalog,
+});
+if (!result.ok) {
+  for (const d of result.diagnostics) console.warn(d.code, d.path, d.message);
+}
+```
+
+A node with an id outside the catalog fails with `unknown-id`; other codes
+include `schema`, `unknown-prop`, `prop-type`, `enum-value`,
+`missing-required`, `extension-prop`, `catalog-mismatch`,
+`unsupported-profile` and `unknown-slot`.
+
+## What's inside
+
+| Subpath | Purpose | Headline exports |
+| --- | --- | --- |
+| `@texuli/spec` | Runtime: types, vocabulary, validation, hashing | `BlueprintEnvelope`, `SpecCatalog`, `SpecValidation` and the other generated types; `SPEC_COMPONENT_IDS`, `SpecComponentProps`, `SPEC_CATALOG_HASH`, `SPEC_VERSION`; `validateBlueprint`, `validateTree`, `validateInstance`, `checkSchemaDocument`; `canonicalJson`, `sha256` |
+| `@texuli/spec/codegen` | Build time: generation and conformance | `buildSpec`, `projectCatalog`, `checkConformance`, `formatJson`, `nextSpecVersion`, `checkVersionHistory` |
+
+## Key guarantees
+
+- **Closed vocabulary.** Component ids, prop names, prop kinds and enum
+  values are closed; anything outside the catalog is refused.
+- **No platform props from data.** Web-only props (slots, events, `class`,
+  `className`, `style` and the chart `renderer`) are marked as web
+  extensions, left out of `SpecComponentProps`, and refused when a
+  blueprint sets them.
+- **Fails closed.** The portable profile is refused until a capability is
+  audited portable, and a blueprint bound to another catalog hash is
+  refused when you pass `catalogHash`.
+- **Deterministic.** Canonical JSON sorts keys at every depth, and every
+  generated file carries the spec version and digest with no timestamps.
+- **Structure only.** This validator checks structure. URL policy, tree
+  limits and rendering live in the runtime validator of
+  [`@texuli/catalog`](https://www.npmjs.com/package/@texuli/catalog).
 
 ## Versioning
 
-**The spec digest** is the SHA-256 of `manifest.json`'s canonical JSON: the
-spec version, the dialect and a digest per normative file (schemas,
-`catalog/components.json`, `catalog/capabilities.json` and every fixture).
-Every generated file carries it in its stamp (`// Spec 0.2.0, digest …`).
-The same normative files always give the same digest.
+The spec has its own semantic version (`SPEC_VERSION`), separate from the
+npm package version. The **spec digest** is the SHA-256 of the manifest
+that pins every normative file (schemas, catalog and fixtures); any
+normative change moves the digest and requires a new spec version.
 
-**The version follows the digest.** Every normative change changes the
-digest, and a changed digest needs a new semantic version.
-`tests/spec.test.ts` fails when the digest moves without one. The
-release goes in `versions.json`: its version, its digest, its change class
-and a one-line summary.
-
-| Class | What it covers | Before 1.0.0 | From 1.0.0 |
+| Change class | Examples | Before 1.0.0 | From 1.0.0 |
 | --- | --- | --- | --- |
-| patch | Nothing accepted changes: descriptions, diagnostic wording, a new fixture for behavior that already holds | patch | patch |
-| minor | Additive: optional fields, new catalog ids, new optional props, new diagnostic codes for data that was already refused, new named extensions. Existing portable fixtures still pass | minor | minor |
-| major | Removing or renaming ids, props or fields; changing a prop type; making something required; changing what accepted data means | minor | major |
+| patch | Descriptions, diagnostic wording, a fixture for behavior that already holds | patch | patch |
+| minor | Optional fields, new catalog ids, new optional props, new diagnostic codes for data that was already refused | minor | minor |
+| major | Removing or renaming ids, props or fields; changing a prop type; making something required | minor | major |
 
-`nextSpecVersion(previous, class)` computes the step and
-`checkVersionHistory` enforces it. Before 1.0.0, any change to accepted data
-bumps the minor number. Moving to 1.0.0 is a release decision for the owner,
-not a side effect of a change. 0.1.0, the bootstrap, has no pinned digest:
-its normative files moved without a version until 0.2.0.
+For TypeScript consumers, a patch leaves the generated types and
+`SPEC_COMPONENT_IDS` unchanged; code that compiled against a minor release
+keeps compiling, though new optional fields and ids can appear in data it
+reads. Native (Kotlin) builds compile the generated models from the same
+spec, and their decoders are closed: a blueprint that uses a field from a
+newer spec fails to decode on an older native build with a `schema`
+diagnostic instead of passing silently. A blueprint binds to an exact
+catalog hash today; an envelope field for a compatible spec range, and
+migrations between versions, are planned and not built.
 
-**What a projection change means for consumers:**
-- **TypeScript (`@texuli/spec`):** a patch release leaves the generated types
-  and `SPEC_COMPONENT_IDS` alone, apart from the stamp. Code that compiled
-  against a minor release keeps compiling, but new optional fields and ids
-  can appear in data it reads. A major-class change (a minor bump before
-  1.0.0) may remove or retype what it relied on.
-- **Kotlin and native (`native/`):** `texuli-spec` compiles
-  `generated/kotlin` from this package, so a native build always matches the
-  checked-out spec. The generated decoders are closed: a blueprint that uses
-  a field from a newer spec fails to decode on an older native build with a
-  `schema` diagnostic. It does not pass silently. After a change, regenerate,
-  rebuild native, and refresh the conformance traces when goldens moved
-  (`pnpm exec tsx native/conformance/web/trace.ts --write`). Native
-  conformance compares the native refusals with every invalid fixture's
-  codes.
-- **Blueprints:** a blueprint binds to an exact catalog hash today. The
-  envelope field for a compatible spec range is **planned, not built**.
-  Until it exists, a consumer checks the spec version it ships against the
-  stamp of the spec it was built from.
+The full rules (the digest, `versions.json` pins, regeneration and the
+conformance harness) are in
+[contract.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/contract.md).
 
-Migrations between versions (deterministic blueprint transforms tested per
-version pair) are **planned, not built**: nothing has needed one yet.
+## Documentation
 
+- Website: [texuli.com](https://texuli.com), the
+  [agents overview](https://texuli.com/agents-page/) and
+  [web and native](https://texuli.com/web-and-native/)
+- Schemas, catalog and fixtures:
+  [packages/spec](https://github.com/DailybotHQ/texuli/tree/main/packages/spec)
+- The contract in depth (the JSON Schema dialect, projections, conformance
+  and versioning): [contract.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/contract.md)
+- The Kotlin Multiplatform twin that consumes the generated models:
+  [native/README.md](https://github.com/DailybotHQ/texuli/blob/main/native/README.md)
+- Architecture: [ARCHITECTURE.md](https://github.com/DailybotHQ/texuli/blob/main/docs/ARCHITECTURE.md)
 
-## Named slots and conditions
+## Related packages
 
-A node may carry `slot` (audit G04: the parent's named slot, a string such as
-`hero`) and `when` (audit G07: the blocks `Condition` AST that shows the node
-when true). Both match what `@texuli/catalog` renders.
+- [`@texuli/catalog`](https://www.npmjs.com/package/@texuli/catalog): the agent catalog and the renderer with no HTML sinks.
+- [`@texuli/player`](https://www.npmjs.com/package/@texuli/player): the Svelte paint runtime for validated blueprints.
+- [`texuli`](https://www.npmjs.com/package/texuli): the styled Svelte 5 components blueprints are built from.
 
-## Not yet
+## Contributing
 
-- Behavior contracts, token roles and the token-to-Compose generator (B1
-  steps 2 and 5).
-- Making the spec authoritative for the web packages (B1 step 3 cutover);
-  today the catalog manifests are the bootstrap input.
-- Compiling the Kotlin, and the native runtime (B2).
-- A full type for `when`. The dialect has no unions, so `condition` and
-  `numberFormula` are closed records whose `op` is an enum and whose operands
-  are typed (except `value`, which is a number for `num` and a formula for
-  `round` and `clamp`). Which operands each `op` needs, and the formula
-  limits, are checked by the runtime parser in `@texuli/blocks/formula`.
+Source, issues and contribution guidelines live at
+[github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli). Report
+bugs at [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues).
+
+## License
+
+MIT © Dailybot, Inc.

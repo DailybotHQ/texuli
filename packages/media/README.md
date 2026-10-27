@@ -1,31 +1,34 @@
 # @texuli/media
 
-Media: images, galleries, video, audio and layered compositions. The L4
-domain package composes `texuli` components, `@texuli/primitives` behavior
-and the `@texuli/tokens` engine into Svelte 5 media surfaces. Published to npm as `0.1.0-next.2` under the `next`
-dist-tag (by CI, with provenance); no stable release (`latest` is reserved
-for 1.0.0), so install it with `@next`. The workspace package stays
-`"private": true`.
+Media components for Svelte 5: safe responsive images, galleries with a
+lightbox, accessible video and audio players, WebVTT captions and chapters,
+an image editor, and a layered composition model with SVG and canvas
+renderers, keyframe animation, a timeline editor and in-browser PNG, SVG and
+WebM export. Every media URL passes a URL policy before it reaches the page,
+so the components are safe to point at user or agent content. It is part of
+[Texuli](https://texuli.com), "Small pieces. Infinite possibilities.": an MIT
+Svelte 5 component library by Dailybot, Inc.
 
-## Status
+> **Status: preview.** `@texuli/media` is published on npm under the `next`
+> dist-tag. There is no stable release yet, so install it with `@next` and
+> expect the API to change between previews.
 
-Implemented in `src/` and exported through [`package.json`](package.json)
-(the root and 22 subpaths): safe image and gallery rendering, video and audio
-players, an image editor with crop presets, video trim and caption editing
-recipes, the composition model (v1, and v2 with groups and layer timing) with
-SVG and canvas renderers, keyframe animation with a timeline editor,
-captions, export, and the
-provider-neutral generator slot. They are covered by 72 unit tests in 16
-files (`pnpm vitest run packages/media`).
-Per-item notes live in [`docs/`](docs/) here until they are folded into this
-README.
+## Install
 
-## Using the components
+```sh
+npm install @texuli/media@next @texuli/tokens@next svelte
+```
 
-The package peers on Svelte 5 (`^5.57.2`); its `@texuli/*` dependencies are
-workspace links. Media URLs are untrusted by default: every source passes the
-core URL policy (`safeImageSrc`, `safeImageSrcset`, `safeMediaSrc`), and a
-`trust` prop set to `developer` widens what a host-authored value may use.
+- `svelte` (^5.57.2) is a peer dependency.
+- The components style themselves with the Texuli `--tx-*` design tokens.
+  Import the token stylesheet once in your app (installing `@texuli/tokens`
+  directly lets your bundler resolve it); each component imports its own CSS.
+
+```css
+@import '@texuli/tokens/base.css';
+```
+
+## Quick start
 
 ```svelte
 <script lang="ts">
@@ -43,44 +46,94 @@ core URL policy (`safeImageSrc`, `safeImageSrcset`, `safeMediaSrc`), and a
 />
 ```
 
-## Areas
+`Image` builds the `srcset` from `widths` and your `loader`, reserves space
+from `width` and `height`, loads lazily by default, and shows a labeled
+fallback when a source is rejected or fails to load.
 
-| Import | What it does | Documentation |
-| --- | --- | --- |
-| `@texuli/media/image` | Safe responsive `Image`: srcset, focal point, placeholders, lazy by default, labeled fallback | [Image](docs/image.md) |
-| `@texuli/media/gallery` (+ `/lightbox`) | Grid or masonry `Gallery`; `Lightbox` modal viewer with keyboard, swipe and zoom | [Gallery and Lightbox](docs/gallery.md) |
-| `@texuli/media/video` | Video player with track sources through the media URL policy | [Video player](docs/video.md) |
-| `@texuli/media/audio` | Audio player and waveform | [Audio player and waveform](docs/audio.md) |
-| `@texuli/media/image-editor` (+ `/model`, `/render`) | Image editor model and rendering | [Image editor](docs/image-editor.md) |
-| `@texuli/media/composition-model` | The layered composition data model | — |
-| `@texuli/media/composition-v2` | Groups and layer timing; resolves any instant to a flat v1 frame for every renderer and the WebM export | [Composition v2](docs/composition-v2.md) |
-| `@texuli/media/timeline` (+ `/model`) | `AnimationTimeline` editor: layer windows, keyframes, playhead, preview, undo/redo; the framework-free edit model that keeps documents valid | [Animation timeline](docs/timeline.md) |
-| `@texuli/media/composition-svg` | `CompositionSvg`, `renderCompositionSvg`, `compositionToSvgString` | [Composition SVG renderer](docs/composition-svg.md) |
-| `@texuli/media/composition-canvas` (+ `/render`, `/draw`) | Canvas composition renderer and draw helpers | [Composition renderer: canvas](docs/media-composition-canvas.md) |
-| `@texuli/media/animation` (+ `/player`) | Keyframe animation: `sampleComposition`, `validateAnimation`, `createTimeline`; `CompositionAnimationPlayer` on `/player` | [Composition keyframe animation](docs/animation.md) |
-| `@texuli/media/captions` | Captions and chapters | [Captions and chapters](docs/captions.md) |
-| `@texuli/media/export` (+ `/ui`) | Export functions (each loads on first call) and the `CompositionExport` control | [Media export](docs/media-export.md) |
-| `@texuli/media/generator-slot` | Host-provided generation UI over a provider-neutral seam; Texuli ships no model and opens no network | [Generator slot](docs/generator-slot.md) |
+Sources are treated as **untrusted** by default. For URLs your own code
+authors, pass `trust="developer"` to allow the wider developer tier.
 
-`composition-model` has no doc page yet; its types are the source of truth.
+## What's inside
 
-## Planned
+**Components:**
 
-No roadmap item in this package is open as of 2026-10-26: composition v2
-(groups and layer timing) and the animation timeline editor ship as the
-`composition-v2` and `timeline` subpaths above. Image crop presets, video trim
-recipes, caption cue editing, generation provenance display, provenance
-sidecars on composition exports, WebM composition export, and the sequential
-export queue with progress receipts are implemented too. Per-area limits stay
-in each doc.
+| Import | What it gives you |
+| --- | --- |
+| `@texuli/media/image` | `Image`: srcset, focal point, placeholders, lazy loading and a labeled fallback |
+| `@texuli/media/gallery` | `Gallery`: grid or masonry layouts of images |
+| `@texuli/media/gallery/lightbox` | `Lightbox`: a modal viewer with keyboard, swipe and zoom |
+| `@texuli/media/video` | `VideoPlayer` with custom accessible controls, and `VideoEditPanel` for trim and caption editing |
+| `@texuli/media/audio` | `AudioPlayer` and `Waveform` |
+| `@texuli/media/captions` | WebVTT captions and chapters: chapter menu, transcript view and active cue |
+| `@texuli/media/image-editor` | `ImageEditor`: crop (with presets), rotate, flip, resize, adjust and annotate, exported as PNG, JPEG or WebP |
+| `@texuli/media/generator-slot` | `GeneratorSlot`: UI for a media generator your app provides |
 
-## Verification
+**Compositions** (layered, serializable documents):
 
-```bash
-pnpm vitest run packages/media       # 72 tests / 16 files
-pnpm --filter @texuli/media typecheck  # exit 0
-npx biome check packages/media       # exit 0
-```
+| Import | What it gives you |
+| --- | --- |
+| `@texuli/media/composition-model` | The composition types, validation and provenance collection |
+| `@texuli/media/composition-v2` | Groups and layer timing; resolves any instant to a flat frame |
+| `@texuli/media/composition-svg` | `CompositionSvg`, `renderCompositionSvg` and `compositionToSvgString` |
+| `@texuli/media/composition-canvas` | A canvas renderer for compositions |
+| `@texuli/media/composition-canvas/render`, `@texuli/media/composition-canvas/draw` | The canvas render entry and its lower-level draw pipeline |
+| `@texuli/media/animation` | Keyframes and easing: `sampleComposition`, `validateAnimation`, `createTimeline` |
+| `@texuli/media/animation/player` | `CompositionAnimationPlayer` for playback |
+| `@texuli/media/timeline` | `AnimationTimeline`: layer windows, keyframes, playhead, preview, undo and redo |
+| `@texuli/media/timeline/model` | The framework-free edit model behind the timeline editor |
+| `@texuli/media/export` | `exportPng`, `exportSvg`, `exportWebm`, `exportQueue` and `downloadBlob`; each exporter loads on first use |
+| `@texuli/media/export/ui` | `CompositionExport`, a ready-made export control |
 
-Browser behavior and size budgets live in the repository's
-[testing guide](../../docs/TESTING_GUIDE.md).
+**Models without the UI:** `@texuli/media/image-editor/model` (the
+serializable edit recipe) and `@texuli/media/image-editor/render`. The package
+root, `@texuli/media`, re-exports the framework-free models and helpers.
+
+## Key guarantees
+
+- **URL policy on every source.** Images, srcsets, video, audio and track
+  URLs pass the Texuli URL policy (`safeImageSrc`, `safeImageSrcset`,
+  `safeMediaSrc`) at the `untrusted` tier unless you opt into `developer`.
+- **No HTML sinks.** Caption cue text is stripped to plain text and rendered
+  as text; nothing is injected as HTML.
+- **No network of its own.** Export runs entirely in the browser and uploads
+  nothing. The generator slot ships no model and opens no connection; your
+  app supplies the generator, and its results pass the URL policy before
+  display.
+- **Accessible players.** Video and audio use custom controls with labels
+  and keyboard support; caption UI loads only when tracks are passed.
+- **Reduced motion.** The gallery and lightbox respect
+  `prefers-reduced-motion`, and the animation sampler can hold a still frame.
+- **Non-destructive editing.** Image edits are a small, serializable recipe
+  applied to the untouched source, so they can be saved, validated and
+  reopened.
+
+## Documentation
+
+- Site: [texuli.com](https://texuli.com) and the
+  [media page](https://texuli.com/media-page/)
+- Components:
+  [image](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/image.md),
+  [gallery and lightbox](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/gallery.md),
+  [video](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/video.md),
+  [audio and waveform](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/audio.md),
+  [captions and chapters](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/captions.md),
+  [image editor](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/image-editor.md),
+  [generator slot](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/generator-slot.md)
+- Compositions:
+  [composition v2](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/composition-v2.md),
+  [SVG renderer](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/composition-svg.md),
+  [canvas renderer](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/media-composition-canvas.md),
+  [keyframe animation](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/animation.md),
+  [animation timeline](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/timeline.md),
+  [export](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/media-export.md)
+- Source: [github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli)
+  · Issues: [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues)
+
+## Contributing
+
+Contributions are welcome; start at the
+[GitHub repository](https://github.com/DailybotHQ/texuli).
+
+## License
+
+MIT © Dailybot, Inc.

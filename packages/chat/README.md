@@ -1,84 +1,129 @@
 # @texuli/chat
 
-Chat interfaces for conversations between people, or between a person and an
-agent: thread, message list, composer and typing indicator. The L4 domain
-package composes `texuli` components, `@texuli/primitives` behavior and the
-`@texuli/tokens` engine into Svelte 5 surfaces. Published to npm as `0.1.0-next.2` under the `next`
-dist-tag (by CI, with provenance); no stable release (`latest` is reserved
-for 1.0.0), so install it with `@next`. The workspace package stays
-`"private": true`.
+Chat interfaces for Svelte 5: a conversation thread, a virtualized message
+list, a composer and a typing indicator, generic enough for conversations
+between people or between a person and an agent. It handles message
+grouping, date separators, streamed agent replies and screen-reader
+announcements, and it renders message text without ever injecting HTML. It
+is part of [Texuli](https://texuli.com), "Small pieces. Infinite
+possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
-## Status
+> **Status: preview.** `@texuli/chat` is published on npm under the `next`
+> dist-tag. There is no stable release yet, so install it with `@next` and
+> expect the API to change between previews.
 
-Implemented in `src/` and exported from the package entry: `ChatThread`,
-`MessageList` and `groupMessages` for the conversation view; `Composer` and
-`TypingIndicator` for input. They are covered by 18 unit tests in 2 files
-(`pnpm vitest run packages/chat`), with per-item notes in
-[`docs/chat-thread.md`](docs/chat-thread.md) and
-[`docs/chat-composer.md`](docs/chat-composer.md).
+## Install
 
-## Using the components
+```sh
+npm install @texuli/chat@next @texuli/tokens@next svelte
+```
 
-The package peers on Svelte 5 (`^5.57.2`); its `@texuli/*` dependencies are
-workspace links.
+- `svelte` (^5.57.2) is a peer dependency.
+- The components style themselves with the Texuli `--tx-*` design tokens.
+  Import the token stylesheet once in your app (installing `@texuli/tokens`
+  directly lets your bundler resolve it).
+
+```css
+@import '@texuli/tokens/base.css';
+```
+
+## Quick start
 
 ```svelte
 <script lang="ts">
-  import { ChatThread, Composer, type ChatMessage } from '@texuli/chat';
+  import { ChatThread, type ChatMessage } from '@texuli/chat';
 
-  let messages: ChatMessage[] = [/* stable ids, author ids, body, dates */];
-  let draft = '';
+  const me = { id: 'u-1', name: 'Ada' };
+  const agent = { id: 'agent', name: 'Helper' };
+
+  let messages = $state<ChatMessage[]>([
+    { id: 'm1', author: agent, body: 'Hi! How can I help?', at: '2026-01-05T09:00:00Z' },
+  ]);
+
+  function send(body: string) {
+    messages = [...messages, { id: crypto.randomUUID(), author: me, body, at: new Date() }];
+  }
 </script>
 
-<ChatThread {messages} currentUserId="u-1" />
-<Composer bind:value={draft} onSubmit={(text) => {}} />
+<ChatThread {messages} currentUserId="u-1" onSend={send} label="Support chat" />
 ```
 
-## What the surfaces do today
+`ChatThread` combines the message list with the built-in composer; omit
+`onSend` for a read-only thread, or pass a `composer` snippet to supply your
+own input chrome.
 
-- **`ChatThread` / `MessageList`.** Messages carry a stable id, author id and
-  display name, body text and a date. Consecutive messages from one author
-  group within five minutes; each local calendar day starts with a date
-  separator. `currentUserId` controls own-message alignment; the list shows
-  avatars, localized timestamps, status text, and a polite live log. It
-  virtualizes from 100 messages with variable row measurements and five rows
-  of overscan. `parseMessageText` splits body text into typed text parts,
-  including the closed G21 inline nodes: mentions, dates and status chips.
-  `composer` replaces the built-in composer with host-owned chrome.
-- **Display components (G10).** `ChatThreadDisplay` and
-  `ChatMessageDisplay` paint the player's `chat-thread` and `chat-message`
-  ids as a static transcript: a labelled section, with one article per
-  message showing author, role and time. Text goes through
-  `parseMessageText`, and block children render under it. There is no
-  composer or live region. `CHAT_DISPLAY_LOADERS` maps both ids for a
-  `@texuli/player` host. Role labels are English only for now.
-- **Streaming replies.** `applyChatStreamEvent(messages, event)` folds
-  `start` / `delta` / `end` / `error` events into the message list. A message
-  with `streaming: true` is busy and shows a caret; its partial text is
-  hidden from the live log and announced once, when it finishes.
-- **`Composer`.** Binds a string draft through `value`, submits trimmed text
-  on Enter or form submission (Shift+Enter makes a newline), ignores Enter
-  while an input method editor is composing, grows to `maxRows` (default 6),
-  and supports `maxLength`, `disabled`, externally controlled `sending`, an
-  `attachments` snippet, and async submissions that set pending state and
-  prevent duplicate sends.
-- **`TypingIndicator`.** Localized typing labels for one or more authors.
+### Streaming an agent reply
 
-## Planned
+`applyChatStreamEvent(messages, event)` folds `start`, `delta`, `end` and
+`error` events into the message list immutably:
 
-Roadmap items not started as of 2026-10-24: moving the chat display
-manifests into a catalog `chat` group, localized display role labels, a
-mention picker in the built-in composer, and the chat→blueprint drafting
-loop in the agent service. They are PLAN_004 tasks; do not assume any of
-them works today.
+```ts
+import { applyChatStreamEvent } from '@texuli/chat';
 
-## Verification
-
-```bash
-pnpm vitest run packages/chat        # 18 tests / 2 files
-pnpm --filter @texuli/chat typecheck  # exit 0
-npx biome check packages/chat        # exit 0
+messages = applyChatStreamEvent(messages, { type: 'start', id: 'r1', author: agent, at: new Date() });
+messages = applyChatStreamEvent(messages, { type: 'delta', id: 'r1', text: 'Checking your order' });
+messages = applyChatStreamEvent(messages, { type: 'end', id: 'r1' });
 ```
 
-Browser behavior and size budgets live in the repository's
-[testing guide](../../docs/TESTING_GUIDE.md).
+While a message streams it shows a caret; its partial text stays out of the
+live region and is announced once, when it finishes.
+
+## What's inside
+
+Everything is exported from the package root, `@texuli/chat`:
+
+| Export | What it does |
+| --- | --- |
+| `ChatThread` | The full conversation view: message list plus composer, typing indicator and header slots |
+| `MessageList` | The message log on its own: grouping, date separators, avatars, timestamps, status and virtualization |
+| `Composer` | Message input: Enter to send, Shift+Enter for a new line, auto-growing, with attachments and pending states |
+| `TypingIndicator` | Localized "is typing" labels for one or more authors |
+| `ChatThreadDisplay`, `ChatMessageDisplay` | A static transcript view (no composer, no live region) for rendering saved or generated conversations |
+| `CHAT_DISPLAY_LOADERS` | Loaders that map the display components for a `@texuli/player` host |
+| `applyChatStreamEvent` | Folds streamed reply events into a message list |
+| `groupMessages`, `parseMessageText`, `messageTokens` | The grouping and text-parsing helpers behind the list |
+
+## Key guarantees
+
+- **No HTML sinks.** Message bodies support a small text format (`**strong**`,
+  `*emphasis*`, backtick code and `[label](https://example.com)` links), and
+  it renders as Svelte text nodes, never as HTML.
+- **URL policy on links.** Link destinations pass the Texuli URL policy at
+  the `untrusted` tier; a rejected link stays visible as literal text.
+- **Closed inline tokens.** Mentions (`@[Name](mention:id)`), dates
+  (`[[date:ISO]]`) and status chips (`[[status:tone|Label]]`) are parsed
+  against strict patterns; anything that fails a check stays literal text.
+  Mentions are display-only and do not notify anyone.
+- **Screen-reader friendly.** The list is a polite live log, streamed replies
+  are announced once on completion, and the list, thread and composer take
+  translatable `labels`.
+- **Input-method safe.** The composer ignores Enter while an input method
+  editor is composing, and async submissions prevent duplicate sends.
+- **Scales to long threads.** The list virtualizes from 100 messages with
+  measured row heights, and keeps your place when older history is
+  prepended.
+
+## Not yet available
+
+These are planned and do not work today: a mention picker in the built-in
+composer, and localized role labels in the transcript display components
+(they are English only for now).
+
+## Documentation
+
+- Site: [texuli.com](https://texuli.com) and the
+  [live examples](https://texuli.com/examples/)
+- Guides:
+  [chat thread and message list](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-thread.md),
+  [composer and typing indicator](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-composer.md)
+- Source: [github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli)
+  · Issues: [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues)
+
+## Contributing
+
+Contributions are welcome; start at the
+[GitHub repository](https://github.com/DailybotHQ/texuli).
+
+## License
+
+MIT © Dailybot, Inc.

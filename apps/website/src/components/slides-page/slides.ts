@@ -56,7 +56,7 @@ export const SLIDES_EXAMPLES: readonly SlidesExampleLink[] = [
 
 /** Package docs, by repository path: the site does not serve them yet. */
 export const SLIDES_DOCS: readonly { path: string; summary: string }[] = [
-  { path: 'packages/slides/README.md', summary: 'Status, usage and checks' },
+  { path: 'packages/slides/README.md', summary: 'Install, quick start and subpaths' },
   { path: 'packages/slides/docs/model.md', summary: 'Deck model, slot masters, reveal steps' },
   { path: 'packages/slides/docs/grammar.md', summary: 'Catalog encodings and agent decks' },
   {
