@@ -189,13 +189,13 @@ describe('the state surface: spec and player refuse the same nodes', () => {
 describe('list item text: the player refuses what the spec refuses', () => {
   it('refuses controls, bidirectional overrides and isolates, and invisible formatting', () => {
     for (const label of [
-      'a‮b',
-      'a⁦b',
-      'a​b',
-      'a‎b',
-      'a⁠b',
-      'a﻿b',
-      'a؜b',
+      'a\u202Eb',
+      'a\u2066b',
+      'a\u200Bb',
+      'a\u200Eb',
+      'a\u2060b',
+      'a\uFEFFb',
+      'a\u061Cb',
       'a\u0000b',
       'a\nb',
       'a\u0085b',
@@ -208,7 +208,7 @@ describe('list item text: the player refuses what the spec refuses', () => {
   });
 
   it('keeps plain text, emoji joiners and script joiners', () => {
-    for (const label of ['Bug report', 'Café 3 €', '👩‍💻', 'می‌خواهم'])
+    for (const label of ['Bug report', 'Café 3 €', '👩\u200D💻', 'می\u200Cخواهم'])
       expect(coerceList([{ id: 'x', label }], 10), label).toBeDefined();
   });
 });

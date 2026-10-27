@@ -91,7 +91,7 @@ export const HOSTILE_BLUEPRINTS: readonly HostileBlueprint[] = Object.freeze([
     id: 'workflow-bidi-label',
     category: 'bidi',
     title: 'A bidi override in a workflow node label',
-    tree: graph([node('a', 'pay‮yas')], []),
+    tree: graph([node('a', 'pay\u202Eyas')], []),
     refuse: ['prop-type'],
   },
   {

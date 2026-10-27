@@ -43,7 +43,7 @@ class SurfaceTest {
 
     @Test
     fun listItemTextRefusesControlBidiAndInvisibleCharacters() {
-        for (label in listOf("a‮b", "a⁧b", "a​b", "a‎b", "a⁠b", "a﻿b", "a؜b", "a\u0007b", "a\u0085b")) {
+        for (label in listOf("a\u202Eb", "a\u2067b", "a\u200Bb", "a\u200Eb", "a\u2060b", "a\uFEFFb", "a\u061Cb", "a\u0007b", "a\u0085b")) {
             val list = JsonValue.Arr(listOf(JsonValue.Obj(mapOf("id" to JsonValue.Str("t1"), "label" to JsonValue.Str(label)))))
             assertEquals(
                 "[0].label" to "Item text cannot hold control, bidirectional or invisible formatting characters.",
@@ -51,7 +51,7 @@ class SurfaceTest {
                 label,
             )
         }
-        for (label in listOf("Bug report", "👩‍💻", "می‌خواهم")) {
+        for (label in listOf("Bug report", "👩\u200D💻", "می\u200Cخواهم")) {
             val list = JsonValue.Arr(listOf(JsonValue.Obj(mapOf("id" to JsonValue.Str("t1"), "label" to JsonValue.Str(label)))))
             assertNull(listProblem(list, 10), label)
         }
