@@ -9,8 +9,7 @@
  *   pnpm exec tsx packages/tools/src/cli-add/cli.ts button --cwd <app> --source-root <repo>
  *   … --json --dry-run --force --out src/ui/button
  */
-import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { isMainModule } from '../internal/is-main.ts';
 import { addComponent } from './add.ts';
 import { listAddableIds } from './registry.ts';
 import type { AddResult } from './types.ts';
@@ -152,19 +151,10 @@ export async function runAddCli(
   return result.ok ? 0 : 1;
 }
 
-/** True when this module is the process entry (tsx / node cli.ts). */
-export function isMainModule(metaUrl: string): boolean {
-  const entry = process.argv[1];
-  if (!entry) return false;
-  try {
-    return resolve(fileURLToPath(metaUrl)) === resolve(entry);
-  } catch {
-    return metaUrl.endsWith(entry.replace(/\\/g, '/'));
-  }
-}
-
 if (isMainModule(import.meta.url)) {
   runAddCli(process.argv.slice(2)).then((code) => {
     process.exitCode = code;
   });
 }
+
+export { isMainModule };

@@ -9,7 +9,7 @@
  *   pnpm exec tsx packages/tools/src/cli-init/cli.ts theme preview <id> [--mode light|dark] [--json]
  *   pnpm exec tsx packages/tools/src/cli-init/cli.ts theme apply <id> [--cwd <app>] [--force] [--dry-run] [--json]
  */
-import { fileURLToPath } from 'node:url';
+import { isMainModule } from '../internal/is-main.ts';
 import { FRAMEWORKS } from './detect.ts';
 import { initProject } from './init.ts';
 import { applyProjectTheme } from './theme-apply.ts';
@@ -205,16 +205,7 @@ export async function runInitCli(
   }
 }
 
-function isMain(metaUrl: string): boolean {
-  const entry = process.argv[1];
-  try {
-    return entry !== undefined && fileURLToPath(metaUrl) === entry;
-  } catch {
-    return false;
-  }
-}
-
-if (isMain(import.meta.url)) {
+if (isMainModule(import.meta.url)) {
   runInitCli(process.argv.slice(2)).then((code) => {
     process.exitCode = code;
   });

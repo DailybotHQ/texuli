@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { isMainModule } from '../internal/is-main.ts';
 import { formatGoldenReport, scoreGoldenRun } from './report.ts';
 
 /**
@@ -27,16 +27,6 @@ async function main(argv: readonly string[]): Promise<number> {
     argv.includes('--json') ? `${JSON.stringify(report, null, 2)}\n` : formatGoldenReport(report)
   );
   return 0;
-}
-
-function isMainModule(metaUrl: string): boolean {
-  const entry = process.argv[1];
-  if (!entry) return false;
-  try {
-    return fileURLToPath(metaUrl) === entry;
-  } catch {
-    return false;
-  }
 }
 
 if (isMainModule(import.meta.url)) {
