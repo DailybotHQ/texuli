@@ -69,7 +69,7 @@ export function libraryJsonLd(): { '@context': string; '@graph': Array<Record<st
         softwareVersion: texuliPackageVersion(),
         license: 'https://opensource.org/licenses/MIT',
         description:
-          'Open-source Svelte 5 component system with a closed agent catalog and a sink-free renderer. Preview on npm (dist-tag next); the native Kotlin Multiplatform renderer is in development.',
+          'Open-source Svelte 5 component system with a closed agent catalog and a sink-free renderer. Pre-1.0 release on npm; the native Kotlin Multiplatform renderer is in development.',
         url: `${SITE_URL}/`,
       },
     ],

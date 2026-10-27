@@ -5,9 +5,9 @@
  * the status line for Dailybot, Inc.
  *
  * T-79 (core punch list rows 3, 4, 9, 14): the status line states the
- * release truth from docs/RELEASE.md — preview packages on npm under the
- * `next` tag, no stable release, the native renderer in development — and
- * is the single sitewide place the npm preview is claimed (narrative
+ * release truth from docs/RELEASE.md — pre-1.0 packages on npm, no stable
+ * release, the native renderer in development — and is the single
+ * sitewide place the npm release is claimed (narrative
  * blueprint §6). No version number here, so it cannot drift from the
  * registry. External links (repository, license) pass the URL policy at
  * the developer tier; site routes take the base.
@@ -73,8 +73,8 @@ const productLinks = PRODUCT_GROUP_IDS.flatMap((id) => {
       </ul>
     </nav>
     <p class="site-footer__status" data-tx-site-status="">
-      <strong>Texuli</strong> is MIT licensed, by Dailybot, Inc. Preview packages are on npm under
-      the <code>next</code> tag; no stable release yet. The native renderer is in development.
+      <strong>Texuli</strong> is MIT licensed, by Dailybot, Inc. Pre-1.0 packages are on
+      npm; no stable release yet. The native renderer is in development.
     </p>
   </div>
 </footer>

@@ -274,8 +274,8 @@ export function checkRuntimeAllowlist(packages: readonly WorkspacePackage[]): Su
     const deps = pkg.manifest.dependencies ?? {};
     for (const [dep, range] of Object.entries(deps)) {
       if (isWorkspaceRange(range) || isInternalName(dep)) {
-        // Internal deps may be pinned to exact reserved versions
-        // (0.1.0-next.3) instead of workspace: ranges; they are still
+        // Internal deps may be pinned to exact versions (0.2.0)
+        // instead of workspace: ranges; they are still
         // workspace packages, resolved by the workspace, not externals.
         if (!isInternalName(dep) && !names.has(dep)) {
           findings.push({

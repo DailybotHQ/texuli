@@ -164,7 +164,7 @@ test.describe('texuli.com landing', () => {
     await expect(footer.getByText(/Dailybot, Inc/)).toBeVisible();
     // T-79 rows 3, 4, 9: the release truth and the project row.
     const release = footer.locator('[data-tx-site-status]');
-    await expect(release).toContainText('Preview packages are on npm under the next tag');
+    await expect(release).toContainText('Pre-1.0 packages are on npm');
     await expect(release).toContainText('no stable release yet');
     await expect(release).not.toContainText('not released yet');
     await expect(footer.getByRole('link', { name: 'GitHub' })).toHaveAttribute(

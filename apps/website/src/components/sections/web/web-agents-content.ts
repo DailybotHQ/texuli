@@ -8,8 +8,8 @@
  * the repository file it cites: a claim's `sources` phrases appear word for
  * word in both the cited file and this module's copy. Every agent surface
  * is a real file or page served by this site, and the install line states
- * the release truth from `docs/RELEASE.md`: the `next` preview is out,
- * nothing stable is, and `latest` tracks the newest preview until 1.0.0.
+ * the release truth from `docs/RELEASE.md`: 0.2.0 is out (`latest` and
+ * `next` both name it), it is pre-1.0, and nothing stable is yet.
  */
 
 /** Repository-relative path of the cited file. */
@@ -135,12 +135,12 @@ export const WEB_AGENTS_SURFACES: readonly AgentsSurface[] = [
   },
 ];
 
-/** The install block: the real preview command and the release truth. */
+/** The install block: the real install command and the release truth. */
 export const WEB_AGENTS_INSTALL = {
-  command: 'pnpm add texuli@next',
+  command: 'pnpm add texuli',
   note:
-    'Installs the 0.1.0-next.3 preview from the next dist-tag. Nothing stable is published ' +
-    'yet: until 1.0.0, the latest tag tracks the newest preview.',
+    'Installs 0.2.0, a pre-1.0 release: under 0.x a new minor may contain breaking ' +
+    'changes, so pin the version. 1.0.0 will be the first stable release.',
 } as const;
 
 /** Blueprint s8: one platform, two runtimes, start today. */
