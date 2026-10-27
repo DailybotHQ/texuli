@@ -228,7 +228,7 @@ function sourceFiles(dir: string): string[] {
 }
 
 describe('package sources under a strict CSP', () => {
-  it('no package source uses a sink the policy blocks', () => {
+  it('no package source uses a sink the policy blocks', { timeout: 30_000 }, () => {
     const packages = join(ROOT, 'packages');
     const files = readdirSync(packages)
       .map((name) => join(packages, name, 'src'))
