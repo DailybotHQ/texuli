@@ -1,5 +1,6 @@
 <script lang="ts">
 import { Button, ButtonGroup, IconButton } from 'texuli/button';
+import { scopedTheme } from '../scoped-theme.ts';
 
 let last = $state('idle');
 
@@ -42,6 +43,16 @@ async function slowSave(): Promise<void> {
         ></circle><circle cx="8" cy="13" r="1.5" fill="currentColor"></circle></svg
       >
     </IconButton>
+    <IconButton label="More actions, large" variant="outline" size="lg">
+      <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"
+        ><circle cx="8" cy="3" r="1.5" fill="currentColor"></circle><circle
+          cx="8"
+          cy="8"
+          r="1.5"
+          fill="currentColor"
+        ></circle><circle cx="8" cy="13" r="1.5" fill="currentColor"></circle></svg
+      >
+    </IconButton>
   </div>
 
   <h3>States</h3>
@@ -58,6 +69,11 @@ async function slowSave(): Promise<void> {
     <Button variant="outline">Center</Button>
     <Button variant="outline">End</Button>
   </ButtonGroup>
+  <ButtonGroup label="Text alignment, vertical" orientation="vertical" data-axis="group-vertical">
+    <Button variant="outline">Start</Button>
+    <Button variant="outline">Center</Button>
+    <Button variant="outline">End</Button>
+  </ButtonGroup>
 
   <h3>RTL</h3>
   <div class="row" dir="rtl" lang="ar" data-axis="rtl">
@@ -66,7 +82,7 @@ async function slowSave(): Promise<void> {
   </div>
 
   <h3>Dark</h3>
-  <div class="row dark-panel" data-tx-mode="dark" data-axis="dark">
+  <div class="row dark-panel" use:scopedTheme={'dark'} data-axis="dark">
     <Button variant="default">Dark default</Button>
     <Button variant="secondary">Dark secondary</Button>
     <Button variant="outline">Dark outline</Button>
@@ -91,7 +107,5 @@ async function slowSave(): Promise<void> {
   .dark-panel {
     padding: 0.75rem;
     border-radius: var(--tx-radius, 0.5rem);
-    background: var(--tx-background, #0a0a0a);
-    color: var(--tx-foreground, #fafafa);
   }
 </style>

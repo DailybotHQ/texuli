@@ -6,6 +6,7 @@ import {
   cascade,
   criticalPath,
   type Dependency,
+  durationDays,
   type ScheduleTask,
   type TaskChange,
   type TimelineItem,
@@ -14,11 +15,12 @@ import {
 import {
   axisPixel,
   DAY_WIDTH,
+  DEFAULT_TIMELINE_LABELS,
   dateOffset,
-  durationLabel,
   HEADER_HEIGHT,
   progressValue,
   ROW_HEIGHT,
+  type TimelineLabels,
   type TimelineZoom,
   timelineRange,
   ZOOMS,
@@ -44,6 +46,7 @@ let {
   onRetry,
   getGroup,
   maxRows = 500,
+  labels: labelOverrides,
   class: className,
 }: {
   tasks?: readonly T[];
@@ -64,8 +67,17 @@ let {
   onRetry?: () => void | Promise<void>;
   getGroup?: (task: T) => { id: string; label: string } | undefined;
   maxRows?: number;
+  /** Every user-facing string; defaults keep the original English copy. */
+  labels?: Partial<TimelineLabels>;
   class?: ClassValue;
 } = $props();
+
+const labels = $derived.by<TimelineLabels>(() => {
+  const merged: TimelineLabels = { ...DEFAULT_TIMELINE_LABELS, ...labelOverrides };
+  if (labelOverrides?.columns)
+    merged.columns = { ...DEFAULT_TIMELINE_LABELS.columns, ...labelOverrides.columns };
+  return merged;
+});
 
 const uid = $props.id();
 const today = $derived((now ?? new Date()).toISOString().slice(0, 10) as IsoDate);
@@ -135,12 +147,11 @@ function taskInlineStyle(task: T & ScheduleTask): string {
   const offset = dateOffset(position.start, range.start);
   const days = Math.max(task.milestone ? 0 : 1, daysBetween(position.start, position.end) + 1);
   const barWidth = task.milestone ? 12 : Math.max(width * 0.7, days * width);
-  const startPx = axisPixel(offset, width, canvasWidth, direction);
-  const inset =
-    direction === 'rtl'
-      ? `inset-inline-end:${canvasWidth - startPx}px;width:${barWidth}px`
-      : `inset-inline-start:${startPx}px;width:${barWidth}px`;
-  return inset;
+  // Logical inset from the day offset: `dir` mirrors it, so the earliest
+  // date sits at the inline start in RTL — the same side the mirrored SVG
+  // arrows anchor at (axisPixel).
+  const startPx = offset * width;
+  return `inset-inline-start:${startPx}px;width:${barWidth}px`;
 }
 
 function begin(
@@ -202,15 +213,15 @@ async function commit(): Promise<void> {
     ...pending,
     ...Object.fromEntries(result.map((change) => [change.id, true as const])),
   };
-  announcement = 'Saving schedule changes…';
+  announcement = labels.saving;
   try {
     await onReschedule(result);
-    announcement = `Saved ${result.length} schedule change${result.length === 1 ? '' : 's'}.`;
+    announcement = labels.saved(result.length);
   } catch {
     const next = { ...optimistic };
     for (const change of result) delete next[change.id];
     optimistic = next;
-    announcement = 'The schedule was not saved; dates were restored.';
+    announcement = labels.saveFailed;
   } finally {
     const nextPending = { ...pending };
     for (const change of result) delete nextPending[change.id];
@@ -220,7 +231,7 @@ async function commit(): Promise<void> {
 
 function cancel(): void {
   interaction = null;
-  announcement = 'Reschedule cancelled.';
+  announcement = labels.cancelled;
 }
 
 function keyTask(task: T & ScheduleTask, event: KeyboardEvent): void {
@@ -229,7 +240,7 @@ function keyTask(task: T & ScheduleTask, event: KeyboardEvent): void {
     if (event.key === ' ') {
       event.preventDefault();
       begin(task, event.shiftKey ? 'resize-end' : 'move');
-      announcement = `Picked up ${getTitle(task)}. Use arrow keys to adjust dates; Enter saves, Escape cancels.`;
+      announcement = labels.pickedUp(getTitle(task));
     }
     return;
   }
@@ -255,7 +266,7 @@ function keyTask(task: T & ScheduleTask, event: KeyboardEvent): void {
         : { ...draft, end: addDays(draft.end, delta) };
   if (next.start <= next.end) {
     interaction = { ...current, draft: next };
-    announcement = `${getTitle(task)} preview: ${next.start} to ${next.end}.`;
+    announcement = labels.preview(getTitle(task), formatDate(next.start), formatDate(next.end));
   }
 }
 
@@ -298,9 +309,9 @@ function tickWidth(): number {
       aria-pressed={milestonesOnly}
       onclick={() => (milestonesOnly = !milestonesOnly)}
     >
-      {milestonesOnly ? 'Show all tasks' : 'Milestones only'}
+      {milestonesOnly ? labels.showAllTasks : labels.milestonesOnly}
     </button>
-    <div class="zooms" role="group" aria-label="Timeline zoom">
+    <div class="zooms" role="group" aria-label={labels.zoomGroup}>
       {#each ZOOMS as option (option)}
         <button
           type="button"
@@ -314,30 +325,29 @@ function tickWidth(): number {
   </header>
 
   {#if loading}
-    <p class="status" role="status">Loading timeline…</p>
+    <p class="status" role="status">{labels.loading}</p>
   {:else if error}
     <p class="status" role="alert">
-      Could not load the timeline.
+      {labels.loadError}
       {#if onRetry}
-        <button type="button" onclick={() => void onRetry()}>Retry</button>
+        <button type="button" onclick={() => void onRetry()}>{labels.retry}</button>
       {/if}
     </p>
   {:else}
     {#if model.truncatedCount > 0}
       <p class="notice" role="status">
-        Showing {model.visible.length} of {model.totalScheduled} scheduled tasks; {model.truncatedCount}
-        are hidden.
+        {labels.truncated(model.visible.length, model.totalScheduled, model.truncatedCount)}
       </p>
     {/if}
     {#if milestonesOnly}
       <p class="notice" role="status">
-        Showing only milestone tasks
-        <button type="button" onclick={() => (milestonesOnly = false)}>Show all</button>
+        {labels.milestonesNotice}
+        <button type="button" onclick={() => (milestonesOnly = false)}>{labels.showAll}</button>
       </p>
     {/if}
     {#if model.unscheduled.length > 0}
-      <aside class="unscheduled" aria-label="Unscheduled tasks">
-        <h3>Unscheduled <span>{model.unscheduled.length}</span></h3>
+      <aside class="unscheduled" aria-label={labels.unscheduledTray}>
+        <h3>{labels.unscheduledHeading} <span>{model.unscheduled.length}</span></h3>
         <ul>
           {#each model.unscheduled as task (task.id)}
             <li>
@@ -351,16 +361,16 @@ function tickWidth(): number {
       <div class="body" class:has-interaction={!!interaction}>
         <div
           class="task-table"
-          role="treegrid"
-          aria-label={`${label} tasks`}
+          role="table"
+          aria-label={labels.tasksTable(label)}
           aria-colcount="4"
           aria-rowcount={visibleTasks.length + 1}
         >
           <div class="table-head" role="row" aria-rowindex="1">
-            <span role="columnheader">Task</span>
-            <span role="columnheader">Start</span>
-            <span role="columnheader">End</span>
-            <span role="columnheader">Duration</span>
+            <span role="columnheader">{labels.columns.task}</span>
+            <span role="columnheader">{labels.columns.start}</span>
+            <span role="columnheader">{labels.columns.end}</span>
+            <span role="columnheader">{labels.columns.duration}</span>
           </div>
           <div class="table-viewport" style:block-size="{Math.max(ROW_HEIGHT, viewportHeight)}px">
             {#each visible.items as row (visibleTasks[row.index]?.id)}
@@ -374,23 +384,19 @@ function tickWidth(): number {
                 style:block-size="{row.size}px"
                 data-task-row={task.id}
               >
-                <span role="gridcell" class="task-name" title={getTitle(task)}>
+                <span role="cell" class="task-name" title={getTitle(task)}>
                   {#if getGroup}
                     <span class="group-label">{getGroup(task)?.label}</span>
                   {/if}
                   {#if critical.has(task.id)}
-                    <span class="critical-mark" aria-label="Critical path">●</span>
+                    <span class="critical-mark" aria-label={labels.criticalPath}>●</span>
                   {/if}
                   {getTitle(task)}
                 </span>
-                <span role="gridcell">{dates.start}</span>
-                <span role="gridcell">{dates.end}</span>
-                <span role="gridcell"
-                  >{durationLabel({
-                    ...dates,
-                    id: task.id,
-                    milestone: task.milestone,
-                  })}</span
+                <span role="cell">{dates.start}</span>
+                <span role="cell">{dates.end}</span>
+                <span role="cell"
+                  >{labels.duration(durationDays(dates), task.milestone === true)}</span
                 >
               </div>
             {/each}
@@ -405,7 +411,7 @@ function tickWidth(): number {
             <div class="date-head" style:block-size="{HEADER_HEIGHT}px">
               {#each dayTicks as tick (tick.date)}
                 <span
-                  style:inset-inline-start="{axisPixel(tick.offset / width, width, canvasWidth, direction)}px"
+                  style:inset-inline-start="{tick.offset}px"
                   style:inline-size="{tickWidth()}px"
                 >
                   {formatDate(tick.date)}
@@ -417,11 +423,13 @@ function tickWidth(): number {
                 class="today-line"
                 data-today-line
                 role="img"
-                style:inset-inline-start="{axisPixel(todayOffset / width, width, canvasWidth, direction)}px"
+                style:inset-inline-start="{todayOffset}px"
                 style:inset-block-start="{HEADER_HEIGHT}px"
                 style:block-size="{axis.total}px"
-                aria-label={`Today, ${formatDate(today)}`}
-              ></div>
+                aria-label={`${labels.todayLabel}, ${formatDate(today)}`}
+              >
+                <span class="today-chip" aria-hidden="true">{labels.todayLabel}</span>
+              </div>
             {/if}
             <svg
               class="dependencies"
@@ -483,8 +491,8 @@ function tickWidth(): number {
                     change && 'preview'
                   )}
                   style={taskInlineStyle(task)}
-                  aria-label={`${getTitle(task)}, ${formatDate(shown.start)} to ${formatDate(shown.end)}${task.milestone ? ', milestone' : ''}${pending[task.id] ? ', saving' : ''}`}
-                  aria-roledescription="reschedulable task"
+                  aria-label={`${getTitle(task)}, ${formatDate(shown.start)} to ${formatDate(shown.end)}${task.milestone ? `, ${labels.milestoneSuffix}` : ''}${pending[task.id] ? `, ${labels.savingSuffix}` : ''}`}
+                  aria-roledescription={labels.reschedulableTask}
                   aria-busy={pending[task.id] ? 'true' : undefined}
                   aria-pressed={interaction?.id === task.id}
                   disabled={!!pending[task.id]}
@@ -498,8 +506,8 @@ function tickWidth(): number {
                   <span class="progress" style:inline-size="{progressValue(getProgress(task))}%"
                   ></span>
                   <span class="bar-label">
-                    {getTitle(task)}{task.milestone ? ' · milestone' : ''}{pending[task.id]
-                      ? ' · Saving'
+                    {getTitle(task)}{task.milestone ? ` · ${labels.milestoneSuffix}` : ''}{pending[task.id]
+                      ? ` · ${labels.savingSuffix}`
                       : ''}
                   </span>
                   <span
@@ -525,7 +533,7 @@ function tickWidth(): number {
         </div>
       </div>
     {:else if !loading}
-      <p class="status" role="status">No scheduled tasks in this range.</p>
+      <p class="status" role="status">{labels.empty}</p>
     {/if}
   {/if}
   <p class="sr-only" aria-live="polite">{announcement}</p>
@@ -540,6 +548,9 @@ function tickWidth(): number {
     --tx-tl-accent: var(--tx-primary, Highlight);
     --tx-tl-accent-fg: var(--tx-primary-foreground, HighlightText);
     --tx-tl-critical: var(--tx-destructive, Mark);
+    /* The contract pairs destructiveForeground with destructive, so the
+       critical bar stays AA in every theme without hardcoded colors. */
+    --tx-tl-critical-fg: var(--tx-destructive-foreground, MarkText);
     color: var(--tx-tl-ink);
     background: var(--tx-tl-surface);
     border: 1px solid var(--tx-tl-line);
@@ -602,7 +613,10 @@ function tickWidth(): number {
   .table-head,
   .table-row {
     display: grid;
-    grid-template-columns: minmax(8rem, 1fr) 7.2rem 7.2rem 5.6rem;
+    /* Shrinkable date tracks: on a 360px screen the cells ellipsize instead
+       of the End and Duration columns clipping away. */
+    grid-template-columns: minmax(6rem, 1fr) minmax(4.5rem, 7.2rem) minmax(4.5rem, 7.2rem)
+      minmax(3.5rem, 5.6rem);
     align-items: center;
     gap: 0.4rem;
     padding-inline: 0.65rem;
@@ -624,6 +638,12 @@ function tickWidth(): number {
     border-block-end: 1px solid color-mix(in srgb, var(--tx-tl-line) 65%, transparent);
     font-size: 0.72rem;
     white-space: nowrap;
+  }
+  .table-row > span,
+  .table-head span {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .task-name {
     overflow: hidden;
@@ -674,8 +694,7 @@ function tickWidth(): number {
     z-index: 3;
     pointer-events: none;
   }
-  .today-line::before {
-    content: 'Today';
+  .today-chip {
     position: absolute;
     inset-block-start: 0;
     inset-inline-start: 0.15rem;
@@ -727,9 +746,9 @@ function tickWidth(): number {
   }
   .task-bar.critical {
     border-color: var(--tx-tl-critical);
-    /* Solid-enough fill so 0.7rem labels stay AA against the bar. */
-    background: color-mix(in srgb, var(--tx-tl-critical) 78%, #1a1010);
-    color: #fff;
+    /* Solid destructive fill; its contract foreground keeps labels AA. */
+    background: var(--tx-tl-critical);
+    color: var(--tx-tl-critical-fg);
   }
   .task-bar.preview {
     outline: 2px dashed var(--tx-tl-accent);
@@ -750,8 +769,13 @@ function tickWidth(): number {
     background: color-mix(in srgb, var(--tx-tl-accent) 20%, transparent);
     pointer-events: none;
   }
+  /* On the solid critical fill, progress is a stripe on the block-end edge:
+     a tint behind the label would pull the fill toward the label color and
+     break AA (T-87). */
   .critical .progress {
-    background: color-mix(in srgb, #000 25%, transparent);
+    inset-block: auto 0;
+    block-size: 3px;
+    background: var(--tx-tl-critical-fg);
   }
   .bar-label {
     position: relative;
@@ -762,9 +786,6 @@ function tickWidth(): number {
     font-weight: var(--tx-font-weight-semibold, 600);
     color: inherit;
     pointer-events: none;
-  }
-  .task-bar.critical .bar-label {
-    color: #fff;
   }
   .milestone .bar-label {
     display: none;
@@ -780,6 +801,25 @@ function tickWidth(): number {
   }
   .resize.end {
     inset-inline-end: 0;
+  }
+  @media (forced-colors: active) {
+    .zooms button[aria-pressed='true'],
+    .toolbar > button[aria-pressed='true'] {
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+    /* Critical stays distinguishable by a heavier system-color border; the
+       progress stripe opts out of forcing so it is not erased to Canvas. */
+    .task-bar.critical {
+      border: 2px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .critical .progress {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
   }
   .notice,
   .unscheduled,

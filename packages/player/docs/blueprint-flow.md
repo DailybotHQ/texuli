@@ -1,7 +1,8 @@
 # Embedding the blueprint flow
 
-**Packages:** `@texuli/player`, `@texuli/catalog` (private workspace packages;
-names reserved on npm as `0.1.0-next.0`, no stable release)
+**Packages:** `@texuli/player`, `@texuli/catalog` (on npm as `0.1.0-next.1`
+under the `next` dist-tag; no stable release; the workspace packages stay
+`"private": true`)
 
 How a host app takes a blueprint from an agent or a person, validates it,
 lets someone edit it with undo, digests it and paints it. This is the flow

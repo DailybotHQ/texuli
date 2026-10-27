@@ -1,0 +1,164 @@
+---
+/**
+ * /web-and-native/ — the texel-ladder section (PLAN_006 T-49).
+ *
+ * The composition ladder — texels → primitives → components — as a real
+ * ordered list (the ladder's text alternative is its own markup: no
+ * `aria-hidden` duplicate is needed), each rung annotated for both runtimes.
+ * Copy and citations come from `./layers-data.ts`; the unit test anchors the
+ * runtime notes to the files that state them.
+ *
+ * Static markup, zero script, no motion; one `section` landmark named by
+ * its `h2`, rung titles as `h3` so heading order never skips a level.
+ */
+import { LADDER_STAGES } from './layers-data.ts';
+
+const titleId = 'arch-ladder-title';
+---
+
+<section class="arch-ladder" aria-labelledby={titleId} data-tx-arch-section="ladder">
+  <h2 id={titleId}>The texel ladder: three rungs, two runtimes</h2>
+  <p class="arch-ladder__lead">
+    Components are not invented per page — they compose up a fixed ladder, and the same ladder is
+    the grammar on both runtimes: the web renders it in Svelte, the native renderer consumes the
+    same catalog contract in Compose.
+  </p>
+
+  <ol class="arch-ladder__list">
+    {
+      LADDER_STAGES.map((stage) => (
+        <li class="arch-ladder__rung">
+          <h3>{stage.name}</h3>
+          <p class="arch-ladder__role">{stage.role}</p>
+          <p class="arch-ladder__home">
+            <code>{stage.home}</code>
+            <span> · layer {stage.layer}</span>
+          </p>
+          <dl class="arch-ladder__runtimes">
+            <div>
+              <dt>Web</dt>
+              <dd>{stage.runtimes.web.text}</dd>
+            </div>
+            <div>
+              <dt>Native</dt>
+              <dd>{stage.runtimes.native.text}</dd>
+            </div>
+          </dl>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .arch-ladder {
+    display: grid;
+    gap: 1rem;
+    padding-block: clamp(2rem, 6vw, 4rem);
+    color: var(--tx-foreground);
+  }
+  .arch-ladder h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    line-height: 1.2;
+  }
+  .arch-ladder__lead {
+    margin: 0;
+    max-inline-size: 46rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.6;
+  }
+  .arch-ladder__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: arch-ladder;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .arch-ladder__rung {
+    counter-increment: arch-ladder;
+    display: grid;
+    gap: 0.4rem;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding: 0.85rem 1rem;
+    padding-inline-start: 2.6rem;
+    background: var(--tx-surface, var(--tx-background));
+    position: relative;
+  }
+  .arch-ladder__rung::before {
+    content: counter(arch-ladder);
+    position: absolute;
+    inset-inline-start: 0.85rem;
+    inset-block-start: 0.95rem;
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: 0.75rem;
+    font-weight: 650;
+    color: var(--tx-muted-foreground);
+    background: color-mix(in oklab, var(--tx-muted) 40%, var(--tx-background));
+  }
+  .arch-ladder__rung h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+  }
+  .arch-ladder__role {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+  .arch-ladder__home {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--tx-muted-foreground);
+  }
+  .arch-ladder__home span {
+    font-family: var(--tx-body-font, inherit);
+  }
+  .arch-ladder__runtimes {
+    margin: 0.25rem 0 0;
+    display: grid;
+    gap: 0.35rem;
+  }
+  .arch-ladder__runtimes div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    align-items: baseline;
+  }
+  .arch-ladder__runtimes dt {
+    flex: none;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: 999px;
+    padding-block: 0.05rem;
+    padding-inline: 0.55rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--tx-muted-foreground);
+  }
+  .arch-ladder__runtimes dd {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.5;
+  }
+  @media (min-width: 56rem) {
+    .arch-ladder__list {
+      gap: 0.6rem;
+    }
+  }
+  @media (forced-colors: active) {
+    .arch-ladder__rung,
+    .arch-ladder__rung::before,
+    .arch-ladder__runtimes dt {
+      border-color: CanvasText;
+      background: Canvas;
+    }
+  }
+</style>

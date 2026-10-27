@@ -1,32 +1,81 @@
 ---
 /**
- * Site footer: agent surfaces, changelog, MIT line for Dailybot, Inc.
+ * Site footer: the product row (derived from NAV_GROUPS, T-32), the project
+ * row (agent surfaces, changelog, the repository, license and brand) and
+ * the status line for Dailybot, Inc.
+ *
+ * T-79 (core punch list rows 3, 4, 9, 14): the status line states the
+ * release truth from docs/RELEASE.md — preview packages on npm under the
+ * `next` tag, no stable release, the native renderer in development — and
+ * is the single sitewide place the npm preview is claimed (narrative
+ * blueprint §6). No version number here, so it cannot drift from the
+ * registry. External links (repository, license) pass the URL policy at
+ * the developer tier; site routes take the base.
  */
-import { withBase } from './site.ts';
+import { safeHref } from '@texuli/core/url-policy';
+import { NAV_GROUPS, REPOSITORY_URL, withBase } from './site.ts';
 
 const base = import.meta.env.BASE_URL;
+
+/** The project row: site routes first, then the repository and license. */
 const links = [
+  { href: '/guides/', label: 'Guides' },
+  { href: '/changelog/', label: 'Changelog' },
   { href: '/llms.txt', label: 'llms.txt' },
   { href: '/skill/', label: 'Agent skill' },
-  { href: '/changelog/', label: 'Changelog' },
-  { href: '/guides/', label: 'Guides' },
+  { href: '/brand/', label: 'Brand' },
+  { href: REPOSITORY_URL, label: 'GitHub' },
+  { href: `${REPOSITORY_URL}/blob/main/LICENSE`, label: 'MIT license' },
 ] as const;
+
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  if (safe === undefined) return undefined;
+  return safe.startsWith('/') ? withBase(base, safe) : safe;
+};
+
+/**
+ * Product doors, one per nav group, resolved against NAV_GROUPS so the
+ * footer never drifts from the sidebar (T-32). The platform door is the
+ * native landing; everything else takes the group's first link under its
+ * group label.
+ */
+const PRODUCT_GROUP_IDS = ['components', 'primitives', 'themes', 'platform', 'agents'];
+const productLinks = PRODUCT_GROUP_IDS.flatMap((id) => {
+  const group = NAV_GROUPS.find((candidate) => candidate.id === id);
+  if (!group) return [];
+  const href = id === 'platform' ? '/native/' : (group.links[0]?.href ?? '');
+  const label = id === 'platform' ? 'Native' : group.label;
+  return href ? [{ href, label }] : [];
+});
 ---
 
 <footer class="site-footer" data-tx-site-footer="">
   <div class="site-footer__inner">
     <nav aria-label="Footer">
-      <ul>
+      <ul class="site-footer__products">
         {
-          links.map((link) => (
+          productLinks.map((link) => (
             <li>
               <a href={withBase(base, link.href)}>{link.label}</a>
             </li>
           ))
         }
       </ul>
+      <ul class="site-footer__project">
+        {
+          links.map((link) => (
+            <li>
+              <a href={resolveHref(link.href)}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
     </nav>
-    <p>Texuli is MIT licensed, by Dailybot, Inc. In development, not released yet.</p>
+    <p class="site-footer__status" data-tx-site-status="">
+      <strong>Texuli</strong> is MIT licensed, by Dailybot, Inc. Preview packages are on npm under
+      the <code>next</code> tag; no stable release yet. The native renderer is in development.
+    </p>
   </div>
 </footer>
 
@@ -52,6 +101,13 @@ const links = [
     padding: 0;
     list-style: none;
   }
+  .site-footer__products {
+    font-weight: 600;
+  }
+  nav {
+    display: grid;
+    gap: 0.35rem;
+  }
   a {
     color: var(--tx-link);
     text-decoration: none;
@@ -68,5 +124,13 @@ const links = [
   }
   p {
     margin: 0;
+    max-inline-size: 46rem;
+    line-height: 1.5;
+  }
+  .site-footer__status strong {
+    color: var(--tx-foreground);
+  }
+  code {
+    font-size: 0.85em;
   }
 </style>

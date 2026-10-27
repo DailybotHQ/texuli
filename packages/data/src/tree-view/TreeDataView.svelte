@@ -50,7 +50,7 @@ interface TreeDataViewProps<T> {
 const DEFAULT_LABELS: TreeDataViewLabels = {
   tree: 'Tree',
   instructions:
-    'Arrow keys move focus. Left and Right collapse or expand. Space toggles the checkbox. Alt+Up or Alt+Down reorders among siblings. Tab indents; Shift+Tab outdents. Drag the grip to move a row.',
+    'Arrow keys move focus. Left and Right collapse or expand. Space toggles the checkbox. Alt+Up or Alt+Down reorders among siblings. Alt+Right indents; Alt+Left outdents. Drag the grip to move a row.',
   dragHandle: (label) => `Move ${label}`,
   expand: (label) => `Expand ${label}`,
   collapse: (label) => `Collapse ${label}`,
@@ -103,6 +103,8 @@ let drag = $state<{
   active: boolean;
   target: { parentId: string | null; index: number } | null;
 } | null>(null);
+/** True right after a completed drag, so its trailing click stays silent. */
+let suppressHandleInstructions = false;
 
 const accessors = $derived({
   id: getId,
@@ -284,11 +286,30 @@ function onRowKey(event: KeyboardEvent, row: FlatNode<T>): void {
 
   const collapseKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
   const expandKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+  // Indent follows the direction that moves a row deeper in reading order,
+  // mirroring the collapse/expand flip above.
+  const indentKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+  const outdentKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
 
-  if (event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+  const isArrow =
+    event.key === 'ArrowUp' ||
+    event.key === 'ArrowDown' ||
+    event.key === 'ArrowLeft' ||
+    event.key === 'ArrowRight';
+  // A read-only tree (no onMove) leaves Alt+Arrow to the browser (Alt+Left is
+  // Back): no preventDefault, no move, no announcement, no plain-arrow fallback.
+  if (event.altKey && isArrow && !onMove) return;
+  if (event.altKey && onMove && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
     event.preventDefault();
     const step = event.key === 'ArrowUp' ? -1 : 1;
     applyMoveResult(moveSibling(tree, row.id, step), row.item);
+    void focusRow(row.id);
+    return;
+  }
+  if (event.altKey && onMove && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+    event.preventDefault();
+    const result = event.key === indentKey ? indent(tree, row.id) : outdent(tree, row.id);
+    applyMoveResult(result, row.item);
     void focusRow(row.id);
     return;
   }
@@ -359,16 +380,11 @@ function onRowKey(event: KeyboardEvent, row: FlatNode<T>): void {
     toggleSelected(row.id);
     return;
   }
-  if (event.key === 'Tab' && onMove) {
-    event.preventDefault();
-    const result = event.shiftKey ? outdent(tree, row.id) : indent(tree, row.id);
-    applyMoveResult(result, row.item);
-    void focusRow(row.id);
-  }
 }
 
 function onPointerDown(event: PointerEvent, row: FlatNode<T>): void {
   if (!onMove || event.button !== 0 || pending[row.id]) return;
+  suppressHandleInstructions = false;
   drag = {
     id: row.id,
     pointerId: event.pointerId,
@@ -441,9 +457,24 @@ function onPointerUp(event: PointerEvent): void {
     event.target.releasePointerCapture(event.pointerId);
   }
   if (!current.active) return;
+  // The browser fires a trailing click on the handle after a real drag; the
+  // move announcement just made must not be followed by the instructions.
+  suppressHandleInstructions = true;
   const item = itemById(current.id);
   const target = targetAt(event.clientX, event.clientY, current.id) ?? current.target;
   if (item && target) moveTo(item, target);
+}
+
+/**
+ * The grip is pointer-only; assistive tech that activates it gets the keyboard
+ * move map instead of silence (the moves themselves stay keyboard-reachable).
+ */
+function onHandleClick(): void {
+  if (suppressHandleInstructions) {
+    suppressHandleInstructions = false;
+    return;
+  }
+  announce(labels.instructions);
 }
 
 function onPointerCancel(event: PointerEvent): void {
@@ -488,7 +519,7 @@ function dropTargetFor(row: FlatNode<T>): boolean {
       role="tree"
       aria-labelledby={titleId}
       aria-describedby={instructionsId}
-      aria-multiselectable={checkboxes ? 'true' : undefined}
+      aria-multiselectable="true"
     >
       {#each rows as row (row.id)}
         {@const itemLabel = getLabel(row.item)}
@@ -513,7 +544,7 @@ function dropTargetFor(row: FlatNode<T>): boolean {
           aria-posinset={row.position}
           aria-setsize={row.siblings}
           aria-expanded={row.hasChildren ? row.expanded : undefined}
-          aria-selected={checkboxes ? isSelected : undefined}
+          aria-selected={isSelected}
           aria-busy={isLoading || pending[row.id] ? 'true' : undefined}
           style="--tx-tree-view-depth: {row.level - 1}"
           onfocus={() => (activeId = row.id)}
@@ -528,6 +559,7 @@ function dropTargetFor(row: FlatNode<T>): boolean {
               aria-label={labels.dragHandle(itemLabel)}
               disabled={pending[row.id]}
               onpointerdown={(event) => onPointerDown(event, row)}
+              onclick={onHandleClick}
             >
               <span class="tx-tree-view__grip" aria-hidden="true">⠿</span>
             </button>
@@ -720,21 +752,35 @@ function dropTargetFor(row: FlatNode<T>): boolean {
       line-height: 1;
     }
 
+    /* The hit area stays at the shared 2.25rem control size; the drawn box is
+       the 1.25rem pseudo-element, so the tap target clears 24px. */
     .tx-tree-view__check {
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: 0.25rem;
-      inline-size: 1.25rem;
-      block-size: 1.25rem;
+      position: relative;
       margin-inline: 0.25rem;
     }
 
+    .tx-tree-view__check::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      inline-size: 1.25rem;
+      block-size: 1.25rem;
+      border: 1px solid var(--tx-border, CanvasText);
+      border-radius: 0.25rem;
+    }
+
     .tx-tree-view__check[data-checked='true'] {
-      background: var(--tx-primary, Highlight);
-      border-color: var(--tx-primary, Highlight);
       color: var(--tx-primary-foreground, Canvas);
     }
 
+    .tx-tree-view__check[data-checked='true']::before {
+      background: var(--tx-primary, Highlight);
+      border-color: var(--tx-primary, Highlight);
+    }
+
     .tx-tree-view__check svg {
+      position: relative;
       inline-size: 0.875rem;
       block-size: 0.875rem;
       fill: none;
@@ -824,9 +870,11 @@ function dropTargetFor(row: FlatNode<T>): boolean {
         forced-color-adjust: none;
       }
       .tx-tree-view__check[data-checked='true'] {
+        color: HighlightText;
+      }
+      .tx-tree-view__check[data-checked='true']::before {
         background: Highlight;
         border-color: CanvasText;
-        color: HighlightText;
       }
     }
   }

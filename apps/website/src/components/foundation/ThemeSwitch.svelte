@@ -12,6 +12,7 @@ import {
   readCachedAppearance,
 } from '@texuli/tokens/no-flash';
 import { ToggleGroup, ToggleGroupItem } from 'texuli/toggle';
+import { track } from '../../lib/track.ts';
 import { APPEARANCE_NAMESPACE, SITE_THEME } from './site.ts';
 
 type Choice = 'light' | 'dark' | 'system';
@@ -37,6 +38,7 @@ function apply(mode: 'light' | 'dark'): void {
 
 function choose(next: string | string[]): void {
   if (next !== 'light' && next !== 'dark' && next !== 'system') return;
+  track('theme_switch', { from: choice, to: next });
   choice = next;
   if (next === 'system') {
     try {

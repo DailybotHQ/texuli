@@ -19,8 +19,15 @@ Validate an untrusted catalog tree **before** sink-free rendering:
 
 On failure, `renderCatalogTreeWithLimits` returns **empty roots** and does not
 call the renderer. Diagnostics use stable codes (`depth-exceeded`,
-`nodes-exceeded`, `bytes-exceeded`, `branching-exceeded`, `roots-exceeded`,
-`time-exceeded`).
+`value-depth-exceeded`, `value-cycle`, `nodes-exceeded`, `bytes-exceeded`,
+`branching-exceeded`, `roots-exceeded`, `time-exceeded`).
+
+Prop values are measured too, iteratively, so a value bomb cannot exhaust the
+stack. A value nested deeper than `MAX_VALUE_MEASURE_DEPTH` (128) is refused
+with `value-depth-exceeded`. A value that refers back to one of its own
+ancestors (a cycle, which only a host-built object can carry, never JSON) is
+refused with `value-cycle` instead of being walked forever. A value shared by
+two props is not a cycle: it is measured at its deepest reference.
 
 ## Usage
 

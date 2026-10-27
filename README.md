@@ -35,10 +35,11 @@ the same pieces are safe to hand to a machine.
 
 ![The Texuli website](docs/assets/screenshots/homepage.png)
 
-> **Status: in development, not released.** The screenshot above is a local
-> build of the texuli.com website — texuli.com is not deployed. The package
-> names are reserved on npm as `0.1.0-next.0` (dist-tag `next`); the
-> workspace packages stay `private: true` and no stable release is out
+> **Status: in development, no stable release.** The screenshot above is the
+> texuli.com website, which deploys from `main` to Cloudflare Pages. All 15
+> packages are on npm as `0.1.0-next.1` under the `next` dist-tag (published
+> by CI with provenance); there is no stable release (`latest` is reserved for
+> 1.0.0), and the workspace packages stay `private: true`
 > ([RELEASE](docs/RELEASE.md)).
 
 </div>
@@ -181,11 +182,12 @@ every verified command.
 
 ## Honest boundaries
 
-- **Not released yet.** The workspace packages are `private: true`; the npm
-  names are reserved as `0.1.0-next.0` (dist-tag `next`) and installing from
-  npm is not supported until the release waves run
-  ([RELEASE](docs/RELEASE.md)).
-- **texuli.com is not deployed.** Run it locally with `pnpm dev`.
+- **No stable release yet.** All 15 packages are on npm as `0.1.0-next.1`
+  under the `next` dist-tag; install with `@next`. They are previews, not a
+  supported release (`latest` is reserved for 1.0.0), and the workspace
+  packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
+- **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with
+  `pnpm dev`.
 - **Web first, native in progress.** The Compose twin (see
   [above](#the-kotlin-multiplatform-twin)) renders a real slice with visible
   placeholders for the rest; nothing native is published and Android waits on

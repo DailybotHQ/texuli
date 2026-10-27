@@ -126,7 +126,7 @@ const emphasisTag = (type: 'strong' | 'em' | 'del') => type;
   .tx-md-quote {
     margin-inline: 0;
     padding-inline-start: 1em;
-    border-inline-start: 3px solid var(--tx-color-border-strong, currentColor);
+    border-inline-start: 3px solid var(--tx-border-strong, currentColor);
   }
   .tx-md-code,
   .tx-md-pre {
@@ -135,19 +135,19 @@ const emphasisTag = (type: 'strong' | 'em' | 'del') => type;
   }
   .tx-md-code {
     padding-inline: 0.25em;
-    border-radius: 0.25em;
-    background: var(--tx-color-surface-muted, color-mix(in srgb, currentColor 10%, transparent));
+    border-radius: var(--tx-radius, 0.25em);
+    background: var(--tx-muted, color-mix(in srgb, currentColor 10%, transparent));
   }
   .tx-md-pre {
     overflow-x: auto;
     padding: 0.75em 1em;
-    border: 1px solid var(--tx-color-border, color-mix(in srgb, currentColor 30%, transparent));
-    border-radius: 0.375em;
+    border: 1px solid var(--tx-border, color-mix(in srgb, currentColor 30%, transparent));
+    border-radius: var(--tx-radius, 0.375em);
     white-space: pre;
   }
   .tx-md-pre:focus-visible,
   .tx-md-link:focus-visible {
-    outline: 2px solid var(--tx-color-focus, Highlight);
+    outline: 2px solid var(--tx-ring, Highlight);
     outline-offset: 2px;
   }
   /* Link color stays the host's (or the UA's); the underline marks links in every scheme. */
@@ -157,7 +157,7 @@ const emphasisTag = (type: 'strong' | 'em' | 'del') => type;
   }
   .tx-md-rule {
     border: 0;
-    border-block-start: 1px solid var(--tx-color-border, color-mix(in srgb, currentColor 40%, transparent));
+    border-block-start: 1px solid var(--tx-border, color-mix(in srgb, currentColor 40%, transparent));
   }
   @media (forced-colors: active) {
     .tx-md-quote,

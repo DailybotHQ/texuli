@@ -49,6 +49,21 @@ describe('virtual grid window', () => {
     expect(moveVirtualCell({ row: 50, col: 4 }, 'End', options)).toEqual({ row: 50, col: 39 });
     expect(moveVirtualCell({ row: 50, col: 4 }, 'PageDown', options)).toEqual({ row: 58, col: 4 });
   });
+
+  it('reaches the grid corners with Ctrl+Home and Ctrl+End like moveCell', () => {
+    const options = { rows: 10, columns: 5, pageSize: 4 };
+    expect(moveVirtualCell({ row: 2, col: 1 }, 'Home', { ...options, ctrl: true })).toEqual({
+      row: 0,
+      col: 0,
+    });
+    expect(moveVirtualCell({ row: 2, col: 1 }, 'End', { ...options, ctrl: true })).toEqual({
+      row: 9,
+      col: 4,
+    });
+    // Without the modifier, Home and End keep the row.
+    expect(moveVirtualCell({ row: 2, col: 1 }, 'Home', options)).toEqual({ row: 2, col: 0 });
+    expect(moveVirtualCell({ row: 2, col: 1 }, 'End', options)).toEqual({ row: 2, col: 4 });
+  });
 });
 
 describe('VirtualDataGrid', () => {
@@ -104,7 +119,103 @@ describe('VirtualDataGrid', () => {
     grid.style.direction = 'rtl';
     grid.focus();
     await fireEvent.keyDown(grid, { key: 'ArrowLeft' });
-    expect(grid.getAttribute('aria-activedescendant')).toBe('tx-virtual-grid-0-1');
+    const secondCell = grid.querySelector('[aria-rowindex="2"] [aria-colindex="2"]');
+    expect(grid.getAttribute('aria-activedescendant')).toBe(secondCell?.id);
     expect(grid.tabIndex).toBe(0);
+  });
+
+  it('scopes cell ids to the component instance so two grids never collide', () => {
+    const shared = {
+      rows: [
+        { id: 'a', name: 'A' },
+        { id: 'b', name: 'B' },
+      ],
+      columns: [
+        { key: 'name', header: 'Name' },
+        { key: 'id', header: 'ID' },
+      ],
+      getRowId: (row: unknown) => (row as { id: string }).id,
+      viewportHeight: 120,
+      viewportWidth: 320,
+    };
+    render(VirtualDataGrid, { props: { ...shared, caption: 'First grid' } });
+    render(VirtualDataGrid, { props: { ...shared, caption: 'Second grid' } });
+
+    const grids = [
+      screen.getByRole('grid', { name: 'First grid' }),
+      screen.getByRole('grid', { name: 'Second grid' }),
+    ];
+    const ids = grids.flatMap((grid) =>
+      [...grid.querySelectorAll<HTMLElement>('[id]')].map((element) => element.id)
+    );
+    expect(ids.length).toBeGreaterThan(0);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const grid of grids) {
+      const activeId = grid.getAttribute('aria-activedescendant') ?? '';
+      expect(grid.querySelector(`[id="${activeId}"]`)).not.toBeNull();
+    }
+  });
+
+  it('marks the active cell so sighted keyboard users can see it', async () => {
+    const { container } = render(VirtualDataGrid, {
+      props: {
+        rows: [
+          { id: 'a', name: 'A' },
+          { id: 'b', name: 'B' },
+        ],
+        columns: [
+          { key: 'name', header: 'Name' },
+          { key: 'id', header: 'ID' },
+        ],
+        getRowId: (row: unknown) => (row as { id: string }).id,
+        caption: 'Active records',
+        viewportHeight: 120,
+        viewportWidth: 320,
+      },
+    });
+    const grid = screen.getByRole('grid', { name: 'Active records' });
+    // The active cell starts on the first body cell and is marked from the start.
+    const initial = container.querySelector<HTMLElement>('[data-tx-active="true"]');
+    expect(initial?.getAttribute('role')).toBe('gridcell');
+    expect(initial?.closest('[role="row"]')?.getAttribute('aria-rowindex')).toBe('2');
+    grid.focus();
+    await fireEvent.keyDown(grid, { key: 'ArrowDown' });
+    const marked = container.querySelector<HTMLElement>('[data-tx-active="true"]');
+    expect(marked?.getAttribute('role')).toBe('gridcell');
+    expect(marked?.closest('[role="row"]')?.getAttribute('aria-rowindex')).toBe('3');
+    expect(marked?.getAttribute('aria-colindex')).toBe('1');
+    expect(grid.getAttribute('aria-activedescendant')).toBe(marked?.id);
+  });
+
+  it('moves to the grid corners with Ctrl+Home and Ctrl+End', async () => {
+    render(VirtualDataGrid, {
+      props: {
+        rows: [
+          { id: 'a', name: 'A' },
+          { id: 'b', name: 'B' },
+        ],
+        columns: [
+          { key: 'name', header: 'Name' },
+          { key: 'id', header: 'ID' },
+        ],
+        getRowId: (row: unknown) => (row as { id: string }).id,
+        caption: 'Corner records',
+        viewportHeight: 120,
+        viewportWidth: 320,
+      },
+    });
+    const grid = screen.getByRole('grid', { name: 'Corner records' });
+    grid.focus();
+    await fireEvent.keyDown(grid, { key: 'End', ctrlKey: true });
+    const lastCell = grid.querySelector(
+      '[aria-rowindex="3"] [aria-colindex="2"]'
+    ) as HTMLElement | null;
+    expect(grid.getAttribute('aria-activedescendant')).toBe(lastCell?.id);
+    await fireEvent.keyDown(grid, { key: 'Home', ctrlKey: true });
+    // Ctrl+Home goes to the first body cell: the header row is not addressable.
+    const firstCell = grid.querySelector(
+      '[aria-rowindex="2"] [aria-colindex="1"]'
+    ) as HTMLElement | null;
+    expect(grid.getAttribute('aria-activedescendant')).toBe(firstCell?.id);
   });
 });

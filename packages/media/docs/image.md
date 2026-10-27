@@ -56,7 +56,7 @@ The model: `resolveImageSources`, `buildSrcset`, `safeSizes`,
 | `loading` | `lazy` | `lazy` or `eager`. |
 | `fetchPriority` | `auto` | `high`, `low` or `auto`. |
 | `trust` | `untrusted` | `developer` also allows HTTP, blob URLs and bounded base64 raster data images. |
-| `href` | — | Wraps the image in a link, through `safeHref`. An unsafe href leaves a plain image. |
+| `href` | — | Wraps the image in a link, through `safeHref(href, trust)`. The same `trust` tier as `src` applies: untrusted allows `https:`, `mailto:` and `#fragment` only; developer also allows relative and `http:` app links. An unsafe href leaves a plain image. |
 | `onactivate` | — | Wraps the image in a native `<button type="button">`. |
 | `actionLabel` | — | Accessible name for the link or button. Needed when `alt` is `""`. |
 | `labels` | English | `{ unavailable }`: the visible fallback text. |

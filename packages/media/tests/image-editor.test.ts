@@ -1,3 +1,6 @@
+/// <reference types="node" />
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fireEvent, render } from '@testing-library/svelte';
 import { flushSync, tick } from 'svelte';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -921,5 +924,35 @@ describe('cropToAspectRatio', () => {
       width: 0.5,
       height: 1,
     });
+  });
+});
+
+describe('image editor stylesheet', () => {
+  const source = readFileSync(
+    join(import.meta.dirname, '..', 'src', 'image-editor', 'Editor.svelte'),
+    'utf8'
+  );
+  const css = source.slice(source.indexOf('<style>'));
+  /** The value of every declaration with its var() fallbacks removed. */
+  const bareValues = [...css.matchAll(/[a-z-]+:\s*([^;{}]+);/g)].map((match) => {
+    let value = match[1] ?? '';
+    // Strip var(--token, fallback) innermost first, so only bare literals stay.
+    for (let previous = ''; previous !== value; ) {
+      previous = value;
+      value = value.replace(/var\(--[a-z-]+(?:,[^()]*(?:\([^()]*\)[^()]*)*)?\)/g, 'TOKEN');
+    }
+    return value;
+  });
+
+  // T-70: chrome colors follow the --tx-* contract (literals only as var() fallbacks).
+  it('has no bare color literals outside var() fallbacks', () => {
+    const offenders = bareValues.filter((value) =>
+      /#[\da-f]{3,8}\b|light-dark\(|oklch\(|rgb\((?!0 0 0 \/ 0\.001\))/i.test(value)
+    );
+    expect(offenders).toEqual([]);
+  });
+
+  it('dims outside the crop with the theme scrim token', () => {
+    expect(css).toMatch(/box-shadow:\s*0 0 0 100vmax var\(--tx-scrim/);
   });
 });

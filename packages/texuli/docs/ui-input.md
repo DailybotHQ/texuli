@@ -51,7 +51,7 @@ Consumer classes compose through `cx` / `variants` and win by source order in
 ## Examples
 
 Registry id `texuli-input` (`packages/examples/src/input/`): default, clearable,
-invalid, disabled, group adornments, autosize, character count, RTL, dark.
+invalid, disabled, group adornments, autosize, character count, RTL.
 
 ## Testing
 

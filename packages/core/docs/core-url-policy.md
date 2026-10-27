@@ -19,6 +19,11 @@ it; now all four apply the untrusted policy.
 
 - Both tiers reject executable or content-smuggling schemes (`javascript:`,
   `vbscript:` and `data:`), protocol-relative URLs and backslash-prefixed URLs.
+  A value whose first two characters are any mix of `/` and `\` (`//host`,
+  `/\host`, `\/host`, `\\host`) counts as protocol-relative, because browsers
+  read `\` as `/` and `/\evil.example` opens `https://evil.example/`; the
+  check runs after the trim and control-character strip, so `/\t\host` is
+  caught too.
 - Untrusted links allow HTTPS, `mailto:` and same-document fragments.
 - Developer links may use other non-blocked schemes and relative URLs.
 - ASCII controls are removed before scheme inspection so split executable

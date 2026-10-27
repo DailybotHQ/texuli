@@ -1,32 +1,75 @@
 ---
+import WebAgentsCta from '../components/sections/web/WebAgentsCta.astro';
+import WebCorrelation from '../components/sections/web/WebCorrelation.astro';
+import WebHero from '../components/sections/web/WebHero.astro';
+import WebWhySvelte from '../components/sections/web/WebWhySvelte.astro';
 /**
- * texuli.com home: a minimal landing (T-site-ia). The landing header (logo,
- * Docs, search, theme, Get started), one hero with live Texuli widgets, three
- * feature cards, a short agents strip and the footer. Everything else lives
- * in the docs, behind the sidebar.
+ * texuli.com home (PLAN_006 T-44): the unified landing assembled from the
+ * four blueprint sections in order — hero, why Svelte for the web, the
+ * correlation demo, agents + closing CTA (narrative blueprint §5 s1..s4).
+ * The retired minimal-landing sections (LandingHero, FeatureCards,
+ * AgentsSection and their islands) are deleted with this integration.
+ * JSON-LD per the T-site-ia contract, unchanged. T-79 (core punch list
+ * row 2): the title and description spend the SERP and quote surface on
+ * the platform claim (web today, native in development, agent-safe), and
+ * the bands below the hero rise in on scroll (row 13) — CSS only, behind
+ * `prefers-reduced-motion: no-preference` and a scroll-timeline support
+ * check, translate only so contrast and visibility never depend on it.
  */
-import AgentsSection from '../components/landing/AgentsSection.astro';
-import FeatureCards from '../components/landing/FeatureCards.astro';
-import LandingHero from '../components/landing/LandingHero.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { libraryJsonLd } from '../lib/schema';
+
+const HOME_TITLE = 'One component catalog for web and native';
+const HOME_DESCRIPTION =
+  'Interfaces from texels: one owned, accessible component catalog. Svelte 5 for the web ' +
+  'today, a Kotlin Multiplatform renderer in development, safe for agents.';
 ---
 
 <BaseLayout
-  title="Texuli"
-  description="Interfaces from texels. Owned, accessible Svelte 5 components that people and agents can build anything with."
+  title={HOME_TITLE}
+  description={HOME_DESCRIPTION}
   landing
+  jsonLd={libraryJsonLd()}
 >
   <div class="landing" data-tx-landing="">
-    <LandingHero />
-    <FeatureCards />
-    <AgentsSection />
+    <WebHero />
+    <WebWhySvelte />
+    <WebCorrelation />
+    <WebAgentsCta />
   </div>
 </BaseLayout>
 
 <style>
+  /* Each section carries its own block padding: they stack as full-width
+     bands, no extra gap. */
   .landing {
     display: grid;
-    gap: clamp(1.5rem, 4vw, 3rem);
-    padding-block-end: clamp(2rem, 6vw, 4rem);
+    gap: 0;
+  }
+  /* Scroll reveal (row 13): each band after the hero rises 1.5rem as it
+     enters the viewport. Opt-in motion only, and transform only — no
+     opacity — so nothing is ever hidden or low-contrast, with or without
+     support. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .landing > :global(section + section) {
+        /* Longhands on purpose: the build minifier folds a full
+           `animation` shorthand plus `animation-timeline` into one
+           shorthand Chromium rejects; without duration it cannot merge. */
+        animation-name: landing-rise;
+        animation-timing-function: var(--site-motion-linked-easing);
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+  }
+  @keyframes landing-rise {
+    from {
+      translate: 0 1.5rem;
+    }
+    to {
+      translate: 0 0;
+    }
   }
 </style>

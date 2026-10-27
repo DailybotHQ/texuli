@@ -108,8 +108,9 @@ Markers, routes and fences use **strong** semantic tones only:
 
 `default` and `accent` are accepted aliases of `primary` (never soft accent surfaces).
 Marker fills and route/fence strokes are gated at **3:1** (UI) against the map plate
-in `COMPONENT_CONTRAST_PAIRS` (`map.marker.*`, `map.route.*`, `map.fence.*`) across
-the full theme library. Glyph text uses the matching `*Foreground` on the fill (AA text).
+in `COMPONENT_CONTRAST_PAIRS` (`map.marker.*`, `map.route.primary`,
+`map.fence.warning`) across the full theme library. Glyph text uses the matching
+`*Foreground` on the fill (AA text).
 
 Shapes: `circle` (default), `square`, `diamond`, `pin`. Glyph is one or two characters.
 
@@ -144,6 +145,9 @@ Hosts can also listen with `onViewChange={({ center, zoom }) => …}`.
 - Routes and fences appear in the list as `Route: …` / `Fence: …`
 - List: virtualized `role="list"` with setsize/posinset, `data-list-item`, `aria-current`
 - Clustered points omit `data-marker` until the cluster is expanded
+- Location panel: a `complementary` landmark named `<label> locations` (the
+  `label` prop, else the basemap name), so two maps on one page keep distinct
+  landmark names; it was a fixed "Map locations" before 2026-10-26
 
 ## Deferred: fence editing
 

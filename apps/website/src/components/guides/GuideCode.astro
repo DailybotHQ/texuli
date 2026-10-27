@@ -1,14 +1,61 @@
 ---
 /**
- * Static code sample. Text only — never {@html} or set:html from data.
+ * Static code sample with build-time highlighting (T-80 row 4). The snippet
+ * is an author-owned string in page frontmatter; `highlightGuideCode` tags
+ * slices of it once at build time and this template renders each slice as
+ * text — never `{@html}` or `set:html`, so the output is escaped by Astro
+ * and no script ships. Colors come from theme tokens that pass WCAG AA on
+ * the code background in light and dark (pinned by
+ * apps/website/tests/polish-reading-highlight.test.ts).
  */
+import { type GuideLanguage, highlightGuideCode } from './highlight.ts';
+
 interface Props {
   code: string;
   /** Accessible name for the pre block. */
   label?: string;
+  /** Language hint; `'auto'` infers from the snippet itself. */
+  lang?: GuideLanguage;
 }
 
-const { code, label = 'Code sample' } = Astro.props;
+const { code, label = 'Code sample', lang = 'auto' } = Astro.props;
+const tokens = highlightGuideCode(code, lang);
 ---
 
-<pre class="guide-code" tabindex="0" role="region" aria-label={label}><code>{code}</code></pre>
+<pre class="guide-code" tabindex="0" role="region" aria-label={label}><code>{tokens.map((token) =>
+    token.kind === 'plain' ? token.text : <span class={`tk-${token.kind}`}>{token.text}</span>
+  )}</code></pre>
+
+<style>
+  .tk-comment {
+    color: var(--tx-muted-foreground);
+    font-style: italic;
+  }
+  .tk-keyword {
+    color: var(--tx-primary);
+    font-weight: var(--tx-font-weight-medium, 500);
+  }
+  .tk-string {
+    color: var(--tx-link);
+  }
+  .tk-tag {
+    color: var(--tx-primary);
+    font-weight: var(--tx-font-weight-medium, 500);
+  }
+  .tk-flag {
+    color: var(--tx-subtle-foreground);
+    font-weight: var(--tx-font-weight-medium, 500);
+  }
+  /* In forced-colors mode the palette collapses to system colors. */
+  @media (forced-colors: active) {
+    .tk-comment,
+    .tk-keyword,
+    .tk-string,
+    .tk-tag,
+    .tk-flag {
+      color: inherit;
+      font-style: inherit;
+      font-weight: inherit;
+    }
+  }
+</style>

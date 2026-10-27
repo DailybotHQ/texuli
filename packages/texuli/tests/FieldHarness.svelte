@@ -9,6 +9,7 @@ interface Props {
   description?: string;
   error?: string | null;
   required?: boolean;
+  disabled?: boolean;
   hideLabel?: boolean;
   onValidate?: (values: Record<string, string>) => FieldErrorMap | Promise<FieldErrorMap>;
   onSubmitValues?: (values: Record<string, string>) => void;
@@ -22,6 +23,7 @@ let {
   description,
   error = null,
   required = false,
+  disabled = false,
   hideLabel = false,
   onValidate,
   onSubmitValues,
@@ -44,7 +46,7 @@ let errors = $state<FieldErrorMap>({});
     </div>
   </Form>
 {:else}
-  <Field {label} {description} {error} {required} {hideLabel}>
+  <Field {label} {description} {error} {required} {disabled} {hideLabel}>
     {#snippet children(control)}
       <Input {...control.props} bind:value />
     {/snippet}

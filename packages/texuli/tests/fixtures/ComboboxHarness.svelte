@@ -49,7 +49,7 @@ let {
     {name}
     {required}
   >
-    <MultiSelect.Field {open} {disabled}>
+    <MultiSelect.Field {disabled}>
       <MultiSelect.Chips>
         {#each Array.isArray(value) ? value : [] as selected (selected)}
           <MultiSelect.Chip value={selected} />
@@ -84,7 +84,7 @@ let {
     {name}
     {required}
   >
-    <Combobox.Field {open} {disabled}>
+    <Combobox.Field {disabled}>
       <Combobox.Input id="cb-input" />
       <Combobox.Trigger aria-label="Show colors" />
     </Combobox.Field>

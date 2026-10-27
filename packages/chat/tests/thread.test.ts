@@ -271,6 +271,15 @@ describe('MessageList', () => {
 });
 
 describe('ChatThread', () => {
+  it('forwards the log label and virtualization tuning to the message list', () => {
+    const messages = Array.from({ length: 150 }, (_, index) => message(`m-${index}`));
+    render(ChatThread, {
+      props: { messages, label: 'Release log', virtualizeAfter: 20 },
+    });
+    const log = screen.getByRole('log', { name: 'Release log' });
+    expect(log.getAttribute('data-virtualized')).toBe('true');
+  });
+
   it('composes the message log, typing status, and async composer callback', async () => {
     let sent: string | undefined;
     render(ChatThread, {

@@ -98,6 +98,18 @@ describe('HeatmapChart', () => {
     expect(container.querySelector('[data-chart-axis="y"]')?.textContent).toContain('Alpha');
   });
 
+  it('renders the grammar-mandated h2 figure title', () => {
+    const { container } = render(HeatmapChart, {
+      props: {
+        title: 'Team load',
+        description: 'Relative load by day and team.',
+        cells: heatCells,
+      },
+    });
+    expect(container.querySelector('figcaption h2')).toBeTruthy();
+    expect(container.querySelector('figcaption h3')).toBeNull();
+  });
+
   it('requires accessible title and description', () => {
     expect(() =>
       render(HeatmapChart, {

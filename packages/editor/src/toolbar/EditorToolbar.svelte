@@ -66,7 +66,7 @@ const groups = $derived.by((): Item[][] => {
       {
         id: 'link',
         label: labels.link,
-        glyph: 'Link',
+        glyph: labels.link,
         pressed: active.marks.has('link'),
         intent: 'link',
         enabled: active.block?.type === 'paragraph' || active.block?.type === 'heading',

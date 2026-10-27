@@ -7,9 +7,11 @@ import type { RenderNode } from '@texuli/catalog/render/renderer';
 
 type Props = {
   roots: readonly RenderNode[];
+  /** False until the tree in the editor has run: the empty state then says so. */
+  rendered?: boolean;
 };
 
-let { roots }: Props = $props();
+let { roots, rendered = true }: Props = $props();
 
 function propEntries(props: Readonly<Record<string, unknown>>): [string, string][] {
   return Object.entries(props).map(([k, v]) => {
@@ -26,7 +28,9 @@ function propEntries(props: Readonly<Record<string, unknown>>): [string, string]
 }
 </script>
 
-{#if roots.length === 0}
+{#if !rendered}
+  <p class="empty" role="status">Not rendered yet. Run Render tree to preview the tree in the editor.</p>
+{:else if roots.length === 0}
   <p class="empty" role="status">Nothing to show. The tree was empty or every node was dropped.</p>
 {:else}
   <ul class="tree" data-tx-playground-tree="">

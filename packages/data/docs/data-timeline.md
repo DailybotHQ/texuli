@@ -15,7 +15,9 @@ A time-scaled timeline / Gantt with:
 - Critical path and cascade on reschedule (engine)
 - Zoom (day / week / month / quarter), today line, progress, milestones
 - Keyboard pickup (Space → arrows → Enter/Escape) and pointer drag
-- RTL via `direction="rtl"` and logical CSS
+- RTL via `direction="rtl"`: bars, ticks and the today line are placed with
+  logical insets, so the earliest date sits at the inline start (the right
+  edge); the dependency canvas mirrors its coordinates to match
 - Virtualized rows for large plans
 
 ## Usage
@@ -45,6 +47,27 @@ A time-scaled timeline / Gantt with:
 
 Pass a fixed `now` in tests and visual stories so the today line is stable.
 
+## Labels
+
+Every user-facing string (toolbar, columns, notices, live announcements) goes
+through the `labels` prop — a `Partial<TimelineLabels>` merged over
+`DEFAULT_TIMELINE_LABELS`, whose defaults are the original English copy:
+
+```svelte
+<TimelineView
+  {tasks}
+  labels={{
+    milestonesOnly: 'Nur Meilensteine',
+    saving: 'Speichere Termine…',
+    columns: { task: 'Aufgabe', start: 'Von', end: 'Bis', duration: 'Dauer' },
+  }}
+/>
+```
+
+Preview and bar announcements format their dates with `locale` (full month),
+so keyboard users hear "Design brief preview: January 6, 2026 to January 10,
+2026." rather than ISO strings.
+
 ## Engine vs view
 
 | Layer | Import | Role |
@@ -55,4 +78,17 @@ Pass a fixed `now` in tests and visual stories so the today line is stable.
 ## Tokens
 
 Uses `--tx-border`, `--tx-foreground`, `--tx-surface`, `--tx-primary`,
-`--tx-destructive`, `--tx-ring` with system-color fallbacks for forced colors.
+`--tx-primary-foreground`, `--tx-destructive`, `--tx-destructive-foreground`
+(critical bars pair the solid destructive fill with its contract foreground so
+labels stay AA in every theme) and `--tx-ring`, each with system-color
+fallbacks; pressed zoom and toolbar buttons keep a Highlight state under
+`forced-colors: active`.
+
+On a critical bar, progress is a 3px stripe on the block-end edge in the
+contract foreground, never a tint behind the label: a tint would pull the fill
+toward the label color and break AA. Under `forced-colors: active` a critical
+bar is Canvas with CanvasText text and a 2px CanvasText border, and its
+progress stripe opts out of forcing (`forced-color-adjust: none`) so it stays
+visible. A critical bar with no progress is told apart from a normal bar by
+that heavier border alone; the critical-path mark in the task list
+(`labels.criticalPath`) names it for assistive technology.

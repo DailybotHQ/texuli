@@ -50,3 +50,10 @@ A grid/list file browser over flat `{ id, parentId, name, kind, … }` rows with
 | View | `FileBrowser` | layout, selection, preview, keyboard |
 
 Generated thumbnails are `data:image/svg+xml` URLs passed through `safeImageSrc(..., 'developer')`.
+
+## Changes since 0.1.0-next.1
+
+- Breaking (types only): `FileBrowserLabels` no longer has `openFolder` or
+  `selectItem`. The view never rendered them; a `labels` object literal that
+  still passes them is now a TypeScript excess-property error, so delete those
+  two keys.

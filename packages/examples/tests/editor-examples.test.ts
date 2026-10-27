@@ -18,6 +18,9 @@ describe('editor examples', () => {
     const textbox = getByRole('textbox', { name });
     expect(textbox.getAttribute('aria-multiline')).toBe('true');
     expect(container.querySelector('[role="toolbar"]') !== null).toBe(toolbar);
+    if (id === 'editor-toolbar') {
+      expect(container.querySelector('.narrow-rtl[dir="rtl"]')).not.toBeNull();
+    }
     expect(container.querySelector('script, [onclick], [onerror]')).toBeNull();
   });
 

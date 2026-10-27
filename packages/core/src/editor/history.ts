@@ -63,6 +63,7 @@ export function editorHistoryReducer(
     case 'apply': {
       if (!action.result.ok) return { ...history, errors: action.result.errors };
       const state = action.result.state;
+      if (state.doc === history.present.doc) return { ...history, present: state, errors: [] };
       const kind = action.kind ?? 'other';
       const at = action.at ?? 0;
       const block = focusBlock(state);

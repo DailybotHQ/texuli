@@ -10,6 +10,14 @@ import {
   resolveVideoTextTracks,
   VIDEO_PLAYBACK_RATES,
 } from '../src/video/index.ts';
+import captionsHostSource from '../src/video/VideoCaptions.svelte?raw';
+import videoPlayerSource from '../src/video/VideoPlayer.svelte?raw';
+
+function styleBlock(source: string): string {
+  const open = source.indexOf('<style>');
+  const close = source.indexOf('</style>', open);
+  return open === -1 || close === -1 ? '' : source.slice(open + 7, close);
+}
 
 const CAPTIONS_VTT = `WEBVTT
 
@@ -270,5 +278,37 @@ describe('VideoPlayer', () => {
     expect(chapterButtons.length).toBeGreaterThanOrEqual(2);
     await fireEvent.click(chapterButtons[1]!);
     expect(video.currentTime).toBe(30);
+  });
+
+  // T-68: chapter changes must use the shared announcer without disabling inert exemptions.
+  it('announces chapter changes through getAnnouncer with immediate polite delivery', () => {
+    expect(captionsHostSource).not.toMatch(/inertRegistry\s*:\s*null/);
+    expect(captionsHostSource).toMatch(/getAnnouncer\(\s*doc\s*\)/);
+    expect(captionsHostSource).toMatch(/immediate\s*:\s*true/);
+    expect(captionsHostSource).toMatch(/from '@texuli\/core\/announcer'/);
+  });
+
+  // T-68: on-video cue chrome must use tokens / system colors, not hardcoded #000/#fff.
+  it('styles on-video caption text with token or system colors, not bare hex', () => {
+    const css = styleBlock(videoPlayerSource);
+    expect(css).toMatch(/\.tx-video-player__caption-text/);
+    expect(css).not.toMatch(/\.tx-video-player__caption-text\s*\{[^}]*\bcolor:\s*#fff\b/i);
+    expect(css).not.toMatch(/\.tx-video-player__caption-text\s*\{[^}]*background-color:[^;]*#000/i);
+    expect(css).toMatch(/\.tx-video-player__caption-text\s*\{[^}]*(--tx-|CanvasText|Canvas)/s);
+  });
+
+  it('keeps both sides of the caption scrim contrast pair in system colors', () => {
+    const css = styleBlock(videoPlayerSource);
+    expect(css).not.toMatch(
+      /\.tx-video-player__caption-text\s*\{[^}]*background-color:[^}]*var\(--tx-background[^}]*CanvasText/s
+    );
+    expect(css).toMatch(/\.tx-video-player__caption-text\s*\{[^}]*color:\s*Canvas\s*;/s);
+  });
+
+  // T-68: captions load failure copy is a label, not a hardcoded English string.
+  it('exposes captionsUnavailable on the labels contract', () => {
+    expect(videoPlayerSource).toMatch(/captionsUnavailable:/);
+    expect(videoPlayerSource).toMatch(/labels\.captionsUnavailable/);
+    expect(videoPlayerSource).not.toMatch(/>Captions unavailable\.</);
   });
 });

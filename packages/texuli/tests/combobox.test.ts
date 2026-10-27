@@ -90,6 +90,19 @@ describe('Combobox', () => {
     const input = screen.getByRole('combobox', { name: 'Colors' });
     expect((input as HTMLInputElement).disabled).toBe(true);
   });
+
+  it('reflects the context open state on the field without an explicit open prop', async () => {
+    // The docs pattern renders <Combobox.Field> with no props: the open
+    // chrome must follow the combobox context, not require manual threading.
+    const { container } = render(ComboboxHarness);
+    const field = () =>
+      container.querySelector<HTMLElement>('[data-tx-combobox-field]') as HTMLElement;
+    expect(field().getAttribute('data-state')).toBe('closed');
+    await fireEvent.input(screen.getByRole('combobox', { name: 'Colors' }), {
+      target: { value: 'ja' },
+    });
+    await waitFor(() => expect(field().getAttribute('data-state')).toBe('open'));
+  });
 });
 
 describe('Combobox filter and form props', () => {

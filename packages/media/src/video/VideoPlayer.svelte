@@ -29,6 +29,7 @@ const DEFAULT_LABELS: VideoPlayerLabels = {
   captions: 'Captions',
   captionsOff: 'Captions off',
   captionTrack: 'Caption track',
+  captionsUnavailable: 'Captions unavailable.',
   chapters: 'Chapters',
   transcript: 'Transcript',
   chapterAnnouncement: 'Chapter',
@@ -409,7 +410,7 @@ function onPlayerKeydown(event: KeyboardEvent): void {
       <p class="tx-video-player__error" role="status">{labels.pictureInPictureFailed}</p>
     {/if}
     {#if captionsLoadError}
-      <p class="tx-video-player__error" role="status">Captions unavailable.</p>
+      <p class="tx-video-player__error" role="status">{labels.captionsUnavailable}</p>
     {/if}
   {:else}
     <p class="tx-video-player__error" role="alert">{labels.blocked}</p>
@@ -449,8 +450,14 @@ function onPlayerKeydown(event: KeyboardEvent): void {
       max-inline-size: 90%;
       padding: 0.35rem 0.75rem;
       border-radius: var(--tx-radius-md, 0.375rem);
-      background-color: color-mix(in oklab, Canvas 15%, #000 85%);
-      color: #fff;
+      /* Keep the scrim and foreground in the same system-color scheme. */
+      background-color: color-mix(
+        in oklab,
+        Canvas 18%,
+        CanvasText 82%
+      );
+      color: Canvas;
+      border: 1px solid CanvasText;
       font-size: var(--tx-text-sm, 0.875rem);
       line-height: 1.35;
       text-align: center;

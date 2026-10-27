@@ -21,6 +21,8 @@ type Props = {
   variant?: TabsVariant;
   orientation?: TabsOrientation;
   activationMode?: 'automatic' | 'manual';
+  /** Wrap arrow-key focus past the first/last tab (APG optional wrapping). */
+  loop?: boolean;
   disabled?: boolean;
   class?: ClassValue;
   listClass?: string;
@@ -37,6 +39,7 @@ let {
   variant = 'line',
   orientation = 'horizontal',
   activationMode = 'automatic',
+  loop = false,
   disabled = false,
   class: className,
   listClass,
@@ -71,6 +74,7 @@ const triggerClass = $derived(tabsTriggerClass({ variant }));
   {onValueChange}
   {orientation}
   {activationMode}
+  {loop}
   {disabled}
   class={rootClass}
   data-tx-tabs=""

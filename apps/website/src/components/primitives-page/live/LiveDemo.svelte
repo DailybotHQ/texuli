@@ -392,7 +392,7 @@ onMount(() => {
     border: 1px solid var(--tx-border);
     border-radius: 0.375rem;
     font-size: 0.875rem;
-    transition: background-color 150ms ease;
+    transition: background-color var(--site-motion-fast) var(--site-motion-easing);
   }
   .live__key[data-pressed] {
     border-color: var(--tx-ring, Highlight);

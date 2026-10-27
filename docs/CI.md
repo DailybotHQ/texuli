@@ -24,10 +24,22 @@ integration.
   `pnpm --filter @texuli/website check:csp`, then the browser e2e suite on
   chromium with the site-perf budget tests excluded (the audit job owns
   them).
-- **`audits`** — `pnpm size` and the full `tests/e2e/site-perf.spec.ts`.
-  Allowed to fail while the tracked reds below stand, so drift stays
-  visible without blocking merges. A NEW failure here is a regression:
-  fix it, do not raise a budget.
+- **`audits`** — `pnpm size`, then `pnpm build` and the full
+  `tests/e2e/site-perf.spec.ts`. Allowed to fail while the tracked reds
+  below stand, so drift stays visible without blocking merges. A NEW
+  failure here is a regression: fix it, do not raise a budget. The steps
+  run in order with no `if: always()`, so while `pnpm size` fails the build
+  and site-perf steps in this job are skipped; site-perf is verified by
+  running it locally (see below).
+
+The PLAN_006 offline site audits (`node scripts/audit-seo.mjs --dist
+apps/website/dist`, `node scripts/audit-aeo.mjs --dist apps/website/dist`)
+and the llms parity check (`pnpm exec tsx scripts/check-llms-parity.ts`)
+are documented opt-in developer gates; they are not separate CI jobs. The
+website job runs the site browser specs, including SEO, AEO, analytics and
+platform-page coverage. The theme sweep is a tested static helper with a
+temporary runner recorded in the plan findings; it is not a CI command or a
+browser visual test.
 
 ## Publishing to npm
 
@@ -66,19 +78,29 @@ ships in the output and is applied by Cloudflare Pages). Every push to
 social images, sitemap and robots.txt are generated at build time against
 `https://texuli.com` (the `site` in `apps/website/astro.config.mjs`).
 
-## Tracked pre-existing budget reds
+## Tracked budget reds
 
-These fail today on `main` and pre-date CI (verified byte-identical on
-the PLAN_005 starting commit `bb6aff20`). They run only in the
-non-blocking `audits` job until a dedicated performance pass retires
-them:
+These run only in the non-blocking `audits` job. The numbers below are
+from local runs on 2026-10-26 (PLAN_006 T-93 and T-98); CI has not
+re-measured them.
 
-- `pnpm size`: 18 entries without budget rows (`@texuli/astro`,
-  `@texuli/player`, `@texuli/slides`, `@texuli/spec`) and 7 over budget
-  (`@texuli/catalog` and three of its subpaths, `@texuli/charts` math,
-  `@texuli/data` grid-editing).
-- `site-perf`: document budgets of `/builder/` (30.7 > 24 KB gzip — the
-  share-link, starter and editor feature growth; the editor itself loads
-  as an on-demand chunk), `/charts-page/` (28.7 > 28), `/color-explorer/`
-  (307.8 > 304 raw), `/gallery-components/` (884.6 > 880 raw), and the
-  `/` page weight (154.8 > 152).
+- `pnpm size`: 26 of 307 entries failed in the T-93 run and 27 in the
+  T-98 run.
+  - 19 entries have no budget row: `@texuli/astro` (8 entries),
+    `@texuli/player` (2), `@texuli/slides` (7) and `@texuli/spec` (2).
+  - 7 are over their cap in both runs (gzip): `@texuli/catalog`
+    (51,987 B > 49,152 B), `@texuli/catalog/manifests/content`
+    (8,317 > 8,192), `@texuli/catalog/player` (16,832 > 8,192),
+    `@texuli/catalog/render/hostile` (12,934 > 12,288),
+    `@texuli/catalog/validate` (14,163 > 8,192), `@texuli/charts/math`
+    (12,357 > 12,288) and `@texuli/data/grid-editing` (15,740 > 15,360);
+    figures from the T-98 run.
+  - The T-98 run adds `@texuli/editor/controller` at 18,372 B against
+    18,368 B (4 B over).
+  - Adding or raising budget rows is an owner decision;
+    `texuli.budgets.json` is unchanged.
+- `site-perf`: no tracked reds. The document budgets for `/builder/`,
+  `/charts-page/`, `/color-explorer/` and `/gallery-components/` were
+  raised in commit `7996bbd7` (`apps/website/src/components/perf/budgets.ts`).
+  After T-91 and T-92 the full spec passed 10 of 10 on chromium, and the
+  `/` page weighs 83.8 KB against its 152 KB budget.

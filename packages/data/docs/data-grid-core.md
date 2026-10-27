@@ -38,6 +38,7 @@
 | `empty`, `loading` | none, `false` | Empty snippet; `loading` shows a row and sets `aria-busy` |
 | `maxBlockSize` | none | Caps the height (a plain CSS length) with a sticky header |
 | `density` | `default` | `compact`, `default` or `comfortable` (the Table's) |
+| `virtualizeAbove` | off (`Infinity`) | Windows the rows once more than this many are visible: only the rows in view (plus `overscanRows`) render, with spacer rows for the rest; the focused row stays rendered wherever it is. `rowSize` (default `36`) must match the density's real row height, `viewportHeight` (default `360`) sizes the scroll area unless `maxBlockSize` is set. Details: [data-grid-edit-virtual](./data-grid-edit-virtual.md) |
 | `locale` | `en` | Text sort order (the engine never uses the system locale) |
 | `labels` | English | Every visible and announced string, all translatable (`resolveDataGridLabels`) |
 
@@ -78,9 +79,10 @@ The keys are described to assistive technology through `aria-describedby` (the `
 
 ## Verified
 
-- `pnpm vitest run packages/data/tests/grid-core.test.ts`: **22 tests**.
+- `pnpm vitest run packages/data/tests/grid-core.test.ts`: **26 tests**.
   - Model: sort cycling and Shift keys, `aria-sort`, accent-folding search, filter then search then sort, invalid filters rejected, `cellText`, every APG key including RTL and the edges, clamping, labels.
   - Component: grid roles and counts, one tab stop, header sorting with Shift, non-sortable headers, search with the count, filter, keyboard movement, Space and Shift+Space selection, the header tri-state, Ctrl/Cmd+A, Enter activation, loading and empty states, translations, and hostile cell text kept as text.
+  - Windowing: the view plus overscan renders with spacer rows for the rest, `aria-rowcount` stays the full set, scrolling moves the window, the focused row stays rendered past it, and windowed cells never wrap (the `rowSize` math).
 - In the browser (Chromium, WebKit, Pixel 7; a scratch spec on port 4810), the `data-grid-core` example:
   - passes **axe** in light, dark and forced colors;
   - takes one Tab into the grid, and arrows, Enter on a header (sort) and Space (select) behave as above;
@@ -90,7 +92,8 @@ The keys are described to assistive technology through `aria-describedby` (the `
 
 ## Limits
 
-- **No virtualization, pagination or grouping in the view.** The engine has windowing and groups, and `@texuli/data/virtual-list` exists; a large grid should use them.
+- **Windowed rows must stay single-line.** The scroll math derives positions from `rowSize`, so windowed cells never wrap at any width — their table scrolls sideways instead. A large grid can also use `@texuli/data/virtual-list`.
+- **No pagination or grouping in the view.** (`ColumnGrid` adds group headers; the engine has groups.)
 - **No column resizing, reordering or pinning UI.** The engine's column state supports them.
 - **No cell editing.** Cells are read-only; an editable grid is a separate task.
 - **Wide grids scroll inside the Table's wrapper,** which becomes a focusable, named region.

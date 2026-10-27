@@ -46,7 +46,9 @@ const sources = $derived(resolveImageSources({ src, srcset, sizes, widths, loade
 const size = $derived(intrinsicSize(width, height));
 const fill = $derived(normalizeFit(fit));
 const backdrop = $derived(resolvePlaceholder(placeholder, trust));
-const link = $derived(href === undefined ? undefined : safeHref(href));
+// Same trust tier as image sources: developer for app-authored props,
+// untrusted (default) for agent or user content.
+const link = $derived(href === undefined ? undefined : safeHref(href, trust));
 const position = $derived(focalPoint === undefined ? undefined : focalPointPosition(focalPoint));
 const unavailable = $derived(labels?.unavailable ?? 'Image unavailable');
 /** Sized boxes fill their container up to the intrinsic width. */

@@ -21,6 +21,82 @@ function rule(source: string, selector: string): string {
   return match[1];
 }
 
+describe('navigation lane CSS guards (T-57)', () => {
+  const family = [
+    'navigation/navigation.css',
+    'stepper/stepper.css',
+    'tabs-accordion/tabs-accordion.css',
+  ];
+
+  it('no hardcoded hex or color-function token fallbacks in the navigation family', () => {
+    for (const file of family) {
+      const hits = css(file).match(/var\(--tx-[^)]*#[0-9a-fA-F]{3,8}\b[^)]*\)/g) ?? [];
+      expect(hits, file).toEqual([]);
+    }
+  });
+
+  it('navigation.css keeps active pagination and menu states visible under forced colors', () => {
+    const source = css('navigation/navigation.css');
+    const forced = source.slice(source.indexOf('@media (forced-colors: active)'));
+    expect(forced).toMatch(
+      /\.tx-pagination__button\[aria-current="page"\][^{]*\{[^}]*border-color:\s*Highlight/
+    );
+    expect(forced).toMatch(
+      /\.tx-nav-menu__trigger\[data-state="open"\][^{]*\{[^}]*outline:\s*1px solid Highlight/
+    );
+  });
+
+  it('breadcrumb links meet the 24px block-axis tap target', () => {
+    const link = rule(css('navigation/navigation.css'), '.tx-breadcrumb__link');
+    expect(link).toMatch(/display:\s*inline-flex/);
+    expect(link).toMatch(/min-block-size:\s*1\.5rem/);
+  });
+
+  it('wizard direction chevrons flip in RTL', () => {
+    const source = css('stepper/stepper.css');
+    expect(source).toMatch(
+      /\.tx-wizard:dir\(rtl\)\s+\.tx-wizard__chevron\s*\{[^}]*transform:\s*scaleX\(-1\)/
+    );
+  });
+
+  it('the wizard panel shows the family focus ring on keyboard focus', () => {
+    const source = css('stepper/stepper.css');
+    const panel = rule(source, '.tx-wizard__panel:focus-visible');
+    expect(panel).toMatch(
+      /outline:\s*var\(--tx-focus-ring-width, 2px\) solid var\(--tx-ring, Highlight\)/
+    );
+  });
+
+  it('the navigation menu indicator follows the block axis when vertical', () => {
+    const vertical = rule(
+      css('navigation/navigation.css'),
+      '.tx-nav-menu__indicator[data-orientation="vertical"]'
+    );
+    expect(vertical).toMatch(
+      /inset-block-start:\s*var\(--tx-navigation-menu-indicator-offset, 0\)/
+    );
+    expect(vertical).not.toMatch(
+      /inset-inline-start:\s*var\(--tx-navigation-menu-indicator-offset/
+    );
+  });
+});
+
+describe('toolbar forced-colors state visibility', () => {
+  it('remaps the shared pressed button primitive to system highlight colors', () => {
+    const source = css('toolbar/toolbar.css');
+    const forced = source.slice(source.indexOf('@media (forced-colors: active)'));
+    expect(forced).toMatch(
+      /\.tx-toolbar__button\[data-state="on"\]\s*\{[^}]*background:\s*Highlight[^}]*color:\s*HighlightText/
+    );
+  });
+});
+
+describe('dialog token names', () => {
+  it('uses the emitted foreground role without a phantom variable alias', () => {
+    expect(css('dialog/dialog.css')).not.toContain('--tx-color-foreground');
+  });
+});
+
 describe('polish audit CSS guards', () => {
   it('P1-03: the tabs scroller has no negative inline margin', () => {
     const scroller = rule(css('tabs-accordion/tabs-accordion.css'), '.tx-tabs__scroller');

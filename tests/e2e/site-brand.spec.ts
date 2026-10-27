@@ -68,16 +68,21 @@ async function visit(page: Page, path: string) {
 const mode = (page: Page) => page.locator('html').getAttribute('data-tx-mode');
 
 test.describe('texuli.com brand and home', () => {
-  test('home landing shows the library hero and sections', async ({ page }) => {
+  test('home landing shows the platform hero and the unified sections', async ({ page }) => {
+    // The unified landing since T-44 (narrative blueprint §5); the section
+    // order and every call to action are asserted in site-landing.spec.ts.
     expect(await visit(page, '/')).toEqual([]);
-    await expect(page).toHaveTitle('Texuli');
+    await expect(page).toHaveTitle('One component catalog for web and native · Texuli');
     await expect(
       page.getByRole('heading', { level: 1, name: 'Interfaces from texels.' })
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Start building' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Browse components' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: 'Why Texuli' })).toBeVisible();
-    await expect(page.locator('[data-tx-landing-moments]')).toBeVisible();
+    const hero = page.locator('[data-tx-web-hero]');
+    await expect(hero.getByRole('link', { name: 'Start building' })).toBeVisible();
+    await expect(hero.getByRole('link', { name: 'See the native story' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 2, name: 'Why Svelte for the web' })
+    ).toBeVisible();
+    await expect(page.locator('[data-tx-landing-moments]')).toHaveCount(0);
   });
 
   test('brand page deepens the story and marks navigation', async ({ page }) => {

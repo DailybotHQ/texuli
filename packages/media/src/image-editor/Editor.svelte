@@ -797,7 +797,8 @@ const filterValue = (name: FilterName) =>
       border: var(--tx-border-width, 1px) solid var(--tx-border, light-dark(#d4d4d8, #3f3f46));
       border-radius: var(--tx-radius, 0.5rem);
       background:
-        repeating-conic-gradient(light-dark(#f4f4f5, #27272a) 0 25%, transparent 0 50%) 0 0 / 1rem 1rem;
+        repeating-conic-gradient(var(--tx-muted, light-dark(#f4f4f5, #27272a)) 0 25%, transparent 0 50%) 0 0 /
+        1rem 1rem;
     }
     .tx-ie-picture {
       position: absolute;
@@ -819,10 +820,12 @@ const filterValue = (name: FilterName) =>
       cursor: crosshair;
       background: rgb(0 0 0 / 0.001);
     }
+    /* Crop chrome sits on the photo, not on the theme surface: a light edge over the
+       theme scrim reads on any image. Hosts can retune the pair with the two properties. */
     .tx-ie-crop {
       position: absolute;
-      box-shadow: 0 0 0 100vmax rgb(0 0 0 / 0.5);
-      outline: 2px solid #ffffff;
+      box-shadow: 0 0 0 100vmax var(--tx-scrim, rgb(0 0 0 / 0.5));
+      outline: 2px solid var(--tx-image-editor-edge, #ffffff);
       outline-offset: -1px;
       cursor: move;
     }
@@ -835,9 +838,9 @@ const filterValue = (name: FilterName) =>
       inset-block-end: -0.5rem;
       inline-size: 1rem;
       block-size: 1rem;
-      border: 2px solid #000000;
+      border: 2px solid var(--tx-image-editor-edge-contrast, #000000);
       border-radius: 999px;
-      background: #ffffff;
+      background: var(--tx-image-editor-edge, #ffffff);
       cursor: nwse-resize;
     }
     .tx-ie-mark {
@@ -958,7 +961,7 @@ const filterValue = (name: FilterName) =>
       inline-size: 0.875rem;
       block-size: 0.875rem;
       border-radius: 999px;
-      border: 1px solid light-dark(#52525b, #a1a1aa);
+      border: 1px solid var(--tx-border-strong, light-dark(#52525b, #a1a1aa));
     }
     .tx-ie-selected {
       display: grid;
@@ -974,7 +977,7 @@ const filterValue = (name: FilterName) =>
       inline-size: 1.75rem;
       block-size: 1.75rem;
       padding: 0;
-      border: 2px solid light-dark(#52525b, #a1a1aa);
+      border: 2px solid var(--tx-border-strong, light-dark(#52525b, #a1a1aa));
       border-radius: 999px;
       cursor: pointer;
     }

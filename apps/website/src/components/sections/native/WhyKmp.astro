@@ -1,0 +1,223 @@
+---
+/**
+ * /native/ section 2 (T-46) — the runtime story: why Kotlin Multiplatform,
+ * and how the Compose renderer consumes the catalog contract. The copy,
+ * citations and verbatim Kotlin excerpts live in `why-kmp-content.ts` so the
+ * unit test can pin every claim against the repository file it is cited from.
+ *
+ * Honesty placement (narrative blueprint §6): this section states the
+ * renderer's "in development, conformance-tested, not published" status and
+ * leaves the widget-by-widget ledger to the status section (T-48). No dates
+ * presented as promises, no invented counters, no HTML sinks.
+ */
+import { withBase } from '../../foundation/site.ts';
+import {
+  WHY_KMP_ARCHITECTURE_HREF,
+  WHY_KMP_CLAIMS,
+  WHY_KMP_EXCERPTS,
+  WHY_KMP_GUIDE_HREF,
+  WHY_KMP_HOW_INTRO,
+  WHY_KMP_LEDE,
+  WHY_KMP_STATUS,
+  WHY_KMP_STEPS,
+  WHY_KMP_TOKEN_NOTE,
+} from './why-kmp-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const guideHref = withBase(base, WHY_KMP_GUIDE_HREF);
+const architectureHref = withBase(base, WHY_KMP_ARCHITECTURE_HREF);
+---
+
+<section class="why-kmp" aria-labelledby="native-why-kmp-title" data-tx-native-section="why-kmp">
+  <h2 id="native-why-kmp-title">Why Kotlin Multiplatform</h2>
+  <p class="why-kmp__lede">{WHY_KMP_LEDE.text}</p>
+
+  <div class="why-kmp__columns">
+    <div class="why-kmp__why">
+      <h3>Why Kotlin wins the native half</h3>
+      <ul class="why-kmp__claims">
+        {
+          WHY_KMP_CLAIMS.map((claim) => (
+            <li>
+              <strong>{claim.title}.</strong> {claim.body}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="why-kmp__how">
+      <h3>How the renderer consumes the contract</h3>
+      <p class="why-kmp__how-intro">{WHY_KMP_HOW_INTRO.text}</p>
+      <ol class="why-kmp__steps">
+        {
+          WHY_KMP_STEPS.map((step) => (
+            <li>
+              {step.code ? <code>{step.code}</code> : null}
+              {step.code ? ' ' : ''}
+              {step.rest}
+            </li>
+          ))
+        }
+      </ol>
+      <p class="why-kmp__note">{WHY_KMP_TOKEN_NOTE.text}</p>
+    </div>
+  </div>
+
+  <div class="why-kmp__code">
+    {
+      WHY_KMP_EXCERPTS.map((excerpt) => (
+        <figure>
+          <figcaption>
+            {excerpt.label}: <code>{excerpt.file}</code>
+          </figcaption>
+          <pre
+            tabindex="0"
+            role="region"
+            aria-label={`Kotlin source excerpt from ${excerpt.file}`}
+          ><code>{excerpt.code}</code></pre>
+        </figure>
+      ))
+    }
+  </div>
+
+  <p class="why-kmp__status">
+    <strong>Status.</strong> {WHY_KMP_STATUS.text}
+  </p>
+  <p class="why-kmp__links">
+    <a href={guideHref}>Read the full argument: Why Svelte and Kotlin</a>
+    <a href={architectureHref}>The architecture: web and native, one contract</a>
+  </p>
+</section>
+
+<style>
+  .why-kmp {
+    display: grid;
+    gap: 1.25rem;
+    max-inline-size: 72rem;
+    margin-inline: auto;
+    padding-block: clamp(2rem, 5vw, 3.5rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .why-kmp h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.2;
+    color: var(--tx-foreground);
+  }
+  .why-kmp__lede {
+    margin: 0;
+    max-inline-size: 46rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.6;
+  }
+  .why-kmp__columns {
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 56rem) {
+    .why-kmp__columns {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+  .why-kmp h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1.1rem;
+    color: var(--tx-foreground);
+  }
+  .why-kmp__claims,
+  .why-kmp__steps {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+    color: var(--tx-foreground);
+    line-height: 1.55;
+  }
+  .why-kmp__claims strong {
+    color: var(--tx-foreground);
+  }
+  .why-kmp__how-intro {
+    margin: 0 0 0.75rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.55;
+  }
+  .why-kmp__note {
+    margin: 0.9rem 0 0;
+    padding-inline-start: 0.9rem;
+    border-inline-start: 2px solid var(--tx-border);
+    color: var(--tx-muted-foreground);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+  .why-kmp__code {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 56rem) {
+    .why-kmp__code {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      align-items: start;
+    }
+  }
+  .why-kmp__code figure {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    margin: 0;
+    min-inline-size: 0;
+  }
+  .why-kmp__code figcaption {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .why-kmp pre {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    overflow: auto;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: color-mix(in oklab, var(--tx-muted) 55%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+  .why-kmp pre:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .why-kmp__status {
+    margin: 0;
+    max-inline-size: 46rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.55;
+  }
+  .why-kmp__status strong {
+    color: var(--tx-foreground);
+  }
+  .why-kmp__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  .why-kmp__links a {
+    color: var(--tx-primary);
+    text-decoration-thickness: from-font;
+    text-underline-offset: 0.2em;
+  }
+  .why-kmp__links a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  @media (forced-colors: active) {
+    .why-kmp pre {
+      border-color: CanvasText;
+      background: Canvas;
+    }
+  }
+</style>

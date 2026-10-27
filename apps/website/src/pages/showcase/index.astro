@@ -2,8 +2,11 @@
 import { Badge } from 'texuli/badge';
 import { Card, CardContent, CardDescription, CardGrid, CardHeader, CardTitle } from 'texuli/card';
 import PageBanner from '../../components/landing/PageBanner.astro';
+import { heroScreens } from '../../components/showcase/hero-screens.ts';
 import { SHOWCASE_SCREENS, showcasePath } from '../../components/showcase/showcase.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const heroes = heroScreens(SHOWCASE_SCREENS);
 ---
 
 <BaseLayout
@@ -16,6 +19,21 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     Full example screens dogfooding Texuli. Static HTML after build — no runtime network. Fictional
     Harbor Notes data.
   </p>
+  <section class="heroes" aria-labelledby="heroes-title">
+    <h2 id="heroes-title">Start here</h2>
+    <div class="heroes-grid">
+      {
+        heroes.map(({ screen, href, why }) => (
+          <a class="hero" href={href}>
+            <span class="hero-kind">{screen.blurb}</span>
+            <span class="hero-name">{screen.title}</span>
+            <span class="hero-why">{why}</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+  <h2 class="all-title">All {SHOWCASE_SCREENS.length} screens</h2>
   <CardGrid minItemWidth="15rem">
     {
       SHOWCASE_SCREENS.map((screen) => (
@@ -48,6 +66,55 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     color: var(--tx-muted-foreground);
     font-size: 1.125rem;
     max-inline-size: 40rem;
+  }
+  .heroes {
+    margin-block: 0 2rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .heroes h2,
+  .all-title {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+  .all-title {
+    margin-block-end: 0.85rem;
+  }
+  .heroes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+  }
+  .hero {
+    display: grid;
+    gap: 0.35rem;
+    align-content: start;
+    padding: 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, var(--tx-background));
+    color: inherit;
+    text-decoration: none;
+  }
+  .hero:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 3px;
+  }
+  .hero-kind {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .hero-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .hero-why {
+    font-size: 0.9rem;
+    line-height: 1.45;
   }
   .card-link {
     display: block;

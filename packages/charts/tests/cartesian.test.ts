@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { compile } from 'svelte/compiler';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import AreaChart from '../src/cartesian/AreaChart.svelte';
 import BarChart from '../src/cartesian/BarChart.svelte';
 import CartesianChart from '../src/cartesian/CartesianChart.svelte';
@@ -488,5 +488,146 @@ describe('Cartesian chart renderers', () => {
     expect(() => render(LineChart, { title: 'No description', description: '', series })).toThrow(
       /accessible description/
     );
+  });
+});
+
+describe('Cartesian chart family cohesion', () => {
+  it('renders the grammar-mandated h2 figure title', () => {
+    const { container } = render(LineChart, {
+      title: 'Weekly signups',
+      description: 'Signups by day.',
+      series: [series[0] as CartesianSeries],
+      interactive: false,
+    });
+    expect(container.querySelector('figcaption h2')).toBeTruthy();
+    expect(container.querySelector('figcaption h3')).toBeNull();
+  });
+
+  it('keeps the sibling caption styles for the figure title and description', () => {
+    const source = readFileSync(
+      resolve(__dirname, '../src/cartesian/CartesianChart.svelte'),
+      'utf8'
+    );
+    const css = compile(source, {
+      filename: 'CartesianChart.svelte',
+      css: 'external',
+    }).css?.code;
+    // The grammar assigns Cartesian titles rank 2; keep the visual title size at 1rem.
+    expect(css).toMatch(/figcaption[^{]*h2[^{]*\{[^}]*font-size:\s*1rem/);
+    expect(css).toMatch(/figcaption[^{]*h2[^{]*\{[^}]*margin-block:\s*0/);
+    expect(css).toMatch(/figcaption[^{]*p[^{]*\{[^}]*margin-block:\s*0\.25rem\s+0\.75rem/);
+  });
+
+  it('rejects duplicate x values within a series before they collide as bar keys', () => {
+    expect(() =>
+      assertCartesianSeries([
+        {
+          id: 'twice',
+          label: 'Twice',
+          points: [
+            { x: 'Mon', y: 1 },
+            { x: 'Mon', y: 2 },
+          ],
+        },
+      ])
+    ).toThrow(/duplicate x/i);
+    expect(() =>
+      assertCartesianSeries([
+        {
+          id: 'numeric',
+          label: 'Numeric',
+          points: [
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+            { x: 2, y: 3 },
+          ],
+        },
+      ])
+    ).toThrow(/duplicate x/i);
+    expect(() =>
+      render(BarChart, {
+        title: 'Colliding bars',
+        description: 'Duplicate x points would collide as bar keys.',
+        series: [
+          {
+            id: 'dup',
+            label: 'Dup',
+            points: [
+              { x: 'Mon', y: 1 },
+              { x: 'Mon', y: 2 },
+            ],
+          },
+        ],
+        interactive: false,
+      })
+    ).toThrow(/duplicate x/i);
+  });
+
+  it('keeps grouped bar geometry identical between the SVG and canvas renderers', () => {
+    const januaryToApril = [
+      { x: 'Jan', y: 12 },
+      { x: 'Feb', y: 18 },
+      { x: 'Mar', y: 9 },
+      { x: 'Apr', y: 15 },
+    ];
+    const groupedSeries: CartesianSeries[] = [
+      { id: 'new', label: 'New accounts', points: januaryToApril },
+      {
+        id: 'returning',
+        label: 'Returning accounts',
+        points: januaryToApril.map((point) => ({ x: point.x, y: point.y - 4 })),
+      },
+    ];
+    const props = {
+      title: 'Grouped bars',
+      description: 'Two grouped series in one category band.',
+      series: groupedSeries,
+      interactive: false,
+    };
+
+    const svg = render(BarChart, { ...props, renderer: 'svg' });
+    const svgBars = [...svg.container.querySelectorAll('rect[data-series]')].map((rect) => ({
+      x: Number(rect.getAttribute('x')),
+      y: Number(rect.getAttribute('y')),
+      width: Number(rect.getAttribute('width')),
+      height: Number(rect.getAttribute('height')),
+    }));
+    expect(svgBars).toHaveLength(8);
+
+    const fillRect = vi.fn();
+    const context = {
+      clearRect: vi.fn(),
+      fillRect,
+      setTransform: vi.fn(),
+    } as unknown as CanvasRenderingContext2D;
+    const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context);
+    try {
+      const canvas = render(BarChart, { ...props, renderer: 'canvas' });
+      expect(canvas.container.querySelectorAll('canvas')).toHaveLength(1);
+      // drawCanvasChart paints series by series, matching model.bars order.
+      const canvasBars = fillRect.mock.calls.map((call) => ({
+        x: call[0] as number,
+        y: call[1] as number,
+        width: call[2] as number,
+        height: call[3] as number,
+      }));
+      expect(canvasBars).toHaveLength(8);
+      expect(svgBars).toHaveLength(canvasBars.length);
+      svgBars.forEach((bar, index) => {
+        const canvasBar = canvasBars[index] as {
+          x: number;
+          y: number;
+          width: number;
+          height: number;
+        };
+        expect(Math.abs(bar.x - canvasBar.x)).toBeLessThanOrEqual(0.5);
+        expect(Math.abs(bar.y - canvasBar.y)).toBeLessThanOrEqual(0.5);
+        expect(Math.abs(bar.width - canvasBar.width)).toBeLessThanOrEqual(0.5);
+        expect(Math.abs(bar.height - canvasBar.height)).toBeLessThanOrEqual(0.5);
+      });
+    } finally {
+      getContext.mockRestore();
+      vi.restoreAllMocks();
+    }
   });
 });

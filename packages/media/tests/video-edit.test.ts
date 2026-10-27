@@ -2,6 +2,13 @@ import { fireEvent, render } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 import { createVideoEdit, serializeWebVtt, validateVideoEdit } from '../src/video/edit.ts';
 import { VideoEditPanel } from '../src/video/entry.ts';
+import videoEditSource from '../src/video/VideoEditPanel.svelte?raw';
+
+function styleBlock(source: string): string {
+  const open = source.indexOf('<style>');
+  const close = source.indexOf('</style>', open);
+  return open === -1 || close === -1 ? '' : source.slice(open + 7, close);
+}
 
 describe('video edit model', () => {
   it('creates a full-length edit and validates trim and caption bounds', () => {
@@ -54,5 +61,14 @@ describe('VideoEditPanel', () => {
       target: { value: 'Pier 4 & ferry' },
     });
     expect(onchange.mock.lastCall?.[0].captions[0].text).toBe('Pier 4 & ferry');
+  });
+
+  // T-68: edit chrome must sit in tx.components and use --tx-* roles like VideoPlayer.
+  it('paints through @layer tx.components and token border/surface roles', () => {
+    const css = styleBlock(videoEditSource);
+    expect(css).toMatch(/@layer\s+tx\.components/);
+    expect(css).toMatch(/--tx-border/);
+    expect(css).toMatch(/--tx-surface|--tx-background|--tx-radius/);
+    expect(css).toMatch(/forced-colors:\s*active/);
   });
 });

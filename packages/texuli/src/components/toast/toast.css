@@ -35,8 +35,15 @@
     margin: 0;
     border: 0;
     padding-block: 0;
-    padding-inline: var(--tx-toaster-edge)
-      calc(var(--tx-toaster-edge) + env(safe-area-inset-right, 0px));
+    /*
+     * Safe-area env() insets are physical — the notch does not move with the
+     * reading direction — so they ride the physical longhands. In a logical
+     * inline slot, env(safe-area-inset-right) would guard the physical left
+     * edge in RTL and leave the real right edge unprotected.
+     */
+    padding-inline: var(--tx-toaster-edge);
+    padding-right: calc(var(--tx-toaster-edge) + env(safe-area-inset-right, 0px));
+    padding-left: calc(var(--tx-toaster-edge) + env(safe-area-inset-left, 0px));
     background: transparent;
     color: inherit;
     overflow: visible;

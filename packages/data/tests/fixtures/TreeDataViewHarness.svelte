@@ -1,6 +1,19 @@
 <script lang="ts">
 import { TreeDataView, type TreeMove } from '../../src/tree-view/index.ts';
 
+let {
+  checkboxes = true,
+  dir = 'ltr' as 'ltr' | 'rtl',
+  selectedIds = [] as string[],
+  readOnly = false,
+}: {
+  checkboxes?: boolean;
+  dir?: 'ltr' | 'rtl';
+  selectedIds?: string[];
+  /** Renders without `onMove`: a read-only tree. */
+  readOnly?: boolean;
+} = $props();
+
 interface Node {
   id: string;
   title: string;
@@ -18,7 +31,9 @@ let nodes = $state<Node[]>([
   { id: 'lazy-root', title: 'Lazy folder', parentId: null, rank: 'a1', lazy: true },
 ]);
 let moves = $state<TreeMove[]>([]);
-let selected = $state<string[]>([]);
+// Intentional one-time seed: the harness owns selection from here on.
+// svelte-ignore state_referenced_locally
+let selected = $state<string[]>(selectedIds);
 let expanded = $state<string[]>(['docs', 'guides']);
 let loadCount = $state(0);
 
@@ -51,7 +66,8 @@ function onMove(move: TreeMove): void {
 
 <TreeDataView
   items={nodes}
-  dir="ltr"
+  {dir}
+  {checkboxes}
   bind:selected
   bind:expanded
   getId={(node) => node.id}
@@ -61,7 +77,7 @@ function onMove(move: TreeMove): void {
   hasChildren={(node) => node.lazy === true}
   {loadChildren}
   {onChildrenLoaded}
-  {onMove}
+  onMove={readOnly ? undefined : onMove}
 >
   {#snippet item(node)}
     <span data-node-title={node.id}>{node.title}</span>

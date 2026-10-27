@@ -4,10 +4,13 @@ export interface FieldControl {
   describedBy: string | undefined;
   invalid: boolean;
   required: boolean;
+  disabled: boolean;
   props: {
     id: string;
     'aria-describedby': string | undefined;
     'aria-invalid': true | undefined;
     'aria-required': true | undefined;
+    /** Set only when the Field is disabled (`undefined` otherwise). */
+    disabled: true | undefined;
   };
 }

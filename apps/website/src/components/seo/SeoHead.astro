@@ -2,9 +2,12 @@
 /**
  * Search and social metadata for one page (T-site-seo): canonical URL,
  * Open Graph, a large-image card and the page's own social image, built at
- * compile time by the SEO integration (`/og/<page>.png`). `noindex` keeps
- * a page (the 404) out of search results and the sitemap.
+ * compile time by the SEO integration (`/og/<page>.png`), plus env-gated
+ * search-engine verification metas (rendered only when the owner's token
+ * exists). `noindex` keeps a page (the 404) out of search results and the
+ * sitemap.
  */
+import { ANALYTICS } from '../../lib/constances';
 import {
   absoluteUrl,
   normalizePagePath,
@@ -29,6 +32,8 @@ const pagePath = normalizePagePath(Astro.url.pathname, base);
 const canonical = site ? absoluteUrl(site, base, pagePath) : undefined;
 const image = site && !noindex ? absoluteUrl(site, base, ogImageFile(pagePath)) : undefined;
 const locale = lang.replace('-', '_');
+// Env-gated (constances.ts): empty tokens render no meta at all.
+const { google, bing } = ANALYTICS.verification;
 ---
 
 {canonical && !noindex && <link rel="canonical" href={canonical} />}
@@ -49,3 +54,5 @@ const locale = lang.replace('-', '_');
 <meta name="twitter:description" content={description} />
 {image && <meta name="twitter:image" content={image} />}
 {image && <meta name="twitter:image:alt" content={title} />}
+{google && <meta name="google-site-verification" content={google} />}
+{bing && <meta name="msvalidate.01" content={bing} />}

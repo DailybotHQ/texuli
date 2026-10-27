@@ -1,0 +1,46 @@
+---
+/**
+ * /native/ — the native-focused landing (sub-site IA decision 2, owned by
+ * analysis_results/subsite-ia-routes.md). Landing shell, not a fenced
+ * sub-site: it shares the shell system, theme, CSP and analytics of the one
+ * site. Assembled (PLAN_006 T-48) from the three committed G7 sections in
+ * blueprint order (narrative-blueprint.md §5 "Native landing"): hero +
+ * status (T-45), why Kotlin Multiplatform (T-46), evidence + roadmap
+ * (T-47). Every section is static markup fed by its shared, unit-tested
+ * content module; the hero's h1 is the page's only h1, and each section's
+ * h2 continues the heading ladder without skips.
+ *
+ * Metadata per the T-17 contract (analysis_results/subsite-ia-nav.md §3):
+ * JSON-LD is Organization-only — nothing installable exists yet, so a
+ * SoftwareApplication node would be dishonest. Canonical and the OG set are
+ * emitted by SeoHead; the sitemap picks the route up via the build pipeline.
+ */
+import NativeEvidenceRoadmap from '../../components/sections/native/NativeEvidenceRoadmap.astro';
+import NativeHeroStatus from '../../components/sections/native/NativeHeroStatus.astro';
+import WhyKmp from '../../components/sections/native/WhyKmp.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      name: 'Dailybot, Inc.',
+      url: 'https://dailybot.com/',
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Texuli native — the same catalog, rendered by Compose"
+  description="The Texuli contract renders native surfaces with Compose through Kotlin Multiplatform. In development, conformance-tested, and open about its status."
+  landing
+  jsonLd={organizationJsonLd}
+>
+  <div class="landing" data-tx-landing="">
+    <NativeHeroStatus />
+    <WhyKmp />
+    <NativeEvidenceRoadmap />
+  </div>
+</BaseLayout>

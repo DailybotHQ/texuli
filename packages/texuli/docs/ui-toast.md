@@ -26,6 +26,13 @@ import { Toaster, toast, createToastStore } from 'texuli/toast';
 
 `success`, `error`, `info`, `warning` — token-colored icon chips. Errors use assertive announcements via `@texuli/core/announcer` (through the primitive Provider).
 
+### Actions
+
+`action: { label, onClick }` renders a real button. The toast stays mounted
+and interactive while `onClick` runs, then dismisses when its promise settles
+(failures surface through the action's own UI); sync actions dismiss on the
+next tick.
+
 ### Promise toasts
 
 ```ts

@@ -2,13 +2,13 @@
 name: texuli-themes
 description: Pick, generate, apply and AA-check Texuli themes offline — library search, seed/mood/image generation, light dark high-contrast and system modes, CLI and MCP. No network; WCAG 2.x AA only (not APCA).
 version: "0.2.0"
-documentation_url: https://texuli.com/docs/
+documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
 metadata:
   openclaw:
     emoji: "▣"
-    homepage: https://texuli.com/docs/
+    homepage: https://texuli.com/guides/
     requires:
       anyBins:
         - bash

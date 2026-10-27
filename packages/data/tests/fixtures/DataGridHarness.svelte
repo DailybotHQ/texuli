@@ -22,6 +22,10 @@ interface Props {
   loading?: boolean;
   activated?: string[];
   labels?: Record<string, unknown>;
+  /** Row windowing threshold, passed through to the grid. */
+  virtualizeAbove?: number;
+  /** Row height in px while windowing. */
+  rowSize?: number;
 }
 
 const DEALS: Deal[] = [
@@ -63,6 +67,8 @@ let {
   loading = false,
   activated = [],
   labels = {},
+  virtualizeAbove = Number.POSITIVE_INFINITY,
+  rowSize = 36,
 }: Props = $props();
 
 const columns: DataGridColumn<Deal>[] = [
@@ -98,6 +104,8 @@ const columns: DataGridColumn<Deal>[] = [
   {searchable}
   {loading}
   {labels}
+  {virtualizeAbove}
+  {rowSize}
   onRowActivate={(row) => activated.push(row.id)}
 />
 <output data-testid="state">{JSON.stringify({ sort, search, selected })}</output>

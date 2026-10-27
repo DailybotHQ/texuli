@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Badge from '../src/components/badge/Badge.svelte';
@@ -58,6 +60,26 @@ describe('Tag', () => {
     expect(btn.getAttribute('aria-busy')).toBe('true');
     resolve();
     await waitFor(() => expect(btn.getAttribute('aria-busy')).not.toBe('true'));
+  });
+});
+
+describe('Tag remove target size', () => {
+  // jsdom does no layout, so the 24px hit box is pinned as a stylesheet
+  // contract (same pattern as the avatar contrast rules in avatar.test.ts).
+  it('gives the remove control a 24px hit box without growing the tag', () => {
+    const css = readFileSync(
+      join(import.meta.dirname, '../src/components/badge/badge.css'),
+      'utf8'
+    );
+    const rule = css.match(/\.tx-tag__remove\s*\{([^}]*)\}/)?.[1] ?? '';
+    // The audit bar (rubric, responsive dimension): tap targets >= 24px. The
+    // remove control rendered a 16px box (12px glyph + 2px padding).
+    expect(rule).toContain('min-inline-size: 1.5rem');
+    expect(rule).toContain('min-block-size: 1.5rem');
+    // The larger box is clawed back on both axes so the tag's outer
+    // geometry (and every visual baseline) stays as it was.
+    expect(rule).toMatch(/margin:\s*-0\.25rem;/);
+    expect(rule).toMatch(/padding:\s*0\.375rem;/);
   });
 });
 

@@ -9,6 +9,7 @@
  *   pnpm exec tsx packages/tools/src/cli-add/cli.ts button --cwd <app> --source-root <repo>
  *   … --json --dry-run --force --out src/ui/button
  */
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { addComponent } from './add.ts';
 import { listAddableIds } from './registry.ts';
@@ -156,7 +157,7 @@ export function isMainModule(metaUrl: string): boolean {
   const entry = process.argv[1];
   if (!entry) return false;
   try {
-    return fileURLToPath(metaUrl) === entry || fileURLToPath(metaUrl) === fileURLToPath(entry);
+    return resolve(fileURLToPath(metaUrl)) === resolve(entry);
   } catch {
     return metaUrl.endsWith(entry.replace(/\\/g, '/'));
   }

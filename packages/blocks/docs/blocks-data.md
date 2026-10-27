@@ -79,6 +79,14 @@ Every `color` (series, points, annotations) must be a bare `var(--token)`
 reference. Series, series points, heatmap cells and scatter points are closed
 objects: unknown keys are rejected, not stripped.
 
+Cartesian `series` follow the renderer's x rules, so a block that validates
+always draws: each x appears once within a series (aggregate repeated
+measurements first), categories are non-empty, and x values are either all
+categories or all numbers across the chart. The same x in different series is
+fine (grouped and stacked bars). A block that breaks these rules is invalid:
+`DataBlockView` shows its invalid notice and calls `oninvalid` instead of
+rendering a chart.
+
 ```json
 {
   "type": "chart",
@@ -106,6 +114,12 @@ chart props (callbacks such as `onselect`, `brushInvert`, `format`, and
 
 ### Rendering notes
 
+- **Accessible names.** A table block without a `caption` is named from the
+  `tableSummary` label (default "Data table"); a caption names it instead.
+  Stat and KPI rows announce themselves as a group through the `statGroup` /
+  `kpiGroup` labels. All three join `invalid` and `emptyTable` in
+  `DataBlockLabels`, so hosts pass one `labels` object to translate the
+  family's announced strings.
 - **Compact kinds** (`sparkline`, `bullet`, `gauge`, `progress-ring`) use their
   `label` only as an accessible name, so `ChartBlockView` renders the block
   `title` as a visible `h3` and the `description` below it.

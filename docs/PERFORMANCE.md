@@ -15,8 +15,25 @@ about 100), so wall times are upper bounds.
 | `pnpm build` wall time | about 99 s (`astro check` then the static build) | `time pnpm build` |
 | `astro check` (website) | about 23 s, 161 files, 0 errors | `time pnpm --filter @texuli/website typecheck` |
 | Website `index.html` | 70,613 B (14,457 B gzip) | `wc -c` and `gzip -9 -c … \| wc -c` on `apps/website/dist/index.html` |
-| Scripts the landing references directly | 6 modules, 6,810 B gzip; their imports bring the page's JS to about 113 KB gzip (`site-perf.spec.ts`, 2026-10-23) | `grep -o '_astro/[^"]*\.js' apps/website/dist/index.html` |
+| Scripts the landing references directly | **Historical (2026-10-23, before the PLAN_006 T-44 landing):** 6 modules, 6,810 B gzip; their imports brought the page's JS to about 113 KB gzip. For the current landing see the next section | `grep -o '_astro/[^"]*\.js' apps/website/dist/index.html`; JS total from `site-perf.spec.ts` |
 | Core unit tests | 22 files, 322 tests in about 6 s | `pnpm vitest run packages/core` |
+
+### Website assets (2026-10-26, PLAN_006 T-92)
+
+On dev after `f2a49551` with other lanes' uncommitted work present. The
+numbers a reader needs are in the table; the per-file detail is in the T-92
+walk, `.dwp/plans/PLAN_006_website_marketing_seo_analytics/analysis_results/walks/perf-assets.md`
+(local plan evidence, git-ignored).
+
+| What | Value | How it was measured |
+| --- | --- | --- |
+| Checked-in brand and demo PNGs (17 files) | 67,933 B → 50,499 B, lossless (decoded pixels identical) | Sharp re-encode; RGBA comparison against `git show HEAD:<file>` |
+| Brand WebP copies (10 files, each with a PNG fallback in `<picture>`) | 24,982 B total | file sizes in `apps/website/dist/brand/` |
+| Header logo per page (gzip -9) | 3,754 B PNG → 1,149 B WebP on 1x screens (2,333 B on 2x, 3,275 B on 3x) | `gzip -9 -c <file> \| wc -c` |
+| Route page weight (site-perf method, Chromium 1x) | 2.5 to 2.6 KB lighter on every route with the header; `/web-and-native/` 96.6 → 94.1 KB (budget 96); `/` 86.3 → 83.8 KB (budget 152) | `tests/e2e/site-perf.spec.ts` (10 passed), same measurement as a script |
+| Landing (`/`) JavaScript (PLAN_006 T-91, same build family) | 54.3 KB gzip; two islands, `SiteSearch` and `ThemeSwitch`, both `client:load` (the T-44 landing removed the hero islands) | site-perf's per-route JS measurement, run as a temporary local script |
+| Font files and `@font-face` rules in the build | 0 and 0: system font stacks, no font requests | `find apps/website/dist -name '*.woff*'`; `grep -l '@font-face' apps/website/dist/_astro/*.css` |
+| OG images (398 PNG, 1200 px) | 12,712,517 B at Sharp palette effort 8 (effort 10: 838 B larger, 4.6 s slower, not adopted) | every page's OG SVG encoded at both settings |
 
 ### Charts large-data limits (2026-10-24)
 

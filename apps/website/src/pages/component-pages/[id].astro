@@ -3,6 +3,7 @@
  * /component-pages/<id>/ — one page per catalog manifest id (static paths).
  */
 import ComponentPageBody from '../../components/component-pages/ComponentPageBody.astro';
+import { familyNote } from '../../components/component-pages/family-notes.ts';
 import {
   COMPONENT_PAGES,
   getComponentPage,
@@ -19,12 +20,14 @@ const { id } = Astro.params;
 if (!id) throw new Error('Missing component id');
 const entry = getComponentPage(id);
 if (!entry) throw new Error(`Unknown component page id: ${id}`);
+// The share card reads this: one-line summary plus the family differentiator
+// (punch-list rows 1 and 3 — the per-component art itself is routed to the
+// SEO surface).
+const note = familyNote(entry.group);
+const description = `${entry.summary}${note ? ` ${note.headline}` : ''} Catalog id ${entry.id}.`;
 ---
 
-<BaseLayout
-  title={entry.label}
-  description={`${entry.summary} Catalog id ${entry.id}.`}
->
+<BaseLayout title={entry.label} description={description}>
   <p class="crumb">
     <a href="/component-pages/">Components</a>
     <span aria-hidden="true"> / </span>

@@ -1,0 +1,238 @@
+---
+/**
+ * /native/ hero + status section (PLAN_006 T-45). Static markup only — no
+ * island, no motion — so nothing moves and reduced-motion preferences are
+ * respected by construction. Copy and structure come from the shared,
+ * unit-tested `native-hero-content.ts` module: the hero tells the one-
+ * contract story and the status ledger states exactly what ships (npm
+ * 0.1.0-next.1), what is in development (the Compose renderer) and what is
+ * only planned (Maven Central, ADR-005) — marked with the site's planned
+ * marker (`data-tx-planned` plus visible "Planned" text).
+ *
+ * The page shell (`src/pages/native/index.astro`) owns this section's slot;
+ * this file only renders inside it.
+ */
+import { withBase } from '../../foundation/site.ts';
+import { nativeHeroContent as content } from './native-hero-content.ts';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="native-hero" aria-labelledby={content.ids.hero} data-tx-native-hero="">
+  <p class="native-hero__eyebrow">{content.eyebrow}</p>
+  <h1 id={content.ids.hero}>{content.title}</h1>
+  <p class="native-hero__lead">{content.lead}</p>
+  <div class="native-hero__actions">
+    {
+      content.links.map((link) => (
+        <a
+          href={withBase(base, link.href)}
+          class={link.role === 'primary'
+            ? 'native-hero__cta native-hero__cta--primary'
+            : 'native-hero__cta native-hero__cta--secondary'}
+        >
+          {link.label}
+        </a>
+      ))
+    }
+  </div>
+
+  <section class="native-status" aria-labelledby={content.ids.status}>
+    <h2 id={content.ids.status}>{content.statusHeading}</h2>
+    <p class="native-status__intro">{content.statusIntro}</p>
+    <dl class="native-status__ledger">
+      {
+        content.statusRows.map((row) => (
+          <div class="native-status__row" data-tx-status={row.kind}>
+            <dt>{row.term}</dt>
+            <dd>
+              <span
+                class="native-status__badge"
+                data-tx-status-badge={row.kind}
+                data-tx-planned={row.kind === 'planned' ? '' : undefined}
+              >
+                {row.statusLabel}
+              </span><span class="native-status__sep">: </span>
+              <span class="native-status__detail">{row.detail}</span>
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+</section>
+
+<style>
+  .native-hero {
+    display: grid;
+    gap: 1rem;
+    max-inline-size: 64rem;
+    margin-inline: auto;
+    padding-block: clamp(1.5rem, 5vw, 3.5rem) clamp(2rem, 6vw, 4rem);
+    padding-inline: 1rem;
+  }
+  .native-hero__eyebrow {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  h1 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2rem, 6.5vw, 3.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-weight: 750;
+    text-wrap: balance;
+  }
+  .native-hero__lead {
+    margin: 0;
+    max-inline-size: 44rem;
+    color: var(--tx-foreground);
+    font-size: clamp(1rem, 2.4vw, 1.15rem);
+    line-height: 1.55;
+  }
+  .native-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 0.35rem;
+  }
+  .native-hero__cta {
+    display: inline-block;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding-block: 0.6rem;
+    padding-inline: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .native-hero__cta--primary {
+    background: var(--tx-foreground);
+    border-color: var(--tx-foreground);
+    color: var(--tx-background);
+  }
+  .native-hero__cta--primary:hover {
+    background: color-mix(in oklab, var(--tx-foreground) 88%, var(--tx-background));
+    color: var(--tx-background);
+  }
+  .native-hero__cta--secondary {
+    background: transparent;
+    color: var(--tx-foreground);
+  }
+  .native-hero__cta--secondary:hover {
+    background: color-mix(in oklab, var(--tx-muted) 45%, var(--tx-background));
+  }
+  .native-hero__cta:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    /* Forced colors (T-87, axe color-contrast): the filled CTA's author
+       text color would sit on the forced Canvas, so name system colors. */
+    .native-hero__cta--primary,
+    .native-hero__cta--primary:hover {
+      border-color: LinkText;
+      background: Canvas;
+      color: LinkText;
+    }
+  }
+  .native-status {
+    display: grid;
+    gap: 0.75rem;
+    margin-block-start: clamp(1rem, 3vw, 2rem);
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-card, var(--tx-background));
+    padding-block: 1.25rem;
+    padding-inline: clamp(1rem, 3vw, 1.5rem);
+  }
+  .native-status h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.25rem;
+    line-height: 1.3;
+    font-weight: 650;
+  }
+  .native-status__intro {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .native-status__ledger {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+  }
+  .native-status__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+    border-block-start: 1px solid var(--tx-border);
+    padding-block-start: 0.75rem;
+  }
+  .native-status__row:first-child {
+    border-block-start: none;
+    padding-block-start: 0;
+  }
+  .native-status__row dt {
+    color: var(--tx-foreground);
+    font-weight: 650;
+  }
+  .native-status__row dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0;
+  }
+  .native-status__badge {
+    flex: none;
+    border: 1px solid var(--tx-border);
+    border-radius: 999px;
+    padding-block: 0.1rem;
+    padding-inline: 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .native-status__badge[data-tx-status-badge='shipped'] {
+    background: var(--tx-primary);
+    border-color: var(--tx-primary);
+    color: var(--tx-primary-foreground, var(--tx-background));
+  }
+  .native-status__badge[data-tx-status-badge='development'] {
+    background: color-mix(in oklab, var(--tx-muted) 55%, var(--tx-background));
+    color: var(--tx-foreground);
+  }
+  .native-status__badge[data-tx-status-badge='planned'] {
+    background: transparent;
+    color: var(--tx-muted-foreground);
+  }
+  /* Screen readers read the badge and the detail as one run without it
+     ("Shipped All 15 packages…"); the hidden colon splits the phrases
+     (T-90). Out of the flex flow, so the visual gap is unchanged. */
+  .native-status__sep {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .native-status__detail {
+    color: var(--tx-muted-foreground);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  @media (min-width: 640px) {
+    .native-status__row {
+      grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+      column-gap: 1.25rem;
+    }
+  }
+</style>

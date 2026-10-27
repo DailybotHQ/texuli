@@ -8,6 +8,7 @@
  * them made the bundler pull an unrelated shared chunk into every page.
  */
 import type { Component } from 'svelte';
+import { oncePerInstance } from '../../lib/track.ts';
 import CodeSample from './CodeSample.svelte';
 import DemoFrame from './DemoFrame.svelte';
 import LazyMount from './LazyMount.svelte';
@@ -61,6 +62,9 @@ let {
 }: Props = $props();
 
 let values = $state<Record<string, unknown>>(initialProps(schema, example));
+
+/** The catalog's once-per-visit demo open event (see track.ts). */
+const trackDemoOpen = oncePerInstance('component_demo_open');
 let stageVisible = $state(false);
 /** The stage router, behind a dynamic boundary (see LazyLiveStage). */
 let Stage = $state<Component<{
@@ -100,6 +104,8 @@ const code = $derived(
 );
 
 function onChange(name: string, value: unknown): void {
+  // First control interaction = the demo was opened and used; once only.
+  trackDemoOpen({ component: componentId });
   values = { ...values, [name]: value };
 }
 

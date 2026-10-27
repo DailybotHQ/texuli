@@ -72,6 +72,20 @@ describe('compileForcedColorsCss', () => {
     }
   });
 
+  it('anchors critical tokens to system colors when more contrast is requested', () => {
+    const css = compileForcedColorsCss();
+    const contrastBlock = css.split('@media (prefers-contrast: more)')[1];
+
+    expect(contrastBlock).toContain('--tx-border: CanvasText;');
+    expect(contrastBlock).toContain('--tx-border-strong: CanvasText;');
+    expect(contrastBlock).toContain('--tx-ring: Highlight;');
+    expect(contrastBlock).toContain('--tx-selection: Highlight;');
+    expect(contrastBlock).toContain('--tx-selection-foreground: HighlightText;');
+    expect(contrastBlock).not.toMatch(
+      /--tx-(?:border|border-strong|ring|selection|selection-foreground): var\(--tx-/
+    );
+  });
+
   it('matches the shipped forced-colors.css file and stays under the CSS budget', () => {
     const compiled = compileForcedColorsCss();
     const shipped = readFileSync('packages/tokens/src/forced-colors/forced-colors.css', 'utf8');

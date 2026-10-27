@@ -5,7 +5,7 @@ import AlertSurface from './AlertSurface.svelte';
 /** Full-width page or section banner. */
 type Props = Omit<ComponentProps<typeof AlertSurface>, 'layout'>;
 
-let { ...rest }: Props = $props();
+let { ref = $bindable(null), ...rest }: Props = $props();
 </script>
 
-<AlertSurface layout="banner" {...rest} />
+<AlertSurface layout="banner" bind:ref {...rest} />

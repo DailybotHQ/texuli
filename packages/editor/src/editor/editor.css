@@ -96,7 +96,7 @@ h4.tx-editor-heading {
 }
 
 .tx-editor-link {
-  color: var(--tx-primary, LinkText);
+  color: var(--tx-link, LinkText);
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
@@ -147,9 +147,14 @@ h4.tx-editor-heading {
   text-decoration: line-through;
 }
 
+/*
+ * The checkbox itself is the 24px target (WCAG 2.2 target size, 2.5.8): it
+ * sits inside the editor's textbox, so a wrapper hit area or the spacing
+ * exception does not count.
+ */
 .tx-editor-check input {
-  inline-size: 1rem;
-  block-size: 1rem;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
   margin: 0;
   accent-color: var(--tx-primary, AccentColor);
 }

@@ -172,6 +172,21 @@ describe('compact charts', () => {
     });
     expect(gauge.container.querySelector('svg')?.outerHTML).not.toContain('NaN');
   });
+
+  it('keeps tight threshold bands visible on the gauge', () => {
+    // Two thresholds 0.2 apart: the middle band's angular sweep is smaller
+    // than its pad angle, and it still must render (the legend/table list it).
+    const { container } = render(Gauge, {
+      props: {
+        label: 'Tight bands',
+        value: 60,
+        thresholds: [59.9, 60.1],
+      },
+    });
+    const bands = [...container.querySelectorAll('[data-band]')];
+    expect(bands).toHaveLength(3);
+    for (const band of bands) expect(band.getAttribute('d')).not.toBe('');
+  });
 });
 
 describe('sparkline large-data limits', () => {

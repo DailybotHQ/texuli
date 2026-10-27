@@ -33,6 +33,8 @@ const rows = [
     budget: { ...DEFAULT_BUDGET, ...entry.budget },
   })),
 ];
+// Exact routes with their own limits (prefix rows are families, not single routes).
+const budgetedRoutes = ROUTE_BUDGET_OVERRIDES.length;
 ---
 
 <BaseLayout
@@ -45,6 +47,61 @@ const rows = [
     measures the built site in a browser: no request may leave this origin, islands hydrate only
     where there is something to operate, and each number stays under its limit.
   </p>
+
+  <section class="measured" aria-labelledby="measured-title">
+    <h2 id="measured-title">Measured, not claimed</h2>
+    <p class="measured-lead">
+      The 30-second rollup for a skeptic: what this site proves about itself, and where the proof
+      lives. Everything below is checked by the repository's own gates, never asserted.
+    </p>
+    <dl class="measured-grid">
+      <div class="fact">
+        <dt>{rows.length} budget rows</dt>
+        <dd>
+          Computed at this page's build from the same source the checker reads:
+          {budgetedRoutes} routes with their own limits and one default for every other route
+          (<code>tests/e2e/site-perf.spec.ts</code> measures each built route against it).
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>Axe, zero exclusions</dt>
+        <dd>
+          Every page in the sitemap plus the 404 is swept with WCAG 2.x A/AA axe rules and no
+          excluded rules or nodes, in light and dark (<code>tests/e2e/a11y-site.spec.ts</code>,
+          verified 2026-10-26).
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>CSP enforced, no unsafe-inline or unsafe-eval</dt>
+        <dd>
+          Every build emits per-route <code>Content-Security-Policy</code> headers with exact
+          script/style hashes and a report-only variant; an independent scanner re-checks every
+          hash over the built output (<code>pnpm check:csp</code>).
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>No request leaves this origin</dt>
+        <dd>
+          The browser specs fail on any foreign HTTP(S) request, so third-party calls cannot
+          appear silently.
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>15 packages on npm, all prerelease</dt>
+        <dd>
+          Published as <code>0.1.0-next.1</code> under the <code>next</code> dist-tag with
+          provenance; <code>latest</code> stays reserved for 1.0.0 (as of 2026-10-26).
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>Per-component evidence</dt>
+        <dd>
+          Behavior checks, gzip budget and measured size, axe suites and the browser matrix for
+          each id live on its page — start at <a href="/evidence/">Evidence</a>.
+        </dd>
+      </div>
+    </dl>
+  </section>
 
   <div class="table" role="region" aria-labelledby="budget-caption" tabindex="0">
     <table>
@@ -108,6 +165,41 @@ const rows = [
     max-inline-size: 44rem;
     color: var(--tx-muted-foreground);
     font-size: 1.125rem;
+  }
+  .measured {
+    margin-block-end: 2rem;
+    padding: 1.1rem 1.25rem 1.25rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, var(--tx-background));
+  }
+  .measured h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1.25rem;
+  }
+  .measured-lead {
+    margin: 0 0 1rem;
+    max-inline-size: 44rem;
+    color: var(--tx-muted-foreground);
+  }
+  .measured-grid {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1rem;
+  }
+  .fact {
+    display: grid;
+    gap: 0.25rem;
+    align-content: start;
+  }
+  .fact dt {
+    font-weight: 700;
+  }
+  .fact dd {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.45;
   }
   .table {
     overflow-x: auto;

@@ -221,12 +221,12 @@ const model = $derived.by(() => {
             const index = keyIndex.get(point.x) ?? 0;
             const categoryStart = category(categories[index] as string) ?? margin.left;
             const markBand = markBandWidth(index);
-            const barWidth = markBand / (groupSize + 0.2);
-            const span = stackSpans[seriesIndex]?.[index] ?? [0, point.y];
-            const groupOffset = grouped ? seriesIndex * barWidth : 0;
+            const slot = grouped ? groupedBarSlot(markBand, groupSize, seriesIndex) : null;
+            const groupOffset = slot ? slot.offset : 0;
             const x = visibleXScale
               ? xPosition(point.x) - markBand / 2 + groupOffset
               : categoryStart + groupOffset;
+            const span = stackSpans[seriesIndex]?.[index] ?? [0, point.y];
             const y0 = yScale(span[0]);
             const y1 = yScale(span[1]);
             return [
@@ -235,7 +235,7 @@ const model = $derived.by(() => {
                 seriesIndex,
                 x,
                 y: Math.min(y0, y1),
-                width: grouped ? barWidth * 0.88 : markBand * 0.72,
+                width: slot ? slot.width : markBand * 0.72,
                 height: Math.max(0, Math.abs(y1 - y0)),
                 color:
                   item.color ??
@@ -269,6 +269,10 @@ const model = $derived.by(() => {
         if (!isBar) return { x: canvasX(point.x), y: y1, y0 };
         const categoryStart = category(categories[index] as string) ?? margin.left;
         const markBand = markBandWidth(index);
+        const slot =
+          kind === 'bar' && renderedSeries.length > 1
+            ? groupedBarSlot(markBand, renderedSeries.length, seriesIndex)
+            : null;
         const barBase = yScale(span[0]);
         const barEnd = yScale(span[1]);
         return {
@@ -277,21 +281,10 @@ const model = $derived.by(() => {
           y0,
           bar: {
             y: Math.min(barBase, barEnd),
-            x: visibleXScale
-              ? canvasX(point.x) -
-                markBand / 2 +
-                (kind === 'bar' && renderedSeries.length > 1
-                  ? seriesIndex * ((markBand * 0.88) / renderedSeries.length)
-                  : 0)
-              : categoryStart +
-                (kind === 'bar' && renderedSeries.length > 1
-                  ? seriesIndex * ((category.bandwidth() * 0.88) / renderedSeries.length)
-                  : 0),
-            width: visibleXScale
-              ? markBand *
-                (kind === 'bar' && renderedSeries.length > 1 ? 0.88 / renderedSeries.length : 0.72)
-              : category.bandwidth() *
-                (kind === 'bar' && renderedSeries.length > 1 ? 0.88 / renderedSeries.length : 0.72),
+            x:
+              (visibleXScale ? canvasX(point.x) - markBand / 2 : categoryStart) +
+              (slot ? slot.offset : 0),
+            width: slot ? slot.width : markBand * 0.72,
             height: Math.abs(barEnd - barBase),
           },
         };
@@ -435,6 +428,21 @@ function display(value: number | string | null): string {
     : value;
 }
 
+/**
+ * One grouped-bar geometry for both renderers: the category band splits into
+ * `count + 0.2` slots (the fraction is the group's side padding) and each bar
+ * fills 88% of its slot. Canvas marks reuse the SVG numbers, so a chart keeps
+ * its shape when it crosses the canvas point threshold.
+ */
+function groupedBarSlot(
+  markBand: number,
+  count: number,
+  seriesIndex: number
+): { offset: number; width: number } {
+  const slot = markBand / (count + 0.2);
+  return { offset: seriesIndex * slot, width: slot * 0.88 };
+}
+
 const interactionModules = $derived(
   interactive
     ? Promise.all([
@@ -503,7 +511,7 @@ const interactionModules = $derived(
           {height}
           plot={plotRect}
           {formatters}
-          crosshair={kind === 'bar' || kind === 'stacked-bar' ? 'x' : 'x'}
+          crosshair="x"
           {brushInvert}
           fullDomain={fullDomain ?? model.defaultDomain}
           {onzoom}
@@ -704,9 +712,15 @@ const interactionModules = $derived(
     --chart-8: var(--tx-chart-8, #fdae6b);
   }
 
+  figcaption h2 {
+    font-size: 1rem;
+    margin-block: 0;
+  }
+
   figcaption p {
     /* Fallback keeps WCAG AA on light surfaces when tokens are unset. */
     color: var(--tx-muted-foreground, #575757);
+    margin-block: 0.25rem 0.75rem;
   }
   .chart[data-mode='dark'] figcaption p {
     color: var(--tx-muted-foreground, #c8cdd4);

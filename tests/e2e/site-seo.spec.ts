@@ -6,6 +6,7 @@ import { extname, join, normalize, relative, resolve } from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import {
+  AI_CRAWLERS,
   absoluteUrl,
   buildRobots,
   buildSitemap,
@@ -13,6 +14,7 @@ import {
   normalizePagePath,
   OG_IMAGE_HEIGHT,
   OG_IMAGE_WIDTH,
+  ogAreaFor,
   ogImageFile,
   ogImageSvg,
   readPageMeta,
@@ -140,14 +142,63 @@ test.describe('seo helpers', () => {
     expect(escapeXml(`a&b<c>"d"'e'${String.fromCharCode(1)}`)).toBe(
       'a&amp;b&lt;c&gt;&quot;d&quot;&apos;e&apos;'
     );
-    const xml = buildSitemap([`${SITE}/b/`, `${SITE}/`, `${SITE}/b/`, `${SITE}/a?x=1&y=2`]);
+    const xml = buildSitemap([
+      `${SITE}/b/`,
+      { loc: `${SITE}/`, lastmod: '2026-10-25' },
+      `${SITE}/b/`,
+      `${SITE}/a?x=1&y=2`,
+    ]);
     expect(xml.match(/<loc>/g)).toHaveLength(3);
     expect(xml.indexOf(`${SITE}/</loc>`)).toBeLessThan(xml.indexOf(`${SITE}/b/</loc>`));
     expect(xml).toContain('x=1&amp;y=2');
+    expect(xml).toContain('<lastmod>2026-10-25</lastmod>');
+    expect(xml.match(/<lastmod>/g)).toHaveLength(1);
     expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true);
-    expect(buildRobots(`${SITE}/sitemap.xml`)).toBe(
-      `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`
+    expect(() => buildSitemap([{ loc: `${SITE}/x/`, lastmod: 'not-a-date' }])).toThrow();
+
+    const robots = buildRobots(`${SITE}/sitemap.xml`);
+    expect(robots).toContain('User-agent: *\nAllow: /\n');
+    expect(robots).toContain(`Sitemap: ${SITE}/sitemap.xml\n`);
+    // Every AI crawler is welcomed by name; nothing is disallowed, and the
+    // Content-Signal header waits for the request-time rewrite (a static
+    // file cannot vary by user agent).
+    for (const crawler of AI_CRAWLERS)
+      expect(robots).toContain(`User-agent: ${crawler}\nAllow: /\n`);
+    expect(robots).not.toContain('Disallow');
+    // No Content-Signal *directive* (the comment that explains its absence
+    // may name it): the header needs per-agent responses.
+    expect(robots).not.toMatch(/^Content-Signal:/m);
+  });
+
+  test('area art: routes map to areas and the badge changes the image', () => {
+    expect(ogAreaFor('/').label).toBe('');
+    expect(ogAreaFor('/guides/theming/').label).toBe('Guides');
+    expect(ogAreaFor('/component-pages/button/').label).toBe('Components');
+    expect(ogAreaFor('/primitives-page/accordion/').label).toBe('Primitives');
+    expect(ogAreaFor('/theme-studio/').label).toBe('Themes');
+    expect(ogAreaFor('/playground/').label).toBe('Agents');
+    const accents = new Set(
+      [
+        '/',
+        '/guides/x/',
+        '/component-pages/x/',
+        '/primitives-page/x/',
+        '/theme-studio/',
+        '/playground/',
+      ].map((path) => ogAreaFor(path).accent)
     );
+    expect(accents.size).toBeGreaterThanOrEqual(5);
+    const base = {
+      title: 'Same title',
+      description: 'Same description text.',
+      url: 'texuli.com/x',
+      siteName: 'Texuli',
+    };
+    const plain = ogImageSvg(base);
+    const guides = ogImageSvg({ ...base, area: ogAreaFor('/guides/theming/') });
+    expect(guides).toContain('GUIDES');
+    expect(plain).not.toContain('GUIDES');
+    expect(guides).not.toBe(plain);
   });
 
   test('read page meta, wrap text and escape hostile titles in the image', () => {
@@ -174,10 +225,33 @@ test.describe('seo helpers', () => {
 });
 
 test.describe('texuli.com SEO build output', () => {
-  test('robots.txt allows crawling and points at the sitemap', async ({ request }) => {
+  test('robots.txt allows crawling, points at the sitemap and welcomes AI crawlers', async ({
+    request,
+  }) => {
     const robots = await request.get(`${origin}/robots.txt`);
     expect(robots.status()).toBe(200);
-    expect(await robots.text()).toBe(`User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
+    const text = await robots.text();
+    expect(text).toBe(buildRobots(`${SITE}/sitemap.xml`));
+    expect(text).toContain('User-agent: *');
+    for (const crawler of AI_CRAWLERS) expect(text).toContain(`User-agent: ${crawler}`);
+    expect(text).not.toMatch(/^Content-Signal:/m);
+    expect(text).not.toContain('Disallow');
+  });
+
+  test('every sitemap url carries a valid lastmod date', async ({ request }) => {
+    const response = await request.get(`${origin}/sitemap.xml`);
+    expect(response.status()).toBe(200);
+    const xml = await response.text();
+    const blocks = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
+    expect(blocks.length).toBe(indexedPages().length);
+    for (const block of blocks) {
+      const loc = block.match(/<loc>([^<]+)<\/loc>/)?.[1] ?? '';
+      const match = block.match(/<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/);
+      expect(match, `lastmod present on ${loc}`).toBeTruthy();
+      const date = new Date(`${match![1]}T00:00:00Z`);
+      expect(date.getTime(), `lastmod parses on ${loc}`).not.toBeNaN();
+      expect(date.getTime(), `lastmod not in the future on ${loc}`).toBeLessThanOrEqual(Date.now());
+    }
   });
 
   test('the sitemap lists every indexed page once (not the 404 or noindex previews)', async ({
@@ -194,6 +268,27 @@ test.describe('texuli.com SEO build output', () => {
     expect(locs.some((loc) => loc.includes('/component-pages/'))).toBe(true);
     expect(locs.some((loc) => loc.includes('404'))).toBe(false);
     expect(locs.some((loc) => loc.includes('/examples/preview/'))).toBe(false);
+  });
+
+  test('every area carries resolvable, alt-texted OG art', async ({ page, request }) => {
+    const samples = [
+      '/',
+      '/guides/theming/',
+      '/component-pages/button/',
+      '/primitives-page/accordion/',
+      '/theme-studio/',
+      '/playground/',
+    ];
+    for (const path of samples) {
+      await page.goto(`${origin}${path}`);
+      const image = await meta(page, 'og:image');
+      expect(image, `og:image on ${path}`).toBeTruthy();
+      expect(await meta(page, 'og:image:alt'), `og:image:alt on ${path}`).toBeTruthy();
+      expect(await meta(page, 'twitter:card', 'name')).toBe('summary_large_image');
+      const png = await request.get(image!);
+      expect(png.status(), `OG asset resolves for ${path}`).toBe(200);
+      expect(png.headers()['content-type']).toBe('image/png');
+    }
   });
 
   test('example preview documents are noindex', () => {
@@ -236,12 +331,120 @@ test.describe('texuli.com SEO build output', () => {
       expect(await meta(page, 'twitter:card', 'name')).toBe('summary_large_image');
       expect(await meta(page, 'twitter:image', 'name')).toBe(image);
       expect(await page.locator('head meta[name="robots"]').count()).toBe(0);
+      // Clean-env build: verification metas stay off until the owner
+      // provisions the tokens.
+      expect(await page.locator('head meta[name="google-site-verification"]').count()).toBe(0);
+      expect(await page.locator('head meta[name="msvalidate.01"]').count()).toBe(0);
       // The image the tags name is served by the static host.
       const png = await request.get(`${origin}/${ogImageFile(path)}`);
       expect(png.status()).toBe(200);
       expect(png.headers()['content-type']).toBe('image/png');
     });
   }
+
+  test('structured data on the home page: Organization, WebSite, SoftwareApplication', async ({
+    page,
+  }) => {
+    await page.goto(`${origin}/`);
+    const blocks = await page.locator('head script[type="application/ld+json"]').allTextContents();
+    expect(blocks.length, 'the home page embeds JSON-LD in its head').toBeGreaterThan(0);
+
+    const nodes: Array<Record<string, unknown>> = [];
+    for (const block of blocks) {
+      const parsed: unknown = JSON.parse(block);
+      const graph =
+        parsed &&
+        typeof parsed === 'object' &&
+        Array.isArray((parsed as { '@graph'?: unknown })['@graph'])
+          ? ((parsed as { '@graph': unknown[] })['@graph'] as Array<Record<string, unknown>>)
+          : [parsed as Record<string, unknown>];
+      nodes.push(...graph);
+    }
+    const byType = new Map(nodes.map((node) => [node['@type'], node]));
+
+    const org = byType.get('Organization') as Record<string, unknown> | undefined;
+    expect(org, 'Organization node present').toBeTruthy();
+    expect(org?.name).toBe('Dailybot, Inc.');
+    expect(org?.url).toMatch(/^https:\/\//);
+
+    const website = byType.get('WebSite') as Record<string, unknown> | undefined;
+    expect(website, 'WebSite node present').toBeTruthy();
+    expect(website?.name).toBe('Texuli');
+    expect(website?.url).toBe(`${SITE}/`);
+    const action = website?.potentialAction as Record<string, unknown> | undefined;
+    expect(action?.['@type']).toBe('SearchAction');
+    expect(JSON.stringify(action)).toContain('/search/?q={search_term_string}');
+
+    const app = byType.get('SoftwareApplication') as Record<string, unknown> | undefined;
+    expect(app, 'SoftwareApplication node present').toBeTruthy();
+    expect(app?.name).toBe('Texuli');
+    expect(app?.applicationCategory).toBe('DeveloperApplication');
+    // Preview reality: the npm dist-tag is `next`; a stable release would be a
+    // claim this site cannot make yet. The pattern fails the day the wording
+    // drifts from the published preview.
+    expect(app?.softwareVersion).toMatch(/^\d+\.\d+\.\d+-next\.\d+$/);
+    expect(app?.license).toBe('https://opensource.org/licenses/MIT');
+    expect(String(app?.description)).toContain('in development');
+    // Nothing is for sale: omitting offers is the honest state.
+    expect(app, 'no invented offers').not.toHaveProperty('offers');
+  });
+
+  test('nested pages carry a BreadcrumbList derived from the site nav', async ({ page }) => {
+    const readCrumbs = async (path: string) => {
+      await page.goto(`${origin}${path}`);
+      const blocks = await page
+        .locator('head script[type="application/ld+json"]')
+        .allTextContents();
+      const nodes: Array<Record<string, unknown>> = [];
+      for (const block of blocks) {
+        const parsed: unknown = JSON.parse(block);
+        if (
+          parsed &&
+          typeof parsed === 'object' &&
+          (parsed as { '@type'?: unknown })['@type'] === 'BreadcrumbList'
+        )
+          nodes.push(parsed as Record<string, unknown>);
+      }
+      expect(nodes.length, `one BreadcrumbList on ${path}`).toBe(1);
+      return nodes[0] as {
+        itemListElement: Array<{ position: number; name: string; item: string }>;
+      };
+    };
+
+    // A guide: Home → Get started (its group landing) → the guide.
+    const guide = await readCrumbs('/guides/theming/');
+    expect(guide.itemListElement.map((entry) => entry.name)).toEqual([
+      'Home',
+      'Get started',
+      'Theming',
+    ]);
+
+    // A component page: Home → Components → the page (its family heading has
+    // no href, so it cannot be a breadcrumb entry).
+    const button = await readCrumbs('/component-pages/button/');
+    expect(button.itemListElement.map((entry) => entry.name)).toEqual([
+      'Home',
+      'Components',
+      'Button',
+    ]);
+
+    // Every entry: contiguous positions, an absolute https item URL, and the
+    // last item names the page itself.
+    for (const crumbs of [guide, button]) {
+      crumbs.itemListElement.forEach((entry, index) => {
+        expect(entry.position).toBe(index + 1);
+        expect(entry.item).toMatch(/^https:\/\/texuli\.com\//);
+      });
+      expect(crumbs.itemListElement.at(-1)?.item).toMatch(/\/$/);
+    }
+
+    // The landing has no parent chain: no BreadcrumbList there.
+    await page.goto(`${origin}/`);
+    const homeBlocks = await page
+      .locator('head script[type="application/ld+json"]')
+      .allTextContents();
+    for (const block of homeBlocks) expect(block).not.toContain('"BreadcrumbList"');
+  });
 
   test('an unknown path gets the 404 page: noindex, no canonical, links home', async ({ page }) => {
     const { foreign, status } = await visit(page, '/no-such-page/');

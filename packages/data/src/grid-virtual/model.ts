@@ -53,7 +53,7 @@ export function virtualGridWindow(
 export function moveVirtualCell(
   position: VirtualCellPosition,
   key: string,
-  options: { rows: number; columns: number; pageSize: number; rtl?: boolean }
+  options: { rows: number; columns: number; pageSize: number; rtl?: boolean; ctrl?: boolean }
 ): VirtualCellPosition | null {
   const rowMax = Math.max(0, Math.floor(options.rows) - 1);
   const colMax = Math.max(0, Math.floor(options.columns) - 1);
@@ -73,8 +73,9 @@ export function moveVirtualCell(
   if (horizontal) next = { row, col: Math.max(0, Math.min(colMax, col + horizontal)) };
   else if (key === 'ArrowDown') next = { row: Math.min(rowMax, row + 1), col };
   else if (key === 'ArrowUp') next = { row: Math.max(0, row - 1), col };
-  else if (key === 'Home') next = { row, col: 0 };
-  else if (key === 'End') next = { row, col: colMax };
+  // With Ctrl (or Cmd), Home and End go to the grid's corners, as in moveCell.
+  else if (key === 'Home') next = options.ctrl ? { row: 0, col: 0 } : { row, col: 0 };
+  else if (key === 'End') next = options.ctrl ? { row: rowMax, col: colMax } : { row, col: colMax };
   else if (key === 'PageDown')
     next = { row: Math.min(rowMax, row + Math.max(1, options.pageSize)), col };
   else if (key === 'PageUp') next = { row: Math.max(0, row - Math.max(1, options.pageSize)), col };

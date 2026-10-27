@@ -30,6 +30,7 @@ export interface VideoPlayerLabels {
   captions: string;
   captionsOff: string;
   captionTrack: string;
+  captionsUnavailable: string;
   chapters: string;
   transcript: string;
   chapterAnnouncement: string;

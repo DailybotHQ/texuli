@@ -2,9 +2,12 @@
 
 Every workspace package, its layer and its public entries. Layers point down
 only: a package imports only from lower layers (the repository's
-`scripts/check-layers.ts` enforces it). **Every package is private and
-source-first. Nothing is on npm**, so import these in a Texuli workspace or
-copy components with the CLI ([`../components/SKILL.md`](../components/SKILL.md)).
+`scripts/check-layers.ts` enforces it). **All 15 packages are on npm as
+`0.1.0-next.1` under the `next` dist-tag** (published by CI with provenance;
+no stable release, `latest` is reserved for 1.0.0; the workspace packages
+stay `private: true`), so install them with `@next`, import them in a Texuli
+workspace, or copy components with the CLI
+([`../components/SKILL.md`](../components/SKILL.md)).
 
 This table is derived from each `packages/*/package.json` `exports` map and the
 `LAYERS` map in `scripts/check-layers.ts`. Long entry lists are cut after 14;
@@ -29,9 +32,9 @@ read the package's `package.json` for the rest.
 | L8 | `@texuli/tools` | Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. | `@texuli/tools`, `@texuli/tools/a2ui`, `@texuli/tools/cli-add`, `@texuli/tools/cli-init`, `@texuli/tools/cli-update`, `@texuli/tools/llms`, `@texuli/tools/elements`, `@texuli/tools/golden` |
 
 Apps that consume the packages (not layers):
-- `apps/website`: texuli.com, built with Astro 7 and Svelte islands. It is not
-  deployed. It hosts the playground, the blueprint builder (`/builder/`) and
-  the agent chat (`/agent-chat/`).
+- `apps/website`: texuli.com, built with Astro 7 and Svelte islands. It
+  deploys from `main` to Cloudflare Pages. It hosts the playground, the
+  blueprint builder (`/builder/`) and the agent chat (`/agent-chat/`).
 - `apps/agent` (`@texuli/agent`): the agent service. It is not deployed and
   has no real model provider (see [`../blueprints/SKILL.md`](../blueprints/SKILL.md)).
 

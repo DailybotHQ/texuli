@@ -79,6 +79,11 @@ const columns: DataGridColumn<Deal>[] = [
 let sort = $state([{ key: 'amountCents', direction: 'desc' as const }]);
 let selected = $state<string[]>(['d2']);
 const openOnly = { type: 'condition', field: 'stage', operator: 'eq', value: 'Open' };
+const virtualDeals = Array.from({ length: 80 }, (_, index) => {
+  const source = deals[index % deals.length];
+  if (!source) throw new Error('The fictional deal sample is empty.');
+  return { ...source, id: `virtual-${index + 1}`, name: `${source.name} · ${index + 1}` };
+});
 
 const arabicColumns: DataGridColumn<Deal>[] = [
   { key: 'name', header: 'الصفقة', type: 'text' },
@@ -120,6 +125,17 @@ const arabicColumns: DataGridColumn<Deal>[] = [
     caption="Open deals"
     filter={openOnly}
     density="compact"
+  />
+
+  <h3>Windowed rows</h3>
+  <p>80 fictional rows with virtualization enabled after 20 visible records.</p>
+  <DataGrid
+    rows={virtualDeals}
+    {columns}
+    getRowId={(deal) => deal.id}
+    caption="Windowed deals"
+    virtualizeAbove={20}
+    maxBlockSize="14rem"
   />
 
   <h3>Right to left</h3>

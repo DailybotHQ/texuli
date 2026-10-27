@@ -70,6 +70,12 @@
     outline: none;
   }
 
+  /* Skip link focuses main (tabindex="-1"); keep a keyboard-visible ring. */
+  .tx-app-shell__main:focus-visible {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 4px;
+  }
+
   .tx-app-shell__main[data-bottom-nav] {
     padding-block-end: 5rem;
   }
@@ -108,6 +114,21 @@
 
     .tx-app-shell__bottom-nav {
       display: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tx-app-shell__command-bar {
+      border-block-end-color: CanvasText;
+    }
+
+    .tx-app-shell__skip:focus {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .tx-app-shell__main:focus-visible {
+      outline-color: Highlight;
     }
   }
 }

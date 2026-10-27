@@ -89,6 +89,8 @@ There is no selection column; `DataGrid` has one.
   - A group that reordering or pinning splits shows its header over each part.
   - Columns outside every group get an empty spacer.
   - The group row is not part of the keyboard grid.
+  - With a capped height, both rows stick; keyboard-scrolled rows stop below
+    the pair (scroll padding), not under the second one.
 - **Announcements:** moves ("Deal moved to position 2 of 7"), pins, widths,
   hides and shows are announced in a polite live region.
 - **Focus:** after a menu action or a drag, focus stays on the column's
@@ -138,7 +140,7 @@ grid-core's model; grid-core alone measures 10.63 KiB.
 ## Verified
 
 - **Unit tests:** `pnpm vitest run packages/data/tests/grid-columns.test.ts`
-  has 20 tests.
+  has 23 tests.
   - Model: state validation, completion, zone-aware moves, resize bounds and
     reset, pin offsets and `pinsFit`, group runs, drop targets including RTL,
     and the last-column guard.
@@ -147,6 +149,9 @@ grid-core's model; grid-core alone measures 10.63 KiB.
     and hide, focus following the column, the chooser, pointer resize
     (including RTL), drag reorder without sorting, keyboard navigation of the
     new order, search over visible columns only, and narrow-grid pins.
+  - Cohesion and sticky chrome: vector (SVG) sort indicators like grid-core's,
+    and grouped grids marked so keyboard scroll padding clears both sticky
+    header rows.
   - 11 deliberate code breaks each fail a test.
 - **Real browsers:** a scratch Playwright spec on Chromium, WebKit and Pixel 7
   (lane N port 4950, not committed) passed:

@@ -16,7 +16,7 @@
 
   .tx-captions[data-status="blocked"],
   .tx-captions[data-status="error"] {
-    border-color: var(--tx-destructive, crimson);
+    border-color: var(--tx-destructive, Mark);
   }
 
   .tx-captions__active {

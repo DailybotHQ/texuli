@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { Worker } from 'node:worker_threads';
 import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_TREE_LIMITS,
@@ -46,6 +47,13 @@ function wide(count: number): Record<string, unknown> {
   };
 }
 
+/** A props value nested `levels` deep (iteratively built, as JSON.parse would deliver it). */
+function deepValue(levels: number): unknown {
+  let value: unknown = 'end';
+  for (let i = 0; i < levels; i += 1) value = [value];
+  return value;
+}
+
 describe('measureCatalogTree', () => {
   it('counts depth, nodes, branching and roots', () => {
     const { metrics } = measureCatalogTree(chain(4));
@@ -72,6 +80,18 @@ describe('measureCatalogTree', () => {
     const { metrics, snapshot } = measureCatalogTree(tree);
     expect(metrics.bytes).toBe(utf8ByteLength(snapshot));
     expect(snapshot).toContain('caf');
+  });
+
+  it('measures a value nested far past any limit without overflowing the stack', () => {
+    const tree = { id: 'card', props: { title: 'bomb', data: deepValue(100_000) } };
+    const { metrics, diagnostics } = measureCatalogTree(tree);
+    expect(metrics.nodes).toBe(1);
+    expect(diagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
+  });
+
+  it('caps the snapshot depth so byte measurement itself cannot recurse without bound', () => {
+    const { snapshot } = measureCatalogTree({ id: 'card', props: { data: deepValue(100_000) } });
+    expect(snapshot.length).toBeLessThan(10_000);
   });
 });
 
@@ -160,6 +180,14 @@ describe('renderCatalogTreeWithLimits', () => {
       expect(result.roots[0].children).toHaveLength(3);
     }
   });
+
+  it('survives a value nested far past any limit: the limits gate refuses, nothing renders', () => {
+    const tree = { id: 'card', props: { title: 'bomb', data: deepValue(100_000) } };
+    const result = renderCatalogTreeWithLimits(tree, { catalog, tier: 'untrusted' });
+    expect(result.withinLimits).toBe(false);
+    expect(result.roots).toEqual([]);
+    expect(result.limitDiagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
+  });
 });
 
 describe('render time budget (perf-gated)', () => {
@@ -182,5 +210,78 @@ describe('render time budget (perf-gated)', () => {
       expect(result.limitDiagnostics.some((d) => d.code === 'time-exceeded')).toBe(true);
       expect(result.roots).toEqual([]);
     }
+  });
+});
+
+describe('cyclic values', () => {
+  /**
+   * Measure a cyclic tree in a worker with a small heap and a deadline, so a
+   * measurer that loops on the cycle fails this test quickly instead of
+   * exhausting the test runner's heap.
+   */
+  function measureCyclicInWorker(): Promise<{ codes: string[]; ok: boolean }> {
+    const measureUrl = new URL('../src/render/limits/validate.ts', import.meta.url).href;
+    const source = `
+      import { parentPort } from 'node:worker_threads';
+      const { validateCatalogTreeLimits } = await import(${JSON.stringify(measureUrl)});
+      const tree = { id: 'card', props: { title: 'loop', data: { items: [] } } };
+      tree.props.data.items.push(tree);
+      const result = validateCatalogTreeLimits(tree);
+      parentPort.postMessage({ codes: result.diagnostics.map((d) => d.code), ok: result.ok });
+    `;
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(new URL(`data:text/javascript,${encodeURIComponent(source)}`), {
+        resourceLimits: { maxOldGenerationSizeMb: 64 },
+      });
+      const deadline = setTimeout(() => {
+        void worker.terminate();
+        reject(new Error('Measuring a cyclic tree did not finish within 5 seconds.'));
+      }, 5_000);
+      worker.once('message', (message) => {
+        clearTimeout(deadline);
+        void worker.terminate();
+        resolve(message as { codes: string[]; ok: boolean });
+      });
+      worker.once('error', (error) => {
+        clearTimeout(deadline);
+        reject(error);
+      });
+    });
+  }
+
+  it('refuses a cyclic tree with a value-cycle diagnostic instead of exhausting the heap', async () => {
+    const result = await measureCyclicInWorker();
+    expect(result.ok).toBe(false);
+    expect(result.codes).toContain('value-cycle');
+  });
+
+  it('refuses a cyclic tree at the render gate: nothing renders', () => {
+    const tree: Record<string, unknown> = { id: 'card', props: { title: 'loop' } };
+    (tree.props as Record<string, unknown>).self = tree;
+    const result = renderCatalogTreeWithLimits(tree, { catalog, tier: 'untrusted' });
+    expect(result.withinLimits).toBe(false);
+    expect(result.roots).toEqual([]);
+    expect(result.limitDiagnostics.some((d) => d.code === 'value-cycle')).toBe(true);
+  });
+
+  it('accepts a value shared by two props (a repeated reference is not a cycle)', () => {
+    const shared = { label: 'Shared' };
+    const tree = { id: 'card', props: { title: 'twice', first: shared, second: shared } };
+    const { diagnostics } = measureCatalogTree(tree);
+    expect(diagnostics.some((d) => d.code === 'value-cycle')).toBe(false);
+    expect(validateCatalogTreeLimits(tree).ok).toBe(true);
+  });
+
+  it('measures a shared value at its deepest reference, so sharing never hides depth', () => {
+    const shared = deepValue(100);
+    // Walked last-in first-out: `shallow` (depth 3) expands first, then the
+    // same value under `deep` sits 40 levels lower, past the 128 limit.
+    const tree = { id: 'card', props: { deep: deepValue(40), shallow: shared } };
+    let cursor = tree.props.deep as unknown[];
+    while (Array.isArray(cursor[0])) cursor = cursor[0] as unknown[];
+    cursor[0] = shared;
+    const { diagnostics } = measureCatalogTree(tree);
+    expect(diagnostics.some((d) => d.code === 'value-depth-exceeded')).toBe(true);
+    expect(diagnostics.some((d) => d.code === 'value-cycle')).toBe(false);
   });
 });

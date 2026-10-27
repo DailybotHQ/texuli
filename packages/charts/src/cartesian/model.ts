@@ -57,6 +57,7 @@ export function assertCartesianSeries(series: readonly CartesianSeries[]): void 
     const xs = points.map((point) => point.x);
     if (!sameType(xs))
       throw new TypeError(`Series "${item.id}" cannot mix category and numeric x values.`);
+    const seenX = new Set<number | string>();
     for (const [pointIndex, point] of item.points.entries()) {
       if (
         (typeof point.x !== 'string' && !Number.isFinite(point.x)) ||
@@ -65,6 +66,12 @@ export function assertCartesianSeries(series: readonly CartesianSeries[]): void 
       ) {
         throw new TypeError(`Series "${item.id}" point ${pointIndex} must contain finite values.`);
       }
+      if (seenX.has(point.x)) {
+        throw new TypeError(
+          `Series "${item.id}" has a duplicate x value ${JSON.stringify(point.x)} at point ${pointIndex}; aggregate repeated measurements before charting them.`
+        );
+      }
+      seenX.add(point.x);
     }
   }
   const kinds = new Set(

@@ -470,7 +470,7 @@ export function parseInlineData(
               o: {
                 'id!': 'token',
                 'label!': 'text',
-                'points!': { a: { o: { 'x!': 'textnum', 'y!': 'num?' } }, m: 1 },
+                'points!': { a: { o: { 'x!': 'textnum', 'y!': 'num?' } }, u: 'x', m: 1 },
                 color: 'color',
               },
             },
@@ -478,7 +478,16 @@ export function parseInlineData(
             n: 8,
             m: 1,
           };
-  return parseValue(spec, value, path, { nodes: 0 }, 0);
+  const parsed = parseValue(spec, value, path, { nodes: 0 }, 0);
+  if (!parsed.success || kind === 'heatmap' || kind === 'scatter' || kind === 'bubble') {
+    return parsed;
+  }
+  // Match the cartesian renderer's chart-wide category/numeric x domain.
+  const series = parsed.data as readonly {
+    readonly points: readonly { readonly x: string | number }[];
+  }[];
+  const xType = typeof series[0]?.points[0]?.x;
+  return series.some((s) => s.points.some((p) => typeof p.x !== xType)) ? fail(path, 'x') : parsed;
 }
 
 export function isExtendedChartKind(kind: string): kind is ExtendedChartKind {

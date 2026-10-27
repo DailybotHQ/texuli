@@ -112,6 +112,8 @@ export function validateCatalogTreeLimits(
   const budgetCodes = new Set([
     'roots-exceeded',
     'depth-exceeded',
+    'value-depth-exceeded',
+    'value-cycle',
     'nodes-exceeded',
     'bytes-exceeded',
     'branching-exceeded',

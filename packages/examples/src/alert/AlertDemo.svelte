@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ALERT_TONES, Alert, type AlertTone, Banner, Callout } from 'texuli/alert';
+import { ALERT_TONES, Alert, AlertSurface, type AlertTone, Banner, Callout } from 'texuli/alert';
 import { scopedTheme } from '../scoped-theme.ts';
 
 let dismissed = $state(false);
@@ -59,6 +59,16 @@ const toneTitle: Record<AlertTone, string> = {
   <section>
     <h2>Callout</h2>
     <Callout tone="brand" title="Design tip" text="Prefer logical properties for padding and borders." />
+  </section>
+
+  <section>
+    <h2>Custom alert surface layout</h2>
+    <AlertSurface
+      layout="callout"
+      tone="success"
+      title="Export prepared"
+      text="The fictional workspace export is ready in this browser session."
+    />
   </section>
 
   <section>

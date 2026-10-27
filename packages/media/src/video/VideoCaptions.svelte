@@ -127,10 +127,12 @@ $effect(() => {
   const doc = getOwnerDocument(root);
   if (!doc) return;
   try {
-    getAnnouncer(doc, { inertRegistry: null, politeDebounceMs: 0 }).announce(
-      `${chapterAnnouncement} ${current.title}`.trim(),
-      'polite'
-    );
+    // Shared page announcer (default inert exemptions). immediate bypasses
+    // polite debounce so chapter titles re-announce without poisoning options.
+    getAnnouncer(doc).announce(`${chapterAnnouncement} ${current.title}`.trim(), {
+      politeness: 'polite',
+      immediate: true,
+    });
   } catch {
     // Announcer is optional when the document is incomplete.
   }

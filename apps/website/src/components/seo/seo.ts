@@ -51,19 +51,83 @@ export function escapeXml(text: string): string {
   return text.replace(XML_FORBIDDEN, '').replace(/[&<>"']/g, (char) => XML_ESCAPES[char] ?? char);
 }
 
-/** A `sitemap.xml` for absolute page URLs, sorted, without duplicates. */
-export function buildSitemap(urls: readonly string[], lastmod?: string): string {
-  const unique = [...new Set(urls)].sort();
-  const entries = unique.map(
-    (url) =>
-      `  <url>\n    <loc>${escapeXml(url)}</loc>${lastmod ? `\n    <lastmod>${escapeXml(lastmod)}</lastmod>` : ''}\n  </url>`
-  );
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;
+export interface SitemapEntry {
+  loc: string;
+  /** W3C date (`YYYY-MM-DD`) of the page's last source change. */
+  lastmod?: string;
 }
 
-/** `robots.txt`: allow everything, point at the sitemap. */
+const W3C_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * A `sitemap.xml` for absolute page URLs — optionally with per-page lastmod
+ * dates (an entry without one, or a bare string, omits the element) — sorted,
+ * without duplicates. An invalid date fails the build: a sitemap that lies to
+ * crawlers is worse than one that says less.
+ */
+export function buildSitemap(entries: readonly (string | SitemapEntry)[]): string {
+  const unique = new Map<string, string | undefined>();
+  for (const item of entries) {
+    const entry: SitemapEntry = typeof item === 'string' ? { loc: item } : item;
+    if (entry.lastmod !== undefined && !W3C_DATE.test(entry.lastmod))
+      throw new Error(`invalid lastmod "${entry.lastmod}" for ${entry.loc}`);
+    if (!unique.has(entry.loc)) unique.set(entry.loc, entry.lastmod);
+  }
+  const urls = [...unique.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(
+      ([loc, lastmod]) =>
+        `  <url>\n    <loc>${escapeXml(loc)}</loc>${lastmod ? `\n    <lastmod>${escapeXml(lastmod)}</lastmod>` : ''}\n  </url>`
+    );
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;
+}
+
+/**
+ * AI/LLM crawlers explicitly allowed in robots.txt: the docs, the markdown
+ * twins and the agent catalog exist to be read by agents. The list follows
+ * the deepworkplan.com policy (the reference set from the SEO audit).
+ */
+export const AI_CRAWLERS = [
+  'GPTBot',
+  'ChatGPT-User',
+  'ClaudeBot',
+  'anthropic-ai',
+  'Google-Extended',
+  'Bytespider',
+  'CCBot',
+  'PerplexityBot',
+  'Applebot-Extended',
+  'Amazonbot',
+  'Meta-ExternalAgent',
+  'cohere-ai',
+  'OAI-SearchBot',
+  'DeepSeekBot',
+  'Claude-SearchBot',
+  'Perplexity-User',
+] as const;
+
+/**
+ * `robots.txt`: default allow, the sitemap, and explicit AI-crawler allows.
+ * No `Content-Signal` yet: that is a per-user-agent response header, which a
+ * static file cannot serve — it waits for the request-time rewrite.
+ */
 export function buildRobots(sitemapUrl: string): string {
-  return `User-agent: *\nAllow: /\n\nSitemap: ${sitemapUrl}\n`;
+  const lines = [
+    '# robots.txt for Texuli',
+    '# https://texuli.com',
+    '',
+    '# Default: every crawler may crawl everything public.',
+    'User-agent: *',
+    'Allow: /',
+    '',
+    `Sitemap: ${sitemapUrl}`,
+    '',
+    '# AI/LLM crawlers: explicitly welcome. Content-Signal needs per-agent',
+    '# responses (request-time middleware, planned); a static file cannot',
+    '# vary by user agent.',
+  ];
+  for (const crawler of AI_CRAWLERS) lines.push('', `User-agent: ${crawler}`, 'Allow: /');
+  return `${lines.join('\n')}\n`;
 }
 
 const ENTITIES: Record<string, string> = {
@@ -137,13 +201,67 @@ export interface OgImageInput {
   /** Shown in the footer, e.g. `texuli.com/guides/theming`. */
   url: string;
   siteName: string;
+  /** Area badge and accent (T-21); omitted = brand-only card. */
+  area?: OgArea;
+}
+
+/** One site area's share-art identity: a badge label and its accent. */
+export interface OgArea {
+  /** Badge text, uppercased in the art; empty = no badge. */
+  label: string;
+  accent: string;
+}
+
+/**
+ * The area a route belongs to (T-21) — the share art says where a link
+ * lands. Labels are section names, not claims: no metrics, no invented
+ * numbers. Areas that do not exist yet (native, architecture) are mapped
+ * ahead of the sub-site scaffold.
+ */
+const OG_AREAS: readonly (readonly [prefix: string, area: OgArea])[] = [
+  ['/native/', { label: 'Native', accent: '#fb923c' }],
+  ['/web-and-native/', { label: 'Architecture', accent: '#22d3ee' }],
+  ['/architecture/', { label: 'Architecture', accent: '#22d3ee' }],
+  ['/primitives-page/', { label: 'Primitives', accent: '#a78bfa' }],
+  ['/guides/', { label: 'Guides', accent: '#34d399' }],
+  ['/skill/', { label: 'Guides', accent: '#34d399' }],
+  ['/foundation/', { label: 'Guides', accent: '#34d399' }],
+  ['/component-pages/', { label: 'Components', accent: '#60a5fa' }],
+  ['/blocks-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/charts-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/media-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/gallery-components/', { label: 'Components', accent: '#60a5fa' }],
+  ['/examples/', { label: 'Components', accent: '#60a5fa' }],
+  ['/slides-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/editor-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/gallery-themes/', { label: 'Themes', accent: '#fbbf24' }],
+  ['/theme-switcher/', { label: 'Themes', accent: '#fbbf24' }],
+  ['/theme-studio/', { label: 'Themes', accent: '#fbbf24' }],
+  ['/color-explorer/', { label: 'Themes', accent: '#fbbf24' }],
+  ['/agents-page/', { label: 'Agents', accent: '#f472b6' }],
+  ['/playground/', { label: 'Agents', accent: '#f472b6' }],
+  ['/builder/', { label: 'Agents', accent: '#f472b6' }],
+  ['/agent-chat/', { label: 'Agents', accent: '#f472b6' }],
+  ['/brand/', { label: 'Project', accent: '#94a3b8' }],
+  ['/showcase/', { label: 'Project', accent: '#94a3b8' }],
+  ['/evidence/', { label: 'Project', accent: '#94a3b8' }],
+  ['/perf/', { label: 'Project', accent: '#94a3b8' }],
+  ['/changelog/', { label: 'Project', accent: '#94a3b8' }],
+];
+
+export function ogAreaFor(path: string): OgArea {
+  const page = normalizePagePath(path);
+  for (const [prefix, area] of OG_AREAS) if (page.startsWith(prefix)) return area;
+  return { label: '', accent: '#60a5fa' };
 }
 
 /**
  * The social image as SVG (1200 × 630). Every text is XML-escaped; the
  * colors pass WCAG AA on their backgrounds (white and slate on near-black).
+ * An area adds a top-right badge in the area accent and tints the footer
+ * rule with it.
  */
-export function ogImageSvg({ title, description, url, siteName }: OgImageInput): string {
+export function ogImageSvg({ title, description, url, siteName, area }: OgImageInput): string {
   const titleLines = wrapText(title, 28, 3);
   const descriptionLines = wrapText(description, 58, 3);
   const titleStart = 250;
@@ -153,6 +271,15 @@ export function ogImageSvg({ title, description, url, siteName }: OgImageInput):
     lines
       .map((line, i) => `<tspan x="${x}" y="${y + i * step}">${escapeXml(line)}</tspan>`)
       .join('');
+  const accent = area?.accent ?? '#60a5fa';
+  // Badge: uppercased label in an accent pill, right-aligned with the margin.
+  const badgeLabel = area?.label.toUpperCase() ?? '';
+  const badgeWidth = badgeLabel.length * 18 + 48;
+  const badgeX = OG_IMAGE_WIDTH - 80 - badgeWidth;
+  const badge = badgeLabel
+    ? `<rect x="${badgeX}" y="96" width="${badgeWidth}" height="56" rx="14" fill="${accent}"/>
+  <text x="${badgeX + badgeWidth / 2}" y="133" text-anchor="middle" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="2" fill="#0b1220">${escapeXml(badgeLabel)}</text>`
+    : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" viewBox="0 0 ${OG_IMAGE_WIDTH} ${OG_IMAGE_HEIGHT}">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -161,12 +288,13 @@ export function ogImageSvg({ title, description, url, siteName }: OgImageInput):
     </linearGradient>
   </defs>
   <rect width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" fill="url(#bg)"/>
-  <rect x="80" y="96" width="56" height="56" rx="14" fill="#60a5fa"/>
+  <rect x="80" y="96" width="56" height="56" rx="14" fill="${accent}"/>
   <rect x="96" y="112" width="24" height="24" rx="6" fill="#0b1220"/>
   <text x="156" y="138" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="38" font-weight="700" fill="#ffffff">${escapeXml(siteName)}</text>
+  ${badge}
   <text font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#ffffff">${tspans(titleLines, 80, titleStart, titleLineHeight)}</text>
   <text font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="30" fill="#cbd5e1">${tspans(descriptionLines, 80, descriptionStart, 42)}</text>
-  <rect x="80" y="548" width="1040" height="2" fill="#334155"/>
+  <rect x="80" y="548" width="1040" height="2" fill="${accent}"/>
   <text x="80" y="590" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" fill="#93c5fd">${escapeXml(url)}</text>
 </svg>`;
 }

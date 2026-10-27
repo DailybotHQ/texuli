@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { OverlayDismissEvent } from '@texuli/core/overlay';
 import type { PortalTarget } from '@texuli/core/portal';
 import * as AlertDialogPrimitive from '@texuli/primitives/alert-dialog';
 import type { Snippet } from 'svelte';
@@ -85,6 +86,15 @@ function setOpen(next: boolean): void {
   onOpenChange?.(next);
 }
 
+/**
+ * While the confirm is pending the dialog must not dismiss: the primitive
+ * closes itself on Escape, so this veto is the only place the pending guard
+ * still holds (the Cancel control and backdrop are already inert).
+ */
+function handleDismiss(event: OverlayDismissEvent): void {
+  if (pending) event.preventDefault();
+}
+
 async function confirm(event: MouseEvent): Promise<void> {
   // Keep the primitive Action from closing before async work finishes.
   event.preventDefault();
@@ -108,7 +118,7 @@ function cancel(): void {
 }
 </script>
 
-<AlertDialogPrimitive.Root bind:open onOpenChange={setOpen}>
+<AlertDialogPrimitive.Root bind:open onOpenChange={setOpen} onDismissRequest={handleDismiss}>
   {#if trigger}
     <AlertDialogPrimitive.Trigger>
       {#snippet child({ props })}

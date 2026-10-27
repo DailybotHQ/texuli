@@ -6,7 +6,10 @@ vocabulary, capability tiers and diagnostics. TypeScript and Kotlin are
 deterministic projections generated from it, and a conformance harness keeps
 everything from drifting.
 
-**Status: in development, not published.** Layer 0, no dependencies,
+**Status: in development.** Published to npm as `0.1.0-next.1` under the `next`
+dist-tag (by CI, with provenance); no stable release (`latest` is reserved
+for 1.0.0), so install it with `@next`. The workspace package stays
+`"private": true`. Layer 0, no dependencies,
 framework-free. Kotlin is generated as committed text by this package's
 TypeScript generator; no Kotlin toolchain runs here, and nothing is compiled
 or published to Maven.

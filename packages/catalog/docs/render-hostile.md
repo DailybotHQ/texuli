@@ -26,6 +26,7 @@ render **inert** through the sink-free pipeline:
 | Oversized | Long strings and keys past the byte limit, hundreds of unknown props |
 | Duplicate keys | Raw JSON where the last `href` or `id` wins (a script link, a chrome id) |
 | URL tricks | Tab- and newline-split schemes, mixed case, protocol-relative, a developer-only relative link, credentials before the host, an SVG data image, a script URL deep in chart data |
+| Image candidate sets | Every `srcset` candidate and its descriptor passes `safeImageSrcset` at the untrusted tier; one refused candidate drops the whole prop before host-facing paint |
 
 A sample is a `tree`, a `richtext` string, or raw JSON `text` for shapes a JS
 object cannot hold (own `__proto__` keys, duplicate keys).

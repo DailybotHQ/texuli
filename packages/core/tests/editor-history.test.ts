@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { deleteBackward, insertText, splitBlock } from '../src/editor/edit.ts';
+import { deleteBackward, insertText, splitBlock, toggleMark } from '../src/editor/edit.ts';
 import {
   canRedo,
   canUndo,
@@ -90,6 +90,16 @@ describe('editor history', () => {
     expect(history.errors[0]?.code).toBe('nothing-to-do');
     expect(canUndo(history)).toBe(false);
     expect(editorHistoryReducer(history, { type: 'undo' })).toBe(history);
+  });
+
+  it('does not create an undo step when a caret mark toggle leaves the document unchanged', () => {
+    let history = createEditorHistory(start());
+    history = editorHistoryReducer(history, {
+      type: 'apply',
+      result: toggleMark(history.present, 'strong'),
+    });
+    expect(canUndo(history)).toBe(false);
+    expect(history.present.storedMarks).toEqual([{ type: 'strong' }]);
   });
 
   it('keeps at most `limit` snapshots, and restarts on replace', () => {

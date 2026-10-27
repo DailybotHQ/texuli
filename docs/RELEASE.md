@@ -8,8 +8,13 @@ the intended process; it does not publish packages or grant release authority.
 All 15 packable packages are published to npm as `0.1.0-next.1` under the
 `next` dist-tag (2026-10-25, publish workflow run
 https://github.com/DailybotHQ/texuli/actions/runs/40238083612, from the
-verified tarballs with signed provenance). The `latest` dist-tag stays on
-`0.1.0-next.0` and is reserved for the 1.0.0 stable release. Workspace
+verified tarballs with signed provenance). Observed registry state on
+2026-10-26: `npm view texuli dist-tags` prints
+`{ latest: '0.1.0-next.0', next: '0.1.0-next.1' }` (the same for
+`@texuli/core` and `@texuli/slides`), so `latest` still resolves to the
+first upload, `0.1.0-next.0`, and a bare install gets that version; install
+the previews with `@next`. By policy `latest` is reserved for the 1.0.0
+stable release (see the dist-tag rules below). Workspace
 manifests remain `private: true`; the previews are not approved for
 general use, and every future version and wave requires a fresh, explicit
 developer GO. Publishing never overwrites a published version.
@@ -48,8 +53,9 @@ default.
   version. It moves only with a new version and a fresh GO.
 - **`latest`** is npm's default install tag and is reserved for the first
   supported stable release. It is first used when an owner-approved `1.0.0`
-  release has completed its compatibility, support, and release gates. It is
-  not used for the current `0.1.0-next.0` name reservations or any `0.x` line.
+  release has completed its compatibility, support, and release gates. No
+  `0.x` release is ever tagged `latest`; where it resolves today is recorded
+  under [Current npm status](#current-npm-status).
 - Dailybot v4 and other production consumers must pin exact package versions
   in their manifests and lockfiles. They must not rely on a moving dist-tag;
   `next` is for deliberate preview integration only.

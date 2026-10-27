@@ -29,6 +29,12 @@ interface Props {
   emptyText?: string;
   locale?: string;
   labels?: Partial<MessageListLabels>;
+  /** Accessible name for the message log; forwarded to the list. */
+  label?: string;
+  /** Virtualization threshold forwarded to the list; `Infinity` renders every row. */
+  virtualizeAfter?: number;
+  /** Rows rendered beyond the view, forwarded to the list. */
+  overscan?: number;
   class?: ClassValue;
 }
 
@@ -48,13 +54,26 @@ let {
   emptyText,
   locale,
   labels,
+  label,
+  virtualizeAfter,
+  overscan,
   class: className,
 }: Props = $props();
 </script>
 
 <section class={cx('tx-chat-thread', className)} data-tx-chat-thread>
   {@render header?.()}
-  <MessageList {messages} {currentUserId} {body} {emptyText} {locale} {labels}>
+  <MessageList
+    {messages}
+    {currentUserId}
+    {body}
+    {emptyText}
+    {locale}
+    {labels}
+    {label}
+    {virtualizeAfter}
+    {overscan}
+  >
     {#snippet footer()}
       <TypingIndicator names={typing} class="tx-chat-thread__typing" />
     {/snippet}

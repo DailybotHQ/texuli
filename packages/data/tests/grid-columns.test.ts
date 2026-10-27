@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import type { Component } from 'svelte';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
@@ -223,6 +225,19 @@ describe('ColumnGrid', () => {
   // a slow first transform under the parallel suite never meets a test wait.
   beforeAll(async () => {
     await import('../src/grid-columns/ColumnMenu.svelte');
+  });
+
+  it('renders deterministic vector sort indicators instead of font-dependent glyphs', () => {
+    render(TypedColumnGrid, {
+      props: { rows, columns, getRowId: (r: Row) => r.id, caption: 'Deals' },
+    });
+    const icon = document.querySelector('.tx-data-grid__sort-icon');
+
+    // Sibling DataGrid sets the bar (grid-core.test.ts): the direction marker
+    // is drawn by the stylesheet's own SVG paths, never by a font glyph that
+    // varies (or turns into emoji) across platforms.
+    expect(icon?.querySelector('svg[aria-hidden="true"] path')).toBeTruthy();
+    expect(icon?.textContent?.trim()).toBe('');
   });
 
   it('renders the state: order, widths, pins and group headers', () => {
@@ -527,5 +542,37 @@ describe('ColumnGrid', () => {
       },
     });
     expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('marks grouped grids so keyboard scrolling can clear both sticky header rows', () => {
+    // A focused body row must stop below the group row AND the column header
+    // row (5rem of sticky chrome), not under the second one.
+    const plain = render(TypedColumnGrid, {
+      props: { rows, columns, getRowId: (r: Row) => r.id, caption: 'Deals' },
+    });
+    expect(
+      (plain.container.querySelector('[data-tx-grid-columns]') as HTMLElement).hasAttribute(
+        'data-grouped'
+      )
+    ).toBe(false);
+    plain.unmount();
+    const grouped = render(TypedColumnGrid, {
+      props: { rows, columns, getRowId: (r: Row) => r.id, caption: 'Deals', groups },
+    });
+    expect(
+      (grouped.container.querySelector('[data-tx-grid-columns]') as HTMLElement).hasAttribute(
+        'data-grouped'
+      )
+    ).toBe(true);
+  });
+
+  it('doubles the sticky scroll padding on grouped grids in the stylesheet', () => {
+    const css = readFileSync(
+      join(process.cwd(), 'packages/data/src/grid-columns/grid-columns.css'),
+      'utf8'
+    );
+    expect(css).toMatch(
+      /\.tx-grid-columns\[data-grouped\] \.tx-table-wrap--sticky \{[^}]*scroll-padding-block-start: 5rem;/
+    );
   });
 });

@@ -38,13 +38,17 @@ const days = $derived.by(() =>
     return { date, items: eventsOnDate(items, date, timeZone) };
   })
 );
+// Day heading ids carry the instance id, so two calendars on one page never
+// share them (a duplicated id would label every section with the first one's
+// headings).
+const uid = $props.id();
 </script>
 
 <div class="tx-calendar__agenda" data-agenda>
   {#if days.every((day) => day.items.length === 0)}<p class="tx-calendar__empty">{labels.empty}</p>{/if}
   {#each days as day (day.date)}
-    <section class="tx-calendar__agenda-day" aria-labelledby={`calendar-agenda-${day.date}`}>
-      <h3 id={`calendar-agenda-${day.date}`} class="tx-calendar__agenda-heading">
+    <section class="tx-calendar__agenda-day" aria-labelledby={`${uid}-agenda-${day.date}`}>
+      <h3 id={`${uid}-agenda-${day.date}`} class="tx-calendar__agenda-heading">
         <button
           type="button"
           data-calendar-date={day.date}

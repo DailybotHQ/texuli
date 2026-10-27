@@ -158,6 +158,9 @@ describe('Enter', () => {
 describe('Backspace and Delete', () => {
   it('deletes graphemes, words and lines', () => {
     expect(text(ok(deleteBackward(at(md('a👨\u200d👩\u200d👧'), 0, 9))))).toBe('a');
+    const flag = '🇨🇴';
+    expect(text(ok(deleteBackward(at(md(`a${flag}`), 0, 1 + flag.length))))).toBe('a');
+    expect(text(ok(deleteForward(at(md(`a${flag}b`), 0, 1))))).toBe('ab');
     expect(text(ok(deleteBackward(at(md('one two'), 0, 7), 'word')))).toBe('one');
     expect(text(ok(deleteForward(at(md('one two'), 0, 0), 'word')))).toBe('two');
     const line = ok(deleteBackward(at(md('ab\\\ncd'), 0, 5), 'line'));
@@ -194,6 +197,14 @@ describe('Backspace and Delete', () => {
     expect(deleteBackward(at(md('a'), 0, 0)).ok).toBe(false);
     expect(deleteForward(at(md('a'), 0, 1)).ok).toBe(false);
     expect(deleteSelection(at(md('a'), 0, 0)).ok).toBe(false);
+  });
+
+  it('handles editing commands from an empty document', () => {
+    const empty = md('');
+    expect(deleteBackward(empty).ok).toBe(false);
+    expect(deleteForward(empty).ok).toBe(false);
+    expect(ok(splitBlock(empty, ids())).doc.blocks).toHaveLength(2);
+    expect(ok(toggleMark(empty, 'strong')).storedMarks).toEqual([{ type: 'strong' }]);
   });
 
   it('deletes ranges across containers and prunes emptied ones', () => {

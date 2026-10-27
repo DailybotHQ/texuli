@@ -17,6 +17,7 @@ import {
   type IsoDate,
   isNoMove,
   keyMove,
+  MAX_OCCURRENCES,
   type MoveChoice,
   moveChoices,
   moveOccurrence,
@@ -638,7 +639,7 @@ const modeLabels = $derived.by(
       <button type="button" aria-label={labels.next} onclick={() => step(1)}>›</button>
     </div>
     <h2 aria-live="polite">{title}</h2>
-    <div class="tx-calendar__modes" role="group" aria-label="Calendar view">
+    <div class="tx-calendar__modes" role="group" aria-label={labels.viewModes}>
       {#each modes as mode (mode)}
         <button type="button" aria-pressed={view === mode} aria-keyshortcuts={mode[0]?.toUpperCase()} onclick={() => switchMode(mode)}>{modeLabels[mode]}</button>
       {/each}
@@ -672,7 +673,7 @@ const modeLabels = $derived.by(
   {#if MoveMenu}<MoveMenu request={moveRequest} onSelect={onMoveSelect} />{/if}
   {#if editable}<p id={hintId} class="tx-calendar__sr-only">{labels.moveHint}</p>{/if}
   <p class="tx-calendar__sr-only" role="status" aria-live="polite" data-calendar-announcer>{announcement}</p>
-  {#if expansion.truncated}<p class="tx-calendar__note" role="note">Showing the first 1,000 matching event occurrences.</p>{/if}
+  {#if expansion.truncated}<p class="tx-calendar__note" role="note">{labels.truncationNote(MAX_OCCURRENCES)}</p>{/if}
 </section>
 
 <style>
@@ -686,5 +687,5 @@ const modeLabels = $derived.by(
   .tx-calendar__loading, .tx-calendar__note { padding: .75rem 1rem; color: var(--tx-muted-foreground, GrayText); font-size: .875rem; }
   .tx-calendar__sr-only { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: -1px; padding: 0; border: 0; }
   @media (max-width: 40rem) { .tx-calendar__header h2 { order: 1; flex-basis: 100%; } }
-  @media (forced-colors: active) { .tx-calendar { border-color: CanvasText; } }
+  @media (forced-colors: active) { .tx-calendar { border-color: CanvasText; } .tx-calendar__modes button[aria-pressed="true"] { border-color: Highlight; background: Highlight; color: HighlightText; } }
 </style>

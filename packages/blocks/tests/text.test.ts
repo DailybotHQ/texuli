@@ -1,4 +1,7 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { render } from '@testing-library/svelte';
+import { contrastRatio, SEMANTIC_ROLES, tokenToCssVar } from '@texuli/tokens';
 import { describe, expect, it, vi } from 'vitest';
 import { checkTextBlock, loadTextFamily, TEXT_BLOCK_TYPES } from '../src/index.ts';
 import { resolveTextBlockLabels } from '../src/text/index.ts';
@@ -282,5 +285,122 @@ describe('RichText and the lazy family', () => {
     const family = await loadTextFamily();
     const { container } = render(family.default, { block: { type: 'text', markdown: 'Lazy.' } });
     expect(container.textContent).toContain('Lazy.');
+  });
+});
+
+describe('text family styles use the token contract', () => {
+  const styleSource = (name: string) =>
+    readFileSync(join(import.meta.dirname, '..', 'src', name), 'utf8');
+  const styled = ['text/TextBlockView.svelte', 'text/RichText.svelte'];
+  /** Every rule of one top-level selector (`  .tx-callout { … }`). */
+  const rulesOf = (text: string, selector: string) =>
+    [...text.matchAll(new RegExp(`^  ${selector} \\{[^}]*\\}`, 'gm'))].map((match) => match[0]);
+
+  it('never references a phantom --tx-color-* token (themes emit --tx-<role>)', () => {
+    for (const source of [...styled, 'code/code.css']) {
+      expect(styleSource(source), source).not.toMatch(/--tx-color-/);
+    }
+  });
+
+  it('resolves every var(--tx-…) to a semantic role, a design token, or a local definition', () => {
+    const roles = new Set(SEMANTIC_ROLES.map((role) => tokenToCssVar(role)));
+    // Design (non-color) tokens this lane reads (STYLE_VARIABLES in
+    // packages/tokens/src/css/apply.ts, plus the tailwind preset's target size);
+    // every color comes from a semantic role.
+    const designTokens = new Set([
+      '--tx-font-mono',
+      '--tx-font-sans',
+      '--tx-radius',
+      '--tx-border-width',
+      '--tx-font-size-xs',
+      '--tx-font-size-sm',
+      '--tx-font-weight-medium',
+      '--tx-font-weight-bold',
+      '--tx-focus-ring-width',
+      '--tx-target-size',
+    ]);
+    for (const source of [...styled, 'code/code.css']) {
+      const text = styleSource(source);
+      const local = new Set(
+        [...text.matchAll(/--(tx-[a-z0-9-]+)\s*:/g)].map((match) => `--${match[1]}`)
+      );
+      for (const match of text.matchAll(/var\((--tx-[a-z0-9-]+)/g)) {
+        const token = match[1] ?? '';
+        const known = roles.has(token) || designTokens.has(token) || local.has(token);
+        expect(known, `${source}: ${token} is not a token the themes emit`).toBe(true);
+      }
+    }
+  });
+
+  it('draws each tone from its contract role with a >=3:1 fallback on light and dark surfaces', () => {
+    const view = styleSource('text/TextBlockView.svelte');
+    const roles: Record<string, string> = {
+      accent: '--tx-primary',
+      info: '--tx-info',
+      success: '--tx-success',
+      warning: '--tx-warning',
+      danger: '--tx-destructive',
+    };
+    for (const [tone, role] of Object.entries(roles)) {
+      const rule = new RegExp(`\\[data-tone='${tone}'\\]\\s*\\{[^}]*\\}`).exec(view)?.[0] ?? '';
+      expect(rule, `tone ${tone} must draw from ${role}`).toContain(`var(${role}`);
+      const fallback = new RegExp(`var\\(${role},\\s*(#[0-9a-fA-F]{3,8})\\)`).exec(rule)?.[1];
+      // Border/tint color (non-text): the docs promise >=3:1 against white and #121212.
+      expect(fallback, `tone ${tone} keeps a hex fallback`).toBeTruthy();
+      expect(contrastRatio(fallback ?? '', '#ffffff')).toBeGreaterThanOrEqual(3);
+      expect(contrastRatio(fallback ?? '', '#121212')).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('uses paired semantic soft fills for callouts instead of near-transparent tone mixes', () => {
+    const view = styleSource('text/TextBlockView.svelte');
+    const fills: Record<string, string> = {
+      accent: '--tx-primary-soft',
+      info: '--tx-info-soft',
+      success: '--tx-success-soft',
+      warning: '--tx-warning-soft',
+      danger: '--tx-destructive-soft',
+    };
+    const foregrounds: Record<string, string> = {
+      accent: '--tx-primary-soft-foreground',
+      info: '--tx-info-soft-foreground',
+      success: '--tx-success-soft-foreground',
+      warning: '--tx-warning-soft-foreground',
+      danger: '--tx-destructive-soft-foreground',
+    };
+    for (const [tone, fill] of Object.entries(fills)) {
+      const rule = new RegExp(`\\[data-tone='${tone}'\\]\\s*\\{[^}]*\\}`).exec(view)?.[0] ?? '';
+      expect(rule, `${tone} maps to its semantic soft fill`).toContain(`var(${fill}`);
+      expect(rule, `${tone} maps to its paired soft foreground`).toContain(
+        `var(${foregrounds[tone]}`
+      );
+    }
+    expect(rulesOf(view, '\\.tx-callout')[0]).not.toContain('color-mix(');
+  });
+
+  it('draws the accent tone with the primary role, never the soft accent fill', () => {
+    // `--tx-accent` is a soft fill in the token contract (light in light mode),
+    // so as a border or rule color it is near-invisible on the page canvas.
+    const view = styleSource('text/TextBlockView.svelte');
+    const rule = /\[data-tone='accent'\]\s*\{[^}]*\}/.exec(view)?.[0] ?? '';
+    expect(rule).toMatch(/--tx-block-tone:\s*var\(--tx-primary\b/);
+    expect(rule).not.toContain('var(--tx-accent');
+  });
+
+  it('takes surface radii from the theme radius token like the code family does', () => {
+    for (const [source, selector] of [
+      ['text/TextBlockView.svelte', '\\.tx-callout'],
+      ['text/TextBlockView.svelte', '\\.tx-block-invalid'],
+      ['text/RichText.svelte', '\\.tx-md-pre'],
+      ['text/RichText.svelte', '\\.tx-md-code'],
+      ['code/code.css', '\\.tx-block-invalid'],
+    ] as const) {
+      const rules = rulesOf(styleSource(source), selector);
+      expect(rules.length, `${source}: ${selector}`).toBeGreaterThan(0);
+      expect(
+        rules.some((rule) => rule.includes('var(--tx-radius')),
+        `${source}: ${selector} must take its radius from --tx-radius`
+      ).toBe(true);
+    }
   });
 });

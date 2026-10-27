@@ -34,7 +34,7 @@ let { title, labels, rows, pointRows = false }: Props = $props();
 
 <style>
   .geo-table { color: var(--tx-foreground, CanvasText); font: inherit; font-size: 0.875rem; }
-  summary { cursor: pointer; inline-size: fit-content; padding-block: 0.5rem; text-decoration: underline; text-underline-offset: 0.2em; }
+  summary { align-content: center; cursor: pointer; inline-size: fit-content; min-block-size: 2.75rem; padding-block: 0.5rem; text-decoration: underline; text-underline-offset: 0.2em; }
   .table-scroll { max-inline-size: 100%; overflow-x: auto; }
   table { border-collapse: collapse; inline-size: 100%; text-align: start; }
   caption { padding-block: 0.5rem; text-align: start; }

@@ -149,6 +149,12 @@
     padding-inline: 0;
   }
 
+  /* Icon-only controls stay square at every size (IconButton passes this). */
+  .tx-button[data-icon-only="true"] {
+    aspect-ratio: 1;
+    padding-inline: 0;
+  }
+
   @media (max-width: 639px) {
     .tx-button--sm,
     .tx-button--md,
@@ -176,7 +182,7 @@
     border-radius: 9999px;
     border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
     border-block-start-color: currentColor;
-    animation: tx-button-spin var(--tx-motion-base, 200ms) linear infinite;
+    animation: tx-button-spin var(--tx-motion-slow, 0.75s) linear infinite;
   }
 
   .tx-button__label--hidden {

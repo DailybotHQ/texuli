@@ -62,6 +62,15 @@ chrome mappings fail.
 system fallbacks. Mode resolution (`@texuli/tokens/modes`) already selects
 `high-contrast` when the user prefers more contrast and mode is `system`.
 
+**Known limitation.** Without forced colors, `CanvasText` and `Highlight`
+resolve against the element's used `color-scheme`, not against the theme's
+surface. When that scheme and the surface disagree (for example `system`
+mode resolving to `high-contrast` with `color-scheme: light dark`, a
+light-surface theme, and a dark OS preference), `--tx-border` and `--tx-ring`
+can paint near-white on a light surface. Hosts with a fixed-surface theme
+should set `color-scheme` to match it. A rendered check in `high-contrast`
+mode with one light and one dark theme is still planned.
+
 ## API
 
 | Export | Role |

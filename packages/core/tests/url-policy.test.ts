@@ -20,6 +20,40 @@ describe('safeHref', () => {
     }
   });
 
+  it('refuses every slash/backslash authority prefix in every tier (S-10)', () => {
+    // Browsers treat `\` like `/` in special URLs, so each of these opens
+    // another origin (`/\evil.example` resolves to `https://evil.example/`).
+    const hostile = [
+      '//evil.example/path',
+      '/\\evil.example',
+      '\\/evil.example',
+      '\\\\evil.example',
+      ' /\\evil.example',
+      '\t/\\evil.example',
+      '\u0000/\\evil.example',
+      '\n\\/evil.example',
+      '/\t\\evil.example',
+      '\\\r\\evil.example',
+      '/\u001f/evil.example',
+    ];
+    for (const trust of ['developer', 'untrusted'] as const) {
+      for (const value of hostile) {
+        expect(safeHref(value, trust), `${trust} ${JSON.stringify(value)}`).toBeUndefined();
+        expect(safeImageSrc(value, trust), `${trust} ${JSON.stringify(value)}`).toBeUndefined();
+        expect(safeMediaSrc(value, trust), `${trust} ${JSON.stringify(value)}`).toBeUndefined();
+        expect(
+          safeImageSrcset(`${value} 1x`, trust),
+          `${trust} ${JSON.stringify(value)}`
+        ).toBeUndefined();
+      }
+    }
+    // A single leading slash stays a same-origin path.
+    expect(safeHref('/docs/button', 'developer')).toBe('/docs/button');
+    expect(safeHref('./a//b', 'developer')).toBe('./a//b');
+    expect(safeImageSrc('/assets/a.png', 'developer')).toBe('/assets/a.png');
+    expect(safeMediaSrc('/media/a.mp4', 'developer')).toBe('/media/a.mp4');
+  });
+
   it('keeps same-document fragments in every tier', () => {
     expect(safeHref('#section-2')).toBe('#section-2');
     expect(safeHref('#section-2', 'developer')).toBe('#section-2');

@@ -92,7 +92,10 @@ function handleClick(event: any): void {
     <span class="tx-button__spinner" data-tx-button-spinner aria-hidden="true">
       <span class="tx-button__spinner-icon"></span>
     </span>
-    <span class="tx-button__label--hidden">{@render text()}</span>
+    <!-- With `loadingLabel`, that text IS the name; the visible label must not join it. -->
+    <span class="tx-button__label--hidden" aria-hidden={loadingLabel ? 'true' : undefined}
+      >{@render text()}</span
+    >
     {#if loadingLabel}
       <span class="tx-button__sr-only">{loadingLabel}</span>
     {/if}

@@ -2,13 +2,15 @@
  * Build-time HTML to Markdown for "Copy page" (FIX-site-sidebar-nav): turns a
  * page's rendered main content into Markdown an agent can read. Runs only in
  * the Astro build on the site's own HTML. Text only: scripts, styles,
- * templates, SVG, navigation, forms and hidden content are dropped; nothing
- * is executed, and the result goes back into the page only as escaped text
+ * templates, SVG, navigation, forms, the copy-page hint and hidden content
+ * are dropped; nothing is executed, and the result goes back into the page only as escaped text
  * (`integration.ts`).
  */
 
+// The copy-page hint matches by class token, whatever else the tag carries:
+// the build adds Astro's scope attribute (`data-astro-cid-…`) after it.
 const DROP =
-  /<(script|style|template|svg|noscript|button|select|textarea|input|dialog|nav)\b[^>]*>[\s\S]*?<\/\1>|<(input|img|br|hr|meta|link)\b[^>]*\/?>/gi;
+  /<(script|style|template|svg|noscript|button|select|textarea|input|dialog|nav)\b[^>]*>[\s\S]*?<\/\1>|<(input|img|br|hr|meta|link)\b[^>]*\/?>|<p\b[^>]*\sclass="(?:[^"]*\s)?copy-page__hint(?:\s[^"]*)?"[^>]*>[\s\S]*?<\/p>/gi;
 
 const ENTITIES: Record<string, string> = {
   amp: '&',
@@ -72,23 +74,37 @@ export function htmlToMarkdown(html: string): string {
     );
     return `\uE000${blocks.length - 1}\uE000`;
   });
+  // Tables next, as one Markdown table per `<table>`: the separator belongs
+  // after the header row only, even when body rows use `th` row headers.
+  text = text.replace(/<table\b[^>]*>([\s\S]*?)<\/table>/gi, (_m, table: string) => {
+    const rows = [...table.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((row) =>
+      [...(row[1] ?? '').matchAll(/<(th|td)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map((cell) =>
+        inline(cell[2] ?? '')
+          .trim()
+          .replace(/\|/g, '\\|')
+      )
+    );
+    if (!rows.length) return '\n\n';
+    const width = Math.max(...rows.map((cells) => cells.length));
+    const pad = (cells: string[]) => {
+      const copy = [...cells];
+      while (copy.length < width) copy.push('');
+      return copy;
+    };
+    const separator = `|${Array.from({ length: width }, () => ' --- |').join('')}`;
+    const lines = [
+      `| ${pad(rows[0] ?? []).join(' | ')} |`,
+      separator,
+      ...rows.slice(1).map((cells) => `| ${pad(cells).join(' | ')} |`),
+    ];
+    return `\n\n${lines.join('\n')}\n\n`;
+  });
   text = text
     .replace(
       /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi,
       (_m, level: string, body: string) =>
         `\n\n${'#'.repeat(Number(level))} ${inline(body).trim()}\n\n`
     )
-    .replace(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi, (_m, row: string) => {
-      const cells = [...row.matchAll(/<t[hd]\b[^>]*>([\s\S]*?)<\/t[hd]>/gi)].map((cell) =>
-        inline(cell[1] ?? '')
-          .trim()
-          .replace(/\|/g, '\\|')
-      );
-      const header = /<th\b/i.test(row);
-      return `\n| ${cells.join(' | ')} |${header ? `\n|${cells.map(() => ' --- |').join('')}` : ''}`;
-    })
-    .replace(/<\/table>/gi, '\n\n')
-    .replace(/<li\b[^>]*>([\s\S]*?)<\/li>/gi, (_m, body: string) => `\n- ${inline(body).trim()}`)
     .replace(/<\/(ul|ol)>/gi, '\n\n')
     .replace(
       /<blockquote\b[^>]*>([\s\S]*?)<\/blockquote>/gi,
@@ -107,4 +123,19 @@ export function htmlToMarkdown(html: string): string {
     .join('\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()}\n`;
+}
+
+/**
+ * Root-relative links to absolute ones for the served `.md` twins (T-23):
+ * an agent fetching `guides/theming.md` from anywhere must be able to follow
+ * links without resolving a base. Fenced code is left untouched, so a code
+ * sample that shows Markdown keeps its shape.
+ */
+export function absolutizeMarkdownLinks(markdown: string, origin: string): string {
+  return markdown
+    .split(/(```[\s\S]*?```)/g)
+    .map((chunk) =>
+      chunk.startsWith('```') ? chunk : chunk.replace(/\]\((\/[^)]*)\)/g, `](${origin}$1)`)
+    )
+    .join('');
 }

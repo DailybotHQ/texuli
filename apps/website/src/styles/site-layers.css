@@ -24,6 +24,13 @@
    */
   html {
     --site-header-height: 56px;
+    --site-motion-fast: 120ms;
+    --site-motion-base: 180ms;
+    --site-motion-slow: 280ms;
+    --site-motion-ambient: 2.8s;
+    --site-motion-easing: cubic-bezier(0.2, 0, 0, 1);
+    /* Scroll-linked animation progress must stay linear with scroll position. */
+    --site-motion-linked-easing: linear;
     scroll-padding-top: calc(var(--site-header-height) + 0.75rem);
   }
 

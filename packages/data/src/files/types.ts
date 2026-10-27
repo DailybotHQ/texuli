@@ -10,8 +10,6 @@ export interface FileBrowserLabels {
   empty: string;
   preview: string;
   previewEmpty: string;
-  openFolder: (name: string) => string;
-  selectItem: (name: string) => string;
   size: string;
   modified: string;
   kind: string;

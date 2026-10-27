@@ -5,6 +5,7 @@ import {
   calendarColorIndex,
   calendarFill,
   createCalendarHeatmapLayout,
+  formatCalendarMonth,
 } from '../src/calendar/model.ts';
 import { calendarLayout } from '../src/math/index.ts';
 
@@ -79,5 +80,33 @@ describe('CalendarHeatmap', () => {
         end: '2026-03-08',
       })
     ).toThrow(/accessible description/);
+  });
+
+  it('labels months by name, not as bare numbers', () => {
+    const { container } = render(CalendarHeatmap, {
+      title: 'Daily activity',
+      description: 'Fictional activity across March and April 2026.',
+      start: '2026-03-01',
+      end: '2026-04-30',
+      values,
+    });
+    const labels = [...container.querySelectorAll('.months text')].map(
+      (node) => node.textContent ?? ''
+    );
+    // `YYYY-MM`.slice(5) drew "03"; the plot labels months like the table does (words, UTC).
+    expect(labels).toEqual(['Mar 2026', 'Apr 2026']);
+    expect(labels).not.toContain('03');
+  });
+});
+
+describe('calendar month label formatting', () => {
+  it('formats a YYYY-MM column label as a short month name in UTC', () => {
+    expect(formatCalendarMonth('2026-03')).toBe('Mar 2026');
+    expect(formatCalendarMonth('2026-12')).toBe('Dec 2026');
+    expect(formatCalendarMonth('2026-03', 'fr-FR')).toBe('mars 2026');
+  });
+
+  it('passes an unparseable month through instead of printing Invalid Date', () => {
+    expect(formatCalendarMonth('not-a-date')).toBe('not-a-date');
   });
 });

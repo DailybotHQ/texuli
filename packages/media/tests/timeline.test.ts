@@ -1,9 +1,13 @@
 // @vitest-environment happy-dom
+/// <reference types="node" />
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 import type { CompositionAnimation } from '../src/animation/types.ts';
 import { validateAnimationV2, validateCompositionV2 } from '../src/composition-v2/index.ts';
 import AnimationTimeline from '../src/timeline/AnimationTimeline.svelte';
+import { DEFAULT_TIMELINE_LABELS, refusalAnnouncement } from '../src/timeline/labels.ts';
 import {
   applyTimelineAction,
   createTimelineHistory,
@@ -457,5 +461,118 @@ describe('AnimationTimeline', () => {
     await waitFor(() =>
       expect(document.querySelector('[data-tx-timeline-stage] svg')).not.toBeNull()
     );
+  });
+
+  it('announces a refused edit with no message through the invalid-edit label', () => {
+    expect(refusalAnnouncement(DEFAULT_TIMELINE_LABELS, '')).toBe('Not applied: invalid edit');
+    expect(refusalAnnouncement(DEFAULT_TIMELINE_LABELS, '   ')).toBe('Not applied: invalid edit');
+    expect(refusalAnnouncement(DEFAULT_TIMELINE_LABELS, undefined)).toBe(
+      'Not applied: invalid edit'
+    );
+    expect(refusalAnnouncement(DEFAULT_TIMELINE_LABELS, 'Windows must overlap.')).toBe(
+      'Not applied: Windows must overlap.'
+    );
+    expect(
+      refusalAnnouncement(
+        {
+          ...DEFAULT_TIMELINE_LABELS,
+          notApplied: 'No aplicado: {reason}',
+          invalidEdit: 'edición no válida',
+        },
+        ''
+      )
+    ).toBe('No aplicado: edición no válida');
+  });
+
+  // T-70: every visible and announced string is a label a host can translate.
+  it('renders and announces with the labels a host passes', async () => {
+    const labels = {
+      title: 'Línea de tiempo',
+      table: 'Capas y fotogramas clave',
+      undo: 'Deshacer',
+      redo: 'Rehacer',
+      playhead: 'Cabezal',
+      keyframe: 'Fotograma {index} de {count} en {layer} a los {time}',
+      keyframeMoved: 'Fotograma movido a {time}.',
+      seconds: '{value} s',
+    };
+    await render(AnimationTimeline, {
+      props: {
+        composition: golden.composition,
+        animation: golden.animation,
+        preview: false,
+        labels,
+      },
+    });
+    expect(await screen.findByRole('table', { name: 'Capas y fotogramas clave' })).toBeTruthy();
+    expect(screen.getByRole('region', { name: 'Línea de tiempo' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Deshacer' })).toBeTruthy();
+    expect(screen.getByRole('slider', { name: 'Cabezal' })).toBeTruthy();
+    const key = screen.getByRole('button', {
+      name: 'Fotograma 1 de 2 en Harbor Notes a los 0.00 s',
+    });
+    await fireEvent.keyDown(key, { key: 'ArrowRight' });
+    await waitFor(() =>
+      expect(document.querySelector('[data-tx-timeline-status]')?.textContent).toContain(
+        'Fotograma movido a 0.10 s.'
+      )
+    );
+    // Labels the host leaves out keep their defaults.
+    expect(screen.getAllByRole('button', { name: /^Add a keyframe to / }).length).toBeGreaterThan(
+      0
+    );
+  });
+
+  // T-70: Number('') is 0, so clearing the field used to set the opacity to zero.
+  it('ignores a cleared opacity field instead of setting the opacity to zero', async () => {
+    const { onchange } = await renderTimeline();
+    await fireEvent.click(
+      screen.getByRole('button', { name: 'Keyframe 2 of 2 on lower-third at 2.60 s' })
+    );
+    const opacity = screen.getByRole('spinbutton', { name: 'Opacity' }) as HTMLInputElement;
+    await fireEvent.change(opacity, { target: { value: '' } });
+    expect(onchange).not.toHaveBeenCalled();
+    await fireEvent.change(opacity, { target: { value: '0.4' } });
+    const last = onchange.mock.calls.at(-1)?.[0] as TimelineDocument;
+    expect(last.animation.tracks[0]?.keyframes[1]?.opacity).toBe(0.4);
+  });
+
+  // T-70: same shortcut hints as the image editor's history buttons.
+  it('exposes the undo and redo shortcuts on their buttons', async () => {
+    await renderTimeline();
+    expect(screen.getByRole('button', { name: 'Undo' }).getAttribute('aria-keyshortcuts')).toBe(
+      'Control+Z Meta+Z'
+    );
+    expect(screen.getByRole('button', { name: 'Redo' }).getAttribute('aria-keyshortcuts')).toBe(
+      'Control+Shift+Z Meta+Shift+Z Control+Y'
+    );
+  });
+});
+
+describe('timeline stylesheet', () => {
+  const css = readFileSync(
+    join(import.meta.dirname, '..', 'src', 'timeline', 'timeline.css'),
+    'utf8'
+  );
+  const rule = (selector: string) => {
+    const start = css.indexOf(`${selector} {`);
+    return start < 0 ? '' : css.slice(start, css.indexOf('}', start));
+  };
+
+  // T-70: focus rings follow the theme's focus-ring tokens like sibling components.
+  it('draws focus rings with the focus-ring tokens', () => {
+    const focus = rule('.tx-animation-timeline__keyframe:focus-visible');
+    expect(focus).toMatch(/var\(--tx-focus-ring-width/);
+    expect(focus).toMatch(/var\(--tx-focus-ring-offset/);
+    expect(rule('.tx-animation-timeline__table-scroll:focus-visible')).toMatch(
+      /var\(--tx-focus-ring-width/
+    );
+  });
+
+  // T-70: the 1rem keyframe diamond needs a 24px (1.5rem) pointer target.
+  it('gives the keyframe diamond a hit area of at least 24px', () => {
+    const hit = rule('.tx-animation-timeline__keyframe::before');
+    expect(hit).toMatch(/content:\s*(''|"")/);
+    expect(hit).toMatch(/inset:\s*-0\.25rem/);
   });
 });

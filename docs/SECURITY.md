@@ -1,7 +1,10 @@
 # Security — Texuli
 
 Texuli is a **client-side** Svelte 5 component library and a **static** website.
-It has no Texuli server, accounts database, or secrets store in the repository.
+The website also ships two Cloudflare Pages Functions under `functions/` (a
+request-shaping middleware and a same-origin analytics proxy; see
+[section 15](#15-website-edge-functions-and-analytics)). There is no other
+Texuli server, accounts database, or secrets store in the repository.
 The real attack surface is **what components and agent trees render**: links,
 images, media, catalog trees, and host-mounted embeds. This document states the
 threat model, the controls that **ship today**, where they are enforced, the
@@ -56,7 +59,7 @@ Related detail: [CSP and Trusted Types](quality/csp.md),
 | | |
 | --- | --- |
 | **Threat** | Executable or smuggled URLs (`javascript:`, `data:` on links, protocol-relative, control characters in schemes); untrusted relative/http navigation; arbitrary media origins |
-| **Control** | `safeHref` / `safeImageSrc` / `safeImageSrcset` / `safeMediaSrc` in `packages/core/src/url/` and `packages/core/src/url-policy/`. Both tiers block executable schemes after trim + control-char strip. Untrusted links: `https:`, `mailto:`, `#fragment` only. Untrusted media: `blob:` or HTTPS origins on an explicit allowlist. Rejected values return `undefined` (inert). |
+| **Control** | `safeHref` / `safeImageSrc` / `safeImageSrcset` / `safeMediaSrc` in `packages/core/src/url/` and `packages/core/src/url-policy/`. Both tiers block executable schemes after trim + control-char strip, and refuse protocol-relative values: any value opening with two of `/` and `\` (`//`, `/\`, `\/`, `\\`) or with any leading backslash, since browsers resolve `/\evil.example` to `https://evil.example/`. Untrusted links: `https:`, `mailto:`, `#fragment` only. Untrusted media: `blob:` or HTTPS origins on an explicit allowlist. Rejected values return `undefined` (inert). |
 | **Enforced** | Every component and block that paints `href`/`src` must call these helpers (call-site discipline + catalog/playground re-checks). |
 | **Tests** | `packages/core/tests/url-policy.test.ts` |
 | **Residual** | A host that binds raw attributes bypasses the door. Allowed HTTPS hosts can still track (privacy, not script). |
@@ -160,7 +163,7 @@ Related detail: [CSP and Trusted Types](quality/csp.md),
 | **Threat** | Package or example code using HTML sinks, eval, inline style attributes, arbitrary Trusted Types policies |
 | **Control** | Enforced CSP on the fixture production build: `script-src`/`style-src` `'self'`; `require-trusted-types-for 'script'`; only `svelte-trusted-html`; probe + source scan + every registry example. Spec: `docs/quality/csp.md`, `tests/e2e/csp.spec.ts` |
 | **Tests** | `tests/e2e/csp.spec.ts` (Playwright matrix) |
-| **Residual** | Proven on the **fixture app**; consuming apps must set their own headers. Narrow WebKit `<select>` engine exception documented in the CSP doc. |
+| **Residual** | Proven on the **fixture app**; consuming apps must set their own headers. Narrow WebKit `<select>` engine exception documented in the CSP doc. The website's own per-route CSP adds one more Trusted Types name, `texuli-analytics`, only on pages that mount the analytics loader (section 15). |
 
 ### 13. Supply chain
 
@@ -179,6 +182,21 @@ Related detail: [CSP and Trusted Types](quality/csp.md),
 | **Control** | See [Embed blocks (`mountEmbed`)](#embed-blocks-mountembed) |
 | **Tests** | `packages/blocks/tests/embed.test.ts` (schema, deferred Start, sandbox attributes, allowlist refusal) |
 | **Residual** | Third-party widget isolation strength equals host CSP + allowlist + sandbox discipline |
+
+### 15. Website edge functions and analytics
+
+The website runs two Cloudflare Pages Functions and an opt-in analytics
+loader. Analytics is **off by default**: with no `PUBLIC_UMAMI_WEBSITE_ID`
+the loader tag is not rendered, the middleware sends no events, and with no
+`UMAMI_ENDPOINT_ORIGIN` the proxy answers 503. Neither value is set in the
+repository; both are owner-provisioned.
+
+| | |
+| --- | --- |
+| **Threat** | The edge code handles every request: a hostile request shaping a response, a proxy used as an open relay or to serve a redirect target as same-origin script, oversized beacon bodies, request data (raw user agent, IP, query, search text, attacker-chosen paths) leaking into analytics events, and an analytics script that needs a script-URL sink under Trusted Types |
+| **Control** | **Middleware** (`functions/_middleware.ts`): builds three kinds of answer; every other request goes through the static pipeline, and the middleware never builds a body for it. It serves a built markdown twin on an explicit `text/markdown` preference, the stripped `robots.txt` variant to audit tools, and an RFC 9457 `problem+json` body instead of the HTML 404 for agent user agents; every body comes from the build output or a fixed shape, and a twin that was not built falls through to the site's 404. It reads no request bodies. Bot events (`apps/website/src/lib/bot-events.ts`) count only known AI crawlers, unknown-bot heuristics and served twins, and fire only for HTML answers with status 200 (never 404s, redirects or errors); the payload carries the UA class and the path only, scrubbed of email-shaped values and capped at 256 characters, and the edge request sends its own `texuli-edge/1.0` user agent. Sends are fire-and-forget through `waitUntil` and never block the response. **Proxy** (`functions/api/umami/[[path]].ts`, `functions/_lib/umami-proxy.ts`, `apps/website/src/lib/umami-proxy-filter.ts`): exactly `GET script.js` and `POST api/send` pass (404 or 405 otherwise); the client's query string is not forwarded; the upstream origin comes only from the server-side env; only `content-type`, the client IP (as `x-forwarded-for`) and the user agent are forwarded, so cookies and authorization are dropped; beacons must be `application/json` (415) and at most 16 KB (413, the read stops at the limit); upstream redirects are never followed (`redirect: 'manual'`) and any non-2xx answer, or an unreachable upstream, becomes a 503 problem. **Client** (`apps/website/public/umami-loader.js`): skips audit-tool user agents, accepts only an `http(s)` script URL, sets it through the named Trusted Types policy `texuli-analytics`, which vouches for that one configured URL only, and tells the tracker to drop query strings and fragments. Outbound-link events carry origin and pathname only, and search events carry the query length and hit count, never the text. **CSP** (`apps/website/src/components/security/csp.ts`): `connect-src 'self'` (no foreign analytics origin), and `trusted-types` allows `texuli-analytics` only on pages whose HTML mounts the loader tag; every other page keeps `svelte-trusted-html` alone. |
+| **Tests** | `apps/website/tests/umami-proxy.test.ts` (allowlist, 404/405/413/415, header allowlist, manual redirect and opaque redirect to 503, unreachable upstream), `apps/website/tests/umami-bot-events.test.ts` (classes, 200-only HTML events, 256-character cap, scrub, off state, through the middleware), `apps/website/tests/umami-loader.test.ts` (Trusted Types policy, refused policy, audit skip, non-http source, query and fragment exclusion), `apps/website/tests/csp-analytics-policy.test.ts`, `apps/website/tests/umami-track.test.ts`, `apps/website/tests/umami-wiring.test.ts`, `apps/website/tests/md-negotiate.test.ts`, `apps/website/tests/robots-variants.test.ts`, `apps/website/tests/agent-request.test.ts`; E2E `tests/e2e/analytics.spec.ts` (default-off) and `tests/e2e/analytics-csp.spec.ts` (per-route policy names; its zero-violation browser half runs only against a fixture build with the loader mounted, which CI does not make) |
+| **Residual** | **Owner check, unverified offline:** the middleware runs on every route, and Cloudflare Pages may not apply the `_headers` CSP to responses a Function builds. The post-deploy check (inspect the `Content-Security-Policy` header on HTML routes that pass through the middleware; if it is missing, limit the middleware with `_routes.json` or copy the asset headers onto its responses) is recorded in the PLAN_006 launch-readiness runbook (local plan evidence, git-ignored) and has not been run. With analytics enabled, the upstream Umami service receives the client IP and user agent for its geo and device dimensions. |
 
 ---
 
@@ -217,5 +235,8 @@ third-party component libraries in product docs.
 
 ## Reporting
 
-There is no public channel yet because the repository is not published.
-Report issues to the maintainers at Dailybot directly.
+The repository's remote is `https://github.com/DailybotHQ/texuli.git`
+(`git remote -v`), and GitHub reports it as public
+(`gh repo view DailybotHQ/texuli --json visibility`, 2026-10-26). There is no
+dedicated security reporting channel yet: report issues to the maintainers at
+Dailybot directly, not in public issues.

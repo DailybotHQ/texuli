@@ -1,5 +1,7 @@
 <script lang="ts">
 import { onMount } from 'svelte';
+import { EVENTS } from '../../lib/analytics.ts';
+import { track } from '../../lib/track.ts';
 import { withBase } from '../foundation/site.ts';
 import { SEARCH_KIND_LABEL } from './index-data.ts';
 import { searchSiteIndex } from './search.ts';
@@ -21,6 +23,9 @@ function readQuery(): void {
   const q = new URL(location.href).searchParams.get('q') ?? '';
   query = q;
   hits = q.trim() ? searchSiteIndex(q, { limit: 48 }) : [];
+  // A non-empty query is a submitted search, however it arrived here. The
+  // query text never leaves the page: only its length and the hit count.
+  if (q.trim()) track(EVENTS.SEARCH, { query_length: q.trim().length, results: hits.length });
 }
 
 onMount(() => {

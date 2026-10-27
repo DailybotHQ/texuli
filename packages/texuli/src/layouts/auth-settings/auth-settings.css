@@ -354,6 +354,11 @@
     color: var(--tx-muted-foreground, GrayText);
   }
 
+  /* › points inline-end in LTR; flip under RTL (mobile Back chevron convention). */
+  .tx-settings-layout:dir(rtl) .tx-settings-layout__chevron {
+    transform: scaleX(-1);
+  }
+
   @media (min-width: 48rem) {
     .tx-settings-layout__chevron {
       display: none;
@@ -396,6 +401,12 @@
     font-size: var(--tx-font-size-lg, 1.125rem);
     font-weight: var(--tx-font-weight-semibold, 600);
     outline: none;
+  }
+
+  /* List→detail moves focus onto the title (tabindex="-1"); keep a keyboard ring. */
+  .tx-settings-layout__detail-title:focus-visible {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
   }
 
   /* Phone: list and detail are alternate screens. */

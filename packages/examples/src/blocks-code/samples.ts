@@ -62,6 +62,14 @@ export const CODE_SAMPLES: readonly { label: string; block: unknown }[] = [
     label: 'Plain text (no language)',
     block: { type: 'code', code: 'Harbor Notes v1.4.2\nAll systems normal.' },
   },
+  {
+    label: 'Long line (horizontal scroll)',
+    block: {
+      type: 'code',
+      lang: 'text',
+      code: 'deployment-note: this deliberately long line demonstrates that code remains readable in a horizontally scrollable region at narrow viewport widths without wrapping or clipping its contents',
+    },
+  },
 ];
 
 const RLO = '\u202e';

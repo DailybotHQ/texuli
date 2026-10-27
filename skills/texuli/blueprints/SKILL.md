@@ -2,13 +2,13 @@
 name: texuli-blueprints
 description: Validate, wrap, edit, paint and hand off untrusted agent blueprints offline — validateDraft, the envelope and its lifecycle, edit history, the player core and the Svelte player, the agent service and the spec contract. Agents draft, validation gates, the owner activates.
 version: "0.2.0"
-documentation_url: https://texuli.com/docs/
+documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
 metadata:
   openclaw:
     emoji: "▣"
-    homepage: https://texuli.com/docs/
+    homepage: https://texuli.com/guides/
     requires:
       anyBins:
         - bash
@@ -144,8 +144,10 @@ Invalid drafts are refused by default. `invalidPolicy="preview"` shows
 placeholders behind a warning, and still offers no activation. The deck frame
 and intent controls are later phases. Doc: `packages/player/README.md`.
 
-On texuli.com (built locally, not deployed), `/builder/` composes and edits a
-draft with this player, and `/agent-chat/` talks to the agent service.
+On texuli.com (deployed from `main` to Cloudflare Pages), `/builder/`
+composes and edits a draft with this player. `/agent-chat/` talks to the
+agent service only when a build configures one; the agent service is not
+deployed, so run it locally.
 
 ## E — Agent service (`apps/agent`, `@texuli/agent`)
 

@@ -1,4 +1,4 @@
-import { safeHref, safeMediaSrc } from '@texuli/core/url-policy';
+import { safeHref, safeImageSrcset, safeMediaSrc } from '@texuli/core/url-policy';
 import { createArtifactFrame } from '../frame/frame.ts';
 import { renderCatalogTreeWithLimits } from '../limits/render.ts';
 import { DEFAULT_TREE_LIMITS } from '../limits/types.ts';
@@ -89,7 +89,11 @@ export function assertInertRoots(roots: readonly RenderNode[]): string[] {
 function isUrlKey(key: string): boolean {
   const lower = key.toLowerCase();
   return (
-    URL_KEYS.has(lower) || lower.endsWith('href') || lower.endsWith('src') || lower.endsWith('url')
+    URL_KEYS.has(lower) ||
+    lower.endsWith('href') ||
+    lower.endsWith('src') ||
+    lower.endsWith('srcset') ||
+    lower.endsWith('url')
   );
 }
 
@@ -109,6 +113,11 @@ export function hardenInertRoots(roots: readonly RenderNode[]): readonly RenderN
           continue;
         }
         if (typeof value === 'string' && isUrlKey(key)) {
+          if (key.toLowerCase().endsWith('srcset')) {
+            const srcset = safeImageSrcset(value, 'untrusted');
+            if (srcset && !looksExecutable(srcset)) props[key] = srcset;
+            continue;
+          }
           const href = safeHref(value, 'untrusted');
           const media = safeMediaSrc(value, 'untrusted');
           const ok = href ?? media;

@@ -1,0 +1,230 @@
+---
+/**
+ * /web-and-native/ — the layer-graph section (PLAN_006 T-49).
+ *
+ * The down-only layer graph (L0–L8) as a stacked-band diagram with its real
+ * text alternative: the same graph rendered as a table (caption, scoped
+ * headers, one row per package — the architecture doc's own table). The
+ * diagram is a decorative duplicate, hidden from assistive technology; the
+ * table is the accessible statement of the graph.
+ *
+ * Data comes from `./layers-data.ts`, whose unit test re-parses
+ * `docs/ARCHITECTURE.md` and cross-checks `scripts/check-layers.ts`, so the
+ * section can only draw what the repository declares and enforces.
+ *
+ * A11y: one `section` landmark named by its `h2`; the table lives in a
+ * keyboard-scrollable named region at narrow viewports; nothing else is
+ * focusable (the bands are text, not buttons — the graph has no
+ * interactions to offer). Static markup, zero script, no motion.
+ */
+import { ARCH_LAYERS, ARCH_LAYERS_DESCENDING, dependencySummary } from './layers-data.ts';
+
+const titleId = 'arch-layers-title';
+---
+
+<section class="arch-layers" aria-labelledby={titleId} data-tx-arch-section="layers">
+  <h2 id={titleId}>The layer graph: nine floors, dependencies point down</h2>
+  <p class="arch-layers__lead">
+    Every workspace package sits on exactly one floor, and a package may depend only on packages
+    below it — never sideways, never up. The layer of every package is declared once in
+    <code>scripts/check-layers.ts</code>, and <code>pnpm check:layers</code> enforces the graph on
+    every manifest and every shipped file.
+  </p>
+
+  <figure class="arch-layers__figure">
+    <div class="arch-layers__diagram" aria-hidden="true">
+      {
+        ARCH_LAYERS_DESCENDING.map((layer) => (
+          <div class="arch-layers__band" data-layer={layer.label}>
+            <span class="arch-layers__level">{layer.label}</span>
+            <span class="arch-layers__packages">
+              {layer.packages.map((pkg) => (
+                <span class="arch-layers__chip">{pkg.name}</span>
+              ))}
+            </span>
+            <span class="arch-layers__deps">{dependencySummary(layer)}</span>
+          </div>
+        ))
+      }
+      <p class="arch-layers__down">▲ dependencies point down only</p>
+    </div>
+
+    <div class="arch-layers__table-region" role="region" aria-label="The layer graph as a table" tabindex="0">
+      <table class="arch-layers__table">
+        <caption>
+          The layer graph as a table: every workspace package, the floor it sits on, what it holds,
+          and the lower floors it may depend on.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Layer</th>
+            <th scope="col">Package</th>
+            <th scope="col">What it holds</th>
+            <th scope="col">Depends on</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            ARCH_LAYERS.flatMap((layer) =>
+              layer.packages.map((pkg) => (
+                <tr>
+                  <th scope="row">{layer.label}</th>
+                  <td>
+                    <code>{pkg.name}</code>
+                  </td>
+                  <td>{pkg.role}</td>
+                  <td>{pkg.dependsOn.length > 0 ? pkg.dependsOn.join(', ') : 'none'}</td>
+                </tr>
+              ))
+            )
+          }
+        </tbody>
+      </table>
+    </div>
+    <figcaption>
+      The diagram above repeats this table: floors L0 through L8, top floor L8, and every dependency
+      pointing down — the rule <code>scripts/check-layers.ts</code> enforces.
+    </figcaption>
+  </figure>
+</section>
+
+<style>
+  .arch-layers {
+    display: grid;
+    gap: 1rem;
+    padding-block: clamp(2rem, 6vw, 4rem);
+    color: var(--tx-foreground);
+  }
+  .arch-layers h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    line-height: 1.2;
+  }
+  .arch-layers__lead {
+    margin: 0;
+    max-inline-size: 46rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.6;
+  }
+  .arch-layers__figure {
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .arch-layers__diagram {
+    display: grid;
+    gap: 0.4rem;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding: 0.75rem;
+    background: var(--tx-surface, var(--tx-background));
+  }
+  .arch-layers__band {
+    display: grid;
+    grid-template-columns: minmax(3.5rem, auto) minmax(0, 1fr);
+    gap: 0.25rem 0.75rem;
+    align-items: baseline;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.375rem);
+    padding: 0.45rem 0.6rem;
+    background: color-mix(in oklab, var(--tx-muted) 40%, var(--tx-background));
+  }
+  .arch-layers__level {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-weight: 650;
+    color: var(--tx-foreground);
+  }
+  .arch-layers__packages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  .arch-layers__chip {
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: 999px;
+    padding-block: 0.05rem;
+    padding-inline: 0.55rem;
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.78rem;
+    color: var(--tx-foreground);
+    background: var(--tx-background);
+  }
+  .arch-layers__deps {
+    grid-column: 2;
+    font-size: 0.78rem;
+    color: var(--tx-muted-foreground);
+  }
+  .arch-layers__down {
+    margin: 0;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--tx-muted-foreground);
+  }
+  .arch-layers__table-region {
+    overflow: auto;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+  }
+  .arch-layers__table-region:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .arch-layers__table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .arch-layers__table caption {
+    caption-side: top;
+    text-align: start;
+    padding-block: 0.5rem;
+    padding-inline: 0.6rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.8rem;
+  }
+  .arch-layers__table th,
+  .arch-layers__table td {
+    border-block-start: var(--tx-border-width, 1px) solid var(--tx-border);
+    padding: 0.45rem 0.6rem;
+    text-align: start;
+    vertical-align: top;
+  }
+  .arch-layers__table thead th {
+    border-block-start: none;
+    color: var(--tx-muted-foreground);
+    font-weight: 600;
+  }
+  .arch-layers__table tbody th {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .arch-layers__table td code {
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+  }
+  .arch-layers figcaption {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  @media (max-width: 22.5rem) {
+    .arch-layers__band {
+      grid-template-columns: 1fr;
+    }
+    .arch-layers__deps {
+      grid-column: 1;
+    }
+  }
+  @media (forced-colors: active) {
+    .arch-layers__diagram,
+    .arch-layers__band,
+    .arch-layers__chip,
+    .arch-layers__table-region,
+    .arch-layers__table th,
+    .arch-layers__table td {
+      border-color: CanvasText;
+      background: Canvas;
+    }
+  }
+</style>

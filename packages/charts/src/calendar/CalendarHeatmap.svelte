@@ -6,6 +6,7 @@ import {
   calendarLabels,
   createCalendarHeatmapLayout,
   formatCalendarDate,
+  formatCalendarMonth,
   formatCalendarValue,
 } from './model.ts';
 
@@ -69,7 +70,7 @@ $effect(() => {
     <desc id="{uid}-description">{description}</desc>
     <g class="months" aria-hidden="true">
       {#each months as month (month.month)}
-        <text x={month.x} y="12">{month.month.slice(5)}</text>
+        <text x={month.x} y="12">{formatCalendarMonth(month.month)}</text>
       {/each}
     </g>
     <g transform="translate(0 {labelOffset})" aria-hidden="true">

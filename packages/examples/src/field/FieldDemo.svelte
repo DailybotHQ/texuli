@@ -44,13 +44,24 @@ function validate(values: Record<string, string>): FieldErrorMap {
   </Field>
 
   <h3>Horizontal + RTL</h3>
-  <div dir="rtl">
-    <Field label="Locale" orientation="horizontal" description="Reading direction sample.">
+  <div dir="rtl" lang="ar">
+    <Field
+      label="اللغة"
+      orientation="horizontal"
+      description="اتجاه القراءة من اليمين إلى اليسار."
+    >
       {#snippet children(control)}
-        <Input {...control.props} value="ar-EG" readonly />
+        <Input {...control.props} value="العربية - مصر" readonly />
       {/snippet}
     </Field>
   </div>
+
+  <h3>Disabled field</h3>
+  <Field label="Workspace slug" description="Managed by the workspace owner." disabled>
+    {#snippet children(control)}
+      <Input {...control.props} value="harbor-notes" />
+    {/snippet}
+  </Field>
 
   <h3>Composed Label / Description / FieldError</h3>
   <div class="tx-field-root">

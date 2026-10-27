@@ -1,0 +1,205 @@
+---
+/**
+ * /web-and-native/ — the portability deep-dive section (PLAN_006 T-51).
+ *
+ * The T-16 demo spec's deep-dive half: the walk from one declaration to two
+ * languages — the manifest panel, the TypeScript projection panel, the
+ * Kotlin projection panel — followed by the token and behavior-pattern
+ * steps, and the limits stated on screen ("What does not move today").
+ * Excerpts are verbatim repository code rendered as text; highlighted
+ * segments are the strings the projections literally share.
+ *
+ * Copy, citations and excerpts come from `./portability-content.ts`, whose
+ * unit test anchors every claim to the file it cites and re-proves the
+ * shared-string claims byte for byte. The only links are real on-site
+ * routes; repository paths stay text (`code`), since the site does not
+ * mirror files.
+ *
+ * A11y: one `section` landmark named by its `h2`; each excerpt is a named,
+ * keyboard-scrollable code region; headings keep the h2 → h3 order. Static
+ * markup, zero script, no motion.
+ */
+import { withBase } from '../../foundation/site.ts';
+import {
+  PORTABILITY_EXCERPTS,
+  PORTABILITY_LEDE,
+  PORTABILITY_LIMITS,
+  PORTABILITY_LINKS,
+  PORTABILITY_STEPS,
+  SHARED_NOTE,
+} from './portability-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const titleId = 'arch-portability-title';
+const panelsTitleId = 'arch-portability-panels-title';
+const limitsTitleId = 'arch-portability-limits-title';
+---
+
+<section class="arch-portability" aria-labelledby={titleId} data-tx-arch-section="portability">
+  <h2 id={titleId}>Interface portability: the mechanism</h2>
+  <p class="arch-portability__lede">{PORTABILITY_LEDE.text}</p>
+
+  <h3 id={panelsTitleId}>One declaration, two projections</h3>
+  <div class="arch-portability__panels">
+    {
+      PORTABILITY_EXCERPTS.map((excerpt) => (
+        <figure>
+          <figcaption>
+            {excerpt.label}: <code>{excerpt.file}</code>
+          </figcaption>
+          <pre tabindex="0" role="region" aria-label={`Source excerpt from ${excerpt.file}`}><code>{excerpt.segments.map((segment) => (segment.mark ? <mark>{segment.text}</mark> : segment.text))}</code></pre>
+        </figure>
+      ))
+    }
+  </div>
+  <p class="arch-portability__shared-note">{SHARED_NOTE}</p>
+
+  <div class="arch-portability__step">
+    <h3>Define once</h3>
+    <p>{PORTABILITY_STEPS[0]?.body}</p>
+  </div>
+  <div class="arch-portability__step">
+    <h3>Project twice</h3>
+    <p>{PORTABILITY_STEPS[1]?.body}</p>
+  </div>
+  <div class="arch-portability__step">
+    <h3>Tokens cross</h3>
+    <p>{PORTABILITY_STEPS[2]?.body}</p>
+  </div>
+  <div class="arch-portability__step">
+    <h3>Semantic roles cross</h3>
+    <p>{PORTABILITY_STEPS[3]?.body}</p>
+  </div>
+
+  <h3 id={limitsTitleId}>What does not move today</h3>
+  <ul class="arch-portability__limits">
+    {PORTABILITY_LIMITS.map((limit) => <li>{limit.text}</li>)}
+  </ul>
+
+  <p class="arch-portability__links">
+    {
+      PORTABILITY_LINKS.map((link) => (
+        <a href={withBase(base, link.href)}>{link.label}</a>
+      ))
+    }
+  </p>
+</section>
+
+<style>
+  .arch-portability {
+    display: grid;
+    gap: 1rem;
+    padding-block: clamp(2rem, 6vw, 4rem);
+    color: var(--tx-foreground);
+  }
+  .arch-portability h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    line-height: 1.2;
+  }
+  .arch-portability h3 {
+    margin: 0.5rem 0 0;
+    font-size: 1.1rem;
+  }
+  .arch-portability__lede {
+    margin: 0;
+    max-inline-size: 46rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.6;
+  }
+  .arch-portability__panels {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 56rem) {
+    .arch-portability__panels {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+  .arch-portability__panels figure {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    margin: 0;
+    min-inline-size: 0;
+  }
+  .arch-portability__panels figcaption {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .arch-portability pre {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    overflow: auto;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: color-mix(in oklab, var(--tx-muted) 55%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+  .arch-portability pre:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .arch-portability pre mark {
+    background: color-mix(in oklab, var(--tx-primary) 30%, var(--tx-background));
+    color: inherit;
+    border-radius: 2px;
+  }
+  .arch-portability__shared-note {
+    margin: 0;
+    padding-inline-start: 0.9rem;
+    border-inline-start: 2px solid var(--tx-border);
+    color: var(--tx-muted-foreground);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+  .arch-portability__step p {
+    margin: 0.25rem 0 0;
+    max-inline-size: 46rem;
+    line-height: 1.55;
+  }
+  .arch-portability__limits {
+    margin: 0;
+    padding-inline-start: 1.25rem;
+    display: grid;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+  .arch-portability__limits li::marker {
+    color: var(--tx-muted-foreground);
+  }
+  .arch-portability__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin: 0.25rem 0 0;
+    font-size: 0.95rem;
+  }
+  .arch-portability__links a {
+    color: var(--tx-primary);
+    text-decoration-thickness: from-font;
+    text-underline-offset: 0.2em;
+  }
+  .arch-portability__links a:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  @media (forced-colors: active) {
+    .arch-portability pre {
+      border-color: CanvasText;
+      background: Canvas;
+    }
+    .arch-portability pre mark {
+      background: Canvas;
+      color: CanvasText;
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

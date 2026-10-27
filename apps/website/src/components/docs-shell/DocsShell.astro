@@ -4,6 +4,7 @@
  * Edit-free (no third-party edit links). Fully static except the site theme switch.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { isDocsPath } from '../foundation/nav-data.ts';
 import DocsMobileNav from './DocsMobileNav.astro';
 import DocsPager from './DocsPager.astro';
 import DocsSidebar from './DocsSidebar.astro';
@@ -14,19 +15,41 @@ interface Props {
   title: string;
   description: string;
   toc?: readonly TocEntry[];
+  /** Optional JSON-LD graph, passed through to `BaseLayout` (T-52 TechArticle). */
+  jsonLd?: Record<string, unknown>;
+  /**
+   * Render the docs-shell demo navigation (the sidebar and the phone
+   * "Documentation menu" over `DOCS_SECTIONS`). Pages outside the demo
+   * area turn it off: they already sit in the site's Primary sidebar, and
+   * a second "Documentation" landmark without their page in it misleads
+   * screen-reader and keyboard users (T-90).
+   */
+  demoNav?: boolean;
 }
 
-const { title, description, toc = [] } = Astro.props;
+const { title, description, toc = [], jsonLd = undefined, demoNav = true } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const current = Astro.url.pathname.slice(base.replace(/\/+$/, '').length) || '/';
 const { prev, next } = docsPager(current);
+/**
+ * BaseLayout renders its own "On this page" (PageToc, 80rem and up) on
+ * docs-layout paths; at that width the shell yields its side column so a
+ * page never shows two such navigations (PLAN_006 P2-3).
+ */
+const layoutPageToc = isDocsPath(current);
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
   <div class="docs-shell" data-tx-docs-shell="">
-    <DocsMobileNav currentPath={current} />
-    <div class="docs-shell__grid">
-      <DocsSidebar currentPath={current} />
+    {demoNav && <DocsMobileNav currentPath={current} />}
+    <div
+      class:list={[
+        'docs-shell__grid',
+        !demoNav && 'docs-shell__grid--no-demo-nav',
+        layoutPageToc && 'docs-shell__grid--page-toc',
+      ]}
+    >
+      {demoNav && <DocsSidebar currentPath={current} />}
       <div class="docs-shell__main">
         <article class="docs-article" data-tx-docs-article="">
           <header class="docs-article__header">
@@ -67,10 +90,17 @@ const { prev, next } = docsPager(current);
     display: grid;
     gap: 1.25rem;
   }
+  /* Base rule first: the media queries below must win the cascade. */
+  .docs-shell__toc {
+    display: none;
+  }
   @media (min-width: 64rem) {
     .docs-shell__grid {
       grid-template-columns: 14rem minmax(0, 1fr) 13rem;
       align-items: start;
+    }
+    .docs-shell__grid--no-demo-nav {
+      grid-template-columns: minmax(0, 1fr) 13rem;
     }
     .docs-shell__toc {
       display: block;
@@ -79,8 +109,18 @@ const { prev, next } = docsPager(current);
       display: none;
     }
   }
-  .docs-shell__toc {
-    display: none;
+  /* Docs-layout pages: BaseLayout's PageToc owns "On this page" from 80rem
+     (its breakpoint), so the shell drops its TOC column there. */
+  @media (min-width: 80rem) {
+    .docs-shell__grid--page-toc {
+      grid-template-columns: 14rem minmax(0, 1fr);
+    }
+    .docs-shell__grid--page-toc.docs-shell__grid--no-demo-nav {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .docs-shell__grid--page-toc .docs-shell__toc {
+      display: none;
+    }
   }
   .docs-article__header {
     margin-block-end: 1.25rem;

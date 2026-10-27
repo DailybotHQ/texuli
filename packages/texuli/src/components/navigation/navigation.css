@@ -132,6 +132,14 @@
     opacity: 0;
   }
 
+  /* A vertical indicator's offset is measured on the block axis. */
+  .tx-nav-menu__indicator[data-orientation="vertical"] {
+    inset-inline-start: auto;
+    inset-block-start: var(--tx-navigation-menu-indicator-offset, 0);
+    inline-size: 2px;
+    block-size: var(--tx-navigation-menu-indicator-size, 0);
+  }
+
   /* ── Breadcrumb ─────────────────────────────────────────────── */
   .tx-breadcrumb {
     color: var(--tx-muted-foreground, GrayText);
@@ -164,6 +172,10 @@
   }
 
   .tx-breadcrumb__link {
+    display: inline-flex;
+    align-items: center;
+    /* Inline links stay ≥ 24px tall for the tap target without breaking the trail. */
+    min-block-size: 1.5rem;
     color: inherit;
     text-decoration: none;
     border-radius: var(--tx-radius-sm, 0.25rem);
@@ -294,5 +306,29 @@
     color: var(--tx-muted-foreground, GrayText);
     letter-spacing: 0.08em;
     user-select: none;
+  }
+
+  /* Forced colors strip the tint backgrounds: keep current/selected state on
+     the borders and outlines the mode preserves. */
+  @media (forced-colors: active) {
+    .tx-pagination__button--active,
+    .tx-pagination__button[aria-current="page"],
+    .tx-pagination__button[data-state="active"] {
+      border-color: Highlight;
+      forced-color-adjust: none;
+    }
+
+    .tx-pagination__button:disabled,
+    .tx-pagination__button[data-state="disabled"] {
+      border-color: GrayText;
+    }
+
+    .tx-nav-menu__trigger[data-state="open"],
+    .tx-nav-menu__link--active,
+    .tx-nav-menu__link[aria-current="page"] {
+      outline: 1px solid Highlight;
+      outline-offset: -1px;
+      forced-color-adjust: none;
+    }
   }
 }

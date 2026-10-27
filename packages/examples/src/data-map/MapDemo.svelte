@@ -99,6 +99,20 @@ const fences: MapFence[] = [
   <div class="map-host">
     <MapView {markers} {routes} {fences} label="Harbor coverage" listPlacement="side" />
   </div>
+  <section dir="rtl" lang="ar" aria-labelledby="map-rtl-title">
+    <h3 id="map-rtl-title">التغطية باللغة العربية</h3>
+    <p>نسخة RTL للعلامات والمسارات نفسها على الخريطة المحلية.</p>
+    <div class="map-host">
+      <MapView
+        {markers}
+        {routes}
+        {fences}
+        label="تغطية الميناء"
+        direction="rtl"
+        listPlacement="side"
+      />
+    </div>
+  </section>
 </section>
 
 <style>
@@ -152,5 +166,8 @@ const fences: MapFence[] = [
   }
   .map-host {
     min-block-size: 22rem;
+  }
+  h3 {
+    margin: 0;
   }
 </style>

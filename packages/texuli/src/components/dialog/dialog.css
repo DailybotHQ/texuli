@@ -5,11 +5,7 @@
 @layer tx.components {
   .tx-dialog__overlay {
     box-sizing: border-box;
-    background: color-mix(
-      in srgb,
-      var(--tx-color-foreground, var(--tx-foreground, CanvasText)) 45%,
-      transparent
-    );
+    background: color-mix(in srgb, var(--tx-foreground, CanvasText) 45%, transparent);
   }
 
   .tx-dialog,
@@ -23,7 +19,7 @@
     );
     --tx-dialog-muted: var(--tx-muted-foreground, GrayText);
     --tx-dialog-ring: var(--tx-ring, Highlight);
-    --tx-dialog-danger: var(--tx-destructive, var(--tx-color-danger, #dc2626));
+    --tx-dialog-danger: var(--tx-destructive, crimson);
     --tx-dialog-danger-soft: color-mix(in srgb, var(--tx-dialog-danger) 12%, transparent);
 
     position: fixed;

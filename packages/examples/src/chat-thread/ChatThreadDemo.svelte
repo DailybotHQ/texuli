@@ -1,5 +1,5 @@
 <script lang="ts">
-import { type ChatMessage, ChatThread } from '@texuli/chat';
+import { applyChatStreamEvent, type ChatMessage, ChatThread } from '@texuli/chat';
 
 const currentUserId = 'person-avery';
 const authors = {
@@ -41,6 +41,19 @@ let messages = $state<ChatMessage[]>([
 ]);
 let draft = $state('');
 let nextId = 6;
+
+function simulateStream(): void {
+  const id = 'streamed-reply';
+  messages = applyChatStreamEvent(messages, {
+    type: 'start',
+    id,
+    author: authors.sam,
+    at: '2026-06-12T14:12:00.000Z',
+  });
+  messages = applyChatStreamEvent(messages, { type: 'delta', id, text: 'Streamed reply: ' });
+  messages = applyChatStreamEvent(messages, { type: 'delta', id, text: 'review is complete.' });
+  messages = applyChatStreamEvent(messages, { type: 'end', id, status: 'sent' });
+}
 
 async function send(body: string): Promise<void> {
   const sentAt = new Date('2026-06-12T14:10:00.000Z').getTime() + nextId * 60_000;
@@ -94,6 +107,9 @@ async function send(body: string): Promise<void> {
       }}
     >
       Load earlier messages
+    </button>
+    <button type="button" class="demo__history" onclick={simulateStream}>
+      Simulate a streamed reply
     </button>
   </div>
   <ChatThread {messages} {currentUserId} bind:draft onSend={send} typing={['Jordan Lee']}>

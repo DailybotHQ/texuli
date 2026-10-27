@@ -62,6 +62,39 @@ describe('RichTextEditor rendering', () => {
     expect(screen.getByRole('toolbar', { name: 'Formatting' })).toBeTruthy();
   });
 
+  it('exposes the empty placeholder to assistive technology', () => {
+    const { surface } = mount('', { placeholder: 'Write a fictional update.' });
+    expect(surface.getAttribute('aria-placeholder')).toBe('Write a fictional update.');
+  });
+
+  it('uses the external controller URL tier when rendering existing links', () => {
+    const doc = fromMarkdown('[internal](http://example.com/docs)', {
+      newId: createEditorIds('dev-link'),
+      trust: 'developer',
+    }).doc;
+    const controller = new EditorController({ doc, trust: 'developer' });
+    const view = render(RichTextEditor, { props: { controller, label: 'Notes' } });
+    expect(view.container.querySelector('a')?.getAttribute('href')).toBe('http://example.com/docs');
+  });
+
+  it('keeps the visible link action label in sync with internal editor props', async () => {
+    const view = render(RichTextEditor, {
+      props: { value: load('Notes'), label: 'Notes', labels: { link: 'Insert hyperlink' } },
+    });
+    expect(screen.getByRole('button', { name: 'Insert hyperlink' }).textContent).toContain(
+      'Insert hyperlink'
+    );
+
+    await view.rerender({
+      value: load('Notes'),
+      label: 'Notes',
+      labels: { link: 'Add example link' },
+    });
+    expect(screen.getByRole('button', { name: 'Add example link' }).textContent).toContain(
+      'Add example link'
+    );
+  });
+
   it('renders the vocabulary as real elements and DOM text that equals the model text', () => {
     const markdown = [
       '# Title',

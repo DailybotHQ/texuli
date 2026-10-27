@@ -9,6 +9,7 @@ import EvidencePanel from '../evidence/EvidencePanel.astro';
 import LiveDemo from '../live/LiveDemo.svelte';
 import { STAGE_CONTROLS } from '../live/stage-controls.ts';
 import { stageFor } from '../live/stage-map.ts';
+import { familyNote } from './family-notes.ts';
 import {
   a11yLines,
   type ComponentPageEntry,
@@ -16,6 +17,7 @@ import {
   componentPager,
   keyboardRows,
 } from './load-manifests.ts';
+import ThemeStrip from './ThemeStrip.astro';
 
 interface Props {
   entry: ComponentPageEntry;
@@ -25,6 +27,8 @@ const { entry } = Astro.props;
 const a11y = a11yLines(entry.a11y);
 const keys = keyboardRows(entry.a11y);
 const { prev, next } = componentPager(entry.id);
+// Family differentiators (punch-list row 3): why this family, not just what it is.
+const note = familyNote(entry.group);
 // Resolved at build time so the live demo island ships no per-id tables.
 const stage = stageFor(entry.id);
 const EDITABLE = new Set(['string', 'number', 'boolean', 'enum']);
@@ -71,7 +75,16 @@ const liveProps = {
       <code>{entry.id}</code>
     </p>
     <p class="cp__lead">{entry.summary}</p>
+    {
+      note && (
+        <p class="cp__family">
+          <strong>{note.headline}</strong> {note.body}
+        </p>
+      )
+    }
   </header>
+
+  <ThemeStrip />
 
   <section class="cp__section" aria-labelledby="cp-examples">
     <h2 id="cp-examples">Live examples</h2>
@@ -290,6 +303,14 @@ const liveProps = {
     font-size: 1.1rem;
     color: var(--tx-muted-foreground);
     max-inline-size: 42rem;
+  }
+  .cp__family {
+    margin: 0.5rem 0 0;
+    max-inline-size: 42rem;
+    font-size: 0.95rem;
+  }
+  .cp__family strong {
+    font-weight: 650;
   }
   .cp__section h2 {
     margin: 0 0 0.75rem;

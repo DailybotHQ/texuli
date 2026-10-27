@@ -79,6 +79,31 @@ describe('Separator / AspectRatio / VisuallyHidden', () => {
     expect(el?.getAttribute('style') ?? el?.style.cssText ?? '').toMatch(/--tx-aspect-ratio/);
   });
 
+  it('accepts decimal and slash ratios for custom', () => {
+    for (const value of ['1.618', '16/9', ' 5 / 4 ']) {
+      const { container } = render(SeparatorAspectHarness, {
+        props: { show: 'aspect', custom: value },
+      });
+      const el = container.querySelector('[data-tx-aspect-ratio]') as HTMLElement | null;
+      expect(el?.getAttribute('data-ratio')).toBe('custom');
+      expect(el?.getAttribute('style') ?? '').toMatch(/^--tx-aspect-ratio: [\d./ ]+;?$/);
+    }
+  });
+
+  it('ignores a custom aspect-ratio that is not a plain ratio', () => {
+    // Same injection guard as CardGrid's minItemWidth and Table's maxBlockSize:
+    // anything that is not a plain ratio falls back to the named ratio.
+    const { container } = render(SeparatorAspectHarness, {
+      props: { show: 'aspect', custom: '5 / 4; background: url(https://evil.example/x.png)' },
+    });
+    const el = container.querySelector('[data-tx-aspect-ratio]') as HTMLElement | null;
+    const style = el?.getAttribute('style') ?? '';
+    expect(style).not.toContain('background');
+    expect(style).not.toContain(';');
+    expect(el?.getAttribute('data-ratio')).toBe('16/9');
+    expect(el?.className).toContain('tx-aspect-ratio--16-9');
+  });
+
   it('renders VisuallyHidden content for assistive tech', () => {
     const { container, getByText } = render(SeparatorAspectHarness, {
       props: { show: 'hidden' },

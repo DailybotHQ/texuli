@@ -119,7 +119,7 @@ export class EditorController {
   epochs: ReadonlyMap<EditorBlockId, number> = $state.raw(new Map());
   /** The last refusal, for hosts that show it. */
   errors: readonly EditorIssue[] = $state.raw([]);
-  labels: EditorLabels;
+  labels: EditorLabels = $state.raw(DEFAULT_EDITOR_LABELS);
   trust: HrefTrust;
   readonly options: EditorControllerOptions;
   /** Set by Escape in the text: the next Tab leaves the editor even inside a list. */
@@ -271,11 +271,7 @@ export class EditorController {
 
   /** Whether the caret is inside a list item (Tab indents instead of moving focus). */
   get inList(): boolean {
-    const { selection, doc } = this.state;
-    if (selection.kind !== 'text') return false;
-    return (
-      locateBlock(doc, selection.focus.block)?.ancestors.some((a) => a.kind === 'item') ?? false
-    );
+    return this.listDepth() > 0;
   }
 
   private listDepth(): number {
@@ -313,12 +309,7 @@ export class EditorController {
   }
 
   toggleList(kind: 'bullet' | 'ordered' | 'todo'): boolean {
-    const name =
-      kind === 'bullet'
-        ? this.labels.bulletList
-        : kind === 'ordered'
-          ? this.labels.orderedList
-          : this.labels.todoList;
+    const name = this.labels[`${kind}List`];
     const was = this.active.list === kind;
     return this.apply(
       toggleList(this.state, kind, this.transform),
@@ -404,6 +395,10 @@ export class EditorController {
       this.toggleMark(mark);
       return true;
     }
+    if (intent.startsWith('heading-')) {
+      this.setBlock('heading', Number(intent.slice(-1)) as 1 | 2 | 3 | 4);
+      return true;
+    }
     switch (intent) {
       case 'undo':
         this.undo();
@@ -414,20 +409,10 @@ export class EditorController {
       case 'paragraph':
         this.setBlock('paragraph');
         return true;
-      case 'heading-1':
-      case 'heading-2':
-      case 'heading-3':
-      case 'heading-4':
-        this.setBlock('heading', Number(intent.slice(-1)) as 1 | 2 | 3 | 4);
-        return true;
       case 'bullet-list':
-        this.toggleList('bullet');
-        return true;
       case 'ordered-list':
-        this.toggleList('ordered');
-        return true;
       case 'todo-list':
-        this.toggleList('todo');
+        this.toggleList(intent.slice(0, -5) as 'bullet' | 'ordered' | 'todo');
         return true;
       case 'quote':
         this.toggleQuote();
@@ -467,6 +452,17 @@ export class EditorController {
     }
     const selection = this.state.selection;
     const range = selection.kind === 'node' || !isCollapsed(selection);
+    // The six directional deletes: delete-[word-|line-](back|for)ward.
+    if (intent.endsWith('ward')) {
+      const unit = intent.includes('word') ? 'word' : intent.includes('line') ? 'line' : 'grapheme';
+      const result = range
+        ? deleteSelection(this.state, this.transform)
+        : intent.endsWith('forward')
+          ? deleteForward(this.state, unit, this.transform)
+          : deleteBackward(this.state, unit, this.transform);
+      this.apply(result, 'deletion');
+      return true;
+    }
     switch (intent) {
       case 'insert-text':
       case 'replace-text':
@@ -481,26 +477,6 @@ export class EditorController {
       case 'delete-selection':
         this.apply(deleteSelection(this.state, this.transform), 'deletion');
         return true;
-      case 'delete-backward':
-      case 'delete-word-backward':
-      case 'delete-line-backward':
-      case 'delete-forward':
-      case 'delete-word-forward':
-      case 'delete-line-forward': {
-        const forward = intent.endsWith('forward');
-        const unit = intent.includes('word')
-          ? 'word'
-          : intent.includes('line')
-            ? 'line'
-            : 'grapheme';
-        const result = range
-          ? deleteSelection(this.state, this.transform)
-          : forward
-            ? deleteForward(this.state, unit, this.transform)
-            : deleteBackward(this.state, unit, this.transform);
-        this.apply(result, 'deletion');
-        return true;
-      }
       case 'undo':
         this.undo();
         return true;

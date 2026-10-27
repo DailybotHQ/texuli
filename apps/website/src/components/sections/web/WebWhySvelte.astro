@@ -1,0 +1,255 @@
+---
+/**
+ * Unified landing, why-Svelte section (PLAN_006 T-41). The web story in
+ * customer language, the three-layer ladder with one verbatim repository
+ * excerpt per layer, and the guarantee row — every claim linking the real
+ * on-site route that documents it (narrative blueprint §2 pillar 1, §3, §5 s4).
+ *
+ * All copy and citations live in `web-why-svelte-content.ts`; the unit test
+ * (`apps/website/tests/web-why-svelte.test.ts`) pins every claim against the
+ * repository file it cites and the excerpts byte for byte. No HTML sinks,
+ * no other component libraries named, links resolved through the URL policy
+ * (developer tier: app-authored site routes).
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../foundation/site.ts';
+import {
+  WEB_WHY_CTA,
+  WEB_WHY_GUARANTEES,
+  WEB_WHY_IDS,
+  WEB_WHY_LADDER,
+  WEB_WHY_LEDE,
+  WEB_WHY_STORY,
+} from './web-why-svelte-content.ts';
+
+const base = import.meta.env.BASE_URL;
+
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+---
+
+<section class="web-why" aria-labelledby={WEB_WHY_IDS.section} data-tx-web-why-svelte="">
+  <h2 id={WEB_WHY_IDS.section}>Why Svelte for the web</h2>
+  <p class="web-why__lede">{WEB_WHY_LEDE.text}</p>
+
+  <h3 id={WEB_WHY_IDS.story}>The web story</h3>
+  <div class="web-why__story">
+    {
+      WEB_WHY_STORY.map((claim) => (
+        <div class="web-why__claim">
+          <p>
+            <strong>{claim.title}.</strong> {claim.body}
+          </p>
+          <a class="web-why__claim-link" href={resolveHref(claim.href)}>{claim.label}</a>
+        </div>
+      ))
+    }
+  </div>
+
+  <h3 id={WEB_WHY_IDS.ladder}>The ladder: texels to components</h3>
+  <ol class="web-why__ladder" role="list">
+    {
+      WEB_WHY_LADDER.map((row) => (
+        <li class="web-why__rung" data-tx-ladder-layer={row.layer}>
+          <p class="web-why__rung-head">
+            <span class="web-why__rung-name">{row.name}</span> {row.role}
+          </p>
+          <figure>
+            <figcaption>
+              {row.excerpt.label}: <code>{row.excerpt.file}</code>
+            </figcaption>
+            <pre
+              tabindex="0"
+              role="region"
+              aria-label={`Repository excerpt from ${row.excerpt.file}`}
+            ><code>{row.excerpt.code}</code></pre>
+          </figure>
+          <a class="web-why__claim-link" href={resolveHref(row.href)}>{row.label}</a>
+        </li>
+      ))
+    }
+  </ol>
+
+  <h3 id={WEB_WHY_IDS.guarantees}>The guarantees</h3>
+  <div class="web-why__guarantees">
+    {
+      WEB_WHY_GUARANTEES.map((claim) => (
+        <div class="web-why__claim">
+          <p>
+            <strong>{claim.title}.</strong> {claim.body}
+          </p>
+          <a class="web-why__claim-link" href={resolveHref(claim.href)}>{claim.label}</a>
+        </div>
+      ))
+    }
+  </div>
+
+  <p class="web-why__cta">
+    <a class="web-hero__cta" href={resolveHref(WEB_WHY_CTA.href)}>{WEB_WHY_CTA.label}</a>
+  </p>
+</section>
+
+<style>
+  .web-why {
+    display: grid;
+    gap: 1.25rem;
+    max-inline-size: 72rem;
+    margin-inline: auto;
+    padding-block: clamp(2rem, 5vw, 3.5rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .web-why h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.2;
+    color: var(--tx-foreground);
+  }
+  .web-why h3 {
+    margin: 0.5rem 0 0;
+    font-size: 1.1rem;
+    color: var(--tx-foreground);
+  }
+  .web-why__lede {
+    margin: 0;
+    max-inline-size: 46rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.6;
+  }
+  .web-why__story,
+  .web-why__guarantees {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 56rem) {
+    .web-why__story,
+    .web-why__guarantees {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+      align-items: start;
+    }
+  }
+  .web-why__claim {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding: 0.85rem 1rem;
+    background: var(--tx-card, var(--tx-background));
+    min-inline-size: 0;
+  }
+  .web-why__claim p {
+    margin: 0;
+    color: var(--tx-foreground);
+    line-height: 1.55;
+  }
+  .web-why__claim strong {
+    color: var(--tx-foreground);
+  }
+  .web-why__claim-link {
+    /* A 24px target (WCAG 2.5.8); the text alone was 23px (T-89). */
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--tx-primary);
+    font-size: 0.9rem;
+    text-decoration-thickness: from-font;
+    text-underline-offset: 0.2em;
+  }
+  .web-why__claim-link:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .web-why__ladder {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: rung;
+  }
+  .web-why__rung {
+    display: grid;
+    gap: 0.6rem;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding: 0.85rem 1rem;
+    background: var(--tx-card, var(--tx-background));
+    min-inline-size: 0;
+  }
+  .web-why__rung-head {
+    margin: 0;
+    color: var(--tx-foreground);
+    line-height: 1.55;
+  }
+  .web-why__rung-name {
+    font-weight: 700;
+  }
+  .web-why__rung figure {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    margin: 0;
+    min-inline-size: 0;
+  }
+  .web-why__rung figcaption {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .web-why pre {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    overflow: auto;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: color-mix(in oklab, var(--tx-muted) 55%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+  .web-why pre:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .web-why__cta {
+    margin: 0.5rem 0 0;
+  }
+  .web-why__cta :global(.web-hero__cta) {
+    display: inline-block;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding-block: 0.6rem;
+    padding-inline: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    background: var(--tx-foreground);
+    border-color: var(--tx-foreground);
+    color: var(--tx-background);
+  }
+  .web-why__cta :global(.web-hero__cta:hover) {
+    background: color-mix(in oklab, var(--tx-foreground) 88%, var(--tx-background));
+    color: var(--tx-background);
+  }
+  .web-why__cta :global(.web-hero__cta:focus-visible) {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    .web-why pre {
+      border-color: CanvasText;
+      background: Canvas;
+    }
+    /* Forced colors (T-87, axe color-contrast): the filled CTA's author
+       text color would sit on the forced Canvas, so name system colors. */
+    .web-why__cta :global(.web-hero__cta),
+    .web-why__cta :global(.web-hero__cta:hover) {
+      border-color: LinkText;
+      background: Canvas;
+      color: LinkText;
+    }
+  }
+</style>

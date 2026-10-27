@@ -2,9 +2,10 @@
 
 Media: images, galleries, video, audio and layered compositions. The L4
 domain package composes `texuli` components, `@texuli/primitives` behavior
-and the `@texuli/tokens` engine into Svelte 5 media surfaces. The package is
-private and source-first while Texuli is in development; it is not published
-to npm.
+and the `@texuli/tokens` engine into Svelte 5 media surfaces. Published to npm as `0.1.0-next.1` under the `next`
+dist-tag (by CI, with provenance); no stable release (`latest` is reserved
+for 1.0.0), so install it with `@next`. The workspace package stays
+`"private": true`.
 
 ## Status
 

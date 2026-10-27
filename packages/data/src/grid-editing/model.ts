@@ -80,7 +80,7 @@ export function validateCell<T>(
   draft: EditorDraft,
   labels: Pick<
     GridEditingLabels,
-    'invalidNumber' | 'invalidEnum' | 'required'
+    'invalidNumber' | 'invalidDate' | 'invalidEnum' | 'required'
   > = DEFAULT_GRID_EDITING_LABELS
 ): CellValidation {
   const value = parseEditorValue(column, draft);
@@ -101,7 +101,7 @@ export function validateCell<T>(
   if (column.type === 'date' && typeof value === 'string' && value !== '') {
     const ms = Date.parse(value);
     if (!Number.isFinite(ms)) {
-      return { ok: false, message: labels.invalidNumber };
+      return { ok: false, message: labels.invalidDate };
     }
   }
 

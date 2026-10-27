@@ -1,10 +1,14 @@
 // @vitest-environment happy-dom
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
+import EditableDataGrid from '../src/grid-editing/EditableDataGrid.svelte';
 import {
   applyRowValue,
   cellKey,
   createUndoStack,
+  DEFAULT_GRID_EDITING_LABELS,
   draftFromValue,
   parseClipboard,
   parseEditorValue,
@@ -38,6 +42,13 @@ const columns: EditableColumn<Deal>[] = [
   { key: 'active', header: 'Active', type: 'boolean', editable: true },
 ];
 
+const dueColumn: EditableColumn<{ id: string }> = {
+  key: 'due',
+  header: 'Due',
+  type: 'date',
+  editable: true,
+};
+
 describe('grid editing engine', () => {
   it('parses drafts by column type', () => {
     expect(parseEditorValue(columns[0]!, 'Harbor')).toBe('Harbor');
@@ -60,6 +71,19 @@ describe('grid editing engine', () => {
     };
     expect(validateCell(required, { id: 'd1' } as Deal, '').ok).toBe(false);
     expect(validateCell(required, { id: 'd1' } as Deal, 'Ok').ok).toBe(true);
+  });
+
+  it('rejects an invalid date with the date message, not the number one', () => {
+    expect(validateCell(dueColumn, { id: 'd1' }, 'not-a-date')).toMatchObject({
+      ok: false,
+      message: 'Enter a valid date.',
+    });
+    expect(
+      validateCell(dueColumn, { id: 'd1' }, 'nope', {
+        ...DEFAULT_GRID_EDITING_LABELS,
+        invalidDate: 'Use YYYY-MM-DD.',
+      })
+    ).toMatchObject({ ok: false, message: 'Use YYYY-MM-DD.' });
   });
 
   it('serializes and parses TSV clipboard blocks', () => {
@@ -178,5 +202,139 @@ describe('EditableDataGrid', () => {
       expect(screen.getByRole('alert').textContent).toContain('Harbor refused the write.');
     });
     expect(screen.getByText('Harbor Notes')).toBeTruthy();
+  });
+
+  it('commits an enum editor on blur like the text editor', async () => {
+    render(GridEditingHarness);
+    await fireEvent.dblClick(screen.getByText('Open').closest('[data-tx-edit-cell]')!);
+    const select = await screen.findByDisplayValue('Open');
+    await fireEvent.change(select, { target: { value: 'Lost' } });
+    await fireEvent.blur(select);
+    await waitFor(() => expect(screen.queryByDisplayValue('Lost')).toBeNull());
+    await waitFor(() => expect(screen.getByText('Lost')).toBeTruthy());
+  });
+
+  it('commits the boolean switch on blur', async () => {
+    render(GridEditingHarness);
+    await fireEvent.dblClick(screen.getByText('No').closest('[data-tx-edit-cell]')!);
+    const booleanEditor = await screen.findByRole('switch', { name: 'Active' });
+    await fireEvent.click(booleanEditor);
+    // Focus leaves the editor for another cell: the draft commits.
+    const outside = screen.getByText('Harbor Notes').closest<HTMLElement>('[role=gridcell]')!;
+    await fireEvent.blur(booleanEditor, { relatedTarget: outside });
+    await fireEvent.focusOut(booleanEditor, { relatedTarget: outside });
+    await waitFor(() => expect(screen.queryByRole('switch')).toBeNull());
+    // d1 already shows "Yes"; after the blur commit d2 joins it.
+    await waitFor(() => expect(screen.getAllByText('Yes')).toHaveLength(2));
+  });
+
+  it('keeps the boolean editor open when Tab moves focus to its Save button', async () => {
+    render(GridEditingHarness);
+    await fireEvent.dblClick(screen.getByText('No').closest('[data-tx-edit-cell]')!);
+    const booleanEditor = await screen.findByRole('switch', { name: 'Active' });
+    await fireEvent.click(booleanEditor);
+    const save = screen.getByRole('button', { name: 'Save' });
+    await fireEvent.blur(booleanEditor, { relatedTarget: save });
+    await fireEvent.focusOut(booleanEditor, { relatedTarget: save });
+    // The editor is still mounted and its Save button is reachable.
+    expect(screen.getByRole('switch', { name: 'Active' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Save' }).isConnected).toBe(true);
+    expect(screen.getAllByText('Yes')).toHaveLength(1);
+  });
+
+  it('commits from the Save button and returns focus to the cell, not <body>', async () => {
+    render(GridEditingHarness);
+    await fireEvent.dblClick(screen.getByText('No').closest('[data-tx-edit-cell]')!);
+    const booleanEditor = await screen.findByRole('switch', { name: 'Active' });
+    await fireEvent.click(booleanEditor);
+    const save = screen.getByRole('button', { name: 'Save' });
+    const gridcell = save.closest<HTMLElement>('[role=gridcell]')!;
+    save.focus();
+    await fireEvent.focusOut(booleanEditor, { relatedTarget: save });
+    await fireEvent.click(save);
+    await waitFor(() => expect(screen.queryByRole('switch')).toBeNull());
+    await waitFor(() => expect(screen.getAllByText('Yes')).toHaveLength(2));
+    await waitFor(() => expect(document.activeElement).toBe(gridcell));
+    expect(document.activeElement).not.toBe(document.body);
+  });
+
+  it('marks the reopened editor invalid and links the cell error', async () => {
+    render(GridEditingHarness);
+    await fireEvent.dblClick(screen.getByText('120').closest('[data-tx-edit-cell]')!);
+    const input = await screen.findByDisplayValue('120');
+    await fireEvent.input(input, { target: { value: 'abc' } });
+    await fireEvent.keyDown(input, { key: 'Enter' });
+    await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy());
+
+    await fireEvent.dblClick(screen.getByText('120').closest('[data-tx-edit-cell]')!);
+    const reopened = await screen.findByDisplayValue('120');
+    expect(reopened.getAttribute('aria-invalid')).toBe('true');
+    const describedBy = reopened.getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
+    expect(document.getElementById(describedBy!)?.textContent).toMatch(/number/i);
+  });
+
+  it('announces how many cells a paste wrote', async () => {
+    render(GridEditingHarness);
+    const name = screen.getByText('Harbor Notes').closest('[data-tx-edit-cell]') as HTMLElement;
+    name.focus();
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { readText: async () => 'Alpha\nBeta' },
+    });
+    try {
+      await fireEvent.keyDown(name, { key: 'v', ctrlKey: true });
+      await waitFor(() => expect(screen.getByText('Pasted 2 cells.')).toBeTruthy());
+      await waitFor(() => expect(screen.getByText('Alpha')).toBeTruthy());
+    } finally {
+      delete (navigator as unknown as { clipboard?: unknown }).clipboard;
+    }
+  });
+
+  it('labels the boolean save button through labels.save', async () => {
+    render(EditableDataGrid, {
+      props: {
+        rows: [
+          { id: 'b1', name: 'Beacon', active: false },
+          { id: 'b2', name: 'Cairn', active: true },
+        ],
+        columns: [
+          { key: 'name', header: 'Deal', type: 'text' },
+          { key: 'active', header: 'Active', type: 'boolean', editable: true },
+        ],
+        getRowId: (row: unknown) => (row as Deal).id,
+        caption: 'Switch grid',
+        onCommit: () => {},
+        labels: { save: 'Keep' },
+      },
+    });
+    await fireEvent.dblClick(screen.getByText('No').closest('[data-tx-edit-cell]')!);
+    expect(await screen.findByRole('button', { name: 'Keep' })).toBeTruthy();
+  });
+
+  it('leaves the date editor typeable on touch keyboards', async () => {
+    render(EditableDataGrid, {
+      props: {
+        rows: [{ id: 't1', name: 'Tempora', due: '2026-01-31' }],
+        columns: [{ key: 'due', header: 'Due', type: 'date', editable: true }],
+        getRowId: (row: unknown) => (row as { id: string }).id,
+        caption: 'Date grid',
+        onCommit: () => {},
+      },
+    });
+    await fireEvent.dblClick(screen.getByText('2026-01-31').closest('[data-tx-edit-cell]')!);
+    const input = await screen.findByDisplayValue('2026-01-31');
+    // inputmode="none" hides the soft keyboard entirely: a phone user could
+    // never type the draft.
+    expect(input.getAttribute('inputmode')).not.toBe('none');
+  });
+
+  it('keeps grid-editing.css free of hardcoded color literals', () => {
+    const css = readFileSync(
+      join(import.meta.dirname, '../src/grid-editing/grid-editing.css'),
+      'utf8'
+    );
+    const literals = css.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
+    expect(literals).toEqual([]);
   });
 });

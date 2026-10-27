@@ -10,7 +10,8 @@ const toc = [
 ];
 
 const treeSnippet = `guides/
-  getting-started/   install or copy
+  getting-started/   install the published preview
+  why-svelte-kotlin/ web and native, one contract
   theming/           themes and tokens
   dark-mode/         light, dark, system
   accessibility/     keyboard and contrast
@@ -42,8 +43,9 @@ const treeSnippet = `guides/
 
   <h2 id="static-and-local">Static and local</h2>
   <p>
-    After <code>pnpm build</code> the site is plain files. Guide pages make no request to another
-    origin. The shared appearance switch in the header is the only client control on most pages;
-    interactive demos that need state use a focused Svelte island.
+    Guide pages are static files. They make no request to another origin, so nothing leaks to third
+    parties and a loaded page keeps working offline. The shared appearance switch in the header is
+    the only client control on most pages; interactive demos that need state use a focused Svelte
+    island.
   </p>
 </GuidesShell>

@@ -304,6 +304,53 @@ describe('Image', () => {
     expect(unsafe.container.querySelector('img')).not.toBeNull();
   });
 
+  it('threads the trust tier into the href policy', () => {
+    // Untrusted default: relative and http links stay inert (same tier as agent/user content).
+    const relativeUntrusted = render(Image, {
+      src: PHOTO,
+      alt: 'Harbor album',
+      href: '/albums/harbor',
+    });
+    expect(relativeUntrusted.container.querySelector('a')).toBeNull();
+    expect(relativeUntrusted.container.querySelector('img')).not.toBeNull();
+
+    const httpUntrusted = render(Image, {
+      src: PHOTO,
+      alt: 'Harbor album',
+      href: 'http://images.example.com/album',
+    });
+    expect(httpUntrusted.container.querySelector('a')).toBeNull();
+
+    // Developer tier: app-authored relative and http hrefs pass; script schemes still fail.
+    const relativeDeveloper = render(Image, {
+      src: PHOTO,
+      alt: 'Harbor album',
+      href: '/albums/harbor',
+      trust: 'developer',
+    });
+    expect(relativeDeveloper.container.querySelector('a')?.getAttribute('href')).toBe(
+      '/albums/harbor'
+    );
+
+    const httpDeveloper = render(Image, {
+      src: PHOTO,
+      alt: 'Harbor album',
+      href: 'http://localhost:5173/album',
+      trust: 'developer',
+    });
+    expect(httpDeveloper.container.querySelector('a')?.getAttribute('href')).toBe(
+      'http://localhost:5173/album'
+    );
+
+    const scriptDeveloper = render(Image, {
+      src: PHOTO,
+      alt: 'Harbor album',
+      href: 'javascript:alert(1)',
+      trust: 'developer',
+    });
+    expect(scriptDeveloper.container.querySelector('a')).toBeNull();
+  });
+
   it('becomes a native button with onactivate', async () => {
     const onactivate = vi.fn();
     const { container } = render(Image, {

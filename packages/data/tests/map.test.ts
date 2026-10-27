@@ -97,7 +97,9 @@ describe('MapView', () => {
   it('names list rows label, detail with data-list-item and aria-current on selection', async () => {
     const onSelect = vi.fn();
     render(MapView, { props: { markers, onSelect } });
-    const locations = within(screen.getByRole('complementary', { name: 'Map locations' }));
+    const locations = within(
+      screen.getByRole('complementary', { name: `${PORT_MERIDIAN.name} locations` })
+    );
     const list = locations.getByRole('list', { name: 'Map places' });
     expect(list.getAttribute('data-map-place-list')).toBe('');
     const rows = list.querySelectorAll('[role="listitem"]');
@@ -340,6 +342,15 @@ describe('MapView', () => {
     expect(Number.isFinite(last.zoom)).toBe(true);
   });
 
+  it('keeps the empty place row out of the set bookkeeping', () => {
+    render(MapView, { props: { markers: [] } });
+    const empty = screen.getByText('No locations');
+    expect(empty.getAttribute('role')).toBe('listitem');
+    // "1 of 0" is nonsense bookkeeping for a row that is not a real entry.
+    expect(empty.getAttribute('aria-posinset')).toBeNull();
+    expect(empty.getAttribute('aria-setsize')).toBeNull();
+  });
+
   it('packs the header at the top when the host container is taller than the content', async () => {
     const { readFileSync } = await import('node:fs');
     const { resolve } = await import('node:path');
@@ -371,5 +382,24 @@ describe('MapView', () => {
     expect(header.getBoundingClientRect().top - root.getBoundingClientRect().top).toBeLessThan(16);
 
     host.remove();
+  });
+});
+
+describe('MapView location panel name (T-87 F9, axe landmark-unique)', () => {
+  it('names the panel from the map label, so two maps on a page stay distinct', () => {
+    render(MapView, { props: { markers, label: 'Harbor coverage' } });
+    render(MapView, { props: { markers, label: 'Depot coverage' } });
+    const panels = screen.getAllByRole('complementary');
+    expect(panels.map((panel) => panel.getAttribute('aria-label'))).toEqual([
+      'Harbor coverage locations',
+      'Depot coverage locations',
+    ]);
+  });
+
+  it('falls back to the basemap name when no label is given', () => {
+    render(MapView, { props: { markers } });
+    expect(
+      screen.getByRole('complementary', { name: `${PORT_MERIDIAN.name} locations` })
+    ).toBeTruthy();
   });
 });

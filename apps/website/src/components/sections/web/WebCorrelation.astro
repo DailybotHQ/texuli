@@ -1,0 +1,290 @@
+---
+/**
+ * Unified landing, correlation section (PLAN_006 T-42): the flagship
+ * portability demo from the T-16 spec, "one line in, two languages out".
+ * Three panels walk the badge from its catalog manifest to the generated
+ * TypeScript and Kotlin projections, with the shared summary string
+ * highlighted in each; the native renderer is a status chip, never a
+ * screenshot. The honesty frame (today versus planned) sits on screen
+ * under its own headings.
+ *
+ * All copy and excerpts live in `web-correlation-content.ts`; the unit test
+ * (`apps/website/tests/web-correlation.test.ts`) pins every excerpt byte for
+ * byte against the file it cites. Excerpts render as text and `<mark>`
+ * elements only — no HTML sinks. Static markup, no island and no motion, so
+ * reduced-motion preferences hold by construction. Links resolve through the
+ * URL policy (developer tier: app-authored site routes).
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../foundation/site.ts';
+import {
+  dedent,
+  highlightShared,
+  WEB_CORR_ARCH_LINK,
+  WEB_CORR_CAPTION,
+  WEB_CORR_DEMO_LINK,
+  WEB_CORR_IDS,
+  WEB_CORR_LEDE,
+  WEB_CORR_MOVES_TODAY,
+  WEB_CORR_PANELS,
+  WEB_CORR_PLANNED,
+  WEB_CORR_STATUS_CHIP,
+  WEB_CORR_TITLE,
+} from './web-correlation-content.ts';
+
+const base = import.meta.env.BASE_URL;
+
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+---
+
+<section class="web-corr" aria-labelledby={WEB_CORR_IDS.section} data-tx-web-correlation="">
+  <h2 id={WEB_CORR_IDS.section}>{WEB_CORR_TITLE}</h2>
+  <p class="web-corr__lede">{WEB_CORR_LEDE}</p>
+
+  <ol class="web-corr__panels" role="list">
+    {
+      WEB_CORR_PANELS.map((panel) => (
+        <li class="web-corr__panel" data-tx-corr-panel={panel.id}>
+          <p class="web-corr__panel-head">
+            <span class="web-corr__step" aria-hidden="true">{panel.step}</span>
+            <span class="web-corr__panel-title">{panel.title}</span>
+          </p>
+          <p class="web-corr__panel-text">{panel.description}</p>
+          {panel.excerpts.map((excerpt) => (
+            <figure>
+              <figcaption>
+                <code>{excerpt.file}</code>
+              </figcaption>
+              <pre
+                tabindex="0"
+                role="region"
+                aria-label={`${panel.title}: excerpt from ${excerpt.file}`}
+              ><code>{highlightShared(dedent(excerpt.code)).map((segment) => segment.shared ? <mark>{segment.text}</mark> : segment.text)}</code></pre>
+            </figure>
+          ))}
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="web-corr__frame">
+    <p class="web-corr__caption">{WEB_CORR_CAPTION}</p>
+    <p class="web-corr__chip" data-status="in-development">{WEB_CORR_STATUS_CHIP}</p>
+    <p class="web-corr__link">
+      {
+        [WEB_CORR_DEMO_LINK, WEB_CORR_ARCH_LINK].map((link, index) => (
+          <>
+            {index > 0 && <span aria-hidden="true"> · </span>}
+            <a href={resolveHref(link.href)}>{link.label}</a>
+          </>
+        ))
+      }
+    </p>
+  </div>
+
+  <div class="web-corr__status">
+    <div class="web-corr__column">
+      <h3 id={WEB_CORR_IDS.today}>What moves today</h3>
+      <ul role="list">
+        {WEB_CORR_MOVES_TODAY.map((item) => <li data-status="shipped">{item}</li>)}
+      </ul>
+    </div>
+    <div class="web-corr__column">
+      <h3 id={WEB_CORR_IDS.planned}>Planned</h3>
+      <ul role="list">
+        {WEB_CORR_PLANNED.map((item) => <li data-status="planned">{item}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .web-corr {
+    display: grid;
+    gap: 1.25rem;
+    max-inline-size: 72rem;
+    margin-inline: auto;
+    padding-block: clamp(2rem, 5vw, 3.5rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .web-corr h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.2;
+    color: var(--tx-foreground);
+  }
+  .web-corr h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--tx-foreground);
+  }
+  .web-corr__lede {
+    margin: 0;
+    max-inline-size: 46rem;
+    color: var(--tx-muted-foreground);
+    line-height: 1.6;
+  }
+  .web-corr__panels {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 56rem) {
+    .web-corr__panels {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+    }
+    .web-corr__status {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .web-corr__panel {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding: 0.85rem 1rem;
+    background: var(--tx-card, var(--tx-background));
+    min-inline-size: 0;
+  }
+  .web-corr__panel-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    color: var(--tx-foreground);
+    font-weight: 700;
+  }
+  .web-corr__step {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    border-radius: 999px;
+    background: var(--tx-foreground);
+    color: var(--tx-background);
+    font-size: 0.8rem;
+  }
+  .web-corr__panel-text {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .web-corr figure {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+    min-inline-size: 0;
+  }
+  .web-corr figcaption {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .web-corr pre {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    overflow: auto;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: color-mix(in oklab, var(--tx-muted) 55%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    text-align: start;
+  }
+  .web-corr pre:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .web-corr mark {
+    border-radius: 0.2rem;
+    padding-inline: 0.1rem;
+    background: color-mix(in oklab, var(--tx-primary) 22%, transparent);
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--tx-primary);
+    text-underline-offset: 0.2em;
+  }
+  .web-corr__frame {
+    display: grid;
+    gap: 0.6rem;
+    justify-items: start;
+  }
+  .web-corr__caption {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-weight: 600;
+  }
+  .web-corr__chip {
+    margin: 0;
+    border: 1px solid var(--tx-border);
+    border-radius: 999px;
+    padding-block: 0.3rem;
+    padding-inline: 0.85rem;
+    background: color-mix(in oklab, var(--tx-muted) 55%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  .web-corr__link {
+    margin: 0;
+  }
+  .web-corr__link a {
+    color: var(--tx-primary);
+    font-size: 0.9rem;
+    text-decoration-thickness: from-font;
+    text-underline-offset: 0.2em;
+  }
+  .web-corr__link a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .web-corr__status {
+    display: grid;
+    gap: 1rem;
+  }
+  .web-corr__column {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    border: var(--tx-border-width, 1px) solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    padding: 0.85rem 1rem;
+    min-inline-size: 0;
+  }
+  .web-corr__column ul {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding-inline-start: 1.1rem;
+    color: var(--tx-foreground);
+    line-height: 1.55;
+  }
+  .web-corr__column li[data-status='planned'] {
+    color: var(--tx-muted-foreground);
+  }
+  @media (forced-colors: active) {
+    .web-corr pre,
+    .web-corr__chip {
+      border-color: CanvasText;
+      background: Canvas;
+    }
+    .web-corr mark {
+      background: Highlight;
+      color: HighlightText;
+    }
+    .web-corr__step {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

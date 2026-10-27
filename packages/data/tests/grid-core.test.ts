@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { describe, expect, it } from 'vitest';
@@ -351,5 +353,71 @@ describe('DataGrid', () => {
     });
     expect(grid().querySelector('img, b')).toBeNull();
     expect(bodyNames()).toEqual(['<img src=x onerror=alert(1)>']);
+  });
+});
+
+const manyDeals = Array.from({ length: 30 }, (_, index) => ({
+  id: `v${index}`,
+  name: `Deal ${index}`,
+  owner: 'Ada',
+  stage: 'open',
+  amount: index * 10,
+  closes: '2026-01-01',
+}));
+const scrollArea = () => document.querySelector('.tx-table-wrap') as HTMLElement;
+
+async function scrollBy(scrollTop: number): Promise<void> {
+  const area = scrollArea();
+  area.scrollTop = scrollTop;
+  area.dispatchEvent(new Event('scroll', { bubbles: true }));
+  await tick();
+  await tick();
+}
+
+describe('DataGrid windowing', () => {
+  it('renders the rows in view plus overscan and spacers for the rest', async () => {
+    render(DataGridHarness, { props: { rows: manyDeals, virtualizeAbove: 0 } });
+    expect(document.querySelector('[data-tx-data-grid]')?.getAttribute('data-virtual')).toBe(
+      'true'
+    );
+    expect(grid().getAttribute('aria-rowcount')).toBe('31');
+    // Viewport 360px at rowSize 36 = 10 rows, plus 4 above and 4 below overscan.
+    const body = document.querySelector('.tx-table__body') as HTMLElement;
+    const dataRows = body.querySelectorAll('tr:not(.tx-data-grid__spacer)');
+    expect(dataRows).toHaveLength(14);
+    const spacers = body.querySelectorAll('.tx-data-grid__spacer');
+    expect(spacers).toHaveLength(1);
+    const spacerCell = body.querySelector('.tx-data-grid__spacer > td') as HTMLElement | null;
+    expect(spacerCell?.style.blockSize).toBe('576px');
+    // Following the scroll moves the window.
+    await scrollBy(360);
+    expect(
+      (document.querySelector('[data-tx-grid-cell="11:1"]') as HTMLElement).textContent?.trim()
+    ).toBe('Deal 10');
+  });
+
+  it('keeps the focused row rendered while the window scrolls past it', async () => {
+    render(DataGridHarness, { props: { rows: manyDeals, virtualizeAbove: 0 } });
+    (document.querySelector('[data-tx-grid-cell="1:0"]') as HTMLElement).focus();
+    await tick();
+    await scrollBy(720);
+    // The window moved to rows 16-29, and the focused row is still rendered.
+    expect(
+      (document.querySelector('[data-tx-grid-cell="21:1"]') as HTMLElement).textContent?.trim()
+    ).toBe('Deal 20');
+    expect(document.querySelector('[data-tx-grid-cell="1:0"]')).toBeTruthy();
+    // Exactly one tab stop still, with the focused cell carrying it.
+    expect(document.querySelectorAll('table [tabindex="0"]')).toHaveLength(1);
+  });
+
+  it('keeps windowed rows on one line so the rowSize math holds at every width', () => {
+    // Windowed grids derive row positions from `rowSize`; a wrapped row is
+    // taller and breaks the scroll math (spacers assume single-line rows), so
+    // windowed cells never wrap — the table scrolls sideways instead.
+    const css = readFileSync(
+      join(process.cwd(), 'packages/data/src/grid-core/grid-core.css'),
+      'utf8'
+    );
+    expect(css).toMatch(/\.tx-data-grid\[data-virtual\][^{]*\{[^}]*white-space: nowrap;/);
   });
 });

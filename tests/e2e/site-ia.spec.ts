@@ -81,67 +81,98 @@ function docsRoutes(dir = DIST): string[] {
     // Isolated preview documents (loaded inside iframes) are bare by design: no docs shell.
     // /llms.txt/ is the built stub of the 301 redirect to /llms/llms.txt
     // (astro.config.mjs redirects): an endpoint, bare by design too.
-    return /\/preview\//.test(route) || route === '/llms.txt/' ? [] : [route];
+    // /native/ is the second landing-shell route (T-32), asserted separately.
+    return /\/preview\//.test(route) || route === '/llms.txt/' || landingRoutes().includes(route)
+      ? []
+      : [route];
   });
 }
 
+/** Landing-shell routes: the home and the native landing (T-32). */
+function landingRoutes(): string[] {
+  return ['/', '/native/'];
+}
+
 test.describe('landing', () => {
-  test('a slim header: logo, Docs, search, theme and Get started; no page links or sidebar', async ({
+  test('a slim header: logo, Docs, the platform doors, GitHub, search, theme and Get started; no sidebar', async ({
     page,
   }, info) => {
     expect(await visit(page, '/')).toEqual([]);
     const header = page.locator('[data-tx-site-header]');
+    const phone = info.project.name === 'mobile';
     await expect(header).toHaveAttribute('data-variant', 'landing');
     await expect(header.getByRole('link', { name: 'Texuli home' })).toHaveAttribute('href', '/');
     await expect(header.getByRole('link', { name: 'Docs', exact: true })).toHaveAttribute(
       'href',
       '/guides/'
     );
+    // The platform doors (T-32) and the GitHub door (T-84). GitHub and Get
+    // started hide up to 64rem and the platform doors up to 48rem (T-89;
+    // subsite IA §1.3): the hero and the web-and-native section carry the
+    // platform paths, and the footer carries GitHub.
+    const doors = [
+      { name: 'Web + native', href: '/web-and-native/' },
+      { name: 'Native', href: '/native/' },
+      { name: 'GitHub', href: 'https://github.com/DailybotHQ/texuli' },
+    ];
+    for (const door of doors) {
+      // Located by href, not by role: a hidden link has no role to find.
+      const link = header.locator(`a[href="${door.href}"]`);
+      await expect(link).toHaveCount(1);
+      await expect(link).toHaveText(door.name);
+      if (phone) await expect(link).toBeHidden();
+      else await expect(link).toBeVisible();
+    }
+    if (phone) {
+      const main = page.locator('main');
+      for (const href of ['/native/', '/web-and-native/']) {
+        await expect(main.locator(`a[href="${href}"]`).first()).toBeVisible();
+      }
+      await expect(
+        page.locator('footer a[href="https://github.com/DailybotHQ/texuli"]')
+      ).toBeVisible();
+    }
     await expect(header.locator('astro-island:not([ssr]) [data-tx-site-search]')).toBeVisible();
     await expect(header.getByRole('group', { name: 'Appearance' })).toBeVisible();
     const getStarted = header.getByRole('link', { name: 'Get started' });
-    if (info.project.name === 'mobile') {
+    if (phone) {
       // The hero's own call to action sits right below on phones.
       await expect(getStarted).toBeHidden();
     } else {
       await expect(getStarted).toHaveAttribute('href', '/guides/getting-started/');
     }
-    // Only global utilities: the header lists no pages and there is no docs chrome.
-    expect(await header.getByRole('link').count()).toBe(info.project.name === 'mobile' ? 2 : 3);
+    // Only global utilities: the header lists no pages beyond the platform
+    // doors and GitHub, and there is no docs chrome. Up to 48rem only the
+    // logo and Docs remain visible (and so exposed as links).
+    expect(await header.getByRole('link').count()).toBe(phone ? 2 : 6);
     await expect(page.locator('[data-tx-site-sidebar]')).toHaveCount(0);
     await expect(page.locator('[data-site-menu]')).toHaveCount(0);
     await expect(page.getByRole('navigation', { name: 'Primary' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Copy page' })).toHaveCount(0);
   });
 
-  test('one hero with live widgets, three feature cards, an agents strip and the footer', async ({
+  test('the four unified sections mount in order with the footer and zero islands', async ({
     page,
   }) => {
     await visit(page, '/');
     const main = page.getByRole('main');
     await expect(main.getByRole('heading', { level: 1 })).toHaveText('Interfaces from texels.');
-    const hero = page.locator('[data-tx-landing-hero]');
-    await expect(hero.getByRole('link')).toHaveCount(2);
-
-    // The widgets are real Texuli components that respond.
-    const moments = page.locator('[data-tx-landing-moments]');
-    await expect(moments.locator('astro-island[ssr]')).toHaveCount(0);
-    const mute = moments.getByRole('button', { name: 'Mute output' });
-    await expect(mute).toHaveAttribute('aria-pressed', 'false');
-    await mute.click();
-    await expect(mute).toHaveAttribute('aria-pressed', 'true');
-    await expect(moments.getByRole('slider', { name: 'Volume' })).toBeDisabled();
-
-    const features = page.locator('[data-tx-landing-features]');
-    await expect(features.getByRole('heading', { level: 3 })).toHaveCount(3);
-    await expect(page.locator('[data-tx-landing-agents]')).toBeVisible();
-    await expect(page.getByRole('contentinfo')).toBeVisible();
-
-    // Nothing else on the home: these four sections and nothing between them.
+    // The four blueprint sections (T-44) and nothing between them (the
+    // agents CTA's module script rides inside the grid and is not content).
     const sections = await page
       .locator('[data-tx-landing] > *')
-      .evaluateAll((nodes) => nodes.map((node) => node.tagName.toLowerCase()));
-    expect(sections).toEqual(['section', 'section', 'section']);
+      .evaluateAll((nodes) =>
+        nodes.map((node) => node.tagName.toLowerCase()).filter((tag) => tag !== 'script')
+      );
+    expect(sections).toEqual(['section', 'section', 'section', 'section']);
+    // The hero's theme moment is build-time data painted in the HTML.
+    await expect(page.locator('[data-tx-hero-theme]')).toHaveCount(6);
+    // No islands inside the landing content: the sections' scripts are
+    // module scripts. The header chrome (SiteSearch, ThemeSwitch) hydrates
+    // as on every page.
+    await expect(page.locator('[data-tx-landing] astro-island')).toHaveCount(0);
+    await expect(page.locator('[data-tx-web-agents]')).toBeVisible();
+    await expect(page.getByRole('contentinfo')).toBeVisible();
   });
 
   test('fits a phone with no horizontal scroll', async ({ page }, info) => {
@@ -182,6 +213,7 @@ test.describe('docs shell', () => {
     test.skip(info.project.name !== 'chromium', 'data check');
     expect(SITE_NAV_GROUPS.map((group) => group.label)).toEqual([
       'Get started',
+      'Platform',
       'Components',
       'Primitives',
       'Themes',
@@ -191,6 +223,47 @@ test.describe('docs shell', () => {
     const guides = GUIDES_SECTIONS.flatMap((section) => section.items).map((item) => item.href);
     const getStarted = SITE_NAV_GROUPS[0]?.links.map((link) => link.href) ?? [];
     expect(getStarted).toEqual([...guides, '/skill/']);
+  });
+
+  test('the platform group holds the architecture page and the native landing', ({
+    browserName: _browser,
+  }, info) => {
+    test.skip(info.project.name !== 'chromium', 'data check');
+    const platform = SITE_NAV_GROUPS.find((group) => group.id === 'platform');
+    expect(platform?.links.map((link) => link.href)).toEqual(['/web-and-native/', '/native/']);
+    expect(platform?.expand).toBeUndefined();
+  });
+
+  test('every nav target resolves in the built site', ({ browserName: _browser }, info) => {
+    test.skip(info.project.name !== 'chromium', 'data check');
+    // Links without href are family headings; children nest one level.
+    const flat = SITE_NAV_GROUPS.flatMap((group) =>
+      group.links.flatMap((link) => [
+        ...(link.href ? [link.href] : []),
+        ...(link.children ?? []).flatMap((child) => (child.href ? [child.href] : [])),
+      ])
+    );
+    const unresolved: string[] = [];
+    for (const href of flat) {
+      const dir = join(DIST, href.replace(/^\/+/, ''));
+      if (!existsSync(join(dir, 'index.html')) && !existsSync(`${dir}.html`)) unresolved.push(href);
+    }
+    expect(unresolved).toEqual([]);
+  });
+
+  test('the native landing is one interaction from the home header', async ({ page }, info) => {
+    test.skip(info.project.name === 'mobile', 'the hero calls to action carry the paths');
+    await page.setViewportSize({ width: 1440, height: 900 });
+    expect(await visit(page, '/')).toEqual([]);
+    await page
+      .getByRole('navigation', { name: 'Platform' })
+      .getByRole('link', { name: 'Native', exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/native\/$/);
+    // The native hero's h1 is the one-contract claim (T-45's content decision).
+    await expect(page.locator('#native-hero-title')).toHaveText(
+      'The same catalog, rendered by Compose.'
+    );
   });
 
   test('a guide lives in the shell: one navigation, its group open, the shared pager', async ({

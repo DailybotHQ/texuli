@@ -6,14 +6,18 @@
  *   sidebar as a drawer whose code loads on first press), the Texuli logo,
  *   site search (an input-like trigger with the Cmd/Ctrl+K hint) and the
  *   light/dark/system switch. Page links live in the sidebar.
- * - `landing` (the home): the logo, a Docs link, search, the switch and a
- *   Get started button (hidden on phones, where the hero's own call to action
- *   sits right below).
+ * - `landing` (the home): the logo, a Docs link, the platform doors (Web +
+ *   native, Native), a GitHub door, search, the switch and a Get started
+ *   button. Up to 64rem GitHub and Get started hide (the footer carries
+ *   GitHub, the hero carries Start building) and up to 48rem the doors hide
+ *   too: the page body carries the platform paths. Without that the header
+ *   ran 152px past a 768px viewport (T-89, walks/responsive.md).
  */
+import { safeHref } from '@texuli/core/url-policy';
 import { Button } from 'texuli/button';
 import BrandLogo from '../brand/BrandLogo.astro';
 import SiteSearch from '../search/SiteSearch.svelte';
-import { DOCS_HOME, GET_STARTED, SITE_NAME, withBase } from './site.ts';
+import { DOCS_HOME, GET_STARTED, REPOSITORY_URL, SITE_NAME, withBase } from './site.ts';
 import ThemeSwitch from './ThemeSwitch.svelte';
 
 interface Props {
@@ -22,6 +26,7 @@ interface Props {
 
 const { variant = 'docs' } = Astro.props;
 const base = import.meta.env.BASE_URL;
+const repositoryHref = safeHref(REPOSITORY_URL, 'developer');
 ---
 
 <header class="site-header" data-tx-site-header="" data-variant={variant}>
@@ -43,6 +48,24 @@ const base = import.meta.env.BASE_URL;
       <a class="docs-link" href={withBase(base, DOCS_HOME)}>
         Docs
       </a>
+    )
+  }
+  {
+    variant === 'landing' && (
+      <nav class="platform-links" aria-label="Platform">
+        <a class="docs-link" href={withBase(base, '/web-and-native/')}>
+          Web + native
+        </a>
+        <a class="docs-link" href={withBase(base, '/native/')}>
+          Native
+        </a>
+      </nav>
+    )
+  }
+  {
+    variant === 'landing' && repositoryHref && (
+      // Hides up to 64rem (data-repo-door), and with the doors up to 48rem.
+      <span class="platform-links" data-repo-door=""><a class="docs-link" href={repositoryHref}>GitHub</a></span>
     )
   }
   <div class="tools">
@@ -76,6 +99,8 @@ const base = import.meta.env.BASE_URL;
   .brand {
     display: inline-flex;
     align-items: center;
+    /* A 40px target even when the logo shrinks to 20px on phones (T-89). */
+    min-block-size: 2.5rem;
     border-radius: var(--tx-radius, 0.375rem);
   }
   .docs-link {
@@ -87,12 +112,31 @@ const base = import.meta.env.BASE_URL;
     color: var(--tx-foreground);
     font-weight: 600;
     text-decoration: none;
+    white-space: nowrap;
   }
   .docs-link:hover {
     background: color-mix(in srgb, var(--tx-foreground) 6%, transparent);
   }
-  @media (max-width: 40rem) {
-    .tools :global(.get-started) {
+  .platform-links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  @media (max-width: 64rem) {
+    .tools :global(.get-started),
+    [data-repo-door] {
+      display: none;
+    }
+  }
+  /* The search trigger keeps its label but stops claiming 16rem, so the
+     doors fit beside it from 48rem up. */
+  @media (min-width: 48rem) and (max-width: 64rem) {
+    .site-header[data-variant='landing'] .tools :global([data-tx-command-trigger]) {
+      min-inline-size: 10rem;
+    }
+  }
+  @media (max-width: 48rem) {
+    .platform-links {
       display: none;
     }
   }
@@ -144,13 +188,28 @@ const base = import.meta.env.BASE_URL;
       display: none;
     }
   }
-  /* Narrow phones: the search trigger keeps its Cmd/Ctrl+K hint but shrinks. */
+  /* Narrow phones: the search trigger collapses to its glyph (the
+     component hides the label visually, keeping it as the accessible name,
+     and drops the Cmd/Ctrl+K hint, meaningless on touch). It keeps a
+     2.5rem target instead of shrinking to nothing (T-79, core row 12). */
   @media (max-width: 30rem) {
     .tools :global([data-tx-command-trigger]) {
-      min-inline-size: 0;
+      min-inline-size: 2.5rem;
     }
     .brand :global(.brand-logo) {
       block-size: 20px;
+    }
+    /* Logo, Docs, search glyph and the three-way switch fit 360px only with
+       tighter spacing: it ran 9px past the viewport before (T-89). */
+    .site-header {
+      gap: 0.5rem;
+      padding-inline: 0.75rem;
+    }
+    .tools {
+      gap: 0.25rem;
+    }
+    .docs-link {
+      padding-inline: 0.25rem;
     }
   }
   .brand:focus-visible,

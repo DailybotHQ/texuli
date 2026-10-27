@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   SELECT_SIZES,
@@ -40,6 +40,13 @@ describe('Select', () => {
       'true'
     );
     expect(screen.getByText('Coming soon')).toBeTruthy();
+  });
+
+  it('names the option group through Select.Label', async () => {
+    render(SelectFixture, { props: { open: true, value: 'free' } });
+    const listbox = await screen.findByRole('listbox');
+    // APG listbox grouping: the group is named by its group label.
+    expect(within(listbox).getByRole('group', { name: 'Plans' })).toBeTruthy();
   });
 
   it('keeps the separator out of the listbox semantics', async () => {

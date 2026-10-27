@@ -16,6 +16,15 @@ export function canonicalJson(tree: CatalogTreeInput): string {
   return canonicalBlueprintJson(tree);
 }
 
+/**
+ * True while the draft is only the untouched page root (punch-list row 3):
+ * the first-run state in the structure pane shows until the first child
+ * lands, then it never comes back for that draft.
+ */
+export function isBareDraft(tree: CatalogTreeInput): boolean {
+  return (tree.children?.length ?? 0) === 0;
+}
+
 export type FlatNode = {
   node: CatalogTreeInput;
   path: number[];

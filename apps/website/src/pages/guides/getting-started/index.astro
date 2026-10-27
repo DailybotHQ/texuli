@@ -1,5 +1,4 @@
 ---
-import GettingStartedLive from '../../../components/guides/GettingStartedLive.svelte';
 import GuideCode from '../../../components/guides/GuideCode.astro';
 import GuidesShell from '../../../components/guides/GuidesShell.astro';
 
@@ -7,14 +6,27 @@ const toc = [
   { id: 'install', label: 'Install', level: 2 as const },
   { id: 'wire-tokens', label: 'Wire tokens', level: 2 as const },
   { id: 'import-a-component', label: 'Import a component', level: 2 as const },
-  { id: 'live-example', label: 'Live example', level: 2 as const },
 ];
 
-const installSnippet = `# From the Texuli monorepo (workspace packages)
-pnpm add texuli @texuli/tokens @texuli/primitives @texuli/core
+const installSnippet = `# Texuli is in development: every package ships as the 0.1.0-next.1 prerelease (dist-tag next) — there is no stable release yet.
+pnpm add texuli@next @texuli/tokens@next @texuli/primitives@next @texuli/core@next`;
 
-# Or copy components with the agent tools (local files only)
-pnpm exec texuli init --cwd path/to/app --theme enterprise-neutral`;
+const initSnippet = `# The copy path: run the init CLI from a checkout of the Texuli repository.
+pnpm exec tsx packages/tools/src/cli-init/cli.ts init --cwd path/to/app --theme enterprise-neutral`;
+
+const wireSnippet = `<!-- index.html — the theme attribute selects the theme; the bootstrap resolves the mode -->
+<html lang="en" data-tx-theme="enterprise-neutral" data-tx-mode="light">
+  <head>
+    <!-- texuli:no-flash -->
+    <script>/* the no-flash bootstrap, inlined first: sets light / dark / system before first paint */</script>
+    <!-- /texuli:no-flash -->
+  </head>
+
+/* src/texuli.css — generated: base styles first, then the compiled theme */
+@import '@texuli/tokens/base.css';
+
+// the entry imports the stylesheet (Vite shown; Astro and SvelteKit get the equivalent)
+import './texuli.css';`;
 
 const importSnippet = `import { Button } from 'texuli/button';
 import { Card, CardContent, CardHeader, CardTitle } from 'texuli/card';
@@ -28,24 +40,28 @@ import '@texuli/tokens/base.css';`;
 >
   <h2 id="install">Install</h2>
   <p>
-    Prefer workspace packages while developing inside this monorepo. Consumers can install the
-    published names once they ship, or copy files with <code>texuli init</code> (no network; see <code>@texuli/tools/cli-init</code>).
+    Texuli is in development: every package is published as the <code>0.1.0-next.1</code> prerelease under
+    the <code>next</code> dist-tag, and there is no stable release yet. Install the published
+    preview into your app:
   </p>
-  <GuideCode code={installSnippet} label="Install commands" />
+  <GuideCode code={installSnippet} label="Install the published preview" lang="bash" />
+  <p>
+    Prefer copying files instead? <code>texuli init</code> writes the stylesheet, the no-flash
+    bootstrap and <code>texuli.config.json</code> with no network. It runs from a checkout of the
+    repository (see <code>@texuli/tools/cli-init</code>):
+  </p>
+  <GuideCode code={initSnippet} label="Copy path: texuli init from a repository checkout" lang="bash" />
 
   <h2 id="wire-tokens">Wire tokens</h2>
   <p>
     Every app needs the base stylesheet and a compiled theme on <code>&lt;html data-tx-theme&gt;</code>.
-    <code>texuli init</code> writes the stylesheet, the no-flash bootstrap and <code>texuli.config.json</code> for Vite, Astro or SvelteKit. Default theme: <code>enterprise-neutral</code>.
+    <code>texuli init</code> writes the three pieces below for Vite, Astro or SvelteKit. Default theme: <code>enterprise-neutral</code>.
   </p>
+  <GuideCode code={wireSnippet} label="Wiring: theme attribute, no-flash bootstrap, stylesheet" lang="html" />
 
   <h2 id="import-a-component">Import a component</h2>
   <p>
     Import through lazy subpaths — never a kitchen-sink root barrel for UI. Texels use <code>@texuli/core/&lt;name&gt;</code>.
   </p>
   <GuideCode code={importSnippet} label="Component imports" />
-
-  <h2 id="live-example">Live example</h2>
-  <p>The button below is a real <code>texuli/button</code> island on this static page.</p>
-  <GettingStartedLive client:load />
 </GuidesShell>

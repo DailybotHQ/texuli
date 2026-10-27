@@ -26,7 +26,7 @@ export interface ResolvedNavGroup {
 const byLabel = (a: NavLink, b: NavLink) => a.label.localeCompare(b.label, 'en');
 
 /** Families the component pages group into, in sidebar order. */
-const COMPONENT_FAMILIES: readonly {
+export const COMPONENT_FAMILIES: readonly {
   label: string;
   /** Landing page of the family, when it has one; otherwise a plain heading. */
   href?: string;
@@ -161,13 +161,23 @@ export function pagerFor(current: string): {
 /**
  * Docs pages get the reading layout: prose width, "On this page", the pager
  * and "Copy page". Galleries, studios and showcases keep the wide layout.
+ * DOC_SHELL_ROUTES holds the first-class reading routes outside the section
+ * trees (T-32: the architecture page joins them).
  */
+export const DOC_SHELL_ROUTES: readonly string[] = [
+  '/skill/',
+  '/foundation/',
+  '/component-pages/',
+  '/primitives-page/',
+  '/web-and-native/',
+];
+
 export function isDocsPath(current: string): boolean {
   const here = normalizePath(current);
   return (
     /^\/component-pages\/[^/]+\/$/.test(here) ||
     /^\/primitives-page\/[^/]+\/$/.test(here) ||
     here.startsWith('/guides/') ||
-    ['/skill/', '/foundation/', '/component-pages/', '/primitives-page/'].includes(here)
+    DOC_SHELL_ROUTES.includes(here)
   );
 }

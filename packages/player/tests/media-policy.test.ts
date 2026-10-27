@@ -94,17 +94,22 @@ describe('media nodes painted in the player', () => {
   });
 
   it('keeps media-image on the untrusted policy whatever trust the blueprint claims', async () => {
-    const { container } = await paint([
-      {
-        id: 'media-image',
-        props: {
-          src: 'https://images.example/harbor.png',
-          srcset: 'http://images.example/harbor-2x.png 2x',
-          alt: 'Fictional harbor',
-          trust: 'developer',
+    const { container } = await paint(
+      [
+        {
+          id: 'media-image',
+          props: {
+            src: 'https://images.example/harbor.png',
+            srcset: 'http://images.example/harbor-2x.png 2x',
+            alt: 'Fictional harbor',
+            trust: 'developer',
+          },
         },
-      },
-    ]);
+      ],
+      // Let the developer tier validate the HTTP candidate so this exercises
+      // the player's paint-time clamp back to untrusted media policy.
+      { tier: 'developer' }
+    );
     const img = await waitFor(() => {
       const element = container.querySelector('img');
       expect(element).not.toBeNull();

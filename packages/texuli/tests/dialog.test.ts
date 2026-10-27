@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DIALOG_SIZES, dialogContentClass } from '../src/components/dialog/index.ts';
@@ -7,6 +9,19 @@ import DialogHarness from './fixtures/DialogHarness.svelte';
 
 afterEach(() => {
   cleanup();
+});
+
+describe('dialog CSS source', () => {
+  it('takes danger colors from the shared destructive token with no hex or phantom fallbacks', () => {
+    const source = readFileSync(
+      join(process.cwd(), 'packages/texuli/src/components/dialog/dialog.css'),
+      'utf8'
+    );
+    // Sibling convention (alert, toast, button): var(--tx-destructive, crimson).
+    expect(source).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    expect(source).not.toContain('--tx-color-danger');
+    expect(source).toContain('var(--tx-destructive, crimson)');
+  });
 });
 
 describe('dialog variants', () => {
@@ -101,6 +116,33 @@ describe('AlertDialog', () => {
       );
     });
     expect(screen.getByRole('alertdialog')).toBeTruthy();
+  });
+
+  it('stays open while the confirm is pending; Escape cannot dismiss it', async () => {
+    let resolveConfirm: (() => void) | undefined;
+    const onConfirm = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveConfirm = resolve;
+        })
+    );
+    render(AlertDialogHarness, { props: { open: false, onConfirm } });
+    await fireEvent.click(screen.getByRole('button', { name: 'Delete project' }));
+    const dialog = await screen.findByRole('alertdialog', { name: 'Delete project?' });
+    await fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    await waitFor(() => {
+      expect(dialog.getAttribute('aria-busy')).toBe('true');
+    });
+
+    await fireEvent.keyDown(dialog.ownerDocument, { key: 'Escape' });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(screen.getByRole('alertdialog', { name: 'Delete project?' })).toBeTruthy();
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+
+    resolveConfirm?.();
+    await waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+    });
   });
 
   it('cancels without calling onConfirm', async () => {

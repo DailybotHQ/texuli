@@ -36,7 +36,7 @@ workspace root.
 ## Live islands
 
 SSR live stage covers `badge`, `button`, `card`, `kbd`, `tag`, `alert` and
-`callout`. Tone fills use the token engine soft/solid AA pairs
+`callout`. Tone fills use the theme engine soft/solid AA pairs
 (`*Soft` / `*SoftForeground` and solid `*Foreground`) — no clamps. Authored
 props always appear in the code sample; other ids use a static props card.
 

@@ -168,84 +168,133 @@ function cueLabel(template: string, index: number): string {
 </section>
 
 <style>
-  .tx-video-edit {
-    display: grid;
-    gap: 1rem;
-    inline-size: 100%;
-    color: CanvasText;
-    font: inherit;
-  }
+  @layer tx.components {
+    .tx-video-edit {
+      display: grid;
+      gap: 1rem;
+      inline-size: 100%;
+      color: var(--tx-foreground, CanvasText);
+      font: inherit;
+    }
 
-  fieldset {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
-    gap: 0.75rem;
-    min-inline-size: 0;
-    margin: 0;
-    padding: 1rem;
-    border: 1px solid color-mix(in srgb, CanvasText 25%, transparent);
-    border-radius: 0.5rem;
-  }
+    .tx-video-edit fieldset {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+      gap: 0.75rem;
+      min-inline-size: 0;
+      margin: 0;
+      padding: 1rem;
+      border: 1px solid var(--tx-border, ButtonBorder);
+      border-radius: var(--tx-radius, 0.5rem);
+      background: var(--tx-surface, Canvas);
+    }
 
-  legend {
-    padding-inline: 0.35rem;
-    font-weight: 650;
-  }
+    .tx-video-edit legend {
+      padding-inline: 0.35rem;
+      font-weight: 650;
+      color: var(--tx-foreground, CanvasText);
+    }
 
-  label {
-    display: grid;
-    gap: 0.35rem;
-    min-inline-size: 0;
-  }
+    .tx-video-edit label {
+      display: grid;
+      gap: 0.35rem;
+      min-inline-size: 0;
+    }
 
-  input,
-  textarea,
-  button {
-    box-sizing: border-box;
-    max-inline-size: 100%;
-    min-block-size: 2.5rem;
-    padding: 0.5rem;
-    color: inherit;
-    font: inherit;
-  }
+    .tx-video-edit input,
+    .tx-video-edit textarea,
+    .tx-video-edit button {
+      box-sizing: border-box;
+      max-inline-size: 100%;
+      min-block-size: 2.5rem;
+      padding: 0.5rem;
+      color: inherit;
+      font: inherit;
+    }
 
-  input,
-  textarea {
-    inline-size: 100%;
-    border: 1px solid color-mix(in srgb, CanvasText 35%, transparent);
-    border-radius: 0.3rem;
-    background: Canvas;
-  }
+    .tx-video-edit input,
+    .tx-video-edit textarea {
+      inline-size: 100%;
+      border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
+      border-radius: var(--tx-radius-sm, 0.3rem);
+      background: var(--tx-background, Canvas);
+      color: var(--tx-foreground, CanvasText);
+    }
 
-  textarea {
-    min-block-size: 5rem;
-    resize: vertical;
-  }
+    .tx-video-edit textarea {
+      min-block-size: 5rem;
+      resize: vertical;
+    }
 
-  button {
-    justify-self: start;
-    border: 1px solid color-mix(in srgb, CanvasText 35%, transparent);
-    border-radius: 0.3rem;
-    background: Canvas;
-    cursor: pointer;
-  }
+    .tx-video-edit button {
+      justify-self: start;
+      border: 1px solid var(--tx-border, ButtonBorder);
+      border-radius: var(--tx-radius-sm, 0.3rem);
+      background: var(--tx-background, Canvas);
+      color: var(--tx-foreground, CanvasText);
+      cursor: pointer;
+    }
 
-  :is(input, textarea, button):focus-visible {
-    outline: 2px solid Highlight;
-    outline-offset: 2px;
-  }
+    .tx-video-edit button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
 
-  .tx-video-edit__cue {
-    display: grid;
-    grid-column: 1 / -1;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
-    align-items: end;
-    gap: 0.75rem;
-    padding-block: 0.5rem;
-    border-block-end: 1px solid color-mix(in srgb, CanvasText 15%, transparent);
-  }
+    .tx-video-edit :is(input, textarea, button):focus-visible {
+      outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+      outline-offset: var(--tx-focus-ring-offset, 2px);
+    }
 
-  .tx-video-edit__text {
-    grid-column: 1 / -1;
+    .tx-video-edit__cue {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+      align-items: end;
+      gap: 0.75rem;
+      padding-block: 0.5rem;
+      border-block-end: 1px solid var(--tx-border, ButtonBorder);
+    }
+
+    .tx-video-edit__text {
+      grid-column: 1 / -1;
+    }
+
+    .tx-video-edit [role='alert'] {
+      margin: 0;
+      color: var(--tx-destructive, Mark);
+    }
+
+    @media (forced-colors: active) {
+      .tx-video-edit {
+        color: CanvasText;
+      }
+
+      .tx-video-edit fieldset,
+      .tx-video-edit input,
+      .tx-video-edit textarea,
+      .tx-video-edit button {
+        border-color: ButtonText;
+        background: Canvas;
+        color: CanvasText;
+      }
+
+      .tx-video-edit :is(input, textarea, button):focus-visible {
+        outline: 3px solid Highlight;
+        outline-offset: 2px;
+      }
+
+      .tx-video-edit button:disabled {
+        opacity: 1;
+        color: GrayText;
+        border-color: GrayText;
+      }
+
+      .tx-video-edit [role='alert'] {
+        color: CanvasText;
+        border: 2px solid CanvasText;
+        padding: 0.35rem 0.5rem;
+        font-weight: 600;
+      }
+    }
   }
 </style>

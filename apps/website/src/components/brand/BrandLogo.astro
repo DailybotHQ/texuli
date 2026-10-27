@@ -5,6 +5,9 @@
  * in the accessibility tree. They load lazily: the visible one is on screen and
  * loads at once, while the hidden one (display: none) is fetched only when the
  * mode switches, so a page downloads one logo, not two.
+ *
+ * Each image is a <picture>: lossless WebP first, the PNG as the fallback.
+ * Header-sized logos also pick a copy for the screen density (T-92).
  */
 interface Props {
   /** Rendered height in CSS pixels; the width follows the 3332:972 artwork. */
@@ -19,15 +22,29 @@ const ratio = variant === 'logo' ? 3332 / 972 : 1;
 const width = Math.round(height * ratio);
 // Header-sized logos (24px tall or less) use a copy pre-scaled to 72px tall,
 // sharp up to 3x screens at about 4 KB, instead of the 3332x972 artwork
-// (11 to 13 KB) on every page (FIX-site-perf-routes).
+// (11 to 13 KB) on every page (FIX-site-perf-routes). T-92: as lossless WebP
+// they also come 24, 48 and 72 px tall for 1x, 2x and 3x screens, so a 1x
+// screen loads about 1.1 KB instead of 3.7 KB (gzip); the 72 px PNG stays the
+// fallback for browsers without WebP.
 const small = variant === 'logo' && height <= 24;
-const file = (mode: 'light' | 'dark') =>
-  `${base}brand/texuli-${variant}-${mode}${small ? '-72' : ''}.png`;
+type Mode = 'light' | 'dark';
+const stem = (mode: Mode) => `${base}brand/texuli-${variant}-${mode}`;
+const file = (mode: Mode) => `${stem(mode)}${small ? '-72' : ''}.png`;
+const webp = (mode: Mode) =>
+  small
+    ? `${stem(mode)}-24.webp 1x, ${stem(mode)}-48.webp 2x, ${stem(mode)}-72.webp 3x`
+    : `${stem(mode)}.webp`;
 ---
 
 <span class="brand-logo" style={`--brand-logo-h: ${height}px`}>
-  <img class="brand-logo__light" src={file('light')} alt="Texuli" {width} {height} loading="lazy" decoding="async" />
-  <img class="brand-logo__dark" src={file('dark')} alt="" aria-hidden="true" {width} {height} loading="lazy" decoding="async" />
+  <picture>
+    <source srcset={webp('light')} type="image/webp" />
+    <img class="brand-logo__light" src={file('light')} alt="Texuli" {width} {height} loading="lazy" decoding="async" />
+  </picture>
+  <picture>
+    <source srcset={webp('dark')} type="image/webp" />
+    <img class="brand-logo__dark" src={file('dark')} alt="" aria-hidden="true" {width} {height} loading="lazy" decoding="async" />
+  </picture>
 </span>
 
 <style>
@@ -35,6 +52,10 @@ const file = (mode: 'light' | 'dark') =>
     display: inline-flex;
     align-items: center;
     block-size: var(--brand-logo-h);
+  }
+  /* The <picture> wrappers add no box: each img stays the flex item it was. */
+  .brand-logo picture {
+    display: contents;
   }
   .brand-logo img {
     block-size: 100%;
@@ -48,5 +69,30 @@ const file = (mode: 'light' | 'dark') =>
   }
   :global(:root[data-tx-mode='dark']) .brand-logo__dark {
     display: block;
+  }
+  /* Forced colors never recolor raster artwork, and the forced Canvas follows
+     the system palette, not the site mode: pick the variant from
+     prefers-color-scheme so a chosen Light mode on a dark forced palette
+     never draws the black logo on a black Canvas (PLAN_006 P2-6). The
+     :root[data-tx-mode] selectors match the site-mode rules' specificity. */
+  @media (forced-colors: active) {
+    .brand-logo__light,
+    :global(:root[data-tx-mode]) .brand-logo__light {
+      display: block;
+    }
+    .brand-logo__dark,
+    :global(:root[data-tx-mode]) .brand-logo__dark {
+      display: none;
+    }
+  }
+  @media (forced-colors: active) and (prefers-color-scheme: dark) {
+    .brand-logo__light,
+    :global(:root[data-tx-mode]) .brand-logo__light {
+      display: none;
+    }
+    .brand-logo__dark,
+    :global(:root[data-tx-mode]) .brand-logo__dark {
+      display: block;
+    }
   }
 </style>

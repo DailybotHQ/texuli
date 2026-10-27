@@ -392,8 +392,8 @@ $effect(() => {
     .tx-chat-message-group__meta { display: flex; align-items: baseline; gap: 0.5rem; margin: 0; padding-inline: 0.25rem; color: var(--tx-muted-foreground, GrayText); font-size: 0.75rem; }
     .tx-chat-message-group__author { color: var(--tx-foreground, CanvasText); font-weight: 600; }
     .tx-chat-message-group__you { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-    .tx-chat-message { max-inline-size: 100%; overflow-wrap: anywhere; white-space: pre-wrap; border-radius: 1rem 1rem 1rem 0.25rem; background: var(--tx-muted, ButtonFace); padding: 0.5rem 0.875rem; }
-    .tx-chat-message--own { border-radius: 1rem 1rem 0.25rem 1rem; background: var(--tx-primary, Highlight); color: var(--tx-primary-foreground, HighlightText); }
+    .tx-chat-message { max-inline-size: 100%; overflow-wrap: anywhere; white-space: pre-wrap; border-radius: 1rem; border-end-start-radius: 0.25rem; background: var(--tx-muted, ButtonFace); padding: 0.5rem 0.875rem; }
+    .tx-chat-message--own { border-radius: 1rem; border-end-end-radius: 0.25rem; background: var(--tx-primary, Highlight); color: var(--tx-primary-foreground, HighlightText); }
     .tx-chat-message--failed { outline: 2px solid var(--tx-destructive, Mark); }
     .tx-chat-message__sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .tx-chat-message__caret { display: inline-block; inline-size: 0.5em; block-size: 1em; margin-inline-start: 0.1em; vertical-align: text-bottom; background: currentColor; animation: tx-chat-caret 1s steps(1) infinite; }

@@ -5,6 +5,7 @@
  * service, so no extra dependency), and writes `sitemap.xml` and
  * `robots.txt`. Everything is a static file; nothing runs at request time.
  */
+import { execFileSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,10 +16,12 @@ import {
   buildSitemap,
   normalizePagePath,
   OG_IMAGE_WIDTH,
+  ogAreaFor,
   ogImageFile,
   ogImageSvg,
   readPageMeta,
   SEO_EXCLUDED,
+  type SitemapEntry,
 } from './seo.ts';
 
 type SharpService = {
@@ -31,6 +34,65 @@ type SharpService = {
 };
 
 const SITE_NAME = 'Texuli';
+
+/**
+ * Per-page sitemap dates from git (T-20): a route's lastmod is the last
+ * commit date that touched its source. Static routes map to their
+ * `src/pages/**` file; the dynamic `[id].astro` routes map to their template
+ * plus the package area that feeds them. Unmapped routes fall back to HEAD.
+ */
+const sourceDates = new Map<string, string>();
+
+/**
+ * The last commit date (for `gitArgs`, e.g. `['--', path]`) as a UTC
+ * `YYYY-MM-DD`. `%cs` would be the committer's own calendar day, which runs
+ * up to 14 hours ahead of UTC; the sitemap gates compare lastmod with UTC, so
+ * the date is formatted in the local zone with `TZ=UTC` forced on the child.
+ */
+export function gitCommitDateUtc(gitArgs: readonly string[], cwd?: string): string {
+  return execFileSync(
+    'git',
+    ['log', '-1', '--date=format-local:%Y-%m-%d', '--format=%cd', ...gitArgs],
+    { encoding: 'utf8', cwd, env: { ...process.env, TZ: 'UTC' } }
+  ).trim();
+}
+
+function gitDate(path: string): string | undefined {
+  if (!sourceDates.has(path)) {
+    let date = '';
+    try {
+      date = gitCommitDateUtc(['--', path]);
+    } catch {
+      date = '';
+    }
+    if (date) sourceDates.set(path, date);
+  }
+  return sourceDates.get(path);
+}
+
+/** HEAD's commit date; a non-git build fails loudly instead of lying. */
+function headDate(): string {
+  return gitCommitDateUtc([]);
+}
+
+function routeLastmod(path: string): string {
+  const latest = (...candidates: string[]) => {
+    const dates = candidates
+      .map(gitDate)
+      .filter((date): date is string => Boolean(date))
+      .sort();
+    return dates.at(-1);
+  };
+  const date = /^\/component-pages\/[^/]+\/$/.test(path)
+    ? latest('src/pages/component-pages/[id].astro', '../../packages/catalog/src/manifests')
+    : /^\/primitives-page\/[^/]+\/$/.test(path)
+      ? latest('src/pages/primitives-page/[id].astro', '../../packages/primitives/src')
+      : (() => {
+          const rel = path === '/' ? '' : path.slice(1);
+          return latest(`src/pages/${rel}index.astro`, `src/pages/${rel.replace(/\/$/, '')}.astro`);
+        })();
+  return date ?? gitDate('.') ?? headDate();
+}
 
 export function seoIntegration(): AstroIntegration {
   let site: string | URL | undefined;
@@ -59,7 +121,7 @@ export function seoIntegration(): AstroIntegration {
           },
           dangerouslyProcessSVG: true,
         };
-        const urls: string[] = [];
+        const entries: SitemapEntry[] = [];
         let images = 0;
         for (const { pathname } of pages) {
           const path = normalizePagePath(pathname);
@@ -73,7 +135,7 @@ export function seoIntegration(): AstroIntegration {
           }
           const meta = readPageMeta(html);
           if (meta.noindex) continue;
-          urls.push(absoluteUrl(site, base, path));
+          entries.push({ loc: absoluteUrl(site, base, path), lastmod: routeLastmod(path) });
           const display = absoluteUrl(site, base, path)
             .replace(/^https?:\/\//, '')
             .replace(/\/$/, '');
@@ -82,6 +144,7 @@ export function seoIntegration(): AstroIntegration {
             description: meta.description,
             url: display,
             siteName: SITE_NAME,
+            area: ogAreaFor(path),
           });
           const png = await sharp.transform(
             new TextEncoder().encode(svg),
@@ -95,10 +158,10 @@ export function seoIntegration(): AstroIntegration {
           images += 1;
         }
         const sitemapUrl = absoluteUrl(site, base, 'sitemap.xml');
-        await writeFile(join(out, 'sitemap.xml'), buildSitemap(urls));
+        await writeFile(join(out, 'sitemap.xml'), buildSitemap(entries));
         await writeFile(join(out, 'robots.txt'), buildRobots(sitemapUrl));
         logger.info(
-          `sitemap.xml (${urls.length} pages), robots.txt and ${images} social images written.`
+          `sitemap.xml (${entries.length} pages with lastmod), robots.txt and ${images} social images written.`
         );
       },
     },

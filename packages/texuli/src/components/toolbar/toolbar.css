@@ -165,7 +165,8 @@
       border: 1px solid ButtonText;
       forced-color-adjust: none;
     }
-    .tx-toolbar__group-item[data-state="on"] {
+    .tx-toolbar__group-item[data-state="on"],
+    .tx-toolbar__button[data-state="on"] {
       background: Highlight;
       color: HighlightText;
     }

@@ -104,6 +104,9 @@ describe('publishManifest', () => {
     expect(problems).toEqual([
       'manifest: exports..: export target outside src/: ./index.js',
       'manifest: @texuli/ghost is not a workspace package',
+      // The unresolvable range stays `workspace:*`, which the packed-manifest
+      // check then rejects too — both problems are reported, not guessed.
+      'manifest: @texuli/ghost: published range must be a real semver range, got "workspace:*"',
     ]);
     expect(publishManifest(pkg({ name: 'demo', version: '0.3.0' }), versions).problems).toEqual([
       'manifest: no exports map',

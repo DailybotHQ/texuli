@@ -5,27 +5,35 @@
 **E2E:** `tests/e2e/site-ia.spec.ts`, `tests/e2e/site-docs-nav.spec.ts` and
 `tests/e2e/a11y-site.spec.ts`
 
-texuli.com has two kinds of page: a minimal landing on `/`, and one docs shell
-everywhere else.
+texuli.com has two kinds of page: a minimal landing on `/` (and `/native/`),
+and one docs shell everywhere else. The platform routes (`/`, `/native/`,
+`/web-and-native/`), their header, sidebar and footer doors, the breadcrumb
+trail and the per-route metadata are in [site-subsite.md](site-subsite.md);
+the landing sections are in [site-landing.md](site-landing.md).
 
 ## Landing (`/`)
 
 `BaseLayout` with `landing`:
 
 - **Header** (`SiteHeader` `variant="landing"`): the Texuli logo (`BrandLogo`),
-  a Docs link (`/guides/`), search with the ⌘/Ctrl+K hint, the
-  light/dark/system switch and a Get started button
-  (`/guides/getting-started/`). Get started hides on phones, because the
-  hero's own call to action sits right below.
-- **Hero** (`landing/LandingHero.astro`): headline, one-line subhead, two calls
-  to action and a compact grid of live Texuli widgets (`HeroMoments`, one
-  island).
-- **Below the hero:** three feature cards (`FeatureCards`) and a short agents
-  strip (`AgentsSection`). Its playground hydrates when it scrolls into view.
+  a Docs link (`/guides/`), the platform doors (Web + native, Native), a
+  GitHub door, search with the ⌘/Ctrl+K hint, the light/dark/system switch
+  and a Get started button (`/guides/getting-started/`). GitHub and Get
+  started hide up to 64rem and the platform doors up to 48rem (T-89): the hero carries `/native/` and Get
+  started, the web-and-native section carries `/web-and-native/`, and the
+  footer carries GitHub. `site-ia.spec.ts` pins 6 header links on desktop
+  and 2 on phones.
+- **Sections** (`sections/web/*`, PLAN_006 T-44): `WebHero` (platform hero,
+  proof strip, theme swatches as data), `WebWhySvelte`, `WebCorrelation`
+  (one contract, two projections; links the badge page and
+  `/web-and-native/`) and `WebAgentsCta` (agents strip and closing call to
+  action). The page body is static Astro. The shared header still hydrates
+  `SiteSearch` and `ThemeSwitch` (`client:load`), so the full home document has
+  two islands; neither landing section needs a page-specific island.
 - **Footer:** the site footer.
 
-There is no sidebar, no page links in the header and nothing else on the
-home.
+There is no sidebar and no page links in the header beyond the platform
+doors and GitHub. `/native/` uses the same landing shell.
 
 ## Docs shell (every other page)
 
@@ -37,6 +45,8 @@ for the details.
 - **Left sidebar:** all navigation, in groups:
   - **Get started:** Introduction (`/guides/`), every guide in reading order,
     Skill.
+  - **Platform:** Web + native (`/web-and-native/`), Native (Kotlin)
+    (`/native/`).
   - **Components:** Overview, Gallery, Examples, Blocks, Charts, Media, then
     every catalog component, alphabetically.
   - **Primitives:** the overview, then every primitive, alphabetically.
@@ -62,6 +72,7 @@ pager are gone, because the shell supplies them.
 | Header variants | `components/foundation/SiteHeader.astro` |
 | Landing or shell | `layouts/BaseLayout.astro` (`landing`) |
 | Home composition | `pages/index.astro` |
+| Breadcrumb trail (visible and JSON-LD) | `components/seo/breadcrumbs.ts`, rendered by `layouts/BaseLayout.astro` |
 
 ## Validate
 
@@ -71,24 +82,29 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-ia.spec.ts tests
 ```
 
 `site-ia.spec.ts` checks:
-- **Landing header:** logo, Docs, search, theme and Get started, and nothing
-  else. There is no sidebar, menu or Copy page on the home.
-- **Landing sections:** the live widgets respond, and there are exactly three
-  sections (hero, features, agents) plus the footer, with no horizontal scroll
-  on phones.
+- **Landing header:** logo, Docs, the platform doors, GitHub, search, theme
+  and Get started, and nothing else. There is no sidebar, menu or Copy page
+  on the home.
+- **Landing sections:** exactly four sections in blueprint order plus the
+  footer, the build-time theme moment painted in the HTML, no
+  `astro-island` inside the landing content, and no horizontal scroll on
+  phones. `/native/` is checked as the second landing-shell route.
 - **Every other page has the shell:** each built page (more than 150) has the
   sidebar and the docs header, with no `nav` in the header.
-- **Sidebar groups:** they are in order, with the guides in reading order.
+- **Sidebar groups:** they are in order, with the guides in reading order;
+  the platform group holds the architecture page and the native landing;
+  every nav target resolves in the built site.
 - **Guides:** a guide shows one navigation with its group open, "On this page",
   the shared pager and Copy page.
 - **Phones:** the drawer opens the same navigation from any docs page.
 
 ## Limits
 
-- **Hero widgets load up front.** `HeroMoments` is above the fold and
-  hydrates on load. The home ships about 113 KB of JavaScript (gzip,
-  measured 2026-10-23 in `site-visual.md`), within its 116 KB landing
-  budget.
+- **The home body is static.** The T-44 landing replaced the hero widget
+  islands (`HeroMoments` and `AgentsPlayground`)
+  with four static sections; only the shared search and theme controls hydrate.
+  Its page weight is tracked against the `/` budget
+  in `components/perf/budgets.ts`: 83.8 KB against 152 KB in the local
+  T-92 run (2026-10-26), so it is no longer a tracked red in `docs/CI.md`.
 - **Landing cleanup (T-site-theme-swatches):** `AnnouncementBanner`, `ThemesStripHost`,
   `ThemesStrip` and `theme-swatch.ts` were removed (nothing imported them after T-site-ia).
-  landing color work in flight elsewhere settles.

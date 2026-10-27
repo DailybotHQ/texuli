@@ -7,6 +7,11 @@ import ThemeGallery from '../../components/gallery-themes/ThemeGallery.svelte';
  * swatches, WCAG AA scores (light / dark / high-contrast) and one-click apply.
  * Each theme's CSS is a same-origin file loaded when its card is near the viewport (T-site-perf);
  * the first 24 cards are in the HTML and the rest come from /theme-gallery.json (FIX-site-perf-routes).
+ *
+ * T-83 share loop (gallery punch list row 2), page-owned so the island stays
+ * untouched: `?theme=<id>&mode=<mode>` deep links apply through the same
+ * site-appearance path, every Apply is mirrored into the address bar, and the
+ * copy button shares the current view. Per-theme OG cards remain with T-21.
  */
 import PageBanner from '../../components/landing/PageBanner.astro';
 import {
@@ -29,6 +34,19 @@ const varNames = themeCssVariableNames();
 >
   <style is:inline set:html={highContrastCss}></style>
   <PageBanner slot="page-themes" />
+  <div
+    class="share"
+    data-theme-linker
+    data-valid-ids={JSON.stringify(allCards.map((card) => card.id))}
+    data-var-names={JSON.stringify(varNames)}
+  >
+    <button type="button" class="share__copy" data-copy-link hidden>Copy link to this view</button>
+    <p class="share__status" data-copy-link-status aria-live="polite"></p>
+    <p class="share__hint">
+      Apply any theme and the address keeps it: <code>?theme=&lt;id&gt;</code> reopens the gallery
+      with that theme applied, ready to share.
+    </p>
+  </div>
   <ThemeGallery
     client:load
     {cards}
@@ -37,3 +55,111 @@ const varNames = themeCssVariableNames();
     {varNames}
   />
 </BaseLayout>
+
+<script>
+  /**
+   * The deep-link wiring (T-83). Runs as a bundled module: parses the query,
+   * applies a valid link before/while the island hydrates, then mirrors the
+   * painted appearance back into the URL. The island's own summary and Apply
+   * controls keep working exactly as before.
+   */
+  import { APPEARANCE_NAMESPACE, SITE_THEME } from '../../components/foundation/site.ts';
+  import { ensureThemeCss } from '../../components/perf/theme-assets.ts';
+  import {
+    applySiteAppearance,
+    readModePreference,
+  } from '../../components/theme-switcher/appearance.ts';
+  import {
+    applyThemeFromLink,
+    wireCopyLink,
+    wireThemeLinkSync,
+    type ThemeLinkModeChoice,
+  } from '../../components/gallery-themes/theme-link.ts';
+
+  const host = document.querySelector<HTMLElement>('[data-theme-linker]');
+  if (host) {
+    const readList = (key: 'validIds' | 'varNames'): string[] => {
+      try {
+        const parsed: unknown = JSON.parse(host.dataset[key] ?? '[]');
+        return Array.isArray(parsed) ? parsed.filter((entry): entry is string => typeof entry === 'string') : [];
+      } catch {
+        return [];
+      }
+    };
+    const validThemeIds = readList('validIds');
+    const varNames = readList('varNames');
+    const namespace = host.dataset.namespace ?? APPEARANCE_NAMESPACE;
+    const defaultThemeId = SITE_THEME;
+
+    const currentSearch = (): string => window.location.search;
+    const replaceSearch = (search: string): void => {
+      window.history.replaceState(null, '', `${window.location.pathname}${search}${window.location.hash}`);
+    };
+    const apply = (themeId: string, mode: ThemeLinkModeChoice): void => {
+      applySiteAppearance({ themeId, mode, varNames, namespace });
+    };
+
+    void applyThemeFromLink({
+      document,
+      validThemeIds,
+      defaultThemeId,
+      currentSearch,
+      replaceSearch,
+      ensureCss: (id) => ensureThemeCss(id),
+      apply,
+      storedModeChoice: () => readModePreference(namespace),
+    });
+    wireThemeLinkSync({ document, defaultThemeId, currentSearch, replaceSearch });
+
+    const button = document.querySelector<HTMLButtonElement>('[data-copy-link]');
+    const status = document.querySelector<HTMLElement>('[data-copy-link-status]');
+    if (button && status) {
+      // Without JS the button stays hidden; the address bar still carries the link.
+      button.hidden = false;
+      wireCopyLink({ button, status });
+    }
+  }
+</script>
+
+<style>
+  .share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    margin-block-end: 1.25rem;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, var(--tx-background));
+  }
+  .share__copy {
+    appearance: none;
+    margin: 0;
+    min-block-size: 2rem;
+    padding-inline: 0.75rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.375rem);
+    background: var(--tx-secondary, var(--tx-muted));
+    color: var(--tx-secondary-foreground, var(--tx-foreground));
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .share__copy:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .share__status {
+    margin: 0;
+    min-block-size: 1em;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .share__hint {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.8125rem;
+  }
+</style>

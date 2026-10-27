@@ -1,4 +1,7 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
+import { compile } from 'svelte/compiler';
 import { afterEach, describe, expect, it } from 'vitest';
 import GeoMap from '../src/geo/GeoMap.svelte';
 import GeoPointMap from '../src/geo/GeoPointMap.svelte';
@@ -82,6 +85,15 @@ describe('GeoMap', () => {
       data: {},
     });
     expect(container.querySelectorAll('[data-region]')).toHaveLength(WORLD_TILES.length);
+  });
+});
+
+describe('geo data-table disclosure', () => {
+  it('gives the summary the family tap-target height', () => {
+    const source = readFileSync(resolve(__dirname, '../src/geo/GeoDataTable.svelte'), 'utf8');
+    const css = compile(source, { filename: 'GeoDataTable.svelte', css: 'external' }).css?.code;
+    expect(css).toContain('min-block-size: 2.75rem');
+    expect(css).toContain('align-content: center');
   });
 });
 

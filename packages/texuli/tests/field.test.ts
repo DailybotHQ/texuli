@@ -43,6 +43,20 @@ describe('Field', () => {
     });
     expect(view.getByRole('textbox', { name: 'Search' })).toBeTruthy();
   });
+
+  it('hands its disabled state to the control through control.props', () => {
+    const view = render(FieldHarness, { props: { label: 'Locked field', disabled: true } });
+    const input = view.getByRole('textbox', { name: 'Locked field' }) as HTMLInputElement;
+    // The docs promise "chrome + control props" for disabled, like required.
+    expect(input.disabled).toBe(true);
+    expect(input.getAttribute('aria-invalid')).toBeNull();
+  });
+
+  it('leaves the control enabled when the field is not disabled', () => {
+    const view = render(FieldHarness, { props: { label: 'Open field' } });
+    const input = view.getByRole('textbox', { name: 'Open field' }) as HTMLInputElement;
+    expect(input.disabled).toBe(false);
+  });
 });
 
 describe('Form', () => {

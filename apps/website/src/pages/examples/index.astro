@@ -7,8 +7,15 @@ import {
 /**
  * /examples/ — every registered @texuli/examples demo, filterable, lazy-live.
  * Page chrome (h1 + main) comes from BaseLayout: do not nest another main.
+ *
+ * T-83 curation (gallery punch list row 6): a newcomer meets the flat
+ * catalog through build-time curated lanes by job and per-family counts.
+ * Every lane item links to its real detail route; the island below keeps its
+ * own filters. Deep links from component pages wait on the parity mapping
+ * (T-85/T-06) and are recorded, not built here.
  */
 import ExamplesBrowser from '../../components/examples/ExamplesBrowser.svelte';
+import { exampleLanes, examplePackageCounts } from '../../components/examples/lanes.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const full = buildExampleCatalog();
@@ -17,6 +24,9 @@ const items = full.map(({ source: _source, ...rest }) => ({ ...rest, source: nul
 const packages = listExamplePackages(full);
 const kinds = listExampleKinds(full);
 const base = import.meta.env.BASE_URL;
+const detailHref = (id: string) => `${base.replace(/\/+$/, '')}/examples/${id}/`;
+const lanes = exampleLanes(full);
+const counts = examplePackageCounts(full);
 const title = 'Examples';
 const description =
   'Every registered Texuli example, live from the shared registry. Filter by package and kind. Static site, no foreign network.';
@@ -27,6 +37,44 @@ const description =
     <h1 id="examples-page-title">{title}</h1>
     <p class="lead">{description}</p>
   </header>
+
+  <section class="lanes" aria-labelledby="lanes-title">
+    <h2 id="lanes-title">Start from a job</h2>
+    <div class="lanes-grid">
+      {
+        lanes.map((lane) => (
+          <div class="lane">
+            <h3>{lane.title}</h3>
+            <p class="lane-description">{lane.description}</p>
+            <ul>
+              {lane.items.map((item) => (
+                <li>
+                  <a href={detailHref(item.id)}>{item.title}</a>
+                </li>
+              ))}
+              {lane.total > lane.items.length && (
+                <li class="lane-more">+ {lane.total - lane.items.length} more — use the search below</li>
+              )}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="families" aria-labelledby="families-title">
+    <h2 id="families-title">Every family, counted</h2>
+    <p class="counts">
+      {full.length} registered examples across {counts.length} packages:
+      {counts.map((entry, index) => (
+        <>
+          {index > 0 && <span aria-hidden="true"> · </span>}
+          <span class="count"><strong>{entry.packageId}</strong> {entry.count}</span>
+        </>
+      ))}
+    </p>
+  </section>
+
   <ExamplesBrowser
     client:load
     items={items}
@@ -51,5 +99,64 @@ const description =
     max-inline-size: 44rem;
     color: var(--tx-foreground);
     font-size: 1.05rem;
+  }
+  .lanes {
+    margin-block-end: 1.5rem;
+  }
+  .lanes h2,
+  .families h2 {
+    margin: 0 0 0.6rem;
+    font-size: 1.25rem;
+  }
+  .lanes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+  }
+  .lane {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, var(--tx-background));
+  }
+  .lane h3 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .lane-description {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.875rem;
+  }
+  .lane ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+  }
+  .lane a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--tx-link, var(--tx-foreground));
+  }
+  .lane-more {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8125rem;
+  }  .families {
+    margin-block-end: 1.5rem;
+  }
+  .counts {
+    margin: 0;
+    max-inline-size: 48rem;
+    font-size: 0.9375rem;
+  }
+  .count strong {
+    font-weight: 700;
   }
 </style>
