@@ -1,10 +1,22 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import { type ActionStatus, actionValues, validateFieldValue } from '../actions.ts';
-import { getPlayerActionAccess, getPlayerLabels, getPlayerStateAccess } from '../context.ts';
+import {
+  getPlayerActionAccess,
+  getPlayerInteraction,
+  getPlayerLabels,
+  getPlayerStateAccess,
+} from '../context.ts';
 import { type RegisteredField, setActionFormContext } from './form-context.ts';
 
-let { action, label, children }: { action: string; label: string; children?: Snippet } = $props();
+let {
+  action,
+  label,
+  children,
+  txPath,
+}: { action: string; label: string; children?: Snippet; txPath?: string } = $props();
+const interaction = getPlayerInteraction();
+let form = $state<HTMLFormElement>();
 const actions = getPlayerActionAccess();
 const stateAccess = getPlayerStateAccess();
 const labels = getPlayerLabels();
@@ -19,6 +31,7 @@ setActionFormContext({
     return () => fields.delete(field);
   },
   pending: () => status === 'pending',
+  submit: () => form?.requestSubmit(),
 });
 
 let receipt = $derived.by(() => {
@@ -63,10 +76,13 @@ async function onSubmit(event: SubmitEvent): Promise<void> {
   }
   status = 'pending';
   status = await actions.propose(action, values);
+  // Spec 0.3.0: the form's `submit` event runs its `on.submit` actions once proposed.
+  if (txPath !== undefined && status === 'confirmed') interaction?.dispatch(txPath, 'submit');
 }
 </script>
 
 <form
+  bind:this={form}
   class="tx-player-action-form"
   aria-label={label}
   aria-describedby={receipt ? receiptId : undefined}

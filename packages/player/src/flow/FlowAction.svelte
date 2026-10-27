@@ -1,8 +1,9 @@
 <script lang="ts">
-import { getPlayerFlowAccess } from '../context.ts';
+import { getPlayerFlowAccess, getPlayerInteraction } from '../context.ts';
 
-let { event, label }: { event: string; label: string } = $props();
+let { event, label, txPath }: { event: string; label: string; txPath?: string } = $props();
 const access = getPlayerFlowAccess();
+const interaction = getPlayerInteraction();
 let available = $derived(access?.can(event) === true);
 </script>
 
@@ -14,6 +15,8 @@ let available = $derived(access?.can(event) === true);
   aria-disabled={!available}
   onclick={() => {
     if (available) access?.dispatch(event);
+    // Spec 0.3.0: a press also runs the node's `on.press` actions.
+    if (txPath !== undefined) interaction?.dispatch(txPath, 'press');
   }}
 >
   {label}

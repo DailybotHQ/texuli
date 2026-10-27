@@ -72,4 +72,16 @@ export const PLAYER_LOADERS: Readonly<Record<string, PlayerLoader>> = Object.fre
     (await import('@texuli/media/composition-svg')).CompositionSvg,
   'media-composition-canvas': async () =>
     (await import('@texuli/media/composition-canvas')).CompositionCanvas,
+  // Spec 0.3.0: data views, chat, drag as data and workflows, through the player's painters.
+  'data-board': async () => (await import('./painters/DataBoardPainter.svelte')).default,
+  'data-tree-view': async () => (await import('./painters/DataTreeViewPainter.svelte')).default,
+  'data-calendar': async () => (await import('./painters/DataCalendarPainter.svelte')).default,
+  'data-grid': async () => (await import('./painters/DataGridPainter.svelte')).default,
+  'data-files': async () => (await import('./painters/DataFilesPainter.svelte')).default,
+  'data-map': async () => (await import('./painters/DataMapPainter.svelte')).default,
+  'data-timeline': async () => (await import('./painters/DataTimelinePainter.svelte')).default,
+  'chat-thread': async () => (await import('@texuli/chat')).ChatThreadDisplay,
+  'chat-message': async () => (await import('@texuli/chat')).ChatMessageDisplay,
+  'sortable-list': async () => (await import('./painters/SortableListPainter.svelte')).default,
+  'workflow-graph': async () => (await import('./painters/WorkflowGraphPainter.svelte')).default,
 });

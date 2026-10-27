@@ -1,12 +1,13 @@
 <script lang="ts">
 import { onMount } from 'svelte';
 import type { FieldKind } from '../actions.ts';
-import { getPlayerStateAccess } from '../context.ts';
+import { getPlayerInteraction, getPlayerStateAccess } from '../context.ts';
 import { getActionFormContext } from './form-context.ts';
 
 let {
   name,
   state: stateName,
+  txPath,
   label,
   kind = 'text',
   required = false,
@@ -30,9 +31,17 @@ let {
   min?: number;
   max?: number;
   placeholder?: string;
+  txPath?: string;
 } = $props();
 
 const access = getPlayerStateAccess();
+const interaction = getPlayerInteraction();
+/** Write the variable, then run the node's `on.change` actions (spec 0.3.0). */
+function write(value: unknown): void {
+  if (access?.write(stateName, value) && txPath !== undefined) {
+    interaction?.dispatch(txPath, 'change', { value });
+  }
+}
 const form = getActionFormContext();
 const id = $props.id();
 let input = $state<HTMLInputElement | HTMLTextAreaElement | null>(null);
@@ -63,8 +72,8 @@ function onInput(event: Event): void {
   const raw = (event.currentTarget as HTMLInputElement | HTMLTextAreaElement).value;
   if (kind === 'number') {
     const number = raw === '' ? Number.NaN : Number(raw);
-    if (Number.isFinite(number)) access?.write(stateName, number);
-  } else access?.write(stateName, raw);
+    if (Number.isFinite(number)) write(number);
+  } else write(raw);
   error = null;
 }
 </script>

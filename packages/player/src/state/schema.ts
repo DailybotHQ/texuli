@@ -22,14 +22,36 @@ export const DATA_SOURCE_NAME = /^(?=.{1,64}$)[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0
  * a `source`, the variable is host-bound: its value comes from the host's
  * data under that name, and only the host can change it.
  */
+/** Most items a list variable holds, and most scalar fields per item (spec 0.3.0). */
+export const MAX_LIST_ITEMS = 500;
+export const MAX_ITEM_FIELDS = 16;
+/** A list item key: the spec `itemKey`. */
+export const ITEM_KEY = /^[A-Za-z0-9._:-]{1,64}$/;
+const ITEM_FIELD = /^[A-Za-z][A-Za-z0-9_]{0,31}$/;
+const MAX_ITEM_TEXT = 2000;
+
+/** One list item: an id and up to 16 scalar fields. */
+export type ListItem = Readonly<Record<string, string | number | boolean>> & {
+  readonly id: string;
+};
+
+/**
+ * A workflow graph value (spec `WorkflowGraph`). The state layer checks its
+ * envelope (version, bounded lists); the workflow painter runs the full
+ * workflow model checks before anything paints.
+ */
+export type WorkflowValue = Readonly<Record<string, unknown>>;
+
 export type StateDeclaration = (
   | { type: 'boolean'; initial: boolean }
   | { type: 'number'; min: number; max: number; initial: number }
   | { type: 'enum'; values: readonly string[]; initial: string }
   | { type: 'string'; maxLength: number; initial: string }
+  | { type: 'list'; maxItems: number; initial: readonly ListItem[] }
+  | { type: 'workflow'; initial: WorkflowValue }
 ) & { source?: string };
 
-export type StateValue = boolean | number | string;
+export type StateValue = boolean | number | string | readonly ListItem[] | WorkflowValue;
 export type StateDeclarations = Readonly<Record<string, StateDeclaration>>;
 export type StateSnapshot = Readonly<Record<string, StateValue>>;
 
@@ -47,7 +69,9 @@ export interface StateIssue {
     | 'flow-shape'
     | 'flow-binding'
     | 'action-binding'
-    | 'host-binding';
+    | 'host-binding'
+    | 'binding'
+    | 'action';
   path: string;
   message: string;
 }
@@ -78,6 +102,8 @@ function parseOne(name: string, raw: unknown, issues: StateIssue[]): StateDeclar
     number: ['type', 'min', 'max', 'initial', 'source'],
     enum: ['type', 'values', 'initial', 'source'],
     string: ['type', 'maxLength', 'initial', 'source'],
+    list: ['type', 'maxItems', 'initial'],
+    workflow: ['type', 'initial'],
   };
   const keys = typeof raw.type === 'string' ? allowed[raw.type] : undefined;
   if (!keys) return fail('state-type', `"${name}" has an unknown type.`);
@@ -140,9 +166,81 @@ function parseOne(name: string, raw: unknown, issues: StateIssue[]): StateDeclar
       }
       return { type: 'string', maxLength, initial };
     }
+    case 'list': {
+      const maxItems = raw.maxItems ?? MAX_LIST_ITEMS;
+      if (
+        typeof maxItems !== 'number' ||
+        !Number.isInteger(maxItems) ||
+        maxItems < 0 ||
+        maxItems > MAX_LIST_ITEMS
+      ) {
+        return fail('state-shape', `"${name}" maxItems must be 0–${MAX_LIST_ITEMS}.`);
+      }
+      const initial = coerceList(raw.initial ?? [], maxItems);
+      if (!initial) {
+        return fail(
+          'state-initial',
+          `"${name}" initial must be at most ${maxItems} items, each { id, scalar fields }.`
+        );
+      }
+      return { type: 'list', maxItems, initial };
+    }
+    case 'workflow': {
+      const initial = coerceWorkflow(raw.initial);
+      if (!initial)
+        return fail('state-initial', `"${name}" initial must be a workflow graph (version 1).`);
+      return { type: 'workflow', initial };
+    }
     default:
       return fail('state-type', `"${name}" has an unknown type.`);
   }
+}
+
+/** A frozen copy of a list value, or `undefined` when it does not fit. */
+export function coerceList(value: unknown, maxItems: number): readonly ListItem[] | undefined {
+  if (!Array.isArray(value) || value.length > maxItems) return undefined;
+  const seen = new Set<string>();
+  const out: ListItem[] = [];
+  for (const raw of value) {
+    if (!isBag(raw) || typeof raw.id !== 'string' || !ITEM_KEY.test(raw.id) || seen.has(raw.id)) {
+      return undefined;
+    }
+    seen.add(raw.id);
+    const keys = Object.keys(raw);
+    if (keys.length > MAX_ITEM_FIELDS + 1) return undefined;
+    const item: Record<string, string | number | boolean> = {};
+    for (const key of keys) {
+      const field = raw[key];
+      if (key !== 'id' && !ITEM_FIELD.test(key)) return undefined;
+      if (typeof field === 'string') {
+        if (field.length > MAX_ITEM_TEXT) return undefined;
+      } else if (typeof field === 'number') {
+        if (!Number.isFinite(field)) return undefined;
+      } else if (typeof field !== 'boolean') {
+        return undefined;
+      }
+      Object.defineProperty(item, key, { value: field, enumerable: true });
+    }
+    out.push(Object.freeze(item) as ListItem);
+  }
+  return Object.freeze(out);
+}
+
+const MAX_WORKFLOW_NODES = 500;
+const MAX_WORKFLOW_EDGES = 2000;
+
+/**
+ * A workflow value's envelope: version 1 with bounded node type, node and
+ * edge lists. The full checks (ports, cycles, labels) run in the painter.
+ */
+export function coerceWorkflow(value: unknown): WorkflowValue | undefined {
+  if (!isBag(value) || value.version !== 1) return undefined;
+  const { nodeTypes, nodes, edges } = value;
+  if (!Array.isArray(nodeTypes) || nodeTypes.length === 0 || nodeTypes.length > 64)
+    return undefined;
+  if (!Array.isArray(nodes) || nodes.length > MAX_WORKFLOW_NODES) return undefined;
+  if (!Array.isArray(edges) || edges.length > MAX_WORKFLOW_EDGES) return undefined;
+  return Object.freeze({ ...value });
 }
 
 /**
@@ -217,6 +315,10 @@ export function coerceStateValue(
       return typeof value === 'string' && declaration.values.includes(value) ? value : undefined;
     case 'string':
       return typeof value === 'string' && value.length <= declaration.maxLength ? value : undefined;
+    case 'list':
+      return coerceList(value, declaration.maxItems);
+    case 'workflow':
+      return coerceWorkflow(value);
   }
 }
 
