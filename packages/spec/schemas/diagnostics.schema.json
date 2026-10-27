@@ -13,6 +13,13 @@
       "items": {
         "$ref": "#/$defs/diagnostic"
       }
+    },
+    "warnings": {
+      "description": "Advisory findings; ok still means no diagnostics.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/warning"
+      }
     }
   },
   "required": ["ok", "diagnostics"],
@@ -49,8 +56,37 @@
         "extension-prop",
         "catalog-mismatch",
         "unsupported-profile",
-        "unknown-slot"
+        "unknown-slot",
+        "state",
+        "unknown-state",
+        "binding",
+        "action",
+        "unknown-event",
+        "workflow"
       ]
+    },
+    "warning": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/warningCode"
+        },
+        "path": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["code", "path", "message"],
+      "additionalProperties": false
+    },
+    "warningCode": {
+      "type": "string",
+      "enum": ["deprecated"]
     }
   }
 }

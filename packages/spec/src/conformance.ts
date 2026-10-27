@@ -1,11 +1,25 @@
 import { buildSpec } from './build.ts';
-import { CAPABILITIES, type SpecCatalog } from './catalog.ts';
+import { CAPABILITIES, type SpecCatalog, type SpecDeprecation } from './catalog.ts';
+import { checkPropSchema, defCollisions } from './contract.ts';
 import { checkSchemaDocument, isRecord, type Schema, validateInstance } from './dialect.ts';
 import { type SpecDiagnosticCode, validateBlueprint } from './validate.ts';
+import { SPEC_VERSION } from './version.ts';
+import { validateWorkflowGraph } from './workflow.ts';
 
 /** One conformance failure: drift is a failed gate, never a warning. */
 export interface ConformanceIssue {
-  check: 'dialect' | 'catalog' | 'capabilities' | 'manifest' | 'generated' | 'golden' | 'invalid';
+  check:
+    | 'dialect'
+    | 'catalog'
+    | 'capabilities'
+    | 'manifest'
+    | 'generated'
+    | 'golden'
+    | 'invalid'
+    | 'contract'
+    | 'prop-schema'
+    | 'deprecation'
+    | 'workflow';
   path: string;
   message: string;
 }
@@ -20,7 +34,11 @@ export interface ConformanceIssue {
  * - regenerating gives byte-identical TypeScript and Kotlin, with no file
  *   missing or extra;
  * - every golden blueprint validates, and every invalid fixture fails with
- *   exactly its expected diagnostic codes.
+ *   exactly its expected diagnostic codes (blueprints and workflow graphs);
+ * - the blueprint and workflow `$defs` stay disjoint, every catalog property
+ *   schema is usable (array and object props only, contract `$ref`s only),
+ *   bindable props are declared portable props, and no deprecation outlives
+ *   its one-minor warning window.
  * Runtime-neutral: the caller reads the files.
  */
 export function checkConformance(
@@ -44,6 +62,16 @@ export function checkConformance(
   }
   const catalogSchema = schemas['schemas/catalog.schema.json'];
   const blueprintSchema = schemas['schemas/blueprint.schema.json'];
+  const workflowSchema = schemas['schemas/workflow.schema.json'];
+  if (blueprintSchema) {
+    for (const name of defCollisions(blueprintSchema, workflowSchema)) {
+      issues.push({
+        check: 'contract',
+        path: 'schemas/blueprint.schema.json',
+        message: `$defs.${name} is also a workflow definition`,
+      });
+    }
+  }
   const catalog = json('catalog/components.json') as SpecCatalog;
   if (catalogSchema) {
     for (const issue of validateInstance(catalogSchema, catalog)) {
@@ -73,6 +101,8 @@ export function checkConformance(
       }
     }
   }
+
+  issues.push(...checkCatalogContract(catalog));
 
   let build: ReturnType<typeof buildSpec> | undefined;
   try {
@@ -112,8 +142,27 @@ export function checkConformance(
     }
   }
 
+  if (workflowSchema) {
+    for (const path of Object.keys(normative).filter((p) => p.startsWith('fixtures/workflow/'))) {
+      const fixture = json(path) as { expect?: readonly string[]; graph?: unknown };
+      const golden = path.startsWith('fixtures/workflow/golden/');
+      const got = validateWorkflowGraph(
+        golden ? fixture : fixture.graph,
+        workflowSchema
+      ).diagnostics.map((d) => d.code);
+      const expected = golden ? [] : (fixture.expect ?? []);
+      if (got.join(',') !== expected.join(',')) {
+        issues.push({
+          check: 'workflow',
+          path,
+          message: `expected [${expected.join(', ')}], got [${got.join(', ')}]`,
+        });
+      }
+    }
+  }
+
   if (blueprintSchema) {
-    const documents = { blueprintSchema, catalog };
+    const documents = { blueprintSchema, catalog, workflowSchema, validateWorkflowGraph };
     for (const path of Object.keys(normative).filter((p) => p.startsWith('fixtures/golden/'))) {
       const result = validateBlueprint(json(path), documents);
       for (const d of result.diagnostics) {
@@ -134,6 +183,68 @@ export function checkConformance(
           check: 'invalid',
           path,
           message: `expected [${fixture.expect.join(', ')}], got [${got.join(', ')}]`,
+        });
+      }
+    }
+  }
+  return issues;
+}
+
+/** The minor-version window: a deprecation since `since` expires one minor later. */
+export function deprecationExpired(since: string, specVersion: string = SPEC_VERSION): boolean {
+  const parse = (v: string) => v.split('.').map(Number) as [number, number, number];
+  const [major, minor] = parse(specVersion);
+  const [sinceMajor, sinceMinor] = parse(since);
+  return major > sinceMajor || (major === sinceMajor && minor >= sinceMinor + 1);
+}
+
+/** Catalog rules the schema cannot express: property schemas, bindable props, deprecations. */
+export function checkCatalogContract(
+  catalog: SpecCatalog,
+  specVersion: string = SPEC_VERSION
+): ConformanceIssue[] {
+  const issues: ConformanceIssue[] = [];
+  const path = 'catalog/components.json';
+  const expired = (where: string, deprecated: SpecDeprecation | undefined) => {
+    if (deprecated && deprecationExpired(deprecated.since, specVersion)) {
+      issues.push({
+        check: 'deprecation',
+        path,
+        message: `${where}: deprecated since ${deprecated.since}; remove it (one minor of warnings has passed)`,
+      });
+    }
+  };
+  for (const component of catalog?.components ?? []) {
+    expired(component.id, component.deprecated);
+    const portable = new Set(component.props.filter((p) => !p.extension).map((p) => p.name));
+    for (const name of component.bindable ?? []) {
+      if (!portable.has(name)) {
+        issues.push({
+          check: 'prop-schema',
+          path,
+          message: `${component.id}: bindable "${name}" is not a portable prop`,
+        });
+      }
+    }
+    if (new Set(component.events ?? []).size !== (component.events ?? []).length) {
+      issues.push({ check: 'catalog', path, message: `${component.id}: events repeat` });
+    }
+    for (const prop of component.props) {
+      expired(`${component.id}.${prop.name}`, prop.deprecated);
+      if (!prop.schema) continue;
+      if (prop.kind !== 'array' && prop.kind !== 'object') {
+        issues.push({
+          check: 'prop-schema',
+          path,
+          message: `${component.id}.${prop.name}: only array and object props take a schema`,
+        });
+        continue;
+      }
+      for (const problem of checkPropSchema(prop.schema)) {
+        issues.push({
+          check: 'prop-schema',
+          path,
+          message: `${component.id}.${prop.name}: ${problem}`,
         });
       }
     }

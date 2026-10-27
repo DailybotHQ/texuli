@@ -192,13 +192,24 @@ export function checkSchemaDocument(document: unknown): SchemaIssue[] {
 }
 
 /**
+ * Optional callbacks for {@link validateInstance}. `value` runs at every
+ * schema node a value meets (after `$ref` resolution, so a caller can match
+ * a `$defs` entry by identity). Returning `undefined` lets the dialect check
+ * the value as usual; returning issues (possibly none) replaces that check.
+ */
+export interface DialectHooks {
+  value?(node: Schema, value: unknown, path: string): readonly SchemaIssue[] | undefined;
+}
+
+/**
  * Validate a JSON value against a dialect schema. `root` resolves `$ref`s
  * (defaults to `schema`). Returns every issue, with JSON paths from `$`.
  */
 export function validateInstance(
   schema: Schema,
   value: unknown,
-  root: Schema = schema
+  root: Schema = schema,
+  hooks: DialectHooks = {}
 ): SchemaIssue[] {
   const issues: SchemaIssue[] = [];
   const fail = (code: string, path: string, message: string): void => {
@@ -214,6 +225,11 @@ export function validateInstance(
       const target = name === undefined ? undefined : root.$defs?.[name];
       if (target === undefined) fail('bad-ref', path, `Unresolved ${node.$ref}.`);
       else visit(target, current, path, depth + 1);
+      return;
+    }
+    const handled = hooks.value?.(node, current, path);
+    if (handled !== undefined) {
+      issues.push(...handled);
       return;
     }
     if (node.const !== undefined && current !== node.const) {

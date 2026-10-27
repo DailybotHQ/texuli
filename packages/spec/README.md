@@ -48,7 +48,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version, e.g. '0.2.0'
+SPEC_VERSION;                         // the spec version, e.g. '0.3.0'
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -68,31 +68,50 @@ const digest = sha256(canonicalJson({ b: 1, a: [true, null] }));
 
 To check a whole blueprint, pass the blueprint schema and catalog documents
 from the repository's `packages/spec/schemas/blueprint.schema.json` and
-`packages/spec/catalog/components.json`:
+`packages/spec/catalog/components.json`. Workflow graphs and migrations
+are opt-in subpaths, so the root stays small: a host that renders workflow
+graphs passes `schemas/workflow.schema.json` and `validateWorkflowGraph`
+from `@texuli/spec/workflow` (without both, a `workflow` state variable or
+a `workflowGraph` prop fails closed), and a host that reads older
+envelopes runs `migrateBlueprint` from `@texuli/spec/migrate` first:
 
 ```ts
 import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
+import { migrateBlueprint } from '@texuli/spec/migrate';
+import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const result = validateBlueprint(blueprint, {
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → 0.3.0 stamps `spec`; never throws
+const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
+  workflowSchema: workflowSchemaJson as Schema, // only for workflow graphs
+  validateWorkflowGraph, // only for workflow graphs
 });
 if (!result.ok) {
   for (const d of result.diagnostics) console.warn(d.code, d.path, d.message);
 }
+for (const w of result.warnings ?? []) console.info(w.code, w.path); // `deprecated`
 ```
 
-A node with an id outside the catalog fails with `unknown-id`; other codes
-include `schema`, `unknown-prop`, `prop-type`, `enum-value`,
+A node with an id outside the catalog fails with `unknown-id`. The other
+codes are `schema`, `unknown-prop`, `prop-type`, `enum-value`,
 `missing-required`, `extension-prop`, `catalog-mismatch`,
-`unsupported-profile` and `unknown-slot`.
+`unsupported-profile`, `unknown-slot`, and, from spec 0.3.0, `state` (a
+refused state or flow declaration), `unknown-state` (a binding or action
+names no declared variable), `binding` (a malformed, misplaced, read-only or
+ill-fitting binding), `action` (an action with the wrong fields or target),
+`unknown-event` (an `on` key the component does not fire) and `workflow` (a
+workflow graph rule). Deprecated components and props add a `deprecated`
+warning without failing.
 
 ## What's inside
 
 | Subpath | Purpose | Headline exports |
 | --- | --- | --- |
-| `@texuli/spec` | Runtime: types, vocabulary, validation, hashing | `BlueprintEnvelope`, `SpecCatalog`, `SpecValidation` and the other generated types; `SPEC_COMPONENT_IDS`, `SpecComponentProps`, `SPEC_CATALOG_HASH`, `SPEC_VERSION`; `validateBlueprint`, `validateTree`, `validateInstance`, `checkSchemaDocument`; `canonicalJson`, `sha256` |
-| `@texuli/spec/codegen` | Build time: generation and conformance | `buildSpec`, `projectCatalog`, `checkConformance`, `formatJson`, `nextSpecVersion`, `checkVersionHistory` |
+| `@texuli/spec` | Runtime: types, vocabulary, validation, hashing | `BlueprintEnvelope`, `SpecCatalog`, `SpecValidation`, `WorkflowGraph` and the other generated types; `SPEC_COMPONENT_IDS`, `SpecComponentProps`, `SPEC_CATALOG_HASH`, `SPEC_VERSION`; `validateBlueprint`, `validateTree`, `validateInstance`, `checkSchemaDocument`; the contract constants (`SPEC_ACTION_OPS`, `SPEC_EVENT_NAMES`, `SPEC_STATE_TYPES`, `SPEC_LIMITS`, `SPEC_PATTERNS`, `ACTION_FIELDS`); `canonicalJson`, `sha256` |
+| `@texuli/spec/workflow` | Runtime, opt-in: workflow graph validation | `validateWorkflowGraph` (pass it in `SpecDocuments.validateWorkflowGraph`) |
+| `@texuli/spec/migrate` | Runtime, opt-in: envelope migrations | `migrateBlueprint`, `SPEC_MIGRATIONS`, `UNDECLARED_SPEC_VERSION` |
+| `@texuli/spec/codegen` | Build time: generation and conformance | `buildSpec`, `projectCatalog`, `checkConformance`, `checkCatalogContract`, `formatJson`, `nextSpecVersion`, `checkVersionHistory` |
 
 ## Key guarantees
 
@@ -107,9 +126,18 @@ include `schema`, `unknown-prop`, `prop-type`, `enum-value`,
   refused when you pass `catalogHash`.
 - **Deterministic.** Canonical JSON sorts keys at every depth, and every
   generated file carries the spec version and digest with no timestamps.
+- **Interaction as data, never code.** Spec 0.3.0 adds local state,
+  bindings (`{"$state": name}`, read-only `{"$data": name}`), a closed
+  action set (`setState`, `toggleState`, `moveItem`, `flowGo`, `emit`,
+  `submit`) on a closed event vocabulary, drag as data (`reorder`) and
+  workflow graphs (at most 500 nodes and 2,000 edges). Nothing in a
+  blueprint is evaluated.
 - **Structure only.** This validator checks structure. URL policy, tree
   limits and rendering live in the runtime validator of
-  [`@texuli/catalog`](https://www.npmjs.com/package/@texuli/catalog).
+  [`@texuli/catalog`](https://www.npmjs.com/package/@texuli/catalog). The
+  reducers that run the actions belong to the runtime
+  ([`@texuli/player`](https://www.npmjs.com/package/@texuli/player)); in
+  this repository they are not wired to the 0.3.0 fields yet.
 
 ## Versioning
 
@@ -131,8 +159,11 @@ reads. Native (Kotlin) builds compile the generated models from the same
 spec, and their decoders are closed: a blueprint that uses a field from a
 newer spec fails to decode on an older native build with a `schema`
 diagnostic instead of passing silently. A blueprint binds to an exact
-catalog hash today; an envelope field for a compatible spec range, and
-migrations between versions, are planned and not built.
+catalog hash, and from 0.3.0 may declare the exact spec version it was
+written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
+(`@texuli/spec/migrate`) brings an
+envelope up to the current spec with pure, per-version steps
+(`src/migrations/`); a compatible version range is planned, not built.
 
 The full rules (the digest, `versions.json` pins, regeneration and the
 conformance harness) are in
@@ -166,3 +197,7 @@ bugs at [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texu
 ## License
 
 MIT © Dailybot, Inc.
+
+---
+
+Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-spec).

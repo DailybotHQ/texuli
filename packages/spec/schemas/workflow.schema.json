@@ -1,0 +1,294 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://texuli.example/spec/schemas/workflow.schema.json",
+  "title": "WorkflowGraph",
+  "description": "A workflow graph as data (ADR-008): closed node types with typed ports and fields, nodes, edges between declared ports, optional groups and a cycle policy. At most 500 nodes and 2,000 edges. Ids, references, field values, port directions and cycles are checked by validateWorkflowGraph.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "nodeTypes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/workflowNodeType"
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "$ref": "#/$defs/workflowNode"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "maxItems": 2000,
+      "items": {
+        "$ref": "#/$defs/workflowEdge"
+      }
+    },
+    "groups": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/workflowGroup"
+      }
+    },
+    "cycles": {
+      "description": "forbid makes the graph acyclic (a self-loop counts); omitted means allow.",
+      "type": "string",
+      "enum": ["allow", "forbid"]
+    },
+    "viewport": {
+      "$ref": "#/$defs/workflowViewport"
+    }
+  },
+  "required": ["version", "nodeTypes", "nodes", "edges"],
+  "additionalProperties": false,
+  "$defs": {
+    "workflowId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,64}$"
+    },
+    "workflowLabel": {
+      "description": "Display text: no control characters and no bidirectional overrides or isolates.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]*$"
+    },
+    "workflowCoordinate": {
+      "type": "number",
+      "minimum": -1000000,
+      "maximum": 1000000
+    },
+    "workflowPosition": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/workflowCoordinate"
+        },
+        "y": {
+          "$ref": "#/$defs/workflowCoordinate"
+        }
+      },
+      "required": ["x", "y"],
+      "additionalProperties": false
+    },
+    "workflowSize": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "height": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10000
+        }
+      },
+      "required": ["width", "height"],
+      "additionalProperties": false
+    },
+    "workflowPort": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/workflowId"
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["in", "out"]
+        },
+        "label": {
+          "$ref": "#/$defs/workflowLabel"
+        },
+        "kind": {
+          "description": "Ports with a kind connect only to ports of the same kind.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,31}$"
+        },
+        "multiple": {
+          "description": "Whether the port takes more than one edge.",
+          "type": "boolean"
+        }
+      },
+      "required": ["id", "direction"],
+      "additionalProperties": false
+    },
+    "workflowField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9_]{0,31}$"
+        },
+        "label": {
+          "$ref": "#/$defs/workflowLabel"
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "enum"]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "enumValues": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        "maxLength": {
+          "description": "For string fields; 2000 when omitted.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000
+        }
+      },
+      "required": ["name", "kind"],
+      "additionalProperties": false
+    },
+    "workflowNodeType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/workflowId"
+        },
+        "label": {
+          "$ref": "#/$defs/workflowLabel"
+        },
+        "category": {
+          "$ref": "#/$defs/workflowLabel"
+        },
+        "ports": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/workflowPort"
+          }
+        },
+        "fields": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/workflowField"
+          }
+        }
+      },
+      "required": ["id", "label", "ports"],
+      "additionalProperties": false
+    },
+    "workflowNode": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/workflowId"
+        },
+        "type": {
+          "$ref": "#/$defs/workflowId"
+        },
+        "label": {
+          "$ref": "#/$defs/workflowLabel"
+        },
+        "position": {
+          "$ref": "#/$defs/workflowPosition"
+        },
+        "size": {
+          "$ref": "#/$defs/workflowSize"
+        },
+        "group": {
+          "$ref": "#/$defs/workflowId"
+        },
+        "data": {
+          "description": "Field values by field name: scalars of the field kind.",
+          "type": "object",
+          "additionalProperties": {}
+        },
+        "locked": {
+          "type": "boolean"
+        }
+      },
+      "required": ["id", "type", "label", "position"],
+      "additionalProperties": false
+    },
+    "workflowEndpoint": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/$defs/workflowId"
+        },
+        "port": {
+          "$ref": "#/$defs/workflowId"
+        }
+      },
+      "required": ["node", "port"],
+      "additionalProperties": false
+    },
+    "workflowEdge": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/workflowId"
+        },
+        "from": {
+          "$ref": "#/$defs/workflowEndpoint"
+        },
+        "to": {
+          "$ref": "#/$defs/workflowEndpoint"
+        },
+        "label": {
+          "$ref": "#/$defs/workflowLabel"
+        }
+      },
+      "required": ["id", "from", "to"],
+      "additionalProperties": false
+    },
+    "workflowGroup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/workflowId"
+        },
+        "label": {
+          "$ref": "#/$defs/workflowLabel"
+        },
+        "position": {
+          "$ref": "#/$defs/workflowPosition"
+        },
+        "size": {
+          "$ref": "#/$defs/workflowSize"
+        }
+      },
+      "required": ["id", "label"],
+      "additionalProperties": false
+    },
+    "workflowViewport": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/workflowCoordinate"
+        },
+        "y": {
+          "$ref": "#/$defs/workflowCoordinate"
+        },
+        "zoom": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 4
+        }
+      },
+      "required": ["x", "y", "zoom"],
+      "additionalProperties": false
+    }
+  }
+}
