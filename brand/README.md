@@ -15,3 +15,10 @@ The website serves resized copies from `apps/website/public/brand/` through
 `BrandLogo.astro` (switches with the color mode) and `BrandHead.astro`
 (favicons, manifest, theme color). Keep the originals here as the source;
 regenerate the web copies from them.
+
+## Social card
+
+`social/texuli-og-source.png` is the designed home-page social card ("Build
+any interface."). The website build serves a 1200 × 630 crop of it
+(`apps/website/src/components/seo/og-home.png`) as the home page's
+`og:image`; every other page gets its own generated card.
