@@ -30,7 +30,16 @@ const TYPES: Record<string, string> = {
 /** Anything that would smell like analytics leaving the site. */
 const ANALYTICS_REQUEST = /\/api\/umami\/|umami-loader\.js|cloud\.umami\.is/;
 
-const ROUTES = ['/', '/guides/', '/guides/theming/', '/component-pages/button/', '/native/'];
+// The required CI website job runs this spec (site-perf's silence checks run
+// only in the allowed-to-fail audits job), so the PLAN_006 routes are here too.
+const ROUTES = [
+  '/',
+  '/guides/',
+  '/guides/theming/',
+  '/component-pages/button/',
+  '/native/',
+  '/web-and-native/',
+];
 
 let server: Server;
 let origin = '';

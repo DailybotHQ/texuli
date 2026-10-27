@@ -46,14 +46,35 @@ describe('ANALYTICS gating', () => {
     expect(ANALYTICS.umami.hostUrl).toBe('/api/umami');
   });
 
-  it('points at the cloud origin in direct mode (explicit opt-out)', async () => {
+  // The enforced CSP allows `script-src 'self'` and `connect-src 'self'`
+  // only, so direct mode would be blocked by the browser: a silent off.
+  // The config fails closed instead and renders no analytics markup.
+  it('fails closed in direct mode (PUBLIC_UMAMI_USE_PROXY=false): the CSP would block it', async () => {
     const { ANALYTICS } = await loadConstances({
       PUBLIC_UMAMI_WEBSITE_ID: 'test-id',
       PROD: 'true',
       PUBLIC_UMAMI_USE_PROXY: 'false',
     });
-    expect(ANALYTICS.umami.enabled).toBe(true);
-    expect(ANALYTICS.umami.scriptUrl).toBe('https://cloud.umami.is/script.js');
+    expect(ANALYTICS.umami.enabled).toBe(false);
+    expect(ANALYTICS.umami.scriptUrl).toBe('');
+    expect(ANALYTICS.umami.hostUrl).toBe('');
+  });
+
+  it.each([
+    'https://cloud.umami.is/script.js',
+    '//cloud.umami.is/script.js',
+    '/\\cloud.umami.is/script.js',
+    'http://analytics.example.com/script.js',
+    'javascript:alert(1)',
+    'api/umami/script.js',
+  ])('refuses the non-same-origin script override %s (analytics off, no markup)', async (url) => {
+    const { ANALYTICS } = await loadConstances({
+      PUBLIC_UMAMI_WEBSITE_ID: 'test-id',
+      PROD: 'true',
+      PUBLIC_UMAMI_SCRIPT_URL: url,
+    });
+    expect(ANALYTICS.umami.enabled).toBe(false);
+    expect(ANALYTICS.umami.scriptUrl).toBe('');
     expect(ANALYTICS.umami.hostUrl).toBe('');
   });
 

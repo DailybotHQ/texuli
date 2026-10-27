@@ -89,7 +89,9 @@ isTabbable(stops[0]!);                        // true
 - **`untrusted`** (default, for agent or user content): only `https:`,
   `mailto:` and `#fragment`.
 - **`developer`** (for app-authored props): anything except `javascript:`,
-  `vbscript:`, `data:` and protocol-relative `//host` URLs.
+  `vbscript:`, `data:` and any value opening with two slashes or
+  backslashes in any mix (`//host`, `/\host`, `\/host`, `\\host`) or with
+  any leading backslash, which browsers resolve off-origin.
 - Whitespace and ASCII control characters are stripped before the scheme is
   read, so `java\tscript:` is caught.
 

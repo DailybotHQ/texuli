@@ -19,13 +19,37 @@ const umamiScriptOverride = (import.meta.env.PUBLIC_UMAMI_SCRIPT_URL || '').trim
 const umamiUseProxy = import.meta.env.PUBLIC_UMAMI_USE_PROXY !== 'false';
 
 /**
+ * The enforced page CSP allows `script-src 'self'` and `connect-src 'self'`
+ * with no analytics carve-out, so only a same-origin path can load. A
+ * root-relative path (`/…`, never `//…` or `/\…`, which browsers read as
+ * another host) is the only accepted shape.
+ */
+export function isSameOriginPath(url: string): boolean {
+  return url.startsWith('/') && !url.startsWith('//') && !url.startsWith('/\\');
+}
+
+/**
+ * The script the loader would inject. Direct mode (`PUBLIC_UMAMI_USE_PROXY=false`)
+ * resolves to the Umami Cloud origin, which the CSP blocks, so it fails the
+ * same-origin check below like any foreign override.
+ */
+const umamiScriptCandidate =
+  umamiScriptOverride ||
+  (umamiUseProxy ? '/api/umami/script.js' : 'https://cloud.umami.is/script.js');
+
+/**
  * Analytics configuration — every consumer must treat `enabled: false` as
  * "no script, no requests, no storage". `scriptUrl` is empty when disabled
  * so a consumer can never accidentally point at an analytics origin.
+ *
+ * Fail closed: a script source that is not a same-origin path disables
+ * analytics entirely (no markup) instead of shipping a tag the CSP would
+ * silently block.
  */
 const umamiEnabled =
   Boolean(umamiWebsiteId) &&
-  (import.meta.env.PROD || import.meta.env.PUBLIC_UMAMI_ENABLE === 'true');
+  (import.meta.env.PROD || import.meta.env.PUBLIC_UMAMI_ENABLE === 'true') &&
+  isSameOriginPath(umamiScriptCandidate);
 
 export const ANALYTICS = {
   umami: {
@@ -33,10 +57,7 @@ export const ANALYTICS = {
     /** Production loads when an id exists; local opt-in via PUBLIC_UMAMI_ENABLE=true. */
     enabled: umamiEnabled,
     /** Inert unless enabled — even a loader bug cannot emit a script. */
-    scriptUrl: umamiEnabled
-      ? umamiScriptOverride ||
-        (umamiUseProxy ? '/api/umami/script.js' : 'https://cloud.umami.is/script.js')
-      : '',
+    scriptUrl: umamiEnabled ? umamiScriptCandidate : '',
     /** Same-origin collect endpoint when the first-party proxy is on. */
     hostUrl: umamiEnabled && umamiUseProxy ? '/api/umami' : '',
   },

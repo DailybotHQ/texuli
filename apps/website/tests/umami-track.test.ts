@@ -85,12 +85,12 @@ describe('track() when analytics is enabled', () => {
 
   it('sanitizes before queueing: denied keys and email-shaped values', async () => {
     const { track } = await loadTrack(ENABLED);
-    track('search', { query: 'contact alice@example.com about themes', results: 12 });
+    track('theme_switch', { from: 'contact alice@example.com', to: 'dark' });
     const umami = stubUmami();
     document.dispatchEvent(new CustomEvent(UMAMI_READY_EVENT));
-    expect(umami.track).toHaveBeenCalledWith('search', {
-      query: 'contact [redacted] about themes',
-      results: 12,
+    expect(umami.track).toHaveBeenCalledWith('theme_switch', {
+      from: 'contact [redacted]',
+      to: 'dark',
     });
   });
 
@@ -129,11 +129,13 @@ describe('track() when analytics is enabled', () => {
 
   it('scrubs email-shaped values from any string payload', async () => {
     const { track } = await loadTrack(ENABLED);
-    track('outbound_doc_link', { url: 'https://example.com/docs?cc=bob@x.com' });
+    // Outbound URLs reach track as origin + pathname only (outbound-links.ts);
+    // an address in the path itself is still scrubbed here.
+    track('outbound_doc_link', { url: 'https://example.com/people/bob@example.com/docs' });
     const umami = stubUmami();
     document.dispatchEvent(new CustomEvent(UMAMI_READY_EVENT));
     expect(umami.track).toHaveBeenCalledWith('outbound_doc_link', {
-      url: 'https://example.com/docs?cc=[redacted]',
+      url: 'https://example.com/people/[redacted]/docs',
     });
   });
 });

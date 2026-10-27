@@ -5,7 +5,11 @@
  * page data or agent output) and is serialized once at build time. The CSP
  * integration hashes every inline script in the built HTML, so the block
  * is budgeted like the rest — `check:csp` proves coverage.
+ * `serializeJsonLd` escapes `<`, `>`, `&`, U+2028 and U+2029 so no string
+ * in the data can close the element (S-7).
  */
+import { serializeJsonLd } from './json-ld.ts';
+
 interface Props {
   /** A schema.org object, or an array of them; serialized as-is. */
   data: Record<string, unknown>;
@@ -14,4 +18,4 @@ interface Props {
 const { data } = Astro.props;
 ---
 
-<script is:inline type="application/ld+json" set:html={JSON.stringify(data)} />
+<script is:inline type="application/ld+json" set:html={serializeJsonLd(data)} />

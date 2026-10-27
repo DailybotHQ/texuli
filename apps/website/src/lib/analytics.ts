@@ -6,7 +6,7 @@
  * tasks; they must call `sanitizeEventData` on every payload — no event
  * leaves the site with a denylisted key in it. String values are also
  * scrubbed of email-shaped substrings: denylisted keys can be audited,
- * free-text values (a search query, a pasted path) cannot.
+ * free-text values (a pasted path, a link) cannot.
  */
 
 /**
@@ -49,7 +49,7 @@ export const EVENTS = {
   STUDIO_LAUNCH: 'studio_launch',
   /** An outbound link to external documentation: { url }. */
   OUTBOUND_DOC_LINK: 'outbound_doc_link',
-  /** Search query submitted via /search/: { query, results }. */
+  /** Search submitted via /search/: { query_length, results } — never the query text. */
   SEARCH: 'search',
   /** Reserved — edge: known AI bot page view (server-side only). */
   AI_BOT_VISIT: 'ai_bot_visit',
@@ -81,7 +81,7 @@ export interface EventPayloads {
   component_demo_open: { component: string };
   studio_launch: { studio: string };
   outbound_doc_link: { url: string };
-  search: { query: string; results: number };
+  search: { query_length: number; results: number };
 }
 
 /** Email-shaped substrings never leave the site, in any value. The

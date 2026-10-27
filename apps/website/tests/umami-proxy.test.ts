@@ -160,6 +160,115 @@ describe('the route handler (functions/api/umami/[[path]].ts)', () => {
     expect(response.headers.get('allow')).toBe('GET');
   });
 
+  const ORIGIN_ENV = { UMAMI_ENDPOINT_ORIGIN: 'https://cloud.example.com' };
+
+  function sendRequest(body: BodyInit, headers: Record<string, string> = {}): Request {
+    return new Request('https://texuli.com/api/umami/api/send', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...headers },
+      body,
+    });
+  }
+
+  it('rejects a declared body over 16 KB with 413 without forwarding it', async () => {
+    const fetchStub = vi.fn(async () => new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchStub);
+    const response = await route.onRequest({
+      request: sendRequest('{}', { 'content-length': String(16 * 1024 + 1) }),
+      params: { path: ['api', 'send'] },
+      env: ORIGIN_ENV,
+    });
+    expect(response.status).toBe(413);
+    expect(response.headers.get('content-type')).toBe('application/problem+json');
+    expect(fetchStub).not.toHaveBeenCalled();
+  });
+
+  it('rejects an undeclared body that reads past 16 KB with 413', async () => {
+    const fetchStub = vi.fn(async () => new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchStub);
+    const big = `{"pad":"${'x'.repeat(16 * 1024)}"}`;
+    const request = sendRequest(big);
+    expect(request.headers.get('content-length')).toBeNull();
+    const response = await route.onRequest({
+      request,
+      params: { path: ['api', 'send'] },
+      env: ORIGIN_ENV,
+    });
+    expect(response.status).toBe(413);
+    expect(fetchStub).not.toHaveBeenCalled();
+  });
+
+  it('forwards a body of exactly 16 KB', async () => {
+    const fetchStub = vi.fn(
+      async (_url: RequestInfo | URL, _init?: RequestInit) => new Response('{}', { status: 200 })
+    );
+    vi.stubGlobal('fetch', fetchStub);
+    const exact = 'x'.repeat(16 * 1024);
+    const response = await route.onRequest({
+      request: sendRequest(exact),
+      params: { path: ['api', 'send'] },
+      env: ORIGIN_ENV,
+    });
+    expect(response.status).toBe(200);
+    const [, init] = fetchStub.mock.calls[0];
+    expect(((init as RequestInit).body as ArrayBuffer).byteLength).toBe(16 * 1024);
+  });
+
+  it('requires application/json on api/send (415 otherwise)', async () => {
+    const fetchStub = vi.fn(async () => new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchStub);
+    const response = await route.onRequest({
+      request: sendRequest('{}', { 'content-type': 'text/plain' }),
+      params: { path: ['api', 'send'] },
+      env: ORIGIN_ENV,
+    });
+    expect(response.status).toBe(415);
+    expect(fetchStub).not.toHaveBeenCalled();
+    const ok = await route.onRequest({
+      request: sendRequest('{}', { 'content-type': 'application/json; charset=utf-8' }),
+      params: { path: ['api', 'send'] },
+      env: ORIGIN_ENV,
+    });
+    expect(ok.status).toBe(200);
+  });
+
+  it('never follows upstream redirects', async () => {
+    const fetchStub = vi.fn(
+      async (_url: RequestInfo | URL, _init?: RequestInit) => new Response('', { status: 200 })
+    );
+    vi.stubGlobal('fetch', fetchStub);
+    await route.onRequest(ctx('script.js', 'GET', ORIGIN_ENV));
+    const [, init] = fetchStub.mock.calls[0];
+    expect((init as RequestInit).redirect).toBe('manual');
+  });
+
+  it.each([
+    [301, { location: 'https://attacker.example/script.js' }],
+    [302, { location: '/elsewhere' }],
+    [404, {}],
+    [500, {}],
+  ])('turns an upstream %i answer into the 503 problem', async (status, headers) => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('upstream body', { status, headers }))
+    );
+    const response = await route.onRequest(ctx('script.js', 'GET', ORIGIN_ENV));
+    expect(response.status).toBe(503);
+    expect(response.headers.get('content-type')).toBe('application/problem+json');
+    expect(response.headers.get('location')).toBeNull();
+    expect(await response.text()).not.toContain('upstream body');
+  });
+
+  it('turns an opaque redirect (status 0) into the 503 problem', async () => {
+    const opaque = { status: 0, ok: false, body: null, headers: new Headers() } as Response;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => opaque)
+    );
+    const response = await route.onRequest(ctx('script.js', 'GET', ORIGIN_ENV));
+    expect(response.status).toBe(503);
+  });
+
   it('returns a 503 problem when the upstream is unreachable', async () => {
     vi.stubGlobal(
       'fetch',

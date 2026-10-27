@@ -92,6 +92,12 @@ describe('the shipped loader (public/umami-loader.js)', () => {
     expect(appended[0].hasAttribute('defer')).toBe(true);
   });
 
+  it('tells the tracker to drop query strings and fragments (theme share links live in #theme=)', async () => {
+    const appended = await runLoader(mount, 'Mozilla/5.0 (Macintosh) Chrome/131.0.0.0');
+    expect(appended[0].getAttribute('data-exclude-search')).toBe('true');
+    expect(appended[0].getAttribute('data-exclude-hash')).toBe('true');
+  });
+
   it('injects without a host attribute in direct mode', async () => {
     const appended = await runLoader(
       { ...mount, 'data-host-url': '' },
@@ -117,6 +123,53 @@ describe('the shipped loader (public/umami-loader.js)', () => {
   it('injects nothing when the tag carries no script source', async () => {
     const appended = await runLoader(
       { 'data-umami-loader': '', 'data-website-id': 'texuli-test-id' },
+      'Mozilla/5.0 (Macintosh) Chrome/131.0.0.0'
+    );
+    expect(appended).toHaveLength(0);
+  });
+
+  it('creates the src through the texuli-analytics Trusted Types policy when it exists', async () => {
+    const policies: { name: string; rules: { createScriptURL: (url: string) => unknown } }[] = [];
+    vi.stubGlobal('trustedTypes', {
+      createPolicy: (name: string, rules: { createScriptURL: (url: string) => string }) => {
+        policies.push({ name, rules });
+        return {
+          createScriptURL: (url: string) => ({ toString: () => rules.createScriptURL(url) }),
+        };
+      },
+    });
+    const appended = await runLoader(mount, 'Mozilla/5.0 (Macintosh) Chrome/131.0.0.0');
+    expect(policies.map((policy) => policy.name)).toEqual(['texuli-analytics']);
+    expect(appended).toHaveLength(1);
+    expect(appended[0].getAttribute('src')).toBe('/api/umami/script.js');
+    // The policy vouches for the one configured URL and nothing else.
+    const rules = policies[0].rules;
+    expect(rules.createScriptURL('/api/umami/script.js')).toBe('/api/umami/script.js');
+    expect(() => rules.createScriptURL('/evil.js')).toThrow();
+    expect(() => rules.createScriptURL('https://attacker.example/script.js')).toThrow();
+  });
+
+  it('injects nothing, quietly, when the page CSP refuses the policy', async () => {
+    vi.stubGlobal('trustedTypes', {
+      createPolicy: () => {
+        throw new TypeError('Policy "texuli-analytics" disallowed.');
+      },
+    });
+    const appended = await runLoader(mount, 'Mozilla/5.0 (Macintosh) Chrome/131.0.0.0');
+    expect(appended).toHaveLength(0);
+  });
+
+  it('never creates a policy for an auditing client', async () => {
+    const createPolicy = vi.fn();
+    vi.stubGlobal('trustedTypes', { createPolicy });
+    const appended = await runLoader(mount, 'Mozilla/5.0 Chrome/131.0.0.0 Chrome-Lighthouse');
+    expect(appended).toHaveLength(0);
+    expect(createPolicy).not.toHaveBeenCalled();
+  });
+
+  it('injects nothing when the configured source is not an http(s) or same-origin URL', async () => {
+    const appended = await runLoader(
+      { ...mount, 'data-script-src': 'javascript:alert(1)' },
       'Mozilla/5.0 (Macintosh) Chrome/131.0.0.0'
     );
     expect(appended).toHaveLength(0);

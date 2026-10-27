@@ -3,7 +3,8 @@
  * click listener for the whole document — no per-link listeners, no
  * layout shift, nothing on the interaction path beyond one `closest()`.
  * External http(s) links emit the catalog's `outbound_doc_link` event
- * with the resolved URL; same-origin links, fragments and non-http
+ * with the resolved URL's origin and pathname (never its query string or
+ * fragment); same-origin links, fragments and non-http
  * schemes emit nothing. Idempotent: a document attribute guards against
  * double setup.
  */
@@ -32,7 +33,9 @@ export function setupOutboundDocTracking(root: Document = document): void {
       }
       if (resolved.protocol !== 'https:' && resolved.protocol !== 'http:') return;
       if (resolved.origin === location.origin) return;
-      track(EVENTS.OUTBOUND_DOC_LINK, { url: resolved.href });
+      // Origin + pathname only: query strings and fragments can carry
+      // tokens, addresses or tracking ids that are not ours to send.
+      track(EVENTS.OUTBOUND_DOC_LINK, { url: `${resolved.origin}${resolved.pathname}` });
     },
     { passive: true }
   );

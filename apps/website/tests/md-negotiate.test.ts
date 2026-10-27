@@ -117,6 +117,52 @@ describe('the middleware wrapper', () => {
   });
 });
 
+describe('the middleware Vary on negotiable HTML (PLAN_006 P2-4)', () => {
+  // A shared cache keyed only by URL could hand a markdown twin to a browser
+  // (or HTML to an agent) unless the HTML variant also declares Vary: Accept.
+  it('adds Vary: Accept to the HTML of a docs path, like its twin', async () => {
+    const { context } = makeContext('/guides/theming/', 'text/html', {});
+    const response = await onRequest(context);
+    expect(response.headers.get('content-type')).toBe('text/html; charset=utf-8');
+    expect(response.headers.get('vary')).toBe('Accept');
+    expect(await response.text()).toContain('page');
+  });
+
+  it('adds it when the twin was not built and the pipeline answers', async () => {
+    const { context } = makeContext('/web-and-native/', 'text/markdown', {});
+    const response = await onRequest(context);
+    expect(response.headers.get('vary')).toBe('Accept');
+  });
+
+  it('keeps an existing Vary and never duplicates Accept', async () => {
+    const { context, next } = makeContext('/guides/theming/', null, {});
+    next.mockImplementationOnce(
+      async () =>
+        new Response('<!doctype html><html lang="en"><body>page</body></html>', {
+          status: 200,
+          headers: { 'content-type': 'text/html; charset=utf-8', vary: 'Accept-Encoding' },
+        })
+    );
+    expect((await onRequest(context)).headers.get('vary')).toBe('Accept-Encoding, Accept');
+    const again = makeContext('/guides/theming/', null, {});
+    again.next.mockImplementationOnce(
+      async () =>
+        new Response('<!doctype html><html lang="en"><body>page</body></html>', {
+          status: 200,
+          headers: { 'content-type': 'text/html; charset=utf-8', vary: 'accept' },
+        })
+    );
+    expect((await onRequest(again.context)).headers.get('vary')).toBe('accept');
+  });
+
+  it('leaves non-negotiable pages without Vary: Accept', async () => {
+    for (const path of ['/', '/themes/']) {
+      const { context } = makeContext(path, 'text/html', {});
+      expect((await onRequest(context)).headers.get('vary')).toBeNull();
+    }
+  });
+});
+
 describe('the middleware agent 404 (T-27)', () => {
   it('returns problem+json to an agent that misses', async () => {
     const { context } = makeContext(

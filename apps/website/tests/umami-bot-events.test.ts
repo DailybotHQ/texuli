@@ -89,6 +89,27 @@ describe('buildBotEventBody', () => {
     expect(body).not.toContain('Mozilla');
   });
 
+  it('caps the path at 256 characters', () => {
+    const long = `/${'a'.repeat(5000)}`;
+    const parsed = JSON.parse(
+      buildBotEventBody('ai_bot_visit', long, 'site-id', 'texuli.com') as string
+    );
+    expect(parsed.payload.data.path).toHaveLength(256);
+    expect(parsed.payload.data.path).toBe(long.slice(0, 256));
+  });
+
+  it('scrubs email-shaped values from the path, like the client sanitizer', () => {
+    const parsed = JSON.parse(
+      buildBotEventBody(
+        'unknown_bot_visit',
+        '/people/alice@example.com/profile/',
+        'site-id',
+        'texuli.com'
+      ) as string
+    );
+    expect(parsed.payload.data.path).toBe('/people/[redacted]/profile/');
+  });
+
   it('marks markdown twins distinctly from bot visits', () => {
     const parsed = JSON.parse(
       buildBotEventBody('markdown_request', '/guides/', 'site-id', 'texuli.com') as string
@@ -183,6 +204,47 @@ describe('the middleware wiring (functions/_middleware.ts)', () => {
     expect(sent[0].init.method).toBe('POST');
     expect(String(sent[0].init.body)).toContain('"name":"ai_bot_visit"');
     expect(waited).toHaveLength(1);
+  });
+
+  it('sends nothing for a bot hitting the HTML 404 with an invented path', async () => {
+    const { sent, response } = await run({
+      userAgent: 'GPTBot/1.0',
+      path: '/attacker-chosen/alice@example.com/',
+      env: { PUBLIC_UMAMI_WEBSITE_ID: 'site-id' },
+      next: async () =>
+        new Response('<!doctype html><title>Not found</title>', {
+          status: 404,
+          headers: { 'content-type': 'text/html; charset=utf-8' },
+        }),
+    });
+    expect(response.status).toBe(404);
+    expect(sent).toHaveLength(0);
+  });
+
+  it('sends nothing for non-200 HTML answers (redirects, errors)', async () => {
+    for (const status of [301, 304, 500]) {
+      const { sent } = await run({
+        userAgent: 'SiteMonitor 3.0',
+        env: { PUBLIC_UMAMI_WEBSITE_ID: 'site-id' },
+        next: async () =>
+          new Response(status === 304 ? null : '<!doctype html>', {
+            status,
+            headers: { 'content-type': 'text/html; charset=utf-8' },
+          }),
+      });
+      expect(sent).toHaveLength(0);
+    }
+  });
+
+  it('caps an over-long bot page path at 256 characters', async () => {
+    const { sent } = await run({
+      userAgent: 'GPTBot/1.0',
+      path: `/${'b'.repeat(3000)}/`,
+      env: { PUBLIC_UMAMI_WEBSITE_ID: 'site-id' },
+    });
+    expect(sent).toHaveLength(1);
+    const parsed = JSON.parse(String(sent[0].init.body));
+    expect(parsed.payload.data.path).toHaveLength(256);
   });
 
   it('sends nothing when the website id is not provisioned', async () => {

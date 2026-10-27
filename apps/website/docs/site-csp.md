@@ -37,6 +37,12 @@ pages, 2 492 script, 10 487 style and 862 attribute hashes covered.
 
 The browser side (hydration under the real headers, violation observers,
 Trusted Types enforcement) is proven separately by `tests/e2e/csp.spec.ts`.
+`tests/e2e/analytics-csp.spec.ts` checks every route's `trusted-types`
+against its HTML (the analytics name appears only where the loader is
+mounted). On an analytics fixture build it also loads the tracker under the
+enforced headers with zero violations (see
+[site-analytics.md](site-analytics.md#verification-commands)). The policy
+units are `apps/website/tests/csp-analytics-policy.test.ts`.
 
 ## Host application contract
 
@@ -85,6 +91,7 @@ server configured from the manifest) before trusting a preview.
 | `object-src 'none'`, `base-uri 'none'` | No plugins, no base-tag hijack |
 | `form-action 'self'` | Submissions stay on-site |
 | `require-trusted-types-for 'script'` + `trusted-types svelte-trusted-html` | DOM sink injection requires the single allow-listed policy |
+| `trusted-types … texuli-analytics` (analytics pages only) | Added only on a page whose HTML mounts the Umami loader tag (`<script … data-umami-loader>`), so a build without `PUBLIC_UMAMI_WEBSITE_ID` keeps exactly `trusted-types svelte-trusted-html`. `public/umami-loader.js` creates the policy, and its `createScriptURL` returns only the one configured script URL (throwing for any other). Nothing else is broadened: `script-src` stays `'self'` + hashes |
 
 ## What is not covered
 

@@ -14,6 +14,9 @@
 
 export type UmamiProxyUpstreamPath = 'script.js' | 'api/send';
 
+/** Every status the proxy answers with a problem body. */
+export type UmamiProxyStatus = 404 | 405 | 413 | 415 | 503;
+
 export type UmamiProxyDecision =
   | { action: 'forward'; upstreamPath: UmamiProxyUpstreamPath; method: 'GET' | 'POST' }
   | { action: 'reject'; status: 404 | 405 | 503; title: string; allow?: string };
@@ -49,6 +52,6 @@ export function getUmamiProxyCacheControl(path: string): string {
 }
 
 /** RFC 9457 body for a rejection, matching the middleware's agent 404s. */
-export function umamiProxyProblem(status: 404 | 405 | 503, title: string): string {
+export function umamiProxyProblem(status: UmamiProxyStatus, title: string): string {
   return JSON.stringify({ type: 'about:blank', title, status });
 }

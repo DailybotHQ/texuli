@@ -49,6 +49,23 @@ export function pageSources(html: string): PageSources {
   };
 }
 
+/**
+ * The Trusted Types policy public/umami-loader.js creates to set the
+ * analytics script URL. Allowed only on pages that mount the loader tag,
+ * so an analytics-off build keeps `trusted-types svelte-trusted-html`.
+ */
+export const ANALYTICS_TRUSTED_TYPES_POLICY = 'texuli-analytics';
+
+/** The rendered loader tag (an escaped code sample never matches). */
+const UMAMI_LOADER_TAG = /<script\b[^>]*\sdata-umami-loader(?=[\s=>/])/i;
+
+/** The Trusted Types policy names one finished page may create. */
+export function trustedTypesPolicies(html: string): string[] {
+  return UMAMI_LOADER_TAG.test(html)
+    ? ['svelte-trusted-html', ANALYTICS_TRUSTED_TYPES_POLICY]
+    : ['svelte-trusted-html'];
+}
+
 export interface PagePolicyOptions {
   /** Extra `connect-src` origins (the configured agent service, on the agent chat page only). */
   connect?: readonly string[];
@@ -75,7 +92,7 @@ export function pagePolicy(html: string, options: PagePolicyOptions = {}): strin
     "base-uri 'none'",
     "form-action 'self'",
     "require-trusted-types-for 'script'",
-    'trusted-types svelte-trusted-html',
+    `trusted-types ${trustedTypesPolicies(html).join(' ')}`,
   ].join('; ');
 }
 

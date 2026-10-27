@@ -49,16 +49,17 @@ describe('ThemeSwitch wires theme_switch', () => {
 });
 
 describe('SearchResults wires search', () => {
-  it('emits the query and hit count for a submitted search', async () => {
-    window.history.replaceState(null, '', '/search/?q=button');
+  it('emits the query length and hit count, never the query text', async () => {
+    window.history.replaceState(null, '', '/search/?q=button%20alice');
     render(SearchResults);
     // onMount reads the query synchronously; flush the effect queue.
     await vi.waitFor(() => {
       expect(track).toHaveBeenCalledWith('search', {
-        query: 'button',
+        query_length: 12,
         results: expect.any(Number),
       });
     });
+    expect(JSON.stringify(track.mock.calls)).not.toContain('alice');
   });
 
   it('emits nothing without a query', () => {
@@ -106,6 +107,15 @@ describe('outbound_doc_link wires external anchors', () => {
     fireEvent.click(document.getElementById('anchor') as HTMLElement);
     fireEvent.click(document.getElementById('mail') as HTMLElement);
     expect(track).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends origin and pathname only: no query string, no fragment', () => {
+    setupOutboundDocTracking();
+    document.body.innerHTML = `<a href="https://docs.example.com/guide/intro?cc=bob@example.com&ref=texuli#token=abc">Ext</a>`;
+    fireEvent.click(document.querySelector('a') as HTMLElement);
+    expect(track).toHaveBeenCalledWith('outbound_doc_link', {
+      url: 'https://docs.example.com/guide/intro',
+    });
   });
 
   it('is idempotent: a second setup call adds no listener', () => {

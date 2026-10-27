@@ -13,6 +13,9 @@
  * fetches assets and shapes responses. No secrets, no PII, no request
  * bodies are read or logged.
  */
+
+import { markdownTwinFor } from '../apps/website/src/components/docs/markdown-negotiation.ts';
+import { isDocsPath } from '../apps/website/src/components/foundation/nav-data.ts';
 import { agentProblem, isAgentRequest } from '../apps/website/src/lib/agent-request.ts';
 import {
   type BotEventName,
@@ -57,6 +60,26 @@ function sendBotEvent(context: Context, event: BotEventName, pathname: string): 
   if (context.waitUntil) context.waitUntil(send);
 }
 
+/**
+ * The HTML of a negotiable docs path declares `Vary: Accept`, matching its
+ * markdown twin, so a shared cache keyed by URL never hands one variant to
+ * a consumer that asked for the other. An existing Vary is kept; Accept is
+ * appended once. Headers are copied because pipeline responses can be
+ * immutable.
+ */
+function varyOnAccept(response: Response): Response {
+  const vary = response.headers.get('vary') ?? '';
+  const listed = vary.split(',').map((token) => token.trim().toLowerCase());
+  if (listed.includes('accept') || listed.includes('*')) return response;
+  const headers = new Headers(response.headers);
+  headers.set('vary', vary.trim() ? `${vary}, Accept` : 'Accept');
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export const onRequest = async (context: Context): Promise<Response> => {
   const url = new URL(context.request.url);
   const userAgent = context.request.headers.get('user-agent');
@@ -91,9 +114,14 @@ export const onRequest = async (context: Context): Promise<Response> => {
   }
   const response = await context.next();
   const status = response.status;
-  // Bot page hits count by class; only real HTML pages, not assets or 404s.
+  // Bot page hits count by class; only real HTML pages answered 200 — never
+  // assets, redirects, errors or the HTML 404 (whose path the client chose).
   const pageEvent = botEventFor(userAgent, false);
-  if (pageEvent && (response.headers.get('content-type') ?? '').includes('text/html')) {
+  if (
+    pageEvent &&
+    status === 200 &&
+    (response.headers.get('content-type') ?? '').includes('text/html')
+  ) {
     sendBotEvent(context, pageEvent, url.pathname);
   }
   if (status === 404 && isAgentRequest(userAgent)) {
@@ -101,6 +129,13 @@ export const onRequest = async (context: Context): Promise<Response> => {
       status: 404,
       headers: { 'content-type': 'application/problem+json' },
     });
+  }
+  if (
+    (response.headers.get('content-type') ?? '').includes('text/html') &&
+    isDocsPath(url.pathname) &&
+    markdownTwinFor(url.pathname)
+  ) {
+    return varyOnAccept(response);
   }
   return response;
 };

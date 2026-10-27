@@ -5,11 +5,16 @@
  * the repository's pack (the aeo scan's "generate the index" pattern).
  * The index lists every `SKILL.md` in the pack — the router and each
  * sub-skill — with the SHA-256 digest of the served file.
+ *
+ * Only an allowlist is published (S-8): exactly the files named in the
+ * pack's `SHA256SUMS`, plus `SHA256SUMS` itself. Untracked, ignored or
+ * scratch files under `skills/texuli/` never reach the site. An entry that
+ * leaves the pack, or a listed file that is missing, fails the build.
  */
 
 import { createHash } from 'node:crypto';
-import { cpSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { copyFileSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, isAbsolute, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 
@@ -29,18 +34,42 @@ function frontmatterOf(markdown: string): Record<string, string> {
   return scalars;
 }
 
-/** Every `SKILL.md` under the pack, as pack-relative paths. */
-function skillFiles(): string[] {
-  const found: string[] = [];
-  const walk = (dir: string) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (entry.name === 'SKILL.md') found.push(full.slice(PACK.length + 1));
+/**
+ * The pack-relative paths `SHA256SUMS` lists (`<hex digest>  <path>`, with an
+ * optional `*` binary marker). Throws on a malformed line or on a path that
+ * is absolute or climbs out of the pack.
+ */
+export function listedPackFiles(pack: string): string[] {
+  const files: string[] = [];
+  for (const line of readFileSync(join(pack, 'SHA256SUMS'), 'utf8').split('\n')) {
+    if (line.trim() === '') continue;
+    const relative = /^[0-9a-f]{64} [ *](.+)$/.exec(line)?.[1];
+    if (!relative) throw new Error(`skill pack: malformed SHA256SUMS line: ${line}`);
+    const clean = normalize(relative);
+    if (isAbsolute(relative) || clean === '..' || clean.startsWith(`..${sep}`)) {
+      throw new Error(`skill pack: SHA256SUMS entry outside the pack: ${relative}`);
     }
-  };
-  walk(PACK);
-  return found.sort();
+    files.push(clean.split(sep).join('/'));
+  }
+  return files;
+}
+
+/**
+ * Copy the allowlisted pack files into `served`. Returns the pack-relative
+ * paths published, `SHA256SUMS` included.
+ */
+export function publishSkillPack(pack: string, served: string): string[] {
+  const published = [...listedPackFiles(pack), 'SHA256SUMS'];
+  for (const relative of published) {
+    const source = join(pack, relative);
+    if (!statSync(source, { throwIfNoEntry: false })?.isFile()) {
+      throw new Error(`skill pack: SHA256SUMS lists a missing file: ${relative}`);
+    }
+    const target = join(served, relative);
+    mkdirSync(dirname(target), { recursive: true });
+    copyFileSync(source, target);
+  }
+  return published;
 }
 
 export function skillPackIntegration(): AstroIntegration {
@@ -49,19 +78,21 @@ export function skillPackIntegration(): AstroIntegration {
     hooks: {
       'astro:build:done': ({ dir, logger }) => {
         const served = join(fileURLToPath(dir), 'skill-pack');
-        cpSync(PACK, served, { recursive: true });
-        const skills = skillFiles().map((relative) => {
-          const content = readFileSync(join(served, relative));
-          const meta = frontmatterOf(content.toString('utf8'));
-          return {
-            name: meta.name ?? relative.replace(/\/SKILL\.md$/, '').replaceAll('/', '-'),
-            type: 'skill-md',
-            description: meta.description ?? '',
-            ...(meta.version ? { version: meta.version } : {}),
-            url: `${SITE}/skill-pack/${relative}`,
-            digest: `sha256:${createHash('sha256').update(content).digest('hex')}`,
-          };
-        });
+        const skills = publishSkillPack(PACK, served)
+          .filter((relative) => relative === 'SKILL.md' || relative.endsWith('/SKILL.md'))
+          .sort()
+          .map((relative) => {
+            const content = readFileSync(join(served, relative));
+            const meta = frontmatterOf(content.toString('utf8'));
+            return {
+              name: meta.name ?? relative.replace(/\/SKILL\.md$/, '').replaceAll('/', '-'),
+              type: 'skill-md',
+              description: meta.description ?? '',
+              ...(meta.version ? { version: meta.version } : {}),
+              url: `${SITE}/skill-pack/${relative}`,
+              digest: `sha256:${createHash('sha256').update(content).digest('hex')}`,
+            };
+          });
         const wellKnown = join(fileURLToPath(dir), '.well-known/agent-skills');
         mkdirSync(wellKnown, { recursive: true });
         writeFileSync(

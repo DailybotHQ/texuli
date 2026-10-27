@@ -4,7 +4,9 @@
  * Two trust tiers:
  * - `developer`: props written by the app's own developers. Every scheme is
  *   allowed except the ones that execute or smuggle content: `javascript:`,
- *   `vbscript:`, `data:` and protocol-relative `//host` URLs.
+ *   `vbscript:`, `data:` and protocol-relative URLs: any value opening with
+ *   two of `/` and `\` (`//host`, `/\host`, `\/host`, `\\host`) or with a
+ *   backslash.
  * - `untrusted`: content an agent or a user produced. Only `https:`,
  *   `mailto:` and same-document `#fragment` links pass, and additionally:
  *   - no invisible formatting characters anywhere (zero-width, bidi
@@ -19,6 +21,7 @@
  * `untrusted` (`resolveTrust`). A rejected value returns `undefined`, so the
  * caller renders inert text.
  */
+import { hasAuthorityPrefix } from '../url-policy/shared.ts';
 import { resolveTrust } from '../url-policy/trust.ts';
 
 export type HrefTrust = 'developer' | 'untrusted';
@@ -71,7 +74,8 @@ export function safeHref(value: unknown, requested: HrefTrust = 'untrusted'): st
   if (href === '') return undefined;
   if (trust === 'untrusted' && hasInvisibleFormatting(href)) return undefined;
   if (href.startsWith('#')) return href;
-  if (href.startsWith('//') || href.startsWith('\\')) return undefined;
+  // `//`, `/\`, `\/` and `\\` all open another origin; so does any leading `\`.
+  if (hasAuthorityPrefix(href)) return undefined;
 
   const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(href)?.[1]?.toLowerCase();
   if (trust === 'untrusted') {

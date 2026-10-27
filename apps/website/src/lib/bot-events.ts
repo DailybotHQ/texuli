@@ -8,12 +8,13 @@
  * nothing.
  *
  * The emitted payload is UA-class + path shape only — never a raw user
- * agent, never an IP, never a referrer chain. The request the middleware
+ * agent, never an IP, never a referrer chain — and the path is scrubbed
+ * and capped at 256 characters. The request the middleware
  * sends announces itself with the class in its own user-agent header, so
  * even the proxy's allowlisted UA forwarding cannot leak the original.
  */
 import { isAgentRequest } from './agent-request.ts';
-import { EVENTS } from './analytics.ts';
+import { EVENTS, sanitizeEventData } from './analytics.ts';
 
 export type BotUaClass = 'ai_bot' | 'unknown_bot' | 'plain_agent' | 'audit_tool' | 'human';
 
@@ -74,6 +75,22 @@ export function botEventFor(
   return null;
 }
 
+/** The longest path an edge event carries. */
+export const BOT_EVENT_PATH_MAX = 256;
+
+/**
+ * The path as an edge event may carry it: scrubbed of email-shaped values
+ * by the client's own sanitizer, then capped at {@link BOT_EVENT_PATH_MAX}.
+ * The scrub sees a bounded window first (a twice-the-cap slice), so an
+ * attacker-length path costs a fixed amount of work and an address that
+ * straddles the cap is still scrubbed whole.
+ */
+export function botEventPath(pathname: string): string {
+  const head = pathname.slice(0, BOT_EVENT_PATH_MAX * 2);
+  const scrubbed = sanitizeEventData({ path: head })?.path;
+  return String(scrubbed ?? '').slice(0, BOT_EVENT_PATH_MAX);
+}
+
 /**
  * The edge event body for `/api/umami/api/send`: Umami's send shape with
  * UA-class + path only. Returns null when analytics is not provisioned —
@@ -92,7 +109,7 @@ export function buildBotEventBody(
       website: websiteId,
       name: event,
       hostname,
-      data: { path: pathname },
+      data: { path: botEventPath(pathname) },
       // The class, never the raw UA: the header below matches it.
       userAgent: event === EVENTS.MARKDOWN_REQUEST ? 'markdown-client' : 'bot',
     },

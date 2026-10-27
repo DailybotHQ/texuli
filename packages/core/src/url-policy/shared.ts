@@ -12,17 +12,24 @@ export function cleanSource(value: unknown): string | undefined {
   return source;
 }
 
+/**
+ * Whether a URL opens with a backslash or with `//` or `/\`. Browsers read
+ * `\` as `/` in http(s) URLs, so `//host`, `/\host`, `\/host` and `\\host`
+ * are all protocol-relative and leave the page's origin (`/\evil.example`
+ * resolves to `https://evil.example/`). Callers pass the value after
+ * trimming and stripping control characters.
+ */
+export function hasAuthorityPrefix(value: string): boolean {
+  return /^(\\|\/[/\\])/.test(value);
+}
+
 export function sourceScheme(value: string): string | undefined {
   return /^([a-z][a-z0-9+.-]*):/i.exec(value)?.[1]?.toLowerCase();
 }
 
 export function isBlockedSource(value: string): boolean {
   const scheme = sourceScheme(value);
-  return (
-    (scheme !== undefined && BLOCKED_SCHEMES.has(`${scheme}:`)) ||
-    value.startsWith('//') ||
-    value.startsWith('\\')
-  );
+  return (scheme !== undefined && BLOCKED_SCHEMES.has(`${scheme}:`)) || hasAuthorityPrefix(value);
 }
 
 export function isAllowedRelativeOrWebSource(value: string): boolean {
