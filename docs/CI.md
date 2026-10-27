@@ -69,14 +69,14 @@ granular access token of the publishing account with read-and-write on
 the `@texuli` packages. CI tokens bypass the 2FA one-time-password flow
 that blocks terminal publishes.
 
-To release: push a tag (`v0.1.0-next.2`) or run the workflow from the
+To release: push a tag (`v0.1.0-next.3`) or run the workflow from the
 Actions tab against `main`. Never overwrite a published version; new
 content means a new version.
 
 The publish step is idempotent: it skips any `name@version` already on the
 registry and retries `npm publish` up to three times, because the
 provenance step can fail transiently reading the OIDC token
-(`IDENTITY_TOKEN_READ_ERROR`; the 2026-10-27 `0.1.0-next.2` run stopped at
+(`IDENTITY_TOKEN_READ_ERROR`; the 2026-10-27 `0.1.0-next.3` run stopped at
 `@texuli/slides` that way). After a partial failure, re-run the workflow:
 it publishes only what is missing.
 

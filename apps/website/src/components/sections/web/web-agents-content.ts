@@ -9,7 +9,7 @@
  * word in both the cited file and this module's copy. Every agent surface
  * is a real file or page served by this site, and the install line states
  * the release truth from `docs/RELEASE.md`: the `next` preview is out,
- * nothing stable is, and `latest` waits for 1.0.0.
+ * nothing stable is, and `latest` tracks the newest preview until 1.0.0.
  */
 
 /** Repository-relative path of the cited file. */
@@ -139,8 +139,8 @@ export const WEB_AGENTS_SURFACES: readonly AgentsSurface[] = [
 export const WEB_AGENTS_INSTALL = {
   command: 'pnpm add texuli@next',
   note:
-    'Installs the 0.1.0-next.2 preview from the next dist-tag. Nothing stable is published ' +
-    'yet: the latest tag is reserved for the 1.0.0 release.',
+    'Installs the 0.1.0-next.3 preview from the next dist-tag. Nothing stable is published ' +
+    'yet: until 1.0.0, the latest tag tracks the newest preview.',
 } as const;
 
 /** Blueprint s8: one platform, two runtimes, start today. */

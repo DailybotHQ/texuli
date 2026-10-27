@@ -4,7 +4,7 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are npm previews: `0.1.0-next.2` under the `next` dist-tag, with
+The packages are npm previews: `0.1.0-next.3` under the `next` dist-tag, with
 no stable release. An app outside a Texuli checkout installs them with the
 tag, for example `pnpm add texuli@next @texuli/tokens@next` (the developer
 runs the install; it uses the network). `@texuli/editor` is not on npm.

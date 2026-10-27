@@ -5,17 +5,15 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-All 15 packable packages are published to npm as `0.1.0-next.2` under the
-`next` dist-tag (2026-10-27, from `main` by the publish workflow, from the
-verified tarballs with signed provenance; it carries the PLAN_006 package
-fixes). The previous preview, `0.1.0-next.1`, went out on 2026-10-25 (run
-https://github.com/DailybotHQ/texuli/actions/runs/40238083612). Observed registry state on
-2026-10-26: `npm view texuli dist-tags` prints
-`{ latest: '0.1.0-next.0', next: '0.1.0-next.1' }` (the same for
-`@texuli/core` and `@texuli/slides`), so `latest` still resolves to the
-first upload, `0.1.0-next.0`, and a bare install gets that version; install
-the previews with `@next`. By policy `latest` is reserved for the 1.0.0
-stable release (see the dist-tag rules below). Workspace
+All 15 packable packages are published to npm as `0.1.0-next.3` under the
+`next` and `latest` dist-tags (2026-10-27, from `main` by the publish
+workflow, from the verified tarballs with signed provenance): consumer
+READMEs and two CLI fixes on top of `0.1.0-next.2` (the same day, the
+PLAN_006 package fixes). `0.1.0-next.1` went out on 2026-10-25 (run
+https://github.com/DailybotHQ/texuli/actions/runs/40238083612). Since
+2026-10-27 the publish workflow also points `latest` at every version it
+publishes (see the dist-tag rules below), so npm's package page shows the
+current README and a bare install gets the newest preview. Workspace
 manifests remain `private: true`; the previews are not approved for
 general use, and every future version and wave requires a fresh, explicit
 developer GO. Publishing never overwrites a published version.
@@ -52,11 +50,13 @@ default.
 - **`next`** points to the newest owner-approved preview. Use it for
   `0.x.y-next.N` versions, any other pre-release, and any supported `0.x`
   version. It moves only with a new version and a fresh GO.
-- **`latest`** is npm's default install tag and is reserved for the first
-  supported stable release. It is first used when an owner-approved `1.0.0`
-  release has completed its compatibility, support, and release gates. No
-  `0.x` release is ever tagged `latest`; where it resolves today is recorded
-  under [Current npm status](#current-npm-status).
+- **`latest`** is npm's default install tag, and npm's package page shows
+  the README of the version it names. Until the first supported stable
+  release (an owner-approved `1.0.0`), `latest` tracks the newest preview:
+  the publish workflow moves it together with `next` (owner decision
+  2026-10-27; before that, `latest` was reserved for 1.0.0 and stayed on
+  the first upload, `0.1.0-next.0`). From 1.0.0 on, `latest` names only
+  stable releases.
 - Dailybot v4 and other production consumers must pin exact package versions
   in their manifests and lockfiles. They must not rely on a moving dist-tag;
   `next` is for deliberate preview integration only.
@@ -89,9 +89,9 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 15 npm packages | `0.1.0-next.2` (dist-tag `next`) | Each package manifest; published 2026-10-27 by the publish workflow (`0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| 15 npm packages | `0.1.0-next.3` (dist-tags `next` and `latest`) | Each package manifest; published 2026-10-27 by the publish workflow (`0.1.0-next.2` the same day; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
 | Blueprint spec | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | `packages/spec/versions.json`; every generated file is stamped `// Spec 0.2.0, digest …`. |
-| `@texuli/spec` (npm) | `0.1.0-next.2` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
+| `@texuli/spec` (npm) | `0.1.0-next.3` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 
 - A normative spec change takes a new spec version and a fresh digest pin in

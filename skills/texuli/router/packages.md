@@ -3,8 +3,8 @@
 Every workspace package, its layer and its public entries. Layers point down
 only: a package imports only from lower layers (the repository's
 `scripts/check-layers.ts` enforces it). **15 of these 16 packages are on npm
-as `0.1.0-next.2` under the `next` dist-tag** (published by CI with
-provenance; no stable release, `latest` is reserved for 1.0.0; the workspace
+as `0.1.0-next.3` under the `next` dist-tag** (published by CI with
+provenance; no stable release, `latest` tracks the newest preview until 1.0.0; the workspace
 packages stay `private: true`), so install them with `@next`, import them in
 a Texuli workspace, or copy components with the CLI
 ([`../components/SKILL.md`](../components/SKILL.md)). The exception is
