@@ -3,7 +3,7 @@
  * (PLAN_006 T-40; narrative blueprint §1 "Hero direction", §5 s1, §6).
  *
  * Framework-free on purpose: the Astro component renders this module as-is
- * and the unit test (`apps/website/tests/web-hero.test.ts`) pins the same
+ * and the unit test (`apps/website/tests/section-contracts.test.ts`) pins the same
  * strings, so the test covers what ships. Every fact here is a repository
  * fact today:
  *

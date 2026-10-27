@@ -15,78 +15,89 @@ afterEach(() => {
 });
 
 describe('environment texels', () => {
-  it('can be imported in a server environment and checks globals only when called', () => {
+  it('can be imported in a server environment and checks globals only when called, and 3 related cases', () => {
+    // can be imported in a server environment and checks globals only when called
     expect(isBrowser()).toBe(false);
 
     vi.stubGlobal('window', {});
     vi.stubGlobal('document', {});
     expect(isBrowser()).toBe(true);
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    {
+      // gets the owning document and window without ambient document globals
+      const view = { name: 'view' } as unknown as Window;
+      const doc = { nodeType: 9, defaultView: view } as unknown as Document;
+      const element = { nodeType: 1, ownerDocument: doc } as unknown as Node;
+
+      expect(getOwnerDocument(element)).toBe(doc);
+      expect(getOwnerDocument(doc)).toBe(doc);
+      expect(getOwnerDocument(null)).toBeUndefined();
+      expect(getOwnerWindow(element)).toBe(view);
+      expect(getOwnerWindow(null)).toBeUndefined();
+    }
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    {
+      // attaches listeners when available and cleans them up exactly once
+      const target = new EventTarget();
+      const listener = vi.fn();
+      const dispose = listen(target, 'change', listener);
+
+      target.dispatchEvent(new Event('change'));
+      expect(listener).toHaveBeenCalledTimes(1);
+      dispose();
+      dispose();
+      target.dispatchEvent(new Event('change'));
+      expect(listener).toHaveBeenCalledTimes(1);
+
+      expect(() => listen(undefined, 'change', listener)()).not.toThrow();
+    }
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    {
+      // uses the supplied matchMedia implementation or an SSR default
+      expect(matchesMedia('(prefers-reduced-motion: reduce)')).toBe(false);
+      expect(matchesMedia('(prefers-reduced-motion: reduce)', null, true)).toBe(true);
+
+      const ownerWindow = {
+        matchMedia: vi.fn(() => ({ matches: true })),
+      } as unknown as Pick<Window, 'matchMedia'>;
+      expect(matchesMedia('(prefers-reduced-motion: reduce)', ownerWindow)).toBe(true);
+      expect(ownerWindow.matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)');
+    }
   });
+  it('uses requestAnimationFrame when available and cancels its handle; falls back to a cancellable timeout when requestAnimationFrame is unavailable', () => {
+    {
+      // uses requestAnimationFrame when available and cancels its handle
+      const requestAnimationFrame = vi.fn((_callback: FrameRequestCallback) => 41);
+      const cancelAnimationFrame = vi.fn();
+      const ownerWindow = { requestAnimationFrame, cancelAnimationFrame } as unknown as Window;
+      const callback = vi.fn();
 
-  it('gets the owning document and window without ambient document globals', () => {
-    const view = { name: 'view' } as unknown as Window;
-    const doc = { nodeType: 9, defaultView: view } as unknown as Document;
-    const element = { nodeType: 1, ownerDocument: doc } as unknown as Node;
+      const cancel = requestFrame(callback, ownerWindow);
+      expect(requestAnimationFrame).toHaveBeenCalledWith(callback);
+      cancel();
+      expect(cancelAnimationFrame).toHaveBeenCalledWith(41);
+      expect(callback).not.toHaveBeenCalled();
+    }
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    {
+      // falls back to a cancellable timeout when requestAnimationFrame is unavailable
+      vi.useFakeTimers();
+      const callback = vi.fn();
 
-    expect(getOwnerDocument(element)).toBe(doc);
-    expect(getOwnerDocument(doc)).toBe(doc);
-    expect(getOwnerDocument(null)).toBeUndefined();
-    expect(getOwnerWindow(element)).toBe(view);
-    expect(getOwnerWindow(null)).toBeUndefined();
-  });
+      requestFrame(callback);
+      vi.advanceTimersByTime(16);
+      expect(callback).toHaveBeenCalledOnce();
+      expect(callback).toHaveBeenCalledWith(expect.any(Number));
 
-  it('attaches listeners when available and cleans them up exactly once', () => {
-    const target = new EventTarget();
-    const listener = vi.fn();
-    const dispose = listen(target, 'change', listener);
-
-    target.dispatchEvent(new Event('change'));
-    expect(listener).toHaveBeenCalledTimes(1);
-    dispose();
-    dispose();
-    target.dispatchEvent(new Event('change'));
-    expect(listener).toHaveBeenCalledTimes(1);
-
-    expect(() => listen(undefined, 'change', listener)()).not.toThrow();
-  });
-
-  it('uses the supplied matchMedia implementation or an SSR default', () => {
-    expect(matchesMedia('(prefers-reduced-motion: reduce)')).toBe(false);
-    expect(matchesMedia('(prefers-reduced-motion: reduce)', null, true)).toBe(true);
-
-    const ownerWindow = {
-      matchMedia: vi.fn(() => ({ matches: true })),
-    } as unknown as Pick<Window, 'matchMedia'>;
-    expect(matchesMedia('(prefers-reduced-motion: reduce)', ownerWindow)).toBe(true);
-    expect(ownerWindow.matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)');
-  });
-
-  it('uses requestAnimationFrame when available and cancels its handle', () => {
-    const requestAnimationFrame = vi.fn((_callback: FrameRequestCallback) => 41);
-    const cancelAnimationFrame = vi.fn();
-    const ownerWindow = { requestAnimationFrame, cancelAnimationFrame } as unknown as Window;
-    const callback = vi.fn();
-
-    const cancel = requestFrame(callback, ownerWindow);
-    expect(requestAnimationFrame).toHaveBeenCalledWith(callback);
-    cancel();
-    expect(cancelAnimationFrame).toHaveBeenCalledWith(41);
-    expect(callback).not.toHaveBeenCalled();
-  });
-
-  it('falls back to a cancellable timeout when requestAnimationFrame is unavailable', () => {
-    vi.useFakeTimers();
-    const callback = vi.fn();
-
-    requestFrame(callback);
-    vi.advanceTimersByTime(16);
-    expect(callback).toHaveBeenCalledOnce();
-    expect(callback).toHaveBeenCalledWith(expect.any(Number));
-
-    const canceledCallback = vi.fn();
-    const cancel = requestFrame(canceledCallback);
-    cancel();
-    vi.advanceTimersByTime(16);
-    expect(canceledCallback).not.toHaveBeenCalled();
+      const canceledCallback = vi.fn();
+      const cancel = requestFrame(canceledCallback);
+      cancel();
+      vi.advanceTimersByTime(16);
+      expect(canceledCallback).not.toHaveBeenCalled();
+    }
   });
 });

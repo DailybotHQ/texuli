@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Source:** `packages/texuli/src/components/stepper/`  
-**Tests:** `packages/texuli/tests/stepper.test.ts`  
+**Tests:** `packages/texuli/tests/navigation.test.ts`  
 **Example:** `texuli-stepper`  
 **Task:** T-ui-stepper
 
@@ -41,7 +41,7 @@ Multi-step form shell: Stepper + panel + Back/Next/Finish.
 | `backLabel` / `nextLabel` / `finishLabel` | Localizable |
 | `secondaryActions` | Optional footer snippet (start side) |
 
-Uses `texuli/Button` for actions (loading while validate/onFinish pending).
+`Wizard` uses the styled `Button` (`texuli/button`) for actions (loading while validate/onFinish pending).
 
 ## Tokens and layers
 

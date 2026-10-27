@@ -19,6 +19,7 @@ each links its contract doc in `docs/`.
 | Envelope | `@texuli/catalog/envelope` | The blueprint envelope | [envelope](docs/envelope.md) |
 | Catalog build | `@texuli/catalog/build` and `build/node` | Content-addressed build; the Node entry writes one `catalog-<sha256>.json` into the output directory | [catalog-build](docs/catalog-build.md) |
 | Draft validation | `@texuli/catalog/validate` | Validate a draft before it is rendered | [validate](docs/validate.md) |
+| Block family checks | `@texuli/catalog/validate/blocks` | `createFamilyBlockCheck`: runs each `blocks-*` node through its own family's parser, given the engines | [validate](docs/validate.md#block-families-texulicatalogvalidateblocks) |
 | Edit operations | `@texuli/catalog/edit` | Typed blueprint edit operations | [edit](docs/edit.md) |
 | Document player | `@texuli/catalog/player` | The document player core | [player](docs/player.md) |
 | Renderer | `@texuli/catalog/render/renderer` | The sink-free render tree an untrusted catalog tree becomes, including named slots (`slot`, audit G04) and conditional regions (`when`, audit G07) | [render-renderer](docs/render-renderer.md) |
@@ -90,7 +91,7 @@ Understanding schemas other than version 1 is planned; no bump exists today.
 ## Testing
 
 ```bash
-pnpm vitest run packages/catalog          # 25 test files (incl. the golden fixture suite)
+pnpm vitest run packages/catalog          # 28 test files (incl. the golden fixture suite)
 pnpm --filter @texuli/catalog typecheck   # svelte-aware typecheck
 npx biome check packages/catalog          # lint + format
 ```

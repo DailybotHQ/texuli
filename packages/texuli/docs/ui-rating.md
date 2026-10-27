@@ -91,15 +91,12 @@ which fails without the fix. The primitive's own tests still pass.
 
 ## Verified
 
-- **Unit tests:** `pnpm vitest run packages/texuli/tests/rating.test.ts`,
-  16 tests:
-  - helpers: normalizing, fill, steps, locale templates;
-  - input: the radio group and labels, one Tab stop, click and keyboard
-    selection with fill, **RTL arrows**, half values with start/end
-    targets, clearable (and not), **no clear on the first press when focus
-    selects first**, read-only and disabled, hover preview (mouse only),
-    a translated locale summary with a hidden label, "Not rated" and a
-    star-count clamp, form submission, size and tone;
+- **Unit tests:** `pnpm vitest run packages/texuli/tests/forms.test.ts -t rating`,
+  9 tests:
+  - helpers: locale templates;
+  - input: the Tab stop following an outside value, **RTL arrows**, half
+    values, clearable, **no clear on the first press when focus selects
+    first**, read-only and disabled, form submission;
   - display: an image showing a fraction.
 - **Browser** (a scratch Playwright spec, not committed; the example on
   `TEXULI_E2E_PORT=4830`, chromium, webkit and Pixel 7): **18 passed.**

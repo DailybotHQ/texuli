@@ -244,8 +244,8 @@ test.describe('texuli.com skill page', () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe with the checksums open (${scheme})`, async ({ page }) => {
+  test(`passes axe with the checksums open in light and dark`, async ({ page }) => {
+    for (const scheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: scheme });
       expect(await visit(page)).toEqual([]);
       expect(await page.locator('html').getAttribute('data-tx-mode')).toBe(scheme);
@@ -260,6 +260,6 @@ test.describe('texuli.com skill page', () => {
           (v) => `${v.id}: ${v.help} ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`
         )
       ).toEqual([]);
-    });
-  }
+    }
+  });
 });

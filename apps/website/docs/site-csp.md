@@ -5,7 +5,8 @@ rendering, and every artifact is proven by a check over the built output:
 
 - `dist/_headers` — Cloudflare Pages shape: one enforcing
   `Content-Security-Policy` and one `Content-Security-Policy-Report-Only`
-  header per route.
+  header per route, plus `Vary: Accept` on every docs-class route that has
+  a Markdown twin (`varyHeaderLine`; see [site-aeo.md](site-aeo.md)).
 - `dist/csp-manifest.json` — host-neutral: the same routes and policy
   strings as data (versioned JSON, sorted routes, no timestamps), so any
   static host or proxy can emit the headers without re-parsing HTML.
@@ -14,7 +15,8 @@ Each HTML route's policy carries the SHA-256 hashes of exactly its finished
 inline scripts, style elements and server-rendered style attributes —
 including Astro's island boot code. The report-only variant is the enforcing
 policy plus `report-to texuli-csp`. Both policies exclude `unsafe-inline`
-and `unsafe-eval`, restrict connections to the site origin, and require
+and `unsafe-eval`, restrict connections to the site origin (plus the
+configured agent service origin on the agent chat page only), and require
 Trusted Types for script sinks. Both the directory URL (`/docs/`) and the
 direct file URL (`/docs/index.html`) are covered.
 
@@ -42,7 +44,7 @@ against its HTML (the analytics name appears only where the loader is
 mounted). On an analytics fixture build it also loads the tracker under the
 enforced headers with zero violations (see
 [site-analytics.md](site-analytics.md#verification-commands)). The policy
-units are `apps/website/tests/csp-analytics-policy.test.ts`.
+units are `apps/website/tests/site-build-guards.test.ts`.
 
 ## Host application contract
 
@@ -50,7 +52,10 @@ The artifacts are response-header source data; the host must send them.
 Until a host applies them, the CSP exists only in `dist/`.
 
 - **Cloudflare Pages** (the shape `_headers` targets): deploy `dist/` as-is;
-  the file is native to that host.
+  the file is native to that host. Pages applies `_headers` only to the
+  asset response, so `functions/_middleware.ts` returns every pass-through
+  response untouched: a middleware that rebuilt the HTML response (as an
+  earlier version did to add `Vary`) would serve the page without its CSP.
 - **Any other static host or CDN**: read `csp-manifest.json` and configure
   the host to send, for every route in `pages`, the two header values
   verbatim:
@@ -73,6 +78,9 @@ Requirements a host configuration must meet, whatever the mechanism:
    through `/route/` and `/route/index.html`.
 2. The policy string for that exact route — hashes are per page.
 3. No header on non-HTML assets is required (the policy governs documents).
+4. `csp-manifest.json` carries only the two CSP values; a host that also
+   negotiates Markdown twins sends `Vary: Accept` on those docs pages
+   itself.
 
 `astro preview` and `astro dev` do not apply either artifact; they serve
 without CSP. Verify on a host that sends the headers (or a local static
@@ -108,8 +116,9 @@ server configured from the manifest) before trusting a preview.
 - A host that cannot set response headers cannot apply this policy; per-page
   `<meta http-equiv>` tags are deliberately not used (they pushed pages over
   their fixed page-weight budgets).
-- The future agent worker origin is not configured or allowed yet; add only
-  the selected origin when the service is built and approved.
+- The agent service origin is allowed only when a build sets
+  `PUBLIC_TEXULI_AGENT_URL`, and only in the agent chat page's
+  `connect-src` (`agentConnectSources`); production builds set none today.
 
 Before any deployment, confirm the chosen host supports one of the two
 artifacts or translate the manifest into that host's configuration, then

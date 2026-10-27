@@ -103,7 +103,7 @@ const result = await updateComponent({ id: 'button', cwd, sourceRoot, baseRoot, 
 
 ## Tests
 
-`pnpm vitest run packages/tools/tests/cli-update.test.ts` (17 tests, Node). Each test builds a v1 and a v2 source tree and an app with v1 added through the real `addComponent`, in temporary directories. They cover:
+`pnpm vitest run packages/tools/tests/cli-update.test.ts` (8 grouped tests, Node). Each scenario builds a v1 and a v2 source tree and an app with v1 added through the real `addComponent`, in temporary directories. They cover:
 - every status;
 - the refusal leaving the files byte-identical;
 - markers, prune and a second no-op update;

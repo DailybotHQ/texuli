@@ -60,15 +60,15 @@ const checklist = {
 };
 
 describe('interactive block schema', () => {
-  it('accepts poll, quiz, calculator and checklist', () => {
+  it('accepts poll, quiz, calculator and checklist; rejects hostile or incomplete interactive data; evaluates calculator formulas from validated data', async () => {
+    // accepts poll, quiz, calculator and checklist
     for (const block of [poll, quiz, calculator, checklist]) {
       const parsed = safeParseBlock(block);
       expect(parsed.success).toBe(true);
       expect(checkInteractiveBlock(block).ok).toBe(true);
     }
-  });
-
-  it('rejects hostile or incomplete interactive data', () => {
+    cleanup();
+    // rejects hostile or incomplete interactive data
     expect(
       safeParseBlock({
         type: 'poll',
@@ -119,51 +119,57 @@ describe('interactive block schema', () => {
         items: [{ id: '1bad', label: 'Nope' }],
       }).success
     ).toBe(false);
-  });
-
-  it('evaluates calculator formulas from validated data', () => {
-    const parsed = safeParseBlock(calculator);
-    expect(parsed.success).toBe(true);
-    if (!parsed.success || parsed.data.type !== 'calculator') return;
-    const result = evaluateCalculator(parsed.data, { hours: 2, rate: 1500 });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value).toBe(3000);
-    expect(result.formatted).toMatch(/\$/);
+    cleanup();
+    // evaluates calculator formulas from validated data
+    await (async () => {
+      const parsed = safeParseBlock(calculator);
+      expect(parsed.success).toBe(true);
+      if (!parsed.success || parsed.data.type !== 'calculator') return;
+      const result = evaluateCalculator(parsed.data, { hours: 2, rate: 1500 });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toBe(3000);
+      expect(result.formatted).toMatch(/\$/);
+    })();
   });
 });
 
 describe('InteractiveBlockView', () => {
-  it('renders a poll and accepts a vote', async () => {
-    const { getByText, getByRole } = render(InteractiveBlockView, {
-      props: { block: poll },
-    });
-    expect(getByText(/busiest/)).toBeTruthy();
-    // select first option via radio
-    const radios = document.querySelectorAll('[role="radio"]');
-    expect(radios.length).toBeGreaterThan(0);
-    await fireEvent.click(radios[0]!);
-    await fireEvent.click(getByRole('button', { name: 'Vote' }));
-    expect(getByText('Results')).toBeTruthy();
-  });
-
-  it('renders checklist progress', async () => {
-    const { getByText } = render(InteractiveBlockView, {
-      props: { block: checklist },
-    });
-    expect(getByText(/Completed:\s*1\s*\/\s*2/)).toBeTruthy();
-  });
-
-  it('shows invalid note for hostile blocks', () => {
-    const { getByRole } = render(InteractiveBlockView, {
-      props: {
-        block: {
-          type: 'poll',
-          question: 'x',
-          options: [{ id: 'a', label: 'A' }],
+  it('renders a poll and accepts a vote; renders checklist progress; shows invalid note for hostile blocks', async () => {
+    // renders a poll and accepts a vote
+    await (async () => {
+      const { getByText, getByRole } = render(InteractiveBlockView, {
+        props: { block: poll },
+      });
+      expect(getByText(/busiest/)).toBeTruthy();
+      // select first option via radio
+      const radios = document.querySelectorAll('[role="radio"]');
+      expect(radios.length).toBeGreaterThan(0);
+      await fireEvent.click(radios[0]!);
+      await fireEvent.click(getByRole('button', { name: 'Vote' }));
+      expect(getByText('Results')).toBeTruthy();
+    })();
+    cleanup();
+    // renders checklist progress
+    await (async () => {
+      const { getByText } = render(InteractiveBlockView, {
+        props: { block: checklist },
+      });
+      expect(getByText(/Completed:\s*1\s*\/\s*2/)).toBeTruthy();
+    })();
+    cleanup();
+    {
+      // shows invalid note for hostile blocks
+      const { getByRole } = render(InteractiveBlockView, {
+        props: {
+          block: {
+            type: 'poll',
+            question: 'x',
+            options: [{ id: 'a', label: 'A' }],
+          },
         },
-      },
-    });
-    expect(getByRole('note').textContent).toMatch(/not valid/i);
+      });
+      expect(getByRole('note').textContent).toMatch(/not valid/i);
+    }
   });
 });

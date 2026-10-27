@@ -3,7 +3,7 @@
 **App:** `apps/website`  
 **Page:** `/color-explorer/`  
 **Components:** `src/components/color-explorer/`  
-**Tests:** `tests/e2e/site-color-explorer.spec.ts`, `scripts/tests/site-color-explorer.test.ts`
+**Tests:** `tests/e2e/site-color-explorer.spec.ts`, `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
@@ -27,6 +27,6 @@ Static after build. Theme CSS is inlined (same as the theme gallery). No runtime
 ## Validation
 
 ```bash
-pnpm vitest run scripts/tests/site-color-explorer.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 bash -c 'pnpm build && TEXULI_E2E_PORT=4930 pnpm exec playwright test tests/e2e/site-color-explorer.spec.ts'
 ```

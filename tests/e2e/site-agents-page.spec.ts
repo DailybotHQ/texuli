@@ -3,7 +3,6 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import { primaryNav } from './support/site-nav.ts';
 
@@ -76,8 +75,6 @@ async function visit(page: Page, path: string) {
   return foreign;
 }
 
-const mode = (page: Page) => page.locator('html').getAttribute('data-tx-mode');
-
 test.describe('texuli.com agents page', () => {
   test('page covers agent topics and marks nav', async ({ page }) => {
     expect(await visit(page, '/agents-page/')).toEqual([]);
@@ -132,15 +129,6 @@ test.describe('texuli.com agents page', () => {
     expect(await visit(page, '/agents-page/')).toEqual([]);
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on agents page (${scheme})`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: scheme });
-      await visit(page, '/agents-page/');
-      expect(await mode(page)).toBe(scheme);
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-      expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
-    });
-  }
+  // axe on this page in light and dark (zero exclusions) runs in the page sweep,
+  // a11y-site.spec.ts.
 });

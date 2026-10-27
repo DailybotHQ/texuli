@@ -12,7 +12,7 @@ import public subpaths only.
 | Shell | App layout / sidebar from `texuli` layouts (developer tier) |
 | KPIs | `stat` / `kpi` (display manifests) |
 | Grouping | `card` + `CardGrid` |
-| Dense data | `@texuli/data/*` views (grid, board, …) when present |
+| Dense data | `@texuli/data/*` views (grid, tree, board, calendar, timeline, files, …) |
 | Charts | `@texuli/charts/*` lazy families (`cartesian`, `compact`, `part-whole`, …) |
 | Theme | `enterprise-neutral` or themes skill search |
 
@@ -67,7 +67,8 @@ prototypes as real credentials.
 | Validate agent output | `validateDeckDraft(input, { catalog })`: the catalog's `validateDraft` (ids, props, sinks, block schemas, grammar, `layout-deck` root) plus deck rules (slide ids, declared masters, theme references); returns the deck and per-slide master, transition, theme and step count |
 | Interchange / legacy | `toDeckGrammar` (structured `slides[]` prop; not checked node by node by the renderer); `projectLegacyDeck` reads the older deck-of-cards shape |
 | Present | `@texuli/slides/stage` (`DeckStage`, optional `@texuli/slides/styles.css`): one slide at a time, previous/next, Home/End, `o` overview, `p` presenter view (notes, next slide or step; timer opt-in), `f` fullscreen (visible window-filling fallback), slot masters split at top-level dividers, `fade`/`fade-up`/`none` transitions, reduced motion honoured |
-| Print / export | `DeckPrint` + `requestDeckPdf` (browser print to PDF), `exportDeckPptx` (text, bullets and notes; media and charts are reported as omitted) |
+| Print / export | `DeckPrint` (`@texuli/slides/stage`) + `requestDeckPdf` (`@texuli/slides/export`, browser print to PDF), `exportDeckPptx` (`@texuli/slides/export`: text, bullets and notes; media and charts are reported as omitted) |
+| Starter decks | `createDeckFromTemplate('report' \| 'pitch' \| 'review')` from `@texuli/slides/templates`: real blocks that validate, render, print and export like any deck |
 | Text | block content or plain text — not HTML strings |
 | Chrome | developer shell only outside the deck frame |
 

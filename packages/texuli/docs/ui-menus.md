@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Import:** `import { DropdownMenu, ContextMenu, Menubar } from 'texuli/menus'`  
-**Tests:** `packages/texuli/tests/menus.test.ts`  
+**Tests:** `packages/texuli/tests/overlays.test.ts`  
 **Example:** `texuli-menus`
 
 ## Contract

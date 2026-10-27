@@ -56,6 +56,6 @@ invalid, disabled, group adornments, autosize, character count, RTL.
 ## Testing
 
 ```bash
-pnpm vitest run packages/texuli/tests/input.test.ts
-pnpm vitest run packages/texuli/tests/internal-cx.test.ts packages/texuli/tests/variants-css.test.ts
+pnpm vitest run packages/texuli/tests/forms.test.ts
+pnpm vitest run packages/texuli/tests/contracts.test.ts
 ```

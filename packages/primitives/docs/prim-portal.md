@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/primitives`  
 **Source:** `packages/primitives/src/portal/`  
-**Tests:** `packages/primitives/tests/portal.test.ts`  
+**Tests:** `packages/primitives/tests/overlays.test.ts`  
 **Behavior:** `tests/behavior/scenarios/portal.spec.ts`  
 **Task:** T-prim-portal
 

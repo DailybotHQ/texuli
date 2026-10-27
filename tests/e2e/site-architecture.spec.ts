@@ -10,7 +10,6 @@ import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
@@ -214,30 +213,17 @@ test.describe('architecture status and integration (T-52)', () => {
 
   // PLAN_006 P2-3: the shell's side TOC shows from 64rem and yields to the
   // layout's PageToc from 80rem, so exactly one "On this page" is exposed.
-  for (const width of [1100, 1400]) {
-    test(`exactly one visible "On this page" navigation at ${width}px`, async ({ page }) => {
+  test(`exactly one visible "On this page" navigation at 1100 and 1400px`, async ({ page }) => {
+    for (const width of [1100, 1400]) {
       await page.setViewportSize({ width, height: 900 });
       await visit(page, '/web-and-native/');
       const tocs = page.getByRole('navigation', { name: 'On this page' });
       await expect(tocs).toHaveCount(1);
       await expect(tocs.first()).toBeVisible();
       await expect(tocs.first().locator('a[href="#why-both"]')).toBeVisible();
-    });
-  }
-
-  test('the full page passes axe with zero exclusions', async ({ page }) => {
-    await visit(page, '/web-and-native/');
-    const results = await new AxeBuilder({ page })
-      .withTags([
-        'wcag2a',
-        'wcag2aa',
-        'wcag21a',
-        'wcag21aa',
-        'wcag22a',
-        'wcag22aa',
-        'best-practice',
-      ])
-      .analyze();
-    expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
+    }
   });
+
+  // axe on /web-and-native/ (zero exclusions, light and dark) runs in the page
+  // sweep, a11y-site.spec.ts.
 });

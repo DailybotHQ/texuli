@@ -51,28 +51,28 @@ async function writeBudgets(budgets: BudgetsFile): Promise<string> {
 }
 
 describe('discoverEntries', () => {
-  it('finds every measurable export subpath and skips what is not code', async () => {
-    const entries = await discoverEntries(workspace, ['@fixture/tool']);
-    expect(entries.map((entry) => entry.id)).toEqual([
-      '@fixture/alpha',
-      '@fixture/alpha/extra',
-      '@fixture/alpha/styles.css',
-      '@fixture/widgets',
-      '@fixture/widgets/button',
-    ]);
-    const css = entries.find((entry) => entry.id === '@fixture/alpha/styles.css');
-    expect(css?.css).toBe(true);
-    expect(css?.file).toBe(join(workspace, 'packages/alpha/src/styles.css'));
-    // ./package.json, the ./internal/* wildcard and the types-only ./types are skipped.
-    expect(entries.some((entry) => entry.id.includes('package.json'))).toBe(false);
-  });
-
-  it('measures ignored packages only when they are not ignored', async () => {
-    const entries = await discoverEntries(workspace);
-    expect(entries.map((entry) => entry.id)).toContain('@fixture/tool');
-  });
-
-  it('picks the svelte, browser, import or default condition, in that order', () => {
+  it('finds every measurable export subpath and skips what is not code; measures ignored packages only when they are not ignored; picks the svelte, browser, import or default condition, in that order', async () => {
+    // finds every measurable export subpath and skips what is not code
+    {
+      const entries = await discoverEntries(workspace, ['@fixture/tool']);
+      expect(entries.map((entry) => entry.id)).toEqual([
+        '@fixture/alpha',
+        '@fixture/alpha/extra',
+        '@fixture/alpha/styles.css',
+        '@fixture/widgets',
+        '@fixture/widgets/button',
+      ]);
+      const css = entries.find((entry) => entry.id === '@fixture/alpha/styles.css');
+      expect(css?.css).toBe(true);
+      expect(css?.file).toBe(join(workspace, 'packages/alpha/src/styles.css'));
+      // ./package.json, the ./internal/* wildcard and the types-only ./types are skipped.
+      expect(entries.some((entry) => entry.id.includes('package.json'))).toBe(false);
+    }
+    // measures ignored packages only when they are not ignored
+    {
+      const entries = await discoverEntries(workspace);
+      expect(entries.map((entry) => entry.id)).toContain('@fixture/tool');
+    }
     expect(exportFile('./src/index.ts')).toBe('./src/index.ts');
     expect(exportFile({ types: './a.d.ts', default: './a.js', svelte: './a.ts' })).toBe('./a.ts');
     expect(exportFile({ node: './n.js', import: { default: './i.js' } })).toBe('./i.js');
@@ -145,75 +145,77 @@ describe('budgets', () => {
     },
   });
 
-  it('applies the exact id before the package pattern', () => {
+  it('applies the exact id before the package pattern; rejects a malformed file with every problem listed; flags over budget, no budget and larger than Protoyard, each with its reason; prints one row per entry, with the pattern that applied', () => {
     expect(budgetFor('@fixture/widgets/dialog', budgets)?.key).toBe('@fixture/widgets/dialog');
     expect(budgetFor('@fixture/widgets/button', budgets)?.key).toBe('@fixture/widgets/*');
     // The pattern covers subpaths, not the package root.
     expect(budgetFor('@fixture/widgets', budgets)).toBeNull();
-  });
-
-  it('rejects a malformed file with every problem listed', () => {
-    expect(() => parseBudgets(null)).toThrow(/expected an object/);
-    expect(() => parseBudgets({})).toThrow(/"budgets" object/);
-    let message = '';
-    try {
-      parseBudgets({
-        ignore: 'tools',
-        budgets: {
-          a: { gzip: -1 },
-          'b*': { gzip: 10 },
-          c: { gzip: 10, cssGzip: 1.5 },
-          d: { gzip: 10, protoyard: { specifier: 'other-ui' } },
-        },
-      });
-    } catch (error) {
-      message = String(error);
+    // rejects a malformed file with every problem listed
+    {
+      expect(() => parseBudgets(null)).toThrow(/expected an object/);
+      expect(() => parseBudgets({})).toThrow(/"budgets" object/);
+      let message = '';
+      try {
+        parseBudgets({
+          ignore: 'tools',
+          budgets: {
+            a: { gzip: -1 },
+            'b*': { gzip: 10 },
+            c: { gzip: 10, cssGzip: 1.5 },
+            d: { gzip: 10, protoyard: { specifier: 'other-ui' } },
+          },
+        });
+      } catch (error) {
+        message = String(error);
+      }
+      expect(message).toContain('"ignore" must be an array');
+      expect(message).toContain('a: "gzip" must be a whole number');
+      expect(message).toContain('b*: a pattern ends in "/*"');
+      expect(message).toContain('c: "cssGzip" must be a whole number');
+      expect(message).toContain('d: "protoyard.specifier" must name a @protoyard/* import');
     }
-    expect(message).toContain('"ignore" must be an array');
-    expect(message).toContain('a: "gzip" must be a whole number');
-    expect(message).toContain('b*: a pattern ends in "/*"');
-    expect(message).toContain('c: "cssGzip" must be a whole number');
-    expect(message).toContain('d: "protoyard.specifier" must name a @protoyard/* import');
-  });
-
-  it('flags over budget, no budget and larger than Protoyard, each with its reason', () => {
-    const rows = compare(
-      [
-        { id: '@fixture/widgets/button', measure: measure(1000, { cssGzip: 2000 }) },
-        { id: '@fixture/widgets/dialog', measure: measure(8000) },
-        { id: '@fixture/alpha', measure: measure(310) },
-        { id: '@fixture/unknown', measure: measure(10) },
-      ],
-      budgets
-    );
-    const byId = Object.fromEntries(rows.map((row) => [row.id, row]));
-    expect(byId['@fixture/widgets/button']?.status).toBe('over');
-    expect(byId['@fixture/widgets/button']?.problems).toEqual(['css gzip 2000 B > 1024 B']);
-    expect(byId['@fixture/widgets/dialog']?.status).toBe('ok');
-    expect(byId['@fixture/alpha']?.status).toBe('larger-than-protoyard');
-    expect(byId['@fixture/alpha']?.problems[0]).toMatch(/@protoyard\/ui 300 B/);
-    expect(byId['@fixture/unknown']?.status).toBe('unbudgeted');
-    expect(unmatchedBudgets(rows, budgets)).toEqual([]);
-    expect(unmatchedBudgets(rows.slice(0, 1), budgets)).toEqual([
-      '@fixture/widgets/dialog',
-      '@fixture/alpha',
-    ]);
-  });
-
-  it('prints one row per entry, with the pattern that applied', () => {
-    const rows = compare(
-      [
-        { id: '@fixture/widgets/button', measure: measure(900, { cssGzip: 120 }) },
-        { id: '@fixture/alpha', measure: measure(2000) },
-      ],
-      budgets
-    );
-    const table = formatTable(rows).split('\n');
-    expect(table[0]).toMatch(
-      /^entry\s+gzip\s+budget\s+brotli\s+css gzip\s+lazy gzip\s+protoyard\s+status$/
-    );
-    expect(table[2]).toMatch(/^@fixture\/alpha .*1\.95 KiB .*512 B .*300 B @protoyard\/ui .*OVER$/);
-    expect(table[3]).toMatch(/900 B\s+4\.00 KiB \(@fixture\/widgets\/\*\).*120 B .*ok$/);
+    // flags over budget, no budget and larger than Protoyard, each with its reason
+    {
+      const rows = compare(
+        [
+          { id: '@fixture/widgets/button', measure: measure(1000, { cssGzip: 2000 }) },
+          { id: '@fixture/widgets/dialog', measure: measure(8000) },
+          { id: '@fixture/alpha', measure: measure(310) },
+          { id: '@fixture/unknown', measure: measure(10) },
+        ],
+        budgets
+      );
+      const byId = Object.fromEntries(rows.map((row) => [row.id, row]));
+      expect(byId['@fixture/widgets/button']?.status).toBe('over');
+      expect(byId['@fixture/widgets/button']?.problems).toEqual(['css gzip 2000 B > 1024 B']);
+      expect(byId['@fixture/widgets/dialog']?.status).toBe('ok');
+      expect(byId['@fixture/alpha']?.status).toBe('larger-than-protoyard');
+      expect(byId['@fixture/alpha']?.problems[0]).toMatch(/@protoyard\/ui 300 B/);
+      expect(byId['@fixture/unknown']?.status).toBe('unbudgeted');
+      expect(unmatchedBudgets(rows, budgets)).toEqual([]);
+      expect(unmatchedBudgets(rows.slice(0, 1), budgets)).toEqual([
+        '@fixture/widgets/dialog',
+        '@fixture/alpha',
+      ]);
+    }
+    // prints one row per entry, with the pattern that applied
+    {
+      const rows = compare(
+        [
+          { id: '@fixture/widgets/button', measure: measure(900, { cssGzip: 120 }) },
+          { id: '@fixture/alpha', measure: measure(2000) },
+        ],
+        budgets
+      );
+      const table = formatTable(rows).split('\n');
+      expect(table[0]).toMatch(
+        /^entry\s+gzip\s+budget\s+brotli\s+css gzip\s+lazy gzip\s+protoyard\s+status$/
+      );
+      expect(table[2]).toMatch(
+        /^@fixture\/alpha .*1\.95 KiB .*512 B .*300 B @protoyard\/ui .*OVER$/
+      );
+      expect(table[3]).toMatch(/900 B\s+4\.00 KiB \(@fixture\/widgets\/\*\).*120 B .*ok$/);
+    }
   });
 });
 
@@ -236,28 +238,31 @@ describe('updateBudgets: budgets only shrink by default', () => {
       base()
     );
 
-  it('tightens a budget to the rounded-up measure and refuses to raise one', () => {
-    const result = updateBudgets(base(), rows());
-    expect(result.budgets.budgets.shrinks).toEqual({ gzip: 1024, brotli: 832 });
-    expect(result.budgets.budgets.grows).toEqual({ gzip: 128 });
-    expect(result.budgets.budgets['new-entry']).toBeUndefined();
-    // Pattern budgets are design targets: never rewritten.
-    expect(result.budgets.budgets['pattern/*']).toEqual({ gzip: 4096 });
-    expect(result.refused).toEqual([
-      'grows: gzip would grow 128 → 512 B',
-      'new-entry: no budget (add one with --allow-grow)',
-    ]);
-    expect(result.changes).toEqual(['shrinks: gzip 4096 → 1024 B', 'shrinks: brotli 4096 → 832 B']);
-  });
-
-  it('raises and adds budgets only with allowGrow', () => {
-    const result = updateBudgets(base(), rows(), { allowGrow: true });
-    expect(result.budgets.budgets.grows).toEqual({ gzip: 512 });
-    expect(result.budgets.budgets['new-entry']).toEqual({ gzip: 128, cssGzip: 64 });
-    expect(result.refused).toEqual([]);
-  });
-
-  it('rounds up to the budget step and never below one step', () => {
+  it('tightens a budget to the rounded-up measure and refuses to raise one; raises and adds budgets only with allowGrow; rounds up to the budget step and never below one step', () => {
+    // tightens a budget to the rounded-up measure and refuses to raise one
+    {
+      const result = updateBudgets(base(), rows());
+      expect(result.budgets.budgets.shrinks).toEqual({ gzip: 1024, brotli: 832 });
+      expect(result.budgets.budgets.grows).toEqual({ gzip: 128 });
+      expect(result.budgets.budgets['new-entry']).toBeUndefined();
+      // Pattern budgets are design targets: never rewritten.
+      expect(result.budgets.budgets['pattern/*']).toEqual({ gzip: 4096 });
+      expect(result.refused).toEqual([
+        'grows: gzip would grow 128 → 512 B',
+        'new-entry: no budget (add one with --allow-grow)',
+      ]);
+      expect(result.changes).toEqual([
+        'shrinks: gzip 4096 → 1024 B',
+        'shrinks: brotli 4096 → 832 B',
+      ]);
+    }
+    // raises and adds budgets only with allowGrow
+    {
+      const result = updateBudgets(base(), rows(), { allowGrow: true });
+      expect(result.budgets.budgets.grows).toEqual({ gzip: 512 });
+      expect(result.budgets.budgets['new-entry']).toEqual({ gzip: 128, cssGzip: 64 });
+      expect(result.refused).toEqual([]);
+    }
     expect(roundUp(0)).toBe(64);
     expect(roundUp(64)).toBe(64);
     expect(roundUp(65)).toBe(128);

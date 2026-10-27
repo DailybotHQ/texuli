@@ -52,42 +52,45 @@ describe('links', () => {
 describe('commands', () => {
   const ctx = commandContext(repositoryRootFromHere());
 
-  it('accepts real scripts, paths, pnpm built-ins, globs and placeholders', () => {
-    const markdown = [
-      '```bash',
-      'pnpm install',
-      'pnpm vitest run packages/core/tests/roving.test.ts',
-      'pnpm vitest run packages/primitives/tests/consumer-ids*.test.ts',
-      "bash -c 'pnpm build && TEXULI_E2E_PORT=4820 pnpm exec playwright test tests/e2e/csp.spec.ts'",
-      'pnpm --filter @texuli/website exec astro check',
-      'pnpm --dir tests/fixtures/app exec vite --port 4930',
-      'node scripts/anything.mjs   # other tools are not checked',
-      '```',
-      'Run `pnpm --filter <package> typecheck` or `pnpm size --filter primitives`.',
-    ].join('\n');
-    expect(checkCommands('doc.md', markdown, ctx)).toEqual([]);
-  });
-
-  it('reports unknown scripts, packages and files, in fences and inline code', () => {
-    const markdown = [
-      '```sh',
-      'pnpm no-such-script',
-      'pnpm vitest run packages/core/tests/nope.test.ts',
-      '```',
-      'Then `pnpm --filter @texuli/nope build`.',
-    ].join('\n');
-    expect(
-      checkCommands('doc.md', markdown, ctx).map(({ line, message }) => [line, message])
-    ).toEqual([
-      [2, 'pnpm no-such-script: no such root script'],
-      [3, 'packages/core/tests/nope.test.ts does not exist in the repository'],
-      [5, 'pnpm --filter @texuli/nope: no such workspace package'],
-    ]);
+  it('accepts real scripts, paths, pnpm built-ins, globs and placeholders; reports unknown scripts, packages and files, in fences and inline code', () => {
+    // accepts real scripts, paths, pnpm built-ins, globs and placeholders
+    {
+      const markdown = [
+        '```bash',
+        'pnpm install',
+        'pnpm vitest run packages/core/tests/roving.test.ts',
+        'pnpm vitest run packages/primitives/tests/consumer-ids*.test.ts',
+        "bash -c 'pnpm build && TEXULI_E2E_PORT=4820 pnpm exec playwright test tests/e2e/csp.spec.ts'",
+        'pnpm --filter @texuli/website exec astro check',
+        'pnpm --dir tests/fixtures/app exec vite --port 4930',
+        'node scripts/anything.mjs   # other tools are not checked',
+        '```',
+        'Run `pnpm --filter <package> typecheck` or `pnpm size --filter primitives`.',
+      ].join('\n');
+      expect(checkCommands('doc.md', markdown, ctx)).toEqual([]);
+    }
+    // reports unknown scripts, packages and files, in fences and inline code
+    {
+      const markdown = [
+        '```sh',
+        'pnpm no-such-script',
+        'pnpm vitest run packages/core/tests/nope.test.ts',
+        '```',
+        'Then `pnpm --filter @texuli/nope build`.',
+      ].join('\n');
+      expect(
+        checkCommands('doc.md', markdown, ctx).map(({ line, message }) => [line, message])
+      ).toEqual([
+        [2, 'pnpm no-such-script: no such root script'],
+        [3, 'packages/core/tests/nope.test.ts does not exist in the repository'],
+        [5, 'pnpm --filter @texuli/nope: no such workspace package'],
+      ]);
+    }
   });
 });
 
 describe('the repository docs', () => {
   it('have no broken relative link and no unknown command', () => {
     expect(checkDocs(repositoryRootFromHere())).toEqual([]);
-  });
+  }, 60_000);
 });

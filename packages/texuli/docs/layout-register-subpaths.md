@@ -22,4 +22,4 @@ statically import layout Svelte files for registration.
 `package.json` `sideEffects` is CSS-only; register modules do not self-register
 on import.
 
-Gate: `pnpm vitest run packages/texuli/tests/layout-register-tree-shake.test.ts`
+Gate: `pnpm vitest run packages/texuli/tests/contracts.test.ts`

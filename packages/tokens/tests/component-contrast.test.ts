@@ -83,7 +83,8 @@ function checkPalette(themeId: string, mode: string, palette: SemanticPalette): 
 }
 
 describe('component variant contrast (Button, Badge, Toggle, Alert, Callout, Toast)', () => {
-  it('exports a non-empty pair matrix covering soft tone variants', () => {
+  it('exports a non-empty pair matrix covering soft tone variants; passes AA for every library theme (210) × light/dark and high-contrast hex pairs', async () => {
+    // exports a non-empty pair matrix covering soft tone variants
     expect(COMPONENT_CONTRAST_PAIRS.length).toBeGreaterThan(40);
     expect(COMPONENT_CONTRAST_PAIRS.some((p) => p.variant === 'secondary')).toBe(true);
     expect(COMPONENT_CONTRAST_PAIRS.some((p) => p.variant === 'ghost')).toBe(true);
@@ -99,20 +100,20 @@ describe('component variant contrast (Button, Badge, Toggle, Alert, Callout, Toa
     expect(COMPONENT_CONTRAST_PAIRS.some((p) => p.foreground === 'warningSoftForeground')).toBe(
       true
     );
-  });
+    // passes AA for every library theme (210) × light/dark and high-contrast hex pairs
+    await (async () => {
+      const meta = await getFullThemeLibraryMeta();
+      expect(meta.length).toBe(210);
 
-  it('passes AA for every library theme (210) × light/dark and high-contrast hex pairs', async () => {
-    const meta = await getFullThemeLibraryMeta();
-    expect(meta.length).toBe(210);
+      const fails: string[] = [];
+      for (const entry of meta) {
+        const theme = await loadFullLibraryTheme(entry.id);
+        fails.push(...checkPalette(entry.id, 'light', theme.light));
+        fails.push(...checkPalette(entry.id, 'dark', theme.dark));
+      }
+      fails.push(...checkPalette('system', 'high-contrast', createHighContrastPalette()));
 
-    const fails: string[] = [];
-    for (const entry of meta) {
-      const theme = await loadFullLibraryTheme(entry.id);
-      fails.push(...checkPalette(entry.id, 'light', theme.light));
-      fails.push(...checkPalette(entry.id, 'dark', theme.dark));
-    }
-    fails.push(...checkPalette('system', 'high-contrast', createHighContrastPalette()));
-
-    expect(fails, fails.slice(0, 40).join('\n')).toEqual([]);
-  }, 180_000);
+      expect(fails, fails.slice(0, 40).join('\n')).toEqual([]);
+    })();
+  }, 180000);
 });

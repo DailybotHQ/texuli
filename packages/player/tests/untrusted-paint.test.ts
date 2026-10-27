@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { render } from '@testing-library/svelte';
 import { createEnvelope } from '@texuli/catalog/envelope';
-import type { Component } from 'svelte';
+import type { Component, ComponentProps } from 'svelte';
 import { flushSync, tick } from 'svelte';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { PLAYER_FRAME_PROTOCOL } from '../src/embed/protocol.ts';
@@ -366,7 +366,7 @@ async function settle(): Promise<void> {
 
 // ── Entry paths ─────────────────────────────────────────────────
 
-type Path = (tree: unknown) => Promise<Element>;
+type Path = (tree: unknown) => Promise<{ container: Element; dispose: () => void }>;
 
 function wrapper(tree: unknown) {
   return { format: LOCAL_STATE_FORMAT, version: 1, state: {}, blueprint: tree };
@@ -389,46 +389,37 @@ function fakeWindow(parent?: unknown) {
   return target;
 }
 
+function renderPlayer(props: { blueprint: unknown } & Record<string, unknown>) {
+  const { container, unmount } = render(Player, {
+    props: { loaders, ...props } as ComponentProps<typeof Player>,
+  });
+  return { container, dispose: unmount };
+}
+
+/** Reset between corpus items inside one test: no stale probe records or DOM. */
+function reset() {
+  probeLog.length = 0;
+  document.body.innerHTML = '';
+}
+
 const PATHS: ReadonlyArray<[string, Path]> = [
-  ['object', async (tree) => render(Player, { props: { blueprint: tree, loaders } }).container],
-  [
-    'JSON text',
-    async (tree) =>
-      render(Player, { props: { blueprint: JSON.stringify(tree), loaders } }).container,
-  ],
-  [
-    'developer tier',
-    async (tree) =>
-      render(Player, { props: { blueprint: tree, loaders, tier: 'developer' } }).container,
-  ],
-  [
-    'invalid preview',
-    async (tree) =>
-      render(Player, { props: { blueprint: tree, loaders, invalidPolicy: 'preview' } }).container,
-  ],
+  ['object', async (tree) => renderPlayer({ blueprint: tree })],
+  ['JSON text', async (tree) => renderPlayer({ blueprint: JSON.stringify(tree) })],
+  ['developer tier', async (tree) => renderPlayer({ blueprint: tree, tier: 'developer' })],
+  ['invalid preview', async (tree) => renderPlayer({ blueprint: tree, invalidPolicy: 'preview' })],
   [
     'envelope',
-    async (tree) =>
-      render(Player, { props: { blueprint: envelope(tree), loaders, invalidPolicy: 'preview' } })
-        .container,
+    async (tree) => renderPlayer({ blueprint: envelope(tree), invalidPolicy: 'preview' }),
   ],
   [
     'envelope in state wrapper',
-    async (tree) =>
-      render(Player, {
-        props: { blueprint: wrapper(envelope(tree)), loaders, invalidPolicy: 'preview' },
-      }).container,
+    async (tree) => renderPlayer({ blueprint: wrapper(envelope(tree)), invalidPolicy: 'preview' }),
   ],
-  [
-    'state wrapper',
-    async (tree) => render(Player, { props: { blueprint: wrapper(tree), loaders } }).container,
-  ],
+  ['state wrapper', async (tree) => renderPlayer({ blueprint: wrapper(tree) })],
   [
     'state wrapper text',
     async (tree) =>
-      render(Player, {
-        props: { blueprint: JSON.stringify(wrapper(tree)), loaders, invalidPolicy: 'preview' },
-      }).container,
+      renderPlayer({ blueprint: JSON.stringify(wrapper(tree)), invalidPolicy: 'preview' }),
   ],
   [
     'mountPlayer update()',
@@ -442,7 +433,7 @@ const PATHS: ReadonlyArray<[string, Path]> = [
       });
       await settle();
       mounted.update({ blueprint: tree });
-      return target;
+      return { container: target, dispose: () => mounted.dispose() };
     },
   ],
   [
@@ -452,7 +443,7 @@ const PATHS: ReadonlyArray<[string, Path]> = [
       const win = fakeWindow(parent);
       const target = document.createElement('div');
       document.body.append(target);
-      mountPlayerFrame(target, {
+      const mounted = mountPlayerFrame(target, {
         parentOrigins: ['https://host.example'],
         window: win as unknown as Window,
         loaders,
@@ -468,17 +459,22 @@ const PATHS: ReadonlyArray<[string, Path]> = [
       });
       Object.defineProperty(event, 'source', { value: parent });
       win.dispatchEvent(event);
-      return target;
+      return { container: target, dispose: () => mounted.dispose() };
     },
   ],
 ];
 
 describe('untrusted at paint: every entry path', () => {
+  // One test per entry path; every hostile tree is asserted inside it.
   for (const [pathName, enter] of PATHS) {
-    it.each(HOSTILE_TREES)(`${pathName}: %s paints nothing unsafe`, async (_name, tree) => {
-      const container = await enter(tree);
-      await settle();
-      expect(violations(container)).toEqual([]);
+    it(`${pathName}: no hostile tree paints anything unsafe`, async () => {
+      for (const [name, tree] of HOSTILE_TREES) {
+        reset();
+        const { container, dispose } = await enter(tree);
+        await settle();
+        expect(violations(container), `${pathName}: ${name}`).toEqual([]);
+        dispose();
+      }
     });
   }
 
@@ -589,43 +585,49 @@ describe('untrusted at paint: player-owned layout painters', () => {
   const SAFE_STYLE =
     /^(--tx-player-columns: [1-4](; --tx-player-gap: (0|\d{1,2}(\.\d{1,2})?(rem|em)|\d{1,3}px))?|--tx-player-span: [1-4]; --tx-player-row-span: [12]);?$/;
 
+  const layoutLoaders = Object.fromEntries(
+    [
+      'layout-page',
+      'layout-doc',
+      'layout-card',
+      'layout-grid',
+      'layout-deck',
+      'deck-slide',
+      'layout-stack',
+      'layout-row',
+      'layout-split',
+      'layout-tile',
+    ].map((id) => [id, real])
+  );
+
   for (const [pathName, extra] of LAYOUT_PATHS) {
-    it.each(LAYOUT_TREES)(`${pathName}: %s writes only guarded attributes`, async (_name, tree) => {
-      const layoutLoaders = Object.fromEntries(
-        [
-          'layout-page',
-          'layout-doc',
-          'layout-card',
-          'layout-grid',
-          'layout-deck',
-          'deck-slide',
-          'layout-stack',
-          'layout-row',
-          'layout-split',
-          'layout-tile',
-        ].map((id) => [id, real])
-      );
-      const { container } = render(Player, {
-        props: { blueprint: tree, loaders: { ...loaders, ...layoutLoaders }, ...extra },
-      });
-      await settle();
-      await settle();
-      expect(violations(container)).toEqual([]);
-      for (const element of container.querySelectorAll('[style]')) {
-        expect(element.getAttribute('style')).toMatch(SAFE_STYLE);
-      }
-      for (const element of container.querySelectorAll('[lang]')) {
-        expect(element.getAttribute('lang')).toMatch(/^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$/);
-      }
-      // Ids and in-page links are player-generated, never blueprint text.
-      for (const element of container.querySelectorAll('[id]')) {
-        expect(element.id).toMatch(/^[A-Za-z0-9_-]+$/);
-      }
-      for (const link of container.querySelectorAll('a[href]')) {
-        const href = link.getAttribute('href') ?? '';
-        if (link.classList.contains('tx-player__skip')) continue;
-        expect(href).toMatch(/^#[A-Za-z0-9_-]+$/);
-        expect(container.querySelector(`[id="${href.slice(1)}"]`)).not.toBeNull();
+    it(`${pathName}: every layout tree writes only guarded attributes`, async () => {
+      for (const [name, tree] of LAYOUT_TREES) {
+        reset();
+        const at = `${pathName}: ${name}`;
+        const { container, unmount } = render(Player, {
+          props: { blueprint: tree, loaders: { ...loaders, ...layoutLoaders }, ...extra },
+        });
+        await settle();
+        await settle();
+        expect(violations(container), at).toEqual([]);
+        for (const element of container.querySelectorAll('[style]')) {
+          expect(element.getAttribute('style'), at).toMatch(SAFE_STYLE);
+        }
+        for (const element of container.querySelectorAll('[lang]')) {
+          expect(element.getAttribute('lang'), at).toMatch(/^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$/);
+        }
+        // Ids and in-page links are player-generated, never blueprint text.
+        for (const element of container.querySelectorAll('[id]')) {
+          expect(element.id, at).toMatch(/^[A-Za-z0-9_-]+$/);
+        }
+        for (const link of container.querySelectorAll('a[href]')) {
+          const href = link.getAttribute('href') ?? '';
+          if (link.classList.contains('tx-player__skip')) continue;
+          expect(href, at).toMatch(/^#[A-Za-z0-9_-]+$/);
+          expect(container.querySelector(`[id="${href.slice(1)}"]`), at).not.toBeNull();
+        }
+        unmount();
       }
     });
   }
@@ -691,9 +693,9 @@ function hostBound() {
 }
 
 describe('untrusted at paint: host data cannot smuggle', () => {
-  it.each(HOSTILE_STRINGS)(
-    'dataSources %j into every bound prop paints nothing unsafe',
-    async (value) => {
+  it('no hostile dataSources value paints anything unsafe in any bound prop', async () => {
+    for (const value of HOSTILE_STRINGS) {
+      reset();
       const target = document.createElement('div');
       document.body.append(target);
       const mounted = mountPlayer(target, {
@@ -704,70 +706,73 @@ describe('untrusted at paint: host data cannot smuggle', () => {
       await settle();
       mounted.update({ dataSources: { 'feed.value': value } });
       await settle();
-      expect(violations(target)).toEqual([]);
+      expect(violations(target), value).toEqual([]);
       mounted.dispose();
     }
-  );
+  });
 
-  it.each(HOSTILE_STRINGS)('a frame data message %j paints nothing unsafe', async (value) => {
-    const parent = fakeWindow();
-    const win = fakeWindow(parent);
-    const target = document.createElement('div');
-    document.body.append(target);
-    mountPlayerFrame(target, {
-      parentOrigins: ['https://host.example'],
-      window: win as unknown as Window,
-      loaders,
-    });
-    const send = (data: unknown) => {
-      const event = new MessageEvent('message', { origin: 'https://host.example', data });
-      Object.defineProperty(event, 'source', { value: parent });
-      win.dispatchEvent(event);
-    };
-    send({ protocol: PLAYER_FRAME_PROTOCOL, type: 'init', blueprint: hostBound(), options: {} });
-    await settle();
-    send({ protocol: PLAYER_FRAME_PROTOCOL, type: 'data', sources: { 'feed.value': value } });
-    await settle();
-    expect(violations(target)).toEqual([]);
+  it('no hostile frame data message paints anything unsafe', async () => {
+    for (const value of HOSTILE_STRINGS) {
+      reset();
+      const parent = fakeWindow();
+      const win = fakeWindow(parent);
+      const target = document.createElement('div');
+      document.body.append(target);
+      const mounted = mountPlayerFrame(target, {
+        parentOrigins: ['https://host.example'],
+        window: win as unknown as Window,
+        loaders,
+      });
+      const send = (data: unknown) => {
+        const event = new MessageEvent('message', { origin: 'https://host.example', data });
+        Object.defineProperty(event, 'source', { value: parent });
+        win.dispatchEvent(event);
+      };
+      send({ protocol: PLAYER_FRAME_PROTOCOL, type: 'init', blueprint: hostBound(), options: {} });
+      await settle();
+      send({ protocol: PLAYER_FRAME_PROTOCOL, type: 'data', sources: { 'feed.value': value } });
+      await settle();
+      expect(violations(target), value).toEqual([]);
+      mounted.dispose();
+    }
   });
 });
 
 describe('untrusted at paint: local state cannot smuggle', () => {
-  it.each(HOSTILE_STRINGS)(
-    'setState(%j) into every bound prop paints nothing unsafe',
-    async (value) => {
+  it('no hostile setState value paints anything unsafe in any bound prop', async () => {
+    for (const value of HOSTILE_STRINGS) {
+      reset();
       const target = document.createElement('div');
       document.body.append(target);
       const mounted = mountPlayer(target, { blueprint: bound('string', 'ok'), loaders });
       await settle();
-      expect(mounted.setState('v', value)).toBe(true);
+      expect(mounted.setState('v', value), value).toBe(true);
       await settle();
-      expect(violations(target)).toEqual([]);
+      expect(violations(target), value).toEqual([]);
       mounted.dispose();
     }
-  );
-
-  it.each(HOSTILE_STRINGS)('initialState %j paints nothing unsafe', async (value) => {
-    const { container } = render(Player, {
-      props: { blueprint: bound('string', 'ok'), loaders, initialState: { v: value } },
-    });
-    await settle();
-    expect(violations(container)).toEqual([]);
   });
 
-  it.each(HOSTILE_STRINGS)(
-    'a declared initial or enum value %j paints nothing unsafe',
-    async (value) => {
+  it('no hostile initialState, declared initial or enum value paints anything unsafe', async () => {
+    for (const value of HOSTILE_STRINGS) {
+      reset();
+      const initial = render(Player, {
+        props: { blueprint: bound('string', 'ok'), loaders, initialState: { v: value } },
+      });
+      await settle();
+      expect(violations(initial.container), `initialState ${value}`).toEqual([]);
+      initial.unmount();
       for (const type of ['string', 'enum'] as const) {
+        reset();
         const { container, unmount } = render(Player, {
           props: { blueprint: bound(type, value), loaders, invalidPolicy: 'preview' },
         });
         await settle();
-        expect(violations(container)).toEqual([]);
+        expect(violations(container), `${type} ${value}`).toEqual([]);
         unmount();
       }
     }
-  );
+  });
 
   it('wrong-kind values and values outside the declaration never reach a prop', async () => {
     const target = document.createElement('div');

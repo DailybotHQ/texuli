@@ -35,7 +35,7 @@ reads Playwright `ariaSnapshot()` trees of the built site and lists the three
 page-layer fixes it made. It also recorded four studio findings (theme-studio
 label in name; the playground's false preview status, long preset names and
 replaced Validation status), which T-88 fixed and pins in
-`apps/website/tests/theme-studio-label-in-name.test.ts` and
+`apps/website/tests/studios.test.ts` and
 `apps/website/tests/playground-sr.test.ts`. No screen reader was run for it.
 
 ## Focus performance
@@ -68,7 +68,8 @@ Otherwise a dark theme's light text is measured on a white Canvas.
 ## Site sweep
 
 `tests/e2e/a11y-site.spec.ts` runs axe with zero exclusions on every page of
-the built sitemap (light, dark, forced colors) and a keyboard-only walk.
+the built sitemap (light and dark; forced colors and a keyboard-only walk on
+one page per route group).
 Findings in package code are fixed in the component, never excluded or
 overridden at page level.
 

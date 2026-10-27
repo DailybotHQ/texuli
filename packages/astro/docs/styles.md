@@ -39,5 +39,5 @@ Tailwind preset from `@texuli/tokens`; that fixture does not use
 matches the CSS pipeline of your site.
 
 The exact stylesheet content is in [`src/styles.css`](../src/styles.css).
-`packages/astro/tests/integration.test.ts` checks the imports, supported
+`packages/astro/tests/astro.test.ts` checks the imports, supported
 variants, and print rule.

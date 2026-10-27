@@ -43,55 +43,70 @@ async function expectNoAxeViolations(page: Page, id: SlidesFixture) {
 const stage = (page: Page) => page.getByRole('region', { name: /^Presentation: / });
 const progress = (page: Page) => stage(page).locator('.tx-deck-stage__progress');
 
+const HALF = Math.ceil(ALL.length / 2);
+
 test.describe('a11y slides · axe', () => {
-  for (const id of ALL) {
-    test(`${id} passes axe on a light page, a dark page and a dark page on a dark OS`, async ({
+  // Each check walks its fixtures in one page session.
+  for (const batch of [ALL.slice(0, HALF), ALL.slice(HALF)]) {
+    test(`${batch.join(', ')} pass axe on a light page, a dark page and a dark page on a dark OS`, async ({
       page,
     }) => {
-      await gotoFixture(page, id, 'light');
-      await expectNoAxeViolations(page, id);
-      // A dark host page while the OS prefers light: the deck follows the page.
-      await gotoFixture(page, id, 'dark');
-      await expectNoAxeViolations(page, id);
-      await page.emulateMedia({ colorScheme: 'dark' });
-      await gotoFixture(page, id, 'dark');
-      await expectNoAxeViolations(page, id);
-    });
-  }
-
-  for (const id of TEMPLATES) {
-    test(`${id} passes axe with the overview and the presenter view open`, async ({ page }) => {
-      for (const mode of ['light', 'dark'] as const) {
-        await gotoFixture(page, id, mode);
-        await page.getByRole('button', { name: 'Overview' }).click();
-        await expect(page.getByRole('navigation', { name: 'Slides' })).toBeVisible();
-        await expectNoAxeViolations(page, id);
-        await page.getByRole('button', { name: 'Close overview' }).click();
-        await page.getByRole('button', { name: 'Presenter' }).click();
-        await expect(page.getByRole('complementary', { name: 'Speaker notes' })).toBeVisible();
-        await expectNoAxeViolations(page, id);
+      test.setTimeout(batch.length * 40_000);
+      for (const id of batch) {
+        await test.step(id, async () => {
+          await page.emulateMedia({ colorScheme: 'light' });
+          await gotoFixture(page, id, 'light');
+          await expectNoAxeViolations(page, id);
+          // A dark host page while the OS prefers light: the deck follows the page.
+          await gotoFixture(page, id, 'dark');
+          await expectNoAxeViolations(page, id);
+          await page.emulateMedia({ colorScheme: 'dark' });
+          await gotoFixture(page, id, 'dark');
+          await expectNoAxeViolations(page, id);
+        });
       }
     });
   }
 
-  for (const id of ['slides-template-report', 'slides-media-deck'] as const) {
-    test(`${id} passes axe under forced colors`, async ({ page }) => {
-      await page.emulateMedia({ forcedColors: 'active', colorScheme: 'light' });
+  test('the templates pass axe with the overview and the presenter view open', async ({ page }) => {
+    test.setTimeout(TEMPLATES.length * 40_000);
+    for (const id of TEMPLATES) {
+      for (const mode of ['light', 'dark'] as const) {
+        await test.step(`${id} (${mode})`, async () => {
+          await gotoFixture(page, id, mode);
+          await page.getByRole('button', { name: 'Overview' }).click();
+          await expect(page.getByRole('navigation', { name: 'Slides' })).toBeVisible();
+          await expectNoAxeViolations(page, id);
+          await page.getByRole('button', { name: 'Close overview' }).click();
+          await page.getByRole('button', { name: 'Presenter' }).click();
+          await expect(page.getByRole('complementary', { name: 'Speaker notes' })).toBeVisible();
+          await expectNoAxeViolations(page, id);
+        });
+      }
+    }
+  });
+
+  test('a template and the media deck pass axe under forced colors', async ({ page }) => {
+    await page.emulateMedia({ forcedColors: 'active', colorScheme: 'light' });
+    for (const id of ['slides-template-report', 'slides-media-deck'] as const) {
       await gotoFixture(page, id);
       await expectNoAxeViolations(page, id);
-    });
-  }
+    }
+  });
 
-  for (const id of ALL) {
-    test(`${id} reflows at 320 CSS px without horizontal scroll`, async ({ page }) => {
-      await page.setViewportSize({ width: 320, height: 640 });
+  test('every deck reflows at 320 CSS px without horizontal scroll', async ({ page }) => {
+    test.setTimeout(ALL.length * 20_000);
+    await page.setViewportSize({ width: 320, height: 640 });
+    const overflows: string[] = [];
+    for (const id of ALL) {
       await gotoFixture(page, id);
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth
       );
-      expect(overflow).toBeLessThanOrEqual(1);
-    });
-  }
+      if (overflow > 1) overflows.push(`${id}: ${overflow}px`);
+    }
+    expect(overflows).toEqual([]);
+  });
 });
 
 test.describe('a11y slides · structure and names', () => {

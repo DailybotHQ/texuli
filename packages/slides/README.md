@@ -1,6 +1,6 @@
 # @texuli/slides
 
-Validated presentation decks: a deck model of ordered slides holding
+**Layer L7: slides.** Validated presentation decks: a deck model of ordered slides holding
 `@texuli/blocks` content, catalog encodings and agent validation, a Svelte 5
 stage with a presenter view, print/PDF and PPTX export, and starter
 templates. Published to npm as `0.1.0-next.1` under the `next`
@@ -93,10 +93,10 @@ the suite, the baselines are recorded on macOS only.
 
 ## Size
 
-The package subpaths have been measured, including the stage's initial and
-deferred JavaScript, but the size budget rows still await owner review; see
-the PLAN_004 slides size audit. `pnpm size --filter slides` reports the
-numbers.
+Every subpath has its own row in `texuli.budgets.json`, and `pnpm size`
+(2026-10-26) reports each within budget: the root entry measures 43.14 of
+44.88 KiB gzip and `./stage` 19.50 of 20.31 KiB (its deferred JavaScript is
+measured too). `pnpm size --filter slides` reports the numbers.
 
 ## Accessibility
 

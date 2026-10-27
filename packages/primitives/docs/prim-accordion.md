@@ -97,13 +97,11 @@ motion, or under reduced motion, it closes on the next frame.
 
 ## Verified
 
-- `pnpm vitest run packages/primitives/tests/accordion.test.ts`: 26 tests
-  covering structure, ids, heading levels, the Tab order, `data-*`
-  attributes, single, multiple and collapsible modes, disabled items and a
-  disabled root, the keyboard rules, nested scoping, `forceMount`, the size
-  variables, the exit animation, the child snippet and consumer
-  `preventDefault`. Deliberate mutations of the toggle and navigation logic
-  fail the tests.
+- `pnpm vitest run packages/primitives/tests/composites.test.ts -t accordion`:
+  6 tests covering what the behavior suite does not drive: the missing-root
+  error, a non-collapsible open item (`aria-disabled`), nested scoping, the
+  size variables, the exit animation and a consumer `preventDefault`.
+  Structure, modes, disabled items and the keyboard rules are behavior rows.
 - **Behavior:**
   ```
   pnpm exec playwright test tests/behavior/scenarios/accordion.spec.ts

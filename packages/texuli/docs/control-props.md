@@ -35,7 +35,7 @@ not replaced. The helper is `splitControlProps` / `joinIds` in
 | `FileUpload` | the file input | `aria-*` / `data-*` only; handlers and layout stay on the drop zone |
 | `DatePicker` | — | always labeled by its required `label`, with `description` and `error` props; it takes no free attributes |
 
-Tests: `packages/texuli/tests/control-aria.test.ts`. For every component it
+Tests: `packages/texuli/tests/forms.test.ts`. For every component it
 checks that `getByRole(role, { name })` finds the control by its
 `aria-label`, that `aria-describedby` lands on it, and that axe reports no
 name or ARIA-rule violations.

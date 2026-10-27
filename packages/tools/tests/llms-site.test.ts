@@ -1,6 +1,6 @@
 // @vitest-environment node
 /// <reference types="node" />
-import { describe, expect, it } from 'vitest';
+import { expect, it } from 'vitest';
 import type { SiteLlmsSection } from '../src/llms/site.ts';
 import { formatSiteLlmsTxt } from '../src/llms/site.ts';
 
@@ -10,8 +10,9 @@ const section = (overrides: Partial<SiteLlmsSection> = {}): SiteLlmsSection => (
   ...overrides,
 });
 
-describe('formatSiteLlmsTxt', () => {
-  it('renders the convention: H1, blockquote summary, H2 sections, links', () => {
+it('formatSiteLlmsTxt renders the convention, descriptions, drops empty sections and keeps hrefs on one line', () => {
+  // renders the convention: H1, blockquote summary, H2 sections, links
+  {
     const body = formatSiteLlmsTxt({
       title: 'Texuli',
       summary: 'Small pieces. Infinite possibilities.',
@@ -20,9 +21,9 @@ describe('formatSiteLlmsTxt', () => {
     expect(body).toBe(
       `# Texuli\n\n> Small pieces. Infinite possibilities.\n\n## Guides\n\n- [Theming](https://texuli.com/guides/theming/)\n`
     );
-  });
-
-  it('carries the intro paragraph, section descriptions and link descriptions', () => {
+  }
+  // carries the intro paragraph, section descriptions and link descriptions
+  {
     const body = formatSiteLlmsTxt({
       title: 'Texuli',
       summary: 's',
@@ -45,9 +46,9 @@ describe('formatSiteLlmsTxt', () => {
     expect(body).toContain(
       '- [Theming](https://texuli.com/guides/theming/): Design tokens end to end.\n'
     );
-  });
-
-  it('drops empty sections and collapses line breaks to single lines', () => {
+  }
+  // drops empty sections and collapses line breaks to single lines
+  {
     const body = formatSiteLlmsTxt({
       title: 'Texuli',
       summary: 's',
@@ -70,9 +71,9 @@ describe('formatSiteLlmsTxt', () => {
     expect(body).toContain('- [Broken title](https://texuli.com/a/): broken description');
     expect(body.endsWith('\n')).toBe(true);
     expect(body.includes('\r')).toBe(false);
-  });
-
-  it('percent-encodes whitespace, newlines and parentheses in hrefs so a list item stays one line', () => {
+  }
+  // percent-encodes whitespace, newlines and parentheses in hrefs so a list item stays one line
+  {
     const body = formatSiteLlmsTxt({
       title: 'Texuli',
       summary: 's',
@@ -95,5 +96,5 @@ describe('formatSiteLlmsTxt', () => {
     const lines = body.split('\n').filter((line) => line.startsWith('- '));
     expect(lines).toHaveLength(3);
     for (const line of lines) expect(line).toMatch(/^- \[[^\]]+\]\([^\s()]+\)$/);
-  });
+  }
 });

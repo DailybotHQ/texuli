@@ -3,7 +3,6 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 
 /*
@@ -70,8 +69,6 @@ async function visit(page: Page, path: string) {
   return foreign;
 }
 
-const mode = (page: Page) => page.locator('html').getAttribute('data-tx-mode');
-
 test.describe('texuli.com docs shell', () => {
   test('sidebar marks the current page and pager moves in reading order', async ({ page }) => {
     expect(await visit(page, '/docs-shell/')).toEqual([]);
@@ -106,15 +103,15 @@ test.describe('texuli.com docs shell', () => {
 
   // PLAN_006 P2-3: the side-column TOC shows from 64rem (it never did: the
   // base display:none rule came after the media query) and stays the only one.
-  for (const width of [1100, 1400]) {
-    test(`exactly one visible "On this page" navigation at ${width}px`, async ({ page }) => {
+  test(`exactly one visible "On this page" navigation at 1100 and 1400px`, async ({ page }) => {
+    for (const width of [1100, 1400]) {
       await page.setViewportSize({ width, height: 900 });
       await visit(page, '/docs-shell/');
       const tocs = page.getByRole('navigation', { name: 'On this page' });
       await expect(tocs).toHaveCount(1);
       await expect(tocs.first().locator('a[href="#static-and-local"]')).toBeVisible();
-    });
-  }
+    }
+  });
 
   test('mobile menu lists the same destinations without foreign requests', async ({
     page,
@@ -137,17 +134,6 @@ test.describe('texuli.com docs shell', () => {
     }
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on docs pages (${scheme})`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: scheme });
-      for (const path of DOCS_PATHS) {
-        await visit(page, path);
-        expect(await mode(page)).toBe(scheme);
-        const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-          .analyze();
-        expect(results.violations.map((v) => `${path} ${v.id}`)).toEqual([]);
-      }
-    });
-  }
+  // axe on the docs pages in light and dark (zero exclusions) runs in the page sweep,
+  // a11y-site.spec.ts.
 });

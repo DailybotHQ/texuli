@@ -165,19 +165,17 @@ positioning code is bundled.
 ## Tests
 
 ```bash
-pnpm vitest run packages/primitives/tests/sheet.test.ts
+pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/overlays.test.ts
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/sheet.spec.ts
 ```
 
-**Unit** (15 tests) cover:
-- the drag rules;
-- the modal sheet on a side: name, `aria-modal`, focus, inert, Escape and
-  restore;
-- the non-modal panel: focus in, page usable, Escape only from inside, restore;
-- drawer drag: spring back, dismiss, follow and clamp, cancel, snap points by
-  drag and by handle, flick versus hold, top-drawer mirroring, fields, the
-  swallowed click, the decorative grip;
-- the responsive modal on wide and phone screens.
+**Unit** (10 tests, `-t sheet`) cover:
+- the drag rules: logical sides by direction, snap-point projection;
+- the panel dismissal options (FIX-sheet-dismiss-outside): outside press,
+  outside focus, `closeOnEscape`, and the defaults that leave it open;
+- drawer drag: flick versus hold, top-drawer mirroring and fields, the
+  swallowed click;
+- the responsive modal on phone screens.
 
 **Browser** (Chromium, WebKit, Pixel 7) covers:
 - the sheet's focus trap, Escape and restore, and its backdrop press;
@@ -218,7 +216,7 @@ read when the panel opens.
   it is placed, because moving a focused node blurs it in browsers. Before
   this fix, a dialog mounted with `open` (for example a lazily imported
   command palette) ended with focus on `body`.
-- **Tests:** `packages/primitives/tests/dialog-contained-focus.test.ts`
+- **Tests:** `packages/primitives/tests/overlays.test.ts`
   (dialog, alert dialog and sheet), plus the behavior rows
   `contained-backdrop-under-content` and `mounted-open-keeps-focus` in
   `tests/behavior/scenarios/dialog.spec.ts`.

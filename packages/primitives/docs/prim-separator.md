@@ -72,14 +72,12 @@ budget of ≤ 1 KB and the default 4 KiB for a primitive.
 ## Tests
 
 ```bash
-pnpm vitest run packages/primitives/tests/separator.test.ts
+pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/composites.test.ts
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/separator.spec.ts
 ```
 
-The 10 unit tests cover:
-- the attribute rules (default, vertical, decorative, unknown orientation);
-- rendering;
-- decorative hiding;
+The 4 unit tests (`-t separator`) cover:
+- the attribute rules (decorative hiding in either orientation, unknown
+  orientation);
 - authoritative semantics over passed-through attributes;
-- `ref`;
 - the `child` snippet.

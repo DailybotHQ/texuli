@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
-import { defineRows, gotoScenario, scenario } from '../harness/index.ts';
+import { expect } from '@playwright/test';
+import { defineRows, scenario } from '../harness/index.ts';
 
 const listbox = (page: import('@playwright/test').Page, name = 'Colors') =>
   page.getByRole('listbox', { name, exact: true });
@@ -98,12 +98,14 @@ scenario(
         expect(result.violations).toEqual([]);
       },
     },
+    {
+      id: 'touch-selects',
+      title: 'selects by touch on the phone',
+      projects: ['mobile'],
+      async run({ page }) {
+        await option(page, 'Jade').tap();
+        expect(await isSelected(option(page, 'Jade'))).toBe(true);
+      },
+    },
   ])
 );
-
-test('listbox selects by touch on Pixel 7', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile', 'Touch input is exercised on the Pixel 7 project.');
-  await gotoScenario(page, 'listbox');
-  await option(page, 'Jade').tap();
-  expect(await isSelected(option(page, 'Jade'))).toBe(true);
-});

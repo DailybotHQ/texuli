@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Import:** `import { Button, IconButton, ButtonGroup } from 'texuli/button'`  
-**Tests:** `packages/texuli/tests/button.test.ts`  
+**Tests:** `packages/texuli/tests/forms.test.ts`, `packages/texuli/tests/contracts.test.ts`  
 **Example:** `texuli-button` (`packages/examples/src/button/`)
 
 ## Contract
@@ -28,7 +28,7 @@ Styled controls on the `--tx-*` token contract and `@layer tx.components`:
 `label` (optional string) gives the button plain text without a snippet. It is
 rendered as escaped text (never markup), and a non-empty `label` replaces
 `children` when both are given; an empty or missing `label` keeps `children`.
-Tested in `packages/texuli/tests/label-prop.test.ts`.
+Tested in `packages/texuli/tests/forms.test.ts`.
 
 ```svelte
 <Button type="submit" label="Save changes" />

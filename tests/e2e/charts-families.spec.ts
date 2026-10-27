@@ -110,39 +110,44 @@ test.describe('accessible data tables by keyboard', () => {
     await expect(table).toHaveCount(0);
   });
 
-  for (const id of [
-    'charts-part-whole',
-    'charts-matrix',
-    'charts-flow',
-    'charts-geo',
-    'charts-compact',
-    'charts-histogram',
-    'charts-statistical',
-  ]) {
-    test(`${id}: Tab reaches each data-table disclosure and Enter opens it`, async ({ page }) => {
-      const host = await openExample(page, id);
-      const summaries = host.locator('details > summary');
-      const count = await summaries.count();
-      expect(count, `${id} renders data-table disclosures`).toBeGreaterThan(0);
-      const summary = summaries.first();
-      const details = host.locator('details').first();
+  test('Tab reaches each data-table disclosure and Enter opens it, in every family', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    for (const id of [
+      'charts-part-whole',
+      'charts-matrix',
+      'charts-flow',
+      'charts-geo',
+      'charts-compact',
+      'charts-histogram',
+      'charts-statistical',
+    ]) {
+      await test.step(id, async () => {
+        const host = await openExample(page, id);
+        const summaries = host.locator('details > summary');
+        const count = await summaries.count();
+        expect(count, `${id} renders data-table disclosures`).toBeGreaterThan(0);
+        const summary = summaries.first();
+        const details = host.locator('details').first();
 
-      // Reach the disclosure with Tab from the element just before it.
-      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
-      await summary.focus();
-      await page.keyboard.press('Shift+Tab');
-      await page.keyboard.press('Tab');
-      await expect(summary).toBeFocused();
+        // Reach the disclosure with Tab from the element just before it.
+        await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+        await summary.focus();
+        await page.keyboard.press('Shift+Tab');
+        await page.keyboard.press('Tab');
+        await expect(summary).toBeFocused();
 
-      await page.keyboard.press('Enter');
-      await expect(details).toHaveAttribute('open', '');
-      const table = details.locator('table');
-      await expect(table).toBeVisible();
-      await expect(table.locator('tbody tr').first()).toBeVisible();
-      await page.keyboard.press('Enter');
-      await expect(details).not.toHaveAttribute('open', '');
-    });
-  }
+        await page.keyboard.press('Enter');
+        await expect(details).toHaveAttribute('open', '');
+        const table = details.locator('table');
+        await expect(table).toBeVisible();
+        await expect(table.locator('tbody tr').first()).toBeVisible();
+        await page.keyboard.press('Enter');
+        await expect(details).not.toHaveAttribute('open', '');
+      });
+    }
+  });
 });
 
 test.describe('canvas renderer', () => {

@@ -11,7 +11,7 @@
 | --- | --- | --- |
 | Ported library (`@texuli/tokens/library`) | 64 | Unchanged; still the industry/brand/HC/colorblind/seasonal/mono catalog |
 | Expanded set (`@texuli/tokens/library-expand`) | **146** | 6 Protoyard built-ins + 140 curated |
-| **Full catalog** | **210** | `FULL_THEME_LIBRARY_META` = port ∪ expand |
+| **Full catalog** | **210** | `await getFullThemeLibraryMeta()` = port ∪ expand (the deprecated sync `FULL_THEME_LIBRARY_META` is the 146 expand entries only) |
 
 ## Protoyard built-in ports (first six expand entries)
 
@@ -48,13 +48,14 @@ Solid fills are dual-safe for outline ink on page surfaces (component AA). No AP
 import {
   BUILTIN_PRESET_IDS,
   EXPAND_THEME_LIBRARY_META,
-  FULL_THEME_LIBRARY_META,
+  getFullThemeLibraryMeta,
   listFullThemeLibrary,
   loadExpandTheme,
   loadFullLibraryTheme,
   searchFullThemeLibrary,
 } from '@texuli/tokens/library-expand';
 
+await getFullThemeLibraryMeta(); // all 210 themes, port first
 await loadExpandTheme('violet');
 await loadFullLibraryTheme('harbor-teal'); // port id still works
 ```

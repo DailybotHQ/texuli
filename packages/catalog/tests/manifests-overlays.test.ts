@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { readdir } from 'node:fs/promises';
-import { describe, expect, it } from 'vitest';
+import { expect, it } from 'vitest';
 import { buildCatalog } from '../src/build/index.ts';
 import { discoverManifestGroups, MANIFESTS_DIR } from '../src/build/node.ts';
 import {
@@ -23,36 +23,31 @@ function expectPropsMatch(manifestId: OverlaysManifestId, names: readonly string
   expect(schemaNames).toEqual([...names].sort());
 }
 
-describe('overlays manifests', () => {
-  it('validates every overlay/navigation manifest as a closed set', () => {
+it('overlay manifests are a closed, frozen, never-emittable set with schema parity, discovered without a build change', async () => {
+  // validates every overlay/navigation manifest as a closed set
+  {
     const result = validateCatalogManifests(OVERLAYS_MANIFESTS);
     expect(result.diagnostics, JSON.stringify(result.diagnostics, null, 2)).toEqual([]);
     expect(result.valid).toBe(true);
     expect(OVERLAYS_MANIFESTS.length).toBe(Object.keys(OVERLAYS_PROP_NAMES).length);
     expect(new Set(OVERLAYS_MANIFESTS.map((m) => m.id)).size).toBe(OVERLAYS_MANIFESTS.length);
-  });
-
-  it('keeps every entry frozen, app-tier, and never agent-emittable', () => {
-    for (const manifest of OVERLAYS_MANIFESTS) {
-      expect(isCatalogManifest(manifest)).toBe(true);
-      expect(Object.isFrozen(manifest)).toBe(true);
-      expect(manifest.package).toBe('texuli');
-      expect(manifest.tier).toBe('app');
-      expect(manifest.agentEmittable).toBe(false);
-      expect(manifest.useWhen.length).toBeGreaterThan(0);
-      expect(manifest.dontUseWhen.length).toBeGreaterThan(0);
-      expect(manifest.examples.length).toBeGreaterThan(0);
-      expect(validateCatalogManifest(manifest).valid).toBe(true);
-    }
-  });
-
-  it('matches each component prop surface to its schema (type parity)', () => {
-    for (const [id, names] of Object.entries(OVERLAYS_PROP_NAMES)) {
-      expectPropsMatch(id as OverlaysManifestId, names);
-    }
-  });
-
-  it('documents Dialog props used by Dialog.svelte', () => {
+  }
+  for (const manifest of OVERLAYS_MANIFESTS) {
+    expect(isCatalogManifest(manifest)).toBe(true);
+    expect(Object.isFrozen(manifest)).toBe(true);
+    expect(manifest.package).toBe('texuli');
+    expect(manifest.tier).toBe('app');
+    expect(manifest.agentEmittable).toBe(false);
+    expect(manifest.useWhen.length).toBeGreaterThan(0);
+    expect(manifest.dontUseWhen.length).toBeGreaterThan(0);
+    expect(manifest.examples.length).toBeGreaterThan(0);
+    expect(validateCatalogManifest(manifest).valid).toBe(true);
+  }
+  for (const [id, names] of Object.entries(OVERLAYS_PROP_NAMES)) {
+    expectPropsMatch(id as OverlaysManifestId, names);
+  }
+  // documents Dialog props used by Dialog.svelte
+  {
     type DialogProp = (typeof dialogPropNames)[number];
     const required: DialogProp[] = [
       'open',
@@ -68,9 +63,9 @@ describe('overlays manifests', () => {
       'class',
     ];
     expect(required).toEqual([...OVERLAYS_PROP_NAMES.dialog]);
-  });
-
-  it('rejects unknown example props against the schema', () => {
+  }
+  // rejects unknown example props against the schema
+  {
     const dialog = OVERLAYS_MANIFESTS.find((m) => m.id === 'dialog')!;
     const broken = {
       ...dialog,
@@ -79,9 +74,9 @@ describe('overlays manifests', () => {
     const result = validateCatalogManifest(broken);
     expect(result.valid).toBe(false);
     expect(result.diagnostics.some((d) => d.code === 'unknown-prop')).toBe(true);
-  });
-
-  it('appears in discoverManifestGroups without changing the catalog build', async () => {
+  }
+  // appears in discoverManifestGroups without changing the catalog build
+  {
     const folders = (await readdir(MANIFESTS_DIR, { withFileTypes: true }))
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
@@ -104,5 +99,5 @@ describe('overlays manifests', () => {
     for (const id of build.catalog.groups.overlays ?? []) {
       expect(build.catalog.tiers.untrusted).not.toContain(id);
     }
-  });
+  }
 });

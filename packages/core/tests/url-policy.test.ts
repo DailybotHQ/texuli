@@ -9,17 +9,6 @@ import {
 } from '../src/index.ts';
 
 describe('safeHref', () => {
-  it('rejects executable and smuggling schemes in every tier', () => {
-    for (const trust of ['developer', 'untrusted'] as const) {
-      expect(safeHref('javascript:alert(1)', trust)).toBeUndefined();
-      expect(safeHref(' JaVaScRiPt:alert(1)', trust)).toBeUndefined();
-      expect(safeHref('java\tscript:alert(1)', trust)).toBeUndefined();
-      expect(safeHref('vbscript:msgbox(1)', trust)).toBeUndefined();
-      expect(safeHref('data:text/html,<b>x</b>', trust)).toBeUndefined();
-      expect(safeHref('//evil.example/path', trust)).toBeUndefined();
-    }
-  });
-
   it('refuses every slash/backslash authority prefix in every tier (S-10)', () => {
     // Browsers treat `\` like `/` in special URLs, so each of these opens
     // another origin (`/\evil.example` resolves to `https://evil.example/`).
@@ -53,21 +42,26 @@ describe('safeHref', () => {
     expect(safeImageSrc('/assets/a.png', 'developer')).toBe('/assets/a.png');
     expect(safeMediaSrc('/media/a.mp4', 'developer')).toBe('/media/a.mp4');
   });
-
-  it('keeps same-document fragments in every tier', () => {
+  it('rejects executable and smuggling schemes in every tier, and 3 related cases', () => {
+    // rejects executable and smuggling schemes in every tier
+    for (const trust of ['developer', 'untrusted'] as const) {
+      expect(safeHref('javascript:alert(1)', trust)).toBeUndefined();
+      expect(safeHref(' JaVaScRiPt:alert(1)', trust)).toBeUndefined();
+      expect(safeHref('java\tscript:alert(1)', trust)).toBeUndefined();
+      expect(safeHref('vbscript:msgbox(1)', trust)).toBeUndefined();
+      expect(safeHref('data:text/html,<b>x</b>', trust)).toBeUndefined();
+      expect(safeHref('//evil.example/path', trust)).toBeUndefined();
+    }
+    // keeps same-document fragments in every tier
     expect(safeHref('#section-2')).toBe('#section-2');
     expect(safeHref('#section-2', 'developer')).toBe('#section-2');
-  });
-
-  it('allows only https and mailto for untrusted content', () => {
+    // allows only https and mailto for untrusted content
     expect(safeHref('https://example.com/a')).toBe('https://example.com/a');
     expect(safeHref('mailto:team@example.com')).toBe('mailto:team@example.com');
     expect(safeHref('http://example.com')).toBeUndefined();
     expect(safeHref('/docs/button')).toBeUndefined();
     expect(safeHref('tel:+15550100')).toBeUndefined();
-  });
-
-  it('allows relative paths and other schemes from developers', () => {
+    // allows relative paths and other schemes from developers
     expect(safeHref('/docs/button', 'developer')).toBe('/docs/button');
     expect(safeHref('http://localhost:4321', 'developer')).toBe('http://localhost:4321');
     expect(safeHref('tel:+15550100', 'developer')).toBe('tel:+15550100');
@@ -81,15 +75,14 @@ describe('safeHref', () => {
 });
 
 describe('safeImageSrc', () => {
-  it('allows HTTPS and relative assets for untrusted images', () => {
+  it('allows HTTPS and relative assets for untrusted images, and 3 related cases', () => {
+    // allows HTTPS and relative assets for untrusted images
     expect(safeImageSrc('https://cdn.example.test/image.webp')).toBe(
       'https://cdn.example.test/image.webp'
     );
     expect(safeImageSrc('/assets/image.webp')).toBe('/assets/image.webp');
     expect(safeImageSrc('./assets/image.webp')).toBe('./assets/image.webp');
-  });
-
-  it('limits developer sources to image-safe URL forms', () => {
+    // limits developer sources to image-safe URL forms
     expect(safeImageSrc('http://localhost/image.png', 'developer')).toBe(
       'http://localhost/image.png'
     );
@@ -100,9 +93,7 @@ describe('safeImageSrc', () => {
     expect(
       safeImageSrc('https://user:password@example.test/image.png', 'developer')
     ).toBeUndefined();
-  });
-
-  it('rejects unsafe schemes, protocol-relative paths and browser-normalized characters', () => {
+    // rejects unsafe schemes, protocol-relative paths and browser-normalized characters
     for (const value of [
       'javascript:alert(1)',
       'vbscript:msgbox(1)',
@@ -114,19 +105,21 @@ describe('safeImageSrc', () => {
     ]) {
       expect(safeImageSrc(value)).toBeUndefined();
     }
-  });
+    {
+      // allows only bounded base64 raster data images from developers
+      const smallPng = 'data:image/png;base64,iVBORw0KGgo=';
+      expect(safeImageSrc(smallPng, 'developer')).toBe(smallPng);
+      expect(safeImageSrc(smallPng)).toBeUndefined();
+      expect(safeImageSrc('data:image/svg+xml;base64,PHN2Zz4=', 'developer')).toBeUndefined();
+      expect(safeImageSrc('data:text/html;base64,PGI+eDwvYj4=', 'developer')).toBeUndefined();
 
-  it('allows only bounded base64 raster data images from developers', () => {
-    const smallPng = 'data:image/png;base64,iVBORw0KGgo=';
-    expect(safeImageSrc(smallPng, 'developer')).toBe(smallPng);
-    expect(safeImageSrc(smallPng)).toBeUndefined();
-    expect(safeImageSrc('data:image/svg+xml;base64,PHN2Zz4=', 'developer')).toBeUndefined();
-    expect(safeImageSrc('data:text/html;base64,PGI+eDwvYj4=', 'developer')).toBeUndefined();
-
-    const atLimitPayload = `${'A'.repeat(4 * Math.ceil(MAX_DATA_IMAGE_BYTES / 3) - 2)}==`;
-    expect(safeImageSrc(`data:image/png;base64,${atLimitPayload}`, 'developer')).toBeDefined();
-    const overLimitPayload = 'A'.repeat(4 * Math.ceil((MAX_DATA_IMAGE_BYTES + 1) / 3));
-    expect(safeImageSrc(`data:image/png;base64,${overLimitPayload}`, 'developer')).toBeUndefined();
+      const atLimitPayload = `${'A'.repeat(4 * Math.ceil(MAX_DATA_IMAGE_BYTES / 3) - 2)}==`;
+      expect(safeImageSrc(`data:image/png;base64,${atLimitPayload}`, 'developer')).toBeDefined();
+      const overLimitPayload = 'A'.repeat(4 * Math.ceil((MAX_DATA_IMAGE_BYTES + 1) / 3));
+      expect(
+        safeImageSrc(`data:image/png;base64,${overLimitPayload}`, 'developer')
+      ).toBeUndefined();
+    }
   });
 
   it('fails closed for malformed input and invalid trust values', () => {
@@ -139,8 +132,8 @@ describe('safeImageSrc', () => {
 
 describe('safeMediaSrc', () => {
   const options = { allowedOrigins: ['https://media.example.test'] };
-
-  it('allows only blob URLs and exact allowlisted HTTPS origins for untrusted media', () => {
+  it('allows only blob URLs and exact allowlisted HTTPS origins for untrusted media, and 3 related cases', () => {
+    // allows only blob URLs and exact allowlisted HTTPS origins for untrusted media
     expect(safeMediaSrc('blob:https://app.example.test/clip-id')).toBe(
       'blob:https://app.example.test/clip-id'
     );
@@ -154,9 +147,7 @@ describe('safeMediaSrc', () => {
       safeMediaSrc('https://other.example.test/demo.mp4', 'untrusted', options)
     ).toBeUndefined();
     expect(safeMediaSrc('https://media.example.test/demo.mp4')).toBeUndefined();
-  });
-
-  it('rejects insecure, relative, executable and data URLs from untrusted media', () => {
+    // rejects insecure, relative, executable and data URLs from untrusted media
     for (const value of [
       'http://media.example.test/demo.mp4',
       '/demo.mp4',
@@ -167,17 +158,13 @@ describe('safeMediaSrc', () => {
     ]) {
       expect(safeMediaSrc(value, 'untrusted', options)).toBeUndefined();
     }
-  });
-
-  it('permits developer-authored HTTP and relative assets but never data media', () => {
+    // permits developer-authored HTTP and relative assets but never data media
     expect(safeMediaSrc('http://localhost/demo.mp4', 'developer')).toBe(
       'http://localhost/demo.mp4'
     );
     expect(safeMediaSrc('./media/demo.mp4', 'developer')).toBe('./media/demo.mp4');
     expect(safeMediaSrc('data:video/mp4;base64,AAAA', 'developer')).toBeUndefined();
-  });
-
-  it('ignores malformed allowlist entries and rejects malformed input', () => {
+    // ignores malformed allowlist entries and rejects malformed input
     expect(
       safeMediaSrc('https://media.example.test/demo.mp4', 'untrusted', {
         allowedOrigins: ['https://media.example.test/path', 'http://media.example.test'],
@@ -191,7 +178,8 @@ describe('safeMediaSrc', () => {
 });
 
 describe('safeImageSrcset', () => {
-  it('keeps valid density and width candidate sets', () => {
+  it('keeps valid density and width candidate sets; rejects the whole set when any candidate or descriptor is unsafe', () => {
+    // keeps valid density and width candidate sets
     expect(safeImageSrcset('/small.webp 1x, /large.webp 2x')).toBe(
       '/small.webp 1x, /large.webp 2x'
     );
@@ -199,9 +187,7 @@ describe('safeImageSrcset', () => {
       '/small.webp 320w, /large.webp 640w'
     );
     expect(safeImageSrcset('/one.webp, /two.webp 2x')).toBe('/one.webp, /two.webp 2x');
-  });
-
-  it('rejects the whole set when any candidate or descriptor is unsafe', () => {
+    // rejects the whole set when any candidate or descriptor is unsafe
     for (const value of [
       '/safe.webp 1x, javascript:alert(1) 2x',
       '/safe.webp 1x, /other.webp 640w',
@@ -319,15 +305,13 @@ describe('resolveTrust: an unknown trust value fails closed to untrusted', () =>
     media: ['https://media.example.test/demo.mp4'],
     srcset: ['images/a.png 1x, https://example.com/b.png 2x'],
   };
-
-  it('maps only the exact string "developer" to developer', () => {
+  it('maps only the exact string "developer" to developer, and 2 related cases', () => {
+    // maps only the exact string "developer" to developer
     expect(resolveTrust('developer')).toBe('developer');
     expect(resolveTrust('untrusted')).toBe('untrusted');
     expect(resolveTrust(undefined)).toBe('untrusted');
     for (const value of odd) expect(resolveTrust(value), String(value)).toBe('untrusted');
-  });
-
-  it('confirms the developer-only inputs really differ between the tiers', () => {
+    // confirms the developer-only inputs really differ between the tiers
     for (const value of developerOnly.href) {
       expect(safeHref(value, 'developer'), value).toBe(value);
       expect(safeHref(value, 'untrusted'), value).toBeUndefined();
@@ -339,30 +323,36 @@ describe('resolveTrust: an unknown trust value fails closed to untrusted', () =>
     for (const value of developerOnly.srcset) {
       expect(safeImageSrcset(value, 'developer'), value).toBeDefined();
     }
-  });
-
-  it.each(odd.map((value) => [JSON.stringify(value) ?? String(value), value]))(
-    'judges every URL policy with trust %s exactly as untrusted',
-    (_label, value) => {
+    // judges every URL policy with each odd trust value exactly as untrusted
+    for (const [label, value] of odd.map((value) => [
+      JSON.stringify(value) ?? String(value),
+      value,
+    ])) {
       const trust = value as never;
       for (const href of [...developerOnly.href, ...untrustedOk.href]) {
-        expect(safeHref(href, trust), href).toBe(safeHref(href, 'untrusted'));
+        expect(safeHref(href, trust), `${label} ${href}`).toBe(safeHref(href, 'untrusted'));
       }
-      for (const href of developerOnly.href) expect(safeHref(href, trust), href).toBeUndefined();
+      for (const href of developerOnly.href)
+        expect(safeHref(href, trust), `${label} ${href}`).toBeUndefined();
       for (const src of [...developerOnly.image, ...untrustedOk.image]) {
-        expect(safeImageSrc(src, trust), src).toBe(safeImageSrc(src, 'untrusted'));
+        expect(safeImageSrc(src, trust), `${label} ${src}`).toBe(safeImageSrc(src, 'untrusted'));
       }
-      for (const src of untrustedOk.image) expect(safeImageSrc(src, trust), src).toBe(src);
+      for (const src of untrustedOk.image)
+        expect(safeImageSrc(src, trust), `${label} ${src}`).toBe(src);
       for (const src of [...developerOnly.media, ...untrustedOk.media]) {
-        expect(safeMediaSrc(src, trust, media), src).toBe(safeMediaSrc(src, 'untrusted', media));
+        expect(safeMediaSrc(src, trust, media), `${label} ${src}`).toBe(
+          safeMediaSrc(src, 'untrusted', media)
+        );
       }
       for (const src of developerOnly.media)
-        expect(safeMediaSrc(src, trust, media), src).toBeUndefined();
+        expect(safeMediaSrc(src, trust, media), `${label} ${src}`).toBeUndefined();
       for (const set of [...developerOnly.srcset, ...untrustedOk.srcset]) {
-        expect(safeImageSrcset(set, trust), set).toBe(safeImageSrcset(set, 'untrusted'));
+        expect(safeImageSrcset(set, trust), `${label} ${set}`).toBe(
+          safeImageSrcset(set, 'untrusted')
+        );
       }
       for (const set of developerOnly.srcset)
-        expect(safeImageSrcset(set, trust), set).toBeUndefined();
+        expect(safeImageSrcset(set, trust), `${label} ${set}`).toBeUndefined();
     }
-  );
+  });
 });

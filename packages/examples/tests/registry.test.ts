@@ -37,10 +37,6 @@ describe('defineExample', () => {
     expect(Object.isFrozen(entry)).toBe(true);
     expect(getExample('demo-button')).toBe(entry);
     expect(listExampleIds()).toEqual(['demo-button']);
-  });
-
-  it('rejects a duplicate id', () => {
-    defineExample(sample());
     expect(() => defineExample(sample())).toThrow(/already registered/);
   });
 

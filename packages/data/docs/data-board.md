@@ -4,7 +4,7 @@
 **Lazy subpath:** `@texuli/data/board`
 **Engine:** `packages/data/src/engines/board/` (framework-free, also `./board/engine`)
 **View:** `packages/data/src/board/`
-**Tests:** `packages/data/tests/board.test.ts`, `packages/data/tests/board-engine.test.ts`
+**Tests:** `packages/data/tests/board.test.ts`, `packages/data/tests/engines.test.ts`
 **Example:** `data-board`
 
 ## Goal

@@ -60,14 +60,14 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/component-pages/button/',
     reason:
-      'The first live Button demo mounts on open: its frame with real controls, then only the Button stage family (the props panel and other demos mount on scroll): 104.8 KB page, 67.6 KB JS. CLS room for the eager island mount.',
-    budget: { pageGzipKb: 112, jsGzipKb: 72, cls: 0.15 },
+      'The first live Button demo mounts on open: its frame with real controls, then only the Button stage family (the props panel and other demos mount on scroll): 104.8 KB page, 67.6 KB JS at first; 72.5 KB JS measured 2026-10-27, so the owner raised the JS cap to 76 (measured + 4%, PLAN_006 follow-up). CLS room for the eager island mount.',
+    budget: { pageGzipKb: 112, jsGzipKb: 76, cls: 0.15 },
   },
   {
     route: '/component-pages/charts-pie/',
     reason:
-      'The first live demo is a chart: the chart stage family and the part-whole chart chunk load on open: 113.9 KB page, 77.5 KB JS (104.4 KB JS before per-family stages).',
-    budget: { pageGzipKb: 120, jsGzipKb: 80, cls: 0.15 },
+      'The first live demo is a chart: the chart stage family and the part-whole chart chunk load on open: 113.9 KB page, 77.5 KB JS (104.4 KB JS before per-family stages); 124 KB page, 85.8 KB JS measured 2026-10-27, so the owner raised the caps to 132 and 92 (measured + 4%, rounded up to 4 KB; PLAN_006 follow-up).',
+    budget: { pageGzipKb: 132, jsGzipKb: 92, cls: 0.15 },
   },
   {
     route: '/charts-page/',

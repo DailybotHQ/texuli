@@ -96,7 +96,7 @@ lazily per id.
 ## Verified
 
 - **Unit tests:** `pnpm vitest run packages/tools/tests/elements.test.ts` has
-  19 tests (happy-dom).
+  6 grouped tests (happy-dom).
   - Tags, JSON parsing, and full preset coverage: every content manifest has a
     spec and a loader, and every loader resolves.
   - Idempotent definition, prefixes, and the tier (markup cannot raise it).

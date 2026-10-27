@@ -48,56 +48,60 @@ describe('BLOCK_LIMITS', () => {
 });
 
 describe('safeParseBlocks', () => {
-  it('accepts the core vocabulary and rejects unknown types', () => {
-    const blocks = [
-      { type: 'heading', level: 1, text: 'Hello' },
-      { type: 'text', markdown: 'A **safe** paragraph.' },
-      { type: 'list', items: [{ text: 'One' }, { text: 'Two' }] },
-      { type: 'divider' },
-      {
-        type: 'cta',
-        actions: [{ label: 'Docs', href: 'https://example.com/docs' }],
-      },
-    ];
-    const parsed = safeParseBlocks(blocks);
-    expect(parsed.success).toBe(true);
-    if (parsed.success) expect(parsed.data).toHaveLength(5);
+  it('accepts the core vocabulary and rejects unknown types; refuses javascript hrefs on cta actions', () => {
+    {
+      // accepts the core vocabulary and rejects unknown types
+      const blocks = [
+        { type: 'heading', level: 1, text: 'Hello' },
+        { type: 'text', markdown: 'A **safe** paragraph.' },
+        { type: 'list', items: [{ text: 'One' }, { text: 'Two' }] },
+        { type: 'divider' },
+        {
+          type: 'cta',
+          actions: [{ label: 'Docs', href: 'https://example.com/docs' }],
+        },
+      ];
+      const parsed = safeParseBlocks(blocks);
+      expect(parsed.success).toBe(true);
+      if (parsed.success) expect(parsed.data).toHaveLength(5);
 
-    const bad = safeParseBlocks([{ type: 'script', code: 'alert(1)' }]);
-    expect(bad.success).toBe(false);
-  });
-
-  it('refuses javascript hrefs on cta actions', () => {
-    const parsed = safeParseBlocks([
-      {
-        type: 'cta',
-        actions: [{ label: 'X', href: 'javascript:alert(1)' }],
-      },
-    ]);
-    expect(parsed.success).toBe(false);
+      const bad = safeParseBlocks([{ type: 'script', code: 'alert(1)' }]);
+      expect(bad.success).toBe(false);
+    }
+    {
+      // refuses javascript hrefs on cta actions
+      const parsed = safeParseBlocks([
+        {
+          type: 'cta',
+          actions: [{ label: 'X', href: 'javascript:alert(1)' }],
+        },
+      ]);
+      expect(parsed.success).toBe(false);
+    }
   });
 });
 
 describe('parseUntrustedBlocks', () => {
-  it('round-trips valid core blocks from objects and JSON text', () => {
-    const blocks = [
-      { type: 'heading', level: 2, text: 'Section' },
-      { type: 'text', markdown: 'Body line one.\n\nBody line two.' },
-      { type: 'code', lang: 'ts', code: 'const n = 1;\n' },
-      {
-        type: 'columns',
-        columns: [[{ type: 'text', markdown: 'Left' }], [{ type: 'text', markdown: 'Right' }]],
-      },
-    ];
-    expect(parseUntrustedBlocks(blocks)).toEqual({ success: true, blocks, issues: [] });
-    expect(parseUntrustedBlocks(JSON.stringify(blocks))).toEqual({
-      success: true,
-      blocks,
-      issues: [],
-    });
-  });
-
-  it('rejects hostile and oversized input without throwing', () => {
+  it('round-trips valid core blocks from objects and JSON text, and 2 related cases', async () => {
+    {
+      // round-trips valid core blocks from objects and JSON text
+      const blocks = [
+        { type: 'heading', level: 2, text: 'Section' },
+        { type: 'text', markdown: 'Body line one.\n\nBody line two.' },
+        { type: 'code', lang: 'ts', code: 'const n = 1;\n' },
+        {
+          type: 'columns',
+          columns: [[{ type: 'text', markdown: 'Left' }], [{ type: 'text', markdown: 'Right' }]],
+        },
+      ];
+      expect(parseUntrustedBlocks(blocks)).toEqual({ success: true, blocks, issues: [] });
+      expect(parseUntrustedBlocks(JSON.stringify(blocks))).toEqual({
+        success: true,
+        blocks,
+        issues: [],
+      });
+    }
+    // rejects hostile and oversized input without throwing
     expect(failure('{').code).toBe('invalid-json');
     expect(failure({ type: 'divider' }).code).toBe('invalid-input');
     expect(failure(JSON.stringify([{ type: 'divider' }]), { maxBytes: 4 }).code).toBe('too-large');
@@ -112,52 +116,56 @@ describe('parseUntrustedBlocks', () => {
     expect(
       failure([{ type: 'cta', actions: [{ label: 'X', href: 'javascript:alert(1)' }] }]).code
     ).toBe('invalid-blocks');
-  });
-
-  it('strips Trojan Source and zero-width characters from text before schema', () => {
-    const result = parseUntrustedBlocks([
-      { type: 'heading', level: 2, text: 'Hello\u200B\u202EWorld' },
-    ]);
-    expect(result.success).toBe(true);
-    if (!result.success) return;
-    expect(result.blocks[0]).toEqual({ type: 'heading', level: 2, text: 'HelloWorld' });
-    expect(JSON.stringify(result.blocks)).not.toMatch(/\\u200b|\\u202e|\u200b|\u202e/i);
+    // strips Trojan Source and zero-width characters from text before schema
+    await (async () => {
+      const result = parseUntrustedBlocks([
+        { type: 'heading', level: 2, text: 'Hello\u200B\u202EWorld' },
+      ]);
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.blocks[0]).toEqual({ type: 'heading', level: 2, text: 'HelloWorld' });
+      expect(JSON.stringify(result.blocks)).not.toMatch(/\\u200b|\\u202e|\u200b|\u202e/i);
+    })();
   });
 });
 
 describe('formula AST', () => {
-  it('parses and evaluates a closed calculator expression', () => {
-    const parsed = parseFormula({
-      op: 'mul',
-      left: { op: 'var', name: 'seats' },
-      right: { op: 'num', value: 12 },
-    });
-    expect(parsed.success).toBe(true);
-    if (!parsed.success) return;
-    expect(parsed.variables).toEqual(['seats']);
-    expect(evaluateFormula(parsed.formula, { seats: 3 })).toBe(36);
-  });
-
-  it('refuses unknown ops, reserved names and cycles', () => {
-    expect(parseFormula({ op: 'eval', code: '1+1' }).success).toBe(false);
-    expect(parseFormula({ op: 'var', name: 'constructor' }).success).toBe(false);
-    const cyclic: Record<string, unknown> = { op: 'num', value: 1 };
-    cyclic.self = cyclic;
-    expect(parseFormula(cyclic).diagnostics[0]?.code).toBe('cyclic-formula');
-  });
-
-  it('flags unknown variables when a known set is provided', () => {
-    const parsed = parseFormula(
-      { op: 'add', left: { op: 'var', name: 'seats' }, right: { op: 'var', name: 'typo' } },
-      { variables: ['seats'] }
-    );
-    expect(parsed.success).toBe(false);
-    expect(parsed.diagnostics.some((d) => d.code === 'unknown-variable')).toBe(true);
+  it('parses and evaluates a closed calculator expression; refuses unknown ops, reserved names and cycles; flags unknown variables when a known set is provided', async () => {
+    // parses and evaluates a closed calculator expression
+    await (async () => {
+      const parsed = parseFormula({
+        op: 'mul',
+        left: { op: 'var', name: 'seats' },
+        right: { op: 'num', value: 12 },
+      });
+      expect(parsed.success).toBe(true);
+      if (!parsed.success) return;
+      expect(parsed.variables).toEqual(['seats']);
+      expect(evaluateFormula(parsed.formula, { seats: 3 })).toBe(36);
+    })();
+    {
+      // refuses unknown ops, reserved names and cycles
+      expect(parseFormula({ op: 'eval', code: '1+1' }).success).toBe(false);
+      expect(parseFormula({ op: 'var', name: 'constructor' }).success).toBe(false);
+      const cyclic: Record<string, unknown> = { op: 'num', value: 1 };
+      cyclic.self = cyclic;
+      expect(parseFormula(cyclic).diagnostics[0]?.code).toBe('cyclic-formula');
+    }
+    {
+      // flags unknown variables when a known set is provided
+      const parsed = parseFormula(
+        { op: 'add', left: { op: 'var', name: 'seats' }, right: { op: 'var', name: 'typo' } },
+        { variables: ['seats'] }
+      );
+      expect(parsed.success).toBe(false);
+      expect(parsed.diagnostics.some((d) => d.code === 'unknown-variable')).toBe(true);
+    }
   });
 });
 
 describe('catalog metadata', () => {
-  it('covers every core type with useWhen, dontUseWhen, limits, a11y and examples', () => {
+  it('covers every core type with useWhen, dontUseWhen, limits, a11y and examples; validateBlocksForAuthoring returns path diagnostics for bad input', () => {
+    // covers every core type with useWhen, dontUseWhen, limits, a11y and examples
     expect(listCatalogTypes().length).toBe(BLOCK_CATALOG.length);
     for (const entry of BLOCK_CATALOG) {
       expect(entry.useWhen.length).toBeGreaterThan(0);
@@ -168,12 +176,12 @@ describe('catalog metadata', () => {
       expect(safeParseBlocks([entry.exampleRich]).success).toBe(true);
       expect(getCatalogEntry(entry.type)?.label).toBe(entry.label);
     }
-  });
-
-  it('validateBlocksForAuthoring returns path diagnostics for bad input', () => {
-    const result = validateBlocksForAuthoring([{ type: 'heading', level: 9, text: 'x' }]);
-    expect(result.valid).toBe(false);
-    expect(result.diagnostics[0]?.jsonPath).toContain('$');
+    {
+      // validateBlocksForAuthoring returns path diagnostics for bad input
+      const result = validateBlocksForAuthoring([{ type: 'heading', level: 9, text: 'x' }]);
+      expect(result.valid).toBe(false);
+      expect(result.diagnostics[0]?.jsonPath).toContain('$');
+    }
   });
 });
 

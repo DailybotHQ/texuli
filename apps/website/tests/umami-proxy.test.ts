@@ -17,57 +17,60 @@ import {
 // Literal bracketed filename — the Pages catch-all route convention.
 const route = await import('../../../functions/api/umami/[[path]].ts');
 
-describe('decideUmamiProxy (the allowlist table)', () => {
-  it.each([
-    ['script.js', 'GET', { action: 'forward', upstreamPath: 'script.js', method: 'GET' }],
-    ['api/send', 'POST', { action: 'forward', upstreamPath: 'api/send', method: 'POST' }],
-    ['API/SEND', 'POST', { action: 'reject', status: 404, title: 'Not Found' }],
-  ])('decides %s %s → %j', (path, method, expected) => {
-    expect(decideUmamiProxy(path, method)).toEqual(expected);
-  });
-
-  it.each([
-    ['script.js', 'POST', 'GET'],
-    ['script.js', 'HEAD', 'GET'],
-    ['api/send', 'GET', 'POST'],
-    ['api/send', 'PUT', 'POST'],
-    ['api/send', 'DELETE', 'POST'],
-  ])('rejects %s %s with 405 (Allow: %s)', (path, method, allow) => {
-    const decision = decideUmamiProxy(path, method);
-    expect(decision).toEqual({ action: 'reject', status: 405, title: 'Method Not Allowed', allow });
-  });
-
-  it.each([[''], ['../env'], ['script.js/x'], ['api/send/extra'], ['%2e%2e%2fenv'], ['api']])(
-    'rejects the path %j outright',
-    (path) => {
-      expect(decideUmamiProxy(path, 'GET')).toEqual({
+describe('the pure filter', () => {
+  it('forwards exactly GET script.js and POST api/send; everything else is 404 or 405', () => {
+    expect(decideUmamiProxy('script.js', 'GET')).toEqual({
+      action: 'forward',
+      upstreamPath: 'script.js',
+      method: 'GET',
+    });
+    expect(decideUmamiProxy('api/send', 'POST')).toEqual({
+      action: 'forward',
+      upstreamPath: 'api/send',
+      method: 'POST',
+    });
+    for (const [path, method, allow] of [
+      ['script.js', 'POST', 'GET'],
+      ['script.js', 'HEAD', 'GET'],
+      ['api/send', 'GET', 'POST'],
+      ['api/send', 'PUT', 'POST'],
+      ['api/send', 'DELETE', 'POST'],
+    ]) {
+      expect(decideUmamiProxy(path, method), `${method} ${path}`).toEqual({
+        action: 'reject',
+        status: 405,
+        title: 'Method Not Allowed',
+        allow,
+      });
+    }
+    for (const path of ['', '../env', 'script.js/x', 'api/send/extra', '%2e%2e%2fenv', 'api']) {
+      expect(decideUmamiProxy(path, 'GET'), path).toEqual({
         action: 'reject',
         status: 404,
         title: 'Not Found',
       });
     }
-  );
-});
-
-describe('resolveUmamiProxyPath', () => {
-  it.each([
-    [undefined, ''],
-    ['script.js', 'script.js'],
-    ['/script.js', 'script.js'],
-    [['api', 'send'], 'api/send'],
-    [['/api/', 'send/'], 'api/send'],
-  ])('normalizes %j to %j', (raw, expected) => {
-    expect(resolveUmamiProxyPath(raw as string | string[] | undefined)).toBe(expected);
+    expect(decideUmamiProxy('API/SEND', 'POST')).toEqual({
+      action: 'reject',
+      status: 404,
+      title: 'Not Found',
+    });
   });
-});
 
-describe('cache-control and problem bodies', () => {
-  it('caches the tracker script long and beacons never', () => {
+  it('normalizes the catch-all path, sets cache-control and renders RFC 9457 bodies', () => {
+    for (const [raw, expected] of [
+      [undefined, ''],
+      ['script.js', 'script.js'],
+      ['/script.js', 'script.js'],
+      [['api', 'send'], 'api/send'],
+      [['/api/', 'send/'], 'api/send'],
+    ] as const) {
+      expect(resolveUmamiProxyPath(raw as string | string[] | undefined), String(raw)).toBe(
+        expected
+      );
+    }
     expect(getUmamiProxyCacheControl('script.js')).toContain('max-age=86400');
     expect(getUmamiProxyCacheControl('api/send')).toBe('no-store');
-  });
-
-  it('renders RFC 9457 problem bodies', () => {
     expect(umamiProxyProblem(404, 'Not Found')).toBe(
       '{"type":"about:blank","title":"Not Found","status":404}'
     );
@@ -144,20 +147,14 @@ describe('the route handler (functions/api/umami/[[path]].ts)', () => {
     expect(headers.get('authorization')).toBeNull();
   });
 
-  it('renders 404 problem+json for non-allowlisted paths', async () => {
-    const response = await route.onRequest(
-      ctx('../env', 'GET', { UMAMI_ENDPOINT_ORIGIN: 'https://cloud.example.com' })
-    );
-    expect(response.status).toBe(404);
-    expect(response.headers.get('content-type')).toBe('application/problem+json');
-  });
-
-  it('renders 405 with Allow for wrong methods', async () => {
-    const response = await route.onRequest(
-      ctx('script.js', 'POST', { UMAMI_ENDPOINT_ORIGIN: 'https://cloud.example.com' })
-    );
-    expect(response.status).toBe(405);
-    expect(response.headers.get('allow')).toBe('GET');
+  it('renders 404 problem+json for non-allowlisted paths and 405 with Allow for wrong methods', async () => {
+    const env = { UMAMI_ENDPOINT_ORIGIN: 'https://cloud.example.com' };
+    const notFound = await route.onRequest(ctx('../env', 'GET', env));
+    expect(notFound.status).toBe(404);
+    expect(notFound.headers.get('content-type')).toBe('application/problem+json');
+    const wrongMethod = await route.onRequest(ctx('script.js', 'POST', env));
+    expect(wrongMethod.status).toBe(405);
+    expect(wrongMethod.headers.get('allow')).toBe('GET');
   });
 
   const ORIGIN_ENV = { UMAMI_ENDPOINT_ORIGIN: 'https://cloud.example.com' };
@@ -170,46 +167,24 @@ describe('the route handler (functions/api/umami/[[path]].ts)', () => {
     });
   }
 
-  it('rejects a declared body over 16 KB with 413 without forwarding it', async () => {
-    const fetchStub = vi.fn(async () => new Response('{}', { status: 200 }));
-    vi.stubGlobal('fetch', fetchStub);
-    const response = await route.onRequest({
-      request: sendRequest('{}', { 'content-length': String(16 * 1024 + 1) }),
-      params: { path: ['api', 'send'] },
-      env: ORIGIN_ENV,
-    });
-    expect(response.status).toBe(413);
-    expect(response.headers.get('content-type')).toBe('application/problem+json');
-    expect(fetchStub).not.toHaveBeenCalled();
-  });
-
-  it('rejects an undeclared body that reads past 16 KB with 413', async () => {
-    const fetchStub = vi.fn(async () => new Response('{}', { status: 200 }));
-    vi.stubGlobal('fetch', fetchStub);
-    const big = `{"pad":"${'x'.repeat(16 * 1024)}"}`;
-    const request = sendRequest(big);
-    expect(request.headers.get('content-length')).toBeNull();
-    const response = await route.onRequest({
-      request,
-      params: { path: ['api', 'send'] },
-      env: ORIGIN_ENV,
-    });
-    expect(response.status).toBe(413);
-    expect(fetchStub).not.toHaveBeenCalled();
-  });
-
-  it('forwards a body of exactly 16 KB', async () => {
+  it('caps api/send bodies at 16 KB, declared or not, without forwarding an oversized one', async () => {
     const fetchStub = vi.fn(
       async (_url: RequestInfo | URL, _init?: RequestInit) => new Response('{}', { status: 200 })
     );
     vi.stubGlobal('fetch', fetchStub);
-    const exact = 'x'.repeat(16 * 1024);
-    const response = await route.onRequest({
-      request: sendRequest(exact),
-      params: { path: ['api', 'send'] },
-      env: ORIGIN_ENV,
-    });
-    expect(response.status).toBe(200);
+    const send = (request: Request) =>
+      route.onRequest({ request, params: { path: ['api', 'send'] }, env: ORIGIN_ENV });
+
+    const declared = await send(sendRequest('{}', { 'content-length': String(16 * 1024 + 1) }));
+    expect(declared.status).toBe(413);
+    expect(declared.headers.get('content-type')).toBe('application/problem+json');
+
+    const undeclared = sendRequest(`{"pad":"${'x'.repeat(16 * 1024)}"}`);
+    expect(undeclared.headers.get('content-length')).toBeNull();
+    expect((await send(undeclared)).status).toBe(413);
+    expect(fetchStub).not.toHaveBeenCalled();
+
+    expect((await send(sendRequest('x'.repeat(16 * 1024)))).status).toBe(200);
     const [, init] = fetchStub.mock.calls[0];
     expect(((init as RequestInit).body as ArrayBuffer).byteLength).toBe(16 * 1024);
   });
@@ -232,54 +207,46 @@ describe('the route handler (functions/api/umami/[[path]].ts)', () => {
     expect(ok.status).toBe(200);
   });
 
-  it('never follows upstream redirects', async () => {
+  it('never follows or relays upstream redirects and failures: each becomes the 503 problem', async () => {
     const fetchStub = vi.fn(
       async (_url: RequestInfo | URL, _init?: RequestInit) => new Response('', { status: 200 })
     );
     vi.stubGlobal('fetch', fetchStub);
     await route.onRequest(ctx('script.js', 'GET', ORIGIN_ENV));
-    const [, init] = fetchStub.mock.calls[0];
-    expect((init as RequestInit).redirect).toBe('manual');
-  });
+    expect((fetchStub.mock.calls[0][1] as RequestInit).redirect).toBe('manual');
 
-  it.each([
-    [301, { location: 'https://attacker.example/script.js' }],
-    [302, { location: '/elsewhere' }],
-    [404, {}],
-    [500, {}],
-  ])('turns an upstream %i answer into the 503 problem', async (status, headers) => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response('upstream body', { status, headers }))
-    );
-    const response = await route.onRequest(ctx('script.js', 'GET', ORIGIN_ENV));
-    expect(response.status).toBe(503);
-    expect(response.headers.get('content-type')).toBe('application/problem+json');
-    expect(response.headers.get('location')).toBeNull();
-    expect(await response.text()).not.toContain('upstream body');
-  });
+    for (const [status, headers] of [
+      [301, { location: 'https://attacker.example/script.js' }],
+      [302, { location: '/elsewhere' }],
+      [404, {}],
+      [500, {}],
+    ] as const) {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => new Response('upstream body', { status, headers }))
+      );
+      const response = await route.onRequest(ctx('script.js', 'GET', ORIGIN_ENV));
+      expect(response.status, `upstream ${status}`).toBe(503);
+      expect(response.headers.get('content-type')).toBe('application/problem+json');
+      expect(response.headers.get('location')).toBeNull();
+      expect(await response.text()).not.toContain('upstream body');
+    }
 
-  it('turns an opaque redirect (status 0) into the 503 problem', async () => {
     const opaque = { status: 0, ok: false, body: null, headers: new Headers() } as Response;
     vi.stubGlobal(
       'fetch',
       vi.fn(async () => opaque)
     );
-    const response = await route.onRequest(ctx('script.js', 'GET', ORIGIN_ENV));
-    expect(response.status).toBe(503);
-  });
+    expect((await route.onRequest(ctx('script.js', 'GET', ORIGIN_ENV))).status).toBe(503);
 
-  it('returns a 503 problem when the upstream is unreachable', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn(async () => {
         throw new Error('down');
       })
     );
-    const response = await route.onRequest(
-      ctx('script.js', 'GET', { UMAMI_ENDPOINT_ORIGIN: 'https://cloud.example.com' })
-    );
-    expect(response.status).toBe(503);
-    expect(await response.text()).toContain('unreachable');
+    const unreachable = await route.onRequest(ctx('script.js', 'GET', ORIGIN_ENV));
+    expect(unreachable.status).toBe(503);
+    expect(await unreachable.text()).toContain('unreachable');
   });
 });

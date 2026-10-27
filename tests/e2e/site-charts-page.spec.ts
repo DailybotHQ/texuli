@@ -3,7 +3,6 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import { CHART_FAMILIES } from '../../apps/website/src/components/charts-page/families.ts';
 import { enterDocsFromLanding, primaryNav } from './support/site-nav.ts';
@@ -71,8 +70,6 @@ async function visit(page: Page, path: string) {
   return foreign;
 }
 
-const mode = (page: Page) => page.locator('html').getAttribute('data-tx-mode');
-
 test.describe('texuli.com charts gallery', () => {
   test('index lists every family with contracts and demos without foreign network', async ({
     page,
@@ -120,33 +117,6 @@ test.describe('texuli.com charts gallery', () => {
     await expect(page).toHaveURL(`${origin}/charts-page/`);
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on the charts index (${scheme})`, async ({ page }) => {
-      test.setTimeout(120_000);
-      await page.emulateMedia({ colorScheme: scheme });
-      await visit(page, INDEX);
-      expect(await mode(page)).toBe(scheme);
-      // Wait for first demo island so hydrated chart chrome is in the tree.
-      await expect(page.locator('[data-tx-charts-demo="cartesian"]')).toBeVisible({
-        timeout: 15_000,
-      });
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-      expect(results.violations.map((v) => `${scheme} ${v.id}: ${v.help}`)).toEqual([]);
-    });
-
-    test(`passes axe on cartesian family page (${scheme})`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: scheme });
-      await visit(page, '/charts-page/cartesian/');
-      expect(await mode(page)).toBe(scheme);
-      await expect(page.locator('[data-tx-charts-demo="cartesian"]')).toBeVisible({
-        timeout: 15_000,
-      });
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-      expect(results.violations.map((v) => `cartesian ${scheme} ${v.id}`)).toEqual([]);
-    });
-  }
+  // axe on the charts index and every family page in light and dark (zero
+  // exclusions) runs in the page sweep, a11y-site.spec.ts.
 });

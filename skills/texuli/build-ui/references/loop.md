@@ -72,7 +72,7 @@ Never produce HTML strings from the tree.
 | Catalog limits / renderer | `packages/catalog/tests/render-*.test.ts` |
 | Hostile corpus | `packages/catalog/tests/render-hostile.test.ts` |
 | AA (theme) | themes skill / `packages/tokens/tests/aa-gate.test.ts` |
-| Axe (pages) | Playwright with `TEXULI_E2E_PORT=<lane>` — never 4870 / 4890–4899 |
+| Axe (pages) | Playwright with `TEXULI_E2E_PORT=<port>` (a free port per parallel worker; 4870 is the default) |
 
 ## 5. Render and iterate
 

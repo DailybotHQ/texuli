@@ -210,8 +210,8 @@ test.describe('texuli.com editor area', () => {
     await expect(page.getByRole('link', { name: 'Editor package docs' })).toHaveCount(1);
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on the editor area (${scheme})`, async ({ page }) => {
+  test(`passes axe on the editor area in light and dark`, async ({ page }) => {
+    for (const scheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: scheme });
       await visit(page);
       await page.evaluate((mode) => {
@@ -232,6 +232,6 @@ test.describe('texuli.com editor area', () => {
           )
         )
       ).toEqual([]);
-    });
-  }
+    }
+  });
 });

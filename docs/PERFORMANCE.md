@@ -150,7 +150,7 @@ without an exact budget and never change through `--update`.
 | `@texuli/primitives` (root barrel) | 131,072 | 111,104 |
 | `@texuli/data` (root barrel) | 81,920 | 63,668 |
 | `@texuli/media` (root barrel) | 49,152 | 37,356 |
-| `@texuli/catalog` (root barrel) | 49,152 | 45,767 |
+| `@texuli/catalog` (root barrel; raised from 49,152 on 2026-10-26) | 54,080 | 45,767 |
 | `@texuli/blocks` (root barrel) | 32,768 | 27,924 |
 | `@texuli/charts` (root) | 16,384 | 12,178 |
 | `@texuli/chat` (root) | 16,384 | 10,672 |
@@ -163,6 +163,17 @@ subpaths, so the root barrels are convenience aggregates, not first-load
 costs. The Protoyard baselines were measured at Protoyard `c73e0445` with
 `pnpm exec tsx scripts/size.ts --protoyard ../protoyard`. A Protoyard number is
 that package's whole barrel (`export *`), so it is a ceiling, not a target.
+
+**Measured 2026-10-26** (local macOS, this branch): `pnpm size` covers 307
+entries and reports `307 entries within budget`, exit 0. That is after an
+owner decision the same day (PLAN_006 follow-up) that added rows for the 19
+unbudgeted `@texuli/astro`, `@texuli/player`, `@texuli/slides` and
+`@texuli/spec` entries and raised 7 over-cap rows plus 5 rows Linux CI
+measured a few bytes over, each to the measured size plus 4% headroom with
+its reason in the row's `note`. Some caps in the table above moved with it
+(the `@texuli/catalog` row above shows its new cap); `texuli.budgets.json` is the source of
+truth. CI's `audits` job runs `pnpm size` as a required check
+([CI](CI.md#budget-audits)).
 
 ## Planned budgets (not enforced yet)
 

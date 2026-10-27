@@ -2,7 +2,7 @@
  * The unified landing's why-Svelte section: copy, citations and code
  * excerpts (PLAN_006 T-41; narrative blueprint §2 pillar 1, §3, §5 s4).
  * Kept out of the .astro so the unit test
- * (`apps/website/tests/web-why-svelte.test.ts`) can pin every claim against
+ * (`apps/website/tests/section-contracts.test.ts`) can pin every claim against
  * the repository file it is cited from.
  *
  * The rule the module enforces on itself: a claim's `sources` phrases appear

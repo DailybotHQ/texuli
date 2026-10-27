@@ -44,7 +44,7 @@ A Dialog should pass `focusScope`, `inert` and `scrollLock`, and **not** `positi
 
 ## Tests
 
-`packages/core/tests/overlay-core.test.ts` (13 tests):
+`packages/core/tests/overlay-core.test.ts` (3 tests):
 - each missing feature throws, and `setAnchor` without `position` throws;
 - Escape works with no features;
 - a position-only overlay works;

@@ -227,5 +227,5 @@ section. A hosted frame page on a dedicated origin is planned, not built.
 ```bash
 pnpm vitest run packages/player
 pnpm --filter @texuli/player typecheck
-pnpm vitest run packages/examples/tests/player-examples.test.ts
+pnpm vitest run packages/examples/tests/examples-render.test.ts
 ```

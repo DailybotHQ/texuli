@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Import:** `import { Kbd, Code, CopyButton, copyText } from 'texuli/kbd-code'`  
-**Tests:** `packages/texuli/tests/kbd-code.test.ts`  
+**Tests:** `packages/texuli/tests/forms.test.ts`  
 **Example:** `texuli-kbd-code`
 
 ## Components
@@ -19,7 +19,7 @@
 `label` (optional string) gives the key plain text without a snippet. It is
 rendered as escaped text (never markup), and a non-empty `label` replaces
 `children` when both are given; an empty or missing `label` keeps `children`.
-Tested in `packages/texuli/tests/label-prop.test.ts`.
+Tested in `packages/texuli/tests/forms.test.ts`.
 
 ### Code
 

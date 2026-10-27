@@ -70,8 +70,8 @@ packages/blocks/
 │   └── <family>/    text, structure, media, embed, interactive, data, map,
 │                    diagram, code — engine + renderers per family; text
 │                    adds markdown, code adds the tokenizer
-└── tests/           one suite per family plus core, engine-subpaths,
-                     formula-subpath, chart-parity, readme-subpaths
+└── tests/           one suite per family plus core, engine-subpaths
+                     (formula included), chart-parity, readme-subpaths
 ```
 
 ## Testing

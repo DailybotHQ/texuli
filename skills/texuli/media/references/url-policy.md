@@ -1,9 +1,13 @@
 # Media URL policy (short)
 
-| Trust | Typical allowed sources |
-| --- | --- |
-| `untrusted` (default for agent/user content) | `https:` from allowlisted origins where required; no `javascript:`, `data:` media, `vbscript:`, protocol-relative `//` |
-| `developer` | App-authored assets: relative paths, `http(s):` as the texel allows; still blocks executable schemes |
+| Trust | Images (`safeImageSrc`, `safeImageSrcset`) | Audio and video (`safeMediaSrc`) |
+| --- | --- | --- |
+| `untrusted` (default for agent/user content) | `https:` and relative assets only | Blob URLs, or exact origins from an HTTPS `allowedOrigins` list |
+| `developer` | Also `http:`, valid blob URLs, and PNG, JPEG, GIF, WebP or AVIF base64 `data:` images up to 1 MiB decoded | Also `http:`, HTTPS from any origin and relative asset paths; `data:` is never accepted for media |
+
+Never allowed on either tier: `javascript:`, `vbscript:`, SVG or non-image
+`data:` URLs, and protocol-relative values (`//host`, `\\host`). Links use
+`safeHref`: untrusted allows only `https:`, `mailto:` and `#fragment`.
 
 Always:
 

@@ -28,57 +28,21 @@ scenario(
   'pin-input',
   defineRows([
     {
-      id: 'named-one-time-code',
-      title: 'one named text field, offered for one-time-code autofill',
+      id: 'named-typing-limits-complete',
+      title:
+        'one named text field offered for one-time-code autofill: digits fill it, other characters are refused, Backspace removes the last, it stops at its length, and filling the last cell reports the code once',
       async run({ page }) {
         await expect(input(page)).toBeVisible();
         await expect(input(page)).toHaveAttribute('autocomplete', 'one-time-code');
         await expect(input(page)).toHaveAttribute('maxlength', '6');
-      },
-    },
-    {
-      id: 'type-digits',
-      title: 'typing digits fills the code',
-      async run({ page }) {
-        await input(page).focus();
-        await page.keyboard.type('123');
-        await expect(shown(page)).toHaveText('123');
-      },
-    },
-    {
-      id: 'refuse-letters',
-      title: 'characters outside the pattern are refused',
-      async run({ page }) {
         await input(page).focus();
         await page.keyboard.type('1a2');
         await expect(shown(page)).toHaveText('12');
-      },
-    },
-    {
-      id: 'length-limit',
-      title: 'the code stops at its length',
-      async run({ page }) {
-        await input(page).focus();
-        await page.keyboard.type('12345678');
-        await expect(shown(page)).toHaveText('123456');
-      },
-    },
-    {
-      id: 'backspace',
-      title: 'Backspace removes the last character',
-      async run({ page }) {
-        await input(page).focus();
-        await page.keyboard.type('123');
+        await page.keyboard.type('3');
         await page.keyboard.press('Backspace');
         await expect(shown(page)).toHaveText('12');
-      },
-    },
-    {
-      id: 'complete-once',
-      title: 'filling the last cell reports the code once',
-      async run({ page }) {
-        await input(page).focus();
-        await page.keyboard.type('123456');
+        await page.keyboard.type('345678');
+        await expect(shown(page)).toHaveText('123456');
         await expect
           .poll(async () => (await completes(page)).map((e) => e.detail))
           .toEqual(['123456']);

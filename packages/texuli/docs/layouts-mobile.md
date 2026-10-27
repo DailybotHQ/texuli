@@ -107,20 +107,14 @@ Measured with `pnpm size` on 2026-10-24:
 
 ## Verified
 
-- **Unit tests:** `pnpm vitest run packages/texuli/tests/layouts-mobile.test.ts`
-  has 15 tests.
-  - Model: tab splitting, stack headers for root, nested, detail and unknown
-    paths, `navCurrent`, options, and lazy registration.
+- **Unit tests:** `pnpm vitest run packages/texuli/tests/layouts.test.ts -t layouts-mobile`
+  has 7 tests.
+  - Model: tab splitting, stack headers, `navCurrent`.
   - Components through `LayoutHost`:
-    - the tab bar, badges, the primary action and More;
-    - the More sheet, closing on a link or in-app navigation;
-    - Back and the title on a detail screen;
-    - following `hashchange`;
+    - the More sheet closing on in-app navigation;
     - unsafe hrefs;
-    - the drawer with nested items;
     - screen state kept across a layout switch, and RTL;
-    - a nested `<main>`;
-    - no nav model.
+    - a nested `<main>`.
 - **Real browsers:** a scratch Playwright spec on Chromium, WebKit and Pixel 7
   (lane N, not committed) passed 64 checks:
   - axe reported no violations for the three examples, the More sheet and the

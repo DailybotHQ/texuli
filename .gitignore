@@ -31,3 +31,7 @@ tmp/*
 # Deep Work Plan working state (not tracked), except the addon registry
 .dwp/*
 !.dwp/config.json
+
+# Python bytecode (the DWP helper scripts)
+__pycache__/
+*.pyc

@@ -130,7 +130,7 @@ first enabled item the tab stop. It overwrote the component's own tabindex:
 RadioGroup `value="team"` put the stop on "free", Tabs `value="b"` on "a".
 Tests:
 - `packages/core/tests/roving.test.ts`;
-- `packages/primitives/tests/roving-selected.test.ts`;
-- `packages/texuli/tests/rating.test.ts`;
+- `packages/primitives/tests/composites.test.ts`;
+- `packages/texuli/tests/forms.test.ts`;
 - the behavior rows `tab-stop-on-initial-value` and `tab-stop-follows-value`
   for radio-group and tabs.

@@ -21,8 +21,11 @@ could be bypassed. Read-only; reports risks with a concrete exploit or input.
 
 ## When to use
 
-- Any change to `packages/core/src/url/` or anything that renders a link,
-  image or content from data.
+- Any change to `packages/core/src/url/` or `packages/core/src/url-policy/`,
+  or anything that renders a link, image or content from data (the catalog
+  renderer, `@texuli/player`, blocks, chat, the editor).
+- A change to the website CSP (`apps/website/src/components/security/csp.ts`),
+  the Pages middleware (`functions/`) or the agent service (`apps/agent`).
 - A new dependency, or a change to `package.json` or `pnpm-lock.yaml`.
 - The Final Review of a plan.
 
@@ -35,17 +38,25 @@ could be bypassed. Read-only; reports risks with a concrete exploit or input.
 1. **Sinks:** search the diff and touched files for `{@html}`, `set:html`,
    `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `eval`, `new Function`,
    `srcdoc`, and string-built `<script>`.
-2. **URL policy:** every rendered `href`/`src` passes `safeHref`; agent or
-   user content uses the `untrusted` tier. Try bypass inputs against the
+2. **URL policy:** every rendered link passes `safeHref` and every image
+   or media source `safeImageSrc` / `safeMediaSrc`; agent or user content
+   uses the `untrusted` tier. Untrusted blueprints go through
+   `validateDraft` before paint (`pnpm vitest run packages/catalog` holds
+   the hostile corpus). Try bypass inputs against the
    policy with a scratch test: mixed case, tab/newline inside the scheme,
    leading control characters, `//host`, `\\host`, `data:`, `vbscript:`.
-   Run with `pnpm vitest run packages/core`.
+   Run with `pnpm vitest run packages/core/tests/url-policy.test.ts`.
 3. **Supply chain:** `pnpm vitest run scripts/tests/supply-chain.test.ts`
-   (allowlist, banned packages, licenses); no new runtime dependency in
-   `@texuli/core`; lockfile changes come from the owner.
+   (allowlist, banned packages, licenses) and `pnpm check:trojan-source`;
+   no new runtime dependency in `@texuli/core`; lockfile changes come from
+   the owner.
 4. **Secrets and data:** no tokens, keys or real personal data; nothing reads
    `.env`.
-5. **Local only:** no remote added, no push, no publish or deploy script.
+5. **Release paths:** no push, no new remote; npm publishing happens only
+   through `.github/workflows/publish.yml` with provenance and the website
+   deploys from `main` through CI, so flag any other publish or deploy
+   script, any change to those workflows without the owner, and any token
+   or key in the repository.
 
 ## Output
 

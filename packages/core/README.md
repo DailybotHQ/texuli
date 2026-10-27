@@ -41,12 +41,12 @@ rest.
 | URL policy (links) | `safeHref`, `type HrefTrust` | [core-url-policy](docs/core-url-policy.md) |
 | URL policy (media) | `safeImageSrc`, `safeImageSrcset`, `safeMediaSrc`, `MAX_DATA_IMAGE_BYTES` | [core-url-policy](docs/core-url-policy.md) |
 
-The editor texels are not in the root barrel: the barrel measures 22.63 of
-its 24 KiB budget. `pnpm size --filter core/editor` (2026-10-25) measures
-`editor-history` at 754 B and `editor-keymap` at 2.49 KiB, both within the 4
-KiB per-texel default. `editor-markdown` (7.03 KiB), `editor-model` (7.81
-KiB) and `editor-transforms` (10.36 KiB) are over it, so their budget rows
-are pending with the owner.
+The editor texels are not in the root barrel: the barrel measures 22.64 of
+its 24 KiB budget. `pnpm size` (2026-10-26) measures `editor-history` at
+773 B and `editor-keymap` at 2.49 KiB, both within the 4 KiB per-texel
+default. `editor-markdown` (7.05 of 7.50 KiB), `editor-model` (7.83 of
+8.50 KiB) and `editor-transforms` (10.36 of 11 KiB) are over that default
+and carry their own budget rows; every entry is within budget.
 
 The tables above name the headline exports per texel, not the full surface:
 read `src/index.ts` (and the per-area `index.ts`) for every exported symbol

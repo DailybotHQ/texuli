@@ -43,9 +43,12 @@ for the repository rules — everything in this kit follows them.
 - **Vendored skills** (`skills/deepworkplan/`, `skills/ai-diff-reviewer/`)
   are installed from pinned releases recorded in `../skills-lock.json`;
   upgrade them with `/dwp-upgrade` or their own setup flow, never by hand.
-- **Permissions** (`settings.json`): read-only git and the pnpm gates are
-  allowed; `git add -A`, any `git push`, `git remote add` and reading `.env`
-  files are denied. The repository is local only.
+- **Permissions** (`settings.json`): read-only git, the pnpm gates,
+  `git push` and `gh repo edit` are allowed at the permission layer;
+  `git add -A`, `git add --all`, `git remote add` and reading `.env` files
+  are denied. A permission allow is not an authorization: `AGENTS.md` rule 3
+  still requires the developer's go in the current task before any push or
+  writing `gh` command.
 
 ## Changing the kit
 

@@ -3,7 +3,6 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import { primaryNav } from './support/site-nav.ts';
 
@@ -86,8 +85,6 @@ async function tap(locator: ReturnType<Page['locator']>) {
   await locator.click();
 }
 
-const mode = (page: Page) => page.locator('html').getAttribute('data-tx-mode');
-
 test.describe('texuli.com guides', () => {
   test('sidebar marks the current page and pager walks the reading order', async ({ page }) => {
     expect(await visit(page, '/guides/')).toEqual([]);
@@ -168,20 +165,6 @@ test.describe('texuli.com guides', () => {
     }
   });
 
-  // One test per page and scheme, like a11y-site.spec.ts: a guide page with
-  // live islands takes a good share of the test timeout to load and sweep, so
-  // several pages do not fit inside one test.
-  for (const scheme of ['light', 'dark'] as const) {
-    for (const path of GUIDE_PATHS) {
-      test(`passes axe on ${path} (${scheme})`, async ({ page }) => {
-        await page.emulateMedia({ colorScheme: scheme });
-        await visit(page, path);
-        expect(await mode(page)).toBe(scheme);
-        const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-          .analyze();
-        expect(results.violations).toEqual([]);
-      });
-    }
-  }
+  // axe on every guide page in light and dark (zero exclusions) runs in the page
+  // sweep, a11y-site.spec.ts.
 });

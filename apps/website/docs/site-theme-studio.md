@@ -2,7 +2,7 @@
 
 **App:** `apps/website`  
 **Path:** `/theme-studio/`  
-**Tests:** `scripts/tests/site-theme-studio.test.ts`, `tests/e2e/site-theme-studio.spec.ts`
+**Tests:** `scripts/tests/site-loaders.test.ts`, `tests/e2e/site-theme-studio.spec.ts`
 
 ## Goal
 
@@ -28,7 +28,7 @@ Static Astro page + one Svelte island. APCA is out of scope.
 ## Validation
 
 ```bash
-pnpm vitest run scripts/tests/site-theme-studio.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 pnpm build
 TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-theme-studio.spec.ts
 ```

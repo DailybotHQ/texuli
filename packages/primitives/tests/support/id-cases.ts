@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import type { Component } from 'svelte';
 import { describe, expect, it } from 'vitest';
 import { brokenIdRefs } from './id-refs.ts';
@@ -24,33 +24,39 @@ export interface IdCase {
 
 export { fireEvent, screen };
 
-export function runIdCases(title: string, cases: readonly IdCase[]): void {
+/** Runs each named table as one test; every message names the failing case. */
+export function runIdCases(title: string, tables: Record<string, readonly IdCase[]>): void {
   describe(title, () => {
-    for (const testCase of cases) {
-      it(testCase.name, async () => {
-        render(testCase.fixture);
-        await testCase.open?.();
-        for (const [id, role] of Object.entries(testCase.ids)) {
-          await waitFor(() => {
-            const element = document.getElementById(id);
-            expect(element, `#${id}`).toBeTruthy();
-            const actual = element?.getAttribute('role') ?? element?.tagName.toLowerCase();
-            expect(actual, `#${id} role`).toBe(role);
-          });
+    for (const [family, cases] of Object.entries(tables)) {
+      it(family, async () => {
+        for (const testCase of cases) {
+          const at = `${testCase.name}:`;
+          render(testCase.fixture);
+          await testCase.open?.();
+          for (const [id, role] of Object.entries(testCase.ids)) {
+            await waitFor(() => {
+              const element = document.getElementById(id);
+              expect(element, `${at} #${id}`).toBeTruthy();
+              const actual = element?.getAttribute('role') ?? element?.tagName.toLowerCase();
+              expect(actual, `${at} #${id} role`).toBe(role);
+            });
+          }
+          for (const [text, role] of Object.entries(testCase.labels ?? {})) {
+            const control = screen.getByLabelText(text);
+            expect(
+              control.getAttribute('role') ?? control.tagName.toLowerCase(),
+              `${at} ${text}`
+            ).toBe(role);
+          }
+          for (const [id, ref] of Object.entries(testCase.refs ?? {})) {
+            expect(
+              document.getElementById(id)?.getAttribute(ref.attribute),
+              `${at} #${id} ${ref.attribute}`
+            ).toBe(ref.id);
+          }
+          await waitFor(() => expect(brokenIdRefs(), `${at} dangling references`).toEqual([]));
+          cleanup();
         }
-        for (const [text, role] of Object.entries(testCase.labels ?? {})) {
-          expect(
-            screen.getByLabelText(text).getAttribute('role') ??
-              screen.getByLabelText(text).tagName.toLowerCase()
-          ).toBe(role);
-        }
-        for (const [id, ref] of Object.entries(testCase.refs ?? {})) {
-          expect(
-            document.getElementById(id)?.getAttribute(ref.attribute),
-            `#${id} ${ref.attribute}`
-          ).toBe(ref.id);
-        }
-        await waitFor(() => expect(brokenIdRefs()).toEqual([]));
       });
     }
   });

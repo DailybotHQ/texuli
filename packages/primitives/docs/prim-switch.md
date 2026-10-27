@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/primitives`  
 **Import:** `import { Switch } from '@texuli/primitives/switch'`  
-**Tests:** `packages/primitives/tests/switch.test.ts`  
+**Tests:** `packages/primitives/tests/forms.test.ts`  
 **Behavior:** `tests/behavior/scenarios/switch.spec.ts`
 
 ## Contract

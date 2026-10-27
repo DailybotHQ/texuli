@@ -17,8 +17,8 @@ project overview.
 | [DESIGN_LANGUAGE](DESIGN_LANGUAGE.md) | The cross-surface visual contract: color roles and modes, spacing and density, shape and elevation, motion and reduced motion, focus, typography, direction |
 | [TESTING_GUIDE](TESTING_GUIDE.md) | Every gate, the source→test map, scoped commands, blind spots, posture, and PLAN_006 SEO/AEO/analytics/theme evidence |
 | [DEVELOPMENT_COMMANDS](DEVELOPMENT_COMMANDS.md) | Every root script and package script, verbatim, plus opt-in SEO/AEO audit commands |
-| [CI](CI.md) | GitHub Actions workflows, npm publishing waves, Cloudflare Pages deployment settings |
-| [SECURITY](SECURITY.md) | Threat model: URL policy, HTML sinks, untrusted agent output, CSP, supply chain |
+| [CI](CI.md) | GitHub Actions workflows and budget audits, npm publishing waves, Cloudflare Pages deployment and Functions |
+| [SECURITY](SECURITY.md) | Threat model: URL policy, HTML sinks, untrusted agent output, CSP, supply chain, edge functions and analytics |
 | [PERFORMANCE](PERFORMANCE.md) | Size budgets, measured numbers, perf tests |
 | [ACCESSIBILITY](ACCESSIBILITY.md) | Accessibility contract and how it is checked |
 | [AI_AGENT_ONBOARDING](AI_AGENT_ONBOARDING.md) | First-session checklist |
@@ -28,6 +28,7 @@ project overview.
 
 | Module | README |
 | --- | --- |
+| `@texuli/astro` | [packages/astro/README.md](../packages/astro/README.md): Astro integration, content layouts and Svelte islands for Texuli sites. |
 | `@texuli/blocks` | [packages/blocks/README.md](../packages/blocks/README.md): Content blocks: closed vocabulary, untrusted guard, formula AST and catalog metadata for pages, documents and slides. |
 | `@texuli/catalog` | [packages/catalog/README.md](../packages/catalog/README.md): The agent catalog and the renderer with no HTML sinks. |
 | `@texuli/charts` | [packages/charts/README.md](../packages/charts/README.md): Chart math and every chart family, one lazy subpath per family. |
@@ -37,15 +38,21 @@ project overview.
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
 | `@texuli/media` | [packages/media/README.md](../packages/media/README.md): Media: images, galleries, video, audio and layered compositions. |
+| `@texuli/player` | [packages/player/README.md](../packages/player/README.md): Svelte paint runtime for validated Texuli catalog blueprints. |
 | `@texuli/primitives` | [packages/primitives/README.md](../packages/primitives/README.md): Owned, headless Svelte 5 primitives built on the texels. |
+| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): Presentation deck model, grammar, and responsive stage runtime. |
+| `@texuli/spec` | [packages/spec/README.md](../packages/spec/README.md): The schema-first blueprint contract: JSON schemas, the catalog vocabulary, TypeScript and Kotlin projections, and the conformance harness. |
 | `texuli` | [packages/texuli/README.md](../packages/texuli/README.md): Styled Texuli components, layouts and shells. |
 | `@texuli/tokens` | [packages/tokens/README.md](../packages/tokens/README.md): The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. |
 | `@texuli/tools` | [packages/tools/README.md](../packages/tools/README.md): Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. |
-| `@texuli/website` | [apps/website/README.md](../apps/website/README.md): texuli.com: the Texuli documentation, catalog and live examples, built with Astro. |
+| `@texuli/website` | [apps/website/README.md](../apps/website/README.md): texuli.com: the Texuli documentation, catalog and live examples, built with Astro; the Pages Functions live in the root `functions/`. |
+| `@texuli/agent` | [apps/agent/README.md](../apps/agent/README.md): The texuli.com agent service: prompt to validated blueprint draft, fake replay provider only, not deployed. |
+| `native/` | [native/README.md](../native/README.md): The Gradle Kotlin Multiplatform twin (`texuli-spec`, `texuli-compose`, `conformance`); not a pnpm package. |
 
 Other entry points: the agent skill [`skills/texuli/SKILL.md`](../skills/texuli/SKILL.md),
 the behavior suite [`tests/behavior/README.md`](../tests/behavior/README.md),
-the visual suite [`tests/visual/README.md`](../tests/visual/README.md), and the
+the visual suite [`tests/visual/README.md`](../tests/visual/README.md), the
+published catalog [`apps/website/public/catalog/README.md`](../apps/website/public/catalog/README.md), and the
 agent kit [`.agents/README.md`](../.agents/README.md).
 
 ## Every topic guide
@@ -59,17 +66,17 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [a11y-overlays](quality/a11y-overlays.md) | Overlay and navigation accessibility sweep |
 | [a11y-site](quality/a11y-site.md) | Accessibility sweep: texuli.com |
 | [a11y-slides](quality/a11y-slides.md) | Accessibility sweep: slides |
+| [consumers-registry](quality/consumers-registry.md) | Consumer apps against the npm registry |
 | [consumers](quality/consumers.md) | Consumer apps: Vite, Astro and SvelteKit |
-| [consumers-registry](quality/consumers-registry.md) | Consumer apps installing the published packages from the npm registry |
 | [csp](quality/csp.md) | Strict CSP and Trusted Types |
 | [packaging](quality/packaging.md) | Packaging, publint and attw |
 | [perf-builder](quality/perf-builder.md) | Blueprint builder performance at scale |
 | [perf-data](quality/perf-data.md) | Data, chart and composition performance checks |
 | [perf-primitives](quality/perf-primitives.md) | Primitive performance |
 | [responsive-sweep](quality/responsive-sweep.md) | Responsive and right-to-left sweep: PLAN_004 surfaces |
-| [sr-transcripts](quality/sr-transcripts.md) | Screen-reader transcripts (VoiceOver, macOS) |
+| [sr-transcripts-site](quality/sr-transcripts-site.md) | Screen-reader transcripts: website (accessibility-tree pass) |
 | [sr-transcripts-slides](quality/sr-transcripts-slides.md) | Screen-reader transcripts: slides (VoiceOver, macOS) |
-| [sr-transcripts-site](quality/sr-transcripts-site.md) | Screen-reader transcripts: website (accessibility-tree pass, no screen reader run) |
+| [sr-transcripts](quality/sr-transcripts.md) | Screen-reader transcripts (VoiceOver, macOS) |
 | [ssr](quality/ssr.md) | SSR and hydration smoke check |
 | [supply-chain](quality/supply-chain.md) | Supply chain and SBOM |
 
@@ -77,15 +84,20 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 
 | Doc | Title |
 | --- | --- |
+| [site-aeo](../apps/website/docs/site-aeo.md) | texuli.com agent surfaces (AEO) |
+| [site-agent-chat](../apps/website/docs/site-agent-chat.md) | texuli.com: agent chat |
 | [site-agents-page](../apps/website/docs/site-agents-page.md) | texuli.com: Texuli for agents |
+| [site-analytics](../apps/website/docs/site-analytics.md) | texuli.com analytics (Umami) |
+| [site-architecture](../apps/website/docs/site-architecture.md) | texuli.com architecture page (web and native) |
 | [site-blocks-page](../apps/website/docs/site-blocks-page.md) | Blocks and templates |
 | [site-brand](../apps/website/docs/site-brand.md) | texuli.com: brand and home page |
 | [site-builder](../apps/website/docs/site-builder.md) | Blueprint builder (texuli.com) |
 | [site-charts-page](../apps/website/docs/site-charts-page.md) | Charts gallery (texuli.com) |
 | [site-color-explorer](../apps/website/docs/site-color-explorer.md) | texuli.com: Color and token explorer |
 | [site-component-pages](../apps/website/docs/site-component-pages.md) | Component pages generator |
+| [site-csp](../apps/website/docs/site-csp.md) | Built-site Content Security Policy |
 | [site-docs-shell](../apps/website/docs/site-docs-shell.md) | Docs shell (texuli.com) |
-| [site-editor](../apps/website/docs/site-editor.md) | texuli.com: editor area and the builder's rich text fields |
+| [site-editor](../apps/website/docs/site-editor.md) | texuli.com: editor area |
 | [site-evidence](../apps/website/docs/site-evidence.md) | texuli.com: Evidence on every component page |
 | [site-examples](../apps/website/docs/site-examples.md) | texuli.com: live examples |
 | [site-foundation](../apps/website/docs/site-foundation.md) | texuli.com: site foundation |
@@ -93,10 +105,11 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-gallery-themes](../apps/website/docs/site-gallery-themes.md) | texuli.com: theme gallery |
 | [site-guides](../apps/website/docs/site-guides.md) | texuli.com: Guides |
 | [site-ia](../apps/website/docs/site-ia.md) | Site information architecture |
-| [site-landing](../apps/website/docs/site-landing.md) | texuli.com library landing |
+| [site-landing](../apps/website/docs/site-landing.md) | texuli.com landing system |
 | [site-live-components](../apps/website/docs/site-live-components.md) | Live interactive component pages |
 | [site-live-primitives](../apps/website/docs/site-live-primitives.md) | Live primitive demos |
 | [site-media-page](../apps/website/docs/site-media-page.md) | texuli.com: media lab |
+| [site-native](../apps/website/docs/site-native.md) | texuli.com native landing |
 | [site-perf](../apps/website/docs/site-perf.md) | Site performance |
 | [site-playground](../apps/website/docs/site-playground.md) | Agent playground (texuli.com) |
 | [site-primitives-page](../apps/website/docs/site-primitives-page.md) | Primitives reference |
@@ -104,11 +117,35 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-seo](../apps/website/docs/site-seo.md) | texuli.com: SEO, social images and sitemap |
 | [site-showcase](../apps/website/docs/site-showcase.md) | Showcase: complete interfaces |
 | [site-sidebar-nav](../apps/website/docs/site-sidebar-nav.md) | Site navigation and docs layout |
-| [site-slides-page](../apps/website/docs/site-slides-page.md) | texuli.com: slides area |
 | [site-skill](../apps/website/docs/site-skill.md) | The Texuli skill page |
+| [site-slides-page](../apps/website/docs/site-slides-page.md) | texuli.com: slides area |
+| [site-subsite](../apps/website/docs/site-subsite.md) | texuli.com sub-sites: routes, doors and breadcrumbs |
 | [site-theme-studio](../apps/website/docs/site-theme-studio.md) | Theme studio (texuli.com) |
 | [site-theme-swatches](../apps/website/docs/site-theme-swatches.md) | Theme swatches (own palette) |
+| [site-theme-sweep](../apps/website/docs/site-theme-sweep.md) | Theme sweep tooling |
 | [site-theme-switcher](../apps/website/docs/site-theme-switcher.md) | texuli.com: theme and mode switcher |
+| [site-visual](../apps/website/docs/site-visual.md) | Visual polish |
+
+### Agent service (`apps/agent/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [csp-reports](../apps/agent/docs/csp-reports.md) | Agent service: CSP report intake |
+| [evals](../apps/agent/docs/evals.md) | Agent service: offline eval harness |
+| [key-store](../apps/agent/docs/key-store.md) | Agent service: provider key store and local dev boundary |
+| [service-runbook](../apps/agent/docs/service-runbook.md) | Agent service contract and runbook |
+
+### `@texuli/astro` (`packages/astro/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [content](../packages/astro/docs/content.md) | Content block parser |
+| [integration](../packages/astro/docs/integration.md) | Astro integration |
+| [layouts-content-layout](../packages/astro/docs/layouts-content-layout.md) | `ContentLayout` |
+| [sections-hero](../packages/astro/docs/sections-hero.md) | `Hero` |
+| [sections-section](../packages/astro/docs/sections-section.md) | `Section` |
+| [site](../packages/astro/docs/site.md) | Site model |
+| [styles](../packages/astro/docs/styles.md) | `@texuli/astro/styles.css` |
 
 ### `@texuli/blocks` (`packages/blocks/docs/`)
 
@@ -116,6 +153,8 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | --- | --- |
 | [blocks-data](../packages/blocks/docs/blocks-data.md) | Blocks: table, stat, chart and KPI |
 | [code](../packages/blocks/docs/code.md) | Code blocks |
+| [embed](../packages/blocks/docs/embed.md) | Embed blocks |
+| [formula](../packages/blocks/docs/formula.md) | `@texuli/blocks/formula` |
 | [interactive](../packages/blocks/docs/interactive.md) | Interactive blocks |
 | [map](../packages/blocks/docs/map.md) | Map block |
 | [media](../packages/blocks/docs/media.md) | Media blocks |
@@ -127,21 +166,42 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | Doc | Title |
 | --- | --- |
 | [catalog-build](../packages/catalog/docs/catalog-build.md) | Catalog build (content-addressed, with emit tiers) |
+| [edit](../packages/catalog/docs/edit.md) | Blueprint edit operations |
+| [envelope](../packages/catalog/docs/envelope.md) | Blueprint envelope |
 | [manifests-display](../packages/catalog/docs/manifests-display.md) | Display and feedback manifests |
 | [manifests-layouts](../packages/catalog/docs/manifests-layouts.md) | Catalog manifests: layouts and shells |
+| [player](../packages/catalog/docs/player.md) | Document player core |
 | [render-frame](../packages/catalog/docs/render-frame.md) | Artifact frame |
 | [render-grammar](../packages/catalog/docs/render-grammar.md) | Composition grammar |
 | [render-hostile](../packages/catalog/docs/render-hostile.md) | Hostile corpus |
 | [render-limits](../packages/catalog/docs/render-limits.md) | Catalog tree limits |
 | [render-renderer](../packages/catalog/docs/render-renderer.md) | Catalog renderer core |
 | [render-richtext](../packages/catalog/docs/render-richtext.md) | Catalog rich-text renderer |
+| [validate](../packages/catalog/docs/validate.md) | Draft validation |
 
 ### `@texuli/charts` (`packages/charts/docs/`)
 
 | Doc | Title |
 | --- | --- |
+| [charts-annotations](../packages/charts/docs/charts-annotations.md) | Charts: annotations |
+| [charts-axis](../packages/charts/docs/charts-axis.md) | Chart axes |
+| [charts-calendar](../packages/charts/docs/charts-calendar.md) | Charts: calendar heatmap |
+| [charts-canvas](../packages/charts/docs/charts-canvas.md) | Charts: canvas renderer |
+| [charts-cartesian](../packages/charts/docs/charts-cartesian.md) | Charts: line, area, bar, stacked bar and combo |
+| [charts-colors](../packages/charts/docs/charts-colors.md) | Chart color scales |
+| [charts-compact](../packages/charts/docs/charts-compact.md) | Charts: sparkline, bullet, gauge and progress ring |
+| [charts-flow](../packages/charts/docs/charts-flow.md) | Charts: funnel, sankey and network |
+| [charts-geo](../packages/charts/docs/charts-geo.md) | Charts: geo map and point map |
+| [charts-histogram](../packages/charts/docs/charts-histogram.md) | Charts: histogram |
 | [charts-interaction](../packages/charts/docs/charts-interaction.md) | Chart interaction |
+| [charts-large-series](../packages/charts/docs/charts-large-series.md) | Windowed cartesian series |
 | [charts-matrix](../packages/charts/docs/charts-matrix.md) | Charts: heatmap, scatter and bubble |
+| [charts-pack](../packages/charts/docs/charts-pack.md) | Charts: circle packing |
+| [charts-part-whole](../packages/charts/docs/charts-part-whole.md) | Charts: pie, donut, sunburst and treemap |
+| [charts-rtl](../packages/charts/docs/charts-rtl.md) | Charts in right-to-left layouts |
+| [charts-schemas](../packages/charts/docs/charts-schemas.md) | Charts: prop schemas and tiers |
+| [charts-statistical](../packages/charts/docs/charts-statistical.md) | Charts: statistical marks |
+| [charts-worker](../packages/charts/docs/charts-worker.md) | Charts: worker offload |
 
 ### `@texuli/chat` (`packages/chat/docs/`)
 
@@ -149,16 +209,6 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | --- | --- |
 | [chat-composer](../packages/chat/docs/chat-composer.md) | Chat composer and typing indicator |
 | [chat-thread](../packages/chat/docs/chat-thread.md) | Chat thread and message list |
-
-### `@texuli/editor` (`packages/editor/docs/`)
-
-| Doc | Title |
-| --- | --- |
-| [editor-controller](../packages/editor/docs/editor-controller.md) | Editor controller |
-| [editor-link-dialog](../packages/editor/docs/editor-link-dialog.md) | Link dialog |
-| [editor-paste](../packages/editor/docs/editor-paste.md) | Clipboard import |
-| [editor-surface](../packages/editor/docs/editor-surface.md) | Editor surface |
-| [editor-toolbar](../packages/editor/docs/editor-toolbar.md) | Editor toolbar |
 
 ### `@texuli/core` (`packages/core/docs/`)
 
@@ -168,6 +218,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [core-controllable](../packages/core/docs/core-controllable.md) | Controllable state |
 | [core-dir-locale](../packages/core/docs/core-dir-locale.md) | Direction, locale and messages |
 | [core-dismiss](../packages/core/docs/core-dismiss.md) | Texel: outside interaction (pointer vs focus) |
+| [core-editor](../packages/core/docs/core-editor.md) | Editor texels |
 | [core-env](../packages/core/docs/core-env.md) | Environment and SSR helpers |
 | [core-focus-scope](../packages/core/docs/core-focus-scope.md) | Texel: focus scope and trap |
 | [core-form-bridge](../packages/core/docs/core-form-bridge.md) | Native form bridge |
@@ -191,13 +242,28 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | Doc | Title |
 | --- | --- |
 | [data-activity](../packages/data/docs/data-activity.md) | Activity feed |
+| [data-board](../packages/data/docs/data-board.md) | Board (kanban) |
+| [data-calendar-reschedule](../packages/data/docs/data-calendar-reschedule.md) | Calendar rescheduling, creating and the clock |
 | [data-files](../packages/data/docs/data-files.md) | File browser |
 | [data-grid-columns](../packages/data/docs/data-grid-columns.md) | Data grid column operations |
 | [data-grid-core](../packages/data/docs/data-grid-core.md) | Data grid core |
+| [data-grid-edit-a11y](../packages/data/docs/data-grid-edit-a11y.md) | Editable grid accessibility: read-only cells, editor focus, tab stop |
+| [data-grid-edit-virtual](../packages/data/docs/data-grid-edit-virtual.md) | Editable grid row windowing |
 | [data-grid-editing](../packages/data/docs/data-grid-editing.md) | Data grid editing |
+| [data-grid-virtual](../packages/data/docs/data-grid-virtual.md) | Virtual data grid |
 | [data-map](../packages/data/docs/data-map.md) | Offline map |
 | [data-timeline](../packages/data/docs/data-timeline.md) | Timeline and Gantt |
 | [data-tree-view](../packages/data/docs/data-tree-view.md) | Tree data view |
+
+### `@texuli/editor` (`packages/editor/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [editor-controller](../packages/editor/docs/editor-controller.md) | Editor controller |
+| [editor-link-dialog](../packages/editor/docs/editor-link-dialog.md) | Link dialog |
+| [editor-paste](../packages/editor/docs/editor-paste.md) | Clipboard import |
+| [editor-surface](../packages/editor/docs/editor-surface.md) | Editor surface |
+| [editor-toolbar](../packages/editor/docs/editor-toolbar.md) | Editor toolbar |
 
 ### `@texuli/media` (`packages/media/docs/`)
 
@@ -207,13 +273,23 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [audio](../packages/media/docs/audio.md) | Audio player and waveform |
 | [captions](../packages/media/docs/captions.md) | Captions and chapters |
 | [composition-svg](../packages/media/docs/composition-svg.md) | Composition SVG renderer |
+| [composition-v2](../packages/media/docs/composition-v2.md) | Composition v2: groups and layer timing |
 | [gallery](../packages/media/docs/gallery.md) | Gallery and Lightbox |
 | [generator-slot](../packages/media/docs/generator-slot.md) | Generator slot |
 | [image-editor](../packages/media/docs/image-editor.md) | Image editor |
 | [image](../packages/media/docs/image.md) | Image |
 | [media-composition-canvas](../packages/media/docs/media-composition-canvas.md) | Composition renderer: canvas |
 | [media-export](../packages/media/docs/media-export.md) | Media export |
+| [timeline](../packages/media/docs/timeline.md) | Animation timeline |
 | [video](../packages/media/docs/video.md) | Video player |
+
+### `@texuli/player` (`packages/player/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [blueprint-flow](../packages/player/docs/blueprint-flow.md) | Embedding the blueprint flow |
+| [embedding](../packages/player/docs/embedding.md) | Embedding the player |
+| [paint-proof](../packages/player/docs/paint-proof.md) | Untrusted at paint: the player's security property |
 
 ### `@texuli/primitives` (`packages/primitives/docs/`)
 
@@ -263,15 +339,30 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [prim-tree](../packages/primitives/docs/prim-tree.md) | Tree primitive |
 | [svelte-attachments](../packages/primitives/docs/svelte-attachments.md) | Svelte attachments for primitives |
 
+### `@texuli/slides` (`packages/slides/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [export](../packages/slides/docs/export.md) | Print, PDF and PPTX export |
+| [grammar](../packages/slides/docs/grammar.md) | Catalog grammar and agent decks |
+| [model](../packages/slides/docs/model.md) | Deck model |
+| [stage](../packages/slides/docs/stage.md) | Stage: DeckStage and DeckPrint |
+| [styles](../packages/slides/docs/styles.md) | Stylesheet |
+| [templates](../packages/slides/docs/templates.md) | Starter templates |
+
 ### `texuli` (`packages/texuli/docs/`)
 
 | Doc | Title |
 | --- | --- |
+| [class-value](../packages/texuli/docs/class-value.md) | `class` prop: Svelte 5 ClassValue |
+| [control-props](../packages/texuli/docs/control-props.md) | Control and wrapper attributes (FIX-choice-aria) |
 | [layout-host](../packages/texuli/docs/layout-host.md) | LayoutHost and the layout contract |
+| [layout-register-subpaths](../packages/texuli/docs/layout-register-subpaths.md) | Layout register-only subpaths |
 | [layouts-auth-settings](../packages/texuli/docs/layouts-auth-settings.md) | Auth, onboarding and settings layouts |
 | [layouts-dashboard](../packages/texuli/docs/layouts-dashboard.md) | Dashboard grid and analytics layouts |
 | [layouts-marketing](../packages/texuli/docs/layouts-marketing.md) | Marketing layouts |
 | [layouts-mobile](../packages/texuli/docs/layouts-mobile.md) | Mobile layouts: tab bar and drawer, with stacked navigation |
+| [layouts-rail-master-detail](../packages/texuli/docs/layouts-rail-master-detail.md) | App layouts: rail and master-detail |
 | [layouts-shells](../packages/texuli/docs/layouts-shells.md) | Generic app shells |
 | [ui-alert](../packages/texuli/docs/ui-alert.md) | Components: Alert, Callout and Banner |
 | [ui-avatar](../packages/texuli/docs/ui-avatar.md) | Avatar and AvatarGroup |
@@ -315,6 +406,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [ui-tooltip](../packages/texuli/docs/ui-tooltip.md) | Tooltip |
 | [ui-tree](../packages/texuli/docs/ui-tree.md) | TreeView |
 | [using-with-your-css](../packages/texuli/docs/using-with-your-css.md) | Using Texuli with your own CSS |
+| [variants-css](../packages/texuli/docs/variants-css.md) | Recipe helpers import their CSS |
 
 ### `@texuli/tokens` (`packages/tokens/docs/`)
 
@@ -339,9 +431,21 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | Doc | Title |
 | --- | --- |
 | [a2ui](../packages/tools/docs/a2ui.md) | A2UI adapter (experimental) |
-| [cli-add](../packages/tools/docs/cli-add.md) | texuli add |
-| [cli-init](../packages/tools/docs/cli-init.md) | texuli init and texuli theme |
-| [cli-update](../packages/tools/docs/cli-update.md) | texuli diff and texuli update |
+| [cli-add](../packages/tools/docs/cli-add.md) | `texuli add` |
+| [cli-init](../packages/tools/docs/cli-init.md) | `texuli init` and `texuli theme` |
+| [cli-update](../packages/tools/docs/cli-update.md) | `texuli diff` and `texuli update` |
 | [elements](../packages/tools/docs/elements.md) | Custom elements |
 | [golden](../packages/tools/docs/golden.md) | Agent golden set and scorer |
 | [llms](../packages/tools/docs/llms.md) | llms.txt and agent docs bundle |
+
+### Native (`native/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [ADOPTION](../native/docs/ADOPTION.md) | Adopting the native renderer |
+| [kmp-aichat-migration](../native/docs/kmp-aichat-migration.md) | KMPAIChat migration validation |
+| [kmp-pttdynamics-migration](../native/docs/kmp-pttdynamics-migration.md) | KMPPTTDynamics migration validation |
+| [kmp-starter-migration](../native/docs/kmp-starter-migration.md) | KMPStarter migration validation |
+| [kmp-tapduel-migration](../native/docs/kmp-tapduel-migration.md) | KMPTapDuelGame migration validation |
+| [kmp-todo-migration](../native/docs/kmp-todo-migration.md) | KMPTodoApp migration validation |
+| [kmp-voicechat-migration](../native/docs/kmp-voicechat-migration.md) | KMPAIVoiceChat migration validation |

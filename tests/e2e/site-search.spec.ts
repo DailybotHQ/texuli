@@ -156,10 +156,12 @@ test.describe('texuli.com search', () => {
     }
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on search pages (${scheme})`, async ({ page }) => {
+  // The bare /search/ page is in the page sweep (a11y-site.spec.ts); this is
+  // the page with results.
+  test(`passes axe on a search with results in light and dark`, async ({ page }) => {
+    for (const scheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: scheme });
-      for (const path of ['/search/', '/search/?q=button']) {
+      for (const path of ['/search/?q=button']) {
         await visit(page, path);
         expect(await mode(page)).toBe(scheme);
         const results = await new AxeBuilder({ page })
@@ -167,6 +169,6 @@ test.describe('texuli.com search', () => {
           .analyze();
         expect(results.violations.map((v) => `${path} ${v.id}`)).toEqual([]);
       }
-    });
-  }
+    }
+  });
 });

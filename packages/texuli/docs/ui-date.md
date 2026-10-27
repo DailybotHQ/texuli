@@ -51,12 +51,10 @@ The styling adds:
 
 ## Verified
 
-- `pnpm vitest run packages/texuli/tests/date.test.ts`: **14 tests**.
-  - Presets: values, year and leap boundaries, labels, an invalid `today`, matching.
-  - Size classes.
-  - Calendar: name, size, selection, bounds and unavailable days, locale digits.
-  - DatePicker: label, description, the dialog and choosing, invalid, disabled, required.
-  - DateRangePicker: presets with `aria-pressed`, applying a preset, custom presets and labels, no presets by default.
+- `pnpm vitest run packages/texuli/tests/forms.test.ts -t '^date '`: **6 tests**.
+  - Presets: year and leap boundaries, labels, an invalid `today`, matching.
+  - Calendar: bounds and unavailable days, locale digits.
+  - DateRangePicker: applying a preset, and opening focus on the range start.
 - In the browser (Chromium, WebKit, Pixel 7; a scratch spec on port 4810), the `texuli-date` example:
   - passes **axe** in light, dark and forced colors, closed and with the range picker open;
   - shows the "Last 7 days" preset pressed and 7 days selected, and choosing "This month" updates the range;

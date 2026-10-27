@@ -3,7 +3,6 @@ import { createReadStream, existsSync, readdirSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import { primaryNav } from './support/site-nav.ts';
 
@@ -115,19 +114,6 @@ test.describe('texuli.com evidence', () => {
     }
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on evidence index and a component page (${scheme})`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: scheme });
-      for (const path of ['/evidence/', `/component-pages/${sampleIds[0]}/`]) {
-        await visit(page, path);
-        const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-          .analyze();
-        expect(
-          results.violations.map((v) => `${path} ${v.id}: ${v.help}`),
-          path
-        ).toEqual([]);
-      }
-    });
-  }
+  // axe on /evidence/ and every component page in light and dark (zero exclusions)
+  // runs in the page sweep, a11y-site.spec.ts.
 });

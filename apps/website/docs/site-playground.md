@@ -2,7 +2,7 @@
 
 **App:** `apps/website`  
 **Surface:** `src/components/playground/`, `src/pages/playground/`  
-**Tests:** `scripts/tests/site-playground.test.ts`, `tests/e2e/site-playground.spec.ts`
+**Tests:** `scripts/tests/site-loaders.test.ts`, `tests/e2e/site-playground.spec.ts`
 
 ## Goal
 
@@ -30,7 +30,7 @@ Static Astro page + one Svelte island. No runtime network.
 
 ```bash
 bash -c 'pnpm build && TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-playground.spec.ts'
-pnpm vitest run scripts/tests/site-playground.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 ```
 
 ## Limits

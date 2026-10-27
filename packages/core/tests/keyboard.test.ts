@@ -20,16 +20,15 @@ import {
 const key = (init: KeyboardEventInit & { key: string }) => new KeyboardEvent('keydown', init);
 
 describe('normalizeKey', () => {
-  it('maps legacy and alternative names to the standard ones', () => {
+  it('maps legacy and alternative names to the standard ones; lowercases one letter and keeps symbols and named keys', () => {
+    // maps legacy and alternative names to the standard ones
     expect(normalizeKey('Esc')).toBe('Escape');
     expect(normalizeKey('Left')).toBe('ArrowLeft');
     expect(normalizeKey('Down')).toBe('ArrowDown');
     expect(normalizeKey('Del')).toBe('Delete');
     expect(normalizeKey(' ')).toBe('Space');
     expect(normalizeKey('Spacebar')).toBe('Space');
-  });
-
-  it('lowercases one letter and keeps symbols and named keys', () => {
+    // lowercases one letter and keeps symbols and named keys
     expect(normalizeKey('K')).toBe('k');
     expect(normalizeKey('Ä')).toBe('ä');
     expect(normalizeKey('?')).toBe('?');
@@ -39,15 +38,14 @@ describe('normalizeKey', () => {
 });
 
 describe('IME composition guard', () => {
-  it('recognizes composing events from every engine', () => {
+  it('recognizes composing events from every engine; never activates or navigates while composing', () => {
+    // recognizes composing events from every engine
     expect(isComposing(key({ key: 'Enter', isComposing: true }))).toBe(true);
     // Safari reports the key with keyCode 229 before isComposing turns true.
     expect(isComposing({ key: 'Enter', keyCode: 229 })).toBe(true);
     expect(isComposing({ key: 'Process' })).toBe(true);
     expect(isComposing(key({ key: 'Enter' }))).toBe(false);
-  });
-
-  it('never activates or navigates while composing', () => {
+    // never activates or navigates while composing
     expect(isActivationKey(key({ key: 'Enter', isComposing: true }))).toBe(false);
     expect(
       getNavigationIntent(key({ key: 'ArrowDown', isComposing: true }), { orientation: 'vertical' })
@@ -59,7 +57,8 @@ describe('IME composition guard', () => {
 });
 
 describe('activation keys', () => {
-  it('accepts Enter and Space (any spelling) without command modifiers', () => {
+  it('accepts Enter and Space (any spelling) without command modifiers, and 2 related cases', () => {
+    // accepts Enter and Space (any spelling) without command modifiers
     expect(isActivationKey(key({ key: 'Enter' }))).toBe(true);
     expect(isActivationKey(key({ key: ' ' }))).toBe(true);
     expect(isActivationKey({ key: 'Spacebar' })).toBe(true);
@@ -67,80 +66,79 @@ describe('activation keys', () => {
     expect(isActivationKey(key({ key: 'Enter', ctrlKey: true }))).toBe(false);
     expect(isActivationKey(key({ key: ' ', metaKey: true }))).toBe(false);
     expect(isActivationKey(key({ key: 'a' }))).toBe(false);
-  });
-
-  it('narrows to one key for links (Enter) and checkboxes (Space)', () => {
+    // narrows to one key for links (Enter) and checkboxes (Space)
     expect(isActivationKey(key({ key: 'Enter' }), 'Enter')).toBe(true);
     expect(isActivationKey(key({ key: ' ' }), 'Enter')).toBe(false);
     expect(isActivationKey(key({ key: ' ' }), 'Space')).toBe(true);
     expect(isActivationKey(key({ key: 'Enter' }), 'Space')).toBe(false);
-  });
-
-  it('counts Ctrl, Meta and Alt as command modifiers, not Shift', () => {
+    // counts Ctrl, Meta and Alt as command modifiers, not Shift
     expect(hasCommandModifier(key({ key: 'a', altKey: true }))).toBe(true);
     expect(hasCommandModifier(key({ key: 'a', shiftKey: true }))).toBe(false);
   });
 });
 
 describe('navigation intents', () => {
-  it('follows the orientation of the widget', () => {
-    const horizontal = { orientation: 'horizontal' } as const;
-    const vertical = { orientation: 'vertical' } as const;
-    expect(getNavigationIntent(key({ key: 'ArrowRight' }), horizontal)).toBe('next');
-    expect(getNavigationIntent(key({ key: 'ArrowLeft' }), horizontal)).toBe('previous');
-    expect(getNavigationIntent(key({ key: 'ArrowDown' }), horizontal)).toBeNull();
-    expect(getNavigationIntent(key({ key: 'ArrowDown' }), vertical)).toBe('next');
-    expect(getNavigationIntent(key({ key: 'ArrowUp' }), vertical)).toBe('previous');
-    expect(getNavigationIntent(key({ key: 'ArrowRight' }), vertical)).toBeNull();
-    const both = { orientation: 'both' } as const;
-    expect(
-      ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].map((k) =>
-        getNavigationIntent(key({ key: k }), both)
-      )
-    ).toEqual(['next', 'next', 'previous', 'previous']);
-  });
-
-  it('flips the horizontal arrows in right-to-left text', () => {
-    const container = document.createElement('div');
-    container.setAttribute('dir', 'rtl');
-    const item = document.createElement('button');
-    container.append(item);
-    document.body.append(container);
-    const direction = directionOf(item);
-    expect(direction).toBe('rtl');
-    const options = { orientation: 'horizontal', direction } as const;
-    expect(getNavigationIntent(key({ key: 'ArrowLeft' }), options)).toBe('next');
-    expect(getNavigationIntent(key({ key: 'ArrowRight' }), options)).toBe('previous');
-    // Vertical arrows and Home and End do not depend on direction.
-    expect(getNavigationIntent(key({ key: 'Home' }), options)).toBe('first');
-    expect(
-      getNavigationIntent(key({ key: 'ArrowDown' }), { orientation: 'vertical', direction })
-    ).toBe('next');
-    expect(flipArrowForDirection('ArrowLeft', 'rtl')).toBe('ArrowRight');
-    expect(flipArrowForDirection('Left', 'ltr')).toBe('ArrowLeft');
-    expect(flipArrowForDirection('ArrowUp', 'rtl')).toBe('ArrowUp');
-    container.remove();
-  });
-
-  it('handles Home and End by default and page keys on request', () => {
-    const list = { orientation: 'vertical' } as const;
-    expect(getNavigationIntent(key({ key: 'Home' }), list)).toBe('first');
-    expect(getNavigationIntent(key({ key: 'End' }), list)).toBe('last');
-    expect(getNavigationIntent(key({ key: 'Home' }), { ...list, homeEnd: false })).toBeNull();
-    expect(getNavigationIntent(key({ key: 'PageDown' }), list)).toBeNull();
-    const paged = { ...list, pageKeys: true };
-    expect(getNavigationIntent(key({ key: 'PageDown' }), paged)).toBe('page-next');
-    expect(getNavigationIntent(key({ key: 'PageUp' }), paged)).toBe('page-previous');
-  });
-
-  it('leaves platform chords alone but lets Shift through', () => {
-    const list = { orientation: 'vertical' } as const;
-    expect(getNavigationIntent(key({ key: 'ArrowDown', metaKey: true }), list)).toBeNull();
-    expect(getNavigationIntent(key({ key: 'ArrowDown', ctrlKey: true }), list)).toBeNull();
-    expect(getNavigationIntent(key({ key: 'ArrowDown', altKey: true }), list)).toBeNull();
-    expect(getNavigationIntent(key({ key: 'ArrowDown', shiftKey: true }), list)).toBe('next');
-    expect(getNavigationIntent(key({ key: 'a' }), list)).toBeNull();
-    expect(getNavigationIntent({ key: 'Down' }, list)).toBe('next');
+  it('follows the orientation of the widget, and 3 related cases', () => {
+    {
+      // follows the orientation of the widget
+      const horizontal = { orientation: 'horizontal' } as const;
+      const vertical = { orientation: 'vertical' } as const;
+      expect(getNavigationIntent(key({ key: 'ArrowRight' }), horizontal)).toBe('next');
+      expect(getNavigationIntent(key({ key: 'ArrowLeft' }), horizontal)).toBe('previous');
+      expect(getNavigationIntent(key({ key: 'ArrowDown' }), horizontal)).toBeNull();
+      expect(getNavigationIntent(key({ key: 'ArrowDown' }), vertical)).toBe('next');
+      expect(getNavigationIntent(key({ key: 'ArrowUp' }), vertical)).toBe('previous');
+      expect(getNavigationIntent(key({ key: 'ArrowRight' }), vertical)).toBeNull();
+      const both = { orientation: 'both' } as const;
+      expect(
+        ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].map((k) =>
+          getNavigationIntent(key({ key: k }), both)
+        )
+      ).toEqual(['next', 'next', 'previous', 'previous']);
+    }
+    {
+      // flips the horizontal arrows in right-to-left text
+      const container = document.createElement('div');
+      container.setAttribute('dir', 'rtl');
+      const item = document.createElement('button');
+      container.append(item);
+      document.body.append(container);
+      const direction = directionOf(item);
+      expect(direction).toBe('rtl');
+      const options = { orientation: 'horizontal', direction } as const;
+      expect(getNavigationIntent(key({ key: 'ArrowLeft' }), options)).toBe('next');
+      expect(getNavigationIntent(key({ key: 'ArrowRight' }), options)).toBe('previous');
+      // Vertical arrows and Home and End do not depend on direction.
+      expect(getNavigationIntent(key({ key: 'Home' }), options)).toBe('first');
+      expect(
+        getNavigationIntent(key({ key: 'ArrowDown' }), { orientation: 'vertical', direction })
+      ).toBe('next');
+      expect(flipArrowForDirection('ArrowLeft', 'rtl')).toBe('ArrowRight');
+      expect(flipArrowForDirection('Left', 'ltr')).toBe('ArrowLeft');
+      expect(flipArrowForDirection('ArrowUp', 'rtl')).toBe('ArrowUp');
+      container.remove();
+    }
+    {
+      // handles Home and End by default and page keys on request
+      const list = { orientation: 'vertical' } as const;
+      expect(getNavigationIntent(key({ key: 'Home' }), list)).toBe('first');
+      expect(getNavigationIntent(key({ key: 'End' }), list)).toBe('last');
+      expect(getNavigationIntent(key({ key: 'Home' }), { ...list, homeEnd: false })).toBeNull();
+      expect(getNavigationIntent(key({ key: 'PageDown' }), list)).toBeNull();
+      const paged = { ...list, pageKeys: true };
+      expect(getNavigationIntent(key({ key: 'PageDown' }), paged)).toBe('page-next');
+      expect(getNavigationIntent(key({ key: 'PageUp' }), paged)).toBe('page-previous');
+    }
+    {
+      // leaves platform chords alone but lets Shift through
+      const list = { orientation: 'vertical' } as const;
+      expect(getNavigationIntent(key({ key: 'ArrowDown', metaKey: true }), list)).toBeNull();
+      expect(getNavigationIntent(key({ key: 'ArrowDown', ctrlKey: true }), list)).toBeNull();
+      expect(getNavigationIntent(key({ key: 'ArrowDown', altKey: true }), list)).toBeNull();
+      expect(getNavigationIntent(key({ key: 'ArrowDown', shiftKey: true }), list)).toBe('next');
+      expect(getNavigationIntent(key({ key: 'a' }), list)).toBeNull();
+      expect(getNavigationIntent({ key: 'Down' }, list)).toBe('next');
+    }
   });
 });
 
@@ -150,8 +148,8 @@ describe('isTextEntryTarget', () => {
     host.innerHTML = html;
     return host.firstElementChild;
   };
-
-  it('treats typing surfaces as text entry', () => {
+  it('treats typing surfaces as text entry; leaves buttons, checkboxes and plain elements to shortcuts', () => {
+    // treats typing surfaces as text entry
     for (const html of [
       '<input>',
       '<input type="search">',
@@ -166,9 +164,7 @@ describe('isTextEntryTarget', () => {
     ]) {
       expect(isTextEntryTarget(make(html)), html).toBe(true);
     }
-  });
-
-  it('leaves buttons, checkboxes and plain elements to shortcuts', () => {
+    // leaves buttons, checkboxes and plain elements to shortcuts
     for (const html of [
       '<input type="checkbox">',
       '<input type="button">',
@@ -186,7 +182,8 @@ describe('isTextEntryTarget', () => {
 });
 
 describe('parseShortcut and resolveShortcut', () => {
-  it('reads modifiers in any order and case, with aliases', () => {
+  it('reads modifiers in any order and case, with aliases; rejects malformed shortcuts with a RangeError; resolves Mod to Meta on mac and Ctrl elsewhere', () => {
+    // reads modifiers in any order and case, with aliases
     expect(parseShortcut('Mod+Shift+K')).toEqual({
       key: 'k',
       mod: true,
@@ -208,9 +205,7 @@ describe('parseShortcut and resolveShortcut', () => {
     expect(parseShortcut('Mod+Plus').key).toBe('+');
     expect(parseShortcut('F12').key).toBe('F12');
     expect(parseShortcut('?').key).toBe('?');
-  });
-
-  it('rejects malformed shortcuts with a RangeError', () => {
+    // rejects malformed shortcuts with a RangeError
     for (const bad of [
       '',
       'Mod+',
@@ -223,9 +218,7 @@ describe('parseShortcut and resolveShortcut', () => {
     ]) {
       expect(() => parseShortcut(bad), bad).toThrow(RangeError);
     }
-  });
-
-  it('resolves Mod to Meta on mac and Ctrl elsewhere', () => {
+    // resolves Mod to Meta on mac and Ctrl elsewhere
     expect(resolveShortcut('Mod+K', 'mac')).toMatchObject({ meta: true, ctrl: false });
     expect(resolveShortcut('Mod+K', 'other')).toMatchObject({ meta: false, ctrl: true });
     expect(resolveShortcut('Ctrl+K', 'mac')).toMatchObject({ meta: false, ctrl: true });
@@ -246,7 +239,8 @@ describe('detectPlatform', () => {
 });
 
 describe('matchesShortcut', () => {
-  it('requires exactly the written modifiers', () => {
+  it('requires exactly the written modifiers, and 3 related cases', () => {
+    // requires exactly the written modifiers
     expect(matchesShortcut(key({ key: 'k', metaKey: true }), 'Mod+K', 'mac')).toBe(true);
     expect(matchesShortcut(key({ key: 'k', ctrlKey: true }), 'Mod+K', 'other')).toBe(true);
     expect(matchesShortcut(key({ key: 'k', ctrlKey: true }), 'Mod+K', 'mac')).toBe(false);
@@ -259,17 +253,13 @@ describe('matchesShortcut', () => {
     expect(matchesShortcut(key({ key: 'k' }), 'Mod+K', 'mac')).toBe(false);
     expect(matchesShortcut(key({ key: 'Escape' }), 'Escape', 'other')).toBe(true);
     expect(matchesShortcut(key({ key: 'Esc' }), 'Escape', 'other')).toBe(true);
-  });
-
-  it('ignores Shift for symbols it does not name, and honors it when it does', () => {
+    // ignores Shift for symbols it does not name, and honors it when it does
     expect(matchesShortcut(key({ key: '?', shiftKey: true }), '?', 'other')).toBe(true);
     expect(matchesShortcut(key({ key: '?' }), '?', 'other')).toBe(true);
     expect(matchesShortcut(key({ key: '?' }), 'Shift+?', 'other')).toBe(false);
     // Letters keep Shift strict: a single-key "k" is not Shift+K.
     expect(matchesShortcut(key({ key: 'K', shiftKey: true }), 'k', 'other')).toBe(false);
-  });
-
-  it('falls back to the physical key when the typed character differs', () => {
+    // falls back to the physical key when the typed character differs
     // ⌥K types "˚" on macOS.
     expect(matchesShortcut(key({ key: '˚', code: 'KeyK', altKey: true }), 'Alt+K', 'mac')).toBe(
       true
@@ -288,12 +278,12 @@ describe('matchesShortcut', () => {
     expect(matchesShortcut(key({ key: 'л', code: 'KeyL', ctrlKey: true }), 'Mod+K', 'other')).toBe(
       false
     );
-  });
-
-  it('skips auto-repeat unless asked', () => {
-    const held = key({ key: 'k', ctrlKey: true, repeat: true });
-    expect(matchesShortcut(held, 'Mod+K', 'other')).toBe(false);
-    expect(matchesShortcut(held, 'Mod+K', 'other', { allowRepeat: true })).toBe(true);
+    {
+      // skips auto-repeat unless asked
+      const held = key({ key: 'k', ctrlKey: true, repeat: true });
+      expect(matchesShortcut(held, 'Mod+K', 'other')).toBe(false);
+      expect(matchesShortcut(held, 'Mod+K', 'other', { allowRepeat: true })).toBe(true);
+    }
   });
 });
 
@@ -303,28 +293,28 @@ describe('createShortcutMap', () => {
     { id: 'help', keys: '?' },
     { id: 'close', keys: 'Escape' },
   ] as const;
-
-  it('returns the bound id, trying alternatives', () => {
-    const map = createShortcutMap(bindings, 'mac');
-    expect(map.platform).toBe('mac');
-    expect(map.match(key({ key: 'p', metaKey: true }))).toBe('palette');
-    expect(map.match(key({ key: '?', shiftKey: true }))).toBe('help');
-    expect(map.match(key({ key: 'Escape' }))).toBe('close');
-    expect(map.match(key({ key: 'x' }))).toBeNull();
-  });
-
-  it('describes bindings for people and for aria-keyshortcuts', () => {
-    const mac = createShortcutMap(bindings, 'mac');
-    expect(mac.describe('palette')).toEqual(['⌘K', '⌘P']);
-    expect(mac.describe('palette', 'text')).toEqual(['Cmd+K', 'Cmd+P']);
-    expect(mac.ariaKeyShortcuts('palette')).toBe('Meta+K Meta+P');
-    const other = createShortcutMap(bindings, 'other');
-    expect(other.describe('palette')).toEqual(['Ctrl+K', 'Ctrl+P']);
-    expect(other.ariaKeyShortcuts('palette')).toBe('Control+K Control+P');
-    expect(() => other.describe('missing' as never)).toThrow(RangeError);
-  });
-
-  it('rejects conflicts, repeated ids and empty bindings when it is built', () => {
+  it('returns the bound id, trying alternatives, and 2 related cases', () => {
+    {
+      // returns the bound id, trying alternatives
+      const map = createShortcutMap(bindings, 'mac');
+      expect(map.platform).toBe('mac');
+      expect(map.match(key({ key: 'p', metaKey: true }))).toBe('palette');
+      expect(map.match(key({ key: '?', shiftKey: true }))).toBe('help');
+      expect(map.match(key({ key: 'Escape' }))).toBe('close');
+      expect(map.match(key({ key: 'x' }))).toBeNull();
+    }
+    {
+      // describes bindings for people and for aria-keyshortcuts
+      const mac = createShortcutMap(bindings, 'mac');
+      expect(mac.describe('palette')).toEqual(['⌘K', '⌘P']);
+      expect(mac.describe('palette', 'text')).toEqual(['Cmd+K', 'Cmd+P']);
+      expect(mac.ariaKeyShortcuts('palette')).toBe('Meta+K Meta+P');
+      const other = createShortcutMap(bindings, 'other');
+      expect(other.describe('palette')).toEqual(['Ctrl+K', 'Ctrl+P']);
+      expect(other.ariaKeyShortcuts('palette')).toBe('Control+K Control+P');
+      expect(() => other.describe('missing' as never)).toThrow(RangeError);
+    }
+    // rejects conflicts, repeated ids and empty bindings when it is built
     expect(() =>
       createShortcutMap(
         [
@@ -358,16 +348,15 @@ describe('createShortcutMap', () => {
 });
 
 describe('formatShortcut and ariaKeyShortcuts', () => {
-  it('uses the platform convention and the ⌃⌥⇧⌘ order on mac', () => {
+  it('uses the platform convention and the ⌃⌥⇧⌘ order on mac; names modifiers the way aria-keyshortcuts expects', () => {
+    // uses the platform convention and the ⌃⌥⇧⌘ order on mac
     expect(formatShortcut('Mod+Shift+Alt+Ctrl+K', 'mac')).toBe('⌃⌥⇧⌘K');
     expect(formatShortcut('Mod+Shift+K', 'other')).toBe('Ctrl+Shift+K');
     expect(formatShortcut('Alt+ArrowUp', 'mac', 'text')).toBe('Option+Up');
     expect(formatShortcut('Alt+ArrowUp', 'mac')).toBe('⌥↑');
     expect(formatShortcut('Enter', 'other')).toBe('↵');
     expect(formatShortcut('Space', 'other', 'text')).toBe('Space');
-  });
-
-  it('names modifiers the way aria-keyshortcuts expects', () => {
+    // names modifiers the way aria-keyshortcuts expects
     expect(ariaKeyShortcuts('Mod+Shift+K', 'mac')).toBe('Shift+Meta+K');
     expect(ariaKeyShortcuts('Mod+Shift+K', 'other')).toBe('Control+Shift+K');
     expect(ariaKeyShortcuts('Mod+Plus', 'other')).toBe('Control+Plus');

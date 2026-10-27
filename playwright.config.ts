@@ -26,6 +26,8 @@ export default defineConfig({
     'consumers/**/*.spec.ts',
   ],
   fullyParallel: true,
+  // GitHub's ubuntu-latest runners have 4 vCPUs; Playwright defaults to half.
+  workers: process.env.CI ? 4 : undefined,
   retries: 0,
   reporter: [['list']],
   use: {

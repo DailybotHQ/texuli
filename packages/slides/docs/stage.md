@@ -2,9 +2,9 @@
 
 **Import:** `@texuli/slides/stage`  
 **Source:** `packages/slides/src/stage/`  
-**Tests:** `tests/stage.test.ts`, `tests/fragments.test.ts`, `tests/stage-screen.test.ts`, `tests/presenter.test.ts`,
-`tests/transitions.test.ts`, `tests/theme.test.ts`, `tests/media.test.ts`,
-`tests/print.test.ts`, `tests/a11y.test.ts`; browser sweep
+**Tests:** `tests/stage.test.ts` (runtime, themes, transitions, presenter,
+accessibility), `tests/stage-content.test.ts` (print, media, fragments, slot
+masters, fullscreen, presenter screen); browser sweep
 `tests/e2e/a11y-slides.spec.ts`
 
 The Svelte 5 runtime for a validated deck ([model.md](model.md)): the

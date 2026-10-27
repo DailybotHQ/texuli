@@ -108,18 +108,15 @@ landed, without dropping behavior.
 ## Tests
 
 ```bash
-pnpm vitest run packages/primitives/tests/splitter.test.ts
+pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/composites.test.ts
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/splitter.spec.ts
 ```
 
-**Unit** (16 tests) cover:
-- the model: initial and saved layouts, normalization, min and max,
-  collapse snapping and reopening, keys including right to left, collapse and
-  restore;
+**Unit** (7 tests, `-t splitter`) cover:
+- the model: normalization, and collapse snapping and reopening;
 - persistence, including corrupt data and refusing storage;
-- the components: APG attributes in both directions, keyboard, Enter collapse
-  with inert and callbacks, right to left, pointer drag with save-on-end and
-  foreign pointers ignored, restore on mount, and the `child` handle.
+- the components: Enter collapse with inert and callbacks, pointer drag with
+  save-on-end, and restore on mount.
 
 **Browser** (Chromium, WebKit, Pixel 7) covers:
 - attributes and the Tab stop;

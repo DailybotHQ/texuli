@@ -5,7 +5,7 @@
  * blueprint §5 s5).
  *
  * Kept out of the .astro so the unit test
- * (`apps/website/tests/web-correlation.test.ts`) can pin every excerpt byte
+ * (`apps/website/tests/section-contracts.test.ts`) can pin every excerpt byte
  * for byte against the file it cites: if a regeneration of the spec
  * projections changes a quoted line, the test fails and the demo cannot
  * drift away from the real artifacts. The excerpts are code-authored text

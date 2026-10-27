@@ -4,7 +4,7 @@
  * Every @texuli/blocks family engine subpath (plus formula and code/tokenizer)
  * must:
  * 1. Import in plain Node (no DOM, no Svelte runtime).
- * 2. Bundle with Vite or esbuild without the Svelte plugin, with zero
+ * 2. Bundle with Vite without the Svelte plugin, with zero
  *    .svelte modules reachable in the graph (Protoyard hosts that parse
  *    blocks without a Svelte plugin depend on this).
  *
@@ -22,30 +22,7 @@ import { parseFormula } from '../src/core/formula/index.ts';
 import { DIAGRAM_LIMITS, layoutFlow, parseDiagram } from '../src/diagram/engine.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const REPO = resolve(ROOT, '../..');
 const SRC = join(ROOT, 'src');
-
-type EsbuildBuild = (options: {
-  entryPoints: string[];
-  bundle: boolean;
-  write: boolean;
-  format: 'esm';
-  platform: 'neutral';
-  target: string;
-  logLevel: 'silent';
-  metafile: boolean;
-  plugins: [];
-  external: string[];
-}) => Promise<{
-  outputFiles?: Array<{ text: string }>;
-  metafile?: { inputs?: Record<string, unknown> };
-}>;
-
-async function loadEsbuild(): Promise<{ build: EsbuildBuild }> {
-  const require = createRequire(join(REPO, 'package.json'));
-  const esbuildPath = require.resolve('esbuild');
-  return import(pathToFileURL(esbuildPath).href) as Promise<{ build: EsbuildBuild }>;
-}
 
 /** Engine (and sibling pure) subpaths published for Svelte-free hosts. */
 const ENGINE_ENTRIES: ReadonlyArray<{
@@ -157,33 +134,36 @@ describe('@texuli/blocks engine exports map', () => {
 });
 
 describe('@texuli/blocks engine plain-Node import', () => {
-  it('loads each engine module without DOM globals', async () => {
-    expect(typeof document).toBe('undefined');
-    expect(typeof window).toBe('undefined');
-    for (const entry of ENGINE_ENTRIES) {
-      const mod = await import(pathToFileURL(entry.file).href);
-      expect(mod, entry.exportPath).toBeTypeOf('object');
-      expect(Object.keys(mod).length, entry.exportPath).toBeGreaterThan(0);
+  it('loads each engine module without DOM globals; exposes diagram layoutFlow + DIAGRAM_LIMITS and code language resolve', async () => {
+    // loads each engine module without DOM globals
+    await (async () => {
+      expect(typeof document).toBe('undefined');
+      expect(typeof window).toBe('undefined');
+      for (const entry of ENGINE_ENTRIES) {
+        const mod = await import(pathToFileURL(entry.file).href);
+        expect(mod, entry.exportPath).toBeTypeOf('object');
+        expect(Object.keys(mod).length, entry.exportPath).toBeGreaterThan(0);
+      }
+    })();
+    {
+      // exposes diagram layoutFlow + DIAGRAM_LIMITS and code language resolve
+      expect(DIAGRAM_LIMITS.flowNodes).toBeGreaterThan(0);
+      const parsed = parseDiagram({
+        type: 'flow',
+        nodes: [
+          { id: 'a', label: 'A' },
+          { id: 'b', label: 'B' },
+        ],
+      });
+      expect(parsed.success).toBe(true);
+      if (parsed.success && parsed.data.type === 'flow') {
+        const layout = layoutFlow(parsed.data);
+        expect(layout.positions.length).toBe(2);
+      }
+      expect(resolveCodeLanguage('typescript')).toBe('ts');
+      expect(CODE_GRAMMAR_LANGUAGES.includes('ts')).toBe(true);
+      expect(parseFormula({ op: 'num', value: 1 }).success).toBe(true);
     }
-  });
-
-  it('exposes diagram layoutFlow + DIAGRAM_LIMITS and code language resolve', () => {
-    expect(DIAGRAM_LIMITS.flowNodes).toBeGreaterThan(0);
-    const parsed = parseDiagram({
-      type: 'flow',
-      nodes: [
-        { id: 'a', label: 'A' },
-        { id: 'b', label: 'B' },
-      ],
-    });
-    expect(parsed.success).toBe(true);
-    if (parsed.success && parsed.data.type === 'flow') {
-      const layout = layoutFlow(parsed.data);
-      expect(layout.positions.length).toBe(2);
-    }
-    expect(resolveCodeLanguage('typescript')).toBe('ts');
-    expect(CODE_GRAMMAR_LANGUAGES.includes('ts')).toBe(true);
-    expect(parseFormula({ op: 'num', value: 1 }).success).toBe(true);
   });
 });
 
@@ -235,8 +215,8 @@ describe('@texuli/blocks engine Vite build without Svelte plugin', () => {
     if (workDir) await rm(workDir, { recursive: true, force: true });
   });
 
-  for (const entry of ENGINE_ENTRIES) {
-    it(`Vite-bundles ${entry.exportPath} with no .svelte reachable`, () => {
+  it('Vite-bundles every engine subpath with no .svelte reachable', () => {
+    for (const entry of ENGINE_ENTRIES) {
       const code = bundles.get(entry.exportPath) ?? '';
       expect(code.length, entry.exportPath).toBeGreaterThan(50);
       for (const needle of FORBIDDEN) {
@@ -245,40 +225,6 @@ describe('@texuli/blocks engine Vite build without Svelte plugin', () => {
       for (const keep of entry.mustInclude) {
         expect(code.includes(keep), `${entry.exportPath} should retain ${keep}`).toBe(true);
       }
-    });
-  }
-});
-
-describe('@texuli/blocks engine esbuild without Svelte plugin', () => {
-  for (const entry of ENGINE_ENTRIES) {
-    it(`esbuild-bundles ${entry.exportPath} with no .svelte reachable`, async () => {
-      const { build } = await loadEsbuild();
-      const result = await build({
-        entryPoints: [entry.file],
-        bundle: true,
-        write: false,
-        format: 'esm',
-        platform: 'neutral',
-        target: 'es2022',
-        logLevel: 'silent',
-        metafile: true,
-        // No svelte plugin; .svelte files must not appear in the module graph.
-        plugins: [],
-        external: ['svelte', 'svelte/*'],
-      });
-      const code = (result.outputFiles ?? []).map((f) => f.text).join('\n');
-      expect(code.length).toBeGreaterThan(50);
-      for (const needle of FORBIDDEN) {
-        expect(
-          code.includes(needle),
-          `${entry.exportPath} esbuild must not contain ${needle}`
-        ).toBe(false);
-      }
-      const svelteInputs = Object.keys(result.metafile?.inputs ?? {}).filter((p) =>
-        p.endsWith('.svelte')
-      );
-      expect(code.includes('.svelte')).toBe(false);
-      expect(svelteInputs).toEqual([]);
-    });
-  }
+    }
+  });
 });

@@ -33,20 +33,27 @@ the repository skills when one fits (`.agents/skills/*/SKILL.md`).
 ## Procedure
 
 1. **Read before writing:** the module README (`packages/core/README.md` or
-   `apps/website/README.md`), `docs/STANDARDS.md`, and the nearest example
-   (`packages/core/src/url/safe-href.ts` with its test).
+   `apps/website/README.md`, or the package's `README.md`),
+   `docs/STANDARDS.md`, and the nearest example (for a texel,
+   `packages/core/src/roving/` with `packages/core/tests/roving.test.ts`).
 2. **Pick the skill:** framework-free behavior → `add-texel`; website page →
-   `add-website-page`; lint or type errors → `fix-lint`.
+   `add-website-page`; lint, type or layer-guard errors → `fix-lint`; a
+   primitive, styled component, catalog manifest or example → the stages
+   in `skills/texuli/contribute/SKILL.md`.
 3. **Implement inside the owned paths.** Erasable TypeScript, relative
    imports with `.ts`, Svelte 5 runes, no HTML sinks, URLs through
    `safeHref`, logical CSS properties.
-4. **Test the behavior** in `packages/<pkg>/tests/<name>.test.ts`.
+4. **Test the behavior** in `packages/<pkg>/tests/` (extend the existing area or family file; one looping test per behavior, not one test per item).
 5. **Run the gates:**
    - `npx biome check <paths>`
    - `pnpm --filter <package> typecheck`
    - `pnpm vitest run <path>` with a non-zero `passed` count
-   - `pnpm build` for website changes
-   - `pnpm check && pnpm build` for `packages/core` or root config
+   - `pnpm build` (then `pnpm --filter @texuli/website check:csp` and the
+     area's `tests/e2e/site-*.spec.ts`) for website changes
+   - the behavior suite for `packages/primitives`, `pnpm size --filter <dir>`
+     for a new or grown subpath, `pnpm check:skill` for `skills/texuli`
+   - `pnpm check`, the behavior suite and `pnpm build` for `packages/core`
+     or root config
 6. **Commit only if asked** with `/commit`.
 
 ## Output

@@ -171,8 +171,10 @@ test.describe('data calendar · host parity', () => {
     expect(Math.abs(offset)).toBeLessThan(2);
   });
 
-  for (const mode of ['light', 'dark'] as const) {
-    test(`passes axe with the slot focused and an event grabbed (${mode})`, async ({ page }) => {
+  test(`passes axe with the slot focused and an event grabbed in light and dark`, async ({
+    page,
+  }) => {
+    for (const mode of ['light', 'dark'] as const) {
       await open(page, mode);
       await slot(page).focus();
       await chip(page, 'design-review').focus();
@@ -184,6 +186,6 @@ test.describe('data calendar · host parity', () => {
         .withTags(AXE_TAGS)
         .analyze();
       expect(results.violations).toEqual([]);
-    });
-  }
+    }
+  });
 });

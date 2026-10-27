@@ -93,17 +93,12 @@ anchor flips with the logical property.
 
 ## Verified
 
-- `pnpm vitest run packages/primitives/tests/slider.test.ts`: 28 tests.
+- `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/forms.test.ts -t slider`: 9 tests.
   - The math: snapping with decimals, bounds and gaps, pointer to value in
-    every orientation and RTL, nearest thumb, the key mapping.
-  - Roles and values, positions, vertical layout and ticks.
-  - Every key, RTL, decimal steps and `preventDefault`.
-  - Range bounds and the minimum gap, and drags that stop at the neighbor.
-  - Disabled, both keys and pointer.
-  - Pointer and touch: press, drag, a single commit, capture, cancel, the
-    right button, the nearest range thumb, RTL.
-  - Form submit, reset and disabled; the child snippet.
-  - Nine deliberate mutations of the implementation each fail a test.
+    every orientation and RTL.
+  - Logical positions; range thumbs never cross and keep the minimum gap.
+  - Pointer: a single commit on release, the right button ignored.
+  - Form submit, reset and disabled.
 - **Behavior:** `pnpm exec playwright test tests/behavior/scenarios/slider.spec.ts`
   runs 10 rows: roles, keyboard, Tab order, range order, RTL, click, drag
   with a single commit, touch tap, disabled, and axe.

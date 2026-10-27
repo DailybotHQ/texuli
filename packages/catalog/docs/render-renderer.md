@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/catalog`  
 **Import:** `@texuli/catalog/render/renderer`  
-**Tests:** `packages/catalog/tests/render-renderer.test.ts`, `packages/catalog/tests/render-block-families.test.ts`, `packages/catalog/tests/tier-semantics.test.ts`, `packages/catalog/tests/render-slots-conditions.test.ts`
+**Tests:** `packages/catalog/tests/render-renderer.test.ts` (renderer, block family ids, tier semantics), `packages/catalog/tests/render-slots-conditions.test.ts`
 
 ## Goal
 
@@ -81,7 +81,7 @@ renderCatalogTree(tree, {
 
 Each `blocks-*` id renders only its own family's block types
 (`BLOCK_FAMILY_TYPES`, held equal to the `*_BLOCK_TYPES` lists in
-`@texuli/blocks` by `render-block-families.test.ts`). A `cta` block under
+`@texuli/blocks` by `render-renderer.test.ts`). A `cta` block under
 `blocks-text` passes the block schema but would paint the text family's inert
 "invalid" notice, so the renderer drops it with a diagnostic that names the
 right id (`blocks-structure`). `blockFamilyIdFor(type)` answers which id

@@ -156,7 +156,7 @@ key. Placeholders such as `{width}` are filled as plain text.
 
 ## Verified
 
-- `pnpm vitest run packages/media/tests/image-editor.test.ts`: 37 tests (2026-10-26) cover:
+- `pnpm vitest run packages/media/tests/image-editor.test.ts`: 10 tests (2026-10-26) cover:
   - the model, the history and the validator against hostile edits;
   - the filter math against the CSS definitions, and the blur;
   - a geometric property: the source region under the crop stays the same

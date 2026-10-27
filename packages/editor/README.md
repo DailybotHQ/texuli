@@ -4,6 +4,7 @@ Rich text editor surface built on the `@texuli/core` editor texels:
 the closed document model, pure transforms, snapshot history, keyboard
 map and the Markdown codec, bound to an owned, sink-free Svelte 5
 rendering (no `{@html}`, no `innerHTML`, links through the URL policy).
+Layer L4, beside the other domain packages.
 
 **Status: in development.** This package is private (`0.0.0`) and excluded
 from packing until its own release; nothing here is published. The
@@ -83,8 +84,8 @@ held document in `$state.raw`, not `$state`, so it is not deep-proxied.
 - **Read-only** mode keeps the textbox with `aria-readonly="true"` and refuses
   every edit.
 
-Tests: `pnpm vitest run packages/editor` (paste, controller and component
-tests, including hostile paste and link-policy cases). Examples:
+Tests: `pnpm vitest run packages/editor` (22 tests in 2 files: the model,
+including hostile paste and link-policy cases, and the component). Examples:
 `editor-basic`, `editor-toolbar` and `editor-long-document` in
 `@texuli/examples`, with light and dark visual baselines.
 

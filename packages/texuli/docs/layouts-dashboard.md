@@ -3,7 +3,7 @@
 **Package:** `texuli`  
 **Import:** `texuli/layouts/dashboard`  
 **Layout id:** `dashboard-grid`  
-**Tests:** `packages/texuli/tests/layouts-dashboard.test.ts`  
+**Tests:** `packages/texuli/tests/layouts.test.ts`  
 **Example:** `layouts-dashboard`
 
 ## Goal

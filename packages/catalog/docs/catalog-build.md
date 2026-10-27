@@ -103,7 +103,7 @@ Emit tiers: 41 entries for developers and 41 in Tier U.
 
 ## Tests
 
-`pnpm vitest run packages/catalog/tests/build.test.ts` (15 tests, Node
+`pnpm vitest run packages/catalog/tests/build.test.ts` (5 grouped tests, Node
 environment) covers:
 - canonical JSON and SHA-256;
 - addressing, order independence, change detection and tamper refusal;

@@ -11,4 +11,4 @@ import { buttonVariants } from 'texuli/button';
 const className = buttonVariants({ variant: 'outline', size: 'sm' });
 ```
 
-Gate: `pnpm vitest run packages/texuli/tests/variants-css.test.ts`
+Gate: `pnpm vitest run packages/texuli/tests/contracts.test.ts`

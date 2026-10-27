@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/primitives`
 **Import:** `import { ColorPicker } from '@texuli/primitives/color-picker'`
-**Tests:** `packages/primitives/tests/color-picker.test.ts`
+**Tests:** `packages/primitives/tests/models.test.ts`, `packages/primitives/tests/forms.test.ts`
 **Browser check:** `tests/behavior/scenarios/color-picker.spec.ts`
 
 `ColorPicker.Root` provides controlled or uncontrolled color state and composes

@@ -18,13 +18,18 @@ end to end and native for agents:
   layouts;
 - **domain packages** (data, charts, media, chat, content blocks) build on
   the components;
-- the **agent catalog** renders agent output with no HTML sinks.
+- the **agent catalog** renders agent output with no HTML sinks, and the
+  blueprint contract (`@texuli/spec`) also feeds a Kotlin Multiplatform
+  twin in `native/`.
 
-**Status: in development, not released.** All 15 packages are published
-to npm as `0.1.0-next.1` under the `next` dist-tag by the publish
-workflow; the workspace packages stay `private: true`, no stable release
-is out (`latest` is reserved for 1.0.0), and texuli.com deploys from
-`main` to Cloudflare Pages. See
+**Status: in development, not released.** The 15 packable packages (all
+of `packages/` except `@texuli/editor` and `@texuli/examples`, which are
+never packed) are published to npm as `0.1.0-next.1` under the `next`
+dist-tag by the publish workflow; the workspace packages stay
+`private: true`, no stable release is out (`latest` is reserved for 1.0.0
+by policy; see [RELEASE](docs/RELEASE.md) for where it resolves today),
+and texuli.com deploys from `main` to Cloudflare Pages, with the Pages
+Functions in `functions/`. See
 [docs/PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md) and
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
@@ -34,21 +39,24 @@ is out (`latest` is reserved for 1.0.0), and texuli.com deploys from
 | --- | --- | --- |
 | Product | [PRODUCT_SPEC](docs/PRODUCT_SPEC.md) | Problem, consumers, capabilities, non-goals, release status |
 | Releases | [RELEASE](docs/RELEASE.md) | Independent package versions, prerelease and stable dist-tags, owner-GO publication waves |
-| Architecture | [ARCHITECTURE](docs/ARCHITECTURE.md) | The down-only layer graph (L0 core … L7 tools), every package and subpath, engines, the website, build and test shape |
+| Architecture | [ARCHITECTURE](docs/ARCHITECTURE.md) | The down-only layer graph (L0 core and spec … L8 tools and astro), every package and subpath, engines, the website, build and test shape |
 | Decisions | [DECISIONS](docs/DECISIONS.md) | Architecture decisions: options, choice, why, how to reverse |
+| Design language | [DESIGN_LANGUAGE](docs/DESIGN_LANGUAGE.md) · [EDITOR_ARCHITECTURE](docs/EDITOR_ARCHITECTURE.md) | The cross-surface visual contract; the rich text editor's contracts (ADR-003) |
 | Standards | [STANDARDS](docs/STANDARDS.md) | TypeScript, Svelte 5, Biome, CSS logical properties, naming, a11y, honesty |
 | Testing | [TESTING_GUIDE](docs/TESTING_GUIDE.md) | Every gate with verified results, source→test map, blind spots, posture |
 | Commands | [DEVELOPMENT_COMMANDS](docs/DEVELOPMENT_COMMANDS.md) | Every root and package script, scoped variants |
-| Security | [SECURITY](docs/SECURITY.md) | Threat model: URL policy, HTML sinks, untrusted agent output, CSP, supply chain |
-| CI | [CI](docs/CI.md) | GitHub Actions: checks, behavior suite, website, npm publishing waves, Cloudflare Pages deployment, tracked budget reds |
+| Security | [SECURITY](docs/SECURITY.md) | Threat model: URL policy, HTML sinks, untrusted agent output, CSP, supply chain, edge functions and analytics |
+| CI | [CI](docs/CI.md) | GitHub Actions: checks, behavior suite, website, npm publishing waves, Cloudflare Pages deployment, budget audits |
 | Accessibility | [ACCESSIBILITY](docs/ACCESSIBILITY.md) | The accessibility contract and its checks |
 | Performance | [PERFORMANCE](docs/PERFORMANCE.md) | Size budgets, measured numbers, perf tests |
 | Quality reports | [docs/quality/](docs/README.md#quality-reports-docsquality) | a11y sweeps, consumers, CSP, SSR, packaging, perf, supply chain, screen-reader transcripts |
 | Onboarding | [AI_AGENT_ONBOARDING](docs/AI_AGENT_ONBOARDING.md) | First-session checklist |
 | Collaboration | [AI_AGENT_COLLAB](docs/AI_AGENT_COLLAB.md) | Path ownership, owner-held files, commits in a shared checkout, handoffs |
 | Index | [docs/README](docs/README.md) | Every guide: repository, package, website and quality docs |
-| Packages | [core](packages/core/README.md) · [primitives](packages/primitives/README.md) · [tokens](packages/tokens/README.md) · [texuli](packages/texuli/README.md) · [charts](packages/charts/README.md) · [data](packages/data/README.md) · [media](packages/media/README.md) · [chat](packages/chat/README.md) · [blocks](packages/blocks/README.md) · [catalog](packages/catalog/README.md) · [tools](packages/tools/README.md) · [examples](packages/examples/README.md) | Each package's front page; its `docs/*.md` describe every subpath |
+| Packages | [core](packages/core/README.md) · [primitives](packages/primitives/README.md) · [tokens](packages/tokens/README.md) · [texuli](packages/texuli/README.md) · [charts](packages/charts/README.md) · [data](packages/data/README.md) · [media](packages/media/README.md) · [chat](packages/chat/README.md) · [blocks](packages/blocks/README.md) · [catalog](packages/catalog/README.md) · [slides](packages/slides/README.md) · [player](packages/player/README.md) · [tools](packages/tools/README.md) · [astro](packages/astro/README.md) · [spec](packages/spec/README.md) · [editor](packages/editor/README.md) · [examples](packages/examples/README.md) | Each package's front page; its `docs/*.md` describe every subpath |
 | Website | [apps/website](apps/website/README.md) | texuli.com (Astro 7 + Svelte islands); area designs in `apps/website/docs/` |
+| Agent service | [apps/agent](apps/agent/README.md) | The texuli.com agent service: prompt → validated blueprint draft, fake replay provider only, not deployed |
+| Native | [native](native/README.md) | The Gradle Kotlin Multiplatform twin (`texuli-spec`, `texuli-compose`, `conformance`); not a pnpm package |
 | Agent skill | [skills/texuli](skills/texuli/SKILL.md) | The distributable skill for building with Texuli (`pnpm check:skill`) |
 | Test suites | [behavior](tests/behavior/README.md) · [visual](tests/visual/README.md) | The primitives behavior suite; visual baselines |
 | Kit | [.agents catalog](.agents/docs/skills_agents_catalog.md), [commands](.agents/docs/COMMANDS_REFERENCE.md) | Skills, agents, slash commands |
@@ -68,10 +76,20 @@ texuli/
 │   ├── media/           L4 @texuli/media: image, gallery, video, audio, editor, compositions   (README, docs/)
 │   ├── chat/            L4 @texuli/chat: thread, messages, composer                            (README, docs/)
 │   ├── blocks/          L5 @texuli/blocks: content blocks for pages, documents and slides      (README, docs/)
+│   ├── spec/            L0 @texuli/spec: the blueprint contract, schemas, TS + Kotlin codegen   (README)
+│   ├── editor/          L4 @texuli/editor: rich text editor surface (0.0.0, never packed)      (README, docs/)
 │   ├── catalog/         L6 @texuli/catalog: agent catalog + sink-free renderer                 (README, docs/)
-│   ├── tools/           L7 @texuli/tools: CLI, llms, A2UI, custom elements, golden set, MCP     (README, docs/)
+│   ├── slides/          L7 @texuli/slides: deck model, grammar, export, stage runtime          (README, docs/)
+│   ├── player/          L7 @texuli/player: paint runtime for validated blueprints              (README, docs/)
+│   ├── tools/           L8 @texuli/tools: CLI, llms, A2UI, custom elements, golden set, MCP     (README, docs/)
+│   ├── astro/           L8 @texuli/astro: Astro integration, content layouts, sections          (README, docs/)
 │   └── examples/        @texuli/examples (private): the examples registry for tests, visuals and the site
-├── apps/website/        @texuli/website: texuli.com, Astro 7 + Svelte islands                  (README, docs/)
+├── apps/
+│   ├── website/         @texuli/website: texuli.com, Astro 7 + Svelte islands                  (README, docs/)
+│   └── agent/           @texuli/agent: the agent service (fake replay provider; not deployed)   (README, docs/)
+├── functions/           Cloudflare Pages Functions: _middleware.ts (Markdown twins, robots variant,
+│                        problem+json 404s, bot events) and api/umami (same-origin analytics proxy)
+├── native/              Gradle Kotlin Multiplatform twin: texuli-spec, texuli-compose, conformance (README, docs/)
 ├── .github/workflows/   CI (checks, behavior, website, budget audits) and the npm publish workflow
 ├── skills/texuli/       the distributable agent skill (setup.sh, SHA256SUMS)
 ├── tests/
@@ -103,9 +121,11 @@ access after `pnpm install`. Browser commands need `TEXULI_E2E_PORT=<port>`
 | --- | --- | --- |
 | Install (lockfile owner only) | `pnpm install` · `pnpm test:e2e:install` (browsers) | — |
 | Website dev server | `pnpm dev` (stop: `pnpm --filter @texuli/website exec astro dev stop`) | — |
-| Lint + format | `pnpm lint` · `pnpm lint:fix` · `pnpm format` | `npx biome check <path>` |
+| Lint + format | `pnpm lint` (Biome + `check:trojan-source`) · `pnpm lint:fix` · `pnpm format` | `npx biome check <path>` |
 | Type check | `pnpm typecheck` | `pnpm --filter <package> typecheck` |
 | Unit + component tests | `pnpm test` | `pnpm vitest run packages/<pkg>` · `pnpm vitest run <file>` · `-t "<name>"` |
+| Agent service tests (not in `pnpm test`) | `pnpm --filter @texuli/agent exec vitest run` | `… vitest run tests/<file>.test.ts` |
+| Docs links and commands | `pnpm check:docs` | — |
 | Layer guard | `pnpm check:layers` | — |
 | Fast full gate | `pnpm check` (lint, typecheck, test, layers) | — |
 | Behavior suite (primitives) | `pnpm exec playwright test tests/behavior` | `… tests/behavior/scenarios/<primitive>.spec.ts` |
@@ -116,6 +136,7 @@ access after `pnpm install`. Browser commands need `TEXULI_E2E_PORT=<port>`
 | Perf limits (opt-in) | `pnpm test:perf` | — |
 | Agent skill | `pnpm check:skill` | — |
 | Website build | `pnpm build` (then `tests/e2e/site-*.spec.ts`) | — |
+| Native twin (JDK 21, not in `pnpm check`) | `./native/gradlew -p native check` | — |
 | Repository conformance (read-only) | `bash .agents/skills/deepworkplan/verify/conformance.sh --repo-only` | — |
 
 A `-t` filter that matches nothing exits 0 with every test skipped; always
@@ -127,10 +148,11 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
 
 1. **English only** in code, comments, UI copy, docs and commits.
 2. **Conventional Commits**: `type(scope): summary`. Scopes: `core`,
-   `primitives`, `tokens`, `texuli`, `charts`, `data`, `media`, `chat`,
-   `blocks`, `catalog`, `tools`, `examples`, `website`, `agent`, `native`, `skill`, `e2e`,
-   `consumers`, `scripts`, `docs`, `deps`, `ci`, `dwp` (the `.agents/`,
-   `.review/` and `.dwp/` harness). **Stage exact paths**, never
+   `spec`, `primitives`, `tokens`, `texuli`, `charts`, `data`, `media`,
+   `chat`, `editor`, `blocks`, `catalog`, `slides`, `player`, `tools`,
+   `astro`, `examples`, `website` (also `functions/`), `agent`, `native`,
+   `skill`, `e2e`, `visual`, `consumers`, `scripts`, `docs`, `deps`, `ci`,
+   `dwp` (the `.agents/`, `.review/` and `.dwp/` harness). **Stage exact paths**, never
    `git add -A` or `git add .`.
 3. **Local only.** Never push, never add a git remote, and never run a `gh`
    command that writes, until the developer says so. Commit only when asked.
@@ -167,7 +189,12 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. All 15 packages are on npm as `0.1.0-next.1` (dist-tag `next`, published by CI with provenance); no stable release is published (`latest` stays reserved for 1.0.0). texuli.com deploys from `main` (Cloudflare Pages).
+    check results. The 15 packable packages are on npm as `0.1.0-next.1`
+    (dist-tag `next`, published by CI with provenance); `@texuli/editor`,
+    `@texuli/examples`, the apps and `native/` publish nothing. No stable
+    release is published (`latest` stays reserved for 1.0.0). texuli.com
+    deploys from `main` (Cloudflare Pages); the agent service is not
+    deployed.
 13. **Scratch work** goes in `tmp/`. Plan artifacts go in
     `.dwp/plans/<plan>/analysis_results/`, never the repository root.
 14. **Progress reporting** (when a reporting tool is available) is
@@ -268,7 +295,9 @@ review** (installed, Flow A; rules in [.review/extension.md](.review/extension.m
 | Docs are honest | `pnpm exec tsx scripts/check-docs.ts` passes (links resolve, commands name real scripts and paths), and every cheap documented command runs |
 
 Not covered automatically: screen-reader experience beyond the recorded
-transcripts, Firefox, and real deployments. See
+transcripts, Firefox, real deployments (including the Pages Functions on
+Cloudflare's runtime), and, in CI, the agent service tests and the native
+Gradle build (both run locally only). See
 [TESTING_GUIDE](docs/TESTING_GUIDE.md).
 
 ## Adding a texel (the short version)

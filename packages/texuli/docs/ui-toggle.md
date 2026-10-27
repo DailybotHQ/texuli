@@ -44,6 +44,6 @@ Registry id **`texuli-toggle`**.
 ## Testing
 
 ```bash
-pnpm vitest run packages/texuli/tests/toggle.test.ts
+pnpm vitest run packages/texuli/tests/forms.test.ts
 TEXULI_E2E_PORT=4930 pnpm visual:update -g texuli-toggle
 ```

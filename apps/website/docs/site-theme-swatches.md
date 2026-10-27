@@ -2,7 +2,7 @@
 
 **App:** `apps/website`  
 **Pages:** `/theme-switcher/`, `/gallery-themes/`  
-**Tests:** `scripts/tests/site-theme-swatches.test.ts`, `tests/e2e/site-theme-swatches.spec.ts`
+**Tests:** `scripts/tests/site-loaders.test.ts`, `tests/e2e/site-theme-swatches.spec.ts`
 
 ## Goal
 
@@ -22,7 +22,7 @@ foreground — never the active site theme’s CSS variables.
 ## Validate
 
 ```bash
-pnpm vitest run scripts/tests/site-theme-swatches.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 pnpm build
 TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-theme-swatches.spec.ts
 ```

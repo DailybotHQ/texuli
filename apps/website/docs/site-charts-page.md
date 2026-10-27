@@ -2,7 +2,7 @@
 
 **App:** `apps/website`  
 **Paths:** `/charts-page/` (all families) · `/charts-page/<family>/`  
-**Tests:** `scripts/tests/site-charts-page.test.ts`, `tests/e2e/site-charts-page.spec.ts`
+**Tests:** `scripts/tests/site-loaders.test.ts`, `tests/e2e/site-charts-page.spec.ts`
 
 ## Goal
 
@@ -35,7 +35,7 @@ Fictional Harbor Notes metrics only. Geo tiles are schematic, not live GIS.
 ```bash
 pnpm build
 TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-charts-page.spec.ts
-pnpm vitest run scripts/tests/site-charts-page.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 ```
 
 ## Limits

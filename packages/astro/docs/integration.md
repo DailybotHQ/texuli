@@ -105,7 +105,7 @@ file. The helper returns the body only, without a `<script>` wrapper or nonce.
 
 ## Tests
 
-`packages/astro/tests/integration.test.ts` checks head injection, deterministic
+`packages/astro/tests/astro.test.ts` checks head injection, deterministic
 script output, cached appearance application, storage updates, system
 preference changes, manual placement, option validation, and stylesheet
 variants. The packed `astro-plain` fixture also checks that the injected

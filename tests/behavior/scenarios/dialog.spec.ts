@@ -85,19 +85,15 @@ scenario(
       },
     },
     {
-      id: 'trigger-named',
-      title: 'the trigger is a button that says it opens a dialog',
+      id: 'open-named-trapped-inert-locked',
+      title:
+        'opening: a named trigger and dialog, focus moves in and Tab stays inside, the page behind is inert and does not scroll',
       async run({ page }) {
         await expect(trigger(page)).toHaveAttribute('aria-haspopup', 'dialog');
         await expect(
           page.getByRole('button', { name: 'Open settings', expanded: false })
         ).toBeVisible();
-      },
-    },
-    {
-      id: 'dialog-named',
-      title: 'the dialog is named by its title and described by its description',
-      async run({ page }) {
+        expect(await isScrollLocked(page)).toBe(false);
         await open(page);
         await expect(dialog(page)).toHaveAccessibleDescription(
           'Change how your fictional workspace looks.'
@@ -105,24 +101,7 @@ scenario(
         await expect(
           page.getByRole('button', { name: 'Open settings', expanded: true })
         ).toBeAttached();
-      },
-    },
-    {
-      id: 'focus-moves-in',
-      title: 'opening moves focus into the dialog',
-      async run({ page, recordOpenToFocus }) {
-        await open(page);
         expect(await focusIsWithin(dialog(page))).toBe(true);
-        await page.keyboard.press('Escape');
-        await layerClosed(page);
-        recordOpenToFocus(await sampleOpenToFocus(page, trigger(page)));
-      },
-    },
-    {
-      id: 'focus-trapped',
-      title: 'Tab and Shift+Tab stay inside the dialog',
-      async run({ page }) {
-        await open(page);
         const stops = [
           ...(await focusSequence(page, 6)),
           ...(await focusSequence(page, 6, { reverse: true })),
@@ -132,88 +111,46 @@ scenario(
             stop.name
           );
         }
+        expect(await isInert(frame.before(page))).toBe(true);
+        expect(await isInert(frame.after(page))).toBe(true);
+        expect(await isScrollLocked(page)).toBe(true);
       },
     },
     {
-      id: 'escape-returns-focus',
-      title: 'Escape closes it and focus returns to the trigger',
-      async run({ page }) {
+      id: 'escape-top-layer-then-returns-focus',
+      title:
+        'Escape closes it: focus returns to the trigger, the page scrolls again, it reports opening and closing once each; with a nested dialog open, Escape closes only the top one',
+      async run({ page, recordOpenToFocus }) {
         await open(page);
         await page.keyboard.press('Escape');
         await layerClosed(page);
         await expectFocus(page, 'button', 'Open settings');
-      },
-    },
-    {
-      id: 'close-button',
-      title: 'the Close button closes it',
-      async run({ page }) {
-        await open(page);
-        const close = layer(page).getByRole('button', { name: 'Close' });
-        await close.click();
-        await layerClosed(page);
-      },
-    },
-    {
-      id: 'escape-closes-top-layer-only',
-      title: 'with a nested dialog open, Escape closes only the top one',
-      async run({ page }) {
+        await expect.poll(() => isScrollLocked(page)).toBe(false);
+        await expectEvents(page, [
+          { name: 'openChange', detail: true },
+          { name: 'openChange', detail: false },
+        ]);
         await open(page);
         await page.getByRole('button', { name: 'Open details' }).click();
         await expect(page.getByRole('dialog', { name: 'Details' })).toBeVisible();
         await page.keyboard.press('Escape');
         await expect(page.getByRole('dialog', { name: 'Details' })).toHaveCount(0);
         await expect(dialog(page)).toBeVisible();
-      },
-    },
-    {
-      id: 'outside-inert',
-      title: 'the page behind the dialog is inert while it is open',
-      async run({ page }) {
-        await open(page);
-        expect(await isInert(frame.before(page))).toBe(true);
-        expect(await isInert(frame.after(page))).toBe(true);
-      },
-    },
-    {
-      id: 'scroll-locked',
-      title: 'the page does not scroll while the dialog is open',
-      async run({ page }) {
-        expect(await isScrollLocked(page)).toBe(false);
-        await open(page);
-        expect(await isScrollLocked(page)).toBe(true);
-      },
-    },
-    {
-      id: 'scroll-released',
-      title: 'the page scrolls again once the dialog closes',
-      async run({ page }) {
-        await open(page);
         await page.keyboard.press('Escape');
         await layerClosed(page);
-        await expect.poll(() => isScrollLocked(page)).toBe(false);
+        recordOpenToFocus(await sampleOpenToFocus(page, trigger(page)));
       },
     },
     {
-      id: 'outside-pointer-closes',
-      title: 'a pointer press outside closes it',
+      id: 'close-button-and-outside-pointer',
+      title: 'the Close button closes it, and so does a pointer press outside',
       async run({ page }) {
+        await open(page);
+        await layer(page).getByRole('button', { name: 'Close' }).click();
+        await layerClosed(page);
         await open(page);
         await pointerOutside(page);
         await layerClosed(page);
-      },
-    },
-    {
-      id: 'open-change-events',
-      title: 'it reports opening and closing once each, in order',
-      async run({ page }) {
-        await open(page);
-        await page.keyboard.press('Escape');
-        await layerClosed(page);
-        await expectEvents(page, [
-          { name: 'openChange', detail: true },
-          { name: 'openChange', detail: false },
-        ]);
       },
     },
   ])

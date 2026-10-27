@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Import:** `import { Separator, AspectRatio, VisuallyHidden } from 'texuli/separator-aspect'`  
-**Tests:** `packages/texuli/tests/separator-aspect.test.ts`  
+**Tests:** `packages/texuli/tests/display.test.ts`  
 **Example:** `texuli-separator-aspect`
 
 ## Contract

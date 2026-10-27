@@ -1,7 +1,8 @@
 # Build-ui gates (offline)
 
-Run from the **monorepo root**. Lane Playwright always sets `TEXULI_E2E_PORT`
-(lane J: **4910**). Do **not** use 4870 or 4890–4899 (lead-reserved).
+Run from the **monorepo root**. Every Playwright command sets
+`TEXULI_E2E_PORT=<port>`: 4870 is the default, and each parallel worker in a
+shared checkout picks its own free port so two servers never collide.
 
 ## Skill pack
 
@@ -27,27 +28,33 @@ npx biome check packages/catalog/src packages/catalog/tests
 ## Styled UI you composed
 
 ```bash
-pnpm vitest run packages/texuli/tests/<name>.test.ts
+pnpm vitest run packages/texuli/tests/<family>.test.ts
 pnpm --filter texuli typecheck
-npx biome check packages/texuli/src/components/<name> packages/texuli/tests/<name>.test.ts
-# Report gzip only; do not edit texuli.budgets.json
+npx biome check packages/texuli/src/components/<name> packages/texuli/tests/<family>.test.ts
+# Report gzip only; do not edit texuli.budgets.json (owner-held)
 pnpm size --filter 'texuli/<subpath>'
 ```
 
 ## Website page (if you touched apps/website)
 
 ```bash
-pnpm --filter @texuli/website build
-TEXULI_E2E_PORT=4910 pnpm exec playwright test tests/e2e/<spec>.spec.ts
+pnpm build
+pnpm --filter @texuli/website check:csp
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/<spec>.spec.ts
 ```
+
+The repository's `add-website-page` procedure
+(`.agents/skills/add-website-page/SKILL.md`) covers SEO, twins and CSP.
 
 ## Examples + visuals (only when you register a new example id)
 
 ```bash
-git merge --no-edit dev
-TEXULI_E2E_PORT=4910 pnpm visual:update -g <example-id>
+TEXULI_E2E_PORT=<port> pnpm visual:update -g <example-id>
 # Commit only your new PNGs under tests/visual/visual.spec.ts-snapshots/
 ```
+
+`-g` is a substring match: an id that prefixes other ids rebaselines them
+too, so check `git status` and keep only your own PNGs.
 
 ## MCP catalog (local stdio)
 

@@ -35,8 +35,8 @@ empty when no one is typing and announces one, two, or several people otherwise.
 Pass `labels` callbacks to localize those messages and `showLabel` to make the
 message visible next to the decorative dots.
 
-Run `pnpm vitest run packages/chat/tests/composer.test.ts` for interaction
-coverage, `pnpm vitest run packages/examples/tests/chat-composer.test.ts` for
+Run `pnpm vitest run packages/chat/tests/components.test.ts` for interaction
+coverage, `pnpm vitest run packages/examples/tests/examples-render.test.ts` for
 the example, and `TEXULI_E2E_PORT=4860 pnpm exec playwright test
 tests/e2e/chat-composer.spec.ts --project chromium` for its browser and axe
 check.

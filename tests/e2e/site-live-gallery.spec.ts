@@ -13,7 +13,8 @@ import { COMPONENT_PAGES } from '../../apps/website/src/components/component-pag
  * scrolls near; category, tag and search filters; light/dark and RTL per
  * preview; a props panel that drives the preview and the code; overlays that
  * open by pointer and keyboard; axe with zero exclusions (frames included)
- * in light, dark and forced colors. Run `pnpm build` first.
+ * in light and dark on every card, and in forced colors on each full-page
+ * layout's own document. Run `pnpm build` first.
  */
 
 const DIST = resolve('apps/website/dist');
@@ -107,15 +108,6 @@ async function showPreview(page: Page, id: string): Promise<FrameLocator> {
   return preview(page, id);
 }
 
-/** Loads every preview on the page, one scroll step at a time. */
-async function showAll(page: Page): Promise<string[]> {
-  const ids = await page
-    .locator('[data-tx-gallery-card]')
-    .evaluateAll((nodes) => nodes.map((n) => n.getAttribute('data-tx-gallery-card') ?? ''));
-  for (const id of ids) await showPreview(page, id);
-  return ids;
-}
-
 function frameFor(page: Page, id: string): Frame {
   // Exact `id` match: `id=alert` must not pick the `id=alert-dialog` preview.
   const frame = page
@@ -125,39 +117,62 @@ function frameFor(page: Page, id: string): Frame {
   return frame;
 }
 
-test.describe('texuli.com living component gallery', () => {
-  // Each test loads many preview documents: run them one at a time so a
-  // busy machine does not starve a preview of the time to report ready.
-  test.describe.configure({ mode: 'serial' });
+/**
+ * The full sweep (every card mounted, axe with frames) is split into chunks of
+ * cards, one test each, so the chunks run in parallel instead of one long
+ * serial test at the end of the run.
+ */
+const SWEEP_CHUNKS = 4;
 
-  test('lazily mounts a real, working preview in every card', async ({ page }, info) => {
-    test.skip(info.project.name !== 'chromium', 'the full sweep runs once; the others sample');
-    test.setTimeout(600_000);
+test.describe('texuli.com living component gallery', () => {
+  test('loads previews lazily: only the cards near the first screen have one at open', async ({
+    page,
+  }) => {
     expect(await visit(page)).toEqual([]);
     await expect(page.locator('[data-tx-gallery-card]')).toHaveCount(CARD_COUNT);
-
-    // Lazy: on open, only the previews near the first screen have an iframe.
     await expect(page.locator('[data-tx-preview-slot]')).toHaveCount(CARD_COUNT);
-    const loadedAtOpen = await page.locator('[data-tx-preview-frame]').count();
-    expect(loadedAtOpen).toBeLessThan(10);
-
-    const ids = await showAll(page);
-    expect(ids).toHaveLength(CARD_COUNT);
-    await expect(page.locator('[data-tx-preview-frame][data-loaded="true"]')).toHaveCount(
-      CARD_COUNT
-    );
-    // Every stage is a real component family; no static stand-in copy anywhere.
-    for (const id of ids) {
-      const family = await preview(page, id)
-        .locator(`[data-tx-live-stage="${id}"]`)
-        .getAttribute('data-family');
-      expect(family, id).toBeTruthy();
-    }
-    for (const frame of page.frames()) {
-      if (frame === page.mainFrame()) continue;
-      expect(await frame.locator('[data-tx-gallery-preview], .preview--empty').count()).toBe(0);
-    }
+    expect(await page.locator('[data-tx-preview-frame]').count()).toBeLessThan(10);
   });
+
+  for (let chunk = 0; chunk < SWEEP_CHUNKS; chunk += 1) {
+    test(`cards ${chunk + 1}/${SWEEP_CHUNKS} mount a real, working preview and pass axe (frames included) in light and dark`, async ({
+      page,
+    }, info) => {
+      // WebKit and the Pixel 7 sample the first chunk; Chromium sweeps every card.
+      test.skip(info.project.name !== 'chromium' && chunk > 0, 'the full sweep runs once');
+      test.setTimeout(600_000);
+      for (const mode of ['light', 'dark'] as const) {
+        await page.emulateMedia({ colorScheme: mode });
+        expect(await visit(page)).toEqual([]);
+        const all = await page
+          .locator('[data-tx-gallery-card]')
+          .evaluateAll((nodes) => nodes.map((n) => n.getAttribute('data-tx-gallery-card') ?? ''));
+        expect(all).toHaveLength(CARD_COUNT);
+        const size = Math.ceil(all.length / SWEEP_CHUNKS);
+        const ids = all.slice(chunk * size, (chunk + 1) * size);
+        for (const id of ids) {
+          await showPreview(page, id);
+          // A real component family; no static stand-in copy.
+          const family = await preview(page, id)
+            .locator(`[data-tx-live-stage="${id}"]`)
+            .getAttribute('data-family');
+          expect(family, id).toBeTruthy();
+          expect(
+            await preview(page, id).locator('[data-tx-gallery-preview], .preview--empty').count(),
+            id
+          ).toBe(0);
+        }
+        // The whole page, frames included (zero exclusions): the chunk's
+        // previews are the frames loaded so far.
+        const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+        expect(
+          results.violations.map(
+            (v) => `${mode} ${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`
+          )
+        ).toEqual([]);
+      }
+    });
+  }
 
   test('filters by category, tag and search', async ({ page }) => {
     expect(await visit(page)).toEqual([]);
@@ -381,28 +396,6 @@ test.describe('texuli.com living component gallery', () => {
     });
   }
 
-  for (const mode of ['light', 'dark', 'forced-colors'] as const) {
-    test(`axe finds nothing with every preview loaded (${mode})`, async ({ page }, info) => {
-      test.setTimeout(900_000);
-      await page.emulateMedia({
-        colorScheme: mode === 'dark' ? 'dark' : 'light',
-        forcedColors: mode === 'forced-colors' ? 'active' : 'none',
-      });
-      expect(await visit(page)).toEqual([]);
-      if (info.project.name !== 'chromium') {
-        // WebKit and the Pixel 7 sample one category of overlays and forms.
-        await page
-          .getByRole('group', { name: 'Category', exact: true })
-          .getByRole('button', { name: 'forms', exact: true })
-          .click();
-      }
-      await showAll(page);
-      const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
-      expect(
-        results.violations.map(
-          (v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`
-        )
-      ).toEqual([]);
-    });
-  }
+  // Forced colors on the gallery previews: the full-page layout documents
+  // above, and the component family samples in site-live-components.spec.ts.
 });

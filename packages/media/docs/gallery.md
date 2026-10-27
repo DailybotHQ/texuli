@@ -140,7 +140,7 @@ never requested, is not a button, and the lightbox skips it.
 ## Verification
 
 - **Unit tests:** `pnpm vitest run packages/media/tests/gallery.test.ts` has
-  18 tests. They cover the model and the components: the URL policy, malformed
+  4 tests. They cover the model and the components: the URL policy, malformed
   input, masonry packing, navigation, gestures, zoom, focus return and the
   error fallback. Ten deliberate code breaks each fail a test.
 - **Real browsers:** an ad-hoc Playwright run on Chromium, WebKit and Pixel 7

@@ -2,7 +2,7 @@
 
 **App:** `apps/website`  
 **Surface:** `src/components/guides/`, `src/pages/guides/`  
-**Tests:** `tests/e2e/site-guides.spec.ts`, `scripts/tests/guides-nav.test.ts`
+**Tests:** `tests/e2e/site-guides.spec.ts`, `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
@@ -45,7 +45,7 @@ Site header `NAV` includes **Guides** (`/guides/`).
 
 ```bash
 bash -c 'pnpm build && TEXULI_E2E_PORT=4940 pnpm exec playwright test tests/e2e/site-guides.spec.ts'
-pnpm vitest run scripts/tests/guides-nav.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 ```
 
 The e2e spec serves `apps/website/dist` on a free port (same pattern as

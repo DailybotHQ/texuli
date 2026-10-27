@@ -24,6 +24,6 @@ The DateField rejects impossible dates and values outside its optional ISO
 uses the locale's cycle) and a `minuteStep`; values remain 24-hour strings.
 Each segment is a native spinbutton for keyboard and touch accessibility.
 
-Validation: `pnpm vitest run packages/primitives/tests/date-field.test.ts`,
+Validation: `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/forms.test.ts`,
 `TEXULI_E2E_PORT=4790 pnpm exec playwright test tests/behavior/scenarios/date-field.spec.ts`,
 and `pnpm --filter @texuli/primitives typecheck`.

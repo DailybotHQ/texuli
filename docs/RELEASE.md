@@ -70,7 +70,7 @@ Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
 versions (prerelease compatibility between Texuli packages is exact, per
 "Independent package versions" above), while the private development
-manifests (`apps/website`, `packages/examples`, `packages/editor`) keep the
+manifests (`apps/website`, `apps/agent`, `packages/examples`, `packages/editor`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary
 (`scripts/packages.ts` rewrites `workspace:` to the exact workspace version
 and fails the pack when a published manifest would still carry
@@ -94,7 +94,7 @@ the package-to-package contract outside this repository.
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 
 - A normative spec change takes a new spec version and a fresh digest pin in
-  `packages/spec/versions.json` (`tests/versioning.test.ts` enforces the pin);
+  `packages/spec/versions.json` (`tests/spec.test.ts` enforces the pin);
   regeneration re-stamps the generated TypeScript and Kotlin.
 - Consumers pin exact npm versions ("Dist-tags" above) and can assert the
   contract they built against via the digest stamp in `@texuli/spec`'s
@@ -117,7 +117,7 @@ tag. Any GO for Task 170's name reservation covers only that reservation.
 | 175 | Controls | `@texuli/primitives` | Fresh owner GO after its core dependency and behavior, accessibility, size, pack, and consumer gates pass. |
 | 176 | Styled package | `texuli` | Fresh owner GO after core, primitives, and tokens compatibility plus style and consumer gates pass. |
 | 177 | Domain packages | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/blocks` | Fresh owner GO for the exact ready set after dependency order, package checks, size, pack, and consumer gates pass. |
-| 178 | Catalog and integration tools | `@texuli/catalog`, `@texuli/tools`, `@texuli/astro`; `@texuli/player` and `@texuli/slides` only when ready | Fresh owner GO for each exact release set after implementation, dependency, pack, consumer, and relevant website/build gates pass. |
+| 178 | Catalog and integration tools | `@texuli/catalog`, `@texuli/tools`, `@texuli/astro`, `@texuli/player`, `@texuli/slides`, `@texuli/spec` (the order in `publish.yml`; all six went out in the 2026-10-25 `0.1.0-next.1` run) | Fresh owner GO for each exact release set after implementation, dependency, pack, consumer, and relevant website/build gates pass. |
 
 Each outward wave must also pass its task's `pnpm verify:packages` gate and
 the applicable tests, type checks, layer checks, behavior, visual, size,

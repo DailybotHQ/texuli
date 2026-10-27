@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Import:** `import { Tooltip } from 'texuli/tooltip'`  
-**Tests:** `packages/texuli/tests/tooltip.test.ts`  
+**Tests:** `packages/texuli/tests/overlays.test.ts`  
 **Example:** `texuli-tooltip`
 
 ## Contract

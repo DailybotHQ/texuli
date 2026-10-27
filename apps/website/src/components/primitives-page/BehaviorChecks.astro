@@ -24,7 +24,7 @@ const focusLimit = openToFocusLimit(evidence.scenario);
       <>
         <p>
           <code>{evidence.file}</code> runs <strong>{evidence.rows.length} rows</strong> against the
-          {' '}{name} scenario on Chromium, WebKit and the Pixel 7. Each row asserts what a user or
+          {' '}{name} scenario on Chromium and WebKit (touch rows also on the Pixel 7). Each row asserts what a user or
           assistive technology can observe, held to the WAI-ARIA Authoring Practices pattern.
         </p>
         <details class="behavior__rows">
@@ -43,7 +43,7 @@ const focusLimit = openToFocusLimit(evidence.scenario);
       <>
         <p>
           <code>{evidence.file}</code> checks the {name} scenario in the browser (
-          <strong>{evidence.checks.length} checks</strong>) on Chromium, WebKit and the Pixel 7.
+          <strong>{evidence.checks.length} checks</strong>) on Chromium and WebKit (touch rows also on the Pixel 7).
         </p>
         <ul class="behavior__list">
           {evidence.checks.map((check) => (

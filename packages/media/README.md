@@ -15,7 +15,7 @@ players, an image editor with crop presets, video trim and caption editing
 recipes, the composition model (v1, and v2 with groups and layer timing) with
 SVG and canvas renderers, keyframe animation with a timeline editor,
 captions, export, and the
-provider-neutral generator slot. They are covered by 301 unit tests in 17
+provider-neutral generator slot. They are covered by 72 unit tests in 16
 files (`pnpm vitest run packages/media`).
 Per-item notes live in [`docs/`](docs/) here until they are folded into this
 README.
@@ -57,7 +57,7 @@ core URL policy (`safeImageSrc`, `safeImageSrcset`, `safeMediaSrc`), and a
 | `@texuli/media/timeline` (+ `/model`) | `AnimationTimeline` editor: layer windows, keyframes, playhead, preview, undo/redo; the framework-free edit model that keeps documents valid | [Animation timeline](docs/timeline.md) |
 | `@texuli/media/composition-svg` | `CompositionSvg`, `renderCompositionSvg`, `compositionToSvgString` | [Composition SVG renderer](docs/composition-svg.md) |
 | `@texuli/media/composition-canvas` (+ `/render`, `/draw`) | Canvas composition renderer and draw helpers | [Composition renderer: canvas](docs/media-composition-canvas.md) |
-| `@texuli/media/animation` | Keyframe animation: `sampleComposition`, `validateAnimation`, `createTimeline` | [Composition keyframe animation](docs/animation.md) |
+| `@texuli/media/animation` (+ `/player`) | Keyframe animation: `sampleComposition`, `validateAnimation`, `createTimeline`; `CompositionAnimationPlayer` on `/player` | [Composition keyframe animation](docs/animation.md) |
 | `@texuli/media/captions` | Captions and chapters | [Captions and chapters](docs/captions.md) |
 | `@texuli/media/export` (+ `/ui`) | Export functions (each loads on first call) and the `CompositionExport` control | [Media export](docs/media-export.md) |
 | `@texuli/media/generator-slot` | Host-provided generation UI over a provider-neutral seam; Texuli ships no model and opens no network | [Generator slot](docs/generator-slot.md) |
@@ -66,16 +66,18 @@ core URL policy (`safeImageSrc`, `safeImageSrcset`, `safeMediaSrc`), and a
 
 ## Planned
 
-Roadmap items not started as of 2026-10-25: composition engine v2 (layers and
-timing) and the animation timeline editor. Image crop presets, video trim
+No roadmap item in this package is open as of 2026-10-26: composition v2
+(groups and layer timing) and the animation timeline editor ship as the
+`composition-v2` and `timeline` subpaths above. Image crop presets, video trim
 recipes, caption cue editing, generation provenance display, provenance
 sidecars on composition exports, WebM composition export, and the sequential
-export queue with progress receipts are implemented.
+export queue with progress receipts are implemented too. Per-area limits stay
+in each doc.
 
 ## Verification
 
 ```bash
-pnpm vitest run packages/media       # 264 tests / 15 files
+pnpm vitest run packages/media       # 72 tests / 16 files
 pnpm --filter @texuli/media typecheck  # exit 0
 npx biome check packages/media       # exit 0
 ```

@@ -30,12 +30,11 @@ const LAYOUTS = [
 
 test.use({ viewport: { width: 390, height: 844 } });
 
-for (const id of LAYOUTS) {
-  test(`${id}: the screen slot shrinks to a 390 px phone`, async ({ page }, info) => {
-    test.skip(
-      info.project.name !== 'chromium',
-      'Geometry at a fixed viewport: one engine is enough'
-    );
+test('every layout: the screen slot shrinks to a 390 px phone', async ({ page }, info) => {
+  test.skip(info.project.name !== 'chromium', 'Geometry at a fixed viewport: one engine is enough');
+  test.setTimeout(LAYOUTS.length * 10_000);
+  // One page session walks every layout (page setup dominates).
+  for (const id of LAYOUTS) {
     await page.goto(`/?layout-slot=${id}`);
     const root = page.locator(`[data-slot-root="${id}"]`);
     await expect(root).toHaveAttribute('data-ready', 'true');
@@ -57,9 +56,9 @@ for (const id of LAYOUTS) {
     }, id);
 
     // The wide element keeps its size; only its container scrolls.
-    expect(box.wide).toBe(600);
+    expect(box.wide, `${id}: wide element`).toBe(600);
     expect(box.page, `${id}: page overflows`).toBeLessThanOrEqual(box.viewport);
     expect(box.root, `${id}: layout root overflows`).toBeLessThanOrEqual(box.rootClient);
     expect(box.screen, `${id}: screen wider than the viewport`).toBeLessThanOrEqual(box.viewport);
-  });
-}
+  }
+});

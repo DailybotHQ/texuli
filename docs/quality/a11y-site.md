@@ -2,8 +2,11 @@
 
 **Task:** T-quality-a11y-site · **Spec:** `tests/e2e/a11y-site.spec.ts`
 
-Every page of the built website runs axe with **zero exclusions** in light,
-dark and high contrast, plus a keyboard-only walk. Findings were fixed
+Every page of the built website runs axe with **zero exclusions** in light
+and dark (one test per page, one page session), plus the visual polish check
+([site-visual](../../apps/website/docs/site-visual.md)) on the same loads;
+one page per route group also runs axe in high contrast and a keyboard-only
+walk. Findings were fixed
 **at their source**; no rule is disabled, no selector excluded, no gate
 weakened.
 
@@ -37,9 +40,18 @@ bash -c 'pnpm build && TEXULI_E2E_PORT=<lane port> pnpm exec playwright test tes
     within 3 levels, for `:has(:focus-visible)` patterns);
   - focus never drops to `body` mid-walk;
   - Shift+Tab walks back out (no trap).
-- **Projects:** Chromium sweeps **every page**. WebKit and Pixel 7 sweep
-  **one page per route group**, the same templates (`/`, `/guides/…`,
-  `/component-pages/…`, …). WebKit's keyboard walk is skipped because its
+- **High contrast and the keyboard walk** run on one page per route group
+  (the same templates: `/`, `/guides/…`, `/component-pages/…`, …).
+- **Component pages** also mount their live stage (the real component, its
+  marker part on screen, no request to another origin), the check
+  `site-live-components.spec.ts` used to run on separate loads.
+- **Primitive pages** (`/primitives-page/<id>/`) are swept by
+  `site-live-primitives.spec.ts`, with the demo mounted, the API rows and
+  the demo's floating content open, in light, dark and forced colors; here
+  only the group's representative runs.
+- **Projects:** Chromium sweeps **every page**; the Pixel 7 runs the polish
+  check on every page and axe on the representatives; WebKit runs the
+  representatives only. WebKit's keyboard walk is skipped because its
   default Tab order skips links and buttons (a macOS setting); the walk
   runs on Chromium and Pixel 7.
 

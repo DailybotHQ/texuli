@@ -48,7 +48,8 @@ cannot drift from the behavior.
 ## What the spec checks
 
 For each primitive, on Chromium (all 41) and on WebKit and Pixel 7 (accordion,
-dialog, menu, select, slider, tabs):
+dialog, menu, select, slider, tabs), in two tests: the interactions (a fresh
+load of the page for each), and axe plus the polish check in each mode:
 
 - **Lazy loading:** the island is `client="visible"`, and with the demo off
   screen it stays unloaded until scrolled into view.
@@ -62,10 +63,14 @@ dialog, menu, select, slider, tabs):
   demo parts.
 - **Props:** changing the first prop through its control changes the code
   sample.
-- **Frame:** the Dark toggle changes the stage's computed background, and
-  the RTL switch sets `dir="rtl"`.
+- **Frame** (the same frame on every page, checked on the representative
+  set): the Dark toggle changes the stage's computed background, and the RTL
+  switch sets `dir="rtl"`.
 - **axe, zero exclusions,** in light, dark and forced colors, with the demo
-  mounted, and again with floating content open where the demo has some.
+  mounted and the API rows (`details`) open, and again with floating content
+  open where the demo has some. This is the page sweep for these routes:
+  the polish check of [site-visual](site-visual.md) runs here in light and
+  dark, and `a11y-site.spec.ts` skips them.
 - **Budget:** each route's JavaScript, measured with the demo loaded, stays
   within `budgetFor(route)`.
 
@@ -91,7 +96,7 @@ keeps their CSS out of every page: each demo's CSS loads with its chunk.
   component CSS, so composing a primitive with a recipe gets the styles.
 - The uncontrolled `Switch` primitive (`defaultChecked`, no binding)
   re-renders when toggled. A regression test is in
-  `packages/primitives/tests/switch.test.ts`.
+  `packages/primitives/tests/forms.test.ts`.
 
 ## Limits
 

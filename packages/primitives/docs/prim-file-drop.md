@@ -69,7 +69,7 @@ framework-free helpers exported from the same subpath. `validateFiles` returns
 ## Validation
 
 ```sh
-pnpm vitest run packages/primitives/tests/file-drop.test.ts
+pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/forms.test.ts
 TEXULI_E2E_PORT=4850 pnpm exec playwright test tests/behavior/scenarios/file-drop.spec.ts
 ```
 

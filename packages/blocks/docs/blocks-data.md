@@ -144,6 +144,6 @@ chart props (callbacks such as `onselect`, `brushInvert`, `format`, and
 ## Testing
 
 ```bash
-pnpm vitest run packages/blocks/tests/data.test.ts packages/blocks/tests/chart-parity.test.ts packages/blocks/tests/chart-render.test.ts
+pnpm vitest run packages/blocks/tests/data.test.ts packages/blocks/tests/chart-parity.test.ts
 TEXULI_E2E_PORT=4930 pnpm visual:update -g blocks-data
 ```

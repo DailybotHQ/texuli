@@ -3,7 +3,6 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import { primaryNav } from './support/site-nav.ts';
 
@@ -75,8 +74,6 @@ async function visit(page: Page, path: string) {
   return foreign;
 }
 
-const mode = (page: Page) => page.locator('html').getAttribute('data-tx-mode');
-
 test.describe('texuli.com showcase', () => {
   test('index lists every screen and primary nav marks Showcase', async ({ page }) => {
     expect(await visit(page, '/showcase/')).toEqual([]);
@@ -127,20 +124,6 @@ test.describe('texuli.com showcase', () => {
     }
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on showcase pages (${scheme})`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: scheme });
-      for (const path of SHOWCASE_PATHS) {
-        await visit(page, path);
-        expect(await mode(page)).toBe(scheme);
-        const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-          .analyze();
-        expect(
-          results.violations.map((v) => `${path} ${v.id}: ${v.help}`),
-          path
-        ).toEqual([]);
-      }
-    });
-  }
+  // axe on the showcase pages in light and dark (zero exclusions) runs in the page
+  // sweep, a11y-site.spec.ts.
 });

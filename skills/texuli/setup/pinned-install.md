@@ -11,8 +11,11 @@ other version.
 
 ## 1. Get the release files (manual, once)
 
-From the Texuli GitHub Release for the version you pin (for example
-`v0.1.0`), download two assets into an empty folder:
+**No skill release is published yet.** Until one is, install from a Texuli
+checkout and verify the pack's own `SHA256SUMS` (step 2's second command,
+then step 3). When a release exists, from the Texuli GitHub Release for the
+version you pin (for example `v0.1.0`), download two assets into an empty
+folder:
 
 - the skill archive, `texuli-skill-<version>.tar.gz`;
 - that release's `SHA256SUMS` for the skill.

@@ -58,7 +58,7 @@ async function visit(page: Page) {
   expect(foreign).toEqual([]);
 }
 
-async function tabUntil(page: Page, selector: string, maximum = 500) {
+async function tabUntil(page: Page, selector: string, maximum = 500, key = 'Tab') {
   for (let index = 0; index < maximum; index += 1) {
     if (
       await page
@@ -67,7 +67,7 @@ async function tabUntil(page: Page, selector: string, maximum = 500) {
         .catch(() => false)
     )
       return;
-    await page.keyboard.press('Tab');
+    await page.keyboard.press(key);
   }
   const focused = await page.evaluate(() => document.activeElement?.outerHTML.slice(0, 200));
   throw new Error(`Keyboard traversal did not reach ${selector}; focused element: ${focused}`);
@@ -195,8 +195,9 @@ test.describe('texuli.com blueprint builder', () => {
     const row = page.getByRole('treeitem', { name: new RegExp(label) });
     await expect(row).toBeFocused();
 
-    // Escape clears the search and restores the full list.
-    await tabUntil(page, '#palette-search');
+    // Escape clears the search and restores the full list. The search comes
+    // before the outline, so walk back to it instead of around the page.
+    await tabUntil(page, '#palette-search', 100, 'Shift+Tab');
     await page.keyboard.press('Escape');
     await expect(search).toHaveValue('');
     await expect(count).toHaveText(`${total} components`);
@@ -986,24 +987,9 @@ test.describe('texuli.com blueprint builder', () => {
     await expect(page.locator('[data-builder-payload]')).toContainText('Your text is kept');
   });
 
-  for (const scheme of ['light', 'dark', 'forced-colors'] as const) {
-    test(`has no axe violations in ${scheme} mode`, async ({ page }) => {
-      await page.emulateMedia(
-        scheme === 'forced-colors' ? { forcedColors: 'active' } : { colorScheme: scheme }
-      );
-      await visit(page);
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-      expect(
-        results.violations.flatMap((violation) =>
-          violation.nodes.map(
-            (node) => `${scheme} ${violation.id} ${node.target.join(', ')} ${node.html}`
-          )
-        )
-      ).toEqual([]);
-    });
-  }
+  // axe on /builder/ (light, dark and forced colors, zero exclusions) runs in
+  // the page sweep, a11y-site.spec.ts.
+
   test('keyboard: Tab walks the panes in order, with no trap and no dead stop', async ({
     page,
   }, testInfo) => {

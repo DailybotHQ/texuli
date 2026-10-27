@@ -11,8 +11,9 @@ description: Review the current branch diff locally with the vendored AI Diff Re
 
 1. Read `.agents/skills/ai-diff-reviewer/SKILL.md` fresh and run its local
    review capability on the current diff, passing along any arguments
-   (base branch, paths). The repository is local only, so review the working
-   tree or a local branch; never fetch from or push to a remote.
+   (base branch, paths). Review the working tree or a local branch; never
+   push, and never post review comments to the remote (Flow A, local review,
+   is the only installed flow).
 2. The skill auto-detects `.review/extension.md`; make sure it is applied —
    it holds Texuli's severity overrides (another component library, HTML sinks, URL
    policy bypass, upward layer imports, accessibility regressions, physical

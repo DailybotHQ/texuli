@@ -150,7 +150,10 @@ const PAGE_CLASSES: ReadonlyArray<{ name: string; path: string; limit: number }>
 
 for (const { name, path, limit } of PAGE_CLASSES) {
   test.describe(`keyboard walk: ${name}`, () => {
-    test('the skip link moves focus into the main landmark', async ({ page }) => {
+    test('the skip link moves focus into main; Tab reaches the end without a trap, and Shift+Tab retraces it', async ({
+      page,
+    }) => {
+      test.setTimeout(120_000);
       await open(page, path);
       await page.keyboard.press('Tab');
       expect(await activeLabel(page)).toContain('Skip to content');
@@ -160,10 +163,8 @@ for (const { name, path, limit } of PAGE_CLASSES) {
         () => document.activeElement?.closest('main, #main') !== null
       );
       expect(inMain, `first stop after the skip link: ${await activeLabel(page)}`).toBe(true);
-    });
 
-    test('Tab reaches the end without a trap, and Shift+Tab retraces it', async ({ page }) => {
-      test.setTimeout(120_000);
+      // The full walk starts from a fresh load.
       await open(page, path);
       const { stops, drop } = await walkTabStops(page, limit);
       expect(drop, 'focus must not drop to body before the last stop').toBeNull();
@@ -201,9 +202,11 @@ const TOOLS: ReadonlyArray<{ path: string; root: string; keys: string }> = [
   { path: '/playground/', root: '[data-tx-playground]', keys: '[data-tx-playground-keys]' },
 ];
 
-for (const tool of TOOLS) {
-  test.describe(`tool shortcuts (WCAG 2.1.4): ${tool.path}`, () => {
-    test('stay inactive with the focus outside the tool, work inside it', async ({ page }) => {
+test.describe('tool shortcuts (WCAG 2.1.4)', () => {
+  test('stay inactive with the focus outside the tool, work inside it, in every tool', async ({
+    page,
+  }) => {
+    for (const tool of TOOLS) {
       await open(page, tool.path);
       const keys = page.locator(tool.keys);
       await expect(keys).toHaveCount(1);
@@ -220,9 +223,9 @@ for (const tool of TOOLS) {
       await expect(keys).toHaveAttribute('open', '');
       await page.keyboard.press('Shift+Slash');
       await expect(keys).not.toHaveAttribute('open', '');
-    });
+    }
   });
-}
+});
 
 test('color explorer: `/` focuses the filter without typing a slash into it', async ({ page }) => {
   await open(page, '/color-explorer/');

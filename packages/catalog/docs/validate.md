@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/catalog`  
 **Import:** `@texuli/catalog/validate`  
-**Tests:** `packages/catalog/tests/validate-draft.test.ts`, `packages/catalog/tests/validate-family-blocks.test.ts`
+**Tests:** `packages/catalog/tests/validate-draft.test.ts` (drafts and block family checks)
 
 ## Goal
 

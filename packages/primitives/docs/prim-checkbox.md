@@ -39,7 +39,7 @@ Headless Svelte 5 checkbox built on texels (`createControllableState`).
 ## Testing
 
 ```bash
-pnpm vitest run packages/primitives/tests/checkbox.test.ts
+pnpm vitest run packages/primitives/tests/forms.test.ts
 pnpm exec playwright test tests/behavior/scenarios/checkbox.spec.ts
 ```
 

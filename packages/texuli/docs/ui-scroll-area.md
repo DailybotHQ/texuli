@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Export:** `texuli/scroll-area`  
-**Tests:** `packages/texuli/tests/scroll-area.test.ts`
+**Tests:** `packages/texuli/tests/display.test.ts`
 
 `ScrollArea` styles the native, focusable viewport from `@texuli/primitives/scroll-area`.
 The native viewport remains the source of scrolling for keyboard, touch, wheel and assistive

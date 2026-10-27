@@ -55,95 +55,110 @@ async function expectExampleA11y(page: Page, id: OverlayExample): Promise<void> 
 }
 
 test.describe('overlay and navigation accessibility · light and dark', () => {
-  for (const id of OVERLAY_EXAMPLES) {
-    test(`${id} has no axe violations in light or dark`, async ({ page }) => {
-      await gotoExample(page, id, 'light');
-      await expectExampleA11y(page, id);
-      await gotoExample(page, id, 'dark');
-      await expectExampleA11y(page, id);
-    });
-  }
+  // One page session walks every example, light then dark.
+  test('every overlay example has no axe violations in light or dark', async ({ page }) => {
+    test.setTimeout(OVERLAY_EXAMPLES.length * 30_000);
+    for (const id of OVERLAY_EXAMPLES) {
+      await test.step(id, async () => {
+        await gotoExample(page, id, 'light');
+        await expectExampleA11y(page, id);
+        await gotoExample(page, id, 'dark');
+        await expectExampleA11y(page, id);
+      });
+    }
+  });
 });
 
 test.describe('overlay and navigation accessibility · keyboard', () => {
-  test('dialog Escape closes the top layer and restores trigger focus', async ({ page }) => {
-    await gotoExample(page, 'ui-dialog', 'light');
-    const trigger = page.getByRole('button', { name: 'Open settings' });
-    const dialog = page.getByRole('dialog', { name: 'Workspace settings' });
-    await expect(dialog).toBeVisible();
-    await dialog.getByRole('button', { name: 'Cancel' }).click();
-    await expect(dialog).toHaveCount(0);
-    await trigger.click();
-    await expect(dialog).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(dialog).toHaveCount(0);
-    await expect(trigger).toBeFocused();
-  });
-
-  test('sheet Escape restores focus and keeps its trigger operable', async ({ page }) => {
-    await gotoExample(page, 'texuli-sheet', 'light');
-    const trigger = page.getByRole('button', { name: 'Open sm sheet' });
-    await trigger.click();
-    await expect(page.getByRole('dialog', { name: 'sm sheet' })).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('dialog', { name: 'sm sheet' })).toHaveCount(0);
-    await expect(trigger).toBeFocused();
-  });
-
-  test('dropdown menu Escape restores focus to its trigger', async ({ page }) => {
-    await gotoExample(page, 'texuli-menus', 'light');
-    const trigger = page.getByRole('button', { name: 'Actions', exact: true });
-    const menu = page.getByRole('menu').filter({
-      has: page.getByRole('menuitem', { name: 'New note' }),
+  test('Escape closes dialog, sheet, menu, navigation menu and drawer and restores focus', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    await test.step('dialog Escape closes the top layer and restores trigger focus', async () => {
+      await gotoExample(page, 'ui-dialog', 'light');
+      const trigger = page.getByRole('button', { name: 'Open settings' });
+      const dialog = page.getByRole('dialog', { name: 'Workspace settings' });
+      await expect(dialog).toBeVisible();
+      await dialog.getByRole('button', { name: 'Cancel' }).click();
+      await expect(dialog).toHaveCount(0);
+      await trigger.click();
+      await expect(dialog).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(dialog).toHaveCount(0);
+      await expect(trigger).toBeFocused();
     });
-    await expect(menu).toBeVisible();
-    await trigger.click();
-    await expect(menu).toBeHidden();
-    await trigger.click();
-    await expect(menu).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(menu).toHaveCount(0);
-    await expect(trigger).toBeFocused();
-  });
 
-  test('navigation menu opens by keyboard and Escape returns to its trigger', async ({ page }) => {
-    await gotoExample(page, 'ui-navigation', 'light');
-    const trigger = page.getByRole('button', { name: 'Products' });
-    await trigger.focus();
-    await page.keyboard.press('Enter');
-    await expect(page.getByRole('link', { name: 'Analytics' })).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('link', { name: 'Analytics' })).toHaveCount(0);
-    await expect(trigger).toBeFocused();
-  });
+    await test.step('sheet Escape restores focus and keeps its trigger operable', async () => {
+      await gotoExample(page, 'texuli-sheet', 'light');
+      const trigger = page.getByRole('button', { name: 'Open sm sheet' });
+      await trigger.click();
+      await expect(page.getByRole('dialog', { name: 'sm sheet' })).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(page.getByRole('dialog', { name: 'sm sheet' })).toHaveCount(0);
+      await expect(trigger).toBeFocused();
+    });
 
-  test('mobile navigation drawer opens and restores focus on close', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await gotoExample(page, 'texuli-sidebar', 'light');
-    const trigger = page.getByRole('button', { name: 'Open navigation' }).last();
-    await trigger.click();
-    await expect(page.getByRole('dialog', { name: 'Navigation' })).toBeVisible();
-    await page.getByRole('button', { name: 'Close navigation' }).click();
-    await expect(page.getByRole('dialog', { name: 'Navigation' })).toHaveCount(0);
-    await expect(trigger).toBeFocused();
+    await test.step('dropdown menu Escape restores focus to its trigger', async () => {
+      await gotoExample(page, 'texuli-menus', 'light');
+      const trigger = page.getByRole('button', { name: 'Actions', exact: true });
+      const menu = page.getByRole('menu').filter({
+        has: page.getByRole('menuitem', { name: 'New note' }),
+      });
+      await expect(menu).toBeVisible();
+      await trigger.click();
+      await expect(menu).toBeHidden();
+      await trigger.click();
+      await expect(menu).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(menu).toHaveCount(0);
+      await expect(trigger).toBeFocused();
+    });
+
+    await test.step('navigation menu opens by keyboard and Escape returns to its trigger', async () => {
+      await gotoExample(page, 'ui-navigation', 'light');
+      const trigger = page.getByRole('button', { name: 'Products' });
+      await trigger.focus();
+      await page.keyboard.press('Enter');
+      await expect(page.getByRole('link', { name: 'Analytics' })).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(page.getByRole('link', { name: 'Analytics' })).toHaveCount(0);
+      await expect(trigger).toBeFocused();
+    });
+
+    await test.step('mobile navigation drawer opens and restores focus on close', async () => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await gotoExample(page, 'texuli-sidebar', 'light');
+      const trigger = page.getByRole('button', { name: 'Open navigation' }).last();
+      await trigger.click();
+      await expect(page.getByRole('dialog', { name: 'Navigation' })).toBeVisible();
+      await page.getByRole('button', { name: 'Close navigation' }).click();
+      await expect(page.getByRole('dialog', { name: 'Navigation' })).toHaveCount(0);
+      await expect(trigger).toBeFocused();
+    });
   });
 });
 
 test.describe('overlay and navigation accessibility · forced colors and RTL', () => {
-  test('dialog and menu remain named under forced colors', async ({ page }) => {
-    await page.emulateMedia({ forcedColors: 'active', colorScheme: 'light' });
-    await gotoExample(page, 'ui-dialog', 'light');
-    await expectExampleA11y(page, 'ui-dialog');
-    await gotoExample(page, 'texuli-menus', 'light');
-    await expectExampleA11y(page, 'texuli-menus');
-  });
+  test('dialog and menu stay named under forced colors; menu and sheet in RTL', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await test.step('dialog and menu remain named under forced colors', async () => {
+      await page.emulateMedia({ forcedColors: 'active', colorScheme: 'light' });
+      await gotoExample(page, 'ui-dialog', 'light');
+      await expectExampleA11y(page, 'ui-dialog');
+      await gotoExample(page, 'texuli-menus', 'light');
+      await expectExampleA11y(page, 'texuli-menus');
+    });
 
-  test('navigation and overlays retain names in RTL', async ({ page }) => {
-    await gotoExample(page, 'texuli-menus', 'light');
-    await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));
-    await expectExampleA11y(page, 'texuli-menus');
-    await gotoExample(page, 'texuli-sheet', 'light');
-    await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));
-    await expectExampleA11y(page, 'texuli-sheet');
+    await test.step('navigation and overlays retain names in RTL', async () => {
+      await page.emulateMedia({ forcedColors: 'none' });
+      await gotoExample(page, 'texuli-menus', 'light');
+      await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));
+      await expectExampleA11y(page, 'texuli-menus');
+      await gotoExample(page, 'texuli-sheet', 'light');
+      await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));
+      await expectExampleA11y(page, 'texuli-sheet');
+    });
   });
 });

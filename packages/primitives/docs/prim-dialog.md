@@ -51,7 +51,7 @@ The primitive supplies no visual theme or backdrop color. Consumers should provi
   it is placed, because moving a focused node blurs it in browsers. Before
   this fix, a dialog mounted with `open` (for example a lazily imported
   command palette) ended with focus on `body`.
-- **Tests:** `packages/primitives/tests/dialog-contained-focus.test.ts`
-  (dialog, alert dialog and sheet), plus the behavior rows
+- **Tests:** `packages/primitives/tests/overlays.test.ts`
+  (`-t dialog-contained-focus`: dialog, alert dialog and sheet), plus the behavior rows
   `contained-backdrop-under-content` and `mounted-open-keeps-focus` in
   `tests/behavior/scenarios/dialog.spec.ts`.

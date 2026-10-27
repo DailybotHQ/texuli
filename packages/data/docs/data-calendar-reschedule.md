@@ -3,7 +3,7 @@
 **Package:** `@texuli/data`  
 **Lazy subpath:** `@texuli/data/calendar/view` (`CalendarView`)  
 **Engine:** `packages/data/src/engines/calendar/move.ts` (exported from `@texuli/data/calendar`)  
-**Tests:** `packages/data/tests/calendar-move.test.ts` and `calendar-slots.test.ts` (engine), `calendar-reschedule.test.ts`, `calendar-host-parity.test.ts` and `calendar-initial-scroll.test.ts` (component), `tests/e2e/data-calendar-reschedule.spec.ts` and `data-calendar-parity.spec.ts` (browser)  
+**Tests:** `packages/data/tests/engines.test.ts` (engine: moves, slots and clock), `calendar-reschedule.test.ts`, `calendar-host-parity.test.ts` and `calendar-initial-scroll.test.ts` (component), `tests/e2e/data-calendar-reschedule.spec.ts` and `data-calendar-parity.spec.ts` (browser)  
 **Example:** `data-calendar`
 
 ## Goal

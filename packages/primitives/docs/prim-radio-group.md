@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/primitives`  
 **Source:** `packages/primitives/src/radio-group/`  
-**Tests:** `packages/primitives/tests/radio-group.test.ts`  
+**Tests:** `packages/primitives/tests/forms.test.ts`  
 **Behavior:** `tests/behavior/scenarios/radio-group.spec.ts`  
 **Task:** T-prim-radio-group
 

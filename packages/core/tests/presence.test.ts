@@ -51,241 +51,290 @@ describe('hasPendingMotion', () => {
 });
 
 describe('createPresence', () => {
-  it('mounts open immediately and writes data-state', () => {
-    const presence = createPresence({ present: true });
-    const el = panel();
-    presence.setNode(el);
+  it('mounts open immediately and writes data-state, and 3 related cases', () => {
+    {
+      // mounts open immediately and writes data-state
+      const presence = createPresence({ present: true });
+      const el = panel();
+      presence.setNode(el);
 
-    expect(presence.getSnapshot()).toEqual({
-      present: true,
-      mounted: true,
-      state: 'open',
-      exiting: false,
-    });
-    expect(el.getAttribute(PRESENCE_STATE_ATTR)).toBe('open');
+      expect(presence.getSnapshot()).toEqual({
+        present: true,
+        mounted: true,
+        state: 'open',
+        exiting: false,
+      });
+      expect(el.getAttribute(PRESENCE_STATE_ATTR)).toBe('open');
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    document.body.replaceChildren();
+    {
+      // fires onEnter when opening from closed
+      const onEnter = vi.fn();
+      const presence = createPresence({ onEnter });
+      presence.setNode(panel());
+      presence.setPresent(true);
+      expect(presence.getSnapshot().state).toBe('open');
+      expect(onEnter).toHaveBeenCalledTimes(1);
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    document.body.replaceChildren();
+    {
+      // keeps mounted while exiting until transitionend
+      const onExitComplete = vi.fn();
+      const presence = createPresence({
+        present: true,
+        onExitComplete,
+        reducedMotion: false,
+        skipExitAnimation: false,
+        isMotionPending: () => true,
+      });
+      const el = panel();
+      presence.setNode(el);
+
+      presence.setPresent(false);
+      expect(presence.getSnapshot()).toMatchObject({
+        present: false,
+        mounted: true,
+        state: 'closed',
+        exiting: true,
+      });
+      expect(el.getAttribute(PRESENCE_STATE_ATTR)).toBe('closed');
+      expect(onExitComplete).not.toHaveBeenCalled();
+
+      el.dispatchEvent(new Event('transitionend', { bubbles: true }));
+      expect(presence.getSnapshot()).toMatchObject({
+        mounted: false,
+        state: 'closed',
+        exiting: false,
+      });
+      expect(onExitComplete).toHaveBeenCalledTimes(1);
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    document.body.replaceChildren();
+    {
+      // completes exit on animationend as well as transitionend
+      const onExitComplete = vi.fn();
+      const presence = createPresence({
+        present: true,
+        onExitComplete,
+        reducedMotion: false,
+        isMotionPending: () => true,
+      });
+      const el = panel();
+      presence.setNode(el);
+      presence.setPresent(false);
+      el.dispatchEvent(new Event('animationend', { bubbles: true }));
+      expect(onExitComplete).toHaveBeenCalledTimes(1);
+    }
   });
+  it('skips the exit wait under reduced motion, and 3 related cases', () => {
+    {
+      // skips the exit wait under reduced motion
+      vi.useFakeTimers();
+      const onExitComplete = vi.fn();
+      const presence = createPresence({
+        present: true,
+        reducedMotion: true,
+        onExitComplete,
+        isMotionPending: () => true,
+      });
+      const el = panel();
+      presence.setNode(el);
+      presence.setPresent(false);
 
-  it('fires onEnter when opening from closed', () => {
-    const onEnter = vi.fn();
-    const presence = createPresence({ onEnter });
-    presence.setNode(panel());
-    presence.setPresent(true);
-    expect(presence.getSnapshot().state).toBe('open');
-    expect(onEnter).toHaveBeenCalledTimes(1);
+      expect(presence.getSnapshot().exiting).toBe(true);
+      expect(presence.getSnapshot().state).toBe('closed');
+
+      vi.advanceTimersByTime(16);
+      expect(onExitComplete).toHaveBeenCalledTimes(1);
+      expect(presence.getSnapshot().mounted).toBe(false);
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    document.body.replaceChildren();
+    {
+      // skips the exit wait when skipExitAnimation is set
+      vi.useFakeTimers();
+      const presence = createPresence({
+        present: true,
+        skipExitAnimation: true,
+        isMotionPending: () => true,
+      });
+      presence.setNode(panel());
+      presence.setPresent(false);
+      vi.advanceTimersByTime(16);
+      expect(presence.getSnapshot().mounted).toBe(false);
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    document.body.replaceChildren();
+    {
+      // skips the exit wait when no CSS motion is pending
+      vi.useFakeTimers();
+      const onExitComplete = vi.fn();
+      const presence = createPresence({
+        present: true,
+        reducedMotion: false,
+        isMotionPending: () => false,
+        onExitComplete,
+      });
+      presence.setNode(panel());
+      presence.setPresent(false);
+      expect(presence.getSnapshot().exiting).toBe(true);
+      vi.advanceTimersByTime(16);
+      expect(onExitComplete).toHaveBeenCalledTimes(1);
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    document.body.replaceChildren();
+    {
+      // forceMount keeps the node mounted after exit completes
+      vi.useFakeTimers();
+      const onExitComplete = vi.fn();
+      const presence = createPresence({
+        present: true,
+        forceMount: true,
+        skipExitAnimation: true,
+        onExitComplete,
+      });
+      const el = panel();
+      presence.setNode(el);
+      presence.setPresent(false);
+      vi.advanceTimersByTime(16);
+
+      expect(onExitComplete).toHaveBeenCalled();
+      expect(presence.getSnapshot()).toMatchObject({
+        present: false,
+        mounted: true,
+        state: 'closed',
+        exiting: false,
+      });
+      expect(el.getAttribute(PRESENCE_STATE_ATTR)).toBe('closed');
+    }
   });
+  it('re-opens while exiting and cancels the exit wait, and 3 related cases', () => {
+    {
+      // re-opens while exiting and cancels the exit wait
+      const onEnter = vi.fn();
+      const onExitComplete = vi.fn();
+      const presence = createPresence({
+        present: true,
+        reducedMotion: false,
+        isMotionPending: () => true,
+        onEnter,
+        onExitComplete,
+      });
+      const el = panel();
+      presence.setNode(el);
+      presence.setPresent(false);
+      expect(presence.getSnapshot().exiting).toBe(true);
 
-  it('keeps mounted while exiting until transitionend', () => {
-    const onExitComplete = vi.fn();
-    const presence = createPresence({
-      present: true,
-      onExitComplete,
-      reducedMotion: false,
-      skipExitAnimation: false,
-      isMotionPending: () => true,
-    });
-    const el = panel();
-    presence.setNode(el);
-
-    presence.setPresent(false);
-    expect(presence.getSnapshot()).toMatchObject({
-      present: false,
-      mounted: true,
-      state: 'closed',
-      exiting: true,
-    });
-    expect(el.getAttribute(PRESENCE_STATE_ATTR)).toBe('closed');
-    expect(onExitComplete).not.toHaveBeenCalled();
-
-    el.dispatchEvent(new Event('transitionend', { bubbles: true }));
-    expect(presence.getSnapshot()).toMatchObject({
-      mounted: false,
-      state: 'closed',
-      exiting: false,
-    });
-    expect(onExitComplete).toHaveBeenCalledTimes(1);
+      onEnter.mockClear();
+      presence.setPresent(true);
+      expect(presence.getSnapshot()).toMatchObject({
+        present: true,
+        mounted: true,
+        state: 'open',
+        exiting: false,
+      });
+      expect(onEnter).toHaveBeenCalled();
+      el.dispatchEvent(new Event('transitionend', { bubbles: true }));
+      expect(onExitComplete).not.toHaveBeenCalled();
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    document.body.replaceChildren();
+    {
+      // completeExit finishes without a motion event
+      const onExitComplete = vi.fn();
+      const presence = createPresence({
+        present: true,
+        reducedMotion: false,
+        isMotionPending: () => true,
+        onExitComplete,
+      });
+      const el = panel();
+      presence.setNode(el);
+      presence.setPresent(false);
+      presence.completeExit();
+      expect(onExitComplete).toHaveBeenCalledTimes(1);
+      expect(presence.getSnapshot().mounted).toBe(false);
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    document.body.replaceChildren();
+    {
+      // ignores transitionend from child targets
+      const onExitComplete = vi.fn();
+      const presence = createPresence({
+        present: true,
+        reducedMotion: false,
+        isMotionPending: () => true,
+        onExitComplete,
+      });
+      const el = panel();
+      const child = document.createElement('span');
+      el.append(child);
+      presence.setNode(el);
+      presence.setPresent(false);
+      child.dispatchEvent(new Event('transitionend', { bubbles: true }));
+      expect(onExitComplete).not.toHaveBeenCalled();
+      el.dispatchEvent(new Event('transitionend', { bubbles: true }));
+      expect(onExitComplete).toHaveBeenCalledTimes(1);
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    document.body.replaceChildren();
+    {
+      // dispose clears pending work
+      vi.useFakeTimers();
+      const onExitComplete = vi.fn();
+      const presence = createPresence({
+        present: true,
+        skipExitAnimation: true,
+        onExitComplete,
+      });
+      presence.setNode(panel());
+      presence.setPresent(false);
+      presence.dispose();
+      vi.advanceTimersByTime(32);
+      expect(onExitComplete).not.toHaveBeenCalled();
+    }
   });
-
-  it('completes exit on animationend as well as transitionend', () => {
-    const onExitComplete = vi.fn();
-    const presence = createPresence({
-      present: true,
-      onExitComplete,
-      reducedMotion: false,
-      isMotionPending: () => true,
-    });
-    const el = panel();
-    presence.setNode(el);
-    presence.setPresent(false);
-    el.dispatchEvent(new Event('animationend', { bubbles: true }));
-    expect(onExitComplete).toHaveBeenCalledTimes(1);
-  });
-
-  it('skips the exit wait under reduced motion', () => {
-    vi.useFakeTimers();
-    const onExitComplete = vi.fn();
-    const presence = createPresence({
-      present: true,
-      reducedMotion: true,
-      onExitComplete,
-      isMotionPending: () => true,
-    });
-    const el = panel();
-    presence.setNode(el);
-    presence.setPresent(false);
-
-    expect(presence.getSnapshot().exiting).toBe(true);
-    expect(presence.getSnapshot().state).toBe('closed');
-
-    vi.advanceTimersByTime(16);
-    expect(onExitComplete).toHaveBeenCalledTimes(1);
-    expect(presence.getSnapshot().mounted).toBe(false);
-  });
-
-  it('skips the exit wait when skipExitAnimation is set', () => {
-    vi.useFakeTimers();
-    const presence = createPresence({
-      present: true,
-      skipExitAnimation: true,
-      isMotionPending: () => true,
-    });
-    presence.setNode(panel());
-    presence.setPresent(false);
-    vi.advanceTimersByTime(16);
-    expect(presence.getSnapshot().mounted).toBe(false);
-  });
-
-  it('skips the exit wait when no CSS motion is pending', () => {
-    vi.useFakeTimers();
-    const onExitComplete = vi.fn();
-    const presence = createPresence({
-      present: true,
-      reducedMotion: false,
-      isMotionPending: () => false,
-      onExitComplete,
-    });
-    presence.setNode(panel());
-    presence.setPresent(false);
-    expect(presence.getSnapshot().exiting).toBe(true);
-    vi.advanceTimersByTime(16);
-    expect(onExitComplete).toHaveBeenCalledTimes(1);
-  });
-
-  it('forceMount keeps the node mounted after exit completes', () => {
-    vi.useFakeTimers();
-    const onExitComplete = vi.fn();
-    const presence = createPresence({
-      present: true,
-      forceMount: true,
-      skipExitAnimation: true,
-      onExitComplete,
-    });
-    const el = panel();
-    presence.setNode(el);
-    presence.setPresent(false);
-    vi.advanceTimersByTime(16);
-
-    expect(onExitComplete).toHaveBeenCalled();
-    expect(presence.getSnapshot()).toMatchObject({
-      present: false,
-      mounted: true,
-      state: 'closed',
-      exiting: false,
-    });
-    expect(el.getAttribute(PRESENCE_STATE_ATTR)).toBe('closed');
-  });
-
-  it('re-opens while exiting and cancels the exit wait', () => {
-    const onEnter = vi.fn();
-    const onExitComplete = vi.fn();
-    const presence = createPresence({
-      present: true,
-      reducedMotion: false,
-      isMotionPending: () => true,
-      onEnter,
-      onExitComplete,
-    });
-    const el = panel();
-    presence.setNode(el);
-    presence.setPresent(false);
-    expect(presence.getSnapshot().exiting).toBe(true);
-
-    onEnter.mockClear();
-    presence.setPresent(true);
-    expect(presence.getSnapshot()).toMatchObject({
-      present: true,
-      mounted: true,
-      state: 'open',
-      exiting: false,
-    });
-    expect(onEnter).toHaveBeenCalled();
-    el.dispatchEvent(new Event('transitionend', { bubbles: true }));
-    expect(onExitComplete).not.toHaveBeenCalled();
-  });
-
-  it('completeExit finishes without a motion event', () => {
-    const onExitComplete = vi.fn();
-    const presence = createPresence({
-      present: true,
-      reducedMotion: false,
-      isMotionPending: () => true,
-      onExitComplete,
-    });
-    const el = panel();
-    presence.setNode(el);
-    presence.setPresent(false);
-    presence.completeExit();
-    expect(onExitComplete).toHaveBeenCalledTimes(1);
-    expect(presence.getSnapshot().mounted).toBe(false);
-  });
-
-  it('ignores transitionend from child targets', () => {
-    const onExitComplete = vi.fn();
-    const presence = createPresence({
-      present: true,
-      reducedMotion: false,
-      isMotionPending: () => true,
-      onExitComplete,
-    });
-    const el = panel();
-    const child = document.createElement('span');
-    el.append(child);
-    presence.setNode(el);
-    presence.setPresent(false);
-    child.dispatchEvent(new Event('transitionend', { bubbles: true }));
-    expect(onExitComplete).not.toHaveBeenCalled();
-    el.dispatchEvent(new Event('transitionend', { bubbles: true }));
-    expect(onExitComplete).toHaveBeenCalledTimes(1);
-  });
-
-  it('dispose clears pending work', () => {
-    vi.useFakeTimers();
-    const onExitComplete = vi.fn();
-    const presence = createPresence({
-      present: true,
-      skipExitAnimation: true,
-      onExitComplete,
-    });
-    presence.setNode(panel());
-    presence.setPresent(false);
-    presence.dispose();
-    vi.advanceTimersByTime(32);
-    expect(onExitComplete).not.toHaveBeenCalled();
-  });
-
-  it('starts unmounted when present is false', () => {
-    const presence = createPresence();
-    expect(presence.getSnapshot()).toEqual({
-      present: false,
-      mounted: false,
-      state: 'closed',
-      exiting: false,
-    });
-  });
-
-  it('syncAttributes writes data-state onto an explicit node', () => {
-    const presence = createPresence({ present: true });
-    const el = panel();
-    presence.syncAttributes(el);
-    expect(el.getAttribute(PRESENCE_STATE_ATTR)).toBe('open');
+  it('starts unmounted when present is false; syncAttributes writes data-state onto an explicit node', () => {
+    {
+      // starts unmounted when present is false
+      const presence = createPresence();
+      expect(presence.getSnapshot()).toEqual({
+        present: false,
+        mounted: false,
+        state: 'closed',
+        exiting: false,
+      });
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    document.body.replaceChildren();
+    {
+      // syncAttributes writes data-state onto an explicit node
+      const presence = createPresence({ present: true });
+      const el = panel();
+      presence.syncAttributes(el);
+      expect(el.getAttribute(PRESENCE_STATE_ATTR)).toBe('open');
+    }
   });
 });

@@ -3,7 +3,6 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 
 /*
@@ -68,8 +67,6 @@ async function visit(page: Page, path: string) {
   );
   return foreign;
 }
-
-const mode = (page: Page) => page.locator('html').getAttribute('data-tx-mode');
 
 /** Read computed background of the primary swatch chip for a theme card. */
 async function primarySwatchRgb(page: Page, themeId: string): Promise<string> {
@@ -146,15 +143,6 @@ test.describe('texuli.com theme swatches paint each theme', () => {
     expect(await visit(page, '/gallery-themes/')).toEqual([]);
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on the theme switcher (${scheme})`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: scheme });
-      await visit(page, '/theme-switcher/');
-      expect(await mode(page)).toBe(scheme);
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-      expect(results.violations.map((v) => `${scheme} ${v.id}`)).toEqual([]);
-    });
-  }
+  // axe on this page in light and dark (zero exclusions) runs in the page sweep,
+  // a11y-site.spec.ts.
 });

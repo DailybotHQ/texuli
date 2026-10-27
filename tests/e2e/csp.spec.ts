@@ -637,22 +637,36 @@ test.describe('csp · sources', () => {
   });
 });
 
+/** Examples per test: one page session walks a batch (page setup dominates). */
+const EXAMPLE_BATCH = 12;
+
 test.describe('csp · every example renders with zero violations', () => {
-  for (const id of listExampleIds()) {
-    test(id, async ({ page }) => {
+  const ids = listExampleIds();
+  for (let start = 0; start < ids.length; start += EXAMPLE_BATCH) {
+    const batch = ids.slice(start, start + EXAMPLE_BATCH);
+    test(`${batch[0]} … ${batch.at(-1)}`, async ({ page }) => {
+      test.setTimeout(batch.length * 60_000);
       const findings = await watchViolations(page);
-      await page.goto(`/?fixture=${id}`);
-      const host = page.locator(`[data-example-host="${id}"]`);
-      await expect(host, `${id} renders`).toBeVisible({ timeout: 60_000 });
-      await expect(host.locator(':scope > p[role="status"]'), `${id} loads`).toHaveCount(0, {
-        timeout: 60_000,
-      });
-      await expect(
-        host.locator(':scope > p[role="alert"]'),
-        `${id} loads without error`
-      ).toHaveCount(0);
-      await settle(page);
-      expect(await pageViolations(page, findings), id).toEqual([]);
+      const problems: string[] = [];
+      for (const id of batch) {
+        const logged = findings.length;
+        await page.goto(`/?fixture=${id}`);
+        const host = page.locator(`[data-example-host="${id}"]`);
+        await expect(host, `${id} renders`).toBeVisible({ timeout: 60_000 });
+        await expect(host.locator(':scope > p[role="status"]'), `${id} loads`).toHaveCount(0, {
+          timeout: 60_000,
+        });
+        await expect(
+          host.locator(':scope > p[role="alert"]'),
+          `${id} loads without error`
+        ).toHaveCount(0);
+        await settle(page);
+        // The store resets on every navigation; the console findings are this example's.
+        for (const finding of await pageViolations(page, findings.slice(logged))) {
+          problems.push(`${id}: ${finding.kind} ${finding.detail}`);
+        }
+      }
+      expect(problems).toEqual([]);
     });
   }
 });

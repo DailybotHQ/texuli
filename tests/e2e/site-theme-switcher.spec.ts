@@ -185,8 +185,8 @@ test.describe('texuli.com theme switcher', () => {
     ).toBeGreaterThan(0);
   });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`passes axe on the switcher (${scheme})`, async ({ page }) => {
+  test(`passes axe on the switcher in light and dark`, async ({ page }) => {
+    for (const scheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: scheme });
       await visit(page);
       // Force explicit mode so axe sees the intended palette even if cache differs.
@@ -196,6 +196,6 @@ test.describe('texuli.com theme switcher', () => {
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
       expect(results.violations.map((v) => v.id)).toEqual([]);
-    });
-  }
+    }
+  });
 });

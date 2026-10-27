@@ -13,6 +13,8 @@ import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 import { agentEndpoint } from '../agent-chat/client.ts';
+import { markdownTwinFor } from '../docs/markdown-negotiation.ts';
+import { isDocsPath } from '../foundation/nav-data.ts';
 
 const INLINE_SCRIPT = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
 const INLINE_STYLE = /<style\b[^>]*>([\s\S]*?)<\/style\s*>/gi;
@@ -36,6 +38,18 @@ export interface PageSources {
   scripts: string[];
   styles: string[];
   attributes: string[];
+}
+
+/**
+ * The `Vary: Accept` line a page's `_headers` rule carries when the page is
+ * negotiable (a docs path with a Markdown twin). It lives here, next to the
+ * CSP, because Cloudflare Pages applies `_headers` only to the asset
+ * response: the edge middleware must pass that response through untouched,
+ * or the page loses its CSP (PLAN_006 T-100 S-2, seen in production).
+ */
+export function varyHeaderLine(route: string): string {
+  const page = route.endsWith('/index.html') ? route.slice(0, -'index.html'.length) : route;
+  return isDocsPath(page) && markdownTwinFor(page) ? '\n  Vary: Accept' : '';
 }
 
 /** The deduplicated inline sources of one finished HTML document. */
@@ -223,7 +237,7 @@ export function cspIntegration(): AstroIntegration {
           });
           const reportOnly = reportOnlyPolicy(policy, reportEndpoint);
           const rule = (path: string) =>
-            `${path}\n  Content-Security-Policy: ${policy}\n  Content-Security-Policy-Report-Only: ${reportOnly}${reporting}`;
+            `${path}\n  Content-Security-Policy: ${policy}\n  Content-Security-Policy-Report-Only: ${reportOnly}${reporting}${varyHeaderLine(path)}`;
           rules.push(rule(route));
           manifestPages.push({
             route,

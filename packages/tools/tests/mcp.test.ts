@@ -1,7 +1,8 @@
 // @vitest-environment node
 import { PassThrough } from 'node:stream';
-import { describe, expect, it } from 'vitest';
+import { expect, it } from 'vitest';
 import { createTexuliMcpServer, MCP_PROTOCOL_VERSION, runMcpStdio } from '../src/mcp/index.ts';
+import { scenario } from './scenario.ts';
 
 type Response = {
   jsonrpc: '2.0';
@@ -47,36 +48,41 @@ function toolData(response: Response): Record<string, unknown> {
   return JSON.parse(content[0]?.text ?? 'null') as Record<string, unknown>;
 }
 
-describe('Texuli MCP server', () => {
-  it('negotiates MCP, announces only read-only tools and waits for initialized', async () => {
-    const handle = createTexuliMcpServer();
-    const early = (await callTool(handle, 'catalog')) as Response;
-    expect(early.error?.code).toBe(-32002);
+it('negotiates MCP with read-only tools and serves the real catalog, manifests, validation and themes', async () => {
+  await scenario(
+    'negotiates MCP, announces only read-only tools and waits for initialized',
+    async () => {
+      const handle = createTexuliMcpServer();
+      const early = (await callTool(handle, 'catalog')) as Response;
+      expect(early.error?.code).toBe(-32002);
 
-    const init = (await handle({
-      jsonrpc: '2.0',
-      id: 'init',
-      method: 'initialize',
-      params: { protocolVersion: MCP_PROTOCOL_VERSION },
-    })) as Response;
-    expect(init.result?.protocolVersion).toBe(MCP_PROTOCOL_VERSION);
-    expect(init.result?.capabilities).toEqual({ tools: { listChanged: false } });
-    await handle({ jsonrpc: '2.0', method: 'notifications/initialized' });
+      const init = (await handle({
+        jsonrpc: '2.0',
+        id: 'init',
+        method: 'initialize',
+        params: { protocolVersion: MCP_PROTOCOL_VERSION },
+      })) as Response;
+      expect(init.result?.protocolVersion).toBe(MCP_PROTOCOL_VERSION);
+      expect(init.result?.capabilities).toEqual({ tools: { listChanged: false } });
+      await handle({ jsonrpc: '2.0', method: 'notifications/initialized' });
 
-    const listed = (await handle({ jsonrpc: '2.0', id: 2, method: 'tools/list' })) as Response;
-    const tools = listed.result?.tools as { name: string; annotations: Record<string, unknown> }[];
-    expect(tools.map(({ name }) => name)).toEqual([
-      'catalog',
-      'component',
-      'validate',
-      'example',
-      'theme',
-    ]);
-    expect(tools.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
-    expect(tools.every(({ annotations }) => annotations.destructiveHint === false)).toBe(true);
-  });
-
-  it('builds the real catalog and reads component manifests and examples', async () => {
+      const listed = (await handle({ jsonrpc: '2.0', id: 2, method: 'tools/list' })) as Response;
+      const tools = listed.result?.tools as {
+        name: string;
+        annotations: Record<string, unknown>;
+      }[];
+      expect(tools.map(({ name }) => name)).toEqual([
+        'catalog',
+        'component',
+        'validate',
+        'example',
+        'theme',
+      ]);
+      expect(tools.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
+      expect(tools.every(({ annotations }) => annotations.destructiveHint === false)).toBe(true);
+    }
+  );
+  await scenario('builds the real catalog and reads component manifests and examples', async () => {
     const { handle } = await initializedServer();
     const catalog = toolData(await callTool(handle, 'catalog', { query: 'card' }));
     expect(catalog.hash).toMatch(/^[0-9a-f]{64}$/);
@@ -94,88 +100,96 @@ describe('Texuli MCP server', () => {
       (examples.examples as { componentId: string }[]).every((item) => item.componentId === 'card')
     ).toBe(true);
   });
-
-  it('validates one untrusted manifest and a set, returning actionable diagnostics', async () => {
-    const { handle } = await initializedServer();
-    const validManifest = {
-      id: 'notice-card',
-      package: 'texuli',
-      label: 'Notice card',
-      summary: 'A sample content card.',
-      tier: 'content',
-      agentEmittable: true,
-      useWhen: ['Show a short notice.'],
-      dontUseWhen: ['Application navigation.'],
-      a11y: 'Keep the heading descriptive.',
-      props: [{ name: 'title', kind: 'string' }],
-      examples: [{ id: 'basic', title: 'Basic', props: { title: 'Hello' } }],
-    };
-    expect(toolData(await callTool(handle, 'validate', { manifest: validManifest }))).toMatchObject(
-      {
+  await scenario(
+    'validates one untrusted manifest and a set, returning actionable diagnostics',
+    async () => {
+      const { handle } = await initializedServer();
+      const validManifest = {
+        id: 'notice-card',
+        package: 'texuli',
+        label: 'Notice card',
+        summary: 'A sample content card.',
+        tier: 'content',
+        agentEmittable: true,
+        useWhen: ['Show a short notice.'],
+        dontUseWhen: ['Application navigation.'],
+        a11y: 'Keep the heading descriptive.',
+        props: [{ name: 'title', kind: 'string' }],
+        examples: [{ id: 'basic', title: 'Basic', props: { title: 'Hello' } }],
+      };
+      expect(
+        toolData(await callTool(handle, 'validate', { manifest: validManifest }))
+      ).toMatchObject({
         valid: true,
         diagnostics: [],
-      }
-    );
-    const duplicate = toolData(
-      await callTool(handle, 'validate', { manifests: [validManifest, validManifest] })
-    );
-    expect(duplicate.valid).toBe(false);
-    expect(
-      (duplicate.diagnostics as { code: string }[]).some(({ code }) => code === 'duplicate-id')
-    ).toBe(true);
-    const invalid = toolData(await callTool(handle, 'validate', { manifest: { id: 'bad id' } }));
-    expect(invalid.valid).toBe(false);
-    expect(
-      (invalid.diagnostics as { jsonPath: string }[]).some(({ jsonPath }) => jsonPath === '$.id')
-    ).toBe(true);
-  });
-
-  it('searches theme metadata and reads a real full theme definition', async () => {
+      });
+      const duplicate = toolData(
+        await callTool(handle, 'validate', { manifests: [validManifest, validManifest] })
+      );
+      expect(duplicate.valid).toBe(false);
+      expect(
+        (duplicate.diagnostics as { code: string }[]).some(({ code }) => code === 'duplicate-id')
+      ).toBe(true);
+      const invalid = toolData(await callTool(handle, 'validate', { manifest: { id: 'bad id' } }));
+      expect(invalid.valid).toBe(false);
+      expect(
+        (invalid.diagnostics as { jsonPath: string }[]).some(({ jsonPath }) => jsonPath === '$.id')
+      ).toBe(true);
+    }
+  );
+  await scenario('searches theme metadata and reads a real full theme definition', async () => {
     const { handle } = await initializedServer();
     const matches = toolData(await callTool(handle, 'theme', { query: 'violet' }));
     expect((matches.themes as { id: string }[]).some(({ id }) => id === 'violet')).toBe(true);
     const theme = toolData(await callTool(handle, 'theme', { id: 'violet' }));
     expect(theme.theme).toMatchObject({ id: 'violet' });
   });
+});
 
-  it('reports invalid arguments as tool errors and unknown tools as protocol errors', async () => {
-    const { handle } = await initializedServer();
-    const badArgs = await callTool(handle, 'catalog', { limit: 0 });
-    expect(badArgs.result?.isError).toBe(true);
-    expect(toolData(badArgs).error).toContain('limit');
-    const missing = await callTool(handle, 'component', { id: 'not-in-catalog' });
-    expect(missing.result?.isError).toBe(true);
-    const unknown = await callTool(handle, 'execute', {});
-    expect(unknown.error?.code).toBe(-32602);
-  });
-
-  it('speaks newline-delimited JSON-RPC on stdio without logging to stdout', async () => {
-    const input = new PassThrough();
-    const output = new PassThrough();
-    const chunks: string[] = [];
-    output.setEncoding('utf8');
-    output.on('data', (chunk: string) => chunks.push(chunk));
-    const done = runMcpStdio(input, output);
-    input.end(
-      `${[
-        JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'initialize',
-          params: { protocolVersion: MCP_PROTOCOL_VERSION },
-        }),
-        JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }),
-        JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }),
-      ].join('\n')}\n`
-    );
-    await done;
-    const messages = chunks
-      .join('')
-      .trim()
-      .split('\n')
-      .map((line) => JSON.parse(line) as Response);
-    expect(messages.map(({ id }) => id)).toEqual([1, 2]);
-    expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version: '0.0.0' });
-    expect(messages[1]?.result?.tools).toHaveLength(5);
-  });
+it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on stdio', async () => {
+  await scenario(
+    'reports invalid arguments as tool errors and unknown tools as protocol errors',
+    async () => {
+      const { handle } = await initializedServer();
+      const badArgs = await callTool(handle, 'catalog', { limit: 0 });
+      expect(badArgs.result?.isError).toBe(true);
+      expect(toolData(badArgs).error).toContain('limit');
+      const missing = await callTool(handle, 'component', { id: 'not-in-catalog' });
+      expect(missing.result?.isError).toBe(true);
+      const unknown = await callTool(handle, 'execute', {});
+      expect(unknown.error?.code).toBe(-32602);
+    }
+  );
+  await scenario(
+    'speaks newline-delimited JSON-RPC on stdio without logging to stdout',
+    async () => {
+      const input = new PassThrough();
+      const output = new PassThrough();
+      const chunks: string[] = [];
+      output.setEncoding('utf8');
+      output.on('data', (chunk: string) => chunks.push(chunk));
+      const done = runMcpStdio(input, output);
+      input.end(
+        `${[
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'initialize',
+            params: { protocolVersion: MCP_PROTOCOL_VERSION },
+          }),
+          JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }),
+          JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }),
+        ].join('\n')}\n`
+      );
+      await done;
+      const messages = chunks
+        .join('')
+        .trim()
+        .split('\n')
+        .map((line) => JSON.parse(line) as Response);
+      expect(messages.map(({ id }) => id)).toEqual([1, 2]);
+      expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version: '0.0.0' });
+      expect(messages[1]?.result?.tools).toHaveLength(5);
+    }
+  );
 });

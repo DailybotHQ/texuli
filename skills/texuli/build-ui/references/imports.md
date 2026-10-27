@@ -24,7 +24,8 @@ Every package and its layer: [`../../router/packages.md`](../../router/packages.
 | --- | --- |
 | Roving tab | `@texuli/core/roving` |
 | URL policy | `@texuli/core/url-policy` |
-| Focus scope | `@texuli/core/focus-scope` (when present) |
+| Focus scope | `@texuli/core/focus-scope` |
+| Editor model and Markdown | `@texuli/core/editor-model`, `@texuli/core/editor-markdown` (not in the root barrel) |
 
 Never `@texuli/core` root barrel for app code.
 
@@ -63,7 +64,9 @@ Never `@texuli/core` root barrel for app code.
 | Media | `@texuli/media/<area>` |
 | Chat | `@texuli/chat` (`ChatThread`, `Composer`, `parseMessageText`) |
 | Content blocks | `@texuli/blocks/<family>` (lazy) or `@texuli/blocks/<family>/renderers` |
-| Decks | `@texuli/slides/model`, `@texuli/slides/grammar`, `@texuli/slides/stage` |
+| Decks | `@texuli/slides/model`, `@texuli/slides/grammar`, `@texuli/slides/stage`, `@texuli/slides/export` (print, PDF seam, PPTX), `@texuli/slides/templates` (report, pitch, review) |
+| Rich text editor | `@texuli/editor/editor` (`RichTextEditor`), `@texuli/editor/toolbar`, `@texuli/editor/controller`; in development, workspace only (not on npm) |
+| Astro sites | `@texuli/astro` (`texuli()` integration), `@texuli/astro/styles.css`, `@texuli/astro/site` (`defineSite`, `sitePageMeta`, `siteSitemap`), `@texuli/astro/layouts/ContentLayout` |
 | Paint a validated blueprint | `@texuli/player` (+ `@texuli/player/styles.css`) |
 | Class helpers from those packages | `texuli/cx` only |
 

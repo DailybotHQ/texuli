@@ -14,66 +14,36 @@ scenario(
   'popover',
   defineRows([
     {
-      id: 'trigger-state',
-      title: 'the trigger reports collapsed, then expanded',
+      id: 'open-anchored-not-modal',
+      title:
+        'opening: the trigger reports collapsed then expanded, focus moves in, the panel sits 6 px below its trigger, and the page behind stays usable (not modal)',
       async run({ page }) {
         await expect(page.getByRole('button', { name: 'Filters', expanded: false })).toBeVisible();
         await open(page);
         await expect(page.getByRole('button', { name: 'Filters', expanded: true })).toBeVisible();
-      },
-    },
-    {
-      id: 'focus-moves-in',
-      title: 'opening moves focus into the panel',
-      async run({ page, recordOpenToFocus }) {
-        await open(page);
         expect(await focusIsWithin(layer(page))).toBe(true);
-        await page.keyboard.press('Escape');
-        await layerClosed(page);
-        recordOpenToFocus(await sampleOpenToFocus(page, trigger(page)));
+        const anchor = await trigger(page).boundingBox();
+        const panel = await layer(page).boundingBox();
+        expect(anchor && panel).toBeTruthy();
+        if (anchor && panel) expect(Math.round(panel.y - (anchor.y + anchor.height))).toBe(6);
+        expect(await isInert(frame.after(page))).toBe(false);
       },
     },
     {
       id: 'escape-returns-focus',
       title: 'Escape closes it and focus returns to the trigger',
-      async run({ page }) {
+      async run({ page, recordOpenToFocus }) {
         await open(page);
         await page.keyboard.press('Escape');
         await layerClosed(page);
         await expectFocus(page, 'button', 'Filters');
+        recordOpenToFocus(await sampleOpenToFocus(page, trigger(page)));
       },
     },
     {
-      id: 'outside-pointer-closes',
-      title: 'a pointer press outside closes it',
-      async run({ page }) {
-        await open(page);
-        await pointerOutside(page);
-        await layerClosed(page);
-      },
-    },
-    {
-      id: 'focus-can-leave',
-      title: 'it is not modal: focus can move to the page behind it',
-      async run({ page }) {
-        await open(page);
-        expect(await isInert(frame.after(page))).toBe(false);
-      },
-    },
-    {
-      id: 'anchored-below',
-      title: 'it opens below its trigger, 6 px away',
-      async run({ page }) {
-        await open(page);
-        const anchor = await trigger(page).boundingBox();
-        const panel = await layer(page).boundingBox();
-        expect(anchor && panel).toBeTruthy();
-        if (anchor && panel) expect(Math.round(panel.y - (anchor.y + anchor.height))).toBe(6);
-      },
-    },
-    {
-      id: 'close-button',
-      title: 'the Apply button closes it',
+      id: 'apply-and-outside-pointer-close',
+      title:
+        'the Apply button closes it (opening and closing reported once each), and so does a pointer press outside',
       async run({ page }) {
         await open(page);
         await layer(page).getByRole('button', { name: 'Apply' }).click();
@@ -82,11 +52,15 @@ scenario(
           { name: 'openChange', detail: true },
           { name: 'openChange', detail: false },
         ]);
+        await open(page);
+        await pointerOutside(page);
+        await layerClosed(page);
       },
     },
     {
-      id: 'modal-traps-tab',
-      title: 'a modal popover keeps Tab and Shift+Tab inside it',
+      id: 'modal-traps-and-returns-focus',
+      title:
+        'a modal popover keeps Tab and Shift+Tab inside it; Escape closes it and focus returns to its trigger',
       async run({ page }) {
         await page.getByRole('button', { name: 'Share' }).click();
         await expect(layer(page)).toBeVisible();
@@ -95,15 +69,6 @@ scenario(
           await page.keyboard.press(key);
           expect(await focusIsWithin(layer(page))).toBe(true);
         }
-      },
-    },
-    {
-      id: 'modal-escape-returns-focus',
-      title: 'Escape closes a modal popover and focus returns to its trigger',
-      async run({ page }) {
-        await page.getByRole('button', { name: 'Share' }).click();
-        await expect(layer(page)).toBeVisible();
-        await expect.poll(() => focusIsWithin(layer(page))).toBe(true);
         await page.keyboard.press('Escape');
         await layerClosed(page);
         await expectFocus(page, 'button', 'Share');

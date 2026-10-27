@@ -69,7 +69,10 @@ packages/examples/
 │   ├── entries/              one module per example (side-effect register)
 │   └── demos/                Svelte demo components
 └── tests/
-    └── registry.test.ts
+    ├── registry.test.ts               the registry and the public barrel
+    ├── registration-side-effects.test.ts
+    ├── scoped-theme.test.ts
+    └── examples-render.test.ts        every example with a unit check, by area
 ```
 
 ## Testing

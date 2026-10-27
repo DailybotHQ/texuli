@@ -8,7 +8,7 @@
 #   ./setup.sh --list-hosts
 #   ./setup.sh --help
 #
-# Hosts and destinations (references/hosts.md is the canonical map):
+# Hosts and destinations (router/hosts.md is the canonical map):
 #   claude    ~/.claude/skills/texuli/
 #   cursor    ~/.cursor/skills/texuli/
 #   codex     ~/.codex/skills/texuli/

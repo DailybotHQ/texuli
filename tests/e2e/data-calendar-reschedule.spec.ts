@@ -183,8 +183,10 @@ test.describe('data calendar · reschedule', () => {
     ).toHaveAttribute('aria-disabled', 'true');
   });
 
-  for (const mode of ['light', 'dark'] as const) {
-    test(`passes axe after a move and with the Move menu open (${mode})`, async ({ page }) => {
+  test(`passes axe after a move and with the Move menu open in light and dark`, async ({
+    page,
+  }) => {
+    for (const mode of ['light', 'dark'] as const) {
       await open(page, mode);
       await chip(page, 'design-review').focus();
       await page.keyboard.press('Control+ArrowRight');
@@ -197,6 +199,6 @@ test.describe('data calendar · reschedule', () => {
         .withTags(AXE_TAGS)
         .analyze();
       expect(results.violations).toEqual([]);
-    });
-  }
+    }
+  });
 });

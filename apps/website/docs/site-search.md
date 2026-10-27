@@ -2,7 +2,7 @@
 
 **App:** `apps/website`  
 **Surface:** `src/components/search/`, `src/pages/search/`  
-**Tests:** `scripts/tests/site-search.test.ts`, `tests/e2e/site-search.spec.ts`
+**Tests:** `scripts/tests/site-loaders.test.ts`, `tests/e2e/site-search.spec.ts`
 
 ## Goal
 
@@ -34,8 +34,8 @@ trigger. Header also mounts `SiteSearch` site-wide.
 ## Validation
 
 ```bash
-bash -c 'pnpm build && TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-search.spec.ts'
-pnpm vitest run scripts/tests/site-search.test.ts
+bash -c 'pnpm build && TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-search.spec.ts'
+pnpm vitest run scripts/tests/site-loaders.test.ts
 ```
 
 ## Limits

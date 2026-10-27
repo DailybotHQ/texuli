@@ -103,26 +103,15 @@ within its 22 KiB budget. That is **1.02 KiB on top of**
 ## Tests
 
 ```bash
-pnpm vitest run packages/primitives/tests/menubar.test.ts
+pnpm vitest run packages/primitives/tests/overlays.test.ts
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/menubar.spec.ts
 ```
 
-The 16 unit tests cover:
-- the APG structure and the single Tab stop
-- arrows between triggers: disabled skipped, wrapping, `loop={false}`, RTL,
-  modifiers
-- Home and End
-- opening on the first or last item
-- carrying the open menu from inside it and from the triggers
-- submenu keys
-- Escape and focus return
-- item selection
-- click toggling and switching
+The 4 unit tests (`-t menubar`) cover what the behavior rows do not:
+- the arrows swapped in RTL
+- carrying the open menu from inside it
 - hover only after the first open (not on touch)
-- disabled triggers
 - the controlled `value`
-
-Six deliberate mutations each fail a test.
 
 ## Limits
 

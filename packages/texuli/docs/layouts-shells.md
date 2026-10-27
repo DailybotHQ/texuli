@@ -75,15 +75,13 @@ Every label can be translated.
 
 ## Verified
 
-- `pnpm vitest run packages/texuli/tests/shells.test.ts`: 13 tests.
-  - Structure and slots; the skip link; nested mode without landmarks; empty
-    slots; translated labels.
-  - The drawer: the header toggle, the bound prop, following a link, in-app
-    navigation, and closing at the 1024 px boundary (1023 stays open).
-  - The context API, and no context outside a shell.
+- `pnpm vitest run packages/texuli/tests/navigation.test.ts packages/texuli/tests/contracts.test.ts -t '^shells '`: 7 tests.
+  - The skip link; nested mode without landmarks.
+  - The drawer: the bound prop, following a link, and closing at the
+    1024 px boundary (1023 stays open).
+  - No context outside a shell.
   - The source imports nothing from Protoyard or Lucide, and its CSS
     uses no physical properties.
-  - Ten deliberate mutations each fail a test.
 - A one-off probe in Chromium and WebKit (2026-10-23), at 1280 px and 600 px:
   - The column shows only when the shell is wide.
   - The skip link appears on focus, focuses main and leaves the hash

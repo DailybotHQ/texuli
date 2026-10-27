@@ -120,17 +120,17 @@ The SVG player, the canvas view and all three exports show the same colors.
 
 ## Verified
 
-- `pnpm vitest run packages/media/tests/export.test.ts`: 43 tests.
+- `pnpm vitest run packages/media/tests/export.test.ts`: 7 tests.
   - Filenames: path traversal, Windows paths, bidi, control characters, length, extensions.
   - SVG: escaping, no `<script>`; unsafe `javascript:`, `data:` and `http:` sources refused, developer trust allowed.
   - PNG: pixel ratio, background, failed images, unsafe sources never fetched, tainted, encode failure, `OffscreenCanvas`, abort.
   - WebM: frame count, explicit frame deadlines, submitted-frame monotonic progress, fixed VP8/4 Mbps/1-second-chunk profile, `requestFrame` calls, OKLCH colors reaching the canvas, invalid or mismatched animation, unsafe source, unsupported paths, cancellation during a pending deadline, recorder failures, frame times, fixed MIME choice.
   - `downloadBlob`.
   - The control: keyboard button and announcement, the invalid message, WebM disabled with a reason, label merging.
-- `pnpm vitest run packages/media/tests/export-queue.test.ts`: 5 tests.
+- `pnpm vitest run packages/media/tests/export-queue.test.ts`: 1 test.
   - Ordered batch completion, aggregate progress, deterministic duration, and receipts without request content.
   - Failed item continuation, cancellation before start, and abort during the active item with queued work cancelled.
-- `packages/media/tests/animation-color.test.ts`: 17 tests (mixing, gamut, hue path, alpha, validation by layer type, sampling for shapes, text and gradients).
+- `packages/media/tests/animation-color.test.ts`: 2 tests (mixing, gamut, hue path, alpha, validation by layer type, sampling for shapes, text and gradients).
 - In real browsers (Chromium, WebKit, Pixel 7; scratch Playwright spec on port 4810):
   - axe passes in light, dark and forced colors.
   - Pressing Enter on **Export SVG** downloads `harbor-poster.svg`, which starts with `<?xml`.

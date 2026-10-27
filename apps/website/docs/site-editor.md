@@ -3,7 +3,7 @@
 **App:** `apps/website`  
 **Route:** `/editor-page/`  
 **Components:** `src/components/editor-page/` (content data and the live island), `src/components/builder/inspector/text/` (the builder's rich text fields)  
-**Tests:** `tests/e2e/site-editor.spec.ts` · `tests/e2e/site-builder.spec.ts` (text inspector case) · `scripts/tests/site-builder-inspector-richtext.test.ts` · `scripts/tests/docs-shell-nav.test.ts`
+**Tests:** `tests/e2e/site-editor.spec.ts` · `tests/e2e/site-builder.spec.ts` (text inspector case) · `scripts/tests/site-builder.test.ts` · `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
@@ -92,7 +92,7 @@ List items keep plain text fields; the editor there is planned.
 ```bash
 pnpm build
 TEXULI_E2E_PORT=4874 pnpm exec playwright test tests/e2e/site-editor.spec.ts tests/e2e/site-builder.spec.ts --project=chromium
-pnpm vitest run scripts/tests/site-builder-inspector-richtext.test.ts scripts/tests/docs-shell-nav.test.ts
+pnpm vitest run scripts/tests/site-builder.test.ts scripts/tests/site-loaders.test.ts
 ```
 
 `site-editor.spec.ts` serves `apps/website/dist` on a loopback port and

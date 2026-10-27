@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { fireEvent, render } from '@testing-library/svelte';
+import { cleanup, fireEvent, render } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -19,7 +19,8 @@ const DATA_AUDIO =
   'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
 
 describe('resolveAudioSource', () => {
-  it('keeps blob and allowlisted https, drops unsafe sources', () => {
+  it('keeps blob and allowlisted https, drops unsafe sources; widens the policy only for developer trust', () => {
+    // keeps blob and allowlisted https, drops unsafe sources
     expect(
       resolveAudioSource({
         src: HTTPS,
@@ -56,9 +57,8 @@ describe('resolveAudioSource', () => {
       expect(resolved.src, String(src)).toBeUndefined();
       expect(resolved.dropped).toBe(true);
     }
-  });
-
-  it('widens the policy only for developer trust', () => {
+    cleanup();
+    // widens the policy only for developer trust
     expect(
       resolveAudioSource({
         src: 'http://localhost:5173/clip.mp3',
@@ -88,15 +88,17 @@ describe('formatAudioTime', () => {
 });
 
 describe('buildWaveformPeaks', () => {
-  it('downsamples mono samples into normalized peak bars', () => {
-    const samples = Float32Array.from({ length: 64 }, (_, i) => (i % 8 === 0 ? 0.5 : 0.05));
-    const peaks = buildWaveformPeaks(samples, 8);
-    expect(peaks).toHaveLength(8);
-    expect(Math.max(...peaks)).toBeCloseTo(1, 5);
-    expect(peaks.every((p) => p >= 0 && p <= 1)).toBe(true);
-  });
-
-  it('clamps bar count to AUDIO_LIMITS', () => {
+  it('downsamples mono samples into normalized peak bars; clamps bar count to AUDIO_LIMITS', () => {
+    {
+      // downsamples mono samples into normalized peak bars
+      const samples = Float32Array.from({ length: 64 }, (_, i) => (i % 8 === 0 ? 0.5 : 0.05));
+      const peaks = buildWaveformPeaks(samples, 8);
+      expect(peaks).toHaveLength(8);
+      expect(Math.max(...peaks)).toBeCloseTo(1, 5);
+      expect(peaks.every((p) => p >= 0 && p <= 1)).toBe(true);
+    }
+    cleanup();
+    // clamps bar count to AUDIO_LIMITS
     expect(buildWaveformPeaks([1, 0, 1], 2)).toHaveLength(AUDIO_LIMITS.minBars);
     expect(buildWaveformPeaks([1], 10_000)).toHaveLength(AUDIO_LIMITS.maxBars);
     expect(buildWaveformPeaks([])).toHaveLength(AUDIO_LIMITS.defaultBars);
@@ -104,18 +106,20 @@ describe('buildWaveformPeaks', () => {
 });
 
 describe('monoFromAudioBuffer and clampSeekRatio', () => {
-  it('mixes multi-channel buffers to mono', () => {
-    const left = new Float32Array([1, 0, -1]);
-    const right = new Float32Array([0, 1, 0]);
-    const mono = monoFromAudioBuffer({
-      numberOfChannels: 2,
-      length: 3,
-      getChannelData: (c) => (c === 0 ? left : right),
-    });
-    expect(Array.from(mono)).toEqual([0.5, 0.5, -0.5]);
-  });
-
-  it('clamps seek ratios into [0, 1]', () => {
+  it('mixes multi-channel buffers to mono; clamps seek ratios into [0, 1]', () => {
+    {
+      // mixes multi-channel buffers to mono
+      const left = new Float32Array([1, 0, -1]);
+      const right = new Float32Array([0, 1, 0]);
+      const mono = monoFromAudioBuffer({
+        numberOfChannels: 2,
+        length: 3,
+        getChannelData: (c) => (c === 0 ? left : right),
+      });
+      expect(Array.from(mono)).toEqual([0.5, 0.5, -0.5]);
+    }
+    cleanup();
+    // clamps seek ratios into [0, 1]
     expect(clampSeekRatio(-0.2)).toBe(0);
     expect(clampSeekRatio(0.4)).toBe(0.4);
     expect(clampSeekRatio(1.5)).toBe(1);
@@ -124,150 +128,164 @@ describe('monoFromAudioBuffer and clampSeekRatio', () => {
 });
 
 describe('decodeWaveformPeaks', () => {
-  it('returns peaks from a mocked fetch + decoder', async () => {
-    const samples = new Float32Array(32);
-    for (let i = 0; i < samples.length; i += 1) samples[i] = i / 32;
-    const fetchImpl = vi.fn(async () => new Response(new ArrayBuffer(8), { status: 200 }));
-    const audioContext = {
-      decodeAudioData: vi.fn(async () => ({
-        numberOfChannels: 1,
-        length: samples.length,
-        duration: 1.25,
-        getChannelData: () => samples,
-      })),
-      close: vi.fn(async () => undefined),
-    };
-
-    const result = await decodeWaveformPeaks(HTTPS, {
-      barCount: 16,
-      fetchImpl: fetchImpl as unknown as typeof fetch,
-      audioContext,
-    });
-    expect(result?.duration).toBe(1.25);
-    expect(result?.peaks).toHaveLength(16);
-    expect(audioContext.close).toHaveBeenCalled();
-  });
-
-  it('returns undefined when fetch fails or duration exceeds the limit', async () => {
-    expect(
-      await decodeWaveformPeaks(HTTPS, {
-        fetchImpl: vi.fn(async () => {
-          throw new Error('offline');
-        }) as unknown as typeof fetch,
-      })
-    ).toBeUndefined();
-
-    const long = await decodeWaveformPeaks(HTTPS, {
-      fetchImpl: vi.fn(
-        async () => new Response(new ArrayBuffer(4), { status: 200 })
-      ) as unknown as typeof fetch,
-      audioContext: {
-        decodeAudioData: async () => ({
+  it('returns peaks from a mocked fetch + decoder; returns undefined when fetch fails or duration exceeds the limit', async () => {
+    // returns peaks from a mocked fetch + decoder
+    await (async () => {
+      const samples = new Float32Array(32);
+      for (let i = 0; i < samples.length; i += 1) samples[i] = i / 32;
+      const fetchImpl = vi.fn(async () => new Response(new ArrayBuffer(8), { status: 200 }));
+      const audioContext = {
+        decodeAudioData: vi.fn(async () => ({
           numberOfChannels: 1,
-          length: 1,
-          duration: AUDIO_LIMITS.maxDurationSec + 1,
-          getChannelData: () => new Float32Array([0]),
-        }),
-      },
-    });
-    expect(long).toBeUndefined();
+          length: samples.length,
+          duration: 1.25,
+          getChannelData: () => samples,
+        })),
+        close: vi.fn(async () => undefined),
+      };
+
+      const result = await decodeWaveformPeaks(HTTPS, {
+        barCount: 16,
+        fetchImpl: fetchImpl as unknown as typeof fetch,
+        audioContext,
+      });
+      expect(result?.duration).toBe(1.25);
+      expect(result?.peaks).toHaveLength(16);
+      expect(audioContext.close).toHaveBeenCalled();
+    })();
+    cleanup();
+    // returns undefined when fetch fails or duration exceeds the limit
+    await (async () => {
+      expect(
+        await decodeWaveformPeaks(HTTPS, {
+          fetchImpl: vi.fn(async () => {
+            throw new Error('offline');
+          }) as unknown as typeof fetch,
+        })
+      ).toBeUndefined();
+
+      const long = await decodeWaveformPeaks(HTTPS, {
+        fetchImpl: vi.fn(
+          async () => new Response(new ArrayBuffer(4), { status: 200 })
+        ) as unknown as typeof fetch,
+        audioContext: {
+          decodeAudioData: async () => ({
+            numberOfChannels: 1,
+            length: 1,
+            duration: AUDIO_LIMITS.maxDurationSec + 1,
+            getChannelData: () => new Float32Array([0]),
+          }),
+        },
+      });
+      expect(long).toBeUndefined();
+    })();
   });
 });
 
 describe('Waveform', () => {
-  it('exposes a keyboard-operable slider and reports seek', async () => {
-    const onSeek = vi.fn();
-    const peaks = buildWaveformPeaks(
-      Float32Array.from({ length: 32 }, (_, i) => Math.sin(i / 4) * 0.8),
-      16
-    );
-    const { getByRole } = render(Waveform, {
-      props: { peaks, progress: 0.25, onSeek, label: 'Clip waveform' },
-    });
-    const slider = getByRole('slider', { name: 'Clip waveform' });
-    expect(slider.getAttribute('aria-valuenow')).toBe('25');
+  it('exposes a keyboard-operable slider and reports seek; stretches its peaks across the full box; ignores keyboard seek when disabled', async () => {
+    // exposes a keyboard-operable slider and reports seek
+    await (async () => {
+      const onSeek = vi.fn();
+      const peaks = buildWaveformPeaks(
+        Float32Array.from({ length: 32 }, (_, i) => Math.sin(i / 4) * 0.8),
+        16
+      );
+      const { getByRole } = render(Waveform, {
+        props: { peaks, progress: 0.25, onSeek, label: 'Clip waveform' },
+      });
+      const slider = getByRole('slider', { name: 'Clip waveform' });
+      expect(slider.getAttribute('aria-valuenow')).toBe('25');
 
-    slider.focus();
-    await fireEvent.keyDown(slider, { key: 'ArrowRight' });
-    expect(onSeek).toHaveBeenCalledWith(expect.closeTo(0.27, 5));
+      slider.focus();
+      await fireEvent.keyDown(slider, { key: 'ArrowRight' });
+      expect(onSeek).toHaveBeenCalledWith(expect.closeTo(0.27, 5));
 
-    await fireEvent.keyDown(slider, { key: 'Home' });
-    expect(onSeek).toHaveBeenLastCalledWith(0);
+      await fireEvent.keyDown(slider, { key: 'Home' });
+      expect(onSeek).toHaveBeenLastCalledWith(0);
 
-    await fireEvent.keyDown(slider, { key: 'End' });
-    expect(onSeek).toHaveBeenLastCalledWith(1);
-  });
-
-  // Audit P1-14: with the default aspect ratio the peaks drew as a ~150px strip.
-  it('stretches its peaks across the full box', () => {
-    const { getByRole } = render(Waveform, {
-      props: { peaks: [0.2, 0.8, 0.4], progress: 0, onSeek: vi.fn(), label: 'Clip waveform' },
-    });
-    expect(getByRole('slider', { name: 'Clip waveform' }).getAttribute('preserveAspectRatio')).toBe(
-      'none'
-    );
-  });
-
-  it('ignores keyboard seek when disabled', async () => {
-    const onSeek = vi.fn();
-    const { getByRole } = render(Waveform, {
-      props: {
-        peaks: [0.2, 0.8, 0.4],
-        progress: 0.5,
-        disabled: true,
-        onSeek,
-      },
-    });
-    const slider = getByRole('slider');
-    await fireEvent.keyDown(slider, { key: 'ArrowRight' });
-    expect(onSeek).not.toHaveBeenCalled();
+      await fireEvent.keyDown(slider, { key: 'End' });
+      expect(onSeek).toHaveBeenLastCalledWith(1);
+    })();
+    cleanup();
+    {
+      // stretches its peaks across the full box
+      // Audit P1-14: with the default aspect ratio the peaks drew as a ~150px strip.
+      const { getByRole } = render(Waveform, {
+        props: { peaks: [0.2, 0.8, 0.4], progress: 0, onSeek: vi.fn(), label: 'Clip waveform' },
+      });
+      expect(
+        getByRole('slider', { name: 'Clip waveform' }).getAttribute('preserveAspectRatio')
+      ).toBe('none');
+    }
+    cleanup();
+    // ignores keyboard seek when disabled
+    await (async () => {
+      const onSeek = vi.fn();
+      const { getByRole } = render(Waveform, {
+        props: {
+          peaks: [0.2, 0.8, 0.4],
+          progress: 0.5,
+          disabled: true,
+          onSeek,
+        },
+      });
+      const slider = getByRole('slider');
+      await fireEvent.keyDown(slider, { key: 'ArrowRight' });
+      expect(onSeek).not.toHaveBeenCalled();
+    })();
   });
 });
 
 describe('AudioPlayer', () => {
-  // T-68: muted chrome fallbacks must be system colors, not a fixed grey hex.
-  it('avoids hardcoded hex greys in the audio stylesheet', () => {
-    const source = readFileSync('packages/media/src/audio/audio.css', 'utf8');
-    expect(source).not.toMatch(/#575757/);
-    expect(source).toMatch(/--tx-muted-foreground,\s*GrayText/);
-    expect(source).toMatch(/--tx-destructive,\s*Mark/);
-  });
-
-  it('blocks an unsafe source and never mounts an audio element', async () => {
-    const onError = vi.fn();
-    const { container, getByRole } = render(AudioPlayer, {
-      props: {
-        src: 'javascript:alert(1)',
-        label: 'Unsafe clip',
-        onError,
-      },
-    });
-    await tick();
-    const region = getByRole('region', { name: 'Unsafe clip' });
-    expect(region.getAttribute('data-status')).toBe('blocked');
-    expect(container.querySelector('audio')).toBeNull();
-    expect(container.querySelector('[data-tx-audio-message]')?.textContent).toBe(
-      'Audio unavailable'
-    );
-    expect((getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled).toBe(true);
-  });
-
-  it('renders a waveform when peaks are provided for a safe blob source', async () => {
-    const peaks = buildWaveformPeaks(
-      Float32Array.from({ length: 48 }, (_, i) => (i % 6 === 0 ? 0.9 : 0.1)),
-      24
-    );
-    const blobSrc = 'blob:https://app.example/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-    const { container, getByRole } = render(AudioPlayer, {
-      props: {
-        src: blobSrc,
-        peaks,
-        label: 'Harbor Notes',
-      },
-    });
-    await tick();
-    expect(container.querySelector('audio')?.getAttribute('src')).toBe(blobSrc);
-    expect(getByRole('slider', { name: 'Waveform' })).toBeTruthy();
-    expect(container.querySelector('[data-tx-audio-current]')?.textContent).toBe('0:00');
+  it('avoids hardcoded hex greys in the audio stylesheet, and 2 related cases', async () => {
+    {
+      // avoids hardcoded hex greys in the audio stylesheet
+      // T-68: muted chrome fallbacks must be system colors, not a fixed grey hex.
+      const source = readFileSync('packages/media/src/audio/audio.css', 'utf8');
+      expect(source).not.toMatch(/#575757/);
+      expect(source).toMatch(/--tx-muted-foreground,\s*GrayText/);
+      expect(source).toMatch(/--tx-destructive,\s*Mark/);
+    }
+    cleanup();
+    // blocks an unsafe source and never mounts an audio element
+    await (async () => {
+      const onError = vi.fn();
+      const { container, getByRole } = render(AudioPlayer, {
+        props: {
+          src: 'javascript:alert(1)',
+          label: 'Unsafe clip',
+          onError,
+        },
+      });
+      await tick();
+      const region = getByRole('region', { name: 'Unsafe clip' });
+      expect(region.getAttribute('data-status')).toBe('blocked');
+      expect(container.querySelector('audio')).toBeNull();
+      expect(container.querySelector('[data-tx-audio-message]')?.textContent).toBe(
+        'Audio unavailable'
+      );
+      expect((getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled).toBe(true);
+    })();
+    cleanup();
+    // renders a waveform when peaks are provided for a safe blob source
+    await (async () => {
+      const peaks = buildWaveformPeaks(
+        Float32Array.from({ length: 48 }, (_, i) => (i % 6 === 0 ? 0.9 : 0.1)),
+        24
+      );
+      const blobSrc = 'blob:https://app.example/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+      const { container, getByRole } = render(AudioPlayer, {
+        props: {
+          src: blobSrc,
+          peaks,
+          label: 'Harbor Notes',
+        },
+      });
+      await tick();
+      expect(container.querySelector('audio')?.getAttribute('src')).toBe(blobSrc);
+      expect(getByRole('slider', { name: 'Waveform' })).toBeTruthy();
+      expect(container.querySelector('[data-tx-audio-current]')?.textContent).toBe('0:00');
+    })();
   });
 });

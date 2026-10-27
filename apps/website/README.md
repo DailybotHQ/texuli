@@ -24,8 +24,8 @@ and the evidence and perf reports. Each area has a design doc in
 | `src/layouts/BaseLayout.astro` | The layout behind content pages: the docs shell with the left sidebar (`SiteSidebar`), the utility header and the phone drawer; `variant="landing"` drives the home |
 | `src/components/component-pages/load-manifests.ts` | Component pages resolve against the workspace packages' real exports, so a broken component breaks the build |
 | `src/components/TexelsDiagram.astro` | The texels → Texuli → interfaces diagram (decorative grids marked `aria-hidden`) |
-| `astro.config.mjs` | `site: 'https://texuli.com'`, `integrations: [svelte(), copyPageIntegration(), seoIntegration(), cspIntegration()]` |
-| `src/components/security/csp.ts` | The build-time CSP integration: per-route hash policies written to `dist/_headers` and `dist/csp-manifest.json` |
+| `astro.config.mjs` | `site: 'https://texuli.com'`, `integrations: [svelte(), copyPageIntegration(), skillPackIntegration(), seoIntegration(), cspIntegration()]` |
+| `src/components/security/csp.ts` | The build-time CSP integration: per-route hash policies written to `dist/_headers` (plus `Vary: Accept` on negotiable docs pages) and `dist/csp-manifest.json` |
 | `tests/csp-coverage.mts` | The generation-side proof: every built page's inline scripts, styles and style attributes are covered by its policy in both artifacts (`pnpm --filter @texuli/website check:csp`) |
 | `tsconfig.json` | Extends `astro/tsconfigs/strict` |
 

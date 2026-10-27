@@ -10,9 +10,9 @@ for 1.0.0), so install it with `@next`. The workspace package stays
 ## Status
 
 Implemented in `src/` and exported through [`package.json`](package.json)
-(70 subpaths): 41 styled component families, the `cx`/variant helpers, the
-icon system, and the layout families listed below. They are covered by 519
-unit tests in 59 files (`pnpm vitest run packages/texuli`). Per-item notes
+(the root and 69 subpaths): 41 styled component families, the `cx`/variant helpers, the
+icon system, and the layout families listed below. They are covered by 205
+unit tests in 6 files (`pnpm vitest run packages/texuli`). Per-item notes
 live in [`docs/`](docs/) here until they are folded into this README.
 
 ## Using the components
@@ -97,7 +97,7 @@ customization and the control-props convention.
 | `texuli/layouts/content/*` (`blog`, `docs`, `editorial`) | Exported and typed in source; per-family docs not written yet |
 | `texuli/layouts/dashboard` (+ `/register`) | [Dashboard layout](docs/layouts-dashboard.md) |
 | `texuli/layouts/host` (+ `/chrome`, `/drawer`) | [Host layout kit](docs/layout-host.md) |
-| `texuli/layouts/marketing` (+ `/register`, `entry`, `landing`, `pricing`, `register`, `section`) | [Marketing layouts](docs/layouts-marketing.md) |
+| `texuli/layouts/marketing` (+ `/entry`, `/landing`, `/pricing`, `/register`, `/section`) | [Marketing layouts](docs/layouts-marketing.md) |
 | `texuli/layouts/mobile` (+ `/register`) | [Mobile layouts](docs/layouts-mobile.md) |
 | `texuli/layouts/shells` | [AppShell](docs/layouts-shells.md) |
 | register-only subpaths (cold-start registration) | [Layout register subpaths](docs/layout-register-subpaths.md) |
@@ -114,7 +114,7 @@ customization and the control-props convention.
 ## Verification
 
 ```bash
-pnpm vitest run packages/texuli     # 519 tests / 59 files
+pnpm vitest run packages/texuli     # 205 tests / 6 files
 pnpm --filter texuli typecheck      # exit 0
 npx biome check packages/texuli     # exit 0
 ```

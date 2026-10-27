@@ -182,5 +182,6 @@ pnpm exec tsx packages/spec/scripts/generate.ts
 pnpm vitest run packages/spec
 ```
 
-Doc: `packages/spec/README.md`. The native Kotlin build in `native/` consumes
-the generated Kotlin; it has not been compiled yet.
+Doc: `packages/spec/README.md`. The native Kotlin Multiplatform build in
+`native/` consumes the generated Kotlin (in development; its Gradle `check`
+is recorded passing in `native/README.md`, and nothing is on Maven Central).

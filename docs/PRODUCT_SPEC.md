@@ -2,11 +2,11 @@
 
 > **Small pieces. Infinite possibilities.**
 >
-> Status on 2026-10-25: **pre-release.** All 15 packable packages are on
+> Status on 2026-10-26: **pre-release.** All 15 packable packages are on
 > npm as `0.1.0-next.1` under the `next` dist-tag (published by CI from
 > verified tarballs, with signed provenance); texuli.com deploys from
 > `main` to Cloudflare Pages. The
-> implementation itself is substantial: every layer from L0 texels to L7
+> implementation itself is substantial: every layer from L0 texels to L8
 > tools exists in source with tests, all in this private workspace. The
 > "What exists today" table says exactly what is real.
 
@@ -76,10 +76,16 @@ closed, documented catalog that can be validated before anything renders.
 | Tokens + CSS, OKLCH theme engine (L2): the `--tx-*` contract, 210 themes, compiled CSS, forced colors, the AA gate, the Tailwind preset | **Exists**, private | [`packages/tokens`](../packages/tokens/README.md) |
 | `texuli` styled components, layouts and app shells (L3) | **Exists**, private | [`packages/texuli`](../packages/texuli/README.md) |
 | Charts, data, media and chat packages (L4) | **Exists**, private | [`packages/charts`](../packages/charts/README.md), [`packages/data`](../packages/data/README.md), [`packages/media`](../packages/media/README.md), [`packages/chat`](../packages/chat/README.md) |
+| Blueprint contract (L0): JSON schemas, catalog vocabulary, TypeScript and Kotlin codegen, conformance harness | **Exists**, private | [`packages/spec`](../packages/spec/README.md) |
+| Rich text editor (L4) | **In development**, `0.0.0`, never packed or published | [`packages/editor`](../packages/editor/README.md) |
 | Content blocks (L5) | **Exists**, private | [`packages/blocks`](../packages/blocks/README.md) |
 | Agent catalog and the sink-free renderer (L6) | **Exists**, private | [`packages/catalog`](../packages/catalog/README.md) |
-| Tools (L7): the copy-in CLIs (`texuli-add`, `texuli-init`, `texuli-update`, `texuli-llms`), A2UI, custom elements, the golden set, and the read-only local MCP server source | **Exists as source**, private; no published binaries | [`packages/tools`](../packages/tools/README.md) |
-| Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, deployed at https://texuli.com (Cloudflare Pages) | [`apps/website`](../apps/website/README.md) |
+| Slides and the blueprint player (L7) | **Exists**, private | [`packages/slides`](../packages/slides/README.md), [`packages/player`](../packages/player/README.md) |
+| Astro integration (L8) | **Exists**, private | [`packages/astro`](../packages/astro/README.md) |
+| Kotlin Multiplatform twin (`texuli-spec`, `texuli-compose`, conformance) | **In development**, nothing published; app shells and most chart families are placeholders | [`native`](../native/README.md) |
+| Agent service (prompt → validated blueprint draft) | **In development**, fake replay provider only, not deployed | [`apps/agent`](../apps/agent/README.md) |
+| Tools (L8): the copy-in CLIs (`texuli-add`, `texuli-init`, `texuli-update`, `texuli-llms`), A2UI, custom elements, the golden set, and the read-only local MCP server source | **Exists as source**, private; no published binaries | [`packages/tools`](../packages/tools/README.md) |
+| Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, deployed at https://texuli.com (Cloudflare Pages) with two Pages Functions (`functions/`: agent-facing request shaping and a same-origin Umami analytics proxy, off until the owner provisions it) | [`apps/website`](../apps/website/README.md) |
 | npm preview release | **Done** — all 15 packages as `0.1.0-next.1`, dist-tag `next`, CI-published with provenance | [RELEASE](RELEASE.md) |
 | npm stable release | Planned; needs the developer's explicit go. texuli.com deploys from `main` (Cloudflare Pages) | — |
 
@@ -101,8 +107,10 @@ closed, documented catalog that can be validated before anything renders.
   Texuli's own.
 - **Not framework-agnostic at the component layer.** Components are Svelte 5;
   only the texels underneath are framework-free.
-- **Not a hosted service.** Texuli is a library and a static website; it has
-  no backend.
+- **Not a hosted service.** Texuli is a library and a static website. Its
+  only server-side code is the two Cloudflare Pages Functions beside the
+  site (request shaping and the analytics proxy); the agent service in
+  `apps/agent` is not deployed.
 - **Not "agent-native" by marketing.** The claim waits for the catalog, the
   renderer and their tests to exist.
 - **No release before it is earned.** Package names, the token prefix and

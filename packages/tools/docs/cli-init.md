@@ -84,7 +84,7 @@ const result = await initProject({ cwd: '/app', theme: 'ocean', dryRun: true });
 
 ## Tests
 
-`pnpm vitest run packages/tools/tests/cli-init.test.ts` (34 tests, Node
+`pnpm vitest run packages/tools/tests/cli-init.test.ts` (11 grouped tests, Node
 environment) covers:
 - the three framework fixtures in `packages/tools/tests/fixtures/cli-init/`,
   copied to temporary folders;

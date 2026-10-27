@@ -52,7 +52,7 @@ be blocked by the browser and record nothing. `src/lib/constances.ts`
 therefore fails closed: when the resolved script source is not a
 same-origin path, `ANALYTICS.umami.enabled` is `false`, the loader renders
 no markup and no event is sent, exactly as with no website id
-(`tests/analytics.test.ts`). The only working setup is the default proxy
+(`tests/analytics-client.test.ts`). The only working setup is the default proxy
 path `/api/umami/script.js` with the collect endpoint `/api/umami`.
 
 ## How it behaves once enabled
@@ -88,7 +88,11 @@ path `/api/umami/script.js` with the collect endpoint `/api/umami`.
   silent unless the website id is provisioned. Bot page hits count only for
   HTML answered `200`: redirects, errors and the HTML 404 (whose path the
   client chose) count nothing. The path is scrubbed with the client's email
-  scrub and capped at 256 characters.
+  scrub and capped at 256 characters. The body carries the class, never
+  the raw UA: payload `userAgent: 'bot'` (`'markdown-client'` for served
+  twins), sent with the request header
+  `User-Agent: texuli-edge/1.0 (server-side event)` (`buildBotEventBody`,
+  `buildBotEventRequest`).
 - **Proxy allowlist:** exactly `GET /api/umami/script.js` and
   `POST /api/umami/api/send`; everything else is a 404/405 problem+json.
   Cookies and authorization headers are dropped at the proxy. A beacon must
@@ -103,6 +107,11 @@ path `/api/umami/script.js` with the collect endpoint `/api/umami`.
 - Expect the six client events above plus the three edge events; any
   other event name is a bug (the catalog is closed).
 - Expect near-zero counts for Lighthouse runs (skipped by design).
+- **Set `DISABLE_BOT_CHECK=1` on the Umami server.** Umami's default bot
+  check may discard the edge events, whose user agent is bot-classed by
+  design (above); without the setting the three edge counts can stay empty
+  while browser analytics is unaffected. **Unverified** against a live
+  Umami: confirm on the dashboard after the first deploy with the id set.
 
 ## Verification commands
 
@@ -143,19 +152,19 @@ violations and that the tracker runs.
 
 | Behavior | Pinned by |
 | --- | --- |
-| Env parsing, production gating, proxy or direct source, verification metas off by default, PII key denylist and email scrub | `apps/website/tests/analytics.test.ts` |
-| `track` is a silent no-op when off; queues until the tracker is ready when on | `apps/website/tests/umami-track.test.ts` |
-| Loader attributes and injection, the `texuli-analytics` Trusted Types policy, exclude-search/hash; skip list | `apps/website/tests/umami-loader.test.ts`, `apps/website/tests/umami-loader-component.test.ts` |
-| The page CSP names `texuli-analytics` only where the loader is mounted | `apps/website/tests/csp-analytics-policy.test.ts` |
+| Env parsing, production gating, proxy or direct source, verification metas off by default, PII key denylist and email scrub | `apps/website/tests/analytics-client.test.ts` |
+| `track` is a silent no-op when off; queues until the tracker is ready when on | `apps/website/tests/analytics-client.test.ts` |
+| Loader attributes and injection, the `texuli-analytics` Trusted Types policy, exclude-search/hash; skip list | `apps/website/tests/analytics-client.test.ts` |
+| The page CSP names `texuli-analytics` only where the loader is mounted | `apps/website/tests/site-build-guards.test.ts` |
 | Proxy allowlist, header stripping, 503 without an origin, 16 KB body cap, JSON-only beacons, no redirects followed | `apps/website/tests/umami-proxy.test.ts` |
-| Edge event classification, the silent default, 200-only page hits, path scrub and 256-character cap | `apps/website/tests/umami-bot-events.test.ts` |
+| Edge event classification, the silent default, 200-only page hits, path scrub and 256-character cap | `apps/website/tests/edge-middleware.test.ts` |
 | Surfaces wired to the catalog events | `apps/website/tests/umami-wiring.test.ts` |
 | Default build: zero analytics markup and requests | `tests/e2e/analytics.spec.ts` |
 | Fixture build: same-origin injection, Lighthouse skipped | `tests/e2e/analytics-fixture.spec.ts` |
 | Built headers: Trusted Types allowance follows the mount; fixture build: zero violations under the enforced CSP | `tests/e2e/analytics-csp.spec.ts` |
 
 ```bash
-pnpm vitest run apps/website/tests/analytics.test.ts apps/website/tests/umami-track.test.ts apps/website/tests/umami-proxy.test.ts apps/website/tests/umami-bot-events.test.ts
+pnpm vitest run apps/website/tests/analytics-client.test.ts apps/website/tests/umami-proxy.test.ts apps/website/tests/edge-middleware.test.ts
 ```
 
 ## How to extend

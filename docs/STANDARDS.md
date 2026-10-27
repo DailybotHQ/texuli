@@ -32,8 +32,8 @@ mandatory subset; this file explains them.
   snippets. No `export let`, no `on:click`, no `$:`, no slots.
 - **No `{@html}`** on anything that comes from props, content or an agent.
 - **Astro components** keep logic in the frontmatter and styles scoped;
-  global tokens live on `:root` with a `prefers-color-scheme: dark` variant
-  (see `apps/website/src/pages/index.astro`).
+  global tokens come from `@texuli/tokens` (`base.css` and the compiled
+  theme CSS, as in `apps/website/src/layouts/ExamplePreviewLayout.astro`).
 
 ## CSS
 
@@ -43,8 +43,9 @@ mandatory subset; this file explains them.
   this (`max-inline-size`, `margin-inline`, `margin-block-start`).
 - Colors and surfaces come from custom properties, never hard-coded inside a
   component when a token exists.
-- Respect `prefers-color-scheme`; planned components also respect
-  `forced-colors` and `prefers-reduced-motion`.
+- Respect `prefers-color-scheme`, `forced-colors` and
+  `prefers-reduced-motion`; the styled components already carry
+  `forced-colors` and reduced-motion rules.
 
 ## Formatting and lint (Biome 2.5.15)
 
@@ -60,11 +61,12 @@ mandatory subset; this file explains them.
 
 ## Naming
 
-- Files: `kebab-case.ts` (`safe-href.ts`); tests mirror the name
-  (`tests/safe-href.test.ts`). Svelte and Astro components: `PascalCase`
+- Files: `kebab-case.ts` (`safe-href.ts`); tests are named after the area
+  or subpath (`packages/core/tests/url-policy.test.ts` covers `src/url/`
+  and `src/url-policy/`). Svelte and Astro components: `PascalCase`
   (`TexelsDiagram.astro`).
-- Packages: `@texuli/<name>` for workspace packages; the planned styled
-  package is the unscoped `texuli`.
+- Packages: `@texuli/<name>` for workspace packages; the styled package
+  is the unscoped `texuli`.
 - Folders inside `src/` group a concern (`src/url/`).
 
 ## Accessibility

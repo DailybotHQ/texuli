@@ -4,7 +4,7 @@
 **Paths:** `/component-pages/`, `/component-pages/<id>/`  
 **Surface:** `src/components/component-pages/`, `src/pages/component-pages/`  
 **E2E:** `tests/e2e/site-component-pages.spec.ts`  
-**Unit:** `scripts/tests/site-component-pages.test.ts`
+**Unit:** `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
@@ -44,7 +44,7 @@ props always appear in the code sample; other ids use a static props card.
 
 ```bash
 pnpm build
-pnpm vitest run scripts/tests/site-component-pages.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 TEXULI_E2E_PORT=4920 pnpm exec playwright test tests/e2e/site-component-pages.spec.ts
 ```
 

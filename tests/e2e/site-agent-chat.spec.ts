@@ -3,7 +3,6 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 
 /**
@@ -91,8 +90,10 @@ test.describe('texuli.com agent chat', () => {
     expect(await page.locator('a[href="/agent-chat/"]').count()).toBeGreaterThan(0);
   });
 
-  for (const width of [360, 768, 1024, 1440]) {
-    test(`fits ${width}px without horizontal scroll, with 44px touch targets`, async ({ page }) => {
+  test(`fits 360, 768, 1024 and 1440px without horizontal scroll, with 44px touch targets`, async ({
+    page,
+  }) => {
+    for (const width of [360, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await visit(page);
       const overflow = await page.evaluate(
@@ -108,21 +109,9 @@ test.describe('texuli.com agent chat', () => {
         .locator('[data-tx-agent-chat]')
         .evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(' ').length);
       expect(columns).toBe(width >= 1024 ? 2 : 1);
-    });
-  }
+    }
+  });
 
-  for (const scheme of ['light', 'dark'] as const) {
-    test(`has no axe violations in ${scheme} mode, with reduced motion`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
-      await visit(page);
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-      expect(
-        results.violations.flatMap((violation) =>
-          violation.nodes.map((node) => `${scheme} ${violation.id} ${node.target.join(', ')}`)
-        )
-      ).toEqual([]);
-    });
-  }
+  // axe on this page in light and dark (zero exclusions) runs in the page sweep,
+  // a11y-site.spec.ts.
 });
