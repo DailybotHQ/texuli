@@ -31,26 +31,33 @@ policy.
 
 ## Inputs
 
-- The diff: `git diff`, `git diff --staged`, or `git diff main...HEAD`
-  (local branches only; there is no remote).
+- The diff: `git diff`, `git diff --staged`, or `git diff main...HEAD`.
+  Review local state only: never fetch, push or comment on the remote.
 - The task or plan acceptance criteria, when there is one.
 
 ## Procedure
 
 1. **Scope the diff.** `git diff --stat`; list the touched surfaces:
-   `packages/core` (L0, shared), `apps/website`, a new package, owner-held
-   root files, the harness (`.agents/`, `.review/`, `docs/`).
+   `packages/core` (L0, shared), another package (`packages/<pkg>`),
+   `apps/website`, `apps/agent`, `functions/`, `skills/texuli`, CI and
+   publishing (`.github/workflows/`), owner-held root files, the harness
+   (`.agents/`, `.review/`) and `docs/`.
 2. **Owner-held files.** Flag edits to `package.json`, `pnpm-lock.yaml`,
-   `pnpm-workspace.yaml`, `biome.json`, `tsconfig.base.json` or
-   `vitest.config.ts` without the owner's agreement.
+   `pnpm-workspace.yaml`, `biome.json`, `tsconfig.base.json`,
+   `vitest.config.ts`, `playwright.config.ts` or `texuli.budgets.json`
+   without the owner's agreement.
 3. **Owned primitives.** Any other component library in a package's
    `dependencies` or imported from shipped source is critical.
 4. **Sinks and URLs.** No `{@html}`, `set:html`, `innerHTML`, `eval` or
-   `new Function` on data; every rendered `href`/`src` passes `safeHref` with
-   the right tier (`untrusted` for agent or user content).
-5. **Layers.** No upward import (L0 imports nothing from the workspace), no
+   `new Function` on data; every rendered link passes `safeHref` and every
+   image or media source `safeImageSrc` / `safeMediaSrc`
+   (`@texuli/core/url-policy`) with the right tier (`untrusted` for agent or
+   user content). Website changes keep the build-time CSP free of
+   `unsafe-inline` and `unsafe-eval`.
+5. **Layers.** No upward import against the `LAYERS` map in
+   `scripts/check-layers.ts` (L0 imports nothing from the workspace), no
    deep import into another package's `src/`, no framework import in
-   `packages/core`.
+   `packages/core` (`pnpm check:layers`).
 6. **TypeScript and Svelte.** Erasable TypeScript only; relative imports keep
    `.ts`; Svelte 5 runes only.
 7. **Accessibility and CSS.** Focus order, Escape, `inert`, scroll lock and

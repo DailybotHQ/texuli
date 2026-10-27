@@ -2,10 +2,12 @@
 
 Texuli is a pre-release pnpm monorepo for a Svelte 5 component library that
 owns every primitive. The framework-free L0 texels live in `packages/core`
-(`@texuli/core`; today only `src/url/safe-href.ts`, the two-tier URL policy),
-and the Astro 7 + `@astrojs/svelte` website lives in `apps/website`. Planned
-layers (primitives, tokens, styled components, layouts, data, catalog) do not
-exist yet, so most diffs add the first version of something. A good review
+(`@texuli/core`: the overlay engine, roving focus, positioning, the editor
+model and the two-tier URL policy, among others); the layers above it
+(primitives, tokens, styled components, domain packages, blocks, catalog,
+slides, player, tools, astro) are in `packages/`, the Astro 7 +
+`@astrojs/svelte` website in `apps/website`, and its Cloudflare Pages
+Functions in `functions/`. A good review
 here protects four promises: no borrowed primitives at runtime, no way for
 content to become code, dependencies that point down only, and docs that
 never claim more than exists.
@@ -26,7 +28,7 @@ never claim more than exists.
   policy, or loosening the policy (allowing `javascript:`, `vbscript:`,
   `data:`, `//host` or `\host` in any tier, or anything beyond `https:`,
   `mailto:` and `#fragment` for `untrusted`) is critical. A policy change
-  without a hostile-input test in `packages/core/tests/safe-href.test.ts`
+  without a hostile-input test in `packages/core/tests/url-policy.test.ts`
   is critical too.
 - **Always `critical`:** a push, `git remote add`, a writing `gh` command,
   an npm publish or a deploy step added to any script, command or skill.

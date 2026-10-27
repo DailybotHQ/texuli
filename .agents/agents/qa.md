@@ -34,14 +34,22 @@ it does not change production code.
 1. List behaviors at the public boundary (exports from
    `packages/<pkg>/src/index.ts`): normal cases, edge cases, errors, and for
    anything that guards a sink, one hostile input per bypass class (see
-   `packages/core/tests/safe-href.test.ts`).
+   `packages/core/tests/url-policy.test.ts` and the catalog's hostile corpus
+   in `packages/catalog/tests/render-hostile.test.ts`).
 2. Map each behavior to an existing test or mark it missing.
-3. Add missing tests in `packages/<pkg>/tests/<name>.test.ts`. Assert
-   values, not internal calls; no randomness or wall-clock time.
+3. Add missing tests in `packages/<pkg>/tests/` (extend the existing area or family file; one looping test per behavior, not one test per item) (website:
+   `apps/website/tests/`, scripts: `scripts/tests/`). Assert values, not
+   internal calls; no randomness or wall-clock time (timings go in
+   `tests/perf`, opt-in).
 4. Run `pnpm vitest run packages/<pkg>` and confirm the `passed` count rose
    by the number of tests added; then `pnpm check`.
-5. For website changes, run `pnpm build`; state plainly that layout, dark
-   mode and accessibility are not asserted automatically yet.
+5. For primitives, run the behavior suite
+   (`TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior`, three
+   projects). For website changes, run `pnpm build`, then the area's
+   `tests/e2e/site-*.spec.ts` (axe in light and dark) and
+   `pnpm --filter @texuli/website check:csp`. State plainly what stays
+   manual: screen-reader output beyond the recorded transcripts, Firefox and
+   the deployed origin.
 
 ## Output
 
@@ -51,7 +59,8 @@ commands run with counts, and remaining gaps.
 ## Guardrails
 
 - Tests only; report production bugs to the executor or debugger.
-- Never cite a proposed check (parity harness, axe, Playwright) as run.
+- Never cite a check you did not run (behavior suite, axe, Playwright,
+  visual, native parity) as passing.
 
 ## Definition of done
 

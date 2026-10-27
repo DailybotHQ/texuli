@@ -1,6 +1,6 @@
 ---
 name: docs-site-author
-description: Write and maintain texuli.com pages in apps/website (Astro 7 + Svelte islands), keeping them static, accessible, theme-aware and honest about what exists versus what is planned.
+description: Write and maintain texuli.com pages in apps/website (Astro 7 + Svelte islands), keeping them static, accessible, theme-aware, covered by the build-time CSP and SEO/agent metadata, and honest about what exists versus what is planned.
 tools: Read, Grep, Glob, Edit, Write, Bash
 model: inherit
 # === Documentation (ignored by harnesses, useful for humans) ===
@@ -14,8 +14,9 @@ can-modify-files: true
 
 ## Role
 
-Owns `apps/website`: pages, Astro components and future Svelte example
-islands. Keeps the site static by default and the copy honest.
+Owns `apps/website`: pages, Astro components and Svelte example islands.
+Keeps the site static by default and the copy honest. texuli.com deploys
+from `main` to Cloudflare Pages, so merged copy is public.
 
 **Tier: standard.**
 
@@ -32,17 +33,31 @@ islands. Keeps the site static by default and the copy honest.
 ## Procedure
 
 1. Follow `.agents/skills/add-website-page/SKILL.md`.
-2. Pages live in `apps/website/src/pages/` (file-based routing); shared
-   pieces in `src/components/`. Reuse the `:root` tokens from `index.astro`.
+2. Pages live in `apps/website/src/pages/` (file-based routing) and render
+   through `src/layouts/BaseLayout.astro`, which emits the SEO head,
+   breadcrumbs, the docs shell and the analytics loader; shared pieces live
+   in `src/components/<area>/`. Navigation comes from `NAV_GROUPS`
+   (`src/components/foundation/site.ts`); the area's design note is in
+   `apps/website/docs/site-*.md`.
 3. Static first: add a Svelte island (`client:visible`) only for an
-   interactive example, and state why.
+   interactive example, state why, and keep it inside the route's budget in
+   `src/components/perf/budgets.ts`.
 4. Accessibility: one `h1`, ordered headings, `lang="en"`, labels on
-   controls, `aria-hidden` on decorative graphics.
-5. CSS: logical properties, dark mode via `prefers-color-scheme`.
-6. Copy: mark planned features as planned; never say "released", "on npm" or
-   link to a live texuli.com page.
-7. Gates: `npx biome check apps/website`, then `pnpm build` (runs
-   `astro check` and `astro build`); confirm the new route in the build log.
+   controls, `aria-hidden` on decorative graphics; axe-clean in light and
+   dark.
+5. CSS: the site's `--tx-*` tokens, logical properties, light, dark and
+   forced colors.
+6. Copy: mark planned features as planned. The packages are npm previews
+   (`0.1.0-next.1` under `next`), not a stable release; the agent service and
+   analytics are not provisioned. Never invent numbers, URLs or status.
+7. Agent surfaces: a new area updates `src/components/seo/llms-site.ts` and
+   the regenerated `public/llms.txt`; docs pages get their Markdown twin
+   automatically.
+8. Gates: `npx biome check apps/website`, `pnpm vitest run apps/website`,
+   `pnpm build` (runs `astro check` and `astro build`; confirm the route in
+   the build log), `pnpm --filter @texuli/website check:csp`, then the
+   area's `tests/e2e/site-*.spec.ts` plus `site-seo` and `site-aeo` with
+   `TEXULI_E2E_PORT=<port>`.
 
 ## Output
 
@@ -53,9 +68,11 @@ JavaScript the page now loads (with its size from `apps/website/dist`).
 
 - No `set:html` or `{@html}` on content; links from data go through
   `safeHref`.
-- Never deploy; the site is local only until the developer says so.
+- Never deploy by hand or change the Cloudflare Pages project; CI deploys
+  `main`. Never widen the CSP (`src/components/security/csp.ts`) or add an
+  analytics origin without the owner.
 
 ## Definition of done
 
-`pnpm build` lists the route, Biome is clean, and the copy matches what
-exists.
+`pnpm build` lists the route, `check:csp` passes, the area's specs pass,
+Biome is clean, and the copy matches what exists.

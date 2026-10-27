@@ -1,7 +1,7 @@
 ---
 name: fix-lint
-description: Fix Biome lint and format errors and tsc or astro check errors in Texuli, including erasable-syntax and strict-mode pitfalls, without weakening any rule.
-version: "1.0.0"
+description: Fix Biome lint and format errors, tsc or astro check errors and layer-guard findings in Texuli, including erasable-syntax and strict-mode pitfalls, without weakening any rule.
+version: "1.1.0"
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit
 # === Documentation (ignored by harnesses, useful for humans) ===
@@ -21,8 +21,8 @@ disabling rules, adding `// @ts-ignore`, or editing `biome.json` or
 ## When to use
 
 - `pnpm lint`, `npx biome check <path>`, `pnpm typecheck`,
-  `pnpm --filter <package> typecheck` or `pnpm build` (which starts with
-  `astro check`) fails.
+  `pnpm --filter <package> typecheck`, `pnpm check:layers` or `pnpm build`
+  (which starts with `astro check`) fails.
 
 ## Inputs
 
@@ -38,7 +38,7 @@ disabling rules, adding `// @ts-ignore`, or editing `biome.json` or
    ```
 2. **Apply safe Biome fixes** to the files you own:
    `npx biome check --write <path>`. Avoid the workspace-wide
-   `pnpm lint:fix` in a shared checkout; it touches other lanes' files.
+   `pnpm lint:fix` in a shared checkout; it touches other agents' files.
    Re-run the check and fix what remains by hand.
 3. **Erasable TypeScript** (`erasableSyntaxOnly`):
    - enum → `as const` array or object plus a union type
@@ -57,10 +57,18 @@ disabling rules, adding `// @ts-ignore`, or editing `biome.json` or
    `$props()`, `on:click` with `onclick`, `$:` with `$derived`/`$effect`,
    slots with snippets. Unused-variable rules are relaxed for `.svelte` and
    `.astro` by `biome.json`; do not add more exceptions.
-6. **A justified suppression** names the rule and the reason, like
+6. **Layer guard (`pnpm check:layers`).** `scripts/check-layers.ts` fails on
+   an upward or deep `src/` import across packages, an HTML or code sink
+   (`{@html}`, `eval(`, `new Function(`, `innerHTML`/`outerHTML` assignment,
+   `insertAdjacentHTML(`) and a static `style="..."` attribute in shipped
+   Svelte markup. Fix the import to a public subpath of a lower layer, render
+   text instead of HTML, and move static styles to a class (dynamic
+   `style={...}` and `style:` directives are fine). Comments and strings are
+   masked, so a doc comment never trips it.
+7. **A justified suppression** names the rule and the reason, like
    `// biome-ignore lint/suspicious/noControlCharactersInRegex: control characters are the target`
    in `safe-href.ts`. Use it only when the code is right and the rule is not.
-7. **Re-run** the failing commands, then the tests for the area
+8. **Re-run** the failing commands, then the tests for the area
    (`pnpm vitest run packages/<pkg>`) to confirm behavior did not change.
 
 ## Validation

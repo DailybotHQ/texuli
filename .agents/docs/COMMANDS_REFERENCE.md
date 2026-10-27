@@ -27,9 +27,9 @@ skills, or ask for them in plain text.
 
 | Command | File | Routes to | Does |
 | --- | --- | --- | --- |
-| `/commit` | `.agents/commands/commit.md` | `AGENTS.md` rules 2–3, `docs/AI_AGENT_COLLAB.md` | Conventional Commit with a Texuli scope, exact-path staging, never pushes |
+| `/commit` | `.agents/commands/commit.md` | `AGENTS.md` rules 2–3, `docs/AI_AGENT_COLLAB.md` | Conventional Commit with a Texuli scope, exact-path staging; never pushes unless the developer asks |
 | `/code-review` | `.agents/commands/code-review.md` | `.agents/skills/ai-diff-reviewer/SKILL.md` + `.review/extension.md` | Local review of the diff (read-only) |
-| `/pr` | `.agents/commands/pr.md` | `.agents/skills/ai-diff-reviewer/open-pr/SKILL.md` | Drafts a PR title and body into `tmp/`; pushing is forbidden for now |
+| `/pr` | `.agents/commands/pr.md` | `.agents/skills/ai-diff-reviewer/open-pr/SKILL.md` | Drafts a PR title and body into `tmp/`; pushes or opens a PR only on the developer's explicit go |
 
 ## Deep Work Plans
 

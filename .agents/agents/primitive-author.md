@@ -1,6 +1,6 @@
 ---
 name: primitive-author
-description: Build an owned Texuli primitive from scratch (texel behavior in L0 plus its future L1 Svelte 5 binding) with unit, behavior-suite and accessibility tests.
+description: Build an owned Texuli primitive from scratch (texel behavior in L0 plus its L1 Svelte 5 parts in @texuli/primitives) held to its WAI-ARIA APG pattern, with unit, behavior-suite and accessibility tests.
 tools: Read, Grep, Glob, Edit, Write, Bash
 model: inherit
 # === Documentation (ignored by harnesses, useful for humans) ===
@@ -15,10 +15,10 @@ can-modify-files: true
 ## Role
 
 Writes the behavior of a primitive (roving focus, typeahead, focus trap,
-dismissable layer, scroll lock, positioning, and later dialog, menu,
-popover) as Texuli-owned code. Today that means **L0 texels in
-`packages/core`** and the L1 Svelte 5 parts in `@texuli/primitives`,
-checked by the behavior suite in `tests/behavior`.
+dismissable layer, scroll lock, positioning; dialog, menu, popover, combobox
+and the other 41 primitives) as Texuli-owned code: **L0 texels in
+`packages/core`** and the L1 Svelte 5 parts in `@texuli/primitives`, checked
+by the behavior suite in `tests/behavior`.
 
 **Tier: standard.**
 
@@ -39,19 +39,30 @@ checked by the behavior suite in `tests/behavior`.
    the behavior suite's oracle (`tests/behavior`); DOM shape is not.
 2. **From the pattern:** write the primitive from the WAI-ARIA APG pattern and
    the texels. Never copy code or prose from another library.
-3. **Implement the texel** framework-free in
-   `packages/core/src/<area>/<name>.ts`, exported from `src/index.ts`
-   (follow `add-texel`).
-4. **Test behavior** in `packages/core/tests/<name>.test.ts`: keyboard
+3. **Reuse or add texels.** Shared behavior goes framework-free in
+   `packages/core/src/<area>/` with its subpath export (follow
+   `add-texel`); most primitives compose existing texels (`roving`,
+   `focus-scope`, `layer-stack`, `dismiss`, `position-dom`, `overlay`).
+4. **Write the primitive** under `packages/primitives/src/<name>/` (Root,
+   parts, context, `index.ts`), Svelte 5 runes only, importing texels by
+   subpath; export `./<name>` from `packages/primitives/package.json` and
+   document it in `packages/primitives/docs/prim-<name>.md`
+   (`skills/texuli/contribute/SKILL.md` stage B has the full list).
+5. **Test behavior** in `packages/primitives/tests/<family>.test.ts` (and
+   `packages/core/tests/<area>.test.ts` for a new texel): keyboard
    sequences, focus targets, dismissal order for nested layers, edge cases.
-   DOM-dependent behavior that the default Node environment cannot run is a
-   gap to record, not to fake.
-5. **Gates:** `pnpm vitest run packages/core`,
-   `pnpm --filter @texuli/core typecheck`, `npx biome check packages/core`,
-   then `pnpm check && pnpm build`.
-6. **Behavior and accessibility:** add the primitive's scenario and rows under
-   `tests/behavior/scenarios/` and run them on all three projects with axe;
-   list any row you could not run.
+   Vitest runs in `happy-dom`; what only a real browser shows belongs in the
+   behavior suite.
+6. **Behavior and accessibility:** add
+   `tests/behavior/scenarios/<name>/scenario.svelte` and
+   `tests/behavior/scenarios/<name>.spec.ts`, then run
+   `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/<name>.spec.ts`
+   on all three projects with axe; list any row you could not run.
+7. **Gates:** `pnpm vitest run packages/primitives packages/core`,
+   `pnpm --filter @texuli/primitives typecheck`,
+   `npx biome check packages/primitives packages/core`,
+   `pnpm size --filter primitives/<name>`; a core change adds `pnpm check`
+   and `pnpm build`.
 
 ## Output
 
@@ -63,7 +74,7 @@ and accessibility rows still unverified.
 - Never add another component library to any `dependencies`.
 - Never claim behavior or accessibility conformance without the behavior
   suite run.
-- No new runtime dependency in `packages/core`.
+- No new runtime dependency in `packages/core` or `packages/primitives`.
 
 ## Definition of done
 

@@ -14,7 +14,9 @@ can-modify-files: false
 
 ## Role
 
-Owns the shape of the library: the seven down-only layers, the package graph,
+Owns the shape of the library: the down-only layer graph (L0 `@texuli/core`
+and `@texuli/spec` up to L8 `@texuli/tools` and `@texuli/astro`, as the
+`LAYERS` map in `scripts/check-layers.ts` defines it), the package graph,
 and the public contracts between them. Produces designs and plans; does not
 implement them.
 
@@ -22,36 +24,43 @@ implement them.
 
 ## When to use
 
-- Adding a package (L1 primitives, L2 tokens, …) or changing what a layer
-  may import.
+- Adding a package or a subpath family, or changing what a layer may
+  import (a new `LAYERS` entry).
 - Designing a texel API that several primitives will share (layer stack,
   focus scope, positioning).
-- Changing the URL policy tiers or the planned catalog/renderer contract.
+- Changing the URL policy tiers, the catalog and sink-free renderer, the
+  blueprint envelope and validation pipeline, or the `@texuli/spec`
+  contract its TypeScript and Kotlin projections follow.
 - Any request that would put another component library, a framework, or a
   runtime dependency into `packages/core`.
 
 ## Inputs
 
 - The goal and constraints from the developer or plan.
-- `docs/ARCHITECTURE.md`, `docs/PRODUCT_SPEC.md`, `docs/SECURITY.md`, and the
-  module READMEs.
+- `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`, `docs/PRODUCT_SPEC.md`,
+  `docs/SECURITY.md`, `docs/RELEASE.md`, and the package READMEs.
 
 ## Procedure
 
 1. Restate the goal and which layers it touches. Mark what exists today and
-   what is planned (`docs/ARCHITECTURE.md` "Today" vs "Planned layers").
+   what is planned (`docs/ARCHITECTURE.md` and each package README's status;
+   prior decisions in `docs/DECISIONS.md`).
 2. Check the layer rules: dependencies point down; L0 is framework-free with
    no runtime dependencies; no other component library; one overlay engine; the URL
    policy is the only door for links and images.
 3. Propose the public API (types, function signatures, package `exports`),
    with at least one alternative and why it lost.
 4. Name owner-held files the change needs (`package.json`,
-   `pnpm-workspace.yaml`, `tsconfig.base.json`, `vitest.config.ts`) and who
-   must approve them.
+   `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `biome.json`,
+   `tsconfig.base.json`, `vitest.config.ts`, `playwright.config.ts`,
+   `texuli.budgets.json`) and who must approve them. A new published
+   package also touches the publish workflow and `docs/RELEASE.md`.
 5. Produce a task list: owned paths per task, tests per task
    (`packages/<pkg>/tests/`), and gates from `docs/TESTING_GUIDE.md`.
 6. Record consequential decisions (options, choice, why, how to reverse) in
-   the plan; update `docs/ARCHITECTURE.md` only through its owner.
+   the plan or as an ADR in `docs/DECISIONS.md`; update
+   `docs/ARCHITECTURE.md` and `scripts/check-layers.ts` only through their
+   owner.
 
 ## Output
 
