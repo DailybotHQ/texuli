@@ -152,13 +152,13 @@ importers:
         specifier: ^9.1.0
         version: 9.1.1(@types/node@24.19.2)(astro@7.4.2(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(esbuild@0.28.2)(jiti@2.7.0)(svelte@5.57.2)(tsx@4.23.15)(typescript@6.0.3)(yaml@2.9.1)
       '@texuli/blocks':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../blocks
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/tokens':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../tokens
       astro:
         specifier: ^7.4.0
@@ -170,85 +170,85 @@ importers:
   packages/blocks:
     dependencies:
       '@texuli/charts':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../charts
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/data':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../data
       '@texuli/media':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../media
       '@texuli/tokens':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../tokens
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
       texuli:
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../texuli
 
   packages/catalog:
     dependencies:
       '@texuli/blocks':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../blocks
       '@texuli/charts':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../charts
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/data':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../data
       '@texuli/media':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../media
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
       texuli:
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../texuli
 
   packages/charts:
     dependencies:
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/primitives':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../primitives
       '@texuli/tokens':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../tokens
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
       texuli:
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../texuli
 
   packages/chat:
     dependencies:
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/primitives':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../primitives
       '@texuli/tokens':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../tokens
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
       texuli:
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../texuli
 
   packages/core: {}
@@ -256,19 +256,19 @@ importers:
   packages/data:
     dependencies:
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/primitives':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../primitives
       '@texuli/tokens':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../tokens
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
       texuli:
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../texuli
 
   packages/date: {}
@@ -276,19 +276,19 @@ importers:
   packages/editor:
     dependencies:
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/primitives':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../primitives
       '@texuli/tokens':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../tokens
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
       texuli:
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../texuli
 
   packages/examples:
@@ -336,34 +336,34 @@ importers:
   packages/media:
     dependencies:
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/primitives':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../primitives
       '@texuli/tokens':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../tokens
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
       texuli:
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../texuli
 
   packages/player:
     dependencies:
       '@texuli/blocks':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../blocks
       '@texuli/catalog':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../catalog
       '@texuli/charts':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../charts
       '@texuli/media':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../media
       svelte:
         specifier: ^5.57.2
@@ -372,10 +372,10 @@ importers:
   packages/primitives:
     dependencies:
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/date':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../date
       svelte:
         specifier: ^5.57.2
@@ -384,16 +384,16 @@ importers:
   packages/slides:
     dependencies:
       '@texuli/blocks':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../blocks
       '@texuli/catalog':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../catalog
       '@texuli/media':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../media
       '@texuli/tokens':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../tokens
       svelte:
         specifier: ^5.57.2
@@ -404,13 +404,13 @@ importers:
   packages/texuli:
     dependencies:
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/primitives':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../primitives
       '@texuli/tokens':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../tokens
       svelte:
         specifier: ^5.57.2
@@ -421,22 +421,22 @@ importers:
   packages/tools:
     dependencies:
       '@texuli/blocks':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../blocks
       '@texuli/catalog':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../catalog
       '@texuli/charts':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../charts
       '@texuli/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@texuli/media':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../media
       '@texuli/tokens':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../tokens
       svelte:
         specifier: ^5.57.2

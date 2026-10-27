@@ -51,7 +51,7 @@ export const TEXULI_INSTALL_NAMES = [
   '@texuli/data',
 ] as const;
 
-/** The new date package is required by local packs but is not on npm yet. */
+/** Local packs also need @texuli/date (from 0.3.0 a dependency of @texuli/primitives); the registry install pulls it in transitively. */
 const LOCAL_INSTALL_NAMES = [...TEXULI_INSTALL_NAMES, '@texuli/date'] as const;
 
 const ASTRO_TRANSITIVE_PACKAGES = [

@@ -62,19 +62,24 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   { phrase: /production[- ]ready/i, why: 'nothing is released as stable' },
   {
     phrase: /Nothing is on npm/i,
-    why: 'every package is on npm as 0.2.0, and the site is deployed',
+    why: 'every package is on npm as 0.3.0, and the site is deployed',
   },
   {
     phrase: /\b0\.1\.0\b/,
-    why: 'the 0.1.0-next.N previews are superseded: name the current release, 0.2.0',
+    why: 'the 0.1.0-next.N previews are superseded: name the current release, 0.3.0',
+  },
+  {
+    // A URL segment such as the agentskills discovery schema `/0.2.0/` is not a release claim.
+    phrase: /(?<![/\w.-])0\.2\.0\b/,
+    why: '0.2.0 is superseded: name the current release, 0.3.0',
   },
   {
     phrase: /texuli(?:\/[a-z-]+)?@next\b/,
-    why: 'install plainly: latest and next both name 0.2.0',
+    why: 'install plainly: latest and next both name 0.3.0',
   },
   {
     phrase: /not released yet/i,
-    why: '0.2.0 is published; say "no stable release yet" instead',
+    why: '0.3.0 is published; say "no stable release yet" instead',
   },
   { phrase: /token engine/i, why: 'the word list calls @texuli/tokens the theme engine' },
   {
@@ -83,7 +88,7 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   },
   {
     phrase: /stable release is (out|available|published)/i,
-    why: '0.2.0 is pre-1.0; 1.0.0 will be the first stable release',
+    why: '0.3.0 is pre-1.0; 1.0.0 will be the first stable release',
   },
 ];
 
@@ -115,20 +120,20 @@ describe('site copy honesty', () => {
   });
 
   it('never calls a published package unpublished', () => {
-    // The 15 packages from the 0.2.0 release are on npm. The new date
-    // package and the private 0.0.0 workspaces are not yet published.
+    // The 16 packages of the 0.3.0 release, @texuli/date included, are on
+    // npm. Only the private 0.0.0 workspaces (editor, examples) are not.
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
-      if (dir === 'date') return false;
       try {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')
         ) as { version?: string };
-        return pkg.version === '0.2.0';
+        return pkg.version === '0.3.0';
       } catch {
         return false;
       }
     });
-    expect(published).toHaveLength(15);
+    expect(published).toHaveLength(16);
+    expect(published).toContain('date');
     const wrong: string[] = [];
     for (const file of files) {
       const copy = copyOf(file);

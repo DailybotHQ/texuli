@@ -22,11 +22,11 @@ end to end and native for agents:
   blueprint contract (`@texuli/spec`) also feeds a Kotlin Multiplatform
   twin in `native/`.
 
-**Status: in development, pre-1.0.** The 15 packages in the `0.2.0` release
-are published to npm by the publish workflow (`latest` and `next` both
-point to it). The new `@texuli/date` package is not yet published, so 16
-packages are packable in the workspace (all of `packages/` except
-`@texuli/editor` and `@texuli/examples`). Workspace packages stay
+**Status: in development, pre-1.0.** All 16 packable packages (all of
+`packages/` except `@texuli/editor` and `@texuli/examples`) are released as
+`0.3.0`, which the publish workflow publishes from `main` after the merge
+and points `latest` and `next` to; `@texuli/date` is published for the first
+time in `0.3.0` (the previous release, `0.2.0`, had 15 packages). Workspace packages stay
 `private: true`, and no stable release is out (1.0.0 will be the first; under
 0.x a new minor may break; see [RELEASE](docs/RELEASE.md)),
 and texuli.com deploys from `main` to Cloudflare Pages, with the Pages
@@ -191,11 +191,10 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The 15 previously released packages are on npm as `0.2.0`
-    (dist-tags `latest` and `next`, published by CI with provenance);
-    `@texuli/date` is packable but not yet published. `@texuli/editor`,
-    `@texuli/examples`, the apps and `native/` publish
-    nothing. 0.2.0 is a pre-1.0 release, not stable (1.0.0 will be the first
+    check results. The 16 packable packages, including `@texuli/date`, are
+    released on npm as `0.3.0` (dist-tags `latest` and `next`, published by
+    CI with provenance). `@texuli/editor`, `@texuli/examples`, the apps and
+    `native/` publish nothing. 0.3.0 is a pre-1.0 release, not stable (1.0.0 will be the first
     stable release; `latest` tracks the newest release). texuli.com
     deploys from `main` (Cloudflare Pages); the agent service is not
     deployed.

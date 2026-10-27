@@ -14,9 +14,9 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.2.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.3.0`) may contain breaking
-> changes, so pin the exact version or use `^0.2.0`, which accepts only 0.2.x.
+> published to npm as `0.3.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.4.0`) may contain breaking
+> changes, so pin the exact version or use `^0.3.0`, which accepts only 0.3.x.
 
 ## Install
 

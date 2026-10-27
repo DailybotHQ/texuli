@@ -54,8 +54,8 @@ Not layers, because they consume the library:
 
 `@texuli/editor` and `@texuli/examples` are never packed
 (`NEVER_PACKED` in `scripts/packages.ts`); the other 16 packages are the
-packable set. The 15 packages from the `0.2.0` release are on npm;
-`@texuli/date` is new in the workspace and has not been published.
+packable set. All 16 are released on npm as `0.3.0`, the first release of
+`@texuli/date` (the previous release, `0.2.0`, had 15 packages).
 
 ```text
 L8  tools · astro
@@ -195,9 +195,9 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 15 previously released packages to npm as the `0.2.0` release
-    (dist-tags `latest` and `next`), with provenance ([RELEASE](RELEASE.md)).
-    `@texuli/date` is not yet published.
+    the 16 packable packages, `@texuli/date` included, to npm as the
+    `0.3.0` release (dist-tags `latest` and `next`), with provenance
+    ([RELEASE](RELEASE.md)).
 - **Tests:**
   - **Unit:** Vitest (happy-dom) in `packages/*/tests/`,
     `apps/website/tests/` and `scripts/tests/`, plus perf tests in `tests/perf/` (opt in with

@@ -50,7 +50,7 @@ describe('guide code highlighting', () => {
     tokens.map((token) => token.text).join('');
 
   /** The install snippet shape (bash): comments, a command, package names. */
-  const INSTALL = `# Texuli is in development: every package ships as 0.2.0, a pre-1.0 release — 1.0.0 will be the first stable release.
+  const INSTALL = `# Texuli is in development: every package ships as 0.3.0, a pre-1.0 release — 1.0.0 will be the first stable release.
 pnpm add texuli @texuli/tokens @texuli/primitives @texuli/core`;
 
   /** The imports shape (TypeScript): keywords and strings. */
@@ -612,9 +612,9 @@ describe('screen-reader pass fixes (T-90)', () => {
    *    and the "Documentation menu" disclosure on phones. The page keeps the
    *    docs shell's article chrome but opts out of that demo navigation.
    * 2. The /native/ status ledger ran the status badge straight into its
-   *    detail ("Shipped All 15 packages…"), so a screen reader read the status
+   *    detail ("Shipped All 16 packages…"), so a screen reader read the status
    *    and the sentence as one run. A visually hidden separator now splits them
-   *    ("Shipped: All 15 packages…") without changing the visual design.
+   *    ("Shipped: All 16 packages…") without changing the visual design.
    * 3. The build's HTML compression dropped the space before the guide link on
    *    /web-and-native/, so the text read "the guideWhy Svelte and Kotlin".
    */
