@@ -21,37 +21,25 @@
         {
           "gap": "G05",
           "tier": "untrusted",
-          "codes": [
-            "block-family-mismatch",
-            "node-dropped",
-            "schema-failure"
-          ],
+          "codes": ["block-family-mismatch", "node-dropped", "schema-failure"],
           "placeholders": 0
         },
         {
           "gap": "G05",
           "tier": "untrusted",
-          "codes": [
-            "block-family-mismatch",
-            "node-dropped",
-            "schema-failure"
-          ],
+          "codes": ["block-family-mismatch", "node-dropped", "schema-failure"],
           "placeholders": 0
         },
         {
           "gap": "G06",
           "tier": "untrusted",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         },
         {
           "gap": "G04",
           "tier": "developer",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         },
         {
@@ -85,34 +73,25 @@
         {
           "gap": "G06",
           "tier": "untrusted",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         },
         {
           "gap": "G01",
           "tier": "untrusted",
-          "codes": [
-            "node-dropped",
-            "schema-failure"
-          ],
+          "codes": ["node-dropped", "schema-failure"],
           "placeholders": 0
         },
         {
           "gap": "G02",
           "tier": "untrusted",
-          "codes": [
-            "invalid-prop"
-          ],
+          "codes": ["invalid-prop"],
           "placeholders": 0
         },
         {
           "gap": "G20",
           "tier": "developer",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         }
       ]
@@ -122,19 +101,13 @@
       "nodes": 12,
       "components": 0,
       "placeholders": 1,
-      "codes": [
-        "node-dropped",
-        "tier-denied"
-      ],
+      "codes": ["node-dropped", "tier-denied"],
       "grammar": [],
       "sinks": [],
       "guidance": [],
       "cross": {
         "tier": "untrusted",
-        "codes": [
-          "node-dropped",
-          "tier-denied"
-        ],
+        "codes": ["node-dropped", "tier-denied"],
         "placeholders": 1
       },
       "frame": null,
@@ -142,41 +115,31 @@
         {
           "gap": "G06",
           "tier": "untrusted",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         },
         {
           "gap": "G02",
           "tier": "developer",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         },
         {
           "gap": "G17",
           "tier": "developer",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         },
         {
           "gap": "G03",
           "tier": "developer",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         },
         {
           "gap": "G01",
           "tier": "developer",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         }
       ]
@@ -186,19 +149,13 @@
       "nodes": 18,
       "components": 6,
       "placeholders": 3,
-      "codes": [
-        "node-dropped",
-        "tier-denied"
-      ],
+      "codes": ["node-dropped", "tier-denied"],
       "grammar": [],
       "sinks": [],
       "guidance": [],
       "cross": {
         "tier": "untrusted",
-        "codes": [
-          "node-dropped",
-          "tier-denied"
-        ],
+        "codes": ["node-dropped", "tier-denied"],
         "placeholders": 3
       },
       "frame": null,
@@ -206,43 +163,31 @@
         {
           "gap": "G09",
           "tier": "developer",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         },
         {
           "gap": "G07",
           "tier": "untrusted",
-          "codes": [
-            "invalid-prop"
-          ],
+          "codes": ["invalid-prop"],
           "placeholders": 0
         },
         {
           "gap": "G05",
           "tier": "developer",
-          "codes": [
-            "block-family-mismatch",
-            "node-dropped",
-            "schema-failure"
-          ],
+          "codes": ["block-family-mismatch", "node-dropped", "schema-failure"],
           "placeholders": 0
         },
         {
           "gap": "G18",
           "tier": "developer",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         },
         {
           "gap": "G06",
           "tier": "untrusted",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         }
       ]
@@ -272,25 +217,19 @@
         {
           "gap": "G10",
           "tier": "untrusted",
-          "codes": [
-            "invalid-prop"
-          ],
+          "codes": ["invalid-prop"],
           "placeholders": 0
         },
         {
           "gap": "G06",
           "tier": "untrusted",
-          "codes": [
-            "tier-denied"
-          ],
+          "codes": ["tier-denied"],
           "placeholders": 1
         },
         {
           "gap": "G10",
           "tier": "developer",
-          "codes": [
-            "unknown-id"
-          ],
+          "codes": ["unknown-id"],
           "placeholders": 1
         }
       ]
@@ -314,17 +253,13 @@
         {
           "gap": "G11",
           "tier": "untrusted",
-          "codes": [
-            "invalid-prop"
-          ],
+          "codes": ["invalid-prop"],
           "placeholders": 0
         },
         {
           "gap": "G11",
           "tier": "untrusted",
-          "codes": [
-            "invalid-prop"
-          ],
+          "codes": ["invalid-prop"],
           "placeholders": 0
         },
         {
@@ -336,19 +271,13 @@
         {
           "gap": "G05",
           "tier": "untrusted",
-          "codes": [
-            "block-family-mismatch",
-            "node-dropped",
-            "schema-failure"
-          ],
+          "codes": ["block-family-mismatch", "node-dropped", "schema-failure"],
           "placeholders": 0
         },
         {
           "gap": "G14",
           "tier": "untrusted",
-          "codes": [
-            "invalid-prop"
-          ],
+          "codes": ["invalid-prop"],
           "placeholders": 0
         }
       ]
@@ -382,9 +311,7 @@
         {
           "gap": "G13",
           "tier": "untrusted",
-          "codes": [
-            "invalid-prop"
-          ],
+          "codes": ["invalid-prop"],
           "placeholders": 0
         },
         {
@@ -418,17 +345,13 @@
         {
           "gap": "G13",
           "tier": "untrusted",
-          "codes": [
-            "invalid-prop"
-          ],
+          "codes": ["invalid-prop"],
           "placeholders": 0
         },
         {
           "gap": "G13",
           "tier": "untrusted",
-          "codes": [
-            "invalid-prop"
-          ],
+          "codes": ["invalid-prop"],
           "placeholders": 0
         }
       ]

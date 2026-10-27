@@ -2,16 +2,8 @@
   "format": "texuli-catalog",
   "version": 1,
   "groups": {
-    "chat": [
-      "chat-message",
-      "chat-thread"
-    ],
-    "composition": [
-      "layout-row",
-      "layout-split",
-      "layout-stack",
-      "layout-tile"
-    ],
+    "chat": ["chat-message", "chat-thread"],
+    "composition": ["layout-row", "layout-split", "layout-stack", "layout-tile"],
     "content": [
       "blocks-code",
       "blocks-data",
@@ -177,9 +169,7 @@
       "host-region",
       "sortable-list"
     ],
-    "workflows": [
-      "workflow-graph"
-    ]
+    "workflows": ["workflow-graph"]
   },
   "entries": [
     {
@@ -189,15 +179,9 @@
       "summary": "Groups fields whose submit proposes one named action intent to the host.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Ask the host to do something with a few named values, such as a request"
-      ],
-      "dontUseWhen": [
-        "Payment or sign-in: those are host regions"
-      ],
-      "a11y": [
-        "A labelled form; invalid fields are marked and focused; the receipt is announced"
-      ],
+      "useWhen": ["Ask the host to do something with a few named values, such as a request"],
+      "dontUseWhen": ["Payment or sign-in: those are host regions"],
+      "a11y": ["A labelled form; invalid fields are marked and focused; the receipt is announced"],
       "props": [
         {
           "name": "action",
@@ -226,18 +210,10 @@
           }
         }
       ],
-      "related": [
-        "form-field",
-        "form-submit"
-      ],
-      "events": [
-        "submit"
-      ],
+      "related": ["form-field", "form-submit"],
+      "events": ["submit"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "alert",
@@ -246,26 +222,14 @@
       "summary": "Inline feedback for a page section (status or error).",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Report a result or problem next to the related content"
-      ],
-      "dontUseWhen": [
-        "A full-page failure (use error-state)",
-        "A quiet tip in docs (use callout)"
-      ],
+      "useWhen": ["Report a result or problem next to the related content"],
+      "dontUseWhen": ["A full-page failure (use error-state)", "A quiet tip in docs (use callout)"],
       "a11y": "error tone uses role=alert; other tones use role=status; dismiss is named.",
       "props": [
         {
           "name": "tone",
           "kind": "enum",
-          "enumValues": [
-            "info",
-            "success",
-            "warning",
-            "error",
-            "brand",
-            "neutral"
-          ],
+          "enumValues": ["info", "success", "warning", "error", "brand", "neutral"],
           "default": "info"
         },
         {
@@ -333,11 +297,7 @@
           }
         }
       ],
-      "related": [
-        "callout",
-        "banner",
-        "error-state"
-      ],
+      "related": ["callout", "banner", "error-state"],
       "group": "display",
       "emit": []
     },
@@ -348,13 +308,8 @@
       "summary": "Modal confirm/cancel dialog for consequential actions.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Confirm delete or irreversible actions",
-        "Require an explicit choice"
-      ],
-      "dontUseWhen": [
-        "Informational copy without a choice (use dialog or toast)"
-      ],
+      "useWhen": ["Confirm delete or irreversible actions", "Require an explicit choice"],
+      "dontUseWhen": ["Informational copy without a choice (use dialog or toast)"],
       "a11y": [
         "Role alertdialog; focus trapped until confirm or cancel",
         "Destructive mode styles the confirm action and warning icon"
@@ -431,10 +386,7 @@
           }
         }
       ],
-      "related": [
-        "dialog",
-        "toaster"
-      ],
+      "related": ["dialog", "toaster"],
       "group": "overlays",
       "emit": []
     },
@@ -445,12 +397,8 @@
       "summary": "Auto-fit KPI and widget grid for dashboard screens.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "KPI tiles and chart cards inside a dashboard"
-      ],
-      "dontUseWhen": [
-        "Single full-bleed chart"
-      ],
+      "useWhen": ["KPI tiles and chart cards inside a dashboard"],
+      "dontUseWhen": ["Single full-bleed chart"],
       "a11y": "Optional region label names the metrics group.",
       "props": [
         {
@@ -498,9 +446,7 @@
           }
         }
       ],
-      "related": [
-        "layout-dashboard-grid"
-      ],
+      "related": ["layout-dashboard-grid"],
       "group": "layouts",
       "emit": []
     },
@@ -511,12 +457,8 @@
       "summary": "Desktop sidebar shell with mobile sheet drawer and main slot.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Full app chrome with responsive navigation"
-      ],
-      "dontUseWhen": [
-        "Sidebar alone inside a custom shell"
-      ],
+      "useWhen": ["Full app chrome with responsive navigation"],
+      "dontUseWhen": ["Sidebar alone inside a custom shell"],
       "a11y": "Menu button opens a labelled sheet; main has a stable id.",
       "props": [
         {
@@ -540,10 +482,7 @@
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "default",
-            "inset"
-          ],
+          "enumValues": ["default", "inset"],
           "default": "default"
         },
         {
@@ -584,10 +523,7 @@
         {
           "name": "hrefTrust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ],
+          "enumValues": ["developer", "untrusted"],
           "default": "developer",
           "trust": "developer"
         },
@@ -610,10 +546,7 @@
           }
         }
       ],
-      "related": [
-        "sidebar",
-        "sheet"
-      ],
+      "related": ["sidebar", "sheet"],
       "group": "overlays",
       "emit": []
     },
@@ -624,13 +557,8 @@
       "summary": "A compact status or category label.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Show a short status or category next to a title"
-      ],
-      "dontUseWhen": [
-        "A removable filter (use tag)",
-        "A toggleable filter chip (use chip)"
-      ],
+      "useWhen": ["Show a short status or category next to a title"],
+      "dontUseWhen": ["A removable filter (use tag)", "A toggleable filter chip (use chip)"],
       "a11y": [
         "Never convey meaning by color alone; pair with a word.",
         "In a catalog tree, set label (or put the word in an inline-text child)."
@@ -683,11 +611,7 @@
           }
         }
       ],
-      "related": [
-        "tag",
-        "chip",
-        "inline-text"
-      ],
+      "related": ["tag", "chip", "inline-text"],
       "group": "display",
       "emit": []
     },
@@ -698,25 +622,14 @@
       "summary": "Full-width notice across a page or app shell.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Announce a global condition (maintenance, trial)"
-      ],
-      "dontUseWhen": [
-        "Inline field errors (use alert near the field)"
-      ],
+      "useWhen": ["Announce a global condition (maintenance, trial)"],
+      "dontUseWhen": ["Inline field errors (use alert near the field)"],
       "a11y": "Same tone roles as Alert; dismiss control is optional and named.",
       "props": [
         {
           "name": "tone",
           "kind": "enum",
-          "enumValues": [
-            "info",
-            "success",
-            "warning",
-            "error",
-            "brand",
-            "neutral"
-          ],
+          "enumValues": ["info", "success", "warning", "error", "brand", "neutral"],
           "default": "info"
         },
         {
@@ -785,10 +698,7 @@
           }
         }
       ],
-      "related": [
-        "alert",
-        "callout"
-      ],
+      "related": ["alert", "callout"],
       "group": "display",
       "emit": []
     },
@@ -799,12 +709,8 @@
       "summary": "Validated, highlighted code.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render code blocks from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render code blocks from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -860,10 +766,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "blocks-data",
@@ -872,12 +775,8 @@
       "summary": "Validated tables, statistics, key metrics and chart content blocks.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render data blocks from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render data blocks from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -902,10 +801,7 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "light",
-            "dark"
-          ]
+          "enumValues": ["light", "dark"]
         }
       ],
       "examples": [
@@ -926,10 +822,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "blocks-diagram",
@@ -938,12 +831,8 @@
       "summary": "Validated flow, tree, board and terminal diagrams.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render diagram blocks from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render diagram blocks from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -981,10 +870,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "blocks-embed",
@@ -1044,10 +930,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "blocks-interactive",
@@ -1056,12 +939,8 @@
       "summary": "Validated polls, quizzes, calculators and checklists.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render interactive blocks from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render interactive blocks from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -1102,10 +981,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "blocks-map",
@@ -1114,12 +990,8 @@
       "summary": "Validated map points and routes.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render map blocks from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render map blocks from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -1171,10 +1043,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "blocks-media",
@@ -1183,12 +1052,8 @@
       "summary": "Validated image, figure, video and gallery content blocks.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render media blocks from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render media blocks from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -1232,10 +1097,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "blocks-structure",
@@ -1244,12 +1106,8 @@
       "summary": "Validated layouts and calls to action.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render structure blocks from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render structure blocks from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -1290,10 +1148,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "blocks-text",
@@ -1302,12 +1157,8 @@
       "summary": "Validated heading, paragraph, list, quote and callout content.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render text blocks from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render text blocks from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -1344,10 +1195,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "breadcrumb",
@@ -1356,12 +1204,8 @@
       "summary": "Hierarchy trail with URL-policy links.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Show location in a hierarchy"
-      ],
-      "dontUseWhen": [
-        "Primary navigation (use navigation-menu or sidebar)"
-      ],
+      "useWhen": ["Show location in a hierarchy"],
+      "dontUseWhen": ["Primary navigation (use navigation-menu or sidebar)"],
       "a11y": "nav landmark; current page is not a link.",
       "props": [
         {
@@ -1378,11 +1222,7 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
@@ -1402,10 +1242,7 @@
         {
           "name": "hrefTrust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ],
+          "enumValues": ["developer", "untrusted"],
           "default": "developer",
           "trust": "developer"
         },
@@ -1435,10 +1272,7 @@
           }
         }
       ],
-      "related": [
-        "navigation-menu",
-        "pagination"
-      ],
+      "related": ["navigation-menu", "pagination"],
       "group": "overlays",
       "emit": []
     },
@@ -1449,10 +1283,7 @@
       "summary": "A pressable action control with loading and optional link rendering.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Primary and secondary actions",
-        "Submit and reset controls in forms"
-      ],
+      "useWhen": ["Primary and secondary actions", "Submit and reset controls in forms"],
       "dontUseWhen": [
         "An icon-only control (use icon-button)",
         "A toggleable filter chip (use chip)",
@@ -1467,25 +1298,13 @@
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "default",
-            "secondary",
-            "outline",
-            "ghost",
-            "destructive",
-            "link"
-          ],
+          "enumValues": ["default", "secondary", "outline", "ghost", "destructive", "link"],
           "default": "default"
         },
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg",
-            "icon"
-          ],
+          "enumValues": ["sm", "md", "lg", "icon"],
           "default": "md"
         },
         {
@@ -1497,20 +1316,13 @@
         {
           "name": "hrefTrust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ],
+          "enumValues": ["developer", "untrusted"],
           "default": "developer"
         },
         {
           "name": "type",
           "kind": "enum",
-          "enumValues": [
-            "button",
-            "submit",
-            "reset"
-          ],
+          "enumValues": ["button", "submit", "reset"],
           "default": "button"
         },
         {
@@ -1579,12 +1391,7 @@
           }
         }
       ],
-      "related": [
-        "icon-button",
-        "button-group",
-        "form",
-        "inline-text"
-      ],
+      "related": ["icon-button", "button-group", "form", "inline-text"],
       "group": "forms",
       "emit": []
     },
@@ -1595,21 +1402,14 @@
       "summary": "Groups related buttons with shared borders and orientation.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Cluster related actions that share a single decision"
-      ],
-      "dontUseWhen": [
-        "Unrelated actions across a toolbar (use a plain flex row)"
-      ],
+      "useWhen": ["Cluster related actions that share a single decision"],
+      "dontUseWhen": ["Unrelated actions across a toolbar (use a plain flex row)"],
       "a11y": "role=group with an optional accessible label.",
       "props": [
         {
           "name": "orientation",
           "kind": "enum",
-          "enumValues": [
-            "horizontal",
-            "vertical"
-          ],
+          "enumValues": ["horizontal", "vertical"],
           "default": "horizontal"
         },
         {
@@ -1643,10 +1443,7 @@
           }
         }
       ],
-      "related": [
-        "button",
-        "icon-button"
-      ],
+      "related": ["button", "icon-button"],
       "group": "forms",
       "emit": []
     },
@@ -1657,9 +1454,7 @@
       "summary": "Emphasized documentation-style tip with a strong start edge.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Highlight a tip or note beside prose"
-      ],
+      "useWhen": ["Highlight a tip or note beside prose"],
       "dontUseWhen": [
         "A blocking error (use alert with error tone)",
         "A site-wide notice (use banner)"
@@ -1669,14 +1464,7 @@
         {
           "name": "tone",
           "kind": "enum",
-          "enumValues": [
-            "info",
-            "success",
-            "warning",
-            "error",
-            "brand",
-            "neutral"
-          ],
+          "enumValues": ["info", "success", "warning", "error", "brand", "neutral"],
           "default": "info"
         },
         {
@@ -1744,10 +1532,7 @@
           }
         }
       ],
-      "related": [
-        "alert",
-        "banner"
-      ],
+      "related": ["alert", "banner"],
       "group": "display",
       "emit": []
     },
@@ -1758,10 +1543,7 @@
       "summary": "A surface for grouping related content with optional link behavior.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Group related content in a bordered surface",
-        "Make a whole tile a single link"
-      ],
+      "useWhen": ["Group related content in a bordered surface", "Make a whole tile a single link"],
       "dontUseWhen": [
         "A single line of chrome (use badge or button)",
         "A data grid of many rows (use table)"
@@ -1775,10 +1557,7 @@
           "name": "variant",
           "kind": "enum",
           "description": "Visual elevation",
-          "enumValues": [
-            "elevated",
-            "flat"
-          ],
+          "enumValues": ["elevated", "flat"],
           "default": "elevated"
         },
         {
@@ -1790,10 +1569,7 @@
         {
           "name": "hrefTrust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ],
+          "enumValues": ["developer", "untrusted"],
           "default": "developer"
         },
         {
@@ -1825,10 +1601,7 @@
           }
         }
       ],
-      "related": [
-        "button",
-        "stat"
-      ],
+      "related": ["button", "stat"],
       "group": "display",
       "emit": []
     },
@@ -1839,12 +1612,8 @@
       "summary": "A categorical area chart with an accessible data table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render area chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render area chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -1868,19 +1637,12 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "light",
-            "dark"
-          ]
+          "enumValues": ["light", "dark"]
         },
         {
           "name": "renderer",
           "kind": "enum",
-          "enumValues": [
-            "svg",
-            "canvas",
-            "auto"
-          ]
+          "enumValues": ["svg", "canvas", "auto"]
         },
         {
           "name": "class",
@@ -1915,10 +1677,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-bar",
@@ -1927,12 +1686,8 @@
       "summary": "A categorical bar chart with a zero baseline and accessible data table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render bar chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render bar chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -1956,19 +1711,12 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "light",
-            "dark"
-          ]
+          "enumValues": ["light", "dark"]
         },
         {
           "name": "renderer",
           "kind": "enum",
-          "enumValues": [
-            "svg",
-            "canvas",
-            "auto"
-          ]
+          "enumValues": ["svg", "canvas", "auto"]
         },
         {
           "name": "class",
@@ -2003,10 +1751,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-bubble",
@@ -2015,12 +1760,8 @@
       "summary": "A scatter plot where point size can encode another measure.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render bubble chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render bubble chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2048,10 +1789,7 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "light",
-            "dark"
-          ]
+          "enumValues": ["light", "dark"]
         },
         {
           "name": "interactive",
@@ -2086,10 +1824,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-bullet",
@@ -2098,12 +1833,8 @@
       "summary": "A compact value, range and target comparison.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render bullet chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render bullet chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2157,10 +1888,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-canvas-renderer",
@@ -2169,12 +1897,8 @@
       "summary": "A low-level canvas mark renderer for dense chart series.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render canvas chart renderer from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render canvas chart renderer from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2184,13 +1908,7 @@
           "name": "kind",
           "kind": "enum",
           "required": true,
-          "enumValues": [
-            "line",
-            "area",
-            "bar",
-            "stacked-bar",
-            "combo"
-          ]
+          "enumValues": ["line", "area", "bar", "stacked-bar", "combo"]
         },
         {
           "name": "series",
@@ -2221,10 +1939,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-cartesian",
@@ -2233,12 +1948,8 @@
       "summary": "The general line, area, bar, stacked bar or combo chart renderer.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render cartesian chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render cartesian chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2248,13 +1959,7 @@
           "name": "kind",
           "kind": "enum",
           "required": true,
-          "enumValues": [
-            "line",
-            "area",
-            "bar",
-            "stacked-bar",
-            "combo"
-          ]
+          "enumValues": ["line", "area", "bar", "stacked-bar", "combo"]
         },
         {
           "name": "title",
@@ -2274,10 +1979,7 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "light",
-            "dark"
-          ]
+          "enumValues": ["light", "dark"]
         },
         {
           "name": "class",
@@ -2286,11 +1988,7 @@
         {
           "name": "renderer",
           "kind": "enum",
-          "enumValues": [
-            "svg",
-            "canvas",
-            "auto"
-          ]
+          "enumValues": ["svg", "canvas", "auto"]
         },
         {
           "name": "interactive",
@@ -2322,10 +2020,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-combo",
@@ -2334,12 +2029,8 @@
       "summary": "A categorical chart that combines bar and line series.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render combo chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render combo chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2363,19 +2054,12 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "light",
-            "dark"
-          ]
+          "enumValues": ["light", "dark"]
         },
         {
           "name": "renderer",
           "kind": "enum",
-          "enumValues": [
-            "svg",
-            "canvas",
-            "auto"
-          ]
+          "enumValues": ["svg", "canvas", "auto"]
         },
         {
           "name": "class",
@@ -2410,10 +2094,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-donut",
@@ -2422,12 +2103,8 @@
       "summary": "A part-to-whole chart with a central opening and data table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render donut chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render donut chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2479,10 +2156,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-funnel",
@@ -2491,12 +2165,8 @@
       "summary": "A conversion funnel with step values and accessible table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render funnel chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render funnel chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2519,10 +2189,7 @@
         {
           "name": "orientation",
           "kind": "enum",
-          "enumValues": [
-            "vertical",
-            "horizontal"
-          ]
+          "enumValues": ["vertical", "horizontal"]
         },
         {
           "name": "width",
@@ -2558,10 +2225,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-gauge",
@@ -2570,12 +2234,8 @@
       "summary": "A radial value gauge with thresholds and an accessible data table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render gauge chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render gauge chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2641,10 +2301,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-geo-map",
@@ -2653,12 +2310,8 @@
       "summary": "A tiled geographic choropleth with a tabular data alternative.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render geographic map from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render geographic map from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2708,10 +2361,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-geo-point-map",
@@ -2720,12 +2370,8 @@
       "summary": "Geographic points positioned on a tiled map.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render geographic point map from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render geographic point map from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2775,10 +2421,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-heatmap",
@@ -2787,12 +2430,8 @@
       "summary": "A matrix of labeled cells with an accessible data table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render heatmap from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render heatmap from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2816,10 +2455,7 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "light",
-            "dark"
-          ]
+          "enumValues": ["light", "dark"]
         },
         {
           "name": "interactive",
@@ -2854,10 +2490,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-line",
@@ -2866,12 +2499,8 @@
       "summary": "A categorical line chart with accessible values.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render line chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render line chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -2895,19 +2524,12 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "light",
-            "dark"
-          ]
+          "enumValues": ["light", "dark"]
         },
         {
           "name": "renderer",
           "kind": "enum",
-          "enumValues": [
-            "svg",
-            "canvas",
-            "auto"
-          ]
+          "enumValues": ["svg", "canvas", "auto"]
         },
         {
           "name": "class",
@@ -2942,10 +2564,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-network",
@@ -2954,12 +2573,8 @@
       "summary": "A node and connection graph with an accessible table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render network graph from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render network graph from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -3013,10 +2628,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-pie",
@@ -3025,12 +2637,8 @@
       "summary": "A part-to-whole chart with an accessible data table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render pie chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render pie chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -3082,10 +2690,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-progress-ring",
@@ -3094,12 +2699,8 @@
       "summary": "A compact radial progress indicator with a data table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render progress ring from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render progress ring from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -3152,10 +2753,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-sankey",
@@ -3164,12 +2762,8 @@
       "summary": "A weighted flow diagram with an accessible table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render sankey chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render sankey chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -3223,10 +2817,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-scatter",
@@ -3235,12 +2826,8 @@
       "summary": "A quantitative scatter plot with an accessible data table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render scatter chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render scatter chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -3268,10 +2855,7 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "light",
-            "dark"
-          ]
+          "enumValues": ["light", "dark"]
         },
         {
           "name": "interactive",
@@ -3306,10 +2890,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-sparkline",
@@ -3318,12 +2899,8 @@
       "summary": "A compact line, area or bar trend chart.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render sparkline from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render sparkline from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -3350,11 +2927,7 @@
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "line",
-            "area",
-            "bar"
-          ]
+          "enumValues": ["line", "area", "bar"]
         },
         {
           "name": "format",
@@ -3379,20 +2952,12 @@
           "title": "Sparkline example",
           "props": {
             "label": "Daily active users",
-            "values": [
-              18,
-              21,
-              19,
-              26
-            ]
+            "values": [18, 21, 19, 26]
           }
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-stacked-bar",
@@ -3401,12 +2966,8 @@
       "summary": "A categorical stacked bar chart with accessible values.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render stacked bar chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render stacked bar chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -3430,19 +2991,12 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "light",
-            "dark"
-          ]
+          "enumValues": ["light", "dark"]
         },
         {
           "name": "renderer",
           "kind": "enum",
-          "enumValues": [
-            "svg",
-            "canvas",
-            "auto"
-          ]
+          "enumValues": ["svg", "canvas", "auto"]
         },
         {
           "name": "class",
@@ -3477,10 +3031,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-sunburst",
@@ -3489,12 +3040,8 @@
       "summary": "A hierarchical part-to-whole chart with an accessible table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render sunburst chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render sunburst chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -3549,10 +3096,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "charts-treemap",
@@ -3561,12 +3105,8 @@
       "summary": "A hierarchical part-to-whole chart with an accessible table.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render treemap chart from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render treemap chart from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -3621,10 +3161,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "chat-message",
@@ -3633,13 +3170,8 @@
       "summary": "One display-only chat message: author, role, time, text and block children.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Inside chat-thread, one per message"
-      ],
-      "dontUseWhen": [
-        "Outside a chat-thread",
-        "For a reply box; that is host chrome"
-      ],
+      "useWhen": ["Inside chat-thread, one per message"],
+      "dontUseWhen": ["Outside a chat-thread", "For a reply box; that is host chrome"],
       "a11y": [
         "Renders an article named by author and time; the role is visible text",
         "Message text is plain text nodes; links pass the untrusted URL policy"
@@ -3655,11 +3187,7 @@
           "name": "role",
           "kind": "enum",
           "required": true,
-          "enumValues": [
-            "user",
-            "agent",
-            "system"
-          ]
+          "enumValues": ["user", "agent", "system"]
         },
         {
           "name": "at",
@@ -3690,14 +3218,9 @@
           }
         }
       ],
-      "related": [
-        "chat-thread"
-      ],
+      "related": ["chat-thread"],
       "group": "chat",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "chat-thread",
@@ -3740,14 +3263,9 @@
           }
         }
       ],
-      "related": [
-        "chat-message"
-      ],
+      "related": ["chat-message"],
       "group": "chat",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "checkbox",
@@ -3756,10 +3274,7 @@
       "summary": "A binary or indeterminate checkbox with optional label.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Independent on/off choices",
-        "Select-all with indeterminate"
-      ],
+      "useWhen": ["Independent on/off choices", "Select-all with indeterminate"],
       "dontUseWhen": [
         "A single exclusive choice in a set (use radio-group)",
         "A switch-style setting (use switch)"
@@ -3820,10 +3335,7 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md"
-          ],
+          "enumValues": ["sm", "md"],
           "default": "md"
         },
         {
@@ -3856,10 +3368,7 @@
           }
         }
       ],
-      "related": [
-        "switch",
-        "radio-group"
-      ],
+      "related": ["switch", "radio-group"],
       "group": "forms",
       "emit": []
     },
@@ -3870,13 +3379,8 @@
       "summary": "A toggleable filter chip (pressed state).",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Filter toggles in a toolbar or facet list"
-      ],
-      "dontUseWhen": [
-        "Navigation (use a link)",
-        "A one-shot action (use button)"
-      ],
+      "useWhen": ["Filter toggles in a toolbar or facet list"],
+      "dontUseWhen": ["Navigation (use a link)", "A one-shot action (use button)"],
       "a11y": "Uses aria-pressed for selection; must be a real button.",
       "props": [
         {
@@ -3912,11 +3416,7 @@
         {
           "name": "type",
           "kind": "enum",
-          "enumValues": [
-            "button",
-            "submit",
-            "reset"
-          ],
+          "enumValues": ["button", "submit", "reset"],
           "default": "button"
         },
         {
@@ -3934,11 +3434,7 @@
           }
         }
       ],
-      "related": [
-        "badge",
-        "tag",
-        "button"
-      ],
+      "related": ["badge", "tag", "button"],
       "group": "display",
       "emit": []
     },
@@ -3949,12 +3445,8 @@
       "summary": "Inline or block code with escaped text (no HTML).",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Show a short code sample or token"
-      ],
-      "dontUseWhen": [
-        "A full syntax-highlighted editor"
-      ],
+      "useWhen": ["Show a short code sample or token"],
+      "dontUseWhen": ["A full syntax-highlighted editor"],
       "a11y": "Text is always escaped; language is display-only metadata.",
       "props": [
         {
@@ -3966,10 +3458,7 @@
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "inline",
-            "block"
-          ],
+          "enumValues": ["inline", "block"],
           "default": "inline"
         },
         {
@@ -3993,9 +3482,7 @@
           }
         }
       ],
-      "related": [
-        "kbd"
-      ],
+      "related": ["kbd"],
       "group": "display",
       "emit": []
     },
@@ -4095,20 +3582,13 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "outline",
-            "soft"
-          ],
+          "enumValues": ["outline", "soft"],
           "default": "outline"
         },
         {
@@ -4144,12 +3624,7 @@
           }
         }
       ],
-      "related": [
-        "multi-select",
-        "select",
-        "field",
-        "form"
-      ],
+      "related": ["multi-select", "select", "field", "form"],
       "group": "forms",
       "emit": []
     },
@@ -4160,12 +3635,8 @@
       "summary": "Dialog-hosted command palette with search and recent items.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "App-wide jump-to and actions (⌘K)"
-      ],
-      "dontUseWhen": [
-        "Simple select lists (use select or combobox)"
-      ],
+      "useWhen": ["App-wide jump-to and actions (⌘K)"],
+      "dontUseWhen": ["Simple select lists (use select or combobox)"],
       "a11y": "Dialog title/description; listbox keyboard for results.",
       "props": [
         {
@@ -4234,20 +3705,13 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "outline",
-            "soft"
-          ],
+          "enumValues": ["outline", "soft"],
           "default": "default"
         },
         {
@@ -4266,10 +3730,7 @@
           }
         }
       ],
-      "related": [
-        "dialog",
-        "dropdown-menu"
-      ],
+      "related": ["dialog", "dropdown-menu"],
       "group": "overlays",
       "emit": []
     },
@@ -4280,26 +3741,15 @@
       "summary": "Shared docs/blog/editorial reading frame with optional TOC.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Long-form content with a table of contents"
-      ],
-      "dontUseWhen": [
-        "App chrome shells"
-      ],
-      "a11y": [
-        "Main landmark holds the article",
-        "TOC links are in-page anchors"
-      ],
+      "useWhen": ["Long-form content with a table of contents"],
+      "dontUseWhen": ["App chrome shells"],
+      "a11y": ["Main landmark holds the article", "TOC links are in-page anchors"],
       "props": [
         {
           "name": "kind",
           "kind": "enum",
           "required": true,
-          "enumValues": [
-            "docs",
-            "blog",
-            "editorial"
-          ]
+          "enumValues": ["docs", "blog", "editorial"]
         },
         {
           "name": "mountScreen",
@@ -4349,10 +3799,7 @@
           }
         }
       ],
-      "related": [
-        "layout-docs",
-        "layout-blog"
-      ],
+      "related": ["layout-docs", "layout-blog"],
       "group": "layouts",
       "emit": []
     },
@@ -4363,12 +3810,8 @@
       "summary": "Pointer-anchored menu (right-click, long-press, Menu key).",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Actions on a canvas or list row via context click"
-      ],
-      "dontUseWhen": [
-        "A visible button trigger (use dropdown-menu)"
-      ],
+      "useWhen": ["Actions on a canvas or list row via context click"],
+      "dontUseWhen": ["A visible button trigger (use dropdown-menu)"],
       "a11y": "Opens at the pointer; keyboard Menu/Shift+F10 supported on the region.",
       "props": [
         {
@@ -4392,10 +3835,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "dropdown-menu",
-        "context-menu-trigger"
-      ],
+      "related": ["dropdown-menu", "context-menu-trigger"],
       "group": "overlays",
       "emit": []
     },
@@ -4406,12 +3846,8 @@
       "summary": "Region that opens the context menu.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Define the hit target for a context menu"
-      ],
-      "dontUseWhen": [
-        "Button menus"
-      ],
+      "useWhen": ["Define the hit target for a context menu"],
+      "dontUseWhen": ["Button menus"],
       "a11y": "Region text names the menu; long-press suppresses iOS callout.",
       "props": [
         {
@@ -4435,9 +3871,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "context-menu"
-      ],
+      "related": ["context-menu"],
       "group": "overlays",
       "emit": []
     },
@@ -4448,9 +3882,7 @@
       "summary": "A segmented choice that sets an enum state variable to one of its values.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Switch between a few views or ranges, such as this week or last week"
-      ],
+      "useWhen": ["Switch between a few views or ranges, such as this week or last week"],
       "dontUseWhen": [
         "Submitting, saving or sending anything: controls only set local state",
         "Navigating: use a link"
@@ -4483,18 +3915,10 @@
           }
         }
       ],
-      "related": [
-        "control-toggle",
-        "control-slider"
-      ],
-      "events": [
-        "change"
-      ],
+      "related": ["control-toggle", "control-slider"],
+      "events": ["change"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "control-filter",
@@ -4503,16 +3927,12 @@
       "summary": "A text field that sets a string state variable, capped at its declared length.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Type a filter that other nodes read through a binding"
-      ],
+      "useWhen": ["Type a filter that other nodes read through a binding"],
       "dontUseWhen": [
         "Submitting, saving or sending anything: controls only set local state",
         "Navigating: use a link"
       ],
-      "a11y": [
-        "A native search input with a visible label; Enter never submits"
-      ],
+      "a11y": ["A native search input with a visible label; Enter never submits"],
       "props": [
         {
           "name": "state",
@@ -4543,17 +3963,10 @@
           }
         }
       ],
-      "related": [
-        "control-toggle"
-      ],
-      "events": [
-        "change"
-      ],
+      "related": ["control-toggle"],
+      "events": ["change"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "control-slider",
@@ -4562,16 +3975,12 @@
       "summary": "A range input that sets a number state variable within its declared min and max.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Adjust a threshold or a count within a bounded range"
-      ],
+      "useWhen": ["Adjust a threshold or a count within a bounded range"],
       "dontUseWhen": [
         "Submitting, saving or sending anything: controls only set local state",
         "Navigating: use a link"
       ],
-      "a11y": [
-        "A native range input with a visible label and value"
-      ],
+      "a11y": ["A native range input with a visible label and value"],
       "props": [
         {
           "name": "state",
@@ -4603,17 +4012,10 @@
           }
         }
       ],
-      "related": [
-        "control-choice"
-      ],
-      "events": [
-        "change"
-      ],
+      "related": ["control-choice"],
+      "events": ["change"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "control-toggle",
@@ -4622,16 +4024,12 @@
       "summary": "A switch that sets a boolean state variable.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Show or hide details, include or exclude a series"
-      ],
+      "useWhen": ["Show or hide details, include or exclude a series"],
       "dontUseWhen": [
         "Submitting, saving or sending anything: controls only set local state",
         "Navigating: use a link"
       ],
-      "a11y": [
-        "A button with role=\"switch\" and aria-checked; Space or Enter flips it"
-      ],
+      "a11y": ["A button with role=\"switch\" and aria-checked; Space or Enter flips it"],
       "props": [
         {
           "name": "state",
@@ -4657,17 +4055,10 @@
           }
         }
       ],
-      "related": [
-        "control-choice"
-      ],
-      "events": [
-        "change"
-      ],
+      "related": ["control-choice"],
+      "events": ["change"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "data-board",
@@ -4676,9 +4067,7 @@
       "summary": "A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Show work items by status and let people move them between columns"
-      ],
+      "useWhen": ["Show work items by status and let people move them between columns"],
       "dontUseWhen": [
         "One ordered list: use sortable-list",
         "Read-only status counts: use kpi or a chart"
@@ -4725,10 +4114,7 @@
                   "maximum": 500
                 }
               },
-              "required": [
-                "id",
-                "title"
-              ]
+              "required": ["id", "title"]
             }
           }
         },
@@ -4774,11 +4160,7 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "id",
-                "title",
-                "column"
-              ]
+              "required": ["id", "title", "column"]
             }
           }
         },
@@ -4801,20 +4183,14 @@
                   "maxLength": 120
                 }
               },
-              "required": [
-                "id",
-                "title"
-              ]
+              "required": ["id", "title"]
             }
           }
         },
         {
           "name": "density",
           "kind": "enum",
-          "enumValues": [
-            "comfortable",
-            "compact"
-          ]
+          "enumValues": ["comfortable", "compact"]
         }
       ],
       "examples": [
@@ -4855,21 +4231,11 @@
           }
         }
       ],
-      "related": [
-        "sortable-list",
-        "data-tree-view"
-      ],
-      "events": [
-        "move"
-      ],
-      "bindable": [
-        "items"
-      ],
+      "related": ["sortable-list", "data-tree-view"],
+      "events": ["move"],
+      "bindable": ["items"],
       "group": "data",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "data-calendar",
@@ -4878,13 +4244,8 @@
       "summary": "Events on a month, week, day or agenda view; people open, and when allowed move, events.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Show scheduled events or availability over days and weeks"
-      ],
-      "dontUseWhen": [
-        "Task durations and dependencies: use data-timeline",
-        "One date: use text"
-      ],
+      "useWhen": ["Show scheduled events or availability over days and weeks"],
+      "dontUseWhen": ["Task durations and dependencies: use data-timeline", "One date: use text"],
       "a11y": [
         "A labelled grid with roving focus; every event is a button with its time and title",
         "Moving an event has a keyboard path; changes are announced politely"
@@ -4933,34 +4294,17 @@
                 },
                 "tone": {
                   "type": "string",
-                  "enum": [
-                    "primary",
-                    "info",
-                    "success",
-                    "warning",
-                    "danger",
-                    "neutral"
-                  ]
+                  "enum": ["primary", "info", "success", "warning", "danger", "neutral"]
                 }
               },
-              "required": [
-                "id",
-                "title",
-                "start",
-                "end"
-              ]
+              "required": ["id", "title", "start", "end"]
             }
           }
         },
         {
           "name": "view",
           "kind": "enum",
-          "enumValues": [
-            "month",
-            "week",
-            "day",
-            "agenda"
-          ],
+          "enumValues": ["month", "week", "day", "agenda"],
           "default": "week"
         },
         {
@@ -5010,22 +4354,11 @@
           }
         }
       ],
-      "related": [
-        "data-timeline"
-      ],
-      "events": [
-        "select",
-        "move",
-        "change"
-      ],
-      "bindable": [
-        "view"
-      ],
+      "related": ["data-timeline"],
+      "events": ["select", "move", "change"],
+      "bindable": ["view"],
       "group": "data",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "data-files",
@@ -5034,12 +4367,8 @@
       "summary": "Folders and files in a grid or list with breadcrumbs, selection and type previews.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Show a folder structure people browse and select from"
-      ],
-      "dontUseWhen": [
-        "Uploading files: that is host chrome (file-upload)"
-      ],
+      "useWhen": ["Show a folder structure people browse and select from"],
+      "dontUseWhen": ["Uploading files: that is host chrome (file-upload)"],
       "a11y": [
         "A labelled grid or list with roving focus; folders open with Enter, Backspace goes up",
         "Selection is exposed per item; previews are decorative"
@@ -5074,10 +4403,7 @@
                 },
                 "kind": {
                   "type": "string",
-                  "enum": [
-                    "folder",
-                    "file"
-                  ]
+                  "enum": ["folder", "file"]
                 },
                 "parent": {
                   "type": "string",
@@ -5099,30 +4425,20 @@
                   "description": "An ISO 8601 date (2026-10-27) or time (2026-10-27T09:00:00Z)."
                 }
               },
-              "required": [
-                "id",
-                "name",
-                "kind"
-              ]
+              "required": ["id", "name", "kind"]
             }
           }
         },
         {
           "name": "layout",
           "kind": "enum",
-          "enumValues": [
-            "grid",
-            "list"
-          ],
+          "enumValues": ["grid", "list"],
           "default": "grid"
         },
         {
           "name": "density",
           "kind": "enum",
-          "enumValues": [
-            "comfortable",
-            "compact"
-          ]
+          "enumValues": ["comfortable", "compact"]
         }
       ],
       "examples": [
@@ -5149,21 +4465,11 @@
           }
         }
       ],
-      "related": [
-        "data-tree-view"
-      ],
-      "events": [
-        "select",
-        "change"
-      ],
-      "bindable": [
-        "layout"
-      ],
+      "related": ["data-tree-view"],
+      "events": ["select", "change"],
+      "bindable": ["layout"],
       "group": "data",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "data-grid",
@@ -5172,12 +4478,8 @@
       "summary": "A sortable, searchable grid of rows and typed columns; virtualized for long lists.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Show many records people sort, search and select"
-      ],
-      "dontUseWhen": [
-        "A small static table in a document: use table or blocks-data"
-      ],
+      "useWhen": ["Show many records people sort, search and select"],
+      "dontUseWhen": ["A small static table in a document: use table or blocks-data"],
       "a11y": [
         "A WAI-ARIA grid with a caption, sortable column headers and roving cell focus",
         "Sort and search changes are announced; selection is exposed per row"
@@ -5211,28 +4513,17 @@
                 },
                 "kind": {
                   "type": "string",
-                  "enum": [
-                    "text",
-                    "number",
-                    "date"
-                  ]
+                  "enum": ["text", "number", "date"]
                 },
                 "align": {
                   "type": "string",
-                  "enum": [
-                    "start",
-                    "center",
-                    "end"
-                  ]
+                  "enum": ["start", "center", "end"]
                 },
                 "sortable": {
                   "type": "boolean"
                 }
               },
-              "required": [
-                "id",
-                "header"
-              ]
+              "required": ["id", "header"]
             }
           }
         },
@@ -5260,10 +4551,7 @@
                   }
                 }
               },
-              "required": [
-                "id",
-                "cells"
-              ]
+              "required": ["id", "cells"]
             }
           }
         },
@@ -5280,11 +4568,7 @@
         {
           "name": "density",
           "kind": "enum",
-          "enumValues": [
-            "compact",
-            "default",
-            "comfortable"
-          ]
+          "enumValues": ["compact", "default", "comfortable"]
         }
       ],
       "examples": [
@@ -5325,19 +4609,10 @@
           }
         }
       ],
-      "related": [
-        "table",
-        "blocks-data"
-      ],
-      "events": [
-        "select",
-        "change"
-      ],
+      "related": ["table", "blocks-data"],
+      "events": ["select", "change"],
       "group": "data",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "data-map",
@@ -5346,13 +4621,8 @@
       "summary": "Places as markers on an offline vector basemap, clustered when close, with a place list beside it.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Show where things are: stores, deliveries, sites"
-      ],
-      "dontUseWhen": [
-        "Values per region: use charts-geo-map",
-        "One address: use text"
-      ],
+      "useWhen": ["Show where things are: stores, deliveries, sites"],
+      "dontUseWhen": ["Values per region: use charts-geo-map", "One address: use text"],
       "a11y": [
         "Every marker is also an item in a labelled place list (the non-map path)",
         "The map pans and zooms by keyboard; selection is announced"
@@ -5400,32 +4670,17 @@
                 },
                 "tone": {
                   "type": "string",
-                  "enum": [
-                    "primary",
-                    "info",
-                    "success",
-                    "warning",
-                    "danger",
-                    "neutral"
-                  ]
+                  "enum": ["primary", "info", "success", "warning", "danger", "neutral"]
                 }
               },
-              "required": [
-                "id",
-                "label",
-                "lat",
-                "lng"
-              ]
+              "required": ["id", "label", "lat", "lng"]
             }
           }
         },
         {
           "name": "listPlacement",
           "kind": "enum",
-          "enumValues": [
-            "side",
-            "below"
-          ],
+          "enumValues": ["side", "below"],
           "default": "side"
         }
       ],
@@ -5453,17 +4708,10 @@
           }
         }
       ],
-      "related": [
-        "charts-geo-point-map"
-      ],
-      "events": [
-        "select"
-      ],
+      "related": ["charts-geo-point-map"],
+      "events": ["select"],
       "group": "data",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "data-timeline",
@@ -5472,12 +4720,8 @@
       "summary": "Tasks as bars over days, weeks, months or quarters, with dependencies and progress.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Show a schedule of tasks with durations and dependencies"
-      ],
-      "dontUseWhen": [
-        "Point-in-time events: use timeline or data-calendar"
-      ],
+      "useWhen": ["Show a schedule of tasks with durations and dependencies"],
+      "dontUseWhen": ["Point-in-time events: use timeline or data-calendar"],
       "a11y": [
         "A labelled grid of rows; every bar is a button with its dates and progress",
         "Rescheduling has a keyboard path; dependencies are listed as text"
@@ -5534,10 +4778,7 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "id",
-                "title"
-              ]
+              "required": ["id", "title"]
             }
           }
         },
@@ -5562,30 +4803,17 @@
                 },
                 "type": {
                   "type": "string",
-                  "enum": [
-                    "FS",
-                    "SS",
-                    "FF",
-                    "SF"
-                  ]
+                  "enum": ["FS", "SS", "FF", "SF"]
                 }
               },
-              "required": [
-                "from",
-                "to"
-              ]
+              "required": ["from", "to"]
             }
           }
         },
         {
           "name": "zoom",
           "kind": "enum",
-          "enumValues": [
-            "day",
-            "week",
-            "month",
-            "quarter"
-          ],
+          "enumValues": ["day", "week", "month", "quarter"],
           "default": "week"
         },
         {
@@ -5626,23 +4854,11 @@
           }
         }
       ],
-      "related": [
-        "data-calendar",
-        "timeline"
-      ],
-      "events": [
-        "select",
-        "move",
-        "change"
-      ],
-      "bindable": [
-        "zoom"
-      ],
+      "related": ["data-calendar", "timeline"],
+      "events": ["select", "move", "change"],
+      "bindable": ["zoom"],
       "group": "data",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "data-tree-view",
@@ -5651,9 +4867,7 @@
       "summary": "A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Show nested items such as folders, outlines or org charts"
-      ],
+      "useWhen": ["Show nested items such as folders, outlines or org charts"],
       "dontUseWhen": [
         "A flat list: use list or sortable-list",
         "Files with previews: use data-files"
@@ -5700,10 +4914,7 @@
                   "maxLength": 64
                 }
               },
-              "required": [
-                "id",
-                "label"
-              ]
+              "required": ["id", "label"]
             }
           }
         },
@@ -5715,10 +4926,7 @@
         {
           "name": "density",
           "kind": "enum",
-          "enumValues": [
-            "comfortable",
-            "compact"
-          ]
+          "enumValues": ["comfortable", "compact"]
         }
       ],
       "examples": [
@@ -5745,22 +4953,11 @@
           }
         }
       ],
-      "related": [
-        "data-files",
-        "data-board"
-      ],
-      "events": [
-        "move",
-        "select"
-      ],
-      "bindable": [
-        "items"
-      ],
+      "related": ["data-files", "data-board"],
+      "events": ["move", "select"],
+      "bindable": ["items"],
       "group": "data",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "deck-slide",
@@ -5769,12 +4966,8 @@
       "summary": "One slide in a deck: a title, content blocks and speaker notes.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Compose deck slide structure in agent-authored trees"
-      ],
-      "dontUseWhen": [
-        "App chrome shells (sidebar, top-nav, dialogs)"
-      ],
+      "useWhen": ["Compose deck slide structure in agent-authored trees"],
+      "dontUseWhen": ["App chrome shells (sidebar, top-nav, dialogs)"],
       "a11y": [
         "Structure is semantic regions the host maps to real layout components",
         "No HTML strings; children are nested catalog nodes"
@@ -5814,11 +5007,7 @@
         {
           "name": "transition",
           "kind": "enum",
-          "enumValues": [
-            "none",
-            "fade",
-            "fade-up"
-          ]
+          "enumValues": ["none", "fade", "fade-up"]
         },
         {
           "name": "themeRef",
@@ -5844,16 +5033,9 @@
           }
         }
       ],
-      "related": [
-        "layout-page",
-        "layout-doc",
-        "layout-grid"
-      ],
+      "related": ["layout-page", "layout-doc", "layout-grid"],
       "group": "layouts",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "description",
@@ -5862,12 +5044,8 @@
       "summary": "Help text associated with a field control.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Short guidance under a label"
-      ],
-      "dontUseWhen": [
-        "An error message (use field-error)"
-      ],
+      "useWhen": ["Short guidance under a label"],
+      "dontUseWhen": ["An error message (use field-error)"],
       "a11y": "Wire via aria-describedby from Field or the host.",
       "props": [
         {
@@ -5886,11 +5064,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "field",
-        "label",
-        "field-error"
-      ],
+      "related": ["field", "label", "field-error"],
       "group": "forms",
       "emit": []
     },
@@ -5901,37 +5075,20 @@
       "summary": "Non-modal detail panel alongside content.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Inspect a selected row without leaving the list"
-      ],
-      "dontUseWhen": [
-        "Full-page blocking flows (use dialog)"
-      ],
+      "useWhen": ["Inspect a selected row without leaving the list"],
+      "dontUseWhen": ["Full-page blocking flows (use dialog)"],
       "a11y": "Keep a visible heading; do not trap focus unless modal.",
       "props": [
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg",
-            "xl"
-          ],
+          "enumValues": ["sm", "md", "lg", "xl"],
           "default": "md"
         },
         {
           "name": "side",
           "kind": "enum",
-          "enumValues": [
-            "top",
-            "right",
-            "bottom",
-            "left",
-            "start",
-            "end",
-            "center"
-          ],
+          "enumValues": ["top", "right", "bottom", "left", "start", "end", "center"],
           "default": "end"
         },
         {
@@ -5964,10 +5121,7 @@
           }
         }
       ],
-      "related": [
-        "sheet",
-        "drawer"
-      ],
+      "related": ["sheet", "drawer"],
       "group": "overlays",
       "emit": []
     },
@@ -5978,10 +5132,7 @@
       "summary": "Modal dialog with title, optional description, body and footer.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Confirm multi-step flows",
-        "Show focused detail without leaving the page"
-      ],
+      "useWhen": ["Confirm multi-step flows", "Show focused detail without leaving the page"],
       "dontUseWhen": [
         "A destructive confirm that must trap attention (use alert-dialog)",
         "Non-modal hints (use popover or tooltip)"
@@ -6009,12 +5160,7 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg",
-            "xl"
-          ],
+          "enumValues": ["sm", "md", "lg", "xl"],
           "default": "md"
         },
         {
@@ -6060,10 +5206,7 @@
           }
         }
       ],
-      "related": [
-        "alert-dialog",
-        "sheet"
-      ],
+      "related": ["alert-dialog", "sheet"],
       "group": "overlays",
       "emit": []
     },
@@ -6074,37 +5217,20 @@
       "summary": "Bottom or edge drawer with optional drag dismiss.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Mobile sheets that feel like drawers"
-      ],
-      "dontUseWhen": [
-        "Desktop side navigation (use sidebar)"
-      ],
+      "useWhen": ["Mobile sheets that feel like drawers"],
+      "dontUseWhen": ["Desktop side navigation (use sidebar)"],
       "a11y": "Same focus model as sheet; prefer labelled titles.",
       "props": [
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg",
-            "xl"
-          ],
+          "enumValues": ["sm", "md", "lg", "xl"],
           "default": "md"
         },
         {
           "name": "side",
           "kind": "enum",
-          "enumValues": [
-            "top",
-            "right",
-            "bottom",
-            "left",
-            "start",
-            "end",
-            "center"
-          ],
+          "enumValues": ["top", "right", "bottom", "left", "start", "end", "center"],
           "default": "bottom"
         },
         {
@@ -6137,10 +5263,7 @@
           }
         }
       ],
-      "related": [
-        "sheet",
-        "responsive-modal"
-      ],
+      "related": ["sheet", "responsive-modal"],
       "group": "overlays",
       "emit": []
     },
@@ -6151,10 +5274,7 @@
       "summary": "Menu button pattern with items, checkboxes, radios and submenus.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Actions behind a button trigger",
-        "Menus with keyboard typeahead"
-      ],
+      "useWhen": ["Actions behind a button trigger", "Menus with keyboard typeahead"],
       "dontUseWhen": [
         "Top-level app menus (use menubar)",
         "Pointer-anchored region menus (use context-menu)"
@@ -6184,11 +5304,7 @@
           }
         }
       ],
-      "related": [
-        "context-menu",
-        "menubar",
-        "dropdown-menu-item"
-      ],
+      "related": ["context-menu", "menubar", "dropdown-menu-item"],
       "group": "overlays",
       "emit": []
     },
@@ -6199,31 +5315,20 @@
       "summary": "Floating menu surface for dropdown items.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Host menu items under a dropdown trigger"
-      ],
-      "dontUseWhen": [
-        "Non-menu floating panels (use popover)"
-      ],
+      "useWhen": ["Host menu items under a dropdown trigger"],
+      "dontUseWhen": ["Non-menu floating panels (use popover)"],
       "a11y": "role=menu; labelled by the trigger.",
       "props": [
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "default",
-            "soft"
-          ],
+          "enumValues": ["default", "soft"],
           "default": "default"
         },
         {
@@ -6237,22 +5342,13 @@
         {
           "name": "side",
           "kind": "enum",
-          "enumValues": [
-            "top",
-            "right",
-            "bottom",
-            "left"
-          ],
+          "enumValues": ["top", "right", "bottom", "left"],
           "default": "bottom"
         },
         {
           "name": "align",
           "kind": "enum",
-          "enumValues": [
-            "start",
-            "center",
-            "end"
-          ],
+          "enumValues": ["start", "center", "end"],
           "default": "start"
         },
         {
@@ -6270,10 +5366,7 @@
           }
         }
       ],
-      "related": [
-        "dropdown-menu",
-        "dropdown-menu-item"
-      ],
+      "related": ["dropdown-menu", "dropdown-menu-item"],
       "group": "overlays",
       "emit": []
     },
@@ -6284,12 +5377,8 @@
       "summary": "Menu item with optional icon and shortcut chrome.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "A single actionable row inside a menu"
-      ],
-      "dontUseWhen": [
-        "Standalone buttons outside a menu"
-      ],
+      "useWhen": ["A single actionable row inside a menu"],
+      "dontUseWhen": ["Standalone buttons outside a menu"],
       "a11y": "role=menuitem; shortcuts are visual only.",
       "props": [
         {
@@ -6343,10 +5432,7 @@
           }
         }
       ],
-      "related": [
-        "dropdown-menu",
-        "context-menu"
-      ],
+      "related": ["dropdown-menu", "context-menu"],
       "group": "overlays",
       "emit": []
     },
@@ -6357,31 +5443,20 @@
       "summary": "Styled button that opens a dropdown menu.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Label the control that opens DropdownMenu"
-      ],
-      "dontUseWhen": [
-        "Context or menubar triggers"
-      ],
+      "useWhen": ["Label the control that opens DropdownMenu"],
+      "dontUseWhen": ["Context or menubar triggers"],
       "a11y": "aria-haspopup=menu and aria-expanded track open state.",
       "props": [
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "default",
-            "soft"
-          ],
+          "enumValues": ["default", "soft"],
           "default": "default"
         },
         {
@@ -6402,9 +5477,7 @@
           }
         }
       ],
-      "related": [
-        "dropdown-menu"
-      ],
+      "related": ["dropdown-menu"],
       "group": "overlays",
       "emit": []
     },
@@ -6415,12 +5488,8 @@
       "summary": "Placeholder when a list or panel has nothing to show yet.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "First-run or filtered-empty lists"
-      ],
-      "dontUseWhen": [
-        "A failure after a request (use error-state)"
-      ],
+      "useWhen": ["First-run or filtered-empty lists"],
+      "dontUseWhen": ["A failure after a request (use error-state)"],
       "a11y": "Title is required text; illustration is decorative (aria-hidden).",
       "props": [
         {
@@ -6443,10 +5512,7 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md"
-          ],
+          "enumValues": ["sm", "md"],
           "default": "md"
         },
         {
@@ -6465,10 +5531,7 @@
           }
         }
       ],
-      "related": [
-        "error-state",
-        "table"
-      ],
+      "related": ["error-state", "table"],
       "group": "display",
       "emit": []
     },
@@ -6479,12 +5542,8 @@
       "summary": "Full-panel failure with optional retry.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "A view failed to load and the user can retry"
-      ],
-      "dontUseWhen": [
-        "A soft warning inline (use alert)"
-      ],
+      "useWhen": ["A view failed to load and the user can retry"],
+      "dontUseWhen": ["A soft warning inline (use alert)"],
       "a11y": "Uses role=alert; retry is a real button with pending support.",
       "props": [
         {
@@ -6525,10 +5584,7 @@
           }
         }
       ],
-      "related": [
-        "empty-state",
-        "alert"
-      ],
+      "related": ["empty-state", "alert"],
       "group": "display",
       "emit": []
     },
@@ -6539,12 +5595,8 @@
       "summary": "Label, description and error wiring for a single control.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Compose a labeled control with optional help and error text"
-      ],
-      "dontUseWhen": [
-        "Standalone chrome without a form control"
-      ],
+      "useWhen": ["Compose a labeled control with optional help and error text"],
+      "dontUseWhen": ["Standalone chrome without a form control"],
       "a11y": [
         "Generates id and aria-describedby for the control snippet",
         "Marks aria-invalid when error is present",
@@ -6587,10 +5639,7 @@
         {
           "name": "orientation",
           "kind": "enum",
-          "enumValues": [
-            "vertical",
-            "horizontal"
-          ],
+          "enumValues": ["vertical", "horizontal"],
           "default": "vertical"
         },
         {
@@ -6615,13 +5664,7 @@
           }
         }
       ],
-      "related": [
-        "label",
-        "description",
-        "field-error",
-        "form",
-        "input"
-      ],
+      "related": ["label", "description", "field-error", "form", "input"],
       "group": "forms",
       "emit": []
     },
@@ -6632,12 +5675,8 @@
       "summary": "An alert-role error message for a field.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Surface a validation error next to a control"
-      ],
-      "dontUseWhen": [
-        "Help text that is not an error (use description)"
-      ],
+      "useWhen": ["Surface a validation error next to a control"],
+      "dontUseWhen": ["Help text that is not an error (use description)"],
       "a11y": "role=alert; show=false renders nothing while the host keeps aria wiring.",
       "props": [
         {
@@ -6663,10 +5702,7 @@
           }
         }
       ],
-      "related": [
-        "field",
-        "form"
-      ],
+      "related": ["field", "form"],
       "group": "forms",
       "emit": []
     },
@@ -6677,15 +5713,9 @@
       "summary": "A button that fires one declared flow event, such as next or back.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Move between the views of a declared flow"
-      ],
-      "dontUseWhen": [
-        "Submitting or navigating away: actions only change the local view"
-      ],
-      "a11y": [
-        "A type=\"button\"; aria-disabled when no transition applies from the current view"
-      ],
+      "useWhen": ["Move between the views of a declared flow"],
+      "dontUseWhen": ["Submitting or navigating away: actions only change the local view"],
+      "a11y": ["A type=\"button\"; aria-disabled when no transition applies from the current view"],
       "props": [
         {
           "name": "event",
@@ -6710,17 +5740,10 @@
           }
         }
       ],
-      "related": [
-        "flow-view"
-      ],
-      "events": [
-        "press"
-      ],
+      "related": ["flow-view"],
+      "events": ["press"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "flow-view",
@@ -6729,15 +5752,9 @@
       "summary": "One named view of a multi-step flow; only the current view paints.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Split a wizard or a multi-step report into named steps"
-      ],
-      "dontUseWhen": [
-        "Content that should always show"
-      ],
-      "a11y": [
-        "A labelled region; focus moves to it when an action brings it into view"
-      ],
+      "useWhen": ["Split a wizard or a multi-step report into named steps"],
+      "dontUseWhen": ["Content that should always show"],
+      "a11y": ["A labelled region; focus moves to it when an action brings it into view"],
       "props": [
         {
           "name": "name",
@@ -6765,14 +5782,9 @@
           }
         }
       ],
-      "related": [
-        "flow-action"
-      ],
+      "related": ["flow-action"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "form",
@@ -6781,12 +5793,8 @@
       "summary": "A form shell with layout, validation hook and error map.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Collect and validate a set of fields before submit"
-      ],
-      "dontUseWhen": [
-        "A single control with no submit (use field alone)"
-      ],
+      "useWhen": ["Collect and validate a set of fields before submit"],
+      "dontUseWhen": ["A single control with no submit (use field alone)"],
       "a11y": [
         "Native constraint validation runs unless noValidate is set",
         "Field errors map back onto controls after onValidate"
@@ -6795,10 +5803,7 @@
         {
           "name": "layout",
           "kind": "enum",
-          "enumValues": [
-            "stack",
-            "grid"
-          ],
+          "enumValues": ["stack", "grid"],
           "default": "stack"
         },
         {
@@ -6848,11 +5853,7 @@
           }
         }
       ],
-      "related": [
-        "field",
-        "button",
-        "input"
-      ],
+      "related": ["field", "button", "input"],
       "group": "forms",
       "emit": []
     },
@@ -6863,15 +5864,9 @@
       "summary": "A named, validated field bound to a declared local-state variable.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Collect one value for an action"
-      ],
-      "dontUseWhen": [
-        "Passwords, card numbers or one-time codes: never in a blueprint"
-      ],
-      "a11y": [
-        "A visible label; required and invalid states are exposed; errors are linked"
-      ],
+      "useWhen": ["Collect one value for an action"],
+      "dontUseWhen": ["Passwords, card numbers or one-time codes: never in a blueprint"],
+      "a11y": ["A visible label; required and invalid states are exposed; errors are linked"],
       "props": [
         {
           "name": "name",
@@ -6894,13 +5889,7 @@
         {
           "name": "kind",
           "kind": "enum",
-          "enumValues": [
-            "text",
-            "email",
-            "tel",
-            "number",
-            "multiline"
-          ],
+          "enumValues": ["text", "email", "tel", "number", "multiline"],
           "default": "text"
         },
         {
@@ -6932,13 +5921,7 @@
         {
           "name": "pattern",
           "kind": "enum",
-          "enumValues": [
-            "email",
-            "phone",
-            "postal-code",
-            "digits",
-            "slug"
-          ]
+          "enumValues": ["email", "phone", "postal-code", "digits", "slug"]
         },
         {
           "name": "minLength",
@@ -6975,17 +5958,10 @@
           }
         }
       ],
-      "related": [
-        "action-form"
-      ],
-      "events": [
-        "change"
-      ],
+      "related": ["action-form"],
+      "events": ["change"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "form-submit",
@@ -6994,15 +5970,9 @@
       "summary": "Proposes the form's action with its fields' values; disabled while a receipt is pending.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "The one primary action of an action-form"
-      ],
-      "dontUseWhen": [
-        "Navigation or local view changes: use flow-action"
-      ],
-      "a11y": [
-        "A submit button inside the form; Enter in a field submits too"
-      ],
+      "useWhen": ["The one primary action of an action-form"],
+      "dontUseWhen": ["Navigation or local view changes: use flow-action"],
+      "a11y": ["A submit button inside the form; Enter in a field submits too"],
       "props": [
         {
           "name": "label",
@@ -7020,14 +5990,9 @@
           }
         }
       ],
-      "related": [
-        "action-form"
-      ],
+      "related": ["action-form"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "host-region",
@@ -7073,14 +6038,9 @@
           }
         }
       ],
-      "related": [
-        "layout-stack"
-      ],
+      "related": ["layout-stack"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "hover-card",
@@ -7089,12 +6049,8 @@
       "summary": "Preview panel that opens on hover or focus.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Rich previews without a click"
-      ],
-      "dontUseWhen": [
-        "Required interactions (use popover or dialog)"
-      ],
+      "useWhen": ["Rich previews without a click"],
+      "dontUseWhen": ["Required interactions (use popover or dialog)"],
       "a11y": "Opens on focus as well as hover; dismissible.",
       "props": [
         {
@@ -7114,10 +6070,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "popover",
-        "tooltip"
-      ],
+      "related": ["popover", "tooltip"],
       "group": "overlays",
       "emit": []
     },
@@ -7128,31 +6081,20 @@
       "summary": "Styled hover-card surface.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Body of a hover card"
-      ],
-      "dontUseWhen": [
-        "Click-toggled panels (use popover-content)"
-      ],
+      "useWhen": ["Body of a hover card"],
+      "dontUseWhen": ["Click-toggled panels (use popover-content)"],
       "a11y": "Same surface tokens as popover for contrast.",
       "props": [
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "elevated",
-            "flat"
-          ],
+          "enumValues": ["elevated", "flat"],
           "default": "elevated"
         },
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
@@ -7176,9 +6118,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "hover-card"
-      ],
+      "related": ["hover-card"],
       "group": "overlays",
       "emit": []
     },
@@ -7189,12 +6129,8 @@
       "summary": "An icon-only button that requires an accessible name.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Toolbar and dense chrome actions that are icon-only"
-      ],
-      "dontUseWhen": [
-        "Actions with a visible text label (use button)"
-      ],
+      "useWhen": ["Toolbar and dense chrome actions that are icon-only"],
+      "dontUseWhen": ["Actions with a visible text label (use button)"],
       "a11y": "label is required and becomes aria-label on the control.",
       "props": [
         {
@@ -7206,14 +6142,7 @@
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "default",
-            "secondary",
-            "outline",
-            "ghost",
-            "destructive",
-            "link"
-          ],
+          "enumValues": ["default", "secondary", "outline", "ghost", "destructive", "link"],
           "default": "ghost"
         },
         {
@@ -7255,10 +6184,7 @@
           }
         }
       ],
-      "related": [
-        "button",
-        "button-group"
-      ],
+      "related": ["button", "button-group"],
       "group": "forms",
       "emit": []
     },
@@ -7307,12 +6233,7 @@
           }
         }
       ],
-      "related": [
-        "button",
-        "label",
-        "badge",
-        "kbd"
-      ],
+      "related": ["button", "label", "badge", "kbd"],
       "group": "display",
       "emit": []
     },
@@ -7323,10 +6244,7 @@
       "summary": "A single-line text (or file) control with optional clear.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Short free-text fields",
-        "Native file selection"
-      ],
+      "useWhen": ["Short free-text fields", "Native file selection"],
       "dontUseWhen": [
         "Multi-line text (use textarea)",
         "A labeled field with description and error (wrap in field)"
@@ -7407,12 +6325,7 @@
           }
         }
       ],
-      "related": [
-        "input-group",
-        "textarea",
-        "field",
-        "text-counter"
-      ],
+      "related": ["input-group", "textarea", "field", "text-counter"],
       "group": "forms",
       "emit": []
     },
@@ -7423,12 +6336,8 @@
       "summary": "An input with start/end adornments and optional clear.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Inputs with a unit, icon or trailing action"
-      ],
-      "dontUseWhen": [
-        "A bare input with no adornment (use input)"
-      ],
+      "useWhen": ["Inputs with a unit, icon or trailing action"],
+      "dontUseWhen": ["A bare input with no adornment (use input)"],
       "a11y": "Invalid state marks the control aria-invalid; clear has an accessible name.",
       "props": [
         {
@@ -7505,10 +6414,7 @@
           }
         }
       ],
-      "related": [
-        "input",
-        "field"
-      ],
+      "related": ["input", "field"],
       "group": "forms",
       "emit": []
     },
@@ -7519,12 +6425,8 @@
       "summary": "Inline keyboard key affordance.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Document a shortcut next to a control"
-      ],
-      "dontUseWhen": [
-        "Multi-line code (use code with variant block)"
-      ],
+      "useWhen": ["Document a shortcut next to a control"],
+      "dontUseWhen": ["Multi-line code (use code with variant block)"],
       "a11y": "Rendered as a real kbd element; text is escaped.",
       "props": [
         {
@@ -7556,10 +6458,7 @@
           }
         }
       ],
-      "related": [
-        "code",
-        "inline-text"
-      ],
+      "related": ["code", "inline-text"],
       "group": "display",
       "emit": []
     },
@@ -7570,12 +6469,8 @@
       "summary": "A formatted metric with unit, previous-period delta and optional link.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Show a numeric KPI with unit formatting and comparison"
-      ],
-      "dontUseWhen": [
-        "A free-form already-formatted string (use stat)"
-      ],
+      "useWhen": ["Show a numeric KPI with unit formatting and comparison"],
+      "dontUseWhen": ["A free-form already-formatted string (use stat)"],
       "a11y": "Loading and empty states are announced; linked tiles use real anchors after URL policy.",
       "props": [
         {
@@ -7591,12 +6486,7 @@
         {
           "name": "unit",
           "kind": "enum",
-          "enumValues": [
-            "number",
-            "compact",
-            "cents",
-            "percent"
-          ],
+          "enumValues": ["number", "compact", "cents", "percent"],
           "default": "number"
         },
         {
@@ -7615,10 +6505,7 @@
         {
           "name": "positive",
           "kind": "enum",
-          "enumValues": [
-            "up",
-            "down"
-          ],
+          "enumValues": ["up", "down"],
           "default": "up"
         },
         {
@@ -7633,10 +6520,7 @@
         {
           "name": "hrefTrust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ],
+          "enumValues": ["developer", "untrusted"],
           "default": "developer"
         },
         {
@@ -7652,10 +6536,7 @@
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "elevated",
-            "flat"
-          ],
+          "enumValues": ["elevated", "flat"],
           "default": "elevated"
         },
         {
@@ -7676,10 +6557,7 @@
           }
         }
       ],
-      "related": [
-        "stat",
-        "card"
-      ],
+      "related": ["stat", "card"],
       "group": "display",
       "emit": []
     },
@@ -7690,12 +6568,8 @@
       "summary": "A form label with optional required marker and sr-only mode.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Label a control outside Field"
-      ],
-      "dontUseWhen": [
-        "A full field stack (use field)"
-      ],
+      "useWhen": ["Label a control outside Field"],
+      "dontUseWhen": ["A full field stack (use field)"],
       "a11y": "srOnly keeps the label for assistive tech while hiding it visually.",
       "props": [
         {
@@ -7706,10 +6580,7 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md"
-          ],
+          "enumValues": ["sm", "md"],
           "default": "md"
         },
         {
@@ -7736,11 +6607,7 @@
           }
         }
       ],
-      "related": [
-        "field",
-        "description",
-        "inline-text"
-      ],
+      "related": ["field", "description", "inline-text"],
       "group": "forms",
       "emit": []
     },
@@ -7751,16 +6618,9 @@
       "summary": "Sign-in form column plus brand panel.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Sign-in and account entry pages"
-      ],
-      "dontUseWhen": [
-        "Post-auth app chrome"
-      ],
-      "a11y": [
-        "Form and brand panels are labelled",
-        "Brand copy is author-provided"
-      ],
+      "useWhen": ["Sign-in and account entry pages"],
+      "dontUseWhen": ["Post-auth app chrome"],
+      "a11y": ["Form and brand panels are labelled", "Brand copy is author-provided"],
       "props": [
         {
           "name": "form",
@@ -7813,9 +6673,7 @@
           }
         }
       ],
-      "related": [
-        "layout-wizard"
-      ],
+      "related": ["layout-wizard"],
       "group": "layouts",
       "emit": []
     },
@@ -7826,12 +6684,8 @@
       "summary": "Blog/post reading layout (content-layout kind blog).",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Blog posts and field notes"
-      ],
-      "dontUseWhen": [
-        "Settings shells"
-      ],
+      "useWhen": ["Blog posts and field notes"],
+      "dontUseWhen": ["Settings shells"],
       "a11y": [
         "Skip link targets main when chrome is present",
         "Primary navigation is a labelled landmark"
@@ -7885,10 +6739,7 @@
           }
         }
       ],
-      "related": [
-        "layout-host",
-        "layout-chrome"
-      ],
+      "related": ["layout-host", "layout-chrome"],
       "group": "layouts",
       "emit": []
     },
@@ -7899,12 +6750,8 @@
       "summary": "Content card frame for grouped agent-authored blocks.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Compose card layout structure in agent-authored trees"
-      ],
-      "dontUseWhen": [
-        "App chrome shells (sidebar, top-nav, dialogs)"
-      ],
+      "useWhen": ["Compose card layout structure in agent-authored trees"],
+      "dontUseWhen": ["App chrome shells (sidebar, top-nav, dialogs)"],
       "a11y": [
         "Structure is semantic regions the host maps to real layout components",
         "No HTML strings; children are nested catalog nodes"
@@ -7933,16 +6780,9 @@
           }
         }
       ],
-      "related": [
-        "layout-page",
-        "layout-doc",
-        "layout-grid"
-      ],
+      "related": ["layout-page", "layout-doc", "layout-grid"],
       "group": "layouts",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "layout-chrome",
@@ -7951,27 +6791,15 @@
       "summary": "Shared brand, actions, user and skip-link chrome for desktop layouts.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Layout frames that share brand and user chrome"
-      ],
-      "dontUseWhen": [
-        "Standalone navigation without a layout host"
-      ],
-      "a11y": [
-        "Skip link targets the main region",
-        "Every href passes the URL policy"
-      ],
+      "useWhen": ["Layout frames that share brand and user chrome"],
+      "dontUseWhen": ["Standalone navigation without a layout host"],
+      "a11y": ["Skip link targets the main region", "Every href passes the URL policy"],
       "props": [
         {
           "name": "part",
           "kind": "enum",
           "required": true,
-          "enumValues": [
-            "skip",
-            "brand",
-            "actions",
-            "user"
-          ]
+          "enumValues": ["skip", "brand", "actions", "user"]
         },
         {
           "name": "nav",
@@ -7991,10 +6819,7 @@
         {
           "name": "hrefTrust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ],
+          "enumValues": ["developer", "untrusted"],
           "default": "developer",
           "trust": "developer"
         },
@@ -8017,10 +6842,7 @@
           }
         }
       ],
-      "related": [
-        "layout-host",
-        "nav-icon"
-      ],
+      "related": ["layout-host", "nav-icon"],
       "group": "layouts",
       "emit": []
     },
@@ -8031,12 +6853,8 @@
       "summary": "Top chrome plus container-query widget grid.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Analytics and operations dashboards"
-      ],
-      "dontUseWhen": [
-        "Long-form reading"
-      ],
+      "useWhen": ["Analytics and operations dashboards"],
+      "dontUseWhen": ["Long-form reading"],
       "a11y": [
         "Skip link targets main when chrome is present",
         "Primary navigation is a labelled landmark"
@@ -8080,10 +6898,7 @@
         {
           "name": "hrefTrust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ],
+          "enumValues": ["developer", "untrusted"],
           "default": "developer",
           "trust": "developer"
         }
@@ -8100,10 +6915,7 @@
           }
         }
       ],
-      "related": [
-        "layout-host",
-        "layout-chrome"
-      ],
+      "related": ["layout-host", "layout-chrome"],
       "group": "layouts",
       "emit": []
     },
@@ -8114,12 +6926,8 @@
       "summary": "Slide deck frame for sequenced content.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Compose deck layout structure in agent-authored trees"
-      ],
-      "dontUseWhen": [
-        "App chrome shells (sidebar, top-nav, dialogs)"
-      ],
+      "useWhen": ["Compose deck layout structure in agent-authored trees"],
+      "dontUseWhen": ["App chrome shells (sidebar, top-nav, dialogs)"],
       "a11y": [
         "Structure is semantic regions the host maps to real layout components",
         "No HTML strings; children are nested catalog nodes"
@@ -8143,11 +6951,7 @@
         {
           "name": "aspect",
           "kind": "enum",
-          "enumValues": [
-            "16:9",
-            "4:3",
-            "1:1"
-          ],
+          "enumValues": ["16:9", "4:3", "1:1"],
           "default": "16:9"
         },
         {
@@ -8189,16 +6993,9 @@
           }
         }
       ],
-      "related": [
-        "layout-page",
-        "layout-doc",
-        "layout-grid"
-      ],
+      "related": ["layout-page", "layout-doc", "layout-grid"],
       "group": "layouts",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "layout-doc",
@@ -8207,12 +7004,8 @@
       "summary": "Document frame with optional table of contents.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Compose doc layout structure in agent-authored trees"
-      ],
-      "dontUseWhen": [
-        "App chrome shells (sidebar, top-nav, dialogs)"
-      ],
+      "useWhen": ["Compose doc layout structure in agent-authored trees"],
+      "dontUseWhen": ["App chrome shells (sidebar, top-nav, dialogs)"],
       "a11y": [
         "Structure is semantic regions the host maps to real layout components",
         "No HTML strings; children are nested catalog nodes"
@@ -8247,15 +7040,9 @@
           }
         }
       ],
-      "related": [
-        "layout-page",
-        "layout-grid"
-      ],
+      "related": ["layout-page", "layout-grid"],
       "group": "layouts",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "layout-docs",
@@ -8264,12 +7051,8 @@
       "summary": "Documentation reading layout (content-layout kind docs).",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Product docs and guides"
-      ],
-      "dontUseWhen": [
-        "App dashboards"
-      ],
+      "useWhen": ["Product docs and guides"],
+      "dontUseWhen": ["App dashboards"],
       "a11y": [
         "Skip link targets main when chrome is present",
         "Primary navigation is a labelled landmark"
@@ -8322,10 +7105,7 @@
           }
         }
       ],
-      "related": [
-        "layout-host",
-        "layout-chrome"
-      ],
+      "related": ["layout-host", "layout-chrome"],
       "group": "layouts",
       "emit": []
     },
@@ -8336,16 +7116,9 @@
       "summary": "Mobile navigation drawer built on the dialog primitive.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Narrow layouts that hide primary nav behind a menu"
-      ],
-      "dontUseWhen": [
-        "Desktop-only sidebars"
-      ],
-      "a11y": [
-        "Drawer is a labelled dialog",
-        "Close control is named"
-      ],
+      "useWhen": ["Narrow layouts that hide primary nav behind a menu"],
+      "dontUseWhen": ["Desktop-only sidebars"],
+      "a11y": ["Drawer is a labelled dialog", "Close control is named"],
       "props": [
         {
           "name": "open",
@@ -8378,10 +7151,7 @@
           }
         }
       ],
-      "related": [
-        "layout-sidebar",
-        "dialog"
-      ],
+      "related": ["layout-sidebar", "dialog"],
       "group": "layouts",
       "emit": []
     },
@@ -8392,12 +7162,8 @@
       "summary": "Primary nav plus optional context aside.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Tools that need nav and a context rail"
-      ],
-      "dontUseWhen": [
-        "Single-column reading layouts"
-      ],
+      "useWhen": ["Tools that need nav and a context rail"],
+      "dontUseWhen": ["Single-column reading layouts"],
       "a11y": [
         "Skip link targets main when chrome is present",
         "Primary navigation is a labelled landmark"
@@ -8458,10 +7224,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "layout-host",
-        "layout-chrome"
-      ],
+      "related": ["layout-host", "layout-chrome"],
       "group": "layouts",
       "emit": []
     },
@@ -8472,12 +7235,8 @@
       "summary": "Long-read editorial layout (content-layout kind editorial).",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Magazine-style long reads"
-      ],
-      "dontUseWhen": [
-        "Dense data grids"
-      ],
+      "useWhen": ["Magazine-style long reads"],
+      "dontUseWhen": ["Dense data grids"],
       "a11y": [
         "Skip link targets main when chrome is present",
         "Primary navigation is a labelled landmark"
@@ -8530,10 +7289,7 @@
           }
         }
       ],
-      "related": [
-        "layout-host",
-        "layout-chrome"
-      ],
+      "related": ["layout-host", "layout-chrome"],
       "group": "layouts",
       "emit": []
     },
@@ -8544,12 +7300,8 @@
       "summary": "Responsive content grid for agent-authored tiles.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Compose grid layout structure in agent-authored trees"
-      ],
-      "dontUseWhen": [
-        "App chrome shells (sidebar, top-nav, dialogs)"
-      ],
+      "useWhen": ["Compose grid layout structure in agent-authored trees"],
+      "dontUseWhen": ["App chrome shells (sidebar, top-nav, dialogs)"],
       "a11y": [
         "Structure is semantic regions the host maps to real layout components",
         "No HTML strings; children are nested catalog nodes"
@@ -8584,15 +7336,9 @@
           }
         }
       ],
-      "related": [
-        "layout-page",
-        "layout-doc"
-      ],
+      "related": ["layout-page", "layout-doc"],
       "group": "layouts",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "layout-host",
@@ -8601,12 +7347,8 @@
       "summary": "Resolves a layout id, applies width fallbacks, and keeps one stable screen outlet.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Apps that switch between shared layouts without remounting the screen"
-      ],
-      "dontUseWhen": [
-        "A single fixed page frame with no layout catalog"
-      ],
+      "useWhen": ["Apps that switch between shared layouts without remounting the screen"],
+      "dontUseWhen": ["A single fixed page frame with no layout catalog"],
       "a11y": [
         "Loading state is named for assistive tech",
         "Screen outlet stays stable across layout switches"
@@ -8670,10 +7412,7 @@
           "name": "dir",
           "kind": "enum",
           "description": "Document direction",
-          "enumValues": [
-            "ltr",
-            "rtl"
-          ]
+          "enumValues": ["ltr", "rtl"]
         },
         {
           "name": "loadingLabel",
@@ -8694,10 +7433,7 @@
           }
         }
       ],
-      "related": [
-        "layout-sidebar",
-        "layout-chrome"
-      ],
+      "related": ["layout-sidebar", "layout-chrome"],
       "group": "layouts",
       "emit": []
     },
@@ -8708,12 +7444,8 @@
       "summary": "Standalone marketing landing composition.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Static landing pages without LayoutHost"
-      ],
-      "dontUseWhen": [
-        "Routed app shells"
-      ],
+      "useWhen": ["Static landing pages without LayoutHost"],
+      "dontUseWhen": ["Routed app shells"],
       "a11y": "Author-provided landmarks; no default product copy.",
       "props": [
         {
@@ -8752,9 +7484,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "layout-marketing"
-      ],
+      "related": ["layout-marketing"],
       "group": "layouts",
       "emit": []
     },
@@ -8765,16 +7495,9 @@
       "summary": "Marketing page frame with hero, sections and footer slots.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Landing and product marketing pages"
-      ],
-      "dontUseWhen": [
-        "Authenticated app chrome"
-      ],
-      "a11y": [
-        "Hero and content regions can be labelled",
-        "Navigation is a landmark"
-      ],
+      "useWhen": ["Landing and product marketing pages"],
+      "dontUseWhen": ["Authenticated app chrome"],
+      "a11y": ["Hero and content regions can be labelled", "Navigation is a landmark"],
       "props": [
         {
           "name": "mountScreen",
@@ -8854,10 +7577,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "layout-landing",
-        "layout-pricing"
-      ],
+      "related": ["layout-landing", "layout-pricing"],
       "group": "layouts",
       "emit": []
     },
@@ -8868,12 +7588,8 @@
       "summary": "Full page content frame for agent-authored documents.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Compose page layout structure in agent-authored trees"
-      ],
-      "dontUseWhen": [
-        "App chrome shells (sidebar, top-nav, dialogs)"
-      ],
+      "useWhen": ["Compose page layout structure in agent-authored trees"],
+      "dontUseWhen": ["App chrome shells (sidebar, top-nav, dialogs)"],
       "a11y": [
         "Structure is semantic regions the host maps to real layout components",
         "No HTML strings; children are nested catalog nodes"
@@ -8908,15 +7624,9 @@
           }
         }
       ],
-      "related": [
-        "layout-doc",
-        "layout-grid"
-      ],
+      "related": ["layout-doc", "layout-grid"],
       "group": "layouts",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "layout-pricing",
@@ -8925,12 +7635,8 @@
       "summary": "Pricing plans grid with title and footnote.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Pricing tables on marketing pages"
-      ],
-      "dontUseWhen": [
-        "In-app billing settings (use settings layout)"
-      ],
+      "useWhen": ["Pricing tables on marketing pages"],
+      "dontUseWhen": ["In-app billing settings (use settings layout)"],
       "a11y": "Plans are a list of cards; title names the section.",
       "props": [
         {
@@ -8974,9 +7680,7 @@
           }
         }
       ],
-      "related": [
-        "layout-marketing"
-      ],
+      "related": ["layout-marketing"],
       "group": "layouts",
       "emit": []
     },
@@ -8987,12 +7691,8 @@
       "summary": "Children side by side, wrapping onto new lines when space runs out.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Place a few items next to each other, such as KPIs or actions"
-      ],
-      "dontUseWhen": [
-        "App chrome shells (sidebar, top-nav, dialogs)"
-      ],
+      "useWhen": ["Place a few items next to each other, such as KPIs or actions"],
+      "dontUseWhen": ["App chrome shells (sidebar, top-nav, dialogs)"],
       "a11y": [
         "DOM order stays reading order; the layout never reorders children visually",
         "Logical properties only, so right-to-left content mirrors"
@@ -9001,23 +7701,13 @@
         {
           "name": "gap",
           "kind": "enum",
-          "enumValues": [
-            "none",
-            "small",
-            "medium",
-            "large"
-          ],
+          "enumValues": ["none", "small", "medium", "large"],
           "description": "Space between children."
         },
         {
           "name": "align",
           "kind": "enum",
-          "enumValues": [
-            "start",
-            "center",
-            "end",
-            "stretch"
-          ]
+          "enumValues": ["start", "center", "end", "stretch"]
         },
         {
           "name": "wrap",
@@ -9039,15 +7729,9 @@
           }
         }
       ],
-      "related": [
-        "layout-stack",
-        "layout-grid"
-      ],
+      "related": ["layout-stack", "layout-grid"],
       "group": "composition",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "layout-settings",
@@ -9056,16 +7740,9 @@
       "summary": "Settings section list plus detail pane.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Account and workspace settings"
-      ],
-      "dontUseWhen": [
-        "Primary app navigation"
-      ],
-      "a11y": [
-        "Section list is labelled",
-        "Phone back control is named"
-      ],
+      "useWhen": ["Account and workspace settings"],
+      "dontUseWhen": ["Primary app navigation"],
+      "a11y": ["Section list is labelled", "Phone back control is named"],
       "props": [
         {
           "name": "title",
@@ -9129,9 +7806,7 @@
           }
         }
       ],
-      "related": [
-        "layout-wizard"
-      ],
+      "related": ["layout-wizard"],
       "group": "layouts",
       "emit": []
     },
@@ -9142,12 +7817,8 @@
       "summary": "App sidebar column with responsive drawer fallback.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Desktop apps with persistent primary navigation"
-      ],
-      "dontUseWhen": [
-        "Marketing landing pages"
-      ],
+      "useWhen": ["Desktop apps with persistent primary navigation"],
+      "dontUseWhen": ["Marketing landing pages"],
       "a11y": [
         "Skip link targets main when chrome is present",
         "Primary navigation is a labelled landmark"
@@ -9208,10 +7879,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "layout-host",
-        "layout-chrome"
-      ],
+      "related": ["layout-host", "layout-chrome"],
       "group": "layouts",
       "emit": []
     },
@@ -9222,12 +7890,8 @@
       "summary": "Two panes side by side at a fixed ratio, stacked on narrow screens.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Show a primary pane with a supporting pane, such as text beside a chart"
-      ],
-      "dontUseWhen": [
-        "App chrome shells (sidebar, top-nav, dialogs)"
-      ],
+      "useWhen": ["Show a primary pane with a supporting pane, such as text beside a chart"],
+      "dontUseWhen": ["App chrome shells (sidebar, top-nav, dialogs)"],
       "a11y": [
         "DOM order stays reading order; the layout never reorders children visually",
         "Logical properties only, so right-to-left content mirrors"
@@ -9236,24 +7900,13 @@
         {
           "name": "ratio",
           "kind": "enum",
-          "enumValues": [
-            "1:1",
-            "1:2",
-            "2:1",
-            "1:3",
-            "3:1"
-          ],
+          "enumValues": ["1:1", "1:2", "2:1", "1:3", "3:1"],
           "default": "1:1"
         },
         {
           "name": "gap",
           "kind": "enum",
-          "enumValues": [
-            "none",
-            "small",
-            "medium",
-            "large"
-          ],
+          "enumValues": ["none", "small", "medium", "large"],
           "description": "Space between children."
         },
         {
@@ -9270,15 +7923,9 @@
           }
         }
       ],
-      "related": [
-        "layout-row",
-        "layout-grid"
-      ],
+      "related": ["layout-row", "layout-grid"],
       "group": "composition",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "layout-stack",
@@ -9287,12 +7934,8 @@
       "summary": "Children in one column, in reading order, with a fixed gap.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Group content vertically with consistent spacing"
-      ],
-      "dontUseWhen": [
-        "App chrome shells (sidebar, top-nav, dialogs)"
-      ],
+      "useWhen": ["Group content vertically with consistent spacing"],
+      "dontUseWhen": ["App chrome shells (sidebar, top-nav, dialogs)"],
       "a11y": [
         "DOM order stays reading order; the layout never reorders children visually",
         "Logical properties only, so right-to-left content mirrors"
@@ -9301,12 +7944,7 @@
         {
           "name": "gap",
           "kind": "enum",
-          "enumValues": [
-            "none",
-            "small",
-            "medium",
-            "large"
-          ],
+          "enumValues": ["none", "small", "medium", "large"],
           "description": "Space between children."
         },
         {
@@ -9323,15 +7961,9 @@
           }
         }
       ],
-      "related": [
-        "layout-row",
-        "layout-split"
-      ],
+      "related": ["layout-row", "layout-split"],
       "group": "composition",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "layout-tile",
@@ -9340,12 +7972,8 @@
       "summary": "A titled tile inside layout-grid that can span several columns or rows.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Make one dashboard tile wider or taller than its neighbors"
-      ],
-      "dontUseWhen": [
-        "App chrome shells (sidebar, top-nav, dialogs)"
-      ],
+      "useWhen": ["Make one dashboard tile wider or taller than its neighbors"],
+      "dontUseWhen": ["App chrome shells (sidebar, top-nav, dialogs)"],
       "a11y": [
         "DOM order stays reading order; the layout never reorders children visually",
         "Logical properties only, so right-to-left content mirrors"
@@ -9383,15 +8011,9 @@
           }
         }
       ],
-      "related": [
-        "layout-grid",
-        "layout-card"
-      ],
+      "related": ["layout-grid", "layout-card"],
       "group": "composition",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "layout-top-nav",
@@ -9400,12 +8022,8 @@
       "summary": "Horizontal top navigation with optional mobile menu.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Product shells with a top bar"
-      ],
-      "dontUseWhen": [
-        "Dense multi-section sidebars"
-      ],
+      "useWhen": ["Product shells with a top bar"],
+      "dontUseWhen": ["Dense multi-section sidebars"],
       "a11y": [
         "Skip link targets main when chrome is present",
         "Primary navigation is a labelled landmark"
@@ -9466,10 +8084,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "layout-host",
-        "layout-chrome"
-      ],
+      "related": ["layout-host", "layout-chrome"],
       "group": "layouts",
       "emit": []
     },
@@ -9480,16 +8095,9 @@
       "summary": "Centered onboarding wizard frame with steps.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Multi-step setup and onboarding"
-      ],
-      "dontUseWhen": [
-        "Single-page forms"
-      ],
-      "a11y": [
-        "Steps expose current position",
-        "Back and next controls are named"
-      ],
+      "useWhen": ["Multi-step setup and onboarding"],
+      "dontUseWhen": ["Single-page forms"],
+      "a11y": ["Steps expose current position", "Back and next controls are named"],
       "props": [
         {
           "name": "steps",
@@ -9573,10 +8181,7 @@
           }
         }
       ],
-      "related": [
-        "layout-auth-split",
-        "layout-settings"
-      ],
+      "related": ["layout-auth-split", "layout-settings"],
       "group": "layouts",
       "emit": []
     },
@@ -9587,12 +8192,8 @@
       "summary": "A validated layered composition rendered to a canvas.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render canvas composition from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render canvas composition from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -9606,10 +8207,7 @@
         {
           "name": "trust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ]
+          "enumValues": ["developer", "untrusted"]
         },
         {
           "name": "label",
@@ -9626,10 +8224,7 @@
         {
           "name": "dir",
           "kind": "enum",
-          "enumValues": [
-            "ltr",
-            "rtl"
-          ]
+          "enumValues": ["ltr", "rtl"]
         },
         {
           "name": "fontFamily",
@@ -9664,10 +8259,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "media-composition-svg",
@@ -9676,12 +8268,8 @@
       "summary": "A validated, structured vector composition.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render svg composition from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render svg composition from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -9695,10 +8283,7 @@
         {
           "name": "trust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ]
+          "enumValues": ["developer", "untrusted"]
         },
         {
           "name": "title",
@@ -9739,10 +8324,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "media-image",
@@ -9751,12 +8333,8 @@
       "summary": "A responsive image with URL validation, loading states and actions.",
       "tier": "content",
       "agentEmittable": true,
-      "useWhen": [
-        "Render responsive image from structured content data."
-      ],
-      "dontUseWhen": [
-        "Application navigation, account controls or mutations."
-      ],
+      "useWhen": ["Render responsive image from structured content data."],
+      "dontUseWhen": ["Application navigation, account controls or mutations."],
       "a11y": [
         "Provide the required accessible title, description or text alternatives.",
         "Keep data available in the component-provided text or table alternative."
@@ -9802,13 +8380,7 @@
         {
           "name": "fit",
           "kind": "enum",
-          "enumValues": [
-            "cover",
-            "contain",
-            "fill",
-            "none",
-            "scale-down"
-          ]
+          "enumValues": ["cover", "contain", "fill", "none", "scale-down"]
         },
         {
           "name": "focalPoint",
@@ -9821,27 +8393,17 @@
         {
           "name": "loading",
           "kind": "enum",
-          "enumValues": [
-            "eager",
-            "lazy"
-          ]
+          "enumValues": ["eager", "lazy"]
         },
         {
           "name": "fetchPriority",
           "kind": "enum",
-          "enumValues": [
-            "high",
-            "low",
-            "auto"
-          ]
+          "enumValues": ["high", "low", "auto"]
         },
         {
           "name": "trust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ]
+          "enumValues": ["developer", "untrusted"]
         },
         {
           "name": "href",
@@ -9893,10 +8455,7 @@
         }
       ],
       "group": "content",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "menubar",
@@ -9905,12 +8464,8 @@
       "summary": "Application menubar with roving top-level items.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Desktop-style File/Edit/View bars"
-      ],
-      "dontUseWhen": [
-        "A single actions button (use dropdown-menu)"
-      ],
+      "useWhen": ["Desktop-style File/Edit/View bars"],
+      "dontUseWhen": ["A single actions button (use dropdown-menu)"],
       "a11y": "role=menubar; one Tab stop; arrows move between menus.",
       "props": [
         {
@@ -9934,10 +8489,7 @@
         {
           "name": "dir",
           "kind": "enum",
-          "enumValues": [
-            "ltr",
-            "rtl"
-          ]
+          "enumValues": ["ltr", "rtl"]
         }
       ],
       "examples": [
@@ -9949,10 +8501,7 @@
           }
         }
       ],
-      "related": [
-        "menubar-trigger",
-        "dropdown-menu"
-      ],
+      "related": ["menubar-trigger", "dropdown-menu"],
       "group": "overlays",
       "emit": []
     },
@@ -9963,31 +8512,20 @@
       "summary": "Top-level menubar item that opens a menu.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Label a menubar menu"
-      ],
-      "dontUseWhen": [
-        "Dropdown button triggers"
-      ],
+      "useWhen": ["Label a menubar menu"],
+      "dontUseWhen": ["Dropdown button triggers"],
       "a11y": "role=menuitem with aria-haspopup=menu.",
       "props": [
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "default",
-            "soft"
-          ],
+          "enumValues": ["default", "soft"],
           "default": "default"
         },
         {
@@ -10011,9 +8549,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "menubar"
-      ],
+      "related": ["menubar"],
       "group": "overlays",
       "emit": []
     },
@@ -10024,9 +8560,7 @@
       "summary": "A combobox for several values, shown as removable chips.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Choose several values from a long list by typing"
-      ],
+      "useWhen": ["Choose several values from a long list by typing"],
       "dontUseWhen": [
         "One value (use combobox or select)",
         "A few independent options (use checkbox)"
@@ -10106,20 +8640,13 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "outline",
-            "soft"
-          ],
+          "enumValues": ["outline", "soft"],
           "default": "outline"
         },
         {
@@ -10154,12 +8681,7 @@
           }
         }
       ],
-      "related": [
-        "combobox",
-        "checkbox",
-        "field",
-        "form"
-      ],
+      "related": ["combobox", "checkbox", "field", "form"],
       "group": "forms",
       "emit": []
     },
@@ -10170,12 +8692,8 @@
       "summary": "Renders a nav model icon by name or component.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Layout chrome needs a consistent nav icon"
-      ],
-      "dontUseWhen": [
-        "Arbitrary illustration outside nav"
-      ],
+      "useWhen": ["Layout chrome needs a consistent nav icon"],
+      "dontUseWhen": ["Arbitrary illustration outside nav"],
       "a11y": "Decorative by default; pass label when the icon is the only name.",
       "props": [
         {
@@ -10202,9 +8720,7 @@
           }
         }
       ],
-      "related": [
-        "layout-chrome"
-      ],
+      "related": ["layout-chrome"],
       "group": "layouts",
       "emit": []
     },
@@ -10215,13 +8731,8 @@
       "summary": "Site or app navigation with expandable triggers and links.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Primary site navigation with flyouts"
-      ],
-      "dontUseWhen": [
-        "In-page tabs (use tabs)",
-        "App menubar (use menubar)"
-      ],
+      "useWhen": ["Primary site navigation with flyouts"],
+      "dontUseWhen": ["In-page tabs (use tabs)", "App menubar (use menubar)"],
       "a11y": "Landmarks and link semantics; triggers expose expanded state.",
       "props": [
         {
@@ -10231,19 +8742,13 @@
         {
           "name": "orientation",
           "kind": "enum",
-          "enumValues": [
-            "horizontal",
-            "vertical"
-          ],
+          "enumValues": ["horizontal", "vertical"],
           "default": "horizontal"
         },
         {
           "name": "dir",
           "kind": "enum",
-          "enumValues": [
-            "ltr",
-            "rtl"
-          ]
+          "enumValues": ["ltr", "rtl"]
         },
         {
           "name": "delayDuration",
@@ -10271,11 +8776,7 @@
           }
         }
       ],
-      "related": [
-        "menubar",
-        "breadcrumb",
-        "sidebar"
-      ],
+      "related": ["menubar", "breadcrumb", "sidebar"],
       "group": "overlays",
       "emit": []
     },
@@ -10286,12 +8787,8 @@
       "summary": "Page controls for long lists.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Paging tables or search results"
-      ],
-      "dontUseWhen": [
-        "Infinite scroll only feeds"
-      ],
+      "useWhen": ["Paging tables or search results"],
+      "dontUseWhen": ["Infinite scroll only feeds"],
       "a11y": "Named navigation; previous/next buttons disabled at ends.",
       "props": [
         {
@@ -10307,20 +8804,13 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "outline",
-            "soft"
-          ],
+          "enumValues": ["outline", "soft"],
           "default": "outline"
         },
         {
@@ -10350,10 +8840,7 @@
           }
         }
       ],
-      "related": [
-        "breadcrumb",
-        "table"
-      ],
+      "related": ["breadcrumb", "table"],
       "group": "overlays",
       "emit": []
     },
@@ -10364,14 +8851,8 @@
       "summary": "Non-modal floating panel anchored to a trigger.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Lightweight detail next to a control",
-        "Pickers that are not full dialogs"
-      ],
-      "dontUseWhen": [
-        "Modal workflows (use dialog)",
-        "Single-line hints (use tooltip)"
-      ],
+      "useWhen": ["Lightweight detail next to a control", "Pickers that are not full dialogs"],
+      "dontUseWhen": ["Modal workflows (use dialog)", "Single-line hints (use tooltip)"],
       "a11y": "Focus can move into the panel; Escape dismisses.",
       "props": [
         {
@@ -10397,11 +8878,7 @@
           }
         }
       ],
-      "related": [
-        "hover-card",
-        "tooltip",
-        "dialog"
-      ],
+      "related": ["hover-card", "tooltip", "dialog"],
       "group": "overlays",
       "emit": []
     },
@@ -10412,31 +8889,20 @@
       "summary": "Styled popover surface with optional arrow.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Body of a popover"
-      ],
-      "dontUseWhen": [
-        "Menu lists (use dropdown-menu-content)"
-      ],
+      "useWhen": ["Body of a popover"],
+      "dontUseWhen": ["Menu lists (use dropdown-menu-content)"],
       "a11y": "Provide a visible heading or aria-label when needed.",
       "props": [
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "elevated",
-            "flat"
-          ],
+          "enumValues": ["elevated", "flat"],
           "default": "elevated"
         },
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
@@ -10455,22 +8921,13 @@
         {
           "name": "side",
           "kind": "enum",
-          "enumValues": [
-            "top",
-            "right",
-            "bottom",
-            "left"
-          ],
+          "enumValues": ["top", "right", "bottom", "left"],
           "default": "bottom"
         },
         {
           "name": "align",
           "kind": "enum",
-          "enumValues": [
-            "start",
-            "center",
-            "end"
-          ],
+          "enumValues": ["start", "center", "end"],
           "default": "center"
         },
         {
@@ -10493,9 +8950,7 @@
           }
         }
       ],
-      "related": [
-        "popover"
-      ],
+      "related": ["popover"],
       "group": "overlays",
       "emit": []
     },
@@ -10506,12 +8961,8 @@
       "summary": "One option inside a RadioGroup.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "A single exclusive option inside radio-group"
-      ],
-      "dontUseWhen": [
-        "Independent toggles (use checkbox or switch)"
-      ],
+      "useWhen": ["A single exclusive option inside radio-group"],
+      "dontUseWhen": ["Independent toggles (use checkbox or switch)"],
       "a11y": "value is required; card layout keeps the label associated with the control.",
       "props": [
         {
@@ -10539,10 +8990,7 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md"
-          ],
+          "enumValues": ["sm", "md"],
           "default": "md"
         },
         {
@@ -10569,10 +9017,7 @@
           }
         }
       ],
-      "related": [
-        "radio-group",
-        "checkbox"
-      ],
+      "related": ["radio-group", "checkbox"],
       "group": "forms",
       "emit": []
     },
@@ -10583,13 +9028,8 @@
       "summary": "A set of exclusive radio options with keyboard roving.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Pick exactly one option from a short closed set"
-      ],
-      "dontUseWhen": [
-        "Many options with search (use select or combobox)",
-        "Independent toggles"
-      ],
+      "useWhen": ["Pick exactly one option from a short closed set"],
+      "dontUseWhen": ["Many options with search (use select or combobox)", "Independent toggles"],
       "a11y": "Arrow keys move focus; Space selects; loop wraps at the ends.",
       "props": [
         {
@@ -10622,28 +9062,19 @@
         {
           "name": "orientation",
           "kind": "enum",
-          "enumValues": [
-            "vertical",
-            "horizontal"
-          ],
+          "enumValues": ["vertical", "horizontal"],
           "default": "vertical"
         },
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "default",
-            "card"
-          ],
+          "enumValues": ["default", "card"],
           "default": "default"
         },
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md"
-          ],
+          "enumValues": ["sm", "md"],
           "default": "md"
         },
         {
@@ -10684,11 +9115,7 @@
           }
         }
       ],
-      "related": [
-        "radio",
-        "select",
-        "checkbox"
-      ],
+      "related": ["radio", "select", "checkbox"],
       "group": "forms",
       "emit": []
     },
@@ -10699,37 +9126,20 @@
       "summary": "Dialog on large screens, drawer/sheet on small screens.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "One flow that should adapt across breakpoints"
-      ],
-      "dontUseWhen": [
-        "Fixed desktop-only dialogs"
-      ],
+      "useWhen": ["One flow that should adapt across breakpoints"],
+      "dontUseWhen": ["Fixed desktop-only dialogs"],
       "a11y": "Preserves dialog semantics on large viewports.",
       "props": [
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg",
-            "xl"
-          ],
+          "enumValues": ["sm", "md", "lg", "xl"],
           "default": "md"
         },
         {
           "name": "side",
           "kind": "enum",
-          "enumValues": [
-            "top",
-            "right",
-            "bottom",
-            "left",
-            "start",
-            "end",
-            "center"
-          ],
+          "enumValues": ["top", "right", "bottom", "left", "start", "end", "center"],
           "default": "bottom"
         },
         {
@@ -10750,10 +9160,7 @@
           }
         }
       ],
-      "related": [
-        "dialog",
-        "drawer"
-      ],
+      "related": ["dialog", "drawer"],
       "group": "overlays",
       "emit": []
     },
@@ -10764,12 +9171,8 @@
       "summary": "Stable screen mount point that survives layout switches.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "LayoutHost needs a durable screen node"
-      ],
-      "dontUseWhen": [
-        "Static pages without layout switching"
-      ],
+      "useWhen": ["LayoutHost needs a durable screen node"],
+      "dontUseWhen": ["Static pages without layout switching"],
       "a11y": "Outlet is a plain region; screen content supplies its own landmarks.",
       "props": [
         {
@@ -10790,9 +9193,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "layout-host"
-      ],
+      "related": ["layout-host"],
       "group": "layouts",
       "emit": []
     },
@@ -10803,9 +9204,7 @@
       "summary": "A single-value select root with size and variant chrome.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Pick one value from a moderate closed list"
-      ],
+      "useWhen": ["Pick one value from a moderate closed list"],
       "dontUseWhen": [
         "A short exclusive set that fits on the page (use radio-group)",
         "Free text with suggestions (use combobox)"
@@ -10850,9 +9249,7 @@
         {
           "name": "type",
           "kind": "enum",
-          "enumValues": [
-            "single"
-          ],
+          "enumValues": ["single"],
           "default": "single"
         },
         {
@@ -10873,20 +9270,13 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "outline",
-            "soft"
-          ],
+          "enumValues": ["outline", "soft"],
           "default": "outline"
         },
         {
@@ -10931,22 +9321,14 @@
       "summary": "The positioned listbox surface for Select items.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Wrap Select items and groups"
-      ],
-      "dontUseWhen": [
-        "A free-floating popover (use popover)"
-      ],
+      "useWhen": ["Wrap Select items and groups"],
+      "dontUseWhen": ["A free-floating popover (use popover)"],
       "a11y": "role=listbox; focus stays in the trigger while the list is open.",
       "props": [
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
@@ -10967,11 +9349,7 @@
           }
         }
       ],
-      "related": [
-        "select",
-        "select-item",
-        "select-viewport"
-      ],
+      "related": ["select", "select-item", "select-viewport"],
       "group": "forms",
       "emit": []
     },
@@ -10982,12 +9360,8 @@
       "summary": "Groups related Select items under an optional label.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Cluster related options inside a long Select"
-      ],
-      "dontUseWhen": [
-        "A single flat list of options"
-      ],
+      "useWhen": ["Cluster related options inside a long Select"],
+      "dontUseWhen": ["A single flat list of options"],
       "a11y": "role=group; pair with Select.Label for an accessible name.",
       "props": [
         {
@@ -11006,10 +9380,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "select-label",
-        "select-item"
-      ],
+      "related": ["select-label", "select-item"],
       "group": "forms",
       "emit": []
     },
@@ -11020,12 +9391,8 @@
       "summary": "One selectable option inside Select.Content.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Declare a Select option with value and label"
-      ],
-      "dontUseWhen": [
-        "A radio option outside Select (use radio)"
-      ],
+      "useWhen": ["Declare a Select option with value and label"],
+      "dontUseWhen": ["A radio option outside Select (use radio)"],
       "a11y": "role=option; disabled items are skipped by keyboard.",
       "props": [
         {
@@ -11071,11 +9438,7 @@
           }
         }
       ],
-      "related": [
-        "select",
-        "select-content",
-        "select-group"
-      ],
+      "related": ["select", "select-content", "select-group"],
       "group": "forms",
       "emit": []
     },
@@ -11086,12 +9449,8 @@
       "summary": "A non-interactive heading inside a Select group.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Name a Select.Group"
-      ],
-      "dontUseWhen": [
-        "A selectable option (use select-item)"
-      ],
+      "useWhen": ["Name a Select.Group"],
+      "dontUseWhen": ["A selectable option (use select-item)"],
       "a11y": "Not focusable; provides visible structure only.",
       "props": [
         {
@@ -11110,9 +9469,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "select-group"
-      ],
+      "related": ["select-group"],
       "group": "forms",
       "emit": []
     },
@@ -11123,12 +9480,8 @@
       "summary": "Portals Select.Content out of overflow-clipped ancestors.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Select must escape a scroll or overflow container"
-      ],
-      "dontUseWhen": [
-        "Inline content that fits in-flow"
-      ],
+      "useWhen": ["Select must escape a scroll or overflow container"],
+      "dontUseWhen": ["Inline content that fits in-flow"],
       "a11y": "Does not change roles; children keep listbox semantics.",
       "props": [
         {
@@ -11143,9 +9496,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "select-content"
-      ],
+      "related": ["select-content"],
       "group": "forms",
       "emit": []
     },
@@ -11156,12 +9507,8 @@
       "summary": "A visual divider between Select groups or items.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Separate option clusters inside Select"
-      ],
-      "dontUseWhen": [
-        "Page-level section breaks"
-      ],
+      "useWhen": ["Separate option clusters inside Select"],
+      "dontUseWhen": ["Page-level section breaks"],
       "a11y": "Decorative separator; not in the tab order.",
       "props": [
         {
@@ -11176,10 +9523,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "select-group",
-        "select-content"
-      ],
+      "related": ["select-group", "select-content"],
       "group": "forms",
       "emit": []
     },
@@ -11190,31 +9534,20 @@
       "summary": "The button that opens a Select listbox.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Compose a Select with custom trigger content"
-      ],
-      "dontUseWhen": [
-        "A standalone button outside Select"
-      ],
+      "useWhen": ["Compose a Select with custom trigger content"],
+      "dontUseWhen": ["A standalone button outside Select"],
       "a11y": "aria-haspopup=listbox and aria-expanded reflect open state.",
       "props": [
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg"
-          ],
+          "enumValues": ["sm", "md", "lg"],
           "default": "md"
         },
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "outline",
-            "soft"
-          ],
+          "enumValues": ["outline", "soft"],
           "default": "outline"
         },
         {
@@ -11236,10 +9569,7 @@
           }
         }
       ],
-      "related": [
-        "select",
-        "select-value"
-      ],
+      "related": ["select", "select-value"],
       "group": "forms",
       "emit": []
     },
@@ -11250,12 +9580,8 @@
       "summary": "Shows the selected label or a placeholder inside the trigger.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Display the current Select value"
-      ],
-      "dontUseWhen": [
-        "Static text outside Select"
-      ],
+      "useWhen": ["Display the current Select value"],
+      "dontUseWhen": ["Static text outside Select"],
       "a11y": "Placeholder is visible text inside the trigger name.",
       "props": [
         {
@@ -11281,10 +9607,7 @@
           }
         }
       ],
-      "related": [
-        "select",
-        "select-trigger"
-      ],
+      "related": ["select", "select-trigger"],
       "group": "forms",
       "emit": []
     },
@@ -11295,12 +9618,8 @@
       "summary": "Scrollable viewport inside Select.Content.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Long option lists that need an internal scroll region"
-      ],
-      "dontUseWhen": [
-        "Short lists that fit without scrolling"
-      ],
+      "useWhen": ["Long option lists that need an internal scroll region"],
+      "dontUseWhen": ["Short lists that fit without scrolling"],
       "a11y": "Keeps option focus management inside the listbox.",
       "props": [
         {
@@ -11319,10 +9638,7 @@
           "props": {}
         }
       ],
-      "related": [
-        "select-content",
-        "select-item"
-      ],
+      "related": ["select-content", "select-item"],
       "group": "forms",
       "emit": []
     },
@@ -11333,37 +9649,20 @@
       "summary": "Edge-anchored modal panel (drawer-like sheet).",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Mobile filters, detail rails, edge panels"
-      ],
-      "dontUseWhen": [
-        "Centered modal forms (use dialog)"
-      ],
+      "useWhen": ["Mobile filters, detail rails, edge panels"],
+      "dontUseWhen": ["Centered modal forms (use dialog)"],
       "a11y": "Focus trapped while open; Escape dismisses.",
       "props": [
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md",
-            "lg",
-            "xl"
-          ],
+          "enumValues": ["sm", "md", "lg", "xl"],
           "default": "md"
         },
         {
           "name": "side",
           "kind": "enum",
-          "enumValues": [
-            "top",
-            "right",
-            "bottom",
-            "left",
-            "start",
-            "end",
-            "center"
-          ],
+          "enumValues": ["top", "right", "bottom", "left", "start", "end", "center"],
           "default": "start"
         },
         {
@@ -11403,11 +9702,7 @@
           }
         }
       ],
-      "related": [
-        "drawer",
-        "dialog",
-        "sidebar"
-      ],
+      "related": ["drawer", "dialog", "sidebar"],
       "group": "overlays",
       "emit": []
     },
@@ -11418,12 +9713,8 @@
       "summary": "Collapsible app rail with sections, badges and safe links.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Primary app navigation rail"
-      ],
-      "dontUseWhen": [
-        "Marketing site nav (use navigation-menu)"
-      ],
+      "useWhen": ["Primary app navigation rail"],
+      "dontUseWhen": ["Marketing site nav (use navigation-menu)"],
       "a11y": "nav landmark; collapsed items keep accessible names via tooltips.",
       "props": [
         {
@@ -11452,10 +9743,7 @@
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "default",
-            "inset"
-          ],
+          "enumValues": ["default", "inset"],
           "default": "default"
         },
         {
@@ -11486,10 +9774,7 @@
         {
           "name": "hrefTrust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ],
+          "enumValues": ["developer", "untrusted"],
           "default": "developer",
           "trust": "developer"
         },
@@ -11519,11 +9804,7 @@
           }
         }
       ],
-      "related": [
-        "app-nav",
-        "navigation-menu",
-        "sheet"
-      ],
+      "related": ["app-nav", "navigation-menu", "sheet"],
       "group": "overlays",
       "emit": []
     },
@@ -11590,18 +9871,10 @@
           }
         }
       ],
-      "related": [
-        "data-board",
-        "blocks-structure"
-      ],
-      "events": [
-        "move"
-      ],
+      "related": ["data-board", "blocks-structure"],
+      "events": ["move"],
       "group": "state",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     },
     {
       "id": "split-view",
@@ -11610,16 +9883,9 @@
       "summary": "Master-detail split with list and detail panes.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "List/detail workflows on wide screens"
-      ],
-      "dontUseWhen": [
-        "Single-stream feeds"
-      ],
-      "a11y": [
-        "List and detail regions are labelled",
-        "Narrow containers show one pane at a time"
-      ],
+      "useWhen": ["List/detail workflows on wide screens"],
+      "dontUseWhen": ["Single-stream feeds"],
+      "a11y": ["List and detail regions are labelled", "Narrow containers show one pane at a time"],
       "props": [
         {
           "name": "list",
@@ -11663,9 +9929,7 @@
           }
         }
       ],
-      "related": [
-        "layout-dual-sidebar"
-      ],
+      "related": ["layout-dual-sidebar"],
       "group": "layouts",
       "emit": []
     },
@@ -11676,12 +9940,8 @@
       "summary": "A single metric with optional delta, trend and sparkline slot.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Show one KPI with a human-formatted value"
-      ],
-      "dontUseWhen": [
-        "A currency/percent KPI with previous period math (use kpi)"
-      ],
+      "useWhen": ["Show one KPI with a human-formatted value"],
+      "dontUseWhen": ["A currency/percent KPI with previous period math (use kpi)"],
       "a11y": "Label and value are text; trend has a spoken word, not color alone.",
       "props": [
         {
@@ -11703,20 +9963,13 @@
         {
           "name": "trend",
           "kind": "enum",
-          "enumValues": [
-            "up",
-            "down",
-            "neutral"
-          ]
+          "enumValues": ["up", "down", "neutral"]
         },
         {
           "name": "positive",
           "kind": "enum",
           "description": "Which direction is good",
-          "enumValues": [
-            "up",
-            "down"
-          ],
+          "enumValues": ["up", "down"],
           "default": "up"
         },
         {
@@ -11734,10 +9987,7 @@
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "elevated",
-            "flat"
-          ],
+          "enumValues": ["elevated", "flat"],
           "default": "elevated"
         },
         {
@@ -11757,10 +10007,7 @@
           }
         }
       ],
-      "related": [
-        "kpi",
-        "card"
-      ],
+      "related": ["kpi", "card"],
       "group": "display",
       "emit": []
     },
@@ -11771,12 +10018,8 @@
       "summary": "Horizontal or vertical progress through ordered steps.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Show multi-step onboarding or checkout progress"
-      ],
-      "dontUseWhen": [
-        "A chronological event log (use timeline)"
-      ],
+      "useWhen": ["Show multi-step onboarding or checkout progress"],
+      "dontUseWhen": ["A chronological event log (use timeline)"],
       "a11y": "nav with an accessible name; current step is announced; completed steps may be activatable.",
       "props": [
         {
@@ -11799,10 +10042,7 @@
         {
           "name": "orientation",
           "kind": "enum",
-          "enumValues": [
-            "horizontal",
-            "vertical"
-          ],
+          "enumValues": ["horizontal", "vertical"],
           "default": "horizontal"
         },
         {
@@ -11843,10 +10083,7 @@
           }
         }
       ],
-      "related": [
-        "timeline",
-        "layout-wizard"
-      ],
+      "related": ["timeline", "layout-wizard"],
       "group": "display",
       "emit": []
     },
@@ -11857,12 +10094,8 @@
       "summary": "An immediate on/off setting control.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Settings that take effect immediately"
-      ],
-      "dontUseWhen": [
-        "A form agreement that must be submitted (use checkbox)"
-      ],
+      "useWhen": ["Settings that take effect immediately"],
+      "dontUseWhen": ["A form agreement that must be submitted (use checkbox)"],
       "a11y": "role=switch with aria-checked; label wires the accessible name.",
       "props": [
         {
@@ -11909,10 +10142,7 @@
         {
           "name": "size",
           "kind": "enum",
-          "enumValues": [
-            "sm",
-            "md"
-          ],
+          "enumValues": ["sm", "md"],
           "default": "md"
         },
         {
@@ -11934,9 +10164,7 @@
           }
         }
       ],
-      "related": [
-        "checkbox"
-      ],
+      "related": ["checkbox"],
       "group": "forms",
       "emit": []
     },
@@ -11947,13 +10175,8 @@
       "summary": "A responsive data table with density, stacking and sticky header options.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Tabular comparison of many rows and columns"
-      ],
-      "dontUseWhen": [
-        "A single metric (use stat or kpi)",
-        "A free-form card layout"
-      ],
+      "useWhen": ["Tabular comparison of many rows and columns"],
+      "dontUseWhen": ["A single metric (use stat or kpi)", "A free-form card layout"],
       "a11y": [
         "Real table markup with caption or label for the scroll region",
         "Stacked mode keeps labels associated with cells",
@@ -11963,32 +10186,20 @@
         {
           "name": "variant",
           "kind": "enum",
-          "enumValues": [
-            "plain",
-            "striped",
-            "grid"
-          ],
+          "enumValues": ["plain", "striped", "grid"],
           "default": "plain"
         },
         {
           "name": "density",
           "kind": "enum",
-          "enumValues": [
-            "compact",
-            "default",
-            "comfortable"
-          ],
+          "enumValues": ["compact", "default", "comfortable"],
           "default": "default"
         },
         {
           "name": "stack",
           "kind": "enum",
           "description": "Stack rows into labelled cards when the container is narrow",
-          "enumValues": [
-            "never",
-            "sm",
-            "md"
-          ],
+          "enumValues": ["never", "sm", "md"],
           "default": "never"
         },
         {
@@ -12032,10 +10243,7 @@
           }
         }
       ],
-      "related": [
-        "stat",
-        "empty-state"
-      ],
+      "related": ["stat", "empty-state"],
       "group": "display",
       "emit": []
     },
@@ -12046,13 +10254,8 @@
       "summary": "A labeled chip that can be removed.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Show a selected filter or category the user can remove"
-      ],
-      "dontUseWhen": [
-        "Static status (use badge)",
-        "A pressed filter control (use chip)"
-      ],
+      "useWhen": ["Show a selected filter or category the user can remove"],
+      "dontUseWhen": ["Static status (use badge)", "A pressed filter control (use chip)"],
       "a11y": "Remove control has an accessible name; pending remove is disabled.",
       "props": [
         {
@@ -12106,10 +10309,7 @@
           }
         }
       ],
-      "related": [
-        "badge",
-        "chip"
-      ],
+      "related": ["badge", "chip"],
       "group": "display",
       "emit": []
     },
@@ -12120,12 +10320,8 @@
       "summary": "An input or textarea that shows remaining characters near the limit.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Bounded free-text with a visible remaining count"
-      ],
-      "dontUseWhen": [
-        "Unbounded text without a max length"
-      ],
+      "useWhen": ["Bounded free-text with a visible remaining count"],
+      "dontUseWhen": ["Unbounded text without a max length"],
       "a11y": "Remaining count is exposed via aria-describedby while focused near the limit.",
       "props": [
         {
@@ -12135,10 +10331,7 @@
         {
           "name": "tag",
           "kind": "enum",
-          "enumValues": [
-            "input",
-            "textarea"
-          ],
+          "enumValues": ["input", "textarea"],
           "default": "input"
         },
         {
@@ -12228,11 +10421,7 @@
           }
         }
       ],
-      "related": [
-        "input",
-        "textarea",
-        "field"
-      ],
+      "related": ["input", "textarea", "field"],
       "group": "forms",
       "emit": []
     },
@@ -12243,12 +10432,8 @@
       "summary": "A multi-line text control with optional autosize.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Longer free-text fields (notes, comments, descriptions)"
-      ],
-      "dontUseWhen": [
-        "A single-line value (use input)"
-      ],
+      "useWhen": ["Longer free-text fields (notes, comments, descriptions)"],
+      "dontUseWhen": ["A single-line value (use input)"],
       "a11y": "Pair with Field or an external label; autosize disables manual resize.",
       "props": [
         {
@@ -12298,11 +10483,7 @@
           }
         }
       ],
-      "related": [
-        "input",
-        "text-counter",
-        "field"
-      ],
+      "related": ["input", "text-counter", "field"],
       "group": "forms",
       "emit": []
     },
@@ -12313,12 +10494,8 @@
       "summary": "Vertical or horizontal chronological list of events.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Show a sequence of events with status"
-      ],
-      "dontUseWhen": [
-        "A Gantt schedule with dependencies (use @texuli/data/timeline)"
-      ],
+      "useWhen": ["Show a sequence of events with status"],
+      "dontUseWhen": ["A Gantt schedule with dependencies (use @texuli/data/timeline)"],
       "a11y": [
         "Ordered list with an accessible name",
         "Status has a spoken word and marker shape, not color alone",
@@ -12333,10 +10510,7 @@
         {
           "name": "orientation",
           "kind": "enum",
-          "enumValues": [
-            "vertical",
-            "horizontal"
-          ],
+          "enumValues": ["vertical", "horizontal"],
           "default": "vertical"
         },
         {
@@ -12351,10 +10525,7 @@
         {
           "name": "hrefTrust",
           "kind": "enum",
-          "enumValues": [
-            "developer",
-            "untrusted"
-          ],
+          "enumValues": ["developer", "untrusted"],
           "default": "developer"
         },
         {
@@ -12396,9 +10567,7 @@
           }
         }
       ],
-      "related": [
-        "stepper"
-      ],
+      "related": ["stepper"],
       "group": "display",
       "emit": []
     },
@@ -12409,12 +10578,8 @@
       "summary": "Live region that renders toast notifications from the shared store.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Transient success/error feedback after an action"
-      ],
-      "dontUseWhen": [
-        "Blocking errors that need a decision (use alert-dialog)"
-      ],
+      "useWhen": ["Transient success/error feedback after an action"],
+      "dontUseWhen": ["Blocking errors that need a decision (use alert-dialog)"],
       "a11y": "role=region with polite live updates; dismiss controls are labelled.",
       "props": [
         {
@@ -12465,10 +10630,7 @@
           }
         }
       ],
-      "related": [
-        "alert-dialog",
-        "banner"
-      ],
+      "related": ["alert-dialog", "banner"],
       "group": "overlays",
       "emit": []
     },
@@ -12479,13 +10641,8 @@
       "summary": "Short delayed hint on hover or focus.",
       "tier": "app",
       "agentEmittable": false,
-      "useWhen": [
-        "Icon-only controls need a name",
-        "Optional keyboard shortcut hints"
-      ],
-      "dontUseWhen": [
-        "Essential instructions (put them in visible copy)"
-      ],
+      "useWhen": ["Icon-only controls need a name", "Optional keyboard shortcut hints"],
+      "dontUseWhen": ["Essential instructions (put them in visible copy)"],
       "a11y": "Shows on focus; content is plain text or a snippet, never a sink.",
       "props": [
         {
@@ -12508,22 +10665,13 @@
         {
           "name": "side",
           "kind": "enum",
-          "enumValues": [
-            "top",
-            "right",
-            "bottom",
-            "left"
-          ],
+          "enumValues": ["top", "right", "bottom", "left"],
           "default": "top"
         },
         {
           "name": "align",
           "kind": "enum",
-          "enumValues": [
-            "start",
-            "center",
-            "end"
-          ],
+          "enumValues": ["start", "center", "end"],
           "default": "center"
         },
         {
@@ -12561,10 +10709,7 @@
           }
         }
       ],
-      "related": [
-        "popover",
-        "hover-card"
-      ],
+      "related": ["popover", "hover-card"],
       "group": "overlays",
       "emit": []
     },
@@ -12608,19 +10753,13 @@
         {
           "name": "mode",
           "kind": "enum",
-          "enumValues": [
-            "view",
-            "edit"
-          ],
+          "enumValues": ["view", "edit"],
           "default": "view"
         },
         {
           "name": "flow",
           "kind": "enum",
-          "enumValues": [
-            "LR",
-            "TB"
-          ],
+          "enumValues": ["LR", "TB"],
           "default": "LR"
         }
       ],
@@ -12708,22 +10847,11 @@
           }
         }
       ],
-      "related": [
-        "blocks-diagram",
-        "charts-sankey"
-      ],
-      "events": [
-        "change",
-        "select"
-      ],
-      "bindable": [
-        "graph"
-      ],
+      "related": ["blocks-diagram", "charts-sankey"],
+      "events": ["change", "select"],
+      "bindable": ["graph"],
       "group": "workflows",
-      "emit": [
-        "developer",
-        "untrusted"
-      ]
+      "emit": ["developer", "untrusted"]
     }
   ],
   "tiers": {
