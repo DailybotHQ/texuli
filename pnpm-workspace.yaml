@@ -3,9 +3,9 @@ packages:
   - apps/*
   - tests/fixtures/*
 
-# Internal deps are pinned to exact reserved versions (0.1.0-next.3) so the
-# packed manifests declare exact pins; those versions are not on the
-# registry yet, so link them to the workspace projects instead.
+# Internal deps are pinned to exact versions (0.2.0) so the packed
+# manifests declare exact pins; link them to the workspace projects
+# instead of the registry.
 linkWorkspacePackages: true
 allowBuilds:
   # Native binaries pnpm would otherwise refuse to run.
