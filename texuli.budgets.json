@@ -107,6 +107,14 @@
       "gzip": 4096,
       "note": "Per-texel subpath budget (lead decision 2026-10-23): primitives import texels through these subpaths, so each texel is a first-load cost only where used."
     },
+    "@texuli/date": {
+      "gzip": 2048,
+      "note": "Owned Gregorian date engine; measured 1.66 KiB gzip on 2026-10-27, with room for platform variance. Owner-approved for the external date dependency migration."
+    },
+    "@texuli/date/calendar": {
+      "gzip": 2048,
+      "note": "Gregorian calendar subpath; measured 1.66 KiB gzip on 2026-10-27. Owner-approved for the external date dependency migration."
+    },
     "@texuli/core/editor-transforms": {
       "gzip": 11264,
       "note": "The editor transform set (every node/mark operation, refusal issues, structural sharing; measured 10,604 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package)."

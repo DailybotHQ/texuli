@@ -57,8 +57,9 @@ export const ALLOWED_LICENSES = new Set([
  */
 export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string[]>> = {
   '@texuli/core': [],
+  '@texuli/date': [],
   '@texuli/tokens': [],
-  '@texuli/primitives': ['@internationalized/date'],
+  '@texuli/primitives': [],
   texuli: [],
   '@texuli/charts': [],
   '@texuli/chat': [],
@@ -133,13 +134,6 @@ export type CycloneDxBom = {
   components: SbomComponent[];
   dependencies: Array<{ ref: string; dependsOn: string[] }>;
 };
-
-const DEPENDENCY_FIELDS = [
-  'dependencies',
-  'devDependencies',
-  'peerDependencies',
-  'optionalDependencies',
-] as const;
 
 export function isWorkspaceRange(range: string): boolean {
   return range === 'workspace:*' || range.startsWith('workspace:');

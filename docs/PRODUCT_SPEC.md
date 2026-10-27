@@ -2,10 +2,11 @@
 
 > **Small pieces. Infinite possibilities.**
 >
-> Status on 2026-10-27: **pre-1.0.** All 15 packable packages are on
+> Status on 2026-10-27: **pre-1.0.** The 15 previously packable packages are on
 > npm as the `0.2.0` release (dist-tags `latest` and `next`; published by CI
 > from verified tarballs, with signed provenance); texuli.com deploys from
 > `main` to Cloudflare Pages. The
+> new `@texuli/date` package exists only in the workspace. The
 > implementation itself is substantial: every layer from L0 texels to L8
 > tools exists in source with tests, all in this private workspace. The
 > "What exists today" table says exactly what is real.

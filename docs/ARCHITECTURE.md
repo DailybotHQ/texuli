@@ -20,8 +20,9 @@ packages in lower layers.
 | Layer | Package | What it holds | Workspace dependencies |
 | --- | --- | --- | --- |
 | L0 | `@texuli/core` | Texels: ids, keyboard intents, roving focus and typeahead, focus scope, inert, dismissable layers, layer stack, overlay engine, portal, positioning (math + DOM), presence, scroll lock, tabbable, form bridge, announcer, direction and locale, the URL policy | none |
+| L0 | `@texuli/date` | Framework-free Gregorian dates, arithmetic, locale week starts and time-zone-aware today | none |
 | L0 | `@texuli/spec` | Framework-free blueprint contract and code generation | none |
-| L1 | `@texuli/primitives` | 41 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core |
+| L1 | `@texuli/primitives` | 41 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core, date |
 | L2 | `@texuli/tokens` | The OKLCH theme engine, the `--tx-*` token contract, 200+ themes, compiled CSS, forced colors, the AA gate, the Tailwind preset | none |
 | L3 | `texuli` | Styled components (Button … Tree), the class helpers (`cx`, `variants`), icons, layouts and app shells | core, primitives, tokens |
 | L4 | `@texuli/charts` | Chart math and every chart family, one lazy subpath per family | core, primitives, tokens, texuli |
@@ -52,8 +53,9 @@ Not layers, because they consume the library:
   website (see [The website](#the-website)).
 
 `@texuli/editor` and `@texuli/examples` are never packed
-(`NEVER_PACKED` in `scripts/packages.ts`); the other 15 packages are the
-packable set.
+(`NEVER_PACKED` in `scripts/packages.ts`); the other 16 packages are the
+packable set. The 15 packages from the `0.2.0` release are on npm;
+`@texuli/date` is new in the workspace and has not been published.
 
 ```text
 L8  tools · astro
@@ -64,7 +66,7 @@ L4  charts · data · media · chat
 L3  texuli (styled components, layouts, shells)
 L2  tokens (theme engine, CSS contract)
 L1  primitives (headless, APG)
-L0  core (texels, framework-free)
+L0  core · date (framework-free)
           ▲ dependencies point down only (scripts/check-layers.ts)
 ```
 
@@ -99,6 +101,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/chat` (private) | `.` |
 | `@texuli/editor` (private) | `.`, `controller`, `editor`, `link-dialog`, `paste`, `toolbar` |
 | `@texuli/core` (private) | `.`, `announcer`, `controllable`, `dir-locale`, `dismiss`, `editor-history`, `editor-keymap`, `editor-markdown`, `editor-model`, `editor-transforms`, `env`, `focus-scope`, `form-bridge`, `ids`, `inert`, `keyboard`, `layer-stack`, `lazy`, `overlay`, `overlay-core`, `portal`, `position-dom`, `position-math`, `presence`, `roving`, `scroll-lock`, `tabbable`, `url-policy` |
+| `@texuli/date` (private) | `.`, `calendar` |
 | `@texuli/data` (private) | `.`, `activity`, `activity/engine`, `board`, `board/engine`, `calendar`, `files`, `files/engine`, `geo`, `grid`, `grid-columns`, `grid-core`, `grid-virtual`, `map`, `timeline`, `timeline/engine`, `tree`, `tree-view`, `virtual-list`, `calendar/view`, `grid-editing` |
 | `@texuli/examples` (private) | `.` |
 | `@texuli/media` (private) | `.`, `animation`, `animation/player`, `audio`, `captions`, `composition-canvas`, `composition-canvas/draw`, `composition-canvas/render`, `composition-model`, `composition-svg`, `composition-v2`, `export`, `export/ui`, `gallery`, `gallery/lightbox`, `generator-slot`, `image`, `image-editor`, `image-editor/model`, `image-editor/render`, `timeline`, `timeline/model`, `video` |
@@ -192,8 +195,9 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    all 15 packages to npm as the `0.2.0` release (dist-tags `latest` and
-    `next`), with provenance ([RELEASE](RELEASE.md)).
+    the 15 previously released packages to npm as the `0.2.0` release
+    (dist-tags `latest` and `next`), with provenance ([RELEASE](RELEASE.md)).
+    `@texuli/date` is not yet published.
 - **Tests:**
   - **Unit:** Vitest (happy-dom) in `packages/*/tests/`,
     `apps/website/tests/` and `scripts/tests/`, plus perf tests in `tests/perf/` (opt in with

@@ -75,8 +75,8 @@ The range grid marks days with `data-range-start`, `data-range-end`, `data-in-ra
 
 ## Size
 
-`@texuli/primitives/date-picker` measures **28.60 KiB** gzip (`pnpm size`, 2026-10-24), within its own 29 KiB budget and above the 24 KiB floating-primitive cap it started with. Almost all of it is the composed primitives:
-- the Calendar (13.05 KiB with `@internationalized/date`);
+With `@texuli/date`, `@texuli/primitives/date-picker` measures **20.26 KiB** gzip (`pnpm size --filter primitives`, 2026-10-27), within its 29 KiB budget. Its composed primitives include:
+- the Calendar (5.15 KiB);
 - the Popover (11.88 KiB);
 - the DateField (3.40 KiB).
 
@@ -86,4 +86,4 @@ The pickers' own code is a few KiB. When this page was first written (31.19 KiB)
 
 - **Months shown:** one month per dialog.
 - **Time:** there is no time picker; compose a TimeField.
-- **Calendars:** the value is Gregorian ISO; other calendar systems display through the Calendar's `calendar` prop, which is not exposed here yet.
+- **Calendars:** values and display use the Gregorian calendar. Labels follow `locale`.

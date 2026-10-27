@@ -1,0 +1,38 @@
+{
+  "name": "@texuli/date",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Framework-free Gregorian date arithmetic for Texuli calendars and date fields.",
+  "keywords": [
+    "date",
+    "calendar",
+    "gregorian",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
+  "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/date"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./calendar": {
+      "types": "./src/calendar.ts",
+      "default": "./src/calendar.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

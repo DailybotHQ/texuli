@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { CalendarDate } from '@internationalized/date';
+import type { CalendarDate } from '@texuli/date';
 import { DatePicker, type DateRange, DateRangePicker } from '../../src/date-picker/index.ts';
 
 interface Props {

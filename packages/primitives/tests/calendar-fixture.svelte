@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { CalendarDate as CalendarDateType, CalendarIdentifier } from '@internationalized/date';
+import type { CalendarDate as CalendarDateType, CalendarIdentifier } from '@texuli/date';
 import { Calendar, CalendarDate } from '../src/calendar/index.ts';
 
 let {

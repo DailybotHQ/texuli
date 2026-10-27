@@ -26,6 +26,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 /** Layer of every workspace package. A package may only depend on lower layers. */
 export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   '@texuli/core': 0,
+  '@texuli/date': 0,
   // L0: the framework-free blueprint contract — the cross-language spine
   // consumed by every layer (spec-compose-design.md B1).
   '@texuli/spec': 0,

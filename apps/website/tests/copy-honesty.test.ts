@@ -115,9 +115,10 @@ describe('site copy honesty', () => {
   });
 
   it('never calls a published package unpublished', () => {
-    // The 15 packages at 0.2.0 are on npm (latest and next); only the
-    // private 0.0.0 workspaces (editor, examples) are unpublished.
+    // The 15 packages from the 0.2.0 release are on npm. The new date
+    // package and the private 0.0.0 workspaces are not yet published.
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
+      if (dir === 'date') return false;
       try {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')

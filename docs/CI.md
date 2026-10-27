@@ -59,7 +59,7 @@ browser visual test.
 
 `publish.yml` rebuilds every tarball from source with
 `pnpm verify:packages` (publint strict, byte checks, SHA-256 recorded),
-then publishes the 15 packable packages in the wave order documented in
+then publishes the packable packages in the wave order documented in
 [RELEASE](RELEASE.md), always `--tag next`, then points `latest` at the
 same versions: `latest` tracks the newest release (owner decision
 2026-10-27; today both name `0.2.0`), so npm's package page shows the current README. Tarballs ship with signed npm provenance via

@@ -140,6 +140,7 @@ then the package, then its consumers (the layers above it).
 | Source | Unit tests | Browser and other gates |
 | --- | --- | --- |
 | `packages/core/src/<texel>/` | `pnpm vitest run packages/core/tests/<texel>.test.ts`, then `pnpm vitest run packages/core` | core is L0: run `pnpm check`. Overlay and roving changes also run the behavior suite |
+| `packages/date/src/**` | `pnpm vitest run packages/date` (Gregorian arithmetic, locale weeks, time zones) | Date is L0: run `pnpm check`, `pnpm size --filter @texuli/date`, `pnpm verify:packages --filter date`, and the calendar/date-picker behavior scenarios. |
 | `packages/core/src/roving/` | `pnpm vitest run packages/core/tests/roving.test.ts packages/primitives/tests/composites.test.ts packages/texuli/tests/forms.test.ts` | `tests/behavior/scenarios/{radio-group,tabs,toggle,toolbar}.spec.ts` |
 | `packages/core/src/overlay/`, `inert/`, `focus-scope/`, `dismiss/` | `pnpm vitest run packages/core/tests/overlay.test.ts packages/core/tests/inert.test.ts` | `tests/behavior` (every overlay primitive), `tests/e2e/a11y-overlays.spec.ts` |
 | `packages/core/src/editor/` (the editor model, transforms, history, keymap, Markdown codec) | `pnpm vitest run packages/core/tests/editor-model.test.ts packages/core/tests/editor-transforms.test.ts packages/core/tests/editor-history.test.ts packages/core/tests/editor-markdown.test.ts` | core is L0: run `pnpm check`. The seeded random-edit and round-trip property tests are in these files |

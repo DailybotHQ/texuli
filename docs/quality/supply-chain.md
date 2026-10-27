@@ -10,8 +10,8 @@ Enforce the monorepo supply-chain rules without weakening a check:
 
 1. **Runtime dependency allowlist** — library packages take only `workspace:*`
    internals, optional `svelte`, and the few externals named in
-   `RUNTIME_EXTERNAL_ALLOWLIST` (today `@internationalized/date` on
-   `@texuli/primitives`; Astro packages on `@texuli/website`).
+   `RUNTIME_EXTERNAL_ALLOWLIST` (today Astro packages on
+   `@texuli/website` and `astro` on `@texuli/astro`).
 2. **Banned runtime packages** — `clsx`, `tailwind-merge`,
    `tailwind-variants`, `@floating-ui/*` never appear in `dependencies` or
    `optionalDependencies`.

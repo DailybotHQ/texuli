@@ -75,14 +75,20 @@ describe('lifecycle and banned packages (unit)', () => {
         fakePkg('@texuli/core', { dependencies: { lodash: '^4.0.0' } }, 'packages/core'),
         fakePkg(
           '@texuli/primitives',
-          { dependencies: { '@internationalized/date': '^3.12.4', '@texuli/core': 'workspace:*' } },
+          { dependencies: { '@texuli/date': '0.2.0', '@texuli/core': 'workspace:*' } },
           'packages/primitives'
+        ),
+        fakePkg(
+          '@texuli/date',
+          { dependencies: { '@internationalized/date': '^3.12.4' } },
+          'packages/date'
         ),
       ]);
       expect(
         findings.some((f) => f.package === '@texuli/core' && f.code === 'runtime-not-allowed')
       ).toBe(true);
       expect(findings.some((f) => f.package === '@texuli/primitives')).toBe(false);
+      expect(findings.some((f) => f.package === '@texuli/date')).toBe(true);
     }
   });
 });
@@ -99,12 +105,13 @@ describe('CycloneDX SBOM builder', () => {
         '.'
       ),
       fakePkg('@texuli/core', { dependencies: {} }, 'packages/core'),
+      fakePkg('@texuli/date', { dependencies: {} }, 'packages/date'),
       fakePkg(
         '@texuli/primitives',
         {
           dependencies: {
             '@texuli/core': 'workspace:*',
-            '@internationalized/date': '^3.12.4',
+            '@texuli/date': '0.2.0',
           },
           peerDependencies: { svelte: '^5.57.2' },
         },
@@ -116,7 +123,8 @@ describe('CycloneDX SBOM builder', () => {
     expect(bom.specVersion).toBe('1.5');
     expect(bom.metadata.timestamp).toBe('2026-10-23T00:00:00.000Z');
     expect(bom.components.some((c) => c.name === '@texuli/core')).toBe(true);
-    expect(bom.components.some((c) => c.name === '@internationalized/date')).toBe(true);
+    expect(bom.components.some((c) => c.name === '@texuli/date')).toBe(true);
+    expect(bom.components.some((c) => c.name === '@internationalized/date')).toBe(false);
     expect(bom.components.some((c) => c.name === 'svelte')).toBe(true);
     const prim = bom.dependencies.find((d) => d.ref.startsWith('workspace:@texuli/primitives'));
     expect(prim?.dependsOn.some((r) => r.includes('@texuli/core'))).toBe(true);

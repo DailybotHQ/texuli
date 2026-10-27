@@ -68,7 +68,7 @@ describe('publishManifest', () => {
             './theme.css': './src/theme.css',
           },
           bin: { 'demo-cli': './src/cli.ts' },
-          dependencies: { '@texuli/core': 'workspace:*', '@internationalized/date': '^3.12.4' },
+          dependencies: { '@texuli/core': 'workspace:*', 'example-lib': '^1.2.3' },
           peerDependencies: { svelte: '^5.57.2' },
         }),
         versions
@@ -92,7 +92,7 @@ describe('publishManifest', () => {
         },
         bin: { 'demo-cli': './dist/cli.js' },
         files: ['dist'],
-        dependencies: { '@texuli/core': '0.3.0', '@internationalized/date': '^3.12.4' },
+        dependencies: { '@texuli/core': '0.3.0', 'example-lib': '^1.2.3' },
         peerDependencies: { svelte: '^5.57.2' },
       });
     }

@@ -33,7 +33,14 @@ const execFileAsync = promisify(execFile);
 export const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
 /** Packages required for the smoke consumer (each major layer + data). */
-export const CONSUMER_PACK_FILTER = ['core', 'tokens', 'primitives', 'texuli', 'data'] as const;
+export const CONSUMER_PACK_FILTER = [
+  'core',
+  'date',
+  'tokens',
+  'primitives',
+  'texuli',
+  'data',
+] as const;
 
 /** Texuli packages that must resolve from packed file: tarballs after install. */
 export const TEXULI_INSTALL_NAMES = [
@@ -43,6 +50,9 @@ export const TEXULI_INSTALL_NAMES = [
   'texuli',
   '@texuli/data',
 ] as const;
+
+/** The new date package is required by local packs but is not on npm yet. */
+const LOCAL_INSTALL_NAMES = [...TEXULI_INSTALL_NAMES, '@texuli/date'] as const;
 
 const ASTRO_TRANSITIVE_PACKAGES = [
   '@texuli/astro',
@@ -86,6 +96,7 @@ export const CONSUMERS: readonly ConsumerDef[] = [
 
 export interface TarballMap {
   core: string;
+  date: string;
   tokens: string;
   primitives: string;
   texuli: string;
@@ -109,6 +120,7 @@ export async function ensureConsumerTarballs(options?: {
   const tarballsDir = join(root, 'tmp/packages/tarballs');
   const needed = [
     'texuli-core',
+    'texuli-date',
     'texuli-tokens',
     'texuli-primitives',
     'texuli-0',
@@ -153,6 +165,7 @@ export async function ensureConsumerTarballs(options?: {
   return {
     dir: tarballsDir,
     core: pick(['texuli-core-']),
+    date: pick(['texuli-date-']),
     tokens: pick(['texuli-tokens-']),
     primitives: pick(['texuli-primitives-']),
     texuli: pick(['texuli-0.', 'texuli-1.', 'texuli-2.']),
@@ -165,7 +178,7 @@ export async function ensureConsumerTarballs(options?: {
 }
 
 function rewritePlaceholders(pkgJson: string, tarballs: TarballMap): string {
-  return pkgJson
+  const replaced = pkgJson
     .replaceAll('file:PLACEHOLDER_CORE', `file:${tarballs.core}`)
     .replaceAll('file:PLACEHOLDER_PRIMITIVES', `file:${tarballs.primitives}`)
     .replaceAll('file:PLACEHOLDER_TOKENS', `file:${tarballs.tokens}`)
@@ -175,6 +188,10 @@ function rewritePlaceholders(pkgJson: string, tarballs: TarballMap): string {
     .replaceAll('file:PLACEHOLDER_BLOCKS', `file:${tarballs.blocks}`)
     .replaceAll('file:PLACEHOLDER_CHARTS', `file:${tarballs.charts}`)
     .replaceAll('file:PLACEHOLDER_MEDIA', `file:${tarballs.media}`);
+  const manifest = JSON.parse(replaced) as { dependencies?: Record<string, string> };
+  manifest.dependencies ??= {};
+  manifest.dependencies['@texuli/date'] = `file:${tarballs.date}`;
+  return JSON.stringify(manifest, null, 2);
 }
 
 /**
@@ -191,8 +208,9 @@ export function rewritePlaceholdersToVersion(pkgJson: string, version: string): 
  * never the public registry.
  */
 export function assertInstalledFromTarballs(consumerDir: string, tarballs: TarballMap): void {
-  const expected: Record<(typeof TEXULI_INSTALL_NAMES)[number], string> = {
+  const expected: Record<(typeof LOCAL_INSTALL_NAMES)[number], string> = {
     '@texuli/core': realpathSync(tarballs.core),
+    '@texuli/date': realpathSync(tarballs.date),
     '@texuli/tokens': realpathSync(tarballs.tokens),
     '@texuli/primitives': realpathSync(tarballs.primitives),
     texuli: realpathSync(tarballs.texuli),
@@ -207,7 +225,7 @@ export function assertInstalledFromTarballs(consumerDir: string, tarballs: Tarba
     packages?: Record<string, { resolved?: string; version?: string; link?: boolean }>;
   };
 
-  for (const name of TEXULI_INSTALL_NAMES) {
+  for (const name of LOCAL_INSTALL_NAMES) {
     const key = `node_modules/${name}`;
     const entry = lock.packages?.[key];
     if (!entry) {

@@ -36,7 +36,7 @@ Every root script, verbatim.
 | `pnpm visual` | `tsx scripts/visual.ts` | Visual regression against `tests/visual/visual.spec.ts-snapshots` (light and dark, desktop and Pixel 7) |
 | `pnpm visual:update` | `tsx scripts/visual.ts --update` | Write new baselines (review the PNGs before committing) |
 | `pnpm test:perf` | `TEXULI_PERF=1 vitest run tests/perf packages/blocks/tests/code.test.ts packages/blocks/tests/text.test.ts` | Wall-clock and scale limits (opt-in; never in the default suite) |
-| `pnpm verify:packages` | `tsx scripts/packages.ts` | Build, pack and check the 15 packable packages as npm would publish them (publint, attw; `@texuli/editor` and `@texuli/examples` are never packed); publishes nothing |
+| `pnpm verify:packages` | `tsx scripts/packages.ts` | Build, pack and check the 16 packable packages as npm would publish them (publint, attw; `@texuli/editor` and `@texuli/examples` are never packed); publishes nothing |
 | `pnpm check:docs` | `tsx scripts/check-docs.ts` | Every relative Markdown link and documented command is real (see Other tools) |
 | `pnpm check:trojan-source` | `tsx scripts/check-trojan-source.ts` | Fail on literal bidi and zero-width control characters in tracked text files (part of `pnpm lint`); gate: `pnpm vitest run scripts/tests/trojan-source.test.ts` |
 

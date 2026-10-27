@@ -37,7 +37,6 @@
     "@arethetypeswrong/core": "^0.18.5",
     "@axe-core/playwright": "^4.14.0",
     "@biomejs/biome": "2.5.15",
-    "@internationalized/date": "^3.12.4",
     "@playwright/test": "^1.64.1",
     "@sveltejs/package": "^3.0.1",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",

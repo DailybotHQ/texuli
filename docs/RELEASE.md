@@ -5,7 +5,7 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-`0.2.0` is the current release of all 15 packable packages (owner decision
+`0.2.0` is the current release of the 15 previously packable packages (owner decision
 2026-10-27; published from `main` by the publish workflow, from the verified
 tarballs with signed provenance). Both the `latest` and `next` dist-tags
 point to it, so a bare `npm install texuli` or `pnpm add texuli` gets it. It
@@ -15,6 +15,12 @@ is the first non-prerelease `0.x` line, after the `0.1.0-next.0` through
 https://github.com/DailybotHQ/texuli/actions/runs/40238083612), and
 `0.1.0-next.2` (the PLAN_006 package fixes) and `0.1.0-next.3` (consumer
 READMEs and two CLI fixes) on 2026-10-27.
+
+`@texuli/date` is a new, sixteenth packable workspace package. It is not on
+npm yet. The next approved publication must publish it before a new
+`@texuli/primitives` version that depends on it. The already published
+`@texuli/primitives@0.2.0` is immutable and still depends on
+`@internationalized/date`.
 
 `0.2.0` is still pre-1.0, not a stable release: see "0.x versioning" below.
 Workspace manifests remain `private: true`, and every future version and
@@ -102,6 +108,7 @@ the package-to-package contract outside this repository.
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
 | 15 npm packages | `0.2.0` (dist-tags `latest` and `next`) | Each package manifest; published by the publish workflow (previews before it: `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| `@texuli/date` | Workspace only; not published | `packages/date/package.json`; future publication requires owner GO. |
 | Blueprint spec | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | `packages/spec/versions.json`; every generated file is stamped `// Spec 0.2.0, digest …`. |
 | `@texuli/spec` (npm) | `0.2.0` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
@@ -127,6 +134,7 @@ tag. Any GO for Task 170's name reservation covers only that reservation.
 | Task | Wave | Planned package order | Approval boundary |
 | --- | --- | --- | --- |
 | 174 | Foundations | `@texuli/core`, then `@texuli/tokens` | Fresh owner GO for the exact Task 174 package/version set after its release gates; core precedes tokens. |
+| Future | Date foundation | `@texuli/date`, before the next `@texuli/primitives` version | Fresh owner GO for the new package and the changed primitives version; both need new immutable release versions. |
 | 175 | Controls | `@texuli/primitives` | Fresh owner GO after its core dependency and behavior, accessibility, size, pack, and consumer gates pass. |
 | 176 | Styled package | `texuli` | Fresh owner GO after core, primitives, and tokens compatibility plus style and consumer gates pass. |
 | 177 | Domain packages | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/blocks` | Fresh owner GO for the exact ready set after dependency order, package checks, size, pack, and consumer gates pass. |
