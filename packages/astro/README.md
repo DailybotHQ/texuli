@@ -1,15 +1,38 @@
 # @texuli/astro
 
-**Layer L8: adapters.** Astro 7 integration, token stylesheet, static content components, and a closed
-content-block parser for Texuli sites. Published to npm as `0.1.0-next.2` under the `next`
-dist-tag (by CI, with provenance); no stable release (`latest` is reserved
-for 1.0.0), so install it with `@next`. The workspace package stays
-`"private": true`.
+The Astro integration for [Texuli](https://texuli.com), an MIT-licensed
+Svelte 5 component library by Dailybot, Inc. (*Small pieces. Infinite
+possibilities.*). Add one integration to an Astro 7 site to get Texuli's
+design tokens and a no-flash light and dark bootstrap. The package also
+provides static layout and section components that ship no JavaScript, a
+closed-schema parser for structured content blocks, and a validated site
+model for pages, navigation, metadata and a sitemap. Use Texuli's Svelte
+components as islands wherever a page needs interaction.
 
-## Install and configure
+> **Status: preview.** Texuli is in development. The packages are published
+> to npm as prereleases under the `next` dist-tag, and there is no stable
+> release yet, so install with `@next`. APIs may still change between
+> previews.
 
-Add the Astro Svelte integration when the site uses Svelte islands, then add
-Texuli's integration to the Astro config:
+## Install
+
+```bash
+npm install @texuli/astro@next @astrojs/svelte svelte
+```
+
+`@astrojs/svelte` (`^9.1.0`) and Svelte 5 (`^5.57.2`) are peer
+dependencies, for sites that use Svelte islands. Astro 7 is installed as a
+dependency.
+
+Import the Texuli stylesheet once, from a site-owned global stylesheet:
+
+```css
+@import '@texuli/astro/styles.css';
+```
+
+## Quick start
+
+Add the integration to `astro.config.mjs`:
 
 ```ts
 import svelte from '@astrojs/svelte';
@@ -21,35 +44,11 @@ export default defineConfig({
 });
 ```
 
-Import the Texuli stylesheet once from a site-owned global stylesheet:
+Use the same `namespace` in Texuli's appearance switcher so the early
+bootstrap reads the appearance the site stores. The default namespace is
+`site`.
 
-```css
-@import '@texuli/astro/styles.css';
-```
-
-Use the same `namespace` in Texuli's appearance writer and the integration so
-the early bootstrap reads the cache entry that the site writes. The default
-namespace is `site`. See [integration setup and CSP](docs/integration.md) and
-[stylesheet contents](docs/styles.md).
-
-## Entry points
-
-| Import | Purpose | Documentation |
-| --- | --- | --- |
-| `@texuli/astro` | `texuli`, `themeBootstrapScript`, `TexuliAstroOptions`, density/radius types, and `parseTexuliBlocks` | [Integration](docs/integration.md), [content parser](docs/content.md) |
-| `@texuli/astro/integration` | Integration and theme-bootstrap API | [Integration](docs/integration.md) |
-| `@texuli/astro/content` | Closed-schema content-block parser | [Content parser](docs/content.md) |
-| `@texuli/astro/site` | Validated site model, page metadata and sitemap for Protoyard static sites | [Site model](docs/site.md) |
-| `@texuli/astro/styles.css` | Token base, forced-colors rules, density/radius variants, and print rules | [Stylesheet](docs/styles.md) |
-| `@texuli/astro/layouts/ContentLayout` | Semantic HTML document shell | [ContentLayout](docs/layouts-content-layout.md) |
-| `@texuli/astro/sections/Hero` | Static hero section | [Hero](docs/sections-hero.md) |
-| `@texuli/astro/sections/Section` | Static width-constrained section | [Section](docs/sections-section.md) |
-
-The package peers on Astro Svelte integration and Svelte 5 for sites that use
-Svelte islands. The layout and section components in this package render static
-HTML and do not hydrate themselves.
-
-## Components and content
+Then build pages from the static components:
 
 ```astro
 ---
@@ -69,35 +68,56 @@ import Section from '@texuli/astro/sections/Section';
 </ContentLayout>
 ```
 
-For structured content, `parseTexuliBlocks(value)` validates unknown input
-against `@texuli/blocks` and returns either the typed blocks or schema issues.
-It does not render HTML or interpret unknown block types. See [content
-parsing](docs/content.md). For whole-site definitions — pages, navigation,
-canonical metadata and a sitemap — `defineSite` validates the export and
-returns the frozen model the layouts consume. See the [site
-model](docs/site.md). The Protoyard `site` export that fills this model is
-planned on the Protoyard side.
+## What's inside
 
-## Fixtures and checks
+| Import | What it does |
+| --- | --- |
+| `@texuli/astro` | `texuli`, `themeBootstrapScript`, `parseTexuliBlocks` and `defineSite`, with their types |
+| `@texuli/astro/integration` | The integration and the theme bootstrap (namespace, fallback mode, density and radius) |
+| `@texuli/astro/content` | `parseTexuliBlocks`: validates unknown input against the `@texuli/blocks` schemas |
+| `@texuli/astro/site` | `defineSite` and helpers: a validated, frozen site model with page metadata and a sitemap |
+| `@texuli/astro/styles.css` | Token base, forced-colors rules, density and radius variants, and print rules |
+| `@texuli/astro/layouts/ContentLayout` | A semantic HTML document shell |
+| `@texuli/astro/sections/Hero` | A static hero section |
+| `@texuli/astro/sections/Section` | A static, width-constrained section |
 
-The packed consumer fixtures live under `tests/consumers/fixtures/`:
+## Key guarantees
 
-- `astro-plain` installs the packed Astro package, uses this integration and
-  stylesheet, renders the layout and sections, and includes a Svelte smoke
-  island.
-- `astro-tailwind` checks the Astro/Tailwind consumer path with token CSS; it
-  does not install `@texuli/astro`.
+- **Static by default.** The layout and section components render HTML
+  and never hydrate themselves.
+- **Closed content schema.** `parseTexuliBlocks` returns typed blocks or
+  schema issues. It renders no HTML and does not interpret unknown block
+  types.
+- **Validated site model.** `defineSite` checks the whole definition
+  against a closed schema, including the site URL against the Texuli URL
+  policy, and throws a `TypeError` naming the failing field.
+- **CSP-aware bootstrap.** The inline theme bootstrap is deterministic. The
+  package writes no CSP headers; a site using hash-based CSP computes the
+  hash of `themeBootstrapScript(options)`, or sets `bootstrap: 'manual'`
+  and places the script itself.
 
-Package behavior is covered by `packages/astro/tests/astro.test.ts`
-(content blocks, the theme integration, the layout contract and the site
-model). The consumer harness builds and
-serves the packed fixtures in `tests/consumers/consumers.spec.ts`.
+## Documentation
 
-```bash
-pnpm vitest run packages/astro
-pnpm --filter @texuli/astro typecheck
-npx biome check packages/astro
-pnpm verify:packages --filter packages/astro
-```
+- Website: [texuli.com](https://texuli.com) and the
+  [getting started guide](https://texuli.com/guides/getting-started/)
+- Integration setup and CSP: [integration.md](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/integration.md)
+- Stylesheet contents: [styles.md](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/styles.md)
+- Content parsing: [content.md](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/content.md)
+- Site model: [site.md](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/site.md)
+- Components: [ContentLayout](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/layouts-content-layout.md), [Hero](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/sections-hero.md), [Section](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/sections-section.md)
 
-The package source and exports are listed in [`package.json`](package.json).
+## Related packages
+
+- [`texuli`](https://www.npmjs.com/package/texuli): the styled Svelte 5 components to use as islands.
+- [`@texuli/tokens`](https://www.npmjs.com/package/@texuli/tokens): the theme engine and design tokens.
+- [`@texuli/blocks`](https://www.npmjs.com/package/@texuli/blocks): the content blocks `parseTexuliBlocks` validates.
+
+## Contributing
+
+Source, issues and contribution guidelines live at
+[github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli). Report
+bugs at [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues).
+
+## License
+
+MIT © Dailybot, Inc.

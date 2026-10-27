@@ -1,97 +1,152 @@
 # @texuli/catalog
 
-**Layer L6: the agent catalog.** Authored component manifests, the blueprint
-envelope, the content-addressed catalog build, draft validation and the
+The agent catalog of [Texuli](https://texuli.com), an MIT-licensed Svelte 5
+component library by Dailybot, Inc. (*Small pieces. Infinite
+possibilities.*). It describes which Texuli components an agent may use and
+with which props. It validates what the agent writes, and ships the
 sink-free renderer that turns untrusted agent trees into safe render trees.
-Published to npm as `0.1.0-next.2` under the `next` dist-tag (CI publishes
-with provenance; `latest` stays reserved for 1.0.0). The workspace package
-itself stays `"private": true`.
+Agent output is treated as hostile data: it is parsed, bounded and checked
+against closed schemas, and it never reaches an HTML sink.
 
-## What exists today
+Use it to validate agent output on a server, in an edge worker or in the
+browser, or to build your own painter. To paint validated blueprints in
+Svelte, use [`@texuli/player`](https://www.npmjs.com/package/@texuli/player),
+which is built on this package.
 
-Every area below is implemented, exported and tested. One subpath per area;
-each links its contract doc in `docs/`.
+> **Status: preview.** Texuli is in development. The packages are published
+> to npm as prereleases under the `next` dist-tag, and there is no stable
+> release yet, so install with `@next`. APIs may still change between
+> previews.
 
-| Area | Subpath | What it does | Doc |
-| --- | --- | --- | --- |
-| Manifest format | `@texuli/catalog/manifest` | The authored-manifest schema and its build-time validator | this README |
-| Authored manifests | `@texuli/catalog/manifests/{content,display,forms,layouts,overlays}` | The authored manifests in five groups (133 entries), including the `inline-text` node that gives slot-only components such as `button` their text (audit G03) | [manifests-display](docs/manifests-display.md), [manifests-layouts](docs/manifests-layouts.md) |
-| Envelope | `@texuli/catalog/envelope` | The blueprint envelope | [envelope](docs/envelope.md) |
-| Catalog build | `@texuli/catalog/build` and `build/node` | Content-addressed build; the Node entry writes one `catalog-<sha256>.json` into the output directory | [catalog-build](docs/catalog-build.md) |
-| Draft validation | `@texuli/catalog/validate` | Validate a draft before it is rendered | [validate](docs/validate.md) |
-| Block family checks | `@texuli/catalog/validate/blocks` | `createFamilyBlockCheck`: runs each `blocks-*` node through its own family's parser, given the engines | [validate](docs/validate.md#block-families-texulicatalogvalidateblocks) |
-| Edit operations | `@texuli/catalog/edit` | Typed blueprint edit operations | [edit](docs/edit.md) |
-| Document player | `@texuli/catalog/player` | The document player core | [player](docs/player.md) |
-| Renderer | `@texuli/catalog/render/renderer` | The sink-free render tree an untrusted catalog tree becomes, including named slots (`slot`, audit G04) and conditional regions (`when`, audit G07) | [render-renderer](docs/render-renderer.md) |
-| Conditions | `@texuli/catalog/render/conditions` | `formulaConditions`, the injected runtime that checks and evaluates `when` with the blocks `Condition` AST | [render-renderer](docs/render-renderer.md#conditional-regions-audit-g07) |
-| Composition grammar | `@texuli/catalog/render/grammar` | The composition grammar for agent trees | [render-grammar](docs/render-grammar.md) |
-| Artifact frame | `@texuli/catalog/render/frame` | The artifact frame | [render-frame](docs/render-frame.md) |
-| Rich text | `@texuli/catalog/render/richtext` | The sink-free rich-text renderer | [render-richtext](docs/render-richtext.md) |
-| Tree limits | `@texuli/catalog/render/limits` | Depth and size limits for agent trees | [render-limits](docs/render-limits.md) |
-| Hostile corpus | `@texuli/catalog/render/hostile` | The hostile-input corpus and expected outcomes | [render-hostile](docs/render-hostile.md) |
-
-Agents may emit only ids whose manifest marks them `agentEmittable`, at the
-`content` tier; `app` chrome stays developer-authored. The build computes the
-content address over the whole catalog and emits **one** catalog file
-(`catalog-<sha256>.json`); there are no per-component generated files.
-
-## Manifest format (build-time)
-
-The format and its validator live in `src/manifest/`; the authored manifests
-themselves live in `src/manifests/<group>/`. They are validated **only at
-build / CI time** — the renderer must not import this module, and there is no
-schema library on the render path.
-
-| Field | Role |
-| --- | --- |
-| `id` | Closed kebab-case component id |
-| `package` | `texuli` or `@texuli/<name>` |
-| `label` / `summary` | Display name and one-line summary |
-| `tier` | `app` (chrome) or `content` (blocks / media / charts) |
-| `agentEmittable` | Agents may emit this id (**default `false`**) |
-| `schemaVersion` | Optional manifest-schema version declaration (must be `1`; stripped before the build content-addresses) |
-| `useWhen` / `dontUseWhen` | Authoring guidance (must stay disjoint) |
-| `a11y` | Keyboard, name, contrast, RTL, motion notes |
-| `props` | Public prop schemas (`kind`, `enumValues`, optional `trust`) |
-| `examples` | Props-only samples (required when `agentEmittable`) |
-| `related` | Optional related component ids |
-
-```ts
-import {
-  defineCatalogManifest,
-  validateCatalogManifest,
-} from '@texuli/catalog/manifest';
-
-const result = validateCatalogManifest(rawJson);
-if (!result.valid) {
-  // result.diagnostics: code, jsonPath, message, hint
-}
-
-const manifest = defineCatalogManifest(rawJson); // throws CatalogManifestError if invalid
-```
-
-Incomplete or contradictory entries fail validation (missing fields, bad ids,
-enum without values, example props not in the schema, `agentEmittable` without
-examples or useWhen, duplicate ids in a list).
-
-### Schema version and digest stability
-
-The authored-manifest schema is versioned by `MANIFEST_SCHEMA_VERSION`
-(currently `1`, exported from `@texuli/catalog/manifest`). A manifest may
-declare `"schemaVersion": 1`; omitting it means the same. Any other value
-fails validation with a `schema-version` diagnostic, so a future schema
-change fails loudly instead of misreading old data. The field is authoring
-metadata: `buildCatalog` strips it before content-addressing, so a catalog
-built from manifests that declare it is byte-identical — same
-`catalog-<sha256>.json` name, same digest — to one built without it. The
-built file's own envelope version (`CATALOG_FORMAT` / `CATALOG_VERSION` in
-`src/build/build.ts`) is independent of the manifest schema version.
-Understanding schemas other than version 1 is planned; no bump exists today.
-
-## Testing
+## Install
 
 ```bash
-pnpm vitest run packages/catalog          # 28 test files (incl. the golden fixture suite)
-pnpm --filter @texuli/catalog typecheck   # svelte-aware typecheck
-npx biome check packages/catalog          # lint + format
+npm install @texuli/catalog@next svelte
 ```
+
+Svelte 5 (`^5.57.2`) is a peer dependency. The validation entries are
+runtime-neutral (no DOM and no Node APIs) and ship no CSS. Only
+`@texuli/catalog/build/node`, which discovers and writes catalog files,
+needs Node.
+
+## Quick start
+
+Build a catalog from the authored manifests, then validate an agent's draft
+against it:
+
+```ts
+import { buildCatalog } from '@texuli/catalog/build';
+import { CONTENT_MANIFESTS } from '@texuli/catalog/manifests/content';
+import { LAYOUTS_MANIFESTS } from '@texuli/catalog/manifests/layouts';
+import { renderCatalogFromBuild } from '@texuli/catalog/render/renderer';
+import { validateDraft } from '@texuli/catalog/validate';
+
+const build = await buildCatalog([
+  { name: 'content', manifests: CONTENT_MANIFESTS },
+  { name: 'layouts', manifests: LAYOUTS_MANIFESTS },
+]);
+const catalog = renderCatalogFromBuild(build.catalog);
+
+// Agent output, as JSON text or data. The tier defaults to `untrusted`.
+const result = validateDraft(agentOutput, { catalog });
+
+if (result.ok) {
+  paint(result.roots); // the sink-free render tree
+} else {
+  console.log(result.diagnostics); // check, code, severity, path, message
+}
+```
+
+A draft such as `{"id":"layout-page","props":{"title":"<img src=x onerror=…>"}}`
+fails with `sink` and `html-string` diagnostics. To check every `blocks-*`
+node with its own family's parser as well, pass a `checkBlock` built with
+`createFamilyBlockCheck` from `@texuli/catalog/validate/blocks` (see
+[validate.md](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/validate.md)).
+
+## What's inside
+
+The root entry, `@texuli/catalog`, re-exports the build, manifests, frame,
+grammar and renderer APIs. Import subpaths to keep bundles narrow.
+
+**Validate and render**
+
+| Subpath | What it does |
+| --- | --- |
+| `@texuli/catalog/validate` | `validateDraft`: the single validation entry for untrusted blueprint JSON, plus `scanSinks` and `draftCommitGate` |
+| `@texuli/catalog/validate/blocks` | `createFamilyBlockCheck`: checks each `blocks-*` node with its family's parser |
+| `@texuli/catalog/render/renderer` | `renderCatalogTree`: the sink-free render tree, with named slots and conditional regions |
+| `@texuli/catalog/render/limits` | Depth, node, byte, branching and root limits, checked before rendering |
+| `@texuli/catalog/render/grammar` | `checkCompositionGrammar`: heading outline, landmarks and composition rules for agent trees |
+| `@texuli/catalog/render/richtext` | The sink-free rich-text renderer |
+| `@texuli/catalog/render/conditions` | `formulaConditions`: the runtime that evaluates `when` conditions |
+| `@texuli/catalog/render/frame` | The artifact frame: a required visible label and badge, and intents the host must confirm |
+| `@texuli/catalog/render/hostile` | A corpus of hostile inputs with their expected outcomes, for your own tests |
+
+**Catalog and manifests**
+
+| Subpath | What it does |
+| --- | --- |
+| `@texuli/catalog/manifest` | The manifest format: `defineCatalogManifest`, `validateCatalogManifest` |
+| `@texuli/catalog/manifests/content` | Authored manifests for content blocks, charts and media |
+| `@texuli/catalog/manifests/display` | Authored manifests for display and feedback components |
+| `@texuli/catalog/manifests/forms` | Authored manifests for form components |
+| `@texuli/catalog/manifests/layouts` | Authored manifests for layouts, decks and app shells |
+| `@texuli/catalog/manifests/overlays` | Authored manifests for overlays and navigation chrome (app tier) |
+| `@texuli/catalog/build` | `buildCatalog`: a content-addressed catalog (`catalog-<sha256>.json`) |
+| `@texuli/catalog/build/node` | Node only: discover the manifest groups (source or published files) and write the content-addressed catalog file |
+
+**Blueprints**
+
+| Subpath | What it does |
+| --- | --- |
+| `@texuli/catalog/envelope` | The versioned blueprint envelope: catalog binding, lifecycle status and provenance |
+| `@texuli/catalog/edit` | Typed edit operations, undo and redo, and the canonical blueprint digest |
+| `@texuli/catalog/player` | The framework-free document player core that `@texuli/player` wraps |
+
+## Key guarantees
+
+- **Untrusted by default.** The host picks the tier, never the draft.
+  Agents may emit only ids whose manifest marks them `agentEmittable`; app
+  chrome stays developer-authored.
+- **No HTML sinks.** HTML strings, executable strings, `class`, `style`,
+  `innerHTML`, `srcdoc` and `on…` keys are refused or stripped. Prototype
+  keys (`__proto__`, `constructor`, `prototype`) are refused anywhere.
+- **URL policy.** Links, image sources and media sources pass the
+  `@texuli/core` URL policy for the host's tier.
+- **Bounded.** Text input is size-capped before `JSON.parse`. Trees are
+  limited by default to depth 16, 512 nodes, 256 KiB, 64 children per node
+  and 32 roots; prop values nested deeper than 128 levels are refused.
+- **Closed vocabulary.** Unknown ids and ids not allowed at the tier become
+  visible placeholders; props that fail their schema are dropped.
+- **Never throws.** `validateDraft` fails closed with diagnostics, including
+  an `internal-error` diagnostic for anything unexpected.
+
+## Documentation
+
+- Website: [texuli.com](https://texuli.com), the
+  [agents overview](https://texuli.com/agents-page/) and the
+  [playground](https://texuli.com/playground/)
+- Draft validation: [validate.md](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/validate.md)
+- Renderer, slots and conditions: [render-renderer.md](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/render-renderer.md)
+- Tree limits: [render-limits.md](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/render-limits.md)
+- Composition grammar: [render-grammar.md](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/render-grammar.md)
+- Artifact frame: [render-frame.md](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/render-frame.md)
+- Envelope: [envelope.md](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/envelope.md) · Catalog build: [catalog-build.md](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/catalog-build.md) · Edits: [edit.md](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/edit.md)
+- Every contract: [packages/catalog/docs](https://github.com/DailybotHQ/texuli/tree/main/packages/catalog/docs)
+- Security model: [SECURITY.md](https://github.com/DailybotHQ/texuli/blob/main/docs/SECURITY.md)
+
+## Related packages
+
+- [`@texuli/player`](https://www.npmjs.com/package/@texuli/player): paints validated blueprints in Svelte.
+- [`@texuli/tools`](https://www.npmjs.com/package/@texuli/tools): llms.txt generation, the A2UI adapter and custom elements over this catalog.
+- [`@texuli/core`](https://www.npmjs.com/package/@texuli/core): the URL policy used at every tier.
+
+## Contributing
+
+Source, issues and contribution guidelines live at
+[github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli). Report
+bugs at [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues).
+
+## License
+
+MIT © Dailybot, Inc.

@@ -62,11 +62,11 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   { phrase: /production[- ]ready/i, why: 'nothing is released as stable' },
   {
     phrase: /Nothing is on npm/i,
-    why: 'every package is on npm as 0.1.0-next.2 under next, and the site is deployed',
+    why: 'every package is on npm as 0.1.0-next.3 under next, and the site is deployed',
   },
   {
     phrase: /\b0\.1\.0(?!-next)\b(?!<\/code>-)/,
-    why: 'name the published prerelease exactly: 0.1.0-next.2',
+    why: 'name the published prerelease exactly: 0.1.0-next.3',
   },
   {
     phrase: /not released yet/i,
@@ -108,14 +108,14 @@ describe('site copy honesty', () => {
   });
 
   it('never calls a published package unpublished', () => {
-    // The 15 packages at 0.1.0-next.2 are on npm under next; only the
+    // The 15 packages at 0.1.0-next.3 are on npm under next; only the
     // private 0.0.0 workspaces (editor, examples) are unpublished.
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
       try {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')
         ) as { version?: string };
-        return pkg.version === '0.1.0-next.2';
+        return pkg.version === '0.1.0-next.3';
       } catch {
         return false;
       }

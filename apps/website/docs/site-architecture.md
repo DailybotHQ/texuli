@@ -37,7 +37,7 @@ URL — T-12: no existing route moves) and links `/native/`.
 3. `#portability` — `PortabilityDeepDive` (`portability-content.ts`): what
    moving an interface between runtimes takes
 4. `#what-exists-today` — the release truth (15 packages on npm as
-   `0.1.0-next.2` under `next`, nothing on Maven Central, the Compose
+   `0.1.0-next.3` under `next`, nothing on Maven Central, the Compose
    renderer consumed from source) and `ParityTable` (`parity-data.ts`),
    one evidence cell per row
 

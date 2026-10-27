@@ -1,130 +1,166 @@
 # @texuli/charts
 
-**Layer L4: charts.** Chart math and every chart family, one lazy subpath
-per family. Published to npm as `0.1.0-next.2` under the `next`
-dist-tag (by CI, with provenance); no stable release (`latest` is reserved
-for 1.0.0), so install it with `@next`. The workspace package stays
-`"private": true`.
+Accessible Svelte 5 charts and the framework-free chart math behind them.
+Line, area, bar, pie, treemap, heatmap, Sankey, gauge, box plot and more:
+every family is its own lazy subpath, every chart renders an accessible
+summary and a data-table fallback, and the scales, shapes and layouts are
+plain TypeScript you can use without any component. It is part of
+[Texuli](https://texuli.com), "Small pieces. Infinite possibilities.": an MIT
+Svelte 5 component library by Dailybot, Inc., for application developers and
+for agents that render charts from validated data.
 
-## What exists today
+> **Status: preview.** `@texuli/charts` is published on npm under the `next`
+> dist-tag. There is no stable release yet, so install it with `@next` and
+> expect the API to change between previews.
 
-**Chart math** (`@texuli/charts` and `@texuli/charts/math`): framework-free
-TypeScript — scales, shapes, layouts and downsampling. No Svelte, no third-party
-chart library. Ported from Protoyard's `@protoyard/charts` engine so results match.
+## Install
 
-| Area | Subpath | Exports (selected) |
-| --- | --- | --- |
-| Scales | `@texuli/charts/math/scales` | `linearScale`, `logScale`, `sqrtScale`, `timeScale`, `bandScale`, `pointScale`, `ordinalScale`, `ticks`, `niceDomain`, `extent`, format helpers |
-| Shapes | `@texuli/charts/math/shapes` | `linePath`, `areaPath`, `arcPath`, `pie`, `stack`, `bin` (`MAX_BINS` from `math/shapes/bin.ts`), `symbolPath` |
-| Layouts | `@texuli/charts/math/layout` | `treemap`, `sunburst`, `pack`, `sankey`, `funnelLayout`, `gaugeLayout`, `calendarLayout`, `matrixLayout`, `plotArea` |
-| Downsample | `@texuli/charts/math/downsample` | `lttbIndices`, `largestTriangleThreeBuckets`, `minMaxBuckets`, `bisectX` |
-| Color | `@texuli/charts/math/color` | `sequentialFallback` |
+```sh
+npm install @texuli/charts@next @texuli/tokens@next svelte
+```
 
-`@texuli/charts/math` (and the package root) is a facade: an exact union of the
-family subpaths, with the same bindings. Import a family subpath when you need
-one area. Each family is measured as its own `pnpm size` entry, so new math
-lands in the family it belongs to instead of growing one 12 KiB entry.
+- `svelte` (^5.57.2) is a peer dependency.
+- Charts style themselves with the Texuli `--tx-*` design tokens. Import the
+  token stylesheet once in your app (installing `@texuli/tokens` directly lets
+  your bundler resolve it); each chart imports its own component CSS.
+
+```css
+@import '@texuli/tokens/base.css';
+```
+
+## Quick start
+
+```svelte
+<script lang="ts">
+  import { LineChart, type CartesianSeries } from '@texuli/charts/cartesian';
+
+  const series: CartesianSeries[] = [
+    {
+      id: 'signups',
+      label: 'Sign-ups',
+      points: [
+        { x: 'Jan', y: 120 },
+        { x: 'Feb', y: 180 },
+        { x: 'Mar', y: 165 },
+      ],
+    },
+  ];
+</script>
+
+<LineChart
+  title="Monthly sign-ups"
+  description="Sign-ups rose in February and held steady in March."
+  {series}
+/>
+```
+
+`title` and `description` are required: they become the chart's accessible
+name and summary. The math works on its own, with no Svelte:
 
 ```ts
-import { linearScale, lttbIndices, treemap } from '@texuli/charts';
-// or: import { … } from '@texuli/charts/math';
-// or one family: import { linearScale } from '@texuli/charts/math/scales';
+import { linearScale, lttbIndices } from '@texuli/charts/math';
+
+const y = linearScale({ domain: [0, 180], range: [320, 0], nice: true });
+y(90); // pixel position
+y.ticks(5); // tick values
+
+const keep = lttbIndices(xs, ys, 500); // downsample a long series to 500 points
 ```
 
-**Chart families** are lazy package subpaths:
+## What's inside
 
-| Subpath | Components |
+**Chart families** (Svelte components):
+
+| Import | What it gives you |
 | --- | --- |
-| `@texuli/charts/cartesian` | Cartesian, line, area, bar, stacked bar and combo charts ([docs](docs/charts-cartesian.md)) |
-| `@texuli/charts/part-whole` | Pie, donut, sunburst and treemap charts ([docs](docs/charts-part-whole.md)) |
-| `@texuli/charts/matrix` | Heatmap, scatter and bubble charts ([docs](docs/charts-matrix.md)) |
-| `@texuli/charts/compact` | Sparkline, bullet, gauge and progress ring charts ([docs](docs/charts-compact.md)) |
-| `@texuli/charts/flow` | Sankey, funnel and network charts ([docs](docs/charts-flow.md)) |
-| `@texuli/charts/geo` | Schematic tile and point maps ([docs](docs/charts-geo.md)) |
-| `@texuli/charts/histogram` | `HistogramChart`, built on `bin` ([docs](docs/charts-histogram.md)) |
-| `@texuli/charts/pack` | `PackChart`, built on `pack` ([docs](docs/charts-pack.md)) |
-| `@texuli/charts/calendar` | `CalendarHeatmap`, built on `calendarLayout` ([docs](docs/charts-calendar.md)) |
-| `@texuli/charts/statistical` | `BoxPlotChart`, `ViolinChart` and `EcdfChart`, with quantile, box-summary, kernel-density and ECDF math ([docs](docs/charts-statistical.md)) |
-| `@texuli/charts/worker` (+ `/entry`, the module the host's `Worker` loads) | Opt-in worker offload for `bin`, LTTB and min-max on very large series, with a main-thread fallback ([docs](docs/charts-worker.md)) |
-| `@texuli/charts/streaming` | Immutable bounded append helpers for numeric chart series ([docs](docs/charts-large-series.md#append-only-numeric-streams)) |
-| `@texuli/charts/canvas` | Dense-series canvas renderer ([docs](docs/charts-canvas.md)) |
-| `@texuli/charts/interaction` | Tooltip, legend, table and exploration building blocks ([docs](docs/charts-interaction.md)) |
-| `@texuli/charts/axis` | Reusable SVG axes, tick model and numeric/time formatters ([docs](docs/charts-axis.md)) |
-| `@texuli/charts/annotations` | `AnnotationLayer` and the shared annotation model used by the Cartesian and matrix charts ([docs](docs/charts-annotations.md)) |
-| `@texuli/charts/schemas` | The per-family prop schemas (`chartPropSchemas`) for builders and inspectors ([docs](docs/charts-schemas.md)) |
-| `@texuli/charts/colors` | Token-backed categorical, sequential, and diverging color scale helpers ([docs](docs/charts-colors.md)) |
+| `@texuli/charts/cartesian` | `LineChart`, `AreaChart`, `BarChart`, `StackedBarChart`, `ComboChart` and the shared `CartesianChart` |
+| `@texuli/charts/part-whole` | Pie, donut, sunburst and treemap charts |
+| `@texuli/charts/matrix` | Heatmap, scatter and bubble charts |
+| `@texuli/charts/compact` | `Sparkline`, `BulletChart`, `Gauge` and `ProgressRing` |
+| `@texuli/charts/flow` | Sankey, funnel and network charts |
+| `@texuli/charts/geo` | Schematic tile and point maps |
+| `@texuli/charts/histogram` | `HistogramChart` |
+| `@texuli/charts/pack` | `PackChart` (circle packing) |
+| `@texuli/charts/calendar` | `CalendarHeatmap` |
+| `@texuli/charts/statistical` | `BoxPlotChart`, `ViolinChart` and `EcdfChart`, with quantile, density and ECDF math |
 
-Every chart family renders accessible text (`role="img"`, a label, title and
-description) and a data-table fallback: the shared `ChartTable` behind a
-**Show data table** button on the Cartesian family, and a `details` disclosure
-in every other family. Only cartesian charts (by default) and matrix charts
-(with `interactive`) add a point-by-point keyboard explorer.
+**Building blocks:**
 
-Every subpath above links its reference in [`docs/`](docs/): components, props
-(generated from `@texuli/charts/schemas`, with their `blueprint` or `developer`
-exposure), scales and layout, keyboard access and the registered example. The
-math subpaths are described in the table at the top of this page. The eleven
-family examples are
-registered in the examples registry (`charts-cartesian`, `charts-part-whole`,
-`charts-matrix`, `charts-compact`, `charts-flow`, `charts-geo`,
-`charts-histogram`, `charts-pack`, `charts-calendar`, `charts-canvas`,
-`charts-interaction`), as are `charts-statistical`, `charts-windowed`
-(`visibleDomain`) and the right-to-left `charts-rtl`; all carry visual
-baselines in `tests/visual/`.
-
-Charts work in right-to-left pages: captions, legends and tables follow the
-document direction, while each plot keeps a left-to-right coordinate system
-(`direction="ltr"` on every chart SVG). See [right-to-left layouts](docs/charts-rtl.md).
-
-Cartesian, matrix, and histogram charts use the shared axis renderer and its
-deterministic default number formatting. Custom `Axis` compositions accept a
-typed `format` callback; `formatNumericAxisTick` and `formatTimeAxisTick` are
-available from `@texuli/charts/axis`.
-
-Cartesian families can render a numeric x-domain window from a larger series
-with the optional `visibleDomain` prop; see [windowed cartesian series](docs/charts-large-series.md).
-Append-only numeric updates are available through `appendSeriesWindow` and
-`appendCartesianSeriesWindow` in `@texuli/charts/streaming`.
-
-## Large-data limits
-
-What stays bounded however long the input is:
-
-| Surface | Limit |
+| Import | What it gives you |
 | --- | --- |
-| `Sparkline` marks | At most `SPARKLINE_MAX_POINTS` (2,000) drawn samples plus the end marker; longer series draw min-max buckets (first, lowest, highest, last and gaps per bucket), so spikes survive |
-| `Sparkline` data table | Past `SPARKLINE_TABLE_WINDOW` (200) values the table renders a scroll window of rows (`tableWindow`, the same pattern as `ChartTable`) in a focusable region; `aria-rowcount` and `aria-rowindex` keep the full count, and every row stays reachable by scrolling |
-| `bin` and `HistogramChart` | At most `MAX_BINS` (1,000) bins from `count`; the extent is one scan |
-| Statistical marks | 100,000 values per group, 24 groups, 200 drawn outliers, 512 density points; each group is sorted once |
+| `@texuli/charts/axis` | Reusable SVG axes, the tick model and numeric and time tick formatters |
+| `@texuli/charts/interaction` | Tooltip, legend, data table and keyboard exploration pieces |
+| `@texuli/charts/annotations` | `AnnotationLayer`: reference lines, bands and point callouts |
+| `@texuli/charts/canvas` | A canvas renderer for dense series |
+| `@texuli/charts/colors` | Token-backed categorical, sequential and diverging color scales |
+| `@texuli/charts/schemas` | `chartPropSchemas`, the prop schema of every family, for builders and inspectors |
 
-`pnpm test:perf` runs `tests/perf/charts-large-data.test.ts`, which asserts
-these output bounds and wall-clock budgets calibrated against a native 100k
-sort. Measured numbers are in [PERFORMANCE](../../docs/PERFORMANCE.md).
+**Data and math** (framework-free TypeScript):
 
-## Testing
+| Import | What it gives you |
+| --- | --- |
+| `@texuli/charts`, `@texuli/charts/math` | Every math export below, from one entry |
+| `@texuli/charts/math/scales` | Linear, log, sqrt, time, band, point and ordinal scales; ticks and nice domains |
+| `@texuli/charts/math/shapes` | Line, area and arc paths, pie, stack, bin and symbols |
+| `@texuli/charts/math/layout` | Treemap, sunburst, pack, Sankey, funnel, gauge, calendar and matrix layouts |
+| `@texuli/charts/math/downsample` | LTTB and min-max downsampling, `bisectX` |
+| `@texuli/charts/math/color` | A sequential color fallback |
+| `@texuli/charts/streaming` | Immutable, bounded append helpers for live numeric series |
+| `@texuli/charts/worker`, `@texuli/charts/worker/entry` | Opt-in Web Worker offload for binning and downsampling very large series, with a main-thread fallback; load the entry with `new Worker(new URL('@texuli/charts/worker/entry', import.meta.url), { type: 'module' })` |
 
-```bash
-pnpm vitest run packages/charts
-pnpm --filter @texuli/charts typecheck
-npx biome check packages/charts
-pnpm size --filter charts
-TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e/charts.spec.ts tests/e2e/charts-families.spec.ts tests/e2e/charts-worker.spec.ts
-```
+## Key guarantees
 
-The browser specs run on the registered examples (`/?fixture=<id>`) in Chromium,
-the Pixel 7 profile and WebKit:
+- **Accessible by default.** Every chart has `role="img"`, a title and a
+  description, plus a data-table fallback: a **Show data table** button on
+  the cartesian family and a `details` disclosure everywhere else. Cartesian
+  charts (and matrix charts with `interactive`) add a keyboard explorer:
+  arrow keys, Home/End, Page Up/Down between series, Escape to dismiss.
+- **Right-to-left ready.** Captions, legends and tables follow the page
+  direction; each plot keeps a left-to-right coordinate system.
+- **Themeable.** Series colors default to the `--tx-chart-*` tokens, so
+  charts follow the active Texuli theme; the full-size families also take a
+  `mode` of `light` or `dark`.
+- **No third-party chart library.** The scales, shapes and layouts are
+  written in-house as plain TypeScript.
+- **Bounded on large data.** `Sparkline` draws at most 2,000 samples (longer
+  series fall back to min-max buckets so spikes survive), `bin` makes at most
+  1,000 bins, and statistical charts cap groups, outliers and density points.
+  The cartesian `renderer="auto"` mode switches to canvas at 5,000 points.
 
-| Spec area | What it checks | Fixture |
-| --- | --- | --- |
-| Keyboard exploration | Arrow/Page keys announce points; Escape closes the tooltip; axe has no violations | `charts-interaction`, `charts-cartesian` |
-| Tooltips | Pointer hover shows a tooltip beside the snapped point listing every series; it hides when the pointer leaves | `charts-cartesian` |
-| Legends | Space/Enter toggle series (`aria-pressed`), hidden series lose their marks, the last visible series stays locked | `charts-cartesian` |
-| `visibleDomain` | Exploration is limited to the window plus one neighbor per side; moving the window moves the first and last points | `charts-windowed` |
-| Data tables | The cartesian table toggle works with Enter/Space and returns focus; every family's `details` disclosure is reachable with Tab and opens with Enter | `charts-cartesian`, part-whole, matrix, flow, geo, compact, histogram, statistical |
-| Canvas renderer | Dense series draw on an `aria-hidden` canvas, emit no SVG marks, keep a named plot, a downsampled explorer and the data table | `charts-canvas` |
-| Right-to-left | Plot SVGs compute `direction: ltr`, heatmap row labels end before the cells, captions align to the right, the tooltip stays beside its point | `charts-rtl` |
+## Documentation
 
-The worker offload runs in a real module `Worker` in
-`tests/e2e/charts-worker.spec.ts`, which checks its results equal the
-synchronous ones and that a blocked worker falls back to the main thread.
-Not covered in the browser: Firefox and pointer brushing/zoom.
+- Site: [texuli.com](https://texuli.com) and the
+  [charts gallery](https://texuli.com/charts-page/)
+- Families:
+  [cartesian](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-cartesian.md),
+  [part-whole](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-part-whole.md),
+  [matrix](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-matrix.md),
+  [compact](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-compact.md),
+  [flow](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-flow.md),
+  [geo](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-geo.md),
+  [histogram](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-histogram.md),
+  [pack](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-pack.md),
+  [calendar](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-calendar.md),
+  [statistical](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-statistical.md)
+- Building blocks:
+  [axis](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-axis.md),
+  [interaction and keyboard](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-interaction.md),
+  [annotations](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-annotations.md),
+  [canvas](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-canvas.md),
+  [colors](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-colors.md),
+  [prop schemas](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-schemas.md)
+- Guides:
+  [large and streaming series](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-large-series.md),
+  [worker offload](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-worker.md),
+  [right-to-left layouts](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-rtl.md)
+- Source: [github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli)
+  · Issues: [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues)
+
+## Contributing
+
+Contributions are welcome; start at the
+[GitHub repository](https://github.com/DailybotHQ/texuli).
+
+## License
+
+MIT © Dailybot, Inc.

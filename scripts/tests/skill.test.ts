@@ -423,6 +423,8 @@ describe('commands, CLI references and snippets', () => {
       'TEXULI_E2E_PORT=4830 pnpm exec playwright test tests/e2e/site-seo.spec.ts',
       'pnpm vitest run packages/texuli/tests/<name>.test.ts',
       'npx biome check scripts/check-skill.ts',
+      // A bin a workspace package publishes is what a consumer's npx runs.
+      'npx texuli-init theme list',
       './skills/texuli/setup.sh --verify --expect-version 0.1.0',
       './texuli/setup.sh --verify --dir ./texuli --sums ./SHA256SUMS',
       'git merge --no-edit dev',

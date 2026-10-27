@@ -24,10 +24,10 @@ end to end and native for agents:
 
 **Status: in development, not released.** The 15 packable packages (all
 of `packages/` except `@texuli/editor` and `@texuli/examples`, which are
-never packed) are published to npm as `0.1.0-next.2` under the `next`
+never packed) are published to npm as `0.1.0-next.3` under the `next`
 dist-tag by the publish workflow; the workspace packages stay
-`private: true`, no stable release is out (`latest` is reserved for 1.0.0
-by policy; see [RELEASE](docs/RELEASE.md) for where it resolves today),
+`private: true`, no stable release is out (until 1.0.0, `latest` tracks the newest
+preview; see [RELEASE](docs/RELEASE.md)),
 and texuli.com deploys from `main` to Cloudflare Pages, with the Pages
 Functions in `functions/`. See
 [docs/PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md) and
@@ -189,10 +189,10 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The 15 packable packages are on npm as `0.1.0-next.2`
+    check results. The 15 packable packages are on npm as `0.1.0-next.3`
     (dist-tag `next`, published by CI with provenance); `@texuli/editor`,
     `@texuli/examples`, the apps and `native/` publish nothing. No stable
-    release is published (`latest` stays reserved for 1.0.0). texuli.com
+    release is published (`latest` tracks the newest preview until 1.0.0). texuli.com
     deploys from `main` (Cloudflare Pages); the agent service is not
     deployed.
 13. **Scratch work** goes in `tmp/`. Plan artifacts go in

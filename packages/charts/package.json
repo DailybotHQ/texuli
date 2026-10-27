@@ -1,6 +1,6 @@
 {
   "name": "@texuli/charts",
-  "version": "0.1.0-next.2",
+  "version": "0.1.0-next.3",
   "private": true,
   "description": "Chart math and every chart family, one lazy subpath per family.",
   "keywords": [
@@ -149,10 +149,10 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.1.0-next.2",
-    "@texuli/primitives": "0.1.0-next.2",
-    "@texuli/tokens": "0.1.0-next.2",
-    "texuli": "0.1.0-next.2"
+    "@texuli/core": "0.1.0-next.3",
+    "@texuli/primitives": "0.1.0-next.3",
+    "@texuli/tokens": "0.1.0-next.3",
+    "texuli": "0.1.0-next.3"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

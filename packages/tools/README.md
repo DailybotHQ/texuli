@@ -1,37 +1,130 @@
 # @texuli/tools
 
-**Layer L8: tools.** Agent and developer tooling over the library: the
-copy-in CLI, the agent docs bundle, the A2UI adapter, custom elements, the
-golden set and the read-only MCP server. Published to npm as `0.1.0-next.2` under the `next`
-dist-tag (by CI, with provenance); no stable release (`latest` is reserved
-for 1.0.0), so install it with `@next`. The workspace package stays
-`"private": true`. The bins below are
-documented for use inside this repository.
+Agent and developer tooling for [Texuli](https://texuli.com), an
+MIT-licensed Svelte 5 component library by Dailybot, Inc. (*Small pieces.
+Infinite possibilities.*). It includes command-line tools that wire Texuli
+themes into a project and copy component source into your app. It also
+generates `llms.txt` agent docs from the component catalog, converts to and
+from A2UI messages, and provides light-DOM custom elements that render
+catalog trees in any host, Svelte or not. A golden set of interface tasks
+with an offline scorer measures how well an agent builds with the catalog.
 
-## What exists today
+> **Status: preview.** Texuli is in development. The packages are published
+> to npm as prereleases under the `next` dist-tag, and there is no stable
+> release yet, so install with `@next`. APIs may still change between
+> previews.
 
-Every area has source in `src/` and a unit test in `tests/`. All areas
-except the MCP server also have a doc in [`docs/`](docs/) and an exported
-subpath in `package.json`.
+## Install
 
-| Area | Source | Subpath | Bin | What it does |
-| --- | --- | --- | --- | --- |
-| Copy-in CLI | `src/cli-add/` | `@texuli/tools/cli-add` | `texuli-add` | Copies styled component source into a consumer app with a provenance header. Never copies `@texuli/primitives`; local paths only. [Docs](docs/cli-add.md) |
-| Init and themes | `src/cli-init/` | `@texuli/tools/cli-init` | `texuli-init` | Wires tokens and CSS into a Vite, Astro or SvelteKit project, then lists, previews and applies themes from the theme library (210 themes). Local files only. [Docs](docs/cli-init.md) |
-| Update | `src/cli-update/` | `@texuli/tools/cli-update` | `texuli-update` | Updates a component copied with `texuli add` to new source by three-way merge: base from the provenance headers, the consumer's edits, the new upstream. [Docs](docs/cli-update.md) |
-| Agent docs bundle | `src/llms/` | `@texuli/tools/llms` | `texuli-llms` | Generates the llms.txt bundle and agent-facing docs from catalog manifests. [Docs](docs/llms.md) |
-| A2UI adapter (experimental) | `src/a2ui/` | `@texuli/tools/a2ui` | — | Converts between catalog trees and A2UI v0.9 server-to-client messages, on plain data only. [Docs](docs/a2ui.md) |
-| Custom elements | `src/elements/` | `@texuli/tools/elements` | — | Light-DOM custom elements that render catalog trees with the real content components, for hosts that do not use Svelte. [Docs](docs/elements.md) |
-| Golden set | `src/golden/` | `@texuli/tools/golden` | CLI source only: `src/golden/cli.ts`, not a registered bin | Thirty pre-registered interface tasks for agents, each with a reference tree, plus an offline scorer. [Docs](docs/golden.md) |
-| MCP server | `src/mcp/` | — | — | The read-only local stdio MCP server over the catalog and themes (`catalog`, `component`, `validate`, `example`, `theme` tools). Source and tests only: no export, no published binary. |
+```bash
+npm install @texuli/tools@next svelte
+```
 
-The root entry (`@texuli/tools`) re-exports the A2UI, copy-in CLI, update
-and llms helpers.
+Svelte 5 (`^5.57.2`) is a peer dependency. The package installs four
+command-line tools: `texuli-init`, `texuli-add`, `texuli-update` and
+`texuli-llms`. They work on local files only and make no network requests.
 
-## Status
+Run them with `npx` (or from a package script):
 
-Implemented and gated in this repository: unit tests per area, including
-`tests/mcp.test.ts`. The package itself is on npm as `0.1.0-next.2`
-(`next` dist-tag), but the MCP server is not delivered outside this
-repository: it has no export and no published binary
-([ARCHITECTURE](../../docs/ARCHITECTURE.md) tracks the delivery plan).
+```bash
+npx texuli-init theme list
+```
+
+## Quick start
+
+Wire Texuli's tokens and a theme into a Vite, Astro or SvelteKit project
+(the framework is detected from `package.json`):
+
+```bash
+npx texuli-init init --theme ocean --dry-run
+npx texuli-init theme preview ocean --mode dark
+```
+
+Render agent output in any page with the custom elements:
+
+```ts
+import { defineTexuliElements } from '@texuli/tools/elements';
+
+defineTexuliElements(); // <tx-catalog>, <tx-blocks-text>, <tx-charts-bar>, …
+```
+
+```html
+<tx-catalog>
+  <script type="application/json">
+    [{ "id": "blocks-text", "props": { "block": { "type": "heading", "level": 2, "text": "Quarterly notes" } } }]
+  </script>
+</tx-catalog>
+```
+
+## What's inside
+
+**Command-line tools**
+
+| Command | Subpath | What it does |
+| --- | --- | --- |
+| `texuli-init` | `@texuli/tools/cli-init` | `init` wires tokens, a theme and a no-flash bootstrap into a project; `theme list`, `theme preview` and `theme apply` work with the theme library |
+| `texuli-add` | `@texuli/tools/cli-add` | Copies styled component source into your app with a provenance header, from a Texuli source checkout (`--source-root`) |
+| `texuli-update` | `@texuli/tools/cli-update` | `diff` and `update` merge a copied component with new upstream source (three-way merge from the provenance headers) |
+| `texuli-llms` | `@texuli/tools/llms` | Generates `llms.txt`, `llms-full.txt` and per-component Markdown from catalog manifests |
+
+**Libraries**
+
+| Subpath | What it does |
+| --- | --- |
+| `@texuli/tools/elements` | Light-DOM custom elements that render catalog trees with the real content components |
+| `@texuli/tools/a2ui` | Experimental: converts catalog trees to and from A2UI v0.9 server-to-client messages, on plain data |
+| `@texuli/tools/golden` | Thirty interface tasks for agents, each with a reference tree, and an offline, report-only scorer |
+| `@texuli/tools/llms` | `buildLlmsBundle` and `writeLlmsBundle`: the agent docs bundle as a library |
+
+The root entry, `@texuli/tools`, re-exports the A2UI, copy-in, update and
+llms helpers.
+
+`npx texuli-llms --out <dir>` writes `llms.txt`, `llms-full.txt` and
+one Markdown page per catalog component from the published manifests.
+
+Not shipped in this package: the read-only MCP server over the catalog and
+themes exists in the repository source, but has no export and no published
+command yet.
+
+## Key guarantees
+
+- **Local only.** The CLIs read and write local files and never use the
+  network. `--dry-run` plans without writing, and `--json` prints
+  machine-readable results.
+- **Never overwrites silently.** `texuli-init` replaces a stylesheet or
+  config it did not generate only with `--force`, and never follows
+  symlinks; `texuli-update` refuses conflicts by default.
+- **Untrusted catalog trees.** The custom elements check every tree against
+  the catalog, at the `untrusted` tier by default, before it renders. The
+  A2UI adapter validates message shapes and works on plain data, with no
+  DOM and no network.
+- **Styled source only.** `texuli-add` copies styled components and never
+  copies the headless primitives package.
+
+## Documentation
+
+- Website: [texuli.com](https://texuli.com), the
+  [agents overview](https://texuli.com/agents-page/) and the site's
+  [llms.txt](https://texuli.com/llms.txt)
+- `texuli init` and themes: [cli-init.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/cli-init.md)
+- `texuli add`: [cli-add.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/cli-add.md) · `texuli diff` and `texuli update`: [cli-update.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/cli-update.md)
+- Agent docs bundle: [llms.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/llms.md)
+- Custom elements: [elements.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/elements.md)
+- A2UI adapter: [a2ui.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/a2ui.md)
+- Golden set and scorer: [golden.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/golden.md)
+
+## Related packages
+
+- [`@texuli/catalog`](https://www.npmjs.com/package/@texuli/catalog): the catalog these tools read and validate against.
+- [`@texuli/tokens`](https://www.npmjs.com/package/@texuli/tokens): the theme engine behind `texuli-init`.
+- [`@texuli/player`](https://www.npmjs.com/package/@texuli/player): paints validated blueprints in Svelte.
+
+## Contributing
+
+Source, issues and contribution guidelines live at
+[github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli). Report
+bugs at [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues).
+
+## License
+
+MIT © Dailybot, Inc.

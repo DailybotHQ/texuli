@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
  */
 const ROOT = 'packages/slides';
 const read = (path: string) => readFileSync(`${ROOT}/${path}`, 'utf8');
+const DOCS_URL = 'https://github.com/DailybotHQ/texuli/blob/main/packages/slides';
 
 const SUBPATH_DOCS: Record<string, { doc: string; entry?: string }> = {
   './model': { doc: 'docs/model.md', entry: 'src/model/index.ts' },
@@ -57,7 +58,8 @@ describe('slides documentation', () => {
     }
     for (const [subpath, { doc, entry }] of Object.entries(SUBPATH_DOCS)) {
       expect(existsSync(`${ROOT}/${doc}`), doc).toBe(true);
-      expect(readme, subpath).toContain(`](${doc})`);
+      // npm renders the README off-repo, so it links docs by absolute URL.
+      expect(readme, subpath).toContain(`](${DOCS_URL}/${doc})`);
       if (!entry) continue;
       const page = read(doc);
       const missing = exportedNames(read(entry)).filter((name) => !mentions(page, name));

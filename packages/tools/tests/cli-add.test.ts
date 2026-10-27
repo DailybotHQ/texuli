@@ -42,6 +42,22 @@ it('normalizes a pnpm shim entry path containing a parent segment', () => {
   }
 });
 
+it('recognizes a bin started through a node_modules/.bin symlink', async () => {
+  // npx and package scripts run the .bin link; the CLIs used to exit silently.
+  const dir = await tempDir('texuli-bin-');
+  const link = join(dir, 'texuli-add');
+  await symlink(resolve('packages/tools/src/cli-add/cli.ts'), link);
+  const previous = process.argv[1];
+  process.argv[1] = link;
+  try {
+    const moduleUrl = pathToFileURL(resolve('packages/tools/src/cli-add/cli.ts')).href;
+    expect(isMainModule(moduleUrl)).toBe(true);
+  } finally {
+    if (previous === undefined) delete process.argv[1];
+    else process.argv[1] = previous;
+  }
+});
+
 async function tempDir(prefix: string): Promise<string> {
   const dir = await mkdtemp(join(tmpdir(), prefix));
   temps.push(dir);

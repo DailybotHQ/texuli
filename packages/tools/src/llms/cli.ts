@@ -6,9 +6,9 @@
  *   pnpm exec tsx packages/tools/src/llms/cli.ts --out apps/website/public/llms --json
  */
 
-import { fileURLToPath } from 'node:url';
 import { buildCatalog } from '@texuli/catalog/build';
 import { discoverManifestGroups } from '@texuli/catalog/build/node';
+import { isMainModule } from '../internal/is-main.ts';
 import { buildLlmsBundle } from './bundle.ts';
 import { writeLlmsBundle } from './write.ts';
 
@@ -100,18 +100,10 @@ Generate llms.txt, llms-full.txt and components/<id>.md from catalog manifests.
   }
 }
 
-export function isMainModule(metaUrl: string): boolean {
-  const entry = process.argv[1];
-  if (!entry) return false;
-  try {
-    return fileURLToPath(metaUrl) === entry;
-  } catch {
-    return false;
-  }
-}
-
 if (isMainModule(import.meta.url)) {
   runLlmsCli().then((result) => {
     if (!result.ok) process.exitCode = 1;
   });
 }
+
+export { isMainModule };

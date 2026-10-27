@@ -1,86 +1,139 @@
 # @texuli/blocks
 
-**Layer L5: content blocks.** The closed content vocabulary for pages,
-documents and slides: schema-validated block types, framework-free family
-engines, Svelte 5 renderers, the untrusted-input guard, the closed formula
-AST and catalog metadata. Published to npm as `0.1.0-next.2` under the `next`
-dist-tag (by CI, with provenance); no stable release (`latest` is reserved
-for 1.0.0), so install it with `@next`. The workspace package stays
-`"private": true`.
+Content blocks for pages, documents and slides: a closed vocabulary of
+typed JSON blocks (headings, rich text, columns, tabs, images, tables, KPIs,
+charts, maps, polls, code and more), an untrusted-input guard that validates
+them, framework-free engines and Svelte 5 renderers. It is built for content
+that comes from people or AI agents: anything that fails validation becomes
+an inert notice instead of reaching the page. It is part of
+[Texuli](https://texuli.com), "Small pieces. Infinite possibilities.": an MIT
+Svelte 5 component library by Dailybot, Inc.
 
-## What exists today
+> **Status: preview.** `@texuli/blocks` is published on npm under the `next`
+> dist-tag. There is no stable release yet, so install it with `@next` and
+> expect the API to change between previews.
 
-Every family below is implemented, exported and tested. The root barrel
-`src/index.ts` re-exports the core vocabulary plus, for every family, its
-`*_BLOCK_TYPES` list, `check*Block` authoring guard, `is*FamilyBlock`
-narrower and `load*Family()` renderers loader. Engines stay behind their
-`/engine` subpaths, and the Svelte renderers load through the
-`load*Family()` loaders.
+## Install
 
-| Family | Block types | Subpaths | Doc |
-| --- | --- | --- | --- |
-| Core vocabulary | schemas, limits, safety, untrusted guard, text helpers, catalog (see below) | `@texuli/blocks`, `@texuli/blocks/core` | — |
-| Formula | closed calculator engine: parser, AST, evaluator, limits, diagnostics | `@texuli/blocks/formula` | [formula](docs/formula.md) |
-| Text | `heading`, `text`, `list`, `quote`, `callout` | `@texuli/blocks/text`, `@texuli/blocks/text/engine`, `@texuli/blocks/text/markdown`, `@texuli/blocks/text/renderers` | [text](docs/text.md) |
-| Structure | `columns`, `grid`, `tabs`, `accordion`, `cards`, `divider`, `cta` | `@texuli/blocks/structure`, `@texuli/blocks/structure/engine`, `@texuli/blocks/structure/renderers` | [structure](docs/structure.md) |
-| Media | `image`, `figure`, `video`, `gallery` | `@texuli/blocks/media`, `@texuli/blocks/media/engine`, `@texuli/blocks/media/renderers` | [media](docs/media.md) |
-| Embed | `embed-app`, `link-preview` | `@texuli/blocks/embed`, `@texuli/blocks/embed/engine`, `@texuli/blocks/embed/renderers` | [embed](docs/embed.md) |
-| Interactive | `poll`, `quiz`, `calculator`, `checklist` | `@texuli/blocks/interactive`, `@texuli/blocks/interactive/engine`, `@texuli/blocks/interactive/renderers` | [interactive](docs/interactive.md) |
-| Data | `table`, `stat`, `kpi`, `chart` — chart kinds: `line`, `area`, `bar`, `stacked-bar`, `combo`, `heatmap`, `scatter` | `@texuli/blocks/data`, `@texuli/blocks/data/engine`, `@texuli/blocks/data/renderers` | [blocks-data](docs/blocks-data.md) |
-| Map | `map` — places and an optional route on a basemap | `@texuli/blocks/map`, `@texuli/blocks/map/engine`, `@texuli/blocks/map/renderers` | [map](docs/map.md) |
-| Diagram | `flow`, `tree`, `board`, `terminal` diagrams from validated data | `@texuli/blocks/diagram`, `@texuli/blocks/diagram/engine`, `@texuli/blocks/diagram/renderers` | — |
-| Code | `code` | `@texuli/blocks/code`, `@texuli/blocks/code/engine`, `@texuli/blocks/code/tokenizer`, `@texuli/blocks/code/renderers` | [code](docs/code.md) |
-
-`docs/` has one page per area; each page names its imports and limits.
-
-## Core vocabulary and guard
-
-The core engine (root and `@texuli/blocks/core`) exports:
-
-| Area | Exports |
-| --- | --- |
-| Limits | `BLOCK_LIMITS` |
-| Safety | `isUnsafeTextCharacter`, `classifyMediaSource`, `hasUnsafeText` |
-| Schemas | `safeParseBlocks`, `safeParseBlock`, `BLOCK_TYPES`, the block types |
-| Untrusted | `parseUntrustedBlocks` |
-| Formula | `parseFormula`, `evaluateFormula`, `formatFormulaValue`, `FORMULA_LIMITS` |
-| Catalog | `BLOCK_CATALOG`, `getCatalogEntry`, `validateBlocksForAuthoring` |
-| Text | `walkBlocks`, `blockText`, `headingOutline`, `slugifyHeading` |
-
-## Safety rules
-
-- No zod: owned validators only (runtime allowlists).
-- No HTML sinks; every href passes `safeHref` from `@texuli/core/url-policy`
-  at the `untrusted` tier (action, CTA, link preview).
-- Formulas are closed JSON ASTs — parsed, evaluated and formatted, never
-  executed as code.
-- Trojan Source attacks and bidi controls are stripped or refused.
-- Fictional example data only (`example.com`).
-
-## Layout
-
-```text
-packages/blocks/
-├── docs/            one page per area (blocks-data, code, embed, formula,
-│                    interactive, map, media, structure, text)
-├── src/
-│   ├── index.ts     root barrel: core plus per-family types, guards, loaders
-│   ├── core/        vocabulary, schemas, limits, safety, untrusted, text,
-│   │                catalog, formula
-│   └── <family>/    text, structure, media, embed, interactive, data, map,
-│                    diagram, code — engine + renderers per family; text
-│                    adds markdown, code adds the tokenizer
-└── tests/           one suite per family plus core, engine-subpaths
-                     (formula included), chart-parity, readme-subpaths
+```sh
+npm install @texuli/blocks@next @texuli/tokens@next svelte
 ```
 
-## Testing
+- `svelte` (^5.57.2) is a peer dependency.
+- The renderers style themselves with the Texuli `--tx-*` design tokens.
+  Import the token stylesheet once in your app (installing `@texuli/tokens`
+  directly lets your bundler resolve it); each renderer imports its own CSS.
 
-```bash
-pnpm vitest run packages/blocks
-pnpm --filter @texuli/blocks typecheck
-npx biome check packages/blocks
+```css
+@import '@texuli/tokens/base.css';
 ```
 
-`tests/readme-subpaths.test.ts` pins this README to the package manifest:
-every export subpath and every docs page must stay documented.
+## Quick start
+
+Validate untrusted JSON, then render the text family with its lazily loaded
+renderer:
+
+```svelte
+<script lang="ts">
+  import { isTextFamilyBlock, loadTextFamily, parseUntrustedBlocks } from '@texuli/blocks';
+
+  // For example, JSON produced by an agent.
+  let { input }: { input: string } = $props();
+
+  const result = $derived(parseUntrustedBlocks(input));
+</script>
+
+{#if result.success}
+  {#await loadTextFamily() then { default: TextBlockView }}
+    {#each result.blocks.filter(isTextFamilyBlock) as block, index (index)}
+      <TextBlockView {block} />
+    {/each}
+  {/await}
+{:else}
+  <p>This content could not be displayed.</p>
+{/if}
+```
+
+With `input` set to
+`[{"type":"heading","level":2,"text":"Release notes"},{"type":"text","markdown":"A **safe** paragraph."}]`,
+this renders an `h2` and a paragraph. `parseUntrustedBlocks` accepts JSON text
+or objects, enforces size, depth and count limits, strips invisible and
+bidirectional control characters, and returns either the typed blocks or a
+list of issues. It never throws.
+
+The package root exports a `load*Family()` renderer loader and a
+`*_BLOCK_TYPES` list for every family, plus `check*Block` guards and
+`is*FamilyBlock` narrowers for most of them.
+
+## What's inside
+
+| Family | Block types | Imports |
+| --- | --- | --- |
+| Core | Schemas, limits, safety checks, the untrusted guard, text helpers and catalog metadata | `@texuli/blocks`, `@texuli/blocks/core` |
+| Formula | A closed calculator language: parser, AST, evaluator and formatter | `@texuli/blocks/formula` |
+| Text | `heading`, `text`, `list`, `quote`, `callout` | `@texuli/blocks/text`, `@texuli/blocks/text/engine`, `@texuli/blocks/text/markdown`, `@texuli/blocks/text/renderers` |
+| Structure | `columns`, `grid`, `tabs`, `accordion`, `cards`, `divider`, `cta` | `@texuli/blocks/structure`, `@texuli/blocks/structure/engine`, `@texuli/blocks/structure/renderers` |
+| Media | `image`, `figure`, `video`, `gallery` | `@texuli/blocks/media`, `@texuli/blocks/media/engine`, `@texuli/blocks/media/renderers` |
+| Embed | `embed-app`, `link-preview` | `@texuli/blocks/embed`, `@texuli/blocks/embed/engine`, `@texuli/blocks/embed/renderers` |
+| Interactive | `poll`, `quiz`, `calculator`, `checklist` | `@texuli/blocks/interactive`, `@texuli/blocks/interactive/engine`, `@texuli/blocks/interactive/renderers` |
+| Data | `table`, `stat`, `kpi`, `chart` (line, area, bar, stacked bar, combo, heatmap, scatter) | `@texuli/blocks/data`, `@texuli/blocks/data/engine`, `@texuli/blocks/data/renderers` |
+| Map | `map`: places and an optional route on an offline basemap | `@texuli/blocks/map`, `@texuli/blocks/map/engine`, `@texuli/blocks/map/renderers` |
+| Diagram | `flow`, `tree`, `board` and `terminal` diagrams | `@texuli/blocks/diagram`, `@texuli/blocks/diagram/engine`, `@texuli/blocks/diagram/renderers` |
+| Code | `code`, with syntax colors from an owned tokenizer | `@texuli/blocks/code`, `@texuli/blocks/code/engine`, `@texuli/blocks/code/tokenizer`, `@texuli/blocks/code/renderers` |
+
+In each family, the plain subpath is the light API (guards, labels, the lazy
+loader), `/engine` is framework-free logic, and `/renderers` gives you the
+Svelte views eagerly. `@texuli/blocks/text/markdown` is the owned Markdown
+subset parser.
+
+The core vocabulary includes `safeParseBlocks` and `safeParseBlock`,
+`parseUntrustedBlocks`, `BLOCK_LIMITS`, `BLOCK_CATALOG` with
+`validateBlocksForAuthoring` (metadata for builders and agents), and the
+text helpers `walkBlocks`, `blockText` and `headingOutline`.
+
+## Key guarantees
+
+- **Untrusted by design.** Every block passes an owned runtime validator
+  before anything renders; a rejected block becomes an inert, translatable
+  notice.
+- **No HTML sinks.** Markdown, code and every other block render as Svelte
+  text and elements, never through `{@html}`. Raw tags in Markdown stay
+  literal text.
+- **URL policy on every link.** Links, calls to action and link previews pass
+  `safeHref` at the `untrusted` tier. Block media accepts only avatar ids,
+  small inline `data:` images and videos, and relative paths; remote URLs are
+  refused at parse time.
+- **No code execution.** Formulas are closed JSON ASTs that are parsed,
+  evaluated and formatted, never run as code. Embed apps start only after the
+  user activates them, inside a host-provided mount, and link previews never
+  fetch.
+- **No network from maps.** The map block draws on an offline, fictional
+  basemap; it never loads tiles or geocodes.
+- **Trojan Source safe.** Bidirectional overrides and invisible control
+  characters are stripped or refused.
+
+## Documentation
+
+- Site: [texuli.com](https://texuli.com) and the
+  [blocks gallery](https://texuli.com/blocks-page/)
+- Families:
+  [text](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/text.md),
+  [structure](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/structure.md),
+  [media](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/media.md),
+  [embed](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/embed.md),
+  [interactive](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/interactive.md),
+  [data](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/blocks-data.md),
+  [map](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/map.md),
+  [code](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/code.md),
+  [formula](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/formula.md)
+- Source: [github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli)
+  · Issues: [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues)
+
+## Contributing
+
+Contributions are welcome; start at the
+[GitHub repository](https://github.com/DailybotHQ/texuli).
+
+## License
+
+MIT © Dailybot, Inc.

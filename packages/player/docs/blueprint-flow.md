@@ -1,6 +1,6 @@
 # Embedding the blueprint flow
 
-**Packages:** `@texuli/player`, `@texuli/catalog` (on npm as `0.1.0-next.2`
+**Packages:** `@texuli/player`, `@texuli/catalog` (on npm as `0.1.0-next.3`
 under the `next` dist-tag; no stable release; the workspace packages stay
 `"private": true`)
 
@@ -48,7 +48,7 @@ blueprint (text or data)
 - **Every change re-validates.** Pass the new tree through `blueprint` and
   the player re-validates the whole tree on the same handle. Loaded painters,
   local state, the flow view and the selection are kept
-  ([Live updates](../README.md#live-updates-r20)).
+  ([Live updates](reference.md#live-updates-r20)).
 - **Invalid drafts.** `invalidPolicy="refuse"` (the default) shows a notice
   instead of the tree. `"preview"` paints the valid parts with visible
   placeholders under a warning, for an editor; it never activates anything.
@@ -169,7 +169,7 @@ if (!result.ok) {
   activation and tier the input declared are never trusted.
 - **Local state.** A blueprint in the player's provisional
   `texuli-local-state` wrapper is resolved by the player before validation
-  ([Local state](../README.md#local-state-g01)). `validateDraft` alone does
+  ([Local state](reference.md#local-state-g01)). `validateDraft` alone does
   not unwrap it; validate those through the player.
 
 ## 5. Edit with undo

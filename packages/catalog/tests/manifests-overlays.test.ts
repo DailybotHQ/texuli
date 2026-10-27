@@ -1,5 +1,7 @@
 // @vitest-environment node
-import { readdir } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { expect, it } from 'vitest';
 import { buildCatalog } from '../src/build/index.ts';
 import { discoverManifestGroups, MANIFESTS_DIR } from '../src/build/node.ts';
@@ -99,5 +101,22 @@ it('overlay manifests are a closed, frozen, never-emittable set with schema pari
     for (const id of build.catalog.groups.overlays ?? []) {
       expect(build.catalog.tiers.untrusted).not.toContain(id);
     }
+  }
+});
+
+it('discovers a group shipped as index.js, as in the published package', async () => {
+  // The npm tarball ships compiled .js only; discovery once looked for index.ts alone.
+  const dir = await mkdtemp(join(tmpdir(), 'texuli-manifests-'));
+  try {
+    await mkdir(join(dir, 'sample'));
+    await writeFile(
+      join(dir, 'sample', 'index.js'),
+      "export const SAMPLE = { id: 'sample-widget', package: 'texuli', props: [] };\n"
+    );
+    const groups = await discoverManifestGroups(dir);
+    expect(groups.map((group) => group.name)).toEqual(['sample']);
+    expect(groups[0]?.manifests.map((manifest) => manifest.id)).toEqual(['sample-widget']);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
   }
 });

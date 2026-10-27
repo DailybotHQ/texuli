@@ -2,8 +2,9 @@
 /**
  * Node side of the catalog build: finds every manifest group folder and
  * writes the content-addressed file. Groups are discovered from the folders
- * of `src/manifests/` (each with an `index.ts`), so a new group is picked up
- * without changing the build.
+ * of `src/manifests/` (each with an `index.ts`, or the `index.js` the
+ * published package ships), so a new group is picked up without changing
+ * the build.
  */
 import { existsSync } from 'node:fs';
 import { mkdir, readdir, writeFile } from 'node:fs/promises';
@@ -37,19 +38,29 @@ export function manifestsOf(module: Record<string, unknown>): CatalogManifest[] 
   return [...found];
 }
 
-/** Imports each `<dir>/<group>/index.ts` and collects its manifests, groups sorted by name. */
+/** A group folder's entry: `index.ts` in the source tree, `index.js` in the published package. */
+function groupEntry(dir: string, name: string): string | undefined {
+  return ['index.ts', 'index.js']
+    .map((file) => join(dir, name, file))
+    .find((path) => existsSync(path));
+}
+
+/** Imports each `<dir>/<group>/index.(ts|js)` and collects its manifests, groups sorted by name. */
 export async function discoverManifestGroups(
   dir: string = MANIFESTS_DIR
 ): Promise<ManifestGroup[]> {
   const folders = (await readdir(dir, { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory() && existsSync(join(dir, entry.name, 'index.ts')))
+    .filter((entry) => entry.isDirectory() && groupEntry(dir, entry.name))
     .map((entry) => entry.name)
     .sort();
   return Promise.all(
     folders.map(async (name) => ({
       name,
       manifests: manifestsOf(
-        (await import(pathToFileURL(join(dir, name, 'index.ts')).href)) as Record<string, unknown>
+        (await import(pathToFileURL(groupEntry(dir, name) as string).href)) as Record<
+          string,
+          unknown
+        >
       ),
     }))
   );

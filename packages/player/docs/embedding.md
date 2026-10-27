@@ -1,13 +1,13 @@
 # Embedding the player
 
-**Package:** `@texuli/player` (private workspace package; not published as a
-stable release)
+**Package:** `@texuli/player` (preview on npm under the `next` dist-tag; no
+stable release yet)
 
 How to put a validated catalog blueprint on a page: quick start, the props a
 host controls, the trust badge and frame contract, localization, inactive
-frames, and the four ways to embed. The package [README](../README.md) is the
-reference for loaders, error placeholders, layouts, keyboard, local state and
-the iframe protocol; [paint-proof.md](paint-proof.md) argues the security
+frames, and the four ways to embed. The [player reference](reference.md)
+covers loaders, error placeholders, layouts, keyboard, local state and the
+iframe protocol; [paint-proof.md](paint-proof.md) argues the security
 property. To validate, edit, digest and activate blueprints around the
 player, as the texuli.com builder does, read
 [blueprint-flow.md](blueprint-flow.md).
@@ -62,17 +62,17 @@ Every option belongs to the host. A blueprint can set none of them.
 | `density` | `'comfortable'` | `compact` tightens chrome and spacing for chat surfaces |
 | `active` | `true` | `false` makes the painted surface `inert` (see [Inactive frames](#inactive-frames)) |
 | `composer` | — | A host snippet painted under the surface, outside the validated tree |
-| `hostRegions` | — | Host snippets by region name, mounted where a `host-region` node names them, with no blueprint data (see [Host regions](../README.md#host-regions-r21)) |
+| `hostRegions` | — | Host snippets by region name, mounted where a `host-region` node names them, with no blueprint data (see [Host regions](reference.md#host-regions-r21)) |
 | `initialState`, `onStateChange` | — | Local state seeds and snapshots for blueprints that declare state |
 | `onDiagnostics` | — | Called after each validation with `{ status, surface, error?, diagnostics, receipt, stateIssues }`. `surface` is `'tree'` when the blueprint painted and `'notice'` when it was refused |
 | `onResize` | — | Called with the root's border-box `{ blockSize, inlineSize }` |
 | `onNodeError` | — | Called once per node that cannot paint, with `{ code, id, path, phase, error? }` |
 | `landmarks` | `true` | `false` stops layout painters from emitting `<main>`; pass it when the player sits inside your own landmark |
 | `motion` | `'auto'` | `auto` follows `prefers-reduced-motion`; `reduce` stops motion inside the player |
-| `selectable`, `selection`, `onSelectionChange` | `false`, —, — | Frame selection for a builder-style preview ([Selection](../README.md#selection-builder-preview)) |
-| `view`, `onFlowChange` | — | The flow view and its transitions ([Views and flows](../README.md#views-and-flows-g09)) |
-| `onAction` | — | Answers action-form intents with `confirmed` or `rejected`; without it, actions are unavailable ([Action surface](../README.md#action-surface-and-receipts-g17)) |
-| `dataSources` | — | Plain scalars for host-bound state variables ([Host data binding](../README.md#host-data-binding-host-g01)) |
+| `selectable`, `selection`, `onSelectionChange` | `false`, —, — | Frame selection for a builder-style preview ([Selection](reference.md#selection-builder-preview)) |
+| `view`, `onFlowChange` | — | The flow view and its transitions ([Views and flows](reference.md#views-and-flows-g09)) |
+| `onAction` | — | Answers action-form intents with `confirmed` or `rejected`; without it, actions are unavailable ([Action surface](reference.md#action-surface-and-receipts-g17)) |
+| `dataSources` | — | Plain scalars for host-bound state variables ([Host data binding](reference.md#host-data-binding-host-g01)) |
 
 ## Trust badge and frame contract
 
@@ -106,7 +106,7 @@ Unfocused, it is clipped to a 1 × 1 px box (`clip-path: inset(50%)`), so it
 never shows over host content above the player. It expands in place when
 focused. The full key map
 (F6 between frames, arrows between frames, Escape walking outward) is in the
-README's [Keyboard and focus](../README.md#keyboard-and-focus) section.
+reference's [Keyboard and focus](reference.md#keyboard-and-focus) section.
 
 ## Labels and localization
 
@@ -176,7 +176,7 @@ player.dispose();
 `update` changes the props in place: declared state that still fits, the
 flow view, the selection and loaded painters are kept, even when the
 blueprint changes (see
-[Live updates](../README.md#live-updates-r20)). To start over, `dispose()`
+[Live updates](reference.md#live-updates-r20)). To start over, `dispose()`
 and mount again.
 
 ### 3. Script on a plain page
@@ -203,7 +203,7 @@ There is no standalone browser bundle or CDN build.
 For a host on another origin, use `<PlayerFrame>` (or `createPlayerFrameHost`)
 on the host page and `mountPlayerFrame` on the frame page. The frame is
 sandboxed without `allow-same-origin`, and only display data crosses the
-`postMessage` boundary. See the README's [Iframe frame](../README.md#iframe-frame)
+`postMessage` boundary. See the reference's [Iframe frame](reference.md#iframe-frame)
 section. A hosted frame page on a dedicated origin is planned, not built.
 
 ## Limits
