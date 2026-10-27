@@ -17,7 +17,7 @@ export interface BoardPlacement {
 export interface MoveMenuDestination {
   /** Stable id for the menu item (`columnId:laneId:position`). */
   id: string;
-  /** Visible label, e.g. `Done — top`. */
+  /** Visible label, from `MoveMenuText.top` or `.bottom`. */
   label: string;
   target: MoveTarget;
   /** True when the move is invalid or would not change placement. */
@@ -26,6 +26,20 @@ export interface MoveMenuDestination {
   reason?: string;
 }
 
+/** Translatable menu text; see `BoardLabels`. */
+export interface MoveMenuText {
+  top: (columnTitle: string) => string;
+  bottom: (columnTitle: string) => string;
+  /** Reason for a destination that would not change placement. */
+  alreadyAt: (destinationLabel: string) => string;
+}
+
+export const DEFAULT_MOVE_MENU_TEXT: MoveMenuText = {
+  top: (column) => `${column} — top`,
+  bottom: (column) => `${column} — bottom`,
+  alreadyAt: (label) => `Already at ${label.toLowerCase()}.`,
+};
+
 /**
  * Top and bottom of every column (current lane) as menu destinations.
  * Pure: uses `validateMove` so WIP and `canMove` rules match the drag path.
@@ -33,7 +47,8 @@ export interface MoveMenuDestination {
 export function moveMenuDestinations<T>(
   grid: BoardGrid<T>,
   itemId: string,
-  rules: MoveRules<T> = {}
+  rules: MoveRules<T> = {},
+  text: MoveMenuText = DEFAULT_MOVE_MENU_TEXT
 ): MoveMenuDestination[] {
   const from = grid.positions.get(itemId);
   if (!from) return [];
@@ -53,7 +68,7 @@ export function moveMenuDestinations<T>(
         index,
       };
       const result = validateMove(grid, itemId, target, rules);
-      const label = position === 'top' ? `${column.title} — top` : `${column.title} — bottom`;
+      const label = position === 'top' ? text.top(column.title) : text.bottom(column.title);
       const id = `${column.id}:${fromLane.id}:${position}`;
       if (!result.ok) {
         destinations.push({ id, label, target, disabled: true, reason: result.reason });
@@ -65,7 +80,7 @@ export function moveMenuDestinations<T>(
           label,
           target,
           disabled: true,
-          reason: `Already at ${label.toLowerCase()}.`,
+          reason: text.alreadyAt(label),
         });
         continue;
       }
@@ -84,13 +99,4 @@ export function placementsOf(move: BoardMove): Record<string, BoardPlacement> {
     placements[entry.itemId] = { columnId: move.columnId, laneId: move.laneId, rank: entry.rank };
   }
   return placements;
-}
-
-/** Pointer travel before a press becomes a drag, preserving ordinary clicks. */
-export const DRAG_THRESHOLD_PX = 4;
-
-/** Index before the first item whose vertical midpoint is below the pointer. */
-export function indexFromPointer(middles: readonly number[], y: number): number {
-  const index = middles.findIndex((middle) => y < middle);
-  return index === -1 ? middles.length : index;
 }

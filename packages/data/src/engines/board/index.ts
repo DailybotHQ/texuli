@@ -26,6 +26,9 @@ export {
   type WipStatus,
 } from './board.ts';
 export {
+  type BoardKeyboardText,
+  type BoardPositionValues,
+  DEFAULT_BOARD_KEYBOARD_TEXT,
   describePosition,
   IDLE,
   type KeyboardMoveState,
@@ -33,5 +36,6 @@ export {
   type MoveKey,
   moveIntent,
   pickUp,
+  positionValues,
 } from './keyboard.ts';
 export { assertRank, compareRanks, isRank, RankError, rankBetween, rankSequence } from './rank.ts';

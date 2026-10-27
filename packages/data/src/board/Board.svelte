@@ -1,12 +1,25 @@
 <script lang="ts" generics="T">
 import { lazyChunk } from '@texuli/core/lazy';
+import type { Point } from '@texuli/drag';
+import { midpointIndex } from '@texuli/drag/collision';
+import { bindPointerGesture, createPointerTracker } from '@texuli/drag/gesture';
+import {
+  type DragMessagesOverrides,
+  type DragMessageValues,
+  formatDragMessage,
+  resolveDragMessages,
+} from '@texuli/drag/messages';
 import { type Component, type Snippet, tick } from 'svelte';
+import type { Attachment } from 'svelte/attachments';
 import { type ClassValue, cx, variants } from 'texuli/cx';
 import {
   type BoardColumnDef,
+  type BoardKeyboardText,
   type BoardLaneDef,
   type BoardMove,
   type BoardOptions,
+  type BoardPositionValues,
+  DEFAULT_BOARD_KEYBOARD_TEXT,
   evaluateWip,
   groupBoard,
   IDLE,
@@ -18,13 +31,12 @@ import {
   validateMove,
 } from '../engines/board/index.ts';
 import {
-  DRAG_THRESHOLD_PX,
-  indexFromPointer,
+  DEFAULT_MOVE_MENU_TEXT,
   type MoveMenuDestination,
   moveMenuDestinations,
   placementsOf,
 } from './model.ts';
-import type { BoardLabels } from './types.ts';
+import type { BoardLabelOverrides, BoardLabels } from './types.ts';
 
 type MoveMenuProps = {
   open?: boolean;
@@ -50,7 +62,9 @@ interface BoardProps<T> {
   card: Snippet<[T, { pending: boolean }]>;
   onMove: (move: BoardMove, item: T) => void | Promise<void>;
   canMove?: MoveRules<T>['canMove'];
-  labels?: Partial<BoardLabels>;
+  labels?: BoardLabelOverrides;
+  /** Drag announcements (`@texuli/drag` templates), e.g. a localized `pickedUp`. */
+  messages?: DragMessagesOverrides;
   density?: 'comfortable' | 'compact';
   dir?: 'ltr' | 'rtl' | 'auto';
   class?: ClassValue;
@@ -77,6 +91,14 @@ const DEFAULT_LABELS: BoardLabels = {
   cardCount: (count, hardLimit) =>
     `${count} card${count === 1 ? '' : 's'}${hardLimit === undefined ? '' : `, limit ${hardLimit}`}`,
   announcement: (message) => message,
+  moved: (label, column, edge) => `Moved ${label} to ${column} (${edge}).`,
+  moveFailed: (label) => `${label} was not moved. It returned to its previous position.`,
+  locked: (label) => `${label} is locked and cannot be moved.`,
+  cannotMove: (label) => `${label} cannot move there.`,
+  menuTop: DEFAULT_MOVE_MENU_TEXT.top,
+  menuBottom: DEFAULT_MOVE_MENU_TEXT.bottom,
+  alreadyAt: DEFAULT_MOVE_MENU_TEXT.alreadyAt,
+  keyboard: DEFAULT_BOARD_KEYBOARD_TEXT,
 };
 
 let {
@@ -93,6 +115,7 @@ let {
   onMove,
   canMove,
   labels: labelOverrides,
+  messages: messageOverrides,
   density = 'comfortable',
   dir,
   class: className,
@@ -101,7 +124,41 @@ let {
 const uid = $props.id();
 const instructionsId = `board-${uid}-instructions`;
 const titleId = `board-${uid}-title`;
-const labels = $derived({ ...DEFAULT_LABELS, ...labelOverrides });
+const labels = $derived<BoardLabels>({
+  ...DEFAULT_LABELS,
+  ...labelOverrides,
+  keyboard: { ...DEFAULT_BOARD_KEYBOARD_TEXT, ...labelOverrides?.keyboard },
+});
+const messages = $derived(resolveDragMessages(messageOverrides));
+
+/**
+ * Keyboard sentences: the board labels, except where the host gave a drag
+ * message template (`pickedUp`, `moved`, `dropped`, `cancelled`), which then
+ * speaks for pointer and keyboard drags alike.
+ */
+const keyboardText = $derived.by((): BoardKeyboardText => {
+  const overrides = messageOverrides ?? {};
+  const values = (item: string, at: BoardPositionValues) => ({
+    item,
+    position: at.position,
+    total: at.total,
+    container: at.lane === null ? at.column : `${at.column}, ${at.lane}`,
+  });
+  const text: BoardKeyboardText = { ...labels.keyboard };
+  if (overrides.pickedUp !== undefined) {
+    text.pickedUp = (item, _where, at) => formatDragMessage(messages.pickedUp, values(item, at));
+  }
+  if (overrides.moved !== undefined) {
+    text.moved = (item, _where, at) => formatDragMessage(messages.moved, values(item, at));
+  }
+  if (overrides.dropped !== undefined) {
+    text.dropped = (item, _where, at) => formatDragMessage(messages.dropped, values(item, at));
+  }
+  if (overrides.cancelled !== undefined) {
+    text.cancelled = (item, _where, at) => formatDragMessage(messages.cancelled, values(item, at));
+  }
+  return text;
+});
 let pending = $state<Record<string, boolean>>({});
 let held = $state<KeyboardMoveState>(IDLE);
 let announcement = $state('');
@@ -111,14 +168,8 @@ let MoveMenu = $state.raw<Component<MoveMenuProps> | undefined>();
 let menuReady = $state(false);
 /** Which card’s move menu is open (`itemId`), once the lazy menu is mounted. */
 let openMenuId = $state<string | null>(null);
-let drag = $state<{
-  id: string;
-  pointerId: number;
-  x: number;
-  y: number;
-  active: boolean;
-  target: MoveTarget | null;
-} | null>(null);
+/** The pointer drag in progress (keyboard moves use `held`). */
+let drag = $state<{ id: string; active: boolean; target: MoveTarget | null } | null>(null);
 
 const options = $derived<BoardOptions<T>>({
   columns,
@@ -209,7 +260,11 @@ function cardLocked(item: T): boolean {
 }
 
 function destinationsFor(item: T): MoveMenuDestination[] {
-  return moveMenuDestinations(grid, getId(item), rules);
+  return moveMenuDestinations(grid, getId(item), rules, {
+    top: labels.menuTop,
+    bottom: labels.menuBottom,
+    alreadyAt: labels.alreadyAt,
+  });
 }
 
 const MOVE_MENU_CHUNK = 'data:board:move-menu';
@@ -260,7 +315,7 @@ async function commit(
       else delete restored[id];
     }
     placements = restored;
-    announce(`${getLabel(item)} was not moved. It returned to its previous position.`);
+    announce(labels.moveFailed(getLabel(item)));
     await focusCard(move.itemId, focus);
   } finally {
     const { [move.itemId]: _done, ...remaining } = pending;
@@ -270,7 +325,7 @@ async function commit(
 
 function moveTo(item: T, target: MoveTarget, focus: 'menu' | 'handle' = 'handle'): void {
   if (cardLocked(item)) {
-    announce(`${getLabel(item)} is locked and cannot be moved.`);
+    announce(labels.locked(getLabel(item)));
     return;
   }
   const result = validateMove(grid, getId(item), target, rules);
@@ -281,15 +336,14 @@ function moveTo(item: T, target: MoveTarget, focus: 'menu' | 'handle' = 'handle'
   if (result.unchanged) return;
   const column = columns.find((candidate) => candidate.id === result.move.columnId);
   const position = result.move.index === 0 ? 'top' : 'bottom';
-  announce(
-    `Moved ${getLabel(item)} to ${column?.title ?? result.move.columnId} (${position}).${result.wip.status !== 'ok' ? ` ${result.wip.reason}` : ''}`
-  );
+  const moved = labels.moved(getLabel(item), column?.title ?? result.move.columnId, position);
+  announce(result.wip.status === 'ok' ? moved : `${moved} ${result.wip.reason}`);
   void commit(result.move, item, focus);
 }
 
 function onMenuSelect(item: T, destination: MoveMenuDestination): void {
   if (destination.disabled) {
-    announce(destination.reason ?? `${getLabel(item)} cannot move there.`);
+    announce(destination.reason ?? labels.cannotMove(getLabel(item)));
     return;
   }
   moveTo(item, destination.target, 'menu');
@@ -301,7 +355,7 @@ function onCardKey(event: KeyboardEvent, item: T): void {
   if (held.mode !== 'held') {
     if (event.key !== ' ' && event.key !== 'Spacebar' && event.key !== 'Enter') return;
     event.preventDefault();
-    const result = pickUp(grid, id);
+    const result = pickUp(grid, id, keyboardText);
     held = result.state;
     announce(result.announcement);
     return;
@@ -320,7 +374,7 @@ function onCardKey(event: KeyboardEvent, item: T): void {
         ? 'ArrowLeft'
         : event.key
     : event.key;
-  const result = moveIntent(grid, held, { key, shiftKey: event.shiftKey }, rules);
+  const result = moveIntent(grid, held, { key, shiftKey: event.shiftKey }, rules, keyboardText);
   if (!result.handled) return;
   event.preventDefault();
   held = result.state;
@@ -332,71 +386,147 @@ function onCardKey(event: KeyboardEvent, item: T): void {
   void focusCard(id);
 }
 
-function onPointerDown(event: PointerEvent, item: T): void {
-  if (event.button !== 0 || pending[getId(item)] || held.mode === 'held' || cardLocked(item))
-    return;
-  if (event.target instanceof Element && event.target.closest('[data-board-no-drag]')) return;
-  drag = {
-    id: getId(item),
-    pointerId: event.pointerId,
-    x: event.clientX,
-    y: event.clientY,
-    active: false,
-    target: null,
-  };
-  (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
+// ── Pointer drag on the shared @texuli/drag engine ─────────────────────────
+// The gesture tracker owns the drag lifecycle: the 4 px threshold, capture
+// (with a document fallback) and pointercancel. A drop goes through `moveTo`,
+// which asks `validateMove` and voices any refusal, like the keyboard path.
+// The cells and card middles are measured when the drag starts and re-measured only
+// on scroll.
+
+/** Vertical middles of the other cards per cell, measured at drag start and on scroll. */
+let cellMiddles = new Map<HTMLElement, readonly number[]>();
+let stopWatching: (() => void) | null = null;
+/** Where the dragged card started, for the pick-up and cancel announcements. */
+let origin: DragMessageValues = {};
+
+function measureCells(itemId: string): void {
+  const root = document.getElementById(`board-${uid}`);
+  cellMiddles = new Map(
+    [...(root?.querySelectorAll<HTMLElement>('[data-board-cell]') ?? [])].map((cell) => [
+      cell,
+      [...cell.querySelectorAll<HTMLElement>('[data-board-card]')]
+        .filter((card) => card.dataset.itemId !== itemId)
+        .map((card) => {
+          const box = card.getBoundingClientRect();
+          return box.top + box.height / 2;
+        }),
+    ])
+  );
 }
 
-function targetAt(x: number, y: number, itemId: string): MoveTarget | null {
+/**
+ * The cell under the pointer comes from `elementFromPoint`: columns sit in a
+ * clipped horizontal scroller, and only the topmost visible cell may take a
+ * drop. The index comes from the engine's midpoint search.
+ */
+function targetAt(point: Point): MoveTarget | null {
   const root = document.getElementById(`board-${uid}`);
   const cell = root?.ownerDocument
-    .elementFromPoint(x, y)
+    .elementFromPoint(point.x, point.y)
     ?.closest<HTMLElement>('[data-board-cell]');
-  if (!cell) return null;
-  const cards = [...cell.querySelectorAll<HTMLElement>('[data-board-card]')].filter(
-    (element) => element.dataset.itemId !== itemId
-  );
-  const middles = cards.map((element) => {
-    const rect = element.getBoundingClientRect();
-    return rect.top + rect.height / 2;
-  });
+  if (!cell || !root?.contains(cell)) return null;
   return {
     columnId: cell.dataset.columnId ?? '',
     laneId: cell.dataset.laneId ?? '',
-    index: indexFromPointer(middles, y),
+    index: midpointIndex(cellMiddles.get(cell) ?? [], point.y),
   };
 }
 
-function onPointerMove(event: PointerEvent): void {
-  if (!drag || drag.pointerId !== event.pointerId) return;
-  const active =
-    drag.active || Math.hypot(event.clientX - drag.x, event.clientY - drag.y) >= DRAG_THRESHOLD_PX;
-  if (active && !drag.active) {
-    const item = itemById(drag.id);
-    if (item) announce(`Dragging ${getLabel(item)}.`);
+function startDrag(item: T, point: Point): void {
+  const id = getId(item);
+  measureCells(id);
+  const root = document.getElementById(`board-${uid}`);
+  const doc = root?.ownerDocument;
+  if (doc) {
+    const onScroll = () => measureCells(id);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      cancelDrag(true);
+    };
+    doc.addEventListener('scroll', onScroll, true);
+    doc.addEventListener('keydown', onKey, true);
+    stopWatching = () => {
+      doc.removeEventListener('scroll', onScroll, true);
+      doc.removeEventListener('keydown', onKey, true);
+    };
   }
-  drag = {
-    ...drag,
-    active,
-    target: active ? targetAt(event.clientX, event.clientY, drag.id) : drag.target,
+  drag = { id, active: true, target: null };
+  const from = grid.positions.get(id);
+  const cell = from ? grid.cells[from.laneIndex]?.[from.columnIndex] : undefined;
+  const column = from ? grid.columns[from.columnIndex] : undefined;
+  const lane = from ? grid.lanes[from.laneIndex] : undefined;
+  origin = {
+    item: getLabel(item),
+    position: (cell?.items.findIndex((entry) => getId(entry) === id) ?? 0) + 1,
+    total: cell?.items.length ?? 1,
+    container: `${column?.title ?? ''}${grid.lanes.length > 1 ? `, ${lane?.title ?? ''}` : ''}`,
   };
+  announce(formatDragMessage(messages.pickedUp, origin));
+  moveDrag(point);
 }
 
-function onPointerUp(event: PointerEvent): void {
-  if (!drag || drag.pointerId !== event.pointerId) return;
+function moveDrag(point: Point): void {
+  if (!drag) return;
+  const target = targetAt(point);
+  drag = { ...drag, target };
+}
+
+function endDrag(point: Point): void {
   const current = drag;
-  drag = null;
-  if (event.target instanceof HTMLElement && event.target.hasPointerCapture?.(event.pointerId)) {
-    event.target.releasePointerCapture(event.pointerId);
-  }
-  if (!current.active) return;
+  if (!current) return;
+  const target = targetAt(point) ?? current.target;
+  finishDrag();
   const item = itemById(current.id);
-  const target = targetAt(event.clientX, event.clientY, current.id) ?? current.target;
-  if (item && target) moveTo(item, target);
+  if (!item || !target) return;
+  moveTo(item, target);
 }
 
-function onPointerCancel(event: PointerEvent): void {
-  if (drag?.pointerId === event.pointerId) drag = null;
+function finishDrag(): void {
+  stopWatching?.();
+  stopWatching = null;
+  drag = null;
+}
+
+function cancelDrag(announceIt: boolean): void {
+  const wasDragging = drag !== null;
+  finishDrag();
+  if (announceIt && wasDragging) announce(formatDragMessage(messages.cancelled, origin));
+}
+
+/** Pointer drags from a card handle (keyed by id, so re-renders never re-attach it). */
+function dragFrom(id: string): Attachment<HTMLElement> {
+  return (node) => {
+    let blocked = false;
+    // Decided at press time: pending, held, locked or a no-drag area.
+    const onDown = (event: PointerEvent) => {
+      const item = itemById(id);
+      blocked =
+        !item ||
+        Boolean(pending[id]) ||
+        held.mode === 'held' ||
+        cardLocked(item) ||
+        (event.target instanceof Element && event.target.closest('[data-board-no-drag]') !== null);
+    };
+    node.addEventListener('pointerdown', onDown, true);
+    const dispose = bindPointerGesture(
+      node,
+      createPointerTracker({
+        onStart: (event) => {
+          const item = itemById(id);
+          if (!blocked && item) startDrag(item, event.point);
+        },
+        onMove: (event) => moveDrag(event.point),
+        onEnd: (event) => endDrag(event.point),
+        onCancel: () => cancelDrag(false),
+      }),
+      { listenOn: node.closest<HTMLElement>('.tx-board') ?? node }
+    );
+    return () => {
+      node.removeEventListener('pointerdown', onDown, true);
+      dispose();
+    };
+  };
 }
 </script>
 
@@ -405,9 +535,6 @@ function onPointerCancel(event: PointerEvent): void {
   class={cx(rootClasses({ density, class: className }), drag?.active && 'tx-board--dragging')}
   aria-labelledby={titleId}
   dir={dir}
-  onpointermove={onPointerMove}
-  onpointerup={onPointerUp}
-  onpointercancel={onPointerCancel}
 >
   <h2 id={titleId} class="tx-board__sr-only">{labels.board}</h2>
   <p id={instructionsId} class="tx-board__sr-only">{labels.instructions}</p>
@@ -492,7 +619,7 @@ function onPointerCancel(event: PointerEvent): void {
                         aria-pressed={held.mode === 'held' && held.itemId === id}
                         disabled={pending[id] || locked}
                         onkeydown={(event) => onCardKey(event, item)}
-                        onpointerdown={(event) => onPointerDown(event, item)}
+                        {@attach dragFrom(id)}
                       >
                         <span class="tx-board__grip" aria-hidden="true">⠿</span>
                       </button>

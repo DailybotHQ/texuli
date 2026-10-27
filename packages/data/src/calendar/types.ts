@@ -64,6 +64,8 @@ export interface CalendarLabels {
   grabbed: (title: string) => string;
   grabMoved: (title: string, when: string) => string;
   moveCancelled: string;
+  /** Title for an event whose data has none (when no `getTitle` is given). */
+  untitledEvent: string;
   /** Name of the focused empty time slot. */
   emptySlot: (when: string) => string;
   /** Appended to the empty slot's name when activating it creates an event. */
@@ -119,6 +121,7 @@ export const DEFAULT_CALENDAR_LABELS: CalendarLabels = {
     `Picked up ${title}. Arrow keys move it, Space or Enter drops it, Escape cancels.`,
   grabMoved: (title, when) => `${title}: ${when}.`,
   moveCancelled: 'Move cancelled.',
+  untitledEvent: 'Untitled event',
   emptySlot: (when) => `Empty slot, ${when}`,
   addsEvent: 'Enter adds an event',
   addsAllDayEvent: 'Enter adds an all-day event',

@@ -14,6 +14,7 @@ export {
   type ColumnMenuAction,
   canHideColumn,
   canMoveColumn,
+  columnDropCollision,
   columnWidth,
   completeState,
   dropTarget,

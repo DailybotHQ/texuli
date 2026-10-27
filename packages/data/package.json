@@ -103,6 +103,7 @@
   },
   "dependencies": {
     "@texuli/core": "0.3.0",
+    "@texuli/drag": "workspace:*",
     "@texuli/primitives": "0.3.0",
     "@texuli/tokens": "0.3.0",
     "texuli": "0.3.0"

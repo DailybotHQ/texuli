@@ -11,4 +11,13 @@ export interface TreeDataViewLabels {
   empty: string;
   savingMove: string;
   announcement: (message: string) => string;
+  collapsed: (itemLabel: string) => string;
+  expanded: (itemLabel: string) => string;
+  /** Announced after a keyboard reorder, indent or outdent. */
+  moved: (itemLabel: string) => string;
+  /** Announced after a pointer drop; `parentLabel` is `topLevel` for root rows. */
+  movedUnder: (itemLabel: string, parentLabel: string) => string;
+  topLevel: string;
+  /** Announced when the host's `onMove` fails and the row returns. */
+  moveFailed: (itemLabel: string) => string;
 }

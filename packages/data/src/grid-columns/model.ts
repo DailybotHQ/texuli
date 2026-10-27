@@ -1,3 +1,4 @@
+import type { CollisionStrategy } from '@texuli/drag/collision';
 import {
   type ColumnState,
   ColumnStateSchema,
@@ -305,4 +306,23 @@ export function dropTarget(
   const rightmost = cells.reduce((a, b) => (b.right > a.right ? b : a));
   if (x < min) return { key: leftmost.key, side: rtl ? 'after' : 'before' };
   return { key: rightmost.key, side: rtl ? 'before' : 'after' };
+}
+
+/**
+ * The header-reorder collision for `@texuli/drag`: wraps `dropTarget`, so the
+ * droppables are one pin zone's header cells in visual order and the hit
+ * carries its side (flipped in right-to-left grids).
+ */
+export function columnDropCollision(rtl = false): CollisionStrategy {
+  return ({ pointer, droppables }) => {
+    const cells = droppables
+      .filter((droppable) => !droppable.disabled)
+      .map((droppable) => ({
+        key: droppable.id,
+        left: droppable.rect.x,
+        right: droppable.rect.x + droppable.rect.width,
+      }));
+    const hit = dropTarget(cells, pointer.x, rtl);
+    return hit ? { id: hit.key, score: 0, side: hit.side } : null;
+  };
 }
