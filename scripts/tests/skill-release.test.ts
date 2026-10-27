@@ -248,6 +248,9 @@ describe('workflows', () => {
       /on:\n {2}workflow_run:\n {4}workflows: \[CI\]\n {4}types: \[completed\]\n {4}branches: \[main\]/
     );
     expect(release).toMatch(/^permissions: \{\}$/m);
+    // The checkout persists no credentials; only the push step holds the token.
+    expect(release).toContain('persist-credentials: false');
+    expect(release.match(/PUSH_TOKEN: /g)).toHaveLength(1);
     for (const guard of [
       "github.event.workflow_run.conclusion == 'success'",
       "github.event.workflow_run.event == 'push'",
@@ -273,9 +276,9 @@ describe('workflows', () => {
       `git archive --format=tar.gz --prefix=texuli/ -o "$OUT/$ARCHIVE" "\${TAG}:skills/texuli"`,
       'sha256sum -c SHA256SUMS',
       'bash texuli/setup.sh --verify --dir texuli --expect-version "$VERSION"',
-      `git push --atomic origin HEAD:refs/heads/main "refs/tags/\${TAG}"`,
+      'git push --atomic \\\n            "https://x-access-token:${PUSH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"',
       'gh release create "$TAG"',
-      `npx --yes skills add "https://github.com/DailybotHQ/texuli/tree/\${TAG}/skills/texuli"`,
+      `npx --yes skills@1.7.4 add "https://github.com/DailybotHQ/texuli/tree/\${TAG}/skills/texuli"`,
     ];
     const positions = steps.map((step) => release.indexOf(step));
     expect(
