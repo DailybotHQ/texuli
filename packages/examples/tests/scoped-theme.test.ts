@@ -7,7 +7,7 @@ import { scopedTheme } from '../src/scoped-theme.ts';
 // Audit P1-02: a hand-built "dark" section kept the page's light soft fills
 // under light text. The scope must switch every token, soft fills included.
 describe('scopedTheme', () => {
-  it('applies the page theme in dark mode to the section, soft fills included', async () => {
+  it('applies the page theme in dark mode, soft fills included, and falls back for an unknown theme', async () => {
     const theme = await loadLibraryTheme('enterprise-neutral');
     applyTheme(document.documentElement, { theme, mode: 'light' });
     const section = document.createElement('section');
@@ -23,13 +23,12 @@ describe('scopedTheme', () => {
     }
     action.destroy();
     section.remove();
-  });
 
-  it('falls back to the default library theme for an unknown page theme', async () => {
+    // An unknown page theme falls back to the default library theme.
     document.documentElement.dataset.txTheme = 'not-a-theme';
-    const section = document.createElement('section');
-    const action = scopedTheme(section, 'dark');
-    await action.ready;
-    expect(section.dataset.txTheme).toBe('enterprise-neutral');
+    const fallback = document.createElement('section');
+    const second = scopedTheme(fallback, 'dark');
+    await second.ready;
+    expect(fallback.dataset.txTheme).toBe('enterprise-neutral');
   });
 });
