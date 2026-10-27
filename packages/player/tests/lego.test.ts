@@ -106,7 +106,10 @@ describe('the lego golden', () => {
     expect(screen.getByRole('heading', { name: 'Introduction' })).toBeTruthy();
     expect(await screen.findByRole('button', { name: 'Heading' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Hero image' })).toBeTruthy();
-    expect(screen.getAllByText('Write launch copy').length).toBeGreaterThan(0);
+    // The workflow editor loads lazily (edit mode only), so wait for it.
+    expect(
+      (await screen.findAllByText('Write launch copy', {}, { timeout: 10_000 })).length
+    ).toBeGreaterThan(0);
     // One drag scope serves both sortable lists.
     expect(container.querySelectorAll('.tx-player-reorder-scope')).toHaveLength(1);
   });
