@@ -23,7 +23,7 @@ own it, then theme it, adjust it and keep it updatable.
 
 The copy path is **local**: its commands run from a Texuli monorepo checkout
 against folders on disk. The packages are npm previews: 15 are on npm as
-`0.1.0-next.1` under the `next` dist-tag, with no stable release (`latest` is
+`0.1.0-next.2` under the `next` dist-tag, with no stable release (`latest` is
 reserved for 1.0.0). Install them only with the `@next` tag
 (`pnpm add texuli@next`), never a bare `npm install texuli`, and never
 suggest a download URL. `@texuli/editor` is in development and not on npm.

@@ -2,7 +2,7 @@
 
 **Layer L8: tools.** Agent and developer tooling over the library: the
 copy-in CLI, the agent docs bundle, the A2UI adapter, custom elements, the
-golden set and the read-only MCP server. Published to npm as `0.1.0-next.1` under the `next`
+golden set and the read-only MCP server. Published to npm as `0.1.0-next.2` under the `next`
 dist-tag (by CI, with provenance); no stable release (`latest` is reserved
 for 1.0.0), so install it with `@next`. The workspace package stays
 `"private": true`. The bins below are
@@ -31,7 +31,7 @@ and llms helpers.
 ## Status
 
 Implemented and gated in this repository: unit tests per area, including
-`tests/mcp.test.ts`. The package itself is on npm as `0.1.0-next.1`
+`tests/mcp.test.ts`. The package itself is on npm as `0.1.0-next.2`
 (`next` dist-tag), but the MCP server is not delivered outside this
 repository: it has no export and no published binary
 ([ARCHITECTURE](../../docs/ARCHITECTURE.md) tracks the delivery plan).

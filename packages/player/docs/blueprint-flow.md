@@ -1,6 +1,6 @@
 # Embedding the blueprint flow
 
-**Packages:** `@texuli/player`, `@texuli/catalog` (on npm as `0.1.0-next.1`
+**Packages:** `@texuli/player`, `@texuli/catalog` (on npm as `0.1.0-next.2`
 under the `next` dist-tag; no stable release; the workspace packages stay
 `"private": true`)
 

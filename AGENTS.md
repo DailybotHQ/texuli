@@ -24,7 +24,7 @@ end to end and native for agents:
 
 **Status: in development, not released.** The 15 packable packages (all
 of `packages/` except `@texuli/editor` and `@texuli/examples`, which are
-never packed) are published to npm as `0.1.0-next.1` under the `next`
+never packed) are published to npm as `0.1.0-next.2` under the `next`
 dist-tag by the publish workflow; the workspace packages stay
 `private: true`, no stable release is out (`latest` is reserved for 1.0.0
 by policy; see [RELEASE](docs/RELEASE.md) for where it resolves today),
@@ -189,7 +189,7 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The 15 packable packages are on npm as `0.1.0-next.1`
+    check results. The 15 packable packages are on npm as `0.1.0-next.2`
     (dist-tag `next`, published by CI with provenance); `@texuli/editor`,
     `@texuli/examples`, the apps and `native/` publish nothing. No stable
     release is published (`latest` stays reserved for 1.0.0). texuli.com

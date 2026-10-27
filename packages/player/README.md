@@ -23,7 +23,7 @@ history and undo, the digest and activation, and CSP. This README is the
 reference for each area; [paint-proof.md](docs/paint-proof.md) argues the
 security property.
 
-Published to npm as `0.1.0-next.1` under the `next` dist-tag (by CI, with
+Published to npm as `0.1.0-next.2` under the `next` dist-tag (by CI, with
 provenance); no stable release (`latest` is reserved for 1.0.0), so install
 it with `@next`. The workspace package stays `"private": true`.
 

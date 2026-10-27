@@ -5,10 +5,11 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-All 15 packable packages are published to npm as `0.1.0-next.1` under the
-`next` dist-tag (2026-10-25, publish workflow run
-https://github.com/DailybotHQ/texuli/actions/runs/40238083612, from the
-verified tarballs with signed provenance). Observed registry state on
+All 15 packable packages are published to npm as `0.1.0-next.2` under the
+`next` dist-tag (2026-10-27, from `main` by the publish workflow, from the
+verified tarballs with signed provenance; it carries the PLAN_006 package
+fixes). The previous preview, `0.1.0-next.1`, went out on 2026-10-25 (run
+https://github.com/DailybotHQ/texuli/actions/runs/40238083612). Observed registry state on
 2026-10-26: `npm view texuli dist-tags` prints
 `{ latest: '0.1.0-next.0', next: '0.1.0-next.1' }` (the same for
 `@texuli/core` and `@texuli/slides`), so `latest` still resolves to the
@@ -88,9 +89,9 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 15 npm packages | `0.1.0-next.1` (dist-tag `next`) | Each package manifest; published 2026-10-25 by the publish workflow (run 40238083612). |
+| 15 npm packages | `0.1.0-next.2` (dist-tag `next`) | Each package manifest; published 2026-10-27 by the publish workflow (`0.1.0-next.1`: 2026-10-25, run 40238083612). |
 | Blueprint spec | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | `packages/spec/versions.json`; every generated file is stamped `// Spec 0.2.0, digest …`. |
-| `@texuli/spec` (npm) | `0.1.0-next.1` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
+| `@texuli/spec` (npm) | `0.1.0-next.2` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 
 - A normative spec change takes a new spec version and a fresh digest pin in

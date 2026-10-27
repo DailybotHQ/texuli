@@ -3,7 +3,7 @@
 **Layer L6: the agent catalog.** Authored component manifests, the blueprint
 envelope, the content-addressed catalog build, draft validation and the
 sink-free renderer that turns untrusted agent trees into safe render trees.
-Published to npm as `0.1.0-next.1` under the `next` dist-tag (CI publishes
+Published to npm as `0.1.0-next.2` under the `next` dist-tag (CI publishes
 with provenance; `latest` stays reserved for 1.0.0). The workspace package
 itself stays `"private": true`.
 

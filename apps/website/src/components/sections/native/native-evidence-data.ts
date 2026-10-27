@@ -75,7 +75,7 @@ export const NATIVE_SHIPPED: readonly string[] = [
   'The dual-target golden gate passes: GoldenConformanceTest requires each spec golden’s native semantic trace to equal the web trace, and InvalidFixtureParityTest refuses every invalid fixture with exactly the TypeScript validator’s codes.',
   'Six Kotlin Multiplatform app migrations pin every widget’s documented status, from a starter screen to a static game scoreboard.',
   'HostilePropsTest drives wrong types, depth bombs and control strings through every projection: nothing throws, and everything stays in bounds.',
-  'The web runtime is published: all 15 packages are on npm as 0.1.0-next.1 under the next dist-tag.',
+  'The web runtime is published: all 15 packages are on npm as 0.1.0-next.2 under the next dist-tag.',
 ];
 
 /**

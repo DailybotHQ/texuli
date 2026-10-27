@@ -3,7 +3,7 @@
 **Layer L7: slides.** Validated presentation decks: a deck model of ordered slides holding
 `@texuli/blocks` content, catalog encodings and agent validation, a Svelte 5
 stage with a presenter view, print/PDF and PPTX export, and starter
-templates. Published to npm as `0.1.0-next.1` under the `next`
+templates. Published to npm as `0.1.0-next.2` under the `next`
 dist-tag (by CI, with provenance); no stable release (`latest` is reserved
 for 1.0.0), so install it with `@next`. The workspace package stays
 `"private": true`.

@@ -3,7 +3,7 @@
 **Layer L5: content blocks.** The closed content vocabulary for pages,
 documents and slides: schema-validated block types, framework-free family
 engines, Svelte 5 renderers, the untrusted-input guard, the closed formula
-AST and catalog metadata. Published to npm as `0.1.0-next.1` under the `next`
+AST and catalog metadata. Published to npm as `0.1.0-next.2` under the `next`
 dist-tag (by CI, with provenance); no stable release (`latest` is reserved
 for 1.0.0), so install it with `@next`. The workspace package stays
 `"private": true`.
