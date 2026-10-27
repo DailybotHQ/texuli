@@ -128,13 +128,17 @@ const repositoryHref = safeHref(REPOSITORY_URL, 'developer');
       display: none;
     }
   }
-  /* The search trigger keeps its label but stops claiming 16rem, and the
-     links pad less, so the doors fit beside it from 48rem up. At 769px the
-     header had about 19px to spare with macOS fonts and ran past the
-     viewport with Linux fonts in CI; this frees about 48px more. */
+  /* The search trigger keeps its label but stops claiming 16rem and drops
+     its decorative Cmd/Ctrl+K hint (aria-hidden; the shortcut still works),
+     and the links pad less, so the doors fit beside it from 48rem up. At
+     769px the header had about 19px to spare with macOS fonts and ran 20px
+     past the viewport with Linux fonts in CI. */
   @media (min-width: 48rem) and (max-width: 64rem) {
     .site-header[data-variant='landing'] .tools :global([data-tx-command-trigger]) {
       min-inline-size: 8rem;
+    }
+    .site-header[data-variant='landing'] .tools :global(.tx-command-trigger__keys) {
+      display: none;
     }
     .site-header[data-variant='landing'] .docs-link {
       padding-inline: 0.375rem;
