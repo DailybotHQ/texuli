@@ -1,4 +1,5 @@
-import { type CatalogManifest, defineCatalogManifest } from '../../manifest/index.ts';
+import { manifestData } from '../../manifest/data.ts';
+import type { CatalogManifest } from '../../manifest/types.ts';
 import { CONTENT_PROP_NAMES, type ContentManifestId } from './prop-names.ts';
 
 type PropKind = CatalogManifest['props'][number]['kind'];
@@ -18,6 +19,7 @@ const LABELS: Partial<Record<ContentManifestId, string>> = {
 };
 
 /** `blocks-text` is "Text blocks", `charts-stacked-bar` "Stacked bar chart". */
+/* @__NO_SIDE_EFFECTS__ */
 function labelOf(id: ContentManifestId): string {
   const [family, ...words] = id.split('-');
   const name = words.join(' ');
@@ -168,6 +170,7 @@ const BOOLEAN_PROPS = new Set(['showLast', 'validate', 'focusable', 'lineNumbers
 /** Host callbacks besides the `on*` props. */
 const EVENT_PROPS = new Set(['resolveAvatar', 'loadImage', 'loader', 'mountEmbed']);
 
+/* @__NO_SIDE_EFFECTS__ */
 function propKind(id: ContentManifestId, name: string): PropKind {
   if (ENUMS[id]?.[name]) return 'enum';
   if (name.startsWith('on') || EVENT_PROPS.has(name)) return 'event';
@@ -183,6 +186,7 @@ function propKind(id: ContentManifestId, name: string): PropKind {
   return 'string';
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 function propSchemas(id: ContentManifestId): CatalogManifest['props'] {
   const required = new Set(id.startsWith('blocks-') ? ['block'] : (REQUIRED[id] ?? []));
   return CONTENT_PROP_NAMES[id].map((name) => {
@@ -313,12 +317,13 @@ const EXAMPLES: Record<ContentManifestId, Readonly<Record<string, unknown>>> = {
   'media-composition-canvas': { composition: { width: 320, height: 180, layers: [] } },
 };
 
+/* @__NO_SIDE_EFFECTS__ */
 function makeManifest(id: ContentManifestId): CatalogManifest {
   // `blocks-*` ships in @texuli/blocks, `charts-*` in @texuli/charts, `media-*` in @texuli/media.
   const packageName = `@texuli/${id.split('-')[0]}`;
   const label = labelOf(id);
   const isEmbed = id === 'blocks-embed';
-  return defineCatalogManifest({
+  return /* @__PURE__ */ manifestData({
     id,
     package: packageName,
     label,
@@ -353,15 +358,14 @@ function makeManifest(id: ContentManifestId): CatalogManifest {
   });
 }
 
-export const CONTENT_MANIFESTS = Object.freeze(
-  (Object.keys(CONTENT_PROP_NAMES) as ContentManifestId[]).map(makeManifest)
+export const CONTENT_MANIFESTS = /* @__PURE__ */ Object.freeze(
+  /* @__PURE__ */ (Object.keys(CONTENT_PROP_NAMES) as ContentManifestId[]).map(makeManifest)
 );
 
 export const CONTENT_PROP_NAME_MAP = CONTENT_PROP_NAMES;
 
-export const contentManifestsById = Object.freeze(
-  Object.fromEntries(CONTENT_MANIFESTS.map((manifest) => [manifest.id, manifest])) as Record<
-    ContentManifestId,
-    CatalogManifest
-  >
+export const contentManifestsById = /* @__PURE__ */ Object.freeze(
+  /* @__PURE__ */ Object.fromEntries(
+    /* @__PURE__ */ CONTENT_MANIFESTS.map((manifest) => [manifest.id, manifest])
+  ) as Record<ContentManifestId, CatalogManifest>
 );

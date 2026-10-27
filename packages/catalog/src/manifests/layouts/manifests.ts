@@ -1,4 +1,5 @@
-import { type CatalogManifest, defineCatalogManifest } from '../../manifest/index.ts';
+import { manifestData } from '../../manifest/data.ts';
+import type { CatalogManifest } from '../../manifest/types.ts';
 import {
   analyticsGridPropNames,
   authSplitLayoutPropNames,
@@ -31,6 +32,7 @@ import {
 
 const PKG = 'texuli';
 
+/* @__NO_SIDE_EFFECTS__ */
 function propsFrom(
   names: readonly string[],
   detail: Record<
@@ -92,7 +94,7 @@ const layoutIds = [
   'custom',
 ] as const;
 
-export const layoutHostManifest = defineCatalogManifest({
+export const layoutHostManifest = /* @__PURE__ */ manifestData({
   id: 'layout-host',
   package: PKG,
   label: 'LayoutHost',
@@ -126,7 +128,7 @@ export const layoutHostManifest = defineCatalogManifest({
   related: ['layout-sidebar', 'layout-chrome'],
 });
 
-export const layoutChromeManifest = defineCatalogManifest({
+export const layoutChromeManifest = /* @__PURE__ */ manifestData({
   id: 'layout-chrome',
   package: PKG,
   label: 'LayoutChrome',
@@ -158,7 +160,7 @@ export const layoutChromeManifest = defineCatalogManifest({
   related: ['layout-host', 'nav-icon'],
 });
 
-export const layoutDrawerManifest = defineCatalogManifest({
+export const layoutDrawerManifest = /* @__PURE__ */ manifestData({
   id: 'layout-drawer',
   package: PKG,
   label: 'LayoutDrawer',
@@ -178,7 +180,7 @@ export const layoutDrawerManifest = defineCatalogManifest({
   related: ['layout-sidebar', 'dialog'],
 });
 
-export const screenOutletManifest = defineCatalogManifest({
+export const screenOutletManifest = /* @__PURE__ */ manifestData({
   id: 'screen-outlet',
   package: PKG,
   label: 'ScreenOutlet',
@@ -196,7 +198,7 @@ export const screenOutletManifest = defineCatalogManifest({
   related: ['layout-host'],
 });
 
-export const navIconManifest = defineCatalogManifest({
+export const navIconManifest = /* @__PURE__ */ manifestData({
   id: 'nav-icon',
   package: PKG,
   label: 'NavIcon',
@@ -207,7 +209,11 @@ export const navIconManifest = defineCatalogManifest({
   dontUseWhen: ['Arbitrary illustration outside nav'],
   a11y: 'Decorative by default; pass label when the icon is the only name.',
   props: propsFrom(navIconPropNames, {
-    icon: { kind: 'unknown', required: true, description: 'Icon name or component' },
+    icon: {
+      kind: 'string',
+      required: true,
+      description: 'Icon name (hosts may also pass a component in code)',
+    },
     class: { kind: 'string' },
     label: { kind: 'string' },
   }),
@@ -215,6 +221,7 @@ export const navIconManifest = defineCatalogManifest({
   related: ['layout-chrome'],
 });
 
+/* @__NO_SIDE_EFFECTS__ */
 function hostLayoutManifest(
   id: string,
   label: string,
@@ -226,7 +233,7 @@ function hostLayoutManifest(
   exampleProps: Record<string, unknown> = {}
 ): CatalogManifest {
   const detail: Parameters<typeof propsFrom>[1] = { ...hostLayoutDetail, ...extra };
-  return defineCatalogManifest({
+  return /* @__PURE__ */ manifestData({
     id,
     package: PKG,
     label,
@@ -245,7 +252,7 @@ function hostLayoutManifest(
   });
 }
 
-export const layoutSidebarManifest = hostLayoutManifest(
+export const layoutSidebarManifest = /* @__PURE__ */ hostLayoutManifest(
   'layout-sidebar',
   'Sidebar layout',
   'App sidebar column with responsive drawer fallback.',
@@ -259,7 +266,7 @@ export const layoutSidebarManifest = hostLayoutManifest(
   }
 );
 
-export const layoutTopNavManifest = hostLayoutManifest(
+export const layoutTopNavManifest = /* @__PURE__ */ hostLayoutManifest(
   'layout-top-nav',
   'Top navigation layout',
   'Horizontal top navigation with optional mobile menu.',
@@ -273,7 +280,7 @@ export const layoutTopNavManifest = hostLayoutManifest(
   }
 );
 
-export const layoutDualSidebarManifest = hostLayoutManifest(
+export const layoutDualSidebarManifest = /* @__PURE__ */ hostLayoutManifest(
   'layout-dual-sidebar',
   'Dual sidebar layout',
   'Primary nav plus optional context aside.',
@@ -287,7 +294,7 @@ export const layoutDualSidebarManifest = hostLayoutManifest(
   }
 );
 
-export const splitViewManifest = defineCatalogManifest({
+export const splitViewManifest = /* @__PURE__ */ manifestData({
   id: 'split-view',
   package: PKG,
   label: 'SplitView',
@@ -310,7 +317,7 @@ export const splitViewManifest = defineCatalogManifest({
   related: ['layout-dual-sidebar'],
 });
 
-export const layoutDashboardGridManifest = hostLayoutManifest(
+export const layoutDashboardGridManifest = /* @__PURE__ */ hostLayoutManifest(
   'layout-dashboard-grid',
   'Dashboard grid layout',
   'Top chrome plus container-query widget grid.',
@@ -328,7 +335,7 @@ export const layoutDashboardGridManifest = hostLayoutManifest(
   { options: { title: 'Overview', dense: false } }
 );
 
-export const analyticsGridManifest = defineCatalogManifest({
+export const analyticsGridManifest = /* @__PURE__ */ manifestData({
   id: 'analytics-grid',
   package: PKG,
   label: 'AnalyticsGrid',
@@ -351,7 +358,7 @@ export const analyticsGridManifest = defineCatalogManifest({
   related: ['layout-dashboard-grid'],
 });
 
-export const contentLayoutManifest = defineCatalogManifest({
+export const contentLayoutManifest = /* @__PURE__ */ manifestData({
   id: 'content-layout',
   package: PKG,
   label: 'ContentLayout',
@@ -373,7 +380,7 @@ export const contentLayoutManifest = defineCatalogManifest({
   related: ['layout-docs', 'layout-blog'],
 });
 
-export const layoutDocsManifest = hostLayoutManifest(
+export const layoutDocsManifest = /* @__PURE__ */ hostLayoutManifest(
   'layout-docs',
   'Docs layout',
   'Documentation reading layout (content-layout kind docs).',
@@ -384,7 +391,7 @@ export const layoutDocsManifest = hostLayoutManifest(
   { options: { title: 'Guides' } }
 );
 
-export const layoutBlogManifest = hostLayoutManifest(
+export const layoutBlogManifest = /* @__PURE__ */ hostLayoutManifest(
   'layout-blog',
   'Blog layout',
   'Blog/post reading layout (content-layout kind blog).',
@@ -395,7 +402,7 @@ export const layoutBlogManifest = hostLayoutManifest(
   { options: { title: 'Field notes', author: 'Ada Example' } }
 );
 
-export const layoutEditorialManifest = hostLayoutManifest(
+export const layoutEditorialManifest = /* @__PURE__ */ hostLayoutManifest(
   'layout-editorial',
   'Editorial layout',
   'Long-read editorial layout (content-layout kind editorial).',
@@ -406,7 +413,7 @@ export const layoutEditorialManifest = hostLayoutManifest(
   { options: { title: 'The long read' } }
 );
 
-export const layoutMarketingManifest = defineCatalogManifest({
+export const layoutMarketingManifest = /* @__PURE__ */ manifestData({
   id: 'layout-marketing',
   package: PKG,
   label: 'Marketing layout',
@@ -438,7 +445,7 @@ export const layoutMarketingManifest = defineCatalogManifest({
   related: ['layout-landing', 'layout-pricing'],
 });
 
-export const layoutLandingManifest = defineCatalogManifest({
+export const layoutLandingManifest = /* @__PURE__ */ manifestData({
   id: 'layout-landing',
   package: PKG,
   label: 'Landing layout',
@@ -461,7 +468,7 @@ export const layoutLandingManifest = defineCatalogManifest({
   related: ['layout-marketing'],
 });
 
-export const layoutPricingManifest = defineCatalogManifest({
+export const layoutPricingManifest = /* @__PURE__ */ manifestData({
   id: 'layout-pricing',
   package: PKG,
   label: 'Pricing layout',
@@ -489,7 +496,7 @@ export const layoutPricingManifest = defineCatalogManifest({
   related: ['layout-marketing'],
 });
 
-export const layoutAuthSplitManifest = defineCatalogManifest({
+export const layoutAuthSplitManifest = /* @__PURE__ */ manifestData({
   id: 'layout-auth-split',
   package: PKG,
   label: 'Auth split layout',
@@ -521,7 +528,7 @@ export const layoutAuthSplitManifest = defineCatalogManifest({
   related: ['layout-wizard'],
 });
 
-export const layoutWizardManifest = defineCatalogManifest({
+export const layoutWizardManifest = /* @__PURE__ */ manifestData({
   id: 'layout-wizard',
   package: PKG,
   label: 'Wizard layout',
@@ -563,7 +570,7 @@ export const layoutWizardManifest = defineCatalogManifest({
   related: ['layout-auth-split', 'layout-settings'],
 });
 
-export const layoutSettingsManifest = defineCatalogManifest({
+export const layoutSettingsManifest = /* @__PURE__ */ manifestData({
   id: 'layout-settings',
   package: PKG,
   label: 'Settings layout',
@@ -600,6 +607,7 @@ export const layoutSettingsManifest = defineCatalogManifest({
 });
 
 /** Content composition layouts — Tier U when agent-emittable (CONTENT_LAYOUT_IDS). */
+/* @__NO_SIDE_EFFECTS__ */
 function contentComposition(
   id: 'layout-card' | 'layout-page' | 'layout-doc' | 'layout-deck' | 'layout-grid' | 'deck-slide',
   label: string,
@@ -608,7 +616,7 @@ function contentComposition(
   detail: Parameters<typeof propsFrom>[1],
   exampleProps: Record<string, unknown>
 ): CatalogManifest {
-  return defineCatalogManifest({
+  return /* @__PURE__ */ manifestData({
     id,
     package: PKG,
     label,
@@ -627,7 +635,7 @@ function contentComposition(
   });
 }
 
-export const cardLayoutManifest = contentComposition(
+export const cardLayoutManifest = /* @__PURE__ */ contentComposition(
   'layout-card',
   'Card layout',
   'Content card frame for grouped agent-authored blocks.',
@@ -640,7 +648,7 @@ export const cardLayoutManifest = contentComposition(
   { title: 'Summary' }
 );
 
-export const pageLayoutManifest = contentComposition(
+export const pageLayoutManifest = /* @__PURE__ */ contentComposition(
   'layout-page',
   'Page layout',
   'Full page content frame for agent-authored documents.',
@@ -654,7 +662,7 @@ export const pageLayoutManifest = contentComposition(
   { title: 'Overview', description: 'Quarterly update' }
 );
 
-export const docLayoutManifest = contentComposition(
+export const docLayoutManifest = /* @__PURE__ */ contentComposition(
   'layout-doc',
   'Doc layout',
   'Document frame with optional table of contents.',
@@ -668,7 +676,7 @@ export const docLayoutManifest = contentComposition(
   { title: 'Guide', toc: true }
 );
 
-export const deckLayoutManifest = contentComposition(
+export const deckLayoutManifest = /* @__PURE__ */ contentComposition(
   'layout-deck',
   'Deck layout',
   'Slide deck frame for sequenced content.',
@@ -701,7 +709,7 @@ export const deckLayoutManifest = contentComposition(
  * One slide in a `layout-deck`. Children are the slide's content blocks; the
  * stage shows one slide at a time, and the title is the slide's heading.
  */
-export const deckSlideManifest = contentComposition(
+export const deckSlideManifest = /* @__PURE__ */ contentComposition(
   'deck-slide',
   'Deck slide',
   'One slide in a deck: a title, content blocks and speaker notes.',
@@ -735,7 +743,7 @@ export const deckSlideManifest = contentComposition(
   { slideId: 'opening', title: 'Opening' }
 );
 
-export const gridLayoutManifest = contentComposition(
+export const gridLayoutManifest = /* @__PURE__ */ contentComposition(
   'layout-grid',
   'Grid layout',
   'Responsive content grid for agent-authored tiles.',
@@ -750,8 +758,8 @@ export const gridLayoutManifest = contentComposition(
 );
 
 /** Every layouts/shells manifest in stable id order. */
-export const LAYOUTS_MANIFESTS: readonly CatalogManifest[] = Object.freeze(
-  [
+export const LAYOUTS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze(
+  /* @__PURE__ */ [
     analyticsGridManifest,
     cardLayoutManifest,
     contentLayoutManifest,
@@ -785,9 +793,8 @@ export const LAYOUTS_MANIFESTS: readonly CatalogManifest[] = Object.freeze(
 /** Map of component id → expected prop names for type/schema parity tests. */
 export { LAYOUTS_PROP_NAMES as LAYOUTS_PROP_NAME_MAP } from './prop-names.ts';
 
-export const layoutsManifestsById = Object.freeze(
-  Object.fromEntries(LAYOUTS_MANIFESTS.map((manifest) => [manifest.id, manifest])) as Record<
-    string,
-    CatalogManifest
-  >
+export const layoutsManifestsById = /* @__PURE__ */ Object.freeze(
+  /* @__PURE__ */ Object.fromEntries(
+    /* @__PURE__ */ LAYOUTS_MANIFESTS.map((manifest) => [manifest.id, manifest])
+  ) as Record<string, CatalogManifest>
 );

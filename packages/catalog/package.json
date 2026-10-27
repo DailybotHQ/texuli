@@ -53,6 +53,18 @@
       "types": "./src/manifests/content/index.ts",
       "default": "./src/manifests/content/index.ts"
     },
+    "./manifests/chat": {
+      "types": "./src/manifests/chat/index.ts",
+      "default": "./src/manifests/chat/index.ts"
+    },
+    "./manifests/composition": {
+      "types": "./src/manifests/composition/index.ts",
+      "default": "./src/manifests/composition/index.ts"
+    },
+    "./manifests/data": {
+      "types": "./src/manifests/data/index.ts",
+      "default": "./src/manifests/data/index.ts"
+    },
     "./manifests/display": {
       "types": "./src/manifests/display/index.ts",
       "default": "./src/manifests/display/index.ts"
@@ -68,6 +80,14 @@
     "./manifests/overlays": {
       "types": "./src/manifests/overlays/index.ts",
       "default": "./src/manifests/overlays/index.ts"
+    },
+    "./manifests/state": {
+      "types": "./src/manifests/state/index.ts",
+      "default": "./src/manifests/state/index.ts"
+    },
+    "./manifests/workflows": {
+      "types": "./src/manifests/workflows/index.ts",
+      "default": "./src/manifests/workflows/index.ts"
     },
     "./player": {
       "types": "./src/player/index.ts",
@@ -114,12 +134,13 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.3.0",
-    "texuli": "0.3.0",
-    "@texuli/charts": "0.3.0",
-    "@texuli/data": "0.3.0",
     "@texuli/blocks": "0.3.0",
-    "@texuli/media": "0.3.0"
+    "@texuli/charts": "0.3.0",
+    "@texuli/core": "0.3.0",
+    "@texuli/data": "0.3.0",
+    "@texuli/media": "0.3.0",
+    "@texuli/spec": "workspace:*",
+    "texuli": "0.3.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

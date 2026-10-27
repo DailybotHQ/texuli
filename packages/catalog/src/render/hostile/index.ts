@@ -7,6 +7,11 @@
  */
 
 export {
+  HOSTILE_BLUEPRINTS,
+  type HostileBlueprint,
+  type HostileBlueprintCategory,
+} from './blueprints.ts';
+export {
   assertInertRoots,
   collectRenderStrings,
   hardenInertRoots,

@@ -44,4 +44,5 @@ export {
   type EnvelopeTrigger,
   type ProvenanceEntry,
   SUPPORTED_ENVELOPE_VERSIONS,
+  SUPPORTED_SPEC_VERSIONS,
 } from './types.ts';

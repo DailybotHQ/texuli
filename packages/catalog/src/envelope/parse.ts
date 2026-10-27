@@ -8,6 +8,7 @@ import {
   ENVELOPE_VERSION,
   type EnvelopeIssue,
   SUPPORTED_ENVELOPE_VERSIONS,
+  SUPPORTED_SPEC_VERSIONS,
 } from './types.ts';
 
 /** Most provenance entries an envelope keeps (the oldest are dropped). */
@@ -54,6 +55,9 @@ const FIELDS: Readonly<Record<string, readonly string[]>> = {
     'meetingRef',
     'activatedBy',
     'provenance',
+    'spec',
+    'state',
+    'flow',
     'tree',
   ],
   generator: ['kind', 'name', 'model'],
@@ -255,6 +259,23 @@ export function parseEnvelope(
         const ops = parseEditOps(entry.ops);
         if (!ops.ok) error('invalid-ops', `${path}.ops`, ops.error.message);
       });
+    }
+  }
+
+  if (root.spec !== undefined && !SUPPORTED_SPEC_VERSIONS.includes(root.spec as string)) {
+    error(
+      'unsupported-spec',
+      '$.spec',
+      `Spec ${JSON.stringify(root.spec).slice(0, 32)} is not supported; this package reads ${SUPPORTED_SPEC_VERSIONS.join(', ')} (older envelopes migrate).`
+    );
+  }
+  for (const key of ['state', 'flow'] as const) {
+    const value = root[key];
+    if (
+      value !== undefined &&
+      (value === null || typeof value !== 'object' || Array.isArray(value))
+    ) {
+      error('invalid-field', `$.${key}`, `"${key}" must be an object.`);
     }
   }
 

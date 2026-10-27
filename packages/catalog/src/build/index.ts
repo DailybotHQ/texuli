@@ -17,6 +17,11 @@ export {
 } from './build.ts';
 export { canonicalJson, sha256Hex } from './canonical.ts';
 export {
+  type CatalogCapabilityClaim,
+  catalogCapabilities,
+  NATIVE_BOUND_IDS,
+} from './capabilities.ts';
+export {
   type CatalogEmitTier,
   CHROME_GROUPS,
   CONTENT_LAYOUT_IDS,

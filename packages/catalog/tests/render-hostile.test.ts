@@ -511,8 +511,10 @@ describe('seeded hostile fuzz', () => {
 
     const node = (depth: number, safe: boolean): Record<string, unknown> => {
       const id = safe ? pick(['blocks-text', 'layout-card', 'charts-sparkline']) : pick(IDS);
-      const props = object(depth, safe);
-      if (id.startsWith('blocks-') || chance(0.2)) {
+      // Benign nodes carry only declared props (a block), so they stay valid
+      // however the catalog's id list (and with it the sequence) grows.
+      const props = safe ? {} : object(depth, safe);
+      if (id.startsWith('blocks-') || (!safe && chance(0.2))) {
         props.block = safe
           ? { type: 'text', markdown: pick(SAFE_STRINGS) }
           : { type: pick(BLOCK_TYPES), ...object(depth + 1, false) };

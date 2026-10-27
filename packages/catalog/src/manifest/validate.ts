@@ -1,4 +1,7 @@
+import { manifestData } from './data.ts';
 import type {
+  CatalogDeprecation,
+  CatalogEventName,
   CatalogExample,
   CatalogManifest,
   CatalogPropKind,
@@ -22,6 +25,126 @@ const PROP_KINDS = new Set<CatalogPropKind>([
   'unknown',
 ]);
 const TRUST = new Set(['developer', 'untrusted']);
+
+/** The closed event vocabulary (spec 0.3.0 `SPEC_EVENT_NAMES`). */
+export const CATALOG_EVENT_NAMES: readonly CatalogEventName[] = Object.freeze([
+  'press',
+  'change',
+  'select',
+  'submit',
+  'dismiss',
+  'move',
+]);
+
+/** The contract `$defs` a property schema may `$ref` (spec 0.3.0 `SPEC_PROP_REFS`). */
+export const CATALOG_SCHEMA_REFS: readonly string[] = Object.freeze([
+  'binding',
+  'reorder',
+  'action',
+  'eventMap',
+  'condition',
+  'workflowGraph',
+]);
+
+const SCHEMA_TYPES = new Set(['object', 'array', 'string', 'number', 'integer', 'boolean']);
+const SCHEMA_KEYS = new Set([
+  'type',
+  'description',
+  'properties',
+  'required',
+  'additionalProperties',
+  'items',
+  'enum',
+  'minLength',
+  'maxLength',
+  'minimum',
+  'maximum',
+  'minItems',
+  'maxItems',
+  '$ref',
+]);
+const SCHEMA_NUMBERS = ['minLength', 'maxLength', 'minimum', 'maximum', 'minItems', 'maxItems'];
+const MAX_SCHEMA_DEPTH = 16;
+const SPEC_VERSION_RE = /^\d+\.\d+\.\d+$/;
+
+/**
+ * Structural check of a property schema: the dialect subset, closed keys,
+ * a type wherever there is no `$ref`, a `$ref` that names a contract
+ * `$defs` entry and stands alone. `@texuli/spec` conformance runs the full
+ * dialect check on the projected catalog.
+ */
+function schemaProblems(raw: unknown, path: ManifestPath[], depth = 0): [ManifestPath[], string][] {
+  if (!isRecord(raw)) return [[path, 'A schema must be an object.']];
+  if (depth > MAX_SCHEMA_DEPTH) return [[path, `Schemas nest at most ${MAX_SCHEMA_DEPTH} levels.`]];
+  const out: [ManifestPath[], string][] = [];
+  for (const key of Object.keys(raw)) {
+    if (!SCHEMA_KEYS.has(key)) out.push([[...path, key], `"${key}" is not a schema keyword.`]);
+  }
+  if (raw.$ref !== undefined) {
+    const name =
+      typeof raw.$ref === 'string' ? /^#\/\$defs\/([A-Za-z]+)$/.exec(raw.$ref)?.[1] : undefined;
+    if (name === undefined || !CATALOG_SCHEMA_REFS.includes(name)) {
+      out.push([[...path, '$ref'], '$ref must name a contract $defs entry (#/$defs/<name>).']);
+    }
+    if (Object.keys(raw).some((key) => key !== '$ref' && key !== 'description')) {
+      out.push([path, '$ref stands alone (only a description may sit beside it).']);
+    }
+    return out;
+  }
+  if (typeof raw.type !== 'string' || !SCHEMA_TYPES.has(raw.type)) {
+    out.push([[...path, 'type'], 'A schema needs a type (or a $ref).']);
+  }
+  for (const key of SCHEMA_NUMBERS) {
+    if (raw[key] !== undefined && (typeof raw[key] !== 'number' || !Number.isFinite(raw[key]))) {
+      out.push([[...path, key], `"${key}" must be a finite number.`]);
+    }
+  }
+  if (
+    raw.enum !== undefined &&
+    (!Array.isArray(raw.enum) || !raw.enum.every((v) => typeof v === 'string'))
+  ) {
+    out.push([[...path, 'enum'], '"enum" must list strings.']);
+  }
+  if (
+    raw.required !== undefined &&
+    (!Array.isArray(raw.required) || !raw.required.every((v) => typeof v === 'string'))
+  ) {
+    out.push([[...path, 'required'], '"required" must list property names.']);
+  }
+  if (raw.properties !== undefined) {
+    if (!isRecord(raw.properties))
+      out.push([[...path, 'properties'], '"properties" must be an object.']);
+    else {
+      for (const [name, child] of Object.entries(raw.properties)) {
+        out.push(...schemaProblems(child, [...path, 'properties', name], depth + 1));
+      }
+    }
+  }
+  if (raw.items !== undefined)
+    out.push(...schemaProblems(raw.items, [...path, 'items'], depth + 1));
+  if (raw.additionalProperties !== undefined) {
+    out.push(
+      ...schemaProblems(raw.additionalProperties, [...path, 'additionalProperties'], depth + 1)
+    );
+  }
+  return out;
+}
+
+function deprecationProblem(raw: unknown): string | undefined {
+  if (!isRecord(raw) || typeof raw.since !== 'string' || !SPEC_VERSION_RE.test(raw.since)) {
+    return 'deprecated needs { since: "<x.y.z>", replacement? }.';
+  }
+  if (Object.keys(raw).some((key) => key !== 'since' && key !== 'replacement')) {
+    return 'deprecated takes only since and replacement.';
+  }
+  if (
+    raw.replacement !== undefined &&
+    (typeof raw.replacement !== 'string' || raw.replacement === '')
+  ) {
+    return 'deprecated.replacement must be a non-empty string.';
+  }
+  return undefined;
+}
 
 /**
  * The authored-manifest schema version this validator understands. A
@@ -306,6 +429,40 @@ function validateProp(
     );
   }
 
+  if (raw.schema !== undefined) {
+    if (kind !== 'array' && kind !== 'object') {
+      issue(
+        diagnostics,
+        'schema-unexpected',
+        [...path, 'schema'],
+        'Only array and object props take a schema.',
+        'Remove the schema or change the kind.'
+      );
+    } else {
+      for (const [where, message] of schemaProblems(raw.schema, [...path, 'schema'])) {
+        issue(
+          diagnostics,
+          'invalid-schema',
+          where,
+          message,
+          'Use the spec property-schema subset.'
+        );
+      }
+    }
+  }
+  if (raw.deprecated !== undefined) {
+    const problem = deprecationProblem(raw.deprecated);
+    if (problem) {
+      issue(
+        diagnostics,
+        'invalid-deprecated',
+        [...path, 'deprecated'],
+        problem,
+        'Name the spec version.'
+      );
+    }
+  }
+
   if (!name || !kindRaw || !PROP_KINDS.has(kindRaw as CatalogPropKind)) return undefined;
 
   const prop: CatalogPropSchema = {
@@ -323,6 +480,10 @@ function validateProp(
     ...(raw.default !== undefined ? { default: raw.default } : {}),
     ...(typeof raw.trust === 'string' && TRUST.has(raw.trust)
       ? { trust: raw.trust as 'developer' | 'untrusted' }
+      : {}),
+    ...(isRecord(raw.schema) ? { schema: raw.schema as CatalogPropSchema['schema'] } : {}),
+    ...(isRecord(raw.deprecated)
+      ? { deprecated: raw.deprecated as unknown as CatalogDeprecation }
       : {}),
   };
   return prop;
@@ -710,6 +871,75 @@ export function validateCatalogManifest(input: unknown): ManifestValidation {
     }
   }
 
+  // Events, bindable props and deprecation (spec 0.3.0).
+  if (input.events !== undefined) {
+    if (!Array.isArray(input.events)) {
+      issue(
+        diagnostics,
+        'invalid-type',
+        ['events'],
+        '"events" must be an array.',
+        'List event names.'
+      );
+    } else {
+      const seen = new Set<string>();
+      input.events.forEach((event, i) => {
+        if (typeof event !== 'string' || !CATALOG_EVENT_NAMES.includes(event as CatalogEventName)) {
+          issue(
+            diagnostics,
+            'invalid-event',
+            ['events', i],
+            `Events are one of ${CATALOG_EVENT_NAMES.join(', ')}.`,
+            'Use the closed event vocabulary.'
+          );
+        } else if (seen.has(event)) {
+          issue(
+            diagnostics,
+            'duplicate-event',
+            ['events', i],
+            `Event "${event}" repeats.`,
+            'List it once.'
+          );
+        }
+        if (typeof event === 'string') seen.add(event);
+      });
+    }
+  }
+  if (input.bindable !== undefined) {
+    const props = Array.isArray(input.props) ? input.props.filter(isRecord) : [];
+    if (!Array.isArray(input.bindable)) {
+      issue(
+        diagnostics,
+        'invalid-type',
+        ['bindable'],
+        '"bindable" must be an array.',
+        'List prop names.'
+      );
+    } else {
+      input.bindable.forEach((name, i) => {
+        const prop = props.find((candidate) => candidate.name === name);
+        const portable =
+          prop !== undefined &&
+          !['slot', 'event', 'unknown'].includes(String(prop.kind)) &&
+          !['class', 'className', 'style', 'renderer'].includes(String(name));
+        if (!portable) {
+          issue(
+            diagnostics,
+            'invalid-bindable',
+            ['bindable', i],
+            `"${String(name)}" is not a portable data prop of this component.`,
+            'Bindable props are declared props of a data kind.'
+          );
+        }
+      });
+    }
+  }
+  if (input.deprecated !== undefined) {
+    const problem = deprecationProblem(input.deprecated);
+    if (problem)
+      issue(diagnostics, 'invalid-deprecated', ['deprecated'], problem, 'Name the spec version.');
+  }
+
   // Unknown top-level keys are rejected so typos fail build validation.
   const allowed = new Set([
     'id',
@@ -725,6 +955,9 @@ export function validateCatalogManifest(input: unknown): ManifestValidation {
     'props',
     'examples',
     'related',
+    'events',
+    'bindable',
+    'deprecated',
   ]);
   for (const key of Object.keys(input)) {
     if (!allowed.has(key)) {
@@ -787,31 +1020,7 @@ export function defineCatalogManifest(input: unknown): Readonly<CatalogManifest>
     throw new CatalogManifestError(result.diagnostics);
   }
 
-  const agentEmittable = input.agentEmittable === true;
-  const a11yRaw = input.a11y;
-  const a11y =
-    typeof a11yRaw === 'string'
-      ? a11yRaw.trim()
-      : (a11yRaw as string[]).map((s) => String(s).trim());
-
-  const manifest: CatalogManifest = {
-    id: String(input.id).trim(),
-    package: String(input.package).trim(),
-    label: String(input.label).trim(),
-    summary: String(input.summary).trim(),
-    tier: input.tier as CatalogTier,
-    agentEmittable,
-    useWhen: (input.useWhen as string[]).map((s) => s.trim()),
-    dontUseWhen: (input.dontUseWhen as string[]).map((s) => s.trim()),
-    a11y,
-    props: input.props as CatalogPropSchema[],
-    examples: input.examples as CatalogExample[],
-    ...(Array.isArray(input.related)
-      ? { related: (input.related as string[]).map((s) => s.trim()) }
-      : {}),
-  };
-
-  return Object.freeze(manifest);
+  return manifestData(input as unknown as CatalogManifest);
 }
 
 /** Error thrown by {@link defineCatalogManifest} with structured diagnostics. */

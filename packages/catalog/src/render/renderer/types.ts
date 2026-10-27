@@ -1,5 +1,5 @@
 import type { FormulaInputs } from '@texuli/blocks/formula';
-import type { CatalogPropSchema } from '../../manifest/types.ts';
+import type { CatalogEventName, CatalogPropSchema } from '../../manifest/types.ts';
 
 /**
  * Untrusted / agent-authored catalog tree node (input).
@@ -25,6 +25,13 @@ export interface CatalogTreeInput {
    * `conditionInputs`. False or unknown hides the node.
    */
   when?: unknown;
+  /**
+   * Two-way bindings (spec 0.3.0): `{ <bindable prop>: {"$state": name} }`.
+   * Checked by `validateDraft`; the renderer paints the resolved props.
+   */
+  bind?: Readonly<Record<string, unknown>>;
+  /** Event handlers (spec 0.3.0): `{ <event>: action[] }` from the closed action set. */
+  on?: Readonly<Record<string, unknown>>;
 }
 
 /** Who is allowed to emit component ids into the tree. */
@@ -93,6 +100,10 @@ export interface RenderComponentSpec {
   agentEmittable?: boolean;
   /** Emit tier membership from the built catalog. */
   emit?: readonly RenderTier[];
+  /** Events a node's `on` may handle (spec 0.3.0). */
+  events?: readonly CatalogEventName[];
+  /** Props a node may `bind` (spec 0.3.0). */
+  bindable?: readonly string[];
 }
 
 /** Lookup table the renderer uses (built catalog or a test double). */

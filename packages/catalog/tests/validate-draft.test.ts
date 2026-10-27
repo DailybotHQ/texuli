@@ -60,7 +60,9 @@ describe('validateDraft', () => {
         expect(result.diagnostics).toEqual([]);
         expect(result).toMatchObject({ ok: true, status: 'valid', tier: 'untrusted' });
         expect(result.checks).toEqual(
-          Object.fromEntries(DRAFT_CHECKS.map((c) => [c, c === 'envelope' ? 'skipped' : 'pass']))
+          Object.fromEntries(
+            DRAFT_CHECKS.map((c) => [c, c === 'envelope' || c === 'spec' ? 'skipped' : 'pass'])
+          )
         );
         expect(result.envelope).toBeNull();
         expect(result.roots[0]).toMatchObject({ kind: 'component', id: 'layout-doc' });

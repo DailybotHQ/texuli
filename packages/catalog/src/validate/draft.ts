@@ -1,3 +1,4 @@
+import { migrateBlueprint } from '@texuli/spec/migrate';
 import { isEnvelopeLike, parseEnvelope } from '../envelope/parse.ts';
 import type { BlueprintEnvelope } from '../envelope/types.ts';
 import { checkCompositionGrammar, grammarIssueSeverity } from '../render/grammar/check.ts';
@@ -15,13 +16,16 @@ import type {
   RenderOptions,
   RenderTier,
 } from '../render/renderer/types.ts';
+import { resolveInteraction } from './interaction.ts';
 import { scanSinks } from './sinks.ts';
 
 /** The checks `validateDraft` runs, in order. */
 export const DRAFT_CHECKS = [
   'input',
   'envelope',
+  'spec',
   'structure',
+  'interaction',
   'sinks',
   'limits',
   'render',
@@ -99,6 +103,18 @@ export interface ValidateDraftOptions {
   conditions?: RenderOptions['conditions'];
   /** Values the `when` conditions read (audit G07). Default: none, so conditions are unknown. */
   conditionInputs?: RenderOptions['conditionInputs'];
+  /**
+   * The full spec 0.3.0 check of an envelope, usually `validateBlueprint`
+   * from `@texuli/spec` with the host's spec documents (state and flow
+   * declarations, binding types, writability, action rules, workflow
+   * graphs). Injected like `checkBlock`, so this module stays small. Without
+   * it the `spec` check is `skipped`; the catalog-local interaction check
+   * (declared names, events, bindable props, closed action ops) always runs.
+   */
+  checkSpec?: (envelope: unknown) => {
+    ok: boolean;
+    diagnostics: readonly { code: string; path: string; message: string }[];
+  };
 }
 
 export type DraftStatus = 'valid' | 'invalid' | 'parse' | 'over-limits';
@@ -110,7 +126,7 @@ export interface DraftValidation {
   status: DraftStatus;
   tier: RenderTier;
   /**
-   * The draft with only `id`, `props`, `children`, `slot` and `when` on each node, or `null`
+   * The draft with only `id`, `props`, `children`, `slot`, `when`, `bind` and `on` on each node, or `null`
    * when it could not be read (bad JSON, not a tree, over the limits).
    */
   draft: CatalogTreeInput | readonly CatalogTreeInput[] | null;
@@ -127,7 +143,7 @@ export interface DraftValidation {
   checks: Readonly<Record<DraftCheck, DraftCheckStatus>>;
 }
 
-const NODE_KEYS = new Set(['id', 'props', 'children', 'slot', 'when']);
+const NODE_KEYS = new Set(['id', 'props', 'children', 'slot', 'when', 'bind', 'on']);
 const PROTOTYPE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 /** Values nested deeper than this are refused, not walked (depth bombs). */
 const MAX_VALUE_DEPTH = 128;
@@ -206,7 +222,11 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
 
     // ── Envelope ─────────────────────────────────────────────
     if (isEnvelopeLike(value)) {
-      const parsed = parseEnvelope(value, { catalogHash: options.catalogHash });
+      // Older envelopes are migrated first (spec 0.2.0 → current); only `spec` changes.
+      const migrated = migrateBlueprint(value);
+      const blueprint = migrated.blueprint as Record<string, unknown>;
+      value = blueprint;
+      const parsed = parseEnvelope(blueprint, { catalogHash: options.catalogHash });
       for (const issue of parsed.issues) {
         diagnostics.push({ check: 'envelope', ...issue });
       }
@@ -228,6 +248,14 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
       if (envelope.tier !== undefined && envelope.tier !== tier) {
         warn('tier-ignored', '$.tier', `Validated at the host's "${tier}" tier.`);
       }
+      const spec = options.checkSpec?.(blueprint);
+      if (spec) {
+        for (const d of spec.diagnostics) error('spec', d.code, d.path, d.message);
+        if (!spec.ok && !diagnostics.some((d) => d.check === 'spec')) {
+          error('spec', 'spec', '$', 'The spec check refused the envelope.');
+        }
+        checks.spec = 'pass';
+      }
       value = envelope.tree;
       checks.envelope = 'pass';
     }
@@ -237,6 +265,14 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
     checks.structure = 'pass';
     // The byte measure walks values recursively: refuse a depth bomb first.
     if (diagnostics.some((d) => d.code === 'too-deep')) return finish('over-limits', null);
+
+    // ── Interaction (spec 0.3.0) ─────────────────────────────
+    // Bindings paint their first values; bind and on name closed sets.
+    const interaction = resolveInteraction(draft, envelope?.state, options.catalog);
+    for (const issue of interaction.issues) {
+      error('interaction', issue.code, issue.path, issue.message, issue.id);
+    }
+    checks.interaction = 'pass';
 
     // ── Raw sink scan ────────────────────────────────────────
     for (const finding of scanSinks(value, tier)) {
@@ -251,7 +287,7 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
     checks.limits = 'pass';
 
     // ── Renderer ─────────────────────────────────────────────
-    const rendered = renderCatalogTree(draft, {
+    const rendered = renderCatalogTree(interaction.tree, {
       catalog: options.catalog,
       tier,
       conditions: options.conditions,
@@ -366,7 +402,7 @@ function normalize(
         report(
           'unknown-field',
           `${path}.${key}`,
-          'Catalog nodes take only id, props, children, slot and when.'
+          'Catalog nodes take only id, props, children, slot, when, bind and on.'
         );
       }
     }
@@ -374,6 +410,8 @@ function normalize(
     if (record.props !== undefined) out.props = record.props;
     if (record.slot !== undefined) out.slot = record.slot;
     if (record.when !== undefined) out.when = record.when;
+    if (record.bind !== undefined) out.bind = record.bind;
+    if (record.on !== undefined) out.on = record.on;
     if (Array.isArray(record.children)) {
       out.children = record.children.map((child, index) =>
         node(child, `${path}.children.${index}`)
