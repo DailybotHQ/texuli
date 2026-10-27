@@ -13,8 +13,8 @@ spec both read them.
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Default (every route) | 224 KB | 24 KB | 96 KB | 64 KB | 0.1 | 2,500 ms |
 | `/` (landing) | 224 KB | 24 KB | 152 KB | 116 KB | 0.1 | 3,000 ms |
-| `/component-pages/button/` | 224 KB | 24 KB | 112 KB | 72 KB | 0.15 | 2,500 ms |
-| `/component-pages/charts-pie/` | 224 KB | 24 KB | 120 KB | 80 KB | 0.15 | 2,500 ms |
+| `/component-pages/button/` | 224 KB | 24 KB | 112 KB | 76 KB | 0.15 | 2,500 ms |
+| `/component-pages/charts-pie/` | 224 KB | 24 KB | 132 KB | 92 KB | 0.15 | 2,500 ms |
 | `/charts-page/` | 224 KB | 28 KB | 96 KB | 64 KB | 0.1 | 2,500 ms |
 | `/gallery-themes/` | 224 KB | 24 KB | 132 KB | 64 KB | 0.1 | 2,500 ms |
 | `/theme-switcher/` | 224 KB | 24 KB | 100 KB | 64 KB | 0.1 | 2,500 ms |
