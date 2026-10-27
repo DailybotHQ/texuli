@@ -29,6 +29,7 @@ describe('consumer harness matrix', () => {
     expect(CONSUMER_PACK_FILTER).toEqual([
       'core',
       'date',
+      'drag',
       'tokens',
       'primitives',
       'texuli',
