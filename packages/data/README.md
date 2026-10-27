@@ -121,6 +121,22 @@ The package root, `@texuli/data`, re-exports the main views and helpers.
 **Known limit:** fence editing on the map is not implemented yet; fences are
 drawn and listed only.
 
+## Unreleased
+
+In the repository, not in the published `0.3.0`:
+
+- **One drag engine.** The board, tree view, calendar, timeline and grid
+  column moves run on
+  [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md)
+  (in development, not on npm yet; the next release publishes it first):
+  one pointer gesture tracker (capture, threshold, `pointercancel` as
+  cancel). The board and tree view also announce moves from localized
+  `DragMessages` templates, overridable with their new `messages` prop.
+- **Breaking:** `@texuli/data/board` and `@texuli/data/tree-view` no longer
+  export `DRAG_THRESHOLD_PX` or `indexFromPointer`. The threshold lives in
+  `@texuli/drag/gesture` and the pointer index in
+  `@texuli/drag/collision` (`midpointIndex`).
+
 ## Documentation
 
 - Site: [texuli.com](https://texuli.com) and the

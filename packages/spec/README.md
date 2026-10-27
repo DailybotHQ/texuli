@@ -18,6 +18,13 @@ DOM, no Svelte, no Node APIs and no runtime dependencies.
 > stable release). Under 0.x, a new minor (`0.4.0`) may contain breaking
 > changes, so pin the exact version or use `^0.3.0`, which accepts only 0.3.x.
 
+> **Unreleased in this README.** `@texuli/spec@0.3.0` on npm carries **spec
+> 0.2.0** and only the root and `codegen` subpaths. Spec 0.3.0 (state,
+> bindings, closed actions, `reorder`, workflow graphs) and the `workflow`,
+> `migrate` and `surface` subpaths described below are in the repository
+> and reach npm with the next owner-approved release
+> ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
+
 ## Install
 
 ```bash
@@ -111,6 +118,7 @@ warning without failing.
 | `@texuli/spec` | Runtime: types, vocabulary, validation, hashing | `BlueprintEnvelope`, `SpecCatalog`, `SpecValidation`, `WorkflowGraph` and the other generated types; `SPEC_COMPONENT_IDS`, `SpecComponentProps`, `SPEC_CATALOG_HASH`, `SPEC_VERSION`; `validateBlueprint`, `validateTree`, `validateInstance`, `checkSchemaDocument`; the contract constants (`SPEC_ACTION_OPS`, `SPEC_EVENT_NAMES`, `SPEC_STATE_TYPES`, `SPEC_LIMITS`, `SPEC_PATTERNS`, `ACTION_FIELDS`); `canonicalJson`, `sha256` |
 | `@texuli/spec/workflow` | Runtime, opt-in: workflow graph validation | `validateWorkflowGraph` (pass it in `SpecDocuments.validateWorkflowGraph`) |
 | `@texuli/spec/migrate` | Runtime, opt-in: envelope migrations | `migrateBlueprint`, `SPEC_MIGRATIONS`, `UNDECLARED_SPEC_VERSION` |
+| `@texuli/spec/surface` | Runtime: the state surface rules every validator shares (no imports) | `checkStateSurface`, `surfaceInputs`, `SPEC_CONTROL_STATE_TYPES`, `SURFACE_PLAYER_CODES`, `LIST_TEXT_PATTERN` |
 | `@texuli/spec/codegen` | Build time: generation and conformance | `buildSpec`, `projectCatalog`, `checkConformance`, `checkCatalogContract`, `formatJson`, `nextSpecVersion`, `checkVersionHistory` |
 
 ## Key guarantees
@@ -137,7 +145,18 @@ warning without failing.
   [`@texuli/catalog`](https://www.npmjs.com/package/@texuli/catalog). The
   reducers that run the actions belong to the runtime
   ([`@texuli/player`](https://www.npmjs.com/package/@texuli/player)); in
-  this repository they are not wired to the 0.3.0 fields yet.
+  this repository it runs every 0.3.0 action).
+- **A blueprint that validates paints.** The state surface rules
+  (`@texuli/spec/surface`) refuse exactly what the player refuses at paint
+  time: form fields and submits outside an `action-form`, nested forms,
+  controls and fields that name no declared variable of their type, flow
+  nodes without a matching view or event, and writers of a host-bound
+  variable. The spec, `@texuli/catalog`'s `validateDraft` and the Kotlin
+  twin run the same rules.
+- **List item text never hides or reorders itself.** String fields of list
+  state items refuse control characters, bidirectional overrides and
+  isolates, and invisible formatting characters (`SPEC_PATTERNS.listText`;
+  ZWNJ and ZWJ stay allowed for scripts and emoji).
 
 ## Versioning
 

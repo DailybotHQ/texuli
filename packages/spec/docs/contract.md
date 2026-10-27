@@ -25,8 +25,8 @@ fixtures are not part of the npm package.
 | `schemas/` | The normative JSON schemas: `blueprint` (envelope v1, local state, flow and the node tree), `catalog`, `diagnostics`, `manifest`, `workflow` (workflow graphs) |
 | `catalog/components.json` | The closed vocabulary, projected from the built catalog: id, label, summary, group, placement (`app`/`content`), emit tiers, capability and props |
 | `catalog/capabilities.json` | Reviewed capability claims. Empty: no id is audited portable yet, so every capability is `unknown` (ADR-003) |
-| `fixtures/golden/` | Blueprints that must validate: a report, a dashboard, a proactive deck and a report with a named slot and a `when` condition (fictional data) |
-| `fixtures/invalid/` | Blueprints that must fail with exact diagnostic codes, one or more per code, including slot and condition cases (an undeclared or root `slot`, an unknown condition `op`, an extra condition field) and the 0.3.0 cases (a refused state declaration, an unknown variable, a two-key binding, an undeclared event, an action missing its fields, an unknown `spec` version) |
+| `fixtures/golden/` | Nine blueprints that must validate (fictional data): a report, a dashboard, a proactive deck and a report with a named slot and a `when` condition (0.2.0 envelopes), and five 0.3.0 interfaces: `app-dashboard` (filters bound to state), `mobile-flow` (flow views, forms, `flowGo`), `sortable-board` (reorder groups, locked, clone, `on.move`), `workflow-builder` (an edit-mode `workflow-graph` bound to state) and `lego` (layouts, a data board, charts, media, blocks, a sortable palette and outline, and a workflow editor in one tree). `@texuli/player`'s `golden.test.ts` and `lego.test.ts` paint them |
+| `fixtures/invalid/` | Blueprints that must fail with exact diagnostic codes, one or more per code, including slot and condition cases (an undeclared or root `slot`, an unknown condition `op`, an extra condition field) and the 0.3.0 cases (a refused state declaration, an unknown variable, a two-key binding, an undeclared event, an action missing its fields, an unknown `spec` version) and the state surface cases (bidi in a list item, form nodes outside an `action-form`, a control and a flow view with nothing declared) |
 | `fixtures/workflow/` | `golden/` workflow graphs that must validate (a six-node pipeline) and `invalid/` graphs (`{ expect, graph }`) that must fail with exact codes: a dangling edge, an undeclared node type, a forbidden cycle |
 | `manifest.json` | The spec version, the dialect and a SHA-256 per normative file |
 | `versions.json` | Every released spec version pinned to its spec digest (not normative: it pins the normative files) |
@@ -64,6 +64,10 @@ maps. Anything else fails `checkSchemaDocument`, and generation refuses it.
   fail closed (`state` and `prop-type`).
 - `@texuli/spec/migrate` (`src/migrations/index.ts`), opt-in at run time:
   `migrateBlueprint`, `SPEC_MIGRATIONS` and `UNDECLARED_SPEC_VERSION`.
+- `@texuli/spec/surface` (`src/surface.ts`, no imports): `checkStateSurface`,
+  `surfaceInputs`, `SPEC_CONTROL_STATE_TYPES`, `SURFACE_PLAYER_CODES` and
+  `LIST_TEXT_PATTERN`. `validateBlueprint` runs it, and `@texuli/catalog`'s
+  `validateDraft` imports it, so both refuse the same nodes.
 - `@texuli/spec/codegen`, build time: `buildSpec`, `projectCatalog`,
   `checkConformance`, `checkCatalogContract`, `formatJson`. The conformance
   harness passes the workflow validator itself.
@@ -210,7 +214,8 @@ variables named `^[a-z][A-Za-z0-9_]{0,31}$`. Types: `boolean` (default
 distinct values of 1–64 characters, default the first), `string`
 (`maxLength` 1–1000, default 200; default `""`), `list` (`maxItems` 0–500,
 default 500; items are `{ id, ...fields }` with a unique item key
-`^[A-Za-z0-9._:-]{1,64}$` and at most 16 scalar fields), `workflow` (an
+`^[A-Za-z0-9._:-]{1,64}$` and at most 16 scalar fields; string fields
+follow `listText`, below), `workflow` (an
 `initial` graph that must pass the workflow rules, checked only when the
 host supplies the workflow schema and validator; otherwise `state`). A
 `source` (host data
@@ -293,9 +298,40 @@ edges join the same ports; and `cycles: "forbid"` means acyclic (a
 self-loop counts). `@texuli/workflows/model` is the editor's runtime
 model; this schema is the interchange contract.
 
+**The state surface** (codes `action`, `binding`, `state`;
+`src/surface.ts`). So that a blueprint that validates always paints, the
+validator refuses exactly what `@texuli/player` refuses at paint time, with
+the player's messages and its codes mapped onto the closed set
+(`action-binding` → `action`, `control-binding` and `host-binding` →
+`binding`, `flow-binding` → `state`):
+
+- `form-field` and `form-submit` sit inside an `action-form`; forms never
+  nest; a form's `action` and a field's `name` match the intent pattern;
+  field names are unique in a form; a field writes a declared variable of
+  its type (`kind: "number"` a number, others a string).
+- `control-toggle`, `control-choice`, `control-slider` and `control-filter`
+  name a declared `boolean`, `enum`, `number` or `string` variable.
+- `flow-view` names a declared view and `flow-action` an event some
+  transition handles; neither appears without a `flow`.
+- No control or field writes a host-bound variable (one with a `source`).
+
+An envelope with `state` or `flow` has declarations (empty with only a
+flow); without either, every control, field and flow node is refused.
+`packages/player/tests/surface-parity.test.ts` proves the two agree on a
+corpus that exercises every player code.
+
+**List item text** (`SPEC_PATTERNS.listText`, code `state`). String fields
+of list items refuse C0 and C1 controls (tab and newline included),
+bidirectional overrides and isolates (U+202A–202E, U+2066–2069) and the
+invisible formatting characters U+061C, U+180E, U+200B, U+200E, U+200F,
+U+2060–2064 and U+FEFF, so a draggable item never hides or reorders its
+text. ZWNJ and ZWJ (U+200C, U+200D) stay allowed: Persian and Indic
+scripts and emoji sequences need them. The catalog and the player's list
+parsing apply the same pattern.
+
 **The Kotlin twin.** `native/texuli-spec` mirrors every rule above in the
 TypeScript order (`SpecValidator.kt`, `PropSchemaValidator.kt`,
-`WorkflowValidator.kt`, `Contract.kt`), and the conformance module checks
+`WorkflowValidator.kt`, `Contract.kt`, `Surface.kt`), and the conformance module checks
 that every invalid blueprint and workflow fixture is refused with the same
 codes on both targets. Known differences, all on input that is refused on
 both targets: the generated decoders stop at the first shape error, so
@@ -315,12 +351,6 @@ harness supplies it on the TypeScript side, so fixtures compare equal).
 - Making the spec authoritative for the web packages (B1 step 3 cutover);
   today the catalog manifests are the bootstrap input.
 - Compiling the Kotlin, and the native runtime (B2).
-- Runtime support for the 0.3.0 fields: the player's reducers and dispatch
-  for `on`, `bind`, `reorder` and `moveItem`, `$data` resolution, and
-  `@texuli/catalog/validate` running `migrateBlueprint` and accepting
-  `spec`, `state` and `flow`. No catalog component declares `events`,
-  `bindable` or a property schema yet, so today any `on` is refused with
-  `unknown-event`.
 - A full type for `when`. The dialect has no unions, so `condition` and
   `numberFormula` are closed records whose `op` is an enum and whose operands
   are typed (except `value`, which is a number for `num` and a formula for

@@ -74,8 +74,8 @@ budget rows (2026-10-26).
 
 | Package | Script | Runs |
 | --- | --- | --- |
-| `@texuli/core`, `@texuli/spec`, `@texuli/tokens`, `@texuli/tools`, `@texuli/astro` | `typecheck` | `tsc -p tsconfig.json` |
-| Svelte packages (`primitives`, `texuli`, `charts`, `chat`, `data`, `media`, `editor`, `blocks`, `catalog`, `slides`, `player`, `examples`) | `typecheck` | `node ../../scripts/typecheck-svelte.mjs` (`svelte-check --fail-on-warnings`) |
+| `@texuli/core`, `@texuli/drag`, `@texuli/spec`, `@texuli/tokens`, `@texuli/tools`, `@texuli/astro` | `typecheck` | `tsc -p tsconfig.json` |
+| Svelte packages (`primitives`, `texuli`, `charts`, `chat`, `data`, `media`, `editor`, `workflows`, `blocks`, `catalog`, `slides`, `player`, `examples`) | `typecheck` | `node ../../scripts/typecheck-svelte.mjs` (`svelte-check --fail-on-warnings`) |
 | `tests/fixtures/app` (`@texuli/fixture-app`) | `dev` / `typecheck` | `vite` / `node ../../../scripts/typecheck-svelte.mjs` |
 | `@texuli/website` | `dev` / `prebuild` / `build` / `preview` / `typecheck` / `check:csp` | `astro dev` / `node ../../scripts/generate-examples-catalog.mjs` / `astro check && astro build` / `astro preview` / `astro check` / `tsx tests/csp-coverage.mts` (after a build) |
 | `@texuli/agent` | `typecheck` / `dev` | `tsc -p tsconfig.json` / `tsx src/node.ts` (local service on the fake replay provider). Tests: `pnpm --filter @texuli/agent exec vitest run` (its own `vitest.config.ts`; not in `pnpm test`) |
@@ -95,6 +95,14 @@ budget rows (2026-10-26).
 | `pnpm exec tsx scripts/generate-site-llms.ts` | Regenerate the checked-in root `llms.txt`; its freshness is asserted by `scripts/tests/site-loaders.test.ts` |
 | `pnpm exec tsx tests/behavior/harness/limits-cli.ts [<primitive>] [--measure]` | Report the last behavior run against its limits |
 | `pnpm exec tsx scripts/check-skill.ts --write-sums` | Regenerate `skills/texuli/SHA256SUMS` after an intentional skill edit |
+| `pnpm exec tsx scripts/check-skill.ts --refresh-mirror` | Refresh the dogfood mirror `.agents/skills/texuli/` and its `skills-lock.json` hash |
+| `pnpm exec tsx scripts/check-skill.ts --release-plan` | Print the next skill release (`skip`, `current`, `last_tag`, `bump`, `version`, `tag` lines) from the Conventional Commits since the last `skill-v` tag; read-only. Used by the skill-release workflow |
+| `pnpm exec tsx scripts/check-skill.ts --release <version> [--date <YYYY-MM-DD>] [--notes <file>]` | Stamp a skill release locally (version in every `SKILL.md`, the changelog, `SHA256SUMS`, the mirror) and validate the pack; refuses a version that differs from the plan. The skill-release workflow runs it; see [RELEASE](RELEASE.md#skill-release) |
+| `pnpm exec tsx scripts/coverage-matrix.ts [--json] [--out <file>]` | The JSON coverage matrix: for every Svelte component of the published component packages, its catalog manifest, spec id and capability, player loader, render catalogs, example and docs page, plus the gaps. Offline and read-only; tests: `pnpm vitest run scripts/tests/coverage-matrix.test.ts` |
+| `pnpm exec tsx packages/player/scripts/render-specs.ts [--check]` | Regenerate (or, with `--check`, fail on drift in) `packages/player/src/render-specs.ts`, the lean render specs the player's catalog is built from; `packages/player/tests/render-specs.test.ts` fails on drift |
+| `pnpm exec tsx packages/spec/scripts/generate.ts [--check]` | Regenerate the spec projections, `manifest.json` and the digest stamps (or fail on drift); a moved digest needs a `versions.json` pin ([contract](../packages/spec/docs/contract.md)) |
+| `pnpm exec tsx native/conformance/web/trace.ts [--write]` | Check (or refresh) the web half of the dual-target golden gate: one semantic trace per spec golden in `native/conformance/expected/` |
+| `pnpm exec tsx native/conformance/web/structure.ts` | Native structure checks without a JDK: Kotlin files, generated sources consumed in place, traces target-independent, and the Kotlin contract patterns equal to the spec's |
 | `./skills/texuli/setup.sh --verify [--expect-version <v>]` | Verify the skill pack checksums (pinned installs: `skills/texuli/setup/pinned-install.md`) |
 | `bash .agents/skills/deepworkplan/verify/conformance.sh --repo-only` | Read-only DWP repository conformance check |
 | `python3 .agents/skills/deepworkplan/shared/config.py show --repo .` | Print the addon registry (`.dwp/config.json`) |

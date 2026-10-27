@@ -65,6 +65,18 @@ closed, documented catalog that can be validated before anything renders.
    examples); a renderer with no HTML sinks; a two-tier URL policy that
    separates developer-written props from untrusted content; and a read-only
    MCP server.
+6. **Whole interfaces as JSON.** A blueprint (spec 0.3.0) declares local
+   state, flows, two-way bindings and a closed action set, so an agent can
+   send a working dashboard, form flow, sortable board or workflow builder
+   as data. All 66 agent-emittable ids of the 158-id catalog paint in the
+   player, and a blueprint that validates always paints (the spec, catalog,
+   player and Kotlin validators share the state surface rules).
+7. **One drag engine.** `@texuli/drag` plans every drag as data (sortable
+   lists, boards, trees, spatial canvases, graph editing) under one
+   keyboard, announcement and i18n contract, with non-drag alternatives.
+8. **Workflows.** `@texuli/workflows` is an accessible workflow graph editor
+   and viewer: typed nodes and ports, validated operations, layered
+   auto-layout, a keyboard model and a treegrid outline.
 
 ## What exists today versus what is planned
 
@@ -73,15 +85,17 @@ closed, documented catalog that can be validated before anything renders.
 | Workspace (pnpm 11, TypeScript 6 strict + erasable, Biome 2.5, Vitest 5) | **Exists** | repository root |
 | L0 texels: the two-tier URL policy (`safeHref`, `safeImageSrc`, `safeMediaSrc`), ids, roving focus and typeahead, focus scope, the layer stack, scroll lock, positioning, dismissable layers, inert, portal, announcer, and the rest of `@texuli/core` | **Exists**, unit tests per texel | [`packages/core`](../packages/core/README.md) |
 | `@texuli/date` (L0): dependency-free Gregorian calendar dates for the calendar, date field and date picker | **Exists**, unit tests | [`packages/date`](../packages/date/README.md) |
-| `@texuli/primitives` (L1): 41 owned headless primitives and the behavior suite (42 scenario specs on chromium, webkit and a Pixel 7 profile) | **Exists**, private | [`packages/primitives`](../packages/primitives/README.md), [`tests/behavior`](../tests/behavior/README.md) |
+| `@texuli/primitives` (L1): 42 owned headless primitives (`sortable` unreleased) and the behavior suite (44 scenario specs, including `sortable` and `workflow-editor`, on chromium, webkit and a Pixel 7 profile) | **Exists**, private | [`packages/primitives`](../packages/primitives/README.md), [`tests/behavior`](../tests/behavior/README.md) |
+| `@texuli/drag` (L0): the framework-free drag engine (sortable, collision, modifiers, auto-scroll, gesture, spatial, graph, messages) | **In development**, `0.0.0`, not on npm; already used by primitives, data, workflows and the player | [`packages/drag`](../packages/drag/README.md) |
+| `@texuli/workflows` (L4): workflow model, layout, spec adapter, editor, viewer and inspector | **In development**, `0.0.0`, not on npm; the player's `workflow-graph` painter | [`packages/workflows`](../packages/workflows/README.md) |
 | Tokens + CSS, OKLCH theme engine (L2): the `--tx-*` contract, 210 themes, compiled CSS, forced colors, the AA gate, the Tailwind preset | **Exists**, private | [`packages/tokens`](../packages/tokens/README.md) |
 | `texuli` styled components, layouts and app shells (L3) | **Exists**, private | [`packages/texuli`](../packages/texuli/README.md) |
 | Charts, data, media and chat packages (L4) | **Exists**, private | [`packages/charts`](../packages/charts/README.md), [`packages/data`](../packages/data/README.md), [`packages/media`](../packages/media/README.md), [`packages/chat`](../packages/chat/README.md) |
-| Blueprint contract (L0): JSON schemas, catalog vocabulary, TypeScript and Kotlin codegen, conformance harness | **Exists**, private | [`packages/spec`](../packages/spec/README.md) |
+| Blueprint contract (L0): JSON schemas, catalog vocabulary, TypeScript and Kotlin codegen, conformance harness; spec 0.3.0 (state, bindings, closed actions, `reorder`, workflow graphs, the state surface) | **Exists**, private; npm `@texuli/spec@0.3.0` carries spec 0.2.0, and spec 0.3.0 is unreleased | [`packages/spec`](../packages/spec/README.md) |
 | Rich text editor (L4) | **In development**, `0.0.0`, never packed or published | [`packages/editor`](../packages/editor/README.md) |
 | Content blocks (L5) | **Exists**, private | [`packages/blocks`](../packages/blocks/README.md) |
 | Agent catalog and the sink-free renderer (L6) | **Exists**, private | [`packages/catalog`](../packages/catalog/README.md) |
-| Slides and the blueprint player (L7) | **Exists**, private | [`packages/slides`](../packages/slides/README.md), [`packages/player`](../packages/player/README.md) |
+| Slides and the blueprint player (L7) | **Exists**, private; the player's spec 0.3.0 interaction and its data, chat, sortable and workflow painters are unreleased | [`packages/slides`](../packages/slides/README.md), [`packages/player`](../packages/player/README.md) |
 | Astro integration (L8) | **Exists**, private | [`packages/astro`](../packages/astro/README.md) |
 | Kotlin Multiplatform twin (`texuli-spec`, `texuli-compose`, conformance) | **In development**, nothing published; app shells and most chart families are placeholders | [`native`](../native/README.md) |
 | Agent service (prompt → validated blueprint draft) | **In development**, fake replay provider only, not deployed | [`apps/agent`](../apps/agent/README.md) |

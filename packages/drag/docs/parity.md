@@ -7,9 +7,8 @@ check per row; the last test in that file fails when this table and the
 tests drift apart. Deeper coverage per subpath is in the files in the last
 column.
 
-Status: **in development** (`0.0.0`, private, not published). The package
-is framework-free: Svelte bindings (`@texuli/primitives/sortable`) are a
-separate task.
+Status: **in development** (`0.0.0`, private, not yet on npm). The package
+is framework-free; the Svelte binding is `@texuli/primitives/sortable`.
 
 | Capability | Parity test | Subpath | Deeper tests |
 | --- | --- | --- | --- |
@@ -62,8 +61,7 @@ separate task.
 ## Outside the engine (binding concerns)
 
 These SortableJS options are rendering concerns, so they belong to the
-bindings (`@texuli/primitives/sortable`, T-sortable-binding), not to this
-framework-free engine: ghost, chosen and drag CSS classes; FLIP and drop
+binding (`@texuli/primitives/sortable`), not to this framework-free engine: ghost, chosen and drag CSS classes; FLIP and drop
 animations (disabled under reduced motion); the drag overlay element;
 `touch-action` on handles; debouncing pointer-drag announcements. The
 engine supplies what they need: `state.delta`, `state.move.next`, lifecycle

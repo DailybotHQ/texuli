@@ -71,13 +71,13 @@ from subpaths to keep bundles narrow.
 
 ## What's inside
 
-41 primitives, one subpath each (`@texuli/primitives/<subpath>`):
+42 primitives, one subpath each (`@texuli/primitives/<subpath>`):
 
 | Purpose | Subpaths |
 | --- | --- |
 | Overlays | `dialog`, `alert-dialog`, `sheet`, `popover`, `hover-card`, `tooltip`, `toast`, `portal` |
 | Menus and navigation | `menu`, `context-menu`, `menubar`, `navigation-menu`, `command`, `toolbar`, `tabs`, `pagination` |
-| Selection and lists | `select`, `combobox`, `listbox`, `tree` |
+| Selection and lists | `select`, `combobox`, `listbox`, `tree`, `sortable` (unreleased) |
 | Form controls | `label`, `checkbox`, `switch`, `radio-group`, `toggle`, `slider`, `number-field`, `pin-input`, `tags-input`, `color-picker`, `file-drop` |
 | Dates | `calendar`, `date-field`, `date-picker` |
 | Disclosure and layout | `accordion`, `collapsible`, `splitter`, `scroll-area`, `separator` |
@@ -107,6 +107,15 @@ from subpaths to keep bundles narrow.
   compute dates with [`@texuli/date`](https://www.npmjs.com/package/@texuli/date)
   and label them with `Intl.DateTimeFormat`. Only the Gregorian calendar is
   supported; `CalendarDate` is re-exported from `@texuli/date`.
+
+### Unreleased
+
+`sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) is in the repository
+but not in the published `0.3.0`. It binds the drag engine
+[`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md),
+which is in development and not on npm yet; the next release publishes
+`@texuli/drag` first ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
+Contract: [prim-sortable.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-sortable.md).
 
 ### Breaking in 0.3.0
 

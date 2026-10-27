@@ -1,9 +1,11 @@
 # `@texuli/drag` — interaction, accessibility and i18n contract
 
 **Status: in development** (PLAN_007, [ADR-007](../../../docs/DECISIONS.md)).
-Every surface built on `@texuli/drag` — the `@texuli/primitives/sortable`
-binding, `@texuli/workflows`, and the data views and builder that migrate to
-it — meets this contract. The engine is general purpose: strategies,
+Every surface built on `@texuli/drag` meets this contract: the
+`@texuli/primitives/sortable` binding, `@texuli/workflows`, the
+`@texuli/data` board, tree view, calendar, timeline and grid column moves,
+the `@texuli/player` shared drag scope for `sortable-list` nodes, and the
+texuli.com builder outline. The package is not yet on npm. The engine is general purpose: strategies,
 collisions, modifiers and messages are pluggable, so a new surface composes
 these pieces instead of forking the engine.
 

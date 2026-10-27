@@ -18,6 +18,13 @@ which is built on this package.
 > stable release). Under 0.x, a new minor (`0.4.0`) may contain breaking
 > changes, so pin the exact version or use `^0.3.0`, which accepts only 0.3.x.
 
+> **Unreleased in this README.** The repository is ahead of npm: the
+> `chat`, `composition`, `data`, `state` and `workflows` manifest groups
+> (158 catalog ids, 66 of them agent-emittable; 133 ids before), spec 0.3.0 interaction
+> (`bind`, `on`, closed actions, `reorder`) and the state surface checks
+> below are not in the published `0.3.0`; they ship with the next
+> owner-approved release.
+
 ## Install
 
 ```bash
@@ -92,6 +99,11 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
 | `@texuli/catalog/manifests/forms` | Authored manifests for form components |
 | `@texuli/catalog/manifests/layouts` | Authored manifests for layouts, decks and app shells |
 | `@texuli/catalog/manifests/overlays` | Authored manifests for overlays and navigation chrome (app tier) |
+| `@texuli/catalog/manifests/composition` | Unreleased: composition layouts (`layout-stack`, `layout-row`, `layout-split`, `layout-tile`) |
+| `@texuli/catalog/manifests/data` | Unreleased: data views as JSON (grid, tree, board, calendar, timeline, map, files), with their `bind` props and `on` events |
+| `@texuli/catalog/manifests/chat` | Unreleased: chat display ids (thread and messages; the composer stays host chrome) |
+| `@texuli/catalog/manifests/state` | Unreleased: state and action surfaces (controls, forms, flow views and actions, sortable lists, host regions) |
+| `@texuli/catalog/manifests/workflows` | Unreleased: `workflow-graph`, validated against the spec workflow schema |
 | `@texuli/catalog/build` | `buildCatalog`: a content-addressed catalog (`catalog-<sha256>.json`) |
 | `@texuli/catalog/build/node` | Node only: discover the manifest groups (source or published files) and write the content-addressed catalog file |
 
@@ -120,6 +132,12 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
   visible placeholders; props that fail their schema are dropped.
 - **Never throws.** `validateDraft` fails closed with diagnostics, including
   an `internal-error` diagnostic for anything unexpected.
+- **Interaction as data (unreleased).** Spec 0.3.0 bindings, `bind`, `on`
+  and the closed actions are checked against each component's declared
+  `events` and `bindable` props; nothing is evaluated. For an envelope, the
+  state surface rules refuse exactly what `@texuli/player` would refuse at
+  paint time, and list item text refuses control, bidirectional and
+  invisible formatting characters.
 
 ## Documentation
 

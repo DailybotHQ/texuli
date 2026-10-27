@@ -14,6 +14,14 @@ player never navigates, fetches or persists anything on its own.
 > stable release). Under 0.x, a new minor (`0.4.0`) may contain breaking
 > changes, so pin the exact version or use `^0.3.0`, which accepts only 0.3.x.
 
+> **Unreleased in this README.** The repository is ahead of npm: spec 0.3.0
+> envelopes (`state`, `flow`, `bind`, `on` and the closed actions), the
+> data view, chat display, sortable list and workflow graph painters, and
+> the shared drag scope are not in the published `0.3.0`. They ship with
+> the next owner-approved release, after `@texuli/drag` and
+> `@texuli/workflows` are published
+> ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
+
 ## Install
 
 ```bash
@@ -108,6 +116,22 @@ The TypeScript declarations list the full surface.
 - **No side effects.** Controls write local state only. An action form
   proposes an intent to your `onAction` handler, and the player sends
   nothing itself.
+- **Every emittable id paints from JSON (unreleased).** All 66
+  agent-emittable ids of the 158-id catalog have a painter (the other ids
+  are app tier, refused at the untrusted tier), including data views (grid, tree, board,
+  calendar, timeline, map, files), chat display, `sortable-list` and
+  `workflow-graph` (the `@texuli/workflows` viewer or editor). Node `on`
+  runs only the closed actions (`setState`, `toggleState`, `moveItem`,
+  `flowGo`, `emit`, `submit`), and `bind` writes back only to declared
+  variables. The chat composer stays host chrome.
+- **One drag scope (unreleased).** `sortable-list` nodes share one drag
+  scope, so an item moves between lists anywhere in the layout under the
+  same group, `accepts`, `locked`, `pull` and `maxItems` rules that
+  `moveItem` applies; the drag offers exactly what the data move does.
+- **A blueprint that validates paints.** The spec and catalog validators
+  refuse the same state surface errors the player refuses (form nodes
+  outside an `action-form`, unbound controls, unmatched flow nodes, writes
+  to host-bound variables).
 - **Accessible frame.** A skip link, F6 between frames, Escape walking
   outward, `inert` for inactive frames, one polite live region, and reduced
   motion honored.

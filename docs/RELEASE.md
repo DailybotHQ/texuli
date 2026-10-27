@@ -26,6 +26,45 @@ Workspace manifests remain `private: true`, and every future version and
 wave requires a fresh, explicit developer GO. Publishing never overwrites a
 published version.
 
+### Not yet on npm
+
+- `@texuli/drag` (the drag engine, layer L0) and `@texuli/workflows` (the
+  workflow editor and viewer, layer L4) are **in development**: private
+  `0.0.0` workspace packages, never published.
+- `@texuli/editor` and `@texuli/examples` stay private (`NEVER_PACKED` in
+  `scripts/packages.ts`).
+- The repository is ahead of npm: the `0.3.0` tarballs on npm predate
+  PLAN_007, so the changes under "Unreleased" below are not in any published
+  version.
+
+### Unreleased (in the repository after `0.3.0`)
+
+These reach npm only with the next owner-approved release (a new `0.x`
+minor, because some are breaking):
+
+- **Breaking, `@texuli/data`:** the board and tree view no longer export
+  `DRAG_THRESHOLD_PX` or `indexFromPointer`. Every drag surface (board, tree
+  view, calendar, timeline, grid column moves) now runs on `@texuli/drag`
+  with localized `DragMessages`; use `@texuli/drag/gesture` for the
+  threshold and `@texuli/drag/collision` (`midpointIndex`) for the index.
+- **`@texuli/primitives`:** a new `@texuli/primitives/sortable` binding
+  (`Sortable.Root`, `List`, `Item`, `Handle`) on `@texuli/drag`.
+- **Blueprint spec 0.3.0** (ADR-008): envelope `spec`, `state` and `flow`;
+  node `bind` and `on`; `$state` and `$data` bindings; the closed actions
+  (`setState`, `toggleState`, `moveItem`, `flowGo`, `emit`, `submit`);
+  `reorder` (drag as data) and `workflowGraph` (`schemas/workflow.schema.json`);
+  migrations from 0.2.0 (`@texuli/spec/migrate`); the state surface and list
+  item text rules (`@texuli/spec/surface`); and catalog coverage of 158 ids.
+  A 0.2.0 blueprint migrates purely and still validates.
+- **`@texuli/player`:** paints every agent-emittable id from JSON (data views,
+  chat display, sortable lists with a shared drag scope, workflow graphs)
+  and runs the closed actions.
+- **Unchanged, for the record:** the chat composer stays host chrome. The
+  catalog has no `chat-composer` entry, and the player refuses the id at
+  every tier; hosts mount a composer in their own chrome. The
+  `CalendarIdentifier` narrowing to `'gregory'` already shipped in `0.3.0`
+  (above).
+
 ### History
 
 - `0.2.0` (2026-10-27): the first non-prerelease `0.x` line, for the 15
@@ -122,8 +161,10 @@ the package-to-package contract outside this repository.
 | --- | --- | --- |
 | 16 npm packages | `0.3.0` (dist-tags `latest` and `next`) | Each package manifest; published by the publish workflow after the merge (before it: `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
 | `@texuli/date` | `0.3.0` (first publication) | `packages/date/package.json`; published with the other 15 packages, before `@texuli/primitives`, which depends on it. |
-| Blueprint spec | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | `packages/spec/versions.json`; every generated file is stamped `// Spec 0.2.0, digest …`. |
-| `@texuli/spec` (npm) | `0.3.0` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
+| Blueprint spec (repository) | `0.3.0`, digest `a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848` | `packages/spec/versions.json`; every generated file is stamped `// Spec 0.3.0, digest …`. Not yet on npm. |
+| Blueprint spec (npm) | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | Shipped by `@texuli/spec@0.3.0`, whose generated sources carry the `0.2.0` stamp. |
+| `@texuli/spec` (npm) | `0.3.0` | Ships the spec `0.2.0` generated sources (above). |
+| `@texuli/drag`, `@texuli/workflows` | `0.0.0`, private | Not on npm; in development. |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 
 - A normative spec change takes a new spec version and a fresh digest pin in
@@ -148,10 +189,20 @@ tag. Any GO for Task 170's name reservation covers only that reservation.
 | --- | --- | --- | --- |
 | 174 | Foundations | `@texuli/core`, then `@texuli/tokens` | Fresh owner GO for the exact Task 174 package/version set after its release gates; core precedes tokens. |
 | 0.3.0 | Date foundation | `@texuli/date`, before `@texuli/primitives` (first published in `0.3.0`) | Fresh owner GO for the exact version; `@texuli/date` precedes the primitives that depend on it. |
+| Next (planned) | Drag foundation | `@texuli/drag`, before `@texuli/primitives` and `@texuli/data` | Fresh owner GO for its first version; it must be published **before** every package that depends on it (`@texuli/primitives`, `@texuli/data`, `@texuli/workflows`). |
 | 175 | Controls | `@texuli/primitives` | Fresh owner GO after its core dependency and behavior, accessibility, size, pack, and consumer gates pass. |
 | 176 | Styled package | `texuli` | Fresh owner GO after core, primitives, and tokens compatibility plus style and consumer gates pass. |
+| Next (planned) | Workflows | `@texuli/workflows`, after `@texuli/drag` and `texuli`, before `@texuli/player` | Fresh owner GO for its first version; it must be published **before** `@texuli/player`, which depends on it. |
 | 177 | Domain packages | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/blocks` | Fresh owner GO for the exact ready set after dependency order, package checks, size, pack, and consumer gates pass. |
 | 178 | Catalog and integration tools | `@texuli/catalog`, `@texuli/tools`, `@texuli/astro`, `@texuli/player`, `@texuli/slides`, `@texuli/spec` (the order in `publish.yml`; all six went out in the 2026-10-25 `0.1.0-next.1` run) | Fresh owner GO for each exact release set after implementation, dependency, pack, consumer, and relevant website/build gates pass. |
+
+The two planned rows are not in `.github/workflows/publish.yml` yet; adding
+them there waits for an owner-approved release. Until `@texuli/drag` and
+`@texuli/workflows` carry a real version, `pnpm verify:packages` refuses the
+packages that depend on them (the packer reports
+`@texuli/drag: published range must be a real semver range, got "0.0.0"`),
+which is the guard that keeps an unpublished dependency out of a published
+manifest.
 
 Each outward wave must also pass its task's `pnpm verify:packages` gate and
 the applicable tests, type checks, layer checks, behavior, visual, size,

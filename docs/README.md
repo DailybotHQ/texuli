@@ -23,6 +23,8 @@ project overview.
 | [ACCESSIBILITY](ACCESSIBILITY.md) | Accessibility contract and how it is checked |
 | [AI_AGENT_ONBOARDING](AI_AGENT_ONBOARDING.md) | First-session checklist |
 | [AI_AGENT_COLLAB](AI_AGENT_COLLAB.md) | Ownership, owner-held files, commits, handoffs, plans and delegation |
+| [SKILL_INSTALLATION](SKILL_INSTALLATION.md) | Installing the Texuli agent skill on each host |
+| [SKILL_COMPATIBILITY](SKILL_COMPATIBILITY.md) | What is proven about installing the skill on each route and host, and what is not |
 
 ## Package and app front pages
 
@@ -36,6 +38,7 @@ project overview.
 | `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): The rich text editor surface, toolbar, link dialog and clipboard import on the core editor texels. |
 | `@texuli/core` | [packages/core/README.md](../packages/core/README.md): Texels: framework-free behavior and policy that every Texuli component is built from. |
 | `@texuli/date` | [packages/date/README.md](../packages/date/README.md): Owned Gregorian date arithmetic for Texuli calendars and date fields. |
+| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, not on npm: the framework-free drag engine (sortable, gesture, spatial, graph). |
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
 | `@texuli/media` | [packages/media/README.md](../packages/media/README.md): Media: images, galleries, video, audio and layered compositions. |
@@ -45,6 +48,7 @@ project overview.
 | `@texuli/spec` | [packages/spec/README.md](../packages/spec/README.md): The schema-first blueprint contract: JSON schemas, the catalog vocabulary, TypeScript and Kotlin projections, and the conformance harness. |
 | `texuli` | [packages/texuli/README.md](../packages/texuli/README.md): Styled Texuli components, layouts and shells. |
 | `@texuli/tokens` | [packages/tokens/README.md](../packages/tokens/README.md): The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. |
+| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, not on npm: the accessible workflow graph editor and viewer. |
 | `@texuli/tools` | [packages/tools/README.md](../packages/tools/README.md): Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. |
 | `@texuli/website` | [apps/website/README.md](../apps/website/README.md): texuli.com: the Texuli documentation, catalog and live examples, built with Astro; the Pages Functions live in the root `functions/`. |
 | `@texuli/agent` | [apps/agent/README.md](../apps/agent/README.md): The texuli.com agent service: prompt to validated blueprint draft, fake replay provider only, not deployed. |
@@ -256,6 +260,13 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [data-timeline](../packages/data/docs/data-timeline.md) | Timeline and Gantt |
 | [data-tree-view](../packages/data/docs/data-tree-view.md) | Tree data view |
 
+### `@texuli/drag` (`packages/drag/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [contract](../packages/drag/docs/contract.md) | Interaction, accessibility and i18n contract |
+| [parity](../packages/drag/docs/parity.md) | Capability parity (SortableJS-class), one test per row |
+
 ### `@texuli/editor` (`packages/editor/docs/`)
 
 | Doc | Title |
@@ -291,6 +302,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [blueprint-flow](../packages/player/docs/blueprint-flow.md) | Embedding the blueprint flow |
 | [embedding](../packages/player/docs/embedding.md) | Embedding the player |
 | [paint-proof](../packages/player/docs/paint-proof.md) | Untrusted at paint: the player's security property |
+| [reference](../packages/player/docs/reference.md) | Player reference: loaders, layouts, keyboard, state, flows, actions, drag between lists, iframe protocol |
 
 ### `@texuli/primitives` (`packages/primitives/docs/`)
 
@@ -337,6 +349,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [prim-toggle](../packages/primitives/docs/prim-toggle.md) | Toggle and ToggleGroup |
 | [prim-toolbar](../packages/primitives/docs/prim-toolbar.md) | Toolbar |
 | [prim-tooltip](../packages/primitives/docs/prim-tooltip.md) | Tooltip primitive |
+| [prim-sortable](../packages/primitives/docs/prim-sortable.md) | Sortable primitive (unreleased) |
 | [prim-tree](../packages/primitives/docs/prim-tree.md) | Tree primitive |
 | [svelte-attachments](../packages/primitives/docs/svelte-attachments.md) | Svelte attachments for primitives |
 
@@ -350,6 +363,12 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [stage](../packages/slides/docs/stage.md) | Stage: DeckStage and DeckPrint |
 | [styles](../packages/slides/docs/styles.md) | Stylesheet |
 | [templates](../packages/slides/docs/templates.md) | Starter templates |
+
+### `@texuli/spec` (`packages/spec/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [contract](../packages/spec/docs/contract.md) | The spec contract: files, generation, conformance, versioning, spec 0.3.0 and the state surface |
 
 ### `texuli` (`packages/texuli/docs/`)
 

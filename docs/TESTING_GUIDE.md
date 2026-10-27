@@ -149,7 +149,11 @@ then the package, then its consumers (the layers above it).
 | any primitive part that renders an id | `pnpm vitest run packages/primitives/tests/consumer-ids.test.ts` | `tests/behavior/scenarios/{select,combobox}.spec.ts` |
 | `packages/primitives/src/{dialog,alert-dialog,sheet}/`, `internal/backdrop.ts` | `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/overlays.test.ts packages/texuli/tests/overlays.test.ts` | `tests/behavior/scenarios/{dialog,sheet,alert-dialog}.spec.ts` |
 | `packages/primitives/src/toast/`, `packages/texuli/src/components/toast/` | `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/overlays.test.ts packages/texuli/tests/overlays.test.ts packages/texuli/tests/contracts.test.ts -t toast` | `tests/e2e/toaster-viewport.spec.ts`; `pnpm visual -g texuli-toast` |
-| `packages/spec/**` (schemas, catalog vocabulary, TS and Kotlin codegen, `versions.json`) | `pnpm vitest run packages/spec` (`spec.test.ts` pins the spec digest and checks Kotlin codegen and web parity) | `./native/gradlew -p native check` (JDK 21) for the Kotlin side |
+| `packages/spec/**` (schemas, catalog vocabulary, TS and Kotlin codegen, `versions.json`) | `pnpm vitest run packages/spec` (`spec.test.ts` pins the spec digest, the golden list and migrations, and checks Kotlin codegen and web parity; `contract.test.ts` covers the 0.3.0 rules, the state surface and list text). After a normative change: `pnpm exec tsx packages/spec/scripts/generate.ts` and a `versions.json` pin | `pnpm exec tsx packages/spec/scripts/generate.ts --check`; `pnpm exec tsx native/conformance/web/trace.ts` (golden traces) and `native/conformance/web/structure.ts`; `./native/gradlew -p native check` (JDK 21) for the Kotlin side; `packages/player/tests/surface-parity.test.ts` (spec and player refuse the same state surface nodes) |
+| `packages/spec/fixtures/golden/**` | `pnpm vitest run packages/spec packages/player/tests/golden.test.ts packages/player/tests/lego.test.ts` (each golden validates, hashes stably and paints; lego's cross-package moves) | `pnpm exec tsx native/conformance/web/trace.ts --write`, then the native check (`GoldenConformanceTest` pins the count); `pnpm exec tsx tests/fixtures/golden/run-golden-fixtures.mts` |
+| `packages/drag/src/**` (in development) | `pnpm vitest run packages/drag` (`parity.test.ts` fails when `docs/parity.md` and the tests drift; `package.test.ts`: SSR-safe, no dependencies, no sinks) | `pnpm size --filter @texuli/drag`; perf: `TEXULI_PERF=1 pnpm vitest run tests/perf/drag.test.ts`; consumers: `packages/primitives/tests/sortable.test.ts`, `pnpm vitest run packages/data packages/workflows` and `tests/behavior/scenarios/sortable.spec.ts` |
+| `packages/primitives/src/sortable/` | `pnpm vitest run packages/primitives/tests/sortable.test.ts` | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/sortable.spec.ts` |
+| `packages/workflows/src/**` (in development) | `pnpm vitest run packages/workflows` (model, layout, spec adapter, editor, viewer) | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/workflow-editor.spec.ts`; perf: `TEXULI_PERF=1 pnpm vitest run tests/perf/workflows.test.ts`; `pnpm size --filter @texuli/workflows`; the player's `workflow-graph` painter: `pnpm vitest run packages/player/tests/interaction.test.ts` |
 | `packages/tokens/src/**` | `pnpm vitest run packages/tokens` (contrast, generator, library, contract) | `pnpm size`; `pnpm verify:packages --filter tokens`; theme pages: `tests/e2e/site-gallery-themes.spec.ts` |
 | attributes of styled form components (`packages/texuli/src/internal/control-props.ts`) | `pnpm vitest run packages/texuli/tests/forms.test.ts -t control-aria` | `tests/e2e/a11y-forms.spec.ts` |
 | `packages/texuli/src/components/<name>/` | `pnpm vitest run packages/texuli -t '^<name> '` (forms, overlays, display, navigation, contracts) | `pnpm visual -g <example-id>` (the examples in `packages/examples/src/<name>/`); the a11y sweeps in `tests/e2e/a11y-{forms,display,overlays}.spec.ts` |
@@ -161,9 +165,9 @@ then the package, then its consumers (the layers above it).
 | `packages/chat/src/**` | `pnpm vitest run packages/chat` | `tests/e2e/chat.spec.ts` |
 | `packages/blocks/src/<family>/` | `pnpm vitest run packages/blocks/tests/<family>.test.ts` | `pnpm visual -g blocks-<family>`; perf: `pnpm test:perf` (code, text) |
 | `packages/slides/src/**` | `pnpm vitest run packages/slides` | `tests/e2e/a11y-slides.spec.ts`, `tests/e2e/site-slides.spec.ts` |
-| `packages/player/src/**` | `pnpm vitest run packages/player` | `tests/e2e/site-builder.spec.ts` |
+| `packages/player/src/**` | `pnpm vitest run packages/player`: `examples-paint` (every emittable example paints), `loader-parity` (every emittable id has a painter), `interaction` (state, actions, bindings, sortable lists, workflow graphs), `spec-mirror` (constants equal `@texuli/spec`), `surface-parity`, `golden`, `lego` (the shared drag scope across lists), `render-specs` (the lean specs match the manifests) | `pnpm exec tsx packages/player/scripts/render-specs.ts --check`; `pnpm size --filter player`; `tests/e2e/site-builder.spec.ts` |
 | `packages/astro/src/**` | `pnpm vitest run packages/astro` | `tests/e2e/astro-islands.spec.ts` and `tests/consumers/consumers.spec.ts` (the `astro-plain` consumer installs the packed `@texuli/astro`) |
-| `packages/catalog/src/**` (manifests, build, render) | `pnpm vitest run packages/catalog` | `tests/e2e/renderer-hostile.spec.ts`; `tests/perf/catalog-render-limits.test.ts` (`pnpm test:perf`); the site's live-components tests |
+| `packages/catalog/src/**` (manifests, build, render) | `pnpm vitest run packages/catalog`: `coverage` (every component of the published packages is covered or excluded with a reason), `examples-roundtrip` (every manifest example validates against the spec and hashes stably), `validate-interaction` (bindings, `bind`, `on`, the state surface and list text without a spec check), `render-hostile-blueprints` (the 0.3.0 hostile corpus) | `pnpm exec tsx scripts/coverage-matrix.ts`; `tests/e2e/renderer-hostile.spec.ts`; `tests/perf/catalog-render-limits.test.ts` (`pnpm test:perf`); the site's live-components tests |
 | `packages/tools/src/**` (CLI, llms, a2ui, elements, golden, mcp) | `pnpm vitest run packages/tools` | `pnpm check:skill` when the skill references a command |
 | `packages/examples/src/index.ts`, `packages/examples/package.json` `sideEffects` | `pnpm vitest run packages/examples/tests/registration-side-effects.test.ts` | `tests/e2e/csp.spec.ts` (builds the fixture app for production) |
 | `packages/examples/src/**` | `pnpm vitest run packages/examples` | `TEXULI_E2E_PORT=<port> pnpm visual -g <example-id>` (commit the new baselines) |
@@ -174,6 +178,10 @@ then the package, then its consumers (the layers above it).
 | `scripts/packages.ts` | `pnpm vitest run scripts/tests/packages.test.ts` | `pnpm verify:packages` |
 | `scripts/visual.ts`, `tests/visual/**` | `pnpm vitest run scripts/tests/visual.test.ts` | `pnpm visual -g <example-id>` |
 | `scripts/supply-chain.ts` | `pnpm vitest run scripts/tests/supply-chain.test.ts` | — |
+| `scripts/coverage-matrix.ts` | `pnpm vitest run scripts/tests/coverage-matrix.test.ts packages/catalog/tests/coverage.test.ts` | `pnpm exec tsx scripts/coverage-matrix.ts` |
+| any `README.md` (root, packages, apps, `native/`) | `pnpm vitest run scripts/tests/readme-credit.test.ts` (every README carries the tagged "Powered by Dailybot" link) | `pnpm exec tsx scripts/check-docs.ts` |
+| `.github/workflows/skill-release.yml`, the release paths of `scripts/check-skill.ts` | `pnpm vitest run scripts/tests/skill-release.test.ts` (version plan and bump, changelog stamp, version sync, archive and `SHA256SUMS`, the workflow's guarantees, shared install commands) | `pnpm exec tsx scripts/check-skill.ts --release-plan` (read-only) |
+| `tests/e2e/*.spec.ts`, `tests/e2e/shards.json` | `pnpm vitest run scripts/tests/e2e-shards.test.ts` (every e2e spec is in exactly one CI shard) | the spec itself with `TEXULI_E2E_PORT=<port> pnpm exec playwright test <spec>` |
 | `tests/consumers/**` | `pnpm vitest run scripts/tests/consumers-harness.test.ts` | `tests/consumers/consumers.spec.ts` and `tests/consumers/consumers-registry.spec.ts` |
 | `apps/website/src/components/<area>/`, `pages/<area>/` | `pnpm vitest run scripts/tests/site-<area>.test.ts` where one exists, and `pnpm vitest run apps/website` | `pnpm build`, then `tests/e2e/site-<area>.spec.ts` where the area has browser behavior (static pages have none: their data is Vitest and their axe runs in `tests/e2e/a11y-site-<n>.spec.ts`); design notes in `apps/website/docs/site-<area>.md` |
 | `apps/website` layout, nav, SEO (indexed pages only; previews are noindex), perf | `pnpm vitest run scripts/tests/site-loaders.test.ts apps/website/tests/docs-reading.test.ts` | `tests/e2e/site-{docs-shell,docs-nav,seo,perf}.spec.ts`; every page: `tests/e2e/a11y-site-<n>.spec.ts` |
@@ -226,7 +234,14 @@ suite and `pnpm build`.
 - **Firefox is not covered** (Playwright's Firefox doesn't launch on this
   macOS).
 - **Wall-clock assertions** live only in `pnpm test:perf` or behind
-  `TEXULI_PERF=1`.
+  `TEXULI_PERF=1` (`tests/perf/`: builder, catalog render limits, charts,
+  data grid and media, PLAN_004 surfaces, and, from PLAN_007, `drag.test.ts`
+  and `workflows.test.ts`; set `TEXULI_PERF_REPORT=1` to print the measured
+  times).
+- **The workflow and player drag paths in happy-dom** have no layout: the
+  editor's pointer drags and the shared drag scope are tested through the
+  keyboard model and the engine there, and in a browser by
+  `tests/behavior/scenarios/{sortable,workflow-editor}.spec.ts`.
 - **Automated accessibility only:**
   - axe with zero exclusions in light, dark and forced colors;
   - keyboard walks;
