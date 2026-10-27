@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test';
 import { serveDist } from './support/site.ts';
 
 /*
- * texuli.com keyboard walk (PLAN_006 T-88). a11y-site.spec.ts already checks
+ * texuli.com keyboard walk (PLAN_006 T-88). a11y-site-<n>.spec.ts already checks
  * the first Tab stops of a page per route group (skip link first, visible
  * focus, no body drop); this spec adds what that sweep does not: the skip
  * link moves focus into the main landmark, and a whole-page walk on one page

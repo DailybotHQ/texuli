@@ -48,7 +48,7 @@ The e2e spec (one test on Chromium since the 2026-10-27 trim) serves
 - a WebM recording downloads a real WebM (EBML header checked);
 - no foreign network.
 
-axe in light and dark runs in the page sweep (`a11y-site.spec.ts`).
+axe in light and dark runs in the page sweep (`a11y-site-<n>.spec.ts`).
 
 ## Limits
 

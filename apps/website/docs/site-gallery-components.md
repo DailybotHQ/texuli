@@ -127,5 +127,5 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-live-gallery.spe
   of its own), best practices too for full-page layouts, which also run in
   forced colors. Every component's own axe and behavior run in the fixture
   app (`a11y-*.spec.ts`, `tests/behavior`); the gallery page itself is in the
-  page sweep (`a11y-site.spec.ts`). Chromium only, like the rest of the
+  page sweep (`a11y-site-<n>.spec.ts`). Chromium only, like the rest of the
   website suite.

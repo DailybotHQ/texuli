@@ -64,7 +64,7 @@ is in [site-subsite.md](site-subsite.md). Unit tests:
   navigation, reading text whole). The page has no spec of its own since the
   2026-10-27 trim.
 - Built output: axe and polish in light and dark in the page sweep
-  (`tests/e2e/a11y-site.spec.ts`); its links in the built-site link audit and
+  (`tests/e2e/a11y-site-<n>.spec.ts`); its links in the built-site link audit and
   its head in the SEO audit (`tests/e2e/site-seo.spec.ts`); docs-shell
   membership in `tests/e2e/site-ia.spec.ts`; 360 and 768 px in
   `tests/e2e/site-responsive.spec.ts`; a full Tab walk is not run on it

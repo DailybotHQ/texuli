@@ -74,7 +74,7 @@ in each mode, and the toast pages plus the transfer budgets:
   open where the demo has some; the polish check of
   [site-visual](site-visual.md) in light and dark. The other primitive pages
   share the template; every primitive's keyboard, pointer and axe contract
-  runs in its behavior scenario (`tests/behavior`), and `a11y-site.spec.ts`
+  runs in its behavior scenario (`tests/behavior`), and `a11y-site-<n>.spec.ts`
   sweeps the group's representative page.
 - **Toasts:** the toast primitive page and the Toaster component page place
   live toasts on click, axe clean in every mode.

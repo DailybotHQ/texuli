@@ -3,7 +3,7 @@
 **App:** `@texuli/website` (`apps/website`)  
 **Task:** T-site-ia (absorbs FIX-site-sidebar-nav)  
 **E2E:** `tests/e2e/site-ia.spec.ts`, `tests/e2e/site-docs-nav.spec.ts` and
-`tests/e2e/a11y-site.spec.ts`
+`tests/e2e/a11y-site-<n>.spec.ts`
 
 texuli.com has two kinds of page: a minimal landing on `/` (and `/native/`),
 and one docs shell everywhere else. The platform routes (`/`, `/native/`,
@@ -78,7 +78,7 @@ pager are gone, because the shell supplies them.
 
 ```bash
 pnpm build
-TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-ia.spec.ts tests/e2e/a11y-site.spec.ts
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-ia.spec.ts tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts
 ```
 
 `site-ia.spec.ts` (one test since the 2026-10-27 trim) checks:

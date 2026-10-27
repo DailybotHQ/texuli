@@ -5,7 +5,7 @@
 **Surface:** `src/components/live/`  
 **E2E:** `tests/e2e/site-component-pages.spec.ts`  
 **Unit:** `scripts/tests/site-loaders.test.ts`  
-**A11y:** `tests/e2e/a11y-site.spec.ts` (zero exclusions on every built page)
+**A11y:** `tests/e2e/a11y-site-<n>.spec.ts` (zero exclusions on every built page)
 
 ## Goal
 
@@ -78,7 +78,7 @@ and **no** excluded selectors. Fixes at source include:
 pnpm vitest run scripts/tests/site-loaders.test.ts
 pnpm build
 TEXULI_E2E_PORT=4920 pnpm exec playwright test tests/e2e/site-component-pages.spec.ts
-TEXULI_E2E_PORT=4920 pnpm exec playwright test tests/e2e/a11y-site.spec.ts
+TEXULI_E2E_PORT=4920 pnpm exec playwright test tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts
 ```
 
 The per-id check (the live stage is ready, its marker is on screen, no request leaves the origin)

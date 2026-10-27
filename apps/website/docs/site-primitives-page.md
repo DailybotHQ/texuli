@@ -57,7 +57,7 @@ The unit test covers every subpath documented once, every anatomy part a real
 export, the import line, the scenario parsing and the open-to-focus limits; the
 pages render that data. `site-live-primitives.spec.ts` opens the rows
 disclosure from the keyboard and runs axe with the disclosures open on the
-representative pages; the index is in the page sweep (`a11y-site.spec.ts`).
+representative pages; the index is in the page sweep (`a11y-site-<n>.spec.ts`).
 
 ## Limits
 

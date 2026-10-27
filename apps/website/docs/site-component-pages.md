@@ -51,7 +51,7 @@ TEXULI_E2E_PORT=4920 pnpm exec playwright test tests/e2e/site-component-pages.sp
 The spec (one test) drives the badge props panel into the live code sample,
 toggles the dropdown menu stage, and runs axe under forced colors on one page
 per family; every page's required sections are unit-tested, and axe in light
-and dark runs on a sample in the page sweep (`a11y-site.spec.ts`).
+and dark runs on a sample in the page sweep (`a11y-site-<n>.spec.ts`).
 
 ## Limits
 

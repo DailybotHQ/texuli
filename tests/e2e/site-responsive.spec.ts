@@ -8,7 +8,7 @@ import { serveDist, settle } from './support/site.ts';
  * landing and native pages also at 360px right to left. The landing header
  * is walked across its breakpoints, and the standalone links the sweep found
  * under 24px are held to WCAG 2.5.8. The desktop width (1280) is the page
- * sweep's polish check in a11y-site.spec.ts. Requires `pnpm build` first.
+ * sweep's polish check in a11y-site-<n>.spec.ts. Requires `pnpm build` first.
  */
 
 const origin = serveDist();

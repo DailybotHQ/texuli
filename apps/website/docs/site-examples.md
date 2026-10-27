@@ -53,7 +53,7 @@ E2E (one test on Chromium since the 2026-10-27 trim):
 Package and kind filters and the lanes are unit-tested
 (`scripts/tests/site-loaders.test.ts`, `apps/website/tests/gallery.test.ts`);
 axe (zero exclusions) in light, dark and forced colors runs on the index and a
-sample detail page in the page sweep (`a11y-site.spec.ts`).
+sample detail page in the page sweep (`a11y-site-<n>.spec.ts`).
 
 ## Budgets / performance
 

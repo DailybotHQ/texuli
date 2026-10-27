@@ -100,7 +100,7 @@ for unknown paths.
   page; `noindex`, no canonical, no image tags; the path is not echoed;
   Home links to `/`; the skip link moves focus to `main`. axe on the 404
   and home pages in light and dark runs in the page sweep
-  (`a11y-site.spec.ts`).
+  (`a11y-site-<n>.spec.ts`).
 
 ## Limits
 

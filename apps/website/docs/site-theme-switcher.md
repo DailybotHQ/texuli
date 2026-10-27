@@ -73,7 +73,7 @@ The spec (one test on Chromium since the 2026-10-27 trim) serves
 
 The catalog, filters and swatch colors are unit-tested
 (`scripts/tests/site-loaders.test.ts`); axe in light and dark runs in the page
-sweep (`a11y-site.spec.ts`).
+sweep (`a11y-site-<n>.spec.ts`).
 
 ## Limits
 

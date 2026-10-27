@@ -5,7 +5,7 @@ import { expectMode, serveDist, settle } from './support/site.ts';
  * Visual polish details for texuli.com (T-site-visual-polish). The per-page
  * polish check (no horizontal overflow, no element escaping the viewport, no
  * broken image, no stand-in copy, in light and dark) runs in the page sweep,
- * a11y-site.spec.ts, on the same page loads as axe. These are the targeted
+ * a11y-site-<n>.spec.ts, on the same page loads as axe. These are the targeted
  * checks: gallery previews paint the palette of the active mode, inline code
  * keeps its surrounding spaces as rendered, demo frames fit their column on
  * a phone, and color scales paint more than one fill. Run `pnpm build` first.

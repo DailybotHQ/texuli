@@ -3,7 +3,7 @@
 **App:** `apps/website`  
 **Page:** `/agents-page/`  
 **Components:** `src/components/agents-page/`  
-**Tests:** `scripts/tests/site-loaders.test.ts` (the committed catalog and llms snapshots); axe and polish in the page sweep, `tests/e2e/a11y-site.spec.ts`; links in the built-site audit, `tests/e2e/site-seo.spec.ts`
+**Tests:** `scripts/tests/site-loaders.test.ts` (the committed catalog and llms snapshots); axe and polish in the page sweep, `tests/e2e/a11y-site-<n>.spec.ts`; links in the built-site audit, `tests/e2e/site-seo.spec.ts`
 
 ## Goal
 
@@ -54,5 +54,5 @@ longer matches the manifests.
 ```bash
 pnpm vitest run scripts/tests/site-loaders.test.ts
 pnpm build
-TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts tests/e2e/site-seo.spec.ts
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts tests/e2e/site-seo.spec.ts
 ```

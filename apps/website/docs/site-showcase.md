@@ -2,7 +2,7 @@
 
 **App:** `@texuli/website` (`apps/website`)  
 **Paths:** `/showcase/` and `/showcase/<screen>/`  
-**Tests:** `apps/website/tests/gallery.test.ts` (screens and hero curation); axe and polish in the page sweep, `tests/e2e/a11y-site.spec.ts`
+**Tests:** `apps/website/tests/gallery.test.ts` (screens and hero curation); axe and polish in the page sweep, `tests/e2e/a11y-site-<n>.spec.ts`
 
 ## Goal
 
@@ -36,7 +36,7 @@ Static Astro output. Fictional Harbor Notes copy. **No runtime network** after l
 
 ```bash
 pnpm build
-TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts
 ```
 
 The showcase has no spec of its own since the 2026-10-27 trim: the sweep runs

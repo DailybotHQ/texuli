@@ -10,7 +10,7 @@ Product guides for getting started (install or copy), theming, dark mode,
 accessibility, RTL and i18n, forms and performance. Every page includes a
 **live** Texuli snippet that actually runs. Static output, no runtime network
 beyond the page’s own assets, axe WCAG 2.1 A/AA in light and dark (the page
-sweep, `a11y-site.spec.ts`).
+sweep, `a11y-site-<n>.spec.ts`).
 
 ## Components
 

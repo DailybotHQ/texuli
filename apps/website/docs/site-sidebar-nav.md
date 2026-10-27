@@ -2,7 +2,7 @@
 
 **App:** `@texuli/website` (`apps/website`)  
 **Paths:** every page except the home landing (see [site-ia.md](site-ia.md))  
-**E2E:** `tests/e2e/site-docs-nav.spec.ts` (plus `a11y-site.spec.ts` for every page and `site-perf.spec.ts` for the JS budgets)
+**E2E:** `tests/e2e/site-docs-nav.spec.ts` (plus `a11y-site-<n>.spec.ts` for every page and `site-perf.spec.ts` for the JS budgets)
 
 ## What every docs page has
 
@@ -116,7 +116,7 @@ in Chromium on the same tree before and after the change:
 
 ```bash
 pnpm build
-TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-docs-nav.spec.ts tests/e2e/a11y-site.spec.ts tests/e2e/site-perf.spec.ts
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-docs-nav.spec.ts tests/e2e/a11y-site-1.spec.ts tests/e2e/a11y-site-2.spec.ts tests/e2e/a11y-site-3.spec.ts tests/e2e/site-perf.spec.ts
 ```
 
 ## Limits
