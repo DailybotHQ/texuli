@@ -60,8 +60,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/component-pages/button/',
     reason:
-      'The first live Button demo mounts on open: its frame with real controls, then only the Button stage family (the props panel and other demos mount on scroll): 104.8 KB page, 67.6 KB JS at first; 72.5 KB JS measured 2026-10-27, so the owner raised the JS cap to 76 (measured + 4%, PLAN_006 follow-up). CLS room for the eager island mount.',
-    budget: { pageGzipKb: 112, jsGzipKb: 76, cls: 0.15 },
+      'The first live Button demo mounts on open: its frame with real controls, then only the Button stage family (the props panel and other demos mount on scroll): 104.8 KB page, 67.6 KB JS at first; 72.5 KB JS measured 2026-10-27, so the owner raised the JS cap to 76 (measured + 4%, PLAN_006 follow-up). PLAN_007 grew the shared shell (nav, search and footer credit): 112.9 KB page measured 2026-10-27, cap 118 (measured + 4%). CLS room for the eager island mount.',
+    budget: { pageGzipKb: 118, jsGzipKb: 76, cls: 0.15 },
   },
   {
     route: '/drag-page/',
