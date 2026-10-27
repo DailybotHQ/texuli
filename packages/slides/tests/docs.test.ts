@@ -49,56 +49,53 @@ describe('slides documentation', () => {
   const exportsMap = JSON.parse(read('package.json')).exports as Record<string, unknown>;
   const readme = read('README.md');
 
-  it('maps every package subpath to a docs page', () => {
-    const subpaths = Object.keys(exportsMap).filter((key) => key !== '.');
-    expect(subpaths.sort()).toEqual(Object.keys(SUBPATH_DOCS).sort());
-  });
-
-  it.each(Object.entries(SUBPATH_DOCS))(
-    '%s has a docs page linked from the README',
-    (_subpath, { doc }) => {
-      expect(existsSync(`${ROOT}/${doc}`), doc).toBe(true);
-      expect(readme).toContain(`](${doc})`);
+  it('maps every subpath to a linked docs page that documents every exported name and the root exports', () => {
+    // maps every package subpath to a docs page
+    {
+      const subpaths = Object.keys(exportsMap).filter((key) => key !== '.');
+      expect(subpaths.sort()).toEqual(Object.keys(SUBPATH_DOCS).sort());
     }
-  );
-
-  it.each(Object.entries(SUBPATH_DOCS).filter(([, value]) => value.entry))(
-    '%s documents every exported name',
-    (_subpath, { doc, entry }) => {
+    for (const [subpath, { doc, entry }] of Object.entries(SUBPATH_DOCS)) {
+      expect(existsSync(`${ROOT}/${doc}`), doc).toBe(true);
+      expect(readme, subpath).toContain(`](${doc})`);
+      if (!entry) continue;
       const page = read(doc);
-      const missing = exportedNames(read(entry as string)).filter((name) => !mentions(page, name));
+      const missing = exportedNames(read(entry)).filter((name) => !mentions(page, name));
       expect(missing, `${doc} does not mention`).toEqual([]);
     }
-  );
-
-  it('documents every root export in the README or a docs page', () => {
-    const all = [readme, ...Object.values(SUBPATH_DOCS).map(({ doc }) => read(doc))].join('\n');
-    const missing = exportedNames(read('src/index.ts')).filter((name) => !mentions(all, name));
-    expect(missing).toEqual([]);
-  });
-
-  it('documents every DeckStage and DeckPrint prop', () => {
-    const page = read('docs/stage.md');
-    for (const component of ['DeckStage', 'DeckPrint']) {
-      const props = propNames(component);
-      expect(props.length, component).toBeGreaterThan(3);
-      expect(
-        props.filter((prop) => !mentions(page, prop)),
-        component
-      ).toEqual([]);
+    // documents every root export in the README or a docs page
+    {
+      const all = [readme, ...Object.values(SUBPATH_DOCS).map(({ doc }) => read(doc))].join('\n');
+      const missing = exportedNames(read('src/index.ts')).filter((name) => !mentions(all, name));
+      expect(missing).toEqual([]);
     }
   });
 
-  it('documents every stylesheet class hook and named page', () => {
-    const css = read('src/styles.css');
-    const page = read('docs/styles.md');
-    const classes = [
-      ...new Set([...css.matchAll(/\.(tx-deck-[a-z0-9_-]+)/g)].map((m) => m[1] as string)),
-    ];
-    const pages = [
-      ...new Set([...css.matchAll(/@page (tx-deck-[a-z0-9-]+)/g)].map((m) => m[1] as string)),
-    ];
-    expect(classes.length).toBeGreaterThan(20);
-    expect([...classes, ...pages].filter((name) => !page.includes(`\`${name}\``))).toEqual([]);
+  it('documents every stage prop and stylesheet hook', () => {
+    // documents every DeckStage and DeckPrint prop
+    {
+      const page = read('docs/stage.md');
+      for (const component of ['DeckStage', 'DeckPrint']) {
+        const props = propNames(component);
+        expect(props.length, component).toBeGreaterThan(3);
+        expect(
+          props.filter((prop) => !mentions(page, prop)),
+          component
+        ).toEqual([]);
+      }
+    }
+    // documents every stylesheet class hook and named page
+    {
+      const css = read('src/styles.css');
+      const page = read('docs/styles.md');
+      const classes = [
+        ...new Set([...css.matchAll(/\.(tx-deck-[a-z0-9_-]+)/g)].map((m) => m[1] as string)),
+      ];
+      const pages = [
+        ...new Set([...css.matchAll(/@page (tx-deck-[a-z0-9-]+)/g)].map((m) => m[1] as string)),
+      ];
+      expect(classes.length).toBeGreaterThan(20);
+      expect([...classes, ...pages].filter((name) => !page.includes(`\`${name}\``))).toEqual([]);
+    }
   });
 });
