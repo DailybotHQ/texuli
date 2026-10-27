@@ -1,0 +1,134 @@
+---
+import { WORKFLOW_FEATURES } from '../../components/workflows-site/page.ts';
+/**
+ * /workflows-page/ — @texuli/workflows: the interactive editor and the
+ * read-only viewer on one fictional example.com pipeline. Both islands mount
+ * when they scroll into view.
+ */
+import WorkflowsEditorDemo from '../../components/workflows-site/WorkflowsEditorDemo.svelte';
+import WorkflowsViewerDemo from '../../components/workflows-site/WorkflowsViewerDemo.svelte';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Workflow editor"
+  description="@texuli/workflows (in development): an accessible workflow editor and viewer built on Texuli's own drag engine, with typed ports, auto-layout, a minimap, an outline and graphs that are plain, validated JSON."
+>
+  <div class="workflows-page" data-tx-workflows-page="">
+    <header class="workflows-page__hero">
+      <p class="eyebrow">@texuli/workflows · in development</p>
+      <h1>Workflows you can edit, read and ship as JSON</h1>
+      <p class="lead">
+        A graph editor built from Texuli pieces: the drag engine places and connects steps, the
+        primitives give it keyboard and screen-reader support, and the graph is plain JSON that a
+        validator checks before anything paints. <code>@texuli/workflows</code> is in development
+        and not on npm yet. Every step below is fictional and points at example.com.
+      </p>
+      <p class="workflows-page__links">
+        <a href="/workflows-page/json/">Try the JSON live preview</a>
+        <span aria-hidden="true">·</span>
+        <a href="/drag-page/">See the drag engine</a>
+      </p>
+    </header>
+
+    <ul class="features" aria-label="What the editor does">
+      {
+        WORKFLOW_FEATURES.map((feature) => (
+          <li class="features__item">
+            <strong>{feature.title}</strong>
+            <span>{feature.detail}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <section class="demo" id="editor" aria-labelledby="editor-title">
+      <h2 id="editor-title">The editor</h2>
+      <p>
+        Drag steps from the palette, connect ports, select a step to edit it in the inspector, or
+        use the outline to do all of it without the canvas. Auto-layout tidies the graph.
+      </p>
+      <WorkflowsEditorDemo client:visible />
+    </section>
+
+    <section class="demo" id="viewer" aria-labelledby="viewer-title">
+      <h2 id="viewer-title">The read-only viewer</h2>
+      <p>The same graph, laid out top to bottom, for dashboards and documents that only show it.</p>
+      <WorkflowsViewerDemo client:visible />
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .workflows-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+  .workflows-page__hero {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+    color: var(--tx-foreground);
+  }
+  .lead,
+  .demo > p {
+    margin: 0;
+    max-inline-size: 46rem;
+    color: var(--tx-foreground);
+  }
+  .lead {
+    font-size: 1.0625rem;
+  }
+  .workflows-page__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+  }
+  .workflows-page__links a {
+    color: var(--tx-link, LinkText);
+  }
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .features__item {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.75rem;
+    background: var(--tx-surface, Canvas);
+  }
+  .features__item span {
+    font-size: 0.875rem;
+    color: var(--tx-muted-foreground, CanvasText);
+  }
+  .demo {
+    display: grid;
+    gap: 0.75rem;
+    min-inline-size: 0;
+    scroll-margin-block-start: 5rem;
+  }
+  .demo h2 {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  }
+</style>

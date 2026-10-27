@@ -1,0 +1,195 @@
+---
+/**
+ * /drag-page/ — @texuli/drag: one general-purpose drag engine behind every
+ * Texuli surface. The hero workbench mounts on open; each demo below mounts
+ * when it scrolls into view.
+ */
+import DragWorkbench from '../../components/drag-site/DragWorkbench.svelte';
+import FileDropDemo from '../../components/drag-site/FileDropDemo.svelte';
+import GridColumnsDemo from '../../components/drag-site/GridColumnsDemo.svelte';
+import GroupsDemo from '../../components/drag-site/GroupsDemo.svelte';
+import { DRAG_PIECES, DRAG_SECTIONS } from '../../components/drag-site/page.ts';
+import SortableKinds from '../../components/drag-site/SortableKinds.svelte';
+import SpatialDemo from '../../components/drag-site/SpatialDemo.svelte';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const section = (id: string) => {
+  const entry = DRAG_SECTIONS.find((candidate) => candidate.id === id);
+  if (!entry) throw new Error(`Unknown drag section ${id}`);
+  return entry;
+};
+---
+
+<BaseLayout
+  title="Drag and drop"
+  description="@texuli/drag, Texuli's own drag engine (in development): sortable lists, boards, trees, groups, a free-placement canvas and grid columns, all on one keyboard-accessible, localized engine."
+>
+  <div class="drag-page" data-tx-drag-page="">
+    <header class="drag-page__hero">
+      <p class="eyebrow">@texuli/drag · in development</p>
+      <h1>One drag engine, every surface</h1>
+      <p class="lead">
+        Lists, boards, trees, canvases and grid columns snap together from the same small pieces:
+        a session, collision strategies, modifiers, a gesture tracker and localized messages. Every
+        move works from the keyboard and is announced. <code>@texuli/drag</code> is in development
+        and not on npm yet.
+      </p>
+      <ol class="pieces" aria-label="The pieces">
+        {
+          DRAG_PIECES.map((piece) => (
+            <li class="pieces__item">
+              <code>{piece.name}</code>
+              <span>{piece.role}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </header>
+
+    <DragWorkbench client:visible />
+
+    <nav class="toc" aria-label="Demos on this page">
+      <ul>
+        {
+          DRAG_SECTIONS.map((entry) => (
+            <li>
+              <a href={`#${entry.id}`}>{entry.title}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <section class="demo" id="lists" aria-labelledby="lists-title">
+      <h2 id="lists-title">{section('lists').title}</h2>
+      <p>{section('lists').summary}</p>
+      <SortableKinds client:visible />
+    </section>
+
+    <section class="demo" id="groups" aria-labelledby="groups-title">
+      <h2 id="groups-title">{section('groups').title}</h2>
+      <p>{section('groups').summary}</p>
+      <GroupsDemo client:visible />
+    </section>
+
+    <section class="demo" id="canvas" aria-labelledby="canvas-title">
+      <h2 id="canvas-title">{section('canvas').title}</h2>
+      <p>{section('canvas').summary}</p>
+      <SpatialDemo client:visible />
+    </section>
+
+    <section class="demo" id="grid-columns" aria-labelledby="grid-columns-title">
+      <h2 id="grid-columns-title">{section('grid-columns').title}</h2>
+      <p>{section('grid-columns').summary}</p>
+      <GridColumnsDemo client:visible />
+    </section>
+
+    <section class="demo demo--aside" id="file-drop" aria-labelledby="file-drop-title">
+      <h2 id="file-drop-title">{section('file-drop').title}</h2>
+      <p>{section('file-drop').summary}</p>
+      <FileDropDemo client:visible />
+    </section>
+
+    <section class="demo" id="contract" aria-labelledby="contract-title">
+      <h2 id="contract-title">{section('contract').title}</h2>
+      <ul class="contract">
+        {
+          section('contract').points?.map((point) => (
+            <li>{point}</li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .drag-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+  .drag-page__hero {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0;
+    max-inline-size: 46rem;
+    font-size: 1.0625rem;
+    color: var(--tx-foreground);
+  }
+  .pieces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pieces__item {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.75rem;
+    background: var(--tx-surface, Canvas);
+    font-size: 0.8125rem;
+  }
+  .pieces__item code {
+    font-weight: 600;
+  }
+  .pieces__item span {
+    color: var(--tx-muted-foreground, CanvasText);
+  }
+  .toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .toc a {
+    color: var(--tx-link, LinkText);
+  }
+  .demo {
+    display: grid;
+    gap: 0.75rem;
+    scroll-margin-block-start: 5rem;
+  }
+  .demo h2 {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  }
+  .demo > p {
+    margin: 0;
+    max-inline-size: 46rem;
+  }
+  .demo--aside {
+    padding: 1rem;
+    border: 1px dashed var(--tx-border, CanvasText);
+    border-radius: 1rem;
+  }
+  .contract {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+    max-inline-size: 46rem;
+  }
+</style>
