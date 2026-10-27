@@ -30,4 +30,4 @@ kotlin {
 // Nothing is published; the module is consumed in place from this
 // repository, and the version mirrors the npm prerelease line it tracks.
 group = "com.texuli"
-version = "0.1.0-next.2"
+version = "0.1.0-next.3"
