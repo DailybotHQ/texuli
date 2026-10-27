@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Locator, type Page, test } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { defineRows, focusSequence, frame, scenario } from '../harness/index.ts';
 
 /*
@@ -13,9 +13,9 @@ const root = (page: Page) => page.locator('[data-behavior="scenario"]');
 const email = (page: Page) => root(page).getByRole('textbox', { name: 'Work email' });
 const ERROR = 'Enter an address like name@example.com.';
 
-/** A tap on touch projects, a click elsewhere. */
-async function press(target: Locator): Promise<void> {
-  if (test.info().project.use.hasTouch) await target.tap();
+/** A tap on the phone, a click elsewhere. */
+async function press(target: Locator, touch: boolean): Promise<void> {
+  if (touch) await target.tap();
   else await target.click();
 }
 
@@ -41,15 +41,15 @@ scenario(
     {
       id: 'pointer-focuses',
       title: 'pressing a label focuses its text field and toggles its checkbox',
-      async run({ page }) {
-        await press(root(page).getByText('Work email', { exact: true }));
+      async run({ page, touch }) {
+        await press(root(page).getByText('Work email', { exact: true }), touch);
         await expect(email(page)).toBeFocused();
-        await press(root(page).getByText('Company', { exact: true }));
+        await press(root(page).getByText('Company', { exact: true }), touch);
         await expect(root(page).getByRole('textbox', { name: 'Company' })).toBeFocused();
         const checkbox = root(page).getByRole('checkbox', { name: 'Remember me' });
-        await press(root(page).getByText('Remember me'));
+        await press(root(page).getByText('Remember me'), touch);
         await expect(checkbox).toBeChecked();
-        await press(root(page).getByText('Remember me'));
+        await press(root(page).getByText('Remember me'), touch);
         await expect(checkbox).not.toBeChecked();
       },
     },

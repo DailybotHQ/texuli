@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { behaviorEvents, defineRows, scenario } from '../harness/index.ts';
 
 const grid = (page: import('@playwright/test').Page) => page.getByRole('grid');
@@ -50,8 +50,8 @@ scenario(
     {
       id: 'touch-selection',
       title: 'a touch tap selects an available day',
+      projects: ['mobile'],
       async run({ page }) {
-        if (!test.info().project.use.hasTouch) return;
         const box = await day(page, 18).boundingBox();
         if (!box) throw new Error('calendar day is not visible');
         await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);

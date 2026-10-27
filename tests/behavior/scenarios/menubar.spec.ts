@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { defineRows, scenario } from '../harness/index.ts';
 import { pointerOutside } from '../harness/oracle.ts';
 import { eventNames, expectFocus, layerClosed } from './common.ts';
@@ -22,7 +22,7 @@ scenario(
       id: 'roles-arrows-one-tab-stop',
       title:
         'a named menubar of collapsed menuitems that open menus; ArrowRight and ArrowLeft move between triggers, skipping the disabled one; the menubar is one Tab stop',
-      async run({ page }) {
+      async run({ page, project }) {
         await expect(page.getByRole('menubar', { name: 'Application' })).toBeVisible();
         await expect(trigger(page, 'File')).toHaveAttribute('aria-haspopup', 'menu');
         await expect(page.getByRole('menuitem', { name: 'File', expanded: false })).toBeVisible();
@@ -34,7 +34,7 @@ scenario(
         await page.keyboard.press('ArrowLeft');
         await expectFocus(page, 'menuitem', 'Edit');
         await layerClosed(page);
-        await page.keyboard.press(test.info().project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
+        await page.keyboard.press(project === 'webkit' ? 'Alt+Tab' : 'Tab');
         await expect(trigger(page, 'View')).not.toBeFocused();
         await expect(trigger(page, 'File')).not.toBeFocused();
         await expect(trigger(page, 'Edit')).not.toBeFocused();
@@ -84,9 +84,9 @@ scenario(
     {
       id: 'hover-after-open',
       title: 'after a click opens one menu, hovering another trigger switches to it',
+      // Hover is a mouse behavior; the phone has nothing to check here.
+      projects: ['chromium', 'webkit'],
       async run({ page }) {
-        // Hover is a mouse behavior; touch projects have nothing to check here.
-        if (test.info().project.use.hasTouch) return;
         await trigger(page, 'File').click();
         await expect(expanded(page, 'File')).toBeVisible();
         await trigger(page, 'View').hover();
@@ -117,8 +117,8 @@ scenario(
     {
       id: 'touch',
       title: 'a tap opens a menu and a tap on an item runs it',
+      projects: ['mobile'],
       async run({ page }) {
-        if (!test.info().project.use.hasTouch) return;
         await trigger(page, 'Edit').tap();
         await expect(expanded(page, 'Edit')).toBeVisible();
         await page.getByRole('menuitem', { name: 'Redo' }).tap();
