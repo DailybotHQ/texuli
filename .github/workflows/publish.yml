@@ -3,8 +3,10 @@
 # Trigger: a `v*` tag push, or a manual workflow_dispatch run against a
 # branch. The job rebuilds every tarball from source with
 # `pnpm verify:packages` (publint-strict, byte checks), then publishes the
-# freshly packed tarballs in the documented wave order with `--tag next`.
-# `latest` stays reserved for the 1.0.0 stable release.
+# freshly packed tarballs in the documented wave order with `--tag next`,
+# then points `latest` at the same versions: until 1.0.0, `latest` tracks
+# the newest preview, so npm's package page shows the current README and a
+# bare install gets the current preview (owner decision 2026-10-27).
 #
 # Requires one repository secret:
 #   NPM_TOKEN — a granular access token of the publishing account with
@@ -32,9 +34,9 @@ jobs:
     name: Pack, verify and publish (dist-tag next)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
@@ -55,8 +57,29 @@ jobs:
             slug=${name#@}; slug=${slug//\//-}
             tarball="tmp/packages/tarballs/${slug}-${version}.tgz"
             test -s "$tarball"
+            # Idempotent: a re-run after a partial failure skips what is
+            # already on the registry (a published version never changes).
+            if npm view "${name}@${version}" version >/dev/null 2>&1; then
+              echo "Skipping ${name}@${version}: already on npm"
+              return 0
+            fi
             echo "Publishing ${name}@${version} (${tarball})"
-            npm publish "$tarball" --tag next --access public --provenance
+            # The provenance step reads a GitHub OIDC token, which can fail
+            # transiently (IDENTITY_TOKEN_READ_ERROR, run 40506123596), so
+            # retry before failing the wave.
+            local attempt
+            for attempt in 1 2 3; do
+              if npm publish "$tarball" --tag next --access public --provenance; then
+                return 0
+              fi
+              # A failed attempt may still have landed; never publish twice.
+              if npm view "${name}@${version}" version >/dev/null 2>&1; then
+                return 0
+              fi
+              echo "Attempt ${attempt} for ${name}@${version} failed; retrying"
+              sleep $((attempt * 15))
+            done
+            return 1
           }
           # Wave 174 — the L0 texels and the L2 token engine.
           publish packages/core
@@ -79,5 +102,15 @@ jobs:
           publish packages/slides
           publish packages/spec
           echo "All 15 packages published under dist-tag next."
+      - name: Point latest at this release
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          for dir in core tokens primitives texuli charts data media chat blocks catalog tools astro player slides spec; do
+            name=$(node -p "require('./packages/${dir}/package.json').name")
+            version=$(node -p "require('./packages/${dir}/package.json').version")
+            npm dist-tag add "${name}@${version}" latest
+          done
       - name: Record digests
         run: cat tmp/packages/SHA256SUMS
