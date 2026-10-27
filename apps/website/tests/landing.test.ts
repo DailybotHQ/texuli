@@ -62,7 +62,7 @@ describe('landing', () => {
 
   it('states the release truth without a version, and routes repository links through safeHref', () => {
     const status = /<p class="site-footer__status"[\s\S]*?<\/p>/.exec(footer)?.[0] ?? '';
-    expect(status).toContain('<code>next</code>');
+    expect(status).toMatch(/Pre-1\.0 packages are on\s+npm/);
     expect(status).toMatch(/no stable release yet/);
     expect(status).toMatch(/native renderer is in development/);
     expect(status).not.toMatch(/\d+\.\d+\.\d+/);

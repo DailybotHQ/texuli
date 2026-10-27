@@ -172,7 +172,7 @@ test.describe('architecture status and integration (T-52)', () => {
       )?.[0] ?? '';
     expect(section, 'the status section renders').not.toBe('');
     // Web shipped, native in development — both statements, plain words.
-    expect(section).toContain('0.1.0-next.3');
+    expect(section).toContain('0.2.0');
     expect(section).toContain('in development');
     expect(section).toContain('Maven Central');
     // The parity table gives the per-capability evidence.

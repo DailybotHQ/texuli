@@ -62,22 +62,29 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   { phrase: /production[- ]ready/i, why: 'nothing is released as stable' },
   {
     phrase: /Nothing is on npm/i,
-    why: 'every package is on npm as 0.1.0-next.3 under next, and the site is deployed',
+    why: 'every package is on npm as 0.2.0, and the site is deployed',
   },
   {
-    phrase: /\b0\.1\.0(?!-next)\b(?!<\/code>-)/,
-    why: 'name the published prerelease exactly: 0.1.0-next.3',
+    phrase: /\b0\.1\.0\b/,
+    why: 'the 0.1.0-next.N previews are superseded: name the current release, 0.2.0',
+  },
+  {
+    phrase: /texuli(?:\/[a-z-]+)?@next\b/,
+    why: 'install plainly: latest and next both name 0.2.0',
   },
   {
     phrase: /not released yet/i,
-    why: 'the prerelease is published; say "no stable release yet" instead',
+    why: '0.2.0 is published; say "no stable release yet" instead',
   },
   { phrase: /token engine/i, why: 'the word list calls @texuli/tokens the theme engine' },
   {
     phrase: /See the badge component rendered/i,
     why: 'one call to action, one label: "See the badge rendered on the web"',
   },
-  { phrase: /stable release is (out|available|published)/i, why: 'latest is reserved for 1.0.0' },
+  {
+    phrase: /stable release is (out|available|published)/i,
+    why: '0.2.0 is pre-1.0; 1.0.0 will be the first stable release',
+  },
 ];
 
 describe('site copy honesty', () => {
@@ -108,14 +115,14 @@ describe('site copy honesty', () => {
   });
 
   it('never calls a published package unpublished', () => {
-    // The 15 packages at 0.1.0-next.3 are on npm under next; only the
+    // The 15 packages at 0.2.0 are on npm (latest and next); only the
     // private 0.0.0 workspaces (editor, examples) are unpublished.
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
       try {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')
         ) as { version?: string };
-        return pkg.version === '0.1.0-next.3';
+        return pkg.version === '0.2.0';
       } catch {
         return false;
       }

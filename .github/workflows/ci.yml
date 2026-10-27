@@ -66,9 +66,8 @@ jobs:
   website:
     name: Website build and site checks (${{ matrix.shard }}/6)
     runs-on: ubuntu-latest
-    # The e2e suite is about two hours of summed test time (the a11y page
-    # sweep alone is over an hour), so six runners each build the site and
-    # run one shard of the same suite.
+    # Six runners each build the site and run one shard of the same e2e
+    # suite (about an hour of summed test time after the 2026-10-27 trim).
     strategy:
       fail-fast: false
       matrix:

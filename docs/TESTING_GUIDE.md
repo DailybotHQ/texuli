@@ -108,7 +108,11 @@ the behavior suite passes (125 passed, 28 skipped by design, 1.3 min),
 `pnpm exec playwright test tests/e2e --project chromium --grep-invert
 "performance budgets"` passes 893 (14 skipped, 9.7 min), and
 `site-perf.spec.ts` passes 10 after the owner raised the button and
-charts-pie page caps.
+charts-pie page caps. After the page-sweep trim (up to four pages per route
+group, representative primitive demos), the full
+`pnpm exec playwright test tests/e2e --project chromium` run passed 526
+(14 skipped; 530 tests, budgets included) in 10.5 min on 2026-10-27, about
+30 min of summed test time.
 `packages/tokens/tests/library-quality.test.ts` used to read commit
 `5c682dd^` from git, which is not in `main`'s history and broke CI's `check`
 job; it now reads a committed fixture ([CI](CI.md#known-ci-breakage-and-its-fix)).

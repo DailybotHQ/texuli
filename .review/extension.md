@@ -1,6 +1,6 @@
 # Review overrides for texuli
 
-Texuli is a pre-release pnpm monorepo for a Svelte 5 component library that
+Texuli is a pre-1.0 pnpm monorepo for a Svelte 5 component library that
 owns every primitive. The framework-free L0 texels live in `packages/core`
 (`@texuli/core`: the overlay engine, roving focus, positioning, the editor
 model and the two-tier URL policy, among others); the layers above it

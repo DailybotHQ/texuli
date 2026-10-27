@@ -9,14 +9,15 @@ plain TypeScript you can use without any component. It is part of
 Svelte 5 component library by Dailybot, Inc., for application developers and
 for agents that render charts from validated data.
 
-> **Status: preview.** `@texuli/charts` is published on npm under the `next`
-> dist-tag. There is no stable release yet, so install it with `@next` and
-> expect the API to change between previews.
+> **Status: 0.x release.** `@texuli/charts` is published on npm as `0.2.0`, a
+> pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
+> minor (`0.3.0`) may contain breaking changes, so pin the exact version or
+> use `^0.2.0`, which accepts only 0.2.x.
 
 ## Install
 
 ```sh
-npm install @texuli/charts@next @texuli/tokens@next svelte
+npm install @texuli/charts @texuli/tokens svelte
 ```
 
 - `svelte` (^5.57.2) is a peer dependency.

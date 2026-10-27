@@ -9,11 +9,16 @@ import {
   serveDist,
   settle,
   sitePaths,
+  sweepSample,
 } from './support/site.ts';
 
 /*
  * The texuli.com page sweep (T-quality-a11y-site, T-site-visual-polish). One
- * test per built page (dist/sitemap.xml, plus the 404), in one page session:
+ * test per swept page, in one page session: up to four evenly spaced pages
+ * of each route group of dist/sitemap.xml, plus the 404 (sweepSample). The
+ * pages of a group share a template, and the components of the large groups
+ * (`/examples/…`, `/component-pages/…`) are axe-checked in light and dark in
+ * the fixture app too:
  *  - light, then dark: axe with ZERO exclusions (no disabled rules, no
  *    excluded selectors), and the polish check (no horizontal overflow, no
  *    element escaping the viewport, no broken image, no stand-in copy);
@@ -28,7 +33,7 @@ import {
  * with the demo mounted and its floating content open, in light, dark and
  * forced colors; here only the group's representative runs.
  *
- * Chromium sweeps every page; the Pixel 7 runs the polish check on every page
+ * Chromium sweeps every page above; the Pixel 7 runs the polish check on each
  * and axe on the representatives; WebKit runs the representatives only.
  * Run `pnpm build` first.
  */
@@ -126,7 +131,7 @@ function liveId(path: string): string | undefined {
   return id && LIVE_MARKERS[id] ? id : undefined;
 }
 
-const SWEPT = PATHS.filter(
+const SWEPT = sweepSample(PATHS).filter(
   (path) => !/^\/primitives-page\/[^/]+\/$/.test(path) || SAMPLE.has(path)
 );
 

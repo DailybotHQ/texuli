@@ -5,18 +5,29 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-All 15 packable packages are published to npm as `0.1.0-next.3` under the
-`next` and `latest` dist-tags (2026-10-27, from `main` by the publish
-workflow, from the verified tarballs with signed provenance): consumer
-READMEs and two CLI fixes on top of `0.1.0-next.2` (the same day, the
-PLAN_006 package fixes). `0.1.0-next.1` went out on 2026-10-25 (run
-https://github.com/DailybotHQ/texuli/actions/runs/40238083612). Since
-2026-10-27 the publish workflow also points `latest` at every version it
-publishes (see the dist-tag rules below), so npm's package page shows the
-current README and a bare install gets the newest preview. Workspace
-manifests remain `private: true`; the previews are not approved for
-general use, and every future version and wave requires a fresh, explicit
-developer GO. Publishing never overwrites a published version.
+`0.2.0` is the current release of all 15 packable packages (owner decision
+2026-10-27; published from `main` by the publish workflow, from the verified
+tarballs with signed provenance). Both the `latest` and `next` dist-tags
+point to it, so a bare `npm install texuli` or `pnpm add texuli` gets it. It
+is the first non-prerelease `0.x` line, after the `0.1.0-next.0` through
+`0.1.0-next.3` previews: `0.1.0-next.0` was the name reservation,
+`0.1.0-next.1` went out on 2026-10-25 (run
+https://github.com/DailybotHQ/texuli/actions/runs/40238083612), and
+`0.1.0-next.2` (the PLAN_006 package fixes) and `0.1.0-next.3` (consumer
+READMEs and two CLI fixes) on 2026-10-27.
+
+`0.2.0` is still pre-1.0, not a stable release: see "0.x versioning" below.
+Workspace manifests remain `private: true`, and every future version and
+wave requires a fresh, explicit developer GO. Publishing never overwrites a
+published version.
+
+### 0.x versioning
+
+Until 1.0.0, a breaking change bumps the minor (`0.2.0` to `0.3.0`) and a
+fix bumps the patch (`0.2.0` to `0.2.1`). Consumers pin the exact version or
+use `~0.2.0` or `^0.2.0`; for a `0.x` version both ranges accept only
+`0.2.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
+release.
 
 ## Independent package versions
 
@@ -47,19 +58,20 @@ default.
 
 ## Dist-tags
 
-- **`next`** points to the newest owner-approved preview. Use it for
-  `0.x.y-next.N` versions, any other pre-release, and any supported `0.x`
-  version. It moves only with a new version and a fresh GO.
+- **`next`** points to the newest owner-approved version, including any
+  future `0.x.y-next.N` or other pre-release. The publish workflow always
+  publishes with `--tag next`, so it moves only with a new version and a
+  fresh GO. Today it names `0.2.0`.
 - **`latest`** is npm's default install tag, and npm's package page shows
-  the README of the version it names. Until the first supported stable
-  release (an owner-approved `1.0.0`), `latest` tracks the newest preview:
-  the publish workflow moves it together with `next` (owner decision
-  2026-10-27; before that, `latest` was reserved for 1.0.0 and stayed on
-  the first upload, `0.1.0-next.0`). From 1.0.0 on, `latest` names only
-  stable releases.
+  the README of the version it names. It tracks the newest release, before
+  and after 1.0.0: the publish workflow moves it together with `next`
+  (owner decision 2026-10-27; before that, `latest` was reserved for 1.0.0
+  and stayed on the first upload, `0.1.0-next.0`). Today it names `0.2.0`.
+  The workflow moves `latest` on every run, so publishing a future
+  pre-release without moving `latest` needs a workflow change first.
 - Dailybot v4 and other production consumers must pin exact package versions
   in their manifests and lockfiles. They must not rely on a moving dist-tag;
-  `next` is for deliberate preview integration only.
+  `next` is for deliberate pre-release integration only.
 
 Promoting a version to a dist-tag does not change that version's bytes. Publish
 a new immutable version for every fix or change; never overwrite an existing
@@ -69,8 +81,8 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (prerelease compatibility between Texuli packages is exact, per
-"Independent package versions" above), while the private development
+versions (for `0.2.0`, every internal pin is exactly `0.2.0`; compatibility
+between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`, `packages/editor`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary
 (`scripts/packages.ts` rewrites `workspace:` to the exact workspace version
@@ -89,9 +101,9 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 15 npm packages | `0.1.0-next.3` (dist-tags `next` and `latest`) | Each package manifest; published 2026-10-27 by the publish workflow (`0.1.0-next.2` the same day; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| 15 npm packages | `0.2.0` (dist-tags `latest` and `next`) | Each package manifest; published by the publish workflow (previews before it: `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
 | Blueprint spec | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | `packages/spec/versions.json`; every generated file is stamped `// Spec 0.2.0, digest …`. |
-| `@texuli/spec` (npm) | `0.1.0-next.3` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
+| `@texuli/spec` (npm) | `0.2.0` | Ships the spec `0.2.0` generated sources stamped with the digest above. |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 
 - A normative spec change takes a new spec version and a fresh digest pin in
@@ -129,9 +141,10 @@ new version rather than reusing a published version.
 
 ## Honesty in documentation
 
-The npm name reservation is a prerelease publication by the owner, not a
-supported product release. Keep `private: true`, pre-release status, and the
-absence of a stable `latest` release clear until the corresponding approved
-stable release actually exists. A passing pack gate proves only that a tarball
+The npm name reservation (`0.1.0-next.0`) was a prerelease publication by
+the owner, not a supported product release. `0.2.0` is a release but not a
+stable one: keep `private: true`, the pre-1.0 status, and the absence of a
+stable 1.0.0 clear until the corresponding approved stable release actually
+exists. A passing pack gate proves only that a tarball
 was built and checked; it does not prove that it was published, supported, or
 usable by consumers.

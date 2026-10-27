@@ -379,10 +379,10 @@ test.describe('texuli.com SEO build output', () => {
     expect(app, 'SoftwareApplication node present').toBeTruthy();
     expect(app?.name).toBe('Texuli');
     expect(app?.applicationCategory).toBe('DeveloperApplication');
-    // Preview reality: the npm dist-tag is `next`; a stable release would be a
-    // claim this site cannot make yet. The pattern fails the day the wording
-    // drifts from the published preview.
-    expect(app?.softwareVersion).toMatch(/^\d+\.\d+\.\d+-next\.\d+$/);
+    // Pre-1.0 reality: the npm release is 0.x; a stable 1.0 would be a
+    // claim this site cannot make yet. The pattern fails the day the version
+    // leaves the 0.x line.
+    expect(app?.softwareVersion).toMatch(/^0\.\d+\.\d+(?:-next\.\d+)?$/);
     expect(app?.license).toBe('https://opensource.org/licenses/MIT');
     expect(String(app?.description)).toContain('in development');
     // Nothing is for sale: omitting offers is the honest state.

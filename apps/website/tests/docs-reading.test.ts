@@ -37,9 +37,9 @@ describe('guide code highlighting', () => {
   const textOf = (tokens: readonly GuideToken[]): string =>
     tokens.map((token) => token.text).join('');
 
-  /** The install snippet shape (bash): comments, a command, dist-tag names. */
-  const INSTALL = `# Texuli is in development: every package ships as the 0.1.0-next.3 prerelease (dist-tag next) — there is no stable release yet.
-pnpm add texuli@next @texuli/tokens@next @texuli/primitives@next @texuli/core@next`;
+  /** The install snippet shape (bash): comments, a command, package names. */
+  const INSTALL = `# Texuli is in development: every package ships as 0.2.0, a pre-1.0 release — 1.0.0 will be the first stable release.
+pnpm add texuli @texuli/tokens @texuli/primitives @texuli/core`;
 
   /** The imports shape (TypeScript): keywords and strings. */
   const IMPORTS = `import { Button } from 'texuli/button';
@@ -117,14 +117,14 @@ import { createRovingFocus } from '@texuli/core/roving';
 
   describe('highlightGuideCode tags the expected shapes', () => {
     it('tags comments, keywords, strings, tags and flags in each snippet shape', () => {
-      // the install snippet: hash comment, command keyword, plain dist-tags
+      // the install snippet: hash comment, command keyword, plain package names
       {
         const kinds = kindsOf(highlightGuideCode(INSTALL));
         expect(kinds).toContain('comment:# Texuli is in development');
         expect(kinds).toContain('keyword:pnpm');
         expect(kinds).toContain('keyword:texuli');
-        // The bare command name is the keyword; package names and @next stay plain.
-        expect(kinds).not.toContain('keyword:texuli@next');
+        // The bare command name is the keyword; scoped package names stay plain.
+        expect(kinds).not.toContain('keyword:@texuli/tokens');
         expect(kinds).not.toContain('keyword:add');
         expect(kinds).not.toMatch(/string:/);
       }

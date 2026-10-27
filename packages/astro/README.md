@@ -9,15 +9,15 @@ closed-schema parser for structured content blocks, and a validated site
 model for pages, navigation, metadata and a sitemap. Use Texuli's Svelte
 components as islands wherever a page needs interaction.
 
-> **Status: preview.** Texuli is in development. The packages are published
-> to npm as prereleases under the `next` dist-tag, and there is no stable
-> release yet, so install with `@next`. APIs may still change between
-> previews.
+> **Status: 0.x release.** Texuli is in development. The packages are
+> published to npm as `0.2.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.3.0`) may contain breaking
+> changes, so pin the exact version or use `^0.2.0`, which accepts only 0.2.x.
 
 ## Install
 
 ```bash
-npm install @texuli/astro@next @astrojs/svelte svelte
+npm install @texuli/astro @astrojs/svelte svelte
 ```
 
 `@astrojs/svelte` (`^9.1.0`) and Svelte 5 (`^5.57.2`) are peer

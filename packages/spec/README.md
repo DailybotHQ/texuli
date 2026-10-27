@@ -13,21 +13,21 @@ renderer for them. The same contract also generates the Kotlin models used
 by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
-> **Status: preview.** Texuli is in development. The packages are published
-> to npm as prereleases under the `next` dist-tag, and there is no stable
-> release yet, so install with `@next`. APIs may still change between
-> previews.
+> **Status: 0.x release.** Texuli is in development. The packages are
+> published to npm as `0.2.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.3.0`) may contain breaking
+> changes, so pin the exact version or use `^0.2.0`, which accepts only 0.2.x.
 
 ## Install
 
 ```bash
-npm install @texuli/spec@next
+npm install @texuli/spec
 ```
 
 ```bash
-pnpm add @texuli/spec@next
+pnpm add @texuli/spec
 # or
-yarn add @texuli/spec@next
+yarn add @texuli/spec
 ```
 
 No peer dependencies and no CSS. The package is ESM-only and ships

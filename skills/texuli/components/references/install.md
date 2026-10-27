@@ -4,9 +4,11 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are npm previews: `0.1.0-next.3` under the `next` dist-tag, with
-no stable release. An app outside a Texuli checkout installs them with the
-tag, for example `pnpm add texuli@next @texuli/tokens@next` (the developer
+The packages are on npm as `0.2.0`, a pre-1.0 release (`latest` and `next`
+both point to it; 1.0.0 will be the first stable release). An app outside a
+Texuli checkout installs them plainly, for example
+`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.2.0`
+(for 0.x it accepts only 0.2.x, since a new minor may break) (the developer
 runs the install; it uses the network). `@texuli/editor` is not on npm.
 Inside this monorepo, an app depends on the workspace packages:
 

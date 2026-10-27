@@ -17,7 +17,7 @@
  *
  * Honesty placement (blueprint §6): the hero claims the *system*, not
  * released artifacts. No version, no npm claim, no dates — the footer's
- * status line is the single place "preview on npm" is claimed sitewide.
+ * status line is the single place the npm release is claimed sitewide.
  */
 
 /** A hero call to action; app-authored site links, developer trust tier. */

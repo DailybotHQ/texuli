@@ -14,7 +14,7 @@ A screenshot review of every route family found the issues below. The spec keeps
 
 ## What the spec checks
 
-**Every built page** (sitemap plus the 404), in light and dark. The per-page check runs in the page sweep, `tests/e2e/a11y-site.spec.ts`, on the same page loads as axe (primitive pages: `site-live-primitives.spec.ts`, with the demo mounted). Chromium and the Pixel 7 walk every page; WebKit walks one page per route group.
+**Every swept page** (up to four evenly spaced pages of each route group of the sitemap, plus the 404), in light and dark. The per-page check runs in the page sweep, `tests/e2e/a11y-site.spec.ts`, on the same page loads as axe (primitive pages: `site-live-primitives.spec.ts`, with the demo mounted). Chromium and the Pixel 7 walk every swept page; WebKit walks one page per route group.
 
 | Check | Fails when |
 | --- | --- |

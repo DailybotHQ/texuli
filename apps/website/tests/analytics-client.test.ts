@@ -378,7 +378,7 @@ describe('the shipped loader (public/umami-loader.js)', () => {
 });
 
 describe('the landing copy command (web-copy-command.ts, T-43)', () => {
-  const COMMAND = 'pnpm add texuli@next';
+  const COMMAND = 'pnpm add texuli';
   const FAILED = 'Copy failed: your browser blocked the clipboard.';
 
   function buildHost(): { host: HTMLElement; status: () => string | null | undefined } {

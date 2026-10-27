@@ -107,7 +107,7 @@ test.describe('native hero (T-45)', () => {
     expect(main).toContain('data-tx-planned');
     expect(main).toContain('data-tx-status="planned"');
     // The claims match reality: the real npm version, ADR-005, no Maven.
-    expect(main).toContain('0.1.0-next.3');
+    expect(main).toContain('0.2.0');
     expect(main).toContain('Planned (ADR-005)');
     expect(main).toContain('nothing is on Maven yet');
     expect(main).toContain('conformance-tested');

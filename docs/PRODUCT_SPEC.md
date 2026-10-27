@@ -2,9 +2,9 @@
 
 > **Small pieces. Infinite possibilities.**
 >
-> Status on 2026-10-26: **pre-release.** All 15 packable packages are on
-> npm as `0.1.0-next.3` under the `next` dist-tag (published by CI from
-> verified tarballs, with signed provenance); texuli.com deploys from
+> Status on 2026-10-27: **pre-1.0.** All 15 packable packages are on
+> npm as the `0.2.0` release (dist-tags `latest` and `next`; published by CI
+> from verified tarballs, with signed provenance); texuli.com deploys from
 > `main` to Cloudflare Pages. The
 > implementation itself is substantial: every layer from L0 texels to L8
 > tools exists in source with tests, all in this private workspace. The
@@ -86,8 +86,8 @@ closed, documented catalog that can be validated before anything renders.
 | Agent service (prompt → validated blueprint draft) | **In development**, fake replay provider only, not deployed | [`apps/agent`](../apps/agent/README.md) |
 | Tools (L8): the copy-in CLIs (`texuli-add`, `texuli-init`, `texuli-update`, `texuli-llms`), A2UI, custom elements, the golden set, and the read-only local MCP server source | **Exists as source**, private; no published binaries | [`packages/tools`](../packages/tools/README.md) |
 | Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, deployed at https://texuli.com (Cloudflare Pages) with two Pages Functions (`functions/`: agent-facing request shaping and a same-origin Umami analytics proxy, off until the owner provisions it) | [`apps/website`](../apps/website/README.md) |
-| npm preview release | **Done** — all 15 packages as `0.1.0-next.3`, dist-tag `next`, CI-published with provenance | [RELEASE](RELEASE.md) |
-| npm stable release | Planned; needs the developer's explicit go. texuli.com deploys from `main` (Cloudflare Pages) | — |
+| npm 0.x release | **Done** — all 15 packages as `0.2.0` (after the `0.1.0-next.0`–`next.3` previews), dist-tags `latest` and `next`, CI-published with provenance | [RELEASE](RELEASE.md) |
+| npm stable release (1.0.0) | Planned; needs the developer's explicit go. texuli.com deploys from `main` (Cloudflare Pages) | — |
 
 ## Success criteria
 
@@ -118,10 +118,10 @@ closed, documented catalog that can be validated before anything renders.
 
 ## Honest boundaries
 
-- The implementation is pre-release. All 15 packages are on npm as
-  `0.1.0-next.3` under the `next` dist-tag (published by CI with provenance;
-  previews, not a supported release; `latest` tracks the newest preview
-  until 1.0.0), and the
+- The implementation is pre-1.0. All 15 packages are on npm as `0.2.0`
+  (published by CI with provenance; `latest` and `next` both point to it; not
+  a stable release: under 0.x a new minor may contain breaking changes, and
+  1.0.0 will be the first stable release), and the
   workspace packages stay `private: true`. texuli.com deploys from `main` to
   Cloudflare Pages. The repository's remote is
   `https://github.com/DailybotHQ/texuli.git` (`git remote -v`), and GitHub

@@ -17,10 +17,13 @@ import { polishProblems } from './support/site.ts';
  *
  * Each demo declares its own key and control checks (mirrored on the frame
  * as data attributes), so this spec runs exactly what the page promises.
- * Two tests per primitive: the interactions (a fresh load each), and axe plus
- * the polish check in light, dark and forced colors with the demo mounted
- * and its floating content open (this is the page sweep for these routes;
- * a11y-site.spec.ts skips them).
+ * Every primitive page must ship its lazy demo island (a build check). The
+ * demo interactions (a fresh load each) and axe plus the polish check in
+ * light, dark and forced colors, with the demo mounted and its floating
+ * content open, run on the representative set (overlay, form, composite and
+ * range primitives): the pages share one template, and every primitive's
+ * keyboard, pointer and axe contract runs in its behavior scenario
+ * (tests/behavior). a11y-site.spec.ts skips these pages.
  * Chromium covers every primitive; WebKit and Pixel 7 cover a representative
  * set (overlay, form, composite and range primitives).
  */
@@ -366,14 +369,8 @@ async function checkToggles(live: Locator): Promise<void> {
   await expect(stage).toHaveAttribute('dir', 'rtl');
 }
 
-for (const id of IDS) {
+for (const id of IDS.filter((name) => REPRESENTATIVE.has(name))) {
   test.describe(`live ${id}`, () => {
-    test.skip(
-      ({ browserName, isMobile }) =>
-        (browserName !== 'chromium' || isMobile) && !REPRESENTATIVE.has(id),
-      'Representative primitives only on this project'
-    );
-
     test('controlled and uncontrolled panels, keyboard hints, anatomy bridge, props panel', async ({
       page,
       isMobile,
@@ -387,7 +384,7 @@ for (const id of IDS) {
       await checkAnatomy(page, await openDemo(page, id), id, isMobile);
       const live = await openDemo(page, id);
       await checkPropsPanel(page, live, id);
-      if (REPRESENTATIVE.has(id)) await checkToggles(live);
+      await checkToggles(live);
     });
 
     test('axe, zero exclusions, and polish in light, dark and forced colors', async ({ page }) => {

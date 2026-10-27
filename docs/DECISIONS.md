@@ -209,7 +209,7 @@ reverse it. Newest last.
   `io.github.dailybothq` — a GitHub-account namespace, verifiable without a
   domain.
 - **Choice:** `com.texuli`, artifacts `texuli-spec` and `texuli-compose`,
-  versions tracking the npm prerelease line they mirror (`0.1.0-next.3`).
+  versions tracking the npm release line they mirror (`0.2.0`).
 - **Why:** texuli.com is owned and deployed, so the Central Portal can verify
   the namespace by DNS, and the group matches the Kotlin package names the
   sources already use (`com.texuli.spec.runtime`, `com.texuli.compose`).
