@@ -1,7 +1,7 @@
 # Embedding the player
 
-**Package:** `@texuli/player` (preview on npm under the `next` dist-tag; no
-stable release yet)
+**Package:** `@texuli/player` (on npm as `0.2.0`, a pre-1.0 release; no
+stable 1.0.0 yet)
 
 How to put a validated catalog blueprint on a page: quick start, the props a
 host controls, the trust badge and frame contract, localization, inactive

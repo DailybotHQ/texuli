@@ -13,21 +13,21 @@ which is built on these primitives. They are built from scratch on the
 [`@texuli/core`](https://www.npmjs.com/package/@texuli/core) texels and do
 not depend on any other component library.
 
-> **Status: preview.** Texuli is in development. The packages are published
-> to npm as prereleases under the `next` dist-tag, and there is no stable
-> release yet, so install with `@next`. APIs may still change between
-> previews.
+> **Status: 0.x release.** Texuli is in development. The packages are
+> published to npm as `0.2.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.3.0`) may contain breaking
+> changes, so pin the exact version or use `^0.2.0`, which accepts only 0.2.x.
 
 ## Install
 
 ```bash
-npm install @texuli/primitives@next
+npm install @texuli/primitives
 ```
 
 ```bash
-pnpm add @texuli/primitives@next
+pnpm add @texuli/primitives
 # or
-yarn add @texuli/primitives@next
+yarn add @texuli/primitives
 ```
 
 - **Peer dependency:** `svelte` `^5.57.2`.

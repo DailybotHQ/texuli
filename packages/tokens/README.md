@@ -12,21 +12,21 @@ components, or on its own as a framework-free token engine for any CSS
 (including a Tailwind 4 preset). The engine is plain TypeScript with no
 runtime dependencies.
 
-> **Status: preview.** Texuli is in development. The packages are published
-> to npm as prereleases under the `next` dist-tag, and there is no stable
-> release yet, so install with `@next`. APIs may still change between
-> previews.
+> **Status: 0.x release.** Texuli is in development. The packages are
+> published to npm as `0.2.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.3.0`) may contain breaking
+> changes, so pin the exact version or use `^0.2.0`, which accepts only 0.2.x.
 
 ## Install
 
 ```bash
-npm install @texuli/tokens@next
+npm install @texuli/tokens
 ```
 
 ```bash
-pnpm add @texuli/tokens@next
+pnpm add @texuli/tokens
 # or
-yarn add @texuli/tokens@next
+yarn add @texuli/tokens
 ```
 
 No peer dependencies. Import the base stylesheet once, in your app's global

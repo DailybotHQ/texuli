@@ -22,11 +22,11 @@ consume the packages, or copy a styled component's source into the app and
 own it, then theme it, adjust it and keep it updatable.
 
 The copy path is **local**: its commands run from a Texuli monorepo checkout
-against folders on disk. The packages are npm previews: 15 are on npm as
-`0.1.0-next.3` under the `next` dist-tag, with no stable release (`latest` tracks the
-newest preview until 1.0.0). Install them with the `@next` tag
-(`pnpm add texuli@next`), which always names the newest preview, and never
-suggest a download URL. `@texuli/editor` is in development and not on npm.
+against folders on disk. 15 packages are on npm as
+`0.2.0`, a pre-1.0 release (`latest` and `next` both point to it; 1.0.0 will
+be the first stable release). Install them plainly (`pnpm add texuli`), pin
+the exact version or `^0.2.0` (for 0.x it accepts only 0.2.x, since a new
+minor may break), and never suggest a download URL. `@texuli/editor` is in development and not on npm.
 
 ## Choose a path
 

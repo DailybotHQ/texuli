@@ -192,8 +192,8 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    all 15 packages to npm as `0.1.0-next.3` under the `next` dist-tag, with
-    provenance ([RELEASE](RELEASE.md)).
+    all 15 packages to npm as the `0.2.0` release (dist-tags `latest` and
+    `next`), with provenance ([RELEASE](RELEASE.md)).
 - **Tests:**
   - **Unit:** Vitest (happy-dom) in `packages/*/tests/`,
     `apps/website/tests/` and `scripts/tests/`, plus perf tests in `tests/perf/` (opt in with

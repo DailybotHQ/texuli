@@ -1,7 +1,7 @@
 # Embedding the blueprint flow
 
-**Packages:** `@texuli/player`, `@texuli/catalog` (on npm as `0.1.0-next.3`
-under the `next` dist-tag; no stable release; the workspace packages stay
+**Packages:** `@texuli/player`, `@texuli/catalog` (on npm as `0.2.0`, a
+pre-1.0 release; no stable 1.0.0 yet; the workspace packages stay
 `"private": true`)
 
 How a host app takes a blueprint from an agent or a person, validates it,

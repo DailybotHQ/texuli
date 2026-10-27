@@ -8,15 +8,15 @@ keyboard-driven Svelte 5 stage with a presenter view, fullscreen, themes and
 reveal steps. The same deck also prints to PDF through the browser and
 exports to PPTX locally.
 
-> **Status: preview.** Texuli is in development. The packages are published
-> to npm as prereleases under the `next` dist-tag, and there is no stable
-> release yet, so install with `@next`. APIs may still change between
-> previews.
+> **Status: 0.x release.** Texuli is in development. The packages are
+> published to npm as `0.2.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.3.0`) may contain breaking
+> changes, so pin the exact version or use `^0.2.0`, which accepts only 0.2.x.
 
 ## Install
 
 ```bash
-npm install @texuli/slides@next svelte
+npm install @texuli/slides svelte
 ```
 
 Svelte 5 (`^5.57.2`) is a peer dependency. Import the stage and print

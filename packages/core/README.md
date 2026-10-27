@@ -11,21 +11,21 @@ Use it directly when you build your own components in any framework, or
 when you need Texuli's URL policy to sanitize links and media from agents
 or users. It has no runtime dependencies and imports no UI framework.
 
-> **Status: preview.** Texuli is in development. The packages are published
-> to npm as prereleases under the `next` dist-tag, and there is no stable
-> release yet, so install with `@next`. APIs may still change between
-> previews.
+> **Status: 0.x release.** Texuli is in development. The packages are
+> published to npm as `0.2.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.3.0`) may contain breaking
+> changes, so pin the exact version or use `^0.2.0`, which accepts only 0.2.x.
 
 ## Install
 
 ```bash
-npm install @texuli/core@next
+npm install @texuli/core
 ```
 
 ```bash
-pnpm add @texuli/core@next
+pnpm add @texuli/core
 # or
-yarn add @texuli/core@next
+yarn add @texuli/core
 ```
 
 No peer dependencies and no CSS. The package is ESM-only and ships

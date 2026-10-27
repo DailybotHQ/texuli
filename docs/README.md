@@ -9,7 +9,7 @@ project overview.
 | Guide | What it covers |
 | --- | --- |
 | [PRODUCT_SPEC](PRODUCT_SPEC.md) | What Texuli is, who it is for, capabilities, non-goals, release status |
-| [RELEASE](RELEASE.md) | Independent package versions, prerelease and stable dist-tags, owner-GO publication waves |
+| [RELEASE](RELEASE.md) | Independent package versions, 0.x versioning, prerelease and stable dist-tags, owner-GO publication waves |
 | [ARCHITECTURE](ARCHITECTURE.md) | The down-only layer graph, every package and its subpaths, the website, build and test shape |
 | [DECISIONS](DECISIONS.md) | Architecture decisions: options, choice, why, how to reverse |
 | [EDITOR_ARCHITECTURE](EDITOR_ARCHITECTURE.md) | The rich text editor's contracts (ADR-003): model, selection, history, keyboard, paste security, interchange. The model exists as core texels and the editor package implements the surface |

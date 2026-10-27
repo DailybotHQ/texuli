@@ -22,12 +22,12 @@ end to end and native for agents:
   blueprint contract (`@texuli/spec`) also feeds a Kotlin Multiplatform
   twin in `native/`.
 
-**Status: in development, not released.** The 15 packable packages (all
+**Status: in development, pre-1.0.** The 15 packable packages (all
 of `packages/` except `@texuli/editor` and `@texuli/examples`, which are
-never packed) are published to npm as `0.1.0-next.3` under the `next`
-dist-tag by the publish workflow; the workspace packages stay
-`private: true`, no stable release is out (until 1.0.0, `latest` tracks the newest
-preview; see [RELEASE](docs/RELEASE.md)),
+never packed) are published to npm as the `0.2.0` release by the publish
+workflow (`latest` and `next` both point to it); the workspace packages stay
+`private: true`, and no stable release is out (1.0.0 will be the first; under
+0.x a new minor may break; see [RELEASE](docs/RELEASE.md)),
 and texuli.com deploys from `main` to Cloudflare Pages, with the Pages
 Functions in `functions/`. See
 [docs/PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md) and
@@ -38,7 +38,7 @@ Functions in `functions/`. See
 | Area | Doc | What it covers |
 | --- | --- | --- |
 | Product | [PRODUCT_SPEC](docs/PRODUCT_SPEC.md) | Problem, consumers, capabilities, non-goals, release status |
-| Releases | [RELEASE](docs/RELEASE.md) | Independent package versions, prerelease and stable dist-tags, owner-GO publication waves |
+| Releases | [RELEASE](docs/RELEASE.md) | Independent package versions, 0.x versioning, prerelease and stable dist-tags, owner-GO publication waves |
 | Architecture | [ARCHITECTURE](docs/ARCHITECTURE.md) | The down-only layer graph (L0 core and spec … L8 tools and astro), every package and subpath, engines, the website, build and test shape |
 | Decisions | [DECISIONS](docs/DECISIONS.md) | Architecture decisions: options, choice, why, how to reverse |
 | Design language | [DESIGN_LANGUAGE](docs/DESIGN_LANGUAGE.md) · [EDITOR_ARCHITECTURE](docs/EDITOR_ARCHITECTURE.md) | The cross-surface visual contract; the rich text editor's contracts (ADR-003) |
@@ -189,10 +189,11 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The 15 packable packages are on npm as `0.1.0-next.3`
-    (dist-tag `next`, published by CI with provenance); `@texuli/editor`,
-    `@texuli/examples`, the apps and `native/` publish nothing. No stable
-    release is published (`latest` tracks the newest preview until 1.0.0). texuli.com
+    check results. The 15 packable packages are on npm as `0.2.0`
+    (dist-tags `latest` and `next`, published by CI with provenance);
+    `@texuli/editor`, `@texuli/examples`, the apps and `native/` publish
+    nothing. 0.2.0 is a pre-1.0 release, not stable (1.0.0 will be the first
+    stable release; `latest` tracks the newest release). texuli.com
     deploys from `main` (Cloudflare Pages); the agent service is not
     deployed.
 13. **Scratch work** goes in `tmp/`. Plan artifacts go in
