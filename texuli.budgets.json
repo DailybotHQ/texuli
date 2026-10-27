@@ -59,13 +59,21 @@
       "gzip": 12288,
       "note": "Authored manifest data (schemas, useWhen/dontUseWhen, a11y notes, examples) grows with each component group; measured forms 10,491 B (lead decision 2026-10-23)."
     },
+    "@texuli/catalog/manifests/data": {
+      "gzip": 9280,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-catalog-coverage): manifests for the data views (board, tree view, calendar, grid, files, map, timeline) with prop schemas; measured 8,902 B + 4% headroom."
+    },
+    "@texuli/catalog/manifests/state": {
+      "gzip": 9024,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-catalog-coverage): the state, action, flow and form surfaces adopted from the player, plus the sortable list with reorder; measured 8,622 B + 4% headroom."
+    },
     "@texuli/catalog/manifests/display": {
-      "gzip": 10240,
-      "note": "Authored manifest data (schemas, useWhen, examples) for display components; measured 8,989 B."
+      "gzip": 11456,
+      "note": "Authored manifest data (schemas, useWhen, examples) for display components; measured 8,989 B. Owner decision 2026-10-27 (PLAN_007): raised to measured 11,004 B + 4% headroom; manifests carry events, bindable and prop schemas."
     },
     "@texuli/catalog/manifests/forms": {
-      "gzip": 12288,
-      "note": "Authored form manifests (26 components); measured 10,491 B (lead decision 2026-10-23)."
+      "gzip": 13696,
+      "note": "Authored form manifests (26 components); measured 10,491 B (lead decision 2026-10-23). Owner decision 2026-10-27 (PLAN_007): raised to measured 13,115 B + 4% headroom; manifests carry events, bindable and prop schemas."
     },
     "@texuli/catalog/manifests/layouts": {
       "gzip": 12288,
@@ -76,8 +84,8 @@
       "note": "Authored overlays manifests; measured 10,170 B (26 manifests) (lead decision 2026-10-23). Explicit entry: the manifests/* pattern does not take precedence over @texuli/catalog/*."
     },
     "@texuli/catalog/render/hostile": {
-      "gzip": 13504,
-      "note": "Hostile test corpus (16 attack samples: script URLs, fake dialogs, bidi, giant trees, injection) plus hardenInertRoots; loaded only by tests and security tooling, never by a renderer. Measured 9,247 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 12,288 B to measured 12,927 B + 4% headroom; already over at T-01. Trimming stays a follow-up."
+      "gzip": 15168,
+      "note": "Hostile test corpus (16 attack samples: script URLs, fake dialogs, bidi, giant trees, injection) plus hardenInertRoots; loaded only by tests and security tooling, never by a renderer. Measured 9,247 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 12,288 B to measured 12,927 B + 4% headroom; already over at T-01. Trimming stays a follow-up. Owner decision 2026-10-27 (PLAN_007): raised to measured 14,573 B + 4% headroom; the hostile corpus gained workflow, reorder, bidi and unknown-action attacks."
     },
     "@texuli/charts": {
       "gzip": 16384,
@@ -110,6 +118,78 @@
     "@texuli/date": {
       "gzip": 2048,
       "note": "Owned Gregorian date engine; measured 1.66 KiB gzip on 2026-10-27, with room for platform variance. Owner-approved for the external date dependency migration."
+    },
+    "@texuli/drag": {
+      "gzip": 1728,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): session state machine, intents, refusals and geometry; measured 1,603 B + 4% headroom."
+    },
+    "@texuli/drag/sortable": {
+      "gzip": 7488,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): general-purpose sortable: lists in every axis, groups with pull/put/clone, swap, nested lists and trees, multi-item, handles, filters, locked items, the controller and keyboard targets; measured 7,191 B + 4% headroom."
+    },
+    "@texuli/drag/collision": {
+      "gzip": 768,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): pluggable collision strategies; measured 708 B + 4% headroom."
+    },
+    "@texuli/drag/modifiers": {
+      "gzip": 576,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): axis lock, bounds and snap-to-grid; measured 529 B + 4% headroom."
+    },
+    "@texuli/drag/auto-scroll": {
+      "gzip": 704,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): edge auto-scroll on a caller frame loop; measured 671 B + 4% headroom."
+    },
+    "@texuli/drag/gesture": {
+      "gzip": 1280,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): pointer tracker with capture fallback, threshold and long-press; measured 1,194 B + 4% headroom."
+    },
+    "@texuli/drag/spatial": {
+      "gzip": 1728,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): canvas transforms, free placement, snapping, guides, marquee and resize; measured 1,658 B + 4% headroom."
+    },
+    "@texuli/drag/graph": {
+      "gzip": 1536,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): port and edge hit-testing and connection rules; measured 1,468 B + 4% headroom."
+    },
+    "@texuli/drag/messages": {
+      "gzip": 1024,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): localizable announcement templates; measured 945 B + 4% headroom."
+    },
+    "@texuli/drag/testing": {
+      "gzip": 1088,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): test helpers (fake frames and timers, pointer and list fixtures); measured 1,031 B + 4% headroom."
+    },
+    "@texuli/workflows": {
+      "gzip": 44544,
+      "cssGzip": 2688,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-workflows-ui): the root barrel re-exports the model, layout, spec adapter, editor, viewer and inspector; consumers import the subpaths (the viewer alone is ~6 KB). Measured 42,786 B (CSS 2,580 B) + 4% headroom."
+    },
+    "@texuli/workflows/editor": {
+      "gzip": 38080,
+      "cssGzip": 2624,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-workflows-ui): interactive editor: canvas, controller, palette, toolbar, minimap, treegrid outline, inspector and history; measured 36,607 B (CSS 2,467 B) + 4% headroom."
+    },
+    "@texuli/workflows/viewer": {
+      "gzip": 6144,
+      "cssGzip": 768,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-workflows-ui): read-only embeddable viewer; measured 5,852 B (CSS 679 B) + 4% headroom."
+    },
+    "@texuli/workflows/inspector": {
+      "gzip": 5504,
+      "cssGzip": 576,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-workflows-ui): node inspector with URL-policy-checked fields; measured 5,263 B (CSS 519 B) + 4% headroom."
+    },
+    "@texuli/workflows/spec-adapter": {
+      "gzip": 9088,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-workflows-ui): adapter between the editor model and the spec 0.3.0 workflow graph; measured 8,727 B + 4% headroom."
+    },
+    "@texuli/workflows/model": {
+      "gzip": 11840,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-workflows-model): closed graph model with typed ports, validation, cycle policy, history and the canonical document parser; measured 11,365 B + 4% headroom."
+    },
+    "@texuli/workflows/layout": {
+      "gzip": 2240,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-workflows-model): deterministic layered auto-layout; measured 2,119 B + 4% headroom."
     },
     "@texuli/date/calendar": {
       "gzip": 2048,
@@ -148,20 +228,20 @@
       "note": "Default per-view cap (lead decision 2026-10-23): a data view ships its framework-free engine (sort, collation, filter compiler, validation) with its component; measured grid-core 10,342 B."
     },
     "@texuli/data/board/engine": {
-      "gzip": 3648,
-      "note": "FIX-board-engine-subpath: pure TypeScript board engine (ranks, WIP, keyboard moves); no Svelte. Measured 3,448 B. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 3,448 B + 4% headroom so platform drift does not flip it."
+      "gzip": 3904,
+      "note": "FIX-board-engine-subpath: pure TypeScript board engine (ranks, WIP, keyboard moves); no Svelte. Measured 3,448 B. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 3,448 B + 4% headroom so platform drift does not flip it. Owner decision 2026-10-27 (PLAN_007): raised to measured 3,706 B + 4% headroom; the keyboard announcements are localized text tables."
     },
     "@texuli/data/grid-columns": {
-      "gzip": 16384,
-      "note": "Column operations compose the grid core (10.1 KiB) with resize, reorder, pinning, groups and a lazy column menu; measured 15,083 B (lead decision 2026-10-23)."
+      "gzip": 17408,
+      "note": "Column operations compose the grid core (10.1 KiB) with resize, reorder, pinning, groups and a lazy column menu; measured 15,083 B (lead decision 2026-10-23). Owner decision 2026-10-27 (PLAN_007): raised to measured 16,727 B + 4% headroom; reorder and resize run on the shared @texuli/drag engine, inlined per entry by the size tool."
     },
     "@texuli/data/grid-editing": {
       "gzip": 16448,
       "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 15,360 B to measured 15,808 B + 4% headroom; already over at T-01. Trimming stays a follow-up."
     },
     "@texuli/data/timeline": {
-      "gzip": 10240,
-      "note": "Lead decision 2026-10-23: the timeline/Gantt view with its engine measured 9,647 B; the 8 KiB default was provisional."
+      "gzip": 11520,
+      "note": "Lead decision 2026-10-23: the timeline/Gantt view with its engine measured 9,647 B; the 8 KiB default was provisional. Owner decision 2026-10-27 (PLAN_007): raised to measured 11,019 B + 4% headroom; pointer moves run on the shared @texuli/drag engine (tracker and modifiers), inlined per entry."
     },
     "@texuli/examples": {
       "gzip": 16384,
@@ -187,6 +267,11 @@
       "gzip": 4096,
       "cssGzip": 1024,
       "note": "Design target: a simple primitive is at most 4 KiB gzip and 1 KiB of CSS."
+    },
+    "@texuli/primitives/sortable": {
+      "gzip": 16128,
+      "cssGzip": 512,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-sortable-binding): the Svelte binding carries the general-purpose @texuli/drag sortable engine (session, sortable, gesture, collision, auto-scroll) plus keyboard, announcements, FLIP and overlay preview; measured 15,475 B + 4% headroom (CSS 458 B)."
     },
     "@texuli/primitives/alert-dialog": {
       "gzip": 13312,
@@ -554,16 +639,16 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/catalog/manifests/content": {
-      "gzip": 8704,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 8,317 B gzip, cap = measured + 4% headroom."
+      "gzip": 10112,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 8,317 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 9,670 B + 4% headroom; manifests carry events, bindable and prop schemas, and each group ships the validator's checks."
     },
     "@texuli/catalog/player": {
-      "gzip": 17536,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 16,826 B gzip, cap = measured + 4% headroom."
+      "gzip": 19712,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 16,826 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 18,920 B + 4% headroom; the player manifests gained the spec 0.3.0 fields."
     },
     "@texuli/catalog/validate": {
-      "gzip": 14784,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom."
+      "gzip": 16896,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate."
     },
     "@texuli/player": {
       "gzip": 79808,
@@ -606,12 +691,20 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 3,266 B CSS, cap = measured + 4% headroom."
     },
     "@texuli/spec": {
-      "gzip": 5632,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 5,357 B gzip, cap = measured + 4% headroom."
+      "gzip": 10560,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 5,357 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec 0.3.0 adds the interaction contract (state, closed actions, bindings, events) to the root; workflow validation and migrations moved to on-demand subpaths; measured 10,101 B + 4% headroom."
+    },
+    "@texuli/spec/workflow": {
+      "gzip": 3648,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-spec-standard): workflow graph validator, loaded only by hosts that render workflows; measured 3,460 B + 4% headroom."
+    },
+    "@texuli/spec/migrate": {
+      "gzip": 576,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec version migrations, loaded on demand; measured 503 B + 4% headroom."
     },
     "@texuli/spec/codegen": {
-      "gzip": 11072,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 10,644 B gzip, cap = measured + 4% headroom."
+      "gzip": 18624,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 10,644 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007 T-spec-standard): build-time only; 0.3.0 validators for the conformance harness; measured 17,904 B + 4% headroom."
     },
     "@texuli/charts/cartesian": {
       "gzip": 12736,
