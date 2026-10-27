@@ -170,7 +170,7 @@ test('keyboard: palette, JSON, outline moves, history, Tab order and F6 panes', 
     'true'
   );
   const rows = await page.getByRole('treeitem').count();
-  await search.fill('sortable list');
+  await search.fill('sortable-list');
   await expect(search).not.toHaveAttribute('aria-activedescendant', /.+/);
   await search.press('ArrowDown');
   await search.press('Enter');
