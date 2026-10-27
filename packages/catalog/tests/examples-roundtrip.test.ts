@@ -62,8 +62,42 @@ function stateNames(value: unknown, out = new Set<string>()): Set<string> {
   return out;
 }
 
+/** The state type each control example writes, declared under its `state` name. */
+const CONTROL_TYPES: Readonly<Record<string, Record<string, unknown>>> = {
+  'control-toggle': { type: 'boolean' },
+  'control-choice': { type: 'enum', values: ['this-week', 'last-week'] },
+  'control-slider': { type: 'number', min: 0, max: 10 },
+  'control-filter': { type: 'string' },
+};
+
+/** Fields and submits sit in a form (the state surface rule); examples are fragments. */
+const IN_FORM = new Set(['form-field', 'form-submit']);
+
+/**
+ * An example as a valid blueprint: the `$state` lists it reads, the variable a
+ * control or field writes, a flow for flow nodes, and a form around fields.
+ */
 function envelopeFor(id: string, example: string, props: Readonly<Record<string, unknown>>) {
-  const names = [...stateNames(props)];
+  const state: Record<string, unknown> = Object.fromEntries(
+    [...stateNames(props)].map((name) => [name, { type: 'list', maxItems: 50 }])
+  );
+  const name = typeof props.state === 'string' ? props.state : undefined;
+  const control = CONTROL_TYPES[id];
+  if (name && control) state[name] = control;
+  if (name && id === 'form-field')
+    state[name] =
+      props.kind === 'number' ? { type: 'number', min: 0, max: 100 } : { type: 'string' };
+  const flow =
+    id === 'flow-view'
+      ? { views: [props.name], initial: props.name, transitions: [] }
+      : id === 'flow-action'
+        ? {
+            views: ['start', 'end'],
+            initial: 'start',
+            transitions: [{ from: 'start', to: 'end', on: props.event }],
+          }
+        : undefined;
+  const node = { id, props };
   return {
     format: 'texuli-blueprint',
     version: 1,
@@ -74,10 +108,15 @@ function envelopeFor(id: string, example: string, props: Readonly<Record<string,
     updatedAt: '2026-10-27T09:00:00Z',
     generator: { kind: 'tool', name: 'examples round-trip' },
     spec: '0.3.0',
-    ...(names.length > 0
-      ? { state: Object.fromEntries(names.map((name) => [name, { type: 'list', maxItems: 50 }])) }
-      : {}),
-    tree: { id, props },
+    ...(Object.keys(state).length > 0 ? { state } : {}),
+    ...(flow ? { flow } : {}),
+    tree: IN_FORM.has(id)
+      ? {
+          id: 'action-form',
+          props: { action: 'send-request', label: 'Send request' },
+          children: [node],
+        }
+      : node,
   };
 }
 
@@ -112,9 +151,15 @@ describe('manifest examples round-trip', () => {
       const errors = result.diagnostics.filter((d) => d.severity === 'error');
       expect(errors, JSON.stringify(errors)).toEqual([]);
       expect(result.checks.spec).toBe('pass');
-      expect(result.roots[0]).toMatchObject({ kind: 'component', id: entry.id });
+      const wrapped = IN_FORM.has(entry.id);
+      expect(result.roots[0]).toMatchObject({
+        kind: 'component',
+        id: wrapped ? 'action-form' : entry.id,
+      });
 
-      const draft = result.draft as CatalogTreeInput;
+      const root = result.draft as CatalogTreeInput;
+      const draft = (wrapped ? root.children?.[0] : root) as CatalogTreeInput;
+      expect(draft.id).toBe(entry.id);
       const digest = await blueprintDigest(draft);
       expect(await blueprintDigest(JSON.parse(JSON.stringify(draft)))).toBe(digest);
       const reversed = { props: draft.props, id: draft.id } as CatalogTreeInput;

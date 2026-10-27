@@ -116,6 +116,12 @@ export interface PlayerReorder {
   list: readonly ListItem[];
   axis: 'vertical' | 'horizontal' | 'grid';
   group?: string;
+  /** Groups whose items this container takes, besides its own. */
+  accepts: readonly string[];
+  /** What leaving this container does to an item. */
+  pull: 'move' | 'clone' | 'none';
+  /** The bound list's declared `maxItems`. */
+  maxItems?: number;
   disabled: boolean;
   locked: readonly string[];
 }
@@ -140,8 +146,45 @@ export interface PlayerInteraction {
   write(path: string, prop: string, value: unknown): boolean;
   /** The node's reorder list and options, or `null` when it has none. */
   reorder(path: string): PlayerReorder | null;
+  /** Whether `move` would accept this move (the same rules, nothing changes). */
+  canMove(fromPath: string, item: string, toPath: string, index: number): boolean;
   /** Move an item from one reorder container to another (or within one), then run `on.move`. */
   move(fromPath: string, item: string, toPath: string, index: number): boolean;
+}
+
+const REORDER_SCOPE = Symbol('tx-player-reorder-scope');
+
+/** One reorder container as the shared drag scope sees it. */
+export interface ReorderScopeContainer {
+  /** The node path of the container (its `txPath`). */
+  path: string;
+  label: string;
+  info: PlayerReorder;
+}
+
+/**
+ * The player's shared drag scope: every `sortable-list` under one player
+ * registers its container here, so one drag session spans them and a drag
+ * between lists of one group runs the same `interaction.move` as the
+ * keyboard. Item keys are namespaced per container (`path/id`), so equal
+ * item ids in two lists never collide.
+ */
+export interface ReorderScope {
+  /** Register a container (read reactively; `null` while it has no list); returns the unregister function. */
+  register(container: () => ReorderScopeContainer | null): () => void;
+  /** The primitive's list id for a container path. */
+  listId(path: string): string;
+  /** The primitive's item key for an item of a container. */
+  itemKey(path: string, item: string): string;
+}
+
+export function setReorderScope(scope: ReorderScope): void {
+  setContext(REORDER_SCOPE, scope);
+}
+
+/** The enclosing player's drag scope, or `null` when none is mounted. */
+export function getReorderScope(): ReorderScope | null {
+  return getContext<ReorderScope | undefined>(REORDER_SCOPE) ?? null;
 }
 
 export function setPlayerInteraction(access: PlayerInteraction): void {

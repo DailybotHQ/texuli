@@ -607,6 +607,30 @@ local wrapper:
   never fetches, persists or posts it. A state change re-validates on the
   same handle, so loaded painters are kept.
 
+### Drag between lists (spec 0.3.0 `reorder`)
+
+A `sortable-list` paints its `reorder.bind` list variable. When the tree
+has a reorder container, the player lazily loads one shared drag scope (a
+single `Sortable.Root` around the painted tree, laid out with
+`display: contents`). Every list registers with it, so a pointer drag or a
+keyboard move (Space, arrows past a list's edge, Space) can carry an item
+to another list anywhere in the layout, in reading order.
+
+- **One rule set.** The scope adds no rule. Its drop verdict is the player's
+  `canMove`, a dry run of the same checks `move` commits: both containers
+  enabled, the target `accepts` the source `group` (or shares it), and the
+  closed `moveItem` reducer (`locked`, `pull` move, clone or none, the
+  list's `maxItems`). A drop runs `move`, which commits the state and then
+  the source's `on.move`. What a drag offers is exactly what the data move
+  does.
+- **No id collisions.** Item keys are namespaced per container, so equal
+  item ids in two lists never meet. Clones take the reducer's fresh id.
+- **Other pieces.** A `data-board` moves cards between its columns and
+  writes them to a bound `items` list. A `workflow-graph` in `edit` mode
+  adds palette node types to its canvas and writes the graph to a bound
+  `workflow` variable. The spec golden `lego.json` composes all three (see
+  `tests/lego.test.ts`).
+
 ### Conditional regions (G07)
 
 A node's `when` (a closed `Condition` from `@texuli/blocks/formula`; see the

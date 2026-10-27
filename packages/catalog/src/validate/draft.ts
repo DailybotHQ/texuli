@@ -268,7 +268,7 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
 
     // ── Interaction (spec 0.3.0) ─────────────────────────────
     // Bindings paint their first values; bind and on name closed sets.
-    const interaction = resolveInteraction(draft, envelope?.state, options.catalog);
+    const interaction = resolveInteraction(draft, envelope?.state, options.catalog, envelope);
     for (const issue of interaction.issues) {
       error('interaction', issue.code, issue.path, issue.message, issue.id);
     }

@@ -30,6 +30,15 @@ function envelope(tree: unknown, extra: Record<string, unknown> = {}) {
     tree,
   };
 }
+/** A flow declaring the views and events the flow nodes below use (the player refuses them otherwise). */
+const flow = {
+  views: ['a', 'b'],
+  initial: 'a',
+  transitions: [
+    { from: 'a', to: 'b', on: 'next' },
+    { from: 'a', to: 'b', on: 'e' },
+  ],
+};
 const run = (input: unknown, options: Partial<Parameters<typeof validateDraft>[1]> = {}) =>
   validateDraft(input, { catalog, frameRoots: false, ...options });
 const codes = (result: ReturnType<typeof run>) =>
@@ -148,11 +157,11 @@ describe('bindings, bind and on', () => {
         ],
       },
     };
-    expect(codes(run(envelope(toggle, { state })))).toEqual([]);
+    expect(codes(run(envelope(toggle, { state, flow })))).toEqual([]);
   });
 
   it('refuses undeclared names, unbindable props, unfired events and actions outside the closed set', () => {
-    const bad = (tree: unknown) => codes(run(envelope(tree, { state })));
+    const bad = (tree: unknown) => codes(run(envelope(tree, { state, flow })));
     expect(bad({ id: 'layout-tile', props: { title: { $state: 'ghost' } } })).toEqual([
       'interaction:unknown-state',
     ]);
@@ -257,5 +266,59 @@ describe('manifest format (events, bindable, schemas, deprecation)', () => {
     expect(schema({ $ref: '#/$defs/reorder', type: 'object' })).toEqual(['invalid-schema']);
     expect(schema({ items: {} })).toEqual(['invalid-schema', 'invalid-schema']);
     expect(schema({ type: 'string' }, 'string')).toEqual(['schema-unexpected']);
+  });
+});
+
+describe('the state surface, without a host spec check', () => {
+  const state = { query: { type: 'string' } };
+  const errors = (input: unknown) =>
+    run(input)
+      .diagnostics.filter((d) => d.severity === 'error')
+      .map((d) => `${d.code} ${d.path}`);
+
+  it('refuses control, bidirectional and invisible characters in list item text', () => {
+    const list = (label: string) =>
+      envelope(
+        { id: 'sortable-list', props: { label: 'Tasks', reorder: { bind: { $state: 'tasks' } } } },
+        { state: { tasks: { type: 'list', initial: [{ id: 't1', label }] } } }
+      );
+    for (const label of ['a\u202Eb', 'a\u2067b', 'a\u200Bb', 'a\uFEFFb', 'a\u0007b', 'a\u0085b']) {
+      expect(errors(list(label)), JSON.stringify(label)).toEqual([
+        'state state.tasks.initial[0].label',
+      ]);
+    }
+    // Joiners some scripts and emoji need stay allowed.
+    for (const label of ['Bug report', '👩\u200D💻', 'می\u200Cخواهم']) {
+      expect(errors(list(label)), JSON.stringify(label)).toEqual([]);
+    }
+  });
+
+  it('refuses forms, controls and flow nodes the player would refuse, at their paths', () => {
+    const page = (children: unknown[], extra: Record<string, unknown> = {}) =>
+      envelope({ id: 'layout-stack', props: {}, children }, extra);
+    expect(
+      errors(
+        page([{ id: 'form-field', props: { name: 'q', label: 'Q', state: 'query' } }], { state })
+      )
+    ).toEqual(['action 0.children.0']);
+    expect(errors(page([{ id: 'form-submit', props: { label: 'Go' } }], { state }))).toEqual([
+      'action 0.children.0',
+    ]);
+    expect(
+      errors(page([{ id: 'control-toggle', props: { label: 'T', state: 'query' } }], { state }))
+    ).toEqual(['binding 0.children.0']);
+    expect(errors(page([{ id: 'flow-view', props: { name: 'a' } }]))).toEqual([
+      'state 0.children.0',
+    ]);
+    // In a form, with a declared variable of its type, a field is fine.
+    const form = {
+      id: 'action-form',
+      props: { action: 'search', label: 'Search' },
+      children: [
+        { id: 'form-field', props: { name: 'q', label: 'Q', state: 'query' } },
+        { id: 'form-submit', props: { label: 'Go' } },
+      ],
+    };
+    expect(errors(page([form], { state }))).toEqual([]);
   });
 });

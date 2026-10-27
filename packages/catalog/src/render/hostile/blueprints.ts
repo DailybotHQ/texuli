@@ -126,6 +126,38 @@ export const HOSTILE_BLUEPRINTS: readonly HostileBlueprint[] = Object.freeze([
     refuse: ['prop-type'],
   },
   {
+    id: 'reorder-bidi-item',
+    category: 'bidi',
+    title: 'A right-to-left override in a draggable list item, spoofing a file extension',
+    state: {
+      tasks: { type: 'list', initial: [{ id: 't1', label: 'Invoice \u202Eexe.pdf' }] },
+    },
+    tree: {
+      id: 'sortable-list',
+      props: { label: 'Tasks', reorder: { bind: { $state: 'tasks' }, group: 'tasks' } },
+    },
+    refuse: ['state'],
+  },
+  {
+    id: 'reorder-zero-width-item',
+    category: 'bidi',
+    title: 'A zero-width space hiding inside a draggable list item',
+    state: { tasks: { type: 'list', initial: [{ id: 't1', label: 'Pay\u200Bnow' }] } },
+    tree: {
+      id: 'sortable-list',
+      props: { label: 'Tasks', reorder: { bind: { $state: 'tasks' } } },
+    },
+    refuse: ['state'],
+  },
+  {
+    id: 'form-field-outside-form',
+    category: 'unknown-action',
+    title: 'A form field outside any action-form (the player refuses it; so do the validators)',
+    state: { email: { type: 'string' } },
+    tree: { id: 'form-field', props: { name: 'email', label: 'Email', state: 'email' } },
+    refuse: ['action'],
+  },
+  {
     id: 'reorder-undeclared-list',
     category: 'reorder',
     title: 'reorder binds a list that is not declared',

@@ -1,11 +1,14 @@
 <script lang="ts">
 import { Sortable, type SortableContainer, type SortableMove } from '@texuli/primitives/sortable';
-import { getPlayerInteraction } from '../context.ts';
+import { getPlayerInteraction, getReorderScope } from '../context.ts';
 
 /**
  * `sortable-list` (spec 0.3.0 `reorder`): the items are the bound list
  * variable; a drag or keyboard move runs the closed `moveItem` reducer
- * through the player, then the node's `on.move` actions.
+ * through the player, then the node's `on.move` actions. Inside the
+ * player's shared drag scope the list joins its one `Sortable.Root`, so
+ * items cross to other lists the group rules allow; on its own it keeps a
+ * root of its own and reorders in place.
  */
 let {
   label,
@@ -21,9 +24,22 @@ let {
 } = $props();
 
 const interaction = getPlayerInteraction();
+const scope = getReorderScope();
 const info = $derived(txPath !== undefined ? (interaction?.reorder(txPath) ?? null) : null);
 const byId = $derived(new Map((info?.list ?? []).map((item) => [item.id, item])));
-const containerId = $derived(`list-${txPath ?? 'none'}`);
+const containerId = $derived(
+  scope && txPath !== undefined ? scope.listId(txPath) : `list-${txPath ?? 'none'}`
+);
+/** The item id behind a primitive key (namespaced inside the shared scope). */
+const itemOf = (key: string): string =>
+  scope && txPath !== undefined ? key.slice(scope.itemKey(txPath, '').length) : key;
+
+// Registered once per path; the scope reads `info` through the getter, so state changes flow in.
+$effect(() => {
+  const path = txPath;
+  if (!scope || path === undefined) return;
+  return scope.register(() => (info ? { path, label, info } : null));
+});
 const containers = $derived<SortableContainer[]>([
   {
     id: containerId,
@@ -47,24 +63,35 @@ function onMove(move: SortableMove): boolean {
 }
 </script>
 
+{#snippet list()}
+  <Sortable.List id={containerId} {label} class="tx-player-sortable__list">
+    {#snippet children({ items })}
+      {#each items as key (key)}
+        {@const id = itemOf(key)}
+        <Sortable.Item id={key} label={text(id, itemLabel) || id} class="tx-player-sortable__item">
+          <Sortable.Handle class="tx-player-sortable__handle">⠿</Sortable.Handle>
+          <span class="tx-player-sortable__text">
+            <span>{text(id, itemLabel) || id}</span>
+            {#if itemDetail && text(id, itemDetail)}
+              <small>{text(id, itemDetail)}</small>
+            {/if}
+          </span>
+        </Sortable.Item>
+      {/each}
+    {/snippet}
+  </Sortable.List>
+{/snippet}
+
 <div class="tx-player-sortable" data-axis={info?.axis ?? 'vertical'}>
-  <Sortable.Root {containers} {onMove}>
-    <Sortable.List id={containerId} {label} class="tx-player-sortable__list">
-      {#snippet children({ items })}
-        {#each items as id (id)}
-          <Sortable.Item {id} label={text(id, itemLabel) || id} class="tx-player-sortable__item">
-            <Sortable.Handle class="tx-player-sortable__handle">⠿</Sortable.Handle>
-            <span class="tx-player-sortable__text">
-              <span>{text(id, itemLabel) || id}</span>
-              {#if itemDetail && text(id, itemDetail)}
-                <small>{text(id, itemDetail)}</small>
-              {/if}
-            </span>
-          </Sortable.Item>
-        {/each}
-      {/snippet}
-    </Sortable.List>
-  </Sortable.Root>
+  {#if scope}
+    {#if info}
+      {@render list()}
+    {/if}
+  {:else}
+    <Sortable.Root {containers} {onMove}>
+      {@render list()}
+    </Sortable.Root>
+  {/if}
 </div>
 
 <style>

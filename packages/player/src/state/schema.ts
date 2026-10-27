@@ -29,6 +29,14 @@ export const MAX_ITEM_FIELDS = 16;
 export const ITEM_KEY = /^[A-Za-z0-9._:-]{1,64}$/;
 const ITEM_FIELD = /^[A-Za-z][A-Za-z0-9_]{0,31}$/;
 const MAX_ITEM_TEXT = 2000;
+/**
+ * List item text (spec `listText`): no C0 or C1 controls, bidirectional
+ * overrides or isolates, or invisible formatting characters (zero-width
+ * space, direction marks, word joiner, byte order mark…), so a draggable
+ * item never hides or reorders its text. ZWNJ and ZWJ stay allowed.
+ */
+export const LIST_TEXT =
+  /^[^\u0000-\u001f\u007f-\u009f\u061c\u180e\u200b\u200e\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]*$/u;
 
 /** One list item: an id and up to 16 scalar fields. */
 export type ListItem = Readonly<Record<string, string | number | boolean>> & {
@@ -213,7 +221,7 @@ export function coerceList(value: unknown, maxItems: number): readonly ListItem[
       const field = raw[key];
       if (key !== 'id' && !ITEM_FIELD.test(key)) return undefined;
       if (typeof field === 'string') {
-        if (field.length > MAX_ITEM_TEXT) return undefined;
+        if (field.length > MAX_ITEM_TEXT || !LIST_TEXT.test(field)) return undefined;
       } else if (typeof field === 'number') {
         if (!Number.isFinite(field)) return undefined;
       } else if (typeof field !== 'boolean') {

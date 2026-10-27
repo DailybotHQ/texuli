@@ -23,6 +23,7 @@ import {
   DATA_SOURCE_NAME,
   DEFAULT_STRING_LENGTH,
   ITEM_KEY,
+  LIST_TEXT,
   MAX_ENUM_VALUE_LENGTH,
   MAX_ENUM_VALUES,
   MAX_ITEM_FIELDS,
@@ -73,6 +74,7 @@ describe('the player mirrors the spec contract', () => {
     expect(STATE_BINDING_KEY).toBe(SPEC_STATE_BINDING_KEY);
     expect(DATA_BINDING_KEY).toBe('$data');
     expect(ITEM_KEY.source).toBe(SPEC_PATTERNS.itemKey);
+    expect(LIST_TEXT.source).toBe(SPEC_PATTERNS.listText);
     expect(FLOW_NAME.source).toBe(SPEC_PATTERNS.flowName);
     expect(ACTION_NAME.source).toBe(SPEC_PATTERNS.intentName);
     const data = new RegExp(SPEC_PATTERNS.dataName);

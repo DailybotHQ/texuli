@@ -650,6 +650,48 @@ function reorderOf(path: string) {
 const stringList = (value: unknown): readonly string[] =>
   Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : [];
 
+const pullOf = (value: unknown): 'move' | 'clone' | 'none' =>
+  value === 'clone' || value === 'none' ? value : 'move';
+
+/**
+ * The one reorder rule set (spec 0.3.0): both containers enabled, the target
+ * accepting the source's group across containers, and the closed `moveItem`
+ * reducer (locked, pull, maxItems). `null` when the move is refused. The UI
+ * drag asks it before a drop (`canMove`) and the move commits its result, so
+ * what a drag offers is exactly what `move` does.
+ */
+function planMove(fromPath: string, item: string, toPath: string, index: number) {
+  const source = reorderOf(fromPath);
+  const target = reorderOf(toPath);
+  if (!source || !target || source.reorder.disabled === true || target.reorder.disabled === true)
+    return null;
+  if (fromPath !== toPath) {
+    // Containers exchange items only when the target accepts the source's group.
+    const group = typeof source.reorder.group === 'string' ? source.reorder.group : undefined;
+    if (
+      group === undefined ||
+      !stringList(target.reorder.accepts)
+        .concat(typeof target.reorder.group === 'string' ? [target.reorder.group] : [])
+        .includes(group)
+    ) {
+      return null;
+    }
+  }
+  const declarations = split.kind === 'stateful' ? split.declarations : {};
+  const maxItems: Record<string, number> = {};
+  for (const name of [source.reorder.list, target.reorder.list]) {
+    const declaration = declarations[name];
+    if (declaration?.type === 'list') maxItems[name] = declaration.maxItems;
+  }
+  const moved = moveListItem(
+    { [source.reorder.list]: source.list, [target.reorder.list]: target.list },
+    maxItems,
+    { from: source.reorder.list, item, to: target.reorder.list, index },
+    { locked: stringList(source.reorder.locked), pull: pullOf(source.reorder.pull) }
+  );
+  return moved.ok ? { source, lists: moved.lists } : null;
+}
+
 setPlayerInteraction({
   dispatch(path, event, detail, form) {
     const actions = interactions.get(path)?.on?.[event];
@@ -666,55 +708,29 @@ setPlayerInteraction({
     const { reorder, list } = found;
     const axis =
       reorder.axis === 'horizontal' || reorder.axis === 'grid' ? reorder.axis : 'vertical';
+    const declaration = split.kind === 'stateful' ? split.declarations[reorder.list] : undefined;
     return {
       list,
       axis,
       ...(typeof reorder.group === 'string' ? { group: reorder.group } : {}),
+      accepts: stringList(reorder.accepts),
+      pull: pullOf(reorder.pull),
+      ...(declaration?.type === 'list' ? { maxItems: declaration.maxItems } : {}),
       disabled: reorder.disabled === true,
       locked: stringList(reorder.locked),
     };
   },
+  canMove: (fromPath, item, toPath, index) => planMove(fromPath, item, toPath, index) !== null,
   move(fromPath, item, toPath, index) {
-    const source = reorderOf(fromPath);
-    const target = reorderOf(toPath);
-    if (!source || !target || source.reorder.disabled === true || target.reorder.disabled === true)
-      return false;
-    if (fromPath !== toPath) {
-      // Containers exchange items only when the target accepts the source's group.
-      const group = typeof source.reorder.group === 'string' ? source.reorder.group : undefined;
-      if (
-        group === undefined ||
-        !stringList(target.reorder.accepts)
-          .concat(typeof target.reorder.group === 'string' ? [target.reorder.group] : [])
-          .includes(group)
-      ) {
-        return false;
-      }
-    }
-    const declarations = split.kind === 'stateful' ? split.declarations : {};
-    const maxItems: Record<string, number> = {};
-    for (const name of [source.reorder.list, target.reorder.list]) {
-      const declaration = declarations[name];
-      if (declaration?.type === 'list') maxItems[name] = declaration.maxItems;
-    }
-    const pull =
-      source.reorder.pull === 'clone' || source.reorder.pull === 'none'
-        ? source.reorder.pull
-        : 'move';
-    const moved = moveListItem(
-      { [source.reorder.list]: source.list, [target.reorder.list]: target.list },
-      maxItems,
-      { from: source.reorder.list, item, to: target.reorder.list, index },
-      { locked: stringList(source.reorder.locked), pull }
-    );
-    if (!moved.ok) {
+    const planned = planMove(fromPath, item, toPath, index);
+    if (!planned) {
       announcePolite(resolvedLabels.actionRefused);
       return false;
     }
     const next: Record<string, StateValue> = { ...stateValues };
-    for (const [name, list] of Object.entries(moved.lists)) next[name] = list;
+    for (const [name, list] of Object.entries(planned.lists)) next[name] = list;
     commitSnapshot(Object.freeze(next));
-    const actions = source.node?.on?.move;
+    const actions = planned.source.node?.on?.move;
     if (actions) runNodeActions(actions, 'move', undefined, null);
     return true;
   },
@@ -808,6 +824,16 @@ let paintNodes = $derived.by(() => {
   playerState;
   loadRevision;
   return player?.paintNow(adapter) ?? [];
+});
+
+// The shared drag scope (spec 0.3.0 reorder), loaded only when a node reorders.
+let hasReorder = $derived([...interactions.values()].some((node) => node.reorder !== undefined));
+let ReorderScope = $state.raw<Component<{ children: Snippet }> | null>(null);
+$effect(() => {
+  if (!hasReorder || ReorderScope !== null) return;
+  void import('./painters/ReorderScope.svelte').then((module) => {
+    ReorderScope = module.default;
+  });
 });
 
 function countKind(nodes: readonly PlayerPaintNode[], kind: PlayerPaintNode['kind']): number {
@@ -1007,6 +1033,12 @@ $effect(() => {
 });
 </script>
 
+
+{#snippet painted()}
+  {#each paintNodes as node (node.path)}
+    <PlayerNode {node} {onNodeError} />
+  {/each}
+{/snippet}
 <section
   bind:this={root}
   class="tx-player"
@@ -1071,9 +1103,12 @@ $effect(() => {
       onclick={onSurfaceClick}
       onsubmit={onSurfaceSubmit}
     >
-      {#each paintNodes as node (node.path)}
-        <PlayerNode {node} {onNodeError} />
-      {/each}
+      {#if !hasReorder}
+        {@render painted()}
+      {:else if ReorderScope}
+        <!-- One drag scope for every reorder container (lists of a group exchange items). -->
+        <ReorderScope children={painted} />
+      {/if}
     </div>
     {#if !playerState.validation.ok}
       <p class="tx-player__preview-warning">

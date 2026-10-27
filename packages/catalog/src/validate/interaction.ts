@@ -8,6 +8,7 @@
  * replaced by their first-paint values so the renderer checks the props a
  * person will actually see. Never evaluates anything.
  */
+import { checkStateSurface, LIST_TEXT_PATTERN, surfaceInputs } from '@texuli/spec/surface';
 import type { CatalogTreeInput, RenderCatalog } from '../render/renderer/types.ts';
 
 /** The closed action ops and the fields each takes (mirrors spec `ACTION_FIELDS`). */
@@ -26,7 +27,7 @@ export const INTERACTION_ACTION_FIELDS: Readonly<
 export const MAX_ACTIONS_PER_EVENT = 8;
 
 export interface InteractionIssue {
-  code: 'unknown-state' | 'binding' | 'unknown-event' | 'action';
+  code: 'unknown-state' | 'binding' | 'unknown-event' | 'action' | 'state';
   path: string;
   message: string;
   id?: string;
@@ -92,7 +93,8 @@ function hostPlaceholder(
 export function resolveInteraction(
   draft: CatalogTreeInput | readonly CatalogTreeInput[],
   state: unknown,
-  catalog: RenderCatalog
+  catalog: RenderCatalog,
+  envelope?: unknown
 ): { tree: CatalogTreeInput | CatalogTreeInput[]; issues: InteractionIssue[] } {
   const issues: InteractionIssue[] = [];
   const declared: Bag = isBag(state) ? state : {};
@@ -283,5 +285,40 @@ export function resolveInteraction(
   const tree = Array.isArray(draft)
     ? draft.map((root, i) => visit(root, String(i)))
     : visit(draft as CatalogTreeInput, '0');
+
+  // List item text (spec `listText`): a draggable item never hides or reorders its text.
+  for (const [name, declaration] of Object.entries(declared)) {
+    if (!isBag(declaration) || declaration.type !== 'list') continue;
+    const items = Array.isArray(declaration.initial) ? declaration.initial : [];
+    items.forEach((item, i) => {
+      if (!isBag(item)) return;
+      for (const [key, field] of Object.entries(item)) {
+        if (typeof field === 'string' && !LIST_TEXT.test(field)) {
+          report(
+            'state',
+            `state.${name}.initial[${i}].${key}`,
+            'Item text cannot hold control, bidirectional or invisible formatting characters.'
+          );
+        }
+      }
+    });
+  }
+
+  // The state surface's node rules (spec `checkStateSurface`, as the player
+  // refuses them). An envelope carries its own state and flow; a bare tree's
+  // context is its host's, which checks it at paint time.
+  if (isBag(envelope)) {
+    const inputs = surfaceInputs(envelope);
+    const roots = Array.isArray(draft) ? draft : [draft];
+    roots.forEach((root, r) => {
+      for (const issue of checkStateSurface(root, inputs)) {
+        const path = `${r}${issue.at.map((index) => `.children.${index}`).join('')}`;
+        report(issue.code, path, issue.message);
+      }
+    });
+  }
   return { tree, issues };
 }
+
+/** The spec's list item text rule, compiled once. */
+const LIST_TEXT = new RegExp(LIST_TEXT_PATTERN, 'u');
