@@ -502,6 +502,9 @@ export function commandContext(repoRoot: string): CommandContext {
     JSON.parse(readFileSync(path, 'utf8')) as Record<string, unknown>;
   const rootPackage = readJson(join(repoRoot, 'package.json'));
   const packageScripts = new Map<string, Set<string>>();
+  // Binaries the workspace packages publish (`bin`): what a consumer's
+  // `npx <bin>` runs after installing that package, so they are real.
+  const publishedBins = new Set<string>();
   for (const parent of ['packages', 'apps']) {
     const dir = join(repoRoot, parent);
     if (!existsSync(dir)) continue;
@@ -510,6 +513,9 @@ export function commandContext(repoRoot: string): CommandContext {
       if (!existsSync(manifest)) continue;
       const pkg = readJson(manifest);
       packageScripts.set(String(pkg.name), new Set(Object.keys((pkg.scripts as object) ?? {})));
+      if (pkg.bin && typeof pkg.bin === 'object') {
+        for (const bin of Object.keys(pkg.bin)) publishedBins.add(bin);
+      }
     }
   }
   const binDir = join(repoRoot, 'node_modules', '.bin');
@@ -518,7 +524,7 @@ export function commandContext(repoRoot: string): CommandContext {
     repoRoot,
     rootScripts: new Set(Object.keys((rootPackage.scripts as object) ?? {})),
     packageScripts,
-    bins: new Set(existsSync(binDir) ? readdirSync(binDir) : []),
+    bins: new Set([...(existsSync(binDir) ? readdirSync(binDir) : []), ...publishedBins]),
     setupFlags: new Set(
       existsSync(setup) ? (readFileSync(setup, 'utf8').match(/--[a-z][a-z-]*/g) ?? []) : []
     ),
