@@ -88,160 +88,168 @@ const criticals = (result: { findings: { severity: string; category: string }[] 
   result.findings.filter((finding) => finding.severity === 'critical');
 
 describe('auditSite on a green fixture dist', () => {
-  it('finds zero criticals and records the planned T-09 targets', () => {
-    const result = auditSite(greenSite());
-    expect(criticals(result).map((finding) => `${finding.category}: ${finding.detail}`)).toEqual(
-      []
-    );
-    expect(result.summary.findings.critical).toBe(0);
-    expect(result.summary.findings.planned).toBe(4);
-    expect(result.summary.byCategory.Twitter?.planned).toBe(1);
-    expect(result.summary.pages).toEqual({ total: 3, indexed: 3, noindex: 0 });
-  });
-
-  it('renders a green verdict and the planned section', () => {
-    const report = renderMarkdown(auditSite(greenSite()));
-    expect(report).toContain('GREEN — every shipped category holds');
-    expect(report).toContain('twitter:site');
-    expect(report).toContain('## Findings');
+  it('finds zero criticals and records the planned T-09 targets; renders a green verdict and the planned section', () => {
+    // finds zero criticals and records the planned T-09 targets
+    {
+      const result = auditSite(greenSite());
+      expect(criticals(result).map((finding) => `${finding.category}: ${finding.detail}`)).toEqual(
+        []
+      );
+      expect(result.summary.findings.critical).toBe(0);
+      expect(result.summary.findings.planned).toBe(4);
+      expect(result.summary.byCategory.Twitter?.planned).toBe(1);
+      expect(result.summary.pages).toEqual({ total: 3, indexed: 3, noindex: 0 });
+    }
+    // renders a green verdict and the planned section
+    {
+      const report = renderMarkdown(auditSite(greenSite()));
+      expect(report).toContain('GREEN — every shipped category holds');
+      expect(report).toContain('twitter:site');
+      expect(report).toContain('## Findings');
+    }
   });
 });
 
 describe('auditSite page checks', () => {
-  it('flags a missing canonical and a canonical that does not self-reference', () => {
-    const site = greenSite();
-    site.pages[1]!.html = site.pages[1]!.html.replace(/<link rel="canonical" href="[^"]*">/, '');
-    expect(
-      criticals(auditSite(site)).some(
-        (finding) => finding.category === 'Canonical' && finding.detail.includes('missing')
-      )
-    ).toBe(true);
-    const site2 = greenSite();
-    site2.pages[1]!.html = site2.pages[1]!.html.replace(
-      'https://texuli.com/guides/theming/',
-      'https://texuli.com/guides/other/'
-    );
-    expect(
-      criticals(auditSite(site2)).some(
-        (finding) =>
-          finding.category === 'Canonical' && finding.detail.includes('does not self-reference')
-      )
-    ).toBe(true);
-  });
+  it('flags a missing canonical and a canonical that does not self-reference; compares the decoded text: an escaped apostrophe in <title> matches the raw og:title; flags missing description, missing og:image and a cross-bound og:title; flags unparseable JSON-LD and the shipped graph scopes; flags a missing or wrong-size OG art and keeps title length a warning; skips noindex pages as indexed but keeps them out of the sitemap; warns on duplicate descriptions instead of failing the run', () => {
+    // flags a missing canonical and a canonical that does not self-reference
+    {
+      const site = greenSite();
+      site.pages[1]!.html = site.pages[1]!.html.replace(/<link rel="canonical" href="[^"]*">/, '');
+      expect(
+        criticals(auditSite(site)).some(
+          (finding) => finding.category === 'Canonical' && finding.detail.includes('missing')
+        )
+      ).toBe(true);
+      const site2 = greenSite();
+      site2.pages[1]!.html = site2.pages[1]!.html.replace(
+        'https://texuli.com/guides/theming/',
+        'https://texuli.com/guides/other/'
+      );
+      expect(
+        criticals(auditSite(site2)).some(
+          (finding) =>
+            finding.category === 'Canonical' && finding.detail.includes('does not self-reference')
+        )
+      ).toBe(true);
+    }
+    // compares the decoded text: an escaped apostrophe in <title> matches the raw og:title
+    {
+      // Astro escapes `'` as `&#39;` in element text but not in attribute
+      // values; both mean the same string (T-98: /web-and-native/ false red).
+      const site = greenSite();
+      site.pages[1]!.html = site.pages[1]!.html.replace(
+        /<title>[^<]*<\/title>/,
+        '<title>Texuli&#39;s architecture &amp; seam · Texuli</title>'
+      ).replace(
+        /<meta property="og:title" content="[^"]*">/,
+        `<meta property="og:title" content="Texuli's architecture &amp; seam · Texuli">`
+      );
+      const opengraph = criticals(auditSite(site)).filter(
+        (finding) => finding.category === 'Open Graph'
+      );
+      expect(opengraph).toEqual([]);
+    }
+    // flags missing description, missing og:image and a cross-bound og:title
+    {
+      const site = greenSite();
+      site.pages[1]!.html = site.pages[1]!.html.replace(/<meta name="description"[^>]*>/, '');
+      const site2 = greenSite();
+      site2.pages[1]!.html = site2.pages[1]!.html.replace(
+        /<meta property="og:image" content="[^"]*">/,
+        ''
+      );
+      const site3 = greenSite();
+      site3.pages[1]!.html = site3.pages[1]!.html.replace(
+        /<meta property="og:title" content="[^"]*">/,
+        '<meta property="og:title" content="Other">'
+      );
+      const results = [auditSite(site), auditSite(site2), auditSite(site3)].map(criticals);
+      expect(
+        results[0]!.some(
+          (finding) =>
+            finding.category === 'Meta' && finding.detail.includes('missing meta description')
+        )
+      ).toBe(true);
+      expect(
+        results[1]!.some(
+          (finding) =>
+            finding.category === 'Open Graph' && finding.detail.includes('missing og:image')
+        )
+      ).toBe(true);
+      expect(
+        results[2]!.some(
+          (finding) =>
+            finding.category === 'Open Graph' && finding.detail.includes('differs from <title>')
+        )
+      ).toBe(true);
+    }
+    // flags unparseable JSON-LD and the shipped graph scopes
+    {
+      const broken = greenSite();
+      broken.pages[1]!.html = broken.pages[1]!.html.replace(BREADCRUMB_JSONLD, '{"@context":');
+      const categories = criticals(auditSite(broken)).filter(
+        (finding) => finding.category === 'JSON-LD'
+      );
+      expect(categories.some((finding) => finding.detail.includes('does not parse'))).toBe(true);
+      expect(categories.some((finding) => finding.detail.includes('BreadcrumbList'))).toBe(true);
 
-  it('compares the decoded text: an escaped apostrophe in <title> matches the raw og:title', () => {
-    // Astro escapes `'` as `&#39;` in element text but not in attribute
-    // values; both mean the same string (T-98: /web-and-native/ false red).
-    const site = greenSite();
-    site.pages[1]!.html = site.pages[1]!.html.replace(
-      /<title>[^<]*<\/title>/,
-      '<title>Texuli&#39;s architecture &amp; seam · Texuli</title>'
-    ).replace(
-      /<meta property="og:title" content="[^"]*">/,
-      `<meta property="og:title" content="Texuli's architecture &amp; seam · Texuli">`
-    );
-    const opengraph = criticals(auditSite(site)).filter(
-      (finding) => finding.category === 'Open Graph'
-    );
-    expect(opengraph).toEqual([]);
-  });
+      const noGraph = greenSite();
+      noGraph.pages[0]!.html = noGraph.pages[0]!.html.replace(LANDING_JSONLD, BREADCRUMB_JSONLD);
+      expect(
+        criticals(auditSite(noGraph)).some((finding) => finding.detail.includes('WebSite graph'))
+      ).toBe(true);
+    }
+    // flags a missing or wrong-size OG art and keeps title length a warning
+    {
+      const missing = greenSite();
+      missing.readAsset = () => null;
+      expect(
+        criticals(auditSite(missing)).some(
+          (finding) => finding.category === 'OG art' && finding.detail.includes('missing')
+        )
+      ).toBe(true);
+      const wrong = greenSite();
+      wrong.readAsset = () => pngHeader(600, 315);
+      expect(
+        criticals(auditSite(wrong)).some((finding) => finding.detail.includes('600×315'))
+      ).toBe(true);
 
-  it('flags missing description, missing og:image and a cross-bound og:title', () => {
-    const site = greenSite();
-    site.pages[1]!.html = site.pages[1]!.html.replace(/<meta name="description"[^>]*>/, '');
-    const site2 = greenSite();
-    site2.pages[1]!.html = site2.pages[1]!.html.replace(
-      /<meta property="og:image" content="[^"]*">/,
-      ''
-    );
-    const site3 = greenSite();
-    site3.pages[1]!.html = site3.pages[1]!.html.replace(
-      /<meta property="og:title" content="[^"]*">/,
-      '<meta property="og:title" content="Other">'
-    );
-    const results = [auditSite(site), auditSite(site2), auditSite(site3)].map(criticals);
-    expect(
-      results[0]!.some(
-        (finding) =>
-          finding.category === 'Meta' && finding.detail.includes('missing meta description')
-      )
-    ).toBe(true);
-    expect(
-      results[1]!.some(
-        (finding) =>
-          finding.category === 'Open Graph' && finding.detail.includes('missing og:image')
-      )
-    ).toBe(true);
-    expect(
-      results[2]!.some(
-        (finding) =>
-          finding.category === 'Open Graph' && finding.detail.includes('differs from <title>')
-      )
-    ).toBe(true);
-  });
-
-  it('flags unparseable JSON-LD and the shipped graph scopes', () => {
-    const broken = greenSite();
-    broken.pages[1]!.html = broken.pages[1]!.html.replace(BREADCRUMB_JSONLD, '{"@context":');
-    const categories = criticals(auditSite(broken)).filter(
-      (finding) => finding.category === 'JSON-LD'
-    );
-    expect(categories.some((finding) => finding.detail.includes('does not parse'))).toBe(true);
-    expect(categories.some((finding) => finding.detail.includes('BreadcrumbList'))).toBe(true);
-
-    const noGraph = greenSite();
-    noGraph.pages[0]!.html = noGraph.pages[0]!.html.replace(LANDING_JSONLD, BREADCRUMB_JSONLD);
-    expect(
-      criticals(auditSite(noGraph)).some((finding) => finding.detail.includes('WebSite graph'))
-    ).toBe(true);
-  });
-
-  it('flags a missing or wrong-size OG art and keeps title length a warning', () => {
-    const missing = greenSite();
-    missing.readAsset = () => null;
-    expect(
-      criticals(auditSite(missing)).some(
-        (finding) => finding.category === 'OG art' && finding.detail.includes('missing')
-      )
-    ).toBe(true);
-    const wrong = greenSite();
-    wrong.readAsset = () => pngHeader(600, 315);
-    expect(criticals(auditSite(wrong)).some((finding) => finding.detail.includes('600×315'))).toBe(
-      true
-    );
-
-    const long = greenSite();
-    long.pages[1] = greenPage('/guides/theming/', `Texuli — ${'x'.repeat(90)}`);
-    const result = auditSite(long);
-    expect(criticals(result).length).toBe(0);
-    expect(result.summary.findings.warning).toBeGreaterThanOrEqual(1);
-  });
-
-  it('skips noindex pages as indexed but keeps them out of the sitemap', () => {
-    const site = greenSite();
-    const preview = greenPage('/examples/preview/harbor/');
-    preview.noindex = true;
-    site.pages.push(preview);
-    const result = auditSite(site);
-    expect(result.summary.pages).toEqual({ total: 4, indexed: 3, noindex: 1 });
-    expect(criticals(result).length).toBe(0);
-  });
-
-  it('warns on duplicate descriptions instead of failing the run', () => {
-    const site = greenSite();
-    const twin = greenPage('/guides/rtl/', 'Texuli — twin');
-    twin.html = twin.html.replace(
-      /A unique honest description for [^"]+/,
-      'Shared description text for twins'
-    );
-    const original = greenPage('/guides/other/', 'Texuli — other');
-    original.html = original.html.replace(
-      /A unique honest description for [^"]+/,
-      'Shared description text for twins'
-    );
-    site.pages.push(twin, original);
-    const warnings = auditSite(site).findings.filter((finding) => finding.severity === 'warning');
-    expect(warnings.some((finding) => finding.detail.includes('duplicate description'))).toBe(true);
+      const long = greenSite();
+      long.pages[1] = greenPage('/guides/theming/', `Texuli — ${'x'.repeat(90)}`);
+      const result = auditSite(long);
+      expect(criticals(result).length).toBe(0);
+      expect(result.summary.findings.warning).toBeGreaterThanOrEqual(1);
+    }
+    // skips noindex pages as indexed but keeps them out of the sitemap
+    {
+      const site = greenSite();
+      const preview = greenPage('/examples/preview/harbor/');
+      preview.noindex = true;
+      site.pages.push(preview);
+      const result = auditSite(site);
+      expect(result.summary.pages).toEqual({ total: 4, indexed: 3, noindex: 1 });
+      expect(criticals(result).length).toBe(0);
+    }
+    // warns on duplicate descriptions instead of failing the run
+    {
+      const site = greenSite();
+      const twin = greenPage('/guides/rtl/', 'Texuli — twin');
+      twin.html = twin.html.replace(
+        /A unique honest description for [^"]+/,
+        'Shared description text for twins'
+      );
+      const original = greenPage('/guides/other/', 'Texuli — other');
+      original.html = original.html.replace(
+        /A unique honest description for [^"]+/,
+        'Shared description text for twins'
+      );
+      site.pages.push(twin, original);
+      const warnings = auditSite(site).findings.filter((finding) => finding.severity === 'warning');
+      expect(warnings.some((finding) => finding.detail.includes('duplicate description'))).toBe(
+        true
+      );
+    }
   });
 });
 
@@ -325,36 +333,36 @@ describe('auditSite robots checks', () => {
 });
 
 describe('pure extractors', () => {
-  it('leaves character references beyond U+10FFFF undecoded instead of throwing (T-100 P2-4)', () => {
-    expect(() => decodeEntities('A &#x110000; B')).not.toThrow();
-    expect(decodeEntities('A &#x110000; B &#1114112; C')).toBe('A &#x110000; B &#1114112; C');
-    expect(decodeEntities('&#x10FFFF;')).toBe(String.fromCodePoint(0x10ffff));
-    expect(decodeEntities('&#39;&#x27;&amp;')).toBe("''&");
-    // One hostile reference in a title or meta must not abort the whole audit.
-    const site = greenSite();
-    site.pages[1]!.html = site.pages[1]!.html.replace('<title>', '<title>&#x110000; ').replace(
-      'content="A unique',
-      'content="&#x110000; A unique'
-    );
-    expect(() => auditSite(site)).not.toThrow();
-  });
-
-  it('matches the shipped path and image conventions', () => {
+  it('leaves character references beyond U+10FFFF undecoded instead of throwing (T-100 P2-4); matches the shipped path and image conventions; extracts meta, canonical, blocks and PNG dimensions', () => {
+    // leaves character references beyond U+10FFFF undecoded instead of throwing (T-100 P2-4)
+    {
+      expect(() => decodeEntities('A &#x110000; B')).not.toThrow();
+      expect(decodeEntities('A &#x110000; B &#1114112; C')).toBe('A &#x110000; B &#1114112; C');
+      expect(decodeEntities('&#x10FFFF;')).toBe(String.fromCodePoint(0x10ffff));
+      expect(decodeEntities('&#39;&#x27;&amp;')).toBe("''&");
+      // One hostile reference in a title or meta must not abort the whole audit.
+      const site = greenSite();
+      site.pages[1]!.html = site.pages[1]!.html.replace('<title>', '<title>&#x110000; ').replace(
+        'content="A unique',
+        'content="&#x110000; A unique'
+      );
+      expect(() => auditSite(site)).not.toThrow();
+    }
     expect(normalizePagePath('guides/theming')).toBe('/guides/theming/');
     expect(normalizePagePath('/index.html')).toBe('/');
     expect(ogImageFile('/')).toBe('og/index.png');
     expect(ogImageFile('/guides/theming/')).toBe('og/guides/theming.png');
-  });
-
-  it('extracts meta, canonical, blocks and PNG dimensions', () => {
-    const page = greenPage('/');
-    expect(metaContent(page.html, 'description')).toContain('unique honest description');
-    expect(canonicalOf(page.html)).toBe('https://texuli.com/');
-    expect(jsonLdBlocks(page.html)).toHaveLength(1);
-    expect(isNoindex(page.html)).toBe(false);
-    expect(pngSize(pngHeader(1200, 630))).toEqual({ width: 1200, height: 630 });
-    expect(pngSize(Buffer.from('not a png'))).toBeNull();
-    expect(pngSize(null)).toBeNull();
+    // extracts meta, canonical, blocks and PNG dimensions
+    {
+      const page = greenPage('/');
+      expect(metaContent(page.html, 'description')).toContain('unique honest description');
+      expect(canonicalOf(page.html)).toBe('https://texuli.com/');
+      expect(jsonLdBlocks(page.html)).toHaveLength(1);
+      expect(isNoindex(page.html)).toBe(false);
+      expect(pngSize(pngHeader(1200, 630))).toEqual({ width: 1200, height: 630 });
+      expect(pngSize(Buffer.from('not a png'))).toBeNull();
+      expect(pngSize(null)).toBeNull();
+    }
   });
 });
 

@@ -498,72 +498,75 @@ async function runSeed(seed: number, tally: Tally): Promise<void> {
 }
 
 describe('builder round-trip property (Task 72)', () => {
-  it(`holds for ${SEEDS} seeded sequences of ${STEPS} steps`, async () => {
-    const tally: Tally = {};
-    for (let seed = 1; seed <= SEEDS; seed += 1) await runSeed(seed, tally);
-    // TEXULI_PROPERTY_TALLY=1 prints how often each step kind ran.
-    if (process.env.TEXULI_PROPERTY_TALLY) console.log(JSON.stringify(tally));
-    // The generator really exercised every kind of step (deterministic per seed set).
-    for (const kind of [
-      'insert',
-      'remove',
-      'move',
-      'group-move',
-      'group-drop',
-      'group-remove',
-      'duplicate',
-      'paste',
-      'inspector',
-      'json',
-      'undo',
-      'playerValid',
-    ]) {
-      expect(tally[kind] ?? 0, `${kind} ran`).toBeGreaterThan(0);
-    }
-    expect(
-      Object.keys(tally).filter((kind) => kind.startsWith('json-refused:')).length,
-      'hostile kinds covered'
-    ).toBeGreaterThanOrEqual(5);
-  }, 120_000);
-
-  it('pins the counterexample it found: the history refuses node shapes the panel refuses', () => {
-    // Seed 1 committed `{ ..., "when": { "op": "gt" } }` past the panel: the history accepted it.
-    const page = { id: 'layout-page', props: { title: 'Fictional' }, children: [] };
-    for (const hostile of [
-      { ...page, when: { op: 'gt' } },
-      { ...page, slot: 'hero' },
-      { ...page, props: [] },
-      { ...page, children: { 0: { id: 'blocks-text' } } },
-    ]) {
-      const history = createBuilderHistory();
-      expect(
-        history.apply({ op: 'replaceAll', tree: hostile as never }).ok,
-        JSON.stringify(hostile)
-      ).toBe(false);
-      expect(validateBuilderTree(hostile), JSON.stringify(hostile)).toBe(false);
-      expect(builderTreeIssues(hostile).length, JSON.stringify(hostile)).toBeGreaterThan(0);
-    }
-  });
-
-  it('is deterministic: the same seed gives the same final tree', async () => {
-    const finalTree = async (seed: number) => {
-      const rng = generator(seed);
-      const history = createBuilderHistory();
-      for (let i = 0; i < 12; i += 1) {
-        const op = inspectorOp(rng, history.tree);
-        if (op) history.apply(op);
-        const containers = nodes(history.tree).filter(({ node }) => canContain(node.id));
-        const { path } = rng.pick(containers);
-        history.apply({
-          op: 'insert',
-          parent: path,
-          index: 0,
-          node: { id: 'blocks-text', props: { block: textBlock(rng) }, children: [] },
-        });
+  it(`holds for ${SEEDS} seeded sequences of ${STEPS} steps, pins its counterexample, and is deterministic`, async () => {
+    // holds for ${SEEDS} seeded sequences of ${STEPS} steps
+    {
+      const tally: Tally = {};
+      for (let seed = 1; seed <= SEEDS; seed += 1) await runSeed(seed, tally);
+      // TEXULI_PROPERTY_TALLY=1 prints how often each step kind ran.
+      if (process.env.TEXULI_PROPERTY_TALLY) console.log(JSON.stringify(tally));
+      // The generator really exercised every kind of step (deterministic per seed set).
+      for (const kind of [
+        'insert',
+        'remove',
+        'move',
+        'group-move',
+        'group-drop',
+        'group-remove',
+        'duplicate',
+        'paste',
+        'inspector',
+        'json',
+        'undo',
+        'playerValid',
+      ]) {
+        expect(tally[kind] ?? 0, `${kind} ran`).toBeGreaterThan(0);
       }
-      return canonical(history.tree);
-    };
-    expect(await finalTree(7)).toBe(await finalTree(7));
-    expect(await finalTree(7)).not.toBe(await finalTree(8));
-  });
+      expect(
+        Object.keys(tally).filter((kind) => kind.startsWith('json-refused:')).length,
+        'hostile kinds covered'
+      ).toBeGreaterThanOrEqual(5);
+    }
+    // pins the counterexample it found: the history refuses node shapes the panel refuses
+    {
+      // Seed 1 committed `{ ..., "when": { "op": "gt" } }` past the panel: the history accepted it.
+      const page = { id: 'layout-page', props: { title: 'Fictional' }, children: [] };
+      for (const hostile of [
+        { ...page, when: { op: 'gt' } },
+        { ...page, slot: 'hero' },
+        { ...page, props: [] },
+        { ...page, children: { 0: { id: 'blocks-text' } } },
+      ]) {
+        const history = createBuilderHistory();
+        expect(
+          history.apply({ op: 'replaceAll', tree: hostile as never }).ok,
+          JSON.stringify(hostile)
+        ).toBe(false);
+        expect(validateBuilderTree(hostile), JSON.stringify(hostile)).toBe(false);
+        expect(builderTreeIssues(hostile).length, JSON.stringify(hostile)).toBeGreaterThan(0);
+      }
+    }
+    // is deterministic: the same seed gives the same final tree
+    {
+      const finalTree = async (seed: number) => {
+        const rng = generator(seed);
+        const history = createBuilderHistory();
+        for (let i = 0; i < 12; i += 1) {
+          const op = inspectorOp(rng, history.tree);
+          if (op) history.apply(op);
+          const containers = nodes(history.tree).filter(({ node }) => canContain(node.id));
+          const { path } = rng.pick(containers);
+          history.apply({
+            op: 'insert',
+            parent: path,
+            index: 0,
+            node: { id: 'blocks-text', props: { block: textBlock(rng) }, children: [] },
+          });
+        }
+        return canonical(history.tree);
+      };
+      expect(await finalTree(7)).toBe(await finalTree(7));
+      expect(await finalTree(7)).not.toBe(await finalTree(8));
+    }
+  }, 120000);
 });

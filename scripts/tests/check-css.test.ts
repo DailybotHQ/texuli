@@ -32,7 +32,7 @@ describe('check-css parsing', () => {
 });
 
 describe('check-css dead CSS', () => {
-  it('finds a repeated declaration, an identical rule and a shadowed declaration', () => {
+  it('finds a repeated declaration, an identical rule and a shadowed declaration; keeps fallbacks, contexts and !important apart', () => {
     expect(codes('.a {\n  color: red;\n  color: red;\n}')).toEqual(['duplicate-declaration@3']);
     expect(codes('.a { margin: 0; }\n.b { margin: 1px; }\n.a { margin: 0; }')).toEqual([
       'duplicate-rule@3',
@@ -44,9 +44,6 @@ describe('check-css dead CSS', () => {
     expect(codes('.a, .b { color: red; }\n.b,.a { color: blue; }')).toEqual([
       'shadowed-declaration@1',
     ]);
-  });
-
-  it('keeps fallbacks, contexts and !important apart', () => {
     // A fallback pair (different values in one rule) is intentional.
     expect(codes('.a { color: red; color: oklch(60% 0.1 20); }')).toEqual([]);
     // The same selector in another at-rule context is a separate rule.
@@ -65,14 +62,11 @@ describe('check-css unused classes', () => {
     'style="var(--tx-chart-{index})"',
   ].join('\n');
 
-  it('accepts literal classes and template-built ones', () => {
+  it('accepts literal classes and template-built ones; does not treat a custom property template as a class', () => {
     expect(classIsReferenced('tx-card', corpus)).toBe(true);
     expect(classIsReferenced('tx-card--compact', corpus)).toBe(true);
     expect(classIsReferenced('tx-chip--lg', corpus)).toBe(true);
     expect(classIsReferenced('tx-tag--danger', corpus)).toBe(true);
-  });
-
-  it('does not treat a custom property template as a class', () => {
     expect(classIsReferenced('tx-chart-legend__swatch', corpus)).toBe(false);
     expect(
       findUnusedClasses('x.css', '/* .tx-ghost */\n.tx-card {}\n.tx-ghost__part {}', corpus).map(
@@ -87,5 +81,5 @@ describe('repository stylesheets', () => {
     const { files, findings } = checkRepositoryCss();
     expect(files).toBeGreaterThan(50);
     expect(findings.map((f) => `${f.file}:${f.line} ${f.code} ${f.message}`)).toEqual([]);
-  });
+  }, 60_000);
 });

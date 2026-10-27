@@ -87,191 +87,206 @@ const criticals = (result: {
 }) => result.findings.filter((finding) => finding.severity === 'critical');
 
 describe('auditAeo on a green fixture surface', () => {
-  it('finds zero criticals, three planned rows and counts the surface', () => {
-    const result = auditAeo(greenSurface());
-    expect(criticals(result).map((finding) => `${finding.category}: ${finding.detail}`)).toEqual(
-      []
-    );
-    expect(result.summary.findings.critical).toBe(0);
-    expect(result.summary.findings.planned).toBe(3);
-    expect(result.summary.surface).toEqual({ topRoutes: 2, twins: 3, wellKnownFiles: 4 });
-  });
-
-  it('renders a green verdict and the planned section', () => {
-    const report = renderMarkdown(auditAeo(greenSurface()));
-    expect(report).toContain('GREEN — the agent surface holds');
-    expect(report).toContain('Content-Signal');
-  });
-
-  it('warns on an indexed top route outside the nav-curated llms.txt', () => {
-    const surface = greenSurface();
-    surface.topRoutes = ['guides/', 'search/', 'docs-shell/'];
-    const warnings = auditAeo(surface).findings.filter(
-      (finding) => finding.severity === 'warning' && finding.category === 'llms'
-    );
-    expect(warnings.map((finding) => finding.page).sort()).toEqual(['docs-shell/', 'search/']);
+  it('finds zero criticals, three planned rows and counts the surface; renders a green verdict and the planned section; warns on an indexed top route outside the nav-curated llms.txt', () => {
+    // finds zero criticals, three planned rows and counts the surface
+    {
+      const result = auditAeo(greenSurface());
+      expect(criticals(result).map((finding) => `${finding.category}: ${finding.detail}`)).toEqual(
+        []
+      );
+      expect(result.summary.findings.critical).toBe(0);
+      expect(result.summary.findings.planned).toBe(3);
+      expect(result.summary.surface).toEqual({ topRoutes: 2, twins: 3, wellKnownFiles: 4 });
+    }
+    // renders a green verdict and the planned section
+    {
+      const report = renderMarkdown(auditAeo(greenSurface()));
+      expect(report).toContain('GREEN — the agent surface holds');
+      expect(report).toContain('Content-Signal');
+    }
+    // warns on an indexed top route outside the nav-curated llms.txt
+    {
+      const surface = greenSurface();
+      surface.topRoutes = ['guides/', 'search/', 'docs-shell/'];
+      const warnings = auditAeo(surface).findings.filter(
+        (finding) => finding.severity === 'warning' && finding.category === 'llms'
+      );
+      expect(warnings.map((finding) => finding.page).sort()).toEqual(['docs-shell/', 'search/']);
+    }
   });
 });
 
 describe('auditAeo red cases', () => {
-  it('flags a missing or shim llms.txt and a dead llms link', () => {
-    const missing = greenSurface();
-    missing.llmsTxt = null;
-    expect(
-      criticals(auditAeo(missing)).some((finding) => finding.detail.includes('llms.txt is missing'))
-    ).toBe(true);
+  it('flags a missing or shim llms.txt and a dead llms link; flags unparseable or unresolvable .well-known files and digest drift; flags twin drift: a promised twin missing and a page without a manifest entry; flags a robots policy that shrinks, forbids or lies', () => {
+    // flags a missing or shim llms.txt and a dead llms link
+    {
+      const missing = greenSurface();
+      missing.llmsTxt = null;
+      expect(
+        criticals(auditAeo(missing)).some((finding) =>
+          finding.detail.includes('llms.txt is missing')
+        )
+      ).toBe(true);
 
-    const shim = greenSurface();
-    shim.llmsTxt = '<!doctype html><html><body>redirect</body></html>';
-    expect(criticals(auditAeo(shim)).some((finding) => finding.detail.includes('HTML shim'))).toBe(
-      true
-    );
+      const shim = greenSurface();
+      shim.llmsTxt = '<!doctype html><html><body>redirect</body></html>';
+      expect(
+        criticals(auditAeo(shim)).some((finding) => finding.detail.includes('HTML shim'))
+      ).toBe(true);
 
-    const dead = greenSurface();
-    dead.llmsTxt = '- [x](https://texuli.com/guides/ghost/)';
-    dead.exists = () => false;
-    expect(
-      criticals(auditAeo(dead)).some((finding) => finding.detail.includes('does not serve'))
-    ).toBe(true);
+      const dead = greenSurface();
+      dead.llmsTxt = '- [x](https://texuli.com/guides/ghost/)';
+      dead.exists = () => false;
+      expect(
+        criticals(auditAeo(dead)).some((finding) => finding.detail.includes('does not serve'))
+      ).toBe(true);
 
-    const absent = { ...greenSurface(), llmsComponents: null, llmsFull: null };
-    const findings = criticals(auditAeo(absent)).filter((finding) => finding.category === 'llms');
-    expect(findings.length).toBeGreaterThanOrEqual(2);
-  });
+      const absent = { ...greenSurface(), llmsComponents: null, llmsFull: null };
+      const findings = criticals(auditAeo(absent)).filter((finding) => finding.category === 'llms');
+      expect(findings.length).toBeGreaterThanOrEqual(2);
+    }
+    // flags unparseable or unresolvable .well-known files and digest drift
+    {
+      const bad = greenSurface();
+      bad.wellKnown['ai-catalog.json'] = '{"entries":';
+      expect(
+        criticals(auditAeo(bad)).some(
+          (finding) =>
+            finding.page === 'ai-catalog.json' && finding.detail.includes('does not parse')
+        )
+      ).toBe(true);
 
-  it('flags unparseable or unresolvable .well-known files and digest drift', () => {
-    const bad = greenSurface();
-    bad.wellKnown['ai-catalog.json'] = '{"entries":';
-    expect(
-      criticals(auditAeo(bad)).some(
-        (finding) => finding.page === 'ai-catalog.json' && finding.detail.includes('does not parse')
-      )
-    ).toBe(true);
+      const advertises = greenSurface();
+      advertises.wellKnown['ai-catalog.json'] = JSON.stringify({
+        entries: [{ identifier: 'urn:air:content:ghost', url: 'https://texuli.com/ghost.txt' }],
+      });
+      advertises.exists = (path: string) => path !== '/ghost.txt';
+      expect(
+        criticals(auditAeo(advertises)).some((finding) => finding.detail.includes('does not serve'))
+      ).toBe(true);
 
-    const advertises = greenSurface();
-    advertises.wellKnown['ai-catalog.json'] = JSON.stringify({
-      entries: [{ identifier: 'urn:air:content:ghost', url: 'https://texuli.com/ghost.txt' }],
-    });
-    advertises.exists = (path: string) => path !== '/ghost.txt';
-    expect(
-      criticals(auditAeo(advertises)).some((finding) => finding.detail.includes('does not serve'))
-    ).toBe(true);
+      const linkset = greenSurface();
+      linkset.wellKnown['api-catalog'] = JSON.stringify({
+        linkset: [
+          {
+            anchor: 'https://texuli.com/',
+            links: [{ rel: 'item', href: 'https://texuli.com/ghost.json' }],
+          },
+        ],
+      });
+      linkset.exists = (path: string) => path !== '/ghost.json';
+      expect(
+        criticals(auditAeo(linkset)).some((finding) =>
+          finding.detail.includes('linkset advertises')
+        )
+      ).toBe(true);
 
-    const linkset = greenSurface();
-    linkset.wellKnown['api-catalog'] = JSON.stringify({
-      linkset: [
-        {
-          anchor: 'https://texuli.com/',
-          links: [{ rel: 'item', href: 'https://texuli.com/ghost.json' }],
+      const card = greenSurface();
+      card.wellKnown['mcp/server-card.json'] = JSON.stringify({ serverInfo: {} });
+      const cardFindings = criticals(auditAeo(card)).filter(
+        (finding) => finding.page === 'mcp/server-card.json'
+      );
+      expect(cardFindings.some((finding) => finding.detail.includes('serverInfo.name'))).toBe(true);
+      expect(cardFindings.some((finding) => finding.detail.includes('no tools'))).toBe(true);
+      expect(
+        cardFindings.some((finding) => finding.detail.includes('transport.stdio.launch'))
+      ).toBe(true);
+
+      const drifted = greenSurface();
+      drifted.readBytes = () => Buffer.from('changed body');
+      expect(
+        criticals(auditAeo(drifted)).some((finding) => finding.detail.includes('digest drift'))
+      ).toBe(true);
+    }
+    // flags twin drift: a promised twin missing and a page without a manifest entry
+    {
+      const missing = greenSurface();
+      missing.mdManifest = JSON.stringify({
+        twins: {
+          ...JSON.parse(greenSurface().mdManifest),
+          '/guides/position/': '/guides/position.md',
         },
-      ],
-    });
-    linkset.exists = (path: string) => path !== '/ghost.json';
-    expect(
-      criticals(auditAeo(linkset)).some((finding) => finding.detail.includes('linkset advertises'))
-    ).toBe(true);
+      });
+      missing.exists = (path: string) => path !== '/guides/position.md';
+      expect(
+        criticals(auditAeo(missing)).some((finding) => finding.detail.includes('dist lacks it'))
+      ).toBe(true);
 
-    const card = greenSurface();
-    card.wellKnown['mcp/server-card.json'] = JSON.stringify({ serverInfo: {} });
-    const cardFindings = criticals(auditAeo(card)).filter(
-      (finding) => finding.page === 'mcp/server-card.json'
-    );
-    expect(cardFindings.some((finding) => finding.detail.includes('serverInfo.name'))).toBe(true);
-    expect(cardFindings.some((finding) => finding.detail.includes('no tools'))).toBe(true);
-    expect(cardFindings.some((finding) => finding.detail.includes('transport.stdio.launch'))).toBe(
-      true
-    );
+      const uncovered = greenSurface();
+      uncovered.familyPages.guides = ['/guides/', '/guides/theming/', '/guides/position/'];
+      expect(
+        criticals(auditAeo(uncovered)).some((finding) =>
+          finding.detail.includes('without a manifest twin')
+        )
+      ).toBe(true);
 
-    const drifted = greenSurface();
-    drifted.readBytes = () => Buffer.from('changed body');
-    expect(
-      criticals(auditAeo(drifted)).some((finding) => finding.detail.includes('digest drift'))
-    ).toBe(true);
-  });
+      const noManifest = greenSurface();
+      noManifest.mdManifest = null;
+      expect(
+        criticals(auditAeo(noManifest)).some((finding) =>
+          finding.detail.includes('md-manifest.json is missing')
+        )
+      ).toBe(true);
+    }
+    // flags a robots policy that shrinks, forbids or lies
+    {
+      const shrunk = greenSurface();
+      shrunk.robots = 'User-agent: *\nAllow: /\n\nSitemap: https://texuli.com/sitemap.xml\n';
+      expect(
+        criticals(auditAeo(shrunk)).some((finding) => finding.detail.includes('user-agent groups'))
+      ).toBe(true);
 
-  it('flags twin drift: a promised twin missing and a page without a manifest entry', () => {
-    const missing = greenSurface();
-    missing.mdManifest = JSON.stringify({
-      twins: {
-        ...JSON.parse(greenSurface().mdManifest),
-        '/guides/position/': '/guides/position.md',
-      },
-    });
-    missing.exists = (path: string) => path !== '/guides/position.md';
-    expect(
-      criticals(auditAeo(missing)).some((finding) => finding.detail.includes('dist lacks it'))
-    ).toBe(true);
+      const noSitemap = greenSurface();
+      noSitemap.robots = greenSurface().robots.replace(
+        'Sitemap: https://texuli.com/sitemap.xml\n',
+        ''
+      );
+      expect(
+        criticals(auditAeo(noSitemap)).some((finding) => finding.detail.includes('no Sitemap line'))
+      ).toBe(true);
 
-    const uncovered = greenSurface();
-    uncovered.familyPages.guides = ['/guides/', '/guides/theming/', '/guides/position/'];
-    expect(
-      criticals(auditAeo(uncovered)).some((finding) =>
-        finding.detail.includes('without a manifest twin')
-      )
-    ).toBe(true);
-
-    const noManifest = greenSurface();
-    noManifest.mdManifest = null;
-    expect(
-      criticals(auditAeo(noManifest)).some((finding) =>
-        finding.detail.includes('md-manifest.json is missing')
-      )
-    ).toBe(true);
-  });
-
-  it('flags a robots policy that shrinks, forbids or lies', () => {
-    const shrunk = greenSurface();
-    shrunk.robots = 'User-agent: *\nAllow: /\n\nSitemap: https://texuli.com/sitemap.xml\n';
-    expect(
-      criticals(auditAeo(shrunk)).some((finding) => finding.detail.includes('user-agent groups'))
-    ).toBe(true);
-
-    const noSitemap = greenSurface();
-    noSitemap.robots = greenSurface().robots.replace(
-      'Sitemap: https://texuli.com/sitemap.xml\n',
-      ''
-    );
-    expect(
-      criticals(auditAeo(noSitemap)).some((finding) => finding.detail.includes('no Sitemap line'))
-    ).toBe(true);
-
-    const forbidding = greenSurface();
-    forbidding.robots = `${greenSurface().robots}User-agent: *\nDisallow: /private/\n`;
-    expect(
-      criticals(auditAeo(forbidding)).some((finding) => finding.detail.includes('Disallow exists'))
-    ).toBe(true);
+      const forbidding = greenSurface();
+      forbidding.robots = `${greenSurface().robots}User-agent: *\nDisallow: /private/\n`;
+      expect(
+        criticals(auditAeo(forbidding)).some((finding) =>
+          finding.detail.includes('Disallow exists')
+        )
+      ).toBe(true);
+    }
   });
 });
 
 describe('auditAeo on malformed percent escapes (T-100 P2-4)', () => {
-  it('reports a critical finding per surface instead of throwing URIError', () => {
-    const surface = greenSurface();
-    surface.llmsTxt = '# Texuli\n\n- [x](https://texuli.com/guides/%E0%A4%A/)\n';
-    surface.wellKnown['ai-catalog.json'] = JSON.stringify({
-      host: { displayName: 'Texuli' },
-      entries: [{ identifier: 'broken', url: 'https://texuli.com/%zz/', type: 'x' }],
-    });
-    surface.wellKnown['api-catalog'] = JSON.stringify({
-      linkset: [
-        { anchor: 'https://texuli.com/', links: [{ rel: 'doc', href: 'https://texuli.com/%/' }] },
-      ],
-    });
-    surface.wellKnown['agent-skills/index.json'] = JSON.stringify({
-      skills: [{ name: 'broken-skill', url: 'https://texuli.com/skill-pack/%G0.md', digest: 'x' }],
-    });
-    let result: ReturnType<typeof auditAeo> | undefined;
-    expect(() => {
-      result = auditAeo(surface);
-    }).not.toThrow();
-    const malformed = criticals(result as ReturnType<typeof auditAeo>).filter((finding) =>
-      finding.detail.includes('malformed percent escape')
-    );
-    expect(malformed.map((finding) => finding.page).sort()).toEqual(
-      ['/guides/%E0%A4%A/', 'broken', 'broken-skill', 'doc'].sort()
-    );
-  });
-
-  it('marks a malformed on-site URL instead of throwing', () => {
+  it('reports a critical finding per surface instead of throwing URIError; marks a malformed on-site URL instead of throwing', () => {
+    // reports a critical finding per surface instead of throwing URIError
+    {
+      const surface = greenSurface();
+      surface.llmsTxt = '# Texuli\n\n- [x](https://texuli.com/guides/%E0%A4%A/)\n';
+      surface.wellKnown['ai-catalog.json'] = JSON.stringify({
+        host: { displayName: 'Texuli' },
+        entries: [{ identifier: 'broken', url: 'https://texuli.com/%zz/', type: 'x' }],
+      });
+      surface.wellKnown['api-catalog'] = JSON.stringify({
+        linkset: [
+          { anchor: 'https://texuli.com/', links: [{ rel: 'doc', href: 'https://texuli.com/%/' }] },
+        ],
+      });
+      surface.wellKnown['agent-skills/index.json'] = JSON.stringify({
+        skills: [
+          { name: 'broken-skill', url: 'https://texuli.com/skill-pack/%G0.md', digest: 'x' },
+        ],
+      });
+      let result: ReturnType<typeof auditAeo> | undefined;
+      expect(() => {
+        result = auditAeo(surface);
+      }).not.toThrow();
+      const malformed = criticals(result as ReturnType<typeof auditAeo>).filter((finding) =>
+        finding.detail.includes('malformed percent escape')
+      );
+      expect(malformed.map((finding) => finding.page).sort()).toEqual(
+        ['/guides/%E0%A4%A/', 'broken', 'broken-skill', 'doc'].sort()
+      );
+    }
     expect(() => distPathFor('https://texuli.com/%zz/', AEO_CONFIG)).not.toThrow();
     expect(distPathFor('https://texuli.com/%zz/', AEO_CONFIG)).toBe('malformed:/%zz/');
   });
