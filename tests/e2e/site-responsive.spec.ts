@@ -170,10 +170,16 @@ test('the landing header fits across its breakpoints, doors shown only where the
     const header = await page.evaluate(() => {
       const root = document.querySelector('[data-tx-site-header]');
       const viewport = document.documentElement.clientWidth;
-      const past = [...(root?.querySelectorAll('*') ?? [])].filter((element) => {
-        const rect = element.getBoundingClientRect();
-        return rect.width > 0 && rect.right > viewport + 1;
-      }).length;
+      const past = [...(root?.querySelectorAll('*') ?? [])]
+        .filter((element) => {
+          const rect = element.getBoundingClientRect();
+          return rect.width > 0 && rect.right > viewport + 1;
+        })
+        .map((element) => {
+          const rect = element.getBoundingClientRect();
+          const cls = element.getAttribute('class')?.split(/\s+/)[0] ?? '';
+          return `${element.tagName.toLowerCase()}.${cls} ${Math.round(rect.left)}-${Math.round(rect.right)}`;
+        });
       const visible = (selector: string) => {
         const element = root?.querySelector(selector);
         return Boolean(element && element.getBoundingClientRect().width > 0);
@@ -189,7 +195,7 @@ test('the landing header fits across its breakpoints, doors shown only where the
         start: visible('.get-started'),
       };
     });
-    expect(header.past, `${width}px: header elements past the viewport`).toBe(0);
+    expect(header.past, `${width}px: header elements past the viewport`).toEqual([]);
     expect(header.wrapped, `${width}px: a header link wraps`).toBe(false);
     expect(header.doors, `${width}px: platform doors`).toBe(width > 768);
     expect(header.repo, `${width}px: GitHub door`).toBe(width > 1024);
