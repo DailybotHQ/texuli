@@ -35,10 +35,24 @@ function oneline(text: string): string {
 }
 
 /**
+ * A Markdown link destination that cannot break its list item: surrounding
+ * whitespace is trimmed, then any inner whitespace (including newlines) and
+ * parentheses are percent-encoded.
+ */
+function linkHref(href: string): string {
+  return href
+    .trim()
+    .replace(/[\s()]/g, (char) =>
+      char === '(' ? '%28' : char === ')' ? '%29' : encodeURIComponent(char)
+    );
+}
+
+/**
  * The `llms.txt` document. Sections without links are dropped (an empty
  * section is a caller bug, not content); every text field is collapsed to
- * one line. Hrefs are used as given — callers pass absolute URLs so agents
- * can fetch without resolving a base.
+ * one line. Hrefs are used as given apart from percent-encoding whitespace and
+ * parentheses (so a link cannot break its list item) — callers pass absolute
+ * URLs so agents can fetch without resolving a base.
  */
 export function formatSiteLlmsTxt(options: SiteLlmsOptions): string {
   const lines: string[] = [`# ${oneline(options.title)}`, '', `> ${oneline(options.summary)}`];
@@ -49,7 +63,7 @@ export function formatSiteLlmsTxt(options: SiteLlmsOptions): string {
     if (section.description) lines.push(oneline(section.description), '');
     for (const link of section.links) {
       const title = oneline(link.title);
-      const href = link.href.trim();
+      const href = linkHref(link.href);
       const description = link.description ? oneline(link.description) : '';
       lines.push(`- [${title}](${href})${description ? `: ${description}` : ''}`);
     }

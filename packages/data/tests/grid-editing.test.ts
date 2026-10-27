@@ -219,10 +219,43 @@ describe('EditableDataGrid', () => {
     await fireEvent.dblClick(screen.getByText('No').closest('[data-tx-edit-cell]')!);
     const booleanEditor = await screen.findByRole('switch', { name: 'Active' });
     await fireEvent.click(booleanEditor);
-    await fireEvent.blur(booleanEditor);
+    // Focus leaves the editor for another cell: the draft commits.
+    const outside = screen.getByText('Harbor Notes').closest<HTMLElement>('[role=gridcell]')!;
+    await fireEvent.blur(booleanEditor, { relatedTarget: outside });
+    await fireEvent.focusOut(booleanEditor, { relatedTarget: outside });
     await waitFor(() => expect(screen.queryByRole('switch')).toBeNull());
     // d1 already shows "Yes"; after the blur commit d2 joins it.
     await waitFor(() => expect(screen.getAllByText('Yes')).toHaveLength(2));
+  });
+
+  it('keeps the boolean editor open when Tab moves focus to its Save button', async () => {
+    render(GridEditingHarness);
+    await fireEvent.dblClick(screen.getByText('No').closest('[data-tx-edit-cell]')!);
+    const booleanEditor = await screen.findByRole('switch', { name: 'Active' });
+    await fireEvent.click(booleanEditor);
+    const save = screen.getByRole('button', { name: 'Save' });
+    await fireEvent.blur(booleanEditor, { relatedTarget: save });
+    await fireEvent.focusOut(booleanEditor, { relatedTarget: save });
+    // The editor is still mounted and its Save button is reachable.
+    expect(screen.getByRole('switch', { name: 'Active' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Save' }).isConnected).toBe(true);
+    expect(screen.getAllByText('Yes')).toHaveLength(1);
+  });
+
+  it('commits from the Save button and returns focus to the cell, not <body>', async () => {
+    render(GridEditingHarness);
+    await fireEvent.dblClick(screen.getByText('No').closest('[data-tx-edit-cell]')!);
+    const booleanEditor = await screen.findByRole('switch', { name: 'Active' });
+    await fireEvent.click(booleanEditor);
+    const save = screen.getByRole('button', { name: 'Save' });
+    const gridcell = save.closest<HTMLElement>('[role=gridcell]')!;
+    save.focus();
+    await fireEvent.focusOut(booleanEditor, { relatedTarget: save });
+    await fireEvent.click(save);
+    await waitFor(() => expect(screen.queryByRole('switch')).toBeNull());
+    await waitFor(() => expect(screen.getAllByText('Yes')).toHaveLength(2));
+    await waitFor(() => expect(document.activeElement).toBe(gridcell));
+    expect(document.activeElement).not.toBe(document.body);
   });
 
   it('marks the reopened editor invalid and links the cell error', async () => {

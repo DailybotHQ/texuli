@@ -457,3 +457,27 @@ describe('provenance source paths', () => {
     expect(result.errors[0]).toContain('plain relative path');
   });
 });
+
+describe('triple-slash directives', () => {
+  it('sit above every statement in the tools sources (TypeScript ignores them otherwise)', async () => {
+    const { readdir } = await import('node:fs/promises');
+    const root = resolve(import.meta.dirname, '../src');
+    const entries = await readdir(root, { recursive: true });
+    const misplaced: string[] = [];
+    for (const entry of entries) {
+      if (!entry.endsWith('.ts')) continue;
+      const lines = (await readFile(join(root, entry), 'utf8')).split('\n');
+      let seenStatement = false;
+      for (const line of lines) {
+        const text = line.trim();
+        if (text.startsWith('/// <reference')) {
+          if (seenStatement) misplaced.push(entry);
+          continue;
+        }
+        if (text === '' || text.startsWith('//') || text.startsWith('#!')) continue;
+        seenStatement = true;
+      }
+    }
+    expect(misplaced).toEqual([]);
+  });
+});

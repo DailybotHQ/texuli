@@ -52,6 +52,12 @@ floating content, groups, optional descriptions and leading icons.
 | `Item` | Option; optional `description`, `icon` |
 | `Group` / `Label` / `Separator` | Grouping chrome |
 
+`Select.Label` names its group, so it must be rendered inside a
+`Select.Group`; rendered anywhere else it throws
+(`Select.GroupLabel must be rendered inside Select.Group`). To label the
+whole control, name the trigger instead (`aria-labelledby` pointing at
+visible text, as in the example above, or `aria-label`).
+
 ## Variants
 
 | Prop | Values |

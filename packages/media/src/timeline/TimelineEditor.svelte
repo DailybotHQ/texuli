@@ -4,7 +4,12 @@ import { type ClassValue, cx } from 'texuli/cx';
 import { EASING_NAMES, type EasingName } from '../animation/types.ts';
 import type { CompositionIssue } from '../composition-model/types.ts';
 import { sampleCompositionV2 } from '../composition-v2/animation.ts';
-import { DEFAULT_TIMELINE_LABELS, fillTimelineLabel, type TimelineLabels } from './labels.ts';
+import {
+  DEFAULT_TIMELINE_LABELS,
+  fillTimelineLabel,
+  refusalAnnouncement,
+  type TimelineLabels,
+} from './labels.ts';
 import {
   createTimelineHistory,
   snapTime,
@@ -129,7 +134,7 @@ function dispatch(next: TimelineHistory, message: string) {
   const before = history;
   history = next;
   if (next.errors.length > 0 && next.present === before?.present) {
-    announcement = fillTimelineLabel(l.notApplied, { reason: next.errors[0]?.message ?? '' });
+    announcement = refusalAnnouncement(l, next.errors[0]?.message);
     return;
   }
   if (next.present !== before?.present) {

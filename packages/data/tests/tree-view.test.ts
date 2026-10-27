@@ -105,6 +105,19 @@ describe('TreeDataView', () => {
     expect(instructions.textContent).not.toMatch(/Tab indents/);
   });
 
+  it('leaves Alt+Arrow alone in a read-only tree (no onMove)', async () => {
+    render(TreeDataViewHarness, { props: { readOnly: true } });
+    const api = screen.getByRole('treeitem', { name: /API/ });
+    api.focus();
+    for (const key of ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']) {
+      // fireEvent resolves to dispatchEvent's result: false once prevented.
+      const notPrevented = await fireEvent.keyDown(api, { key, altKey: true, cancelable: true });
+      expect(notPrevented, `Alt+${key} keeps its default`).toBe(true);
+      expect(document.querySelector('.tx-tree-view__live')?.textContent ?? '').not.toMatch(/Moved/);
+    }
+    expect(screen.getByLabelText('Move count').textContent).toBe('0');
+  });
+
   it('indents with Alt+ArrowRight and outdents with Alt+ArrowLeft', async () => {
     render(TreeDataViewHarness);
     const api = screen.getByRole('treeitem', { name: /API/ });

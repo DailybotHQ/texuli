@@ -55,7 +55,9 @@ pnpm exec tsx packages/tools/src/llms/cli.ts \
 route map — an H1, a blockquote summary, then H2 sections of
 `- [Title](href): one line` links. It takes no catalog input; the sections
 come from the consumer (texuli.com derives them from its nav in
-`apps/website/src/components/seo/llms-site.ts`):
+`apps/website/src/components/seo/llms-site.ts`). Text fields are collapsed to
+one line, and whitespace, newlines and parentheses inside an href are
+percent-encoded so no link can break its list item:
 
 ```ts
 import { formatSiteLlmsTxt, type SiteLlmsSection } from '@texuli/tools/llms';

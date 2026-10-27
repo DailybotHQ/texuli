@@ -61,6 +61,8 @@ export interface TimelineLabels {
   opacitySet: string;
   /** `{reason}`: the model's refusal message */
   notApplied: string;
+  /** The `{reason}` of `notApplied` when the refusal carries no message. */
+  invalidEdit: string;
 }
 
 export const DEFAULT_TIMELINE_LABELS: Readonly<TimelineLabels> = Object.freeze({
@@ -102,6 +104,7 @@ export const DEFAULT_TIMELINE_LABELS: Readonly<TimelineLabels> = Object.freeze({
   opacity: 'Opacity',
   opacitySet: 'Opacity set to {value}.',
   notApplied: 'Not applied: {reason}',
+  invalidEdit: 'invalid edit',
 });
 
 /** Fills `{name}` placeholders as plain text; unknown ones stay as written. */
@@ -112,4 +115,16 @@ export function fillTimelineLabel(
   return template.replace(/\{([a-zA-Z]+)\}/g, (match, name: string) =>
     Object.hasOwn(values, name) ? String(values[name]) : match
   );
+}
+
+/**
+ * The announcement for a refused edit. An empty or missing refusal message
+ * falls back to `invalidEdit`, so the status never ends in a bare colon.
+ */
+export function refusalAnnouncement(
+  labels: Pick<TimelineLabels, 'notApplied' | 'invalidEdit'>,
+  reason: string | undefined
+): string {
+  const text = reason?.trim() ? reason : labels.invalidEdit;
+  return fillTimelineLabel(labels.notApplied, { reason: text });
 }

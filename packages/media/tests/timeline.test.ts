@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+/// <reference types="node" />
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
@@ -6,6 +7,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { CompositionAnimation } from '../src/animation/types.ts';
 import { validateAnimationV2, validateCompositionV2 } from '../src/composition-v2/index.ts';
 import AnimationTimeline from '../src/timeline/AnimationTimeline.svelte';
+import { DEFAULT_TIMELINE_LABELS, refusalAnnouncement } from '../src/timeline/labels.ts';
 import {
   applyTimelineAction,
   createTimelineHistory,
@@ -459,6 +461,27 @@ describe('AnimationTimeline', () => {
     await waitFor(() =>
       expect(document.querySelector('[data-tx-timeline-stage] svg')).not.toBeNull()
     );
+  });
+
+  it('announces a refused edit with no message through the invalid-edit label', () => {
+    expect(refusalAnnouncement(DEFAULT_TIMELINE_LABELS, '')).toBe('Not applied: invalid edit');
+    expect(refusalAnnouncement(DEFAULT_TIMELINE_LABELS, '   ')).toBe('Not applied: invalid edit');
+    expect(refusalAnnouncement(DEFAULT_TIMELINE_LABELS, undefined)).toBe(
+      'Not applied: invalid edit'
+    );
+    expect(refusalAnnouncement(DEFAULT_TIMELINE_LABELS, 'Windows must overlap.')).toBe(
+      'Not applied: Windows must overlap.'
+    );
+    expect(
+      refusalAnnouncement(
+        {
+          ...DEFAULT_TIMELINE_LABELS,
+          notApplied: 'No aplicado: {reason}',
+          invalidEdit: 'edición no válida',
+        },
+        ''
+      )
+    ).toBe('No aplicado: edición no válida');
   });
 
   // T-70: every visible and announced string is a label a host can translate.

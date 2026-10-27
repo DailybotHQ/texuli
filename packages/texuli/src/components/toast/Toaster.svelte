@@ -109,11 +109,15 @@ const KIND_MARK: Record<ToastKind, string> = {
 async function runAction(item: ToastItem): Promise<void> {
   const action = item.action;
   if (!action) return;
-  // The action owns its error surface; the toast always dismisses after it.
+  // The toast always dismisses after its action. A rejection is not swallowed:
+  // it is rethrown on a microtask so it reaches the host's error reporting
+  // (window "error") without leaving the toast stuck.
   try {
     await action.onClick();
-  } catch {
-    // Swallowed: a failing action reports through its own UI.
+  } catch (error) {
+    queueMicrotask(() => {
+      throw error;
+    });
   } finally {
     store.dismiss(item.id);
   }

@@ -5,10 +5,13 @@ let {
   checkboxes = true,
   dir = 'ltr' as 'ltr' | 'rtl',
   selectedIds = [] as string[],
+  readOnly = false,
 }: {
   checkboxes?: boolean;
   dir?: 'ltr' | 'rtl';
   selectedIds?: string[];
+  /** Renders without `onMove`: a read-only tree. */
+  readOnly?: boolean;
 } = $props();
 
 interface Node {
@@ -74,7 +77,7 @@ function onMove(move: TreeMove): void {
   hasChildren={(node) => node.lazy === true}
   {loadChildren}
   {onChildrenLoaded}
-  {onMove}
+  onMove={readOnly ? undefined : onMove}
 >
   {#snippet item(node)}
     <span data-node-title={node.id}>{node.title}</span>

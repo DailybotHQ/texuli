@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { resolve } from 'node:path';
 /// <reference types="node" />
 /**
  * `texuli add <component> [options]`
@@ -10,6 +9,7 @@ import { resolve } from 'node:path';
  *   pnpm exec tsx packages/tools/src/cli-add/cli.ts button --cwd <app> --source-root <repo>
  *   … --json --dry-run --force --out src/ui/button
  */
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { addComponent } from './add.ts';
 import { listAddableIds } from './registry.ts';

@@ -94,6 +94,38 @@ describe('Toaster', () => {
     );
   });
 
+  it('dismisses after a rejecting action and rethrows the error asynchronously', async () => {
+    const store = createToastStore({ duration: 0 });
+    const failure = new Error('Undo failed upstream.');
+    const thrown: unknown[] = [];
+    const original = globalThis.queueMicrotask.bind(globalThis);
+    // Wrap every microtask so a rethrow is captured instead of reaching Vitest.
+    const spy = vi.spyOn(globalThis, 'queueMicrotask').mockImplementation((callback) => {
+      original(() => {
+        try {
+          callback();
+        } catch (error) {
+          thrown.push(error);
+        }
+      });
+    });
+    try {
+      store.info('Archived', {
+        action: { label: 'Undo', onClick: () => Promise.reject(failure) },
+      });
+      const view = render(ToastHarness, { props: { store } });
+      await fireEvent.click(view.getByRole('button', { name: 'Undo' }));
+      await waitFor(() =>
+        expect(
+          within(view.getByRole('region', { name: 'Notifications' })).queryByText('Archived')
+        ).toBeNull()
+      );
+      await waitFor(() => expect(thrown).toContain(failure));
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
   it('keeps the toast mounted while an async action runs, then dismisses', async () => {
     const store = createToastStore({ duration: 0 });
     let release!: () => void;

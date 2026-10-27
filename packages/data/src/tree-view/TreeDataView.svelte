@@ -291,14 +291,22 @@ function onRowKey(event: KeyboardEvent, row: FlatNode<T>): void {
   const indentKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
   const outdentKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
 
-  if (event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+  const isArrow =
+    event.key === 'ArrowUp' ||
+    event.key === 'ArrowDown' ||
+    event.key === 'ArrowLeft' ||
+    event.key === 'ArrowRight';
+  // A read-only tree (no onMove) leaves Alt+Arrow to the browser (Alt+Left is
+  // Back): no preventDefault, no move, no announcement, no plain-arrow fallback.
+  if (event.altKey && isArrow && !onMove) return;
+  if (event.altKey && onMove && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
     event.preventDefault();
     const step = event.key === 'ArrowUp' ? -1 : 1;
     applyMoveResult(moveSibling(tree, row.id, step), row.item);
     void focusRow(row.id);
     return;
   }
-  if (event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+  if (event.altKey && onMove && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
     event.preventDefault();
     const result = event.key === indentKey ? indent(tree, row.id) : outdent(tree, row.id);
     applyMoveResult(result, row.item);

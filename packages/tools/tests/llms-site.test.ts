@@ -71,4 +71,29 @@ describe('formatSiteLlmsTxt', () => {
     expect(body.endsWith('\n')).toBe(true);
     expect(body.includes('\r')).toBe(false);
   });
+
+  it('percent-encodes whitespace, newlines and parentheses in hrefs so a list item stays one line', () => {
+    const body = formatSiteLlmsTxt({
+      title: 'Texuli',
+      summary: 's',
+      sections: [
+        section({
+          links: [
+            { title: 'Spaced', href: ' https://texuli.com/a b/ ' },
+            {
+              title: 'Broken',
+              href: 'https://texuli.com/x\n## Injected\n- [y](https://evil.example/)',
+            },
+            { title: 'Paren', href: 'https://texuli.com/p)(q' },
+          ],
+        }),
+      ],
+    });
+    expect(body).toContain('- [Spaced](https://texuli.com/a%20b/)\n');
+    expect(body).toContain('- [Paren](https://texuli.com/p%29%28q)\n');
+    expect(body).not.toMatch(/^## Injected/m);
+    const lines = body.split('\n').filter((line) => line.startsWith('- '));
+    expect(lines).toHaveLength(3);
+    for (const line of lines) expect(line).toMatch(/^- \[[^\]]+\]\([^\s()]+\)$/);
+  });
 });

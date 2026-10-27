@@ -130,7 +130,9 @@ exported from `@texuli/media/timeline`). Pass any subset as `labels`; the rest
 keep their English defaults. Placeholders such as `{layer}` and `{time}` are
 filled as plain text, and `seconds` (`{value} s`) formats every time shown.
 Layer names and the model's refusal messages come from the document and the
-model, not from labels.
+model, not from labels. A refused edit is announced through `notApplied`
+(`Not applied: {reason}`); when the refusal carries no message, `{reason}` is
+the `invalidEdit` label (`invalid edit`).
 
 ## Not covered yet
 
