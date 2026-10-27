@@ -190,7 +190,7 @@ describe('nodes', () => {
       'javascript:alert(1)',
       'data:text/html,<b>x</b>',
       '//evil.example',
-      'jav​ascript:x',
+      'jav\u200bascript:x',
     ]) {
       const hostile = { ...node('x', 'http'), props: { url } };
       expect(errorOf(graph, [{ op: 'addNode', node: hostile }]).code).toBe('unsafe-url');
@@ -208,7 +208,7 @@ describe('nodes', () => {
 
   it('refuses control and bidi override characters in labels and text props', () => {
     const graph = pipeline();
-    for (const label of ['pay‮yas', 'a\u0000b', 'x⁦y']) {
+    for (const label of ['pay\u202eyas', 'a\u0000b', 'x\u2066y']) {
       expect(errorOf(graph, [{ op: 'addNode', node: { ...node('x'), label } }]).code).toBe(
         'unsafe-text'
       );
@@ -718,7 +718,7 @@ describe('document', () => {
     const parsed = parseWorkflow(
       {
         version: WORKFLOW_SCHEMA_VERSION,
-        nodes: [node('a'), node('b', 'script'), { ...node('c'), label: 'x‮y' }],
+        nodes: [node('a'), node('b', 'script'), { ...node('c'), label: 'x\u202ey' }],
         edges: [edge('e', 'a', 'b')],
       },
       context
