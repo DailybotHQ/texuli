@@ -389,7 +389,7 @@ describe('conformance harness', () => {
     expect(conditional).toContain('"slot"');
     expect(conditional).toContain('"when"');
     // A portable profile fails closed while no id is audited portable.
-    expect(documents.catalog.components.some((c) => c.capability === 'portable')).toBe(false);
+    expect(documents.catalog.components.some((c) => c.capability === 'portable-core')).toBe(false);
     const portable = {
       ...json<Record<string, unknown>>('fixtures/golden/report-on-demand.json'),
       profile: 'portable',
