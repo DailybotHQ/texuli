@@ -50,6 +50,33 @@ export function sitePaths(): string[] {
   return [...paths.sort(), '/__missing__/'];
 }
 
+/**
+ * The pages a sweep visits: up to `perGroup` evenly spaced pages (always the
+ * first) of each route group. The pages of a group share a template; the
+ * large groups (`/examples/…`, `/component-pages/…`) render one component
+ * per page, and those components are axe-checked in the fixture app
+ * (a11y-*.spec.ts).
+ */
+export function sweepSample(paths: readonly string[], perGroup = 4): string[] {
+  const groups = new Map<string, string[]>();
+  for (const path of paths) {
+    const group = path.split('/')[1] ?? '';
+    groups.set(group, [...(groups.get(group) ?? []), path]);
+  }
+  const kept = new Set<string>();
+  for (const members of groups.values()) {
+    if (members.length <= perGroup) {
+      for (const path of members) kept.add(path);
+      continue;
+    }
+    const step = members.length / perGroup;
+    for (let index = 0; index < perGroup; index += 1) {
+      kept.add(members[Math.floor(index * step)] as string);
+    }
+  }
+  return paths.filter((path) => kept.has(path));
+}
+
 /** One representative page per route group (`/`, `/guides/…`, `/component-pages/…`). */
 export function representatives(paths: readonly string[]): Set<string> {
   const seen = new Map<string, string>();
