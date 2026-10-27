@@ -18,6 +18,9 @@ it('assigns every website e2e spec to exactly one CI shard', () => {
   expect(new Set(assigned).size).toBe(assigned.length);
   // .github/workflows/ci.yml runs one matrix job per shard.
   const ci = readFileSync(join(process.cwd(), '.github/workflows/ci.yml'), 'utf8');
-  const matrix = /shard: \[([\d, ]+)\]/.exec(ci)?.[1]?.split(',').map((n) => Number(n.trim()));
+  const matrix = /shard: \[([\d, ]+)\]/
+    .exec(ci)?.[1]
+    ?.split(',')
+    .map((n) => Number(n.trim()));
   expect(matrix).toEqual(shards.map((_, index) => index + 1));
 });
