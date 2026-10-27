@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/data`  
 **Subpaths:** `@texuli/data/grid-editing` (`EditableDataGrid`), `@texuli/data/grid-core` (`DataGrid`)  
-**Tests:** `packages/data/tests/grid-edit-virtual.test.ts` (component), `tests/e2e/data-grid-edit-virtual.spec.ts` (browser)  
+**Tests:** `packages/data/tests/grid-edit-virtual.test.ts` (component), `tests/e2e/data.spec.ts` (browser, the data grid test)  
 **Example:** `data-grid-editing-virtual` (100,000 fictional rows)
 
 ## Goal

@@ -40,5 +40,5 @@ renderer.
 
 ```bash
 pnpm vitest run packages/charts/tests/canvas.test.ts
-TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e/charts-families.spec.ts -g "canvas"
+TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e/charts.spec.ts --project chromium
 ```

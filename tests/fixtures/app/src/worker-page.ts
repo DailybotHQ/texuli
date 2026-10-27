@@ -3,7 +3,7 @@ import { bin } from '@texuli/charts/math/shapes';
 import { type ChartWorkerLike, createChartOffload, toFloat64 } from '@texuli/charts/worker';
 
 /*
- * tests/e2e/charts-worker.spec.ts: runs the offload in a REAL module worker
+ * tests/e2e/charts.spec.ts: runs the offload in a REAL module worker
  * created with the documented host pattern, then with a constructor that
  * throws, and publishes whether every result equals the synchronous math.
  */

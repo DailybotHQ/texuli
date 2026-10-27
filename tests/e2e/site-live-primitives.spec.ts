@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { createReadStream, existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
@@ -11,21 +11,20 @@ import { polishProblems } from './support/site.ts';
 
 /*
  * Live primitive demos (T-site-live-primitives). Every /primitives-page/<id>/
- * mounts the real primitive, lazily, in a framed preview with light/dark and
- * RTL toggles, uncontrolled and controlled panels, a props panel that drives
- * the code sample, keyboard hints that light up, and an anatomy bridge.
- *
- * Each demo declares its own key and control checks (mirrored on the frame
- * as data attributes), so this spec runs exactly what the page promises.
- * Every primitive page must ship its lazy demo island (a build check). The
- * demo interactions (a fresh load each) and axe plus the polish check in
- * light, dark and forced colors, with the demo mounted and its floating
- * content open, run on the representative set (overlay, form, composite and
- * range primitives): the pages share one template, and every primitive's
- * keyboard, pointer and axe contract runs in its behavior scenario
- * (tests/behavior). a11y-site.spec.ts skips these pages.
- * Chromium covers every primitive; WebKit and Pixel 7 cover a representative
- * set (overlay, form, composite and range primitives).
+ * mounts the real primitive, lazily (the client:visible island is pinned in
+ * apps/website/tests/component-pages.test.ts, with the reference data), in a
+ * framed preview with light/dark and RTL toggles, uncontrolled and
+ * controlled panels, a props panel that drives the code sample, keyboard
+ * hints that light up, and an anatomy bridge. Each demo declares its own key
+ * and control checks (mirrored on the frame as data attributes), so this
+ * spec runs exactly what the page promises, on the representative set
+ * (overlay, form, composite and range primitives): the pages share one
+ * template, and every primitive's keyboard, pointer and axe contract runs in
+ * its behavior scenario (tests/behavior). a11y-site.spec.ts skips these
+ * pages. Three sessions: the demo interactions (with lazy loading, the
+ * pre-hydration mode and the reference's row list); axe plus the polish
+ * check in light, dark and forced colors with floating content open; and
+ * the toast pages plus the route transfer budgets.
  */
 
 const DIST = resolve('apps/website/dist');
@@ -38,7 +37,7 @@ const AXE_TAGS = [
   'wcag22aa',
   'best-practice',
 ];
-const REPRESENTATIVE = new Set(['accordion', 'dialog', 'select', 'slider', 'tabs', 'menu']);
+const REPRESENTATIVE = ['accordion', 'dialog', 'select', 'slider', 'tabs', 'menu'] as const;
 const TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -67,17 +66,6 @@ interface ControlCheck {
   act: string;
   expect: Expectation;
 }
-
-function primitiveIds(): string[] {
-  const dir = join(DIST, 'primitives-page');
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(join(dir, entry.name, 'index.html')))
-    .map((entry) => entry.name)
-    .sort();
-}
-
-const IDS = primitiveIds();
 
 let server: Server;
 let origin = '';
@@ -134,82 +122,6 @@ async function axe(page: Page): Promise<string[]> {
       `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(' | ')}`
   );
 }
-
-test('every primitive page ships a lazy live demo island', ({ browserName }, info) => {
-  test.skip(info.project.name !== 'chromium', 'build output is browser-independent');
-  void browserName;
-  expect(IDS.length).toBeGreaterThanOrEqual(41);
-  for (const id of IDS) {
-    const html = readFileSync(join(DIST, 'primitives-page', id, 'index.html'), 'utf8');
-    // Hydrated only when visible (an IntersectionObserver), then the demo chunk loads.
-    expect(html, id).toMatch(/<astro-island[^>]+client="visible"[^>]+LiveDemo/);
-    expect(html, id).toContain(`data-live-demo="${id}"`);
-  }
-});
-
-test('a demo loads only once it scrolls into view', async ({ page }, info) => {
-  test.skip(info.project.name !== 'chromium', 'IntersectionObserver timing is checked once');
-  await page.setViewportSize({ width: 1280, height: 240 });
-  const scripts: string[] = [];
-  page.on('requestfinished', (request) => {
-    if (request.url().endsWith('.js')) scripts.push(new URL(request.url()).pathname);
-  });
-  await page.goto(`${origin}/primitives-page/dialog/`);
-  await page.waitForFunction(
-    () =>
-      document.documentElement.dataset.txPageReady === 'true' ||
-      (!document.querySelector('script[data-tx-ready-script]') &&
-        document.readyState === 'complete'),
-    undefined,
-    { polling: 250 }
-  );
-  const live = page.locator('[data-live-demo="dialog"]');
-  await expect(live).not.toHaveAttribute('data-ready', '');
-  const before = scripts.length;
-  await live.scrollIntoViewIfNeeded();
-  await expect(live).toHaveAttribute('data-ready', '', { timeout: 20_000 });
-  expect(scripts.length).toBeGreaterThan(before);
-});
-
-test('the preview follows the page mode before and after it hydrates', async ({ page }, info) => {
-  test.skip(info.project.name !== 'chromium', 'server-rendered styling is checked once');
-  await page.emulateMedia({ colorScheme: 'dark' });
-  await page.setViewportSize({ width: 1280, height: 240 });
-  await page.goto(`${origin}/primitives-page/calendar/`);
-  await page.waitForFunction(
-    () =>
-      document.documentElement.dataset.txPageReady === 'true' ||
-      (!document.querySelector('script[data-tx-ready-script]') &&
-        document.readyState === 'complete'),
-    undefined,
-    { polling: 250 }
-  );
-  const live = page.locator('[data-live-demo="calendar"]');
-  const stage = live.locator('[data-live-stage]');
-  const colors = () =>
-    page.evaluate(() => {
-      const node = document.querySelector('[data-live-stage]');
-      const tokens = (style: CSSStyleDeclaration) =>
-        ['--tx-background', '--tx-foreground'].map((name) => style.getPropertyValue(name).trim());
-      const own = node ? getComputedStyle(node) : undefined;
-      return {
-        page: tokens(getComputedStyle(document.documentElement)),
-        stage: own ? [...tokens(own), own.color, own.backgroundColor] : [],
-      };
-    });
-  // Not hydrated yet: the server-rendered stage already uses the dark tokens.
-  await expect(live).not.toHaveAttribute('data-ready', '');
-  await expect(page.locator('html')).toHaveAttribute('data-tx-mode', 'dark');
-  await expect(stage).not.toHaveAttribute('data-tx-mode', /.*/);
-  const before = await colors();
-  expect(before.page.every(Boolean)).toBe(true);
-  expect(before.stage.slice(0, 2)).toEqual(before.page);
-  // Hydrated: the stage scopes the same mode, so its colors do not change.
-  await live.scrollIntoViewIfNeeded();
-  await expect(live).toHaveAttribute('data-ready', '', { timeout: 20_000 });
-  await expect(stage).toHaveAttribute('data-tx-mode', 'dark');
-  expect((await colors()).stage).toEqual(before.stage);
-});
 
 /** Controlled panel: a control outside the primitive changes its state. */
 async function checkControlled(live: Locator, id: string): Promise<void> {
@@ -369,57 +281,6 @@ async function checkToggles(live: Locator): Promise<void> {
   await expect(stage).toHaveAttribute('dir', 'rtl');
 }
 
-for (const id of IDS.filter((name) => REPRESENTATIVE.has(name))) {
-  test.describe(`live ${id}`, () => {
-    test('controlled and uncontrolled panels, keyboard hints, anatomy bridge, props panel', async ({
-      page,
-      isMobile,
-    }, info) => {
-      test.setTimeout(120_000);
-      // Each check may leave floating content open (a modal makes the rest of
-      // the page inert), so each starts from a fresh load of the same page;
-      // the page session keeps its cache, which makes the reloads cheap.
-      await checkControlled(await openDemo(page, id), id);
-      await checkKeyHints(page, await openDemo(page, id), id, info.project.name);
-      await checkAnatomy(page, await openDemo(page, id), id, isMobile);
-      const live = await openDemo(page, id);
-      await checkPropsPanel(page, live, id);
-      await checkToggles(live);
-    });
-
-    test('axe, zero exclusions, and polish in light, dark and forced colors', async ({ page }) => {
-      test.setTimeout(90_000);
-      for (const mode of ['light', 'dark', 'forced-colors'] as const) {
-        await page.emulateMedia({
-          colorScheme: mode === 'dark' ? 'dark' : 'light',
-          forcedColors: mode === 'forced-colors' ? 'active' : 'none',
-          reducedMotion: 'reduce',
-        });
-        const live = await openDemo(page, id);
-        // The API rows (details) are checked open (site-primitives-page.spec.ts).
-        await page.evaluate(() => {
-          for (const details of document.querySelectorAll('details')) details.open = true;
-        });
-        expect(await axe(page), `axe ${mode}`).toEqual([]);
-        if (mode !== 'forced-colors') {
-          expect(await polishProblems(page), `polish ${mode}`).toEqual([]);
-        }
-        // Open floating content is checked too.
-        const raw = await live.getAttribute('data-key-check');
-        const check = raw ? (JSON.parse(raw) as KeyCheck) : undefined;
-        if (check?.open) {
-          await live
-            .locator('[data-demo-mode="uncontrolled"]')
-            .locator(check.open)
-            .first()
-            .click(check.openWith === 'contextmenu' ? { button: 'right' } : {});
-          expect(await axe(page), `axe ${mode}, open`).toEqual([]);
-        }
-      }
-    });
-  });
-}
-
 async function weigh(
   page: Page,
   id: string,
@@ -459,18 +320,158 @@ async function weigh(
   return { js: kb(js), total: kb(total) };
 }
 
-test('primitive routes stay within budget: the default until the demo is seen, the route budget with it', async ({
+async function settled(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.txPageReady === 'true' ||
+      (!document.querySelector('script[data-tx-ready-script]') &&
+        document.readyState === 'complete'),
+    undefined,
+    { polling: 100 }
+  );
+}
+
+test('representative demos: controlled panels, key hints, anatomy, props, toggles, lazy loading', async ({
+  page,
+  isMobile,
+}, info) => {
+  test.setTimeout(240_000);
+  for (const id of REPRESENTATIVE) {
+    // Each check may leave floating content open (a modal makes the rest of
+    // the page inert), so each starts from a fresh load of the same page;
+    // the page session keeps its cache, which makes the reloads cheap.
+    await checkControlled(await openDemo(page, id), id);
+    await checkKeyHints(page, await openDemo(page, id), id, info.project.name);
+    await checkAnatomy(page, await openDemo(page, id), id, isMobile);
+    const live = await openDemo(page, id);
+    await checkPropsPanel(page, live, id);
+    await checkToggles(live);
+  }
+
+  // The reference's behavior row list opens from the keyboard.
+  await page.goto(`${origin}/primitives-page/dialog/`);
+  const summary = page.locator('.behavior__rows summary');
+  await summary.focus();
+  await expect(page.locator('[data-row]').first()).toBeHidden();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('[data-row]').first()).toBeVisible();
+
+  // On a short screen the demo loads only once it scrolls into view, and the
+  // server-rendered stage already wears the page's dark tokens before it
+  // hydrates (its colors do not change after).
+  await page.setViewportSize({ width: 1280, height: 240 });
+  await page.emulateMedia({ colorScheme: 'dark' });
+  const scripts: string[] = [];
+  page.on('requestfinished', (request) => {
+    if (request.url().endsWith('.js')) scripts.push(new URL(request.url()).pathname);
+  });
+  await page.goto(`${origin}/primitives-page/calendar/`);
+  await settled(page);
+  const live = page.locator('[data-live-demo="calendar"]');
+  const stage = live.locator('[data-live-stage]');
+  const colors = () =>
+    page.evaluate(() => {
+      const node = document.querySelector('[data-live-stage]');
+      const tokens = (style: CSSStyleDeclaration) =>
+        ['--tx-background', '--tx-foreground'].map((name) => style.getPropertyValue(name).trim());
+      const own = node ? getComputedStyle(node) : undefined;
+      return {
+        page: tokens(getComputedStyle(document.documentElement)),
+        stage: own ? [...tokens(own), own.color, own.backgroundColor] : [],
+      };
+    });
+  await expect(live).not.toHaveAttribute('data-ready', '');
+  await expect(stage).not.toHaveAttribute('data-tx-mode', /.*/);
+  const before = await colors();
+  expect(before.page.every(Boolean)).toBe(true);
+  expect(before.stage.slice(0, 2)).toEqual(before.page);
+  const loaded = scripts.length;
+  await live.scrollIntoViewIfNeeded();
+  await expect(live).toHaveAttribute('data-ready', '', { timeout: 20_000 });
+  expect(scripts.length).toBeGreaterThan(loaded);
+  await expect(stage).toHaveAttribute('data-tx-mode', 'dark');
+  expect((await colors()).stage).toEqual(before.stage);
+});
+
+test('representative demos: axe with zero exclusions and polish in light, dark and forced colors, open content too', async ({
+  page,
+}) => {
+  test.setTimeout(240_000);
+  for (const id of REPRESENTATIVE) {
+    for (const mode of ['light', 'dark', 'forced-colors'] as const) {
+      await page.emulateMedia({
+        colorScheme: mode === 'dark' ? 'dark' : 'light',
+        forcedColors: mode === 'forced-colors' ? 'active' : 'none',
+        reducedMotion: 'reduce',
+      });
+      const live = await openDemo(page, id);
+      // The API rows (details) are checked open.
+      await page.evaluate(() => {
+        for (const details of document.querySelectorAll('details')) details.open = true;
+      });
+      expect(await axe(page), `${id} axe ${mode}`).toEqual([]);
+      if (mode !== 'forced-colors') {
+        expect(await polishProblems(page), `${id} polish ${mode}`).toEqual([]);
+      }
+      // Open floating content is checked too.
+      const raw = await live.getAttribute('data-key-check');
+      const check = raw ? (JSON.parse(raw) as KeyCheck) : undefined;
+      if (check?.open) {
+        await live
+          .locator('[data-demo-mode="uncontrolled"]')
+          .locator(check.open)
+          .first()
+          .click(check.openWith === 'contextmenu' ? { button: 'right' } : {});
+        expect(await axe(page), `${id} axe ${mode}, open`).toEqual([]);
+      }
+    }
+  }
+});
+
+test('toast pages place live toasts, axe clean in every mode; routes stay within their transfer budgets', async ({
+  page,
   browser,
 }, info) => {
-  test.skip(info.project.name !== 'chromium', 'transfer sizes are checked once');
-  test.setTimeout(400_000);
+  test.setTimeout(240_000);
+  for (const mode of ['light', 'dark', 'forced-colors'] as const) {
+    await page.emulateMedia({
+      colorScheme: mode === 'dark' ? 'dark' : 'light',
+      forcedColors: mode === 'forced-colors' ? 'active' : 'none',
+      reducedMotion: 'reduce',
+    });
+    const live = await openDemo(page, 'toast');
+    await live.locator('[data-demo-mode="uncontrolled"] [data-demo-act="show"]').click();
+    const toast = live.locator('[data-demo-mode="uncontrolled"] [data-tx-toast-root]').first();
+    await expect(toast).toBeVisible();
+    // Placed by the library at the viewport's bottom end, inside the screen.
+    const box = await toast.boundingBox();
+    const size = page.viewportSize() ?? { width: 0, height: 0 };
+    if (!box) throw new Error('toast not rendered');
+    expect(size.height - (box.y + box.height)).toBeLessThan(48);
+    expect(size.width - (box.x + box.width)).toBeLessThan(48);
+    expect(await axe(page), `toast ${mode}`).toEqual([]);
+
+    await page.goto(`${origin}/component-pages/toaster/`);
+    const stage = page.locator('[data-tx-toast-stage="toaster"]');
+    await stage.scrollIntoViewIfNeeded();
+    await expect(stage).toBeVisible({ timeout: 20_000 });
+    for (const kind of ['success', 'info', 'warning', 'error'])
+      await stage.getByRole('button', { name: `Show ${kind}` }).click();
+    const toasts = stage.locator('[data-tx-toast-root]');
+    await expect(toasts).toHaveCount(4);
+    expect(await axe(page), `Toaster ${mode}`).toEqual([]);
+    await stage.getByRole('button', { name: 'Dismiss all' }).click();
+    await expect(toasts).toHaveCount(0);
+  }
+
+  // Transfer budgets: before the demo is seen the page stays within the site
+  // default; with it, within the route budget. Every primitive's own bundle
+  // is held by pnpm size (texuli.budgets.json).
   const over: string[] = [];
   const report: string[] = [];
-  for (const id of IDS) {
+  for (const id of REPRESENTATIVE) {
     const route = `/primitives-page/${id}/`;
     const budget = budgetFor(route);
-    // Off screen (a short viewport): the demo has not loaded, so its JavaScript
-    // stays within the site default.
     const shortContext = await browser.newContext({ viewport: { width: 1280, height: 240 } });
     const before = await weigh(await shortContext.newPage(), id, false);
     await shortContext.close();
@@ -490,58 +491,4 @@ test('primitive routes stay within budget: the default until the demo is seen, t
   }
   await info.attach('primitive-weights', { body: report.join('\n'), contentType: 'text/plain' });
   expect(over).toEqual([]);
-});
-
-test.describe('live toasts on the toast pages (FIX-toaster-viewport)', () => {
-  test.skip(({ isMobile, browserName }) => isMobile || browserName !== 'chromium', 'checked once');
-
-  const MODES = ['light', 'dark', 'forced-colors'] as const;
-  const emulate = (page: Page, mode: (typeof MODES)[number]) =>
-    page.emulateMedia({
-      colorScheme: mode === 'dark' ? 'dark' : 'light',
-      forcedColors: mode === 'forced-colors' ? 'active' : 'none',
-      reducedMotion: 'reduce',
-    });
-
-  test('the toast primitive page shows a placed toast on click, axe clean, in light, dark and forced colors', async ({
-    page,
-  }) => {
-    test.setTimeout(90_000);
-    for (const mode of MODES) {
-      await emulate(page, mode);
-      const live = await openDemo(page, 'toast');
-      await live.locator('[data-demo-mode="uncontrolled"] [data-demo-act="show"]').click();
-      const toast = live.locator('[data-demo-mode="uncontrolled"] [data-tx-toast-root]').first();
-      await expect(toast).toBeVisible();
-      // Placed by the library at the viewport's bottom end, inside the screen.
-      const box = await toast.boundingBox();
-      const size = page.viewportSize() ?? { width: 0, height: 0 };
-      if (!box) throw new Error('toast not rendered');
-      expect(size.height - (box.y + box.height)).toBeLessThan(48);
-      expect(size.width - (box.x + box.width)).toBeLessThan(48);
-      expect(await axe(page), mode).toEqual([]);
-    }
-  });
-
-  test('the Toaster component page shows live toasts on click, axe clean, in light, dark and forced colors', async ({
-    page,
-  }) => {
-    test.setTimeout(90_000);
-    for (const mode of MODES) {
-      await emulate(page, mode);
-      await page.goto(`${origin}/component-pages/toaster/`);
-      const stage = page.locator('[data-tx-toast-stage="toaster"]');
-      await stage.scrollIntoViewIfNeeded();
-      await expect(stage).toBeVisible({ timeout: 20_000 });
-      for (const kind of ['success', 'info', 'warning', 'error']) {
-        await stage.getByRole('button', { name: `Show ${kind}` }).click();
-      }
-      const toasts = stage.locator('[data-tx-toast-root]');
-      await expect(toasts).toHaveCount(4);
-      await expect(toasts.first()).toBeVisible();
-      expect(await axe(page), mode).toEqual([]);
-      await stage.getByRole('button', { name: 'Dismiss all' }).click();
-      await expect(toasts).toHaveCount(0);
-    }
-  });
 });

@@ -38,5 +38,5 @@ message visible next to the decorative dots.
 Run `pnpm vitest run packages/chat/tests/components.test.ts` for interaction
 coverage, `pnpm vitest run packages/examples/tests/examples-render.test.ts` for
 the example, and `TEXULI_E2E_PORT=4860 pnpm exec playwright test
-tests/e2e/chat-composer.spec.ts --project chromium` for its browser and axe
+tests/e2e/chat.spec.ts --project chromium` for its browser and axe
 check.

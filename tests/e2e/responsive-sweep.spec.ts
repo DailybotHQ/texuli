@@ -12,7 +12,8 @@ import { expect, type Page, test } from '@playwright/test';
  * `/agent-chat/` and `/builder/` pages. At each declared width, in both
  * directions: no horizontal page scroll and no element past the viewport
  * edge (except inside its own scroll container). In RTL, rows flow from the
- * right. One test per surface and direction walks every width.
+ * right. One test walks the player surfaces at every width in both
+ * directions; one walks both built pages.
  */
 
 // 360 stands for the small phones (400 was a near duplicate).
@@ -60,9 +61,9 @@ async function noHorizontalScroll(page: Page) {
 }
 
 test.describe('responsive sweep · player and timeline surfaces', () => {
-  for (const dir of DIRECTIONS) {
-    test(`${dir} at ${WIDTHS.join(', ')}px`, async ({ page }) => {
-      test.setTimeout(WIDTHS.length * 30_000);
+  test(`ltr and rtl at ${WIDTHS.join(', ')}px`, async ({ page }) => {
+    test.setTimeout(WIDTHS.length * DIRECTIONS.length * 30_000);
+    for (const dir of DIRECTIONS) {
       for (const width of WIDTHS) {
         await page.setViewportSize({ width, height: 1000 });
         await page.goto(`/responsive.html?dir=${dir}`);
@@ -95,8 +96,8 @@ test.describe('responsive sweep · player and timeline surfaces', () => {
           else expect(first.x).toBeLessThan(second.x);
         }
       }
-    });
-  }
+    }
+  });
 });
 
 const DIST = resolve('apps/website/dist');
@@ -136,9 +137,9 @@ test.describe('responsive sweep · built site pages', () => {
   });
   test.afterAll(() => new Promise<void>((done) => server.close(() => done())));
 
-  for (const route of ['/agent-chat/', '/builder/']) {
-    test(`${route} in ltr and rtl at ${WIDTHS.join(', ')}px`, async ({ page }) => {
-      test.setTimeout(WIDTHS.length * 30_000);
+  test(`/agent-chat/ and /builder/ in ltr and rtl at ${WIDTHS.join(', ')}px`, async ({ page }) => {
+    test.setTimeout(WIDTHS.length * 60_000);
+    for (const route of ['/agent-chat/', '/builder/']) {
       for (const width of WIDTHS) {
         await page.setViewportSize({ width, height: 1000 });
         await page.goto(`${origin}${route}`);
@@ -149,9 +150,9 @@ test.describe('responsive sweep · built site pages', () => {
             dir
           );
           await noHorizontalScroll(page);
-          expect(await overflowing(page, 'main'), `${dir} at ${width}px`).toEqual([]);
+          expect(await overflowing(page, 'main'), `${route} ${dir} at ${width}px`).toEqual([]);
         }
       }
-    });
-  }
+    }
+  });
 });

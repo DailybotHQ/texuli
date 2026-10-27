@@ -1,7 +1,16 @@
 // @vitest-environment node
-import { cpSync, mkdtempSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  statSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import {
   checkWorkspace,
@@ -189,6 +198,54 @@ describe('checkWorkspace', () => {
       );
     }
   }, 60_000);
+});
+
+/**
+ * Sinks a strict CSP or Trusted Types blocks at runtime (moved from
+ * tests/e2e/csp.spec.ts). A raw line scan, stricter than checkWorkspace: it
+ * also catches style attribute writes, document.write, string timers,
+ * createContextualFragment and srcdoc, in comments too.
+ */
+const BLOCKED_SINKS: [string, RegExp][] = [
+  ['a style attribute write', /setAttribute\(\s*['"]style['"]/],
+  [
+    'an HTML string sink',
+    /\.(?:inner|outer)HTML\s*=(?!=)|insertAdjacentHTML\(|createContextualFragment\(/,
+  ],
+  ['document.write', /document\.write(?:ln)?\(/],
+  ['{@html}', /\{@html\s/],
+  ['eval or new Function', /(?<![.\w])eval\(|new Function\(/],
+  ['a string timer', /set(?:Timeout|Interval)\(\s*['"`]/],
+  ['srcdoc', /\bsrcdoc\s*=/],
+];
+
+function sourceFiles(dir: string): string[] {
+  return readdirSync(dir).flatMap((name) => {
+    const path = join(dir, name);
+    if (statSync(path).isDirectory()) return name === 'node_modules' ? [] : sourceFiles(path);
+    return /\.(?:ts|js|svelte)$/.test(name) ? [path] : [];
+  });
+}
+
+describe('package sources under a strict CSP', () => {
+  it('no package source uses a sink the policy blocks', () => {
+    const packages = join(ROOT, 'packages');
+    const files = readdirSync(packages)
+      .map((name) => join(packages, name, 'src'))
+      .filter((dir) => existsSync(dir))
+      .flatMap(sourceFiles);
+    expect(files.length).toBeGreaterThan(100);
+    const hits = files.flatMap((file) =>
+      readFileSync(file, 'utf8')
+        .split('\n')
+        .flatMap((line, index) =>
+          BLOCKED_SINKS.filter(([, pattern]) => pattern.test(line)).map(
+            ([what]) => `${relative(ROOT, file)}:${index + 1} ${what}`
+          )
+        )
+    );
+    expect(hits).toEqual([]);
+  });
 });
 
 describe('run (CLI)', () => {

@@ -1,6 +1,6 @@
 /**
  * Accessibility sweep: slides (T-p7-deck-a11y). The seven slides examples are
- * the fixtures. axe with zero exclusions in light and dark (including a dark
+ * the fixtures; three tests, each one page session. axe with zero exclusions in light and dark (including a dark
  * host page on a light OS), presenter and overview states, forced colors,
  * 320px reflow, the deck keyboard map with focus movement, tab order, reduced
  * motion and the heading outline. Fix findings at source.
@@ -43,32 +43,30 @@ async function expectNoAxeViolations(page: Page, id: SlidesFixture) {
 const stage = (page: Page) => page.getByRole('region', { name: /^Presentation: / });
 const progress = (page: Page) => stage(page).locator('.tx-deck-stage__progress');
 
-const HALF = Math.ceil(ALL.length / 2);
-
-test.describe('a11y slides · axe', () => {
-  // Each check walks its fixtures in one page session.
-  for (const batch of [ALL.slice(0, HALF), ALL.slice(HALF)]) {
-    test(`${batch.join(', ')} pass axe on a light page, a dark page and a dark page on a dark OS`, async ({
-      page,
-    }) => {
-      test.setTimeout(batch.length * 40_000);
-      for (const id of batch) {
-        await test.step(id, async () => {
-          await page.emulateMedia({ colorScheme: 'light' });
-          await gotoFixture(page, id, 'light');
-          await expectNoAxeViolations(page, id);
-          // A dark host page while the OS prefers light: the deck follows the page.
-          await gotoFixture(page, id, 'dark');
-          await expectNoAxeViolations(page, id);
-          await page.emulateMedia({ colorScheme: 'dark' });
-          await gotoFixture(page, id, 'dark');
-          await expectNoAxeViolations(page, id);
-        });
-      }
+test('every deck passes axe on a light page, a dark page and a dark page on a dark OS', async ({
+  page,
+}) => {
+  test.setTimeout(ALL.length * 40_000);
+  for (const id of ALL) {
+    await test.step(id, async () => {
+      await page.emulateMedia({ colorScheme: 'light' });
+      await gotoFixture(page, id, 'light');
+      await expectNoAxeViolations(page, id);
+      // A dark host page while the OS prefers light: the deck follows the page.
+      await gotoFixture(page, id, 'dark');
+      await expectNoAxeViolations(page, id);
+      await page.emulateMedia({ colorScheme: 'dark' });
+      await gotoFixture(page, id, 'dark');
+      await expectNoAxeViolations(page, id);
     });
   }
+});
 
-  test('the templates pass axe with the overview and the presenter view open', async ({ page }) => {
+test('structure and names; axe with the overview, the presenter view and forced colors; 320px reflow', async ({
+  page,
+}) => {
+  test.setTimeout(240_000);
+  await test.step('the templates pass axe with the overview and the presenter view open', async () => {
     test.setTimeout(TEMPLATES.length * 40_000);
     for (const id of TEMPLATES) {
       for (const mode of ['light', 'dark'] as const) {
@@ -85,34 +83,15 @@ test.describe('a11y slides · axe', () => {
       }
     }
   });
-
-  test('a template and the media deck pass axe under forced colors', async ({ page }) => {
+  await test.step('a template and the media deck pass axe under forced colors', async () => {
     await page.emulateMedia({ forcedColors: 'active', colorScheme: 'light' });
     for (const id of ['slides-template-report', 'slides-media-deck'] as const) {
       await gotoFixture(page, id);
       await expectNoAxeViolations(page, id);
     }
+    await page.emulateMedia({ forcedColors: 'none' });
   });
-
-  test('every deck reflows at 320 CSS px without horizontal scroll', async ({ page }) => {
-    test.setTimeout(ALL.length * 20_000);
-    await page.setViewportSize({ width: 320, height: 640 });
-    const overflows: string[] = [];
-    for (const id of ALL) {
-      await gotoFixture(page, id);
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth
-      );
-      if (overflow > 1) overflows.push(`${id}: ${overflow}px`);
-    }
-    expect(overflows).toEqual([]);
-  });
-});
-
-test.describe('a11y slides · structure and names', () => {
-  test('the stage exposes a named region, a named controls group and a polite position', async ({
-    page,
-  }) => {
+  await test.step('the stage exposes a named region, a named controls group and a polite position', async () => {
     await gotoFixture(page, 'slides-template-report');
     await expect(stage(page)).toHaveAccessibleName('Presentation: Quarterly report');
     const controls = stage(page).getByRole('group', { name: 'Presentation controls' });
@@ -132,10 +111,7 @@ test.describe('a11y slides · structure and names', () => {
     await expect(stage(page).getByRole('heading', { level: 2 })).toHaveText(['Trend']);
     await expect(stage(page).getByRole('article', { name: 'Trend' })).toBeVisible();
   });
-
-  test('presenter panes are a complementary notes region and an up-next region, timer-free by default', async ({
-    page,
-  }) => {
+  await test.step('presenter panes are a complementary notes region and an up-next region, timer-free by default', async () => {
     await gotoFixture(page, 'slides-template-pitch');
     await page.getByRole('button', { name: 'Presenter' }).click();
     await expect(page.getByRole('button', { name: 'Presenter' })).toHaveAttribute(
@@ -151,10 +127,7 @@ test.describe('a11y slides · structure and names', () => {
       'Up next',
     ]);
   });
-
-  test('the print view is one region per slide with an h2 title and no focus traps', async ({
-    page,
-  }) => {
+  await test.step('the print view is one region per slide with an h2 title and no focus traps', async () => {
     await gotoFixture(page, 'slides-media-deck');
     const print = page.getByRole('document', { name: 'Print: Harbor tour' });
     await expect(print.getByRole('region')).toHaveCount(3);
@@ -168,12 +141,27 @@ test.describe('a11y slides · structure and names', () => {
     await page.keyboard.press('Tab');
     expect(await print.evaluate((el) => el.contains(document.activeElement))).toBe(false);
   });
+  await test.step('every deck reflows at 320 CSS px without horizontal scroll', async () => {
+    test.setTimeout(ALL.length * 20_000);
+    await page.setViewportSize({ width: 320, height: 640 });
+    const overflows: string[] = [];
+    for (const id of ALL) {
+      await gotoFixture(page, id);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+      );
+      if (overflow > 1) overflows.push(`${id}: ${overflow}px`);
+    }
+    expect(overflows).toEqual([]);
+  });
 });
 
-test.describe('a11y slides · keyboard', () => {
-  test('arrows, Page keys, Space, Home and End move between slides and focus the new slide', async ({
-    page,
-  }) => {
+test('the deck keyboard map, tab order, reveal steps, slots, fullscreen and motion', async ({
+  page,
+  browserName,
+}) => {
+  test.setTimeout(120_000);
+  await test.step('arrows, Page keys, Space, Home and End move between slides and focus the new slide', async () => {
     await gotoFixture(page, 'slides-template-report');
     const press = async (key: string, expected: string, title: string) => {
       await page.keyboard.press(key);
@@ -190,10 +178,7 @@ test.describe('a11y slides · keyboard', () => {
     // The last slide does not wrap (loop is off in the template).
     await press('ArrowRight', 'Slide 6 of 6: Next steps', 'Next steps');
   });
-
-  test('o opens the overview on the current slide; Escape closes it and returns focus', async ({
-    page,
-  }) => {
+  await test.step('o opens the overview on the current slide; Escape closes it and returns focus', async () => {
     await gotoFixture(page, 'slides-template-review');
     await stage(page).getByRole('article', { name: 'Demo' }).focus();
     await page.keyboard.press('o');
@@ -206,10 +191,7 @@ test.describe('a11y slides · keyboard', () => {
     await expect(page.getByRole('navigation', { name: 'Slides' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Overview' })).toBeFocused();
   });
-
-  test('p opens the presenter view, s focuses the notes, Escape closes and returns focus', async ({
-    page,
-  }) => {
+  await test.step('p opens the presenter view, s focuses the notes, Escape closes and returns focus', async () => {
     await gotoFixture(page, 'slides-template-pitch');
     await stage(page).getByRole('article', { name: 'The solution' }).focus();
     await page.keyboard.press('p');
@@ -223,13 +205,10 @@ test.describe('a11y slides · keyboard', () => {
     await expect(notes).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Presenter' })).toBeFocused();
   });
-
-  test('tab order runs through the controls, then the slide content, then the presenter panes', async ({
-    page,
-  }, testInfo) => {
+  await test.step('tab order runs through the controls, then the slide content, then the presenter panes', async () => {
     // WebKit's default Tab skips links and buttons (a macOS setting), so the
     // tab-order walk runs on Chromium and Pixel 7.
-    test.skip(testInfo.project.name === 'webkit', 'WebKit Tab order depends on a system setting');
+    if (browserName === 'webkit') return;
     await gotoFixture(page, 'slides-template-review');
     await page.getByRole('button', { name: 'Presenter' }).click();
     await page.getByRole('link', { name: 'All examples' }).focus();
@@ -255,8 +234,7 @@ test.describe('a11y slides · keyboard', () => {
       'region',
     ]);
   });
-
-  test('single-key shortcuts act only while focus is inside the deck', async ({ page }) => {
+  await test.step('single-key shortcuts act only while focus is inside the deck', async () => {
     await gotoFixture(page, 'slides-template-report');
     await page.getByRole('link', { name: 'All examples' }).focus();
     await page.keyboard.press('ArrowRight');
@@ -264,10 +242,7 @@ test.describe('a11y slides · keyboard', () => {
     await expect(progress(page)).toHaveText('Slide 4 of 6: Trend');
     await expect(page.getByRole('navigation', { name: 'Slides' })).toHaveCount(0);
   });
-});
-
-test.describe('a11y slides · reveal steps, slots and fullscreen', () => {
-  test('arrow keys reveal and hide steps, and the position text reports them', async ({ page }) => {
+  await test.step('arrow keys reveal and hide steps, and the position text reports them', async () => {
     await gotoFixture(page, 'slides-fragments');
     await expect(progress(page)).toHaveText('Slide 2 of 2: Launch plan, 2 of 4 revealed');
     await stage(page).getByRole('article', { name: 'Launch plan' }).focus();
@@ -283,8 +258,7 @@ test.describe('a11y slides · reveal steps, slots and fullscreen', () => {
     await expect(stage(page).getByText('Open the beta')).toBeHidden();
     await expect(stage(page).getByRole('article', { name: 'Launch plan' })).toBeFocused();
   });
-
-  test('the presenter screen shows the step progress and the next step', async ({ page }) => {
+  await test.step('the presenter screen shows the step progress and the next step', async () => {
     await gotoFixture(page, 'slides-presenter-screen');
     await expect(page.getByRole('complementary', { name: 'Speaker notes' })).toContainText(
       'Reveal step 1 of 4'
@@ -293,8 +267,7 @@ test.describe('a11y slides · reveal steps, slots and fullscreen', () => {
       'Reveal step 2 of 4 on this slide'
     );
   });
-
-  test('slot masters print their slots in reading order with one h2 per page', async ({ page }) => {
+  await test.step('slot masters print their slots in reading order with one h2 per page', async () => {
     await gotoFixture(page, 'slides-slot-masters');
     const print = page.getByRole('document', { name: 'Print: Quarter in review' });
     await expect(print.getByRole('heading', { level: 2 })).toHaveText([
@@ -318,10 +291,7 @@ test.describe('a11y slides · reveal steps, slots and fullscreen', () => {
       'footer',
     ]);
   });
-
-  test('fullscreen opens natively or fills the window visibly, and closing returns focus', async ({
-    page,
-  }) => {
+  await test.step('fullscreen opens natively or fills the window visibly, and closing returns focus', async () => {
     await gotoFixture(page, 'slides-template-report');
     await page.getByRole('button', { name: 'Fullscreen' }).click();
     await expect(stage(page)).toHaveAttribute('data-fullscreen', /^(native|viewport)$/);
@@ -336,12 +306,7 @@ test.describe('a11y slides · reveal steps, slots and fullscreen', () => {
     await expect(stage(page)).not.toHaveAttribute('data-fullscreen', /.+/);
     await expect(page.getByRole('button', { name: 'Fullscreen' })).toBeFocused();
   });
-});
-
-test.describe('a11y slides · motion', () => {
-  test('reduced motion cuts every transition; full motion keeps the deck token', async ({
-    page,
-  }) => {
+  await test.step('reduced motion cuts every transition; full motion keeps the deck token', async () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await gotoFixture(page, 'slides-template-report');
     await page.getByRole('button', { name: 'Next slide' }).click();

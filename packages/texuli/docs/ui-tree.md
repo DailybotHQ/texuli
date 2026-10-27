@@ -49,7 +49,7 @@ committed visual baselines cover light and dark on desktop Chromium and Pixel
 
 ```sh
 pnpm vitest run packages/texuli/tests/display.test.ts packages/texuli/tests/contracts.test.ts
-TEXULI_E2E_PORT=4850 pnpm exec playwright test tests/e2e/ui-tree.spec.ts
+TEXULI_E2E_PORT=4850 pnpm exec playwright test tests/e2e/a11y-display.spec.ts --project chromium
 TEXULI_E2E_PORT=4850 pnpm visual:update -g texuli-tree
 pnpm size --filter texuli/tree
 ```

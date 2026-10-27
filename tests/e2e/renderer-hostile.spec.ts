@@ -1,8 +1,9 @@
 /// <reference types="node" />
 /**
  * Hostile corpus browser check: sink-free render output must not execute
- * scripts. The corpus is processed in Node; the page only receives inert text
- * (textContent / createElement). Axe stays clean.
+ * scripts. The corpus is processed in Node (its inertness is unit-tested in
+ * packages/catalog/tests/render-hostile.test.ts); the page only receives
+ * inert text (textContent / createElement). Axe stays clean.
  */
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
@@ -130,12 +131,6 @@ function buildHostilePageHtml(): string {
 test.describe('renderer hostile corpus (browser)', () => {
   test.beforeEach(() => {
     resetArtifactFrameIds();
-  });
-
-  test('corpus is inert in Node before paint', () => {
-    const report = runHostileCorpus({ catalog });
-    expect(report.ok).toBe(true);
-    expect(report.results.length).toBe(HOSTILE_SAMPLES.length);
   });
 
   test('inert HTML paints with zero corpus script execution and axe clean', async ({ page }) => {

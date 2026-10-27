@@ -11,7 +11,6 @@
  *
  * Fix findings at their source; never loosen the policy. See docs/quality/csp.md.
  */
-import { createHash } from 'node:crypto';
 import {
   existsSync,
   mkdirSync,
@@ -21,13 +20,9 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
-import { extname, join, normalize, relative, resolve, sep } from 'node:path';
+import { extname, join, normalize, resolve, sep } from 'node:path';
 import { type BrowserContext, expect, type Page, test } from '@playwright/test';
-import {
-  pagePolicy,
-  pageRoute,
-  reportOnlyPolicy,
-} from '../../apps/website/src/components/security/csp.ts';
+import { pagePolicy } from '../../apps/website/src/components/security/csp.ts';
 import { listExampleIds } from '../fixtures/app/src/examples.ts';
 
 /** The only Trusted Types policy allowed: Svelte's own, for its template HTML. */
@@ -266,50 +261,6 @@ function siteHeaders(): Map<string, SitePolicyHeaders> {
   return headers;
 }
 
-function builtHtmlFiles(dir: string): string[] {
-  return readdirSync(dir).flatMap((name) => {
-    const path = join(dir, name);
-    return statSync(path).isDirectory()
-      ? builtHtmlFiles(path)
-      : name.endsWith('.html')
-        ? [path]
-        : [];
-  });
-}
-
-function hashSource(source: string): string {
-  return `'sha256-${createHash('sha256').update(source).digest('base64')}'`;
-}
-
-/** An independent assertion over the emitted header, not the policy generator. */
-function expectSafePagePolicy(policy: string, html: string): void {
-  expect(policy).not.toMatch(/'unsafe-(?:inline|eval)'/);
-  const directives = new Map(
-    policy.split('; ').map((directive) => {
-      const [name, ...values] = directive.split(' ');
-      return [name, values.join(' ')];
-    })
-  );
-  expect(directives.get('require-trusted-types-for')).toBe("'script'");
-  expect(directives.get('trusted-types')).toBe('svelte-trusted-html');
-  expect(directives.get('script-src')).toContain("'self'");
-  expect(directives.get('style-src')).toContain("'self'");
-  const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)]
-    .filter((match) => !/\ssrc\s*=/.test(match[1] ?? ''))
-    .map((match) => match[2] ?? '');
-  const styles = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style\s*>/gi)].map(
-    (match) => match[1] ?? ''
-  );
-  const styleAttributes = [...html.matchAll(/\sstyle=(['"])(.*?)\1/gi)].map(
-    (match) => match[2] ?? ''
-  );
-  for (const source of scripts) expect(directives.get('script-src')).toContain(hashSource(source));
-  for (const source of styles) expect(directives.get('style-src')).toContain(hashSource(source));
-  for (const source of styleAttributes) {
-    expect(directives.get('style-src-attr')).toContain(hashSource(source));
-  }
-}
-
 type Finding = { kind: string; detail: string };
 
 /** One `securitypolicyviolation` event, with what it was raised on. */
@@ -431,6 +382,7 @@ test.beforeEach(async ({ context, baseURL }) => {
 test.describe('csp · the policy is really enforced', () => {
   test('the document carries the policy and blocks HTML sinks, eval and inline styles', async ({
     page,
+    browserName,
   }) => {
     const findings = await watchViolations(page);
     const response = await page.goto('/?fixture=smoke');
@@ -456,61 +408,38 @@ test.describe('csp · the policy is really enforced', () => {
     expect(probes.styleAttribute, `${browser}: a style attribute`).toBe('blocked');
     // The probes above are expected violations; prove they were reported.
     expect((await rawViolations(page)).length).toBeGreaterThan(0);
-  });
 
-  test('canary: WebKit still reports a bare native select (remove the exception when this fails)', async ({
-    page,
-    browserName,
-  }) => {
-    test.skip(browserName !== 'webkit', 'the engine bug is WebKit only');
-    await watchViolations(page);
-    await page.goto('/?fixture=smoke');
-    await settle(page);
-    // A select built by the page's own policy-bound code, with no style at all.
-    await page.evaluate(async (path) => {
-      await import(`${path}?select`);
-    }, PROBE_PATH);
-    await expect
-      .poll(
-        async () =>
-          (await rawViolations(page)).filter((event) => isWebkitSelectBug('webkit', event)).length
-      )
-      .toBeGreaterThan(0);
-  });
-});
-
-test.describe('csp · built website', () => {
-  test('every built HTML route has enforcing and report-only hashes without unsafe directives', () => {
-    expect(existsSync(join(SITE_DIST, '_headers')), 'run pnpm build first').toBe(true);
-    const headers = siteHeaders();
-    const pages = builtHtmlFiles(SITE_DIST);
-    expect(pages.length).toBeGreaterThan(100);
-    for (const file of pages) {
-      const route = pageRoute(SITE_DIST, file);
-      const html = readFileSync(file, 'utf8');
-      const policy = pagePolicy(html);
-      const reportOnly = reportOnlyPolicy(policy);
-      expect(headers.get(route), route).toEqual({ enforced: policy, reportOnly });
-      expect(reportOnly).toBe(`${policy}; report-to texuli-csp`);
-      expectSafePagePolicy(policy, html);
-      expectSafePagePolicy(reportOnly, html);
-      if (route.endsWith('/')) {
-        expect(headers.get(`${route}index.html`), route).toEqual({
-          enforced: policy,
-          reportOnly,
-        });
-      }
+    // Canary: WebKit still reports a bare native select (remove the WebKit
+    // select exception when this fails). A select built by the page's own
+    // policy-bound code, with no style at all.
+    if (browserName === 'webkit') {
+      await page.evaluate(async (path) => {
+        await import(`${path}?select`);
+      }, PROBE_PATH);
+      await expect
+        .poll(
+          async () =>
+            (await rawViolations(page)).filter((event) => isWebkitSelectBug('webkit', event)).length
+        )
+        .toBeGreaterThan(0);
     }
   });
+});
+// Every built route's enforcing and report-only headers are checked against
+// the page's own inline sources by `pnpm --filter @texuli/website check:csp`
+// (tests/csp-coverage.mts), and its Trusted Types allowance by
+// analytics.spec.ts; the policy builder is unit-tested in
+// apps/website/tests/site-build-guards.test.ts.
+test('the built website hydrates its islands under each page policy, which both enforces and reports', async ({
+  context,
+  page,
+  baseURL,
+}) => {
+  expect(existsSync(join(SITE_DIST, 'index.html')), 'run pnpm build first').toBe(true);
+  await serveSite(context, baseURL ?? `http://127.0.0.1:${PORT}`);
+  const findings = await watchViolations(page);
 
-  test('policy hashes each page and protects the hydrated home island', async ({
-    context,
-    page,
-    baseURL,
-  }) => {
-    expect(existsSync(join(SITE_DIST, 'index.html')), 'run pnpm build first').toBe(true);
-    await serveSite(context, baseURL ?? `http://127.0.0.1:${PORT}`);
-    const findings = await watchViolations(page);
+  await test.step('the home header island switches the mode under the page policy', async () => {
     const response = await page.goto('/');
     const policy = response?.headers()['content-security-policy'];
     const reportOnly = response?.headers()['content-security-policy-report-only'];
@@ -519,8 +448,7 @@ test.describe('csp · built website', () => {
     expect(policy).toContain("script-src 'self' 'sha256-");
     expect(policy).toContain("style-src 'self' 'sha256-");
     expect(policy).toContain("require-trusted-types-for 'script'");
-    expect(policy).not.toContain('unsafe-inline');
-    expect(policy).not.toContain('unsafe-eval');
+    expect(policy).not.toMatch(/'unsafe-(?:inline|eval)'/);
     // The home's hydrated islands live in the header since T-44 retired the
     // landing playground: drive the Appearance switch under the page policy.
     const dark = page
@@ -533,37 +461,7 @@ test.describe('csp · built website', () => {
     expect(await pageViolations(page, findings)).toEqual([]);
   });
 
-  test('the theme island hydrates and changes mode under its page policy', async ({
-    context,
-    page,
-    baseURL,
-  }) => {
-    await serveSite(context, baseURL ?? `http://127.0.0.1:${PORT}`);
-    const findings = await watchViolations(page);
-    const response = await page.goto('/theme-switcher/');
-    expect(response?.headers()['content-security-policy']).toBe(
-      siteHeaders().get('/theme-switcher/')?.enforced
-    );
-    expect(response?.headers()['content-security-policy-report-only']).toBe(
-      siteHeaders().get('/theme-switcher/')?.reportOnly
-    );
-    const dark = page.getByRole('group', { name: 'Mode' }).getByRole('button', { name: 'Dark' });
-    await dark.click();
-    await expect(page.locator('[data-tx-theme-switcher] [role="status"]')).toContainText(
-      'mode dark'
-    );
-    await settle(page);
-    expect(await pageViolations(page, findings)).toEqual([]);
-  });
-
-  test('enforcing and report-only policies both observe an unauthorized style', async ({
-    context,
-    page,
-    baseURL,
-  }) => {
-    await serveSite(context, baseURL ?? `http://127.0.0.1:${PORT}`);
-    await watchViolations(page);
-    await page.goto('/');
+  await test.step('enforcing and report-only policies both observe an unauthorized style', async () => {
     await page.evaluate(() => {
       const style = document.createElement('style');
       style.textContent = 'body { outline: 3px solid red; }';
@@ -585,67 +483,38 @@ test.describe('csp · built website', () => {
     );
   });
 
-  test('a changed inline script needs a different page hash', () => {
-    const html =
-      '<html><head><meta charset="utf-8" /><script>window.ready=1</script></head></html>';
-    expect(pagePolicy(html)).not.toBe(pagePolicy(html.replace('ready=1', 'ready=2')));
-    expect(pageRoute('/dist', '/dist/docs/index.html')).toBe('/docs/');
-    expect(pageRoute('/dist', '/dist/index.html')).toBe('/');
-  });
-});
-
-/** Sinks a strict CSP or Trusted Types blocks; none may appear in package sources. */
-const BLOCKED_SINKS: [string, RegExp][] = [
-  ['a style attribute write', /setAttribute\(\s*['"]style['"]/],
-  [
-    'an HTML string sink',
-    /\.(?:inner|outer)HTML\s*=(?!=)|insertAdjacentHTML\(|createContextualFragment\(/,
-  ],
-  ['document.write', /document\.write(?:ln)?\(/],
-  ['{@html}', /\{@html\s/],
-  ['eval or new Function', /(?<![.\w])eval\(|new Function\(/],
-  ['a string timer', /set(?:Timeout|Interval)\(\s*['"`]/],
-  ['srcdoc', /\bsrcdoc\s*=/],
-];
-
-function sourceFiles(dir: string): string[] {
-  return readdirSync(dir).flatMap((name) => {
-    const path = join(dir, name);
-    if (statSync(path).isDirectory()) return name === 'node_modules' ? [] : sourceFiles(path);
-    return /\.(?:ts|js|svelte)$/.test(name) ? [path] : [];
-  });
-}
-
-test.describe('csp · sources', () => {
-  test('no package source uses a sink the policy blocks', () => {
-    const packages = join(ROOT, 'packages');
-    const files = readdirSync(packages)
-      .map((name) => join(packages, name, 'src'))
-      .filter((dir) => existsSync(dir))
-      .flatMap(sourceFiles);
-    expect(files.length).toBeGreaterThan(100);
-    const hits = files.flatMap((file) =>
-      readFileSync(file, 'utf8')
-        .split('\n')
-        .flatMap((line, index) =>
-          BLOCKED_SINKS.filter(([, pattern]) => pattern.test(line)).map(
-            ([what]) => `${relative(ROOT, file)}:${index + 1} ${what}`
-          )
-        )
+  await test.step('the theme island hydrates and changes mode under its page policy', async () => {
+    const logged = findings.length;
+    const response = await page.goto('/theme-switcher/');
+    expect(response?.headers()['content-security-policy']).toBe(
+      siteHeaders().get('/theme-switcher/')?.enforced
     );
-    expect(hits).toEqual([]);
+    expect(response?.headers()['content-security-policy-report-only']).toBe(
+      siteHeaders().get('/theme-switcher/')?.reportOnly
+    );
+    const dark = page.getByRole('group', { name: 'Mode' }).getByRole('button', { name: 'Dark' });
+    await dark.click();
+    await expect(page.locator('[data-tx-theme-switcher] [role="status"]')).toContainText(
+      'mode dark'
+    );
+    await settle(page);
+    expect(await pageViolations(page, findings.slice(logged))).toEqual([]);
   });
 });
 
-/** Examples per test: one page session walks a batch (page setup dominates). */
-const EXAMPLE_BATCH = 12;
+/**
+ * Every registered example, dealt into a few tests: one page session walks a
+ * batch (page setup dominates), and the batches run in parallel.
+ */
+const EXAMPLE_BATCHES = 4;
 
 test.describe('csp · every example renders with zero violations', () => {
   const ids = listExampleIds();
-  for (let start = 0; start < ids.length; start += EXAMPLE_BATCH) {
-    const batch = ids.slice(start, start + EXAMPLE_BATCH);
+  const size = Math.ceil(ids.length / EXAMPLE_BATCHES);
+  for (let start = 0; start < ids.length; start += size) {
+    const batch = ids.slice(start, start + size);
     test(`${batch[0]} … ${batch.at(-1)}`, async ({ page }) => {
-      test.setTimeout(batch.length * 60_000);
+      test.setTimeout(batch.length * 20_000);
       const findings = await watchViolations(page);
       const problems: string[] = [];
       for (const id of batch) {

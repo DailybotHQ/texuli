@@ -92,10 +92,11 @@ async function reportsFor(page: string, timeout = 20_000) {
   return store.snapshot().recent.filter((report) => report.page === page);
 }
 
-test.describe('csp · report-only observability', () => {
-  test('the site-shaped report-only policy raises a report-only violation and never blocks', async ({
-    page,
-  }) => {
+test('report-only raises and delivers reduced reports without blocking; enforcing blocks and reports', async ({
+  page,
+  browserName,
+}) => {
+  await test.step('the site-shaped report-only policy raises a report-only violation and never blocks', async () => {
     await page.addInitScript(() => {
       const seen: { directive: string; disposition: string }[] = [];
       (window as unknown as { __violations: typeof seen }).__violations = seen;
@@ -114,9 +115,7 @@ test.describe('csp · report-only observability', () => {
       .toContainEqual(expect.objectContaining({ disposition: 'report' }));
   });
 
-  test('a report-only violation is delivered to the intake, reduced, and never blocks', async ({
-    page,
-  }) => {
+  await test.step('a report-only violation is delivered to the intake, reduced', async () => {
     await page.goto(`${origin}/report-only-legacy?session=fictional-secret#frag`);
     // Report-only never enforces: the inline style still applies.
     await expect(page.locator('#probe')).toHaveCSS('color', 'rgb(255, 0, 0)');
@@ -127,10 +126,7 @@ test.describe('csp · report-only observability', () => {
     expect(JSON.stringify(store.snapshot())).not.toMatch(/fictional-secret|frag|255/);
   });
 
-  test('the enforcing policy blocks the same violation and reports it', async ({
-    page,
-    browserName,
-  }) => {
+  await test.step('the enforcing policy blocks the same violation and reports it', async () => {
     await page.goto(`${origin}/enforced`);
     await expect(page.locator('#probe')).not.toHaveCSS('color', 'rgb(255, 0, 0)');
     const reports = await reportsFor('/enforced');

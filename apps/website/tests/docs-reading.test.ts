@@ -7,20 +7,32 @@
  * - the guides outline, breadcrumbs, 404 and Markdown twin hint (T-80);
  * - the docs shell's single "On this page" navigation (Final Review P2-3);
  * - the screen-reader pass fixes (T-90, docs/quality/sr-transcripts-site.md);
- * - every guide live island is mounted (regression of 7996bbd7).
+ * - every guide live island is mounted (regression of 7996bbd7);
+ * - the site navigation model (groups, current page, pager) and the
+ *   "Copy page" Markdown rendition the build fills into every docs page.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadLibraryTheme } from '@texuli/tokens/library';
 import { describe, expect, it } from 'vitest';
+import { COMPONENT_PAGES } from '../src/components/component-pages/load-manifests.ts';
+import { fillPageMarkdown } from '../src/components/docs/integration.ts';
 import { htmlToMarkdown } from '../src/components/docs/markdown.ts';
+import {
+  isDocsPath,
+  navSections,
+  pagerFor,
+  SITE_NAV_GROUPS,
+  SITE_NAV_ORDER,
+} from '../src/components/foundation/nav-data.ts';
 import {
   type GuideLanguage,
   type GuideToken,
   highlightGuideCode,
 } from '../src/components/guides/highlight.ts';
 import { flattenGuidesNav, GUIDES_SECTIONS } from '../src/components/guides/nav.ts';
+import { PRIMITIVES } from '../src/components/primitives-page/primitives.ts';
 import { breadcrumbTrail } from '../src/components/seo/breadcrumbs.ts';
 
 describe('guide code highlighting', () => {
@@ -723,5 +735,96 @@ describe('guide live islands', () => {
       );
       expect(page?.source).toContain('<h2 id="live-example">Live example</h2>');
     });
+  });
+});
+
+describe('site navigation model', () => {
+  const BUTTON = '/component-pages/button/';
+
+  it('groups come from site.ts: guides in reading order, the platform pair, every component and primitive', () => {
+    expect(SITE_NAV_GROUPS.map((group) => group.label)).toEqual([
+      'Get started',
+      'Platform',
+      'Components',
+      'Primitives',
+      'Themes',
+      'Agents',
+      'Project',
+    ]);
+    const guides = GUIDES_SECTIONS.flatMap((section) => section.items).map((item) => item.href);
+    expect(SITE_NAV_GROUPS[0]?.links.map((link) => link.href)).toEqual([...guides, '/skill/']);
+    const platform = SITE_NAV_GROUPS.find((group) => group.id === 'platform');
+    expect(platform?.links.map((link) => link.href)).toEqual(['/web-and-native/', '/native/']);
+    // The home is a landing outside the docs navigation.
+    expect(SITE_NAV_ORDER.some((link) => link.href === '/')).toBe(false);
+    expect(SITE_NAV_ORDER.some((link) => link.href.startsWith('/migration'))).toBe(false);
+
+    const hrefs = new Set(SITE_NAV_ORDER.map((link) => link.href));
+    for (const entry of COMPONENT_PAGES) expect(hrefs).toContain(`/component-pages/${entry.id}/`);
+    for (const doc of PRIMITIVES) expect(hrefs).toContain(`/primitives-page/${doc.id}/`);
+    // Catalog pages nest one level per family, sorted, each listed once.
+    const families =
+      SITE_NAV_GROUPS.find((group) => group.id === 'components')?.links.filter(
+        (link) => link.children
+      ) ?? [];
+    for (const family of families) {
+      const labels = (family.children ?? []).map((child) => child.label);
+      expect(labels).toEqual([...labels].sort((a, b) => a.localeCompare(b, 'en')));
+    }
+    const labels = families.flatMap((family) => (family.children ?? []).map((c) => c.label));
+    expect(new Set(labels).size).toBe(COMPONENT_PAGES.length);
+  });
+
+  it('marks the current page and section, pages in sidebar order, and tells docs pages apart', () => {
+    const button = navSections('', BUTTON).flatMap((section) => section.items);
+    const family = button.find(
+      (item) => item.current === 'section' && item.children?.some((child) => child.current)
+    );
+    expect(family?.children?.filter((child) => child.current)).toEqual([
+      { label: 'Button', href: BUTTON, current: 'page' },
+    ]);
+    // A page without its own link marks its nearest listed ancestor.
+    const dashboard = navSections('/base', '/showcase/dashboard/').flatMap((s) => s.items);
+    expect(dashboard.filter((item) => item.current)).toEqual([
+      { label: 'Showcase', href: '/base/showcase/', current: 'section' },
+    ]);
+    const index = SITE_NAV_ORDER.findIndex((link) => link.href === BUTTON);
+    expect(pagerFor(BUTTON)).toEqual({
+      previous: SITE_NAV_ORDER[index - 1],
+      next: SITE_NAV_ORDER[index + 1],
+    });
+    expect(pagerFor('/guides/')).toEqual({ next: SITE_NAV_ORDER[1] });
+    expect(pagerFor('/')).toEqual({});
+    expect(pagerFor('/not-listed/')).toEqual({});
+    expect(isDocsPath(BUTTON)).toBe(true);
+    expect(isDocsPath('/guides/install/')).toBe(true);
+    expect(isDocsPath('/gallery-components/')).toBe(false);
+    expect(isDocsPath('/')).toBe(false);
+  });
+
+  it('"Copy page" Markdown keeps content, drops controls and hidden text, and fills only the body', () => {
+    const markdown = htmlToMarkdown(`
+      <h2 id="a">Usage &amp; notes</h2>
+      <p>Read the <a href="/guides/">guides</a> and use <code>texuli add</code>.</p>
+      <p>Render <code>&lt;Button&gt;</code> for an &lt;a&gt; link.</p>
+      <pre><code>pnpm add texuli</code></pre>
+      <table><tr><th>Prop</th><th>Type</th></tr><tr><td>size</td><td>sm | md</td></tr></table>
+      <button>Copy page</button><script>alert(1)</script>
+      <div aria-hidden="true">decoration</div><p hidden>secret</p>`);
+    expect(markdown).toContain('## Usage & notes');
+    expect(markdown).toContain('Read the [guides](/guides/) and use `texuli add`.');
+    expect(markdown).toContain('```\npnpm add texuli\n```');
+    // Escaped text survives as text: it is never mistaken for a tag.
+    expect(markdown).toContain('Render `<Button>` for an <a> link.');
+    expect(markdown).toContain('| Prop | Type |');
+    for (const dropped of ['Copy page', 'alert(1)', 'decoration', 'secret'])
+      expect(markdown).not.toContain(dropped);
+
+    const page = `<main><template data-page-markdown="" data-x>Head\n</template><!--tx-page-body--><h2>A &lt;b&gt; tag</h2><p>x</p><!--/tx-page-body--><nav>Pager</nav></main>`;
+    const filled = fillPageMarkdown(page) ?? '';
+    expect(filled).toContain('<template data-page-markdown="" data-x>Head\n## A &lt;b&gt; tag');
+    expect(filled).not.toContain('tx-page-body');
+    expect(filled).not.toMatch(/<template[^>]*>[^<]*Pager/);
+    expect(fillPageMarkdown('<main><p>No template</p></main>')).toBeNull();
   });
 });
