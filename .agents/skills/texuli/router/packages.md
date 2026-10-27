@@ -2,14 +2,18 @@
 
 Every workspace package, its layer and its public entries. Layers point down
 only: a package imports only from lower layers (the repository's
-`scripts/check-layers.ts` enforces it). **16 of these 17 packages are on npm
+`scripts/check-layers.ts` enforces it). **16 of these 19 packages are on npm
 as `0.3.0`** (published by CI with provenance; `latest` and `next` both
 point to it; pre-1.0, not stable; the workspace packages stay
 `private: true`), so install them plainly (`pnpm add texuli`), import them in
 a Texuli workspace, or copy components with the CLI
-([`../components/SKILL.md`](../components/SKILL.md)). The exception is
-`@texuli/editor`: version `0.0.0`, in development, excluded from packing and
-not on npm, so only a Texuli workspace can import it. `@texuli/examples` is a
+([`../components/SKILL.md`](../components/SKILL.md)). The exceptions are
+`@texuli/editor`, `@texuli/drag` and `@texuli/workflows`: version `0.0.0`,
+in development and not on npm, so only a Texuli workspace can import them.
+The repository is ahead of npm: everything marked unreleased below (spec
+0.3.0, the new catalog groups, `sortable`, the player's interaction) ships
+with the next owner-approved release, which publishes `@texuli/drag` and
+`@texuli/workflows` before the packages that depend on them. `@texuli/examples` is a
 private registry for tests and the site, not a library, and is left out.
 
 This table is derived from each `packages/*/package.json` `exports` map and the
@@ -21,8 +25,9 @@ rest.
 | --- | --- | --- | --- |
 | L0 | `@texuli/core` | Texels: framework-free behavior and policy that every Texuli component is built from. | `@texuli/core`, `@texuli/core/announcer`, `@texuli/core/controllable`, `@texuli/core/dir-locale`, `@texuli/core/dismiss`, `@texuli/core/editor-history`, `@texuli/core/editor-keymap`, `@texuli/core/editor-markdown`, `@texuli/core/editor-model`, `@texuli/core/editor-transforms`, `@texuli/core/env`, `@texuli/core/focus-scope`, `@texuli/core/form-bridge`, `@texuli/core/ids`, … (28 entries) |
 | L0 | `@texuli/date` | Dependency-free Gregorian calendar dates (`CalendarDate`, month and week helpers) behind the calendar and date pickers; first published in `0.3.0`. | `@texuli/date`, `@texuli/date/calendar` |
-| L0 | `@texuli/spec` | The schema-first blueprint contract: JSON schemas, the catalog vocabulary, deterministic TypeScript and Kotlin projections, and the conformance harness. | `@texuli/spec`, `@texuli/spec/codegen` |
-| L1 | `@texuli/primitives` | Owned, headless Svelte 5 primitives built on the texels. | `@texuli/primitives`, `@texuli/primitives/accordion`, `@texuli/primitives/alert-dialog`, `@texuli/primitives/avatar`, `@texuli/primitives/calendar`, `@texuli/primitives/checkbox`, `@texuli/primitives/collapsible`, `@texuli/primitives/color-picker`, `@texuli/primitives/combobox`, `@texuli/primitives/command`, `@texuli/primitives/context-menu`, `@texuli/primitives/date-field`, `@texuli/primitives/date-picker`, `@texuli/primitives/dialog`, … (42 entries) |
+| L0 | `@texuli/drag` | Framework-free drag engine: sortable lists and groups, trees, swap, multi-drag, gesture, spatial canvas, graph editing, localized `DragMessages`. **In development: `0.0.0`, not on npm.** | `@texuli/drag`, `@texuli/drag/auto-scroll`, `@texuli/drag/collision`, `@texuli/drag/gesture`, `@texuli/drag/graph`, `@texuli/drag/messages`, `@texuli/drag/modifiers`, `@texuli/drag/sortable`, `@texuli/drag/spatial`, `@texuli/drag/testing` |
+| L0 | `@texuli/spec` | The schema-first blueprint contract: JSON schemas, the catalog vocabulary, deterministic TypeScript and Kotlin projections, and the conformance harness. Spec 0.3.0 (state, bindings, closed actions, `reorder`, workflow graphs, the state surface) is in the repository; npm `0.3.0` carries spec 0.2.0 and only the root and `codegen`. | `@texuli/spec`, `@texuli/spec/codegen`, `@texuli/spec/migrate`, `@texuli/spec/surface`, `@texuli/spec/workflow` |
+| L1 | `@texuli/primitives` | Owned, headless Svelte 5 primitives built on the texels (42, including `sortable` on `@texuli/drag`, unreleased). | `@texuli/primitives`, `@texuli/primitives/accordion`, `@texuli/primitives/alert-dialog`, `@texuli/primitives/avatar`, `@texuli/primitives/calendar`, `@texuli/primitives/checkbox`, `@texuli/primitives/collapsible`, `@texuli/primitives/color-picker`, `@texuli/primitives/combobox`, `@texuli/primitives/command`, `@texuli/primitives/context-menu`, `@texuli/primitives/date-field`, `@texuli/primitives/date-picker`, `@texuli/primitives/dialog`, … (43 entries) |
 | L2 | `@texuli/tokens` | The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. | `@texuli/tokens`, `@texuli/tokens/aa-gate`, `@texuli/tokens/aa-gate/components`, `@texuli/tokens/base.css`, `@texuli/tokens/build`, `@texuli/tokens/contract`, `@texuli/tokens/css`, `@texuli/tokens/forced-colors`, `@texuli/tokens/forced-colors.css`, `@texuli/tokens/generator`, `@texuli/tokens/library`, `@texuli/tokens/library-expand`, `@texuli/tokens/modes`, `@texuli/tokens/no-flash`, … (18 entries) |
 | L3 | `texuli` | Styled Texuli components, layouts and shells. | `texuli`, `texuli/alert`, `texuli/avatar`, `texuli/badge`, `texuli/button`, `texuli/card`, `texuli/carousel`, `texuli/choice`, `texuli/combobox`, `texuli/command`, `texuli/cx`, `texuli/date`, `texuli/dialog`, `texuli/empty`, … (70 entries) |
 | L4 | `@texuli/charts` | Chart math and every chart family, one lazy subpath per family. | `@texuli/charts`, `@texuli/charts/annotations`, `@texuli/charts/axis`, `@texuli/charts/calendar`, `@texuli/charts/canvas`, `@texuli/charts/cartesian`, `@texuli/charts/colors`, `@texuli/charts/compact`, `@texuli/charts/flow`, `@texuli/charts/geo`, `@texuli/charts/histogram`, `@texuli/charts/interaction`, `@texuli/charts/math`, `@texuli/charts/math/color`, … (26 entries) |
@@ -30,9 +35,10 @@ rest.
 | L4 | `@texuli/data` | Data views: grid, tree, board, calendar, timeline, map, activity and files. | `@texuli/data`, `@texuli/data/activity`, `@texuli/data/activity/engine`, `@texuli/data/board`, `@texuli/data/board/engine`, `@texuli/data/calendar`, `@texuli/data/calendar/view`, `@texuli/data/files`, `@texuli/data/files/engine`, `@texuli/data/geo`, `@texuli/data/grid`, `@texuli/data/grid-columns`, `@texuli/data/grid-core`, `@texuli/data/grid-editing`, … (21 entries) |
 | L4 | `@texuli/editor` | Rich text editor surface on the `@texuli/core` editor texels: owned model, transforms, history and a sink-free Svelte 5 rendering. **In development: `0.0.0`, not published to npm.** | `@texuli/editor`, `@texuli/editor/controller`, `@texuli/editor/editor`, `@texuli/editor/link-dialog`, `@texuli/editor/paste`, `@texuli/editor/toolbar` |
 | L4 | `@texuli/media` | Media: images, galleries, video, audio and layered compositions. | `@texuli/media`, `@texuli/media/animation`, `@texuli/media/animation/player`, `@texuli/media/audio`, `@texuli/media/captions`, `@texuli/media/composition-canvas`, `@texuli/media/composition-canvas/draw`, `@texuli/media/composition-canvas/render`, `@texuli/media/composition-model`, `@texuli/media/composition-svg`, `@texuli/media/composition-v2`, `@texuli/media/export`, `@texuli/media/export/ui`, `@texuli/media/gallery`, … (23 entries) |
+| L4 | `@texuli/workflows` | Accessible workflow graph editor and viewer: model, layered layout, spec adapter, editor, viewer, inspector. **In development: `0.0.0`, not on npm.** | `@texuli/workflows`, `@texuli/workflows/editor`, `@texuli/workflows/inspector`, `@texuli/workflows/layout`, `@texuli/workflows/model`, `@texuli/workflows/spec-adapter`, `@texuli/workflows/viewer` |
 | L5 | `@texuli/blocks` | Content blocks: closed vocabulary, untrusted guard, formula AST and catalog metadata for pages, documents and slides. | `@texuli/blocks`, `@texuli/blocks/code`, `@texuli/blocks/code/engine`, `@texuli/blocks/code/renderers`, `@texuli/blocks/code/tokenizer`, `@texuli/blocks/core`, `@texuli/blocks/data`, `@texuli/blocks/data/engine`, `@texuli/blocks/data/renderers`, `@texuli/blocks/diagram`, `@texuli/blocks/diagram/engine`, `@texuli/blocks/diagram/renderers`, `@texuli/blocks/embed`, `@texuli/blocks/embed/engine`, … (32 entries) |
-| L6 | `@texuli/catalog` | The agent catalog and the renderer with no HTML sinks. | `@texuli/catalog`, `@texuli/catalog/build`, `@texuli/catalog/build/node`, `@texuli/catalog/edit`, `@texuli/catalog/envelope`, `@texuli/catalog/manifest`, `@texuli/catalog/manifests/content`, `@texuli/catalog/manifests/display`, `@texuli/catalog/manifests/forms`, `@texuli/catalog/manifests/layouts`, `@texuli/catalog/manifests/overlays`, `@texuli/catalog/player`, `@texuli/catalog/render/conditions`, `@texuli/catalog/render/frame`, … (21 entries) |
-| L7 | `@texuli/player` | Svelte paint runtime for validated Texuli catalog blueprints. | `@texuli/player`, `@texuli/player/styles.css` |
+| L6 | `@texuli/catalog` | The agent catalog (158 ids, 66 agent-emittable; the `chat`, `composition`, `data`, `state` and `workflows` groups are unreleased) and the renderer with no HTML sinks. | `@texuli/catalog`, `@texuli/catalog/build`, `@texuli/catalog/build/node`, `@texuli/catalog/edit`, `@texuli/catalog/envelope`, `@texuli/catalog/manifest`, `@texuli/catalog/manifests/chat`, `@texuli/catalog/manifests/composition`, `@texuli/catalog/manifests/content`, `@texuli/catalog/manifests/data`, `@texuli/catalog/manifests/display`, `@texuli/catalog/manifests/forms`, `@texuli/catalog/manifests/layouts`, `@texuli/catalog/manifests/overlays`, … (26 entries) |
+| L7 | `@texuli/player` | Svelte paint runtime for validated Texuli catalog blueprints: every emittable id, spec 0.3.0 state and closed actions, one shared drag scope (unreleased beyond npm `0.3.0`). | `@texuli/player`, `@texuli/player/styles.css` |
 | L7 | `@texuli/slides` | Presentation deck model, grammar, and responsive stage runtime. | `@texuli/slides`, `@texuli/slides/export`, `@texuli/slides/grammar`, `@texuli/slides/model`, `@texuli/slides/stage`, `@texuli/slides/styles.css`, `@texuli/slides/templates` |
 | L8 | `@texuli/astro` | Astro integration, content layouts and Svelte islands for Texuli sites. | `@texuli/astro`, `@texuli/astro/content`, `@texuli/astro/integration`, `@texuli/astro/layouts/ContentLayout`, `@texuli/astro/sections/Hero`, `@texuli/astro/sections/Section`, `@texuli/astro/site`, `@texuli/astro/styles.css` |
 | L8 | `@texuli/tools` | Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. | `@texuli/tools`, `@texuli/tools/a2ui`, `@texuli/tools/cli-add`, `@texuli/tools/cli-init`, `@texuli/tools/cli-update`, `@texuli/tools/elements`, `@texuli/tools/golden`, `@texuli/tools/llms` |
@@ -82,4 +88,17 @@ import { fromMarkdown, toMarkdown } from '@texuli/core/editor-markdown';
 import { texuli } from '@texuli/astro';
 import { defineSite, sitePageMeta, siteSitemap } from '@texuli/astro/site';
 import { GOLDEN_TASKS, scoreGoldenTree } from '@texuli/tools/golden';
+import { applyMove, createSortableModel, planMove } from '@texuli/drag/sortable';
+import { resolveDragMessages } from '@texuli/drag/messages';
+import { Sortable } from '@texuli/primitives/sortable';
+import { WorkflowEditor } from '@texuli/workflows/editor';
+import { WorkflowViewer } from '@texuli/workflows/viewer';
+import { WorkflowInspector } from '@texuli/workflows/inspector';
+import { applyWorkflowOps, createWorkflow, defineNodeTypes } from '@texuli/workflows/model';
+import { layoutMoves, layoutWorkflow } from '@texuli/workflows/layout';
+import { fromSpecWorkflow, toSpecWorkflow } from '@texuli/workflows/spec-adapter';
+import { migrateBlueprint } from '@texuli/spec/migrate';
+import { validateWorkflowGraph } from '@texuli/spec/workflow';
+import { checkStateSurface, surfaceInputs } from '@texuli/spec/surface';
+import { CalendarDate } from '@texuli/date';
 ```

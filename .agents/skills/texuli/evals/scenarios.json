@@ -454,5 +454,94 @@
       "mustInclude": ["layout-page", "media-image", "blocks-text"],
       "recorded": true
     }
+  ],
+  "interactive": [
+    {
+      "task": "i01-sortable-lists",
+      "title": "Sortable lists that exchange items (drag and drop)",
+      "follow": "build-ui/SKILL.md",
+      "stages": ["B", "C", "D"],
+      "rules": ["Public imports only", "Sink-free", "A11y and contrast"],
+      "traps": [
+        "A drag with no keyboard path or non-drag alternative (WCAG 2.5.7)",
+        "Hardcoded English announcements instead of DragMessages"
+      ],
+      "mustInclude": ["@texuli/primitives/sortable"],
+      "reference": "tests/behavior/scenarios/sortable/scenario.svelte",
+      "recorded": false
+    },
+    {
+      "task": "i02-workflow-editor",
+      "title": "Workflow editor with typed nodes and auto-layout",
+      "follow": "build-ui/SKILL.md",
+      "stages": ["B", "C", "D"],
+      "rules": ["Public imports only", "Sink-free", "A11y and contrast"],
+      "traps": [
+        "Rendering node labels or props as HTML",
+        "Editing the graph outside the validated workflow ops"
+      ],
+      "mustInclude": ["@texuli/workflows/editor", "@texuli/workflows/model"],
+      "reference": "packages/examples/src/workflows-editor/WorkflowsEditorDemo.svelte",
+      "recorded": false
+    },
+    {
+      "task": "i03-stateful-board-json",
+      "title": "Stateful sprint board as a JSON blueprint with reorder (drag as data)",
+      "follow": "blueprints/SKILL.md",
+      "stages": ["A", "D", "G"],
+      "rules": [
+        "Validate first, paint second.",
+        "Actions are closed",
+        "Drag as data",
+        "A blueprint that validates paints"
+      ],
+      "traps": [
+        "An action outside the closed set (fetch, navigate)",
+        "Bidirectional or zero-width characters in a draggable list item"
+      ],
+      "mustInclude": ["layout-page", "sortable-list"],
+      "reference": "packages/spec/fixtures/golden/sortable-board.json",
+      "recorded": false
+    },
+    {
+      "task": "i04-workflow-builder-json",
+      "title": "Editable workflow-graph bound to a workflow variable",
+      "follow": "blueprints/SKILL.md",
+      "stages": ["A", "D", "G"],
+      "rules": ["Validate first, paint second.", "Workflows:", "A blueprint that validates paints"],
+      "traps": [
+        "A graph prop set both in props and in bind",
+        "A forbidden cycle or more than 500 nodes"
+      ],
+      "mustInclude": ["layout-page", "workflow-graph"],
+      "reference": "packages/spec/fixtures/golden/workflow-builder.json",
+      "recorded": false
+    },
+    {
+      "task": "i05-lego-composition",
+      "title": "One JSON screen: board, charts, media, blocks, sortable palette and outline, workflow editor",
+      "follow": "blueprints/SKILL.md",
+      "stages": ["A", "D", "G"],
+      "rules": [
+        "Validate first, paint second.",
+        "Drag as data",
+        "Workflows:",
+        "A blueprint that validates paints"
+      ],
+      "traps": [
+        "Moving items between lists whose groups do not accept each other",
+        "A form field outside an action-form"
+      ],
+      "mustInclude": [
+        "layout-page",
+        "data-board",
+        "sortable-list",
+        "workflow-graph",
+        "media-image",
+        "blocks-text"
+      ],
+      "reference": "packages/spec/fixtures/golden/lego.json",
+      "recorded": false
+    }
   ]
 }

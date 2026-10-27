@@ -168,6 +168,9 @@ Full checklists: [`references/recipes.md`](references/recipes.md).
 | Form flow | `texuli/input`, field, button, stepper; forms manifests |
 | Slide / deck | `@texuli/slides` (model, grammar, stage, export, templates) over `@texuli/blocks` content |
 | Media story | [`../media/SKILL.md`](../media/SKILL.md) + content card |
+| Drag and drop (lists, groups, boards, trees) | `@texuli/primitives/sortable`, `@texuli/data/board`, `@texuli/data/tree-view`; engine `@texuli/drag` (in development, not on npm) |
+| Workflow editor or diagram | `@texuli/workflows` editor, viewer, inspector, model, layout (in development, not on npm) |
+| A whole stateful screen as JSON (an agent sends it) | [`../blueprints/SKILL.md`](../blueprints/SKILL.md) stage **G** |
 
 ## Offline gates for this skill pack
 
@@ -184,7 +187,7 @@ See [`references/imports.md`](references/imports.md).
 ## Local references
 
 - [`references/loop.md`](references/loop.md) — catalog → pick → compose → validate → render
-- [`references/recipes.md`](references/recipes.md) — five interface recipes
+- [`references/recipes.md`](references/recipes.md) — seven interface recipes (drag and workflows included)
 - [`references/gates.md`](references/gates.md) — offline commands
 - [`references/imports.md`](references/imports.md) — public import map
 - Router: [`../router/routes.md`](../router/routes.md)

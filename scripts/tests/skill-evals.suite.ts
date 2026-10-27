@@ -11,6 +11,8 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { validateBlueprint } from '../../packages/spec/src/validate.ts';
+import { validateWorkflowGraph } from '../../packages/spec/src/workflow.ts';
 import { runGoldenCli } from '../../packages/tools/src/golden/cli.ts';
 import {
   type AxeLike,
@@ -45,7 +47,12 @@ interface RuleBreak {
   tree: unknown;
 }
 
-const scenarios = json<{ version: number; scenarios: Scenario[] }>('scenarios.json').scenarios;
+const scenarioFile = json<{
+  version: number;
+  scenarios: Scenario[];
+  interactive: (Scenario & { reference: string })[];
+}>('scenarios.json');
+const scenarios = scenarioFile.scenarios;
 const following = json<Record<string, unknown>>('runs/skill-following.json');
 const breaks = json<RuleBreak[]>('runs/rule-breaks.json');
 
@@ -149,6 +156,57 @@ describe('skills/texuli/evals: scenario evals', () => {
       expect(out.join('')).toContain('g03-onboarding-handbook');
     } finally {
       vi.restoreAllMocks();
+    }
+  });
+});
+
+/** Collect every node id of a blueprint tree. */
+function nodeIds(node: unknown, out = new Set<string>()): Set<string> {
+  if (node && typeof node === 'object') {
+    const bag = node as { id?: unknown; children?: unknown };
+    if (typeof bag.id === 'string') out.add(bag.id);
+    if (Array.isArray(bag.children)) for (const child of bag.children) nodeIds(child, out);
+  }
+  return out;
+}
+
+describe('skills/texuli/evals: interactive scenarios (drag, workflows, stateful JSON)', () => {
+  const spec = (rel: string) => JSON.parse(readFileSync(join(root, 'packages/spec', rel), 'utf8'));
+  const documents = {
+    blueprintSchema: spec('schemas/blueprint.schema.json'),
+    catalog: spec('catalog/components.json'),
+    workflowSchema: spec('schemas/workflow.schema.json'),
+    validateWorkflowGraph,
+  } as Parameters<typeof validateBlueprint>[1];
+
+  it('quotes its rules and stages from the followed sub-skill, and its reference holds what it needs', () => {
+    const interactive = scenarioFile.interactive;
+    expect(interactive.length).toBeGreaterThanOrEqual(3);
+    const ids = interactive.map((scenario) => scenario.task);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const id of ids) expect(goldenTask(id), id).toBeUndefined();
+    const text = JSON.stringify(interactive);
+    for (const needle of ['drag', 'sortable', 'workflow', 'reorder'])
+      expect(text).toContain(needle);
+    for (const scenario of interactive) {
+      const skill = readFileSync(join(root, 'skills', 'texuli', scenario.follow), 'utf8');
+      for (const rule of scenario.rules) expect(skill, `${scenario.task}: ${rule}`).toContain(rule);
+      for (const stage of scenario.stages)
+        expect(skill, `${scenario.task}: ${stage}`).toMatch(new RegExp(`^#{2,3} ${stage} —`, 'm'));
+      expect(scenario.recorded).toBe(false);
+      const reference = readFileSync(join(root, scenario.reference), 'utf8');
+      if (scenario.reference.endsWith('.json')) {
+        // A JSON scenario's reference is a spec golden: it validates and uses every needed id.
+        const blueprint = JSON.parse(reference) as { tree: unknown };
+        expect(validateBlueprint(blueprint, documents).diagnostics, scenario.task).toEqual([]);
+        const used = nodeIds(blueprint.tree);
+        for (const id of scenario.mustInclude)
+          expect([...used], `${scenario.task}: ${id}`).toContain(id);
+      } else {
+        // A Svelte scenario's reference imports every needed entry.
+        for (const entry of scenario.mustInclude)
+          expect(reference, `${scenario.task}: ${entry}`).toContain(`'${entry}'`);
+      }
     }
   });
 });

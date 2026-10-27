@@ -93,6 +93,106 @@ flatten them. A presenter screen is a second same-origin window linked with
 **Compose order:** story outline → media slots with policy-safe URLs →
 captions/chapters → export only if the brief asks (media export docs).
 
+## 6. Drag and drop: sortable lists, groups and boards
+
+**Brief shape:** reorder a list; move cards between columns; copy from a
+palette; reparent in a tree. `@texuli/drag` is in development and not on
+npm, so this runs in a Texuli workspace.
+
+| Need | Prefer |
+| --- | --- |
+| A sortable list or several lists that exchange items | `@texuli/primitives/sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) |
+| A kanban board with WIP limits and a "Move to…" menu | `@texuli/data/board` (`Board`) |
+| An outline or file tree with reorder and indent | `@texuli/data/tree-view` (`TreeDataView`) |
+| Rules and planning without Svelte (server, worker, tests) | `@texuli/drag/sortable` (`createSortableModel`, `planMove`, `applyMove`) |
+| Localized announcements | `@texuli/drag/messages` (`resolveDragMessages`), or each view's `messages` prop |
+
+```svelte
+<script lang="ts">
+  import { Sortable, type SortableContainer } from '@texuli/primitives/sortable';
+
+  const labels: Record<string, string> = { copy: 'Write copy', review: 'Review', ship: 'Ship' };
+  let containers = $state<SortableContainer[]>([
+    { id: 'todo', items: ['copy', 'review'], group: 'tasks' },
+    { id: 'done', items: ['ship'], group: 'tasks', maxItems: 10 },
+  ]);
+</script>
+
+<Sortable.Root bind:containers crossContainers>
+  {#each containers as list (list.id)}
+    <Sortable.List id={list.id} label={list.id === 'todo' ? 'To do' : 'Done'}>
+      {#snippet children({ items })}
+        {#each items as id (id)}
+          <Sortable.Item {id} label={labels[id]}>
+            <Sortable.Handle>⠿</Sortable.Handle>
+            {labels[id]}
+          </Sortable.Item>
+        {/each}
+      {/snippet}
+    </Sortable.List>
+  {/each}
+</Sortable.Root>
+```
+
+**Rules:** container `group` with `pull` (`true`, `false` or `'clone'`) and
+`put`; `locked` items never move; `maxItems` caps a list; `canDrop` refuses
+with a reason; `onMove` returning `false` means you apply the move yourself.
+**Accessibility contract** (every drag surface): Space or Enter picks up and
+drops, arrows move (inline arrows flip in RTL), Escape restores the origin,
+handles are named buttons with instructions, every pointer drag has a non-drag
+alternative (WCAG 2.5.7), and every announcement comes from `DragMessages`.
+Contract: `packages/drag/docs/contract.md`.
+
+**Gates:** `pnpm vitest run packages/primitives/tests/sortable.test.ts` and
+the behavior scenario `tests/behavior/scenarios/sortable.spec.ts`.
+
+## 7. Workflow editor
+
+**Brief shape:** an automation, approval or pipeline the person edits as
+nodes and edges, or a read-only diagram of one. `@texuli/workflows` is in
+development and not on npm.
+
+```svelte
+<script lang="ts">
+  import { WorkflowEditor } from '@texuli/workflows/editor';
+  import { layoutMoves, layoutWorkflow } from '@texuli/workflows/layout';
+  import { applyWorkflowOps, createWorkflow, defineNodeTypes, type WorkflowGraph } from '@texuli/workflows/model';
+
+  const registry = defineNodeTypes([
+    { type: 'request', label: 'Request', ports: [{ id: 'out', direction: 'out', dataType: 'any' }] },
+    { type: 'end', label: 'End', ports: [{ id: 'in', direction: 'in', dataType: 'any' }] },
+  ]);
+  const at = { x: 0, y: 0 };
+  const built = applyWorkflowOps(createWorkflow(), [
+    { op: 'addNode', node: { id: 'ask', type: 'request', label: 'Expense submitted', position: at } },
+    { op: 'addNode', node: { id: 'paid', type: 'end', label: 'Paid', position: at } },
+    { op: 'connect', edge: { id: 'e1', from: { node: 'ask', port: 'out' }, to: { node: 'paid', port: 'in' } } },
+  ], { registry });
+  if (!built.ok) throw new Error(built.error.message);
+  const laid = applyWorkflowOps(built.graph, [{ op: 'moveNodes', moves: layoutMoves(layoutWorkflow(built.graph)) }], { registry });
+  let graph = $state.raw<WorkflowGraph>(laid.ok ? laid.graph : built.graph);
+</script>
+
+<WorkflowEditor {graph} {registry} onchange={(next) => (graph = next)} />
+```
+
+| Need | Prefer |
+| --- | --- |
+| Editable graph (toolbar, palette, canvas, minimap, inspector, treegrid outline) | `WorkflowEditor` from `@texuli/workflows/editor`; each part is also exported |
+| Read-only figure | `WorkflowViewer` from `@texuli/workflows/viewer` |
+| Node props panel | `WorkflowInspector` from `@texuli/workflows/inspector` |
+| Undo and redo | `createWorkflowHistory` from `@texuli/workflows/model` |
+| From or to blueprint JSON (`workflow-graph`) | `fromSpecWorkflow`, `toSpecWorkflow` from `@texuli/workflows/spec-adapter` |
+
+**Keyboard:** arrows move focus to the nearest node, Alt+Arrow nudges,
+Enter on a port starts connect mode, Delete removes, Ctrl or Cmd with Z / Y
+undo and redo, = / - zoom, 0 fits; the outline treegrid edits without the
+canvas. **Limits:** 500 nodes, 2,000 edges; every op is validated and a
+refused op changes nothing; labels refuse control and bidi characters.
+
+**Gates:** `pnpm vitest run packages/workflows` and the behavior scenario
+`tests/behavior/scenarios/workflow-editor.spec.ts`.
+
 ## Shared acceptance for every recipe
 
 - [ ] Primary path works with real handlers (no dead buttons)

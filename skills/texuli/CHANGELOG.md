@@ -15,6 +15,23 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+### Content
+
+- Drag and drop: `@texuli/drag` (the framework-free engine) and
+  `@texuli/primitives/sortable`, with the shared accessibility and i18n
+  contract; build-ui recipes for sortable lists and a workflow editor.
+- `@texuli/workflows`: editor, viewer, inspector, model, layout and the spec
+  adapter, marked in development and not on npm.
+- Blueprints stage G: spec 0.3.0 interaction as data (envelope `state` and
+  `flow`, `$state` and `$data` bindings, the closed actions, `on`, `reorder`,
+  `workflow-graph`, migrations and the state surface rules), with a
+  validated example in `blueprints/references/interaction.md`.
+- The package index lists `@texuli/drag`, `@texuli/workflows`, the new spec
+  and catalog subpaths and the 158-id catalog, and says what is unreleased.
+- Evals: five `interactive` scenarios (sortable lists, a workflow editor,
+  stateful JSON with `reorder`, an editable `workflow-graph`, the lego
+  composition).
+
 ### Publishing
 
 - The pack is released on its own tag namespace, `skill-vX.Y.Z`, with a
