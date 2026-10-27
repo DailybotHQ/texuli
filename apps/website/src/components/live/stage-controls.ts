@@ -157,3 +157,24 @@ export const STAGE_CONTROLS: Readonly<Record<string, readonly string[]>> = Objec
   toaster: ['label', 'position', 'dismissLabel'],
   tooltip: ['content', 'shortcut', 'side', 'align', 'sideOffset', 'delayDuration', 'disabled'],
 });
+
+/**
+ * Starting values a component page gives a stage over the manifest example
+ * and default, only where the default would collide with the page's own
+ * chrome. The docs shell already renders the page trail as the navigation
+ * landmark named "Breadcrumb" (BaseLayout), so a live Breadcrumb under the
+ * library default name repeats that landmark (axe `landmark-unique`). The
+ * panel, the code sample and the rendered name all read the seeded value.
+ */
+export const PAGE_STAGE_SEEDS: Readonly<Record<string, Readonly<Record<string, unknown>>>> =
+  Object.freeze({
+    breadcrumb: Object.freeze({ label: 'Project breadcrumb' }),
+  });
+
+/** An example's props with the page seed underneath (the example still wins). */
+export function seededExampleProps(
+  id: string,
+  props: Readonly<Record<string, unknown>> | undefined
+): Record<string, unknown> {
+  return { ...(PAGE_STAGE_SEEDS[id] ?? {}), ...(props ?? {}) };
+}

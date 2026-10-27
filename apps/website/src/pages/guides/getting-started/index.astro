@@ -1,4 +1,5 @@
 ---
+import GettingStartedLive from '../../../components/guides/GettingStartedLive.svelte';
 import GuideCode from '../../../components/guides/GuideCode.astro';
 import GuidesShell from '../../../components/guides/GuidesShell.astro';
 
@@ -6,6 +7,7 @@ const toc = [
   { id: 'install', label: 'Install', level: 2 as const },
   { id: 'wire-tokens', label: 'Wire tokens', level: 2 as const },
   { id: 'import-a-component', label: 'Import a component', level: 2 as const },
+  { id: 'live-example', label: 'Live example', level: 2 as const },
 ];
 
 const installSnippet = `# Texuli is in development: every package ships as the 0.1.0-next.1 prerelease (dist-tag next) — there is no stable release yet.
@@ -64,4 +66,8 @@ import '@texuli/tokens/base.css';`;
     Import through lazy subpaths — never a kitchen-sink root barrel for UI. Texels use <code>@texuli/core/&lt;name&gt;</code>.
   </p>
   <GuideCode code={importSnippet} label="Component imports" />
+
+  <h2 id="live-example">Live example</h2>
+  <p>The button below is a real <code>texuli/button</code> island on this static page.</p>
+  <GettingStartedLive client:load />
 </GuidesShell>

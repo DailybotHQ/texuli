@@ -81,6 +81,8 @@ test.describe('navigation model', () => {
   test('groups come from site.ts, with every component and primitive', () => {
     expect(SITE_NAV_GROUPS.map((group) => group.label)).toEqual([
       'Get started',
+      // The platform group (architecture page + native landing) since T-32.
+      'Platform',
       'Components',
       'Primitives',
       'Themes',
@@ -101,7 +103,10 @@ test.describe('navigation model', () => {
     // Components are grouped by family (site-ia.md: Overview, Gallery,
     // Examples, Blocks, Charts, Media, then every catalog component): the
     // catalog pages are one nested, alphabetically sorted level per family.
-    const componentLinks = SITE_NAV_GROUPS[1]?.links.filter((link) => link.children) ?? [];
+    const componentLinks =
+      SITE_NAV_GROUPS.find((group) => group.id === 'components')?.links.filter(
+        (link) => link.children
+      ) ?? [];
     const labels = componentLinks.flatMap((family) =>
       (family.children ?? []).map((child) => child.label)
     );

@@ -137,4 +137,14 @@ describe('the strip template keeps the site contract', () => {
   it('the component page body mounts the strip', () => {
     expect(bodySource).toContain('<ThemeStrip />');
   });
+
+  it('mounts the strip after the live examples, so the first demo stays in the first screen', () => {
+    // The first LiveDemo is client:visible: a strip above it (7996bbd7) moved
+    // it below the fold, and no component page mounted its stage on load.
+    const strip = bodySource.indexOf('<ThemeStrip />');
+    const examplesEnd = bodySource.indexOf('aria-labelledby="cp-props"');
+    expect(bodySource.indexOf('aria-labelledby="cp-examples"')).toBeLessThan(strip);
+    expect(bodySource.indexOf('<LiveDemo')).toBeLessThan(strip);
+    expect(strip).toBeLessThan(examplesEnd);
+  });
 });

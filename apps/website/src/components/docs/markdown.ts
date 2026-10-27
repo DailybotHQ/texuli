@@ -105,6 +105,7 @@ export function htmlToMarkdown(html: string): string {
       (_m, level: string, body: string) =>
         `\n\n${'#'.repeat(Number(level))} ${inline(body).trim()}\n\n`
     )
+    .replace(/<li\b[^>]*>([\s\S]*?)<\/li>/gi, (_m, body: string) => `\n- ${inline(body).trim()}`)
     .replace(/<\/(ul|ol)>/gi, '\n\n')
     .replace(
       /<blockquote\b[^>]*>([\s\S]*?)<\/blockquote>/gi,

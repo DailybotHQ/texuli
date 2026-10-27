@@ -27,10 +27,12 @@ integration.
 - **`audits`** — `pnpm size`, then `pnpm build` and the full
   `tests/e2e/site-perf.spec.ts`. Allowed to fail while the tracked reds
   below stand, so drift stays visible without blocking merges. A NEW
-  failure here is a regression: fix it, do not raise a budget. The steps
-  run in order with no `if: always()`, so while `pnpm size` fails the build
-  and site-perf steps in this job are skipped; site-perf is verified by
-  running it locally (see below).
+  failure here is a regression: fix it, do not raise a budget. The build
+  and site-perf steps run with `if: success() || failure()`, so site-perf
+  is measured even while `pnpm size` is red.
+- `check` and `website` check out the full history (`fetch-depth: 0`): the
+  tokens library-quality test reads an older commit, and the sitemap's
+  `lastmod` comes from each page's git log.
 
 The PLAN_006 offline site audits (`node scripts/audit-seo.mjs --dist
 apps/website/dist`, `node scripts/audit-aeo.mjs --dist apps/website/dist`)

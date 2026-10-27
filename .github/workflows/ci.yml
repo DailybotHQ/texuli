@@ -28,7 +28,11 @@ jobs:
     name: Lint, types, unit tests, layers
     runs-on: ubuntu-latest
     steps:
+      # Full history: packages/tokens/tests/library-quality.test.ts reads the
+      # pre-compact library port from git (5c682dd^).
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -64,13 +68,17 @@ jobs:
     name: Website build and site checks
     runs-on: ubuntu-latest
     steps:
+      # Full history: the sitemap's lastmod comes from each page's git log.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm build
       - run: pnpm --filter @texuli/website check:csp
       # The site-perf budget tests ("performance budgets") run in the
@@ -100,9 +108,13 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm size
+      # Run even when pnpm size is red, so site-perf is actually measured.
       - run: pnpm build
+        if: success() || failure()
       - run: TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e/site-perf.spec.ts --project chromium
+        if: success() || failure()
       - name: Report
         if: always()
         run: |

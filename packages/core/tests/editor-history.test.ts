@@ -102,6 +102,31 @@ describe('editor history', () => {
     expect(history.present.storedMarks).toEqual([{ type: 'strong' }]);
   });
 
+  it('ends the typing step at a caret mark toggle, so undo stops at the format change', () => {
+    // Regression (20f4f422): skipping the no-op toggle's step kept `last`, so
+    // typing before and after Ctrl+B merged and one undo erased all of it.
+    const toggle = (history: EditorHistory) =>
+      editorHistoryReducer(history, {
+        type: 'apply',
+        result: toggleMark(history.present, 'strong'),
+      });
+    let history = createEditorHistory(start());
+    history = type(history, 'Fictional ', 0);
+    history = toggle(history);
+    history = type(history, 'launch', 10);
+    history = toggle(history);
+    history = type(history, ' notes.', 20);
+    expect(textOf(history)).toBe('Fictional **launch** notes.');
+    expect(history.past).toHaveLength(3);
+    history = editorHistoryReducer(history, { type: 'undo' });
+    expect(textOf(history)).toBe('Fictional **launch**');
+    history = editorHistoryReducer(history, { type: 'undo' });
+    expect(textOf(history)).toBe('Fictional');
+    history = editorHistoryReducer(history, { type: 'undo' });
+    expect(textOf(history)).toBe('');
+    expect(canUndo(history)).toBe(false);
+  });
+
   it('keeps at most `limit` snapshots, and restarts on replace', () => {
     let history = createEditorHistory(start(), { limit: 3 });
     for (let i = 0; i < 10; i += 1) history = type(history, String(i), i * 10_000);

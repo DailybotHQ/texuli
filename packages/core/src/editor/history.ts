@@ -63,7 +63,12 @@ export function editorHistoryReducer(
     case 'apply': {
       if (!action.result.ok) return { ...history, errors: action.result.errors };
       const state = action.result.state;
-      if (state.doc === history.present.doc) return { ...history, present: state, errors: [] };
+      // A change that leaves the document as it was (a caret mark toggle) is
+      // no undo step, but like a selection change it ends the running typing
+      // step: undo after "a **b**" stops at the format change, not at "".
+      if (state.doc === history.present.doc) {
+        return { ...history, present: state, errors: [], last: null };
+      }
       const kind = action.kind ?? 'other';
       const at = action.at ?? 0;
       const block = focusBlock(state);

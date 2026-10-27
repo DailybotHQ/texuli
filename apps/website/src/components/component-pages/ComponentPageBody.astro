@@ -7,7 +7,7 @@ import { Badge } from 'texuli/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'texuli/card';
 import EvidencePanel from '../evidence/EvidencePanel.astro';
 import LiveDemo from '../live/LiveDemo.svelte';
-import { STAGE_CONTROLS } from '../live/stage-controls.ts';
+import { STAGE_CONTROLS, seededExampleProps } from '../live/stage-controls.ts';
 import { stageFor } from '../live/stage-map.ts';
 import { familyNote } from './family-notes.ts';
 import {
@@ -84,8 +84,6 @@ const liveProps = {
     }
   </header>
 
-  <ThemeStrip />
-
   <section class="cp__section" aria-labelledby="cp-examples">
     <h2 id="cp-examples">Live examples</h2>
     {
@@ -114,7 +112,11 @@ const liveProps = {
               packageName={entry.package}
               schema={liveSchema}
               {...liveProps}
-              example={{ id: example.id, title: example.title, props: example.props }}
+              example={{
+                id: example.id,
+                title: example.title,
+                props: seededExampleProps(entry.id, example.props),
+              }}
               eager={index === 0}
             />
           </div>
@@ -122,6 +124,15 @@ const liveProps = {
       )
     }
   </section>
+
+  {/*
+    The theme strip follows the live examples, never precedes them: the
+    first example's island is client:visible, so anything tall above it
+    pushes it below the fold and its stage no longer mounts at once
+    (docs/site-live-components.md). Above the examples (7996bbd7) it put
+    the first demo ~1100px down a 720px viewport.
+  */}
+  <ThemeStrip />
 
   <section class="cp__section" aria-labelledby="cp-props">
     <h2 id="cp-props">Props</h2>
