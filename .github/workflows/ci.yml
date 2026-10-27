@@ -7,8 +7,7 @@
 #                mobile (the suite's three projects).
 #   - website:   the website build (which runs `astro check`) plus the
 #                browser e2e suite except the budget tests.
-#   - audits:    size budgets and the site-perf budgets, allowed to fail
-#                while the tracked pre-existing reds stand (docs/CI.md).
+#   - audits:    size budgets and the site-perf budgets (docs/CI.md).
 name: CI
 
 on:
@@ -28,8 +27,8 @@ jobs:
     name: Lint, types, unit tests, layers
     runs-on: ubuntu-latest
     steps:
-      # Full history: packages/tokens/tests/library-quality.test.ts reads the
-      # pre-compact library port from git (5c682dd^).
+      # Full history, so tests and scripts that read git (size revisions,
+      # check-docs) see the same repository as a local clone.
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -94,12 +93,8 @@ jobs:
           retention-days: 5
 
   audits:
-    name: Budget audits (tracked pre-existing reds)
+    name: Budget audits (size and site-perf)
     runs-on: ubuntu-latest
-    # pnpm size carries documented reds (docs/CI.md); site-perf passed
-    # 10/10 locally on 2026-10-26. They run here so the drift stays visible
-    # without blocking merges; fixing the size reds retires this tolerance.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -119,11 +114,8 @@ jobs:
         if: always()
         run: |
           {
-            echo "## Budget audit (allowed to fail)"
+            echo "## Budget audit"
             echo ""
-            echo "Tracked reds, documented in docs/CI.md (local run 2026-10-26):"
-            echo "- pnpm size: 19 no-budget rows (@texuli/astro, player, slides, spec) and 7 over-budget rows (catalog, catalog/manifests/content, catalog/player, catalog/render/hostile, catalog/validate, charts/math, data/grid-editing); budget rows are an owner decision."
-            echo "- site-perf: no tracked reds (10/10 passed locally after T-91/T-92)."
-            echo ""
-            echo "A NEW failure here is a regression — fix it, do not raise a budget."
+            echo "pnpm size and the site-perf budgets carry no tracked reds (owner budget rows applied 2026-10-26)."
+            echo "A failure here is a regression: shrink the code; raise a budget only as an owner decision with a reason (docs/CI.md)."
           } >> "$GITHUB_STEP_SUMMARY"
