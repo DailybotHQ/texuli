@@ -521,7 +521,7 @@ const instructions = $derived(formatDragMessage(resolved.instructions, {}));
 
 <div
   {...rest}
-  class={`tx-sortable ${rest.class ?? ''}`.trim()}
+  class={['tx-sortable', rest.class]}
   data-dragging={dragState.phase === 'dragging' ? '' : undefined}
   data-input={dragState.input ?? undefined}
   {@attach attachRoot}
