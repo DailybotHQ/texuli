@@ -18,8 +18,8 @@ metadata:
 # Texuli — interface skill
 
 Use this skill to build accessible, token-themed UI with **Texuli**: primitives,
-styled components, layouts, charts, media, data views, content blocks and
-decks. It also covers handling interfaces that agents write as data
+styled components, layouts, charts, media, data views, content blocks, decks,
+the rich text editor and Astro sites. It also covers handling interfaces that agents write as data
 (blueprints). This file is the
 **router**. Detailed procedures live in neighboring sub-skills and in
 [`router/`](router/). Read the matching guide before starting its workflow.
@@ -46,10 +46,11 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 15 packages are on npm as `0.1.0-next.1` under the `next` dist-tag
-   (published by CI with provenance; no stable release, `latest` is reserved
-   for 1.0.0), so install them with `@next`; the workspace packages stay
-   `private: true`. The
+   All 15 published packages are on npm as `0.1.0-next.1` under the `next`
+   dist-tag (published by CI with provenance; no stable release, `latest` is
+   reserved for 1.0.0), so install them with `@next`; the workspace packages
+   stay `private: true`. `@texuli/editor` (the rich text editor) is in
+   development and not on npm: only a Texuli workspace can import it. The
    package and layer index is [`router/packages.md`](router/packages.md).
 3. Route by intent using the table below and
    [`router/routes.md`](router/routes.md).
@@ -97,7 +98,7 @@ From a Texuli repository checkout (this pack's parent monorepo):
 # Validate this skill pack (frontmatter, required files, local links, checksums)
 pnpm exec tsx scripts/check-skill.ts
 
-# Or the package script when present
+# Or the root script (same check)
 pnpm check:skill
 
 # Verify checksums only

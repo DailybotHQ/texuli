@@ -4,8 +4,11 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-Texuli is not on a registry yet. Inside this monorepo, an app depends on the
-workspace packages:
+The packages are npm previews: `0.1.0-next.1` under the `next` dist-tag, with
+no stable release. An app outside a Texuli checkout installs them with the
+tag, for example `pnpm add texuli@next @texuli/tokens@next` (the developer
+runs the install; it uses the network). `@texuli/editor` is not on npm.
+Inside this monorepo, an app depends on the workspace packages:
 
 ```json
 {
@@ -36,7 +39,13 @@ SvelteKit, or Astro with `@astrojs/svelte` (Astro needs
 workspace can also use `@texuli/astro`: its `texuli()` integration applies the
 cached theme and mode before paint (CSP-friendly bootstrap, nonce option), and
 `@texuli/astro/styles.css` carries the token contract (see
-`packages/astro/README.md`).
+`packages/astro/README.md`). For a whole site, `defineSite` from
+`@texuli/astro/site` validates the pages, navigation and canonical metadata
+once; `sitePageMeta` gives each page its title, description and canonical
+URL, and `siteSitemap` writes the sitemap from the same model
+(`packages/astro/docs/site.md`). `@texuli/astro/content` parses a closed set
+of content blocks (`parseTexuliBlocks`), so page content never reaches an
+HTML sink.
 
 Import each component through its subpath:
 

@@ -38,14 +38,19 @@ This file is the procedure. Layer map and gate commands live in
 ## Layer order (down only)
 
 ```text
-@texuli/core (L0 texels)
+@texuli/core, @texuli/spec (L0: texels; the blueprint contract)
   → @texuli/primitives (L1 headless)
     → @texuli/tokens (L2)
       → texuli (L3 styled)
-        → charts / data / media / chat (L5)
-          → @texuli/catalog manifests (L6)
-            → apps/website pages
+        → charts / data / media / chat / editor (L4)
+          → @texuli/blocks (L5)
+            → @texuli/catalog manifests (L6)
+              → @texuli/slides, @texuli/player (L7)
+                → @texuli/tools, @texuli/astro (L8)
+                  → apps/website, apps/agent
 ```
+
+The full map is [`references/layers.md`](references/layers.md).
 
 Never import a higher layer from a lower one. Import texels by **subpath**
 (`@texuli/core/roving`), never the `@texuli/core` root barrel from other
@@ -66,27 +71,35 @@ patterns on the texels; never add another component library.
 
 **Goal:** framework-free TypeScript behavior or policy with tests.
 
-1. Read a model texel, e.g. `packages/core/src/url-policy/` (or
-   `packages/core/src/roving/`) and its tests under `packages/core/tests/`.
-2. Add `packages/core/src/<area>/<name>.ts` (kebab-case, one concern).
-3. Export a **subpath** from `packages/core/package.json` `exports` (sorted
-   keys) and a thin `packages/core/src/<area>/index.ts` if the package uses
-   that pattern. Prefer subpath imports for consumers.
-4. Tests: `packages/core/tests/<name>.test.ts` — normal, edge, and **hostile
+1. Read a model texel, e.g. `packages/core/src/roving/` (`index.ts` plus
+   its source files) with `packages/core/tests/roving.test.ts`, or the URL
+   policy (`packages/core/src/url/safe-href.ts`, `packages/core/src/url-policy/`)
+   with `packages/core/tests/url-policy.test.ts`.
+2. Add `packages/core/src/<area>/` (kebab-case, one concern) with an
+   `index.ts` that re-exports the texel's public names.
+3. Export a **subpath** `./<area>` from `packages/core/package.json`
+   `exports`, and add the names to the `packages/core/src/index.ts` barrel
+   unless they are heavy (the editor texels stay subpath-only because the
+   barrel is near its budget). Consumers import the subpath.
+4. Tests: `packages/core/tests/<area>.test.ts` — normal, edge, and **hostile
    inputs** when the texel guards a sink (URL, HTML, focus escape).
-5. Docs: `packages/core/docs/<name>.md` only (do **not** edit package
-   `README.md` in multi-lane work).
+5. Docs: `packages/core/docs/core-<area>.md`, plus its row in the texel table
+   of `packages/core/README.md` (in a shared checkout, through the README's
+   owner).
+6. Size: every core subpath is budgeted at 4 KiB gzip by default
+   (`@texuli/core/*` in `texuli.budgets.json`, owner-held); measure it.
 
 **Gate (scoped):**
 
 ```bash
-pnpm vitest run packages/core/tests/<name>.test.ts
+pnpm vitest run packages/core/tests/<area>.test.ts
 pnpm --filter @texuli/core typecheck
-npx biome check packages/core/src/<area> packages/core/tests/<name>.test.ts
+npx biome check packages/core/src/<area> packages/core/tests/<area>.test.ts
+pnpm size --filter core/<area>
 ```
 
-Shared core changes that affect the whole monorepo still need `pnpm check`
-when the developer asks for a full gate (owner-held root config unchanged).
+Core is shared by every layer, so a core change also runs `pnpm check`, the
+primitives behavior suite and `pnpm build` before it is done.
 
 ---
 
@@ -98,20 +111,22 @@ APG pattern.
 1. Scaffold under `packages/primitives/src/<name>/` (Root, parts, context,
    `index.ts`). Svelte 5 runes only.
 2. Export `./<name>` from `packages/primitives/package.json` (sorted).
-3. Unit tests in `packages/primitives/tests/<name>.test.ts`.
+3. Unit tests in the family file `packages/primitives/tests/<family>.test.ts`
+   (`models`, `forms`, `overlays`, `composites`; one `describe` per primitive),
+   only for logic the behavior suite cannot reach.
 4. **Behavior scenario** (required for interactive primitives):
    - `tests/behavior/scenarios/<name>/scenario.svelte` — the scenario page
    - `tests/behavior/scenarios/<name>.spec.ts` — `scenario(...)` rows
-5. Docs: `packages/primitives/docs/<name>.md`.
+5. Docs: `packages/primitives/docs/prim-<name>.md`.
 
 **Gate:**
 
 ```bash
-pnpm vitest run packages/primitives/tests/<name>.test.ts
+pnpm vitest run packages/primitives/tests/<family>.test.ts
 pnpm --filter @texuli/primitives typecheck
-npx biome check packages/primitives/src/<name> packages/primitives/tests/<name>.test.ts
-# Behavior (private lane port — never 4870 / 489x)
-TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/behavior/scenarios/<name>.spec.ts
+npx biome check packages/primitives/src/<name> packages/primitives/tests/<family>.test.ts
+# Behavior suite (a free port per parallel worker; 4870 is the default)
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/<name>.spec.ts
 ```
 
 ---
@@ -126,16 +141,19 @@ via `@layer tx.base, tx.components`.
    (or `texuli/cx` from other packages).
 2. Export `./<name>` from `packages/texuli/package.json` (sorted).
 3. One barrel block in `packages/texuli/src/index.ts` for the folder only
-   (alphabetical; change nothing else in concurrent lanes).
-4. Tests: `packages/texuli/tests/<name>.test.ts`.
-5. Docs: `packages/texuli/docs/ui-<name>.md` (no package README edits).
+   (alphabetical; change nothing else when other agents share the checkout).
+4. Tests: add a `describe` to the family file
+   `packages/texuli/tests/<family>.test.ts` (`forms`, `overlays`, `display`,
+   `navigation`, `layouts`; static CSS guards go in `contracts`).
+5. Docs: `packages/texuli/docs/ui-<name>.md`; the package README's
+   component table changes through its owner in a shared checkout.
 
 **Gate:**
 
 ```bash
-pnpm vitest run packages/texuli/tests/<name>.test.ts
+pnpm vitest run packages/texuli/tests/<family>.test.ts
 pnpm --filter texuli typecheck
-npx biome check packages/texuli/src/components/<name> packages/texuli/tests/<name>.test.ts
+npx biome check packages/texuli/src/components/<name> packages/texuli/tests/<family>.test.ts
 pnpm size --filter texuli/<name>   # report gzip; do not edit texuli.budgets.json
 ```
 
@@ -152,12 +170,16 @@ pnpm size --filter texuli/<name>   # report gzip; do not edit texuli.budgets.jso
    example** when emittable.
 4. Tests: extend the matching `packages/catalog/tests/manifests-*.test.ts` or
    add a focused test file.
+5. Refresh the coupled artifacts in the same change: the spec vocabulary
+   and the website catalog and llms snapshots
+   ([`references/layers.md`](references/layers.md#coupled-artifacts)).
 
 **Gate:**
 
 ```bash
 pnpm vitest run packages/catalog/tests/manifests-<family>.test.ts
 pnpm --filter @texuli/catalog typecheck
+pnpm vitest run packages/spec
 ```
 
 ---
@@ -166,41 +188,51 @@ pnpm --filter @texuli/catalog typecheck
 
 **Goal:** fixture-app demo with light/dark visual baselines.
 
-1. `packages/examples/src/<example-id>/` — demo Svelte + `entry.ts` with
-   `defineExample`.
-2. Register side-effect import + named export in
+1. `packages/examples/src/<example-id>/` — a `Demo.svelte` plus `entry.ts`
+   (or `entries.ts` for several ids) calling `defineExample`.
+2. Register the side-effect import and the named export in
    `packages/examples/src/index.ts` (alphabetical).
-3. **Visual baselines** (lane port only):
+3. **Visual baselines** (your own port):
 
 ```bash
-git merge --no-edit dev   # before capturing, if behind
-TEXULI_E2E_PORT=4880 pnpm visual:update -g <example-id>
+TEXULI_E2E_PORT=<port> pnpm visual:update -g <example-id>
 # Inspect light and dark PNGs (dark must look dark), then commit only yours:
 # tests/visual/visual.spec.ts-snapshots/<example-id>--*.png
 ```
 
+`-g` matches by substring, so an id that prefixes others rebaselines them
+too: keep only your own PNGs.
+
 **Gate:**
 
 ```bash
-TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/visual/visual.spec.ts -g <example-id>
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/visual/visual.spec.ts -g <example-id>
 ```
 
 ---
 
 ## Stage F — Website page (`apps/website`)
 
-**Goal:** docs page on the future texuli.com site that links the live example.
+**Goal:** a page on texuli.com (deployed from `main` to Cloudflare Pages)
+that documents the piece and links the live example.
 
-1. Add or update a page under `apps/website/src/pages/` (Astro).
-2. English only; logical CSS; no `{@html}` on untrusted content.
+1. Component pages are generated at build time from the catalog manifests
+   (`/component-pages/<id>/`), so a new manifest entry needs no page file.
+   Primitive pages (`/primitives-page/<id>/`) come from the `PRIMITIVES`
+   list in `apps/website/src/components/primitives-page/primitives.ts`: add
+   the new primitive there. A hand-written page goes under `apps/website/src/pages/` (Astro)
+   and follows the repository procedure in
+   `.agents/skills/add-website-page/SKILL.md`: `BaseLayout`, the nav source,
+   breadcrumbs, the Markdown twin, `llms.txt` and the build-time CSP.
+2. English only; logical CSS; no `{@html}` or `set:html` on content.
 3. Prefer linking the catalog example id over duplicating markup.
 
 **Gate:**
 
 ```bash
-pnpm --filter @texuli/website typecheck
-# When e2e exists for the page:
-# TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-foundation.spec.ts
+pnpm build
+pnpm --filter @texuli/website check:csp
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-component-pages.spec.ts
 ```
 
 ---

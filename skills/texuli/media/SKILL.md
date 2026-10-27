@@ -33,8 +33,10 @@ Package docs (read these for props and limits):
 | Gallery / lightbox | `packages/media/docs/gallery.md` |
 | Video | `packages/media/docs/video.md` |
 | Captions | `packages/media/docs/captions.md` |
-| Composition model | `packages/media/docs/` composition-* |
+| Composition v2 (groups, layer timing) | `packages/media/docs/composition-v2.md` |
 | Canvas / SVG render | `packages/media/docs/media-composition-canvas.md`, `composition-svg.md` |
+| Animation / timeline editor | `packages/media/docs/animation.md`, `timeline.md` |
+| Image editor | `packages/media/docs/image-editor.md` |
 | Export | `packages/media/docs/media-export.md` |
 | Generator slot | `packages/media/docs/generator-slot.md` |
 | Audio | `packages/media/docs/audio.md` |
@@ -68,7 +70,8 @@ Procedure detail lives in [`references/`](references/).
 
 ## Offline gates (media package)
 
-From the monorepo root (lane private ports only — never 4870 / 489x for Playwright):
+From the monorepo root (Playwright commands set `TEXULI_E2E_PORT=<port>`, a
+free port per parallel worker; 4870 is the default):
 
 ```bash
 # Unit tests (pick the area you touched)
@@ -91,8 +94,7 @@ pnpm size --filter '@texuli/media/generator-slot'
 Example + visual baselines (when you register a new example id):
 
 ```bash
-git merge --no-edit dev
-TEXULI_E2E_PORT=4920 pnpm visual:update -g <example-id>
+TEXULI_E2E_PORT=<port> pnpm visual:update -g <example-id>
 # Inspect light/dark PNGs under tests/visual/visual.spec.ts-snapshots/
 ```
 
@@ -224,7 +226,11 @@ pnpm vitest run packages/media/tests/captions.test.ts
 <CompositionCanvas composition={scene} label="Spring campaign poster" />
 ```
 
-**Gate:** scoped composition tests under `packages/media/tests/` (composition-*).
+**Gate:** `pnpm vitest run packages/media/tests/composition-model.test.ts`
+(and `composition-canvas`, `composition-svg` or `composition-v2` for the
+renderer you touched). Groups and layer timing live in
+`@texuli/media/composition-v2`, which resolves any instant to a flat frame
+for every renderer and the WebM export.
 
 ---
 

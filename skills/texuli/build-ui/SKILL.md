@@ -144,7 +144,7 @@ const { roots, diagnostics } = renderCatalogTree(tree, { catalog: view, tier: 'u
 Commands: [`references/gates.md`](references/gates.md). Minimum after edits:
 
 ```bash
-pnpm vitest run packages/texuli/tests/<area>.test.ts   # or catalog / app tests
+pnpm vitest run packages/texuli/tests/<family>.test.ts   # or catalog / app tests
 pnpm --filter texuli typecheck                        # packages you touched
 npx biome check <touched paths>
 ```
@@ -154,9 +154,13 @@ Untrusted trees: limits + renderer unit tests; optional hostile corpus
 
 ### E — Render and iterate
 
-- Fixture / examples: `TEXULI_E2E_PORT=<lane port> pnpm protoyard`-style local
-  preview is N/A; use website `pnpm --filter @texuli/website dev` or package
-  example fixture when present.
+- Preview: the website dev server (`pnpm dev`, Astro at
+  `http://localhost:4321`; stop it with
+  `pnpm --filter @texuli/website exec astro dev stop`), or the fixture app the
+  visual and e2e suites serve (`tests/fixtures/app`).
+- Agent trees: paint a validated draft with `@texuli/player` (see
+  [`../blueprints/SKILL.md`](../blueprints/SKILL.md)) or try it in the
+  site's `/builder/`.
 - Visual baselines only when you **register** a new example id (see gates).
 - Fix diagnostics, re-validate, stop when the brief’s acceptance is met.
 
@@ -169,7 +173,7 @@ Full checklists: [`references/recipes.md`](references/recipes.md).
 | Dashboard | `texuli/card`, `texuli/stat`, layouts app shell, optional `@texuli/charts/*` / `@texuli/data/*` |
 | Landing | layout page, `texuli/button`, display badges, media hero via media skill |
 | Form flow | `texuli/input`, field, button, stepper; forms manifests |
-| Slide / deck | `@texuli/slides` (model, grammar, stage) over `@texuli/blocks` content |
+| Slide / deck | `@texuli/slides` (model, grammar, stage, export, templates) over `@texuli/blocks` content |
 | Media story | [`../media/SKILL.md`](../media/SKILL.md) + content card |
 
 ## Offline gates for this skill pack
