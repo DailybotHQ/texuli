@@ -137,6 +137,8 @@ export interface SizeMeasure {
    * Reported, never budgeted: first paint does not pay for them.
    */
   lazyGzip: number;
+  /** CSS of chunks reached only through import(): it loads with that lazy JS. */
+  lazyCssGzip: number;
 }
 
 export const gzipSize = (data: string | Uint8Array): number =>
@@ -192,7 +194,9 @@ export async function measureEntry(entry: Pick<SizeEntry, 'file' | 'css'>): Prom
         write: false,
         minify: true,
         target: 'es2022',
-        cssCodeSplit: false,
+        // Split CSS, so CSS is attributed to the chunk that imports it: the
+        // entry's static graph (cssGzip) or a lazy chunk (lazyCssGzip).
+        cssCodeSplit: true,
         reportCompressedSize: false,
         lib: { entry: main, formats: ['es'], fileName: 'entry', cssFileName: 'entry' },
         rollupOptions: { external: isExternal },
@@ -205,14 +209,21 @@ export async function measureEntry(entry: Pick<SizeEntry, 'file' | 'css'>): Prom
     // imports statically. Chunks reached only through import() load later.
     const chunks = new Map<
       string,
-      { code: string; imports: readonly string[]; isEntry: boolean }
+      {
+        code: string;
+        imports: readonly string[];
+        isEntry: boolean;
+        viteMetadata?: { importedCss: Set<string> };
+      }
     >();
-    let css = '';
+    const assets = new Map<string, string>();
     for (const file of outputs) {
       if (file.type === 'chunk') chunks.set(file.fileName, file);
       else if (file.fileName.endsWith('.css')) {
-        css +=
-          typeof file.source === 'string' ? file.source : new TextDecoder().decode(file.source);
+        assets.set(
+          file.fileName,
+          typeof file.source === 'string' ? file.source : new TextDecoder().decode(file.source)
+        );
       }
     }
     const initial = new Set<string>();
@@ -224,9 +235,19 @@ export async function measureEntry(entry: Pick<SizeEntry, 'file' | 'css'>): Prom
     for (const [name, chunk] of chunks) if (chunk.isEntry) visit(name);
     let js = '';
     let lazy = '';
+    const initialCss = new Set<string>();
     for (const [name, chunk] of chunks) {
-      if (initial.has(name)) js += chunk.code;
-      else lazy += chunk.code;
+      if (initial.has(name)) {
+        js += chunk.code;
+        for (const file of chunk.viteMetadata?.importedCss ?? []) initialCss.add(file);
+      } else lazy += chunk.code;
+    }
+    let css = '';
+    let lazyCss = '';
+    for (const [name, source] of assets) {
+      // A stylesheet entry (`./styles.css`) is all initial.
+      if (entry.css || initialCss.has(name)) css += source;
+      else lazyCss += source;
     }
     const bytes = new TextEncoder().encode(js);
     return {
@@ -235,6 +256,7 @@ export async function measureEntry(entry: Pick<SizeEntry, 'file' | 'css'>): Prom
       brotli: js ? brotliSize(bytes) : 0,
       cssGzip: css ? gzipSize(css) : 0,
       lazyGzip: lazy ? gzipSize(lazy) : 0,
+      lazyCssGzip: lazyCss ? gzipSize(lazyCss) : 0,
     };
   } finally {
     await rm(dir, { recursive: true, force: true });
@@ -467,6 +489,7 @@ export function formatTable(rows: readonly SizeRow[]): string {
     'brotli',
     'css gzip',
     'lazy gzip',
+    'lazy css',
     'protoyard',
     'status',
   ];
@@ -481,6 +504,7 @@ export function formatTable(rows: readonly SizeRow[]): string {
       kib(row.measure.brotli),
       row.measure.cssGzip > 0 ? kib(row.measure.cssGzip) : '—',
       row.measure.lazyGzip > 0 ? kib(row.measure.lazyGzip) : '—',
+      row.measure.lazyCssGzip > 0 ? kib(row.measure.lazyCssGzip) : '—',
       row.budget?.protoyard?.gzip !== undefined
         ? `${kib(row.budget.protoyard.gzip)} ${row.budget.protoyard.specifier}`
         : '—',

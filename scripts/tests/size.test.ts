@@ -209,7 +209,7 @@ describe('budgets', () => {
       );
       const table = formatTable(rows).split('\n');
       expect(table[0]).toMatch(
-        /^entry\s+gzip\s+budget\s+brotli\s+css gzip\s+lazy gzip\s+protoyard\s+status$/
+        /^entry\s+gzip\s+budget\s+brotli\s+css gzip\s+lazy gzip\s+lazy css\s+protoyard\s+status$/
       );
       expect(table[2]).toMatch(
         /^@fixture\/alpha .*1\.95 KiB .*512 B .*300 B @protoyard\/ui .*OVER$/

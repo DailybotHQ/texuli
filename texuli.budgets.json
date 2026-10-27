@@ -661,16 +661,16 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 2,420 B CSS, cap = measured + 4% headroom."
     },
     "@texuli/slides": {
-      "gzip": 45952,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 44,177 B gzip, cap = measured + 4% headroom."
+      "gzip": 48192,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 44,177 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 46,295 B + 4% headroom."
     },
     "@texuli/slides/model": {
       "gzip": 22336,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 21,437 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/grammar": {
-      "gzip": 37696,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom."
+      "gzip": 39872,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom."
     },
     "@texuli/slides/export": {
       "gzip": 8064,
