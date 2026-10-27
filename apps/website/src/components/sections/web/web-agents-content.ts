@@ -4,7 +4,7 @@
  * §2 pillar 3, §5 s6 "Agents strip" and s8 "Closing CTA band").
  *
  * Kept out of the .astro so the unit test
- * (`apps/website/tests/web-agents-cta.test.ts`) can pin every claim against
+ * (`apps/website/tests/section-contracts.test.ts`) can pin every claim against
  * the repository file it cites: a claim's `sources` phrases appear word for
  * word in both the cited file and this module's copy. Every agent surface
  * is a real file or page served by this site, and the install line states

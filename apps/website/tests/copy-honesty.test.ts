@@ -28,13 +28,22 @@ function sourceFiles(dir: string): string[] {
   });
 }
 
-/** Visible copy only: comments carry the ban lists themselves, and copy wraps across lines. */
+const copies = new Map<string, string>();
+
+/**
+ * Visible copy only: comments carry the ban lists themselves, and copy wraps
+ * across lines. Computed once per file; both scans below share it.
+ */
 function copyOf(file: string): string {
-  return readFileSync(file, 'utf8')
+  const cached = copies.get(file);
+  if (cached !== undefined) return cached;
+  const copy = readFileSync(file, 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, ' ')
     .replace(/<!--[\s\S]*?-->/g, ' ')
     .replace(/^\s*\/\/.*$/gm, ' ')
     .replace(/\s+/g, ' ');
+  copies.set(file, copy);
+  return copy;
 }
 
 const BANNED: readonly { phrase: RegExp; why: string }[] = [
@@ -74,18 +83,15 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
 describe('site copy honesty', () => {
   const files = sourceFiles(srcRoot);
 
-  it('scans the rendered source tree', () => {
+  it('never uses a banned claim anywhere in the rendered source tree', () => {
     expect(files.length).toBeGreaterThan(100);
-  });
-
-  for (const { phrase, why } of BANNED) {
-    it(`never claims ${phrase.source} (${why})`, () => {
+    for (const { phrase, why } of BANNED) {
       const hits = files
         .filter((file) => phrase.test(copyOf(file)))
         .map((file) => relative(siteRoot, file));
-      expect(hits).toEqual([]);
-    });
-  }
+      expect(hits, `${phrase.source} (${why})`).toEqual([]);
+    }
+  });
 
   it('keeps every guide table of contents pointing at a heading on its page', () => {
     const guides = files.filter((file) => /pages\/guides\/[^/]+\/index\.astro$/.test(file));
@@ -127,20 +133,5 @@ describe('site copy honesty', () => {
       }
     }
     expect(wrong).toEqual([]);
-  });
-
-  it('states the native targets the native README records', () => {
-    const page = readFileSync(join(srcRoot, 'pages/web-and-native/index.astro'), 'utf8');
-    expect(page).toMatch(/JVM/);
-    expect(page).toMatch(/Android is pending/);
-  });
-
-  it('names the semantic scope of the golden gate', () => {
-    const content = readFileSync(
-      join(srcRoot, 'components/sections/architecture/portability-content.ts'),
-      'utf8'
-    );
-    expect(content).toContain("title: 'Semantic roles cross'");
-    expect(content).toMatch(/not part of the trace/);
   });
 });

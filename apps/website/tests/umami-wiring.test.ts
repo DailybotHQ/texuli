@@ -15,7 +15,7 @@ vi.mock('../src/lib/track.ts', () => ({
   UMAMI_READY_EVENT: 'tx-umami-ready',
   track: (...args: unknown[]) => track(...args),
   // Mirrors the real guard's shape; the real behavior is proven against
-  // the actual module in umami-track.test.ts.
+  // the actual module in analytics-client.test.ts.
   oncePerInstance: (eventName: string) => {
     let done = false;
     return (data?: unknown) => {

@@ -2,7 +2,7 @@
  * Copy and structure for the /native/ hero + status section (PLAN_006 T-45).
  *
  * Framework-free on purpose: the Astro component renders this module as-is,
- * and the unit test (`apps/website/tests/native-hero-status.test.ts`) pins
+ * and the unit test (`apps/website/tests/section-contracts.test.ts`) pins
  * the same strings, so the test covers what ships. Every claim here is a
  * repository fact today:
  *

@@ -105,7 +105,7 @@ export function evidenceForComponent(id: string, pkg: string): ComponentEvidence
         scenario,
         status: 'checked' as const,
         checks: behaviorCheckCount(scenario),
-        note: `Rows in tests/behavior/scenarios/${scenario}.spec.ts, held to the WAI-ARIA APG pattern, run on Chromium, WebKit and the Pixel 7.`,
+        note: `Rows in tests/behavior/scenarios/${scenario}.spec.ts, held to the WAI-ARIA APG pattern, run on Chromium and WebKit, and its touch rows on the Pixel 7.`,
       }
     : {
         status: 'n/a' as const,
