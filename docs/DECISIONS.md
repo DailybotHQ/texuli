@@ -150,6 +150,11 @@ reverse it. Newest last.
   catalog can adopt it. The Svelte package, the paste import and the DOM
   selection mapping stay planned at L4. **Reverse:** move the subpaths into
   `@texuli/editor/model` and re-export them from core under the same names.
+- **Status note (2026-10-26):** the L4 package now exists as
+  `@texuli/editor` (`editor`, `toolbar`, `link-dialog`, `controller`,
+  `paste`), with the DOM selection mapping in `./editor`. It stays private
+  at `0.0.0` and is never packed (`NEVER_PACKED` in `scripts/packages.ts`);
+  the model remains in core as amended above.
 
 ## ADR-004: Versioned blueprint envelope with host-owned activation
 

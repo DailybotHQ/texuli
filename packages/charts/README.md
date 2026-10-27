@@ -45,7 +45,7 @@ import { linearScale, lttbIndices, treemap } from '@texuli/charts';
 | `@texuli/charts/pack` | `PackChart`, built on `pack` ([docs](docs/charts-pack.md)) |
 | `@texuli/charts/calendar` | `CalendarHeatmap`, built on `calendarLayout` ([docs](docs/charts-calendar.md)) |
 | `@texuli/charts/statistical` | `BoxPlotChart`, `ViolinChart` and `EcdfChart`, with quantile, box-summary, kernel-density and ECDF math ([docs](docs/charts-statistical.md)) |
-| `@texuli/charts/worker` | Opt-in worker offload for `bin`, LTTB and min-max on very large series, with a main-thread fallback ([docs](docs/charts-worker.md)) |
+| `@texuli/charts/worker` (+ `/entry`, the module the host's `Worker` loads) | Opt-in worker offload for `bin`, LTTB and min-max on very large series, with a main-thread fallback ([docs](docs/charts-worker.md)) |
 | `@texuli/charts/streaming` | Immutable bounded append helpers for numeric chart series ([docs](docs/charts-large-series.md#append-only-numeric-streams)) |
 | `@texuli/charts/canvas` | Dense-series canvas renderer ([docs](docs/charts-canvas.md)) |
 | `@texuli/charts/interaction` | Tooltip, legend, table and exploration building blocks ([docs](docs/charts-interaction.md)) |
@@ -108,7 +108,7 @@ pnpm vitest run packages/charts
 pnpm --filter @texuli/charts typecheck
 npx biome check packages/charts
 pnpm size --filter charts
-TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e/charts.spec.ts tests/e2e/charts-families.spec.ts
+TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/e2e/charts.spec.ts tests/e2e/charts-families.spec.ts tests/e2e/charts-worker.spec.ts
 ```
 
 The browser specs run on the registered examples (`/?fixture=<id>`) in Chromium,
@@ -124,5 +124,7 @@ the Pixel 7 profile and WebKit:
 | Canvas renderer | Dense series draw on an `aria-hidden` canvas, emit no SVG marks, keep a named plot, a downsampled explorer and the data table | `charts-canvas` |
 | Right-to-left | Plot SVGs compute `direction: ltr`, heatmap row labels end before the cells, captions align to the right, the tooltip stays beside its point | `charts-rtl` |
 
-Not covered in the browser: the worker offload surface (separate task), Firefox,
-and pointer brushing/zoom.
+The worker offload runs in a real module `Worker` in
+`tests/e2e/charts-worker.spec.ts`, which checks its results equal the
+synchronous ones and that a blocked worker falls back to the main thread.
+Not covered in the browser: Firefox and pointer brushing/zoom.

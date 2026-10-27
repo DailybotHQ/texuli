@@ -99,21 +99,12 @@ let topics = $state(['design', 'research']);
 
 ## Verified
 
-- `pnpm vitest run packages/primitives/tests/tags-input.test.ts`: 24 tests.
+- `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/forms.test.ts -t tags-input`: 9 tests.
   - The pure split and accept rules.
-  - Structure and names.
-  - Adding by Enter and the delimiter; Enter not submitting while there is
-    text.
-  - Duplicate, max and validator refusals with announcements and
-    `aria-invalid`.
-  - Paste splitting, with it off, and add-on-blur.
-  - Every keyboard path and RTL.
-  - Removal and where focus goes; the remove button.
-  - Disabled; form submit, `required` (also when it changes after mount),
-    focus on invalid, and reset.
-  - The child snippet.
-  - Deliberate mutations of the rules, keyboard and form bridge (focus target,
-    reset, `required` and value sync) each fail a test.
+  - Enter not submitting while there is text; max and validator refusals.
+  - Paste splitting after typed text.
+  - Form submit and reset, `required` (also when it changes after mount),
+    and focus on invalid.
 - `pnpm exec playwright test tests/behavior/scenarios/tags-input.spec.ts`
   passes 22 runs and skips 2, in Chromium, WebKit and the Pixel 7. It covers
   the group and Tab stop, adding and refusing with announcements, keyboard

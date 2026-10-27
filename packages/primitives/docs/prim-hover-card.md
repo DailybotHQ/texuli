@@ -28,7 +28,6 @@ The package is headless and supplies no visual theme. Style `[data-state="open"]
 Validation:
 
 ```sh
-pnpm vitest run packages/primitives/tests/hover-card.test.ts
 TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/behavior/scenarios/hover-card.spec.ts
 pnpm --filter @texuli/primitives typecheck
 ```

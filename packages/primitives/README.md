@@ -11,9 +11,11 @@ for 1.0.0), so install it with `@next`. The workspace package stays
 ## What exists today
 
 Every primitive below is implemented and exported. Each one ships a subpath
-(`@texuli/primitives/<name>`), a contract doc in `docs/prim-<name>.md`, unit
-tests in `tests/`, and a browser scenario in the behavior suite
-(`tests/behavior/scenarios/<name>`). The root barrel `src/index.ts`
+(`@texuli/primitives/<name>`), a contract doc in `docs/prim-<name>.md` and a
+browser scenario in the behavior suite (`tests/behavior/scenarios/<name>`),
+which owns keyboard, focus, ARIA and axe. Unit tests in `tests/` (models,
+forms, overlays, composites and consumer ids) cover only what the suite does
+not reach: models, form participation, edge cases and fixed findings. The root barrel `src/index.ts`
 re-exports every primitive; import subpaths to keep bundles narrow.
 
 | Primitive | Subpath | Doc |
@@ -85,7 +87,7 @@ Two cross-cutting docs describe package-wide contracts:
 ## Testing
 
 ```bash
-pnpm vitest run packages/primitives        # unit + component tests (51 files)
+pnpm vitest run packages/primitives        # 183 unit + component tests (5 files)
 pnpm --filter @texuli/primitives typecheck # svelte-aware typecheck
 npx biome check packages/primitives        # lint + format
 ```

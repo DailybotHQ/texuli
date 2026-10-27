@@ -81,7 +81,7 @@ the caller's and can be translated.
 
 ## Verified
 
-- `pnpm vitest run packages/texuli/tests/table.test.ts`: 21 tests (classes, every variant and density, sections and scopes, wrapper and table classes, busy, the sticky cap and its injection guard, overflow to a focusable named region (by label or by caption), stacking roles and labels in both breakpoints, relabelling after a row is added, the parts, `fillStackLabels` with `colspan`, author labels and stale labels, and `isScrollable`).
+- `pnpm vitest run packages/texuli/tests/display.test.ts -t '^table '`: 7 tests (sections and scopes, the height cap's injection guard, overflow to a focusable region named by its label, relabelling after a row is added, `fillStackLabels` with `colspan`, author labels and stale labels, and `isScrollable`).
 - In the browser, with Chromium, WebKit and the Pixel 7 in light and dark, the `texuli-table` example passes axe. Keyboard scrolling of the capped table works, and its header stays pinned. The narrow table stacks with visible labels, and its cells and headers remain in the accessibility tree. The wide table does not stack. RTL numeric headers align to the end.
 - axe also passes with four generated themes (blue/slate, rose/stone, green/tinted and yellow/warm, from `@texuli/tokens/generator`) in light and dark, and with forced colors emulated. These runs were scratch checks, not committed specs, because the fixture app does not load theme tokens yet.
 - Visual baselines: `texuli-table` in light and dark, on Chromium and the Pixel 7.

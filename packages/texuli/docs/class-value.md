@@ -20,6 +20,6 @@ arrays, object maps), not only `string`.
 
 ## Tests
 
-- Runtime: `packages/texuli/tests/internal-cx.test.ts`, `class-value.test.ts`
+- Runtime: `packages/texuli/tests/contracts.test.ts` (`internal-cx`), `packages/texuli/tests/forms.test.ts` (`class-value`)
 - Compile-time fixture: `packages/texuli/tests/fixtures/ClassValueHarness.svelte`
   (string / array with falsy / object map on Button, Badge, Card, Input)

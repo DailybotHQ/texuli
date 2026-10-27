@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Source:** `packages/texuli/src/components/field/`  
-**Tests:** `packages/texuli/tests/field.test.ts`  
+**Tests:** `packages/texuli/tests/forms.test.ts`  
 **Example:** `texuli-field`  
 **Task:** T-ui-field
 

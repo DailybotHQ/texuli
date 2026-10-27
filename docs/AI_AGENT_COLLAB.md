@@ -6,12 +6,14 @@ same time without stepping on each other.
 ## Ownership: one writer per path
 
 - Agree on **path ownership** before starting. A lane owns whole folders
-  (`packages/core/src/focus/`, `apps/website/src/pages/docs/`, a new
+  (`packages/core/src/roving/`, `apps/website/src/pages/guides/`, a new
   `packages/<name>/`). It never edits a path another lane owns; it asks the
   owner instead.
 - **Owner-held files** (the lead or maintainer): `package.json`,
   `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `biome.json`,
-  `tsconfig.base.json`, `vitest.config.ts`, `AGENTS.md` and `docs/`. Others
+  `tsconfig.base.json`, `vitest.config.ts`, `playwright.config.ts`,
+  `texuli.budgets.json` (AGENTS.md rule 5), plus `AGENTS.md` and `docs/`
+  by lane convention. Others
   send requests ("please add `packages/primitives` to the workspace").
 - **`packages/core` is L0.** Its public API (`src/index.ts`) changes
   additively and through its owner; every layer above depends on it.

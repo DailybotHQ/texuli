@@ -48,5 +48,5 @@ point callout.
 ## Testing
 
 ```bash
-pnpm vitest run packages/charts/tests/annotations.test.ts
+pnpm vitest run packages/charts/tests/math.test.ts
 ```

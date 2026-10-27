@@ -2,9 +2,8 @@
 
 **Import:** `@texuli/slides/grammar` (also re-exported from `@texuli/slides`)  
 **Source:** `packages/slides/src/grammar/`  
-**Tests:** `tests/deck.test.ts`, `tests/grammar-charts.test.ts`,
-`tests/render-tree.test.ts`, `tests/golden-decks.test.ts`,
-`tests/fragments-grammar.test.ts`, `tests/slots-grammar.test.ts`
+**Tests:** `tests/decks.test.ts` (model, grammar, chart projection, render
+tree, slots, fragments, templates and golden decks)
 
 Encodings between the deck model ([model.md](model.md)) and catalog trees,
 plus the single validation entry point for decks an agent returns.
@@ -95,7 +94,7 @@ The `DeckDraftResult` carries:
 Hostile reveal shapes fail closed with diagnostics and never throw: a
 negative, fractional, string or out-of-range `step` and an unknown or
 non-string `reveal` fail the block schema; a nested `step` or `reveal` and a
-slide past 32 steps fail the deck rules. `tests/fragments-grammar.test.ts`
+slide past 32 steps fail the deck rules. `tests/decks.test.ts`
 pins them.
 
 The golden decks in [`tests/golden/`](../tests/golden) pin this end to end:

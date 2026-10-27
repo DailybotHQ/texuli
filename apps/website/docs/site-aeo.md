@@ -23,7 +23,7 @@ middleware also does is in [site-analytics.md](site-analytics.md).
 | `/llms.txt` | The whole-site index in the llmstxt.org shape: H1, summary blockquote, one H2 per site area, `- [Title](url): line` links | A **committed** file, `apps/website/public/llms.txt`, written by `scripts/generate-site-llms.ts` from `src/components/seo/llms-site.ts` (sections derived from `NAV_GROUPS`, the guides and the component families) through `formatSiteLlmsTxt` in `@texuli/tools/llms`. Served verbatim, no redirect |
 | `/llms/`, `/catalog/` | The catalog bundle (`llms.txt`, `llms-full.txt`, per-component docs) and the catalog JSON | Committed snapshots under `public/llms/` and `public/catalog/`, unchanged by this plan |
 | `<page>.md` twins | One Markdown file beside every docs-class page (`isDocsPath`), plus `md-manifest.json` mapping page → twin | `src/components/docs/integration.ts` at build time: the exact "Copy page" text with root-relative links made absolute (`absolutizeMarkdownLinks`), so the twin and Copy page cannot disagree |
-| `/.well-known/ai-catalog.json`, `/.well-known/api-catalog`, `/.well-known/mcp/server-card.json` | The ARD catalog, the RFC 9727 linkset and the card for the tools package's **local stdio** MCP server (five read-only tools, no hosted endpoint) | Committed under `apps/website/public/.well-known/` |
+| `/.well-known/ai-catalog.json`, `/.well-known/api-catalog`, `/.well-known/mcp/server-card.json` | The ARD catalog, the RFC 9727 linkset and the card for the tools package's **local stdio** MCP server (five read-only tools, no hosted endpoint) | Committed under `apps/website/public/.well-known/`. The ARD's `logoUrl` is `https://texuli.com/brand/texuli-logo-light.png`, a committed file in `apps/website/public/brand/` |
 | `/.well-known/agent-skills/index.json`, `/skill-pack/` | The skill pack copied into the build and indexed with the SHA-256 of each served `SKILL.md` | Generated at build by `src/integrations/skill-pack.ts`, so digests cannot drift |
 | `/robots.txt` | Allow-all default, `Sitemap:` line, an explicit `Allow: /` group for each of the 16 `AI_CRAWLERS`, no `Disallow` | `buildRobots` in `src/components/seo/seo.ts`, written by the SEO integration; there is no `public/robots.txt` |
 
@@ -31,7 +31,8 @@ middleware also does is in [site-analytics.md](site-analytics.md).
 
 Cloudflare Pages Functions from the repository root. The site itself stays
 `output: 'static'`; the middleware imports pure decision modules from
-`apps/website/src/lib/` and does three things, in order:
+`apps/website/src/lib/` and does three things, in order (the bot-event
+counting it also does is in [site-analytics.md](site-analytics.md)):
 
 1. **Strict-parser robots.** For Lighthouse-family user agents
    (`isStrictParserAudit`) it serves `/robots.txt` through
@@ -52,6 +53,14 @@ Cloudflare Pages Functions from the repository root. The site itself stays
    and `guide: <origin>/llms.txt`. Browsers and Lighthouse keep the static
    `404.html`.
 
+Every other response is returned as the very object `context.next()` gave,
+never a rebuilt copy: Cloudflare Pages applies `_headers` only to that
+asset response, so a copy would drop the page CSP (PLAN_006 T-100 S-2). The
+HTML of a negotiable docs page still declares `Vary: Accept`, matching its
+twin, but the header now comes from the page's `_headers` rule:
+`varyHeaderLine` in `src/components/security/csp.ts` adds it at build time
+to every docs-class route that has a twin (see [site-csp.md](site-csp.md)).
+
 ## Ownership
 
 | Concern | Files |
@@ -60,7 +69,7 @@ Cloudflare Pages Functions from the repository root. The site itself stays
 | Twins | `src/components/docs/integration.ts`, `src/components/docs/markdown.ts`, `src/components/docs/markdown-negotiation.ts` |
 | Discovery | `public/.well-known/**`, `src/integrations/skill-pack.ts` |
 | Robots | `src/components/seo/seo.ts` (`AI_CRAWLERS`, `buildRobots`), `src/lib/robots-variants.ts` |
-| Edge | `functions/_middleware.ts`, `src/lib/md-negotiate.ts`, `src/lib/agent-request.ts` |
+| Edge | `functions/_middleware.ts`, `src/lib/md-negotiate.ts`, `src/lib/agent-request.ts`; the HTML `Vary: Accept` rule in `src/components/security/csp.ts` (`varyHeaderLine`) |
 | Audits | `scripts/audit-aeo.mjs`, `scripts/check-llms-parity.ts` |
 
 ## Spec map
@@ -70,15 +79,15 @@ Cloudflare Pages Functions from the repository root. The site itself stays
 | `/llms.txt` is a physical `text/plain` file that byte-equals the generator output; every area has a section; every link resolves | `tests/e2e/site-aeo.spec.ts` |
 | Every docs-class page has a twin; the manifest matches; sampled twins are well-formed Markdown with absolute links; component twin ids equal the llms component-doc ids | `tests/e2e/site-aeo.spec.ts` |
 | The `.well-known` files parse, their on-site URLs resolve, the server card names exactly the shipped tools, the skill digests match | `tests/e2e/site-aeo.spec.ts` |
-| Negotiation decision table and the middleware wrapper over a stubbed `ASSETS` | `apps/website/tests/md-negotiate.test.ts`, `apps/website/tests/markdown-negotiation.test.ts` |
-| Agent classification and problem JSON | `apps/website/tests/agent-request.test.ts` |
-| Robots variant stripping, pinned against the shipped `buildRobots` output | `apps/website/tests/robots-variants.test.ts` |
+| Negotiation decision table, the middleware wrapper over a stubbed `ASSETS`, the untouched pass-through and the `_headers` `Vary: Accept` line | `apps/website/tests/edge-middleware.test.ts` |
+| Agent classification and problem JSON | `apps/website/tests/edge-middleware.test.ts` |
+| Robots variant stripping, pinned against the shipped `buildRobots` output | `apps/website/tests/edge-middleware.test.ts` |
 | The robots policy and the sitemap | `tests/e2e/site-seo.spec.ts` |
 | Offline audit of the whole surface (critical / warning / planned) | `scripts/tests/audit-aeo.test.ts`; real run below |
 | Catalog ids, twins, llms docs and examples reconcile | `scripts/tests/check-llms-parity.test.ts` |
 
 ```bash
-pnpm vitest run apps/website/tests/md-negotiate.test.ts apps/website/tests/agent-request.test.ts apps/website/tests/robots-variants.test.ts
+pnpm vitest run apps/website/tests/edge-middleware.test.ts
 pnpm build
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-aeo.spec.ts --project=chromium
 pnpm exec tsx scripts/check-llms-parity.ts

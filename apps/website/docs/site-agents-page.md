@@ -41,7 +41,7 @@ pnpm exec tsx packages/catalog/src/build/cli.ts --out tmp/catalog
 The second command writes `tmp/catalog/catalog-<sha256>.json`: copy it to
 `public/catalog/catalog.json`, format it with `npx biome format --write`, and
 put the new hash in `public/catalog/README.md`.
-`scripts/tests/site-agents-snapshots.test.ts` fails when either snapshot no
+`scripts/tests/site-loaders.test.ts` fails when either snapshot no
 longer matches the manifests.
 
 | Path | Source |

@@ -3,7 +3,7 @@
 **App:** `apps/website`  
 **Route:** `/slides-page/`  
 **Components:** `src/components/slides-page/` (content data), `src/components/examples/ExampleHost.svelte` (the islands)  
-**Tests:** `tests/e2e/site-slides.spec.ts` · `scripts/tests/docs-shell-nav.test.ts`
+**Tests:** `tests/e2e/site-slides.spec.ts` · `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
@@ -45,7 +45,7 @@ reveal motion under reduced motion.
 ```bash
 pnpm build
 TEXULI_E2E_PORT=4872 pnpm exec playwright test tests/e2e/site-slides.spec.ts --project=chromium
-pnpm vitest run scripts/tests/docs-shell-nav.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 ```
 
 The e2e spec serves `apps/website/dist` on a loopback port and checks:

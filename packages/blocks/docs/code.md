@@ -78,7 +78,7 @@ The renderer loads only the grammar of the block's language (`loadCodeGrammar`, 
 
 ## Verified
 
-- `pnpm vitest run packages/blocks/tests/code.test.ts`: 67 tests.
+- `pnpm vitest run packages/blocks/tests/code.test.ts`: 12 tests.
   - Golden tokens for all nine grammars, plus invariants, seeded round trips, linear time, the capture-group refusal and highlight steps.
   - The guard, accepting valid blocks and rejecting 12 hostile shapes.
   - Labels, token styles and the theme contrast sweep.

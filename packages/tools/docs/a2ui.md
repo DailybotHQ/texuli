@@ -91,7 +91,7 @@ Upstream leaves the component shape to each catalog. A basic-catalog name such a
 
 ## Tests
 
-`pnpm vitest run packages/tools/tests/a2ui.test.ts` (18 tests, Node). Fixtures are in `packages/tools/tests/fixtures/a2ui/`. The tests cover:
+`pnpm vitest run packages/tools/tests/a2ui.test.ts` (6 grouped tests, Node). Fixtures are in `packages/tools/tests/fixtures/a2ui/`. The tests cover:
 - the fixture tree and payload converting into each other exactly, with schema-valid output;
 - round trips, streamed updates, `deleteSurface` and other surfaces;
 - every invalid fixture failing the schema;

@@ -21,22 +21,24 @@ Every root script, verbatim.
 | `pnpm dev` | `pnpm --filter @texuli/website dev` | The website dev server (`astro dev`, http://localhost:4321) |
 | `pnpm build` | `pnpm --filter @texuli/website build` | Website: `prebuild` regenerates the examples catalog, then `astro check && astro build` (output `apps/website/dist`, plus sitemap, robots and social images) |
 | `pnpm preview` | `pnpm --filter @texuli/website preview` | Serve the last build (`astro preview`) |
-| `pnpm lint` | `biome check` | Lint + format check, whole workspace |
+| `pnpm lint` | `biome check && pnpm check:trojan-source` | Lint + format check, whole workspace, then the Trojan Source scan |
 | `pnpm lint:fix` | `biome check --write` | Apply safe fixes |
 | `pnpm format` | `biome format --write` | Format only |
 | `pnpm typecheck` | `pnpm -r --if-present typecheck` | Every package's `typecheck` (stops at the first failure; add `--no-bail` via `pnpm -r --no-bail typecheck` to see all) |
-| `pnpm test` | `vitest run` | Unit and component tests: `packages/*/tests`, `scripts/tests` |
+| `pnpm test` | `vitest run` | Unit and component tests: `packages/*/tests`, `apps/website/tests`, `scripts/tests` (not `apps/agent/tests`) |
 | `pnpm test:watch` | `vitest` | Watch mode (runs once without a TTY) |
 | `pnpm check` | `pnpm lint && pnpm typecheck && pnpm test && pnpm check:layers` | The fast full gate |
 | `pnpm test:e2e` | `playwright test` | Every browser check (e2e, behavior, visual, consumers) on Chromium, WebKit and Pixel 7 against the fixture app on `TEXULI_E2E_PORT` (default 4870) |
 | `pnpm test:e2e:install` | `playwright install chromium webkit` | Install the browsers |
 | `pnpm check:layers` | `tsx scripts/check-layers.ts` | Layer guard: down-only dependencies, no deep imports, no HTML/code sinks, no static `style=` |
 | `pnpm check:skill` | `tsx scripts/check-skill.ts` | Validate the `skills/texuli` agent skill: frontmatter, links, commands, CLI references, snippets, checksums |
-| `pnpm size` | `tsx scripts/size.ts` | Build every export subpath alone (Svelte external) and compare gzip against `texuli.budgets.json`. PLAN_006's result (T-93, 2026-10-26): 26 of 307 entries fail — 19 without a budget row, 7 over their cap (T-98 adds `@texuli/editor/controller`, 4 B over: 27). The list with sizes is in [CI](CI.md#tracked-budget-reds); each is an owner decision (the plan's `budget-proposal.md`, local plan evidence, git-ignored) |
+| `pnpm size` | `tsx scripts/size.ts` | Build every export subpath alone (Svelte external) and compare gzip against `texuli.budgets.json`. 2026-10-26, after the owner's budget rows: `307 entries within budget`, exit 0 (local macOS run; history in [CI](CI.md#budget-audits)) |
 | `pnpm visual` | `tsx scripts/visual.ts` | Visual regression against `tests/visual/visual.spec.ts-snapshots` (light and dark, desktop and Pixel 7) |
 | `pnpm visual:update` | `tsx scripts/visual.ts --update` | Write new baselines (review the PNGs before committing) |
 | `pnpm test:perf` | `TEXULI_PERF=1 vitest run tests/perf packages/blocks/tests/code.test.ts packages/blocks/tests/text.test.ts` | Wall-clock and scale limits (opt-in; never in the default suite) |
-| `pnpm verify:packages` | `tsx scripts/packages.ts` | Build, pack and check every library package as npm would publish it (publint, attw); publishes nothing |
+| `pnpm verify:packages` | `tsx scripts/packages.ts` | Build, pack and check the 15 packable packages as npm would publish them (publint, attw; `@texuli/editor` and `@texuli/examples` are never packed); publishes nothing |
+| `pnpm check:docs` | `tsx scripts/check-docs.ts` | Every relative Markdown link and documented command is real (see Other tools) |
+| `pnpm check:trojan-source` | `tsx scripts/check-trojan-source.ts` | Fail on literal bidi and zero-width control characters in tracked text files (part of `pnpm lint`); gate: `pnpm vitest run scripts/tests/trojan-source.test.ts` |
 
 ## Scoped variants
 
@@ -65,16 +67,19 @@ PLAN_006's SEO and agent-surface audits are separate, opt-in offline checks;
 their verified results and the analytics and platform-page browser specs are
 listed in [TESTING_GUIDE](TESTING_GUIDE.md). Website size and performance
 results for this plan: site-perf 10/10 (chromium) after T-91/T-92; `pnpm size`
-26 of 307 entries fail, recorded as owner decisions by T-93.
+failed 26 of 307 entries at T-93, and passes 307 of 307 after the owner's
+budget rows (2026-10-26).
 
 ## Package scripts
 
 | Package | Script | Runs |
 | --- | --- | --- |
-| `@texuli/core`, `@texuli/tokens`, `@texuli/tools` | `typecheck` | `tsc -p tsconfig.json` |
-| Svelte packages (`primitives`, `texuli`, `charts`, `chat`, `data`, `media`, `blocks`, `catalog`, `examples`) | `typecheck` | `node ../../scripts/typecheck-svelte.mjs` (`svelte-check --fail-on-warnings`) |
-| `tests/fixtures/app` | `dev` / `typecheck` | `vite` / `svelte-check` |
-| `@texuli/website` | `dev` / `prebuild` / `build` / `preview` / `typecheck` | `astro dev` / `node ../../scripts/generate-examples-catalog.mjs` / `astro check && astro build` / `astro preview` / `astro check` |
+| `@texuli/core`, `@texuli/spec`, `@texuli/tokens`, `@texuli/tools`, `@texuli/astro` | `typecheck` | `tsc -p tsconfig.json` |
+| Svelte packages (`primitives`, `texuli`, `charts`, `chat`, `data`, `media`, `editor`, `blocks`, `catalog`, `slides`, `player`, `examples`) | `typecheck` | `node ../../scripts/typecheck-svelte.mjs` (`svelte-check --fail-on-warnings`) |
+| `tests/fixtures/app` (`@texuli/fixture-app`) | `dev` / `typecheck` | `vite` / `node ../../../scripts/typecheck-svelte.mjs` |
+| `@texuli/website` | `dev` / `prebuild` / `build` / `preview` / `typecheck` / `check:csp` | `astro dev` / `node ../../scripts/generate-examples-catalog.mjs` / `astro check && astro build` / `astro preview` / `astro check` / `tsx tests/csp-coverage.mts` (after a build) |
+| `@texuli/agent` | `typecheck` / `dev` | `tsc -p tsconfig.json` / `tsx src/node.ts` (local service on the fake replay provider). Tests: `pnpm --filter @texuli/agent exec vitest run` (its own `vitest.config.ts`; not in `pnpm test`) |
+| `native/` (Gradle, not a pnpm package) | `check` | `./native/gradlew -p native check` with JDK 21 ([native/README](../native/README.md)) |
 
 ## Other tools
 
@@ -106,7 +111,7 @@ results for this plan: site-perf 10/10 (chromium) after T-91/T-92; `pnpm size`
 ## Not available
 
 There are no release, publish or deploy commands. Packages are
-`private: true`; npm carries all 15 packages as `0.1.0-next.1` (dist-tag
+`private: true`; npm carries the 15 packable packages as `0.1.0-next.1` (dist-tag
 `next`) as CI-published previews, not supported releases — publishing runs
 through the publish workflow (see [CI](CI.md)). See [RELEASE](RELEASE.md)
 for the version and owner-GO policy. texuli.com deploys from `main`

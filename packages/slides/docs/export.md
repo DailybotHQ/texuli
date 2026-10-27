@@ -3,7 +3,7 @@
 **Import:** `@texuli/slides/export` (the main functions are also re-exported
 from `@texuli/slides`)  
 **Source:** `packages/slides/src/export/`  
-**Tests:** `tests/export.test.ts`, `tests/print.test.ts`, `tests/pptx.test.ts`
+**Tests:** `tests/export.test.ts` (print plan, PDF seam, PPTX), `tests/stage-content.test.ts` (DeckPrint)
 
 Framework-free export of a validated deck. Nothing here uploads anything.
 

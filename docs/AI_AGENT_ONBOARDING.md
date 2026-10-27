@@ -7,11 +7,12 @@ verified baseline before you change anything.
 
 1. [`AGENTS.md`](../AGENTS.md): rules, quick commands, authority.
 2. [`PRODUCT_SPEC.md`](PRODUCT_SPEC.md): what exists today versus what is
-   planned. Most of the library is planned; do not describe it as built.
-3. [`ARCHITECTURE.md`](ARCHITECTURE.md): the seven down-only layers.
-4. The README of the module you will touch:
-   [`packages/core`](../packages/core/README.md) or
-   [`apps/website`](../apps/website/README.md).
+   planned. Most packages exist in source with tests; the editor, the
+   native twin and the agent service are in development. Describe only what
+   the table says exists.
+3. [`ARCHITECTURE.md`](ARCHITECTURE.md): the down-only layers L0 to L8.
+4. The README of the module you will touch (every package, `apps/website`,
+   `apps/agent` and `native/` has one; [docs/README](README.md) lists them).
 
 ## 2. Check the environment
 
@@ -27,12 +28,13 @@ do not run it yourself in a shared checkout.
 ## 3. Run the baseline
 
 ```bash
-pnpm check   # lint + typecheck + tests: 1 file, 5 tests today
+pnpm check   # lint, typecheck, unit and component tests, layer guard (minutes)
 pnpm build   # astro check + astro build of the website
 ```
 
-Both must pass before you start. If one fails on a clean checkout, report it
-with the failing command instead of working around it.
+Both should pass before you start; the current known failures, if any, are
+listed in [`TESTING_GUIDE.md`](TESTING_GUIDE.md). If one fails on a clean
+checkout, report it with the failing command instead of working around it.
 
 ## 4. Know where things live
 
@@ -54,5 +56,6 @@ with the failing command instead of working around it.
 - No other component library; no `{@html}`, `eval` or `new Function` on data.
 - Owner-held files (`package.json`, `pnpm-lock.yaml`,
   `pnpm-workspace.yaml`, `biome.json`, `tsconfig.base.json`,
-  `vitest.config.ts`) change only with the owner.
+  `vitest.config.ts`, `playwright.config.ts`, `texuli.budgets.json`)
+  change only with the owner.
 - Mark planned work as planned in every doc you touch.

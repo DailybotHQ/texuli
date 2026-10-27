@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Import:** `import { FileUpload } from 'texuli/file-upload'`  
-**Tests:** `packages/texuli/tests/file-upload.test.ts`  
+**Tests:** `packages/texuli/tests/forms.test.ts`  
 **Example:** `texuli-file-upload`
 
 ## Contract

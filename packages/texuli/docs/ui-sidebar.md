@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Import:** `import { Sidebar, AppNav } from 'texuli/sidebar'`  
-**Tests:** `packages/texuli/tests/sidebar.test.ts`  
+**Tests:** `packages/texuli/tests/navigation.test.ts`  
 **Example:** `texuli-sidebar`
 
 ## Contract

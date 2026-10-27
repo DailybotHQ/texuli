@@ -120,7 +120,7 @@ budget is the default `texuli/*` pattern, 12 KiB.
 ## Tests
 
 ```bash
-pnpm vitest run packages/texuli/tests/timeline.test.ts
+pnpm vitest run packages/texuli/tests/display.test.ts packages/texuli/tests/contracts.test.ts
 ```
 
 Fifteen tests cover:

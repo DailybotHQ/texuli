@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Import:** `import { Combobox, MultiSelect } from 'texuli/combobox'`  
-**Tests:** `packages/texuli/tests/combobox.test.ts`  
+**Tests:** `packages/texuli/tests/forms.test.ts`  
 **Example:** `texuli-combobox`
 
 ## Contract

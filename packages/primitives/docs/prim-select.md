@@ -72,7 +72,7 @@ disabled items.
 ## Testing
 
 ```bash
-pnpm vitest run packages/primitives/tests/select.test.ts
+pnpm vitest run packages/primitives/tests/forms.test.ts
 TEXULI_E2E_PORT=4930 pnpm exec playwright test tests/behavior/scenarios/select.spec.ts --project=chromium
 pnpm size --filter primitives/select
 ```

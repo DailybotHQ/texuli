@@ -36,8 +36,8 @@ the same pieces are safe to hand to a machine.
 ![The Texuli website](docs/assets/screenshots/homepage.png)
 
 > **Status: in development, no stable release.** The screenshot above is the
-> texuli.com website, which deploys from `main` to Cloudflare Pages. All 15
-> packages are on npm as `0.1.0-next.1` under the `next` dist-tag (published
+> texuli.com website, which deploys from `main` to Cloudflare Pages. The 15
+> packable packages are on npm as `0.1.0-next.1` under the `next` dist-tag (published
 > by CI with provenance); there is no stable release (`latest` is reserved for
 > 1.0.0), and the workspace packages stay `private: true`
 > ([RELEASE](docs/RELEASE.md)).
@@ -87,13 +87,15 @@ Every layer is a package with one job, and every dependency points down only
 | Layer | Package | The small pieces |
 | --- | --- | --- |
 | L0 | [`@texuli/core`](packages/core/README.md) | **Texels**: framework-free behavior and policy — the overlay engine, roving focus, positioning, ids, the two-tier URL policy |
+| L0 | [`@texuli/spec`](packages/spec/README.md) | The schema-first blueprint contract, with TypeScript and Kotlin projections |
 | L1 | [`@texuli/primitives`](packages/primitives/README.md) | 41 owned headless primitives, one subpath each, held to the APG patterns |
 | L2 | [`@texuli/tokens`](packages/tokens/README.md) | The OKLCH theme engine, the `--tx-*` token contract, 200+ themes, compiled CSS |
 | L3 | [`texuli`](packages/texuli/README.md) | Styled components, icons, layouts and app shells |
-| L4 | [`@texuli/data`](packages/data/README.md) · [`@texuli/charts`](packages/charts/README.md) · [`@texuli/media`](packages/media/README.md) · [`@texuli/chat`](packages/chat/README.md) | Domain packages: data views, every chart family, media, chat |
+| L4 | [`@texuli/data`](packages/data/README.md) · [`@texuli/charts`](packages/charts/README.md) · [`@texuli/media`](packages/media/README.md) · [`@texuli/chat`](packages/chat/README.md) · [`@texuli/editor`](packages/editor/README.md) | Domain packages: data views, every chart family, media, chat, the rich text editor (in development, not packed) |
 | L5 | [`@texuli/blocks`](packages/blocks/README.md) | Content blocks for pages, documents and slides |
 | L6 | [`@texuli/catalog`](packages/catalog/README.md) | The agent catalog and its sink-free renderer |
-| L7 | [`@texuli/tools`](packages/tools/README.md) | The copy-in CLI, LLM docs, the A2UI adapter, custom elements, the MCP server |
+| L7 | [`@texuli/slides`](packages/slides/README.md) · [`@texuli/player`](packages/player/README.md) | Slide decks; the runtime that paints validated blueprints |
+| L8 | [`@texuli/tools`](packages/tools/README.md) · [`@texuli/astro`](packages/astro/README.md) | The copy-in CLI, LLM docs, the A2UI adapter, custom elements, the MCP server; the Astro integration |
 
 The layer graph is enforced, not aspirational: `pnpm check:layers` fails any
 import that points up.
@@ -164,8 +166,9 @@ every verified command.
 
 ## Measured quality
 
-- **4,610 unit and component tests** at the first-release sweep, plus a
-  behavior suite per primitive on Chromium, WebKit and a Pixel 7 viewport
+- **1,551 unit and component tests** after the 2026-10-27 lean-suite trim
+  (one suite, the same locally and in CI), plus a behavior suite per
+  primitive on Chromium and WebKit, with touch rows on a Pixel 7 viewport
   ([TESTING_GUIDE](docs/TESTING_GUIDE.md)).
 - **axe with zero exclusions** in light, dark and forced colors, with
   keyboard walks, RTL layouts and reduced motion on every example
@@ -176,13 +179,13 @@ every verified command.
   export their TS source.
 - **A dual-target conformance gate.** The Compose twin must reproduce the
   web's semantic traces and refusal codes for every spec golden
-  (`./gradlew -p native check` on JDK 21).
+  (`./native/gradlew -p native check` on JDK 21; a local gate, not in CI).
 - **A threat model that is tested, not just written** — hostile inputs ship
   as fixtures in the suites ([SECURITY](docs/SECURITY.md)).
 
 ## Honest boundaries
 
-- **No stable release yet.** All 15 packages are on npm as `0.1.0-next.1`
+- **No stable release yet.** The 15 packable packages are on npm as `0.1.0-next.1`
   under the `next` dist-tag; install with `@next`. They are previews, not a
   supported release (`latest` is reserved for 1.0.0), and the workspace
   packages stay `private: true` ([RELEASE](docs/RELEASE.md)).

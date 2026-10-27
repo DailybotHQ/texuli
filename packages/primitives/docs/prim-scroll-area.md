@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/primitives`  
 **Source:** `packages/primitives/src/scroll-area/`  
-**Tests:** `packages/primitives/tests/scroll-area.test.ts`  
+**Tests:** `packages/primitives/tests/composites.test.ts`  
 **Behavior:** `tests/behavior/scenarios/scroll-area.spec.ts`
 
 Headless scroll region with optional custom scrollbar chrome. **Native scrolling

@@ -84,15 +84,10 @@ Pixel 7.
 
 ## Verified
 
-- `pnpm vitest run packages/texuli/tests/resizable.test.ts`: 13 tests.
-  - The class composers; group, panel and handle classes with consumer
-    classes.
-  - The bordered and vertical variants.
-  - The APG separator attributes, the default and translated label, the
-    grip being `aria-hidden` and hideable, the small size.
-  - Keyboard resizing with `onLayoutChange`, RTL, Enter collapse, disabled,
-    and storage restore and save.
-  - Five deliberate mutations each fail a test.
+- `pnpm vitest run packages/texuli/tests/display.test.ts -t resizable`: 3 tests.
+  - The default and translated label; disabled; storage restore and save.
+  - Keyboard resizing, RTL and Enter collapse are covered by the splitter
+    primitive (`tests/behavior/scenarios/splitter.spec.ts`).
 - In the fixture app (2026-10-23), on Chromium, WebKit and the Pixel 7, in
   light and dark:
   - axe reports 0 violations

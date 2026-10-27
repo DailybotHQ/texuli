@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/primitives`  
 **Import:** `import { Toast, createToastManager } from '@texuli/primitives/toast'`  
-**Tests:** `packages/primitives/tests/toast.test.ts`  
+**Tests:** `packages/primitives/tests/models.test.ts`, `packages/primitives/tests/overlays.test.ts`  
 **Behavior:** `tests/behavior/scenarios/toast.spec.ts`
 
 ## Contract

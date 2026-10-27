@@ -1,6 +1,6 @@
 # `@texuli/player`
 
-Svelte 5 paint runtime for validated catalog blueprints. It wraps the
+**Layer L7: the player.** Svelte 5 paint runtime for validated catalog blueprints. It wraps the
 framework-free `@texuli/catalog/player` core and defaults to `untrusted`
 validation. The host supplies the blueprint and may supply its own catalog,
 catalog hash, lifecycle status, trust tier, and loader overrides.
@@ -22,6 +22,10 @@ player: tiers, loaders, validating with the player's own options, edit
 history and undo, the digest and activation, and CSP. This README is the
 reference for each area; [paint-proof.md](docs/paint-proof.md) argues the
 security property.
+
+Published to npm as `0.1.0-next.1` under the `next` dist-tag (by CI, with
+provenance); no stable release (`latest` is reserved for 1.0.0), so install
+it with `@next`. The workspace package stays `"private": true`.
 
 The player includes lazy block, chart and media loaders plus a painter for
 every agent-emittable content layout in the catalog: `layout-page`,
@@ -158,7 +162,7 @@ const loaders = { ...PLAYER_LOADERS, ...CHAT_DISPLAY_LOADERS };
 
 ### Golden fixtures 02, 06, 07 and 08
 
-`tests/fixture-02.test.ts` paints golden fixture 02, the operations
+`tests/fixtures.test.ts` paints golden fixture 02, the operations
 dashboard (`tests/fixtures/golden/02-dashboard.json`), through
 `createPlayer` and the real painters (layouts, blocks, charts). It checks
 against the numbers in `golden-expectations.json`, the file the golden
@@ -177,7 +181,7 @@ In the `Player` it also checks:
 - no placeholders or node errors;
 - inertness with `active={false}`.
 
-`tests/fixture-06.test.ts` does the same for golden fixture 06, the
+`tests/fixtures.test.ts` does the same for golden fixture 06, the
 presentation slide (`06-presentation-slide.json`). It is a `layout-deck`
 holding one card with a stepped list and a bar chart. It checks:
 - 4 nodes painted as 4 components, with 0 placeholders, at both tiers;
@@ -189,7 +193,7 @@ holding one card with a stepped list and a bar chart. It checks:
   (`step` and `reveal` are presenter fields and hide nothing here);
 - inertness with `active={false}`.
 
-`tests/fixture-08.test.ts` covers golden fixture 08, the proactive deck
+`tests/fixtures.test.ts` covers golden fixture 08, the proactive deck
 (`08-proactive-deck.json`), prepared before a meeting and shown in an
 artifact frame. It checks:
 - 12 nodes painted as 12 components, with 0 placeholders, at both tiers;
@@ -203,7 +207,7 @@ artifact frame. It checks:
   stepped risk list that stays visible, and decisions;
 - inertness with `active={false}`.
 
-`tests/fixture-07.test.ts` covers golden fixture 07, the report on demand
+`tests/fixtures.test.ts` covers golden fixture 07, the report on demand
 (`07-report-on-demand.json`), and goes beyond paint to the interaction
 contract. Paint checks:
 - 13 nodes painted as 13 components, with 0 placeholders, at both tiers;
@@ -631,7 +635,7 @@ mapped to numbers:
 A condition that is false or unknown hides its node, and `setState`
 re-evaluates every condition on the same handle. With no state wrapper,
 every input is unknown, so `when` nodes stay hidden. An invalid condition is
-a validation error. Tested in `packages/player/tests/slots-conditions.test.ts`.
+a validation error. Tested in `packages/player/tests/painting.test.ts`.
 
 ```json
 { "id": "layout-card", "props": { "title": "Details" },
@@ -696,7 +700,7 @@ with a `host-region` node. The agent never emits the sensitive fields itself
 - **Keyboard:** F6, Escape and tab-order normalization treat host content
   like the rest of the surface.
 
-Tested in `packages/player/tests/host-regions.test.ts`.
+Tested in `packages/player/tests/painting.test.ts`.
 
 **Planned, not built:** host regions for the iframe frame and `mountPlayer`
 hosts (both take snippets only through Svelte today).
@@ -725,7 +729,7 @@ reader did where it still fits:
 Blueprint nodes have no stable ids yet, so "the same node" means the same
 path and the same catalog id. An inserted node shifts the paths after it,
 and their selection and component state go with the path. Tested in
-`packages/player/tests/live-updates.test.ts`.
+`packages/player/tests/state.test.ts`.
 
 **Planned, not built:** identity by stable node ids from the envelope, and
 streaming appends (chat messages arriving one by one) as their own API.

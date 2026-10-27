@@ -101,18 +101,12 @@ within the task's ≤ 2 KB and the `@texuli/primitives/context-menu` budget of
 ## Tests
 
 ```bash
-pnpm vitest run packages/primitives/tests/context-menu.test.ts
+pnpm vitest run packages/primitives/tests/overlays.test.ts
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/context-menu.spec.ts
 ```
 
-**Unit** (8 tests) cover:
-- the right click (default prevented, focus on the menu, ArrowDown and
-  ArrowUp entry);
-- the keyboard open and focus return;
-- the shared Menu keys, submenu, checkbox item and select-closes;
+**Unit** (3 tests, `-t context-menu`) cover:
 - moving the menu on a second right click, and closing on a region press;
-- outside press, Escape and Tab;
-- `disabled`;
 - the touch long press (the lift is not a click, no double open);
 - cancelled long presses.
 

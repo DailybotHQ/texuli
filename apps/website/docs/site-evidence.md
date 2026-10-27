@@ -4,7 +4,7 @@
 **Paths:** `/evidence/`, evidence strip on `/component-pages/<id>/`  
 **Surface:** `src/components/evidence/`, `src/pages/evidence/`  
 **E2E:** `tests/e2e/site-evidence.spec.ts`  
-**Unit:** `scripts/tests/site-evidence.test.ts`
+**Unit:** `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
@@ -38,6 +38,6 @@ Snapshots are dated (`EVIDENCE_AS_OF`). They are not live CI polling.
 ## Validation
 
 ```bash
-pnpm vitest run scripts/tests/site-evidence.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 bash -c 'pnpm build && TEXULI_E2E_PORT=4930 pnpm exec playwright test tests/e2e/site-evidence.spec.ts'
 ```

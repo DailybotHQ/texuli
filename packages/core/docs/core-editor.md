@@ -14,7 +14,8 @@ The framework-free model of the rich text editor that
 and [EDITOR_ARCHITECTURE](../../../docs/EDITOR_ARCHITECTURE.md) decided:
 document, selection, transforms, history, key intents and the Markdown codec.
 No DOM, no HTML and no framework. The Svelte binding that renders it is
-planned; nothing here touches the page.
+the private, in-development [`@texuli/editor`](../../editor/README.md)
+package; nothing here touches the page.
 
 ```ts
 import { fromMarkdown, toMarkdown } from '@texuli/core/editor-markdown';
@@ -183,12 +184,12 @@ that blocks text and catalog rich text use. `toMarkdown(doc)` writes it.
   test of it. A parity test that runs both parsers belongs to the blocks
   adoption task, because core cannot import blocks.
 - **Paste import** of clipboard HTML (the owned tokenizer in the ADR) is not
-  implemented.
-- **The DOM side is not implemented:** DOM selection mapping, the
-  `beforeinput` binding and the editing surface belong to the planned Svelte
-  package.
+  a core texel: it lives in `@texuli/editor/paste`.
+- **The DOM side is not in core:** DOM selection mapping, the
+  `beforeinput` binding and the editing surface live in `@texuli/editor`
+  (`./controller`, `./editor`).
 - **Code blocks inside list items** do not round-trip two consecutive blank
   lines.
 - **Size:** these subpaths are larger than the 4 KiB per-texel default
-  budget (see the package README). Their budget rows are pending with the
-  owner.
+  budget (see the package README), so each has its own row in
+  `texuli.budgets.json`; `pnpm size` reports all three within budget.

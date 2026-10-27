@@ -78,17 +78,17 @@ required). The current home sections do not use it; `PageBanner` does
 
 | Behavior | Pinned by |
 | --- | --- |
-| Section content, targets and honesty per section | `apps/website/tests/web-hero.test.ts`, `web-why-svelte.test.ts`, `web-correlation.test.ts`, `web-agents-cta.test.ts`, `web-copy-command.test.ts` |
-| Native sections | `apps/website/tests/native-hero-status.test.ts`, `native-why-kmp.test.ts`, `native-evidence.test.ts` |
-| Architecture sections | `apps/website/tests/arch-layers.test.ts`, `arch-portability.test.ts`, `arch-parity.test.ts` |
-| Proof-strip sources, home title band, motion rules, footer release truth | `apps/website/tests/polish-core-landing.test.ts` |
+| Section content, targets and honesty per section | `apps/website/tests/section-contracts.test.ts`, `analytics-client.test.ts` |
+| Native sections | `apps/website/tests/section-contracts.test.ts` |
+| Architecture sections | `apps/website/tests/section-contracts.test.ts` |
+| Proof-strip sources, home title band, motion rules, footer release truth | `apps/website/tests/landing.test.ts` |
 | Banned claims the repository contradicts (size, native targets, parity) | `apps/website/tests/copy-honesty.test.ts` |
 | Four sections in blueprint order, CTAs, reveal under reduced motion, axe in both modes | `tests/e2e/site-landing.spec.ts` |
 | Landing shell, no islands inside `[data-tx-landing]`, phone width | `tests/e2e/site-ia.spec.ts` |
 | Page weight against the `/` budget | `tests/e2e/site-perf.spec.ts` |
 
 ```bash
-pnpm vitest run apps/website/tests/web-hero.test.ts apps/website/tests/copy-honesty.test.ts
+pnpm vitest run apps/website/tests/section-contracts.test.ts apps/website/tests/copy-honesty.test.ts
 pnpm build
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-landing.spec.ts tests/e2e/site-ia.spec.ts --project=chromium
 ```
@@ -111,9 +111,11 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-landing.spec.ts 
 - **Static by design.** The interactive hero widgets and the agents
   playground were replaced by static, link-led sections; the live demos
   live on the docs and gallery pages.
-- **The `/` budget is a tracked red** in `docs/CI.md`; per-route budgets
-  for `/native/` and `/web-and-native/` are proposed for the owner-held
-  budgets file, not registered.
+- **The `/` budget is no longer a tracked red:** the local T-92 run
+  measured 83.8 KB against the 152 KB `/` limit in
+  `components/perf/budgets.ts` (see [site-ia.md](site-ia.md)).
+  `/web-and-native/` has its own HTML budget there (26 KB gzip);
+  `/native/` fits the default and has none.
 - **Rendered theme checks:** the highlighted `mark` in `WebCorrelation`
   and the `WebAgentsCta` band use `color-mix()`; the static theme sweep
   does not measure them ([site-theme-sweep.md](site-theme-sweep.md)).

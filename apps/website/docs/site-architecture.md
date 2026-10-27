@@ -44,8 +44,7 @@ URL — T-12: no existing route moves) and links `/native/`.
 The page shares the component + content module pattern of the landing
 system ([site-landing.md](site-landing.md)); the route and shell decision
 is in [site-subsite.md](site-subsite.md). Unit tests:
-`apps/website/tests/arch-layers.test.ts`, `arch-portability.test.ts`,
-`arch-parity.test.ts`.
+`apps/website/tests/section-contracts.test.ts`.
 
 ## Cross-link invariant (asserted, not hoped)
 

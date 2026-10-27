@@ -2,8 +2,8 @@
 
 **Import:** `@texuli/slides/model` (also re-exported from `@texuli/slides`)  
 **Source:** `packages/slides/src/model/`  
-**Tests:** `tests/deck.test.ts`, `tests/transitions.test.ts`, `tests/media.test.ts`,
-`tests/fragments.test.ts`, `tests/stage-screen.test.ts`
+**Tests:** `tests/decks.test.ts`, `tests/stage.test.ts`,
+`tests/stage-content.test.ts`
 
 The framework-free deck model: validation, the closed vocabularies (aspects,
 masters, transitions), theme references, and the pure helpers the stage, the

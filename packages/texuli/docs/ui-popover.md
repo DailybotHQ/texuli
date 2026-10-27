@@ -3,7 +3,7 @@
 **Package:** `texuli`  
 **Source:** `packages/texuli/src/components/popover/`  
 **Primitives:** `@texuli/primitives/popover`, `@texuli/primitives/hover-card`  
-**Tests:** `packages/texuli/tests/popover.test.ts`  
+**Tests:** `packages/texuli/tests/overlays.test.ts`  
 **Examples:** `ui-popover`, `ui-popover-variants`, `ui-popover-states`, `ui-popover-rtl`, `ui-popover-dark`
 
 Styled floating surfaces with an arrow, on the `--tx-*` token contract.

@@ -118,7 +118,8 @@ is gated by the token AA checks and the browser axe suites.
 
 ## Verified
 
-`pnpm vitest run packages/tools/tests/golden.test.ts`: 45 tests.
+`pnpm vitest run packages/tools/tests/golden.test.ts`: 8 grouped tests (every
+reference task is scored inside one of them).
 
 - **The set:**
   - 30 unique ids

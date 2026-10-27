@@ -88,7 +88,7 @@ registers only in the layer stack.
 
 ## Verified
 
-- `pnpm vitest run packages/core/tests/inert.test.ts`: 24 tests (pure target
+- `pnpm vitest run packages/core/tests/inert.test.ts`: 8 tests (pure target
   computation, exemptions, exact restore including author-set attributes,
   nesting in and out of order, live exemptions, `refresh`, `observe`, the
   shared registry). Six deliberate mutations of the implementation each fail

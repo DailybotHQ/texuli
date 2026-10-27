@@ -140,7 +140,7 @@ grid-core's model; grid-core alone measures 10.63 KiB.
 ## Verified
 
 - **Unit tests:** `pnpm vitest run packages/data/tests/grid-columns.test.ts`
-  has 23 tests.
+  has 2 tests.
   - Model: state validation, completion, zone-aware moves, resize bounds and
     reset, pin offsets and `pinsFit`, group runs, drop targets including RTL,
     and the last-column guard.

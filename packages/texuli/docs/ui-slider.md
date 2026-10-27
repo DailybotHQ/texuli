@@ -50,6 +50,6 @@ Registry id **`texuli-slider`**.
 ## Testing
 
 ```bash
-pnpm vitest run packages/texuli/tests/slider.test.ts
+pnpm vitest run packages/texuli/tests/forms.test.ts
 TEXULI_E2E_PORT=4930 pnpm visual:update -g texuli-slider
 ```

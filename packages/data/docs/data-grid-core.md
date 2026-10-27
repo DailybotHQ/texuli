@@ -79,7 +79,7 @@ The keys are described to assistive technology through `aria-describedby` (the `
 
 ## Verified
 
-- `pnpm vitest run packages/data/tests/grid-core.test.ts`: **26 tests**.
+- `pnpm vitest run packages/data/tests/grid-core.test.ts`: **3 tests**.
   - Model: sort cycling and Shift keys, `aria-sort`, accent-folding search, filter then search then sort, invalid filters rejected, `cellText`, every APG key including RTL and the edges, clamping, labels.
   - Component: grid roles and counts, one tab stop, header sorting with Shift, non-sortable headers, search with the count, filter, keyboard movement, Space and Shift+Space selection, the header tri-state, Ctrl/Cmd+A, Enter activation, loading and empty states, translations, and hostile cell text kept as text.
   - Windowing: the view plus overscan renders with spacer rows for the rest, `aria-rowcount` stays the full set, scrolling moves the window, the focused row stays rendered past it, and windowed cells never wrap (the `rowSize` math).

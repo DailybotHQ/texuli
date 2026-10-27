@@ -38,7 +38,7 @@ on a lane port (never 4870, never the developer's `:4321` dev server), and run
 Names, roles and contrast are also checked automatically by
 `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts --project chromium`
 (axe, zero exclusions); the page-layer fixes from this pass are pinned by
-`pnpm vitest run apps/website/tests/a11y-sr-pass.test.ts`.
+`pnpm vitest run apps/website/tests/docs-reading.test.ts`.
 
 ## Shared site chrome
 
@@ -164,7 +164,7 @@ repository today", and two Kotlin code regions · contentinfo.
   Publication under…" as one run, so the status read as the first word of the
   sentence. A visually hidden colon now separates them
   (`apps/website/src/components/sections/native/NativeHeroStatus.astro`,
-  pinned by `apps/website/tests/a11y-sr-pass.test.ts`). The visual design is
+  pinned by `apps/website/tests/docs-reading.test.ts`). The visual design is
   unchanged.
 
 ## 3. Architecture page (`/web-and-native/`)
@@ -229,7 +229,7 @@ page" · contentinfo.
   `/web-and-native/` passes `demoNav={false}`; the article takes the freed
   column. Files: `apps/website/src/components/docs-shell/DocsShell.astro`,
   `apps/website/src/pages/web-and-native/index.astro`; test:
-  `apps/website/tests/a11y-sr-pass.test.ts`.
+  `apps/website/tests/docs-reading.test.ts`.
 - **Fixed (T-90):** the build's HTML compression dropped the space before the
   guide link, so the text run (and the page's Markdown twin) read "lives in
   the guideWhy Svelte and Kotlin". The space now sits on the same source line
@@ -301,7 +301,7 @@ share link".
   named "Secondary color", which dropped "(optional)". **Fixed by T-88:**
   each field's `aria-label` now matches its visible label ("Color for light
   mode", "Secondary color (optional)"), pinned by
-  `apps/website/tests/theme-studio-label-in-name.test.ts`. The tree was not
+  `apps/website/tests/studios.test.ts`. The tree was not
   re-captured after the fix.
 
 ### Agent playground (`/playground/`)

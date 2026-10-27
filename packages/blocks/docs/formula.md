@@ -38,6 +38,6 @@ metadata.
 ## Gates
 
 ```sh
-pnpm vitest run packages/blocks/tests/formula-subpath.test.ts
+pnpm vitest run packages/blocks/tests/engine-subpaths.test.ts packages/blocks/tests/core.test.ts
 pnpm size --filter blocks/formula
 ```

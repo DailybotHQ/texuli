@@ -116,7 +116,7 @@ exporter. Untrusted data goes through `renderComposition` or the component.
 
 ## Verified
 
-- `pnpm vitest run packages/media/tests/composition-canvas.test.ts`: 40 tests
+- `pnpm vitest run packages/media/tests/composition-canvas.test.ts`: 7 tests
   covering the geometry, the draw engine on a recording 2D context, the URL
   policy at load, render failures, the viewport and the component. Eight
   deliberate mutations of the implementation each fail a test.

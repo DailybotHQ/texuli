@@ -35,6 +35,6 @@ summary and exact-value alternative.
 ## Testing
 
 ```bash
-pnpm vitest run packages/charts/tests/axes.test.ts
+pnpm vitest run packages/charts/tests/cartesian.test.ts
 pnpm --filter @texuli/charts typecheck
 ```

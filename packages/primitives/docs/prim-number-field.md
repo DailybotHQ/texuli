@@ -121,20 +121,14 @@ disabled, and the input is `disabled` or `readonly`.
 
 ## Verified
 
-- **Unit tests:** `pnpm vitest run packages/primitives/tests/number-field.test.ts`,
-  24 tests:
+- **Unit tests:** `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/forms.test.ts`,
+  10 tests (`-t number-field`):
   - round trips in en-US, de-DE, fr-FR, ar-EG, en-IN, ja-JP and de-CH,
-    plus currency and percent;
-  - typed variants; rejections; partial text;
-  - stepping math, PageUp/PageDown, snapping and precision;
-  - press-repeat timing with fake timers;
-  - the component: the APG keys, Home/End without bounds, locale commit on
-    Enter and blur with clamping, revert and empty, `snapOnStep`, refused
-    keystrokes;
-  - the steppers: labels, Tab order, `aria-controls`, disabled at bounds,
-    mouse vs touch focus, hold-to-repeat, AT clicks;
-  - disabled and read-only; wheel; controlled value; form submission and
-    reset; a `child` input.
+    plus currency and percent; typed variants;
+  - stepping math on the grid without float noise, PageUp/PageDown;
+  - the component: revert and empty, refused keystrokes, mouse vs touch
+    focus, hold-to-repeat and AT clicks, the wheel, and form submission
+    and reset.
 - **Browser:** `pnpm exec playwright test tests/behavior/scenarios/number-field.spec.ts`,
   6 tests on chromium, webkit and Pixel 7 (15 passed; the mouse and touch
   tests skip on the other kind of project by design):

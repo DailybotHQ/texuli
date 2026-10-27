@@ -41,6 +41,6 @@ explorer in this family.
 Registry example id: **`charts-pack`**.
 
 ```bash
-pnpm vitest run packages/charts/tests/pack.test.ts
+pnpm vitest run packages/charts/tests/part-whole.test.ts
 TEXULI_E2E_PORT=4932 pnpm visual -g charts-pack
 ```

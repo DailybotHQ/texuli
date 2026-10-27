@@ -3,7 +3,7 @@
 **App:** `apps/website`  
 **Route:** `/gallery-themes/`  
 **Components:** `src/components/gallery-themes/`  
-**Tests:** `tests/e2e/site-gallery-themes.spec.ts` · `scripts/tests/site-gallery-themes.test.ts`
+**Tests:** `tests/e2e/site-gallery-themes.spec.ts` · `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
@@ -54,7 +54,7 @@ import {
 ## Tests
 
 ```bash
-pnpm vitest run scripts/tests/site-gallery-themes.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 bash -c 'pnpm build && TEXULI_E2E_PORT=4910 pnpm exec playwright test tests/e2e/site-gallery-themes.spec.ts'
 ```
 

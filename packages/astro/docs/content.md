@@ -38,5 +38,5 @@ loader.
 
 ## Tests
 
-`packages/astro/tests/content.test.ts` covers a valid heading block and rejects
+`packages/astro/tests/astro.test.ts` covers a valid heading block and rejects
 an unknown raw-HTML type and a non-array value.

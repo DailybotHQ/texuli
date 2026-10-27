@@ -2,8 +2,10 @@
 
 **Layer L4: data.** Data views: grid, tree, board, calendar, timeline, map,
 activity and files — each a framework-free engine (in `src/engines/`) with a
-Svelte 5 view on top. Private workspace package (`"private": true`), not
-published.
+Svelte 5 view on top. Published to npm as `0.1.0-next.1` under the `next`
+dist-tag (by CI, with provenance); no stable release (`latest` is reserved
+for 1.0.0), so install it with `@next`. The workspace package stays
+`"private": true`.
 
 ## What exists today
 
@@ -29,6 +31,7 @@ Docs: [data-grid-core](docs/data-grid-core.md),
 [data-grid-editing](docs/data-grid-editing.md),
 [data-grid-edit-a11y](docs/data-grid-edit-a11y.md),
 [data-grid-edit-virtual](docs/data-grid-edit-virtual.md),
+[data-board](docs/data-board.md),
 [data-calendar-reschedule](docs/data-calendar-reschedule.md),
 [data-timeline](docs/data-timeline.md),
 [data-map](docs/data-map.md) (deferred fence editing),

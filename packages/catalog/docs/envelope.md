@@ -148,7 +148,7 @@ build's developer tier, every `agentEmittable` component. App chrome such as
 Today that is 41 of the catalog's 133 ids (D5 counted 36; G05 added four
 block families; G11 added `deck-slide`). Tier U is the same 41 ids, and it
 must stay a subset of the developer tier.
-`packages/catalog/tests/tier-semantics.test.ts` pins the
+`packages/catalog/tests/render-renderer.test.ts` pins the
 list and checks every catalog id in both tiers and both developer modes, so
 adding or removing an emittable id is a deliberate change to that test and
 this page.

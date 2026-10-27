@@ -2,7 +2,7 @@
 
 **Import:** `@texuli/slides/templates` (also re-exported from `@texuli/slides`)  
 **Source:** `packages/slides/src/templates/`  
-**Tests:** `tests/templates.test.ts`
+**Tests:** `tests/decks.test.ts`
 
 Three starter decks built from the existing model, masters and block types.
 Each returns a validated `Deck`, so it renders, prints and exports like any

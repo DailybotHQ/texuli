@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/primitives`  
 **Source:** `packages/primitives/src/toggle/`  
-**Tests:** `packages/primitives/tests/toggle.test.ts`  
+**Tests:** `packages/primitives/tests/composites.test.ts`  
 **Behavior:** `tests/behavior/scenarios/toggle.spec.ts`
 
 Headless Svelte 5 toggle button and toggle group, owned,

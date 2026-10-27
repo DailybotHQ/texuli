@@ -1,7 +1,7 @@
 # Accessibility sweep: slides
 
 **Task:** `T-p7-deck-a11y` (PLAN_004) · **Gate:** `tests/e2e/a11y-slides.spec.ts`  
-**Unit tests:** `packages/slides/tests/a11y.test.ts`  
+**Unit tests:** `packages/slides/tests/stage.test.ts`  
 **Transcripts:** [sr-transcripts-slides.md](sr-transcripts-slides.md)
 
 axe-core and keyboard checks for `DeckStage` and `DeckPrint`, using the seven
@@ -80,11 +80,11 @@ fixtures.
 
 ```sh
 TEXULI_E2E_PORT=<lane-port> pnpm exec playwright test tests/e2e/a11y-slides.spec.ts --project chromium --project mobile
-pnpm vitest run packages/slides/tests/a11y.test.ts
+pnpm vitest run packages/slides/tests/stage.test.ts
 ```
 
 On 2026-10-25, a fresh run on dev `852b8d2a` (port 4961) passed 44/44 on `chromium` and
-`mobile` (Pixel 7); `pnpm vitest run packages/slides/tests/a11y.test.ts`
+`mobile` (Pixel 7); `pnpm vitest run packages/slides/tests/stage.test.ts`
 passed 6/6; and `pnpm visual -g slides-` passed 16/16 with no changes. The
 `webkit` project was not run: headless WebKit could
 not launch on the machine (`browserType.launch` timed out after 180 s), and

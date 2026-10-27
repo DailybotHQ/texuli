@@ -56,7 +56,7 @@ RTL.
   (a known environment gap; see the task 181 diagnosis). Firefox is not in
   the matrix.
 - Host regions (`HostRegion`) need a host shell, so they are not on the
-  fixture page; they keep their unit tests (`packages/player/tests/host-regions.test.ts`).
+  fixture page; they keep their unit tests (`packages/player/tests/painting.test.ts`).
 - Layout behavior at the declared widths is checked for overflow and
   direction, not against visual baselines: the fixture page has no
   baselines. **Planned:** registry examples for the player's controls, flows

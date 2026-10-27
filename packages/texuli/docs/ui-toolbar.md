@@ -54,6 +54,6 @@ Registry id **`texuli-toolbar`**.
 ## Testing
 
 ```bash
-pnpm vitest run packages/texuli/tests/toolbar.test.ts
+pnpm vitest run packages/texuli/tests/navigation.test.ts
 TEXULI_E2E_PORT=4930 pnpm visual:update -g texuli-toolbar
 ```

@@ -59,12 +59,11 @@ The range grid marks days with `data-range-start`, `data-range-end`, `data-in-ra
 
 ## Behavior and tests
 
-- **Unit:** `pnpm vitest run packages/primitives/tests/date-picker.test.ts`, **14 tests**:
-  - helpers;
-  - the button's name and state; the named dialog with focus on the selected day;
-  - arrows plus choose, then close and focus return; `closeOnSelect`; Escape;
-  - field to calendar; bounds and unavailable days; translations;
-  - range: start then end, preview, ordering, every day selected, the button name, and range fields.
+- **Unit:** `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/forms.test.ts`, **8 tests** (`-t date-picker`):
+  - helpers (canonical parsing, range order and membership);
+  - `closeOnSelect`;
+  - opening focus when today is unavailable, after a minimum, and on a range start;
+  - range: ordering an end picked first, and the range fields.
 - **Browser:** `tests/behavior/scenarios/date-picker.spec.ts`, **11 rows** on Chromium, WebKit and the Pixel 7:
   - the trigger's state, focus on the selected date, and the named dialog;
   - arrows plus Enter choose, then focus returns; PageDown;

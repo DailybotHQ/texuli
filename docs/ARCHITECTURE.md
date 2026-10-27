@@ -40,6 +40,20 @@ Not layers, because they consume the library:
 - **`@texuli/examples`** (private) is the examples registry. Every component
   writes its examples once, for tests, visual baselines and the website.
 - **`@texuli/website`** (`apps/website`) is texuli.com.
+- **`@texuli/agent`** (`apps/agent`, private) is the texuli.com agent
+  service: a stateless worker that turns a chat prompt into a validated,
+  untrusted blueprint draft. It runs only on a fake replay provider and is
+  not deployed.
+- **`native/`** is a self-contained Gradle Kotlin Multiplatform build
+  (`texuli-spec`, `texuli-compose`, `conformance`) that consumes the
+  generated Kotlin from `@texuli/spec`. It is not a pnpm package and the
+  layer guard does not see it.
+- **`functions/`** holds the Cloudflare Pages Functions deployed with the
+  website (see [The website](#the-website)).
+
+`@texuli/editor` and `@texuli/examples` are never packed
+(`NEVER_PACKED` in `scripts/packages.ts`); the other 15 packages are the
+packable set.
 
 ```text
 L8  tools · astro
@@ -80,7 +94,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | --- | --- |
 | `@texuli/astro` (private) | `.`, `content`, `integration`, `site`, `styles.css`, `layouts/ContentLayout`, `sections/Hero`, `sections/Section` |
 | `@texuli/blocks` (private) | `.`, `code`, `code/engine`, `code/renderers`, `code/tokenizer`, `core`, `data`, `data/engine`, `data/renderers`, `diagram`, `diagram/engine`, `diagram/renderers`, `embed`, `embed/engine`, `embed/renderers`, `formula`, `interactive`, `interactive/engine`, `interactive/renderers`, `map`, `map/engine`, `map/renderers`, `media`, `media/engine`, `media/renderers`, `structure`, `structure/engine`, `structure/renderers`, `text`, `text/engine`, `text/markdown`, `text/renderers` |
-| `@texuli/catalog` (private) | `.`, `build`, `build/node`, `edit`, `envelope`, `manifest`, `manifests/content`, `manifests/display`, `manifests/forms`, `manifests/layouts`, `manifests/overlays`, `player`, `render/frame`, `render/grammar`, `render/hostile`, `render/limits`, `render/renderer`, `render/richtext`, `validate`, `validate/blocks` |
+| `@texuli/catalog` (private) | `.`, `build`, `build/node`, `edit`, `envelope`, `manifest`, `manifests/content`, `manifests/display`, `manifests/forms`, `manifests/layouts`, `manifests/overlays`, `player`, `render/frame`, `render/grammar`, `render/hostile`, `render/limits`, `render/conditions`, `render/renderer`, `render/richtext`, `validate`, `validate/blocks` |
 | `@texuli/charts` (private) | `.`, `canvas`, `colors`, `calendar`, `annotations`, `axis`, `cartesian`, `compact`, `flow`, `geo`, `histogram`, `interaction`, `math`, `math/scales`, `math/shapes`, `math/layout`, `math/downsample`, `math/color`, `matrix`, `part-whole`, `pack`, `statistical`, `streaming`, `schemas`, `worker`, `worker/entry` |
 | `@texuli/chat` (private) | `.` |
 | `@texuli/editor` (private) | `.`, `controller`, `editor`, `link-dialog`, `paste`, `toolbar` |
@@ -155,7 +169,18 @@ static site with `client:visible` islands:
 - SEO with compile-time social images.
 
 It imports the workspace packages directly, so a broken component breaks
-`pnpm build`. Per-route budgets live in
+`pnpm build`. Two Cloudflare Pages Functions in the repository-root
+`functions/` run beside the static output:
+- `_middleware.ts` serves Markdown twins of docs pages on an explicit
+  `text/markdown` preference, a stripped `robots.txt` to audit tools and a
+  `problem+json` 404 to agents, and sends bot-hit events; every other
+  request gets the static asset response back untouched, so its `_headers`
+  (CSP, and `Vary: Accept` on negotiable docs pages) survive;
+- `api/umami/[[path]].ts` is the same-origin Umami analytics proxy, off
+  until the owner provisions it.
+
+The pure decisions live in `apps/website/src/lib/` and are tested in
+`apps/website/tests/` ([SECURITY](SECURITY.md#15-website-edge-functions-and-analytics)). Per-route budgets live in
 `apps/website/src/components/perf/budgets.ts`. Each area's design is in
 `apps/website/docs/`.
 
@@ -170,8 +195,8 @@ It imports the workspace packages directly, so a broken component breaks
     all 15 packages to npm as `0.1.0-next.1` under the `next` dist-tag, with
     provenance ([RELEASE](RELEASE.md)).
 - **Tests:**
-  - **Unit:** Vitest (happy-dom) in `packages/*/tests/` and
-    `scripts/tests/`, plus perf tests in `tests/perf/` (opt in with
+  - **Unit:** Vitest (happy-dom) in `packages/*/tests/`,
+    `apps/website/tests/` and `scripts/tests/`, plus perf tests in `tests/perf/` (opt in with
     `TEXULI_PERF=1`).
   - **Browser:** Playwright with Chromium, WebKit and Pixel 7. Checks live
     in `tests/e2e/`, the behavior suite in `tests/behavior/`, visual
@@ -186,10 +211,10 @@ It imports the workspace packages directly, so a broken component breaks
 | File | Role |
 | --- | --- |
 | `package.json` | Root scripts (see [DEVELOPMENT_COMMANDS](DEVELOPMENT_COMMANDS.md)), pnpm, Node ≥ 24.20 |
-| `pnpm-workspace.yaml` | Workspace globs `packages/*`, `apps/*` |
+| `pnpm-workspace.yaml` | Workspace globs `packages/*`, `apps/*`, `tests/fixtures/*` |
 | `tsconfig.base.json` | Strict, `erasableSyntaxOnly`, `verbatimModuleSyntax`, `noUncheckedIndexedAccess`, `allowImportingTsExtensions` |
 | `biome.json` | Lint and format |
-| `vitest.config.ts` | Svelte plugin, happy-dom; includes `packages/*/tests`, `scripts/tests`, `tests/perf` |
+| `vitest.config.ts` | Svelte plugin, happy-dom; includes `packages/*/tests`, `apps/website/tests`, `scripts/tests`, and `tests/perf` only on a perf run (`apps/agent` has its own config) |
 | `playwright.config.ts` | Chromium, WebKit and Pixel 7 against `tests/fixtures/app` on `TEXULI_E2E_PORT` |
 | `texuli.budgets.json` | gzip caps per export subpath (`pnpm size`) |
 
@@ -201,4 +226,5 @@ It imports the workspace packages directly, so a broken component breaks
 | A primitive | `packages/primitives/src/<name>/` + `tests/` + `tests/behavior/scenarios/<name>` | unit tests, behavior suite on three projects, `pnpm size` |
 | A styled component | `packages/texuli/src/components/<name>/` + an example in `packages/examples` + visual baselines | unit tests, `pnpm visual -g <example>` |
 | A website page | `apps/website/src/pages/`, `apps/website/src/components/` + `tests/e2e/site-*.spec.ts` | `pnpm build` + its site spec |
+| Edge behavior (middleware, analytics proxy) | `functions/` + its pure logic in `apps/website/src/lib/` + `apps/website/tests/` | `pnpm vitest run apps/website`, `pnpm build`, then a post-deploy header check |
 | A new package or layer | `packages/<name>/` and `LAYERS` in `scripts/check-layers.ts` | owner approval (workspace, lockfile), then `pnpm check` |

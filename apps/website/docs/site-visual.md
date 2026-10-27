@@ -14,7 +14,7 @@ A screenshot review of every route family found the issues below. The spec keeps
 
 ## What the spec checks
 
-**Every built page** (sitemap plus the 404), in light and dark. Chromium and the Pixel 7 walk every page; WebKit walks one page per route group.
+**Every built page** (sitemap plus the 404), in light and dark. The per-page check runs in the page sweep, `tests/e2e/a11y-site.spec.ts`, on the same page loads as axe (primitive pages: `site-live-primitives.spec.ts`, with the demo mounted). Chromium and the Pixel 7 walk every page; WebKit walks one page per route group.
 
 | Check | Fails when |
 | --- | --- |
@@ -24,7 +24,7 @@ A screenshot review of every route family found the issues below. The spec keeps
 | Broken images | A rendered `<img>` has no pixels |
 | Illustration fallbacks | A slot without artwork lacks its texel mosaic |
 
-**Targeted checks:**
+**Targeted checks** (`tests/e2e/site-visual.spec.ts`):
 - **Theme swatches:** the switcher and the theme gallery paint the palette of the active mode (dark when the site is dark).
 - **Inline code** keeps the spaces around it (the guides).
 - **Demo frames** fit their column on a phone.
@@ -32,7 +32,7 @@ A screenshot review of every route family found the issues below. The spec keeps
 
 ```bash
 pnpm build
-TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-visual.spec.ts
+TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-site.spec.ts tests/e2e/site-visual.spec.ts
 ```
 
 ## What the review found, and the fixes

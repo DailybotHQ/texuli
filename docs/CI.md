@@ -16,7 +16,8 @@ integration.
   tests, layer guard) plus `scripts/supply-chain.ts`, `scripts/check-docs.ts`
   and `pnpm check:skill`.
 - **`behavior`** — the primitives behavior suite on all three projects
-  (chromium, webkit, mobile): `TEXULI_E2E_PORT=4870 pnpm exec playwright
+  (chromium, webkit, mobile; the Pixel 7 runs the phone-specific rows, see
+  [tests/behavior/README.md](../tests/behavior/README.md)): `TEXULI_E2E_PORT=4870 pnpm exec playwright
   test tests/behavior`, after `pnpm exec playwright install --with-deps
   chromium webkit`. Failed runs upload `test-results/` as an artifact.
 - **`website`** — `pnpm build` (which runs `astro check`, the examples
@@ -25,14 +26,22 @@ integration.
   chromium with the site-perf budget tests excluded (the audit job owns
   them).
 - **`audits`** — `pnpm size`, then `pnpm build` and the full
-  `tests/e2e/site-perf.spec.ts`. Allowed to fail while the tracked reds
-  below stand, so drift stays visible without blocking merges. A NEW
-  failure here is a regression: fix it, do not raise a budget. The build
-  and site-perf steps run with `if: success() || failure()`, so site-perf
-  is measured even while `pnpm size` is red.
-- `check` and `website` check out the full history (`fetch-depth: 0`): the
-  tokens library-quality test reads an older commit, and the sitemap's
-  `lastmod` comes from each page's git log.
+  `tests/e2e/site-perf.spec.ts`. It is a required job (no
+  `continue-on-error`): a failure is a regression. Shrink the code; a
+  budget is raised only as an owner decision with a reason in
+  `texuli.budgets.json`. The build and site-perf steps run with
+  `if: success() || failure()`, so site-perf is measured even when
+  `pnpm size` is red.
+- `check` and `website` check out the full history (`fetch-depth: 0`):
+  `check` for the tests that read git history
+  (`apps/website/tests/site-build-guards.test.ts` reads page commit dates),
+  `website` because the sitemap's `lastmod` comes from each page's git
+  log.
+- No CI job runs the agent service tests
+  (`pnpm --filter @texuli/agent exec vitest run`; the root
+  `vitest.config.ts` does not collect `apps/agent/tests`) or the native
+  Gradle build (`./native/gradlew -p native check`, JDK 21). Both are
+  local gates.
 
 The PLAN_006 offline site audits (`node scripts/audit-seo.mjs --dist
 apps/website/dist`, `node scripts/audit-aeo.mjs --dist apps/website/dist`)
@@ -75,34 +84,59 @@ project settings are:
 
 The build runs the same gates as local development: the examples catalog
 prebuild, `astro check`, and the CSP integration (whose `_headers` file
-ships in the output and is applied by Cloudflare Pages). Every push to
+ships in the output and is applied by Cloudflare Pages).
+
+Pages also deploys the Functions in the repository-root `functions/`
+directory: `_middleware.ts` runs on every route, and
+`api/umami/[[path]].ts` is the same-origin analytics proxy
+([SECURITY](SECURITY.md#15-website-edge-functions-and-analytics)).
+Cloudflare applies `_headers` only to the static asset response, so the
+middleware returns that response object untouched on every pass-through
+request; `Vary: Accept` for the docs pages that have a Markdown twin is
+written into `_headers` by the CSP integration (`varyHeaderLine` in
+`apps/website/src/components/security/csp.ts`) rather than added by the
+middleware. An earlier middleware rebuilt docs HTML responses to add
+`Vary`, which dropped their CSP in production (PLAN_006 T-100, S-2); the
+fix is in code and covered by `apps/website/tests/edge-middleware.test.ts`.
+After the next deploy, confirm on a few HTML routes (a docs page with a
+twin, `/`, a component page) that `Content-Security-Policy` is present
+and that docs pages carry `Vary: Accept`. The variables
+`PUBLIC_UMAMI_WEBSITE_ID` and `UMAMI_ENDPOINT_ORIGIN` live in the Pages
+project settings, owner-provisioned; analytics stays off without them. Every push to
 `main` deploys; a pull request gets a preview deployment. The per-page
 social images, sitemap and robots.txt are generated at build time against
 `https://texuli.com` (the `site` in `apps/website/astro.config.mjs`).
 
-## Tracked budget reds
+## Budget audits
 
-These run only in the non-blocking `audits` job. The numbers below are
-from local runs on 2026-10-26 (PLAN_006 T-93 and T-98); CI has not
-re-measured them.
+The `audits` job carries no tracked reds.
 
-- `pnpm size`: 26 of 307 entries failed in the T-93 run and 27 in the
-  T-98 run.
-  - 19 entries have no budget row: `@texuli/astro` (8 entries),
-    `@texuli/player` (2), `@texuli/slides` (7) and `@texuli/spec` (2).
-  - 7 are over their cap in both runs (gzip): `@texuli/catalog`
-    (51,987 B > 49,152 B), `@texuli/catalog/manifests/content`
-    (8,317 > 8,192), `@texuli/catalog/player` (16,832 > 8,192),
-    `@texuli/catalog/render/hostile` (12,934 > 12,288),
-    `@texuli/catalog/validate` (14,163 > 8,192), `@texuli/charts/math`
-    (12,357 > 12,288) and `@texuli/data/grid-editing` (15,740 > 15,360);
-    figures from the T-98 run.
-  - The T-98 run adds `@texuli/editor/controller` at 18,372 B against
-    18,368 B (4 B over).
-  - Adding or raising budget rows is an owner decision;
-    `texuli.budgets.json` is unchanged.
-- `site-perf`: no tracked reds. The document budgets for `/builder/`,
-  `/charts-page/`, `/color-explorer/` and `/gallery-components/` were
-  raised in commit `7996bbd7` (`apps/website/src/components/perf/budgets.ts`).
-  After T-91 and T-92 the full spec passed 10 of 10 on chromium, and the
-  `/` page weighs 83.8 KB against its 152 KB budget.
+- `pnpm size`: the PLAN_006 runs (T-93 and T-98, 2026-10-26) failed 26
+  and 27 of 307 entries: 19 entries without a budget row (`@texuli/astro`,
+  `@texuli/player`, `@texuli/slides`, `@texuli/spec`) and 7 over their
+  cap (`@texuli/catalog`, `catalog/manifests/content`, `catalog/player`,
+  `catalog/render/hostile`, `catalog/validate`, `charts/math`,
+  `data/grid-editing`), plus `@texuli/editor/controller` 4 B over in
+  T-98. The owner resolved them on 2026-10-26 (PLAN_006 follow-up) with
+  rows for the 19 unbudgeted entries and raises for the 7 over-cap ones in
+  `texuli.budgets.json`, plus raises for 5 rows Linux CI measured a few
+  bytes over their macOS figure (`charts/cartesian`, `data/board/engine`,
+  `editor/controller`, `editor/editor`, `blocks/data/renderers`). Each new
+  cap is the measured size plus 4% headroom, with its reason in the row's
+  `note`. A local `pnpm size` on
+  2026-10-26 with those rows reported `307 entries within budget`, exit 0.
+- `site-perf`: the document budgets for `/builder/`, `/charts-page/`,
+  `/color-explorer/` and `/gallery-components/` were raised in commit
+  `7996bbd7` (`apps/website/src/components/perf/budgets.ts`). After T-91
+  and T-92 the full spec passed 10 of 10 on chromium locally, and the `/`
+  page weighs 83.8 KB against its 152 KB budget.
+
+## Known CI breakage and its fix
+
+The `check` job failed on GitHub because
+`packages/tokens/tests/library-quality.test.ts` read the pre-compact theme
+port from git at `5c682dd^`, a commit that is not in `main`'s history. On
+this branch the test reads a committed fixture
+(`packages/tokens/tests/fixtures/library-port-original-seeds.json`)
+instead of git. A green `check` run on GitHub after that change has not
+been observed yet.

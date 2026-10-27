@@ -3,7 +3,7 @@
 **App:** `apps/website`
 **Routes:** `/gallery-components/` and its isolated preview document `/gallery-components/preview/?id=<id>`
 **Components:** `src/components/gallery-components/`, with the shared live stages in `src/components/live/`
-**Tests:** `tests/e2e/site-live-gallery.spec.ts`, `tests/e2e/site-gallery-components.spec.ts`, `scripts/tests/site-live-gallery.test.ts`, `scripts/tests/site-gallery-components.test.ts`
+**Tests:** `tests/e2e/site-live-gallery.spec.ts`, `tests/e2e/site-gallery-components.spec.ts`, `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
@@ -103,7 +103,7 @@ and the reason. `site-perf.spec.ts` measures both routes.
 ## Validate
 
 ```bash
-pnpm vitest run scripts/tests/site-live-gallery.test.ts scripts/tests/site-gallery-components.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 pnpm build
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-live-gallery.spec.ts tests/e2e/site-perf.spec.ts
 ```
@@ -120,5 +120,7 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-live-gallery.spe
   browser spec's samples (button, alert, pagination), not by every id.
 - **Theme.** Previews use the site theme in light or dark. They do not follow
   a theme picked on `/theme-switcher/`.
-- **Full sweeps run on Chromium.** WebKit and the Pixel 7 run axe on the forms
-  category.
+- **Full sweeps run on Chromium,** in four parallel chunks of cards (every
+  card mounted, axe on the page with its frames, light and dark). WebKit and the Pixel 7 run
+  the first chunk. Forced colors is checked on each full-page layout's own
+  document, not on every card.

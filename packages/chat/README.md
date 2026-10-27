@@ -12,7 +12,7 @@ for 1.0.0), so install it with `@next`. The workspace package stays
 
 Implemented in `src/` and exported from the package entry: `ChatThread`,
 `MessageList` and `groupMessages` for the conversation view; `Composer` and
-`TypingIndicator` for input. They are covered by 35 unit tests in 5 files
+`TypingIndicator` for input. They are covered by 18 unit tests in 2 files
 (`pnpm vitest run packages/chat`), with per-item notes in
 [`docs/chat-thread.md`](docs/chat-thread.md) and
 [`docs/chat-composer.md`](docs/chat-composer.md).
@@ -75,7 +75,7 @@ them works today.
 ## Verification
 
 ```bash
-pnpm vitest run packages/chat        # 35 tests / 5 files
+pnpm vitest run packages/chat        # 18 tests / 2 files
 pnpm --filter @texuli/chat typecheck  # exit 0
 npx biome check packages/chat        # exit 0
 ```

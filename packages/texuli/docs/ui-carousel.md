@@ -166,8 +166,10 @@ In `@texuli/examples`:
 
 On 2026-10-23:
 
-- **Unit and component:** `pnpm vitest run packages/texuli/tests/carousel.test.ts`
-  runs 28 tests.
+- **Unit and component:** `pnpm vitest run packages/texuli/tests/display.test.ts -t carousel`
+  runs 12 tests (the model, inert hidden slides, arrows, swipe in RTL, the
+  track without a style string, and autoplay: live region, focus stop,
+  reduced motion, hidden page).
 - **axe:** every example has zero violations, also after moving to the second
   slide, in light and dark, with and without forced colors, on Chromium,
   WebKit and the Pixel 7. No rule is disabled.

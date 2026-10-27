@@ -32,7 +32,7 @@ Filled variants use token **pairs** (e.g. `--tx-success` / `--tx-success-foregro
 Badge also takes a `label` (optional string) that gives it plain text without a snippet. It is
 rendered as escaped text (never markup), and a non-empty `label` replaces
 `children` when both are given; an empty or missing `label` keeps `children`.
-Tested in `packages/texuli/tests/label-prop.test.ts`.
+Tested in `packages/texuli/tests/forms.test.ts`.
 
 Styles live in `@layer tx.components`. Import `@texuli/tokens/base.css` once at the app root. Consumer classes compose via `class=`; layers decide conflicts (no tailwind-merge).
 

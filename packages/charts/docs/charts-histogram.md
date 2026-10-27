@@ -46,6 +46,6 @@ explorer in this family.
 Registry example id: **`charts-histogram`**.
 
 ```bash
-pnpm vitest run packages/charts/tests/histogram.test.ts
+pnpm vitest run packages/charts/tests/statistical.test.ts
 TEXULI_E2E_PORT=4931 pnpm visual -g charts-histogram
 ```

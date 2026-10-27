@@ -113,7 +113,7 @@ The same normative files always give the same digest.
 
 **The version follows the digest.** Every normative change changes the
 digest, and a changed digest needs a new semantic version.
-`tests/versioning.test.ts` fails when the digest moves without one. The
+`tests/spec.test.ts` fails when the digest moves without one. The
 release goes in `versions.json`: its version, its digest, its change class
 and a one-line summary.
 

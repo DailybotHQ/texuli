@@ -3,7 +3,7 @@
 **App:** `apps/website`  
 **Routes:** `/examples/`, `/examples/<id>/`  
 **Components:** `src/components/examples/`  
-**Tests:** `tests/e2e/site-examples.spec.ts` · `scripts/tests/site-examples.test.ts`
+**Tests:** `tests/e2e/site-examples.spec.ts` · `scripts/tests/site-loaders.test.ts`
 
 ## Goal
 
@@ -37,7 +37,7 @@ pnpm --filter @texuli/website preview
 ## Tests
 
 ```bash
-pnpm vitest run scripts/tests/site-examples.test.ts
+pnpm vitest run scripts/tests/site-loaders.test.ts
 bash -c 'pnpm build && TEXULI_E2E_PORT=4910 pnpm exec playwright test tests/e2e/site-examples.spec.ts'
 ```
 

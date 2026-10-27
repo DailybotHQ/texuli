@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/catalog`  
 **Import:** `@texuli/catalog/render/hostile`  
-**Tests:** `packages/catalog/tests/render-hostile.test.ts`, `packages/catalog/tests/hostile-pipeline.test.ts`, `packages/catalog/tests/hostile-fuzz.test.ts`, `tests/e2e/renderer-hostile.spec.ts`  
+**Tests:** `packages/catalog/tests/render-hostile.test.ts` (helpers, the corpus through the pipeline, the seeded fuzz), `tests/e2e/renderer-hostile.spec.ts`  
 **Fixtures:** `tests/fixtures/hostile/corpus.json`
 
 ## Goal
@@ -50,13 +50,13 @@ if (!report.ok) throw new Error('corpus not inert');
 
 ## Invalid or inert, end to end
 
-`hostile-pipeline.test.ts` runs every sample, bare and wrapped in a frame,
+The pipeline tests run every sample, bare and wrapped in a frame,
 through `validateDraft` and the document player core. `validateDraft` never
 throws, and a valid draft carries nothing executable. Under both the default
 `refuse` policy and `preview`, the player paints no forbidden or handler key,
 no prototype key in a valid draft, and no URL the untrusted policy refuses.
 
-`hostile-fuzz.test.ts` repeats that check for three fixed seeds × 180 rounds
+The seeded fuzz repeats that check for three fixed seeds × 180 rounds
 of generated hostile trees and raw-JSON mutations (duplicate keys, injected
 `__proto__`, truncated text). It uses no network and takes a few seconds; the
 same seed always gives the same inputs.

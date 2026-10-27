@@ -3,7 +3,7 @@
 **Package:** `texuli`  
 **Source:** `packages/texuli/src/components/dialog/`  
 **Primitives:** `@texuli/primitives/dialog`, `@texuli/primitives/alert-dialog`  
-**Tests:** `packages/texuli/tests/dialog.test.ts`  
+**Tests:** `packages/texuli/tests/overlays.test.ts`  
 **Examples:** `ui-dialog`, `ui-dialog-variants`, `ui-dialog-states`, `ui-dialog-rtl`, `ui-dialog-dark`
 
 Styled modal surfaces on the `--tx-*` token contract: a general **Dialog** with header, body and footer, and an **AlertDialog** confirm pattern.

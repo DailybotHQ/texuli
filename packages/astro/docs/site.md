@@ -90,7 +90,7 @@ is untrusted, treat it as such before calling `defineSite`.
 
 ## Tests
 
-`packages/astro/tests/site.test.ts` covers normalization and freezing, the
+`packages/astro/tests/astro.test.ts` covers normalization and freezing, the
 kind discriminator, slug/home/base-URL/date/language validation, block-schema
 failures, `sitePage`/`sitePageMeta`, and the deterministic sitemap including
 XML escaping.

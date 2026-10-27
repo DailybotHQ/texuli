@@ -1,6 +1,6 @@
 # @texuli/astro
 
-Astro 7 integration, token stylesheet, static content components, and a closed
+**Layer L8: adapters.** Astro 7 integration, token stylesheet, static content components, and a closed
 content-block parser for Texuli sites. Published to npm as `0.1.0-next.1` under the `next`
 dist-tag (by CI, with provenance); no stable release (`latest` is reserved
 for 1.0.0), so install it with `@next`. The workspace package stays
@@ -88,9 +88,9 @@ The packed consumer fixtures live under `tests/consumers/fixtures/`:
 - `astro-tailwind` checks the Astro/Tailwind consumer path with token CSS; it
   does not install `@texuli/astro`.
 
-Package behavior is covered by `packages/astro/tests/content.test.ts`,
-`packages/astro/tests/integration.test.ts`, and
-`packages/astro/tests/site.test.ts`. The consumer harness builds and
+Package behavior is covered by `packages/astro/tests/astro.test.ts`
+(content blocks, the theme integration, the layout contract and the site
+model). The consumer harness builds and
 serves the packed fixtures in `tests/consumers/consumers.spec.ts`.
 
 ```bash

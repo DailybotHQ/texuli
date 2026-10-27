@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/primitives`  
 **Source:** `packages/primitives/src/tabs/`  
-**Tests:** `packages/primitives/tests/tabs.test.ts`  
+**Tests:** `packages/primitives/tests/composites.test.ts`  
 **Behavior:** `tests/behavior/scenarios/tabs.spec.ts`  
 **Task:** T-prim-tabs
 

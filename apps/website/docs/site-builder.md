@@ -2,7 +2,7 @@
 
 **App:** `apps/website`  
 **Surface:** `src/components/builder/`, `src/pages/builder/`  
-**Tests:** `scripts/tests/site-builder-palette.test.ts`, `scripts/tests/site-builder-outline.test.ts`, `scripts/tests/site-builder-inspector-text.test.ts`, `scripts/tests/site-builder-inspector-choice.test.ts`, `scripts/tests/site-builder-inspector-number.test.ts`, `scripts/tests/site-builder-inspector-struct.test.ts`, `scripts/tests/site-builder-inspector-media.test.ts`, `scripts/tests/site-builder-payload.test.ts`, `scripts/tests/site-builder-preview.test.ts`, `scripts/tests/site-builder-history.test.ts`, `scripts/tests/site-builder-roundtrip.property.test.ts`, `scripts/tests/site-builder-keyboard.test.ts`, `tests/e2e/site-builder.spec.ts`
+**Tests:** `scripts/tests/site-builder.test.ts`, `scripts/tests/site-builder-dom.test.ts`, `scripts/tests/site-builder-roundtrip.property.test.ts`, `tests/e2e/site-builder.spec.ts`
 
 ## Goal
 
@@ -237,8 +237,8 @@ Every type also has a **Tone** (`neutral`, `accent`, `info`, `success`,
 - **Switching type keeps the text and tone.** A heading takes the first line;
   a list takes one item per line, up to 12.
 - **Markdown fields edit as rich text.** Text, quote and callout body use
-  `RichTextEditor` from `@texuli/editor` (reached through
-  `@texuli/examples/editor` until the website declares the package). The
+  `RichTextEditor` from `@texuli/editor/editor`, loaded lazily by
+  `inspector/text/MarkdownField.svelte` (the website declares the package). The
   field still stores Markdown: the editor reads it at the `untrusted` tier,
   lists what it could not keep (a refused link keeps its text only) under
   **Editor notes**, and writes the Markdown back on each edit. A pressed
@@ -521,7 +521,7 @@ that reason. Typing them correctly is a catalog change, outside the builder.
 - **Round trip.** Committed text reads back to the same canonical JSON, so
   the digest equals the player's (`blueprintDigest`). Only key order,
   whitespace, absent fields, number formatting and string escapes
-  normalize. `site-builder-payload.test.ts` checks idempotence, the digest,
+  normalize. `site-builder.test.ts` checks idempotence, the digest,
   inspector and JSON edits through the same history, and that refused text
   leaves the history untouched.
 
@@ -732,7 +732,7 @@ The whole builder works from the keyboard (Task 75). Its parts:
     "Item removed. 2 left.").
   - Nested lists handle their own keys.
 
-`site-builder-keyboard.test.ts` covers the focus rules, the list action on
+`site-builder-dom.test.ts` covers the focus rules, the list action on
 a DOM list and the pane cycle. It also mounts the builder (happy-dom) for
 the outline's node operations: Shift, Space, Ctrl/Cmd+click, Shift+click,
 Ctrl/Cmd+A and Escape selection; group Alt+Arrow moves and Delete with
@@ -764,7 +764,7 @@ rule always refuses, so typing in it could only fail. `inspectorFields` (in
 ## Validation
 
 ```bash
-pnpm vitest run scripts/tests/site-builder-palette.test.ts scripts/tests/site-builder-outline.test.ts scripts/tests/site-builder-inspector-text.test.ts scripts/tests/site-builder-inspector-choice.test.ts scripts/tests/site-builder-inspector-number.test.ts scripts/tests/site-builder-inspector-struct.test.ts scripts/tests/site-builder-inspector-media.test.ts scripts/tests/site-builder-payload.test.ts scripts/tests/site-builder-preview.test.ts scripts/tests/site-builder-history.test.ts scripts/tests/site-builder-roundtrip.property.test.ts scripts/tests/site-builder-keyboard.test.ts
+pnpm vitest run scripts/tests/site-builder.test.ts scripts/tests/site-builder-dom.test.ts scripts/tests/site-builder-roundtrip.property.test.ts
 pnpm --filter @texuli/website typecheck
 pnpm build
 TEXULI_E2E_PORT=4898 pnpm exec playwright test tests/e2e/site-builder.spec.ts

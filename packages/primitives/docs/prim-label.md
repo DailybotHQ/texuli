@@ -61,18 +61,12 @@ label's own handling.
 
 ## Verified
 
-- **Unit tests:** `pnpm vitest run packages/primitives/tests/label.test.ts`,
-  16 tests:
-  - the helpers: id joining; describedby only for mounted parts;
-    invalid-without-error; required and disabled; the selection rule;
-  - Field: association with explicit ids; the error wired and live only
-    while invalid, then recovering; references to unmounted parts never
-    emitted; author references kept; required and disabled on every part;
-    `bind:value` on the default input and on a `child` textarea;
-    `forceMount`; unique generated ids; the missing provider named;
-  - Label: `for` and wrapping; double-click selection stopped but not on
-    interactive content; `child` composition with the consumer handler
-    first.
+- **Unit tests:** `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/forms.test.ts`,
+  6 tests (`-t '^label '`):
+  - the helpers: id joining;
+  - Field: references to unmounted parts never emitted; author references
+    kept; unique generated ids; the missing provider named;
+  - Label: `child` composition with the consumer handler first.
 - **Behavior:** `pnpm exec playwright test tests/behavior/scenarios/label.spec.ts`
   runs 8 rows, against the Bits `Label` driver and the owned driver:
   - names (by `for` and by wrapping);

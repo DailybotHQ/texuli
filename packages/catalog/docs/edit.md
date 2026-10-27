@@ -2,7 +2,7 @@
 
 **Package:** `@texuli/catalog`  
 **Import:** `@texuli/catalog/edit`  
-**Tests:** `packages/catalog/tests/edit.test.ts`, `packages/catalog/tests/edit-history.test.ts`
+**Tests:** `packages/catalog/tests/edit.test.ts` (ops and history)
 
 ## Goal
 

@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Source:** `packages/texuli/src/components/toast/`  
-**Tests:** `packages/texuli/tests/toast.test.ts`  
+**Tests:** `packages/texuli/tests/overlays.test.ts`, `packages/texuli/tests/contracts.test.ts`  
 **Example:** `texuli-toast`  
 **Task:** T-ui-toast
 
@@ -71,6 +71,6 @@ toast.promise(save(), {
   (`0` keeps toasts until dismissed). A toast's own `duration` wins, and
   without either each kind uses `DEFAULT_TOAST_DURATION`.
 - **Example:** `texuli-toaster-positions` (two stacks, two toasts per tone).
-  Checks: `packages/texuli/tests/toast.test.ts` and
+  Checks: `packages/texuli/tests/overlays.test.ts`, `packages/texuli/tests/contracts.test.ts` and
   `tests/e2e/toaster-viewport.spec.ts` (axe in light, dark and forced
   colors; placement in LTR and RTL; exit motion; reachable under a modal).

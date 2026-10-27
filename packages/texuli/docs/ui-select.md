@@ -3,7 +3,7 @@
 **Package:** `texuli`  
 **Source:** `packages/texuli/src/components/select/`  
 **Primitive:** `@texuli/primitives/select`  
-**Tests:** `packages/texuli/tests/select.test.ts`  
+**Tests:** `packages/texuli/tests/forms.test.ts`  
 **Examples:** `ui-select`, `ui-select-variants`, `ui-select-states`, `ui-select-rtl`, `ui-select-dark`
 
 Styled single-select listbox on the `--tx-*` token contract: field-like trigger,

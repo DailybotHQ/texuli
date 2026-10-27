@@ -112,18 +112,13 @@ separator attributes. The toolbar's own six parts add about 1.6 KB.
 ## Tests
 
 ```bash
-pnpm vitest run packages/primitives/tests/toolbar.test.ts
+pnpm vitest run packages/primitives/tests/composites.test.ts
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/behavior/scenarios/toolbar.spec.ts
 ```
 
-**Unit** (10 tests) cover:
-- the named toolbar and `aria-orientation`;
-- the single Tab stop;
-- arrows, Home and End with and without wrap, vertical, right to left;
-- disabled items focusable but inert;
-- toggle and radio groups;
-- separators;
-- links through the URL policy.
+**Unit** (1 test, `-t toolbar`) covers links through the URL policy; the
+structure, Tab stop, arrows, disabled items, groups and separators are
+behavior rows.
 
 **Browser** (Chromium, WebKit, Pixel 7) covers:
 - Tab entry and re-entry on the last item;

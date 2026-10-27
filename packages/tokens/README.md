@@ -51,7 +51,7 @@ the generator for pastel fills: [tokens-tone-soft](docs/tokens-tone-soft.md).
 ## Testing
 
 ```bash
-pnpm vitest run packages/tokens            # 15 test files
+pnpm vitest run packages/tokens            # 13 test files
 pnpm --filter @texuli/tokens typecheck     # tsc -p tsconfig.json
 npx biome check packages/tokens            # lint + format
 ```

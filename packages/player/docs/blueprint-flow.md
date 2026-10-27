@@ -304,7 +304,7 @@ built.
 
 ```bash
 pnpm vitest run packages/player
-pnpm vitest run packages/catalog/tests/edit.test.ts packages/catalog/tests/edit-history.test.ts packages/catalog/tests/player.test.ts
+pnpm vitest run packages/catalog/tests/edit.test.ts packages/catalog/tests/player.test.ts
 pnpm vitest run scripts/tests/site-builder-roundtrip.property.test.ts
 TEXULI_E2E_PORT=4911 pnpm exec playwright test tests/e2e/csp.spec.ts -g "player-" --project chromium
 ```
