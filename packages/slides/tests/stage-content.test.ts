@@ -3,7 +3,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import type { Block } from '@texuli/blocks/core';
 import { generateThemeFromSeed } from '@texuli/tokens/generator';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildDeckPptx } from '../src/export/index.ts';
 import {
   blockFragment,
@@ -18,6 +18,7 @@ import {
 } from '../src/model/index.ts';
 import DeckPrint from '../src/stage/DeckPrint.svelte';
 import DeckStage from '../src/stage/DeckStage.svelte';
+import { loadDefaultDeckRenderers } from '../src/stage/defaults.ts';
 import { gateDeckMedia, settleDeckImages } from '../src/stage/media.ts';
 import {
   createDeckSync,
@@ -26,6 +27,9 @@ import {
   parseDeckSyncMessage,
 } from '../src/stage/sync.ts';
 import { clearDeckHash, scenario } from './scenario.ts';
+
+// The default renderer tables load on first use; preload them, as a host that paints at once does.
+beforeAll(() => loadDefaultDeckRenderers());
 
 // Stages write `#/<slide>/<step>`; every test starts without one.
 beforeEach(clearDeckHash);

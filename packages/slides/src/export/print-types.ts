@@ -21,6 +21,12 @@ export interface DeckPrintViewProps {
   children?: Snippet<[DeckSlide, number]>;
   /** Extra renderer tables ahead of the default layouts and component registry. */
   renderers?: DeckRenderers | readonly DeckRenderers[];
+  /**
+   * Append the default tables (the 20 catalog layouts, the component
+   * registry) after `renderers`, imported on first use. Default true; `false`
+   * leaves every page to `renderers` and never loads the defaults.
+   */
+  defaultRenderers?: boolean;
   /** URL policy tier for media and links; keep `untrusted` for agent decks. */
   tier?: DeckMediaTrust;
   messages?: DeckStageMessages;

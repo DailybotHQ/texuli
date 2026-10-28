@@ -1,8 +1,9 @@
 // @vitest-environment happy-dom
 
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import DeckStage from '../src/stage/DeckStage.svelte';
+import { loadDefaultDeckRenderers } from '../src/stage/defaults.ts';
 import {
   moveOverviewSelection,
   OVERVIEW_WINDOW_RADIUS,
@@ -10,6 +11,9 @@ import {
   overviewWindow,
 } from '../src/stage/overview/index.ts';
 import { clearDeckHash, scenario } from './scenario.ts';
+
+// The default renderer tables load on first use; preload them, as a host that paints at once does.
+beforeAll(() => loadDefaultDeckRenderers());
 
 // ---------------------------------------------------------------------------
 // Fixtures

@@ -90,6 +90,7 @@ A deck route prints when its URL asks for it:
 | `notes` | `none` | `none`, `appendix` or `handout`. |
 | `slide` (v1 name `children`) | — | A snippet `(slide, index)` that paints each slide instead of the default renderers. |
 | `renderers` | — | Extra renderer tables ahead of the default layouts and component registry. |
+| `defaultRenderers` | `true` | Append the default tables (layouts, component registry) after `renderers`, imported on first use with the print body. `false` paints with `renderers` only and never loads the defaults. |
 | `tier` | `untrusted` | URL policy tier for media and links; keep `untrusted` for agent decks. |
 | `messages`, `resolveAvatar` | — | As on the stage ([stage.md](stage.md)). |
 | `loadTheme` | the library loader | Catalog theme loader; `null` when the host loads theme CSS itself. |

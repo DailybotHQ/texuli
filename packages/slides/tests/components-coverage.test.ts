@@ -13,7 +13,7 @@ import { STATE_MANIFESTS } from '@texuli/catalog/manifests/state';
 import { WORKFLOWS_MANIFESTS } from '@texuli/catalog/manifests/workflows';
 import type { Deck, DeckSlide, FreeSlide as FreeSlideModel } from '@texuli/deck/model';
 import { PLAYER_LOADERS } from '@texuli/player';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import FreeSlide from '../src/components/FreeSlide.svelte';
 import {
   BLOCK_FAMILY_IDS,
@@ -24,10 +24,14 @@ import {
   slideComponentSupport,
 } from '../src/registry/index.ts';
 import DeckStage from '../src/stage/DeckStage.svelte';
+import { loadDefaultDeckRenderers } from '../src/stage/defaults.ts';
 import { createDeckTranslator } from '../src/stage/messages.ts';
 import { prepareDeck } from '../src/stage/prepare.ts';
 import { deckSlideSteps, deckStepView } from '../src/stage/steps.ts';
 import { clearDeckHash } from './scenario.ts';
+
+// The default renderer tables load on first use; preload them, as a host that paints at once does.
+beforeAll(() => loadDefaultDeckRenderers());
 
 type Bag = Record<string, unknown>;
 

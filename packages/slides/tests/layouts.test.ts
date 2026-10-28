@@ -25,7 +25,7 @@ import {
   resolveDeckBackground,
 } from '@texuli/deck/model';
 import { loadAllFullLibraryThemes } from '@texuli/tokens/library-expand';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   DECK_BACKGROUND_GALLERY,
   deckBackgroundContrast,
@@ -43,7 +43,11 @@ import {
   textOverflows,
 } from '../src/layouts/index.ts';
 import DeckStage from '../src/stage/DeckStage.svelte';
+import { loadDefaultDeckRenderers } from '../src/stage/defaults.ts';
 import { scenario } from './scenario.ts';
+
+// The default renderer tables load on first use; preload them, as a host that paints at once does.
+beforeAll(() => loadDefaultDeckRenderers());
 
 type Bag = Record<string, unknown>;
 

@@ -9,10 +9,13 @@
  *   `item` (component items on free slides), and supplies the parse hooks
  *   (`knownComponents`, `validateComponent`) for the second validation phase.
  * - A **host** answers `custom` (and may override anything with `slide`),
- *   and may replace the free-slide block check with `validateBlock`.
+ *   and may replace the free-slide block check with `validateBlock`, or with
+ *   `loadValidateBlock` to import that check on first use (the stage resolves
+ *   it before it validates, so the validator stays out of the initial JS).
  *
  * The stage appends its default tables (layouts and the component registry)
- * after the host's; `defaultRenderers={false}` leaves them out.
+ * after the host's, imported on first use (`loadDefaultDeckRenderers`);
+ * `defaultRenderers={false}` leaves them out, and none of their code loads.
  *
  * A renderer is a Svelte component, or `{ load }` for one that is imported on
  * first use (only mounted slides trigger the import; `prefetch` warms the
@@ -29,6 +32,7 @@ import type {
   ResolvedDeckBackground,
   SlideComponentItem,
 } from '@texuli/deck/model';
+import { createDiagnostic, type DeckDiagnostic, type PathSegment } from '@texuli/deck/schema';
 import type { Component } from 'svelte';
 import type { DeckMediaTrust } from './media.ts';
 import type { DeckTranslate } from './messages.ts';
@@ -92,7 +96,24 @@ type Resolve<S, P extends Record<string, unknown>> = (
   lookup: DeckRendererLookup
 ) => DeckRendererEntry<P> | null | undefined;
 
+/** A free-slide block check (`validateBlock`): the diagnostics of one block, if any. */
+export type DeckBlockValidator = NonNullable<DeckValidationHooks['validateBlock']>;
+
+/** What `loadValidateBlock` may resolve to: the check, or a module exporting it. */
+export type DeckBlockValidatorModule =
+  | DeckBlockValidator
+  | { readonly validateBlock: DeckBlockValidator }
+  | { readonly default: DeckBlockValidator };
+
 export interface DeckRenderers extends DeckValidationHooks {
+  /**
+   * `validateBlock`, imported on first use (`() => import('./validate-block.ts')`).
+   * The stage resolves it before it validates a deck and paints nothing
+   * meanwhile; a `validateBlock` on the same table wins over it. If the
+   * import fails, every free-slide block is refused (the deck shows its
+   * error state, never unchecked content).
+   */
+  loadValidateBlock?(): Promise<DeckBlockValidatorModule>;
   /** Any slide; answered first (a host override). */
   slide?: Resolve<DeckSlide, DeckSlideRendererProps>;
   /** Catalog layout slides (the layouts lane). */
@@ -185,21 +206,86 @@ export function resolveBackgroundRenderer(
   return first(list, (r) => r.background, background, lookup);
 }
 
+// Lazy block validators by table: the loaded check, or the refusal when its import failed.
+const BLOCK_VALIDATORS = new WeakMap<object, DeckBlockValidator>();
+const BLOCK_VALIDATOR_LOADS = new WeakMap<object, Promise<void>>();
+
+function blockValidatorOf(loaded: DeckBlockValidatorModule): DeckBlockValidator | undefined {
+  if (typeof loaded === 'function') return loaded;
+  if (loaded && typeof loaded === 'object') {
+    if ('validateBlock' in loaded && typeof loaded.validateBlock === 'function') {
+      return loaded.validateBlock;
+    }
+    if ('default' in loaded && typeof loaded.default === 'function') return loaded.default;
+  }
+  return undefined;
+}
+
+function refuseBlocks(_block: unknown, path: PathSegment[]): DeckDiagnostic[] {
+  return [
+    createDiagnostic('block-props', 'The block check could not be loaded.', path, {
+      fix: "Check the host's loadValidateBlock import.",
+    }),
+  ];
+}
+
+function lazyBlockTable(table: DeckRenderers): boolean {
+  return typeof table.validateBlock !== 'function' && typeof table.loadValidateBlock === 'function';
+}
+
+/** True when every `loadValidateBlock` in the list has settled (so validation can run). */
+export function deckValidatorsReady(list: readonly DeckRenderers[]): boolean {
+  return list.every((table) => !lazyBlockTable(table) || BLOCK_VALIDATORS.has(table));
+}
+
+/**
+ * Import every `loadValidateBlock` of the list once (later calls share the
+ * import). Never rejects: a failed import or a module without a check
+ * leaves a validator that refuses every block.
+ */
+export function loadDeckValidators(list: readonly DeckRenderers[]): Promise<void> {
+  const loads = list.filter(lazyBlockTable).map((table) => {
+    const started = BLOCK_VALIDATOR_LOADS.get(table);
+    if (started) return started;
+    const load = Promise.resolve()
+      .then(() => table.loadValidateBlock?.())
+      .then(
+        (loaded) => {
+          const check = loaded === undefined ? undefined : blockValidatorOf(loaded);
+          BLOCK_VALIDATORS.set(table, check ? check.bind(table) : refuseBlocks);
+        },
+        () => {
+          BLOCK_VALIDATORS.set(table, refuseBlocks);
+        }
+      );
+    BLOCK_VALIDATOR_LOADS.set(table, load);
+    return load;
+  });
+  return Promise.all(loads).then(() => undefined);
+}
+
 /**
  * Merge the parse hooks of every renderer table: component ids are unioned,
  * component validators all run, and the first table with a `validateBlock`
- * (the host's, ahead of the defaults) replaces the stage's block check.
+ * or a `loadValidateBlock` (the host's, ahead of the defaults) replaces the
+ * stage's block check. A lazy check that has not loaded yet refuses every
+ * block (call `loadDeckValidators` first), so nothing unchecked is accepted.
  */
 export function deckValidationHooks(list: readonly DeckRenderers[]): DeckValidationHooks {
   const known = list.flatMap((r) => r.knownComponents ?? []);
   const validators = list.flatMap((r) => (r.validateComponent ? [r.validateComponent] : []));
   const declared = list.some((r) => r.knownComponents !== undefined);
-  const blockTable = list.find((r) => typeof r.validateBlock === 'function');
+  const blockTable = list.find(
+    (r) => typeof r.validateBlock === 'function' || typeof r.loadValidateBlock === 'function'
+  );
+  const validateBlock = blockTable?.validateBlock
+    ? blockTable.validateBlock.bind(blockTable)
+    : blockTable
+      ? (BLOCK_VALIDATORS.get(blockTable) ?? refuseBlocks)
+      : undefined;
   return {
     ...(declared ? { knownComponents: [...new Set(known)] } : {}),
-    ...(blockTable?.validateBlock
-      ? { validateBlock: blockTable.validateBlock.bind(blockTable) }
-      : {}),
+    ...(validateBlock ? { validateBlock } : {}),
     ...(validators.length > 0
       ? {
           validateComponent: (component, path) => {

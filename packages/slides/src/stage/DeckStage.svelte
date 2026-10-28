@@ -49,8 +49,6 @@ import { resolveImageSources } from '@texuli/media/image';
 import type { Theme } from '@texuli/tokens/contract';
 import { defineTheme } from '@texuli/tokens/contract';
 import { flushSync, onMount, type Snippet, tick, untrack } from 'svelte';
-import { layoutRenderers } from '../layouts/index.ts';
-import { componentRenderers } from '../registry/index.ts';
 import DeckChrome from './chrome/DeckChrome.svelte';
 import DeckProgress from './chrome/DeckProgress.svelte';
 import DeckToolbar from './chrome/DeckToolbar.svelte';
@@ -59,6 +57,7 @@ import { type DeckStageContext, type DeckStageSlideEntry, setDeckStageContext } 
 import { deckCssVars } from './css-vars.ts';
 import DeckError from './DeckError.svelte';
 import DeckSlideView from './DeckSlideView.svelte';
+import { loadDefaultDeckRenderers, loadedDefaultDeckRenderers } from './defaults.ts';
 import { dispatchDeckEvent } from './events.ts';
 import { canUseNativeFullscreen, type DeckFullscreenState } from './fullscreen.ts';
 import { clickInput, createSwipeTracker, keyInput, selectionLength } from './input.ts';
@@ -71,7 +70,13 @@ import { prepareDeck } from './prepare.ts';
 import DeckPresenterPane from './presenter/DeckPresenterPane.svelte';
 import type { DeckPresenterHost } from './presenter/host.ts';
 import type { DeckPreviewPaint } from './presenter/paint.ts';
-import { type DeckRenderers, deckRendererList, deckValidationHooks } from './renderers.ts';
+import {
+  type DeckRenderers,
+  deckRendererList,
+  deckValidationHooks,
+  deckValidatorsReady,
+  loadDeckValidators,
+} from './renderers.ts';
 import {
   claimDeckHash,
   readDeckHash,
@@ -127,9 +132,13 @@ interface Props {
   renderers?: DeckRenderers | readonly DeckRenderers[];
   /**
    * Append the default renderer tables (the 20 catalog layouts and the
-   * component registry) after `renderers`. Default true; `false` leaves every
-   * slide to the host's tables (nothing from the defaults loads: no lazy
-   * chunk, CSS or prefetch), and a slide no table answers shows a placeholder.
+   * component registry) after `renderers`. Default true: the tables are
+   * imported on first use, and the first stage shows a loading status until
+   * they arrive (`loadDefaultDeckRenderers()` before mounting skips it).
+   * `false` leaves every slide to the host's tables (none of the defaults'
+   * code is bundled into the stage's initial graph, and nothing of them
+   * loads: no lazy chunk, CSS or prefetch), and a slide no table answers
+   * shows a placeholder.
    */
   defaultRenderers?: boolean;
   /** Focus the active slide on mount. */
@@ -171,7 +180,8 @@ interface Props {
   onError?: (issues: PreparedIssues) => void;
 }
 
-type PreparedIssues = ReturnType<typeof prepareDeck>['issues'];
+type PreparedDeck = ReturnType<typeof prepareDeck>;
+type PreparedIssues = PreparedDeck['issues'];
 
 let {
   deck,
@@ -217,14 +227,53 @@ const instance = namespace ?? uid;
 // svelte-ignore state_referenced_locally
 const ownsHash = browser && syncHash && claimDeckHash(window, instance);
 
-// Host renderers win; the default layouts and component registry answer last (unless turned off).
+// Host renderers win; the default layouts and component registry answer last (unless turned
+// off). They are imported on first use: until they (and any lazy host block check) arrive, the
+// stage validates and paints nothing and shows a loading status (also during SSR).
+let defaultTables = $state.raw<readonly DeckRenderers[] | undefined>(loadedDefaultDeckRenderers());
+let validatorsVersion = $state(0);
+let defaultsReady = $derived(defaultRenderers === false || defaultTables !== undefined);
 let rendererList = $derived(
   defaultRenderers === false
     ? [...deckRendererList(renderers)]
-    : [...deckRendererList(renderers), layoutRenderers, componentRenderers]
+    : [...deckRendererList(renderers), ...(defaultTables ?? [])]
 );
-let prepared = $derived(prepareDeck(deck, deckValidationHooks(rendererList)));
-let model = $derived(prepared.ok ? prepared.deck : null);
+let validatorsReady = $derived.by(() => {
+  void validatorsVersion;
+  return deckValidatorsReady(rendererList);
+});
+let prepared = $derived<PreparedDeck | null>(
+  defaultsReady && validatorsReady ? prepareDeck(deck, deckValidationHooks(rendererList)) : null
+);
+let model = $derived(prepared?.ok ? prepared.deck : null);
+
+$effect.pre(() => {
+  if (defaultRenderers === false || defaultTables !== undefined) return;
+  let live = true;
+  loadDefaultDeckRenderers().then(
+    (tables) => {
+      if (live) defaultTables = tables;
+    },
+    () => {
+      // The chunk failed: paint without the defaults (their slides show placeholders).
+      if (live) defaultTables = [];
+    }
+  );
+  return () => {
+    live = false;
+  };
+});
+
+$effect.pre(() => {
+  if (!defaultsReady || validatorsReady) return;
+  let live = true;
+  void loadDeckValidators(rendererList).then(() => {
+    if (live) validatorsVersion += 1;
+  });
+  return () => {
+    live = false;
+  };
+});
 let t = $derived(createDeckTranslator(messages));
 let paintTier = $derived<DeckMediaTrust>(tier ?? mediaTrust ?? 'untrusted');
 let showTrustBadge = $derived(trustBadge !== false && paintTier === 'untrusted');
@@ -617,7 +666,7 @@ $effect(() => {
 });
 
 $effect(() => {
-  if (prepared.ok) return;
+  if (!prepared || prepared.ok) return;
   const issues = prepared.issues;
   untrack(() => {
     onError?.(issues);
@@ -1149,13 +1198,16 @@ $effect(() => {
   data-theme-status={themeStatus}
   data-presenter={presenter ? 'true' : undefined}
   data-fullscreen={fullscreen === 'off' ? undefined : fullscreen}
-  data-tx-deck-invalid={prepared.ok ? undefined : 'true'}
+  data-tx-deck-invalid={!prepared || prepared.ok ? undefined : 'true'}
+  aria-busy={prepared ? undefined : 'true'}
   tabindex="-1"
   onkeydown={onKeydown}
   onfocusout={onFocusOut}
   use:deckCssVars={styleResolution.cssVars}
 >
-  {#if !prepared.ok}
+  {#if !prepared}
+    <p class="tx-deck-stage__loading" role="status">{t('layout.contentLoading')}</p>
+  {:else if !prepared.ok}
     <DeckError issues={prepared.issues} {t} />
   {:else if model && view && activeSlide}
     <!-- DOM order is focus order: below the slide (default), Tab reaches the controls after the slide content. -->

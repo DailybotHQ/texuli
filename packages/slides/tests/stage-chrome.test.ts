@@ -2,13 +2,14 @@
 
 import { configure, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { DECK_CONTROLS } from '@texuli/deck/engine';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   createDeckTooltip,
   placeDeckTooltip,
   TOOLTIP_HOVER_DELAY_MS,
   TOOLTIP_LONG_PRESS_MS,
 } from '../src/stage/chrome/tooltip.ts';
+import { loadDefaultDeckRenderers } from '../src/stage/defaults.ts';
 import {
   claimFirstRunHint,
   copyDeckText,
@@ -23,6 +24,9 @@ import {
 } from '../src/stage/index.ts';
 import { createDeckTranslator } from '../src/stage/messages.ts';
 import { scenario } from './scenario.ts';
+
+// The default renderer tables load on first use; preload them, as a host that paints at once does.
+beforeAll(() => loadDefaultDeckRenderers());
 
 // ---------------------------------------------------------------------------
 // Fixtures and helpers

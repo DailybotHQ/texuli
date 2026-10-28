@@ -43,7 +43,7 @@ scoped styles.
 | `locale` / `dir` | `meta.locale` / `meta.dir` | Override the `lang` and `dir` of the stage |
 | `plugins` | `[]` | Engine plugins (`beforeNavigate`, `beforeRender`/`afterRender`, `onAction`, …), in order |
 | `renderers` | — | Renderer tables, first answer wins (`DeckRenderers`: layouts, components, backgrounds, custom slides, and the free-slide block check `validateBlock`) |
-| `defaultRenderers` | `true` | Append the default tables (the 20 catalog layouts and the component registry) after `renderers`. `false` leaves every slide to the host's tables: nothing from the defaults loads (no lazy chunk, CSS or prefetch), component ids are the host's to check, and a slide no table answers shows a labelled placeholder |
+| `defaultRenderers` | `true` | Append the default tables (the 20 catalog layouts and the component registry) after `renderers`. They are imported on first use (`loadDefaultDeckRenderers`), so the first stage on a page shows a polite loading status (`aria-busy`) for one chunk; await `loadDefaultDeckRenderers()` before mounting to paint at once. `false` leaves every slide to the host's tables: none of the defaults' code is in the stage's initial graph and nothing of them loads (no lazy chunk, CSS or prefetch), component ids are the host's to check, and a slide no table answers shows a labelled placeholder |
 | `autofocus` | `false` | Focus the active slide on mount |
 | `namespace` | a unique id | Instance namespace: presenter channel, view-transition names and the first-visit hint |
 | `initialSlideId` | first visible slide | Open on this slide (a valid URL hash wins when the stage owns it) |
@@ -88,6 +88,31 @@ scoped styles.
   };
   // <DeckStage {deck} renderers={hostBlocks} />
   ```
+
+  A heavy check (a schema library) can stay out of the initial JavaScript:
+  `loadValidateBlock()` on the table imports it on first use and resolves to
+  the check, or to a module exporting `validateBlock` or a default
+  (`DeckBlockValidatorModule`; the check is a `DeckBlockValidator`). The
+  stage calls `loadDeckValidators(list)` and validates only once
+  `deckValidatorsReady(list)` is true, showing the loading status
+  meanwhile. A `validateBlock` on the same table wins over it; until it
+  loads (outside the stage) and if its import fails, every free-slide block
+  is refused, so unchecked content is never accepted.
+
+  ```ts
+  const hostBlocks: DeckRenderers = {
+    loadValidateBlock: () => import('./validate-host-blocks.ts'),
+    free: () => HostFreeSlide,
+  };
+  ```
+- **Default tables:** `loadDefaultDeckRenderers()` imports the layouts
+  table and the component registry once (later calls share the import) and
+  `loadedDefaultDeckRenderers()` returns them synchronously once loaded (or
+  `undefined`). The stage and the print view call it only when their
+  `defaultRenderers` is on; a failed import paints without them (their
+  slides show placeholders). The stage does not validate or paint the deck
+  until the tables are there, also during SSR, where it renders the loading
+  status.
 - **Canvas:** a fixed virtual canvas (1280 × 720 for 16:9) is scaled into
   the stage with a `ResizeObserver` and letterboxed. CSS variables go on the
   stage root through `deckCssVars` (the CSSOM, never a static `style`).
