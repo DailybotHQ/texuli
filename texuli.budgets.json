@@ -665,8 +665,8 @@
       "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for the root convenience aggregate, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
     },
     "@texuli/deck/model": {
-      "gzip": 32768,
-      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for model v2, migration, lint, patch and text twins, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+      "gzip": 49152,
+      "note": "Owner decision 2026-10-27 (PLAN_008 T-model-v2, owner consent in analysis_results/owner-consent.md): provisional cap raised from 32 KiB after the first real measurement, 36.65 KiB for the schema kit, 21-layout catalog, style, backgrounds, steps, motion, parseDeck, the untrusted loader and migration; 48 KiB leaves room for the lint rules. T-perf-budgets measures and tightens it."
     },
     "@texuli/deck/schema": {
       "gzip": 16384,

@@ -17,6 +17,7 @@ import {
   type ValidateResult,
   validate,
 } from '../../schema/index.ts';
+import { steppablePattern } from '../steps/slide-steps.ts';
 import {
   bigStatProps,
   chartProps,
@@ -636,10 +637,8 @@ export function layoutSteppablePaths(id: unknown): readonly string[] {
   return isLayoutId(id) ? DECK_LAYOUTS[id].steppable : [];
 }
 
-/** The pattern of a path inside `props`: `[]` → `''`, `['cards', 2]` → `cards.*`. */
-export function steppablePattern(path: readonly PathSegment[]): string {
-  return path.map((part) => (typeof part === 'number' ? '*' : part)).join('.');
-}
+/** The pattern of a path inside `props` (one definition, shared with the steps pass). */
+export { steppablePattern };
 
 /** Whether `layout` reveals a step marker found at `path` (relative to `props`). */
 export function isSteppablePath(layout: unknown, path: readonly PathSegment[]): boolean {

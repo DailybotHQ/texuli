@@ -1,0 +1,42 @@
+{
+  "$comment": "Golden deck: the older layout-deck of layout-card slides (g16 shape), kept as a regression on the legacy projection. Fictional data only.",
+  "golden": "deck-legacy-cards",
+  "tree": {
+    "id": "layout-deck",
+    "props": { "title": "Weekly planning" },
+    "children": [
+      {
+        "id": "layout-card",
+        "props": { "title": "Agenda" },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": { "type": "list", "items": [{ "text": "Progress" }, { "text": "Risks" }] }
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": { "title": "Burn-down" },
+        "children": [
+          {
+            "id": "charts-bar",
+            "props": {
+              "title": "Points left",
+              "description": "Story points left in the fictional sprint",
+              "series": [
+                {
+                  "id": "left",
+                  "label": "Left",
+                  "points": [{ "x": "Mon", "y": 21 }, { "x": "Fri", "y": 6 }]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

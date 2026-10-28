@@ -18,6 +18,13 @@ import {
   validate,
 } from '../../schema/index.ts';
 import { isDeckBackgroundPreset } from '../backgrounds/schema.ts';
+import {
+  MAX_MOTION_MS,
+  REDUCED_FADE_MS,
+  resolveSlideTransition,
+  SUBTLE_SCALE,
+  TRANSITION_MS,
+} from '../motion/transition.ts';
 import { DECK_CANVAS, type DeckAspect, type DeckTransition } from '../shared.ts';
 import {
   DECK_STYLE_DEFAULTS,
@@ -68,21 +75,14 @@ export const DECK_ASPECT_RATIOS: Readonly<Record<DeckAspect, string>> = Object.f
   '1:1': '1 / 1',
 });
 
-/** Full-motion durations in milliseconds. */
-export const DECK_TRANSITION_MS: Readonly<Record<DeckTransition, number>> = Object.freeze({
-  none: 0,
-  fade: 300,
-  'fade-up': 300,
-  slide: 400,
-  zoom: 350,
-  morph: 400,
-});
+/** Full-motion durations in milliseconds (the motion module's table). */
+export const DECK_TRANSITION_MS: Readonly<Record<DeckTransition, number>> = TRANSITION_MS;
 /** `subtle` motion scales durations by this factor (and plays `zoom` as `fade`). */
-export const DECK_SUBTLE_FACTOR = 0.6;
+export const DECK_SUBTLE_FACTOR = SUBTLE_SCALE;
 /** Under reduced motion every transition is a short fade. */
-export const DECK_REDUCED_MOTION_MS = 150;
+export const DECK_REDUCED_MOTION_MS = REDUCED_FADE_MS;
 /** No transition runs longer than this. */
-export const DECK_TRANSITION_CAP_MS = 400;
+export const DECK_TRANSITION_CAP_MS = MAX_MOTION_MS;
 
 export interface DeckResolvedTransition {
   name: DeckTransition;
@@ -91,25 +91,16 @@ export interface DeckResolvedTransition {
 
 /**
  * The transition the stage plays: `none` motion or transition → none;
- * reduced motion → a 150 ms fade; `subtle` → ×0.6 and zoom → fade; capped at 400 ms.
+ * reduced motion → a 150 ms fade; `subtle` → ×0.6 and zoom → fade; capped at
+ * 400 ms. Delegates to the one resolver, `resolveSlideTransition`.
  */
 export function resolveDeckTransition(
   transition: DeckTransition,
   motion: DeckMotion,
   reducedMotion = false
 ): DeckResolvedTransition {
-  if (motion === 'none' || transition === 'none') return { name: 'none', durationMs: 0 };
-  if (reducedMotion) return { name: 'fade', durationMs: DECK_REDUCED_MOTION_MS };
-  const full = DECK_TRANSITION_MS[transition];
-  if (motion === 'subtle') {
-    const name = transition === 'zoom' ? 'fade' : transition;
-    const base = DECK_TRANSITION_MS[name];
-    return {
-      name,
-      durationMs: Math.min(DECK_TRANSITION_CAP_MS, Math.round(base * DECK_SUBTLE_FACTOR)),
-    };
-  }
-  return { name: transition, durationMs: Math.min(DECK_TRANSITION_CAP_MS, full) };
+  const resolved = resolveSlideTransition({ slide: { transition }, motion, reducedMotion });
+  return { name: resolved.name, durationMs: resolved.durationMs };
 }
 
 type Defaulted = typeof DECK_STYLE_DEFAULTS;
