@@ -102,16 +102,16 @@ describe('string', () => {
       ['bell\u0007', false, false],
       ['del\u007f', false, false],
       ['c1\u0085', false, false],
-      ['rlo‮', false, false],
-      ['isolate⁦', false, false],
-      ['sep ', false, true],
+      ['rlo\u202E', false, false],
+      ['isolate\u2066', false, false],
+      ['sep\u2028', false, true],
       ['emoji 😀 ok', true, true],
     ];
     for (const [input, lineOk, blockOk] of cases) {
       expect(validate(line, input).ok, JSON.stringify(input)).toBe(lineOk);
       expect(validate(block, input).ok, JSON.stringify(input)).toBe(blockOk);
     }
-    expect(issuesOf(line, 'a‮b')[0]?.message).toBe(
+    expect(issuesOf(line, 'a\u202Eb')[0]?.message).toBe(
       'Character U+202E at index 1 is not allowed here.'
     );
   });
@@ -440,7 +440,7 @@ describe('bounded json', () => {
       ],
     ];
     for (const [input, expected] of cases) expect(where(issuesOf(props, input))).toEqual(expected);
-    expect(codes(issuesOf(t.json({ text: 'line' }), { a: 'x‮y' }))).toEqual(['unsafe-text']);
+    expect(codes(issuesOf(t.json({ text: 'line' }), { a: 'x\u202Ey' }))).toEqual(['unsafe-text']);
   });
 });
 
@@ -599,7 +599,7 @@ describe('hostile input never throws and stays bounded', () => {
       -0,
       Number.NaN,
       '',
-      '‮',
+      '\u202E',
       [],
       {},
       [undefined],

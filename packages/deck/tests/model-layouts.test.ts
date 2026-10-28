@@ -446,7 +446,7 @@ describe('hostile props', () => {
   });
 
   it('refuses control and bidi-override characters in single-line text', () => {
-    for (const value of ['line\nbreak', 'bidi‮override', 'nul\u0000']) {
+    for (const value of ['line\nbreak', 'bidi\u202Eoverride', 'nul\u0000']) {
       expect(codesAt(validateLayoutProps('quote', { quote: value })), value).toEqual([
         'unsafe-text $.quote',
       ]);

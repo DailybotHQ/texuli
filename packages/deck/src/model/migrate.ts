@@ -103,6 +103,24 @@ function assign(target: Bag, key: string, value: unknown): void {
 // ---------------------------------------------------------------------------
 // Texuli v1
 
+/**
+ * A catalog theme without a mode becomes the string shorthand, so every
+ * authoring form (JSON, Markdown `theme:`) round-trips it unchanged.
+ */
+function shorthandTheme(theme: unknown): unknown {
+  if (theme === null || typeof theme !== 'object' || Array.isArray(theme)) return theme;
+  const ref = theme as Record<string, unknown>;
+  const keys = Object.keys(ref);
+  if (
+    ref.kind === 'catalog' &&
+    typeof ref.id === 'string' &&
+    keys.every((key) => key === 'kind' || key === 'id')
+  ) {
+    return ref.id;
+  }
+  return theme;
+}
+
 const V1_SLIDE_KEYS = ['id', 'title', 'notes', 'master', 'themeRef', 'transition', 'blocks'];
 
 function fromTexuliV1(input: Bag, notes: Notes): Bag {
@@ -117,7 +135,7 @@ function fromTexuliV1(input: Bag, notes: Notes): Bag {
 
   const style: Bag = {};
   assign(style, 'aspect', meta.aspect);
-  assign(style, 'theme', meta.themeRef);
+  assign(style, 'theme', shorthandTheme(meta.themeRef));
   if (settings.showProgress === false) style.progress = 'none';
   if (settings.defaultTransition !== undefined && settings.defaultTransition !== 'fade') {
     style.transition = settings.defaultTransition;
@@ -143,7 +161,7 @@ function fromTexuliV1(input: Bag, notes: Notes): Bag {
     assign(out, 'id', slide.id);
     assign(out, 'title', slide.title);
     assign(out, 'notes', slide.notes);
-    assign(out, 'theme', slide.themeRef);
+    assign(out, 'theme', shorthandTheme(slide.themeRef));
     assign(out, 'transition', slide.transition);
     out.layout = 'free';
     assign(out, 'master', slide.master);

@@ -130,7 +130,8 @@ describe('migrateDeck: fixtures', () => {
     const v1Slides = input.slides as Json[];
     expect(deck.style).toEqual({
       aspect: (input.meta as Json).aspect,
-      theme: (input.meta as Json).themeRef,
+      // A mode-less catalog reference becomes the string shorthand.
+      theme: ((input.meta as Json).themeRef as Json).id,
       progress: 'none',
       transition: 'fade-up',
     });

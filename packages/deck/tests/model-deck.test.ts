@@ -208,7 +208,7 @@ describe('parseDeck: slide kinds', () => {
       '/slides/0/notes',
     ]);
     expect(parseDeck(slide({ notes: 'a\nb\tc' })).ok).toBe(true);
-    expect(at(parseDeck(slide({ notes: 'a‮b' })).issues, 'unsafe-text')).toEqual([
+    expect(at(parseDeck(slide({ notes: 'a\u202Eb' })).issues, 'unsafe-text')).toEqual([
       '/slides/0/notes',
     ]);
     expect(at(parseDeck(slide({ title: text(201) })).issues, 'too-long')).toEqual([

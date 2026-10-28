@@ -52,7 +52,7 @@ describe('theme references', () => {
       [{ kind: 'embedded', theme: [1, 2] }, ['embedded-theme $.theme']],
       [{ kind: 'embedded', theme: deep }, ['too-deep $.theme.a.b.c.d.e.f']],
       [{ kind: 'embedded', theme: { name: 'x'.repeat(513) } }, ['too-long $.theme.name']],
-      [{ kind: 'embedded', theme: { name: 'a‮b' } }, ['unsafe-text $.theme.name']],
+      [{ kind: 'embedded', theme: { name: 'a\u202Eb' } }, ['unsafe-text $.theme.name']],
       [{ kind: 'catalog', id: 'amber', extra: true }, ['unknown-key $.extra']],
       [42, ['invalid-type $']],
     ];
@@ -332,7 +332,7 @@ describe('resolveDeckStyle', () => {
       'amber',
       [],
       { aspect: '21:9', radius: 'large' },
-      { footer: 'a‮b', density: 'compact', background: 'url(javascript:alert(1))' },
+      { footer: 'a\u202Eb', density: 'compact', background: 'url(javascript:alert(1))' },
       { transition: { toString: () => 'zoom' }, progress: 'top' },
       JSON.parse('{"__proto__":{"motion":"none"},"slideNumbers":false}'),
       Object.create({ aspect: '4:3' }),

@@ -167,20 +167,20 @@ describe('loadUntrustedDeck: hostile corpus', () => {
         {
           id: 'one',
           layout: 'quote',
-          props: { quote: 'Pay‮⁦ now​!', cite: 'Fam‍‌ily' },
-          notes: 'line two\tthree\n',
+          props: { quote: 'Pay\u202E\u2066 now\u200B!', cite: 'Fam\u200D\u200Cily' },
+          notes: 'line\u2028two\tthree\n',
         },
       ])
     );
     expect(result.ok).toBe(true);
     const slide = result.deck?.slides[0] as Json;
-    expect(slide.props).toEqual({ quote: 'Pay now!', cite: 'Fam‍‌ily' });
+    expect(slide.props).toEqual({ quote: 'Pay now!', cite: 'Fam\u200D\u200Cily' });
     expect(slide.notes).toBe('line two\tthree\n');
     expect(result.issues.map((i) => `${i.code} ${i.severity} ${i.pointer}`)).toEqual([
       'hidden-characters warning /slides/0/props/quote',
       'hidden-characters warning /slides/0/notes',
     ]);
-    expect(stripHiddenCharacters('a\u0000b\u009Fc﻿d؜e')).toBe('abcde');
+    expect(stripHiddenCharacters('a\u0000b\u009Fc\uFEFFd\u061Ce')).toBe('abcde');
     const same = 'plain';
     expect(stripHiddenCharacters(same)).toBe(same);
   });
@@ -189,7 +189,7 @@ describe('loadUntrustedDeck: hostile corpus', () => {
     const slides = Array.from({ length: 30 }, (_, i) => ({
       id: `s${i}`,
       layout: 'quote',
-      props: { quote: 'a​b' },
+      props: { quote: 'a\u200Bb' },
     }));
     const result = loadUntrustedDeck(deck(slides));
     expect(result.ok).toBe(true);
