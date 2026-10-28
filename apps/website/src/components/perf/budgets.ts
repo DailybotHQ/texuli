@@ -156,8 +156,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/gallery-components/',
     reason:
-      'The living gallery: server-rendered cards, each with its preview frame, light/dark and RTL controls, props toggle and tag filters. Measured 845.8 KB raw / 46.4 KB gzip at FIX-site-perf-routes; the PLAN_006 gallery audit (T-83) added card content: 888.2 KB raw / 48.5 KB gzip of HTML and 90.1 KB JS, limits 892 / 50 / 92. T-93 still owns slimming the raw size.',
-    budget: { htmlRawKb: 892, htmlGzipKb: 50, pageGzipKb: 184, jsGzipKb: 92 },
+      'The living gallery: server-rendered cards, each with its preview frame, light/dark and RTL controls, props toggle and tag filters. Measured 845.8 KB raw / 46.4 KB gzip at FIX-site-perf-routes; the PLAN_006 gallery audit (T-83) added card content: 888.2 KB raw / 48.5 KB gzip of HTML and 90.1 KB JS, limits 892 / 50 / 92. PLAN_007 (owned sortable and drag engine in the shared component code) brought JS to 92.0 KB locally and 92.1 KB in CI at the ready signal; the JS cap is now 96 (measured + 4%). T-93 still owns slimming the raw size.',
+    budget: { htmlRawKb: 892, htmlGzipKb: 50, pageGzipKb: 184, jsGzipKb: 96 },
   },
   {
     route: '/examples/',
