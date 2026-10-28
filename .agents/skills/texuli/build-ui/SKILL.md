@@ -168,8 +168,8 @@ Full checklists: [`references/recipes.md`](references/recipes.md).
 | Form flow | `texuli/input`, field, button, stepper; forms manifests |
 | Slide / deck | Deck v2 from JSON or Markdown: `@texuli/deck` (model, markdown, authoring, templates; in development, not on npm) presented by `@texuli/slides/stage` `DeckStage`, exported by `@texuli/slides/export`; 21 layout ids, `deck` CLI and MCP tool: [`references/decks.md`](references/decks.md). npm `@texuli/slides` `0.3.0` is the v1 model |
 | Media story | [`../media/SKILL.md`](../media/SKILL.md) + content card |
-| Drag and drop (lists, groups, boards, trees) | `@texuli/primitives/sortable`, `@texuli/data/board`, `@texuli/data/tree-view`; engine `@texuli/drag` (in development, not on npm) |
-| Workflow editor or diagram | `@texuli/workflows` editor, viewer, inspector, model, layout (in development, not on npm) |
+| Drag and drop (lists, groups, boards, trees) | `@texuli/primitives/sortable`, `@texuli/data/board`, `@texuli/data/tree-view`; engine `@texuli/drag` (in development, on npm as `0.3.0`; `sortable` and the data drag migrations are unreleased) |
+| Workflow editor or diagram | `@texuli/workflows` editor, viewer, inspector, model, layout (in development, on npm as `0.3.0`) |
 | A whole stateful screen as JSON (an agent sends it) | [`../blueprints/SKILL.md`](../blueprints/SKILL.md) stage **G** |
 
 ## Offline gates for this skill pack

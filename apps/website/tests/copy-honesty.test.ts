@@ -120,13 +120,11 @@ describe('site copy honesty', () => {
   });
 
   it('never calls a published package unpublished', () => {
-    // The 16 packages of the 0.3.0 release, @texuli/date included, are on
-    // npm. Not on npm: the private 0.0.0 workspaces (editor, examples) and
-    // @texuli/drag and @texuli/workflows, which sit on the 0.3.0 line in the
-    // repository until an owner-approved publish wave (PLAN_007).
-    const NOT_YET_PUBLISHED = new Set(['drag', 'workflows']);
+    // All 18 packages on the 0.3.0 line are on npm: @texuli/date first
+    // shipped in 0.3.0, and @texuli/drag and @texuli/workflows were first
+    // published as 0.3.0 on 2026-10-28 (UTC). Not on npm: the private 0.0.0
+    // workspaces (editor, examples).
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
-      if (NOT_YET_PUBLISHED.has(dir)) return false;
       try {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')
@@ -136,8 +134,8 @@ describe('site copy honesty', () => {
         return false;
       }
     });
-    expect(published).toHaveLength(16);
-    expect(published).toContain('date');
+    expect(published).toHaveLength(18);
+    for (const dir of ['date', 'drag', 'workflows']) expect(published).toContain(dir);
     const wrong: string[] = [];
     for (const file of files) {
       const copy = copyOf(file);
@@ -145,7 +143,7 @@ describe('site copy honesty', () => {
         const name = dir === 'texuli' ? 'texuli' : `@texuli/${dir}`;
         // The bare `texuli` package must not match inside `@texuli/<name>`.
         const pattern = dir === 'texuli' ? '(?<![@/\\w])texuli(?![/\\w])' : `@texuli\\/${dir}\\b`;
-        const claim = new RegExp(`${pattern}.{0,400}?\\bnot published to npm`, 'i');
+        const claim = new RegExp(`${pattern}.{0,400}?\\bnot (?:yet )?(?:published to|on) npm`, 'i');
         if (claim.test(copy)) wrong.push(`${relative(siteRoot, file)}: ${name}`);
       }
     }

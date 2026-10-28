@@ -612,9 +612,9 @@ describe('screen-reader pass fixes (T-90)', () => {
    *    and the "Documentation menu" disclosure on phones. The page keeps the
    *    docs shell's article chrome but opts out of that demo navigation.
    * 2. The /native/ status ledger ran the status badge straight into its
-   *    detail ("Shipped All 16 packages…"), so a screen reader read the status
+   *    detail ("Shipped All 18 packages…"), so a screen reader read the status
    *    and the sentence as one run. A visually hidden separator now splits them
-   *    ("Shipped: All 16 packages…") without changing the visual design.
+   *    ("Shipped: All 18 packages…") without changing the visual design.
    * 3. The build's HTML compression dropped the space before the guide link on
    *    /web-and-native/, so the text read "the guideWhy Svelte and Kotlin".
    */

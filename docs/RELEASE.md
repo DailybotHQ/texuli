@@ -5,12 +5,22 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-`0.3.0` is the current release of all 16 packable packages (owner decision
+`0.3.0` is the current release of all 18 packable packages (owner decision
 2026-10-27): the 15 packages of the `0.2.0` release plus `@texuli/date`,
-which is published for the first time in `0.3.0`. The publish workflow
-publishes it from `main` after the merge, from the verified tarballs with
-signed provenance, and moves both the `latest` and `next` dist-tags to it,
-so a bare `npm install texuli` or `pnpm add texuli` gets it.
+which is published for the first time in `0.3.0`, and `@texuli/drag` and
+`@texuli/workflows`, first published as `0.3.0` on 2026-10-28 (UTC). The
+publish workflow publishes from `main`, from the verified tarballs with
+signed provenance, and moves both the `latest` and `next` dist-tags to the
+published version, so a bare `npm install texuli` or `pnpm add texuli` gets
+it.
+
+**First publication of drag and workflows.** A manual `workflow_dispatch`
+of `publish.yml` on `main` (run
+https://github.com/DailybotHQ/texuli/actions/runs/40616266068, 2026-10-28
+UTC) published `@texuli/drag@0.3.0` and `@texuli/workflows@0.3.0` with
+provenance; `npm view` reports `latest` and `next` at `0.3.0` for both. Both
+packages are still **in development** (pre-1.0). The run skipped the other
+16 packages, because the publish loop skips any version npm already has.
 
 `0.3.0` is a breaking `0.x` minor:
 
@@ -28,20 +38,18 @@ published version.
 
 ### Not yet on npm
 
-- `@texuli/drag` (the drag engine, layer L0) and `@texuli/workflows` (the
-  workflow editor and viewer, layer L4) are **in development**: versioned
-  `0.3.0` and in the `publish.yml` waves (owner decision 2026-10-27), never
-  published yet. The next owner-run publish (a `v*` tag or a manual run)
-  publishes them.
 - `@texuli/deck` (the deck engine, layer L0) is **in development**:
   versioned `0.4.0` and in the `publish.yml` waves, never published. The
   `0.4.0` stage of `@texuli/slides` depends on it, so it must be published
   first (ADR-009).
 - `@texuli/editor` and `@texuli/examples` stay private (`NEVER_PACKED` in
   `scripts/packages.ts`).
-- The repository is ahead of npm: the `0.3.0` tarballs on npm predate
-  PLAN_007, so the changes under "Unreleased" below are not in any published
-  version.
+- The repository is ahead of npm: the `0.3.0` tarballs of the 16 packages
+  other than drag and workflows predate PLAN_007, so the changes under
+  "Unreleased" below are not in any published version. Because the publish
+  loop never republishes an existing version, those packages ship their
+  PLAN_007 changes only after a version bump and a new owner-approved
+  publish run.
 
 ### Unreleased (in the repository after `0.3.0`)
 
@@ -180,14 +188,14 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 16 npm packages | `0.3.0` (dist-tags `latest` and `next`) | Each package manifest; published by the publish workflow after the merge (before it: `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| 16 npm packages (all but drag and workflows) | `0.3.0` (dist-tags `latest` and `next`) | Each package manifest; published by the publish workflow after the merge, from pre-PLAN_007 sources (before it: `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
 | `@texuli/date` | `0.3.0` (first publication) | `packages/date/package.json`; published with the other 15 packages, before `@texuli/primitives`, which depends on it. |
 | Blueprint spec (repository) | `0.4.0`, digest `fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3` (after `0.3.0`, digest `a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848`) | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Not yet on npm. |
 | Blueprint spec (npm) | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | Shipped by `@texuli/spec@0.3.0`, whose generated sources carry the `0.2.0` stamp. |
 | `@texuli/spec` (npm) | `0.3.0` | Ships the spec `0.2.0` generated sources (above). |
+| `@texuli/drag`, `@texuli/workflows` | `0.3.0` (first publication, dist-tags `latest` and `next`) | Each package manifest; published on 2026-10-28 (UTC) by a manual run of `publish.yml` on `main` (run 40616266068). In development, pre-1.0. |
 | `@texuli/deck` | `0.4.0`, in the publish waves after `@texuli/drag` | In development (PLAN_008, ADR-009); never published. The slides stage depends on it, so it must be published **before** `@texuli/slides`. |
 | `@texuli/slides` | `0.3.0` on npm (model v1); `0.4.0` next | The v2 stage on `@texuli/deck` is in the repository, in development and not on npm; it ships as `0.4.0` (the workspace manifest still reads `0.3.0` until that version bump), after `@texuli/deck` and `@texuli/player`, with a fresh owner GO. |
-| `@texuli/drag`, `@texuli/workflows` | `0.3.0`, in the publish waves | Not on npm yet; in development. The next owner-run publish publishes them. |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 
 - A normative spec change takes a new spec version and a fresh digest pin in
@@ -212,19 +220,20 @@ tag. Any GO for Task 170's name reservation covers only that reservation.
 | --- | --- | --- | --- |
 | 174 | Foundations | `@texuli/core`, then `@texuli/tokens` | Fresh owner GO for the exact Task 174 package/version set after its release gates; core precedes tokens. |
 | 0.3.0 | Date foundation | `@texuli/date`, before `@texuli/primitives` (first published in `0.3.0`) | Fresh owner GO for the exact version; `@texuli/date` precedes the primitives that depend on it. |
-| Next | Drag foundation | `@texuli/drag`, before `@texuli/primitives` and `@texuli/data` | Fresh owner GO for its first version; it must be published **before** every package that depends on it (`@texuli/primitives`, `@texuli/data`, `@texuli/workflows`). |
+| 0.3.0 | Drag foundation | `@texuli/drag`, before `@texuli/primitives` and `@texuli/data` (first published as `0.3.0` on 2026-10-28) | Fresh owner GO for each version; it must be published **before** every package that depends on it (`@texuli/primitives`, `@texuli/data`, `@texuli/workflows`). |
 | 175 | Controls | `@texuli/primitives` | Fresh owner GO after its core dependency and behavior, accessibility, size, pack, and consumer gates pass. |
 | 176 | Styled package | `texuli` | Fresh owner GO after core, primitives, and tokens compatibility plus style and consumer gates pass. |
-| Next | Workflows | `@texuli/workflows`, after `@texuli/drag` and `texuli`, before `@texuli/player` | Fresh owner GO for its first version; it must be published **before** `@texuli/player`, which depends on it. |
+| 0.3.0 | Workflows | `@texuli/workflows`, after `@texuli/drag` and `texuli`, before `@texuli/player` (first published as `0.3.0` on 2026-10-28) | Fresh owner GO for each version; it must be published **before** `@texuli/player`, which depends on it. |
 | Next | Deck engine | `@texuli/deck` `0.4.0`, after `@texuli/drag`, before `@texuli/slides` | Fresh owner GO for its first version; it must be published **before** `@texuli/slides` `0.4.0`, which depends on it. |
 | 177 | Domain packages | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/blocks` | Fresh owner GO for the exact ready set after dependency order, package checks, size, pack, and consumer gates pass. |
 | 178 | Catalog and integration tools | `@texuli/catalog`, `@texuli/tools`, `@texuli/astro`, `@texuli/player`, `@texuli/slides`, `@texuli/spec` (the order in `publish.yml`; all six went out in the 2026-10-25 `0.1.0-next.1` run) | Fresh owner GO for each exact release set after implementation, dependency, pack, consumer, and relevant website/build gates pass. |
 
-The three "Next" rows are in `.github/workflows/publish.yml` (order: core,
-date, spec, drag, deck, tokens, primitives, texuli, workflows, charts, data,
-media, chat, blocks, catalog, tools, astro, player, slides). Drag and
-workflows are versioned `0.3.0` (owner decision 2026-10-27); deck is
-`0.4.0`, the version `@texuli/slides` `0.4.0` pins. `pnpm verify:packages` still refuses
+The drag, workflows and deck rows are in `.github/workflows/publish.yml`
+(order: core, date, spec, drag, deck, tokens, primitives, texuli, workflows,
+charts, data, media, chat, blocks, catalog, tools, astro, player, slides).
+Drag and workflows are versioned `0.3.0` (owner decision 2026-10-27) and
+were published by the 2026-10-28 manual run; deck is `0.4.0`, the version
+`@texuli/slides` `0.4.0` pins, and is not on npm. `pnpm verify:packages` still refuses
 any `0.0.0` or `workspace:` range in a published manifest, the guard that
 keeps an unversioned dependency out. The publish loop skips versions npm
 already has, so a package changed since its published `0.3.0` (for example

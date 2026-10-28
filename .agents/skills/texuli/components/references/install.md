@@ -9,8 +9,9 @@ both point to it; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
 `pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.3.0`
 (for 0.x it accepts only 0.3.x, since a new minor may break) (the developer
-runs the install; it uses the network). `@texuli/editor`, `@texuli/drag` and
-`@texuli/workflows` are in development and not on npm.
+runs the install; it uses the network). `@texuli/drag` and
+`@texuli/workflows` are in development and on npm as `0.3.0`;
+`@texuli/editor` is in development and not on npm.
 Inside this monorepo, an app depends on the workspace packages:
 
 ```json

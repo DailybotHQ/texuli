@@ -22,11 +22,15 @@ end to end and native for agents:
   blueprint contract (`@texuli/spec`) also feeds a Kotlin Multiplatform
   twin in `native/`.
 
-**Status: in development, pre-1.0.** The 16 published packages (all of
-`packages/` except `@texuli/editor`, `@texuli/examples`, `@texuli/drag`,
-`@texuli/workflows` and `@texuli/deck`) are released as `0.3.0`, which the publish workflow publishes from `main` after the merge
-and points `latest` and `next` to; `@texuli/date` is published for the first
-time in `0.3.0` (the previous release, `0.2.0`, had 15 packages). Workspace packages stay
+**Status: in development, pre-1.0.** 18 packages (all of `packages/` except
+`@texuli/editor`, `@texuli/examples` and `@texuli/deck`) are released on npm
+as `0.3.0`, which the publish workflow publishes from `main` and points
+`latest` and `next` to; `@texuli/date` is published for the first time in
+`0.3.0` (the previous release, `0.2.0`, had 15 packages), and `@texuli/drag`
+and `@texuli/workflows` followed on 2026-10-28 (UTC). The npm tarballs of the
+other 16 predate PLAN_007 and PLAN_008, so those plans' changes ship only
+with their next version bump; `@texuli/deck` (`0.4.0`) is in the repository
+and not on npm ([RELEASE](docs/RELEASE.md)). Workspace packages stay
 `private: true`, and no stable release is out (1.0.0 will be the first; under
 0.x a new minor may break; see [RELEASE](docs/RELEASE.md)),
 and texuli.com deploys from `main` to Cloudflare Pages, with the Pages
@@ -71,7 +75,7 @@ texuli/
 │   ├── core/            L0 @texuli/core: texels (overlay engine, roving, positioning, URL policy…)  (README, docs/)
 │   ├── date/            L0 @texuli/date: Gregorian date arithmetic and locale week starts      (README)
 │   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (0.4.0, in development, not on npm) (README, docs/)
-│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, not on npm) (README, docs/)
+│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.3.0) (README, docs/)
 │   ├── primitives/      L1 @texuli/primitives: 42 owned headless primitives, APG patterns      (README, docs/)
 │   ├── tokens/          L2 @texuli/tokens: OKLCH theme engine, --tx-* contract, 200+ themes, CSS (README, docs/)
 │   ├── texuli/          L3 texuli: styled components, cx/variants, icons, layouts, shells      (README, docs/)
@@ -194,13 +198,15 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The 16 packable packages, including `@texuli/date`, are
-    released on npm as `0.3.0` (dist-tags `latest` and `next`, published by
-    CI with provenance). `@texuli/editor`, `@texuli/examples`, the apps and
-    `native/` publish nothing; `@texuli/drag` and `@texuli/workflows` are in
-    development and not on npm (versioned `0.3.0` and in the publish waves
-    ahead of the packages that depend on them; the next owner-run publish
-    publishes them; [RELEASE](docs/RELEASE.md)). `@texuli/deck` `0.4.0` and
+    check results. 18 packable packages, including `@texuli/date`,
+    `@texuli/drag` and `@texuli/workflows`, are released on npm as `0.3.0`
+    (dist-tags `latest` and `next`, published by CI with provenance; drag
+    and workflows, still in development, first published on 2026-10-28
+    UTC). `@texuli/editor`, `@texuli/examples`, the apps and `native/`
+    publish nothing. The other 16 packages' `0.3.0` tarballs predate
+    PLAN_007: its additions to them (for example `@texuli/primitives/sortable`)
+    are in the repository and ship with each package's next version
+    ([RELEASE](docs/RELEASE.md)). `@texuli/deck` `0.4.0` and
     the `@texuli/slides` `0.4.0` stage are in the repository, in development
     and not on npm (npm has `@texuli/slides@0.3.0`, the previous deck model;
     `@texuli/deck` was never published), and spec `0.4.0` is in the
