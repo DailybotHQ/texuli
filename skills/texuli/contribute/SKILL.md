@@ -31,15 +31,15 @@ This file is the procedure. Layer map and gate commands live in
 ## Layer order (down only)
 
 ```text
-@texuli/core, @texuli/spec (L0: texels; the blueprint contract)
+@texuli/core, @texuli/spec, @texuli/deck (L0: texels; the blueprint contract; the deck engine)
   → @texuli/primitives (L1 headless)
     → @texuli/tokens (L2)
       → texuli (L3 styled)
         → charts / data / media / chat / editor (L4)
           → @texuli/blocks (L5)
             → @texuli/catalog manifests (L6)
-              → @texuli/slides, @texuli/player (L7)
-                → @texuli/tools, @texuli/astro (L8)
+              → @texuli/player (L7)
+                → @texuli/slides, @texuli/tools, @texuli/astro (L8)
                   → apps/website, apps/agent
 ```
 

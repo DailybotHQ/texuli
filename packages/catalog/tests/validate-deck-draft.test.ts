@@ -54,6 +54,23 @@ describe('validateDeckDraft (model v2 encoding)', () => {
     expect(second.deck?.slides).toHaveLength(2);
   });
 
+  it('maps a slide themeRef to the deck v2 slide theme and back', () => {
+    const tree = {
+      id: DECK_ROOT_CATALOG_ID,
+      props: { title: 'Themed' },
+      children: [
+        { id: DECK_SLIDE_CATALOG_ID, props: { title: 'One', themeRef: 'ocean' }, children: [] },
+      ],
+    };
+    const mapped = layoutDeckToV2(tree);
+    const slide = mapped.deck?.slides[0] as Record<string, unknown> | undefined;
+    expect(slide?.theme).toBe('ocean');
+    expect(slide).not.toHaveProperty('themeRef');
+    const back = deckV2ToLayoutTree(mapped.deck);
+    const child = (back?.children as { props: Record<string, unknown> }[] | undefined)?.[0];
+    expect(child?.props.themeRef).toBe('ocean');
+  });
+
   it('projects legacy layout-card children with a warning', () => {
     const tree = {
       id: 'layout-deck',

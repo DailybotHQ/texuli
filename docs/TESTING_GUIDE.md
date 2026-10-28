@@ -164,7 +164,8 @@ then the package, then its consumers (the layers above it).
 | `packages/editor/src/**` | `pnpm vitest run packages/editor` | `pnpm visual -g " editor-"`; `pnpm size --filter @texuli/editor` |
 | `packages/chat/src/**` | `pnpm vitest run packages/chat` | `tests/e2e/chat.spec.ts` |
 | `packages/blocks/src/<family>/` | `pnpm vitest run packages/blocks/tests/<family>.test.ts` | `pnpm visual -g blocks-<family>`; perf: `pnpm test:perf` (code, text) |
-| `packages/slides/src/**` | `pnpm vitest run packages/slides` | `tests/e2e/a11y-slides.spec.ts`, `tests/e2e/site-slides.spec.ts` |
+| `packages/deck/src/**` (in development) | `pnpm vitest run packages/deck`: `model-*.test.ts` (schema kit, deck, layouts, backgrounds, style, motion, steps, loader, migration with `tests/fixtures/migrate/`), `engine.test.ts`, `engine-import-guard.test.ts` (the engine imports nothing outside the package), `markdown-*.test.ts` (parse, round trip, text twins, math, the hostile corpus), `authoring.test.ts` (builder, outlines, lint, patch, templates, the starter decks in `packages/deck/decks/`) | deck is L0: run `pnpm check`; `pnpm size --filter deck`; perf: `TEXULI_PERF=1 pnpm vitest run tests/perf/slides.test.ts` (the 200-slide Markdown parse); consumers: `pnpm vitest run packages/slides packages/tools/tests/deck.test.ts` |
+| `packages/slides/src/**` | `pnpm vitest run packages/slides`: `stage*.test.ts` (input, canvas, routes, keys, transitions, i18n, chrome, overview, presenter window, model v1 content), `layouts.test.ts`, `components-registry.test.ts`, `components-coverage.test.ts` (every catalog id is a slide component or excluded with a reason), `export.test.ts` (v1) and `export-v2.test.ts`, `decks.test.ts` (model v1, grammar, templates and golden decks), `docs.test.ts` (every subpath, export, stage prop and stylesheet hook is documented) | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/a11y-slides.spec.ts tests/e2e/slides-print.spec.ts`; after `pnpm build`, `tests/e2e/site-slides.spec.ts`; `pnpm visual -g slides-` (the `slides-layout-<id>`, `slides-backgrounds`, template, tour, fragments, media, slot-masters and presenter-screen examples); `pnpm size --filter slides`; perf: `TEXULI_PERF=1 pnpm vitest run tests/perf/slides.test.ts` |
 | `packages/player/src/**` | `pnpm vitest run packages/player`: `examples-paint` (every emittable example paints), `loader-parity` (every emittable id has a painter), `interaction` (state, actions, bindings, sortable lists, workflow graphs), `spec-mirror` (constants equal `@texuli/spec`), `surface-parity`, `golden`, `lego` (the shared drag scope across lists), `render-specs` (the lean specs match the manifests) | `pnpm exec tsx packages/player/scripts/render-specs.ts --check`; `pnpm size --filter player`; `tests/e2e/site-builder.spec.ts` |
 | `packages/astro/src/**` | `pnpm vitest run packages/astro` | `tests/e2e/astro-islands.spec.ts` and `tests/consumers/consumers.spec.ts` (the `astro-plain` consumer installs the packed `@texuli/astro`) |
 | `packages/catalog/src/**` (manifests, build, render) | `pnpm vitest run packages/catalog`: `coverage` (every component of the published packages is covered or excluded with a reason), `examples-roundtrip` (every manifest example validates against the spec and hashes stably), `validate-interaction` (bindings, `bind`, `on`, the state surface and list text without a spec check), `render-hostile-blueprints` (the 0.3.0 hostile corpus) | `pnpm exec tsx scripts/coverage-matrix.ts`; `tests/e2e/renderer-hostile.spec.ts`; `tests/perf/catalog-render-limits.test.ts` (`pnpm test:perf`); the site's live-components tests |
@@ -235,9 +236,9 @@ suite and `pnpm build`.
   macOS).
 - **Wall-clock assertions** live only in `pnpm test:perf` or behind
   `TEXULI_PERF=1` (`tests/perf/`: builder, catalog render limits, charts,
-  data grid and media, PLAN_004 surfaces, and, from PLAN_007, `drag.test.ts`
-  and `workflows.test.ts`; set `TEXULI_PERF_REPORT=1` to print the measured
-  times).
+  data grid and media, PLAN_004 surfaces, from PLAN_007, `drag.test.ts`
+  and `workflows.test.ts`, and from PLAN_008 `slides.test.ts`; set
+  `TEXULI_PERF_REPORT=1` to print the measured times).
 - **The workflow and player drag paths in happy-dom** have no layout: the
   editor's pointer drags and the shared drag scope are tested through the
   keyboard model and the engine there, and in a browser by

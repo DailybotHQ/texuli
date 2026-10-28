@@ -21,7 +21,7 @@ packages in lower layers.
 | --- | --- | --- | --- |
 | L0 | `@texuli/core` | Texels: ids, keyboard intents, roving focus and typeahead, focus scope, inert, dismissable layers, layer stack, overlay engine, portal, positioning (math + DOM), presence, scroll lock, tabbable, form bridge, announcer, direction and locale, the URL policy | none |
 | L0 | `@texuli/date` | Framework-free Gregorian dates, arithmetic, locale week starts and time-zone-aware today | none |
-| L0 | `@texuli/deck` | In development: framework-free, dependency-free deck engine (one validated deck model from JSON or Markdown, layouts, steps, navigation, presenter protocol, lint, authoring) | none |
+| L0 | `@texuli/deck` | In development (`0.4.0`, not on npm): the framework-free, dependency-free deck engine: deck model v2 and its owned schema kit, migration, the untrusted loader, the Markdown dialect, TeX-subset math, the layout catalog, backgrounds and contrast, navigation, controls, canvas fit and the presenter protocol, lint, patch, the typed builder, brief outlines and templates | none |
 | L0 | `@texuli/drag` | In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing) | none |
 | L0 | `@texuli/spec` | Framework-free blueprint contract and code generation | none |
 | L1 | `@texuli/primitives` | 42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core, date, drag |
@@ -38,7 +38,7 @@ packages in lower layers.
 | L7 | `@texuli/player` | Blueprint player runtime and styles | blocks, catalog, charts, chat, data, media, primitives, spec, texuli, workflows |
 | L8 | `@texuli/tools` | Copy-in CLI (`texuli-add`, `texuli-init`, `texuli-update`), `texuli-llms`, A2UI adapter, custom elements and the golden set | core, tokens, catalog, blocks, charts, media |
 | L8 | `@texuli/astro` | Astro integration, site helpers and content layouts | blocks, core, tokens |
-| L8 | `@texuli/slides` | Slide grammar, export and the presentation stage; moving onto `@texuli/deck` (ADR-009, in development) and painting components through the player | blocks, catalog, deck, media, player, tokens |
+| L8 | `@texuli/slides` | The Svelte 5 presentation stage on `@texuli/deck` (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from `0.3.0`; `0.4.0` in development, not on npm | blocks, catalog, deck, media, player, tokens |
 
 Not layers, because they consume the library:
 - **`@texuli/examples`** (private) is the examples registry. Every component
@@ -60,8 +60,10 @@ Not layers, because they consume the library:
 as `0.3.0`, the first release of `@texuli/date` (the previous release,
 `0.2.0`, had 15 packages). `@texuli/drag` and `@texuli/workflows` are in
 development: versioned `0.3.0` and in the `publish.yml` wave order ahead of
-their dependents, so `pnpm verify:packages` packs 18 packages, but not on
-npm until the next owner-run publish ([RELEASE](RELEASE.md)).
+their dependents, but not on npm until the next owner-run publish.
+`@texuli/deck` (`0.4.0`, never published) is in the waves too, before
+`@texuli/slides`, whose `0.4.0` stage depends on it, so
+`pnpm verify:packages` packs 19 packages ([RELEASE](RELEASE.md)).
 
 ```text
 L8  tools · astro · slides
@@ -171,6 +173,9 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
   controls, forms and flows, `sortable-list` (one shared drag scope per
   player) and `workflow-graph` (`@texuli/workflows`). `tests/loader-parity`
   fails when an emittable id has no painter.
+- **Decks as data.** Spec 0.4.0 (ADR-009, in the repository) adds the
+  deck model v2 props to `layout-deck` and `deck-slide`; see
+  [Decks: engine and stage](#decks-engine-and-stage).
 - **Interaction as data.** Spec 0.3.0 (ADR-008) adds `state`, `flow`,
   `bind`, `on` and a closed action set (`setState`, `toggleState`,
   `moveItem`, `flowGo`, `emit`, `submit`). The player runs them in its
@@ -186,6 +191,44 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
 - custom elements;
 - the local stdio MCP server (`packages/tools/src/mcp`, tested in
   `packages/tools/tests/mcp.test.ts`; no published binary yet).
+
+## Decks: engine and stage
+
+ADR-009 splits presentations in two packages (both `0.4.0`, in the
+repository, not on npm):
+
+- **`@texuli/deck` (L0)** owns everything that is data: deck model v2
+  (`formatVersion: 2`; slides told apart by `layout`: 20 catalog layouts,
+  `free`, `component`, `custom`), validated by an owned schema kit that
+  reports every issue at once and exports JSON Schema from the same
+  definition (no zod). JSON (`parseDeck`, `loadUntrustedDeck`) and Markdown
+  (`parseDeckMarkdown`, an owned dialect that refuses HTML) produce the same
+  validated deck, and `migrateDeck` lifts model v1 decks, catalog grammar
+  trees and Protoyard decks. The engine (navigation, hash routes, the
+  controls registry, canvas fit, auto-slide, the presenter protocol, the
+  controller) imports nothing outside the package, which
+  `packages/deck/tests/engine-import-guard.test.ts` enforces. It checks URL
+  syntax only; it never carries a trust tier.
+- **`@texuli/slides` (L8)** is the Svelte 5 stage on the engine: canvas,
+  chrome, overview, presenter window, the layout renderers, backgrounds,
+  print and PPTX. It sits at L8, above `@texuli/player` (L7), because its
+  default **component registry** paints catalog components through the
+  player: a slide component becomes a one-node blueprint that the player
+  validates again at the stage's tier and paints with its lazy painter
+  (53 slide components; app shells, overlays, route hosts and the deck
+  wrappers are excluded with reasons, and a coverage test keeps every
+  catalog id classified). Hosts answer first through `renderers`. The URL
+  policy applies at paint with the host's tier (`untrusted` by default).
+
+Agent decks travel as catalog trees under spec `0.4.0` (in the repository
+only), whose `layout-deck` and `deck-slide` manifests carry the model v2
+props. `validateDeckDraft` in `@texuli/catalog/validate` maps a tree to a
+v2 deck without depending on `@texuli/deck`; the host then runs
+`migrateDeck` and `parseDeck`. `@texuli/player` keeps painting decks as a
+document and offers a `deckHost` seam (and `chrome={false}`) so a host with
+`@texuli/slides` presents them on the stage. Package docs:
+[packages/deck](../packages/deck/README.md) and
+[packages/slides](../packages/slides/README.md).
 
 ## The website
 

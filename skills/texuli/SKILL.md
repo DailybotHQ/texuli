@@ -13,7 +13,7 @@ metadata: {"openclaw":{"emoji":"▣","homepage":"https://texuli.com/guides/","re
 Use this skill to build accessible, token-themed UI with **Texuli**: primitives,
 styled components, layouts, charts, media, data views, content blocks, decks,
 drag and drop (sortable lists, boards, trees, canvases), workflow editors, the
-rich text editor and Astro sites. It also covers interfaces that agents write
+rich text editor and Astro sites, and decks generated from JSON or Markdown. It also covers interfaces that agents write
 as data (blueprints), including whole stateful screens in spec 0.3.0 JSON. This file is the
 **router**. Detailed procedures live in neighboring sub-skills and in
 [`router/`](router/). Read the matching guide before starting its workflow.
@@ -47,7 +47,10 @@ agent config, or publish packages without explicit consent (see
    stay `private: true`. `@texuli/editor` (the rich text editor),
    `@texuli/drag` (the drag engine) and `@texuli/workflows` (the workflow
    editor) are in development and not on npm: only a Texuli workspace can
-   import them. The repository is ahead of npm: spec 0.3.0, the new catalog
+   import them. `@texuli/deck` (the deck engine behind the deck generator)
+   is in development and has never been published; the repository's
+   `@texuli/slides` stage is built on it, while npm `0.3.0` ships the v1
+   deck model. The repository is ahead of npm: spec 0.4.0, the new catalog
    groups, `@texuli/primitives/sortable` and the player's interaction are
    unreleased and arrive with the next owner-approved release. The
    package and layer index is [`router/packages.md`](router/packages.md).
@@ -63,6 +66,7 @@ agent config, or publish packages without explicit consent (see
 | Full routing table and sub-skill map | [`router/routes.md`](router/routes.md) |
 | Which package or subpath exists, and its layer | [`router/packages.md`](router/packages.md) |
 | Build or fix a component / layout / shell / screen | [`build-ui/SKILL.md`](build-ui/SKILL.md) |
+| A deck from JSON or Markdown: layouts, validation, `DeckStage`, print and PPTX, the `deck` CLI and MCP tool | [`build-ui/references/decks.md`](build-ui/references/decks.md) |
 | Drag and drop: sortable lists, groups, boards, trees, a canvas, a workflow editor | [`build-ui/SKILL.md`](build-ui/SKILL.md) (recipes) |
 | Themes, palettes, forced-colors, AA contrast, theme CLI/MCP | [`themes/SKILL.md`](themes/SKILL.md) |
 | Images, video, captions, compositions, export, generator slot | [`media/SKILL.md`](media/SKILL.md) |

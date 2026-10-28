@@ -138,7 +138,8 @@ function slideFromGrammar(props: Bag, children: unknown, id: unknown): Bag {
   if (typeof props.title === 'string') out.title = props.title;
   if (typeof props.notes === 'string') out.notes = props.notes;
   if (typeof props.master === 'string') out.master = props.master;
-  if (props.themeRef !== undefined) out.themeRef = props.themeRef;
+  // Deck v2 names a slide's theme `theme`; the grammar prop is `themeRef`.
+  if (props.themeRef !== undefined) out.theme = props.themeRef;
   if (typeof props.transition === 'string') out.transition = props.transition;
   if (props.background !== undefined) out.background = props.background;
   if (Array.isArray(props.steps)) out.steps = props.steps;
@@ -353,7 +354,7 @@ export function deckV2ToLayoutTree(deck: unknown): Bag | null {
     if (typeof s.notes === 'string') slideProps.notes = s.notes;
     if (typeof s.master === 'string') slideProps.master = s.master;
     if (typeof s.transition === 'string') slideProps.transition = s.transition;
-    if (s.themeRef !== undefined) slideProps.themeRef = s.themeRef;
+    if (s.theme !== undefined) slideProps.themeRef = s.theme;
     if (typeof s.layout === 'string') slideProps.layout = s.layout;
     if (s.props !== undefined) slideProps.props = s.props;
     if (s.component !== undefined) slideProps.component = s.component;

@@ -77,6 +77,14 @@ closed, documented catalog that can be validated before anything renders.
 8. **Workflows.** `@texuli/workflows` is an accessible workflow graph editor
    and viewer: typed nodes and ports, validated operations, layered
    auto-layout, a keyboard model and a treegrid outline.
+9. **Presentations from JSON or Markdown.** `@texuli/deck` (in development,
+   `0.4.0`, not on npm) validates one deck model generated from JSON or from
+   an owned Markdown dialect, with 21 layouts, backgrounds with guaranteed
+   text contrast, steps, navigation, lint with fixes and authoring helpers
+   for people and agents. `@texuli/slides` `0.4.0` presents it on a stage
+   (canvas, routes, chrome, overview, presenter window), with any
+   slide-renderable Texuli component on a slide, and prints it or exports
+   it to PPTX.
 
 ## What exists today versus what is planned
 
@@ -91,11 +99,13 @@ closed, documented catalog that can be validated before anything renders.
 | Tokens + CSS, OKLCH theme engine (L2): the `--tx-*` contract, 210 themes, compiled CSS, forced colors, the AA gate, the Tailwind preset | **Exists**, private | [`packages/tokens`](../packages/tokens/README.md) |
 | `texuli` styled components, layouts and app shells (L3) | **Exists**, private | [`packages/texuli`](../packages/texuli/README.md) |
 | Charts, data, media and chat packages (L4) | **Exists**, private | [`packages/charts`](../packages/charts/README.md), [`packages/data`](../packages/data/README.md), [`packages/media`](../packages/media/README.md), [`packages/chat`](../packages/chat/README.md) |
-| Blueprint contract (L0): JSON schemas, catalog vocabulary, TypeScript and Kotlin codegen, conformance harness; spec 0.3.0 (state, bindings, closed actions, `reorder`, workflow graphs, the state surface) | **Exists**, private; npm `@texuli/spec@0.3.0` carries spec 0.2.0, and spec 0.3.0 is unreleased | [`packages/spec`](../packages/spec/README.md) |
+| Blueprint contract (L0): JSON schemas, catalog vocabulary, TypeScript and Kotlin codegen, conformance harness; spec 0.3.0 (state, bindings, closed actions, `reorder`, workflow graphs, the state surface) and spec 0.4.0 (deck model v2 on `layout-deck` and `deck-slide`) | **Exists**, private; npm `@texuli/spec@0.3.0` carries spec 0.2.0, and specs 0.3.0 and 0.4.0 are unreleased | [`packages/spec`](../packages/spec/README.md) |
 | Rich text editor (L4) | **In development**, `0.0.0`, never packed or published | [`packages/editor`](../packages/editor/README.md) |
 | Content blocks (L5) | **Exists**, private | [`packages/blocks`](../packages/blocks/README.md) |
 | Agent catalog and the sink-free renderer (L6) | **Exists**, private | [`packages/catalog`](../packages/catalog/README.md) |
-| Slides and the blueprint player (L7) | **Exists**, private; the player's spec 0.3.0 interaction and its data, chat, sortable and workflow painters are unreleased | [`packages/slides`](../packages/slides/README.md), [`packages/player`](../packages/player/README.md) |
+| `@texuli/deck` (L0): deck model v2, the JSON loader and Markdown dialect, math, layouts, backgrounds, engine, lint, patch, builder and templates | **In development**, `0.4.0`, never published; in the publish waves before `@texuli/slides` | [`packages/deck`](../packages/deck/README.md) |
+| Blueprint player (L7) | **Exists**, private; the player's spec 0.3.0 interaction, its data, chat, sortable and workflow painters, the `deckHost` seam and `chrome={false}` are unreleased | [`packages/player`](../packages/player/README.md) |
+| Slides (L8): the v2 stage, layouts, backgrounds, components on slides, print and PPTX | **In development**, `0.4.0`, not on npm; npm has `@texuli/slides@0.3.0` with the previous deck model | [`packages/slides`](../packages/slides/README.md) |
 | Astro integration (L8) | **Exists**, private | [`packages/astro`](../packages/astro/README.md) |
 | Kotlin Multiplatform twin (`texuli-spec`, `texuli-compose`, conformance) | **In development**, nothing published; app shells and most chart families are placeholders | [`native`](../native/README.md) |
 | Agent service (prompt → validated blueprint draft) | **In development**, fake replay provider only, not deployed | [`apps/agent`](../apps/agent/README.md) |

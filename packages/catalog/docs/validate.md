@@ -118,6 +118,86 @@ The renderer's own family check (`blockFamilyMismatch`, in the `render`
 check) also reads only its own keys, and refuses a `blocks-*` id with no
 known family instead of skipping it.
 
+## Deck drafts (model v2)
+
+**Tests:** `packages/catalog/tests/validate-deck-draft.test.ts`
+
+> **Unreleased.** Deck model v2 trees, spec `0.4.0` and the functions below
+> are in the repository only; they reach npm with the next owner-approved
+> release. `@texuli/deck`, which owns the model, has never been published.
+
+`validateDeckDraft(input, options)` is the entry for a deck an agent writes
+as a catalog tree. It runs `validateDraft` at the host's tier (`untrusted`
+by default) with `layout-deck` as the only frame root
+(`DECK_ROOT_CATALOG_ID`; its slides are `deck-slide`,
+`DECK_SLIDE_CATALOG_ID`), then maps the tree to a plain deck model v2 object
+(`DeckV2Plain`, `formatVersion: 2`). It never throws.
+
+`@texuli/catalog` does not depend on `@texuli/deck`, so the mapped deck is
+**not** validated against the model. A host that has `@texuli/deck` runs
+`migrateDeck` and `parseDeck` on it, or passes them as `loadDeck`, which this
+call runs on the mapped object (a loader that throws becomes a `deck-loader`
+error):
+
+```ts
+import { validateDeckDraft } from '@texuli/catalog/validate';
+import { migrateDeck, parseDeck } from '@texuli/deck/model';
+
+const result = validateDeckDraft(agentJson, {
+  catalog,
+  loadDeck: ({ mapped }) => {
+    const parsed = parseDeck(migrateDeck(mapped).deck);
+    return parsed.ok
+      ? { deck: mapped } // or the validated `parsed.deck`, which has the same shape
+      : {
+          deck: null,
+          issues: parsed.issues.map((issue) => ({
+            check: 'deck' as const,
+            code: 'deck-schema' as const,
+            severity: 'error' as const,
+            path: issue.jsonPath,
+            message: issue.message,
+          })),
+        };
+  },
+});
+```
+
+The mapping (`layoutDeckToV2`, pure) reads:
+
+- the `layout-deck` props into `meta` (title, description, locale, `dir`;
+  a missing title becomes “Untitled deck”), `style` (`aspect`, `themeRef`
+  as `theme`, `transition`, `motion`, `background` and a `style` object),
+  `navigation` (from v1 `settings` or a `navigation` object) and `outline`;
+- each `deck-slide` child into a slide: `id` from `slideId`, `title`,
+  `notes`, `master`, `themeRef`, `transition`, `background` and `steps`; a
+  slide with a catalog `layout` keeps it and its `props`, and
+  `layout: 'component'` keeps its component. An id that is not a lowercase
+  slug is rewritten and a duplicate gets a suffix, each with a warning.
+  Known gap: a slide `themeRef` is copied under that name, which the v2
+  `parseDeck` refuses (`unknown-key`; the v2 slide field is `theme`);
+- the children of a free slide into blocks: a block node's `block` prop as
+  the block, a `charts-*` node as a chart block, any other node as a
+  component item (`{ type: 'component', component, props }`);
+- a structured `slides[]` prop the same way;
+- legacy `layout-card` children as free slides, with a `deck-legacy-cards`
+  warning (`legacyCards: true` on the result).
+
+`deckV2ToLayoutTree(deck)` encodes a v2 deck back as a `layout-deck` tree
+with `deck-slide` children; the test round-trips the golden mapping.
+
+The result (`DeckDraftResult`) carries `ok`, `status`, the catalog `draft`,
+the mapped `deck` (only when `ok`), `diagnostics` (catalog findings, then
+`DeckDraftIssue`s with `check: 'deck'` and a `DeckDraftIssueCode`:
+`deck-schema`, `deck-legacy-cards`, `deck-empty` or `deck-loader`) and
+`legacyCards`. A non-deck root and a deck without slides fail.
+`ValidateDeckDraftOptions` are the draft options without `frameRoots`, plus
+`loadDeck`.
+
+This function is not the model v1 `validateDeckDraft` of
+`@texuli/slides/grammar`, which validates `0.3.0` decks and returns a v1
+deck.
+
 ## Edit history
 
 `draftCommitGate(options)` adapts `validateDraft` to the commit gate of

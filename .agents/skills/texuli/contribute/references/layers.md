@@ -3,6 +3,7 @@
 | Layer | Package | What goes here | Must not import |
 | --- | --- | --- | --- |
 | L0 | `@texuli/core` | Texels: framework-free behavior and DOM policy | Svelte, any other package |
+| L0 | `@texuli/deck` | The framework-free, dependency-free deck engine (model v2, Markdown, layouts, navigation; in development, not on npm) | Svelte, the DOM at import, any other package |
 | L0 | `@texuli/spec` | The schema-first blueprint contract and its TypeScript and Kotlin projections | Any other package |
 | L1 | `@texuli/primitives` | Owned headless Svelte controls on the texels | `texuli`, another component library |
 | L2 | `@texuli/tokens` | Theme engine, `--tx-*` contract, themes, CSS | Components |
@@ -10,8 +11,8 @@
 | L4 | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/editor` | Domain kits (the editor is in development and not on npm) | Blocks, catalog and above |
 | L5 | `@texuli/blocks` | Content blocks for pages, documents and slides | Catalog and above |
 | L6 | `@texuli/catalog` | Manifests, the sink-free renderer, validation, envelope, edit ops, player core | Svelte paint above it |
-| L7 | `@texuli/slides`, `@texuli/player` | The deck runtime; the Svelte paint of validated blueprints | Tools, adapters |
-| L8 | `@texuli/tools`, `@texuli/astro` | CLI, MCP, custom elements, golden set; the Astro integration | — |
+| L7 | `@texuli/player` | The Svelte paint of validated blueprints | Tools, adapters |
+| L8 | `@texuli/slides`, `@texuli/tools`, `@texuli/astro` | The deck stage on `@texuli/deck` and the player; CLI, MCP, custom elements, golden set; the Astro integration | — |
 | App | `apps/website`, `apps/agent`, fixtures | The site, the agent service, demos | — |
 
 `scripts/check-layers.ts` enforces this map (`pnpm check:layers`): a package

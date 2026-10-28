@@ -210,6 +210,50 @@ its reason in the row's `note`. Some caps in the table above moved with it
 truth. CI's `audits` job runs `pnpm size` as a required check
 ([CI](CI.md#budget-audits)).
 
+## Slides and deck (PLAN_008)
+
+`@texuli/deck` and `@texuli/slides` `0.4.0` are in the repository and not on
+npm. Their size caps are owner decisions of 2026-10-28 (PLAN_008
+T-perf-budgets): each cap is the measured size on the final PLAN_008 code
+plus 4% headroom, with the reason in the row's `note` in
+`texuli.budgets.json`. `pnpm size --filter deck` and
+`pnpm size --filter slides` report every entry within budget (8 and 7
+entries, exit 0; re-run 2026-10-28 at `664e1380`, same numbers).
+
+| Entry | Measured (B gzip) | Cap (B gzip) |
+| --- | --- | --- |
+| `@texuli/deck` (root) | 37,827 | 39,340 |
+| `@texuli/deck/model` | 37,550 | 39,053 |
+| `@texuli/deck/schema` | 8,980 | 9,340 |
+| `@texuli/deck/engine` | 24,156 | 25,123 |
+| `@texuli/deck/markdown` | 57,866 | 60,181 |
+| `@texuli/deck/math` | 6,021 | 6,262 |
+| `@texuli/deck/authoring` | 30,740 | 31,971 |
+| `@texuli/deck/templates` | 27,361 | 28,456 |
+| `@texuli/slides` (root) | 48,476 | 50,416 |
+| `@texuli/slides/stage` | 105,851 (CSS 2.11 KiB) | 110,085 (CSS 11,264) |
+| `@texuli/slides/styles.css` | CSS 4,741 | CSS 4,931 |
+
+The other `@texuli/slides` rows (`model`, `grammar`, `export`, `templates`)
+keep their PLAN_006 caps. These are initial bundles: the stage loads its
+layouts, the component registry's player painters, the chrome layers, the
+presenter window and the v2 PPTX writer as lazy chunks (`pnpm size` lists
+376 KiB of lazy gzip behind `@texuli/slides/stage` and 448 KiB behind
+`@texuli/slides/export`), and only the slides that mount pull a content
+family.
+
+`tests/perf/slides.test.ts` (`TEXULI_PERF=1`) asserts the runtime limits at
+the 200-slide cap: the first stage render under 1 s with at most three
+slides mounted, a controller step under 16 ms (median and p95 over 128
+steps on a slide with 32 steps), a 200-slide Markdown parse under 1 s, the
+201st slide refused (`md-too-many-slides`) in bounded time, and a text-only
+deck prefetching only the `blocks-text` chunk. Measured on 2026-10-28 with
+`TEXULI_PERF=1 TEXULI_PERF_REPORT=1 pnpm vitest run tests/perf/slides.test.ts`
+(happy-dom, Apple M1 Max, `664e1380`): 3 passed; first stage render
+40.5 ms, step median 0.14 ms and p95 0.31 ms, 200-slide Markdown parse
+8.2 ms, slide 201 refused in 3.1 ms. These are unit-environment timings, not
+browser measurements.
+
 ## Planned budgets (not enforced yet)
 
 | Budget | Target |

@@ -73,7 +73,8 @@
  *
  * ## Constraints
  * - Framework-free and DOM-free at import (no `window`/`document` access).
- * - Imports stay inside `packages/deck/src/engine/ (recursive)` (import-guard enforced).
+ * - Imports stay inside `packages/deck/src/` (the engine uses the package's own model;
+ *   import-guard enforced), and nothing touches window, document or navigator at load.
  * - Zero third-party runtime dependencies; erasable TypeScript only.
  */
 
