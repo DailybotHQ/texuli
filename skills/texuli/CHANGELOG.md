@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-10-28
+
+### Changes
+
+- docs: @texuli/deck and the v2 slides stage, repository docs and the skill's deck recipes
+
 ### Content
 
 - The deck generator: a new `build-ui/references/decks.md` with recipes for
