@@ -660,6 +660,38 @@
       "cssGzip": 2560,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 2,420 B CSS, cap = measured + 4% headroom."
     },
+    "@texuli/deck": {
+      "gzip": 81920,
+      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for the root convenience aggregate, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+    },
+    "@texuli/deck/model": {
+      "gzip": 32768,
+      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for model v2, migration, lint, patch and text twins, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+    },
+    "@texuli/deck/schema": {
+      "gzip": 16384,
+      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for the owned schema kit, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+    },
+    "@texuli/deck/engine": {
+      "gzip": 24576,
+      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for navigation, controls, motion, canvas fit and the presenter protocol, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+    },
+    "@texuli/deck/markdown": {
+      "gzip": 32768,
+      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for the Markdown dialect parser and serializer, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+    },
+    "@texuli/deck/math": {
+      "gzip": 12288,
+      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for the TeX subset to MathML, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+    },
+    "@texuli/deck/authoring": {
+      "gzip": 16384,
+      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for the typed builder and brief outlines, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+    },
+    "@texuli/deck/templates": {
+      "gzip": 24576,
+      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for starter decks and templates, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+    },
     "@texuli/slides": {
       "gzip": 48192,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 44,177 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 46,295 B + 4% headroom."

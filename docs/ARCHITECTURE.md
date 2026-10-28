@@ -21,6 +21,7 @@ packages in lower layers.
 | --- | --- | --- | --- |
 | L0 | `@texuli/core` | Texels: ids, keyboard intents, roving focus and typeahead, focus scope, inert, dismissable layers, layer stack, overlay engine, portal, positioning (math + DOM), presence, scroll lock, tabbable, form bridge, announcer, direction and locale, the URL policy | none |
 | L0 | `@texuli/date` | Framework-free Gregorian dates, arithmetic, locale week starts and time-zone-aware today | none |
+| L0 | `@texuli/deck` | In development: framework-free, dependency-free deck engine (one validated deck model from JSON or Markdown, layouts, steps, navigation, presenter protocol, lint, authoring) | none |
 | L0 | `@texuli/drag` | In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing) | none |
 | L0 | `@texuli/spec` | Framework-free blueprint contract and code generation | none |
 | L1 | `@texuli/primitives` | 42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core, date, drag |
@@ -34,10 +35,10 @@ packages in lower layers.
 | L4 | `@texuli/workflows` | In development: interactive, accessible workflow graph editor and viewer (model, layout, editor) | core, drag, primitives, tokens, texuli |
 | L5 | `@texuli/blocks` | Content blocks (text, code, data, diagram, embed, interactive, map, media, structure): closed vocabulary, untrusted guard, formula AST | core, tokens, texuli, charts, data, media |
 | L6 | `@texuli/catalog` | The agent catalog (manifests per group, build) and the renderer with no HTML sinks | core, spec, texuli, charts, data, blocks, media |
-| L7 | `@texuli/slides` | Slide model, grammar, export and stage runtime | blocks, catalog, media, tokens |
 | L7 | `@texuli/player` | Blueprint player runtime and styles | blocks, catalog, charts, chat, data, media, primitives, spec, texuli, workflows |
 | L8 | `@texuli/tools` | Copy-in CLI (`texuli-add`, `texuli-init`, `texuli-update`), `texuli-llms`, A2UI adapter, custom elements and the golden set | core, tokens, catalog, blocks, charts, media |
 | L8 | `@texuli/astro` | Astro integration, site helpers and content layouts | blocks, core, tokens |
+| L8 | `@texuli/slides` | Slide grammar, export and the presentation stage; moving onto `@texuli/deck` (ADR-009, in development) and painting components through the player | blocks, catalog, deck, media, player, tokens |
 
 Not layers, because they consume the library:
 - **`@texuli/examples`** (private) is the examples registry. Every component
@@ -63,15 +64,15 @@ their dependents, so `pnpm verify:packages` packs 18 packages, but not on
 npm until the next owner-run publish ([RELEASE](RELEASE.md)).
 
 ```text
-L8  tools · astro
-L7  slides · player
+L8  tools · astro · slides
+L7  player
 L6  catalog
 L5  blocks
 L4  charts · data · media · chat · editor · workflows
 L3  texuli (styled components, layouts, shells)
 L2  tokens (theme engine, CSS contract)
 L1  primitives (headless, APG)
-L0  core · date · drag · spec (framework-free)
+L0  core · date · deck · drag · spec (framework-free)
           ▲ dependencies point down only (scripts/check-layers.ts)
 ```
 
@@ -107,6 +108,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/editor` (private) | `.`, `controller`, `editor`, `link-dialog`, `paste`, `toolbar` |
 | `@texuli/core` (private) | `.`, `announcer`, `controllable`, `dir-locale`, `dismiss`, `editor-history`, `editor-keymap`, `editor-markdown`, `editor-model`, `editor-transforms`, `env`, `focus-scope`, `form-bridge`, `ids`, `inert`, `keyboard`, `layer-stack`, `lazy`, `overlay`, `overlay-core`, `portal`, `position-dom`, `position-math`, `presence`, `roving`, `scroll-lock`, `tabbable`, `url-policy` |
 | `@texuli/date` (private) | `.`, `calendar` |
+| `@texuli/deck` (private, in development) | `.`, `model`, `schema`, `engine`, `markdown`, `math`, `authoring`, `templates` |
 | `@texuli/drag` (private, in development) | `.`, `sortable`, `collision`, `modifiers`, `auto-scroll`, `gesture`, `spatial`, `graph`, `messages`, `testing` |
 | `@texuli/data` (private) | `.`, `activity`, `activity/engine`, `board`, `board/engine`, `calendar`, `files`, `files/engine`, `geo`, `grid`, `grid-columns`, `grid-core`, `grid-virtual`, `map`, `timeline`, `timeline/engine`, `tree`, `tree-view`, `virtual-list`, `calendar/view`, `grid-editing` |
 | `@texuli/examples` (private) | `.` |

@@ -51,6 +51,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         dependsOn: [],
       },
       {
+        name: '@texuli/deck',
+        role: 'In development: framework-free, dependency-free deck engine (one validated deck model from JSON or Markdown, layouts, steps, navigation, presenter protocol, lint, authoring)',
+        dependsOn: [],
+      },
+      {
         name: '@texuli/drag',
         role: 'In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing)',
         dependsOn: [],
@@ -158,11 +163,6 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     label: 'L7',
     packages: [
       {
-        name: '@texuli/slides',
-        role: 'Slide model, grammar, export and stage runtime',
-        dependsOn: ['blocks', 'catalog', 'media', 'tokens'],
-      },
-      {
         name: '@texuli/player',
         role: 'Blueprint player runtime and styles',
         dependsOn: [
@@ -193,6 +193,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         name: '@texuli/astro',
         role: 'Astro integration, site helpers and content layouts',
         dependsOn: ['blocks', 'core', 'tokens'],
+      },
+      {
+        name: '@texuli/slides',
+        role: 'Slide grammar, export and the presentation stage; moving onto @texuli/deck (ADR-009, in development) and painting components through the player',
+        dependsOn: ['blocks', 'catalog', 'deck', 'media', 'player', 'tokens'],
       },
     ],
   },

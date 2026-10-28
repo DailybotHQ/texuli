@@ -166,6 +166,7 @@ the package-to-package contract outside this repository.
 | Blueprint spec (repository) | `0.3.0`, digest `a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848` | `packages/spec/versions.json`; every generated file is stamped `// Spec 0.3.0, digest …`. Not yet on npm. |
 | Blueprint spec (npm) | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | Shipped by `@texuli/spec@0.3.0`, whose generated sources carry the `0.2.0` stamp. |
 | `@texuli/spec` (npm) | `0.3.0` | Ships the spec `0.2.0` generated sources (above). |
+| `@texuli/deck` | `0.4.0`, in the publish waves after `@texuli/drag` | In development (PLAN_008, ADR-009); not on npm. The slides stage depends on it, so it must be published **before** `@texuli/slides`. |
 | `@texuli/drag`, `@texuli/workflows` | `0.3.0`, in the publish waves | Not on npm yet; in development. The next owner-run publish publishes them. |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 

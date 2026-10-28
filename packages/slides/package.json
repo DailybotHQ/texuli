@@ -58,7 +58,9 @@
   "dependencies": {
     "@texuli/blocks": "0.3.0",
     "@texuli/catalog": "0.3.0",
+    "@texuli/deck": "0.4.0",
     "@texuli/media": "0.3.0",
+    "@texuli/player": "0.3.0",
     "@texuli/tokens": "0.3.0"
   },
   "peerDependencies": {

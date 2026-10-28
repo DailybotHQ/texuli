@@ -28,6 +28,8 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   '@texuli/core': 0,
   '@texuli/date': 0,
   '@texuli/drag': 0,
+  // L0: the framework-free, dependency-free deck engine (ADR-009).
+  '@texuli/deck': 0,
   // L0: the framework-free blueprint contract — the cross-language spine
   // consumed by every layer (spec-compose-design.md B1).
   '@texuli/spec': 0,
@@ -43,14 +45,14 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   '@texuli/blocks': 5,
   '@texuli/catalog': 6,
   '@texuli/tools': 8,
-  // L7: the slides runtime orchestrates blocks/media content through the
-  // catalog vocabulary; the Svelte player paints validated blueprints on
-  // the same floor (roadmap D4).
-  '@texuli/slides': 7,
+  // L7: the Svelte player paints validated blueprints (roadmap D4).
   '@texuli/player': 7,
+  // L8: the slides stage presents @texuli/deck decks and paints any
+  // slide-renderable component through the player (ADR-009).
   // L8: adapters and hosts that consume the library (astro integration;
   // tools wraps the player, so it sits above it per roadmap D4).
   '@texuli/astro': 8,
+  '@texuli/slides': 8,
 });
 
 /**

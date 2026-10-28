@@ -291,6 +291,8 @@ importers:
 
   packages/date: {}
 
+  packages/deck: {}
+
   packages/drag: {}
 
   packages/editor:
@@ -433,9 +435,15 @@ importers:
       '@texuli/catalog':
         specifier: 0.3.0
         version: link:../catalog
+      '@texuli/deck':
+        specifier: 0.4.0
+        version: link:../deck
       '@texuli/media':
         specifier: 0.3.0
         version: link:../media
+      '@texuli/player':
+        specifier: 0.3.0
+        version: link:../player
       '@texuli/tokens':
         specifier: 0.3.0
         version: link:../tokens
