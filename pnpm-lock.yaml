@@ -120,6 +120,9 @@ importers:
       '@texuli/data':
         specifier: workspace:*
         version: link:../../packages/data
+      '@texuli/deck':
+        specifier: workspace:*
+        version: link:../../packages/deck
       '@texuli/drag':
         specifier: workspace:*
         version: link:../../packages/drag
@@ -138,6 +141,9 @@ importers:
       '@texuli/primitives':
         specifier: workspace:*
         version: link:../../packages/primitives
+      '@texuli/slides':
+        specifier: workspace:*
+        version: link:../../packages/slides
       '@texuli/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens

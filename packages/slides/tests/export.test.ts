@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 
 import { readFileSync } from 'node:fs';
+import { type Block, blockText, safeParseBlocks, walkBlocks } from '@texuli/blocks/core';
 import { describe, expect, it, vi } from 'vitest';
 import {
   buildDeckPptx,
@@ -20,7 +21,10 @@ import {
   writeZip,
   type XmlElement,
 } from '../src/export/index.ts';
+import { V1_MEDIA_BLOCK_TYPES, v1BlockText, v1WalkBlocks } from '../src/export/pptx-v1.ts';
+import { BLOCK_CATALOG_IDS, catalogIdForBlock } from '../src/grammar/index.ts';
 import { parseDeck } from '../src/model/index.ts';
+import { createDeckFromTemplate, DECK_TEMPLATE_IDS } from '../src/templates/index.ts';
 import { scenario } from './scenario.ts';
 
 describe('print plan and PDF seam', () => {
@@ -387,5 +391,67 @@ describe('PPTX export', () => {
       expect(exported.blob.size).toBe(first.bytes.length);
       expect(exported.omitted).toHaveLength(2);
     });
+  });
+});
+
+describe('v1 PPTX block text parity', () => {
+  it('reads block text, walks nested blocks and spots media exactly as @texuli/blocks and the grammar do', () => {
+    const blocks: Block[] = [
+      ...DECK_TEMPLATE_IDS.flatMap((id) =>
+        createDeckFromTemplate(id).slides.flatMap((slide) => slide.blocks)
+      ),
+    ];
+    const extra = safeParseBlocks([
+      { type: 'heading', level: 1, text: 'Title', eyebrow: 'Eyebrow', subtitle: 'Sub  title' },
+      {
+        type: 'text',
+        markdown: '# Head\n**bold** and *it* `code` [link](https://example.com)\n```\nblock\n```',
+      },
+      { type: 'list', items: [{ text: '**one**' }, { text: 'two' }] },
+      { type: 'quote', quote: 'Q *q*', cite: 'C' },
+      { type: 'callout', title: 'T', body: 'B **b**' },
+      { type: 'code', code: 'let a = 1;', caption: ' Cap ' },
+      { type: 'cta', actions: [{ label: 'Go', href: 'https://example.com' }] },
+      { type: 'divider' },
+      {
+        type: 'columns',
+        columns: [[{ type: 'text', markdown: 'Left' }], [{ type: 'text', markdown: 'Right' }]],
+      },
+      {
+        type: 'tabs',
+        id: 'tabs',
+        label: 'Tabs',
+        panels: [
+          { id: 'one', label: 'One', blocks: [{ type: 'text', markdown: 'Inside' }] },
+          { id: 'two', label: 'Two', blocks: [{ type: 'divider' }] },
+        ],
+      },
+      {
+        type: 'image',
+        src: 'media/a.png',
+        alt: 'Alt',
+        width: 10,
+        height: 10,
+        caption: 'Cap',
+      },
+      { type: 'video', src: 'media/a.mp4', label: 'Clip', width: 640, height: 360 },
+      { type: 'table', columns: [{ id: 'a', label: 'A' }], rows: [{ a: 1 }] },
+    ]);
+    if (!extra.success) throw new Error(JSON.stringify(extra.issues.slice(0, 5)));
+    blocks.push(...extra.data);
+    expect(blocks.length).toBeGreaterThan(20);
+    const walked = walkBlocks(blocks);
+    expect(v1WalkBlocks(blocks).map((entry) => entry.jsonPath)).toEqual(
+      walked.map((entry) => entry.jsonPath)
+    );
+    for (const { block, jsonPath } of walked) {
+      expect(v1BlockText(block), jsonPath).toBe(blockText(block));
+      expect(V1_MEDIA_BLOCK_TYPES.has(block.type), block.type).toBe(
+        catalogIdForBlock(block.type) === 'blocks-media'
+      );
+    }
+    for (const type of Object.keys(BLOCK_CATALOG_IDS) as Block['type'][]) {
+      expect(V1_MEDIA_BLOCK_TYPES.has(type), type).toBe(catalogIdForBlock(type) === 'blocks-media');
+    }
   });
 });

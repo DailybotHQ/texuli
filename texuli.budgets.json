@@ -693,8 +693,8 @@
       "note": "Owner decision 2026-10-28 (PLAN_008 T-authoring, owner consent in analysis_results/owner-consent.md): provisional cap raised from 24 KiB after the first real measurement, 26.72 KiB (template registry and generator over the builder). T-perf-budgets measures and tightens it."
     },
     "@texuli/slides": {
-      "gzip": 48192,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 44,177 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 46,295 B + 4% headroom."
+      "gzip": 50176,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-export, owner consent in analysis_results/owner-consent.md): provisional cap 49 KiB, measured 47.34 KiB after the v2 print and PPTX API (the root re-exports export/api.ts; the v2 writer and print pages load lazily). T-perf-budgets measures and tightens it."
     },
     "@texuli/slides/model": {
       "gzip": 22336,
