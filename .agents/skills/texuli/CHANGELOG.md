@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.2.2] — 2026-10-28
+
+### Changes
+
+- docs: @texuli/drag and @texuli/workflows are on npm as 0.3.0
+
 ### Content
 
 - `@texuli/drag` and `@texuli/workflows` are on npm as `0.3.0` (first
