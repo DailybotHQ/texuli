@@ -67,8 +67,7 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   texuli: [],
   '@texuli/charts': [],
   '@texuli/chat': [],
-  // @texuli/editor has only internal runtime deps; it stays private
-  // (NEVER_PACKED) until its own release.
+  // @texuli/editor has only internal runtime deps (publishable from 0.5.0).
   '@texuli/editor': [],
   '@texuli/data': [],
   '@texuli/media': [],

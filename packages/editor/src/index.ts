@@ -1,6 +1,8 @@
 // @texuli/editor: the rich text editor on the @texuli/core editor texels.
 // Each part is also its own subpath (editor, toolbar, link-dialog,
-// controller, paste), so a host pays only for what it imports.
+// controller, paste), so a host pays only for what it imports. The Markdown
+// codec is only at `@texuli/editor/markdown`: it would grow this barrel by
+// about 5 KB gzip for hosts that never read or write Markdown.
 export {
   createEditorController,
   DEFAULT_EDITOR_LABELS,

@@ -158,6 +158,10 @@ reflect this decision.
   `paste`), with the DOM selection mapping in `./editor`. It stays private
   at `0.0.0` and is never packed (`NEVER_PACKED` in `scripts/packages.ts`);
   the model remains in core as amended above.
+- **Status note (2026-10-28, PLAN_009 G17):** on the owner's approval the
+  package became publishable: it left `NEVER_PACKED`, gained
+  `@texuli/editor/markdown` and joined the publish workflow after `texuli`.
+  It is first published with `0.5.0`; until then it is not on npm.
 
 ## ADR-004: Versioned blueprint envelope with host-owned activation
 

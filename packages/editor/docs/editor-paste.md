@@ -14,6 +14,17 @@ editor vocabulary. It is framework-free and never touches the DOM.
 
 A `PasteResult` holds `doc` (empty `blocks` for an empty clipboard),
 `diagnostics`, `source`, `blocks` and `linksRemoved`.
+`pastedBlockCount(result)` counts the pasted blocks, containers included.
+
+Types: `PasteOptions` (`newId`, lower `limits`); `PasteSource` (`'editor'`,
+`'html'`, `'text'` or `'empty'`; `'markdown'` is reserved, no import
+produces it yet: read Markdown with
+[`@texuli/editor/markdown`](editor-markdown.md)); `ClipboardLike` (what
+`readClipboard` needs from a `DataTransfer`: `getData(type)` and optional
+`types`); and the tokenizer stages' `HtmlToken`, `RawBlock` (a loose block
+before the loader) and `HtmlImportStats` (`blocks` built and whether the
+source was `truncated`). `EDITOR_CLIPBOARD_TYPE` is
+`application/x-texuli-editor+json`.
 
 **Security posture:**
 

@@ -10,6 +10,7 @@ arrow keys move, Home and End jump).
 | `onCommand` | Called after a command (and on Escape), so the host returns focus to the text |
 | `onLinkRequest` | The Link button: open the link dialog |
 | `disabled` | Disable every button |
+| `class` | Extra classes on the toolbar |
 
 Buttons, in three groups: bold, italic, strikethrough, inline code and link;
 headings 1–3, bulleted, numbered and check lists, quote, code block and

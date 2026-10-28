@@ -35,7 +35,7 @@ project overview.
 | `@texuli/catalog` | [packages/catalog/README.md](../packages/catalog/README.md): The agent catalog and the renderer with no HTML sinks. |
 | `@texuli/charts` | [packages/charts/README.md](../packages/charts/README.md): Chart math and every chart family, one lazy subpath per family. |
 | `@texuli/chat` | [packages/chat/README.md](../packages/chat/README.md): Chat interfaces: thread, message list, composer and typing indicator, generic for people and agents. |
-| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): The rich text editor surface, toolbar, link dialog and clipboard import on the core editor texels. |
+| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): In development, publishable from `0.5.0` (not on npm yet): the rich text editor surface, toolbar, link dialog, clipboard import and Markdown in and out on the core editor texels. |
 | `@texuli/core` | [packages/core/README.md](../packages/core/README.md): Texels: framework-free behavior and policy that every Texuli component is built from. |
 | `@texuli/date` | [packages/date/README.md](../packages/date/README.md): Owned Gregorian date arithmetic for Texuli calendars and date fields. |
 | `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, first on npm as `0.4.0`: the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
@@ -206,6 +206,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [charts-part-whole](../packages/charts/docs/charts-part-whole.md) | Charts: pie, donut, sunburst and treemap |
 | [charts-rtl](../packages/charts/docs/charts-rtl.md) | Charts in right-to-left layouts |
 | [charts-schemas](../packages/charts/docs/charts-schemas.md) | Charts: prop schemas and tiers |
+| [charts-sparkline-lite](../packages/charts/docs/charts-sparkline-lite.md) | Charts: light sparkline |
 | [charts-statistical](../packages/charts/docs/charts-statistical.md) | Charts: statistical marks |
 | [charts-worker](../packages/charts/docs/charts-worker.md) | Charts: worker offload |
 
@@ -286,6 +287,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | --- | --- |
 | [editor-controller](../packages/editor/docs/editor-controller.md) | Editor controller |
 | [editor-link-dialog](../packages/editor/docs/editor-link-dialog.md) | Link dialog |
+| [editor-markdown](../packages/editor/docs/editor-markdown.md) | Markdown in and out |
 | [editor-paste](../packages/editor/docs/editor-paste.md) | Clipboard import |
 | [editor-surface](../packages/editor/docs/editor-surface.md) | Editor surface |
 | [editor-toolbar](../packages/editor/docs/editor-toolbar.md) | Editor toolbar |

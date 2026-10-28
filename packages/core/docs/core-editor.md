@@ -14,8 +14,8 @@ The framework-free model of the rich text editor that
 and [EDITOR_ARCHITECTURE](../../../docs/EDITOR_ARCHITECTURE.md) decided:
 document, selection, transforms, history, key intents and the Markdown codec.
 No DOM, no HTML and no framework. The Svelte binding that renders it is
-the private, in-development [`@texuli/editor`](../../editor/README.md)
-package; nothing here touches the page.
+the in-development [`@texuli/editor`](../../editor/README.md) package
+(publishable from `0.5.0`, not on npm yet); nothing here touches the page.
 
 ```ts
 import { fromMarkdown, toMarkdown } from '@texuli/core/editor-markdown';
@@ -166,6 +166,14 @@ that blocks text and catalog rich text use. `toMarkdown(doc)` writes it.
 - Delimiter closers and bracket pairs are computed once per span, so hostile
   delimiter runs stay linear. 100,000-character runs of `*a `, `_a `,
   `**a `, `[a`, `` `a `` and `~~a ` are in the tests, bounded at 3 s each.
+- Block lines are classified in linear time: the heading closing sequence
+  and the fence info string are read by hand, and the line patterns have no
+  overlapping quantifiers (runs of spaces before a closing `#` or after a
+  fence once backtracked cubically and quadratically). Trailing spaces
+  before a hard break are counted from the end of the line.
+- `\r\n` and `\r` read as `\n`. U+2028 and U+2029 are not line endings: they
+  stay inside their line (a heading, list item or quote keeps its kind) and
+  the model stores them as breaks.
 
 **Writing:**
 
@@ -173,6 +181,10 @@ that blocks text and catalog rich text use. `toMarkdown(doc)` writes it.
   output by reading it back.
 - Writing is stable: what was written reads and writes back unchanged for
   2,000 seeded inputs.
+- Writing is linear: each mark's span end is computed once from the end of
+  the paragraph, and runs of breaks are crossed in constant time (long
+  marked link labels and tens of thousands of breaks once made it
+  quadratic).
 - Reading what was written gives the same document, except what the subset
   cannot spell: empty paragraphs, breaks in headings (written as spaces),
   breaks and whitespace at the edges of a block or of a mark, and an em mark

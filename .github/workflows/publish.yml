@@ -57,6 +57,11 @@ jobs:
             slug=${name#@}; slug=${slug//\//-}
             tarball="tmp/packages/tarballs/${slug}-${version}.tgz"
             test -s "$tarball"
+            # 0.0.0 is the unreleased placeholder: fail instead of publishing it.
+            if [ "$version" = "0.0.0" ]; then
+              echo "Refusing to publish ${name}@0.0.0: bump the version first"
+              return 1
+            fi
             # Idempotent: a re-run after a partial failure skips what is
             # already on the registry (a published version never changes).
             if npm view "${name}@${version}" version >/dev/null 2>&1; then
@@ -97,6 +102,8 @@ jobs:
           publish packages/texuli
           # L4: the workflow editor, after texuli and before the player.
           publish packages/workflows
+          # L4: the rich text editor (core, primitives, tokens and texuli first).
+          publish packages/editor
           # Wave 177 — L4 domain packages.
           publish packages/charts
           publish packages/data
@@ -115,7 +122,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          for dir in core date spec drag deck tokens primitives texuli workflows charts data media chat blocks catalog tools astro player slides; do
+          for dir in core date spec drag deck tokens primitives texuli workflows editor charts data media chat blocks catalog tools astro player slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             npm dist-tag add "${name}@${version}" latest

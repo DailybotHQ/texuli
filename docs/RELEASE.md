@@ -23,8 +23,13 @@ overwrites a published version.
 
 ### Not on npm
 
-- `@texuli/editor` and `@texuli/examples` stay private (`NEVER_PACKED` in
+- `@texuli/examples` is never packed (`NEVER_PACKED` in
   `scripts/packages.ts`).
+- `@texuli/editor` is publishable from `0.5.0` (PLAN_009 G17, owner approval
+  2026-10-28): `pnpm verify:packages` packs it and the publish workflow
+  publishes it after `texuli`, but it is not on npm yet. Its version stays
+  the `0.0.0` placeholder until the release bumps it, and the publish
+  workflow refuses to publish a `0.0.0` version.
 
 ### 0.4.0
 
@@ -86,8 +91,8 @@ Every packable package moves to `0.4.0` together, and every internal
   `CalendarIdentifier` narrowing to `'gregory'` already shipped in `0.3.0`.
 
 **Publish order** (`publish.yml`): core, date, spec, drag, deck, tokens,
-primitives, texuli, workflows, charts, data, media, chat, blocks, catalog,
-tools, astro, player, slides. `@texuli/deck` goes out before
+primitives, texuli, workflows, editor, charts, data, media, chat, blocks,
+catalog, tools, astro, player, slides (`@texuli/editor` from `0.5.0`). `@texuli/deck` goes out before
 `@texuli/slides` (and before `@texuli/tools`, which pins it);
 `@texuli/drag` before `@texuli/primitives`, `@texuli/data` and
 `@texuli/workflows`; `@texuli/workflows` before `@texuli/player`; and
@@ -180,7 +185,7 @@ Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
 versions (for `0.4.0`, every internal pin is exactly `0.4.0`; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
-manifests (`apps/website`, `apps/agent`, `packages/examples`, `packages/editor`) keep the
+manifests (`apps/website`, `apps/agent`, `packages/examples`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary
 (`scripts/packages.ts` rewrites `workspace:` to the exact workspace version
 and fails the pack when a published manifest would still carry
@@ -237,7 +242,8 @@ tag. Any GO for Task 170's name reservation covers only that reservation.
 
 The date, drag, workflows and deck rows are in `.github/workflows/publish.yml`
 (order: core, date, spec, drag, deck, tokens, primitives, texuli, workflows,
-charts, data, media, chat, blocks, catalog, tools, astro, player, slides).
+editor, charts, data, media, chat, blocks, catalog, tools, astro, player,
+slides; `@texuli/editor` goes out from `0.5.0`, after `texuli`).
 Every packable package is `0.4.0`, and every internal dependency between
 them is pinned to exactly `0.4.0`. `pnpm verify:packages` still refuses any
 `0.0.0` or `workspace:` range in a published manifest, the guard that keeps

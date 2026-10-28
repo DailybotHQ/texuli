@@ -2,12 +2,13 @@
   "name": "@texuli/editor",
   "version": "0.0.0",
   "private": true,
-  "description": "Rich text editor surface built on the @texuli/core editor texels: owned model, transforms, history and a sink-free Svelte 5 rendering (in development).",
+  "description": "Rich text editor for Svelte 5 on the @texuli/core editor texels: owned document model, transforms, history, Markdown in and out, and a sink-free rendering.",
   "keywords": [
     "svelte",
     "svelte-5",
     "rich-text",
     "editor",
+    "markdown",
     "design-system",
     "texuli"
   ],
@@ -45,7 +46,14 @@
       "svelte": "./src/link-dialog/index.ts",
       "default": "./src/link-dialog/index.ts"
     },
-    "./paste": "./src/paste/index.ts",
+    "./markdown": {
+      "types": "./src/markdown/index.ts",
+      "default": "./src/markdown/index.ts"
+    },
+    "./paste": {
+      "types": "./src/paste/index.ts",
+      "default": "./src/paste/index.ts"
+    },
     "./toolbar": {
       "types": "./src/toolbar/index.ts",
       "svelte": "./src/toolbar/index.ts",

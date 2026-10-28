@@ -1,95 +1,99 @@
 # @texuli/editor
 
-Rich text editor surface built on the `@texuli/core` editor texels:
-the closed document model, pure transforms, snapshot history, keyboard
-map and the Markdown codec, bound to an owned, sink-free Svelte 5
-rendering (no `{@html}`, no `innerHTML`, links through the URL policy).
-Layer L4, beside the other domain packages.
+A rich text editor for Svelte 5: headings, lists, todo lists, quotes, code,
+dividers, media references, and the strong, em, strike, code and link marks,
+with undo and redo, input-method composition, Markdown shortcuts, a roving
+formatting toolbar, a link dialog, safe paste, and Markdown in and out. The
+document is an owned, closed model (the `@texuli/core` editor texels), and
+the rendering is sink-free: no `{@html}`, no `innerHTML`, every link through
+the URL policy. It is part of [Texuli](https://texuli.com), "Small pieces.
+Infinite possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
-**Status: in development.** This package is private (`0.0.0`) and excluded
-from packing until its own release; nothing here is published. The
-architecture contract is
-[ADR-003](../../docs/DECISIONS.md) and
-[EDITOR_ARCHITECTURE](../../docs/EDITOR_ARCHITECTURE.md); the model lives in
-[`@texuli/core`](../core) (the `editor-*` subpaths,
-[core-editor](../core/docs/core-editor.md)).
+> **Status: in development, not on npm yet.** The package is publishable
+> (`pnpm verify:packages` packs it, and it is in the publish workflow after
+> `texuli`) but its version is still the `0.0.0` placeholder; it is first
+> published with the next release (planned `0.5.0`). The architecture
+> contract is ADR-003 in
+> [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)
+> and [EDITOR_ARCHITECTURE](https://github.com/DailybotHQ/texuli/blob/main/docs/EDITOR_ARCHITECTURE.md).
+> Texuli is pre-1.0: under 0.x a new minor may contain breaking changes.
 
-## Subpaths
+## Install
 
-| Subpath | What it holds | Doc |
-| --- | --- | --- |
-| `.` | Everything below, as one barrel | — |
-| `./editor` | `RichTextEditor` (toolbar, link dialog and surface), `EditorSurface`, the DOM selection mapping | [editor-surface](docs/editor-surface.md) |
-| `./toolbar` | `EditorToolbar`, the roving formatting toolbar | [editor-toolbar](docs/editor-toolbar.md) |
-| `./link-dialog` | `LinkDialog`, link editing through the URL policy | [editor-link-dialog](docs/editor-link-dialog.md) |
-| `./controller` | `EditorController`, the headless editor (history, commands, composition guard, announcements) and `DEFAULT_EDITOR_LABELS` | [editor-controller](docs/editor-controller.md) |
-| `./paste` | Framework-free clipboard import: the owned HTML tokenizer, plain text and the editor's JSON format | [editor-paste](docs/editor-paste.md) |
+```bash
+npm install @texuli/editor
+```
 
-Each subpath has its own gzip budget in `texuli.budgets.json`
-(`pnpm size --filter @texuli/editor`). The editor surface bundles the core
-editor texels, so `./editor` measures about 34 KiB gzip; `./paste` and
-`./controller` load no UI.
+Once it is published. In the Texuli workspace, depend on it as
+`"@texuli/editor": "workspace:*"`. It builds on `@texuli/core`,
+`@texuli/primitives`, `@texuli/tokens` and `texuli`; `svelte` (^5.57.2) is a
+peer dependency. Import the token stylesheet once
+(`@texuli/tokens/base.css`); the editor imports its own CSS.
 
-## Using it
+## Quick start
 
 ```svelte
 <script lang="ts">
-  import { fromMarkdown, toMarkdown } from '@texuli/core/editor-markdown';
   import { RichTextEditor } from '@texuli/editor/editor';
+  import { documentToMarkdown, markdownToDocument } from '@texuli/editor/markdown';
 
-  // Untrusted Markdown (agent output, stored text) loads at the untrusted tier.
-  const { doc } = fromMarkdown('Hello **world**');
-  let markdown = $state(toMarkdown(doc));
+  // Untrusted Markdown (agent output, stored text) reads at the untrusted tier.
+  const { doc } = markdownToDocument('# Plan\n\n- [ ] Draft the **brief**\n- [x] Book the room');
+  let markdown = $state(documentToMarkdown(doc));
 </script>
 
-<RichTextEditor value={doc} label="Notes" onChange={(next) => (markdown = toMarkdown(next))} />
+<RichTextEditor value={doc} label="Notes" onChange={(next) => (markdown = documentToMarkdown(next))} />
 ```
 
 `value` is read on mount and whenever a new document arrives from outside
 (history restarts); the editor's own edits arrive through `onChange`. Keep a
 held document in `$state.raw`, not `$state`, so it is not deep-proxied.
 
-## What works today
+## Subpaths
 
-- **Rendering.** Every node and mark of the closed vocabulary renders through
-  owned Svelte components with text interpolation only: `h1`–`h4`, `p`,
-  `ul`/`ol`/`li`, todo checkboxes outside the editable text, `blockquote`,
-  `pre`/`code`, `hr`, and media blocks the host resolves with `resolveMedia`
-  (checked by `safeImageSrc` at the untrusted tier). Link hrefs are checked
-  again by `safeHref` at render; a refused one renders as marked text. Links
-  get `rel="noopener noreferrer nofollow"` and no `target`.
-- **Input.** One `contenteditable` textbox. Every cancelable `beforeinput` is
-  prevented and becomes a model transform; unsupported input types (such as
-  underline) are refused. The keymap from `@texuli/core/editor-keymap` runs
-  marks, headings, lists, quote, todo toggle, undo and redo; Tab indents only
-  inside lists, and Escape then Tab leaves the editor.
-- **Input methods.** Between `compositionstart` and `compositionend` the model
-  is not touched; at the end the block's DOM text is diffed into one typing
-  step and the block re-renders from the model. Inputs that cannot be
-  canceled take the same path on `input`.
-- **Selection.** Block id plus UTF-16 offset, read from the DOM on
-  `selectionchange` and written back after each render.
-- **Paste** is data: clipboard HTML goes through the owned tokenizer and an
-  element allowlist, then the core untrusted loader; every pasted link is
-  checked at the `untrusted` tier whatever the editor's `trust` is.
-- **Links** typed in the dialog pass `safeHref` at the editor's `trust`
-  (`untrusted` by default). A refused address shows a visible error and the
-  document does not change.
-- **Announcements** through the core announcer (polite): mark toggles at a
-  caret, block type changes, list level, undo and redo, paste results and
-  refusals.
-- **Styles** use `--tx-*` tokens and logical properties only; forced-colors
-  mappings are included. Off-screen top-level blocks use
-  `content-visibility: auto`.
-- **Read-only** mode keeps the textbox with `aria-readonly="true"` and refuses
-  every edit.
+| Import | What it gives you | Doc |
+| --- | --- | --- |
+| `@texuli/editor/editor` | `RichTextEditor` (toolbar, link dialog and surface), `EditorSurface`, the DOM selection mapping | [editor-surface](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-surface.md) |
+| `@texuli/editor/toolbar` | `EditorToolbar`, the roving formatting toolbar | [editor-toolbar](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-toolbar.md) |
+| `@texuli/editor/link-dialog` | `LinkDialog`, link editing through the URL policy | [editor-link-dialog](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-link-dialog.md) |
+| `@texuli/editor/controller` | `EditorController`, the headless editor (history, commands, composition guard, announcements), and `DEFAULT_EDITOR_LABELS` | [editor-controller](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-controller.md) |
+| `@texuli/editor/markdown` | `markdownToDocument` and `documentToMarkdown`: framework-free Markdown in and out | [editor-markdown](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-markdown.md) |
+| `@texuli/editor/paste` | Framework-free clipboard import: the owned HTML tokenizer, plain text and the editor's JSON format | [editor-paste](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-paste.md) |
+| `@texuli/editor` | The editor, toolbar, link dialog, controller and paste in one barrel (not the Markdown codec), plus `EDITOR_PACKAGE_VERSION` | — |
 
-Tests: `pnpm vitest run packages/editor` (22 tests in 2 files: the model,
-including hostile paste and link-policy cases, and the component). Examples:
-`editor-basic`, `editor-toolbar` and `editor-long-document` in
-`@texuli/examples`, with light and dark visual baselines.
+Each subpath has its own gzip budget in `texuli.budgets.json`
+(`pnpm size --filter @texuli/editor`). The editor surface bundles the core
+editor texels, so `@texuli/editor/editor` measures about 34 KiB gzip;
+`@texuli/editor/markdown` about 8.5 KiB, and `./paste` and `./controller`
+load no UI.
 
-## Not done yet
+## Key guarantees
+
+- **No HTML sinks.** Every node and mark renders through owned Svelte
+  components with text interpolation only. Raw HTML in Markdown stays
+  literal text; pasted HTML goes through an owned tokenizer and an element
+  allowlist; nothing is ever parsed as markup into the page.
+- **Links and media pass the URL policy.** Links typed in the dialog pass
+  `safeHref` at the editor's `trust` (`untrusted` by default) and are checked
+  again at render; a refused one renders as text. Pasted and Markdown links
+  are checked at the `untrusted` tier. Links get
+  `rel="noopener noreferrer nofollow"` and no `target`. Media blocks are
+  resolved by the host (`resolveMedia`) and their `src` passes
+  `safeImageSrc`.
+- **Bounded, linear input.** Documents are capped (2,000 blocks, 200,000
+  characters, depth 4) and Markdown at 100,000 characters; reading and
+  writing Markdown stay linear on hostile input (the tests read and write
+  18 such inputs at the cap within a bound each).
+- **Accessible editing.** One `contenteditable` textbox with a name; Tab
+  indents only inside lists and Escape then Tab leaves the editor;
+  `aria-readonly` in read-only mode; mark, block, list, undo, paste and
+  refusal changes are announced politely through the core announcer.
+- **Input methods.** Between `compositionstart` and `compositionend` the
+  model is not touched; the composed text is applied as one step.
+- **Styles** use `--tx-*` tokens and logical properties only, with
+  forced-colors mappings.
+
+## What is not done yet
 
 - Copy writes no `application/x-texuli-editor+json` data yet (the native
   copy runs; paste reads that format when present). Drop is refused.
@@ -100,6 +104,26 @@ including hostile paste and link-policy cases, and the component). Examples:
   not a measured result.
 - Tree adapters to blocks and the catalog are planned in those packages.
 
----
+Tests: `pnpm vitest run packages/editor` (the model, hostile paste and
+link-policy cases, the component, the Markdown codec and the docs coverage).
+Examples: `editor-basic`, `editor-toolbar` and `editor-long-document` in
+`@texuli/examples`, with light and dark visual baselines.
 
-Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-editor).
+## Documentation
+
+- The model, transforms, history and keymap:
+  [core-editor](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-editor.md)
+- Decisions: ADR-003 in
+  [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)
+  and [EDITOR_ARCHITECTURE](https://github.com/DailybotHQ/texuli/blob/main/docs/EDITOR_ARCHITECTURE.md)
+- Source: [github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli)
+  · Issues: [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues)
+
+## Contributing
+
+Contributions are welcome; start at the
+[GitHub repository](https://github.com/DailybotHQ/texuli).
+
+## License
+
+MIT © Dailybot, Inc. Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-editor).

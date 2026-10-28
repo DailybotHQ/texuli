@@ -22,13 +22,14 @@ end to end and native for agents:
   blueprint contract (`@texuli/spec`) also feeds a Kotlin Multiplatform
   twin in `native/`.
 
-**Status: in development, pre-1.0.** All 19 packable packages (all of
-`packages/` except `@texuli/editor` and `@texuli/examples`) are released as
+**Status: in development, pre-1.0.** 19 packages (all of `packages/`
+except `@texuli/editor` and `@texuli/examples`) are released as
 `0.4.0`, which the publish workflow publishes from `main` after the merge
 and points `latest` and `next` to; `@texuli/deck` is published for the first
 time in `0.4.0` (the previous release, `0.3.0`, had 18 packages), and
 `@texuli/drag`, `@texuli/workflows` and `@texuli/deck` are still in
-development ([RELEASE](docs/RELEASE.md)). Workspace packages stay
+development ([RELEASE](docs/RELEASE.md)). `@texuli/editor` is publishable
+from `0.5.0` (packed and in the publish workflow) but not on npm yet. Workspace packages stay
 `private: true`, and no stable release is out (1.0.0 will be the first; under
 0.x a new minor may break; see [RELEASE](docs/RELEASE.md)),
 and texuli.com deploys from `main` to Cloudflare Pages, with the Pages
@@ -83,7 +84,7 @@ texuli/
 │   ├── chat/            L4 @texuli/chat: thread, messages, composer                            (README, docs/)
 │   ├── blocks/          L5 @texuli/blocks: content blocks for pages, documents and slides      (README, docs/)
 │   ├── spec/            L0 @texuli/spec: the blueprint contract, schemas, TS + Kotlin codegen   (README)
-│   ├── editor/          L4 @texuli/editor: rich text editor surface (0.0.0, never packed)      (README, docs/)
+│   ├── editor/          L4 @texuli/editor: rich text editor, Markdown in/out (publishable from 0.5.0, not on npm yet) (README, docs/)
 │   ├── workflows/       L4 @texuli/workflows: workflow editor, viewer, model, layout (in development) (README)
 │   ├── catalog/         L6 @texuli/catalog: agent catalog + sink-free renderer                 (README, docs/)
 │   ├── player/          L7 @texuli/player: paint runtime for validated blueprints              (README, docs/)
@@ -200,8 +201,10 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     (first published in `0.4.0`), are released on npm as `0.4.0` (dist-tags
     `latest` and `next`, published by CI with provenance); `@texuli/drag`,
     `@texuli/workflows` and `@texuli/deck` are still in development, and the
-    blueprint spec in `@texuli/spec@0.4.0` is `0.4.0`. `@texuli/editor`,
-    `@texuli/examples`, the apps and `native/` publish nothing. 0.4.0 is a
+    blueprint spec in `@texuli/spec@0.4.0` is `0.4.0`. `@texuli/editor` is
+    publishable from `0.5.0` and not on npm yet (its version is the `0.0.0`
+    placeholder until that release); `@texuli/examples`, the apps and
+    `native/` publish nothing. 0.4.0 is a
     pre-1.0 release, not stable (1.0.0 will be the first
     stable release; `latest` tracks the newest release). texuli.com
     deploys from `main` (Cloudflare Pages); the agent service is not

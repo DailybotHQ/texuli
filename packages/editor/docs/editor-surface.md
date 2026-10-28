@@ -1,8 +1,10 @@
 # Editor surface
 
-`@texuli/editor/editor` exports `RichTextEditor`, `EditorSurface` and the DOM
-selection mapping (`readDomSelection`, `writeDomSelection`, `domToPoint`,
-`pointToDom`, `domBlockText`).
+`@texuli/editor/editor` exports `RichTextEditor`, `EditorSurface`, the
+`EditorMediaResolver` type and the DOM selection mapping
+(`readDomSelection`, `writeDomSelection`, `domToPoint`, `pointToDom`,
+`domBlockText`, `sameSelection`, and the `BLOCK_ATTR` and `VOID_ATTR`
+attribute names).
 
 ## RichTextEditor
 
@@ -11,7 +13,7 @@ The toolbar, the link dialog and the editing surface, wired to one
 
 | Prop | Default | Meaning |
 | --- | --- | --- |
-| `value` | empty document | The document (from `loadEditorDocument` or `fromMarkdown`). A new value from outside restarts history |
+| `value` | empty document | The document (from `markdownToDocument` in [`@texuli/editor/markdown`](editor-markdown.md), or `loadEditorDocument`). A new value from outside restarts history |
 | `onChange` | — | Every accepted change of the document |
 | `controller` | created | Bring your own `EditorController` |
 | `trust` | `'untrusted'` | URL policy tier for links typed in the link dialog. Pasted and autolinked URLs are always `untrusted` |
@@ -22,13 +24,15 @@ The toolbar, the link dialog and the editing surface, wired to one
 | `readonly` | `false` | `aria-readonly="true"`, no toolbar, every edit refused |
 | `toolbar` | `true` | Show the formatting toolbar |
 | `resolveMedia` | — | `(ref) => { src, alt? }` for media blocks; `src` passes `safeImageSrc` at the untrusted tier, otherwise the block shows its alt text |
+| `id` | — | The id of the editing textbox (for `aria-controls` or a skip link elsewhere on the page) |
+| `class` | — | Extra classes on the root element |
 
 ## EditorSurface
 
 The bare `contenteditable` region (`role="textbox"`, `aria-multiline`), for
-hosts that bring their own chrome. Props: `controller`, `label`,
+hosts that bring their own chrome. Props: `controller`, `id`, `label`,
 `aria-labelledby`, `aria-describedby`, `placeholder`, `readonly`, `trust`,
-`resolveMedia`, `onLinkRequest` (Mod+K). `focus()` focuses it and restores
+`resolveMedia`, `onLinkRequest` (Mod+K) and `class`. `focus()` focuses it and restores
 the model selection.
 
 ## How input flows

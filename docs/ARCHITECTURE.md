@@ -55,9 +55,10 @@ Not layers, because they consume the library:
 - **`functions/`** holds the Cloudflare Pages Functions deployed with the
   website (see [The website](#the-website)).
 
-`@texuli/editor` and `@texuli/examples` are never packed
-(`NEVER_PACKED` in `scripts/packages.ts`); `pnpm verify:packages` packs the
-other 19. All 19 are released on npm as `0.4.0`, the first release of
+`@texuli/examples` is never packed (`NEVER_PACKED` in
+`scripts/packages.ts`); `pnpm verify:packages` packs the other 20.
+`@texuli/editor` is publishable from `0.5.0` and not on npm yet; the other
+19 are released on npm as `0.4.0`, the first release of
 `@texuli/deck` (the previous release, `0.3.0`, had 18 packages);
 `@texuli/drag`, `@texuli/workflows` and `@texuli/deck` are in development
 and sit in the `publish.yml` wave order ahead of their dependents
@@ -103,9 +104,9 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/astro` (private) | `.`, `content`, `integration`, `site`, `styles.css`, `layouts/ContentLayout`, `sections/Hero`, `sections/Section` |
 | `@texuli/blocks` (private) | `.`, `code`, `code/engine`, `code/renderers`, `code/tokenizer`, `core`, `data`, `data/engine`, `data/renderers`, `diagram`, `diagram/engine`, `diagram/renderers`, `embed`, `embed/engine`, `embed/renderers`, `formula`, `interactive`, `interactive/engine`, `interactive/renderers`, `map`, `map/engine`, `map/renderers`, `media`, `media/engine`, `media/renderers`, `structure`, `structure/engine`, `structure/renderers`, `text`, `text/engine`, `text/markdown`, `text/renderers` |
 | `@texuli/catalog` (private) | `.`, `build`, `build/node`, `edit`, `envelope`, `manifest`, `manifests/content`, `manifests/chat`, `manifests/composition`, `manifests/data`, `manifests/display`, `manifests/forms`, `manifests/layouts`, `manifests/overlays`, `manifests/state`, `manifests/workflows`, `player`, `render/frame`, `render/grammar`, `render/hostile`, `render/limits`, `render/conditions`, `render/renderer`, `render/richtext`, `validate`, `validate/blocks` |
-| `@texuli/charts` (private) | `.`, `canvas`, `colors`, `calendar`, `annotations`, `axis`, `cartesian`, `compact`, `flow`, `geo`, `histogram`, `interaction`, `math`, `math/scales`, `math/shapes`, `math/layout`, `math/downsample`, `math/color`, `matrix`, `part-whole`, `pack`, `statistical`, `streaming`, `schemas`, `worker`, `worker/entry` |
+| `@texuli/charts` (private) | `.`, `canvas`, `colors`, `calendar`, `annotations`, `axis`, `cartesian`, `compact`, `sparkline-lite`, `flow`, `geo`, `histogram`, `interaction`, `math`, `math/scales`, `math/shapes`, `math/layout`, `math/downsample`, `math/color`, `matrix`, `part-whole`, `pack`, `statistical`, `streaming`, `schemas`, `worker`, `worker/entry` |
 | `@texuli/chat` (private) | `.` |
-| `@texuli/editor` (private) | `.`, `controller`, `editor`, `link-dialog`, `paste`, `toolbar` |
+| `@texuli/editor` (private, in development) | `.`, `controller`, `editor`, `link-dialog`, `markdown`, `paste`, `toolbar` |
 | `@texuli/core` (private) | `.`, `announcer`, `controllable`, `dir-locale`, `dismiss`, `editor-history`, `editor-keymap`, `editor-markdown`, `editor-model`, `editor-transforms`, `env`, `focus-scope`, `form-bridge`, `ids`, `inert`, `keyboard`, `layer-stack`, `lazy`, `overlay`, `overlay-core`, `portal`, `position-dom`, `position-math`, `presence`, `roving`, `scroll-lock`, `tabbable`, `url-policy` |
 | `@texuli/date` (private) | `.`, `calendar` |
 | `@texuli/deck` (private, in development) | `.`, `model`, `schema`, `engine`, `markdown`, `math`, `authoring`, `templates` |

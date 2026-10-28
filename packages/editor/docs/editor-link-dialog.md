@@ -7,6 +7,7 @@
 | --- | --- |
 | `controller` | The editor whose selection it links |
 | `onClose` | Called after Apply, Remove or Cancel, and on Escape |
+| `class` | Extra classes on the dialog |
 
 - The address field starts with the link at the selection, if any. At a caret
   outside a link, a “Link text” field appears and the text is inserted as the
