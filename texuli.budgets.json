@@ -661,40 +661,40 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 2,420 B CSS, cap = measured + 4% headroom."
     },
     "@texuli/deck": {
-      "gzip": 81920,
-      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for the root convenience aggregate, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+      "gzip": 39340,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 37,827 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/model": {
-      "gzip": 49152,
-      "note": "Owner decision 2026-10-27 (PLAN_008 T-model-v2, owner consent in analysis_results/owner-consent.md): provisional cap raised from 32 KiB after the first real measurement, 36.65 KiB for the schema kit, 21-layout catalog, style, backgrounds, steps, motion, parseDeck, the untrusted loader and migration; 48 KiB leaves room for the lint rules. T-perf-budgets measures and tightens it."
+      "gzip": 39053,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 37,550 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/schema": {
-      "gzip": 16384,
-      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for the owned schema kit, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+      "gzip": 9340,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 8,980 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/engine": {
-      "gzip": 24576,
-      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for navigation, controls, motion, canvas fit and the presenter protocol, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+      "gzip": 25123,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 24,156 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/markdown": {
-      "gzip": 61440,
-      "note": "Owner decision 2026-10-27 (PLAN_008 T-markdown, owner consent in analysis_results/owner-consent.md): provisional cap raised from 32 KiB after the first real measurement, 56.49 KiB: the entry must call parseDeck (22.85 KiB with the model data on that path), plus math, the parser, the writer and the text twins. T-perf-budgets measures and tightens it."
+      "gzip": 60181,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 57,866 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/math": {
-      "gzip": 12288,
-      "note": "Owner decision 2026-10-27 (PLAN_008 T-owner-setup, ADR-009): provisional cap for the TeX subset to MathML, from the package-shape research estimate; T-perf-budgets measures it and tightens with pnpm size --update."
+      "gzip": 6262,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 6,021 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/authoring": {
-      "gzip": 32768,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-authoring, owner consent in analysis_results/owner-consent.md): provisional cap raised from 16 KiB after the first real measurement, 30.02 KiB: the typed builder validates through parseDeck, plus eight brief outlines, the layout selector, lint (14 rules) and RFC 6902 patch. T-perf-budgets measures and tightens it."
+      "gzip": 31971,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 30,740 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/templates": {
-      "gzip": 28672,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-authoring, owner consent in analysis_results/owner-consent.md): provisional cap raised from 24 KiB after the first real measurement, 26.72 KiB (template registry and generator over the builder). T-perf-budgets measures and tightens it."
+      "gzip": 28456,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 27,361 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/slides": {
-      "gzip": 50176,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-export, owner consent in analysis_results/owner-consent.md): provisional cap 49 KiB, measured 47.34 KiB after the v2 print and PPTX API (the root re-exports export/api.ts; the v2 writer and print pages load lazily). T-perf-budgets measures and tightens it."
+      "gzip": 50416,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 48,476 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/slides/model": {
       "gzip": 22336,
@@ -713,14 +713,14 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 22,361 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/stage": {
-      "gzip": 110592,
+      "gzip": 110085,
       "cssGzip": 11264,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-components/T-layouts-backgrounds wiring, owner consent in analysis_results/owner-consent.md): provisional cap 108 KiB: the stage validates any deck with the @texuli/deck model and engine, and its default renderer tables (21 layouts, the component registry) are eager while every layout, family and painter loads lazily; measured 103.03 KiB. Research ceiling 120 KiB (Protoyard's stage measures 92 KiB). T-perf-budgets measures and tightens it."
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 105,851 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/slides/styles.css": {
       "gzip": 64,
-      "cssGzip": 5120,
-      "note": "Owner decision 2026-10-27 (PLAN_008 T-stage, owner consent in analysis_results/owner-consent.md): provisional cap raised from 3,456 B CSS for the v2 stage (canvas, letterbox, fragments, transitions, backgrounds); measured 4,804 B. T-perf-budgets tightens it."
+      "cssGzip": 4931,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 4,741 B CSS gzip on the final PLAN_008 stage, cap = measured + 4% headroom."
     },
     "@texuli/spec": {
       "gzip": 11968,
