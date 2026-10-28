@@ -44,8 +44,8 @@
       "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
     },
     "@texuli/catalog": {
-      "gzip": 54080,
-      "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up."
+      "gzip": 57024,
+      "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 54080 -> 57024 B, measured + 4% after four new manifests (time-field, data-cohort-table, data-notification-inbox, data-filter-builder) and the linear-time rich text parser and sink scan; measured 54,821 B."
     },
     "@texuli/catalog/*": {
       "gzip": 8192,
