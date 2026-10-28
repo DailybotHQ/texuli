@@ -79,7 +79,7 @@ export const DECK_CANVAS: Readonly<Record<DeckAspect, { width: number; height: n
  * Size caps for `data:` and the trust tier are the host's, applied later.
  */
 export const MEDIA_SRC_PATTERN =
-  '^(?:https://[^\\s"<>\\\\]+|(?!/)(?!.*\\.\\.)(?!.*\\.svg(?:[?#]|$))[A-Za-z0-9._~/-]+(?:[?#][^\\s"<>\\\\]*)?|data:(?:image/(?:png|jpeg|gif|webp|avif)|video/(?:mp4|webm));base64,[A-Za-z0-9+/=]+|avatar:av-[0-9]{3})$';
+  '^(?:https://(?![^?#]*\\.svg(?:[?#]|$))[^\\s"<>\\\\]+|(?!/)(?!.*\\.\\.)(?!.*\\.svg(?:[?#]|$))[A-Za-z0-9._~/-]+(?:[?#][^\\s"<>\\\\]*)?|data:(?:image/(?:png|jpeg|gif|webp|avif)|video/(?:mp4|webm));base64,[A-Za-z0-9+/=]+|avatar:av-[0-9]{3})$';
 
 export const mediaSrc = t.string({ min: 1, max: 2_000_000, pattern: MEDIA_SRC_PATTERN });
 
