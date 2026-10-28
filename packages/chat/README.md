@@ -76,8 +76,8 @@ Everything is exported from the package root, `@texuli/chat`:
 | Export | What it does |
 | --- | --- |
 | `ChatThread` | The full conversation view: message list plus composer, typing indicator and header slots |
-| `MessageList` | The message log on its own: grouping, date separators, avatars, timestamps, status and virtualization |
-| `Composer` | Message input: Enter to send, Shift+Enter for a new line, auto-growing, with attachments and pending states |
+| `MessageList` | The message log on its own: grouping, date separators, avatars, timestamps, status, virtualization, per-message actions, inline edit and jump to latest |
+| `Composer` | Message input: Enter to send, Shift+Enter for a new line, auto-growing, with attachments, actions, a key hook, pending states and Stop for a streaming reply |
 | `TypingIndicator` | Localized "is typing" labels for one or more authors |
 | `ChatThreadDisplay`, `ChatMessageDisplay` | A static transcript view (no composer, no live region) for rendering saved or generated conversations |
 | `CHAT_DISPLAY_LOADERS` | Loaders that map the display components for a `@texuli/player` host |

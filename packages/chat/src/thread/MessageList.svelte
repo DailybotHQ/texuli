@@ -2,11 +2,12 @@
 import type { Snippet } from 'svelte';
 import { tick } from 'svelte';
 import { Avatar } from 'texuli/avatar';
+import { Button } from 'texuli/button';
 import { type ClassValue, cx } from 'texuli/cx';
 import { groupMessages } from './group-messages.ts';
 import { DEFAULT_MESSAGE_LIST_LABELS, type MessageListLabels } from './labels.ts';
 import MessageText from './MessageText.svelte';
-import type { ChatMessage, ChatMessageStatus } from './types.ts';
+import type { ChatMessage, ChatMessageActions, ChatMessageStatus } from './types.ts';
 import { MessageVirtualWindow, type VirtualWindow } from './virtual-window.ts';
 
 interface Props {
@@ -22,8 +23,14 @@ interface Props {
   /** Virtualization starts at this number of author groups. Set to Infinity to disable. */
   virtualizeAfter?: number;
   overscan?: number;
+  /** Per-message controls (feedback, copy, regenerate, edit) under each finished message. */
+  actions?: Snippet<[ChatMessage, ChatMessageActions]>;
+  /** Saves an inline edit; return false or reject to keep the editor open. */
+  onEdit?: (message: ChatMessage, body: string) => unknown;
   class?: ClassValue;
 }
+
+const uid = $props.id();
 
 let {
   messages,
@@ -36,6 +43,8 @@ let {
   labels: labelOverrides = {},
   virtualizeAfter = 100,
   overscan = 5,
+  actions,
+  onEdit,
   class: className,
 }: Props = $props();
 
@@ -55,6 +64,14 @@ let anchorBeforeUpdate: ScrollAnchor | null = null;
 /** The virtual window as last rendered: row starts here match the DOM. */
 let rendered: VirtualWindow | null = null;
 let remeasureFrame = 0;
+/** The reader is at the bottom; false shows the jump-to-latest control. */
+let atBottom = $state(true);
+/** Messages arrived while the reader was scrolled up. */
+let unseen = $state(false);
+let editingId = $state<string | null>(null);
+let editDraft = $state('');
+let editSaving = $state(false);
+let editReturn: HTMLElement | null = null;
 
 /** A rendered row and where it sat, used to keep it still while offsets change. */
 interface ScrollAnchor {
@@ -142,6 +159,77 @@ function onScroll(event: Event): void {
   scrollTop = element.scrollTop;
   viewportSize = element.clientHeight || viewportSize;
   stickToBottom = nearBottom(element);
+  setAtBottom(stickToBottom);
+}
+
+function setAtBottom(value: boolean): void {
+  atBottom = value;
+  if (value) unseen = false;
+}
+
+function toBottom(element: HTMLElement): void {
+  element.scrollTop = element.scrollHeight;
+  scrollTop = element.scrollTop;
+  setAtBottom(true);
+}
+
+function jumpToLatest(): void {
+  const element = viewport;
+  if (!element) return;
+  stickToBottom = true;
+  toBottom(element);
+  // The control leaves once the reader is at the bottom; focus stays in the log.
+  element.focus();
+}
+
+function startEdit(message: ChatMessage): void {
+  if (!onEdit || message.streaming) return;
+  const active = document.activeElement;
+  editReturn = active instanceof HTMLElement ? active : null;
+  editDraft = message.body;
+  editingId = message.id;
+}
+
+function endEdit(): void {
+  editingId = null;
+  const target = editReturn;
+  editReturn = null;
+  void tick().then(() => (target?.isConnected ? target : viewport)?.focus());
+}
+
+async function saveEdit(message: ChatMessage): Promise<void> {
+  const next = editDraft.trim();
+  if (editSaving || next === '') return;
+  if (next === message.body) return endEdit();
+  editSaving = true;
+  try {
+    if ((await onEdit?.(message, next)) !== false) endEdit();
+  } catch {
+    // A rejected save keeps the editor open with the draft.
+  } finally {
+    editSaving = false;
+  }
+}
+
+function editKeydown(event: KeyboardEvent, message: ChatMessage): void {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    event.stopPropagation();
+    endEdit();
+  } else if (
+    event.key === 'Enter' &&
+    !event.shiftKey &&
+    !event.isComposing &&
+    event.keyCode !== 229
+  ) {
+    event.preventDefault();
+    void saveEdit(message);
+  }
+}
+
+function focusEnd(node: HTMLTextAreaElement): void {
+  node.focus();
+  node.setSelectionRange(node.value.length, node.value.length);
 }
 
 // The topmost rendered row in view, with the start it was rendered at. The
@@ -249,16 +337,16 @@ $effect(() => {
     last.id !== previousLastId &&
     last.author.id === currentUserId;
   const shouldStick = count > previousCount && (stickToBottom || ownNewMessage);
+  const previousCountBefore = previousCount;
   previousCount = count;
   previousFirstId = firstId;
   previousLastId = last?.id;
   if (!viewport) return;
   const element = viewport;
   if (shouldStick) {
-    void tick().then(() => {
-      element.scrollTop = element.scrollHeight;
-      scrollTop = element.scrollTop;
-    });
+    void tick().then(() => toBottom(element));
+  } else if (count > previousCountBefore && !prepended) {
+    unseen = true;
   } else if (prepended) {
     // Virtual rows: keep the anchor row still, using model offsets that the
     // DOM has just rendered. Comparing scrollHeight before and after would mix
@@ -270,6 +358,19 @@ $effect(() => {
       scrollTop = element.scrollTop;
     });
   }
+});
+
+// A streamed reply grows without adding messages: follow it while the reader
+// is at the bottom, and leave the view alone once they scroll up.
+$effect(() => {
+  const last = messages[messages.length - 1];
+  if (!last?.streaming) return;
+  void last.body;
+  const element = viewport;
+  if (!element || !stickToBottom) return;
+  void tick().then(() => {
+    if (stickToBottom) toBottom(element);
+  });
 });
 </script>
 
@@ -333,7 +434,33 @@ $effect(() => {
                 </p>
               {/if}
               {#each group.messages as message (message.id)}
-                {#if message.streaming}
+                {#if editingId === message.id && !message.streaming}
+                  <form
+                    class="tx-chat-message-edit"
+                    data-tx-chat-edit
+                    aria-live="off"
+                    onsubmit={(event) => {
+                      event.preventDefault();
+                      void saveEdit(message);
+                    }}
+                  >
+                    <label class="tx-chat-message__sr" for={`${uid}-edit`}>{labels.editInput}</label>
+                    <textarea
+                      id={`${uid}-edit`}
+                      class="tx-chat-message-edit__field"
+                      rows="3"
+                      value={editDraft}
+                      readonly={editSaving}
+                      use:focusEnd
+                      oninput={(event) => (editDraft = event.currentTarget.value)}
+                      onkeydown={(event) => editKeydown(event, message)}
+                    ></textarea>
+                    <div class="tx-chat-message-edit__actions">
+                      <Button size="sm" variant="ghost" onclick={endEdit}>{labels.cancelEdit}</Button>
+                      <Button type="submit" size="sm" disabled={editDraft.trim() === ''} loading={editSaving}>{labels.saveEdit}</Button>
+                    </div>
+                  </form>
+                {:else if message.streaming}
                   <!-- Partial text is hidden from the live log so it is not read token by token;
                        the finished message replaces this node and is announced once. -->
                   <div class={cx('tx-chat-message', own && 'tx-chat-message--own', 'tx-chat-message--streaming')} data-streaming aria-busy="true">
@@ -350,6 +477,12 @@ $effect(() => {
                     {statusText[message.status]}
                   </p>
                 {/if}
+                {#if actions && !message.streaming}
+                  <!-- Controls stay out of the live log's announcements. -->
+                  <div class="tx-chat-message__actions" data-message-actions={message.id} aria-live="off">
+                    {@render actions(message, { edit: () => startEdit(message), canEdit: onEdit !== undefined })}
+                  </div>
+                {/if}
               {/each}
             </div>
           </div>
@@ -358,7 +491,13 @@ $effect(() => {
     </div>
   {/if}
   {@render footer?.()}
+  {#if !atBottom && messages.length > 0}
+    <div class="tx-chat-message-list__jump" aria-live="off">
+      <Button size="sm" variant="secondary" onclick={jumpToLatest} data-tx-chat-jump>{labels.jumpToLatest}</Button>
+    </div>
+  {/if}
 </div>
+<span class="tx-chat-message__sr" role="status">{unseen && !atBottom ? labels.newBelow : ''}</span>
 
 <style>
   @layer tx.components {
@@ -404,6 +543,12 @@ $effect(() => {
     .tx-chat-message-list__day { position: relative; display: flex; align-items: center; justify-content: center; margin-block: 0.35rem; color: var(--tx-muted-foreground, GrayText); font-size: 0.75rem; }
     .tx-chat-message-list__day::before { position: absolute; inset-inline: 0; block-size: 1px; background: var(--tx-border, ButtonBorder); content: ''; }
     .tx-chat-message-list__day span { position: relative; background: var(--tx-surface, Canvas); padding-inline: 0.5rem; }
+    .tx-chat-message__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem; }
+    .tx-chat-message-edit { display: grid; inline-size: min(100%, 32rem); gap: 0.5rem; }
+    .tx-chat-message-edit__field { box-sizing: border-box; inline-size: 100%; margin: 0; border: 1px solid var(--tx-input, var(--tx-border, CanvasText)); border-radius: var(--tx-radius, 0.375rem); background: var(--tx-surface, Canvas); color: var(--tx-foreground, CanvasText); padding: 0.5rem 0.75rem; font: inherit; resize: vertical; }
+    .tx-chat-message-edit__field:focus-visible { outline: 2px solid var(--tx-ring, Highlight); outline-offset: 1px; }
+    .tx-chat-message-edit__actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+    .tx-chat-message-list__jump { position: sticky; inset-block-end: 0; display: flex; block-size: 0; flex: none; align-items: flex-end; justify-content: center; overflow: visible; }
     .tx-chat-message-list__empty { margin: auto; color: var(--tx-muted-foreground, GrayText); text-align: center; }
 
     @media (min-width: 640px) {

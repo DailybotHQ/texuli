@@ -3,7 +3,11 @@ import type { Snippet } from 'svelte';
 import { Button } from 'texuli/button';
 import { type ClassValue, cx } from 'texuli/cx';
 import { autosizeTextarea } from 'texuli/input';
-import { type ComposerLabels, DEFAULT_COMPOSER_LABELS } from './labels.ts';
+import {
+  type ComposerActionContext,
+  type ComposerLabels,
+  DEFAULT_COMPOSER_LABELS,
+} from './labels.ts';
 
 interface Props {
   value?: string;
@@ -15,8 +19,23 @@ interface Props {
   sending?: boolean;
   maxRows?: number;
   maxLength?: number;
-  /** Attachment and other controls rendered beside the send button. */
+  /** Attachment and other controls rendered at the start of the action row. */
   attachments?: Snippet;
+  /**
+   * Host controls (a model choice, a custom send) rendered just before the
+   * send or stop button, with the composer state and its `submit`/`stop`.
+   */
+  actions?: Snippet<[ComposerActionContext]>;
+  /** A reply is streaming: the send button becomes Stop and Escape stops it. */
+  streaming?: boolean;
+  /** Called by the Stop button, or Escape in the field, while `streaming`. */
+  onStop?: () => void;
+  /**
+   * Runs before the built-in keys (Enter to send, Escape to stop); call
+   * `event.preventDefault()` to take the key over, for example for a
+   * suggestion list or history.
+   */
+  onkeydown?: (event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }) => void;
   class?: ClassValue;
 }
 
@@ -30,6 +49,10 @@ let {
   maxRows = 6,
   maxLength,
   attachments,
+  actions,
+  streaming = false,
+  onStop,
+  onkeydown,
   class: className,
 }: Props = $props();
 
@@ -39,7 +62,7 @@ let error = $state(false);
 let composing = $state(false);
 const labels = $derived({ ...DEFAULT_COMPOSER_LABELS, ...labelOverrides });
 const busy = $derived(sending || pending);
-const canSend = $derived(!disabled && !busy && value.trim().length > 0);
+const canSend = $derived(!disabled && !busy && !streaming && value.trim().length > 0);
 const hintId = `chat-composer-${id}-hint`;
 const errorId = `chat-composer-${id}-error`;
 
@@ -78,8 +101,20 @@ async function submit(): Promise<void> {
   }
 }
 
-function onKeydown(event: KeyboardEvent): void {
-  if (
+function stop(): void {
+  if (!streaming || !onStop) return;
+  onStop();
+  // The Stop button leaves with the stream; keep focus in the composer.
+  field?.focus();
+}
+
+function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }): void {
+  onkeydown?.(event);
+  if (event.defaultPrevented) return;
+  if (event.key === 'Escape' && streaming && onStop) {
+    event.preventDefault();
+    stop();
+  } else if (
     event.key === 'Enter' &&
     !event.shiftKey &&
     !event.isComposing &&
@@ -123,16 +158,25 @@ function onKeydown(event: KeyboardEvent): void {
   ></textarea>
   <div class="tx-chat-composer__actions">
     <div class="tx-chat-composer__attachments">{@render attachments?.()}</div>
-    <Button
-      type="submit"
-      variant="outline"
-      size="sm"
-      disabled={!canSend}
-      loading={busy}
-      loadingLabel={labels.sending}
-    >
-      {labels.send}
-    </Button>
+    <div class="tx-chat-composer__end">
+      {@render actions?.({ canSend, busy, streaming, submit, stop })}
+      {#if streaming && onStop}
+        <Button type="button" variant="outline" size="sm" aria-keyshortcuts="Escape" onclick={stop} data-tx-chat-stop>
+          {labels.stop}
+        </Button>
+      {:else}
+        <Button
+          type="submit"
+          variant="outline"
+          size="sm"
+          disabled={!canSend}
+          loading={busy}
+          loadingLabel={labels.sending}
+        >
+          {labels.send}
+        </Button>
+      {/if}
+    </div>
   </div>
   <span id={hintId} class="visually-hidden">{labels.hint}</span>
   {#if error}<p id={errorId} class="tx-chat-composer__error" role="alert">{labels.sendError}</p>{/if}
@@ -193,6 +237,12 @@ function onKeydown(event: KeyboardEvent): void {
       align-items: end;
       justify-content: space-between;
       gap: 0.75rem;
+    }
+
+    .tx-chat-composer__end {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .tx-chat-composer__attachments {

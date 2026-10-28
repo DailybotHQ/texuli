@@ -75,6 +75,28 @@ connection.
 This component does not provide message persistence, delivery, encryption, or
 network behavior.
 
+## Message actions, inline edit and the scroll anchor (G33)
+
+- `actions` is a snippet rendered under each finished message (never
+  while it streams) with the message and a `ChatMessageActions` object:
+  `edit()` and `canEdit`. Use it for feedback, copy, regenerate or edit
+  buttons. The row is excluded from the live log's announcements.
+- `onEdit(message, body)` enables inline edit. `edit()` swaps the bubble
+  for a labelled textarea ("Edit message") with Save and Cancel, and
+  focuses it. Enter saves, Shift+Enter adds a line, and Escape cancels.
+  An unchanged body just closes. Return `false`, or reject, to keep the
+  editor open with the draft. On close, focus returns to the control that
+  opened the editor (or the log when it is gone).
+- While the reader is at the bottom, the list follows a streaming reply as
+  it grows. Once they scroll up it stays put, and a "Jump to latest"
+  button appears. A polite status announces "New messages below" when
+  messages arrive while they are scrolled up. The button scrolls to the
+  bottom and moves focus to the log.
+
+The labels `jumpToLatest`, `newBelow`, `editInput`, `saveEdit` and
+`cancelEdit` translate these controls. `ChatThread` forwards `actions` and
+`onEdit`.
+
 ## Display transcript for the player (G10)
 
 `ChatThreadDisplay` and `ChatMessageDisplay` are the painters for the

@@ -5,6 +5,17 @@ export interface ComposerLabels {
   send: string;
   sending: string;
   sendError: string;
+  /** Name of the button that stops a streaming reply. */
+  stop: string;
+}
+
+/** What the `actions` snippet receives: the composer state and its commands. */
+export interface ComposerActionContext {
+  canSend: boolean;
+  busy: boolean;
+  streaming: boolean;
+  submit: () => Promise<void>;
+  stop: () => void;
 }
 
 export const DEFAULT_COMPOSER_LABELS: ComposerLabels = {
@@ -14,4 +25,5 @@ export const DEFAULT_COMPOSER_LABELS: ComposerLabels = {
   send: 'Send message',
   sending: 'Sending message',
   sendError: 'Your message could not be sent. Please try again.',
+  stop: 'Stop generating',
 };

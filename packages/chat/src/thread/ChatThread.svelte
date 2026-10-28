@@ -6,7 +6,7 @@ import type { ComposerLabels } from '../composer/labels.ts';
 import TypingIndicator from '../composer/TypingIndicator.svelte';
 import type { MessageListLabels } from './labels.ts';
 import MessageList from './MessageList.svelte';
-import type { ChatMessage } from './types.ts';
+import type { ChatMessage, ChatMessageActions } from './types.ts';
 
 interface Props {
   messages: ChatMessage[];
@@ -35,6 +35,13 @@ interface Props {
   virtualizeAfter?: number;
   /** Rows rendered beyond the view, forwarded to the list. */
   overscan?: number;
+  /** Per-message controls, forwarded to the list. */
+  actions?: Snippet<[ChatMessage, ChatMessageActions]>;
+  /** Inline edit save, forwarded to the list. */
+  onEdit?: (message: ChatMessage, body: string) => unknown;
+  /** A reply is streaming: the built-in composer shows Stop (with `onStop`). */
+  streaming?: boolean;
+  onStop?: () => void;
   class?: ClassValue;
 }
 
@@ -57,6 +64,10 @@ let {
   label,
   virtualizeAfter,
   overscan,
+  actions,
+  onEdit,
+  streaming = false,
+  onStop,
   class: className,
 }: Props = $props();
 </script>
@@ -73,6 +84,8 @@ let {
     {label}
     {virtualizeAfter}
     {overscan}
+    {actions}
+    {onEdit}
   >
     {#snippet footer()}
       <TypingIndicator names={typing} class="tx-chat-thread__typing" />
@@ -89,6 +102,8 @@ let {
         onSubmit={onSend}
         {sending}
         {disabled}
+        {streaming}
+        {onStop}
         labels={placeholder ? { ...composerLabels, placeholder } : composerLabels}
       />
     </div>

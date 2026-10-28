@@ -15,6 +15,24 @@ localized `labels.sendError`. Unexpected exception details are not shown.
 Successful sends clear the draft. Override any `ComposerLabels` field for
 translated input, placeholder, keyboard hint, send, pending, and error text.
 
+## Streaming stop, key hook and actions (G32)
+
+- `streaming` marks a running reply. With `onStop`, the send button becomes
+  a Stop button named by `labels.stop` ("Stop generating", with
+  `aria-keyshortcuts="Escape"`), and Escape in the field calls `onStop`
+  too. Focus stays in the field after a stop. Enter does not send while
+  `streaming` is true; the field stays editable so the next message can be
+  drafted.
+- `onkeydown` runs before the built-in keys (Enter to send, Escape to
+  stop). Call `event.preventDefault()` to take a key over, for example to
+  drive a suggestion list or message history; otherwise the built-in
+  handling still runs.
+- The `actions` snippet renders just before the send or stop button, for
+  a model choice or a custom control. It receives a `ComposerActionContext`:
+  `canSend`, `busy`, `streaming`, `submit()` and `stop()`.
+
+`ChatThread` forwards `streaming` and `onStop` to its built-in composer.
+
 ## Host composer chrome (G21 contract)
 
 The composer is host chrome: it belongs to the application, never to
