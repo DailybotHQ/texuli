@@ -4,13 +4,13 @@ The deck generator: one validated deck model (v2) that you write as JSON or
 as Markdown, presented by the `@texuli/slides` stage and exported to print,
 PDF and PPTX.
 
-**Status: in development, not on npm.** `@texuli/deck` (the L0 engine,
-`0.4.0` in the repository) has never been published. The `@texuli/slides`
-stage in the repository is built on it (L8) and is ahead of npm, where
-`@texuli/slides` `0.3.0` still carries the previous model (the v1 recipe in
-[`recipes.md`](recipes.md) section 4). Spec `0.4.0`, which encodes deck
-model v2, is in the repository only. Everything here runs in a Texuli
-workspace; do not tell a consumer app to install it.
+**Status: in development, on npm from `0.4.0`.** `@texuli/deck` (the L0
+engine) is first published in `0.4.0`. The `@texuli/slides` `0.4.0` stage is
+built on it (L8); `@texuli/slides` `0.3.0` carries the previous model (the v1
+recipe in [`recipes.md`](recipes.md) section 4). Spec `0.4.0`, which encodes
+deck model v2, ships in `@texuli/spec` `0.4.0`. A consumer app installs
+`@texuli/deck` and `@texuli/slides` `0.4.0` or later; never `0.3.0` for v2
+decks.
 
 | Package | Layer | Use it for |
 | --- | --- | --- |
@@ -268,7 +268,7 @@ if (prepared.ok) {
 ## 5. Agent tooling
 
 From a Texuli checkout, the `deck` command of the `texuli` CLI (also the
-`texuli-deck` bin of `@texuli/tools`, repository only) prints JSON and exits
+`texuli-deck` bin of `@texuli/tools`, new in `0.4.0`) prints JSON and exits
 1 when a deck is invalid:
 
 ```bash

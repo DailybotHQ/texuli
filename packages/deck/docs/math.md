@@ -6,7 +6,7 @@ converter returns plain objects built only from a closed set of MathML Core
 elements and attributes, and a renderer walks that tree. Nothing here can
 reach an HTML sink.
 
-> **Status:** in the repository as `@texuli/deck` `0.4.0`, not on npm. Block
+> **Status:** in development; `@texuli/deck` is on npm from `0.4.0`. Block
 > math (`$$ … $$` in the [Markdown dialect](markdown.md#math), or a
 > `{ "type": "math", "tex": "…" }` block in JSON) is supported. Inline `$…$`
 > inside text blocks stays as written; rendering it needs an opt-in in

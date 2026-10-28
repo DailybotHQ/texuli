@@ -122,9 +122,9 @@ known family instead of skipping it.
 
 **Tests:** `packages/catalog/tests/validate-deck-draft.test.ts`
 
-> **Unreleased.** Deck model v2 trees, spec `0.4.0` and the functions below
-> are in the repository only; they reach npm with the next owner-approved
-> release. `@texuli/deck`, which owns the model, has never been published.
+> **New in `0.4.0`.** Deck model v2 trees, spec `0.4.0` and the functions
+> below ship in `@texuli/catalog` `0.4.0`, with the first release of
+> `@texuli/deck`, which owns the model.
 
 `validateDeckDraft(input, options)` is the entry for a deck an agent writes
 as a catalog tree. It runs `validateDraft` at the host's tier (`untrusted`

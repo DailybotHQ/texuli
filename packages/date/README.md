@@ -11,10 +11,10 @@ you need small, framework-free date-only math (add months, find the start of
 a locale's week, count the weeks in a month) without a larger date library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.3.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release); `0.3.0` is the first release of `@texuli/date`. Under 0.x,
-> a new minor (`0.4.0`) may contain breaking changes, so pin the exact
-> version or use `^0.3.0`, which accepts only 0.3.x.
+> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release); `@texuli/date` was first released in `0.3.0`. Under 0.x,
+> a new minor (`0.5.0`) may contain breaking changes, so pin the exact
+> version or use `^0.4.0`, which accepts only 0.4.x.
 
 ## Install
 

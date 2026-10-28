@@ -10,16 +10,15 @@ output stays inside a labelled frame with a visible trust badge, and the
 player never navigates, fetches or persists anything on its own.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.3.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.4.0`) may contain breaking
-> changes, so pin the exact version or use `^0.3.0`, which accepts only 0.3.x.
+> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.5.0`) may contain breaking
+> changes, so pin the exact version or use `^0.4.0`, which accepts only 0.4.x.
 
-> **Unreleased in this README.** The repository is ahead of npm: spec 0.3.0
-> envelopes (`state`, `flow`, `bind`, `on` and the closed actions), the
-> data view, chat display, sortable list and workflow graph painters, and
-> the shared drag scope are not in the published `0.3.0`. They ship with
-> the next owner-approved release, after `@texuli/drag` and
-> `@texuli/workflows` are published
+> **New in `0.4.0`.** Spec 0.3.0 and 0.4.0 envelopes (`state`, `flow`,
+> `bind`, `on` and the closed actions), the data view, chat display,
+> sortable list and workflow graph painters, the shared drag scope, the
+> `deckHost` seam and `chrome={false}` ship in `0.4.0`; the `0.3.0` release
+> predates them
 > ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 ## Install
@@ -116,7 +115,7 @@ The TypeScript declarations list the full surface.
 - **No side effects.** Controls write local state only. An action form
   proposes an intent to your `onAction` handler, and the player sends
   nothing itself.
-- **Every emittable id paints from JSON (unreleased).** All 66
+- **Every emittable id paints from JSON (new in `0.4.0`).** All 66
   agent-emittable ids of the 158-id catalog have a painter (the other ids
   are app tier, refused at the untrusted tier), including data views (grid, tree, board,
   calendar, timeline, map, files), chat display, `sortable-list` and
@@ -124,7 +123,7 @@ The TypeScript declarations list the full surface.
   runs only the closed actions (`setState`, `toggleState`, `moveItem`,
   `flowGo`, `emit`, `submit`), and `bind` writes back only to declared
   variables. The chat composer stays host chrome.
-- **One drag scope (unreleased).** `sortable-list` nodes share one drag
+- **One drag scope (new in `0.4.0`).** `sortable-list` nodes share one drag
   scope, so an item moves between lists anywhere in the layout under the
   same group, `accepts`, `locked`, `pull` and `maxItems` rules that
   `moveItem` applies; the drag offers exactly what the data move does.
@@ -144,7 +143,7 @@ The TypeScript declarations list the full surface.
 Not built yet: painting the catalog core's closed intents (such as
 `navigate` or `copy`), retrying a failed node, and a hosted player-frame
 page. Decks paint as a document flow; the slide-by-slide presenter stage
-lives in `@texuli/slides`. Unreleased (in the repository, not on npm yet): a
+lives in `@texuli/slides`. New in `0.4.0`: a
 host that has both packages passes a `deckHost` to present a deck blueprint
 on that stage instead, and `chrome={false}` paints a component with no frame
 chrome, as the slides stage does for every component on a slide

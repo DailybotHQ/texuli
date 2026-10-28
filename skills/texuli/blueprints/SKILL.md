@@ -194,7 +194,7 @@ is recorded passing in `native/README.md`, and nothing is on Maven Central).
 
 ## G — Interaction as data (spec 0.3.0)
 
-Unreleased: in the repository, not in the npm `0.3.0` packages. Detail and a
+New in the `0.4.0` packages; `0.3.0` predates it. Detail and a
 validated example: [`references/interaction.md`](references/interaction.md).
 
 - **State and flow** live in the envelope (`state`, `flow`); props read them

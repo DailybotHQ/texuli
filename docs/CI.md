@@ -90,17 +90,17 @@ browser visual test.
 then publishes the packable packages in the wave order documented in
 [RELEASE](RELEASE.md), always `--tag next`, then points `latest` at the
 same versions: `latest` tracks the newest release (owner decision
-2026-10-27; both name `0.3.0` once the post-merge run publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
+2026-10-27; both name `0.4.0` once the post-merge run publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
 GitHub's OIDC token (`id-token: write`).
 
-`publish.yml` lists `@texuli/drag` and `@texuli/workflows` (both in
-development, versioned `0.3.0`) ahead of the packages that depend on them
-(owner decision 2026-10-27). A manual `workflow_dispatch` run on `main`
-(run 40616266068, 2026-10-28 UTC) published both for the first time as
-`0.3.0`, with provenance, and pointed `latest` and `next` at it. The same
-run skipped the other 16 packages: the publish loop skips versions npm
-already has, so a package changed since its published `0.3.0` (every
-PLAN_007 change outside drag and workflows) needs a new version first
+`publish.yml` lists `@texuli/drag`, `@texuli/workflows` and
+`@texuli/deck` (all in development) ahead of the packages that depend on
+them (owner decision 2026-10-27). A manual `workflow_dispatch` run on `main`
+(run 40616266068, 2026-10-28 UTC) published drag and workflows for the
+first time as `0.3.0`; `@texuli/deck` is first published in `0.4.0`, the
+release in which all 19 packable packages move together. The publish loop
+skips versions npm already has, so a package changed since its published
+version needs a new version first
 ([RELEASE](RELEASE.md#publication-waves)).
 
 One-time setup, already done: the repository secret `NPM_TOKEN` holds a
@@ -108,7 +108,7 @@ granular access token of the publishing account with read-and-write on
 the `@texuli` packages. CI tokens bypass the 2FA one-time-password flow
 that blocks terminal publishes.
 
-To release: push a tag (`v0.3.0`) or run the workflow from the
+To release: push a tag (`v0.4.0`) or run the workflow from the
 Actions tab against `main`. Never overwrite a published version; new
 content means a new version.
 

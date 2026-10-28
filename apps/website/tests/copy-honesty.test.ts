@@ -62,24 +62,24 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   { phrase: /production[- ]ready/i, why: 'nothing is released as stable' },
   {
     phrase: /Nothing is on npm/i,
-    why: 'every package is on npm as 0.3.0, and the site is deployed',
+    why: 'every package is on npm as 0.4.0, and the site is deployed',
   },
   {
     phrase: /\b0\.1\.0\b/,
-    why: 'the 0.1.0-next.N previews are superseded: name the current release, 0.3.0',
+    why: 'the 0.1.0-next.N previews are superseded: name the current release, 0.4.0',
   },
   {
     // A URL segment such as the agentskills discovery schema `/0.2.0/` is not a release claim.
     phrase: /(?<![/\w.-])0\.2\.0\b/,
-    why: '0.2.0 is superseded: name the current release, 0.3.0',
+    why: '0.2.0 is superseded: name the current release, 0.4.0',
   },
   {
     phrase: /texuli(?:\/[a-z-]+)?@next\b/,
-    why: 'install plainly: latest and next both name 0.3.0',
+    why: 'install plainly: latest and next both name 0.4.0',
   },
   {
     phrase: /not released yet/i,
-    why: '0.3.0 is published; say "no stable release yet" instead',
+    why: '0.4.0 is published; say "no stable release yet" instead',
   },
   { phrase: /token engine/i, why: 'the word list calls @texuli/tokens the theme engine' },
   {
@@ -88,7 +88,7 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   },
   {
     phrase: /stable release is (out|available|published)/i,
-    why: '0.3.0 is pre-1.0; 1.0.0 will be the first stable release',
+    why: '0.4.0 is pre-1.0; 1.0.0 will be the first stable release',
   },
 ];
 
@@ -120,22 +120,21 @@ describe('site copy honesty', () => {
   });
 
   it('never calls a published package unpublished', () => {
-    // All 18 packages on the 0.3.0 line are on npm: @texuli/date first
-    // shipped in 0.3.0, and @texuli/drag and @texuli/workflows were first
-    // published as 0.3.0 on 2026-10-28 (UTC). Not on npm: the private 0.0.0
+    // All 19 packages of the 0.4.0 release are on npm, @texuli/deck
+    // included (first published in 0.4.0). Not on npm: the private 0.0.0
     // workspaces (editor, examples).
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
       try {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')
         ) as { version?: string };
-        return pkg.version === '0.3.0';
+        return pkg.version === '0.4.0';
       } catch {
         return false;
       }
     });
-    expect(published).toHaveLength(18);
-    for (const dir of ['date', 'drag', 'workflows']) expect(published).toContain(dir);
+    expect(published).toHaveLength(19);
+    for (const dir of ['date', 'deck', 'drag', 'workflows']) expect(published).toContain(dir);
     const wrong: string[] = [];
     for (const file of files) {
       const copy = copyOf(file);

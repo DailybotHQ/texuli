@@ -2,9 +2,10 @@
 
 A blueprint can carry a whole working screen as JSON: local state, flows,
 two-way bindings, a closed action set, drag as data and workflow graphs.
-Nothing in it is evaluated. **Unreleased:** spec 0.3.0, its catalog groups
-and the player's interaction are in the repository, not in the npm `0.3.0`
-packages (npm's `@texuli/spec@0.3.0` carries spec 0.2.0).
+Nothing in it is evaluated. **New in `0.4.0`:** spec 0.3.0, its catalog groups
+and the player's interaction ship in the `0.4.0` packages, not in `0.3.0`
+(`@texuli/spec@0.3.0` carries spec 0.2.0; `@texuli/spec@0.4.0` carries spec
+0.4.0).
 
 Contract in depth: `packages/spec/docs/contract.md`. Validated, painted
 examples: `packages/spec/fixtures/golden/` (`app-dashboard`, `mobile-flow`,

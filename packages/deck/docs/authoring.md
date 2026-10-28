@@ -5,7 +5,7 @@ layout selection, brief outlines that draft a deck, quality lint and bounded
 RFC 6902 JSON Patch (ADR-009). Everything is pure and deterministic; the same
 input always gives the same deck.
 
-> **Status:** in the repository as `@texuli/deck` `0.4.0`, not on npm.
+> **Status:** in development; `@texuli/deck` is on npm from `0.4.0`.
 
 ## Builder
 

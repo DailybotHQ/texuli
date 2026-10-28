@@ -86,6 +86,6 @@ export const SLIDES_KEYS: readonly SlidesKey[] = [
   { keys: ['Esc'], action: 'close the top layer' },
 ];
 
-/** Honest status line (the 0.4.0 model is in the repository only). */
+/** Honest status line (the 0.4.0 release is the first with the v2 stage). */
 export const SLIDES_STATUS =
-  'The 0.4.0 slides stage and @texuli/deck are in development and in the repository only; @texuli/slides 0.3.0 on npm has the previous deck model.';
+  'The slides stage and @texuli/deck are in development and on npm as 0.4.0, a pre-1.0 release; @texuli/slides 0.3.0 has the previous deck model.';

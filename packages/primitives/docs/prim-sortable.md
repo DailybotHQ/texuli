@@ -4,9 +4,8 @@
 [`@texuli/drag`](../../drag/README.md) sortable engine to Svelte 5:
 reorderable lists in every axis, lists that exchange items in a group,
 clone on pull, swap, multi-item drags and locked items, with keyboard,
-pointer and touch input and localized announcements. Unreleased: it is in
-the repository, not in the published `0.3.0`, and `@texuli/drag` is not on
-npm yet.
+pointer and touch input and localized announcements. New in `0.4.0`: it is
+not in `0.3.0`.
 
 ```svelte
 <script lang="ts">

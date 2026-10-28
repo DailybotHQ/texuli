@@ -9,10 +9,10 @@ own, in Node or behind a view of your own. It is part of
 Svelte 5 component library by Dailybot, Inc., for teams building
 data-heavy product screens.
 
-> **Status: 0.x release.** `@texuli/data` is published on npm as `0.3.0`, a
+> **Status: 0.x release.** `@texuli/data` is published on npm as `0.4.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.4.0`) may contain breaking changes, so pin the exact version or
-> use `^0.3.0`, which accepts only 0.3.x.
+> minor (`0.5.0`) may contain breaking changes, so pin the exact version or
+> use `^0.4.0`, which accepts only 0.4.x.
 
 ## Install
 
@@ -121,15 +121,15 @@ The package root, `@texuli/data`, re-exports the main views and helpers.
 **Known limit:** fence editing on the map is not implemented yet; fences are
 drawn and listed only.
 
-## Unreleased
+## New in 0.4.0
 
-In the repository, not in the published `0.3.0`:
+Not in the `0.3.0` release:
 
 - **One drag engine.** The board, tree view, calendar, timeline and grid
   column moves run on
   [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md)
-  (in development, on npm as `0.3.0`; the published `@texuli/data` `0.3.0`
-  predates this migration):
+  (in development, on npm as `0.4.0`; `@texuli/data` `0.3.0` predates this
+  migration):
   one pointer gesture tracker (capture, threshold, `pointercancel` as
   cancel). The board and tree view also announce moves from localized
   `DragMessages` templates, overridable with their new `messages` prop.

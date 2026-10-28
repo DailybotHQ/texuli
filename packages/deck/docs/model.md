@@ -6,8 +6,8 @@ TypeScript types and a JSON Schema 2020-12 export. Everything here is data
 and pure functions: no Svelte, no DOM, no fetching, and no function throws on
 bad input.
 
-> **Status:** in the repository as `@texuli/deck` `0.4.0`, not on npm. The
-> npm `@texuli/slides` `0.3.0` uses the previous deck model; migrate those
+> **Status:** in development; `@texuli/deck` is on npm from `0.4.0`. The
+> `@texuli/slides` `0.3.0` uses the previous deck model; migrate those
 > decks with `migrateDeck` (below).
 
 ```ts

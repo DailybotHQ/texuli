@@ -14,17 +14,16 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.3.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.4.0`) may contain breaking
-> changes, so pin the exact version or use `^0.3.0`, which accepts only 0.3.x.
+> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.5.0`) may contain breaking
+> changes, so pin the exact version or use `^0.4.0`, which accepts only 0.4.x.
 
-> **Unreleased in this README.** `@texuli/spec@0.3.0` on npm carries **spec
-> 0.2.0** and only the root and `codegen` subpaths. The repository is at
-> **spec 0.4.0**: spec 0.3.0 (state, bindings, closed actions, `reorder`,
-> workflow graphs), spec 0.4.0 (deck model v2 on `layout-deck` and
-> `deck-slide`, below) and the `workflow`, `migrate` and `surface` subpaths
-> described below are in the repository only, and reach npm with the next
-> owner-approved release
+> **New in `0.4.0`.** `@texuli/spec@0.4.0` carries **spec 0.4.0**: spec
+> 0.3.0 (state, bindings, closed actions, `reorder`, workflow graphs), spec
+> 0.4.0 (deck model v2 on `layout-deck` and `deck-slide`, below) and the
+> `workflow`, `migrate` and `surface` subpaths described below.
+> `@texuli/spec@0.3.0` carried spec 0.2.0 and only the root and `codegen`
+> subpaths
 > ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 ## Install
@@ -57,7 +56,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.4.0' in the repository
+SPEC_VERSION;                         // the spec version: '0.4.0'
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -142,7 +141,7 @@ warning without failing.
   `submit`) on a closed event vocabulary, drag as data (`reorder`) and
   workflow graphs (at most 500 nodes and 2,000 edges). Nothing in a
   blueprint is evaluated.
-- **Decks as data.** Spec 0.4.0 (in the repository; ADR-009) gives
+- **Decks as data.** Spec 0.4.0 (ADR-009) gives
   `layout-deck` and `deck-slide` optional deck model v2 props: the 9:16
   aspect, the `slide`, `zoom` and `morph` transitions, motion, navigation,
   outline, a slide `layout` with its `props`, `background`, step labels and
@@ -153,8 +152,8 @@ warning without failing.
   limits and rendering live in the runtime validator of
   [`@texuli/catalog`](https://www.npmjs.com/package/@texuli/catalog). The
   reducers that run the actions belong to the runtime
-  ([`@texuli/player`](https://www.npmjs.com/package/@texuli/player)); in
-  this repository it runs every 0.3.0 action).
+  ([`@texuli/player`](https://www.npmjs.com/package/@texuli/player)), which
+  runs every 0.3.0 action from `0.4.0`).
 - **A blueprint that validates paints.** The state surface rules
   (`@texuli/spec/surface`) refuse exactly what the player refuses at paint
   time: form fields and submits outside an `action-form`, nested forms,

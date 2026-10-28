@@ -1,6 +1,6 @@
 # Embedding the player
 
-**Package:** `@texuli/player` (on npm as `0.3.0`, a pre-1.0 release; no
+**Package:** `@texuli/player` (on npm as `0.4.0`, a pre-1.0 release; no
 stable 1.0.0 yet)
 
 How to put a validated catalog blueprint on a page: quick start, the props a
@@ -212,8 +212,7 @@ section. A hosted frame page on a dedicated origin is planned, not built.
 
 ## Frameless and deck hosts
 
-Unreleased: both props are in the repository and reach npm with the next
-owner-approved release.
+New in `0.4.0`: neither prop is in `0.3.0`.
 
 **`chrome={false}`.** The `@texuli/slides` stage paints each catalog
 component on a slide through a player with `chrome={false}`: the slide is

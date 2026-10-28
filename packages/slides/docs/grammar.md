@@ -9,8 +9,7 @@ Encodings between the model v1 deck ([model.md](model.md)) and catalog
 trees, plus the validation entry point for model v1 decks an agent returns.
 
 > **Model v1.** This subpath encodes the `0.3.0` deck model and is kept for
-> compatibility. Model v2 decks (the next minor, `0.4.0`, in the repository
-> and not on npm yet) travel as catalog trees too, under spec `0.4.0`; they
+> compatibility. Model v2 decks (new in `0.4.0`) travel as catalog trees too, under spec `0.4.0`; they
 > are validated by `@texuli/catalog/validate` and the `@texuli/deck` model,
 > not by this subpath. See [Model v2 deck trees](#model-v2-deck-trees).
 
@@ -117,8 +116,8 @@ The golden decks in [`tests/golden/`](../tests/golden) pin this end to end:
 
 ## Model v2 deck trees
 
-Spec `0.4.0` (in the repository only; npm's `@texuli/spec` still carries
-spec 0.2.0) extends the `layout-deck` and `deck-slide` manifests with
+Spec `0.4.0` (shipped by `@texuli/spec` `0.4.0`; `@texuli/spec` `0.3.0`
+carried spec 0.2.0) extends the `layout-deck` and `deck-slide` manifests with
 optional model v2 props: the 9:16 aspect, the `slide`, `zoom` and `morph`
 transitions, motion, navigation, outline, the slide `layout` and its
 `props`, `background`, step labels and component slides. A model v1 tree is
