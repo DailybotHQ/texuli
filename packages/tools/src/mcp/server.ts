@@ -6,6 +6,7 @@ import {
   listFullThemeLibrary,
   loadFullLibraryTheme,
 } from '@texuli/tokens/library-expand';
+import { DECK_COMMANDS, type DeckCommandName, runDeckCommand } from '../deck/index.ts';
 
 const PROTOCOL_VERSION = '2025-11-25';
 const SERVER_VERSION = '0.0.0';
@@ -81,6 +82,28 @@ const COMMON_ANNOTATIONS = {
 } as const;
 
 const TOOLS: readonly ToolDefinition[] = [
+  {
+    name: 'deck',
+    description: 'Inspect, validate and convert a Texuli deck with the shared v2 model.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        command: { type: 'string', enum: DECK_COMMANDS },
+        deck: {
+          type: 'object',
+          description: 'A JSON deck value for lint, inspect or to-markdown.',
+        },
+        markdown: {
+          type: 'string',
+          maxLength: 2000000,
+          description: 'A deck Markdown document for from-markdown.',
+        },
+      },
+      required: ['command'],
+      additionalProperties: false,
+    },
+    annotations: COMMON_ANNOTATIONS,
+  },
   {
     name: 'catalog',
     description: 'Search the built, content-addressed Texuli component catalog.',
@@ -190,6 +213,25 @@ export function createTexuliMcpServer(): (
   async function callTool(name: string, rawArgs: unknown): Promise<JsonObject> {
     if (!isObject(rawArgs)) throw new TypeError('Tool arguments must be an object.');
     const args = rawArgs;
+
+    if (name === 'deck') {
+      rejectUnknownArgs(args, ['command', 'deck', 'markdown']);
+      const command = stringArg(args, 'command', true) as DeckCommandName;
+      if (!(DECK_COMMANDS as readonly string[]).includes(command))
+        throw new TypeError(`Unknown deck command "${command}".`);
+      if (Object.hasOwn(args, 'markdown') && typeof args.markdown !== 'string')
+        throw new TypeError('"markdown" must be a string.');
+      if (
+        typeof args.markdown === 'string' &&
+        new TextEncoder().encode(args.markdown).byteLength > 2_000_000
+      )
+        throw new TypeError('Deck Markdown exceeds 2000000 bytes.');
+      const result = runDeckCommand(command, {
+        ...(Object.hasOwn(args, 'deck') ? { deck: args.deck } : {}),
+        ...(typeof args.markdown === 'string' ? { markdown: args.markdown } : {}),
+      });
+      return { result };
+    }
 
     if (name === 'catalog') {
       rejectUnknownArgs(args, ['query', 'group', 'tier', 'limit']);
@@ -352,7 +394,7 @@ export function createTexuliMcpServer(): (
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: 'texuli', version: SERVER_VERSION },
         instructions:
-          'Read-only catalog, component, validation, example and theme tools. No files or network are modified.',
+          'Read-only catalog, component, validation, example, theme and deck tools. No files or network are modified.',
       });
     }
 

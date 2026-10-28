@@ -52,13 +52,19 @@
     "./golden": {
       "types": "./src/golden/index.ts",
       "default": "./src/golden/index.ts"
+    },
+    "./deck": {
+      "types": "./src/deck/index.ts",
+      "default": "./src/deck/index.ts"
     }
   },
   "bin": {
+    "texuli": "./src/cli/texuli.ts",
     "texuli-add": "./src/cli-add/cli.ts",
     "texuli-init": "./src/cli-init/cli.ts",
     "texuli-llms": "./src/llms/cli.ts",
-    "texuli-update": "./src/cli-update/cli.ts"
+    "texuli-update": "./src/cli-update/cli.ts",
+    "texuli-deck": "./src/cli/deck.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"
@@ -69,7 +75,8 @@
     "@texuli/tokens": "0.3.0",
     "@texuli/blocks": "0.3.0",
     "@texuli/charts": "0.3.0",
-    "@texuli/media": "0.3.0"
+    "@texuli/media": "0.3.0",
+    "@texuli/deck": "0.4.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

@@ -1,0 +1,140 @@
+{
+  "formatVersion": 2,
+  "meta": {
+    "title": "Example presentation"
+  },
+  "slides": [
+    {
+      "id": "slide-title",
+      "title": "Example presentation",
+      "notes": "Draft guidance: Introduce the topic and presenter. Add only verified details from the brief or cited sources.",
+      "layout": "title-hero",
+      "props": {
+        "title": "Shipping calmer releases",
+        "subtitle": "What a small team learned in one year",
+        "meta": "Ada Example · Example Conf · 2026"
+      }
+    },
+    {
+      "id": "slide-hook",
+      "title": "A question to carry",
+      "notes": "Draft guidance: Open with a question or observation. Add only verified details from the brief or cited sources.",
+      "layout": "title-hero",
+      "props": {
+        "title": "A question to carry",
+        "subtitle": "What a small team learned in one year",
+        "meta": "Ada Example · Example Conf · 2026"
+      }
+    },
+    {
+      "id": "slide-story",
+      "title": "A concrete story",
+      "notes": "Draft guidance: Tell one sourced or personal story. Add only verified details from the brief or cited sources.",
+      "layout": "image-centered",
+      "props": {
+        "title": "A concrete story",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "caption": "Three stages, one direction."
+      }
+    },
+    {
+      "id": "slide-idea",
+      "title": "The idea",
+      "notes": "Draft guidance: Explain the central insight. Add only verified details from the brief or cited sources.",
+      "layout": "three-column-cards",
+      "props": {
+        "title": "The idea",
+        "cards": [
+          {
+            "icon": "zap",
+            "heading": "Small",
+            "body": "Ship the smallest useful change first."
+          },
+          {
+            "icon": "compass",
+            "heading": "Clear",
+            "body": "One sentence explains every change."
+          },
+          {
+            "icon": "users",
+            "heading": "Shared",
+            "body": "Anyone on the team can release."
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-practice",
+      "title": "What to try",
+      "notes": "Draft guidance: Offer a practical next step. Add only verified details from the brief or cited sources.",
+      "layout": "process-steps",
+      "props": {
+        "title": "What to try",
+        "steps": [
+          {
+            "title": "Propose",
+            "body": "Open a small pull request."
+          },
+          {
+            "title": "Check",
+            "body": "Tests and reviews run in parallel."
+          },
+          {
+            "title": "Merge",
+            "body": "The branch lands on main."
+          },
+          {
+            "title": "Release",
+            "body": "The pipeline publishes it."
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-recap",
+      "title": "Takeaways",
+      "notes": "Draft guidance: Repeat the memorable points. Add only verified details from the brief or cited sources.",
+      "layout": "three-column-cards",
+      "props": {
+        "title": "Takeaways",
+        "cards": [
+          {
+            "icon": "zap",
+            "heading": "Small",
+            "body": "Ship the smallest useful change first."
+          },
+          {
+            "icon": "compass",
+            "heading": "Clear",
+            "body": "One sentence explains every change."
+          },
+          {
+            "icon": "users",
+            "heading": "Shared",
+            "body": "Anyone on the team can release."
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-close",
+      "title": "Close and next steps",
+      "notes": "Draft guidance: Summarize the ask and give a follow-up path. Add only verified details from the brief or cited sources.",
+      "layout": "closing-cta",
+      "props": {
+        "title": "Close and next steps",
+        "text": "Questions are welcome after the talk.",
+        "cta": {
+          "label": "Read the guide",
+          "href": "https://example.com/guide"
+        },
+        "footnote": "All names and numbers are fictional."
+      }
+    }
+  ]
+}

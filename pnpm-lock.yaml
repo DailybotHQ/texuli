@@ -484,6 +484,9 @@ importers:
       '@texuli/core':
         specifier: 0.3.0
         version: link:../core
+      '@texuli/deck':
+        specifier: 0.4.0
+        version: link:../deck
       '@texuli/media':
         specifier: 0.3.0
         version: link:../media

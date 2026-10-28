@@ -1,0 +1,808 @@
+{
+  "formatVersion": 2,
+  "meta": {
+    "title": "Texuli deck feature catalog",
+    "description": "Fictional coverage examples for layouts, backgrounds, and component families.",
+    "locale": "en"
+  },
+  "slides": [
+    {
+      "id": "layout-title-hero",
+      "title": "Title hero",
+      "notes": "Presenter guidance for title-hero: explain the example, cite any evidence, and invite questions.",
+      "layout": "title-hero",
+      "props": {
+        "title": "Title hero example",
+        "subtitle": "What a small team learned in one year",
+        "meta": "Ada Example · Example Conf · 2026"
+      },
+      "background": "solid-color"
+    },
+    {
+      "id": "layout-section-divider",
+      "title": "Section divider",
+      "notes": "Presenter guidance for section-divider: explain the example, cite any evidence, and invite questions.",
+      "layout": "section-divider",
+      "props": {
+        "eyebrow": "Part 2",
+        "title": "Section divider example"
+      },
+      "background": "solid-surface"
+    },
+    {
+      "id": "layout-two-column-split",
+      "title": "Two-column split",
+      "notes": "Presenter guidance for two-column-split: explain the example, cite any evidence, and invite questions.",
+      "layout": "two-column-split",
+      "props": {
+        "title": "Two-column split example",
+        "left": {
+          "heading": "Before",
+          "body": "Releases waited for a weekly window."
+        },
+        "right": {
+          "heading": "After",
+          "body": "Every merged change ships the same day."
+        }
+      },
+      "background": "solid-primary"
+    },
+    {
+      "id": "layout-three-column-cards",
+      "title": "Three-column cards",
+      "notes": "Presenter guidance for three-column-cards: explain the example, cite any evidence, and invite questions.",
+      "layout": "three-column-cards",
+      "props": {
+        "title": "Three-column cards example",
+        "cards": [
+          {
+            "icon": "zap",
+            "heading": "Small",
+            "body": "Ship the smallest useful change first."
+          },
+          {
+            "icon": "compass",
+            "heading": "Clear",
+            "body": "One sentence explains every change."
+          },
+          {
+            "icon": "users",
+            "heading": "Shared",
+            "body": "Anyone on the team can release."
+          }
+        ]
+      },
+      "background": "solid-accent"
+    },
+    {
+      "id": "layout-image-left",
+      "title": "Image left",
+      "notes": "Presenter guidance for image-left: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-left",
+      "props": {
+        "title": "Image left example",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "heading": "What you are looking at",
+        "body": "Each box is a stage; a change moves right when its checks pass."
+      },
+      "background": "solid-muted"
+    },
+    {
+      "id": "layout-image-right",
+      "title": "Image right",
+      "notes": "Presenter guidance for image-right: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-right",
+      "props": {
+        "title": "Image right example",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "heading": "Checks run in parallel",
+        "body": "Say it first, then show where it happens."
+      },
+      "background": "solid-inverse"
+    },
+    {
+      "id": "layout-image-centered",
+      "title": "Image centered",
+      "notes": "Presenter guidance for image-centered: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-centered",
+      "props": {
+        "title": "Image centered example",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "caption": "Three stages, one direction."
+      },
+      "background": "gradient-brand"
+    },
+    {
+      "id": "layout-image-full-bleed",
+      "title": "Image full bleed",
+      "notes": "Presenter guidance for image-full-bleed: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-full-bleed",
+      "props": {
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "caption": "Where it started",
+        "credit": "Photo: Example Studio",
+        "overlay": "dark"
+      },
+      "background": "gradient-dusk"
+    },
+    {
+      "id": "layout-quote",
+      "title": "Quote",
+      "notes": "Presenter guidance for quote: explain the example, cite any evidence, and invite questions.",
+      "layout": "quote",
+      "props": {
+        "quote": "Make the next step obvious, then make it small.",
+        "cite": "Marco Example"
+      },
+      "background": "gradient-dawn"
+    },
+    {
+      "id": "layout-code-with-callout",
+      "title": "Code with callout",
+      "notes": "Presenter guidance for code-with-callout: explain the example, cite any evidence, and invite questions.",
+      "layout": "code-with-callout",
+      "props": {
+        "title": "Code with callout example",
+        "code": {
+          "lang": "ts",
+          "source": "export function total(items: number[]) {\n  return items.reduce((a, b) => a + b, 0);\n}",
+          "highlights": ["2"]
+        },
+        "heading": "What is happening",
+        "bullets": ["Sum the list in one pass", "Start from zero for an empty list"]
+      },
+      "background": "gradient-forest"
+    },
+    {
+      "id": "layout-big-stat",
+      "title": "Big stat",
+      "notes": "Presenter guidance for big-stat: explain the example, cite any evidence, and invite questions.",
+      "layout": "big-stat",
+      "props": {
+        "number": "87%",
+        "label": "of releases shipped on the day they merged",
+        "context": "A fictional team, over twelve months",
+        "source": "n = 412 releases"
+      },
+      "background": "gradient-mist"
+    },
+    {
+      "id": "layout-comparison-table",
+      "title": "Comparison table",
+      "notes": "Presenter guidance for comparison-table: explain the example, cite any evidence, and invite questions.",
+      "layout": "comparison-table",
+      "props": {
+        "title": "Comparison table example",
+        "columns": ["Weekly window", "Continuous"],
+        "rows": [
+          {
+            "label": "Lead time",
+            "values": ["5 days", "Same day"]
+          },
+          {
+            "label": "Rollback",
+            "values": [false, true]
+          },
+          {
+            "label": "Best for",
+            "values": ["Large batches", "Small changes"]
+          }
+        ]
+      },
+      "background": "pattern-dots"
+    },
+    {
+      "id": "layout-process-steps",
+      "title": "Process steps",
+      "notes": "Presenter guidance for process-steps: explain the example, cite any evidence, and invite questions.",
+      "layout": "process-steps",
+      "props": {
+        "title": "Process steps example",
+        "steps": [
+          {
+            "title": "Propose",
+            "body": "Open a small pull request."
+          },
+          {
+            "title": "Check",
+            "body": "Tests and reviews run in parallel."
+          },
+          {
+            "title": "Merge",
+            "body": "The branch lands on main."
+          },
+          {
+            "title": "Release",
+            "body": "The pipeline publishes it."
+          }
+        ]
+      },
+      "background": "pattern-grid"
+    },
+    {
+      "id": "layout-timeline",
+      "title": "Timeline",
+      "notes": "Presenter guidance for timeline: explain the example, cite any evidence, and invite questions.",
+      "layout": "timeline",
+      "props": {
+        "title": "Timeline example",
+        "events": [
+          {
+            "time": "January",
+            "text": "First automated release"
+          },
+          {
+            "time": "April",
+            "text": "Checks run in parallel"
+          },
+          {
+            "time": "August",
+            "text": "Same-day releases by default"
+          },
+          {
+            "time": "December",
+            "text": "Rollback in one click"
+          }
+        ]
+      },
+      "background": "solid-color"
+    },
+    {
+      "id": "layout-team-avatars",
+      "title": "Team avatars",
+      "notes": "Presenter guidance for team-avatars: explain the example, cite any evidence, and invite questions.",
+      "layout": "team-avatars",
+      "props": {
+        "title": "Team avatars example",
+        "people": [
+          {
+            "name": "Ada Example",
+            "role": "Design",
+            "avatar": "av-001"
+          },
+          {
+            "name": "Marco Example",
+            "role": "Engineering",
+            "avatar": "av-002"
+          }
+        ]
+      },
+      "background": "solid-surface"
+    },
+    {
+      "id": "layout-closing-cta",
+      "title": "Closing call to action",
+      "notes": "Presenter guidance for closing-cta: explain the example, cite any evidence, and invite questions.",
+      "layout": "closing-cta",
+      "props": {
+        "title": "Closing call to action example",
+        "text": "Questions are welcome after the talk.",
+        "cta": {
+          "label": "Read the guide",
+          "href": "https://example.com/guide"
+        },
+        "footnote": "All names and numbers are fictional."
+      },
+      "background": "solid-primary"
+    },
+    {
+      "id": "layout-video-centered",
+      "title": "Video centered",
+      "notes": "Presenter guidance for video-centered: explain the example, cite any evidence, and invite questions.",
+      "layout": "video-centered",
+      "props": {
+        "title": "Video centered example",
+        "video": {
+          "src": "https://example.com/media/demo.mp4",
+          "label": "Product demo clip",
+          "width": 960,
+          "height": 540,
+          "muted": true
+        },
+        "caption": "Recorded on a test project."
+      },
+      "background": "solid-accent"
+    },
+    {
+      "id": "layout-video-left",
+      "title": "Video left",
+      "notes": "Presenter guidance for video-left: explain the example, cite any evidence, and invite questions.",
+      "layout": "video-left",
+      "props": {
+        "title": "Video left example",
+        "video": {
+          "src": "https://example.com/media/demo.mp4",
+          "label": "Product demo clip",
+          "width": 960,
+          "height": 540,
+          "muted": true
+        },
+        "heading": "What you are watching",
+        "body": "A change goes from merge to production while the checks report."
+      },
+      "background": "solid-muted"
+    },
+    {
+      "id": "layout-video-right",
+      "title": "Video right",
+      "notes": "Presenter guidance for video-right: explain the example, cite any evidence, and invite questions.",
+      "layout": "video-right",
+      "props": {
+        "title": "Video right example",
+        "video": {
+          "src": "https://example.com/media/demo.mp4",
+          "label": "Product demo clip",
+          "width": 960,
+          "height": 540,
+          "muted": true
+        },
+        "heading": "Rollback is one click",
+        "body": "Say it first, then let the clip prove it."
+      },
+      "background": "solid-inverse"
+    },
+    {
+      "id": "layout-chart",
+      "title": "Chart",
+      "notes": "Presenter guidance for chart: explain the example, cite any evidence, and invite questions.",
+      "layout": "chart",
+      "props": {
+        "title": "Chart example",
+        "spec": {
+          "kind": "bar",
+          "title": "Releases per month",
+          "description": "Releases grew from 12 in January to 31 in March.",
+          "series": [
+            {
+              "id": "releases",
+              "label": "Releases",
+              "points": [
+                {
+                  "x": "Jan",
+                  "y": 12
+                },
+                {
+                  "x": "Feb",
+                  "y": 22
+                },
+                {
+                  "x": "Mar",
+                  "y": 31
+                }
+              ]
+            }
+          ]
+        },
+        "height": "md",
+        "showTable": true
+      },
+      "background": "gradient-brand"
+    },
+    {
+      "id": "background-paper",
+      "title": "Background paper",
+      "notes": "Presenter guidance for paper: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-right",
+      "props": {
+        "title": "Background preset paper",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "heading": "Checks run in parallel",
+        "body": "Say it first, then show where it happens."
+      },
+      "background": "gradient-dusk"
+    },
+    {
+      "id": "background-midnight",
+      "title": "Background midnight",
+      "notes": "Presenter guidance for midnight: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-centered",
+      "props": {
+        "title": "Background preset midnight",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "caption": "Three stages, one direction."
+      },
+      "background": "gradient-dawn"
+    },
+    {
+      "id": "background-ocean",
+      "title": "Background ocean",
+      "notes": "Presenter guidance for ocean: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-full-bleed",
+      "props": {
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "caption": "Where it started",
+        "credit": "Photo: Example Studio",
+        "overlay": "dark"
+      },
+      "background": "gradient-forest"
+    },
+    {
+      "id": "background-forest",
+      "title": "Background forest",
+      "notes": "Presenter guidance for forest: explain the example, cite any evidence, and invite questions.",
+      "layout": "quote",
+      "props": {
+        "quote": "Make the next step obvious, then make it small.",
+        "cite": "Marco Example"
+      },
+      "background": "gradient-mist"
+    },
+    {
+      "id": "background-sunset",
+      "title": "Background sunset",
+      "notes": "Presenter guidance for sunset: explain the example, cite any evidence, and invite questions.",
+      "layout": "code-with-callout",
+      "props": {
+        "title": "Background preset sunset",
+        "code": {
+          "lang": "ts",
+          "source": "export function total(items: number[]) {\n  return items.reduce((a, b) => a + b, 0);\n}",
+          "highlights": ["2"]
+        },
+        "heading": "What is happening",
+        "bullets": ["Sum the list in one pass", "Start from zero for an empty list"]
+      },
+      "background": "pattern-dots"
+    },
+    {
+      "id": "background-lavender",
+      "title": "Background lavender",
+      "notes": "Presenter guidance for lavender: explain the example, cite any evidence, and invite questions.",
+      "layout": "big-stat",
+      "props": {
+        "number": "87%",
+        "label": "of releases shipped on the day they merged",
+        "context": "A fictional team, over twelve months",
+        "source": "n = 412 releases"
+      },
+      "background": "pattern-grid"
+    },
+    {
+      "id": "background-rose",
+      "title": "Background rose",
+      "notes": "Presenter guidance for rose: explain the example, cite any evidence, and invite questions.",
+      "layout": "comparison-table",
+      "props": {
+        "title": "Background preset rose",
+        "columns": ["Weekly window", "Continuous"],
+        "rows": [
+          {
+            "label": "Lead time",
+            "values": ["5 days", "Same day"]
+          },
+          {
+            "label": "Rollback",
+            "values": [false, true]
+          },
+          {
+            "label": "Best for",
+            "values": ["Large batches", "Small changes"]
+          }
+        ]
+      },
+      "background": "solid-color"
+    },
+    {
+      "id": "background-slate",
+      "title": "Background slate",
+      "notes": "Presenter guidance for slate: explain the example, cite any evidence, and invite questions.",
+      "layout": "process-steps",
+      "props": {
+        "title": "Background preset slate",
+        "steps": [
+          {
+            "title": "Propose",
+            "body": "Open a small pull request."
+          },
+          {
+            "title": "Check",
+            "body": "Tests and reviews run in parallel."
+          },
+          {
+            "title": "Merge",
+            "body": "The branch lands on main."
+          },
+          {
+            "title": "Release",
+            "body": "The pipeline publishes it."
+          }
+        ]
+      },
+      "background": "solid-surface"
+    },
+    {
+      "id": "background-cream",
+      "title": "Background cream",
+      "notes": "Presenter guidance for cream: explain the example, cite any evidence, and invite questions.",
+      "layout": "timeline",
+      "props": {
+        "title": "Background preset cream",
+        "events": [
+          {
+            "time": "January",
+            "text": "First automated release"
+          },
+          {
+            "time": "April",
+            "text": "Checks run in parallel"
+          },
+          {
+            "time": "August",
+            "text": "Same-day releases by default"
+          },
+          {
+            "time": "December",
+            "text": "Rollback in one click"
+          }
+        ]
+      },
+      "background": "solid-primary"
+    },
+    {
+      "id": "background-mono",
+      "title": "Background mono",
+      "notes": "Presenter guidance for mono: explain the example, cite any evidence, and invite questions.",
+      "layout": "team-avatars",
+      "props": {
+        "title": "Background preset mono",
+        "people": [
+          {
+            "name": "Ada Example",
+            "role": "Design",
+            "avatar": "av-001"
+          },
+          {
+            "name": "Marco Example",
+            "role": "Engineering",
+            "avatar": "av-002"
+          }
+        ]
+      },
+      "background": "solid-accent"
+    },
+    {
+      "id": "background-brand",
+      "title": "Background brand",
+      "notes": "Presenter guidance for brand: explain the example, cite any evidence, and invite questions.",
+      "layout": "closing-cta",
+      "props": {
+        "title": "Background preset brand",
+        "text": "Questions are welcome after the talk.",
+        "cta": {
+          "label": "Read the guide",
+          "href": "https://example.com/guide"
+        },
+        "footnote": "All names and numbers are fictional."
+      },
+      "background": "solid-muted"
+    },
+    {
+      "id": "background-dawn",
+      "title": "Background dawn",
+      "notes": "Presenter guidance for dawn: explain the example, cite any evidence, and invite questions.",
+      "layout": "video-centered",
+      "props": {
+        "title": "Background preset dawn",
+        "video": {
+          "src": "https://example.com/media/demo.mp4",
+          "label": "Product demo clip",
+          "width": 960,
+          "height": 540,
+          "muted": true
+        },
+        "caption": "Recorded on a test project."
+      },
+      "background": "solid-inverse"
+    },
+    {
+      "id": "background-dusk",
+      "title": "Background dusk",
+      "notes": "Presenter guidance for dusk: explain the example, cite any evidence, and invite questions.",
+      "layout": "video-left",
+      "props": {
+        "title": "Background preset dusk",
+        "video": {
+          "src": "https://example.com/media/demo.mp4",
+          "label": "Product demo clip",
+          "width": 960,
+          "height": 540,
+          "muted": true
+        },
+        "heading": "What you are watching",
+        "body": "A change goes from merge to production while the checks report."
+      },
+      "background": "gradient-brand"
+    },
+    {
+      "id": "components-1",
+      "title": "Component families 1",
+      "notes": "Presenter guidance for component group 1: identify renderer, trust tier, and accessible interaction.",
+      "layout": "free",
+      "blocks": [
+        {
+          "type": "component",
+          "component": "chart",
+          "props": {
+            "title": "chart example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "table",
+          "props": {
+            "title": "table example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "diagram",
+          "props": {
+            "title": "diagram example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "map",
+          "props": {
+            "title": "map example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "embed",
+          "props": {
+            "title": "embed example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "poll",
+          "props": {
+            "title": "poll example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "quiz",
+          "props": {
+            "title": "quiz example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "calculator",
+          "props": {
+            "title": "calculator example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "counter",
+          "props": {
+            "title": "counter example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "tabs",
+          "props": {
+            "title": "tabs example"
+          }
+        }
+      ]
+    },
+    {
+      "id": "components-2",
+      "title": "Component families 2",
+      "notes": "Presenter guidance for component group 2: identify renderer, trust tier, and accessible interaction.",
+      "layout": "free",
+      "blocks": [
+        {
+          "type": "component",
+          "component": "form",
+          "props": {
+            "title": "form example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "files",
+          "props": {
+            "title": "files example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "timeline",
+          "props": {
+            "title": "timeline example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "calendar",
+          "props": {
+            "title": "calendar example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "workflow",
+          "props": {
+            "title": "workflow example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "chat",
+          "props": {
+            "title": "chat example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "video",
+          "props": {
+            "title": "video example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "audio",
+          "props": {
+            "title": "audio example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "image",
+          "props": {
+            "title": "image example"
+          }
+        },
+        {
+          "type": "component",
+          "component": "gallery",
+          "props": {
+            "title": "gallery example"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,7 @@
 // @vitest-environment node
-// @ts-expect-error Node ambient module types are excluded by this package tsconfig.
+/// <reference types="node" />
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-// @ts-expect-error Node ambient module types are excluded by this package tsconfig.
 import { dirname, extname, join, resolve } from 'node:path';
-// @ts-expect-error Node ambient module types are excluded by this package tsconfig.
 import { fileURLToPath } from 'node:url';
 import * as ts from 'typescript';
 import { afterEach, describe, expect, it, vi } from 'vitest';
