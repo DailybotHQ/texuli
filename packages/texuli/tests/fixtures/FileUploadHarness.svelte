@@ -17,6 +17,10 @@ let {
   progress = {} as FileUploadProgressMap,
   files = $bindable<File[]>([]),
   rejects = $bindable<FileDropRejection[]>([]),
+  onFilesAdd,
+  onFileRemove,
+  onchange,
+  ondrop,
 }: {
   accept?: string;
   maxSize?: number;
@@ -28,6 +32,10 @@ let {
   progress?: FileUploadProgressMap;
   files?: File[];
   rejects?: FileDropRejection[];
+  onFilesAdd?: (files: File[]) => void;
+  onFileRemove?: (file: File) => void;
+  onchange?: (event: Event) => void;
+  ondrop?: (event: DragEvent) => void;
 } = $props();
 </script>
 
@@ -42,4 +50,8 @@ let {
   {variant}
   {showPreviews}
   {progress}
+  {onFilesAdd}
+  {onFileRemove}
+  {onchange}
+  {ondrop}
 />

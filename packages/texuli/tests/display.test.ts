@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Alert from '../src/components/alert/Alert.svelte';
 import { alertRole } from '../src/components/alert/tones.ts';
 import { avatarInitials, avatarToneIndex, hashString } from '../src/components/avatar/initials.ts';
+import { avatarSrcset } from '../src/components/avatar/srcset.ts';
 import Chip from '../src/components/badge/Chip.svelte';
 import Tag from '../src/components/badge/Tag.svelte';
 import Card from '../src/components/card/Card.svelte';
@@ -120,6 +121,63 @@ describe('avatar', () => {
       const root = await screen.findByRole('img', { name: 'Ada Example' });
       expect(root.querySelector('img')).toBeNull();
       expect(root.textContent).toContain('AE');
+    });
+  });
+
+  describe('Avatar srcset (G10)', () => {
+    it('keeps only the srcset candidates the URL policy accepts, at the given trust', () => {
+      const cases: {
+        srcset: string;
+        srcTrust: 'untrusted' | 'developer';
+        sizes?: string;
+        expected: string | null;
+        expectedSizes?: string | null;
+      }[] = [
+        {
+          srcset: 'https://cdn.example/ada-64.webp 1x, https://cdn.example/ada-128.webp 2x',
+          srcTrust: 'untrusted',
+          expected: 'https://cdn.example/ada-64.webp 1x, https://cdn.example/ada-128.webp 2x',
+        },
+        {
+          srcset: 'javascript:alert(1) 1x, https://cdn.example/ada-128.webp 2x',
+          srcTrust: 'untrusted',
+          expected: 'https://cdn.example/ada-128.webp 2x',
+        },
+        {
+          srcset: 'https://cdn.example/a.webp 64w, data:text/html;base64,AAAA 128w, /b.webp 2x',
+          srcTrust: 'untrusted',
+          sizes: '40px',
+          expected: 'https://cdn.example/a.webp 64w',
+          expectedSizes: '40px',
+        },
+        {
+          srcset: 'javascript:alert(1) 1x, vbscript:x 2x',
+          srcTrust: 'developer',
+          sizes: '40px',
+          expected: null,
+          expectedSizes: null,
+        },
+      ];
+      for (const { srcset, srcTrust, sizes, expected, expectedSizes } of cases) {
+        const view = render(AvatarFixture, {
+          props: {
+            name: 'Ada Example',
+            src: 'https://cdn.example/ada-64.webp',
+            srcTrust,
+            srcset,
+            ...(sizes ? { sizes } : {}),
+          },
+        });
+        const img = view.container.querySelector('img');
+        expect(img, srcset).toBeTruthy();
+        expect(img?.getAttribute('srcset'), srcset).toBe(expected);
+        if (expectedSizes !== undefined) expect(img?.getAttribute('sizes')).toBe(expectedSizes);
+        cleanup();
+      }
+      expect(avatarSrcset('https://cdn.example/a.webp 2x, javascript:x 1x')).toBe(
+        'https://cdn.example/a.webp 2x'
+      );
+      expect(avatarSrcset('   ')).toBeUndefined();
     });
   });
 

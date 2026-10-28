@@ -22,7 +22,14 @@ Styled tags field and color picker on owned primitives
 ```
 
 Supports delimiter (default `,`), paste split, blur-add, duplicates policy,
-`max`, and `validate`. Invalid attempts fire `onInvalid` and keep the draft.
+`max`, and `validate`. Each refused tag fires `onInvalid({ tag, reason,
+message? })` with `reason` `'duplicate'`, `'max'` or `'invalid'` (refused by
+`validate`; a returned string is `message`), and the draft stays for
+correction.
+
+The draft text is bindable: `bind:inputValue` reads and writes it (cleared
+once it becomes tags), and `onInputValueChange(value)` reports every change
+the input makes (typing and clearing).
 
 ## ColorPicker
 

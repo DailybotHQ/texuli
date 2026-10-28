@@ -3,9 +3,11 @@ import {
   DEFAULT_TOAST_DURATION,
   MAX_TOASTS,
   type PromiseToastMessages,
+  type ToastAnnouncement,
   type ToastItem,
   type ToastKind,
   type ToastOptions,
+  type ToastSettleReason,
 } from './types.ts';
 
 export type ToastStore = {
@@ -24,14 +26,62 @@ export type ToastStore = {
    * promise settles. Returns the stable toast id.
    */
   promise: <T>(promise: Promise<T>, messages: PromiseToastMessages) => string;
+  /** Dismiss one toast, or every toast without an id. Settles with `'dismiss'`. */
   dismiss: (id?: string) => void;
+  /**
+   * Run a toast's action, keep it while a returned promise runs, then dismiss
+   * it and settle with `'action'` (also when the action rejects; the error is
+   * rethrown on a microtask). The toast's timer stops while the action runs.
+   */
+  action: (id: string) => Promise<void>;
+  /**
+   * Pause every toast timer; each keeps its remaining time. Holds stack by
+   * key: timers run again only when every key has resumed. The Toaster holds
+   * its own key while the pointer or focus is in its region. Default key
+   * `'host'`.
+   */
+  pause: (key?: string) => void;
+  /** Release one `pause` hold (default key `'host'`). */
+  resume: (key?: string) => void;
+  /** True while any pause hold is active. */
+  isPaused: () => boolean;
+  /**
+   * The announcement for a toast (its `message` and `politeness`), or for
+   * the newest toast without an id. `undefined` when there is none.
+   */
+  announcement: (id?: string) => ToastAnnouncement | undefined;
 };
 
 type Meta = {
   kind: ToastKind;
   action?: ToastOptions['action'];
+  onSettle?: ToastOptions['onSettle'];
   pending?: boolean;
 };
+
+type Timer = {
+  remaining: number;
+  startedAt: number;
+  handle: ReturnType<typeof setTimeout> | undefined;
+};
+
+/** Rethrow a callback error outside the store so it reaches host error reporting. */
+function report(error: unknown): void {
+  queueMicrotask(() => {
+    throw error;
+  });
+}
+
+function announcementFor(
+  title: string,
+  description: string | undefined,
+  tone: 'foreground' | 'background'
+): ToastAnnouncement {
+  return {
+    message: [title, description].filter(Boolean).join('. '),
+    politeness: tone === 'foreground' ? 'assertive' : 'polite',
+  };
+}
 
 function resolveMessage(value: string | ((arg: unknown) => string), arg: unknown): string {
   return typeof value === 'function' ? value(arg) : value;
@@ -46,8 +96,9 @@ function resolveOptional(
 }
 
 /**
- * Styled toast API on top of the primitive queue. Visual kind and actions
- * live here; the primitive owns R16 viewport, timers, and announcer wiring.
+ * Styled toast API on top of the primitive queue. Visual kind, actions,
+ * settle reasons and the auto-dismiss timers (with pause and resume) live
+ * here; the primitive owns the R16 viewport and the announcer wiring.
  */
 export function createToastStore(options?: {
   /**
@@ -81,6 +132,7 @@ export function createToastStore(options?: {
         createdAt: record.createdAt,
         priority: record.priority,
         tone: record.tone,
+        announcement: announcementFor(record.title, record.description, record.tone),
       };
       if (record.description) item.description = record.description;
       if (extra?.action) item.action = extra.action;
@@ -93,13 +145,77 @@ export function createToastStore(options?: {
     for (const listener of listeners) listener(items);
   }
 
+  const timers = new Map<string, Timer>();
+  /** Reasons recorded just before the store itself removes a toast. */
+  const reasons = new Map<string, ToastSettleReason>();
+  const holds = new Set<string>();
+  /** Toasts whose action is running (a second click does not run it again). */
+  const acting = new Set<string>();
+
+  function clearTimer(id: string): void {
+    const timer = timers.get(id);
+    if (timer?.handle !== undefined) clearTimeout(timer.handle);
+    timers.delete(id);
+  }
+
+  function armTimer(id: string, timer: Timer): void {
+    timer.startedAt = Date.now();
+    timer.handle = setTimeout(() => {
+      timers.delete(id);
+      remove(id, 'timeout');
+    }, timer.remaining);
+  }
+
+  function startTimer(id: string, duration: number): void {
+    clearTimer(id);
+    if (!(duration > 0) || !Number.isFinite(duration)) return;
+    const timer: Timer = { remaining: duration, startedAt: 0, handle: undefined };
+    timers.set(id, timer);
+    if (holds.size === 0) armTimer(id, timer);
+  }
+
+  function pauseTimers(): void {
+    for (const timer of timers.values()) {
+      if (timer.handle === undefined) continue;
+      clearTimeout(timer.handle);
+      timer.handle = undefined;
+      timer.remaining = Math.max(0, timer.remaining - (Date.now() - timer.startedAt));
+    }
+  }
+
+  function resumeTimers(): void {
+    for (const [id, timer] of timers) {
+      if (timer.handle === undefined) armTimer(id, timer);
+    }
+  }
+
+  function remove(id: string, reason: ToastSettleReason): void {
+    if (!meta.has(id)) return;
+    reasons.set(id, reason);
+    manager.dismiss(id);
+    reasons.delete(id);
+  }
+
+  // Every way out of the queue passes here: the store's timer and action
+  // record their reason first; the close button, a swipe, `dismiss()` and
+  // the max cap leave none and settle as 'dismiss'.
   manager.subscribe(() => {
-    // Drop meta for dismissed toasts.
     const live = new Set(manager.list().map((t) => t.id));
-    for (const id of meta.keys()) {
-      if (!live.has(id)) meta.delete(id);
+    const settled: [NonNullable<Meta['onSettle']>, ToastSettleReason][] = [];
+    for (const [id, extra] of meta) {
+      if (live.has(id)) continue;
+      meta.delete(id);
+      clearTimer(id);
+      if (extra.onSettle) settled.push([extra.onSettle, reasons.get(id) ?? 'dismiss']);
     }
     emit();
+    for (const [onSettle, reason] of settled) {
+      try {
+        onSettle(reason);
+      } catch (error) {
+        report(error);
+      }
+    }
   });
 
   function show(kind: ToastKind, title: string, options: ToastOptions = {}): string {
@@ -115,8 +231,21 @@ export function createToastStore(options?: {
     meta.set(id, {
       kind,
       ...(options.action ? { action: options.action } : {}),
+      ...(options.onSettle ? { onSettle: options.onSettle } : {}),
       pending: false,
     });
+    const record = manager.list().find((item) => item.id === id);
+    if (record) {
+      startTimer(id, record.duration);
+    } else {
+      // Pushed out by the max cap at once (lower priority than a full stack).
+      meta.delete(id);
+      try {
+        options.onSettle?.('dismiss');
+      } catch (error) {
+        report(error);
+      }
+    }
     emit();
     return id;
   }
@@ -162,15 +291,40 @@ export function createToastStore(options?: {
       return id;
     },
     dismiss(id) {
-      if (id === undefined) {
-        manager.dismissAll();
-        meta.clear();
-        emit();
-        return;
+      if (id === undefined) manager.dismissAll();
+      else remove(id, 'dismiss');
+    },
+    async action(id) {
+      const action = meta.get(id)?.action;
+      if (!action || acting.has(id)) return;
+      acting.add(id);
+      clearTimer(id);
+      try {
+        await action.onClick();
+      } catch (error) {
+        report(error);
+      } finally {
+        acting.delete(id);
+        remove(id, 'action');
       }
-      manager.dismiss(id);
-      meta.delete(id);
-      emit();
+    },
+    pause(key = 'host') {
+      const wasRunning = holds.size === 0;
+      holds.add(key);
+      if (wasRunning) pauseTimers();
+    },
+    resume(key = 'host') {
+      if (!holds.delete(key) || holds.size > 0) return;
+      resumeTimers();
+    },
+    isPaused: () => holds.size > 0,
+    announcement(id) {
+      const records = manager.list();
+      const record =
+        id === undefined
+          ? [...records].sort((a, b) => b.createdAt - a.createdAt)[0]
+          : records.find((item) => item.id === id);
+      return record ? announcementFor(record.title, record.description, record.tone) : undefined;
     },
   };
 
@@ -201,6 +355,10 @@ export const toast = {
   promise: <T>(promise: Promise<T>, messages: PromiseToastMessages) =>
     getToastStore().promise(promise, messages),
   dismiss: (id?: string) => getToastStore().dismiss(id),
+  action: (id: string) => getToastStore().action(id),
+  pause: (key?: string) => getToastStore().pause(key),
+  resume: (key?: string) => getToastStore().resume(key),
+  announcement: (id?: string) => getToastStore().announcement(id),
   subscribe: (listener: (items: readonly ToastItem[]) => void) =>
     getToastStore().subscribe(listener),
   get items() {

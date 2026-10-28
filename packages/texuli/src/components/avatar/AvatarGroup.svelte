@@ -59,6 +59,8 @@ const classes = $derived(
       name={item.name}
       src={item.src}
       srcTrust={item.srcTrust}
+      srcset={item.srcset}
+      sizes={item.sizes}
       status={item.status}
       decorative={item.decorative ?? Boolean(label)}
       {size}

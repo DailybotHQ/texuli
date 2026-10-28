@@ -45,7 +45,7 @@ let topics = $state(['design', 'research']);
 | `TagsInput.List` | `ul role="list"` | The tags' container |
 | `TagsInput.Tag` | `li tabindex="-1"` | `index`. Focus comes from the arrow keys; it is not a Tab stop |
 | `TagsInput.TagRemove` | `button tabindex="-1"` | `index`. Named "Remove {tag}" by default; for pointer and touch |
-| `TagsInput.Input` | `input type="text" autocomplete="off"` | The only Tab stop. Give it an accessible name |
+| `TagsInput.Input` | `input type="text" autocomplete="off"` | The only Tab stop. Give it an accessible name. `value` is the draft (bindable, cleared once it becomes tags); `onValueChange(value)` reports every draft change the input makes |
 
 - The root's `children` snippet receives `{ tags }`.
 - Every part takes a `child` snippet. The root's hidden form fields and its

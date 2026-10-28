@@ -13,6 +13,26 @@ export type ToastOptions = {
   /** Reuse an id to replace an existing toast (e.g. loading → success). */
   id?: string;
   action?: ToastAction;
+  /**
+   * Called exactly once when the toast leaves: `'timeout'` when its timer ran
+   * out, `'action'` after its action ran, `'dismiss'` for every other way out
+   * (the close button, a swipe, `dismiss()`, or being pushed out of the stack
+   * by newer toasts). Undo pattern: commit on `'timeout'` and `'dismiss'`,
+   * revert on `'action'`. Replacing a toast by `id` keeps one toast: only the
+   * newest `onSettle` is called.
+   */
+  onSettle?: (reason: ToastSettleReason) => void;
+};
+
+/** Why a toast left the stack (see `ToastOptions.onSettle`). */
+export type ToastSettleReason = 'timeout' | 'dismiss' | 'action';
+
+/** What the screen reader hears for a toast, and how urgently. */
+export type ToastAnnouncement = {
+  /** `title` and `description` joined with `. ` (the announced text). */
+  message: string;
+  /** `assertive` for errors, `polite` for every other kind. */
+  politeness: 'polite' | 'assertive';
 };
 
 export type ToastItem = {
@@ -28,6 +48,8 @@ export type ToastItem = {
   createdAt: number;
   priority: 'low' | 'normal' | 'high';
   tone: 'foreground' | 'background';
+  /** The announcement the region speaks for this toast. */
+  announcement: ToastAnnouncement;
 };
 
 export type PromiseToastMessages = {

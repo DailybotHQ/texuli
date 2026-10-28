@@ -4,7 +4,9 @@
 
 Styled avatars on the token contract, built on `@texuli/primitives/avatar`.
 Fallback initials, optional presence status, and stacked groups. Image URLs go
-through the primitive’s `safeImageSrc` policy.
+through the primitive’s `safeImageSrc` policy, and `srcset` candidates through
+`avatarSrcset(value, trust)` (exported), which keeps only the candidates the
+URL policy accepts.
 
 ## Avatar
 
@@ -21,7 +23,9 @@ through the primitive’s `safeImageSrc` policy.
 | --- | --- | --- |
 | `name` | required | Initials, tone slot, default accessible name |
 | `src` | — | Optional image; unsafe schemes keep initials |
-| `srcTrust` | `untrusted` | URL policy trust |
+| `srcTrust` | `untrusted` | URL policy trust for `src` and every `srcset` candidate |
+| `srcset` | — | Responsive candidates (`a.webp 1x, b.webp 2x` or `w` descriptors), used with `src`. Each candidate URL passes the image URL policy at `srcTrust`; refused or malformed candidates (and URLs holding a comma) are dropped, and candidates keep the first kept one's descriptor kind |
+| `sizes` | — | `sizes` for width descriptors (set only when a candidate is kept) |
 | `size` | `md` | `xs` \| `sm` \| `md` \| `lg` |
 | `status` | — | `online` \| `away` \| `busy` \| `offline` |
 | `decorative` | `false` | Hides the control from assistive tech |
@@ -61,7 +65,7 @@ contrast. Forced colors use `CanvasText` on `Canvas` and drop the ring.
 
 | Prop | Default | Notes |
 | --- | --- | --- |
-| `items` | required | `{ name, src?, status?, decorative? }[]` |
+| `items` | required | `{ name, src?, srcTrust?, srcset?, sizes?, status?, decorative? }[]` |
 | `max` | all | Faces before a `+N` overflow chip |
 | `size` | `md` | Applied to every face |
 | `label` | — | `aria-label` on the group |

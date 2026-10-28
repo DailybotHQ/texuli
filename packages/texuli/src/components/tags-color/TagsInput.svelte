@@ -12,7 +12,16 @@ import './tags-color.css';
 type Props = {
   value?: string[];
   onValueChange?: (value: string[]) => void;
+  /**
+   * Called for every refused tag with `{ tag, reason, message? }`; `reason`
+   * is `'duplicate'`, `'max'` or `'invalid'` (refused by `validate`, whose
+   * returned message is `message`). The draft stays for correction.
+   */
   onInvalid?: (detail: TagsInputInvalidDetail) => void;
+  /** The draft text in the input (bindable). Cleared once it becomes tags. */
+  inputValue?: string;
+  /** Called with each draft change the input makes (typing, clearing). */
+  onInputValueChange?: (value: string) => void;
   delimiter?: string | RegExp;
   addOnPaste?: boolean;
   addOnBlur?: boolean;
@@ -40,6 +49,8 @@ let {
   value = $bindable([] as string[]),
   onValueChange,
   onInvalid,
+  inputValue = $bindable(''),
+  onInputValueChange,
   delimiter = ',',
   addOnPaste = true,
   addOnBlur = false,
@@ -105,6 +116,8 @@ const split = $derived(splitControlProps(rest));
     </TagsInputPrimitive.List>
     <TagsInputPrimitive.Input
       {...split.control}
+      bind:value={inputValue}
+      onValueChange={onInputValueChange}
       class="tx-tags-input__input"
       aria-label={(split.control['aria-label'] as string | undefined) ?? inputLabel}
       {placeholder}

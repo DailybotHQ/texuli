@@ -46,6 +46,7 @@ import RefHarness from './fixtures/RefHarness.svelte';
 import { type RefKind } from './fixtures/ref-kind.ts';
 import SelectFixture from './fixtures/SelectFixture.svelte';
 import SliderHarness from './fixtures/SliderHarness.svelte';
+import TagsInputHarness from './fixtures/TagsInputHarness.svelte';
 import ToggleHarness from './fixtures/ToggleHarness.svelte';
 
 // Styled form components: ARIA reaching the control (axe), label and ref
@@ -906,6 +907,53 @@ describe('slider', () => {
 describe('tags-color', () => {
   afterEach(cleanup);
 
+  describe('TagsInput (G11)', () => {
+    it('reports each refusal with its reason and binds the draft both ways', async () => {
+      const onInvalid = vi.fn();
+      const onInputValueChange = vi.fn();
+      const view = render(TagsInputHarness, {
+        props: {
+          max: 3,
+          validate: (tag: string) => tag.includes('@') || 'Use an email address',
+          onInvalid,
+          onInputValueChange,
+        },
+      });
+      const field = screen.getByRole('textbox', { name: 'Add a recipient' }) as HTMLInputElement;
+      const draft = () => view.container.querySelector('[data-probe="draft"]')?.textContent;
+      const cases: { typed: string; reason: string | null }[] = [
+        { typed: 'design', reason: 'duplicate' },
+        { typed: 'not-an-email', reason: 'invalid' },
+        { typed: 'ada@example.com', reason: null },
+        { typed: 'bea@example.com', reason: null },
+        { typed: 'cal@example.com', reason: 'max' },
+      ];
+      for (const { typed, reason } of cases) {
+        onInvalid.mockClear();
+        await fireEvent.input(field, { target: { value: typed } });
+        expect(draft(), typed).toBe(typed);
+        await fireEvent.keyDown(field, { key: 'Enter' });
+        if (reason === null) {
+          expect(onInvalid, typed).not.toHaveBeenCalled();
+          expect(draft(), typed).toBe('');
+          expect(field.value).toBe('');
+        } else {
+          expect(onInvalid.mock.calls[0]?.[0], typed).toMatchObject({
+            tag: typed,
+            reason,
+            ...(reason === 'invalid' ? { message: 'Use an email address' } : {}),
+          });
+          // A refused draft stays for correction.
+          expect(draft(), typed).toBe(typed);
+        }
+      }
+      expect(onInputValueChange).toHaveBeenCalledWith('');
+      // The host writes the draft into the field.
+      await fireEvent.click(screen.getByRole('button', { name: 'Prefill' }));
+      expect(field.value).toBe('ops@example.com');
+    });
+  });
+
   describe('ColorPicker', () => {
     it('accepts a hex value in the format field', async () => {
       const onValueChange = vi.fn();
@@ -970,6 +1018,40 @@ describe('file-upload', () => {
       const remove = getByLabelText('Remove notes.txt');
       await fireEvent.click(remove);
       expect(container.querySelector('[data-tx-file-upload-list]')).toBeNull();
+    });
+
+    it('reports added and removed files to the callbacks and the caller handlers (G8)', async () => {
+      const notes = makeFile('notes.txt', 'text/plain');
+      const plan = makeFile('plan.md', 'text/markdown');
+      const bad = makeFile('archive.zip', 'application/zip');
+      const extra = makeFile('extra.txt', 'text/plain');
+      const onFilesAdd = vi.fn();
+      const onFileRemove = vi.fn();
+      const onchange = vi.fn();
+      const ondrop = vi.fn();
+      const { container, getByLabelText } = render(FileUploadHarness, {
+        props: {
+          accept: '.txt,.md',
+          files: [notes],
+          onFilesAdd,
+          onFileRemove,
+          onchange,
+          ondrop,
+        },
+      });
+      // Host-set files are not reported.
+      expect(onFilesAdd).not.toHaveBeenCalled();
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+      Object.defineProperty(input, 'files', { configurable: true, value: [plan, bad] });
+      await fireEvent.change(input);
+      const zone = container.querySelector('.tx-file-upload__zone') as HTMLElement;
+      await fireEvent.drop(zone, { dataTransfer: { files: [extra], types: ['Files'] } });
+      expect(onFilesAdd.mock.calls).toEqual([[[plan]], [[extra]]]);
+      expect(onchange).toHaveBeenCalledTimes(1);
+      expect(ondrop).toHaveBeenCalledTimes(1);
+      await fireEvent.click(getByLabelText('Remove plan.md'));
+      expect(onFileRemove.mock.calls).toEqual([[plan]]);
+      expect(container.textContent).not.toContain('plan.md');
     });
 
     it('marks the control disabled', () => {
