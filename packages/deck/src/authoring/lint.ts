@@ -53,37 +53,90 @@ const asRecord = (value: unknown): Record<string, unknown> | undefined =>
   value !== null && typeof value === 'object' && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : undefined;
-const NON_TEXT_KEYS = new Set([
-  'src',
-  'href',
-  'alt',
-  'lang',
-  'source',
-  'highlights',
-  'avatar',
-  'icon',
-  'overlay',
-  'height',
-  'width',
-  'step',
-  'fragment',
-  'reveal',
-  'tone',
+/**
+ * Keys whose strings are text a viewer reads: titles, bodies, list items,
+ * labels and captions. Everything else (chart kinds, ids, URLs, alt text,
+ * code, sizes, widths, tones, step fields) is a setting, not words on the
+ * slide. A string inside an array counts when the array's key does
+ * (`bullets`, comparison `columns` and `values`).
+ */
+const HUMAN_TEXT_KEYS = new Set([
+  'title',
+  'subtitle',
+  'eyebrow',
+  'meta',
+  'heading',
+  'body',
+  'text',
+  'markdown',
+  'quote',
+  'cite',
+  'caption',
+  'credit',
+  'label',
+  'description',
+  'context',
+  'footnote',
+  'name',
+  'role',
+  'number',
+  'bullets',
+  'items',
+  'columns',
+  'values',
+  'time',
+  'summary',
+  'content',
 ]);
-function wordCount(value: unknown, depth = 0): number {
-  if (typeof value === 'string')
-    return (value.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu) ?? []).length;
+const WORD = /[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu;
+/** Link destinations in Markdown text: `](https://…)` is not words on the slide. */
+const LINK_DESTINATION = /\]\([^)\s]*\)/g;
+
+/**
+ * Words of human text in a value (see `HUMAN_TEXT_KEYS`). `all` counts every
+ * string below (the cells of a table block's `rows`, keyed by column id).
+ */
+function wordCount(value: unknown, human = false, all = false, depth = 0): number {
+  if (typeof value === 'string') {
+    if (!human && !all) return 0;
+    return (value.replace(LINK_DESTINATION, ']').match(WORD) ?? []).length;
+  }
   if (depth >= WORD_DEPTH) return 0;
   if (Array.isArray(value))
-    return value.reduce<number>((sum, item) => sum + wordCount(item, depth + 1), 0);
+    return value.reduce<number>((sum, item) => sum + wordCount(item, human, all, depth + 1), 0);
   const record = asRecord(value);
-  return record
-    ? Object.entries(record).reduce<number>(
-        (sum, [key, child]) => sum + (NON_TEXT_KEYS.has(key) ? 0 : wordCount(child, depth + 1)),
-        0
-      )
-    : 0;
+  if (!record) return 0;
+  let sum = 0;
+  for (const [key, child] of Object.entries(record)) {
+    const rows = all || (record.type === 'table' && key === 'rows');
+    sum += wordCount(child, all || HUMAN_TEXT_KEYS.has(key), rows, depth + 1);
+  }
+  return sum;
 }
+
+/** Boilerplate notes phrases, matched inside normalized notes (lowercase, punctuation as spaces). */
+const BOILERPLATE_NOTES = [
+  'do not read the slide',
+  "don't read the slide",
+  'dont read the slide',
+  'no leer la diapositiva',
+];
+
+/** Notes lowercased with punctuation as single spaces (`’` read as `'`). */
+const normalizeNotes = (notes: string) =>
+  notes
+    .toLowerCase()
+    .replace(/’/g, "'")
+    .replace(/[^\p{L}\p{N}']+/gu, ' ')
+    .trim();
+
+/** How a message names a slide: `slide "pricing"`, or its position when it has no id. */
+const slideName = (item: Record<string, unknown>, index: number) =>
+  typeof item.id === 'string' && item.id !== ''
+    ? `slide ${JSON.stringify(item.id.slice(0, 64))}`
+    : `slide ${index + 1}`;
+const quoted = (text: string, max = 60) =>
+  JSON.stringify(text.length > max ? `${text.slice(0, max - 1)}…` : text);
 
 /**
  * Static quality checks. It accepts untrusted input and never throws. Work is
@@ -197,19 +250,24 @@ export function lintDeck(value: unknown): DeckLintReport {
       walk(item.blocks, [...base, 'blocks'], (record, path) =>
         imageCheck(record, path, record.type === 'image')
       );
-    const steps = Array.isArray(item.steps) ? item.steps : [];
+    const name = slideName(item, index);
+    const labels = Array.isArray(item.steps) ? item.steps : [];
     const stepResult = slideSteps(item as unknown as Parameters<typeof slideSteps>[0]);
-    const revealedSteps = stepResult.steps.filter(
-      (step) => step.index > 0 && step.fragments.length > 0
-    ).length;
-    if (steps.length > revealedSteps)
-      add(
-        'empty-steps',
-        'warning',
-        'The slide labels more steps than it reveals.',
-        [...base, 'steps'],
-        'Remove unused labels or add reveal markers.'
-      );
+    // A custom slide's host component reveals its own steps: its labels are the steps.
+    if (layout !== 'custom') {
+      labels.forEach((label, i) => {
+        const step = stepResult.steps[i + 1];
+        if (step && step.fragments.length > 0) return;
+        const text = typeof label === 'string' ? ` (${quoted(label)})` : '';
+        add(
+          'empty-steps',
+          'warning',
+          `The ${name} labels step ${i + 1}${text} in "steps", but nothing reveals on it.`,
+          [...base, 'steps', i],
+          `Add a fragment with "step": ${i + 1}, or remove this label.`
+        );
+      });
+    }
     for (const problem of stepResult.issues)
       if (problem.code === 'step-unrevealed')
         add('step-unrevealed', 'warning', problem.message, [...base, ...problem.path], problem.fix);
@@ -240,20 +298,21 @@ export function lintDeck(value: unknown): DeckLintReport {
         'notes',
       ]);
     if (visible && notes) {
-      const normalized = notes
-        .toLowerCase()
-        .replace(/[^\p{L}\p{N}']+/gu, ' ')
-        .trim();
+      const normalized = normalizeNotes(notes);
       const prior = notesSeen.get(normalized);
       if (prior !== undefined)
         add('notes-duplicate', 'warning', `Notes repeat slide ${prior + 1}.`, [...base, 'notes']);
       else notesSeen.set(normalized, index);
-      if (
-        /^(?:do not read the slide|don't read the slide|dont read the slide|no leer la diapositiva)$/u.test(
-          normalized
-        )
-      )
-        add('notes-boilerplate', 'warning', 'Speaker notes are boilerplate.', [...base, 'notes']);
+      const padded = ` ${normalized} `;
+      const phrase = BOILERPLATE_NOTES.find((text) => padded.includes(` ${text} `));
+      if (phrase)
+        add(
+          'notes-boilerplate',
+          'warning',
+          `The ${name} "notes" contain the boilerplate phrase "${phrase}".`,
+          [...base, 'notes'],
+          'Replace it with what to say: the point, the evidence and the transition.'
+        );
     }
     if (visible) {
       if (typeof layout === 'string' && layout === previousLayout) run++;
@@ -266,14 +325,45 @@ export function lintDeck(value: unknown): DeckLintReport {
           [...base, 'layout']
         );
       previousLayout = typeof layout === 'string' ? layout : '';
-      const textWords = wordCount(item.props ?? item.blocks ?? item.component);
       const allowed = layout === 'title-hero' || layout === 'big-stat' ? 60 : 55;
-      if (textWords > allowed)
+      // Words per part: free blocks, layout props by top-level key, or component props.
+      const parts: { path: PathSegment[]; field: string; words: number }[] = [];
+      if (layout === 'free' && Array.isArray(item.blocks)) {
+        item.blocks.forEach((block, b) => {
+          const type = asRecord(block)?.type;
+          parts.push({
+            path: [...base, 'blocks', b],
+            field: `blocks[${b}]${typeof type === 'string' ? ` (${type.slice(0, 32)})` : ''}`,
+            words: wordCount(block),
+          });
+        });
+      } else if (layout === 'component') {
+        const component = asRecord(item.component);
+        parts.push({
+          path: [...base, 'component', 'props'],
+          field: 'component.props',
+          words: wordCount(component?.props, false, false, 1),
+        });
+      } else if (props) {
+        for (const [key, child] of Object.entries(props))
+          parts.push({
+            path: [...base, 'props'],
+            field: `props.${key}`,
+            words: wordCount({ [key]: child }),
+          });
+      }
+      const textWords = parts.reduce((sum, part) => sum + part.words, 0);
+      const most = parts.reduce<(typeof parts)[number] | undefined>(
+        (best, part) => (best === undefined || part.words > best.words ? part : best),
+        undefined
+      );
+      if (textWords > allowed && most)
         add(
           'too-many-words',
           'warning',
-          `Slide has ${textWords} words; the suggested limit is ${allowed}.`,
-          [...base, 'props']
+          `The ${name} has ${textWords} words of text; the suggested limit is ${allowed}. ${most.field} holds the most (${most.words}).`,
+          most.path,
+          'Cut the text, split the slide, or move the detail into the speaker notes.'
         );
     }
     if (visible && layout === 'free') {

@@ -12,7 +12,7 @@ import { createDiagnostic, type DeckDiagnostic } from '../schema/index.ts';
 import { attributeWritable, writeAttribute } from './attributes.ts';
 import { FRONTMATTER_KEYS, writeScalar } from './frontmatter.ts';
 import { deriveSlideId, readDeckDraft, stackSectionId } from './parse.ts';
-import { escapeInline, fenceFor, inertJson, jsonEqual } from './text.ts';
+import { escapeInline, fenceFor, hasUnsafeLink, inertJson, jsonEqual } from './text.ts';
 
 type Bag = Record<string, unknown>;
 type AttrList = [string, string | number | true][];
@@ -548,6 +548,13 @@ function slideSurvives(text: string, slide: Bag): boolean {
 }
 
 function writeSlide(slide: Bag, plan: SlidePlan): string {
+  const head = plan.section.length > 0 ? `${comment('slide', plan.section)}\n\n` : '';
+  // Notes are written verbatim after `Note:`: a link whose target the text
+  // twins would drop (`[x](javascript:…)`) keeps the slide in an exact,
+  // inert JSON fence instead of becoming live Markdown.
+  if (typeof slide.notes === 'string' && hasUnsafeLink(slide.notes)) {
+    return `${head}${json('slide', slide)}`;
+  }
   const jsonBlocks = new Set<number>();
   if (slide.layout === 'free') {
     (slide.blocks as Bag[]).forEach((block, i) => {
@@ -565,7 +572,6 @@ function writeSlide(slide: Bag, plan: SlidePlan): string {
     const blocks = slideMarkdown(slide, plan, all, false);
     if (blocks !== null && slideSurvives(blocks, slide)) return blocks;
   }
-  const head = plan.section.length > 0 ? `${comment('slide', plan.section)}\n\n` : '';
   return `${head}${json('slide', slide)}`;
 }
 

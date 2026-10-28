@@ -319,6 +319,95 @@ describe('DeckStage v2: input, canvas and the mounted window', () => {
       },
       resetAll
     );
+    await scenario(
+      'rewrites a followed hash past the last step to the clamped route',
+      async () => {
+        mockPreferences();
+        const deck = deckOf([
+          free('opening', 'Opening'),
+          free('plan', 'Plan', {}, [
+            { type: 'list', step: 1, items: [{ text: 'A' }, { text: 'B' }] },
+          ]),
+        ]);
+        history.replaceState(null, '', '#/plan/9');
+        const { container } = render(DeckStage, { props: { deck, loadTheme: null } });
+        // A deep link is clamped too.
+        expect(active(container).dataset.step).toBe('2');
+        await waitFor(() => expect(location.hash).toBe('#/plan/2'));
+        // Already on the last step: the engine does not move, the address still follows.
+        for (const hash of ['#/plan/7', '#/plan/32']) {
+          history.replaceState(null, '', hash);
+          window.dispatchEvent(new Event('hashchange'));
+          await waitFor(() => expect(location.hash, hash).toBe('#/plan/2'));
+        }
+        // From another slide: the deck lands on the last step and says so.
+        history.replaceState(null, '', '#/opening/0');
+        window.dispatchEvent(new Event('hashchange'));
+        await waitFor(() => expect(activeId(container)).toBe('opening'));
+        history.replaceState(null, '', '#/plan/5');
+        window.dispatchEvent(new Event('hashchange'));
+        await waitFor(() => expect(activeId(container)).toBe('plan'));
+        expect(active(container).dataset.step).toBe('2');
+        await waitFor(() => expect(location.hash).toBe('#/plan/2'));
+      },
+      resetAll
+    );
+    await scenario(
+      'never drops a hashchange that arrives during a slide transition: it applies after',
+      async () => {
+        mockPreferences();
+        // Browsers run a view transition's DOM swap a frame or more later: hold it.
+        const pending: (() => void)[] = [];
+        (document as unknown as Doc).startViewTransition = vi.fn((update: () => void) => {
+          let finish: () => void = () => undefined;
+          const finished = new Promise<void>((resolve) => {
+            finish = resolve;
+          });
+          pending.push(() => {
+            update();
+            finish();
+          });
+          return { ready: Promise.resolve(), finished };
+        });
+        document.documentElement.animate =
+          vi.fn() as unknown as typeof document.documentElement.animate;
+        const release = async () => {
+          for (const run of pending.splice(0)) run();
+          await Promise.resolve();
+          await Promise.resolve();
+        };
+        const hashchange = () => window.dispatchEvent(new Event('hashchange'));
+        const { container } = render(DeckStage, {
+          props: { deck: deckOf(sixSlides()), loadTheme: null },
+        });
+        await waitFor(() => expect(location.hash).toBe('#/opening/0'));
+
+        // The address bar changes while opening → market is still playing. Its
+        // event is a queued task: the swap must not overwrite the typed hash first.
+        await press('ArrowRight');
+        expect(activeId(container)).toBe('opening');
+        history.replaceState(null, '', '#/plan/0');
+        await release();
+        expect(location.hash).toBe('#/plan/0');
+        hashchange();
+        await release();
+        await waitFor(() => expect(activeId(container)).toBe('plan'));
+        await waitFor(() => expect(location.hash).toBe('#/plan/0'));
+
+        // A hashchange while a transition is in flight waits for it, then applies.
+        await press('ArrowRight');
+        expect(activeId(container)).toBe('plan');
+        history.replaceState(null, '', '#/close/0');
+        hashchange();
+        expect(location.hash).toBe('#/close/0');
+        await release();
+        await waitFor(() => expect(pending.length).toBe(1));
+        await release();
+        await waitFor(() => expect(activeId(container)).toBe('close'));
+        await waitFor(() => expect(location.hash).toBe('#/close/0'));
+      },
+      resetAll
+    );
   });
 
   it('keyboard input is focus-scoped: in an embedded pair only the focused deck reacts', async () => {

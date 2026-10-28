@@ -4,7 +4,10 @@
  * descriptions and LLM context; one-way, unlike `deckToMarkdown`) and
  * `deckOutline` (one compact row per slide). Both are pure and
  * deterministic, and nothing an author typed can become HTML or a link
- * target in them: plain fields are escaped and Markdown fields made inert.
+ * target in them: plain fields are escaped and Markdown fields made inert
+ * (no raw HTML, and a link whose target is not `https:`, `http:`,
+ * `mailto:`, a fragment or a relative path keeps its label and loses its
+ * URL; see `neutralizeLinks`).
  */
 
 import { mathText, texToMath } from '../math/index.ts';
@@ -16,6 +19,7 @@ import {
   inertMarkdown,
   inlineCode,
   linkTarget,
+  neutralizeLinks,
   stripHidden,
   trimCharEnd,
 } from './text.ts';
@@ -66,7 +70,7 @@ function codeFence(code: string, lang: string): string {
   return `${fence}${lang.replace(/[^\w+-]/g, '').slice(0, 24)}\n${body}\n${fence}`;
 }
 
-const markdown = (value: unknown) => inertMarkdown(str(value)).trim();
+const markdown = (value: unknown) => inertMarkdown(neutralizeLinks(str(value))).trim();
 
 /** Every string of a value, labelled by key path (unknown shapes, component props). */
 function strings(value: unknown, path: string[] = [], out: string[] = [], depth = 0): string[] {
@@ -436,18 +440,21 @@ export interface DeckOutlineText {
   slides: DeckOutlineSlide[];
 }
 
+/** A title for the outline, with unsafe link targets dropped (see `neutralizeLinks`). */
+const outlineTitle = (title: string | null) => (title === null ? null : neutralizeLinks(title));
+
 /** One compact row per slide: id, layout and title (for authoring hints, MCP and agents). */
 export function deckOutline(
   deck: Deck,
   options: Pick<DeckTextOptions, 'includeHidden'> = {}
 ): DeckOutlineText {
   return {
-    title: deck.outline?.title?.trim() || deck.meta.title.trim() || null,
+    title: outlineTitle(deck.outline?.title?.trim() || deck.meta.title.trim() || null),
     slides: listed(deck, options.includeHidden ?? true).map(({ slide, number, section }) => ({
       number,
       id: slide.id,
       layout: slide.layout,
-      title: slideTitle(slide),
+      title: outlineTitle(slideTitle(slide)),
       section: section?.id ?? null,
       hidden: slide.hidden === true,
     })),
@@ -456,7 +463,7 @@ export function deckOutline(
 
 /** The outline as plain lines: `3. pricing · comparison-table · Plans compared`. */
 export function formatDeckOutline(outline: DeckOutlineText): string {
-  const clean = (text: string) => stripHidden(text).replace(/\s+/g, ' ').trim();
+  const clean = (text: string) => neutralizeLinks(text).replace(/\s+/g, ' ').trim();
   return outline.slides
     .map(
       (slide) =>

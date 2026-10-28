@@ -290,6 +290,7 @@ function fromGrammar(input: Bag, notes: Notes): Bag {
 // Protoyard
 
 const PART_WHOLE = ['pie', 'donut'];
+const STEP_KEYS = ['step', 'fragment', 'reveal', 'tone'] as const;
 
 /** Protoyard's ChartSpec (`kind`, `labels`, `series[{label, values}]`) as a chart block body. */
 function chartBody(spec: Bag, path: PathSegment[], notes: Notes): Bag {
@@ -307,6 +308,12 @@ function chartBody(spec: Bag, path: PathSegment[], notes: Notes): Bag {
   }
   const values = (entry: unknown): unknown[] =>
     isBag(entry) && Array.isArray(entry.values) ? (entry.values as unknown[]) : [];
+  /** A series entry's step marker (`step`, `fragment`, `reveal`, `tone`), kept as authored. */
+  const marker = (entry: unknown): Bag => {
+    const out: Bag = {};
+    if (isBag(entry)) for (const key of STEP_KEYS) assign(out, key, entry[key]);
+    return out;
+  };
   if (PART_WHOLE.includes(spec.kind as string) || spec.kind === 'funnel') {
     const first = values(series[0]);
     const data = labels.map((label, j) => ({
@@ -315,6 +322,17 @@ function chartBody(spec: Bag, path: PathSegment[], notes: Notes): Bag {
       value: typeof first[j] === 'number' ? first[j] : 0,
     }));
     out.props = spec.kind === 'funnel' ? { steps: data } : { data };
+    // One data list: a marker on the first series moves to the chart itself.
+    const firstMarker = marker(series[0]);
+    if (Object.keys(firstMarker).length > 0) {
+      if (spec.step === undefined) Object.assign(out, firstMarker);
+      else
+        notes.warn('The first series step marker was dropped; the chart has its own.', [
+          ...path,
+          'series',
+          0,
+        ]);
+    }
   } else {
     out.series = series.map((entry, s) => ({
       id: `series-${s + 1}`,
@@ -323,12 +341,13 @@ function chartBody(spec: Bag, path: PathSegment[], notes: Notes): Bag {
         const y = values(entry)[j];
         return { x, y: typeof y === 'number' ? y : null };
       }),
+      ...marker(entry),
     }));
   }
   if ((spec.unit !== undefined && spec.unit !== 'number') || spec.currency !== undefined) {
     notes.warn('The chart `unit`/`currency` was dropped; set a chart format in props.', path);
   }
-  for (const key of ['step', 'fragment', 'reveal', 'tone']) assign(out, key, spec[key]);
+  for (const key of STEP_KEYS) assign(out, key, spec[key]);
   notes.warn('The Protoyard ChartSpec became a Texuli chart block body.', path);
   return out;
 }

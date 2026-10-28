@@ -8,7 +8,11 @@
  * - The **registry lane** answers `component` (whole-slide components),
  *   `item` (component items on free slides), and supplies the parse hooks
  *   (`knownComponents`, `validateComponent`) for the second validation phase.
- * - A **host** answers `custom` (and may override anything with `slide`).
+ * - A **host** answers `custom` (and may override anything with `slide`),
+ *   and may replace the free-slide block check with `validateBlock`.
+ *
+ * The stage appends its default tables (layouts and the component registry)
+ * after the host's; `defaultRenderers={false}` leaves them out.
  *
  * A renderer is a Svelte component, or `{ load }` for one that is imported on
  * first use (only mounted slides trigger the import; `prefetch` warms the
@@ -181,13 +185,21 @@ export function resolveBackgroundRenderer(
   return first(list, (r) => r.background, background, lookup);
 }
 
-/** Merge the parse hooks of every renderer table (component ids are unioned). */
+/**
+ * Merge the parse hooks of every renderer table: component ids are unioned,
+ * component validators all run, and the first table with a `validateBlock`
+ * (the host's, ahead of the defaults) replaces the stage's block check.
+ */
 export function deckValidationHooks(list: readonly DeckRenderers[]): DeckValidationHooks {
   const known = list.flatMap((r) => r.knownComponents ?? []);
   const validators = list.flatMap((r) => (r.validateComponent ? [r.validateComponent] : []));
   const declared = list.some((r) => r.knownComponents !== undefined);
+  const blockTable = list.find((r) => typeof r.validateBlock === 'function');
   return {
     ...(declared ? { knownComponents: [...new Set(known)] } : {}),
+    ...(blockTable?.validateBlock
+      ? { validateBlock: blockTable.validateBlock.bind(blockTable) }
+      : {}),
     ...(validators.length > 0
       ? {
           validateComponent: (component, path) => {

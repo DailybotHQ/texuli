@@ -3,7 +3,8 @@
  * diagnostics. Every input goes through `migrateDeck` (a v2 deck passes
  * unchanged; a Texuli v1 deck, a grammar tree or a Protoyard deck is
  * converted) and then `parseDeck`, with `@texuli/blocks` checking each
- * free-slide block body. The stage paints only an `ok` result: an invalid
+ * free-slide block body (unless the host hooks bring their own
+ * `validateBlock`). The stage paints only an `ok` result: an invalid
  * deck is never rendered.
  */
 
@@ -18,10 +19,19 @@ import {
 import { createDiagnostic, type DeckDiagnostic, type PathSegment } from '@texuli/deck/schema';
 import { isUnsizedImage, playerFamilyOf, withStandInSize } from '../registry/extended.ts';
 
-/** The host hooks `parseDeck` runs in its second phase (the component registry fills these). */
+/**
+ * The host hooks `parseDeck` runs in its second phase (the component registry
+ * fills `knownComponents` and `validateComponent`). `validateBlock` replaces
+ * the stage's free-slide block check (`validateDeckBlock`, the
+ * `@texuli/blocks` schema): a host whose free-slide renderer paints its own
+ * blocks validates them itself, or returns `undefined` to accept every
+ * block. The built-in free-slide renderer still checks each block when it
+ * paints one, so a block it cannot read shows as a placeholder, never as
+ * raw data.
+ */
 export type DeckValidationHooks = Pick<
   ParseDeckOptions,
-  'validateComponent' | 'knownComponents' | 'maxIssues'
+  'validateComponent' | 'knownComponents' | 'maxIssues' | 'validateBlock'
 >;
 
 export type PreparedDeck =
@@ -92,9 +102,10 @@ export function prepareDeck(input: unknown, hooks: DeckValidationHooks = {}): Pr
   try {
     const migration = migrateDeck(input);
     from = migration.from;
+    const validateBlock = hooks.validateBlock ?? validateDeckBlock;
     const parsed = parseDeck(migration.deck, {
       ...hooks,
-      validateBlock: (block, path) => validateDeckBlock(block, path),
+      validateBlock: (block, path) => validateBlock(block, path),
     });
     const notes = migration.issues.filter((issue) => issue.severity !== 'error');
     if (parsed.ok && parsed.deck) {

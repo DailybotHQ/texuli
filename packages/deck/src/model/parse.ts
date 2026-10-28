@@ -98,7 +98,11 @@ class Sink {
   }
 }
 
-/** A copy of a block without the deck's step fields (at every nesting level). */
+/**
+ * A copy of a block without the deck's step fields (at every nesting level,
+ * including chart `series` entries, which the chart block parser refuses
+ * with step fields).
+ */
 export function stripStepFields<T>(block: T): T {
   if (!isBag(block)) return block;
   const out: Bag = {};
@@ -106,7 +110,7 @@ export function stripStepFields<T>(block: T): T {
     if ((STEP_FIELD_KEYS as readonly string[]).includes(key)) continue;
     out[key] = block[key];
   }
-  for (const key of ['blocks', 'children'] as const) {
+  for (const key of ['blocks', 'children', 'series'] as const) {
     if (Array.isArray(out[key])) out[key] = (out[key] as unknown[]).map(stripStepFields);
   }
   if (Array.isArray(out.columns)) {

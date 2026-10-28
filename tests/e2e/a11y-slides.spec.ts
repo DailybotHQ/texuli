@@ -200,6 +200,66 @@ test('structure and names; axe with the overview, presenter, help and blackout o
   });
 });
 
+test('the presenter split view at 1280 × 720 with the window-blocked notice keeps Previous and Next clear of the toolbar', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 1280, height: 720 });
+  // The browser blocks the presenter window: the split view shows the reason and stays.
+  await page.addInitScript(() => {
+    window.open = () => null;
+  });
+  const clearOfToolbar = async (id: SlidesFixture, label: string) => {
+    const pane = stage(page).locator('[data-tx-deck-presenter-split]');
+    for (const name of ['Previous', 'Next'] as const) {
+      const button = pane.getByRole('button', { name, exact: true });
+      await button.scrollIntoViewIfNeeded();
+      // Nothing paints over the button: the topmost element at its center is the button.
+      const clear = await button.evaluate((element) => {
+        const box = element.getBoundingClientRect();
+        const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+        return hit === element || element.contains(hit)
+          ? 'clear'
+          : `${hit?.tagName}.${hit?.className} at ${Math.round(box.top)}`;
+      });
+      expect(clear, `${id} (${label}): ${name}`).toBe('clear');
+    }
+  };
+  for (const id of ['slides-template-report', 'slides-presenter-screen'] as const) {
+    await test.step(id, async () => {
+      await gotoFixture(page, id);
+      const pane = stage(page).locator('[data-tx-deck-presenter-split]');
+      if ((await pane.count()) === 0) await tool(page, 'Presenter view').click();
+      await pane.getByRole('button', { name: 'Open presenter window' }).click();
+      await expect(pane.locator('[data-tx-deck-presenter-reason="popup-blocked"]')).toBeVisible();
+      await clearOfToolbar(id, 'host box');
+      // A full-window host (`fit="viewport"`) bounds the slide row: with long
+      // notes the pane is taller than the row, and it scrolls inside the row
+      // instead of running under the toolbar.
+      await stage(page).evaluate((element) => {
+        element.setAttribute('data-tx-deck-fit-mode', 'viewport');
+        const side = element.querySelector<HTMLElement>('[data-tx-deck-presenter-split]');
+        const main = element.querySelector<HTMLElement>('.tx-deck-stage__main');
+        const notes = side?.querySelector<HTMLElement>('.tx-deck-stage__notes');
+        if (!side || !main || !notes) throw new Error('presenter pane parts');
+        // Notes as tall as the row: the pane holds more than the row can show.
+        notes.style.minBlockSize = `${main.getBoundingClientRect().height}px`;
+      });
+      const bounds = await stage(page).evaluate((element) => {
+        const side = element.querySelector('[data-tx-deck-presenter-split]') as HTMLElement;
+        const main = element.querySelector('.tx-deck-stage__main') as HTMLElement;
+        return {
+          overflow: side.getBoundingClientRect().bottom - main.getBoundingClientRect().bottom,
+          scrolls: side.scrollHeight > side.clientHeight,
+        };
+      });
+      expect(bounds.overflow, `${id}: the pane stays inside the slide row`).toBeLessThanOrEqual(1);
+      expect(bounds.scrolls, `${id}: the pane scrolls`).toBe(true);
+      await clearOfToolbar(id, 'full window');
+    });
+  }
+});
+
 test('the deck keyboard map, chrome, tab order, reveal steps, fullscreen and motion', async ({
   page,
   browserName,

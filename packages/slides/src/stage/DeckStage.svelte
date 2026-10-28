@@ -26,6 +26,7 @@ import type {
   DeckAction,
   DeckActionSource,
   DeckController,
+  DeckHashLocation,
   DeckInputState,
   DeckLocation,
   DeckPlugin,
@@ -38,6 +39,7 @@ import {
   createDeckController,
   deckCanvasSize,
   fitDeckCanvas,
+  formatDeckHash,
   resolveDeckLocale,
   resolveDeckTransition,
 } from '@texuli/deck/engine';
@@ -123,6 +125,13 @@ interface Props {
   plugins?: readonly DeckPlugin[];
   /** Renderer tables, first answer wins (layouts, components, backgrounds, custom slides). */
   renderers?: DeckRenderers | readonly DeckRenderers[];
+  /**
+   * Append the default renderer tables (the 20 catalog layouts and the
+   * component registry) after `renderers`. Default true; `false` leaves every
+   * slide to the host's tables (nothing from the defaults loads: no lazy
+   * chunk, CSS or prefetch), and a slide no table answers shows a placeholder.
+   */
+  defaultRenderers?: boolean;
   /** Focus the active slide on mount. */
   autofocus?: boolean;
   /** Instance namespace (presenter channel, view-transition names). Defaults to a unique id. */
@@ -176,6 +185,7 @@ let {
   dir,
   plugins = [],
   renderers,
+  defaultRenderers = true,
   autofocus = false,
   namespace,
   initialSlideId,
@@ -207,8 +217,12 @@ const instance = namespace ?? uid;
 // svelte-ignore state_referenced_locally
 const ownsHash = browser && syncHash && claimDeckHash(window, instance);
 
-// Host renderers win; the default layouts and component registry answer last.
-let rendererList = $derived([...deckRendererList(renderers), layoutRenderers, componentRenderers]);
+// Host renderers win; the default layouts and component registry answer last (unless turned off).
+let rendererList = $derived(
+  defaultRenderers === false
+    ? [...deckRendererList(renderers)]
+    : [...deckRendererList(renderers), layoutRenderers, componentRenderers]
+);
 let prepared = $derived(prepareDeck(deck, deckValidationHooks(rendererList)));
 let model = $derived(prepared.ok ? prepared.deck : null);
 let t = $derived(createDeckTranslator(messages));
@@ -426,6 +440,24 @@ function flushFocus(deferred: boolean) {
 
 let focusAfterMove = false;
 
+// Slide transitions still playing, and the latest route (`hashchange`) that
+// arrived meanwhile: it is applied once they end, never dropped. `routeEpoch`
+// ignores transitions of an engine that has been replaced.
+let transitions = 0;
+let routeEpoch = 0;
+let queuedRoute: DeckHashLocation | null = null;
+let flushRoute: (() => void) | null = null;
+let followRoute: ((target: DeckHashLocation) => void) | null = null;
+// The hash the address bar shows on the stage's behalf: the last one it wrote
+// or followed. Any other deck route there is the user's, and is never
+// overwritten (its `hashchange` may still be on its way).
+let routeHash: string | null = null;
+
+function writeRoute(location: DeckHashLocation) {
+  writeDeckHash(window, location);
+  routeHash = formatDeckHash(location.slideId, location.step);
+}
+
 function visiblePosition(current: DeckState): number {
   return entries.findIndex((entry) => entry.index === current.slideIndex);
 }
@@ -498,7 +530,14 @@ function onEngineChange(current: DeckController, change: DeckStateChange) {
   });
   const detail = { from: fromId, to: next.slideId, transition: resolved, mode: played.mode };
   dispatchDeckEvent(root, 'tx-deck:transition-start', detail);
-  void played.finished.then(() => dispatchDeckEvent(root, 'tx-deck:transition-end', detail));
+  const epoch = routeEpoch;
+  transitions += 1;
+  void played.finished.then(() => {
+    dispatchDeckEvent(root, 'tx-deck:transition-end', detail);
+    if (epoch !== routeEpoch) return;
+    transitions = Math.max(0, transitions - 1);
+    if (transitions === 0) flushRoute?.();
+  });
   reportChange(change);
   if (focusAfterMove) {
     focusAfterMove = false;
@@ -538,6 +577,9 @@ $effect(() => {
   if (!current) return;
   untrack(() => {
     shown = { engine: current, state: current.getState() };
+    routeEpoch += 1;
+    transitions = 0;
+    queuedRoute = null;
     overviewOpen = false;
     blackout = false;
     enter = null;
@@ -598,19 +640,65 @@ $effect(() => {
 // URL hash: write on every position, follow hashchange and deep links.
 $effect(() => {
   if (!ownsHash || !view) return;
-  writeDeckHash(window, { slideId: view.slideId, step: view.step });
+  const at = { slideId: view.slideId, step: view.step };
+  untrack(() => {
+    // A route waits for the transition to end: keep the address the user typed until it applies.
+    if (queuedRoute) return;
+    // The user changed the address since the stage last wrote it (a slide
+    // transition can finish before the `hashchange` task runs): follow it, never overwrite it.
+    if (routeHash !== null && window.location.hash !== routeHash) {
+      const typed = readDeckHash(window);
+      if (typed && model && slideExists(model, typed.slideId) && followRoute) {
+        followRoute(typed);
+        return;
+      }
+    }
+    writeRoute(at);
+  });
 });
 $effect(() => {
   const current = engine;
   const currentDeck = model;
   if (!ownsHash || !current || !currentDeck) return;
-  return watchDeckHash(window, (target) => {
+  const follow = (target: DeckHashLocation, queued = false) => {
     if (!slideExists(currentDeck, target.slideId)) return;
+    const hash = formatDeckHash(target.slideId, target.step);
+    // The address bar is back at the stage's own position: nothing to follow,
+    // and a route queued meanwhile is no longer wanted.
+    if (!queued && hash === routeHash && window.location.hash === routeHash) {
+      queuedRoute = null;
+      return;
+    }
+    if (transitions > 0) {
+      queuedRoute = target;
+      return;
+    }
     const now = current.getState();
-    if (now.slideId === target.slideId && now.step === target.step) return;
-    const location: DeckLocation = { ...now, slideId: target.slideId, step: target.step };
-    current.goTo(location, { source: 'route' });
-  });
+    if (now.slideId !== target.slideId || now.step !== target.step) {
+      const location: DeckLocation = { ...now, slideId: target.slideId, step: target.step };
+      current.goTo(location, { source: 'route' });
+    }
+    routeHash = hash;
+    // A step past the slide's last one is clamped (or a plugin redirected the
+    // move): the address bar shows where the deck is, also when it did not move.
+    const after = current.getState();
+    if (after.slideId !== target.slideId || after.step !== target.step) {
+      writeRoute({ slideId: after.slideId, step: after.step });
+    }
+  };
+  followRoute = (target) => follow(target);
+  flushRoute = () => {
+    const target = queuedRoute;
+    queuedRoute = null;
+    if (target) follow(target, true);
+  };
+  const stop = watchDeckHash(window, (target) => follow(target));
+  return () => {
+    stop();
+    followRoute = null;
+    flushRoute = null;
+    queuedRoute = null;
+  };
 });
 
 // Idle prefetch of the slides after the mounted window.

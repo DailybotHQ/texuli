@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { render, screen } from '@testing-library/svelte';
+import { cleanup, render, screen } from '@testing-library/svelte';
 import { createMemoryPresenterTransport, resolveDeckTransition } from '@texuli/deck/engine';
 import type { DeckSlide } from '@texuli/deck/model';
 import { generateThemeFromSeed } from '@texuli/tokens/generator';
@@ -40,6 +40,7 @@ import {
   transitionKeyframes,
   viewTransitionPrefix,
 } from '../src/stage/transition.ts';
+import HostFreeSlide from './fixtures/HostFreeSlide.svelte';
 import { scenario } from './scenario.ts';
 
 const reset = () => {
@@ -157,6 +158,102 @@ describe('stage seams: messages, preparation and steps', () => {
         });
         expect(screen.getByRole('alert').textContent).toBe('This deck could not be shown.');
         expect(document.querySelector('[data-code="unknown-component"]')).toBeTruthy();
+      },
+      reset
+    );
+    await scenario(
+      'a host validateBlock replaces the blocks check, so host block types paint through the host',
+      () => {
+        const hostDeck = {
+          formatVersion: 2,
+          meta: { title: 'Host blocks' },
+          slides: [free('one', [{ type: 'host-card', title: 'Hello from the host' }])],
+        };
+        const refused = prepareDeck(hostDeck);
+        expect(refused.ok).toBe(false);
+        expect(refused.issues.map((issue) => issue.code)).toContain('block-props');
+        // Accept every block (the host paints them), or check them the host's way.
+        expect(
+          prepareDeck(hostDeck, deckValidationHooks([{ validateBlock: () => undefined }])).ok
+        ).toBe(true);
+        const strict = prepareDeck(
+          hostDeck,
+          deckValidationHooks([
+            {
+              validateBlock: (block, path) =>
+                block.type === 'host-card'
+                  ? [
+                      {
+                        code: 'block-props',
+                        severity: 'error',
+                        path,
+                        jsonPath: '$',
+                        pointer: '',
+                        message: 'The host refuses this card.',
+                      },
+                    ]
+                  : undefined,
+            },
+            // A later table never overrides the first block check.
+            { validateBlock: () => undefined },
+          ])
+        );
+        expect(strict.ok).toBe(false);
+        expect(strict.issues.map((issue) => issue.message)).toContain(
+          'The host refuses this card.'
+        );
+
+        render(DeckStage, {
+          props: {
+            deck: hostDeck,
+            loadTheme: null,
+            renderers: { validateBlock: () => undefined, free: () => HostFreeSlide },
+          },
+        });
+        expect(screen.queryByRole('alert')).toBeNull();
+        expect(document.querySelector('[data-host-free]')?.textContent?.trim()).toBe(
+          'Hello from the host'
+        );
+      },
+      reset
+    );
+    await scenario(
+      'defaultRenderers={false} leaves every slide to the host tables',
+      () => {
+        const deck = {
+          formatVersion: 2,
+          meta: { title: 'Host only' },
+          slides: [
+            { id: 'q', layout: 'quote', props: { quote: 'Small pieces.' } },
+            free('two', [{ type: 'text', markdown: 'Two' }]),
+          ],
+        };
+        const on = render(DeckStage, { props: { deck, loadTheme: null } });
+        const quote = () => document.querySelector('[data-slide-id="q"]');
+        expect(quote()?.querySelector('[data-tx-deck-placeholder]')).toBeNull();
+        on.unmount();
+
+        render(DeckStage, { props: { deck, loadTheme: null, defaultRenderers: false } });
+        expect(screen.queryByRole('alert')).toBeNull();
+        // No default layout table: the quote slide shows the labelled placeholder.
+        expect(quote()?.querySelector('[data-tx-deck-placeholder="quote"]')).toBeTruthy();
+        cleanup();
+        // Without the default registry, component ids are the host's to check.
+        const hostComponent = {
+          formatVersion: 2,
+          meta: { title: 'Ids' },
+          slides: [
+            { id: 'c', layout: 'component', component: { component: 'host-thing', props: {} } },
+          ],
+        };
+        const withDefaults = render(DeckStage, { props: { deck: hostComponent, loadTheme: null } });
+        expect(document.querySelector('[data-code="unknown-component"]')).toBeTruthy();
+        withDefaults.unmount();
+        render(DeckStage, {
+          props: { deck: hostComponent, loadTheme: null, defaultRenderers: false },
+        });
+        expect(screen.queryByRole('alert')).toBeNull();
+        expect(document.querySelector('[data-tx-deck-placeholder="component"]')).toBeTruthy();
       },
       reset
     );

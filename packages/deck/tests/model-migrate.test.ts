@@ -1,6 +1,13 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { detectDeckShape, loadUntrustedDeck, migrateDeck, parseDeck } from '../src/model/index.ts';
+import {
+  detectDeckShape,
+  loadUntrustedDeck,
+  migrateDeck,
+  parseDeck,
+  slideSteps,
+  stripStepFields,
+} from '../src/model/index.ts';
 import type { DeckDiagnostic } from '../src/schema/index.ts';
 import cedar from './fixtures/migrate/protoyard-cedar-training.json';
 import createAnything from './fixtures/migrate/protoyard-create-anything.json';
@@ -284,6 +291,55 @@ describe('migrateDeck: rules', () => {
       slides: [{ id: 'a', layout: 'quote', props: { quote: 'Q' } }],
     }).deck as Json;
     expect(untitled.meta).toEqual({ title: 'Untitled deck' });
+  });
+
+  it('keeps Protoyard step markers on chart series entries', () => {
+    const spec = (kind: string, series: Json[], extra: Json = {}) => ({
+      kind,
+      title: 'Revenue',
+      description: 'Fictional revenue by quarter.',
+      labels: ['Q1', 'Q2'],
+      series,
+      ...extra,
+    });
+    const { deck } = migrateDeck({
+      style: {},
+      slides: [
+        {
+          id: 'bars',
+          layout: 'chart',
+          props: {
+            spec: spec('bar', [
+              { label: 'North', values: [1, 2] },
+              { label: 'South', values: [3, 4], step: 1, fragment: 'fade-up' },
+              { label: 'West', values: [5, 6], step: 2, reveal: 'grow', tone: 'accent' },
+            ]),
+          },
+        },
+        {
+          id: 'pie',
+          layout: 'chart',
+          props: { spec: spec('pie', [{ label: 'Share', values: [60, 40], step: 1 }]) },
+        },
+      ],
+    }) as { deck: Json };
+    const [barSlide, pieSlide] = deck.slides as [Json, Json];
+    const bars = ((barSlide.props as Json).spec as Json).series as Json[];
+    expect(bars.map(({ points: _points, ...rest }) => rest)).toEqual([
+      { id: 'series-1', label: 'North' },
+      { id: 'series-2', label: 'South', step: 1, fragment: 'fade-up' },
+      { id: 'series-3', label: 'West', step: 2, reveal: 'grow', tone: 'accent' },
+    ]);
+    // A part-whole chart has one data list: the first series marker moves to the chart.
+    expect(((pieSlide.props as Json).spec as Json).step).toBe(1);
+    const parsed = parseDeck(deck);
+    expect(parsed.ok).toBe(true);
+    expect(parsed.steps?.map((steps) => steps.count)).toEqual([2, 1]);
+    expect(slideSteps(barSlide as never).count).toBe(2);
+    // The stage strips the markers before the chart block parser reads the series.
+    const stripped = stripStepFields((barSlide.props as Json).spec) as Json;
+    expect((stripped.series as Json[]).every((entry) => !('step' in entry))).toBe(true);
+    expect((stripped.series as Json[]).every((entry) => !('fragment' in entry))).toBe(true);
   });
 
   it('reports v1 step gaps, empty slides and bad start indexes', () => {

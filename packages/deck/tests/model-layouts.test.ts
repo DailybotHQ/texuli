@@ -298,6 +298,32 @@ describe('validateLayoutProps', () => {
     const wide = withValue('comparison-table', ['columns'], ['A', 'B', 'C', 'D', 'E']);
     expect(codesAt(validateLayoutProps('comparison-table', wide))).toContain('too-many $.columns');
   });
+
+  it("accepts the deck's own routes as link targets and still refuses every other hash path", () => {
+    const accepted = ['#/intro', '#/intro/0', '#/q3-results/7', '#/a/32', '#top', '#'];
+    for (const href of accepted) {
+      const props = withValue('closing-cta', ['cta', 'href'], href);
+      expect(codesAt(validateLayoutProps('closing-cta', props)), href).toEqual([]);
+    }
+    const refused = [
+      '#/Intro',
+      '#/intro/33',
+      '#/intro/1/2',
+      '#/intro/',
+      '#//evil.example',
+      '#/../x',
+      '#/intro?x=1',
+      '#/-intro',
+      `#/${'a'.repeat(65)}`,
+      '#/intro/%31',
+    ];
+    for (const href of refused) {
+      const props = withValue('closing-cta', ['cta', 'href'], href);
+      expect(codesAt(validateLayoutProps('closing-cta', props)), href).toEqual([
+        'pattern $.cta.href',
+      ]);
+    }
+  });
 });
 
 /** Every object schema reachable from a layout's props, with its path pattern. */

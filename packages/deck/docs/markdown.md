@@ -455,7 +455,8 @@ There is no HTML sink anywhere in the dialect:
   map to nothing (`md-class-refused`) are refused.
 - CSS values (a CSS gradient, `url(…)`) in background attributes are
   `md-css-refused`; name a preset instead.
-- Links must be `https:`, `mailto:`, a `#fragment` or a relative path, and
+- Links must be `https:`, `mailto:`, a `#fragment`, a deck route
+  (`#/<slide-id>` or `#/<slide-id>/<step>`) or a relative path, and
   media an `https:` URL, a relative path (no `..` or `.svg`, in any letter
   case and also percent-encoded), a base64
   `data:` raster or video, or an `avatar:` id. Anything else
@@ -575,7 +576,15 @@ migrated Protoyard fixtures (`tests/markdown-roundtrip.test.ts`,
 ## Text twins
 
 One-way plain-text views, pure and deterministic; nothing an author typed
-becomes HTML or a link target in them:
+becomes HTML or a link target in them. Plain fields are escaped; Markdown
+fields (text blocks, list items, quotes, callouts) keep their syntax, minus
+raw HTML and minus any link whose target is not `https:`, `http:`,
+`mailto:`, a fragment or a relative path: such a link keeps its label and
+loses its URL (`[docs](javascript:x)` becomes `docs`), and a reference
+definition with such a target is broken so no link uses it. Outline titles
+get the same treatment. The canonical writer (`deckToMarkdown`) never writes
+such a link as live Markdown either: a slide whose notes carry one is written
+as an exact `::: slide` JSON fence, as a block that holds one already is.
 
 - `deckToText(deck, options?)`: a readable Markdown document for
   accessibility, artifact descriptions and LLM context. `DeckTextOptions`:

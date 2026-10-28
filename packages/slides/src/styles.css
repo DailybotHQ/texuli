@@ -410,6 +410,28 @@
   min-inline-size: 0;
 }
 
+/*
+ * A stage with a bounded height (`fit="viewport"` or the window-filling full
+ * screen): the slide row has a fixed height, so the presenter pane scrolls
+ * inside it instead of running into the toolbar row below, which would paint
+ * over its Previous and Next buttons. (In a host box the row grows with the
+ * pane and the percentage resolves to none.)
+ */
+.tx-deck-stage[data-presenter]:is([data-tx-deck-fit-mode="viewport"], [data-fullscreen])
+.tx-deck-stage__main {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.tx-deck-stage:is([data-tx-deck-fit-mode="viewport"], [data-fullscreen])
+  .tx-deck-stage__main
+  > .tx-deck-stage__presenter-side {
+  /* Rows keep their content height: the preview (overflow hidden) would collapse its row. */
+  grid-auto-rows: max-content;
+  max-block-size: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 .tx-deck-stage__timer {
   display: flex;
   flex-wrap: wrap;

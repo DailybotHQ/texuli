@@ -8,6 +8,7 @@ import {
   DECK_LINT_MAX_ISSUES,
   DECK_OUTLINE_IDS,
   DECK_OUTLINES,
+  type DeckLintIssue,
   deck,
   generateDeckFromBrief,
   lintDeck,
@@ -168,6 +169,122 @@ describe('static quality lint', () => {
         'custom-slide',
       ])
     );
+  });
+
+  const LONG_NOTES = 'Walk through the evidence, then invite questions from the room.';
+  const lintOne = (slide: Record<string, unknown>) =>
+    lintDeck({
+      formatVersion: 2,
+      meta: { title: 'Rules' },
+      slides: [{ notes: LONG_NOTES, ...slide }],
+    }).issues;
+  const finding = (issues: DeckLintIssue[], rule: string) =>
+    issues.filter((issue) => issue.rule === rule).map((issue) => [issue.jsonPath, issue.message]);
+
+  it('too-many-words counts human text only and points at the wordiest free block', () => {
+    const words = (n: number) => Array.from({ length: n }, (_, i) => `word${i}`).join(' ');
+    // Settings never count: chart kinds and series labels as data, ids, widths, URLs, code.
+    const settings = lintOne({
+      id: 'settings',
+      layout: 'free',
+      blocks: [
+        { type: 'heading', level: 2, text: 'Revenue' },
+        {
+          type: 'chart',
+          kind: 'stacked-bar-horizontal',
+          title: 'Quarterly',
+          description: 'Fictional data.',
+          series: Array.from({ length: 12 }, (_, i) => ({
+            id: `series-${i}`,
+            points: Array.from({ length: 6 }, (__, j) => ({ x: `quarter-${j}`, y: j })),
+          })),
+        },
+        { type: 'code', lang: 'ts', code: words(80) },
+        { type: 'text', markdown: `See [docs](https://example.com/${'a/'.repeat(40)}).` },
+      ],
+    });
+    expect(finding(settings, 'too-many-words')).toEqual([]);
+    // Human text: titles, body strings, list items and table cells; notes never count.
+    const wordy = lintOne({
+      id: 'wordy',
+      layout: 'free',
+      notes: `${LONG_NOTES} ${words(200)}`,
+      blocks: [
+        { type: 'heading', level: 2, text: words(5) },
+        { type: 'list', items: [{ text: words(20) }, { text: words(20) }] },
+        {
+          type: 'table',
+          columns: [{ id: 'a', label: 'Plan' }],
+          rows: [{ a: words(12) }],
+        },
+      ],
+    });
+    expect(finding(wordy, 'too-many-words')).toEqual([
+      [
+        '$.slides[0].blocks[1]',
+        'The slide "wordy" has 58 words of text; the suggested limit is 55. blocks[1] (list) holds the most (40).',
+      ],
+    ]);
+    // Layout slides name the field and stay at props.
+    const layout = lintOne({
+      id: 'split',
+      layout: 'two-column-split',
+      props: { left: { heading: 'Left', body: words(40) }, right: { body: words(20) } },
+    });
+    expect(finding(layout, 'too-many-words')).toEqual([
+      [
+        '$.slides[0].props',
+        'The slide "split" has 61 words of text; the suggested limit is 55. props.left holds the most (41).',
+      ],
+    ]);
+  });
+
+  it('notes-boilerplate finds boilerplate phrases inside notes, in any case', () => {
+    for (const notes of [
+      'Do not read the slide.',
+      '  DON’T READ THE SLIDE — tell the story of the launch instead, with numbers.',
+      'Opening: no leer la diapositiva, contar la historia.',
+    ]) {
+      const issues = lintOne({ id: 'intro', layout: 'quote', props: { quote: 'Q' }, notes });
+      expect(finding(issues, 'notes-boilerplate'), notes).toEqual([
+        [
+          '$.slides[0].notes',
+          expect.stringMatching(/^The slide "intro" "notes" contain the boilerplate phrase "/),
+        ],
+      ]);
+    }
+    const clean = lintOne({
+      id: 'intro',
+      layout: 'quote',
+      props: { quote: 'Q' },
+      notes: 'Read the slide title aloud, then do not dwell on the numbers for long.',
+    });
+    expect(finding(clean, 'notes-boilerplate')).toEqual([]);
+  });
+
+  it('empty-steps points at each empty label and skips custom slides', () => {
+    const issues = lintOne({
+      id: 'reveal',
+      layout: 'free',
+      steps: ['Problem', 'Answer', 'Extra'],
+      blocks: [
+        { type: 'text', markdown: 'Problem', step: 1 },
+        { type: 'text', markdown: 'Answer', step: 2 },
+      ],
+    });
+    expect(finding(issues, 'empty-steps')).toEqual([
+      [
+        '$.slides[0].steps[2]',
+        'The slide "reveal" labels step 3 ("Extra") in "steps", but nothing reveals on it.',
+      ],
+    ]);
+    const custom = lintOne({
+      id: 'widget',
+      layout: 'custom',
+      steps: ['One', 'Two'],
+      props: { component: 'host-widget' },
+    });
+    expect(finding(custom, 'empty-steps')).toEqual([]);
   });
 
   it('stays bounded on hostile decks: 16,000 slides, deep props, a capped and deduplicated list', () => {

@@ -15,7 +15,9 @@
  *   object): highlight *i* at `step + i`, `step` defaulting to 0;
  * - props markers `{ step, fragment | reveal, tone }` anywhere in `props`
  *   (a marker off the layout's steppable paths still counts, with a
- *   `step-unrevealed` warning, as in Protoyard);
+ *   `step-unrevealed` warning, as in Protoyard); a props object with
+ *   `fragment` or `reveal` but no `step` reveals nothing and is reported as
+ *   the warning `step-missing`;
  * - `slide.steps` labels, which name steps 1… and may extend the count.
  * A `custom` slide's props belong to its host component: labels only.
  *
@@ -53,6 +55,7 @@ export const STEP_CODES = Object.freeze({
   fragmentConflict: 'fragment-conflict',
   tooManySteps: 'too-many-steps',
   stepUnrevealed: 'step-unrevealed',
+  stepMissing: 'step-missing',
 } as const);
 export type StepCode = (typeof STEP_CODES)[keyof typeof STEP_CODES];
 export type StepDiagnostic = DeckDiagnostic<StepCode>;
@@ -328,6 +331,16 @@ function fromProps(value: unknown, path: PathSegment[], depth: number, walk: Pro
   // A props code object (`{ source, highlights }`, as in code-with-callout).
   if (typeof record.source === 'string' && Array.isArray(record.highlights)) {
     fromHighlights(record.highlights, base, path, toneOf(record), {}, walk.out);
+  }
+  if (record.step === undefined && (record.fragment !== undefined || record.reveal !== undefined)) {
+    const field = record.fragment !== undefined ? 'fragment' : 'reveal';
+    walk.out.issue(
+      STEP_CODES.stepMissing,
+      `This marker sets "${field}" but no "step", so it is ignored and never reveals.`,
+      path,
+      `Add "step": 1 (or the step it should enter on), or remove "${field}".`,
+      true
+    );
   }
   if (stepped) {
     const effect = walk.out.effectOf(record, path);

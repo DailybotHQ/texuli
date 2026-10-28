@@ -55,8 +55,13 @@ function refresh() {
 $effect(() => {
   if (!timers) return;
   refresh();
+  // A start, pause, reset or slide change repaints at once (auto-start included).
+  const off = timers.onChange(refresh);
   const interval = setInterval(refresh, 1000);
-  return () => clearInterval(interval);
+  return () => {
+    off();
+    clearInterval(interval);
+  };
 });
 
 $effect(() => {

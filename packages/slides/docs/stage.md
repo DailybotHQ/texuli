@@ -42,7 +42,8 @@ scoped styles.
 | `messages` | — | Partial overrides of every stage string (`DeckStageMessages`; English defaults) |
 | `locale` / `dir` | `meta.locale` / `meta.dir` | Override the `lang` and `dir` of the stage |
 | `plugins` | `[]` | Engine plugins (`beforeNavigate`, `beforeRender`/`afterRender`, `onAction`, …), in order |
-| `renderers` | — | Renderer tables, first answer wins (`DeckRenderers`: layouts, components, backgrounds, custom slides) |
+| `renderers` | — | Renderer tables, first answer wins (`DeckRenderers`: layouts, components, backgrounds, custom slides, and the free-slide block check `validateBlock`) |
+| `defaultRenderers` | `true` | Append the default tables (the 20 catalog layouts and the component registry) after `renderers`. `false` leaves every slide to the host's tables: nothing from the defaults loads (no lazy chunk, CSS or prefetch), component ids are the host's to check, and a slide no table answers shows a labelled placeholder |
 | `autofocus` | `false` | Focus the active slide on mount |
 | `namespace` | a unique id | Instance namespace: presenter channel, view-transition names and the first-visit hint |
 | `initialSlideId` | first visible slide | Open on this slide (a valid URL hash wins when the stage owns it) |
@@ -71,7 +72,22 @@ scoped styles.
   and never throws (a `PreparedDeck`: the deck, or its issues). The host
   registry adds its checks through `DeckValidationHooks`
   (`deckValidationHooks` merges the tables); `validateDeckBlock` checks one
-  free-slide block body.
+  free-slide block body against `@texuli/blocks`. A host whose free-slide
+  renderer paints its own block types replaces that check with
+  `validateBlock(block, path)` on its renderer table (the first table with
+  one wins; return `undefined` to accept a block, or diagnostics to refuse
+  it, and call `validateDeckBlock` to keep the default for the rest). The
+  built-in free-slide renderer still checks each block when it paints it, so
+  a block it cannot read shows a placeholder, never raw data.
+
+  ```ts
+  const hostBlocks: DeckRenderers = {
+    validateBlock: (block, path) =>
+      block.type === 'host-card' ? undefined : validateDeckBlock(block, path),
+    free: () => HostFreeSlide,
+  };
+  // <DeckStage {deck} renderers={hostBlocks} />
+  ```
 - **Canvas:** a fixed virtual canvas (1280 × 720 for 16:9) is scaled into
   the stage with a `ResizeObserver` and letterboxed. CSS variables go on the
   stage root through `deckCssVars` (the CSSOM, never a static `style`).
@@ -88,7 +104,13 @@ scoped styles.
 - **Hash:** `#/<slide>/<step>`. `claimDeckHash` gives the page hash to one
   stage, `releaseDeckHash` frees it, `readDeckHash`, `writeDeckHash` and
   `watchDeckHash` read, write (`replaceState`) and follow it on a
-  `DeckRouteWindow`. Hostile hashes are ignored.
+  `DeckRouteWindow`. Hostile hashes are ignored. A followed hash past a
+  slide's last step is clamped, and the address is rewritten to the clamped
+  route (also when the deck did not move). A `hashchange` that arrives while a
+  slide transition plays is queued and applied when the transition ends (the
+  latest one wins), and the stage never overwrites a deck route it did not
+  write: a transition that finishes before the user's `hashchange` runs
+  follows the typed route instead of replacing it.
 - **Keys** follow the engine registry (`DECK_CONTROLS`, `decideDeckInput`);
   `keyInput` and `clickInput` describe the DOM event for it. Keys act while
   focus is inside the deck; the deck that owns the hash also takes keys
@@ -265,7 +287,13 @@ returns focus to the slide. Each card is named by its visible caption
 
 `S`, `P` or the toolbar opens the presenter layout, `DeckPresenterPane`
 beside the slides (notes, up next, and with `presenterTimer` a timer). A
-host replaces it with `presenterView`. `createPresenterTimer(now?)` returns
+host replaces it with `presenterView`. The timers start with the pane and the
+status line says so from the first paint (`DeckPresenterTimers.onChange`
+repaints it on every start, pause, reset and slide change); the slide
+stopwatch restarts the moment the deck moves to another slide, not when the
+transition paints it. In a stage with a bounded height (`fit="viewport"` or
+the window-filling full screen) the pane scrolls inside the slide row, so the
+toolbar never covers its Previous and Next buttons. `createPresenterTimer(now?)` returns
 a `PresenterTimer` and `formatElapsed(ms)` formats it.
 
 ### Fullscreen

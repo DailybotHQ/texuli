@@ -334,6 +334,60 @@ describe('presenter split view', () => {
       },
       reset
     );
+    await scenario(
+      'the label says the timers run from the first paint, and the slide stopwatch restarts at navigation',
+      async () => {
+        mockMatchMedia();
+        vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+        vi.setSystemTime(new Date(2026, 9, 27, 9, 41, 0));
+        // Browsers run a view transition's DOM swap a frame or more later: hold it.
+        const pending: (() => void)[] = [];
+        const doc = document as unknown as { startViewTransition?: unknown };
+        doc.startViewTransition = vi.fn((update: () => void) => {
+          let finish: () => void = () => undefined;
+          const finished = new Promise<void>((resolve) => {
+            finish = resolve;
+          });
+          pending.push(() => {
+            update();
+            finish();
+          });
+          return { ready: Promise.resolve(), finished };
+        });
+        document.documentElement.animate =
+          vi.fn() as unknown as typeof document.documentElement.animate;
+        try {
+          render(DeckStage, {
+            props: { deck: talkDeck(), loadTheme: null, presenter: true, presenterTimer: true },
+          });
+          const reading = (name: string) =>
+            screen.getByRole('timer', { name }).textContent?.trim() ?? '';
+          await screen.findAllByRole('timer');
+          // Auto-started: no one-second window that offers "Start timers".
+          expect(screen.getByRole('button', { name: 'Pause timers' })).toBeTruthy();
+          expect(screen.queryByRole('button', { name: 'Start timers' })).toBeNull();
+
+          vi.advanceTimersByTime(20_000);
+          flushSync();
+          expect(reading('Slide')).toBe('0:20');
+          await fireEvent.click(inSplit().getByRole('button', { name: 'Next' }));
+          flushSync();
+          // The engine moved; the transition has not painted the new slide yet.
+          expect(activeSlide()?.dataset.slideId).toBe('intro');
+          expect(reading('Slide')).toBe('0:00');
+          expect(reading('Elapsed')).toBe('0:20');
+          vi.advanceTimersByTime(3_000);
+          for (const run of pending.splice(0)) run();
+          await Promise.resolve();
+          flushSync();
+          expect(activeSlide()?.dataset.slideId).toBe('goals');
+          expect(reading('Slide')).toBe('0:03');
+        } finally {
+          Reflect.deleteProperty(document, 'startViewTransition');
+        }
+      },
+      reset
+    );
   });
 });
 

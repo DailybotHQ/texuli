@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
+import { parseDeck } from '../src/model/parse.ts';
 import { FRAGMENT_EFFECTS, type FragmentEffect, MAX_SLIDE_STEPS } from '../src/model/shared.ts';
 import {
   activeCodeHighlight,
@@ -315,6 +316,40 @@ describe('slideSteps: conflicts and limits', () => {
     ]);
     expect(steppablePattern([])).toBe('');
     expect(steppablePattern(['cards', 2, 'cta'])).toBe('cards.*.cta');
+  });
+
+  it('warns step-missing for a props marker with fragment or reveal but no step', () => {
+    const slide = {
+      id: 'cards',
+      layout: 'three-column-cards',
+      props: {
+        cards: [
+          { heading: 'A', body: 'One', fragment: 'fade-up' },
+          { heading: 'B', body: 'Two', reveal: 'grow', tone: 'accent' },
+          { heading: 'C', body: 'Three', fragment: 'in', step: 1 },
+        ],
+      },
+    };
+    const steps = slideSteps(slide, { steppablePaths: ['cards.*'], path: ['slides', 2] });
+    expect(steps.count).toBe(1);
+    expect(codes(steps)).toEqual([
+      'warning step-missing $.slides[2].props.cards[0]',
+      'warning step-missing $.slides[2].props.cards[1]',
+    ]);
+    expect(steps.issues[0]?.message).toContain('"fragment" but no "step"');
+    expect(steps.issues[1]?.message).toContain('"reveal" but no "step"');
+    expect(steps.issues[0]?.slideId).toBe('cards');
+    // parseDeck reports it as a warning: the deck stays valid.
+    const parsed = parseDeck({ formatVersion: 2, meta: { title: 'Steps' }, slides: [slide] });
+    expect(parsed.ok).toBe(true);
+    expect(
+      parsed.issues.map((issue) => `${issue.severity} ${issue.code} ${issue.jsonPath}`)
+    ).toEqual([
+      'warning step-missing $.slides[0].props.cards[0]',
+      'warning step-missing $.slides[0].props.cards[1]',
+    ]);
+    // A marker with a step, or a tone alone, is not reported.
+    expect(slideSteps({ props: { tone: 'accent' } }).issues).toEqual([]);
   });
 });
 

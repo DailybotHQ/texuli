@@ -572,6 +572,7 @@ describe('deck model: JSON Schema, codes and the root aggregate', () => {
       'fragment-conflict',
       'too-many-steps',
       'step-unrevealed',
+      'step-missing',
       'unknown-layout',
       'layout-props',
       'unknown-background',

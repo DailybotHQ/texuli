@@ -101,8 +101,10 @@ From `shared.ts`, used by every part of the model:
   or end marker (`%2esvg`, `.svg%3F`, `.svg%23`)
   (`png`, `jpeg`, `gif`, `webp`, `avif`) or video (`mp4`, `webm`), or an
   `avatar:av-NNN` id.
-- `LINK_HREF_PATTERN` and `linkHref`: `https:`, `mailto:`, a `#fragment` or
-  a relative path (no `//`, no `..`).
+- `LINK_HREF_PATTERN` and `linkHref`: `https:`, `mailto:`, a `#fragment`,
+  the deck's own route (`#/<slide-id>` or `#/<slide-id>/<step>`, step 0 to
+  32, as the engine's `parseDeckHash` reads it) or a relative path (no `//`,
+  no `..`). Any other `#/…` path stays refused.
 - `boundedProps` (`t.json` with depth 4) and `componentProps` (depth 8,
   2,000 items per array, so data views and workflow graphs fit).
 - `FRAGMENT_EFFECTS`, `BLOCK_REVEALS`, `FRAGMENT_TONES` and `stepFields`
@@ -414,7 +416,9 @@ Rules, from `slideSteps`:
 - A code block's `highlights` (or a props `code` object): highlight *i* at
   `step + i`, `step` defaulting to 0.
 - Props markers count anywhere in `props`; a marker off the layout's
-  steppable paths still counts, with a `step-unrevealed` warning.
+  steppable paths still counts, with a `step-unrevealed` warning. A props
+  object with `fragment` or `reveal` but no `step` reveals nothing and is
+  reported as the warning `step-missing` at the marker's path.
 - `slide.steps` labels name steps 1… and may extend the count.
 - A `custom` slide steps through its labels only.
 - More than 32 distinct steps is the error `too-many-steps`.
@@ -617,6 +621,7 @@ to `DeckCode`, the keys of `DECK_CODES`; `DeckCodeInfo` is one row
 | `fragment-conflict` | error | cross-field | A step marker sets both `fragment` and `reveal`. |
 | `too-many-steps` | error | cross-field | A slide has more than 32 distinct steps. |
 | `step-unrevealed` | warning | cross-field | A step marker sits where the layout reveals nothing. |
+| `step-missing` | warning | cross-field | A props marker sets `fragment` or `reveal` but no `step`; it is ignored. |
 | `unknown-component` | error | host | The component id is not in the host registry. |
 | `component-props` | error | host | The host registry refused the component props. |
 | `block-props` | error | host | The host block validator refused a block. |

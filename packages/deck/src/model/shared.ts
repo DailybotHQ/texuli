@@ -91,9 +91,13 @@ export const MEDIA_SRC_PATTERN = `^(?:https://(?![^?#]*${SVG_ENDING})[^\\s"<>\\\
 
 export const mediaSrc = t.string({ min: 1, max: 2_000_000, pattern: MEDIA_SRC_PATTERN });
 
-/** Link syntax: `https:`, `mailto:`, a fragment or a relative path. */
+/**
+ * Link syntax: `https:`, `mailto:`, a fragment, the deck's own route
+ * (`#/<slide-id>` or `#/<slide-id>/<step>`, step 0 to 32, as `parseDeckHash`
+ * reads it) or a relative path.
+ */
 export const LINK_HREF_PATTERN =
-  '^(?:https://[^\\s"<>\\\\]+|mailto:[^\\s"<>\\\\]+|#[A-Za-z0-9._~-]*|(?!//)(?!.*\\.\\.)[A-Za-z0-9._~/-]+(?:[?#][^\\s"<>\\\\]*)?)$';
+  '^(?:https://[^\\s"<>\\\\]+|mailto:[^\\s"<>\\\\]+|#[A-Za-z0-9._~-]*|#/[a-z0-9][a-z0-9-]{0,63}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?!//)(?!.*\\.\\.)[A-Za-z0-9._~/-]+(?:[?#][^\\s"<>\\\\]*)?)$';
 
 export const linkHref = t.string({ min: 1, max: 2048, pattern: LINK_HREF_PATTERN });
 

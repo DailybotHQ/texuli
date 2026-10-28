@@ -125,6 +125,11 @@ export const DECK_CODES = Object.freeze({
     'cross-field',
     'A step marker sits where the layout reveals nothing.'
   ),
+  'step-missing': code(
+    'warning',
+    'cross-field',
+    'A props marker sets `fragment` or `reveal` but no `step`; it is ignored.'
+  ),
   // Host phase (parse options)
   'unknown-component': code('error', 'host', 'The component id is not in the host registry.'),
   'component-props': code('error', 'host', 'The host registry refused the component props.'),

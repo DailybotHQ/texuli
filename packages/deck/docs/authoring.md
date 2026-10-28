@@ -159,15 +159,15 @@ pass. `DECK_LINT_RULES` groups the rules:
 | `image-alt` | error | An image (a layout `image` or an `image` block) has no descriptive alt text. |
 | `image-size` | error | An image has no intrinsic `width` and `height`. |
 | `step-order` | error | A later element is revealed before an earlier one (authored steps go down in document order). |
-| `empty-steps` | warning | The slide labels more steps than it reveals. |
+| `empty-steps` | warning | A step label in `steps` names a step on which nothing reveals (reported at that label; `custom` slides, whose host reveals its own steps, are skipped). |
 | `unknown-background` | warning | A slide background string is not a preset id. |
 | `custom-slide` | warning | A `custom` slide depends on a host renderer and may not travel with the deck. |
 | `step-unrevealed` | warning | A step marker sits where the layout reveals nothing. |
 | `notes-missing` | warning | A visible slide has no notes, or notes under 40 characters. |
 | `notes-duplicate` | warning | A slide's notes repeat an earlier slide's. |
-| `notes-boilerplate` | warning | Notes are boilerplate such as "do not read the slide". |
+| `notes-boilerplate` | warning | Notes contain a boilerplate phrase such as "do not read the slide" (case-insensitive, anywhere in the notes). |
 | `layout-repetition` | warning | A layout repeats more than twice in a row. |
-| `too-many-words` | warning | A visible slide has more than 55 words (60 for `title-hero` and `big-stat`). |
+| `too-many-words` | warning | A visible slide has more than 55 words of human text (60 for `title-hero` and `big-stat`): titles, bodies, list items, labels, captions and table cells, never settings such as chart kinds, ids, URLs, code or widths, and never the notes. A free slide is reported at its wordiest block, a layout slide at `props`. |
 | `prefer-layout` | warning (listed under `suggestions`) | A visible free slide holds a chart, table, quote, code or image block that may fit a catalog layout better. |
 
 Other `parseDeck` issues keep their code as the rule. Every starter deck in
