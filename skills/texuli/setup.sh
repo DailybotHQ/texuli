@@ -88,6 +88,12 @@ die_usage() {
   exit 2
 }
 
+# Fails with a usage error unless the option ($2) has a non-empty value ($3);
+# $1 is the remaining argument count.
+need_value() {
+  if [ "$1" -lt 2 ] || [ -z "$3" ]; then die_usage "$2"; fi
+}
+
 # The skills directory for a host, relative to the home; empty when unknown.
 host_dir() {
   case "$1" in
@@ -213,18 +219,18 @@ EXPECT=""
 SHOW_VERSION=0
 while [ $# -gt 0 ]; do
   case "$1" in
-    --host) [ $# -ge 2 ] && [ -n "$2" ] || die_usage "--host needs a value"; HOST=$2; shift 2 ;;
+    --host) need_value $# "--host needs a value" "${2:-}"; HOST=$2; shift 2 ;;
     --host=*) HOST=${1#--host=}; shift ;;
-    --home) [ $# -ge 2 ] && [ -n "$2" ] || die_usage "--home needs a directory"; HOME_DIR=$2; shift 2 ;;
+    --home) need_value $# "--home needs a directory" "${2:-}"; HOME_DIR=$2; shift 2 ;;
     --home=*) HOME_DIR=${1#--home=}; shift ;;
     --link) LINK=1; shift ;;
     --replace) REPLACE=1; shift ;;
     --dry-run) DRY_RUN=1; shift ;;
     --verify) VERIFY=1; shift ;;
-    --sums) [ $# -ge 2 ] && [ -n "$2" ] || die_usage "--sums needs a file"; SUMS=$2; shift 2 ;;
-    --dir) [ $# -ge 2 ] && [ -n "$2" ] || die_usage "--dir needs a directory"; VERIFY_DIR=$2; shift 2 ;;
+    --sums) need_value $# "--sums needs a file" "${2:-}"; SUMS=$2; shift 2 ;;
+    --dir) need_value $# "--dir needs a directory" "${2:-}"; VERIFY_DIR=$2; shift 2 ;;
     --list-hosts) LIST=1; shift ;;
-    --expect-version) [ $# -ge 2 ] && [ -n "$2" ] || die_usage "--expect-version needs a version"; EXPECT=$2; shift 2 ;;
+    --expect-version) need_value $# "--expect-version needs a version" "${2:-}"; EXPECT=$2; shift 2 ;;
     --expect-version=*) EXPECT=${1#--expect-version=}; shift ;;
     --version) SHOW_VERSION=1; shift ;;
     -h | --help) usage; exit 0 ;;
