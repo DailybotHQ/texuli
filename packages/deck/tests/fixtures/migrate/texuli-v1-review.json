@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "title": "Sprint review",
+    "aspect": "16:9",
+    "themeRef": {
+      "kind": "catalog",
+      "id": "graphite"
+    }
+  },
+  "masters": ["title", "content", "two-column", "media-left", "closing"],
+  "slides": [
+    {
+      "id": "cover",
+      "title": "Sprint review",
+      "master": "title",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "text": "Platform team · Sprint 42"
+        }
+      ]
+    },
+    {
+      "id": "goals",
+      "title": "Sprint goals",
+      "notes": "Say whether each goal was met before showing details.",
+      "master": "content",
+      "blocks": [
+        {
+          "type": "checklist",
+          "items": [
+            {
+              "id": "export",
+              "label": "Ship the billing export"
+            },
+            {
+              "id": "latency",
+              "label": "Cut p95 latency by 20%"
+            },
+            {
+              "id": "docs",
+              "label": "Publish the API guide"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shipped",
+      "title": "What shipped",
+      "master": "two-column",
+      "blocks": [
+        {
+          "type": "columns",
+          "columns": [
+            [
+              {
+                "type": "text",
+                "markdown": "**Billing export** for every workspace."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "markdown": "**Faster search** across boards."
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo",
+      "title": "Demo",
+      "master": "media-left",
+      "blocks": [
+        {
+          "type": "figure",
+          "src": "images/review-demo.png",
+          "width": 1280,
+          "height": 720,
+          "alt": "Screenshot of the shipped feature",
+          "caption": "The export flow"
+        },
+        {
+          "type": "code",
+          "code": "await exportInvoices({ month: '2026-10' });",
+          "lang": "ts"
+        }
+      ]
+    },
+    {
+      "id": "next",
+      "title": "Next sprint",
+      "master": "closing",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            {
+              "text": "Publish the API guide"
+            },
+            {
+              "text": "Board permissions"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "startIndex": 0,
+    "loop": false,
+    "showProgress": true,
+    "defaultTransition": "fade"
+  }
+}

@@ -685,7 +685,7 @@ export const deckLayoutManifest = /* @__PURE__ */ contentComposition(
     title: { kind: 'string', trust: 'untrusted' },
     description: { kind: 'string', trust: 'untrusted' },
     locale: { kind: 'string', description: 'Language tag such as en or en-GB' },
-    aspect: { kind: 'enum', enumValues: ['16:9', '4:3', '1:1'], default: '16:9' },
+    aspect: { kind: 'enum', enumValues: ['16:9', '4:3', '9:16', '1:1'], default: '16:9' },
     themeRef: {
       kind: 'unknown',
       description: 'Catalog theme id, or a catalog or embedded theme reference object',
@@ -697,7 +697,26 @@ export const deckLayoutManifest = /* @__PURE__ */ contentComposition(
     },
     slides: {
       kind: 'array',
-      description: 'Structured slide objects (@texuli/slides grammar); prefer deck-slide children',
+      description:
+        'Structured slide objects (@texuli/deck model v2 grammar); prefer deck-slide children',
+    },
+    transition: {
+      kind: 'enum',
+      enumValues: ['none', 'fade', 'fade-up', 'slide', 'zoom', 'morph'],
+      description: 'Default slide transition (model v2)',
+    },
+    motion: {
+      kind: 'enum',
+      enumValues: ['full', 'subtle', 'none'],
+      description: 'Motion ceiling for the deck',
+    },
+    navigation: {
+      kind: 'object',
+      description: 'loop, start slide id, autoSlideMs',
+    },
+    outline: {
+      kind: 'object',
+      description: 'Sections and vertical stacks (model v2 outline)',
     },
     children: { kind: 'slot' },
     class: { kind: 'string' },
@@ -735,8 +754,28 @@ export const deckSlideManifest = /* @__PURE__ */ contentComposition(
         'closing',
       ],
     },
-    transition: { kind: 'enum', enumValues: ['none', 'fade', 'fade-up'] },
+    layout: {
+      kind: 'string',
+      description: 'Catalog layout id, free, component or custom (model v2)',
+    },
+    transition: { kind: 'enum', enumValues: ['none', 'fade', 'fade-up', 'slide', 'zoom', 'morph'] },
     themeRef: { kind: 'unknown', description: 'Overrides the deck theme for this slide' },
+    background: {
+      kind: 'unknown',
+      description: 'Slide background preset or spec (model v2)',
+    },
+    steps: {
+      kind: 'array',
+      description: 'Optional step labels (names steps 1…)',
+    },
+    props: {
+      kind: 'object',
+      description: 'Layout props when layout is a catalog layout id',
+    },
+    component: {
+      kind: 'object',
+      description: 'Component slide payload when layout is component',
+    },
     children: { kind: 'slot' },
     class: { kind: 'string' },
   },

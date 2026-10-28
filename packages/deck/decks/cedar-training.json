@@ -1,0 +1,168 @@
+{
+  "formatVersion": 2,
+  "meta": {
+    "title": "Cedar operations training"
+  },
+  "slides": [
+    {
+      "id": "slide-title",
+      "title": "Cedar operations training",
+      "notes": "Draft guidance: Introduce the topic and presenter. Add only verified details from the brief or cited sources.",
+      "layout": "title-hero",
+      "props": {
+        "title": "Shipping calmer releases",
+        "subtitle": "What a small team learned in one year",
+        "meta": "Ada Example · Example Conf · 2026"
+      }
+    },
+    {
+      "id": "slide-objectives",
+      "title": "Learning objectives",
+      "notes": "Draft guidance: List observable outcomes. Add only verified details from the brief or cited sources.",
+      "layout": "section-divider",
+      "props": {
+        "eyebrow": "Part 2",
+        "title": "Learning objectives"
+      }
+    },
+    {
+      "id": "slide-context",
+      "title": "Why this matters",
+      "notes": "Draft guidance: Connect the topic to a task. Add only verified details from the brief or cited sources.",
+      "layout": "two-column-split",
+      "props": {
+        "title": "Why this matters",
+        "left": {
+          "heading": "Before",
+          "body": "Releases waited for a weekly window."
+        },
+        "right": {
+          "heading": "After",
+          "body": "Every merged change ships the same day."
+        }
+      }
+    },
+    {
+      "id": "slide-concept",
+      "title": "Core concept",
+      "notes": "Draft guidance: Explain one key idea. Add only verified details from the brief or cited sources.",
+      "layout": "three-column-cards",
+      "props": {
+        "title": "Core concept",
+        "cards": [
+          {
+            "icon": "zap",
+            "heading": "Small",
+            "body": "Ship the smallest useful change first."
+          },
+          {
+            "icon": "compass",
+            "heading": "Clear",
+            "body": "One sentence explains every change."
+          },
+          {
+            "icon": "users",
+            "heading": "Shared",
+            "body": "Anyone on the team can release."
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-demo",
+      "title": "Demonstration",
+      "notes": "Draft guidance: Show the method in context. Add only verified details from the brief or cited sources.",
+      "layout": "image-centered",
+      "props": {
+        "title": "Demonstration",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "caption": "Three stages, one direction."
+      }
+    },
+    {
+      "id": "slide-practice",
+      "title": "Practice",
+      "notes": "Draft guidance: Give a guided activity. Add only verified details from the brief or cited sources.",
+      "layout": "process-steps",
+      "props": {
+        "title": "Practice",
+        "steps": [
+          {
+            "title": "Propose",
+            "body": "Open a small pull request."
+          },
+          {
+            "title": "Check",
+            "body": "Tests and reviews run in parallel."
+          },
+          {
+            "title": "Merge",
+            "body": "The branch lands on main."
+          },
+          {
+            "title": "Release",
+            "body": "The pipeline publishes it."
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-check",
+      "title": "Check understanding",
+      "notes": "Draft guidance: Add a question and expected reasoning. Add only verified details from the brief or cited sources.",
+      "layout": "big-stat",
+      "props": {
+        "number": "87%",
+        "label": "Check understanding",
+        "context": "A fictional team, over twelve months",
+        "source": "n = 412 releases"
+      }
+    },
+    {
+      "id": "slide-resources",
+      "title": "Resources",
+      "notes": "Draft guidance: Link trusted follow-up material. Add only verified details from the brief or cited sources.",
+      "layout": "three-column-cards",
+      "props": {
+        "title": "Resources",
+        "cards": [
+          {
+            "icon": "zap",
+            "heading": "Small",
+            "body": "Ship the smallest useful change first."
+          },
+          {
+            "icon": "compass",
+            "heading": "Clear",
+            "body": "One sentence explains every change."
+          },
+          {
+            "icon": "users",
+            "heading": "Shared",
+            "body": "Anyone on the team can release."
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-close",
+      "title": "Close and next steps",
+      "notes": "Draft guidance: Summarize the ask and give a follow-up path. Add only verified details from the brief or cited sources.",
+      "layout": "closing-cta",
+      "props": {
+        "title": "Close and next steps",
+        "text": "Questions are welcome after the talk.",
+        "cta": {
+          "label": "Read the guide",
+          "href": "https://example.com/guide"
+        },
+        "footnote": "All names and numbers are fictional."
+      }
+    }
+  ]
+}

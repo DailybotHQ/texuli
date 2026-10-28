@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "title": "Harborline",
+    "aspect": "16:9",
+    "themeRef": {
+      "kind": "catalog",
+      "id": "ocean"
+    }
+  },
+  "masters": ["title", "section", "media-right", "content", "quote", "closing"],
+  "slides": [
+    {
+      "id": "cover",
+      "title": "Harborline",
+      "master": "title",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "text": "Shipping, simplified"
+        }
+      ]
+    },
+    {
+      "id": "problem",
+      "title": "The problem",
+      "notes": "Tell one customer story before the numbers.",
+      "master": "section",
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "Freight teams still track containers in spreadsheets."
+        }
+      ]
+    },
+    {
+      "id": "solution",
+      "title": "The solution",
+      "master": "media-right",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            {
+              "text": "Live container map"
+            },
+            {
+              "text": "Generated manifests"
+            },
+            {
+              "text": "Alerts before delays"
+            }
+          ]
+        },
+        {
+          "type": "image",
+          "src": "images/pitch-product.png",
+          "width": 1280,
+          "height": 720,
+          "alt": "Product screenshot"
+        }
+      ]
+    },
+    {
+      "id": "proof",
+      "title": "Traction",
+      "master": "content",
+      "blocks": [
+        {
+          "type": "stat",
+          "items": [
+            {
+              "label": "Pilot customers",
+              "value": "14"
+            },
+            {
+              "label": "Containers tracked",
+              "value": "9,200"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "voice",
+      "title": "Customer voice",
+      "master": "quote",
+      "blocks": [
+        {
+          "type": "quote",
+          "quote": "We stopped losing containers.",
+          "cite": "Operations lead, Example Freight"
+        }
+      ]
+    },
+    {
+      "id": "ask",
+      "title": "The ask",
+      "master": "closing",
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "A pilot with your **Rotterdam** team this quarter."
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "startIndex": 1,
+    "loop": true,
+    "showProgress": false,
+    "defaultTransition": "fade-up"
+  }
+}

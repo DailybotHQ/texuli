@@ -88,6 +88,8 @@ jobs:
           # spec; primitives, data and workflows import the drag engine.
           publish packages/spec
           publish packages/drag
+          # L0: the deck engine that the slides stage depends on (ADR-009).
+          publish packages/deck
           publish packages/tokens
           # Wave 175 — L1 headless primitives.
           publish packages/primitives
@@ -113,7 +115,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          for dir in core date spec drag tokens primitives texuli workflows charts data media chat blocks catalog tools astro player slides; do
+          for dir in core date spec drag deck tokens primitives texuli workflows charts data media chat blocks catalog tools astro player slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             npm dist-tag add "${name}@${version}" latest

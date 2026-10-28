@@ -144,7 +144,11 @@ The TypeScript declarations list the full surface.
 Not built yet: painting the catalog core's closed intents (such as
 `navigate` or `copy`), retrying a failed node, and a hosted player-frame
 page. Decks paint as a document flow; the slide-by-slide presenter stage
-lives in `@texuli/slides`.
+lives in `@texuli/slides`. Unreleased (in the repository, not on npm yet): a
+host that has both packages passes a `deckHost` to present a deck blueprint
+on that stage instead, and `chrome={false}` paints a component with no frame
+chrome, as the slides stage does for every component on a slide
+([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md)).
 
 ## Documentation
 

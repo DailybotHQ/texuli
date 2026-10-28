@@ -120,6 +120,9 @@ importers:
       '@texuli/data':
         specifier: workspace:*
         version: link:../../packages/data
+      '@texuli/deck':
+        specifier: workspace:*
+        version: link:../../packages/deck
       '@texuli/drag':
         specifier: workspace:*
         version: link:../../packages/drag
@@ -138,6 +141,9 @@ importers:
       '@texuli/primitives':
         specifier: workspace:*
         version: link:../../packages/primitives
+      '@texuli/slides':
+        specifier: workspace:*
+        version: link:../../packages/slides
       '@texuli/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
@@ -291,6 +297,8 @@ importers:
 
   packages/date: {}
 
+  packages/deck: {}
+
   packages/drag: {}
 
   packages/editor:
@@ -433,9 +441,15 @@ importers:
       '@texuli/catalog':
         specifier: 0.3.0
         version: link:../catalog
+      '@texuli/deck':
+        specifier: 0.4.0
+        version: link:../deck
       '@texuli/media':
         specifier: 0.3.0
         version: link:../media
+      '@texuli/player':
+        specifier: 0.3.0
+        version: link:../player
       '@texuli/tokens':
         specifier: 0.3.0
         version: link:../tokens
@@ -476,6 +490,9 @@ importers:
       '@texuli/core':
         specifier: 0.3.0
         version: link:../core
+      '@texuli/deck':
+        specifier: 0.4.0
+        version: link:../deck
       '@texuli/media':
         specifier: 0.3.0
         version: link:../media

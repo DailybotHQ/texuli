@@ -647,8 +647,8 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 16,826 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 18,920 B + 4% headroom; the player manifests gained the spec 0.3.0 fields. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 20,166 B + 4% headroom."
     },
     "@texuli/catalog/validate": {
-      "gzip": 18240,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom."
+      "gzip": 20652,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom. PLAN_008 T-catalog-player (2026-10-28): validateDeckDraft and the deck v2 tree mapping joined this entry; measured 19,857 B gzip, cap = measured + 4% (was 18,240 B)."
     },
     "@texuli/player": {
       "gzip": 79808,
@@ -660,9 +660,41 @@
       "cssGzip": 2560,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 2,420 B CSS, cap = measured + 4% headroom."
     },
+    "@texuli/deck": {
+      "gzip": 39340,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 37,827 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+    },
+    "@texuli/deck/model": {
+      "gzip": 39053,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 37,550 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+    },
+    "@texuli/deck/schema": {
+      "gzip": 9340,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 8,980 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+    },
+    "@texuli/deck/engine": {
+      "gzip": 25123,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 24,156 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+    },
+    "@texuli/deck/markdown": {
+      "gzip": 60181,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 57,866 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+    },
+    "@texuli/deck/math": {
+      "gzip": 6262,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 6,021 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+    },
+    "@texuli/deck/authoring": {
+      "gzip": 31971,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 30,740 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+    },
+    "@texuli/deck/templates": {
+      "gzip": 28456,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 27,361 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+    },
     "@texuli/slides": {
-      "gzip": 48192,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 44,177 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 46,295 B + 4% headroom."
+      "gzip": 50416,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 48,476 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/slides/model": {
       "gzip": 22336,
@@ -671,6 +703,14 @@
     "@texuli/slides/grammar": {
       "gzip": 39872,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom."
+    },
+    "@texuli/slides/components": {
+      "gzip": 55613,
+      "note": "Owner decision 2026-10-28 (PLAN_008, owner consent in analysis_results/owner-consent.md): new public subpath for hosts such as Protoyard (the component registry: the renderer table, the slide-component outline (53 ids, exclusions with reasons), the state host and capabilities; painters and player families load lazily); measured 53,473 B gzip, cap = measured + 4% headroom."
+    },
+    "@texuli/slides/layouts": {
+      "gzip": 40575,
+      "note": "Owner decision 2026-10-28 (PLAN_008, owner consent in analysis_results/owner-consent.md): new public subpath for hosts such as Protoyard (the 20 layout renderers table with fit-text and media helpers; each layout component loads lazily); measured 39,014 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/export": {
       "gzip": 8064,
@@ -681,14 +721,14 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 22,361 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/stage": {
-      "gzip": 20800,
+      "gzip": 110085,
       "cssGzip": 11264,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 19,965 B gzip, 10,823 B CSS, cap = measured + 4% headroom."
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 105,851 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/slides/styles.css": {
       "gzip": 64,
-      "cssGzip": 3456,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 3,266 B CSS, cap = measured + 4% headroom."
+      "cssGzip": 4931,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 4,741 B CSS gzip on the final PLAN_008 stage, cap = measured + 4% headroom."
     },
     "@texuli/spec": {
       "gzip": 11968,

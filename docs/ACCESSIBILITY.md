@@ -146,6 +146,65 @@ focus, nudge and undo, keyboard connect, the treegrid outline rename, a
 pointer drag, and axe in light and dark). No screen-reader session has been
 run on these surfaces yet.
 
+## Slides stage
+
+The `@texuli/slides` `0.4.0` stage (in the repository, not on npm; the full
+contract is [stage.md](../packages/slides/docs/stage.md)) follows this
+contract:
+
+- **Key map.** One registry (`DECK_CONTROLS` in `@texuli/deck/engine`)
+  drives the keys, the toolbar, the tooltips and the help dialog, so they
+  cannot disagree: arrows, Page Up and Down, Space, Shift+Space, Enter and
+  Backspace step and move; Home and End jump; `O` overview, `F` full
+  screen, `S` or `P` presenter, `B` or `.` blackout, `L` laser, `?` help.
+  Keys act while focus is inside the deck (and, for the deck that owns the
+  URL hash, while nothing on the page has focus). They never fire on
+  buttons, links, fields, interactive blocks or the chrome, and the
+  horizontal arrows swap in right-to-left decks. Esc closes the innermost
+  layer first: help, overview, blackout, laser, then full screen. Every
+  control is a button too, with a target of at least 32 px (44 px on touch).
+- **Live region.** One polite, atomic live region announces “Slide n of m:
+  <title>”, and “, step k of s” on a slide with steps, after every move.
+  Chrome notices (copy link, the laser turning on or off) are polite too.
+  Presenter timers are readable on demand and never announced every second.
+- **Slides.** Each slide is a `group` with the role description “slide”,
+  named by its title (or “Slide n”). At most three slides are mounted; the
+  two that are not current are `inert` and hidden from assistive tech.
+- **Focus after transitions.** After a keyboard move, focus goes to the
+  incoming slide, never the outgoing one: with View Transitions, the stage
+  focuses it inside the transition's DOM update. It only does so while focus
+  was in the deck (or dropped to `<body>` by the swap), so an embedded deck
+  never takes focus back from the page. Overview, full screen and blackout
+  return focus to the slide when they close.
+- **Help dialog.** `?` opens a modal dialog (`showModal`) generated from the
+  registry, grouped like the toolbar, listing every key and “Button only”
+  for controls without keys, filtered by what the page can do. Focus moves
+  to Close and stays inside; Esc, `?` or Close shut it and return focus to
+  its opener.
+- **Presenter.** The presenter layout is a labelled region beside the slides
+  (notes as a complementary region, up next, optional timers). The presenter
+  window is a second same-origin window with its own polite live region; it
+  focuses the notes on open and takes the same navigation keys. When the
+  browser blocks the window, the presenter view stays on the page and a
+  status note says why.
+- **Motion, colors and reflow.** Reduced motion turns slide movement into a
+  short fade (motion `none` cuts) and stops fragment animation; forced
+  colors keep every control and layer bordered; every UI string comes from
+  overridable messages, and `meta.locale` and `meta.dir` set `lang` and
+  `dir`.
+
+Checked by `tests/e2e/a11y-slides.spec.ts` on the built fixture app: axe with
+zero violations on a light page, a dark page and a dark page on a dark OS;
+axe with the overview, presenter, help and blackout open and in forced
+colors; reflow at 320 CSS px; names and structure; and the keyboard map,
+chrome, tab order, reveal steps, full screen and motion
+([quality/a11y-slides.md](quality/a11y-slides.md)). Unit tests in
+`packages/slides/tests/stage*.test.ts` cover the live region, focus after a
+move and the help dialog. The VoiceOver transcripts in
+[quality/sr-transcripts-slides.md](quality/sr-transcripts-slides.md) were
+authored for the `0.3.0` stage (PLAN_004); no screen-reader session has been
+run on the `0.4.0` stage yet.
+
 ## Related docs
 
 | Doc | Role |

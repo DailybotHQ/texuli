@@ -59,6 +59,7 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   '@texuli/core': [],
   '@texuli/date': [],
   // In development (PLAN_007): no runtime externals; private until a publish wave.
+  '@texuli/deck': [],
   '@texuli/drag': [],
   '@texuli/workflows': [],
   '@texuli/tokens': [],

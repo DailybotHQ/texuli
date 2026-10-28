@@ -477,13 +477,24 @@ describe('deck render tree (G11)', () => {
       badBlock.children[0].children[0] = { id: 'blocks-text', props: { block: { type: 'list' } } };
       expect(parseDeckRenderTree(badBlock).success).toBe(false);
 
+      // An unknown transition token is refused by the catalog schema and the parser.
       const badTransition = JSON.parse(JSON.stringify(tree));
-      badTransition.children[0].props.transition = 'zoom';
+      badTransition.children[0].props.transition = 'spin';
       const rendered = renderCatalogTree(badTransition, { catalog, tier: 'untrusted' });
       expect(rendered.diagnostics.map((d) => `${d.path} ${d.code}`)).toContain(
         '0.children.0 schema-failure'
       );
       expect(parseDeckRenderTree(badTransition).success).toBe(false);
+      // Spec 0.4.0 (PLAN_008, deck model v2) made slide, zoom and morph valid deck-slide
+      // transitions in the catalog (golden G11 was re-pinned the same way), while this
+      // package's v1 tree parser still only knows none, fade and fade-up.
+      const v2Transition = JSON.parse(JSON.stringify(tree));
+      v2Transition.children[0].props.transition = 'zoom';
+      const v2Rendered = renderCatalogTree(v2Transition, { catalog, tier: 'untrusted' });
+      expect(v2Rendered.diagnostics.map((d) => d.code)).not.toContain('schema-failure');
+      expect(parseDeckRenderTree(v2Transition).issues[0]?.path).toBe(
+        'children[0].props.transition'
+      );
     }
     // refuses HTML-looking slide notes in the renderer, keeping the sink-free contract
     {

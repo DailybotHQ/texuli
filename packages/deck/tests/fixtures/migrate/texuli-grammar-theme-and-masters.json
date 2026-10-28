@@ -1,0 +1,86 @@
+{
+  "$comment": "Golden deck: deck and slide theme references, declared built-in masters and per-slide transitions. Fictional data only.",
+  "golden": "deck-theme-and-masters",
+  "tree": {
+    "id": "layout-deck",
+    "props": {
+      "title": "Harborline pitch",
+      "aspect": "4:3",
+      "themeRef": { "kind": "catalog", "id": "graphite", "mode": "system" },
+      "masters": ["title", "two-column", "quote", "closing"],
+      "settings": {
+        "startIndex": 0,
+        "loop": true,
+        "showProgress": true,
+        "defaultTransition": "fade-up"
+      }
+    },
+    "children": [
+      {
+        "id": "deck-slide",
+        "props": {
+          "slideId": "cover",
+          "title": "Harborline",
+          "master": "title",
+          "transition": "none"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": { "block": { "type": "heading", "level": 2, "text": "Shipping, simplified" } }
+          }
+        ]
+      },
+      {
+        "id": "deck-slide",
+        "props": { "slideId": "compare", "title": "Before and after", "master": "two-column" },
+        "children": [
+          {
+            "id": "blocks-structure",
+            "props": {
+              "block": {
+                "type": "columns",
+                "columns": [
+                  [{ "type": "text", "markdown": "Manual manifests" }],
+                  [{ "type": "text", "markdown": "Generated manifests" }]
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "deck-slide",
+        "props": {
+          "slideId": "voice",
+          "title": "Customer voice",
+          "master": "quote",
+          "transition": "fade",
+          "themeRef": { "kind": "catalog", "id": "ocean", "mode": "dark" }
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "quote",
+                "quote": "We stopped losing containers.",
+                "cite": "Ops lead, Example Freight"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "deck-slide",
+        "props": {
+          "slideId": "close",
+          "title": "Thank you",
+          "master": "closing",
+          "themeRef": "sepia-print"
+        },
+        "children": []
+      }
+    ]
+  }
+}

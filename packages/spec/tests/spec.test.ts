@@ -454,7 +454,7 @@ describe('the 0.3.0 contract mirrors its schemas', () => {
 });
 
 describe('migrations', () => {
-  it('migrates 0.2.0 goldens to 0.3.0 purely, idempotently, and leaves the tree alone', () => {
+  it('migrates 0.2.0 goldens to the current spec purely, idempotently, and leaves the tree alone', () => {
     const documents = {
       blueprintSchema: json<Schema>('schemas/blueprint.schema.json'),
       catalog: json<SpecCatalog>('catalog/components.json'),
@@ -467,7 +467,7 @@ describe('migrations', () => {
       return value;
     };
     const goldens = Object.keys(normative).filter((p) => p.startsWith('fixtures/golden/'));
-    // Goldens written for 0.3.0 (they stamp `spec`) are already current: migration is a no-op.
+    // Goldens written for the current spec (they stamp `spec`) are already current: migration is a no-op.
     const current = goldens.filter((p) => json<{ spec?: string }>(p).spec === SPEC_VERSION);
     expect(current.length).toBeGreaterThan(0);
     for (const path of current) {
@@ -484,9 +484,9 @@ describe('migrations', () => {
       expect(result, path).toMatchObject({
         from: '0.2.0',
         to: SPEC_VERSION,
-        applied: ['0.2.0->0.3.0'],
+        applied: ['0.2.0->0.3.0', '0.3.0->0.4.0'],
       });
-      expect(result.blueprint, path).toEqual({ ...input, spec: '0.3.0' });
+      expect(result.blueprint, path).toEqual({ ...input, spec: SPEC_VERSION });
       expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);
       expect(validateBlueprint(result.blueprint, documents).ok, path).toBe(true);
       const again = migrateBlueprint(result.blueprint);

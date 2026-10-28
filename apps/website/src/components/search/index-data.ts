@@ -101,6 +101,15 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['json', 'blueprint', 'player', 'validate', 'state', 'actions'],
   },
   {
+    id: 'page-slides',
+    title: 'Slides',
+    description:
+      'Generate decks from JSON or Markdown: 20 layouts, contrast-safe backgrounds, any component on a slide, presenter, print and PPTX.',
+    href: '/slides-page/',
+    kind: 'page',
+    keywords: ['slides', 'deck', 'presentation', 'markdown', 'json', 'presenter', 'pptx'],
+  },
+  {
     id: 'page-theme-studio',
     title: 'Theme studio',
     description: 'Generate a theme from color, words or image; tune roles; export CSS and JSON.',

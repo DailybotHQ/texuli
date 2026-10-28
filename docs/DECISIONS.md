@@ -337,3 +337,114 @@ reflect this decision.
   diagnostic has a Kotlin twin, so native fixture parity holds. Until a
   publish wave ships `0.3.0`, later normative changes inside the same plan
   amend the `0.3.0` pin in `versions.json` rather than minting new minors.
+
+## ADR-009: A from-scratch deck engine (`@texuli/deck`) and a full presentation stage (`@texuli/slides`)
+
+- **Date:** 2026-10-27 · **Decided by:** the project owner (PLAN_008).
+- **Context:** `@texuli/slides` 0.3.0 has a validated model, reveal steps,
+  presenter tools, print and PPTX, but no URL routing, fixed-canvas scaling,
+  touch, blackout, laser, help, copy link, auto-slide, auto-animate,
+  imperative API, i18n or per-slide backgrounds, and it cannot place most
+  Texuli components on a slide. Protoyard's deck generator
+  (`@protoyard/decks`, `@protoyard/decks-ui`) has the most complete model and
+  stage behavior we own (21 layouts, 13 backgrounds with a contrast scrim,
+  style, outline, fragments, controls registry, hash routing, canvas fit,
+  chrome, overview, presenter, print, lint, patch), built on zod and
+  Protoyard's runtime. The developer asked for one complete library built from
+  scratch on the Texuli ecosystem, generating decks from JSON and Markdown,
+  with any Texuli component on a slide, which Protoyard then consumes.
+  Research inputs: `.dwp/plans/PLAN_008_slides_complete_library/analysis_results/adr-inputs/`.
+- **Options:** (A) engine subpaths inside `@texuli/slides` (L7) with an
+  import-guard test; (B) a new L0 engine package plus the stage moved to L8;
+  (C) keep one package and add features. For components: (1) the stage imports
+  `@texuli/player`; (2) the host injects every renderer; (3) a default
+  registry built from blocks and player painters that hosts can replace or
+  extend.
+- **Choice:** B with 3.
+  - **`@texuli/deck` (L0, new):** framework-free, DOM-free, zero runtime
+    dependencies. Owns the canonical model v2, an owned schema kit
+    (combinators as data giving all-issues validation, `Infer` types and a
+    JSON Schema 2020-12 export from one source; no zod), the untrusted loader,
+    the JSON and Markdown codecs, the 21-layout catalog with
+    `useWhen`/`dontUseWhen`/`pacing`, style and background data with contrast
+    math, fragments and steps, transitions, navigation (incl. vertical stacks),
+    hash routing, the controls registry and input decisions, canvas fit,
+    auto-slide, the presenter protocol, quality lint, full RFC 6902 patch,
+    text and outline twins, the typed builder, brief outlines and templates.
+  - **`@texuli/slides` (moves L7 → L8):** the Svelte 5 stage, chrome,
+    overview, presenter, print and PPTX export, layout and background
+    rendering. It depends on `@texuli/deck` and `@texuli/player`, and ships a
+    default component registry (every blocks family plus every slide-renderable
+    player painter) that a host can replace or extend per catalog id.
+    Component families load lazily; only mounted slides trigger imports.
+  - **Model v2** (`formatVersion: 2`): Protoyard's shape is the base — `style`,
+    `slides` discriminated by `layout` (`<catalog layout>` | `free` |
+    `component` | `custom`), `outline`, `hidden`, step labels, backgrounds
+    (13 presets, hex colors with contrast check, image/video specs), the
+    8 fragment effects plus a highlight tone and v1's `items` kind,
+    transitions `none`, `fade`, `fade-up`, `slide`, `zoom`, `morph`, aspects
+    16:9, 4:3, 9:16, 1:1. Texuli adds `meta` (title, locale, description),
+    catalog or embedded themes with modes, masters on free slides, notes up
+    to 6,000 characters. More than 32 steps on a slide is an error. One
+    `DeckDiagnostic` shape (code, severity, path, jsonPath, message, fix,
+    slideId, source line/column) capped at 200 issues. Migration detects the
+    input shape (Texuli v1 deck, Texuli grammar tree, Protoyard deck) and is
+    lossless; lifting a master to a layout is a lint suggestion, never
+    automatic. The chart layout uses the Texuli chart block; the Protoyard
+    importer converts its ChartSpec.
+  - **Markdown dialect:** reveal.js is an inspiration, not a compatibility
+    target. An owned linear parser with line/column diagnostics: closed-key
+    scalar frontmatter, `---` slides and `--` vertical stacks, `Note:`,
+    `<!-- .slide: -->` and `<!-- .element: -->` comments with a closed
+    attribute set (reveal aliases mapped), fragments, code `[1-2|4-6]` steps,
+    `$$` block math, `layout="<id>"` with `:::` regions for every layout, and
+    `::: component <catalog-id> {…}` fences with a bounded JSON body. HTML,
+    iframes, `class`, `style` and `on*` are refused with a diagnostic. Inline
+    text keeps the Markdown string `@texuli/blocks` already paints.
+    `deckToMarkdown` is canonical; supported features round-trip.
+  - **Math:** an owned TeX subset to a MathML node tree (no `\href`,
+    `\color`, `\html*` or macros), rendered as MathML Core. Block math ships
+    in this plan; inline math inside text blocks needs an opt-in in
+    `@texuli/blocks` and is a follow-up.
+  - **Components on slides:** "any component" means every slide-renderable
+    catalog component and every blocks family. App shells, overlays, route
+    hosts and the deck wrappers themselves are excluded with reasons.
+    Untrusted decks are read-only by default except the interactive blocks
+    (poll, quiz, calculator, counter, tabs, reveal, chart controls, form) on
+    in-memory state; mutating data views, sortable lists, workflow editing and
+    embeds need a host capability. Component props are validated in a second
+    phase by the registry at the host's tier.
+  - **Security:** the deck never carries its own trust tier. The engine
+    checks URL syntax only; the stage applies `@texuli/core/url-policy` at
+    paint with the host's tier (`untrusted` by default).
+  - **i18n:** every stage string comes from overridable messages with English
+    defaults; `meta.locale` becomes `lang`.
+  - **Versions:** both packages ship as `0.4.0`; `@texuli/deck` publishes
+    before `@texuli/slides` in the waves. Publication needs a separate GO.
+- **Why:** a package boundary enforces "standalone like reveal.js" better
+  than a test inside a Svelte package, and lets Protoyard, Node tools and
+  agents use the engine without Svelte. The layer guard forbids same-layer
+  imports, so the stage must sit above the player to render the full catalog
+  by default; an injectable registry keeps hosts (Protoyard's runtime state,
+  embeds, custom slides) in control without forking. Protoyard's model is the
+  most complete and battle-tested; Texuli's themes, masters and closed
+  security model are kept on top.
+- **Reverse when:** the stage at L8 blocks a lower package from presenting
+  decks (then move the default registry into an L8 integration package and
+  return the stage to L7), or the engine needs a framework (it must not:
+  split the framework part out instead).
+- **Addendum (2026-10-28, PLAN_008 T-catalog-player): spec 0.4.0.** The
+  `layout-deck` and `deck-slide` manifests now project deck model v2 (9:16
+  aspect, `slide`/`zoom`/`morph` transitions, motion, navigation, outline,
+  slide layout, background, steps and component slides), which changes the
+  projected catalog and the normative digest, so the blueprint spec takes an
+  additive minor, `0.4.0` (`versions.json` pin
+  `fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3`).
+  `migrations/0.3.0-0.4.0.ts` only restamps `spec`. The generated Kotlin
+  under `packages/spec/generated/kotlin` is regenerated; the native runtime
+  twin's interaction contract (ADR-008) is unchanged. `@texuli/catalog`
+  validates deck trees with `validateDeckDraft` and maps them to and from
+  deck v2 without depending on `@texuli/deck`; `@texuli/player` keeps
+  painting decks as a document and exposes a `deckHost` seam (and
+  `chrome={false}`) so a host with `@texuli/slides` presents them on the
+  stage.

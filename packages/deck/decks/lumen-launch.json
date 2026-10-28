@@ -1,0 +1,169 @@
+{
+  "formatVersion": 2,
+  "meta": {
+    "title": "Lumen launch plan"
+  },
+  "slides": [
+    {
+      "id": "slide-title",
+      "title": "Lumen launch plan",
+      "notes": "Draft guidance: Introduce the topic and presenter. Add only verified details from the brief or cited sources.",
+      "layout": "title-hero",
+      "props": {
+        "title": "Shipping calmer releases",
+        "subtitle": "What a small team learned in one year",
+        "meta": "Ada Example · Example Conf · 2026"
+      }
+    },
+    {
+      "id": "slide-audience",
+      "title": "Who this is for",
+      "notes": "Draft guidance: Define the intended audience. Add only verified details from the brief or cited sources.",
+      "layout": "two-column-split",
+      "props": {
+        "title": "Who this is for",
+        "left": {
+          "heading": "Before",
+          "body": "Releases waited for a weekly window."
+        },
+        "right": {
+          "heading": "After",
+          "body": "Every merged change ships the same day."
+        }
+      }
+    },
+    {
+      "id": "slide-need",
+      "title": "The need",
+      "notes": "Draft guidance: Describe the verified user need. Add only verified details from the brief or cited sources.",
+      "layout": "two-column-split",
+      "props": {
+        "title": "The need",
+        "left": {
+          "heading": "Before",
+          "body": "Releases waited for a weekly window."
+        },
+        "right": {
+          "heading": "After",
+          "body": "Every merged change ships the same day."
+        }
+      }
+    },
+    {
+      "id": "slide-promise",
+      "title": "The promise",
+      "notes": "Draft guidance: State the product promise. Add only verified details from the brief or cited sources.",
+      "layout": "three-column-cards",
+      "props": {
+        "title": "The promise",
+        "cards": [
+          {
+            "icon": "zap",
+            "heading": "Small",
+            "body": "Ship the smallest useful change first."
+          },
+          {
+            "icon": "compass",
+            "heading": "Clear",
+            "body": "One sentence explains every change."
+          },
+          {
+            "icon": "users",
+            "heading": "Shared",
+            "body": "Anyone on the team can release."
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-experience",
+      "title": "The experience",
+      "notes": "Draft guidance: Show the core user journey. Add only verified details from the brief or cited sources.",
+      "layout": "image-centered",
+      "props": {
+        "title": "The experience",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "caption": "Three stages, one direction."
+      }
+    },
+    {
+      "id": "slide-plan",
+      "title": "Launch plan",
+      "notes": "Draft guidance: Sequence launch work. Add only verified details from the brief or cited sources.",
+      "layout": "timeline",
+      "props": {
+        "title": "Launch plan",
+        "events": [
+          {
+            "time": "January",
+            "text": "First automated release"
+          },
+          {
+            "time": "April",
+            "text": "Checks run in parallel"
+          },
+          {
+            "time": "August",
+            "text": "Same-day releases by default"
+          },
+          {
+            "time": "December",
+            "text": "Rollback in one click"
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-risks",
+      "title": "Risks",
+      "notes": "Draft guidance: Identify launch risks. Add only verified details from the brief or cited sources.",
+      "layout": "two-column-split",
+      "props": {
+        "title": "Risks",
+        "left": {
+          "heading": "Before",
+          "body": "Releases waited for a weekly window."
+        },
+        "right": {
+          "heading": "After",
+          "body": "Every merged change ships the same day."
+        }
+      }
+    },
+    {
+      "id": "slide-next",
+      "title": "Next steps",
+      "notes": "Draft guidance: Name owners and next actions. Add only verified details from the brief or cited sources.",
+      "layout": "closing-cta",
+      "props": {
+        "title": "Next steps",
+        "text": "Questions are welcome after the talk.",
+        "cta": {
+          "label": "Read the guide",
+          "href": "https://example.com/guide"
+        },
+        "footnote": "All names and numbers are fictional."
+      }
+    },
+    {
+      "id": "slide-close",
+      "title": "Close and next steps",
+      "notes": "Draft guidance: Summarize the ask and give a follow-up path. Add only verified details from the brief or cited sources.",
+      "layout": "closing-cta",
+      "props": {
+        "title": "Close and next steps",
+        "text": "Questions are welcome after the talk.",
+        "cta": {
+          "label": "Read the guide",
+          "href": "https://example.com/guide"
+        },
+        "footnote": "All names and numbers are fictional."
+      }
+    }
+  ]
+}

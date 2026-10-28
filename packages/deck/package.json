@@ -1,0 +1,63 @@
+{
+  "name": "@texuli/deck",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Framework-free, dependency-free deck engine for Texuli: one validated deck model generated from JSON or Markdown, layouts, steps, navigation, presenter protocol, lint and authoring.",
+  "keywords": [
+    "deck",
+    "slides",
+    "presentation",
+    "markdown",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
+  "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/deck"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./model": {
+      "types": "./src/model/index.ts",
+      "default": "./src/model/index.ts"
+    },
+    "./schema": {
+      "types": "./src/schema/index.ts",
+      "default": "./src/schema/index.ts"
+    },
+    "./engine": {
+      "types": "./src/engine/index.ts",
+      "default": "./src/engine/index.ts"
+    },
+    "./markdown": {
+      "types": "./src/markdown/index.ts",
+      "default": "./src/markdown/index.ts"
+    },
+    "./math": {
+      "types": "./src/math/index.ts",
+      "default": "./src/math/index.ts"
+    },
+    "./authoring": {
+      "types": "./src/authoring/index.ts",
+      "default": "./src/authoring/index.ts"
+    },
+    "./templates": {
+      "types": "./src/templates/index.ts",
+      "default": "./src/templates/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

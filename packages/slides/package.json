@@ -50,6 +50,16 @@
       "svelte": "./src/stage/index.ts",
       "default": "./src/stage/index.ts"
     },
+    "./components": {
+      "types": "./src/registry/index.ts",
+      "svelte": "./src/registry/index.ts",
+      "default": "./src/registry/index.ts"
+    },
+    "./layouts": {
+      "types": "./src/layouts/index.ts",
+      "svelte": "./src/layouts/index.ts",
+      "default": "./src/layouts/index.ts"
+    },
     "./styles.css": "./src/styles.css"
   },
   "scripts": {
@@ -58,7 +68,9 @@
   "dependencies": {
     "@texuli/blocks": "0.3.0",
     "@texuli/catalog": "0.3.0",
+    "@texuli/deck": "0.4.0",
     "@texuli/media": "0.3.0",
+    "@texuli/player": "0.3.0",
     "@texuli/tokens": "0.3.0"
   },
   "peerDependencies": {

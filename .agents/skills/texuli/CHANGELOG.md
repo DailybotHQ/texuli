@@ -15,6 +15,21 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+### Content
+
+- The deck generator: a new `build-ui/references/decks.md` with recipes for
+  a deck from JSON (model v2: `formatVersion: 2`, `meta`, `style`, layout,
+  free and component slides, validated with `parseDeck` and
+  `loadUntrustedDeck`), a deck from Markdown (frontmatter, `---` and `--`,
+  `Note:`, `.slide` and `.element` comments, `layout=` with `:::` regions,
+  `::: component` fences, code steps, `$$` math), presenting with
+  `DeckStage`, print and PPTX export, and the `deck` CLI commands and MCP
+  tool; plus the 21 layout ids with their `useWhen` guidance.
+- The router, the route map, the package index and the layer map know
+  `@texuli/deck` (L0) and the `@texuli/slides` stage at L8, marked in
+  development and not on npm; npm `@texuli/slides` `0.3.0` stays the v1
+  deck model, and spec 0.4.0 is in the repository only.
+
 ## [0.2.0] — 2026-10-28
 
 ### Changes

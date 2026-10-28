@@ -1,0 +1,86 @@
+{
+  "$comment": "Golden deck: speaker notes and stepped blocks in the deck-slide render tree form. Fictional data only.",
+  "golden": "deck-notes-and-steps",
+  "tree": {
+    "id": "layout-deck",
+    "props": {
+      "title": "Sprint 42 review",
+      "description": "Fictional sprint review for the Example Co. platform team.",
+      "locale": "en",
+      "aspect": "16:9",
+      "settings": {
+        "startIndex": 0,
+        "loop": false,
+        "showProgress": true,
+        "defaultTransition": "fade"
+      }
+    },
+    "children": [
+      {
+        "id": "deck-slide",
+        "props": {
+          "slideId": "goals",
+          "title": "Sprint goals",
+          "notes": "Open with the two goals.\nPause before the third bullet."
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "step": 1,
+                "reveal": "fade",
+                "items": [
+                  { "text": "Ship the billing export" },
+                  { "text": "Cut p95 latency by 20%" }
+                ]
+              }
+            }
+          },
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": { "type": "callout", "tone": "info", "step": 2, "body": "Both goals met." }
+            }
+          }
+        ]
+      },
+      {
+        "id": "deck-slide",
+        "props": {
+          "slideId": "demo",
+          "title": "Demo",
+          "notes": "Run the export against the staging workspace at example.com."
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": { "block": { "type": "heading", "level": 3, "text": "Export flow" } }
+          },
+          {
+            "id": "blocks-code",
+            "props": {
+              "block": {
+                "type": "code",
+                "lang": "ts",
+                "step": 1,
+                "code": "await exportInvoices({ month: '2026-10' });"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "deck-slide",
+        "props": { "slideId": "next", "title": "Next sprint" },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": { "block": { "type": "text", "markdown": "Focus on **reliability**." } }
+          }
+        ]
+      }
+    ]
+  }
+}

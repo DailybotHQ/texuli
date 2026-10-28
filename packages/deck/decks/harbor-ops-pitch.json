@@ -1,0 +1,125 @@
+{
+  "formatVersion": 2,
+  "meta": {
+    "title": "Harbor operations pitch"
+  },
+  "slides": [
+    {
+      "id": "slide-title",
+      "title": "Harbor operations pitch",
+      "notes": "Draft guidance: Introduce the topic and presenter. Add only verified details from the brief or cited sources.",
+      "layout": "title-hero",
+      "props": {
+        "title": "Shipping calmer releases",
+        "subtitle": "What a small team learned in one year",
+        "meta": "Ada Example · Example Conf · 2026"
+      }
+    },
+    {
+      "id": "slide-problem",
+      "title": "The problem",
+      "notes": "Draft guidance: Describe who has the problem and when. Add only verified details from the brief or cited sources.",
+      "layout": "two-column-split",
+      "props": {
+        "title": "The problem",
+        "left": {
+          "heading": "Before",
+          "body": "Releases waited for a weekly window."
+        },
+        "right": {
+          "heading": "After",
+          "body": "Every merged change ships the same day."
+        }
+      }
+    },
+    {
+      "id": "slide-solution",
+      "title": "The solution",
+      "notes": "Draft guidance: Explain the proposed solution. Add only verified details from the brief or cited sources.",
+      "layout": "three-column-cards",
+      "props": {
+        "title": "The solution",
+        "cards": [
+          {
+            "icon": "zap",
+            "heading": "Small",
+            "body": "Ship the smallest useful change first."
+          },
+          {
+            "icon": "compass",
+            "heading": "Clear",
+            "body": "One sentence explains every change."
+          },
+          {
+            "icon": "users",
+            "heading": "Shared",
+            "body": "Anyone on the team can release."
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-traction",
+      "title": "Evidence of demand",
+      "notes": "Draft guidance: Add sourced traction measures. Add only verified details from the brief or cited sources.",
+      "layout": "big-stat",
+      "props": {
+        "number": "87%",
+        "label": "Evidence of demand",
+        "context": "A fictional team, over twelve months",
+        "source": "n = 412 releases"
+      }
+    },
+    {
+      "id": "slide-team",
+      "title": "The team",
+      "notes": "Draft guidance: Introduce contributors and relevant experience. Add only verified details from the brief or cited sources.",
+      "layout": "team-avatars",
+      "props": {
+        "title": "The team",
+        "people": [
+          {
+            "name": "Ada Example",
+            "role": "Design",
+            "avatar": "av-001"
+          },
+          {
+            "name": "Marco Example",
+            "role": "Engineering",
+            "avatar": "av-002"
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-ask",
+      "title": "The ask",
+      "notes": "Draft guidance: State the request and what it enables. Add only verified details from the brief or cited sources.",
+      "layout": "closing-cta",
+      "props": {
+        "title": "The ask",
+        "text": "Questions are welcome after the talk.",
+        "cta": {
+          "label": "Read the guide",
+          "href": "https://example.com/guide"
+        },
+        "footnote": "All names and numbers are fictional."
+      }
+    },
+    {
+      "id": "slide-close",
+      "title": "Close and next steps",
+      "notes": "Draft guidance: Summarize the ask and give a follow-up path. Add only verified details from the brief or cited sources.",
+      "layout": "closing-cta",
+      "props": {
+        "title": "Close and next steps",
+        "text": "Questions are welcome after the talk.",
+        "cta": {
+          "label": "Read the guide",
+          "href": "https://example.com/guide"
+        },
+        "footnote": "All names and numbers are fictional."
+      }
+    }
+  ]
+}
