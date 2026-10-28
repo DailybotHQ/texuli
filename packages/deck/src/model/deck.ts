@@ -31,7 +31,7 @@ import {
   layoutPropsSchema,
 } from './layouts/catalog.ts';
 import {
-  boundedProps,
+  componentProps,
   deckTransition,
   FRAGMENT_TONES,
   line,
@@ -210,7 +210,7 @@ const blockHead = t.object(
 );
 
 const objectProps = (description: string) =>
-  t.refine(boundedProps, {
+  t.refine(componentProps, {
     code: 'invalid-type',
     description,
     check(value, context) {

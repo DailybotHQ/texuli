@@ -947,35 +947,22 @@ describe('DeckStage v2: steps, renderers, style and hooks', () => {
     );
   });
 
-  it('asks the renderer list first and paints labelled placeholders until the lanes land', async () => {
+  it('asks the renderer list first, paints the default layouts and components, and labels what has no renderer', async () => {
     await scenario(
-      'paints catalog layouts, components and custom slides as named placeholders',
+      'paints catalog layouts and components by default and names a custom slide with no host renderer',
       async () => {
         mockPreferences();
         const deck = deckOf([
-          { id: 'hero', title: 'Hero', layout: 'title-hero', props: { title: 'Hero title' } },
-          {
-            id: 'chart',
-            title: 'Chart',
-            layout: 'component',
-            component: { component: 'chart-bar', props: {} },
-          },
           { id: 'host', title: 'Host', layout: 'custom', props: { component: 'host-widget' } },
-          free('mixed', 'Mixed', {}, [
-            text('Before'),
-            { type: 'component', component: 'stat-card', props: { value: 3 } },
-          ]),
+          { id: 'hero', title: 'Hero', layout: 'title-hero', props: { title: 'Hero title' } },
         ]);
         const { container } = render(DeckStage, { props: { deck, loadTheme: null } });
         const note = () =>
           active(container).querySelector('.tx-deck-stage__placeholder-text')?.textContent?.trim();
-        expect(note()).toBe('The Title hero layout is not available in this stage yet.');
-        await press('ArrowRight');
-        expect(note()).toBe('The chart-bar component is not available in this stage yet.');
-        await press('ArrowRight');
         expect(note()).toBe('The host has no renderer for the custom slide host-widget.');
         await press('ArrowRight');
-        expect(note()).toBe('The stat-card component is not available in this stage yet.');
+        await waitFor(() => expect(active(container).textContent).toContain('Hero title'));
+        expect(note()).toBeUndefined();
       },
       resetAll
     );

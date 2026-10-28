@@ -91,3 +91,10 @@ export const linkHref = t.string({ min: 1, max: 2048, pattern: LINK_HREF_PATTERN
 
 /** Bounded JSON props (Protoyard's limits): depth 4, 100 keys, 200 items. */
 export const boundedProps = t.json({ depth: 4 });
+
+/**
+ * Catalog component props on a slide: deeper and longer than layout props, so
+ * data views and workflow graphs (500 nodes, 2,000 edges) fit. The host's
+ * registry validates the content at its tier.
+ */
+export const componentProps = t.json({ depth: 8, maxItems: 2000 });

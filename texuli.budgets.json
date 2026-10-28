@@ -713,9 +713,9 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 22,361 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/stage": {
-      "gzip": 98304,
+      "gzip": 110592,
       "cssGzip": 11264,
-      "note": "Owner decision 2026-10-27 (PLAN_008 T-stage, ADR-009, owner consent in analysis_results/owner-consent.md): provisional cap raised from 20,800 B after the v2 rewrite: the stage now validates any deck input with the @texuli/deck model and runs the engine (model 36.7 KiB + engine 23.6 KiB of the 83.69 KiB measured). Research ceiling 120 KiB (Protoyard stage measures 92 KiB). T-perf-budgets measures and tightens it."
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-components/T-layouts-backgrounds wiring, owner consent in analysis_results/owner-consent.md): provisional cap 108 KiB: the stage validates any deck with the @texuli/deck model and engine, and its default renderer tables (21 layouts, the component registry) are eager while every layout, family and painter loads lazily; measured 103.03 KiB. Research ceiling 120 KiB (Protoyard's stage measures 92 KiB). T-perf-budgets measures and tightens it."
     },
     "@texuli/slides/styles.css": {
       "gzip": 64,

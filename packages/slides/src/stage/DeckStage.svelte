@@ -47,6 +47,8 @@ import { resolveImageSources } from '@texuli/media/image';
 import type { Theme } from '@texuli/tokens/contract';
 import { defineTheme } from '@texuli/tokens/contract';
 import { flushSync, onMount, type Snippet, tick, untrack } from 'svelte';
+import { layoutRenderers } from '../layouts/index.ts';
+import { componentRenderers } from '../registry/index.ts';
 import DeckChrome from './chrome/DeckChrome.svelte';
 import DeckProgress from './chrome/DeckProgress.svelte';
 import DeckToolbar from './chrome/DeckToolbar.svelte';
@@ -191,7 +193,8 @@ const instance = namespace ?? uid;
 // svelte-ignore state_referenced_locally
 const ownsHash = browser && syncHash && claimDeckHash(window, instance);
 
-let rendererList = $derived(deckRendererList(renderers));
+// Host renderers win; the default layouts and component registry answer last.
+let rendererList = $derived([...deckRendererList(renderers), layoutRenderers, componentRenderers]);
 let prepared = $derived(prepareDeck(deck, deckValidationHooks(rendererList)));
 let model = $derived(prepared.ok ? prepared.deck : null);
 let t = $derived(createDeckTranslator(messages));
