@@ -1,7 +1,7 @@
 ---
 name: texuli-build-ui
 description: Turn an idea into a Texuli interface offline — read the catalog (MCP or catalog.json), pick components by useWhen/dontUseWhen, compose, validate, render, iterate; recipes for dashboard, landing, form, slide, media story.
-version: "0.2.0"
+version: "0.2.1"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
@@ -166,7 +166,7 @@ Full checklists: [`references/recipes.md`](references/recipes.md).
 | Dashboard | `texuli/card`, `texuli/stat`, layouts app shell, optional `@texuli/charts/*` / `@texuli/data/*` |
 | Landing | layout page, `texuli/button`, display badges, media hero via media skill |
 | Form flow | `texuli/input`, field, button, stepper; forms manifests |
-| Slide / deck | `@texuli/slides` (model, grammar, stage, export, templates) over `@texuli/blocks` content |
+| Slide / deck | Deck v2 from JSON or Markdown: `@texuli/deck` (model, markdown, authoring, templates; in development, not on npm) presented by `@texuli/slides/stage` `DeckStage`, exported by `@texuli/slides/export`; 21 layout ids, `deck` CLI and MCP tool: [`references/decks.md`](references/decks.md). npm `@texuli/slides` `0.3.0` is the v1 model |
 | Media story | [`../media/SKILL.md`](../media/SKILL.md) + content card |
 | Drag and drop (lists, groups, boards, trees) | `@texuli/primitives/sortable`, `@texuli/data/board`, `@texuli/data/tree-view`; engine `@texuli/drag` (in development, on npm as `0.3.0`; `sortable` and the data drag migrations are unreleased) |
 | Workflow editor or diagram | `@texuli/workflows` editor, viewer, inspector, model, layout (in development, on npm as `0.3.0`) |
@@ -188,6 +188,7 @@ See [`references/imports.md`](references/imports.md).
 
 - [`references/loop.md`](references/loop.md) — catalog → pick → compose → validate → render
 - [`references/recipes.md`](references/recipes.md) — seven interface recipes (drag and workflows included)
+- [`references/decks.md`](references/decks.md) — deck generator: JSON, Markdown, `DeckStage`, print and PPTX, agent tools, the 21 layouts
 - [`references/gates.md`](references/gates.md) — offline commands
 - [`references/imports.md`](references/imports.md) — public import map
 - Router: [`../router/routes.md`](../router/routes.md)

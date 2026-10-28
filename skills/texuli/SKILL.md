@@ -1,7 +1,7 @@
 ---
 name: texuli
 description: Build accessible, themed interfaces with Texuli by routing requests to local sub-skills for components, themes, media, installation, and contributions.
-version: "0.2.0"
+version: "0.2.1"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
@@ -13,7 +13,7 @@ metadata: {"openclaw":{"emoji":"▣","homepage":"https://texuli.com/guides/","re
 Use this skill to build accessible, token-themed UI with **Texuli**: primitives,
 styled components, layouts, charts, media, data views, content blocks, decks,
 drag and drop (sortable lists, boards, trees, canvases), workflow editors, the
-rich text editor and Astro sites. It also covers interfaces that agents write
+rich text editor and Astro sites, and decks generated from JSON or Markdown. It also covers interfaces that agents write
 as data (blueprints), including whole stateful screens in spec 0.3.0 JSON. This file is the
 **router**. Detailed procedures live in neighboring sub-skills and in
 [`router/`](router/). Read the matching guide before starting its workflow.
@@ -47,8 +47,11 @@ agent config, or publish packages without explicit consent (see
    stay `private: true`. `@texuli/drag` (the drag engine) and
    `@texuli/workflows` (the workflow editor) are in development but on npm
    as `0.3.0`. `@texuli/editor` (the rich text editor) is in development
-   and not on npm: only a Texuli workspace can import it. The repository is
-   ahead of npm: spec 0.3.0, the new catalog groups,
+   and not on npm: only a Texuli workspace can import it. `@texuli/deck`
+   (the deck engine behind the deck generator) is in development and has
+   never been published; the repository's `@texuli/slides` stage is built
+   on it, while npm `0.3.0` ships the v1 deck model. The repository is
+   ahead of npm: spec 0.4.0, the new catalog groups,
    `@texuli/primitives/sortable`, the data drag migrations and the player's
    interaction are unreleased and arrive with each package's next
    owner-approved release. The
@@ -65,6 +68,7 @@ agent config, or publish packages without explicit consent (see
 | Full routing table and sub-skill map | [`router/routes.md`](router/routes.md) |
 | Which package or subpath exists, and its layer | [`router/packages.md`](router/packages.md) |
 | Build or fix a component / layout / shell / screen | [`build-ui/SKILL.md`](build-ui/SKILL.md) |
+| A deck from JSON or Markdown: layouts, validation, `DeckStage`, print and PPTX, the `deck` CLI and MCP tool | [`build-ui/references/decks.md`](build-ui/references/decks.md) |
 | Drag and drop: sortable lists, groups, boards, trees, a canvas, a workflow editor | [`build-ui/SKILL.md`](build-ui/SKILL.md) (recipes) |
 | Themes, palettes, forced-colors, AA contrast, theme CLI/MCP | [`themes/SKILL.md`](themes/SKILL.md) |
 | Images, video, captions, compositions, export, generator slot | [`media/SKILL.md`](media/SKILL.md) |

@@ -21,7 +21,7 @@ closed with an `internal-error` diagnostic.
 | --- | --- | --- |
 | `input` | Text: a byte cap before `JSON.parse` (`maxBytes` + 8 KiB), then parse. The value must be an object or an array | yes |
 | `envelope` | For a [blueprint envelope](./envelope.md): strict field rules, the catalog binding (`catalogHash`), and trust warnings for a declared status, activation or tier; then the tree runs the checks below. `skipped` for a bare tree | on an unsupported version or a missing tree |
-| `spec` | For an envelope, after `migrateBlueprint` (`@texuli/spec/migrate`) brings a 0.2.0 envelope to 0.3.0: the host's `checkSpec` (for example `@texuli/spec`'s `validateBlueprint` with the spec documents); `skipped` without one | no |
+| `spec` | For an envelope, after `migrateBlueprint` (`@texuli/spec/migrate`) brings an older envelope (undeclared or `"spec": "0.2.0"`) to the current spec version: the host's `checkSpec` (for example `@texuli/spec`'s `validateBlueprint` with the spec documents); `skipped` without one | no |
 | `structure` | One iterative pass: prototype keys (`__proto__`, `constructor`, `prototype`) anywhere, values nested deeper than 128 levels, node fields other than `id`, `props`, `children`, `slot`, `when`, `bind`, `on` | only on a depth bomb |
 | `interaction` | Spec 0.3.0 interaction, catalog-local: `$state` and `$data` bindings name declared variables (and are replaced by their first-paint values for the checks below), `bind` only on `bindable` props, `on` only for events the component fires, closed action ops and fields; list item text follows `SPEC_PATTERNS.listText`; and, for an envelope, the state surface rules from `@texuli/spec/surface` (form nodes inside an `action-form`, controls and fields bound to declared variables of their type, flow nodes matching the flow, no writes to host-bound variables), as `@texuli/player` refuses them | no |
 | `sinks` | The raw sink scan (`scanSinks`): executable strings, HTML strings, `class` / `style` / `innerHTML` / `srcdoc` keys, `on…` keys, functions, bidi controls, and URLs the host tier's policy refuses for their kind of key (links through the link policy, `src` and `poster` through the image or media policy, and every `srcset` candidate through the image-set policy) | no |
@@ -117,6 +117,86 @@ them.
 The renderer's own family check (`blockFamilyMismatch`, in the `render`
 check) also reads only its own keys, and refuses a `blocks-*` id with no
 known family instead of skipping it.
+
+## Deck drafts (model v2)
+
+**Tests:** `packages/catalog/tests/validate-deck-draft.test.ts`
+
+> **Unreleased.** Deck model v2 trees, spec `0.4.0` and the functions below
+> are in the repository only; they reach npm with the next owner-approved
+> release. `@texuli/deck`, which owns the model, has never been published.
+
+`validateDeckDraft(input, options)` is the entry for a deck an agent writes
+as a catalog tree. It runs `validateDraft` at the host's tier (`untrusted`
+by default) with `layout-deck` as the only frame root
+(`DECK_ROOT_CATALOG_ID`; its slides are `deck-slide`,
+`DECK_SLIDE_CATALOG_ID`), then maps the tree to a plain deck model v2 object
+(`DeckV2Plain`, `formatVersion: 2`). It never throws.
+
+`@texuli/catalog` does not depend on `@texuli/deck`, so the mapped deck is
+**not** validated against the model. A host that has `@texuli/deck` runs
+`migrateDeck` and `parseDeck` on it, or passes them as `loadDeck`, which this
+call runs on the mapped object (a loader that throws becomes a `deck-loader`
+error):
+
+```ts
+import { validateDeckDraft } from '@texuli/catalog/validate';
+import { migrateDeck, parseDeck } from '@texuli/deck/model';
+
+const result = validateDeckDraft(agentJson, {
+  catalog,
+  loadDeck: ({ mapped }) => {
+    const parsed = parseDeck(migrateDeck(mapped).deck);
+    return parsed.ok
+      ? { deck: mapped } // or the validated `parsed.deck`, which has the same shape
+      : {
+          deck: null,
+          issues: parsed.issues.map((issue) => ({
+            check: 'deck' as const,
+            code: 'deck-schema' as const,
+            severity: 'error' as const,
+            path: issue.jsonPath,
+            message: issue.message,
+          })),
+        };
+  },
+});
+```
+
+The mapping (`layoutDeckToV2`, pure) reads:
+
+- the `layout-deck` props into `meta` (title, description, locale, `dir`;
+  a missing title becomes “Untitled deck”), `style` (`aspect`, `themeRef`
+  as `theme`, `transition`, `motion`, `background` and a `style` object),
+  `navigation` (from v1 `settings` or a `navigation` object) and `outline`;
+- each `deck-slide` child into a slide: `id` from `slideId`, `title`,
+  `notes`, `master`, `themeRef`, `transition`, `background` and `steps`; a
+  slide with a catalog `layout` keeps it and its `props`, and
+  `layout: 'component'` keeps its component. An id that is not a lowercase
+  slug is rewritten and a duplicate gets a suffix, each with a warning.
+  Known gap: a slide `themeRef` is copied under that name, which the v2
+  `parseDeck` refuses (`unknown-key`; the v2 slide field is `theme`);
+- the children of a free slide into blocks: a block node's `block` prop as
+  the block, a `charts-*` node as a chart block, any other node as a
+  component item (`{ type: 'component', component, props }`);
+- a structured `slides[]` prop the same way;
+- legacy `layout-card` children as free slides, with a `deck-legacy-cards`
+  warning (`legacyCards: true` on the result).
+
+`deckV2ToLayoutTree(deck)` encodes a v2 deck back as a `layout-deck` tree
+with `deck-slide` children; the test round-trips the golden mapping.
+
+The result (`DeckDraftResult`) carries `ok`, `status`, the catalog `draft`,
+the mapped `deck` (only when `ok`), `diagnostics` (catalog findings, then
+`DeckDraftIssue`s with `check: 'deck'` and a `DeckDraftIssueCode`:
+`deck-schema`, `deck-legacy-cards`, `deck-empty` or `deck-loader`) and
+`legacyCards`. A non-deck root and a deck without slides fail.
+`ValidateDeckDraftOptions` are the draft options without `frameRoots`, plus
+`loadDeck`.
+
+This function is not the model v1 `validateDeckDraft` of
+`@texuli/slides/grammar`, which validates `0.3.0` decks and returns a v1
+deck.
 
 ## Edit history
 

@@ -19,10 +19,12 @@ DOM, no Svelte, no Node APIs and no runtime dependencies.
 > changes, so pin the exact version or use `^0.3.0`, which accepts only 0.3.x.
 
 > **Unreleased in this README.** `@texuli/spec@0.3.0` on npm carries **spec
-> 0.2.0** and only the root and `codegen` subpaths. Spec 0.3.0 (state,
-> bindings, closed actions, `reorder`, workflow graphs) and the `workflow`,
-> `migrate` and `surface` subpaths described below are in the repository
-> and reach npm with the next owner-approved release
+> 0.2.0** and only the root and `codegen` subpaths. The repository is at
+> **spec 0.4.0**: spec 0.3.0 (state, bindings, closed actions, `reorder`,
+> workflow graphs), spec 0.4.0 (deck model v2 on `layout-deck` and
+> `deck-slide`, below) and the `workflow`, `migrate` and `surface` subpaths
+> described below are in the repository only, and reach npm with the next
+> owner-approved release
 > ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 ## Install
@@ -55,7 +57,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version, e.g. '0.3.0'
+SPEC_VERSION;                         // the spec version: '0.4.0' in the repository
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -87,7 +89,7 @@ import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
 import { migrateBlueprint } from '@texuli/spec/migrate';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const migrated = migrateBlueprint(blueprint); // 0.2.0 → 0.3.0 stamps `spec`; never throws
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → 0.3.0 → 0.4.0; never throws
 const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
@@ -140,6 +142,13 @@ warning without failing.
   `submit`) on a closed event vocabulary, drag as data (`reorder`) and
   workflow graphs (at most 500 nodes and 2,000 edges). Nothing in a
   blueprint is evaluated.
+- **Decks as data.** Spec 0.4.0 (in the repository; ADR-009) gives
+  `layout-deck` and `deck-slide` optional deck model v2 props: the 9:16
+  aspect, the `slide`, `zoom` and `morph` transitions, motion, navigation,
+  outline, a slide `layout` with its `props`, `background`, step labels and
+  component slides. The change is additive: every 0.3.0 envelope is a valid
+  0.4.0 envelope, and the `0.3.0 → 0.4.0` migration only stamps `spec`. The
+  deck model itself is validated by `@texuli/deck`, not by this package.
 - **Structure only.** This validator checks structure. URL policy, tree
   limits and rendering live in the runtime validator of
   [`@texuli/catalog`](https://www.npmjs.com/package/@texuli/catalog). The
@@ -182,7 +191,11 @@ catalog hash, and from 0.3.0 may declare the exact spec version it was
 written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 (`@texuli/spec/migrate`) brings an
 envelope up to the current spec with pure, per-version steps
-(`src/migrations/`); a compatible version range is planned, not built.
+(`src/migrations/`: `0.2.0 → 0.3.0` and `0.3.0 → 0.4.0`, both of which only
+stamp `spec`); a compatible version range is planned, not built. The
+repository pins spec `0.4.0` to digest
+`fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3` in
+`versions.json`.
 
 The full rules (the digest, `versions.json` pins, regeneration and the
 conformance harness) are in

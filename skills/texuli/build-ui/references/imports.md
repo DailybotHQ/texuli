@@ -64,7 +64,8 @@ Never `@texuli/core` root barrel for app code.
 | Media | `@texuli/media/<area>` |
 | Chat | `@texuli/chat` (`ChatThread`, `Composer`, `parseMessageText`) |
 | Content blocks | `@texuli/blocks/<family>` (lazy) or `@texuli/blocks/<family>/renderers` |
-| Decks | `@texuli/slides/model`, `@texuli/slides/grammar`, `@texuli/slides/stage`, `@texuli/slides/export` (print, PDF seam, PPTX), `@texuli/slides/templates` (report, pitch, review) |
+| Decks (v2 engine) | `@texuli/deck/model` (`parseDeck`, `loadUntrustedDeck`, `DECK_LAYOUTS`), `@texuli/deck/markdown` (`parseDeckMarkdown`, `deckToMarkdown`), `@texuli/deck/authoring`, `@texuli/deck/templates`, `@texuli/deck/engine`, `@texuli/deck/math`; in development, workspace only (not on npm). See [`decks.md`](decks.md) |
+| Decks (stage and v1) | `@texuli/slides/stage` (`DeckStage`, `prepareDeck`), `@texuli/slides/export` (`DeckPrintView`, print plan, PDF seam, PPTX), `@texuli/slides/model`, `@texuli/slides/grammar`, `@texuli/slides/templates` (report, pitch, review; v1) |
 | Rich text editor | `@texuli/editor/editor` (`RichTextEditor`), `@texuli/editor/toolbar`, `@texuli/editor/controller`; in development, workspace only (not on npm) |
 | Astro sites | `@texuli/astro` (`texuli()` integration), `@texuli/astro/styles.css`, `@texuli/astro/site` (`defineSite`, `sitePageMeta`, `siteSitemap`), `@texuli/astro/layouts/ContentLayout` |
 | Paint a validated blueprint | `@texuli/player` (+ `@texuli/player/styles.css`) |

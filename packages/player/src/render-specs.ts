@@ -1593,7 +1593,7 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
       {
         name: 'aspect',
         kind: 'enum',
-        enumValues: ['16:9', '4:3', '1:1'],
+        enumValues: ['16:9', '4:3', '9:16', '1:1'],
       },
       {
         name: 'themeRef',
@@ -1610,6 +1610,24 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
       {
         name: 'slides',
         kind: 'array',
+      },
+      {
+        name: 'transition',
+        kind: 'enum',
+        enumValues: ['none', 'fade', 'fade-up', 'slide', 'zoom', 'morph'],
+      },
+      {
+        name: 'motion',
+        kind: 'enum',
+        enumValues: ['full', 'subtle', 'none'],
+      },
+      {
+        name: 'navigation',
+        kind: 'object',
+      },
+      {
+        name: 'outline',
+        kind: 'object',
       },
       {
         name: 'children',
@@ -1655,13 +1673,33 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
         ],
       },
       {
+        name: 'layout',
+        kind: 'string',
+      },
+      {
         name: 'transition',
         kind: 'enum',
-        enumValues: ['none', 'fade', 'fade-up'],
+        enumValues: ['none', 'fade', 'fade-up', 'slide', 'zoom', 'morph'],
       },
       {
         name: 'themeRef',
         kind: 'unknown',
+      },
+      {
+        name: 'background',
+        kind: 'unknown',
+      },
+      {
+        name: 'steps',
+        kind: 'array',
+      },
+      {
+        name: 'props',
+        kind: 'object',
+      },
+      {
+        name: 'component',
+        kind: 'object',
       },
       {
         name: 'children',

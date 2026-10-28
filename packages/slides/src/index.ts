@@ -19,7 +19,7 @@ export {
   planDeckPrint,
   requestDeckPdf,
   writeDeckPptx,
-} from './export/index.ts';
+} from './export/api.ts';
 export {
   BLOCK_CATALOG_IDS,
   catalogIdForBlock,

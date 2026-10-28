@@ -4,9 +4,22 @@
 **Source:** `packages/slides/src/templates/`  
 **Tests:** `tests/decks.test.ts`
 
-Three starter decks built from the existing model, masters and block types.
-Each returns a validated `Deck`, so it renders, prints and exports like any
-other deck.
+Three starter decks built from the model v1 deck ([model.md](model.md)),
+its masters and block types. Each returns a validated v1 `Deck`, so it
+renders, prints and exports like any other deck; the v2 stage migrates it
+when it presents it.
+
+> **Model v1 templates.** These are the `0.3.0` templates, kept for
+> compatibility. The model v2 templates of the next minor, `0.4.0` (in the
+> repository, not on npm yet), live in `@texuli/deck/templates`:
+> `createDeckTemplate(id, title?)` returns a validated v2 deck for one of
+> the nine ids in `DECK_TEMPLATES` (`pitch`, `review`, `qbr`, `launch`,
+> `status`, `training`, `lesson`, `report`, `talk`), built from the brief
+> outlines of `@texuli/deck/authoring` (`generateDeckFromBrief`), with
+> placeholder content marked as draft guidance. The repository also keeps
+> fictional starter decks as JSON and Markdown pairs in
+> [`packages/deck/decks/`](../../deck/decks); the deck tests read them, and
+> the texuli.com slides page presents a copy of one.
 
 `DECK_TEMPLATE_IDS` lists them (`DeckTemplateId`). `DECK_TEMPLATES` maps each
 id to its `DeckTemplate`: `label`, `description`, default `themeId`,

@@ -69,6 +69,8 @@ Every option belongs to the host. A blueprint can set none of them.
 | `onNodeError` | — | Called once per node that cannot paint, with `{ code, id, path, phase, error? }` |
 | `landmarks` | `true` | `false` stops layout painters from emitting `<main>`; pass it when the player sits inside your own landmark |
 | `motion` | `'auto'` | `auto` follows `prefers-reduced-motion`; `reduce` stops motion inside the player |
+| `chrome` | `true` | `false` paints no frame chrome: no label heading, status, trust badge, skip link or end anchor (`data-tx-player-chrome="off"`). For a host that already frames the content and states its trust itself, such as a slide (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
+| `deckHost` | `null` | A `DeckPlayerHost` that presents a validated `layout-deck` blueprint on a stage instead of the document flow (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
 | `selectable`, `selection`, `onSelectionChange` | `false`, —, — | Frame selection for a builder-style preview ([Selection](reference.md#selection-builder-preview)) |
 | `view`, `onFlowChange` | — | The flow view and its transitions ([Views and flows](reference.md#views-and-flows-g09)) |
 | `onAction` | — | Answers action-form intents with `confirmed` or `rejected`; without it, actions are unavailable ([Action surface](reference.md#action-surface-and-receipts-g17)) |
@@ -84,7 +86,9 @@ your app's own UI.
 - **Trust badge.** At the `untrusted` tier the chrome always shows
   **Untrusted content** (`labels.trustBadge`) next to the status, also while
   the frame is inactive. You can reword it but not remove it. The `developer`
-  tier shows no badge.
+  tier shows no badge. The one exception is `chrome={false}`, where the
+  embedding host shows the trust signal instead
+  ([Frameless and deck hosts](#frameless-and-deck-hosts)).
 - **Validation.** Every value that paints has passed `validateDraft` and the
   untrusted URL policy, on every entry path (blueprint object or JSON text,
   envelopes, local state and `setState`, `mountPlayer` updates and frame
@@ -206,6 +210,63 @@ sandboxed without `allow-same-origin`, and only display data crosses the
 `postMessage` boundary. See the reference's [Iframe frame](reference.md#iframe-frame)
 section. A hosted frame page on a dedicated origin is planned, not built.
 
+## Frameless and deck hosts
+
+Unreleased: both props are in the repository and reach npm with the next
+owner-approved release.
+
+**`chrome={false}`.** The `@texuli/slides` stage paints each catalog
+component on a slide through a player with `chrome={false}`: the slide is
+the frame, so the player adds no label heading, skip link or end anchor and
+the component adds nothing to the slide's outline. That also removes the
+status and the **Untrusted content** badge. This is the one exception to the
+trust-badge contract above: with `chrome={false}` the embedding host must
+show the trust signal itself. The slides stage does: at the `untrusted` tier
+it shows one **Untrusted content** badge in its toolbar row for the whole
+deck (`trustBadge`, `stage.untrustedBadge` in
+[`@texuli/slides` stage docs](../../slides/docs/stage.md#trust-badge)). Use
+`chrome={false}` only where your own surface does the same. Validation, the
+URL policy at paint and containment are unchanged.
+
+**`deckHost`.** The player (layer L7) cannot import `@texuli/slides` (L8), so
+it paints a `layout-deck` blueprint as a document flow. A host that has both
+packages can present it on the slides stage instead by passing a
+`DeckPlayerHost`:
+
+```ts
+import type { DeckPlayerHost } from '@texuli/player';
+
+const deckHost: DeckPlayerHost = {
+  present({ tree, tier, label, active, root }) {
+    // Map `tree` to a deck (validateDeckDraft from @texuli/catalog/validate,
+    // then migrateDeck and parseDeck from @texuli/deck/model) and mount
+    // DeckStage from @texuli/slides/stage with `tier`.
+    return () => {
+      // Unmount the stage.
+    };
+  },
+};
+// <Player {blueprint} {deckHost} label="Deck preview" />
+```
+
+When the validated tree's root is a deck (`isLayoutDeckTree`), the player
+skips document paint, renders an empty `data-tx-player-deck-host-surface`
+element (the root carries `data-tx-player-deck-host="pending"`) and calls
+`present` with a `DeckPlayerHostRequest`: the validated `tree`, the
+host-chosen `tier` (never one from the draft), the frame `label`, whether
+the frame is `active`, and the player `root` element. `label`, `active` and
+`root` are live getters: read them when you need them; changing them never
+calls `present` again, so the stage keeps its position. `present` may return
+a cleanup, which the player calls when the blueprint, tier or host changes
+(then it presents again), and on destroy. Without a `deckHost`, or for any other root, the player
+paints as before. `DECK_STAGE_HOST_PACKAGE` names the package that owns the
+stage. `@texuli/slides` does not ship a ready-made `DeckPlayerHost` adapter
+yet, so a host writes the few lines above itself.
+
+Tests: `packages/player/tests/deck-host.test.ts` (deck detection,
+`chrome={false}`, a mock host called for a deck and document paint without
+one).
+
 ## Limits
 
 - **Fidelity is structural, not pixel-level.** The golden fixture tests check
@@ -216,9 +277,9 @@ section. A hosted frame page on a dedicated origin is planned, not built.
 - **Provenance strip:** planned. The frame shows no provenance (who made the
   blueprint, from what) yet; the design's `provenance` frame option is not
   built.
-- **Not built yet:** painting the core's closed intents, retrying a failed node, the
-  slides presenter stage (decks paint as a document flow), a real-browser
-  keyboard pass and a screen-reader pass.
+- **Not built yet:** painting the core's closed intents, retrying a failed node, a
+  ready-made deck host (decks paint as a document flow unless the host passes
+  `deckHost`), a real-browser keyboard pass and a screen-reader pass.
 - **Untrusted by default.** Choosing `tier="developer"` widens validation but
   never the paint-time URL policy.
 

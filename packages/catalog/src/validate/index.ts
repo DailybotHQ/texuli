@@ -6,6 +6,19 @@
  */
 
 export {
+  DECK_ROOT_CATALOG_ID,
+  DECK_SLIDE_CATALOG_ID,
+  type DeckDraftDiagnostic,
+  type DeckDraftIssue,
+  type DeckDraftIssueCode,
+  type DeckDraftResult,
+  type DeckV2Plain,
+  deckV2ToLayoutTree,
+  layoutDeckToV2,
+  type ValidateDeckDraftOptions,
+  validateDeckDraft,
+} from './deck-draft.ts';
+export {
   DRAFT_CHECKS,
   DRAFT_FRAME_IDS,
   DRAFT_TEXT_ALLOWANCE,

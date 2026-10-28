@@ -1,0 +1,69 @@
+{
+  "$comment": "PLAN_008 T-catalog-player: hostile deck inputs that must be refused safely. Fictional data only.",
+  "fixture": "09-deck-v2-hostile",
+  "cases": [
+    {
+      "name": "html-sink-in-title",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "<img src=x onerror=alert(1)>" },
+        "children": [
+          {
+            "id": "deck-slide",
+            "props": { "slideId": "s1", "title": "A" },
+            "children": [
+              {
+                "id": "blocks-text",
+                "props": { "block": { "type": "text", "markdown": "Hi" } }
+              }
+            ]
+          }
+        ]
+      },
+      "expect": "valid-or-sanitized"
+    },
+    {
+      "name": "not-a-deck-root",
+      "tree": {
+        "id": "layout-page",
+        "props": { "title": "Not a deck" },
+        "children": []
+      },
+      "expect": "invalid-root"
+    },
+    {
+      "name": "empty-deck",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Empty" },
+        "children": []
+      },
+      "expect": "deck-empty"
+    },
+    {
+      "name": "script-block",
+      "tree": {
+        "id": "layout-deck",
+        "props": { "title": "Bad block" },
+        "children": [
+          {
+            "id": "deck-slide",
+            "props": { "slideId": "s1" },
+            "children": [
+              {
+                "id": "blocks-text",
+                "props": {
+                  "block": {
+                    "type": "text",
+                    "markdown": "<script>alert(1)</script>"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "expect": "valid-markdown-escaped"
+    }
+  ]
+}

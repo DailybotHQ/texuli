@@ -42,7 +42,12 @@ content" (`labels.trustBadge`), next to the status badge. This is the
 artifact-frame contract from `@texuli/catalog/render/frame`: agent output
 stays distinguishable from app chrome. A host can reword the badge but not
 remove it; it stays visible when the player is inactive. The `developer`
-tier shows no trust badge.
+tier shows no trust badge. The one exception is `chrome={false}`, which
+paints no frame chrome and so no badge: the embedding host must then show
+the trust signal itself. The `@texuli/slides` stage, which paints catalog
+components through frameless players, shows one **Untrusted content** badge
+in its toolbar row at the `untrusted` tier
+([embedding.md](embedding.md#frameless-and-deck-hosts)).
 
 Invalid drafts are refused by default. `invalidPolicy="preview"` displays the
 validated placeholder tree with a visible warning; it does not enable
@@ -231,7 +236,7 @@ pixel baselines are committed in the visual suite (`tests/visual`);
 | --- | --- | --- |
 | `layout-page` | `<main>`, h1 title, description | |
 | `layout-doc` | `<article>`, h1 title, description | `toc` (default `true`) lists the doc's titled frames **and its heading blocks** (`blocks-text` with `type: "heading"`, at their declared level) as a **Contents** `<nav>` when there are at least two. A link focuses its frame, or a generated anchor wrapping the heading block, without changing the URL hash |
-| `layout-deck` | `<article>`, h1 title, description, `lang` from `locale` when it is a language tag | A **document flow**: every slide shows in order. The presenter stage (one slide at a time, `aspect`, `themeRef`, `masters`, `settings`, the structured `slides` prop) is the slides runtime's, and mapping to it is planned (phase 2) |
+| `layout-deck` | `<article>`, h1 title, description, `lang` from `locale` when it is a language tag | A **document flow**: every slide shows in order. The presenter stage (one slide at a time, `aspect`, `themeRef`, `masters`, `settings`, the structured `slides` prop and the spec 0.4.0 model v2 props) is `@texuli/slides`'s; a host that passes `deckHost` presents the validated deck there instead (unreleased, [embedding](embedding.md#frameless-and-deck-hosts)) |
 | `deck-slide` | `<section>` named by its title, speaker `notes` in a closed `<details>` | `slideId`, `master` and `transition` are not painted |
 | `layout-card` | `<section>` named by its title | |
 | `layout-grid` | Grid of 1–4 `columns` | `gap` applies only as a bounded length (`0`, `≤ 99.99rem/em`, `≤ 999px`); anything else is ignored |

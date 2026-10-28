@@ -1,0 +1,464 @@
+{
+  "formatVersion": 2,
+  "meta": {
+    "title": "Texuli: create anything",
+    "description": "A fictional 25-slide flagship about building with Texuli.",
+    "author": "Texuli Example Team",
+    "locale": "en"
+  },
+  "slides": [
+    {
+      "id": "texuli-01",
+      "title": "Small pieces",
+      "notes": "Presenter guidance for Texuli slide 1: explain the example, cite any evidence, and invite questions.",
+      "layout": "title-hero",
+      "props": {
+        "title": "Small pieces",
+        "subtitle": "What a small team learned in one year",
+        "meta": "Ada Example · Example Conf · 2026"
+      }
+    },
+    {
+      "id": "texuli-02",
+      "title": "One validated model",
+      "notes": "Presenter guidance for Texuli slide 2: explain the example, cite any evidence, and invite questions.",
+      "layout": "section-divider",
+      "props": {
+        "eyebrow": "Part 2",
+        "title": "One validated model"
+      }
+    },
+    {
+      "id": "texuli-03",
+      "title": "Human authoring",
+      "notes": "Presenter guidance for Texuli slide 3: explain the example, cite any evidence, and invite questions.",
+      "layout": "two-column-split",
+      "props": {
+        "title": "Human authoring",
+        "left": {
+          "heading": "Before",
+          "body": "Releases waited for a weekly window."
+        },
+        "right": {
+          "heading": "After",
+          "body": "Every merged change ships the same day."
+        }
+      }
+    },
+    {
+      "id": "texuli-04",
+      "title": "Agent authoring",
+      "notes": "Presenter guidance for Texuli slide 4: explain the example, cite any evidence, and invite questions.",
+      "layout": "three-column-cards",
+      "props": {
+        "title": "Agent authoring",
+        "cards": [
+          {
+            "icon": "zap",
+            "heading": "Small",
+            "body": "Ship the smallest useful change first."
+          },
+          {
+            "icon": "compass",
+            "heading": "Clear",
+            "body": "One sentence explains every change."
+          },
+          {
+            "icon": "users",
+            "heading": "Shared",
+            "body": "Anyone on the team can release."
+          }
+        ]
+      }
+    },
+    {
+      "id": "texuli-05",
+      "title": "A clear contract",
+      "notes": "Presenter guidance for Texuli slide 5: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-left",
+      "props": {
+        "title": "A clear contract",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "heading": "What you are looking at",
+        "body": "Each box is a stage; a change moves right when its checks pass."
+      }
+    },
+    {
+      "id": "texuli-06",
+      "title": "A useful component",
+      "notes": "Presenter guidance for Texuli slide 6: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-right",
+      "props": {
+        "title": "A useful component",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "heading": "Checks run in parallel",
+        "body": "Say it first, then show where it happens."
+      }
+    },
+    {
+      "id": "texuli-07",
+      "title": "A trusted stage",
+      "notes": "Presenter guidance for Texuli slide 7: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-centered",
+      "props": {
+        "title": "A trusted stage",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "caption": "Three stages, one direction."
+      }
+    },
+    {
+      "id": "texuli-08",
+      "title": "Accessible motion",
+      "notes": "Presenter guidance for Texuli slide 8: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-full-bleed",
+      "props": {
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "caption": "Where it started",
+        "credit": "Photo: Example Studio",
+        "overlay": "dark"
+      }
+    },
+    {
+      "id": "texuli-09",
+      "title": "Reveal steps",
+      "notes": "Presenter guidance for Texuli slide 9: explain the example, cite any evidence, and invite questions.",
+      "layout": "quote",
+      "props": {
+        "quote": "Make the next step obvious, then make it small.",
+        "cite": "Marco Example"
+      }
+    },
+    {
+      "id": "texuli-10",
+      "title": "Evidence first",
+      "notes": "Presenter guidance for Texuli slide 10: explain the example, cite any evidence, and invite questions.",
+      "layout": "code-with-callout",
+      "props": {
+        "title": "Evidence first",
+        "code": {
+          "lang": "ts",
+          "source": "export function total(items: number[]) {\n  return items.reduce((a, b) => a + b, 0);\n}",
+          "highlights": ["2"]
+        },
+        "heading": "What is happening",
+        "bullets": ["Sum the list in one pass", "Start from zero for an empty list"]
+      }
+    },
+    {
+      "id": "texuli-11",
+      "title": "Open formats",
+      "notes": "Presenter guidance for Texuli slide 11: explain the example, cite any evidence, and invite questions.",
+      "layout": "big-stat",
+      "props": {
+        "number": "87%",
+        "label": "of releases shipped on the day they merged",
+        "context": "A fictional team, over twelve months",
+        "source": "n = 412 releases"
+      }
+    },
+    {
+      "id": "texuli-12",
+      "title": "Predictable export",
+      "notes": "Presenter guidance for Texuli slide 12: explain the example, cite any evidence, and invite questions.",
+      "layout": "comparison-table",
+      "props": {
+        "title": "Predictable export",
+        "columns": ["Weekly window", "Continuous"],
+        "rows": [
+          {
+            "label": "Lead time",
+            "values": ["5 days", "Same day"]
+          },
+          {
+            "label": "Rollback",
+            "values": [false, true]
+          },
+          {
+            "label": "Best for",
+            "values": ["Large batches", "Small changes"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "texuli-13",
+      "title": "A stable catalog",
+      "notes": "Presenter guidance for Texuli slide 13: explain the example, cite any evidence, and invite questions.",
+      "layout": "process-steps",
+      "props": {
+        "title": "A stable catalog",
+        "steps": [
+          {
+            "title": "Propose",
+            "body": "Open a small pull request."
+          },
+          {
+            "title": "Check",
+            "body": "Tests and reviews run in parallel."
+          },
+          {
+            "title": "Merge",
+            "body": "The branch lands on main."
+          },
+          {
+            "title": "Release",
+            "body": "The pipeline publishes it."
+          }
+        ]
+      }
+    },
+    {
+      "id": "texuli-14",
+      "title": "Fictional examples",
+      "notes": "Presenter guidance for Texuli slide 14: explain the example, cite any evidence, and invite questions.",
+      "layout": "timeline",
+      "props": {
+        "title": "Fictional examples",
+        "events": [
+          {
+            "time": "January",
+            "text": "First automated release"
+          },
+          {
+            "time": "April",
+            "text": "Checks run in parallel"
+          },
+          {
+            "time": "August",
+            "text": "Same-day releases by default"
+          },
+          {
+            "time": "December",
+            "text": "Rollback in one click"
+          }
+        ]
+      }
+    },
+    {
+      "id": "texuli-15",
+      "title": "Responsive layout",
+      "notes": "Presenter guidance for Texuli slide 15: explain the example, cite any evidence, and invite questions.",
+      "layout": "team-avatars",
+      "props": {
+        "title": "Responsive layout",
+        "people": [
+          {
+            "name": "Ada Example",
+            "role": "Design",
+            "avatar": "av-001"
+          },
+          {
+            "name": "Marco Example",
+            "role": "Engineering",
+            "avatar": "av-002"
+          }
+        ]
+      }
+    },
+    {
+      "id": "texuli-16",
+      "title": "Typed composition",
+      "notes": "Presenter guidance for Texuli slide 16: explain the example, cite any evidence, and invite questions.",
+      "layout": "closing-cta",
+      "props": {
+        "title": "Typed composition",
+        "text": "Questions are welcome after the talk.",
+        "cta": {
+          "label": "Read the guide",
+          "href": "https://example.com/guide"
+        },
+        "footnote": "All names and numbers are fictional."
+      }
+    },
+    {
+      "id": "texuli-17",
+      "title": "Safe content",
+      "notes": "Presenter guidance for Texuli slide 17: explain the example, cite any evidence, and invite questions.",
+      "layout": "video-centered",
+      "props": {
+        "title": "Safe content",
+        "video": {
+          "src": "https://example.com/media/demo.mp4",
+          "label": "Product demo clip",
+          "width": 960,
+          "height": 540,
+          "muted": true
+        },
+        "caption": "Recorded on a test project."
+      }
+    },
+    {
+      "id": "texuli-18",
+      "title": "Useful notes",
+      "notes": "Presenter guidance for Texuli slide 18: explain the example, cite any evidence, and invite questions.",
+      "layout": "video-left",
+      "props": {
+        "title": "Useful notes",
+        "video": {
+          "src": "https://example.com/media/demo.mp4",
+          "label": "Product demo clip",
+          "width": 960,
+          "height": 540,
+          "muted": true
+        },
+        "heading": "What you are watching",
+        "body": "A change goes from merge to production while the checks report."
+      }
+    },
+    {
+      "id": "texuli-19",
+      "title": "One source",
+      "notes": "Presenter guidance for Texuli slide 19: explain the example, cite any evidence, and invite questions.",
+      "layout": "video-right",
+      "props": {
+        "title": "One source",
+        "video": {
+          "src": "https://example.com/media/demo.mp4",
+          "label": "Product demo clip",
+          "width": 960,
+          "height": 540,
+          "muted": true
+        },
+        "heading": "Rollback is one click",
+        "body": "Say it first, then let the clip prove it."
+      }
+    },
+    {
+      "id": "texuli-20",
+      "title": "Shared vocabulary",
+      "notes": "Presenter guidance for Texuli slide 20: explain the example, cite any evidence, and invite questions.",
+      "layout": "chart",
+      "props": {
+        "title": "Shared vocabulary",
+        "spec": {
+          "kind": "bar",
+          "title": "Releases per month",
+          "description": "Releases grew from 12 in January to 31 in March.",
+          "series": [
+            {
+              "id": "releases",
+              "label": "Releases",
+              "points": [
+                {
+                  "x": "Jan",
+                  "y": 12
+                },
+                {
+                  "x": "Feb",
+                  "y": 22
+                },
+                {
+                  "x": "Mar",
+                  "y": 31
+                }
+              ]
+            }
+          ]
+        },
+        "height": "md",
+        "showTable": true
+      }
+    },
+    {
+      "id": "texuli-21",
+      "title": "Simple tools",
+      "notes": "Presenter guidance for Texuli slide 21: explain the example, cite any evidence, and invite questions.",
+      "layout": "title-hero",
+      "props": {
+        "title": "Simple tools",
+        "subtitle": "What a small team learned in one year",
+        "meta": "Ada Example · Example Conf · 2026"
+      }
+    },
+    {
+      "id": "texuli-22",
+      "title": "Better iteration",
+      "notes": "Presenter guidance for Texuli slide 22: explain the example, cite any evidence, and invite questions.",
+      "layout": "section-divider",
+      "props": {
+        "eyebrow": "Part 2",
+        "title": "Better iteration"
+      }
+    },
+    {
+      "id": "texuli-23",
+      "title": "Measured quality",
+      "notes": "Presenter guidance for Texuli slide 23: explain the example, cite any evidence, and invite questions.",
+      "layout": "two-column-split",
+      "props": {
+        "title": "Measured quality",
+        "left": {
+          "heading": "Before",
+          "body": "Releases waited for a weekly window."
+        },
+        "right": {
+          "heading": "After",
+          "body": "Every merged change ships the same day."
+        }
+      }
+    },
+    {
+      "id": "texuli-24",
+      "title": "Open ecosystem",
+      "notes": "Presenter guidance for Texuli slide 24: explain the example, cite any evidence, and invite questions.",
+      "layout": "three-column-cards",
+      "props": {
+        "title": "Open ecosystem",
+        "cards": [
+          {
+            "icon": "zap",
+            "heading": "Small",
+            "body": "Ship the smallest useful change first."
+          },
+          {
+            "icon": "compass",
+            "heading": "Clear",
+            "body": "One sentence explains every change."
+          },
+          {
+            "icon": "users",
+            "heading": "Shared",
+            "body": "Anyone on the team can release."
+          }
+        ]
+      }
+    },
+    {
+      "id": "texuli-25",
+      "title": "Infinite possibilities",
+      "notes": "Presenter guidance for Texuli slide 25: explain the example, cite any evidence, and invite questions.",
+      "layout": "image-left",
+      "props": {
+        "title": "Infinite possibilities",
+        "image": {
+          "src": "https://example.com/media/diagram.webp",
+          "alt": "A placeholder diagram with three connected boxes",
+          "width": 640,
+          "height": 480
+        },
+        "heading": "What you are looking at",
+        "body": "Each box is a stage; a change moves right when its checks pass."
+      }
+    }
+  ]
+}

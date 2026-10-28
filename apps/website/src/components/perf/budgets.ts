@@ -64,6 +64,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 118, jsGzipKb: 76, cls: 0.15 },
   },
   {
+    route: '/slides-page/',
+    reason:
+      'PLAN_008: four lazy deck islands (the flagship deck, the live JSON and Markdown editors, the galleries). JS at the ready signal equals the island-free baseline; the page total is Astro hoisting the CSS of the lazily imported stage, layout and player chunks into <head>. Measured 160.1 KB page, 55.1 KB JS and 25.4 KB gzip of HTML (+4% headroom). Follow-up: ship the deck and player CSS as one lazily loaded stylesheet.',
+    budget: { pageGzipKb: 168, jsGzipKb: 60, htmlGzipKb: 27 },
+  },
+  {
     route: '/drag-page/',
     reason:
       'PLAN_007: the first screen is the drag workbench, three sortable surfaces (list, board, tree) on one @texuli/drag engine; the other demos load on scroll. Measured 108.5 KB page, 71.9 KB JS at the ready signal (+4% headroom).',
@@ -108,8 +114,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/builder/',
     reason:
-      'The builder page mounts the BuilderApp studio island (structure tree, props and theme controls) on open: measured 31.7 KB gzip of HTML after the PLAN_006 builder polish (T-82). PLAN_007: the palette now lists the data, chat, workflows and state groups of the 158-id catalog inline, measured 234.9 KB raw (+4% headroom).',
-    budget: { htmlGzipKb: 34, htmlRawKb: 248 },
+      'The builder page mounts the BuilderApp studio island (structure tree, props and theme controls) on open: measured 31.7 KB gzip of HTML after the PLAN_006 builder polish (T-82). PLAN_007: the palette now lists the data, chat, workflows and state groups of the 158-id catalog inline, measured 234.9 KB raw (+4% headroom). PLAN_008: the deck root and slide manifests now carry the v2 deck props (layout, background, steps, motion, navigation, outline), measured 35.8 KB gzip of HTML (+4% headroom).',
+    budget: { htmlGzipKb: 38, htmlRawKb: 248 },
   },
   {
     route: '/component-pages/',

@@ -2,14 +2,20 @@
 
 **Import:** `@texuli/slides/stage`  
 **Source:** `packages/slides/src/stage/`  
-**Tests:** `tests/stage.test.ts` (runtime, themes, transitions, presenter,
-accessibility), `tests/stage-content.test.ts` (print, media, fragments, slot
-masters, fullscreen, presenter screen); browser sweep
+**Tests:** `tests/stage.test.ts` (input, canvas, routing, keys, pointer,
+transitions, i18n, steps, renderers, style, hooks, themes),
+`tests/stage-seams.test.ts` (messages, preparation, steps, renderers,
+routing and transition helpers), `tests/stage-content.test.ts` (print,
+media, fragments, slot masters, fullscreen, presenter screen),
+`tests/stage-chrome.test.ts` (toolbar, slide list, blackout, laser, help,
+copy link, first-visit hint, tooltips, full screen overlay); browser sweep
 `tests/e2e/a11y-slides.spec.ts`
 
-The Svelte 5 runtime for a validated deck ([model.md](model.md)): the
-interactive `DeckStage` and the all-pages `DeckPrint`. Import
-`@texuli/slides/styles.css` once for their styles ([styles.md](styles.md)).
+The Svelte 5 runtime for a deck ([model.md](model.md)) on the
+`@texuli/deck` engine (ADR-009): the interactive `DeckStage` and the
+all-pages `DeckPrint`. Import `@texuli/slides/styles.css` once for their
+styles ([styles.md](styles.md)); the chrome components carry their own
+scoped styles.
 
 ```svelte
 <script lang="ts">
@@ -27,125 +33,279 @@ interactive `DeckStage` and the all-pages `DeckPrint`. Import
 
 | Prop | Default | What it does |
 | --- | --- | --- |
-| `deck` | required | The validated `Deck` |
-| `initialSlideId` | `settings.startIndex` | Open on this slide; lets a host restore a slide from its own URL or history |
-| `initialStep` | `0` | Open the initial slide at this [reveal step](#reveal-steps), clamped to its steps |
-| `onSlideChange` | — | Receives a `SlideNavigationIntent` (`{ index, slideId }`) for the host to persist; the stage never changes the URL |
-| `onStepChange` | — | Receives a `SlideStepIntent` (`{ index, slideId, step, stepCount }`) on every slide or reveal step change |
-| `presenter` | `false` | Bindable presenter mode |
-| `onPresenterChange` | — | Called with `open` when presenter mode toggles |
-| `presenterTimer` | `false` | Show the elapsed timer in the presenter view |
-| `onFullscreenChange` | — | Called with the `DeckFullscreenState` (`off`, `native`, `viewport`) when fullscreen changes |
-| `sync` | `null` | A `DeckSync` link that keeps this stage and another window's stage on one slide and step ([presenter screen](#presenter-screen)) |
+| `deck` | required | A v2 deck, or any input `migrateDeck` understands (Texuli v1, grammar tree, Protoyard). An invalid deck shows its diagnostics and is never painted |
+| `syncHash` | `true` | Keep `#/<slide>/<step>` in the URL (`replaceState`) and follow `hashchange` and deep links. Only the first stage on a page claims the hash |
+| `fit` | `container` | `container` letterboxes the canvas inside the host box; `viewport` fills the window height |
+| `tier` | `untrusted` | URL policy tier for every link and media source painted (`DeckMediaTrust`) |
+| `mediaTrust` | — | v1 name of `tier`, kept for existing hosts |
+| `trustBadge` | `true` | Show the stage's trust badge, **Untrusted content** (`stage.untrustedBadge`, overridable through `messages`), at the inline start of the toolbar row when the paint tier is `untrusted`. The stage paints catalog components through players with `chrome={false}`, so this badge is the deck's trust signal; the `developer` tier never shows it. See [Trust badge](#trust-badge) |
+| `messages` | — | Partial overrides of every stage string (`DeckStageMessages`; English defaults) |
+| `locale` / `dir` | `meta.locale` / `meta.dir` | Override the `lang` and `dir` of the stage |
+| `plugins` | `[]` | Engine plugins (`beforeNavigate`, `beforeRender`/`afterRender`, `onAction`, …), in order |
+| `renderers` | — | Renderer tables, first answer wins (`DeckRenderers`: layouts, components, backgrounds, custom slides, and the free-slide block check `validateBlock`) |
+| `defaultRenderers` | `true` | Append the default tables (the 20 catalog layouts and the component registry) after `renderers`. `false` leaves every slide to the host's tables: nothing from the defaults loads (no lazy chunk, CSS or prefetch), component ids are the host's to check, and a slide no table answers shows a labelled placeholder |
+| `autofocus` | `false` | Focus the active slide on mount |
+| `namespace` | a unique id | Instance namespace: presenter channel, view-transition names and the first-visit hint |
+| `initialSlideId` | first visible slide | Open on this slide (a valid URL hash wins when the stage owns it) |
+| `initialStep` | `0` | Open the initial slide at this [reveal step](#reveal-steps) |
+| `autoSlideMs` | `navigation.autoSlideMs` | Auto-slide interval; `0` turns it off. It never runs during SSR and pauses while the tab is hidden |
+| `clickToAdvance` | `true` | A primary click on the slide advances; links, controls, media, interactive blocks and the chrome never do |
+| `presenter` | `false` | Bindable presenter layout |
+| `presenterTimer` | `false` | Show the elapsed timer in the presenter pane |
+| `sync` | `null` | A same-origin link to another stage window: the engine presenter protocol, or a v1 `DeckSync` ([presenter screen](#presenter-screen)) |
 | `loadTheme` | `loadDeckLibraryTheme` | Resolves catalog theme ids; `null` leaves them to host CSS |
-| `mediaTrust` | `untrusted` | URL policy tier for media at paint (`DeckMediaTrust`) |
 | `resolveAvatar` | — | Host adapter for `avatar:` image ids |
+| `controller` | `null` | Read-only binding to the engine `DeckController` for imperative hosts |
+| `chrome` | — | Snippet that replaces the default toolbar and progress bar (the [chrome layers](#chrome) stay) |
+| `toolbarPosition` | `bottom` | Where the toolbar (or the `chrome` snippet) sits: `bottom` puts it below the slide, aligned to the inline end, with its popups opening upward; `top` puts it above the slide. DOM order follows, so Tab reaches the controls after the slide content by default. The root carries `data-tx-deck-toolbar` |
+| `overviewView` | — | Snippet that replaces the default overview |
+| `presenterView` | — | Snippet that replaces the default presenter pane |
+| `onSlideChange` | — | Receives a `SlideNavigationIntent` (`{ index, slideId }`) when the slide changes |
+| `onStepChange` | — | Receives a `SlideStepIntent` (`{ index, slideId, step, stepCount }`) on every slide or step change |
+| `onPresenterChange` | — | Called with `open` when the presenter layout toggles |
+| `onFullscreenChange` | — | Called with the `DeckFullscreenState` (`off`, `native`, `viewport`) |
+| `onError` | — | Called with the diagnostics when the deck is invalid |
 
-The stage mounts only the active slide, and lazily loads the block families
-its blocks use (`loadDeckBlockFamily`; `DeckBlockRendererProps` is the props
-shape a family renderer receives). A family that already loaded renders at
-once on later slides.
+### Preparation, canvas and mounting
 
-### Keyboard and focus
+- **Input:** `prepareDeck(input, hooks)` migrates and validates any input
+  and never throws (a `PreparedDeck`: the deck, or its issues). The host
+  registry adds its checks through `DeckValidationHooks`
+  (`deckValidationHooks` merges the tables); `validateDeckBlock` checks one
+  free-slide block body against `@texuli/blocks`. A host whose free-slide
+  renderer paints its own block types replaces that check with
+  `validateBlock(block, path)` on its renderer table (the first table with
+  one wins; return `undefined` to accept a block, or diagnostics to refuse
+  it, and call `validateDeckBlock` to keep the default for the rest). The
+  built-in free-slide renderer still checks each block when it paints it, so
+  a block it cannot read shows a placeholder, never raw data.
 
-The stage is a region named “Presentation: <title>”. Its controls are a group
-named “Presentation controls”: Previous slide, Next slide, Overview,
-Presenter and Fullscreen. On a slide with [reveal steps](#reveal-steps), the first two are
-named Previous step and Next step while a step remains in that direction. A
-polite live region announces “Slide n of m: <title>”, followed by “, k of s
-revealed” on a slide with steps.
+  ```ts
+  const hostBlocks: DeckRenderers = {
+    validateBlock: (block, path) =>
+      block.type === 'host-card' ? undefined : validateDeckBlock(block, path),
+    free: () => HostFreeSlide,
+  };
+  // <DeckStage {deck} renderers={hostBlocks} />
+  ```
+- **Canvas:** a fixed virtual canvas (1280 × 720 for 16:9) is scaled into
+  the stage with a `ResizeObserver` and letterboxed. CSS variables go on the
+  stage root through `deckCssVars` (the CSSOM, never a static `style`).
+- **Mounting:** at most three slides are mounted (the active one and its
+  neighbours, `inert` and hidden from assistive tech). The block families of
+  the next slides load when the browser is idle (`prefetchDeckSlides`,
+  `slideBlockFamilies`, `whenIdle`); `loadDeckBlockFamily` loads one family
+  (`DeckBlockRendererProps` is what a family renderer receives).
+- **Slides** are `role="group"` with `aria-roledescription="slide"`, named
+  by their title (or "Slide n"), and carry `data-step` and `data-step-count`.
 
-| Key (focus inside the deck) | Action |
+### Routing, keys and pointer
+
+- **Hash:** `#/<slide>/<step>`. `claimDeckHash` gives the page hash to one
+  stage, `releaseDeckHash` frees it, `readDeckHash`, `writeDeckHash` and
+  `watchDeckHash` read, write (`replaceState`) and follow it on a
+  `DeckRouteWindow`. Hostile hashes are ignored. A followed hash past a
+  slide's last step is clamped, and the address is rewritten to the clamped
+  route (also when the deck did not move). A `hashchange` that arrives while a
+  slide transition plays is queued and applied when the transition ends (the
+  latest one wins), and the stage never overwrites a deck route it did not
+  write: a transition that finishes before the user's `hashchange` runs
+  follows the typed route instead of replacing it.
+- **Keys** follow the engine registry (`DECK_CONTROLS`, `decideDeckInput`);
+  `keyInput` and `clickInput` describe the DOM event for it. Keys act while
+  focus is inside the deck; the deck that owns the hash also takes keys
+  while nothing on the page has focus. Navigation keys are ignored on
+  buttons, links, fields, interactive blocks and the chrome.
+
+| Key | Action |
 | --- | --- |
-| Right, Page Down, Space, Enter | Next step, or the next slide when every step shows |
-| Left, Page Up, Backspace | Hide the newest step, or the previous slide (fully revealed) at step 0 |
-| Home / End | First slide at step 0 / last slide fully revealed |
-| `o` | Toggle the overview; focus moves to the current slide's item |
-| `p` | Toggle presenter mode |
-| `s` | In presenter mode, focus the speaker notes |
-| `f` | Toggle [fullscreen](#fullscreen) |
-| Escape | Close the overview, then fullscreen, then presenter mode, returning focus to its button |
+| → ↓ Page Down Space Enter | Next step, or the next slide |
+| ← ↑ Page Up Shift+Space Backspace | Previous step, or the previous slide |
+| Home / End | First / last slide |
+| `O` | Overview |
+| `F` | Full screen |
+| `S` or `P` | Presenter layout |
+| `B` or `.` | [Blackout](#chrome) |
+| `L` | [Laser pointer](#chrome) |
+| `?` | [Controls and shortcuts](#chrome) |
+| Ctrl/⌘ + P | The browser's print (the print styles hide the chrome) |
+| Esc | Closes the innermost layer: help, overview, blackout, laser, then full screen (`DECK_ESCAPE_ORDER`) |
 
-Keys act only while focus is inside the deck. Navigation and letter keys are
-ignored while a button, link or text field inside it has focus, so those keep
-their own Enter and Space; Escape still works there. Navigating from a slide moves focus to the new slide.
-Toggling presenter mode from a slide keeps focus on it. The deck loops only
-when `settings.loop` is set.
+  In right-to-left decks the horizontal arrows swap.
+- **Pointer:** a primary click on the slide advances (`clickToAdvance`;
+  `selectionLength` keeps selecting text from advancing; the first click on
+  an embedded deck only focuses it). `createSwipeTracker` turns a touch or
+  pen drag into a swipe (≥ 50 px, < 800 ms); a second finger cancels it.
+- **Events:** the root dispatches `DeckStageEvent`s (`DECK_STAGE_EVENTS`,
+  typed by `DeckStageEventMap` and `DeckStageEventName`) through
+  `dispatchDeckEvent`: `tx-deck:ready`, `change`, `step`,
+  `transition-start`, `transition-end`, `overview`, `presenter`,
+  `fullscreen`, `blackout`, `action` (every chrome action: help, laser, copy
+  link, print, slide list) and `error`.
+
+### Chrome
+
+Every chrome component reads `getDeckStageContext()` (a
+`DeckStageContext`, set by the stage with `setDeckStageContext`; the slide
+list entries are `DeckStageSlideEntry`) and `getDeckChromeContext()` (the
+`DeckChromeState` the stage creates with `createDeckChromeState` and
+provides with `setDeckChromeContext`), and marks its root with
+`data-tx-deck-chrome`, so clicks and swipes on it never move the deck.
+Every string comes from the messages (`DECK_CHROME_MESSAGES` joins
+`DECK_STAGE_MESSAGES`).
+
+- **`DeckToolbar`:** a group named “Presentation controls” with one group
+  per registry group (Navigate, View, Present, Share and print, Help). It
+  shows every control `deckChromeEnvironment(window)` allows (print only
+  where the page can print, copy link only with a clipboard path, no debug
+  panel). Buttons are icons with their label as text for assistive tech;
+  toggles report `aria-pressed`, the help button `aria-expanded`, and
+  Previous and Next are `aria-disabled` at the ends of a deck that does not
+  loop. Targets are at least 32 px (44 px on touch). When the full toolbar
+  does not fit (measured, never a breakpoint), the View, Present, Share and
+  Help groups fold into “More”, a disclosure (Escape closes it). By default
+  it sits below the slide, aligned to the inline end (right in left-to-right
+  decks, left in right-to-left ones); `toolbarPosition="top"` puts it above.
+  The toolbar hides in full screen.
+- **Slide list:** the counter (“3 / 12”, named “Choose a slide, 3 / 12”)
+  opens a listbox of every slide by number and title. Focus starts on the
+  current slide; arrows, Home and End move, Enter or a click jumps (focus
+  goes to the slide), Escape closes and returns to the counter, Tab or a
+  pointer outside closes.
+- **Tooltips:** one per toolbar (a `DeckTooltip` showing a
+  `DeckTooltipContent`): the label, the registry description and the keys
+  (`deckShortcutText`). Its runtime loads on the first hover, focus or touch
+  on a tool. It opens after 300 ms of hover, at once on keyboard focus, and
+  after a 500 ms touch, whose click it swallows. While it shows, its button
+  is `aria-describedby` it; Escape closes only the tooltip. It stays inside
+  the viewport, and blackout and the laser suppress it.
+- **`DeckProgress`:** the progress bar, on the edge `style.progress` names
+  (`top`, `bottom`; `none` hides it), a `progressbar` named “Deck progress”
+  and valued by the slide position.
+- **`DeckChrome`:** the layers over the stage, mounted even when a host
+  replaces the toolbar:
+  - **Blackout** (`B`, `.`): a black screen over the whole stage, one real
+    button. For two seconds it says “Screen blacked out. Press B or select
+    to show the slide.”, then turns fully black. A click, `B` or Esc brings
+    the slide back and focus returns to it.
+  - **Laser** (`L`): a red dot replaces the cursor over the slides, starting
+    where the pointer was (else in the middle), with a “Laser on” chip; a
+    touch moves it to each tap. A click does not advance while it is on.
+    Turning it on or off is announced politely.
+  - **Controls and shortcuts** (`?`): a modal dialog (`showModal`)
+    generated from `DECK_CONTROLS`, grouped as in the toolbar, with every
+    key and “Button only” for controls without keys, filtered by the page's
+    capabilities. Focus moves to Close and stays inside (Tab wraps); Esc,
+    `?` or Close shut it, and focus returns to its opener (or the slide).
+  - **Copy link:** copies `deckSlideLink(location.href, slide, step)`
+    (`#/<slide>/<step>`) with `copyDeckText`, which falls back to
+    `execCommand('copy')` and reports a failure. A toast answers (“Link to
+    this slide copied.” or “Could not copy the link.”) in a polite live
+    region and its visible twin, for 2.5 s.
+  - **Print** (the button): opens `deckPrintLink(…)` (`?print=1` plus the
+    slide hash) in a new tab, where the host renders `DeckPrint` when
+    `parseDeckRoute(location.hash, location.search).flags.print` is set; a
+    host that does not handle `?print=1` shows the deck there. When the tab
+    cannot open, the page prints itself.
+  - **First-visit hint:** “Use ← → to move, F for full screen, ? for every
+    control.” It shows once per `namespace` (`claimFirstRunHint`, stored in
+    `localStorage` and safe when storage throws), never in a hidden tab or
+    under automation (`firstRunHintAllowed`; `?hint=1` forces it,
+    `?hint=0` turns it off), for `FIRST_RUN_HINT_MS` (6 s) or until the
+    first key, pointer or wheel input. It never takes focus.
+  - **Full screen overlay:** in full screen, Leave full screen, Previous,
+    the counter and Next. It shows on entering and on every pointer move,
+    and fades after 2.5 s (then `inert`); blackout and the laser hide it.
+
+  Help, the laser, the hint, the overlay, the slide list and “More” load on
+  their own chunks the first time they open.
+- **Actions:** `runDeckChromeAction(stage, chrome, action)` runs any deck
+  action the way the keys do; a host `chrome` snippet uses it with the two
+  contexts. `DeckChromeNotice` is the toast's message.
+- **Accessibility:** forced colors keep every control and layer bordered
+  (blackout stays black), motion only fades and glides with no reduced
+  motion preference, the toolbar follows `dir` and the arrow icons mirror in
+  right-to-left decks.
+
+### Messages and language
+
+`createDeckTranslator(overrides)` returns the `DeckTranslate` every string
+goes through: the engine catalog plus the stage keys
+(`DECK_STAGE_MESSAGES`, `DeckStageOnlyMessageKey`; together
+`DeckStageMessageKey`). Overrides are partial (`DeckStageMessages`);
+non-string values keep the default. `meta.locale` becomes `lang` and
+`meta.dir` becomes `dir`.
 
 ### Reveal steps
 
-The stage plays the slide's reveal steps ([model.md](model.md#reveal-steps-fragments)).
+Each mounted slide gets a step context (`setDeckStepContext`;
+`getDeckStepContext()` returns a `DeckStepContext`). `deckSlideSteps` reads a
+slide's step table, `clampStep` bounds a step, `deckStepView` builds a plain
+context from a `StepViewInput` and `createDeckStepContext` a reactive one.
+Renderers spread `DeckFragmentAttributes` on stepped elements; fragments
+keep their space when hidden. Forward steps animate per effect; going back
+and reduced motion cut.
 
-- **Forward:** advancing reveals the next step before it leaves the slide. A
-  slide opens at step 0, whether reached by going forward, from the overview
-  or by Home; the initial slide opens at `initialStep`.
-- **Backward:** going back hides steps in reverse, one per press. Going back
-  from step 0 opens the previous slide in its final state, as does End.
-- **Painting:** each revealing top-level block sits in a box-less
-  `tx-deck-stage__fragment` wrapper, so the layout matches the final state at
-  every step. Hidden blocks and list items use `visibility: hidden`: they keep
-  their space and leave the accessibility tree and the tab order. Code
-  highlights follow the step through the code family's `hostStep`. The
-  article carries `data-step` and `data-step-count`.
-- **Transitions per reveal:** only a forward step animates. The block's
-  entrance reveal (`fade`, `fade-up`, `grow`) wins; otherwise the slide's
-  transition (`resolveSlideTransition`) applies. A list animates only its
-  newest item. Stepping back, layout changes (presenter, overview) and
-  reduced motion cut.
-- **Overview:** it lists slide titles, not slide content, so no partial state
-  shows there. Choosing the current slide keeps its progress; another slide
-  opens at step 0. Print and PPTX export show every slide fully revealed
-  ([export.md](export.md)).
+### Renderers
 
-`onSlideChange` fires only when the slide changes, as before. `onStepChange`
-reports every position change, slide or step, as a `SlideStepIntent`; it
-does not fire for the first position. A host restores a step with
-`initialStep`.
+`renderers` plugs layouts, components, backgrounds and custom slides in
+without editing the stage. `DeckRenderers` tables are flattened by
+`deckRendererList`; `resolveSlideRenderer`, `resolveItemRenderer` and
+`resolveBackgroundRenderer` ask them with a `DeckRendererLookup`. An entry
+(`DeckRendererEntry`) is a component or a `DeckLazyRenderer`
+(`isLazyRenderer`, `loadRenderer` loads it once, `readyRenderer` returns it
+when loaded). Renderers receive `DeckSlideRendererProps` with a
+`DeckSlideRenderContext`, `DeckItemRendererProps` or
+`DeckBackgroundRendererProps`. Free slides compose with `composeFreeSlide`
+(a `ComposedFreeSlide` of `FreeSlideRegion`s) and `freeSlideEntry`
+(`FreeSlideEntry`). A slide without a renderer shows a labelled
+placeholder.
 
-### Fullscreen
+### Transitions and motion
 
-The Fullscreen button and `f` toggle fullscreen.
-`canUseNativeFullscreen(element, document)` checks for the Fullscreen API
-(`requestFullscreen` and `fullscreenEnabled`).
+`playDeckTransition(options)` (`PlayDeckTransitionOptions`,
+`PlayedDeckTransition`) renders the resolved transition with View
+Transitions (`DeckViewTransition` on a `DeckTransitionDocument`, names from
+`viewTransitionPrefix` and `viewTransitionIdent`, keyframes from
+`transitionKeyframes`), a CSS fallback, or a cut (`DeckTransitionMode`,
+`DeckTransitionDirection`). Morph pairs match `DECK_MORPH_ATTRIBUTE`.
+Reduced motion turns movement into a short fade; motion `none` cuts.
+Focus after a keyboard move waits for the incoming slide: with View
+Transitions the DOM swaps inside the transition's update callback, so the
+stage focuses the target slide there, never the outgoing one. That deferred
+focus only happens while focus is still in the deck or was dropped to
+`<body>` by the swap, so an embedded deck never takes focus back from the page.
 
-- **Native:** with the API, the stage element enters fullscreen
-  (`data-fullscreen="native"`). The browser's own exit (Escape, a system
-  gesture) closes it, and the stage follows the `fullscreenchange` event.
-- **Fallback:** without the API, or when the browser refuses, the stage fills
-  the window (`data-fullscreen="viewport"`: fixed, inset 0) and shows a
-  visible status note saying so, never a silent no-op. Escape exits. While
-  it fills the window, focus that leaves the stage returns to the slide; page
-  scroll is not locked, but `overscroll-behavior: contain` keeps wheel
-  scrolling inside the deck.
-- **Focus:** entering moves focus to the slide; leaving with Escape or the
-  button returns it to the Fullscreen button. Nothing animates on either
-  change, so reduced motion needs no special case.
+### Overview
 
-`onFullscreenChange` reports each state. The stage leaves native fullscreen
-when it unmounts.
+`O` or the toolbar opens `DeckOverview`; choosing a slide closes it and
+returns focus to the slide. Each card is named by its visible caption
+(“3 Pricing”) and described by its position (`stage.overviewCardPosition`,
+“slide 3 of 25”). A host replaces it with `overviewView`.
 
 ### Presenter view
 
-Presenter mode is a layout of the same deck; it never changes the deck data.
-It shows the current slide with its panes, which stack below it on narrow
-viewports:
+`S`, `P` or the toolbar opens the presenter layout, `DeckPresenterPane`
+beside the slides (notes, up next, and with `presenterTimer` a timer). A
+host replaces it with `presenterView`. The timers start with the pane and the
+status line says so from the first paint (`DeckPresenterTimers.onChange`
+repaints it on every start, pause, reset and slide change); the slide
+stopwatch restarts the moment the deck moves to another slide, not when the
+transition paints it. In a stage with a bounded height (`fit="viewport"` or
+the window-filling full screen) the pane scrolls inside the slide row, so the
+toolbar never covers its Previous and Next buttons. `createPresenterTimer(now?)` returns
+a `PresenterTimer` and `formatElapsed(ms)` formats it.
 
-- a “Speaker notes” complementary region (plain text, line breaks kept, never
-  HTML), which starts with “Reveal step k of s” on a slide with steps;
-- an “Up next” region with the next slide's title, or “Reveal step k of s on
-  this slide” while a step remains;
-- with `presenterTimer`, an elapsed timer (`role="timer"`) with Pause/Resume
-  and Reset.
+### Fullscreen
 
-The view is timer-free by default, so the same deck and position always
-render the same presenter view. With `presenterTimer`, the timer is a local
-stopwatch: it starts when presenter mode opens, pauses when it closes, and
-uses no network clock. `createPresenterTimer(now?)`
-returns that `PresenterTimer` (`start`, `pause`, `reset`, `elapsed`,
-`running`), and `formatElapsed(ms)` formats it as `m:ss` or `h:mm:ss`, for
-hosts that build their own presenter chrome.
-
-Planned: a next-slide thumbnail and a wall clock.
+`F`, the toolbar or `toggleFullscreen()` on the context toggle full screen.
+`canUseNativeFullscreen(element, document)` checks for the Fullscreen API.
+With it, the stage root enters full screen (`data-fullscreen="native"`) and
+follows the browser leaving it. Without it, or when the browser refuses,
+the stage fills the window (`data-fullscreen="viewport"`) and says so in a
+status note; while it fills the window, focus that leaves the stage returns
+to the slide. Entering and leaving move focus to the slide.
+`onFullscreenChange` reports each `DeckFullscreenState`.
 
 ### Presenter screen
 
@@ -181,16 +341,6 @@ const sync = createDeckSync({ deck: 'board-update-q3' });
   joins the audience's slide instead of moving it.
 - The host opens and closes the second window; the stage never calls
   `window.open`.
-
-### Transitions and motion
-
-The stage writes the resolved transition token (`resolveSlideTransition`) to
-`data-transition` on the entering slide. The first paint never animates, and
-only navigation to another slide animates: re-mounting the same slide for the
-presenter view or the overview is a cut. Reduced motion comes from
-`prefers-reduced-motion: reduce` or a host-set `data-tx-motion="reduce"` on
-the root element, both observed after mount; under either, every slide cuts.
-Exit, view and shared-element transitions are not implemented.
 
 ### Themes
 
@@ -234,10 +384,35 @@ At `untrusted`, relative image paths and host-resolved avatars paint. `data:`
 images and video are refused: the untrusted policy needs `https` from an
 allowed origin, and the block schema only accepts relative or `data:` video.
 A refused block becomes a visible note; a refused gallery item is dropped.
-App-authored decks can pass `mediaTrust="developer"`.
+App-authored decks can pass `tier="developer"`.
 
-Only the active slide's media loads. The overview lists titles, and the
-presenter view shows the next slide by title only.
+### Trust badge
+
+At the `untrusted` tier (the default) the stage shows one badge,
+**Untrusted content**, at the inline start of the row that holds the toolbar
+(or the host `chrome` snippet), above or below the slide with
+`toolbarPosition`. It is the deck-level counterpart of the player's
+artifact-frame badge: each catalog component on a slide paints through a
+`Player` with `chrome={false}`, which drops the player's own badge, so the
+stage carries the trust signal once for the whole deck instead of once per
+component. The badge is plain text (`data-tx-deck-trust="untrusted"`), read
+in reading order, never focusable, uses `CanvasText` in forced colors, and
+hides in print and, with the default toolbar, in full screen (the overlay
+replaces the toolbar row). Reword it with
+`messages={{ 'stage.untrustedBadge': '…' }}`. Hosts that present their own
+content pass `tier="developer"` and never see it; `trustBadge={false}` hides
+it at the `untrusted` tier for a host that states the trust of the deck
+itself, next to the stage.
+
+Only the mounted slides (at most three) load their media.
+
+### Style helpers
+
+`DECK_FALLBACK_PALETTES` and `deckBackgroundPalette` give the contrast math
+real colors; `slideThemeReference`, `deckThemeReferences`, `deckThemeKey`,
+`deckThemeId`, `loadDeckTheme`, `resolveStageMode` and `seedColor` resolve
+deck and slide themes. `deckSyncLink(sync)` adapts either sync transport to
+one `DeckSyncLink` of `DeckSyncSignal`s.
 
 ## DeckPrint
 
@@ -270,7 +445,7 @@ content; clipping to one page applies only when printing.
 ## Accessibility
 
 [docs/quality/a11y-slides.md](../../../docs/quality/a11y-slides.md) records
-the sweep: axe in light, dark, overview, presenter and forced-colors states,
-reflow at 320px, the keyboard map and reduced motion.
+the sweep: axe in light, dark, overview, presenter, help, blackout and
+forced-colors states, reflow at 320px, the keyboard map and reduced motion.
 [sr-transcripts-slides.md](../../../docs/quality/sr-transcripts-slides.md)
 holds VoiceOver transcripts authored from the accessibility tree.

@@ -1,0 +1,143 @@
+{
+  "formatVersion": 2,
+  "meta": {
+    "title": "Northwind quarterly review"
+  },
+  "slides": [
+    {
+      "id": "slide-title",
+      "title": "Northwind quarterly review",
+      "notes": "Draft guidance: Introduce the topic and presenter. Add only verified details from the brief or cited sources.",
+      "layout": "title-hero",
+      "props": {
+        "title": "Shipping calmer releases",
+        "subtitle": "What a small team learned in one year",
+        "meta": "Ada Example · Example Conf · 2026"
+      }
+    },
+    {
+      "id": "slide-agenda",
+      "title": "Agenda",
+      "notes": "Draft guidance: List the review topics. Add only verified details from the brief or cited sources.",
+      "layout": "section-divider",
+      "props": {
+        "eyebrow": "Part 2",
+        "title": "Agenda"
+      }
+    },
+    {
+      "id": "slide-highlights",
+      "title": "Quarter highlights",
+      "notes": "Draft guidance: Add sourced performance measures. Add only verified details from the brief or cited sources.",
+      "layout": "big-stat",
+      "props": {
+        "number": "87%",
+        "label": "Quarter highlights",
+        "context": "A fictional team, over twelve months",
+        "source": "n = 412 releases"
+      }
+    },
+    {
+      "id": "slide-wins",
+      "title": "Wins",
+      "notes": "Draft guidance: Explain what worked and why. Add only verified details from the brief or cited sources.",
+      "layout": "three-column-cards",
+      "props": {
+        "title": "Wins",
+        "cards": [
+          {
+            "icon": "zap",
+            "heading": "Small",
+            "body": "Ship the smallest useful change first."
+          },
+          {
+            "icon": "compass",
+            "heading": "Clear",
+            "body": "One sentence explains every change."
+          },
+          {
+            "icon": "users",
+            "heading": "Shared",
+            "body": "Anyone on the team can release."
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-misses",
+      "title": "Misses and lessons",
+      "notes": "Draft guidance: Describe gaps and lessons. Add only verified details from the brief or cited sources.",
+      "layout": "two-column-split",
+      "props": {
+        "title": "Misses and lessons",
+        "left": {
+          "heading": "Before",
+          "body": "Releases waited for a weekly window."
+        },
+        "right": {
+          "heading": "After",
+          "body": "Every merged change ships the same day."
+        }
+      }
+    },
+    {
+      "id": "slide-risks",
+      "title": "Risks",
+      "notes": "Draft guidance: Name risks and mitigation. Add only verified details from the brief or cited sources.",
+      "layout": "two-column-split",
+      "props": {
+        "title": "Risks",
+        "left": {
+          "heading": "Before",
+          "body": "Releases waited for a weekly window."
+        },
+        "right": {
+          "heading": "After",
+          "body": "Every merged change ships the same day."
+        }
+      }
+    },
+    {
+      "id": "slide-next",
+      "title": "Next quarter",
+      "notes": "Draft guidance: List next priorities. Add only verified details from the brief or cited sources.",
+      "layout": "timeline",
+      "props": {
+        "title": "Next quarter",
+        "events": [
+          {
+            "time": "January",
+            "text": "First automated release"
+          },
+          {
+            "time": "April",
+            "text": "Checks run in parallel"
+          },
+          {
+            "time": "August",
+            "text": "Same-day releases by default"
+          },
+          {
+            "time": "December",
+            "text": "Rollback in one click"
+          }
+        ]
+      }
+    },
+    {
+      "id": "slide-close",
+      "title": "Close and next steps",
+      "notes": "Draft guidance: Summarize the ask and give a follow-up path. Add only verified details from the brief or cited sources.",
+      "layout": "closing-cta",
+      "props": {
+        "title": "Close and next steps",
+        "text": "Questions are welcome after the talk.",
+        "cta": {
+          "label": "Read the guide",
+          "href": "https://example.com/guide"
+        },
+        "footnote": "All names and numbers are fictional."
+      }
+    }
+  ]
+}

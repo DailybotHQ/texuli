@@ -1,13 +1,24 @@
-# Deck model
+# Deck model v1
 
 **Import:** `@texuli/slides/model` (also re-exported from `@texuli/slides`)  
 **Source:** `packages/slides/src/model/`  
 **Tests:** `tests/decks.test.ts`, `tests/stage.test.ts`,
-`tests/stage-content.test.ts`
+`tests/stage-content.test.ts`; migration to v2:
+`packages/deck/tests/model-migrate.test.ts`
 
-The framework-free deck model: validation, the closed vocabularies (aspects,
-masters, transitions), theme references, and the pure helpers the stage, the
-grammar and the exporters share. Nothing here touches the DOM.
+The framework-free deck model of `@texuli/slides` `0.3.0` (model v1):
+validation, the closed vocabularies (aspects, masters, transitions), theme
+references, and the pure helpers the v1 grammar, templates and exporters
+share. Nothing here touches the DOM.
+
+> **Model v1 is kept for compatibility.** `0.3.0` on npm has this model only.
+> From the next minor, `0.4.0` (in the repository, not on npm yet), the
+> canonical deck is **model v2**, owned by `@texuli/deck/model`
+> (`formatVersion: 2`, catalog layouts, backgrounds, outline, navigation and
+> component slides). This subpath still parses v1 decks, and the v2 stage
+> accepts them and migrates them on the fly; new decks should be written as
+> v2. See [Migrating a v1 deck to model v2](#migrating-a-v1-deck-to-model-v2)
+> below and [migration.md](migration.md) for the whole upgrade.
 
 ## Parsing a deck
 
@@ -187,3 +198,48 @@ to `fade`. `resolveSlideTransition(deck, slide, { reducedMotion })` returns the
 effective token, and always `none` under reduced motion. Transitions are
 web-only styling; the stage and stylesheet apply them (see
 [stage.md](stage.md) and [styles.md](styles.md)).
+
+## Migrating a v1 deck to model v2
+
+`migrateDeck(input)` from `@texuli/deck/model` converts a v1 deck to model
+v2. It detects the shape (`detectDeckShape`: a `meta` object with
+`slides[].blocks` is a Texuli v1 deck) rather than reading a version field.
+It is pure and idempotent, never throws, and does not validate: pass its
+`deck` to the v2 `parseDeck`. `DeckStage` runs the same steps itself
+(`prepareDeck`), so a v1 deck still presents on the v2 stage.
+
+```ts
+import { migrateDeck, parseDeck } from '@texuli/deck/model';
+
+const migrated = migrateDeck(v1Deck); // { deck, from: 'texuli-v1', issues }
+const result = parseDeck(migrated.deck);
+if (result.ok) save(result.deck); // store the v2 deck, so it loads without migration
+```
+
+The conversion is lossless for everything v1 can express:
+
+| v1 | v2 |
+| --- | --- |
+| `meta.title`, `description`, `locale` | `meta.title`, `description`, `locale` |
+| `meta.aspect` | `style.aspect` |
+| `meta.themeRef` | `style.theme` (a catalog reference without a mode becomes the id string) |
+| `settings.showProgress: false` | `style.progress: 'none'` |
+| `settings.defaultTransition` | `style.transition` (left out when it is the default, `fade`) |
+| `settings.startIndex` | `navigation.start`, the id of that slide |
+| `settings.loop: true` | `navigation.loop: true` |
+| `masters` | dropped: each slide keeps its own `master` |
+| a slide | a free slide (`layout: 'free'`) with the same `id`, `title`, `notes`, `master`, `transition` and `blocks`; `themeRef` becomes `theme` |
+
+Every judgement call is reported as a `migrated` warning: the conversion
+itself, the dropped `masters` list, a `startIndex` that names no slide,
+unknown slide keys v1 ignored, and steps that v2 renumbers densely (gaps
+between authored steps no longer cost an empty click). The masters and their
+slots render on the v2 stage as before. Moving a free slide to a catalog
+layout is a lint suggestion, never done automatically: `lintDeck` from
+`@texuli/deck/authoring` reports `prefer-layout` when a free slide holds a
+chart, table, quote, code or image block.
+
+The two models share names: `parseDeck`, `Deck`, `DeckSlide` and
+`SLIDE_MASTERS` exist in both `@texuli/slides/model` (v1) and
+`@texuli/deck/model` (v2). Import them from the package of the model you
+mean.

@@ -86,6 +86,15 @@ Not shipped in this package: the read-only MCP server over the catalog and
 themes exists in the repository source, but has no export and no published
 command yet.
 
+**Deck commands (in development, repository only).** The repository source
+adds a `@texuli/tools/deck` subpath and two bins, `texuli` (its `deck`
+command) and `texuli-deck`, with seven commands on the `@texuli/deck` v2
+model: `capabilities`, `schema`, `layouts`, `lint`, `inspect`,
+`from-markdown` and `to-markdown`. The local MCP server has the same
+commands as a read-only `deck` tool. None of this is in the published
+`0.3.0`, and `@texuli/deck` is not on npm yet; see
+[deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md).
+
 ## Key guarantees
 
 - **Local only.** The CLIs read and write local files and never use the
@@ -112,6 +121,7 @@ command yet.
 - Custom elements: [elements.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/elements.md)
 - A2UI adapter: [a2ui.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/a2ui.md)
 - Golden set and scorer: [golden.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/golden.md)
+- Deck commands, the `texuli deck` CLI and the `deck` MCP tool (repository only): [deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md)
 
 ## Related packages
 

@@ -5,8 +5,14 @@
 **Tests:** `tests/decks.test.ts` (model, grammar, chart projection, render
 tree, slots, fragments, templates and golden decks)
 
-Encodings between the deck model ([model.md](model.md)) and catalog trees,
-plus the single validation entry point for decks an agent returns.
+Encodings between the model v1 deck ([model.md](model.md)) and catalog
+trees, plus the validation entry point for model v1 decks an agent returns.
+
+> **Model v1.** This subpath encodes the `0.3.0` deck model and is kept for
+> compatibility. Model v2 decks (the next minor, `0.4.0`, in the repository
+> and not on npm yet) travel as catalog trees too, under spec `0.4.0`; they
+> are validated by `@texuli/catalog/validate` and the `@texuli/deck` model,
+> not by this subpath. See [Model v2 deck trees](#model-v2-deck-trees).
 
 ## Block families
 
@@ -108,3 +114,39 @@ The golden decks in [`tests/golden/`](../tests/golden) pin this end to end:
   children, a malformed block, a block-family mismatch, a `javascript:` image
   source, HTML in notes, `class`/`style` props, both encodings at once, a
   non-deck root and an empty deck.
+
+## Model v2 deck trees
+
+Spec `0.4.0` (in the repository only; npm's `@texuli/spec` still carries
+spec 0.2.0) extends the `layout-deck` and `deck-slide` manifests with
+optional model v2 props: the 9:16 aspect, the `slide`, `zoom` and `morph`
+transitions, motion, navigation, outline, the slide `layout` and its
+`props`, `background`, step labels and component slides. A model v1 tree is
+still a valid `0.4.0` tree.
+
+An agent's v2 deck tree is validated in two steps, neither of which is this
+subpath:
+
+1. `validateDeckDraft` from `@texuli/catalog/validate` (a different function
+   from the v1 `validateDeckDraft` above, with the same name) runs the
+   catalog's draft validation with `layout-deck` as the only root and maps
+   the tree to a plain `formatVersion: 2` object. It never throws.
+2. `migrateDeck` and `parseDeck` from `@texuli/deck/model` validate the
+   model rules. The catalog does not depend on `@texuli/deck`, so a host
+   chains them, or passes them as the catalog's `loadDeck` option.
+
+```ts
+import { validateDeckDraft } from '@texuli/catalog/validate';
+import { migrateDeck, parseDeck } from '@texuli/deck/model';
+
+const draft = validateDeckDraft(agentJson, { catalog }); // untrusted tier by default
+if (draft.ok && draft.deck) {
+  const result = parseDeck(migrateDeck(draft.deck).deck);
+  // result.ok: present result.deck with DeckStage
+}
+```
+
+`DeckStage` also takes a grammar tree directly: it migrates it
+(`texuli-grammar` in `detectDeckShape`) and validates it before it paints.
+The catalog side is documented in
+[validate.md](../../catalog/docs/validate.md#deck-drafts-model-v2).

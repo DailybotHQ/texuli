@@ -1,32 +1,320 @@
 @import "@texuli/tokens/base.css";
 
+/*
+ * DeckStage v2. Hooks: `tx-deck-stage__*` classes, `data-tx-deck-*`
+ * attributes, `--tx-deck-*` variables (set on the stage root through the
+ * CSSOM by the engine resolvers). The canvas is a fixed virtual size
+ * (1280 × 720 for 16:9) scaled into the viewport and letterboxed in the
+ * theme's muted color.
+ */
 .tx-deck-stage {
   box-sizing: border-box;
+  position: relative;
   display: grid;
-  gap: calc(1rem * var(--tx-density, 1));
-  inline-size: min(100%, 80rem);
-  margin-inline: auto;
-  padding: clamp(0.75rem, 2.4vw, 2rem);
+  grid-template-columns: minmax(0, 1fr);
+  gap: calc(0.75rem * var(--tx-density, 1));
+  inline-size: 100%;
   color: var(--tx-foreground);
   background: var(--tx-background);
-  border: 1px solid var(--tx-border);
+}
+
+.tx-deck-stage:focus-visible {
+  outline: 2px solid var(--tx-ring);
+  outline-offset: 2px;
+}
+
+.tx-deck-stage[data-tx-deck-fit-mode="viewport"] {
+  block-size: 100dvh;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+/* The toolbar below the slide (default): the slide row takes the height. */
+.tx-deck-stage[data-tx-deck-toolbar="bottom"]:is(
+  [data-tx-deck-fit-mode="viewport"],
+  [data-fullscreen="viewport"]
+) {
+  grid-template-rows: minmax(0, 1fr) auto auto;
+}
+
+.tx-deck-stage__main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: calc(1rem * var(--tx-density, 1));
+  min-block-size: 0;
+}
+
+.tx-deck-stage[data-presenter] .tx-deck-stage__main {
+  grid-template-columns: minmax(0, 2fr) minmax(min(100%, 16rem), 1fr);
+  align-items: start;
+}
+
+@media (max-width: 48rem) {
+  .tx-deck-stage[data-presenter] .tx-deck-stage__main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The letterbox. In a host box (`container`) it keeps the deck aspect; `viewport` fills the row. */
+.tx-deck-stage__viewport {
+  position: relative;
+  overflow: hidden;
+  inline-size: 100%;
+  aspect-ratio: var(--tx-deck-aspect-ratio, 16 / 9);
+  background: var(--tx-muted, var(--tx-background));
+  border-radius: var(--tx-deck-radius, 0.625rem);
+}
+
+.tx-deck-stage[data-tx-deck-fit-mode="viewport"] .tx-deck-stage__viewport {
+  block-size: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/*
+ * The virtual canvas. Physical `top`/`left` and the translate are on purpose:
+ * the letterbox offsets are geometry measured in physical pixels, and the
+ * content inside still follows `dir` (it inherits it from the stage root).
+ */
+.tx-deck-stage__canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  inline-size: var(--tx-deck-canvas-width, 1280px);
+  block-size: var(--tx-deck-canvas-height, 720px);
+  overflow: hidden;
+  transform-origin: 0 0;
+  transform: translate(var(--tx-deck-offset-x, 0), var(--tx-deck-offset-y, 0))
+    scale(var(--tx-deck-scale, 1));
+  color: var(--tx-foreground);
+  background: var(--tx-background);
+  font-size: calc(28px * var(--tx-deck-density, 1));
+  line-height: 1.35;
+  touch-action: pan-y pinch-zoom;
+}
+
+.tx-deck-stage__viewport[data-tx-deck-fit="pending"] .tx-deck-stage__canvas {
+  visibility: hidden;
+}
+
+.tx-deck-stage__slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  overflow: hidden;
+  color: var(--tx-deck-bg-text, var(--tx-foreground));
+}
+
+.tx-deck-stage__slide[data-tx-deck-active="false"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.tx-deck-stage__slide:focus-visible {
+  outline: 4px solid var(--tx-ring);
+  outline-offset: -4px;
+}
+
+.tx-deck-stage__background {
+  position: absolute;
+  inset: 0;
+  background-color: var(--tx-deck-bg-color, var(--tx-background));
+  background-image: var(--tx-deck-bg-gradient, none);
+}
+
+.tx-deck-stage__background[data-tx-deck-pattern="dots"] {
+  background-image: radial-gradient(var(--tx-deck-bg-pattern-ink) 2px, transparent 2.5px);
+  background-size: 32px 32px;
+}
+
+.tx-deck-stage__background[data-tx-deck-pattern="grid"] {
+  background-image:
+    linear-gradient(var(--tx-deck-bg-pattern-ink) 1px, transparent 1px),
+    linear-gradient(90deg, var(--tx-deck-bg-pattern-ink) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.tx-deck-stage__background-media {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.tx-deck-stage__background-media[data-fit="contain"] {
+  object-fit: contain;
+}
+
+.tx-deck-stage__background-media[data-position="top"] {
+  object-position: top;
+}
+
+.tx-deck-stage__background-media[data-position="bottom"] {
+  object-position: bottom;
+}
+
+.tx-deck-stage__background-media[data-position="left"] {
+  object-position: left;
+}
+
+.tx-deck-stage__background-media[data-position="right"] {
+  object-position: right;
+}
+
+.tx-deck-stage__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--tx-deck-bg-scrim, transparent);
+  opacity: var(--tx-deck-bg-scrim-alpha, 0);
+}
+
+.tx-deck-stage__slide-body {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  align-content: start;
+  gap: 0.75em;
+  min-block-size: 0;
+  padding-block: 64px 88px;
+  padding-inline: 80px;
+}
+
+/* Footer, logo and slide number: on the canvas, under the content. */
+.tx-deck-stage__footer {
+  position: absolute;
+  inset-inline: 80px;
+  inset-block-end: 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--tx-muted-foreground, currentColor);
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.tx-deck-stage__logo {
+  block-size: 32px;
+  inline-size: auto;
+}
+
+.tx-deck-stage__slide-number {
+  margin-inline-start: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Progress (`style.progress`): a thin bar on the top or bottom edge of the letterbox. */
+.tx-deck-stage__progress-bar {
+  position: absolute;
+  z-index: 2;
+  inset-inline: 0;
+  block-size: 4px;
+  background: color-mix(in oklch, var(--tx-foreground, CanvasText) 12%, transparent);
+}
+
+.tx-deck-stage__progress-bar[data-tx-deck-progress="top"] {
+  inset-block-start: 0;
+}
+
+.tx-deck-stage__progress-bar[data-tx-deck-progress="bottom"] {
+  inset-block-end: 0;
+}
+
+.tx-deck-stage__progress-fill {
+  block-size: 100%;
+  inline-size: calc(var(--tx-deck-progress-ratio, 0) * 100%);
+  background: var(--tx-primary, Highlight);
+}
+
+.tx-deck-stage__blackout {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  place-items: end center;
+  padding: 1rem;
+  color: #a3a3a3;
+  background: #000;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tx-deck-stage__blackout-hint {
+  font-size: 0.875rem;
+}
+
+/* The polite announcement: read, not shown. */
+.tx-deck-stage__live {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Placeholders (layouts, components and custom slides without a renderer yet). */
+.tx-deck-stage__placeholder {
+  display: grid;
+  align-content: center;
+  gap: 0.5em;
+  min-block-size: 100%;
+}
+
+.tx-deck-stage__placeholder-text {
+  margin: 0;
+  padding-block: 0.5em;
+  padding-inline: 0.75em;
+  border: 2px dashed currentColor;
+  border-radius: var(--tx-deck-radius, 0.625rem);
+  opacity: 0.8;
+}
+
+/* The invalid-deck state. */
+.tx-deck-stage__invalid {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--tx-destructive, CanvasText);
   border-radius: var(--tx-radius, 0.625rem);
 }
 
-.tx-deck-stage__toolbar,
-.tx-deck-stage__overview-item {
+.tx-deck-stage__invalid-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.tx-deck-stage__invalid-summary,
+.tx-deck-stage__invalid-more {
+  margin: 0;
+}
+
+.tx-deck-stage__invalid-list {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding-inline-start: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.tx-deck-stage__invalid-path {
+  margin-inline-end: 0.5rem;
+}
+
+/* Chrome base (toolbar, overview, presenter pane); the chrome components add scoped styles. */
+.tx-deck-stage__toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
 }
 
-.tx-deck-stage__toolbar {
-  justify-content: space-between;
-}
-
-.tx-deck-stage__control,
-.tx-deck-stage__overview-item {
+.tx-deck-stage__control {
   min-block-size: 44px;
   padding-block: 0.5rem;
   padding-inline: 0.875rem;
@@ -38,29 +326,201 @@
   cursor: pointer;
 }
 
-.tx-deck-stage__control:focus-visible,
-.tx-deck-stage__overview-item:focus-visible {
+.tx-deck-stage__control:focus-visible {
   outline: 2px solid var(--tx-ring);
   outline-offset: 2px;
 }
 
-.tx-deck-stage__progress {
-  font-variant-numeric: tabular-nums;
-}
-
-.tx-deck-stage__slide {
-  display: grid;
-  align-content: start;
-  gap: calc(1rem * var(--tx-density, 1));
+/*
+ * The trust badge row (untrusted tier): the badge at the inline start, the
+ * toolbar (or the host `chrome`) takes the rest, so its own alignment holds.
+ */
+.tx-deck-stage__chrome-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   min-inline-size: 0;
 }
 
-.tx-deck-stage__slide[data-transition="fade"] {
-  animation: tx-deck-slide-fade var(--tx-motion-base, 180ms) ease-out both;
+.tx-deck-stage__chrome-row > :not(.tx-deck-stage__trust) {
+  flex: 1 1 auto;
+  min-inline-size: 0;
 }
 
-.tx-deck-stage__slide[data-transition="fade-up"] {
-  animation: tx-deck-slide-fade-up var(--tx-motion-base, 180ms) ease-out both;
+.tx-deck-stage__trust {
+  flex: none;
+  padding-block: 0.25rem;
+  padding-inline: 0.65rem;
+  color: var(--tx-muted-foreground, var(--tx-foreground));
+  border: 1px dashed var(--tx-border-strong, var(--tx-border));
+  border-radius: 999px;
+  font-size: var(--tx-font-size-xs, 0.75rem);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (forced-colors: active) {
+  .tx-deck-stage__trust {
+    color: CanvasText;
+    border-color: CanvasText;
+  }
+}
+
+/* Full screen hands the default toolbar's controls to the overlay; its row goes with it. */
+.tx-deck-stage[data-fullscreen] .tx-deck-stage__chrome-row:has(> .tx-deck-chrome-toolbar) {
+  display: none;
+}
+
+.tx-deck-stage__fullscreen-note {
+  margin: 0;
+  padding-block: 0.375rem;
+  padding-inline: 0.75rem;
+  color: var(--tx-muted-foreground, var(--tx-foreground));
+  border: 1px dashed var(--tx-border-strong, var(--tx-border));
+  border-radius: var(--tx-radius, 0.625rem);
+}
+
+.tx-deck-stage[data-fullscreen] {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.tx-deck-stage[data-fullscreen="viewport"] {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  block-size: 100dvh;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.tx-deck-stage[data-fullscreen] .tx-deck-stage__viewport {
+  block-size: 100%;
+  aspect-ratio: auto;
+}
+
+.tx-deck-stage__overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 0.75rem;
+}
+
+.tx-deck-stage__presenter-side {
+  display: grid;
+  gap: 0.75rem;
+  min-inline-size: 0;
+}
+
+/*
+ * A stage with a bounded height (`fit="viewport"` or the window-filling full
+ * screen): the slide row has a fixed height, so the presenter pane scrolls
+ * inside it instead of running into the toolbar row below, which would paint
+ * over its Previous and Next buttons. (In a host box the row grows with the
+ * pane and the percentage resolves to none.)
+ */
+.tx-deck-stage[data-presenter]:is([data-tx-deck-fit-mode="viewport"], [data-fullscreen])
+.tx-deck-stage__main {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.tx-deck-stage:is([data-tx-deck-fit-mode="viewport"], [data-fullscreen])
+  .tx-deck-stage__main
+  > .tx-deck-stage__presenter-side {
+  /* Rows keep their content height: the preview (overflow hidden) would collapse its row. */
+  grid-auto-rows: max-content;
+  max-block-size: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.tx-deck-stage__timer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tx-deck-stage__notes,
+.tx-deck-stage__next {
+  padding-block: 0.75rem;
+  padding-inline: 0.875rem;
+  background: var(--tx-surface, var(--tx-background));
+  border: 1px solid var(--tx-border);
+  border-radius: var(--tx-radius, 0.625rem);
+}
+
+.tx-deck-stage__notes:focus-visible {
+  outline: 2px solid var(--tx-ring);
+  outline-offset: 2px;
+}
+
+.tx-deck-stage__pane-title {
+  margin-block: 0 0.5rem;
+  color: var(--tx-muted-foreground, var(--tx-foreground));
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.tx-deck-stage__notes-text,
+.tx-deck-stage__next-title {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.tx-deck-stage__notes-text {
+  white-space: pre-wrap;
+}
+
+.tx-deck-stage__loading,
+.tx-deck-stage__error,
+.tx-deck-stage__empty {
+  margin: 0;
+  color: var(--tx-muted-foreground, var(--tx-foreground));
+}
+
+.tx-deck-stage__slide-title {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2.75rem);
+  line-height: 1.15;
+}
+
+/*
+ * Slide transitions, CSS fallback (no View Transitions): the slide that just
+ * became active carries `data-tx-deck-enter`. Opacity-only fades also run
+ * under reduced motion (the engine resolves every transition to a 150 ms
+ * fade there); movement runs only with no motion preference.
+ */
+.tx-deck-stage__slide[data-tx-deck-enter] {
+  animation: tx-deck-slide-fade var(--tx-deck-transition-duration, 300ms) ease-out both;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tx-deck-stage__slide[data-tx-deck-enter="fade-up"] {
+    animation-name: tx-deck-slide-fade-up;
+  }
+
+  .tx-deck-stage__slide[data-tx-deck-enter="zoom"] {
+    animation-name: tx-deck-slide-zoom;
+  }
+
+  .tx-deck-stage__slide[data-tx-deck-enter="slide"] {
+    --tx-deck-enter-from: 100%;
+    animation-name: tx-deck-slide-in;
+  }
+
+  .tx-deck-stage__slide[data-tx-deck-enter="slide"][data-tx-deck-direction="backward"],
+  .tx-deck-stage[dir="rtl"] .tx-deck-stage__slide[data-tx-deck-enter="slide"] {
+    --tx-deck-enter-from: -100%;
+  }
+
+  .tx-deck-stage[dir="rtl"]
+    .tx-deck-stage__slide[data-tx-deck-enter="slide"][data-tx-deck-direction="backward"] {
+    --tx-deck-enter-from: 100%;
+  }
+}
+
+.tx-deck-stage[data-tx-deck-motion="none"] .tx-deck-stage__slide[data-tx-deck-enter],
+.tx-deck-stage[data-motion="reduce"] .tx-deck-stage__slide[data-tx-deck-enter] {
+  animation-name: tx-deck-slide-fade;
 }
 
 @keyframes tx-deck-slide-fade {
@@ -86,6 +546,190 @@
   }
 }
 
+@keyframes tx-deck-slide-zoom {
+  from {
+    opacity: 0;
+    scale: 0.92;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes tx-deck-slide-in {
+  from {
+    translate: var(--tx-deck-enter-from, 100%) 0;
+  }
+
+  to {
+    translate: 0 0;
+  }
+}
+
+/*
+ * View Transitions: the stage drives the slide snapshots with the Web
+ * Animations API (resolved durations), so the UA crossfade is off for them;
+ * morph groups use the morph duration.
+ */
+::view-transition-old(*.tx-deck-slide),
+::view-transition-new(*.tx-deck-slide) {
+  animation: none;
+}
+
+::view-transition-group(*.tx-deck-morph) {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*.tx-deck),
+  ::view-transition-old(*.tx-deck),
+  ::view-transition-new(*.tx-deck) {
+    animation-duration: 150ms;
+  }
+}
+
+/*
+ * Fragments (v2 step context): `data-tx-deck-fragment` is the phase
+ * (`hidden`, `visible`, `active`, `gone`) and `data-tx-deck-effect` the
+ * effect. Hidden and gone fragments keep their space. Layout renderers put
+ * the attributes on the element itself; the free-slide renderer puts them on
+ * a box-less wrapper, so its child carries the motion (500 ms, as Protoyard).
+ */
+:where(.tx-deck-stage__canvas)
+:is(
+  [data-tx-deck-fragment]:not(.tx-deck-stage__fragment),
+  .tx-deck-stage__fragment[data-tx-deck-fragment] > *
+) {
+  transition:
+    opacity 500ms ease-out,
+    translate 500ms ease-out,
+    scale 500ms ease-out,
+    background-color 500ms ease-out,
+    visibility 500ms;
+}
+
+:where(.tx-deck-stage__canvas)
+  :is(
+    [data-tx-deck-fragment="hidden"]:not(.tx-deck-stage__fragment),
+    [data-tx-deck-fragment="gone"]:not(.tx-deck-stage__fragment),
+    .tx-deck-stage__fragment[data-tx-deck-fragment="hidden"] > *,
+    .tx-deck-stage__fragment[data-tx-deck-fragment="gone"] > *
+  ) {
+  visibility: hidden;
+  opacity: 0;
+}
+
+:where(.tx-deck-stage__canvas)
+  :is(
+    [data-tx-deck-fragment="hidden"][data-tx-deck-effect="fade-up"]:not(.tx-deck-stage__fragment),
+    .tx-deck-stage__fragment[data-tx-deck-fragment="hidden"][data-tx-deck-effect="fade-up"] > *
+  ) {
+  translate: 0 0.6em;
+}
+
+:where(.tx-deck-stage__canvas)
+  :is(
+    [data-tx-deck-fragment="active"][data-tx-deck-effect="grow"]:not(.tx-deck-stage__fragment),
+    .tx-deck-stage__fragment[data-tx-deck-fragment="active"][data-tx-deck-effect="grow"] > *
+  ) {
+  scale: 1.04;
+}
+
+:where(.tx-deck-stage__canvas)
+  :is(
+    [data-tx-deck-fragment="active"][data-tx-deck-effect="shrink"]:not(.tx-deck-stage__fragment),
+    .tx-deck-stage__fragment[data-tx-deck-fragment="active"][data-tx-deck-effect="shrink"] > *
+  ) {
+  scale: 0.94;
+}
+
+:where(.tx-deck-stage__canvas)
+  :is(
+    [data-tx-deck-fragment="active"][data-tx-deck-effect="highlight"]:not(.tx-deck-stage__fragment),
+    .tx-deck-stage__fragment[data-tx-deck-fragment="active"][data-tx-deck-effect="highlight"] > *
+  ) {
+  --tx-deck-tone-color: var(--tx-primary, Highlight);
+  background: color-mix(in oklch, var(--tx-deck-tone-color) 16%, transparent);
+  outline: 3px solid color-mix(in oklch, var(--tx-deck-tone-color) 60%, transparent);
+  outline-offset: 4px;
+  border-radius: 0.25rem;
+}
+
+:where(.tx-deck-stage__canvas) [data-tx-deck-tone="info"] {
+  --tx-deck-tone-color: var(--tx-info, Highlight);
+}
+
+:where(.tx-deck-stage__canvas) [data-tx-deck-tone="success"] {
+  --tx-deck-tone-color: var(--tx-success, Highlight);
+}
+
+:where(.tx-deck-stage__canvas) [data-tx-deck-tone="warning"] {
+  --tx-deck-tone-color: var(--tx-warning, Highlight);
+}
+
+:where(.tx-deck-stage__canvas) [data-tx-deck-tone="danger"] {
+  --tx-deck-tone-color: var(--tx-destructive, Highlight);
+}
+
+:where(.tx-deck-stage__canvas)
+  :is(
+    [data-tx-deck-fragment="active"][data-tx-deck-effect="strike"]:not(.tx-deck-stage__fragment),
+    .tx-deck-stage__fragment[data-tx-deck-fragment="active"][data-tx-deck-effect="strike"] > *
+  ) {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Reduced motion and `motion: none`: fragments change state without moving. */
+@media (prefers-reduced-motion: reduce) {
+  :where(.tx-deck-stage__canvas)
+    :is(
+      [data-tx-deck-fragment]:not(.tx-deck-stage__fragment),
+      .tx-deck-stage__fragment[data-tx-deck-fragment] > *
+    ) {
+    transition: none;
+    translate: none;
+    scale: none;
+  }
+}
+
+:is(.tx-deck-stage[data-motion="reduce"], .tx-deck-stage[data-tx-deck-motion="none"])
+  :is(
+    [data-tx-deck-fragment]:not(.tx-deck-stage__fragment),
+    .tx-deck-stage__fragment[data-tx-deck-fragment] > *
+  ) {
+  transition: none;
+  translate: none;
+  scale: none;
+}
+
+@media (forced-colors: active) {
+  :where(.tx-deck-stage__canvas)
+    :is(
+      [data-tx-deck-fragment="active"][data-tx-deck-effect="highlight"]:not(
+        .tx-deck-stage__fragment
+      ),
+      .tx-deck-stage__fragment[data-tx-deck-fragment="active"][data-tx-deck-effect="highlight"] > *
+    ) {
+    background: Mark;
+    color: MarkText;
+    outline-color: MarkText;
+  }
+
+  .tx-deck-stage__progress-fill {
+    background: Highlight;
+  }
+
+  .tx-deck-stage__viewport,
+  .tx-deck-stage__placeholder-text,
+  .tx-deck-stage__invalid {
+    border-color: CanvasText;
+  }
+}
+
 /* Slide master regions: DOM order is reading order; no visual reordering. */
 .tx-deck-stage__regions {
   display: grid;
@@ -98,31 +742,6 @@
 .tx-deck-stage__regions[data-arrangement="media-end"] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
-}
-
-/*
- * Fullscreen. Native fullscreen shows the stage alone; the window-filling
- * fallback pins it over the page. Nothing animates on either change.
- */
-.tx-deck-stage[data-fullscreen] {
-  overflow: auto;
-  overscroll-behavior: contain;
-}
-
-.tx-deck-stage[data-fullscreen="viewport"] {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  border-radius: 0;
-}
-
-.tx-deck-stage__fullscreen-note {
-  margin: 0;
-  padding-block: 0.375rem;
-  padding-inline: 0.75rem;
-  color: var(--tx-muted-foreground, var(--tx-foreground));
-  border: 1px dashed var(--tx-border-strong, var(--tx-border));
-  border-radius: var(--tx-radius, 0.625rem);
 }
 
 /*
@@ -196,145 +815,6 @@
   color: var(--tx-muted-foreground, var(--tx-foreground));
   border: 1px dashed var(--tx-border-strong, var(--tx-border));
   border-radius: var(--tx-radius, 0.625rem);
-}
-
-.tx-deck-stage__slide-title {
-  margin: 0;
-  font-size: clamp(1.5rem, 3vw, 2.75rem);
-  line-height: 1.15;
-}
-
-/* Centered masters (title, closing) center the slide title with their content. */
-:is(.tx-deck-stage__slide, .tx-deck-print__slide)[data-arrangement="centered"]
-.tx-deck-stage__slide-title {
-  text-align: center;
-}
-
-.tx-deck-stage__overview {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-  gap: 0.75rem;
-}
-
-.tx-deck-stage__overview-item {
-  justify-content: flex-start;
-  text-align: start;
-}
-
-.tx-deck-stage__overview-number {
-  color: var(--tx-muted-foreground);
-  font-variant-numeric: tabular-nums;
-}
-
-.tx-deck-stage__presenter {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(min(100%, 16rem), 1fr);
-  gap: calc(1rem * var(--tx-density, 1));
-  align-items: start;
-}
-
-@media (max-width: 48rem) {
-  .tx-deck-stage__presenter {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.tx-deck-stage__presenter-main {
-  min-inline-size: 0;
-}
-
-.tx-deck-stage__presenter-side {
-  display: grid;
-  gap: 0.75rem;
-  min-inline-size: 0;
-}
-
-.tx-deck-stage__timer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.tx-deck-stage__timer-value {
-  font-size: 1.5rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.tx-deck-stage__notes,
-.tx-deck-stage__next {
-  padding-block: 0.75rem;
-  padding-inline: 0.875rem;
-  background: var(--tx-surface, var(--tx-background));
-  border: 1px solid var(--tx-border);
-  border-radius: var(--tx-radius, 0.625rem);
-}
-
-.tx-deck-stage__notes:focus-visible {
-  outline: 2px solid var(--tx-ring);
-  outline-offset: 2px;
-}
-
-.tx-deck-stage__pane-title {
-  margin-block: 0 0.5rem;
-  color: var(--tx-muted-foreground, var(--tx-foreground));
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.tx-deck-stage__notes-text,
-.tx-deck-stage__next-title {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.tx-deck-stage__notes-text {
-  white-space: pre-wrap;
-}
-
-.tx-deck-stage__loading,
-.tx-deck-stage__error,
-.tx-deck-stage__empty {
-  margin: 0;
-  color: var(--tx-muted-foreground, var(--tx-foreground));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tx-deck-stage,
-  .tx-deck-stage * {
-    scroll-behavior: auto;
-    transition-duration: 0.01ms;
-    animation-duration: 0.01ms;
-    animation-iteration-count: 1;
-  }
-
-  .tx-deck-stage__slide[data-transition] {
-    animation: none;
-  }
-}
-
-.tx-deck-stage[data-motion="reduce"],
-.tx-deck-stage[data-motion="reduce"] * {
-  scroll-behavior: auto;
-  transition-duration: 0.01ms;
-  animation-duration: 0.01ms;
-  animation-iteration-count: 1;
-}
-
-.tx-deck-stage[data-motion="reduce"] .tx-deck-stage__slide[data-transition] {
-  animation: none;
-}
-
-:root[data-tx-motion="reduce"] .tx-deck-stage,
-:root[data-tx-motion="reduce"] .tx-deck-stage * {
-  scroll-behavior: auto;
-  transition-duration: 0.01ms;
-  animation-duration: 0.01ms;
-  animation-iteration-count: 1;
-}
-
-:root[data-tx-motion="reduce"] .tx-deck-stage__slide[data-transition] {
-  animation: none;
 }
 
 /*
@@ -561,6 +1041,7 @@
 }
 
 @media print {
+  .tx-deck-stage__chrome-row,
   .tx-deck-stage__toolbar,
   .tx-deck-stage__presenter-side,
   .tx-deck-stage__overview {
@@ -624,10 +1105,53 @@
 @media (forced-colors: active) {
   .tx-deck-stage,
   .tx-deck-stage__control,
-  .tx-deck-stage__overview-item,
   .tx-deck-stage__notes,
   .tx-deck-stage__next,
   .tx-deck-stage__media-refused {
     border-color: CanvasText;
   }
+}
+
+/* Inside the fixed canvas: pixel sizes for the canvas, whatever the viewport width. */
+.tx-deck-stage__canvas .tx-deck-stage__slide-title {
+  margin: 0;
+  font-size: 2em;
+  line-height: 1.15;
+}
+
+/* Deck text minimums inside the canvas (24 px body, 18 px labels), as in Protoyard. */
+.tx-deck-stage__canvas :is(p, li, blockquote, td, th) {
+  font-size: max(24px, 1em);
+}
+
+.tx-deck-stage__canvas :is(small, caption, figcaption, label, button) {
+  font-size: max(18px, 0.75em);
+}
+
+.tx-deck-stage__canvas .tx-deck-stage__regions,
+.tx-deck-stage__canvas .tx-deck-stage__region {
+  gap: 0.75em;
+}
+
+.tx-deck-stage__canvas .tx-deck-stage__regions[data-arrangement="media-start"],
+.tx-deck-stage__canvas .tx-deck-stage__regions[data-arrangement="media-end"],
+.tx-deck-stage__canvas .tx-deck-stage__regions[data-arrangement="split"][data-slots~="contentEnd"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tx-deck-stage__canvas .tx-deck-stage__region[data-slot="media"] .tx-media-img {
+  block-size: 480px;
+}
+
+.tx-deck-stage__canvas .tx-deck-stage__region:not([data-slot="media"]) .tx-media-img,
+.tx-deck-stage__canvas .tx-deck-stage__region .tx-media-video {
+  max-block-size: 420px;
+}
+
+/* Centered masters (title, closing) center the slide title with their content. */
+:is(.tx-deck-stage__slide-body, .tx-deck-print__slide)[data-arrangement="centered"]
+.tx-deck-stage__slide-title,
+.tx-deck-stage__slide-body:has(> .tx-deck-stage__regions[data-arrangement="centered"])
+  .tx-deck-stage__slide-title {
+  text-align: center;
 }

@@ -184,9 +184,10 @@ export function defineSiteSweep(part: number, parts: number): void {
       browserName,
     }) => {
       // Large pages need more time, never an exclusion (the living gallery holds
-      // 125 interactive cards; axe takes about 30 s on a loaded machine).
+      // about 146 interactive cards since PLAN_008's slides layout examples; axe
+      // takes about 30 s on a loaded machine and the keyboard walk visits every card).
       test.setTimeout(
-        paths.reduce((total, path) => total + (LARGE_PAGES.has(path) ? 180_000 : 60_000), 0)
+        paths.reduce((total, path) => total + (LARGE_PAGES.has(path) ? 300_000 : 60_000), 0)
       );
       const problems: string[] = [];
       for (const path of paths) {

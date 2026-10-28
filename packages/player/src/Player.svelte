@@ -30,6 +30,7 @@ import {
   setPlayerLandmarks,
   setPlayerStateAccess,
 } from './context.ts';
+import { type DeckPlayerHost, isLayoutDeckTree } from './deck-host.ts';
 import type { PlayerDiagnosticsEvent, PlayerSize } from './embed/types.ts';
 import type { PlayerNodeError, PlayerNodeErrorPhase } from './errors.ts';
 import { withoutHostChrome, withoutHostChromeLoaders } from './host-chrome.ts';
@@ -169,6 +170,20 @@ type Props = {
    * the page layout paints a plain section instead (no duplicate `main`).
    */
   landmarks?: boolean;
+  /**
+   * When `false`, the player paints no frame chrome: no label heading, skip
+   * link or end anchor. Use this when the host already frames the content
+   * (for example a deck slide embedding a catalog component).
+   * Default `true`.
+   */
+  chrome?: boolean;
+  /**
+   * Optional host seam for `layout-deck` roots. When set and the validated
+   * tree is a deck, the player calls the host instead of painting the deck
+   * as a document. The player (L7) cannot import `@texuli/slides` (L8); the
+   * slides stage supplies the adapter. Document paint remains the default.
+   */
+  deckHost?: DeckPlayerHost | null;
 };
 
 let {
@@ -202,6 +217,8 @@ let {
   onAction,
   dataSources,
   landmarks = true,
+  chrome = true,
+  deckHost = null,
 }: Props = $props();
 
 // The user's reduced-motion preference, followed live.
@@ -1031,6 +1048,50 @@ $effect(() => {
   observer.observe(element);
   return () => observer.disconnect();
 });
+
+// Deck host seam: when the host can present a layout-deck on a stage, hand
+// the validated tree over and skip document paint for that root.
+let deckHostActive = $derived(
+  Boolean(
+    deckHost &&
+      playerState?.surface === 'tree' &&
+      !stateRefused &&
+      isLayoutDeckTree(playerState.validation.draft ?? playerState.validation.roots[0])
+  )
+);
+// Re-presents only when the blueprint, the tier or the host change. The keys
+// are deriveds, so a host that passes every prop again (mountPlayer, a test
+// rerender) with the same values never re-presents; the validated tree is read
+// untracked, and `label`, `active` and `root` are live getters, so toggling
+// them never re-presents the deck (and never loses its position).
+let deckSource = $derived(blueprint);
+let deckTier = $derived(tier);
+let deckPresenter = $derived(deckHost);
+$effect(() => {
+  const host = deckPresenter;
+  const presentTier = deckTier;
+  void deckSource;
+  if (!host || !deckHostActive) return;
+  const state = untrack(() => playerState);
+  if (!state) return;
+  const tree = (state.validation.draft ?? state.validation.roots[0]) as never;
+  const cleanup = untrack(() =>
+    host.present({
+      tree,
+      tier: presentTier,
+      get label() {
+        return label;
+      },
+      get active() {
+        return active;
+      },
+      get root() {
+        return root;
+      },
+    })
+  );
+  if (typeof cleanup === 'function') return cleanup;
+});
 </script>
 
 
@@ -1039,10 +1100,13 @@ $effect(() => {
     <PlayerNode {node} {onNodeError} />
   {/each}
 {/snippet}
+
 <section
   bind:this={root}
   class="tx-player"
   data-tx-player
+  data-tx-player-chrome={chrome ? undefined : 'off'}
+  data-tx-player-deck-host={deckHostActive ? 'pending' : undefined}
   data-status={shownStatus}
   data-density={density}
   data-tx-motion={reducedMotion ? 'reduce' : undefined}
@@ -1052,23 +1116,25 @@ $effect(() => {
   aria-label={label}
   onfocusin={onFocusIn}
 >
-  {#if playerState?.surface === 'tree' && !stateRefused}
+  {#if chrome && playerState?.surface === 'tree' && !stateRefused}
     <a class="tx-player__skip" href={`#${skipTargetId}`} onclick={skipPast}>
       {resolvedLabels.skip} {label}
     </a>
   {/if}
-  <header class="tx-player__chrome">
-    <h2 class="tx-player__label" tabindex="-1" bind:this={labelElement}>{label}</h2>
-    <span class="tx-player__badges">
-      {#if tier === 'untrusted'}
-        <!-- Always visible at the untrusted tier; the host can reword it, not remove it. -->
-        <span class="tx-player__trust" data-tx-player-trust={tier}>{resolvedLabels.trustBadge}</span>
-      {/if}
-      <span class="tx-player__badge" data-status={shownStatus}>
-        {resolvedLabels.status[shownStatus]}
+  {#if chrome}
+    <header class="tx-player__chrome">
+      <h2 class="tx-player__label" tabindex="-1" bind:this={labelElement}>{label}</h2>
+      <span class="tx-player__badges">
+        {#if tier === 'untrusted'}
+          <!-- Always visible at the untrusted tier; the host can reword it, not remove it. -->
+          <span class="tx-player__trust" data-tx-player-trust={tier}>{resolvedLabels.trustBadge}</span>
+        {/if}
+        <span class="tx-player__badge" data-status={shownStatus}>
+          {resolvedLabels.status[shownStatus]}
+        </span>
       </span>
-    </span>
-  </header>
+    </header>
+  {/if}
 
   {#if stateRefused}
     <div class="tx-player__notice" role="alert" tabindex="-1" data-tx-player-state-notice>
@@ -1103,7 +1169,10 @@ $effect(() => {
       onclick={onSurfaceClick}
       onsubmit={onSurfaceSubmit}
     >
-      {#if !hasReorder}
+      {#if deckHostActive}
+        <!-- Host seam: the slides stage (or a mock) owns the paint. -->
+        <div class="tx-player__deck-host" data-tx-player-deck-host-surface role="presentation"></div>
+      {:else if !hasReorder}
         {@render painted()}
       {:else if ReorderScope}
         <!-- One drag scope for every reorder container (lists of a group exchange items). -->
@@ -1126,7 +1195,7 @@ $effect(() => {
   <span class="tx-player__visually-hidden" aria-live="polite" aria-atomic="true" data-tx-player-announcer>
     {politeText}
   </span>
-  {#if playerState?.surface === 'tree' && !stateRefused}
+  {#if chrome && playerState?.surface === 'tree' && !stateRefused}
     <span class="tx-player__end" id={skipTargetId} tabindex="-1">
       <span class="tx-player__visually-hidden">{label}</span>
     </span>

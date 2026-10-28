@@ -1,5 +1,5 @@
 {
-  "catalogHash": "6389ff8dfd63e2b2e7cf5986be9f82fd72a3256e9e86fe634d066bbcd640ddd2",
+  "catalogHash": "8a449985d45c7bfd1dc2285f3513dfd6ca0e3e38260c0a541fdb7b17e9213006",
   "components": [
     {
       "capability": "web-only",
@@ -3256,6 +3256,11 @@
       "props": [
         {
           "extension": "web",
+          "kind": "unknown",
+          "name": "background"
+        },
+        {
+          "extension": "web",
           "kind": "slot",
           "name": "children"
         },
@@ -3263,6 +3268,14 @@
           "extension": "web",
           "kind": "string",
           "name": "class"
+        },
+        {
+          "kind": "object",
+          "name": "component"
+        },
+        {
+          "kind": "string",
+          "name": "layout"
         },
         {
           "enumValues": [
@@ -3283,9 +3296,17 @@
           "name": "notes"
         },
         {
+          "kind": "object",
+          "name": "props"
+        },
+        {
           "kind": "string",
           "name": "slideId",
           "required": true
+        },
+        {
+          "kind": "array",
+          "name": "steps"
         },
         {
           "extension": "web",
@@ -3297,7 +3318,7 @@
           "name": "title"
         },
         {
-          "enumValues": ["none", "fade", "fade-up"],
+          "enumValues": ["none", "fade", "fade-up", "slide", "zoom", "morph"],
           "kind": "enum",
           "name": "transition"
         }
@@ -4607,7 +4628,7 @@
       "placement": "content",
       "props": [
         {
-          "enumValues": ["16:9", "4:3", "1:1"],
+          "enumValues": ["16:9", "4:3", "9:16", "1:1"],
           "kind": "enum",
           "name": "aspect"
         },
@@ -4634,6 +4655,19 @@
           "name": "masters"
         },
         {
+          "enumValues": ["full", "subtle", "none"],
+          "kind": "enum",
+          "name": "motion"
+        },
+        {
+          "kind": "object",
+          "name": "navigation"
+        },
+        {
+          "kind": "object",
+          "name": "outline"
+        },
+        {
           "kind": "object",
           "name": "settings"
         },
@@ -4649,6 +4683,11 @@
         {
           "kind": "string",
           "name": "title"
+        },
+        {
+          "enumValues": ["none", "fade", "fade-up", "slide", "zoom", "morph"],
+          "kind": "enum",
+          "name": "transition"
         }
       ],
       "summary": "Slide deck frame for sequenced content."

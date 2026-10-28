@@ -38,13 +38,14 @@ project overview.
 | `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): The rich text editor surface, toolbar, link dialog and clipboard import on the core editor texels. |
 | `@texuli/core` | [packages/core/README.md](../packages/core/README.md): Texels: framework-free behavior and policy that every Texuli component is built from. |
 | `@texuli/date` | [packages/date/README.md](../packages/date/README.md): Owned Gregorian date arithmetic for Texuli calendars and date fields. |
+| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, not on npm: the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
 | `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.3.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
 | `@texuli/media` | [packages/media/README.md](../packages/media/README.md): Media: images, galleries, video, audio and layered compositions. |
 | `@texuli/player` | [packages/player/README.md](../packages/player/README.md): Svelte paint runtime for validated Texuli catalog blueprints. |
 | `@texuli/primitives` | [packages/primitives/README.md](../packages/primitives/README.md): Owned, headless Svelte 5 primitives built on the texels. |
-| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): Presentation deck model, grammar, and responsive stage runtime. |
+| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (`0.4.0` in development, not on npm; npm has `0.3.0`, the model v1 stage). |
 | `@texuli/spec` | [packages/spec/README.md](../packages/spec/README.md): The schema-first blueprint contract: JSON schemas, the catalog vocabulary, TypeScript and Kotlin projections, and the conformance harness. |
 | `texuli` | [packages/texuli/README.md](../packages/texuli/README.md): Styled Texuli components, layouts and shells. |
 | `@texuli/tokens` | [packages/tokens/README.md](../packages/tokens/README.md): The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. |
@@ -260,6 +261,18 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [data-timeline](../packages/data/docs/data-timeline.md) | Timeline and Gantt |
 | [data-tree-view](../packages/data/docs/data-tree-view.md) | Tree data view |
 
+### `@texuli/deck` (`packages/deck/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [authoring](../packages/deck/docs/authoring.md) | Authoring (`@texuli/deck/authoring`) |
+| [engine](../packages/deck/docs/engine.md) | Engine (`@texuli/deck/engine`) |
+| [markdown](../packages/deck/docs/markdown.md) | Markdown dialect (`@texuli/deck/markdown`) |
+| [math](../packages/deck/docs/math.md) | Math (`@texuli/deck/math`) |
+| [model](../packages/deck/docs/model.md) | Deck model v2 (`@texuli/deck/model`) |
+| [schema](../packages/deck/docs/schema.md) | Schema kit (`@texuli/deck/schema`) |
+| [templates](../packages/deck/docs/templates.md) | Templates (`@texuli/deck/templates`) |
+
 ### `@texuli/drag` (`packages/drag/docs/`)
 
 | Doc | Title |
@@ -357,9 +370,12 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 
 | Doc | Title |
 | --- | --- |
+| [components](../packages/slides/docs/components.md) | Components on slides |
 | [export](../packages/slides/docs/export.md) | Print, PDF and PPTX export |
 | [grammar](../packages/slides/docs/grammar.md) | Catalog grammar and agent decks |
-| [model](../packages/slides/docs/model.md) | Deck model |
+| [layouts](../packages/slides/docs/layouts.md) | Layouts and their renderers |
+| [migration](../packages/slides/docs/migration.md) | Upgrading from 0.3.0 to 0.4.0 |
+| [model](../packages/slides/docs/model.md) | Deck model v1 |
 | [stage](../packages/slides/docs/stage.md) | Stage: DeckStage and DeckPrint |
 | [styles](../packages/slides/docs/styles.md) | Stylesheet |
 | [templates](../packages/slides/docs/templates.md) | Starter templates |

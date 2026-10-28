@@ -1,0 +1,64 @@
+{
+  "$comment": "PLAN_008 T-catalog-player: model v2 deck as a layout-deck + deck-slide catalog tree. Fictional data only. formatVersion lives on the mapped deck, not on the catalog tree.",
+  "fixture": "09-deck-v2",
+  "catalog": "catalog-current",
+  "screen": "Two-slide v2 deck: free content slide with a list step, then a section slide.",
+  "tier": "untrusted",
+  "result": "deck-v2-grammar",
+  "tree": {
+    "id": "layout-deck",
+    "props": {
+      "title": "Northwind Q1 review",
+      "description": "Two slides for the weekly review",
+      "locale": "en",
+      "aspect": "16:9",
+      "transition": "fade",
+      "motion": "full"
+    },
+    "children": [
+      {
+        "id": "deck-slide",
+        "props": {
+          "slideId": "agenda",
+          "title": "Agenda",
+          "master": "content",
+          "transition": "fade-up",
+          "notes": "Keep each point under thirty seconds."
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "items": [{ "text": "Pipeline health" }, { "text": "Hiring" }, { "text": "Risks" }],
+                "step": 1,
+                "fragment": "fade-up"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "deck-slide",
+        "props": {
+          "slideId": "close",
+          "title": "Next steps",
+          "master": "closing",
+          "transition": "slide"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "text",
+                "markdown": "Ship the **beta** checklist by Friday."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

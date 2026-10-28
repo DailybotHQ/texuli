@@ -1,6 +1,52 @@
+export {
+  claimFirstRunHint,
+  copyDeckText,
+  createDeckChromeState,
+  DECK_CHROME_MESSAGES,
+  DeckChrome,
+  type DeckChromeNotice,
+  DeckChromeState,
+  DeckProgress,
+  DeckToolbar,
+  type DeckTooltip,
+  type DeckTooltipContent,
+  deckChromeEnvironment,
+  deckPrintLink,
+  deckShortcutText,
+  deckSlideLink,
+  FIRST_RUN_HINT_MS,
+  firstRunHintAllowed,
+  getDeckChromeContext,
+  runDeckChromeAction,
+  setDeckChromeContext,
+} from './chrome/index.ts';
+export {
+  type DeckStageContext,
+  type DeckStageSlideEntry,
+  getDeckStageContext,
+  getDeckStepContext,
+  setDeckStageContext,
+  setDeckStepContext,
+} from './context.ts';
+export { deckCssVars } from './css-vars.ts';
 export { default as DeckPrint } from './DeckPrint.svelte';
 export { default as DeckStage } from './DeckStage.svelte';
+export {
+  DECK_STAGE_EVENTS,
+  type DeckStageEvent,
+  type DeckStageEventMap,
+  type DeckStageEventName,
+  dispatchDeckEvent,
+} from './events.ts';
+export {
+  type ComposedFreeSlide,
+  composeFreeSlide,
+  type FreeSlideEntry,
+  type FreeSlideRegion,
+  freeSlideEntry,
+} from './free.ts';
 export { canUseNativeFullscreen, type DeckFullscreenState } from './fullscreen.ts';
+export { clickInput, createSwipeTracker, keyInput, selectionLength } from './input.ts';
 export { type DeckBlockRendererProps, loadDeckBlockFamily } from './loaders.ts';
 export {
   type DeckMediaGate,
@@ -10,8 +56,71 @@ export {
   gateDeckMedia,
   settleDeckImages,
 } from './media.ts';
+export {
+  createDeckTranslator,
+  DECK_STAGE_MESSAGES,
+  type DeckStageMessageKey,
+  type DeckStageMessages,
+  type DeckStageOnlyMessageKey,
+  type DeckTranslate,
+} from './messages.ts';
 export type { SlideNavigationIntent, SlideStepIntent } from './navigation.ts';
+export { DeckOverview } from './overview/index.ts';
+export { prefetchDeckSlides, slideBlockFamilies, whenIdle } from './prefetch.ts';
+export {
+  type DeckValidationHooks,
+  type PreparedDeck,
+  prepareDeck,
+  validateDeckBlock,
+} from './prepare.ts';
+export { DeckPresenterPane } from './presenter/index.ts';
 export { createPresenterTimer, formatElapsed, type PresenterTimer } from './presenter.ts';
+export {
+  type DeckBackgroundRendererProps,
+  type DeckItemRendererProps,
+  type DeckLazyRenderer,
+  type DeckRendererEntry,
+  type DeckRendererLookup,
+  type DeckRenderers,
+  type DeckSlideRenderContext,
+  type DeckSlideRendererProps,
+  deckRendererList,
+  deckValidationHooks,
+  isLazyRenderer,
+  loadRenderer,
+  readyRenderer,
+  resolveBackgroundRenderer,
+  resolveItemRenderer,
+  resolveSlideRenderer,
+} from './renderers.ts';
+export {
+  claimDeckHash,
+  type DeckRouteWindow,
+  readDeckHash,
+  releaseDeckHash,
+  watchDeckHash,
+  writeDeckHash,
+} from './route.ts';
+export {
+  clampStep,
+  createDeckStepContext,
+  type DeckFragmentAttributes,
+  type DeckStepContext,
+  deckSlideSteps,
+  deckStepView,
+  type StepViewInput,
+} from './steps.ts';
+export {
+  DECK_FALLBACK_PALETTES,
+  deckBackgroundPalette,
+  deckThemeId,
+  deckThemeKey,
+  deckThemeReferences,
+  loadDeckTheme,
+  resolveStageMode,
+  seedColor,
+  slideThemeReference,
+} from './style.ts';
 export {
   createDeckSync,
   DECK_SYNC_PROTOCOL,
@@ -22,6 +131,7 @@ export {
   type DeckSyncPosition,
   parseDeckSyncMessage,
 } from './sync.ts';
+export { type DeckSyncLink, type DeckSyncSignal, deckSyncLink } from './sync-link.ts';
 export {
   createDeckThemeCache,
   type DeckThemeLoader,
@@ -30,3 +140,16 @@ export {
   loadDeckLibraryTheme,
   resolveDeckThemeMode,
 } from './theme.ts';
+export {
+  DECK_MORPH_ATTRIBUTE,
+  type DeckTransitionDirection,
+  type DeckTransitionDocument,
+  type DeckTransitionMode,
+  type DeckViewTransition,
+  type PlayDeckTransitionOptions,
+  type PlayedDeckTransition,
+  playDeckTransition,
+  transitionKeyframes,
+  viewTransitionIdent,
+  viewTransitionPrefix,
+} from './transition.ts';

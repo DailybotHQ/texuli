@@ -29,11 +29,15 @@
 | `title` | string | no | untrusted | — | — |
 | `description` | string | no | untrusted | — | — |
 | `locale` | string | no | — | — | Language tag such as en or en-GB |
-| `aspect` | enum(16:9 | 4:3 | 1:1) | no | — | `"16:9"` | — |
+| `aspect` | enum(16:9 | 4:3 | 9:16 | 1:1) | no | — | `"16:9"` | — |
 | `themeRef` | unknown | no | — | — | Catalog theme id, or a catalog or embedded theme reference object |
 | `masters` | array | no | — | — | Built-in slide master ids the slides may use |
 | `settings` | object | no | — | — | startIndex, loop, showProgress and defaultTransition |
-| `slides` | array | no | — | — | Structured slide objects (@texuli/slides grammar); prefer deck-slide children |
+| `slides` | array | no | — | — | Structured slide objects (@texuli/deck model v2 grammar); prefer deck-slide children |
+| `transition` | enum(none | fade | fade-up | slide | zoom | morph) | no | — | — | Default slide transition (model v2) |
+| `motion` | enum(full | subtle | none) | no | — | — | Motion ceiling for the deck |
+| `navigation` | object | no | — | — | loop, start slide id, autoSlideMs |
+| `outline` | object | no | — | — | Sections and vertical stacks (model v2 outline) |
 | `children` | slot | no | — | — | — |
 | `class` | string | no | — | — | — |
 

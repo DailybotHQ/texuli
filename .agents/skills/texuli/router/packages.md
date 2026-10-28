@@ -2,18 +2,21 @@
 
 Every workspace package, its layer and its public entries. Layers point down
 only: a package imports only from lower layers (the repository's
-`scripts/check-layers.ts` enforces it). **18 of these 19 packages are on npm
+`scripts/check-layers.ts` enforces it). **18 of these 20 packages are on npm
 as `0.3.0`** (published by CI with provenance; `latest` and `next` both
 point to it; pre-1.0, not stable; the workspace packages stay
 `private: true`), so install them plainly (`pnpm add texuli`), import them in
 a Texuli workspace, or copy components with the CLI
-([`../components/SKILL.md`](../components/SKILL.md)). The exception is
-`@texuli/editor`: version `0.0.0`, in development and not on npm, so only a
-Texuli workspace can import it. `@texuli/drag` and `@texuli/workflows` are
-in development and on npm as `0.3.0` (first published 2026-10-28). The
-repository is ahead of npm: everything marked unreleased below (spec 0.3.0,
-the new catalog groups, `sortable`, the data drag migrations, the player's
-interaction) ships with the next owner-approved release of each package. `@texuli/examples` is a
+([`../components/SKILL.md`](../components/SKILL.md)). The exceptions are
+`@texuli/editor` (version `0.0.0`) and `@texuli/deck` (the deck engine,
+`0.4.0` in the repository): in development and not on npm, so only a
+Texuli workspace can import them. The repository's `@texuli/slides` stage
+is built on `@texuli/deck` and is ahead of npm `0.3.0` (which ships the v1
+deck model). `@texuli/drag` and `@texuli/workflows` are in development and
+on npm as `0.3.0` (first published 2026-10-28). The repository is ahead of
+npm: everything marked unreleased below (spec 0.4.0, the new catalog
+groups, `sortable`, the data drag migrations, the player's interaction)
+ships with the next owner-approved release of each package. `@texuli/examples` is a
 private registry for tests and the site, not a library, and is left out.
 
 This table is derived from each `packages/*/package.json` `exports` map and the
@@ -25,8 +28,9 @@ rest.
 | --- | --- | --- | --- |
 | L0 | `@texuli/core` | Texels: framework-free behavior and policy that every Texuli component is built from. | `@texuli/core`, `@texuli/core/announcer`, `@texuli/core/controllable`, `@texuli/core/dir-locale`, `@texuli/core/dismiss`, `@texuli/core/editor-history`, `@texuli/core/editor-keymap`, `@texuli/core/editor-markdown`, `@texuli/core/editor-model`, `@texuli/core/editor-transforms`, `@texuli/core/env`, `@texuli/core/focus-scope`, `@texuli/core/form-bridge`, `@texuli/core/ids`, … (28 entries) |
 | L0 | `@texuli/date` | Dependency-free Gregorian calendar dates (`CalendarDate`, month and week helpers) behind the calendar and date pickers; first published in `0.3.0`. | `@texuli/date`, `@texuli/date/calendar` |
+| L0 | `@texuli/deck` | Framework-free, dependency-free deck engine: deck model v2 from JSON or Markdown, the 21 layout ids, steps, navigation and hash routing, presenter protocol, lint, patch and templates. **In development: `0.4.0` in the repository, never published.** | `@texuli/deck`, `@texuli/deck/authoring`, `@texuli/deck/engine`, `@texuli/deck/markdown`, `@texuli/deck/math`, `@texuli/deck/model`, `@texuli/deck/schema`, `@texuli/deck/templates` |
 | L0 | `@texuli/drag` | Framework-free drag engine: sortable lists and groups, trees, swap, multi-drag, gesture, spatial canvas, graph editing, localized `DragMessages`. **In development: on npm as `0.3.0`.** | `@texuli/drag`, `@texuli/drag/auto-scroll`, `@texuli/drag/collision`, `@texuli/drag/gesture`, `@texuli/drag/graph`, `@texuli/drag/messages`, `@texuli/drag/modifiers`, `@texuli/drag/sortable`, `@texuli/drag/spatial`, `@texuli/drag/testing` |
-| L0 | `@texuli/spec` | The schema-first blueprint contract: JSON schemas, the catalog vocabulary, deterministic TypeScript and Kotlin projections, and the conformance harness. Spec 0.3.0 (state, bindings, closed actions, `reorder`, workflow graphs, the state surface) is in the repository; npm `0.3.0` carries spec 0.2.0 and only the root and `codegen`. | `@texuli/spec`, `@texuli/spec/codegen`, `@texuli/spec/migrate`, `@texuli/spec/surface`, `@texuli/spec/workflow` |
+| L0 | `@texuli/spec` | The schema-first blueprint contract: JSON schemas, the catalog vocabulary, deterministic TypeScript and Kotlin projections, and the conformance harness. Spec 0.4.0 (spec 0.3.0's state, bindings, closed actions, `reorder`, workflow graphs and state surface, plus deck model v2) is in the repository only; npm `0.3.0` carries spec 0.2.0 and only the root and `codegen`. | `@texuli/spec`, `@texuli/spec/codegen`, `@texuli/spec/migrate`, `@texuli/spec/surface`, `@texuli/spec/workflow` |
 | L1 | `@texuli/primitives` | Owned, headless Svelte 5 primitives built on the texels (42, including `sortable` on `@texuli/drag`, unreleased). | `@texuli/primitives`, `@texuli/primitives/accordion`, `@texuli/primitives/alert-dialog`, `@texuli/primitives/avatar`, `@texuli/primitives/calendar`, `@texuli/primitives/checkbox`, `@texuli/primitives/collapsible`, `@texuli/primitives/color-picker`, `@texuli/primitives/combobox`, `@texuli/primitives/command`, `@texuli/primitives/context-menu`, `@texuli/primitives/date-field`, `@texuli/primitives/date-picker`, `@texuli/primitives/dialog`, … (43 entries) |
 | L2 | `@texuli/tokens` | The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. | `@texuli/tokens`, `@texuli/tokens/aa-gate`, `@texuli/tokens/aa-gate/components`, `@texuli/tokens/base.css`, `@texuli/tokens/build`, `@texuli/tokens/contract`, `@texuli/tokens/css`, `@texuli/tokens/forced-colors`, `@texuli/tokens/forced-colors.css`, `@texuli/tokens/generator`, `@texuli/tokens/library`, `@texuli/tokens/library-expand`, `@texuli/tokens/modes`, `@texuli/tokens/no-flash`, … (18 entries) |
 | L3 | `texuli` | Styled Texuli components, layouts and shells. | `texuli`, `texuli/alert`, `texuli/avatar`, `texuli/badge`, `texuli/button`, `texuli/card`, `texuli/carousel`, `texuli/choice`, `texuli/combobox`, `texuli/command`, `texuli/cx`, `texuli/date`, `texuli/dialog`, `texuli/empty`, … (70 entries) |
@@ -39,8 +43,8 @@ rest.
 | L5 | `@texuli/blocks` | Content blocks: closed vocabulary, untrusted guard, formula AST and catalog metadata for pages, documents and slides. | `@texuli/blocks`, `@texuli/blocks/code`, `@texuli/blocks/code/engine`, `@texuli/blocks/code/renderers`, `@texuli/blocks/code/tokenizer`, `@texuli/blocks/core`, `@texuli/blocks/data`, `@texuli/blocks/data/engine`, `@texuli/blocks/data/renderers`, `@texuli/blocks/diagram`, `@texuli/blocks/diagram/engine`, `@texuli/blocks/diagram/renderers`, `@texuli/blocks/embed`, `@texuli/blocks/embed/engine`, … (32 entries) |
 | L6 | `@texuli/catalog` | The agent catalog (158 ids, 66 agent-emittable; the `chat`, `composition`, `data`, `state` and `workflows` groups are unreleased) and the renderer with no HTML sinks. | `@texuli/catalog`, `@texuli/catalog/build`, `@texuli/catalog/build/node`, `@texuli/catalog/edit`, `@texuli/catalog/envelope`, `@texuli/catalog/manifest`, `@texuli/catalog/manifests/chat`, `@texuli/catalog/manifests/composition`, `@texuli/catalog/manifests/content`, `@texuli/catalog/manifests/data`, `@texuli/catalog/manifests/display`, `@texuli/catalog/manifests/forms`, `@texuli/catalog/manifests/layouts`, `@texuli/catalog/manifests/overlays`, … (26 entries) |
 | L7 | `@texuli/player` | Svelte paint runtime for validated Texuli catalog blueprints: every emittable id, spec 0.3.0 state and closed actions, one shared drag scope (unreleased beyond npm `0.3.0`). | `@texuli/player`, `@texuli/player/styles.css` |
-| L7 | `@texuli/slides` | Presentation deck model, grammar, and responsive stage runtime. | `@texuli/slides`, `@texuli/slides/export`, `@texuli/slides/grammar`, `@texuli/slides/model`, `@texuli/slides/stage`, `@texuli/slides/styles.css`, `@texuli/slides/templates` |
 | L8 | `@texuli/astro` | Astro integration, content layouts and Svelte islands for Texuli sites. | `@texuli/astro`, `@texuli/astro/content`, `@texuli/astro/integration`, `@texuli/astro/layouts/ContentLayout`, `@texuli/astro/sections/Hero`, `@texuli/astro/sections/Section`, `@texuli/astro/site`, `@texuli/astro/styles.css` |
+| L8 | `@texuli/slides` | The presentation stage on `@texuli/deck`: `DeckStage` (canvas fit, chrome, overview, presenter, deep links), the default component registry, print and PPTX export; the v1 model, grammar and templates remain. The v2 stage is in the repository only; npm `0.3.0` ships the v1 stage at L7. | `@texuli/slides`, `@texuli/slides/export`, `@texuli/slides/grammar`, `@texuli/slides/model`, `@texuli/slides/stage`, `@texuli/slides/styles.css`, `@texuli/slides/templates` |
 | L8 | `@texuli/tools` | Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. | `@texuli/tools`, `@texuli/tools/a2ui`, `@texuli/tools/cli-add`, `@texuli/tools/cli-init`, `@texuli/tools/cli-update`, `@texuli/tools/elements`, `@texuli/tools/golden`, `@texuli/tools/llms` |
 
 Apps that consume the packages (not layers):
@@ -83,6 +87,12 @@ import { toDeckGrammar } from '@texuli/slides/grammar';
 import { DeckStage } from '@texuli/slides/stage';
 import { exportDeckPptx, requestDeckPdf } from '@texuli/slides/export';
 import { createDeckFromTemplate } from '@texuli/slides/templates';
+import { DECK_LAYOUTS, loadUntrustedDeck, parseDeck as parseDeckV2 } from '@texuli/deck/model';
+import { deckToMarkdown, parseDeckMarkdown } from '@texuli/deck/markdown';
+import { lintDeck } from '@texuli/deck/authoring';
+import { createDeckTemplate } from '@texuli/deck/templates';
+import { prepareDeck } from '@texuli/slides/stage';
+import { DeckPrintView, planDeckPrint } from '@texuli/slides/export';
 import { RichTextEditor } from '@texuli/editor/editor';
 import { fromMarkdown, toMarkdown } from '@texuli/core/editor-markdown';
 import { texuli } from '@texuli/astro';

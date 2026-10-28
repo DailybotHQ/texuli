@@ -60,6 +60,15 @@ prototypes as real credentials.
 
 **Brief shape:** sequential slides for a pitch or lesson.
 
+**Deck model v2 (the deck generator, in development, not on npm):** in a
+Texuli workspace, write the deck as JSON or Markdown with `@texuli/deck`,
+validate it with `parseDeck` / `loadUntrustedDeck` / `parseDeckMarkdown`,
+pick from the 21 layout ids by `useWhen`, present it with the v2
+`DeckStage`, export print and PPTX, and use the `deck` CLI and MCP tool:
+[`decks.md`](decks.md). The table below is the v1 model that npm
+`@texuli/slides` `0.3.0` ships; the repository's stage still accepts v1
+decks (it migrates them).
+
 | Need | Prefer |
 | --- | --- |
 | Deck model | `@texuli/slides/model` (`parseDeck`): validated slides of `@texuli/blocks` content, notes, masters, theme references |

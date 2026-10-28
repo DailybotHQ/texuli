@@ -51,6 +51,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         dependsOn: [],
       },
       {
+        name: '@texuli/deck',
+        role: 'In development (0.4.0, not on npm): the framework-free, dependency-free deck engine: deck model v2 and its owned schema kit, migration, the untrusted loader, the Markdown dialect, TeX-subset math, the layout catalog, backgrounds and contrast, navigation, controls, canvas fit and the presenter protocol, lint, patch, the typed builder, brief outlines and templates',
+        dependsOn: [],
+      },
+      {
         name: '@texuli/drag',
         role: 'In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing)',
         dependsOn: [],
@@ -158,11 +163,6 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     label: 'L7',
     packages: [
       {
-        name: '@texuli/slides',
-        role: 'Slide model, grammar, export and stage runtime',
-        dependsOn: ['blocks', 'catalog', 'media', 'tokens'],
-      },
-      {
         name: '@texuli/player',
         role: 'Blueprint player runtime and styles',
         dependsOn: [
@@ -193,6 +193,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         name: '@texuli/astro',
         role: 'Astro integration, site helpers and content layouts',
         dependsOn: ['blocks', 'core', 'tokens'],
+      },
+      {
+        name: '@texuli/slides',
+        role: 'The Svelte 5 presentation stage on @texuli/deck (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from 0.3.0; 0.4.0 in development, not on npm',
+        dependsOn: ['blocks', 'catalog', 'deck', 'media', 'player', 'tokens'],
       },
     ],
   },

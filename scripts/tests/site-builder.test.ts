@@ -451,7 +451,8 @@ describe('inspector: choice', () => {
         // PLAN_005 task 5 adds the G20 layouts: row align and wrap, stack, row and split gaps, split ratio.
         // PLAN_005 task 6: the deck root adds its aspect enum.
         // PLAN_007 T-player-parity: the data views, chat display and workflow graph add 15.
-        expect(CHOICE_PROPS.length).toBe(55);
+        // PLAN_008 T-catalog-player: the v2 deck root adds its transition and motion enums.
+        expect(CHOICE_PROPS.length).toBe(57);
         expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(11);
         const ids = new Set(CHOICE_PROPS.map((entry) => `${entry.id}.${entry.prop.name}`));
         for (const name of [

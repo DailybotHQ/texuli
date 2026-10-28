@@ -1,9 +1,13 @@
 /**
- * Accessibility sweep: slides (T-p7-deck-a11y). The seven slides examples are
- * the fixtures; three tests, each one page session. axe with zero exclusions in light and dark (including a dark
- * host page on a light OS), presenter and overview states, forced colors,
- * 320px reflow, the deck keyboard map with focus movement, tab order, reduced
- * motion and the heading outline. Fix findings at source.
+ * Accessibility sweep: slides (PLAN_008 stage v2). The seven slides examples
+ * are the fixtures; three tests, each one page session. axe with zero
+ * exclusions in light and dark (including a dark host page on a light OS),
+ * with the overview, the presenter view, the help dialog and the blackout
+ * open, and under forced colors; 320px reflow with the folded toolbar; the
+ * deck keyboard map with focus movement, the chrome (slide list, help,
+ * blackout, laser, full screen overlay), tab order, reveal steps and reduced
+ * motion. Slides are `role="group"` with `aria-roledescription="slide"`;
+ * toolbar names come from the stage messages. Fix findings at source.
  */
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
@@ -32,7 +36,7 @@ async function gotoFixture(page: Page, id: SlidesFixture, mode: 'light' | 'dark'
 }
 
 async function expectNoAxeViolations(page: Page, id: SlidesFixture) {
-  // A slide entrance fade lowers opacity while it runs; check the settled page.
+  // A slide entrance or a chrome fade lowers opacity while it runs; check the settled page.
   await page.waitForFunction(() =>
     document.getAnimations().every((animation) => animation.playState !== 'running')
   );
@@ -41,7 +45,11 @@ async function expectNoAxeViolations(page: Page, id: SlidesFixture) {
 }
 
 const stage = (page: Page) => page.getByRole('region', { name: /^Presentation: / });
-const progress = (page: Page) => stage(page).locator('.tx-deck-stage__progress');
+const live = (page: Page) => stage(page).locator('.tx-deck-stage__live');
+const slide = (page: Page, title: string) =>
+  stage(page).locator(`[aria-roledescription="slide"][aria-label="${title}"]`);
+const controls = (page: Page) => stage(page).getByRole('group', { name: 'Presentation controls' });
+const tool = (page: Page, name: string | RegExp) => controls(page).getByRole('button', { name });
 
 test('every deck passes axe on a light page, a dark page and a dark page on a dark OS', async ({
   page,
@@ -62,70 +70,92 @@ test('every deck passes axe on a light page, a dark page and a dark page on a da
   }
 });
 
-test('structure and names; axe with the overview, the presenter view and forced colors; 320px reflow', async ({
+test('structure and names; axe with the overview, presenter, help and blackout open and forced colors; 320px reflow', async ({
   page,
 }) => {
-  test.setTimeout(240_000);
-  await test.step('the templates pass axe with the overview and the presenter view open', async () => {
-    test.setTimeout(TEMPLATES.length * 40_000);
+  test.setTimeout(300_000);
+  await test.step('the templates pass axe with the overview, the presenter view, help and blackout open', async () => {
     for (const id of TEMPLATES) {
       for (const mode of ['light', 'dark'] as const) {
         await test.step(`${id} (${mode})`, async () => {
           await gotoFixture(page, id, mode);
-          await page.getByRole('button', { name: 'Overview' }).click();
+          await tool(page, 'Overview of all slides').click();
           await expect(page.getByRole('navigation', { name: 'Slides' })).toBeVisible();
           await expectNoAxeViolations(page, id);
-          await page.getByRole('button', { name: 'Close overview' }).click();
-          await page.getByRole('button', { name: 'Presenter' }).click();
+          await tool(page, 'Overview of all slides').click();
+          await tool(page, 'Presenter view').click();
           await expect(page.getByRole('complementary', { name: 'Speaker notes' })).toBeVisible();
+          await expectNoAxeViolations(page, id);
+          await tool(page, 'Presenter view').click();
+          await tool(page, 'Controls and shortcuts').click();
+          await expect(page.getByRole('dialog', { name: 'Controls and shortcuts' })).toBeVisible();
+          await expectNoAxeViolations(page, id);
+          await page.keyboard.press('Escape');
+          await expect(page.getByRole('dialog')).toHaveCount(0);
+          await tool(page, 'Black out the screen').click();
+          await expect(
+            stage(page).getByRole('button', { name: /^Screen blacked out/ })
+          ).toBeFocused();
           await expectNoAxeViolations(page, id);
         });
       }
     }
   });
-  await test.step('a template and the media deck pass axe under forced colors', async () => {
+  await test.step('a template and the media deck pass axe under forced colors, also blacked out', async () => {
     await page.emulateMedia({ forcedColors: 'active', colorScheme: 'light' });
     for (const id of ['slides-template-report', 'slides-media-deck'] as const) {
       await gotoFixture(page, id);
       await expectNoAxeViolations(page, id);
     }
+    await gotoFixture(page, 'slides-template-report');
+    await tool(page, 'Black out the screen').click();
+    await expectNoAxeViolations(page, 'slides-template-report');
     await page.emulateMedia({ forcedColors: 'none' });
   });
-  await test.step('the stage exposes a named region, a named controls group and a polite position', async () => {
+  await test.step('the stage is a named region with grouped, message-named controls and a polite position', async () => {
     await gotoFixture(page, 'slides-template-report');
     await expect(stage(page)).toHaveAccessibleName('Presentation: Quarterly report');
-    const controls = stage(page).getByRole('group', { name: 'Presentation controls' });
-    await expect(controls.getByRole('button')).toHaveText([
-      'Previous',
-      'Next',
-      'Overview',
-      'Presenter',
-      'Fullscreen',
-    ]);
-    await expect(controls.getByRole('button', { name: 'Previous slide' })).toBeVisible();
-    await expect(controls.getByRole('button', { name: 'Next slide' })).toBeVisible();
-    await expect(progress(page)).toHaveAttribute('aria-live', 'polite');
-    await expect(progress(page)).toHaveText('Slide 4 of 6: Trend');
-    // Outline: page h1, then the slide title as the deck's h2.
+    const groups = controls(page).getByRole('group');
+    await expect(groups).toHaveCount(5);
+    for (const [name, buttons] of [
+      [
+        'Navigate',
+        [
+          'Previous step or slide',
+          'Choose a slide, 4 / 6',
+          'Next step or slide',
+          'First slide',
+          'Last slide',
+        ],
+      ],
+      ['View', ['Overview of all slides', 'Full screen']],
+      ['Present', ['Presenter view', 'Black out the screen', 'Laser pointer']],
+      ['Share and print', ['Copy link to this slide', 'Print, one slide per page']],
+      ['Help', ['Controls and shortcuts']],
+    ] as const) {
+      const group = controls(page).getByRole('group', { name, exact: true });
+      for (const button of buttons)
+        await expect(group.getByRole('button', { name: button })).toBeVisible();
+    }
+    await expect(tool(page, 'Black out the screen')).toHaveAttribute('aria-pressed', 'false');
+    await expect(tool(page, 'Choose a slide, 4 / 6')).toHaveText('4 / 6');
+    await expect(live(page)).toHaveAttribute('aria-live', 'polite');
+    await expect(live(page)).toHaveText('Slide 4 of 6: Trend');
+    await expect(stage(page).getByRole('progressbar', { name: 'Deck progress' })).toHaveAttribute(
+      'aria-valuetext',
+      'Slide 4 of 6'
+    );
+    // Outline: page h1, then the active slide title as the deck's only exposed h2.
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Report deck template');
     await expect(stage(page).getByRole('heading', { level: 2 })).toHaveText(['Trend']);
-    await expect(stage(page).getByRole('article', { name: 'Trend' })).toBeVisible();
-  });
-  await test.step('presenter panes are a complementary notes region and an up-next region, timer-free by default', async () => {
-    await gotoFixture(page, 'slides-template-pitch');
-    await page.getByRole('button', { name: 'Presenter' }).click();
-    await expect(page.getByRole('button', { name: 'Presenter' })).toHaveAttribute(
-      'aria-pressed',
-      'true'
+    await expect(stage(page).getByRole('group', { name: 'Trend' })).toHaveAttribute(
+      'aria-roledescription',
+      'slide'
     );
-    await expect(page.getByRole('complementary', { name: 'Speaker notes' })).toBeVisible();
-    await expect(page.getByRole('region', { name: 'Up next' })).toContainText('Traction');
-    await expect(page.getByRole('timer')).toHaveCount(0);
-    await expect(stage(page).getByRole('heading', { level: 2 })).toHaveText([
-      'The solution',
-      'Speaker notes',
-      'Up next',
-    ]);
+    // A tooltip describes a control on keyboard focus (the toolbar follows the slide).
+    await tool(page, 'Choose a slide, 4 / 6').focus();
+    await page.keyboard.press('Shift+Tab');
+    await expect(page.getByRole('tooltip')).toHaveCount(1);
   });
   await test.step('the print view is one region per slide with an h2 title and no focus traps', async () => {
     await gotoFixture(page, 'slides-media-deck');
@@ -141,7 +171,7 @@ test('structure and names; axe with the overview, the presenter view and forced 
     await page.keyboard.press('Tab');
     expect(await print.evaluate((el) => el.contains(document.activeElement))).toBe(false);
   });
-  await test.step('every deck reflows at 320 CSS px without horizontal scroll', async () => {
+  await test.step('every deck reflows at 320 CSS px without horizontal scroll; the toolbar folds into More', async () => {
     test.setTimeout(ALL.length * 20_000);
     await page.setViewportSize({ width: 320, height: 640 });
     const overflows: string[] = [];
@@ -153,22 +183,96 @@ test('structure and names; axe with the overview, the presenter view and forced 
       if (overflow > 1) overflows.push(`${id}: ${overflow}px`);
     }
     expect(overflows).toEqual([]);
+    await gotoFixture(page, 'slides-template-report');
+    const more = stage(page)
+      .getByRole('group', { name: 'Presentation controls' })
+      .locator('summary');
+    await expect(more).toHaveAccessibleName('More presentation controls');
+    await more.click();
+    await expect(
+      controls(page).getByRole('button', { name: 'Controls and shortcuts' })
+    ).toBeVisible();
+    await expectNoAxeViolations(page, 'slides-template-report');
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+    );
+    expect(overflow).toBeLessThanOrEqual(1);
   });
 });
 
-test('the deck keyboard map, tab order, reveal steps, slots, fullscreen and motion', async ({
+test('the presenter split view at 1280 × 720 with the window-blocked notice keeps Previous and Next clear of the toolbar', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 1280, height: 720 });
+  // The browser blocks the presenter window: the split view shows the reason and stays.
+  await page.addInitScript(() => {
+    window.open = () => null;
+  });
+  const clearOfToolbar = async (id: SlidesFixture, label: string) => {
+    const pane = stage(page).locator('[data-tx-deck-presenter-split]');
+    for (const name of ['Previous', 'Next'] as const) {
+      const button = pane.getByRole('button', { name, exact: true });
+      await button.scrollIntoViewIfNeeded();
+      // Nothing paints over the button: the topmost element at its center is the button.
+      const clear = await button.evaluate((element) => {
+        const box = element.getBoundingClientRect();
+        const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+        return hit === element || element.contains(hit)
+          ? 'clear'
+          : `${hit?.tagName}.${hit?.className} at ${Math.round(box.top)}`;
+      });
+      expect(clear, `${id} (${label}): ${name}`).toBe('clear');
+    }
+  };
+  for (const id of ['slides-template-report', 'slides-presenter-screen'] as const) {
+    await test.step(id, async () => {
+      await gotoFixture(page, id);
+      const pane = stage(page).locator('[data-tx-deck-presenter-split]');
+      if ((await pane.count()) === 0) await tool(page, 'Presenter view').click();
+      await pane.getByRole('button', { name: 'Open presenter window' }).click();
+      await expect(pane.locator('[data-tx-deck-presenter-reason="popup-blocked"]')).toBeVisible();
+      await clearOfToolbar(id, 'host box');
+      // A full-window host (`fit="viewport"`) bounds the slide row: with long
+      // notes the pane is taller than the row, and it scrolls inside the row
+      // instead of running under the toolbar.
+      await stage(page).evaluate((element) => {
+        element.setAttribute('data-tx-deck-fit-mode', 'viewport');
+        const side = element.querySelector<HTMLElement>('[data-tx-deck-presenter-split]');
+        const main = element.querySelector<HTMLElement>('.tx-deck-stage__main');
+        const notes = side?.querySelector<HTMLElement>('.tx-deck-stage__notes');
+        if (!side || !main || !notes) throw new Error('presenter pane parts');
+        // Notes as tall as the row: the pane holds more than the row can show.
+        notes.style.minBlockSize = `${main.getBoundingClientRect().height}px`;
+      });
+      const bounds = await stage(page).evaluate((element) => {
+        const side = element.querySelector('[data-tx-deck-presenter-split]') as HTMLElement;
+        const main = element.querySelector('.tx-deck-stage__main') as HTMLElement;
+        return {
+          overflow: side.getBoundingClientRect().bottom - main.getBoundingClientRect().bottom,
+          scrolls: side.scrollHeight > side.clientHeight,
+        };
+      });
+      expect(bounds.overflow, `${id}: the pane stays inside the slide row`).toBeLessThanOrEqual(1);
+      expect(bounds.scrolls, `${id}: the pane scrolls`).toBe(true);
+      await clearOfToolbar(id, 'full window');
+    });
+  }
+});
+
+test('the deck keyboard map, chrome, tab order, reveal steps, fullscreen and motion', async ({
   page,
   browserName,
 }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   await test.step('arrows, Page keys, Space, Home and End move between slides and focus the new slide', async () => {
     await gotoFixture(page, 'slides-template-report');
     const press = async (key: string, expected: string, title: string) => {
       await page.keyboard.press(key);
-      await expect(progress(page)).toHaveText(expected);
-      await expect(stage(page).getByRole('article', { name: title })).toBeFocused();
+      await expect(live(page)).toHaveText(expected);
+      await expect(slide(page, title)).toBeFocused();
     };
-    await stage(page).getByRole('article', { name: 'Trend' }).focus();
+    await slide(page, 'Trend').focus();
     await press('ArrowRight', 'Slide 5 of 6: Risks', 'Risks');
     await press('ArrowLeft', 'Slide 4 of 6: Trend', 'Trend');
     await press('Home', 'Slide 1 of 6: Quarterly report', 'Quarterly report');
@@ -178,60 +282,101 @@ test('the deck keyboard map, tab order, reveal steps, slots, fullscreen and moti
     // The last slide does not wrap (loop is off in the template).
     await press('ArrowRight', 'Slide 6 of 6: Next steps', 'Next steps');
   });
-  await test.step('o opens the overview on the current slide; Escape closes it and returns focus', async () => {
+  await test.step('o opens the overview on the current slide; Escape closes it and returns focus to the slide', async () => {
     await gotoFixture(page, 'slides-template-review');
-    await stage(page).getByRole('article', { name: 'Demo' }).focus();
+    await slide(page, 'Demo').focus();
     await page.keyboard.press('o');
     const current = page
       .getByRole('navigation', { name: 'Slides' })
-      .getByRole('button', { name: '4 Demo' });
+      .getByRole('button', { name: '4 Demo', exact: true });
     await expect(current).toBeFocused();
-    await expect(current).toHaveAttribute('aria-current', 'step');
     await page.keyboard.press('Escape');
     await expect(page.getByRole('navigation', { name: 'Slides' })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Overview' })).toBeFocused();
+    await expect(slide(page, 'Demo')).toBeFocused();
   });
-  await test.step('p opens the presenter view, s focuses the notes, Escape closes and returns focus', async () => {
-    await gotoFixture(page, 'slides-template-pitch');
-    await stage(page).getByRole('article', { name: 'The solution' }).focus();
-    await page.keyboard.press('p');
-    const notes = page.getByRole('complementary', { name: 'Speaker notes' });
-    await expect(notes).toBeVisible();
-    await page.keyboard.press('ArrowLeft');
-    await expect(notes).toContainText('Tell one customer story before the numbers.');
-    await page.keyboard.press('s');
-    await expect(notes).toBeFocused();
+  await test.step('? opens the help dialog on Close, Tab stays inside, Escape closes and returns focus', async () => {
+    await gotoFixture(page, 'slides-template-report');
+    await slide(page, 'Trend').focus();
+    await page.keyboard.press('Shift+?');
+    const dialog = page.getByRole('dialog', { name: 'Controls and shortcuts' });
+    await expect(dialog.getByRole('button', { name: 'Close' })).toBeFocused();
+    await expect(dialog.getByRole('heading', { level: 3 })).toHaveText([
+      'Move around',
+      'View',
+      'Present',
+      'Share and print',
+      'Help',
+    ]);
+    // Close and the scrollable list are the only stops: Tab stays inside the dialog.
+    await page.keyboard.press('Tab');
+    await expect(dialog.getByRole('region', { name: 'Controls and shortcuts' })).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(dialog.getByRole('button', { name: 'Close' })).toBeFocused();
+    await page.keyboard.press('ArrowRight');
+    await expect(live(page)).toHaveText('Slide 4 of 6: Trend');
     await page.keyboard.press('Escape');
-    await expect(notes).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Presenter' })).toBeFocused();
+    await expect(dialog).toHaveCount(0);
+    await expect(slide(page, 'Trend')).toBeFocused();
   });
-  await test.step('tab order runs through the controls, then the slide content, then the presenter panes', async () => {
+  await test.step('b blacks out with a hint, Escape returns; l shows the laser chip, Escape removes it', async () => {
+    await slide(page, 'Trend').focus();
+    await page.keyboard.press('b');
+    const black = stage(page).getByRole('button', { name: /^Screen blacked out/ });
+    await expect(black).toBeFocused();
+    await expect(black).toContainText('Press B or select');
+    await page.keyboard.press('ArrowRight');
+    await expect(live(page)).toHaveText('Slide 4 of 6: Trend');
+    await page.keyboard.press('Escape');
+    await expect(black).toHaveCount(0);
+    await expect(slide(page, 'Trend')).toBeFocused();
+    await page.keyboard.press('l');
+    await expect(stage(page).locator('[data-tx-deck-laser]')).toContainText('Laser on');
+    await expect(tool(page, 'Laser pointer')).toHaveAttribute('aria-pressed', 'true');
+    await page.keyboard.press('Escape');
+    await expect(stage(page).locator('[data-tx-deck-laser]')).toHaveCount(0);
+  });
+  await test.step('the slide counter opens a listbox of titles; arrows and Enter jump to a slide', async () => {
+    await tool(page, 'Choose a slide, 4 / 6').click();
+    const list = page.getByRole('listbox', { name: 'Choose a slide' });
+    await expect(list.getByRole('option', { selected: true })).toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
+    await expect(list).toHaveCount(0);
+    await expect(live(page)).toHaveText('Slide 5 of 6: Risks');
+    await expect(slide(page, 'Risks')).toBeFocused();
+  });
+  await test.step('tab order runs through the slide content, then the toolbar groups', async () => {
     // WebKit's default Tab skips links and buttons (a macOS setting), so the
     // tab-order walk runs on Chromium and Pixel 7.
     if (browserName === 'webkit') return;
     await gotoFixture(page, 'slides-template-review');
-    await page.getByRole('button', { name: 'Presenter' }).click();
     await page.getByRole('link', { name: 'All examples' }).focus();
     const order: string[] = [];
-    for (let index = 0; index < 7; index += 1) {
+    for (let index = 0; index < 15; index += 1) {
       await page.keyboard.press('Tab');
       order.push(
         await page.evaluate(() => {
           const el = document.activeElement as HTMLElement;
-          return (
-            el.getAttribute('aria-label') ?? el.getAttribute('role') ?? el.textContent?.trim() ?? ''
-          );
+          return el.getAttribute('aria-label') ?? el.textContent?.trim() ?? '';
         })
       );
     }
     expect(order).toEqual([
-      'Previous slide',
-      'Next slide',
-      'Overview',
-      'Presenter',
-      'Fullscreen',
       'Copy TS code',
-      'region',
+      "await exportInvoices({ month: '2026-10' });",
+      'Previous step or slide',
+      'Choose a slide, 4 / 5',
+      'Next step or slide',
+      'First slide',
+      'Last slide',
+      'Overview of all slides',
+      'Full screen',
+      'Presenter view',
+      'Black out the screen',
+      'Laser pointer',
+      'Copy link to this slide',
+      'Print, one slide per page',
+      'Controls and shortcuts',
     ]);
   });
   await test.step('single-key shortcuts act only while focus is inside the deck', async () => {
@@ -239,89 +384,51 @@ test('the deck keyboard map, tab order, reveal steps, slots, fullscreen and moti
     await page.getByRole('link', { name: 'All examples' }).focus();
     await page.keyboard.press('ArrowRight');
     await page.keyboard.press('o');
-    await expect(progress(page)).toHaveText('Slide 4 of 6: Trend');
+    await expect(live(page)).toHaveText('Slide 4 of 6: Trend');
     await expect(page.getByRole('navigation', { name: 'Slides' })).toHaveCount(0);
   });
-  await test.step('arrow keys reveal and hide steps, and the position text reports them', async () => {
+  await test.step('arrow keys reveal and hide steps, and the announcement reports them', async () => {
     await gotoFixture(page, 'slides-fragments');
-    await expect(progress(page)).toHaveText('Slide 2 of 2: Launch plan, 2 of 4 revealed');
-    await stage(page).getByRole('article', { name: 'Launch plan' }).focus();
-    await expect(stage(page).getByRole('button', { name: 'Next step' })).toBeVisible();
-    await expect(stage(page).getByText('Open the beta')).toBeVisible();
-    await expect(stage(page).getByText('General availability')).toBeHidden();
+    await expect(live(page)).toHaveText('Slide 2 of 2: Launch plan, step 2 of 4');
+    await slide(page, 'Launch plan').focus();
     await page.keyboard.press('ArrowRight');
-    await expect(progress(page)).toHaveText('Slide 2 of 2: Launch plan, 3 of 4 revealed');
-    await expect(stage(page).getByText('General availability')).toBeVisible();
+    await expect(live(page)).toHaveText('Slide 2 of 2: Launch plan, step 3 of 4');
     await page.keyboard.press('ArrowLeft');
     await page.keyboard.press('ArrowLeft');
-    await expect(progress(page)).toHaveText('Slide 2 of 2: Launch plan, 1 of 4 revealed');
-    await expect(stage(page).getByText('Open the beta')).toBeHidden();
-    await expect(stage(page).getByRole('article', { name: 'Launch plan' })).toBeFocused();
+    await expect(live(page)).toHaveText('Slide 2 of 2: Launch plan, step 1 of 4');
+    await expect(slide(page, 'Launch plan')).toBeFocused();
   });
-  await test.step('the presenter screen shows the step progress and the next step', async () => {
-    await gotoFixture(page, 'slides-presenter-screen');
-    await expect(page.getByRole('complementary', { name: 'Speaker notes' })).toContainText(
-      'Reveal step 1 of 4'
-    );
-    await expect(page.getByRole('region', { name: 'Up next' })).toContainText(
-      'Reveal step 2 of 4 on this slide'
-    );
-  });
-  await test.step('slot masters print their slots in reading order with one h2 per page', async () => {
-    await gotoFixture(page, 'slides-slot-masters');
-    const print = page.getByRole('document', { name: 'Print: Quarter in review' });
-    await expect(print.getByRole('heading', { level: 2 })).toHaveText([
-      'Quarter in review',
-      'Before and after',
-      'Customer voice',
-      'Thank you',
-    ]);
-    const slots = await print
-      .locator('.tx-deck-stage__region')
-      .evaluateAll((regions) => regions.map((region) => region.getAttribute('data-slot')));
-    expect(slots).toEqual([
-      'body',
-      'footer',
-      'contentStart',
-      'contentEnd',
-      'footer',
-      'quote',
-      'attribution',
-      'body',
-      'footer',
-    ]);
-  });
-  await test.step('fullscreen opens natively or fills the window visibly, and closing returns focus', async () => {
+  await test.step('fullscreen hides the toolbar behind an overlay that leaves and returns focus to the slide', async () => {
     await gotoFixture(page, 'slides-template-report');
-    await page.getByRole('button', { name: 'Fullscreen' }).click();
+    await tool(page, 'Full screen').click();
     await expect(stage(page)).toHaveAttribute('data-fullscreen', /^(native|viewport)$/);
-    const state = await stage(page).getAttribute('data-fullscreen');
-    expect(['native', 'viewport']).toContain(state);
-    if (state === 'viewport') {
-      await expect(stage(page).locator('.tx-deck-stage__fullscreen-note')).toBeVisible();
-    }
-    await expect(stage(page).getByRole('article', { name: 'Trend' })).toBeFocused();
-    const exit = page.getByRole('button', { name: 'Exit fullscreen' });
-    await exit.click();
+    await expect(slide(page, 'Trend')).toBeFocused();
+    await expect(controls(page)).toBeHidden();
+    const overlay = stage(page).getByRole('group', { name: 'Full screen controls' });
+    await expect(overlay).toContainText('4 / 6');
+    await overlay.getByRole('button', { name: 'Next step or slide' }).click();
+    await expect(live(page)).toHaveText('Slide 5 of 6: Risks');
+    await overlay.getByRole('button', { name: 'Leave full screen' }).click();
     await expect(stage(page)).not.toHaveAttribute('data-fullscreen', /.+/);
-    await expect(page.getByRole('button', { name: 'Fullscreen' })).toBeFocused();
+    await expect(slide(page, 'Risks')).toBeFocused();
+    await expect(controls(page)).toBeVisible();
   });
-  await test.step('reduced motion cuts every transition; full motion keeps the deck token', async () => {
+  await test.step('reduced motion marks the stage and cuts the chrome motion; full motion does not', async () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await gotoFixture(page, 'slides-template-report');
-    await page.getByRole('button', { name: 'Next slide' }).click();
+    await tool(page, 'Next step or slide').click();
+    await expect(live(page)).toHaveText('Slide 5 of 6: Risks');
     await expect(stage(page)).toHaveAttribute('data-motion', 'reduce');
-    await expect(stage(page).getByRole('article', { name: 'Risks' })).toHaveAttribute(
-      'data-transition',
-      'none'
-    );
+    await tool(page, 'Black out the screen').click();
+    const hint = stage(page).locator('.tx-deck-stage__blackout-hint');
+    const duration = () =>
+      hint.evaluate((el) => Number.parseFloat(getComputedStyle(el).transitionDuration));
+    expect(await duration()).toBeLessThan(0.01);
 
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await gotoFixture(page, 'slides-template-report');
-    await page.getByRole('button', { name: 'Next slide' }).click();
-    await expect(stage(page).getByRole('article', { name: 'Risks' })).toHaveAttribute(
-      'data-transition',
-      'fade'
-    );
+    await expect(stage(page)).not.toHaveAttribute('data-motion', /.+/);
+    await tool(page, 'Black out the screen').click();
+    expect(await duration()).toBe(0.2);
   });
 });

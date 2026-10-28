@@ -16,7 +16,7 @@ VoiceOver (macOS) phrasing**, grounded on:
    (`TEXULI_E2E_PORT=4933`, `?fixture=<id>&mode=light`) on 2026-10-25, after
    the fixes listed in [a11y-slides.md](a11y-slides.md).
 2. The deck keyboard contract in
-   [packages/slides/docs/stage.md](../../packages/slides/docs/stage.md#keyboard-and-focus).
+   [packages/slides/docs/stage.md](../../packages/slides/docs/stage.md#routing-keys-and-pointer).
 3. macOS VoiceOver conventions for regions, groups, articles, live regions,
    pressed toggle buttons, timers and complementary landmarks.
 
