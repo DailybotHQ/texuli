@@ -41,10 +41,10 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-/** Workspace packages that are never packed: demo code or an unreleased
- * library. @texuli/editor stays private until its own release so the
- * paused publish waves keep their byte-stable manifest set. */
-export const NEVER_PACKED: readonly string[] = ['@texuli/examples', '@texuli/editor'];
+/** Workspace packages that are never packed: the examples registry is demo
+ * code. (@texuli/editor left this list in PLAN_009 G17: it is publishable
+ * from 0.5.0.) */
+export const NEVER_PACKED: readonly string[] = ['@texuli/examples'];
 
 /** attw resolution kinds outside the ESM-only support policy. */
 export const IGNORED_RESOLUTIONS: readonly string[] = ['node10', 'node16-cjs'];
@@ -460,7 +460,19 @@ export async function compileGeneratedTypeScript(
   return [`build: generated TypeScript compile failed: ${output.trim().slice(0, 2000)}`];
 }
 
-async function buildPackage(pkg: WorkspacePackage, root: string, stage: string): Promise<string[]> {
+/**
+ * Build `pkg`'s `src/` with svelte-package into `<stage>/dist`, exactly as it
+ * is packed. `types: false` skips the declarations (the emitted JavaScript and
+ * Svelte files are the same), for checks that only bundle the output, such as
+ * the dist-parity check (`scripts/dist-parity.ts`).
+ */
+export async function buildPackage(
+  pkg: WorkspacePackage,
+  root: string,
+  stage: string,
+  options: { types?: boolean } = {}
+): Promise<string[]> {
+  const types = options.types ?? true;
   const packageDir = join(root, 'packages', pkg.dir);
   rmSync(stage, { recursive: true, force: true });
   mkdirSync(stage, { recursive: true });
@@ -483,7 +495,17 @@ async function buildPackage(pkg: WorkspacePackage, root: string, stage: string):
   const hadKit = existsSync(kit);
   const { code, output } = await run(
     'pnpm',
-    ['exec', 'svelte-package', '--input', 'src', '--output', dist, '--tsconfig', tsconfig],
+    [
+      'exec',
+      'svelte-package',
+      '--input',
+      'src',
+      '--output',
+      dist,
+      '--tsconfig',
+      tsconfig,
+      ...(types ? [] : ['--no-types']),
+    ],
     packageDir
   );
   rmSync(tsconfig);

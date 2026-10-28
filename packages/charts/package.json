@@ -64,6 +64,11 @@
       "svelte": "./src/compact/index.ts",
       "default": "./src/compact/index.ts"
     },
+    "./sparkline-lite": {
+      "types": "./src/sparkline-lite/index.ts",
+      "svelte": "./src/sparkline-lite/index.ts",
+      "default": "./src/sparkline-lite/index.ts"
+    },
     "./flow": {
       "types": "./src/flow/index.ts",
       "svelte": "./src/flow/index.ts",

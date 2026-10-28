@@ -78,6 +78,7 @@ const keep = lttbIndices(xs, ys, 500); // downsample a long series to 500 points
 | `@texuli/charts/part-whole` | Pie, donut, sunburst and treemap charts |
 | `@texuli/charts/matrix` | Heatmap, scatter and bubble charts |
 | `@texuli/charts/compact` | `Sparkline`, `BulletChart`, `Gauge` and `ProgressRing` |
+| `@texuli/charts/sparkline-lite` | A light `Sparkline` (same props): the drawing and its accessible description, without the data table, for first screens |
 | `@texuli/charts/flow` | Sankey, funnel and network charts |
 | `@texuli/charts/geo` | Schematic tile and point maps |
 | `@texuli/charts/histogram` | `HistogramChart` |
@@ -137,6 +138,7 @@ const keep = lttbIndices(xs, ys, 500); // downsample a long series to 500 points
   [part-whole](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-part-whole.md),
   [matrix](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-matrix.md),
   [compact](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-compact.md),
+  [light sparkline](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-sparkline-lite.md),
   [flow](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-flow.md),
   [geo](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-geo.md),
   [histogram](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-histogram.md),

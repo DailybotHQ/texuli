@@ -84,6 +84,38 @@ export function formatNumber(value: number): string {
   return defaultNumberFormat.format(value);
 }
 
+/**
+ * A fresh `Intl` formatter for a plain-data spec, uncached. It throws when
+ * `Intl` rejects the options; callers fall back to {@link formatNumber}.
+ */
+export function createChartFormatter(
+  spec: ChartFormatSpec
+): Intl.NumberFormat | Intl.DateTimeFormat {
+  if (spec.type === 'date') {
+    return new Intl.DateTimeFormat(spec.locale, {
+      ...(spec.timeZone === undefined ? {} : { timeZone: spec.timeZone }),
+      ...(spec.dateStyle === undefined ? {} : { dateStyle: spec.dateStyle }),
+      ...(spec.timeStyle === undefined ? {} : { timeStyle: spec.timeStyle }),
+      ...(spec.dateStyle === undefined && spec.timeStyle === undefined
+        ? { dateStyle: 'medium' as const }
+        : {}),
+    });
+  }
+  const digits = (candidate: number | undefined) =>
+    Number.isInteger(candidate) && candidate !== undefined && candidate >= 0 && candidate <= 20
+      ? candidate
+      : undefined;
+  const minimumFractionDigits = digits(spec.minimumFractionDigits);
+  const maximumFractionDigits = digits(spec.maximumFractionDigits);
+  return new Intl.NumberFormat(spec.locale, {
+    style: spec.style ?? 'decimal',
+    ...(spec.currency === undefined ? {} : { currency: spec.currency }),
+    notation: spec.notation ?? 'standard',
+    ...(minimumFractionDigits === undefined ? {} : { minimumFractionDigits }),
+    ...(maximumFractionDigits === undefined ? {} : { maximumFractionDigits }),
+  });
+}
+
 /** Most distinct format specs whose `Intl` formatters are kept; the oldest is dropped first. */
 export const MAX_CACHED_FORMATTERS = 64;
 const formatters = new Map<string, Intl.NumberFormat | Intl.DateTimeFormat>();
@@ -97,31 +129,7 @@ function formatterFor(spec: ChartFormatSpec): Intl.NumberFormat | Intl.DateTimeF
   const key = JSON.stringify(spec);
   const cached = formatters.get(key);
   if (cached) return cached;
-  let created: Intl.NumberFormat | Intl.DateTimeFormat;
-  if (spec.type === 'date') {
-    created = new Intl.DateTimeFormat(spec.locale, {
-      ...(spec.timeZone === undefined ? {} : { timeZone: spec.timeZone }),
-      ...(spec.dateStyle === undefined ? {} : { dateStyle: spec.dateStyle }),
-      ...(spec.timeStyle === undefined ? {} : { timeStyle: spec.timeStyle }),
-      ...(spec.dateStyle === undefined && spec.timeStyle === undefined
-        ? { dateStyle: 'medium' as const }
-        : {}),
-    });
-  } else {
-    const digits = (candidate: number | undefined) =>
-      Number.isInteger(candidate) && candidate !== undefined && candidate >= 0 && candidate <= 20
-        ? candidate
-        : undefined;
-    const minimumFractionDigits = digits(spec.minimumFractionDigits);
-    const maximumFractionDigits = digits(spec.maximumFractionDigits);
-    created = new Intl.NumberFormat(spec.locale, {
-      style: spec.style ?? 'decimal',
-      ...(spec.currency === undefined ? {} : { currency: spec.currency }),
-      notation: spec.notation ?? 'standard',
-      ...(minimumFractionDigits === undefined ? {} : { minimumFractionDigits }),
-      ...(maximumFractionDigits === undefined ? {} : { maximumFractionDigits }),
-    });
-  }
+  const created = createChartFormatter(spec);
   if (formatters.size >= MAX_CACHED_FORMATTERS) {
     const oldest = formatters.keys().next().value;
     if (oldest !== undefined) formatters.delete(oldest);

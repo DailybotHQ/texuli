@@ -3,7 +3,10 @@
 **Package:** `@texuli/charts`  
 **Import:** `import { Sparkline, BulletChart, Gauge, ProgressRing } from '@texuli/charts/compact'`
 
-Small single-measure views for tables, cards and KPI rows.
+Small single-measure views for tables, cards and KPI rows. For a first
+screen that only needs the trend and its description, without the data
+table, import `Sparkline` from [`@texuli/charts/sparkline-lite`](charts-sparkline-lite.md)
+instead: same props, no table.
 
 ## Charts
 
