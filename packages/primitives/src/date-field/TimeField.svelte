@@ -19,6 +19,7 @@ let {
   required = false,
   hourCycle,
   minuteStep = 1,
+  labels,
   onValueChange,
   children,
   class: className,
@@ -95,6 +96,42 @@ function changePeriod(next: 'AM' | 'PM'): void {
   }
 }
 
+/** The largest minute on the step grid (45 for a 15-minute step). */
+const lastMinute = $derived(Math.floor(59 / step) * step);
+const KEYS: Record<string, number> = { ArrowUp: 1, ArrowDown: -1, Home: 2, End: -2 };
+
+/**
+ * APG spinbutton keys on a segment: ArrowUp/ArrowDown step (the hour by one,
+ * crossing AM/PM; the minute by `minuteStep`, snapping to the step grid),
+ * both wrapping; Home/End go to the first and last value. An empty segment
+ * starts at its first (ArrowUp, Home) or last (ArrowDown, End) value.
+ */
+function spin(segment: 'hour' | 'minute', event: KeyboardEvent): void {
+  const delta = KEYS[event.key];
+  if (!delta || disabled || event.altKey || event.ctrlKey || event.metaKey) return;
+  event.preventDefault();
+  const up = delta > 0;
+  const raw = segment === 'hour' ? displayHour : displayMinute;
+  const current = Number(raw);
+  // A number input's value is '' or a valid number.
+  const edge = delta * delta > 1 || raw === '';
+  if (segment === 'minute') {
+    const next = edge
+      ? up
+        ? 0
+        : lastMinute
+      : (up ? Math.floor(current / step) + 1 : Math.ceil(current / step) - 1) * step;
+    commit('minute', String(next > lastMinute ? 0 : next < 0 ? lastMinute : next));
+  } else if (edge) {
+    commit('hour', String(up ? (cycle === 12 ? 1 : 0) : cycle === 12 ? 12 : 23));
+  } else {
+    // Step the 24-hour clock, so 11 AM → 12 PM in the 12-hour cycle.
+    const hour24 = (parseHour(current, period, cycle) + delta + 24) % 24;
+    if (cycle === 12) period = dayPeriod(hour24);
+    commit('hour', String(formatHour(hour24, cycle)));
+  }
+}
+
 function isLast(segment: TimeSegment): boolean {
   return segment === order.at(-1);
 }
@@ -102,12 +139,13 @@ function isLast(segment: TimeSegment): boolean {
 
 <div {...rest} class={className} role="group" aria-label={label} data-tx-time-field-root="">
   {#each order as segment (segment)}
-    {#if segment === 'hour'}
-      <input type="number" inputmode="numeric" aria-label="Hour" aria-valuemin={cycle === 12 ? 1 : 0} aria-valuemax={cycle === 12 ? 12 : 23} min={cycle === 12 ? 1 : 0} max={cycle === 12 ? 12 : 23} value={displayHour} {disabled} {required} oninput={(event) => commit('hour', event.currentTarget.value)} />
-    {:else if segment === 'minute'}
-      <input type="number" inputmode="numeric" aria-label="Minute" aria-valuemin="0" aria-valuemax="59" min="0" max="59" step={step} value={displayMinute} {disabled} {required} oninput={(event) => commit('minute', event.currentTarget.value)} />
+    {#if segment !== 'dayPeriod'}
+      {@const hour = segment === 'hour'}
+      {@const low = hour && cycle === 12 ? 1 : 0}
+      {@const high = hour ? (cycle === 12 ? 12 : 23) : 59}
+      <input type="number" inputmode="numeric" aria-label={hour ? (labels?.hour ?? 'Hour') : (labels?.minute ?? 'Minute')} aria-valuemin={low} aria-valuemax={high} min={low} max={high} step={hour ? undefined : step} value={hour ? displayHour : displayMinute} {disabled} {required} oninput={(event) => commit(segment, event.currentTarget.value)} onkeydown={(event) => spin(segment, event)} />
     {:else}
-      <select aria-label="AM or PM" value={period} {disabled} {required} onchange={(event) => changePeriod(event.currentTarget.value === 'PM' ? 'PM' : 'AM')}>
+      <select aria-label={labels?.dayPeriod ?? 'AM or PM'} value={period} {disabled} {required} onchange={(event) => changePeriod(event.currentTarget.value === 'PM' ? 'PM' : 'AM')}>
         <option value="AM">AM</option><option value="PM">PM</option>
       </select>
     {/if}

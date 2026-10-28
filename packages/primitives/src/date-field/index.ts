@@ -23,4 +23,9 @@ export {
   type TimeSegment,
   timeSegmentOrder,
 } from './time.ts';
-export type { DateFieldRootProps, DateSegmentInputProps, TimeFieldRootProps } from './types.ts';
+export type {
+  DateFieldRootProps,
+  DateSegmentInputProps,
+  TimeFieldLabels,
+  TimeFieldRootProps,
+} from './types.ts';

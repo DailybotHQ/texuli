@@ -32,15 +32,20 @@ These are owned, headless pickers following the WAI-ARIA [date picker dialog](ht
 
 | Part | What it is | Props |
 | --- | --- | --- |
-| `DatePicker.Root` | State and the popover | `bind:value` (`YYYY-MM-DD` or `null`), `onValueChange`, `bind:open`, `onOpenChange`, `locale`, `minValue` and `maxValue` (`YYYY-MM-DD`), `isDateUnavailable(CalendarDate)`, `disabled`, `closeOnSelect` (`true`), `labels` |
-| `DateRangePicker.Root` | The same, for a range | `bind:value` (`{ start, end }`, always ordered), and the rest as above; `closeOnSelect` closes when the range is complete |
+| `DatePicker.Root` | State and the popover | `bind:value` (`YYYY-MM-DD` or `null`), `onValueChange`, `bind:open`, `onOpenChange`, `locale`, `minValue` and `maxValue` (`YYYY-MM-DD`), `isDateUnavailable(CalendarDate)`, `today` (`YYYY-MM-DD`; when set, the clock is never read), `weekStartsOn` (`0`–`6`), `onInvalid(text, reason)`, `disabled`, `closeOnSelect` (`true`), `labels` |
+| `DateRangePicker.Root` | The same, for a range | `bind:value` (`{ start, end }`, always ordered), `maxDays`, and the rest as above; `closeOnSelect` closes when the range is complete |
 | `*.Field` | The DateField (single), or a named `role="group"` with start and end DateFields (range) | `label`; `name`, `required` (single); `startName`, `endName` (range). The start field is capped at the end, the end field floored at the start |
 | `*.Trigger` | The button: `aria-haspopup="dialog"`, `aria-expanded`, and a name that says the selected date (`Choose date, selected date is Sunday, March 15, 2026`) | button attributes; `child` snippet |
 | `*.Content` | `role="dialog"`, named by `labels.dialog` | attributes |
 | `DatePicker.Calendar` | The Calendar: previous, heading, next, grid; a `children` snippet replaces them | attributes |
-| `DateRangePicker.Calendar` / `.Grid` | The Calendar's navigation with a range grid: `aria-multiselectable`, and `aria-selected` on every day of the range | attributes |
+| `DateRangePicker.Calendar` / `.Grid` | The Calendar's navigation with a range grid: `aria-multiselectable`, and `aria-selected` on every day of the range | attributes; a `.Grid` `onkeydown` runs first and `preventDefault()` in it skips the grid's keys |
 
-The range grid marks days with `data-range-start`, `data-range-end`, `data-in-range` and `data-preview` (while the end is pending, the range previews to the hovered or focused day). Every string is translatable (`labels`: `trigger`, `triggerWithValue` with `{date}`, `dialog`, `previousMonth`, `nextMonth`, `start`, `end`).
+The range grid marks days with `data-range-start`, `data-range-end`, `data-in-range` and `data-preview` (while the end is pending, the range previews to the hovered or focused day). Every string is translatable (`labels`: `trigger`, `triggerWithValue` with `{date}`, `dialog`, `previousMonth`, `nextMonth`, `start`, `end`, `tooLong` with `{max}`).
+
+- **`today`:** passed to the Calendar as its today (`aria-current="date"` and the starting day). With it, neither picker reads `Date.now()` or `new Date()`.
+- **`maxDays`:** the longest range, both ends included. A longer second pick or typed end is refused: the value stays, the end stays pending, `onInvalid('start/end', 'too-long')` runs and the grid's polite `role="status"` announces `labels.tooLong`.
+- **`onInvalid(text, reason)`:** the fields report complete typed text that is not a date (`invalid`) or is out of bounds (`out-of-range`), once per text (see the DateField).
+- **A range grid outside a picker:** `provideDateRange(state)` supplies the `DateRangeState` (`start`, `end`, `pending`, `message`, `setStart`, `setEnd`, `pick`) to a `DateRangePicker.Grid` inside a plain `Calendar.Root`; the styled `Calendar`'s range mode uses it. `rangeDays(start, end)` counts a range's days, both ends included.
 
 ## Keyboard, pointer and touch
 
@@ -59,11 +64,13 @@ The range grid marks days with `data-range-start`, `data-range-end`, `data-in-ra
 
 ## Behavior and tests
 
-- **Unit:** `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/forms.test.ts`, **8 tests** (`-t date-picker`):
+- **Unit:** `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/forms.test.ts`, **11 tests** (`-t date-picker`):
   - helpers (canonical parsing, range order and membership);
   - `closeOnSelect`;
   - opening focus when today is unavailable, after a minimum, and on a range start;
-  - range: ordering an end picked first, and the range fields.
+  - range: ordering an end picked first, and the range fields;
+  - `today` and `weekStartsOn` with the clock stubbed to throw; `maxDays` refusing a picked and a typed range, with the announcement.
+- **Unit (`-t calendar`):** the range grid composes a caller `onkeydown` (and `preventDefault()` skips the grid's keys).
 - **Browser:** `tests/behavior/scenarios/date-picker.spec.ts`, **11 rows** on Chromium, WebKit and the Pixel 7:
   - the trigger's state, focus on the selected date, and the named dialog;
   - arrows plus Enter choose, then focus returns; PageDown;
@@ -75,10 +82,10 @@ The range grid marks days with `data-range-start`, `data-range-end`, `data-in-ra
 
 ## Size
 
-With `@texuli/date`, `@texuli/primitives/date-picker` measures **20.26 KiB** gzip (`pnpm size --filter primitives`, 2026-10-27), within its 29 KiB budget. Its composed primitives include:
-- the Calendar (5.15 KiB);
+With `@texuli/date`, `@texuli/primitives/date-picker` measures **21.12 KiB** gzip (`pnpm size --filter primitives`, 2026-10-28), within its 29 KiB budget. Its composed primitives include:
+- the Calendar (5.29 KiB);
 - the Popover (11.88 KiB);
-- the DateField (3.40 KiB).
+- the DateField (3.96 KiB).
 
 The pickers' own code is a few KiB. When this page was first written (31.19 KiB) the Popover bundled its modal features statically; it now loads them lazily (a 4.37 KiB chunk) only for `modal`, which this non-modal picker never sets.
 

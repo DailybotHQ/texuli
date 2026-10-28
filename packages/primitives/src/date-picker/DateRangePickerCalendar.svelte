@@ -10,6 +10,7 @@ const range = getRange();
 const start = $derived(toCalendarDate(range.start));
 const min = $derived(toCalendarDate(shell.minValue));
 const max = $derived(toCalendarDate(shell.maxValue));
+const todayDate = $derived(toCalendarDate(shell.today));
 </script>
 
 <div {...rest} data-tx-date-picker-calendar>
@@ -18,6 +19,8 @@ const max = $derived(toCalendarDate(shell.maxValue));
     value={null}
     {...start ? { defaultFocusedValue: start } : {}}
     locale={shell.locale}
+    {...todayDate ? { today: todayDate } : {}}
+    {...shell.weekStartsOn !== undefined ? { weekStartsOn: shell.weekStartsOn } : {}}
     {...min ? { minValue: min } : {}}
     {...max ? { maxValue: max } : {}}
     {...shell.isDateUnavailable ? { isDateUnavailable: shell.isDateUnavailable } : {}}

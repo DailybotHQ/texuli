@@ -1,6 +1,6 @@
 /**
- * Date components: field with segments and a calendar button, the calendar
- * dialog, the calendar grid (single and range) and range presets.
+ * Date components: field with segments and a calendar button, the time
+ * field (hour, minute and AM/PM segments), the calendar dialog, the calendar grid (single and range) and range presets.
  * Colors are contract pairs held to AA: primary/primary-foreground for the
  * chosen day and a range's ends, and
  * surface/muted foregrounds elsewhere; selection/selection-foreground for the
@@ -89,6 +89,27 @@
   .tx-date__field input[aria-label="Year"],
   .tx-date__field input:last-of-type {
     inline-size: 5.5ch;
+  }
+
+  .tx-date--time .tx-date__field input,
+  .tx-date--time .tx-date__field input:last-of-type {
+    inline-size: 3.5ch;
+  }
+
+  .tx-date__field select {
+    min-block-size: var(--tx-target-size, 2rem);
+    padding-inline: 0.25rem;
+    border: 0;
+    border-radius: calc(var(--tx-radius, 0.5rem) * 0.5);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  .tx-date__field select:focus-visible {
+    outline: none;
+    background: var(--tx-accent, Highlight);
+    color: var(--tx-accent-foreground, HighlightText);
   }
 
   .tx-date__field input::-webkit-inner-spin-button,

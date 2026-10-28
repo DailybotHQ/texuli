@@ -20,9 +20,20 @@ let startTime = $state<string | null>('17:05');
 ```
 
 The DateField rejects impossible dates and values outside its optional ISO
-`min`/`max` bounds. TimeField accepts `hourCycle={12 | 24}` (otherwise it
-uses the locale's cycle) and a `minuteStep`; values remain 24-hour strings.
-Each segment is a native spinbutton for keyboard and touch accessibility.
+`min`/`max` bounds. `onInvalid(text, reason)` reports a refused entry once
+it is complete (a month, a day and a four-digit year): `invalid` for a date
+that does not exist (`2/30/2026`) and `out-of-range` outside `min`/`max`.
+`text` is the segments in locale order; the segments carry
+`aria-invalid="true"` until the entry is fixed.
+
+TimeField accepts `hourCycle={12 | 24}` (otherwise it uses the locale's
+cycle), a `minuteStep` and `labels` (`hour`, `minute`, `dayPeriod`); values
+remain 24-hour strings. Each segment is a native spinbutton for keyboard and
+touch accessibility, with the APG spinbutton keys: ArrowUp and ArrowDown step
+the hour by one (crossing AM and PM in the 12-hour cycle) and the minute by
+`minuteStep` (snapping to the step), both wrapping; Home and End go to the
+first and last value. An empty segment starts at its first value (ArrowUp)
+or its last (ArrowDown).
 
 Validation: `pnpm vitest run packages/primitives/tests/models.test.ts packages/primitives/tests/forms.test.ts`,
 `TEXULI_E2E_PORT=4790 pnpm exec playwright test tests/behavior/scenarios/date-field.spec.ts`,

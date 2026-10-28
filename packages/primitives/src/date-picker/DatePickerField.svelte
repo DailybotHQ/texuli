@@ -27,4 +27,5 @@ const single = getSingle();
   disabled={shell.disabled}
   {...shell.minValue ? { min: shell.minValue } : {}}
   {...shell.maxValue ? { max: shell.maxValue } : {}}
+  {...shell.onInvalid ? { onInvalid: shell.onInvalid } : {}}
 />

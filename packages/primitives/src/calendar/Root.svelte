@@ -3,6 +3,7 @@ import { directionOf } from '@texuli/core/dir-locale';
 import {
   type CalendarDate,
   type CalendarIdentifier,
+  today as clockToday,
   createCalendar,
   type DayOfWeek,
   getLocalTimeZone,
@@ -11,7 +12,7 @@ import {
   startOfMonth,
   startOfWeek,
   toCalendar,
-  today,
+  weekStartDay,
 } from '@texuli/date';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
@@ -25,7 +26,14 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onchange'> & {
   defaultFocusedValue?: CalendarDate;
   locale?: string;
   calendar?: CalendarIdentifier;
+  /** First day of the week, `0` (Sunday) to `6` (Saturday); default the locale's. */
   weekStartsOn?: number;
+  /**
+   * The day marked as today (and the starting day when nothing is selected).
+   * When given, the calendar never reads the clock: pass a simulated or
+   * server-provided day for deterministic rendering.
+   */
+  today?: CalendarDate;
   minValue?: CalendarDate;
   maxValue?: CalendarDate;
   isDateUnavailable?: (date: CalendarDate) => boolean;
@@ -47,6 +55,7 @@ let {
   locale = 'en-US',
   calendar: calendarId = 'gregory',
   weekStartsOn,
+  today: todayValue,
   minValue,
   maxValue,
   isDateUnavailable,
@@ -62,13 +71,14 @@ let {
 }: Props = $props();
 
 const calendar = $derived(createCalendar(calendarId));
-const weekDayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
-const firstDayOfWeek = $derived<DayOfWeek | undefined>(
-  weekStartsOn === undefined ? undefined : weekDayNames[weekStartsOn]
-);
+const firstDayOfWeek = $derived<DayOfWeek | undefined>(weekStartDay(weekStartsOn));
+/** Today: the `today` prop when given (the clock is never read then), else the local day. */
+function currentDay(): CalendarDate {
+  return todayValue ?? clockToday(getLocalTimeZone());
+}
 const controlledValue = value !== undefined;
 const initialDate = untrack(() =>
-  toCalendar(defaultFocusedValue ?? value ?? defaultValue ?? today(getLocalTimeZone()), calendar)
+  toCalendar(defaultFocusedValue ?? value ?? defaultValue ?? currentDay(), calendar)
 );
 // svelte-ignore state_referenced_locally -- initial focus seeds the uncontrolled calendar once.
 let localFocusedValue = $state(untrack(() => firstEnabledFocus(initialDate)));
@@ -298,7 +308,7 @@ const context: CalendarContextValue = {
     return currentValue?.compare(date) === 0;
   },
   isToday(date) {
-    return date.compare(toCalendar(today(getLocalTimeZone()), calendar)) === 0;
+    return date.compare(toCalendar(currentDay(), calendar)) === 0;
   },
   isDisabled: isDisabledDate,
   dateLabel(date) {

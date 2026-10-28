@@ -1,6 +1,12 @@
 <script lang="ts">
 import type { CalendarDate } from '@texuli/primitives/calendar';
-import { type DateRange, DateRangePicker as Primitive } from '@texuli/primitives/date-picker';
+import {
+  type DateInvalidHandler,
+  type DateRange,
+  DateRangePicker as Primitive,
+  rangeDays,
+  rangeLimit,
+} from '@texuli/primitives/date-picker';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import CalendarIcon from './CalendarIcon.svelte';
 import type { DateLabels } from './labels.ts';
@@ -32,8 +38,17 @@ interface Props {
    * (relative to `today`), a list of your own, or `false` for none.
    */
   presets?: boolean | readonly DateRangePreset[];
-  /** The day presets count from (`YYYY-MM-DD`); default the local day. */
+  /**
+   * Today (`YYYY-MM-DD`): the day presets count from and the calendar marks;
+   * when set, the clock is never read. Default the local day.
+   */
   today?: string;
+  /** First day of the week, `0` (Sunday) to `6` (Saturday); default the locale's. */
+  weekStartsOn?: number;
+  /** The longest range in days, both ends included; longer ranges are refused and announced. */
+  maxDays?: number;
+  /** Typed text that is not a real date or is out of bounds, and refused ranges (`too-long`). */
+  onInvalid?: DateInvalidHandler;
   size?: DateSize;
   labels?: DateLabels;
   class?: ClassValue;
@@ -55,6 +70,9 @@ let {
   endName,
   presets = false,
   today,
+  weekStartsOn,
+  maxDays,
+  onInvalid,
   size = 'md',
   labels,
   class: className,
@@ -68,11 +86,16 @@ const describedBy = $derived(
   [description ? descriptionId : '', error ? errorId : ''].filter(Boolean).join(' ') || undefined
 );
 const presetList = $derived(
-  presets === true
+  (presets === true
     ? dateRangePresets(today, labels?.presetLabels)
     : presets === false
       ? []
       : [...presets]
+  ).filter((preset) => {
+    // A preset longer than maxDays would bypass the limit: it is not offered.
+    const limit = rangeLimit(maxDays);
+    return limit === undefined || rangeDays(preset.start, preset.end) <= limit;
+  })
 );
 const active = $derived(matchingPreset(presetList, value.start, value.end));
 
@@ -97,6 +120,10 @@ function choose(preset: DateRangePreset): void {
     {...minValue ? { minValue } : {}}
     {...maxValue ? { maxValue } : {}}
     {...isDateUnavailable ? { isDateUnavailable } : {}}
+    {...today ? { today } : {}}
+    {...weekStartsOn !== undefined ? { weekStartsOn } : {}}
+    {...maxDays !== undefined ? { maxDays } : {}}
+    {...onInvalid ? { onInvalid } : {}}
     {disabled}
     {...labels ? { labels } : {}}
     {...onValueChange ? { onValueChange } : {}}
