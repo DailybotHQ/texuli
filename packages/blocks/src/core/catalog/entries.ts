@@ -12,7 +12,11 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = Object.freeze([
     family: 'text',
     useWhen: ['Introduce a section or slide title with a clear hierarchy.'],
     dontUseWhen: ['Long body copy — use a text block instead.'],
-    limits: [`text ≤ ${BLOCK_CONTENT_LIMITS.heading} characters`, 'level 1–4'],
+    limits: [
+      `text ≤ ${BLOCK_CONTENT_LIMITS.heading} characters`,
+      'level 1–4',
+      'align: start | center',
+    ],
     a11y: 'Rendered as the matching heading level; keep one h1 per page when possible.',
     exampleMinimal: { type: 'heading', level: 2, text: 'Section title' },
     exampleRich: {
@@ -21,6 +25,7 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = Object.freeze([
       text: 'Northwind quarterly review',
       eyebrow: 'Q3 2026',
       subtitle: 'Fictional example data only',
+      align: 'center',
       id: 'title',
     },
   },
@@ -30,12 +35,16 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = Object.freeze([
     family: 'text',
     useWhen: ['Body copy with light markdown emphasis.'],
     dontUseWhen: ['A single short label — use heading or list item text.'],
-    limits: [`markdown ≤ ${BLOCK_CONTENT_LIMITS.markdown} characters`],
+    limits: [
+      `markdown ≤ ${BLOCK_CONTENT_LIMITS.markdown} characters`,
+      'size: sm | md | lg; align: start | center',
+    ],
     a11y: 'Markdown is parsed to semantic elements; no raw HTML.',
     exampleMinimal: { type: 'text', markdown: 'A short paragraph.' },
     exampleRich: {
       type: 'text',
       markdown: 'Northwind Labs is a **fictional** company.\n\nEvery number below is example data.',
+      size: 'lg',
     },
   },
   {
@@ -44,13 +53,16 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = Object.freeze([
     family: 'text',
     useWhen: ['Three or more parallel points or steps.'],
     dontUseWhen: ['A single sentence — use text.'],
-    limits: [`≤ ${BLOCK_CONTENT_LIMITS.listItems} items`],
-    a11y: 'Rendered as ul or ol; items stay plain text or light markdown.',
+    limits: [
+      `≤ ${BLOCK_CONTENT_LIMITS.listItems} items`,
+      'style: bullet | number | check (item done) | icon (item icon)',
+    ],
+    a11y: 'Rendered as ul or ol; check items are named Done or Not done.',
     exampleMinimal: { type: 'list', items: [{ text: 'First item' }] },
     exampleRich: {
       type: 'list',
-      ordered: true,
-      items: [{ text: 'Plan' }, { text: 'Ship' }, { text: 'Measure' }],
+      style: 'check',
+      items: [{ text: 'Plan', done: true }, { text: 'Ship', done: true }, { text: 'Measure' }],
     },
   },
   {
@@ -59,13 +71,18 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = Object.freeze([
     family: 'text',
     useWhen: ['A short pull quote or testimonial.'],
     dontUseWhen: ['Long body copy — use text.'],
-    limits: [`quote ≤ ${BLOCK_CONTENT_LIMITS.shortMarkdown} characters`],
-    a11y: 'Uses the blockquote element; cite is optional plain text.',
+    limits: [
+      `quote ≤ ${BLOCK_CONTENT_LIMITS.shortMarkdown} characters`,
+      'avatar: like image src (no remote URLs)',
+    ],
+    a11y: 'Uses the blockquote element; cite and role are optional plain text.',
     exampleMinimal: { type: 'quote', quote: 'Ship small pieces.' },
     exampleRich: {
       type: 'quote',
       quote: 'Small pieces. Infinite possibilities.',
-      cite: 'Texuli docs (fictional)',
+      cite: 'Ada Example',
+      role: 'Head of Design (fictional)',
+      avatar: 'avatar:av-007',
       tone: 'accent',
     },
   },
@@ -75,13 +92,17 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = Object.freeze([
     family: 'text',
     useWhen: ['Highlight a warning, tip or summary beside the main flow.'],
     dontUseWhen: ['Primary body content — use text.'],
-    limits: [`body ≤ ${BLOCK_CONTENT_LIMITS.shortMarkdown} characters`],
+    limits: [
+      `body ≤ ${BLOCK_CONTENT_LIMITS.shortMarkdown} characters`,
+      'icon: a kebab-case icon name',
+    ],
     a11y: 'Tone maps to theme tokens with AA contrast; title is optional.',
     exampleMinimal: { type: 'callout', body: 'Remember the limits.' },
     exampleRich: {
       type: 'callout',
       title: 'Summary',
       body: 'Median response fell while volume grew **18%**.',
+      icon: 'info',
       tone: 'info',
     },
   },
@@ -91,10 +112,10 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = Object.freeze([
     family: 'structure',
     useWhen: ['Separate two sections visually.'],
     dontUseWhen: ['Nesting content — use columns or headings.'],
-    limits: ['No text fields'],
-    a11y: 'Presented as a thematic break (hr); ignore for screen-reader flow when decorative.',
+    limits: ['variant: line | space; label (line only)'],
+    a11y: 'A thematic break (hr); a label names it.',
     exampleMinimal: { type: 'divider' },
-    exampleRich: { type: 'divider', tone: 'neutral' },
+    exampleRich: { type: 'divider', label: 'Part two', tone: 'neutral' },
   },
   {
     type: 'code',
@@ -297,6 +318,7 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = Object.freeze([
       `≤ ${BLOCK_CONTENT_LIMITS.cards} items`,
       'columns 2–4 optional',
       'href uses the untrusted URL policy',
+      'icon: a kebab-case icon name',
     ],
     a11y: 'Linked cards are single anchors with a visible title; rejected hrefs stay non-interactive.',
     exampleMinimal: {
@@ -313,6 +335,7 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = Object.freeze([
       items: [
         {
           title: 'Design system',
+          icon: 'check',
           eyebrow: 'Tokens',
           body: 'Palettes, type and density.',
           href: 'https://example.com/design',
@@ -499,18 +522,29 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = Object.freeze([
     family: 'data',
     useWhen: ['Show a few key figures with short labels.'],
     dontUseWhen: ['A full KPI dashboard — prefer kpi with denser cards.'],
-    limits: [`≤ ${BLOCK_CONTENT_LIMITS.statItems} items`],
-    a11y: 'Each stat is a labeled value; deltas are plain text.',
+    limits: [
+      `≤ ${BLOCK_CONTENT_LIMITS.statItems} items`,
+      `trend: 2–${BLOCK_CONTENT_LIMITS.trendPoints} numbers`,
+    ],
+    a11y: 'Each stat is a labeled value; deltas are plain text; a title names the group.',
     exampleMinimal: {
       type: 'stat',
       items: [{ label: 'Active', value: '128' }],
     },
     exampleRich: {
       type: 'stat',
+      title: 'Northwind this quarter',
       items: [
-        { label: 'Active seats', value: '128', delta: '+12%', tone: 'success' },
+        {
+          label: 'Active seats',
+          value: '128',
+          delta: '+12%',
+          tone: 'success',
+          trend: [96, 104, 117, 128],
+        },
         { label: 'Median latency', value: '42 ms', tone: 'info' },
       ],
+      source: 'Fictional sample data',
     },
   },
   {

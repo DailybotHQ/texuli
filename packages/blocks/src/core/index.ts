@@ -96,15 +96,24 @@ export {
   parsePlainText,
 } from './schema/primitives.ts';
 export {
+  BLOCK_ALIGNS,
   BLOCK_FAMILIES,
+  BLOCK_ICON_NAME,
   BLOCK_REVEALS,
+  BLOCK_TEXT_SIZES,
   BLOCK_TONES,
+  type BlockAlign,
   type BlockFamily,
   type BlockReveal,
+  type BlockTextSize,
   type BlockTone,
+  DIVIDER_VARIANTS,
+  type DividerVariant,
   isBlockFamily,
   isBlockReveal,
   isBlockTone,
+  LIST_STYLES,
+  type ListStyle,
 } from './schema/vocabulary.ts';
 export {
   blockText,

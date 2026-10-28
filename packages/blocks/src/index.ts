@@ -6,6 +6,7 @@
 
 export {
   CODE_BLOCK_TYPES,
+  type CodeBlockBarContext,
   type CodeBlockCheck,
   type CodeBlockLabelOverrides,
   type CodeBlockLabels,
@@ -119,6 +120,7 @@ export {
   type StructureFamilyBlockType,
 } from './structure/index.ts';
 export {
+  type BlockIconResolver,
   checkTextBlock,
   isTextFamilyBlock,
   loadTextFamily,

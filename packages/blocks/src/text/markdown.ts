@@ -47,18 +47,92 @@ export const MARKDOWN_LIMITS = /* @__PURE__ */ Object.freeze({
   inlineDepth: 6,
 });
 
-const FENCE = /^ {0,3}(`{3,}|~{3,})\s*([a-z][a-z0-9+-]{0,31})?\s*$/i;
-const HEADING = /^ {0,3}(#{1,6})(?:[ \t]+(.*?))?[ \t]*#*[ \t]*$/;
-const RULE = /^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/;
-const QUOTE = /^ {0,3}> ?(.*)$/;
-const BULLET = /^( {0,3})([-*+])[ \t]+(.*)$/;
-const ORDERED = /^( {0,3})(\d{1,9})[.)][ \t]+(.*)$/;
+// Line readers stay linear on hostile lines (every text field allows 4,000
+// characters of untrusted agent text). Heading, fence and rule lines are read
+// by hand: their regex forms had neighboring quantifiers over the same spaces
+// and backtracked quadratically or worse (`# a` + 2,000 spaces + `x` took over
+// 20 s). The remaining patterns are anchored, their quantifiers never overlap,
+// and `.` uses the `s` flag so a stray line separator never makes a `(.*)$`
+// tail backtrack.
+const FENCE_OPEN = /^ {0,3}(`{3,}|~{3,})/;
+const FENCE_LANG = /^[a-z][a-z0-9+-]{0,31}$/i;
+const QUOTE = /^ {0,3}> ?(.*)$/s;
+const BULLET = /^( {0,3})([-*+])[ \t]+(.*)$/s;
+const ORDERED = /^( {0,3})(\d{1,9})[.)][ \t]+(.*)$/s;
 const TASK = /^\[([ xX])\][ \t]+/;
 
 /** Parses validated block text into the closed Markdown tree. */
 export function parseMarkdown(source: string): MdDocument {
-  const text = String(source).slice(0, MARKDOWN_LIMITS.source).replace(/\r\n?/g, '\n');
+  // CR LF, CR, U+2028 and U+2029 all end a line: JavaScript regexes treat the
+  // last two as line terminators, so no line may keep one.
+  const text = String(source)
+    .slice(0, MARKDOWN_LIMITS.source)
+    .replace(/\r\n?|[\u2028\u2029]/g, '\n');
   return { blocks: parseBlocks(text.split('\n'), 0) };
+}
+
+const isSpace = (char: string | undefined) => char === ' ' || char === '\t';
+
+/** Leading spaces (not tabs), counted up to `max + 1`. */
+function indentOf(line: string, max: number): number {
+  let n = 0;
+  while (n <= max && line[n] === ' ') n += 1;
+  return n;
+}
+
+/** A fence opening line: its marker and the optional language. */
+function readFence(line: string): { marker: string; lang: string | undefined } | null {
+  const open = FENCE_OPEN.exec(line);
+  if (!open) return null;
+  const info = line.slice(open[0].length).trim();
+  if (info !== '' && !FENCE_LANG.test(info)) return null;
+  return { marker: open[1] as string, lang: info ? info.toLowerCase() : undefined };
+}
+
+/**
+ * An ATX heading line, read the way the old pattern did: up to six `#` (a
+ * seventh or later reads as part of the closing run), then text after a space
+ * or tab, with trailing spaces, the closing `#` run and the spaces before it
+ * dropped from the end. Index scans only: linear in the line.
+ */
+function readHeading(line: string): { level: 1 | 2 | 3 | 4 | 5 | 6; text: string } | null {
+  const indent = indentOf(line, 3);
+  if (indent > 3 || line[indent] !== '#') return null;
+  let at = indent;
+  while (at < indent + 6 && line[at] === '#') at += 1;
+  const level = (at - indent) as 1 | 2 | 3 | 4 | 5 | 6;
+  const rest = line.slice(at);
+  let start = 0;
+  while (isSpace(rest[start])) start += 1;
+  let end = rest.length;
+  while (end > start && isSpace(rest[end - 1])) end -= 1;
+  while (end > start && rest[end - 1] === '#') end -= 1;
+  while (end > start && isSpace(rest[end - 1])) end -= 1;
+  // Without a space or tab after the opening run, only a closing run may follow.
+  if (start === 0 && end > 0) return null;
+  return { level, text: rest.slice(start, end) };
+}
+
+/** A thematic break: three or more of one of `-`, `*` or `_`, spaces and tabs between. */
+function isRule(line: string): boolean {
+  const at = indentOf(line, 3);
+  if (at > 3) return false;
+  const marker = line[at];
+  if (marker !== '-' && marker !== '*' && marker !== '_') return false;
+  let count = 0;
+  for (let i = at; i < line.length; i += 1) {
+    const char = line[i];
+    if (char === marker) count += 1;
+    else if (!isSpace(char)) return false;
+  }
+  return count >= 3;
+}
+
+/** Two or more leading spaces, then a non-whitespace character. */
+function isIndented(line: string): boolean {
+  let at = 0;
+  while (line[at] === ' ') at += 1;
+  return at >= 2 && at < line.length && /\S/.test(line[at] as string);
 }
 
 function isBlank(line: string): boolean {
@@ -76,9 +150,9 @@ function listMarker(line: string): { ordered: boolean; start: number; content: s
 /** True when `line` starts a block other than a paragraph continuation. */
 function startsBlock(line: string): boolean {
   return (
-    FENCE.test(line) ||
-    HEADING.test(line) ||
-    RULE.test(line) ||
+    readFence(line) !== null ||
+    readHeading(line) !== null ||
+    isRule(line) ||
     QUOTE.test(line) ||
     listMarker(line) !== null
   );
@@ -94,9 +168,9 @@ function parseBlocks(lines: readonly string[], depth: number): MdBlock[] {
       continue;
     }
 
-    const fence = FENCE.exec(line);
+    const fence = readFence(line);
     if (fence) {
-      const marker = fence[1] ?? '```';
+      const marker = fence.marker;
       const body: string[] = [];
       i += 1;
       while (i < lines.length && !(lines[i] ?? '').trim().startsWith(marker)) {
@@ -104,19 +178,22 @@ function parseBlocks(lines: readonly string[], depth: number): MdBlock[] {
         i += 1;
       }
       i += 1; // closing fence (or end of input)
-      blocks.push({ type: 'code', lang: fence[2]?.toLowerCase(), text: body.join('\n') });
+      blocks.push({ type: 'code', lang: fence.lang, text: body.join('\n') });
       continue;
     }
 
-    const heading = HEADING.exec(line);
+    const heading = readHeading(line);
     if (heading) {
-      const level = (heading[1] ?? '#').length as 1 | 2 | 3 | 4 | 5 | 6;
-      blocks.push({ type: 'heading', level, children: parseInline(heading[2] ?? '', 0) });
+      blocks.push({
+        type: 'heading',
+        level: heading.level,
+        children: parseInline(heading.text, 0),
+      });
       i += 1;
       continue;
     }
 
-    if (RULE.test(line)) {
+    if (isRule(line)) {
       blocks.push({ type: 'rule' });
       i += 1;
       continue;
@@ -175,14 +252,14 @@ function parseList(
       const next = lines[i] ?? '';
       if (isBlank(next)) {
         const after = lines[i + 1] ?? '';
-        if (/^ {2,}\S/.test(after)) {
+        if (isIndented(after)) {
           body.push('');
           i += 1;
           continue;
         }
         break;
       }
-      if (/^ {2,}\S/.test(next)) {
+      if (isIndented(next)) {
         body.push(next.replace(/^ {2,4}/, ''));
         i += 1;
         continue;
@@ -207,10 +284,82 @@ function parseList(
 }
 
 const ESCAPABLE = /[\\`*_{}[\]()#+\-.!~<>|]/;
+const AUTOLINK = /<((?:https?:\/\/|mailto:)[^\s<>]+)>/iy;
+const LINK_TARGET = /\(\s*<?((?:[^\s()<>]|\([^\s()<>]*\))*)>?(?:\s+"[^"\n]*")?\s*\)/y;
+
+type EmphasisMarker = '**' | '__' | '~~' | '*' | '_';
+
+type InlineScan = {
+  /** The first closing `marker` at or after `from`, or -1. */
+  closer: (marker: EmphasisMarker, from: number) => number;
+  /** The `]` that balances the `[` at `at`, or -1. */
+  labelEnd: (at: number) => number;
+};
+
+/**
+ * Closer and bracket lookups for one inline source, each table built on
+ * first use in one pass. A forward scan per opener made a run of unclosed
+ * `*`, `_`, `~~` or `[` quadratic; with the tables every lookup is constant
+ * time and a parse stays linear in the source.
+ */
+function inlineScan(source: string): InlineScan {
+  const n = source.length;
+  const closers = new Map<EmphasisMarker, Int32Array>();
+  let labels: Int32Array | undefined;
+  return {
+    // The old forward search, right to left: a closer is not after whitespace
+    // or a backslash, not doubled (`*` before `*`) and not inside a word (`_`);
+    // a rejected doubled marker skips its twin.
+    closer(marker, from) {
+      let table = closers.get(marker);
+      if (!table) {
+        table = new Int32Array(n + 3).fill(-1);
+        for (let p = n - 1; p >= 0; p -= 1) {
+          if (!source.startsWith(marker, p)) {
+            table[p] = table[p + 1] as number;
+            continue;
+          }
+          const before = source[p - 1] ?? '';
+          const after = source[p + marker.length] ?? '';
+          const doubled = marker.length === 1 && after === marker;
+          table[p] =
+            !/\s/.test(before) &&
+            before !== '\\' &&
+            !doubled &&
+            !(marker[0] === '_' && /[\p{L}\p{N}]/u.test(after))
+              ? p
+              : (table[p + (doubled ? 2 : 1)] as number);
+        }
+        closers.set(marker, table);
+      }
+      return from < n ? (table[from] as number) : -1;
+    },
+    // Brackets balance on a stack; escaped characters are skipped (an escaped
+    // `[` never opens, and the inline loop never reaches one), and a blank
+    // line closes every open label.
+    labelEnd(at) {
+      if (!labels) {
+        labels = new Int32Array(n).fill(-1);
+        const open: number[] = [];
+        for (let j = 0; j < n; j += 1) {
+          const c = source[j];
+          if (c === '\\') j += 1;
+          else if (c === '[') open.push(j);
+          else if (c === ']') {
+            const start = open.pop();
+            if (start !== undefined) labels[start] = j;
+          } else if (c === '\n' && source[j + 1] === '\n') open.length = 0;
+        }
+      }
+      return labels[at] ?? -1;
+    },
+  };
+}
 
 /** Parses inline Markdown; `depth` caps nested emphasis and links. */
 export function parseInline(source: string, depth: number, inLink = false): MdInline[] {
   const out: MdInline[] = [];
+  const scan = inlineScan(source);
   let buffer = '';
   const flush = () => {
     if (buffer) out.push({ type: 'text', text: buffer });
@@ -236,8 +385,12 @@ export function parseInline(source: string, depth: number, inLink = false): MdIn
     }
 
     if (ch === '\n') {
-      if (/ {2,}$/.test(buffer)) {
-        buffer = buffer.replace(/ +$/, '');
+      // Count trailing spaces by hand: an unanchored `/ {2,}$/` rescans the
+      // whole buffer from every space (quadratic in a long run of spaces).
+      let spaces = 0;
+      while (buffer.charCodeAt(buffer.length - 1 - spaces) === 32) spaces += 1;
+      if (spaces >= 2) {
+        buffer = buffer.slice(0, buffer.length - spaces);
         flush();
         out.push({ type: 'break' });
       } else {
@@ -248,25 +401,27 @@ export function parseInline(source: string, depth: number, inLink = false): MdIn
     }
 
     if (ch === '`') {
-      const run = /^`+/.exec(source.slice(i))?.[0] ?? '`';
-      const close = source.indexOf(run, i + run.length);
+      let length = 1;
+      while (source[i + length] === '`') length += 1;
+      const run = '`'.repeat(length);
+      const close = source.indexOf(run, i + length);
       if (close !== -1) {
         flush();
-        const code = source.slice(i + run.length, close).replace(/\n/g, ' ');
+        const code = source.slice(i + length, close).replace(/\n/g, ' ');
         out.push({
           type: 'code',
-          text: code.length > 2 && /^ .* $/.test(code) ? code.slice(1, -1) : code,
+          text: code.length > 2 && code[0] === ' ' && code.endsWith(' ') ? code.slice(1, -1) : code,
         });
-        i = close + run.length;
+        i = close + length;
         continue;
       }
       buffer += run;
-      i += run.length;
+      i += length;
       continue;
     }
 
     if (depth < MARKDOWN_LIMITS.inlineDepth) {
-      const emphasis = matchEmphasis(source, i);
+      const emphasis = matchEmphasis(source, i, scan);
       if (emphasis) {
         flush();
         out.push({
@@ -282,7 +437,7 @@ export function parseInline(source: string, depth: number, inLink = false): MdIn
       }
 
       if (ch === '!' && source[i + 1] === '[') {
-        const image = matchLink(source, i + 1);
+        const image = matchLink(source, i + 1, scan);
         if (image) {
           // Images are not loaded from text blocks: keep the alt text only.
           buffer += source.slice(image.labelStart, image.labelEnd);
@@ -292,7 +447,7 @@ export function parseInline(source: string, depth: number, inLink = false): MdIn
       }
 
       if (ch === '[' && !inLink) {
-        const link = matchLink(source, i);
+        const link = matchLink(source, i, scan);
         if (link) {
           flush();
           out.push({
@@ -306,7 +461,8 @@ export function parseInline(source: string, depth: number, inLink = false): MdIn
       }
 
       if (ch === '<' && !inLink) {
-        const auto = /^<((?:https?:\/\/|mailto:)[^\s<>]+)>/i.exec(source.slice(i));
+        AUTOLINK.lastIndex = i;
+        const auto = AUTOLINK.exec(source);
         if (auto?.[1]) {
           flush();
           out.push({
@@ -327,33 +483,27 @@ export function parseInline(source: string, depth: number, inLink = false): MdIn
   return out;
 }
 
+const EMPHASIS: readonly { marker: EmphasisMarker; type: 'strong' | 'em' | 'del' }[] = [
+  { marker: '**', type: 'strong' },
+  { marker: '__', type: 'strong' },
+  { marker: '~~', type: 'del' },
+  { marker: '*', type: 'em' },
+  { marker: '_', type: 'em' },
+];
+
 function matchEmphasis(
   source: string,
-  at: number
+  at: number,
+  scan: InlineScan
 ): { type: 'strong' | 'em' | 'del'; innerStart: number; innerEnd: number; end: number } | null {
-  const candidates: { marker: string; type: 'strong' | 'em' | 'del' }[] = [
-    { marker: '**', type: 'strong' },
-    { marker: '__', type: 'strong' },
-    { marker: '~~', type: 'del' },
-    { marker: '*', type: 'em' },
-    { marker: '_', type: 'em' },
-  ];
-  for (const { marker, type } of candidates) {
+  for (const { marker, type } of EMPHASIS) {
     if (!source.startsWith(marker, at)) continue;
     const innerStart = at + marker.length;
     const first = source[innerStart] ?? '';
     if (first === '' || /\s/.test(first)) continue;
     // `_` inside a word (snake_case) is literal.
     if (marker[0] === '_' && /[\p{L}\p{N}]/u.test(source[at - 1] ?? '')) continue;
-    let close = source.indexOf(marker, innerStart + 1);
-    while (close !== -1) {
-      const before = source[close - 1] ?? '';
-      const after = source[close + marker.length] ?? '';
-      const doubled = marker.length === 1 && after === marker;
-      const midWord = marker[0] === '_' && /[\p{L}\p{N}]/u.test(after);
-      if (!/\s/.test(before) && before !== '\\' && !doubled && !midWord) break;
-      close = source.indexOf(marker, close + (doubled ? 2 : 1));
-    }
+    const close = scan.closer(marker, innerStart + 1);
     if (close === -1) continue;
     return { type, innerStart, innerEnd: close, end: close + marker.length };
   }
@@ -362,29 +512,13 @@ function matchEmphasis(
 
 function matchLink(
   source: string,
-  at: number
+  at: number,
+  scan: InlineScan
 ): { labelStart: number; labelEnd: number; href: string; end: number } | null {
-  let level = 0;
-  let labelEnd = -1;
-  for (let j = at; j < source.length; j += 1) {
-    const c = source[j];
-    if (c === '\\') {
-      j += 1;
-      continue;
-    }
-    if (c === '[') level += 1;
-    else if (c === ']') {
-      level -= 1;
-      if (level === 0) {
-        labelEnd = j;
-        break;
-      }
-    } else if (c === '\n' && source[j + 1] === '\n') return null;
-  }
+  const labelEnd = scan.labelEnd(at);
   if (labelEnd === -1 || source[labelEnd + 1] !== '(') return null;
-  const target = /^\(\s*<?((?:[^\s()<>]|\([^\s()<>]*\))*)>?(?:\s+"[^"\n]*")?\s*\)/.exec(
-    source.slice(labelEnd + 1)
-  );
+  LINK_TARGET.lastIndex = labelEnd + 1;
+  const target = LINK_TARGET.exec(source);
   if (!target) return null;
   return {
     labelStart: at + 1,

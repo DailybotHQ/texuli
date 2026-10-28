@@ -11,8 +11,13 @@ Lazy data family. Untrusted JSON is validated through `safeParseBlock` /
 | type | Purpose |
 | --- | --- |
 | `table` | Caption + columns + rows (string/number/null cells) |
-| `stat` | Small labeled figures |
+| `stat` | Small labeled figures, with an optional `title` (names the group) and `source` (plain text under the figures) |
 | `kpi` | KPI-oriented row (same item shape as stat) |
+
+A `stat` or `kpi` item takes `label`, `value`, and optional `hint`, `delta`,
+`tone` and `trend`: 2–60 finite numbers, oldest first, drawn as a sparkline
+under the value (`@texuli/charts/sparkline-lite`, an image named from the
+`trendName` label, default "{label} trend").
 | `chart` | Embeds `@texuli/charts` families with required description |
 
 ## Chart kinds
@@ -117,9 +122,10 @@ chart props (callbacks such as `onselect`, `brushInvert`, `format`, and
 - **Accessible names.** A table block without a `caption` is named from the
   `tableSummary` label (default "Data table"); a caption names it instead.
   Stat and KPI rows announce themselves as a group through the `statGroup` /
-  `kpiGroup` labels. All three join `invalid` and `emptyTable` in
-  `DataBlockLabels`, so hosts pass one `labels` object to translate the
-  family's announced strings.
+  `kpiGroup` labels; a stat `title` is visible and names the group instead.
+  They join `invalid`, `emptyTable` and `trendName` (the `{label}` template
+  that names each trend sparkline) in `DataBlockLabels`, so hosts pass one
+  `labels` object to translate the family's announced strings.
 - **Compact kinds** (`sparkline`, `bullet`, `gauge`, `progress-ring`) use their
   `label` only as an accessible name, so `ChartBlockView` renders the block
   `title` as a visible `h3` and the `description` below it.

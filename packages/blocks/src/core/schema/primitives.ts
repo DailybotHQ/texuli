@@ -1,5 +1,11 @@
 import { hasUnsafeText } from '../safety.ts';
-import { type BlockReveal, type BlockTone, isBlockReveal, isBlockTone } from './vocabulary.ts';
+import {
+  BLOCK_ICON_NAME,
+  type BlockReveal,
+  type BlockTone,
+  isBlockReveal,
+  isBlockTone,
+} from './vocabulary.ts';
 
 /**
  * Content limits per block. They follow layout limits so a block always fits a
@@ -37,6 +43,10 @@ export const BLOCK_CONTENT_LIMITS = Object.freeze({
   href: 2_048,
   heading: 200,
   plain: 500,
+  /** Points in a stat item's trend sparkline. */
+  trendPoints: 60,
+  /** Characters in an icon name. */
+  iconName: 48,
 });
 
 /** Blueprint-style JSONPath, e.g. `$[0]["text"]`. */
@@ -169,4 +179,44 @@ export function parseBlockBase(
   if (reveal.data !== undefined) base.reveal = reveal.data;
   if (tone.data !== undefined) base.tone = tone.data;
   return ok(base);
+}
+
+/** An optional field of {@link parsePlainText}: `undefined` stays `undefined`. */
+export function parseOptionalPlainText(
+  value: unknown,
+  path: (string | number)[],
+  max: number
+): ParseResult<string | undefined> {
+  if (value === undefined) return ok(undefined);
+  return parsePlainText(value, path, max);
+}
+
+/** An optional value from a closed list of words. */
+export function parseOptionalEnum<T extends string>(
+  value: unknown,
+  path: (string | number)[],
+  allowed: readonly T[],
+  field: string
+): ParseResult<T | undefined> {
+  if (value === undefined) return ok(undefined);
+  if (typeof value !== 'string' || !(allowed as readonly string[]).includes(value)) {
+    return fail(path, `${field} must be one of ${allowed.map((word) => `"${word}"`).join(', ')}`);
+  }
+  return ok(value as T);
+}
+
+/** An optional icon name: lowercase kebab-case, at most `iconName` characters. */
+export function parseOptionalIconName(
+  value: unknown,
+  path: (string | number)[]
+): ParseResult<string | undefined> {
+  if (value === undefined) return ok(undefined);
+  if (
+    typeof value !== 'string' ||
+    value.length > BLOCK_CONTENT_LIMITS.iconName ||
+    !BLOCK_ICON_NAME.test(value)
+  ) {
+    return fail(path, 'icon must be a kebab-case icon name, as "circle-check"');
+  }
+  return ok(value);
 }

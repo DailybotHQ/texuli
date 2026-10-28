@@ -3,16 +3,19 @@ import { join } from 'node:path';
 import { cleanup, render } from '@testing-library/svelte';
 import { contrastRatio, SEMANTIC_ROLES, tokenToCssVar } from '@texuli/tokens';
 import { describe, expect, it, vi } from 'vitest';
+import { stripLightMarkdown } from '../src/core/text.ts';
 import { checkTextBlock, loadTextFamily, TEXT_BLOCK_TYPES } from '../src/index.ts';
 import { resolveTextBlockLabels } from '../src/text/index.ts';
 import {
   inlineText,
+  MARKDOWN_LIMITS,
   type MdBlock,
   type MdInline,
   parseInline,
   parseMarkdown,
 } from '../src/text/markdown.ts';
 import { RichText, TextBlockView } from '../src/text/renderers.ts';
+import Glyph from './fixtures/Glyph.svelte';
 
 const RLO = '\u202e';
 
@@ -128,6 +131,77 @@ describe('parseMarkdown', () => {
         4_000
       );
     }
+  });
+});
+
+describe('parseMarkdown: no super-linear backtracking (ReDoS)', () => {
+  const CAP = MARKDOWN_LIMITS.source;
+  const spaces = (n: number) => ' '.repeat(n);
+  /** One hostile source at the 4,000-character text cap per regex shape that backtracked. */
+  const HOSTILE: readonly (readonly [string, string])[] = [
+    ['heading: a space run before text', `# a${spaces(CAP - 4)}x`],
+    ['heading: spaces and hashes', `# a${' #'.repeat((CAP - 4) / 2)}x`],
+    ['fence: a space run in the info string', `${'`'.repeat(3)}${spaces(CAP - 4)}!`],
+    ['bullet: a space run before U+2028', `- ${spaces(CAP - 3)}\u2028`],
+    ['ordered: a space run before U+2029', `1. ${spaces(CAP - 4)}\u2029`],
+    ['rule: spaced dashes before text', `- -${' -'.repeat((CAP - 4) / 2)}x`],
+    ['hard break: a space run before a line break', `${spaces(CAP - 3)}x\ny`],
+    ['hard breaks: many soft line breaks', `a${spaces(18)}b\n`.repeat(CAP / 20)],
+    ['emphasis: unclosed stars', '*a '.repeat(CAP / 3)],
+    ['emphasis: unclosed underscores', '_a '.repeat(CAP / 3)],
+    ['strong: unclosed pairs', '**a '.repeat(CAP / 4)],
+    ['strikethrough: unclosed pairs', '~~a '.repeat(CAP / 4)],
+    ['links: a run of open brackets', '['.repeat(CAP)],
+    ['images: unclosed image labels', '![a'.repeat(CAP / 3)],
+  ];
+  /** Fastest of three runs, so one scheduler pause on a loaded host cannot fail a linear parse. */
+  const fastest = (run: () => void) => {
+    let best = Number.POSITIVE_INFINITY;
+    for (let k = 0; k < 3; k += 1) {
+      const started = performance.now();
+      run();
+      best = Math.min(best, performance.now() - started);
+    }
+    return best;
+  };
+
+  // Before the line readers were written by hand, the first line took over 20 s
+  // and the others 130–670 ms; now each parses in about a millisecond.
+  it.each(HOSTILE)('parses %s well under 100 ms', (name, source) => {
+    expect(source.length, name).toBeGreaterThanOrEqual(CAP - 1);
+    expect(
+      fastest(() => parseMarkdown(source)),
+      name
+    ).toBeLessThan(100);
+    expect(
+      fastest(() => stripLightMarkdown(source)),
+      name
+    ).toBeLessThan(100);
+  });
+
+  it('reads U+2028 and U+2029 as line breaks and keeps the heading grammar', () => {
+    expect(
+      parseMarkdown('# One\u2028## Two\u2029- item').blocks.map((block) => block.type)
+    ).toEqual(['heading', 'heading', 'list']);
+    const heading = (line: string) => {
+      const block = parseMarkdown(line).blocks[0];
+      return block?.type === 'heading' ? [block.level, inlineText(block.children)] : block?.type;
+    };
+    expect(heading('# Title ##  ')).toEqual([1, 'Title']);
+    expect(heading('## Title#')).toEqual([2, 'Title']);
+    expect(heading('   ###\tTabbed')).toEqual([3, 'Tabbed']);
+    expect(heading('#Title')).toBe('paragraph');
+    expect(heading('####### x')).toBe('paragraph');
+    expect(heading('    # code-indented')).toBe('paragraph');
+    expect(heading('```TS  ')).toBe('code');
+    expect(parseMarkdown('```TS  \nx\n```').blocks[0]).toEqual({
+      type: 'code',
+      lang: 'ts',
+      text: 'x',
+    });
+    expect(parseMarkdown('``` not a lang\nx').blocks[0]?.type).toBe('paragraph');
+    expect(parseMarkdown('* * *').blocks[0]?.type).toBe('rule');
+    expect(stripLightMarkdown('see [docs](https://example.com/a_(b)) now')).toBe('see docs now');
   });
 });
 
@@ -281,6 +355,114 @@ describe('TextBlockView', () => {
       );
       expect(container.textContent).not.toContain('bad');
       expect(oninvalid).toHaveBeenCalledWith([expect.objectContaining({ path: ['markdown'] })]);
+    }
+  });
+});
+
+describe('TextBlockView presentation fields', () => {
+  const PNG = 'data:image/png;base64,iVBORw0KGgo=';
+
+  it('renders align, size, list markers, quote role and avatar, and callout icons', () => {
+    const resolveAvatar = vi.fn((id: string) =>
+      id === 'av-007' ? 'https://cdn.example.com/av-007.webp' : undefined
+    );
+    const cases: readonly {
+      block: Record<string, unknown>;
+      props?: Record<string, unknown>;
+      check: (root: HTMLElement) => void;
+    }[] = [
+      {
+        block: { type: 'heading', level: 2, text: 'Plan', align: 'center' },
+        check: (root) => expect(root.querySelector('hgroup')?.dataset.align).toBe('center'),
+      },
+      {
+        block: { type: 'text', markdown: 'Body', size: 'sm', align: 'center' },
+        check: (root) => {
+          const text = root.querySelector<HTMLElement>('[data-tx-block="text"]');
+          expect([text?.dataset.size, text?.dataset.align]).toEqual(['sm', 'center']);
+        },
+      },
+      {
+        block: {
+          type: 'list',
+          style: 'check',
+          items: [{ text: 'Ship', done: true }, { text: 'Measure' }],
+        },
+        check: (root) => {
+          expect(root.querySelector('ul')?.dataset.style).toBe('check');
+          const boxes = [...root.querySelectorAll<HTMLInputElement>('li input[type="checkbox"]')];
+          expect(
+            boxes.map((box) => [box.checked, box.disabled, box.getAttribute('aria-label')])
+          ).toEqual([
+            [true, true, 'Done'],
+            [false, true, 'Not done'],
+          ]);
+        },
+      },
+      {
+        block: { type: 'list', style: 'number', items: [{ text: 'One' }, { text: 'Two' }] },
+        check: (root) => expect(root.querySelectorAll('ol > li')).toHaveLength(2),
+      },
+      {
+        block: {
+          type: 'list',
+          style: 'icon',
+          items: [
+            { text: 'Built in', icon: 'check' },
+            { text: 'Host icon', icon: 'rocket' },
+            { text: 'Unknown', icon: 'no-such-icon' },
+          ],
+        },
+        props: { resolveIcon: (name: string) => (name === 'rocket' ? Glyph : undefined) },
+        check: (root) => {
+          const icons = [...root.querySelectorAll<HTMLElement>('li .tx-block-icon')];
+          expect(icons.map((icon) => icon.dataset.icon)).toEqual(['check', 'rocket']);
+          for (const icon of icons) expect(icon.getAttribute('aria-hidden')).toBe('true');
+          expect(root.querySelector('[data-glyph="rocket"]')).not.toBeNull();
+        },
+      },
+      {
+        block: { type: 'quote', quote: 'Q', cite: 'Ada', role: 'CTO', avatar: 'avatar:av-007' },
+        props: { resolveAvatar },
+        check: (root) => {
+          expect(root.querySelector('figcaption')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+            'Ada, CTO'
+          );
+          const img = root.querySelector('figcaption img');
+          expect(img?.getAttribute('src')).toBe('https://cdn.example.com/av-007.webp');
+          expect(img?.getAttribute('alt')).toBe('');
+          expect(resolveAvatar).toHaveBeenCalledWith('av-007');
+        },
+      },
+      {
+        block: { type: 'quote', quote: 'Q', role: 'Founder', avatar: PNG },
+        check: (root) => {
+          expect(root.querySelector('figcaption img')?.getAttribute('src')).toBe(PNG);
+          expect(root.querySelector('cite')).toBeNull();
+        },
+      },
+      {
+        // The host resolver is the only way to a remote image, and its URL still passes the policy.
+        block: { type: 'quote', quote: 'Q', avatar: 'avatar:av-008' },
+        props: { resolveAvatar: () => 'javascript:alert(1)' },
+        check: (root) => expect(root.querySelector('img')).toBeNull(),
+      },
+      {
+        block: { type: 'callout', title: 'Heads up', body: 'B', icon: 'info', tone: 'info' },
+        check: (root) =>
+          expect(
+            root.querySelector('.tx-callout-head .tx-block-icon')?.getAttribute('data-icon')
+          ).toBe('info'),
+      },
+    ];
+    for (const { block, props, check } of cases) {
+      const { container } = render(TextBlockView, { block, ...props });
+      expect(
+        container.querySelector('[data-tx-block="invalid"]'),
+        JSON.stringify(block)
+      ).toBeNull();
+      check(container);
+      cleanup();
     }
   });
 });

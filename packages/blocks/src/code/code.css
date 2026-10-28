@@ -39,6 +39,25 @@
     color: var(--tx-muted-foreground, CanvasText);
   }
 
+  .tx-code__header {
+    display: flex;
+    flex: 1;
+    gap: 0.5rem;
+    align-items: center;
+    min-inline-size: 0;
+    color: var(--tx-muted-foreground, CanvasText);
+    font-size: var(--tx-font-size-xs, 0.75rem);
+  }
+
+  /* Host actions sit at the end of the bar, before the copy button. */
+  .tx-code__toolbar {
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.25rem;
+    align-items: center;
+    margin-inline-start: auto;
+  }
+
   .tx-code__copy {
     display: inline-flex;
     flex-shrink: 0;

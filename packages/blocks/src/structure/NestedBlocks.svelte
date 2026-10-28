@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Component } from 'svelte';
 import type { Block } from '../core/index.ts';
+import type { BlockIconResolver } from '../icons/types.ts';
 import type { StructureBlockLabels } from './labels.ts';
 
 /**
@@ -11,9 +12,14 @@ import type { StructureBlockLabels } from './labels.ts';
 let {
   blocks,
   labels,
+  resolveIcon,
+  resolveAvatar,
 }: {
   blocks: readonly Block[];
   labels: StructureBlockLabels;
+  /** Forwarded to nested text and structure renderers. */
+  resolveIcon?: BlockIconResolver | undefined;
+  resolveAvatar?: ((id: string) => string | undefined) | undefined;
 } = $props();
 
 const TEXT_TYPES = new Set(['heading', 'text', 'list', 'quote', 'callout']);
@@ -27,7 +33,13 @@ const STRUCTURE_TYPES = new Set([
   'cta',
 ]);
 
-type View = Component<{ block: unknown; labels?: unknown; oninvalid?: unknown }>;
+type View = Component<{
+  block: unknown;
+  labels?: unknown;
+  oninvalid?: unknown;
+  resolveIcon?: BlockIconResolver | undefined;
+  resolveAvatar?: ((id: string) => string | undefined) | undefined;
+}>;
 
 async function loadView(type: string): Promise<View | null> {
   if (TEXT_TYPES.has(type)) {
@@ -51,7 +63,7 @@ async function loadView(type: string): Promise<View | null> {
         <p class="tx-structure-loading" role="status">…</p>
       {:then View}
         {#if View}
-          <View block={child} />
+          <View block={child} {resolveIcon} {resolveAvatar} />
         {:else}
           <p class="tx-structure-empty" role="note" data-tx-nested-unsupported={child.type}>
             {labels.invalid}

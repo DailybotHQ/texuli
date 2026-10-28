@@ -3,6 +3,7 @@ import type { CodeBlockViewProps } from './family-engine.ts';
 
 export {
   CODE_BLOCK_TYPES,
+  type CodeBlockBarContext,
   type CodeBlockViewProps,
   type CodeFamilyBlock,
   type CodeFamilyBlockType,

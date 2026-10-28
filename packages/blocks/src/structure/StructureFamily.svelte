@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Card, CardContent, CardHeader, CardTitle } from 'texuli/card';
 import { Accordion, Tabs } from 'texuli/tabs-accordion';
+import BlockIcon from '../icons/BlockIcon.svelte';
 import { checkStructureBlock } from './check.ts';
 import type { StructureBlockViewProps } from './family.ts';
 import { resolveStructureBlockLabels } from './labels.ts';
@@ -12,7 +13,7 @@ import './structure.css';
  * Structure family renderer: columns, grid, tabs, accordion, cards, divider
  * and cta. Untrusted data is validated before anything paints.
  */
-let { block, labels, oninvalid }: StructureBlockViewProps = $props();
+let { block, labels, resolveIcon, resolveAvatar, oninvalid }: StructureBlockViewProps = $props();
 
 const check = $derived(checkStructureBlock(block));
 const text = $derived(resolveStructureBlockLabels(labels));
@@ -41,7 +42,7 @@ function colsAttr(n: number | undefined, fallback: number): string {
     >
       {#each b.columns as column, c (c)}
         <div class="tx-structure-column" data-column={c}>
-          <NestedBlocks blocks={column} labels={text} />
+          <NestedBlocks blocks={column} labels={text} {resolveIcon} {resolveAvatar} />
         </div>
       {/each}
     </div>
@@ -77,7 +78,7 @@ function colsAttr(n: number | undefined, fallback: number): string {
           {@const panel = b.panels.find((p) => p.id === item.value)}
           {#if panel}
             <div class="tx-structure-panel">
-              <NestedBlocks blocks={panel.blocks} labels={text} />
+              <NestedBlocks blocks={panel.blocks} labels={text} {resolveIcon} {resolveAvatar} />
             </div>
           {/if}
         {/snippet}
@@ -125,6 +126,7 @@ function colsAttr(n: number | undefined, fallback: number): string {
               hrefTrust="untrusted"
             >
               <CardHeader>
+                <BlockIcon name={card.icon} {resolveIcon} class="tx-structure-card-icon" />
                 {#if card.eyebrow}
                   <p class="tx-structure-card-eyebrow">{card.eyebrow}</p>
                 {/if}
@@ -141,7 +143,22 @@ function colsAttr(n: number | undefined, fallback: number): string {
       </ul>
     </section>
   {:else if b.type === 'divider'}
-    <hr class="tx-structure-divider" data-tx-block="divider" data-tone={b.tone} />
+    {#if b.variant === 'space'}
+      <div class="tx-structure-divider-space" data-tx-block="divider" data-variant="space" aria-hidden="true"></div>
+    {:else if b.label}
+      <!-- A named separator: the visible label is its accessible name (separator children are presentational). -->
+      <div
+        class="tx-structure-divider-labeled"
+        data-tx-block="divider"
+        data-tone={b.tone}
+        role="separator"
+        aria-label={b.label}
+      >
+        <span class="tx-structure-divider-label">{b.label}</span>
+      </div>
+    {:else}
+      <hr class="tx-structure-divider" data-tx-block="divider" data-tone={b.tone} />
+    {/if}
   {:else if b.type === 'cta'}
     <nav
       class="tx-structure-cta"

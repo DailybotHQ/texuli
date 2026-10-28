@@ -9,6 +9,7 @@ import {
   ok,
   type ParseResult,
   parseMultilineText,
+  parseOptionalPlainText,
   parsePlainText,
 } from '../core/schema/primitives.ts';
 import { type BlockTone, isBlockTone } from '../core/schema/vocabulary.ts';
@@ -38,20 +39,20 @@ export type StatItem = {
   hint?: string;
   delta?: string;
   tone?: BlockTone;
+  /** Sparkline values, oldest first (2–`trendPoints` finite numbers). */
+  trend?: number[];
 };
 
 export type StatBlock = BlockBase & {
   type: 'stat';
+  /** A visible title that also names the group. */
+  title?: string;
   items: StatItem[];
+  /** Where the figures come from, shown under them. */
+  source?: string;
 };
 
-export type KpiItem = {
-  label: string;
-  value: string;
-  hint?: string;
-  delta?: string;
-  tone?: BlockTone;
-};
+export type KpiItem = StatItem;
 
 export type KpiBlock = BlockBase & {
   type: 'kpi';
@@ -243,6 +244,21 @@ export function parseTableBlock(
   });
 }
 
+function parseTrend(value: unknown, path: (string | number)[]): ParseResult<number[] | undefined> {
+  if (value === undefined) return ok(undefined);
+  const max = BLOCK_CONTENT_LIMITS.trendPoints;
+  if (!Array.isArray(value) || value.length < 2 || value.length > max) {
+    return fail(path, `trend needs 2–${max} numbers`);
+  }
+  for (let i = 0; i < value.length; i += 1) {
+    const point = value[i];
+    if (typeof point !== 'number' || !Number.isFinite(point)) {
+      return fail([...path, i], 'Expected a finite number');
+    }
+  }
+  return ok([...(value as number[])]);
+}
+
 function parseStatItems(
   value: unknown,
   path: (string | number)[],
@@ -289,12 +305,15 @@ function parseStatItems(
     }
     const tone = parseTone(item.data.tone, [...itemPath, 'tone']);
     if (!tone.success) return tone;
+    const trend = parseTrend(item.data.trend, [...itemPath, 'trend']);
+    if (!trend.success) return trend;
     items.push({
       label: label.data,
       value: val.data,
       ...(hint !== undefined ? { hint } : {}),
       ...(delta !== undefined ? { delta } : {}),
       ...(tone.data !== undefined ? { tone: tone.data } : {}),
+      ...(trend.data !== undefined ? { trend: trend.data } : {}),
     });
   }
   return ok(items);
@@ -305,9 +324,27 @@ export function parseStatBlock(
   path: (string | number)[],
   base: BlockBase
 ): ParseResult<StatBlock> {
+  const title = parseOptionalPlainText(
+    record.title,
+    [...path, 'title'],
+    BLOCK_CONTENT_LIMITS.plain
+  );
+  if (!title.success) return title;
   const items = parseStatItems(record.items, [...path, 'items'], BLOCK_CONTENT_LIMITS.statItems);
   if (!items.success) return items;
-  return ok({ ...base, type: 'stat', items: items.data });
+  const source = parseOptionalPlainText(
+    record.source,
+    [...path, 'source'],
+    BLOCK_CONTENT_LIMITS.plain
+  );
+  if (!source.success) return source;
+  return ok({
+    ...base,
+    type: 'stat',
+    ...(title.data !== undefined ? { title: title.data } : {}),
+    items: items.data,
+    ...(source.data !== undefined ? { source: source.data } : {}),
+  });
 }
 
 export function parseKpiBlock(

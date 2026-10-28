@@ -9,6 +9,7 @@
 
 export { checkTextBlock, type TextBlockCheck } from './check.ts';
 export {
+  type BlockIconResolver,
   isTextFamilyBlock,
   loadTextFamily,
   TEXT_BLOCK_TYPES,

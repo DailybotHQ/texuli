@@ -585,6 +585,16 @@ const formatter = prop(
   'localization',
   { kind: 'union', variants: [numberFormat, dateFormat] }
 );
+const valueFormatter = prop(
+  'formatValue',
+  'Value formatter',
+  'Developer callback that formats every visible and accessible value; wins over format.',
+  'localization',
+  { kind: 'event', signature: '(value: number) => string' },
+  false,
+  undefined,
+  'developer'
+);
 
 const flowLabelFields = [
   nested('tableSummary', 'Table action', 'Text that opens the data table.', nonEmptyString),
@@ -884,6 +894,7 @@ export const sparklineSchema = define({
       'line'
     ),
     formatter,
+    valueFormatter,
     height(32),
     prop(
       'showLast',
@@ -918,6 +929,7 @@ export const bulletChartSchema = define({
       []
     ),
     formatter,
+    valueFormatter,
     compactLabels,
   ],
 });
@@ -951,6 +963,7 @@ export const gaugeSchema = define({
       []
     ),
     formatter,
+    valueFormatter,
     prop('size', 'Size', 'Square rendered size in pixels.', 'layout', positiveNumber, false, 144),
     prop(
       'thickness',
@@ -975,6 +988,7 @@ export const progressRingSchema = define({
     prop('value', 'Value', 'Current finite value.', 'data', finiteNumber, true),
     prop('max', 'Maximum', 'Maximum progress value.', 'axes', positiveNumber, false, 100),
     formatter,
+    valueFormatter,
     prop('size', 'Size', 'Square rendered size in pixels.', 'layout', positiveNumber, false, 64),
     prop(
       'thickness',

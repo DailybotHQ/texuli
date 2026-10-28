@@ -19,6 +19,10 @@ let { block, labels, oninvalid, mode = 'light' }: DataBlockViewProps = $props();
 
 const check = $derived(checkDataBlock(block));
 const text = $derived(resolveDataBlockLabels(labels));
+const uid = $props.id();
+const titleId = `tx-stat-title-${uid}`;
+// Trend sparklines load on first use: stat rows without a trend never download them.
+const loadSparkline = () => import('@texuli/charts/sparkline-lite');
 
 $effect(() => {
   if (!check.ok) oninvalid?.(check.issues);
@@ -66,6 +70,8 @@ function cellText(value: string | number | null): string {
       </Table>
     </div>
   {:else if b.type === 'stat' || b.type === 'kpi'}
+    {@const title = b.type === 'stat' ? b.title : undefined}
+    {@const source = b.type === 'stat' ? b.source : undefined}
     <div
       class="tx-block"
       class:tx-block-stat={b.type === 'stat'}
@@ -73,19 +79,32 @@ function cellText(value: string | number | null): string {
       data-tx-block={b.type}
       data-tone={b.tone}
       role="group"
-      aria-label={b.type === 'kpi' ? text.kpiGroup : text.statGroup}
+      aria-label={title ? undefined : b.type === 'kpi' ? text.kpiGroup : text.statGroup}
+      aria-labelledby={title ? titleId : undefined}
     >
+      {#if title}<p class="tx-stat-title" id={titleId}>{title}</p>{/if}
       <div class="tx-stat-grid">
         {#each b.items as item, i (i)}
+          {#snippet trend()}
+            {#await loadSparkline() then { Sparkline }}
+              <Sparkline
+                values={item.trend ?? []}
+                label={text.trendName.split('{label}').join(item.label)}
+                height={28}
+              />
+            {/await}
+          {/snippet}
           <Stat
             label={item.label}
             value={item.value}
             hint={item.hint}
             delta={item.delta}
             data-tone={item.tone}
+            sparkline={item.trend ? trend : undefined}
           />
         {/each}
       </div>
+      {#if source}<p class="tx-stat-source">{source}</p>{/if}
     </div>
   {:else}
     <div class="tx-block tx-block-chart" data-tx-block="chart" data-tone={b.tone}>
@@ -110,6 +129,15 @@ function cellText(value: string | number | null): string {
     border-radius: 0.375em;
     color: var(--tx-muted-foreground, GrayText);
     font-size: 0.875em;
+  }
+  .tx-stat-title {
+    margin: 0 0 0.75rem;
+    font-weight: 600;
+  }
+  .tx-stat-source {
+    margin: 0.75rem 0 0;
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: 0.8125rem;
   }
   .tx-stat-grid {
     display: grid;

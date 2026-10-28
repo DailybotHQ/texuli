@@ -12,6 +12,8 @@ import {
   heatmapFill,
   type ScatterPoint,
 } from '../src/matrix/model.ts';
+import RampLegend from '../src/matrix/RampLegend.svelte';
+import { rampLegendLabels, rampLegendText } from '../src/matrix/ramp-legend.ts';
 import ScatterChart from '../src/matrix/ScatterChart.svelte';
 
 afterEach(() => cleanup());
@@ -286,5 +288,67 @@ describe('ScatterChart and BubbleChart', () => {
       expect(document.querySelector('[data-chart-tooltip]')?.textContent).toContain('Grace');
       expect(document.querySelectorAll('[data-crosshair]')).toHaveLength(2);
     })();
+  });
+});
+
+describe('RampLegend', () => {
+  it('names the ramp with its label and ends, paints every step and formats the ends', () => {
+    const cases = [
+      {
+        props: { label: 'Weekly volume', min: 0, max: 120 },
+        name: 'Weekly volume, color scale from 0 to 120',
+        steps: 9,
+        ends: ['0', '120'],
+      },
+      {
+        props: {
+          label: 'Change',
+          min: -0.2,
+          max: 0.2,
+          ramp: 'diverging',
+          steps: 5,
+          formatValue: (value: number) => `${Math.round(value * 100)}%`,
+        },
+        name: 'Change, color scale from -20% to 20%',
+        steps: 5,
+        ends: ['-20%', '20%'],
+      },
+      {
+        props: { label: 'Load', minLabel: 'Low', maxLabel: 'High', steps: 40 },
+        name: 'Load, color scale from Low to High',
+        steps: 9,
+        ends: ['Low', 'High'],
+      },
+      {
+        props: { label: 'Intensity', steps: 2 },
+        name: 'Intensity, color scale',
+        steps: 2,
+        ends: [],
+      },
+      {
+        props: { label: 'Depth', min: 1, max: 2, description: 'deeper is darker' },
+        name: 'Depth, deeper is darker',
+        steps: 9,
+        ends: ['1', '2'],
+      },
+    ] as const;
+    for (const { props, name, steps, ends } of cases) {
+      const { container } = render(RampLegend, { props: props as never });
+      const legend = screen.getByRole('img', { name });
+      expect(legend.querySelector('.tx-ramp-legend__title')?.textContent).toBe(props.label);
+      const rects = [...legend.querySelectorAll('rect')];
+      expect(rects).toHaveLength(steps);
+      for (const rect of rects) expect(rect.getAttribute('fill')).toMatch(/^var\(--tx-chart-/);
+      expect(new Set(rects.map((rect) => rect.getAttribute('fill'))).size).toBe(steps);
+      const shown = [...container.querySelectorAll('.tx-ramp-legend__ends > span')].map(
+        (span) => span.textContent
+      );
+      expect(shown).toEqual(ends);
+      expect(container.querySelector('[style]')).toBeNull();
+      cleanup();
+    }
+    expect(rampLegendText(rampLegendLabels({ range: '{label}: {min}–{max}' }), 'A', '1', '2')).toBe(
+      'A: 1–2'
+    );
   });
 });

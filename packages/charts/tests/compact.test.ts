@@ -207,6 +207,26 @@ describe('compact charts', () => {
       for (const band of bands) expect(band.getAttribute('d')).not.toBe('');
     }
   });
+
+  it('formatValue formats visible and accessible values and wins over format', () => {
+    const formatValue = (value: number) => `${value} pct`;
+    const format = { type: 'number', locale: 'en-US', style: 'currency', currency: 'USD' } as const;
+    const cases = [
+      { component: Gauge, props: { label: 'Health', value: 92, min: 0, max: 100 } },
+      { component: Sparkline, props: { label: 'Uptime', values: [90, 92] } },
+      { component: BulletChart, props: { label: 'Progress', value: 92, max: 100 } },
+      { component: ProgressRing, props: { label: 'Done', value: 92, max: 100 } },
+    ] as const;
+    for (const { component, props } of cases) {
+      const { container } = render(component as typeof Gauge, {
+        props: { ...props, format, formatValue } as never,
+      });
+      const text = `${container.querySelector('svg desc')?.textContent} ${container.querySelector('table')?.textContent}`;
+      expect(text, props.label).toContain('92 pct');
+      expect(text, props.label).not.toContain('$');
+      cleanup();
+    }
+  });
 });
 
 describe('sparkline large-data limits', () => {

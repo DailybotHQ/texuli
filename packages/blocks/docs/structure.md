@@ -31,11 +31,17 @@ The structure family renders **columns**, **grid**, **tabs**, **accordion**, **c
 | `grid` | 1–12 cells with optional title/body markdown; `columns` 2–4 |
 | `tabs` | Stable `id`, accessible `label`, 2–6 panels of nested blocks; optional `defaultPanel` |
 | `accordion` | 1–6 items with title + optional markdown body; `mode` single\|multiple |
-| `cards` | 1–12 cards with title, optional eyebrow/body/href/tone; `columns` 2–4; hrefs use the untrusted URL policy |
-| `divider` | Thematic break (`hr`) |
+| `cards` | 1–12 cards with title, optional icon/eyebrow/body/href/tone; `columns` 2–4; hrefs use the untrusted URL policy; `icon` is a kebab-case icon name drawn decoratively above the title |
+| `divider` | Thematic break (`hr`). `label` (plain text) centers on the rule and makes it a separator named by the label; `variant: "space"` is blank space hidden from screen readers (no label) |
 | `cta` | 1–3 actions; each href must pass `safeHref(..., 'untrusted')` |
 
 Nested children inside **columns** and **tabs** panels are validated as full blocks. The renderer lazy-loads the text and structure families for nested leaves; other families show the invalid notice until a host mounts them.
+
+`StructureFamily` props: `block`, `labels?`, `oninvalid?(issues)`, and the
+host resolvers `resolveIcon?(name)` (card icons; built-in Texuli icon names
+draw without it, other names draw nothing) and `resolveAvatar?(id)`. Both
+resolvers also reach the nested text and structure blocks (quote avatars,
+list and callout icons). See [text](text.md) for the icon and avatar rules.
 
 ## UI dependencies
 

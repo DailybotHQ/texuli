@@ -20,4 +20,11 @@ export {
   type ScatterSeries,
   scatterInteractionSeries,
 } from './model.ts';
+export { default as RampLegend } from './RampLegend.svelte';
+export {
+  RAMP_LEGEND_LABELS,
+  type RampLegendLabels,
+  rampLegendLabels,
+  rampLegendText,
+} from './ramp-legend.ts';
 export { default as ScatterChart } from './ScatterChart.svelte';
