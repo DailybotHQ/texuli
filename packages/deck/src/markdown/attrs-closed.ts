@@ -595,7 +595,7 @@ export function readSlideAttrs(attrs: readonly Attr[], sink: IssueSink): SlideAt
   }
   if (gradientRaw !== undefined) {
     kinds.push('background-gradient');
-    const match = /^(?:gradient-)?([a-z]+)(?:[ \t]*,?[ \t]*(\d{1,3})(?:deg)?)?$/.exec(
+    const match = /^(?:gradient-)?([a-z]+)(?:[ \t]*(?:,[ \t]*)?(\d{1,3})(?:deg)?)?$/.exec(
       gradientRaw.trim()
     );
     const name = match?.[1];

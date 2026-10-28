@@ -9,6 +9,7 @@ export {
 } from './builder.ts';
 export {
   DECK_AUTHORING_LIMITS,
+  DECK_LINT_MAX_ISSUES,
   DECK_LINT_RULES,
   type DeckLintIssue,
   type DeckLintReport,

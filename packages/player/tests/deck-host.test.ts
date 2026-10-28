@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   DECK_STAGE_HOST_PACKAGE,
   type DeckPlayerHost,
+  type DeckPlayerHostRequest,
   isLayoutDeckTree,
 } from '../src/deck-host.ts';
 import Player from '../src/Player.svelte';
@@ -121,6 +122,55 @@ describe('DeckPlayerHost seam', () => {
 
       cleanup();
       expect(stop).toHaveBeenCalled();
+    });
+  });
+
+  it('presents once: label, active and root changes are live, never a re-present', async () => {
+    await scenario('toggling active does not re-present the deck', async () => {
+      const requests: DeckPlayerHostRequest[] = [];
+      const stop = vi.fn();
+      const present = vi.fn((request: DeckPlayerHostRequest) => {
+        requests.push(request);
+        return stop;
+      });
+      const { container, rerender } = render(Player, {
+        props: { blueprint: deckTree, label: 'Deck preview', deckHost: { present }, active: true },
+      });
+      await waitFor(() => {
+        expect(present).toHaveBeenCalledTimes(1);
+      });
+      const request = requests[0] as DeckPlayerHostRequest;
+      expect(request.active).toBe(true);
+      expect(request.root).toBe(container.querySelector('[data-tx-player]'));
+
+      for (const props of [{ active: false }, { active: true }, { label: 'Renamed deck' }]) {
+        await rerender(props);
+        await tick();
+      }
+      expect(present).toHaveBeenCalledTimes(1);
+      expect(stop).not.toHaveBeenCalled();
+      // The one request reads the current values.
+      expect(request.label).toBe('Renamed deck');
+      await rerender({ active: false });
+      await tick();
+      expect(request.active).toBe(false);
+
+      // A new tier is a new presentation: clean up, then present again.
+      await rerender({ tier: 'developer' });
+      await waitFor(() => {
+        expect(present).toHaveBeenCalledTimes(2);
+      });
+      expect(stop).toHaveBeenCalledTimes(1);
+      expect(requests[1]?.tier).toBe('developer');
+
+      // A new blueprint is a new presentation too, with its own validated tree.
+      const retitled = { ...deckTree, props: { title: 'Retitled deck' } };
+      await rerender({ blueprint: retitled });
+      await waitFor(() => {
+        expect(present).toHaveBeenCalledTimes(3);
+      });
+      expect(stop).toHaveBeenCalledTimes(2);
+      expect(JSON.stringify(requests[2]?.tree)).toContain('Retitled deck');
     });
   });
 

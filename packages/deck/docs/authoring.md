@@ -138,14 +138,19 @@ brief or cited sources.`). Optional outline slides are left out.
 import { lintDeck } from '@texuli/deck/authoring';
 
 const report = lintDeck(deckOrUntrustedValue);
-// { ok, errors, warnings, issues: [{ rule: 'notes-missing', severity: 'warning', path: ['slides', 2, 'notes'], … }] }
+// { ok, errors, warnings, truncated, issues: [{ rule: 'notes-missing', severity: 'warning', path: ['slides', 2, 'notes'], … }] }
 ```
 
 `lintDeck(value)` accepts untrusted input and never throws. It runs
 `parseDeck`, maps its issues onto rules, then adds static quality checks.
 The report (`DeckLintReport`) has `ok` (no errors), the `errors` and
 `warnings` counts and the `issues` (`DeckLintIssue`: a `DeckDiagnostic` with
-a `rule` of type `DeckLintRule`). `DECK_LINT_RULES` groups the rules:
+a `rule` of type `DeckLintRule`). Its work is bounded on hostile input: one
+issue per rule and path, at most `DECK_LINT_MAX_ISSUES` (200) listed with
+`truncated: true` past it (the counts still cover every distinct issue), and
+a deck over a structural limit of the model (`too-many`, such as more than
+200 slides, or `too-deep`) gets the model issues only, without the quality
+pass. `DECK_LINT_RULES` groups the rules:
 
 | Rule | Severity | Raised when |
 | --- | --- | --- |

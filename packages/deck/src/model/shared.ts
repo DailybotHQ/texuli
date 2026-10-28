@@ -74,12 +74,20 @@ export const DECK_CANVAS: Readonly<Record<DeckAspect, { width: number; height: n
   });
 
 /**
- * Media source syntax: an `https:` URL, a relative path without `..`,
- * backslashes or SVG, a base64 `data:` raster or video, or an `avatar:` id.
- * Size caps for `data:` and the trust tier are the host's, applied later.
+ * An SVG path ending, in any letter case, with the dot and the end marker
+ * also percent-encoded: `.svg`, `.SVG`, `%2esvg`, then `?`, `#`, `%3F`,
+ * `%23` or the end. A character class per letter, not the `i` flag: the
+ * pattern travels as a JSON Schema `pattern` string.
  */
-export const MEDIA_SRC_PATTERN =
-  '^(?:https://(?![^?#]*\\.svg(?:[?#]|$))[^\\s"<>\\\\]+|(?!/)(?!.*\\.\\.)(?!.*\\.svg(?:[?#]|$))[A-Za-z0-9._~/-]+(?:[?#][^\\s"<>\\\\]*)?|data:(?:image/(?:png|jpeg|gif|webp|avif)|video/(?:mp4|webm));base64,[A-Za-z0-9+/=]+|avatar:av-[0-9]{3})$';
+const SVG_ENDING = '(?:\\.|%2[eE])[sS][vV][gG](?:[?#]|%(?:3[fF]|23)|$)';
+
+/**
+ * Media source syntax: an `https:` URL, a relative path without `..`,
+ * backslashes or SVG (any case, also percent-encoded), a base64 `data:`
+ * raster or video, or an `avatar:` id. Size caps for `data:` and the trust
+ * tier are the host's, applied later.
+ */
+export const MEDIA_SRC_PATTERN = `^(?:https://(?![^?#]*${SVG_ENDING})[^\\s"<>\\\\]+|(?!/)(?!.*\\.\\.)(?!.*${SVG_ENDING})[A-Za-z0-9._~/-]+(?:[?#][^\\s"<>\\\\]*)?|data:(?:image/(?:png|jpeg|gif|webp|avif)|video/(?:mp4|webm));base64,[A-Za-z0-9+/=]+|avatar:av-[0-9]{3})$`;
 
 export const mediaSrc = t.string({ min: 1, max: 2_000_000, pattern: MEDIA_SRC_PATTERN });
 

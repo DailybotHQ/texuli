@@ -42,7 +42,12 @@ content" (`labels.trustBadge`), next to the status badge. This is the
 artifact-frame contract from `@texuli/catalog/render/frame`: agent output
 stays distinguishable from app chrome. A host can reword the badge but not
 remove it; it stays visible when the player is inactive. The `developer`
-tier shows no trust badge.
+tier shows no trust badge. The one exception is `chrome={false}`, which
+paints no frame chrome and so no badge: the embedding host must then show
+the trust signal itself. The `@texuli/slides` stage, which paints catalog
+components through frameless players, shows one **Untrusted content** badge
+in its toolbar row at the `untrusted` tier
+([embedding.md](embedding.md#frameless-and-deck-hosts)).
 
 Invalid drafts are refused by default. `invalidPolicy="preview"` displays the
 validated placeholder tree with a visible warning; it does not enable

@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   applyDeckPatch,
+  DECK_LINT_MAX_ISSUES,
   DECK_OUTLINE_IDS,
   DECK_OUTLINES,
   deck,
@@ -166,6 +167,54 @@ describe('static quality lint', () => {
         'prefer-layout',
         'custom-slide',
       ])
+    );
+  });
+
+  it('stays bounded on hostile decks: 16,000 slides, deep props, a capped and deduplicated list', () => {
+    const textSlide = (index: number) => ({
+      id: `s${index}`,
+      layout: 'free',
+      blocks: [{ type: 'text', markdown: 'x' }],
+    });
+    // Over the slide cap: the model issue only, no quality pass over 16,000 slides.
+    const started = performance.now();
+    const huge = lintDeck({
+      formatVersion: 2,
+      meta: { title: 'Huge' },
+      slides: Array.from({ length: 16_000 }, (_, index) => textSlide(index)),
+    });
+    expect(performance.now() - started).toBeLessThan(5_000);
+    expect(huge.ok).toBe(false);
+    expect(huge.issues.map((issue) => issue.code)).toEqual(['too-many']);
+    expect(huge.issues.length).toBeLessThanOrEqual(DECK_LINT_MAX_ISSUES);
+
+    // 5,000 and 50,000 levels of props: no stack overflow, no throw.
+    for (const depth of [5_000, 50_000]) {
+      let nested: unknown = 'x';
+      for (let level = 0; level < depth; level++) nested = { a: nested };
+      const deep = () =>
+        lintDeck({
+          formatVersion: 2,
+          meta: { title: 'Deep' },
+          slides: [{ id: 'a', layout: 'title-hero', props: { title: 'x', extra: nested } }],
+        });
+      expect(deep, String(depth)).not.toThrow();
+      expect(deep().ok).toBe(false);
+    }
+
+    // At the slide cap (200), every slide warns: the list stops at the cap, the counts do not.
+    const capped = lintDeck({
+      formatVersion: 2,
+      meta: { title: 'Capped' },
+      slides: Array.from({ length: 200 }, (_, index) => textSlide(index)),
+    });
+    expect(capped.issues).toHaveLength(DECK_LINT_MAX_ISSUES);
+    expect(capped.truncated).toBe(true);
+    expect(capped.warnings).toBeGreaterThan(DECK_LINT_MAX_ISSUES);
+    const keys = capped.issues.map((issue) => JSON.stringify([issue.rule, issue.path]));
+    expect(new Set(keys).size).toBe(keys.length);
+    expect(lintDeck({ formatVersion: 2, meta: { title: 'Small' }, slides: [] }).truncated).toBe(
+      false
     );
   });
 });

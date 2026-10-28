@@ -217,8 +217,12 @@ npm. Their size caps are owner decisions of 2026-10-28 (PLAN_008
 T-perf-budgets): each cap is the measured size on the final PLAN_008 code
 plus 4% headroom, with the reason in the row's `note` in
 `texuli.budgets.json`. `pnpm size --filter deck` and
-`pnpm size --filter slides` report every entry within budget (8 and 7
-entries, exit 0; re-run 2026-10-28 at `664e1380`, same numbers).
+`pnpm size --filter slides` report every entry within budget (8 and 9
+entries, exit 0; the deck run re-run 2026-10-28 at `664e1380`, same
+numbers). The 9 slides entries include the public `components` and `layouts`
+subpaths for hosts (`686ae610`). After the stage trust badge, the slides run
+measured `@texuli/slides/stage` at 103.71 KiB gzip and `styles.css` at
+4.75 KiB CSS gzip, both within their caps.
 
 | Entry | Measured (B gzip) | Cap (B gzip) |
 | --- | --- | --- |
@@ -231,6 +235,8 @@ entries, exit 0; re-run 2026-10-28 at `664e1380`, same numbers).
 | `@texuli/deck/authoring` | 30,740 | 31,971 |
 | `@texuli/deck/templates` | 27,361 | 28,456 |
 | `@texuli/slides` (root) | 48,476 | 50,416 |
+| `@texuli/slides/components` | 53,473 | 55,613 |
+| `@texuli/slides/layouts` | 39,014 | 40,575 |
 | `@texuli/slides/stage` | 105,851 (CSS 2.11 KiB) | 110,085 (CSS 11,264) |
 | `@texuli/slides/styles.css` | CSS 4,741 | CSS 4,931 |
 

@@ -400,7 +400,8 @@ describe('backgrounds keep text contrast', () => {
       }
     }
     expect(checked).toBe(themes.length * 2 * DECK_BACKGROUND_GALLERY.length);
-  });
+    // 200+ themes × 2 modes × every background: CPU-bound, so slow on a loaded host.
+  }, 30_000);
 
   it('never paints a hostile background source, and refuses data: media at the untrusted tier', async () => {
     for (const src of [

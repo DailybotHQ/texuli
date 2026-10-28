@@ -283,7 +283,9 @@ describe('DeckStage chrome', () => {
       const follows = Boolean(
         main.compareDocumentPosition(toolbar) & Node.DOCUMENT_POSITION_FOLLOWING
       );
-      return { follows, data: root.dataset.txDeckToolbar, parent: toolbar.parentElement === root };
+      // At the untrusted tier the toolbar shares the chrome row with the trust badge.
+      const row = toolbar.closest('.tx-deck-stage__chrome-row') ?? toolbar;
+      return { follows, data: root.dataset.txDeckToolbar, parent: row.parentElement === root };
     };
     for (const [props, expected] of [
       [{}, { follows: true, data: 'bottom', parent: true }],
@@ -293,6 +295,40 @@ describe('DeckStage chrome', () => {
       await scenario(`places the toolbar for ${JSON.stringify(props)}`, async () => {
         stageWith(props);
         expect(order()).toEqual(expected);
+      });
+    }
+  });
+
+  it('trust badge: in the chrome row at the untrusted tier, overridable, never at developer or with trustBadge false', async () => {
+    const badge = () => document.querySelector<HTMLElement>('[data-tx-deck-trust]');
+    for (const [props, expected] of [
+      [{}, 'Untrusted content'],
+      [{ tier: 'untrusted' }, 'Untrusted content'],
+      [{ mediaTrust: 'untrusted', toolbarPosition: 'top' }, 'Untrusted content'],
+      [
+        { messages: { 'stage.untrustedBadge': 'Contenido no confiable' } },
+        'Contenido no confiable',
+      ],
+      [{ tier: 'developer' }, null],
+      [{ mediaTrust: 'developer' }, null],
+      [{ trustBadge: false }, null],
+      [{ tier: 'untrusted', trustBadge: false }, null],
+    ] as const) {
+      await scenario(`trust badge for ${JSON.stringify(props)}`, async () => {
+        stageWith(props);
+        const node = badge();
+        expect(node?.textContent ?? null).toBe(expected);
+        if (!node) return;
+        const row = node.parentElement as HTMLElement;
+        const toolbar = screen.getByRole('group', { name: 'Presentation controls' });
+        // One badge, at the inline start of the row that holds the toolbar; plain text, not focusable.
+        expect(document.querySelectorAll('[data-tx-deck-trust]')).toHaveLength(1);
+        expect(row.classList.contains('tx-deck-stage__chrome-row')).toBe(true);
+        expect(row.parentElement).toBe(document.querySelector('.tx-deck-stage'));
+        expect(row.firstElementChild).toBe(node);
+        expect(toolbar.parentElement).toBe(row);
+        expect(node.hasAttribute('tabindex')).toBe(false);
+        expect(node.getAttribute('aria-hidden')).toBeNull();
       });
     }
   });

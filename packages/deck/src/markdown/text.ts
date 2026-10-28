@@ -27,6 +27,28 @@ export function isHiddenCode(code: number): boolean {
   );
 }
 
+/**
+ * Trailing spaces and tabs removed, by index (linear). Regexes such as
+ * `/[ \t]+$/` scan every run once per start position: quadratic on a long
+ * run that is followed by text.
+ */
+export function trimBlankEnd(text: string): string {
+  let end = text.length;
+  while (end > 0) {
+    const code = text.charCodeAt(end - 1);
+    if (code !== 0x20 && code !== 0x09) break;
+    end--;
+  }
+  return end === text.length ? text : text.slice(0, end);
+}
+
+/** Trailing `char` repeats removed, by index (linear; see `trimBlankEnd`). */
+export function trimCharEnd(text: string, char: string): string {
+  let end = text.length;
+  while (end > 0 && text[end - 1] === char) end--;
+  return end === text.length ? text : text.slice(0, end);
+}
+
 /** Remove hidden characters (see `isHiddenCode`). */
 export function stripHidden(text: string): string {
   let out = '';
@@ -149,7 +171,7 @@ export function slugify(text: string, max = 48): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+/, '')
     .slice(0, max)
-    .replace(/-+$/, '');
+    .replace(/-$/, '');
   return slug;
 }
 

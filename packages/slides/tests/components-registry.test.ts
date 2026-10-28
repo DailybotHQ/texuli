@@ -8,6 +8,7 @@ import MathBlock from '../src/components/MathBlock.svelte';
 import {
   componentBlueprint,
   componentRenderers,
+  componentState,
   createComponentRenderers,
   createMemoryStateHost,
   extendedItem,
@@ -364,6 +365,24 @@ describe('registry: state host and capabilities', () => {
       props: { name: 'e', state: 'e', label: 'Email' },
     });
     expect(tree(field)[0]).toMatchObject({ id: 'action-form', children: [{ id: 'form-field' }] });
+  });
+
+  it('copies only own, safe $declare keys: never __proto__, constructor or prototype', () => {
+    // JSON.parse makes "__proto__" an own key; Object.assign would set the prototype.
+    const props = JSON.parse(
+      '{"label":"L","state":"__proto__","reorder":{"bind":{"$state":"constructor"}},' +
+        '"$declare":{"__proto__":{"polluted":true},"constructor":{"type":"string"},' +
+        '"prototype":{"type":"string"},"p":{"type":"list","initial":[]}}}'
+    ) as Bag;
+    for (const id of ['sortable-list', 'control-toggle']) {
+      const state = componentState(id, props);
+      expect(Object.getPrototypeOf(state), id).toBe(Object.prototype);
+      expect(Object.keys(state), id).toEqual(['p']);
+      expect((state as { polluted?: unknown }).polluted, id).toBeUndefined();
+      expect(({} as { polluted?: unknown }).polluted, id).toBeUndefined();
+      const blueprint = componentBlueprint({ id, props });
+      expect(JSON.stringify(blueprint.state), id).toBe('{"p":{"type":"list","initial":[]}}');
+    }
   });
 
   it('control-choice infers its enum from options; $declare still overrides', async () => {

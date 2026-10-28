@@ -30,7 +30,10 @@ export interface Scanned {
   slides: RawSlide[];
 }
 
-/** Line endings normalized, size bounds applied, hidden characters reported and removed. */
+/**
+ * Line endings normalized (CR LF, CR, U+2028 and U+2029 become line feeds),
+ * size bounds applied, hidden characters reported and removed.
+ */
 export function normalizeLines(text: string, sink: IssueSink): Line[] | null {
   if (utf8Length(text) > DECK_MARKDOWN_LIMITS.bytes) {
     sink.report(
@@ -43,7 +46,9 @@ export function normalizeLines(text: string, sink: IssueSink): Line[] | null {
     return null;
   }
   let source = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
-  source = source.replace(/\r\n?/g, '\n');
+  // U+2028 and U+2029 are line terminators to JavaScript regexes (`.` and `$`
+  // stop at them), so they end a line here too: no line holds one.
+  source = source.replace(/\r\n?|[\u2028\u2029]/g, '\n');
   const raw = source.split('\n');
   if (raw.length > DECK_MARKDOWN_LIMITS.lines) {
     sink.report(

@@ -156,6 +156,34 @@ describe('slide engine performance at the 200-slide cap', () => {
     expect(overLimitMs).toBeLessThan(1_000);
   });
 
+  it('parses Markdown linearly: 4× the slides costs well under 16× the time', () => {
+    expect(process.env.TEXULI_PERF).toBe('1');
+    // Rich slides (fragments, code steps, math, a component fence, a table), as in
+    // packages/deck/tests/markdown-hostile.test.ts, which checks the output deterministically.
+    const rich = (slides: number) =>
+      `---\ntitle: Linear parse fixture\n---\n\n${Array.from(
+        { length: slides },
+        (_, i) =>
+          `## Slide ${i}\n\n- one <!-- .element: fragment -->\n- two <!-- .element: fragment -->\n\nSome **text** with [a link](https://example.com/${i}).\n\n\`\`\`ts [1|2]\nconst a = ${i};\nconst b = 2;\n\`\`\`\n\n$$\n\\frac{${i}}{2}\n$$\n\n::: component chart-bar {step=4}\n{"title": "Revenue", "data": [1, 2, 3]}\n:::\n\n| a | b |\n| --- | --- |\n| 1 | 2 |`
+      ).join('\n\n---\n\n')}\n`;
+    const small = rich(50);
+    const large = rich(SLIDE_COUNT);
+    expect(parseDeckMarkdown(small).ok && parseDeckMarkdown(large).ok).toBe(true);
+    const best = (text: string) =>
+      Math.min(
+        ...Array.from({ length: 3 }, () => {
+          const started = performance.now();
+          parseDeckMarkdown(text);
+          return performance.now() - started;
+        })
+      );
+    const smallMs = best(small);
+    const largeMs = best(large);
+    report('parse 50 rich Markdown slides', smallMs);
+    report('parse 200 rich Markdown slides', largeMs);
+    expect(largeMs / Math.max(smallMs, 0.5)).toBeLessThan(10);
+  });
+
   it('prefetches only the text block chunk for a text-only deck', async () => {
     const deck = validDeck();
     const textOnly = deck.slides.every(

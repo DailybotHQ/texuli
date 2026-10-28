@@ -12,7 +12,11 @@
 
 import type { CatalogTreeInput, RenderNode, RenderTier } from '@texuli/catalog/render/renderer';
 
-/** Read-only snapshot the player hands a deck host. */
+/**
+ * Read-only request the player hands a deck host. `tree` and `tier` are fixed
+ * for one presentation; `label`, `active` and `root` are live getters (read
+ * them when needed): changing them does not call `present` again.
+ */
 export interface DeckPlayerHostRequest {
   /** The validated layout-deck tree (or its render root). */
   tree: CatalogTreeInput | RenderNode;
@@ -29,7 +33,7 @@ export interface DeckPlayerHostRequest {
 /**
  * A host that can present a deck blueprint on a stage-like surface.
  * `present` may return a cleanup; the player calls it when the blueprint,
- * tier or host identity changes, and on destroy.
+ * tier or host identity changes, and on destroy, and only then presents again.
  */
 export interface DeckPlayerHost {
   present(request: DeckPlayerHostRequest): undefined | (() => void);

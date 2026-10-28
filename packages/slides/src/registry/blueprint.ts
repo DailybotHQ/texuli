@@ -26,7 +26,10 @@ export interface SlideCapabilities {
   reorder?: boolean;
   /** Edit a `workflow-graph` (mode `edit`). Default false. */
   workflowEdit?: boolean;
-  /** Mount `embed-app` blocks. Default false: embeds paint their safe start card. */
+  /**
+   * Reserved, not wired: no painter reads it and the stage passes no
+   * `mountEmbed`, so `embed-app` blocks always paint their safe start card.
+   */
   embeds?: boolean;
 }
 
@@ -118,17 +121,37 @@ export function gatedProps(id: string, props: Bag, capabilities: SlideCapabiliti
   return out;
 }
 
-/** State declarations for one node: inferred ones, then the author's `$declare` on top. */
+/** Keys never copied into a state table: they would reach `Object.prototype` setters. */
+const UNSAFE_KEYS: ReadonlySet<string> = new Set(['__proto__', 'constructor', 'prototype']);
+
+/** Set an own data property, skipping prototype keys (never a `[[Set]]` on `__proto__`). */
+function setOwn(target: Bag, key: string, value: unknown): void {
+  if (UNSAFE_KEYS.has(key)) return;
+  Object.defineProperty(target, key, {
+    value,
+    enumerable: true,
+    writable: true,
+    configurable: true,
+  });
+}
+
+/**
+ * State declarations for one node: inferred ones, then the author's `$declare`
+ * on top. Only the declaration's own keys are copied, never `__proto__`,
+ * `constructor` or `prototype` (JSON.parse makes `"__proto__"` an own key).
+ */
 export function componentState(id: string, props: Bag): Bag {
   const state: Bag = {};
-  for (const name of stateReads(props)) state[name] = { type: 'list', initial: [] };
+  for (const name of stateReads(props)) setOwn(state, name, { type: 'list', initial: [] });
   const control = CONTROL_STATE[id];
   if (control && typeof props.state === 'string') {
     const declaration = control(props);
-    if (declaration) state[props.state] = declaration;
+    if (declaration) setOwn(state, props.state, declaration);
   }
   const declared = props[DECLARE_KEY];
-  if (isBag(declared)) Object.assign(state, declared);
+  if (isBag(declared)) {
+    for (const key of Object.keys(declared)) setOwn(state, key, declared[key]);
+  }
   return state;
 }
 

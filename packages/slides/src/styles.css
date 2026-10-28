@@ -331,6 +331,46 @@
   outline-offset: 2px;
 }
 
+/*
+ * The trust badge row (untrusted tier): the badge at the inline start, the
+ * toolbar (or the host `chrome`) takes the rest, so its own alignment holds.
+ */
+.tx-deck-stage__chrome-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-inline-size: 0;
+}
+
+.tx-deck-stage__chrome-row > :not(.tx-deck-stage__trust) {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.tx-deck-stage__trust {
+  flex: none;
+  padding-block: 0.25rem;
+  padding-inline: 0.65rem;
+  color: var(--tx-muted-foreground, var(--tx-foreground));
+  border: 1px dashed var(--tx-border-strong, var(--tx-border));
+  border-radius: 999px;
+  font-size: var(--tx-font-size-xs, 0.75rem);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (forced-colors: active) {
+  .tx-deck-stage__trust {
+    color: CanvasText;
+    border-color: CanvasText;
+  }
+}
+
+/* Full screen hands the default toolbar's controls to the overlay; its row goes with it. */
+.tx-deck-stage[data-fullscreen] .tx-deck-stage__chrome-row:has(> .tx-deck-chrome-toolbar) {
+  display: none;
+}
+
 .tx-deck-stage__fullscreen-note {
   margin: 0;
   padding-block: 0.375rem;
@@ -979,6 +1019,7 @@
 }
 
 @media print {
+  .tx-deck-stage__chrome-row,
   .tx-deck-stage__toolbar,
   .tx-deck-stage__presenter-side,
   .tx-deck-stage__overview {

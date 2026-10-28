@@ -52,7 +52,7 @@ unlocks its mutations.
 
 | Group | Catalog ids | Notes |
 | --- | --- | --- |
-| Blocks (9) | `blocks-text`, `blocks-media`, `blocks-data`, `blocks-code`, `blocks-structure`, `blocks-interactive`, `blocks-map`, `blocks-embed`, `blocks-diagram` | Each family is its own lazy chunk. Interactive blocks (poll, quiz, calculator, counter, tabs, reveal) keep their state in memory. `blocks-embed` mounts an app only with the `embeds` capability |
+| Blocks (9) | `blocks-text`, `blocks-media`, `blocks-data`, `blocks-code`, `blocks-structure`, `blocks-interactive`, `blocks-map`, `blocks-embed`, `blocks-diagram` | Each family is its own lazy chunk. Interactive blocks (poll, quiz, calculator, counter, tabs, reveal) keep their state in memory. `blocks-embed` paints its safe start card only (the `embeds` capability is reserved, see [Capabilities](#capabilities)) |
 | Charts (23) | `charts-area`, `charts-bar`, `charts-cartesian`, `charts-combo`, `charts-line`, `charts-stacked-bar`, `charts-bullet`, `charts-gauge`, `charts-progress-ring`, `charts-sparkline`, `charts-funnel`, `charts-network`, `charts-sankey`, `charts-geo-map`, `charts-geo-point-map`, `charts-bubble`, `charts-heatmap`, `charts-scatter`, `charts-donut`, `charts-pie`, `charts-sunburst`, `charts-treemap`, `charts-canvas-renderer` | One chunk per chart family (cartesian, compact, flow, geo, matrix, part-whole, canvas) |
 | Media (3) | `media-image`, `media-composition-svg`, `media-composition-canvas` | |
 | Data views (7) | `data-board`, `data-tree-view`, `data-calendar`, `data-grid`, `data-files`, `data-map`, `data-timeline` | Board card moves need `reorder` |
@@ -170,8 +170,13 @@ headings to the slide outline, and the player paints it with
 | --- | --- | --- |
 | `reorder` | on (local state only) | Reordering a `sortable-list`, moving `data-board` cards |
 | `workflowEdit` (`workflow-edit`) | off | `workflow-graph` in `edit` mode (otherwise `view`) |
-| `embeds` | off | Mounting `embed-app` blocks (otherwise their safe start card) |
+| `embeds` | off | **Reserved, not wired.** Nothing reads it yet, and the stage never passes a `mountEmbed` to the player, so `blocks-embed` always paints its safe start card, with or without it |
 | `actions` | — | Form submits go to the host's `onAction`; without it, forms cannot submit |
+
+`embeds` is reserved for a later host seam that mounts `embed-app` blocks.
+`hasCapability(capabilities, 'embeds')` answers the flag, and the catalog
+table tags `blocks-embed` with it, but no painter consults it today:
+granting it changes nothing on a slide.
 
 ## Math and measured images
 

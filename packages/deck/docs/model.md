@@ -96,7 +96,9 @@ From `shared.ts`, used by every part of the model:
 - `line(max, min?)` and `multiline(max)`: the single-line and multi-line
   string schemas.
 - `MEDIA_SRC_PATTERN` and `mediaSrc`: an `https:` URL (no `.svg`), a relative
-  path without `..`, backslashes or `.svg`, a base64 `data:` raster
+  path without `..`, backslashes or `.svg`, a base64 `data:` raster. The SVG
+  refusal ignores letter case (`.SVG`, `.Svg`) and sees a percent-encoded dot
+  or end marker (`%2esvg`, `.svg%3F`, `.svg%23`)
   (`png`, `jpeg`, `gif`, `webp`, `avif`) or video (`mp4`, `webm`), or an
   `avatar:av-NNN` id.
 - `LINK_HREF_PATTERN` and `linkHref`: `https:`, `mailto:`, a `#fragment` or

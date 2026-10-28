@@ -7,6 +7,7 @@
 import { type PathSegment, toJsonPath } from '../schema/index.ts';
 import type { IssueSink } from './issues.ts';
 import type { Line } from './scan.ts';
+import { trimBlankEnd } from './text.ts';
 
 type Kind = 'string' | 'boolean' | 'int';
 
@@ -64,7 +65,8 @@ export interface Frontmatter {
   lines: Map<string, number>;
 }
 
-const KEY = /^([A-Za-z][A-Za-z0-9-]*)[ \t]*:(?:[ \t]+(.*?))?[ \t]*$/;
+/** Runs on `trimBlankEnd(text)`: no trailing `[ \t]*` competes with the value. */
+const KEY = /^([A-Za-z][A-Za-z0-9-]*)[ \t]*:(?:[ \t]+(.*))?$/;
 
 function scalar(raw: string): { value: string } | { error: string } {
   if (raw.startsWith('"')) {
@@ -108,7 +110,7 @@ export function readFrontmatter(lines: readonly Line[], sink: IssueSink): Frontm
   for (const line of lines) {
     const text = line.text;
     if (text.trim() === '' || text.trimStart().startsWith('#')) continue;
-    const match = KEY.exec(text);
+    const match = KEY.exec(trimBlankEnd(text));
     if (!match) {
       sink.report(
         'md-frontmatter-value',

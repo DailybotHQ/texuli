@@ -1059,16 +1059,37 @@ let deckHostActive = $derived(
       isLayoutDeckTree(playerState.validation.draft ?? playerState.validation.roots[0])
   )
 );
+// Re-presents only when the blueprint, the tier or the host change. The keys
+// are deriveds, so a host that passes every prop again (mountPlayer, a test
+// rerender) with the same values never re-presents; the validated tree is read
+// untracked, and `label`, `active` and `root` are live getters, so toggling
+// them never re-presents the deck (and never loses its position).
+let deckSource = $derived(blueprint);
+let deckTier = $derived(tier);
+let deckPresenter = $derived(deckHost);
 $effect(() => {
-  if (!deckHost || !deckHostActive || !playerState) return;
-  const tree = (playerState.validation.draft ?? playerState.validation.roots[0]) as never;
-  const cleanup = deckHost.present({
-    tree,
-    tier,
-    label,
-    active,
-    root,
-  });
+  const host = deckPresenter;
+  const presentTier = deckTier;
+  void deckSource;
+  if (!host || !deckHostActive) return;
+  const state = untrack(() => playerState);
+  if (!state) return;
+  const tree = (state.validation.draft ?? state.validation.roots[0]) as never;
+  const cleanup = untrack(() =>
+    host.present({
+      tree,
+      tier: presentTier,
+      get label() {
+        return label;
+      },
+      get active() {
+        return active;
+      },
+      get root() {
+        return root;
+      },
+    })
+  );
   if (typeof cleanup === 'function') return cleanup;
 });
 </script>

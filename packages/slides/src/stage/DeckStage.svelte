@@ -106,6 +106,13 @@ interface Props {
   tier?: DeckMediaTrust;
   /** v1 name of `tier` (kept for existing hosts). */
   mediaTrust?: DeckMediaTrust;
+  /**
+   * Show the stage's "Untrusted content" badge (`stage.untrustedBadge`) in the
+   * chrome row when the paint tier is `untrusted`. Default true: components
+   * paint through the player with its own chrome off, so the stage carries the
+   * trust signal. Never shown at the `developer` tier.
+   */
+  trustBadge?: boolean;
   /** Partial overrides of the stage messages (English defaults). */
   messages?: DeckStageMessages;
   /** Override `meta.locale` (the `lang` of the stage). */
@@ -163,6 +170,7 @@ let {
   fit = 'container',
   tier,
   mediaTrust,
+  trustBadge = true,
   messages,
   locale,
   dir,
@@ -205,6 +213,7 @@ let prepared = $derived(prepareDeck(deck, deckValidationHooks(rendererList)));
 let model = $derived(prepared.ok ? prepared.deck : null);
 let t = $derived(createDeckTranslator(messages));
 let paintTier = $derived<DeckMediaTrust>(tier ?? mediaTrust ?? 'untrusted');
+let showTrustBadge = $derived(trustBadge !== false && paintTier === 'untrusted');
 let localeInfo = $derived(resolveDeckLocale(model?.meta, { locale, dir }));
 
 function slideExists(current: Deck, id: string): boolean {
@@ -1007,11 +1016,23 @@ $effect(() => {
 });
 </script>
 
-{#snippet toolbarRow()}
+{#snippet controls()}
   {#if chrome}
     {@render chrome()}
   {:else}
     <DeckToolbar />
+  {/if}
+{/snippet}
+
+{#snippet toolbarRow()}
+  {#if showTrustBadge}
+    <!-- The trust signal sits at the inline start of the chrome row: plain text, not focusable. -->
+    <div class="tx-deck-stage__chrome-row" data-tx-deck-chrome>
+      <span class="tx-deck-stage__trust" data-tx-deck-trust="untrusted">{t('stage.untrustedBadge')}</span>
+      {@render controls()}
+    </div>
+  {:else}
+    {@render controls()}
   {/if}
   {#if fullscreenNote}
     <p class="tx-deck-stage__fullscreen-note" role="status">{fullscreenNote}</p>

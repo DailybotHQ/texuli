@@ -34,10 +34,20 @@ export interface DeckLintIssue extends DeckDiagnostic {
 }
 export interface DeckLintReport {
   ok: boolean;
+  /** Every distinct error found, also past the `issues` cap. */
   errors: number;
+  /** Every distinct warning found, also past the `issues` cap. */
   warnings: number;
+  /** At most `DECK_LINT_MAX_ISSUES`, one per rule and path. */
   issues: DeckLintIssue[];
+  /** True when issues past the cap were counted but not listed. */
+  truncated: boolean;
 }
+
+/** Issues listed in one report (the model's diagnostics cap); the rest are counted. */
+export const DECK_LINT_MAX_ISSUES = 200;
+/** How deep `wordCount` reads a value (the model refuses deeper values anyway). */
+const WORD_DEPTH = 32;
 
 const asRecord = (value: unknown): Record<string, unknown> | undefined =>
   value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -60,23 +70,34 @@ const NON_TEXT_KEYS = new Set([
   'reveal',
   'tone',
 ]);
-function wordCount(value: unknown): number {
+function wordCount(value: unknown, depth = 0): number {
   if (typeof value === 'string')
     return (value.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu) ?? []).length;
-  if (Array.isArray(value)) return value.reduce<number>((sum, item) => sum + wordCount(item), 0);
+  if (depth >= WORD_DEPTH) return 0;
+  if (Array.isArray(value))
+    return value.reduce<number>((sum, item) => sum + wordCount(item, depth + 1), 0);
   const record = asRecord(value);
   return record
     ? Object.entries(record).reduce<number>(
-        (sum, [key, child]) => sum + (NON_TEXT_KEYS.has(key) ? 0 : wordCount(child)),
+        (sum, [key, child]) => sum + (NON_TEXT_KEYS.has(key) ? 0 : wordCount(child, depth + 1)),
         0
       )
     : 0;
 }
 
-/** Static quality checks. It accepts untrusted input and never throws. */
+/**
+ * Static quality checks. It accepts untrusted input and never throws. Work is
+ * bounded: one issue per rule and path (a set, not a scan), at most
+ * `DECK_LINT_MAX_ISSUES` listed, and a deck over the model's structural
+ * limits (`too-many`, `too-deep`) reports the model issues without the
+ * quality pass.
+ */
 export function lintDeck(value: unknown): DeckLintReport {
   const parsed = parseDeck(value);
   const issues: DeckLintIssue[] = [];
+  const seen = new Set<string>();
+  let errors = 0;
+  let warnings = 0;
   const add = (
     rule: DeckLintRule,
     severity: 'error' | 'warning',
@@ -84,21 +105,25 @@ export function lintDeck(value: unknown): DeckLintReport {
     path: PathSegment[],
     fix?: string
   ) => {
-    if (
-      issues.some(
-        (issue) =>
-          issue.rule === rule &&
-          issue.path.length === path.length &&
-          issue.path.every((part, index) => part === path[index])
-      )
-    )
-      return;
+    const key = JSON.stringify([rule, path]);
+    if (seen.has(key)) return;
+    seen.add(key);
+    if (severity === 'error') errors++;
+    else warnings++;
+    if (issues.length >= DECK_LINT_MAX_ISSUES) return;
     issues.push({
       ...createDiagnostic(rule, message, path, fix ? { fix } : undefined),
       rule,
       severity,
     });
   };
+  const report = (): DeckLintReport => ({
+    ok: errors === 0,
+    errors,
+    warnings,
+    issues,
+    truncated: errors + warnings > issues.length || parsed.truncated === true,
+  });
   const raw = asRecord(value);
   const slides = Array.isArray(raw?.slides) ? raw.slides : [];
   for (const issue of parsed.issues) {
@@ -112,6 +137,11 @@ export function lintDeck(value: unknown): DeckLintReport {
           ? 'layout-props'
           : issue.code;
     add(rule, issue.severity, issue.message, path, issue.fix);
+  }
+  // Over a structural limit: the model issues say what to fix; a quality pass
+  // over 16,000 slides or a 5,000-deep value would only add noise and work.
+  if (parsed.issues.some((issue) => issue.code === 'too-many' || issue.code === 'too-deep')) {
+    return report();
   }
   const notesSeen = new Map<string, number>();
   let previousLayout = '';
@@ -268,9 +298,7 @@ export function lintDeck(value: unknown): DeckLintReport {
         );
     }
   });
-  const errors = issues.filter((item) => item.severity === 'error').length;
-  const warnings = issues.filter((item) => item.severity === 'warning').length;
-  return { ok: errors === 0, errors, warnings, issues };
+  return report();
 }
 
 function walk(

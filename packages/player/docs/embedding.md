@@ -86,7 +86,9 @@ your app's own UI.
 - **Trust badge.** At the `untrusted` tier the chrome always shows
   **Untrusted content** (`labels.trustBadge`) next to the status, also while
   the frame is inactive. You can reword it but not remove it. The `developer`
-  tier shows no badge.
+  tier shows no badge. The one exception is `chrome={false}`, where the
+  embedding host shows the trust signal instead
+  ([Frameless and deck hosts](#frameless-and-deck-hosts)).
 - **Validation.** Every value that paints has passed `validateDraft` and the
   untrusted URL policy, on every entry path (blueprint object or JSON text,
   envelopes, local state and `setState`, `mountPlayer` updates and frame
@@ -217,9 +219,14 @@ owner-approved release.
 component on a slide through a player with `chrome={false}`: the slide is
 the frame, so the player adds no label heading, skip link or end anchor and
 the component adds nothing to the slide's outline. That also removes the
-status and the **Untrusted content** badge, so use it only where your own
-surface makes the trust of the content clear. Validation, the URL policy at
-paint and containment are unchanged.
+status and the **Untrusted content** badge. This is the one exception to the
+trust-badge contract above: with `chrome={false}` the embedding host must
+show the trust signal itself. The slides stage does: at the `untrusted` tier
+it shows one **Untrusted content** badge in its toolbar row for the whole
+deck (`trustBadge`, `stage.untrustedBadge` in
+[`@texuli/slides` stage docs](../../slides/docs/stage.md#trust-badge)). Use
+`chrome={false}` only where your own surface does the same. Validation, the
+URL policy at paint and containment are unchanged.
 
 **`deckHost`.** The player (layer L7) cannot import `@texuli/slides` (L8), so
 it paints a `layout-deck` blueprint as a document flow. A host that has both
@@ -247,9 +254,11 @@ skips document paint, renders an empty `data-tx-player-deck-host-surface`
 element (the root carries `data-tx-player-deck-host="pending"`) and calls
 `present` with a `DeckPlayerHostRequest`: the validated `tree`, the
 host-chosen `tier` (never one from the draft), the frame `label`, whether
-the frame is `active`, and the player `root` element. `present` may return
-a cleanup, which the player calls when the blueprint, tier or host changes,
-and on destroy. Without a `deckHost`, or for any other root, the player
+the frame is `active`, and the player `root` element. `label`, `active` and
+`root` are live getters: read them when you need them; changing them never
+calls `present` again, so the stage keeps its position. `present` may return
+a cleanup, which the player calls when the blueprint, tier or host changes
+(then it presents again), and on destroy. Without a `deckHost`, or for any other root, the player
 paints as before. `DECK_STAGE_HOST_PACKAGE` names the package that owns the
 stage. `@texuli/slides` does not ship a ready-made `DeckPlayerHost` adapter
 yet, so a host writes the few lines above itself.

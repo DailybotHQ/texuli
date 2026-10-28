@@ -1,4 +1,4 @@
-import { SPEC_MIGRATIONS, UNDECLARED_SPEC_VERSION } from '@texuli/spec/migrate';
+import { SPEC_MIGRATIONS } from '@texuli/spec/migrate';
 import type { EditOp } from '../edit/types.ts';
 import type { CatalogTreeInput, RenderTier } from '../render/renderer/types.ts';
 
@@ -15,14 +15,17 @@ export const ENVELOPE_VERSION = 1;
 export const SUPPORTED_ENVELOPE_VERSIONS = [ENVELOPE_VERSION] as const;
 
 /**
- * The spec versions an envelope's `spec` may name: the newest step of the
- * migration chain (`@texuli/spec/migrate`). Older envelopes migrate first.
+ * The spec versions `parseEnvelope` accepts in an envelope's `spec`: every
+ * target of the migration chain (`@texuli/spec/migrate`), today `0.3.0` and
+ * `0.4.0`, the same enum as `blueprint.schema.json`. An envelope without
+ * `spec` (written for the undeclared baseline, `0.2.0`) parses as is; one
+ * that declares `"spec": "0.2.0"` is accepted only through migration:
+ * `validateDraft` runs `migrateBlueprint` first, which stamps the current
+ * version, while `parseEnvelope` alone refuses it (`unsupported-spec`).
  */
-/** Every version on the migration chain, including the undeclared baseline. */
-export const SUPPORTED_SPEC_VERSIONS: readonly string[] = Object.freeze([
-  UNDECLARED_SPEC_VERSION,
-  ...SPEC_MIGRATIONS.map((step) => step.to),
-]);
+export const SUPPORTED_SPEC_VERSIONS: readonly string[] = Object.freeze(
+  SPEC_MIGRATIONS.map((step) => step.to)
+);
 
 /**
  * Lifecycle: an agent or builder writes a `draft`; validation makes it

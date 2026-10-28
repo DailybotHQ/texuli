@@ -1,10 +1,35 @@
 #!/usr/bin/env node
 /// <reference types="node" />
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { DECK_COMMANDS, type DeckCommandName, runDeckCommand } from '../deck/index.ts';
 import { isMainModule } from '../internal/is-main.ts';
 
 const MAX_INPUT_BYTES = 2_000_000;
+
+/** The file system calls `readDeckFile` uses (injectable for tests). */
+export interface DeckFileSystem {
+  stat(path: string): Promise<{ size: number; isFile(): boolean }>;
+  readFile(path: string, encoding: 'utf8'): Promise<string>;
+}
+
+const NODE_FS: DeckFileSystem = { stat, readFile };
+
+/**
+ * Read a `--file` input: stat it first and refuse anything that is not a
+ * regular file or is over `MAX_INPUT_BYTES` without reading it, so a huge
+ * file (or a device such as `/dev/zero`) never lands in memory. The byte
+ * check after reading still holds if the file grew in between.
+ */
+export async function readDeckFile(path: string, fs: DeckFileSystem = NODE_FS): Promise<string> {
+  const info = await fs.stat(path);
+  if (!info.isFile()) throw new TypeError(`--file ${path} is not a regular file.`);
+  if (info.size > MAX_INPUT_BYTES)
+    throw new RangeError(
+      `Input exceeds ${MAX_INPUT_BYTES} bytes (${info.size}); nothing was read.`
+    );
+  return fs.readFile(path, 'utf8');
+}
+
 export interface DeckCliArgs {
   command: DeckCommandName;
   file?: string;
@@ -54,7 +79,7 @@ export async function runDeckCli(argv: readonly string[] = process.argv.slice(2)
       return { ok: true };
     }
     let raw = args.text;
-    if (args.file) raw = await readFile(args.file, 'utf8');
+    if (args.file) raw = await readDeckFile(args.file);
     if (
       raw === undefined &&
       ['lint', 'inspect', 'to-markdown', 'from-markdown'].includes(args.command)

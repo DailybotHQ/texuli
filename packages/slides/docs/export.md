@@ -219,6 +219,7 @@ answers) gives the same bytes. Tests unzip the output and parse every part.
 | Option | Default | Meaning |
 | --- | --- | --- |
 | `notes` | `true` | Write speaker notes pages. |
+| `tier` | `untrusted` | The deck's URL policy tier, the one the host gives `DeckStage`. The writer never fetches; it passes the tier to `loadImage` and `snapshotChart` as `context.tier` (only `developer` widens it) so the host applies the same policy. |
 | `loadImage(src, context)` | — | Resolve an image source to bytes (`DeckPptxImageAsset`). Without it, images are omitted. |
 | `snapshotChart(chart, context)` | — | Rasterize a chart block to a picture. Without it, charts are omitted and their title stays. |
 | `palette` | the embedded theme, else neutral | The resolved theme palette (`#rrggbb` per role), or a function of each slide (`undefined` for the deck theme). |
@@ -244,9 +245,12 @@ What the file holds:
 - **Tables** as native `a:tbl` tables, from `comparison-table` slides and
   table blocks.
 - **Pictures** from host bytes. `loadImage` receives the source as authored
-  and a `DeckPptxAssetContext` (`slideId`, the JSON `path`, and `kind`:
-  `image`, `avatar`, `background` or `poster`); the host applies its URL
-  policy, fetches and returns bytes, or nothing to leave the image out.
+  and a `DeckPptxAssetContext` (`slideId`, the JSON `path`, `kind`:
+  `image`, `avatar`, `background` or `poster`, and the deck `tier`); the host
+  applies its URL policy at that tier (for example
+  `safeImageSrc(src, context.tier)` from
+  `@texuli/core/url-policy`), fetches and returns bytes, or nothing to leave
+  the image out.
   Returned bytes must be PNG, JPEG, GIF or BMP, and their leading bytes must
   match the declared `mimeType`; one image may be at most 25 MiB and one file
   at most 200 MiB of media. Anything else, and a callback that throws, is
@@ -254,8 +258,9 @@ What the file holds:
   from the image header, and pictures keep their proportions (contained or
   cropped to cover). The same source is embedded once.
 - **Charts** as pictures. `snapshotChart` receives the chart block and a
-  `DeckPptxChartContext` (`slideId`, `path`, and the picture frame `width`
-  and `height` in canvas pixels, to render at that size or a multiple).
+  `DeckPptxChartContext` (`slideId`, `path`, the deck `tier`, and the
+  picture frame `width` and `height` in canvas pixels, to render at that
+  size or a multiple).
 - **Theme** colors and fonts from the resolved palette and `fonts`.
 - **Backgrounds** per slide: solid, gradient, pattern and image (through
   `loadImage`), with the contrast scrim; a video background uses its poster.

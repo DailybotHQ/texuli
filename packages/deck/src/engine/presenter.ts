@@ -25,12 +25,15 @@ const MAX_STEP = 32;
 
 /** Sanitize a deck namespace for a channel name. */
 export function sanitizePresenterNamespace(namespace: string): string {
-  const raw = typeof namespace === 'string' ? namespace.trim() : '';
-  const cleaned = raw
-    .toLowerCase()
-    .replace(/[^a-z0-9._:-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 96);
+  // Bounded and linear: cap the host string before any pattern runs, then
+  // trim the edge dashes with index scans (no `^-+|-+$` backtracking).
+  const raw = typeof namespace === 'string' ? namespace.slice(0, 512).trim() : '';
+  const dashed = raw.toLowerCase().replace(/[^a-z0-9._:-]+/g, '-');
+  let start = 0;
+  let end = dashed.length;
+  while (start < end && dashed[start] === '-') start += 1;
+  while (end > start && dashed[end - 1] === '-') end -= 1;
+  const cleaned = dashed.slice(start, end).slice(0, 96);
   return cleaned || 'default';
 }
 

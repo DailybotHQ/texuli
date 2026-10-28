@@ -428,10 +428,11 @@ describe('v2 PPTX structure', () => {
       slideId: 'picture',
       path: '$.props.image.src',
       kind: 'image',
+      tier: 'untrusted',
     });
     expect(snapshotChart).toHaveBeenCalledWith(
       { kind: 'bar', title: 'Release count', description: 'Releases per month', type: 'chart' },
-      expect.objectContaining({ slideId: 'trend', path: '$.props.spec' })
+      expect.objectContaining({ slideId: 'trend', path: '$.props.spec', tier: 'untrusted' })
     );
     expect(result.omitted).toEqual([]);
 
@@ -488,6 +489,38 @@ describe('v2 PPTX structure', () => {
     expect(decode('ppt/slides/_rels/slide1.xml.rels')).toContain('notesSlide1.xml');
     expect(zip.has('ppt/notesSlides/notesSlide2.xml')).toBe(false);
     expect(decode('ppt/slides/slide1.xml')).toContain('lang="en-GB"');
+  });
+
+  it('hands the deck tier to every host callback context: untrusted unless the host says developer', async () => {
+    for (const [tier, expected] of [
+      [undefined, 'untrusted'],
+      ['untrusted', 'untrusted'],
+      ['developer', 'developer'],
+      ['root', 'untrusted'],
+    ] as const) {
+      const contexts: Record<string, unknown>[] = [];
+      await writeDeckPptx(harborDeck(), {
+        ...(tier === undefined ? {} : { tier: tier as 'developer' }),
+        loadImage: (_src, context) => {
+          contexts.push({ ...context });
+          return { bytes: picture, mimeType: 'image/png' };
+        },
+        snapshotChart: (_chart, context) => {
+          contexts.push({ ...context });
+          return { bytes: snapshot, mimeType: 'image/png' };
+        },
+      });
+      expect(contexts.length, String(tier)).toBeGreaterThan(1);
+      for (const context of contexts) {
+        expect(context.tier, `${tier} ${JSON.stringify(context)}`).toBe(expected);
+        // The exact context shapes: assets carry a kind, charts their frame size.
+        const keys = Object.keys(context).sort();
+        expect([
+          ['kind', 'path', 'slideId', 'tier'],
+          ['height', 'path', 'slideId', 'tier', 'width'],
+        ]).toContainEqual(keys);
+      }
+    }
   });
 
   it('reports what it cannot map, with the slide id, path and reason, also on the notes page', async () => {

@@ -1,6 +1,6 @@
 // @vitest-environment node
-import { expect, it } from 'vitest';
-import { parseDeckCliArgs } from '../src/cli/deck.ts';
+import { expect, it, vi } from 'vitest';
+import { parseDeckCliArgs, readDeckFile } from '../src/cli/deck.ts';
 import { DECK_COMMANDS, runDeckCommand } from '../src/deck/index.ts';
 import { createTexuliMcpServer, MCP_PROTOCOL_VERSION } from '../src/mcp/index.ts';
 
@@ -78,6 +78,26 @@ it('returns actionable failures and parses the texuli-deck CLI surface strictly'
     /either --file or --text/u
   );
   expect(() => parseDeckCliArgs(['lint', '--file'])).toThrow(/needs a path/u);
+});
+
+it('stats --file first: refuses a file over 2,000,000 bytes or not regular, without reading it', async () => {
+  const fake = (size: number, file = true) => ({
+    stat: vi.fn(async () => ({ size, isFile: () => file })),
+    readFile: vi.fn(async () => '{"formatVersion":2}'),
+  });
+  for (const [size, file, message] of [
+    [2_000_001, true, /exceeds 2000000 bytes \(2000001\); nothing was read/u],
+    [5_000_000_000, true, /exceeds 2000000 bytes/u],
+    [0, false, /not a regular file/u],
+  ] as const) {
+    const fs = fake(size, file);
+    await expect(readDeckFile('deck.json', fs)).rejects.toThrow(message);
+    expect(fs.stat).toHaveBeenCalledWith('deck.json');
+    expect(fs.readFile).not.toHaveBeenCalled();
+  }
+  const fs = fake(2_000_000);
+  await expect(readDeckFile('deck.json', fs)).resolves.toBe('{"formatVersion":2}');
+  expect(fs.readFile).toHaveBeenCalledWith('deck.json', 'utf8');
 });
 
 it('registers a closed, read-only MCP deck tool with CLI command parity', async () => {

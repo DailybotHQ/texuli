@@ -231,6 +231,25 @@ already has, so a package changed since its published `0.3.0` (for example
 `@texuli/data`, which now depends on `@texuli/drag`) needs a new version
 before its change reaches npm.
 
+**The deck release set moves to `0.4.0` together.** `@texuli/deck` is
+`0.4.0`, but the packages around it still read `0.3.0`: `@texuli/slides`,
+`@texuli/player`, `@texuli/catalog` and `@texuli/spec` must move to `0.4.0`
+in the same release task, with exact pins between them. Today
+`@texuli/slides` pins `@texuli/catalog` `0.3.0`, `@texuli/deck` `0.4.0` and
+`@texuli/player` `0.3.0`; `@texuli/player` pins `@texuli/catalog` `0.3.0`;
+and `@texuli/catalog` and `@texuli/player` declare `@texuli/spec` as
+`workspace:*`, a range `pnpm verify:packages` refuses. The release task
+bumps the four manifests to `0.4.0` and pins every one of these
+dependencies to exactly `0.4.0` (plus `@texuli/tools`, which pins
+`@texuli/catalog` `0.3.0` and `@texuli/deck` `0.4.0`, if its deck commands
+ship in the same set). **Publishing before that bump would skip
+`@texuli/slides`:** its manifest still reads `0.3.0`, which npm already has,
+so the publish loop would skip it and the v2 stage would not reach npm,
+while `@texuli/deck` `0.4.0` would go out with no published package using
+it. The same holds for `@texuli/player`, `@texuli/catalog` and
+`@texuli/spec`: their repository changes (the `deckHost` seam,
+`chrome={false}`, spec `0.4.0`) are not in the `0.3.0` tarballs.
+
 Each outward wave must also pass its task's `pnpm verify:packages` gate and
 the applicable tests, type checks, layer checks, behavior, visual, size,
 website, and clean-consumer checks from [TESTING_GUIDE](TESTING_GUIDE.md).

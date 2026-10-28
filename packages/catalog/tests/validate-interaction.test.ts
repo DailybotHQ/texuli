@@ -1,6 +1,8 @@
 // @vitest-environment node
-import { ACTION_FIELDS, SPEC_EVENT_NAMES, SPEC_PROP_REFS } from '@texuli/spec';
+import { ACTION_FIELDS, SPEC_EVENT_NAMES, SPEC_PROP_REFS, SPEC_VERSION } from '@texuli/spec';
+import { UNDECLARED_SPEC_VERSION } from '@texuli/spec/migrate';
 import { describe, expect, it } from 'vitest';
+import blueprintJson from '../../spec/schemas/blueprint.schema.json';
 import { buildCatalog } from '../src/build/index.ts';
 import { discoverManifestGroups } from '../src/build/node.ts';
 import { parseEnvelope, SUPPORTED_SPEC_VERSIONS } from '../src/envelope/index.ts';
@@ -57,6 +59,26 @@ describe('envelope 0.3.0 fields and migration', () => {
     const result = run(envelope({ id: 'layout-stack', props: { gap: 'small' } }));
     expect(codes(result)).toEqual([]);
     expect(result.envelope?.spec).toBe(SUPPORTED_SPEC_VERSIONS[SUPPORTED_SPEC_VERSIONS.length - 1]);
+  });
+
+  it('spec versions: the schema enum parses, undeclared parses, an explicit 0.2.0 only migrates', () => {
+    const tree = { id: 'layout-stack', props: {} };
+    const schema = blueprintJson as unknown as { properties: { spec: { enum: string[] } } };
+    expect([...SUPPORTED_SPEC_VERSIONS]).toEqual(schema.properties.spec.enum);
+    expect(SUPPORTED_SPEC_VERSIONS).not.toContain(UNDECLARED_SPEC_VERSION);
+    for (const spec of SUPPORTED_SPEC_VERSIONS) {
+      expect(parseEnvelope(envelope(tree, { spec })).issues, spec).toEqual([]);
+    }
+    // Undeclared: parses as is, and validateDraft stamps the current version.
+    expect(parseEnvelope(envelope(tree)).issues).toEqual([]);
+    // Declared 0.2.0: refused by parseEnvelope alone, accepted through migration.
+    const legacy = envelope(tree, { spec: UNDECLARED_SPEC_VERSION });
+    expect(parseEnvelope(legacy).issues.map((issue) => issue.code)).toEqual(['unsupported-spec']);
+    const migrated = run(legacy);
+    expect(codes(migrated)).toEqual([]);
+    expect(migrated.envelope?.spec).toBe(SPEC_VERSION);
+    // Migration never mutates its input.
+    expect((legacy as Record<string, unknown>).spec).toBe(UNDECLARED_SPEC_VERSION);
   });
 
   it('accepts spec, state and flow; refuses an unknown spec and non-object state', () => {

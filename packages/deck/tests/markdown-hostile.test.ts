@@ -8,6 +8,7 @@ import {
 } from '../src/markdown/index.ts';
 import { inertJson } from '../src/markdown/text.ts';
 import type { Deck } from '../src/model/index.ts';
+import { MEDIA_SRC_PATTERN } from '../src/model/shared.ts';
 
 type Bag = Record<string, unknown>;
 
@@ -87,11 +88,47 @@ describe('deck markdown: URLs', () => {
     '![x](javascript:alert(1))',
     '![x](../../etc/passwd)',
     '![x](https://example.com/a.svg)',
+    '![x](https://example.com/a.SVG)',
+    '![x](https://example.com/a.Svg?v=1)',
+    '![x](https://example.com/a.svg%3Fv=1)',
+    '![x](https://example.com/a.svg%23top)',
+    '![x](https://example.com/a%2esvg)',
+    '![x](https://example.com/a%2ESVG)',
+    '![x](assets/logo.SVG)',
+    '![x](assets/logo.sVg#frag)',
     '<javascript:alert(1)>',
   ])('%s is refused', (line) => {
     expect(
       codes(line).some((code) => code === 'md-url-refused' || code === 'md-html-refused')
     ).toBe(true);
+  });
+
+  it('refuses SVG media sources in any letter case and percent-encoded, keeps rasters', () => {
+    const media = new RegExp(MEDIA_SRC_PATTERN, 'u');
+    for (const src of [
+      'https://example.com/a.svg',
+      'https://example.com/a.SVG',
+      'https://example.com/a.sVg#x',
+      'https://example.com/a.svg%3Fx=1',
+      'https://example.com/a.svg%3fx=1',
+      'https://example.com/a.svg%23x',
+      'https://example.com/a%2esvg',
+      'https://example.com/a%2ESvG',
+      'assets/a.svg',
+      'assets/a.SVG',
+      'assets/a.Svg?x=1',
+    ]) {
+      expect(media.test(src), src).toBe(false);
+    }
+    for (const src of [
+      'https://example.com/a.png',
+      'https://example.com/a.svgz.png',
+      'https://example.com/svg/a.png',
+      'https://example.com/a.png?name=a.svg',
+      'assets/svg-logo.png',
+    ]) {
+      expect(media.test(src), src).toBe(true);
+    }
   });
 
   it('refuses unsafe media in backgrounds and layouts through the model', () => {
@@ -156,7 +193,8 @@ describe('deck markdown: structure attacks', () => {
     const time = timed(() => {
       expect(codes(nested)).toContain('md-directive-depth');
     });
-    expect(time).toBeLessThan(500);
+    // Generous on purpose (a loaded host); 500 nested openers unbounded would take far longer.
+    expect(time).toBeLessThan(2_000);
     expect(codes('::: script\nalert(1)\n:::')).toContain('md-region-unknown');
   });
 
@@ -256,7 +294,105 @@ describe('deck markdown: bounds', () => {
     const time = timed(() => {
       parseDeckMarkdown(`${FRONT}${body}`);
     });
-    expect(time).toBeLessThan(1_500);
+    // A ceiling, not a benchmark: a super-linear parse of ~1 MiB takes far longer,
+    // and the margin survives a loaded host (1,500 ms failed at load average 76).
+    expect(time).toBeLessThan(6_000);
+  });
+});
+
+describe('deck markdown: no super-linear backtracking (ReDoS)', () => {
+  const LINE = DECK_MARKDOWN_LIMITS.lineLength;
+  const spaces = (n: number) => ' '.repeat(n);
+  /** One hostile line at the 20,000-character line cap, per reported regex shape. */
+  const LINES: readonly (readonly [string, string])[] = [
+    ['heading: a lazy title before trailing spaces', `# ${spaces(LINE - 4)}a `],
+    ['heading: a space run before text', `# a${spaces(LINE - 4)}b`],
+    ['alignment row: a dash and a space run', `-${spaces(LINE - 2)}x`],
+    ['alignment row: a piped cell and a space run', `|-${spaces(LINE - 3)}x`],
+    ['image: a space run inside the parentheses', `![a](${spaces(LINE - 6)}x`],
+    ['image: spaces before a title quote', `![a](b${spaces(LINE - 9)}"x`],
+    ['directive: a space run after the opener', `:::${spaces(LINE - 4)} `],
+    ['math line: many closers', `$$${'$$ '.repeat(Math.floor((LINE - 3) / 3))}x`],
+    ['rule: stars then a space run', `***${spaces(LINE - 4)}x`],
+    [
+      'trailing element: a space run before the comment',
+      `p x${spaces(LINE - 40)}y <!-- .element: a -->`,
+    ],
+    ['U+2028 inside a heading', `# ${spaces(LINE / 2)}\u2028${spaces(LINE / 2 - 4)}a `],
+  ];
+  /** The same lines as a frontmatter value, where the KEY pattern reads them. */
+  const FRONTMATTER: readonly (readonly [string, string])[] = [
+    ['frontmatter: a lazy value before trailing spaces', `title: ${spaces(LINE - 10)}a `],
+    ['frontmatter: a space run before text', `title: a${spaces(LINE - 10)}b`],
+    [
+      'frontmatter: U+2028 in a value',
+      `title: a${spaces(LINE / 2)}\u2028${spaces(LINE / 2 - 12)}a `,
+    ],
+  ];
+  /** As many copies of `line` as fit in 1 MiB, each after a table header for alignment rows. */
+  const fill = (line: string, header: string) => {
+    const unit = `${header}${line}\n\n`;
+    return `${FRONT}${unit.repeat(Math.floor((DECK_MARKDOWN_LIMITS.bytes - FRONT.length) / unit.length))}`;
+  };
+
+  // A ceiling, not a benchmark: before the fix one 1 MiB document of these lines took
+  // 30 s to minutes (notes never finished), now each parses in milliseconds; 2 s keeps
+  // two to four orders of magnitude between them, also on a loaded host.
+  it.each(LINES)('stays linear on hostile lines: %s', (name, line) => {
+    const header = name.startsWith('alignment') ? '| a |\n' : '';
+    for (const text of [`${FRONT}${header}${line}`, fill(line, header)]) {
+      const time = timed(() => {
+        parseDeckMarkdown(text);
+      });
+      expect(time, name).toBeLessThan(2_000);
+    }
+  });
+
+  it.each(FRONTMATTER)('stays linear on hostile frontmatter: %s', (name, line) => {
+    const time = timed(() => {
+      parseDeckMarkdown(`---\n${line}\n---\n\n# Slide`);
+    });
+    expect(time, name).toBeLessThan(2_000);
+  });
+
+  it('stays linear on notes ending in a whitespace run before text', () => {
+    const notes = `# a\n\nNote: a\n${`${spaces(9_000)}\n`.repeat(100)}b`;
+    const time = timed(() => {
+      // Over the notes length limit: refused with a diagnostic, after a linear read.
+      expect(parseDeckMarkdown(`${FRONT}${notes}`).issues.map((issue) => issue.code)).toContain(
+        'too-long'
+      );
+    });
+    expect(time).toBeLessThan(2_000);
+  });
+
+  it('reads U+2028 and U+2029 as line breaks, so no line keeps one', () => {
+    const parsed = parseDeckMarkdown(`${FRONT}# One\u2028# Two\u2029\nA paragraph`);
+    expect(parsed.ok).toBe(true);
+    const twin = deckToMarkdown(parsed.deck as Deck);
+    expect(twin).not.toMatch(/[\u2028\u2029]/);
+    expect(twin).toContain('# One');
+    expect(twin).toContain('Two');
+  });
+
+  it('keeps the image and alignment row grammar of the patterns it replaced', () => {
+    const image = (line: string) => {
+      const parsed = parseDeckMarkdown(`${FRONT}${line}`);
+      return JSON.stringify(parsed.deck ?? parsed.draft ?? null);
+    };
+    expect(image('![Chart](chart.png "Revenue")')).toContain('chart.png');
+    expect(image('![Chart](<chart.png>)')).toContain('chart.png');
+    expect(image('![Chart](chart.png"no space")')).not.toContain('"src":"chart.png"');
+    const table = (row: string) => {
+      const parsed = parseDeckMarkdown(`${FRONT}| a | b |\n${row}\n| 1 | 2 |`);
+      return JSON.stringify(parsed.deck ?? parsed.draft ?? null);
+    };
+    for (const row of ['| --- | :---: |', '---|---', ' |:-|-:|', '| - | - |\t']) {
+      expect(table(row), row).toContain('"type":"table"');
+    }
+    for (const row of ['| --- | x |', '|', '    | --- | --- |', '-- | | --']) {
+      expect(table(row), row).not.toContain('"type":"table"');
+    }
   });
 });
 
@@ -291,14 +427,24 @@ describe('deck markdown: a 200-slide document', () => {
     expect(write).toBeLessThan(2_000);
   });
 
-  it('scales linearly: 4× the slides costs well under 16× the time', () => {
-    const small = document(50);
-    const large = document(200);
-    parseDeckMarkdown(small);
-    parseDeckMarkdown(large);
-    const best = (text: string) =>
-      Math.min(...Array.from({ length: 3 }, () => timed(() => parseDeckMarkdown(text))));
-    const ratio = best(large) / Math.max(best(small), 0.5);
-    expect(ratio).toBeLessThan(10);
+  // Deterministic: the wall-clock ratio (4× the slides, well under 16× the time)
+  // runs only under TEXULI_PERF, in tests/perf/slides.test.ts.
+  it('scales by slide: 4× the document is 4× the slides, each parsed as in the shorter one', () => {
+    const small = parseDeckMarkdown(document(50));
+    const large = parseDeckMarkdown(document(200));
+    expect(small.ok && large.ok).toBe(true);
+    const smallSlides = small.deck?.slides ?? [];
+    const largeSlides = large.deck?.slides ?? [];
+    expect(smallSlides).toHaveLength(50);
+    expect(largeSlides).toHaveLength(200);
+    // No state carries across slides: the shared prefix parses to the same slides.
+    expect(largeSlides.slice(0, 50)).toEqual(smallSlides);
+    // Output grows with the input, not faster: the four quarters match in size.
+    const size = (from: number) => JSON.stringify(largeSlides.slice(from, from + 50)).length;
+    const quarters = [0, 50, 100, 150].map(size);
+    for (const quarter of quarters) {
+      expect(quarter / (quarters[0] ?? 1)).toBeGreaterThan(0.9);
+      expect(quarter / (quarters[0] ?? 1)).toBeLessThan(1.1);
+    }
   });
 });

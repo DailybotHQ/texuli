@@ -17,6 +17,7 @@ import {
   inlineCode,
   linkTarget,
   stripHidden,
+  trimCharEnd,
 } from './text.ts';
 
 type Bag = Record<string, unknown>;
@@ -60,7 +61,7 @@ function table(header: readonly string[], rows: readonly (readonly string[])[]):
 }
 
 function codeFence(code: string, lang: string): string {
-  const body = stripHidden(code).replace(/\n+$/, '');
+  const body = trimCharEnd(stripHidden(code), '\n');
   const fence = fenceFor(body);
   return `${fence}${lang.replace(/[^\w+-]/g, '').slice(0, 24)}\n${body}\n${fence}`;
 }

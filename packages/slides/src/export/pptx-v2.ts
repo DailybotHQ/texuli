@@ -36,6 +36,7 @@ import {
   normalizeThemeReference,
   resolveDeckBackground,
 } from '@texuli/deck/model';
+import type { DeckMediaTrust } from '../stage/media.ts';
 import { PPTX_CANVAS_SLIDE_SIZES } from './canvas.ts';
 import { deckExportFilename } from './filename.ts';
 import {
@@ -86,11 +87,15 @@ export interface DeckPptxAssetContext {
   /** JSON path of the source inside the slide (`$.props.image.src`). */
   path: string;
   kind: 'image' | 'avatar' | 'background' | 'poster';
+  /** The URL policy tier the host painted the deck at (`options.tier`): apply it. */
+  tier: DeckMediaTrust;
 }
 
 export interface DeckPptxChartContext {
   slideId: string;
   path: string;
+  /** The URL policy tier the host painted the deck at (`options.tier`). */
+  tier: DeckMediaTrust;
   /** The picture frame in canvas pixels: render at this size (or a multiple). */
   width: number;
   height: number;
@@ -101,6 +106,13 @@ type Maybe<T> = T | null | undefined;
 export interface DeckPptxV2Options {
   /** Write speaker notes pages. Default true. */
   notes?: boolean;
+  /**
+   * The URL policy tier of the deck, the one the host gives `DeckStage`
+   * (default `untrusted`). The writer never fetches; it hands the tier to
+   * `loadImage` and `snapshotChart` in their context so the host applies the
+   * same policy (for example `safeImageSrc(src, context.tier)`).
+   */
+  tier?: DeckMediaTrust;
   /**
    * Resolve an image source to bytes. The host applies its URL policy and
    * fetches; return nothing to leave the image out (it is then reported).
@@ -751,6 +763,11 @@ class SlideBuilder {
     return this.state.canvas;
   }
 
+  /** The deck's URL policy tier for host callbacks: only `developer` widens it. */
+  get tier(): DeckMediaTrust {
+    return this.state.options.tier === 'developer' ? 'developer' : 'untrusted';
+  }
+
   id(): number {
     const id = this.nextId;
     this.nextId += 1;
@@ -886,7 +903,7 @@ class SlideBuilder {
     }
     const stored = await this.media(
       `${kind}:${src}`,
-      () => loadImage(src, { slideId: this.slide.id, path, kind }),
+      () => loadImage(src, { slideId: this.slide.id, path, kind, tier: this.tier }),
       'The host returned no image bytes.'
     );
     if ('reason' in stored) {
@@ -929,9 +946,10 @@ class SlideBuilder {
       return false;
     }
     const key = `chart:${this.slide.id}:${path}`;
-    const context = {
+    const context: DeckPptxChartContext = {
       slideId: this.slide.id,
       path,
+      tier: this.tier,
       width: Math.round(frame.w),
       height: Math.round(frame.h),
     };
@@ -1038,6 +1056,7 @@ async function paintBackground(builder: SlideBuilder, deck: Deck): Promise<strin
             slideId: slide.id,
             path,
             kind: layer.media === 'image' ? 'background' : 'poster',
+            tier: builder.tier,
           }),
         'The host returned no image bytes.'
       );

@@ -456,7 +456,8 @@ There is no HTML sink anywhere in the dialect:
 - CSS values (a CSS gradient, `url(…)`) in background attributes are
   `md-css-refused`; name a preset instead.
 - Links must be `https:`, `mailto:`, a `#fragment` or a relative path, and
-  media an `https:` URL, a relative path (no `..` or `.svg`), a base64
+  media an `https:` URL, a relative path (no `..` or `.svg`, in any letter
+  case and also percent-encoded), a base64
   `data:` raster or video, or an `avatar:` id. Anything else
   (`javascript:`, `data:text/html`, protocol-relative URLs) is
   `md-url-refused`. An image inside text renders as its alt text

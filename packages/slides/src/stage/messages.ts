@@ -39,6 +39,8 @@ export const DECK_STAGE_MESSAGES = Object.freeze({
   'stage.fullscreenRefused':
     'The browser refused full screen, so the presentation fills the window. Press Escape to leave.',
   'stage.nextStep': 'Step {current} of {total} on this slide',
+  // The stage-level trust signal shown at the untrusted paint tier (`trustBadge`).
+  'stage.untrustedBadge': 'Untrusted content',
   // Chrome strings (toolbar, jump list, tooltips, help, toast), owned by `chrome/`.
   ...DECK_CHROME_MESSAGES,
   // Overview and presenter strings, owned by `overview/` and `presenter/`.

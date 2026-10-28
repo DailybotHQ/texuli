@@ -11,6 +11,7 @@ import { type Attr, readAttributes } from './attributes.ts';
 import type { IssueSink } from './issues.ts';
 import { DECK_MARKDOWN_LIMITS } from './limits.ts';
 import type { Line } from './scan.ts';
+import { trimBlankEnd } from './text.ts';
 
 export interface Src {
   line: number;
@@ -81,14 +82,21 @@ export const JSON_DIRECTIVES = new Set(['component', 'block', 'custom', 'props',
 /** Directives whose body is Markdown (layout regions). */
 export const REGION_DIRECTIVES = new Set(['left', 'right', 'card', 'video']);
 
-const HEADING = /^ {0,3}(#{1,6})(?:[ \t]+(.*?))?[ \t]*$/;
+/*
+ * Linear by construction: the patterns below run on lines with no line
+ * terminator (see `normalizeLines`), and the ones that ended in `[ \t]*$`
+ * after a lazy or greedy capture now run on `trimBlankEnd(text)` and end in
+ * `$`, so no two quantifiers compete for the same spaces. Image lines and
+ * table alignment rows are scanned by index (`matchImageLine`, `isAlignRow`).
+ */
+const HEADING = /^ {0,3}(#{1,6})(?:[ \t]+(.*))?$/;
 const RULE = /^ {0,3}(?:\*[ \t]*){3,}$|^ {0,3}(?:_[ \t]*){3,}$/;
 const BULLET = /^( {0,3})([-*+])[ \t]+(.*)$/;
 const ORDERED = /^( {0,3})(\d{1,9})([.)])[ \t]+(.*)$/;
 const QUOTE = /^ {0,3}>[ ]?(.*)$/;
 const FENCE = /^( {0,3})(`{3,}|~{3,})(.*)$/;
 const MATH_OPEN = /^ {0,3}\$\$[ \t]*$/;
-const MATH_LINE = /^ {0,3}\$\$(.+)\$\$[ \t]*$/;
+const MATH_LINE = /^ {0,3}\$\$(.+)\$\$$/;
 const DIRECTIVE = /^ {0,3}:::[ \t]*([A-Za-z][A-Za-z0-9-]*)?(.*)$/;
 const DIRECTIVE_CLOSE = /^ {0,3}:::[ \t]*$/;
 const NOTE = /^(?:Notes?|notes?):(?:[ \t]?(.*))?$/;
@@ -97,9 +105,7 @@ const NOTE = /^(?:Notes?|notes?):(?:[ \t]?(.*))?$/;
  * openers, which the slide splitter would otherwise read.
  */
 export const NOTE_ESCAPED = /^\\(?=-{2,}[ \t]*$| {0,3}(?::::|`{3}|~{3}|\$\$))/;
-const IMAGE_LINE = /^ {0,3}!\[([^\]]*)\]\(\s*<?([^\s<>]*)>?(?:\s+"([^"]*)")?\s*\)[ \t]*$/;
 const TABLE_ROW = /^ {0,3}\|/;
-const ALIGN_ROW = /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(?:\|[ \t]*:?-+:?[ \t]*)*\|?[ \t]*$/;
 const HTML_LINE = /^ {0,3}<[A-Za-z/!?]/;
 const AUTOLINK = /^ {0,3}<(?:https?:\/\/|mailto:)/i;
 const LINE_SPEC = /^\d{1,4}(?:-\d{1,4})?(?:,\d{1,4}(?:-\d{1,4})?)*$/;
@@ -113,14 +119,79 @@ function isHtmlLine(text: string): boolean {
   return HTML_LINE.test(text) && !text.trimStart().startsWith('<!--') && !AUTOLINK.test(text);
 }
 
+/** `\s` as the regex class reads it (spaces, tabs, Unicode spaces). */
+function isSpace(char: string | undefined): boolean {
+  return char !== undefined && /\s/.test(char);
+}
+
+/**
+ * An image alone on its line: `![alt](url "title")`, with `<url>` allowed.
+ * Scanned by index: the regex it replaces (`\(\s*<?([^\s<>]*)>?(?:\s+"…")?\s*\)`)
+ * backtracked over a long run of spaces between the parentheses.
+ */
+export function matchImageLine(line: string): { alt: string; url: string; title?: string } | null {
+  const text = trimBlankEnd(line);
+  let i = 0;
+  while (i < 3 && text[i] === ' ') i++;
+  if (!text.startsWith('![', i)) return null;
+  const altEnd = text.indexOf(']', i + 2);
+  if (altEnd < 0 || text[altEnd + 1] !== '(' || !text.endsWith(')')) return null;
+  const alt = text.slice(i + 2, altEnd);
+  const inner = text.slice(altEnd + 2, text.length - 1);
+  let at = 0;
+  while (isSpace(inner[at])) at++;
+  if (inner[at] === '<') at++;
+  const urlStart = at;
+  while (at < inner.length && !isSpace(inner[at]) && inner[at] !== '<' && inner[at] !== '>') at++;
+  const url = inner.slice(urlStart, at);
+  if (inner[at] === '>') at++;
+  const gap = at;
+  while (isSpace(inner[at])) at++;
+  if (at === inner.length) return { alt, url };
+  // A title needs a space before it and only spaces after it.
+  if (at === gap || inner[at] !== '"') return null;
+  const close = inner.indexOf('"', at + 1);
+  if (close < 0) return null;
+  let end = close + 1;
+  while (isSpace(inner[end])) end++;
+  if (end !== inner.length) return null;
+  return { alt, url, title: inner.slice(at + 1, close) };
+}
+
+/** `[ \t]` trimmed off both ends, by index. */
+function trimBlank(text: string): string {
+  let start = 0;
+  while (text[start] === ' ' || text[start] === '\t') start++;
+  return trimBlankEnd(text.slice(start));
+}
+
+const ALIGN_CELL = /^:?-+:?$/;
+
+/**
+ * A table alignment row (`| :--- | ---: |`): split on `|`, every cell
+ * `:?-+:?` between spaces or tabs; outer pipes optional. Scanned by
+ * splitting: the single regex it replaces backtracked across cells.
+ */
+export function isAlignRow(line: string): boolean {
+  let text = line;
+  let i = 0;
+  while (i < 3 && text[i] === ' ') i++;
+  text = text.slice(text[i] === '|' ? i + 1 : i);
+  text = trimBlankEnd(text);
+  if (text.endsWith('|')) text = text.slice(0, -1);
+  const cells = text.split('|');
+  for (const cell of cells) if (!ALIGN_CELL.test(trimBlank(cell))) return false;
+  return true;
+}
+
 /** Split a trailing `<!-- .element: … -->` off a line. */
 function trailingElement(text: string): { text: string; attrs: string; column: number } | null {
   const at = text.lastIndexOf('<!--');
   if (at <= 0) return null;
-  const tail = /^<!--[ \t]*\.element:(.*)-->[ \t]*$/.exec(text.slice(at));
+  const tail = /^<!--[ \t]*\.element:(.*)-->$/.exec(trimBlankEnd(text.slice(at)));
   if (!tail || (tail[1] ?? '').includes('-->')) return null;
   return {
-    text: text.slice(0, at).replace(/[ \t]+$/, ''),
+    text: trimBlankEnd(text.slice(0, at)),
     attrs: tail[1] ?? '',
     column: at + 1 + text.slice(at).indexOf(':') + 1,
   };
@@ -204,7 +275,7 @@ class Reader {
     const text = parts
       .map((part) => part.replace(NOTE_ESCAPED, ''))
       .join('\n')
-      .replace(/\s+$/, '');
+      .trimEnd();
     this.notes = { text, src: this.src(line) };
   }
 
@@ -291,7 +362,7 @@ class Reader {
     if (fence && !((fence[2] ?? '').startsWith('`') && (fence[3] ?? '').includes('`'))) {
       return this.code(line, fence[1]?.length ?? 0, fence[2] ?? '```', fence[3] ?? '');
     }
-    const mathLine = MATH_LINE.exec(text);
+    const mathLine = MATH_LINE.exec(trimBlankEnd(text));
     if (mathLine) {
       this.i++;
       return { kind: 'math', tex: (mathLine[1] ?? '').trim(), src: this.src(line) };
@@ -305,7 +376,7 @@ class Reader {
 
     const { text: content, attrs } = this.stripTrailing(line);
 
-    const heading = HEADING.exec(content);
+    const heading = HEADING.exec(trimBlankEnd(content));
     if (heading) {
       this.i++;
       const value = heading[2] ?? '';
@@ -333,19 +404,19 @@ class Reader {
       if (attrs) node.attrs = attrs;
       return node;
     }
-    const image = IMAGE_LINE.exec(content);
+    const image = matchImageLine(content);
     if (image) {
       this.i++;
-      const url = image[2] ?? '';
+      const url = image.url;
       this.checkUrl(url, true, line, content.indexOf('](') + 3);
-      const node: MdNode = { kind: 'image', alt: image[1] ?? '', url, src: this.src(line) };
-      if (image[3] !== undefined) node.title = image[3];
+      const node: MdNode = { kind: 'image', alt: image.alt, url, src: this.src(line) };
+      if (image.title !== undefined) node.title = image.title;
       if (attrs) node.attrs = attrs;
       return node;
     }
     if (QUOTE.test(content)) return this.quote();
     if (BULLET.test(content) || ORDERED.test(content)) return this.list();
-    if (TABLE_ROW.test(content) && ALIGN_ROW.test(this.lines[this.i + 1]?.text ?? '')) {
+    if (TABLE_ROW.test(content) && isAlignRow(this.lines[this.i + 1]?.text ?? '')) {
       return this.table();
     }
     return this.paragraph();
@@ -357,9 +428,9 @@ class Reader {
       text.trim() === '' ||
       FENCE.test(text) ||
       MATH_OPEN.test(text) ||
-      MATH_LINE.test(text) ||
+      MATH_LINE.test(trimBlankEnd(text)) ||
       /^ {0,3}:::/.test(text) ||
-      HEADING.test(text) ||
+      HEADING.test(trimBlankEnd(text)) ||
       RULE.test(text) ||
       QUOTE.test(text) ||
       BULLET.test(text) ||
@@ -368,7 +439,7 @@ class Reader {
       text.trimStart().startsWith('<!--') ||
       isHtmlLine(text) ||
       NOTE.test(text) ||
-      IMAGE_LINE.test(text)
+      matchImageLine(text) !== null
     );
   }
 

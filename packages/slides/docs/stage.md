@@ -38,6 +38,7 @@ scoped styles.
 | `fit` | `container` | `container` letterboxes the canvas inside the host box; `viewport` fills the window height |
 | `tier` | `untrusted` | URL policy tier for every link and media source painted (`DeckMediaTrust`) |
 | `mediaTrust` | — | v1 name of `tier`, kept for existing hosts |
+| `trustBadge` | `true` | Show the stage's trust badge, **Untrusted content** (`stage.untrustedBadge`, overridable through `messages`), at the inline start of the toolbar row when the paint tier is `untrusted`. The stage paints catalog components through players with `chrome={false}`, so this badge is the deck's trust signal; the `developer` tier never shows it. See [Trust badge](#trust-badge) |
 | `messages` | — | Partial overrides of every stage string (`DeckStageMessages`; English defaults) |
 | `locale` / `dir` | `meta.locale` / `meta.dir` | Override the `lang` and `dir` of the stage |
 | `plugins` | `[]` | Engine plugins (`beforeNavigate`, `beforeRender`/`afterRender`, `onAction`, …), in order |
@@ -356,6 +357,24 @@ images and video are refused: the untrusted policy needs `https` from an
 allowed origin, and the block schema only accepts relative or `data:` video.
 A refused block becomes a visible note; a refused gallery item is dropped.
 App-authored decks can pass `tier="developer"`.
+
+### Trust badge
+
+At the `untrusted` tier (the default) the stage shows one badge,
+**Untrusted content**, at the inline start of the row that holds the toolbar
+(or the host `chrome` snippet), above or below the slide with
+`toolbarPosition`. It is the deck-level counterpart of the player's
+artifact-frame badge: each catalog component on a slide paints through a
+`Player` with `chrome={false}`, which drops the player's own badge, so the
+stage carries the trust signal once for the whole deck instead of once per
+component. The badge is plain text (`data-tx-deck-trust="untrusted"`), read
+in reading order, never focusable, uses `CanvasText` in forced colors, and
+hides in print and, with the default toolbar, in full screen (the overlay
+replaces the toolbar row). Reword it with
+`messages={{ 'stage.untrustedBadge': '…' }}`. Hosts that present their own
+content pass `tier="developer"` and never see it; `trustBadge={false}` hides
+it at the `untrusted` tier for a host that states the trust of the deck
+itself, next to the stage.
 
 Only the mounted slides (at most three) load their media.
 
