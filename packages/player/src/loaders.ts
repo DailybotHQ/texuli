@@ -80,6 +80,12 @@ export const PLAYER_LOADERS: Readonly<Record<string, PlayerLoader>> = Object.fre
   'data-files': async () => (await import('./painters/DataFilesPainter.svelte')).default,
   'data-map': async () => (await import('./painters/DataMapPainter.svelte')).default,
   'data-timeline': async () => (await import('./painters/DataTimelinePainter.svelte')).default,
+  'data-cohort-table': async () =>
+    (await import('./painters/DataCohortTablePainter.svelte')).default,
+  'data-notification-inbox': async () =>
+    (await import('./painters/DataNotificationInboxPainter.svelte')).default,
+  'data-filter-builder': async () =>
+    (await import('./painters/DataFilterBuilderPainter.svelte')).default,
   'chat-thread': async () => (await import('@texuli/chat')).ChatThreadDisplay,
   'chat-message': async () => (await import('@texuli/chat')).ChatMessageDisplay,
   'sortable-list': async () => (await import('./painters/SortableListPainter.svelte')).default,

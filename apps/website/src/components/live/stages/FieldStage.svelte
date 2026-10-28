@@ -5,9 +5,10 @@
 <script lang="ts">
 /**
  * Field, Form, Label, Description, FieldError, Input, InputGroup, Textarea
- * and TextCounter: real controls you can type in, with validation.
+ * TextCounter and TimeField: real controls you can type in, with validation.
  */
 import { Button } from 'texuli/button';
+import { TimeField } from 'texuli/date';
 import { Description, Field, FieldError, Form, Label } from 'texuli/field';
 import { Input, InputGroup, Textarea, TextCounter } from 'texuli/input';
 import { readers, type StageValues } from './values.ts';
@@ -23,6 +24,7 @@ let amount = $state('120');
 let notes = $state('Ship the Lumen Atlas pilot on Friday.');
 let summary = $state('A short summary of the release');
 let email = $state('');
+let time = $state<string | null>('09:30');
 let errors = $state<Record<string, string>>({});
 let saved = $state('');
 
@@ -154,6 +156,17 @@ function validate(form: Record<string, string>): Record<string, string> {
         readonly={bool('readonly')}
       />
     </div>
+  {:else if componentId === 'time-field'}
+    <TimeField
+      bind:value={time}
+      label={str('label', 'Reminder')}
+      description={str('description', 'Sent on weekdays.')}
+      error={str('error') || undefined}
+      minuteStep={Math.min(30, Math.max(1, num('minuteStep', 15)))}
+      size={pick('size', ['sm', 'md'] as const, 'md')}
+      disabled={bool('disabled')}
+      required={bool('required')}
+    />
   {:else}
     <TextCounter
       bind:value={summary}

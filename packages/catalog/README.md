@@ -99,7 +99,7 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
 | `@texuli/catalog/manifests/layouts` | Authored manifests for layouts, decks and app shells |
 | `@texuli/catalog/manifests/overlays` | Authored manifests for overlays and navigation chrome (app tier) |
 | `@texuli/catalog/manifests/composition` | New in `0.4.0`: composition layouts (`layout-stack`, `layout-row`, `layout-split`, `layout-tile`) |
-| `@texuli/catalog/manifests/data` | New in `0.4.0`: data views as JSON (grid, tree, board, calendar, timeline, map, files), with their `bind` props and `on` events |
+| `@texuli/catalog/manifests/data` | New in `0.4.0`: data views as JSON (grid, tree, board, calendar, timeline, map, files), with their `bind` props and `on` events; the repository (not on npm yet) adds the cohort table, notification inbox and filter builder |
 | `@texuli/catalog/manifests/chat` | New in `0.4.0`: chat display ids (thread and messages; the composer stays host chrome) |
 | `@texuli/catalog/manifests/state` | New in `0.4.0`: state and action surfaces (controls, forms, flow views and actions, sortable lists, host regions) |
 | `@texuli/catalog/manifests/workflows` | New in `0.4.0`: `workflow-graph`, validated against the spec workflow schema |

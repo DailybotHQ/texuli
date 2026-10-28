@@ -485,6 +485,255 @@ export const dataTimelineManifest: CatalogManifest = /* @__PURE__ */ manifestDat
   related: ['data-calendar', 'timeline'],
 });
 
+export const dataCohortTableManifest: CatalogManifest = /* @__PURE__ */ manifestData({
+  id: 'data-cohort-table',
+  package: PKG,
+  label: 'Cohort table',
+  summary:
+    'A retention table: one row per cohort, one column per period after it started, as rates or counts, with optional heat tints and an averages row.',
+  tier: 'content',
+  agentEmittable: true,
+  useWhen: ['Show how groups that started at different times keep going, period by period'],
+  dontUseWhen: [
+    'One trend over time: use a line chart',
+    'Records people sort and search: use data-grid',
+  ],
+  a11y: [
+    'A real table: a caption, period column headers and cohort row headers with scope',
+    'Heat tints are decorative and contrast-safe; the number stays the cell content',
+  ],
+  props: [
+    {
+      name: 'caption',
+      kind: 'string',
+      required: true,
+      trust: 'untrusted',
+      description: 'The table caption and accessible name: what is measured and how.',
+    },
+    {
+      name: 'rows',
+      kind: 'array',
+      required: true,
+      description:
+        'Cohorts, one row each: a label, an optional size and one value per period reached (rates from 0 to 1, or counts). incomplete marks the last value as a period still in progress.',
+      schema: list(
+        {
+          id,
+          label: text(120),
+          size: { type: 'integer', minimum: 0 },
+          cells: { type: 'array', maxItems: 60, items: { type: 'number' } },
+          incomplete: { type: 'boolean' },
+        },
+        ['label', 'cells'],
+        120
+      ),
+    },
+    {
+      name: 'periods',
+      kind: 'array',
+      description: 'Period column headers ("Month 0", "Month 1"…); missing ones are numbered.',
+      schema: { type: 'array', maxItems: 60, items: text(60) },
+    },
+    { name: 'captionHidden', kind: 'boolean', default: false },
+    { name: 'valueKind', kind: 'enum', enumValues: ['rate', 'count'], default: 'rate' },
+    { name: 'heat', kind: 'boolean', default: false },
+    {
+      name: 'max',
+      kind: 'number',
+      description: 'Top of the heat scale (default: 1 for rates, the largest cell for counts).',
+    },
+    {
+      name: 'average',
+      kind: 'boolean',
+      default: false,
+      description: 'Adds an averages row, weighted by cohort size when every cohort has one.',
+    },
+    { ...densityProp(['compact', 'default', 'comfortable']), default: 'compact' },
+    { name: 'locale', kind: 'string', default: 'en-US' },
+  ],
+  examples: [
+    {
+      id: 'monthly-retention',
+      title: 'Monthly retention',
+      props: {
+        caption: 'Share of accounts active each month after signup',
+        periods: ['Month 0', 'Month 1', 'Month 2'],
+        heat: true,
+        average: true,
+        rows: [
+          { label: 'Aug 2026', size: 420, cells: [1, 0.62, 0.48] },
+          { label: 'Sep 2026', size: 380, cells: [1, 0.58, 0.51], incomplete: true },
+          { label: 'Oct 2026', size: 455, cells: [1, 0.66], incomplete: true },
+        ],
+      },
+    },
+  ],
+  related: ['data-grid', 'charts-heatmap'],
+});
+
+export const dataNotificationInboxManifest: CatalogManifest = /* @__PURE__ */ manifestData({
+  id: 'data-notification-inbox',
+  package: PKG,
+  label: 'Notification inbox',
+  summary:
+    'Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view.',
+  tier: 'content',
+  agentEmittable: true,
+  useWhen: ['List updates someone should catch up on, such as mentions or review requests'],
+  dontUseWhen: [
+    'A short-lived confirmation: that is a host toast',
+    'A history of changes without read state: use timeline',
+  ],
+  a11y: [
+    'A section named by its heading; the unread count is read after it',
+    'Every item has a read toggle named with its title; new unread items are announced politely',
+  ],
+  props: [
+    {
+      name: 'items',
+      kind: 'array',
+      required: true,
+      trust: 'untrusted',
+      description:
+        'Notifications, newest first. href passes the untrusted URL policy (https, mailto and #fragments); read changes stay in view.',
+      schema: list(
+        {
+          id,
+          title: text(),
+          body: text(500),
+          at: isoTime,
+          read: { type: 'boolean' },
+          href: { type: 'string', maxLength: 2048 },
+        },
+        ['id', 'title', 'at', 'read'],
+        200
+      ),
+    },
+    { name: 'filter', kind: 'enum', enumValues: ['all', 'unread'], default: 'all' },
+    {
+      name: 'now',
+      kind: 'string',
+      description: 'The ISO instant the time labels count from (default: when it paints).',
+    },
+    { name: 'timeZone', kind: 'string', default: 'UTC' },
+    { name: 'locale', kind: 'string', default: 'en-US' },
+    {
+      name: 'markReadOnOpen',
+      kind: 'boolean',
+      default: true,
+      description: 'Opening an unread item marks it read.',
+    },
+    {
+      name: 'headingLevel',
+      kind: 'number',
+      default: 2,
+      description: 'Level of the inbox heading, 2 to 6.',
+    },
+  ],
+  events: ['select', 'change'],
+  bindable: ['filter'],
+  examples: [
+    {
+      id: 'mentions',
+      title: 'Mentions',
+      props: {
+        now: '2026-10-27T12:00:00Z',
+        items: [
+          {
+            id: 'n1',
+            title: 'Ana Example mentioned you in Launch plan',
+            body: 'Can you check the timeline before Friday?',
+            at: '2026-10-27T11:40:00Z',
+            read: false,
+            href: 'https://example.com/docs/launch-plan',
+          },
+          {
+            id: 'n2',
+            title: 'Weekly report is ready',
+            at: '2026-10-26T09:00:00Z',
+            read: true,
+          },
+        ],
+      },
+    },
+  ],
+  related: ['timeline', 'chat-thread'],
+});
+
+/** Field types a filter builder condition can test. */
+export const FILTER_FIELD_TYPES = ['text', 'number', 'date', 'boolean', 'enum'] as const;
+
+export const dataFilterBuilderManifest: CatalogManifest = /* @__PURE__ */ manifestData({
+  id: 'data-filter-builder',
+  package: PKG,
+  label: 'Filter builder',
+  summary:
+    'Nested and/or groups of conditions (field, operator by field type, value) that people add, edit and remove.',
+  tier: 'content',
+  agentEmittable: true,
+  useWhen: ['Let people compose a structured filter, such as "status is open and total over 100"'],
+  dontUseWhen: [
+    'One text filter that other nodes read: use control-filter',
+    'A fixed choice between a few views: use control-choice',
+  ],
+  a11y: [
+    'Native selects and inputs, every one labelled; each group is a labelled fieldset',
+    'Adding and removing conditions moves focus to the next control and is announced politely',
+  ],
+  props: [
+    labelProp,
+    {
+      name: 'fields',
+      kind: 'array',
+      required: true,
+      description: 'The fields a condition can test; options list the values of an enum field.',
+      schema: list(
+        {
+          key: id,
+          header: text(120),
+          type: { type: 'string', enum: [...FILTER_FIELD_TYPES] },
+          options: { type: 'array', maxItems: 100, items: text(120) },
+        },
+        ['key', 'header', 'type'],
+        48
+      ),
+    },
+    {
+      name: 'value',
+      kind: 'object',
+      description:
+        'The starting filter: {type:"group", op:"and"|"or", children:[{type:"condition", field, operator, value}…]}. It is checked against fields (at most 6 levels and 200 nodes); one that does not fit starts empty.',
+    },
+    {
+      name: 'maxDepth',
+      kind: 'number',
+      default: 3,
+      description: 'Deepest group level offered (the root is 1), capped at 5.',
+    },
+    { name: 'disabled', kind: 'boolean', default: false },
+  ],
+  events: ['change'],
+  examples: [
+    {
+      id: 'open-orders',
+      title: 'Open orders',
+      props: {
+        label: 'Order filter',
+        fields: [
+          { key: 'status', header: 'Status', type: 'enum', options: ['open', 'closed'] },
+          { key: 'total', header: 'Total', type: 'number' },
+        ],
+        value: {
+          type: 'group',
+          op: 'and',
+          children: [{ type: 'condition', field: 'status', operator: 'eq', value: 'open' }],
+        },
+      },
+    },
+  ],
+  related: ['data-grid', 'control-filter'],
+});
+
 export const DATA_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
   dataBoardManifest,
   dataTreeViewManifest,
@@ -493,6 +742,9 @@ export const DATA_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object
   dataFilesManifest,
   dataMapManifest,
   dataTimelineManifest,
+  dataCohortTableManifest,
+  dataNotificationInboxManifest,
+  dataFilterBuilderManifest,
 ]);
 
 /** Data views are interactive widgets. */
@@ -506,4 +758,7 @@ export const DATA_GRAMMAR_ROLES: readonly GrammarComponentMeta[] = Object.freeze
   { id: 'data-files', role: 'interactive' },
   { id: 'data-map', role: 'interactive' },
   { id: 'data-timeline', role: 'interactive' },
+  { id: 'data-cohort-table', role: 'static' },
+  { id: 'data-notification-inbox', role: 'interactive' },
+  { id: 'data-filter-builder', role: 'interactive' },
 ]);

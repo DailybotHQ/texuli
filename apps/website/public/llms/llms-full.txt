@@ -1,6 +1,6 @@
 # Texuli — full agent docs
 
-> Complete catalog documentation generated from manifests (158 components).
+> Complete catalog documentation generated from manifests (162 components).
 
 ---
 
@@ -3566,6 +3566,104 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Cohort table
+
+> A retention table: one row per cohort, one column per period after it started, as rates or counts, with optional heat tints and an averages row.
+
+- **id:** `data-cohort-table`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- Show how groups that started at different times keep going, period by period
+
+### Don't use when
+
+- One trend over time: use a line chart
+- Records people sort and search: use data-grid
+
+### Accessibility
+
+- A real table: a caption, period column headers and cohort row headers with scope
+- Heat tints are decorative and contrast-safe; the number stays the cell content
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `caption` | string | yes | untrusted | — | The table caption and accessible name: what is measured and how. |
+| `rows` | array | yes | — | — | Cohorts, one row each: a label, an optional size and one value per period reached (rates from 0 to 1, or counts). incomplete marks the last value as a period still in progress. |
+| `periods` | array | no | — | — | Period column headers ("Month 0", "Month 1"…); missing ones are numbered. |
+| `captionHidden` | boolean | no | — | `false` | — |
+| `valueKind` | enum(rate | count) | no | — | `"rate"` | — |
+| `heat` | boolean | no | — | `false` | — |
+| `max` | number | no | — | — | Top of the heat scale (default: 1 for rates, the largest cell for counts). |
+| `average` | boolean | no | — | `false` | Adds an averages row, weighted by cohort size when every cohort has one. |
+| `density` | enum(compact | default | comfortable) | no | — | `"compact"` | — |
+| `locale` | string | no | — | `"en-US"` | — |
+
+### Examples
+
+#### Monthly retention (`monthly-retention`)
+
+```json
+{
+  "caption": "Share of accounts active each month after signup",
+  "periods": [
+    "Month 0",
+    "Month 1",
+    "Month 2"
+  ],
+  "heat": true,
+  "average": true,
+  "rows": [
+    {
+      "label": "Aug 2026",
+      "size": 420,
+      "cells": [
+        1,
+        0.62,
+        0.48
+      ]
+    },
+    {
+      "label": "Sep 2026",
+      "size": 380,
+      "cells": [
+        1,
+        0.58,
+        0.51
+      ],
+      "incomplete": true
+    },
+    {
+      "label": "Oct 2026",
+      "size": 455,
+      "cells": [
+        1,
+        0.66
+      ],
+      "incomplete": true
+    }
+  ]
+}
+```
+
+### Related
+
+- [`data-grid`](components/data-grid.md)
+- [`charts-heatmap`](components/charts-heatmap.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # File browser
 
 > Folders and files in a grid or list with breadcrumbs, selection and type previews.
@@ -3627,6 +3725,90 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ### Related
 
 - [`data-tree-view`](components/data-tree-view.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Filter builder
+
+> Nested and/or groups of conditions (field, operator by field type, value) that people add, edit and remove.
+
+- **id:** `data-filter-builder`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- Let people compose a structured filter, such as "status is open and total over 100"
+
+### Don't use when
+
+- One text filter that other nodes read: use control-filter
+- A fixed choice between a few views: use control-choice
+
+### Accessibility
+
+- Native selects and inputs, every one labelled; each group is a labelled fieldset
+- Adding and removing conditions moves focus to the next control and is announced politely
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name of the view. |
+| `fields` | array | yes | — | — | The fields a condition can test; options list the values of an enum field. |
+| `value` | object | no | — | — | The starting filter: {type:"group", op:"and"\|"or", children:[{type:"condition", field, operator, value}…]}. It is checked against fields (at most 6 levels and 200 nodes); one that does not fit starts empty. |
+| `maxDepth` | number | no | — | `3` | Deepest group level offered (the root is 1), capped at 5. |
+| `disabled` | boolean | no | — | `false` | — |
+
+### Examples
+
+#### Open orders (`open-orders`)
+
+```json
+{
+  "label": "Order filter",
+  "fields": [
+    {
+      "key": "status",
+      "header": "Status",
+      "type": "enum",
+      "options": [
+        "open",
+        "closed"
+      ]
+    },
+    {
+      "key": "total",
+      "header": "Total",
+      "type": "number"
+    }
+  ],
+  "value": {
+    "type": "group",
+    "op": "and",
+    "children": [
+      {
+        "type": "condition",
+        "field": "status",
+        "operator": "eq",
+        "value": "open"
+      }
+    ]
+  }
+}
+```
+
+### Related
+
+- [`data-grid`](components/data-grid.md)
+- [`control-filter`](components/control-filter.md)
 
 ---
 
@@ -3780,6 +3962,80 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ### Related
 
 - [`charts-geo-point-map`](components/charts-geo-point-map.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Notification inbox
+
+> Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view.
+
+- **id:** `data-notification-inbox`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- List updates someone should catch up on, such as mentions or review requests
+
+### Don't use when
+
+- A short-lived confirmation: that is a host toast
+- A history of changes without read state: use timeline
+
+### Accessibility
+
+- A section named by its heading; the unread count is read after it
+- Every item has a read toggle named with its title; new unread items are announced politely
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `items` | array | yes | untrusted | — | Notifications, newest first. href passes the untrusted URL policy (https, mailto and #fragments); read changes stay in view. |
+| `filter` | enum(all | unread) | no | — | `"all"` | — |
+| `now` | string | no | — | — | The ISO instant the time labels count from (default: when it paints). |
+| `timeZone` | string | no | — | `"UTC"` | — |
+| `locale` | string | no | — | `"en-US"` | — |
+| `markReadOnOpen` | boolean | no | — | `true` | Opening an unread item marks it read. |
+| `headingLevel` | number | no | — | `2` | Level of the inbox heading, 2 to 6. |
+
+### Examples
+
+#### Mentions (`mentions`)
+
+```json
+{
+  "now": "2026-10-27T12:00:00Z",
+  "items": [
+    {
+      "id": "n1",
+      "title": "Ana Example mentioned you in Launch plan",
+      "body": "Can you check the timeline before Friday?",
+      "at": "2026-10-27T11:40:00Z",
+      "read": false,
+      "href": "https://example.com/docs/launch-plan"
+    },
+    {
+      "id": "n2",
+      "title": "Weekly report is ready",
+      "at": "2026-10-26T09:00:00Z",
+      "read": true
+    }
+  ]
+}
+```
+
+### Related
+
+- [`timeline`](components/timeline.md)
+- [`chat-thread`](components/chat-thread.md)
 
 ---
 
@@ -9106,6 +9362,75 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - [`input`](components/input.md)
 - [`text-counter`](components/text-counter.md)
 - [`field`](components/field.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# TimeField
+
+> A labelled time of day typed or stepped by segment (hour, minute, AM/PM), with a 24-hour HH:mm value.
+
+- **id:** `time-field`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `forms`
+
+### Use when
+
+- A time of day on its own, such as a reminder or an opening hour
+
+### Don't use when
+
+- A date, or a date and time (use the date pickers)
+- A duration (use a number field)
+
+### Accessibility
+
+- A labelled group of native number inputs (hour, minute) and an AM/PM select; arrows step the segments
+- Description and error are linked to the group; an error marks it invalid
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | — | — | Visible label and accessible name |
+| `description` | string | no | — | — | Help text under the field |
+| `error` | string | no | — | — | Error text; also marks the field invalid |
+| `value` | string | no | — | — | The time as HH:mm (24-hour), or null when empty (bind:value) |
+| `onValueChange` | event | no | — | — | — |
+| `locale` | string | no | — | `"en-US"` | — |
+| `hourCycle` | number | no | — | — | 12 shows AM/PM, 24 does not; default the locale cycle |
+| `minuteStep` | number | no | — | `1` | Minutes the arrow keys move on the minute segment |
+| `disabled` | boolean | no | — | `false` | — |
+| `required` | boolean | no | — | `false` | — |
+| `name` | string | no | — | — | Form field name: submits the value |
+| `size` | enum(sm | md) | no | — | `"md"` | — |
+| `labels` | object | no | — | — | Segment names (hour, minute, dayPeriod) for translation |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Reminder time (`reminder`)
+
+```json
+{
+  "label": "Reminder",
+  "value": "09:30",
+  "minuteStep": 15,
+  "name": "reminder"
+}
+```
+
+### Related
+
+- [`field`](components/field.md)
+- [`input`](components/input.md)
+- [`form`](components/form.md)
 
 ---
 

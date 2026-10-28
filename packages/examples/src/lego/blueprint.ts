@@ -25,7 +25,7 @@ export const legoBlueprint = {
     kind: 'request',
     label: 'Launch workspace requested in chat',
   },
-  spec: '0.4.0',
+  spec: '0.5.0',
   state: {
     deals: {
       type: 'list',

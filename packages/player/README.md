@@ -122,7 +122,12 @@ The TypeScript declarations list the full surface.
   `workflow-graph` (the `@texuli/workflows` viewer or editor). Node `on`
   runs only the closed actions (`setState`, `toggleState`, `moveItem`,
   `flowGo`, `emit`, `submit`), and `bind` writes back only to declared
-  variables. The chat composer stays host chrome.
+  variables. The chat composer stays host chrome. In the repository (not on
+  npm yet), three more data views paint from JSON: `data-cohort-table`,
+  `data-notification-inbox` (read changes stay in view, `filter` is
+  bindable, links always pass the untrusted URL policy) and
+  `data-filter-builder` (a starting filter is parsed against its fields;
+  one that does not fit starts empty).
 - **One drag scope (new in `0.4.0`).** `sortable-list` nodes share one drag
   scope, so an item moves between lists anywhere in the layout under the
   same group, `accepts`, `locked`, `pull` and `maxItems` rules that

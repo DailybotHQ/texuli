@@ -136,7 +136,7 @@ describe('slide components: coverage of the catalog', () => {
     const tables = [Object.keys(SLIDE_COMPONENTS), Object.keys(SLIDE_COMPONENT_EXCLUSIONS), groups];
     const all = tables.flat();
     expect(new Set(all).size).toBe(all.length);
-    expect(entries.length).toBe(158);
+    expect(entries.length).toBe(162);
     for (const entry of entries) {
       expect(slideComponentSupport(entry.id).kind, entry.id).not.toBe('unknown');
     }

@@ -49,9 +49,12 @@ Ids agents may emit into a catalog tree (subject to tier rules). Untrusted model
 - [Toggle control](components/control-toggle.md): A switch that sets a boolean state variable.
 - [Board](components/data-board.md): A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits.
 - [Calendar](components/data-calendar.md): Events on a month, week, day or agenda view; people open, and when allowed move, events.
+- [Cohort table](components/data-cohort-table.md): A retention table: one row per cohort, one column per period after it started, as rates or counts, with optional heat tints and an averages row.
 - [File browser](components/data-files.md): Folders and files in a grid or list with breadcrumbs, selection and type previews.
+- [Filter builder](components/data-filter-builder.md): Nested and/or groups of conditions (field, operator by field type, value) that people add, edit and remove.
 - [Data grid](components/data-grid.md): A sortable, searchable grid of rows and typed columns; virtualized for long lists.
 - [Map](components/data-map.md): Places as markers on an offline vector basemap, clustered when close, with a place list beside it.
+- [Notification inbox](components/data-notification-inbox.md): Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view.
 - [Project timeline](components/data-timeline.md): Tasks as bars over days, weeks, months or quarters, with dependencies and progress.
 - [Tree view](components/data-tree-view.md): A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard.
 - [Deck slide](components/deck-slide.md): One slide in a deck: a title, content blocks and speaker notes.
@@ -168,6 +171,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Tag](components/tag.md): A labeled chip that can be removed.
 - [TextCounter](components/text-counter.md): An input or textarea that shows remaining characters near the limit.
 - [Textarea](components/textarea.md): A multi-line text control with optional autosize.
+- [TimeField](components/time-field.md): A labelled time of day typed or stepped by segment (hour, minute, AM/PM), with a 24-hour HH:mm value.
 - [Timeline](components/timeline.md): Vertical or horizontal chronological list of events.
 - [Toaster](components/toaster.md): Live region that renders toast notifications from the shared store.
 - [Tooltip](components/tooltip.md): Short delayed hint on hover or focus.

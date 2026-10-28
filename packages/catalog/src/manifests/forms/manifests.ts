@@ -29,6 +29,7 @@ import {
   switchPropNames,
   textareaPropNames,
   textCounterPropNames,
+  timeFieldPropNames,
 } from './prop-names.ts';
 
 const PKG = 'texuli';
@@ -948,6 +949,62 @@ export const multiSelectManifest = /* @__PURE__ */ manifestData({
   related: ['combobox', 'checkbox', 'field', 'form'],
 });
 
+export const timeFieldManifest = /* @__PURE__ */ manifestData({
+  id: 'time-field',
+  package: PKG,
+  label: 'TimeField',
+  summary:
+    'A labelled time of day typed or stepped by segment (hour, minute, AM/PM), with a 24-hour HH:mm value.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['A time of day on its own, such as a reminder or an opening hour'],
+  dontUseWhen: [
+    'A date, or a date and time (use the date pickers)',
+    'A duration (use a number field)',
+  ],
+  a11y: [
+    'A labelled group of native number inputs (hour, minute) and an AM/PM select; arrows step the segments',
+    'Description and error are linked to the group; an error marks it invalid',
+  ],
+  props: propsFrom(timeFieldPropNames, {
+    label: { kind: 'string', required: true, description: 'Visible label and accessible name' },
+    description: { kind: 'string', description: 'Help text under the field' },
+    error: { kind: 'string', description: 'Error text; also marks the field invalid' },
+    value: {
+      kind: 'string',
+      description: 'The time as HH:mm (24-hour), or null when empty (bind:value)',
+    },
+    onValueChange: { kind: 'event' },
+    locale: { kind: 'string', default: 'en-US' },
+    hourCycle: {
+      kind: 'number',
+      description: '12 shows AM/PM, 24 does not; default the locale cycle',
+    },
+    minuteStep: {
+      kind: 'number',
+      default: 1,
+      description: 'Minutes the arrow keys move on the minute segment',
+    },
+    disabled: { kind: 'boolean', default: false },
+    required: { kind: 'boolean', default: false },
+    name: { kind: 'string', description: 'Form field name: submits the value' },
+    size: { kind: 'enum', enumValues: ['sm', 'md'], default: 'md' },
+    labels: {
+      kind: 'object',
+      description: 'Segment names (hour, minute, dayPeriod) for translation',
+    },
+    class: { kind: 'string' },
+  }),
+  examples: [
+    {
+      id: 'reminder',
+      title: 'Reminder time',
+      props: { label: 'Reminder', value: '09:30', minuteStep: 15, name: 'reminder' },
+    },
+  ],
+  related: ['field', 'input', 'form'],
+});
+
 /** Every form manifest in stable id order. */
 export const FORMS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
   buttonManifest,
@@ -978,6 +1035,7 @@ export const FORMS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Objec
   switchManifest,
   textCounterManifest,
   textareaManifest,
+  timeFieldManifest,
 ]);
 
 /** Map of component id → expected prop names for type/schema parity tests. */

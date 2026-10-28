@@ -266,6 +266,23 @@ export const comboboxPropNames = [
   'children',
 ] as const;
 
+export const timeFieldPropNames = [
+  'label',
+  'description',
+  'error',
+  'value',
+  'onValueChange',
+  'locale',
+  'hourCycle',
+  'minuteStep',
+  'disabled',
+  'required',
+  'name',
+  'size',
+  'labels',
+  'class',
+] as const;
+
 /** `MultiSelect.Root`: the combobox root with `multiple` always on. */
 export const multiSelectPropNames = comboboxPropNames.filter(
   (name) => name !== 'multiple'
@@ -301,6 +318,7 @@ export const FORMS_PROP_NAMES = {
   'select-viewport': selectViewportPropNames,
   combobox: comboboxPropNames,
   'multi-select': multiSelectPropNames,
+  'time-field': timeFieldPropNames,
 } as const satisfies Record<string, readonly string[]>;
 
 export type FormsManifestId = keyof typeof FORMS_PROP_NAMES;

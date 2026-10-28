@@ -2366,6 +2366,129 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     bindable: ['zoom'],
   },
   {
+    id: 'data-cohort-table',
+    label: 'Cohort table',
+    props: [
+      {
+        name: 'caption',
+        kind: 'string',
+        required: true,
+      },
+      {
+        name: 'rows',
+        kind: 'array',
+        required: true,
+      },
+      {
+        name: 'periods',
+        kind: 'array',
+      },
+      {
+        name: 'captionHidden',
+        kind: 'boolean',
+      },
+      {
+        name: 'valueKind',
+        kind: 'enum',
+        enumValues: ['rate', 'count'],
+      },
+      {
+        name: 'heat',
+        kind: 'boolean',
+      },
+      {
+        name: 'max',
+        kind: 'number',
+      },
+      {
+        name: 'average',
+        kind: 'boolean',
+      },
+      {
+        name: 'density',
+        kind: 'enum',
+        enumValues: ['compact', 'default', 'comfortable'],
+      },
+      {
+        name: 'locale',
+        kind: 'string',
+      },
+    ],
+    agentEmittable: true,
+    emit: ['developer', 'untrusted'],
+  },
+  {
+    id: 'data-notification-inbox',
+    label: 'Notification inbox',
+    props: [
+      {
+        name: 'items',
+        kind: 'array',
+        required: true,
+      },
+      {
+        name: 'filter',
+        kind: 'enum',
+        enumValues: ['all', 'unread'],
+      },
+      {
+        name: 'now',
+        kind: 'string',
+      },
+      {
+        name: 'timeZone',
+        kind: 'string',
+      },
+      {
+        name: 'locale',
+        kind: 'string',
+      },
+      {
+        name: 'markReadOnOpen',
+        kind: 'boolean',
+      },
+      {
+        name: 'headingLevel',
+        kind: 'number',
+      },
+    ],
+    agentEmittable: true,
+    emit: ['developer', 'untrusted'],
+    events: ['select', 'change'],
+    bindable: ['filter'],
+  },
+  {
+    id: 'data-filter-builder',
+    label: 'Filter builder',
+    props: [
+      {
+        name: 'label',
+        kind: 'string',
+        required: true,
+      },
+      {
+        name: 'fields',
+        kind: 'array',
+        required: true,
+      },
+      {
+        name: 'value',
+        kind: 'object',
+      },
+      {
+        name: 'maxDepth',
+        kind: 'number',
+      },
+      {
+        name: 'disabled',
+        kind: 'boolean',
+      },
+    ],
+    agentEmittable: true,
+    emit: ['developer', 'untrusted'],
+    events: ['change'],
+  },
+  {
     id: 'workflow-graph',
     label: 'Workflow graph',
     props: [

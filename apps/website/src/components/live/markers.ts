@@ -207,6 +207,7 @@ export const LIVE_MARKERS: Readonly<Record<string, LiveMarkerSpec>> = {
   tag: { marker: '[data-tx-tag]' },
   'text-counter': { marker: '[data-tx-live-component="text-counter"], textarea' },
   textarea: { marker: 'textarea, [data-tx-textarea]' },
+  'time-field': { marker: '[data-tx-time]' },
   timeline: { marker: '[data-tx-timeline]' },
   toaster: { marker: '[data-tx-live-component="toaster"]', interact: 'button' },
   tooltip: { marker: '[data-tx-live-component="tooltip"]', interact: 'button' },

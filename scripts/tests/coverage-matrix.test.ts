@@ -237,4 +237,47 @@ describe('buildCoverageMatrix', () => {
       specIdsWithoutLoaderOrRenderer: ['ghost', 'select-content'],
     });
   });
+
+  it('shares a loader-matched manifest with a same-named export of the same package only', () => {
+    const component = (key: string, pkg: string, name: string, subpath: string) => ({
+      key,
+      package: pkg,
+      subpaths: [subpath],
+      name,
+      aliases: [name],
+      kind: 'component' as const,
+      file: `${key}.svelte`,
+      paints: [],
+    });
+    const fixture: CoverageInputs = {
+      components: [
+        component('compact', 'charts', 'Sparkline', './compact'),
+        component('lite', 'charts', 'Sparkline', './sparkline-lite'),
+        component('other-pkg', 'media', 'Sparkline', './x'),
+        component('other-name', 'charts', 'SparkBar', './sparkline-lite'),
+      ],
+      manifests: [
+        {
+          id: 'charts-sparkline-x',
+          package: 'charts',
+          label: 'Trend line',
+          source: 'catalog',
+          agentEmittable: true,
+        },
+      ],
+      spec: [],
+      loaders: [
+        { id: 'charts-sparkline-x', target: 'charts/compact#Sparkline', componentKey: 'compact' },
+      ],
+      playerRendererIds: [],
+      examples: [],
+      docs: [],
+    };
+    const { rows } = buildCoverageMatrix(fixture);
+    const manifestOf = (file: string) => rows.find((row) => row.file === file)?.manifest;
+    expect(manifestOf('compact.svelte')).toBe('charts-sparkline-x');
+    expect(manifestOf('lite.svelte')).toBe('charts-sparkline-x');
+    expect(manifestOf('other-pkg.svelte')).toBeNull();
+    expect(manifestOf('other-name.svelte')).toBeNull();
+  });
 });

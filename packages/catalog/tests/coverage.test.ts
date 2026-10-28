@@ -132,9 +132,12 @@ describe('catalog coverage gate', () => {
     expect(groups.data).toEqual([
       'data-board',
       'data-calendar',
+      'data-cohort-table',
       'data-files',
+      'data-filter-builder',
       'data-grid',
       'data-map',
+      'data-notification-inbox',
       'data-timeline',
       'data-tree-view',
     ]);

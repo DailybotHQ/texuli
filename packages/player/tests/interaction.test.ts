@@ -350,3 +350,141 @@ describe('the player runs spec 0.3.0 interaction', () => {
     ).toBeTruthy();
   });
 });
+
+describe('the PLAN_009 data views paint from JSON', () => {
+  it('paints a cohort table with an in-progress last period', async () => {
+    const { container } = render(Player, {
+      props: {
+        blueprint: envelope({
+          id: 'data-cohort-table',
+          props: {
+            caption: 'Retention by signup month',
+            periods: ['Month 0', 'Month 1'],
+            rows: [
+              { label: 'Sep 2026', size: 10, cells: [1, 0.5] },
+              { label: 'Oct 2026', size: 12, cells: [1, 0.25], incomplete: true },
+            ],
+          },
+        }),
+      },
+    });
+    expect(
+      await screen.findByRole('table', { name: 'Retention by signup month' }, { timeout: 5000 })
+    ).toBeTruthy();
+    expect(screen.getByRole('rowheader', { name: 'Oct 2026' })).toBeTruthy();
+    expect(container.querySelectorAll('.tx-cohort__cell--incomplete').length).toBe(1);
+  });
+
+  it('keeps inbox read changes in view, binds the filter and never paints an unsafe link', async () => {
+    const onStateChange = vi.fn();
+    const { container } = render(Player, {
+      props: {
+        blueprint: envelope(
+          {
+            id: 'data-notification-inbox',
+            props: {
+              now: '2026-10-27T12:00:00Z',
+              items: [
+                {
+                  id: 'a',
+                  title: 'Review requested',
+                  at: '2026-10-27T11:00:00Z',
+                  read: false,
+                  href: 'https://example.com/review',
+                },
+                { id: 'b', title: 'Report ready', at: '2026-10-26T11:00:00Z', read: true },
+              ],
+            },
+            bind: { filter: { $state: 'view' } },
+          },
+          { state: { view: { type: 'enum', values: ['all', 'unread'] } } }
+        ),
+        onStateChange,
+      },
+    });
+    const link = await screen.findByRole('link', { name: 'Review requested' }, { timeout: 5000 });
+    expect(link.getAttribute('href')).toBe('https://example.com/review');
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark as read: Review requested' }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Mark as unread: Review requested' })).toBeTruthy()
+    );
+    expect(container.querySelector('[data-unread]')).toBeNull();
+    await fireEvent.click(screen.getByRole('button', { name: 'Unread' }));
+    await waitFor(() => expect(onStateChange).toHaveBeenLastCalledWith({ view: 'unread' }));
+
+    const hostile = render(Player, {
+      props: {
+        blueprint: envelope({
+          id: 'data-notification-inbox',
+          props: {
+            items: [
+              {
+                id: 'x',
+                title: 'Hostile',
+                at: '2026-10-27T11:00:00Z',
+                read: false,
+                href: 'javascript:alert(1)',
+              },
+            ],
+          },
+        }),
+      },
+    });
+    await waitFor(() =>
+      expect(
+        hostile.container.querySelector('[data-status="invalid"]') ??
+          hostile.container.querySelector('[data-tx-inbox]')
+      ).toBeTruthy()
+    );
+    expect(hostile.container.querySelector('a[href^="javascript"]')).toBeNull();
+  });
+
+  it('starts a filter builder from a value that fits its fields, and empty otherwise', async () => {
+    const fields = [
+      { key: 'status', header: 'Status', type: 'enum', options: ['open', 'closed'] },
+      { key: 'total', header: 'Total', type: 'number' },
+    ];
+    const fits = render(Player, {
+      props: {
+        blueprint: envelope({
+          id: 'data-filter-builder',
+          props: {
+            label: 'Order filter',
+            fields,
+            value: {
+              type: 'group',
+              op: 'and',
+              children: [{ type: 'condition', field: 'status', operator: 'eq', value: 'open' }],
+            },
+          },
+        }),
+      },
+    });
+    const region = await screen.findByRole('region', { name: 'Order filter' }, { timeout: 5000 });
+    const values = () =>
+      [...region.querySelectorAll('select')].map((select) => (select as HTMLSelectElement).value);
+    expect(values()).toContain('status');
+    fits.unmount();
+
+    render(Player, {
+      props: {
+        blueprint: envelope({
+          id: 'data-filter-builder',
+          props: {
+            label: 'Bad filter',
+            fields,
+            value: {
+              type: 'group',
+              op: 'and',
+              children: [{ type: 'condition', field: 'secret', operator: 'eq', value: 'x' }],
+            },
+          },
+        }),
+      },
+    });
+    const bad = await screen.findByRole('region', { name: 'Bad filter' }, { timeout: 5000 });
+    expect(
+      [...bad.querySelectorAll('select')].map((s) => (s as HTMLSelectElement).value)
+    ).not.toContain('secret');
+  });
+});

@@ -77,6 +77,26 @@ const PAINT_HINTS: Readonly<Record<string, Readonly<Record<string, NumberHints>>
       source: 'composition canvas backing size',
     },
   },
+  // heatLevel (data/cohort) tints nothing unless the top of the scale is above 0.
+  'data-cohort-table': {
+    max: { bounds: { min: 0, exclusive: true }, source: 'cohort table heat scale' },
+  },
+  // FilterBuilder clamps the offered depth to 1 through FILTER_LIMITS.depth - 1.
+  'data-filter-builder': {
+    maxDepth: {
+      bounds: { min: 1, max: 5, integer: true },
+      default: 3,
+      source: 'filter builder nesting depth',
+    },
+  },
+  // DataNotificationInboxPainter paints the heading as h2 to h6.
+  'data-notification-inbox': {
+    headingLevel: {
+      bounds: { min: 2, max: 6, integer: true },
+      default: 2,
+      source: 'notification inbox heading (h2 to h6)',
+    },
+  },
   // intrinsicSize (media/image) keeps safe integers from 1 to IMAGE_LIMITS.dimension.
   'media-image': {
     width: { bounds: { min: 1, max: 16_384, integer: true }, source: 'image intrinsic size' },

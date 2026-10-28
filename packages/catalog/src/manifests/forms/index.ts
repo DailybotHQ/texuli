@@ -34,6 +34,7 @@ export {
   switchManifest,
   textareaManifest,
   textCounterManifest,
+  timeFieldManifest,
 } from './manifests.ts';
 export {
   buttonGroupPropNames,
@@ -66,4 +67,5 @@ export {
   switchPropNames,
   textareaPropNames,
   textCounterPropNames,
+  timeFieldPropNames,
 } from './prop-names.ts';
