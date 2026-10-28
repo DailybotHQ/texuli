@@ -15,6 +15,14 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+### Content
+
+- `@texuli/drag` and `@texuli/workflows` are on npm as `0.3.0` (first
+  published 2026-10-28; still in development), so 18 packages are on npm.
+  PLAN_007's changes to the other packages (`@texuli/primitives/sortable`,
+  the data drag migrations, spec 0.3.0, the player's interaction) stay
+  unreleased until each package's next release.
+
 ## [0.2.0] — 2026-10-28
 
 ### Changes

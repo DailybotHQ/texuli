@@ -112,8 +112,10 @@ Every drag surface (the `@texuli/primitives/sortable` binding, the
 `@texuli/data` board, tree view, calendar, timeline and column moves,
 `@texuli/workflows` and the player's `sortable-list`) follows one contract,
 [`@texuli/drag`'s interaction, accessibility and i18n contract](../packages/drag/docs/contract.md).
-Unreleased: `@texuli/drag` and `@texuli/workflows` are in development and
-not on npm.
+`@texuli/drag` and `@texuli/workflows` are in development and on npm as
+`0.3.0`; the sortable binding, the data migrations and the player's
+`sortable-list` are in the repository and ship with the next release of
+`@texuli/primitives`, `@texuli/data` and `@texuli/player`.
 
 - **Keyboard first.** Space or Enter on a handle picks up, arrows move
   (inline arrows flip in right-to-left text), Space or Enter drops, Escape

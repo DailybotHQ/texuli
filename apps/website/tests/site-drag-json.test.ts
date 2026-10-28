@@ -233,7 +233,9 @@ describe('the /workflows-page/json/ page', () => {
     expect(page).toContain('<JsonPreviewApp client:visible />');
     const copy = page.replace(/\s+/g, ' ');
     expect(copy).toContain('<code>@texuli/workflows</code>');
-    expect(copy).toContain('is in development and not on npm');
+    expect(copy).toContain('is in development and on npm as <code>0.3.0</code>');
+    expect(copy).toContain('painter that uses it is not in a published player release yet');
+    expect(copy).not.toMatch(/workflows<\/code>.{0,120}not (?:yet )?on npm/);
   });
 
   it('has no HTML sinks, refuses invalid drafts, paints untrusted and loads the player lazily', () => {

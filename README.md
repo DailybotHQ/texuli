@@ -189,7 +189,7 @@ every verified command.
 
 ## Honest boundaries
 
-- **No stable release yet.** The 16 packable packages are on npm as `0.3.0`,
+- **No stable release yet.** The 18 packable packages are on npm as `0.3.0`,
   a pre-1.0 release (`npm install texuli`; `latest` and `next` both point to
   it). Under 0.x a new minor (`0.4.0`) may contain breaking changes, so pin
   the exact version or use `^0.3.0`; 1.0.0 will be the first stable release.

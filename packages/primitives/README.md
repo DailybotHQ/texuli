@@ -113,8 +113,8 @@ from subpaths to keep bundles narrow.
 `sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) is in the repository
 but not in the published `0.3.0`. It binds the drag engine
 [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md),
-which is in development and not on npm yet; the next release publishes
-`@texuli/drag` first ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
+which is in development and on npm as `0.3.0`; `sortable` ships with the
+next release of `@texuli/primitives` ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 Contract: [prim-sortable.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-sortable.md).
 
 ### Breaking in 0.3.0

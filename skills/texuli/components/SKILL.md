@@ -15,12 +15,13 @@ consume the packages, or copy a styled component's source into the app and
 own it, then theme it, adjust it and keep it updatable.
 
 The copy path is **local**: its commands run from a Texuli monorepo checkout
-against folders on disk. 16 packages are on npm as
+against folders on disk. 18 packages are on npm as
 `0.3.0`, a pre-1.0 release (`latest` and `next` both point to it; 1.0.0 will
 be the first stable release). Install them plainly (`pnpm add texuli`), pin
 the exact version or `^0.3.0` (for 0.x it accepts only 0.3.x, since a new
-minor may break), and never suggest a download URL. `@texuli/editor`, `@texuli/drag`
-and `@texuli/workflows` are in development and not on npm, and features
+minor may break), and never suggest a download URL. `@texuli/drag` and
+`@texuli/workflows` are in development and on npm as `0.3.0`;
+`@texuli/editor` is in development and not on npm, and features
 marked unreleased in [`../router/packages.md`](../router/packages.md) (such as
 `@texuli/primitives/sortable` and spec 0.3.0) are not in the published
 `0.3.0`: never tell a consumer app to install them from npm.

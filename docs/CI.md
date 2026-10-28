@@ -95,9 +95,12 @@ GitHub's OIDC token (`id-token: write`).
 
 `publish.yml` lists `@texuli/drag` and `@texuli/workflows` (both in
 development, versioned `0.3.0`) ahead of the packages that depend on them
-(owner decision 2026-10-27). They are not on npm yet: the next `v*` tag or
-manual run publishes them. The publish loop skips versions npm already has,
-so a package changed since its published `0.3.0` needs a new version first
+(owner decision 2026-10-27). A manual `workflow_dispatch` run on `main`
+(run 40616266068, 2026-10-28 UTC) published both for the first time as
+`0.3.0`, with provenance, and pointed `latest` and `next` at it. The same
+run skipped the other 16 packages: the publish loop skips versions npm
+already has, so a package changed since its published `0.3.0` (every
+PLAN_007 change outside drag and workflows) needs a new version first
 ([RELEASE](RELEASE.md#publication-waves)).
 
 One-time setup, already done: the repository secret `NPM_TOKEN` holds a

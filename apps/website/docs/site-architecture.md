@@ -36,7 +36,7 @@ URL — T-12: no existing route moves) and links `/native/`.
    `WebCorrelation` demo (the same component as on the landing)
 3. `#portability` — `PortabilityDeepDive` (`portability-content.ts`): what
    moving an interface between runtimes takes
-4. `#what-exists-today` — the release truth (16 packages on npm as
+4. `#what-exists-today` — the release truth (18 packages on npm as
    `0.3.0`, a pre-1.0 release, nothing on Maven Central, the Compose
    renderer consumed from source) and `ParityTable` (`parity-data.ts`),
    one evidence cell per row

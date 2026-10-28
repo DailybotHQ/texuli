@@ -9,17 +9,20 @@ edits the graph without the canvas. It is part of
 [Texuli](https://texuli.com), "Small pieces. Infinite possibilities.": an
 MIT Svelte 5 component library by Dailybot, Inc.
 
-> **Status: in development.** `@texuli/workflows` is versioned `0.3.0` and
-> listed in the publish waves, but is **not yet on npm** (it goes out with
-> the next owner-run publish). Inside the Texuli repository
-> it is the `workflow-graph` painter of `@texuli/player`, so an agent can
-> send a workflow as JSON. It will be published in a future release wave,
-> after `@texuli/drag` and `texuli` and before the packages that depend on
-> it (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
+> **Status: in development (pre-1.0).** `@texuli/workflows` is on npm as
+> `0.3.0` (first published on 2026-10-28, with provenance). Inside the
+> Texuli repository it is the `workflow-graph` painter of `@texuli/player`,
+> so an agent can send a workflow as JSON; the published `@texuli/player`
+> `0.3.0` predates that painter, which ships with the player's next release
+> (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 ## Install
 
-Not yet on npm. In the Texuli workspace, depend on it as
+```bash
+npm install @texuli/workflows
+```
+
+In the Texuli workspace, depend on it as
 `"@texuli/workflows": "workspace:*"`. It builds on `@texuli/core`,
 `@texuli/drag`, `@texuli/primitives`, `@texuli/tokens` and `texuli`;
 `svelte` (^5.57.2) is a peer dependency. Import the token stylesheet once

@@ -60,7 +60,7 @@ export const nativeHeroContent = {
       kind: 'shipped',
       statusLabel: 'Shipped',
       detail:
-        'All 16 packages are published to npm as 0.3.0, a pre-1.0 release, and ' +
+        'All 18 packages are published to npm as 0.3.0, a pre-1.0 release, and ' +
         'texuli.com builds from this repository.',
     },
     {

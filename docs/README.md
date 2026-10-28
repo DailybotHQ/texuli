@@ -38,7 +38,7 @@ project overview.
 | `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): The rich text editor surface, toolbar, link dialog and clipboard import on the core editor texels. |
 | `@texuli/core` | [packages/core/README.md](../packages/core/README.md): Texels: framework-free behavior and policy that every Texuli component is built from. |
 | `@texuli/date` | [packages/date/README.md](../packages/date/README.md): Owned Gregorian date arithmetic for Texuli calendars and date fields. |
-| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, not on npm: the framework-free drag engine (sortable, gesture, spatial, graph). |
+| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.3.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
 | `@texuli/media` | [packages/media/README.md](../packages/media/README.md): Media: images, galleries, video, audio and layered compositions. |
@@ -48,7 +48,7 @@ project overview.
 | `@texuli/spec` | [packages/spec/README.md](../packages/spec/README.md): The schema-first blueprint contract: JSON schemas, the catalog vocabulary, TypeScript and Kotlin projections, and the conformance harness. |
 | `texuli` | [packages/texuli/README.md](../packages/texuli/README.md): Styled Texuli components, layouts and shells. |
 | `@texuli/tokens` | [packages/tokens/README.md](../packages/tokens/README.md): The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. |
-| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, not on npm: the accessible workflow graph editor and viewer. |
+| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.3.0`: the accessible workflow graph editor and viewer. |
 | `@texuli/tools` | [packages/tools/README.md](../packages/tools/README.md): Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. |
 | `@texuli/website` | [apps/website/README.md](../apps/website/README.md): texuli.com: the Texuli documentation, catalog and live examples, built with Astro; the Pages Functions live in the root `functions/`. |
 | `@texuli/agent` | [apps/agent/README.md](../apps/agent/README.md): The texuli.com agent service: prompt to validated blueprint draft, fake replay provider only, not deployed. |
