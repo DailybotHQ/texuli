@@ -22,6 +22,8 @@ import './rating.css';
  * like 4.3) as a labeled image. Ported from Protoyard's StarRating.
  */
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Selected rating (0 = not rated); bindable. */
   value?: number;
   onValueChange?: (value: number) => void;
@@ -65,6 +67,7 @@ let {
   locale,
   labels,
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -157,6 +160,7 @@ const onpointerleave = () => (hover = null);
 
 {#if display}
   <div
+    bind:this={ref}
     {...rest}
     class={classes}
     role="img"
@@ -172,7 +176,7 @@ const onpointerleave = () => (hover = null);
     {#if showValue}<span class="tx-rating__value" aria-hidden="true">{summary}</span>{/if}
   </div>
 {:else}
-  <div {...wrapperAttrs} class={classes} data-tx-rating="input" data-disabled={disabled ? '' : undefined}>
+  <div bind:this={ref} {...wrapperAttrs} class={classes} data-tx-rating="input" data-disabled={disabled ? '' : undefined}>
     <span class={cx('tx-rating__label', hideLabel && 'tx-rating__label--hidden')} id={`${uid}-label`}>{text.label}</span>
     <RadioGroupPrimitive.Root
       {...controlAttrs}

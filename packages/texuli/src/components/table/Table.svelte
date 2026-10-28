@@ -7,6 +7,8 @@ import { type TableDensity, type TableStack, type TableVariant, tableClass } fro
 import './table.css';
 
 type Props = HTMLTableAttributes & {
+  /** The `<table>` element (bindable). */
+  ref?: HTMLElement | null;
   /** Row treatment. */
   variant?: TableVariant;
   /** Cell padding, scaled by the theme's `--tx-density`. */
@@ -42,8 +44,16 @@ let {
   wrapperClass,
   class: className,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+function bindRef(node: HTMLTableElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 let wrapper: HTMLDivElement | undefined = $state();
 let table: HTMLTableElement | undefined = $state();
@@ -128,6 +138,7 @@ $effect(() => {
     data-density={density}
     data-stack={stack}
     {...rest}
+    {@attach bindRef}
   >
     {@render children?.()}
   </table>

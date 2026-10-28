@@ -1,13 +1,14 @@
 <script lang="ts">
 import { Accordion as AccordionPrimitive } from '@texuli/primitives/accordion';
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import Chevron from './Chevron.svelte';
 import type { AccordionItemDef } from './types.ts';
 import { type AccordionVariant, accordionRootClass } from './variants.ts';
 import './tabs-accordion.css';
 
-type Props = {
+type OwnProps = {
   items: readonly AccordionItemDef[];
   type?: 'single' | 'multiple';
   value?: string | string[];
@@ -19,7 +20,12 @@ type Props = {
   disabled?: boolean;
   class?: ClassValue;
   content?: Snippet<[AccordionItemDef]>;
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
 };
+
+/** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the root element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children' | 'dir'>;
 
 function asArray(v: string | string[] | undefined): string[] {
   return Array.isArray(v) ? v : v ? [v] : [];
@@ -36,6 +42,8 @@ let {
   disabled = false,
   class: className,
   content,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
 
 // Local bindables so the primitive can own open state and still notify hosts.
@@ -87,6 +95,8 @@ const rootClass = $derived(
 
 {#if type === 'multiple'}
   <AccordionPrimitive.Root
+    {...rest}
+    bind:ref
     type="multiple"
     bind:value={multiValue}
     onValueChange={(next) => {
@@ -103,6 +113,8 @@ const rootClass = $derived(
   </AccordionPrimitive.Root>
 {:else}
   <AccordionPrimitive.Root
+    {...rest}
+    bind:ref
     type="single"
     bind:value={singleValue}
     onValueChange={(next) => {

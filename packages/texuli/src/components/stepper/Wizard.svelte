@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { Button } from '../button/index.ts';
 import Stepper from './Stepper.svelte';
@@ -7,7 +8,7 @@ import type { StepperStep } from './types.ts';
 import { wizardClass } from './variants.ts';
 import './stepper.css';
 
-interface Props {
+type OwnProps = {
   steps: readonly StepperStep[];
   /** 0-based active step (bindable). */
   current?: number;
@@ -33,7 +34,12 @@ interface Props {
   /** Extra footer content (e.g. Cancel) on the start side. */
   secondaryActions?: Snippet;
   class?: ClassValue;
-}
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
+};
+
+/** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the root element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'>;
 
 let {
   steps,
@@ -50,7 +56,16 @@ let {
   failureMessage = 'Something went wrong.',
   secondaryActions,
   class: className,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
+
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 let completed = $state(new Set<string>());
 let busy = $state(false);
@@ -94,7 +109,12 @@ function onStepperClick(index: number): void {
 }
 </script>
 
-<div class={wizardClass({ class: className })} data-tx-wizard>
+<div
+  {...rest}
+  {@attach bindRef}
+  class={wizardClass({ class: className })}
+  data-tx-wizard
+>
   <Stepper
     {steps}
     {current}

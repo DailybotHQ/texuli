@@ -19,6 +19,8 @@ let {
   children,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledby,
+  name,
+  form,
   ...rest
 }: ToggleGroupRootProps & { value?: string | string[] } & Record<string, unknown> = $props();
 
@@ -93,10 +95,19 @@ const rovingAttachment = attachRovingFocus({
     Array.from(
       root.querySelectorAll<HTMLElement>('[data-roving-item]:not([disabled]):not([data-disabled])')
     ),
-  // Single selection: the pressed item is the tab stop (APG radio-like group).
-  ...(untrack(() => type) === 'single' ? { selected: indexOfSelected } : {}),
+  // The first pressed item is the tab stop (fallback: the first enabled item),
+  // for single (APG radio-like group) and multiple selection alike.
+  selected: indexOfSelected,
 });
 </script>
+
+{#snippet fields()}
+  {#if name}
+    {#each normalize(current) as pressed (pressed)}
+      <input type="hidden" {name} {form} value={pressed} disabled={isDisabled || undefined} />
+    {/each}
+  {/if}
+{/snippet}
 
 {#if rovingFocus}
   <div
@@ -110,6 +121,7 @@ const rovingAttachment = attachRovingFocus({
     {...rest}
   >
     {@render children?.()}
+    {@render fields()}
   </div>
 {:else}
   <div
@@ -122,5 +134,6 @@ const rovingAttachment = attachRovingFocus({
     {...rest}
   >
     {@render children?.()}
+    {@render fields()}
   </div>
 {/if}

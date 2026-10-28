@@ -5,6 +5,8 @@ import { type CommandSize, type CommandVariant, commandTriggerClass } from './va
 import './command.css';
 
 type Props = Omit<HTMLButtonAttributes, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Visible prompt text. */
   label?: string;
   /** Keys shown after the label (e.g. ['⌘', 'K']). */
@@ -33,6 +35,7 @@ let {
   type = 'button',
   class: className,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -46,6 +49,7 @@ const classes = $derived(
 </script>
 
 <button
+  bind:this={ref}
   class={classes}
   data-tx-command-trigger
   data-size={size}

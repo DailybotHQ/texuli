@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
+import { composeHandlers } from '../internal/handlers.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { tabsContext } from './context.ts';
 
@@ -11,7 +12,15 @@ type Props = Omit<HTMLButtonAttributes, 'value' | 'disabled' | 'children'> & {
   children?: Snippet;
 };
 
-let { value, disabled = false, class: className, children, ...rest }: Props = $props();
+let {
+  value,
+  disabled = false,
+  class: className,
+  children,
+  onclick,
+  onkeydown,
+  ...rest
+}: Props = $props();
 
 const tabs = tabsContext.get();
 // A consumer id wins: the context records it, so every reference follows.
@@ -67,15 +76,9 @@ function onKeydown(event: KeyboardEvent): void {
   aria-controls={controls}
   disabled={itemDisabled || undefined}
   tabindex={selected ? 0 : -1}
-  onclick={(event) => {
-    if (event.defaultPrevented) return;
-    activate();
-  }}
-  onkeydown={(event) => {
-    if (event.defaultPrevented) return;
-    onKeydown(event);
-  }}
   {...rest}
+  onclick={composeHandlers(onclick, activate)}
+  onkeydown={composeHandlers(onkeydown, onKeydown)}
 >
   {@render children?.()}
 </button>

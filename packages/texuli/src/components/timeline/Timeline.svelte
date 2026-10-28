@@ -14,6 +14,8 @@ import { type TimelineOrientation, timelineClass } from './variants.ts';
 import './timeline.css';
 
 type Props = Omit<HTMLOlAttributes, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Data-driven items. Or compose `<TimelineItem>` children instead. */
   items?: readonly TimelineItemData[];
   orientation?: TimelineOrientation;
@@ -37,6 +39,7 @@ let {
   item,
   children,
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -65,6 +68,7 @@ const horizontal = $derived(orientation === 'horizontal');
 <!-- A horizontal timeline scrolls sideways: it takes focus so the keyboard can scroll it. -->
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <ol
+  bind:this={ref}
   class={timelineClass({ orientation, class: className })}
   data-tx-timeline
   data-orientation={orientation}

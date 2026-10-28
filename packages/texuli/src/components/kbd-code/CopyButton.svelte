@@ -6,6 +6,8 @@ import { type CopyButtonSize, copyButtonClass } from './variants.ts';
 import './kbd-code.css';
 
 type Props = HTMLButtonAttributes & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Plain text written to the clipboard. */
   value: string;
   /** Visible / accessible label while idle. */
@@ -17,6 +19,10 @@ type Props = HTMLButtonAttributes & {
   size?: CopyButtonSize;
   /** Test seam for clipboard. */
   clipboard?: ClipboardLike | null;
+  /** Runs after the text reached the clipboard, with the copied text. */
+  onCopy?: (value: string) => void;
+  /** Runs when the clipboard write failed (no clipboard access, denied permission…). */
+  onCopyError?: (value: string) => void;
   class?: ClassValue;
   children?: import('svelte').Snippet;
 };
@@ -28,9 +34,13 @@ let {
   feedbackMs = 1500,
   size = 'md',
   clipboard = undefined,
+  onCopy,
+  onCopyError,
+  onclick,
   disabled = false,
   class: className,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -57,7 +67,15 @@ function clearTimer(): void {
   }
 }
 
-async function onClick(event: MouseEvent): Promise<void> {
+/**
+ * The caller's `onclick` runs first; calling `event.preventDefault()` in it
+ * skips the copy. A caller handler never replaces the copy behavior.
+ */
+async function onClick(
+  event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
+): Promise<void> {
+  onclick?.(event);
+  if (event.defaultPrevented) return;
   if (disabled || pending) {
     event.preventDefault();
     return;
@@ -68,6 +86,8 @@ async function onClick(event: MouseEvent): Promise<void> {
   });
   pending = false;
   copyState = ok ? 'copied' : 'error';
+  if (ok) onCopy?.(value);
+  else onCopyError?.(value);
   clearTimer();
   timer = setTimeout(
     () => {
@@ -80,6 +100,7 @@ async function onClick(event: MouseEvent): Promise<void> {
 </script>
 
 <button
+  bind:this={ref}
   type="button"
   class={classes}
   data-tx-copy-button

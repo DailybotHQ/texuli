@@ -1,4 +1,5 @@
 <script lang="ts">
+import { chainHandlers } from '../internal/handlers.ts';
 import { isRtl, tagsInputContext } from './context.ts';
 import type { TagsInputTagProps } from './types.ts';
 
@@ -49,12 +50,12 @@ const partProps = $derived({
   'data-state': focused ? 'active' : 'inactive',
   'data-disabled': tagsInput.disabled ? '' : undefined,
   onkeydown: handleKeydown,
-  onfocus: () => {
+  onfocus: chainHandlers(rest.onfocus, () => {
     focused = true;
-  },
-  onblur: () => {
+  }),
+  onblur: chainHandlers(rest.onblur, () => {
     focused = false;
-  },
+  }),
 });
 </script>
 

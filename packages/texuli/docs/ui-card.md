@@ -31,6 +31,16 @@ Surface container with optional media, header, body, footer and auto-fit grid.
 
 `href` uses `@texuli/core/url-policy` `safeHref` (default trust `developer`). Unsafe schemes render a non-interactive `div`.
 
+A link card also takes the anchor attributes `target`, `rel` and `download`
+(`true`, or a suggested file name). With `target="_blank"`, `noopener` is
+always added to `rel` (your tokens are kept). They are dropped when the card
+is not a link (no `href`, or a rejected one).
+
+```svelte
+<Card href="https://example.com/report.csv" download="report.csv">…</Card>
+<Card href="https://example.com/docs" target="_blank" rel="external">…</Card>
+```
+
 ## Media
 
 ```svelte
@@ -48,6 +58,15 @@ Surface container with optional media, header, body, footer and auto-fit grid.
 ```
 
 Only simple CSS lengths are accepted for `minItemWidth` (no injection).
+
+`maxColumns` (a whole number ≥ 1) caps the columns however wide the grid
+gets; narrow containers still drop to fewer columns at `minItemWidth`. Invalid
+values are ignored. The gap is the `--tx-card-grid-gap` custom property, set
+by `gap`.
+
+```svelte
+<CardGrid minItemWidth="14rem" maxColumns={3}>…</CardGrid>
+```
 
 ## Styles
 

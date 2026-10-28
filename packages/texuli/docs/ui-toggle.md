@@ -31,6 +31,26 @@ Wraps `@texuli/primitives/toggle`. Logical CSS. No static `style=`.
 | `ToggleGroup` | Single or multiple selection shell |
 | `ToggleGroupItem` | Item inside a group |
 
+### Forms, attributes and focus
+
+- `name` (and `form`, for a group outside its form) makes the group a form
+  field: it submits one `name=value` entry per pressed item, so a
+  `type="multiple"` group submits every pressed value. A disabled group
+  submits nothing.
+- Extra attributes (`id`, `aria-describedby`, `data-*`, handlers) land on the
+  group element, and `bind:ref` binds it.
+- The Tab stop starts on the first pressed item, for `single` and `multiple`
+  groups alike (no pressed item: the first enabled one).
+
+```svelte
+<form>
+  <ToggleGroup type="multiple" name="days" bind:value={days} aria-label="Days">
+    <ToggleGroupItem value="mon">Mon</ToggleGroupItem>
+    <ToggleGroupItem value="tue">Tue</ToggleGroupItem>
+  </ToggleGroup>
+</form>
+```
+
 ### Variants / sizes
 
 - `variant`: `default` \| `outline`

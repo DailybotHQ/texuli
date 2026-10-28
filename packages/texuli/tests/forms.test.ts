@@ -22,11 +22,13 @@ import {
 import { autosizeTextarea } from '../src/components/input/autosize.ts';
 import Input from '../src/components/input/Input.svelte';
 import TextCounter from '../src/components/input/TextCounter.svelte';
-import { copyText } from '../src/components/kbd-code/index.ts';
+import { CopyButton, copyText } from '../src/components/kbd-code/index.ts';
 import { formatRatingLabel, Rating } from '../src/components/rating/index.ts';
 import ColorPicker from '../src/components/tags-color/ColorPicker.svelte';
 import BannerRefHarness from './BannerRefHarness.svelte';
 import FieldHarness from './FieldHarness.svelte';
+import ApiRefHarness from './fixtures/ApiRefHarness.svelte';
+import { API_REF_KINDS } from './fixtures/api-ref-kind.ts';
 import ButtonHarness from './fixtures/ButtonHarness.svelte';
 import ClassValueHarness from './fixtures/ClassValueHarness.svelte';
 import CodeHarness from './fixtures/CodeHarness.svelte';
@@ -34,7 +36,10 @@ import ComboboxHarness from './fixtures/ComboboxHarness.svelte';
 import Fixture from './fixtures/ControlAriaFixture.svelte';
 import CopyButtonHarness from './fixtures/CopyButtonHarness.svelte';
 import FileUploadHarness from './fixtures/FileUploadHarness.svelte';
+import FormControlsHarness from './fixtures/FormControlsHarness.svelte';
 import IconButtonHarness from './fixtures/IconButtonHarness.svelte';
+import InputComposeHarness from './fixtures/InputComposeHarness.svelte';
+import InputValueHarness from './fixtures/InputValueHarness.svelte';
 import LabelPropHarness from './fixtures/LabelPropHarness.svelte';
 import Harness from './fixtures/NumberPinHarness.svelte';
 import RefHarness from './fixtures/RefHarness.svelte';
@@ -1044,6 +1049,202 @@ describe('kbd-code', () => {
         expect(writeText).toHaveBeenCalled();
         expect(['copied', 'error', 'idle']).toContain(button.getAttribute('data-state'));
       });
+    });
+  });
+});
+
+describe('input-api', () => {
+  afterEach(() => cleanup());
+
+  describe('G26: a caller oninput composes with bind:value', () => {
+    it('runs the internal handler first, then the caller, on every styled text control', async () => {
+      const kinds = [
+        'input',
+        'input-clearable',
+        'textarea',
+        'input-group',
+        'text-counter',
+        'text-counter-textarea',
+      ] as const;
+      for (const kind of kinds) {
+        const seen: (string | number | null)[] = [];
+        const view = render(InputComposeHarness, { props: { kind, seen } });
+        const field = view.getByRole('textbox') as HTMLInputElement | HTMLTextAreaElement;
+        await fireEvent.input(field, { target: { value: 'Ada' } });
+        expect(view.getByTestId('bound').textContent, kind).toBe('Ada');
+        // The caller ran once and already saw the bound value.
+        expect(seen, kind).toEqual(['Ada']);
+        view.unmount();
+      }
+    });
+  });
+
+  describe('G38: file inputs', () => {
+    it('defaults files to null, keeps value readable, and resets when files is set to null', async () => {
+      const view = render(InputValueHarness, { props: { kind: 'file' } });
+      const input = view.getByLabelText('Attachment') as HTMLInputElement;
+      expect(view.getByTestId('files').textContent).toBe('null');
+      expect(() => input.value).not.toThrow();
+      expect(input.value).toBe('');
+
+      const file = new File(['hi'], 'note.txt', { type: 'text/plain' });
+      // A non-plain object, like a real FileList (Svelte state never proxies it).
+      const picked = Object.assign(Object.create({ item: () => file }), {
+        0: file,
+        length: 1,
+      }) as FileList;
+      Object.defineProperty(input, 'files', { configurable: true, get: () => picked });
+      Object.defineProperty(input, 'value', {
+        configurable: true,
+        get: () => 'C:\\fakepath\\note.txt',
+        set: (next: string) => {
+          if (next === '') {
+            Object.defineProperty(input, 'files', { configurable: true, get: () => null });
+            Object.defineProperty(input, 'value', { configurable: true, value: '' });
+          }
+        },
+      });
+      await fireEvent.change(input);
+      expect(view.getByTestId('files').textContent).toBe('1');
+
+      await fireEvent.click(view.getByRole('button', { name: 'Reset' }));
+      await tick();
+      expect(view.getByTestId('files').textContent).toBe('null');
+      expect(input.value).toBe('');
+    });
+  });
+
+  describe('G44: numeric inputs bind numbers', () => {
+    it('binds a number for type number and range, and null when emptied', async () => {
+      for (const kind of ['number', 'range'] as const) {
+        const view = render(InputValueHarness, { props: { kind } });
+        const input = view.getByLabelText('Amount') as HTMLInputElement;
+        expect(input.value, kind).toBe('3');
+        await fireEvent.input(input, { target: { value: '7' } });
+        expect(view.getByTestId('amount').textContent, kind).toBe('number:7');
+        if (kind === 'number') {
+          await fireEvent.input(input, { target: { value: '' } });
+          expect(view.getByTestId('amount').textContent, kind).toBe('null');
+        }
+        view.unmount();
+      }
+    });
+  });
+
+  describe('G5: styled components bind ref and spread rest attributes', () => {
+    it('points bind:ref at the root and lands data-* and aria-* on the component', async () => {
+      for (const kind of API_REF_KINDS) {
+        const box: { current: HTMLElement | null } = { current: null };
+        const view = render(ApiRefHarness, {
+          props: {
+            kind,
+            get ref() {
+              return box.current;
+            },
+            set ref(value: HTMLElement | null) {
+              box.current = value;
+            },
+          },
+        });
+        await vi.waitFor(() => {
+          expect(box.current, kind).toBeInstanceOf(HTMLElement);
+        });
+        const el = box.current as HTMLElement;
+        const probe = document.querySelector('[data-probe="probe"]');
+        expect(probe, kind).toBeTruthy();
+        expect(el === probe || el.contains(probe), kind).toBe(true);
+        expect(probe?.getAttribute('aria-describedby') ?? '', kind).toContain('probe-note');
+        view.unmount();
+        await vi.waitFor(() => {
+          expect(box.current, kind).toBeNull();
+        });
+      }
+    });
+  });
+
+  describe('G40–G42: ToggleGroup form values and roving start, PinInput name and inputRef', () => {
+    it('submits each pressed value, starts the tab stop on the first pressed item, and forwards pin props', async () => {
+      const box: { current: HTMLInputElement | null } = { current: null };
+      const view = render(FormControlsHarness, {
+        props: {
+          get pinRef() {
+            return box.current;
+          },
+          set pinRef(value: HTMLInputElement | null) {
+            box.current = value;
+          },
+        },
+      });
+      const form = view.getByTestId('form') as HTMLFormElement;
+      const data = new FormData(form);
+      expect(data.getAll('days')).toEqual(['tue', 'thu']);
+      expect(data.get('code')).toBe('12');
+
+      const group = view.getByRole('group', { name: 'Days' });
+      expect(group.id).toBe('days-group');
+      expect(group.getAttribute('aria-describedby')).toBe('days-note');
+      await vi.waitFor(() => {
+        const stops = within(group)
+          .getAllByRole('button')
+          .filter((button) => button.getAttribute('tabindex') === '0');
+        expect(stops.map((button) => button.textContent?.trim())).toEqual(['Tue']);
+      });
+
+      await fireEvent.click(within(group).getByRole('button', { name: 'Mon' }));
+      expect(new FormData(form).getAll('days')).toEqual(['tue', 'thu', 'mon']);
+
+      await vi.waitFor(() => {
+        expect(box.current).toBeInstanceOf(HTMLInputElement);
+      });
+      expect(box.current?.getAttribute('name')).toBe('code');
+    });
+  });
+
+  describe('G36: CopyButton callbacks', () => {
+    it('reports success and failure, and composes a caller onclick that can cancel the copy', async () => {
+      const onCopy = vi.fn();
+      const onCopyError = vi.fn();
+      const onclick = vi.fn();
+      const writeText = vi.fn(async () => {});
+      const ok = render(CopyButton, {
+        props: {
+          value: 'token',
+          label: 'Copy token',
+          clipboard: { writeText },
+          onCopy,
+          onCopyError,
+          onclick,
+        },
+      });
+      await fireEvent.click(ok.getByRole('button', { name: /Copy token/ }));
+      await vi.waitFor(() => expect(onCopy).toHaveBeenCalledWith('token'));
+      expect(onclick).toHaveBeenCalledTimes(1);
+      expect(onCopyError).not.toHaveBeenCalled();
+      ok.unmount();
+
+      const failed = render(CopyButton, {
+        props: { value: 'token', label: 'Copy token', clipboard: null, onCopy, onCopyError },
+      });
+      // No clipboard and no execCommand fallback (happy-dom): the copy fails.
+      await fireEvent.click(failed.getByRole('button', { name: /Copy token/ }));
+      await vi.waitFor(() => expect(onCopyError).toHaveBeenCalledWith('token'));
+      failed.unmount();
+
+      onCopy.mockClear();
+      const cancel = render(CopyButton, {
+        props: {
+          value: 'token',
+          label: 'Copy token',
+          clipboard: { writeText },
+          onCopy,
+          onclick: (event: MouseEvent) => event.preventDefault(),
+        },
+      });
+      writeText.mockClear();
+      await fireEvent.click(cancel.getByRole('button', { name: /Copy token/ }));
+      await tick();
+      expect(writeText).not.toHaveBeenCalled();
+      expect(onCopy).not.toHaveBeenCalled();
     });
   });
 });

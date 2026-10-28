@@ -45,9 +45,11 @@ let {
 
 const showClear = $derived(clearable && !disabled && !readonly && Boolean(value));
 
-function onInput(event: Event & { currentTarget: HTMLInputElement }) {
+/** Sync `value` first, then run `inputProps.oninput` (it never replaces this one). */
+function onInput(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
   value = event.currentTarget.value;
   onValueChange?.(value);
+  inputProps.oninput?.(event as Parameters<NonNullable<typeof inputProps.oninput>>[0]);
 }
 
 function clear() {
@@ -82,8 +84,8 @@ function clear() {
       {readonly}
       aria-invalid={invalid ? 'true' : undefined}
       data-tx-input=""
-      oninput={onInput}
       {...inputProps}
+      oninput={onInput}
     />
   {/if}
 

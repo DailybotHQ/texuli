@@ -1,6 +1,6 @@
 <script lang="ts">
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
-import type { HTMLAttributes } from 'svelte/elements';
+import type { HTMLAnchorAttributes, HTMLAttributes } from 'svelte/elements';
 import { cx } from '../../internal/cx.ts';
 import { type CardVariant, cardClass } from './variants.ts';
 import './card.css';
@@ -17,6 +17,15 @@ type Props = HTMLAttributes<HTMLElement> & {
   hrefTrust?: HrefTrust;
   /** Accessible name when the card is a link without a nested heading. */
   linkLabel?: string;
+  /** Link target when `href` is set (ignored otherwise). */
+  target?: HTMLAnchorAttributes['target'];
+  /**
+   * Link relationship when `href` is set. With `target="_blank"`, `noopener`
+   * is always added so the opened page gets no `window.opener`.
+   */
+  rel?: string;
+  /** Download the linked resource (`true`, or a suggested file name) when `href` is set. */
+  download?: string | boolean;
   /** The rendered root element (bindable). */
   ref?: HTMLElement | null;
 };
@@ -26,6 +35,9 @@ let {
   href,
   hrefTrust = 'developer',
   linkLabel,
+  target,
+  rel,
+  download,
   class: className,
   children,
   ref = $bindable(null),
@@ -34,6 +46,17 @@ let {
 
 const safe = $derived(href === undefined ? undefined : safeHref(href, hrefTrust));
 const interactive = $derived(Boolean(safe));
+const linkRel = $derived(cardLinkRel(rel, target));
+const linkDownload = $derived(
+  download === true ? '' : download === false || download === undefined ? undefined : download
+);
+
+/** Merge the caller's `rel` tokens with `noopener` for a new browsing context. */
+function cardLinkRel(value: string | undefined, linkTarget: string | null | undefined) {
+  const tokens = (value ?? '').split(/\s+/).filter(Boolean);
+  if (linkTarget === '_blank' && !tokens.includes('noopener')) tokens.push('noopener');
+  return tokens.length > 0 ? tokens.join(' ') : undefined;
+}
 const classes = $derived(
   cardClass({
     variant,
@@ -46,6 +69,9 @@ const classes = $derived(
   <a
     bind:this={ref}
     href={safe}
+    {target}
+    rel={linkRel}
+    download={linkDownload}
     class={classes}
     data-tx-card
     data-variant={variant}

@@ -1,5 +1,6 @@
 <script lang="ts">
 import { composeChildProps } from '../internal/child.ts';
+import { composeHandlers } from '../internal/handlers.ts';
 import { toggleGroupContext } from './context.ts';
 import type { ToggleGroupItemAttrs, ToggleGroupItemProps } from './types.ts';
 
@@ -11,6 +12,9 @@ let {
   children,
   id,
   'aria-label': ariaLabel,
+  onclick: consumerClick,
+  onkeydown: consumerKeydown,
+  onkeyup: consumerKeyup,
   ...rest
 }: ToggleGroupItemProps & Record<string, unknown> = $props();
 
@@ -90,14 +94,14 @@ function bindNode(el: HTMLElement | null): void {
     disabled={attrs.disabled}
     tabindex={attrs.tabindex}
     class={attrs.class}
-    onclick={attrs.onclick}
-    onkeydown={attrs.onkeydown}
-    onkeyup={attrs.onkeyup}
     {@attach (el) => {
       bindNode(el);
       return () => bindNode(null);
     }}
     {...rest}
+    onclick={composeHandlers(consumerClick, attrs.onclick)}
+    onkeydown={composeHandlers(consumerKeydown, attrs.onkeydown)}
+    onkeyup={composeHandlers(consumerKeyup, attrs.onkeyup)}
   >
     {@render children?.()}
   </button>

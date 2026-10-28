@@ -4,6 +4,8 @@ import { type FeedbackSize, type FeedbackTone, spinnerClass } from './variants.t
 import './feedback.css';
 
 type Props = Omit<HTMLAttributes<HTMLSpanElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /**
    * When set, the spinner is a live status region and the label is announced.
    * Without a label it is decorative (`aria-hidden`).
@@ -13,7 +15,14 @@ type Props = Omit<HTMLAttributes<HTMLSpanElement>, 'children'> & {
   tone?: FeedbackTone;
 };
 
-let { label, size = 'md', tone = 'primary', class: className, ...rest }: Props = $props();
+let {
+  label,
+  size = 'md',
+  tone = 'primary',
+  class: className,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const classes = $derived(
   spinnerClass({
@@ -26,6 +35,7 @@ const classes = $derived(
 
 {#if label}
   <span
+    bind:this={ref}
     class={classes}
     role="status"
     data-tx-spinner
@@ -38,6 +48,7 @@ const classes = $derived(
   </span>
 {:else}
   <span
+    bind:this={ref}
     class={classes}
     aria-hidden="true"
     data-tx-spinner

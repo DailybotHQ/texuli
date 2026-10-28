@@ -14,6 +14,8 @@ import {
 import './choice.css';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   value?: string;
   onValueChange?: (value: string) => void;
   name?: string;
@@ -43,8 +45,16 @@ let {
   loop = true,
   class: className,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 const classes = $derived(
   radioGroupClass({
@@ -68,6 +78,7 @@ const classes = $derived(
   data-tx-choice="radio-group"
   data-variant={variant}
   {...rest}
+  {@attach bindRef}
 >
   {#if items}
     {#each items as item (item.value)}

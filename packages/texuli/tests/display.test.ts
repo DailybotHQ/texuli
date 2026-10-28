@@ -184,11 +184,31 @@ describe('badge', () => {
       });
       const onRemove = vi.fn(() => gate);
       const view = render(Tag, { props: { label: 'Ops', onRemove } });
-      const btn = view.getByRole('button', { name: /Remove: Ops/ });
+      const btn = view.getByRole('button', { name: 'Remove Ops' });
       await fireEvent.click(btn);
       expect(btn.getAttribute('aria-busy')).toBe('true');
       resolve();
       await waitFor(() => expect(btn.getAttribute('aria-busy')).not.toBe('true'));
+    });
+  });
+
+  describe('G37: Tag remove name', () => {
+    it('names the tag by default and takes a template, a prefix or a function', () => {
+      const onRemove = vi.fn();
+      const cases: { removeLabel?: string | ((label: string) => string); name: string }[] = [
+        { name: 'Remove Design' },
+        { removeLabel: 'Delete', name: 'Delete Design' },
+        { removeLabel: 'Quitar «{label}»', name: 'Quitar «Design»' },
+        { removeLabel: 'Remove Design tag', name: 'Remove Design tag' },
+        { removeLabel: (label) => `${label} entfernen`, name: 'Design entfernen' },
+      ];
+      for (const { removeLabel, name } of cases) {
+        const view = render(Tag, {
+          props: { label: 'Design', onRemove, ...(removeLabel ? { removeLabel } : {}) },
+        });
+        expect(view.getByRole('button').getAttribute('aria-label')).toBe(name);
+        view.unmount();
+      }
     });
   });
 
@@ -245,6 +265,46 @@ describe('card', () => {
     });
   });
 
+  describe('G34: Card link attributes', () => {
+    it('passes target, rel and download on a link card, adds noopener for _blank, and drops them on a div', () => {
+      const cases = [
+        { props: { target: '_blank' }, rel: 'noopener', target: '_blank', download: null },
+        {
+          props: { target: '_blank', rel: 'noreferrer' },
+          rel: 'noreferrer noopener',
+          target: '_blank',
+          download: null,
+        },
+        { props: { rel: 'external' }, rel: 'external', target: null, download: null },
+        { props: { download: true }, rel: null, target: null, download: '' },
+        { props: { download: 'report.csv' }, rel: null, target: null, download: 'report.csv' },
+      ] as const;
+      for (const entry of cases) {
+        const view = render(Card, {
+          props: { href: 'https://example.com/report', ...entry.props, children: text('Go') },
+        });
+        const link = view.container.querySelector('a[data-tx-card]');
+        expect(link?.getAttribute('href')).toBe('https://example.com/report');
+        expect(link?.getAttribute('rel') ?? null).toBe(entry.rel);
+        expect(link?.getAttribute('target') ?? null).toBe(entry.target);
+        expect(link?.getAttribute('download') ?? null).toBe(entry.download);
+        view.unmount();
+      }
+      const unsafe = render(Card, {
+        props: {
+          href: 'javascript:alert(1)',
+          target: '_blank',
+          download: true,
+          children: text('No'),
+        },
+      });
+      const div = unsafe.container.querySelector('[data-tx-card]');
+      expect(div?.tagName.toLowerCase()).toBe('div');
+      expect(div?.hasAttribute('target')).toBe(false);
+      expect(div?.hasAttribute('download')).toBe(false);
+    });
+  });
+
   describe('CardMedia', () => {
     it('renders img when src is safe and skips hostile schemes', () => {
       const ok = render(CardMedia, {
@@ -279,6 +339,28 @@ describe('card', () => {
         hostile.container.querySelector('[data-tx-card-grid]')?.getAttribute('style') ?? '';
       expect(style).toContain('16rem');
       expect(style).not.toContain('color');
+    });
+
+    it('G43: caps the columns with maxColumns and ignores invalid caps', () => {
+      const capped = render(CardGrid, { props: { maxColumns: 3, children: text('c') } });
+      const grid = capped.container.querySelector('[data-tx-card-grid]') as HTMLElement;
+      expect(grid.getAttribute('data-max-columns')).toBe('3');
+      expect(grid.getAttribute('style')).toContain(
+        'calc((100% - 2 * var(--tx-card-grid-gap)) / 3)'
+      );
+      capped.unmount();
+      for (const maxColumns of [0, -2, Number.NaN]) {
+        const view = render(CardGrid, { props: { maxColumns, children: text('c') } });
+        const el = view.container.querySelector('[data-tx-card-grid]') as HTMLElement;
+        expect(el.hasAttribute('data-max-columns')).toBe(false);
+        expect(el.getAttribute('style')).not.toContain('calc(');
+        view.unmount();
+      }
+      const css = readFileSync(
+        join(import.meta.dirname, '../src/components/card/card.css'),
+        'utf8'
+      );
+      expect(css).toMatch(/\.tx-card-grid\s*\{[^}]*gap:\s*var\(--tx-card-grid-gap\)/);
     });
   });
 });

@@ -10,6 +10,8 @@ import { type FieldOrientation, fieldRootClass } from './variants.ts';
 import './field.css';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   label: string;
   description?: string;
   /** Error message; when present the control is marked `aria-invalid`. */
@@ -38,6 +40,7 @@ let {
   orientation = 'vertical',
   class: className,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -67,6 +70,7 @@ const classes = $derived(cx(fieldRootClass({ orientation }), className));
 </script>
 
 <div
+  bind:this={ref}
   class={classes}
   data-tx-field=""
   data-invalid={invalid ? '' : undefined}

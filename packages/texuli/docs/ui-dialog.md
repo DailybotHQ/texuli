@@ -44,6 +44,8 @@ Styled modal surfaces on the `--tx-*` token contract: a general **Dialog** with 
 | `hideClose` | Hides the header close control |
 | `closeLabel` | Accessible name of the close control (default `Close`) |
 | `open` / `onOpenChange` | Controlled open state |
+| `ref` | Bindable: the dialog content element while open, `null` while closed |
+| other attributes | `id`, `aria-*`, `data-*` and handlers land on the dialog content element (`AlertDialog` too) |
 
 Escape and backdrop pointer dismiss close a Dialog. Focus is trapped while open.
 

@@ -2,13 +2,14 @@
 import { Toolbar as ToolbarPrimitive } from '@texuli/primitives/toolbar';
 import type { Snippet } from 'svelte';
 import { getContext } from 'svelte';
+import type { HTMLButtonAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import type { ToolbarStyleContext } from './style-context.ts';
 import { TOOLBAR_STYLE } from './style-context.ts';
 import { toolbarButtonClass } from './variants.ts';
 import './toolbar.css';
 
-type Props = {
+type OwnProps = {
   disabled?: boolean;
   class?: ClassValue;
   children?: Snippet;
@@ -16,7 +17,12 @@ type Props = {
   'aria-label'?: string;
   'aria-pressed'?: boolean | 'true' | 'false';
   onclick?: (event: MouseEvent) => void;
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
 };
+
+/** Extra attributes (`data-*`, `aria-*`, handlers…) land on the rendered element. */
+type Props = OwnProps & Omit<HTMLButtonAttributes, keyof OwnProps | 'children'>;
 
 let {
   disabled = false,
@@ -26,6 +32,8 @@ let {
   'aria-label': ariaLabel,
   'aria-pressed': ariaPressed,
   onclick,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
 
 const style = getContext<ToolbarStyleContext | undefined>(TOOLBAR_STYLE);
@@ -38,6 +46,8 @@ const classes = $derived(
 </script>
 
 <ToolbarPrimitive.Button
+  {...rest}
+  bind:ref
   {disabled}
   {id}
   {onclick}

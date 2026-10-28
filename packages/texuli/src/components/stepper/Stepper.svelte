@@ -1,10 +1,11 @@
 <script lang="ts">
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import type { StepperOrientation, StepperStep, StepperStepState } from './types.ts';
 import { stepperClass } from './variants.ts';
 import './stepper.css';
 
-interface Props {
+type OwnProps = {
   steps: readonly StepperStep[];
   /** 0-based index of the active step. */
   current: number;
@@ -16,7 +17,12 @@ interface Props {
   /** Accessible name for the progress navigation (localizable). */
   label?: string;
   class?: ClassValue;
-}
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
+};
+
+/** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the root element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps | 'children'>;
 
 let {
   steps,
@@ -26,7 +32,16 @@ let {
   onStepClick,
   label = 'Progress',
   class: className,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
+
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 const done = $derived(
   completed
@@ -47,7 +62,14 @@ function statusPhrase(state: StepperStepState): string {
 }
 </script>
 
-<nav aria-label={label} class={stepperClass({ orientation, class: className })} data-tx-stepper data-orientation={orientation}>
+<nav
+  {...rest}
+  {@attach bindRef}
+  aria-label={label}
+  class={stepperClass({ orientation, class: className })}
+  data-tx-stepper
+  data-orientation={orientation}
+>
   <ol class="tx-stepper__list">
     {#each steps as step, index (step.id)}
       {@const state = stateFor(index, step.id)}

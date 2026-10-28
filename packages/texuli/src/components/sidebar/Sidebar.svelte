@@ -16,6 +16,8 @@ import {
 import './sidebar.css';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Flat list; use `sections` for grouped navigation. */
   items?: readonly SidebarItem[];
   sections?: readonly SidebarSection[];
@@ -58,6 +60,7 @@ let {
   expandLabel = 'Expand sidebar',
   hrefTrust = 'developer',
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -199,6 +202,7 @@ function hrefOf(item: Pick<SidebarItem, 'href'>): string | undefined {
 {/snippet}
 
 <nav
+  bind:this={ref}
   class={rootClass}
   aria-label={label}
   data-tx-sidebar

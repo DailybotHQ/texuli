@@ -6,6 +6,8 @@ import { Button } from '../button/index.ts';
 import './empty.css';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   title?: string;
   message?: string;
   /** Shows a retry button; may return a promise (Button pending). */
@@ -21,11 +23,13 @@ let {
   retryLabel = 'Try again',
   action,
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 </script>
 
 <div
+  bind:this={ref}
   role="alert"
   class={cx('tx-error', className)}
   data-tx-error

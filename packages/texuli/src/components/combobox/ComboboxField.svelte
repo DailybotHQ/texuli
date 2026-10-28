@@ -7,6 +7,8 @@ import { type ComboboxSize, type ComboboxVariant, comboboxFieldClass } from './v
 import './combobox.css';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   children?: Snippet;
   size?: ComboboxSize;
   variant?: ComboboxVariant;
@@ -23,6 +25,7 @@ let {
   open = undefined,
   disabled = false,
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -42,6 +45,7 @@ const classes = $derived(
 </script>
 
 <div
+  bind:this={ref}
   class={classes}
   data-tx-combobox-field
   data-size={size}

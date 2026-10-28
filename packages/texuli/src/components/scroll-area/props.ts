@@ -7,6 +7,8 @@ export type ScrollAreaProps = Omit<
   HTMLAttributes<HTMLDivElement>,
   'aria-label' | 'aria-labelledby' | 'children' | 'dir' | 'role'
 > & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Accessible name for the scroll region. */
   label: string;
   /** Controls when the decorative scrollbar appears. Native scrolling is always available. */

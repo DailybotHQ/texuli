@@ -15,6 +15,8 @@ import {
 import './stat.css';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Metric name (visible + accessible). */
   label: string;
   /** Primary value (pre-formatted string or number). */
@@ -57,6 +59,7 @@ let {
   sparkline,
   variant = 'elevated',
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -67,6 +70,7 @@ const word = $derived(trendWord(resolvedTrend));
 </script>
 
 <article
+  bind:this={ref}
   class={statClass({
     variant,
     class: className,

@@ -2,6 +2,7 @@
 import { createTypeahead } from '@texuli/core/roving';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { composeHandlers } from '../internal/handlers.ts';
 import { type ListboxItemData, listboxContext } from './context.ts';
 
 type Selection = string | readonly string[] | undefined;
@@ -29,6 +30,7 @@ let {
   onValueChange,
   onActiveChange,
   children,
+  onkeydown,
   ...rest
 }: Props = $props();
 
@@ -178,7 +180,7 @@ listboxContext.set(context);
   aria-activedescendant={active !== undefined ? optionId(active) : undefined}
   data-disabled={disabled ? '' : undefined}
   data-multiple={multiple ? '' : undefined}
-  onkeydown={navigate}
+  onkeydown={composeHandlers(onkeydown, navigate)}
 >
   {@render children?.()}
 </div>

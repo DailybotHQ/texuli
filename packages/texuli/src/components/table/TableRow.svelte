@@ -5,6 +5,8 @@ import { getTableContext, stackedRole } from './context.ts';
 import './table.css';
 
 type Props = HTMLAttributes<HTMLTableRowElement> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /**
    * Highlights the row (accent fill and an edge mark). It is visual only: a
    * static table has no selection semantics, so pair it with a checked
@@ -13,12 +15,19 @@ type Props = HTMLAttributes<HTMLTableRowElement> & {
   selected?: boolean;
 };
 
-let { selected = false, class: className, children, ...rest }: Props = $props();
+let {
+  selected = false,
+  class: className,
+  children,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const context = getTableContext();
 </script>
 
 <tr
+  bind:this={ref}
   class={cx('tx-table__row', className)}
   role={stackedRole(context, 'row')}
   data-state={selected ? 'selected' : undefined}

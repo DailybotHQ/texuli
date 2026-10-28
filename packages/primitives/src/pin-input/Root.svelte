@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLInputAttributes } from 'svelte/elements';
+import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
 import {
   acceptsValue,
   clampLength,
@@ -52,6 +53,13 @@ let {
   children,
   inputmode,
   autocomplete = 'one-time-code',
+  oninput,
+  onpaste,
+  onfocus,
+  onblur,
+  onselect,
+  onkeyup,
+  onpointerup,
   ...rest
 }: RootProps = $props();
 
@@ -157,16 +165,16 @@ function onPointerUp(event: PointerEvent): void {
     value={value ?? ''}
     {disabled}
     data-state={complete ? 'complete' : 'incomplete'}
-    oninput={onInput}
-    onpaste={onPaste}
-    onfocus={() => {
+    oninput={chainHandlers(oninput, onInput)}
+    onpaste={composeHandlers(onpaste, onPaste)}
+    onfocus={chainHandlers(onfocus, () => {
       isFocused = true;
       caretTo((value ?? '').length);
-    }}
-    onblur={() => (isFocused = false)}
-    onselect={readSelection}
-    onkeyup={readSelection}
-    onpointerup={onPointerUp}
+    })}
+    onblur={chainHandlers(onblur, () => (isFocused = false))}
+    onselect={chainHandlers(onselect, readSelection)}
+    onkeyup={chainHandlers(onkeyup, readSelection)}
+    onpointerup={chainHandlers(onpointerup, onPointerUp)}
   />
   {@render children?.({ cells, isFocused, isHovering })}
 </div>

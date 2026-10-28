@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
+import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
 import { withArea } from './color.ts';
 import { getColorPickerContext } from './context.ts';
 
@@ -75,12 +76,12 @@ const attrs = $derived({
   'aria-disabled': context.disabled ? true : undefined,
   tabindex: context.disabled ? undefined : 0,
   'data-state': dragging ? 'active' : 'inactive',
-  onpointerdown,
-  onpointermove,
-  onpointerup: end,
-  onpointercancel: end,
-  onlostpointercapture: end,
-  onkeydown,
+  onpointerdown: composeHandlers(rest.onpointerdown, onpointerdown),
+  onpointermove: composeHandlers(rest.onpointermove, onpointermove),
+  onpointerup: chainHandlers(rest.onpointerup, end),
+  onpointercancel: chainHandlers(rest.onpointercancel, end),
+  onlostpointercapture: chainHandlers(rest.onlostpointercapture, end),
+  onkeydown: composeHandlers(rest.onkeydown, onkeydown),
 });
 </script>
 

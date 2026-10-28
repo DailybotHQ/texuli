@@ -91,6 +91,12 @@ from subpaths to keep bundles narrow.
 - **Shared layering.** Escape reaches only the topmost layer, so nested
   dialogs, menus and popovers close in order; overlays portal through one
   implementation.
+- **Your handlers add, never replace.** A handler you pass to a part that
+  binds its own (`onclick` on a radio item, tab or toggle, `onkeydown` on a
+  listbox or calendar grid, `oninput` on the pin input…) runs first, and the
+  part's behavior still runs; call `event.preventDefault()` in a click or
+  key handler to skip it. Bookkeeping handlers (focus, input, pointer up)
+  always run. Handlers a part fully owns are left out of its prop types.
 - **Your ids win.** An `id` you pass on any part replaces the generated one,
   and every `aria-*` reference to that part follows it.
 - **Native forms.** Checkbox, switch, radio group, select, combobox, slider,

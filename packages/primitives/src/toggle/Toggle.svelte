@@ -1,6 +1,7 @@
 <script lang="ts">
 import { untrack } from 'svelte';
 import { composeChildProps } from '../internal/child.ts';
+import { composeHandlers } from '../internal/handlers.ts';
 import type { ToggleRootAttrs, ToggleRootProps } from './types.ts';
 
 let {
@@ -15,6 +16,9 @@ let {
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledby,
   'aria-describedby': ariaDescribedby,
+  onclick: consumerClick,
+  onkeydown: consumerKeydown,
+  onkeyup: consumerKeyup,
   ...rest
 }: ToggleRootProps & { pressed?: boolean } & Record<string, unknown> = $props();
 
@@ -101,10 +105,10 @@ const childProps = $derived(child ? composeChildProps(attrs, {}) : attrs);
     disabled={isDisabled || undefined}
     tabindex={isDisabled ? -1 : 0}
     class={typeof className === 'string' ? className : undefined}
-    onclick={onClick}
-    onkeydown={onKeydown}
-    onkeyup={onKeyup}
     {...rest}
+    onclick={composeHandlers(consumerClick, onClick)}
+    onkeydown={composeHandlers(consumerKeydown, onKeydown)}
+    onkeyup={composeHandlers(consumerKeyup, onKeyup)}
   >
     {@render children?.()}
   </button>

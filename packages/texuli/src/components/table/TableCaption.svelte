@@ -5,11 +5,20 @@ import { getTableContext } from './context.ts';
 import './table.css';
 
 type Props = HTMLAttributes<HTMLElement> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Keep the caption for assistive technology only (it still names the table). */
   hidden?: boolean;
 };
 
-let { hidden = false, id, class: className, children, ...rest }: Props = $props();
+let {
+  hidden = false,
+  id,
+  class: className,
+  children,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const uid = $props.id();
 const captionId = $derived(id ?? `tx-table-caption-${uid}`);
@@ -22,6 +31,7 @@ $effect(() => {
 </script>
 
 <caption
+  bind:this={ref}
   id={captionId}
   class={cx(
     'tx-table__caption',

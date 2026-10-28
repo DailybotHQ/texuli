@@ -37,6 +37,8 @@ Styled disclosure surfaces on owned primitives (`@texuli/primitives/tabs`,
 - `variant`: `line` | `pills` | `enclosed`
 - `orientation`: `horizontal` | `vertical`
 - Roving focus and activation come from the tabs primitive
+- `bind:ref` binds the root element; extra attributes (`id`, `aria-*`,
+  `data-*`, handlers) land on it. `Accordion` and `Collapsible` do the same.
 
 ## Accordion
 

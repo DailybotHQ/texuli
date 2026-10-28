@@ -10,6 +10,8 @@ import { type PositiveDirection, resolveTrend, trendToneClass, trendWord } from 
 import './stat.css';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   label: string;
   value: number | null | undefined;
   unit?: KpiUnit;
@@ -57,6 +59,7 @@ let {
   empty = false,
   variant = 'elevated',
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -72,6 +75,7 @@ const formatted = $derived(formatKpi(value, unit, currency));
 </script>
 
 <article
+  bind:this={ref}
   class={statClass({
     variant,
     class: cx(

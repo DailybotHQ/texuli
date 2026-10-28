@@ -3,6 +3,7 @@ import type { OverlayDismissEvent } from '@texuli/core/overlay';
 import type { PortalTarget } from '@texuli/core/portal';
 import * as AlertDialogPrimitive from '@texuli/primitives/alert-dialog';
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { buttonVariants } from '../button/index.ts';
 import {
@@ -19,7 +20,7 @@ import '../button/button.css';
 
 type TriggerSnippet = Snippet<[{ props: Record<string, unknown> }]>;
 
-type Props = {
+type OwnProps = {
   open?: boolean;
   title: string;
   description?: string;
@@ -42,7 +43,12 @@ type Props = {
   onOpenChange?: (open: boolean) => void;
   /** Mount the portal somewhere other than document.body (scoped previews). */
   portal?: PortalTarget;
+  /** The alert dialog content element while open, `null` while closed (bindable). */
+  ref?: HTMLElement | null;
 };
+
+/** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the alert dialog content element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'role'>;
 
 let {
   open = $bindable(false),
@@ -59,7 +65,16 @@ let {
   errorFallback = 'The action failed. Please try again.',
   onOpenChange,
   portal,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
+
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 let pending = $state(false);
 let error = $state<string | null>(null);
@@ -129,11 +144,13 @@ function cancel(): void {
   <AlertDialogPrimitive.Portal to={portal}>
     <AlertDialogPrimitive.Overlay class={dialogOverlayClass()} data-tx-alert-dialog-overlay="" />
     <AlertDialogPrimitive.Content
+      {...rest}
       class={contentClass}
       data-tx-alert-dialog=""
       data-destructive={destructive ? 'true' : undefined}
       data-state={open ? 'open' : 'closed'}
       aria-busy={pending || undefined}
+      {@attach bindRef}
     >
       <div class="tx-alert-dialog__row">
         {#if destructive}
