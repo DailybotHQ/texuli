@@ -619,8 +619,8 @@
       "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,023 B (CSS 2,214 B)."
     },
     "@texuli/astro": {
-      "gzip": 18688,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 17,958 B gzip, cap = measured + 4% headroom."
+      "gzip": 19520,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 17,958 B gzip, cap = measured + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 18688 -> 19520 B, measured + 4% after ContentLayout children, toc entries and preserved ids (G39) and caller-handler composition in the texuli components it renders (G26); measured 18,757 B."
     },
     "@texuli/astro/appearance": {
       "gzip": 2432,
@@ -628,16 +628,16 @@
       "note": "PLAN_009 T-content-layout (G16): new row for the appearance switcher island (radio group + cache model over @texuli/tokens no-flash and modes); measured 2,334 B gzip, 519 B CSS, cap = measured + 4% headroom."
     },
     "@texuli/astro/content": {
-      "gzip": 14848,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,248 B gzip, cap = measured + 4% headroom."
+      "gzip": 15680,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,248 B gzip, cap = measured + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 14848 -> 15680 B, measured + 4% after ContentLayout children, toc entries and preserved ids (G39) and caller-handler composition in the texuli components it renders (G26); measured 15,022 B."
     },
     "@texuli/astro/integration": {
       "gzip": 2560,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 2,443 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/astro/site": {
-      "gzip": 16320,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 15,690 B gzip, cap = measured + 4% headroom."
+      "gzip": 17152,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 15,690 B gzip, cap = measured + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 16320 -> 17152 B, measured + 4% after ContentLayout children, toc entries and preserved ids (G39) and caller-handler composition in the texuli components it renders (G26); measured 16,476 B."
     },
     "@texuli/astro/styles.css": {
       "gzip": 64,
@@ -719,8 +719,8 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 21,437 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/grammar": {
-      "gzip": 39872,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom."
+      "gzip": 42112,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 39872 -> 42112 B, measured + 4% after the four new catalog manifests and the G21 block fields in the deck grammar; measured 40,474 B."
     },
     "@texuli/slides/components": {
       "gzip": 55613,
