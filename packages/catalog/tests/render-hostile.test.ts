@@ -19,6 +19,7 @@ import {
   renderCatalogFromBuild,
   renderCatalogFromSpecs,
 } from '../src/render/renderer/index.ts';
+import { RICHTEXT_LIMITS } from '../src/render/richtext/index.ts';
 import { validateDraft } from '../src/validate/index.ts';
 import { build, catalog, invalidOrInert } from './hostile-helpers.ts';
 import { scenario } from './scenario.ts';
@@ -228,6 +229,44 @@ describe('hostile helpers and samples', () => {
       },
       reset
     );
+  });
+
+  it('looksExecutable reads event handlers in linear time and matches the old pattern', () => {
+    // Each pair is a value and whether `/on\w+\s*=/i` (with the scheme
+    // alternatives) matched it.
+    for (const [value, expected] of [
+      ['<img src=x onerror=alert(1)>', true],
+      ['ONLOAD = go()', true],
+      ['xonclick\u2028=1', true],
+      ['data-on_x=1', true],
+      ['on=1', false],
+      ['onx', false],
+      ['on x=1', false],
+      ['button-on =1', false],
+      ['data:  text/html,x', true],
+      ['< script', true],
+      ['once upon a time', false],
+    ] as const) {
+      expect(looksExecutable(value), value).toBe(expected);
+    }
+    // `on` repeated restarted the old `on\w+` at every pair and backtracked
+    // to each word end: quadratic. The draft sink scan calls this on every
+    // string with no length cap, so the probe is twice the rich-text cap.
+    const size = 2 * RICHTEXT_LIMITS.source;
+    for (const value of [
+      'on'.repeat(size / 2),
+      `${'on'.repeat(size / 2 - 1)}=`,
+      `o${'n'.repeat(size - 1)}`,
+    ]) {
+      let best = Number.POSITIVE_INFINITY;
+      for (let run = 0; run < 3; run += 1) {
+        const started = performance.now();
+        looksExecutable(value);
+        best = Math.min(best, performance.now() - started);
+      }
+      expect(best, `${value.slice(0, 8)}…: ${best.toFixed(2)} ms`).toBeLessThan(20);
+    }
+    expect(looksExecutable(`${'on'.repeat(size / 2 - 1)}=`)).toBe(true);
   });
 
   it('marks the full corpus inert', () => {

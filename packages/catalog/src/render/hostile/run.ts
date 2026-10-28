@@ -13,8 +13,13 @@ import type {
   HostileSample,
 } from './types.ts';
 
-const SCRIPTISH =
-  /javascript:|vbscript:|data:\s*text\/html|<\s*script|onerror\s*=|onload\s*=|on\w+\s*=/i;
+// Script schemes and `<script`. Event handlers (`onerror=`, `onclick =`…)
+// are read by `hasEventHandler`: the old `on\w+\s*=` alternative backtracked
+// through the rest of every word at each `on`, so `onon…` was quadratic.
+const SCRIPT_SCHEME = /javascript:|vbscript:|data:\s*text\/html|<\s*script/i;
+const WORD = /\w/;
+/** Optional whitespace, then `=`; sticky, so it reads from `lastIndex` only. */
+const ASSIGN = /\s*=/y;
 
 const URL_KEYS = new Set([
   'href',
@@ -55,7 +60,38 @@ export function collectRenderStrings(nodes: readonly RenderNode[]): string[] {
  * True when a string looks like an executable script URL or HTML event handler.
  */
 export function looksExecutable(value: string): boolean {
-  return SCRIPTISH.test(value);
+  return SCRIPT_SCHEME.test(value) || hasEventHandler(value);
+}
+
+/**
+ * True when some word holds `on` (any case) followed by at least one more
+ * word character, and the word is followed by optional whitespace and `=`:
+ * exactly what `/on\w+\s*=/i` matches, read one word at a time. `\w+` has
+ * to run to the end of the word for `\s*=` to follow, so the word end fixes
+ * the match. Linear in the value.
+ */
+function hasEventHandler(value: string): boolean {
+  let at = 0;
+  while (at < value.length) {
+    if (!WORD.test(value[at] as string)) {
+      at += 1;
+      continue;
+    }
+    const start = at;
+    while (at < value.length && WORD.test(value[at] as string)) at += 1;
+    ASSIGN.lastIndex = at;
+    if (!ASSIGN.test(value)) continue;
+    // `on` must start at least three characters before the word end.
+    for (let k = start; k + 2 < at; k += 1) {
+      if (
+        (value[k] === 'o' || value[k] === 'O') &&
+        (value[k + 1] === 'n' || value[k + 1] === 'N')
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 /**

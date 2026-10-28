@@ -183,4 +183,74 @@ describe('renderRichText', () => {
       expect(richTextToPlain(document)).toBe('A B C D E');
     }
   });
+
+  it('parses hostile text at the source cap in linear time and keeps it as text', () => {
+    const cap = RICHTEXT_LIMITS.source;
+    const fill = (unit: string) => unit.repeat(Math.ceil(cap / unit.length)).slice(0, cap);
+    /** The fastest of three runs: the algorithm's cost, not a busy host's scheduler. */
+    const fastest = (source: string) => {
+      let best = Number.POSITIVE_INFINITY;
+      let result = renderRichText(source);
+      for (let run = 0; run < 3; run += 1) {
+        const started = performance.now();
+        result = renderRichText(source);
+        best = Math.min(best, performance.now() - started);
+      }
+      return { best, result };
+    };
+    // Each shape made the old forward scans or regexes restart at every
+    // opener: unclosed labels, label targets, HTML-like tags, trailing-space
+    // lines, emphasis markers and backtick runs.
+    const shapes: Record<string, string> = {
+      'a run of [': '['.repeat(cap),
+      '[ run, then *(': `${'['.repeat(cap - 2)}*(`,
+      'empty labels with open targets': fill('[]('),
+      'labels with open targets': fill('[a](x'),
+      'tags without >': fill('<a'),
+      'closing tags without >': fill('</b'),
+      'space-ended lines': fill(' \n__'),
+      'word lines ending in a space': fill('x \n'),
+      'single stars': fill('*x'),
+      underscores: fill('_ '),
+      'double stars': fill('**x'),
+      'star, then star pairs': `*${fill(' **').slice(1)}`,
+      'falling backtick runs': fill(
+        Array.from({ length: 88 }, (_, k) => `${'`'.repeat(88 - k)}a`).join('')
+      ),
+    };
+    for (const [name, source] of Object.entries(shapes)) {
+      expect(source.length, name).toBe(cap);
+      const { best, result } = fastest(source);
+      expect(best, `${name}: ${best.toFixed(2)} ms`).toBeLessThan(20);
+      // No markup is invented: every node is a known sink-free shape.
+      for (const paragraph of result.document.paragraphs) {
+        for (const type of collectTypes(paragraph.children)) {
+          expect(['text', 'code', 'break', 'strong', 'em', 'link'], name).toContain(type);
+        }
+      }
+    }
+    // Unclosed openers stay literal text, character for character.
+    expect(texts(renderRichText('['.repeat(cap)).document.paragraphs[0]?.children ?? [])).toBe(
+      '['.repeat(cap)
+    );
+    expect(renderRichText(fill('<a')).diagnostics).toEqual([]);
+    expect(renderRichText(`${fill('<a').slice(0, -1)}>`).diagnostics.map((d) => d.code)).toEqual([
+      'html-as-text',
+    ]);
+  });
+
+  it('keeps the old line-terminator rule for padded code spans', () => {
+    // `/^ .* $/` never matched across U+2028 or U+2029, so the padding stays.
+    for (const [source, value] of [
+      ['` a `', 'a'],
+      ['` a\u2028b `', ' a\u2028b '],
+      ['` a\u2029b `', ' a\u2029b '],
+      ['` a\nb `', 'a b'],
+      ['`  `', '  '],
+    ] as const) {
+      expect(renderRichText(source).document.paragraphs[0]?.children, source).toEqual([
+        { type: 'code', value },
+      ]);
+    }
+  });
 });
