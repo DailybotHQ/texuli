@@ -86,13 +86,10 @@ function renderWithoutParse(items: Bag[], step: number) {
   });
 }
 
-/** What an example needs declared around it on a slide (the `$declare` convention). */
+/** What an example needs on a slide: a choice's options (its enum is inferred from them). */
 function declared(id: string, props: Bag): Bag {
   if (id === 'control-choice' && typeof props.state === 'string') {
-    return {
-      ...props,
-      $declare: { [props.state]: { type: 'enum', values: ['this-week', 'last-week'] } },
-    };
+    return { ...props, options: ['this-week', 'last-week'] };
   }
   return props;
 }

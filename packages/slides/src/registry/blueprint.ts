@@ -65,12 +65,29 @@ export function stateReads(value: unknown, out = new Set<string>(), depth = 0): 
   return out;
 }
 
+/** The enum values of a `control-choice` `options` list: unique, non-empty strings. */
+export function choiceValues(options: unknown): string[] {
+  if (!Array.isArray(options)) return [];
+  const values: string[] = [];
+  for (const option of options.slice(0, 64)) {
+    const value = typeof option === 'string' ? option : isBag(option) ? option.value : undefined;
+    if (typeof value === 'string' && value.trim() !== '' && !values.includes(value)) {
+      values.push(value);
+    }
+  }
+  return values;
+}
+
 const CONTROL_STATE: Readonly<Record<string, (props: Bag) => Bag | undefined>> = Object.freeze({
   'control-toggle': () => ({ type: 'boolean' }),
   'control-slider': () => ({ type: 'number', min: 0, max: 100 }),
   'control-filter': () => ({ type: 'string' }),
-  // A choice needs its values: the author declares them with `$declare`.
-  'control-choice': () => undefined,
+  // A choice takes its values from `options` (strings, or objects with a
+  // `value`); without them the author declares the enum with `$declare`.
+  'control-choice': (props) => {
+    const values = choiceValues(props.options);
+    return values.length > 0 ? { type: 'enum', values, initial: values[0] } : undefined;
+  },
   'form-field': (props) =>
     props.kind === 'number' ? { type: 'number', min: 0, max: 1_000_000 } : { type: 'string' },
 });
@@ -84,6 +101,8 @@ export interface ComponentNode {
 export function gatedProps(id: string, props: Bag, capabilities: SlideCapabilities): Bag {
   const out: Bag = { ...props };
   delete out[DECLARE_KEY];
+  // `options` feed the declared enum; the choice control reads its values from there.
+  if (id === 'control-choice') delete out.options;
   if (id === 'sortable-list' && !hasCapability(capabilities, 'reorder') && isBag(out.reorder)) {
     out.reorder = { ...out.reorder, disabled: true };
   }
@@ -114,13 +133,8 @@ export function componentState(id: string, props: Bag): Bag {
 }
 
 /** The one-node blueprint envelope for a slide component. */
-export function componentBlueprint(
-  node: ComponentNode,
-  capabilities: SlideCapabilities = {},
-  label = node.id
-): Bag {
+export function componentBlueprint(node: ComponentNode, capabilities: SlideCapabilities = {}): Bag {
   const props = gatedProps(node.id, node.props, capabilities);
-  const title = label.trim().slice(0, 120) || node.id;
   const state = componentState(node.id, node.props);
   let tree: Bag = { id: node.id, props };
   if (node.id === 'form-field' || node.id === 'form-submit') {
@@ -137,13 +151,9 @@ export function componentBlueprint(
     updatedAt: '2026-01-01T00:00:00Z',
     generator: { kind: 'tool', name: 'texuli-slides' },
     ...(Object.keys(state).length > 0 ? { state } : {}),
-    // The player paints frames: a document frame and a card (their titles
-    // and box hidden on the slide) hold the one node, so its own headings
-    // (a chart title is an h3) keep a valid outline under them.
-    tree: {
-      id: 'layout-doc',
-      props: { title },
-      children: [{ id: 'layout-card', props: { title }, children: [tree] }],
-    },
+    // The player paints frames: an untitled document frame holds the one
+    // node. With no title it adds no heading, so the component contributes
+    // only its own content to the slide's outline.
+    tree: { id: 'layout-doc', props: {}, children: [tree] },
   };
 }

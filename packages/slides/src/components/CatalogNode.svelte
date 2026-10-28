@@ -34,16 +34,46 @@ const stage = getDeckStageContext();
 let options = $derived(registryOptions(context.renderers));
 let override = $derived(Object.hasOwn(options.overrides, id) ? options.overrides[id] : undefined);
 let paints = $derived(paintsComponent(id, options));
-let blueprint = $derived(
-  componentBlueprint({ id, props: { ...props } }, options.capabilities, label)
-);
+let blueprint = $derived(componentBlueprint({ id, props: { ...props } }, options.capabilities));
 let motion = $derived<'auto' | 'reduce'>(stage?.reducedMotion ? 'reduce' : 'auto');
 // The snapshot is read once per mount: later changes flow out through onStateChange.
 // svelte-ignore state_referenced_locally
 const initialState = options.stateHost.read(stateKey);
+
+/** The player's own chrome: a heading with its label, badges and skip links. */
+const CHROME = ':scope > .tx-player__chrome, :scope > .tx-player__skip, :scope > .tx-player__end';
+let root = $state<HTMLElement | null>(null);
+
+/**
+ * The slide is the frame, so the player's chrome leaves the accessibility
+ * tree (`hidden`, not only a style): a component adds no heading to the
+ * slide's outline. Re-applied if the player re-renders its root's children.
+ */
+function hideChrome(container: HTMLElement): void {
+  for (const player of container.querySelectorAll<HTMLElement>('[data-tx-player]')) {
+    for (const part of player.querySelectorAll<HTMLElement>(CHROME)) {
+      if (!part.hidden) part.hidden = true;
+    }
+  }
+}
+
+$effect(() => {
+  const container = root;
+  if (!container || override || !paints) return;
+  void blueprint;
+  hideChrome(container);
+  if (typeof MutationObserver === 'undefined') return;
+  const observer = new MutationObserver(() => hideChrome(container));
+  observer.observe(container, { childList: true });
+  for (const player of container.querySelectorAll('[data-tx-player]')) {
+    observer.observe(player, { childList: true });
+  }
+  return () => observer.disconnect();
+});
 </script>
 
 <div
+  bind:this={root}
   class="tx-deck-component"
   data-tx-deck-component={id}
   data-height={height}
@@ -92,20 +122,10 @@ const initialState = options.stateHost.read(stateKey);
   .tx-deck-component :global(.tx-player__end) {
     display: none;
   }
-  /* The wrapping frame and card are invisible: no box, no padding. */
-  .tx-deck-component :global(.tx-player-layout--doc),
-  .tx-deck-component :global(.tx-player-layout--card) {
+  /* The wrapping document frame is invisible: no box, no padding. */
+  .tx-deck-component :global(.tx-player-layout--doc) {
     padding: 0;
     border: 0;
     background: none;
-  }
-  /* Their titles name the component for assistive technology only. */
-  .tx-deck-component :global(.tx-player-layout__title) {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 </style>

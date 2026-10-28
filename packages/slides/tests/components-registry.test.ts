@@ -236,6 +236,84 @@ describe('registry: the renderer table', () => {
   });
 });
 
+describe('registry: a component adds no headings to the slide outline', () => {
+  const CHART = {
+    title: 'Tickets by status',
+    description: 'Ticket distribution',
+    data: [],
+    labels: {},
+  };
+
+  /** Headings inside the painted components, except the player's hidden chrome label. */
+  const addedHeadings = (root: ParentNode) =>
+    [...root.querySelectorAll('[data-tx-deck-component] h1, [data-tx-deck-component] h2')].filter(
+      (heading) => !heading.closest('.tx-player__chrome')
+    );
+
+  it('ComponentItem and ComponentSlide add no h1 or h2, and the frame is untitled', async () => {
+    mockPreferences();
+    const deck = {
+      formatVersion: 2,
+      meta: { title: 'T' },
+      slides: [
+        {
+          id: 'item',
+          layout: 'free',
+          blocks: [{ type: 'component', component: 'charts-donut', props: CHART }],
+        },
+        { id: 'whole', layout: 'component', component: { component: 'charts-pie', props: CHART } },
+      ],
+    };
+    const { container } = render(DeckStage, { props: { deck, loadTheme: null } });
+    await waitFor(
+      () => {
+        expect(container.querySelectorAll('[data-tx-deck-component] [data-tx-player]').length).toBe(
+          2
+        );
+        expect(container.querySelector('[data-tx-player-skeleton]')).toBeNull();
+      },
+      { timeout: 15_000 }
+    );
+    expect(addedHeadings(container)).toEqual([]);
+    for (const frame of container.querySelectorAll<HTMLElement>(
+      '[data-tx-deck-component] [data-tx-player-frame]'
+    )) {
+      expect(frame.querySelector('.tx-player-layout__title')).toBeNull();
+      expect(frame.hasAttribute('aria-labelledby')).toBe(false);
+    }
+    // The player's own label leaves the accessibility tree with the rest of its chrome.
+    const chrome = [
+      ...container.querySelectorAll<HTMLElement>('[data-tx-deck-component] .tx-player__chrome'),
+    ];
+    expect(chrome.length).toBe(2);
+    for (const part of chrome) expect(part.hidden).toBe(true);
+    for (const skip of container.querySelectorAll<HTMLElement>(
+      '[data-tx-deck-component] .tx-player__skip'
+    )) {
+      expect(skip.hidden).toBe(true);
+    }
+    const visibleHeadings = [
+      ...container.querySelectorAll('[data-tx-deck-component] h1, [data-tx-deck-component] h2'),
+    ].filter((heading) => !heading.closest('[hidden]'));
+    expect(visibleHeadings).toEqual([]);
+
+    // The chart's own title stays (an h3 below the slide's heading).
+    const h3 = [...container.querySelectorAll('[data-tx-deck-component] h3')].map(
+      (h) => h.textContent
+    );
+    expect(h3.join('|')).toContain('Tickets by status');
+  });
+
+  it('the blueprint wraps the node in an untitled document frame', () => {
+    const blueprint = componentBlueprint({ id: 'charts-pie', props: CHART });
+    expect(blueprint.tree).toEqual({
+      id: 'layout-doc',
+      props: {},
+      children: [{ id: 'charts-pie', props: CHART }],
+    });
+  });
+});
+
 describe('registry: state host and capabilities', () => {
   it('keys state by slide id and path, never by content', () => {
     expect(slideStateKey('intro', ['blocks', 3])).toBe('intro/blocks.3');
@@ -281,14 +359,78 @@ describe('registry: state host and capabilities', () => {
       },
     });
     expect(declared.state).toEqual({ p: { type: 'list', initial: [{ id: 'a', label: 'A' }] } });
-    const tree = (blueprint: Bag) =>
-      ((blueprint.tree as Bag).children as Bag[])[0]?.children as Bag[];
+    const tree = (blueprint: Bag) => (blueprint.tree as Bag).children as Bag[];
     expect(((tree(declared)[0] as Bag).props as Bag).$declare).toBeUndefined();
     const field = componentBlueprint({
       id: 'form-field',
       props: { name: 'e', state: 'e', label: 'Email' },
     });
     expect(tree(field)[0]).toMatchObject({ id: 'action-form', children: [{ id: 'form-field' }] });
+  });
+
+  it('control-choice infers its enum from options; $declare still overrides', async () => {
+    const inferred = componentBlueprint({
+      id: 'control-choice',
+      props: {
+        state: 'week',
+        label: 'Week',
+        options: ['this-week', { value: 'last-week' }, 'this-week', '', 4],
+      },
+    });
+    expect(inferred.state).toEqual({
+      week: { type: 'enum', values: ['this-week', 'last-week'], initial: 'this-week' },
+    });
+    const node = ((inferred.tree as Bag).children as Bag[])[0] as Bag;
+    expect(node.props).toEqual({ state: 'week', label: 'Week' });
+    const declared = componentBlueprint({
+      id: 'control-choice',
+      props: {
+        state: 'week',
+        label: 'Week',
+        options: ['a', 'b'],
+        $declare: { week: { type: 'enum', values: ['x', 'y'] } },
+      },
+    });
+    expect(declared.state).toEqual({ week: { type: 'enum', values: ['x', 'y'] } });
+    expect(
+      componentBlueprint({ id: 'control-choice', props: { state: 'week', label: 'Week' } }).state
+    ).toBeUndefined();
+    expect(
+      validateSlideComponent(
+        {
+          component: 'control-choice',
+          props: { state: 'week', label: 'Week', options: ['a', 'b'] },
+        },
+        []
+      )
+    ).toEqual([]);
+
+    mockPreferences();
+    const deck = {
+      formatVersion: 2,
+      meta: { title: 'T' },
+      slides: [
+        {
+          id: 'choice',
+          layout: 'free',
+          blocks: [
+            {
+              type: 'component',
+              component: 'control-choice',
+              props: { state: 'week', label: 'Week', options: ['this-week', 'last-week'] },
+            },
+          ],
+        },
+      ],
+    };
+    const { container } = render(DeckStage, { props: { deck, loadTheme: null } });
+    await waitFor(
+      () => {
+        expect(container.textContent).toContain('last-week');
+        expect(container.querySelector('.tx-player__notice')).toBeNull();
+      },
+      { timeout: 15_000 }
+    );
   });
 
   it('keeps a component’s state in the host across remounts', async () => {
