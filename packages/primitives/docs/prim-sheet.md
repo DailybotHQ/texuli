@@ -131,6 +131,14 @@ default.
 a bottom drawer (`data-side="bottom"`, draggable, with snap points) on
 matching screens and a centered dialog (`data-side="center"`) elsewhere. It is
 modal either way. It reads `matchMedia` only after mount, never at import.
+`data-presentation` is `sheet` or `dialog`.
+- `force`: `auto` (default), or `dialog` / `sheet` to always show that
+  presentation and ignore the width.
+- `host`: size by an element's inline size instead of the viewport (a preview
+  frame, a split pane). A `ResizeObserver` watches it; `query` is then ignored
+  and `breakpoint` (px, default `640`) decides: at or below it, the sheet.
+- The server render and the first client frame show the dialog.
+- `resolveResponsivePresentation(force, narrow)` is exported: the pure rule.
 
 `dismissDirection(side)` and `releaseTarget(offset, velocity, size, snapPoints,
 dismissible)` are exported: the pure drag rules.

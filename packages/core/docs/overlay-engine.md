@@ -121,6 +121,35 @@ region. Then:
 A keyboard shortcut (F6) to reach the toasts belongs to the toast primitive
 (T-prim-toast-region) and the R16 spike (T-overlay-r16).
 
+### Focus-exempt regions (your own toaster)
+
+Any region can be made focus-exempt the same way, for example an undo
+toaster an app renders itself outside a modal dialog:
+
+```ts
+import { getInertRegistry } from '@texuli/core/inert';
+
+const handle = getInertRegistry().exempt({ element: toaster, label: 'undo-toaster' });
+// on unmount:
+handle.release();
+```
+
+While a modal overlay is open, an exempt region:
+
+- is never made inert, and pointer presses, focus and Escape inside it never
+  dismiss the modal;
+- keeps its own Tab order: the modal's focus trap
+  (`createFocusScope`'s `exemptRegions`, which the engine fills with the
+  registry's exemptions) lets Tab and Shift+Tab move natively between the
+  region's stops, and past its last (or before its first) stop focus wraps
+  back into the modal;
+- is entered by the app: a click, a hotkey (the toast primitive uses F6) or
+  `focus()` on its action. Tab from inside the modal still cycles within the
+  modal, as the APG dialog pattern requires.
+
+Register the region on the same registry the overlay uses (the page-wide one
+by default). The styled `Dialog`, `AlertDialog` and sheets use it.
+
 ## Options
 
 | Option | Default | Notes |
@@ -137,7 +166,7 @@ A keyboard shortcut (F6) to reach the toasts belongs to the toast primitive
 | `initialFocus`, `restoreFocus`, `onBeforeRestoreFocus` | — | As in the focus scope. |
 | `onDismissRequest`, `onOpenChange`, `onExitComplete` | — | Callbacks. |
 | `presence` | — | `skipExitAnimation`, `reducedMotion`, `isMotionPending`. |
-| `stack`, `inertRegistry` | page-wide | Injection seams for tests and isolated roots. |
+| `stack`, `inertRegistry` | page-wide | Injection seams for tests and isolated roots. A `stack` is also how an app keeps its own layer order: the styled `Dialog`, `AlertDialog` and sheet roots forward a `stack` prop here. |
 
 The controller also exposes `phase()` (`closed`, `open` or `closing`),
 `isOpen()`, `isTop()`, `toggle(event?)`, `update()`, `setContainer()`,

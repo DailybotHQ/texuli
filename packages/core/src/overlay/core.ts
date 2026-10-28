@@ -280,6 +280,8 @@ export function createOverlayCore(
       focusScope = features.focusScope(element, {
         ...(options.initialFocus ? { initialFocus: options.initialFocus } : {}),
         ...(options.cycleTabNavigation ? { cycleTabNavigation: true } : {}),
+        // Focus-exempt regions (the toast region) keep their own Tab order.
+        exemptRegions: exemptElements,
         onBeforeRestoreFocus: (event) => {
           if (options.restoreFocus === false) event.preventDefault();
           options.onBeforeRestoreFocus?.(event);

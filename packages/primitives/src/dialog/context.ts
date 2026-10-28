@@ -1,4 +1,5 @@
 import type { FocusRestoreEvent, FocusTarget } from '@texuli/core/focus-scope';
+import type { LayerStack } from '@texuli/core/layer-stack';
 import type { OverlayController, OverlayDismissEvent, OverlayMode } from '@texuli/core/overlay';
 import { getContext } from 'svelte';
 
@@ -9,6 +10,8 @@ export type DialogContext = {
   readonly open: boolean;
   readonly mode: OverlayMode;
   readonly container: Element | null;
+  /** The layer stack the content registers on (default: the page-wide one). */
+  readonly stack: LayerStack | undefined;
   readonly triggerId: string;
   /** A part records its consumer `id` (or clears it), so references use the effective id. */
   claimId(

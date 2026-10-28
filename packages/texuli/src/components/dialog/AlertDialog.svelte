@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { LayerStack } from '@texuli/core/layer-stack';
 import type { OverlayDismissEvent } from '@texuli/core/overlay';
 import type { PortalTarget } from '@texuli/core/portal';
 import * as AlertDialogPrimitive from '@texuli/primitives/alert-dialog';
@@ -43,6 +44,12 @@ type OwnProps = {
   onOpenChange?: (open: boolean) => void;
   /** Mount the portal somewhere other than document.body (scoped previews). */
   portal?: PortalTarget;
+  /**
+   * The layer stack (`@texuli/core/layer-stack`) this overlay registers on, for
+   * apps that keep their own Escape and outside-press order. Default: the
+   * page-wide stack. Read when the alert opens.
+   */
+  stack?: LayerStack;
   /** The alert dialog content element while open, `null` while closed (bindable). */
   ref?: HTMLElement | null;
 };
@@ -65,6 +72,7 @@ let {
   errorFallback = 'The action failed. Please try again.',
   onOpenChange,
   portal,
+  stack,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
@@ -133,7 +141,7 @@ function cancel(): void {
 }
 </script>
 
-<AlertDialogPrimitive.Root bind:open onOpenChange={setOpen} onDismissRequest={handleDismiss}>
+<AlertDialogPrimitive.Root bind:open onOpenChange={setOpen} onDismissRequest={handleDismiss} {stack}>
   {#if trigger}
     <AlertDialogPrimitive.Trigger>
       {#snippet child({ props })}

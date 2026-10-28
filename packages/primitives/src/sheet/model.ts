@@ -44,3 +44,18 @@ export function releaseTarget(
   });
   return best;
 }
+
+/** How a responsive modal presents: a centered dialog or a bottom sheet. */
+export type ResponsivePresentation = 'dialog' | 'sheet';
+
+/**
+ * The presentation of a responsive modal: `force` wins; `auto` shows the
+ * sheet when the viewport (or host) is narrow.
+ */
+export function resolveResponsivePresentation(
+  force: ResponsivePresentation | 'auto',
+  narrow: boolean
+): ResponsivePresentation {
+  if (force === 'dialog' || force === 'sheet') return force;
+  return narrow ? 'sheet' : 'dialog';
+}

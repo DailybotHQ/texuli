@@ -4,7 +4,9 @@ export {
   DRAWER_PROJECTION_MS,
   dismissDirection,
   type PhysicalSheetSide,
+  type ResponsivePresentation,
   releaseTarget,
+  resolveResponsivePresentation,
   resolveSheetSide,
   type SheetSide,
 } from './model.ts';

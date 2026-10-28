@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { LayerStack } from '@texuli/core/layer-stack';
 import type { PortalTarget } from '@texuli/core/portal';
 import * as DialogPrimitive from '@texuli/primitives/dialog';
 import type { Snippet } from 'svelte';
@@ -37,6 +38,12 @@ type OwnProps = {
   class?: ClassValue;
   /** Mount the portal somewhere other than document.body (scoped previews). */
   portal?: PortalTarget;
+  /**
+   * The layer stack (`@texuli/core/layer-stack`) this overlay registers on, for
+   * apps that keep their own Escape and outside-press order. Default: the
+   * page-wide stack. Read when the dialog opens.
+   */
+  stack?: LayerStack;
   /** The dialog content element while open, `null` while closed (bindable). */
   ref?: HTMLElement | null;
 };
@@ -57,6 +64,7 @@ let {
   onOpenChange,
   class: className,
   portal,
+  stack,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
@@ -82,7 +90,7 @@ function setOpen(next: boolean): void {
 }
 </script>
 
-<DialogPrimitive.Root bind:open onOpenChange={setOpen}>
+<DialogPrimitive.Root bind:open onOpenChange={setOpen} {stack}>
   {#if trigger}
     <DialogPrimitive.Trigger>
       {#snippet child({ props })}

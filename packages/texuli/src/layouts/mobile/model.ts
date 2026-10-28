@@ -1,4 +1,9 @@
-import { navPath, type ResolvedNavItem, type ResolvedNavSection } from '../host/nav-model.ts';
+import {
+  type NavIconRef,
+  navPath,
+  type ResolvedNavItem,
+  type ResolvedNavSection,
+} from '../host/nav-model.ts';
 
 /**
  * Framework-free model of the mobile layouts (T-layouts-mobile): which
@@ -104,4 +109,25 @@ export function currentHashPath(node?: Node | null): string {
   } catch {
     return '/';
   }
+}
+
+/** One destination of a standalone {@link BottomNav} tab bar. */
+export interface BottomNavItem {
+  /** Stable key (default: `href`). */
+  id?: string;
+  /** Destination; passes `safeHref` at the bar's `hrefTrust`. */
+  href: string;
+  label: string;
+  /** A nav glyph name (`home`, `inbox`, …) or a Svelte SVG component. */
+  icon?: NavIconRef;
+  /** A count or short status, read as part of the link's name. */
+  badge?: string | number;
+  /** `true` or `'page'`: the current screen; `'true'`: the current screen is below it. */
+  current?: boolean | 'page' | 'true';
+}
+
+/** `aria-current` of a bottom-nav link. */
+export function bottomNavCurrent(item: BottomNavItem): 'page' | 'true' | undefined {
+  if (item.current === true || item.current === 'page') return 'page';
+  return item.current === 'true' ? 'true' : undefined;
 }

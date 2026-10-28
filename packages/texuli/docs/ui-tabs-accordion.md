@@ -26,6 +26,7 @@ Styled disclosure surfaces on owned primitives (`@texuli/primitives/tabs`,
   items={[
     { value: 'profile', label: 'Profile' },
     { value: 'team', label: 'Team', badge: 3 },
+    { value: 'search', label: 'Search', icon: 'search' },
   ]}
 >
   {#snippet content(item)}
@@ -35,6 +36,9 @@ Styled disclosure surfaces on owned primitives (`@texuli/primitives/tabs`,
 ```
 
 - `variant`: `line` | `pills` | `enclosed`
+- An item's `icon` (an `IconRef`: a built-in name such as `search`, or a
+  Svelte SVG component such as a Lucide icon) renders before the label. It
+  is decorative (`aria-hidden`), so the tab's name stays its `label`
 - `orientation`: `horizontal` | `vertical`
 - Roving focus and activation come from the tabs primitive
 - `bind:ref` binds the root element; extra attributes (`id`, `aria-*`,

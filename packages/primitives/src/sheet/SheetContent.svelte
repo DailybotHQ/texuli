@@ -125,6 +125,7 @@ function attach(node: HTMLDivElement): () => void {
       element: node,
       mode: context.mode,
       container: context.container,
+      ...(context.stack ? { stack: context.stack } : {}),
       modal,
       restoreFocusTarget: () => context.triggerElement ?? null,
       branches: () => [context.triggerElement],

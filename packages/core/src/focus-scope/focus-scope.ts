@@ -24,6 +24,13 @@ export interface FocusScopeOptions {
   cycleTabNavigation?: boolean;
   /** Called before focus returns to the opener; call `preventDefault()` to cancel. */
   onBeforeRestoreFocus?: (event: FocusRestoreEvent) => void;
+  /**
+   * Focus-exempt regions outside the container (an undo toaster, the live
+   * announcer). While focus is inside one, Tab and Shift+Tab move natively
+   * between the region's own stops; past its last (or before its first) stop,
+   * focus wraps back into the scope. Queried on every Tab.
+   */
+  exemptRegions?: () => readonly Element[];
 }
 
 /** An activated, framework-free keyboard focus scope. */
@@ -91,11 +98,33 @@ export function createFocusScope(
     focus(resolveInitialTarget(container, options), true);
   };
 
+  /** The exempt region holding `node`, when it sits outside the container. */
+  const exemptRegionOf = (node: Element | null): Element | null => {
+    if (!node || container.contains(node)) return null;
+    for (const region of options.exemptRegions?.() ?? []) {
+      if (region.contains(node)) return region;
+    }
+    return null;
+  };
+
   const onKeyDown = (event: KeyboardEvent) => {
     if (!active || !isTopScope(scope, document) || event.key !== 'Tab') return;
 
     const tabbable = getTabbableElements(container);
     const current = document.activeElement;
+    const region = exemptRegionOf(current);
+    if (region) {
+      // Inside a focus-exempt region: native order between its own stops,
+      // then back into the scope at either end.
+      const stops = getTabbableElements(region);
+      const at = stops.indexOf(current as HTMLElement);
+      const leaving = event.shiftKey ? at <= 0 : at < 0 || at === stops.length - 1;
+      if (!leaving) return;
+      event.preventDefault();
+      const target = event.shiftKey ? tabbable[tabbable.length - 1] : tabbable[0];
+      focus(target ?? container, !target);
+      return;
+    }
     const index = tabbable.indexOf(current as HTMLElement);
     const cycle = options.cycleTabNavigation === true;
 

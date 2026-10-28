@@ -96,6 +96,39 @@ nav model's active trail:
 - `splitTabs(items, limit)`, `MOBILE_TAB_LIMIT`, `topLevelItems(sections)`.
 - `stackHeader`, `StackHeader`, `navCurrent`, `currentHashPath`.
 - `mobileLabels(options)`.
+- The standalone parts below: `BottomNav`, `MobileHeader`, `MobileAppFrame`,
+  `BottomNavItem`, `bottomNavCurrent`.
+
+## Standalone parts: `BottomNav`, `MobileHeader`, `MobileAppFrame`
+
+The same tab bar, stack header and frame, as components an app composes
+itself (no layout host or nav model needed). Each is a side-effect-free
+re-export of `texuli/layouts/mobile`.
+
+```svelte
+<script lang="ts">
+  import { BottomNav, MobileAppFrame, MobileHeader } from 'texuli/layouts/mobile';
+  const tabs = [
+    { href: '#/home', label: 'Home', icon: 'home', current: true },
+    { href: '#/inbox', label: 'Inbox', icon: 'inbox', badge: 3 },
+  ];
+</script>
+
+<MobileAppFrame>
+  {#snippet header()}
+    <MobileHeader title="Deal 42" subtitle="Orbit Labs" backHref="#/deals" backTarget="Deals" />
+  {/snippet}
+  {#snippet stickyFooter()}<Button>Save</Button>{/snippet}
+  {#snippet bottomNav()}<BottomNav items={tabs} label="Primary" />{/snippet}
+  <DealScreen />
+</MobileAppFrame>
+```
+
+| Component | Props | Landmarks and behavior |
+| --- | --- | --- |
+| `BottomNav` | `items` (`{ id?, href, label, icon?, badge?, current? }`), `label` (`Primary`), `fixed` (`false`), `hrefTrust` (`developer`), `onSelect(item, event)`, `class`, other attributes | A `nav` named by `label`, one link per item. `current: true` (or `'page'`) sets `aria-current="page"`, `'true'` marks a parent of the current screen; the current link also gets a bar, so color is never the only signal. The badge is part of the link's name. Every `href` passes `safeHref`. Sticky at the bottom of its scroll container; `fixed` pins it to the viewport |
+| `MobileHeader` | `title`, `subtitle`, `titleAs` (`h1`, or `h2`/`p`/`div` when the screen has its own heading), `backHref` or `onBack`, `backLabel` (`Back`), `backTarget`, `hrefTrust`, `actions` snippet, `sticky` (`true`), `class`, other attributes | A `header` (the banner landmark at the top level). Back is a link with `backHref` or a button with `onBack`; with `backTarget` its name is `Back: Deals` (the visible word first, WCAG 2.5.3). The chevron mirrors in RTL |
+| `MobileAppFrame` | `header`, `bottomNav`, `stickyFooter` snippets, `children`, `skipLabel` (`Skip to content`), `mainId`, `mainElement` (`main`), `resetScrollOnNavigate` (`true`), `class`, `mainClass` | A skip link first (it focuses the screen without changing the hash), the header, the scrolling `main` screen, the sticky footer, then the bottom nav. Inside another page's `<main>` the screen is a `div` (one main landmark per page). It is `var(--tx-app-height, 100dvh)` tall: set `--tx-app-height` on a device frame or preview to fit it |
 
 ## Size
 
@@ -105,9 +138,18 @@ Measured with `pnpm size` on 2026-10-24:
 | --- | ---: | ---: |
 | `texuli/layouts/mobile` | 1.72 KiB | 28.93 KiB (both layouts, with Sheet, Dialog, chrome and CSS 4.83 KiB) |
 
+`pnpm size --filter texuli` on 2026-10-28, after the standalone parts joined
+the entry: `texuli/layouts/mobile` measures **7.05 KiB** gzip JS and
+**1.98 KiB** CSS with every export bundled (the 12 KiB `texuli/*` budget). The
+parts are side-effect-free modules (only `*.css` is marked as a side effect),
+and `texuli/layouts/mobile/register` (589 B) does not include them.
+
 ## Verified
 
 - **Unit tests:** `pnpm vitest run packages/texuli/tests/layouts.test.ts -t layouts-mobile`
+- **Standalone parts:** `pnpm vitest run packages/texuli/tests/layouts-mobile-parts.test.ts`
+  (landmarks, `aria-current`, the URL policy on a `javascript:` href, the
+  skip link, Back as a link and a button, no nested `main`).
   has 7 tests.
   - Model: tab splitting, stack headers, `navCurrent`.
   - Components through `LayoutHost`:

@@ -194,4 +194,34 @@ describe('createFocusScope', () => {
       scope.deactivate();
     }
   });
+
+  it('lets Tab move inside a focus-exempt region and wraps back into the scope at its ends', () => {
+    const root = mount(
+      '<main><section id="dialog"><button id="first">First</button><button id="last">Last</button></section><section id="toaster"><button id="undo">Undo</button><button id="dismiss">Dismiss</button></section></main>'
+    );
+    const dialog = root.querySelector('#dialog') as HTMLElement;
+    const toaster = root.querySelector('#toaster') as HTMLElement;
+    const by = (id: string) => root.querySelector(`#${id}`) as HTMLElement;
+    for (const cycleTabNavigation of [false, true]) {
+      const scope = createFocusScope(dialog, {
+        cycleTabNavigation,
+        exemptRegions: () => [toaster],
+      });
+      scope.activate();
+      // Tab between the region's own stops stays native.
+      by('undo').focus();
+      expect(tab().defaultPrevented).toBe(false);
+      by('dismiss').focus();
+      expect(tab(true).defaultPrevented).toBe(false);
+      // Past the region's last stop, focus returns to the scope's first stop…
+      by('dismiss').focus();
+      expect(tab().defaultPrevented).toBe(true);
+      expect(document.activeElement).toBe(by('first'));
+      // …and before its first stop, to the scope's last stop.
+      by('undo').focus();
+      expect(tab(true).defaultPrevented).toBe(true);
+      expect(document.activeElement).toBe(by('last'));
+      scope.deactivate();
+    }
+  });
 });

@@ -14,6 +14,7 @@ let { children, class: className, page, ...rest }: Props = $props();
 
 <Primitive.Page
   {page}
+  data-tx-pagination-page=""
   class={paginationButtonClass({
     class: className,
   })}

@@ -3,6 +3,7 @@ import { Tabs as TabsPrimitive } from '@texuli/primitives/tabs';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import { Icon } from '../icons/index.ts';
 import type { TabItem } from './types.ts';
 import {
   type TabsOrientation,
@@ -106,6 +107,9 @@ const triggerClass = $derived(tabsTriggerClass({ variant }));
           class={triggerClass}
           data-tx-tabs-trigger=""
         >
+          {#if item.icon}
+            <Icon icon={item.icon} size="sm" class="tx-tabs__icon" data-tx-tabs-icon="" />
+          {/if}
           {item.label}
           {#if item.badge !== undefined}
             <span class="tx-tabs__badge" aria-hidden="true">{item.badge}</span>

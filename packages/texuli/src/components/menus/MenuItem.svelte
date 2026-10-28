@@ -13,6 +13,8 @@ type Props = ComponentProps<typeof Primitive> & {
   shortcut?: string;
   /** Extra start padding when no icon/indicator. */
   inset?: boolean;
+  /** A destructive action (delete, remove): the danger tone, marked `data-tone="destructive"`. */
+  destructive?: boolean;
 };
 
 let {
@@ -21,6 +23,7 @@ let {
   icon,
   shortcut,
   inset = false,
+  destructive = false,
   disabled = false,
   ...rest
 }: Props = $props();
@@ -30,11 +33,18 @@ const classes = $derived(
     class: className,
     disabled: Boolean(disabled),
     inset: inset && !icon,
+    destructive,
   })
 );
 </script>
 
-<Primitive class={classes} data-tx-menu-item {disabled} {...rest}>
+<Primitive
+  class={classes}
+  data-tx-menu-item
+  data-tone={destructive ? 'destructive' : undefined}
+  {disabled}
+  {...rest}
+>
   {#if icon}
     <span class={menuIconClass()} data-tx-menu-icon aria-hidden="true">{@render icon()}</span>
   {/if}

@@ -12,7 +12,7 @@
 
 ## Parts
 
-- `Root` — controlled `open` (`bind:open`), `onOpenChange`, `mode`, `container`, `initialFocus`, `onDismissRequest`, preventable `onCloseAutoFocus`.
+- `Root` — controlled `open` (`bind:open`), `onOpenChange`, `mode`, `container`, `initialFocus`, `onDismissRequest`, preventable `onCloseAutoFocus`, and `stack` (a `LayerStack` to register on instead of the page-wide one).
 - `Trigger` — button with `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`, `data-state`.
 - `Portal` — moves children to `document.body` (or `Root.container` in contained mode).
 - `Overlay` — full-viewport backdrop; pointer presses do **not** close the alert.
