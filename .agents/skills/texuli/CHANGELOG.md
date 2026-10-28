@@ -15,6 +15,24 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-10-28
+
+### Changes
+
+- fix(skill): check option values with need_value instead of A && B || C (shellcheck SC2015)
+- docs(skill): teach the Texuli skill drag, workflows and interactive JSON
+- feat(skill): publish the Texuli skill to the standard of the reference skills
+- chore(deps): release 0.3.0 of all 16 packages, @texuli/date for the first time
+- docs: 0.2.0 is the current pre-1.0 release; plain installs in every README
+- docs: latest tracks the newest preview until 1.0.0; name 0.1.0-next.3
+- docs: name 0.1.0-next.2 as the npm preview across docs, site copy and skill
+- docs(skill): refresh the texuli skill pack for the current packages and test layout
+- fix: final-review website, docs, tests and skill findings (PLAN_006 T-100)
+- docs: honesty sweep — state the npm preview and the deploy everywhere (PLAN_006 T-96)
+- feat(slides): add fullscreen, a linked presenter screen and slot masters
+- feat(slides): play reveal steps (fragments) on the stage
+- feat: first version of Texuli
+
 ### Content
 
 - Drag and drop: `@texuli/drag` (the framework-free engine) and
