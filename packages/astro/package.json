@@ -25,6 +25,7 @@
   ],
   "exports": {
     ".": "./src/index.ts",
+    "./appearance": "./src/appearance/index.ts",
     "./content": "./src/content/index.ts",
     "./integration": "./src/integration/index.ts",
     "./site": "./src/site/index.ts",
@@ -34,7 +35,7 @@
     "./sections/Section": "./src/sections/Section.ts"
   },
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
     "@texuli/blocks": "0.4.0",

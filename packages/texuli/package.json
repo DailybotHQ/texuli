@@ -169,6 +169,11 @@
       "types": "./src/layouts/auth-settings/register.ts",
       "default": "./src/layouts/auth-settings/register.ts"
     },
+    "./layouts/content": {
+      "types": "./src/layouts/content/index.ts",
+      "svelte": "./src/layouts/content/index.ts",
+      "default": "./src/layouts/content/index.ts"
+    },
     "./layouts/content/blog": {
       "types": "./src/layouts/content/blog.ts",
       "svelte": "./src/layouts/content/blog.ts",
