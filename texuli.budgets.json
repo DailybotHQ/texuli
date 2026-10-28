@@ -15,12 +15,12 @@
       "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
     },
     "@texuli/blocks/core": {
-      "gzip": 24576,
-      "note": "@texuli/blocks/core holds every family parser plus the catalog metadata by contract (hosts that parse arbitrary documents use it); renderers no longer bundle it. Measured 20.88 KiB."
+      "gzip": 26176,
+      "note": "@texuli/blocks/core holds every family parser plus the catalog metadata by contract (hosts that parse arbitrary documents use it); renderers no longer bundle it. Measured 20.88 KiB. PLAN_009 (2026-10-28, owner-consented release plan): 24576 -> 26176 B, measured + 4% after the new block field schemas (G21) and the linear-time Markdown parser that replaces the backtracking regexes; measured 25,166 B."
     },
     "@texuli/blocks/data/renderers": {
-      "gzip": 12800,
-      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,288 B + 4% headroom so platform drift does not flip it."
+      "gzip": 13632,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,288 B + 4% headroom so platform drift does not flip it. PLAN_009 (2026-10-28, owner-consented release plan): 12800 -> 13632 B, measured + 4% after stat title, source and trend (G21); measured 13,052 B."
     },
     "@texuli/blocks/formula": {
       "gzip": 4096,
@@ -36,8 +36,8 @@
       "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
     },
     "@texuli/blocks/structure/renderers": {
-      "gzip": 32768,
-      "note": "Eager structure renderers include the styled Tabs, Accordion and Card components and the nested-block host; measured 32,051 B. Hosts that care about first load use the lazy @texuli/blocks/structure entry (lead decision 2026-10-23)."
+      "gzip": 35840,
+      "note": "Eager structure renderers include the styled Tabs, Accordion and Card components and the nested-block host; measured 32,051 B. Hosts that care about first load use the lazy @texuli/blocks/structure entry (lead decision 2026-10-23). PLAN_009 (2026-10-28, owner-consented release plan): 32768 -> 35840 B, measured + 4% after list, quote, callout, card and divider fields (G21), the linear-time Markdown parser and the avatar safeImageSrc re-check; measured 34,425 B."
     },
     "@texuli/blocks/text/renderers": {
       "gzip": 12288,
