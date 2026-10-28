@@ -1,7 +1,7 @@
 # Components on slides
 
 **Source:** `packages/slides/src/registry/` (the default component
-registry), `packages/slides/src/components/` (its painters)  
+registry, public as `@texuli/slides/components`), `packages/slides/src/components/` (its painters)  
 **Tests:** `tests/components-registry.test.ts` (the renderer table, outline,
 state host and capabilities, free-slide extensions, hostile props),
 `tests/components-coverage.test.ts` (every catalog id is a slide component
@@ -211,11 +211,29 @@ and `exclude` (ids this host does not allow on slides). The stage installs
 the default registry (`componentRenderers`: memory state, local reorder, no
 actions, no overrides).
 
-**Not exported yet.** The registry lives in `src/registry/` and is not a
-public subpath of `@texuli/slides` (a new export needs the owner-held
-`package.json`), so today a host cannot import `createComponentRenderers`
-from the package. What a host can do now is pass its own `renderers` to
-`DeckStage`: its table answers before the default registry, so it can
-replace the painting of any component or free slide
-([stage.md](stage.md#renderers)). Exporting the registry for capabilities,
-a persistent state host and overrides is planned.
+**Import.** The registry is the `@texuli/slides/components` subpath:
+
+```ts
+import { createComponentRenderers } from '@texuli/slides/components';
+
+const renderers = createComponentRenderers({
+  stateHost: myPersistentStateHost,
+  capabilities: { reorder: true, workflowEdit: false, embeds: false },
+});
+// <DeckStage {deck} {renderers} />: the host table answers first.
+```
+
+| Name | What it is |
+| --- | --- |
+| `ComponentRegistryOptions` | The factory options: `stateHost` (default a new memory host), `capabilities` (default local reorder only), `onAction` (form actions; without it forms cannot submit), `overrides` (replace a catalog id's painter or add a host id), `exclude` (ids not allowed on slides), `validateProps` (an opt-in parse-time props check, for example `validateSlideComponent`, about 35 KiB gzip more) and `validationTier` (default `untrusted`) |
+| `ComponentRenderers` | The renderer table the factory returns: a `DeckRenderers` table marked with `REGISTRY_OPTIONS` |
+| `REGISTRY_OPTIONS` | The symbol that marks a table built by this registry, so its painters find their options |
+| `ResolvedRegistryOptions` | The options with defaults applied (`exclude` as a set) |
+| `registryOptions(renderers)` | The resolved options from a stage's renderer list (defaults when none is there) |
+| `paintsComponent(id, options)` | True when the registry paints `id`: a slide component or a host override, not excluded |
+| `slideCatalog()` | The player's render catalog, built once on first use |
+| `SlideComponentCheck` | The options of `validateSlideComponent`: `tier` and `capabilities` |
+
+A host that only needs to replace some painting can still pass its own
+`renderers` without the factory: its table answers before the default
+registry ([stage.md](stage.md#renderers)).

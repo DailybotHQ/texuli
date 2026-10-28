@@ -704,6 +704,14 @@
       "gzip": 39872,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom."
     },
+    "@texuli/slides/components": {
+      "gzip": 55613,
+      "note": "Owner decision 2026-10-28 (PLAN_008, owner consent in analysis_results/owner-consent.md): new public subpath for hosts such as Protoyard (the component registry: the renderer table, the slide-component outline (53 ids, exclusions with reasons), the state host and capabilities; painters and player families load lazily); measured 53,473 B gzip, cap = measured + 4% headroom."
+    },
+    "@texuli/slides/layouts": {
+      "gzip": 40575,
+      "note": "Owner decision 2026-10-28 (PLAN_008, owner consent in analysis_results/owner-consent.md): new public subpath for hosts such as Protoyard (the 20 layout renderers table with fit-text and media helpers; each layout component loads lazily); measured 39,014 B gzip, cap = measured + 4% headroom."
+    },
     "@texuli/slides/export": {
       "gzip": 8064,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 7,723 B gzip, cap = measured + 4% headroom."

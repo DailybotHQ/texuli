@@ -44,7 +44,7 @@ export function layoutImageSrc(
   return resolveImageSources({ src, trust: tier }).src;
 }
 
-/** The video URL (and poster) a layout may paint at `tier`; `src` is `undefined` when refused. */
+/** The video URL a layout may paint at `tier`; `src` is `undefined` when refused. */
 export function layoutVideoSrc(src: string, tier: DeckMediaTrust) {
   const resolved = resolveVideoSources({ src, trust: tier });
   return { src: resolved.src };

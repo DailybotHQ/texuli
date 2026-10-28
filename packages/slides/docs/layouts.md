@@ -74,8 +74,10 @@ reveals the whole body; on a steppable path it reveals that element.
 - **Wired by default.** `DeckStage` asks the host's `renderers` first, then
   the layout table, then the component registry. A host replaces a layout by
   answering `layout` for it in its own `DeckRenderers` table (see
-  [stage.md](stage.md#renderers)); the default layout table is internal to
-  the stage and not exported.
+  [stage.md](stage.md#renderers)). The default layout table is
+  `layoutRenderers`, exported from `@texuli/slides/layouts` (see
+  [Import and API](#import-and-api)); the print export paint uses
+  the same table.
 - **One frame.** Every layout paints inside a frame that covers the slide
   body and is a size container, so the type scale follows the virtual canvas
   and reads the same on 16:9, 4:3, 9:16 and 1:1. Text uses the slide's
@@ -121,6 +123,51 @@ Layout-specific behavior:
 - `three-column-cards` accepts an `icon` name, but `@texuli/slides` does not
   depend on the icon set yet, so each card shows its number in the icon
   tile.
+
+## Import and API
+
+```ts
+import { layoutRenderers } from '@texuli/slides/layouts';
+```
+
+The `@texuli/slides/layouts` subpath (in `0.4.0`, in development and not on
+npm yet) exports the layout renderer table and the helpers the renderers
+are built from. `DeckStage` (and the print paint) already install
+`layoutRenderers` after the host's `renderers`, so a host does not need to
+pass it. Import it to compose or wrap it: for example, a table that answers
+`layout` for one id and delegates the rest to `layoutRenderers.layout`, or
+calls `layoutRenderers.prefetch` to warm chunks ahead of time. The
+renderer components themselves are not exported; they load through the
+table.
+
+| Export | Kind | What it is |
+| --- | --- | --- |
+| `layoutRenderers` | `DeckRenderers` | The frozen layouts table for `DeckStage` (`renderers={layoutRenderers}`): `layout(slide)` returns the lazy renderer for a catalog layout id (else `undefined`), `prefetch(slide)` loads its chunk. |
+| `LAYOUT_RENDERER_ENTRIES` | `Readonly<Record<DeckCatalogLayoutId, DeckLazyRenderer>>` | One lazy renderer (`{ load }`) per catalog layout; `MediaSide` and `MediaCentered` serve several ids. |
+| `LAYOUT_RENDERER_IDS` | `readonly DeckCatalogLayoutId[]` | The 20 layout ids the table renders (every catalog layout except `free`). |
+| `LAYOUT_TEXT_MINIMUMS` | constant | `{ bodyPx: 24, labelPx: 18 }`: the canvas-pixel floors text fit never goes below (the deck lint reads the same numbers). |
+| `fitScale` | `(needed, available, min) => number` | The zoom that fits `needed` px into `available` px, between `min` and 1; 1 for invalid sizes or an overflow of 2 px or less. |
+| `fitFontSize` | `(start, minPx, overflows) => number` | Steps a font size down 6 % at a time from `start` while `overflows(size)` is true, stopping at `minPx` (at most 40 steps). |
+| `textOverflows` | `(node, fontSize) => boolean` | True when a box's scroll size exceeds its client size by more than half a line (at least 4 px). |
+| `fitText` | `(minPx) => (node) => cleanup` | An attachment that shrinks one text element's font size until it fits, never below `minPx`; re-measures on resize, load and DOM changes; writes `style.fontSize` and `data-tx-deck-fit`. |
+| `fitContent` | `(min = 0.75) => (node) => cleanup` | An attachment that zooms an element (CSS `zoom`) until its content fits its box, never below `min`; writes `style.zoom` and `data-tx-deck-fit`. Both attachments do nothing without `requestAnimationFrame` (SSR). |
+| `LAYOUT_MEDIA_DEFAULT_SIZE` | constant | `{ width: 1280, height: 720 }`: the size a layout image or video assumes without author dimensions. |
+| `avatarId` | `(value) => string \| undefined` | The avatar id in `av-001` or `avatar:av-001`, else `undefined`. |
+| `layoutImageSrc` | `(src, tier, resolveAvatar?) => string \| undefined` | The image URL a layout may paint at the tier: avatar ids through the host adapter, other sources through the `@texuli/media` image resolver (`safeImageSrc`); `undefined` when refused. |
+| `layoutVideoSrc` | `(src, tier) => { src: string \| undefined }` | The video URL through the `@texuli/media` video resolver (`safeMediaSrc`); `src` is `undefined` when refused. |
+| `layoutCodeBlock` | `({ lang, source, highlights? }) => Block \| null` | The `code` block of `code-with-callout`, checked by the block schema (`null` when refused). |
+| `layoutChartBlock` | `(spec) => Block \| null` | The `chart` block of the `chart` layout: the spec without its step fields, typed `chart`, schema-checked. |
+| `layoutCtaBlock` | `({ label, href }) => Block \| null` | The `cta` block of `closing-cta`, or `null` when the block schema refuses the href. |
+| `initials` | `(name) => string` | Up to two uppercase initials by code point (`Ada Example` → `AE`). |
+| `DECK_LAYOUT_MESSAGES` | constant | The English strings layouts add for assistive tech (`layout.yes`, `layout.no`, `layout.empty`, `layout.chartTable`, `layout.chartInvalid`, `layout.video`); not localizable yet. |
+| `DeckLayoutMessageKey` | type | A key of `DECK_LAYOUT_MESSAGES`. |
+| `layoutMessage` | `(key, values?) => string` | A layout string with its `{name}` placeholders filled from `values` (unknown names stay as written). |
+| `PropPath` | type | `readonly (string \| number)[]`: a path relative to the slide's `props` (`['cards', 1]`, `[]` for the whole body). |
+| `LayoutSteps` | interface | `at(path)` returns the fragment attributes for a props object (`{}` when not stepped); `highlight(path)` the current code highlight index, or `undefined`. |
+| `layoutSteps` | `(step) => LayoutSteps` | Step helpers over a `DeckStepContext`; without one (a thumbnail, print) nothing is stepped. |
+| `useLayoutSteps` | `(read) => LayoutSteps` | The step helpers of the slide being rendered: the stage's step context, else `read().step`. Call it while a component initializes (it reads a Svelte context). |
+| `LayoutSlideOf` | `type LayoutSlideOf<Id>` | A catalog layout slide narrowed to one layout id (`layout: Id`, `props: LayoutProps[Id]`). |
+| `LayoutRendererProps` | `interface LayoutRendererProps<Id>` | The props every layout renderer receives: `slide: LayoutSlideOf<Id>` and `context: DeckSlideRenderContext`. |
 
 ## Free slides and masters
 

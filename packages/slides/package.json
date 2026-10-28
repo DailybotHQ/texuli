@@ -50,6 +50,16 @@
       "svelte": "./src/stage/index.ts",
       "default": "./src/stage/index.ts"
     },
+    "./components": {
+      "types": "./src/registry/index.ts",
+      "svelte": "./src/registry/index.ts",
+      "default": "./src/registry/index.ts"
+    },
+    "./layouts": {
+      "types": "./src/layouts/index.ts",
+      "svelte": "./src/layouts/index.ts",
+      "default": "./src/layouts/index.ts"
+    },
     "./styles.css": "./src/styles.css"
   },
   "scripts": {
