@@ -16,7 +16,7 @@
     },
     "tier": "untrusted",
     "profile": "web",
-    "spec": "0.3.0",
+    "spec": "0.4.0",
     "tree": {
       "id": "layout-doc",
       "props": {

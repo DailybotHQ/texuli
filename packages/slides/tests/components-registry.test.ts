@@ -281,16 +281,14 @@ describe('registry: a component adds no headings to the slide outline', () => {
       expect(frame.querySelector('.tx-player-layout__title')).toBeNull();
       expect(frame.hasAttribute('aria-labelledby')).toBe(false);
     }
-    // The player's own label leaves the accessibility tree with the rest of its chrome.
-    const chrome = [
-      ...container.querySelectorAll<HTMLElement>('[data-tx-deck-component] .tx-player__chrome'),
-    ];
-    expect(chrome.length).toBe(2);
-    for (const part of chrome) expect(part.hidden).toBe(true);
-    for (const skip of container.querySelectorAll<HTMLElement>(
-      '[data-tx-deck-component] .tx-player__skip'
-    )) {
-      expect(skip.hidden).toBe(true);
+    // chrome={false}: the player paints no label heading, skip link or end anchor.
+    expect(container.querySelectorAll('[data-tx-deck-component] .tx-player__chrome').length).toBe(
+      0
+    );
+    expect(container.querySelectorAll('[data-tx-deck-component] .tx-player__skip').length).toBe(0);
+    expect(container.querySelectorAll('[data-tx-deck-component] .tx-player__end').length).toBe(0);
+    for (const player of container.querySelectorAll('[data-tx-deck-component] [data-tx-player]')) {
+      expect(player.getAttribute('data-tx-player-chrome')).toBe('off');
     }
     const visibleHeadings = [
       ...container.querySelectorAll('[data-tx-deck-component] h1, [data-tx-deck-component] h2'),

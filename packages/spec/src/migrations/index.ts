@@ -1,6 +1,7 @@
 import { isRecord } from '../dialect.ts';
 import { SPEC_VERSION } from '../version.ts';
 import { migration020to030 } from './0.2.0-0.3.0.ts';
+import { migration030to040 } from './0.3.0-0.4.0.ts';
 import type { SpecMigration, SpecMigrationResult } from './types.ts';
 
 export type { SpecMigration, SpecMigrationResult };
@@ -9,7 +10,10 @@ export type { SpecMigration, SpecMigrationResult };
 export const UNDECLARED_SPEC_VERSION = '0.2.0';
 
 /** Every step, in order; each `to` is the next step's `from`. */
-export const SPEC_MIGRATIONS: readonly SpecMigration[] = Object.freeze([migration020to030]);
+export const SPEC_MIGRATIONS: readonly SpecMigration[] = Object.freeze([
+  migration020to030,
+  migration030to040,
+]);
 
 /**
  * Bring a blueprint envelope up to `target` (the current spec by default)

@@ -56,7 +56,7 @@ describe('envelope 0.3.0 fields and migration', () => {
   it('migrates a 0.2.0 envelope before parsing, so the validated envelope carries the current spec', () => {
     const result = run(envelope({ id: 'layout-stack', props: { gap: 'small' } }));
     expect(codes(result)).toEqual([]);
-    expect(result.envelope?.spec).toBe(SUPPORTED_SPEC_VERSIONS[0]);
+    expect(result.envelope?.spec).toBe(SUPPORTED_SPEC_VERSIONS[SUPPORTED_SPEC_VERSIONS.length - 1]);
   });
 
   it('accepts spec, state and flow; refuses an unknown spec and non-object state', () => {

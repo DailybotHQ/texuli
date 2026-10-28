@@ -58,6 +58,12 @@ export {
   toggleControlManifest,
 } from './control-manifests.ts';
 export {
+  DECK_STAGE_HOST_PACKAGE,
+  type DeckPlayerHost,
+  type DeckPlayerHostRequest,
+  isLayoutDeckTree,
+} from './deck-host.ts';
+export {
   createPlayerFrameClient,
   normalizeParentOrigin,
   type PlayerFrameClient,
@@ -103,6 +109,7 @@ export {
   withoutHostChrome,
   withoutHostChromeLoaders,
 } from './host-chrome.ts';
+
 export {
   applyHostData,
   checkHostBoundWriters,

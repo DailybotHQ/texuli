@@ -433,3 +433,18 @@ reflect this decision.
   decks (then move the default registry into an L8 integration package and
   return the stage to L7), or the engine needs a framework (it must not:
   split the framework part out instead).
+- **Addendum (2026-10-28, PLAN_008 T-catalog-player): spec 0.4.0.** The
+  `layout-deck` and `deck-slide` manifests now project deck model v2 (9:16
+  aspect, `slide`/`zoom`/`morph` transitions, motion, navigation, outline,
+  slide layout, background, steps and component slides), which changes the
+  projected catalog and the normative digest, so the blueprint spec takes an
+  additive minor, `0.4.0` (`versions.json` pin
+  `fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3`).
+  `migrations/0.3.0-0.4.0.ts` only restamps `spec`. The generated Kotlin
+  under `packages/spec/generated/kotlin` is regenerated; the native runtime
+  twin's interaction contract (ADR-008) is unchanged. `@texuli/catalog`
+  validates deck trees with `validateDeckDraft` and maps them to and from
+  deck v2 without depending on `@texuli/deck`; `@texuli/player` keeps
+  painting decks as a document and exposes a `deckHost` seam (and
+  `chrome={false}`) so a host with `@texuli/slides` presents them on the
+  stage.

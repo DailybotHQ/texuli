@@ -18,8 +18,10 @@ export const SUPPORTED_ENVELOPE_VERSIONS = [ENVELOPE_VERSION] as const;
  * The spec versions an envelope's `spec` may name: the newest step of the
  * migration chain (`@texuli/spec/migrate`). Older envelopes migrate first.
  */
+/** Every version on the migration chain, including the undeclared baseline. */
 export const SUPPORTED_SPEC_VERSIONS: readonly string[] = Object.freeze([
-  SPEC_MIGRATIONS[SPEC_MIGRATIONS.length - 1]?.to ?? UNDECLARED_SPEC_VERSION,
+  UNDECLARED_SPEC_VERSION,
+  ...SPEC_MIGRATIONS.map((step) => step.to),
 ]);
 
 /**

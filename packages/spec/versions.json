@@ -17,7 +17,13 @@
       "specVersion": "0.3.0",
       "specDigest": "a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848",
       "change": "minor",
-      "summary": "Additive: envelope spec/state/flow, node bind/on, $defs binding, stateDeclaration, flow, action (closed), eventMap, reorder; catalog events/bindable/propSchema/deprecated; warnings; schemas/workflow.schema.json; codes state, unknown-state, binding, action, unknown-event, workflow; migrations 0.2.0→0.3.0."
+      "summary": "Additive: envelope spec/state/flow, node bind/on, $defs binding, stateDeclaration, flow, action (closed), eventMap, reorder; catalog events/bindable/propSchema/deprecated; warnings; schemas/workflow.schema.json; codes state, unknown-state, binding, action, unknown-event, workflow; migrations 0.2.0\u21920.3.0."
+    },
+    {
+      "specVersion": "0.4.0",
+      "specDigest": "fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3",
+      "change": "minor",
+      "summary": "Additive (PLAN_008 T-catalog-player, ADR-009 deck encoding): layout-deck and deck-slide optional model-v2 props (aspect 9:16, transitions slide/zoom/morph, motion, navigation, outline, layout, background, steps, component). Migration 0.3.0\u21920.4.0 stamps spec only."
     }
   ]
 }
