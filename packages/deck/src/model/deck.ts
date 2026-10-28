@@ -377,7 +377,7 @@ export const freeSlide = t.object(
     ...slideBaseShape,
     layout: t.literal('free'),
     master: t.optional(t.enum(SLIDE_MASTERS), { description: "Default 'content'." }),
-    blocks: t.array(slideItem, { min: 1, max: DECK_MODEL_LIMITS.freeBlocks }),
+    blocks: t.array(slideItem, { max: DECK_MODEL_LIMITS.freeBlocks }),
   },
   { description: 'A free slide: blocks and component items, arranged by a master.' }
 );

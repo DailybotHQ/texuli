@@ -8,6 +8,7 @@ import {
   loadedDeckBlockFamily,
 } from './loaders.ts';
 import { type DeckMediaTrust, deckAvatarResolver, gateDeckMedia } from './media.ts';
+import { createDeckTranslator, type DeckTranslate } from './messages.ts';
 
 interface Props {
   block: Block;
@@ -16,9 +17,12 @@ interface Props {
   resolveAvatar?: (id: string) => string | undefined;
   /** The deck's current reveal step, for families that step (code highlights). */
   hostStep?: number;
+  /** The stage's messages (English defaults when omitted, as in print). */
+  t?: DeckTranslate;
 }
 
-let { block, mediaTrust = 'untrusted', resolveAvatar, hostStep }: Props = $props();
+const english = createDeckTranslator();
+let { block, mediaTrust = 'untrusted', resolveAvatar, hostStep, t = english }: Props = $props();
 let gate = $derived(gateDeckMedia(block, { trust: mediaTrust, resolveAvatar }));
 let avatars = $derived(deckAvatarResolver(resolveAvatar));
 // Seeded from the cache so a re-mounted block paints on its first render.
@@ -53,13 +57,13 @@ $effect(() => {
 
 {#if !gate.block}
   <p class="tx-deck-stage__media-refused" role="note" data-refused={gate.refused.join(' ')}>
-    This media was not shown: its source is not allowed here.
+    {t('stage.mediaRefused')}
   </p>
 {:else if Renderer}
   {@const LoadedRenderer = Renderer}
   <LoadedRenderer block={gate.block} resolveAvatar={avatars} {hostStep} />
 {:else if failed}
-  <p class="tx-deck-stage__error" role="alert">Slide content could not be loaded.</p>
+  <p class="tx-deck-stage__error" role="alert">{t('layout.contentLoadError')}</p>
 {:else}
-  <p class="tx-deck-stage__loading" role="status">Loading slide content…</p>
+  <p class="tx-deck-stage__loading" role="status">{t('layout.contentLoading')}</p>
 {/if}

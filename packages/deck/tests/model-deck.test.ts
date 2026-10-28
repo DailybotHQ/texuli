@@ -117,9 +117,16 @@ describe('parseDeck: slide kinds', () => {
   });
 
   it('checks free slides: master, block count, block heads and component items', () => {
+    // An empty free slide is valid: the stage shows its title.
+    expect(
+      parseDeck({
+        formatVersion: 2,
+        meta: { title: 'T' },
+        slides: [{ id: 'a', layout: 'free', blocks: [] }],
+      }).ok
+    ).toBe(true);
     const cases: [Json, string, string][] = [
       [{ master: 'hero', blocks: [{ type: 'text' }] }, 'enum', '/slides/0/master'],
-      [{ blocks: [] }, 'too-few', '/slides/0/blocks'],
       [{ blocks: [{ type: 'Text' }] }, 'pattern', '/slides/0/blocks/0/type'],
       [{ blocks: [{ markdown: 'no type' }] }, 'required', '/slides/0/blocks/0/type'],
       [{ blocks: ['text'] }, 'invalid-block', '/slides/0/blocks/0'],

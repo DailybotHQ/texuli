@@ -1,0 +1,34 @@
+<script lang="ts">
+/**
+ * PHASE-1 PLACEHOLDER (PLAN_008 T-stage): the deck progress bar, honoring
+ * `style.progress` (`top`, `bottom`, `none`). Phase 2 may restyle it; the
+ * contract stays: a `progressbar` labelled by the messages, valued by the
+ * visible slide position.
+ */
+import { getDeckStageContext } from '../context.ts';
+import { deckCssVars } from '../css-vars.ts';
+
+const stage = getDeckStageContext();
+let total = $derived(stage?.slides.length ?? 0);
+let current = $derived((stage?.position ?? 0) + 1);
+let ratio = $derived(total > 0 ? Math.min(1, current / total) : 0);
+</script>
+
+{#if stage && stage.progress !== 'none'}
+  <div
+    class="tx-deck-stage__progress-bar"
+    data-tx-deck-progress={stage.progress}
+    data-tx-deck-chrome
+    role="progressbar"
+    aria-label={stage.t('chrome.slideProgress')}
+    aria-valuemin={1}
+    aria-valuemax={total}
+    aria-valuenow={current}
+    aria-valuetext={stage.t('stage.slideOf', { current, total })}
+  >
+    <div
+      class="tx-deck-stage__progress-fill"
+      use:deckCssVars={{ '--tx-deck-progress-ratio': String(ratio) }}
+    ></div>
+  </div>
+{/if}

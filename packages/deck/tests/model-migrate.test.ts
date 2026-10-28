@@ -306,19 +306,16 @@ describe('migrateDeck: rules', () => {
       '',
       '/navigation',
       '/slides/0',
-      '/slides/1/blocks',
       '/slides/2',
     ]);
     expect(issues.map((issue) => issue.message.split(' ').slice(0, 2).join(' '))).toEqual([
       'Converted from',
       'settings.startIndex 9',
       'Steps are',
-      'The slide',
       'Dropped keys',
     ]);
-    expect((deck.slides as Json[])[1]?.blocks).toEqual([
-      { type: 'heading', level: 2, text: 'Only a title' },
-    ]);
+    // An empty v1 slide stays empty; its title is shown by the stage.
+    expect((deck.slides as Json[])[1]?.blocks).toEqual([]);
     expect(deck).not.toHaveProperty('navigation');
     expect(parseDeck(deck).ok).toBe(true);
   });

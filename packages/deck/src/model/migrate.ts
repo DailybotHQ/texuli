@@ -165,17 +165,9 @@ function fromTexuliV1(input: Bag, notes: Notes): Bag {
     assign(out, 'transition', slide.transition);
     out.layout = 'free';
     assign(out, 'master', slide.master);
-    let blocks = Array.isArray(slide.blocks) ? (slide.blocks as unknown[]) : [];
-    if (blocks.length === 0) {
-      const title = clip(slide.title, 200);
-      if (title !== undefined) {
-        blocks = [{ type: 'heading', level: 2, text: title }];
-        notes.warn('The slide had no blocks; its title became a heading block.', [
-          ...path,
-          'blocks',
-        ]);
-      }
-    }
+    // An empty v1 slide stays empty: v2 free slides may have no blocks, and
+    // the stage already shows the slide title.
+    const blocks = Array.isArray(slide.blocks) ? (slide.blocks as unknown[]) : [];
     out.blocks = blocks;
     const dropped = Object.keys(slide).filter((key) => !V1_SLIDE_KEYS.includes(key));
     if (dropped.length > 0) {

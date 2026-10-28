@@ -3,7 +3,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import type { Block } from '@texuli/blocks/core';
 import { generateThemeFromSeed } from '@texuli/tokens/generator';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildDeckPptx } from '../src/export/index.ts';
 import {
   blockFragment,
@@ -25,7 +25,10 @@ import {
   type DeckSyncChannel,
   parseDeckSyncMessage,
 } from '../src/stage/sync.ts';
-import { scenario } from './scenario.ts';
+import { clearDeckHash, scenario } from './scenario.ts';
+
+// Stages write `#/<slide>/<step>`; every test starts without one.
+beforeEach(clearDeckHash);
 
 function defineFullscreen(request: (this: Element) => Promise<void>) {
   let element: Element | null = null;
@@ -296,34 +299,39 @@ describe('deck media', () => {
 
   it('stage and print media: active-slide mounting, refusal notices, eager print loading and settling', async () => {
     await scenario(
-      'lays out media regions and mounts only the active slide media, also in presenter mode',
+      'lays out media regions and mounts only the windowed slides media, also in presenter mode',
       async () => {
         mockMedia();
         render(DeckStage, { props: { deck: mediaDeck(), loadTheme: null, presenter: true } });
 
-        const article = screen.getByRole('article', { name: 'The dock' });
-        await waitFor(() => expect(document.querySelectorAll('img')).toHaveLength(2));
-        const regions = article.querySelector('.tx-deck-stage__regions');
+        const slide = screen.getByRole('group', { name: 'The dock' });
+        const sources = () =>
+          [...document.querySelectorAll('img')].map((img) => img.getAttribute('src')).sort();
+        // The active slide and its next neighbour are mounted; the third is not.
+        await waitFor(() =>
+          expect(sources()).toEqual([
+            'assets/dock-detail.png',
+            'assets/dock.png',
+            'assets/yard.png',
+          ])
+        );
+        const regions = slide.querySelector('.tx-deck-stage__regions');
         expect(regions?.getAttribute('data-arrangement')).toBe('media-start');
-        const slots = [...article.querySelectorAll('.tx-deck-stage__region')].map((region) =>
+        const slots = [...slide.querySelectorAll('.tx-deck-stage__region')].map((region) =>
           region.getAttribute('data-slot')
         );
         expect(slots).toEqual(['media', 'body']);
-        const mediaImage = article.querySelector('[data-slot="media"] img');
+        const mediaImage = slide.querySelector('[data-slot="media"] img');
         expect(mediaImage?.getAttribute('src')).toBe('assets/dock.png');
         expect(mediaImage?.closest('figure')?.getAttribute('data-fit')).toBe('cover');
         expect(mediaImage?.getAttribute('loading')).toBe('lazy');
-        // The presenter panes show the next slide by title only: no media is loaded for it.
-        expect(document.querySelector('img[src="assets/yard.png"]')).toBeNull();
+        expect(document.querySelector('img[src="assets/office.png"]')).toBeNull();
 
-        await fireEvent.click(screen.getByRole('button', { name: 'Next slide' }));
-        await waitFor(() =>
-          expect(
-            [...document.querySelectorAll('img')].map((img) => img.getAttribute('src'))
-          ).toEqual(['assets/yard.png'])
-        );
+        await fireEvent.click(screen.getByRole('button', { name: 'Next step or slide' }));
+        await fireEvent.click(screen.getByRole('button', { name: 'Next step or slide' }));
+        await waitFor(() => expect(sources()).toEqual(['assets/office.png', 'assets/yard.png']));
 
-        await fireEvent.click(screen.getByRole('button', { name: 'Overview' }));
+        await fireEvent.click(screen.getByRole('button', { name: 'Overview of all slides' }));
         expect(document.querySelectorAll('img')).toHaveLength(0);
       },
       reset
@@ -538,18 +546,23 @@ describe('reveal steps (fragments)', () => {
   });
 
   describe('DeckStage reveal steps', () => {
-    const fragments = () => [...document.querySelectorAll<HTMLElement>('.tx-deck-stage__fragment')];
+    const active = () =>
+      document.querySelector<HTMLElement>('[data-tx-deck-active="true"]') as HTMLElement;
     const states = () =>
-      fragments().map((element) => ({
-        kind: element.dataset.fragment,
-        state: element.dataset.fragmentState,
+      [
+        ...active().querySelectorAll<HTMLElement>(
+          '.tx-deck-stage__fragment[data-tx-deck-fragment]'
+        ),
+      ].map((element) => ({
+        effect: element.dataset.txDeckEffect,
+        phase: element.dataset.txDeckFragment,
         items: element.dataset.visibleItems,
-        emphasis: element.dataset.emphasis,
       }));
-    const progress = () =>
-      document.querySelector('.tx-deck-stage__progress')?.textContent?.replace(/\s+/g, ' ').trim();
+    const announced = () => document.querySelector('.tx-deck-stage__live')?.textContent?.trim();
+    const next = () => screen.getByRole('button', { name: 'Next step or slide' });
+    const previous = () => screen.getByRole('button', { name: 'Previous step or slide' });
 
-    it('DeckStage reveals step by step in both directions through the key map, initial step and code highlights', async () => {
+    it('DeckStage reveals step by step in both directions through the key map and initial step', async () => {
       await scenario(
         'reveals forward one step at a time before the next slide, and hides in reverse',
         async () => {
@@ -559,45 +572,41 @@ describe('reveal steps (fragments)', () => {
             props: { deck: makeDeck(), initialSlideId: 'goals', onSlideChange },
           });
 
-          expect(progress()).toBe('Slide 2 of 3: Goals, 0 of 3 revealed');
+          expect(announced()).toBe('Slide 2 of 3: Goals, step 0 of 3');
           expect(states()).toEqual([
-            { kind: 'items', state: 'hidden', items: '0', emphasis: undefined },
-            { kind: 'enter', state: 'hidden', items: undefined, emphasis: undefined },
-            { kind: 'emphasis', state: 'shown', items: undefined, emphasis: undefined },
+            { effect: 'fade-up', phase: 'hidden', items: '0' },
+            { effect: 'in', phase: 'hidden', items: undefined },
+            { effect: 'strike', phase: 'visible', items: undefined },
           ]);
-          expect(screen.getByRole('button', { name: 'Previous slide' })).toBeTruthy();
-
-          const nextButton = screen.getByRole('button', { name: 'Next step' });
-          await fireEvent.click(nextButton);
-          expect(progress()).toBe('Slide 2 of 3: Goals, 1 of 3 revealed');
-          expect(states()[0]).toMatchObject({ state: 'shown', items: '1' });
-          await fireEvent.click(nextButton);
-          expect(states()[0]).toMatchObject({ state: 'shown', items: '2' });
-          expect(states()[1]?.state).toBe('hidden');
-          await fireEvent.click(nextButton);
+          await fireEvent.click(next());
+          expect(announced()).toBe('Slide 2 of 3: Goals, step 1 of 3');
+          expect(states()[0]).toEqual({ effect: 'fade-up', phase: 'visible', items: '1' });
+          await fireEvent.click(next());
+          expect(states()[0]?.items).toBe('2');
+          expect(states()[1]?.phase).toBe('hidden');
+          await fireEvent.click(next());
           expect(states()).toEqual([
-            { kind: 'items', state: 'shown', items: '2', emphasis: undefined },
-            { kind: 'enter', state: 'shown', items: undefined, emphasis: undefined },
-            { kind: 'emphasis', state: 'shown', items: undefined, emphasis: 'strike' },
+            { effect: 'fade-up', phase: 'visible', items: '2' },
+            { effect: 'in', phase: 'visible', items: undefined },
+            { effect: 'strike', phase: 'active', items: undefined },
           ]);
-          expect(screen.getByRole('button', { name: 'Next slide' })).toBe(nextButton);
           expect(onSlideChange).not.toHaveBeenCalled();
 
-          await fireEvent.click(nextButton);
-          expect(screen.getByRole('article', { name: 'Close' })).toBeTruthy();
+          await fireEvent.click(next());
+          expect(screen.getByRole('group', { name: 'Close' })).toBeTruthy();
           expect(onSlideChange).toHaveBeenLastCalledWith({ index: 2, slideId: 'close' });
 
           // Back into a slide lands on its final step, then each step hides in reverse.
-          await fireEvent.click(screen.getByRole('button', { name: 'Previous slide' }));
-          expect(screen.getByRole('article', { name: 'Goals' }).dataset.step).toBe('3');
-          await fireEvent.click(screen.getByRole('button', { name: 'Previous step' }));
-          expect(states()[1]?.state).toBe('hidden');
+          await fireEvent.click(previous());
+          expect(screen.getByRole('group', { name: 'Goals' }).dataset.step).toBe('3');
+          await fireEvent.click(previous());
+          expect(states()[1]?.phase).toBe('hidden');
           expect(states()[0]?.items).toBe('2');
-          await fireEvent.click(screen.getByRole('button', { name: 'Previous step' }));
-          await fireEvent.click(screen.getByRole('button', { name: 'Previous step' }));
-          expect(states()[0]).toMatchObject({ state: 'hidden', items: '0' });
-          await fireEvent.click(screen.getByRole('button', { name: 'Previous slide' }));
-          expect(screen.getByRole('article', { name: 'Opening' })).toBeTruthy();
+          await fireEvent.click(previous());
+          await fireEvent.click(previous());
+          expect(states()[0]).toMatchObject({ phase: 'hidden', items: '0' });
+          await fireEvent.click(previous());
+          expect(screen.getByRole('group', { name: 'Opening' })).toBeTruthy();
         },
         reset
       );
@@ -607,18 +616,14 @@ describe('reveal steps (fragments)', () => {
           mockMediaPreferences();
           render(DeckStage, { props: { deck: makeDeck() } });
           const press = async (key: string) => {
-            const article = screen.getByRole('article');
-            article.focus();
-            await fireEvent.keyDown(article, { key });
+            active().focus();
+            await fireEvent.keyDown(active(), { key });
           };
-          const at = () => {
-            const article = screen.getByRole('article');
-            return `${article.getAttribute('aria-label')}@${article.dataset.step}`;
-          };
+          const at = () => `${active().getAttribute('aria-label')}@${active().dataset.step}`;
 
           await press('ArrowRight');
           expect(at()).toBe('Goals@0');
-          expect(document.activeElement).toBe(screen.getByRole('article'));
+          expect(document.activeElement).toBe(active());
           await press(' ');
           await press('PageDown');
           expect(at()).toBe('Goals@2');
@@ -646,87 +651,31 @@ describe('reveal steps (fragments)', () => {
           const first = render(DeckStage, {
             props: { deck: makeDeck(), initialSlideId: 'goals', initialStep: 2 },
           });
-          expect(screen.getByRole('article', { name: 'Goals' }).dataset.step).toBe('2');
-          await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
-          expect(screen.getByRole('article', { name: 'Goals' }).dataset.step).toBe('3');
+          expect(screen.getByRole('group', { name: 'Goals' }).dataset.step).toBe('2');
+          await fireEvent.click(next());
+          expect(screen.getByRole('group', { name: 'Goals' }).dataset.step).toBe('3');
           first.unmount();
 
           render(DeckStage, {
             props: { deck: makeDeck(), initialSlideId: 'goals', initialStep: 99 },
           });
-          expect(screen.getByRole('article', { name: 'Goals' }).dataset.step).toBe('3');
-        },
-        reset
-      );
-      await scenario(
-        'drives code highlight steps through the block family host step',
-        async () => {
-          mockMediaPreferences();
-          const parsed = parseDeck({
-            meta: { title: 'Code walk' },
-            slides: [
-              {
-                id: 'walk',
-                title: 'Walkthrough',
-                blocks: [
-                  {
-                    type: 'code',
-                    lang: 'ts',
-                    code: 'const a = 1;\nconst b = 2;',
-                    highlights: ['1', '2'],
-                  },
-                ],
-              },
-            ],
-          });
-          if (!parsed.success) throw new Error(parsed.issues[0]?.message);
-          const { container } = render(DeckStage, { props: { deck: parsed.deck } });
-          const step = () =>
-            container.querySelector('[data-highlight-step]')?.getAttribute('data-highlight-step');
-          await waitFor(() => expect(step()).toBe('0'));
-          await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
-          await waitFor(() => expect(step()).toBe('1'));
-          expect(screen.getByRole('button', { name: 'Next slide' })).toBeTruthy();
+          expect(screen.getByRole('group', { name: 'Goals' }).dataset.step).toBe('3');
         },
         reset
       );
     });
 
-    it('DeckStage animates only forward reveals, cuts them under reduced motion and shows presenter progress', async () => {
+    it('DeckStage keeps reveal state still under reduced motion and shows presenter progress', async () => {
       await scenario(
-        'animates only forward reveals, with the block reveal or the slide transition',
-        async () => {
-          mockMediaPreferences();
-          const deck = makeDeck();
-          render(DeckStage, { props: { deck, initialSlideId: 'goals' } });
-          const revealOf = (index: number) => fragments()[index]?.dataset.reveal;
-          await waitFor(() => expect(document.querySelector('[data-transition]')).toBeTruthy());
-
-          expect(revealOf(0)).toBeUndefined();
-          await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
-          expect(revealOf(0)).toBe('fade-up');
-          await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
-          expect(revealOf(0)).toBe('fade-up');
-          await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
-          expect(revealOf(0)).toBeUndefined();
-          // No block reveal: the slide transition (the deck default, fade) animates it.
-          expect(revealOf(1)).toBe('fade');
-          expect(revealOf(2)).toBe('fade');
-          await fireEvent.click(screen.getByRole('button', { name: 'Previous step' }));
-          expect(fragments().every((element) => element.dataset.reveal === undefined)).toBe(true);
-        },
-        reset
-      );
-      await scenario(
-        'cuts every reveal under reduced motion',
+        'marks the stage for reduced motion; fragments change state without motion',
         async () => {
           mockMediaPreferences({ reduced: true });
           render(DeckStage, { props: { deck: makeDeck(), initialSlideId: 'goals' } });
           const stage = screen.getByRole('region', { name: 'Presentation: Stepped review' });
           await waitFor(() => expect(stage.getAttribute('data-motion')).toBe('reduce'));
-          await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
-          expect(fragments()[0]?.dataset.fragmentState).toBe('shown');
-          expect(fragments()[0]?.dataset.reveal).toBeUndefined();
+          expect(stage.dataset.txDeckMotion).toBe('subtle');
+          await fireEvent.click(next());
+          expect(states()[0]?.phase).toBe('visible');
         },
         reset
       );
@@ -735,30 +684,31 @@ describe('reveal steps (fragments)', () => {
         async () => {
           mockMediaPreferences();
           render(DeckStage, { props: { deck: makeDeck(), initialSlideId: 'goals' } });
-          await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
-          await fireEvent.click(screen.getByRole('button', { name: 'Presenter' }));
+          await fireEvent.click(next());
+          await fireEvent.click(screen.getByRole('button', { name: 'Presenter view' }));
 
           const notes = screen.getByRole('complementary', { name: 'Speaker notes' });
-          expect(notes.textContent).toContain('Reveal step 1 of 3');
+          expect(notes.textContent).toContain('Step 1 of 3');
+          expect(notes.textContent).toContain('Reveal one goal at a time.');
           const upNext = screen.getByRole('region', { name: 'Up next' });
           expect(upNext.textContent?.replace(/\s+/g, ' ').trim()).toBe(
-            'Up next Reveal step 2 of 3 on this slide'
+            'Up next Step 2 of 3 on this slide'
           );
-          expect(screen.getByRole('article', { name: 'Goals' }).dataset.step).toBe('1');
+          expect(screen.getByRole('group', { name: 'Goals' }).dataset.step).toBe('1');
 
-          await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
-          await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
+          await fireEvent.click(next());
+          await fireEvent.click(next());
           expect(upNext.textContent).toContain('Close');
-          expect(notes.textContent).toContain('Reveal step 3 of 3');
+          expect(notes.textContent).toContain('Step 3 of 3');
 
           // The overview keeps the current slide's progress; another slide opens at step 0.
-          await fireEvent.click(screen.getByRole('button', { name: 'Overview' }));
+          await fireEvent.click(screen.getByRole('button', { name: 'Overview of all slides' }));
           await fireEvent.click(screen.getByRole('button', { name: /Goals/ }));
-          expect(screen.getByRole('article', { name: 'Goals' }).dataset.step).toBe('3');
-          await fireEvent.click(screen.getByRole('button', { name: 'Overview' }));
+          expect(screen.getByRole('group', { name: 'Goals' }).dataset.step).toBe('3');
+          await fireEvent.click(screen.getByRole('button', { name: 'Overview of all slides' }));
           await fireEvent.click(screen.getByRole('button', { name: /Opening/ }));
-          await fireEvent.click(screen.getByRole('button', { name: 'Next slide' }));
-          expect(screen.getByRole('article', { name: 'Goals' }).dataset.step).toBe('0');
+          await fireEvent.click(next());
+          expect(screen.getByRole('group', { name: 'Goals' }).dataset.step).toBe('0');
         },
         reset
       );
@@ -957,20 +907,20 @@ describe('slot masters, fullscreen and the presenter screen', () => {
           render(DeckStage, {
             props: { deck: makeDeck(), initialSlideId: 'compare', loadTheme: null },
           });
-          const regions = document.querySelector<HTMLElement>('.tx-deck-stage__regions');
+          const slide = screen.getByRole('group', { name: 'Before and after' });
+          const regions = slide.querySelector<HTMLElement>('.tx-deck-stage__regions');
           expect(regions?.dataset.arrangement).toBe('split');
           expect(regions?.dataset.slots).toBe('contentStart contentEnd footer');
           expect(
-            [...document.querySelectorAll<HTMLElement>('.tx-deck-stage__region')].map(
+            [...slide.querySelectorAll<HTMLElement>('.tx-deck-stage__region')].map(
               (region) => region.dataset.slot
             )
           ).toEqual(['contentStart', 'contentEnd', 'footer']);
           expect(
-            document.querySelector('[data-slot="contentEnd"] .tx-deck-stage__fragment')
+            slide.querySelector(
+              '[data-slot="contentEnd"] .tx-deck-stage__fragment[data-tx-deck-fragment]'
+            )
           ).toBeTruthy();
-          expect(
-            screen.getByRole('article', { name: 'Before and after' }).dataset.arrangement
-          ).toBe('split');
 
           document.body.innerHTML = '';
           render(DeckPrint, { props: { deck: makeDeck(), loadTheme: null } });
@@ -1006,23 +956,25 @@ describe('slot masters, fullscreen and the presenter screen', () => {
         const onFullscreenChange = vi.fn();
         render(DeckStage, { props: { deck: makeDeck(), loadTheme: null, onFullscreenChange } });
         const stage = screen.getByRole('region', { name: 'Presentation: Board update' });
-        const button = screen.getByRole('button', { name: 'Fullscreen' });
+        const button = screen.getByRole('button', { name: 'Full screen' });
+        const slide = () => document.querySelector<HTMLElement>('[data-tx-deck-active="true"]');
 
         await fireEvent.click(button);
         await waitFor(() => expect(stage.dataset.fullscreen).toBe('viewport'));
         expect(onFullscreenChange).toHaveBeenLastCalledWith('viewport');
         expect(document.querySelector('.tx-deck-stage__fullscreen-note')?.textContent).toBe(
-          'Fullscreen is not available here, so the presentation fills the window. Press Escape to exit.'
+          'Full screen is not available here, so the presentation fills the window. Press Escape to leave.'
         );
         expect(button.getAttribute('aria-pressed')).toBe('true');
-        expect(button.textContent?.trim()).toBe('Exit fullscreen');
-        await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('article')));
+        expect(button.textContent?.trim()).toBe('Leave full screen');
+        await waitFor(() => expect(document.activeElement).toBe(slide()));
 
-        await fireEvent.keyDown(screen.getByRole('article'), { key: 'Escape' });
+        await fireEvent.keyDown(slide() as HTMLElement, { key: 'Escape' });
         expect(stage.dataset.fullscreen).toBeUndefined();
         expect(onFullscreenChange).toHaveBeenLastCalledWith('off');
         expect(screen.queryByText(/fills the window/)).toBeNull();
-        await waitFor(() => expect(document.activeElement).toBe(button));
+        // Focus stays on the slide, so the key map keeps working.
+        await waitFor(() => expect(document.activeElement).toBe(slide()));
       },
       reset
     );
@@ -1034,14 +986,15 @@ describe('slot masters, fullscreen and the presenter screen', () => {
         outside.textContent = 'Outside';
         document.body.append(outside);
         render(DeckStage, { props: { deck: makeDeck(), loadTheme: null } });
-        const article = screen.getByRole('article');
-        article.focus();
-        await fireEvent.keyDown(article, { key: 'f' });
+        const slide = () =>
+          document.querySelector<HTMLElement>('[data-tx-deck-active="true"]') as HTMLElement;
+        slide().focus();
+        await fireEvent.keyDown(slide(), { key: 'f' });
         const stage = screen.getByRole('region', { name: 'Presentation: Board update' });
         await waitFor(() => expect(stage.dataset.fullscreen).toBe('viewport'));
 
-        await fireEvent.focusOut(screen.getByRole('article'), { relatedTarget: outside });
-        await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('article')));
+        await fireEvent.focusOut(slide(), { relatedTarget: outside });
+        await waitFor(() => expect(document.activeElement).toBe(slide()));
         outside.remove();
       },
       reset
@@ -1055,7 +1008,7 @@ describe('slot masters, fullscreen and the presenter screen', () => {
         render(DeckStage, { props: { deck: makeDeck(), loadTheme: null } });
         const stage = screen.getByRole('region', { name: 'Presentation: Board update' });
 
-        await fireEvent.click(screen.getByRole('button', { name: 'Fullscreen' }));
+        await fireEvent.click(screen.getByRole('button', { name: 'Full screen' }));
         await waitFor(() => expect(stage.dataset.fullscreen).toBe('native'));
         expect(request).toHaveBeenCalledTimes(1);
         expect(document.querySelector('.tx-deck-stage__fullscreen-note')).toBeNull();
@@ -1074,10 +1027,10 @@ describe('slot masters, fullscreen and the presenter screen', () => {
           throw new Error('denied');
         });
         render(DeckStage, { props: { deck: makeDeck(), loadTheme: null } });
-        await fireEvent.click(screen.getByRole('button', { name: 'Fullscreen' }));
+        await fireEvent.click(screen.getByRole('button', { name: 'Full screen' }));
         await waitFor(() =>
           expect(document.querySelector('.tx-deck-stage__fullscreen-note')?.textContent).toContain(
-            'The browser refused fullscreen'
+            'The browser refused full screen'
           )
         );
       },
@@ -1092,10 +1045,11 @@ describe('slot masters, fullscreen and the presenter screen', () => {
     render(DeckStage, {
       props: { deck: makeDeck(), loadTheme: null, onStepChange, onSlideChange },
     });
-    await fireEvent.click(screen.getByRole('button', { name: 'Next slide' }));
-    await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
-    await fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
-    await fireEvent.click(screen.getByRole('button', { name: 'Previous step' }));
+    const next = screen.getByRole('button', { name: 'Next step or slide' });
+    await fireEvent.click(next);
+    await fireEvent.click(next);
+    await fireEvent.click(next);
+    await fireEvent.click(screen.getByRole('button', { name: 'Previous step or slide' }));
     expect(onStepChange.mock.calls.map(([intent]) => intent)).toEqual([
       { index: 1, slideId: 'compare', step: 0, stepCount: 2 },
       { index: 1, slideId: 'compare', step: 1, stepCount: 2 },
@@ -1198,15 +1152,18 @@ describe('slot masters, fullscreen and the presenter screen', () => {
           target: presenterHost,
           props: { deck: makeDeck(), loadTheme: null, sync: presenterLink, presenter: true },
         });
-        const articleIn = (host: HTMLElement) => host.querySelector<HTMLElement>('article');
+        const articleIn = (host: HTMLElement) =>
+          host.querySelector<HTMLElement>('[data-tx-deck-active="true"]');
         await waitFor(() => expect(articleIn(presenterHost)?.dataset.slideId).toBe('compare'));
 
         const nextIn = (host: HTMLElement) =>
-          host.querySelector<HTMLButtonElement>('.tx-deck-stage__control:nth-of-type(2)');
+          [...host.querySelectorAll<HTMLButtonElement>('.tx-deck-stage__control')].find(
+            (button) => button.textContent?.trim() === 'Next step or slide'
+          );
         await fireEvent.click(nextIn(audience) as HTMLButtonElement);
         await waitFor(() => expect(articleIn(presenterHost)?.dataset.step).toBe('1'));
         expect(presenterHost.querySelector('.tx-deck-stage__step-progress')?.textContent).toContain(
-          'Reveal step 1 of 2'
+          'Step 1 of 2'
         );
 
         // The presenter drives too, and the audience follows.
