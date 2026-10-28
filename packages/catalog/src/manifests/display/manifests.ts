@@ -1,4 +1,5 @@
-import { type CatalogManifest, defineCatalogManifest } from '../../manifest/index.ts';
+import { manifestData } from '../../manifest/data.ts';
+import type { CatalogManifest } from '../../manifest/types.ts';
 import {
   alertPropNames,
   badgePropNames,
@@ -21,6 +22,7 @@ import {
 
 const PKG = 'texuli';
 
+/* @__NO_SIDE_EFFECTS__ */
 function propsFrom(
   names: readonly string[],
   detail: Record<
@@ -63,7 +65,7 @@ const badgeVariants = [
 
 const alertTones = ['info', 'success', 'warning', 'error', 'brand', 'neutral'] as const;
 
-export const cardManifest = defineCatalogManifest({
+export const cardManifest = /* @__PURE__ */ manifestData({
   id: 'card',
   package: PKG,
   label: 'Card',
@@ -114,7 +116,7 @@ export const cardManifest = defineCatalogManifest({
   related: ['button', 'stat'],
 });
 
-export const badgeManifest = defineCatalogManifest({
+export const badgeManifest = /* @__PURE__ */ manifestData({
   id: 'badge',
   package: PKG,
   label: 'Badge',
@@ -147,7 +149,7 @@ export const badgeManifest = defineCatalogManifest({
   related: ['tag', 'chip', 'inline-text'],
 });
 
-export const tagManifest = defineCatalogManifest({
+export const tagManifest = /* @__PURE__ */ manifestData({
   id: 'tag',
   package: PKG,
   label: 'Tag',
@@ -171,7 +173,7 @@ export const tagManifest = defineCatalogManifest({
   related: ['badge', 'chip'],
 });
 
-export const chipManifest = defineCatalogManifest({
+export const chipManifest = /* @__PURE__ */ manifestData({
   id: 'chip',
   package: PKG,
   label: 'Chip',
@@ -199,7 +201,7 @@ export const chipManifest = defineCatalogManifest({
   related: ['badge', 'tag', 'button'],
 });
 
-export const tableManifest = defineCatalogManifest({
+export const tableManifest = /* @__PURE__ */ manifestData({
   id: 'table',
   package: PKG,
   label: 'Table',
@@ -273,7 +275,7 @@ const alertSharedDetail = {
   class: { kind: 'string' as const },
 };
 
-export const alertManifest = defineCatalogManifest({
+export const alertManifest = /* @__PURE__ */ manifestData({
   id: 'alert',
   package: PKG,
   label: 'Alert',
@@ -294,7 +296,7 @@ export const alertManifest = defineCatalogManifest({
   related: ['callout', 'banner', 'error-state'],
 });
 
-export const calloutManifest = defineCatalogManifest({
+export const calloutManifest = /* @__PURE__ */ manifestData({
   id: 'callout',
   package: PKG,
   label: 'Callout',
@@ -315,7 +317,7 @@ export const calloutManifest = defineCatalogManifest({
   related: ['alert', 'banner'],
 });
 
-export const bannerManifest = defineCatalogManifest({
+export const bannerManifest = /* @__PURE__ */ manifestData({
   id: 'banner',
   package: PKG,
   label: 'Banner',
@@ -341,7 +343,7 @@ export const bannerManifest = defineCatalogManifest({
   related: ['alert', 'callout'],
 });
 
-export const statManifest = defineCatalogManifest({
+export const statManifest = /* @__PURE__ */ manifestData({
   id: 'stat',
   package: PKG,
   label: 'Stat',
@@ -353,8 +355,12 @@ export const statManifest = defineCatalogManifest({
   a11y: 'Label and value are text; trend has a spoken word, not color alone.',
   props: propsFrom(statPropNames, {
     label: { kind: 'string', required: true },
-    value: { kind: 'unknown', required: true, description: 'string or number' },
-    delta: { kind: 'unknown', description: 'string or number change' },
+    value: {
+      kind: 'string',
+      required: true,
+      description: 'The formatted value as display text, such as "$12.4k" or "98%".',
+    },
+    delta: { kind: 'string', description: 'The formatted change as display text, such as "+4%".' },
     trend: { kind: 'enum', enumValues: ['up', 'down', 'neutral'] },
     positive: {
       kind: 'enum',
@@ -382,7 +388,7 @@ export const statManifest = defineCatalogManifest({
   related: ['kpi', 'card'],
 });
 
-export const kpiManifest = defineCatalogManifest({
+export const kpiManifest = /* @__PURE__ */ manifestData({
   id: 'kpi',
   package: PKG,
   label: 'KPI',
@@ -436,7 +442,7 @@ export const kpiManifest = defineCatalogManifest({
   related: ['stat', 'card'],
 });
 
-export const emptyStateManifest = defineCatalogManifest({
+export const emptyStateManifest = /* @__PURE__ */ manifestData({
   id: 'empty-state',
   package: PKG,
   label: 'Empty state',
@@ -464,7 +470,7 @@ export const emptyStateManifest = defineCatalogManifest({
   related: ['error-state', 'table'],
 });
 
-export const errorStateManifest = defineCatalogManifest({
+export const errorStateManifest = /* @__PURE__ */ manifestData({
   id: 'error-state',
   package: PKG,
   label: 'Error state',
@@ -496,7 +502,7 @@ export const errorStateManifest = defineCatalogManifest({
   related: ['empty-state', 'alert'],
 });
 
-export const stepperManifest = defineCatalogManifest({
+export const stepperManifest = /* @__PURE__ */ manifestData({
   id: 'stepper',
   package: PKG,
   label: 'Stepper',
@@ -541,7 +547,7 @@ export const stepperManifest = defineCatalogManifest({
   related: ['timeline', 'layout-wizard'],
 });
 
-export const timelineManifest = defineCatalogManifest({
+export const timelineManifest = /* @__PURE__ */ manifestData({
   id: 'timeline',
   package: PKG,
   label: 'Timeline',
@@ -592,7 +598,7 @@ export const timelineManifest = defineCatalogManifest({
   related: ['stepper'],
 });
 
-export const kbdManifest = defineCatalogManifest({
+export const kbdManifest = /* @__PURE__ */ manifestData({
   id: 'kbd',
   package: PKG,
   label: 'Kbd',
@@ -624,7 +630,7 @@ export const kbdManifest = defineCatalogManifest({
  * component: the host paints `text` as one escaped text node, and the
  * renderer drops any children it is given.
  */
-export const inlineTextManifest = defineCatalogManifest({
+export const inlineTextManifest = /* @__PURE__ */ manifestData({
   id: 'inline-text',
   package: '@texuli/catalog',
   label: 'Inline text',
@@ -659,7 +665,7 @@ export const inlineTextManifest = defineCatalogManifest({
   related: ['button', 'label', 'badge', 'kbd'],
 });
 
-export const codeManifest = defineCatalogManifest({
+export const codeManifest = /* @__PURE__ */ manifestData({
   id: 'code',
   package: PKG,
   label: 'Code',
@@ -694,7 +700,7 @@ export const codeManifest = defineCatalogManifest({
 });
 
 /** Every display/feedback manifest in stable id order. */
-export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = Object.freeze([
+export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
   alertManifest,
   badgeManifest,
   bannerManifest,
@@ -715,7 +721,7 @@ export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = Object.freeze([
 ]);
 
 /** Map of component id → expected prop names for type/schema parity tests. */
-export const DISPLAY_PROP_NAMES = Object.freeze({
+export const DISPLAY_PROP_NAMES = /* @__PURE__ */ Object.freeze({
   alert: alertPropNames,
   badge: badgePropNames,
   banner: bannerPropNames,

@@ -106,6 +106,46 @@ pnpm build
 TEXULI_E2E_PORT=<lane-port> pnpm exec playwright test tests/e2e/site-keyboard.spec.ts --project=chromium
 ```
 
+## Drag and workflows
+
+Every drag surface (the `@texuli/primitives/sortable` binding, the
+`@texuli/data` board, tree view, calendar, timeline and column moves,
+`@texuli/workflows` and the player's `sortable-list`) follows one contract,
+[`@texuli/drag`'s interaction, accessibility and i18n contract](../packages/drag/docs/contract.md).
+Unreleased: `@texuli/drag` and `@texuli/workflows` are in development and
+not on npm.
+
+- **Keyboard first.** Space or Enter on a handle picks up, arrows move
+  (inline arrows flip in right-to-left text), Space or Enter drops, Escape
+  cancels and restores the origin with focus kept on the item, Tab cancels.
+  Every pointer drag has a non-drag alternative (WCAG 2.5.7), such as the
+  board's "Move to…" menu or the workflow palette's buttons.
+- **Named handles.** Handles are buttons with a localized
+  `aria-roledescription` and `aria-describedby` instructions; containers keep
+  their pattern role; no deprecated `aria-grabbed` or `aria-dropeffect`;
+  handles and ports meet the 24 by 24 CSS pixel target (WCAG 2.5.8).
+- **Announced in any language.** Every pick-up, move, drop, cancel and
+  refusal is announced politely from `DragMessages` templates that a locale
+  overrides; pointer drags announce only target changes, debounced.
+- **Motion and colors.** Reduced motion turns off move and drop animations;
+  forced colors keep handles, drop indicators and focus visible.
+- **Workflows.** On the canvas, arrows move focus to the nearest node in that
+  direction, Alt+Arrow nudges a grid step, Space toggles selection, Enter on
+  a port starts connect mode (arrows cycle compatible ports, Enter connects,
+  Escape cancels), Delete removes, Ctrl or Cmd with Z and Y undo and redo,
+  with = and - zoom, and 0 fits. The outline is a WAI-ARIA treegrid that
+  reads the whole graph and edits it without the canvas (renaming is
+  covered by the behavior suite). The read-only viewer is a figure whose nodes are a list that says
+  where each one leads.
+
+Checked by the behavior suite on Chromium and WebKit:
+`tests/behavior/scenarios/sortable.spec.ts` (named and described handles,
+keyboard reorder and cross-list moves, Escape restore, pointer and touch
+drags, axe) and `tests/behavior/scenarios/workflow-editor.spec.ts` (spatial
+focus, nudge and undo, keyboard connect, the treegrid outline rename, a
+pointer drag, and axe in light and dark). No screen-reader session has been
+run on these surfaces yet.
+
 ## Related docs
 
 | Doc | Role |

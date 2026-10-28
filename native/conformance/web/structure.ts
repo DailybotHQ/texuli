@@ -8,8 +8,11 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { canonicalJson } from '../../../packages/spec/src/canonical.ts';
 import type { SpecCatalog } from '../../../packages/spec/src/catalog.ts';
+import { SPEC_PATTERNS } from '../../../packages/spec/src/contract.ts';
 import type { Schema } from '../../../packages/spec/src/dialect.ts';
+import { SPEC_CONTROL_STATE_TYPES } from '../../../packages/spec/src/surface.ts';
 import { validateBlueprint } from '../../../packages/spec/src/validate.ts';
+import { validateWorkflowGraph } from '../../../packages/spec/src/workflow.ts';
 import { traceNode } from './trace-rules.ts';
 
 const NATIVE = join(import.meta.dirname, '../..');
@@ -85,7 +88,7 @@ check(existsSync(join(SPEC_KT, 'com/texuli/spec/Blueprint.kt')), 'the generated 
 const kotlinFiles = walk(NATIVE).filter((f) => f.endsWith('.kt'));
 check(
   !kotlinFiles.some((f) =>
-    /\/com\/texuli\/spec\/(Blueprint|CatalogSchema|Diagnostics|Json|Manifest|Vocabulary)\.kt$/.test(
+    /\/com\/texuli\/spec\/(Blueprint|CatalogSchema|Diagnostics|Json|Manifest|Vocabulary|Workflow)\.kt$/.test(
       f
     )
   ),
@@ -134,6 +137,10 @@ const catalog = JSON.parse(
 const blueprintSchema = JSON.parse(
   readFileSync(join(REPO, 'packages/spec/schemas/blueprint.schema.json'), 'utf8')
 ) as Schema;
+// Goldens with a workflow-graph need the workflow schema and its validator.
+const workflowSchema = JSON.parse(
+  readFileSync(join(REPO, 'packages/spec/schemas/workflow.schema.json'), 'utf8')
+) as Schema;
 const portable = new Map(
   catalog.components.map((c) => [
     c.id,
@@ -159,7 +166,8 @@ const goldenDir = join(REPO, 'packages/spec/fixtures/golden');
 for (const file of readdirSync(goldenDir).filter((f) => f.endsWith('.json'))) {
   const envelope = JSON.parse(readFileSync(join(goldenDir, file), 'utf8')) as { tree: Node };
   check(
-    validateBlueprint(envelope, { blueprintSchema, catalog }).ok,
+    validateBlueprint(envelope, { blueprintSchema, catalog, workflowSchema, validateWorkflowGraph })
+      .ok,
     `${file}: valid under the spec validator`
   );
   const expected = JSON.parse(
@@ -170,6 +178,68 @@ for (const file of readdirSync(goldenDir).filter((f) => f.endsWith('.json'))) {
     canonicalJson(simulated) === canonicalJson(expected.trace),
     `${file}: the native plan's trace equals the web trace`
   );
+}
+
+// 6. KMP chat migration parity: the chat-thread forms the Kotlin migration
+// tests load (KmpAiChatMigrationTest, KmpVoiceChatMigrationTest) validate
+// under the TypeScript validator too, and the transcript as the app models it
+// (no author, role "assistant") is refused with the same pinned diagnostics.
+const kmpFixture = (name: string) =>
+  readFileSync(join(NATIVE, 'conformance/fixtures', `${name}.json`), 'utf8');
+for (const name of ['kmp-aichat-thread', 'kmp-voicechat-thread']) {
+  const result = validateBlueprint(JSON.parse(kmpFixture(name)), { blueprintSchema, catalog });
+  check(
+    result.ok,
+    `${name}.json: valid under the spec validator (${result.diagnostics.map((d) => d.code).join(', ')})`
+  );
+}
+const unmapped = kmpFixture('kmp-voicechat-thread')
+  .replace('"author": "Fictional Person",', '')
+  .replace('"author": "Fictional Agent",', '')
+  .replace('"role": "agent"', '"role": "assistant"');
+check(
+  canonicalJson(
+    validateBlueprint(JSON.parse(unmapped), { blueprintSchema, catalog }).diagnostics.map((d) => [
+      d.code,
+      d.path,
+      d.id,
+    ])
+  ) ===
+    canonicalJson([
+      ['missing-required', '$.tree.children[1].children[0].props.author', 'chat-message'],
+      ['enum-value', '$.tree.children[1].children[1].props.role', 'chat-message'],
+      ['missing-required', '$.tree.children[1].children[1].props.author', 'chat-message'],
+    ]),
+  'the unmapped voice-chat transcript is refused with the diagnostics the Kotlin test pins'
+);
+
+// 7. The hand-written Kotlin contract compiles the spec's patterns verbatim,
+// and its control state types are the spec's (state surface parity).
+const contractKt = readFileSync(
+  join(NATIVE, 'texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/Contract.kt'),
+  'utf8'
+);
+const ktRegex = (name: string): string | undefined => {
+  const match = new RegExp(`val ${name}: Regex = Regex\\("((?:[^"\\\\]|\\\\.)*)"\\)`).exec(
+    contractKt
+  );
+  return match?.[1]?.replace(/\\\$/g, '$').replace(/\\\\/g, '\\');
+};
+for (const [kt, pattern] of [
+  ['ITEM_KEY', SPEC_PATTERNS.itemKey],
+  ['INTENT_NAME', SPEC_PATTERNS.intentName],
+  ['WORKFLOW_LABEL', SPEC_PATTERNS.workflowLabel],
+  ['WORKFLOW_TEXT', SPEC_PATTERNS.workflowText],
+  ['LIST_TEXT', SPEC_PATTERNS.listText],
+] as const) {
+  check(ktRegex(kt) === pattern, `Contract.kt ${kt} is the spec pattern ${pattern}`);
+}
+const surfaceKt = readFileSync(
+  join(NATIVE, 'texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/Surface.kt'),
+  'utf8'
+);
+for (const [id, type] of Object.entries(SPEC_CONTROL_STATE_TYPES)) {
+  check(surfaceKt.includes(`"${id}" to "${type}"`), `Surface.kt maps ${id} to ${type}`);
 }
 
 if (failures.length > 0) {

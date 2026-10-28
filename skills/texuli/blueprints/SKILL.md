@@ -1,18 +1,11 @@
 ---
 name: texuli-blueprints
-description: Validate, wrap, edit, paint and hand off untrusted agent blueprints offline — validateDraft, the envelope and its lifecycle, edit history, the player core and the Svelte player, the agent service and the spec contract. Agents draft, validation gates, the owner activates.
+description: Validate, wrap, edit, paint and hand off untrusted agent blueprints offline — validateDraft, the envelope and its lifecycle, edit history, the player, the agent service, the spec contract, and spec 0.3.0 interaction as data (state, bindings, closed actions, reorder, workflow-graph, migrations). Agents draft, validation gates, the owner activates.
 version: "0.2.0"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
-metadata:
-  openclaw:
-    emoji: "▣"
-    homepage: https://texuli.com/guides/
-    requires:
-      anyBins:
-        - bash
-        - git
+metadata: {"openclaw":{"emoji":"▣","homepage":"https://texuli.com/guides/","requires":{"anyBins":["bash","git"]}}}
 ---
 
 # Blueprints: drafts an agent writes and a host can trust
@@ -38,6 +31,7 @@ replay provider; there is no real model provider and no key.
 | Paint a validated draft | **D** — player |
 | Run the agent service locally, or read its contract | **E** — service |
 | Keep the cross-language contract in step | **F** — spec |
+| Send a whole working screen as JSON: state, bindings, actions, drag, workflows | **G** — interaction |
 
 Building screens by hand stays in [`../build-ui/SKILL.md`](../build-ui/SKILL.md).
 Package entries and layers: [`../router/packages.md`](../router/packages.md).
@@ -72,8 +66,11 @@ if (!result.ok) {
 
 The checks run in order:
 - input: a byte cap before `JSON.parse`;
-- envelope: when the input is one;
+- envelope: when the input is one (a 0.2.0 envelope is migrated to 0.3.0
+  first, then the host's `checkSpec`, if passed, runs);
 - structure: prototype keys, depth bombs, unknown node fields;
+- interaction: bindings, `bind`, `on` and the closed actions, list item
+  text, and the state surface rules (stage G);
 - the raw sink scan;
 - tree limits;
 - the sink-free renderer: ids, tiers, prop schemas and the block family check;
@@ -141,7 +138,10 @@ Doc: `packages/catalog/docs/edit.md`.
 ```
 
 Invalid drafts are refused by default. `invalidPolicy="preview"` shows
-placeholders behind a warning, and still offers no activation. The deck frame
+placeholders behind a warning, and still offers no activation. Every
+agent-emittable id has a painter, including data views, `sortable-list`
+and `workflow-graph`; the player runs spec 0.3.0 actions in local state and
+reports state and intents through `onStateChange` and `onAction` (stage G). The deck frame
 and intent controls are later phases. Doc: `packages/player/README.md`.
 
 On texuli.com (deployed from `main` to Cloudflare Pages), `/builder/`
@@ -171,7 +171,13 @@ deploying are developer decisions.
   subset, the catalog vocabulary projected from the built catalog (every
   capability `unknown` until audited), and golden and invalid fixtures.
 - **Projections:** deterministic TypeScript and Kotlin, both committed.
-- **Validator:** `validateBlueprint` is the target-neutral check.
+- **Validator:** `validateBlueprint` is the target-neutral check. Opt-in
+  subpaths: `@texuli/spec/workflow` (`validateWorkflowGraph`),
+  `@texuli/spec/migrate` (`migrateBlueprint`) and `@texuli/spec/surface`
+  (the state surface rules every validator shares).
+- **Goldens:** `fixtures/golden/` holds nine blueprints that must validate
+  and paint; a new golden moves the spec digest, so it needs a
+  `versions.json` pin and refreshed native traces.
 
 **Coupling:** a catalog manifest change must refresh the spec, or the parity
 test fails:
@@ -185,3 +191,27 @@ pnpm vitest run packages/spec
 Doc: `packages/spec/README.md`. The native Kotlin Multiplatform build in
 `native/` consumes the generated Kotlin (in development; its Gradle `check`
 is recorded passing in `native/README.md`, and nothing is on Maven Central).
+
+## G — Interaction as data (spec 0.3.0)
+
+Unreleased: in the repository, not in the npm `0.3.0` packages. Detail and a
+validated example: [`references/interaction.md`](references/interaction.md).
+
+- **State and flow** live in the envelope (`state`, `flow`); props read them
+  with `{"$state": name}`, and host data with `{"$data": name}` (read-only).
+- **Actions are closed:** a node's `on` maps an event the component declares
+  to `setState`, `toggleState`, `moveItem`, `flowGo`, `emit` or `submit`.
+  `emit` proposes an intent to the host; nothing fetches or navigates.
+- **Drag as data:** a `sortable-list` (or `data-board` with `bind.items`)
+  binds a list variable; `reorder` sets `group`, `accepts`, `locked` and
+  `pull`, and the UI drag offers exactly the moves `moveItem` accepts.
+- **Workflows:** a `workflow-graph` node carries a spec workflow graph;
+  `mode: "edit"` with `bind.graph` to a `workflow` variable makes it editable.
+- **A blueprint that validates paints:** form nodes inside an
+  `action-form`, controls bound to declared variables of their type, flow
+  nodes matching the flow, no writes to host-bound variables.
+
+```bash
+pnpm vitest run packages/player/tests/golden.test.ts
+pnpm vitest run packages/player/tests/lego.test.ts
+```

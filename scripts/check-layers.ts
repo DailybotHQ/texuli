@@ -27,6 +27,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   '@texuli/core': 0,
   '@texuli/date': 0,
+  '@texuli/drag': 0,
   // L0: the framework-free blueprint contract — the cross-language spine
   // consumed by every layer (spec-compose-design.md B1).
   '@texuli/spec': 0,
@@ -38,6 +39,7 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   '@texuli/data': 4,
   '@texuli/editor': 4,
   '@texuli/media': 4,
+  '@texuli/workflows': 4,
   '@texuli/blocks': 5,
   '@texuli/catalog': 6,
   '@texuli/tools': 8,

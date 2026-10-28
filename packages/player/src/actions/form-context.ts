@@ -16,6 +16,8 @@ export interface RegisteredField {
 export interface ActionFormContext {
   register(field: RegisteredField): () => void;
   pending(): boolean;
+  /** Submit the form as its submit button would (the spec 0.3.0 `submit` action). */
+  submit(): void;
 }
 
 export function setActionFormContext(context: ActionFormContext): void {

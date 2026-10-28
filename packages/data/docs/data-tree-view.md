@@ -17,7 +17,9 @@ An outline / file-tree data view over flat `{ id, parentId, rank }` rows with:
 - Drag reorder and keyboard outline edits (Alt+Up/Down reorder, Alt+Right indent,
   Alt+Left outdent — flipped under RTL; Tab stays free for focus movement)
 - RTL via `dir="rtl"` and logical CSS
-- Live region announcements for moves and load errors
+- Live region announcements for moves and load errors; drag announcements come
+  from `DragMessages` templates (`@texuli/drag/messages`), overridable per locale
+  with the `messages` prop (unreleased: not in `0.3.0`)
 
 ## Usage
 

@@ -9,15 +9,34 @@ import { canonicalJson, sha256 } from '../src/canonical.ts';
 import type { SpecCatalog } from '../src/catalog.ts';
 import { kotlinString } from '../src/codegen/kotlin.ts';
 import { checkConformance } from '../src/conformance.ts';
+import {
+  ACTION_FIELDS,
+  DATA_BINDING_KEY,
+  SPEC_ACTION_OPS,
+  SPEC_EVENT_NAMES,
+  SPEC_LIMITS,
+  SPEC_PATTERNS,
+  SPEC_PROP_REFS,
+  SPEC_STATE_TYPES,
+  STATE_BINDING_KEY,
+  STATE_FIELDS,
+} from '../src/contract.ts';
 import { checkSchemaDocument, DIALECT_URI, type Schema, validateInstance } from '../src/dialect.ts';
 import { formatJson } from '../src/format.ts';
-import { SPEC_VERSION } from '../src/index.ts';
+import * as root from '../src/index.ts';
+import {
+  migrateBlueprint,
+  SPEC_MIGRATIONS,
+  UNDECLARED_SPEC_VERSION,
+} from '../src/migrations/index.ts';
 import { validateBlueprint } from '../src/validate.ts';
+import { SPEC_VERSION } from '../src/version.ts';
 import {
   checkVersionHistory,
   nextSpecVersion,
   type SpecVersionHistory,
 } from '../src/versioning.ts';
+import { validateWorkflowGraph } from '../src/workflow.ts';
 import { build, committedOutputs, json, normative } from './helpers.ts';
 
 /**
@@ -65,7 +84,7 @@ describe('canonical JSON and sha256', () => {
 describe('the closed dialect', () => {
   it('accepts every committed schema and refuses keywords, open objects, refs and dialects', () => {
     const schemas = Object.keys(normative).filter((p) => p.startsWith('schemas/'));
-    expect(schemas).toHaveLength(4);
+    expect(schemas).toHaveLength(5);
     for (const path of schemas) expect(checkSchemaDocument(json(path)), path).toEqual([]);
     const base = { $schema: DIALECT_URI };
     expect(codes(checkSchemaDocument({ ...base, type: 'string', format: 'email' }))).toEqual([
@@ -146,17 +165,22 @@ describe('deterministic generation', () => {
       `${KOTLIN_OUT}Json.kt`,
       `${KOTLIN_OUT}Manifest.kt`,
       `${KOTLIN_OUT}Vocabulary.kt`,
+      `${KOTLIN_OUT}Workflow.kt`,
       `${TS_OUT}blueprint.ts`,
       `${TS_OUT}catalog-schema.ts`,
       `${TS_OUT}diagnostics.ts`,
       `${TS_OUT}manifest.ts`,
       `${TS_OUT}vocabulary.ts`,
+      `${TS_OUT}workflow.ts`,
     ]);
     for (const [path, text] of Object.entries(build.generated)) {
       expect(text, path).toContain(
         `// Spec ${build.stamp.specVersion}, digest ${build.stamp.specDigest}`
       );
-      expect(text, path).not.toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/);
+      // The generator stamps no build time: the header carries version and digest
+      // only (manifest examples may legitimately hold ISO dates in the body).
+      const header = text.split('\n').slice(0, 3).join('\n');
+      expect(header, path).not.toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/);
     }
   });
 
@@ -201,7 +225,7 @@ function code(text: string): string {
 
 describe('generated Kotlin (text artifacts; no Kotlin toolchain here)', () => {
   it('is well formed, defines every type it references, decodes closed and escapes strings', () => {
-    expect(kotlin).toHaveLength(6);
+    expect(kotlin).toHaveLength(7);
     for (const [path, text] of kotlin) {
       expect(text, path).toContain('\npackage com.texuli.spec\n');
       expect(text, path).not.toContain('\t');
@@ -245,6 +269,16 @@ describe('generated Kotlin (text artifacts; no Kotlin toolchain here)', () => {
       expect(defined.has(name as string) || builtins.has(name as string), name).toBe(true);
     }
     expect(kotlinString('Say "hi" for $5\\n')).toBe('"Say \\"hi\\" for \\$5\\\\n"');
+    // `$state` and `$data` are wire names, never Kotlin string templates.
+    const blueprintKt = build.generated[`${KOTLIN_OUT}Blueprint.kt`] as string;
+    expect(blueprintKt).toContain('fields["\\$state"]');
+    expect(blueprintKt).toContain('"$path.\\$state"');
+    const codeLines = blueprintKt.split('\n').filter((line) => !/^\s*(\/\*\*|\*)/.test(line));
+    expect(codeLines.join('\n')).not.toMatch(/[^\\]\$(state|data)\b/);
+    const names = [
+      ...all.matchAll(/(?:^|\n)(?:data class|enum class|typealias)\s+([A-Z]\w*)/g),
+    ].map((m) => m[1]);
+    expect(new Set(names).size, 'generated Kotlin type names are unique').toBe(names.length);
   });
 });
 
@@ -300,18 +334,27 @@ describe('conformance harness', () => {
     const documents = {
       blueprintSchema: json<Schema>('schemas/blueprint.schema.json'),
       catalog: json<SpecCatalog>('catalog/components.json'),
+      workflowSchema: json<Schema>('schemas/workflow.schema.json'),
+      validateWorkflowGraph,
     };
     const golden = Object.keys(normative).filter((p) => p.startsWith('fixtures/golden/'));
     expect(golden.sort()).toEqual([
+      'fixtures/golden/app-dashboard.json',
       'fixtures/golden/conditional-report.json',
       'fixtures/golden/dashboard.json',
+      'fixtures/golden/lego.json',
+      'fixtures/golden/mobile-flow.json',
       'fixtures/golden/proactive-deck.json',
       'fixtures/golden/report-on-demand.json',
+      'fixtures/golden/sortable-board.json',
+      'fixtures/golden/workflow-builder.json',
     ]);
     for (const path of golden) expect(validateBlueprint(json(path), documents).ok, path).toBe(true);
     const covered = new Set(
       Object.keys(normative)
-        .filter((p) => p.startsWith('fixtures/invalid/'))
+        .filter(
+          (p) => p.startsWith('fixtures/invalid/') || p.startsWith('fixtures/workflow/invalid/')
+        )
         .flatMap((p) => json<{ expect: string[] }>(p).expect)
     );
     const diagnostics = json<{ $defs: { diagnosticCode: { enum: string[] } } }>(
@@ -324,6 +367,16 @@ describe('conformance harness', () => {
       ['unknown-slot-root', ['unknown-slot']],
       ['condition-unknown-op', ['schema']],
       ['condition-extra-field', ['schema']],
+      ['state-declaration', ['state']],
+      ['unknown-state', ['unknown-state']],
+      ['binding-shape', ['binding']],
+      ['unknown-event', ['unknown-event']],
+      ['action-fields', ['unknown-event', 'action']],
+      ['spec-version', ['schema']],
+      // The state surface agrees with the player: list item text, forms, controls and flow nodes.
+      ['state-list-text', ['state']],
+      ['form-outside', ['action', 'action']],
+      ['surface-nodes', ['binding', 'state']],
     ] as const) {
       const fixture = json<{ expect: string[]; blueprint: unknown }>(
         `fixtures/invalid/${name}.json`
@@ -336,12 +389,138 @@ describe('conformance harness', () => {
     expect(conditional).toContain('"slot"');
     expect(conditional).toContain('"when"');
     // A portable profile fails closed while no id is audited portable.
-    expect(documents.catalog.components.every((c) => c.capability === 'unknown')).toBe(true);
+    expect(documents.catalog.components.some((c) => c.capability === 'portable-core')).toBe(false);
     const portable = {
       ...json<Record<string, unknown>>('fixtures/golden/report-on-demand.json'),
       profile: 'portable',
     };
     expect(validateBlueprint(portable, documents).diagnostics[0]?.code).toBe('unsupported-profile');
+  });
+});
+
+describe('the 0.3.0 contract mirrors its schemas', () => {
+  it('keeps every exported constant equal to the schema JSON', () => {
+    type Defs = Record<string, Schema>;
+    const blueprint = json<{ $defs: Defs; properties: Record<string, Schema> }>(
+      'schemas/blueprint.schema.json'
+    );
+    const catalog = json<{ $defs: Defs }>('schemas/catalog.schema.json');
+    const workflow = json<{ $defs: Defs; properties: Record<string, Schema> }>(
+      'schemas/workflow.schema.json'
+    );
+    const d = blueprint.$defs;
+    const field = (def: string, name: string) => d[def]?.properties?.[name] as Schema;
+    expect(field('action', 'op').enum).toEqual([...SPEC_ACTION_OPS]);
+    expect(field('stateDeclaration', 'type').enum).toEqual([...SPEC_STATE_TYPES]);
+    expect(catalog.$defs.eventName?.enum).toEqual([...SPEC_EVENT_NAMES]);
+    expect(Object.keys(d.binding?.properties ?? {})).toEqual([STATE_BINDING_KEY, DATA_BINDING_KEY]);
+    // Every op and type field the validator allows is a schema field.
+    const actionFields = Object.keys(d.action?.properties ?? {});
+    for (const op of SPEC_ACTION_OPS) {
+      for (const name of ACTION_FIELDS[op].allowed) expect(actionFields, op).toContain(name);
+    }
+    const stateFields = Object.keys(d.stateDeclaration?.properties ?? {});
+    for (const type of SPEC_STATE_TYPES) {
+      for (const name of STATE_FIELDS[type]) expect(stateFields, type).toContain(name);
+    }
+    const ref = catalog.$defs.propSchema?.properties?.$ref?.pattern ?? '';
+    expect(ref).toBe(`^#/\\$defs/(${SPEC_PROP_REFS.join('|')})$`);
+    for (const [name, pattern] of [
+      ['stateName', SPEC_PATTERNS.stateName],
+      ['dataName', SPEC_PATTERNS.dataName],
+      ['flowName', SPEC_PATTERNS.flowName],
+      ['intentName', SPEC_PATTERNS.intentName],
+      ['itemKey', SPEC_PATTERNS.itemKey],
+      ['groupName', SPEC_PATTERNS.groupName],
+    ] as const) {
+      expect(d[name]?.pattern, name).toBe(pattern);
+    }
+    expect(workflow.$defs.workflowId?.pattern).toBe(SPEC_PATTERNS.workflowId);
+    expect(workflow.$defs.workflowLabel?.pattern).toBe(SPEC_PATTERNS.workflowLabel);
+    expect(field('stateDeclaration', 'values').maxItems).toBe(SPEC_LIMITS.enumValues);
+    expect(field('stateDeclaration', 'values').items?.maxLength).toBe(SPEC_LIMITS.enumValueLength);
+    expect(field('stateDeclaration', 'maxLength').maximum).toBe(SPEC_LIMITS.stringLength);
+    expect(field('stateDeclaration', 'maxItems').maximum).toBe(SPEC_LIMITS.listItems);
+    expect(field('flow', 'views').maxItems).toBe(SPEC_LIMITS.flowViews);
+    expect(field('flow', 'transitions').maxItems).toBe(SPEC_LIMITS.flowTransitions);
+    expect(d.eventMap?.additionalProperties).toMatchObject({
+      maxItems: SPEC_LIMITS.actionsPerEvent,
+    });
+    expect(workflow.properties.nodes?.maxItems).toBe(SPEC_LIMITS.workflowNodes);
+    expect(workflow.properties.edges?.maxItems).toBe(SPEC_LIMITS.workflowEdges);
+    expect(workflow.properties.nodeTypes?.maxItems).toBe(SPEC_LIMITS.workflowNodeTypes);
+    expect(workflow.properties.groups?.maxItems).toBe(SPEC_LIMITS.workflowGroups);
+  });
+});
+
+describe('migrations', () => {
+  it('migrates 0.2.0 goldens to 0.3.0 purely, idempotently, and leaves the tree alone', () => {
+    const documents = {
+      blueprintSchema: json<Schema>('schemas/blueprint.schema.json'),
+      catalog: json<SpecCatalog>('catalog/components.json'),
+    };
+    const deepFreeze = <T>(value: T): T => {
+      if (value && typeof value === 'object') {
+        for (const child of Object.values(value)) deepFreeze(child);
+        Object.freeze(value);
+      }
+      return value;
+    };
+    const goldens = Object.keys(normative).filter((p) => p.startsWith('fixtures/golden/'));
+    // Goldens written for 0.3.0 (they stamp `spec`) are already current: migration is a no-op.
+    const current = goldens.filter((p) => json<{ spec?: string }>(p).spec === SPEC_VERSION);
+    expect(current.length).toBeGreaterThan(0);
+    for (const path of current) {
+      const input = deepFreeze(json<Record<string, unknown>>(path));
+      const result = migrateBlueprint(input);
+      expect(result.applied, path).toEqual([]);
+      expect(result.blueprint, path).toBe(input);
+    }
+    const legacy = goldens.filter((p) => !current.includes(p));
+    expect(legacy.length).toBeGreaterThan(0);
+    for (const path of legacy) {
+      const input = deepFreeze(json<Record<string, unknown>>(path));
+      const result = migrateBlueprint(input);
+      expect(result, path).toMatchObject({
+        from: '0.2.0',
+        to: SPEC_VERSION,
+        applied: ['0.2.0->0.3.0'],
+      });
+      expect(result.blueprint, path).toEqual({ ...input, spec: '0.3.0' });
+      expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);
+      expect(validateBlueprint(result.blueprint, documents).ok, path).toBe(true);
+      const again = migrateBlueprint(result.blueprint);
+      expect(again.applied).toEqual([]);
+      expect(again.blueprint).toBe(result.blueprint);
+    }
+    // Not an envelope, an unknown version, a non-string version: passed through untouched.
+    for (const input of [null, 'text', [1], { spec: '9.9.9', tree: {} }, { spec: 3 }]) {
+      const result = migrateBlueprint(input);
+      expect(result.blueprint).toBe(input);
+      expect(result.applied).toEqual([]);
+    }
+    // A parsed __proto__ stays an own key, so validation still refuses it.
+    const proto = JSON.parse('{"format":"texuli-blueprint","__proto__":{"admin":true}}');
+    const migrated = migrateBlueprint(proto).blueprint as Record<string, unknown>;
+    expect(Object.hasOwn(migrated, '__proto__')).toBe(true);
+    expect(Object.getPrototypeOf(migrated)).toBe(Object.prototype);
+    // The chain covers every consecutive pinned pair from the undeclared version.
+    const pinned = history.releases.map((r) => r.specVersion);
+    const chain = pinned.slice(pinned.indexOf(UNDECLARED_SPEC_VERSION));
+    expect(SPEC_MIGRATIONS.map((m) => [m.from, m.to])).toEqual(
+      chain.slice(1).map((to, i) => [chain[i], to])
+    );
+    expect(chain.at(-1)).toBe(SPEC_VERSION);
+  });
+
+  it('keeps workflow validation and migrations out of the root, in their own subpaths', () => {
+    expect(Object.keys(root)).not.toContain('validateWorkflowGraph');
+    expect(Object.keys(root)).not.toContain('migrateBlueprint');
+    const { exports } = JSON.parse(
+      readFileSync(new URL('../package.json', import.meta.url), 'utf8')
+    ) as { exports: Record<string, { default: string }> };
+    expect(exports['./workflow']?.default).toBe('./src/workflow.ts');
+    expect(exports['./migrate']?.default).toBe('./src/migrations/index.ts');
   });
 });
 

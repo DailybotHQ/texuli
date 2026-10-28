@@ -15,7 +15,12 @@ export {
 } from '../build.ts';
 export { prettyJson } from '../canonical.ts';
 export { type BuiltCatalogLike, projectCatalog } from '../catalog.ts';
-export { type ConformanceIssue, checkConformance } from '../conformance.ts';
+export {
+  type ConformanceIssue,
+  checkCatalogContract,
+  checkConformance,
+  deprecationExpired,
+} from '../conformance.ts';
 export { formatJson, LINE_WIDTH } from '../format.ts';
 export {
   checkVersionHistory,
@@ -25,5 +30,5 @@ export {
   type SpecVersionPin,
   type VersionIssue,
 } from '../versioning.ts';
-export { KOTLIN_PACKAGE, kotlinString } from './kotlin.ts';
+export { KOTLIN_PACKAGE, kotlinProperty, kotlinString } from './kotlin.ts';
 export type { SchemaUnit, Stamp } from './shared.ts';

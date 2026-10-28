@@ -5,14 +5,7 @@ version: "0.2.0"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
-metadata:
-  openclaw:
-    emoji: "▣"
-    homepage: https://texuli.com/guides/
-    requires:
-      anyBins:
-        - bash
-        - git
+metadata: {"openclaw":{"emoji":"▣","homepage":"https://texuli.com/guides/","requires":{"anyBins":["bash","git"]}}}
 ---
 
 # Skill evals
@@ -37,6 +30,7 @@ the gate.
 | File | What it is |
 | --- | --- |
 | [`scenarios.json`](scenarios.json) | One scenario per golden task (30): the sub-skill to follow, its stages, the rules it relies on, the traps the brief baits, the components it needs, and whether a recorded tree exists |
+| `scenarios.json` → `interactive` | Five scenarios beyond the golden set, in the same format plus a `reference`: sortable lists (drag and drop), a workflow editor, and stateful JSON blueprints with `reorder`, an editable `workflow-graph` and the lego composition. They are not scored by the golden scorer (it takes trees, not stateful envelopes); `scripts/tests/skill-evals.suite.ts` checks that their rules and stages are quoted from the followed sub-skill and that each reference (a spec golden or a demo) validates and holds what the scenario needs |
 | [`runs/skill-following.json`](runs/skill-following.json) | Trees written by following `build-ui` for ten tasks: all five trap tasks (g03, g06, g08, g17, g30) and five text, data, grid and media tasks. Every check must pass, with axe run, not skipped |
 | [`runs/rule-breaks.json`](runs/rule-breaks.json) | Eight trees that each break one quoted `build-ui` rule. The scorer must fail each on the named check |
 | [`references/protocol.md`](references/protocol.md) | How to run and report a model eval |

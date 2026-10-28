@@ -1,5 +1,6 @@
 <script lang="ts">
-import { Board, type BoardMove } from '../../src/board/index.ts';
+import type { DragMessagesOverrides } from '@texuli/drag/messages';
+import { Board, type BoardLabelOverrides, type BoardMove } from '../../src/board/index.ts';
 
 interface Task {
   id: string;
@@ -10,8 +11,15 @@ interface Task {
 
 let {
   lockedIds = [] as string[],
+  labels,
+  messages,
+  failMoves = false,
 }: {
   lockedIds?: string[];
+  labels?: BoardLabelOverrides;
+  messages?: DragMessagesOverrides;
+  /** The host's save fails, so the board restores the card. */
+  failMoves?: boolean;
 } = $props();
 
 let tasks = $state<Task[]>([
@@ -26,6 +34,7 @@ const columns = [
 ];
 
 function onMove(move: BoardMove): void {
+  if (failMoves) throw new Error('Fictional save failure');
   moves = [...moves, move];
   const ranks = new Map((move.rerank ?? []).map((entry) => [entry.itemId, entry.rank]));
   tasks = tasks.map((task) => {
@@ -47,6 +56,8 @@ function onMove(move: BoardMove): void {
   getRank={(task) => task.rank}
   getLabel={(task) => task.title}
   isLocked={(task) => lockedIds.includes(task.id)}
+  {labels}
+  {messages}
   {onMove}
 >
   {#snippet card(task)}

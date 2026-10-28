@@ -24,6 +24,40 @@ export type CatalogPropKind =
   | 'event'
   | 'unknown';
 
+/**
+ * The closed event vocabulary a node's `on` may name (spec 0.3.0,
+ * `SPEC_EVENT_NAMES`). A component lists the events it really fires.
+ */
+export type CatalogEventName = 'press' | 'change' | 'select' | 'submit' | 'dismiss' | 'move';
+
+/**
+ * A property schema for an `array` or `object` prop: the spec dialect
+ * subset (`SpecPropSchema`). `$ref` names a contract `$defs` entry
+ * (`#/$defs/reorder`, `#/$defs/workflowGraph` …) and stands alone.
+ */
+export interface CatalogValueSchema {
+  type?: 'object' | 'array' | 'string' | 'number' | 'integer' | 'boolean';
+  description?: string;
+  properties?: Readonly<Record<string, CatalogValueSchema>>;
+  required?: readonly string[];
+  additionalProperties?: CatalogValueSchema;
+  items?: CatalogValueSchema;
+  enum?: readonly string[];
+  minLength?: number;
+  maxLength?: number;
+  minimum?: number;
+  maximum?: number;
+  minItems?: number;
+  maxItems?: number;
+  $ref?: string;
+}
+
+/** Deprecated since a spec version; warns for one minor before removal. */
+export interface CatalogDeprecation {
+  since: string;
+  replacement?: string;
+}
+
 /** One prop in the component's public surface. */
 export interface CatalogPropSchema {
   /** Prop name as authors and agents pass it (camelCase). */
@@ -43,6 +77,9 @@ export interface CatalogPropSchema {
    * agent-emittable content components is a host concern — the field is optional.
    */
   trust?: 'developer' | 'untrusted';
+  /** Item or field schema for `array` and `object` props (spec property schema). */
+  schema?: CatalogValueSchema;
+  deprecated?: CatalogDeprecation;
 }
 
 /** A concrete usage sample (props only; no live Svelte in the manifest). */
@@ -96,6 +133,11 @@ export interface CatalogManifest {
   examples: readonly CatalogExample[];
   /** Optional related component ids. */
   related?: readonly string[];
+  /** Events the component fires that a node's `on` may handle (closed vocabulary). */
+  events?: readonly CatalogEventName[];
+  /** Props a node may two-way `bind` to a state variable; each a portable, data prop. */
+  bindable?: readonly string[];
+  deprecated?: CatalogDeprecation;
 }
 
 /** Path segment in a manifest diagnostic. */

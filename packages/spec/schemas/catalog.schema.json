@@ -62,6 +62,26 @@
           "items": {
             "$ref": "#/$defs/prop"
           }
+        },
+        "events": {
+          "description": "The closed events the component fires; a node's on keys must be listed here.",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/eventName"
+          }
+        },
+        "bindable": {
+          "description": "Props a node may two-way bind (node bind).",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+          }
+        },
+        "deprecated": {
+          "$ref": "#/$defs/deprecation"
         }
       },
       "required": ["id", "label", "summary", "group", "placement", "emit", "capability", "props"],
@@ -102,9 +122,102 @@
           "description": "A named platform extension: the prop does not cross the shared boundary (slot, event and unknown kinds).",
           "type": "string",
           "enum": ["web"]
+        },
+        "schema": {
+          "$ref": "#/$defs/propSchema"
+        },
+        "deprecated": {
+          "$ref": "#/$defs/deprecation"
         }
       },
       "required": ["name", "kind"],
+      "additionalProperties": false
+    },
+    "eventName": {
+      "description": "The closed event vocabulary.",
+      "type": "string",
+      "enum": ["press", "change", "select", "submit", "dismiss", "move"]
+    },
+    "deprecation": {
+      "description": "Deprecated since a spec version; warns for one minor before removal.",
+      "type": "object",
+      "properties": {
+        "since": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "replacement": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+        }
+      },
+      "required": ["since"],
+      "additionalProperties": false
+    },
+    "propSchema": {
+      "description": "A dialect subset an array or object prop's value must match. Objects are closed unless additionalProperties gives a map. No pattern (cross-target regex parity). $ref names one of binding, reorder, action, eventMap, condition (blueprint $defs) or workflowGraph.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["object", "array", "string", "number", "integer", "boolean"]
+        },
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/propSchema"
+          }
+        },
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/$defs/propSchema"
+        },
+        "items": {
+          "$ref": "#/$defs/propSchema"
+        },
+        "enum": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "string"
+          }
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "minItems": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxItems": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "$ref": {
+          "type": "string",
+          "pattern": "^#/\\$defs/(binding|reorder|action|eventMap|condition|workflowGraph)$"
+        }
+      },
       "additionalProperties": false
     }
   }

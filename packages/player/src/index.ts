@@ -163,6 +163,7 @@ export {
 } from './mount.ts';
 export { default as Player } from './Player.svelte';
 export { default as PlayerFrame } from './PlayerFrame.svelte';
+export { INTERACTIVE_PAINTER_IDS } from './painters/interactive.ts';
 export {
   HOST_REGION_ID,
   HOST_REGION_NAME,
@@ -188,6 +189,9 @@ export {
 export {
   LOCAL_STATE_FORMAT,
   LOCAL_STATE_VERSION,
+  liftLocalState,
+  type NodeInteraction,
+  type ResolveOptions,
   resolveStateBindings,
   STATE_BINDING_KEY,
   type StatefulSplit,
@@ -206,12 +210,29 @@ export {
   parseFlowDeclaration,
 } from './state/flow.ts';
 export {
+  type ActionEffect,
+  type ActionsResult,
+  type EventDetail,
+  MAX_EMIT_VALUE_LENGTH,
+  MAX_EMIT_VALUES,
+  type MoveOptions,
+  type MoveResult,
+  moveListItem,
+  runActions,
+} from './state/reducers.ts';
+export {
+  coerceList,
   coerceStateValue,
+  coerceWorkflow,
   DATA_SOURCE_NAME,
   DEFAULT_STRING_LENGTH,
+  ITEM_KEY,
   initialSnapshot,
+  type ListItem,
   MAX_ENUM_VALUE_LENGTH,
   MAX_ENUM_VALUES,
+  MAX_ITEM_FIELDS,
+  MAX_LIST_ITEMS,
   MAX_STATE_VARS,
   MAX_STRING_LENGTH,
   parseStateDeclarations,
@@ -221,5 +242,6 @@ export {
   type StateParse,
   type StateSnapshot,
   type StateValue,
+  type WorkflowValue,
 } from './state/schema.ts';
 export type { PlayerPaintNode } from './types.ts';

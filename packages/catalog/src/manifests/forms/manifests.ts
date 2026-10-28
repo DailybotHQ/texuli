@@ -1,4 +1,5 @@
-import { type CatalogManifest, defineCatalogManifest } from '../../manifest/index.ts';
+import { manifestData } from '../../manifest/data.ts';
+import type { CatalogManifest } from '../../manifest/types.ts';
 import {
   buttonGroupPropNames,
   buttonPropNames,
@@ -32,6 +33,7 @@ import {
 
 const PKG = 'texuli';
 
+/* @__NO_SIDE_EFFECTS__ */
 function propsFrom(
   names: readonly string[],
   detail: Record<
@@ -70,7 +72,7 @@ const fieldOrientations = ['vertical', 'horizontal'] as const;
 const radioOrientations = ['vertical', 'horizontal'] as const;
 const radioVariants = ['default', 'card'] as const;
 
-export const buttonManifest = defineCatalogManifest({
+export const buttonManifest = /* @__PURE__ */ manifestData({
   id: 'button',
   package: PKG,
   label: 'Button',
@@ -130,7 +132,7 @@ export const buttonManifest = defineCatalogManifest({
   related: ['icon-button', 'button-group', 'form', 'inline-text'],
 });
 
-export const iconButtonManifest = defineCatalogManifest({
+export const iconButtonManifest = /* @__PURE__ */ manifestData({
   id: 'icon-button',
   package: PKG,
   label: 'IconButton',
@@ -154,7 +156,7 @@ export const iconButtonManifest = defineCatalogManifest({
   related: ['button', 'button-group'],
 });
 
-export const buttonGroupManifest = defineCatalogManifest({
+export const buttonGroupManifest = /* @__PURE__ */ manifestData({
   id: 'button-group',
   package: PKG,
   label: 'ButtonGroup',
@@ -185,7 +187,7 @@ export const buttonGroupManifest = defineCatalogManifest({
   related: ['button', 'icon-button'],
 });
 
-export const inputManifest = defineCatalogManifest({
+export const inputManifest = /* @__PURE__ */ manifestData({
   id: 'input',
   package: PKG,
   label: 'Input',
@@ -221,7 +223,7 @@ export const inputManifest = defineCatalogManifest({
   related: ['input-group', 'textarea', 'field', 'text-counter'],
 });
 
-export const inputGroupManifest = defineCatalogManifest({
+export const inputGroupManifest = /* @__PURE__ */ manifestData({
   id: 'input-group',
   package: PKG,
   label: 'InputGroup',
@@ -251,7 +253,7 @@ export const inputGroupManifest = defineCatalogManifest({
   related: ['input', 'field'],
 });
 
-export const textareaManifest = defineCatalogManifest({
+export const textareaManifest = /* @__PURE__ */ manifestData({
   id: 'textarea',
   package: PKG,
   label: 'Textarea',
@@ -275,7 +277,7 @@ export const textareaManifest = defineCatalogManifest({
   related: ['input', 'text-counter', 'field'],
 });
 
-export const textCounterManifest = defineCatalogManifest({
+export const textCounterManifest = /* @__PURE__ */ manifestData({
   id: 'text-counter',
   package: PKG,
   label: 'TextCounter',
@@ -319,7 +321,7 @@ export const textCounterManifest = defineCatalogManifest({
   related: ['input', 'textarea', 'field'],
 });
 
-export const fieldManifest = defineCatalogManifest({
+export const fieldManifest = /* @__PURE__ */ manifestData({
   id: 'field',
   package: PKG,
   label: 'Field',
@@ -367,7 +369,7 @@ export const fieldManifest = defineCatalogManifest({
   related: ['label', 'description', 'field-error', 'form', 'input'],
 });
 
-export const labelManifest = defineCatalogManifest({
+export const labelManifest = /* @__PURE__ */ manifestData({
   id: 'label',
   package: PKG,
   label: 'Label',
@@ -388,7 +390,7 @@ export const labelManifest = defineCatalogManifest({
   related: ['field', 'description', 'inline-text'],
 });
 
-export const descriptionManifest = defineCatalogManifest({
+export const descriptionManifest = /* @__PURE__ */ manifestData({
   id: 'description',
   package: PKG,
   label: 'Description',
@@ -406,7 +408,7 @@ export const descriptionManifest = defineCatalogManifest({
   related: ['field', 'label', 'field-error'],
 });
 
-export const fieldErrorManifest = defineCatalogManifest({
+export const fieldErrorManifest = /* @__PURE__ */ manifestData({
   id: 'field-error',
   package: PKG,
   label: 'FieldError',
@@ -425,7 +427,7 @@ export const fieldErrorManifest = defineCatalogManifest({
   related: ['field', 'form'],
 });
 
-export const formManifest = defineCatalogManifest({
+export const formManifest = /* @__PURE__ */ manifestData({
   id: 'form',
   package: PKG,
   label: 'Form',
@@ -459,7 +461,7 @@ export const formManifest = defineCatalogManifest({
   related: ['field', 'button', 'input'],
 });
 
-export const checkboxManifest = defineCatalogManifest({
+export const checkboxManifest = /* @__PURE__ */ manifestData({
   id: 'checkbox',
   package: PKG,
   label: 'Checkbox',
@@ -500,7 +502,7 @@ export const checkboxManifest = defineCatalogManifest({
   related: ['switch', 'radio-group'],
 });
 
-export const radioManifest = defineCatalogManifest({
+export const radioManifest = /* @__PURE__ */ manifestData({
   id: 'radio',
   package: PKG,
   label: 'Radio',
@@ -525,7 +527,7 @@ export const radioManifest = defineCatalogManifest({
   related: ['radio-group', 'checkbox'],
 });
 
-export const radioGroupManifest = defineCatalogManifest({
+export const radioGroupManifest = /* @__PURE__ */ manifestData({
   id: 'radio-group',
   package: PKG,
   label: 'RadioGroup',
@@ -573,7 +575,7 @@ export const radioGroupManifest = defineCatalogManifest({
   related: ['radio', 'select', 'checkbox'],
 });
 
-export const switchManifest = defineCatalogManifest({
+export const switchManifest = /* @__PURE__ */ manifestData({
   id: 'switch',
   package: PKG,
   label: 'Switch',
@@ -603,7 +605,7 @@ export const switchManifest = defineCatalogManifest({
   related: ['checkbox'],
 });
 
-export const selectManifest = defineCatalogManifest({
+export const selectManifest = /* @__PURE__ */ manifestData({
   id: 'select',
   package: PKG,
   label: 'Select',
@@ -657,7 +659,7 @@ export const selectManifest = defineCatalogManifest({
   ],
 });
 
-export const selectTriggerManifest = defineCatalogManifest({
+export const selectTriggerManifest = /* @__PURE__ */ manifestData({
   id: 'select-trigger',
   package: PKG,
   label: 'Select.Trigger',
@@ -679,7 +681,7 @@ export const selectTriggerManifest = defineCatalogManifest({
   related: ['select', 'select-value'],
 });
 
-export const selectValueManifest = defineCatalogManifest({
+export const selectValueManifest = /* @__PURE__ */ manifestData({
   id: 'select-value',
   package: PKG,
   label: 'Select.Value',
@@ -698,7 +700,7 @@ export const selectValueManifest = defineCatalogManifest({
   related: ['select', 'select-trigger'],
 });
 
-export const selectContentManifest = defineCatalogManifest({
+export const selectContentManifest = /* @__PURE__ */ manifestData({
   id: 'select-content',
   package: PKG,
   label: 'Select.Content',
@@ -717,7 +719,7 @@ export const selectContentManifest = defineCatalogManifest({
   related: ['select', 'select-item', 'select-viewport'],
 });
 
-export const selectItemManifest = defineCatalogManifest({
+export const selectItemManifest = /* @__PURE__ */ manifestData({
   id: 'select-item',
   package: PKG,
   label: 'Select.Item',
@@ -746,7 +748,7 @@ export const selectItemManifest = defineCatalogManifest({
   related: ['select', 'select-content', 'select-group'],
 });
 
-export const selectGroupManifest = defineCatalogManifest({
+export const selectGroupManifest = /* @__PURE__ */ manifestData({
   id: 'select-group',
   package: PKG,
   label: 'Select.Group',
@@ -764,7 +766,7 @@ export const selectGroupManifest = defineCatalogManifest({
   related: ['select-label', 'select-item'],
 });
 
-export const selectLabelManifest = defineCatalogManifest({
+export const selectLabelManifest = /* @__PURE__ */ manifestData({
   id: 'select-label',
   package: PKG,
   label: 'Select.Label',
@@ -782,7 +784,7 @@ export const selectLabelManifest = defineCatalogManifest({
   related: ['select-group'],
 });
 
-export const selectSeparatorManifest = defineCatalogManifest({
+export const selectSeparatorManifest = /* @__PURE__ */ manifestData({
   id: 'select-separator',
   package: PKG,
   label: 'Select.Separator',
@@ -799,7 +801,7 @@ export const selectSeparatorManifest = defineCatalogManifest({
   related: ['select-group', 'select-content'],
 });
 
-export const selectPortalManifest = defineCatalogManifest({
+export const selectPortalManifest = /* @__PURE__ */ manifestData({
   id: 'select-portal',
   package: PKG,
   label: 'Select.Portal',
@@ -816,7 +818,7 @@ export const selectPortalManifest = defineCatalogManifest({
   related: ['select-content'],
 });
 
-export const selectViewportManifest = defineCatalogManifest({
+export const selectViewportManifest = /* @__PURE__ */ manifestData({
   id: 'select-viewport',
   package: PKG,
   label: 'Select.Viewport',
@@ -891,7 +893,7 @@ const comboboxPropDetail = {
   children: { kind: 'slot' },
 } as const;
 
-export const comboboxManifest = defineCatalogManifest({
+export const comboboxManifest = /* @__PURE__ */ manifestData({
   id: 'combobox',
   package: PKG,
   label: 'Combobox',
@@ -922,7 +924,7 @@ export const comboboxManifest = defineCatalogManifest({
   related: ['multi-select', 'select', 'field', 'form'],
 });
 
-export const multiSelectManifest = defineCatalogManifest({
+export const multiSelectManifest = /* @__PURE__ */ manifestData({
   id: 'multi-select',
   package: PKG,
   label: 'MultiSelect',
@@ -947,7 +949,7 @@ export const multiSelectManifest = defineCatalogManifest({
 });
 
 /** Every form manifest in stable id order. */
-export const FORMS_MANIFESTS: readonly CatalogManifest[] = Object.freeze([
+export const FORMS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
   buttonManifest,
   buttonGroupManifest,
   checkboxManifest,
@@ -981,9 +983,8 @@ export const FORMS_MANIFESTS: readonly CatalogManifest[] = Object.freeze([
 /** Map of component id → expected prop names for type/schema parity tests. */
 export { FORMS_PROP_NAMES as FORMS_PROP_NAME_MAP } from './prop-names.ts';
 
-export const formsManifestsById = Object.freeze(
-  Object.fromEntries(FORMS_MANIFESTS.map((manifest) => [manifest.id, manifest])) as Record<
-    string,
-    CatalogManifest
-  >
+export const formsManifestsById = /* @__PURE__ */ Object.freeze(
+  /* @__PURE__ */ Object.fromEntries(
+    /* @__PURE__ */ FORMS_MANIFESTS.map((manifest) => [manifest.id, manifest])
+  ) as Record<string, CatalogManifest>
 );

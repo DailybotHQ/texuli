@@ -66,6 +66,26 @@ keys nested in block data through to a component. The player now drops
 forbidden, handler and prototype keys at any depth at paint, and drops values
 nested too deep to police.
 
+## Spec 0.3.0 hostile blueprints
+
+`HOSTILE_BLUEPRINTS` (`src/render/hostile/blueprints.ts`, tested by
+`tests/render-hostile-blueprints.test.ts`) holds hostile **envelopes** for
+the 0.3.0 interaction surface. Each runs through `validateDraft` at the
+untrusted tier with `@texuli/spec`'s `validateBlueprint` as `checkSpec`,
+must be refused naming one of its expected codes within 2 seconds, and must
+leave the render tree inert:
+
+| Category | Cases |
+| --- | --- |
+| Workflow cycles | a forbidden cycle, a self-loop |
+| Workflow size | 10,000 nodes |
+| Bidi | an override in a workflow node label; an override (spoofing a file extension) and a zero-width space in a draggable list item (`state`) |
+| Script URLs | `javascript:` in workflow node text |
+| Reorder | `locked` past its 500-item bound, an undeclared list, an extra field |
+| Unknown ids, props and actions | a dangling edge, an id outside the catalog, an unknown node field, an extra board item field, an unknown action op, an extra action field, an event the component never fires, a form field outside an `action-form` (`action`) |
+| Bindings | binding a non-bindable prop, a nested `$data`, a two-key binding |
+| Prototype | a `__proto__` state name |
+
 ## Regenerating the fixture
 
 ```bash

@@ -36,6 +36,7 @@ export const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..
 export const CONSUMER_PACK_FILTER = [
   'core',
   'date',
+  'drag',
   'tokens',
   'primitives',
   'texuli',
@@ -51,8 +52,8 @@ export const TEXULI_INSTALL_NAMES = [
   '@texuli/data',
 ] as const;
 
-/** Local packs also need @texuli/date (from 0.3.0 a dependency of @texuli/primitives); the registry install pulls it in transitively. */
-const LOCAL_INSTALL_NAMES = [...TEXULI_INSTALL_NAMES, '@texuli/date'] as const;
+/** Local packs also need @texuli/date (from 0.3.0 a dependency of @texuli/primitives) and @texuli/drag (a dependency of @texuli/primitives and @texuli/data since PLAN_007); the registry install pulls them in transitively. */
+const LOCAL_INSTALL_NAMES = [...TEXULI_INSTALL_NAMES, '@texuli/date', '@texuli/drag'] as const;
 
 const ASTRO_TRANSITIVE_PACKAGES = [
   '@texuli/astro',
@@ -97,6 +98,7 @@ export const CONSUMERS: readonly ConsumerDef[] = [
 export interface TarballMap {
   core: string;
   date: string;
+  drag: string;
   tokens: string;
   primitives: string;
   texuli: string;
@@ -121,6 +123,7 @@ export async function ensureConsumerTarballs(options?: {
   const needed = [
     'texuli-core',
     'texuli-date',
+    'texuli-drag',
     'texuli-tokens',
     'texuli-primitives',
     'texuli-0',
@@ -166,6 +169,7 @@ export async function ensureConsumerTarballs(options?: {
     dir: tarballsDir,
     core: pick(['texuli-core-']),
     date: pick(['texuli-date-']),
+    drag: pick(['texuli-drag-']),
     tokens: pick(['texuli-tokens-']),
     primitives: pick(['texuli-primitives-']),
     texuli: pick(['texuli-0.', 'texuli-1.', 'texuli-2.']),
@@ -191,6 +195,7 @@ function rewritePlaceholders(pkgJson: string, tarballs: TarballMap): string {
   const manifest = JSON.parse(replaced) as { dependencies?: Record<string, string> };
   manifest.dependencies ??= {};
   manifest.dependencies['@texuli/date'] = `file:${tarballs.date}`;
+  manifest.dependencies['@texuli/drag'] = `file:${tarballs.drag}`;
   return JSON.stringify(manifest, null, 2);
 }
 
@@ -211,6 +216,7 @@ export function assertInstalledFromTarballs(consumerDir: string, tarballs: Tarba
   const expected: Record<(typeof LOCAL_INSTALL_NAMES)[number], string> = {
     '@texuli/core': realpathSync(tarballs.core),
     '@texuli/date': realpathSync(tarballs.date),
+    '@texuli/drag': realpathSync(tarballs.drag),
     '@texuli/tokens': realpathSync(tarballs.tokens),
     '@texuli/primitives': realpathSync(tarballs.primitives),
     texuli: realpathSync(tarballs.texuli),

@@ -1,4 +1,6 @@
 <script lang="ts" generics="T extends TimelineItem">
+import { createPointerTracker } from '@texuli/drag/gesture';
+import { applyModifiers, restrictToAxis, snapToGrid } from '@texuli/drag/modifiers';
 import { type ClassValue, cx } from 'texuli/cx';
 import { addDays, daysBetween, type IsoDate } from '../engines/calendar/dates.ts';
 import { createAxis, windowAxis } from '../engines/grid/virtual.ts';
@@ -96,7 +98,6 @@ let viewportHeight = $state(440);
 let interaction = $state<{
   id: string;
   mode: 'move' | 'resize-start' | 'resize-end';
-  originX: number;
   original: ScheduleTask;
   draft: ScheduleTask;
 } | null>(null);
@@ -160,21 +161,38 @@ function begin(
   event?: PointerEvent
 ): void {
   if (!onReschedule || pending[task.id]) return;
+  // A second pointer (or a non-primary button) never takes over a running drag.
+  if (event && !pointerTracker.down(event)) return;
   const current = positionedTasks.find((item) => item.id === task.id) ?? task;
-  const clientX = event?.clientX ?? 0;
   interaction = {
     id: task.id,
     mode,
-    originX: clientX,
     original: { ...current },
     draft: { ...current },
   };
   if (event) (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
 }
 
-function pointerMove(event: PointerEvent): void {
+// Pointer drags run on @texuli/drag: the tracker owns the lifecycle (no
+// threshold: a press starts the interaction, as before; one pointer;
+// pointercancel = cancel), and modifiers are the time strategy: the travel
+// keeps the inline axis and snaps to whole days.
+const pointerTracker = createPointerTracker({
+  threshold: 0,
+  onMove: (event) => pointerMove(event.delta),
+  onEnd: (event) => {
+    pointerMove(event.delta);
+    void commit();
+  },
+  // A press without travel still commits (a no-op), as the plain pointerup did.
+  onClick: () => void commit(),
+  onCancel: () => cancel(),
+});
+
+function pointerMove(travel: { x: number; y: number }): void {
   if (!interaction) return;
-  const rawDelta = Math.round((event.clientX - interaction.originX) / width);
+  const snapped = applyModifiers([restrictToAxis('x'), snapToGrid({ x: width, y: 0 })], travel);
+  const rawDelta = Math.round(snapped.x / width);
   const delta = direction === 'rtl' ? -rawDelta : rawDelta;
   if (delta === 0) return;
   const { original, mode } = interaction;
@@ -497,9 +515,9 @@ function tickWidth(): number {
                   aria-pressed={interaction?.id === task.id}
                   disabled={!!pending[task.id]}
                   onpointerdown={(event) => begin(task, 'move', event)}
-                  onpointermove={pointerMove}
-                  onpointerup={() => void commit()}
-                  onpointercancel={cancel}
+                  onpointermove={(event) => pointerTracker.move(event)}
+                  onpointerup={(event) => pointerTracker.up(event)}
+                  onpointercancel={(event) => pointerTracker.cancel(event)}
                   onkeydown={(event) => keyTask(task, event)}
                   onclick={() => onOpen?.(task)}
                 >

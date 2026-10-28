@@ -1,12 +1,20 @@
 <script lang="ts">
-import { getPlayerStateAccess } from '../context.ts';
+import { getPlayerInteraction, getPlayerStateAccess } from '../context.ts';
 
 let {
   state: stateName,
+  txPath,
   label,
   placeholder,
-}: { state: string; label: string; placeholder?: string } = $props();
+}: { state: string; label: string; placeholder?: string; txPath?: string } = $props();
 const access = getPlayerStateAccess();
+const interaction = getPlayerInteraction();
+/** Write the variable, then run the node's `on.change` actions (spec 0.3.0). */
+function write(value: unknown): void {
+  if (access?.write(stateName, value) && txPath !== undefined) {
+    interaction?.dispatch(txPath, 'change', { value });
+  }
+}
 const id = $props.id();
 let declaration = $derived(access?.declaration(stateName));
 let maxLength = $derived(declaration?.type === 'string' ? declaration.maxLength : 0);
@@ -29,6 +37,6 @@ function onKeydown(event: KeyboardEvent): void {
     autocomplete="off"
     disabled={!access}
     onkeydown={onKeydown}
-    oninput={(event) => access?.write(stateName, (event.currentTarget as HTMLInputElement).value)}
+    oninput={(event) => write((event.currentTarget as HTMLInputElement).value)}
   />
 </div>

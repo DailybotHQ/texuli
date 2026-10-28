@@ -23,6 +23,9 @@ export {
   type WipStatus,
 } from '../engines/board/board.ts';
 export {
+  type BoardKeyboardText,
+  type BoardPositionValues,
+  DEFAULT_BOARD_KEYBOARD_TEXT,
   describePosition,
   IDLE,
   type KeyboardMoveState,
@@ -30,6 +33,7 @@ export {
   type MoveKey,
   moveIntent,
   pickUp,
+  positionValues,
 } from '../engines/board/keyboard.ts';
 export {
   assertRank,
@@ -42,10 +46,10 @@ export {
 export { default as Board } from './Board.svelte';
 export {
   type BoardPlacement,
-  DRAG_THRESHOLD_PX,
-  indexFromPointer,
+  DEFAULT_MOVE_MENU_TEXT,
   type MoveMenuDestination,
+  type MoveMenuText,
   moveMenuDestinations,
   placementsOf,
 } from './model.ts';
-export type { BoardLabels } from './types.ts';
+export type { BoardLabelOverrides, BoardLabels } from './types.ts';

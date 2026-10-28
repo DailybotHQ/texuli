@@ -568,27 +568,33 @@ and is not built. A real-browser pass is also still to do.
 ### Local state (G01)
 
 A blueprint may declare typed, bounded variables and bind props to them.
-The ADR-003 envelope has no state field yet, so this uses a provisional
-local wrapper:
+From spec 0.3.0 the envelope carries them (`state`, and `flow` for views);
+the player lifts both from the envelope:
 
 ```json
 {
-  "format": "texuli-local-state",
+  "format": "texuli-blueprint",
   "version": 1,
+  "spec": "0.3.0",
   "state": {
     "week": { "type": "enum", "values": ["Week 41", "Week 42"], "initial": "Week 42" },
     "details": { "type": "boolean" }
   },
-  "blueprint": { "id": "layout-page", "props": { "title": { "$state": "week" } } }
+  "tree": { "id": "layout-page", "props": { "title": { "$state": "week" } } }
 }
 ```
+
+The provisional local wrapper from before 0.3.0
+(`{ "format": "texuli-local-state", "version": 1, "state", "flow"?, "blueprint" }`)
+is still accepted.
 
 - **Declarations** (`parseStateDeclarations`):
   - at most 64 variables, with names like `week` or `showDetails`;
   - types `boolean`, `number` (`min` ≤ `max`), `enum` (1–32 distinct strings
-    of at most 64 characters) and `string` (`maxLength` at most 1000, default
-    200);
-  - no objects or arrays;
+    of at most 64 characters), `string` (`maxLength` at most 1000, default
+    200), `list` (items `{ id, ...scalar fields }`, at most `maxItems`, 500
+    by default; string fields refuse control, bidirectional and invisible
+    formatting characters) and `workflow` (a spec workflow graph);
   - an unknown type or field, or an initial value that does not fit, refuses
     the whole blueprint with a visible notice.
 - **Bindings:** a prop value that is exactly `{ "$state": "name" }`, at any
@@ -606,6 +612,30 @@ local wrapper:
   through `onStateChange(snapshot)`, which the host opts into. The player
   never fetches, persists or posts it. A state change re-validates on the
   same handle, so loaded painters are kept.
+
+### Drag between lists (spec 0.3.0 `reorder`)
+
+A `sortable-list` paints its `reorder.bind` list variable. When the tree
+has a reorder container, the player lazily loads one shared drag scope (a
+single `Sortable.Root` around the painted tree, laid out with
+`display: contents`). Every list registers with it, so a pointer drag or a
+keyboard move (Space, arrows past a list's edge, Space) can carry an item
+to another list anywhere in the layout, in reading order.
+
+- **One rule set.** The scope adds no rule. Its drop verdict is the player's
+  `canMove`, a dry run of the same checks `move` commits: both containers
+  enabled, the target `accepts` the source `group` (or shares it), and the
+  closed `moveItem` reducer (`locked`, `pull` move, clone or none, the
+  list's `maxItems`). A drop runs `move`, which commits the state and then
+  the source's `on.move`. What a drag offers is exactly what the data move
+  does.
+- **No id collisions.** Item keys are namespaced per container, so equal
+  item ids in two lists never meet. Clones take the reducer's fresh id.
+- **Other pieces.** A `data-board` moves cards between its columns and
+  writes them to a bound `items` list. A `workflow-graph` in `edit` mode
+  adds palette node types to its canvas and writes the graph to a bound
+  `workflow` variable. The spec golden `lego.json` composes all three (see
+  `tests/lego.test.ts`).
 
 ### Conditional regions (G07)
 

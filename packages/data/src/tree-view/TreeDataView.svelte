@@ -1,6 +1,16 @@
 <script lang="ts" generics="T">
+import type { Point } from '@texuli/drag';
+import { midpointIndex } from '@texuli/drag/collision';
+import { bindPointerGesture, createPointerTracker } from '@texuli/drag/gesture';
+import {
+  type DragMessagesOverrides,
+  type DragMessageValues,
+  formatDragMessage,
+  resolveDragMessages,
+} from '@texuli/drag/messages';
 import type { Snippet } from 'svelte';
 import { tick } from 'svelte';
+import type { Attachment } from 'svelte/attachments';
 import { type ClassValue, cx } from 'texuli/cx';
 import {
   buildTree,
@@ -13,13 +23,7 @@ import {
   type TreeMove,
   type TreeMoveResult,
 } from '../engines/tree/tree.ts';
-import {
-  DRAG_THRESHOLD_PX,
-  dropAsChild,
-  indexFromPointer,
-  placementsOf,
-  type TreePlacement,
-} from './model.ts';
+import { dropAsChild, placementsOf, type TreePlacement } from './model.ts';
 import type { TreeDataViewLabels } from './types.ts';
 
 interface TreeDataViewProps<T> {
@@ -42,6 +46,8 @@ interface TreeDataViewProps<T> {
   /** Custom row body; defaults to the item label. */
   item?: Snippet<[T, { pending: boolean; selected: boolean }]>;
   labels?: Partial<TreeDataViewLabels>;
+  /** Drag announcements (`@texuli/drag` templates), e.g. a localized `pickedUp`. */
+  messages?: DragMessagesOverrides;
   density?: 'comfortable' | 'compact';
   dir?: 'ltr' | 'rtl' | 'auto';
   class?: ClassValue;
@@ -60,6 +66,12 @@ const DEFAULT_LABELS: TreeDataViewLabels = {
   empty: 'No items',
   savingMove: 'Saving move',
   announcement: (message) => message,
+  collapsed: (label) => `Collapsed ${label}.`,
+  expanded: (label) => `Expanded ${label}.`,
+  moved: (label) => `Moved ${label}.`,
+  movedUnder: (label, parent) => `Moved ${label} under ${parent}.`,
+  topLevel: 'the top level',
+  moveFailed: (label) => `${label} was not moved. It returned to its previous position.`,
 };
 
 let {
@@ -79,6 +91,7 @@ let {
   checkboxes = true,
   item: itemSnippet,
   labels: labelOverrides,
+  messages: messageOverrides,
   density = 'comfortable',
   dir,
   class: className,
@@ -88,6 +101,7 @@ const uid = $props.id();
 const instructionsId = `tree-view-${uid}-instructions`;
 const titleId = `tree-view-${uid}-title`;
 const labels = $derived({ ...DEFAULT_LABELS, ...labelOverrides });
+const messages = $derived(resolveDragMessages(messageOverrides));
 
 let pending = $state<Record<string, boolean>>({});
 let placements = $state<Record<string, TreePlacement>>({});
@@ -95,11 +109,9 @@ let loadingIds = $state(new Set<string>());
 let failedIds = $state(new Set<string>());
 let activeId = $state<string | undefined>();
 let announcement = $state('');
+/** The pointer drag in progress (keyboard moves use Alt+Arrow). */
 let drag = $state<{
   id: string;
-  pointerId: number;
-  x: number;
-  y: number;
   active: boolean;
   target: { parentId: string | null; index: number } | null;
 } | null>(null);
@@ -212,13 +224,13 @@ async function toggleExpanded(row: FlatNode<T>): Promise<void> {
   if (!row.hasChildren || pending[row.id]) return;
   if (row.expanded) {
     emitExpanded(expanded.filter((id) => id !== row.id));
-    announce(`Collapsed ${getLabel(row.item)}.`);
+    announce(labels.collapsed(getLabel(row.item)));
     return;
   }
   const ok = await ensureChildren(row.item);
   if (!ok) return;
   if (!expandedSet.has(row.id)) emitExpanded([...expanded, row.id]);
-  announce(`Expanded ${getLabel(row.item)}.`);
+  announce(labels.expanded(getLabel(row.item)));
 }
 
 function toggleSelected(id: string): void {
@@ -247,7 +259,7 @@ async function commit(move: TreeMove, item: T): Promise<void> {
       else delete restored[id];
     }
     placements = restored;
-    announce(`${getLabel(item)} was not moved. It returned to its previous position.`);
+    announce(labels.moveFailed(getLabel(item)));
   } finally {
     const { [move.id]: _done, ...remaining } = pending;
     pending = remaining;
@@ -261,7 +273,7 @@ function applyMoveResult(result: TreeMoveResult, item: T, successMessage?: strin
   }
   if (result.unchanged) return;
   if (successMessage) announce(successMessage);
-  else announce(`Moved ${getLabel(item)}.`);
+  else announce(labels.moved(getLabel(item)));
   void commit(result.move, item);
 }
 
@@ -269,9 +281,9 @@ function moveTo(item: T, target: { parentId: string | null; index: number }): vo
   const result = moveNode(tree, getId(item), target);
   const parentLabel =
     target.parentId === null
-      ? 'the top level'
+      ? labels.topLevel
       : getLabel(itemById(target.parentId) as T) || target.parentId;
-  applyMoveResult(result, item, `Moved ${getLabel(item)} under ${parentLabel}.`);
+  applyMoveResult(result, item, labels.movedUnder(getLabel(item), parentLabel));
 }
 
 function onRowKey(event: KeyboardEvent, row: FlatNode<T>): void {
@@ -382,87 +394,157 @@ function onRowKey(event: KeyboardEvent, row: FlatNode<T>): void {
   }
 }
 
-function onPointerDown(event: PointerEvent, row: FlatNode<T>): void {
-  if (!onMove || event.button !== 0 || pending[row.id]) return;
-  suppressHandleInstructions = false;
-  drag = {
-    id: row.id,
-    pointerId: event.pointerId,
-    x: event.clientX,
-    y: event.clientY,
-    active: false,
-    target: null,
-  };
-  (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
+// ── Pointer drag on the shared @texuli/drag engine ─────────────────────────
+// The gesture tracker owns the drag lifecycle: the 4 px threshold, capture
+// (with a document fallback) and pointercancel. A drop goes through `moveTo`,
+// which asks `moveNode` and voices any refusal, like the keyboard path.
+// The row rects are measured when the drag starts and re-measured only
+// on scroll.
+
+type DropTarget = { parentId: string | null; index: number };
+
+/** Row boxes, measured at drag start and on scroll. */
+let rectById = new Map<string, { x: number; y: number; width: number; height: number }>();
+let stopWatching: (() => void) | null = null;
+/** Where the dragged row started, for the pick-up and cancel announcements. */
+let origin: DragMessageValues = {};
+
+function measureRows(): void {
+  const root = document.getElementById(`tree-view-${uid}`);
+  rectById = new Map(
+    [...(root?.querySelectorAll<HTMLElement>('[data-tree-row-id]') ?? [])].map((node) => {
+      const box = node.getBoundingClientRect();
+      return [
+        node.dataset.treeRowId ?? '',
+        { x: box.left, y: box.top, width: box.width, height: box.height },
+      ];
+    })
+  );
 }
 
-function targetAt(
-  x: number,
-  y: number,
-  movingId: string
-): { parentId: string | null; index: number } | null {
+function textDirection(): 'ltr' | 'rtl' {
   const root = document.getElementById(`tree-view-${uid}`);
-  if (!root) return null;
-  const el = root.ownerDocument.elementFromPoint(x, y)?.closest<HTMLElement>('[data-tree-row-id]');
-  if (!el) return null;
-  const overId = el.dataset.treeRowId;
+  return dir === 'rtl' ||
+    (dir !== 'ltr' && root?.ownerDocument.defaultView?.getComputedStyle(root).direction === 'rtl')
+    ? 'rtl'
+    : 'ltr';
+}
+
+/**
+ * The row under the pointer comes from `elementFromPoint` (the topmost visible
+ * row in a scrolled tree); nesting and the sibling index come from the boxes
+ * measured at drag start and the engine's midpoint search.
+ */
+function targetAt(point: Point, movingId: string): DropTarget | null {
+  const root = document.getElementById(`tree-view-${uid}`);
+  const element = root?.ownerDocument
+    .elementFromPoint(point.x, point.y)
+    ?.closest<HTMLElement>('[data-tree-row-id]');
+  const overId = element && root?.contains(element) ? element.dataset.treeRowId : undefined;
   if (!overId || overId === movingId) return null;
   const over = rowById(overId);
   if (!over) return null;
-
-  const rect = el.getBoundingClientRect();
-  const direction =
-    dir === 'rtl' ||
-    (dir !== 'ltr' && root.ownerDocument.defaultView?.getComputedStyle(root).direction === 'rtl')
-      ? 'rtl'
-      : 'ltr';
-  if (dropAsChild(rect.left, rect.width, x, direction)) {
+  const rect = rectById.get(overId) ?? element?.getBoundingClientRect();
+  if (rect && dropAsChild(rect.x, rect.width, point.x, textDirection())) {
     return { parentId: overId, index: Number.MAX_SAFE_INTEGER };
   }
-
   const parentId = over.parentId;
-  const siblings = (tree.children.get(parentId) ?? [])
+  const middles = (tree.children.get(parentId) ?? [])
     .map((item) => getId(item))
-    .filter((id) => id !== movingId);
-  const middles = siblings
-    .map((id) => root.querySelector<HTMLElement>(`[data-tree-row-id="${CSS.escape(id)}"]`))
-    .filter((node): node is HTMLElement => node !== null)
-    .map((node) => {
-      const box = node.getBoundingClientRect();
-      return box.top + box.height / 2;
-    });
-  return { parentId, index: indexFromPointer(middles, y) };
+    .filter((id) => id !== movingId)
+    .map((id) => rectById.get(id))
+    .filter((box) => box !== undefined)
+    .map((box) => box.y + box.height / 2);
+  return { parentId, index: midpointIndex(middles, point.y) };
 }
 
-function onPointerMove(event: PointerEvent): void {
-  if (!drag || drag.pointerId !== event.pointerId) return;
-  const active =
-    drag.active || Math.hypot(event.clientX - drag.x, event.clientY - drag.y) >= DRAG_THRESHOLD_PX;
-  if (active && !drag.active) {
-    const item = itemById(drag.id);
-    if (item) announce(`Dragging ${getLabel(item)}.`);
+function startDrag(row: FlatNode<T>, point: Point): void {
+  measureRows();
+  const doc = document.getElementById(`tree-view-${uid}`)?.ownerDocument;
+  if (doc) {
+    const onScroll = () => measureRows();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      cancelDrag(true);
+    };
+    doc.addEventListener('scroll', onScroll, true);
+    doc.addEventListener('keydown', onKey, true);
+    stopWatching = () => {
+      doc.removeEventListener('scroll', onScroll, true);
+      doc.removeEventListener('keydown', onKey, true);
+    };
   }
-  drag = {
-    ...drag,
-    active,
-    target: active ? targetAt(event.clientX, event.clientY, drag.id) : drag.target,
+  drag = { id: row.id, active: true, target: null };
+  const parent = row.parentId === null ? undefined : itemById(row.parentId);
+  origin = {
+    item: getLabel(row.item),
+    position: row.position,
+    total: row.siblings,
+    container: parent ? getLabel(parent) : labels.topLevel,
   };
+  announce(formatDragMessage(messages.pickedUp, origin));
+  moveDrag(point);
 }
 
-function onPointerUp(event: PointerEvent): void {
-  if (!drag || drag.pointerId !== event.pointerId) return;
+function moveDrag(point: Point): void {
+  if (!drag) return;
+  const target = targetAt(point, drag.id);
+  drag = { ...drag, target };
+}
+
+function endDrag(point: Point): void {
   const current = drag;
-  drag = null;
-  if (event.target instanceof HTMLElement && event.target.hasPointerCapture?.(event.pointerId)) {
-    event.target.releasePointerCapture(event.pointerId);
-  }
-  if (!current.active) return;
+  if (!current) return;
   // The browser fires a trailing click on the handle after a real drag; the
   // move announcement just made must not be followed by the instructions.
   suppressHandleInstructions = true;
+  const target = targetAt(point, current.id) ?? current.target;
+  finishDrag();
   const item = itemById(current.id);
-  const target = targetAt(event.clientX, event.clientY, current.id) ?? current.target;
-  if (item && target) moveTo(item, target);
+  if (!item || !target) return;
+  moveTo(item, target);
+}
+
+function finishDrag(): void {
+  stopWatching?.();
+  stopWatching = null;
+  drag = null;
+}
+
+function cancelDrag(announceIt: boolean): void {
+  const wasDragging = drag !== null;
+  finishDrag();
+  if (announceIt && wasDragging) announce(formatDragMessage(messages.cancelled, origin));
+}
+
+/** Pointer drags from a row's grip (keyed by id, so re-renders never re-attach it). */
+function dragFrom(id: string): Attachment<HTMLElement> {
+  return (node) => {
+    let blocked = false;
+    const onDown = () => {
+      suppressHandleInstructions = false;
+      blocked = !onMove || Boolean(pending[id]);
+    };
+    node.addEventListener('pointerdown', onDown, true);
+    const dispose = bindPointerGesture(
+      node,
+      createPointerTracker({
+        onStart: (event) => {
+          const row = rowById(id);
+          if (!blocked && row) startDrag(row, event.point);
+        },
+        onMove: (event) => moveDrag(event.point),
+        onEnd: (event) => endDrag(event.point),
+        onCancel: () => cancelDrag(false),
+      }),
+      { listenOn: node.closest<HTMLElement>('[data-tree-view]') ?? node }
+    );
+    return () => {
+      node.removeEventListener('pointerdown', onDown, true);
+      dispose();
+    };
+  };
 }
 
 /**
@@ -475,10 +557,6 @@ function onHandleClick(): void {
     return;
   }
   announce(labels.instructions);
-}
-
-function onPointerCancel(event: PointerEvent): void {
-  if (drag?.pointerId === event.pointerId) drag = null;
 }
 
 function dropTargetFor(row: FlatNode<T>): boolean {
@@ -504,9 +582,6 @@ function dropTargetFor(row: FlatNode<T>): boolean {
   aria-labelledby={titleId}
   dir={dir}
   data-tree-view
-  onpointermove={onPointerMove}
-  onpointerup={onPointerUp}
-  onpointercancel={onPointerCancel}
 >
   <h2 id={titleId} class="tx-tree-view__sr-only">{labels.tree}</h2>
   <p id={instructionsId} class="tx-tree-view__sr-only">{labels.instructions}</p>
@@ -558,7 +633,7 @@ function dropTargetFor(row: FlatNode<T>): boolean {
               data-tree-handle
               aria-label={labels.dragHandle(itemLabel)}
               disabled={pending[row.id]}
-              onpointerdown={(event) => onPointerDown(event, row)}
+              {@attach dragFrom(row.id)}
               onclick={onHandleClick}
             >
               <span class="tx-tree-view__grip" aria-hidden="true">⠿</span>

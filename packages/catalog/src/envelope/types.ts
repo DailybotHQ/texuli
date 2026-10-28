@@ -1,3 +1,4 @@
+import { SPEC_MIGRATIONS, UNDECLARED_SPEC_VERSION } from '@texuli/spec/migrate';
 import type { EditOp } from '../edit/types.ts';
 import type { CatalogTreeInput, RenderTier } from '../render/renderer/types.ts';
 
@@ -12,6 +13,14 @@ export const ENVELOPE_VERSION = 1;
  * entry is refused, never guessed at.
  */
 export const SUPPORTED_ENVELOPE_VERSIONS = [ENVELOPE_VERSION] as const;
+
+/**
+ * The spec versions an envelope's `spec` may name: the newest step of the
+ * migration chain (`@texuli/spec/migrate`). Older envelopes migrate first.
+ */
+export const SUPPORTED_SPEC_VERSIONS: readonly string[] = Object.freeze([
+  SPEC_MIGRATIONS[SPEC_MIGRATIONS.length - 1]?.to ?? UNDECLARED_SPEC_VERSION,
+]);
 
 /**
  * Lifecycle: an agent or builder writes a `draft`; validation makes it
@@ -95,6 +104,16 @@ export interface BlueprintEnvelope {
   activatedBy?: EnvelopeActivation;
   /** Oldest first; at most `MAX_PROVENANCE` entries are kept. */
   provenance?: readonly ProvenanceEntry[];
+  /**
+   * The spec version the envelope was written for (spec 0.3.0). Omitted
+   * means 0.2.0; `validateDraft` migrates before parsing, so a validated
+   * envelope always carries the current version.
+   */
+  spec?: string;
+  /** Local state declarations (spec 0.3.0 `state`), checked by `@texuli/spec`. */
+  state?: Readonly<Record<string, unknown>>;
+  /** The declared flow of views (spec 0.3.0 `flow`), checked by `@texuli/spec`. */
+  flow?: Readonly<Record<string, unknown>>;
   tree: CatalogTreeInput;
 }
 

@@ -25,6 +25,7 @@ import {
   setPlayerActionAccess,
   setPlayerFlowAccess,
   setPlayerHostRegions,
+  setPlayerInteraction,
   setPlayerLabels,
   setPlayerLandmarks,
   setPlayerStateAccess,
@@ -47,6 +48,7 @@ import {
 import { PLAYER_LOADERS } from './loaders.ts';
 import { applyMediaPolicy } from './media-policy.ts';
 import PlayerNode from './PlayerNode.svelte';
+import { withNodePath } from './painters/interactive.ts';
 import { isHostRegionName } from './region-manifests.ts';
 import {
   applySelection,
@@ -61,14 +63,22 @@ import {
   siblingPaths,
 } from './selection.ts';
 import { DEFAULT_LOAD_TIMEOUT_MS, skeletonFamily, withLoadTimeout } from './skeletons.ts';
-import { resolveStateBindings, splitStatefulBlueprint } from './state/bind.ts';
+import {
+  type NodeInteraction,
+  type ResolveOptions,
+  resolveStateBindings,
+  splitStatefulBlueprint,
+} from './state/bind.ts';
 import { checkControlBindings } from './state/controls.ts';
 import { checkFlowNodes, nextFlowView } from './state/flow.ts';
+import { type EventDetail, moveListItem, runActions } from './state/reducers.ts';
 import {
   coerceStateValue,
   initialSnapshot,
+  type ListItem,
   type StateIssue,
   type StateSnapshot,
+  type StateValue,
 } from './state/schema.ts';
 import type { PlayerPaintNode } from './types.ts';
 
@@ -390,31 +400,58 @@ $effect.pre(() => {
     untrack(() => onStateChange?.(next));
   }
 });
-let resolved = $derived.by((): { blueprint: unknown; issues: readonly StateIssue[] } => {
-  if (split.kind === 'invalid') return { blueprint: null, issues: split.issues };
-  // State-only controls must each name a declared variable of the type they write.
-  // Flow nodes must name declared views and events (G09).
-  if (split.kind === 'plain') {
-    return {
-      blueprint: split.blueprint,
-      issues: [
-        ...checkControlBindings(split.blueprint, null),
-        ...checkFlowNodes(split.blueprint, null),
-        ...checkActionNodes(split.blueprint, null),
-      ],
-    };
-  }
-  const bound = resolveStateBindings(split.blueprint, stateValues);
-  const controls = [
-    ...checkControlBindings(split.blueprint, split.declarations),
-    ...checkFlowNodes(split.blueprint, split.flow),
-    ...checkActionNodes(split.blueprint, split.declarations),
-    ...checkHostBoundWriters(split.blueprint, split.declarations),
-  ];
-  return controls.length > 0
-    ? { blueprint: bound.blueprint, issues: [...bound.issues, ...controls] }
-    : bound;
+const NO_INTERACTIONS: ReadonlyMap<string, NodeInteraction> = new Map();
+// What bind, on and reorder name, read by the resolver: bindable props come from the catalog.
+let resolveOptions = $derived<ResolveOptions>({
+  ...(dataSources ? { dataSources } : {}),
+  bindable: (id) => catalog.get(id)?.bindable,
+  writable: (name) =>
+    split.kind === 'stateful' &&
+    Object.hasOwn(split.declarations, name) &&
+    split.declarations[name]?.source === undefined,
 });
+let resolved = $derived.by(
+  (): {
+    blueprint: unknown;
+    issues: readonly StateIssue[];
+    interactions: ReadonlyMap<string, NodeInteraction>;
+  } => {
+    if (split.kind === 'invalid') {
+      return { blueprint: null, issues: split.issues, interactions: NO_INTERACTIONS };
+    }
+    // State-only controls must each name a declared variable of the type they write.
+    // Flow nodes must name declared views and events (G09).
+    if (split.kind === 'plain') {
+      // A plain tree still reads host data and may run actions that need no state.
+      const plain = resolveStateBindings(split.blueprint, NO_STATE, resolveOptions);
+      return {
+        blueprint: plain.blueprint,
+        interactions: plain.interactions,
+        issues: [
+          ...plain.issues,
+          ...checkControlBindings(split.blueprint, null),
+          ...checkFlowNodes(split.blueprint, null),
+          ...checkActionNodes(split.blueprint, null),
+        ],
+      };
+    }
+    const bound = resolveStateBindings(split.blueprint, stateValues, resolveOptions);
+    const controls = [
+      ...checkControlBindings(split.blueprint, split.declarations),
+      ...checkFlowNodes(split.blueprint, split.flow),
+      ...checkActionNodes(split.blueprint, split.declarations),
+      ...checkHostBoundWriters(split.blueprint, split.declarations),
+    ];
+    return controls.length > 0
+      ? {
+          blueprint: bound.blueprint,
+          issues: [...bound.issues, ...controls],
+          interactions: bound.interactions,
+        }
+      : bound;
+  }
+);
+let interactions = $derived(resolved.interactions);
 let stateIssues = $derived(resolved.issues);
 let conditionInputs = $derived(stateConditionInputs(stateValues));
 // The inputs the current player handle last evaluated with.
@@ -556,6 +593,149 @@ setPlayerFlowAccess({
   dispatch: (event) => dispatchFlow(event),
 });
 
+// Spec 0.3.0 interaction: on, bind and reorder, through the closed reducers only.
+function commitSnapshot(next: StateSnapshot): void {
+  stateValues = next;
+  liveState = next;
+  onStateChange?.(next);
+}
+
+let actionSequence = 0;
+
+/** Run `actions` for `event`; refused lists change nothing and are announced. */
+function runNodeActions(
+  actions: readonly unknown[],
+  event: string,
+  detail: EventDetail | undefined,
+  form: { submit(): void } | null | undefined
+): boolean {
+  const declarations = split.kind === 'stateful' ? split.declarations : {};
+  const result = runActions(actions, {
+    snapshot: stateValues,
+    declarations,
+    event,
+    ...(detail ? { detail } : {}),
+    inForm: form !== null && form !== undefined,
+  });
+  if (!result.ok) {
+    announcePolite(resolvedLabels.actionRefused);
+    return false;
+  }
+  if (result.changed.length > 0) commitSnapshot(result.snapshot);
+  for (const effect of result.effects) {
+    if (effect.kind === 'flow') dispatchFlow(effect.event);
+    else if (effect.kind === 'submit') form?.submit();
+    else {
+      actionSequence += 1;
+      const intent = Object.freeze({
+        id: `emit-${actionSequence}`,
+        action: effect.intent,
+        values: effect.values,
+      });
+      void Promise.resolve(onAction ? onAction(intent) : 'unavailable').catch(() => undefined);
+    }
+  }
+  return true;
+}
+
+function reorderOf(path: string) {
+  const node = interactions.get(path);
+  const reorder = node?.reorder;
+  if (!reorder) return null;
+  const list = stateValues[reorder.list];
+  if (!Array.isArray(list)) return null;
+  return { node, reorder, list: list as readonly ListItem[] };
+}
+
+const stringList = (value: unknown): readonly string[] =>
+  Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : [];
+
+const pullOf = (value: unknown): 'move' | 'clone' | 'none' =>
+  value === 'clone' || value === 'none' ? value : 'move';
+
+/**
+ * The one reorder rule set (spec 0.3.0): both containers enabled, the target
+ * accepting the source's group across containers, and the closed `moveItem`
+ * reducer (locked, pull, maxItems). `null` when the move is refused. The UI
+ * drag asks it before a drop (`canMove`) and the move commits its result, so
+ * what a drag offers is exactly what `move` does.
+ */
+function planMove(fromPath: string, item: string, toPath: string, index: number) {
+  const source = reorderOf(fromPath);
+  const target = reorderOf(toPath);
+  if (!source || !target || source.reorder.disabled === true || target.reorder.disabled === true)
+    return null;
+  if (fromPath !== toPath) {
+    // Containers exchange items only when the target accepts the source's group.
+    const group = typeof source.reorder.group === 'string' ? source.reorder.group : undefined;
+    if (
+      group === undefined ||
+      !stringList(target.reorder.accepts)
+        .concat(typeof target.reorder.group === 'string' ? [target.reorder.group] : [])
+        .includes(group)
+    ) {
+      return null;
+    }
+  }
+  const declarations = split.kind === 'stateful' ? split.declarations : {};
+  const maxItems: Record<string, number> = {};
+  for (const name of [source.reorder.list, target.reorder.list]) {
+    const declaration = declarations[name];
+    if (declaration?.type === 'list') maxItems[name] = declaration.maxItems;
+  }
+  const moved = moveListItem(
+    { [source.reorder.list]: source.list, [target.reorder.list]: target.list },
+    maxItems,
+    { from: source.reorder.list, item, to: target.reorder.list, index },
+    { locked: stringList(source.reorder.locked), pull: pullOf(source.reorder.pull) }
+  );
+  return moved.ok ? { source, lists: moved.lists } : null;
+}
+
+setPlayerInteraction({
+  dispatch(path, event, detail, form) {
+    const actions = interactions.get(path)?.on?.[event];
+    return actions ? runNodeActions(actions, event, detail, form) : true;
+  },
+  bound: (path, prop) => interactions.get(path)?.bind?.[prop] !== undefined,
+  write(path, prop, value) {
+    const name = interactions.get(path)?.bind?.[prop];
+    return name !== undefined && setState(name, value);
+  },
+  reorder(path) {
+    const found = reorderOf(path);
+    if (!found) return null;
+    const { reorder, list } = found;
+    const axis =
+      reorder.axis === 'horizontal' || reorder.axis === 'grid' ? reorder.axis : 'vertical';
+    const declaration = split.kind === 'stateful' ? split.declarations[reorder.list] : undefined;
+    return {
+      list,
+      axis,
+      ...(typeof reorder.group === 'string' ? { group: reorder.group } : {}),
+      accepts: stringList(reorder.accepts),
+      pull: pullOf(reorder.pull),
+      ...(declaration?.type === 'list' ? { maxItems: declaration.maxItems } : {}),
+      disabled: reorder.disabled === true,
+      locked: stringList(reorder.locked),
+    };
+  },
+  canMove: (fromPath, item, toPath, index) => planMove(fromPath, item, toPath, index) !== null,
+  move(fromPath, item, toPath, index) {
+    const planned = planMove(fromPath, item, toPath, index);
+    if (!planned) {
+      announcePolite(resolvedLabels.actionRefused);
+      return false;
+    }
+    const next: Record<string, StateValue> = { ...stateValues };
+    for (const [name, list] of Object.entries(planned.lists)) next[name] = list;
+    commitSnapshot(Object.freeze(next));
+    const actions = planned.source.node?.on?.move;
+    if (actions) runNodeActions(actions, 'move', undefined, null);
+    return true;
+  },
+});
+
 // Nothing painted may submit (D14): a submit from a host form wrapper or a
 // painted component is cancelled at the surface. A form the host mounted in
 // one of its own regions is host chrome, so its submit goes through.
@@ -598,7 +778,11 @@ const adapter: PaintAdapter<PlayerPaintNode> = {
       id: node.id,
       path: node.path,
       // Media policy after the URL policy: trust pinned, no autoplay, controls on.
-      props: applyMediaPolicy(node.id, node.props, resolvedLabels),
+      props: withNodePath(
+        node.id,
+        node.path,
+        applyMediaPolicy(node.id, node.props, resolvedLabels)
+      ),
       component: component as Component<Record<string, unknown>>,
       children,
       ...(frames.has(node.path) ? { frame: frames.get(node.path) } : {}),
@@ -640,6 +824,16 @@ let paintNodes = $derived.by(() => {
   playerState;
   loadRevision;
   return player?.paintNow(adapter) ?? [];
+});
+
+// The shared drag scope (spec 0.3.0 reorder), loaded only when a node reorders.
+let hasReorder = $derived([...interactions.values()].some((node) => node.reorder !== undefined));
+let ReorderScope = $state.raw<Component<{ children: Snippet }> | null>(null);
+$effect(() => {
+  if (!hasReorder || ReorderScope !== null) return;
+  void import('./painters/ReorderScope.svelte').then((module) => {
+    ReorderScope = module.default;
+  });
 });
 
 function countKind(nodes: readonly PlayerPaintNode[], kind: PlayerPaintNode['kind']): number {
@@ -839,6 +1033,12 @@ $effect(() => {
 });
 </script>
 
+
+{#snippet painted()}
+  {#each paintNodes as node (node.path)}
+    <PlayerNode {node} {onNodeError} />
+  {/each}
+{/snippet}
 <section
   bind:this={root}
   class="tx-player"
@@ -903,9 +1103,12 @@ $effect(() => {
       onclick={onSurfaceClick}
       onsubmit={onSurfaceSubmit}
     >
-      {#each paintNodes as node (node.path)}
-        <PlayerNode {node} {onNodeError} />
-      {/each}
+      {#if !hasReorder}
+        {@render painted()}
+      {:else if ReorderScope}
+        <!-- One drag scope for every reorder container (lists of a group exchange items). -->
+        <ReorderScope children={painted} />
+      {/if}
     </div>
     {#if !playerState.validation.ok}
       <p class="tx-player__preview-warning">

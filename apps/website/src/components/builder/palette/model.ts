@@ -10,6 +10,7 @@ export const PALETTE_GROUPS = [
   'Content blocks',
   'Charts',
   'Media',
+  'Data views',
   'Interaction',
   'Chat display',
 ] as const;
@@ -60,7 +61,8 @@ export function paletteGroup(manifest: Pick<CatalogManifest, 'id' | 'package'>):
   if (manifest.id.startsWith('charts-')) return 'Charts';
   if (manifest.id.startsWith('media-')) return 'Media';
   if (manifest.id.startsWith('chat-')) return 'Chat display';
-  if (/^(control|flow|action|form|host)-/.test(manifest.id)) return 'Interaction';
+  if (manifest.id.startsWith('data-') || manifest.id === 'workflow-graph') return 'Data views';
+  if (/^(control|flow|action|form|host|sortable)-/.test(manifest.id)) return 'Interaction';
   return 'Content blocks';
 }
 

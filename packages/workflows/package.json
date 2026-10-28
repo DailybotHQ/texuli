@@ -1,0 +1,73 @@
+{
+  "name": "@texuli/workflows",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Interactive, accessible workflow graph editor and viewer for Texuli, built on @texuli/drag.",
+  "keywords": [
+    "workflow",
+    "graph",
+    "editor",
+    "svelte",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
+  "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/workflows"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./model": {
+      "types": "./src/model/index.ts",
+      "default": "./src/model/index.ts"
+    },
+    "./layout": {
+      "types": "./src/layout/index.ts",
+      "default": "./src/layout/index.ts"
+    },
+    "./spec-adapter": {
+      "types": "./src/model/spec-adapter.ts",
+      "default": "./src/model/spec-adapter.ts"
+    },
+    "./editor": {
+      "types": "./src/editor/index.ts",
+      "svelte": "./src/editor/index.ts",
+      "default": "./src/editor/index.ts"
+    },
+    "./viewer": {
+      "types": "./src/viewer/index.ts",
+      "svelte": "./src/viewer/index.ts",
+      "default": "./src/viewer/index.ts"
+    },
+    "./inspector": {
+      "types": "./src/inspector/index.ts",
+      "svelte": "./src/inspector/index.ts",
+      "default": "./src/inspector/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/core": "workspace:*",
+    "@texuli/drag": "workspace:*",
+    "@texuli/primitives": "workspace:*",
+    "@texuli/tokens": "workspace:*",
+    "texuli": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  }
+}

@@ -158,3 +158,7 @@ the [service contract and runbook](docs/service-runbook.md).
 `POST /v1/csp-reports` receives CSP violation reports from texuli.com pages
 when a site build binds `PUBLIC_TEXULI_CSP_REPORT_URL`, and keeps only reduced,
 counted fields. See [docs/csp-reports.md](docs/csp-reports.md).
+
+---
+
+Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-agent).

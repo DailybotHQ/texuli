@@ -17,18 +17,6 @@ export function placementsOf(move: TreeMove): Record<string, TreePlacement> {
   return placements;
 }
 
-/** Pointer travel before a press becomes a drag, preserving ordinary clicks. */
-export const DRAG_THRESHOLD_PX = 4;
-
-/**
- * Drop index among a sibling list from pointer Y and each row's vertical
- * midpoint. Rows whose midpoint is above the pointer sit before the drop.
- */
-export function indexFromPointer(middles: readonly number[], y: number): number {
-  const index = middles.findIndex((middle) => y < middle);
-  return index === -1 ? middles.length : index;
-}
-
 /**
  * Nest a drop under a row when the pointer sits in the trailing third of the
  * row's inline box (logical end), matching outline editors.

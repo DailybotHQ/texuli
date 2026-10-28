@@ -2,6 +2,8 @@ package com.texuli.conformance
 
 import com.texuli.compose.BindingStatus
 import com.texuli.compose.NativeRegistry
+import com.texuli.spec.JsonValue
+import com.texuli.spec.SpecComponentCapability
 import com.texuli.spec.SpecVocabulary
 import com.texuli.spec.runtime.LoadResult
 import com.texuli.spec.runtime.PlanNode
@@ -16,8 +18,8 @@ import kotlin.test.fail
  * The fourth KMP app migration check (native/docs/kmp-voicechat-migration.md):
  * the KMPAIVoiceChat chat and realtime screens, expressed as blueprints in the
  * portable vocabulary, load on the native target with every widget painted;
- * the transcript in its natural chat-thread / chat-message form is refused
- * with exact diagnostics, because those ids are not in the spec vocabulary.
+ * the transcript in its natural chat-thread / chat-message form validates
+ * once the app's roles are mapped (spec 0.3.0), but has no native painter yet.
  * A binding or vocabulary change that lands fails here until the doc moves too.
  */
 class KmpVoiceChatMigrationTest {
@@ -63,32 +65,58 @@ class KmpVoiceChatMigrationTest {
     }
 
     @Test
-    fun theChatThreadFormIsRefusedWithExactDiagnostics() {
-        val result = loadBlueprint(fixture("kmp-voicechat-thread"))
-        val refused = result as? LoadResult.Refused ?: fail("the chat-thread form loaded; update the migration doc")
+    fun theChatThreadFormValidatesWithTheAppRolesMapped() {
+        // The app's "assistant" turn is the catalog's `agent` role, and every
+        // message names an author: the shape the TypeScript validator accepts
+        // too (native/conformance/web/structure.ts checks the same fixture).
+        val root = plan("kmp-voicechat-thread")
+        assertEquals(listOf("blocks-text", "chat-thread"), root.children.map { it.id })
+        val messages = (root.children[1] as PlanNode.Component).children.map { it as PlanNode.Component }
+        assertEquals(listOf("chat-message", "chat-message"), messages.map { it.id })
+        assertEquals(listOf("user", "agent"), messages.map { (it.props["role"] as JsonValue.Str).value })
+        assertTrue(messages.all { it.props["author"] is JsonValue.Str })
+        // Validated and planned, but painted as a `not-on-this-target` placeholder:
+        // the portable chat fixture stays the form that paints natively.
+        for (id in listOf("chat-thread", "chat-message")) {
+            assertEquals(BindingStatus.PLACEHOLDER, NativeRegistry.status(id), "$id gained a native painter; revisit the transcript mapping")
+        }
+    }
+
+    @Test
+    fun theUnmappedAppTranscriptIsRefusedWithExactDiagnostics() {
+        // The transcript copied as the app models it (no author, role "assistant").
+        val unmapped = fixture("kmp-voicechat-thread")
+            .replace("\"author\": \"Fictional Person\",", "")
+            .replace("\"author\": \"Fictional Agent\",", "")
+            .replace("\"role\": \"agent\"", "\"role\": \"assistant\"")
+        val refused = loadBlueprint(unmapped) as? LoadResult.Refused ?: fail("the unmapped transcript loaded; update the migration doc")
         assertEquals(
             listOf(
-                Triple("unknown-id", "\$.tree.children[1].id", "chat-thread"),
-                Triple("unknown-id", "\$.tree.children[1].children[0].id", "chat-message"),
-                Triple("unknown-id", "\$.tree.children[1].children[1].id", "chat-message"),
+                Triple("missing-required", "\$.tree.children[1].children[0].props.author", "chat-message"),
+                Triple("enum-value", "\$.tree.children[1].children[1].props.role", "chat-message"),
+                Triple("missing-required", "\$.tree.children[1].children[1].props.author", "chat-message"),
             ),
             refused.diagnostics.map { Triple(it.code.wire, it.path, it.id) },
         )
     }
 
     @Test
-    fun theVocabularyHasNoChatOrAudioIdsYet() {
+    fun theVocabularyHasChatIdsButNoAudioIds() {
         val ids = SpecVocabulary.components.map { it.id }
-        assertTrue(ids.none { it.startsWith("chat-") }, "a chat-* id reached the spec vocabulary; revisit the transcript mapping")
+        assertTrue(ids.containsAll(listOf("chat-thread", "chat-message")), "a chat id left the spec vocabulary")
+        assertTrue("chat-composer" !in ids, "chat-composer reached the spec vocabulary; a composer is host chrome")
         assertTrue(ids.none { "audio" in it }, "an audio id reached the spec vocabulary; revisit the voice playback mapping")
     }
 
     @Test
     fun theComposerAndRecordingControlsHaveNoBlueprintForm() {
-        // Text field, send, microphone, cancel and stop stay app code: none of these ids can be emitted.
+        // Microphone, cancel and stop stay app code: none of these ids can be emitted.
         for (id in listOf("button", "icon-button", "input", "textarea")) {
             val component = SpecVocabulary.components.single { it.id == id }
-            assertTrue(component.emit.isEmpty(), "$id became emittable; revisit the KMPAIVoiceChat composer mapping")
+            assertTrue(component.emit.isEmpty(), "$id became emittable; revisit the KMPAIVoiceChat recording controls mapping")
         }
+        // The text field + send pair is host chrome on every target (player design
+        // section 8): a blueprint never supplies a composer.
+        assertTrue(SpecVocabulary.components.none { it.id == "chat-composer" }, "chat-composer reached the spec vocabulary; a composer is host chrome")
     }
 }

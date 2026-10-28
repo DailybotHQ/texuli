@@ -1,5 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
-import { groupBoard, indexFromPointer, placementsOf, validateMove } from '@texuli/data/board';
+import * as boardModule from '@texuli/data/board';
+import { groupBoard, placementsOf, validateMove } from '@texuli/data/board';
+import { midpointIndex } from '@texuli/drag/collision';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { moveMenuDestinations } from '../src/board/model.ts';
 import BoardHarness from './fixtures/BoardHarness.svelte';
@@ -12,8 +14,11 @@ afterEach(() => {
 describe('@texuli/data/board', () => {
   it('exports pure pointer placement helpers and includes every reranked item, and 7 related cases', async () => {
     // exports pure pointer placement helpers and includes every reranked item
-    expect(indexFromPointer([10, 30], 20)).toBe(1);
-    expect(indexFromPointer([10, 30], 40)).toBe(2);
+    // Pointer placement now comes from the shared engine; the local copy is gone.
+    expect(midpointIndex([10, 30], 20)).toBe(1);
+    expect(midpointIndex([10, 30], 40)).toBe(2);
+    expect('indexFromPointer' in boardModule).toBe(false);
+    expect('DRAG_THRESHOLD_PX' in boardModule).toBe(false);
     expect(
       placementsOf({
         itemId: 'a',

@@ -1,17 +1,22 @@
 <script lang="ts">
-import { TreeDataView, type TreeMove } from '../../src/tree-view/index.ts';
+import type { DragMessagesOverrides } from '@texuli/drag/messages';
+import { TreeDataView, type TreeDataViewLabels, type TreeMove } from '../../src/tree-view/index.ts';
 
 let {
   checkboxes = true,
   dir = 'ltr' as 'ltr' | 'rtl',
   selectedIds = [] as string[],
   readOnly = false,
+  labels,
+  messages,
 }: {
   checkboxes?: boolean;
   dir?: 'ltr' | 'rtl';
   selectedIds?: string[];
   /** Renders without `onMove`: a read-only tree. */
   readOnly?: boolean;
+  labels?: Partial<TreeDataViewLabels>;
+  messages?: DragMessagesOverrides;
 } = $props();
 
 interface Node {
@@ -78,6 +83,8 @@ function onMove(move: TreeMove): void {
   {loadChildren}
   {onChildrenLoaded}
   onMove={readOnly ? undefined : onMove}
+  {labels}
+  {messages}
 >
   {#snippet item(node)}
     <span data-node-title={node.id}>{node.title}</span>

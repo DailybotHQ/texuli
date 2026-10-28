@@ -102,3 +102,7 @@ analytics and edge logic, polish and honesty guards. The other gates are
 Playwright specs in `tests/e2e/site-*.spec.ts` (plus `site-aeo`,
 `analytics` and `analytics-fixture`). To add a page, follow
 [`.agents/skills/add-website-page/SKILL.md`](../../.agents/skills/add-website-page/SKILL.md).
+
+---
+
+Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-website).

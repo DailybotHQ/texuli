@@ -7,10 +7,20 @@
 import type {
   SpecCatalog,
   SpecComponent,
+  SpecDeprecation,
+  SpecEventName,
   SpecProp,
+  SpecPropSchema,
 } from '../generated/typescript/catalog-schema.ts';
 
-export type { SpecCatalog, SpecComponent, SpecProp };
+export type {
+  SpecCatalog,
+  SpecComponent,
+  SpecDeprecation,
+  SpecEventName,
+  SpecProp,
+  SpecPropSchema,
+};
 
 export const CAPABILITIES = ['portable-core', 'web-only', 'native-only', 'unknown'] as const;
 export type Capability = SpecComponent['capability'];
@@ -34,18 +44,24 @@ export interface BuiltCatalogLike {
     group: string;
     tier: 'app' | 'content';
     emit: readonly string[];
+    events?: readonly SpecEventName[];
+    bindable?: readonly string[];
+    deprecated?: SpecDeprecation;
     props: readonly {
       name: string;
       kind: SpecPropKind;
       required?: boolean;
       enumValues?: readonly string[];
+      schema?: SpecPropSchema;
+      deprecated?: SpecDeprecation;
     }[];
   }[];
 }
 
 /**
  * Project a built catalog into the spec vocabulary. Deterministic: components
- * sorted by id, props by name, emit tiers sorted. Capability is `unknown`
+ * sorted by id, props by name, emit tiers, events and bindable props sorted;
+ * events, bindable, property schemas and deprecations only when present. Capability is `unknown`
  * unless `capabilities` (the reviewed `catalog/capabilities.json`) records an
  * audited value (ADR-003: no id is portable until audited).
  */
@@ -77,8 +93,13 @@ export function projectCatalog(
             ...(WEB_ONLY_KINDS.includes(prop.kind) || WEB_ONLY_PROP_NAMES.includes(prop.name)
               ? { extension: 'web' as const }
               : {}),
+            ...(prop.schema ? { schema: prop.schema } : {}),
+            ...(prop.deprecated ? { deprecated: { ...prop.deprecated } } : {}),
           })
         ),
+        ...(entry.events?.length ? { events: [...entry.events].sort() } : {}),
+        ...(entry.bindable?.length ? { bindable: [...entry.bindable].sort() } : {}),
+        ...(entry.deprecated ? { deprecated: { ...entry.deprecated } } : {}),
       })
     );
   return { catalogHash, components };

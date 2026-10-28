@@ -1,0 +1,116 @@
+{
+  "golden": "mobile-flow",
+  "trace": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "id": "blocks-text",
+                  "role": "paragraph"
+                },
+                {
+                  "id": "media-image",
+                  "name": "People working at a shared table",
+                  "role": "img"
+                },
+                {
+                  "id": "flow-action",
+                  "role": "generic"
+                }
+              ],
+              "id": "flow-view",
+              "role": "generic"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "id": "form-field",
+                      "role": "generic"
+                    },
+                    {
+                      "id": "form-field",
+                      "role": "generic"
+                    },
+                    {
+                      "id": "form-field",
+                      "role": "generic"
+                    },
+                    {
+                      "id": "control-slider",
+                      "role": "generic"
+                    },
+                    {
+                      "id": "form-submit",
+                      "role": "generic"
+                    }
+                  ],
+                  "id": "action-form",
+                  "role": "generic"
+                }
+              ],
+              "id": "flow-view",
+              "role": "generic"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "id": "form-field",
+                      "role": "generic"
+                    },
+                    {
+                      "id": "form-field",
+                      "role": "generic"
+                    },
+                    {
+                      "id": "control-toggle",
+                      "role": "generic"
+                    },
+                    {
+                      "id": "form-submit",
+                      "role": "generic"
+                    }
+                  ],
+                  "id": "action-form",
+                  "role": "generic"
+                },
+                {
+                  "id": "flow-action",
+                  "role": "generic"
+                }
+              ],
+              "id": "flow-view",
+              "role": "generic"
+            },
+            {
+              "children": [
+                {
+                  "id": "blocks-text",
+                  "name": "Reserved",
+                  "role": "note"
+                },
+                {
+                  "id": "flow-action",
+                  "role": "generic"
+                }
+              ],
+              "id": "flow-view",
+              "role": "generic"
+            }
+          ],
+          "id": "layout-stack",
+          "role": "generic"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Workshop sign-up",
+      "role": "main"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+---
+/**
+ * /workflows-page/json/ — the JSON live preview: edit a blueprint, validate
+ * it, and paint it with @texuli/player at the untrusted tier, in the browser.
+ */
+import JsonPreviewApp from '../../../components/workflows-site/json/JsonPreviewApp.svelte';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="JSON live preview"
+  description="Edit a Texuli blueprint as JSON, see the validator's diagnostics with their JSON paths, and watch @texuli/player paint it at the untrusted tier. Everything runs in your browser."
+>
+  <div class="json-page" data-tx-json-page="">
+    <header class="json-page__header">
+      <p class="eyebrow">@texuli/player · spec 0.3.0</p>
+      <h1>JSON live preview</h1>
+      <p class="lead">
+        Texuli builds interfaces from validated JSON. Edit a blueprint on the left: it is
+        checked as you type, and only a blueprint with no errors is painted by the real player,
+        at the untrusted tier an agent's output gets. Nothing you type leaves the browser.
+      </p>
+    </header>
+
+    <JsonPreviewApp client:visible />
+
+    <section class="json-page__notes" aria-labelledby="json-page-how">
+      <h2 id="json-page-how">How the preview works</h2>
+      <ol>
+        <li>
+          <strong>Parse.</strong> The text must be JSON; a syntax error is reported with its line
+          and column.
+        </li>
+        <li>
+          <strong>Validate.</strong> The same checks the player runs: the local-state
+          declarations, the player's binding checks and <code>validateDraft</code> from
+          <code>@texuli/catalog/validate</code> with the player catalog (component ids, prop schemas,
+          bindings, events and closed actions, block schemas, composition grammar and the untrusted
+          URL policy). Each diagnostic lists its code, its message and its JSON path.
+        </li>
+        <li>
+          <strong>Paint or refuse.</strong> With no errors, <code>&lt;Player&gt;</code> paints the
+          blueprint at the <code>untrusted</code> tier and validates it again. With any error the
+          preview is cleared, never left showing an older result, and the status reads
+          “Not rendered”.
+        </li>
+      </ol>
+      <h2 id="json-page-status">What is in development</h2>
+      <ul>
+        <li>
+          The player's runtime for the spec 0.3.0 interaction fields (local state in the envelope,
+          <code>on</code> actions, <code>reorder</code> and workflow graphs) is in development and
+          is not in a published release yet.
+        </li>
+        <li>
+          <code>@texuli/workflows</code>, which paints the <code>workflow-graph</code> node, is in
+          development and not on npm. The preview shows graphs read-only.
+        </li>
+        <li>
+          This page does not run the spec's own structural validator
+          (<code>validateBlueprint</code> from <code>@texuli/spec</code>); the player's checks
+          above decide what paints.
+        </li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .json-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+  .eyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0.5rem 0 0;
+    max-inline-size: 44rem;
+    color: var(--tx-foreground);
+    font-size: 1.0625rem;
+  }
+  .json-page__notes {
+    max-inline-size: 48rem;
+    color: var(--tx-foreground);
+  }
+  .json-page__notes h2 {
+    margin: 1rem 0 0.5rem;
+    font-size: 1.25rem;
+  }
+  .json-page__notes ol,
+  .json-page__notes ul {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+  }
+</style>

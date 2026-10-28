@@ -84,11 +84,17 @@ jobs:
           # Wave 174 — the L0 texels and the L2 token engine.
           publish packages/core
           publish packages/date
+          # L0 packages that later waves depend on: catalog and player import the
+          # spec; primitives, data and workflows import the drag engine.
+          publish packages/spec
+          publish packages/drag
           publish packages/tokens
           # Wave 175 — L1 headless primitives.
           publish packages/primitives
           # Wave 176 — L3 styled components.
           publish packages/texuli
+          # L4: the workflow editor, after texuli and before the player.
+          publish packages/workflows
           # Wave 177 — L4 domain packages.
           publish packages/charts
           publish packages/data
@@ -101,14 +107,13 @@ jobs:
           publish packages/astro
           publish packages/player
           publish packages/slides
-          publish packages/spec
           echo "All packable packages published under dist-tag next."
       - name: Point latest at this release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          for dir in core date tokens primitives texuli charts data media chat blocks catalog tools astro player slides spec; do
+          for dir in core date spec drag tokens primitives texuli workflows charts data media chat blocks catalog tools astro player slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             npm dist-tag add "${name}@${version}" latest

@@ -1,4 +1,4 @@
-import type { SpecCatalog } from '../catalog.ts';
+import type { SpecCatalog, SpecDeprecation, SpecPropSchema } from '../catalog.ts';
 import type { Schema } from '../dialect.ts';
 import {
   assertSupported,
@@ -76,6 +76,20 @@ const KEYWORDS = new Set([
 ]);
 function field(name: string): string {
   return KEYWORDS.has(name) ? `\`${name}\`` : name;
+}
+
+/**
+ * The Kotlin property for a wire name: a leading `$` is stripped (`$state` →
+ * `state`), because `$` starts a string template in Kotlin. The wire name
+ * itself is always emitted through {@link kotlinString}.
+ */
+export function kotlinProperty(name: string): string {
+  return name.startsWith('$') ? name.slice(1) : name;
+}
+
+/** `$` escaped for a Kotlin string template (`\$state`). */
+function templateText(name: string): string {
+  return name.replaceAll('$', '\\$');
 }
 
 interface KotlinContext {
@@ -185,10 +199,14 @@ function dataClass(name: string, node: Schema, ctx: KotlinContext): string[] {
   const props = Object.entries(node.properties ?? {});
   const params: string[] = [];
   const args: string[] = [];
+  const seen = new Set<string>();
   for (const [prop, child] of props) {
-    const inlineName = `${name}${pascal(prop)}`;
+    const property = kotlinProperty(prop);
+    if (seen.has(property)) throw new Error(`${name}: Kotlin property "${property}" collides`);
+    seen.add(property);
+    const inlineName = `${name}${pascal(property)}`;
     const type = kotlinType(child, ctx, inlineName);
-    const path = `"$path.${prop}"`;
+    const path = `"$path.${templateText(prop)}"`;
     if (required.has(prop)) {
       const defaultValue =
         typeof child.const === 'string'
@@ -196,14 +214,14 @@ function dataClass(name: string, node: Schema, ctx: KotlinContext): string[] {
           : child.const !== undefined
             ? ` = ${child.const}L`
             : '';
-      params.push(`${INDENT}val ${field(prop)}: ${type}${defaultValue},`);
+      params.push(`${INDENT}val ${field(property)}: ${type}${defaultValue},`);
       args.push(
-        `${INDENT}${INDENT}${INDENT}${INDENT}${field(prop)} = ${decodeExpr(child, `fields.required("${prop}", path)`, path, ctx, inlineName)},`
+        `${INDENT}${INDENT}${INDENT}${INDENT}${field(property)} = ${decodeExpr(child, `fields.required(${kotlinString(prop)}, path)`, path, ctx, inlineName)},`
       );
     } else {
-      params.push(`${INDENT}val ${field(prop)}: ${type}? = null,`);
+      params.push(`${INDENT}val ${field(property)}: ${type}? = null,`);
       args.push(
-        `${INDENT}${INDENT}${INDENT}${INDENT}${field(prop)} = fields["${prop}"]?.let { ${decodeExpr(child, 'it', path, ctx, inlineName)} },`
+        `${INDENT}${INDENT}${INDENT}${INDENT}${field(property)} = fields[${kotlinString(prop)}]?.let { ${decodeExpr(child, 'it', path, ctx, inlineName)} },`
       );
     }
   }
@@ -329,6 +347,45 @@ export function kotlinJsonRuntime(stamp: Stamp): string {
   return lines.join('\n');
 }
 
+function deprecationExpr(value: SpecDeprecation): string {
+  const replacement =
+    value.replacement === undefined ? '' : `, replacement = ${kotlinString(value.replacement)}`;
+  return `SpecDeprecation(since = ${kotlinString(value.since)}${replacement})`;
+}
+
+/** A `SpecPropSchema(...)` constructor call, recursively; only the keywords present. */
+function propSchemaExpr(schema: SpecPropSchema): string {
+  const args: string[] = [];
+  const number = (value: number) => (Number.isInteger(value) ? `${value}.0` : String(value));
+  if (schema.type !== undefined) args.push(`type = SpecPropSchemaType.${upperSnake(schema.type)}`);
+  if (schema.description !== undefined)
+    args.push(`description = ${kotlinString(schema.description)}`);
+  if (schema.properties !== undefined) {
+    const entries = Object.entries(schema.properties).map(
+      ([name, child]) => `${kotlinString(name)} to ${propSchemaExpr(child)}`
+    );
+    args.push(`properties = mapOf(${entries.join(', ')})`);
+  }
+  if (schema.required !== undefined)
+    args.push(`required = listOf(${schema.required.map(kotlinString).join(', ')})`);
+  if (schema.additionalProperties !== undefined) {
+    args.push(`additionalProperties = ${propSchemaExpr(schema.additionalProperties)}`);
+  }
+  if (schema.items !== undefined) args.push(`items = ${propSchemaExpr(schema.items)}`);
+  if (schema.enum !== undefined)
+    args.push(`enum = listOf(${schema.enum.map(kotlinString).join(', ')})`);
+  for (const key of ['minLength', 'maxLength', 'minItems', 'maxItems'] as const) {
+    const value = schema[key];
+    if (value !== undefined) args.push(`${key} = ${value}L`);
+  }
+  for (const key of ['minimum', 'maximum'] as const) {
+    const value = schema[key];
+    if (value !== undefined) args.push(`${key} = ${number(value)}`);
+  }
+  if (schema.$ref !== undefined) args.push(`ref = ${kotlinString(schema.$ref)}`);
+  return `SpecPropSchema(${args.join(', ')})`;
+}
+
 /** The catalog vocabulary as a Kotlin registry of `SpecComponent` values. */
 export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
   const ids = catalog.components.map((c) => c.id);
@@ -365,11 +422,34 @@ export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
         `${INDENT}${INDENT}${INDENT}${INDENT}${INDENT}kind = SpecPropKind.${upperSnake(p.kind)},`,
         `${INDENT}${INDENT}${INDENT}${INDENT}${INDENT}required = ${optional(p.required === undefined ? undefined : String(p.required))},`,
         `${INDENT}${INDENT}${INDENT}${INDENT}${INDENT}enumValues = ${optional(enumValues)},`,
-        `${INDENT}${INDENT}${INDENT}${INDENT}${INDENT}extension = ${optional(p.extension ? `SpecPropExtension.${upperSnake(p.extension)}` : undefined)},`,
-        `${INDENT}${INDENT}${INDENT}${INDENT}),`
+        `${INDENT}${INDENT}${INDENT}${INDENT}${INDENT}extension = ${optional(p.extension ? `SpecPropExtension.${upperSnake(p.extension)}` : undefined)},`
+      );
+      // Emitted only when present, so a catalog without them stays byte-stable.
+      if (p.schema)
+        lines.push(
+          `${INDENT}${INDENT}${INDENT}${INDENT}${INDENT}schema = ${propSchemaExpr(p.schema)},`
+        );
+      if (p.deprecated) {
+        lines.push(
+          `${INDENT}${INDENT}${INDENT}${INDENT}${INDENT}deprecated = ${deprecationExpr(p.deprecated)},`
+        );
+      }
+      lines.push(`${INDENT}${INDENT}${INDENT}${INDENT}),`);
+    }
+    lines.push(`${INDENT}${INDENT}${INDENT}),`);
+    if (c.events) {
+      lines.push(
+        `${INDENT}${INDENT}${INDENT}events = listOf(${c.events.map((e) => `SpecEventName.${upperSnake(e)}`).join(', ')}),`
       );
     }
-    lines.push(`${INDENT}${INDENT}${INDENT}),`, `${INDENT}${INDENT}),`);
+    if (c.bindable) {
+      lines.push(
+        `${INDENT}${INDENT}${INDENT}bindable = listOf(${c.bindable.map(kotlinString).join(', ')}),`
+      );
+    }
+    if (c.deprecated)
+      lines.push(`${INDENT}${INDENT}${INDENT}deprecated = ${deprecationExpr(c.deprecated)},`);
+    lines.push(`${INDENT}${INDENT}),`);
   }
   lines.push(
     `${INDENT})`,

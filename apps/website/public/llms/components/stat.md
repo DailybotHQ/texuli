@@ -26,8 +26,8 @@
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `label` | string | yes | — | — | — |
-| `value` | unknown | yes | — | — | string or number |
-| `delta` | unknown | no | — | — | string or number change |
+| `value` | string | yes | — | — | The formatted value as display text, such as "$12.4k" or "98%". |
+| `delta` | string | no | — | — | The formatted change as display text, such as "+4%". |
 | `trend` | enum(up | down | neutral) | no | — | — | — |
 | `positive` | enum(up | down) | no | — | `"up"` | Which direction is good |
 | `hint` | string | no | — | — | — |

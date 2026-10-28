@@ -1,7 +1,11 @@
 <script lang="ts" generics="T">
 import { lazyChunk } from '@texuli/core/lazy';
+import type { Point } from '@texuli/drag';
+import type { CollisionStrategy, Droppable } from '@texuli/drag/collision';
+import { bindPointerGesture, createPointerTracker } from '@texuli/drag/gesture';
 import type { Component } from 'svelte';
 import { tick } from 'svelte';
+import type { Attachment } from 'svelte/attachments';
 import { type ClassValue, cx } from 'texuli/cx';
 import {
   Table,
@@ -40,8 +44,8 @@ import {
   type ColumnMenuAction,
   canHideColumn,
   canMoveColumn,
+  columnDropCollision,
   completeState,
-  dropTarget,
   headerGroups,
   moveColumnBy,
   moveColumnTo,
@@ -410,84 +414,137 @@ let dragging = $state<{
 } | null>(null);
 let suppressClick = false;
 
-function startResize(event: PointerEvent, key: string): void {
-  if (event.button !== 0) return;
-  event.preventDefault();
-  event.stopPropagation();
-  const handle = event.currentTarget as HTMLElement;
-  const startX = event.clientX;
-  const base = current;
-  const startResolved = resolved;
-  const direction = isRtl() ? -1 : 1;
-  resizing = key;
-  try {
-    handle.setPointerCapture(event.pointerId);
-  } catch {
-    // Synthetic pointers cannot be captured.
-  }
-  const move = (moveEvent: PointerEvent) => {
-    commitState(
-      resizeColumnBy(columns, startResolved, base, key, (moveEvent.clientX - startX) * direction)
+// Both run on @texuli/drag/gesture. Resize: capture on the grip, no threshold.
+// Reorder: a 6 px sideways threshold and no capture (the header holds the sort
+// button and the menu, whose clicks capture would retarget), heard on the
+// window; the zone's header cells are measured when the drag starts and on
+// scroll, and `columnDropCollision` (wrapping `dropTarget`) picks the side.
+
+/** Pointer resize from a header's inline-end grip. */
+function resizeFrom(key: string): Attachment<HTMLElement> {
+  return (handle) => {
+    // Read at press time only: the attachment itself must not track grid state.
+    let base: typeof current | null = null;
+    let startResolved: typeof resolved | null = null;
+    let direction = 1;
+    const onDown = (event: PointerEvent) => {
+      if (event.button !== 0) return;
+      // The grip never starts a header reorder or selects text.
+      event.preventDefault();
+      event.stopPropagation();
+      base = current;
+      startResolved = resolved;
+      direction = isRtl() ? -1 : 1;
+      resizing = key;
+    };
+    const end = () => {
+      if (resizing !== key) return;
+      resizing = null;
+      const width = orderedColumns(resolved).find((c) => c.def.key === key)?.width;
+      if (width) announcement = text.resized(header(key), width);
+    };
+    handle.addEventListener('pointerdown', onDown);
+    const dispose = bindPointerGesture(
+      handle,
+      createPointerTracker({
+        threshold: 0,
+        onMove: (event) => {
+          if (base && startResolved) {
+            commitState(
+              resizeColumnBy(columns, startResolved, base, key, event.delta.x * direction)
+            );
+          }
+        },
+        onEnd: end,
+        onClick: end,
+        onCancel: end,
+      })
     );
+    return () => {
+      handle.removeEventListener('pointerdown', onDown);
+      dispose();
+    };
   };
-  const end = () => {
-    handle.removeEventListener('pointermove', move);
-    handle.removeEventListener('pointerup', end);
-    handle.removeEventListener('pointercancel', end);
-    resizing = null;
-    const width = orderedColumns(resolved).find((c) => c.def.key === key)?.width;
-    if (width) announcement = text.resized(header(key), width);
-  };
-  handle.addEventListener('pointermove', move);
-  handle.addEventListener('pointerup', end);
-  handle.addEventListener('pointercancel', end);
 }
 
-function startDrag(event: PointerEvent, column: ResolvedColumn<T>): void {
-  if (!reorderable || event.button !== 0) return;
-  const target = event.target as Element;
-  if (target.closest('[data-tx-grid-menu], .tx-grid-columns__resize')) return;
-  const view = (event.currentTarget as Element).ownerDocument.defaultView;
-  if (!view) return;
-  const key = column.def.key;
-  const zone = zoneOf(column);
-  const startX = event.clientX;
-  const rtl = isRtl();
-  const move = (moveEvent: PointerEvent) => {
-    if (!dragging && Math.abs(moveEvent.clientX - startX) < 6) return;
-    const cells = [
-      ...(tableElement()?.querySelectorAll<HTMLElement>(
-        `th[data-column-key][data-zone="${zone}"]`
-      ) ?? []),
-    ].map((th) => {
-      const rect = th.getBoundingClientRect();
-      return { key: th.dataset.columnKey ?? '', left: rect.left, right: rect.right };
-    });
-    dragging = { key, target: dropTarget(cells, moveEvent.clientX, rtl) };
-  };
-  const end = () => {
-    view.removeEventListener('pointermove', move);
-    view.removeEventListener('pointerup', end);
-    view.removeEventListener('pointercancel', cancel);
-    const drop = dragging?.target;
-    if (dragging) suppressClick = true;
-    dragging = null;
-    if (drop && drop.key !== key) {
-      const next = moveColumnTo(columns, resolved, current, key, drop.key, drop.side);
-      if (next !== current) {
-        commitState(next);
-        announceMove(key, next);
-        void focusColumn(key);
+/** Pointer reorder from a header cell, inside its pin zone. */
+function reorderFrom(key: string): Attachment<HTMLElement> {
+  return (cell) => {
+    const view = cell.ownerDocument.defaultView;
+    let cells: Droppable[] = [];
+    let collision: CollisionStrategy = columnDropCollision();
+    let stopScroll: (() => void) | null = null;
+    const measure = (zone: string) => {
+      cells = [
+        ...(tableElement()?.querySelectorAll<HTMLElement>(
+          `th[data-column-key][data-zone="${zone}"]`
+        ) ?? []),
+      ].map((th) => {
+        const box = th.getBoundingClientRect();
+        return {
+          id: th.dataset.columnKey ?? '',
+          rect: { x: box.left, y: box.top, width: box.right - box.left, height: box.height },
+        };
+      });
+    };
+    const targetAt = (point: Point) => {
+      const hit = collision({ pointer: point, droppables: cells });
+      return hit?.side ? { key: hit.id, side: hit.side } : null;
+    };
+    const finish = () => {
+      stopScroll?.();
+      stopScroll = null;
+    };
+    return bindPointerGesture(
+      cell,
+      createPointerTracker({
+        axis: 'x',
+        threshold: 6,
+        onStart: (event) => {
+          const column = orderedColumns(resolved).find((entry) => entry.def.key === key);
+          if (!column) return;
+          const zone = zoneOf(column);
+          collision = columnDropCollision(isRtl());
+          measure(zone);
+          const onScroll = () => measure(zone);
+          cell.ownerDocument.addEventListener('scroll', onScroll, true);
+          stopScroll = () => cell.ownerDocument.removeEventListener('scroll', onScroll, true);
+          dragging = { key, target: targetAt(event.point) };
+        },
+        onMove: (event) => {
+          if (dragging) dragging = { key, target: targetAt(event.point) };
+        },
+        onEnd: () => {
+          finish();
+          const drop = dragging?.target;
+          if (dragging) suppressClick = true;
+          dragging = null;
+          if (drop && drop.key !== key) {
+            const next = moveColumnTo(columns, resolved, current, key, drop.key, drop.side);
+            if (next !== current) {
+              commitState(next);
+              announceMove(key, next);
+              void focusColumn(key);
+            }
+          }
+        },
+        onCancel: () => {
+          finish();
+          dragging = null;
+        },
+      }),
+      {
+        capture: false,
+        ...(view ? { listenOn: view } : {}),
+        accept: (event) =>
+          reorderable &&
+          !(
+            event.target instanceof Element &&
+            event.target.closest('[data-tx-grid-menu], .tx-grid-columns__resize')
+          ),
       }
-    }
+    );
   };
-  const cancel = () => {
-    dragging = null;
-    end();
-  };
-  view.addEventListener('pointermove', move);
-  view.addEventListener('pointerup', end);
-  view.addEventListener('pointercancel', cancel);
 }
 
 function sortClick(event: MouseEvent, key: string): void {
@@ -635,7 +692,7 @@ function dropSide(key: string): 'before' | 'after' | undefined {
             tabindex={!sortable && isActive(0, col) ? 0 : !sortable ? -1 : undefined}
             class="tx-grid-columns__head"
             style={pinStyle(pin)}
-            onpointerdown={(event: PointerEvent) => startDrag(event, column)}
+            {@attach reorderFrom(def.key)}
           >
             <span class="tx-grid-columns__head-inner">
               {#if sortable}
@@ -693,7 +750,7 @@ function dropSide(key: string): 'before' | 'after' | undefined {
                 class="tx-grid-columns__resize"
                 aria-hidden="true"
                 data-active={resizing === def.key ? '' : undefined}
-                onpointerdown={(event) => startResize(event, def.key)}
+                {@attach resizeFrom(def.key)}
                 ondblclick={() => commitState(resetColumnWidth(current, def.key))}
               ></span>
             {/if}

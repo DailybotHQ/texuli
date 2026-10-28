@@ -4,11 +4,18 @@
  * agent host, what each sub-skill does, and the pack's checksums. Built from
  * `skills/texuli/` itself, so the page cannot drift from the pack.
  */
-import { hostCommands } from '../../components/skill/skill.ts';
+import { safeHref } from '@texuli/core/url-policy';
+import {
+  hostCommands,
+  installRoutes,
+  SKILL_REPOSITORY,
+  SKILL_TAG_PREFIX,
+} from '../../components/skill/skill.ts';
 import {
   CHECKSUMS,
   HOSTS,
   PACK_NAME,
+  RELEASED,
   ROUTER,
   SUB_SKILLS,
   SUMS_SHA256,
@@ -16,6 +23,10 @@ import {
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const version = ROUTER.version;
+// A release exists only once the release workflow has stamped CHANGELOG.md.
+const pin = RELEASED || '<version>';
+const routes = installRoutes(pin);
+const releasesHref = safeHref(`${SKILL_REPOSITORY}/releases`, 'developer');
 ---
 
 <BaseLayout
@@ -88,11 +99,55 @@ const version = ROUTER.version;
       </li>
       <li>
         Verify before installing:
-        <pre aria-label="Verify a release"><code>tar -xzf texuli-skill-&lt;version&gt;.tar.gz
-./texuli/setup.sh --verify --dir ./texuli --sums ./SHA256SUMS --expect-version &lt;version&gt;</code></pre>
+        <pre aria-label="Verify a release"><code>grep ' texuli-skill-&lt;version&gt;.tar.gz$' SHA256SUMS | shasum -a 256 -c -
+tar -xzf texuli-skill-&lt;version&gt;.tar.gz
+shasum -a 256 -c SHA256SUMS
+./texuli/setup.sh --verify --dir ./texuli --expect-version &lt;version&gt;</code></pre>
       </li>
       <li>Install with <code>--expect-version</code> as above; upgrade later with <code>--replace</code>.</li>
     </ol>
+  </section>
+
+  <section aria-labelledby="channels-title" class="block">
+    <h2 id="channels-title">Install, update and uninstall</h2>
+    {
+      RELEASED ? (
+        <p data-skill-release={RELEASED}>
+          The latest skill release is <code>{SKILL_TAG_PREFIX}{RELEASED}</code>. Skill releases
+          have their own tags, apart from the npm packages, and each carries the pack archive and a{' '}
+          <code>SHA256SUMS</code>.
+        </p>
+      ) : (
+        <p data-skill-release="">
+          No skill release is published yet. Until the first <code>{SKILL_TAG_PREFIX}X.Y.Z</code>{' '}
+          tag exists, install from a checkout as above; the commands below show{' '}
+          <code>&lt;version&gt;</code> where the release goes.
+        </p>
+      )
+    }
+    <p>
+      Pin the skills CLI with the release's tree URL. Do not use the{' '}
+      <code>owner/repo@ref</code> shorthand: the CLI can ignore that ref and install the default
+      branch. Releases are checksummed, not signed: verify against the release's{' '}
+      <code>SHA256SUMS</code>, at{' '}
+      <a href={releasesHref} rel="noopener noreferrer">the Texuli releases</a>.
+    </p>
+    <ul class="cards" role="list">
+      {
+        routes.map((route) => (
+          <li class="card" data-install-route={route.id}>
+            <h3>{route.title}</h3>
+            <pre aria-label={`${route.title} commands`}><code>{route.commands.join('\n')}</code></pre>
+          </li>
+        ))
+      }
+    </ul>
+    <p>
+      OpenClaw installs from its registry only once a Texuli entry is listed there; until then,
+      copy a verified <code>texuli/</code> folder into its skills folder. A copy installed with{' '}
+      <code>setup.sh</code> is removed by deleting its folder; earlier copies stay under{' '}
+      <code>~/.texuli/skill-backups/</code>.
+    </p>
   </section>
 
   <section aria-labelledby="subskills-title" class="block">

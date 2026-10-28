@@ -24,6 +24,9 @@ import {
   type SitemapEntry,
 } from './seo.ts';
 
+/** The designed social card for the home page (1200 x 630 PNG). */
+const HOME_OG_IMAGE = fileURLToPath(new URL('./og-home.png', import.meta.url));
+
 type SharpService = {
   transform: (
     input: Uint8Array,
@@ -139,6 +142,16 @@ export function seoIntegration(): AstroIntegration {
           const display = absoluteUrl(site, base, path)
             .replace(/^https?:\/\//, '')
             .replace(/\/$/, '');
+          const file = join(out, ogImageFile(path));
+          await mkdir(dirname(file), { recursive: true });
+          // The home page carries the designed brand card (1200 x 630, from
+          // brand/social/texuli-og-source.png); every other page gets its own
+          // generated card.
+          if (path === '/') {
+            await writeFile(file, await readFile(HOME_OG_IMAGE));
+            images += 1;
+            continue;
+          }
           const svg = ogImageSvg({
             title: meta.title.replace(/\s+\u00b7\s+Texuli$/, '') || SITE_NAME,
             description: meta.description,
@@ -152,8 +165,6 @@ export function seoIntegration(): AstroIntegration {
             imageConfig,
             logger
           );
-          const file = join(out, ogImageFile(path));
-          await mkdir(dirname(file), { recursive: true });
           await writeFile(file, png.data);
           images += 1;
         }

@@ -60,8 +60,26 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/component-pages/button/',
     reason:
-      'The first live Button demo mounts on open: its frame with real controls, then only the Button stage family (the props panel and other demos mount on scroll): 104.8 KB page, 67.6 KB JS at first; 72.5 KB JS measured 2026-10-27, so the owner raised the JS cap to 76 (measured + 4%, PLAN_006 follow-up). CLS room for the eager island mount.',
-    budget: { pageGzipKb: 112, jsGzipKb: 76, cls: 0.15 },
+      'The first live Button demo mounts on open: its frame with real controls, then only the Button stage family (the props panel and other demos mount on scroll): 104.8 KB page, 67.6 KB JS at first; 72.5 KB JS measured 2026-10-27, so the owner raised the JS cap to 76 (measured + 4%, PLAN_006 follow-up). PLAN_007 grew the shared shell (nav, search and footer credit): 112.9 KB page measured 2026-10-27, cap 118 (measured + 4%). CLS room for the eager island mount.',
+    budget: { pageGzipKb: 118, jsGzipKb: 76, cls: 0.15 },
+  },
+  {
+    route: '/drag-page/',
+    reason:
+      'PLAN_007: the first screen is the drag workbench, three sortable surfaces (list, board, tree) on one @texuli/drag engine; the other demos load on scroll. Measured 108.5 KB page, 71.9 KB JS at the ready signal (+4% headroom).',
+    budget: { pageGzipKb: 112, jsGzipKb: 76 },
+  },
+  {
+    route: '/workflows-page/',
+    reason:
+      'PLAN_007: the workflow editor is the subject of the page and sits in the first screen (editor plus the workflow model). Measured 126.5 KB page, 92.3 KB JS (+4% headroom).',
+    budget: { pageGzipKb: 132, jsGzipKb: 96 },
+  },
+  {
+    route: '/workflows-page/json/',
+    reason:
+      'PLAN_007: the JSON live preview paints a real player tree on open (player, controls, sortable, workflow graph and the catalog validator). Measured 227.7 KB page, 190.4 KB JS (+4% headroom).',
+    budget: { pageGzipKb: 236, jsGzipKb: 200 },
   },
   {
     route: '/component-pages/charts-pie/',
@@ -90,8 +108,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/builder/',
     reason:
-      'The builder page mounts the BuilderApp studio island (structure tree, props and theme controls) on open: measured 31.7 KB gzip of HTML after the PLAN_006 builder polish (T-82).',
-    budget: { htmlGzipKb: 34 },
+      'The builder page mounts the BuilderApp studio island (structure tree, props and theme controls) on open: measured 31.7 KB gzip of HTML after the PLAN_006 builder polish (T-82). PLAN_007: the palette now lists the data, chat, workflows and state groups of the 158-id catalog inline, measured 234.9 KB raw (+4% headroom).',
+    budget: { htmlGzipKb: 34, htmlRawKb: 248 },
   },
   {
     route: '/component-pages/',
@@ -102,8 +120,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/web-and-native/',
     reason:
-      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26.',
-    budget: { htmlGzipKb: 26 },
+      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom).',
+    budget: { htmlGzipKb: 26, pageGzipKb: 100 },
   },
   {
     route: '/gallery-themes/',
@@ -138,8 +156,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/gallery-components/',
     reason:
-      'The living gallery: server-rendered cards, each with its preview frame, light/dark and RTL controls, props toggle and tag filters. Measured 845.8 KB raw / 46.4 KB gzip at FIX-site-perf-routes; the PLAN_006 gallery audit (T-83) added card content: 888.2 KB raw / 48.5 KB gzip of HTML and 90.1 KB JS, limits 892 / 50 / 92. T-93 still owns slimming the raw size.',
-    budget: { htmlRawKb: 892, htmlGzipKb: 50, pageGzipKb: 184, jsGzipKb: 92 },
+      'The living gallery: server-rendered cards, each with its preview frame, light/dark and RTL controls, props toggle and tag filters. Measured 845.8 KB raw / 46.4 KB gzip at FIX-site-perf-routes; the PLAN_006 gallery audit (T-83) added card content: 888.2 KB raw / 48.5 KB gzip of HTML and 90.1 KB JS, limits 892 / 50 / 92. PLAN_007 (owned sortable and drag engine in the shared component code) brought JS to 92.0 KB locally and 92.1 KB in CI at the ready signal; the JS cap is now 96 (measured + 4%). T-93 still owns slimming the raw size.',
+    budget: { htmlRawKb: 892, htmlGzipKb: 50, pageGzipKb: 184, jsGzipKb: 96 },
   },
   {
     route: '/examples/',

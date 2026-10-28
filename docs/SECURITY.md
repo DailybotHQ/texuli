@@ -227,6 +227,18 @@ Full host cookbook: [packages/blocks/docs/embed.md](../packages/blocks/docs/embe
 Catalog id `blocks-embed` documents the same contract on `mountEmbed` and in
 `dontUseWhen` / `a11y` guidance.
 
+### 16. Interaction as data: spec 0.3.0 state, actions, drag and workflows
+
+Unreleased: in the repository, not in the published `0.3.0` packages.
+
+| | |
+| --- | --- |
+| **Threat** | An agent blueprint that turns interaction into code: open-ended actions (fetch, navigate, eval), bindings that read or write anything, a drag that moves items the rules forbid, a form or control that validates but cannot paint (so validators and painter disagree), list item text that hides or reorders itself (bidirectional overrides, zero-width characters) once it can be dragged between lists, and workflow graphs as size or cycle bombs |
+| **Control** | **Closed actions** (ADR-008): `on` maps only events the component declares to `setState`, `toggleState`, `moveItem`, `flowGo`, `emit` and `submit`, each with a closed field set; `emit` carries at most 32 scalar or `$state` values to the host's `onAction`, and the player sends nothing itself. **Bindings** read declared variables only (`$state`) or host data the host supplies (`$data`, read-only, whole top-level props only); `bind` writes back only `bindable` props to writable variables. **Drag as data**: `reorder` binds a declared list, and every move, keyboard or pointer, goes through one rule set (group and `accepts`, `locked`, `pull`, `maxItems`); the player's shared drag scope asks that rule set before a drop, so the UI cannot offer a move the data model refuses. **State surface parity** (`@texuli/spec/surface`): the spec validator, `@texuli/catalog`'s `validateDraft` and the Kotlin twin refuse exactly what `@texuli/player` refuses at paint time (form nodes outside an `action-form`, nested forms, controls and fields without a declared variable of their type, unmatched flow nodes, writes to host-bound variables), so a blueprint that validates always paints. **List item text** (`SPEC_PATTERNS.listText`): C0 and C1 controls, bidirectional overrides and isolates and invisible formatting characters are refused in list items by the spec, the catalog, the player's list parsing and Kotlin. **Workflow graphs**: closed node types and ports, at most 500 nodes and 2,000 edges, a cycle policy, label text without control or bidi characters, and link and image props through the `untrusted` URL policy |
+| **Enforced** | `packages/spec/src/{validate,surface}.ts`, `packages/catalog/src/validate/interaction.ts`, `packages/player/src/state/**`, `native/texuli-spec/.../{SpecValidator,Surface}.kt`, `packages/workflows/src/model/**` |
+| **Tests** | `packages/catalog/tests/render-hostile-blueprints.test.ts` (the 0.3.0 hostile corpus: workflow cycles, self-loops and 10,000 nodes, bidi in a workflow label and in draggable list items, `javascript:` in node text, oversized or smuggled `reorder`, unknown ids, props, events and actions, a form field outside a form, binding shapes, prototype keys; each refused with an expected code within 2 seconds and inert), `packages/player/tests/surface-parity.test.ts`, `packages/spec/tests/contract.test.ts`, the invalid fixtures `state-list-text`, `form-outside` and `surface-nodes` (TypeScript and Kotlin, `InvalidFixtureParityTest`), `packages/player/tests/{interaction,lego}.test.ts` |
+| **Residual** | `emit` intents reach the host as data; what the host does with them (and whether it confirms them) is the host's responsibility. The player runs actions only in local state; persistence and authorization of a move belong to the application. ZWNJ and ZWJ stay allowed in list text for scripts and emoji. |
+
 ---
 
 ## What agents must not write into docs
@@ -237,8 +249,6 @@ third-party component libraries in product docs.
 
 ## Reporting
 
-The repository's remote is `https://github.com/DailybotHQ/texuli.git`
-(`git remote -v`), and GitHub reports it as public
-(`gh repo view DailybotHQ/texuli --json visibility`, 2026-10-26). There is no
-dedicated security reporting channel yet: report issues to the maintainers at
-Dailybot directly, not in public issues.
+Report vulnerabilities privately, never in a public issue: the channel
+(security@dailybot.com), what to include and the response targets are in
+the root [SECURITY.md](../SECURITY.md#reporting-a-vulnerability).

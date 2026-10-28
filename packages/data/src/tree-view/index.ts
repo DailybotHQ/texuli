@@ -24,10 +24,8 @@ export {
   validParents,
 } from '../engines/tree/index.ts';
 export {
-  DRAG_THRESHOLD_PX,
   depthIndentRem,
   dropAsChild,
-  indexFromPointer,
   placementsOf,
   type TreePlacement,
 } from './model.ts';

@@ -51,6 +51,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         dependsOn: [],
       },
       {
+        name: '@texuli/drag',
+        role: 'In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing)',
+        dependsOn: [],
+      },
+      {
         name: '@texuli/spec',
         role: 'Framework-free blueprint contract and code generation',
         dependsOn: [],
@@ -63,8 +68,8 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     packages: [
       {
         name: '@texuli/primitives',
-        role: '41 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns',
-        dependsOn: ['core', 'date'],
+        role: '42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns',
+        dependsOn: ['core', 'date', 'drag'],
       },
     ],
   },
@@ -102,7 +107,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/data',
         role: 'Data views: grid (core, columns, editing, virtual), tree, board, calendar, timeline, map, activity, files, virtual list',
-        dependsOn: ['core', 'primitives', 'tokens', 'texuli'],
+        dependsOn: ['core', 'drag', 'primitives', 'tokens', 'texuli'],
       },
       {
         name: '@texuli/media',
@@ -118,6 +123,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         name: '@texuli/editor',
         role: 'Rich text editor surface, toolbar, link dialog, headless controller, clipboard import',
         dependsOn: ['core', 'primitives', 'tokens', 'texuli'],
+      },
+      {
+        name: '@texuli/workflows',
+        role: 'In development: interactive, accessible workflow graph editor and viewer (model, layout, editor)',
+        dependsOn: ['core', 'drag', 'primitives', 'tokens', 'texuli'],
       },
     ],
   },
@@ -139,7 +149,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/catalog',
         role: 'The agent catalog (manifests per group, build) and the renderer with no HTML sinks',
-        dependsOn: ['core', 'texuli', 'charts', 'data', 'blocks', 'media'],
+        dependsOn: ['core', 'spec', 'texuli', 'charts', 'data', 'blocks', 'media'],
       },
     ],
   },
@@ -155,7 +165,18 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/player',
         role: 'Blueprint player runtime and styles',
-        dependsOn: ['blocks', 'catalog', 'charts', 'media'],
+        dependsOn: [
+          'blocks',
+          'catalog',
+          'charts',
+          'chat',
+          'data',
+          'media',
+          'primitives',
+          'spec',
+          'texuli',
+          'workflows',
+        ],
       },
     ],
   },
@@ -264,7 +285,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
   },
   {
     name: 'primitives',
-    role: 'Headless parts bound to texels and held to the WAI-ARIA Authoring Practices patterns — 41 owned headless primitives, one subpath each.',
+    role: 'Headless parts bound to texels and held to the WAI-ARIA Authoring Practices patterns — 42 owned headless primitives, one subpath each.',
     home: '@texuli/primitives',
     layer: 'L1',
     runtimes: {

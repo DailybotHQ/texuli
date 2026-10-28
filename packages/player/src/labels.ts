@@ -51,6 +51,8 @@ export interface PlayerLabels {
   actionRejected: string;
   actionFailed: string;
   actionUnavailable: string;
+  /** Announced when a node's actions are refused (a value that does not fit, a locked item). */
+  actionRefused: string;
   /** Field errors: "{label}", and "{min}"/"{max}" for length and range. */
   fieldRequired: string;
   fieldPattern: string;
@@ -94,6 +96,7 @@ export const DEFAULT_PLAYER_LABELS: PlayerLabels = Object.freeze({
   actionRejected: 'Not accepted.',
   actionFailed: 'Could not send. Please try again.',
   actionUnavailable: 'This preview cannot send.',
+  actionRefused: 'That change is not allowed here.',
   fieldRequired: '{label} is required.',
   fieldPattern: '{label} is not in the expected format.',
   fieldLength: '{label} must be {min} to {max} characters.',
@@ -158,6 +161,7 @@ export function resolvePlayerLabels(overrides: PlayerLabelOverrides | undefined)
     actionRejected: text(overrides.actionRejected, base.actionRejected),
     actionFailed: text(overrides.actionFailed, base.actionFailed),
     actionUnavailable: text(overrides.actionUnavailable, base.actionUnavailable),
+    actionRefused: text(overrides.actionRefused, base.actionRefused),
     fieldRequired: text(overrides.fieldRequired, base.fieldRequired),
     fieldPattern: text(overrides.fieldPattern, base.fieldPattern),
     fieldLength: text(overrides.fieldLength, base.fieldLength),

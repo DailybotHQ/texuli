@@ -12,6 +12,12 @@
       "specDigest": "d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f",
       "change": "minor",
       "summary": "Additive: node slot and when ($defs.condition, $defs.numberFormula), the unknown-slot diagnostic, catalog projection refreshes (inline-text, label props on button, badge and kbd, declarative chart formats), the conditional-report golden and the slot and condition invalid fixtures."
+    },
+    {
+      "specVersion": "0.3.0",
+      "specDigest": "a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848",
+      "change": "minor",
+      "summary": "Additive: envelope spec/state/flow, node bind/on, $defs binding, stateDeclaration, flow, action (closed), eventMap, reorder; catalog events/bindable/propSchema/deprecated; warnings; schemas/workflow.schema.json; codes state, unknown-state, binding, action, unknown-event, workflow; migrations 0.2.0→0.3.0."
     }
   ]
 }

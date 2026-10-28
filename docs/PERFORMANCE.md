@@ -98,6 +98,37 @@ Notes and gaps:
   (`data-grid-charts-media.test.ts`) failed under load and passed on two
   isolated reruns and the next full run.
 
+### PLAN_007 drag and workflows (2026-10-27)
+
+`tests/perf/drag.test.ts` and `tests/perf/workflows.test.ts`, run with
+`TEXULI_PERF=1 TEXULI_PERF_REPORT=1 pnpm vitest run tests/perf/drag.test.ts
+tests/perf/workflows.test.ts`: one local run on a 10-core development
+machine under load (load average about 15), best of three per case. The
+calibration baseline (a native 100k `Float64Array` sort) took 11.1 to
+11.3 ms; budgets scale with it. Both packages are in development and not on
+npm.
+
+| Surface | Case | Measured | Budget |
+| --- | --- | --- | --- |
+| Drag sortable | 1,000-item vertical list: move plus collision, per pointer event | 0.037 ms | max(2 ms, 0.1× baseline) |
+| Drag sortable | 1,000-item grid (nearest-center collision), per event | 0.053 ms | max(2 ms, 0.1× baseline) |
+| Drag sortable | 1,000 items across a 4-column board (cross-list plans), per event | 0.017 ms | max(2 ms, 0.1× baseline) |
+| Drag graph | edge hit-testing over 2,000 edges, per event | 0.010 ms | max(2 ms, 0.1× baseline) |
+| Workflows model | parse and validate a 500-node, 2,000-edge document | 3.22 ms | max(60 ms, 6× baseline) |
+| Workflows model | build it from one batch of 2,500 ops with per-edge cycle checks | 3.38 ms | max(60 ms, 6× baseline) |
+| Workflows layout | layered layout (480 crossings) | 3.54 ms | max(150 ms, 15× baseline) |
+| Workflows model | a 50-node drag frame: mean / worst | 0.17 / 0.62 ms | mean max(2 ms, 0.2×), worst max(16 ms, 1.5× baseline) |
+| Workflows model | connect one edge with a full cycle check | 0.13 ms | max(8 ms, 1× baseline) |
+| Workflows model | canonical stringify (239,832 characters) | 1.00 ms | max(30 ms, 3× baseline) |
+| Workflows editor | build the scene (boxes, ports, 2,000 edge paths) | 2.09 ms | max(8 ms, 0.6× baseline) |
+| Workflows editor | mount the full editor (canvas, minimap, outline, palette, inspector) in happy-dom | 555.6 ms | max(3,000 ms, 150× baseline) |
+| Workflows editor | a 50-of-500-node pointer drag in happy-dom: mean / worst frame after the first, and the drop | 16.9 / 35.2 / 36.5 ms | mean max(200 ms, 10×), worst max(600 ms, 30×), drop max(250 ms, 12× baseline) |
+| Workflows editor | keyboard nudge plus undo in happy-dom | 27.3 ms | max(200 ms, 10× baseline) |
+
+The editor rows run in happy-dom (no layout, no paint), so they bound the
+Svelte and model work, not a browser frame; the browser drag is covered by
+`tests/behavior/scenarios/workflow-editor.spec.ts` without a timing limit.
+
 ## Hot paths (planned)
 
 - **Overlay open to focus** (dialog, popover, menu): the layer stack, focus
@@ -113,9 +144,13 @@ Notes and gaps:
 with Vite, the way a consumer imports it (`export * from '<entry>'`, minified,
 `svelte` external, every other import bundled, workspace packages included).
 It measures the entry's **initial** JavaScript (the entry chunk and what it
-imports statically) with gzip -9 and brotli 11, the CSS it emits with gzip, and
-reports chunks reached only through `import()` as lazy gzip without budgeting
-them. Each result is compared with `texuli.budgets.json`; the run fails when an
+imports statically) with gzip -9 and brotli 11, and reports chunks reached
+only through `import()` as `lazy gzip` without budgeting them. CSS is split
+the same way (`cssCodeSplit`): the `css gzip` column is the CSS of the
+entry's static graph (the eager CSS a page pays on load, budgeted when the
+entry has a `cssGzip` budget), and `lazy css` is the CSS of lazily loaded
+chunks, reported but not budgeted. For example, `@texuli/player` loads 2.35
+KiB of eager CSS, and its painters' CSS arrives with the painters. Each result is compared with `texuli.budgets.json`; the run fails when an
 entry is over budget, has no budget, or is larger than the Protoyard package it
 replaces.
 

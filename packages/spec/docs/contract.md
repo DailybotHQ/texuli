@@ -22,11 +22,12 @@ fixtures are not part of the npm package.
 
 | Path | What it holds |
 | --- | --- |
-| `schemas/` | The normative JSON schemas: `blueprint` (envelope v1 and the node tree), `catalog`, `diagnostics`, `manifest` |
+| `schemas/` | The normative JSON schemas: `blueprint` (envelope v1, local state, flow and the node tree), `catalog`, `diagnostics`, `manifest`, `workflow` (workflow graphs) |
 | `catalog/components.json` | The closed vocabulary, projected from the built catalog: id, label, summary, group, placement (`app`/`content`), emit tiers, capability and props |
 | `catalog/capabilities.json` | Reviewed capability claims. Empty: no id is audited portable yet, so every capability is `unknown` (ADR-003) |
-| `fixtures/golden/` | Blueprints that must validate: a report, a dashboard, a proactive deck and a report with a named slot and a `when` condition (fictional data) |
-| `fixtures/invalid/` | Blueprints that must fail with exact diagnostic codes, one or more per code, including slot and condition cases (an undeclared or root `slot`, an unknown condition `op`, an extra condition field) |
+| `fixtures/golden/` | Nine blueprints that must validate (fictional data): a report, a dashboard, a proactive deck and a report with a named slot and a `when` condition (0.2.0 envelopes), and five 0.3.0 interfaces: `app-dashboard` (filters bound to state), `mobile-flow` (flow views, forms, `flowGo`), `sortable-board` (reorder groups, locked, clone, `on.move`), `workflow-builder` (an edit-mode `workflow-graph` bound to state) and `lego` (layouts, a data board, charts, media, blocks, a sortable palette and outline, and a workflow editor in one tree). `@texuli/player`'s `golden.test.ts` and `lego.test.ts` paint them |
+| `fixtures/invalid/` | Blueprints that must fail with exact diagnostic codes, one or more per code, including slot and condition cases (an undeclared or root `slot`, an unknown condition `op`, an extra condition field) and the 0.3.0 cases (a refused state declaration, an unknown variable, a two-key binding, an undeclared event, an action missing its fields, an unknown `spec` version) and the state surface cases (bidi in a list item, form nodes outside an `action-form`, a control and a flow view with nothing declared) |
+| `fixtures/workflow/` | `golden/` workflow graphs that must validate (a six-node pipeline) and `invalid/` graphs (`{ expect, graph }`) that must fail with exact codes: a dangling edge, an undeclared node type, a forbidden cycle |
 | `manifest.json` | The spec version, the dialect and a SHA-256 per normative file |
 | `versions.json` | Every released spec version pinned to its spec digest (not normative: it pins the normative files) |
 | `generated/typescript/`, `generated/kotlin/` | The projections. Never edit them |
@@ -51,9 +52,25 @@ maps. Anything else fails `checkSchemaDocument`, and generation refuses it.
     platform-extension props from data, a node `slot` that names a slot prop
     of its parent (`unknown-slot`), the portable profile failing closed,
     and an optional catalog binding);
+  - from 0.3.0, the state, flow, binding, `bind`, `on` and property-schema
+    rules below and the contract constants (`src/contract.ts`), which
+    `tests/spec.test.ts` keeps equal to the schemas;
   - `canonicalJson` and a synchronous `sha256`.
+- `@texuli/spec/workflow` (`src/workflow.ts`), opt-in at run time:
+  `validateWorkflowGraph`. The root never imports it, so blueprints without
+  workflow graphs do not pay for it. `validateBlueprint` checks a `workflow`
+  state variable or a `workflowGraph` prop only when `SpecDocuments` carries
+  both `workflowSchema` and `validateWorkflowGraph`; without either, they
+  fail closed (`state` and `prop-type`).
+- `@texuli/spec/migrate` (`src/migrations/index.ts`), opt-in at run time:
+  `migrateBlueprint`, `SPEC_MIGRATIONS` and `UNDECLARED_SPEC_VERSION`.
+- `@texuli/spec/surface` (`src/surface.ts`, no imports): `checkStateSurface`,
+  `surfaceInputs`, `SPEC_CONTROL_STATE_TYPES`, `SURFACE_PLAYER_CODES` and
+  `LIST_TEXT_PATTERN`. `validateBlueprint` runs it, and `@texuli/catalog`'s
+  `validateDraft` imports it, so both refuse the same nodes.
 - `@texuli/spec/codegen`, build time: `buildSpec`, `projectCatalog`,
-  `checkConformance`, `formatJson`.
+  `checkConformance`, `checkCatalogContract`, `formatJson`. The conformance
+  harness passes the workflow validator itself.
 
 URL policy, tree limits, grammar and rendering stay in the runtime validator,
 `@texuli/catalog/validate`.
@@ -68,7 +85,11 @@ URL policy, tree limits, grammar and rendering stay in the runtime validator,
   `data object`): data classes, closed enums and static decoders over a
   generated `JsonValue` model, with no library dependency. Decoders check
   JSON types, required and unknown fields, enums and constants. Patterns
-  and limits are the shared validator's job.
+  and limits are the shared validator's job. A wire name starting with `$`
+  (`$state`, `$data`, a property schema's `$ref`) becomes a property without
+  it (`state`, `data`, `ref`); the wire name is always an escaped string
+  literal, never a Kotlin string template, and two names that would
+  collide fail generation.
 - **Stamp.** Every generated file carries the spec version and a digest of
   the normative files. There are no timestamps, and output is
   byte-identical for the same inputs in any order.
@@ -88,7 +109,11 @@ pnpm exec tsx packages/spec/scripts/generate.ts --check    # fail on drift
 - the manifest digests match the normative files;
 - regenerating gives byte-identical files, none missing or extra;
 - the golden fixtures validate and the invalid fixtures fail with exactly
-  their codes, covering every diagnostic code;
+  their codes, covering every diagnostic code (with the workflow fixtures);
+- the blueprint and workflow `$defs` stay disjoint; every catalog property
+  schema is in the dialect, sits on an array or object prop and names only
+  contract `$ref`s; bindable props are declared portable props; and no
+  `deprecated` entry outlives its window (see below);
 - `components.json` equals the projection of the live catalog, and the
   blueprint schema matches the envelope `@texuli/catalog` reads;
 - generation is deterministic and refuses schemas outside the dialect;
@@ -105,7 +130,7 @@ Versioning).
 **The spec digest** is the SHA-256 of `manifest.json`'s canonical JSON: the
 spec version, the dialect and a digest per normative file (schemas,
 `catalog/components.json`, `catalog/capabilities.json` and every fixture).
-Every generated file carries it in its stamp (`// Spec 0.2.0, digest …`).
+Every generated file carries it in its stamp (`// Spec 0.3.0, digest …`).
 The same normative files always give the same digest.
 
 **The version follows the digest.** Every normative change changes the
@@ -141,13 +166,32 @@ its normative files moved without a version until 0.2.0.
   (`pnpm exec tsx native/conformance/web/trace.ts --write`). Native
   conformance compares the native refusals with every invalid fixture's
   codes.
-- **Blueprints:** a blueprint binds to an exact catalog hash today. The
-  envelope field for a compatible spec range is **planned, not built**.
-  Until it exists, a consumer checks the spec version it ships against the
-  stamp of the spec it was built from.
+- **Blueprints:** a blueprint binds to an exact catalog hash. From 0.3.0
+  an envelope may declare the exact spec version it was written for
+  (`spec`, an enum of the current version; omitted means 0.2.0). A field
+  for a compatible spec *range* is **planned, not built**.
 
-Migrations between versions (deterministic blueprint transforms tested per
-version pair) are **planned, not built**: nothing has needed one yet.
+**Migrations** (`src/migrations/<from>-<to>.ts`, exported from
+`@texuli/spec/migrate` as `migrateBlueprint`, `SPEC_MIGRATIONS` and
+`UNDECLARED_SPEC_VERSION`) run
+before validation. Each step is pure (it never mutates its input) and
+moves one version. `migrateBlueprint(input, target = SPEC_VERSION)` never
+throws: a value that is not an envelope, or one declaring a version no
+chain starts from, passes through with `applied: []` (validation then
+refuses an unknown `spec`). It is idempotent, touches only the `spec`
+field (the tree, status, provenance and activation digest stay valid), and
+keeps a parsed `__proto__` key as an own property, which validation still
+refuses. `0.2.0 → 0.3.0` is additive: it stamps `spec: "0.3.0"`. The tests
+check that `SPEC_MIGRATIONS` covers every consecutive pinned pair in
+`versions.json` from 0.2.0 to `SPEC_VERSION`. Inside a plan that has not
+published a spec version, later normative changes amend that version's pin
+rather than minting a new one (ADR-008).
+
+**Deprecation.** A catalog component or prop may carry
+`deprecated: { since, replacement? }`. Validation then adds a `deprecated`
+warning (`SpecValidation.warnings`; `ok` is unaffected). It warns for one
+minor: conformance fails once the spec minor reaches `since` + 1, so the
+entry must be removed by then.
 
 
 ## Named slots and conditions
@@ -155,6 +199,150 @@ version pair) are **planned, not built**: nothing has needed one yet.
 A node may carry `slot` (audit G04: the parent's named slot, a string such as
 `hero`) and `when` (audit G07: the blocks `Condition` AST that shows the node
 when true). Both match what `@texuli/catalog` renders.
+
+## Spec 0.3.0: state, bindings, actions, events and workflows
+
+ADR-008 moves interaction into the contract while keeping blueprints data
+only: every set below is closed, unknown fields are refused, and nothing is
+evaluated. The dialect has no unions, so each sum type is one closed record
+with an enum discriminator (`op`, `type`) and the per-variant rules live in
+`validate.ts` (mirrored by the Kotlin validator).
+
+**State and flow** (envelope `state`, `flow`; code `state`). At most 64
+variables named `^[a-z][A-Za-z0-9_]{0,31}$`. Types: `boolean` (default
+`false`), `number` (`min` ≤ `max` required, default `min`), `enum` (1–32
+distinct values of 1–64 characters, default the first), `string`
+(`maxLength` 1–1000, default 200; default `""`), `list` (`maxItems` 0–500,
+default 500; items are `{ id, ...fields }` with a unique item key
+`^[A-Za-z0-9._:-]{1,64}$` and at most 16 scalar fields; string fields
+follow `listText`, below), `workflow` (an
+`initial` graph that must pass the workflow rules, checked only when the
+host supplies the workflow schema and validator; otherwise `state`). A
+`source` (host data
+name such as `tickets.open`) makes a scalar variable host-bound: read-only
+to the blueprint; lists and workflows take no `source`. A `flow` has 1–16
+distinct views, an `initial` view and at most 64 transitions
+`{ from (a view or *), to, on, when? }`; the `when` guard is the node
+condition AST. A refused declaration stays declared, so its uses are not
+also reported.
+
+**Bindings** (code `binding`, `unknown-state`). A prop value
+`{"$state": name}` reads a declared variable; its declared initial value
+(the first paint) must fit the prop's kind, enum and property schema.
+`{"$data": name}` reads host data: read-only, and only as a whole
+top-level prop of kind string, number, boolean or enum. A binding has
+exactly one key. Inside an array or object prop, `$state` bindings may sit
+at any depth (each must be declared, and must fit its schema position when
+the prop has a property schema); `$data` may not. Node `bind`
+(`{ prop: {"$state": name} }`) is a two-way binding: the prop must be in
+the component's `bindable` list, not also set in `props`, and the variable
+must be writable and fit. A `when` condition's `var` operands read declared
+number and boolean variables (booleans as 1/0), as the player does; their
+names are not checked.
+
+**Events and actions** (codes `unknown-event`, `action`). Node `on` maps an
+event to 1–8 actions run in order. Events are the closed vocabulary
+`press`, `change`, `select`, `submit`, `dismiss`, `move`, and each key must
+be one the component lists in `events`. Actions (`op`), with the fields
+each takes (anything else is refused):
+
+| `op` | Fields | Rules |
+| --- | --- | --- |
+| `setState` | `state`, one of `value` or `fromEvent: "value"` | A writable scalar variable; `value` must fit it; `fromEvent` only on `change` or `select` |
+| `toggleState` | `state` | A writable boolean |
+| `moveItem` | `from`, `item`, `to?`, `index?` (0–499) | Writable lists |
+| `flowGo` | `event` | A declared flow with a transition on `event`; the guard is evaluated at run time |
+| `emit` | `intent`, `values?` | A host intent; at most 32 values, each a boolean, a finite number, a string of at most 2,048 or a `$state` binding of a scalar variable |
+| `submit` | none | Only inside an `action-form` (what `form-submit` does today) |
+
+**`moveItem` semantics** (normative; the reducer lives in the runtime): if
+item `k` is not in `from`, or is locked in the source, refuse with no
+change. Otherwise remove it from `from` and insert it into `to` (default
+`from`) at `clamp(index ?? len, 0, len)`; refuse if the target would exceed
+its `maxItems`. With `pull: "clone"`, insert a copy with id `<id>-<n>`, `n`
+the smallest number ≥ 2 not in use; refuse if that id would exceed 64
+characters.
+
+**Drag as data.** `reorder` is not a node field: it is a container prop
+whose catalog prop has `schema: { "$ref": "#/$defs/reorder" }`:
+`{ bind, axis?, group?, accepts?, locked?, pull?, disabled? }`. Its items
+are the bound list (`bind` must be `$state` of a writable list); a drop or
+keyboard move runs `moveItem`. Containers sharing a group exchange items
+when `accepts` allows; `pull` is `move`, `clone` or `none`.
+
+**Property schemas** (catalog `prop.schema`, array and object props only).
+A dialect subset (`type`, `properties`, `required`, `additionalProperties`,
+`items`, `enum`, string, number and array bounds; no `pattern`, for regex
+parity across targets). Objects are closed unless `additionalProperties`
+gives a map. `$ref` names one of `binding`, `reorder`, `action`,
+`eventMap`, `condition` (blueprint `$defs`) or `workflowGraph` (the
+workflow root). A value that does not match reports its first issue as
+`prop-type`; a `workflowGraph` prop validated without the workflow schema
+or the workflow validator fails closed with `prop-type`.
+
+**Workflow graphs** (`schemas/workflow.schema.json`, `validateWorkflowGraph`
+from `@texuli/spec/workflow`, code `workflow` after a clean schema pass). A graph declares closed
+`nodeTypes` (1–64; each with up to 16 typed ports and 32 fields), nodes
+(≤ 500), edges (≤ 2,000), optional groups (≤ 64), a `cycles` policy
+(`allow`, the default, or `forbid`) and a viewport. Labels are 1–200
+characters with no control characters and no bidirectional overrides or
+isolates. The rules, linear in nodes plus edges: unique ids (node types;
+ports and fields within a type; nodes; edges; groups); every node's type
+and group declared; node `data` keys are declared fields with a value of
+the field kind (string ≤ `maxLength`, default 2,000, no control or bidi
+characters except tab and newline; finite number; boolean; enum member)
+and required fields present; edges go from an existing node's declared
+`out` port to an existing node's declared `in` port, with equal `kind`
+when both declare one; a port without `multiple` takes one edge; no two
+edges join the same ports; and `cycles: "forbid"` means acyclic (a
+self-loop counts). `@texuli/workflows/model` is the editor's runtime
+model; this schema is the interchange contract.
+
+**The state surface** (codes `action`, `binding`, `state`;
+`src/surface.ts`). So that a blueprint that validates always paints, the
+validator refuses exactly what `@texuli/player` refuses at paint time, with
+the player's messages and its codes mapped onto the closed set
+(`action-binding` → `action`, `control-binding` and `host-binding` →
+`binding`, `flow-binding` → `state`):
+
+- `form-field` and `form-submit` sit inside an `action-form`; forms never
+  nest; a form's `action` and a field's `name` match the intent pattern;
+  field names are unique in a form; a field writes a declared variable of
+  its type (`kind: "number"` a number, others a string).
+- `control-toggle`, `control-choice`, `control-slider` and `control-filter`
+  name a declared `boolean`, `enum`, `number` or `string` variable.
+- `flow-view` names a declared view and `flow-action` an event some
+  transition handles; neither appears without a `flow`.
+- No control or field writes a host-bound variable (one with a `source`).
+
+An envelope with `state` or `flow` has declarations (empty with only a
+flow); without either, every control, field and flow node is refused.
+`packages/player/tests/surface-parity.test.ts` proves the two agree on a
+corpus that exercises every player code.
+
+**List item text** (`SPEC_PATTERNS.listText`, code `state`). String fields
+of list items refuse C0 and C1 controls (tab and newline included),
+bidirectional overrides and isolates (U+202A–202E, U+2066–2069) and the
+invisible formatting characters U+061C, U+180E, U+200B, U+200E, U+200F,
+U+2060–2064 and U+FEFF, so a draggable item never hides or reorders its
+text. ZWNJ and ZWJ (U+200C, U+200D) stay allowed: Persian and Indic
+scripts and emoji sequences need them. The catalog and the player's list
+parsing apply the same pattern.
+
+**The Kotlin twin.** `native/texuli-spec` mirrors every rule above in the
+TypeScript order (`SpecValidator.kt`, `PropSchemaValidator.kt`,
+`WorkflowValidator.kt`, `Contract.kt`, `Surface.kt`), and the conformance module checks
+that every invalid blueprint and workflow fixture is refused with the same
+codes on both targets. Known differences, all on input that is refused on
+both targets: the generated decoders stop at the first shape error, so
+Kotlin reports one `schema` diagnostic where TypeScript may list several,
+and skips the semantic checks a malformed value would also have failed;
+outside workflow graphs Kotlin does not check the schema's patterns, and
+reports out-of-range state limits (`values`, `maxLength`, `maxItems`) as
+`state` rather than `schema`. The TypeScript workflow validator is an opt-in subpath for
+bundle size; Kotlin always links `WorkflowValidator.kt`, so its validator
+has no fail-closed mode for a missing workflow validator (the conformance
+harness supplies it on the TypeScript side, so fixtures compare equal).
 
 ## Not yet
 

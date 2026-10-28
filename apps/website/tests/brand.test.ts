@@ -392,3 +392,70 @@ describe('brand page surfaces (W18)', () => {
     });
   });
 });
+
+describe('footer Dailybot credit (PLAN_007)', () => {
+  /**
+   * T-dailybot-credit: the site footer carries a subtle "Powered by Dailybot"
+   * credit, a muted kicker plus the horizontal Dailybot logo. Source-level
+   * like the rest of this file; the a11y-site and site-responsive specs check
+   * the built footer (axe in light, dark and forced colors; no overflow).
+   */
+
+  const HERE = dirname(fileURLToPath(import.meta.url));
+  const WEBSITE = resolve(HERE, '..');
+  const footer = readFileSync(
+    resolve(WEBSITE, 'src/components/foundation/SiteFooter.astro'),
+    'utf8'
+  );
+  const credit = footer.match(/<a\s+class="site-footer__credit"[\s\S]*?<\/a>/)?.[0] ?? '';
+  const imgs = credit.match(/<img\b[^>]*\/>/g) ?? [];
+
+  it('links to Dailybot with the website utm tag, a name and decorative logos that exist', () => {
+    expect(credit).not.toBe('');
+    expect(footer).toContain(
+      "'https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-website'"
+    );
+    expect(footer).toMatch(/const dailybotHref = safeHref\(DAILYBOT_URL, 'developer'\);/);
+    expect(credit).toContain('href={dailybotHref}');
+    expect(credit).toContain('rel="noopener noreferrer"');
+    expect(credit).toContain('aria-label="Powered by Dailybot"');
+    // The visible kicker starts the accessible name (WCAG 2.5.3 label in name).
+    expect(credit).toMatch(/>Powered by<\/span>/);
+    expect(credit).not.toMatch(/\sstyle=/);
+
+    expect(imgs).toHaveLength(2);
+    for (const [img, tone] of [
+      [imgs[0] ?? '', 'black'],
+      [imgs[1] ?? '', 'white'],
+    ] as const) {
+      expect(img).toContain(`src={dailybotLogo('${tone}')}`);
+      expect(img).toContain('alt=""');
+      expect(img).toMatch(/width="\d+"/);
+      expect(img).toMatch(/height="20"/);
+      expect(img).toContain('loading="lazy"');
+      const file = resolve(WEBSITE, `public/brand/dailybot/logo-horizontal-${tone}.svg`);
+      expect(existsSync(file), file).toBe(true);
+      const svg = readFileSync(file, 'utf8');
+      expect(svg).toMatch(/^<svg\b/);
+      expect(svg).not.toMatch(/<script|\son\w+=|href=/i);
+    }
+    expect(footer).toMatch(/brand\/dailybot\/logo-horizontal-\$\{tone\}\.svg/);
+  });
+
+  it('shows the black logo on light modes and the white one on dark, forced colors by scheme', () => {
+    const css = (footer.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '').replace(
+      /\/\*[\s\S]*?\*\//g,
+      ''
+    );
+    expect(css).toMatch(/\.site-footer__credit-dark \{\s*display: none;/);
+    expect(css).toMatch(
+      /:root\[data-tx-mode='dark'\]\) \.site-footer__credit-light \{\s*display: none;/
+    );
+    expect(css).toMatch(
+      /:root\[data-tx-mode='dark'\]\) \.site-footer__credit-dark \{\s*display: block;/
+    );
+    expect(css).toMatch(/@media \(forced-colors: active\) and \(prefers-color-scheme: dark\)/);
+    expect(css).toMatch(/\.site-footer__credit \{[^}]*color: var\(--tx-muted-foreground\);/);
+    expect(css).toMatch(/\.site-footer__credit img \{[^}]*block-size: 1\.25rem;/);
+  });
+});

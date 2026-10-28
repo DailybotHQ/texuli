@@ -27,6 +27,7 @@
     "@texuli/primitives": "workspace:*",
     "@texuli/slides": "workspace:*",
     "@texuli/tokens": "workspace:*",
+    "@texuli/workflows": "workspace:*",
     "texuli": "workspace:*"
   },
   "peerDependencies": {

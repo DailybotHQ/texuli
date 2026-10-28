@@ -66,7 +66,7 @@ export function assertInertRoots(roots: readonly RenderNode[]): string[] {
   const failures: string[] = [];
   const walk = (list: readonly RenderNode[], path: string) => {
     for (let i = 0; i < list.length; i += 1) {
-      const node = list[i]!;
+      const node = list[i] as RenderNode;
       const here = `${path}[${i}]`;
       if (node.kind === 'component') {
         for (const key of Object.keys(node.props)) {

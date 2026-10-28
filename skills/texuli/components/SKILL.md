@@ -5,14 +5,7 @@ version: "0.2.0"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
-metadata:
-  openclaw:
-    emoji: "▣"
-    homepage: https://texuli.com/guides/
-    requires:
-      anyBins:
-        - bash
-        - git
+metadata: {"openclaw":{"emoji":"▣","homepage":"https://texuli.com/guides/","requires":{"anyBins":["bash","git"]}}}
 ---
 
 # Install, copy and customize components
@@ -26,7 +19,11 @@ against folders on disk. 16 packages are on npm as
 `0.3.0`, a pre-1.0 release (`latest` and `next` both point to it; 1.0.0 will
 be the first stable release). Install them plainly (`pnpm add texuli`), pin
 the exact version or `^0.3.0` (for 0.x it accepts only 0.3.x, since a new
-minor may break), and never suggest a download URL. `@texuli/editor` is in development and not on npm.
+minor may break), and never suggest a download URL. `@texuli/editor`, `@texuli/drag`
+and `@texuli/workflows` are in development and not on npm, and features
+marked unreleased in [`../router/packages.md`](../router/packages.md) (such as
+`@texuli/primitives/sortable` and spec 0.3.0) are not in the published
+`0.3.0`: never tell a consumer app to install them from npm.
 
 ## Choose a path
 

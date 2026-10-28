@@ -67,6 +67,7 @@ import './layouts-dashboard/entry.ts';
 import './layouts-marketing/entry.ts';
 import './layouts-shells/entry.ts';
 import './layouts-mobile/entry.ts';
+import './lego/entry.ts';
 import './media-animation/entry.ts';
 import './media-animation-timeline/entry.ts';
 import './media-audio/entry.ts';
@@ -97,6 +98,7 @@ import './sheet/entry.ts';
 import './sidebar/entry.ts';
 import './slider/entry.ts';
 import './slides/entries.ts';
+import './sortable/entry.ts';
 import './stat/entry.ts';
 import './stepper/entry.ts';
 import './table/entry.ts';
@@ -108,6 +110,9 @@ import './toggle/entry.ts';
 import './toolbar/entry.ts';
 import './tooltip/entry.ts';
 import './tree/entry.ts';
+import './workflows-editor/entry.ts';
+import './workflows-state-machine/entry.ts';
+import './workflows-viewer/entry.ts';
 
 export { astroSiteDocExample } from './astro-site-doc/entry.ts';
 export { astroSiteHeroExample } from './astro-site-hero/entry.ts';
@@ -116,6 +121,7 @@ export { texuliComboboxExample } from './combobox/entry.ts';
 export { texuliFileUploadExample } from './file-upload/entry.ts';
 export { texuliAppLayoutsExample } from './layouts-app/entry.ts';
 export { layoutsMarketingExample } from './layouts-marketing/entry.ts';
+export { legoExample } from './lego/entry.ts';
 export { mediaAnimationExample } from './media-animation/entry.ts';
 export { mediaAudioExample } from './media-audio/entry.ts';
 export { mediaCaptionsExample } from './media-captions/entry.ts';
@@ -141,6 +147,7 @@ export { texuliScrollAreaExample } from './scroll-area/entry.ts';
 export { texuliSeparatorAspectExample } from './separator-aspect/entry.ts';
 export { texuliSheetExample } from './sheet/entry.ts';
 export { texuliSidebarExample } from './sidebar/entry.ts';
+export { primitivesSortableExample } from './sortable/entry.ts';
 export { texuliTooltipExample } from './tooltip/entry.ts';
 export type {
   ExampleEntry,
@@ -148,3 +155,6 @@ export type {
   ExampleMeta,
   ExampleModule,
 } from './types.ts';
+export { workflowsEditorExample } from './workflows-editor/entry.ts';
+export { workflowsStateMachineExample } from './workflows-state-machine/entry.ts';
+export { workflowsViewerExample } from './workflows-viewer/entry.ts';

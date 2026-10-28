@@ -28,9 +28,21 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./workflow": {
+      "types": "./src/workflow.ts",
+      "default": "./src/workflow.ts"
+    },
+    "./migrate": {
+      "types": "./src/migrations/index.ts",
+      "default": "./src/migrations/index.ts"
+    },
     "./codegen": {
       "types": "./src/codegen/index.ts",
       "default": "./src/codegen/index.ts"
+    },
+    "./surface": {
+      "types": "./src/surface.ts",
+      "default": "./src/surface.ts"
     }
   },
   "scripts": {

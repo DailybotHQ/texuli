@@ -237,14 +237,20 @@
       "types": "./src/avatar/index.ts",
       "svelte": "./src/avatar/index.ts",
       "default": "./src/avatar/index.ts"
+    },
+    "./sortable": {
+      "types": "./src/sortable/index.ts",
+      "svelte": "./src/sortable/index.ts",
+      "default": "./src/sortable/index.ts"
     }
   },
   "scripts": {
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
+    "@texuli/core": "0.3.0",
     "@texuli/date": "0.3.0",
-    "@texuli/core": "0.3.0"
+    "@texuli/drag": "workspace:*"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

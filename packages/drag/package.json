@@ -1,0 +1,70 @@
+{
+  "name": "@texuli/drag",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Framework-free, general-purpose drag engine for Texuli: sortable lists, boards, trees, spatial canvases and graph editing.",
+  "keywords": [
+    "drag",
+    "drag-and-drop",
+    "sortable",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
+  "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/drag"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./sortable": {
+      "types": "./src/sortable.ts",
+      "default": "./src/sortable.ts"
+    },
+    "./collision": {
+      "types": "./src/collision.ts",
+      "default": "./src/collision.ts"
+    },
+    "./modifiers": {
+      "types": "./src/modifiers.ts",
+      "default": "./src/modifiers.ts"
+    },
+    "./auto-scroll": {
+      "types": "./src/auto-scroll.ts",
+      "default": "./src/auto-scroll.ts"
+    },
+    "./gesture": {
+      "types": "./src/gesture.ts",
+      "default": "./src/gesture.ts"
+    },
+    "./spatial": {
+      "types": "./src/spatial.ts",
+      "default": "./src/spatial.ts"
+    },
+    "./graph": {
+      "types": "./src/graph.ts",
+      "default": "./src/graph.ts"
+    },
+    "./messages": {
+      "types": "./src/messages.ts",
+      "default": "./src/messages.ts"
+    },
+    "./testing": {
+      "types": "./src/testing.ts",
+      "default": "./src/testing.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

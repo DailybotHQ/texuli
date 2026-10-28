@@ -1,0 +1,104 @@
+{
+  "golden": "app-dashboard",
+  "trace": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "id": "control-choice",
+                  "role": "generic"
+                },
+                {
+                  "id": "control-filter",
+                  "role": "generic"
+                },
+                {
+                  "id": "control-toggle",
+                  "role": "generic"
+                }
+              ],
+              "id": "layout-row",
+              "role": "generic"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Filters",
+          "role": "group"
+        },
+        {
+          "id": "blocks-data",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "id": "charts-line",
+                  "name": "Pipeline per day",
+                  "role": "figure"
+                }
+              ],
+              "id": "layout-tile",
+              "role": "generic"
+            },
+            {
+              "children": [
+                {
+                  "id": "charts-donut",
+                  "name": "Deals by stage",
+                  "role": "figure"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Deals by stage",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "id": "charts-bar",
+                  "name": "Revenue by region",
+                  "role": "figure"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Revenue by region",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "id": "charts-gauge",
+                  "name": "Quarter quota attained",
+                  "role": "figure"
+                }
+              ],
+              "id": "layout-tile",
+              "role": "generic"
+            }
+          ],
+          "id": "layout-grid",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "data-grid",
+              "role": "generic"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Accounts",
+          "role": "group"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Revenue operations, week 43",
+      "role": "main"
+    }
+  ]
+}

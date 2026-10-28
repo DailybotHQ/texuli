@@ -6,8 +6,9 @@ document records how its chat screen maps onto the native Compose surface
 today. The check that holds it is
 `conformance/src/jvmTest/kotlin/com/texuli/conformance/KmpAiChatMigrationTest.kt`,
 with two fictional, static blueprints: `conformance/fixtures/kmp-aichat-thread.json`
-(the intended chat form) and `conformance/fixtures/kmp-aichat.json` (the form
-the native target loads today).
+(the intended chat form, which validates on both targets) and
+`conformance/fixtures/kmp-aichat.json` (the form the native target paints
+today).
 
 ## The app's screen
 
@@ -28,29 +29,35 @@ fixtures use fictional static text instead.
 | --- | --- | --- |
 | `Scaffold` + title bar | `layout-page` with a title | Painted (`IMPLEMENTED`) |
 | Demo warning | `blocks-text`, type `text` | Painted |
-| Message list | `chat-thread` | **Refused**: `unknown-id`, the spec vocabulary has no chat ids |
-| `ChatBubble` | `chat-message` (author, role, time, text) | **Refused**: `unknown-id` |
+| Message list | `chat-thread` (label) | Validates and plans; paints a `not-on-this-target` placeholder (`PLACEHOLDER`, no native chat painter) |
+| `ChatBubble` | `chat-message` (required `author` and `role`: `user`, `agent` or `system`; optional `at`, `text`) | Validates and plans; inside the thread's placeholder (`PLACEHOLDER`) |
 | Error banner | `blocks-text`, type `callout` (fallback) | Painted |
 | Message list, fallback | `layout-card` with one `blocks-text` per message, the role written as a prefix ("You: …", "Assistant: …") | Painted |
-| Composer (text field + Send) | None: `input`, `textarea`, `button` and `form` have an empty `emit` list; the composer is host chrome | Stays app code |
+| Composer (text field + Send) | None: host chrome on every target (the player refuses a composer at every tier; a blueprint never supplies one). `input`, `textarea`, `button` and `form` keep an empty `emit` list | Stays app code: the native app provides it, as the web host does |
 | Loading indicator, auto-scroll, empty state | None | Stays app code |
 
-`chat-thread` and `chat-message` are Tier U display ids in the catalog
-(`packages/player/src/chat-manifests.ts`), but they are not in
-`@texuli/spec`'s vocabulary, so `loadBlueprint` refuses the intended form
-outright. It does not paint a placeholder for them. The fallback keeps the
-words and the order but loses the chat semantics: no author or time, the role
-only as text, and no bubble alignment.
+`chat-thread` and `chat-message` are catalog ids
+(`packages/catalog/src/manifests/chat/`), projected into `@texuli/spec`
+0.3.0 as `web-only` and emittable at both tiers. The intended form therefore
+validates under `loadBlueprint` and under the TypeScript `validateBlueprint`
+(`native/conformance/web/structure.ts` checks the same fixture), and plans
+with every chat prop kept (`label`; `author`, `role`, `at`, `text`). The
+native target has no chat painter, so the thread paints one visible
+`not-on-this-target` placeholder. Until a painter lands, the native screen
+uses the fallback, which keeps the words and the order but loses the chat
+semantics: no author or time, the role only as text, and no bubble
+alignment.
 
 ## Gaps
 
-- **Chat ids are not in the spec.** Reaching the native target needs
-  `chat-thread` and `chat-message` in the spec vocabulary, then a native chat
+- **No native chat painter.** The chat ids are in the spec (0.3.0) and the
+  intended form validates on both targets; painting it natively needs a chat
   painter (a labelled list of messages, each named by author and time, with
   links checked by the untrusted URL policy). Planned, not built.
 - **The composer and live behavior** (sending, loading, auto-scroll, errors
-  as they happen) are app code by design. A blueprint is a static transcript,
-  and the catalog keeps the composer as host chrome.
+  as they happen) stay app code on native. The composer (text field and
+  send) is host chrome on every target: the web host or the native app
+  provides it, and it is not part of the blueprint.
 - **Images, tables and charts** do not appear on this screen, so this check
   does not exercise them.
 

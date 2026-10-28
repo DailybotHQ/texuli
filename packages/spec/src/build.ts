@@ -19,6 +19,7 @@ export const SCHEMA_UNITS = [
   { name: 'catalog', prefix: 'Spec', ts: 'catalog-schema.ts', kt: 'CatalogSchema.kt' },
   { name: 'diagnostics', prefix: 'Spec', ts: 'diagnostics.ts', kt: 'Diagnostics.kt' },
   { name: 'manifest', prefix: 'Spec', ts: 'manifest.ts', kt: 'Manifest.kt' },
+  { name: 'workflow', prefix: '', ts: 'workflow.ts', kt: 'Workflow.kt' },
 ] as const;
 
 export const TS_OUT = 'generated/typescript/';

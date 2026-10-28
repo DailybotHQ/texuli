@@ -1,15 +1,26 @@
 <script lang="ts">
-import { getPlayerStateAccess } from '../context.ts';
+import { getPlayerInteraction, getPlayerStateAccess } from '../context.ts';
 
-let { state: stateName, label }: { state: string; label: string } = $props();
+let {
+  state: stateName,
+  label,
+  txPath,
+}: { state: string; label: string; txPath?: string } = $props();
 const access = getPlayerStateAccess();
+const interaction = getPlayerInteraction();
+/** Write the variable, then run the node's `on.change` actions (spec 0.3.0). */
+function write(value: unknown): void {
+  if (access?.write(stateName, value) && txPath !== undefined) {
+    interaction?.dispatch(txPath, 'change', { value });
+  }
+}
 let declaration = $derived(access?.declaration(stateName));
 let values = $derived(declaration?.type === 'enum' ? declaration.values : []);
 let current = $derived(access?.read(stateName));
 let group = $state<HTMLElement | null>(null);
 
 function choose(value: string, focus = false): void {
-  access?.write(stateName, value);
+  write(value);
   if (focus) {
     queueMicrotask(() =>
       group?.querySelector<HTMLElement>(`[data-value="${CSS.escape(value)}"]`)?.focus()

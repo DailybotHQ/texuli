@@ -1,0 +1,95 @@
+{
+  "$comment": "Must fail validateWorkflowGraph with exactly these diagnostic codes, in order.",
+  "expect": ["workflow"],
+  "graph": {
+    "version": 1,
+    "nodeTypes": [
+      {
+        "id": "step",
+        "label": "Step",
+        "ports": [
+          {
+            "id": "in",
+            "direction": "in",
+            "kind": "flow",
+            "multiple": true
+          },
+          {
+            "id": "out",
+            "direction": "out",
+            "kind": "flow",
+            "multiple": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "kind": "string",
+            "required": true,
+            "maxLength": 120
+          },
+          {
+            "name": "retries",
+            "kind": "number"
+          },
+          {
+            "name": "notify",
+            "kind": "boolean"
+          }
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "draft",
+        "type": "step",
+        "label": "Draft",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "data": {
+          "title": "Draft"
+        }
+      },
+      {
+        "id": "review",
+        "type": "step",
+        "label": "Review",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "data": {
+          "title": "Review"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": {
+          "node": "draft",
+          "port": "out"
+        },
+        "to": {
+          "node": "review",
+          "port": "in"
+        }
+      },
+      {
+        "id": "e2",
+        "from": {
+          "node": "review",
+          "port": "out"
+        },
+        "to": {
+          "node": "draft",
+          "port": "in"
+        }
+      }
+    ],
+    "cycles": "forbid"
+  }
+}

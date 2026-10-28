@@ -1,6 +1,10 @@
 <script lang="ts">
 import type { CatalogTreeInput } from '@texuli/catalog/render/renderer';
+import { createDragSession, type Point } from '@texuli/drag';
+import { type Droppable, pointerWithin } from '@texuli/drag/collision';
+import { bindPointerGesture, createPointerTracker } from '@texuli/drag/gesture';
 import { tick } from 'svelte';
+import type { Attachment } from 'svelte/attachments';
 import {
   GROUP_REFUSAL_TEXT,
   type GroupResult,
@@ -33,8 +37,10 @@ import {
  * arrows move focus and selection together, Shift and Ctrl/Cmd extend the
  * selection). Alt+Arrow keys and pointer drags both turn into `move` edit
  * ops through the same model, for one row or the whole selection, and the
- * host applies them behind its structure guard. Labels render as text;
- * rows are never HTML sinks.
+ * host applies them behind its structure guard. Pointer drags run on the
+ * shared `@texuli/drag` engine (gesture tracker, drag session, collision on
+ * rects snapshotted at drag start); the outline model decides placement.
+ * Labels render as text; rows are never HTML sinks.
  */
 let {
   tree,
@@ -91,10 +97,8 @@ let message = $state('');
 let anchorKey = $state<string | null>(null);
 let dragKey = $state<string | null>(null);
 let dropHint = $state<{ key: string; position: DropPosition; refused: string | null } | null>(null);
-/** A pointer press that becomes a drag once it travels past the threshold. */
-let press: { key: string; x: number; y: number; pointerId: number } | null = null;
 let suppressClick = false;
-const DRAG_THRESHOLD = 4;
+let treeElement = $state<HTMLElement | null>(null);
 
 function rowElement(key: string): HTMLElement | null {
   return document.querySelector<HTMLElement>(`[data-builder-row="${key}"]`);
@@ -337,78 +341,119 @@ function dropRefusal(key: string, position: DropPosition): string | null {
   return refused;
 }
 
-function hintAt(x: number, y: number) {
-  const element = document.elementFromPoint(x, y)?.closest<HTMLElement>('[data-outline-row]');
-  const key = element?.dataset.outlineRow;
-  const row = rows.find((candidate) => candidate.key === key);
-  if (!element || !row) return null;
-  const box = element.getBoundingClientRect();
-  const position = dropPosition(y - box.top, box.height, row.canContain);
+interface DropTarget {
+  key: string;
+  position: DropPosition;
+}
+
+/** The engine's session: a refusal's reason is the text the outline announces. */
+const session = createDragSession<string, DropTarget>({
+  // The pointer tracker applies the 4 px threshold before the session starts.
+  threshold: 0,
+  canDrop: (_source, target) => {
+    const refused = dropRefusal(target.key, target.position);
+    return refused === null ? { ok: true } : { ok: false, reason: refused };
+  },
+});
+
+/** Row rects, snapshotted when a drag starts and re-measured only on scroll. */
+let rowRects: Droppable[] = [];
+let stopScrollWatch: (() => void) | null = null;
+
+function measureRows() {
+  rowRects = [...(treeElement?.querySelectorAll<HTMLElement>('[data-outline-row]') ?? [])].map(
+    (element) => {
+      const box = element.getBoundingClientRect();
+      return {
+        id: element.dataset.outlineRow ?? '',
+        rect: { x: box.left, y: box.top, width: box.width, height: box.height },
+      };
+    }
+  );
+}
+
+function hintAt(point: Point) {
+  const hit = pointerWithin({ pointer: point, droppables: rowRects });
+  const row = hit && rows.find((candidate) => candidate.key === hit.id);
+  const rect = hit && rowRects.find((entry) => entry.id === hit.id)?.rect;
+  if (!row || !rect) return null;
+  const position = dropPosition(point.y - rect.y, rect.height, row.canContain);
   return { key: row.key, position, refused: dropRefusal(row.key, position) };
 }
 
-function onpointerdown(event: PointerEvent, key: string) {
-  suppressClick = false;
-  if (event.button !== 0 || key === '') return;
-  press = { key, x: event.clientX, y: event.clientY, pointerId: event.pointerId };
-}
-
-function onpointermove(event: PointerEvent) {
-  if (!press || event.pointerId !== press.pointerId) return;
-  if (dragKey === null) {
-    if (Math.hypot(event.clientX - press.x, event.clientY - press.y) < DRAG_THRESHOLD) return;
-    dragKey = press.key;
-    checked = new Map();
-    message = '';
-    try {
-      (event.currentTarget as Element | null)?.setPointerCapture?.(event.pointerId);
-    } catch {
-      // A pointer the browser no longer tracks cannot be captured; the drag still follows its moves.
-    }
+function startDrag(key: string, point: Point) {
+  dragKey = key;
+  checked = new Map();
+  message = '';
+  measureRows();
+  const doc = treeElement?.ownerDocument;
+  if (doc) {
+    const onScroll = () => measureRows();
+    doc.addEventListener('scroll', onScroll, true);
+    stopScrollWatch = () => doc.removeEventListener('scroll', onScroll, true);
   }
-  dropHint = hintAt(event.clientX, event.clientY);
+  session.start(key, point, 'pointer');
+  moveDrag(point);
 }
 
-function onpointerup(event: PointerEvent) {
-  if (!press || event.pointerId !== press.pointerId) return;
+function moveDrag(point: Point) {
+  if (dragKey === null) return;
+  session.move(point);
+  dropHint = hintAt(point);
+  session.over(dropHint ? { key: dropHint.key, position: dropHint.position } : null);
+}
+
+function endDrag(point: Point) {
   const from = dragKey;
-  press = null;
   if (from === null) return;
   // The click that follows a drag must not reselect the dragged row.
   suppressClick = true;
-  const hint = hintAt(event.clientX, event.clientY);
+  moveDrag(point);
+  const target = dropHint && rows.find((candidate) => candidate.key === dropHint?.key);
+  const position = dropHint?.position;
+  const outcome = session.drop();
   cancelDrag();
-  const target = hint && rows.find((candidate) => candidate.key === hint.key);
-  if (!hint || !target) {
-    message = 'Dropped outside the outline. Nothing moved.';
-    return;
-  }
-  if (hint.refused) {
+  if (outcome.kind === 'cancel') {
     // Refused visibly: the reason is announced and the tree is unchanged.
-    message = hint.refused;
+    message =
+      outcome.reason === 'no-target'
+        ? 'Dropped outside the outline. Nothing moved.'
+        : outcome.reason;
     return;
   }
+  if (outcome.kind !== 'drop' || !target || !position) return;
   const paths = movingPaths(from);
   if (paths.length > 1) {
-    void commit(groupDropMove(tree, paths, target.path, hint.position, canContain), true);
+    void commit(groupDropMove(tree, paths, target.path, position, canContain), true);
   } else {
-    void commit(
-      asGroup(dropMove(tree, parseKey(from), target.path, hint.position, canContain)),
-      false
-    );
+    void commit(asGroup(dropMove(tree, parseKey(from), target.path, position, canContain)), false);
   }
 }
 
 function cancelDrag() {
-  press = null;
+  session.cancel();
+  stopScrollWatch?.();
+  stopScrollWatch = null;
   dragKey = null;
   dropHint = null;
   checked = new Map();
 }
 
-function onpointercancel() {
-  if (dragKey !== null) message = 'Move cancelled.';
-  cancelDrag();
+/** Pointer drags from a row or its handle: capture with a document fallback, a 4 px threshold, pointercancel cancels. */
+function dragFrom(key: string): Attachment<HTMLElement> {
+  return (node) =>
+    bindPointerGesture(
+      node,
+      createPointerTracker({
+        onStart: (event) => startDrag(key, event.point),
+        onMove: (event) => moveDrag(event.point),
+        onEnd: (event) => endDrag(event.point),
+        onCancel: () => {
+          if (dragKey !== null) message = 'Move cancelled.';
+          cancelDrag();
+        },
+      })
+    );
 }
 </script>
 
@@ -425,6 +470,7 @@ function onpointercancel() {
     aria-label={label}
     aria-multiselectable="true"
     aria-describedby={`${uid}-hint`}
+    bind:this={treeElement}
   >
     {#each rows as row, index (row.key)}
       <div
@@ -440,10 +486,8 @@ function onpointercancel() {
           <span
             class="outline__handle"
             aria-hidden="true"
-            onpointerdown={(event) => onpointerdown(event, row.key)}
-            {onpointermove}
-            {onpointerup}
-            {onpointercancel}
+            onpointerdown={() => (suppressClick = false)}
+            {@attach dragFrom(row.key)}
           >⠿</span>
         {/if}
         <button
@@ -461,10 +505,8 @@ function onpointercancel() {
           class:outline__item--dragging={dragKey !== null && movingPaths(dragKey).some((path) => pathKey(path) === row.key)}
           onclick={(event) => onrowclick(event, row)}
           onkeydown={(event) => onkeydown(event, index)}
-          onpointerdown={(event) => onpointerdown(event, row.key)}
-          {onpointermove}
-          {onpointerup}
-          {onpointercancel}
+          onpointerdown={() => (suppressClick = false)}
+          {@attach row.path.length > 0 && dragFrom(row.key)}
         >
           {row.label}
           {#if selectedSet.has(row.key)}<span class="outline__selected-label">Selected</span>{/if}

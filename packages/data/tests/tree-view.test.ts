@@ -2,14 +2,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
+import * as treeViewModule from '@texuli/data/tree-view';
+import { midpointIndex } from '@texuli/drag/collision';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import {
-  DRAG_THRESHOLD_PX,
-  depthIndentRem,
-  dropAsChild,
-  indexFromPointer,
-  placementsOf,
-} from '../src/tree-view/model.ts';
+import { depthIndentRem, dropAsChild, placementsOf } from '../src/tree-view/model.ts';
 import TreeDataViewHarness from './fixtures/TreeDataViewHarness.svelte';
 
 afterEach(() => {
@@ -19,15 +15,17 @@ afterEach(() => {
 
 describe('@texuli/data/tree-view model helpers', () => {
   it('computes pointer drop index, child-nest threshold and placements', () => {
-    expect(indexFromPointer([10, 30], 5)).toBe(0);
-    expect(indexFromPointer([10, 30], 20)).toBe(1);
-    expect(indexFromPointer([10, 30], 40)).toBe(2);
+    // Pointer placement now comes from the shared engine; the local copy is gone.
+    expect(midpointIndex([10, 30], 5)).toBe(0);
+    expect(midpointIndex([10, 30], 20)).toBe(1);
+    expect(midpointIndex([10, 30], 40)).toBe(2);
     expect(dropAsChild(0, 100, 80, 'ltr')).toBe(true);
     expect(dropAsChild(0, 100, 40, 'ltr')).toBe(false);
     expect(dropAsChild(0, 100, 20, 'rtl')).toBe(true);
     expect(depthIndentRem(1)).toBe(0);
     expect(depthIndentRem(3)).toBe(2.5);
-    expect(DRAG_THRESHOLD_PX).toBe(4);
+    expect('DRAG_THRESHOLD_PX' in treeViewModule).toBe(false);
+    expect('indexFromPointer' in treeViewModule).toBe(false);
     expect(
       placementsOf({
         id: 'a',

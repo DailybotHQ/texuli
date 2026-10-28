@@ -1,8 +1,35 @@
 {
-  "catalogHash": "b073e30b4c8b1a30b3ef3ccb372e552d2d88e584616b74591c6c32923b471376",
+  "catalogHash": "6389ff8dfd63e2b2e7cf5986be9f82fd72a3256e9e86fe634d066bbcd640ddd2",
   "components": [
     {
-      "capability": "unknown",
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["submit"],
+      "group": "state",
+      "id": "action-form",
+      "label": "Action form",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "action",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        }
+      ],
+      "summary": "Groups fields whose submit proposes one named action intent to the host."
+    },
+    {
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "alert",
@@ -66,7 +93,7 @@
       "summary": "Inline feedback for a page section (status or error)."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "alert-dialog",
@@ -136,7 +163,7 @@
       "summary": "Modal confirm/cancel dialog for consequential actions."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "analytics-grid",
@@ -178,7 +205,7 @@
       "summary": "Auto-fit KPI and widget grid for dashboard screens."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "app-nav",
@@ -261,7 +288,7 @@
       "summary": "Desktop sidebar shell with mobile sheet drawer and main slot."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "badge",
@@ -300,7 +327,7 @@
       "summary": "A compact status or category label."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "banner",
@@ -364,7 +391,7 @@
       "summary": "Full-width notice across a page or app shell."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-code",
@@ -460,7 +487,7 @@
       "summary": "Validated flow, tree, board and terminal diagrams."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-embed",
@@ -490,7 +517,7 @@
       "summary": "Validated link previews (URL policy) and embed-app shells. Texuli never runs app JSON; hosts mount via mountEmbed with a sandboxed iframe contract."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-interactive",
@@ -515,7 +542,7 @@
       "summary": "Validated polls, quizzes, calculators and checklists."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-map",
@@ -578,7 +605,7 @@
       "summary": "Validated image, figure, video and gallery content blocks."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-structure",
@@ -628,7 +655,7 @@
       "summary": "Validated heading, paragraph, list, quote and callout content."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "breadcrumb",
@@ -676,7 +703,7 @@
       "summary": "Hierarchy trail with URL-policy links."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "button",
@@ -746,7 +773,7 @@
       "summary": "A pressable action control with loading and optional link rendering."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "button-group",
@@ -780,7 +807,7 @@
       "summary": "Groups related buttons with shared borders and orientation."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "callout",
@@ -844,7 +871,7 @@
       "summary": "Emphasized documentation-style tip with a strong start edge."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "card",
@@ -878,7 +905,7 @@
       "summary": "A surface for grouping related content with optional link behavior."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-area",
@@ -936,7 +963,7 @@
       "summary": "A categorical area chart with an accessible data table."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-bar",
@@ -994,7 +1021,7 @@
       "summary": "A categorical bar chart with a zero baseline and accessible data table."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-bubble",
@@ -1095,7 +1122,7 @@
       "summary": "A compact value, range and target comparison."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-canvas-renderer",
@@ -1127,7 +1154,7 @@
       "summary": "A low-level canvas mark renderer for dense chart series."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-cartesian",
@@ -1191,7 +1218,7 @@
       "summary": "The general line, area, bar, stacked bar or combo chart renderer."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-combo",
@@ -1249,7 +1276,7 @@
       "summary": "A categorical chart that combines bar and line series."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-donut",
@@ -1292,7 +1319,7 @@
       "summary": "A part-to-whole chart with a central opening and data table."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-funnel",
@@ -1396,7 +1423,7 @@
       "summary": "A radial value gauge with thresholds and an accessible data table."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-geo-map",
@@ -1438,7 +1465,7 @@
       "summary": "A tiled geographic choropleth with a tabular data alternative."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-geo-point-map",
@@ -1480,7 +1507,7 @@
       "summary": "Geographic points positioned on a tiled map."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-heatmap",
@@ -1532,7 +1559,7 @@
       "summary": "A matrix of labeled cells with an accessible data table."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-line",
@@ -1590,7 +1617,7 @@
       "summary": "A categorical line chart with accessible values."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-network",
@@ -1637,7 +1664,7 @@
       "summary": "A node and connection graph with an accessible table."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-pie",
@@ -1725,7 +1752,7 @@
       "summary": "A compact radial progress indicator with a data table."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-sankey",
@@ -1772,7 +1799,7 @@
       "summary": "A weighted flow diagram with an accessible table."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-scatter",
@@ -1878,7 +1905,7 @@
       "summary": "A compact line, area or bar trend chart."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-stacked-bar",
@@ -1936,7 +1963,7 @@
       "summary": "A categorical stacked bar chart with accessible values."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-sunburst",
@@ -1979,7 +2006,7 @@
       "summary": "A hierarchical part-to-whole chart with an accessible table."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-treemap",
@@ -2022,7 +2049,62 @@
       "summary": "A hierarchical part-to-whole chart with an accessible table."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "group": "chat",
+      "id": "chat-message",
+      "label": "Chat message",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "at"
+        },
+        {
+          "kind": "string",
+          "name": "author",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "enumValues": ["user", "agent", "system"],
+          "kind": "enum",
+          "name": "role",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "text"
+        }
+      ],
+      "summary": "One display-only chat message: author, role, time, text and block children."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "group": "chat",
+      "id": "chat-thread",
+      "label": "Chat thread",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        }
+      ],
+      "summary": "Read-only conversation transcript of chat-message nodes, without a composer."
+    },
+    {
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "checkbox",
@@ -2097,7 +2179,7 @@
       "summary": "A binary or indeterminate checkbox with optional label."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "chip",
@@ -2145,7 +2227,7 @@
       "summary": "A toggleable filter chip (pressed state)."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "code",
@@ -2174,7 +2256,7 @@
       "summary": "Inline or block code with escaped text (no HTML)."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "combobox",
@@ -2280,7 +2362,7 @@
       "summary": "A text input that filters a list of options, for one value or several."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "command-palette",
@@ -2369,7 +2451,7 @@
       "summary": "Dialog-hosted command palette with search and recent items."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "content-layout",
@@ -2418,7 +2500,7 @@
       "summary": "Shared docs/blog/editorial reading frame with optional TOC."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "context-menu",
@@ -2443,7 +2525,7 @@
       "summary": "Pointer-anchored menu (right-click, long-press, Menu key)."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "context-menu-trigger",
@@ -2466,6 +2548,703 @@
         }
       ],
       "summary": "Region that opens the context menu."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change"],
+      "group": "state",
+      "id": "control-choice",
+      "label": "Choice control",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "state",
+          "required": true
+        }
+      ],
+      "summary": "A segmented choice that sets an enum state variable to one of its values."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change"],
+      "group": "state",
+      "id": "control-filter",
+      "label": "Filter control",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "placeholder"
+        },
+        {
+          "kind": "string",
+          "name": "state",
+          "required": true
+        }
+      ],
+      "summary": "A text field that sets a string state variable, capped at its declared length."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change"],
+      "group": "state",
+      "id": "control-slider",
+      "label": "Slider control",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "state",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "step"
+        }
+      ],
+      "summary": "A range input that sets a number state variable within its declared min and max."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change"],
+      "group": "state",
+      "id": "control-toggle",
+      "label": "Toggle control",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "state",
+          "required": true
+        }
+      ],
+      "summary": "A switch that sets a boolean state variable."
+    },
+    {
+      "bindable": ["items"],
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["move"],
+      "group": "data",
+      "id": "data-board",
+      "label": "Board",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "array",
+          "name": "columns",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "title": {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                "wipHard": {
+                  "maximum": 500,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "wipSoft": {
+                  "maximum": 500,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": ["id", "title"],
+              "type": "object"
+            },
+            "maxItems": 24,
+            "type": "array"
+          }
+        },
+        {
+          "enumValues": ["comfortable", "compact"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "column": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "detail": {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "lane": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "locked": {
+                  "type": "boolean"
+                },
+                "rank": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "title": {
+                  "maxLength": 200,
+                  "type": "string"
+                }
+              },
+              "required": ["id", "title", "column"],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "array",
+          "name": "lanes",
+          "schema": {
+            "items": {
+              "properties": {
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "title": {
+                  "maxLength": 120,
+                  "type": "string"
+                }
+              },
+              "required": ["id", "title"],
+              "type": "object"
+            },
+            "maxItems": 24,
+            "type": "array"
+          }
+        }
+      ],
+      "summary": "A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits."
+    },
+    {
+      "bindable": ["view"],
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change", "move", "select"],
+      "group": "data",
+      "id": "data-calendar",
+      "label": "Calendar",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "anchor"
+        },
+        {
+          "kind": "array",
+          "name": "events",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "allDay": {
+                  "type": "boolean"
+                },
+                "end": {
+                  "description": "An ISO 8601 date (2026-10-27) or time (2026-10-27T09:00:00Z).",
+                  "maxLength": 35,
+                  "minLength": 10,
+                  "type": "string"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "start": {
+                  "description": "An ISO 8601 date (2026-10-27) or time (2026-10-27T09:00:00Z).",
+                  "maxLength": 35,
+                  "minLength": 10,
+                  "type": "string"
+                },
+                "title": {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "tone": {
+                  "enum": ["primary", "info", "success", "warning", "danger", "neutral"],
+                  "type": "string"
+                }
+              },
+              "required": ["id", "title", "start", "end"],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
+          "kind": "boolean",
+          "name": "readOnly"
+        },
+        {
+          "kind": "string",
+          "name": "timeZone"
+        },
+        {
+          "enumValues": ["month", "week", "day", "agenda"],
+          "kind": "enum",
+          "name": "view"
+        }
+      ],
+      "summary": "Events on a month, week, day or agenda view; people open, and when allowed move, events."
+    },
+    {
+      "bindable": ["layout"],
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change", "select"],
+      "group": "data",
+      "id": "data-files",
+      "label": "File browser",
+      "placement": "content",
+      "props": [
+        {
+          "enumValues": ["comfortable", "compact"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "kind": "array",
+          "name": "entries",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": ["folder", "file"],
+                  "type": "string"
+                },
+                "name": {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "parent": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "size": {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "type": {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "description": "An ISO 8601 date (2026-10-27) or time (2026-10-27T09:00:00Z).",
+                  "maxLength": 35,
+                  "minLength": 10,
+                  "type": "string"
+                }
+              },
+              "required": ["id", "name", "kind"],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "enumValues": ["grid", "list"],
+          "kind": "enum",
+          "name": "layout"
+        }
+      ],
+      "summary": "Folders and files in a grid or list with breadcrumbs, selection and type previews."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change", "select"],
+      "group": "data",
+      "id": "data-grid",
+      "label": "Data grid",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "caption",
+          "required": true
+        },
+        {
+          "kind": "array",
+          "name": "columns",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "align": {
+                  "enum": ["start", "center", "end"],
+                  "type": "string"
+                },
+                "header": {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": ["text", "number", "date"],
+                  "type": "string"
+                },
+                "sortable": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["id", "header"],
+              "type": "object"
+            },
+            "maxItems": 48,
+            "type": "array"
+          }
+        },
+        {
+          "enumValues": ["compact", "default", "comfortable"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "kind": "array",
+          "name": "rows",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "cells": {
+                  "additionalProperties": {
+                    "maxLength": 500,
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": ["id", "cells"],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "boolean",
+          "name": "searchable"
+        },
+        {
+          "kind": "boolean",
+          "name": "selectable"
+        }
+      ],
+      "summary": "A sortable, searchable grid of rows and typed columns; virtualized for long lists."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["select"],
+      "group": "data",
+      "id": "data-map",
+      "label": "Map",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "enumValues": ["side", "below"],
+          "kind": "enum",
+          "name": "listPlacement"
+        },
+        {
+          "kind": "array",
+          "name": "markers",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "detail": {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "label": {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                "lat": {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                },
+                "lng": {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                "tone": {
+                  "enum": ["primary", "info", "success", "warning", "danger", "neutral"],
+                  "type": "string"
+                }
+              },
+              "required": ["id", "label", "lat", "lng"],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        }
+      ],
+      "summary": "Places as markers on an offline vector basemap, clustered when close, with a place list beside it."
+    },
+    {
+      "bindable": ["zoom"],
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change", "move", "select"],
+      "group": "data",
+      "id": "data-timeline",
+      "label": "Project timeline",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "array",
+          "name": "dependencies",
+          "schema": {
+            "items": {
+              "properties": {
+                "from": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "to": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": {
+                  "enum": ["FS", "SS", "FF", "SF"],
+                  "type": "string"
+                }
+              },
+              "required": ["from", "to"],
+              "type": "object"
+            },
+            "maxItems": 2000,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
+          "kind": "array",
+          "name": "tasks",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "end": {
+                  "description": "An ISO 8601 date (2026-10-27) or time (2026-10-27T09:00:00Z).",
+                  "maxLength": 35,
+                  "minLength": 10,
+                  "type": "string"
+                },
+                "group": {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "milestone": {
+                  "type": "boolean"
+                },
+                "progress": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "start": {
+                  "description": "An ISO 8601 date (2026-10-27) or time (2026-10-27T09:00:00Z).",
+                  "maxLength": 35,
+                  "minLength": 10,
+                  "type": "string"
+                },
+                "title": {
+                  "maxLength": 200,
+                  "type": "string"
+                }
+              },
+              "required": ["id", "title"],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        {
+          "enumValues": ["day", "week", "month", "quarter"],
+          "kind": "enum",
+          "name": "zoom"
+        }
+      ],
+      "summary": "Tasks as bars over days, weeks, months or quarters, with dependencies and progress."
+    },
+    {
+      "bindable": ["items"],
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["move", "select"],
+      "group": "data",
+      "id": "data-tree-view",
+      "label": "Tree view",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "checkboxes"
+        },
+        {
+          "enumValues": ["comfortable", "compact"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "label": {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "parent": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "rank": {
+                  "maxLength": 64,
+                  "type": "string"
+                }
+              },
+              "required": ["id", "label"],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        }
+      ],
+      "summary": "A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard."
     },
     {
       "capability": "unknown",
@@ -2526,7 +3305,7 @@
       "summary": "One slide in a deck: a title, content blocks and speaker notes."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "description",
@@ -2547,7 +3326,7 @@
       "summary": "Help text associated with a field control."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "detail-panel",
@@ -2586,7 +3365,7 @@
       "summary": "Non-modal detail panel alongside content."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "dialog",
@@ -2648,7 +3427,7 @@
       "summary": "Modal dialog with title, optional description, body and footer."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "drawer",
@@ -2687,7 +3466,7 @@
       "summary": "Bottom or edge drawer with optional drag dismiss."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu",
@@ -2712,7 +3491,7 @@
       "summary": "Menu button pattern with items, checkboxes, radios and submenus."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu-content",
@@ -2757,7 +3536,7 @@
       "summary": "Floating menu surface for dropdown items."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu-item",
@@ -2808,7 +3587,7 @@
       "summary": "Menu item with optional icon and shortcut chrome."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu-trigger",
@@ -2839,7 +3618,7 @@
       "summary": "Styled button that opens a dropdown menu."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "empty-state",
@@ -2879,7 +3658,7 @@
       "summary": "Placeholder when a list or panel has nothing to show yet."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "error-state",
@@ -2917,7 +3696,7 @@
       "summary": "Full-panel failure with optional retry."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "field",
@@ -2973,7 +3752,7 @@
       "summary": "Label, description and error wiring for a single control."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "field-error",
@@ -2998,7 +3777,54 @@
       "summary": "An alert-role error message for a field."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["press"],
+      "group": "state",
+      "id": "flow-action",
+      "label": "Flow action",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "event",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        }
+      ],
+      "summary": "A button that fires one declared flow event, such as next or back."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "group": "state",
+      "id": "flow-view",
+      "label": "Flow view",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "name",
+          "required": true
+        }
+      ],
+      "summary": "One named view of a multi-step flow; only the current view paints."
+    },
+    {
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "form",
@@ -3052,7 +3878,127 @@
       "summary": "A form shell with layout, validation hook and error map."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change"],
+      "group": "state",
+      "id": "form-field",
+      "label": "Form field",
+      "placement": "content",
+      "props": [
+        {
+          "enumValues": [
+            "off",
+            "name",
+            "given-name",
+            "family-name",
+            "nickname",
+            "email",
+            "tel",
+            "organization",
+            "organization-title",
+            "street-address",
+            "address-level1",
+            "address-level2",
+            "postal-code",
+            "country-name",
+            "language",
+            "url"
+          ],
+          "kind": "enum",
+          "name": "autocomplete"
+        },
+        {
+          "enumValues": ["text", "email", "tel", "number", "multiline"],
+          "kind": "enum",
+          "name": "kind"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "number",
+          "name": "maxLength"
+        },
+        {
+          "kind": "number",
+          "name": "min"
+        },
+        {
+          "kind": "number",
+          "name": "minLength"
+        },
+        {
+          "kind": "string",
+          "name": "name",
+          "required": true
+        },
+        {
+          "enumValues": ["email", "phone", "postal-code", "digits", "slug"],
+          "kind": "enum",
+          "name": "pattern"
+        },
+        {
+          "kind": "string",
+          "name": "placeholder"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "string",
+          "name": "state",
+          "required": true
+        }
+      ],
+      "summary": "A named, validated field bound to a declared local-state variable."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "group": "state",
+      "id": "form-submit",
+      "label": "Form submit",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        }
+      ],
+      "summary": "Proposes the form's action with its fields' values; disabled while a receipt is pending."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "group": "state",
+      "id": "host-region",
+      "label": "Host region",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "name",
+          "required": true
+        }
+      ],
+      "summary": "Reserves a named place where the host app mounts its own component."
+    },
+    {
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "hover-card",
@@ -3072,7 +4018,7 @@
       "summary": "Preview panel that opens on hover or focus."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "hover-card-content",
@@ -3107,7 +4053,7 @@
       "summary": "Styled hover-card surface."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "icon-button",
@@ -3154,7 +4100,7 @@
       "summary": "An icon-only button that requires an accessible name."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "inline-text",
@@ -3170,7 +4116,7 @@
       "summary": "A plain text run for the slot of a slot-only component (button, label, badge)."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "input",
@@ -3230,7 +4176,7 @@
       "summary": "A single-line text (or file) control with optional clear."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "input-group",
@@ -3304,7 +4250,7 @@
       "summary": "An input with start/end adornments and optional clear."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "kbd",
@@ -3329,7 +4275,7 @@
       "summary": "Inline keyboard key affordance."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "kpi",
@@ -3404,7 +4350,7 @@
       "summary": "A formatted metric with unit, previous-period delta and optional link."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "label",
@@ -3438,7 +4384,7 @@
       "summary": "A form label with optional required marker and sr-only mode."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-auth-split",
@@ -3494,7 +4440,7 @@
       "summary": "Sign-in form column plus brand panel."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-blog",
@@ -3562,7 +4508,7 @@
       "summary": "Content card frame for grouped agent-authored blocks."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-chrome",
@@ -3605,7 +4551,7 @@
       "summary": "Shared brand, actions, user and skip-link chrome for desktop layouts."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-dashboard-grid",
@@ -3737,7 +4683,7 @@
       "summary": "Document frame with optional table of contents."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-docs",
@@ -3780,7 +4726,7 @@
       "summary": "Documentation reading layout (content-layout kind docs)."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-drawer",
@@ -3809,7 +4755,7 @@
       "summary": "Mobile navigation drawer built on the dialog primitive."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-dual-sidebar",
@@ -3864,7 +4810,7 @@
       "summary": "Primary nav plus optional context aside."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-editorial",
@@ -3936,7 +4882,7 @@
       "summary": "Responsive content grid for agent-authored tiles."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-host",
@@ -4010,7 +4956,7 @@
       "summary": "Resolves a layout id, applies width fallbacks, and keeps one stable screen outlet."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-landing",
@@ -4056,7 +5002,7 @@
       "summary": "Standalone marketing landing composition."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-marketing",
@@ -4169,7 +5115,7 @@
       "summary": "Full page content frame for agent-authored documents."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-pricing",
@@ -4206,7 +5152,37 @@
       "summary": "Pricing plans grid with title and footnote."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "group": "composition",
+      "id": "layout-row",
+      "label": "Row layout",
+      "placement": "content",
+      "props": [
+        {
+          "enumValues": ["start", "center", "end", "stretch"],
+          "kind": "enum",
+          "name": "align"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "enumValues": ["none", "small", "medium", "large"],
+          "kind": "enum",
+          "name": "gap"
+        },
+        {
+          "kind": "boolean",
+          "name": "wrap"
+        }
+      ],
+      "summary": "Children side by side, wrapping onto new lines when space runs out."
+    },
+    {
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-settings",
@@ -4266,7 +5242,7 @@
       "summary": "Settings section list plus detail pane."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-sidebar",
@@ -4321,7 +5297,82 @@
       "summary": "App sidebar column with responsive drawer fallback."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "group": "composition",
+      "id": "layout-split",
+      "label": "Split layout",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "enumValues": ["none", "small", "medium", "large"],
+          "kind": "enum",
+          "name": "gap"
+        },
+        {
+          "enumValues": ["1:1", "1:2", "2:1", "1:3", "3:1"],
+          "kind": "enum",
+          "name": "ratio"
+        }
+      ],
+      "summary": "Two panes side by side at a fixed ratio, stacked on narrow screens."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "group": "composition",
+      "id": "layout-stack",
+      "label": "Stack layout",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "enumValues": ["none", "small", "medium", "large"],
+          "kind": "enum",
+          "name": "gap"
+        }
+      ],
+      "summary": "Children in one column, in reading order, with a fixed gap."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "group": "composition",
+      "id": "layout-tile",
+      "label": "Grid tile",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "number",
+          "name": "rowSpan"
+        },
+        {
+          "kind": "number",
+          "name": "span"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        }
+      ],
+      "summary": "A titled tile inside layout-grid that can span several columns or rows."
+    },
+    {
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-top-nav",
@@ -4376,7 +5427,7 @@
       "summary": "Horizontal top navigation with optional mobile menu."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "layout-wizard",
@@ -4460,7 +5511,7 @@
       "summary": "Centered onboarding wizard frame with steps."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "media-composition-canvas",
@@ -4516,7 +5567,7 @@
       "summary": "A validated layered composition rendered to a canvas."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "media-composition-svg",
@@ -4674,7 +5725,7 @@
       "summary": "A responsive image with URL validation, loading states and actions."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "menubar",
@@ -4708,7 +5759,7 @@
       "summary": "Application menubar with roving top-level items."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "menubar-trigger",
@@ -4743,7 +5794,7 @@
       "summary": "Top-level menubar item that opens a menu."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "multi-select",
@@ -4845,7 +5896,7 @@
       "summary": "A combobox for several values, shown as removable chips."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "nav-icon",
@@ -4858,8 +5909,7 @@
           "name": "class"
         },
         {
-          "extension": "web",
-          "kind": "unknown",
+          "kind": "string",
           "name": "icon",
           "required": true
         },
@@ -4871,7 +5921,7 @@
       "summary": "Renders a nav model icon by name or component."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "navigation-menu",
@@ -4915,7 +5965,7 @@
       "summary": "Site or app navigation with expandable triggers and links."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "pagination",
@@ -4964,7 +6014,7 @@
       "summary": "Page controls for long lists."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "popover",
@@ -4989,7 +6039,7 @@
       "summary": "Non-modal floating panel anchored to a trigger."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "popover-content",
@@ -5043,7 +6093,7 @@
       "summary": "Styled popover surface with optional arrow."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "radio",
@@ -5094,7 +6144,7 @@
       "summary": "One option inside a RadioGroup."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "radio-group",
@@ -5163,7 +6213,7 @@
       "summary": "A set of exclusive radio options with keyboard roving."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "responsive-modal",
@@ -5194,7 +6244,7 @@
       "summary": "Dialog on large screens, drawer/sheet on small screens."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "screen-outlet",
@@ -5216,7 +6266,7 @@
       "summary": "Stable screen mount point that survives layout switches."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select",
@@ -5297,7 +6347,7 @@
       "summary": "A single-value select root with size and variant chrome."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-content",
@@ -5323,7 +6373,7 @@
       "summary": "The positioned listbox surface for Select items."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-group",
@@ -5344,7 +6394,7 @@
       "summary": "Groups related Select items under an optional label."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-item",
@@ -5387,7 +6437,7 @@
       "summary": "One selectable option inside Select.Content."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-label",
@@ -5408,7 +6458,7 @@
       "summary": "A non-interactive heading inside a Select group."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-portal",
@@ -5424,7 +6474,7 @@
       "summary": "Portals Select.Content out of overflow-clipped ancestors."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-separator",
@@ -5440,7 +6490,7 @@
       "summary": "A visual divider between Select groups or items."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-trigger",
@@ -5471,7 +6521,7 @@
       "summary": "The button that opens a Select listbox."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-value",
@@ -5496,7 +6546,7 @@
       "summary": "Shows the selected label or a placeholder inside the trigger."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-viewport",
@@ -5517,7 +6567,7 @@
       "summary": "Scrollable viewport inside Select.Content."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "sheet",
@@ -5560,7 +6610,7 @@
       "summary": "Edge-anchored modal panel (drawer-like sheet)."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "sidebar",
@@ -5633,7 +6683,40 @@
       "summary": "Collapsible app rail with sections, badges and safe links."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["move"],
+      "group": "state",
+      "id": "sortable-list",
+      "label": "Sortable list",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "itemDetail"
+        },
+        {
+          "kind": "string",
+          "name": "itemLabel"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "reorder",
+          "required": true,
+          "schema": {
+            "$ref": "#/$defs/reorder"
+          }
+        }
+      ],
+      "summary": "A list whose items are a bound list variable; people reorder it by drag or keyboard, and lists sharing a group exchange items."
+    },
+    {
+      "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "split-view",
@@ -5677,7 +6760,7 @@
       "summary": "Master-detail split with list and detail panes."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "stat",
@@ -5690,8 +6773,7 @@
           "name": "class"
         },
         {
-          "extension": "web",
-          "kind": "unknown",
+          "kind": "string",
           "name": "delta"
         },
         {
@@ -5724,8 +6806,7 @@
           "name": "trend"
         },
         {
-          "extension": "web",
-          "kind": "unknown",
+          "kind": "string",
           "name": "value",
           "required": true
         },
@@ -5738,7 +6819,7 @@
       "summary": "A single metric with optional delta, trend and sparkline slot."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "stepper",
@@ -5782,7 +6863,7 @@
       "summary": "Horizontal or vertical progress through ordered steps."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "switch",
@@ -5844,7 +6925,7 @@
       "summary": "An immediate on/off setting control."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "table",
@@ -5895,7 +6976,7 @@
       "summary": "A responsive data table with density, stacking and sticky header options."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "tag",
@@ -5943,7 +7024,7 @@
       "summary": "A labeled chip that can be removed."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "text-counter",
@@ -6029,7 +7110,7 @@
       "summary": "An input or textarea that shows remaining characters near the limit."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "textarea",
@@ -6075,7 +7156,7 @@
       "summary": "A multi-line text control with optional autosize."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "timeline",
@@ -6118,7 +7199,7 @@
       "summary": "Vertical or horizontal chronological list of events."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "toaster",
@@ -6163,7 +7244,7 @@
       "summary": "Live region that renders toast notifications from the shared store."
     },
     {
-      "capability": "unknown",
+      "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "tooltip",
@@ -6218,6 +7299,42 @@
         }
       ],
       "summary": "Short delayed hint on hover or focus."
+    },
+    {
+      "bindable": ["graph"],
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change", "select"],
+      "group": "workflows",
+      "id": "workflow-graph",
+      "label": "Workflow graph",
+      "placement": "content",
+      "props": [
+        {
+          "enumValues": ["LR", "TB"],
+          "kind": "enum",
+          "name": "flow"
+        },
+        {
+          "kind": "object",
+          "name": "graph",
+          "required": true,
+          "schema": {
+            "$ref": "#/$defs/workflowGraph"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "enumValues": ["view", "edit"],
+          "kind": "enum",
+          "name": "mode"
+        }
+      ],
+      "summary": "A workflow of typed nodes and edges (automations, pipelines, approvals, state diagrams), read-only or editable."
     }
   ]
 }

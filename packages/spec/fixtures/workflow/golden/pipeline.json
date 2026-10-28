@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "nodeTypes": [
+    {
+      "id": "trigger",
+      "label": "Trigger",
+      "category": "Start",
+      "ports": [
+        {
+          "id": "out",
+          "direction": "out",
+          "kind": "flow",
+          "multiple": true
+        }
+      ],
+      "fields": [
+        {
+          "name": "schedule",
+          "label": "Schedule",
+          "kind": "enum",
+          "required": true,
+          "enumValues": ["daily", "weekly"]
+        }
+      ]
+    },
+    {
+      "id": "step",
+      "label": "Step",
+      "ports": [
+        {
+          "id": "in",
+          "direction": "in",
+          "kind": "flow",
+          "multiple": true
+        },
+        {
+          "id": "out",
+          "direction": "out",
+          "kind": "flow",
+          "multiple": true
+        }
+      ],
+      "fields": [
+        {
+          "name": "title",
+          "label": "Title",
+          "kind": "string",
+          "required": true,
+          "maxLength": 120
+        },
+        {
+          "name": "retries",
+          "kind": "number"
+        },
+        {
+          "name": "notify",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "finish",
+      "label": "Finish",
+      "ports": [
+        {
+          "id": "in",
+          "direction": "in",
+          "kind": "flow",
+          "multiple": true
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "trigger",
+      "label": "Every Monday",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "schedule": "weekly"
+      }
+    },
+    {
+      "id": "collect",
+      "type": "step",
+      "label": "Collect updates",
+      "position": {
+        "x": 240,
+        "y": 0
+      },
+      "group": "intake",
+      "data": {
+        "title": "Collect team updates",
+        "retries": 2
+      }
+    },
+    {
+      "id": "review",
+      "type": "step",
+      "label": "Review blockers",
+      "position": {
+        "x": 480,
+        "y": -80
+      },
+      "group": "intake",
+      "data": {
+        "title": "Review blockers",
+        "notify": true
+      }
+    },
+    {
+      "id": "summarize",
+      "type": "step",
+      "label": "Summarize",
+      "position": {
+        "x": 480,
+        "y": 80
+      },
+      "data": {
+        "title": "Summarize for example.com"
+      }
+    },
+    {
+      "id": "publish",
+      "type": "step",
+      "label": "Publish report",
+      "position": {
+        "x": 720,
+        "y": 0
+      },
+      "size": {
+        "width": 180,
+        "height": 72
+      },
+      "data": {
+        "title": "Publish to the team space"
+      }
+    },
+    {
+      "id": "done",
+      "type": "finish",
+      "label": "Done",
+      "position": {
+        "x": 960,
+        "y": 0
+      },
+      "locked": true
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": {
+        "node": "start",
+        "port": "out"
+      },
+      "to": {
+        "node": "collect",
+        "port": "in"
+      }
+    },
+    {
+      "id": "e2",
+      "from": {
+        "node": "collect",
+        "port": "out"
+      },
+      "to": {
+        "node": "review",
+        "port": "in"
+      },
+      "label": "Blockers"
+    },
+    {
+      "id": "e3",
+      "from": {
+        "node": "collect",
+        "port": "out"
+      },
+      "to": {
+        "node": "summarize",
+        "port": "in"
+      }
+    },
+    {
+      "id": "e4",
+      "from": {
+        "node": "review",
+        "port": "out"
+      },
+      "to": {
+        "node": "publish",
+        "port": "in"
+      }
+    },
+    {
+      "id": "e5",
+      "from": {
+        "node": "summarize",
+        "port": "out"
+      },
+      "to": {
+        "node": "publish",
+        "port": "in"
+      }
+    },
+    {
+      "id": "e6",
+      "from": {
+        "node": "publish",
+        "port": "out"
+      },
+      "to": {
+        "node": "done",
+        "port": "in"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "intake",
+      "label": "Intake",
+      "position": {
+        "x": 220,
+        "y": -120
+      },
+      "size": {
+        "width": 480,
+        "height": 260
+      }
+    }
+  ],
+  "cycles": "forbid",
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1
+  }
+}

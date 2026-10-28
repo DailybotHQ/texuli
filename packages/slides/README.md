@@ -124,4 +124,4 @@ bugs at [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texu
 
 ## License
 
-MIT © Dailybot, Inc.
+MIT © Dailybot, Inc. Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-slides).

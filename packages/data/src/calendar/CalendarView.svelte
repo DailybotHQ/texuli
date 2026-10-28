@@ -1,5 +1,7 @@
 <script lang="ts" generics="TData = unknown">
 import { lazyChunk } from '@texuli/core/lazy';
+import { createPointerTracker } from '@texuli/drag/gesture';
+import { applyModifiers, snapToGrid } from '@texuli/drag/modifiers';
 import { type Component, tick } from 'svelte';
 import { type ClassValue } from 'texuli/cx';
 import {
@@ -108,8 +110,7 @@ let {
   agendaDays = 14,
   weekStartsOn,
   labels: labelOverrides,
-  getTitle = (occurrence: Occurrence<TData>) =>
-    String((occurrence.data as { title?: unknown } | undefined)?.title ?? 'Untitled event'),
+  getTitle,
   getTone = () => 'primary',
   onOpen,
   onChange,
@@ -160,7 +161,11 @@ const items = $derived.by<CalendarItem<TData>[]>(() => {
       ...occurrence,
       id: key,
       key,
-      title: getTitle(occurrence),
+      title: getTitle
+        ? getTitle(occurrence)
+        : String(
+            (occurrence.data as { title?: unknown } | undefined)?.title ?? labels.untitledEvent
+          ),
       tone: getTone(occurrence),
       movable: editable && (canMove?.(occurrence) ?? true),
     };
@@ -435,19 +440,19 @@ function onKeydown(event: KeyboardEvent): void {
   void focusCurrentDate();
 }
 
-// Pointer: drag an event across day columns (and down by weeks or time slots).
-const DRAG_THRESHOLD = 4;
+// Pointer: drag an event across day columns (and down by weeks or time slots),
+// on @texuli/drag: the gesture tracker owns the drag lifecycle (4 px
+// threshold, one pointer, pointercancel = cancel), and a snap modifier is the
+// time strategy (one day column by one slot, or one week row in the month), so
+// the drop is a whole number of days and slots.
 // Not reactive: it holds the dragged element, and nothing renders from it.
 let drag: {
   item: CalendarItem<TData>;
   chip: HTMLElement;
   pointerId: number;
-  x: number;
-  y: number;
   columnWidth: number;
   rowHeight: number;
   rtl: boolean;
-  active: boolean;
 } | null = null;
 let suppressClick = false;
 
@@ -468,9 +473,16 @@ function dragGeometry(
   return { columnWidth: rect?.width ?? 0, rowHeight: allDay ? 0 : (rect?.height ?? 0) / 1440 };
 }
 
-function dragMove(event: PointerEvent): CalendarMove {
+/** The time strategy as a modifier: one day column across, one slot (or week row) down. */
+function timeSnap(item: CalendarItem<TData>, columnWidth: number, rowHeight: number) {
+  const down = view === 'month' ? rowHeight : item.allDay ? 0 : rowHeight * slotMinutes;
+  return snapToGrid({ x: columnWidth, y: down });
+}
+
+function snappedMove(travel: { x: number; y: number }): CalendarMove {
   if (!drag) return { days: 0, minutes: 0 };
-  return pointerMove(event.clientX - drag.x, event.clientY - drag.y, {
+  const delta = applyModifiers([timeSnap(drag.item, drag.columnWidth, drag.rowHeight)], travel);
+  return pointerMove(delta.x, delta.y, {
     view,
     allDay: drag.item.allDay,
     columnWidth: drag.columnWidth,
@@ -486,12 +498,40 @@ function clearDragStyle(chip: HTMLElement): void {
   chip.style.removeProperty('--tx-calendar-drag-y');
 }
 
-function cancelDrag(): void {
+function endDrag(): void {
   if (!drag) return;
   if (drag.chip.hasPointerCapture?.(drag.pointerId))
     drag.chip.releasePointerCapture(drag.pointerId);
   clearDragStyle(drag.chip);
   drag = null;
+}
+
+const tracker = createPointerTracker({
+  onMove: (event) => {
+    if (!drag) return;
+    // The chip follows the pointer; the drop snaps.
+    drag.chip.setAttribute('data-dragging', '');
+    drag.chip.style.setProperty('--tx-calendar-drag-x', `${event.delta.x}px`);
+    drag.chip.style.setProperty('--tx-calendar-drag-y', `${event.delta.y}px`);
+  },
+  onEnd: (event) => {
+    if (!drag) return;
+    const { item } = drag;
+    const move = snappedMove(event.delta);
+    endDrag();
+    // The click that follows a drag must not open the event.
+    suppressClick = true;
+    setTimeout(() => (suppressClick = false), 0);
+    void reschedule(item, move);
+  },
+  onClick: () => endDrag(),
+  onCancel: () => endDrag(),
+});
+
+/** Escape, the move menu or a context menu: drop the pointer drag without moving. */
+function cancelDrag(): void {
+  tracker.cancel();
+  endDrag();
 }
 
 function onPointerDown(event: PointerEvent): void {
@@ -502,41 +542,15 @@ function onPointerDown(event: PointerEvent): void {
   if (event.button !== 0 || !event.isPrimary) return;
   const chip = (event.target as HTMLElement).closest<HTMLElement>('[data-calendar-event]');
   const item = chip ? byKey.get(chip.getAttribute('data-calendar-event') ?? '') : undefined;
-  if (!chip || !item?.movable) return;
+  if (!chip || !item?.movable || !tracker.down(event)) return;
   drag = {
     item,
     chip,
     pointerId: event.pointerId,
-    x: event.clientX,
-    y: event.clientY,
     ...dragGeometry(chip, item.allDay),
     rtl: isRtlAt(chip),
-    active: false,
   };
   chip.setPointerCapture?.(event.pointerId);
-}
-
-function onPointerMove(event: PointerEvent): void {
-  if (!drag || event.pointerId !== drag.pointerId) return;
-  const dx = event.clientX - drag.x;
-  const dy = event.clientY - drag.y;
-  if (!drag.active && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
-  drag.active = true;
-  drag.chip.setAttribute('data-dragging', '');
-  drag.chip.style.setProperty('--tx-calendar-drag-x', `${dx}px`);
-  drag.chip.style.setProperty('--tx-calendar-drag-y', `${dy}px`);
-}
-
-function onPointerUp(event: PointerEvent): void {
-  if (!drag || event.pointerId !== drag.pointerId) return;
-  const { item, active } = drag;
-  const move = dragMove(event);
-  cancelDrag();
-  if (!active) return;
-  // The click that follows a drag must not open the event.
-  suppressClick = true;
-  setTimeout(() => (suppressClick = false), 0);
-  void reschedule(item, move);
 }
 
 function onClickCapture(event: MouseEvent): void {
@@ -626,9 +640,9 @@ const modeLabels = $derived.by(
   dir={dir}
   onkeydown={onKeydown}
   onpointerdown={onPointerDown}
-  onpointermove={onPointerMove}
-  onpointerup={onPointerUp}
-  onpointercancel={cancelDrag}
+  onpointermove={(event) => tracker.move(event)}
+  onpointerup={(event) => tracker.up(event)}
+  onpointercancel={(event) => tracker.cancel(event)}
   onclickcapture={onClickCapture}
   oncontextmenu={onContextMenu}
 >

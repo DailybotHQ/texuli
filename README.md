@@ -14,6 +14,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](docs/STANDARDS.md)
 [![Node.js 24.20+](https://img.shields.io/badge/node-%E2%89%A524.20-339933.svg?logo=node.js&logoColor=white)](package.json)
 [![Status: in development](https://img.shields.io/badge/status-in_development-yellow)](docs/RELEASE.md)
+[![Powered by Dailybot](https://img.shields.io/badge/Powered%20by-Dailybot-6C5CE7.svg)](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli)
 
 **Small pieces. Infinite possibilities.** Texuli is an open-source Svelte 5
 component library, built from scratch and owned end to end. Framework-free
@@ -241,4 +242,4 @@ The source-to-test map for choosing the right gates is in
 
 ## License
 
-[MIT](LICENSE) © Dailybot, Inc.
+[MIT license](LICENSE) © Dailybot, Inc., maintained by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli).

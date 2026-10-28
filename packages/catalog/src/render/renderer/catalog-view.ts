@@ -59,5 +59,7 @@ function specFromEntry(entry: CatalogEntry): RenderComponentSpec {
     props: entry.props,
     agentEmittable: entry.agentEmittable === true,
     emit: entry.emit,
+    ...(entry.events ? { events: entry.events } : {}),
+    ...(entry.bindable ? { bindable: entry.bindable } : {}),
   };
 }

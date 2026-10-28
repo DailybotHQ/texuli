@@ -1,0 +1,116 @@
+{
+  "golden": "lego",
+  "trace": [
+    {
+      "children": [
+        {
+          "id": "blocks-data",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "id": "data-board",
+                  "role": "generic"
+                }
+              ],
+              "id": "layout-tile",
+              "role": "generic"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "id": "charts-sparkline",
+                      "name": "Open pipeline, last 8 weeks",
+                      "role": "figure"
+                    },
+                    {
+                      "id": "charts-donut",
+                      "name": "Deals by stage",
+                      "role": "figure"
+                    }
+                  ],
+                  "id": "layout-card",
+                  "name": "Pipeline trend",
+                  "role": "group"
+                },
+                {
+                  "children": [
+                    {
+                      "id": "media-image",
+                      "name": "A product dashboard on a laptop screen",
+                      "role": "img"
+                    }
+                  ],
+                  "id": "layout-card",
+                  "name": "Launch visual",
+                  "role": "group"
+                }
+              ],
+              "id": "layout-stack",
+              "role": "generic"
+            }
+          ],
+          "id": "layout-grid",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "id": "sortable-list",
+                  "role": "generic"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Block palette",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "id": "sortable-list",
+                  "role": "generic"
+                },
+                {
+                  "id": "blocks-text",
+                  "level": 2,
+                  "name": "Introduction",
+                  "role": "heading"
+                },
+                {
+                  "id": "blocks-text",
+                  "role": "paragraph"
+                }
+              ],
+              "id": "layout-card",
+              "name": "Page outline",
+              "role": "group"
+            }
+          ],
+          "id": "layout-split",
+          "role": "generic"
+        },
+        {
+          "children": [
+            {
+              "id": "workflow-graph",
+              "role": "generic"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Launch workflow",
+          "role": "group"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Launch workspace",
+      "role": "main"
+    }
+  ]
+}

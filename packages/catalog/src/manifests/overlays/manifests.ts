@@ -1,4 +1,5 @@
-import { type CatalogManifest, defineCatalogManifest } from '../../manifest/index.ts';
+import { manifestData } from '../../manifest/data.ts';
+import type { CatalogManifest } from '../../manifest/types.ts';
 import {
   alertDialogPropNames,
   appNavPropNames,
@@ -30,6 +31,7 @@ import {
 
 const PKG = 'texuli';
 
+/* @__NO_SIDE_EFFECTS__ */
 function propsFrom(
   names: readonly string[],
   detail: Record<
@@ -74,7 +76,7 @@ const sidebarVariants = ['default', 'inset'] as const;
 const commandSizes = ['sm', 'md', 'lg'] as const;
 const commandVariants = ['outline', 'soft'] as const;
 
-export const dialogManifest = defineCatalogManifest({
+export const dialogManifest = /* @__PURE__ */ manifestData({
   id: 'dialog',
   package: PKG,
   label: 'Dialog',
@@ -113,7 +115,7 @@ export const dialogManifest = defineCatalogManifest({
   related: ['alert-dialog', 'sheet'],
 });
 
-export const alertDialogManifest = defineCatalogManifest({
+export const alertDialogManifest = /* @__PURE__ */ manifestData({
   id: 'alert-dialog',
   package: PKG,
   label: 'AlertDialog',
@@ -157,7 +159,7 @@ export const alertDialogManifest = defineCatalogManifest({
   related: ['dialog', 'toaster'],
 });
 
-export const dropdownMenuManifest = defineCatalogManifest({
+export const dropdownMenuManifest = /* @__PURE__ */ manifestData({
   id: 'dropdown-menu',
   package: PKG,
   label: 'DropdownMenu',
@@ -179,7 +181,7 @@ export const dropdownMenuManifest = defineCatalogManifest({
   related: ['context-menu', 'menubar', 'dropdown-menu-item'],
 });
 
-export const dropdownMenuTriggerManifest = defineCatalogManifest({
+export const dropdownMenuTriggerManifest = /* @__PURE__ */ manifestData({
   id: 'dropdown-menu-trigger',
   package: PKG,
   label: 'DropdownMenu.Trigger',
@@ -199,7 +201,7 @@ export const dropdownMenuTriggerManifest = defineCatalogManifest({
   related: ['dropdown-menu'],
 });
 
-export const dropdownMenuContentManifest = defineCatalogManifest({
+export const dropdownMenuContentManifest = /* @__PURE__ */ manifestData({
   id: 'dropdown-menu-content',
   package: PKG,
   label: 'DropdownMenu.Content',
@@ -222,7 +224,7 @@ export const dropdownMenuContentManifest = defineCatalogManifest({
   related: ['dropdown-menu', 'dropdown-menu-item'],
 });
 
-export const dropdownMenuItemManifest = defineCatalogManifest({
+export const dropdownMenuItemManifest = /* @__PURE__ */ manifestData({
   id: 'dropdown-menu-item',
   package: PKG,
   label: 'DropdownMenu.Item',
@@ -253,7 +255,7 @@ export const dropdownMenuItemManifest = defineCatalogManifest({
   related: ['dropdown-menu', 'context-menu'],
 });
 
-export const contextMenuManifest = defineCatalogManifest({
+export const contextMenuManifest = /* @__PURE__ */ manifestData({
   id: 'context-menu',
   package: PKG,
   label: 'ContextMenu',
@@ -272,7 +274,7 @@ export const contextMenuManifest = defineCatalogManifest({
   related: ['dropdown-menu', 'context-menu-trigger'],
 });
 
-export const contextMenuTriggerManifest = defineCatalogManifest({
+export const contextMenuTriggerManifest = /* @__PURE__ */ manifestData({
   id: 'context-menu-trigger',
   package: PKG,
   label: 'ContextMenu.Trigger',
@@ -291,7 +293,7 @@ export const contextMenuTriggerManifest = defineCatalogManifest({
   related: ['context-menu'],
 });
 
-export const menubarManifest = defineCatalogManifest({
+export const menubarManifest = /* @__PURE__ */ manifestData({
   id: 'menubar',
   package: PKG,
   label: 'Menubar',
@@ -312,7 +314,7 @@ export const menubarManifest = defineCatalogManifest({
   related: ['menubar-trigger', 'dropdown-menu'],
 });
 
-export const menubarTriggerManifest = defineCatalogManifest({
+export const menubarTriggerManifest = /* @__PURE__ */ manifestData({
   id: 'menubar-trigger',
   package: PKG,
   label: 'Menubar.Trigger',
@@ -333,7 +335,7 @@ export const menubarTriggerManifest = defineCatalogManifest({
   related: ['menubar'],
 });
 
-export const popoverManifest = defineCatalogManifest({
+export const popoverManifest = /* @__PURE__ */ manifestData({
   id: 'popover',
   package: PKG,
   label: 'Popover',
@@ -352,7 +354,7 @@ export const popoverManifest = defineCatalogManifest({
   related: ['hover-card', 'tooltip', 'dialog'],
 });
 
-export const popoverContentManifest = defineCatalogManifest({
+export const popoverContentManifest = /* @__PURE__ */ manifestData({
   id: 'popover-content',
   package: PKG,
   label: 'Popover.Content',
@@ -381,7 +383,7 @@ export const popoverContentManifest = defineCatalogManifest({
   related: ['popover'],
 });
 
-export const hoverCardManifest = defineCatalogManifest({
+export const hoverCardManifest = /* @__PURE__ */ manifestData({
   id: 'hover-card',
   package: PKG,
   label: 'HoverCard',
@@ -399,7 +401,7 @@ export const hoverCardManifest = defineCatalogManifest({
   related: ['popover', 'tooltip'],
 });
 
-export const hoverCardContentManifest = defineCatalogManifest({
+export const hoverCardContentManifest = /* @__PURE__ */ manifestData({
   id: 'hover-card-content',
   package: PKG,
   label: 'HoverCard.Content',
@@ -420,7 +422,7 @@ export const hoverCardContentManifest = defineCatalogManifest({
   related: ['hover-card'],
 });
 
-export const sheetManifest = defineCatalogManifest({
+export const sheetManifest = /* @__PURE__ */ manifestData({
   id: 'sheet',
   package: PKG,
   label: 'Sheet',
@@ -455,7 +457,7 @@ export const sheetManifest = defineCatalogManifest({
   related: ['drawer', 'dialog', 'sidebar'],
 });
 
-export const drawerManifest = defineCatalogManifest({
+export const drawerManifest = /* @__PURE__ */ manifestData({
   id: 'drawer',
   package: PKG,
   label: 'Drawer',
@@ -485,7 +487,7 @@ export const drawerManifest = defineCatalogManifest({
   related: ['sheet', 'responsive-modal'],
 });
 
-export const detailPanelManifest = defineCatalogManifest({
+export const detailPanelManifest = /* @__PURE__ */ manifestData({
   id: 'detail-panel',
   package: PKG,
   label: 'DetailPanel',
@@ -515,7 +517,7 @@ export const detailPanelManifest = defineCatalogManifest({
   related: ['sheet', 'drawer'],
 });
 
-export const responsiveModalManifest = defineCatalogManifest({
+export const responsiveModalManifest = /* @__PURE__ */ manifestData({
   id: 'responsive-modal',
   package: PKG,
   label: 'ResponsiveModal',
@@ -535,7 +537,7 @@ export const responsiveModalManifest = defineCatalogManifest({
   related: ['dialog', 'drawer'],
 });
 
-export const tooltipManifest = defineCatalogManifest({
+export const tooltipManifest = /* @__PURE__ */ manifestData({
   id: 'tooltip',
   package: PKG,
   label: 'Tooltip',
@@ -567,7 +569,7 @@ export const tooltipManifest = defineCatalogManifest({
   related: ['popover', 'hover-card'],
 });
 
-export const toasterManifest = defineCatalogManifest({
+export const toasterManifest = /* @__PURE__ */ manifestData({
   id: 'toaster',
   package: PKG,
   label: 'Toaster',
@@ -601,7 +603,7 @@ export const toasterManifest = defineCatalogManifest({
   related: ['alert-dialog', 'banner'],
 });
 
-export const commandPaletteManifest = defineCatalogManifest({
+export const commandPaletteManifest = /* @__PURE__ */ manifestData({
   id: 'command-palette',
   package: PKG,
   label: 'CommandPalette',
@@ -641,7 +643,7 @@ export const commandPaletteManifest = defineCatalogManifest({
   related: ['dialog', 'dropdown-menu'],
 });
 
-export const navigationMenuManifest = defineCatalogManifest({
+export const navigationMenuManifest = /* @__PURE__ */ manifestData({
   id: 'navigation-menu',
   package: PKG,
   label: 'NavigationMenu',
@@ -664,7 +666,7 @@ export const navigationMenuManifest = defineCatalogManifest({
   related: ['menubar', 'breadcrumb', 'sidebar'],
 });
 
-export const breadcrumbManifest = defineCatalogManifest({
+export const breadcrumbManifest = /* @__PURE__ */ manifestData({
   id: 'breadcrumb',
   package: PKG,
   label: 'Breadcrumb',
@@ -705,7 +707,7 @@ export const breadcrumbManifest = defineCatalogManifest({
   related: ['navigation-menu', 'pagination'],
 });
 
-export const paginationManifest = defineCatalogManifest({
+export const paginationManifest = /* @__PURE__ */ manifestData({
   id: 'pagination',
   package: PKG,
   label: 'Pagination',
@@ -729,7 +731,7 @@ export const paginationManifest = defineCatalogManifest({
   related: ['breadcrumb', 'table'],
 });
 
-export const sidebarManifest = defineCatalogManifest({
+export const sidebarManifest = /* @__PURE__ */ manifestData({
   id: 'sidebar',
   package: PKG,
   label: 'Sidebar',
@@ -778,7 +780,7 @@ export const sidebarManifest = defineCatalogManifest({
   related: ['app-nav', 'navigation-menu', 'sheet'],
 });
 
-export const appNavManifest = defineCatalogManifest({
+export const appNavManifest = /* @__PURE__ */ manifestData({
   id: 'app-nav',
   package: PKG,
   label: 'AppNav',
@@ -816,7 +818,7 @@ export const appNavManifest = defineCatalogManifest({
 });
 
 /** Every overlay/navigation manifest in stable id order. */
-export const OVERLAYS_MANIFESTS: readonly CatalogManifest[] = Object.freeze([
+export const OVERLAYS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
   alertDialogManifest,
   appNavManifest,
   breadcrumbManifest,
@@ -848,9 +850,8 @@ export const OVERLAYS_MANIFESTS: readonly CatalogManifest[] = Object.freeze([
 /** Map of component id → expected prop names for type/schema parity tests. */
 export { OVERLAYS_PROP_NAMES as OVERLAYS_PROP_NAME_MAP } from './prop-names.ts';
 
-export const overlaysManifestsById = Object.freeze(
-  Object.fromEntries(OVERLAYS_MANIFESTS.map((manifest) => [manifest.id, manifest])) as Record<
-    string,
-    CatalogManifest
-  >
+export const overlaysManifestsById = /* @__PURE__ */ Object.freeze(
+  /* @__PURE__ */ Object.fromEntries(
+    /* @__PURE__ */ OVERLAYS_MANIFESTS.map((manifest) => [manifest.id, manifest])
+  ) as Record<string, CatalogManifest>
 );

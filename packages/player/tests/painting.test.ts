@@ -516,9 +516,10 @@ describe('chat display (G10)', () => {
           cleanup();
         }
       });
-      await scenario('shows no-painter placeholders until the host adds chat loaders', async () => {
+      await scenario('paints chat with the default loaders (spec 0.3.0 parity)', async () => {
         render(Player, { props: { blueprint: transcript(agentReply) } });
-        expect(await screen.findByText(/No painter for “chat-thread”/)).toBeTruthy();
+        expect(await screen.findByText('Fictional Agent', {}, { timeout: 5000 })).toBeTruthy();
+        expect(screen.queryByText(/No painter for “chat-thread”/)).toBeNull();
       });
       await scenario('paints the thread, message and block body through host loaders', async () => {
         const { container } = render(Player, {

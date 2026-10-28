@@ -9,12 +9,29 @@ integration.
 
 | Workflow | File | Trigger | Jobs |
 | --- | --- | --- | --- |
-| CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | push to `main`, pull requests | `check`, `behavior`, `website`, `audits` |
+| CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | push to `main`, pull requests | `check`, `behavior`, `website`, `audits`, `setup-smoke-macos` |
 | Publish packages | [.github/workflows/publish.yml](../.github/workflows/publish.yml) | `v*` tag push, manual dispatch | `publish` |
+| Skill release | [.github/workflows/skill-release.yml](../.github/workflows/skill-release.yml) | `workflow_run` after a successful CI run for a push to `main` | `release` (`contents: write`), `smoke` (read-only) |
 
 - **`check`** — `pnpm check` (Biome lint, typecheck, unit and component
-  tests, layer guard) plus `scripts/supply-chain.ts`, `scripts/check-docs.ts`
-  and `pnpm check:skill`.
+  tests, layer guard) plus `scripts/supply-chain.ts`, `scripts/check-docs.ts`,
+  `pnpm check:skill` and `shellcheck skills/texuli/setup.sh` (the skill's
+  only shell script; shellcheck ships on the Ubuntu image).
+- **`setup-smoke-macos`** — on `macos-latest`, confirms `/bin/bash` is
+  3.2 and runs the skill's `setup.sh` under it: `--help`, `--version`,
+  `--verify`, then for every host from `--list-hosts` a dry run, an install
+  into a temp home, an idempotent re-run (`Already installed: no change.`)
+  and `--verify` of the installed copy.
+- **Skill release** — releases the agent skill apart from npm: on the
+  first push to `main` after CI succeeds, when commits since the last
+  `skill-v` tag touch `skills/texuli/` and the head commit is not a release
+  commit or `[skip release]`. The `release` job plans the version with
+  `scripts/check-skill.ts --release-plan`, stamps it, pushes the release
+  commit and the `skill-vX.Y.Z` tag atomically, builds the archive and its
+  `SHA256SUMS`, and creates the GitHub Release; `smoke` installs the tag
+  with the skills CLI and checks the version and checksums. No skill release
+  has been cut yet. Details: [RELEASE](RELEASE.md#skill-release);
+  tests: `scripts/tests/skill-release.test.ts`.
 - **`behavior`** — the primitives behavior suite on chromium and webkit
   (the phone-specific rows run in a Pixel 7 context inside the chromium
   test, see
@@ -75,6 +92,13 @@ then publishes the packable packages in the wave order documented in
 same versions: `latest` tracks the newest release (owner decision
 2026-10-27; both name `0.3.0` once the post-merge run publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
 GitHub's OIDC token (`id-token: write`).
+
+`publish.yml` lists `@texuli/drag` and `@texuli/workflows` (both in
+development, versioned `0.3.0`) ahead of the packages that depend on them
+(owner decision 2026-10-27). They are not on npm yet: the next `v*` tag or
+manual run publishes them. The publish loop skips versions npm already has,
+so a package changed since its published `0.3.0` needs a new version first
+([RELEASE](RELEASE.md#publication-waves)).
 
 One-time setup, already done: the repository secret `NPM_TOKEN` holds a
 granular access token of the publishing account with read-and-write on

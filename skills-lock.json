@@ -14,6 +14,12 @@
       "sourceType": "github",
       "skillPath": "skills/deepworkplan/SKILL.md",
       "computedHash": "6bac41526242e69e9a540828285569d2694a8813196d0f15371a7ba8b7f31097"
+    },
+    "texuli": {
+      "source": "DailybotHQ/texuli",
+      "sourceType": "github",
+      "skillPath": "skills/texuli/SKILL.md",
+      "computedHash": "953abc721ee01beb03e2c3257a5f8058fd09db1941a3de778bceb747ca541b30"
     }
   }
 }

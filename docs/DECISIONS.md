@@ -249,3 +249,91 @@ reflect this decision.
   `CalendarIdentifier` type, or make the additional implementation an
   optional adapter. Reintroducing a third-party library requires a new
   supply-chain decision.
+
+## ADR-007: Own a general-purpose drag engine in `@texuli/drag`
+
+- **Date:** 2026-10-27 · **Decided by:** the project owner (PLAN_007).
+- **Context:** drag behavior lives in seven feature-local copies (board, tree
+  view, grid columns, calendar, data timeline, media timeline and the website
+  builder outline), with duplicated thresholds and index math and English-only
+  announcements in two of them. The owner's goal is that Texuli alone builds
+  any interface, including workflows, lists, boards, trees and canvases, with
+  a general-purpose drag system at least as capable as SortableJS, modular and
+  composable across every package. Architecture, performance and security are
+  non-negotiable.
+- **Options:** (1) adopt a third-party drag library; (2) add drag texels to
+  `@texuli/core`; (3) a new L0 package, `@texuli/drag`, framework-free with
+  no runtime dependencies, plus a thin Svelte binding in
+  `@texuli/primitives/sortable`; (4) build workflows at L5 to reuse the chart
+  network layout.
+- **Choice:** option 3. `@texuli/drag` exports small subpaths (`sortable`,
+  `collision`, `modifiers`, `auto-scroll`, `gesture`, `spatial`, `graph`,
+  `messages`, `testing`) around one session state machine. Strategies,
+  collisions, modifiers and messages are pluggable. Because the layer guard
+  refuses same-layer imports, the engine takes `announce`, text direction and
+  navigation intents from the caller; the L1 binding maps keys through
+  `@texuli/core/keyboard` and announcements through `@texuli/core/announcer`.
+  Four interaction kinds stay separate: OS file drop (unchanged), continuous
+  gestures (`gesture`), sortable interactions, and graph editing.
+  `@texuli/workflows` is a new L4 package built on `@texuli/drag`, with a
+  framework-free `model` and `layout`. Both packages start private at `0.0.0`
+  and stay "in development" until an owner-approved publish wave.
+- **Why:** an owned engine keeps the dependency count at zero, gives one
+  accessibility and i18n contract to every surface (`packages/drag/docs/contract.md`),
+  and lets every package compose the same pieces. Core stays small: drag
+  changes do not touch the most widely imported package, and drag gets its
+  own release line. Workflows at L4 keep editing independent of chart math;
+  `@texuli/blocks` (L5) can adopt `workflows/layout` later.
+- **Reverse when:** a measured gap (capability, performance or size) cannot be
+  closed in the owned engine. Then adopt a library behind the same subpath
+  contract, which needs a new supply-chain decision.
+
+## ADR-008: Blueprint spec 0.3.0 — bindings, closed actions, events, prop schemas, drag and workflows as data
+
+- **Date:** 2026-10-27 · **Decided by:** the project owner (PLAN_007).
+- **Context:** the goal is that complete interfaces are built from validated
+  JSON. Today every one of the 133 spec ids reports `capability: "unknown"`;
+  board, tree view, calendar, files, map, chat and workflows have no spec id;
+  14 player loaders have no spec id and 92 spec ids have no loader; local
+  state, actions and host data exist only in `@texuli/player`, so the
+  blueprint schema and the Kotlin twin cannot see them; `array` and `object`
+  props are opaque; spec migrations are planned but not built.
+- **Options:** (1) keep behavior in the player and extend only manifests;
+  (2) an additive spec minor that moves state, actions, events and prop
+  schemas into the contract, with migrations; (3) allow host-supplied code in
+  blueprints.
+- **Choice:** option 2, spec `0.3.0` (additive; `0.2.0` documents migrate).
+  A node is `{ id, props, children | slots, when, bind, on }`. New `$defs`:
+  `binding` (`{"$state": name}` or `{"$data": name}`), a **closed** `action`
+  set (`setState`, `toggleState`, `moveItem`, `flowGo`, `emit` to a host
+  intent, `submit`), `eventMap` (`on: { <event>: action[] }`) and
+  `propSchema` (a dialect subset, so array and object props carry item
+  schemas). Drag is data: a container prop
+  `reorder: { bind, axis, group, accepts, locked }` drives the closed
+  `moveItem` reducer. Workflows are data: a `workflow-graph` id whose `graph`
+  validates against `schemas/workflow.schema.json` (at most 500 nodes and
+  2,000 edges) with closed `nodeTypes`. Every normative change is pinned in
+  `versions.json`; pure `migrations/<from>-<to>.ts` functions run before
+  validation; a manifest `deprecated: { since, replacement }` warns for one
+  minor before removal. Enforcement: catalog coverage (every public component
+  has a manifest or a reasoned, shrink-only exclusion), player loader parity,
+  example round-trips, codegen freshness and a hostile corpus, all in Vitest.
+- **Why:** option 1 leaves the contract unable to describe whole interfaces
+  and keeps the Kotlin twin blind. Option 3 breaks the no-sink, closed-catalog
+  security model. A closed action set keeps blueprints data-only while making
+  them able to express interaction, and the drift gates make the "any
+  interface from JSON" claim checkable.
+- **Reverse when:** a needed interaction cannot be expressed with the closed
+  set. Add a new action in a later minor with its schema, reducer, tests and
+  migration; never open the set to code.
+- **Addendum (2026-10-27, implementation design):** the action discriminator
+  is `op` (as in `condition` and `editOp`); the envelope gains optional
+  `spec`, `state` and `flow`, so the Kotlin twin sees what `$state` names;
+  children keep the per-child `slot` field (no second `slots` encoding, which
+  would make edit paths and canonical hashes ambiguous); migrations are
+  exported from the root of `@texuli/spec`; catalog components gain
+  `events` (a closed event vocabulary) and `bindable`; `reorder` also takes
+  `pull` (`move`, `clone`, `none`) and `disabled`. Every new semantic
+  diagnostic has a Kotlin twin, so native fixture parity holds. Until a
+  publish wave ships `0.3.0`, later normative changes inside the same plan
+  amend the `0.3.0` pin in `versions.json` rather than minting new minors.

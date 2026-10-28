@@ -1,6 +1,59 @@
 # Texuli — full agent docs
 
-> Complete catalog documentation generated from manifests (133 components).
+> Complete catalog documentation generated from manifests (158 components).
+
+---
+
+# Action form
+
+> Groups fields whose submit proposes one named action intent to the host.
+
+- **id:** `action-form`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- Ask the host to do something with a few named values, such as a request
+
+### Don't use when
+
+- Payment or sign-in: those are host regions
+
+### Accessibility
+
+- A labelled form; invalid fields are marked and focused; the receipt is announced
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `action` | string | yes | — | — | The action name the host receives. |
+| `label` | string | yes | untrusted | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Request access (`request`)
+
+```json
+{
+  "action": "request-access",
+  "label": "Request access"
+}
+```
+
+### Related
+
+- [`form-field`](components/form-field.md)
+- [`form-submit`](components/form-submit.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
 
 ---
 
@@ -2536,6 +2589,117 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Chat message
+
+> One display-only chat message: author, role, time, text and block children.
+
+- **id:** `chat-message`
+- **package:** `@texuli/chat`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `chat`
+
+### Use when
+
+- Inside chat-thread, one per message
+
+### Don't use when
+
+- Outside a chat-thread
+- For a reply box; that is host chrome
+
+### Accessibility
+
+- Renders an article named by author and time; the role is visible text
+- Message text is plain text nodes; links pass the untrusted URL policy
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `author` | string | yes | untrusted | — | — |
+| `role` | enum(user | agent | system) | yes | — | — | — |
+| `at` | string | no | — | — | ISO 8601 time; omitted when it does not parse. |
+| `text` | string | no | untrusted | — | Chat inline subset. |
+| `children` | slot | no | — | — | blocks-* nodes. |
+
+### Examples
+
+#### Agent reply (`agent-reply`)
+
+```json
+{
+  "author": "Fictional Agent",
+  "role": "agent",
+  "at": "2026-10-24T09:00:00Z",
+  "text": "Two items are **blocked**."
+}
+```
+
+### Related
+
+- [`chat-thread`](components/chat-thread.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Chat thread
+
+> Read-only conversation transcript of chat-message nodes, without a composer.
+
+- **id:** `chat-thread`
+- **package:** `@texuli/chat`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `chat`
+
+### Use when
+
+- Show a conversation an agent summarized or quoted
+- Show a chat transcript inside a report or document
+
+### Don't use when
+
+- The person needs to reply: the host renders its own composer (host chrome)
+- The content is not a conversation; use text blocks
+
+### Accessibility
+
+- Renders a labelled section; each message is an article with author and time
+- Static: no live region, focus trap or keyboard handling is added
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | no | untrusted | — | Accessible name. |
+| `children` | slot | no | — | — | chat-message nodes. |
+
+### Examples
+
+#### Stand-up excerpt (`standup`)
+
+```json
+{
+  "label": "Stand-up thread"
+}
+```
+
+### Related
+
+- [`chat-message`](components/chat-message.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Checkbox
 
 > A binary or indeterminate checkbox with optional label.
@@ -3024,6 +3188,746 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ### Related
 
 - [`context-menu`](components/context-menu.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Choice control
+
+> A segmented choice that sets an enum state variable to one of its values.
+
+- **id:** `control-choice`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- Switch between a few views or ranges, such as this week or last week
+
+### Don't use when
+
+- Submitting, saving or sending anything: controls only set local state
+- Navigating: use a link
+
+### Accessibility
+
+- A radiogroup of radio buttons; arrows, Home and End move and select (roving tabindex)
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `state` | string | yes | — | — | The declared local-state variable this control sets. |
+| `label` | string | yes | untrusted | — | Visible label and accessible name. |
+
+### Examples
+
+#### Week (`range`)
+
+```json
+{
+  "state": "week",
+  "label": "Week"
+}
+```
+
+### Related
+
+- [`control-toggle`](components/control-toggle.md)
+- [`control-slider`](components/control-slider.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Filter control
+
+> A text field that sets a string state variable, capped at its declared length.
+
+- **id:** `control-filter`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- Type a filter that other nodes read through a binding
+
+### Don't use when
+
+- Submitting, saving or sending anything: controls only set local state
+- Navigating: use a link
+
+### Accessibility
+
+- A native search input with a visible label; Enter never submits
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `state` | string | yes | — | — | The declared local-state variable this control sets. |
+| `label` | string | yes | untrusted | — | Visible label and accessible name. |
+| `placeholder` | string | no | untrusted | — | — |
+
+### Examples
+
+#### Filter (`query`)
+
+```json
+{
+  "state": "query",
+  "label": "Filter tickets"
+}
+```
+
+### Related
+
+- [`control-toggle`](components/control-toggle.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Slider control
+
+> A range input that sets a number state variable within its declared min and max.
+
+- **id:** `control-slider`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- Adjust a threshold or a count within a bounded range
+
+### Don't use when
+
+- Submitting, saving or sending anything: controls only set local state
+- Navigating: use a link
+
+### Accessibility
+
+- A native range input with a visible label and value
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `state` | string | yes | — | — | The declared local-state variable this control sets. |
+| `label` | string | yes | untrusted | — | Visible label and accessible name. |
+| `step` | number | no | — | — | Increment; default 1. |
+
+### Examples
+
+#### Limit (`limit`)
+
+```json
+{
+  "state": "limit",
+  "label": "Items shown",
+  "step": 1
+}
+```
+
+### Related
+
+- [`control-choice`](components/control-choice.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Toggle control
+
+> A switch that sets a boolean state variable.
+
+- **id:** `control-toggle`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- Show or hide details, include or exclude a series
+
+### Don't use when
+
+- Submitting, saving or sending anything: controls only set local state
+- Navigating: use a link
+
+### Accessibility
+
+- A button with role="switch" and aria-checked; Space or Enter flips it
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `state` | string | yes | — | — | The declared local-state variable this control sets. |
+| `label` | string | yes | untrusted | — | Visible label and accessible name. |
+
+### Examples
+
+#### Show details (`details`)
+
+```json
+{
+  "state": "details",
+  "label": "Show details"
+}
+```
+
+### Related
+
+- [`control-choice`](components/control-choice.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Board
+
+> A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits.
+
+- **id:** `data-board`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- Show work items by status and let people move them between columns
+
+### Don't use when
+
+- One ordered list: use sortable-list
+- Read-only status counts: use kpi or a chart
+
+### Accessibility
+
+- Columns are labelled lists; each card has a drag handle button and a "Move to…" menu (the non-drag path)
+- Moves are announced politely with column and position; locked cards refuse moves with a reason
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name of the view. |
+| `columns` | array | yes | — | — | — |
+| `items` | array | yes | — | — | Cards: each names its column (and lane); rank orders cards within a cell. |
+| `lanes` | array | no | — | — | — |
+| `density` | enum(comfortable | compact) | no | — | — | — |
+
+### Examples
+
+#### Sprint board (`sprint`)
+
+```json
+{
+  "label": "Sprint 12",
+  "columns": [
+    {
+      "id": "todo",
+      "title": "To do"
+    },
+    {
+      "id": "doing",
+      "title": "In progress",
+      "wipSoft": 2
+    },
+    {
+      "id": "done",
+      "title": "Done"
+    }
+  ],
+  "items": [
+    {
+      "id": "t1",
+      "title": "Draft the release notes",
+      "column": "todo",
+      "rank": "a0"
+    },
+    {
+      "id": "t2",
+      "title": "Review the onboarding flow",
+      "column": "doing",
+      "rank": "a0"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`sortable-list`](components/sortable-list.md)
+- [`data-tree-view`](components/data-tree-view.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Calendar
+
+> Events on a month, week, day or agenda view; people open, and when allowed move, events.
+
+- **id:** `data-calendar`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- Show scheduled events or availability over days and weeks
+
+### Don't use when
+
+- Task durations and dependencies: use data-timeline
+- One date: use text
+
+### Accessibility
+
+- A labelled grid with roving focus; every event is a button with its time and title
+- Moving an event has a keyboard path; changes are announced politely
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name of the view. |
+| `events` | array | yes | — | — | — |
+| `view` | enum(month | week | day | agenda) | no | — | `"week"` | — |
+| `anchor` | string | no | — | — | The ISO date the view opens on. |
+| `timeZone` | string | no | — | `"UTC"` | — |
+| `locale` | string | no | — | `"en-US"` | — |
+| `readOnly` | boolean | no | — | `false` | — |
+
+### Examples
+
+#### Team week (`week`)
+
+```json
+{
+  "label": "Team calendar",
+  "view": "week",
+  "anchor": "2026-10-26",
+  "events": [
+    {
+      "id": "e1",
+      "title": "Planning",
+      "start": "2026-10-26T09:00:00Z",
+      "end": "2026-10-26T10:00:00Z"
+    },
+    {
+      "id": "e2",
+      "title": "Offsite",
+      "start": "2026-10-29",
+      "end": "2026-10-30",
+      "allDay": true
+    }
+  ]
+}
+```
+
+### Related
+
+- [`data-timeline`](components/data-timeline.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# File browser
+
+> Folders and files in a grid or list with breadcrumbs, selection and type previews.
+
+- **id:** `data-files`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- Show a folder structure people browse and select from
+
+### Don't use when
+
+- Uploading files: that is host chrome (file-upload)
+
+### Accessibility
+
+- A labelled grid or list with roving focus; folders open with Enter, Backspace goes up
+- Selection is exposed per item; previews are decorative
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name of the view. |
+| `entries` | array | yes | — | — | Files and folders; parent names the folder (none for the root). |
+| `layout` | enum(grid | list) | no | — | `"grid"` | — |
+| `density` | enum(comfortable | compact) | no | — | — | — |
+
+### Examples
+
+#### Shared drive (`shared`)
+
+```json
+{
+  "label": "Shared drive",
+  "entries": [
+    {
+      "id": "f1",
+      "name": "Reports",
+      "kind": "folder"
+    },
+    {
+      "id": "f2",
+      "name": "Q3 summary.pdf",
+      "kind": "file",
+      "parent": "f1",
+      "type": "application/pdf",
+      "size": 48213
+    }
+  ]
+}
+```
+
+### Related
+
+- [`data-tree-view`](components/data-tree-view.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Data grid
+
+> A sortable, searchable grid of rows and typed columns; virtualized for long lists.
+
+- **id:** `data-grid`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- Show many records people sort, search and select
+
+### Don't use when
+
+- A small static table in a document: use table or blocks-data
+
+### Accessibility
+
+- A WAI-ARIA grid with a caption, sortable column headers and roving cell focus
+- Sort and search changes are announced; selection is exposed per row
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `caption` | string | yes | untrusted | — | The grid caption and accessible name. |
+| `columns` | array | yes | — | — | — |
+| `rows` | array | yes | — | — | Rows: an id and one display string per column id (the column kind sorts it). |
+| `searchable` | boolean | no | — | `false` | — |
+| `selectable` | boolean | no | — | `false` | — |
+| `density` | enum(compact | default | comfortable) | no | — | — | — |
+
+### Examples
+
+#### Orders (`orders`)
+
+```json
+{
+  "caption": "Open orders",
+  "columns": [
+    {
+      "id": "customer",
+      "header": "Customer"
+    },
+    {
+      "id": "total",
+      "header": "Total",
+      "kind": "number",
+      "align": "end",
+      "sortable": true
+    }
+  ],
+  "rows": [
+    {
+      "id": "o1",
+      "cells": {
+        "customer": "Northwind Example",
+        "total": "1240"
+      }
+    },
+    {
+      "id": "o2",
+      "cells": {
+        "customer": "Contoso Example",
+        "total": "310"
+      }
+    }
+  ]
+}
+```
+
+### Related
+
+- [`table`](components/table.md)
+- [`blocks-data`](components/blocks-data.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Map
+
+> Places as markers on an offline vector basemap, clustered when close, with a place list beside it.
+
+- **id:** `data-map`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- Show where things are: stores, deliveries, sites
+
+### Don't use when
+
+- Values per region: use charts-geo-map
+- One address: use text
+
+### Accessibility
+
+- Every marker is also an item in a labelled place list (the non-map path)
+- The map pans and zooms by keyboard; selection is announced
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name of the view. |
+| `markers` | array | yes | — | — | — |
+| `listPlacement` | enum(side | below) | no | — | `"side"` | — |
+
+### Examples
+
+#### Sites (`sites`)
+
+```json
+{
+  "label": "Warehouses",
+  "markers": [
+    {
+      "id": "w1",
+      "label": "North hub",
+      "lat": 59.33,
+      "lng": 18.07
+    },
+    {
+      "id": "w2",
+      "label": "South hub",
+      "lat": 41.39,
+      "lng": 2.17,
+      "tone": "warning"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`charts-geo-point-map`](components/charts-geo-point-map.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Project timeline
+
+> Tasks as bars over days, weeks, months or quarters, with dependencies and progress.
+
+- **id:** `data-timeline`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- Show a schedule of tasks with durations and dependencies
+
+### Don't use when
+
+- Point-in-time events: use timeline or data-calendar
+
+### Accessibility
+
+- A labelled grid of rows; every bar is a button with its dates and progress
+- Rescheduling has a keyboard path; dependencies are listed as text
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name of the view. |
+| `tasks` | array | yes | — | — | — |
+| `dependencies` | array | no | — | — | — |
+| `zoom` | enum(day | week | month | quarter) | no | — | `"week"` | — |
+| `locale` | string | no | — | `"en"` | — |
+
+### Examples
+
+#### Launch plan (`launch`)
+
+```json
+{
+  "label": "Launch",
+  "zoom": "week",
+  "tasks": [
+    {
+      "id": "d",
+      "title": "Design",
+      "start": "2026-11-02",
+      "end": "2026-11-13",
+      "progress": 0.5
+    },
+    {
+      "id": "b",
+      "title": "Build",
+      "start": "2026-11-16",
+      "end": "2026-12-04"
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "d",
+      "to": "b",
+      "type": "FS"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`data-calendar`](components/data-calendar.md)
+- [`timeline`](components/timeline.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Tree view
+
+> A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard.
+
+- **id:** `data-tree-view`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- Show nested items such as folders, outlines or org charts
+
+### Don't use when
+
+- A flat list: use list or sortable-list
+- Files with previews: use data-files
+
+### Accessibility
+
+- A WAI-ARIA tree with roving focus, typeahead and expand/collapse on arrows
+- Moves have a keyboard path and are announced; selection uses checkboxes when enabled
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name of the view. |
+| `items` | array | yes | — | — | Flat items; parent names the parent item (none for a root). |
+| `checkboxes` | boolean | no | — | `true` | — |
+| `density` | enum(comfortable | compact) | no | — | — | — |
+
+### Examples
+
+#### Project outline (`outline`)
+
+```json
+{
+  "label": "Launch plan",
+  "items": [
+    {
+      "id": "plan",
+      "label": "Plan"
+    },
+    {
+      "id": "scope",
+      "label": "Scope",
+      "parent": "plan"
+    },
+    {
+      "id": "ship",
+      "label": "Ship"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`data-files`](components/data-files.md)
+- [`data-board`](components/data-board.md)
 
 ---
 
@@ -3769,6 +4673,109 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Flow action
+
+> A button that fires one declared flow event, such as next or back.
+
+- **id:** `flow-action`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- Move between the views of a declared flow
+
+### Don't use when
+
+- Submitting or navigating away: actions only change the local view
+
+### Accessibility
+
+- A type="button"; aria-disabled when no transition applies from the current view
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `event` | string | yes | — | — | A declared event. |
+| `label` | string | yes | untrusted | — | — |
+
+### Examples
+
+#### Next (`next`)
+
+```json
+{
+  "event": "next",
+  "label": "Next"
+}
+```
+
+### Related
+
+- [`flow-view`](components/flow-view.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Flow view
+
+> One named view of a multi-step flow; only the current view paints.
+
+- **id:** `flow-view`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- Split a wizard or a multi-step report into named steps
+
+### Don't use when
+
+- Content that should always show
+
+### Accessibility
+
+- A labelled region; focus moves to it when an action brings it into view
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `name` | string | yes | — | — | A declared view. |
+| `label` | string | no | untrusted | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Review step (`step`)
+
+```json
+{
+  "name": "review",
+  "label": "Review"
+}
+```
+
+### Related
+
+- [`flow-action`](components/flow-action.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Form
 
 > A form shell with layout, validation hook and error map.
@@ -3822,6 +4829,173 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - [`field`](components/field.md)
 - [`button`](components/button.md)
 - [`input`](components/input.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Form field
+
+> A named, validated field bound to a declared local-state variable.
+
+- **id:** `form-field`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- Collect one value for an action
+
+### Don't use when
+
+- Passwords, card numbers or one-time codes: never in a blueprint
+
+### Accessibility
+
+- A visible label; required and invalid states are exposed; errors are linked
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `name` | string | yes | — | — | The key in the action values. |
+| `state` | string | yes | — | — | The declared variable it binds. |
+| `label` | string | yes | untrusted | — | — |
+| `kind` | enum(text | email | tel | number | multiline) | no | — | `"text"` | — |
+| `required` | boolean | no | — | — | — |
+| `autocomplete` | enum(off | name | given-name | family-name | nickname | email | tel | organization | organization-title | street-address | address-level1 | address-level2 | postal-code | country-name | language | url) | no | — | — | — |
+| `pattern` | enum(email | phone | postal-code | digits | slug) | no | — | — | — |
+| `minLength` | number | no | — | — | — |
+| `maxLength` | number | no | — | — | — |
+| `min` | number | no | — | — | — |
+| `max` | number | no | — | — | — |
+| `placeholder` | string | no | untrusted | — | — |
+
+### Examples
+
+#### Email (`email`)
+
+```json
+{
+  "name": "email",
+  "state": "email",
+  "label": "Email",
+  "kind": "email",
+  "required": true
+}
+```
+
+### Related
+
+- [`action-form`](components/action-form.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Form submit
+
+> Proposes the form's action with its fields' values; disabled while a receipt is pending.
+
+- **id:** `form-submit`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- The one primary action of an action-form
+
+### Don't use when
+
+- Navigation or local view changes: use flow-action
+
+### Accessibility
+
+- A submit button inside the form; Enter in a field submits too
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | — |
+
+### Examples
+
+#### Send (`send`)
+
+```json
+{
+  "label": "Send request"
+}
+```
+
+### Related
+
+- [`action-form`](components/action-form.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Host region
+
+> Reserves a named place where the host app mounts its own component.
+
+- **id:** `host-region`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- A step that needs sensitive input the agent must never emit (payment, sign-in)
+- A place for host chrome that lives inside the document flow
+
+### Don't use when
+
+- Content the agent can describe itself: use a content block
+- Card numbers, passwords or one-time codes as props: those never appear in a blueprint
+
+### Accessibility
+
+- The host component sits in a labelled group named by the label
+- A region the host does not provide shows the label as visible text, not an empty box
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `name` | string | yes | — | — | The region the host provides, such as "payment" (lowercase, digits, hyphens). |
+| `label` | string | yes | untrusted | — | What the region is for; its accessible name and its placeholder text. |
+
+### Examples
+
+#### Payment step (`payment`)
+
+```json
+{
+  "name": "payment",
+  "label": "Payment details"
+}
+```
+
+### Related
+
+- [`layout-stack`](components/layout-stack.md)
 
 ---
 
@@ -5355,6 +6529,61 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Row layout
+
+> Children side by side, wrapping onto new lines when space runs out.
+
+- **id:** `layout-row`
+- **package:** `texuli`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `composition`
+
+### Use when
+
+- Place a few items next to each other, such as KPIs or actions
+
+### Don't use when
+
+- App chrome shells (sidebar, top-nav, dialogs)
+
+### Accessibility
+
+- DOM order stays reading order; the layout never reorders children visually
+- Logical properties only, so right-to-left content mirrors
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `gap` | enum(none | small | medium | large) | no | — | — | Space between children. |
+| `align` | enum(start | center | end | stretch) | no | — | — | — |
+| `wrap` | boolean | no | — | `true` | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Row (`basic`)
+
+```json
+{
+  "gap": "small",
+  "align": "center"
+}
+```
+
+### Related
+
+- [`layout-stack`](components/layout-stack.md)
+- [`layout-grid`](components/layout-grid.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Settings layout
 
 > Settings section list plus detail pane.
@@ -5472,6 +6701,166 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 - [`layout-host`](components/layout-host.md)
 - [`layout-chrome`](components/layout-chrome.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Split layout
+
+> Two panes side by side at a fixed ratio, stacked on narrow screens.
+
+- **id:** `layout-split`
+- **package:** `texuli`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `composition`
+
+### Use when
+
+- Show a primary pane with a supporting pane, such as text beside a chart
+
+### Don't use when
+
+- App chrome shells (sidebar, top-nav, dialogs)
+
+### Accessibility
+
+- DOM order stays reading order; the layout never reorders children visually
+- Logical properties only, so right-to-left content mirrors
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `ratio` | enum(1:1 | 1:2 | 2:1 | 1:3 | 3:1) | no | — | `"1:1"` | — |
+| `gap` | enum(none | small | medium | large) | no | — | — | Space between children. |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Split (`basic`)
+
+```json
+{
+  "ratio": "2:1"
+}
+```
+
+### Related
+
+- [`layout-row`](components/layout-row.md)
+- [`layout-grid`](components/layout-grid.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Stack layout
+
+> Children in one column, in reading order, with a fixed gap.
+
+- **id:** `layout-stack`
+- **package:** `texuli`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `composition`
+
+### Use when
+
+- Group content vertically with consistent spacing
+
+### Don't use when
+
+- App chrome shells (sidebar, top-nav, dialogs)
+
+### Accessibility
+
+- DOM order stays reading order; the layout never reorders children visually
+- Logical properties only, so right-to-left content mirrors
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `gap` | enum(none | small | medium | large) | no | — | — | Space between children. |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Stack (`basic`)
+
+```json
+{
+  "gap": "medium"
+}
+```
+
+### Related
+
+- [`layout-row`](components/layout-row.md)
+- [`layout-split`](components/layout-split.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Grid tile
+
+> A titled tile inside layout-grid that can span several columns or rows.
+
+- **id:** `layout-tile`
+- **package:** `texuli`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `composition`
+
+### Use when
+
+- Make one dashboard tile wider or taller than its neighbors
+
+### Don't use when
+
+- App chrome shells (sidebar, top-nav, dialogs)
+
+### Accessibility
+
+- DOM order stays reading order; the layout never reorders children visually
+- Logical properties only, so right-to-left content mirrors
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | no | untrusted | — | — |
+| `span` | number | no | — | `1` | Columns, 1 to 4. |
+| `rowSpan` | number | no | — | `1` | Rows, 1 or 2. |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Wide tile (`wide`)
+
+```json
+{
+  "title": "Trend",
+  "span": 2
+}
+```
+
+### Related
+
+- [`layout-grid`](components/layout-grid.md)
+- [`layout-card`](components/layout-card.md)
 
 ---
 
@@ -6001,7 +7390,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
-| `icon` | unknown | yes | — | — | Icon name or component |
+| `icon` | string | yes | — | — | Icon name (hosts may also pass a component in code) |
 | `class` | string | no | — | — | — |
 | `label` | string | no | — | — | — |
 
@@ -7153,6 +8542,68 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Sortable list
+
+> A list whose items are a bound list variable; people reorder it by drag or keyboard, and lists sharing a group exchange items.
+
+- **id:** `sortable-list`
+- **package:** `@texuli/player`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `state`
+
+### Use when
+
+- Let people rank, reorder or move items between lists (priorities, backlog columns)
+- Drag as data: the order is the list variable, so other nodes read it
+
+### Don't use when
+
+- A read-only list: use blocks-structure
+- Cards between board columns with work-in-progress limits: use data-board
+
+### Accessibility
+
+- A labelled list of items, each with a drag handle button; Space or Enter picks up, arrows move, Space or Enter drops, Escape cancels
+- Every move has a non-drag path (keyboard) and is announced politely; reduced motion disables the move animation
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name. |
+| `reorder` | object | yes | — | — | Drag as data: bind (a $state list), axis, group, accepts, locked, pull and disabled. |
+| `itemLabel` | string | no | — | `"label"` | The item field shown as each item’s text. |
+| `itemDetail` | string | no | — | — | An item field shown as secondary text. |
+
+### Examples
+
+#### Priorities (`priorities`)
+
+```json
+{
+  "label": "This week",
+  "reorder": {
+    "bind": {
+      "$state": "priorities"
+    },
+    "axis": "vertical"
+  }
+}
+```
+
+### Related
+
+- [`data-board`](components/data-board.md)
+- [`blocks-structure`](components/blocks-structure.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # SplitView
 
 > Master-detail split with list and detail panes.
@@ -7237,8 +8688,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `label` | string | yes | — | — | — |
-| `value` | unknown | yes | — | — | string or number |
-| `delta` | unknown | no | — | — | string or number change |
+| `value` | string | yes | — | — | The formatted value as display text, such as "$12.4k" or "98%". |
+| `delta` | string | no | — | — | The formatted change as display text, such as "+4%". |
 | `trend` | enum(up | down | neutral) | no | — | — | — |
 | `positive` | enum(up | down) | no | — | `"up"` | Which direction is good |
 | `hint` | string | no | — | — | — |
@@ -7839,6 +9290,138 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 - [`popover`](components/popover.md)
 - [`hover-card`](components/hover-card.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Workflow graph
+
+> A workflow of typed nodes and edges (automations, pipelines, approvals, state diagrams), read-only or editable.
+
+- **id:** `workflow-graph`
+- **package:** `@texuli/workflows`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `workflows`
+
+### Use when
+
+- Show how a process flows from step to step
+- Let people build or change a workflow, bound to a workflow state variable
+
+### Don't use when
+
+- A static diagram in a document: use blocks-diagram
+- Quantities flowing between stages: use charts-sankey
+
+### Accessibility
+
+- View mode: a figure whose nodes are a list that says where each one leads
+- Edit mode: focusable nodes with spatial arrow keys, keyboard connect mode on ports, and a treegrid outline that edits without the canvas
+- Labels are text; links and images pass the untrusted URL policy
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name. |
+| `graph` | object | yes | — | — | A spec WorkflowGraph (version 1): nodeTypes, nodes, edges, groups, cycles. |
+| `mode` | enum(view | edit) | no | — | `"view"` | — |
+| `flow` | enum(LR | TB) | no | — | `"LR"` | — |
+
+### Examples
+
+#### Expense approval (`approval`)
+
+```json
+{
+  "label": "Expense approval",
+  "mode": "view",
+  "graph": {
+    "version": 1,
+    "cycles": "forbid",
+    "nodeTypes": [
+      {
+        "id": "step",
+        "label": "Step",
+        "ports": [
+          {
+            "id": "in",
+            "direction": "in"
+          },
+          {
+            "id": "out",
+            "direction": "out",
+            "multiple": true
+          }
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "ask",
+        "type": "step",
+        "label": "Request",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "review",
+        "type": "step",
+        "label": "Review",
+        "position": {
+          "x": 260,
+          "y": 0
+        }
+      },
+      {
+        "id": "paid",
+        "type": "step",
+        "label": "Paid",
+        "position": {
+          "x": 520,
+          "y": 0
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": {
+          "node": "ask",
+          "port": "out"
+        },
+        "to": {
+          "node": "review",
+          "port": "in"
+        }
+      },
+      {
+        "id": "e2",
+        "from": {
+          "node": "review",
+          "port": "out"
+        },
+        "to": {
+          "node": "paid",
+          "port": "in"
+        }
+      }
+    ]
+  }
+}
+```
+
+### Related
+
+- [`blocks-diagram`](components/blocks-diagram.md)
+- [`charts-sankey`](components/charts-sankey.md)
 
 ---
 

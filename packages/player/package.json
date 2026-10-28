@@ -38,7 +38,13 @@
     "@texuli/blocks": "0.3.0",
     "@texuli/catalog": "0.3.0",
     "@texuli/charts": "0.3.0",
-    "@texuli/media": "0.3.0"
+    "@texuli/chat": "workspace:*",
+    "@texuli/data": "workspace:*",
+    "@texuli/media": "0.3.0",
+    "@texuli/primitives": "workspace:*",
+    "@texuli/spec": "workspace:*",
+    "@texuli/workflows": "workspace:*",
+    "texuli": "workspace:*"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

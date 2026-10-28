@@ -117,6 +117,12 @@ importers:
       '@texuli/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@texuli/data':
+        specifier: workspace:*
+        version: link:../../packages/data
+      '@texuli/drag':
+        specifier: workspace:*
+        version: link:../../packages/drag
       '@texuli/editor':
         specifier: workspace:*
         version: link:../../packages/editor
@@ -129,9 +135,15 @@ importers:
       '@texuli/player':
         specifier: workspace:*
         version: link:../../packages/player
+      '@texuli/primitives':
+        specifier: workspace:*
+        version: link:../../packages/primitives
       '@texuli/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
+      '@texuli/workflows':
+        specifier: workspace:*
+        version: link:../../packages/workflows
       astro:
         specifier: ^7.4.0
         version: 7.4.2(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
@@ -208,6 +220,9 @@ importers:
       '@texuli/media':
         specifier: 0.3.0
         version: link:../media
+      '@texuli/spec':
+        specifier: workspace:*
+        version: link:../spec
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
@@ -258,6 +273,9 @@ importers:
       '@texuli/core':
         specifier: 0.3.0
         version: link:../core
+      '@texuli/drag':
+        specifier: workspace:*
+        version: link:../drag
       '@texuli/primitives':
         specifier: 0.3.0
         version: link:../primitives
@@ -272,6 +290,8 @@ importers:
         version: link:../texuli
 
   packages/date: {}
+
+  packages/drag: {}
 
   packages/editor:
     dependencies:
@@ -326,6 +346,9 @@ importers:
       '@texuli/tokens':
         specifier: workspace:*
         version: link:../tokens
+      '@texuli/workflows':
+        specifier: workspace:*
+        version: link:../workflows
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
@@ -362,12 +385,30 @@ importers:
       '@texuli/charts':
         specifier: 0.3.0
         version: link:../charts
+      '@texuli/chat':
+        specifier: workspace:*
+        version: link:../chat
+      '@texuli/data':
+        specifier: workspace:*
+        version: link:../data
       '@texuli/media':
         specifier: 0.3.0
         version: link:../media
+      '@texuli/primitives':
+        specifier: workspace:*
+        version: link:../primitives
+      '@texuli/spec':
+        specifier: workspace:*
+        version: link:../spec
+      '@texuli/workflows':
+        specifier: workspace:*
+        version: link:../workflows
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
+      texuli:
+        specifier: workspace:*
+        version: link:../texuli
 
   packages/primitives:
     dependencies:
@@ -377,6 +418,9 @@ importers:
       '@texuli/date':
         specifier: 0.3.0
         version: link:../date
+      '@texuli/drag':
+        specifier: workspace:*
+        version: link:../drag
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
@@ -441,6 +485,27 @@ importers:
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
+
+  packages/workflows:
+    dependencies:
+      '@texuli/core':
+        specifier: workspace:*
+        version: link:../core
+      '@texuli/drag':
+        specifier: workspace:*
+        version: link:../drag
+      '@texuli/primitives':
+        specifier: workspace:*
+        version: link:../primitives
+      '@texuli/tokens':
+        specifier: workspace:*
+        version: link:../tokens
+      svelte:
+        specifier: ^5.57.2
+        version: 5.57.2
+      texuli:
+        specifier: workspace:*
+        version: link:../texuli
 
   tests/fixtures/app:
     dependencies:

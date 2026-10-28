@@ -68,8 +68,8 @@ type ComponentPropsById = {
 
 type Assert<Condition extends never> = Condition;
 // Host callbacks (onzoom, onselect…) are never agent-settable data, so manifests omit them.
-// biome-ignore lint/suspicious/noExplicitAny: matches any function signature
 type DataKeys<T> = {
+  // biome-ignore lint/suspicious/noExplicitAny: matches any function signature
   [K in keyof T]-?: NonNullable<T[K]> extends (...args: any[]) => any ? never : K;
 }[keyof T];
 type ComponentPropsMissingFromSchema = {
