@@ -1,7 +1,7 @@
 @import "@texuli/tokens/base.css";
 
 /*
- * DeckStage v2. Hooks: `.tx-deck-stage__*` classes, `data-tx-deck-*`
+ * DeckStage v2. Hooks: `tx-deck-stage__*` classes, `data-tx-deck-*`
  * attributes, `--tx-deck-*` variables (set on the stage root through the
  * CSSOM by the engine resolvers). The canvas is a fixed virtual size
  * (1280 × 720 for 16:9) scaled into the viewport and letterboxed in the
@@ -298,9 +298,8 @@
   margin-inline-end: 0.5rem;
 }
 
-/* Chrome placeholders (phase 1): toolbar, overview, presenter pane. */
-.tx-deck-stage__toolbar,
-.tx-deck-stage__overview-item {
+/* Chrome base (toolbar, overview, presenter pane); the chrome components add scoped styles. */
+.tx-deck-stage__toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -311,8 +310,7 @@
   justify-content: space-between;
 }
 
-.tx-deck-stage__control,
-.tx-deck-stage__overview-item {
+.tx-deck-stage__control {
   min-block-size: 44px;
   padding-block: 0.5rem;
   padding-inline: 0.875rem;
@@ -324,14 +322,9 @@
   cursor: pointer;
 }
 
-.tx-deck-stage__control:focus-visible,
-.tx-deck-stage__overview-item:focus-visible {
+.tx-deck-stage__control:focus-visible {
   outline: 2px solid var(--tx-ring);
   outline-offset: 2px;
-}
-
-.tx-deck-stage__progress {
-  font-variant-numeric: tabular-nums;
 }
 
 .tx-deck-stage__fullscreen-note {
@@ -367,16 +360,6 @@
   gap: 0.75rem;
 }
 
-.tx-deck-stage__overview-item {
-  justify-content: flex-start;
-  text-align: start;
-}
-
-.tx-deck-stage__overview-number {
-  color: var(--tx-muted-foreground);
-  font-variant-numeric: tabular-nums;
-}
-
 .tx-deck-stage__presenter-side {
   display: grid;
   gap: 0.75rem;
@@ -388,11 +371,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-}
-
-.tx-deck-stage__timer-value {
-  font-size: 1.5rem;
-  font-variant-numeric: tabular-nums;
 }
 
 .tx-deck-stage__notes,
@@ -1060,7 +1038,6 @@
 @media (forced-colors: active) {
   .tx-deck-stage,
   .tx-deck-stage__control,
-  .tx-deck-stage__overview-item,
   .tx-deck-stage__notes,
   .tx-deck-stage__next,
   .tx-deck-stage__media-refused {

@@ -14,6 +14,8 @@ import {
   formatMessage,
   type MessageValues,
 } from '@texuli/deck/engine';
+import { DECK_CHROME_MESSAGES } from './chrome/messages.ts';
+import { DECK_PRESENTER_MESSAGES } from './presenter/messages.ts';
 
 /**
  * Stage-only English defaults. Candidates to move into the engine catalog
@@ -37,6 +39,10 @@ export const DECK_STAGE_MESSAGES = Object.freeze({
   'stage.fullscreenRefused':
     'The browser refused full screen, so the presentation fills the window. Press Escape to leave.',
   'stage.nextStep': 'Step {current} of {total} on this slide',
+  // Chrome strings (toolbar, jump list, tooltips, help, toast), owned by `chrome/`.
+  ...DECK_CHROME_MESSAGES,
+  // Overview and presenter strings, owned by `overview/` and `presenter/`.
+  ...DECK_PRESENTER_MESSAGES,
 } as const);
 
 export type DeckStageOnlyMessageKey = keyof typeof DECK_STAGE_MESSAGES;

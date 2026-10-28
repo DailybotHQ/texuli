@@ -399,9 +399,7 @@ describe('DeckStage v2: input, canvas and the mounted window', () => {
         await press('o');
         const nav = screen.getByRole('navigation', { name: 'Slides' });
         await waitFor(() =>
-          expect(document.activeElement).toBe(
-            screen.getByRole('button', { name: 'Go to slide 1: Opening' })
-          )
+          expect(document.activeElement).toBe(screen.getByRole('button', { name: '1 Opening' }))
         );
         expect(slides(container)).toHaveLength(0);
         await fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Escape' });
@@ -410,7 +408,7 @@ describe('DeckStage v2: input, canvas and the mounted window', () => {
         await waitFor(() => expect(document.activeElement).toBe(active(container)));
 
         await press('o');
-        await fireEvent.click(screen.getByRole('button', { name: 'Go to slide 4: Risks' }));
+        await fireEvent.click(screen.getByRole('button', { name: '4 Risks' }));
         expect(activeId(container)).toBe('risks');
         await waitFor(() => expect(document.activeElement).toBe(active(container)));
       },
@@ -608,6 +606,89 @@ describe('DeckStage v2: transitions, motion and language', () => {
           ['glide:tx-deck-tour-m-title', 'glide:tx-deck-tour-m-text-0'],
           ['morph:tx-deck-tour-m-title', 'morph:tx-deck-tour-m-text-0'],
         ]);
+      },
+      resetAll
+    );
+  });
+
+  it('moves focus to the incoming slide once a deferred view transition swaps the DOM', async () => {
+    // Browsers run the update callback a frame or more later; hold it until the test releases it.
+    function deferredViewTransitions() {
+      const pending: (() => void)[] = [];
+      (document as unknown as Doc).startViewTransition = vi.fn((update: () => void) => {
+        let finish: () => void = () => undefined;
+        const finished = new Promise<void>((resolve) => {
+          finish = resolve;
+        });
+        pending.push(() => {
+          update();
+          finish();
+        });
+        return { ready: Promise.resolve(), finished };
+      });
+      document.documentElement.animate =
+        vi.fn() as unknown as typeof document.documentElement.animate;
+      return {
+        release: async () => {
+          for (const run of pending.splice(0)) run();
+          await Promise.resolve();
+        },
+      };
+    }
+    await scenario(
+      'focus waits for the swap and lands on the new slide, never on the outgoing one',
+      async () => {
+        mockPreferences();
+        const vt = deferredViewTransitions();
+        const { container } = render(DeckStage, { props: { deck: motionDeck(), loadTheme: null } });
+        await press('ArrowRight');
+        // The engine moved, the DOM did not yet: focus stays where it was meanwhile.
+        await Promise.resolve();
+        expect(activeId(container)).toBe('opening');
+        await vt.release();
+        expect(activeId(container)).toBe('rise');
+        await waitFor(() => expect(document.activeElement).toBe(active(container)));
+        expect((document.activeElement as HTMLElement).dataset.slideId).toBe('rise');
+      },
+      resetAll
+    );
+    await scenario(
+      'focus dropped to <body> by the swap comes back to the new slide',
+      async () => {
+        mockPreferences();
+        const vt = deferredViewTransitions();
+        const { container } = render(DeckStage, { props: { deck: motionDeck(), loadTheme: null } });
+        await press('ArrowRight');
+        await Promise.resolve();
+        (document.activeElement as HTMLElement).blur();
+        await vt.release();
+        await waitFor(() => expect(document.activeElement).toBe(active(container)));
+        expect(activeId(container)).toBe('rise');
+      },
+      resetAll
+    );
+    await scenario(
+      'never steals focus the page moved elsewhere before the swap (embedded decks)',
+      async () => {
+        mockPreferences();
+        const vt = deferredViewTransitions();
+        const outside = document.createElement('button');
+        outside.textContent = 'Page control';
+        document.body.append(outside);
+        try {
+          const { container } = render(DeckStage, {
+            props: { deck: motionDeck(), loadTheme: null },
+          });
+          await press('ArrowRight');
+          await Promise.resolve();
+          outside.focus();
+          await vt.release();
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          expect(activeId(container)).toBe('rise');
+          expect(document.activeElement).toBe(outside);
+        } finally {
+          outside.remove();
+        }
       },
       resetAll
     );

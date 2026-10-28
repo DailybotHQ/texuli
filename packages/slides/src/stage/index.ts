@@ -1,4 +1,25 @@
-export { DeckProgress, DeckToolbar } from './chrome/index.ts';
+export {
+  claimFirstRunHint,
+  copyDeckText,
+  createDeckChromeState,
+  DECK_CHROME_MESSAGES,
+  DeckChrome,
+  type DeckChromeNotice,
+  DeckChromeState,
+  DeckProgress,
+  DeckToolbar,
+  type DeckTooltip,
+  type DeckTooltipContent,
+  deckChromeEnvironment,
+  deckPrintLink,
+  deckShortcutText,
+  deckSlideLink,
+  FIRST_RUN_HINT_MS,
+  firstRunHintAllowed,
+  getDeckChromeContext,
+  runDeckChromeAction,
+  setDeckChromeContext,
+} from './chrome/index.ts';
 export {
   type DeckStageContext,
   type DeckStageSlideEntry,

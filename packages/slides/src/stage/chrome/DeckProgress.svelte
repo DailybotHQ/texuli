@@ -1,9 +1,8 @@
 <script lang="ts">
 /**
- * PHASE-1 PLACEHOLDER (PLAN_008 T-stage): the deck progress bar, honoring
- * `style.progress` (`top`, `bottom`, `none`). Phase 2 may restyle it; the
- * contract stays: a `progressbar` labelled by the messages, valued by the
- * visible slide position.
+ * The deck progress bar, honoring `style.progress` (`top`, `bottom`, `none`;
+ * the stage places it on that edge of the letterbox): a `progressbar`
+ * labelled by the messages and valued by the visible slide position.
  */
 import { getDeckStageContext } from '../context.ts';
 import { deckCssVars } from '../css-vars.ts';

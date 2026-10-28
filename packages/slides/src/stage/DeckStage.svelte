@@ -47,8 +47,10 @@ import { resolveImageSources } from '@texuli/media/image';
 import type { Theme } from '@texuli/tokens/contract';
 import { defineTheme } from '@texuli/tokens/contract';
 import { flushSync, onMount, type Snippet, tick, untrack } from 'svelte';
+import DeckChrome from './chrome/DeckChrome.svelte';
 import DeckProgress from './chrome/DeckProgress.svelte';
 import DeckToolbar from './chrome/DeckToolbar.svelte';
+import { createDeckChromeState, setDeckChromeContext } from './chrome/state.svelte.ts';
 import { type DeckStageContext, type DeckStageSlideEntry, setDeckStageContext } from './context.ts';
 import { deckCssVars } from './css-vars.ts';
 import DeckError from './DeckError.svelte';
@@ -63,6 +65,8 @@ import DeckOverview from './overview/DeckOverview.svelte';
 import { prefetchDeckSlides, whenIdle } from './prefetch.ts';
 import { prepareDeck } from './prepare.ts';
 import DeckPresenterPane from './presenter/DeckPresenterPane.svelte';
+import type { DeckPresenterHost } from './presenter/host.ts';
+import type { DeckPreviewPaint } from './presenter/paint.ts';
 import { type DeckRenderers, deckRendererList, deckValidationHooks } from './renderers.ts';
 import {
   claimDeckHash,
@@ -230,6 +234,7 @@ let view = $derived(
 );
 let overviewOpen = $state(false);
 let overviewFocus = $state(false);
+let presenterFocus = $state(false);
 let blackout = $state(false);
 let stepDirection = $state<'forward' | 'backward' | 'none'>('none');
 let enter = $state.raw<{
@@ -370,12 +375,35 @@ let fitVars = $derived.by((): Record<string, string> => {
 // ---------------------------------------------------------------------------
 // Navigation and events
 
+// The slide that should take focus once it is on screen. A view transition
+// swaps the DOM a frame or more after the engine moved, so focusing at once
+// would land on the outgoing slide, which turns inert and drops focus to
+// <body>. `undefined`: nothing pending; `null`: focus the stage root.
+let pendingFocus: string | null | undefined;
+
 function focusSlide() {
-  void tick().then(() => {
-    const id = view?.slideId;
-    const target = (id ? slideElements[id] : undefined) ?? root;
-    target?.focus({ preventScroll: true });
-  });
+  pendingFocus = engine?.getState().slideId ?? view?.slideId ?? null;
+  void tick().then(() => flushFocus(false));
+}
+
+/**
+ * Focus the pending slide if it is the one shown. `deferred` is the call from
+ * a view transition's DOM update: by then the user may have moved on, so it
+ * only takes focus back while focus is still in the deck or was dropped to
+ * <body> by the swap (never from an embedding page's own controls).
+ */
+function flushFocus(deferred: boolean) {
+  const id = pendingFocus;
+  if (id === undefined) return;
+  if (id !== null && view?.slideId !== id) return;
+  pendingFocus = undefined;
+  if (deferred) {
+    const active = document.activeElement;
+    const dropped = !active || active === document.body || active === document.documentElement;
+    if (!dropped && !root?.contains(active)) return;
+  }
+  const target = (id ? slideElements[id] : undefined) ?? root;
+  target?.focus({ preventScroll: true });
 }
 
 let focusAfterMove = false;
@@ -431,8 +459,11 @@ function onEngineChange(current: DeckController, change: DeckStateChange) {
           ? { slideId: next.slideId, name: resolved.name, direction }
           : null;
     };
-    if (sync) flushSync(write);
-    else write();
+    if (sync) {
+      flushSync(write);
+      // Inside the view transition's DOM update: the incoming slide is live now.
+      flushFocus(true);
+    } else write();
   };
   const fromId = previous.slideId;
   const played = playDeckTransition({
@@ -469,6 +500,7 @@ function onStageAction(action: DeckAction, source: DeckActionSource) {
       exitFullscreen();
       return;
     case 'presenter':
+      presenterFocus = source === 'keyboard';
       setPresenter(!presenter);
       return;
     case 'next':
@@ -577,7 +609,8 @@ $effect(() => {
 let remote: string | null = null;
 let established = false;
 $effect(() => {
-  const link = deckSyncLink(sync);
+  // While the presenter window is open the stage follows it; the host link resumes after.
+  const link = deckSyncLink(presenterLink ?? sync);
   const current = engine;
   if (!link || !current) return;
   const off = link.subscribe((signal) =>
@@ -648,10 +681,15 @@ $effect(() => {
 // ---------------------------------------------------------------------------
 // Input
 
+// The chrome's layers (help, laser, slide list); help and laser join the Escape order.
+const chromeState = setDeckChromeContext(createDeckChromeState());
+
 function inputState(): DeckInputState {
   return {
     overview: overviewOpen ? 'open' : 'closed',
     blackout,
+    help: chromeState.help,
+    laser: chromeState.laser,
     fullscreen: fullscreen !== 'off',
     dir: localeInfo.dir,
   };
@@ -764,6 +802,46 @@ function onFocusOut(event: FocusEvent) {
   const next = event.relatedTarget;
   if (next instanceof Node && !root?.contains(next)) focusSlide();
 }
+
+// ---------------------------------------------------------------------------
+// Overview thumbnails and presenter previews paint with the stage's own tables.
+
+const previewPaint: DeckPreviewPaint = {
+  get deck() {
+    return model as Deck;
+  },
+  get renderers() {
+    return rendererList;
+  },
+  get tier() {
+    return paintTier;
+  },
+  get t() {
+    return t;
+  },
+  get canvas() {
+    return canvas;
+  },
+  get resolveAvatar() {
+    return resolveAvatar;
+  },
+  palette: (slide) => paletteFor(slide),
+};
+// The presenter window (a second screen, opened from the split view): the
+// stage follows its link while it is open, and closes it when the stage goes.
+let presenterLink = $state.raw<PresenterTransport | null>(null);
+let closePresenterWindow: (() => void) | null = null;
+const presenterHost: DeckPresenterHost = {
+  attach(link, close) {
+    presenterLink = link;
+    closePresenterWindow = close;
+  },
+  detach() {
+    presenterLink = null;
+    closePresenterWindow = null;
+  },
+};
+$effect(() => () => closePresenterWindow?.());
 
 // ---------------------------------------------------------------------------
 // Context for the chrome lanes
@@ -963,7 +1041,7 @@ $effect(() => {
         {#if overviewView}
           {@render overviewView()}
         {:else}
-          <DeckOverview focusCurrent={overviewFocus} />
+          <DeckOverview focusCurrent={overviewFocus} paint={previewPaint} />
         {/if}
       {:else}
         <div
@@ -1026,26 +1104,23 @@ $effect(() => {
           {#if !chrome && styleResolution.style.progress === 'bottom'}
             <DeckProgress />
           {/if}
-          {#if blackout}
-            <button
-              type="button"
-              class="tx-deck-stage__blackout"
-              data-tx-deck-chrome
-              onclick={() => engine?.setBlackout(false)}
-            >
-              <span class="tx-deck-stage__blackout-hint">{t('chrome.blackoutHint')}</span>
-            </button>
-          {/if}
         </div>
       {/if}
       {#if presenter}
         {#if presenterView}
           {@render presenterView()}
         {:else}
-          <DeckPresenterPane timer={presenterTimer} />
+          <DeckPresenterPane
+            timer={presenterTimer}
+            paint={previewPaint}
+            host={presenterHost}
+            focusNotes={presenterFocus}
+          />
         {/if}
       {/if}
     </div>
+    <!-- Blackout, laser, help, first-visit hint, full screen overlay, toast: also under a host `chrome`. -->
+    <DeckChrome />
     <p class="tx-deck-stage__live" aria-live="polite" aria-atomic="true">{announcement}</p>
   {/if}
 </div>
