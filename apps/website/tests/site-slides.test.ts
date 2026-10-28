@@ -69,7 +69,9 @@ afterEach(() => {
 describe('slides page: copy and safety', () => {
   it('says "in development" and never claims 0.4.0 is on npm', () => {
     expect(PAGE).toMatch(/@texuli\/slides · in development/);
-    expect(read('components/slides-site/page.ts')).toMatch(/in development and not on npm yet/);
+    const status = read('components/slides-site/page.ts');
+    expect(status).toMatch(/in development and in the repository only/);
+    expect(status).toMatch(/@texuli\/slides 0\.3\.0 on npm has the previous deck model/);
   });
 
   it('renders no HTML from data, and names only fictional example.com addresses', () => {
