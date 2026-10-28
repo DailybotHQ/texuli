@@ -113,9 +113,9 @@ Every drag surface (the `@texuli/primitives/sortable` binding, the
 `@texuli/workflows` and the player's `sortable-list`) follows one contract,
 [`@texuli/drag`'s interaction, accessibility and i18n contract](../packages/drag/docs/contract.md).
 `@texuli/drag` and `@texuli/workflows` are in development and on npm as
-`0.3.0`; the sortable binding, the data migrations and the player's
-`sortable-list` are in the repository and ship with the next release of
-`@texuli/primitives`, `@texuli/data` and `@texuli/player`.
+`0.4.0`; the sortable binding, the data migrations and the player's
+`sortable-list` ship in the `0.4.0` release of `@texuli/primitives`,
+`@texuli/data` and `@texuli/player`.
 
 - **Keyboard first.** Space or Enter on a handle picks up, arrows move
   (inline arrows flip in right-to-left text), Space or Enter drops, Escape
@@ -150,7 +150,7 @@ run on these surfaces yet.
 
 ## Slides stage
 
-The `@texuli/slides` `0.4.0` stage (in the repository, not on npm; the full
+The `@texuli/slides` `0.4.0` stage (on npm from `0.4.0`; the full
 contract is [stage.md](../packages/slides/docs/stage.md)) follows this
 contract:
 

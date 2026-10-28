@@ -18,7 +18,7 @@ A kanban board over flat `{ id, columnId, rank }` cards with:
   built from the same `validateMove` rules as drag and keyboard
 - Live-region announcements for pickups, positions, WIP rejections and drops;
   drag announcements come from `DragMessages` templates (`@texuli/drag/messages`),
-  overridable per locale with the `messages` prop (unreleased: not in `0.3.0`)
+  overridable per locale with the `messages` prop (new in `0.4.0`)
 - Locked cards (`isLocked`) that cannot be dragged or moved
 - RTL via `dir="rtl"` (arrow keys flip with the reading direction) and logical CSS
 

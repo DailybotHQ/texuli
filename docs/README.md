@@ -38,18 +38,18 @@ project overview.
 | `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): The rich text editor surface, toolbar, link dialog and clipboard import on the core editor texels. |
 | `@texuli/core` | [packages/core/README.md](../packages/core/README.md): Texels: framework-free behavior and policy that every Texuli component is built from. |
 | `@texuli/date` | [packages/date/README.md](../packages/date/README.md): Owned Gregorian date arithmetic for Texuli calendars and date fields. |
-| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, not on npm: the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
-| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.3.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
+| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, first on npm as `0.4.0`: the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
+| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.4.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
 | `@texuli/media` | [packages/media/README.md](../packages/media/README.md): Media: images, galleries, video, audio and layered compositions. |
 | `@texuli/player` | [packages/player/README.md](../packages/player/README.md): Svelte paint runtime for validated Texuli catalog blueprints. |
 | `@texuli/primitives` | [packages/primitives/README.md](../packages/primitives/README.md): Owned, headless Svelte 5 primitives built on the texels. |
-| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (`0.4.0` in development, not on npm; npm has `0.3.0`, the model v1 stage). |
+| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (in development; on npm as `0.4.0`, after the `0.3.0` model v1 stage). |
 | `@texuli/spec` | [packages/spec/README.md](../packages/spec/README.md): The schema-first blueprint contract: JSON schemas, the catalog vocabulary, TypeScript and Kotlin projections, and the conformance harness. |
 | `texuli` | [packages/texuli/README.md](../packages/texuli/README.md): Styled Texuli components, layouts and shells. |
 | `@texuli/tokens` | [packages/tokens/README.md](../packages/tokens/README.md): The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. |
-| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.3.0`: the accessible workflow graph editor and viewer. |
+| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.4.0`: the accessible workflow graph editor and viewer. |
 | `@texuli/tools` | [packages/tools/README.md](../packages/tools/README.md): Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. |
 | `@texuli/website` | [apps/website/README.md](../apps/website/README.md): texuli.com: the Texuli documentation, catalog and live examples, built with Astro; the Pages Functions live in the root `functions/`. |
 | `@texuli/agent` | [apps/agent/README.md](../apps/agent/README.md): The texuli.com agent service: prompt to validated blueprint draft, fake replay provider only, not deployed. |
@@ -362,7 +362,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [prim-toggle](../packages/primitives/docs/prim-toggle.md) | Toggle and ToggleGroup |
 | [prim-toolbar](../packages/primitives/docs/prim-toolbar.md) | Toolbar |
 | [prim-tooltip](../packages/primitives/docs/prim-tooltip.md) | Tooltip primitive |
-| [prim-sortable](../packages/primitives/docs/prim-sortable.md) | Sortable primitive (unreleased) |
+| [prim-sortable](../packages/primitives/docs/prim-sortable.md) | Sortable primitive (new in `0.4.0`) |
 | [prim-tree](../packages/primitives/docs/prim-tree.md) | Tree primitive |
 | [svelte-attachments](../packages/primitives/docs/svelte-attachments.md) | Svelte attachments for primitives |
 

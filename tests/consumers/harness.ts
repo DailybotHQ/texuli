@@ -52,7 +52,7 @@ export const TEXULI_INSTALL_NAMES = [
   '@texuli/data',
 ] as const;
 
-/** Local packs also need @texuli/date (from 0.3.0 a dependency of @texuli/primitives) and @texuli/drag (a dependency of @texuli/primitives and @texuli/data since PLAN_007); the registry install pulls them in transitively. */
+/** Local packs also need @texuli/date (a dependency of @texuli/primitives since 0.3.0) and @texuli/drag (a dependency of @texuli/primitives and @texuli/data since 0.4.0); the registry install pulls them in transitively. */
 const LOCAL_INSTALL_NAMES = [...TEXULI_INSTALL_NAMES, '@texuli/date', '@texuli/drag'] as const;
 
 const ASTRO_TRANSITIVE_PACKAGES = [

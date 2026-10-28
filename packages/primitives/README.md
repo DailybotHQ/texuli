@@ -14,9 +14,9 @@ which is built on these primitives. They are built from scratch on the
 not depend on any other component library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.3.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.4.0`) may contain breaking
-> changes, so pin the exact version or use `^0.3.0`, which accepts only 0.3.x.
+> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.5.0`) may contain breaking
+> changes, so pin the exact version or use `^0.4.0`, which accepts only 0.4.x.
 
 ## Install
 
@@ -77,7 +77,7 @@ from subpaths to keep bundles narrow.
 | --- | --- |
 | Overlays | `dialog`, `alert-dialog`, `sheet`, `popover`, `hover-card`, `tooltip`, `toast`, `portal` |
 | Menus and navigation | `menu`, `context-menu`, `menubar`, `navigation-menu`, `command`, `toolbar`, `tabs`, `pagination` |
-| Selection and lists | `select`, `combobox`, `listbox`, `tree`, `sortable` (unreleased) |
+| Selection and lists | `select`, `combobox`, `listbox`, `tree`, `sortable` (new in `0.4.0`) |
 | Form controls | `label`, `checkbox`, `switch`, `radio-group`, `toggle`, `slider`, `number-field`, `pin-input`, `tags-input`, `color-picker`, `file-drop` |
 | Dates | `calendar`, `date-field`, `date-picker` |
 | Disclosure and layout | `accordion`, `collapsible`, `splitter`, `scroll-area`, `separator` |
@@ -108,13 +108,13 @@ from subpaths to keep bundles narrow.
   and label them with `Intl.DateTimeFormat`. Only the Gregorian calendar is
   supported; `CalendarDate` is re-exported from `@texuli/date`.
 
-### Unreleased
+### New in 0.4.0
 
-`sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) is in the repository
-but not in the published `0.3.0`. It binds the drag engine
+`sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) ships in `0.4.0`; it
+is not in `0.3.0`. It binds the drag engine
 [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md),
-which is in development and on npm as `0.3.0`; `sortable` ships with the
-next release of `@texuli/primitives` ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
+which is in development and on npm as `0.4.0`
+([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 Contract: [prim-sortable.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-sortable.md).
 
 ### Breaking in 0.3.0

@@ -229,7 +229,7 @@ Catalog id `blocks-embed` documents the same contract on `mountEmbed` and in
 
 ### 16. Interaction as data: spec 0.3.0 state, actions, drag and workflows
 
-Unreleased: in the repository, not in the published `0.3.0` packages.
+Released in the `0.4.0` packages; the `0.3.0` packages predate it.
 
 | | |
 | --- | --- |

@@ -10,8 +10,7 @@ renders, prints and exports like any other deck; the v2 stage migrates it
 when it presents it.
 
 > **Model v1 templates.** These are the `0.3.0` templates, kept for
-> compatibility. The model v2 templates of the next minor, `0.4.0` (in the
-> repository, not on npm yet), live in `@texuli/deck/templates`:
+> compatibility. The model v2 templates of `0.4.0` live in `@texuli/deck/templates`:
 > `createDeckTemplate(id, title?)` returns a validated v2 deck for one of
 > the nine ids in `DECK_TEMPLATES` (`pitch`, `review`, `qbr`, `launch`,
 > `status`, `training`, `lesson`, `report`, `talk`), built from the brief

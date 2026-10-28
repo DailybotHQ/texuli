@@ -11,8 +11,8 @@ validation, the closed vocabularies (aspects, masters, transitions), theme
 references, and the pure helpers the v1 grammar, templates and exporters
 share. Nothing here touches the DOM.
 
-> **Model v1 is kept for compatibility.** `0.3.0` on npm has this model only.
-> From the next minor, `0.4.0` (in the repository, not on npm yet), the
+> **Model v1 is kept for compatibility.** `0.3.0` has this model only.
+> From `0.4.0`, the
 > canonical deck is **model v2**, owned by `@texuli/deck/model`
 > (`formatVersion: 2`, catalog layouts, backgrounds, outline, navigation and
 > component slides). This subpath still parses v1 decks, and the v2 stage

@@ -1,7 +1,6 @@
 # Upgrading from 0.3.0 to 0.4.0
 
-**Applies to:** `@texuli/slides` `0.3.0` (on npm) → `0.4.0` (in the
-repository, **not on npm yet**)  
+**Applies to:** `@texuli/slides` `0.3.0` → `0.4.0` (both on npm)  
 **Tests that pin the path:** `packages/deck/tests/model-migrate.test.ts`
 (every input shape, fixtures in `packages/deck/tests/fixtures/migrate/`),
 `tests/layouts.test.ts` (a migrated v1 deck on the v2 stage),

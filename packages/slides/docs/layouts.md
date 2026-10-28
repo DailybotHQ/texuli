@@ -10,9 +10,8 @@ masters on free slides, background contrast),
 (one example per layout, light and dark, desktop and Pixel 7);
 `tests/e2e/a11y-slides.spec.ts`
 
-> **Status: in development.** The layouts arrive with the next minor,
-> `0.4.0`, which is in the repository and **not on npm yet**. The published
-> `0.3.0` has the eight model v1 masters only ([model.md](model.md)).
+> **Status: in development.** The layouts are new in `0.4.0`. `0.3.0`
+> has the eight model v1 masters only ([model.md](model.md)).
 
 A model v2 slide names its layout in `layout`. The deck engine owns the
 **layout catalog** (`DECK_LAYOUTS` in `@texuli/deck/model`): 20 layouts with

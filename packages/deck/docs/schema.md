@@ -7,7 +7,7 @@ same data, and `Infer<typeof S>` reads the TypeScript type. One definition
 therefore gives all-issues validation, types and a schema document that
 never drift apart. There is no third-party schema library.
 
-> **Status:** in the repository as `@texuli/deck` `0.4.0`, not on npm.
+> **Status:** in development; `@texuli/deck` is on npm from `0.4.0`.
 
 ```ts
 import { type Infer, t, toJsonSchema, validate } from '@texuli/deck/schema';

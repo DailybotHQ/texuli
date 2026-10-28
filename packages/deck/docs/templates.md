@@ -6,7 +6,7 @@ Built-in, deterministic deck templates, backed by the
 layouts are chosen for you, and every content field says what to add instead
 of inventing it.
 
-> **Status:** in the repository as `@texuli/deck` `0.4.0`, not on npm.
+> **Status:** in development; `@texuli/deck` is on npm from `0.4.0`.
 
 ```ts
 import { createDeckTemplate, DECK_TEMPLATES } from '@texuli/deck/templates';

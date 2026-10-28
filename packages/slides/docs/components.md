@@ -7,9 +7,8 @@ state host and capabilities, free-slide extensions, hostile props),
 `tests/components-coverage.test.ts` (every catalog id is a slide component
 or excluded with a reason, and every slide component renders with steps)
 
-> **Status: in development.** Components on slides arrive with the next
-> minor, `0.4.0`, which is in the repository and **not on npm yet**. The
-> published `0.3.0` paints `@texuli/blocks` blocks only.
+> **Status: in development.** Components on slides are new in `0.4.0`.
+> `0.3.0` paints `@texuli/blocks` blocks only.
 
 “Any Texuli component on a slide” means every `@texuli/blocks` family and
 every catalog component that belongs on a slide. `DeckStage` paints them by

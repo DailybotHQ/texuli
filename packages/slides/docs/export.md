@@ -12,9 +12,8 @@ Export of a validated deck. Nothing here uploads anything, and the PPTX
 writers never fetch.
 
 > **Status: in development.** The model v2 export described here (the
-> `@texuli/deck` model, `DeckPrintView`, the v2 PPTX writer) lands with the
-> next minor, `0.4.0`, which is **not on npm yet**. The published `0.3.0`
-> has the model v1 export only (`planDeckPrint`, `DeckPrint`, the v1 PPTX
+> `@texuli/deck` model, `DeckPrintView`, the v2 PPTX writer) is new in
+> `0.4.0`. `0.3.0` has the model v1 export only (`planDeckPrint`, `DeckPrint`, the v1 PPTX
 > writer). See [RELEASE](../../../docs/RELEASE.md).
 
 Both deck models are accepted. A deck with `formatVersion: 2` (a validated

@@ -11,21 +11,23 @@ patches, text twins, a typed builder, brief outlines and templates. It has no
 Svelte and no DOM: the `@texuli/slides` stage presents its decks, and Node
 tools and agents can use it on its own.
 
-> **Status: in development, not on npm.** `@texuli/deck` is versioned
-> `0.4.0` in the repository and has never been published. It was built in
-> PLAN_008 (ADR-009 in
+> **Status: in development (pre-1.0).** `@texuli/deck` is published on npm
+> for the first time as `0.4.0`, with provenance. It was built in PLAN_008
+> (ADR-009 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> The `@texuli/slides` stage that renders it is also `0.4.0` in the
-> repository and not on npm yet; npm still has `@texuli/slides` `0.3.0` with
-> the previous deck model. The blueprint spec `0.4.0` that encodes deck model
-> v2 also exists only in the repository. Publication needs a separate owner
-> GO (see
-> [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
+> The `@texuli/slides` `0.4.0` stage renders it (`@texuli/slides` `0.3.0`
+> has the previous deck model), and `@texuli/spec` `0.4.0` ships the
+> blueprint spec `0.4.0` that encodes deck model v2. Under 0.x a new minor
+> may contain breaking changes, so pin the exact version or use `^0.4.0`
+> (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 ## Install
 
-Not on npm yet. In the Texuli workspace, depend on it as
-`"@texuli/deck": "workspace:*"`. It has **no runtime dependencies** and no
+```bash
+npm install @texuli/deck
+```
+
+It has **no runtime dependencies** and no
 peer dependencies: no Svelte, no DOM framework, no schema library.
 
 ## Quick start: JSON

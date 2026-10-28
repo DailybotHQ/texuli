@@ -8,7 +8,7 @@ presenter protocol and the English stage messages. It reads decks and
 returns data; the stage (`@texuli/slides`) owns the DOM, rendering and
 browser APIs.
 
-> **Status:** in the repository as `@texuli/deck` `0.4.0`, not on npm.
+> **Status:** in development; `@texuli/deck` is on npm from `0.4.0`.
 
 The engine touches no `window`, `document` or `BroadcastChannel` when it is
 imported, has no runtime dependencies, and imports only this package's own

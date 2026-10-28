@@ -60,14 +60,14 @@ prototypes as real credentials.
 
 **Brief shape:** sequential slides for a pitch or lesson.
 
-**Deck model v2 (the deck generator, in development, not on npm):** in a
-Texuli workspace, write the deck as JSON or Markdown with `@texuli/deck`,
+**Deck model v2 (the deck generator, in development, on npm from `0.4.0`):**
+write the deck as JSON or Markdown with `@texuli/deck`,
 validate it with `parseDeck` / `loadUntrustedDeck` / `parseDeckMarkdown`,
 pick from the 21 layout ids by `useWhen`, present it with the v2
 `DeckStage`, export print and PPTX, and use the `deck` CLI and MCP tool:
-[`decks.md`](decks.md). The table below is the v1 model that npm
-`@texuli/slides` `0.3.0` ships; the repository's stage still accepts v1
-decks (it migrates them).
+[`decks.md`](decks.md). The table below is the v1 model that
+`@texuli/slides` `0.3.0` ships; the `0.4.0` stage still accepts v1 decks (it
+migrates them).
 
 | Need | Prefer |
 | --- | --- |
@@ -159,7 +159,7 @@ the behavior scenario `tests/behavior/scenarios/sortable.spec.ts`.
 
 **Brief shape:** an automation, approval or pipeline the person edits as
 nodes and edges, or a read-only diagram of one. `@texuli/workflows` is in
-development and on npm as `0.3.0`.
+development and on npm as `0.4.0`.
 
 ```svelte
 <script lang="ts">

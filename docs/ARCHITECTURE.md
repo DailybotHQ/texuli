@@ -21,7 +21,7 @@ packages in lower layers.
 | --- | --- | --- | --- |
 | L0 | `@texuli/core` | Texels: ids, keyboard intents, roving focus and typeahead, focus scope, inert, dismissable layers, layer stack, overlay engine, portal, positioning (math + DOM), presence, scroll lock, tabbable, form bridge, announcer, direction and locale, the URL policy | none |
 | L0 | `@texuli/date` | Framework-free Gregorian dates, arithmetic, locale week starts and time-zone-aware today | none |
-| L0 | `@texuli/deck` | In development (`0.4.0`, in the repository only): the framework-free, dependency-free deck engine: deck model v2 and its owned schema kit, migration, the untrusted loader, the Markdown dialect, TeX-subset math, the layout catalog, backgrounds and contrast, navigation, controls, canvas fit and the presenter protocol, lint, patch, the typed builder, brief outlines and templates | none |
+| L0 | `@texuli/deck` | In development (on npm from `0.4.0`): the framework-free, dependency-free deck engine: deck model v2 and its owned schema kit, migration, the untrusted loader, the Markdown dialect, TeX-subset math, the layout catalog, backgrounds and contrast, navigation, controls, canvas fit and the presenter protocol, lint, patch, the typed builder, brief outlines and templates | none |
 | L0 | `@texuli/drag` | In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing) | none |
 | L0 | `@texuli/spec` | Framework-free blueprint contract and code generation | none |
 | L1 | `@texuli/primitives` | 42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core, date, drag |
@@ -38,7 +38,7 @@ packages in lower layers.
 | L7 | `@texuli/player` | Blueprint player runtime and styles | blocks, catalog, charts, chat, data, media, primitives, spec, texuli, workflows |
 | L8 | `@texuli/tools` | Copy-in CLI (`texuli-add`, `texuli-init`, `texuli-update`), `texuli-llms`, A2UI adapter, custom elements and the golden set | core, tokens, catalog, blocks, charts, media |
 | L8 | `@texuli/astro` | Astro integration, site helpers and content layouts | blocks, core, tokens |
-| L8 | `@texuli/slides` | The Svelte 5 presentation stage on `@texuli/deck` (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from `0.3.0`; `0.4.0` in development, in the repository only | blocks, catalog, deck, media, player, tokens |
+| L8 | `@texuli/slides` | The Svelte 5 presentation stage on `@texuli/deck` (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from `0.3.0`; in development | blocks, catalog, deck, media, player, tokens |
 
 Not layers, because they consume the library:
 - **`@texuli/examples`** (private) is the examples registry. Every component
@@ -56,15 +56,12 @@ Not layers, because they consume the library:
   website (see [The website](#the-website)).
 
 `@texuli/editor` and `@texuli/examples` are never packed
-(`NEVER_PACKED` in `scripts/packages.ts`). 18 packages are released on npm
-as `0.3.0`: `0.3.0` is the first release of `@texuli/date` (the previous
-release, `0.2.0`, had 15 packages), and `@texuli/drag` and
-`@texuli/workflows` (in development, in the `publish.yml` wave order ahead
-of their dependents) were first published as `0.3.0` on 2026-10-28 (UTC).
-The other 16 packages' `0.3.0` tarballs predate PLAN_007, so its changes to
-them ship with their next version. `@texuli/deck` (`0.4.0`, never published)
-is in the waves too, before `@texuli/slides`, whose `0.4.0` stage depends on
-it, so `pnpm verify:packages` packs 19 packages ([RELEASE](RELEASE.md)).
+(`NEVER_PACKED` in `scripts/packages.ts`); `pnpm verify:packages` packs the
+other 19. All 19 are released on npm as `0.4.0`, the first release of
+`@texuli/deck` (the previous release, `0.3.0`, had 18 packages);
+`@texuli/drag`, `@texuli/workflows` and `@texuli/deck` are in development
+and sit in the `publish.yml` wave order ahead of their dependents
+([RELEASE](RELEASE.md)).
 
 ```text
 L8  tools · astro · slides
@@ -165,7 +162,7 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
 ```
 
 - **Catalog groups.** `@texuli/catalog` builds 158 ids from manifest groups:
-  `content`, `display`, `forms`, `layouts`, `overlays`, and (unreleased)
+  `content`, `display`, `forms`, `layouts`, `overlays`, and (new in `0.4.0`)
   `composition`, `data`, `chat`, `state` and `workflows`. 66 ids are
   agent-emittable; the rest are app tier.
 - **Player painters.** `@texuli/player` loads one lazy painter per
@@ -195,8 +192,8 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both `0.4.0`, in the
-repository, not on npm):
+ADR-009 splits presentations in two packages (both on npm as `0.4.0`,
+the first release of `@texuli/deck`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
   (`formatVersion: 2`; slides told apart by `layout`: 20 catalog layouts,
@@ -267,8 +264,8 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the packable packages (18 on npm today, `@texuli/date`, `@texuli/drag`
-    and `@texuli/workflows` included) as the `0.3.0` release (dist-tags `latest` and `next`), with provenance
+    the 19 packable packages, `@texuli/deck` included, to npm as the
+    `0.4.0` release (dist-tags `latest` and `next`), with provenance
     ([RELEASE](RELEASE.md)).
 - **Tests:**
   - **Unit:** Vitest (happy-dom) in `packages/*/tests/`,

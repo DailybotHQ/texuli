@@ -8,7 +8,7 @@ own closed dialect: reveal.js documents are not a compatibility target, some
 reveal.js attributes are mapped and the rest are reported and dropped, and
 there is no HTML at all.
 
-> **Status:** in the repository as `@texuli/deck` `0.4.0`, not on npm.
+> **Status:** in development; `@texuli/deck` is on npm from `0.4.0`.
 
 ```ts
 import { deckToMarkdown, parseDeckMarkdown } from '@texuli/deck/markdown';

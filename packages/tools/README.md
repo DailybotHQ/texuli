@@ -10,9 +10,9 @@ catalog trees in any host, Svelte or not. A golden set of interface tasks
 with an offline scorer measures how well an agent builds with the catalog.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.3.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.4.0`) may contain breaking
-> changes, so pin the exact version or use `^0.3.0`, which accepts only 0.3.x.
+> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.5.0`) may contain breaking
+> changes, so pin the exact version or use `^0.4.0`, which accepts only 0.4.x.
 
 ## Install
 
@@ -86,13 +86,13 @@ Not shipped in this package: the read-only MCP server over the catalog and
 themes exists in the repository source, but has no export and no published
 command yet.
 
-**Deck commands (in development, repository only).** The repository source
-adds a `@texuli/tools/deck` subpath and two bins, `texuli` (its `deck`
+**Deck commands (in development, new in `0.4.0`).** `@texuli/tools` adds
+a `@texuli/tools/deck` subpath and two bins, `texuli` (its `deck`
 command) and `texuli-deck`, with seven commands on the `@texuli/deck` v2
 model: `capabilities`, `schema`, `layouts`, `lint`, `inspect`,
 `from-markdown` and `to-markdown`. The local MCP server has the same
-commands as a read-only `deck` tool. None of this is in the published
-`0.3.0`, and `@texuli/deck` is not on npm yet; see
+commands as a read-only `deck` tool. None of this is in `0.3.0`; it ships
+in `0.4.0` with the first release of `@texuli/deck`; see
 [deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md).
 
 ## Key guarantees
@@ -121,7 +121,7 @@ commands as a read-only `deck` tool. None of this is in the published
 - Custom elements: [elements.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/elements.md)
 - A2UI adapter: [a2ui.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/a2ui.md)
 - Golden set and scorer: [golden.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/golden.md)
-- Deck commands, the `texuli deck` CLI and the `deck` MCP tool (repository only): [deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md)
+- Deck commands, the `texuli deck` CLI and the `deck` MCP tool (new in `0.4.0`): [deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md)
 
 ## Related packages
 

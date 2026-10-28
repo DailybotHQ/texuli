@@ -9,10 +9,10 @@ an inert notice instead of reaching the page. It is part of
 [Texuli](https://texuli.com), "Small pieces. Infinite possibilities.": an MIT
 Svelte 5 component library by Dailybot, Inc.
 
-> **Status: 0.x release.** `@texuli/blocks` is published on npm as `0.3.0`, a
+> **Status: 0.x release.** `@texuli/blocks` is published on npm as `0.4.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.4.0`) may contain breaking changes, so pin the exact version or
-> use `^0.3.0`, which accepts only 0.3.x.
+> minor (`0.5.0`) may contain breaking changes, so pin the exact version or
+> use `^0.4.0`, which accepts only 0.4.x.
 
 ## Install
 

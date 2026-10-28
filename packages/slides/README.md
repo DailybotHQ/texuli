@@ -15,24 +15,21 @@ a framework-free package with no runtime dependencies. This package is the
 Svelte 5 stage on top of it
 ([ADR-009](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 
-> **Status: `0.4.0`, in development, not on npm.** The stage described here
-> is in the repository and ships with the next minor, `0.4.0`, together with
-> `@texuli/deck` `0.4.0`, which has never been published. Both need a
-> separate owner go-ahead to publish. npm has `@texuli/slides@0.3.0`, which
-> has the previous deck model (model v1) and its stage. Texuli is pre-1.0:
-> under 0.x a new minor may contain breaking changes, and `0.4.0` is one.
+> **Status: 0.x release, in development.** The stage described here is
+> published on npm as `0.4.0`, together with `@texuli/deck` `0.4.0`, its
+> first release. `@texuli/slides@0.3.0` has the previous deck model (model
+> v1) and its stage. Texuli is pre-1.0: under 0.x a new minor may contain
+> breaking changes, and `0.4.0` is one, so pin the exact version or use
+> `^0.4.0`, which accepts only 0.4.x.
 > The upgrade path is in
 > [migration.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/migration.md).
 
 ## Install
 
-Once `0.4.0` is published:
-
 ```bash
 npm install @texuli/slides @texuli/deck svelte
 ```
 
-Today, `npm install @texuli/slides` installs `0.3.0`, the previous model.
 Svelte 5 (`^5.57.2`) is a peer dependency. Import the stylesheet once:
 
 ```ts
@@ -260,7 +257,7 @@ the templates and the main export functions. New code builds v2 decks with
 
 - Website: [texuli.com](https://texuli.com) and the
   [slides page](https://texuli.com/slides-page/), with live JSON and Markdown
-  editors (it runs the repository's `0.4.0` code)
+  editors
 - Stage, keyboard, chrome and presenter: [stage.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/stage.md)
 - The 21 layouts and their renderers: [layouts.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/layouts.md)
 - Components on slides: [components.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/components.md)
@@ -273,7 +270,7 @@ the templates and the main export functions. New code builds v2 decks with
 
 ## Related packages
 
-- [`@texuli/deck`](https://github.com/DailybotHQ/texuli/blob/main/packages/deck/README.md): the deck model, Markdown dialect, engine and authoring (in development, not on npm).
+- [`@texuli/deck`](https://github.com/DailybotHQ/texuli/blob/main/packages/deck/README.md): the deck model, Markdown dialect, engine and authoring (in development, first published in `0.4.0`).
 - [`@texuli/blocks`](https://www.npmjs.com/package/@texuli/blocks): the content blocks free slides are made of.
 - [`@texuli/player`](https://www.npmjs.com/package/@texuli/player): paints the catalog components on slides, and paints deck blueprints as a document.
 - [`@texuli/catalog`](https://www.npmjs.com/package/@texuli/catalog): the validation that agent decks and slide components pass.

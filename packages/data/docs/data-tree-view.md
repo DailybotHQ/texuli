@@ -19,7 +19,7 @@ An outline / file-tree data view over flat `{ id, parentId, rank }` rows with:
 - RTL via `dir="rtl"` and logical CSS
 - Live region announcements for moves and load errors; drag announcements come
   from `DragMessages` templates (`@texuli/drag/messages`), overridable per locale
-  with the `messages` prop (unreleased: not in `0.3.0`)
+  with the `messages` prop (new in `0.4.0`)
 
 ## Usage
 

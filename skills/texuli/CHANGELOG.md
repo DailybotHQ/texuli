@@ -17,12 +17,13 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ### Content
 
-- `@texuli/drag` and `@texuli/workflows` are on npm as `0.3.0` (first
-  published 2026-10-28; still in development), so 18 packages are on npm.
-  PLAN_007's changes to the other packages (`@texuli/primitives/sortable`,
-  the data drag migrations, spec 0.3.0, the player's interaction) stay
-  unreleased until each package's next release. `@texuli/deck` is still in
-  the repository only and not on npm.
+- The packages move to `0.4.0`: all 19 packable packages, including the
+  first publication of `@texuli/deck`. `0.4.0` ships PLAN_007
+  (`@texuli/primitives/sortable`, the data drag migrations, spec 0.3.0, the
+  player's interaction) and PLAN_008 (`@texuli/deck`, the `@texuli/slides`
+  v2 stage with its `components` and `layouts` subpaths, spec 0.4.0, the
+  deck CLI and MCP tool). The router, components, blueprints and build-ui
+  references say "on npm as `0.4.0`" and pin `^0.4.0`.
 
 ## [0.2.1] — 2026-10-28
 

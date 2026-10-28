@@ -5,13 +5,11 @@
 `texuli-deck` bin (`src/cli/deck.ts`) · **MCP:** the read-only `deck` tool
 of the local server in `src/mcp/` · **Path:** `src/deck/`
 
-> **Status: in development, repository only.** The `./deck` subpath, the
-> `texuli` and `texuli-deck` bins and the `deck` MCP tool are in this
-> repository's source and not in the published `@texuli/tools` `0.3.0`
-> (which installs `texuli-init`, `texuli-add`, `texuli-update` and
-> `texuli-llms` only). They build on `@texuli/deck` `0.4.0`, which is not on
-> npm either; they reach npm only with a later owner-approved release
-> ([RELEASE](../../../docs/RELEASE.md)). The MCP server has no export and no
+> **Status: in development, new in `0.4.0`.** The `./deck` subpath, the
+> `texuli` and `texuli-deck` bins and the `deck` MCP tool ship in
+> `@texuli/tools` `0.4.0`; `0.3.0` installs `texuli-init`, `texuli-add`,
+> `texuli-update` and `texuli-llms` only. They build on `@texuli/deck`
+> `0.4.0`, its first release ([RELEASE](../../../docs/RELEASE.md)). The MCP server has no export and no
 > registered command.
 
 Agent and developer commands for decks, on the shared v2 deck model of
