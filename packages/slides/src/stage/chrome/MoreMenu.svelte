@@ -103,6 +103,15 @@ function onclick(event: MouseEvent) {
     box-shadow: var(--tx-shadow-float, 0 4px 16px rgb(0 0 0 / 0.16));
   }
 
+  /* Below the slide: "More" stays beside the navigation and opens upward. */
+  :global(.tx-deck-stage[data-tx-deck-toolbar="bottom"]) .tx-deck-chrome-more {
+    margin-inline-start: 0;
+  }
+
+  :global(.tx-deck-stage[data-tx-deck-toolbar="bottom"]) .tx-deck-chrome-more__panel {
+    inset-block: auto calc(100% + 0.25rem);
+  }
+
   @media (pointer: coarse) {
     .tx-deck-chrome-more__summary {
       min-block-size: 2.75rem;

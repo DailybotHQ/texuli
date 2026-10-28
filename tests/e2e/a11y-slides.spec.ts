@@ -152,8 +152,8 @@ test('structure and names; axe with the overview, presenter, help and blackout o
       'aria-roledescription',
       'slide'
     );
-    // A tooltip describes a control on keyboard focus.
-    await stage(page).getByRole('group', { name: 'Trend' }).focus();
+    // A tooltip describes a control on keyboard focus (the toolbar follows the slide).
+    await tool(page, 'Choose a slide, 4 / 6').focus();
     await page.keyboard.press('Shift+Tab');
     await expect(page.getByRole('tooltip')).toHaveCount(1);
   });
@@ -285,14 +285,14 @@ test('the deck keyboard map, chrome, tab order, reveal steps, fullscreen and mot
     await expect(live(page)).toHaveText('Slide 5 of 6: Risks');
     await expect(slide(page, 'Risks')).toBeFocused();
   });
-  await test.step('tab order runs through the toolbar groups, then the slide content', async () => {
+  await test.step('tab order runs through the slide content, then the toolbar groups', async () => {
     // WebKit's default Tab skips links and buttons (a macOS setting), so the
     // tab-order walk runs on Chromium and Pixel 7.
     if (browserName === 'webkit') return;
     await gotoFixture(page, 'slides-template-review');
     await page.getByRole('link', { name: 'All examples' }).focus();
     const order: string[] = [];
-    for (let index = 0; index < 13; index += 1) {
+    for (let index = 0; index < 15; index += 1) {
       await page.keyboard.press('Tab');
       order.push(
         await page.evaluate(() => {
@@ -302,6 +302,8 @@ test('the deck keyboard map, chrome, tab order, reveal steps, fullscreen and mot
       );
     }
     expect(order).toEqual([
+      'Copy TS code',
+      "await exportInvoices({ month: '2026-10' });",
       'Previous step or slide',
       'Choose a slide, 4 / 5',
       'Next step or slide',

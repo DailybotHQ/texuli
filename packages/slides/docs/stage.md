@@ -55,6 +55,7 @@ scoped styles.
 | `resolveAvatar` | — | Host adapter for `avatar:` image ids |
 | `controller` | `null` | Read-only binding to the engine `DeckController` for imperative hosts |
 | `chrome` | — | Snippet that replaces the default toolbar and progress bar (the [chrome layers](#chrome) stay) |
+| `toolbarPosition` | `bottom` | Where the toolbar (or the `chrome` snippet) sits: `bottom` puts it below the slide, aligned to the inline end, with its popups opening upward; `top` puts it above the slide. DOM order follows, so Tab reaches the controls after the slide content by default. The root carries `data-tx-deck-toolbar` |
 | `overviewView` | — | Snippet that replaces the default overview |
 | `presenterView` | — | Snippet that replaces the default presenter pane |
 | `onSlideChange` | — | Receives a `SlideNavigationIntent` (`{ index, slideId }`) when the slide changes |
@@ -139,8 +140,10 @@ Every string comes from the messages (`DECK_CHROME_MESSAGES` joins
   Previous and Next are `aria-disabled` at the ends of a deck that does not
   loop. Targets are at least 32 px (44 px on touch). When the full toolbar
   does not fit (measured, never a breakpoint), the View, Present, Share and
-  Help groups fold into “More”, a disclosure (Escape closes it). The toolbar
-  hides in full screen.
+  Help groups fold into “More”, a disclosure (Escape closes it). By default
+  it sits below the slide, aligned to the inline end (right in left-to-right
+  decks, left in right-to-left ones); `toolbarPosition="top"` puts it above.
+  The toolbar hides in full screen.
 - **Slide list:** the counter (“3 / 12”, named “Choose a slide, 3 / 12”)
   opens a listbox of every slide by number and title. Focus starts on the
   current slide; arrows, Home and End move, Enter or a click jumps (focus

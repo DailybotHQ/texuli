@@ -7,7 +7,9 @@
  * explains each (label, description, shortcut). When the full toolbar does
  * not fit (measured, never a breakpoint), the secondary groups fold into
  * "More". It reads `getDeckStageContext()` and `getDeckChromeContext()`, and
- * hides in full screen, where the full screen overlay takes over.
+ * hides in full screen, where the full screen overlay takes over. Below the
+ * slide (`toolbarPosition`, default) it aligns to the inline end and its
+ * popups open upward.
  */
 import {
   availableDeckControls,
@@ -265,7 +267,8 @@ onMount(() => {
   >
     <ChromeIcon name={control.action === 'fullscreen' && state ? 'fullscreen-on' : control.action} />
     {#if isJump}
-      <span class="tx-deck-chrome-tool__count" aria-hidden="true">{counter()}</span>
+      <!-- Digits read left to right in every direction: "1 / 22", never "22 / 1". -->
+      <bdi class="tx-deck-chrome-tool__count" dir="ltr" aria-hidden="true">{counter()}</bdi>
     {:else}
       <span class={withLabel ? 'tx-deck-chrome-tool__label' : 'tx-deck-chrome-sr'}>{labelFor(control)}</span>
     {/if}
@@ -339,6 +342,12 @@ onMount(() => {
     justify-content: flex-start;
     gap: 0.25rem;
     min-inline-size: 0;
+  }
+
+  /* Below the slide (default): the tools gather at the inline end. An auto margin, not
+     `justify-content`, so an overflow stays measurable on the end side. */
+  :global(.tx-deck-stage[data-tx-deck-toolbar="bottom"]) .tx-deck-chrome-toolbar > .tx-deck-chrome-group:first-child {
+    margin-inline-start: auto;
   }
 
   .tx-deck-chrome-group {

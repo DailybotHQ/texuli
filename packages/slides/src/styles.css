@@ -28,6 +28,14 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
+/* The toolbar below the slide (default): the slide row takes the height. */
+.tx-deck-stage[data-tx-deck-toolbar="bottom"]:is(
+  [data-tx-deck-fit-mode="viewport"],
+  [data-fullscreen="viewport"]
+) {
+  grid-template-rows: minmax(0, 1fr) auto auto;
+}
+
 .tx-deck-stage__main {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -304,10 +312,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-}
-
-.tx-deck-stage__toolbar {
-  justify-content: space-between;
 }
 
 .tx-deck-stage__control {

@@ -34,9 +34,9 @@ interface Box {
 }
 
 /**
- * Where the tooltip goes (viewport coordinates): centered below its button
- * (the toolbar sits on top of the deck), flipped above when the bottom has
- * less room, and slid sideways to stay inside the viewport.
+ * Where the tooltip goes (viewport coordinates): centered below its button,
+ * flipped above when the bottom has less room (as under a toolbar below the
+ * slide, the default), and slid sideways to stay inside the viewport.
  */
 export function placeDeckTooltip(
   anchor: Box,

@@ -139,6 +139,11 @@ interface Props {
   controller?: DeckController | null;
   /** Replaces the default toolbar and progress bar. */
   chrome?: Snippet;
+  /**
+   * Where the toolbar (or the host `chrome` snippet) sits: `bottom` (default)
+   * below the slide, aligned to the inline end, or `top` above it.
+   */
+  toolbarPosition?: 'bottom' | 'top';
   /** Replaces the default overview. */
   overviewView?: Snippet;
   /** Replaces the default presenter pane. */
@@ -176,6 +181,7 @@ let {
   resolveAvatar,
   controller = $bindable(null),
   chrome,
+  toolbarPosition = 'bottom',
   overviewView,
   presenterView,
   onSlideChange,
@@ -1001,6 +1007,17 @@ $effect(() => {
 });
 </script>
 
+{#snippet toolbarRow()}
+  {#if chrome}
+    {@render chrome()}
+  {:else}
+    <DeckToolbar />
+  {/if}
+  {#if fullscreenNote}
+    <p class="tx-deck-stage__fullscreen-note" role="status">{fullscreenNote}</p>
+  {/if}
+{/snippet}
+
 <!-- Keys from anything focused inside the stage reach decideDeckInput (focus-scoped decks). -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
@@ -1014,6 +1031,7 @@ $effect(() => {
   data-tx-deck-fit-mode={fit}
   data-tx-deck-motion={styleResolution.motion}
   data-tx-deck-aspect={styleResolution.style.aspect}
+  data-tx-deck-toolbar={toolbarPosition === 'top' ? 'top' : 'bottom'}
   data-tx-theme={deckThemeId(activeRef)}
   data-tx-mode={activeTheme || activeRef ? mode : undefined}
   data-tx-surface={activeTheme?.style.surface}
@@ -1031,13 +1049,9 @@ $effect(() => {
   {#if !prepared.ok}
     <DeckError issues={prepared.issues} {t} />
   {:else if model && view && activeSlide}
-    {#if chrome}
-      {@render chrome()}
-    {:else}
-      <DeckToolbar />
-    {/if}
-    {#if fullscreenNote}
-      <p class="tx-deck-stage__fullscreen-note" role="status">{fullscreenNote}</p>
+    <!-- DOM order is focus order: below the slide (default), Tab reaches the controls after the slide content. -->
+    {#if toolbarPosition === 'top'}
+      {@render toolbarRow()}
     {/if}
     <div class="tx-deck-stage__main">
       {#if overviewOpen}
@@ -1122,6 +1136,9 @@ $effect(() => {
         {/if}
       {/if}
     </div>
+    {#if toolbarPosition !== 'top'}
+      {@render toolbarRow()}
+    {/if}
     <!-- Blackout, laser, help, first-visit hint, full screen overlay, toast: also under a host `chrome`. -->
     <DeckChrome />
     <p class="tx-deck-stage__live" aria-live="polite" aria-atomic="true">{announcement}</p>

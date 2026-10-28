@@ -112,6 +112,12 @@ onMount(() => {
     box-shadow: var(--tx-shadow-float, 0 4px 16px rgb(0 0 0 / 0.16));
   }
 
+  /* Below the slide: open upward, anchored at the navigation's inline end. */
+  :global(.tx-deck-stage[data-tx-deck-toolbar="bottom"]) .tx-deck-chrome-list {
+    inset-block: auto calc(100% + 0.25rem);
+    inset-inline: auto 0;
+  }
+
   .tx-deck-chrome-list__option {
     display: flex;
     align-items: baseline;

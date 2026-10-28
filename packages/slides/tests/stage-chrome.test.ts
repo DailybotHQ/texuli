@@ -275,6 +275,28 @@ describe('chrome helpers', () => {
 });
 
 describe('DeckStage chrome', () => {
+  it('toolbar position: below the slide by default (DOM and Tab order), above with toolbarPosition top', async () => {
+    const order = () => {
+      const toolbar = screen.getByRole('group', { name: 'Presentation controls' });
+      const main = document.querySelector('.tx-deck-stage__main') as HTMLElement;
+      const root = document.querySelector('.tx-deck-stage') as HTMLElement;
+      const follows = Boolean(
+        main.compareDocumentPosition(toolbar) & Node.DOCUMENT_POSITION_FOLLOWING
+      );
+      return { follows, data: root.dataset.txDeckToolbar, parent: toolbar.parentElement === root };
+    };
+    for (const [props, expected] of [
+      [{}, { follows: true, data: 'bottom', parent: true }],
+      [{ toolbarPosition: 'bottom' }, { follows: true, data: 'bottom', parent: true }],
+      [{ toolbarPosition: 'top' }, { follows: false, data: 'top', parent: true }],
+    ] as const) {
+      await scenario(`places the toolbar for ${JSON.stringify(props)}`, async () => {
+        stageWith(props);
+        expect(order()).toEqual(expected);
+      });
+    }
+  });
+
   it('toolbar: registry groups, message labels, pressed states, capabilities and the tooltip', async () => {
     await scenario(
       'renders every available control in its group with labels from the messages',
