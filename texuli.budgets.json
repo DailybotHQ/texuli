@@ -235,9 +235,13 @@
       "gzip": 17408,
       "note": "Column operations compose the grid core (10.1 KiB) with resize, reorder, pinning, groups and a lazy column menu; measured 15,083 B (lead decision 2026-10-23). Owner decision 2026-10-27 (PLAN_007): raised to measured 16,727 B + 4% headroom; reorder and resize run on the shared @texuli/drag engine, inlined per entry by the size tool."
     },
+    "@texuli/data/activity": {
+      "gzip": 13184,
+      "note": "PLAN_009 (2026-10-28, owner-consented release plan): default 12288 -> 13184 B, measured + 4% after the styled Avatar it renders filters srcset candidates through the URL policy and composes handlers (G10, G26); measured 12,664 B."
+    },
     "@texuli/data/grid-editing": {
-      "gzip": 16448,
-      "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 15,360 B to measured 15,808 B + 4% headroom; already over at T-01. Trimming stays a follow-up."
+      "gzip": 17280,
+      "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 15,360 B to measured 15,808 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 16448 -> 17280 B, measured + 4% after DataGrid paging, rowClass and toolbar/filters/bulkActions snippets (G7); measured 16,601 B."
     },
     "@texuli/data/timeline": {
       "gzip": 11520,
@@ -369,9 +373,9 @@
       "note": "APG window splitter with drag, collapse, RTL and a persistence hook; measured 4,413 B (lead decision 2026-10-23)."
     },
     "@texuli/primitives/tabs": {
-      "gzip": 4608,
+      "gzip": 4800,
       "cssGzip": 1024,
-      "note": "APG composite with roving focus (and ticks for the slider); measured 4,274 B (lead decision 2026-10-23)."
+      "note": "APG composite with roving focus (and ticks for the slider); measured 4,274 B (lead decision 2026-10-23). PLAN_009 (2026-10-28, owner-consented release plan): 4608 -> 4800 B, measured + 4% after handler composition on TabsTrigger and TabsList (G26); measured 4,609 B."
     },
     "@texuli/primitives/tags-input": {
       "gzip": 4608,
@@ -384,9 +388,9 @@
       "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
     },
     "@texuli/primitives/toggle": {
-      "gzip": 5120,
+      "gzip": 5568,
       "cssGzip": 1024,
-      "note": "Roving focus and the native form bridge put this group primitive slightly over the 4 KiB default (lead decision 2026-10-23)."
+      "note": "Roving focus and the native form bridge put this group primitive slightly over the 4 KiB default (lead decision 2026-10-23). PLAN_009 (2026-10-28, owner-consented release plan): 5120 -> 5568 B, measured + 4% after ToggleGroup form submission by name, rest props and first-pressed roving start (G40, G41) plus handler composition (G26); measured 5,345 B."
     },
     "@texuli/primitives/toolbar": {
       "gzip": 5120,
