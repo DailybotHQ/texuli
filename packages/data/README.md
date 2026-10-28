@@ -71,16 +71,19 @@ visible and announced string is translatable through `labels`.
 
 | Import | What it gives you |
 | --- | --- |
-| `@texuli/data/grid-core` | `DataGrid`: sorting, search, filtering, row selection and grid keyboard navigation |
+| `@texuli/data/grid-core` | `DataGrid`: sorting, search, filtering, row selection, client paging, toolbar and bulk-action snippets, and grid keyboard navigation |
+| `@texuli/data/filter-builder` | `FilterBuilder`: nested and/or filter groups with operators by field type, plus the pure `applyFilter` |
 | `@texuli/data/grid-columns` | `ColumnGrid`: resize, reorder, pin, hide, group headers and column menus |
 | `@texuli/data/grid-virtual` | `VirtualDataGrid`: independent row and column windows for large tables |
 | `@texuli/data/grid-editing` | `EditableDataGrid`: inline cell editors, validation, undo and redo, TSV clipboard |
 | `@texuli/data/tree-view` | `TreeDataView`: outline and file-tree view with lazy children, drag reorder and checkboxes |
-| `@texuli/data/board` | `Board`: columns and swimlanes with WIP limits and keyboard moves |
+| `@texuli/data/board` | `Board`: columns and swimlanes with WIP limits, keyboard moves, column footers and heading levels |
 | `@texuli/data/calendar/view` | `CalendarView`: month, time-grid and agenda views with move and reschedule |
 | `@texuli/data/timeline` | `TimelineView`: virtualized Gantt timeline with dependencies, zoom and critical path |
 | `@texuli/data/map` | `MapView`: an offline, fictional vector basemap with markers, clusters, routes and fences |
 | `@texuli/data/activity` | `ActivityFeed`: day-grouped activity with avatars, reactions and pagination |
+| `@texuli/data/activity/inbox` | `NotificationInbox`: unread state, mark read and unread, mark all, item actions and arrival announcements |
+| `@texuli/data/cohort` | `CohortTable`: a cohort retention table with row and period headers, readable numbers and heat cells |
 | `@texuli/data/files` | `FileBrowser`: grid or list browser with breadcrumbs, previews and multi-select |
 | `@texuli/data/virtual-list` | `createVirtualList` and `createInfiniteLoader` for windowed lists |
 
@@ -94,7 +97,7 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/calendar` | Dates in an explicit IANA zone, an RFC 5545 recurrence subset, overlap layout and rescheduling, with no date library |
 | `@texuli/data/timeline/engine` | Working-day calendars, dependencies with lag, critical path and cascading moves |
 | `@texuli/data/geo` | The offline map engine: Web Mercator views, clustering, geofences, distances and routes |
-| `@texuli/data/activity/engine` | Mention tokens, day groups, change summaries, threads and reactions |
+| `@texuli/data/activity/engine` | Mention tokens, day groups, change summaries, threads, reactions and inbox read state |
 | `@texuli/data/files/engine` | Natural-order children, breadcrumbs, name and move checks, deterministic thumbnails |
 
 The package root, `@texuli/data`, re-exports the main views and helpers.
@@ -120,6 +123,21 @@ The package root, `@texuli/data`, re-exports the main views and helpers.
 
 **Known limit:** fence editing on the map is not implemented yet; fences are
 drawn and listed only.
+
+## Unreleased (planned for 0.5.0)
+
+In the workspace, not on npm yet:
+
+- `DataGrid`: client paging (`pageSize`, `bind:page`), `rowClass(row)`, and
+  `filters`, `toolbar` and selection-aware `bulkActions` snippets
+  ([data-grid-core](./docs/data-grid-core.md)).
+- `Board`: a `columnFooter(column, { count })` snippet and `headingLevel`
+  ([data-board](./docs/data-board.md)).
+- New `@texuli/data/filter-builder`
+  ([data-filter-builder](./docs/data-filter-builder.md)),
+  `@texuli/data/activity/inbox`
+  ([data-activity-inbox](./docs/data-activity-inbox.md)) and
+  `@texuli/data/cohort` ([data-cohort](./docs/data-cohort.md)).
 
 ## New in 0.4.0
 

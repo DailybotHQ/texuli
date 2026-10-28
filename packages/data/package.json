@@ -35,6 +35,11 @@
       "default": "./src/activity/index.ts"
     },
     "./activity/engine": "./src/engines/activity/index.ts",
+    "./activity/inbox": {
+      "types": "./src/activity/inbox/index.ts",
+      "svelte": "./src/activity/inbox/index.ts",
+      "default": "./src/activity/inbox/index.ts"
+    },
     "./board": {
       "types": "./src/board/index.ts",
       "svelte": "./src/board/index.ts",
@@ -42,12 +47,22 @@
     },
     "./board/engine": "./src/engines/board/index.ts",
     "./calendar": "./src/engines/calendar/index.ts",
+    "./cohort": {
+      "types": "./src/cohort/index.ts",
+      "svelte": "./src/cohort/index.ts",
+      "default": "./src/cohort/index.ts"
+    },
     "./files": {
       "types": "./src/files/index.ts",
       "svelte": "./src/files/index.ts",
       "default": "./src/files/index.ts"
     },
     "./files/engine": "./src/engines/files/index.ts",
+    "./filter-builder": {
+      "types": "./src/filter-builder/index.ts",
+      "svelte": "./src/filter-builder/index.ts",
+      "default": "./src/filter-builder/index.ts"
+    },
     "./geo": "./src/engines/map/index.ts",
     "./grid": "./src/engines/grid/index.ts",
     "./grid-columns": {

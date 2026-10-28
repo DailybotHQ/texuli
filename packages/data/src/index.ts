@@ -1,6 +1,15 @@
 // @texuli/data: entries are added by the PLAN_001 tasks that build this package (docs/ARCHITECTURE.md).
 
 export {
+  type InboxFilter,
+  type InboxNotification,
+  markAllRead,
+  NotificationInbox,
+  type NotificationInboxLabels,
+  setRead,
+  unreadCount,
+} from './activity/inbox/index.ts';
+export {
   ActivityFeed,
   type ActivityFeedLabels,
   type ActivityFilter,
@@ -9,12 +18,26 @@ export {
 } from './activity/index.ts';
 export { Board, type BoardLabels } from './board/index.ts';
 export {
+  type CohortRow,
+  CohortTable,
+  type CohortTableLabels,
+  cohortAverages,
+} from './cohort/index.ts';
+export {
   FileBrowser,
   type FileBrowserLabels,
   type FileBrowserLayout,
   type FileEntry,
   type FilePreviewModel,
 } from './files/index.ts';
+export {
+  applyFilter,
+  FilterBuilder,
+  type FilterBuilderLabels,
+  type FilterField,
+  type FilterGroup,
+  type FilterNode,
+} from './filter-builder/index.ts';
 export {
   ColumnGrid,
   type ColumnGridLabels,

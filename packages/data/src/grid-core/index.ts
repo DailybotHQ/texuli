@@ -15,6 +15,7 @@ export {
   type CellPosition,
   cellText,
   clampCell,
+  type DataGridBulkContext,
   type DataGridColumn,
   type GridRowsOptions,
   gridRows,

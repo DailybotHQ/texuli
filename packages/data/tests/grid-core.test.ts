@@ -15,6 +15,7 @@ import {
   searchRows,
 } from '../src/grid-core/index.ts';
 import DataGridHarness from './fixtures/DataGridHarness.svelte';
+import DataGridPagingHarness from './fixtures/DataGridPagingHarness.svelte';
 
 type Row = { id: string; name: string; amount: number | null; when?: string | Date };
 const columns: DataGridColumn<Row>[] = [
@@ -444,6 +445,93 @@ describe('DataGrid windowing', () => {
         'utf8'
       );
       expect(css).toMatch(/\.tx-data-grid\[data-virtual\][^{]*\{[^}]*white-space: nowrap;/);
+    }
+  });
+});
+
+describe('DataGrid paging, row classes and toolbar snippets (G7)', () => {
+  const names = () =>
+    [...document.querySelectorAll('tbody tr')].map(
+      (row) => row.querySelectorAll('td')[1]?.textContent?.trim() ?? ''
+    );
+  const state = () =>
+    JSON.parse(screen.getByTestId('paging').textContent ?? '{}') as {
+      page: number;
+      selected: string[];
+      exported: number;
+    };
+
+  it('pages rows client-side with a bound page, row classes, toolbar, filters and selection-aware bulk actions', async () => {
+    {
+      // client paging: one page of rows, the full aria-rowcount, offset row indexes and a pager
+      render(DataGridPagingHarness);
+      const table = screen.getByRole('grid', { name: 'Items' });
+      expect(names()).toEqual(['Item 1', 'Item 2', 'Item 3']);
+      expect(table.getAttribute('aria-rowcount')).toBe('8');
+      const pager = screen.getByRole('navigation', { name: 'Items pages' });
+      expect(within(pager).getByText('Page 1 of 3')).toBeTruthy();
+      const previous = within(pager).getByRole('button', { name: 'Previous page' });
+      expect((previous as HTMLButtonElement).disabled).toBe(true);
+      await fireEvent.click(within(pager).getByRole('button', { name: 'Next page' }));
+      expect(names()).toEqual(['Item 4', 'Item 5', 'Item 6']);
+      expect(state().page).toBe(2);
+      expect(
+        [...document.querySelectorAll('tbody tr')].map((row) => row.getAttribute('aria-rowindex'))
+      ).toEqual(['5', '6', '7']);
+      // The page position is a polite live region inside the pager.
+      const position = within(pager).getByText('Page 2 of 3');
+      expect(position.getAttribute('aria-live')).toBe('polite');
+      // rowClass: rows 1, 4 and 7 are late
+      const late = [...document.querySelectorAll('tbody tr.is-late')].map((row) =>
+        row.querySelectorAll('td')[1]?.textContent?.trim()
+      );
+      expect(late).toEqual(['Item 4']);
+    }
+    cleanup();
+    {
+      // a bound page out of range is clamped, and searching shrinks the pages
+      render(DataGridPagingHarness, { props: { page: 9 } });
+      await tick();
+      expect(state().page).toBe(3);
+      expect(names()).toEqual(['Item 7']);
+      const search = screen.getByRole('searchbox', { name: 'Search' });
+      await fireEvent.input(search, { target: { value: 'Item 2' } });
+      await waitFor(() => expect(state().page).toBe(1));
+      expect(names()).toEqual(['Item 2']);
+      expect(screen.queryByRole('navigation', { name: 'Items pages' })).toBeNull();
+    }
+    cleanup();
+    // pageSize 0 shows every row and no pager
+    render(DataGridPagingHarness, { props: { pageSize: 0 } });
+    expect(names()).toHaveLength(7);
+    expect(screen.queryByRole('navigation')).toBeNull();
+    cleanup();
+    {
+      // toolbar and filters snippets render beside the search; bulk actions follow the selection
+      render(DataGridPagingHarness);
+      const toolbar = document.querySelector('.tx-data-grid__toolbar') as HTMLElement;
+      expect(within(toolbar).getByTestId('filter-chip')).toBeTruthy();
+      await fireEvent.click(within(toolbar).getByRole('button', { name: 'Export' }));
+      expect(state().exported).toBe(1);
+      expect(screen.queryByRole('group', { name: 'Selected rows' })).toBeNull();
+      // The header checkbox selects the rows on this page only.
+      await fireEvent.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
+      expect(state().selected).toEqual(['r1', 'r2', 'r3']);
+      const bulk = screen.getByRole('group', { name: 'Selected rows' });
+      expect(within(bulk).getByTestId('bulk-count').textContent).toBe(
+        '3 picked: Item 1, Item 2, Item 3'
+      );
+      // Selection survives paging, and the bulk context still sees every selected row.
+      await fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      await fireEvent.click(screen.getByRole('checkbox', { name: 'Select Item 4' }));
+      expect(within(bulk).getByTestId('bulk-count').textContent).toContain('4 picked');
+      // Ctrl+A selects every visible row across pages.
+      const cell = document.querySelector('[data-tx-grid-cell="1:1"]') as HTMLElement;
+      await fireEvent.keyDown(cell, { key: 'a', ctrlKey: true });
+      expect(state().selected).toHaveLength(7);
+      await fireEvent.click(within(bulk).getByRole('button', { name: 'Clear selection' }));
+      expect(state().selected).toEqual([]);
+      expect(screen.queryByRole('group', { name: 'Selected rows' })).toBeNull();
     }
   });
 });

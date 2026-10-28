@@ -16,6 +16,16 @@ export interface DataGridColumn<T> extends GridColumnDef<T> {
   editable?: boolean;
 }
 
+/** What the `bulkActions` snippet receives while rows are selected. */
+export interface DataGridBulkContext<T> {
+  /** Selected row ids, on every page, in row order. */
+  selected: readonly string[];
+  /** The selected rows (from `rows`, whatever the filter and page). */
+  rows: T[];
+  /** Clears the selection. */
+  clear: () => void;
+}
+
 /** Display text of a cell: `format`, else the value as plain text. */
 export function cellText<T>(row: T, column: DataGridColumn<T>): string {
   const value = readValue(row, column);
