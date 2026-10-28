@@ -15,6 +15,19 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+### Content
+
+- The APIs prepared for `0.5.0` (PLAN_009, the Protoyard adoption gaps),
+  marked as in the repository and not on npm yet: `build-ui/references/imports.md`
+  gains a "Prepared for 0.5.0" table (composer `streaming` and `onStop`,
+  message actions and inline edit, `DataGrid` paging and snippets, toast
+  `onSettle`, `TimeField`, date pickers' `today`, `@texuli/charts/sparkline-lite`,
+  `@texuli/editor/markdown`, the filter builder, notification inbox and
+  cohort table, `texuli/layouts/content`) and the `0.5.0` behavior changes
+  (numeric and file inputs, composed handlers). The package index lists the
+  new entries as repository only, spec 0.5.0 and the 162-id catalog, and
+  `@texuli/editor` as publishable from `0.5.0`.
+
 ## [0.2.3] — 2026-10-28
 
 ### Changes

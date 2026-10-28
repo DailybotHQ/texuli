@@ -114,6 +114,16 @@ from subpaths to keep bundles narrow.
   and label them with `Intl.DateTimeFormat`. Only the Gregorian calendar is
   supported; `CalendarDate` is re-exported from `@texuli/date`.
 
+### Unreleased (prepared for 0.5.0, not on npm yet)
+
+In the repository, not in the `0.4.0` tarball: caller handlers compose with
+the parts' own instead of replacing them, the `date-field` `TimeField`
+spins with the APG spinbutton keys, the calendar and date picker's `today`, `weekStartsOn` and range options, `ToggleGroup`
+`name` and its first-pressed Tab stop, and `PinInput.Root` `name` and
+`inputRef` ([prim-calendar](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-calendar.md),
+[prim-date-field](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-date-field.md),
+[prim-toggle](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-toggle.md)).
+
 ### New in 0.4.0
 
 `sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) ships in `0.4.0`; it

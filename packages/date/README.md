@@ -98,6 +98,11 @@ export the same surface:
 | `GregorianCalendar`, `createCalendar`, `toCalendar` | The calendar object a `CalendarDate` carries; `createCalendar('gregory')` is the only supported identifier |
 | Types | `CalendarIdentifier` (`'gregory'`), `DateDuration`, `DateFields`, `DayOfWeek` |
 
+## Unreleased (prepared for 0.5.0, not on npm yet)
+
+`localeWeekStart`, `weekStartDay` and `daysBetween` are in the repository,
+not in the `0.4.0` tarball.
+
 ## Key guarantees
 
 - **No runtime dependencies.** Plain TypeScript on the standard `Date` and

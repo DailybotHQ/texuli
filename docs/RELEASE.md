@@ -21,6 +21,11 @@ below. Workspace manifests remain `private: true`, and every future version
 and wave requires a fresh, explicit developer GO. Publishing never
 overwrites a published version.
 
+`0.5.0` is **prepared, not published**: the PLAN_009 changes listed under
+"0.5.0 (unreleased, prepared)" below are in the repository, but no package
+has been bumped to `0.5.0` and npm still serves `0.4.0`. This page is
+updated after that release is actually published.
+
 ### Not on npm
 
 - `@texuli/examples` is never packed (`NEVER_PACKED` in
@@ -31,6 +36,131 @@ overwrites a published version.
   the `0.0.0` placeholder until the release bumps it, and the publish
   workflow refuses to publish a `0.0.0` version.
 
+### 0.5.0 (unreleased, prepared)
+
+**Not on npm.** Prepared on the PLAN_009 branch: the packages are still at
+`0.4.0` (and `@texuli/editor` at the `0.0.0` placeholder) until the release
+task bumps every packable package to `0.5.0` with exact internal pins and the
+developer gives a fresh GO. It closes the gaps Protoyard found while adopting
+Texuli from npm (PLAN_007 there); the ids below match its register.
+
+**Closed gaps.**
+
+| Gap | Package / subpath | What changed |
+| --- | --- | --- |
+| G1 | `texuli/icons` | No Texuli change, by decision: Lucide icons go through the existing `LucideIcon` bridge in `texuli/icons/lucide` (and `IconRef` props accept a Lucide component) |
+| G2 | `@texuli/charts/compact` | `formatValue(value)` on `Sparkline`, `BulletChart`, `Gauge` and `ProgressRing` (wins over `format`; a host callback, never set by blueprints) |
+| G3 | `@texuli/charts/matrix` | `RampLegend`: an accessible, CSP-safe color-ramp legend for a heatmap |
+| G4 | `@texuli/core/inert`, `texuli/dialog` | Focus-exempt regions (`getInertRegistry().exempt(…)`; the `Toaster` is exempt), and a `stack` (`LayerStack`) option on `Dialog` and `AlertDialog` |
+| G5 | `texuli/dialog`, `texuli/tabs-accordion`, `texuli/input` | `bind:ref` and rest attributes on `Dialog`, `Tabs`, `Accordion`, `Collapsible`, `TextCounter`, `Toolbar`, `ToggleGroup` and about 35 more components |
+| G6 | `texuli/sheet` | `ResponsiveModal` `force` (`auto`, `dialog`, `sheet`) and sizing by a `host` element's inline size (`breakpoint`) instead of the viewport |
+| G7 | `@texuli/data/grid-core` | `DataGrid` client paging (`pageSize`, `bind:page`), `rowClass(row)`, and `filters`, `toolbar` and `bulkActions` snippets |
+| G8 | `texuli/file-upload` | `onFilesAdd(files)` and `onFileRemove(file)` |
+| G9 | `texuli/toast` | `onSettle(reason)` with `timeout`, `action` or `dismiss`, called exactly once (undo flows) |
+| G10 | `texuli/avatar` | `srcset` and `sizes`; every candidate passes the image URL policy at `srcTrust` (`avatarSrcset`) |
+| G11 | `texuli/tags-color` | `TagsInput` `onInvalid({ tag, reason })` (`duplicate`, `max`, `invalid`) and a bindable draft (`bind:inputValue`) |
+| G12 | `texuli/date`, `@texuli/primitives` calendar and date picker, `@texuli/date` | `today` (no clock reads), `weekStartsOn` (default from `localeWeekStart`), range highlight, `maxDays` and `onInvalid`; `@texuli/date` adds `localeWeekStart`, `weekStartDay` and `daysBetween` |
+| G13 | `texuli/date` | A styled `TimeField` (`hourCycle`, `minuteStep`, `"HH:mm"` value) over the `@texuli/primitives/date-field` `TimeField`, which now spins with the APG spinbutton keys; catalog id `time-field` |
+| G14 | `@texuli/data/board` | `columnFooter(column, { count })` snippet and `headingLevel` |
+| G15 | `texuli/layouts/mobile` | Standalone `BottomNav`, `MobileHeader` and `MobileAppFrame` |
+| G16 | `@texuli/astro/appearance` (new) | `AppearanceSwitcher`: a light, dark or system radio-group island over the per-site appearance cache (changes through `onValueChange`), with no inline script or style |
+| G17 | `@texuli/editor` (first publication), `@texuli/editor/markdown` (new) | The editor becomes publishable (owner approval 2026-10-28); `markdownToDocument` and `documentToMarkdown` read and write Markdown at the `untrusted` tier, with HTML kept as literal text |
+| G18 | `@texuli/data/filter-builder` (new) | `FilterBuilder`: nested and/or groups with operators by field type (changes through `onValueChange`), and the pure `applyFilter`; catalog id `data-filter-builder` |
+| G19 | `@texuli/data/activity/inbox` (new) | `NotificationInbox`: unread state, mark read and unread, mark all, item actions and arrival announcements; catalog id `data-notification-inbox` |
+| G20 | `@texuli/data/cohort` (new) | `CohortTable`: cohort retention table semantics (row and period headers, readable numbers, heat cells); catalog id `data-cohort-table` |
+| G21 | `@texuli/blocks` (text, structure, data) | Heading and text `align`, text `size`, list `check` and `icon` styles, quote `role` and `avatar`, callout and card `icon`, divider `label` and `variant`, stat `title`, `source` and `trend`; host `resolveIcon` and `resolveAvatar` |
+| G22 | packaging | No packaging defect: a consumer bundle from the packed dist matches one from source (+0.01% raw). `scripts/dist-parity.ts` and its test (dist-parity test added) keep it so |
+| G23 | `@texuli/charts/sparkline-lite` (new) | A light `Sparkline` (same props, no data table): 2.2 to 2.6 KB gzip of first-screen JavaScript against 3.4 to 3.6 KB for the compact one ([PERFORMANCE](PERFORMANCE.md)). The broader first-screen CSS diet stays a follow-up |
+| G24 | `@texuli/slides/stage` | `DeckStage` imports the default renderer tables only when `defaultRenderers` is on; `loadValidateBlock` loads a host block check lazily |
+| G25 | `@texuli/slides` print path | The print paint loads the default renderer tables the same way |
+| G26 | `texuli/input` and every input-like component | A caller `oninput` composes with the internal handler (it used to replace it and stop `bind:value`); 14 primitive parts compose or chain caller handlers |
+| G27 | `texuli/sheet` | `Header`, `Body`, `Footer` and `CloseButton` parts on `Sheet` and `Drawer` |
+| G28 | `texuli/menus` | `destructive` tone on menu `Item`s |
+| G29 | `texuli/tabs-accordion` | Tab item `icon` (`IconRef`, decorative) |
+| G30 | `texuli/navigation` | `Pagination` `stableCount` (constant token count, page buttons sized for the widest number) and `getStablePageTokens` |
+| G31 | docs | `--tx-app-height` documented for `AppShell`, the app layouts and `MobileAppFrame` ([layouts-shells](../packages/texuli/docs/layouts-shells.md)) |
+| G32 | `@texuli/chat` | `Composer` `streaming` with `onStop` (Stop button, Escape), an `onkeydown` hook and an `actions` snippet; `ChatThread` forwards them |
+| G33 | `@texuli/chat` | `MessageList` per-message `actions`, inline edit (`onEdit`), and a bottom-anchored scroll with "Jump to latest" |
+| G34 | `texuli/card` | A link `Card` passes `target`, `rel` (always with `noopener` for `_blank`) and `download` |
+| G35 | `@texuli/blocks/code` | `header` and `toolbar` snippets on the code block bar (`CodeBlockBarContext`) |
+| G36 | `texuli/kbd-code` | `CopyButton` `onCopy(value)` and `onCopyError(value)` |
+| G37 | `texuli/badge` | `Tag` remove button named after the tag; `removeLabel` takes a template, a prefix or a function |
+| G38 | `texuli/input` | `type="file"`: `files` is `null` until a pick and resets with `null` |
+| G39 | `texuli/layouts/content` (new) | `ContentLayout` for direct use: content as children, host TOC entries, `tocLevels` (2 to 6) and preserved heading ids |
+| G40 | `texuli/toggle` | `ToggleGroup` `name` (and `form`): one entry per pressed value |
+| G41 | `texuli/toggle` | `ToggleGroup` rest attributes, `bind:ref`, and the Tab stop on the first pressed item |
+| G42 | `texuli/number-pin` | `PinInput.Root` typed `name` and other input attributes; `bind:inputRef` forwarded |
+| G43 | `texuli/card` | `CardGrid` `maxColumns` |
+| G44 | `texuli/input` | `type="number"` and `type="range"` bind a number, or `null` while empty |
+| G45 | `texuli/toast` | `pause`, `resume` and `isPaused` on the store (stacked holds by key), and `announcement(id?)` |
+
+**Breaking changes under `0.x`.** A new minor may break; these need a look
+when upgrading from `0.4.0`:
+
+- **`texuli/input`:** with `type="number"` or `type="range"`, `bind:value`
+  holds a `number` or `null` (it was the field's text); `onValueChange`
+  still receives the text. With `type="file"`, `files` starts as `null`.
+- **Caller handlers compose (G26):** a handler you pass (`oninput` on
+  `Input`, `Textarea`, `InputGroup` and `TextCounter`; `onclick`,
+  `onkeydown` and others on 14 primitive parts and on `CopyButton`) runs
+  first and no longer replaces the built-in one. Call
+  `event.preventDefault()` in a click or key handler to skip the built-in
+  behavior.
+- **`Tag`:** the remove button's default name is "Remove {label}" (for
+  example "Remove Design"; it was "Remove: Design"). A `removeLabel` prefix
+  now gets the label appended without a colon.
+- **`toast`:** the store owns the auto-dismiss timers. They count from the
+  moment a toast is published, whether or not a `Toaster` is mounted, and
+  each toast settles exactly once (`onSettle`).
+- **`DeckStage`:** with `defaultRenderers` on (the default), the default
+  renderer tables load on first use, so the first stage on a page paints a
+  polite loading status (`aria-busy`) for one chunk, also in server-side
+  rendering. Await `loadDefaultDeckRenderers()` before mounting to paint at
+  once.
+- **`texuli/layouts/content`:** `TocItem.level` and `TocHeading.level` widen
+  from `2 | 3` to `TocLevel` (`2 | 3 | 4 | 5 | 6`); exhaustive checks on the
+  old union need the new levels.
+- **Callback naming:** the new host callbacks are camelCase props, not DOM
+  events: `Composer` `onStop`, `CopyButton` `onCopy` and `onCopyError`,
+  toast `onSettle`, and `onValueChange` on the new `FilterBuilder` and
+  `AppearanceSwitcher`. `onCopy` and `onCopyError` are not the native
+  `oncopy` and `onerror` DOM events.
+
+**New packages and subpaths.**
+
+- `@texuli/editor`: first publication, with the new `@texuli/editor/markdown`.
+- `@texuli/charts/sparkline-lite`.
+- `@texuli/data/filter-builder`, `@texuli/data/activity/inbox` and
+  `@texuli/data/cohort`.
+- `texuli/layouts/content` (until now only `blog`, `docs` and `editorial`
+  under it).
+- `@texuli/astro/appearance`.
+
+**Blueprint spec 0.5.0.** Additive: four new catalog ids,
+`data-cohort-table`, `data-notification-inbox` and `data-filter-builder`
+(agent-emittable, painted by `@texuli/player`; inbox links at the
+`untrusted` tier) and `time-field` (app tier, forms group), for 162 ids. The
+`0.4.0 → 0.5.0` migration only stamps `spec`; the digest is pinned in
+`packages/spec/versions.json`, and the generated TypeScript and Kotlin are
+regenerated. The light `Sparkline` shares the compact `charts-sparkline`
+manifest. The catalog's coverage gate lists eight host-composed parts
+(`SheetHeader`, `SheetBody`, `SheetFooter`, `SheetCloseButton`,
+`BottomNav`, `MobileHeader`, `MobileAppFrame`, `RampLegend`) as exclusions,
+raising the exclusion ceiling from 200 to 208 by developer decision.
+
+**Security hardening: linear-time parsing of untrusted text.** Agent or user
+text could make some parsers backtrack (regular-expression denial of
+service). They now run in linear time:
+`@texuli/blocks/text/markdown` (heading, fence and rule lines, emphasis,
+links and backticks), the core editor Markdown codec
+(`@texuli/core/editor-markdown`, read and write), the catalog's rich text
+parser, and the catalog's draft sink scan (`looksExecutable` and the
+HTML-tag check). Differential fuzzing matched the old parsers' output. See
+[SECURITY](SECURITY.md#17-linear-time-parsing-of-untrusted-text-redos).
+
+**Also in the branch:** the agent service's catalog imports every manifest
+group, so its hash matches the site catalog (`apps/agent`, not published).
+
 ### 0.4.0
 
 Every packable package moves to `0.4.0` together, and every internal
@@ -38,11 +168,20 @@ Every packable package moves to `0.4.0` together, and every internal
 
 **PLAN_007: drag adoption and interactive blueprints.**
 
-- **Breaking, `@texuli/data`:** the board and tree view no longer export
-  `DRAG_THRESHOLD_PX` or `indexFromPointer`. Every drag surface (board, tree
+- **Breaking, `@texuli/data`:** `@texuli/data/board` and
+  `@texuli/data/tree-view` no longer export `DRAG_THRESHOLD_PX` or
+  `indexFromPointer` (`0.3.0` had them). Every drag surface (board, tree
   view, calendar, timeline, grid column moves) now runs on `@texuli/drag`
-  with localized `DragMessages`; use `@texuli/drag/gesture` for the
-  threshold and `@texuli/drag/collision` (`midpointIndex`) for the index.
+  with localized `DragMessages`. Replacements:
+  - `DRAG_THRESHOLD_PX` (4): the `threshold` option of `createPointerTracker`
+    in `@texuli/drag/gesture`, whose default is the same 4 px. There is no
+    exported constant; pass `threshold` to change it.
+  - `indexFromPointer(middles, y)`: `midpointIndex(midpoints, coordinate)`
+    in `@texuli/drag/collision`, which returns the same insertion index for
+    ascending midpoints (by binary search).
+
+  *Correction (2026-10-28, reported by Protoyard):* the first version of
+  these notes named the subpaths without the exact exports above.
 - **`@texuli/primitives`:** a new `@texuli/primitives/sortable` binding
   (`Sortable.Root`, `List`, `Item`, `Handle`) on `@texuli/drag`.
 - **Blueprint spec 0.3.0** (ADR-008): envelope `spec`, `state` and `flow`;
@@ -207,6 +346,7 @@ the package-to-package contract outside this repository.
 | `@texuli/deck` | `0.4.0` (first publication) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
 | `@texuli/drag`, `@texuli/workflows` | `0.4.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
 | Blueprint spec | `0.4.0`, digest `fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3` (after `0.3.0`, digest `a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848`, which was never on npm) | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.4.0`. |
+| Blueprint spec `0.5.0` (prepared, not on npm) | `0.5.0`, digest `1ba15e8b082f68140c4b2768b8fd69c9f760e655dd117fac756f356a71525b2d` | `packages/spec/versions.json` in the repository; ships only when `@texuli/spec@0.5.0` is published. |
 | Blueprint spec in `@texuli/spec@0.3.0` | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | The previous release's generated sources carry the `0.2.0` stamp. |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 

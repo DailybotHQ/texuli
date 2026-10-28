@@ -104,6 +104,18 @@ Everything is exported from the package root, `@texuli/chat`:
   measured row heights, and keeps your place when older history is
   prepended.
 
+## Unreleased (prepared for 0.5.0, not on npm yet)
+
+In the repository, not in the `0.4.0` tarball:
+
+- `Composer`: `streaming` with `onStop` (a Stop button and Escape), an
+  `onkeydown` hook that runs before the built-in keys, and an `actions`
+  snippet ([chat-composer](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-composer.md)).
+- `MessageList`: per-message `actions`, inline edit with `onEdit`, and a
+  bottom-anchored scroll with "Jump to latest"
+  ([chat-thread](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-thread.md)). `ChatThread` forwards all
+  of these.
+
 ## Not yet available
 
 These are planned and do not work today: a mention picker in the built-in

@@ -239,6 +239,18 @@ Released in the `0.4.0` packages; the `0.3.0` packages predate it.
 | **Tests** | `packages/catalog/tests/render-hostile-blueprints.test.ts` (the 0.3.0 hostile corpus: workflow cycles, self-loops and 10,000 nodes, bidi in a workflow label and in draggable list items, `javascript:` in node text, oversized or smuggled `reorder`, unknown ids, props, events and actions, a form field outside a form, binding shapes, prototype keys; each refused with an expected code within 2 seconds and inert), `packages/player/tests/surface-parity.test.ts`, `packages/spec/tests/contract.test.ts`, the invalid fixtures `state-list-text`, `form-outside` and `surface-nodes` (TypeScript and Kotlin, `InvalidFixtureParityTest`), `packages/player/tests/{interaction,lego}.test.ts` |
 | **Residual** | `emit` intents reach the host as data; what the host does with them (and whether it confirms them) is the host's responsibility. The player runs actions only in local state; persistence and authorization of a move belong to the application. ZWNJ and ZWJ stay allowed in list text for scripts and emoji. |
 
+### 17. Linear-time parsing of untrusted text (ReDoS)
+
+In the repository, prepared for `0.5.0` and not in the `0.4.0` packages.
+
+| | |
+| --- | --- |
+| **Threat** | Agent or user text crafted to make a parser backtrack (regular-expression denial of service): a Markdown heading line of `# a`, 2,000 spaces and `x` once took over 20 s in the blocks parser, and an uncapped `<` followed by spaces or an `onon…` run made the catalog's draft sink scan quadratic. A single hostile string can freeze the page or a server render |
+| **Control** | Parsers of untrusted text read lines and markers by index, not with overlapping quantifiers. `@texuli/blocks/text/markdown`: heading, fence and rule lines are scanned by hand, emphasis closers and bracket matches come from one table per source, and U+2028 and U+2029 end a line. `@texuli/core/editor-markdown` (and `@texuli/editor/markdown` over it): the heading closing sequence, fence info, list and quote lines are classified in linear time, and writing is linear. `@texuli/catalog` rich text: label, link-target, emphasis and backtick closers from per-source tables; trailing spaces and the HTML-tag check read by index. `looksExecutable` (the draft sink scan, which has no length cap) runs in linear time, and the scan's HTML-tag check no longer backtracks on spaces. Differential fuzzing (300,000 inputs for blocks, 400,000 for catalog rich text) matched the old parsers' output |
+| **Enforced** | `packages/blocks/src/text/markdown.ts`, `packages/core/src/editor/`, `packages/catalog/src/render/richtext/`, `packages/catalog/src/render/hostile/run.ts` (`looksExecutable`), `packages/catalog/src/validate/sinks.ts` |
+| **Tests** | `packages/blocks/tests/text.test.ts` (14 hostile 4,000-character shapes, 100 ms each), `packages/editor/tests/markdown.test.ts` (hostile input in bounded, linear time), `packages/catalog/tests/render-richtext.test.ts` (hostile runs at the 4,000-character cap under 20 ms), `packages/catalog/tests/render-hostile.test.ts` (an 8,000-character `on` run under 20 ms), `packages/catalog/tests/validate-sinks-linear.test.ts` |
+| **Residual** | Time bounds in unit tests run on a shared, loaded host, so they are generous; a new parser or regular expression on untrusted text needs its own hostile-length test. Hosts that run their own parsers on agent text are outside this control. |
+
 ---
 
 ## What agents must not write into docs

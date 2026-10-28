@@ -76,8 +76,8 @@ const keep = lttbIndices(xs, ys, 500); // downsample a long series to 500 points
 | --- | --- |
 | `@texuli/charts/cartesian` | `LineChart`, `AreaChart`, `BarChart`, `StackedBarChart`, `ComboChart` and the shared `CartesianChart` |
 | `@texuli/charts/part-whole` | Pie, donut, sunburst and treemap charts |
-| `@texuli/charts/matrix` | Heatmap, scatter and bubble charts |
-| `@texuli/charts/compact` | `Sparkline`, `BulletChart`, `Gauge` and `ProgressRing` |
+| `@texuli/charts/matrix` | Heatmap, scatter and bubble charts, and `RampLegend` (an accessible color-ramp legend for a heatmap) |
+| `@texuli/charts/compact` | `Sparkline`, `BulletChart`, `Gauge` and `ProgressRing`, each with an optional `formatValue(value)` callback |
 | `@texuli/charts/sparkline-lite` | A light `Sparkline` (same props): the drawing and its accessible description, without the data table, for first screens |
 | `@texuli/charts/flow` | Sankey, funnel and network charts |
 | `@texuli/charts/geo` | Schematic tile and point maps |
@@ -110,11 +110,26 @@ const keep = lttbIndices(xs, ys, 500); // downsample a long series to 500 points
 | `@texuli/charts/streaming` | Immutable, bounded append helpers for live numeric series |
 | `@texuli/charts/worker`, `@texuli/charts/worker/entry` | Opt-in Web Worker offload for binning and downsampling very large series, with a main-thread fallback; load the entry with `new Worker(new URL('@texuli/charts/worker/entry', import.meta.url), { type: 'module' })` |
 
+## Unreleased (prepared for 0.5.0, not on npm yet)
+
+In the repository, not in the `0.4.0` tarball:
+
+- New subpath `@texuli/charts/sparkline-lite`: a light `Sparkline` with the
+  same props, without the data table
+  ([charts-sparkline-lite](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-sparkline-lite.md)).
+- `RampLegend` in `@texuli/charts/matrix`
+  ([charts-matrix](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-matrix.md)).
+- `formatValue(value)` on the compact `Sparkline`, `BulletChart`, `Gauge`
+  and `ProgressRing`; it wins over `format`
+  ([charts-compact](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-compact.md)).
+
 ## Key guarantees
 
 - **Accessible by default.** Every chart has `role="img"`, a title and a
   description, plus a data-table fallback: a **Show data table** button on
-  the cartesian family and a `details` disclosure everywhere else. Cartesian
+  the cartesian family and a `details` disclosure everywhere else (except
+  the light `Sparkline`, which keeps the name and description and drops the
+  table by design). Cartesian
   charts (and matrix charts with `interactive`) add a keyboard explorer:
   arrow keys, Home/End, Page Up/Down between series, Escape to dismiss.
 - **Right-to-left ready.** Captions, legends and tables follow the page

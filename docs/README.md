@@ -102,6 +102,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-color-explorer](../apps/website/docs/site-color-explorer.md) | texuli.com: Color and token explorer |
 | [site-component-pages](../apps/website/docs/site-component-pages.md) | Component pages generator |
 | [site-csp](../apps/website/docs/site-csp.md) | Built-site Content Security Policy |
+| [site-drag](../apps/website/docs/site-drag.md) | Drag page (texuli.com) |
 | [site-docs-shell](../apps/website/docs/site-docs-shell.md) | Docs shell (texuli.com) |
 | [site-editor](../apps/website/docs/site-editor.md) | texuli.com: editor area |
 | [site-evidence](../apps/website/docs/site-evidence.md) | texuli.com: Evidence on every component page |
@@ -131,6 +132,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-theme-sweep](../apps/website/docs/site-theme-sweep.md) | Theme sweep tooling |
 | [site-theme-switcher](../apps/website/docs/site-theme-switcher.md) | texuli.com: theme and mode switcher |
 | [site-visual](../apps/website/docs/site-visual.md) | Visual polish |
+| [site-workflows](../apps/website/docs/site-workflows.md) | Workflows pages (texuli.com) |
 
 ### Agent service (`apps/agent/docs/`)
 
@@ -145,6 +147,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 
 | Doc | Title |
 | --- | --- |
+| [appearance](../packages/astro/docs/appearance.md) | Appearance switcher (`@texuli/astro/appearance`) |
 | [content](../packages/astro/docs/content.md) | Content block parser |
 | [integration](../packages/astro/docs/integration.md) | Astro integration |
 | [layouts-content-layout](../packages/astro/docs/layouts-content-layout.md) | `ContentLayout` |
@@ -249,9 +252,12 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | Doc | Title |
 | --- | --- |
 | [data-activity](../packages/data/docs/data-activity.md) | Activity feed |
+| [data-activity-inbox](../packages/data/docs/data-activity-inbox.md) | Notification inbox (`@texuli/data/activity/inbox`) |
 | [data-board](../packages/data/docs/data-board.md) | Board (kanban) |
 | [data-calendar-reschedule](../packages/data/docs/data-calendar-reschedule.md) | Calendar rescheduling, creating and the clock |
+| [data-cohort](../packages/data/docs/data-cohort.md) | Cohort retention table (`@texuli/data/cohort`) |
 | [data-files](../packages/data/docs/data-files.md) | File browser |
+| [data-filter-builder](../packages/data/docs/data-filter-builder.md) | Filter builder (`@texuli/data/filter-builder`) |
 | [data-grid-columns](../packages/data/docs/data-grid-columns.md) | Data grid column operations |
 | [data-grid-core](../packages/data/docs/data-grid-core.md) | Data grid core |
 | [data-grid-edit-a11y](../packages/data/docs/data-grid-edit-a11y.md) | Editable grid accessibility: read-only cells, editor focus, tab stop |
@@ -397,6 +403,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [layout-host](../packages/texuli/docs/layout-host.md) | LayoutHost and the layout contract |
 | [layout-register-subpaths](../packages/texuli/docs/layout-register-subpaths.md) | Layout register-only subpaths |
 | [layouts-auth-settings](../packages/texuli/docs/layouts-auth-settings.md) | Auth, onboarding and settings layouts |
+| [layouts-content](../packages/texuli/docs/layouts-content.md) | Content layouts (`texuli/layouts/content`) |
 | [layouts-dashboard](../packages/texuli/docs/layouts-dashboard.md) | Dashboard grid and analytics layouts |
 | [layouts-marketing](../packages/texuli/docs/layouts-marketing.md) | Marketing layouts |
 | [layouts-mobile](../packages/texuli/docs/layouts-mobile.md) | Mobile layouts: tab bar and drawer, with stacked navigation |
@@ -472,6 +479,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [cli-add](../packages/tools/docs/cli-add.md) | `texuli add` |
 | [cli-init](../packages/tools/docs/cli-init.md) | `texuli init` and `texuli theme` |
 | [cli-update](../packages/tools/docs/cli-update.md) | `texuli diff` and `texuli update` |
+| [deck](../packages/tools/docs/deck.md) | Deck commands |
 | [elements](../packages/tools/docs/elements.md) | Custom elements |
 | [golden](../packages/tools/docs/golden.md) | Agent golden set and scorer |
 | [llms](../packages/tools/docs/llms.md) | llms.txt and agent docs bundle |

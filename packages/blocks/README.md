@@ -92,6 +92,27 @@ The core vocabulary includes `safeParseBlocks` and `safeParseBlock`,
 `validateBlocksForAuthoring` (metadata for builders and agents), and the
 text helpers `walkBlocks`, `blockText` and `headingOutline`.
 
+## Unreleased (prepared for 0.5.0, not on npm yet)
+
+In the repository, not in the `0.4.0` tarball:
+
+- **Text family:** heading `align`; text `align` and `size`; list `style`
+  (`bullet`, `number`, `check` with per-item `done`, `icon` with per-item
+  `icon`); quote `role` and `avatar`; callout `icon`
+  ([text](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/text.md)).
+- **Structure family:** card `icon`; divider `label` and
+  `variant: "space"`. The text and structure family views take the host
+  resolvers `resolveIcon?(name)` and `resolveAvatar?(id)` (quote avatars pass
+  `safeImageSrc`), and the structure view passes them to nested blocks
+  ([structure](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/structure.md)).
+- **Data family:** stat `title` and `source`, and a per-item `trend`
+  sparkline on `stat` and `kpi` ([data](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/blocks-data.md)).
+- **Code:** `header` and `toolbar` snippets on the code block bar
+  ([code](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/code.md)).
+- **Linear-time Markdown.** `@texuli/blocks/text/markdown` reads heading,
+  fence and rule lines and inline markers without backtracking, so hostile
+  agent text parses in linear time; U+2028 and U+2029 end a line.
+
 ## Key guarantees
 
 - **Untrusted by design.** Every block passes an owned runtime validator

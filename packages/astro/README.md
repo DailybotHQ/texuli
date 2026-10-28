@@ -83,6 +83,13 @@ import Section from '@texuli/astro/sections/Section';
 | `@texuli/astro/sections/Hero` | A static hero section |
 | `@texuli/astro/sections/Section` | A static, width-constrained section |
 
+## Unreleased (prepared for 0.5.0, not on npm yet)
+
+`@texuli/astro/appearance` (`AppearanceSwitcher`) and `ContentLayout`
+children, host TOC entries, TOC levels and preserved heading ids are in the
+repository, not in the `0.4.0` tarball
+([appearance](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/appearance.md)).
+
 ## Key guarantees
 
 - **Static by default.** The layout and section components render HTML

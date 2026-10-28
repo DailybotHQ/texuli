@@ -84,8 +84,8 @@ re-exports every family; subpaths keep bundles narrow.
 | Purpose | Subpaths |
 | --- | --- |
 | Actions | `button` (Button, IconButton, ButtonGroup), `toggle` (Toggle, ToggleGroup), `kbd-code` (Kbd, Code, CopyButton) |
-| Forms | `field` (Field, Label, Description, FieldError, Form), `input` (Input, InputGroup, Textarea), `choice` (Checkbox, Radio, Switch), `select`, `combobox` (Combobox, MultiSelect), `number-pin` (NumberField, PinInput), `slider`, `date` (Calendar, DatePicker, DateRangePicker), `tags-color` (TagsInput, ColorPicker), `file-upload`, `rating` |
-| Overlays | `dialog` (Dialog, AlertDialog), `sheet` (Sheet, Drawer, DetailPanel, ResponsiveModal), `popover` (Popover, HoverCard), `tooltip`, `toast` (Toaster), `menus` (DropdownMenu, ContextMenu, Menubar), `command` (command palette) |
+| Forms | `field` (Field, Label, Description, FieldError, Form), `input` (Input, InputGroup, Textarea), `choice` (Checkbox, Radio, Switch), `select`, `combobox` (Combobox, MultiSelect), `number-pin` (NumberField, PinInput), `slider`, `date` (Calendar, DatePicker, DateRangePicker, TimeField), `tags-color` (TagsInput, ColorPicker), `file-upload`, `rating` |
+| Overlays | `dialog` (Dialog, AlertDialog), `sheet` (Sheet, Drawer, DetailPanel, ResponsiveModal; `Header`, `Body`, `Footer` and `CloseButton` parts), `popover` (Popover, HoverCard), `tooltip`, `toast` (Toaster), `menus` (DropdownMenu, ContextMenu, Menubar), `command` (command palette) |
 | Navigation | `navigation` (NavigationMenu, Breadcrumb, Pagination), `sidebar` (Sidebar, AppNav), `tabs-accordion` (Tabs, Accordion, Collapsible), `stepper` (Stepper, Wizard), `toolbar`, `tree` (TreeView) |
 | Display | `card`, `alert` (Alert, Callout, Banner), `badge` (Badge, Tag, Chip), `avatar` (Avatar, AvatarGroup), `stat` (Stat, KPI), `table`, `timeline`, `carousel`, `empty` (EmptyState, ErrorState), `feedback` (Skeleton, Spinner, Progress) |
 | Structure | `separator-aspect` (Separator, AspectRatio, VisuallyHidden), `scroll-area`, `resizable` (resizable panels) |
@@ -100,8 +100,9 @@ re-exports every family; subpaths keep bundles narrow.
 | `layouts/dashboard` | `DashboardGridLayout` and `AnalyticsGrid` |
 | `layouts/marketing` (plus `/landing`, `/pricing`, `/section`, `/entry`) | Marketing pages and sections |
 | `layouts/auth-settings` | Auth split, settings and wizard layouts |
+| `layouts/content` | `ContentLayout` for direct use (content as children, host TOC entries, TOC levels, preserved heading ids) and the TOC helpers |
 | `layouts/content/{blog,docs,editorial}` | Content page layouts |
-| `layouts/mobile` | Mobile tabs and drawer layouts (registered for the layout host) and their navigation model helpers |
+| `layouts/mobile` | Mobile tabs and drawer layouts (registered for the layout host), their navigation model helpers, and the standalone `BottomNav`, `MobileHeader` and `MobileAppFrame` parts |
 | `layouts/host` (plus `/chrome`, `/drawer`) | `LayoutHost`: lazy layout resolution with responsive fallbacks, shared chrome and a data-only nav model |
 
 The `layouts/{mobile,dashboard,marketing,auth-settings}/register` subpaths
@@ -112,6 +113,47 @@ the initial chunk.
 
 `texuli/cx` exports `cx` (class composition) and `variants` (typed variant
 recipes), so you can extend components without `clsx` or `tailwind-merge`.
+
+## Unreleased (prepared for 0.5.0, not on npm yet)
+
+In the repository, not in the `0.4.0` tarball. Under `0.x` the new minor
+may break; the breaking items are marked.
+
+- **Breaking, `input`:** with `type="number"` or `type="range"`,
+  `bind:value` binds a number, or `null` while empty; `type="file"` binds
+  `files` as `null` until a pick. A caller `oninput` now composes with the
+  internal handler instead of replacing it (it used to stop `bind:value`)
+  ([ui-input](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-input.md)).
+- **Breaking, `toast`:** the store owns the auto-dismiss timers;
+  `onSettle(reason)` (`timeout`, `action`, `dismiss`), `pause`, `resume`,
+  `isPaused` and `announcement` ([ui-toast](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-toast.md)).
+- **Breaking, `badge`:** the `Tag` remove button is named after its tag
+  ("Remove Design" by default; `removeLabel` customizes it)
+  ([ui-badge](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-badge.md)).
+- **Breaking, `layouts/content`:** `TocItem.level` and `TocHeading.level`
+  widen from `2 | 3` to `2 | 3 | 4 | 5 | 6`
+  ([layouts-content](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-content.md)).
+- `kbd-code`: `CopyButton` takes `onCopy` and `onCopyError`.
+- `date`: `today`, `weekStartsOn`, `maxDays` and `onInvalid` on `Calendar`,
+  `DatePicker` and `DateRangePicker`, range highlight, and a styled
+  `TimeField` ([ui-date](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-date.md)).
+- Overlays: a `stack` option on `Dialog` and `AlertDialog`, focus-exempt
+  regions (an undo toaster), `ResponsiveModal` `force` and host sizing, and
+  the sheet `Header`, `Body`, `Footer` and `CloseButton` parts
+  ([ui-dialog](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-dialog.md), [ui-sheet](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-sheet.md)).
+- `layouts/content` (new subpath): `ContentLayout` with children, host TOC
+  entries, TOC levels and preserved heading ids.
+- `layouts/mobile`: standalone `BottomNav`, `MobileHeader` and
+  `MobileAppFrame` ([layouts-mobile](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-mobile.md)).
+- `bind:ref` and rest attributes on `Dialog`, `Tabs`, `Accordion`,
+  `Collapsible`, `TextCounter`, `Toolbar`, `ToggleGroup` and more;
+  `ToggleGroup` `name`; `PinInput.Root` `name` and `bind:inputRef`;
+  `CardGrid` `maxColumns`; link `Card` `target`, `rel` and `download`;
+  `FileUpload` `onFilesAdd` and `onFileRemove`; `Avatar` `srcset` and
+  `sizes` through the URL policy; a bindable `TagsInput` draft; a
+  `destructive` tone on menu `Item`s; tab icons; `Pagination` `stableCount`; and
+  the `--tx-app-height` variable documented for `AppShell`
+  ([layouts-shells](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-shells.md)).
 
 ## Key guarantees
 
@@ -146,8 +188,10 @@ recipes), so you can extend components without `clsx` or `tailwind-merge`.
 - Class values and variants: [class-value.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/class-value.md)
   and [variants-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/variants-css.md)
 - Icons: [ui-icons.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)
-- Layouts: [layouts-shells.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-shells.md)
-  and [layouts-dashboard.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-dashboard.md)
+- Layouts: [layouts-shells.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-shells.md),
+  [layouts-dashboard.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-dashboard.md),
+  [layouts-content.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-content.md)
+  and [layouts-mobile.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-mobile.md)
 
 ## Related packages
 

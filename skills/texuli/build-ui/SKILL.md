@@ -182,7 +182,10 @@ pnpm vitest run scripts/tests/skill.test.ts
 
 ## Imports cheat sheet
 
-See [`references/imports.md`](references/imports.md).
+See [`references/imports.md`](references/imports.md), including the APIs
+prepared for `0.5.0` (repository only, not on npm yet): composer streaming
+and `onStop`, `DataGrid` paging, toast `onSettle`, `TimeField`, date
+`today`, the light `Sparkline` and editor Markdown.
 
 ## Local references
 

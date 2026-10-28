@@ -21,8 +21,9 @@ be the first stable release). Install them plainly (`pnpm add texuli`), pin
 the exact version or `^0.4.0` (for 0.x it accepts only 0.4.x, since a new
 minor may break), and never suggest a download URL. `@texuli/drag`,
 `@texuli/workflows` and `@texuli/deck` are in development and on npm as
-`0.4.0`; `@texuli/editor` is in development and not on npm, so never tell a
-consumer app to install it from npm. Features such as
+`0.4.0`; `@texuli/editor` is in development and not on npm yet (publishable
+from `0.5.0`, which is prepared but not published), so never tell a consumer
+app to install it from npm. Features such as
 `@texuli/primitives/sortable` and spec 0.3.0 and 0.4.0 need `0.4.0`; they
 are not in `0.3.0`.
 

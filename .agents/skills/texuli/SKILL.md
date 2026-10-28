@@ -48,8 +48,10 @@ agent config, or publish packages without explicit consent (see
    `@texuli/workflows` (the workflow editor) and `@texuli/deck` (the deck
    engine behind the deck generator, first published in `0.4.0`) are in
    development but on npm as `0.4.0`. `@texuli/editor` (the rich text
-   editor) is in development and not on npm: only a Texuli workspace can
-   import it. `0.4.0` ships spec 0.4.0, the new catalog groups,
+   editor) is in development and not on npm yet (publishable from `0.5.0`):
+   only a Texuli workspace can import it. `0.5.0` is prepared in the
+   repository, not published: its new APIs are marked "repository only" in
+   the package index. `0.4.0` ships spec 0.4.0, the new catalog groups,
    `@texuli/primitives/sortable`, the data drag migrations, the player's
    interaction and the `@texuli/slides` v2 stage on `@texuli/deck`;
    `0.3.0` predates them all. The

@@ -124,20 +124,20 @@ The package root, `@texuli/data`, re-exports the main views and helpers.
 **Known limit:** fence editing on the map is not implemented yet; fences are
 drawn and listed only.
 
-## Unreleased (planned for 0.5.0)
+## Unreleased (prepared for 0.5.0, not on npm yet)
 
-In the workspace, not on npm yet:
+In the repository, not in the `0.4.0` tarball:
 
 - `DataGrid`: client paging (`pageSize`, `bind:page`), `rowClass(row)`, and
   `filters`, `toolbar` and selection-aware `bulkActions` snippets
-  ([data-grid-core](./docs/data-grid-core.md)).
+  ([data-grid-core](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-grid-core.md)).
 - `Board`: a `columnFooter(column, { count })` snippet and `headingLevel`
-  ([data-board](./docs/data-board.md)).
-- New `@texuli/data/filter-builder`
-  ([data-filter-builder](./docs/data-filter-builder.md)),
+  ([data-board](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-board.md)).
+- New subpaths: `@texuli/data/filter-builder`
+  ([data-filter-builder](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-filter-builder.md)),
   `@texuli/data/activity/inbox`
-  ([data-activity-inbox](./docs/data-activity-inbox.md)) and
-  `@texuli/data/cohort` ([data-cohort](./docs/data-cohort.md)).
+  ([data-activity-inbox](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-activity-inbox.md)) and
+  `@texuli/data/cohort` ([data-cohort](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-cohort.md)).
 
 ## New in 0.4.0
 
@@ -152,9 +152,12 @@ Not in the `0.3.0` release:
   cancel). The board and tree view also announce moves from localized
   `DragMessages` templates, overridable with their new `messages` prop.
 - **Breaking:** `@texuli/data/board` and `@texuli/data/tree-view` no longer
-  export `DRAG_THRESHOLD_PX` or `indexFromPointer`. The threshold lives in
-  `@texuli/drag/gesture` and the pointer index in
-  `@texuli/drag/collision` (`midpointIndex`).
+  export `DRAG_THRESHOLD_PX` or `indexFromPointer` (`0.3.0` had them). The
+  threshold is the `threshold` option of `createPointerTracker` in
+  `@texuli/drag/gesture` (default 4 px, the old constant's value; there is
+  no exported constant), and the pointer index is `midpointIndex(midpoints,
+  coordinate)` in `@texuli/drag/collision` (the same index as
+  `indexFromPointer(middles, y)` for ascending midpoints).
 
 ## Documentation
 
@@ -174,6 +177,9 @@ Not in the `0.3.0` release:
   [timeline](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-timeline.md),
   [offline map](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-map.md),
   [activity feed](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-activity.md),
+  [notification inbox](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-activity-inbox.md),
+  [cohort table](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-cohort.md),
+  [filter builder](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-filter-builder.md),
   [file browser](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-files.md)
 - Source: [github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli)
   · Issues: [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues)

@@ -11,7 +11,8 @@ Texuli checkout installs them plainly, for example
 (for 0.x it accepts only 0.4.x, since a new minor may break) (the developer
 runs the install; it uses the network). `@texuli/drag`,
 `@texuli/workflows` and `@texuli/deck` are in development and on npm as
-`0.4.0`; `@texuli/editor` is in development and not on npm.
+`0.4.0`; `@texuli/editor` is in development and not on npm yet (publishable
+from `0.5.0`).
 Inside this monorepo, an app depends on the workspace packages:
 
 ```json
