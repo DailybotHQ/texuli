@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.2.3] — 2026-10-28
+
+### Changes
+
+- chore(deps): release 0.4.0 of all 19 packages, @texuli/deck for the first time
+
 ## [0.2.2] — 2026-10-28
 
 ### Changes
