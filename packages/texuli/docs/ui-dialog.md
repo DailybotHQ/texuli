@@ -119,3 +119,13 @@ AlertDialog does **not** close on outside pointer. Cancel is the default initial
 - Layers: `@layer tx.components`
 - AA contrast in light, dark and forced-colors (token fallbacks + `forced-colors` rules)
 - Labels are props so hosts can translate them
+
+## Motion
+
+`motion` (`Dialog` and `AlertDialog`): the panel scales in and out and the
+backdrop fades, through `@texuli/core/motion`
+([ui-motion](ui-motion.md)). `motion={false}` turns it off; reduced motion and
+a `MotionProvider` level of `none` make it instant. A closing dialog gives
+focus back and lifts `inert` at once; only the panel's exit (inert,
+`data-state="closed"`) waits. A dialog open on the first render does not
+animate in.

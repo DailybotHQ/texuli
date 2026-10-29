@@ -218,6 +218,7 @@ public subpath for configuring the default component registry (see
 | Subpath | What it does |
 | --- | --- |
 | `@texuli/slides/stage` | `DeckStage` (model v2 and v1), `DeckPrint` (v1), the chrome, overview and presenter components, preparation (`prepareDeck`, `validateDeckBlock`), routing, steps, renderers, themes, transitions and the v1 presenter sync |
+| `@texuli/slides/stage-core` | `DeckStageCore`: the same stage with no reference to the default renderer tables, for hosts that bring every renderer (their build emits none of the defaults' chunks or CSS), and the rest of `./stage` except `DeckStage`, `DeckPrint` and the default-table loaders ([stage.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/stage.md)) |
 | `@texuli/slides/export` | Print plans and flags, `DeckPrintView` for v2 decks, the PDF seam, PPTX for v1 and v2 decks, and the owned XML and ZIP writers |
 | `@texuli/slides/styles.css` | Stage and print styles, named print pages and reduced-motion rules |
 | `@texuli/slides/model` | The model v1 (`0.3.0`) deck: `parseDeck`, masters, slots and reveal steps, kept for existing decks |

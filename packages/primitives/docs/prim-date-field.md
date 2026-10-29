@@ -24,7 +24,10 @@ The DateField rejects impossible dates and values outside its optional ISO
 it is complete (a month, a day and a four-digit year): `invalid` for a date
 that does not exist (`2/30/2026`) and `out-of-range` outside `min`/`max`.
 `text` is the segments in locale order; the segments carry
-`aria-invalid="true"` until the entry is fixed.
+`aria-invalid="true"` until the entry is fixed. `onValueChange` (and
+`bind:value`) report a date only once the year has four digits: typing
+`2` on the way to `2026` reports `null` (an incomplete entry), never
+`0002-…`; a year before 1000 is typed with its zeros (`0999`).
 
 Both roots take `inputId` (the first segment's id, so a `<label for>` or a
 Field focuses it); an `aria-describedby` or `aria-invalid` you pass reaches

@@ -59,6 +59,7 @@ export {
   CardFooter,
   CardGrid,
   type CardGridGap,
+  type CardGridGapValue,
   CardHeader,
   CardMedia,
   CardTitle,
@@ -713,3 +714,13 @@ export {
   markInDrawer,
   setAppShellContext,
 } from './layouts/shells/index.ts';
+export {
+  type ComponentMotion,
+  MOTION_PRESETS,
+  type MotionDurationName,
+  type MotionLevel,
+  type MotionPreset,
+  type MotionProp,
+  MotionProvider,
+  type MotionSettings,
+} from './motion/index.ts';

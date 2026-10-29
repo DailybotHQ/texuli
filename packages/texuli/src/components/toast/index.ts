@@ -7,6 +7,7 @@ export {
   toast,
 } from './toast-store.ts';
 export {
+  DEFAULT_TOAST_ACTION_ERROR,
   DEFAULT_TOAST_DURATION,
   MAX_TOASTS,
   type PromiseToastMessages,

@@ -34,7 +34,7 @@ These are owned, headless pickers following the WAI-ARIA [date picker dialog](ht
 | --- | --- | --- |
 | `DatePicker.Root` | State and the popover | `bind:value` (`YYYY-MM-DD` or `null`), `onValueChange`, `bind:open`, `onOpenChange`, `locale`, `minValue` and `maxValue` (`YYYY-MM-DD`), `isDateUnavailable(CalendarDate)`, `today` (`YYYY-MM-DD`; when set, the clock is never read), `weekStartsOn` (`0`–`6`), `onInvalid(text, reason)`, `disabled`, `closeOnSelect` (`true`), `labels` |
 | `DateRangePicker.Root` | The same, for a range | `bind:value` (`{ start, end }`, always ordered), `maxDays`, and the rest as above; `closeOnSelect` closes when the range is complete |
-| `*.Field` | The DateField (single), or a named `role="group"` with start and end DateFields (range) | `label`; `name`, `required` (single); `startName`, `endName` (range). The start field is capped at the end, the end field floored at the start |
+| `*.Field` | The DateField (single), or a named `role="group"` with start and end DateFields (range) | `label`; `name`, `required` (single); `startName`, `endName`, `required` (range: every segment of both fields). The start field is capped at the end, the end field floored at the start |
 | `*.Trigger` | The button: `aria-haspopup="dialog"`, `aria-expanded`, and a name that says the selected date (`Choose date, selected date is Sunday, March 15, 2026`) | button attributes; `child` snippet |
 | `*.Content` | `role="dialog"`, named by `labels.dialog` | attributes |
 | `DatePicker.Calendar` | The Calendar: previous, heading, next, grid; a `children` snippet replaces them | attributes |
@@ -43,8 +43,8 @@ These are owned, headless pickers following the WAI-ARIA [date picker dialog](ht
 The range grid marks days with `data-range-start`, `data-range-end`, `data-in-range` and `data-preview` (while the end is pending, the range previews to the hovered or focused day). Every string is translatable (`labels`: `trigger`, `triggerWithValue` with `{date}`, `dialog`, `previousMonth`, `nextMonth`, `start`, `end`, `tooLong` with `{max}`).
 
 - **`today`:** passed to the Calendar as its today (`aria-current="date"` and the starting day). With it, neither picker reads `Date.now()` or `new Date()`.
-- **`maxDays`:** the longest range, both ends included. A longer second pick or typed end is refused: the value stays, the end stays pending, `onInvalid('start/end', 'too-long')` runs and the grid's polite `role="status"` announces `labels.tooLong`.
-- **`onInvalid(text, reason)`:** the fields report complete typed text that is not a date (`invalid`) or is out of bounds (`out-of-range`), once per text (see the DateField).
+- **`maxDays`:** the longest range, both ends included. A longer second pick or typed end is refused: the value stays, the end stays pending, `onInvalid('start/end', 'too-long', { side })` runs (`side` is the end that was picked or typed: `'end'` for the second pick, `'start'` when a typed start makes the range too long) and the grid's polite `role="status"` announces `labels.tooLong`.
+- **`onInvalid(text, reason, detail?)`:** the fields report complete typed text that is not a date (`invalid`) or is out of bounds (`out-of-range`), once per text (see the DateField). In a range, `detail.side` (`DateInvalidDetail`) says which field caused it, `'start'` or `'end'`; a single DatePicker passes no detail.
 - **A range grid outside a picker:** `provideDateRange(state)` supplies the `DateRangeState` (`start`, `end`, `pending`, `message`, `setStart`, `setEnd`, `pick`) to a `DateRangePicker.Grid` inside a plain `Calendar.Root`; the styled `Calendar`'s range mode uses it. `rangeDays(start, end)` counts a range's days, both ends included.
 
 ## Keyboard, pointer and touch

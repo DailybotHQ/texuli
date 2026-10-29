@@ -1,5 +1,6 @@
 import { createToastManager, type ToastManager } from '@texuli/primitives/toast';
 import {
+  DEFAULT_TOAST_ACTION_ERROR,
   DEFAULT_TOAST_DURATION,
   MAX_TOASTS,
   type PromiseToastMessages,
@@ -32,6 +33,8 @@ export type ToastStore = {
    * Run a toast's action, keep it while a returned promise runs, then dismiss
    * it and settle with `'action'` (also when the action rejects; the error is
    * rethrown on a microtask). The toast's timer stops while the action runs.
+   * With `action.retryOnError` a rejection keeps the toast unsettled, with
+   * its `error` message and a fresh timer, so the action can run again.
    */
   action: (id: string) => Promise<void>;
   /**
@@ -57,6 +60,7 @@ type Meta = {
   action?: ToastOptions['action'];
   onSettle?: ToastOptions['onSettle'];
   pending?: boolean;
+  error?: string;
 };
 
 type Timer = {
@@ -136,6 +140,7 @@ export function createToastStore(options?: {
       };
       if (record.description) item.description = record.description;
       if (extra?.action) item.action = extra.action;
+      if (extra?.error) item.error = extra.error;
       return item;
     });
   }
@@ -295,17 +300,40 @@ export function createToastStore(options?: {
       else remove(id, 'dismiss');
     },
     async action(id) {
-      const action = meta.get(id)?.action;
-      if (!action || acting.has(id)) return;
+      const extra = meta.get(id);
+      const action = extra?.action;
+      if (!extra || !action || acting.has(id)) return;
       acting.add(id);
       clearTimer(id);
+      if (extra.error !== undefined) {
+        delete extra.error;
+        emit();
+      }
+      let failed = false;
       try {
         await action.onClick();
       } catch (error) {
+        failed = true;
         report(error);
+        // The toast may have left while the action ran (dismissed, pushed out).
+        const current = meta.get(id);
+        if (action.retryOnError && current === extra) {
+          let message = DEFAULT_TOAST_ACTION_ERROR;
+          try {
+            const text =
+              typeof action.errorText === 'function' ? action.errorText(error) : action.errorText;
+            if (typeof text === 'string' && text) message = text;
+          } catch (textError) {
+            report(textError);
+          }
+          current.error = message;
+          const record = manager.list().find((item) => item.id === id);
+          if (record) startTimer(id, record.duration);
+          emit();
+        }
       } finally {
         acting.delete(id);
-        remove(id, 'action');
+        if (!(failed && action.retryOnError && meta.get(id) === extra)) remove(id, 'action');
       }
     },
     pause(key = 'host') {

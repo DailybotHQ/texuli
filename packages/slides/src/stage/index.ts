@@ -36,7 +36,12 @@ export {
 export { deckCssVars } from './css-vars.ts';
 export { default as DeckPrint } from './DeckPrint.svelte';
 export { default as DeckStage } from './DeckStage.svelte';
-export { loadDefaultDeckRenderers, loadedDefaultDeckRenderers } from './defaults.ts';
+export { default as DeckStageCore } from './DeckStageCore.svelte';
+export {
+  DECK_DEFAULT_RENDERERS_SOURCE,
+  loadDefaultDeckRenderers,
+  loadedDefaultDeckRenderers,
+} from './defaults.ts';
 export {
   DECK_STAGE_EVENTS,
   type DeckStageEvent,
@@ -70,6 +75,7 @@ export {
   type DeckStageOnlyMessageKey,
   type DeckTranslate,
 } from './messages.ts';
+export { loadDeckMigration, loadedDeckMigration } from './migration.ts';
 export type { SlideNavigationIntent, SlideStepIntent } from './navigation.ts';
 export { DeckOverview } from './overview/index.ts';
 export { prefetchDeckSlides, slideBlockFamilies, whenIdle } from './prefetch.ts';
@@ -85,6 +91,7 @@ export {
   type DeckBackgroundRendererProps,
   type DeckBlockValidator,
   type DeckBlockValidatorModule,
+  type DeckDefaultRenderersSource,
   type DeckItemRendererProps,
   type DeckLazyRenderer,
   type DeckRendererEntry,

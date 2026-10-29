@@ -4,6 +4,12 @@ export interface ChatAuthor {
   id: string;
   name: string;
   avatarUrl?: string;
+  /**
+   * Responsive avatar candidates (`a.webp 1x, b.webp 2x` or width
+   * descriptors), used with `avatarUrl`. Each candidate passes the untrusted
+   * image URL policy; refused ones are dropped (texuli `Avatar` `srcset`).
+   */
+  avatarSrcset?: string;
 }
 
 export interface ChatMessage {
@@ -29,4 +35,18 @@ export interface ChatMessageActions {
   edit: () => void;
   /** True when the list accepts edits (`onEdit` is set). */
   canEdit: boolean;
+}
+
+/**
+ * A reading position in a `MessageList` (`bind:anchor`, `onAnchorChange`):
+ * the first message in view and where it sits. Save it per conversation and
+ * hand it back to reopen the list at the same place.
+ */
+export interface ChatReadingAnchor {
+  /** The first message in view (the one crossing the viewport's top edge, or the first below it). */
+  messageId: string;
+  /** Px from the viewport's top edge to the message's top edge (negative when it starts above the view). */
+  offset: number;
+  /** The reader was at the latest message: restoring scrolls to the bottom and keeps following. */
+  atLatest: boolean;
 }

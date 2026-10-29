@@ -84,7 +84,9 @@ function commit(segment: DateSegment, raw: string): void {
     day: segment === 'day' ? (number ?? 0) : Number(current.day) || 0,
   };
   check(current);
-  const candidate = number === null || !parseDateSafe(next) ? null : formatDate(next);
+  // Only a four-digit year is a year: "2" on the way to "2026" is not 0002.
+  const candidate =
+    number === null || current.year.length < 4 || !parseDateSafe(next) ? null : formatDate(next);
   if (candidate && ((low && candidate < formatDate(low)) || (high && candidate > formatDate(high))))
     return;
   if (candidate === value) return;

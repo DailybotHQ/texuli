@@ -41,6 +41,8 @@ interface OwnProps {
   maxValue?: string;
   isDateUnavailable?: (date: CalendarDate) => boolean;
   disabled?: boolean;
+  /** Both dates must be filled: `required` on every segment, and `*` after the visible label. */
+  required?: boolean;
   startName?: string;
   endName?: string;
   /**
@@ -85,6 +87,7 @@ let {
   maxValue,
   isDateUnavailable,
   disabled = false,
+  required = false,
   startName,
   endName,
   presets = false,
@@ -139,7 +142,7 @@ function choose(preset: DateRangePreset): void {
   data-invalid={error ? 'true' : undefined}
   data-disabled={disabled ? 'true' : undefined}
 >
-  {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}</span>{/if}
+  {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}{#if required}<span class="tx-date__required"> *</span>{/if}</span>{/if}
   <Primitive.Root
     bind:value
     bind:open
@@ -162,6 +165,7 @@ function choose(preset: DateRangePreset): void {
       aria-labelledby={(split.control['aria-labelledby'] as string | undefined) ?? field?.labelId}
         class="tx-date__field"
         {label}
+        {required}
         {...startName ? { startName } : {}}
         {...endName ? { endName } : {}}
         aria-describedby={joinIds(describedBy, split.control['aria-describedby'] as string | undefined)}

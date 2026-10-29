@@ -1,6 +1,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/index.ts';
+import type { OverlayMotionHooks } from '../internal/motion-hold.ts';
 
 export type AccordionType = 'single' | 'multiple';
 export type AccordionOrientation = 'vertical' | 'horizontal';
@@ -83,5 +84,10 @@ export interface AccordionContentProps extends Base<HTMLAttributes<HTMLDivElemen
    * for find-in-page or a CSS-only animation. Default `false`.
    */
   forceMount?: boolean;
+  /**
+   * Open and close motion (texuli passes `texuli/motion` hooks): the panel
+   * stays mounted while its close animation plays.
+   */
+  motionHooks?: OverlayMotionHooks;
   ref?: HTMLElement | null;
 }

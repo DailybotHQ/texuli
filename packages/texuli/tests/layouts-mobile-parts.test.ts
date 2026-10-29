@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
+import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { BottomNavItem } from '../src/layouts/mobile/index.ts';
 import Harness from './fixtures/MobilePartsHarness.svelte';
@@ -60,6 +61,31 @@ describe('mobile parts (G15)', () => {
     expect(onBack).toHaveBeenCalledTimes(1);
     expect(screen.getAllByRole('main')).toHaveLength(1);
     expect(document.getElementById('screen')?.tagName).toBe('DIV');
+  });
+});
+
+describe('MobileAppFrame empty sticky footer (G68)', () => {
+  afterEach(cleanup);
+
+  it('hides the padded, bordered footer strip while the snippet renders nothing', async () => {
+    const view = render(Harness, { props: { items, footer: false } });
+    await tick();
+    const strip = () =>
+      document.querySelector<HTMLElement>('[data-tx-mobile-frame-footer]') as HTMLElement;
+    expect(strip().hidden).toBe(true);
+    expect(strip().hasAttribute('data-empty')).toBe(true);
+    await view.rerender({ items, footer: true });
+    await tick();
+    expect(strip().hidden).toBe(false);
+    expect(screen.getByRole('button', { name: 'Save' })).toBeTruthy();
+    await view.rerender({ items, footer: false });
+    await tick();
+    expect(strip().hidden).toBe(true);
+    const css = readFileSync(
+      join(process.cwd(), 'packages/texuli/src/layouts/mobile/mobile.css'),
+      'utf8'
+    );
+    expect(css).toMatch(/\.tx-mobile-frame__footer\[data-empty\][^{]*\{[^}]*display:\s*none/);
   });
 });
 

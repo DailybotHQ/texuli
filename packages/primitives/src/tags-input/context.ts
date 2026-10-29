@@ -7,8 +7,8 @@ export interface TagsInputContext {
   readonly readonly: boolean;
   readonly invalid: boolean;
   readonly labels: TagsInputLabels;
-  /** The one-character delimiter that adds a tag when typed, if any. */
-  readonly delimiterKey: string | undefined;
+  /** True when typing `key` adds the draft as a tag (a one-character delimiter). */
+  isDelimiterKey: (key: string) => boolean;
   readonly addOnPaste: boolean;
   readonly addOnBlur: boolean;
   /** Adds the tags in `text`; returns whether the text was used up. */

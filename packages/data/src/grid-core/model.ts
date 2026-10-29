@@ -14,6 +14,33 @@ export interface DataGridColumn<T> extends GridColumnDef<T> {
   format?: (value: GridValue, row: T) => string;
   /** In an `editable` grid, cells of this column can be edited (others are read-only). */
   editable?: boolean;
+  /**
+   * Hides the column while the viewport is narrower than a breakpoint: `sm`
+   * (640px), `md` (768px), `lg` (1024px), `xl` (1280px) or a width in px.
+   * Hidden columns leave the grid (header, cells, column count and keyboard
+   * model); search and filters still read them.
+   */
+  hideBelow?: DataGridBreakpoint;
+}
+
+/** A named viewport breakpoint or a width in px. */
+export type DataGridBreakpoint = 'sm' | 'md' | 'lg' | 'xl' | number;
+
+const BREAKPOINTS = { sm: 640, md: 768, lg: 1024, xl: 1280 } as const;
+
+/** The min width in px a column needs to show, or `null` (always shown). */
+export function breakpointWidth(value: DataGridBreakpoint | undefined): number | null {
+  if (value === undefined) return null;
+  if (typeof value === 'number') return Number.isFinite(value) && value > 0 ? value : null;
+  return BREAKPOINTS[value] ?? null;
+}
+
+/** What the `empty` snippet receives. */
+export interface DataGridEmptyContext {
+  /** The search text (`''` without a search). */
+  query: string;
+  /** Rows exist but the search or filter matched none of them. */
+  filtered: boolean;
 }
 
 /** What the `bulkActions` snippet receives while rows are selected. */

@@ -9,12 +9,14 @@ import {
   formatDragMessage,
   resolveDragMessages,
 } from '@texuli/drag/messages';
-import { type Component, type Snippet, tick } from 'svelte';
+import { type Component, type Snippet, tick, untrack } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import { type ClassValue, cx, variants } from 'texuli/cx';
+import { createListMotion, type MotionProp } from 'texuli/motion';
 import {
   type BoardColumnDef,
   type BoardKeyboardText,
+  rankSequence,
   type BoardLaneDef,
   type BoardMove,
   type BoardOptions,
@@ -55,13 +57,21 @@ interface BoardProps<T> {
   getId: (item: T) => string;
   getColumn: (item: T) => string;
   getLane?: (item: T) => string;
-  getRank: (item: T) => string;
+  /**
+   * The item's rank (its order in a cell). Omit it for a column-only board:
+   * cards keep the order of `items`, moves go to another column only
+   * (reordering inside a column is refused), and `onMove` still receives a
+   * rank the host may ignore.
+   */
+  getRank?: (item: T) => string;
   getLabel?: (item: T) => string;
   /** When true, the card cannot be dragged or moved via the menu (WCAG lock). */
   isLocked?: (item: T) => boolean;
   card: Snippet<[T, { pending: boolean }]>;
   /** Rendered at the end of each column (add a card, totals…), with the column's card count. */
   columnFooter?: Snippet<[BoardColumnDef, { count: number }]>;
+  /** Rendered in each column header after the title and count (actions, a menu, a hint), with the card count. */
+  columnHeader?: Snippet<[BoardColumnDef, { count: number }]>;
   /**
    * Level of the column headings (2–6, default 3). The board's hidden title
    * sits one level above (no heading at 2), swimlane titles one below.
@@ -75,6 +85,12 @@ interface BoardProps<T> {
   density?: 'comfortable' | 'compact';
   dir?: 'ltr' | 'rtl' | 'auto';
   class?: ClassValue;
+  /**
+   * Motion (`texuli/motion`): cards glide to their new place when `items`
+   * changes (a committed move, an insert or a removal; `layout`, default on).
+   * `false` for none; instant under reduced motion and at level `none`.
+   */
+  motion?: MotionProp;
 }
 
 const rootClasses = variants({
@@ -120,6 +136,7 @@ let {
   isLocked,
   card,
   columnFooter,
+  columnHeader,
   headingLevel = 3,
   onMove,
   canMove,
@@ -128,9 +145,29 @@ let {
   density = 'comfortable',
   dir,
   class: className,
+  motion,
 }: BoardProps<T> = $props();
 
 const uid = $props.id();
+// Layout motion: measure the cards before `items` changes, play after it.
+const cardMotion = createListMotion({
+  motion: () => motion,
+  defaults: { layout: true, duration: 'base' },
+  items: () =>
+    Array.from(
+      document.getElementById(`board-${uid}`)?.querySelectorAll<HTMLElement>('[data-board-card]') ??
+        [],
+      (element) => [element.getAttribute('data-item-id') ?? '', element] as const
+    ),
+});
+$effect.pre(() => {
+  void items;
+  untrack(() => cardMotion.measure());
+});
+$effect(() => {
+  void items;
+  untrack(() => cardMotion.play());
+});
 const level = $derived(Math.min(6, Math.max(2, Math.trunc(headingLevel) || 3)));
 const instructionsId = `board-${uid}-instructions`;
 const titleId = `board-${uid}-title`;
@@ -181,16 +218,30 @@ let openMenuId = $state<string | null>(null);
 /** The pointer drag in progress (keyboard moves use `held`). */
 let drag = $state<{ id: string; active: boolean; target: MoveTarget | null } | null>(null);
 
+/** Column-only mode: no `getRank`, so ranks follow the order of `items`. */
+const columnOnly = $derived(getRank === undefined);
+const localRanks = $derived.by(() => {
+  if (!columnOnly) return null;
+  const ranks = rankSequence(items.length);
+  return new Map(items.map((item, index) => [getId(item), ranks[index] as string]));
+});
+function rankOf(item: T): string {
+  return getRank ? getRank(item) : (localRanks?.get(getId(item)) ?? '');
+}
+
 const options = $derived<BoardOptions<T>>({
   columns,
   ...(lanes?.length ? { lanes, lane: (item: T) => getLane?.(item) ?? '' } : {}),
   id: getId,
   column: (item: T) => placements[getId(item)]?.columnId ?? getColumn(item),
   lane: (item: T) => placements[getId(item)]?.laneId ?? getLane?.(item) ?? '',
-  rank: (item: T) => placements[getId(item)]?.rank ?? getRank(item),
+  rank: (item: T) => placements[getId(item)]?.rank ?? rankOf(item),
   label: getLabel,
 });
-const rules = $derived<MoveRules<T>>(canMove ? { canMove } : {});
+const rules = $derived<MoveRules<T>>({
+  ...(canMove ? { canMove } : {}),
+  ...(columnOnly ? { reorder: false } : {}),
+});
 const grid = $derived(groupBoard(items, options));
 
 $effect(() => {
@@ -206,7 +257,8 @@ $effect(() => {
     return (
       getColumn(item) === placement.columnId &&
       itemLane === targetLane &&
-      getRank(item) === placement.rank
+      // Column-only boards keep no rank: the column (and lane) settle the move.
+      (columnOnly || getRank?.(item) === placement.rank)
     );
   });
   if (settled.length === 0) return;
@@ -232,7 +284,7 @@ const shown = $derived.by(() => {
     ...options,
     column: (item: T) => previewPlacements[getId(item)]?.columnId ?? getColumn(item),
     lane: (item: T) => previewPlacements[getId(item)]?.laneId ?? getLane?.(item) ?? '',
-    rank: (item: T) => previewPlacements[getId(item)]?.rank ?? getRank(item),
+    rank: (item: T) => previewPlacements[getId(item)]?.rank ?? rankOf(item),
   });
 });
 
@@ -553,6 +605,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       {#each grid.columns as column, columnIndex (column.id)}
         {@const count = shown.columnCounts.get(column.id) ?? 0}
         {@const wip = evaluateWip(column, count)}
+        {@const descriptionId = column.description ? `board-${uid}-column-${columnIndex}-description` : undefined}
         <section class="tx-board__column" data-wip={wip.status}>
           <header class="tx-board__column-header">
             <svelte:element this={`h${level}`} class="tx-board__column-title">{column.title}</svelte:element>
@@ -564,6 +617,12 @@ function dragFrom(id: string): Attachment<HTMLElement> {
               >
               <span class="tx-board__sr-only">{labels.cardCount(count, column.wip?.hard)}</span>
             </span>
+            {#if column.description}
+              <p id={descriptionId} class="tx-board__column-description">{column.description}</p>
+            {/if}
+            {#if columnHeader}
+              <div class="tx-board__column-header-extra">{@render columnHeader(column, { count })}</div>
+            {/if}
           </header>
           {#each grid.lanes as lane, laneIndex (lane.id)}
             {@const shownCell = shown.cells[laneIndex]?.[columnIndex]}
@@ -572,6 +631,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
               class="tx-board__cell"
               role="list"
               aria-label={cellLabel}
+              aria-describedby={descriptionId}
               data-board-cell
               data-column-id={column.id}
               data-lane-id={lane.id}
@@ -726,6 +786,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
 
     .tx-board__column-header {
       display: flex;
+      flex-wrap: wrap;
       align-items: baseline;
       justify-content: space-between;
       gap: 0.75rem;
@@ -740,6 +801,18 @@ function dragFrom(id: string): Attachment<HTMLElement> {
 
     .tx-board__column-footer {
       padding: 0.5rem 0.75rem 0.75rem;
+    }
+
+    .tx-board__column-description,
+    .tx-board__column-header-extra {
+      flex: 1 0 100%;
+      min-inline-size: 0;
+    }
+
+    .tx-board__column-description {
+      margin: 0;
+      color: var(--tx-muted-foreground, CanvasText);
+      font-size: var(--tx-font-size-sm, 0.875rem);
     }
 
     .tx-board__count {

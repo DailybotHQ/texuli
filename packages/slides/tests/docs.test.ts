@@ -15,6 +15,7 @@ const SUBPATH_DOCS: Record<string, { doc: string; entry?: string }> = {
   './model': { doc: 'docs/model.md', entry: 'src/model/index.ts' },
   './grammar': { doc: 'docs/grammar.md', entry: 'src/grammar/index.ts' },
   './stage': { doc: 'docs/stage.md', entry: 'src/stage/index.ts' },
+  './stage-core': { doc: 'docs/stage.md', entry: 'src/stage/core.ts' },
   './components': { doc: 'docs/components.md', entry: 'src/registry/index.ts' },
   './layouts': { doc: 'docs/layouts.md', entry: 'src/layouts/index.ts' },
   './export': { doc: 'docs/export.md', entry: 'src/export/index.ts' },
@@ -49,6 +50,22 @@ function propNames(component: string): string[] {
 }
 
 describe('slides documentation', () => {
+  it('keeps the stage-core entry in step with the stage entry, minus the default tables (G72)', () => {
+    const stage = exportedNames(read('src/stage/index.ts'));
+    const core = exportedNames(read('src/stage/core.ts'));
+    const defaultsOnly = [
+      'DECK_DEFAULT_RENDERERS_SOURCE',
+      'DeckPrint',
+      'DeckStage',
+      'loadDefaultDeckRenderers',
+      'loadedDefaultDeckRenderers',
+    ];
+    expect(core).toEqual(stage.filter((name) => !defaultsOnly.includes(name)));
+    expect(read('src/stage/core.ts')).not.toMatch(
+      /from '\.\/(?:defaults\.ts|default-renderers\.ts|DeckStage\.svelte|DeckPrint\.svelte)'/
+    );
+  });
+
   const exportsMap = JSON.parse(read('package.json')).exports as Record<string, unknown>;
   const readme = read('README.md');
 
@@ -76,10 +93,10 @@ describe('slides documentation', () => {
   });
 
   it('documents every stage prop and stylesheet hook', () => {
-    // documents every DeckStage and DeckPrint prop
+    // documents every DeckStage (its core's props) and DeckPrint prop
     {
       const page = read('docs/stage.md');
-      for (const component of ['DeckStage', 'DeckPrint']) {
+      for (const component of ['DeckStageCore', 'DeckPrint']) {
         const props = propNames(component);
         expect(props.length, component).toBeGreaterThan(3);
         expect(

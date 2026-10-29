@@ -12,6 +12,11 @@ export type DateFieldRootProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'
   required?: boolean;
   min?: string;
   max?: string;
+  /**
+   * The typed date as `YYYY-MM-DD`, reported once the month, the day and a
+   * four-digit year make a real date in bounds; `null` while the entry is
+   * incomplete (a partial year never reports `0002-…`).
+   */
   onValueChange?: (value: string | null) => void;
   /**
    * Called once when complete typed text (month, day and a four-digit year)

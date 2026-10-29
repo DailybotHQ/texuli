@@ -6,6 +6,9 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { chainHandlers } from '../../internal/handlers.ts';
 import type { RefProp } from '../../internal/ref.ts';
+import { getMotionSettings } from '../../motion/context.ts';
+import { type MotionProp, resolveComponentMotion } from '../../motion/contract.ts';
+import { createListMotion, createPresenceMotion, loadMotionRuntime } from '../../motion/seam.ts';
 import { getToastStore, type ToastStore } from './toast-store.ts';
 import type { ToastItem, ToastKind } from './types.ts';
 import { type ToasterPosition, toasterClass, toastItemClass } from './variants.ts';
@@ -37,6 +40,12 @@ type OwnProps = {
   mode?: OverlayMode;
   /** The element a `'contained'` stack renders in; it becomes the containing block. */
   container?: Element | null;
+  /**
+   * Motion (`texuli/motion`): new toasts rise in from the stack's edge, a
+   * dismissed one fades out (kept, inert, until it ends) and the stack
+   * reflows (`layout`). `false` for none.
+   */
+  motion?: MotionProp;
 };
 
 /**
@@ -58,6 +67,7 @@ let {
   onpointerleave,
   onfocusin,
   onfocusout,
+  motion,
   ref = $bindable(null),
   ...rest
 }: Props & RefProp = $props();
@@ -100,14 +110,69 @@ function focusOut(event: FocusEvent): void {
 /** A rendered toast; `leaving` keeps a dismissed one mounted for its exit motion. */
 type Rendered = { item: ToastItem; leaving: boolean };
 
-/** Exit motion length; matches `tx-toast-out` in toast.css. */
-const LEAVE_MS = 160;
+/** A leaving toast goes after this even if its exit never reports (ms). */
+const LEAVE_MAX_MS = 1_200;
+const TOAST_MOTION = { enter: 'rise', exit: 'fade', layout: true, duration: 'base' } as const;
 
 let rendered = $state<Rendered[]>(store.items().map((item) => ({ item, leaving: false })));
 const leaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+let listElement = $state<HTMLElement | null>(null);
+const motionSettings = getMotionSettings();
+const presenceMotion = createPresenceMotion({ motion: () => motion, defaults: TOAST_MOTION });
+const stackMotion = createListMotion({
+  motion: () => motion,
+  defaults: TOAST_MOTION,
+  items: () =>
+    Array.from(
+      listElement?.querySelectorAll<HTMLElement>(':scope > [data-toast-id]') ?? [],
+      (element) => [element.getAttribute('data-toast-id') ?? '', element] as const
+    ),
+  // New toasts come in from the stack's edge.
+  enter: () =>
+    resolveComponentMotion(motion, TOAST_MOTION).enter === false
+      ? false
+      : position.startsWith('top')
+        ? 'block-start'
+        : 'block-end',
+});
 
 function reducedMotion(): boolean {
+  if (typeof motionSettings.reducedMotion === 'boolean') return motionSettings.reducedMotion;
   return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/** Whether a dismissed toast plays an exit (else it leaves at once). */
+function exits(): boolean {
+  return (
+    !reducedMotion() &&
+    motionSettings.level !== 'none' &&
+    resolveComponentMotion(motion, TOAST_MOTION).exit !== false
+  );
+}
+
+function dropLeaving(id: string): void {
+  const timer = leaveTimers.get(id);
+  if (timer !== undefined) clearTimeout(timer);
+  leaveTimers.delete(id);
+  rendered = rendered.filter((other) => !(other.leaving && other.item.id === id));
+}
+
+/** Play a leaving toast's exit through the runtime; it leaves when the exit ends. */
+function playExit(id: string): void {
+  void loadMotionRuntime().then(() => {
+    if (!leaveTimers.has(id)) return;
+    const element = listElement?.querySelector<HTMLElement>(
+      `:scope > [data-toast-id="${CSS.escape(id)}"]`
+    );
+    const hold = element ? presenceMotion.exit(element) : null;
+    if (!hold) {
+      dropLeaving(id);
+      return;
+    }
+    void hold.finished.then(() => {
+      if (leaveTimers.has(id)) dropLeaving(id);
+    });
+  });
 }
 
 /**
@@ -118,7 +183,8 @@ function reducedMotion(): boolean {
 function sync(next: readonly ToastItem[]): void {
   const ids = new Set(next.map((item) => item.id));
   const result: Rendered[] = next.map((item) => ({ item, leaving: false }));
-  if (!reducedMotion()) {
+  const started: string[] = [];
+  if (exits()) {
     rendered.forEach((entry, index) => {
       if (ids.has(entry.item.id)) return;
       result.splice(Math.min(index, result.length), 0, { item: entry.item, leaving: true });
@@ -126,11 +192,9 @@ function sync(next: readonly ToastItem[]): void {
         const id = entry.item.id;
         leaveTimers.set(
           id,
-          setTimeout(() => {
-            leaveTimers.delete(id);
-            rendered = rendered.filter((other) => !(other.leaving && other.item.id === id));
-          }, LEAVE_MS)
+          setTimeout(() => dropLeaving(id), LEAVE_MAX_MS)
         );
+        started.push(id);
       }
     });
   }
@@ -143,6 +207,7 @@ function sync(next: readonly ToastItem[]): void {
     }
   }
   rendered = result;
+  for (const id of started) playExit(id);
   // The region leaves the page when it empties, so a pointer or focus inside
   // it never gets its leave event: drop the pause hold with it.
   if (result.length === 0 && (hovered || focused)) {
@@ -162,6 +227,17 @@ $effect(() => {
   };
 });
 
+// Layout: measure the stack before each change, play the reflow (and the
+// entering toasts) after it. Nothing plays for the toasts of the first render.
+$effect.pre(() => {
+  void rendered;
+  untrack(() => stackMotion.measure());
+});
+$effect(() => {
+  void rendered;
+  untrack(() => stackMotion.play());
+});
+
 const offsetValue = $derived(
   offset === undefined ? undefined : typeof offset === 'number' ? `${offset}px` : offset
 );
@@ -175,9 +251,10 @@ const KIND_MARK: Record<ToastKind, string> = {
   warning: '!',
 };
 
-// The store runs the action: the toast always dismisses after it and settles
-// with 'action'. A rejection is rethrown on a microtask so it reaches the
-// host's error reporting (window "error") without leaving the toast stuck.
+// The store runs the action: the toast dismisses after it and settles with
+// 'action'. A rejection is rethrown on a microtask so it reaches the host's
+// error reporting (window "error") without leaving the toast stuck; with
+// `retryOnError` the toast stays with its error so the action can run again.
 function runAction(item: ToastItem): void {
   void store.action(item.id);
 }
@@ -203,7 +280,7 @@ function runAction(item: ToastItem): void {
       active={rendered.length > 0}
     >
       {#if rendered.length > 0}
-        <ol class="tx-toaster__list" data-tx-toast-list>
+        <ol class="tx-toaster__list" data-tx-toast-list bind:this={listElement}>
           {#each rendered as { item, leaving } (item.id)}
             <Toast.Root
               toast={{
@@ -219,6 +296,7 @@ function runAction(item: ToastItem): void {
               class={toastItemClass({ kind: item.kind })}
               data-kind={item.kind}
               data-pending={item.pending ? 'true' : undefined}
+              data-error={item.error ? 'true' : undefined}
               data-leaving={leaving ? 'true' : undefined}
               aria-hidden={leaving ? 'true' : undefined}
               inert={leaving}
@@ -228,6 +306,9 @@ function runAction(item: ToastItem): void {
                 <Toast.Title class="tx-toast__title" />
                 {#if item.description}
                   <Toast.Description class="tx-toast__description" />
+                {/if}
+                {#if item.error}
+                  <p class="tx-toast__error" role="alert">{item.error}</p>
                 {/if}
                 {#if item.action}
                   <Toast.Action

@@ -3,7 +3,7 @@ import { TagsInput, type TagsInputInvalidDetail } from '../src/tags-input/index.
 
 type Props = {
   value?: string[];
-  delimiter?: string | RegExp;
+  delimiter?: string | readonly string[] | RegExp;
   addOnPaste?: boolean;
   addOnBlur?: boolean;
   allowDuplicates?: boolean;

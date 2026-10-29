@@ -45,6 +45,7 @@ export const DateRangePicker: {
 };
 
 export {
+  type DateInvalidDetail,
   type DateInvalidHandler,
   type DateInvalidReason,
   type DatePickerLabels,

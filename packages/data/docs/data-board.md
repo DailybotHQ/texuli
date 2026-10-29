@@ -102,6 +102,31 @@ Example: `data-board-footer`. Test: the "Board column footers and heading
 levels (G14)" block in `packages/data/tests/board.test.ts` (levels 2, 3, 4
 and 6, lanes on and off, one footer per column with its count).
 
+### Column descriptions, header snippet and column-only boards (G67, G69)
+
+- A column's `description` (`BoardColumnDef.description`) renders under its
+  title in the header and describes the column's card lists
+  (`aria-describedby`).
+- `columnHeader` renders in each column header after the title and count
+  (actions, a sort menu, a hint) and receives the column and its card count.
+- **Column-only mode:** omit `getRank` when the host keeps no order field.
+  Cards keep the order of `items`, a move goes to another column (dropping
+  in place is fine; reordering inside a column is refused and announced,
+  through the engine rule `MoveRules.reorder: false`), and a move settles as
+  soon as the item reports its new column. `onMove` still receives a `rank`
+  (derived from the `items` order), which the host may ignore.
+
+```svelte
+<Board columns={[{ id: 'todo', title: 'To do', description: 'Not started yet.' }, …]}
+  items={tickets} getId={(t) => t.id} getColumn={(t) => t.column} {onMove}>
+  {#snippet card(ticket)}<span>{ticket.title}</span>{/snippet}
+  {#snippet columnHeader(column, { count })}<button type="button">Sort {column.title}</button>{/snippet}
+</Board>
+```
+
+Test: the "Board column descriptions, header snippet and column-only mode
+(G67, G69)" block in `packages/data/tests/board.test.ts`.
+
 ## Keyboard map
 
 Focus a card's handle (announced as `Drag <card>`), then:
@@ -135,3 +160,13 @@ Uses `--tx-border`, `--tx-foreground`, `--tx-surface`, `--tx-muted`,
 `--tx-warning`, `--tx-danger`, `--tx-ring`, `--tx-shadow-soft` and the
 `--tx-radius-*` scale, with system-color fallbacks and a `forced-colors: active`
 block.
+
+## Motion
+
+`motion` (`layout` on by default): when `items` changes (a committed move,
+an insert or a removal) the cards glide from where they were to their new
+place (FLIP through `texuli/motion` on `@texuli/core/motion`,
+[ui-motion](../../texuli/docs/ui-motion.md)). Nothing plays on the first
+render; reduced motion, a `MotionProvider` level of `none` and
+`motion={false}` commit at once. Drag previews are not animated by it.
+Tests: `packages/data/tests/motion.test.ts`, `tests/behavior/motion.spec.ts`.

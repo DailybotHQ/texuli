@@ -5,6 +5,7 @@ import type { Placement } from '@texuli/core/position-math';
 import { createRovingFocus } from '@texuli/core/roving';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { createMotionHold, type OverlayMotionHooks } from '../internal/motion-hold.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { type MenuLevel, menuItems } from './context.ts';
 import { pointInPolygon } from './grace.ts';
@@ -13,6 +14,11 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   level: MenuLevel;
   placement: Placement;
   sideOffset: number;
+  /**
+   * Enter and exit motion (texuli passes `texuli/motion` hooks): while the
+   * exit plays, the closed menu stays mounted, inert, out of the layer stack.
+   */
+  motionHooks?: OverlayMotionHooks;
   children?: Snippet;
 } & RefProp;
 
@@ -23,6 +29,7 @@ let {
   children,
   onkeydown,
   onpointermove,
+  motionHooks,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
@@ -34,6 +41,35 @@ $effect(() => {
 });
 
 let content: HTMLElement | undefined;
+let controller: OverlayController | undefined;
+let held = $state(false);
+// Open when it is created (first render, hydration): no enter animation.
+let appeared = untrack(() => level.open);
+let wasOpen = untrack(() => level.open);
+const hold = createMotionHold(
+  () => motionHooks,
+  (next) => (held = next)
+);
+// Before the DOM update: a closing menu is still mounted when its exit starts.
+$effect.pre(() => {
+  const open = level.open;
+  untrack(() => {
+    if (open === wasOpen) return;
+    wasOpen = open;
+    if (!open) {
+      appeared = false;
+      // Held: leave the layer stack and dismissal now; the unmount hides it.
+      if (hold.begin(content)) controller?.close();
+      return;
+    }
+    if (!hold.held() || !content) return;
+    // Reopened during its exit: the same element opens again.
+    controller?.open();
+    focusIntent(content);
+    hold.enter(content);
+  });
+});
+$effect(() => () => hold.cancel());
 const roving = createRovingFocus({
   items: () => menuItems(content),
   orientation: 'vertical',
@@ -75,7 +111,7 @@ function mount(node: HTMLElement): () => void {
   const trigger = level.triggerElement;
   const rtl = !!trigger && getComputedStyle(trigger).direction === 'rtl';
   const side = level.isSub && rtl ? (placement.replace('right', 'left') as Placement) : placement;
-  const controller: OverlayController = createOverlayCore(
+  const overlay: OverlayController = createOverlayCore(
     {
       element: node,
       ...(trigger ? { anchor: trigger } : {}),
@@ -89,6 +125,7 @@ function mount(node: HTMLElement): () => void {
       dismiss: { escape: true, pointerOutside: true, focusOutside: false },
       branches: () => [level.triggerElement, ...level.childContents()],
       label: level.isSub ? 'submenu' : 'menu',
+      presence: { isMotionPending: hold.isMotionPending },
       onDismissRequest(request) {
         // The menu closes itself: Escape returns focus to the trigger, an outside press does not.
         request.preventDefault();
@@ -105,11 +142,15 @@ function mount(node: HTMLElement): () => void {
     // Positioning only: a menu is not modal, so no focus trap, inert or scroll lock.
     { position: positionFloating }
   );
-  level.registerContent(node, controller);
-  controller.open();
+  controller = overlay;
+  level.registerContent(node, overlay);
+  overlay.open();
   focusIntent(node);
+  if (appeared) appeared = false;
+  else hold.enter(node);
   return () => {
-    controller.destroy();
+    overlay.destroy();
+    if (controller === overlay) controller = undefined;
     level.registerContent(undefined);
     content = undefined;
   };
@@ -175,7 +216,7 @@ function handlePointerLeave(event: PointerEvent & { currentTarget: HTMLDivElemen
 }
 </script>
 
-{#if level.open}
+{#if level.open || held}
   <div bind:this={ref}
     {...rest}
     id={level.contentId}
@@ -183,7 +224,8 @@ function handlePointerLeave(event: PointerEvent & { currentTarget: HTMLDivElemen
     aria-labelledby={level.triggerId}
     aria-orientation="vertical"
     tabindex="-1"
-    data-state="open"
+    data-state={level.open ? 'open' : 'closed'}
+    inert={!level.open || undefined}
     popover="manual"
     onkeydown={handleKeydown}
     onpointermove={handlePointerMove}

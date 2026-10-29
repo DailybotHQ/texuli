@@ -440,6 +440,40 @@ describe('tags-input', () => {
       expect(status()).toBe('You can add up to 3 tags');
     });
 
+    it('adds a tag on any of several delimiter keys, or on keys a RegExp matches (G61)', async () => {
+      const cases: Array<{
+        delimiter: string | readonly string[] | RegExp;
+        keys: string[];
+        ignored: string[];
+      }> = [
+        { delimiter: [',', ';', ' '], keys: [',', ';', ' '], ignored: ['|', 'a'] },
+        { delimiter: /[;\s]/g, keys: [';', ' '], ignored: [',', 'a'] },
+        { delimiter: ',', keys: [','], ignored: [';', ' '] },
+      ];
+      for (const { delimiter, keys, ignored } of cases) {
+        render(TagsInputFixture, { props: { value: [], delimiter } });
+        for (const [index, key] of keys.entries()) {
+          await type(`t${index}`);
+          const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+          input().dispatchEvent(event);
+          await tick();
+          expect(event.defaultPrevented, `${String(delimiter)} ${JSON.stringify(key)}`).toBe(true);
+        }
+        expect(tagNames(), String(delimiter)).toEqual(keys.map((_, index) => `t${index}`));
+        for (const key of ignored) {
+          const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+          input().dispatchEvent(event);
+          expect(event.defaultPrevented, `${String(delimiter)} ignores ${key}`).toBe(false);
+        }
+        cleanup();
+      }
+      // Pasted text splits on every delimiter of the list.
+      render(TagsInputFixture, { props: { value: [], delimiter: [';', ' '] } });
+      paste('a;b c');
+      await tick();
+      expect(tagNames()).toEqual(['a', 'b', 'c']);
+    });
+
     it('splits pasted text into tags, after what was already typed', async () => {
       render(TagsInputFixture);
       await type('mob');
@@ -937,6 +971,29 @@ describe('date-field', () => {
       expect(onInvalid).toHaveBeenCalledTimes(2);
     });
 
+    it('reports a value only once the year has four digits, never 0002-… (G65)', async () => {
+      const onValueChange = vi.fn();
+      const view = render(DateField.Root, {
+        props: { value: null, locale: 'en-US', label: 'Due', onValueChange },
+      });
+      const segment = (name: string) => screen.getByRole('spinbutton', { name });
+      await fireEvent.input(segment('Month'), { target: { value: '3' } });
+      await fireEvent.input(segment('Day'), { target: { value: '10' } });
+      for (const partial of ['2', '20', '202']) {
+        await fireEvent.input(segment('Year'), { target: { value: partial } });
+      }
+      expect(onValueChange).not.toHaveBeenCalled();
+      await fireEvent.input(segment('Year'), { target: { value: '2026' } });
+      expect(onValueChange.mock.calls).toEqual([['2026-03-10']]);
+      // Retyping the year clears the value until it is complete again.
+      await fireEvent.input(segment('Year'), { target: { value: '2' } });
+      expect(onValueChange.mock.calls.at(-1)).toEqual([null]);
+      await fireEvent.input(segment('Year'), { target: { value: '0999' } });
+      expect(onValueChange.mock.calls.at(-1)).toEqual(['0999-03-10']);
+      expect(onValueChange.mock.calls.flat()).not.toContain('0002-03-10');
+      view.unmount();
+    });
+
     it('spins time segments with the arrow keys: minute steps wrap, hours cross AM/PM', async () => {
       const onValueChange = vi.fn();
       render(TimeField.Root, {
@@ -1083,7 +1140,7 @@ describe('date-picker', () => {
       await fireEvent.click(day('Monday, March 2, 2026'));
       await fireEvent.click(day('Friday, March 20, 2026'));
       await settle();
-      expect(onInvalid).toHaveBeenCalledWith('2026-03-02/2026-03-20', 'too-long');
+      expect(onInvalid).toHaveBeenCalledWith('2026-03-02/2026-03-20', 'too-long', { side: 'end' });
       expect(state().range).toEqual({ start: '2026-03-02', end: null });
       expect(within(dialog).getByRole('status').textContent).toBe(
         'Choose a range of 7 days or fewer.'
@@ -1105,8 +1162,40 @@ describe('date-picker', () => {
         target: { value: '20' },
       });
       await settle();
-      expect(onInvalid).toHaveBeenCalledWith('2026-03-10/2026-03-20', 'too-long');
+      expect(onInvalid).toHaveBeenCalledWith('2026-03-10/2026-03-20', 'too-long', { side: 'end' });
       expect(state().range).toEqual({ start: '2026-03-10', end: '2026-03-12' });
+    });
+
+    it('marks both fields required and says which side caused a refusal (G66)', async () => {
+      const onInvalid = vi.fn();
+      render(DatePickerHarness, {
+        props: {
+          range: { start: '2026-03-10', end: '2026-03-12' },
+          maxDays: 5,
+          required: true,
+          onInvalid,
+        },
+      });
+      const stay = screen.getByRole('group', { name: 'Stay' });
+      const segments = within(stay).getAllByRole('spinbutton');
+      expect(segments).toHaveLength(6);
+      for (const segment of segments) expect(segment.hasAttribute('required')).toBe(true);
+      const side = (name: 'Start date' | 'End date', segment: string) =>
+        within(within(stay).getByRole('group', { name })).getByRole('spinbutton', {
+          name: segment,
+        });
+      const cases: Array<[HTMLElement, string, unknown[]]> = [
+        [side('Start date', 'Day'), '31', ['3/31/2026', 'out-of-range', { side: 'start' }]],
+        [side('Start date', 'Day'), '1', ['2026-03-01/2026-03-12', 'too-long', { side: 'start' }]],
+        [side('End date', 'Month'), '2', ['2/12/2026', 'out-of-range', { side: 'end' }]],
+        // The refused month stays typed: February 30 does not exist.
+        [side('End date', 'Day'), '30', ['2/30/2026', 'invalid', { side: 'end' }]],
+      ];
+      for (const [segment, typed, expected] of cases) {
+        await fireEvent.input(segment, { target: { value: typed } });
+        await settle();
+        expect(onInvalid.mock.calls.at(-1), expected.join(' ')).toEqual(expected);
+      }
     });
   });
 

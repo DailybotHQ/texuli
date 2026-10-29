@@ -44,6 +44,8 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onchange'> & {
   previousLabel?: string;
   nextLabel?: string;
   onValueChange?: (value: CalendarDate) => void;
+  /** The focused day moved (arrow keys, paging, a pick, the month buttons). */
+  onFocusedValueChange?: (value: CalendarDate) => void;
   child?: ChildSnippet<Record<string, unknown>>;
   children?: Snippet;
 } & RefProp;
@@ -66,6 +68,7 @@ let {
   previousLabel = 'Previous month',
   nextLabel = 'Next month',
   onValueChange,
+  onFocusedValueChange,
   child,
   children,
   ref = $bindable(null),
@@ -126,8 +129,10 @@ function firstEnabledFocus(date: CalendarDate): CalendarDate {
 
 function updateFocus(date: CalendarDate): void {
   if (isDisabledDate(date)) return;
+  const changed = currentFocus.compare(date) !== 0;
   if (focusedValue !== undefined) focusedValue = date;
   else localFocusedValue = date;
+  if (changed) onFocusedValueChange?.(date);
 }
 
 function updateValue(date: CalendarDate): void {

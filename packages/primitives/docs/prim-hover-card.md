@@ -31,3 +31,7 @@ Validation:
 TEXULI_E2E_PORT=4870 pnpm exec playwright test tests/behavior/scenarios/hover-card.spec.ts
 pnpm --filter @texuli/primitives typecheck
 ```
+
+## Motion hooks
+
+The content takes `motionHooks` (enter and exit, the closed part held `inert` while its exit plays); see [prim-dialog](prim-dialog.md#motion-hooks).

@@ -9,7 +9,9 @@
 import { applyColorMode, type ColorMode } from '@texuli/tokens/modes';
 import { appearanceCacheKey } from '@texuli/tokens/no-flash';
 import {
+  APPEARANCE_CHANGE_EVENT,
   APPEARANCE_CHOICES,
+  type AppearanceChangeDetail,
   type AppearanceChoice,
   applyAppearanceChoice,
   readAppearanceChoice,
@@ -29,6 +31,8 @@ type Props = {
   labels?: Partial<Record<AppearanceChoice, string>>;
   /** Called after a choice is stored and applied. */
   onValueChange?: (choice: AppearanceChoice) => void;
+  /** `md` (default) or `sm`, a compact segmented control for toolbars and headers. */
+  size?: 'sm' | 'md';
   class?: string;
 };
 
@@ -39,6 +43,7 @@ let {
   label = 'Appearance',
   labels,
   onValueChange,
+  size = 'md',
   class: className,
 }: Props = $props();
 
@@ -64,8 +69,19 @@ $effect(() => {
     choice = next;
     applyColorMode(document.documentElement, next === 'system' ? fallbackMode : next);
   };
+  // The same tab changed it (another switcher, a command palette): follow the radios.
+  // `applyAppearanceChoice` already wrote the cache and the root.
+  const onChange = (event: Event) => {
+    const detail = (event as CustomEvent<AppearanceChangeDetail>).detail;
+    if (detail?.namespace !== namespace) return;
+    choice = readAppearanceChoice(namespace);
+  };
   addEventListener('storage', onStorage);
-  return () => removeEventListener('storage', onStorage);
+  addEventListener(APPEARANCE_CHANGE_EVENT, onChange);
+  return () => {
+    removeEventListener('storage', onStorage);
+    removeEventListener(APPEARANCE_CHANGE_EVENT, onChange);
+  };
 });
 
 // While System is chosen and the fallback follows the OS, follow it live.
@@ -97,6 +113,7 @@ function choose(next: AppearanceChoice): void {
   aria-labelledby={labelId}
   class={['tx-astro-appearance', className].filter(Boolean).join(' ')}
   data-tx-appearance={choice ?? ''}
+  data-size={size === 'sm' ? 'sm' : 'md'}
 >
   <span id={labelId} class="tx-astro-appearance__label">{label}</span>
   {#each APPEARANCE_CHOICES as option (option)}
@@ -123,7 +140,6 @@ function choose(next: AppearanceChoice): void {
     border-radius: calc(var(--tx-radius, 0.5rem) + 0.125rem);
     background: var(--tx-surface, transparent);
     color: var(--tx-foreground, inherit);
-    font: inherit;
   }
 
   .tx-astro-appearance__label {
@@ -153,6 +169,12 @@ function choose(next: AppearanceChoice): void {
     margin: 0;
     opacity: 0;
     cursor: pointer;
+  }
+
+  .tx-astro-appearance[data-size='sm'] .tx-astro-appearance__option {
+    min-block-size: 1.5rem;
+    padding-block: 0.125rem;
+    padding-inline: 0.5rem;
   }
 
   .tx-astro-appearance__option:has(input:checked) {

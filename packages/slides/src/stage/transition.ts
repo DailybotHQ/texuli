@@ -10,13 +10,15 @@
  *   pairs elements that carry the same `data-tx-deck-morph-id` on both
  *   slides (auto-animate). Durations come from the resolved transition.
  * - **CSS fallback** otherwise: the stage marks the incoming slide
- *   (`data-tx-deck-enter`) and `styles.css` animates it.
+ *   (`data-tx-deck-enter`) and plays its entrance through
+ *   `@texuli/core/motion` (`motion.ts`, ADR-013).
  * - **Cut** for `none` (motion `none`, or the author's choice).
  *
  * Names and timing are set through the CSSOM (never a `style` attribute),
  * so the stage stays inside a strict style CSP.
  */
 import type { ResolvedTransition } from '@texuli/deck/engine';
+import { DECK_TRANSITION_EASING, loadStageMotion } from './motion-capture.ts';
 
 export type DeckTransitionMode = 'view-transition' | 'css' | 'cut';
 export type DeckTransitionDirection = 'forward' | 'backward';
@@ -146,6 +148,11 @@ export interface PlayDeckTransitionOptions {
   from?: () => SlideElement | null | undefined;
   to?: () => SlideElement | null | undefined;
   rtl?: boolean;
+  /**
+   * The viewer's reduced motion: the snapshots keep the deck's 150 ms
+   * opacity-only fade (the runtime's `fade` policy, ADR-013).
+   */
+  reducedMotion?: boolean;
 }
 
 export interface PlayedDeckTransition {
@@ -207,25 +214,48 @@ export function playDeckTransition(options: PlayDeckTransitionOptions): PlayedDe
   }
 
   const root = doc?.documentElement;
-  const timing = { duration: resolved.durationMs, easing: 'cubic-bezier(0.2, 0, 0, 1)' };
+  // The runtime plans the timing (clamp, reduced-motion fade) from the live
+  // incoming slide; a host without one keeps the resolved values.
+  const probe = (): Element | null => {
+    const element = options.to?.() ?? null;
+    return element && typeof (element as unknown as Partial<Element>).getRootNode === 'function'
+      ? (element as unknown as Element)
+      : null;
+  };
   void Promise.resolve(transition.ready)
-    .then(() => {
+    // By now the incoming slide is live; the runtime half is warm (the stage preloads it).
+    .then(() => (probe() ? loadStageMotion() : null))
+    .then((motion) => {
       if (typeof root?.animate !== 'function') return;
       const frames = transitionKeyframes(
         resolved.name === 'morph' ? 'fade' : resolved.name,
         options.direction,
         options.rtl
       );
-      root.animate(frames.old, {
-        ...timing,
-        fill: 'both',
-        pseudoElement: `::view-transition-old(${slideName})`,
-      });
-      root.animate(frames.new, {
-        ...timing,
-        fill: 'both',
-        pseudoElement: `::view-transition-new(${slideName})`,
-      });
+      const live = probe();
+      const reduced = options.reducedMotion === true;
+      const plan = (keyframes: Keyframe[]) =>
+        live && motion
+          ? motion.snapshotPlan(live, keyframes, resolved, reduced)
+          : { keyframes, duration: resolved.durationMs, easing: DECK_TRANSITION_EASING };
+      const old = plan(frames.old);
+      const next = plan(frames.new);
+      if (old) {
+        root.animate(old.keyframes, {
+          duration: old.duration,
+          easing: old.easing,
+          fill: 'both',
+          pseudoElement: `::view-transition-old(${slideName})`,
+        });
+      }
+      if (next) {
+        root.animate(next.keyframes, {
+          duration: next.duration,
+          easing: next.easing,
+          fill: 'both',
+          pseudoElement: `::view-transition-new(${slideName})`,
+        });
+      }
     })
     .catch(() => undefined);
 

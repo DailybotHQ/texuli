@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
-import { createRawSnippet, flushSync } from 'svelte';
+import { createRawSnippet, flushSync, tick } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Alert from '../src/components/alert/Alert.svelte';
 import { alertRole } from '../src/components/alert/tones.ts';
@@ -121,6 +121,25 @@ describe('avatar', () => {
       const root = await screen.findByRole('img', { name: 'Ada Example' });
       expect(root.querySelector('img')).toBeNull();
       expect(root.textContent).toContain('AE');
+    });
+  });
+
+  describe('Avatar image state (G58)', () => {
+    it('reports data-avatar="initials" once the image fails, and for a refused src', async () => {
+      for (const [src, fails, expected] of [
+        ['https://cdn.example/ada.webp', true, 'initials'],
+        ['https://cdn.example/ada.webp', false, 'image'],
+        ['javascript:alert(1)', false, 'initials'],
+        [null, false, 'initials'],
+      ] as const) {
+        const view = render(AvatarFixture, { props: { name: 'Ada Example', src } });
+        const root = view.container.querySelector('[data-tx-avatar]') as HTMLElement;
+        const img = root.querySelector('img');
+        if (fails) await fireEvent.error(img as HTMLImageElement);
+        await tick();
+        expect(root.dataset.avatar, `${src} ${fails}`).toBe(expected);
+        cleanup();
+      }
     });
   });
 
@@ -405,6 +424,35 @@ describe('card', () => {
         hostile.container.querySelector('[data-tx-card-grid]')?.getAttribute('style') ?? '';
       expect(style).toContain('16rem');
       expect(style).not.toContain('color');
+    });
+
+    it('G62: takes free gap values (validated) and merges a caller style with the grid template', () => {
+      const cases: Array<[string, string | null]> = [
+        ['0.75rem', '--tx-card-grid-gap: 0.75rem'],
+        ['12px', '--tx-card-grid-gap: 12px'],
+        ['0', '--tx-card-grid-gap: 0'],
+        ['xl', '--tx-card-grid-gap: 2rem'],
+        ['--tx-spacing-gutter', '--tx-card-grid-gap: var(--tx-spacing-gutter)'],
+        ['1rem; color: red', null],
+        ['url(x)', null],
+        ['--evil); color: red', null],
+      ];
+      for (const [gap, expected] of cases) {
+        const view = render(CardGrid, { props: { gap, children: text('c') } });
+        const style =
+          view.container.querySelector('[data-tx-card-grid]')?.getAttribute('style') ?? '';
+        if (expected) expect(style, gap).toContain(expected);
+        else expect(style, gap).not.toContain('--tx-card-grid-gap');
+        expect(style, gap).not.toContain('color');
+        view.unmount();
+      }
+      const styled = render(CardGrid, {
+        props: { style: 'margin-block: 2rem', maxColumns: 2, children: text('c') },
+      });
+      const style =
+        styled.container.querySelector('[data-tx-card-grid]')?.getAttribute('style') ?? '';
+      expect(style).toContain('grid-template-columns: repeat(auto-fill');
+      expect(style).toContain('margin-block: 2rem');
     });
 
     it('G43: caps the columns with maxColumns and ignores invalid caps', () => {

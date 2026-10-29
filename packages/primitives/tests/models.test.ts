@@ -36,7 +36,7 @@ import {
   type SplitterStorage,
   saveLayout,
 } from '../src/splitter/index.ts';
-import { addTags, splitTags } from '../src/tags-input/index.ts';
+import { addTags, isDelimiterKey, splitTags } from '../src/tags-input/index.ts';
 import { createToastManager } from '../src/toast/manager.ts';
 import { createTooltipDelayGroup } from '../src/tooltip/delay-group.ts';
 import { assertUniqueTreeIds, getTreeWindow } from '../src/tree/model.ts';
@@ -574,6 +574,17 @@ describe('tags-input', () => {
       expect(splitTags('a\nb\r\nc', ',')).toEqual(['a', 'b', 'c']);
       expect(splitTags('a; b|c', /[;|]/)).toEqual(['a', 'b', 'c']);
       expect(splitTags('   ', ',')).toEqual([]);
+      // A list of delimiters (G61): any of them splits, regex characters are literal.
+      expect(splitTags('a; b c|d.e', [';', ' ', '|'])).toEqual(['a', 'b', 'c', 'd.e']);
+      expect(splitTags('a.b', ['.'])).toEqual(['a', 'b']);
+      expect(splitTags('a,b', [])).toEqual(['a,b']);
+      expect(isDelimiterKey(' ', [',', ' '])).toBe(true);
+      expect(isDelimiterKey(';', /[;\s]/g)).toBe(true);
+      // A global RegExp keeps answering the same (no lastIndex drift).
+      expect(isDelimiterKey(';', /[;\s]/g)).toBe(true);
+      expect(isDelimiterKey('Enter', /\w+/)).toBe(false);
+      expect(isDelimiterKey(';', ',')).toBe(false);
+      expect(isDelimiterKey(',', ', ')).toBe(false);
     });
 
     it('accepts in order and explains every refusal', () => {

@@ -7,6 +7,8 @@ import * as DialogPrimitive from '@texuli/primitives/dialog';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { MotionProp } from '../../motion/contract.ts';
+import { createOverlayMotion } from '../../motion/seam.ts';
 import { Icon } from '../icons/index.ts';
 import {
   type DialogSize,
@@ -64,6 +66,12 @@ type OwnProps = {
    * focus where it is (move it yourself to redirect).
    */
   onCloseAutoFocus?: (event: FocusRestoreEvent) => void;
+  /**
+   * Enter and exit motion (`texuli/motion`): default a scale-and-fade on the
+   * panel and a fade on the backdrop; `false` for none. Reduced motion and a
+   * `MotionProvider` level of `none` make it instant.
+   */
+  motion?: MotionProp;
   /** The dialog content element while open, `null` while closed (bindable). */
   ref?: HTMLElement | null;
 };
@@ -89,9 +97,19 @@ let {
   container = null,
   onDismissRequest,
   onCloseAutoFocus,
+  motion,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+const panelMotion = createOverlayMotion({
+  motion: () => motion,
+  defaults: { enter: 'scale', exit: 'scale', duration: 'base' },
+});
+const backdropMotion = createOverlayMotion({
+  motion: () => (motion === false ? false : { duration: motion?.duration ?? 'base' }),
+  defaults: { enter: 'fade', exit: 'fade' },
+});
 
 function bindRef(node: HTMLElement): () => void {
   ref = node;
@@ -131,13 +149,18 @@ function setOpen(next: boolean): void {
     </DialogPrimitive.Trigger>
   {/if}
   <DialogPrimitive.Portal to={portal}>
-    <DialogPrimitive.Overlay class={dialogOverlayClass()} data-tx-dialog-overlay="" />
+    <DialogPrimitive.Overlay
+      class={dialogOverlayClass()}
+      data-tx-dialog-overlay=""
+      motionHooks={backdropMotion}
+    />
     <DialogPrimitive.Content
       {...rest}
       class={contentClass}
       data-tx-dialog=""
       data-size={size}
       data-state={open ? 'open' : 'closed'}
+      motionHooks={panelMotion}
       {@attach bindRef}
     >
       <div class={dialogHeaderClass()} data-tx-dialog-header="">

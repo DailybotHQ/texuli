@@ -2,7 +2,7 @@ import type { Snippet } from 'svelte';
 import type { HTMLAttributes, HTMLButtonAttributes, HTMLInputAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
 import type { TagsInputLabels } from './labels.ts';
-import type { TagRejection } from './tags.ts';
+import type { TagDelimiter, TagRejection } from './tags.ts';
 
 type Part<Attributes> = Omit<Attributes, 'children'> & {
   child?: ChildSnippet<Record<string, unknown>>;
@@ -22,8 +22,13 @@ export interface TagsInputRootProps extends Omit<HTMLAttributes<HTMLDivElement>,
   onValueChange?: (value: string[]) => void;
   /** Called for every tag that is refused, with the reason. */
   onInvalid?: (detail: TagsInputInvalidDetail) => void;
-  /** Splits typed and pasted text. A one-character string also adds a tag when typed. Default `,`. */
-  delimiter?: string | RegExp;
+  /**
+   * Splits typed and pasted text: a string, several strings (any of them,
+   * e.g. `[',', ';', ' ']`) or a RegExp. Typing a one-character delimiter of
+   * the string or list, or a character the RegExp matches, adds the draft as
+   * a tag. Default `,`.
+   */
+  delimiter?: TagDelimiter;
   /** Split pasted text into tags. Default `true`. */
   addOnPaste?: boolean;
   /** Add the typed text when the input loses focus. Default `false`. */

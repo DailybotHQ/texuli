@@ -11,7 +11,15 @@ import TagRemove from './TagsInputTagRemove.svelte';
 export const TagsInput = { Root, List, Tag, TagRemove, Input };
 
 export { DEFAULT_TAGS_INPUT_LABELS, type TagsInputLabels } from './labels.ts';
-export { addTags, splitTags, type TagDecision, type TagRejection, type TagRules } from './tags.ts';
+export {
+  addTags,
+  isDelimiterKey,
+  splitTags,
+  type TagDecision,
+  type TagDelimiter,
+  type TagRejection,
+  type TagRules,
+} from './tags.ts';
 export type {
   TagsInputInputProps,
   TagsInputInvalidDetail,

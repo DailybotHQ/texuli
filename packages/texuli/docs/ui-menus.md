@@ -74,3 +74,10 @@ Shared chrome: items with optional `icon` snippet and `shortcut` string (rendere
 ```
 
 Styles live in `@layer tx.components`. Logical properties; forced-colors borders. Shortcuts are visual only — register real keybindings in the host.
+
+## Motion
+
+`motion` on every menu content (`DropdownMenu`, `ContextMenu`, `Menubar` and
+submenus): a quick scale in and fade out through `@texuli/core/motion`
+([ui-motion](ui-motion.md)). A closing menu leaves the layer stack and stops
+dismissing at once, and stays mounted, inert, only while its exit plays.

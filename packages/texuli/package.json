@@ -260,6 +260,11 @@
       "svelte": "./src/components/menus/index.ts",
       "default": "./src/components/menus/index.ts"
     },
+    "./motion": {
+      "types": "./src/motion/index.ts",
+      "svelte": "./src/motion/index.ts",
+      "default": "./src/motion/index.ts"
+    },
     "./navigation": {
       "types": "./src/components/navigation/index.ts",
       "svelte": "./src/components/navigation/index.ts",

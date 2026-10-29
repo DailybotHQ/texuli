@@ -7,6 +7,8 @@ import * as AlertDialogPrimitive from '@texuli/primitives/alert-dialog';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { MotionProp } from '../../motion/contract.ts';
+import { createOverlayMotion } from '../../motion/seam.ts';
 import { buttonVariants } from '../button/index.ts';
 import {
   alertDialogActionsClass,
@@ -69,6 +71,11 @@ type OwnProps = {
    * focus where it is (move it yourself to redirect).
    */
   onCloseAutoFocus?: (event: FocusRestoreEvent) => void;
+  /**
+   * Enter and exit motion (`texuli/motion`): default a scale-and-fade on the
+   * panel and a fade on the backdrop; `false` for none.
+   */
+  motion?: MotionProp;
   /** The alert dialog content element while open, `null` while closed (bindable). */
   ref?: HTMLElement | null;
 };
@@ -96,9 +103,19 @@ let {
   container = null,
   onDismissRequest,
   onCloseAutoFocus,
+  motion,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+const panelMotion = createOverlayMotion({
+  motion: () => motion,
+  defaults: { enter: 'scale', exit: 'scale', duration: 'base' },
+});
+const backdropMotion = createOverlayMotion({
+  motion: () => (motion === false ? false : { duration: motion?.duration ?? 'base' }),
+  defaults: { enter: 'fade', exit: 'fade' },
+});
 
 function bindRef(node: HTMLElement): () => void {
   ref = node;
@@ -183,7 +200,11 @@ function cancel(): void {
     </AlertDialogPrimitive.Trigger>
   {/if}
   <AlertDialogPrimitive.Portal to={portal}>
-    <AlertDialogPrimitive.Overlay class={dialogOverlayClass()} data-tx-alert-dialog-overlay="" />
+    <AlertDialogPrimitive.Overlay
+      class={dialogOverlayClass()}
+      data-tx-alert-dialog-overlay=""
+      motionHooks={backdropMotion}
+    />
     <AlertDialogPrimitive.Content
       {...rest}
       class={contentClass}
@@ -191,6 +212,7 @@ function cancel(): void {
       data-destructive={destructive ? 'true' : undefined}
       data-state={open ? 'open' : 'closed'}
       aria-busy={pending || undefined}
+      motionHooks={panelMotion}
       {@attach bindRef}
     >
       <div class="tx-alert-dialog__row">

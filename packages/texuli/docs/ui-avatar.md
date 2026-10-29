@@ -36,6 +36,10 @@ The root uses `role="img"` with an accessible name (`Name` or `Name, Online`).
 Decorative avatars set `aria-hidden` and omit the name (pair them with visible
 text). Status is a small corner dot; forced-colors maps it to system colors.
 
+The root's `data-avatar` says what shows: `image` while an image is loading
+or loaded, and `initials` without `src`, for a `src` the URL policy refused,
+and after the image fails to load (host styles can key off it).
+
 **Initials contrast.** Initials are always `--tx-foreground` on `--tx-muted`.
 The token engine's AA gate guarantees that pair at 4.5:1 or better, and a unit
 test checks it in all 210 library themes, light and dark. The seeded tone

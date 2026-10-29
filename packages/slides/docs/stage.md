@@ -1,6 +1,6 @@
 # Stage: DeckStage and DeckPrint
 
-**Import:** `@texuli/slides/stage`  
+**Import:** `@texuli/slides/stage` (and `@texuli/slides/stage-core`, below)  
 **Source:** `packages/slides/src/stage/`  
 **Tests:** `tests/stage.test.ts` (input, canvas, routing, keys, pointer,
 transitions, i18n, steps, renderers, style, hooks, themes),
@@ -43,6 +43,7 @@ scoped styles.
 | `locale` / `dir` | `meta.locale` / `meta.dir` | Override the `lang` and `dir` of the stage |
 | `plugins` | `[]` | Engine plugins (`beforeNavigate`, `beforeRender`/`afterRender`, `onAction`, …), in order |
 | `renderers` | — | Renderer tables, first answer wins (`DeckRenderers`: layouts, components, backgrounds, custom slides, and the free-slide block check `validateBlock`) |
+| `defaults` | built-in (`DeckStage`), none (`DeckStageCore`) | The `DeckDefaultRenderersSource` the tables come from. `DeckStage` sets it; on `DeckStageCore` leave it unset (the stage then never references the defaults) |
 | `defaultRenderers` | `true` | Append the default tables (the 20 catalog layouts and the component registry) after `renderers`. They are imported on first use (`loadDefaultDeckRenderers`), so the first stage on a page shows a polite loading status (`aria-busy`) for one chunk; await `loadDefaultDeckRenderers()` before mounting to paint at once. `false` leaves every slide to the host's tables: none of the defaults' code is in the stage's initial graph and nothing of them loads (no lazy chunk, CSS or prefetch), component ids are the host's to check, and a slide no table answers shows a labelled placeholder |
 | `autofocus` | `false` | Focus the active slide on mount |
 | `namespace` | a unique id | Instance namespace: presenter channel, view-transition names and the first-visit hint |
@@ -152,7 +153,36 @@ scoped styles.
   earlier shape (Texuli v1, a grammar tree, a Protoyard deck) and validates
   it once that import arrives; if the import fails, the deck is refused
   ("The deck could not be migrated."). A v2 deck never loads the migration
-  code.
+  code. `loadDeckMigration()` imports it once (later calls share the import;
+  it never rejects: a failed import resolves to `null` and is retried by the
+  next call) and `loadedDeckMigration()` returns it synchronously once
+  loaded, so a host with an earlier-shape deck awaits `loadDeckMigration()`
+  before mounting and the first stage paints without its loading status
+  (G73). It is the stage's own cache, so it lives here rather than in
+  `@texuli/deck` (whose `migrateDeck` is a plain synchronous import).
+- **Stage core (`@texuli/slides/stage-core`, G72):** `DeckStageCore` is the
+  whole stage without any reference to the default tables: `DeckStage` is
+  `DeckStageCore` with `defaults` set to `DECK_DEFAULT_RENDERERS_SOURCE`
+  (a `DeckDefaultRenderersSource`: `load()` and `loaded()`, the two loaders
+  above). Without `defaults` the core behaves as `defaultRenderers={false}`,
+  and a host build that imports only `@texuli/slides/stage-core` emits no
+  chunk, CSS or prefetch of the layouts table, the component registry or
+  its catalog outline, not even as a lazy chunk (`tests/bundle-graph.test.ts`,
+  "emits no default-table chunk at all"). Its server preload
+  (`#deck-ssr-core`) loads the built-in block support, `migrateDeck` and the
+  block families, never the default tables. `@texuli/slides/stage-core`
+  exports the same names as `@texuli/slides/stage` except `DeckStage`,
+  `DeckPrint`, `DECK_DEFAULT_RENDERERS_SOURCE`, `loadDefaultDeckRenderers`
+  and `loadedDefaultDeckRenderers` (a test keeps the two lists in step).
+
+  ```svelte
+  <script lang="ts">
+    import { DeckStageCore } from '@texuli/slides/stage-core';
+    const renderers = { validateBlock: checkHostBlock, free: () => HostFreeSlide };
+  </script>
+
+  <DeckStageCore {deck} {renderers} />
+  ```
 - **Canvas:** a fixed virtual canvas (1280 × 720 for 16:9) is scaled into
   the stage with a `ResizeObserver` and letterboxed. CSS variables go on the
   stage root through `deckCssVars` (the CSSOM, never a static `style`).
@@ -345,6 +375,30 @@ Transitions (`DeckViewTransition` on a `DeckTransitionDocument`, names from
 `transitionKeyframes`), a CSS fallback, or a cut (`DeckTransitionMode`,
 `DeckTransitionDirection`). Morph pairs match `DECK_MORPH_ATTRIBUTE`.
 Reduced motion turns movement into a short fade; motion `none` cuts.
+
+Every animation plays through the shared runtime, `@texuli/core/motion`
+([ADR-013](../../../docs/DECISIONS.md#adr-013-motion-runtime-web-animations-with-an-owned-spring-solver)),
+loaded as its own chunk (`stage/motion.ts`; the stage warms it on mount, and
+`stage/motion-capture.ts` is the small static half). `@texuli/deck` still
+resolves what to play as data, with its `full` / `subtle` / `none` levels:
+
+- **View Transitions:** the snapshot animations take their timing from the
+  runtime's plan for the live incoming slide (`resolveMotion`: durations
+  clamped to 1 s; under reduced motion the deck's 150 ms opacity-only fade,
+  the runtime's `fade` reduced-motion policy).
+- **CSS fallback:** the incoming slide keeps `data-tx-deck-enter` as a
+  marker, and its entrance plays through `animate` (no CSS keyframes), with
+  the same `fade` policy.
+- **Fragments** (v2 phases, `data-tx-deck-fragment`): `styles.css` holds the
+  end states only; on a step change the stage reads each fragment's style,
+  then animates every changed one from its old style to its new one (500 ms
+  at `full`, × 0.6 at `subtle` with no travel or scale, instant under reduced
+  motion and at `none`; at most 64 elements per step). A fragment fading out
+  stays `visibility: visible` until its animation ends. The v1 reveal steps
+  (`data-reveal`) keep their CSS animation (planned).
+
+Tests: `tests/stage-motion.test.ts`.
+
 Focus after a keyboard move waits for the incoming slide: with View
 Transitions the DOM swaps inside the transition's update callback, so the
 stage focuses the target slide there, never the outgoing one. That deferred

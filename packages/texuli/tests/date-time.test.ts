@@ -90,6 +90,51 @@ describe('date', () => {
     });
   });
 
+  describe('Calendar focused month without a selection (G64)', () => {
+    it('opens on defaultFocusedValue and follows a bound focusedValue', async () => {
+      const opened = render(Calendar, {
+        props: {
+          label: 'Day',
+          today: '2026-10-28',
+          value: null,
+          defaultFocusedValue: '2026-03-05',
+        },
+      });
+      expect(opened.container.textContent).toContain('March 2026');
+      const day = (iso: string) =>
+        opened.container.querySelector(`[data-calendar-date="${iso}"]`) as HTMLElement | null;
+      expect(day('2026-03-05')?.getAttribute('tabindex')).toBe('0');
+      cleanup();
+
+      const onFocusedValueChange = vi.fn();
+      const view = render(Calendar, {
+        props: {
+          label: 'Day',
+          today: '2026-10-28',
+          focusedValue: '2026-05-10',
+          onFocusedValueChange,
+        },
+      });
+      const at = (iso: string) =>
+        view.container.querySelector(`[data-calendar-date="${iso}"]`) as HTMLElement | null;
+      expect(at('2026-05-10')?.getAttribute('tabindex')).toBe('0');
+      at('2026-05-10')?.focus();
+      await fireEvent.keyDown(at('2026-05-10') as HTMLElement, { key: 'ArrowRight' });
+      await settle();
+      expect(onFocusedValueChange).toHaveBeenLastCalledWith('2026-05-11');
+      expect(at('2026-05-11')?.getAttribute('tabindex')).toBe('0');
+      // The host moves the calendar to another month.
+      await view.rerender({
+        label: 'Day',
+        today: '2026-10-28',
+        focusedValue: '2027-01-15',
+        onFocusedValueChange,
+      });
+      await settle();
+      expect(at('2027-01-15')?.getAttribute('tabindex')).toBe('0');
+    });
+  });
+
   describe('Calendar range mode (G12)', () => {
     it('highlights the range with start, end and in-range states and aria-selected', () => {
       const view = render(Calendar, {
@@ -132,7 +177,7 @@ describe('date', () => {
       await pick('Monday, March 2, 2026');
       await pick('Monday, March 16, 2026');
       await settle();
-      expect(onInvalid).toHaveBeenCalledWith('2026-03-02/2026-03-16', 'too-long');
+      expect(onInvalid).toHaveBeenCalledWith('2026-03-02/2026-03-16', 'too-long', { side: 'end' });
       expect(screen.getByRole('status').textContent).toBe('Choose a range of 5 days or fewer.');
       await pick('Friday, March 6, 2026');
       expect(onRangeChange).toHaveBeenLastCalledWith({ start: '2026-03-02', end: '2026-03-06' });
@@ -178,7 +223,7 @@ describe('date', () => {
         target: { value: '25' },
       });
       await settle();
-      expect(onInvalid).toHaveBeenCalledWith('2026-03-10/2026-03-25', 'too-long');
+      expect(onInvalid).toHaveBeenCalledWith('2026-03-10/2026-03-25', 'too-long', { side: 'end' });
       expect(onValueChange).not.toHaveBeenCalled();
       await fireEvent.click(screen.getByRole('button', { name: /^Choose date/ }));
       await settle();
@@ -187,6 +232,18 @@ describe('date', () => {
         .map((button) => button.textContent?.trim());
       expect(presets).toEqual(['Today', 'Yesterday', 'Last 7 days']);
     });
+  });
+});
+
+describe('DateRangePicker required (G66)', () => {
+  it('marks every segment required and the visible label with an asterisk', () => {
+    const view = render(DateRangePicker, { props: { label: 'Period', required: true } });
+    const segments = within(screen.getByRole('group', { name: 'Period' })).getAllByRole(
+      'spinbutton'
+    );
+    expect(segments).toHaveLength(6);
+    for (const segment of segments) expect(segment.hasAttribute('required')).toBe(true);
+    expect(view.container.querySelector('.tx-date__required')?.textContent?.trim()).toBe('*');
   });
 });
 

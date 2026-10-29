@@ -17,7 +17,7 @@
 </Calendar.Root>
 ```
 
-`Root` supports controlled `value` and `focusedValue` bindings, `defaultValue`, `defaultFocusedValue`, `locale`, `calendar="gregory"`, `weekStartsOn` (`0` Sunday to `6` Saturday; default the locale's first day), `today`, `minValue`, `maxValue`, `isDateUnavailable`, `isDateDisabled`, `disabled`, and `readOnly`.
+`Root` supports controlled `value` and `focusedValue` bindings, `onFocusedValueChange` (called when the focused day moves), `defaultValue`, `defaultFocusedValue`, `locale`, `calendar="gregory"`, `weekStartsOn` (`0` Sunday to `6` Saturday; default the locale's first day), `today`, `minValue`, `maxValue`, `isDateUnavailable`, `isDateDisabled`, `disabled`, and `readOnly`.
 
 **`today` (a `CalendarDate`).** The day marked with `aria-current="date"` and `data-today`, and the starting day when nothing is selected. When it is given, the calendar never reads the clock (`Date.now()` or `new Date()`), so a simulated or server-provided day renders deterministically. `onValueChange` receives a `CalendarDate`. Prev/Next buttons honor the available date range. Other calendar systems are outside the current `@texuli/date` contract.
 

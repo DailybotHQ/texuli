@@ -97,6 +97,30 @@ The labels `jumpToLatest`, `newBelow`, `editInput`, `saveEdit` and
 `cancelEdit` translate these controls. `ChatThread` forwards `actions` and
 `onEdit`.
 
+## Reading position, avatars and day separators (G59, G70, G71)
+
+- **Reading position.** `bind:anchor` (a `ChatReadingAnchor`) holds where
+  the reader is: `messageId` (the first message in view, the one crossing
+  the top edge or the first below it), `offset` (px from the viewport's top
+  edge to that message's top, negative when it starts above the view) and
+  `atLatest` (the reader is at the bottom). The list writes it as the reader
+  scrolls, at most once per frame, and calls `onAnchorChange(anchor)` when it
+  changes. An anchor the host sets (on mount, or with a new `messages` array
+  when it swaps conversations) is restored: the list scrolls the message to
+  `offset` (moving the virtual window to its estimated row first, then
+  correcting from the rendered row), or to the bottom for `atLatest`.
+  Restoring is not announced as new messages. An anchor whose message is not
+  in the list, or `null`, opens at the latest message. `ChatThread` forwards
+  `anchor` and `onAnchorChange`. `bind:ref` binds the scrolling log element.
+- **Avatars.** `ChatAuthor.avatarSrcset` passes responsive candidates to the
+  author's avatar (`srcset` on texuli `Avatar`); each candidate goes through
+  the untrusted image URL policy, and refused ones are dropped. Stream
+  `start` events carry it too (a non-string value rejects the event).
+- **Day separators** are their own full-width row at the top of a group,
+  above the row that holds the avatar and the bubbles
+  (`.tx-chat-message-group__row`), so a narrow screen never squeezes the date
+  beside the avatar. Each message bubble carries `data-message-id`.
+
 ## Display transcript for the player (G10)
 
 `ChatThreadDisplay` and `ChatMessageDisplay` are the painters for the

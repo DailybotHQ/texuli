@@ -80,13 +80,13 @@ function announce(said: string): void {
   });
 }
 
-/** Applies a range; `false` when it is longer than `maxDays` (and refused). */
-function commit(next: DateRange): boolean {
+/** Applies a range; `false` when it is longer than `maxDays` (and refused because of `side`). */
+function commit(next: DateRange, side: 'start' | 'end'): boolean {
   const ordered = orderedRange(valid(next.start), valid(next.end));
   const limit = rangeLimit(maxDays);
   if (limit !== undefined && rangeDays(ordered.start, ordered.end) > limit) {
     announce(text.tooLong.split('{max}').join(String(limit)));
-    onInvalid?.(`${ordered.start}/${ordered.end}`, 'too-long');
+    onInvalid?.(`${ordered.start}/${ordered.end}`, 'too-long', { side });
     return false;
   }
   message = '';
@@ -110,20 +110,20 @@ provideRange({
     return message;
   },
   setStart(next) {
-    commit({ start: next, end: value.end });
+    commit({ start: next, end: value.end }, 'start');
   },
   setEnd(next) {
-    commit({ start: value.start, end: next });
+    commit({ start: value.start, end: next }, 'end');
   },
   pick(date) {
     if (!pending) {
       // First pick of a range: the start, with the end pending.
       pending = true;
-      commit({ start: date, end: null });
+      commit({ start: date, end: null }, 'start');
       return;
     }
     // A range longer than maxDays is refused; the end stays pending.
-    if (!commit({ start: value.start, end: date })) return;
+    if (!commit({ start: value.start, end: date }, 'end')) return;
     pending = false;
     if (closeOnSelect) {
       open = false;

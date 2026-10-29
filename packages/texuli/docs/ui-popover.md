@@ -58,3 +58,10 @@ Root also accepts primitive props: `open`, `modal`, `side`, `align`, `sideOffset
 - No static `style=` attributes
 - Layers: `@layer tx.components`
 - Links inside content must use `safeHref` / Button URL policy
+
+## Motion
+
+`motion` on `Popover.Content` (scale in and out) and `HoverCard.Content`
+(scale in, fade out), quick (`fast`), through `@texuli/core/motion`
+([ui-motion](ui-motion.md)). A closing card stays shown, inert, while its
+exit plays.

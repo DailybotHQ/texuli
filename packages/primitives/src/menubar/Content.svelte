@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { OverlayMotionHooks } from '../internal/motion-hold.ts';
 import type { RefProp } from '../internal/ref.ts';
 import MenuContent from '../menu/Content.svelte';
 import { menubarContext, menubarMenuContext } from './context.ts';
@@ -15,6 +16,8 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   side?: 'top' | 'right' | 'bottom' | 'left';
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
+  /** Enter and exit motion (texuli passes `texuli/motion` hooks). */
+  motionHooks?: OverlayMotionHooks;
   children?: Snippet;
 } & RefProp;
 

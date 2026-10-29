@@ -222,3 +222,68 @@ describe('Board column footers and heading levels (G14)', () => {
     }
   });
 });
+
+describe('Board column descriptions, header snippet and column-only mode (G67, G69)', () => {
+  it('shows a column description that describes its cards, and renders the header snippet', async () => {
+    const { default: Harness } = await import('./fixtures/BoardColumnsHarness.svelte');
+    const { container } = render(Harness);
+    const description = container.querySelector('.tx-board__column-description') as HTMLElement;
+    expect(description.textContent).toBe('Tickets nobody has started.');
+    const todo = screen.getByRole('list', { name: 'To do' });
+    expect(todo.getAttribute('aria-describedby')).toBe(description.id);
+    expect(screen.getByRole('list', { name: 'Done' }).hasAttribute('aria-describedby')).toBe(false);
+    // The header snippet sits in the column header with the column and its count.
+    const header = screen.getByTestId('header-todo');
+    expect(header.closest('.tx-board__column-header')).toBeTruthy();
+    expect(header.textContent).toBe('Sort To do (2)');
+    expect(screen.getByTestId('header-done').textContent).toBe('Sort Done (1)');
+  });
+
+  it('works without getRank: keeps the host order, moves across columns, refuses reordering', async () => {
+    const { default: Harness } = await import('./fixtures/BoardColumnsHarness.svelte');
+    render(Harness);
+    const titles = (name: string) =>
+      [...screen.getByRole('list', { name }).querySelectorAll('[data-board-card]')].map((card) =>
+        card.textContent?.trim()
+      );
+    expect(titles('To do')[0]).toContain('Alpha ticket');
+    expect(titles('To do')[1]).toContain('Beta ticket');
+    // Reordering inside a column is refused: the host has no order to store.
+    const handle = () => screen.getByRole('button', { name: 'Drag Alpha ticket' });
+    await fireEvent.keyDown(handle(), { key: ' ' });
+    await fireEvent.keyDown(handle(), { key: 'ArrowDown' });
+    await fireEvent.keyDown(handle(), { key: 'Enter' });
+    expect(document.querySelector('.tx-board__status')?.textContent).toContain(
+      'Alpha ticket keeps its place'
+    );
+    expect(screen.getByTestId('moves').textContent).toBe('[]');
+    await fireEvent.keyDown(handle(), { key: 'Escape' });
+    // A move to another column goes through, and settles on the host's column.
+    await fireEvent.keyDown(handle(), { key: ' ' });
+    await fireEvent.keyDown(handle(), { key: 'ArrowRight' });
+    await fireEvent.keyDown(handle(), { key: 'Enter' });
+    await waitFor(() => expect(screen.getByTestId('moves').textContent).toBe('[["a","done"]]'));
+    await waitFor(() => expect(titles('Done').join(' ')).toContain('Alpha ticket'));
+    expect(document.querySelector('[data-board-card][data-pending]')).toBeNull();
+  });
+
+  it('validateMove with reorder: false refuses a new index in the same cell, not a drop in place', () => {
+    const grid = groupBoard(
+      [
+        { id: 'a', column: 'todo' },
+        { id: 'b', column: 'todo' },
+      ],
+      {
+        columns: [{ id: 'todo', title: 'To do' }],
+        id: (item) => item.id,
+        column: (item) => item.column,
+        rank: (item) => (item.id === 'a' ? 'a0' : 'a1'),
+      }
+    );
+    const moved = validateMove(grid, 'a', { columnId: 'todo', index: 1 }, { reorder: false });
+    expect(moved.ok).toBe(false);
+    const inPlace = validateMove(grid, 'a', { columnId: 'todo', index: 0 }, { reorder: false });
+    expect(inPlace.ok && inPlace.unchanged).toBe(true);
+    expect(validateMove(grid, 'a', { columnId: 'todo', index: 1 }).ok).toBe(true);
+  });
+});

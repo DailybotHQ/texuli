@@ -22,12 +22,17 @@
   "type": "module",
   "sideEffects": [
     "**/*.css",
-    "**/stage/ssr-server.*"
+    "**/stage/ssr-server.*",
+    "**/stage/ssr-core-server.*"
   ],
   "imports": {
     "#deck-ssr": {
       "browser": "./src/stage/ssr-browser.ts",
       "default": "./src/stage/ssr-server.ts"
+    },
+    "#deck-ssr-core": {
+      "browser": "./src/stage/ssr-browser.ts",
+      "default": "./src/stage/ssr-core-server.ts"
     }
   },
   "exports": {
@@ -57,6 +62,11 @@
       "svelte": "./src/stage/index.ts",
       "default": "./src/stage/index.ts"
     },
+    "./stage-core": {
+      "types": "./src/stage/core.ts",
+      "svelte": "./src/stage/core.ts",
+      "default": "./src/stage/core.ts"
+    },
     "./components": {
       "types": "./src/registry/index.ts",
       "svelte": "./src/registry/index.ts",
@@ -75,6 +85,7 @@
   "dependencies": {
     "@texuli/blocks": "0.5.0",
     "@texuli/catalog": "0.5.0",
+    "@texuli/core": "0.5.0",
     "@texuli/deck": "0.5.0",
     "@texuli/media": "0.5.0",
     "@texuli/player": "0.5.0",

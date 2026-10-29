@@ -228,3 +228,7 @@ read when the panel opens.
   (dialog, alert dialog and sheet), plus the behavior rows
   `contained-backdrop-under-content` and `mounted-open-keeps-focus` in
   `tests/behavior/scenarios/dialog.spec.ts`.
+
+## Motion hooks
+
+The content takes `motionHooks` (enter and exit, the closed part held `inert` while its exit plays); see [prim-dialog](prim-dialog.md#motion-hooks).

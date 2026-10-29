@@ -1,5 +1,6 @@
 <script lang="ts">
 import {
+  type TagDelimiter,
   type TagsInputInvalidDetail,
   type TagsInputLabels,
   TagsInput as TagsInputPrimitive,
@@ -23,7 +24,12 @@ type Props = {
   inputValue?: string;
   /** Called with each draft change the input makes (typing, clearing). */
   onInputValueChange?: (value: string) => void;
-  delimiter?: string | RegExp;
+  /**
+   * Splits typed and pasted text: a string, several strings (any of them,
+   * e.g. `[',', ';', ' ']`) or a RegExp. Typing a one-character delimiter, or
+   * a character the RegExp matches, adds the draft as a tag. Default `,`.
+   */
+  delimiter?: TagDelimiter;
   addOnPaste?: boolean;
   addOnBlur?: boolean;
   allowDuplicates?: boolean;

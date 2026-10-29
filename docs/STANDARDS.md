@@ -107,6 +107,41 @@ task.
   Board also renders a visually hidden board title one level above its
   columns (none at 2); that hidden heading is the one documented exception.
 
+### Motion prop contract
+
+Components that move take one `motion` prop and animate only through the
+shared runtime, `@texuli/core/motion`
+([ADR-013](DECISIONS.md#adr-013-motion-runtime-web-animations-with-an-owned-spring-solver);
+reference: [ui-motion](../packages/texuli/docs/ui-motion.md)).
+
+- **One shape:** `motion?: { enter?, exit?, layout?, duration? } | false`.
+  `enter` and `exit` name a preset from the spec's closed vocabulary
+  (`fade`, `rise`, `scale`, `slide-start`, `slide-end`, or `false`),
+  `layout` turns layout animation on or off (FLIP for reorders, inserts and
+  removes; the tabs indicator; accordion height), `duration` names a token
+  step (`fast`, `base`, `slow`). `false` turns the component's motion off.
+  Never CSS, keyframes or milliseconds; unknown names fall back to the
+  component's default (`texuli/motion`, `resolveComponentMotion`).
+- **The level comes from context:** `MotionProvider` (`full`, `subtle`,
+  `none`, and an optional `reducedMotion` override) sets it for a subtree; a
+  nested provider can only lower it. Components read it at init through the
+  `texuli/motion` seams; they never read `prefers-reduced-motion` on their own.
+- **Instant when it must be:** reduced motion, level `none` and
+  `motion={false}` commit the end state at once; nothing animates on the
+  server or for content present on the first render (hydration).
+- **Overlays release interaction at close:** focus returns, `inert` lifts
+  and the layer stack lets go when an overlay closes; only its exit (the
+  part held mounted, `inert`, `data-state="closed"`) waits. Primitives take
+  the hooks as `motionHooks` and animate nothing without them.
+- **No CSS-only enter or exit motion and no lasting inline style:**
+  presence and layout motion play through the runtime with `fill: "none"`;
+  end states live in classes and attributes. CSS transitions remain for
+  hover and focus feedback and for direct manipulation (a drawer's drag
+  snap).
+- **A test per component** with the Web Animations stand-in
+  (`packages/core/tests/motion-fakes.ts`) proves it calls the runtime and is
+  instant under reduced motion and at level `none`.
+
 ## CSS
 
 - **Logical properties** where direction matters: `inline-size`,

@@ -3,6 +3,8 @@ import { Tooltip as TooltipPrimitive } from '@texuli/primitives/tooltip';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { MotionProp } from '../../motion/contract.ts';
+import { createOverlayMotion } from '../../motion/seam.ts';
 import { Kbd } from '../kbd-code/index.ts';
 import { type TooltipAlign, type TooltipSide, tooltipContentClass } from './variants.ts';
 import './tooltip.css';
@@ -28,6 +30,8 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'conten
   disabled?: boolean;
   open?: boolean;
   class?: ClassValue;
+  /** Enter and exit motion (`texuli/motion`): default a quick scale-and-fade in, a fade out; `false` for none. */
+  motion?: MotionProp;
 };
 
 let {
@@ -41,9 +45,15 @@ let {
   disabled = false,
   open = $bindable(false),
   class: className,
+  motion,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+const tooltipMotion = createOverlayMotion({
+  motion: () => motion,
+  defaults: { enter: 'scale', exit: 'fade', duration: 'fast' },
+});
 
 const shortcuts = $derived(
   shortcut === undefined
@@ -79,6 +89,7 @@ const contentClass = $derived(
       {sideOffset}
       class={contentClass}
       data-tx-tooltip
+      motionHooks={tooltipMotion}
     >
       <span class="tx-tooltip__body">
         <span class="tx-tooltip__text">

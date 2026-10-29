@@ -31,6 +31,7 @@ export const EXCLUDED: Record<string, string> = {
   'components/select/SelectRoot': 'provider: selection state, renders its children',
   'components/select/SelectPortal': 'placement: moves its children to the portal target',
   'components/select/SelectValue': 'text: renders the selected label or placeholder, no element',
+  'motion/MotionProvider': 'provider: the motion level for its subtree, renders its children',
 };
 
 /**

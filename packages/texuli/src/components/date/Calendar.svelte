@@ -27,6 +27,19 @@ interface OwnProps {
   /** `bind:value`: the selected day as `YYYY-MM-DD`, or `null`. */
   value?: string | null;
   onValueChange?: (value: string) => void;
+  /**
+   * The day the calendar opens on (`YYYY-MM-DD`), so it shows that month with
+   * nothing selected. Default: the selection (or the range start), else today.
+   */
+  defaultFocusedValue?: string;
+  /**
+   * `bind:focusedValue`: the focused day (`YYYY-MM-DD`), which sets the month
+   * shown. Setting it moves the calendar; arrows, paging and the month
+   * buttons write it back.
+   */
+  focusedValue?: string;
+  /** The focused day moved (`YYYY-MM-DD`). */
+  onFocusedValueChange?: (value: string) => void;
   locale?: string;
   minValue?: string;
   maxValue?: string;
@@ -63,6 +76,9 @@ type Props = OwnProps &
 let {
   value = $bindable(null),
   onValueChange,
+  defaultFocusedValue,
+  focusedValue = $bindable(),
+  onFocusedValueChange,
   locale = 'en-US',
   minValue,
   maxValue,
@@ -91,7 +107,10 @@ const max = $derived(toCalendarDate(maxValue));
 const todayDate = $derived(toCalendarDate(today));
 const rangeMode = $derived(range !== undefined);
 const rangeStart = $derived(toCalendarDate(range?.start));
-const focusStart = $derived(rangeMode ? rangeStart : selected);
+const focusStart = $derived(
+  toCalendarDate(defaultFocusedValue) ?? (rangeMode ? rangeStart : selected)
+);
+const focusedDate = $derived(toCalendarDate(focusedValue));
 let pending = $state(false);
 let message = $state('');
 
@@ -102,12 +121,12 @@ function announce(said: string): void {
   });
 }
 
-function commitRange(next: DateRange): boolean {
+function commitRange(next: DateRange, side: 'start' | 'end'): boolean {
   const ordered = orderedRange(next.start, next.end);
   const limit = rangeLimit(maxDays);
   if (limit !== undefined && rangeDays(ordered.start, ordered.end) > limit) {
     announce(tooLongLabel.split('{max}').join(String(limit)));
-    onInvalid?.(`${ordered.start}/${ordered.end}`, 'too-long');
+    onInvalid?.(`${ordered.start}/${ordered.end}`, 'too-long', { side });
     return false;
   }
   message = '';
@@ -131,18 +150,18 @@ provideDateRange({
     return message;
   },
   setStart(next) {
-    commitRange({ start: next, end: range?.end ?? null });
+    commitRange({ start: next, end: range?.end ?? null }, 'start');
   },
   setEnd(next) {
-    commitRange({ start: range?.start ?? null, end: next });
+    commitRange({ start: range?.start ?? null, end: next }, 'end');
   },
   pick(date) {
     if (!pending) {
       pending = true;
-      commitRange({ start: date, end: null });
+      commitRange({ start: date, end: null }, 'start');
       return;
     }
-    if (commitRange({ start: range?.start ?? null, end: date })) pending = false;
+    if (commitRange({ start: range?.start ?? null, end: date }, 'end')) pending = false;
   },
 });
 </script>
@@ -155,6 +174,13 @@ provideDateRange({
   {...rest}
   value={rangeMode ? null : selected}
   {...focusStart ? { defaultFocusedValue: focusStart } : {}}
+  {...focusedDate ? { focusedValue: focusedDate } : {}}
+  onFocusedValueChange={(date: CalendarDate) => {
+    const next = date.toString();
+    if (next === focusedValue) return;
+    focusedValue = next;
+    onFocusedValueChange?.(next);
+  }}
   {locale}
   {...todayDate ? { today: todayDate } : {}}
   {...weekStartsOn !== undefined ? { weekStartsOn } : {}}

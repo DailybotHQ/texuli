@@ -204,6 +204,10 @@
     font-size: var(--tx-font-size-sm, 0.875rem);
   }
 
+  .tx-data-grid [data-activatable] {
+    cursor: pointer;
+  }
+
   .tx-data-grid__sr-only {
     position: absolute;
     inline-size: 1px;

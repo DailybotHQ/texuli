@@ -3,7 +3,7 @@ import { untrack } from 'svelte';
 import { type Attachment, createAttachmentKey } from 'svelte/attachments';
 import { tagsInputContext, visuallyHidden } from './context.ts';
 import { DEFAULT_TAGS_INPUT_LABELS } from './labels.ts';
-import { addTags, splitTags } from './tags.ts';
+import { addTags, isDelimiterKey, splitTags } from './tags.ts';
 import type { TagsInputRootProps } from './types.ts';
 
 /**
@@ -117,9 +117,7 @@ tagsInputContext.set({
   get labels() {
     return text;
   },
-  get delimiterKey() {
-    return typeof delimiter === 'string' && delimiter.length === 1 ? delimiter : undefined;
-  },
+  isDelimiterKey: (key) => isDelimiterKey(key, delimiter),
   get addOnPaste() {
     return addOnPaste;
   },

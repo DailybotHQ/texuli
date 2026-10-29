@@ -1,7 +1,8 @@
 <script lang="ts">
 import { createPresence, type PresenceSnapshot } from '@texuli/core/presence';
-import { untrack } from 'svelte';
+import { tick, untrack } from 'svelte';
 import { type Attachment, createAttachmentKey } from 'svelte/attachments';
+import { createMotionHold } from '../internal/motion-hold.ts';
 import { itemContext, partAttributes } from './context.ts';
 import type { AccordionContentProps } from './types.ts';
 
@@ -13,6 +14,7 @@ import type { AccordionContentProps } from './types.ts';
  */
 let {
   forceMount = false,
+  motionHooks,
   child,
   children,
   ref = $bindable(null),
@@ -37,17 +39,51 @@ let snapshot = $state<PresenceSnapshot>({
   exiting: false,
   present: item.open,
 });
+let node = $state<HTMLElement | null>(null);
+// Open when it is created (first render, hydration): no open animation.
+let wasOpen = untrack(() => item.open);
+let pendingEnter = false;
+const hold = createMotionHold(
+  () => motionHooks,
+  (held) => {
+    // The close animation ended: the panel may go (or hide, with forceMount).
+    if (!held && !item.open) presence.completeExit();
+  }
+);
 const presence = createPresence({
   present: item.open,
   forceMount: keepMounted,
+  isMotionPending: hold.isMotionPending,
   onSnapshot: (next) => {
     snapshot = next;
   },
 });
-let node = $state<HTMLElement | null>(null);
 
-$effect(() => presence.setPresent(item.open));
-$effect(() => () => presence.dispose());
+$effect(() => {
+  const open = item.open;
+  untrack(() => {
+    if (open !== wasOpen) {
+      wasOpen = open;
+      // Before presence reads `isMotionPending`.
+      if (!open) {
+        pendingEnter = false;
+        hold.begin(node);
+      } else if (node && hold.held()) hold.enter(node);
+      else if (node) {
+        // Kept mounted (forceMount): play once it is shown, after this update.
+        const panel = node;
+        void tick().then(() => {
+          if (item.open && node === panel) hold.enter(panel);
+        });
+      } else pendingEnter = true;
+    }
+    presence.setPresent(open);
+  });
+});
+$effect(() => () => {
+  hold.cancel();
+  presence.dispose();
+});
 
 // Measure on every open or close, so an animation starts from the real size.
 $effect(() => {
@@ -64,6 +100,10 @@ const attach: Attachment<HTMLElement> = (element) => {
   node = element;
   ref = element;
   presence.setNode(element);
+  if (pendingEnter && item.open) {
+    pendingEnter = false;
+    hold.enter(element);
+  }
   return () => {
     presence.setNode(null);
     node = null;

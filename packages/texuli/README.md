@@ -114,6 +114,12 @@ the initial chunk.
 `texuli/cx` exports `cx` (class composition) and `variants` (typed variant
 recipes), so you can extend components without `clsx` or `tailwind-merge`.
 
+`texuli/motion` holds the motion prop contract and `MotionProvider` (in the
+working tree, not released yet): overlays, toasts, tabs, accordions and the
+`@texuli/data` Board and DataGrid animate through `@texuli/core/motion`,
+instant under reduced motion and at level `none`
+([ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)).
+
 ## Planned for the next release
 
 In the working tree, not released yet: `bind:ref` and rest attributes on
@@ -203,6 +209,7 @@ may break; the breaking items are marked.
 - Using Texuli with your own CSS: [using-with-your-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/using-with-your-css.md)
 - Class values and variants: [class-value.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/class-value.md)
   and [variants-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/variants-css.md)
+- Motion: [ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)
 - Icons: [ui-icons.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)
 - Layouts: [layouts-shells.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-shells.md),
   [layouts-dashboard.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-dashboard.md),

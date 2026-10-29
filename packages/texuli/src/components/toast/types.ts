@@ -4,7 +4,19 @@ export type ToastKind = 'success' | 'error' | 'info' | 'warning';
 export type ToastAction = {
   label: string;
   onClick: () => void | Promise<void>;
+  /**
+   * When `onClick` throws or rejects, keep the toast (it does not settle)
+   * with an error message, its timer restarted, so the person can run the
+   * action again (undo that failed on a flaky network). Without it the toast
+   * dismisses and settles with `'action'` either way.
+   */
+  retryOnError?: boolean;
+  /** The error message shown after a failed `retryOnError` action (default "That did not work. Try again."). */
+  errorText?: string | ((error: unknown) => string);
 };
+
+/** The default message of a failed `retryOnError` toast action. */
+export const DEFAULT_TOAST_ACTION_ERROR = 'That did not work. Try again.';
 
 export type ToastOptions = {
   description?: string;
@@ -44,6 +56,8 @@ export type ToastItem = {
   action?: ToastAction;
   /** True while a promise toast is pending. */
   pending?: boolean;
+  /** The message of the last failed `retryOnError` action, until it is run again. */
+  error?: string;
   /** From the primitive queue (for Root binding). */
   createdAt: number;
   priority: 'low' | 'normal' | 'high';

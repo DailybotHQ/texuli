@@ -14,7 +14,11 @@ type Props = {
   header?: Snippet;
   /** Usually a `BottomNav`; outside the scroll region. */
   bottomNav?: Snippet;
-  /** Screen-level actions between the scroll region and the bottom navigation. */
+  /**
+   * Screen-level actions between the scroll region and the bottom navigation.
+   * While it renders nothing (an `{#if}` that is false), its padded, bordered
+   * strip is hidden (`hidden`, `data-empty`).
+   */
   stickyFooter?: Snippet;
   children: Snippet;
   /** The skip link's text. Default "Skip to content". */
@@ -66,6 +70,26 @@ $effect(() => {
   };
 });
 
+let footer = $state<HTMLElement>();
+let footerEmpty = $state(false);
+
+/** No element and no visible text: comments and whitespace count as empty. */
+function isEmpty(node: HTMLElement): boolean {
+  return node.childElementCount === 0 && (node.textContent ?? '').trim() === '';
+}
+
+$effect(() => {
+  const node = footer;
+  if (!node) return;
+  footerEmpty = isEmpty(node);
+  if (typeof MutationObserver === 'undefined') return;
+  const observer = new MutationObserver(() => {
+    footerEmpty = isEmpty(node);
+  });
+  observer.observe(node, { childList: true, subtree: true, characterData: true });
+  return () => observer.disconnect();
+});
+
 function focusScreen(event: MouseEvent): void {
   // A hash router would read the fragment as a route, so focus the screen instead.
   event.preventDefault();
@@ -87,7 +111,13 @@ function focusScreen(event: MouseEvent): void {
     {@render children()}
   </svelte:element>
   {#if stickyFooter}
-    <div class="tx-mobile-frame__footer" data-tx-mobile-frame-footer="">{@render stickyFooter()}</div>
+    <div
+      bind:this={footer}
+      class="tx-mobile-frame__footer"
+      data-tx-mobile-frame-footer=""
+      data-empty={footerEmpty ? '' : undefined}
+      hidden={footerEmpty}
+    >{@render stickyFooter()}</div>
   {/if}
   {@render bottomNav?.()}
 </div>

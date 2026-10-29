@@ -12,9 +12,19 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   endName?: string;
   /** Id of the start field's first segment, for a `<label for>` or a Field. */
   inputId?: string;
+  /** Both the start and the end must be filled (`required` on every segment). */
+  required?: boolean;
 } & RefProp;
 
-let { label, startName, endName, inputId, ref = $bindable(null), ...rest }: Props = $props();
+let {
+  label,
+  startName,
+  endName,
+  inputId,
+  required = false,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 // A description and an invalid state reach every segment, where focus lands.
 const segmentAria = $derived({
   'aria-describedby': rest['aria-describedby'],
@@ -22,6 +32,16 @@ const segmentAria = $derived({
 });
 const shell = getShell();
 const range = getRange();
+// A refusal says which field caused it.
+const invalidFor = (side: 'start' | 'end') => {
+  const report = shell.onInvalid;
+  return report
+    ? {
+        onInvalid: (text: string, reason: 'invalid' | 'out-of-range') =>
+          report(text, reason, { side }),
+      }
+    : {};
+};
 </script>
 
 <div bind:this={ref} {...rest} role="group" aria-label={rest['aria-label'] ?? label} data-tx-date-range-field>
@@ -36,7 +56,8 @@ const range = getRange();
     disabled={shell.disabled}
     {...shell.minValue ? { min: shell.minValue } : {}}
     {...range.end ? { max: range.end } : shell.maxValue ? { max: shell.maxValue } : {}}
-    {...shell.onInvalid ? { onInvalid: shell.onInvalid } : {}}
+    {...invalidFor('start')}
+    {required}
   />
   <span aria-hidden="true" data-tx-date-range-separator>–</span>
   <DateField.Root
@@ -49,6 +70,7 @@ const range = getRange();
     disabled={shell.disabled}
     {...range.start ? { min: range.start } : shell.minValue ? { min: shell.minValue } : {}}
     {...shell.maxValue ? { max: shell.maxValue } : {}}
-    {...shell.onInvalid ? { onInvalid: shell.onInvalid } : {}}
+    {...invalidFor('end')}
+    {required}
   />
 </div>

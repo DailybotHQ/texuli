@@ -246,8 +246,10 @@ export {
 export {
   addTags,
   DEFAULT_TAGS_INPUT_LABELS,
+  isDelimiterKey,
   splitTags,
   type TagDecision,
+  type TagDelimiter,
   type TagRejection,
   type TagRules,
   TagsInput,

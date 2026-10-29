@@ -24,3 +24,7 @@
 `Tooltip.Root` supports `bind:open`, `disabled`, a root-level `delayDuration` override, and `onOpenChange(open)`. Without a provider, each root gets its own delay group. `Tooltip.Trigger` renders a button by default; use its `child` snippet to compose props onto another focusable element. The primitive retains its trigger id, `data-state`, disabled state and `aria-describedby` association when composing child props. `Tooltip.Content` provides `role="tooltip"`, defaults to the top side, and accepts `top`, `right`, `bottom` or `left`, `start`, `center` or `end`, an offset, a class and a content snippet.
 
 The tooltip content is non-modal and does not dismiss on outside pointer or focus. Positioning and Escape ownership use the shared overlay engine; no trigger focus trap or scroll lock is enabled.
+
+## Motion hooks
+
+The content takes `motionHooks` (enter and exit, the closed part held `inert` while its exit plays); see [prim-dialog](prim-dialog.md#motion-hooks).

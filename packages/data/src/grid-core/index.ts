@@ -12,11 +12,14 @@ export {
 } from './labels.ts';
 export {
   ariaSort,
+  breakpointWidth,
   type CellPosition,
   cellText,
   clampCell,
+  type DataGridBreakpoint,
   type DataGridBulkContext,
   type DataGridColumn,
+  type DataGridEmptyContext,
   type GridRowsOptions,
   gridRows,
   type MoveCellOptions,

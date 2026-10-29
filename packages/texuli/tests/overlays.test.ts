@@ -375,6 +375,57 @@ describe('toast', () => {
       }
     });
 
+    it('keeps a toast whose retryOnError action rejects, shows the error, and settles once on a retry (G57)', async () => {
+      const store = createToastStore({ duration: 0 });
+      const thrown: unknown[] = [];
+      const original = globalThis.queueMicrotask.bind(globalThis);
+      const spy = vi.spyOn(globalThis, 'queueMicrotask').mockImplementation((callback) => {
+        original(() => {
+          try {
+            callback();
+          } catch (error) {
+            thrown.push(error);
+          }
+        });
+      });
+      try {
+        const failure = new Error('Offline.');
+        let attempts = 0;
+        const onSettle = vi.fn();
+        const id = store.info('Archived', {
+          action: {
+            label: 'Undo',
+            retryOnError: true,
+            errorText: (error) => `Undo failed: ${(error as Error).message}`,
+            onClick: () => {
+              attempts += 1;
+              return attempts === 1 ? Promise.reject(failure) : Promise.resolve();
+            },
+          },
+          onSettle,
+        });
+        const view = render(ToastHarness, { props: { store } });
+        const region = view.getByRole('region', { name: 'Notifications' });
+        await fireEvent.click(view.getByRole('button', { name: 'Undo' }));
+        await waitFor(() => expect(within(region).getByText('Undo failed: Offline.')).toBeTruthy());
+        expect(store.items()[0]?.error).toBe('Undo failed: Offline.');
+        expect(region.querySelector('[data-tx-toast-root]')?.getAttribute('data-error')).toBe(
+          'true'
+        );
+        expect(onSettle).not.toHaveBeenCalled();
+        await waitFor(() => expect(thrown).toContain(failure));
+        // The retry succeeds: the toast leaves and settles once with 'action'.
+        await fireEvent.click(view.getByRole('button', { name: 'Undo' }));
+        await waitFor(() => expect(within(region).queryByText('Archived')).toBeNull());
+        expect(attempts).toBe(2);
+        expect(onSettle.mock.calls).toEqual([['action']]);
+        store.dismiss(id);
+        expect(onSettle).toHaveBeenCalledTimes(1);
+      } finally {
+        spy.mockRestore();
+      }
+    });
+
     it('keeps the toast mounted while an async action runs, then dismisses', async () => {
       const store = createToastStore({ duration: 0 });
       let release!: () => void;

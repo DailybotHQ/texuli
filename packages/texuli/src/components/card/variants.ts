@@ -8,6 +8,12 @@ export type CardVariant = (typeof CARD_VARIANTS)[number];
 
 export const CARD_GAPS = ['sm', 'md', 'lg'] as const;
 export type CardGridGap = (typeof CARD_GAPS)[number];
+/**
+ * What `CardGrid` `gap` accepts: a class step, the inline steps `none`, `xs`
+ * and `xl`, a CSS length or a custom property name (validated in the
+ * component).
+ */
+export type CardGridGapValue = CardGridGap | 'none' | 'xs' | 'xl' | (string & {});
 
 export const cardClass = variants({
   base: 'tx-card',

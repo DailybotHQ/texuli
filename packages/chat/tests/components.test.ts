@@ -167,6 +167,183 @@ describe('thread', () => {
   });
 });
 
+describe('MessageList adoption gaps (G59, G70, G71)', () => {
+  afterEach(cleanup);
+
+  const jordan = { id: 'jordan', name: 'Jordan Lee' };
+  const avery = { id: 'avery', name: 'Avery Chen' };
+
+  it('passes an author avatarSrcset through the untrusted image policy (G59)', () => {
+    const messages: ChatMessage[] = [
+      {
+        id: 'one',
+        author: {
+          ...jordan,
+          avatarUrl: 'https://cdn.example/jordan-32.webp',
+          avatarSrcset: 'https://cdn.example/jordan-64.webp 2x, javascript:alert(1) 3x',
+        },
+        at: '2026-06-12T10:00:00.000Z',
+        body: 'Hi',
+      },
+    ];
+    const view = render(MessageList, { props: { messages } });
+    const img = view.container.querySelector('.tx-chat-message-group__avatar img');
+    expect(img?.getAttribute('srcset')).toBe('https://cdn.example/jordan-64.webp 2x');
+    // A stream start event carries the srcset too (checked as a string).
+    const streamed = applyChatStreamEvent([], {
+      type: 'start',
+      id: 's1',
+      at: '2026-06-12T10:00:00.000Z',
+      author: { ...jordan, avatarSrcset: 'https://cdn.example/j.webp 2x' },
+    });
+    expect(streamed[0]?.author.avatarSrcset).toBe('https://cdn.example/j.webp 2x');
+    expect(
+      applyChatStreamEvent([], {
+        type: 'start',
+        id: 's2',
+        at: '2026-06-12T10:00:00.000Z',
+        author: { ...jordan, avatarSrcset: 42 },
+      })
+    ).toEqual([]);
+  });
+
+  it('renders the day separator as its own full-width row, outside the avatar row (G70)', () => {
+    const view = render(MessageList, {
+      props: {
+        messages: [
+          { id: 'a', author: jordan, at: '2026-06-12T10:00:00.000Z', body: 'Day one' },
+          { id: 'b', author: jordan, at: '2026-06-13T10:00:00.000Z', body: 'Day two' },
+        ],
+      },
+    });
+    const separators = view.container.querySelectorAll('[role="separator"]');
+    expect(separators).toHaveLength(2);
+    for (const separator of separators) {
+      const group = separator.parentElement as HTMLElement;
+      expect(group.hasAttribute('data-message-group')).toBe(true);
+      // The avatar and the bubbles sit in the row after the separator, never beside it.
+      const row = separator.nextElementSibling as HTMLElement;
+      expect(row.classList.contains('tx-chat-message-group__row')).toBe(true);
+      expect(row.querySelector('.tx-chat-message-group__avatar')).toBeTruthy();
+      expect(group.querySelector(':scope > .tx-chat-message-group__avatar')).toBeNull();
+    }
+  });
+
+  describe('reading position (G71)', () => {
+    const many = Array.from({ length: 10 }, (_, index) => ({
+      id: `m${index}`,
+      author: index % 2 ? avery : jordan,
+      at: '2026-06-12T10:00:00.000Z',
+      body: `Note ${index}`,
+    }));
+    const restore: Array<() => void> = [];
+    const frames: FrameRequestCallback[] = [];
+    /** Layout stand-ins: message `mN` spans N*100 to N*100+80 in a 200px viewport. */
+    function layout(): void {
+      const proto = HTMLElement.prototype;
+      const rect = Object.getOwnPropertyDescriptor(Element.prototype, 'getBoundingClientRect');
+      const logOf = (node: Element) => node.closest('[data-tx-chat-message-list]') as HTMLElement;
+      Element.prototype.getBoundingClientRect = function (this: Element) {
+        const id = this.getAttribute('data-message-id');
+        const top = id
+          ? Number(/\d+$/.exec(id)?.[0] ?? 0) * 100 - (logOf(this)?.scrollTop ?? 0)
+          : 0;
+        const height = id ? 80 : this.hasAttribute('data-tx-chat-message-list') ? 200 : 0;
+        return {
+          top,
+          bottom: top + height,
+          height,
+          left: 0,
+          right: 0,
+          width: 0,
+          x: 0,
+          y: top,
+        } as DOMRect;
+      };
+      const sizes = { clientHeight: 200, scrollHeight: 1000 };
+      for (const [key, value] of Object.entries(sizes)) {
+        Object.defineProperty(proto, key, { configurable: true, get: () => value });
+      }
+      const originalFrame = globalThis.requestAnimationFrame;
+      globalThis.requestAnimationFrame = (callback: FrameRequestCallback) => frames.push(callback);
+      restore.push(() => {
+        if (rect) Object.defineProperty(Element.prototype, 'getBoundingClientRect', rect);
+        for (const key of Object.keys(sizes))
+          delete (proto as unknown as Record<string, unknown>)[key];
+        globalThis.requestAnimationFrame = originalFrame;
+        frames.length = 0;
+      });
+    }
+    const flushFrames = () => {
+      for (const callback of frames.splice(0)) callback(0);
+    };
+    afterEach(() => {
+      for (const undo of restore.splice(0)) undo();
+    });
+
+    it('reports the message in view and whether the reader is at the latest one', async () => {
+      layout();
+      const onAnchorChange = vi.fn();
+      render(MessageList, { props: { messages: many, virtualizeAfter: Infinity, onAnchorChange } });
+      await tick();
+      const log = screen.getByRole('log');
+      log.scrollTop = 350;
+      await fireEvent.scroll(log);
+      flushFrames();
+      expect(onAnchorChange).toHaveBeenLastCalledWith({
+        messageId: 'm3',
+        offset: -50,
+        atLatest: false,
+      });
+      log.scrollTop = 800;
+      await fireEvent.scroll(log);
+      flushFrames();
+      expect(onAnchorChange).toHaveBeenLastCalledWith({
+        messageId: 'm8',
+        offset: 0,
+        atLatest: true,
+      });
+      // An unchanged position is not reported again.
+      const calls = onAnchorChange.mock.calls.length;
+      await fireEvent.scroll(log);
+      flushFrames();
+      expect(onAnchorChange).toHaveBeenCalledTimes(calls);
+    });
+
+    it('restores a saved anchor on mount and when the host swaps conversations, plain or virtualized', async () => {
+      layout();
+      for (const virtualizeAfter of [Infinity, 4]) {
+        const view = render(MessageList, {
+          props: {
+            messages: many,
+            virtualizeAfter,
+            anchor: { messageId: 'm6', offset: -20, atLatest: false },
+          },
+        });
+        const log = screen.getByRole('log');
+        await waitFor(() => expect(log.scrollTop, String(virtualizeAfter)).toBe(620));
+        expect(log.querySelector('[data-message-id="m6"]')).toBeTruthy();
+        // Restoring is not "new messages below".
+        expect(screen.getByRole('status').textContent).toBe('');
+        // Another conversation reopens where it was left; atLatest reopens at the bottom.
+        await view.rerender({
+          messages: many.map((message) => ({ ...message, id: `x${message.id.slice(1)}` })),
+          virtualizeAfter,
+          anchor: { messageId: 'x2', offset: 10, atLatest: false },
+        });
+        await waitFor(() => expect(log.scrollTop, String(virtualizeAfter)).toBe(190));
+        await view.rerender({
+          messages: many,
+          virtualizeAfter,
+          anchor: { messageId: 'm1', offset: 0, atLatest: true },
+        });
+        await waitFor(() => expect(log.scrollTop, String(virtualizeAfter)).toBe(1000));
+        cleanup();
+      }
+    });
+  });
+});
+
 describe('stream', () => {
   const agent = { id: 'agent', name: 'Fictional Agent' };
   const at = '2026-10-24T10:00:00.000Z';
