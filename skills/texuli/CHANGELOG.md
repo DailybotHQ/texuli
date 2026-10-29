@@ -15,6 +15,13 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.2.4] — 2026-10-29
+
+### Changes
+
+- chore(deps): release 0.5.0 of all 20 packages, @texuli/editor for the first time
+- docs: 0.5.0 release notes with every closed Protoyard gap, the 0.4.0 drag helper correction, new subpaths and the skill
+
 ### Content
 
 - The packages move to `0.5.0`: all 20 packable packages, including the
