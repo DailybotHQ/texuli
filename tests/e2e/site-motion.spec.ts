@@ -85,7 +85,7 @@ test('the settings drive every demo: full motion animates, reduced motion starts
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Motion that respects the reader'
   );
-  await expect(page.getByText('in development · ships in 0.6.0')).toBeVisible();
+  await expect(page.getByText('texuli/motion · in development · on npm from 0.6.0')).toBeVisible();
 
   // Settings: the level rescales the duration tokens; the sample plays.
   await hydrated(page, '[data-motion-console]');

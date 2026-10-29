@@ -324,8 +324,8 @@
       "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): 22528 -> 19136 B, tightened to measured + 4% (measured 18,353 B). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 0 B, tightened to measured + 4% (measured 0 B)."
     },
     "@texuli/primitives/date-field": {
-      "gzip": 4224,
-      "note": "PLAN_009 (2026-10-28, owner-consented release plan): default 4096 -> 4224 B, measured + 4% after onInvalid, the TimeField spin keys and translatable segment labels (G12, G13); measured about 4,055 B; Linux CI measures about 0.2% above macOS."
+      "gzip": 4416,
+      "note": "PLAN_009 (2026-10-28, owner-consented release plan): default 4096 -> 4224 B, measured + 4% after onInvalid, the TimeField spin keys and translatable segment labels (G12, G13); measured about 4,055 B; Linux CI measures about 0.2% above macOS. 4224 -> 4416 B after G65 four-digit-year reporting and G66 required/refusal side (T-gaps-53-69); measured 4,239 B in CI on Linux, + 4%."
     },
     "@texuli/primitives/date-picker": {
       "gzip": 23488,
