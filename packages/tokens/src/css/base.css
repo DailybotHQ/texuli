@@ -28,6 +28,119 @@
     --tx-safe-area-block-end: var(--tx-safe-bottom);
     --tx-safe-area-inline-start: var(--tx-safe-left);
     --tx-safe-area-inline-end: var(--tx-safe-right);
+    /* Motion tokens (@texuli/tokens/motion): theme-independent easings and springs. */
+    --tx-motion-instant: 0ms;
+    --tx-motion-slower: 500ms;
+    --tx-motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --tx-motion-ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+    --tx-motion-ease-enter: cubic-bezier(0, 0, 0.2, 1);
+    --tx-motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+    --tx-motion-ease-linear: linear;
+    --tx-motion-spring-gentle: linear(
+      0,
+      0.0228,
+      0.0795,
+      0.1561,
+      0.2426,
+      0.3318,
+      0.419,
+      0.5013,
+      0.5767,
+      0.6444,
+      0.7041,
+      0.7561,
+      0.8007,
+      0.8386,
+      0.8704,
+      0.8969,
+      0.9187,
+      0.9365,
+      0.951,
+      0.9626,
+      0.9718,
+      0.9791,
+      0.9848,
+      0.9892,
+      0.9925,
+      0.9951,
+      0.9969,
+      0.9983,
+      0.9993,
+      0.9999,
+      1.0004,
+      1
+    );
+    --tx-motion-spring-gentle-duration: 648ms;
+    --tx-motion-spring-snappy: linear(
+      0,
+      0.0368,
+      0.1267,
+      0.2447,
+      0.3726,
+      0.4983,
+      0.6137,
+      0.7148,
+      0.7995,
+      0.8679,
+      0.9212,
+      0.9609,
+      0.9892,
+      1.0082,
+      1.0199,
+      1.0261,
+      1.0283,
+      1.0278,
+      1.0255,
+      1.0223,
+      1.0187,
+      1.0151,
+      1.0117,
+      1.0088,
+      1.0062,
+      1.0042,
+      1.0026,
+      1.0014,
+      1.0005,
+      0.9999,
+      0.9995,
+      1
+    );
+    --tx-motion-spring-snappy-duration: 453ms;
+    --tx-motion-spring-bouncy: linear(
+      0,
+      0.1177,
+      0.3817,
+      0.6779,
+      0.9294,
+      1.0989,
+      1.1811,
+      1.1921,
+      1.1571,
+      1.1015,
+      1.0453,
+      1.001,
+      0.9737,
+      0.9627,
+      0.964,
+      0.9727,
+      0.9839,
+      0.9943,
+      1.0019,
+      1.0061,
+      1.0074,
+      1.0066,
+      1.0046,
+      1.0024,
+      1.0006,
+      0.9993,
+      0.9987,
+      0.9986,
+      0.9988,
+      0.9992,
+      0.9997,
+      1
+    );
+    --tx-motion-spring-bouncy-duration: 844ms;
   }
 
   :root:dir(rtl),
@@ -118,7 +231,18 @@
       --tx-motion-fast: 0ms !important;
       --tx-motion-base: 0ms !important;
       --tx-motion-slow: 0ms !important;
+      --tx-motion-slower: 0ms !important;
       --tx-motion-easing: linear !important;
+      --tx-motion-ease-standard: linear !important;
+      --tx-motion-ease-emphasized: linear !important;
+      --tx-motion-ease-enter: linear !important;
+      --tx-motion-ease-exit: linear !important;
+      --tx-motion-spring-gentle: linear !important;
+      --tx-motion-spring-gentle-duration: 0ms !important;
+      --tx-motion-spring-snappy: linear !important;
+      --tx-motion-spring-snappy-duration: 0ms !important;
+      --tx-motion-spring-bouncy: linear !important;
+      --tx-motion-spring-bouncy-duration: 0ms !important;
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       scroll-behavior: auto !important;
@@ -133,7 +257,18 @@
     --tx-motion-fast: 0ms !important;
     --tx-motion-base: 0ms !important;
     --tx-motion-slow: 0ms !important;
+    --tx-motion-slower: 0ms !important;
     --tx-motion-easing: linear !important;
+    --tx-motion-ease-standard: linear !important;
+    --tx-motion-ease-emphasized: linear !important;
+    --tx-motion-ease-enter: linear !important;
+    --tx-motion-ease-exit: linear !important;
+    --tx-motion-spring-gentle: linear !important;
+    --tx-motion-spring-gentle-duration: 0ms !important;
+    --tx-motion-spring-snappy: linear !important;
+    --tx-motion-spring-snappy-duration: 0ms !important;
+    --tx-motion-spring-bouncy: linear !important;
+    --tx-motion-spring-bouncy-duration: 0ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;

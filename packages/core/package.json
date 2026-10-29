@@ -42,6 +42,8 @@
     "./keyboard": "./src/keyboard/index.ts",
     "./layer-stack": "./src/layer-stack/index.ts",
     "./lazy": "./src/lazy/index.ts",
+    "./motion": "./src/motion/index.ts",
+    "./motion/spring": "./src/motion/spring.ts",
     "./overlay": "./src/overlay/index.ts",
     "./overlay-core": "./src/overlay/core-entry.ts",
     "./portal": "./src/portal/index.ts",

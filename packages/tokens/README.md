@@ -122,6 +122,7 @@ With Tailwind 4, import in this order: `tailwindcss`, then
   [theming guide](https://texuli.com/guides/theming/)
 - Compiled CSS and scoped themes: [tokens-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-css.md)
 - Token contract: [tokens-contract.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-contract.md)
+- Motion tokens (durations, easings, springs): [tokens-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-motion.md)
 - Theme generator: [tokens-generator.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-generator.md)
 - Theme libraries: [tokens-library-port.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-port.md)
   and [tokens-library-expand.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-expand.md)

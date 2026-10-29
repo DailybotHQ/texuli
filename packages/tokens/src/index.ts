@@ -6,6 +6,7 @@ export * from './forced-colors/index.ts';
 export * from './generator/index.ts';
 export * from './library-expand/index.ts';
 export * from './modes/index.ts';
+export * from './motion/index.ts';
 export * from './no-flash/index.ts';
 export * from './palette/index.ts';
 export * from './style-presets/index.ts';

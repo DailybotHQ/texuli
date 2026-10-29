@@ -9,6 +9,7 @@ import {
   semanticTokenToCssVar,
   type Theme,
 } from '../contract/index.ts';
+import { slowerDuration } from '../motion/durations.ts';
 
 export interface ThemeAppearanceInput {
   theme: Theme;
@@ -68,6 +69,7 @@ const STYLE_VARIABLES = [
   '--tx-motion-fast',
   '--tx-motion-base',
   '--tx-motion-slow',
+  '--tx-motion-slower',
   '--tx-motion-easing',
   '--tx-focus-ring-style',
   '--tx-focus-ring-width',
@@ -181,6 +183,9 @@ export function themeVariables(input: ThemeAppearanceInput): Record<string, stri
     '--tx-motion-fast': input.reducedMotion ? '0ms' : `${style.motion.durations.fast}ms`,
     '--tx-motion-base': input.reducedMotion ? '0ms' : `${style.motion.durations.base}ms`,
     '--tx-motion-slow': input.reducedMotion ? '0ms' : `${style.motion.durations.slow}ms`,
+    '--tx-motion-slower': input.reducedMotion
+      ? '0ms'
+      : `${slowerDuration(style.motion.durations.slow)}ms`,
     '--tx-motion-easing': input.reducedMotion ? 'linear' : style.motion.easing,
     '--tx-focus-ring-style': style.focusRing.style,
     '--tx-focus-ring-width': style.focusRing.width,

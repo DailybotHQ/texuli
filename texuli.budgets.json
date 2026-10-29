@@ -207,6 +207,14 @@
       "gzip": 8000,
       "note": "The owned Markdown codec with precomputed closers and bracket pairs (measured 7,203 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package). PLAN_009 (2026-10-28, owner-consented release plan): 7680 -> 8000 B, measured + 4% after the linear-time heading, fence, list, quote and link-target readers; measured about 7,660 B; Linux CI measures about 0.2% above macOS."
     },
+    "@texuli/core/motion": {
+      "gzip": 6858,
+      "note": "PLAN_010 T-motion-core (ADR-013): the motion runtime (animate, presence, FLIP, shared elements, timelines, spring solver, reduced-motion source, levels), outside the core root barrel. New row at measured + 4%: measured 6,594 B."
+    },
+    "@texuli/core/motion/spring": {
+      "gzip": 1351,
+      "note": "PLAN_010 T-motion-core (ADR-013): the pure spring solver alone. New row at measured + 4%: measured 1,299 B."
+    },
     "@texuli/core/overlay": {
       "gzip": 14336,
       "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 13,972 B."
@@ -438,8 +446,12 @@
       "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 7,347 B + 4% headroom so platform drift does not flip it."
     },
     "@texuli/tokens/css": {
-      "gzip": 5824,
-      "note": "FIX-tokens-entry-weight: applyTheme/compileThemeCss without library or generator. Measured 5,776 B."
+      "gzip": 6111,
+      "note": "FIX-tokens-entry-weight: applyTheme/compileThemeCss without library or generator. Measured 5,776 B. PLAN_010 T-motion-core (ADR-013): 5824 -> 6111 B, measured + 4% after the theme-driven --tx-motion-slower step (slowerDuration); measured 5,876 B."
+    },
+    "@texuli/tokens/motion": {
+      "gzip": 1242,
+      "note": "PLAN_010 T-motion-core (ADR-013): motion tokens (5 durations, 5 easings, 3 springs with precomputed linear() curves) and motionVariables. New row at measured + 4%: measured 1,194 B."
     },
     "@texuli/tokens/library-expand": {
       "gzip": 8832,

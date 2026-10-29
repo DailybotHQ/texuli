@@ -134,6 +134,7 @@ through this policy, and you can use it the same way. Rejected values return
 - Positioning: [core-position-math.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-position-math.md)
   and [core-position-dom.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-position-dom.md)
 - Rich text editor model: [core-editor.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-editor.md)
+- Motion (`@texuli/core/motion`: animate, presence, FLIP, shared elements, timelines, springs): [core-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-motion.md)
 - Every texel's contract: [packages/core/docs](https://github.com/DailybotHQ/texuli/tree/main/packages/core/docs)
 - Security model: [SECURITY.md](https://github.com/DailybotHQ/texuli/blob/main/docs/SECURITY.md)
 
