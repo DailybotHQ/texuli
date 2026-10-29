@@ -144,8 +144,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/playground/',
     reason:
-      'The playground stage mounts on open; the PLAN_006 studio polish (T-82) extended the presets: measured 100.6 KB page / 69.6 KB JS, limits 104 / 72.',
-    budget: { pageGzipKb: 104, jsGzipKb: 72 },
+      'The playground stage mounts on open; the PLAN_006 studio polish (T-82) extended the presets: measured 100.6 KB page / 69.6 KB JS, limits 104 / 72. PLAN_009 (handler composition and ref props in the shared components) measured 104.1 KB page in CI on Linux, limit 109 (+4% headroom).',
+    budget: { pageGzipKb: 109, jsGzipKb: 72 },
   },
   {
     route: '/search/',
