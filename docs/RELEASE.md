@@ -161,6 +161,52 @@ HTML-tag check). Differential fuzzing matched the old parsers' output. See
 **Also in the branch:** the agent service's catalog imports every manifest
 group, so its hash matches the site catalog (`apps/agent`, not published).
 
+### Known gaps and next steps (planned for the next version, not started)
+
+0.5.0 closes every gap Protoyard reported. These are the known gaps on the
+way to a library that every product consumes from npm with one consistent
+contract. They are planned, not done; the detailed backlog with sources is
+in the PLAN_009 analysis (`next-version-backlog.md`).
+
+- **One API contract everywhere.**
+  - `ref`: styled components that wrap a primitive without an element ref
+    (menus, combobox, select, popover, navigation menu, sheet and command
+    parts, `Radio`, `NumberField.Root`, `Tooltip`) don't take `bind:ref`
+    yet; the primitives need ref support first.
+  - Caller handlers: menu items, navigation menu, toast, tooltip, tree,
+    scroll area, splitter and the sortable handle can still drop or replace
+    a caller's handler. 0.5.0 fixed the inputs and 14 primitive parts.
+  - A library-wide test that every component spreads rest props, takes
+    `ref` and composes handlers, so new components can't regress.
+  - Conventions written in [STANDARDS](STANDARDS.md): handler order
+    (`Input` and `Textarea` sync their value before the caller; the
+    primitives run the caller first), what `headingLevel` sets (`Board`
+    columns vs the `NotificationInbox` heading), `onValueChange` payloads
+    (`Input` reports text while a numeric `bind:value` holds a number), and
+    camelCase callbacks (`onStop`, `onCopy`) vs DOM events.
+- **Proof from npm for every package.** The consumers harness installs the
+  packed tarballs of 5 packages (core, tokens, primitives, texuli, data) in
+  Vite, Astro and SvelteKit apps; extend it to all 20 packable packages, with
+  a smoke import of every subpath.
+- **Size.** Share the chart families' data-table fallback styles (about
+  4.1 KB gzip of lazily loaded CSS); trim the entries raised in 0.5.0
+  (`@texuli/catalog` root, `@texuli/data/grid-editing`,
+  `@texuli/blocks/structure/renderers`); `@texuli/primitives/date-field` has
+  43 B of headroom; confirm that importing only the `texuli/layouts/mobile`
+  model helpers drops the new components.
+- **Slides.** With lazy default renderers, `DeckStage` renders a loading
+  status on the server; preload the defaults in server builds so no-JS and
+  SEO output keep the slides.
+- **Chat.** Per-conversation scroll positions (`scrollKey`), a label for each
+  message article, and an option for `actions` to replace the built-in send
+  button.
+- **Smaller items.** A toast replaced by `id` keeps only the newest
+  `onSettle`; `Pagination` `stableCount` writes a numeric `style` attribute
+  (strict `style-src-attr` hosts need a hash per value); the catalog `tag`
+  manifest still states the old remove label; `texuli/icons` needs an
+  `icons.css.d.ts`; the website's layer data should name the 0.5.0 data views
+  and editor Markdown so the [ARCHITECTURE](ARCHITECTURE.md) layer table can.
+
 ### 0.4.0
 
 Every packable package moves to `0.4.0` together, and every internal
