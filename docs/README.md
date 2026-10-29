@@ -106,6 +106,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-csp](../apps/website/docs/site-csp.md) | Built-site Content Security Policy |
 | [site-drag](../apps/website/docs/site-drag.md) | Drag page (texuli.com) |
 | [site-docs-shell](../apps/website/docs/site-docs-shell.md) | Docs shell (texuli.com) |
+| [site-documents](../apps/website/docs/site-documents.md) | texuli.com: documents page |
 | [site-editor](../apps/website/docs/site-editor.md) | texuli.com: editor area |
 | [site-evidence](../apps/website/docs/site-evidence.md) | texuli.com: Evidence on every component page |
 | [site-examples](../apps/website/docs/site-examples.md) | texuli.com: live examples |
@@ -116,6 +117,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-ia](../apps/website/docs/site-ia.md) | Site information architecture |
 | [site-landing](../apps/website/docs/site-landing.md) | texuli.com landing system |
 | [site-live-components](../apps/website/docs/site-live-components.md) | Live interactive component pages |
+| [site-live-generation](../apps/website/docs/site-live-generation.md) | texuli.com: live generation playground |
 | [site-live-primitives](../apps/website/docs/site-live-primitives.md) | Live primitive demos |
 | [site-media-page](../apps/website/docs/site-media-page.md) | texuli.com: media lab |
 | [site-motion](../apps/website/docs/site-motion.md) | texuli.com: motion page |

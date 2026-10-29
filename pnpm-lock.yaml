@@ -129,6 +129,9 @@ importers:
       '@texuli/deck':
         specifier: workspace:*
         version: link:../../packages/deck
+      '@texuli/document':
+        specifier: workspace:*
+        version: link:../../packages/document
       '@texuli/drag':
         specifier: workspace:*
         version: link:../../packages/drag
@@ -141,6 +144,9 @@ importers:
       '@texuli/media':
         specifier: workspace:*
         version: link:../../packages/media
+      '@texuli/pages':
+        specifier: workspace:*
+        version: link:../../packages/pages
       '@texuli/player':
         specifier: workspace:*
         version: link:../../packages/player

@@ -44,6 +44,7 @@ Every styled component with live examples; each page documents props, behavior a
 - [Editor](https://texuli.com/editor-page/)
 - [Drag and drop](https://texuli.com/drag-page/)
 - [Motion](https://texuli.com/motion-page/)
+- [Documents](https://texuli.com/documents-page/)
 - [Workflow editor](https://texuli.com/workflows-page/)
 - [JSON live preview](https://texuli.com/workflows-page/json/)
 - [Blocks](https://texuli.com/blocks-page/)
@@ -67,10 +68,11 @@ The OKLCH theme engine and the interactive theme tools.
 
 ## Agents
 
-The agent catalog, the sink-free renderer and the agent surfaces.
+The agent catalog, the sink-free renderer, streaming generation and the agent surfaces.
 
 - [Agents](https://texuli.com/agents-page/)
 - [Playground](https://texuli.com/playground/)
+- [Live generation](https://texuli.com/live-generation/)
 - [Builder](https://texuli.com/builder/)
 - [Agent chat](https://texuli.com/agent-chat/)
 

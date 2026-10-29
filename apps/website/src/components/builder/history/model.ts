@@ -149,6 +149,9 @@ export function describeEdit(
     case 'replaceAll':
       label = 'Replace the draft';
       break;
+    case 'patchDocument':
+      label = `Edit ${op.path ? name(op.path) : 'the document'}`;
+      break;
   }
   return ops.length > 1 ? `${label} and ${ops.length - 1} more` : label;
 }

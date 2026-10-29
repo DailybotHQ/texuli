@@ -92,6 +92,34 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['motion', 'animation', 'transition', 'spring', 'reduced motion', 'flip', 'stagger'],
   },
   {
+    id: 'page-documents',
+    title: 'Documents',
+    description:
+      'A block editor with a slash menu, drag, nested pages, columns and live embeds; reader, paged view, Markdown, DOCX and PDF export, collaboration, and documents as agent data (in development, in the repository only).',
+    href: '/documents-page/',
+    kind: 'page',
+    keywords: [
+      'document',
+      'editor',
+      'pages',
+      'export',
+      'pdf',
+      'docx',
+      'markdown',
+      'collaboration',
+      'comments',
+    ],
+  },
+  {
+    id: 'page-live-generation',
+    title: 'Live generation',
+    description:
+      'A recorded agent draft streamed chunk by chunk into the player: skeletons, validated nodes, a held node, a dropped connection and Try again.',
+    href: '/live-generation/',
+    kind: 'page',
+    keywords: ['stream', 'streaming', 'agent', 'generation', 'skeleton', 'player', 'progressive'],
+  },
+  {
     id: 'page-api-contract',
     title: 'Component API contract',
     description:
