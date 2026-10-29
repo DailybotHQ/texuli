@@ -72,6 +72,11 @@ const headers = $derived(
 const sized = $derived(rows.some((row) => typeof row.size === 'number'));
 const top = $derived(max ?? heatMax(rows, valueKind));
 const averages = $derived(average ? cohortAverages(rows) : []);
+/** The Average row's size: the mean over the cohorts that have one (never their total). */
+const averageSize = $derived.by(() => {
+  const sizes = rows.flatMap((row) => (typeof row.size === 'number' ? [row.size] : []));
+  return sizes.length > 0 ? sizes.reduce((sum, size) => sum + size, 0) / sizes.length : null;
+});
 const show = (value: number) =>
   (format ?? ((v, kind) => formatCohortValue(v, kind, locale)))(value, valueKind);
 const level = (value: number | null) => (heat ? heatLevel(value, top) : null);
@@ -129,11 +134,7 @@ const level = (value: number | null) => (heat ? heatLevel(value, top) : null);
           <TableHead scope="row" class="tx-cohort__label">{text.average}</TableHead>
           {#if sized}
             <TableCell numeric label={text.size}>
-              {formatCohortValue(
-                rows.reduce((sum, row) => sum + (row.size ?? 0), 0),
-                'count',
-                locale
-              )}
+              {#if averageSize !== null}{formatCohortValue(averageSize, 'count', locale)}{/if}
             </TableCell>
           {/if}
           {#each headers as header, period (period)}

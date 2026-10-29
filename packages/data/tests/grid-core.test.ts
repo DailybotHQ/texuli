@@ -525,6 +525,8 @@ describe('DataGrid paging, row classes and toolbar snippets (G7)', () => {
       await fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
       await fireEvent.click(screen.getByRole('checkbox', { name: 'Select Item 4' }));
       expect(within(bulk).getByTestId('bulk-count').textContent).toContain('4 picked');
+      // The bulk context lists ids in row order across pages, not page by page.
+      expect(state().selected).toEqual(['r1', 'r2', 'r3', 'r4']);
       // Ctrl+A selects every visible row across pages.
       const cell = document.querySelector('[data-tx-grid-cell="1:1"]') as HTMLElement;
       await fireEvent.keyDown(cell, { key: 'a', ctrlKey: true });

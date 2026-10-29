@@ -29,7 +29,7 @@ Use the same `namespace` (and `fallbackMode`, when you set one) as the
 | `themeId` | — | Theme id cached when neither the cache nor the root `data-tx-theme` names a valid one; otherwise `default`. |
 | `label` | `Appearance` | Accessible name of the radio group (visually hidden). |
 | `labels` | `Light`, `Dark`, `System` | Visible option names, per choice. |
-| `onchange` | — | Called with the choice after it is stored and applied. |
+| `onValueChange` | — | Called with the choice after it is stored and applied. |
 | `class` | — | Extra class on the group. |
 
 ## Behavior
@@ -46,8 +46,8 @@ Use the same `namespace` (and `fallbackMode`, when you set one) as the
   Clearing the cache also forgets a theme another switcher cached in the same
   namespace.
 - A cached `high-contrast` mode is shown with no option selected.
-- Another tab writing the same namespace updates the selection through the
-  `storage` event.
+- Another tab writing the same namespace updates the selection and the mode
+  on the root through the `storage` event.
 - Before it mounts (server render), no option is selected, so the server
   never guesses the stored choice.
 

@@ -42,8 +42,8 @@ function end(): void {
 }
 
 function onkeydown(event: KeyboardEvent): void {
-  rest.onkeydown?.(event as KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement });
-  if (event.defaultPrevented || context.disabled) return;
+  // composeHandlers ran the caller's onkeydown first and skips this when it prevented the default.
+  if (context.disabled) return;
   const delta = event.shiftKey ? step * 10 : step;
   const { l, c } = context.color;
   const next =

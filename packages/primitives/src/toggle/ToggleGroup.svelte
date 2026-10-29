@@ -103,7 +103,8 @@ const rovingAttachment = attachRovingFocus({
 
 {#snippet fields()}
   {#if name}
-    {#each normalize(current) as pressed (pressed)}
+    <!-- Deduped: a repeated value submits once (and a keyed each never sees a duplicate key). -->
+    {#each [...new Set(normalize(current))] as pressed (pressed)}
       <input type="hidden" {name} {form} value={pressed} disabled={isDisabled || undefined} />
     {/each}
   {/if}

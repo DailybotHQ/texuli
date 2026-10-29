@@ -70,7 +70,7 @@ $effect.pre(() => {
     bind:value={model}
     {maxDepth}
     {disabled}
-    onChange={() => {
+    onValueChange={() => {
       if (txPath !== undefined) interaction?.dispatch(txPath, 'change');
     }}
   />

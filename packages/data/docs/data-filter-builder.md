@@ -40,7 +40,7 @@ run it anywhere with the pure `applyFilter(rows, model, fields?)`.
 | Prop | Default | Meaning |
 | --- | --- | --- |
 | `fields` | required | `FilterField[]`: `key`, `header`, `type` (`text`, `number`, `date`, `boolean`, `enum`), `options` for enums, optional `accessor`. DataGrid columns work as they are |
-| `value` | empty `and` group | `bind:value`: the model. `onChange(model)` on every edit |
+| `value` | empty `and` group | `bind:value`: the model. `onValueChange(model)` on every edit |
 | `maxDepth` | `3` | Deepest group level offered (the root is 1), capped at 5: the engine allows 6 levels and the deepest group still holds conditions |
 | `disabled` | `false` | Disables every control |
 | `labels` | English | Every visible and announced string, including the operator names (`resolveFilterBuilderLabels`) |
@@ -76,7 +76,7 @@ child of the root's second child).
 
 ## Verified
 
-- `pnpm vitest run packages/data/tests/filter-builder.test.ts`: **4 tests**.
+- `pnpm vitest run packages/data/tests/filter-builder.test.ts`: **5 tests**.
   - Model: immutable edits by path, field and operator changes, nested groups and combinators, pruning, the depth limit, JSON round trip and parse errors, issues by path, type inference without fields.
   - View: labelled native controls by field type (text, number pair, enum multi-select, comma list with its hint, boolean, date), the model and the matching rows after each edit, focus after add and remove, the live announcement, `aria-invalid` with a described error, `maxDepth`, loading a saved model.
 - In the browser (a scratch spec on port 4937): the `data-filter-builder` example passes axe in light, dark and forced colors on Chromium, WebKit and the Pixel 7, and on Chromium and the Pixel 7 a condition can be added, filled and removed with Tab and Enter alone (WebKit's default Tab order skips buttons, so that step was not run there).

@@ -1241,6 +1241,18 @@ describe('color-picker', () => {
       expect(input.dataset.state).toBe('invalid');
     });
 
+    it("runs the caller's Area onkeydown once per key, before the part moves the color", async () => {
+      const onAreaKeydown = vi.fn();
+      const view = render(ColorPickerFixture, { props: { onAreaKeydown } });
+      const input = view.getByRole('textbox', { name: 'Color value' }) as HTMLInputElement;
+      const before = input.value;
+      await fireEvent.keyDown(view.getByRole('slider', { name: 'Color area' }), {
+        key: 'ArrowRight',
+      });
+      expect(onAreaKeydown).toHaveBeenCalledTimes(1);
+      expect(input.value).not.toBe(before);
+    });
+
     it('disables pointer, keyboard, text and swatch changes when disabled', async () => {
       const view = render(ColorPickerFixture, { props: { disabled: true } });
       const input = view.getByRole('textbox', { name: 'Color value' }) as HTMLInputElement;

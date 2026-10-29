@@ -10,6 +10,7 @@ let {
   rovingFocus = true,
   disableRight = false,
   value,
+  name,
 }: {
   type?: ToggleGroupType;
   onValueChange?: (value: string | string[]) => void;
@@ -17,6 +18,7 @@ let {
   rovingFocus?: boolean;
   disableRight?: boolean;
   value?: string | string[];
+  name?: string;
 } = $props();
 
 const items = untrack(() =>
@@ -46,7 +48,7 @@ const items = untrack(() =>
     {/each}
   </ToggleGroup.Root>
 {:else}
-  <ToggleGroup.Root {type} {value} {onValueChange} {rovingFocus} aria-label={label}>
+  <ToggleGroup.Root {type} {value} {name} {onValueChange} {rovingFocus} aria-label={label}>
     {#each items as item (item.value)}
       <ToggleGroup.Item
         value={item.value}

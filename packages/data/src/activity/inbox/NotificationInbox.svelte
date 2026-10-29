@@ -1,6 +1,6 @@
 <script lang="ts" generics="T extends InboxNotification">
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
-import type { Snippet } from 'svelte';
+import { type Snippet, tick } from 'svelte';
 import { type ClassValue, cx } from 'texuli/cx';
 import { whenLabel } from '../../engines/activity/days.ts';
 import {
@@ -76,7 +76,11 @@ $effect(() => {
   const fresh = seen ? newArrivals(seen, items) : [];
   seen = new Set(items.map((item) => item.id));
   const count = fresh.filter((item) => !item.read).length;
-  if (count > 0) announcement = text.arrived(count);
+  if (count === 0) return;
+  // Cleared first so a second batch of the same size is spoken again.
+  const message = text.arrived(count);
+  announcement = '';
+  void tick().then(() => (announcement = message));
 });
 
 function setFilter(next: InboxFilter): void {

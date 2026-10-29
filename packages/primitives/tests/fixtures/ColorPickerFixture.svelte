@@ -5,11 +5,17 @@ let {
   disabled = false,
   format,
   useChild = false,
-}: { disabled?: boolean; format?: ColorFormat; useChild?: boolean } = $props();
+  onAreaKeydown,
+}: {
+  disabled?: boolean;
+  format?: ColorFormat;
+  useChild?: boolean;
+  onAreaKeydown?: (event: KeyboardEvent) => void;
+} = $props();
 </script>
 
 {#snippet controls()}
-  <ColorPicker.Area />
+  <ColorPicker.Area onkeydown={onAreaKeydown} />
   <ColorPicker.Hue />
   <ColorPicker.Alpha />
   <ColorPicker.FormatInput />

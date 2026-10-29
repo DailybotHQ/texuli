@@ -2,6 +2,7 @@
 import { untrack } from 'svelte';
 import {
   applyFilter,
+  changeValue,
   emptyFilter,
   FilterBuilder,
   type FilterField,
@@ -51,5 +52,6 @@ const matches = $derived(applyFilter(deals, model, fields).map((deal) => deal.id
 </script>
 
 <FilterBuilder {fields} bind:value={model} {...maxDepth ? { maxDepth } : {}} />
+<button type="button" onclick={() => (model = changeValue(model, [0], 7))}>Set first value to 7</button>
 <output data-testid="model">{JSON.stringify(model)}</output>
 <output data-testid="matches">{matches.join(',')}</output>

@@ -291,6 +291,49 @@ describe('FilterBuilder (G18)', () => {
     expect(model().children).toHaveLength(1);
   });
 
+  it('keeps typed decimals in number and range inputs while they read as the model value', async () => {
+    render(FilterBuilderHarness, {
+      props: {
+        value: {
+          type: 'group',
+          op: 'and',
+          children: [
+            { type: 'condition', field: 'amount', operator: 'eq' },
+            { type: 'condition', field: 'amount', operator: 'between', value: [null, null] },
+          ],
+        },
+      },
+    });
+    const first = screen.getByRole('group', { name: 'Condition 1' });
+    const second = screen.getByRole('group', { name: 'Condition 2' });
+    const one = within(first).getByRole('spinbutton', { name: 'Value' }) as HTMLInputElement;
+    const from = within(second).getByRole('spinbutton', { name: 'From' }) as HTMLInputElement;
+    // Typing "1.05": "1." reads as empty in a browser (happy-dom does not
+    // sanitize, so the events carry what a browser reports), then "1.0", "1.05".
+    for (const input of [one, from]) {
+      for (const [typed, read] of [
+        ['', ''],
+        ['1.0', '1.0'],
+        ['1.05', '1.05'],
+      ] as const) {
+        await fireEvent.input(input, { target: { value: typed } });
+        await tick();
+        expect(input.value, typed).toBe(read);
+      }
+    }
+    expect(model().children).toEqual([
+      { type: 'condition', field: 'amount', operator: 'eq', value: 1.05 },
+      { type: 'condition', field: 'amount', operator: 'between', value: [1.05, null] },
+    ]);
+    await fireEvent.input(one, { target: { value: '2.50' } });
+    await tick();
+    expect(one.value).toBe('2.50');
+    // A model change from outside still replaces the text.
+    await fireEvent.click(screen.getByRole('button', { name: 'Set first value to 7' }));
+    await tick();
+    expect(one.value).toBe('7');
+  });
+
   it('flags invalid values, honors maxDepth and loads a saved model', async () => {
     render(FilterBuilderHarness, {
       props: {

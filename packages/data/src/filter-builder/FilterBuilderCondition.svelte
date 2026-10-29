@@ -57,6 +57,21 @@ function setList(raw: string): void {
 }
 
 const show = (value: unknown) => (value === undefined || value === null ? '' : String(value));
+
+/** The typed value inputs: the single value, and the two ends of a range. */
+let single = $state<HTMLInputElement | null>(null);
+const ends = $state<(HTMLInputElement | null)[]>([null, null]);
+
+/**
+ * What a typed value input shows. While its own text already reads as the
+ * model value ("1.0" for 1, or an unfinished "1." a browser reports as
+ * empty), the text stays, so typing a decimal is never rewritten under the
+ * caret; a model change from elsewhere replaces it.
+ */
+function shown(node: HTMLInputElement | null, value: unknown): string {
+  if (node && (read(node.value) ?? null) === (value ?? null)) return node.value;
+  return show(value);
+}
 </script>
 
 <fieldset class="tx-filter-builder__condition" data-filter-path={key}>
@@ -100,7 +115,8 @@ const show = (value: unknown) => (value === undefined || value === null ? '' : S
         disabled={ctx.disabled}
         aria-invalid={issue ? 'true' : undefined}
         aria-describedby={issue ? `${id}-issue` : undefined}
-        value={show(list[end])}
+        bind:this={ends[end]}
+        value={shown(ends[end] ?? null, list[end])}
         oninput={(event) => setEnd(end, event.currentTarget.value)}
       />
     {/each}
@@ -165,7 +181,8 @@ const show = (value: unknown) => (value === undefined || value === null ? '' : S
         disabled={ctx.disabled}
         aria-invalid={issue ? 'true' : undefined}
         aria-describedby={issue ? `${id}-issue` : undefined}
-        value={show(condition.value)}
+        bind:this={single}
+        value={shown(single, condition.value)}
         oninput={(event) => setValue(read(event.currentTarget.value))}
       />
     {/if}

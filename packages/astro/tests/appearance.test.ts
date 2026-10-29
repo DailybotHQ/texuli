@@ -139,14 +139,34 @@ describe('@texuli/astro appearance switcher (G16)', () => {
     for (const listener of media.listeners) listener();
     expect(root.dataset.txMode).toBe('dark');
 
-    // Another tab writes the same namespace: the selection follows.
+    // Another tab writes the same namespace: the selection and the root mode follow.
+    expect(root.dataset.txMode).toBe('dark');
     cacheAppearance('docs', { themeId: 'ocean', mode: 'light', vars: {} });
     window.dispatchEvent(new StorageEvent('storage', { key: appearanceCacheKey('docs') }));
     await waitFor(() =>
       expect(view.getByRole('radio', { name: 'Light' })).toHaveProperty('checked', true)
     );
+    expect(root.dataset.txMode).toBe('light');
+    expect(root.classList.contains('dark')).toBe(false);
+    // Another tab returns to System: the root goes back to the fallback (the OS, dark here).
+    localStorage.removeItem(appearanceCacheKey('docs'));
+    window.dispatchEvent(new StorageEvent('storage', { key: appearanceCacheKey('docs') }));
+    await waitFor(() =>
+      expect(view.getByRole('radio', { name: 'System' })).toHaveProperty('checked', true)
+    );
+    expect(root.dataset.txMode).toBe('dark');
     view.unmount();
     expect(media.listeners.size).toBe(0);
+  });
+
+  it('reports each choice through onValueChange', async () => {
+    const chosen: string[] = [];
+    const view = render(AppearanceSwitcher, {
+      props: { namespace: 'docs', onValueChange: (choice: string) => chosen.push(choice) },
+    });
+    await fireEvent.click(view.getByRole('radio', { name: 'Dark' }));
+    await fireEvent.click(view.getByRole('radio', { name: 'System' }));
+    expect(chosen).toEqual(['dark', 'system']);
   });
 
   it('renders no inline style or script and accepts custom option labels', () => {

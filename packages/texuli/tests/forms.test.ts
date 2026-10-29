@@ -1211,6 +1211,32 @@ describe('input-api', () => {
         view.unmount();
       }
     });
+
+    it('keeps the typed text while it parses to the bound number, and follows outside changes', async () => {
+      const view = render(InputValueHarness, { props: { kind: 'number' } });
+      const input = view.getByLabelText('Amount') as HTMLInputElement;
+      const amount = () => view.getByTestId('amount').textContent;
+      await fireEvent.input(input, { target: { value: '' } });
+      expect(amount()).toBe('null');
+      // Typing "1." is not a valid number yet: browsers report it as empty
+      // (happy-dom does not sanitize, so the event carries what a browser reads).
+      await fireEvent.input(input, { target: { value: '' } });
+      await tick();
+      expect(amount()).toBe('null');
+      await fireEvent.input(input, { target: { value: '1.0' } });
+      await tick();
+      expect(amount()).toBe('number:1');
+      expect(input.value).toBe('1.0');
+      await fireEvent.input(input, { target: { value: '1.05' } });
+      await tick();
+      expect(amount()).toBe('number:1.05');
+      expect(input.value).toBe('1.05');
+      // An outside change still rewrites the field.
+      await fireEvent.click(view.getByRole('button', { name: 'Set five' }));
+      await tick();
+      expect(amount()).toBe('number:5');
+      expect(input.value).toBe('5');
+    });
   });
 
   describe('G5: styled components bind ref and spread rest attributes', () => {

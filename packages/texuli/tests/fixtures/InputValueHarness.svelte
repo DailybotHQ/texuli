@@ -20,6 +20,7 @@ let amount = $state<string | number | null>(3);
   <button type="button" onclick={() => (files = null)}>Reset</button>
   <output data-testid="files">{files === null ? 'null' : files.length}</output>
 {:else}
-  <Input type={kind} aria-label="Amount" min="0" max="10" bind:value={amount} />
+  <Input type={kind} aria-label="Amount" min="0" max="10" step="any" bind:value={amount} />
+  <button type="button" onclick={() => (amount = 5)}>Set five</button>
   <output data-testid="amount">{amount === null ? 'null' : `${typeof amount}:${amount}`}</output>
 {/if}

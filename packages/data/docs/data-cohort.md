@@ -46,7 +46,7 @@ size-weighted averages and optional heat cells whose text keeps its contrast.
 | `format` | percent or grouped integer | `(value, kind) => text` |
 | `heat` | `false` | Tints value cells in five fixed steps |
 | `max` | 1 for rates, the largest cell for counts | Top of the heat scale |
-| `average` | `false` | A `tfoot` row of averages per period, weighted by size when every cohort that reached the period has one |
+| `average` | `false` | A `tfoot` row of averages per period, weighted by size when every cohort that reached the period has one, and the mean cohort size |
 | `density`, `locale`, `labels`, `class` | `compact`, `en-US`, English | Table density, number formatting and every header and announced string |
 
 ## Semantics

@@ -111,12 +111,13 @@ describe('CohortTable (G20)', () => {
         .getAllByRole('cell')
         .map((cell) => cell.getAttribute('data-heat'))
     ).toEqual([null, '4', '2', '1']);
+    // The Average row's size cell is the mean cohort size (350 / 3), not the total.
     const footer = table.querySelector('tfoot tr') as HTMLElement;
     expect(
       within(footer)
         .getAllByRole('cell')
         .map((cell) => cell.textContent?.trim())
-    ).toEqual(['350', '100%', '60%', '25%']);
+    ).toEqual(['117', '100%', '60%', '25%']);
   });
 
   it('formats counts, hides heat when off, and keeps every heat step on a contrast-safe pair', () => {

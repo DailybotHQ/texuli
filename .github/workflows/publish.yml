@@ -45,6 +45,22 @@ jobs:
       # Packs the tarballs into tmp/packages/tarballs/ and records
       # SHA-256 digests; publint warnings fail the job.
       - run: pnpm verify:packages
+      # Pre-flight, before the first `npm publish`: 0.0.0 is the unreleased
+      # placeholder, so any package in the publish list still on it fails the
+      # job here, with nothing published (never halfway through a wave).
+      - name: Refuse unreleased placeholder versions
+        run: |
+          set -euo pipefail
+          refused=0
+          for dir in core date spec drag deck tokens primitives texuli workflows editor charts data media chat blocks catalog tools astro player slides; do
+            name=$(node -p "require('./packages/${dir}/package.json').name")
+            version=$(node -p "require('./packages/${dir}/package.json').version")
+            if [ "$version" = "0.0.0" ]; then
+              echo "Refusing to publish ${name}@0.0.0: bump the version first"
+              refused=1
+            fi
+          done
+          exit "$refused"
       - name: Publish in wave order (docs/RELEASE.md)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -57,11 +73,6 @@ jobs:
             slug=${name#@}; slug=${slug//\//-}
             tarball="tmp/packages/tarballs/${slug}-${version}.tgz"
             test -s "$tarball"
-            # 0.0.0 is the unreleased placeholder: fail instead of publishing it.
-            if [ "$version" = "0.0.0" ]; then
-              echo "Refusing to publish ${name}@0.0.0: bump the version first"
-              return 1
-            fi
             # Idempotent: a re-run after a partial failure skips what is
             # already on the registry (a published version never changes).
             if npm view "${name}@${version}" version >/dev/null 2>&1; then

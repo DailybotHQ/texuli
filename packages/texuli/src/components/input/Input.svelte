@@ -49,8 +49,19 @@ const numeric = $derived(type === 'number' || type === 'range');
 const showClear = $derived(
   clearable && type !== 'file' && !disabled && !readonly && value !== null && value !== ''
 );
-/** What the native input shows: numbers as text, `null` as empty. */
-const fieldValue = $derived(value === null || value === undefined ? '' : String(value));
+/**
+ * What the native input shows: numbers as text, `null` as empty. While the
+ * field's own text already parses to the bound number ("1.0", "1e3", or an
+ * unfinished "1." the browser reports as empty), that text stays: writing
+ * `String(value)` back would rewrite it under the caret. An outside change to
+ * `value` no longer matches the text, so it replaces it.
+ */
+const fieldValue = $derived.by(() => {
+  const next = value === null || value === undefined ? null : value;
+  const node = ref as HTMLInputElement | null;
+  if (numeric && node && node.type === type && toValue(node.value) === next) return node.value;
+  return next === null ? '' : String(next);
+});
 
 /** The bound value for the field's text: numeric types bind a number or `null`. */
 function toValue(text: string): string | number | null {

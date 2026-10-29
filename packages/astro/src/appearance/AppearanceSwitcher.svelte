@@ -6,7 +6,7 @@
  * paint. Nothing touches `window`, `document` or storage until it mounts; it
  * renders no inline script or style.
  */
-import type { ColorMode } from '@texuli/tokens/modes';
+import { applyColorMode, type ColorMode } from '@texuli/tokens/modes';
 import { appearanceCacheKey } from '@texuli/tokens/no-flash';
 import {
   APPEARANCE_CHOICES,
@@ -28,7 +28,7 @@ type Props = {
   /** Visible option names. */
   labels?: Partial<Record<AppearanceChoice, string>>;
   /** Called after a choice is stored and applied. */
-  onchange?: (choice: AppearanceChoice) => void;
+  onValueChange?: (choice: AppearanceChoice) => void;
   class?: string;
 };
 
@@ -38,7 +38,7 @@ let {
   themeId,
   label = 'Appearance',
   labels,
-  onchange,
+  onValueChange,
   class: className,
 }: Props = $props();
 
@@ -56,8 +56,13 @@ let choice = $state<StoredAppearanceChoice | undefined>(undefined);
 $effect(() => {
   const key = appearanceCacheKey(namespace);
   choice = readAppearanceChoice(namespace);
+  // Another tab changed the choice: follow it in the radios and on <html>.
+  // The other tab already wrote the cache, so only the mode is applied here.
   const onStorage = (event: StorageEvent) => {
-    if (event.key === null || event.key === key) choice = readAppearanceChoice(namespace);
+    if (event.key !== null && event.key !== key) return;
+    const next = readAppearanceChoice(namespace);
+    choice = next;
+    applyColorMode(document.documentElement, next === 'system' ? fallbackMode : next);
   };
   addEventListener('storage', onStorage);
   return () => removeEventListener('storage', onStorage);
@@ -83,7 +88,7 @@ $effect(() => {
 function choose(next: AppearanceChoice): void {
   choice = next;
   applyAppearanceChoice(namespace, next, { fallbackMode, ...(themeId ? { themeId } : {}) });
-  onchange?.(next);
+  onValueChange?.(next);
 }
 </script>
 

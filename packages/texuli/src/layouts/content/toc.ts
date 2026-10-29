@@ -45,7 +45,7 @@ export function tocSelector(levels: readonly TocLevel[]): string {
 export function headingSlug(value: string): string {
   const normalized = value
     .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');

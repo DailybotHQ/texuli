@@ -227,9 +227,15 @@ function setSort(next: GridSort): void {
   onSortChange?.(next);
 }
 
+/**
+ * Keeps the selection in row order across every page: the paging helpers
+ * order by the page they act on, which would put a later page's rows first.
+ */
 function setSelected(next: string[]): void {
-  selected = next;
-  onSelectionChange?.(next);
+  const wanted = new Set(next);
+  const ordered = [...allIds.filter((id) => wanted.delete(id)), ...wanted];
+  selected = ordered;
+  onSelectionChange?.(ordered);
 }
 
 function labelOf(row: T): string {

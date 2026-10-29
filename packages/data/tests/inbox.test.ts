@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
@@ -126,6 +126,15 @@ describe('NotificationInbox (G19)', () => {
     await tick();
     expect(status.textContent).toBe('1 new notification.');
     expect(items()).toHaveLength(4);
+    // A second batch of the same size is spoken again: the status clears, then refills.
+    const spoken: string[] = [];
+    const observer = new MutationObserver(() => spoken.push(status.textContent ?? ''));
+    observer.observe(status, { childList: true, characterData: true, subtree: true });
+    await fireEvent.click(screen.getByRole('button', { name: 'Simulate arrival' }));
+    await waitFor(() => expect(spoken.at(-1)).toBe('1 new notification.'));
+    observer.disconnect();
+    expect(spoken).toContain('');
+    expect(items()).toHaveLength(5);
   });
 
   it('renders app routes at the developer tier and never renders unsafe links', async () => {

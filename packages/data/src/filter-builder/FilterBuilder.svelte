@@ -26,7 +26,7 @@ interface Props {
   /** The model (`bind:value`): the grid engine's filter AST, an and/or group at the root. */
   value?: FilterGroup;
   /** Every edit, with the new model. Run it with `applyFilter` or a DataGrid's `filter`. */
-  onChange?: (value: FilterGroup) => void;
+  onValueChange?: (value: FilterGroup) => void;
   /** Deepest group level offered (the root is 1). Capped at 5, where the engine's 6-level limit stops nesting. */
   maxDepth?: number;
   disabled?: boolean;
@@ -37,7 +37,7 @@ interface Props {
 let {
   fields,
   value = $bindable(emptyFilter()),
-  onChange,
+  onValueChange,
   maxDepth = 3,
   disabled = false,
   labels,
@@ -61,7 +61,7 @@ async function focusAfter(target: string): Promise<void> {
 
 function commit(next: FilterGroup, message?: string): void {
   value = next;
-  onChange?.(next);
+  onValueChange?.(next);
   // Cleared first so the same message (two adds in a row) is spoken again.
   if (message) {
     announcement = '';
