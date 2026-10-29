@@ -206,6 +206,10 @@ in the PLAN_009 analysis (`next-version-backlog.md`).
   manifest still states the old remove label; `texuli/icons` needs an
   `icons.css.d.ts`; the website's layer data should name the 0.5.0 data views
   and editor Markdown so the [ARCHITECTURE](ARCHITECTURE.md) layer table can.
+- **Editor codec on long plain text.** The core editor Markdown reader is
+  linear on hostile Markdown but grows faster than linear on very long plain
+  paragraphs (hundreds of milliseconds near its 100,000-character cap);
+  profile its inline loop.
 
 ### 0.4.0
 
