@@ -12,7 +12,7 @@ import MediaView from '../shared/MediaView.svelte';
 import type { MediaResolver } from '../shared/media.ts';
 import PageLinkView from '../shared/PageLinkView.svelte';
 import WrappedBlockView from '../shared/WrappedBlockView.svelte';
-import ReaderBlocks from './ReaderBlocks.svelte';
+import Self from './ReaderBlocks.svelte';
 
 interface Props {
   blocks: readonly DocumentBlock[];
@@ -50,12 +50,12 @@ const level = (value: number) => `h${Math.min(6, Math.max(1, value + props.headi
             <span class="tx-pages-check" aria-hidden="true">{item.checked ? '☑' : '☐'}</span>
             <span class="tx-pages-visually-hidden">{item.checked ? labels.done : labels.notDone}</span>
           {/if}
-          <ReaderBlocks {...props} blocks={item.blocks} />
+          <Self {...props} blocks={item.blocks} />
         </li>
       {/each}
     </svelte:element>
   {:else if block.type === 'quote'}
-    <blockquote class="tx-pages-quote" data-block-id={block.id}><ReaderBlocks {...props} blocks={block.blocks} /></blockquote>
+    <blockquote class="tx-pages-quote" data-block-id={block.id}><Self {...props} blocks={block.blocks} /></blockquote>
   {:else if block.type === 'divider'}
     <hr class="tx-pages-divider" data-block-id={block.id} />
   {:else if block.type === 'media'}
@@ -63,17 +63,17 @@ const level = (value: number) => `h${Math.min(6, Math.max(1, value + props.headi
   {:else if block.type === 'callout'}
     <aside class="tx-pages-callout" data-tone={block.tone} aria-label={block.title || labels.blockType('callout')} data-block-id={block.id}>
       {#if block.title}<p class="tx-pages-callout__heading"><strong>{block.title}</strong></p>{/if}
-      <ReaderBlocks {...props} blocks={block.blocks} />
+      <Self {...props} blocks={block.blocks} />
     </aside>
   {:else if block.type === 'toggle'}
     <details class="tx-pages-details" open={block.open === true} data-block-id={block.id}>
       <summary><Inline content={block.summary} /></summary>
-      <ReaderBlocks {...props} blocks={block.blocks} />
+      <Self {...props} blocks={block.blocks} />
     </details>
   {:else if block.type === 'columns'}
     <div class="tx-pages-columns" data-block-id={block.id} style:grid-template-columns={block.columns.map((column) => `${column.width ?? 1}fr`).join(' ')}>
       {#each block.columns as column (column.id)}
-        <div class="tx-pages-column"><ReaderBlocks {...props} blocks={column.blocks} /></div>
+        <div class="tx-pages-column"><Self {...props} blocks={column.blocks} /></div>
       {/each}
     </div>
   {:else if block.type === 'page-link'}

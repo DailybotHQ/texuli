@@ -42,9 +42,10 @@ import { fileURLToPath } from 'node:url';
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 /** Workspace packages that are never packed: the examples registry is demo
- * code. (@texuli/editor left this list in PLAN_009 G17: it is publishable
- * from 0.5.0.) */
-export const NEVER_PACKED: readonly string[] = ['@texuli/examples'];
+ * code, and @texuli/pages until its first release (0.7.0, PLAN_010): it pins
+ * @texuli/document, which keeps the 0.0.0 placeholder until then. (@texuli/editor
+ * left this list in PLAN_009 G17: it is publishable from 0.5.0.) */
+export const NEVER_PACKED: readonly string[] = ['@texuli/examples', '@texuli/pages'];
 
 /** attw resolution kinds outside the ESM-only support policy. */
 export const IGNORED_RESOLUTIONS: readonly string[] = ['node10', 'node16-cjs'];

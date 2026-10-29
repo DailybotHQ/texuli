@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { createRawSnippet, tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import DataGrid from '../src/grid-core/DataGrid.svelte';
 import {
   ariaSort,
   cellText,
@@ -14,7 +15,6 @@ import {
   resolveDataGridLabels,
   searchRows,
 } from '../src/grid-core/index.ts';
-import DataGrid from '../src/grid-core/DataGrid.svelte';
 import DataGridHarness from './fixtures/DataGridHarness.svelte';
 import DataGridPagingHarness from './fixtures/DataGridPagingHarness.svelte';
 

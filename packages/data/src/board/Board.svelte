@@ -16,7 +16,6 @@ import { createListMotion, type MotionProp } from 'texuli/motion';
 import {
   type BoardColumnDef,
   type BoardKeyboardText,
-  rankSequence,
   type BoardLaneDef,
   type BoardMove,
   type BoardOptions,
@@ -30,6 +29,7 @@ import {
   type MoveTarget,
   moveIntent,
   pickUp,
+  rankSequence,
   validateMove,
 } from '../engines/board/index.ts';
 import {

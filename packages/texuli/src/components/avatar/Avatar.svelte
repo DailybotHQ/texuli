@@ -1,8 +1,8 @@
 <script lang="ts">
 import type { HrefTrust } from '@texuli/core/url-policy';
 import {
-  Avatar as AvatarPrimitive,
   type AvatarImageLoadingStatus,
+  Avatar as AvatarPrimitive,
 } from '@texuli/primitives/avatar';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
