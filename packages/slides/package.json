@@ -22,7 +22,7 @@
   "type": "module",
   "sideEffects": [
     "**/*.css",
-    "./src/stage/ssr-server.ts"
+    "**/stage/ssr-server.*"
   ],
   "imports": {
     "#deck-ssr": {

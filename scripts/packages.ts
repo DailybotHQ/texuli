@@ -193,6 +193,11 @@ export function publishManifest(
   }
   if (!isRecord(source.exports)) problems.push('manifest: no exports map');
   else manifest.exports = mapExport(source.exports, 'root', 'exports', problems, stubs);
+  // Subpath imports (`#name`) point into src like exports do; map them to the
+  // dist tree too, or a packed `import '#name'` would not resolve.
+  if (isRecord(source.imports)) {
+    manifest.imports = mapExport(source.imports, 'root', 'imports', problems, stubs);
+  }
   if (isRecord(source.bin)) {
     const bin: { [key: string]: Json } = {};
     for (const [command, target] of Object.entries(source.bin)) {

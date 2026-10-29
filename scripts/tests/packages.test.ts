@@ -326,6 +326,29 @@ describe('workspace selection', () => {
   });
 });
 
+describe('publishManifest subpath imports', () => {
+  const versions = new Map([['demo', '0.3.0']]);
+  it('maps package.json `imports` to the dist tree, so #-specifiers resolve from the tarball', () => {
+    const { manifest, problems } = publishManifest(
+      pkg({
+        name: 'demo',
+        version: '0.3.0',
+        type: 'module',
+        sideEffects: ['**/*.css'],
+        exports: { '.': './src/index.ts' },
+        imports: {
+          '#ssr': { browser: './src/stage/ssr-browser.ts', default: './src/stage/ssr-server.ts' },
+        },
+      }),
+      versions
+    );
+    expect(problems).toEqual([]);
+    expect(manifest.imports).toEqual({
+      '#ssr': { browser: './dist/stage/ssr-browser.js', default: './dist/stage/ssr-server.js' },
+    });
+  });
+});
+
 describe('sideEffects', () => {
   it('every package declares CSS-only sideEffects (examples also register entries)', () => {
     const all = readWorkspace();
@@ -341,6 +364,11 @@ describe('sideEffects', () => {
           './src/**/entry.ts',
           './src/**/entries.ts',
         ]);
+      } else if (pkg.name === '@texuli/slides') {
+        // The server-only renderer preload (#deck-ssr's default condition)
+        // loads its tables at module evaluation; a glob keeps it in both the
+        // source and the packed dist tree.
+        expect(side as string[]).toEqual(['**/*.css', '**/stage/ssr-server.*']);
       } else if (pkg.name === '@texuli/charts') {
         // The worker offload entry self-registers its message listener, so it
         // must stay in the bundle output even when nothing imports its return.
