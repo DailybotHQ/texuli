@@ -285,7 +285,60 @@ function parseList(
 
 const ESCAPABLE = /[\\`*_{}[\]()#+\-.!~<>|]/;
 const AUTOLINK = /<((?:https?:\/\/|mailto:)[^\s<>]+)>/iy;
-const LINK_TARGET = /\(\s*<?((?:[^\s()<>]|\([^\s()<>]*\))*)>?(?:\s+"[^"\n]*")?\s*\)/y;
+
+const isWhitespace = (char: string | undefined) => char !== undefined && /\s/.test(char);
+/** A target character: not whitespace, a parenthesis or an angle bracket. */
+const isTargetChar = (char: string | undefined) => char !== undefined && !/[\s()<>]/.test(char);
+
+/**
+ * Reads a link target `(<href> "title")` whose `(` is at `open`, by hand.
+ * It returns what `/\(\s*<?((?:[^\s()<>]|\([^\s()<>]*\))*)>?(?:\s+"[^"\n]*")?\s*\)/y`
+ * returned (the href and the index after `)`), but in linear time: in that
+ * regex `\(\s*`, `\s+"` and `\s*\)` competed for one whitespace run, so
+ * `[a](` + 3,990 spaces + `x` took about 250 ms.
+ */
+function readLinkTarget(source: string, open: number): { href: string; end: number } | null {
+  // The optional title and the closing parenthesis from `from`: the index
+  // after `)`, or -1.
+  const close = (from: number) => {
+    let at = from;
+    while (isWhitespace(source[at])) at += 1;
+    if (source[at] === ')') return at + 1;
+    if (at === from || source[at] !== '"') return -1;
+    at += 1;
+    while (at < source.length && source[at] !== '"' && source[at] !== '\n') at += 1;
+    if (source[at] !== '"') return -1;
+    at += 1;
+    while (isWhitespace(source[at])) at += 1;
+    return source[at] === ')' ? at + 1 : -1;
+  };
+  let at = open + 1;
+  while (isWhitespace(source[at])) at += 1;
+  const afterSpace = at;
+  if (source[at] === '<') at += 1;
+  const hrefStart = at;
+  // Plain characters and balanced `(…)` groups without whitespace inside.
+  for (;;) {
+    if (isTargetChar(source[at])) at += 1;
+    else if (source[at] === '(') {
+      let inner = at + 1;
+      while (isTargetChar(source[inner])) inner += 1;
+      if (source[inner] !== ')') break;
+      at = inner + 1;
+    } else break;
+  }
+  const href = source.slice(hrefStart, at);
+  if (source[at] === '>') at += 1;
+  const end = close(at);
+  if (end !== -1) return { href, end };
+  // The regex backtracked into the leading whitespace: `( "title")` is an
+  // empty href with a title.
+  if (afterSpace > open + 1) {
+    const titled = close(open + 1);
+    if (titled !== -1) return { href: '', end: titled };
+  }
+  return null;
+}
 
 type EmphasisMarker = '**' | '__' | '~~' | '*' | '_';
 
@@ -517,15 +570,9 @@ function matchLink(
 ): { labelStart: number; labelEnd: number; href: string; end: number } | null {
   const labelEnd = scan.labelEnd(at);
   if (labelEnd === -1 || source[labelEnd + 1] !== '(') return null;
-  LINK_TARGET.lastIndex = labelEnd + 1;
-  const target = LINK_TARGET.exec(source);
+  const target = readLinkTarget(source, labelEnd + 1);
   if (!target) return null;
-  return {
-    labelStart: at + 1,
-    labelEnd,
-    href: target[1] ?? '',
-    end: labelEnd + 1 + target[0].length,
-  };
+  return { labelStart: at + 1, labelEnd, href: target.href, end: target.end };
 }
 
 /** Plain text of an inline tree (for accessible names and summaries). */

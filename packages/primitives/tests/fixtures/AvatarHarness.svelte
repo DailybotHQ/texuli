@@ -6,6 +6,8 @@ import type { AvatarImageLoadingStatus } from '../../src/avatar/types.ts';
 let {
   src = null as string | null,
   srcTrust = 'untrusted' as HrefTrust,
+  srcset = undefined as string | undefined,
+  sizes = undefined as string | undefined,
   delayMs = 0,
   alt = '',
   loadingStatus = $bindable('loading' as AvatarImageLoadingStatus),
@@ -13,6 +15,8 @@ let {
 }: {
   src?: string | null;
   srcTrust?: HrefTrust;
+  srcset?: string;
+  sizes?: string;
   delayMs?: number;
   alt?: string;
   loadingStatus?: AvatarImageLoadingStatus;
@@ -27,6 +31,6 @@ let {
   aria-label="Portrait"
   data-testid="avatar-root"
 >
-  <Avatar.Image {src} {srcTrust} {alt} />
+  <Avatar.Image {src} {srcTrust} {srcset} {sizes} {alt} />
   <Avatar.Fallback>AE</Avatar.Fallback>
 </Avatar.Root>

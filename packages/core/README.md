@@ -66,7 +66,7 @@ keep bundles narrow.
 
 | Texel | Subpath | Headline exports |
 | --- | --- | --- |
-| URL policy | `url-policy` | `safeHref`, `safeImageSrc`, `safeImageSrcset`, `safeMediaSrc` |
+| URL policy | `url-policy` | `safeHref`, `safeImageSrc`, `safeImageSrcset`, `filterImageSrcset`, `safeMediaSrc` |
 | Ids | `ids` | `createIdScope`, `createIdFamily`, `ariaLabelledBy`, `ariaDescribedBy`, `ensureElementId` |
 | Keyboard | `keyboard` | `parseShortcut`, `matchesShortcut`, `formatShortcut`, `createShortcutMap`, `getNavigationIntent` |
 | Roving focus and typeahead | `roving` | `createRovingFocus`, `createTypeahead`, `setRovingTabIndex` |

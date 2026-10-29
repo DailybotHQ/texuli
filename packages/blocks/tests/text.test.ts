@@ -179,6 +179,39 @@ describe('parseMarkdown: no super-linear backtracking (ReDoS)', () => {
     ).toBeLessThan(100);
   });
 
+  // The link target regex let `\(\s*`, `\s+"` and `\s*\)` compete for one
+  // whitespace run: the first source took about 250 ms before the target was
+  // read by hand.
+  it.each([
+    ['a space run before text', `[a](${spaces(CAP - 5)}x`],
+    ['a space run before an open title', `[a](${spaces(CAP - 6)}"x`],
+    ['an href, then a space run', `[a](b${spaces(CAP - 6)}x`],
+  ])('reads a link target with %s under 20 ms', (name, source) => {
+    expect(source.length, name).toBeGreaterThanOrEqual(CAP - 1);
+    expect(
+      fastest(() => parseMarkdown(source)),
+      name
+    ).toBeLessThan(20);
+  });
+
+  it('reads link targets: angle brackets, balanced parentheses and titles', () => {
+    const href = (source: string) => {
+      const block = parseMarkdown(source).blocks[0];
+      const node = block?.type === 'paragraph' ? block.children[0] : undefined;
+      return node?.type === 'link' ? `link ${node.href ?? '(none)'}` : node?.type;
+    };
+    const cases: readonly (readonly [string, string])[] = [
+      ['[a](https://example.com)', 'link https://example.com'],
+      ['[a](  <https://example.com/x>  "Title" )', 'link https://example.com/x'],
+      ['[a](https://example.com/a_(b))', 'link https://example.com/a_(b)'],
+      // A title alone is a link with an empty href, which the URL policy drops.
+      ['[a](  "only a title")', 'link (none)'],
+      ['[a](https://example.com "open title)', 'text'],
+      ['[a](b c)', 'text'],
+    ];
+    expect(cases.map(([source]) => href(source))).toEqual(cases.map(([, expected]) => expected));
+  });
+
   it('reads U+2028 and U+2029 as line breaks and keeps the heading grammar', () => {
     expect(
       parseMarkdown('# One\u2028## Two\u2029- item').blocks.map((block) => block.type)

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  filterImageSrcset,
   MAX_DATA_IMAGE_BYTES,
   resolveTrust,
   safeHref,
@@ -354,5 +355,23 @@ describe('resolveTrust: an unknown trust value fails closed to untrusted', () =>
       for (const set of developerOnly.srcset)
         expect(safeImageSrcset(set, trust), `${label} ${set}`).toBeUndefined();
     }
+  });
+});
+
+describe('filterImageSrcset', () => {
+  it('drops refused candidates one by one at the trust tier and returns undefined when none survive', () => {
+    const hostile =
+      'data:image/png;base64,AAAA 1x, javascript:alert(1) 2x, http://cdn.example/b.webp 3x';
+    expect(filterImageSrcset(hostile)).toBeUndefined();
+    expect(filterImageSrcset(`${hostile}, https://cdn.example/c.webp 4x`)).toBe(
+      'https://cdn.example/c.webp 4x'
+    );
+    expect(filterImageSrcset(hostile, 'developer')).toBe('http://cdn.example/b.webp 3x');
+    // The first kept candidate's descriptor kind wins.
+    expect(filterImageSrcset('/a.webp 64w, /b.webp 2x, /c.webp 128w')).toBe(
+      '/a.webp 64w, /c.webp 128w'
+    );
+    for (const value of [undefined, null, 42, '', '  ', 'x'.repeat(16_385)])
+      expect(filterImageSrcset(value)).toBeUndefined();
   });
 });

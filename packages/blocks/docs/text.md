@@ -86,13 +86,16 @@ Its safety rules:
   are literal.
 - **Linear time.** Heading, fence and rule lines are read by hand, and the
   inline parser finds emphasis closers and bracket matches from one table
-  per source, so no line or run of markers makes it backtrack. U+2028 and
+  per source, and a link target `(<href> "title")` is read by index, so no
+  line, run of markers or whitespace run makes it backtrack. U+2028 and
   U+2029 end a line like `\n`. Before this, `# a` + 2,000 spaces + `x` took
   over 20 s; on 2026-10-28, with the host at load average 133, each of 14
   hostile 4,000-character shapes (space runs in headings, fences and
   U+2028-ended list lines, long hard-break runs, unclosed `*`, `_`, `**`,
   `~~`, `[` and `![`) parsed in about 1 ms, and `text.test.ts` bounds each
-  at 100 ms.
+  at 100 ms. A link target of `[a](` + 3,990 spaces + `x` took about 250 ms
+  before it was read by index and about 1 ms after; `text.test.ts` bounds
+  three such targets at 20 ms.
 - **Relative headings.** The top Markdown heading level renders as
   `headingBase` (h3 by default) and deeper levels follow without gaps. Author
   text cannot outrank heading blocks or skip outline levels.

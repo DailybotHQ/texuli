@@ -51,10 +51,18 @@ const linkDownload = $derived(
   download === true ? '' : download === false || download === undefined ? undefined : download
 );
 
-/** Merge the caller's `rel` tokens with `noopener` for a new browsing context. */
+/**
+ * Merge the caller's `rel` tokens with `noopener` for a new browsing context.
+ * Browsers read `target` keywords and `rel` tokens ASCII case-insensitively,
+ * so `_BLANK` opens a new context too.
+ */
 function cardLinkRel(value: string | undefined, linkTarget: string | null | undefined) {
   const tokens = (value ?? '').split(/\s+/).filter(Boolean);
-  if (linkTarget === '_blank' && !tokens.includes('noopener')) tokens.push('noopener');
+  if (
+    linkTarget?.toLowerCase() === '_blank' &&
+    !tokens.some((token) => token.toLowerCase() === 'noopener')
+  )
+    tokens.push('noopener');
   return tokens.length > 0 ? tokens.join(' ') : undefined;
 }
 const classes = $derived(

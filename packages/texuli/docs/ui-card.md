@@ -32,8 +32,9 @@ Surface container with optional media, header, body, footer and auto-fit grid.
 `href` uses `@texuli/core/url-policy` `safeHref` (default trust `developer`). Unsafe schemes render a non-interactive `div`.
 
 A link card also takes the anchor attributes `target`, `rel` and `download`
-(`true`, or a suggested file name). With `target="_blank"`, `noopener` is
-always added to `rel` (your tokens are kept). They are dropped when the card
+(`true`, or a suggested file name). With `target="_blank"` (in any letter
+case, as browsers read it), `noopener` is always added to `rel` (your tokens
+are kept). They are dropped when the card
 is not a link (no `href`, or a rejected one).
 
 ```svelte

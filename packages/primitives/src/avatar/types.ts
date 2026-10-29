@@ -24,11 +24,18 @@ export type AvatarRootProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'> &
   ref?: HTMLDivElement | null;
 };
 
-export type AvatarImageProps = Omit<HTMLImgAttributes, 'children' | 'src'> & {
+export type AvatarImageProps = Omit<HTMLImgAttributes, 'children' | 'src' | 'srcset' | 'sizes'> & {
   /** Image URL; validated with `safeImageSrc` before use. */
   src?: string | null;
-  /** Trust level for the URL policy. @default `'untrusted'` */
+  /** Trust level for the URL policy (`src` and every `srcset` candidate). @default `'untrusted'` */
   srcTrust?: HrefTrust;
+  /**
+   * Responsive candidates; each candidate URL passes the image URL policy at
+   * `srcTrust` (`filterImageSrcset`), and refused ones are dropped.
+   */
+  srcset?: string | null;
+  /** Used only while at least one `srcset` candidate survives the policy. */
+  sizes?: string | null;
   alt?: string;
   child?: ChildSnippet<Record<string, unknown>>;
   children?: Snippet;

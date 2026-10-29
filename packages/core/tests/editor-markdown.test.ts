@@ -96,6 +96,17 @@ describe('reading Markdown', () => {
       expect(diagnostics.map((d) => d.code)).toEqual(['link-rejected']);
     }
     {
+      // reads link targets: angle brackets, balanced parentheses, titles and whitespace
+      const hrefs = (source: string) =>
+        (fromMarkdown(source).doc.blocks[0] as Extract<EditorBlock, { type: 'paragraph' }>).content
+          .flatMap((n) => (n.type === 'text' ? n.marks : []))
+          .flatMap((m) => (m.type === 'link' ? [m.href] : []));
+      expect(hrefs('[a](  <https://example.com/x>  "Title" )')).toEqual(['https://example.com/x']);
+      expect(hrefs('[a](https://example.com/a_(b))')).toEqual(['https://example.com/a_(b)']);
+      expect(hrefs('[a](https://example.com "open title)')).toEqual([]);
+      expect(hrefs('[a](b c)')).toEqual([]);
+    }
+    {
       // reads images inside text as their alt text, hard breaks as breaks, soft breaks as spaces
       const doc = read('see ![alt text](https://example.com/i.png) here  \nnext\\\nlast\nsoft');
       expect(doc.blocks[0]).toMatchObject({
@@ -132,6 +143,21 @@ describe('reading Markdown', () => {
       );
       expect(performance.now() - started).toBeLessThan(3_000);
       expect(validateEditorDocument(doc)).toEqual([]);
+    }
+    {
+      // The link target regex let `\(\s*`, `\s+"` and `\s*\)` compete for one
+      // whitespace run: 47 such links at the source cap took about 3 s before
+      // the target was read by hand. Fastest of three, for a loaded host.
+      const unit = `[a](${' '.repeat(2_096)}x\n\n`;
+      const source = unit.repeat(Math.floor(MARKDOWN_CODEC_LIMITS.source / unit.length));
+      expect(source.length).toBeGreaterThan(MARKDOWN_CODEC_LIMITS.source - unit.length);
+      let best = Number.POSITIVE_INFINITY;
+      for (let k = 0; k < 3; k += 1) {
+        const started = performance.now();
+        fromMarkdown(source);
+        best = Math.min(best, performance.now() - started);
+      }
+      expect(best).toBeLessThan(200);
     }
     const blocks = fromMarkdown('p\n\n'.repeat(5_000));
     expect(blocks.doc.blocks.length).toBeLessThanOrEqual(EDITOR_LIMITS.blocks);

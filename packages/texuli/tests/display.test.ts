@@ -333,6 +333,14 @@ describe('card', () => {
           target: '_blank',
           download: null,
         },
+        // Browsers read the target keyword case-insensitively: `_BLANK` is a new context too.
+        { props: { target: '_BLANK' }, rel: 'noopener', target: '_BLANK', download: null },
+        {
+          props: { target: '_Blank', rel: 'NoOpener' },
+          rel: 'NoOpener',
+          target: '_Blank',
+          download: null,
+        },
         { props: { rel: 'external' }, rel: 'external', target: null, download: null },
         { props: { download: true }, rel: null, target: null, download: '' },
         { props: { download: 'report.csv' }, rel: null, target: null, download: 'report.csv' },
