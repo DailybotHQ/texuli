@@ -726,6 +726,30 @@
       "gzip": 28456,
       "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 27,361 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
+    "@texuli/document": {
+      "gzip": 44654,
+      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 42,936 B gzip, cap = measured + 4% headroom. Includes @texuli/deck parseDeck for embedded decks (ADR-011)."
+    },
+    "@texuli/document/model": {
+      "gzip": 1741,
+      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 1,674 B gzip, cap = measured + 4% headroom."
+    },
+    "@texuli/document/schema": {
+      "gzip": 31083,
+      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 29,887 B gzip, cap = measured + 4% headroom. Includes @texuli/deck parseDeck for embedded decks (ADR-011)."
+    },
+    "@texuli/document/ops": {
+      "gzip": 34738,
+      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 33,401 B gzip, cap = measured + 4% headroom."
+    },
+    "@texuli/document/markdown": {
+      "gzip": 37401,
+      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 35,962 B gzip, cap = measured + 4% headroom."
+    },
+    "@texuli/document/sync": {
+      "gzip": 10157,
+      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 9,766 B gzip, cap = measured + 4% headroom. Lazy: only a collaborative session imports it (ADR-010)."
+    },
     "@texuli/slides": {
       "gzip": 50416,
       "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 48,476 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."

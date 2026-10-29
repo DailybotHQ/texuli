@@ -25,6 +25,7 @@ packages in lower layers.
 | L0 | `@texuli/drag` | In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing) | none |
 | L0 | `@texuli/spec` | Framework-free blueprint contract and code generation | none |
 | L1 | `@texuli/primitives` | 42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core, date, drag |
+| L1 | `@texuli/document` | In development (not on npm yet, first release planned for 0.7.0): the framework-free, DOM-free document engine: the block document format with persisted ids, the validator on the deck schema kit, typed operations and bounded RFC 6902 patches with inverses and an op log, Markdown through the core codec, and the CRDT sync core (`sync`); pagination, DOCX and PDF are planned | core, deck |
 | L2 | `@texuli/tokens` | The OKLCH theme engine, the `--tx-*` token contract, 200+ themes, compiled CSS, forced colors, the AA gate, the Tailwind preset | none |
 | L3 | `texuli` | Styled components (Button … Tree), the class helpers (`cx`, `variants`), icons, layouts and app shells | core, primitives, tokens |
 | L4 | `@texuli/charts` | Chart math and every chart family, one lazy subpath per family | core, primitives, tokens, texuli |
@@ -56,8 +57,10 @@ Not layers, because they consume the library:
   website (see [The website](#the-website)).
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
-`scripts/packages.ts`); `pnpm verify:packages` packs the other 20.
-All 20 are released on npm as `0.5.0`, the first release of
+`scripts/packages.ts`); `pnpm verify:packages` packs the other 21.
+`@texuli/document` is new in PLAN_010: it keeps the `0.0.0` placeholder
+version and is not in `publish.yml` until its first release (planned for
+`0.7.0`). The other 20 are released on npm as `0.5.0`, the first release of
 `@texuli/editor` (the previous release, `0.4.0`, had 19 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck` and `@texuli/editor`
 are in development
@@ -72,14 +75,15 @@ L5  blocks
 L4  charts · data · media · chat · editor · workflows
 L3  texuli (styled components, layouts, shells)
 L2  tokens (theme engine, CSS contract)
-L1  primitives (headless, APG)
+L1  primitives (headless, APG) · document (framework-free engine)
 L0  core · date · deck · drag · spec (framework-free)
           ▲ dependencies point down only (scripts/check-layers.ts)
 ```
 
-The packages and subpaths PLAN_010 plans (documents, forms, canvas,
-sheets, motion and more) are not in this table or in `LAYERS` until they
-ship; their decided names and layers are listed in
+The packages and subpaths PLAN_010 plans (forms, canvas, sheets, pages,
+motion and more) are not in this table or in `LAYERS` until they land;
+`@texuli/document` has landed (in development, not on npm). Their decided
+names and layers are listed in
 [Planned (PLAN_010)](#planned-plan010).
 
 ### What the layer guard enforces
@@ -115,6 +119,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/core` (private) | `.`, `announcer`, `controllable`, `dir-locale`, `dismiss`, `editor-history`, `editor-keymap`, `editor-markdown`, `editor-model`, `editor-transforms`, `env`, `focus-scope`, `form-bridge`, `ids`, `inert`, `keyboard`, `layer-stack`, `lazy`, `overlay`, `overlay-core`, `portal`, `position-dom`, `position-math`, `presence`, `roving`, `scroll-lock`, `tabbable`, `url-policy` |
 | `@texuli/date` (private) | `.`, `calendar` |
 | `@texuli/deck` (private, in development) | `.`, `model`, `schema`, `engine`, `markdown`, `math`, `authoring`, `templates` |
+| `@texuli/document` (private, in development) | `.`, `model`, `schema`, `ops`, `markdown`, `sync` |
 | `@texuli/drag` (private, in development) | `.`, `sortable`, `collision`, `modifiers`, `auto-scroll`, `gesture`, `spatial`, `graph`, `messages`, `testing` |
 | `@texuli/data` (private) | `.`, `activity`, `activity/engine`, `activity/inbox`, `board`, `board/engine`, `calendar`, `cohort`, `files`, `files/engine`, `filter-builder`, `geo`, `grid`, `grid-columns`, `grid-core`, `grid-virtual`, `map`, `timeline`, `timeline/engine`, `tree`, `tree-view`, `virtual-list`, `calendar/view`, `grid-editing` |
 | `@texuli/examples` (private) | `.` |
@@ -235,8 +240,9 @@ document and offers a `deckHost` seam (and `chrome={false}`) so a host with
 
 ## Planned (PLAN_010)
 
-**Planned, not shipped.** Nothing in this section exists in the repository
-or on npm yet. These are the package names, layers and subpaths decided by
+**Planned, not shipped.** Nothing in this section is on npm yet, and only
+`@texuli/document` (without `paged`, `docx` and `pdf`) exists in the
+repository. These are the package names, layers and subpaths decided by
 ADR-010 to ADR-016 in [DECISIONS](DECISIONS.md) for the 0.6.0, 0.7.0 and
 0.8.0 release waves. Each package stays "in development" until a release
 the developer approves publishes it, and joins the layer table,
@@ -247,7 +253,7 @@ New packages:
 
 | Planned layer | Package | Subpaths | What it will hold | Will depend on | Release wave | Decision |
 | --- | --- | --- | --- | --- | --- | --- |
-| L1 | `@texuli/document` | `.`, `model`, `schema`, `ops`, `markdown`, `paged`, `docx`, `pdf`, `sync` | Framework-free, DOM-free document engine: the block document format with persisted ids, typed operations and bounded RFC 6902 patches, the untrusted loader, Markdown through the core codec, pagination, DOCX and PDF writers, and the CRDT sync layer | core, deck | 0.7.0 | [ADR-011](DECISIONS.md#adr-011-document-packages-texulidocument-l1-engine-and-texulipages-l8-editor), [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
+| L1 | `@texuli/document` (landed: `.`, `model`, `schema`, `ops`, `markdown`, `sync`; in the layer table) | `paged`, `docx`, `pdf` still planned | Framework-free, DOM-free document engine: the block document format with persisted ids, typed operations and bounded RFC 6902 patches, the untrusted loader, Markdown through the core codec, pagination, DOCX and PDF writers, and the CRDT sync layer | core, deck | 0.7.0 | [ADR-011](DECISIONS.md#adr-011-document-packages-texulidocument-l1-engine-and-texulipages-l8-editor), [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
 | L4 | `@texuli/forms` | `.`, `model` (framework-free), view components | Schema-driven forms: fields, steps, conditional logic on the shared expression AST, closed validation rules, drafts and autosave | core, primitives, tokens, texuli | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
 | L4 | `@texuli/canvas` | `.`, `model` (framework-free), view components | Infinite canvas: shapes, text, connectors, frames, selection, zoom and pan on `@texuli/drag` spatial geometry (shared with workflows), synced through `@texuli/document/sync` | core, document, drag, primitives, tokens, texuli | 0.8.0 | [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
 | L5 | `@texuli/sheets` | `.`, `formula` (framework-free), `model` (framework-free), `csv`, view components | Spreadsheets: the owned formula engine (parser, function set, dependency graph, incremental and bounded recalculation), a sheet view over the data grid editing, CSV import and export; L5 because it builds on `@texuli/data` (L4) | core, date, data, document, drag, primitives, tokens, texuli | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |

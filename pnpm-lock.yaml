@@ -299,6 +299,15 @@ importers:
 
   packages/deck: {}
 
+  packages/document:
+    dependencies:
+      '@texuli/core':
+        specifier: 0.5.0
+        version: link:../core
+      '@texuli/deck':
+        specifier: 0.5.0
+        version: link:../deck
+
   packages/drag: {}
 
   packages/editor:

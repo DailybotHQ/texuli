@@ -34,6 +34,9 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   // consumed by every layer (spec-compose-design.md B1).
   '@texuli/spec': 0,
   '@texuli/primitives': 1,
+  // L1: the framework-free, DOM-free document engine; it imports core and
+  // deck downward, which the same-layer rule forbids at L0 (ADR-011).
+  '@texuli/document': 1,
   '@texuli/tokens': 2,
   texuli: 3,
   '@texuli/charts': 4,

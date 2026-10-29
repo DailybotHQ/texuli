@@ -76,6 +76,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         role: '42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns',
         dependsOn: ['core', 'date', 'drag'],
       },
+      {
+        name: '@texuli/document',
+        role: 'In development (not on npm yet, first release planned for 0.7.0): the framework-free, DOM-free document engine: the block document format with persisted ids, the validator on the deck schema kit, typed operations and bounded RFC 6902 patches with inverses and an op log, Markdown through the core codec, and the CRDT sync core (sync); pagination, DOCX and PDF are planned',
+        dependsOn: ['core', 'deck'],
+      },
     ],
   },
   {
