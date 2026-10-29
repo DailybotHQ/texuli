@@ -46,6 +46,8 @@ fun loadBlueprint(
     components: List<SpecComponent> = SpecVocabulary.components,
     catalogHash: String? = null,
     tier: SpecComponentEmit = SpecComponentEmit.UNTRUSTED,
+    /** The host's data sources (spec 0.8.0); without them a `$source` binding is refused. */
+    sources: List<SourceDescriptor>? = null,
 ): LoadResult {
     val envelope = try {
         BlueprintEnvelope.decode(parseJson(text))
@@ -54,7 +56,7 @@ fun loadBlueprint(
     } catch (error: SpecDecodeException) {
         return LoadResult.Refused(listOf(SpecDiagnostic(SpecDiagnosticCode.SCHEMA, error.path, error.message ?: "not a blueprint")))
     }
-    val validation = validateBlueprint(envelope, components, catalogHash)
+    val validation = validateBlueprint(envelope, components, catalogHash, sources)
     if (!validation.ok) return LoadResult.Refused(validation.diagnostics)
     return LoadResult.Ready(envelope, listOf(planOf(envelope.tree, components, tier)))
 }

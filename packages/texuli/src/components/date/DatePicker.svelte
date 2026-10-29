@@ -2,7 +2,7 @@
 import type { CalendarDate } from '@texuli/primitives/calendar';
 import { type DateInvalidHandler, DatePicker as Primitive } from '@texuli/primitives/date-picker';
 import type { HTMLAttributes } from 'svelte/elements';
-import { joinIds, splitControlProps } from '../../internal/control-props.ts';
+import { joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { getFieldLabelContext } from '../field/context.ts';
 import CalendarIcon from './CalendarIcon.svelte';
@@ -83,7 +83,10 @@ let {
   ...rest
 }: Props = $props();
 
-const split = $derived(splitControlProps(rest));
+const split = $derived(splitRequiredControlProps(rest));
+// `aria-required` (a Field's control props) is not allowed on a group or a
+// slider thumb: it becomes native `required` on the segment or form inputs.
+const isRequired = $derived(required || split.required);
 const field = getFieldLabelContext();
 const showLabel = $derived(!hideLabel && !field);
 
@@ -103,7 +106,7 @@ const describedBy = $derived(
   data-invalid={error ? 'true' : undefined}
   data-disabled={disabled ? 'true' : undefined}
 >
-  {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}{#if required}<span class="tx-date__required"> *</span>{/if}</span>{/if}
+  {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}{#if isRequired}<span class="tx-date__required"> *</span>{/if}</span>{/if}
   <Primitive.Root
     bind:value
     bind:open
@@ -126,7 +129,7 @@ const describedBy = $derived(
         class="tx-date__field"
         {label}
         {...name ? { name } : {}}
-        {required}
+        required={isRequired}
         aria-describedby={joinIds(describedBy, split.control['aria-describedby'] as string | undefined)}
         aria-invalid={error ? 'true' : (split.control['aria-invalid'] as 'true' | undefined)}
       />

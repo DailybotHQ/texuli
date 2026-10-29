@@ -440,6 +440,7 @@ describe('tier semantics (D5)', () => {
     'blocks-media',
     'blocks-structure',
     'blocks-text',
+    'canvas',
     'charts-area',
     'charts-bar',
     'charts-bubble',
@@ -498,6 +499,7 @@ describe('tier semantics (D5)', () => {
     'media-composition-canvas',
     'media-composition-svg',
     'media-image',
+    'schema-form',
     'sortable-list',
     'workflow-graph',
   ];

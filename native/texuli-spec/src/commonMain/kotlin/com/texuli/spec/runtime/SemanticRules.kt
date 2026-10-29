@@ -17,6 +17,8 @@ object SemanticRules {
         "id:layout-grid" to SemanticRule(role = "group"),
         "id:media-image" to SemanticRule(role = "img", name = listOf("alt")),
         "id:document" to SemanticRule(role = "article", name = listOf("label")),
+        "id:schema-form" to SemanticRule(role = "form", name = listOf("label")),
+        "id:canvas" to SemanticRule(role = "figure", name = listOf("label")),
         "prefix:charts-" to SemanticRule(role = "figure", name = listOf("title", "label")),
     )
 

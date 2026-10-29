@@ -118,6 +118,48 @@ is checked by `@texuli/document` on the web only. The Compose renderer
 fails closed: `document` is not in `NativeRegistry`, so it paints a visible
 `not-on-this-target` placeholder. Painting documents natively is planned.
 
+**Forms (spec 0.8.0).** Validation of the shape, painting planned. The
+generated decoders read the `schema-form` id's `schema` (`$defs.formSchema`
+with its fields, options, sections, steps, rules and the closed expression
+AST, `$defs.expression`), so unknown members (an agent `pattern`), field
+types, formats, autocomplete tokens and expression ops are refused
+(`prop-type`), and `PropSchemaValidator` applies the list caps (fields,
+sections, steps, rules) as TypeScript does; the four form invalid fixtures
+run in `InvalidFixtureParityTest`, and the `form-registration` golden's
+trace (`schema-form` as a `form`) matches the web trace. Which members
+apply to which field type, ranges, links and the conditions' field
+references are checked by `@texuli/forms/model` on the web only, and
+evaluating expressions in Kotlin is planned. The Compose renderer fails
+closed: `schema-form` is not in `NativeRegistry`, so it paints a visible
+`not-on-this-target` placeholder.
+
+**Data-source bindings (spec 0.8.0, unreleased).** Validation parity,
+loading planned. `Source.kt` (`texuli-spec`) checks a
+`{"$source": name, "query": {...}, "map": {...}}` prop with the TypeScript
+rules: a `sourceable` prop of the catalog, the closed shape, then the host's
+source descriptors passed as `loadBlueprint(..., sources = …)` or
+`validateBlueprint(..., sources = …)` (`decodeSourceDescriptors` reads
+`registry.describe()` JSON); without descriptors every binding is refused
+(`source`), and an unregistered name is `unknown-source`. The conformance
+suites pass the fixture host (`packages/spec/fixtures/sources.json`), so the
+seven `source-*` invalid fixtures and the `source-tickets` golden's trace
+match the web. The Compose renderer fails closed: a node that reads a source
+paints an `unsupported-source` placeholder (`readsDataSource()`); loading
+sources natively is planned.
+
+**Canvases (spec 0.8.0, unreleased).** Validation parity, painting
+planned. The generated decoders read the `canvas` id's `canvas` (the
+`$defs.canvas` shape: format, version and members), and
+`PropSchemaValidator` applies the grid range and the 5,000-shape and
+5,000-connector caps (`prop-type`), as TypeScript does; the two canvas
+invalid fixtures run in `InvalidFixtureParityTest`, and the `canvas-retro`
+golden's trace (`canvas` as a `figure`, named by its label) matches the web
+trace. The closed shape vocabulary, the palette, text safety and the URL
+policy are checked by `@texuli/canvas/model` on the web only. The Compose
+renderer fails closed: `canvas` is not in `NativeRegistry`, so it paints a
+visible `not-on-this-target` placeholder. Painting canvases natively is
+planned.
+
 ## Modules
 
 | Module | What it holds | Targets |
@@ -234,6 +276,7 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `WorkflowValidatorTest` | `texuli-spec` | Workflow graph rules (ids, types, fields, ports, multiplicity, kinds, cycles), label control and bidi refusals, and the 500-node / 2,000-edge limits |
 | `MotionTest` | `texuli-spec` | Spec 0.6.0 motion: closed decoding into the plan, `schema` refusals of CSS, milliseconds, unknown names and a huge stagger, level precedence, `subtle`, and the stagger cap |
 | `RenderPlanTest` | `texuli-spec` | The render plan's tier gate: ids whose catalog `emit` list lacks the tier become `tier-denied` placeholders (default tier `untrusted`), checked for every catalog id |
+| `SourceTest` | `texuli-spec` | Spec 0.8.0 data-source bindings: a valid binding passes with the host's sources and fails closed without them, the TypeScript refusals (unknown source, a URL name, extra members, page size, fields, sort, operators, values, map, mixed keys, nested bindings), a 10,000-level filter, descriptor decoding and bound plan nodes |
 | `AccessibilityTest` | `texuli-compose` | Image alternatives (blank alt is decorative) and heading ranks clamped to 1-6 |
 | `ChartWidgetsTest` | `texuli-compose` | Compact chart props: gaps, variants, title-over-label naming, bounded scales, refusals |
 | `LayoutWidgetsTest` | `texuli-compose` | Responsive grid columns, gap mapping, document outline order, deck-slide labels |

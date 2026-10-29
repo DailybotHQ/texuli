@@ -46,6 +46,7 @@ export interface BuiltCatalogLike {
     emit: readonly string[];
     events?: readonly SpecEventName[];
     bindable?: readonly string[];
+    sourceable?: readonly string[];
     deprecated?: SpecDeprecation;
     props: readonly {
       name: string;
@@ -60,8 +61,8 @@ export interface BuiltCatalogLike {
 
 /**
  * Project a built catalog into the spec vocabulary. Deterministic: components
- * sorted by id, props by name, emit tiers, events and bindable props sorted;
- * events, bindable, property schemas and deprecations only when present. Capability is `unknown`
+ * sorted by id, props by name, emit tiers, events, bindable and sourceable
+ * props sorted; events, bindable, sourceable, property schemas and deprecations only when present. Capability is `unknown`
  * unless `capabilities` (the reviewed `catalog/capabilities.json`) records an
  * audited value (ADR-003: no id is portable until audited).
  */
@@ -99,6 +100,7 @@ export function projectCatalog(
         ),
         ...(entry.events?.length ? { events: [...entry.events].sort() } : {}),
         ...(entry.bindable?.length ? { bindable: [...entry.bindable].sort() } : {}),
+        ...(entry.sourceable?.length ? { sourceable: [...entry.sourceable].sort() } : {}),
         ...(entry.deprecated ? { deprecated: { ...entry.deprecated } } : {}),
       })
     );

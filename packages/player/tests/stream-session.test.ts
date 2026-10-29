@@ -18,7 +18,10 @@ import {
   STREAM_PENDING_ID,
   type StreamSnapshot,
 } from '../src/stream/session.ts';
+import { checkCanvas } from './canvas-host.ts';
 import { checkDocument } from './document-host.ts';
+import { checkForm } from './form-host.ts';
+import { FIXTURE_SOURCES } from './source-host.ts';
 
 /**
  * The player's streaming session (ADR-014): every golden streams clean in
@@ -43,12 +46,21 @@ const validate = {
   tier: 'untrusted' as const,
   checkBlock: checkFamilyBlock,
   checkDocument,
+  checkCanvas,
+  // Forms (spec 0.8.0) are checked with the forms validator.
+  checkForm,
   conditions: formulaConditions,
   conditionInputs: {},
   roles: PLAYER_GRAMMAR_ROLES,
+  sources: FIXTURE_SOURCES,
+};
+// Spec 0.8.0: bound props stream as empty lists; the fixture host's descriptors check them.
+const sources = {
+  sourceable: (id: string) => catalog.get(id)?.sourceable,
+  resolver: { descriptors: FIXTURE_SOURCES, rows: () => [] },
 };
 const session = () =>
-  createStreamSession({ validate, bindable: (id) => catalog.get(id)?.bindable });
+  createStreamSession({ validate, bindable: (id) => catalog.get(id)?.bindable, sources });
 
 /** A seeded generator, so random chunkings replay. */
 function random(seed: number) {
@@ -152,7 +164,7 @@ describe('streaming session: goldens', () => {
           const resolved = resolveSplitBlueprint(
             split,
             values,
-            playerResolveOptions(split, (id) => catalog.get(id)?.bindable)
+            playerResolveOptions(split, (id) => catalog.get(id)?.bindable, undefined, sources)
           );
           expect(resolved.issues).toEqual([]);
           // Admitted shells are exactly what the agent wrote.

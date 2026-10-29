@@ -52,6 +52,14 @@ object SpecContract {
     const val WORKFLOW_STRING_LENGTH: Int = 2000
     /** Top-level blocks a `document` node's doc may hold (spec 0.7.0 `$defs.document`). */
     const val DOCUMENT_BLOCKS: Int = 2000
+    /** Shapes and connectors a `canvas` node's canvas may hold at its top level (spec 0.8.0 `$defs.canvas`). */
+    const val CANVAS_SHAPES: Int = 5000
+    const val CANVAS_CONNECTORS: Int = 5000
+    /** List caps of a `schema-form` node's schema (spec 0.8.0 `$defs.formSchema`, ADR-015). */
+    const val FORM_FIELDS: Int = 200
+    const val FORM_SECTIONS: Int = 50
+    const val FORM_STEPS: Int = 20
+    const val FORM_RULES: Int = 50
 
     val STATE_NAME: Regex = Regex("^[a-z][A-Za-z0-9_]{0,31}\$")
     val DATA_NAME: Regex = Regex("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)*\$")

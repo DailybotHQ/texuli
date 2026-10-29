@@ -72,6 +72,8 @@ Every option belongs to the host. A blueprint can set none of them.
 | `chrome` | `true` | `false` paints no frame chrome: no label heading, status, trust badge, skip link or end anchor (`data-tx-player-chrome="off"`). For a host that already frames the content and states its trust itself, such as a slide (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
 | `deckHost` | `null` | A `DeckPlayerHost` that presents a validated `layout-deck` blueprint on a stage instead of the document flow (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
 | `documentHost` | `null` | A `DocumentPlayerHost` (spec 0.7.0): its `checkDocument` validates `document` nodes, and its `present` paints a valid `document` root. Without one a document blueprint is refused (see [Document hosts](#document-hosts)) |
+| `canvasHost` | `null` | A `CanvasPlayerHost` (spec 0.8.0): its `checkCanvas` validates `canvas` nodes, and its `present` paints a valid `canvas` root. Without one a canvas blueprint is refused (see [Canvas hosts](#canvas-hosts)) |
+| `formHost` | `null` | A `FormPlayerHost` (spec 0.8.0): its `checkForm` validates `schema-form` nodes (with its `validators` names), and its `present` paints each valid one. Without one a form blueprint is refused (see [Forms](#forms)) |
 | `selectable`, `selection`, `onSelectionChange` | `false`, —, — | Frame selection for a builder-style preview ([Selection](reference.md#selection-builder-preview)) |
 | `view`, `onFlowChange` | — | The flow view and its transitions ([Views and flows](reference.md#views-and-flows-g09)) |
 | `onAction` | — | Answers action-form intents with `confirmed` or `rejected`; without it, actions are unavailable ([Action surface](reference.md#action-surface-and-receipts-g17)) |
@@ -310,6 +312,90 @@ is too large for its eager chunk, so both come from the host through
 Tests: `packages/player/tests/document-host.test.ts` (the seam, a hostile
 document never presented, the preview notice, keyed streaming) and
 `packages/pages/tests/host.test.ts` (the real reader in the player).
+
+
+## Canvas hosts
+
+On this branch, not yet published (spec 0.8.0, ADR-012). A `canvas`
+blueprint is one node whose `canvas` prop is a Texuli canvas. The player
+(L7) could import `@texuli/canvas` (L4), but the canvas validator stays out
+of its first-load chunk, so, as for documents, the host supplies both
+through `canvasHost` (`CanvasPlayerHost`):
+
+```svelte
+<script lang="ts">
+  import { createCanvasPlayerHost } from '@texuli/canvas/host';
+  import { Player } from '@texuli/player';
+  let { draft } = $props();
+  const canvasHost = createCanvasPlayerHost();
+</script>
+
+<Player blueprint={draft} label="Agent canvas" {canvasHost} />
+```
+
+- **`checkCanvas`** (a `DraftCanvasCheck`) joins validation at the
+  player's `tier`, in `validateDraft` and the streaming node checks.
+  Without a `canvasHost` every `canvas` node fails with `canvas-unchecked`
+  and nothing of the canvas paints.
+- **`present`** receives a `CanvasPlayerHostRequest` once the draft is
+  valid and its single root is a `canvas` (`canvasRoot`): the node's
+  `canvas`, its `label` as `canvasLabel`, its `key`, the host-chosen `tier`,
+  and live getters for the frame `label`, `active` and the empty `target`
+  (`data-tx-player-canvas-host-surface`). It may return a cleanup.
+  `createCanvasPlayerHost` validates again and mounts the read-only
+  `CanvasViewer`, loaded on first use.
+- `isCanvasTree` detects a canvas node and `CANVAS_HOST_PACKAGE` names the
+  package that owns the viewer. Under `invalidPolicy="preview"` with no
+  host, a `canvas` node paints a titled notice (`canvasNeedsHost`), never
+  its shapes.
+
+## Forms
+
+A `schema-form` node (spec 0.8.0, ADR-015) is a form as data. The player
+does not depend on `@texuli/forms`: like documents and canvases, a form
+paints through a host seam, `formHost` (`FormPlayerHost`), so the form
+engine stays out of the player's first-load chunk and the player ships
+without the forms package. `@texuli/forms/host` supplies the adapter:
+
+```svelte
+<script lang="ts">
+  import { createFormPlayerHost } from '@texuli/forms/host';
+  import { Player } from '@texuli/player';
+  const formHost = createFormPlayerHost({ validators: { 'company-email': checkCompanyEmail } });
+</script>
+
+<Player blueprint={draft} label="Agent form" {formHost} onAction={answer} />
+```
+
+- **Validation.** The host's `checkForm` (`checkFormDraft`) joins
+  `validateDraft` at the player's tier, with the host's `validators` names:
+  a field may name only those. Without a `formHost` every `schema-form`
+  node fails with `form-unchecked`, the invalid notice shows, and nothing
+  of the form paints.
+- **Painting.** Each valid `schema-form` node renders an element
+  (`data-tx-player-schema-form="<action>"`) and hands it to the host's
+  `present` (`FormPlayerHostRequest`: `schema`, `action`, `formLabel`,
+  `tier`, the live `active`, `labels` and `target`, and `submit`). The
+  adapter validates the schema again at that tier and mounts `SchemaForm`,
+  loaded on first use; the cleanup unmounts it.
+- **Submitting.** `submit(values)` proposes the node's `action` intent
+  through `onAction`, like `action-form`, with the values of the visible,
+  enabled fields; once confirmed the node's `submit` event runs its
+  `on.submit` actions. Action values are scalars, so a list answer
+  (multiselect, tags) travels as JSON array text (`'["a11y","forms"]'`)
+  and a file answer as the JSON list of its file names: the player has no
+  upload channel (uploads through a host seam are planned). A refused,
+  failed or unavailable action resolves `{ ok: false, message }`, which the
+  form shows in its error summary, keeping the answers.
+- **Helpers.** `formActionValues(values)` is the value mapping above;
+  `FORM_HOST_PACKAGE` names the package that owns the adapter.
+- **Native.** The Kotlin twin validates the schema's shape and paints a
+  visible placeholder (planned).
+
+Tests: `packages/player/tests/schema-form.test.ts` (the golden paints
+through the forms adapter, validation before painting, host validator
+names, the action intent, refusals, no host) and the golden and streaming
+suites.
 
 ## Limits
 

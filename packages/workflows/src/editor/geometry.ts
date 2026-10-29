@@ -2,6 +2,7 @@
  * Canvas geometry shared by the editor and the viewer: node boxes, port
  * points, edge curves, spatial focus and bounds. Plain numbers; no DOM.
  */
+import { sideCurvePath } from '@texuli/drag/graph';
 import type { NodeTypeRegistry } from '../model/registry.ts';
 import type {
   Point,
@@ -85,26 +86,17 @@ export function portPlacements(
   return out;
 }
 
-const round = (value: number) => Math.round(value * 10) / 10;
-
-/** An SVG cubic path leaving `a` along `fromSide` and entering `b` along `toSide`. */
+/**
+ * An SVG cubic path leaving `a` along `fromSide` and entering `b` along
+ * `toSide`: `sideCurvePath` from `@texuli/drag/graph`, shared with the canvas.
+ */
 export function edgeCurve(
   a: Point,
   fromSide: PortPlacement['side'],
   b: Point,
   toSide: PortPlacement['side']
 ): string {
-  const reach = Math.max(32, Math.hypot(b.x - a.x, b.y - a.y) * 0.4);
-  const out = (side: PortPlacement['side'], p: Point, sign: 1 | -1): Point => {
-    const d = sign * reach;
-    if (side === 'left') return { x: p.x - d, y: p.y };
-    if (side === 'right') return { x: p.x + d, y: p.y };
-    if (side === 'top') return { x: p.x, y: p.y - d };
-    return { x: p.x, y: p.y + d };
-  };
-  const c1 = out(fromSide, a, 1);
-  const c2 = out(toSide, b, 1);
-  return `M${round(a.x)} ${round(a.y)}C${round(c1.x)} ${round(c1.y)} ${round(c2.x)} ${round(c2.y)} ${round(b.x)} ${round(b.y)}`;
+  return sideCurvePath(a, fromSide, b, toSide);
 }
 
 /** The midpoint of a cubic edge (for its label). */

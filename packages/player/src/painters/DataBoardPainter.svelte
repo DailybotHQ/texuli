@@ -4,7 +4,8 @@ import { getPlayerInteraction } from '../context.ts';
 
 /**
  * `data-board`: cards in columns from plain JSON. A move updates the cards
- * in view, writes them back when `items` is bound, and runs `on.move`.
+ * in view, writes them back when `items` is bound (or saves them through
+ * the host's data source when `items` reads one), and runs `on.move`.
  */
 interface Card {
   id: string;
@@ -54,7 +55,7 @@ const columnDefs = $derived(
   }))
 );
 
-function onMove(move: BoardMove): void {
+async function onMove(move: BoardMove): Promise<void> {
   const placements = placementsOf(move);
   const next = cards.map((card) => {
     const placed = placements[card.id];
@@ -69,8 +70,12 @@ function onMove(move: BoardMove): void {
   });
   cards = next;
   if (txPath === undefined) return;
-  interaction?.write(txPath, 'items', next);
+  // Items read from a host data source (spec 0.8.0) are saved through it: the
+  // board shows the move at once and puts the card back if the source refuses.
+  const saved = interaction?.save?.(txPath, 'items', next) ?? null;
+  if (saved === null) interaction?.write(txPath, 'items', next);
   interaction?.dispatch(txPath, 'move', { value: move.itemId });
+  if (saved) await saved;
 }
 </script>
 

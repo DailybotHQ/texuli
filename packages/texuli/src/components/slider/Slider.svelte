@@ -2,7 +2,7 @@
 import { Slider as SliderPrimitive } from '@texuli/primitives/slider';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
-import { splitControlProps } from '../../internal/control-props.ts';
+import { splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type SliderSize, sliderRootClass } from './variants.ts';
 import './slider.css';
@@ -76,7 +76,10 @@ let {
 
 // aria-*, data-*, handlers and form attributes go to the thumbs (the focusable
 // sliders); layout hooks (style, hidden…) stay on the field wrapper.
-const split = $derived(splitControlProps(rest));
+const split = $derived(splitRequiredControlProps(rest));
+// `aria-required` (a Field's control props) is not allowed on a group or a
+// slider thumb: it becomes native `required` on the segment or form inputs.
+const isRequired = $derived(required || split.required);
 const consumerLabel = $derived(split.control['aria-label'] as string | undefined);
 
 const uid = $props.id();
@@ -195,7 +198,7 @@ const markByIndex = $derived.by(() => {
         {getValueText}
         {name}
         {form}
-        {required}
+        required={isRequired}
         class={rootClass}
         aria-labelledby={label ? labelId : undefined}
       >
@@ -219,7 +222,7 @@ const markByIndex = $derived.by(() => {
         {getValueText}
         {name}
         {form}
-        {required}
+        required={isRequired}
         class={rootClass}
         aria-labelledby={label ? labelId : undefined}
       >

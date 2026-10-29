@@ -51,6 +51,10 @@
     "./stream": {
       "types": "./src/stream/index.ts",
       "default": "./src/stream/index.ts"
+    },
+    "./source": {
+      "types": "./src/source.ts",
+      "default": "./src/source.ts"
     }
   },
   "scripts": {

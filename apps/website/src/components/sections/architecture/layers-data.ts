@@ -139,6 +139,16 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         role: 'In development: interactive, accessible workflow graph editor and viewer (model, layout, editor)',
         dependsOn: ['core', 'drag', 'primitives', 'tokens', 'texuli'],
       },
+      {
+        name: '@texuli/forms',
+        role: 'In development (unreleased; first release planned for 0.8.0): schema-driven forms: the closed form schema and its validator, conditional logic and cross-field rules on @texuli/core/expression, named formats, drafts and autosave, and the form controller (model, framework-free); SchemaForm, which paints any schema with texuli controls, multi-step and keyboard-complete (.); the player form host (host)',
+        dependsOn: ['core', 'texuli'],
+      },
+      {
+        name: '@texuli/canvas',
+        role: 'In development (unreleased; first release planned for 0.8.0): the infinite canvas: the canvas format, its untrusted validator, geometry, connector routing on the curve shared with workflows, freehand simplification, operations with inverses and the op-log history (model, framework-free); CRDT collaboration on @texuli/document/sync (sync); SVG and PNG export (export); the accessible editor and viewer (editor, viewer); the player canvas host (host)',
+        dependsOn: ['core', 'deck', 'document', 'drag', 'texuli'],
+      },
     ],
   },
   {
@@ -159,7 +169,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/catalog',
         role: 'The agent catalog (manifests per group, build) and the renderer with no HTML sinks',
-        dependsOn: ['core', 'spec', 'texuli', 'charts', 'data', 'blocks', 'media'],
+        dependsOn: ['core', 'spec', 'texuli', 'charts', 'data', 'forms', 'blocks', 'media'],
       },
     ],
   },

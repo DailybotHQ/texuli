@@ -39,6 +39,9 @@ export function manifestData(input: CatalogManifest): Readonly<CatalogManifest> 
     ...(Array.isArray(input.bindable) && input.bindable.length > 0
       ? { bindable: input.bindable as string[] }
       : {}),
+    ...(Array.isArray(input.sourceable) && input.sourceable.length > 0
+      ? { sourceable: input.sourceable as string[] }
+      : {}),
     ...(input.deprecated !== null && typeof input.deprecated === 'object'
       ? { deprecated: input.deprecated as CatalogDeprecation }
       : {}),

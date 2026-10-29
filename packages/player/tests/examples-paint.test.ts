@@ -2,8 +2,10 @@ import { render, screen } from '@testing-library/svelte';
 import { buildCatalog } from '@texuli/catalog/build';
 import { describe, expect, it } from 'vitest';
 import Player from '../src/Player.svelte';
+import { testCanvasHost } from './canvas-host.ts';
 import { CATALOG_GROUPS } from './catalog-groups.ts';
 import { testDocumentHost } from './document-host.ts';
+import { testFormHost } from './form-host.ts';
 
 /**
  * Every manifest example of every agent-emittable id paints in the Player
@@ -115,6 +117,9 @@ describe('every emittable example paints', () => {
             invalidPolicy: 'preview',
             // A document example (spec 0.7.0) is checked and painted through a document host.
             documentHost: testDocumentHost().host,
+            // A canvas example (spec 0.8.0) likewise, through a canvas host.
+            canvasHost: testCanvasHost().host,
+            formHost: testFormHost(),
             onDiagnostics: (event: {
               diagnostics: readonly {
                 check: string;

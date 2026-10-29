@@ -104,6 +104,39 @@ const FORM_CONTROLS = [
 ] as const;
 const GROUP_CONTROLS = ['RadioGroup', 'Rating', 'ColorPicker'] as const;
 const FOCUSABLE = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON']);
+/** Roles that support `aria-required` (WAI-ARIA 1.2), implicit ones included. */
+const ARIA_REQUIRED_ROLES = new Set([
+  'checkbox',
+  'combobox',
+  'gridcell',
+  'listbox',
+  'radiogroup',
+  'spinbutton',
+  'switch',
+  'textbox',
+  'tree',
+  'treegrid',
+  'columnheader',
+  'rowheader',
+]);
+/** The implicit role of a native form element (enough for the Field controls). */
+function implicitRole(element: Element): string {
+  const tag = element.tagName;
+  if (tag === 'TEXTAREA') return 'textbox';
+  if (tag === 'SELECT') return element.hasAttribute('multiple') ? 'listbox' : 'combobox';
+  if (tag === 'INPUT') {
+    const type = (element.getAttribute('type') ?? 'text').toLowerCase();
+    if (type === 'checkbox') return 'checkbox';
+    if (type === 'number') return 'spinbutton';
+    if (type === 'radio') return 'radio';
+    if (type === 'range') return 'slider';
+    // ARIA in HTML allows aria-required on a file input (it has no role).
+    if (type === 'file') return 'textbox';
+    if (['button', 'submit', 'reset', 'image', 'hidden', 'color'].includes(type)) return type;
+    return 'textbox';
+  }
+  return tag === 'BUTTON' ? 'button' : 'generic';
+}
 
 describe('Field rule: id and aria from a Field reach the focusable control', () => {
   for (const control of FORM_CONTROLS) {
@@ -128,6 +161,29 @@ describe('Field rule: id and aria from a Field reach the focusable control', () 
       expect(document.querySelectorAll('.tx-date__label')).toHaveLength(0);
     });
   }
+  it('a required Field puts aria-required only on roles that support it, and every control stays required', async () => {
+    const misplaced: string[] = [];
+    const notRequired: string[] = [];
+    for (const control of [...FORM_CONTROLS, ...GROUP_CONTROLS]) {
+      const view = render(FieldRuleContract, { props: { control, required: true } });
+      await tick();
+      const root = view.container;
+      for (const element of root.querySelectorAll('[aria-required]')) {
+        const role = element.getAttribute('role') ?? implicitRole(element);
+        if (!ARIA_REQUIRED_ROLES.has(role)) {
+          misplaced.push(`${control}: <${element.tagName.toLowerCase()} role="${role}">`);
+        }
+      }
+      // A color picker always holds a value: it has no required state.
+      const valued = control === 'ColorPicker';
+      if (!valued && root.querySelectorAll('[aria-required="true"], [required]').length === 0) {
+        notRequired.push(control);
+      }
+      view.unmount();
+    }
+    expect(misplaced).toEqual([]);
+    expect(notRequired).toEqual([]);
+  });
   for (const control of GROUP_CONTROLS) {
     it(`${control}: the group takes the id and is described and invalid`, async () => {
       render(FieldRuleContract, { props: { control } });

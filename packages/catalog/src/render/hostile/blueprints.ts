@@ -1,6 +1,7 @@
 /**
  * Hostile spec 0.3.0 blueprints (data only): workflow graphs, drag as data,
- * bindings and actions. Each must be refused by `validateDraft` with the
+ * bindings and actions, and spec 0.8.0 data-source bindings (validated with
+ * no host sources, so each must fail closed). Each must be refused by `validateDraft` with the
  * host's spec check (`checkSpec: validateBlueprint`), naming at least one of
  * `refuse`; nothing is ever evaluated. `make` builds the large cases on
  * demand, so importing the corpus stays cheap.
@@ -16,7 +17,8 @@ export type HostileBlueprintCategory =
   | 'unknown-prop'
   | 'unknown-action'
   | 'binding'
-  | 'prototype';
+  | 'prototype'
+  | 'source';
 
 export interface HostileBlueprint {
   id: string;
@@ -59,6 +61,12 @@ const graph = (nodes: unknown[], edges: unknown[], cycles = 'forbid') => ({
     label: 'Hostile workflow',
     graph: { version: 1, cycles, nodeTypes: [step], nodes, edges },
   },
+});
+
+/** A data grid whose rows are `rows` (spec 0.8.0 source bindings). */
+const GRID = (rows: unknown) => ({
+  id: 'data-grid',
+  props: { caption: 'Tickets', columns: [{ id: 'title', header: 'Title' }], rows },
 });
 
 export const HOSTILE_BLUEPRINTS: readonly HostileBlueprint[] = Object.freeze([
@@ -269,5 +277,74 @@ export const HOSTILE_BLUEPRINTS: readonly HostileBlueprint[] = Object.freeze([
     title: 'A __proto__ key among the state declarations',
     text: '{"format":"texuli-blueprint","version":1,"id":"hostile","catalog":"__CATALOG__","status":"draft","createdAt":"2026-10-27T09:00:00Z","updatedAt":"2026-10-27T09:00:00Z","generator":{"kind":"agent","name":"Hostile"},"state":{"__proto__":{"type":"boolean"}},"tree":{"id":"layout-stack","props":{}}}',
     refuse: ['prototype-key', 'state', 'schema'],
+  },
+  {
+    id: 'source-url-name',
+    category: 'source',
+    title: 'A data source named by a URL (agents name host sources, never URLs)',
+    tree: GRID({ $source: 'https://attacker.example/rows.json' }),
+    refuse: ['source'],
+  },
+  {
+    id: 'source-fetch-members',
+    category: 'source',
+    title: 'A source binding carrying a request: endpoint, headers and a method',
+    tree: GRID({
+      $source: 'tickets',
+      endpoint: '/api/tickets',
+      headers: { authorization: 'Bearer token' },
+      method: 'DELETE',
+    }),
+    refuse: ['source'],
+  },
+  {
+    id: 'source-sql-filter',
+    category: 'source',
+    title: 'Injection text in a filter value, with no host sources (fails closed)',
+    tree: GRID({
+      $source: 'tickets',
+      query: {
+        filter: {
+          type: 'condition',
+          field: 'title',
+          operator: 'eq',
+          value: "'; DROP TABLE tickets; --",
+        },
+        search: '{"$where":"sleep(1000)"}',
+      },
+    }),
+    refuse: ['source'],
+  },
+  {
+    id: 'source-nested',
+    category: 'source',
+    title: 'A source binding inside a column (only whole sourceable props read sources)',
+    tree: {
+      id: 'data-grid',
+      props: {
+        caption: 'Tickets',
+        columns: [{ id: 'a', header: { $source: 'tickets' } }],
+        rows: [],
+      },
+    },
+    refuse: ['source'],
+  },
+  {
+    id: 'source-deep-filter',
+    category: 'source',
+    title: 'A source filter nested 10,000 levels deep',
+    make: () => {
+      let filter: unknown = { type: 'condition', field: 'title', operator: 'eq', value: 'x' };
+      for (let i = 0; i < 10_000; i += 1) filter = { type: 'group', op: 'and', children: [filter] };
+      return GRID({ $source: 'tickets', query: { filter } });
+    },
+    refuse: ['source', 'over-limits', 'schema'],
+  },
+  {
+    id: 'source-prototype-query',
+    category: 'source',
+    title: 'A __proto__ key inside a source query',
+    text: '{"format":"texuli-blueprint","version":1,"id":"hostile","catalog":"__CATALOG__","status":"draft","createdAt":"2026-10-27T09:00:00Z","updatedAt":"2026-10-27T09:00:00Z","generator":{"kind":"agent","name":"Hostile"},"tree":{"id":"data-grid","props":{"caption":"Tickets","columns":[{"id":"title","header":"Title"}],"rows":{"$source":"tickets","query":{"__proto__":{"pageSize":1}}}}}}',
+    refuse: ['source', 'prototype-key', 'schema'],
   },
 ]);

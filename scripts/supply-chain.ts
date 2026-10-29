@@ -72,6 +72,10 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   // First published in 0.7.0; only internal runtime deps.
   '@texuli/document': [],
   '@texuli/pages': [],
+  // In development (PLAN_010 T-canvas): only internal runtime deps; private until a release.
+  '@texuli/canvas': [],
+  // In development (PLAN_010 T-forms): only internal runtime deps; private until a release.
+  '@texuli/forms': [],
   '@texuli/data': [],
   '@texuli/media': [],
   '@texuli/blocks': [],

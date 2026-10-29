@@ -17,9 +17,11 @@
   },
   "dependencies": {
     "@texuli/blocks": "workspace:*",
+    "@texuli/canvas": "workspace:*",
     "@texuli/catalog": "workspace:*",
     "@texuli/core": "workspace:*",
     "@texuli/document": "workspace:*",
+    "@texuli/forms": "workspace:*",
     "@texuli/spec": "workspace:*"
   },
   "devDependencies": {

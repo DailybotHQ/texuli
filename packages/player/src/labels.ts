@@ -79,6 +79,28 @@ export interface PlayerLabels {
 
   /** A `document` node painted without a document host (spec 0.7.0): only previews reach it. */
   documentNeedsHost: string;
+  /** A `canvas` node painted without a canvas host (spec 0.8.0): only previews reach it. */
+  canvasNeedsHost: string;
+
+  // Data sources (spec 0.8.0): a node whose rows come from the host's source.
+  /** Shown while a bound node's first rows load. `{label}`: the node's caption or label. */
+  sourceLoading: string;
+  /** A bound node whose source returned no rows. */
+  sourceEmpty: string;
+  /** Announced and shown when a bound node's rows could not load. `{label}`, `{reason}`. */
+  sourceFailed: string;
+  /** The retry button of a failed load. */
+  sourceRetry: string;
+  /** The button that loads the next page. */
+  sourceLoadMore: string;
+  /** Shown on the button while the next page loads. */
+  sourceLoadingMore: string;
+  /** Announced after a page loads. `{count}`: rows added. */
+  sourceLoadedMore: string;
+  /** Announced and shown when an edit was refused and undone. `{reason}`. */
+  sourceSaveFailed: string;
+  /** Host translations of the data-source error reasons, by message key (`dataSource.error.<code>`). */
+  sourceErrors: Readonly<Record<string, string>>;
 }
 
 export const DEFAULT_PLAYER_LABELS: PlayerLabels = Object.freeze({
@@ -135,6 +157,17 @@ export const DEFAULT_PLAYER_LABELS: PlayerLabels = Object.freeze({
   streamIncomplete: 'Not received.',
 
   documentNeedsHost: 'This document opens in a document reader.',
+  canvasNeedsHost: 'This canvas opens in a canvas viewer.',
+
+  sourceLoading: 'Loading {label}…',
+  sourceEmpty: 'Nothing to show yet.',
+  sourceFailed: '{label} could not be loaded. {reason}',
+  sourceRetry: 'Try again',
+  sourceLoadMore: 'Load more',
+  sourceLoadingMore: 'Loading more…',
+  sourceLoadedMore: '{count} more shown.',
+  sourceSaveFailed: 'The change was not saved and has been undone. {reason}',
+  sourceErrors: Object.freeze({}),
 });
 
 /** Host overrides; nested maps merge per key. */
@@ -144,6 +177,18 @@ export type PlayerLabelOverrides = Partial<
     placeholders: Partial<PlayerLabels['placeholders']>;
   }
 >;
+
+/** Only non-empty string translations under `dataSource.error.*` keys are kept. */
+function sourceErrorTexts(value: unknown): Readonly<Record<string, string>> {
+  if (typeof value !== 'object' || value === null) return DEFAULT_PLAYER_LABELS.sourceErrors;
+  const out: Record<string, string> = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (key.startsWith('dataSource.error.') && typeof entry === 'string' && entry.trim() !== '') {
+      Object.defineProperty(out, key, { value: entry, enumerable: true });
+    }
+  }
+  return Object.freeze(out);
+}
 
 function text(value: unknown, fallback: string): string {
   return typeof value === 'string' && value.trim() !== '' ? value : fallback;
@@ -211,6 +256,16 @@ export function resolvePlayerLabels(overrides: PlayerLabelOverrides | undefined)
     streamHeld: text(overrides.streamHeld, base.streamHeld),
     streamIncomplete: text(overrides.streamIncomplete, base.streamIncomplete),
     documentNeedsHost: text(overrides.documentNeedsHost, base.documentNeedsHost),
+    canvasNeedsHost: text(overrides.canvasNeedsHost, base.canvasNeedsHost),
+    sourceLoading: text(overrides.sourceLoading, base.sourceLoading),
+    sourceEmpty: text(overrides.sourceEmpty, base.sourceEmpty),
+    sourceFailed: text(overrides.sourceFailed, base.sourceFailed),
+    sourceRetry: text(overrides.sourceRetry, base.sourceRetry),
+    sourceLoadMore: text(overrides.sourceLoadMore, base.sourceLoadMore),
+    sourceLoadingMore: text(overrides.sourceLoadingMore, base.sourceLoadingMore),
+    sourceLoadedMore: text(overrides.sourceLoadedMore, base.sourceLoadedMore),
+    sourceSaveFailed: text(overrides.sourceSaveFailed, base.sourceSaveFailed),
+    sourceErrors: sourceErrorTexts(overrides.sourceErrors),
   };
 }
 

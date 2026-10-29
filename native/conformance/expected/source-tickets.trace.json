@@ -1,0 +1,20 @@
+{
+  "golden": "source-tickets",
+  "trace": [
+    {
+      "children": [
+        {
+          "id": "data-grid",
+          "role": "generic"
+        },
+        {
+          "id": "data-board",
+          "role": "generic"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Ticket triage",
+      "role": "main"
+    }
+  ]
+}

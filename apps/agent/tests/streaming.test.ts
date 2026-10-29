@@ -486,3 +486,88 @@ describe('the service validates document drafts with the host document validator
     }
   );
 });
+
+describe('the service validates forms, canvases and source bindings (spec 0.8.0)', () => {
+  const spec = (name: string) =>
+    (
+      JSON.parse(
+        readFileSync(
+          join(import.meta.dirname, `../../../packages/spec/fixtures/golden/${name}.json`),
+          'utf8'
+        )
+      ) as { tree: Record<string, unknown> }
+    ).tree;
+  const form = spec('form-registration');
+  const canvas = spec('canvas-retro');
+  const sourced = spec('source-tickets');
+  const formNode = (form.children as Record<string, unknown>[])[0] as {
+    props: { schema: { steps?: unknown } & Record<string, unknown> };
+  };
+  // An agent may never ship a regular expression (ReDoS): the forms validator refuses it.
+  const hostileForm = {
+    ...form,
+    children: [
+      {
+        ...formNode,
+        props: {
+          ...formNode.props,
+          schema: {
+            title: 'Evil',
+            fields: [{ name: 'code', type: 'text', label: 'Code', pattern: '^(a+)+$' }],
+          },
+        },
+      },
+    ],
+  };
+  const canvasProps = canvas.props as { canvas: Record<string, unknown> };
+  const hostileCanvas = {
+    ...canvas,
+    props: { ...canvasProps, canvas: { ...canvasProps.canvas, format: 'texuli-evil' } },
+  };
+  const verdict = async (tree: unknown, stream: boolean) => {
+    const prompt = 'Draft it.';
+    const s = service({ provider: createFakeProvider([recording(prompt, tree)]) });
+    const events = await collect(s.draft(request(prompt, { stream }), caller));
+    const result = stream
+      ? finalOf(events)
+      : (events.find((e) => e.type === 'result') as { result: DraftResult }).result;
+    const refused = events.filter((e) => e.type === 'refused' && e.attempt === 1);
+    return { result, codes: result.diagnostics.map((d) => d.code), refused };
+  };
+
+  it.each([true, false])('accepts a valid form and a valid canvas (stream: %s)', async (stream) => {
+    for (const tree of [form, canvas]) {
+      const { result, refused } = await verdict(tree, stream);
+      expect(result.diagnostics).toEqual([]);
+      expect(result.status).toBe('valid');
+      expect(refused).toEqual([]);
+    }
+  });
+
+  it.each([true, false])(
+    'refuses a hostile form and a hostile canvas with the schema reason (stream: %s)',
+    async (stream) => {
+      const formVerdict = await verdict(hostileForm, stream);
+      expect(formVerdict.result.status).toBe('invalid');
+      expect(formVerdict.codes).toContain('form-schema');
+      expect(formVerdict.codes).not.toContain('form-unchecked');
+      const canvasVerdict = await verdict(hostileCanvas, stream);
+      expect(canvasVerdict.result.status).toBe('invalid');
+      expect(canvasVerdict.codes).toContain('canvas-schema');
+      expect(canvasVerdict.codes).not.toContain('canvas-unchecked');
+      if (stream) {
+        expect(formVerdict.refused.length).toBeGreaterThan(0);
+        expect(canvasVerdict.refused.length).toBeGreaterThan(0);
+      }
+    }
+  );
+
+  it.each([true, false])(
+    'refuses source bindings: the service holds no source registry (stream: %s)',
+    async (stream) => {
+      const { result, codes } = await verdict(sourced, stream);
+      expect(result.status).toBe('invalid');
+      expect(codes).toContain('source');
+    }
+  );
+});

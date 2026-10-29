@@ -45,6 +45,10 @@ export const CATALOG_SCHEMA_REFS: readonly string[] = Object.freeze([
   'condition',
   'workflowGraph',
   'document',
+  // Spec 0.8.0 (ADR-015): a closed form schema, checked again by @texuli/forms/model.
+  'formSchema',
+  // Spec 0.8.0 (ADR-012): a canvas, checked again by the host's validateCanvas.
+  'canvas',
 ]);
 
 const SCHEMA_TYPES = new Set(['object', 'array', 'string', 'number', 'integer', 'boolean']);
@@ -935,6 +939,31 @@ export function validateCatalogManifest(input: unknown): ManifestValidation {
       });
     }
   }
+  if (input.sourceable !== undefined) {
+    const props = Array.isArray(input.props) ? input.props.filter(isRecord) : [];
+    if (!Array.isArray(input.sourceable) || input.sourceable.length > 8) {
+      issue(
+        diagnostics,
+        'invalid-type',
+        ['sourceable'],
+        '"sourceable" must be an array of at most 8 prop names.',
+        'List array prop names.'
+      );
+    } else {
+      input.sourceable.forEach((name, i) => {
+        const prop = props.find((candidate) => candidate.name === name);
+        if (prop === undefined || prop.kind !== 'array') {
+          issue(
+            diagnostics,
+            'invalid-sourceable',
+            ['sourceable', i],
+            `"${String(name)}" is not an array prop of this component.`,
+            'Sourceable props are declared array props whose items are rows.'
+          );
+        }
+      });
+    }
+  }
   if (input.deprecated !== undefined) {
     const problem = deprecationProblem(input.deprecated);
     if (problem)
@@ -958,6 +987,7 @@ export function validateCatalogManifest(input: unknown): ManifestValidation {
     'related',
     'events',
     'bindable',
+    'sourceable',
     'deprecated',
   ]);
   for (const key of Object.keys(input)) {

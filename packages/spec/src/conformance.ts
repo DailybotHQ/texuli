@@ -2,6 +2,7 @@ import { buildSpec, EXTERNAL_SCHEMAS } from './build.ts';
 import { CAPABILITIES, type SpecCatalog, type SpecDeprecation } from './catalog.ts';
 import { checkPropSchema, defCollisions } from './contract.ts';
 import { checkSchemaDocument, isRecord, type Schema, validateInstance } from './dialect.ts';
+import type { SpecSourceDescriptor } from './source.ts';
 import { type SpecDiagnosticCode, validateBlueprint } from './validate.ts';
 import { SPEC_VERSION } from './version.ts';
 import { validateWorkflowGraph } from './workflow.ts';
@@ -165,7 +166,15 @@ export function checkConformance(
   }
 
   if (blueprintSchema) {
-    const documents = { blueprintSchema, catalog, workflowSchema, validateWorkflowGraph };
+    // The fixture host's data sources (spec 0.8.0): source bindings are checked against them.
+    const host = json('fixtures/sources.json') as { sources?: SpecSourceDescriptor[] } | null;
+    const documents = {
+      blueprintSchema,
+      catalog,
+      workflowSchema,
+      validateWorkflowGraph,
+      ...(host?.sources ? { sources: host.sources } : {}),
+    };
     for (const path of Object.keys(normative).filter((p) => p.startsWith('fixtures/golden/'))) {
       const result = validateBlueprint(json(path), documents);
       for (const d of result.diagnostics) {
@@ -226,6 +235,16 @@ export function checkCatalogContract(
           check: 'prop-schema',
           path,
           message: `${component.id}: bindable "${name}" is not a portable prop`,
+        });
+      }
+    }
+    for (const name of component.sourceable ?? []) {
+      const prop = component.props.find((p) => p.name === name);
+      if (!prop || prop.extension || prop.kind !== 'array') {
+        issues.push({
+          check: 'prop-schema',
+          path,
+          message: `${component.id}: sourceable "${name}" is not a portable array prop`,
         });
       }
     }

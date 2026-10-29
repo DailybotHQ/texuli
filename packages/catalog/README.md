@@ -104,6 +104,7 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
 | `@texuli/catalog/manifests/state` | New in `0.4.0`: state and action surfaces (controls, forms, flow views and actions, sortable lists, host regions) |
 | `@texuli/catalog/manifests/workflows` | New in `0.4.0`: `workflow-graph`, validated against the spec workflow schema |
 | `@texuli/catalog/manifests/documents` | New in `0.7.0`: `document`, a Texuli document as data (spec 0.7.0) |
+| `@texuli/catalog/manifests/schema-forms` | Unreleased (planned for `0.8.0`): `schema-form`, a form as data (spec 0.8.0), painted by `@texuli/forms` through the player's `formHost` |
 | `@texuli/catalog/build` | `buildCatalog`: a content-addressed catalog (`catalog-<sha256>.json`) |
 | `@texuli/catalog/build/node` | Node only: discover the manifest groups (source or published files) and write the content-addressed catalog file |
 
@@ -138,6 +139,19 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
   state surface rules refuse exactly what `@texuli/player` would refuse at
   paint time, and list item text refuses control, bidirectional and
   invisible formatting characters.
+
+## Unreleased (planned for 0.8.0)
+
+On this branch, not yet published:
+
+- Spec `0.8.0` forms (ADR-015): the agent-emittable `schema-form` id
+  (`@texuli/catalog/manifests/schema-forms`) whose `schema` is a closed form
+  schema: typed fields, sections and steps, conditions and cross-field
+  rules as expressions, named formats and host validator names, never a
+  pattern or code. `validateDraft` checks it with the host's `checkForm`
+  (`checkFormDraft` from `@texuli/forms/model`) at the draft's tier;
+  without it every form is refused (`form-unchecked`)
+  ([validate](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/validate.md)).
 
 ## New in 0.7.0
 

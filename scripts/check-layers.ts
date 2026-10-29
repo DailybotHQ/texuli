@@ -39,10 +39,15 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   '@texuli/document': 1,
   '@texuli/tokens': 2,
   texuli: 3,
+  // L4: the infinite canvas; its model is framework-free and it syncs through
+  // @texuli/document/sync (ADR-010).
+  '@texuli/canvas': 4,
   '@texuli/charts': 4,
   '@texuli/chat': 4,
   '@texuli/data': 4,
   '@texuli/editor': 4,
+  // L4: schema-driven forms on texuli components and @texuli/core/expression (ADR-015).
+  '@texuli/forms': 4,
   '@texuli/media': 4,
   '@texuli/workflows': 4,
   '@texuli/blocks': 5,

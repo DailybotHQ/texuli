@@ -2170,6 +2170,7 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     emit: ['developer', 'untrusted'],
     events: ['move'],
     bindable: ['items'],
+    sourceable: ['items'],
   },
   {
     id: 'data-tree-view',
@@ -2199,6 +2200,7 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     emit: ['developer', 'untrusted'],
     events: ['move', 'select'],
     bindable: ['items'],
+    sourceable: ['items'],
   },
   {
     id: 'data-calendar',
@@ -2240,6 +2242,7 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     emit: ['developer', 'untrusted'],
     events: ['select', 'move', 'change'],
     bindable: ['view'],
+    sourceable: ['events'],
   },
   {
     id: 'data-grid',
@@ -2277,6 +2280,7 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     agentEmittable: true,
     emit: ['developer', 'untrusted'],
     events: ['select', 'change'],
+    sourceable: ['rows'],
   },
   {
     id: 'data-files',
@@ -2307,6 +2311,7 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     emit: ['developer', 'untrusted'],
     events: ['select', 'change'],
     bindable: ['layout'],
+    sourceable: ['entries'],
   },
   {
     id: 'data-map',
@@ -2364,6 +2369,7 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     emit: ['developer', 'untrusted'],
     events: ['select', 'move', 'change'],
     bindable: ['zoom'],
+    sourceable: ['tasks'],
   },
   {
     id: 'data-cohort-table',
@@ -2456,6 +2462,7 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     emit: ['developer', 'untrusted'],
     events: ['select', 'change'],
     bindable: ['filter'],
+    sourceable: ['items'],
   },
   {
     id: 'data-filter-builder',
@@ -2544,5 +2551,51 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     ],
     agentEmittable: true,
     emit: ['developer', 'untrusted'],
+  },
+  {
+    id: 'canvas',
+    label: 'Canvas',
+    props: [
+      {
+        name: 'canvas',
+        kind: 'object',
+        required: true,
+        schema: {
+          $ref: '#/$defs/canvas',
+        },
+      },
+      {
+        name: 'label',
+        kind: 'string',
+      },
+    ],
+    agentEmittable: true,
+    emit: ['developer', 'untrusted'],
+  },
+  {
+    id: 'schema-form',
+    label: 'Schema form',
+    props: [
+      {
+        name: 'schema',
+        kind: 'object',
+        required: true,
+        schema: {
+          $ref: '#/$defs/formSchema',
+        },
+      },
+      {
+        name: 'action',
+        kind: 'string',
+        required: true,
+      },
+      {
+        name: 'label',
+        kind: 'string',
+      },
+    ],
+    agentEmittable: true,
+    emit: ['developer', 'untrusted'],
+    events: ['submit'],
   },
 ];

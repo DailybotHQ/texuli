@@ -1,5 +1,7 @@
+import type { RenderTier } from '@texuli/catalog/render/renderer';
 import { getContext, type Snippet, setContext } from 'svelte';
 import type { ActionStatus } from './actions.ts';
+import type { FormPlayerHost } from './form-host.ts';
 import { DEFAULT_PLAYER_LABELS, type PlayerLabels } from './labels.ts';
 import type { EventDetail } from './state/reducers.ts';
 import type { ListItem, StateDeclaration, StateValue } from './state/schema.ts';
@@ -144,6 +146,13 @@ export interface PlayerInteraction {
   bound(path: string, prop: string): boolean;
   /** Write a bound prop back to its variable; `false` when it is not bound or does not fit. */
   write(path: string, prop: string, value: unknown): boolean;
+  /**
+   * Write a prop that reads a host data source (spec 0.8.0) back through the
+   * source, optimistically: resolves when the source stored the edit, and
+   * rejects when it refused it or could not store it (the rows are already
+   * rolled back). `null` when the prop reads no source.
+   */
+  save?(path: string, prop: string, value: unknown): Promise<void> | null;
   /** The node's reorder list and options, or `null` when it has none. */
   reorder(path: string): PlayerReorder | null;
   /** Whether `move` would accept this move (the same rules, nothing changes). */
@@ -194,4 +203,62 @@ export function setPlayerInteraction(access: PlayerInteraction): void {
 /** The enclosing player's interaction access, or `null` outside a player. */
 export function getPlayerInteraction(): PlayerInteraction | null {
   return getContext<PlayerInteraction | undefined>(INTERACTION) ?? null;
+}
+
+const SOURCES = Symbol('tx-player-sources');
+
+/** What a bound node shows around its component (spec 0.8.0 data sources). */
+export interface PlayerSourceStatus {
+  readonly status: 'loading' | 'ready' | 'error';
+  readonly count: number;
+  readonly refreshing: boolean;
+  readonly hasMore: boolean;
+  readonly loadingMore: boolean;
+  readonly error: { readonly message: string; readonly canRetry: boolean } | null;
+  readonly moreError: { readonly message: string; readonly canRetry: boolean } | null;
+  readonly writeError: { readonly message: string } | null;
+  readonly pending: number;
+}
+
+/**
+ * Data-source bindings for the nodes that read one (spec 0.8.0): the state
+ * a bound node is in, and the retry and load-more actions. Rows reach the
+ * component as its prop; edits go back through `PlayerInteraction.write`.
+ */
+export interface PlayerSourceAccess {
+  /** The node's source state, or `null` when the node reads no source (reactive). */
+  status(path: string): PlayerSourceStatus | null;
+  retry(path: string): void;
+  loadMore(path: string): void;
+}
+
+export function setPlayerSources(access: PlayerSourceAccess): void {
+  setContext(SOURCES, access);
+}
+
+/** The enclosing player's source access, or `null` outside a player. */
+export function getPlayerSources(): PlayerSourceAccess | null {
+  return getContext<PlayerSourceAccess | undefined>(SOURCES) ?? null;
+}
+
+const FORM_HOST = Symbol('tx-player-form-host');
+
+/** The host's form seam under one player (spec 0.8.0) and the tier it validated at. */
+export interface PlayerFormHostAccess {
+  host: FormPlayerHost | null;
+  tier: RenderTier;
+  /** False while the enclosing surface is inactive (`inert`). */
+  active: boolean;
+}
+
+export function setPlayerFormHost(get: () => PlayerFormHostAccess): void {
+  setContext(FORM_HOST, get);
+}
+
+/** The enclosing player's form host (none outside a player: forms then do not paint). */
+export function getPlayerFormHost(): () => PlayerFormHostAccess {
+  return (
+    getContext<(() => PlayerFormHostAccess) | undefined>(FORM_HOST) ??
+    (() => ({ host: null, tier: 'untrusted', active: false }))
+  );
 }

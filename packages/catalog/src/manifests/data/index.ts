@@ -103,6 +103,7 @@ export const dataBoardManifest: CatalogManifest = /* @__PURE__ */ manifestData({
   ],
   events: ['move'],
   bindable: ['items'],
+  sourceable: ['items'],
   examples: [
     {
       id: 'sprint',
@@ -152,6 +153,7 @@ export const dataTreeViewManifest: CatalogManifest = /* @__PURE__ */ manifestDat
   ],
   events: ['move', 'select'],
   bindable: ['items'],
+  sourceable: ['items'],
   examples: [
     {
       id: 'outline',
@@ -209,6 +211,7 @@ export const dataCalendarManifest: CatalogManifest = /* @__PURE__ */ manifestDat
   ],
   events: ['select', 'move', 'change'],
   bindable: ['view'],
+  sourceable: ['events'],
   examples: [
     {
       id: 'week',
@@ -284,6 +287,7 @@ export const dataGridManifest: CatalogManifest = /* @__PURE__ */ manifestData({
     densityProp(['compact', 'default', 'comfortable']),
   ],
   events: ['select', 'change'],
+  sourceable: ['rows'],
   examples: [
     {
       id: 'orders',
@@ -342,6 +346,7 @@ export const dataFilesManifest: CatalogManifest = /* @__PURE__ */ manifestData({
   ],
   events: ['select', 'change'],
   bindable: ['layout'],
+  sourceable: ['entries'],
   examples: [
     {
       id: 'shared',
@@ -467,6 +472,7 @@ export const dataTimelineManifest: CatalogManifest = /* @__PURE__ */ manifestDat
   ],
   events: ['select', 'move', 'change'],
   bindable: ['zoom'],
+  sourceable: ['tasks'],
   examples: [
     {
       id: 'launch',
@@ -632,6 +638,7 @@ export const dataNotificationInboxManifest: CatalogManifest = /* @__PURE__ */ ma
   ],
   events: ['select', 'change'],
   bindable: ['filter'],
+  sourceable: ['items'],
   examples: [
     {
       id: 'mentions',

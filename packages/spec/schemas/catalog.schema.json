@@ -80,6 +80,15 @@
             "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
           }
         },
+        "sourceable": {
+          "description": "Props a node may read from a host data source (spec 0.8.0, ADR-015): {\"$source\": name, \"query\": {...}}. Each names an array prop whose items are rows.",
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+          }
+        },
         "deprecated": {
           "$ref": "#/$defs/deprecation"
         }
@@ -215,7 +224,7 @@
         },
         "$ref": {
           "type": "string",
-          "pattern": "^#/\\$defs/(binding|reorder|action|eventMap|condition|workflowGraph|document)$"
+          "pattern": "^#/\\$defs/(binding|reorder|action|eventMap|condition|workflowGraph|document|formSchema|canvas)$"
         }
       },
       "additionalProperties": false

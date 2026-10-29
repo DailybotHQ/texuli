@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Checkbox as CheckboxPrimitive } from '@texuli/primitives/checkbox';
 import type { HTMLAttributes } from 'svelte/elements';
-import { joinIds, splitControlProps } from '../../internal/control-props.ts';
+import { joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type ChoiceSize, choiceControlClass } from './variants.ts';
 import './choice.css';
@@ -52,7 +52,9 @@ let {
 
 // aria-*, data-*, handlers and form attributes name and wire the control;
 // layout hooks (style, hidden…) stay on the wrapper.
-const split = $derived(splitControlProps(rest));
+const split = $derived(splitRequiredControlProps(rest));
+// A Field's `aria-required` becomes `required` (the primitive derives the attribute).
+const isRequired = $derived(required || split.required);
 
 const controlClass = $derived(
   choiceControlClass({
@@ -73,7 +75,7 @@ const controlClass = $derived(
     {name}
     {value}
     {disabled}
-    {required}
+    required={isRequired}
     {onCheckedChange}
     {onIndeterminateChange}
     class={controlClass}

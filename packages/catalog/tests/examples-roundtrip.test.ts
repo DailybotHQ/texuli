@@ -11,6 +11,7 @@ import { type Schema, validateBlueprint } from '@texuli/spec';
 import { checkCatalogContract, projectCatalog } from '@texuli/spec/codegen';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 import { describe, expect, it } from 'vitest';
+import { checkFormDraft } from '../../forms/src/model/index.ts';
 import blueprintJson from '../../spec/schemas/blueprint.schema.json';
 import workflowJson from '../../spec/schemas/workflow.schema.json';
 import { buildCatalog } from '../src/build/index.ts';
@@ -20,6 +21,7 @@ import { renderCatalogFromBuild } from '../src/render/renderer/index.ts';
 import type { CatalogTreeInput } from '../src/render/renderer/types.ts';
 import { createFamilyBlockCheck, diagramFamilyCheck } from '../src/validate/blocks.ts';
 import { validateDraft } from '../src/validate/index.ts';
+import { checkCanvas } from './canvas-check.ts';
 import { checkDocument } from './document-check.ts';
 
 /**
@@ -148,6 +150,8 @@ describe('manifest examples round-trip', () => {
         frameRoots: false,
         checkBlock,
         checkDocument,
+        checkCanvas,
+        checkForm: checkFormDraft,
         checkSpec: (value) => validateBlueprint(value, documents, { catalogHash: build.hash }),
       });
       const errors = result.diagnostics.filter((d) => d.severity === 'error');

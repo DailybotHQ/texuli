@@ -13,7 +13,10 @@
       "@texuli/document/model": ["../../../packages/document/src/model/index.ts"],
       "@texuli/document/sync": ["../../../packages/document/src/sync/index.ts"],
       "@texuli/document/paged": ["../../../packages/document/src/paged/index.ts"],
-      "@texuli/media/timeline": ["../../../packages/media/src/timeline/index.ts"]
+      "@texuli/media/timeline": ["../../../packages/media/src/timeline/index.ts"],
+      "@texuli/canvas/editor": ["../../../packages/canvas/src/editor/index.ts"],
+      "@texuli/canvas/export": ["../../../packages/canvas/src/export/index.ts"],
+      "@texuli/canvas/model": ["../../../packages/canvas/src/model/index.ts"]
     }
   }
 }

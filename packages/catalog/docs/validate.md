@@ -23,12 +23,13 @@ closed with an `internal-error` diagnostic.
 | `envelope` | For a [blueprint envelope](./envelope.md): strict field rules, the catalog binding (`catalogHash`), and trust warnings for a declared status, activation or tier; then the tree runs the checks below. `skipped` for a bare tree | on an unsupported version or a missing tree |
 | `spec` | For an envelope, after `migrateBlueprint` (`@texuli/spec/migrate`) brings an older envelope (undeclared or `"spec": "0.2.0"`) to the current spec version: the host's `checkSpec` (for example `@texuli/spec`'s `validateBlueprint` with the spec documents); `skipped` without one | no |
 | `structure` | One iterative pass: prototype keys (`__proto__`, `constructor`, `prototype`) anywhere, values nested deeper than 128 levels, node fields other than `key`, `id`, `props`, `children`, `slot`, `when`, `bind`, `on`, `motion`; from spec 0.7.0 a malformed node `key` (`invalid-key`, not `^[A-Za-z0-9._:-]{1,64}$`) or one used twice in the tree (`duplicate-key`) | only on a depth bomb |
-| `interaction` | Spec 0.3.0 interaction, catalog-local: `$state` and `$data` bindings name declared variables (and are replaced by their first-paint values for the checks below), `bind` only on `bindable` props, `on` only for events the component fires, closed action ops and fields; list item text follows `SPEC_PATTERNS.listText`; and, for an envelope, the state surface rules from `@texuli/spec/surface` (form nodes inside an `action-form`, controls and fields bound to declared variables of their type, flow nodes matching the flow, no writes to host-bound variables), as `@texuli/player` refuses them | no |
+| `interaction` | Spec 0.3.0 interaction, catalog-local: `$state` and `$data` bindings name declared variables (and are replaced by their first-paint values for the checks below), `bind` only on `bindable` props, `on` only for events the component fires, closed action ops and fields; from spec 0.8.0, `$source` data-source bindings on `sourceable` props, checked against the host's `sources` (see Data-source bindings below) and replaced by an empty list; list item text follows `SPEC_PATTERNS.listText`; and, for an envelope, the state surface rules from `@texuli/spec/surface` (form nodes inside an `action-form`, controls and fields bound to declared variables of their type, flow nodes matching the flow, no writes to host-bound variables), as `@texuli/player` refuses them | no |
 | `sinks` | The raw sink scan (`scanSinks`): executable strings, HTML strings, `class` / `style` / `innerHTML` / `srcdoc` keys, `on…` keys, functions, bidi controls, and URLs the host tier's policy refuses for their kind of key (links through the link policy, `src` and `poster` through the image or media policy, and every `srcset` candidate through the image-set policy) | no |
 | `limits` | `validateCatalogTreeLimits` (depth, nodes, bytes, branching, roots) | yes |
 | `render` | `renderCatalogTree` at the host's tier: closed ids, tiers, prop schemas, the block family check, named slots and `when` conditions (with the host's `conditions` and `conditionInputs`; a `when` without a runtime is an error) | no |
 | `blocks` | The host's `checkBlock` on every `blocks-*` block (assemble one with `createFamilyBlockCheck` from `@texuli/catalog/validate/blocks`; see the Block families section); `skipped` without one | no |
 | `documents` | Spec 0.7.0: every `document` node (see Documents below). Without the host's `checkDocument` each one fails with `document-unchecked`; `skipped` only when the host passed none (it still fails the draft that holds a document) | no |
+| `forms` | Spec 0.8.0: every `schema-form` node's schema (see Forms below). Without the host's `checkForm` each one fails with `form-unchecked`; `skipped` only when the host passed none (it still fails the draft that holds a form) | no |
 | `grammar` | `checkCompositionGrammar` with `defaultGrammarRoles` (or `roles`); warnings do not fail | no |
 | `root` | One component root whose id is a frame (`DRAFT_FRAME_IDS`: `layout-page`, `layout-doc`, `layout-deck` and, from spec 0.7.0, `document`); `frameRoots: false` turns it off | no |
 
@@ -237,6 +238,68 @@ import { validateDraft } from '@texuli/catalog/validate';
 import { checkDocumentDraft } from '@texuli/pages/host';
 
 const result = validateDraft(agentOutput, { catalog, checkBlock, checkDocument: checkDocumentDraft });
+```
+
+## Forms
+
+A `schema-form` node (spec 0.8.0, ADR-015) carries a closed form schema in
+its `schema` prop (`$defs.formSchema`): typed fields in sections or steps,
+conditions and cross-field rules as expressions of the closed language in
+`@texuli/core/expression`, named formats and host validator names, never a
+pattern or code. The `forms` check runs the host's `checkForm`
+(`DraftFormCheck`) at the draft's tier, usually `checkFormDraft` from
+`@texuli/forms/model`, which runs `validateFormSchema`: closed members per
+field type, unique names and ids, options and defaults, ranges, help links
+through the URL policy, and conditions that read only earlier fields. With
+`formValidators` (the names of the validators the host registered) a
+field's `validator` must name one of them. Injected like `checkDocument`,
+so `@texuli/catalog/validate` never bundles the forms runtime. **Without
+`checkForm` every `schema-form` node fails with `form-unchecked`**; a
+throwing check fails closed (`form-schema`). Issues report as
+`form-schema` with the node path and the JSON path into the schema
+(`0.children.0.props.schema.fields[0].pattern`), at most
+`MAX_FORM_FINDINGS` (50) per form (`DraftFormIssue` is one issue).
+`checkForms(roots, options)` runs the check alone on a render tree
+(`FormCheckOptions`, `FormFinding`), and `schemaFormNodes(roots)` lists
+the `schema-form` nodes (`SCHEMA_FORM_ID`) with their paths.
+
+```ts
+import { validateDraft } from '@texuli/catalog/validate';
+import { checkFormDraft } from '@texuli/forms/model';
+
+const result = validateDraft(agentOutput, { catalog, checkForm: checkFormDraft, formValidators: ['uniqueEmail'] });
+```
+
+## Data-source bindings (spec 0.8.0)
+
+A component's `sourceable` props (the catalog manifest field; today
+`data-grid.rows`, `data-board.items`, `data-tree-view.items`,
+`data-calendar.events`, `data-files.entries`, `data-timeline.tasks` and
+`data-notification-inbox.items`) may read rows from a source the host
+registered (ADR-015):
+`{"$source": name, "query": {...}, "map": {...}}`. The `interaction` check
+runs `checkSourceBinding` from `@texuli/spec/source`, the same rules as the
+spec validator and the Kotlin twin, against `options.sources` (usually
+`registry.describe()` from `@texuli/core/data-source`):
+
+- the closed shape: `$source` is a source name (never a URL), the query
+  holds only `fields`, `filter` (the `@texuli/data` grid filter model, at
+  most 6 levels and 64 nodes), `sort`, `search` and `pageSize`, and `map`
+  pairs item fields with source field names;
+- the meaning: a registered source (`unknown-source` otherwise), declared
+  fields, the operators each field allows and values of its type, sortable
+  fields, `search` only where the source declares it, a page size within its
+  `maxPageSize`, and `map` keys that are item fields of the prop.
+
+Every other problem is `source`, as is a binding on a prop that is not
+sourceable, nested inside a prop value, or mixed with `$state`. **Without
+`sources` every binding fails with `source`**: a binding never passes on
+structure alone. The prop is replaced by an empty list for the `render`
+check; `@texuli/player` fills it with the source's rows at paint time
+([data sources](../../player/docs/data-sources.md)).
+
+```ts
+const result = validateDraft(agentOutput, { catalog, sources: registry.describe() });
 ```
 
 ## Streamed nodes

@@ -18,6 +18,7 @@ Ids agents may emit into a catalog tree (subject to tier rules). Untrusted model
 - [Media blocks](components/blocks-media.md): Validated image, figure, video and gallery content blocks.
 - [Structure blocks](components/blocks-structure.md): Validated layouts and calls to action.
 - [Text blocks](components/blocks-text.md): Validated heading, paragraph, list, quote and callout content.
+- [Canvas](components/canvas.md): A whiteboard or diagram as data: shapes, sticky notes, text, frames, groups and connectors on an infinite canvas.
 - [Area chart](components/charts-area.md): A categorical area chart with an accessible data table.
 - [Bar chart](components/charts-bar.md): A categorical bar chart with a zero baseline and accessible data table.
 - [Bubble chart](components/charts-bubble.md): A scatter plot where point size can encode another measure.
@@ -76,6 +77,7 @@ Ids agents may emit into a catalog tree (subject to tier rules). Untrusted model
 - [Canvas composition](components/media-composition-canvas.md): A validated layered composition rendered to a canvas.
 - [SVG composition](components/media-composition-svg.md): A validated, structured vector composition.
 - [Responsive image](components/media-image.md): A responsive image with URL validation, loading states and actions.
+- [Schema form](components/schema-form.md): A whole form as data: typed fields in sections or steps, conditional logic, named formats and cross-field rules, painted with texuli controls; submitting proposes one action intent to the host.
 - [Sortable list](components/sortable-list.md): A list whose items are a bound list variable; people reorder it by drag or keyboard, and lists sharing a group exchange items.
 - [Workflow graph](components/workflow-graph.md): A workflow of typed nodes and edges (automations, pipelines, approvals, state diagrams), read-only or editable.
 

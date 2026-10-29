@@ -159,6 +159,10 @@ export const SLIDE_COMPONENT_EXCLUSIONS: Readonly<Record<string, string>> = Obje
     'A container of catalog child nodes: use `three-column-cards` or `blocks-structure` cards.',
   document:
     'A whole document (spec 0.7.0): the player paints it only through a host `documentHost` (`@texuli/pages/host`), which the slides stage does not carry; put text on a slide with a layout or the blocks families.',
+  canvas:
+    'A whole canvas (spec 0.8.0): the player paints it only through a host `canvasHost` (`@texuli/canvas/host`), which the slides stage does not carry; draw a diagram on a slide with the blocks diagram family.',
+  'schema-form':
+    'A form as data (spec 0.8.0): the player paints it only through a host `formHost` (`@texuli/forms/host`), and its submit proposes an app action; a slide stage carries neither, so collect answers in the app, not on a slide.',
 });
 
 /** Whole catalog groups the player has no painter for, with their ids and the reason. */

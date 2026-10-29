@@ -1,0 +1,10 @@
+{
+  "golden": "canvas-retro",
+  "trace": [
+    {
+      "id": "canvas",
+      "name": "Launch retro board",
+      "role": "figure"
+    }
+  ]
+}

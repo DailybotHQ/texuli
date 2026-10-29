@@ -50,6 +50,10 @@ export const SPEC_PROP_REFS = [
   'condition',
   'workflowGraph',
   'document',
+  // Spec 0.8.0 (ADR-015): the closed form schema of a `schema-form` node.
+  'formSchema',
+  // Spec 0.8.0 (ADR-012): the canvas a `canvas` node carries (envelope only).
+  'canvas',
 ] as const;
 
 /** The fields each action op takes (besides `op`) and the ones it needs. */
@@ -106,6 +110,9 @@ export const SPEC_LIMITS = Object.freeze({
   documentBlocks: 2000,
   /** Operations one `patchDocument` patch may carry (`$defs.documentPatch`, ADR-011). */
   documentPatchOps: 1000,
+  /** Shapes and connectors a `canvas` node's canvas may hold at its top level (`$defs.canvas`). */
+  canvasShapes: 5000,
+  canvasConnectors: 5000,
 });
 
 /** The name patterns, as the schemas write them. */

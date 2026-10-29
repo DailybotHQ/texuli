@@ -94,6 +94,7 @@ Everything is exported from the root entry, `@texuli/player`.
 | Iframe embedding | `PlayerFrame`, `createPlayerFrameHost`, `mountPlayerFrame`, `createPlayerFrameClient` |
 | Media policy | `applyMediaPolicy`, `TRUST_PINNED_IDS` |
 | Streaming (new in `0.6.0`) | `<Player stream>`, `BlueprintStreamSource`, `PlayerStreamProgress`, `STREAM_PENDING_ID`; the push handle is `createBlueprintStream` from `@texuli/spec/stream` ([streaming.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/streaming.md)) |
+| Data sources (unreleased, planned for `0.8.0`) | `<Player sourceRegistry>` or `sourceLoader`: blueprint props `{"$source": name, "query": {...}}` read host-registered sources from `@texuli/core/data-source`, with loading, empty and error states, paging and optimistic edits ([data-sources.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/data-sources.md)) |
 | Stylesheet | `@texuli/player/styles.css` |
 
 The TypeScript declarations list the full surface.
@@ -169,6 +170,20 @@ on that stage instead, and `chrome={false}` paints a component with no frame
 chrome, as the slides stage does for every component on a slide
 ([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md)).
 
+## Unreleased (planned for 0.8.0)
+
+On this branch, not yet published: `schema-form` nodes (spec 0.8.0) paint
+through the `formHost` seam (`createFormPlayerHost()` from
+`@texuli/forms/host`, which also supplies the form check and the host
+validators by name); submitting proposes the node's action intent, and
+without a host a form blueprint is refused
+([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md#forms)).
+Also on this branch, not yet published: the `canvasHost` seam paints agent
+`canvas` blueprints (spec 0.8.0) through `createCanvasPlayerHost()` from
+`@texuli/canvas/host`, which also supplies the canvas check validation
+runs; without one a canvas is refused
+([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md#canvas-hosts)).
+
 ## New in 0.7.0
 
 Ships in `0.7.0`; the `0.6.0` release predates it: the `documentHost` seam paints agent
@@ -196,6 +211,7 @@ motion at `0s` durations and delays (G78)
 - Validate, edit and activate around the player: [blueprint-flow.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/blueprint-flow.md)
 - Full reference (loaders, layouts, keyboard, state, flows, actions, iframe protocol): [reference.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/reference.md)
 - Streaming mode (paint a blueprint while an agent writes it; new in `0.6.0`): [streaming.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/streaming.md)
+- Data sources (blueprint spec 0.8.0; unreleased, planned for `0.8.0`): [data-sources.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/data-sources.md)
 - Security property: [paint-proof.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/paint-proof.md)
 - Security model: [SECURITY.md](https://github.com/DailybotHQ/texuli/blob/main/docs/SECURITY.md)
 

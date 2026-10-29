@@ -21,6 +21,12 @@ import {
   toDialectSchema,
 } from './contract.ts';
 import { isRecord, type Schema, type SchemaIssue, validateInstance } from './dialect.ts';
+import {
+  checkSourceBinding,
+  isSourceBinding,
+  SOURCE_BINDING_KEY,
+  type SpecSourceDescriptor,
+} from './source.ts';
 import { checkStateSurface, surfaceInputs } from './surface.ts';
 
 export type { SpecDiagnostic, SpecDiagnosticCode, SpecValidation, SpecWarning };
@@ -43,6 +49,12 @@ export interface SpecDocuments {
   workflowSchema?: Schema;
   /** `validateWorkflowGraph` from `@texuli/spec/workflow`, for hosts that render workflows. */
   validateWorkflowGraph?: WorkflowGraphValidator;
+  /**
+   * The host's data sources (spec 0.8.0), as `registry.describe()` from
+   * `@texuli/core/data-source` returns them. A `$source` binding is checked
+   * against them; without them every binding is refused (`source`).
+   */
+  sources?: readonly SpecSourceDescriptor[];
 }
 
 /** The workflow schema and its validator, when the host supplied both. */
@@ -85,6 +97,8 @@ export interface TreeOptions {
   warnings?: SpecWarning[];
   /** Checks `workflowGraph` positions; without it they fail closed. */
   workflow?: WorkflowSupport;
+  /** The host's data sources; without them `$source` bindings fail closed. */
+  sources?: readonly SpecSourceDescriptor[];
 }
 
 const MAX_TREE_DEPTH = 64;
@@ -147,6 +161,7 @@ export function validateBlueprint(
         root: contractRoot(documents.blueprintSchema, workflow?.schema),
         workflow,
         warnings,
+        ...(documents.sources ? { sources: documents.sources } : {}),
       })
     );
   }
@@ -380,6 +395,7 @@ interface NodeContext {
   insideForm: boolean;
   out: SpecDiagnostic[];
   workflow: WorkflowSupport | undefined;
+  sources: readonly SpecSourceDescriptor[] | undefined;
   /** Reports a diagnostic on this node into `out`. */
   fail(code: SpecDiagnosticCode, path: string, message: string): void;
 }
@@ -435,6 +451,7 @@ export function validateTree(
       insideForm,
       out,
       workflow: options.workflow,
+      sources: options.sources,
     });
     if (!component) {
       context.fail('unknown-id', `${path}.id`, `"${node.id}" is not in the catalog.`);
@@ -580,6 +597,10 @@ function checkProps(
       );
       continue;
     }
+    if (isSourceBinding(value)) {
+      checkPropSource(value, prop, component, here, context);
+      continue;
+    }
     if (isBindingShaped(value)) {
       checkPropBinding(value, prop, here, context);
       continue;
@@ -602,6 +623,47 @@ function checkProps(
     }
   }
 }
+
+/**
+ * A whole prop read from a host data source (spec 0.8.0): a sourceable prop,
+ * the closed `$defs.sourceBinding` shape, then the binding against the
+ * host's sources (fail closed without them).
+ */
+function checkPropSource(
+  value: Record<string, unknown>,
+  prop: SpecProp,
+  component: SpecComponent,
+  path: string,
+  context: NodeContext
+): void {
+  const fail = (code: SpecDiagnosticCode, at: string, message: string) =>
+    context.fail(code, `${path}${at}`, message);
+  if (!(component.sourceable ?? []).includes(prop.name)) {
+    fail('source', '', `"${prop.name}" of "${component.id}" cannot read a data source.`);
+    return;
+  }
+  const shape = context.root.$defs?.sourceBinding;
+  if (!shape) {
+    fail('source', '', 'The blueprint schema has no data-source binding.');
+    return;
+  }
+  const issues = validateInstance(shape, value, context.root);
+  const first = issues[0];
+  if (first) {
+    fail('source', first.path.slice(1), `A data-source binding is ${SHAPE_HINT}: ${first.message}`);
+    return;
+  }
+  const itemSchema = prop.schema?.items;
+  const itemFields = itemSchema?.properties ? Object.keys(itemSchema.properties) : undefined;
+  for (const issue of checkSourceBinding(value, {
+    ...(context.sources ? { sources: context.sources } : {}),
+    ...(itemFields ? { itemFields } : {}),
+  })) {
+    fail(issue.code, issue.at, issue.message);
+  }
+}
+
+const SHAPE_HINT = `{"${SOURCE_BINDING_KEY}": name, "query": {...}, "map": {...}}`;
 
 /** Whether `value` is a legal value of `prop` (kind, enum and property schema). */
 function fits(prop: SpecProp, value: unknown, root: Schema): boolean {
@@ -660,6 +722,10 @@ function walkOpaque(value: unknown, path: string, depth: number, context: NodeCo
     return;
   }
   if (!isRecord(value)) return;
+  if (isSourceBinding(value)) {
+    context.fail('source', path, 'A data-source binding reads only a whole top-level prop.');
+    return;
+  }
   if (isBindingShaped(value)) {
     nestedBinding(value, path, context, undefined);
     return;
@@ -753,6 +819,14 @@ function checkPropSchemaValue(
           else extra.push({ ...d, path: at(`${relative}${d.path.slice(1)}`), id });
         }
         return schemaIssues;
+      }
+      if (isSourceBinding(current)) {
+        sub.fail(
+          'source',
+          at(relative),
+          'A data-source binding reads only a whole top-level prop.'
+        );
+        return [];
       }
       if (isBindingShaped(current)) {
         nestedBinding(current, at(relative), sub, node);

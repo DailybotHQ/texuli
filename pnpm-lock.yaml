@@ -83,6 +83,9 @@ importers:
       '@texuli/blocks':
         specifier: workspace:*
         version: link:../../packages/blocks
+      '@texuli/canvas':
+        specifier: workspace:*
+        version: link:../../packages/canvas
       '@texuli/catalog':
         specifier: workspace:*
         version: link:../../packages/catalog
@@ -92,6 +95,9 @@ importers:
       '@texuli/document':
         specifier: workspace:*
         version: link:../../packages/document
+      '@texuli/forms':
+        specifier: workspace:*
+        version: link:../../packages/forms
       '@texuli/spec':
         specifier: workspace:*
         version: link:../../packages/spec
@@ -214,6 +220,27 @@ importers:
       '@texuli/tokens':
         specifier: 0.7.0
         version: link:../tokens
+      svelte:
+        specifier: ^5.57.2
+        version: 5.57.2
+      texuli:
+        specifier: 0.7.0
+        version: link:../texuli
+
+  packages/canvas:
+    dependencies:
+      '@texuli/core':
+        specifier: 0.7.0
+        version: link:../core
+      '@texuli/deck':
+        specifier: 0.7.0
+        version: link:../deck
+      '@texuli/document':
+        specifier: 0.7.0
+        version: link:../document
+      '@texuli/drag':
+        specifier: 0.7.0
+        version: link:../drag
       svelte:
         specifier: ^5.57.2
         version: 5.57.2
@@ -345,6 +372,9 @@ importers:
       '@texuli/blocks':
         specifier: workspace:*
         version: link:../blocks
+      '@texuli/canvas':
+        specifier: workspace:*
+        version: link:../canvas
       '@texuli/charts':
         specifier: workspace:*
         version: link:../charts
@@ -360,6 +390,9 @@ importers:
       '@texuli/editor':
         specifier: workspace:*
         version: link:../editor
+      '@texuli/forms':
+        specifier: workspace:*
+        version: link:../forms
       '@texuli/media':
         specifier: workspace:*
         version: link:../media
@@ -383,6 +416,18 @@ importers:
         version: 5.57.2
       texuli:
         specifier: workspace:*
+        version: link:../texuli
+
+  packages/forms:
+    dependencies:
+      '@texuli/core':
+        specifier: 0.7.0
+        version: link:../core
+      svelte:
+        specifier: ^5.57.2
+        version: 5.57.2
+      texuli:
+        specifier: 0.7.0
         version: link:../texuli
 
   packages/media:

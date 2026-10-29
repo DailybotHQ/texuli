@@ -65,6 +65,10 @@
       "types": "./src/manifests/data/index.ts",
       "default": "./src/manifests/data/index.ts"
     },
+    "./manifests/canvas": {
+      "types": "./src/manifests/canvas/index.ts",
+      "default": "./src/manifests/canvas/index.ts"
+    },
     "./manifests/documents": {
       "types": "./src/manifests/documents/index.ts",
       "default": "./src/manifests/documents/index.ts"
@@ -80,6 +84,10 @@
     "./manifests/layouts": {
       "types": "./src/manifests/layouts/index.ts",
       "default": "./src/manifests/layouts/index.ts"
+    },
+    "./manifests/schema-forms": {
+      "types": "./src/manifests/schema-forms/index.ts",
+      "default": "./src/manifests/schema-forms/index.ts"
     },
     "./manifests/overlays": {
       "types": "./src/manifests/overlays/index.ts",

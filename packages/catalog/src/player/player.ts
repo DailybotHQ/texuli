@@ -22,6 +22,9 @@ export interface PlayerOptions
     ValidateDraftOptions,
     | 'checkBlock'
     | 'checkDocument'
+    | 'checkCanvas'
+    | 'checkForm'
+    | 'formValidators'
     | 'limits'
     | 'frameRoots'
     | 'roles'
@@ -192,6 +195,9 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
       catalogHash: config.catalogHash,
       checkBlock: options.checkBlock,
       checkDocument: options.checkDocument,
+      checkCanvas: options.checkCanvas,
+      checkForm: options.checkForm,
+      formValidators: options.formValidators,
       limits: options.limits,
       frameRoots: options.frameRoots,
       roles: options.roles,

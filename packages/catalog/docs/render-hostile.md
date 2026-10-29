@@ -92,6 +92,7 @@ leave the render tree inert:
 | Unknown ids, props and actions | a dangling edge, an id outside the catalog, an unknown node field, an extra board item field, an unknown action op, an extra action field, an event the component never fires, a form field outside an `action-form` (`action`) |
 | Bindings | binding a non-bindable prop, a nested `$data`, a two-key binding |
 | Prototype | a `__proto__` state name |
+| Data sources (spec 0.8.0, validated with no host sources, so each fails closed) | a source named by a URL, a binding carrying an endpoint, headers and a method, injection text in a filter value and in search, a binding nested in a column, a filter nested 10,000 levels deep, a `__proto__` key in a query |
 
 ## Regenerating the fixture
 

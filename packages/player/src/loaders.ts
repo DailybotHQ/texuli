@@ -27,6 +27,9 @@ export const PLAYER_LOADERS: Readonly<Record<string, PlayerLoader>> = Object.fre
   'layout-deck': async () => (await import('./layouts/ContentLayout.svelte')).default,
   'deck-slide': async () => (await import('./layouts/ContentLayout.svelte')).default,
   document: async () => (await import('./layouts/DocumentFallback.svelte')).default,
+  canvas: async () => (await import('./layouts/CanvasFallback.svelte')).default,
+  // Spec 0.8.0 (ADR-015): a form as data, painted through the host's formHost (@texuli/forms/host).
+  'schema-form': async () => (await import('./painters/SchemaFormPainter.svelte')).default,
   'blocks-text': async () =>
     (await import('@texuli/blocks/text')).loadTextFamily().then((m) => m.default),
   'blocks-data': async () =>

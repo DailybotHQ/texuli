@@ -6,6 +6,15 @@
  */
 
 export {
+  CANVAS_ID,
+  type CanvasFinding,
+  canvasNodes,
+  checkCanvases,
+  type DraftCanvasCheck,
+  type DraftCanvasIssue,
+  MAX_CANVAS_FINDINGS,
+} from './canvas.ts';
+export {
   DECK_ROOT_CATALOG_ID,
   DECK_SLIDE_CATALOG_ID,
   type DeckDraftDiagnostic,
@@ -41,6 +50,16 @@ export {
   type ValidateDraftOptions,
   validateDraft,
 } from './draft.ts';
+export {
+  checkForms,
+  type DraftFormCheck,
+  type DraftFormIssue,
+  type FormCheckOptions,
+  type FormFinding,
+  MAX_FORM_FINDINGS,
+  SCHEMA_FORM_ID,
+  schemaFormNodes,
+} from './form.ts';
 export { draftCommitGate } from './gate.ts';
 export { type SinkFinding, type SinkUrlTier, scanSinks } from './sinks.ts';
 export {

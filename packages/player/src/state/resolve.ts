@@ -4,6 +4,7 @@ import {
   type NodeInteraction,
   type ResolveOptions,
   resolveStateBindings,
+  type SourceResolver,
   type StatefulSplit,
 } from './bind.ts';
 import { checkControlBindings } from './controls.ts';
@@ -26,10 +27,18 @@ const NO_INTERACTIONS: ReadonlyMap<string, NodeInteraction> = new Map();
 export function playerResolveOptions(
   split: StatefulSplit,
   bindable: (id: string) => readonly string[] | undefined,
-  dataSources?: Readonly<Record<string, unknown>>
+  dataSources?: Readonly<Record<string, unknown>>,
+  sources?: {
+    /** Sourceable props by catalog id. */
+    sourceable: (id: string) => readonly string[] | undefined;
+    /** The host's sources; omitted, every `$source` binding is refused. */
+    resolver?: SourceResolver | undefined;
+  }
 ): ResolveOptions {
   return {
     ...(dataSources ? { dataSources } : {}),
+    ...(sources ? { sourceable: sources.sourceable } : {}),
+    ...(sources?.resolver ? { sources: sources.resolver } : {}),
     bindable,
     writable: (name) =>
       split.kind === 'stateful' &&

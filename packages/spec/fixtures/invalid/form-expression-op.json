@@ -1,0 +1,50 @@
+{
+  "$comment": "Must fail spec validation with exactly these diagnostic codes, in order. Spec 0.8.0 (ADR-015): a condition whose expression names an op outside the closed AST.",
+  "expect": ["prop-type"],
+  "blueprint": {
+    "format": "texuli-blueprint",
+    "version": 1,
+    "id": "form-expression-op",
+    "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+    "status": "draft",
+    "createdAt": "2026-10-29T09:00:00Z",
+    "updatedAt": "2026-10-29T09:00:00Z",
+    "generator": {
+      "kind": "agent",
+      "name": "Harbor assistant",
+      "model": "example-model"
+    },
+    "tier": "untrusted",
+    "profile": "web",
+    "spec": "0.8.0",
+    "tree": {
+      "key": "access",
+      "id": "schema-form",
+      "props": {
+        "action": "request-access",
+        "schema": {
+          "title": "Request access",
+          "fields": [
+            {
+              "name": "email",
+              "type": "email",
+              "label": "Work email",
+              "required": true
+            },
+            {
+              "name": "reason",
+              "type": "text",
+              "label": "Reason",
+              "when": {
+                "show": {
+                  "op": "eval",
+                  "value": "fetch('/x')"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

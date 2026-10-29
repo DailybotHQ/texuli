@@ -37,6 +37,7 @@ import com.texuli.spec.JsonValue
 import com.texuli.spec.runtime.PlanNode
 import com.texuli.spec.runtime.childMotionDelays
 import com.texuli.spec.runtime.nativeMotionOf
+import com.texuli.spec.runtime.readsDataSource
 
 /**
  * Paint a validated render plan (design §4, step 5). Each id resolves through
@@ -74,7 +75,8 @@ private fun PlanNodeView(node: PlanNode, path: String, onIntent: (TexuliIntent) 
 private fun PlanNodeContent(node: PlanNode, path: String, onIntent: (TexuliIntent) -> Unit) {
     when (node) {
         is PlanNode.Placeholder -> Placeholder(node.id, node.reason)
-        is PlanNode.Component -> when (node.id) {
+        // Spec 0.8.0: native views do not load host data sources yet; fail closed.
+        is PlanNode.Component -> if (node.readsDataSource()) Placeholder(node.id, "unsupported-source") else when (node.id) {
             "layout-page" -> Frame(node, path, onIntent)
             "layout-doc" -> DocumentFrame(node, path, onIntent)
             "layout-deck" -> DeckFrame(node, path, onIntent)

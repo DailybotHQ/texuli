@@ -8,6 +8,12 @@
  * replaced by their first-paint values so the renderer checks the props a
  * person will actually see. Never evaluates anything.
  */
+
+import {
+  checkSourceBinding,
+  isSourceBinding,
+  type SpecSourceDescriptor,
+} from '@texuli/spec/source';
 import {
   checkStateSurface,
   LIST_TEXT_PATTERN,
@@ -32,7 +38,14 @@ export const INTERACTION_ACTION_FIELDS: Readonly<
 export const MAX_ACTIONS_PER_EVENT = 8;
 
 export interface InteractionIssue {
-  code: 'unknown-state' | 'binding' | 'unknown-event' | 'action' | 'state';
+  code:
+    | 'unknown-state'
+    | 'binding'
+    | 'unknown-event'
+    | 'action'
+    | 'state'
+    | 'source'
+    | 'unknown-source';
   path: string;
   message: string;
   id?: string;
@@ -99,7 +112,8 @@ export function resolveInteraction(
   draft: CatalogTreeInput | readonly CatalogTreeInput[],
   state: unknown,
   catalog: RenderCatalog,
-  envelope?: unknown
+  envelope?: unknown,
+  sources?: readonly SpecSourceDescriptor[]
 ): { tree: CatalogTreeInput | CatalogTreeInput[]; issues: InteractionIssue[] } {
   const issues: InteractionIssue[] = [];
   const declared: Bag = isBag(state) ? state : {};
@@ -121,6 +135,10 @@ export function resolveInteraction(
 
   // Replace `$state` bindings at any depth; `$data` only as a whole top-level prop.
   const resolveValue = (value: unknown, path: string, id: string, depth: number): unknown => {
+    if (isSourceBinding(value)) {
+      report('source', path, 'A data-source binding reads only a whole top-level prop.', id);
+      return undefined;
+    }
     const binding = bindingOf(value);
     if (binding === 'bad') {
       report('binding', path, 'A binding has exactly one key, "$state" or "$data".', id);
@@ -199,7 +217,23 @@ export function resolveInteraction(
       const binding = bindingOf(value);
       const schema = spec?.props.find((prop) => prop.name === name);
       let resolved: unknown;
-      if (schema?.schema?.$ref === '#/$defs/reorder' && isBag(value)) {
+      if (isSourceBinding(value)) {
+        // Spec 0.8.0: the rows come from the host's source at paint time; the
+        // renderer checks an empty list of the prop's kind meanwhile.
+        const here = `${path}.props.${name}`;
+        if (schema?.kind !== 'array' || !spec?.sourceable?.includes(name)) {
+          report('source', here, `"${name}" of "${node.id}" cannot read a data source.`, node.id);
+        } else {
+          const items = schema.schema?.items?.properties;
+          for (const issue of checkSourceBinding(value, {
+            ...(sources ? { sources } : {}),
+            ...(items ? { itemFields: Object.keys(items) } : {}),
+          })) {
+            report(issue.code, `${here}${issue.at}`, issue.message, node.id);
+          }
+        }
+        resolved = [];
+      } else if (schema?.schema?.$ref === '#/$defs/reorder' && isBag(value)) {
         // Drag as data: `reorder.bind` names the list itself, so it stays a
         // binding for the painter; only its name is checked here.
         const bound = bindingOf(value.bind);

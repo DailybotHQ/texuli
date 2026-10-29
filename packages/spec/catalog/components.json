@@ -1,5 +1,5 @@
 {
-  "catalogHash": "c6bd7047eba3e1f32e9ed74097c390a58416cf4260267c8958e0ea70821abf35",
+  "catalogHash": "55d8be63fe2b80cbf116bdd0ccbad77696c12faf4d9b0aea1f5b66608f8efcac",
   "components": [
     {
       "capability": "web-only",
@@ -869,6 +869,29 @@
         }
       ],
       "summary": "Emphasized documentation-style tip with a strong start edge."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "canvas",
+      "id": "canvas",
+      "label": "Canvas",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "canvas",
+          "required": true,
+          "schema": {
+            "$ref": "#/$defs/canvas"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        }
+      ],
+      "summary": "A whiteboard or diagram as data: shapes, sticky notes, text, frames, groups and connectors on an infinite canvas."
     },
     {
       "capability": "web-only",
@@ -2768,6 +2791,7 @@
           }
         }
       ],
+      "sourceable": ["items"],
       "summary": "A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits."
     },
     {
@@ -2850,6 +2874,7 @@
           "name": "view"
         }
       ],
+      "sourceable": ["events"],
       "summary": "Events on a month, week, day or agenda view; people open, and when allowed move, events."
     },
     {
@@ -3021,6 +3046,7 @@
           "name": "layout"
         }
       ],
+      "sourceable": ["entries"],
       "summary": "Folders and files in a grid or list with breadcrumbs, selection and type previews."
     },
     {
@@ -3178,6 +3204,7 @@
           "name": "selectable"
         }
       ],
+      "sourceable": ["rows"],
       "summary": "A sortable, searchable grid of rows and typed columns; virtualized for long lists."
     },
     {
@@ -3321,6 +3348,7 @@
           "name": "timeZone"
         }
       ],
+      "sourceable": ["items"],
       "summary": "Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view."
     },
     {
@@ -3424,6 +3452,7 @@
           "name": "zoom"
         }
       ],
+      "sourceable": ["tasks"],
       "summary": "Tasks as bars over days, weeks, months or quarters, with dependencies and progress."
     },
     {
@@ -3484,6 +3513,7 @@
           "required": true
         }
       ],
+      "sourceable": ["items"],
       "summary": "A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard."
     },
     {
@@ -6548,6 +6578,35 @@
         }
       ],
       "summary": "Dialog on large screens, drawer/sheet on small screens."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "events": ["submit"],
+      "group": "schema-forms",
+      "id": "schema-form",
+      "label": "Schema form",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "action",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "object",
+          "name": "schema",
+          "required": true,
+          "schema": {
+            "$ref": "#/$defs/formSchema"
+          }
+        }
+      ],
+      "summary": "A whole form as data: typed fields in sections or steps, conditional logic, named formats and cross-field rules, painted with texuli controls; submitting proposes one action intent to the host."
     },
     {
       "capability": "web-only",

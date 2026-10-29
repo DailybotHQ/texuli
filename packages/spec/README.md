@@ -121,8 +121,11 @@ refused state or flow declaration), `unknown-state` (a binding or action
 names no declared variable), `binding` (a malformed, misplaced, read-only or
 ill-fitting binding), `action` (an action with the wrong fields or target),
 `unknown-event` (an `on` key the component does not fire) and `workflow` (a
-workflow graph rule), and, from spec 0.7.0, `duplicate-key` (a node key used
-twice in the tree). Deprecated components and props add a `deprecated`
+workflow graph rule), from spec 0.7.0, `duplicate-key` (a node key used
+twice in the tree), and, from spec 0.8.0, `source` (a malformed, misplaced or
+ill-fitting data-source binding, or any binding when the host passes no
+`sources`) and `unknown-source` (a source the host never registered).
+Deprecated components and props add a `deprecated`
 warning without failing.
 
 ## What's inside
@@ -135,6 +138,7 @@ warning without failing.
 | `@texuli/spec/surface` | Runtime: the state surface rules every validator shares (no imports) | `checkStateSurface`, `surfaceInputs`, `SPEC_CONTROL_STATE_TYPES`, `SURFACE_PLAYER_CODES`, `LIST_TEXT_PATTERN` |
 | `@texuli/spec/motion` | Runtime (new in `0.6.0`, spec `0.6.0`): the closed motion vocabulary and its check, shared by the catalog and the player ([motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/motion.md)) | `SPEC_MOTION_PRESETS`, `SPEC_MOTION_DURATIONS`, `SPEC_MOTION_STAGGERS`, `SPEC_MOTION_LEVELS`, `checkNodeMotion`, `checkEnvelopeMotion` |
 | `@texuli/spec/stream` | Runtime, opt-in (new in `0.6.0`): streamed blueprints ([stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)) | `createJsonTokenizer`, `createBlueprintAssembler`, `createBlueprintStream`, `STREAM_NODE_ORDER` |
+| `@texuli/spec/source` | Runtime (unreleased, planned for `0.8.0`, spec `0.8.0`): data-source bindings, shared by the spec validator, `@texuli/catalog` and the player ([source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)) | `checkSourceBinding`, `isSourceBinding`, `SOURCE_BINDING_KEY`, `SPEC_SOURCE_LIMITS`, `SPEC_SOURCE_FILTER_OPERATORS`, `SpecSourceDescriptor` |
 | `@texuli/spec/codegen` | Build time: generation and conformance | `buildSpec`, `projectCatalog`, `checkConformance`, `checkCatalogContract`, `formatJson`, `nextSpecVersion`, `checkVersionHistory` |
 
 ## Key guarantees
@@ -195,6 +199,25 @@ warning without failing.
   nodes without a matching view or event, and writers of a host-bound
   variable. The spec, `@texuli/catalog`'s `validateDraft` and the Kotlin
   twin run the same rules.
+- **Data as a named source, never a request (spec 0.8.0, unreleased).** A
+  component's `sourceable` prop may read rows with
+  `{"$source": name, "query": {...}, "map": {...}}`: an opaque name the host
+  registered, and a closed query (projection, the `@texuli/data` grid filter
+  model, sort, search, a page size). It is checked against the host's source
+  descriptors (`SpecDocuments.sources`) and refused without them; nothing in
+  it is a URL, SQL or code
+  ([source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)).
+- **Forms as data, never patterns or code (spec 0.8.0, unreleased).** The
+  agent-emittable `schema-form` id carries a closed form schema
+  (`$defs.formSchema`): fields of 15 closed types in sections or steps,
+  named formats and host validator names (never a regular expression),
+  and conditions and cross-field rules in the closed expression AST of
+  `@texuli/core/expression` (`$defs.expression`, the `numberFormula` and
+  `condition` shapes extended with strings, booleans, field references and
+  calls to a closed function table). The schema checks the shape; the
+  forms validator (`@texuli/forms/model`, `checkForm` in `validateDraft`)
+  checks the rest at the host's tier. The Kotlin twin decodes the shape and
+  its list caps and paints a placeholder (planned).
 - **List item text never hides or reorders itself.** String fields of list
   state items refuse control characters, bidirectional overrides and
   isolates, and invisible formatting characters (`SPEC_PATTERNS.listText`;
@@ -255,6 +278,8 @@ conformance harness) are in
   [motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/motion.md)
 - Streamed blueprints (the incremental tokenizer, the canonical order and
   node shells; new in `0.6.0`): [stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)
+- Data-source bindings (spec 0.8.0; unreleased):
+  [source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)
 - The Kotlin Multiplatform twin that consumes the generated models:
   [native/README.md](https://github.com/DailybotHQ/texuli/blob/main/native/README.md)
 - Architecture: [ARCHITECTURE.md](https://github.com/DailybotHQ/texuli/blob/main/docs/ARCHITECTURE.md)

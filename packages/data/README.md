@@ -121,6 +121,17 @@ The package root, `@texuli/data`, re-exports the main views and helpers.
   engine, but persisting them, and enforcing authorization and hard limits,
   belongs to your application.
 
+- **Host data sources in generated views (unreleased, planned for `0.8.0`).**
+  In a blueprint, the grid's rows, the board's items, the tree view's items,
+  the calendar's events, the file browser's entries, the timeline's tasks and
+  the notification inbox's items may read a host-registered data source
+  (`@texuli/core/data-source`): the source's filter is this package's grid
+  filter model, and `@texuli/player` shows loading, empty and error states
+  around the view, pages, and saves edits optimistically. A board move is
+  saved through the board's async `onMove`: the card moves at once and goes
+  back, announced, when the save fails
+  ([player data sources](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/data-sources.md)).
+
 **Known limit:** fence editing on the map is not implemented yet; fences are
 drawn and listed only.
 

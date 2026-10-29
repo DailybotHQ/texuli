@@ -1,0 +1,122 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "canvas-retro",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-29T09:00:00Z",
+  "updatedAt": "2026-10-29T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Harbor assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "spec": "0.8.0",
+  "tree": {
+    "key": "retro",
+    "id": "canvas",
+    "props": {
+      "label": "Launch retro board",
+      "canvas": {
+        "format": "texuli-canvas",
+        "formatVersion": 1,
+        "meta": {
+          "title": "Launch retro",
+          "locale": "en"
+        },
+        "grid": 8,
+        "shapes": [
+          {
+            "id": "went-well",
+            "type": "frame",
+            "title": "Went well",
+            "x": 0,
+            "y": 0,
+            "width": 400,
+            "height": 248,
+            "children": [
+              {
+                "id": "note-beta",
+                "type": "sticky",
+                "x": 24,
+                "y": 48,
+                "width": 160,
+                "height": 160,
+                "text": "Beta shipped on time",
+                "color": "green"
+              },
+              {
+                "id": "note-docs",
+                "type": "sticky",
+                "x": 208,
+                "y": 48,
+                "width": 160,
+                "height": 160,
+                "text": "Docs were ready",
+                "color": "blue"
+              }
+            ]
+          },
+          {
+            "id": "start",
+            "type": "ellipse",
+            "x": 480,
+            "y": 16,
+            "width": 144,
+            "height": 72,
+            "text": "Feedback"
+          },
+          {
+            "id": "triage",
+            "type": "diamond",
+            "x": 488,
+            "y": 136,
+            "width": 128,
+            "height": 112,
+            "text": "Urgent?"
+          },
+          {
+            "id": "fix",
+            "type": "rect",
+            "x": 704,
+            "y": 152,
+            "width": 152,
+            "height": 80,
+            "radius": 8,
+            "text": "Fix this week",
+            "paint": {
+              "fill": "orange"
+            }
+          }
+        ],
+        "connectors": [
+          {
+            "id": "to-triage",
+            "from": {
+              "shape": "start"
+            },
+            "to": {
+              "shape": "triage"
+            },
+            "routing": "elbow"
+          },
+          {
+            "id": "urgent",
+            "from": {
+              "shape": "triage",
+              "anchor": "right"
+            },
+            "to": {
+              "shape": "fix",
+              "anchor": "left"
+            },
+            "routing": "curved",
+            "text": "yes"
+          }
+        ]
+      }
+    }
+  }
+}

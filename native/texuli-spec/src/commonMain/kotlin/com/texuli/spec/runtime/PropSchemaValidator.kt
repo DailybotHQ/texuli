@@ -2,8 +2,10 @@ package com.texuli.spec.runtime
 
 import com.texuli.spec.BlueprintAction
 import com.texuli.spec.BlueprintBinding
+import com.texuli.spec.BlueprintCanvas
 import com.texuli.spec.BlueprintCondition
 import com.texuli.spec.BlueprintDocument
+import com.texuli.spec.BlueprintFormSchema
 import com.texuli.spec.BlueprintReorder
 import com.texuli.spec.JsonValue
 import com.texuli.spec.SpecDecodeException
@@ -23,7 +25,7 @@ data class PropSchemaIssue(val code: String, val path: String, val message: Stri
  * type, properties (objects closed unless `additionalProperties` gives a
  * map), required, items, enum, string bounds in code points, number and
  * array bounds. A `ref` dispatches to the generated decoders (`binding`,
- * `reorder`, `action`, `eventMap`, `condition`, `document`) or to [validateWorkflowGraph].
+ * `reorder`, `action`, `eventMap`, `condition`, `document`, `formSchema`) or to [validateWorkflowGraph].
  *
  * With a [context] (inside a blueprint), binding, reorder, action and
  * workflow positions also add their semantic diagnostics to the context,
@@ -50,6 +52,11 @@ internal class PropSchemaValidator(private val context: NodeContext?, private va
             return
         }
         val context = context
+        if (context != null && isSourceBinding(value)) {
+            // Spec 0.8.0: a data-source binding reads only a whole top-level prop.
+            context.fail(SpecDiagnosticCode.SOURCE, at(path), "A data-source binding reads only a whole top-level prop.")
+            return
+        }
         if (context != null && isBindingShaped(value)) {
             nestedBinding(value as JsonValue.Obj, at(path), context) { PropSchemaValidator(null).validate(node, it).isEmpty() }
             return
@@ -171,6 +178,44 @@ internal class PropSchemaValidator(private val context: NodeContext?, private va
                 val document = decode(path, issues) { BlueprintDocument.decode(value, path) } ?: return
                 if (document.blocks.size > SpecContract.DOCUMENT_BLOCKS) {
                     issues += PropSchemaIssue("max-items", "$path.blocks", "At most ${SpecContract.DOCUMENT_BLOCKS} items.")
+                }
+            }
+            "canvas" -> {
+                // Spec 0.8.0 (ADR-012): the canvas's envelope only (format, version, members, the grid
+                // range, the shape and connector caps); its closed shape vocabulary, palette, text
+                // safety and URL policy are the runtime validator's (`@texuli/canvas/model`).
+                val canvas = decode(path, issues) { BlueprintCanvas.decode(value, path) } ?: return
+                canvas.grid?.let { grid ->
+                    if (grid < 1.0) issues += PropSchemaIssue("minimum", "$path.grid", "At least 1.")
+                    if (grid > 1000.0) issues += PropSchemaIssue("maximum", "$path.grid", "At most 1000.")
+                }
+                if (canvas.shapes.size > SpecContract.CANVAS_SHAPES) {
+                    issues += PropSchemaIssue("max-items", "$path.shapes", "At most ${SpecContract.CANVAS_SHAPES} items.")
+                }
+                if (canvas.connectors.size > SpecContract.CANVAS_CONNECTORS) {
+                    issues += PropSchemaIssue("max-items", "$path.connectors", "At most ${SpecContract.CANVAS_CONNECTORS} items.")
+                }
+            }
+            "formSchema" -> {
+                // Spec 0.8.0 (ADR-015): the closed form schema's shape (closed members, field types,
+                // formats, autocomplete tokens and expression ops are enums) and its list caps; names,
+                // members per type, ranges, links and the conditions' field references are the runtime
+                // validator's (`@texuli/forms/model`, validateDraft on the web).
+                val form = decode(path, issues) { BlueprintFormSchema.decode(value, path) } ?: return
+                fun cap(size: Int, max: Int, where: String) {
+                    if (size > max) issues += PropSchemaIssue("max-items", where, "At most $max items.")
+                }
+                cap(form.fields?.size ?: 0, SpecContract.FORM_FIELDS, "$path.fields")
+                cap(form.sections?.size ?: 0, SpecContract.FORM_SECTIONS, "$path.sections")
+                cap(form.steps?.size ?: 0, SpecContract.FORM_STEPS, "$path.steps")
+                cap(form.rules?.size ?: 0, SpecContract.FORM_RULES, "$path.rules")
+                form.sections?.forEachIndexed { i, section -> cap(section.fields.size, SpecContract.FORM_FIELDS, "$path.sections[$i].fields") }
+                form.steps?.forEachIndexed { i, step ->
+                    cap(step.fields?.size ?: 0, SpecContract.FORM_FIELDS, "$path.steps[$i].fields")
+                    cap(step.sections?.size ?: 0, SpecContract.FORM_SECTIONS, "$path.steps[$i].sections")
+                    step.sections?.forEachIndexed { j, section ->
+                        cap(section.fields.size, SpecContract.FORM_FIELDS, "$path.steps[$i].sections[$j].fields")
+                    }
                 }
             }
             "workflowGraph" -> {

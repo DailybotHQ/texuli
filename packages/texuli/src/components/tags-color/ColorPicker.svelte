@@ -46,6 +46,12 @@ let {
 }: Props & RefProp = $props();
 
 const preview = $derived(value ?? defaultValue);
+// A color picker always holds a value, and its `group` role does not support
+// `aria-required` (axe `aria-allowed-attr`): a Field's flag is dropped.
+const groupRest = $derived.by(() => {
+  const { 'aria-required': _required, ...others } = rest as Record<string, unknown>;
+  return others;
+});
 </script>
 
 <ColorPickerPrimitive.Root bind:ref
@@ -60,7 +66,7 @@ const preview = $derived(value ?? defaultValue);
   data-tx-color-picker=""
   data-disabled={disabled ? 'true' : undefined}
   style={`--tx-color-picker-value: ${preview}`}
-  {...rest}
+  {...groupRest}
 >
   <ColorPickerPrimitive.Area class="tx-color-picker__area" data-tx-color-area="" />
   <div class="tx-color-picker__sliders">

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://texuli.example/spec/schemas/blueprint.schema.json",
   "title": "BlueprintEnvelope",
-  "description": "Envelope version 1 around one catalog tree (ADR-004, audit G13). Mirrors what @texuli/catalog/envelope reads; a declared status, activation or tier is display data, never authority. Spec 0.4.0 (ADR-008 + PLAN_008 deck encoding) adds an optional spec version, local state and a flow; spec 0.6.0 (ADR-012, ADR-013) adds the closed motion vocabulary: a node motion and the envelope motion level; spec 0.7.0 (ADR-011, ADR-012, ADR-014) adds an optional node key (a stable instance id, unique in the tree), the document shape a `document` node carries and the patchDocument edit op with its bounded RFC 6902 patch. Planned minor additions: the native profile and several roots.",
+  "description": "Envelope version 1 around one catalog tree (ADR-004, audit G13). Mirrors what @texuli/catalog/envelope reads; a declared status, activation or tier is display data, never authority. Spec 0.4.0 (ADR-008 + PLAN_008 deck encoding) adds an optional spec version, local state and a flow; spec 0.6.0 (ADR-012, ADR-013) adds the closed motion vocabulary: a node motion and the envelope motion level; spec 0.7.0 (ADR-011, ADR-012, ADR-014) adds an optional node key (a stable instance id, unique in the tree), the document shape a `document` node carries and the patchDocument edit op with its bounded RFC 6902 patch. Spec 0.8.0 (ADR-012, ADR-015) adds data-source bindings: a sourceable prop may read rows from a source the host registered ({\"$source\": name, \"query\": {...}}), with a closed query, and forms as data: the closed form schema a `schema-form` node carries ($defs.formSchema) with conditions and cross-field rules in the closed expression AST of @texuli/core/expression ($defs.expression). Spec 0.8.0 (ADR-012) adds the canvas shape a `canvas` node carries ($defs.canvas). Planned minor additions: the native profile and several roots.",
   "type": "object",
   "properties": {
     "format": {
@@ -70,7 +70,7 @@
     "spec": {
       "description": "The spec version the envelope was written for. Omitted means 0.2.0; migrateBlueprint stamps it.",
       "type": "string",
-      "enum": ["0.3.0", "0.4.0", "0.5.0", "0.6.0", "0.7.0"]
+      "enum": ["0.3.0", "0.4.0", "0.5.0", "0.6.0", "0.7.0", "0.8.0"]
     },
     "state": {
       "description": "Local state declarations (ADR-008), at most 64. Names, counts and per-type rules are checked by the validator.",
@@ -455,6 +455,573 @@
       "required": ["op"],
       "additionalProperties": false
     },
+    "expression": {
+      "description": "The closed expression AST of @texuli/core/expression (spec 0.8.0, ADR-015): the numberFormula and condition shapes extended with strings, booleans, null, field references and calls to a closed function table (len, lower, upper, trim, contains, startsWith, endsWith, isEmpty, coalesce, includes, count, sum, abs, floor, ceil, number, today, date, isDate, daysBetween, addDays, year, month, day). Structural shape only: which members each op needs, the function table and arity, at most 1,000 nodes and depth 32 are checked by the runtime parser; ref and range are reserved for dialects (sheets) and refused in forms. Never code, never a regular expression.",
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": [
+            "num",
+            "str",
+            "bool",
+            "null",
+            "var",
+            "field",
+            "ref",
+            "range",
+            "add",
+            "sub",
+            "mul",
+            "div",
+            "mod",
+            "pow",
+            "neg",
+            "lt",
+            "lte",
+            "gt",
+            "gte",
+            "eq",
+            "neq",
+            "and",
+            "or",
+            "not",
+            "if",
+            "min",
+            "max",
+            "concat",
+            "round",
+            "clamp",
+            "call"
+          ]
+        },
+        "value": {
+          "description": "A literal for num (number), str (string, at most 32,768 characters) and bool; an expression for neg, not, round and clamp."
+        },
+        "name": {
+          "description": "The field (or var) a reference reads.",
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$"
+        },
+        "ref": {
+          "description": "A dialect reference (sheets); refused in forms.",
+          "type": "string",
+          "maxLength": 256
+        },
+        "from": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "to": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "left": {
+          "$ref": "#/$defs/expression"
+        },
+        "right": {
+          "$ref": "#/$defs/expression"
+        },
+        "base": {
+          "$ref": "#/$defs/expression"
+        },
+        "exponent": {
+          "$ref": "#/$defs/expression"
+        },
+        "args": {
+          "description": "Operands of and, or, min, max, concat and call (at most 64).",
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/expression"
+          }
+        },
+        "digits": {
+          "type": "integer",
+          "minimum": -12,
+          "maximum": 12
+        },
+        "min": {
+          "$ref": "#/$defs/expression"
+        },
+        "max": {
+          "$ref": "#/$defs/expression"
+        },
+        "test": {
+          "$ref": "#/$defs/expression"
+        },
+        "ifTrue": {
+          "$ref": "#/$defs/expression"
+        },
+        "ifFalse": {
+          "$ref": "#/$defs/expression"
+        },
+        "fn": {
+          "description": "A function of the closed table.",
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$"
+        }
+      },
+      "required": ["op"],
+      "additionalProperties": false
+    },
+    "formOption": {
+      "description": "One choice of a select, radio or multiselect field.",
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      },
+      "required": ["value", "label"],
+      "additionalProperties": false
+    },
+    "formWhen": {
+      "description": "Conditions on a field as expressions over earlier fields: shown while show holds, required while require holds, editable while enable holds. Hidden and disabled fields are not validated or submitted; only true holds (unknown does not).",
+      "type": "object",
+      "properties": {
+        "show": {
+          "$ref": "#/$defs/expression"
+        },
+        "require": {
+          "$ref": "#/$defs/expression"
+        },
+        "enable": {
+          "$ref": "#/$defs/expression"
+        }
+      },
+      "additionalProperties": false
+    },
+    "formVisibility": {
+      "description": "When a step or section shows: an expression over earlier fields.",
+      "type": "object",
+      "properties": {
+        "show": {
+          "$ref": "#/$defs/expression"
+        }
+      },
+      "additionalProperties": false
+    },
+    "formLink": {
+      "description": "A help link under a field; href passes the URL policy at the host's tier.",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "href": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        }
+      },
+      "required": ["label", "href"],
+      "additionalProperties": false
+    },
+    "formMessages": {
+      "description": "Plain-text messages that replace the defaults per rule ({label}, {min}, {max} are filled in).",
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "minLength": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "maxLength": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "min": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "max": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "step": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "format": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "minItems": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "maxItems": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "option": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "fileType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "fileSize": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "additionalProperties": false
+    },
+    "formField": {
+      "description": "One field of a closed type. Which members apply to which type, value types, option membership, ranges and the conditions' field references are checked by @texuli/forms/model (validateFormSchema). Formats are names; a pattern is never accepted.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The key in the submitted values, unique in the form.",
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9_]{0,63}$"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "text",
+            "textarea",
+            "number",
+            "email",
+            "url",
+            "date",
+            "time",
+            "select",
+            "multiselect",
+            "checkbox",
+            "radio",
+            "switch",
+            "slider",
+            "file",
+            "tags"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "placeholder": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "default": {
+          "description": "A value of the field's type (a string, number, boolean, YYYY-MM-DD, HH:MM or a list of option values). Not for file fields."
+        },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/$defs/formOption"
+          }
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "when": {
+          "$ref": "#/$defs/formWhen"
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "min": {
+          "description": "A number for number and slider; YYYY-MM-DD for date; HH:MM for time."
+        },
+        "max": {
+          "description": "A number for number and slider; YYYY-MM-DD for date; HH:MM for time."
+        },
+        "step": {
+          "description": "Above 0, for number and slider.",
+          "type": "number",
+          "minimum": 0
+        },
+        "minItems": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 200
+        },
+        "maxItems": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "format": {
+          "description": "A named format, checked by owned linear-time code.",
+          "type": "string",
+          "enum": [
+            "email",
+            "url",
+            "phone",
+            "postal-code",
+            "postal-code-us",
+            "postal-code-ca",
+            "postal-code-uk",
+            "postal-code-de",
+            "postal-code-fr",
+            "postal-code-es",
+            "postal-code-mx",
+            "postal-code-br",
+            "postal-code-co",
+            "postal-code-in",
+            "postal-code-jp",
+            "postal-code-au",
+            "digits",
+            "alphanumeric",
+            "slug",
+            "iso-date",
+            "time",
+            "hex-color"
+          ]
+        },
+        "validator": {
+          "description": "The name of a validator the host registered (sync or async); an unregistered name fails closed.",
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9_-]{0,63}$"
+        },
+        "messages": {
+          "$ref": "#/$defs/formMessages"
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 20
+        },
+        "accept": {
+          "description": "File types: MIME types (image/png, image/*) or extensions (.pdf).",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "type": "string",
+            "pattern": "^([a-z]+/(\\*|[a-z0-9][a-z0-9.+-]{0,63})|\\.[a-z0-9]{1,10})$"
+          }
+        },
+        "maxSize": {
+          "description": "Largest accepted file in bytes; the host uploads files.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1073741824
+        },
+        "autocomplete": {
+          "description": "An autocomplete token; payment, credential and one-time-code tokens are absent.",
+          "type": "string",
+          "enum": [
+            "off",
+            "name",
+            "given-name",
+            "family-name",
+            "nickname",
+            "email",
+            "tel",
+            "organization",
+            "organization-title",
+            "street-address",
+            "address-level1",
+            "address-level2",
+            "postal-code",
+            "country-name",
+            "language",
+            "url",
+            "bday"
+          ]
+        },
+        "link": {
+          "$ref": "#/$defs/formLink"
+        }
+      },
+      "required": ["name", "type", "label"],
+      "additionalProperties": false
+    },
+    "formSection": {
+      "description": "A group of fields (a fieldset when titled).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "when": {
+          "$ref": "#/$defs/formVisibility"
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/$defs/formField"
+          }
+        }
+      },
+      "required": ["id", "fields"],
+      "additionalProperties": false
+    },
+    "formStep": {
+      "description": "One step of a multi-step form: exactly one of fields or sections; validated before the next step opens.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "when": {
+          "$ref": "#/$defs/formVisibility"
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/$defs/formField"
+          }
+        },
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/formSection"
+          }
+        }
+      },
+      "required": ["id", "title"],
+      "additionalProperties": false
+    },
+    "formRule": {
+      "description": "A cross-field rule: fails when test is false (unknown passes); the message attaches to field, or to the form.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+        },
+        "test": {
+          "$ref": "#/$defs/expression"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "field": {
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9_]{0,63}$"
+        }
+      },
+      "required": ["id", "test", "message"],
+      "additionalProperties": false
+    },
+    "formSchema": {
+      "description": "A form as data (spec 0.8.0, ADR-015), the schema prop of a schema-form node: a title and exactly one of fields (one page), sections or steps (a multi-step flow), plus cross-field rules. At most 200 fields, 50 sections, 20 steps and 50 rules. Checked again by @texuli/forms/model at the host's tier (validateDraft): closed members per type, unique names, options, ranges, named formats, link URLs, and conditions that read earlier fields only.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "submitLabel": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/$defs/formField"
+          }
+        },
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/formSection"
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/formStep"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/formRule"
+          }
+        }
+      },
+      "required": ["title"],
+      "additionalProperties": false
+    },
     "stateName": {
       "description": "A local state variable name.",
       "type": "string",
@@ -815,6 +1382,175 @@
       "items": {
         "$ref": "#/$defs/documentPatchOperation"
       }
+    },
+    "canvas": {
+      "description": "A Texuli canvas (spec 0.8.0, ADR-012): the format, version, metadata, grid, shapes and connectors of @texuli/canvas. This contract checks the envelope of the canvas only; the closed shape vocabulary and palette, text safety, the URL policy and the caps are checked by @texuli/canvas/model (schemas/canvas.schema.json) inside the runtime validator, @texuli/catalog's validateDraft, at the host's tier (the host supplies checkCanvas).",
+      "type": "object",
+      "properties": {
+        "format": {
+          "const": "texuli-canvas"
+        },
+        "formatVersion": {
+          "const": 1
+        },
+        "meta": {
+          "description": "Title, locale and description.",
+          "type": "object",
+          "additionalProperties": {}
+        },
+        "grid": {
+          "description": "The snap grid in world units.",
+          "type": "number",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "shapes": {
+          "description": "The shapes, bottom to top: rect, ellipse, diamond, line, arrow, path, text, sticky, image (a host ref and alt text), frame and group (which hold shapes).",
+          "type": "array",
+          "maxItems": 5000,
+          "items": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "connectors": {
+          "description": "Connectors between shapes or points, routed straight, elbow or curved, with optional caps and a label.",
+          "type": "array",
+          "maxItems": 5000,
+          "items": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "required": ["format", "formatVersion", "shapes", "connectors"],
+      "additionalProperties": false
+    },
+    "sourceName": {
+      "description": "A data source the host registered (spec 0.8.0, ADR-015): an opaque name, never a URL. Checked against the host's registry; with no registry a binding is refused.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*([._-][a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "sourceFieldName": {
+      "description": "A field the source declares.",
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+      "maxLength": 64
+    },
+    "sourceFilter": {
+      "description": "The @texuli/data grid filter model: a condition ({type: condition, field, operator, value}) or an and/or group ({type: group, op, children}). At most 6 levels and 64 nodes. Which members each type takes, the operators each field allows and the value types are checked by the validator against the source's declaration.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["condition", "group"]
+        },
+        "field": {
+          "$ref": "#/$defs/sourceFieldName"
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "eq",
+            "neq",
+            "contains",
+            "in",
+            "between",
+            "before",
+            "after",
+            "isEmpty",
+            "isNotEmpty"
+          ]
+        },
+        "value": {
+          "description": "A string, number, boolean or null; a list of them for in (at most 100) and between (exactly 2). Data, never code."
+        },
+        "op": {
+          "type": "string",
+          "enum": ["and", "or"]
+        },
+        "children": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/sourceFilter"
+          }
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "sourceSort": {
+      "description": "One sort key on a sortable field.",
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/$defs/sourceFieldName"
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["asc", "desc"]
+        }
+      },
+      "required": ["field"],
+      "additionalProperties": false
+    },
+    "sourceQuery": {
+      "description": "The closed query a data-source binding sends (ADR-015): projection, a filter, sort keys, search text and a page size. The host adapter receives it validated and decides how to run it; Texuli never builds URLs, SQL or code from it.",
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/sourceFieldName"
+          }
+        },
+        "filter": {
+          "$ref": "#/$defs/sourceFilter"
+        },
+        "sort": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/sourceSort"
+          }
+        },
+        "search": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "pageSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        }
+      },
+      "additionalProperties": false
+    },
+    "sourceBinding": {
+      "description": "Reads a whole sourceable prop from a host data source (spec 0.8.0, ADR-015): {\"$source\": name, \"query\": {...}, \"map\": {itemField: sourceField}}. The player loads the rows through the host's registry; map renames source fields to the component's item fields (at most 16 entries).",
+      "type": "object",
+      "properties": {
+        "$source": {
+          "$ref": "#/$defs/sourceName"
+        },
+        "query": {
+          "$ref": "#/$defs/sourceQuery"
+        },
+        "map": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/sourceFieldName"
+          }
+        }
+      },
+      "required": ["$source"],
+      "additionalProperties": false
     }
   }
 }

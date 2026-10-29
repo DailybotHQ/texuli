@@ -43,6 +43,55 @@
       "gzip": 12288,
       "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
     },
+    "@texuli/canvas": {
+      "gzip": 50496,
+      "cssGzip": 2112,
+      "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: the root barrel re-exports the model, the editor and the viewer; consumers import the subpaths. Measured 48,549 B (CSS 1,997 B)."
+    },
+    "@texuli/canvas/editor": {
+      "gzip": 46272,
+      "cssGzip": 2048,
+      "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: the editor (toolbar, application surface, minimap, shape tree, controller) with the canvas model, operations and history it edits through; the sync session is not in it. Measured 44,454 B (CSS 1,910 B)."
+    },
+    "@texuli/canvas/export": {
+      "gzip": 8384,
+      "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: SVG through @texuli/core/markup and PNG rasterization, with routing and paint geometry. Measured 8,010 B."
+    },
+    "@texuli/canvas/host": {
+      "gzip": 11200,
+      "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: the player canvas host carries the canvas validator (checkCanvas runs inside validation); the viewer loads lazily (8,214 B lazy). Measured 10,726 B."
+    },
+    "@texuli/canvas/model": {
+      "gzip": 24064,
+      "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: the framework-free model: format, untrusted validator on the @texuli/deck schema kit, geometry, routing, simplification, operations, history and editing helpers. Measured 23,087 B."
+    },
+    "@texuli/canvas/sync": {
+      "gzip": 24512,
+      "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: the @texuli/document/sync CRDT core, the canvas binding (projection validated by the canvas schema), sessions and presence; loaded only for collaboration. Measured 23,559 B."
+    },
+    "@texuli/canvas/viewer": {
+      "gzip": 9664,
+      "cssGzip": 704,
+      "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: the read-only viewer with its routing and paint geometry; no validator, no editor. Measured 9,264 B (CSS 676 B)."
+    },
+    "@texuli/forms": {
+      "gzip": 83008,
+      "cssGzip": 8832,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B)."
+    },
+    "@texuli/forms/model": {
+      "gzip": 19392,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the framework-free runtime: schema validator, named formats, conditional logic on @texuli/core/expression, value validation, the controller and drafts. Measured 18,614 B."
+    },
+    "@texuli/forms/host": {
+      "gzip": 13248,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the player formHost adapter carries the form schema validator (checkForm runs inside validation); SchemaForm loads lazily on the first present. Measured 12,720 B."
+    },
+    "@texuli/forms/styles.css": {
+      "gzip": 64,
+      "cssGzip": 832,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4% for the stylesheet only; measured 0 B, CSS 762 B."
+    },
     "@texuli/catalog": {
       "gzip": 57024,
       "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 54080 -> 57024 B, measured + 4% after four new manifests (time-field, data-cohort-table, data-notification-inbox, data-filter-builder) and the linear-time rich text parser and sink scan; measured 54,821 B."
@@ -119,6 +168,14 @@
       "gzip": 4096,
       "note": "Per-texel subpath budget (lead decision 2026-10-23): primitives import texels through these subpaths, so each texel is a first-load cost only where used."
     },
+    "@texuli/core/data-source": {
+      "gzip": 10304,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new exact row (the @texuli/core/* default is 4,096 B) at measured + 4%: the framework-free data-source texel (ADR-015): source registry and descriptors, the closed query (projection, the grid filter model's and/or-over-field-conditions filters, sort, search, paging) with its validator, the loader (retries, timeouts, a query-keyed page cache) and collections with optimistic writes. Loaded only by hosts and players that bind sources. Measured 9,892 B."
+    },
+    "@texuli/core/expression": {
+      "gzip": 10624,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new exact row (the @texuli/core/* default is 4,096 B) at measured + 4%: the closed expression language (ADR-015): parser with node and depth limits, the closed function table, type inference and the step-bounded evaluator @texuli/forms uses (the planned sheets formula layer extends it). Measured 10,182 B."
+    },
     "@texuli/date": {
       "gzip": 2048,
       "note": "Owned Gregorian date engine; measured 1.66 KiB gzip on 2026-10-27, with room for platform variance. Owner-approved for the external date dependency migration."
@@ -152,8 +209,8 @@
       "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): canvas transforms, free placement, snapping, guides, marquee and resize; measured 1,658 B + 4% headroom."
     },
     "@texuli/drag/graph": {
-      "gzip": 1536,
-      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): port and edge hit-testing and connection rules; measured 1,468 B + 4% headroom."
+      "gzip": 1728,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-drag-engine): port and edge hit-testing and connection rules; measured 1,468 B + 4% headroom. PLAN_010 T-canvas (consented plan): 1536 -> 1728 B, measured + 4% after the side-aware edge curve (sideCurveControls, sideCurvePath) moved here from @texuli/workflows so canvas connectors and workflow edges share one geometry; measured 1,625 B."
     },
     "@texuli/drag/messages": {
       "gzip": 1024,
@@ -434,7 +491,7 @@
     "@texuli/primitives/tree": {
       "gzip": 4224,
       "cssGzip": 0,
-      "note": "APG tree with typeahead, lazy children and virtualization; the task set \u2264 5 KB (measured 4,211 B). PLAN_010 T-release-060 (2026-10-29): 5120 -> 4224 B, tightened to measured + 4% (measured 4,017 B). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 0 B, tightened to measured + 4% (measured 0 B)."
+      "note": "APG tree with typeahead, lazy children and virtualization; the task set ≤ 5 KB (measured 4,211 B). PLAN_010 T-release-060 (2026-10-29): 5120 -> 4224 B, tightened to measured + 4% (measured 4,017 B). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 0 B, tightened to measured + 4% (measured 0 B)."
     },
     "@texuli/tokens": {
       "gzip": 41792,
@@ -702,12 +759,12 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 8,317 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 9,670 B + 4% headroom; manifests carry events, bindable and prop schemas, and each group ships the validator's checks. PLAN_010 T-release-060 (2026-10-29): 10112 -> 5120 B, tightened to measured + 4% (measured 4,915 B)."
     },
     "@texuli/catalog/player": {
-      "gzip": 23424,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 16,826 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 18,920 B + 4% headroom; the player manifests gained the spec 0.3.0 fields. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 20,166 B + 4% headroom. PLAN_010 (2026-10-29, consented plan): 20992 -> 21888 B, measured + 4% after node motion carried on paint nodes (ADR-013); measured 21,032 B. PLAN_010 T-doc-agents (consented plan): 21888 -> 23424 B, measured + 4% after the documentHost seam and document painting; measured 22,488 B."
+      "gzip": 26624,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 16,826 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 18,920 B + 4% headroom; the player manifests gained the spec 0.3.0 fields. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 20,166 B + 4% headroom. PLAN_010 (2026-10-29, consented plan): 20992 -> 21888 B, measured + 4% after node motion carried on paint nodes (ADR-013); measured 21,032 B. PLAN_010 T-doc-agents (consented plan): 21888 -> 23424 B, measured + 4% after the documentHost seam and document painting; measured 22,488 B. PLAN_010 0.8.0 integration (consented plan): 23424 -> 26624 B, measured + 4% after the canvasHost and formHost seams (canvas and schema-form roots handed to the host), the form, canvas and source checks injected into validation, and data-source bindings carried on paint nodes (spec 0.8.0); measured 25,553 B."
     },
     "@texuli/catalog/validate": {
-      "gzip": 23552,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom. PLAN_008 T-catalog-player (2026-10-28): validateDeckDraft and the deck v2 tree mapping joined this entry; measured 19,857 B gzip, cap = measured + 4% (was 18,240 B). PLAN_010 (2026-10-29, consented plan): 20652 -> 22016 B, measured + 4% after validateStreamNode (ADR-014) and the node motion check (ADR-013); measured 21,115 B. PLAN_010 T-doc-agents (consented plan): 22016 -> 23552 B, measured + 4% after the document check (host validator, borrowed catalog ids) and node keys (spec 0.7.0); measured 22,644 B."
+      "gzip": 27072,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom. PLAN_008 T-catalog-player (2026-10-28): validateDeckDraft and the deck v2 tree mapping joined this entry; measured 19,857 B gzip, cap = measured + 4% (was 18,240 B). PLAN_010 (2026-10-29, consented plan): 20652 -> 22016 B, measured + 4% after validateStreamNode (ADR-014) and the node motion check (ADR-013); measured 21,115 B. PLAN_010 T-doc-agents (consented plan): 22016 -> 23552 B, measured + 4% after the document check (host validator, borrowed catalog ids) and node keys (spec 0.7.0); measured 22,644 B. PLAN_010 0.8.0 integration (consented plan): 23552 -> 27072 B, measured + 4% after the spec 0.8.0 checks: the injected form check (checkForm and host validator names), the injected canvas check and the data-source binding check against the host's descriptors (@texuli/spec/source); measured 26,007 B."
     },
     "@texuli/pages": {
       "gzip": 98048,
@@ -748,9 +805,9 @@
       "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the stylesheet only; measured 0 B, CSS 2,296 B."
     },
     "@texuli/player": {
-      "gzip": 85184,
+      "gzip": 94528,
       "cssGzip": 2688,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 76,730 B gzip, 15,251 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): 79808 -> 85184 B, measured + 4% after the streaming mode (ADR-014, about 1.3 KB on the main entry, the reader loop lazy) and the motion frame (ADR-013, about 1.85 KB; its runtime and core motion load only when a node declares motion); measured 81,854 B. PLAN_010 T-release-060 (2026-10-29): CSS 15872 -> 2688 B, tightened to measured + 4% (measured 2,545 B)."
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 76,730 B gzip, 15,251 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): 79808 -> 85184 B, measured + 4% after the streaming mode (ADR-014, about 1.3 KB on the main entry, the reader loop lazy) and the motion frame (ADR-013, about 1.85 KB; its runtime and core motion load only when a node declares motion); measured 81,854 B. PLAN_010 T-release-060 (2026-10-29): CSS 15872 -> 2688 B, tightened to measured + 4% (measured 2,545 B). PLAN_010 0.8.0 integration (consented plan): 85184 -> 94528 B, measured + 4% after data-source bindings (the source access, loader and optimistic-edit wiring on the main entry; painters stay lazy), the canvasHost and formHost seams and the spec 0.8.0 checks of the catalog validator it bundles; the form and canvas engines are not in it (they come from the hosts). Measured 90,833 B (CSS 2,545 B)."
     },
     "@texuli/player/styles.css": {
       "gzip": 64,
@@ -830,20 +887,20 @@
       "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 9,766 B gzip, cap = measured + 4% headroom. Lazy: only a collaborative session imports it (ADR-010)."
     },
     "@texuli/slides": {
-      "gzip": 53632,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 48,476 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_010 T-release-070 (2026-10-29, developer GO for the 0.7.0 release): 50416 -> 53632 B, measured + 4% (measured 51,535 B; over at HEAD) after the document check and node keys (spec 0.7.0) in @texuli/catalog/validate, which the stage bundles."
+      "gzip": 56704,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 48,476 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_010 T-release-070 (2026-10-29, developer GO for the 0.7.0 release): 50416 -> 53632 B, measured + 4% (measured 51,535 B; over at HEAD) after the document check and node keys (spec 0.7.0) in @texuli/catalog/validate, which the stage bundles. PLAN_010 0.8.0 integration (consented plan): 53632 -> 56704 B, measured + 4% after the spec 0.8.0 form, canvas and source checks in @texuli/catalog/validate, which the stage bundles; measured 54,483 B."
     },
     "@texuli/slides/model": {
       "gzip": 22336,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 21,437 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/grammar": {
-      "gzip": 44352,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 39872 -> 42112 B, measured + 4% after the four new catalog manifests and the G21 block fields in the deck grammar; measured 40,474 B. PLAN_010 T-release-070 (2026-10-29, developer GO for the 0.7.0 release): 42112 -> 44352 B, measured + 4% (measured 42,629 B; over at HEAD) after the document check and node keys (spec 0.7.0) in @texuli/catalog/validate, which the grammar bundles."
+      "gzip": 47424,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 39872 -> 42112 B, measured + 4% after the four new catalog manifests and the G21 block fields in the deck grammar; measured 40,474 B. PLAN_010 T-release-070 (2026-10-29, developer GO for the 0.7.0 release): 42112 -> 44352 B, measured + 4% (measured 42,629 B; over at HEAD) after the document check and node keys (spec 0.7.0) in @texuli/catalog/validate, which the grammar bundles. PLAN_010 0.8.0 integration (consented plan): 44352 -> 47424 B, measured + 4% after the spec 0.8.0 form, canvas and source checks in @texuli/catalog/validate and the canvas and schema-forms manifests in the catalog, which the grammar bundles; measured 45,592 B."
     },
     "@texuli/slides/components": {
-      "gzip": 58432,
-      "note": "Owner decision 2026-10-28 (PLAN_008, owner consent in analysis_results/owner-consent.md): new public subpath for hosts such as Protoyard (the component registry: the renderer table, the slide-component outline (53 ids, exclusions with reasons), the state host and capabilities; painters and player families load lazily); measured 53,473 B gzip, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): 55613 -> 58432 B, measured + 4% after ref, rest props and composed handlers on the texuli components it registers (T-std-contract); measured 56,146 B."
+      "gzip": 63616,
+      "note": "Owner decision 2026-10-28 (PLAN_008, owner consent in analysis_results/owner-consent.md): new public subpath for hosts such as Protoyard (the component registry: the renderer table, the slide-component outline (53 ids, exclusions with reasons), the state host and capabilities; painters and player families load lazily); measured 53,473 B gzip, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): 55613 -> 58432 B, measured + 4% after ref, rest props and composed handlers on the texuli components it registers (T-std-contract); measured 56,146 B. PLAN_010 0.8.0 integration (consented plan): 58432 -> 63616 B, measured + 4% after the player's spec 0.8.0 seams (data sources, canvasHost, formHost) and the canvas and schema-form exclusions in the outline; measured 61,154 B."
     },
     "@texuli/slides/layouts": {
       "gzip": 40575,
@@ -881,8 +938,8 @@
       "note": "PLAN_010 (2026-10-29, consented plan): new row at measured + 4% for the incremental blueprint tokenizer and assembler (ADR-014); measured 4,011 B."
     },
     "@texuli/spec": {
-      "gzip": 11968,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 5,357 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec 0.3.0 adds the interaction contract (state, closed actions, bindings, events) to the root; workflow validation and migrations moved to on-demand subpaths; measured 10,101 B + 4% headroom. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 11,472 B + 4% headroom."
+      "gzip": 14848,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 5,357 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec 0.3.0 adds the interaction contract (state, closed actions, bindings, events) to the root; workflow validation and migrations moved to on-demand subpaths; measured 10,101 B + 4% headroom. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 11,472 B + 4% headroom. PLAN_010 0.8.0 integration (consented plan): 11968 -> 14848 B, measured + 4% after spec 0.8.0 on the root: data-source binding validation against host descriptors, the form schema and expression shapes ($defs.formSchema, $defs.expression) and the canvas shape; measured 14,254 B."
     },
     "@texuli/spec/surface": {
       "gzip": 1728,
@@ -893,12 +950,16 @@
       "note": "Owner decision 2026-10-27 (PLAN_007 T-spec-standard): workflow graph validator, loaded only by hosts that render workflows; measured 3,460 B + 4% headroom."
     },
     "@texuli/spec/migrate": {
-      "gzip": 576,
-      "note": "Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec version migrations, loaded on demand; measured 503 B + 4% headroom."
+      "gzip": 640,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec version migrations, loaded on demand; measured 503 B + 4% headroom. PLAN_010 0.8.0 integration (consented plan): 576 -> 640 B, measured + 4% after the 0.7.0 -> 0.8.0 migration (stamps spec only); measured 581 B."
     },
     "@texuli/spec/codegen": {
-      "gzip": 19904,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 10,644 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007 T-spec-standard): build-time only; 0.3.0 validators for the conformance harness; measured 17,904 B + 4% headroom. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 19,098 B + 4% headroom."
+      "gzip": 22720,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 10,644 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007 T-spec-standard): build-time only; 0.3.0 validators for the conformance harness; measured 17,904 B + 4% headroom. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 19,098 B + 4% headroom. PLAN_010 0.8.0 integration (consented plan): 19904 -> 22720 B, measured + 4% after the spec 0.8.0 $defs (sources, forms and expression, canvas) the generators and conformance validators carry; build-time only; measured 21,835 B."
+    },
+    "@texuli/spec/source": {
+      "gzip": 3136,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the data-source binding shapes and their check against host descriptors (spec 0.8.0, ADR-015). Measured 2,964 B."
     },
     "@texuli/charts/cartesian": {
       "gzip": 12736,

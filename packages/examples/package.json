@@ -17,11 +17,13 @@
   },
   "dependencies": {
     "@texuli/blocks": "workspace:*",
+    "@texuli/canvas": "workspace:*",
     "@texuli/charts": "workspace:*",
     "@texuli/chat": "workspace:*",
     "@texuli/core": "workspace:*",
     "@texuli/data": "workspace:*",
     "@texuli/editor": "workspace:*",
+    "@texuli/forms": "workspace:*",
     "@texuli/media": "workspace:*",
     "@texuli/player": "workspace:*",
     "@texuli/primitives": "workspace:*",

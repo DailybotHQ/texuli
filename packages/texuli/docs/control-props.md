@@ -19,6 +19,15 @@ A component's own `aria-describedby` (its description) is joined with yours,
 not replaced. The helper is `splitControlProps` / `joinIds` in
 `packages/texuli/src/internal/control-props.ts`.
 
+`aria-required` (which a `Field` hands every control when `required`) lands
+only on roles that support it. Where the control is a `group` (`DatePicker`,
+`DateRangePicker`, `TimeField`) or a `slider` thumb, it becomes native
+`required` on each segment input or on the slider's form input instead
+(`splitRequiredControlProps`); `Checkbox` and `Select.Trigger` keep it as
+`required` / `aria-required` on their `checkbox` and `combobox` roles;
+`ColorPicker` drops it (a color picker always holds a value). The contract
+test asserts every `aria-required` sits on a supporting role.
+
 ## Per component
 
 | Component | Control | Notes |

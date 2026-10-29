@@ -29,6 +29,7 @@ import {
   SPEC_MIGRATIONS,
   UNDECLARED_SPEC_VERSION,
 } from '../src/migrations/index.ts';
+import type { SpecSourceDescriptor } from '../src/source.ts';
 import { validateBlueprint } from '../src/validate.ts';
 import { SPEC_VERSION } from '../src/version.ts';
 import {
@@ -84,13 +85,17 @@ describe('canonical JSON and sha256', () => {
 describe('the closed dialect', () => {
   it('accepts every committed schema and refuses keywords, open objects, refs and dialects', () => {
     const schemas = Object.keys(normative).filter((p) => p.startsWith('schemas/'));
-    expect(schemas).toHaveLength(6);
-    // The pinned document schema is @texuli/document's export: pinned, not in the dialect.
-    expect(EXTERNAL_SCHEMAS).toEqual(['schemas/document.schema.json']);
+    expect(schemas).toHaveLength(7);
+    // The pinned document and canvas schemas are their engines' exports: pinned, not in the dialect.
+    expect(EXTERNAL_SCHEMAS).toEqual([
+      'schemas/canvas.schema.json',
+      'schemas/document.schema.json',
+    ]);
     const dialect = schemas.filter((path) => !EXTERNAL_SCHEMAS.includes(path));
     expect(dialect).toHaveLength(5);
     for (const path of dialect) expect(checkSchemaDocument(json(path)), path).toEqual([]);
     expect(checkSchemaDocument(json('schemas/document.schema.json')).length).toBeGreaterThan(0);
+    expect(checkSchemaDocument(json('schemas/canvas.schema.json')).length).toBeGreaterThan(0);
     const base = { $schema: DIALECT_URI };
     expect(codes(checkSchemaDocument({ ...base, type: 'string', format: 'email' }))).toEqual([
       'unsupported-keyword',
@@ -341,18 +346,23 @@ describe('conformance harness', () => {
       catalog: json<SpecCatalog>('catalog/components.json'),
       workflowSchema: json<Schema>('schemas/workflow.schema.json'),
       validateWorkflowGraph,
+      // The fixture host's data sources (spec 0.8.0).
+      sources: json<{ sources: SpecSourceDescriptor[] }>('fixtures/sources.json').sources,
     };
     const golden = Object.keys(normative).filter((p) => p.startsWith('fixtures/golden/'));
     expect(golden.sort()).toEqual([
       'fixtures/golden/app-dashboard.json',
+      'fixtures/golden/canvas-retro.json',
       'fixtures/golden/conditional-report.json',
       'fixtures/golden/dashboard.json',
       'fixtures/golden/document-brief.json',
+      'fixtures/golden/form-registration.json',
       'fixtures/golden/lego.json',
       'fixtures/golden/mobile-flow.json',
       'fixtures/golden/proactive-deck.json',
       'fixtures/golden/report-on-demand.json',
       'fixtures/golden/sortable-board.json',
+      'fixtures/golden/source-tickets.json',
       'fixtures/golden/workflow-builder.json',
     ]);
     for (const path of golden) expect(validateBlueprint(json(path), documents).ok, path).toBe(true);
@@ -394,6 +404,14 @@ describe('conformance harness', () => {
       ['document-format', ['prop-type']],
       ['document-extra-field', ['prop-type']],
       ['document-patch-op', ['schema']],
+      // Spec 0.8.0: data-source bindings (ADR-012, ADR-015).
+      ['source-unknown', ['unknown-source']],
+      ['source-url', ['source']],
+      ['source-extra-member', ['source']],
+      ['source-query-field', ['source']],
+      ['source-operator', ['source']],
+      ['source-page-size', ['source']],
+      ['source-not-sourceable', ['source']],
     ] as const) {
       const fixture = json<{ expect: string[]; blueprint: unknown }>(
         `fixtures/invalid/${name}.json`
@@ -505,7 +523,14 @@ describe('migrations', () => {
       expect(result, path).toMatchObject({
         from: '0.2.0',
         to: SPEC_VERSION,
-        applied: ['0.2.0->0.3.0', '0.3.0->0.4.0', '0.4.0->0.5.0', '0.5.0->0.6.0', '0.6.0->0.7.0'],
+        applied: [
+          '0.2.0->0.3.0',
+          '0.3.0->0.4.0',
+          '0.4.0->0.5.0',
+          '0.5.0->0.6.0',
+          '0.6.0->0.7.0',
+          '0.7.0->0.8.0',
+        ],
       });
       expect(result.blueprint, path).toEqual({ ...input, spec: SPEC_VERSION });
       expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);

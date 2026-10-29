@@ -931,6 +931,98 @@
     },
     {
       "a11y": [
+        "Painted as an image named by the canvas title, with every shape and connector listed as text in reading order",
+        "Text is data, never HTML; image refs pass the URL policy at the host tier",
+        "Styles are a closed palette of theme tokens, never raw CSS"
+      ],
+      "agentEmittable": true,
+      "dontUseWhen": [
+        "A workflow with typed ports that runs: use workflow-graph",
+        "A chart of data: use a chart family",
+        "Prose: use document"
+      ],
+      "emit": ["developer", "untrusted"],
+      "examples": [
+        {
+          "id": "decision",
+          "props": {
+            "canvas": {
+              "connectors": [
+                {
+                  "from": { "shape": "ask" },
+                  "id": "yes",
+                  "routing": "curved",
+                  "text": "yes",
+                  "to": { "shape": "ship" }
+                }
+              ],
+              "format": "texuli-canvas",
+              "formatVersion": 1,
+              "meta": { "title": "Release decision" },
+              "shapes": [
+                {
+                  "height": 72,
+                  "id": "ask",
+                  "text": "Ready to ship?",
+                  "type": "ellipse",
+                  "width": 160,
+                  "x": 0,
+                  "y": 0
+                },
+                {
+                  "height": 72,
+                  "id": "ship",
+                  "text": "Ship on example.com",
+                  "type": "rect",
+                  "width": 160,
+                  "x": 240,
+                  "y": 0
+                },
+                {
+                  "color": "yellow",
+                  "height": 120,
+                  "id": "idea",
+                  "text": "Ask the beta testers",
+                  "type": "sticky",
+                  "width": 160,
+                  "x": 0,
+                  "y": 120
+                }
+              ]
+            }
+          },
+          "title": "Decision flow"
+        }
+      ],
+      "group": "canvas",
+      "id": "canvas",
+      "label": "Canvas",
+      "package": "@texuli/canvas",
+      "props": [
+        {
+          "description": "A Texuli canvas: { format: \"texuli-canvas\", formatVersion: 1, meta: { title }, shapes, connectors }. Shapes: rect, ellipse, diamond, line, arrow, path (points), text, sticky, image ({ ref, alt }), frame ({ title, children }) and group ({ children }), each with an id and x, y, width, height. Connectors: { id, from: { shape }, to: { shape }, routing: straight | elbow | curved, text }.",
+          "kind": "object",
+          "name": "canvas",
+          "required": true,
+          "schema": { "$ref": "#/$defs/canvas" }
+        },
+        {
+          "description": "Accessible name; defaults to the canvas title.",
+          "kind": "string",
+          "name": "label",
+          "trust": "untrusted"
+        }
+      ],
+      "related": ["document", "workflow-graph"],
+      "summary": "A whiteboard or diagram as data: shapes, sticky notes, text, frames, groups and connectors on an infinite canvas.",
+      "tier": "content",
+      "useWhen": [
+        "Sketch a flow, a map of ideas, a retro board or an architecture diagram people can keep editing",
+        "Lay out sticky notes in frames and connect shapes with arrows"
+      ]
+    },
+    {
+      "a11y": [
         "When href is set, the card is a real link with an accessible name",
         "Rejected href schemes render as a non-interactive surface"
       ],
@@ -2526,6 +2618,7 @@
         { "enumValues": ["comfortable", "compact"], "kind": "enum", "name": "density" }
       ],
       "related": ["sortable-list", "data-tree-view"],
+      "sourceable": ["items"],
       "summary": "A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits.",
       "tier": "content",
       "useWhen": ["Show work items by status and let people move them between columns"]
@@ -2624,6 +2717,7 @@
         { "default": false, "kind": "boolean", "name": "readOnly" }
       ],
       "related": ["data-timeline"],
+      "sourceable": ["events"],
       "summary": "Events on a month, week, day or agenda view; people open, and when allowed move, events.",
       "tier": "content",
       "useWhen": ["Show scheduled events or availability over days and weeks"]
@@ -2800,6 +2894,7 @@
         { "enumValues": ["comfortable", "compact"], "kind": "enum", "name": "density" }
       ],
       "related": ["data-tree-view"],
+      "sourceable": ["entries"],
       "summary": "Folders and files in a grid or list with breadcrumbs, selection and type previews.",
       "tier": "content",
       "useWhen": ["Show a folder structure people browse and select from"]
@@ -2987,6 +3082,7 @@
         { "enumValues": ["compact", "default", "comfortable"], "kind": "enum", "name": "density" }
       ],
       "related": ["table", "blocks-data"],
+      "sourceable": ["rows"],
       "summary": "A sortable, searchable grid of rows and typed columns; virtualized for long lists.",
       "tier": "content",
       "useWhen": ["Show many records people sort, search and select"]
@@ -3154,6 +3250,7 @@
         }
       ],
       "related": ["timeline", "chat-thread"],
+      "sourceable": ["items"],
       "summary": "Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view.",
       "tier": "content",
       "useWhen": ["List updates someone should catch up on, such as mentions or review requests"]
@@ -3259,6 +3356,7 @@
         { "default": "en", "kind": "string", "name": "locale" }
       ],
       "related": ["data-calendar", "timeline"],
+      "sourceable": ["tasks"],
       "summary": "Tasks as bars over days, weeks, months or quarters, with dependencies and progress.",
       "tier": "content",
       "useWhen": ["Show a schedule of tasks with durations and dependencies"]
@@ -3326,6 +3424,7 @@
         { "enumValues": ["comfortable", "compact"], "kind": "enum", "name": "density" }
       ],
       "related": ["data-files", "data-board"],
+      "sourceable": ["items"],
       "summary": "A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard.",
       "tier": "content",
       "useWhen": ["Show nested items such as folders, outlines or org charts"]
@@ -5872,6 +5971,92 @@
       "useWhen": ["One flow that should adapt across breakpoints"]
     },
     {
+      "a11y": [
+        "A form landmark named by its title; every control is a texuli control with a visible label, its description and its error linked",
+        "Errors are announced, an error summary takes focus and links to each field; each new step heading takes focus and is announced",
+        "Keyboard-complete: native order, Enter moves to the next step or submits; reduced motion makes step transitions instant"
+      ],
+      "agentEmittable": true,
+      "dontUseWhen": [
+        "One or two values for an action: use action-form with form-field",
+        "Payment, passwords or one-time codes: use a host-region",
+        "A filter bar over data: use control-filter or data-filter-builder"
+      ],
+      "emit": ["developer", "untrusted"],
+      "events": ["submit"],
+      "examples": [
+        {
+          "id": "request",
+          "props": {
+            "action": "request-access",
+            "schema": {
+              "fields": [
+                { "label": "Work email", "name": "email", "required": true, "type": "email" },
+                {
+                  "label": "Team",
+                  "name": "team",
+                  "options": [
+                    { "label": "Design", "value": "design" },
+                    { "label": "Engineering", "value": "engineering" }
+                  ],
+                  "required": true,
+                  "type": "select"
+                },
+                {
+                  "label": "Why do you need access?",
+                  "maxLength": 500,
+                  "name": "reason",
+                  "type": "textarea",
+                  "when": {
+                    "require": {
+                      "left": { "name": "team", "op": "field" },
+                      "op": "eq",
+                      "right": { "op": "str", "value": "engineering" }
+                    }
+                  }
+                }
+              ],
+              "submitLabel": "Send request",
+              "title": "Request access"
+            }
+          },
+          "title": "Access request"
+        }
+      ],
+      "group": "schema-forms",
+      "id": "schema-form",
+      "label": "Schema form",
+      "package": "@texuli/forms",
+      "props": [
+        {
+          "description": "The form: { title, description?, submitLabel?, fields | sections | steps, rules? }. Field types: text, textarea, number, email, url, date, time, select, multiselect, checkbox, radio, switch, slider, file (host-handled), tags. Rules: required, minLength, maxLength, min, max, step, minItems, maxItems, a named format (email, url, phone, postal-code…, never a pattern) and validator (a name the host registered). when.show / require / enable are expressions over earlier fields; rules[] are cross-field expressions that fail when false.",
+          "kind": "object",
+          "name": "schema",
+          "required": true,
+          "schema": { "$ref": "#/$defs/formSchema" }
+        },
+        {
+          "description": "The action name the host receives with the submitted values.",
+          "kind": "string",
+          "name": "action",
+          "required": true
+        },
+        {
+          "description": "Accessible name; defaults to the form title.",
+          "kind": "string",
+          "name": "label",
+          "trust": "untrusted"
+        }
+      ],
+      "related": ["action-form", "form-field", "layout-wizard"],
+      "summary": "A whole form as data: typed fields in sections or steps, conditional logic, named formats and cross-field rules, painted with texuli controls; submitting proposes one action intent to the host.",
+      "tier": "content",
+      "useWhen": [
+        "Collect structured answers: registrations, requests, surveys, intake and settings",
+        "A multi-step flow with per-step validation, or fields that appear, become required or become editable from earlier answers"
+      ]
+    },
+    {
       "a11y": "Outlet is a plain region; screen content supplies its own landmarks.",
       "agentEmittable": false,
       "dontUseWhen": ["Static pages without layout switching"],
@@ -6957,6 +7142,7 @@
   ],
   "format": "texuli-catalog",
   "groups": {
+    "canvas": ["canvas"],
     "chat": ["chat-message", "chat-thread"],
     "composition": ["layout-row", "layout-split", "layout-stack", "layout-tile"],
     "content": [
@@ -7116,6 +7302,7 @@
       "toaster",
       "tooltip"
     ],
+    "schema-forms": ["schema-form"],
     "state": [
       "action-form",
       "control-choice",
@@ -7143,6 +7330,7 @@
       "blocks-media",
       "blocks-structure",
       "blocks-text",
+      "canvas",
       "charts-area",
       "charts-bar",
       "charts-bubble",
@@ -7201,6 +7389,7 @@
       "media-composition-canvas",
       "media-composition-svg",
       "media-image",
+      "schema-form",
       "sortable-list",
       "workflow-graph"
     ],
@@ -7215,6 +7404,7 @@
       "blocks-media",
       "blocks-structure",
       "blocks-text",
+      "canvas",
       "charts-area",
       "charts-bar",
       "charts-bubble",
@@ -7273,6 +7463,7 @@
       "media-composition-canvas",
       "media-composition-svg",
       "media-image",
+      "schema-form",
       "sortable-list",
       "workflow-graph"
     ]

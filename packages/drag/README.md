@@ -69,7 +69,7 @@ auto-scroll included).
 | `@texuli/drag/auto-scroll` | Edge zones and a speed curve, on a frame loop you supply | 671 B |
 | `@texuli/drag/gesture` | A pointer tracker: capture with a document fallback, a 4 px threshold, `pointercancel` as cancel, optional long-press | 1.22 KiB |
 | `@texuli/drag/spatial` | Canvas pan and zoom transforms, free placement, snapping and alignment guides, marquee, resize with bounds and aspect ratio | 1.64 KiB |
-| `@texuli/drag/graph` | Port hit-testing, edge hit areas and connection rules (direction, self, type, duplicate, capacity, cycle) | 1.42 KiB |
+| `@texuli/drag/graph` | Port hit-testing, edge hit areas, connection rules (direction, self, type, duplicate, capacity, cycle) and the side-aware edge curve (`sideCurveControls`, `sideCurvePath`) shared by `@texuli/workflows` and `@texuli/canvas` | 1.59 KiB |
 | `@texuli/drag/messages` | `DragMessages` templates and `resolveDragMessages()` / `formatDragMessage()` | 963 B |
 | `@texuli/drag/testing` | Test helpers: fake frames and timers, measured lists, pointer events | 1.01 KiB |
 

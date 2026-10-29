@@ -5,6 +5,7 @@ import com.texuli.compose.NativeRegistry
 import com.texuli.spec.JsonValue
 import com.texuli.spec.runtime.LoadResult
 import com.texuli.spec.runtime.PlanNode
+import com.texuli.spec.runtime.decodeSourceDescriptors
 import com.texuli.spec.runtime.loadBlueprint
 import com.texuli.spec.runtime.parseJson
 import com.texuli.spec.runtime.traceOf
@@ -24,14 +25,17 @@ class GoldenConformanceTest {
     private val goldens = File(repo, "packages/spec/fixtures/golden").listFiles { f -> f.extension == "json" }!!.sortedBy { it.name }
     private val expected = File(repo, "native/conformance/expected")
 
-    private fun load(file: File): LoadResult.Ready = when (val result = loadBlueprint(file.readText())) {
+    // The fixture host's data sources (spec 0.8.0), as the web half validates the goldens.
+    private val sources = decodeSourceDescriptors(parseJson(File(repo, "packages/spec/fixtures/sources.json").readText()))
+
+    private fun load(file: File): LoadResult.Ready = when (val result = loadBlueprint(file.readText(), sources = sources)) {
         is LoadResult.Ready -> result
         is LoadResult.Refused -> fail("${file.name}: refused on the native target: ${result.diagnostics}")
     }
 
     @Test
     fun everyGoldenHasAnExpectedWebTrace() {
-        assertEquals(10, goldens.size)
+        assertEquals(13, goldens.size)
         for (golden in goldens) {
             assertTrue(File(expected, "${golden.nameWithoutExtension}.trace.json").isFile, golden.name)
         }

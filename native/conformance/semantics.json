@@ -10,6 +10,8 @@
     { "id": "layout-grid", "role": "group" },
     { "id": "media-image", "role": "img", "name": ["alt"] },
     { "id": "document", "role": "article", "name": ["label"] },
+    { "id": "schema-form", "role": "form", "name": ["label"] },
+    { "id": "canvas", "role": "figure", "name": ["label"] },
     { "prefix": "charts-", "role": "figure", "name": ["title", "label"] }
   ],
   "blocks": {

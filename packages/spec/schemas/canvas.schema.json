@@ -1,0 +1,1393 @@
+{
+  "$defs": {
+    "shape": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "height": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "paint": {
+              "additionalProperties": false,
+              "properties": {
+                "dash": {
+                  "enum": ["solid", "dashed", "dotted"],
+                  "type": "string"
+                },
+                "fill": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "opacity": {
+                  "maximum": 1,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                "stroke": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "maximum": 16,
+                  "minimum": 0.5,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "radius": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "rotation": {
+              "maximum": 360,
+              "minimum": -360,
+              "type": "number"
+            },
+            "text": {
+              "maxLength": 5000,
+              "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u202A-\\u202E\\u2066-\\u2069]*$",
+              "type": "string"
+            },
+            "type": {
+              "const": "rect"
+            },
+            "width": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "x": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            },
+            "y": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            }
+          },
+          "required": ["id", "x", "y", "width", "height", "type"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "height": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "paint": {
+              "additionalProperties": false,
+              "properties": {
+                "dash": {
+                  "enum": ["solid", "dashed", "dotted"],
+                  "type": "string"
+                },
+                "fill": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "opacity": {
+                  "maximum": 1,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                "stroke": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "maximum": 16,
+                  "minimum": 0.5,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "rotation": {
+              "maximum": 360,
+              "minimum": -360,
+              "type": "number"
+            },
+            "text": {
+              "maxLength": 5000,
+              "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u202A-\\u202E\\u2066-\\u2069]*$",
+              "type": "string"
+            },
+            "type": {
+              "const": "ellipse"
+            },
+            "width": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "x": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            },
+            "y": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            }
+          },
+          "required": ["id", "x", "y", "width", "height", "type"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "height": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "paint": {
+              "additionalProperties": false,
+              "properties": {
+                "dash": {
+                  "enum": ["solid", "dashed", "dotted"],
+                  "type": "string"
+                },
+                "fill": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "opacity": {
+                  "maximum": 1,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                "stroke": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "maximum": 16,
+                  "minimum": 0.5,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "rotation": {
+              "maximum": 360,
+              "minimum": -360,
+              "type": "number"
+            },
+            "text": {
+              "maxLength": 5000,
+              "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u202A-\\u202E\\u2066-\\u2069]*$",
+              "type": "string"
+            },
+            "type": {
+              "const": "diamond"
+            },
+            "width": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "x": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            },
+            "y": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            }
+          },
+          "required": ["id", "x", "y", "width", "height", "type"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "height": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "paint": {
+              "additionalProperties": false,
+              "properties": {
+                "dash": {
+                  "enum": ["solid", "dashed", "dotted"],
+                  "type": "string"
+                },
+                "fill": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "opacity": {
+                  "maximum": 1,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                "stroke": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "maximum": 16,
+                  "minimum": 0.5,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "points": {
+              "description": "Points relative to the shape x and y.",
+              "items": {
+                "description": "[x, y]",
+                "items": {
+                  "maximum": 1000000,
+                  "minimum": -1000000,
+                  "type": "number"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              "maxItems": 1000,
+              "minItems": 2,
+              "type": "array"
+            },
+            "rotation": {
+              "maximum": 360,
+              "minimum": -360,
+              "type": "number"
+            },
+            "type": {
+              "const": "line"
+            },
+            "width": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "x": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            },
+            "y": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            }
+          },
+          "required": ["id", "x", "y", "width", "height", "type", "points"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "height": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "paint": {
+              "additionalProperties": false,
+              "properties": {
+                "dash": {
+                  "enum": ["solid", "dashed", "dotted"],
+                  "type": "string"
+                },
+                "fill": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "opacity": {
+                  "maximum": 1,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                "stroke": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "maximum": 16,
+                  "minimum": 0.5,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "points": {
+              "description": "Points relative to the shape x and y.",
+              "items": {
+                "description": "[x, y]",
+                "items": {
+                  "maximum": 1000000,
+                  "minimum": -1000000,
+                  "type": "number"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              "maxItems": 1000,
+              "minItems": 2,
+              "type": "array"
+            },
+            "rotation": {
+              "maximum": 360,
+              "minimum": -360,
+              "type": "number"
+            },
+            "type": {
+              "const": "arrow"
+            },
+            "width": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "x": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            },
+            "y": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            }
+          },
+          "required": ["id", "x", "y", "width", "height", "type", "points"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "closed": {
+              "type": "boolean"
+            },
+            "height": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "paint": {
+              "additionalProperties": false,
+              "properties": {
+                "dash": {
+                  "enum": ["solid", "dashed", "dotted"],
+                  "type": "string"
+                },
+                "fill": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "opacity": {
+                  "maximum": 1,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                "stroke": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "maximum": 16,
+                  "minimum": 0.5,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "points": {
+              "description": "Points relative to the shape x and y.",
+              "items": {
+                "description": "[x, y]",
+                "items": {
+                  "maximum": 1000000,
+                  "minimum": -1000000,
+                  "type": "number"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              "maxItems": 1000,
+              "minItems": 1,
+              "type": "array"
+            },
+            "rotation": {
+              "maximum": 360,
+              "minimum": -360,
+              "type": "number"
+            },
+            "type": {
+              "const": "path"
+            },
+            "width": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "x": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            },
+            "y": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            }
+          },
+          "required": ["id", "x", "y", "width", "height", "type", "points"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "align": {
+              "enum": ["start", "center", "end"],
+              "type": "string"
+            },
+            "fontSize": {
+              "enum": ["s", "m", "l", "xl"],
+              "type": "string"
+            },
+            "height": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "paint": {
+              "additionalProperties": false,
+              "properties": {
+                "dash": {
+                  "enum": ["solid", "dashed", "dotted"],
+                  "type": "string"
+                },
+                "fill": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "opacity": {
+                  "maximum": 1,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                "stroke": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "maximum": 16,
+                  "minimum": 0.5,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "rotation": {
+              "maximum": 360,
+              "minimum": -360,
+              "type": "number"
+            },
+            "text": {
+              "maxLength": 5000,
+              "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u202A-\\u202E\\u2066-\\u2069]*$",
+              "type": "string"
+            },
+            "type": {
+              "const": "text"
+            },
+            "width": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "x": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            },
+            "y": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            }
+          },
+          "required": ["id", "x", "y", "width", "height", "type", "text"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "color": {
+              "enum": [
+                "default",
+                "gray",
+                "red",
+                "orange",
+                "yellow",
+                "green",
+                "teal",
+                "blue",
+                "purple",
+                "pink"
+              ],
+              "type": "string"
+            },
+            "height": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "paint": {
+              "additionalProperties": false,
+              "properties": {
+                "dash": {
+                  "enum": ["solid", "dashed", "dotted"],
+                  "type": "string"
+                },
+                "fill": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "opacity": {
+                  "maximum": 1,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                "stroke": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "maximum": 16,
+                  "minimum": 0.5,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "rotation": {
+              "maximum": 360,
+              "minimum": -360,
+              "type": "number"
+            },
+            "text": {
+              "maxLength": 5000,
+              "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u202A-\\u202E\\u2066-\\u2069]*$",
+              "type": "string"
+            },
+            "type": {
+              "const": "sticky"
+            },
+            "width": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "x": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            },
+            "y": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            }
+          },
+          "required": ["id", "x", "y", "width", "height", "type", "text"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "alt": {
+              "maxLength": 500,
+              "minLength": 1,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$",
+              "type": "string"
+            },
+            "height": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "paint": {
+              "additionalProperties": false,
+              "properties": {
+                "dash": {
+                  "enum": ["solid", "dashed", "dotted"],
+                  "type": "string"
+                },
+                "fill": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "opacity": {
+                  "maximum": 1,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                "stroke": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "maximum": 16,
+                  "minimum": 0.5,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "ref": {
+              "description": "A host reference. When it is a URL, it passes safeImageSrc at the untrusted tier. (rule \"unsafe-url\")",
+              "maxLength": 256,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,255}$",
+              "type": "string"
+            },
+            "rotation": {
+              "maximum": 360,
+              "minimum": -360,
+              "type": "number"
+            },
+            "type": {
+              "const": "image"
+            },
+            "width": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "x": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            },
+            "y": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            }
+          },
+          "required": ["id", "x", "y", "width", "height", "type", "ref", "alt"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "children": {
+              "items": {
+                "$ref": "#/$defs/shape"
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "height": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "paint": {
+              "additionalProperties": false,
+              "properties": {
+                "dash": {
+                  "enum": ["solid", "dashed", "dotted"],
+                  "type": "string"
+                },
+                "fill": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "opacity": {
+                  "maximum": 1,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                "stroke": {
+                  "enum": [
+                    "default",
+                    "gray",
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "purple",
+                    "pink",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "maximum": 16,
+                  "minimum": 0.5,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "rotation": {
+              "maximum": 360,
+              "minimum": -360,
+              "type": "number"
+            },
+            "title": {
+              "maxLength": 200,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$",
+              "type": "string"
+            },
+            "type": {
+              "const": "frame"
+            },
+            "width": {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            },
+            "x": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            },
+            "y": {
+              "maximum": 1000000,
+              "minimum": -1000000,
+              "type": "number"
+            }
+          },
+          "required": ["id", "x", "y", "width", "height", "type", "children"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "children": {
+              "items": {
+                "$ref": "#/$defs/shape"
+              },
+              "maxItems": 5000,
+              "minItems": 1,
+              "type": "array"
+            },
+            "id": {
+              "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+              "maxLength": 64,
+              "minLength": 1,
+              "not": {
+                "enum": ["root", "trash", "tx:connectors"]
+              },
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "type": {
+              "const": "group"
+            }
+          },
+          "required": ["id", "type", "children"],
+          "type": "object"
+        }
+      ]
+    }
+  },
+  "$id": "https://texuli.com/schemas/canvas.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A Texuli infinite canvas, format version 1: shapes, frames, groups and connectors.",
+  "properties": {
+    "connectors": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "endCap": {
+            "enum": ["none", "arrow", "dot"],
+            "type": "string"
+          },
+          "from": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "anchor": {
+                    "enum": ["auto", "center", "top", "right", "bottom", "left"],
+                    "type": "string"
+                  },
+                  "shape": {
+                    "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "not": {
+                      "enum": ["root", "trash", "tx:connectors"]
+                    },
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+                    "type": "string"
+                  }
+                },
+                "required": ["shape"],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "x": {
+                    "maximum": 1000000,
+                    "minimum": -1000000,
+                    "type": "number"
+                  },
+                  "y": {
+                    "maximum": 1000000,
+                    "minimum": -1000000,
+                    "type": "number"
+                  }
+                },
+                "required": ["x", "y"],
+                "type": "object"
+              }
+            ]
+          },
+          "id": {
+            "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+            "maxLength": 64,
+            "minLength": 1,
+            "not": {
+              "enum": ["root", "trash", "tx:connectors"]
+            },
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+            "type": "string"
+          },
+          "paint": {
+            "additionalProperties": false,
+            "properties": {
+              "dash": {
+                "enum": ["solid", "dashed", "dotted"],
+                "type": "string"
+              },
+              "fill": {
+                "enum": [
+                  "default",
+                  "gray",
+                  "red",
+                  "orange",
+                  "yellow",
+                  "green",
+                  "teal",
+                  "blue",
+                  "purple",
+                  "pink",
+                  "none"
+                ],
+                "type": "string"
+              },
+              "opacity": {
+                "maximum": 1,
+                "minimum": 0.1,
+                "type": "number"
+              },
+              "stroke": {
+                "enum": [
+                  "default",
+                  "gray",
+                  "red",
+                  "orange",
+                  "yellow",
+                  "green",
+                  "teal",
+                  "blue",
+                  "purple",
+                  "pink",
+                  "none"
+                ],
+                "type": "string"
+              },
+              "strokeWidth": {
+                "maximum": 16,
+                "minimum": 0.5,
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "routing": {
+            "enum": ["straight", "elbow", "curved"],
+            "type": "string"
+          },
+          "startCap": {
+            "enum": ["none", "arrow", "dot"],
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 5000,
+            "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u202A-\\u202E\\u2066-\\u2069]*$",
+            "type": "string"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "anchor": {
+                    "enum": ["auto", "center", "top", "right", "bottom", "left"],
+                    "type": "string"
+                  },
+                  "shape": {
+                    "description": "A persisted id, unique among shapes and connectors (root, trash and tx:connectors are reserved).",
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "not": {
+                      "enum": ["root", "trash", "tx:connectors"]
+                    },
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+                    "type": "string"
+                  }
+                },
+                "required": ["shape"],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "x": {
+                    "maximum": 1000000,
+                    "minimum": -1000000,
+                    "type": "number"
+                  },
+                  "y": {
+                    "maximum": 1000000,
+                    "minimum": -1000000,
+                    "type": "number"
+                  }
+                },
+                "required": ["x", "y"],
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": ["id", "from", "to"],
+        "type": "object"
+      },
+      "maxItems": 5000,
+      "type": "array"
+    },
+    "format": {
+      "const": "texuli-canvas"
+    },
+    "formatVersion": {
+      "const": 1
+    },
+    "grid": {
+      "maximum": 1000,
+      "minimum": 1,
+      "type": "number"
+    },
+    "meta": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "maxLength": 1000,
+          "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u202A-\\u202E\\u2066-\\u2069]*$",
+          "type": "string"
+        },
+        "locale": {
+          "maxLength": 35,
+          "pattern": "^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8}){0,4}$",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 200,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "shapes": {
+      "items": {
+        "$ref": "#/$defs/shape"
+      },
+      "maxItems": 5000,
+      "type": "array"
+    }
+  },
+  "required": ["format", "formatVersion", "shapes", "connectors"],
+  "title": "Texuli canvas",
+  "type": "object"
+}

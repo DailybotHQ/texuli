@@ -6,6 +6,7 @@
       "a11y-overlays.spec.ts",
       "analytics.spec.ts",
       "bugs-75-79.spec.ts",
+      "canvas.spec.ts",
       "csp-report.spec.ts",
       "pages-editor.spec.ts",
       "responsive-sweep.spec.ts",

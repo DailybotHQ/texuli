@@ -1,0 +1,43 @@
+{
+  "$comment": "Must fail spec validation with exactly these diagnostic codes, in order. Spec 0.8.0 (ADR-015): only a component's sourceable props read a data source; data-grid columns are not one.",
+  "expect": ["source"],
+  "blueprint": {
+    "format": "texuli-blueprint",
+    "version": 1,
+    "id": "source-not-sourceable",
+    "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+    "status": "draft",
+    "createdAt": "2026-10-29T09:00:00Z",
+    "updatedAt": "2026-10-29T09:00:00Z",
+    "generator": {
+      "kind": "agent",
+      "name": "Harbor assistant",
+      "model": "example-model"
+    },
+    "tier": "untrusted",
+    "profile": "web",
+    "trigger": {
+      "kind": "request",
+      "label": "Ticket triage requested in chat"
+    },
+    "spec": "0.8.0",
+    "tree": {
+      "id": "layout-page",
+      "props": {
+        "title": "Tickets"
+      },
+      "children": [
+        {
+          "id": "data-grid",
+          "props": {
+            "caption": "Tickets",
+            "columns": {
+              "$source": "tickets"
+            },
+            "rows": []
+          }
+        }
+      ]
+    }
+  }
+}

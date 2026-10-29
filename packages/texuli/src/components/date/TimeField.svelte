@@ -1,7 +1,7 @@
 <script lang="ts">
 import { TimeField as Primitive, type TimeFieldLabels } from '@texuli/primitives/date-field';
 import type { HTMLAttributes } from 'svelte/elements';
-import { joinIds, splitControlProps } from '../../internal/control-props.ts';
+import { joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { getFieldLabelContext } from '../field/context.ts';
 import { type DateSize, dateFieldClass } from './variants.ts';
@@ -73,7 +73,10 @@ let {
   ...rest
 }: Props = $props();
 
-const split = $derived(splitControlProps(rest));
+const split = $derived(splitRequiredControlProps(rest));
+// `aria-required` (a Field's control props) is not allowed on a group or a
+// slider thumb: it becomes native `required` on the segment or form inputs.
+const isRequired = $derived(required || split.required);
 const field = getFieldLabelContext();
 const showLabel = $derived(!hideLabel && !field);
 
@@ -93,7 +96,7 @@ const describedBy = $derived(
   data-invalid={error ? 'true' : undefined}
   data-disabled={disabled ? 'true' : undefined}
 >
-  {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}{#if required}<span class="tx-date__required"> *</span>{/if}</span>{/if}
+  {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}{#if isRequired}<span class="tx-date__required"> *</span>{/if}</span>{/if}
   <div class="tx-date__control">
     <Primitive.Root
       {...split.control}
@@ -106,7 +109,7 @@ const describedBy = $derived(
       {...hourCycle ? { hourCycle } : {}}
       {minuteStep}
       {disabled}
-      {required}
+      required={isRequired}
       {...name ? { name } : {}}
       {...labels ? { labels } : {}}
       {...onValueChange ? { onValueChange } : {}}

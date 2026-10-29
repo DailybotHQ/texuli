@@ -1,0 +1,231 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "form-registration",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-29T09:00:00Z",
+  "updatedAt": "2026-10-29T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Harbor assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "trigger": {
+    "kind": "request",
+    "label": "A registration form requested in chat"
+  },
+  "spec": "0.8.0",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Community day",
+      "description": "Registration for the fictional example.com community day."
+    },
+    "children": [
+      {
+        "key": "registration",
+        "id": "schema-form",
+        "props": {
+          "action": "register-attendee",
+          "schema": {
+            "title": "Community day registration",
+            "description": "Register for the example.com community day.",
+            "submitLabel": "Register",
+            "steps": [
+              {
+                "id": "about",
+                "title": "About you",
+                "fields": [
+                  {
+                    "name": "name",
+                    "type": "text",
+                    "label": "Full name",
+                    "required": true,
+                    "maxLength": 80,
+                    "autocomplete": "name"
+                  },
+                  {
+                    "name": "email",
+                    "type": "email",
+                    "label": "Email",
+                    "required": true,
+                    "autocomplete": "email"
+                  },
+                  {
+                    "name": "age",
+                    "type": "number",
+                    "label": "Age",
+                    "min": 13,
+                    "max": 120,
+                    "step": 1
+                  },
+                  {
+                    "name": "guardian",
+                    "type": "text",
+                    "label": "Guardian name",
+                    "when": {
+                      "show": {
+                        "op": "lt",
+                        "left": {
+                          "op": "field",
+                          "name": "age"
+                        },
+                        "right": {
+                          "op": "num",
+                          "value": 18
+                        }
+                      },
+                      "require": {
+                        "op": "lt",
+                        "left": {
+                          "op": "field",
+                          "name": "age"
+                        },
+                        "right": {
+                          "op": "num",
+                          "value": 18
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "attendance",
+                "title": "Attendance",
+                "sections": [
+                  {
+                    "id": "dates",
+                    "title": "Dates",
+                    "fields": [
+                      {
+                        "name": "arrival",
+                        "type": "date",
+                        "label": "Arrival",
+                        "required": true,
+                        "min": "2026-11-01",
+                        "max": "2026-11-30"
+                      },
+                      {
+                        "name": "departure",
+                        "type": "date",
+                        "label": "Departure",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "id": "sessions",
+                    "title": "Sessions",
+                    "fields": [
+                      {
+                        "name": "track",
+                        "type": "radio",
+                        "label": "Track",
+                        "required": true,
+                        "options": [
+                          {
+                            "value": "design",
+                            "label": "Design"
+                          },
+                          {
+                            "value": "engineering",
+                            "label": "Engineering"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "workshops",
+                        "type": "multiselect",
+                        "label": "Workshops",
+                        "maxItems": 2,
+                        "options": [
+                          {
+                            "value": "a11y",
+                            "label": "Accessibility"
+                          },
+                          {
+                            "value": "motion",
+                            "label": "Motion"
+                          },
+                          {
+                            "value": "forms",
+                            "label": "Forms"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "postal",
+                        "type": "text",
+                        "label": "Postal code",
+                        "format": "postal-code",
+                        "link": {
+                          "label": "Why we ask",
+                          "href": "https://example.com/privacy"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "extras",
+                "title": "Extras",
+                "fields": [
+                  {
+                    "name": "newsletter",
+                    "type": "switch",
+                    "label": "Send me the newsletter"
+                  },
+                  {
+                    "name": "topics",
+                    "type": "tags",
+                    "label": "Topics",
+                    "maxItems": 5,
+                    "maxLength": 24,
+                    "when": {
+                      "enable": {
+                        "op": "field",
+                        "name": "newsletter"
+                      }
+                    }
+                  },
+                  {
+                    "name": "terms",
+                    "type": "checkbox",
+                    "label": "I accept the code of conduct",
+                    "required": true,
+                    "messages": {
+                      "required": "Please accept the code of conduct to register."
+                    }
+                  }
+                ]
+              }
+            ],
+            "rules": [
+              {
+                "id": "dates",
+                "field": "departure",
+                "message": "Departure must be on or after arrival.",
+                "test": {
+                  "op": "gte",
+                  "left": {
+                    "op": "field",
+                    "name": "departure"
+                  },
+                  "right": {
+                    "op": "field",
+                    "name": "arrival"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

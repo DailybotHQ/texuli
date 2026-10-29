@@ -123,6 +123,8 @@ export interface RenderComponentSpec {
   events?: readonly CatalogEventName[];
   /** Props a node may `bind` (spec 0.3.0). */
   bindable?: readonly string[];
+  /** Array props a node may read from a host data source (spec 0.8.0). */
+  sourceable?: readonly string[];
 }
 
 /** Lookup table the renderer uses (built catalog or a test double). */
