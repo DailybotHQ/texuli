@@ -1,8 +1,8 @@
 # Golden fixture suite
 
-The eight expressiveness screens from the PLAN_002 audit
-(`.dwp/plans/PLAN_002_universal_ecosystem_roadmap/analysis_results/blueprint-fixtures/`,
-a git-ignored plan folder), promoted into the repository as a golden
+The eight expressiveness screens from the PLAN_002 audit (01 to 08,
+`.dwp/plans/PLAN_002_universal_ecosystem_roadmap/analysis_results/blueprint-fixtures/`,
+a git-ignored plan folder), plus one agent document (09, below), promoted into the repository as a golden
 regression gate. The JSON fixtures are verbatim copies of the audit's screens
 — fictional data only — including their audit-day metadata (`result`,
 `gaps`, `notes`, `northStar`, and the `expect` arrays inside `probes`), which
@@ -71,6 +71,16 @@ outcomes were renamed or closed by the time this suite was pinned:
   prop string, which stay refused, so their pinned outcomes do not change.
   The node-level forms are tested in
   [`packages/catalog/tests/render-slots-conditions.test.ts`](../../../packages/catalog/tests/render-slots-conditions.test.ts).
+
+- **Fixture 09 (spec 0.7.0, PLAN_010).** `09-document-brief.json` is not an
+  audit screen: it adds an agent document in the same format, a keyed
+  `document` root whose `doc` holds a link, a list, a wrapped `blocks-data`
+  stat, a `charts-sparkline` component embed and a callout. It renders clean
+  at both tiers with its artifact frame; probe D01 (no `doc`) fails the
+  required prop and D02 (an `html` prop beside the `doc`) is a forbidden
+  prop. The suite runs the renderer, grammar and sink scan only; the
+  document checks run in `validateDraft` with the host's `checkDocument`
+  ([`packages/catalog/tests/validate-document.test.ts`](../../../packages/catalog/tests/validate-document.test.ts)).
 
 When a finding is intended (a deliberate catalog, manifest or fixture
 change), update `golden-expectations.json` in the same change — regenerate it

@@ -3520,6 +3520,97 @@
       "useWhen": ["Confirm multi-step flows", "Show focused detail without leaving the page"]
     },
     {
+      "a11y": [
+        "Painted as an article named by the document title, with anchored headings and an outline",
+        "Text is data, never HTML; links and media pass the URL policy at the host tier",
+        "Embedded components are validated again as catalog nodes at the same tier"
+      ],
+      "agentEmittable": true,
+      "dontUseWhen": [
+        "An interface with controls, state or flows: use layout-page or layout-doc with catalog nodes",
+        "A slide presentation: use layout-deck"
+      ],
+      "emit": ["developer", "untrusted"],
+      "examples": [
+        {
+          "id": "brief",
+          "props": {
+            "doc": {
+              "blocks": [
+                {
+                  "content": [{ "marks": [], "text": "Project brief", "type": "text" }],
+                  "id": "title",
+                  "level": 1,
+                  "type": "heading"
+                },
+                {
+                  "content": [
+                    {
+                      "marks": [],
+                      "text": "A fictional plan for the example.com launch.",
+                      "type": "text"
+                    }
+                  ],
+                  "id": "intro",
+                  "type": "paragraph"
+                },
+                {
+                  "blocks": [
+                    {
+                      "content": [
+                        { "marks": [], "text": "The beta ends on Friday.", "type": "text" }
+                      ],
+                      "id": "risk-text",
+                      "type": "paragraph"
+                    }
+                  ],
+                  "id": "risk",
+                  "tone": "warning",
+                  "type": "callout"
+                }
+              ],
+              "format": "texuli-document",
+              "formatVersion": 1,
+              "meta": { "locale": "en", "title": "Project brief" }
+            }
+          },
+          "title": "Project brief"
+        }
+      ],
+      "group": "documents",
+      "id": "document",
+      "label": "Document",
+      "package": "@texuli/pages",
+      "props": [
+        {
+          "description": "A Texuli document: { format: \"texuli-document\", formatVersion: 1, meta: { title }, blocks }. Blocks: paragraph, heading, code, list, quote, divider, media, callout, toggle, columns, page-link, block ({ family, block, props }: a @texuli/blocks block) and embed ({ kind: \"component\", inline: { id, props } }: one catalog node).",
+          "kind": "object",
+          "name": "doc",
+          "required": true,
+          "schema": { "$ref": "#/$defs/document" }
+        },
+        {
+          "description": "Accessible name; defaults to the document title.",
+          "kind": "string",
+          "name": "label",
+          "trust": "untrusted"
+        },
+        {
+          "default": true,
+          "description": "Show the \"On this page\" outline when the document has two or more headings.",
+          "kind": "boolean",
+          "name": "outline"
+        }
+      ],
+      "related": ["layout-doc", "layout-page", "blocks-text"],
+      "summary": "A block document (a brief, a report, notes or a page) as data: headings, paragraphs, lists, callouts, columns, content blocks and embedded components.",
+      "tier": "content",
+      "useWhen": [
+        "Write a document people read, export (Markdown, DOCX, PDF) or keep editing",
+        "Edit an existing document with a bounded patch (patchDocument) instead of rewriting it"
+      ]
+    },
+    {
       "a11y": "Same focus model as sheet; prefer labelled titles.",
       "agentEmittable": false,
       "dontUseWhen": ["Desktop side navigation (use sidebar)"],
@@ -6936,6 +7027,7 @@
       "tag",
       "timeline"
     ],
+    "documents": ["document"],
     "forms": [
       "button",
       "button-group",
@@ -7091,6 +7183,7 @@
       "data-timeline",
       "data-tree-view",
       "deck-slide",
+      "document",
       "flow-action",
       "flow-view",
       "form-field",
@@ -7162,6 +7255,7 @@
       "data-timeline",
       "data-tree-view",
       "deck-slide",
+      "document",
       "flow-action",
       "flow-view",
       "form-field",

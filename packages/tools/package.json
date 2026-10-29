@@ -56,6 +56,10 @@
     "./deck": {
       "types": "./src/deck/index.ts",
       "default": "./src/deck/index.ts"
+    },
+    "./document": {
+      "types": "./src/document/index.ts",
+      "default": "./src/document/index.ts"
     }
   },
   "bin": {
@@ -76,7 +80,8 @@
     "@texuli/blocks": "0.6.0",
     "@texuli/charts": "0.6.0",
     "@texuli/media": "0.6.0",
-    "@texuli/deck": "0.6.0"
+    "@texuli/deck": "0.6.0",
+    "@texuli/document": "0.0.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

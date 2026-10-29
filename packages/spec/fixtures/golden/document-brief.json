@@ -1,0 +1,183 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "document-launch-brief",
+  "catalog": "6389ff8dfd63e2b2e7cf5986be9f82fd72a3256e9e86fe634d066bbcd640ddd2",
+  "status": "draft",
+  "createdAt": "2026-10-29T09:00:00Z",
+  "updatedAt": "2026-10-29T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Harbor assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "spec": "0.7.0",
+  "tree": {
+    "key": "brief",
+    "id": "document",
+    "props": {
+      "label": "Launch brief",
+      "doc": {
+        "format": "texuli-document",
+        "formatVersion": 1,
+        "meta": {
+          "title": "Launch brief",
+          "locale": "en",
+          "authors": ["Example team"]
+        },
+        "blocks": [
+          {
+            "id": "title",
+            "type": "heading",
+            "level": 1,
+            "content": [
+              {
+                "type": "text",
+                "text": "Launch brief",
+                "marks": []
+              }
+            ]
+          },
+          {
+            "id": "intro",
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "The fictional example.com beta opens to ",
+                "marks": []
+              },
+              {
+                "type": "text",
+                "text": "every team",
+                "marks": [
+                  {
+                    "type": "strong"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " next week. Read the ",
+                "marks": []
+              },
+              {
+                "type": "text",
+                "text": "plan",
+                "marks": [
+                  {
+                    "type": "link",
+                    "href": "https://example.com/plan"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": ".",
+                "marks": []
+              }
+            ]
+          },
+          {
+            "id": "goals",
+            "type": "heading",
+            "level": 2,
+            "content": [
+              {
+                "type": "text",
+                "text": "Goals",
+                "marks": []
+              }
+            ]
+          },
+          {
+            "id": "goal-list",
+            "type": "list",
+            "kind": "bullet",
+            "items": [
+              {
+                "id": "goal-1",
+                "blocks": [
+                  {
+                    "id": "goal-1-text",
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Invite 40 pilot teams",
+                        "marks": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "goal-2",
+                "blocks": [
+                  {
+                    "id": "goal-2-text",
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Answer feedback within a day",
+                        "marks": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "numbers",
+            "type": "block",
+            "family": "data",
+            "block": "stat",
+            "props": {
+              "items": [
+                {
+                  "label": "Pilot teams",
+                  "value": "40"
+                }
+              ]
+            }
+          },
+          {
+            "id": "trend",
+            "type": "embed",
+            "kind": "component",
+            "title": "Sign-ups per week",
+            "inline": {
+              "id": "charts-sparkline",
+              "props": {
+                "label": "Sign-ups per week",
+                "values": [12, 18, 25, 31, 40]
+              }
+            }
+          },
+          {
+            "id": "risk",
+            "type": "callout",
+            "tone": "warning",
+            "blocks": [
+              {
+                "id": "risk-text",
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The beta ends on Friday.",
+                    "marks": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

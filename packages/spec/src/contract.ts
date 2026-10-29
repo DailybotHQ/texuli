@@ -49,6 +49,7 @@ export const SPEC_PROP_REFS = [
   'eventMap',
   'condition',
   'workflowGraph',
+  'document',
 ] as const;
 
 /** The fields each action op takes (besides `op`) and the ones it needs. */
@@ -101,6 +102,10 @@ export const SPEC_LIMITS = Object.freeze({
   workflowStringLength: 2000,
   /** Deepest prop value walked for nested bindings. */
   propDepth: 32,
+  /** Top-level blocks a `document` node's doc may hold (`$defs.document.blocks`). */
+  documentBlocks: 2000,
+  /** Operations one `patchDocument` patch may carry (`$defs.documentPatch`, ADR-011). */
+  documentPatchOps: 1000,
 });
 
 /** The name patterns, as the schemas write them. */
@@ -110,6 +115,8 @@ export const SPEC_PATTERNS = Object.freeze({
   flowName: '^[a-z][a-z0-9-]{0,31}$',
   intentName: '^[A-Za-z][A-Za-z0-9_-]{0,63}$',
   itemKey: '^[A-Za-z0-9._:-]{1,64}$',
+  /** A node's stable instance id (spec 0.7.0, ADR-014), unique in its tree. */
+  nodeKey: '^[A-Za-z0-9._:-]{1,64}$',
   groupName: '^[a-z][a-z0-9-]{0,31}$',
   workflowId: '^[A-Za-z0-9._:-]{1,64}$',
   workflowFieldName: '^[a-z][A-Za-z0-9_]{0,31}$',
@@ -137,6 +144,7 @@ export const SPEC_REGEX = Object.freeze({
   dataName: new RegExp(SPEC_PATTERNS.dataName, 'u'),
   intentName: new RegExp(SPEC_PATTERNS.intentName, 'u'),
   itemKey: new RegExp(SPEC_PATTERNS.itemKey, 'u'),
+  nodeKey: new RegExp(SPEC_PATTERNS.nodeKey, 'u'),
   listText: new RegExp(SPEC_PATTERNS.listText, 'u'),
 });
 

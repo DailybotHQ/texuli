@@ -20,7 +20,13 @@ export type PlayerLoader = () => Promise<unknown>;
 export interface PlayerOptions
   extends Pick<
     ValidateDraftOptions,
-    'checkBlock' | 'limits' | 'frameRoots' | 'roles' | 'conditions' | 'conditionInputs'
+    | 'checkBlock'
+    | 'checkDocument'
+    | 'limits'
+    | 'frameRoots'
+    | 'roles'
+    | 'conditions'
+    | 'conditionInputs'
   > {
   /** A tree or an envelope, as text or data. Always re-validated. */
   blueprint: unknown;
@@ -185,6 +191,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
       tier,
       catalogHash: config.catalogHash,
       checkBlock: options.checkBlock,
+      checkDocument: options.checkDocument,
       limits: options.limits,
       frameRoots: options.frameRoots,
       roles: options.roles,

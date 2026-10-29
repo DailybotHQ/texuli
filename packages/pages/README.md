@@ -61,6 +61,7 @@ Keep the document in `$state.raw`: every change is a new immutable value.
 | `reader` | `PageReader`, the read-only reader with anchored headings and an outline, and `documentOutline` | [reader](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/reader.md) |
 | `paged` | `PagedView`, the paged view and print: real pages (size, margins, breaks, headers and footers with page numbers) laid out by `@texuli/document/paged`, printed one sheet per page, isolated to the view | [paged](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/paged.md) |
 | `export` | `exportDocument` (Markdown, DOCX and PDF as a `Blob`, writers loaded lazily), `exportFileName` and `downloadBlob` | [export](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/export.md) |
+| `host` | `createDocumentPlayerHost`, the `documentHost` that lets `@texuli/player` paint agent `document` blueprints (spec 0.7.0) with the reader, and `checkDocumentDraft`, the document check for `validateDraft` | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/host.md) |
 | `collab` | `CollabEditor` and its parts on a `CollabSession` of `@texuli/document/collab`: comments anchored to the text, suggestions with accept and reject, version history with restore, remote carets and an accessible collaborator list (import it lazily) | [collab](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/collab.md) |
 | `styles.css` | The editor and reader stylesheet (both components import it) | [styles](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/styles.md) |
 
@@ -131,6 +132,7 @@ Keep the document in `$state.raw`: every change is a new immutable value.
 
 - [Editor](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/editor.md)
 - [Reader](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/reader.md)
+- [Host](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/host.md)
 - [Paged view and print](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/paged.md)
 - [Export](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/export.md)
 - [Collaboration](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/collab.md)

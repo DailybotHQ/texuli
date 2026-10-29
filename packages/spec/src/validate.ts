@@ -404,6 +404,8 @@ export function validateTree(
   const flow = options.flow ?? null;
   const root = options.root ?? { $defs: {} };
   const warn = (warning: SpecWarning) => options.warnings?.push(warning);
+  // Spec 0.7.0 (ADR-014): a node key is unique in its tree; the schema checks its pattern.
+  const keys = new Set<string>();
   const visit = (
     node: unknown,
     path: string,
@@ -412,6 +414,17 @@ export function validateTree(
     insideForm: boolean
   ): void => {
     if (!isRecord(node) || typeof node.id !== 'string' || depth > MAX_TREE_DEPTH) return;
+    if (typeof node.key === 'string' && SPEC_REGEX.nodeKey.test(node.key)) {
+      if (keys.has(node.key)) {
+        out.push({
+          code: 'duplicate-key',
+          path: `${path}.key`,
+          id: node.id,
+          message: `The key "${node.key.slice(0, 64)}" is already used in this tree.`,
+        });
+      }
+      keys.add(node.key);
+    }
     checkSlot(node.slot, parent, node.id, path, out);
     const component = byId.get(node.id);
     const context = reportInto({

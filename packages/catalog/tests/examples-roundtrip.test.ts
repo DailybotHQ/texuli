@@ -20,6 +20,7 @@ import { renderCatalogFromBuild } from '../src/render/renderer/index.ts';
 import type { CatalogTreeInput } from '../src/render/renderer/types.ts';
 import { createFamilyBlockCheck, diagramFamilyCheck } from '../src/validate/blocks.ts';
 import { validateDraft } from '../src/validate/index.ts';
+import { checkDocument } from './document-check.ts';
 
 /**
  * Every manifest example is a blueprint that must validate (the catalog's
@@ -146,6 +147,7 @@ describe('manifest examples round-trip', () => {
         tier,
         frameRoots: false,
         checkBlock,
+        checkDocument,
         checkSpec: (value) => validateBlueprint(value, documents, { catalogHash: build.hash }),
       });
       const errors = result.diagnostics.filter((d) => d.severity === 'error');

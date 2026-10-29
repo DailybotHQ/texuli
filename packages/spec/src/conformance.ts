@@ -1,4 +1,4 @@
-import { buildSpec } from './build.ts';
+import { buildSpec, EXTERNAL_SCHEMAS } from './build.ts';
 import { CAPABILITIES, type SpecCatalog, type SpecDeprecation } from './catalog.ts';
 import { checkPropSchema, defCollisions } from './contract.ts';
 import { checkSchemaDocument, isRecord, type Schema, validateInstance } from './dialect.ts';
@@ -28,7 +28,7 @@ export interface ConformanceIssue {
  * Run the spec's conformance harness (spec/Compose design §7.1 and §7.3)
  * over the normative files and the committed outputs (`manifest.json`,
  * `generated-manifest.json` and every generated file):
- * - every schema stays in the dialect;
+ * - every schema stays in the dialect (except the pinned `EXTERNAL_SCHEMAS`);
  * - `catalog/components.json` and `catalog/capabilities.json` are valid;
  * - the manifest digests match the normative files;
  * - regenerating gives byte-identical TypeScript and Kotlin, with no file
@@ -49,7 +49,10 @@ export function checkConformance(
   const json = (path: string): unknown => JSON.parse(normative[path] ?? 'null');
 
   const schemas: Record<string, Schema> = {};
-  for (const path of Object.keys(normative).filter((p) => p.startsWith('schemas/'))) {
+  const dialectSchemas = Object.keys(normative).filter(
+    (p) => p.startsWith('schemas/') && !EXTERNAL_SCHEMAS.includes(p)
+  );
+  for (const path of dialectSchemas) {
     const schema = json(path) as Schema;
     schemas[path] = schema;
     for (const issue of checkSchemaDocument(schema)) {

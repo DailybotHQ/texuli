@@ -22,10 +22,10 @@ fixtures are not part of the npm package.
 
 | Path | What it holds |
 | --- | --- |
-| `schemas/` | The normative JSON schemas: `blueprint` (envelope v1, local state, flow and the node tree), `catalog`, `diagnostics`, `manifest`, `workflow` (workflow graphs) |
+| `schemas/` | The normative JSON schemas: `blueprint` (envelope v1, local state, flow and the node tree), `catalog`, `diagnostics`, `manifest`, `workflow` (workflow graphs), and from 0.7.0 `document`, `@texuli/document`'s JSON Schema export pinned by digest (`EXTERNAL_SCHEMAS`: not in the dialect, no projection; `packages/catalog/tests/validate-document.test.ts` keeps it equal to `documentJsonSchema()`) |
 | `catalog/components.json` | The closed vocabulary, projected from the built catalog: id, label, summary, group, placement (`app`/`content`), emit tiers, capability and props |
 | `catalog/capabilities.json` | Reviewed capability claims. Empty: no id is audited portable yet, so every capability is `unknown` (ADR-003) |
-| `fixtures/golden/` | Nine blueprints that must validate (fictional data): a report, a dashboard, a proactive deck and a report with a named slot and a `when` condition (0.2.0 envelopes), and five 0.3.0 interfaces: `app-dashboard` (filters bound to state), `mobile-flow` (flow views, forms, `flowGo`), `sortable-board` (reorder groups, locked, clone, `on.move`), `workflow-builder` (an edit-mode `workflow-graph` bound to state) and `lego` (layouts, a data board, charts, media, blocks, a sortable palette and outline, and a workflow editor in one tree). `@texuli/player`'s `golden.test.ts` and `lego.test.ts` paint them |
+| `fixtures/golden/` | Ten blueprints that must validate (fictional data): a report, a dashboard, a proactive deck and a report with a named slot and a `when` condition (0.2.0 envelopes), and five 0.3.0 interfaces: `app-dashboard` (filters bound to state), `mobile-flow` (flow views, forms, `flowGo`), `sortable-board` (reorder groups, locked, clone, `on.move`), `workflow-builder` (an edit-mode `workflow-graph` bound to state) and `lego` (layouts, a data board, charts, media, blocks, a sortable palette and outline, and a workflow editor in one tree). `@texuli/player`'s `golden.test.ts` and `lego.test.ts` paint them |
 | `fixtures/invalid/` | Blueprints that must fail with exact diagnostic codes, one or more per code, including slot and condition cases (an undeclared or root `slot`, an unknown condition `op`, an extra condition field) and the 0.3.0 cases (a refused state declaration, an unknown variable, a two-key binding, an undeclared event, an action missing its fields, an unknown `spec` version) and the state surface cases (bidi in a list item, form nodes outside an `action-form`, a control and a flow view with nothing declared) |
 | `fixtures/workflow/` | `golden/` workflow graphs that must validate (a six-node pipeline) and `invalid/` graphs (`{ expect, graph }`) that must fail with exact codes: a dangling edge, an undeclared node type, a forbidden cycle |
 | `manifest.json` | The spec version, the dialect and a SHA-256 per normative file |
@@ -182,9 +182,9 @@ refuses an unknown `spec`). It is idempotent, touches only the `spec`
 field (the tree, status, provenance and activation digest stay valid), and
 keeps a parsed `__proto__` key as an own property, which validation still
 refuses. `0.2.0 → 0.3.0` is additive: it stamps `spec: "0.3.0"`. Every later step
-(`0.3.0 → 0.4.0`, `0.4.0 → 0.5.0` and `0.5.0 → 0.6.0`, the
-motion vocabulary in [motion.md](motion.md)) is additive and stamps only
-`spec` as well. The tests
+(`0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`, `0.5.0 → 0.6.0`, the
+motion vocabulary in [motion.md](motion.md), and `0.6.0 → 0.7.0`, node keys
+and documents) is additive and stamps only `spec` as well. The tests
 check that `SPEC_MIGRATIONS` covers every consecutive pinned pair in
 `versions.json` from 0.2.0 to `SPEC_VERSION`. Inside a plan that has not
 published a spec version, later normative changes amend that version's pin
@@ -196,6 +196,37 @@ warning (`SpecValidation.warnings`; `ok` is unaffected). It warns for one
 minor: conformance fails once the spec minor reaches `since` + 1, so the
 entry must be removed by then.
 
+
+## Spec 0.7.0: node keys and documents
+
+ADR-011, ADR-012 and ADR-014; additive, so the `0.6.0 → 0.7.0` migration
+stamps `spec` only.
+
+- **Node keys.** A node may carry `key` (`$defs.nodeKey`,
+  `^[A-Za-z0-9._:-]{1,64}$`, `SPEC_PATTERNS.nodeKey`): a stable instance id,
+  unique in its tree. A repeat is `duplicate-key` (a new code, for data the
+  envelope already carried); the schema refuses a malformed key. Streaming,
+  live updates and the `patchDocument` edit op address nodes by key.
+- **Documents.** The agent-emittable `document` catalog id takes a required
+  `doc` prop whose property schema is `{ "$ref": "#/$defs/document" }`
+  (`SPEC_PROP_REFS` gains `document`). `$defs.document` checks the
+  document's envelope only: `format` `texuli-document`, `formatVersion` 1,
+  `meta`, `page`, `blocks` (at most `SPEC_LIMITS.documentBlocks`, 2,000
+  objects) and `annotations`, nothing else. The closed block vocabulary, text
+  safety, the URL policy and the caps belong to `@texuli/document/schema`,
+  which `@texuli/catalog`'s `validateDraft` runs through the host's
+  `checkDocument` (structure only here, as for every prop).
+- **Document patches.** `$defs.editOp` gains `patchDocument` with `key` and
+  `patch` (`$defs.documentPatch`: at most `SPEC_LIMITS.documentPatchOps`,
+  1,000 `$defs.documentPatchOperation`s, each `{ op, path, from?, value? }`
+  with `op` in `add`, `remove`, `replace`, `move`, `copy`, `test`), so a
+  provenance chain can record document edits. The catalog edit parser
+  decides which fields each op takes.
+- **Fixtures.** The `document-brief` golden (a keyed document with a link, a
+  list, a wrapped stat, a component embed and a callout) and the
+  `duplicate-key`, `node-key`, `document-format`, `document-extra-field` and
+  `document-patch-op` invalid fixtures. The Kotlin twin decodes and refuses
+  the same; painting documents natively is planned (a visible placeholder).
 
 ## Named slots and conditions
 

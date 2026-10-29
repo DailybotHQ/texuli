@@ -1,0 +1,1619 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://texuli.com/schemas/document.schema.json",
+  "title": "Texuli document",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "texuli-document"
+    },
+    "formatVersion": {
+      "const": 1
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 500,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        "locale": {
+          "type": "string",
+          "maxLength": 35,
+          "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{1,8}){0,4}$"
+        },
+        "dir": {
+          "type": "string",
+          "enum": ["ltr", "rtl", "auto"]
+        },
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+          },
+          "maxItems": 50
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+          },
+          "maxItems": 50
+        },
+        "created": {
+          "type": "string",
+          "maxLength": 40,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d{1,9})?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$"
+        },
+        "updated": {
+          "type": "string",
+          "maxLength": 40,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d{1,9})?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$"
+        }
+      },
+      "required": ["title"],
+      "additionalProperties": false
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "enum": ["a4", "a5", "letter", "legal", "custom"]
+        },
+        "orientation": {
+          "type": "string",
+          "enum": ["portrait", "landscape"]
+        },
+        "width": {
+          "type": "number",
+          "minimum": 50,
+          "maximum": 1000
+        },
+        "height": {
+          "type": "number",
+          "minimum": 50,
+          "maximum": 1000
+        },
+        "margins": {
+          "type": "object",
+          "properties": {
+            "top": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "bottom": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "inlineStart": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "inlineEnd": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "required": ["top", "bottom", "inlineStart", "inlineEnd"],
+          "additionalProperties": false
+        },
+        "header": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "string",
+              "maxLength": 500,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+            },
+            "center": {
+              "type": "string",
+              "maxLength": 500,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+            },
+            "end": {
+              "type": "string",
+              "maxLength": 500,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "footer": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "string",
+              "maxLength": 500,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+            },
+            "center": {
+              "type": "string",
+              "maxLength": 500,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+            },
+            "end": {
+              "type": "string",
+              "maxLength": 500,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "breaks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+            "description": "A persisted id, unique in the document."
+          },
+          "maxItems": 2000
+        }
+      },
+      "required": ["size", "orientation"],
+      "additionalProperties": false,
+      "description": "A custom page has a width and a height; a preset size has neither. (rule \"page-size\")"
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/block"
+      },
+      "maxItems": 2000
+    },
+    "annotations": {
+      "type": "object",
+      "properties": {
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+                "description": "A persisted id, unique in the document."
+              },
+              "anchor": {
+                "type": "object",
+                "properties": {
+                  "block": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+                    "description": "A persisted id, unique in the document."
+                  },
+                  "start": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 200000
+                  },
+                  "end": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 200000
+                  }
+                },
+                "required": ["block"],
+                "additionalProperties": false
+              },
+              "quote": {
+                "type": "string",
+                "maxLength": 2000,
+                "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u202A-\\u202E\\u2066-\\u2069]*$"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["open", "resolved"]
+              },
+              "messages": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 64,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+                      "description": "A persisted id, unique in the document."
+                    },
+                    "author": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200,
+                      "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+                    },
+                    "body": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4000,
+                      "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u202A-\\u202E\\u2066-\\u2069]*$"
+                    },
+                    "created": {
+                      "type": "string",
+                      "maxLength": 40,
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d{1,9})?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$"
+                    }
+                  },
+                  "required": ["id", "author", "body"],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 200
+              }
+            },
+            "required": ["id", "anchor", "status", "messages"],
+            "additionalProperties": false
+          },
+          "maxItems": 500
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["format", "formatVersion", "meta", "blocks"],
+  "additionalProperties": false,
+  "description": "A Texuli block document, format version 1 (ADR-011).",
+  "$defs": {
+    "block": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "paragraph"
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "text"
+                      },
+                      "text": {
+                        "type": "string",
+                        "maxLength": 200000,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+                      },
+                      "marks": {
+                        "type": "array",
+                        "items": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "strong"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "em"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "strike"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "code"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "link"
+                                },
+                                "href": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 2048,
+                                  "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$",
+                                  "description": "Passes safeHref at the untrusted tier. (rule \"unsafe-url\")"
+                                }
+                              },
+                              "required": ["type", "href"],
+                              "additionalProperties": false
+                            }
+                          ]
+                        },
+                        "maxItems": 5,
+                        "description": "Each mark type at most once per run. (rule \"duplicate-mark\")"
+                      }
+                    },
+                    "required": ["type", "text", "marks"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "break"
+                      }
+                    },
+                    "required": ["type"],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "maxItems": 2000
+            }
+          },
+          "required": ["id", "type", "content"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "heading"
+            },
+            "level": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "text"
+                      },
+                      "text": {
+                        "type": "string",
+                        "maxLength": 200000,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+                      },
+                      "marks": {
+                        "type": "array",
+                        "items": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "strong"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "em"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "strike"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "code"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "link"
+                                },
+                                "href": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 2048,
+                                  "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$",
+                                  "description": "Passes safeHref at the untrusted tier. (rule \"unsafe-url\")"
+                                }
+                              },
+                              "required": ["type", "href"],
+                              "additionalProperties": false
+                            }
+                          ]
+                        },
+                        "maxItems": 5,
+                        "description": "Each mark type at most once per run. (rule \"duplicate-mark\")"
+                      }
+                    },
+                    "required": ["type", "text", "marks"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "break"
+                      }
+                    },
+                    "required": ["type"],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "maxItems": 2000
+            }
+          },
+          "required": ["id", "type", "level", "content"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "code"
+            },
+            "lang": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9+-]{0,31}$"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 200000,
+              "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u202A-\\u202E\\u2066-\\u2069]*$"
+            }
+          },
+          "required": ["id", "type", "text"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "list"
+            },
+            "kind": {
+              "type": "string",
+              "enum": ["bullet", "ordered", "todo"]
+            },
+            "start": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 999999999
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+                    "description": "A persisted id, unique in the document."
+                  },
+                  "checked": {
+                    "type": "boolean"
+                  },
+                  "blocks": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/block"
+                    },
+                    "minItems": 1,
+                    "maxItems": 2000
+                  }
+                },
+                "required": ["id", "blocks"],
+                "additionalProperties": false,
+                "description": "A list item starts with a paragraph. (rule \"list-item-start\")"
+              },
+              "minItems": 1,
+              "maxItems": 2000
+            }
+          },
+          "required": ["id", "type", "kind", "items"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "quote"
+            },
+            "blocks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/block"
+              },
+              "maxItems": 2000
+            }
+          },
+          "required": ["id", "type", "blocks"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "divider"
+            }
+          },
+          "required": ["id", "type"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "media"
+            },
+            "ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$",
+              "description": "Passes safeImageSrc at the untrusted tier. (rule \"unsafe-url\")"
+            },
+            "alt": {
+              "type": "string",
+              "maxLength": 500,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+            }
+          },
+          "required": ["id", "type", "ref", "alt"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "callout"
+            },
+            "tone": {
+              "type": "string",
+              "enum": ["neutral", "accent", "info", "success", "warning", "danger"]
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 500,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+            },
+            "blocks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/block"
+              },
+              "maxItems": 2000
+            }
+          },
+          "required": ["id", "type", "tone", "blocks"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "toggle"
+            },
+            "summary": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "text"
+                      },
+                      "text": {
+                        "type": "string",
+                        "maxLength": 200000,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+                      },
+                      "marks": {
+                        "type": "array",
+                        "items": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "strong"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "em"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "strike"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "code"
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "const": "link"
+                                },
+                                "href": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 2048,
+                                  "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$",
+                                  "description": "Passes safeHref at the untrusted tier. (rule \"unsafe-url\")"
+                                }
+                              },
+                              "required": ["type", "href"],
+                              "additionalProperties": false
+                            }
+                          ]
+                        },
+                        "maxItems": 5,
+                        "description": "Each mark type at most once per run. (rule \"duplicate-mark\")"
+                      }
+                    },
+                    "required": ["type", "text", "marks"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "break"
+                      }
+                    },
+                    "required": ["type"],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "maxItems": 2000
+            },
+            "open": {
+              "type": "boolean"
+            },
+            "blocks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/block"
+              },
+              "maxItems": 2000
+            }
+          },
+          "required": ["id", "type", "summary", "blocks"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "columns"
+            },
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+                    "description": "A persisted id, unique in the document."
+                  },
+                  "type": {
+                    "const": "column"
+                  },
+                  "width": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 12
+                  },
+                  "blocks": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/block"
+                    },
+                    "maxItems": 2000
+                  }
+                },
+                "required": ["id", "type", "blocks"],
+                "additionalProperties": false
+              },
+              "minItems": 2,
+              "maxItems": 4
+            }
+          },
+          "required": ["id", "type", "columns"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "page-link"
+            },
+            "ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$",
+              "description": "A host reference (never rendered as a URL)."
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 500,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+            }
+          },
+          "required": ["id", "type", "ref", "title"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "block"
+            },
+            "family": {
+              "type": "string",
+              "enum": [
+                "text",
+                "media",
+                "data",
+                "structure",
+                "code",
+                "diagram",
+                "interactive",
+                "map",
+                "embed"
+              ]
+            },
+            "block": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+            },
+            "props": {
+              "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_6",
+              "description": "At most 65536 UTF-8 bytes. (rule \"payload-too-large\")"
+            }
+          },
+          "required": ["id", "type", "family", "block", "props"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "description": "A persisted id, unique in the document."
+            },
+            "type": {
+              "const": "embed"
+            },
+            "kind": {
+              "type": "string",
+              "enum": ["component", "deck", "sheet", "canvas"]
+            },
+            "ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$",
+              "description": "A host reference (never rendered as a URL)."
+            },
+            "inline": {
+              "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_10",
+              "description": "An object of at most 65536 UTF-8 bytes. (rule \"payload-too-large\")"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 500,
+              "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+            }
+          },
+          "required": ["id", "type", "kind"],
+          "additionalProperties": false,
+          "description": "Exactly one of ref and inline; inline components are one catalog node, inline decks are deck model v2. (rule \"embed-source\")"
+        }
+      ]
+    },
+    "Json_d6_k100_i500_s10000_n64_0": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 10000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Json_d6_k100_i500_s10000_n64_1": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 10000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_0"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 100,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_0"
+          }
+        }
+      ]
+    },
+    "Json_d6_k100_i500_s10000_n64_2": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 10000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_1"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 100,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_1"
+          }
+        }
+      ]
+    },
+    "Json_d6_k100_i500_s10000_n64_3": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 10000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_2"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 100,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_2"
+          }
+        }
+      ]
+    },
+    "Json_d6_k100_i500_s10000_n64_4": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 10000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_3"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 100,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_3"
+          }
+        }
+      ]
+    },
+    "Json_d6_k100_i500_s10000_n64_5": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 10000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_4"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 100,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_4"
+          }
+        }
+      ]
+    },
+    "Json_d6_k100_i500_s10000_n64_6": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 10000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_5"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 100,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d6_k100_i500_s10000_n64_5"
+          }
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_0": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_1": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_0"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_0"
+          }
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_2": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_1"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_1"
+          }
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_3": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_2"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_2"
+          }
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_4": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_3"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_3"
+          }
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_5": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_4"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_4"
+          }
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_6": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_5"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_5"
+          }
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_7": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_6"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_6"
+          }
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_8": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_7"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_7"
+          }
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_9": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_8"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_8"
+          }
+        }
+      ]
+    },
+    "Json_d10_k200_i1000_s20000_n64_10": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 20000
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_9"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_9"
+          }
+        }
+      ]
+    }
+  }
+}

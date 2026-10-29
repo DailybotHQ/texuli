@@ -43,6 +43,12 @@ export interface StreamNodeInput {
   root?: boolean;
   /** Nodes already admitted in this stream (for the node total). */
   admitted: number;
+  /**
+   * Keys of the nodes already admitted (spec 0.7.0): a key is unique in the
+   * tree, so a node repeating one is refused (`duplicate-key`). The final
+   * `validateDraft` checks the whole tree again.
+   */
+  admittedKeys?: ReadonlySet<string>;
 }
 
 export interface StreamNodeValidation {
@@ -121,8 +127,9 @@ export function validateStreamChain(
 }
 
 /**
- * Whether one streamed node may paint: {@link checkStreamTotals}, then
- * {@link validateStreamChain} on the node's chain. Never throws.
+ * Whether one streamed node may paint: {@link checkStreamTotals}, a key
+ * already admitted, then {@link validateStreamChain} on the node's chain.
+ * Never throws.
  */
 export function validateStreamNode(
   input: StreamNodeInput,
@@ -145,5 +152,21 @@ export function validateStreamNode(
   }
   const totals = checkStreamTotals(input, options.limits);
   if (totals) return { ok: false, diagnostics: Object.freeze([totals]), validation: null };
+  const key = input.shell.key;
+  if (typeof key === 'string' && input.admittedKeys?.has(key)) {
+    return {
+      ok: false,
+      diagnostics: Object.freeze([
+        {
+          check: 'structure' as const,
+          code: 'duplicate-key',
+          severity: 'error' as const,
+          path: '',
+          message: `The key "${key}" is already used in this tree.`,
+        },
+      ]),
+      validation: null,
+    };
+  }
   return validateStreamChain(streamNodeChain(input), options);
 }

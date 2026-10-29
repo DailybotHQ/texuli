@@ -64,6 +64,14 @@ export {
   isLayoutDeckTree,
 } from './deck-host.ts';
 export {
+  DOCUMENT_HOST_PACKAGE,
+  type DocumentPlayerHost,
+  type DocumentPlayerHostRequest,
+  type DraftDocumentCheck,
+  documentRoot,
+  isDocumentTree,
+} from './document-host.ts';
+export {
   createPlayerFrameClient,
   normalizeParentOrigin,
   type PlayerFrameClient,

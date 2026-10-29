@@ -58,6 +58,7 @@ Ids agents may emit into a catalog tree (subject to tier rules). Untrusted model
 - [Project timeline](components/data-timeline.md): Tasks as bars over days, weeks, months or quarters, with dependencies and progress.
 - [Tree view](components/data-tree-view.md): A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard.
 - [Deck slide](components/deck-slide.md): One slide in a deck: a title, content blocks and speaker notes.
+- [Document](components/document.md): A block document (a brief, a report, notes or a page) as data: headings, paragraphs, lists, callouts, columns, content blocks and embedded components.
 - [Flow action](components/flow-action.md): A button that fires one declared flow event, such as next or back.
 - [Flow view](components/flow-view.md): One named view of a multi-step flow; only the current view paints.
 - [Form field](components/form-field.md): A named, validated field bound to a declared local-state variable.

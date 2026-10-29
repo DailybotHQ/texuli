@@ -278,6 +278,8 @@ fun validateTree(
 ): List<SpecDiagnostic> {
     val byId = components.associateBy { it.id }
     val out = ArrayList<SpecDiagnostic>()
+    // Spec 0.7.0 (ADR-014): a node key matches its pattern and is unique in the tree.
+    val keys = HashSet<String>()
     fun visit(
         node: BlueprintNode,
         here: String,
@@ -287,6 +289,13 @@ fun validateTree(
         insideForm: Boolean,
     ) {
         if (depth > MAX_TREE_DEPTH) return
+        node.key?.let { key ->
+            if (!SpecContract.NODE_KEY.matches(key)) {
+                out += SpecDiagnostic(SpecDiagnosticCode.SCHEMA, "$here.key", "pattern: A node key is 1–64 letters, digits or . _ : -.", node.id)
+            } else if (!keys.add(key)) {
+                out += SpecDiagnostic(SpecDiagnosticCode.DUPLICATE_KEY, "$here.key", "The key \"${key.take(64)}\" is already used in this tree.", node.id)
+            }
+        }
         checkSlot(node.slot, parent, parentKnown, node.id, here, out)
         val component = byId[node.id]
         if (component == null) {

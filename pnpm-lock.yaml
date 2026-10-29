@@ -544,6 +544,9 @@ importers:
       '@texuli/deck':
         specifier: 0.6.0
         version: link:../deck
+      '@texuli/document':
+        specifier: 0.0.0
+        version: link:../document
       '@texuli/media':
         specifier: 0.6.0
         version: link:../media

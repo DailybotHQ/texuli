@@ -2521,4 +2521,28 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     events: ['change', 'select'],
     bindable: ['graph'],
   },
+  {
+    id: 'document',
+    label: 'Document',
+    props: [
+      {
+        name: 'doc',
+        kind: 'object',
+        required: true,
+        schema: {
+          $ref: '#/$defs/document',
+        },
+      },
+      {
+        name: 'label',
+        kind: 'string',
+      },
+      {
+        name: 'outline',
+        kind: 'boolean',
+      },
+    ],
+    agentEmittable: true,
+    emit: ['developer', 'untrusted'],
+  },
 ];

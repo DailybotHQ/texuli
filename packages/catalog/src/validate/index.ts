@@ -19,6 +19,16 @@ export {
   validateDeckDraft,
 } from './deck-draft.ts';
 export {
+  checkDocuments,
+  DOCUMENT_ID,
+  type DocumentCheckOptions,
+  type DocumentFinding,
+  type DraftDocumentCheck,
+  type DraftDocumentIssue,
+  documentNodes,
+  MAX_DOCUMENT_FINDINGS,
+} from './document.ts';
+export {
   DRAFT_CHECKS,
   DRAFT_FRAME_IDS,
   DRAFT_TEXT_ALLOWANCE,

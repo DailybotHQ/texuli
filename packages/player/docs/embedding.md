@@ -71,6 +71,7 @@ Every option belongs to the host. A blueprint can set none of them.
 | `motion` | `'auto'` | `auto` follows `prefers-reduced-motion`; `reduce` stops motion inside the player |
 | `chrome` | `true` | `false` paints no frame chrome: no label heading, status, trust badge, skip link or end anchor (`data-tx-player-chrome="off"`). For a host that already frames the content and states its trust itself, such as a slide (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
 | `deckHost` | `null` | A `DeckPlayerHost` that presents a validated `layout-deck` blueprint on a stage instead of the document flow (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
+| `documentHost` | `null` | A `DocumentPlayerHost` (spec 0.7.0): its `checkDocument` validates `document` nodes, and its `present` paints a valid `document` root. Without one a document blueprint is refused (see [Document hosts](#document-hosts)) |
 | `selectable`, `selection`, `onSelectionChange` | `false`, —, — | Frame selection for a builder-style preview ([Selection](reference.md#selection-builder-preview)) |
 | `view`, `onFlowChange` | — | The flow view and its transitions ([Views and flows](reference.md#views-and-flows-g09)) |
 | `onAction` | — | Answers action-form intents with `confirmed` or `rejected`; without it, actions are unavailable ([Action surface](reference.md#action-surface-and-receipts-g17)) |
@@ -265,6 +266,50 @@ yet, so a host writes the few lines above itself.
 Tests: `packages/player/tests/deck-host.test.ts` (deck detection,
 `chrome={false}`, a mock host called for a deck and document paint without
 one).
+
+## Document hosts
+
+In the repository for `0.7.0` (not on npm yet). A `document` blueprint
+(spec 0.7.0, ADR-011) is one node whose `doc` is a Texuli document. The
+player (L7) cannot import `@texuli/pages` (L8), and the document validator
+is too large for its eager chunk, so both come from the host through
+`documentHost` (`DocumentPlayerHost`):
+
+```svelte
+<script lang="ts">
+  import { createDocumentPlayerHost } from '@texuli/pages/host';
+  import { Player } from '@texuli/player';
+  let { draft } = $props();
+  const documentHost = createDocumentPlayerHost();
+</script>
+
+<Player blueprint={draft} label="Agent document" {documentHost} />
+```
+
+- **`checkDocument`** joins validation: the player passes it to
+  `validateDraft` (and to the streaming node checks), which runs it at the
+  player's `tier` and then checks the document's wrapped blocks and
+  component embeds as catalog nodes. Without a `documentHost` every
+  `document` node fails with `document-unchecked` and the player shows its
+  invalid notice; nothing of the document paints.
+- **`present`** receives a `DocumentPlayerHostRequest` once the draft is
+  valid and its single root is a `document` (`documentRoot`): the node's
+  `doc`, its `label` as `docLabel`, `outline`, its `key`, the host-chosen
+  `tier`, and live getters for the frame `label`, `active` and the empty
+  `target` element (`data-tx-player-document-host-surface`) to paint into.
+  It may return a cleanup, called when the blueprint, tier or host changes,
+  and on destroy; it is not called again for label or `active` changes.
+  `createDocumentPlayerHost` validates the document again and mounts the
+  read-only `PageReader`, loaded on first use.
+- The host is read when the player mounts. `isDocumentTree` detects a
+  document node, and `DOCUMENT_HOST_PACKAGE` names the package that owns the
+  reader. Under `invalidPolicy="preview"` with no host, a `document` node
+  paints a titled notice (`documentNeedsHost` in the labels), never its
+  blocks.
+
+Tests: `packages/player/tests/document-host.test.ts` (the seam, a hostile
+document never presented, the preview notice, keyed streaming) and
+`packages/pages/tests/host.test.ts` (the real reader in the player).
 
 ## Limits
 

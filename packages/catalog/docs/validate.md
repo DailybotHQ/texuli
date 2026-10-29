@@ -22,14 +22,15 @@ closed with an `internal-error` diagnostic.
 | `input` | Text: a byte cap before `JSON.parse` (`maxBytes` + 8 KiB), then parse. The value must be an object or an array | yes |
 | `envelope` | For a [blueprint envelope](./envelope.md): strict field rules, the catalog binding (`catalogHash`), and trust warnings for a declared status, activation or tier; then the tree runs the checks below. `skipped` for a bare tree | on an unsupported version or a missing tree |
 | `spec` | For an envelope, after `migrateBlueprint` (`@texuli/spec/migrate`) brings an older envelope (undeclared or `"spec": "0.2.0"`) to the current spec version: the host's `checkSpec` (for example `@texuli/spec`'s `validateBlueprint` with the spec documents); `skipped` without one | no |
-| `structure` | One iterative pass: prototype keys (`__proto__`, `constructor`, `prototype`) anywhere, values nested deeper than 128 levels, node fields other than `id`, `props`, `children`, `slot`, `when`, `bind`, `on`, `motion` | only on a depth bomb |
+| `structure` | One iterative pass: prototype keys (`__proto__`, `constructor`, `prototype`) anywhere, values nested deeper than 128 levels, node fields other than `key`, `id`, `props`, `children`, `slot`, `when`, `bind`, `on`, `motion`; from spec 0.7.0 a malformed node `key` (`invalid-key`, not `^[A-Za-z0-9._:-]{1,64}$`) or one used twice in the tree (`duplicate-key`) | only on a depth bomb |
 | `interaction` | Spec 0.3.0 interaction, catalog-local: `$state` and `$data` bindings name declared variables (and are replaced by their first-paint values for the checks below), `bind` only on `bindable` props, `on` only for events the component fires, closed action ops and fields; list item text follows `SPEC_PATTERNS.listText`; and, for an envelope, the state surface rules from `@texuli/spec/surface` (form nodes inside an `action-form`, controls and fields bound to declared variables of their type, flow nodes matching the flow, no writes to host-bound variables), as `@texuli/player` refuses them | no |
 | `sinks` | The raw sink scan (`scanSinks`): executable strings, HTML strings, `class` / `style` / `innerHTML` / `srcdoc` keys, `on…` keys, functions, bidi controls, and URLs the host tier's policy refuses for their kind of key (links through the link policy, `src` and `poster` through the image or media policy, and every `srcset` candidate through the image-set policy) | no |
 | `limits` | `validateCatalogTreeLimits` (depth, nodes, bytes, branching, roots) | yes |
 | `render` | `renderCatalogTree` at the host's tier: closed ids, tiers, prop schemas, the block family check, named slots and `when` conditions (with the host's `conditions` and `conditionInputs`; a `when` without a runtime is an error) | no |
 | `blocks` | The host's `checkBlock` on every `blocks-*` block (assemble one with `createFamilyBlockCheck` from `@texuli/catalog/validate/blocks`; see the Block families section); `skipped` without one | no |
+| `documents` | Spec 0.7.0: every `document` node (see Documents below). Without the host's `checkDocument` each one fails with `document-unchecked`; `skipped` only when the host passed none (it still fails the draft that holds a document) | no |
 | `grammar` | `checkCompositionGrammar` with `defaultGrammarRoles` (or `roles`); warnings do not fail | no |
-| `root` | One component root whose id is a frame (`layout-page`, `layout-doc`, `layout-deck`); `frameRoots: false` turns it off | no |
+| `root` | One component root whose id is a frame (`DRAFT_FRAME_IDS`: `layout-page`, `layout-doc`, `layout-deck` and, from spec 0.7.0, `document`); `frameRoots: false` turns it off | no |
 
 A draft is `ok` only with zero error diagnostics. `status` is `valid`,
 `invalid`, `parse` or `over-limits`. For envelope input, `envelope` carries
@@ -198,6 +199,46 @@ This function is not the model v1 `validateDeckDraft` of
 `@texuli/slides/grammar`, which validates `0.3.0` decks and returns a v1
 deck.
 
+## Documents (spec 0.7.0)
+
+A `document` node (ADR-011) carries a Texuli document in its `doc` prop:
+`{ format: "texuli-document", formatVersion: 1, meta, blocks, … }`. The
+`documents` check judges it in two steps, at the draft's tier:
+
+1. **The document itself**, with the host's `checkDocument`
+   (`DraftDocumentCheck`): the closed block vocabulary, text safety, the URL
+   policy and the caps. It is injected like `checkBlock`, so
+   `@texuli/catalog/validate` never bundles the document engine; pass
+   `checkDocumentDraft` from `@texuli/pages/host`, or adapt
+   `validateDocument` from `@texuli/document/schema` (the JSDoc of
+   `DraftDocumentCheck` shows the four lines). Errors become
+   `document-schema`; warnings (orphaned comment anchors) do not fail. A
+   throwing check fails closed. **Without `checkDocument` every `document`
+   node fails with `document-unchecked`**: a document never passes on
+   structure alone.
+2. **What it borrows from the catalog**, on the validated copy: a `block`
+   node (`family`, `block`, `props`) is rendered as the `blocks-<family>`
+   catalog node at the tier and checked by `checkBlock` when the host passes
+   one (`document-block`); an `embed` of kind `component` with an `inline`
+   payload is rendered as that one catalog node at the tier, so app chrome,
+   unknown ids and refused props fail (`document-embed`); an embed of a
+   `document` fails (`document-nested`). The raw sink scan already covers
+   every string of the `doc` (HTML strings, script URLs in `href` keys,
+   `on…` keys).
+
+At most `MAX_DOCUMENT_FINDINGS` (20) findings are reported per document.
+`checkDocuments(roots, options)` runs step 2 alone on a render tree, and
+`documentNodes(roots)` lists the `document` nodes with their paths
+(`DOCUMENT_ID`, `DocumentCheckOptions`, `DocumentFinding` and
+`DraftDocumentIssue` are its types).
+
+```ts
+import { validateDraft } from '@texuli/catalog/validate';
+import { checkDocumentDraft } from '@texuli/pages/host';
+
+const result = validateDraft(agentOutput, { catalog, checkBlock, checkDocument: checkDocumentDraft });
+```
+
 ## Streamed nodes
 
 A host that paints a blueprint while an agent writes it (ADR-014;
@@ -207,7 +248,7 @@ functions are new in `0.6.0`.
 
 | Export | What it does |
 | --- | --- |
-| `validateStreamNode(input, options)` | `checkStreamTotals`, then `validateStreamChain` on the node's chain. `input` (`StreamNodeInput`) is the envelope `header` (or `null`), its `treeMember`, the admitted `ancestors`' shells, the node's `shell`, its `index`, `root` for a root of an array, and how many nodes were `admitted` so far. Returns a `StreamNodeValidation` (`ok`, `diagnostics`, `validation`) |
+| `validateStreamNode(input, options)` | `checkStreamTotals`, a key already admitted, then `validateStreamChain` on the node's chain. `input` (`StreamNodeInput`) is the envelope `header` (or `null`), its `treeMember`, the admitted `ancestors`' shells, the node's `shell`, its `index`, `root` for a root of an array, how many nodes were `admitted` so far and, from spec 0.7.0, the `admittedKeys` (a node repeating one is refused with `duplicate-key`). Returns a `StreamNodeValidation` (`ok`, `diagnostics`, `validation`) |
 | `validateStreamChain(chain, options)` | The real `validateDraft` on a prepared chain with the host's options and `frameRoots: false`; any error outside `STREAM_WHOLE_TREE_CHECKS` (`grammar`, `root`) refuses the node. The player calls it after resolving `$state` bindings itself |
 | `streamNodeChain(input)` | The header, each ancestor's shell and the node as one draft whose only leaf is the node |
 | `checkStreamTotals(input, limits)` | The totals measured so far against the limits: `nodes-exceeded`, `branching-exceeded`, `roots-exceeded` |

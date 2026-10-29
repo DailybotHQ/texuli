@@ -1,5 +1,5 @@
 {
-  "catalogHash": "4ac7ecedd1c59d1999a9f7eea2f523c7653fececb97258a478f09253f6b6057f",
+  "catalogHash": "c6bd7047eba3e1f32e9ed74097c390a58416cf4260267c8958e0ea70821abf35",
   "components": [
     {
       "capability": "web-only",
@@ -3686,6 +3686,33 @@
         }
       ],
       "summary": "Modal dialog with title, optional description, body and footer."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "documents",
+      "id": "document",
+      "label": "Document",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "doc",
+          "required": true,
+          "schema": {
+            "$ref": "#/$defs/document"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "boolean",
+          "name": "outline"
+        }
+      ],
+      "summary": "A block document (a brief, a report, notes or a page) as data: headings, paragraphs, lists, callouts, columns, content blocks and embedded components."
     },
     {
       "capability": "web-only",

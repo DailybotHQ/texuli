@@ -50,6 +50,11 @@
       "svelte": "./src/export/index.ts",
       "default": "./src/export/index.ts"
     },
+    "./host": {
+      "types": "./src/host/index.ts",
+      "svelte": "./src/host/index.ts",
+      "default": "./src/host/index.ts"
+    },
     "./collab": {
       "types": "./src/collab/index.ts",
       "svelte": "./src/collab/index.ts",

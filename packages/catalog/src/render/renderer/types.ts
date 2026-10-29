@@ -8,6 +8,13 @@ import type { CatalogEventName, CatalogPropSchema } from '../../manifest/types.t
  * name and an optional condition. No HTML, no functions.
  */
 export interface CatalogTreeInput {
+  /**
+   * The node's stable instance id (spec 0.7.0, ADR-014): unique in the tree,
+   * `^[A-Za-z0-9._:-]{1,64}$`. Streaming, live updates and edit ops address
+   * a node by its key, else by its path. `validateDraft` refuses a malformed
+   * or repeated key.
+   */
+  key?: string;
   /** Catalog component id (`kebab-case`). */
   id: string;
   /** Props bag. Forbidden keys (`class`, `style`, …) are stripped. */
@@ -76,6 +83,8 @@ export type RenderNode =
   | {
       kind: 'component';
       id: string;
+      /** The node's key (spec 0.7.0), when it declares a well-formed one. */
+      key?: string;
       props: Readonly<Record<string, unknown>>;
       children: readonly RenderNode[];
       /** The parent's named slot, when not the default one (audit G04). */

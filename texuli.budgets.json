@@ -698,12 +698,12 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 8,317 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 9,670 B + 4% headroom; manifests carry events, bindable and prop schemas, and each group ships the validator's checks. PLAN_010 T-release-060 (2026-10-29): 10112 -> 5120 B, tightened to measured + 4% (measured 4,915 B)."
     },
     "@texuli/catalog/player": {
-      "gzip": 21888,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 16,826 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 18,920 B + 4% headroom; the player manifests gained the spec 0.3.0 fields. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 20,166 B + 4% headroom. PLAN_010 (2026-10-29, consented plan): 20992 -> 21888 B, measured + 4% after node motion carried on paint nodes (ADR-013); measured 21,032 B."
+      "gzip": 23424,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 16,826 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 18,920 B + 4% headroom; the player manifests gained the spec 0.3.0 fields. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 20,166 B + 4% headroom. PLAN_010 (2026-10-29, consented plan): 20992 -> 21888 B, measured + 4% after node motion carried on paint nodes (ADR-013); measured 21,032 B. PLAN_010 T-doc-agents (consented plan): 21888 -> 23424 B, measured + 4% after the documentHost seam and document painting; measured 22,488 B."
     },
     "@texuli/catalog/validate": {
-      "gzip": 22016,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom. PLAN_008 T-catalog-player (2026-10-28): validateDeckDraft and the deck v2 tree mapping joined this entry; measured 19,857 B gzip, cap = measured + 4% (was 18,240 B). PLAN_010 (2026-10-29, consented plan): 20652 -> 22016 B, measured + 4% after validateStreamNode (ADR-014) and the node motion check (ADR-013); measured 21,115 B."
+      "gzip": 23552,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom. PLAN_008 T-catalog-player (2026-10-28): validateDeckDraft and the deck v2 tree mapping joined this entry; measured 19,857 B gzip, cap = measured + 4% (was 18,240 B). PLAN_010 (2026-10-29, consented plan): 20652 -> 22016 B, measured + 4% after validateStreamNode (ADR-014) and the node motion check (ADR-013); measured 21,115 B. PLAN_010 T-doc-agents (consented plan): 22016 -> 23552 B, measured + 4% after the document check (host validator, borrowed catalog ids) and node keys (spec 0.7.0); measured 22,644 B."
     },
     "@texuli/pages": {
       "gzip": 98048,
@@ -723,6 +723,10 @@
     "@texuli/pages/export": {
       "gzip": 1152,
       "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the lazy Markdown, DOCX and PDF export helpers; measured 1,056 B."
+    },
+    "@texuli/pages/host": {
+      "gzip": 30272,
+      "note": "PLAN_010 T-doc-agents (ADR-011, consented plan): new row at measured + 4% for the player document host (it carries the document validator; the reader loads lazily); measured 29,061 B."
     },
     "@texuli/pages/paged": {
       "gzip": 13312,

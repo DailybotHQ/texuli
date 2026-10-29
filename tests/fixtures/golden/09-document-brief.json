@@ -1,0 +1,364 @@
+{
+  "$comment": "PLAN_010 T-doc-agents fixture in the PLAN_002 audit format (spec 0.7.0, ADR-011). The wrapper is metadata only; `tree` is a real CatalogTreeInput: a keyed `document` root whose doc is a Texuli document with a link, a list, a wrapped blocks-data stat, a charts-sparkline component embed and a callout. The suite pins the renderer, grammar and sink outcomes; the document checks themselves run in validateDraft (packages/catalog/tests/validate-document.test.ts). Probes are fragments expected to fail. Fictional data only.",
+  "fixture": "09-document-brief",
+  "screen": "A launch brief an agent writes as a document: title, intro with a link, goals, a stat, a sign-up trend and a risk callout.",
+  "northStar": "1 - report on demand, as a document people read and export",
+  "tier": "untrusted",
+  "capabilityTier": "unknown (ADR-003); native paints a visible placeholder (planned)",
+  "result": "expressible-today",
+  "frame": {
+    "label": "Launch brief (draft by agent)",
+    "source": "audit-fixture-09"
+  },
+  "tree": {
+    "key": "brief",
+    "id": "document",
+    "props": {
+      "label": "Launch brief",
+      "doc": {
+        "format": "texuli-document",
+        "formatVersion": 1,
+        "meta": {
+          "title": "Launch brief",
+          "locale": "en",
+          "authors": ["Example team"]
+        },
+        "blocks": [
+          {
+            "id": "title",
+            "type": "heading",
+            "level": 1,
+            "content": [
+              {
+                "type": "text",
+                "text": "Launch brief",
+                "marks": []
+              }
+            ]
+          },
+          {
+            "id": "intro",
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "The fictional example.com beta opens to ",
+                "marks": []
+              },
+              {
+                "type": "text",
+                "text": "every team",
+                "marks": [
+                  {
+                    "type": "strong"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " next week. Read the ",
+                "marks": []
+              },
+              {
+                "type": "text",
+                "text": "plan",
+                "marks": [
+                  {
+                    "type": "link",
+                    "href": "https://example.com/plan"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": ".",
+                "marks": []
+              }
+            ]
+          },
+          {
+            "id": "goals",
+            "type": "heading",
+            "level": 2,
+            "content": [
+              {
+                "type": "text",
+                "text": "Goals",
+                "marks": []
+              }
+            ]
+          },
+          {
+            "id": "goal-list",
+            "type": "list",
+            "kind": "bullet",
+            "items": [
+              {
+                "id": "goal-1",
+                "blocks": [
+                  {
+                    "id": "goal-1-text",
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Invite 40 pilot teams",
+                        "marks": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "goal-2",
+                "blocks": [
+                  {
+                    "id": "goal-2-text",
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Answer feedback within a day",
+                        "marks": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "numbers",
+            "type": "block",
+            "family": "data",
+            "block": "stat",
+            "props": {
+              "items": [
+                {
+                  "label": "Pilot teams",
+                  "value": "40"
+                }
+              ]
+            }
+          },
+          {
+            "id": "trend",
+            "type": "embed",
+            "kind": "component",
+            "title": "Sign-ups per week",
+            "inline": {
+              "id": "charts-sparkline",
+              "props": {
+                "label": "Sign-ups per week",
+                "values": [12, 18, 25, 31, 40]
+              }
+            }
+          },
+          {
+            "id": "risk",
+            "type": "callout",
+            "tone": "warning",
+            "blocks": [
+              {
+                "id": "risk-text",
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The beta ends on Friday.",
+                    "marks": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "probes": [
+    {
+      "gap": "D01",
+      "intent": "A document node without its doc prop is refused by the renderer (required prop).",
+      "tree": {
+        "id": "document",
+        "props": {
+          "label": "No doc"
+        }
+      },
+      "expect": ["missing-required"]
+    },
+    {
+      "gap": "D02",
+      "intent": "A document prop outside the manifest (a raw HTML string beside the doc) is dropped by the renderer, and the raw sink scan refuses the draft.",
+      "tree": {
+        "id": "document",
+        "props": {
+          "doc": {
+            "format": "texuli-document",
+            "formatVersion": 1,
+            "meta": {
+              "title": "Launch brief",
+              "locale": "en",
+              "authors": ["Example team"]
+            },
+            "blocks": [
+              {
+                "id": "title",
+                "type": "heading",
+                "level": 1,
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Launch brief",
+                    "marks": []
+                  }
+                ]
+              },
+              {
+                "id": "intro",
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The fictional example.com beta opens to ",
+                    "marks": []
+                  },
+                  {
+                    "type": "text",
+                    "text": "every team",
+                    "marks": [
+                      {
+                        "type": "strong"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "text": " next week. Read the ",
+                    "marks": []
+                  },
+                  {
+                    "type": "text",
+                    "text": "plan",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "href": "https://example.com/plan"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "text": ".",
+                    "marks": []
+                  }
+                ]
+              },
+              {
+                "id": "goals",
+                "type": "heading",
+                "level": 2,
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Goals",
+                    "marks": []
+                  }
+                ]
+              },
+              {
+                "id": "goal-list",
+                "type": "list",
+                "kind": "bullet",
+                "items": [
+                  {
+                    "id": "goal-1",
+                    "blocks": [
+                      {
+                        "id": "goal-1-text",
+                        "type": "paragraph",
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Invite 40 pilot teams",
+                            "marks": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "goal-2",
+                    "blocks": [
+                      {
+                        "id": "goal-2-text",
+                        "type": "paragraph",
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Answer feedback within a day",
+                            "marks": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "numbers",
+                "type": "block",
+                "family": "data",
+                "block": "stat",
+                "props": {
+                  "items": [
+                    {
+                      "label": "Pilot teams",
+                      "value": "40"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "trend",
+                "type": "embed",
+                "kind": "component",
+                "title": "Sign-ups per week",
+                "inline": {
+                  "id": "charts-sparkline",
+                  "props": {
+                    "label": "Sign-ups per week",
+                    "values": [12, 18, 25, 31, 40]
+                  }
+                }
+              },
+              {
+                "id": "risk",
+                "type": "callout",
+                "tone": "warning",
+                "blocks": [
+                  {
+                    "id": "risk-text",
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "The beta ends on Friday.",
+                        "marks": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "html": "<b>Launch</b>"
+        }
+      },
+      "expect": ["forbidden-prop", "sink"]
+    }
+  ],
+  "gaps": [],
+  "notes": "Expressible today at the untrusted tier. validateDraft refuses the node unless the host passes checkDocument (document-unchecked); the player paints it only through a documentHost such as @texuli/pages/host."
+}

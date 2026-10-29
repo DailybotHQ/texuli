@@ -73,6 +73,7 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
       }[];
       expect(tools.map(({ name }) => name)).toEqual([
         'deck',
+        'document',
         'catalog',
         'component',
         'validate',
@@ -190,7 +191,7 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
         .map((line) => JSON.parse(line) as Response);
       expect(messages.map(({ id }) => id)).toEqual([1, 2]);
       expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version: '0.0.0' });
-      expect(messages[1]?.result?.tools).toHaveLength(6);
+      expect(messages[1]?.result?.tools).toHaveLength(7);
     }
   );
 });

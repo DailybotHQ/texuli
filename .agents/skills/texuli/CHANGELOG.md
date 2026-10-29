@@ -17,6 +17,13 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ### Content
 
+- Documents for agents (spec 0.7.0, in the repository for `0.7.0`, not on
+  npm yet): `blueprints/SKILL.md` gains stage I (a `document` node whose
+  `doc` is a Texuli document, `checkDocument` and the player's
+  `documentHost` from `@texuli/pages/host`, `patchDocument` edits with a
+  bounded RFC 6902 patch, node keys) and stage C names `patchDocument`;
+  the new `blueprints/references/documents.md` has an example, the patch
+  shape and the document commands of the `texuli` CLI.
 - The packages move to `0.6.0`: the same 20 published packages as `0.5.0`;
   `@texuli/document` and `@texuli/pages` stay in the repository only (not
   on npm, first release planned for `0.7.0`). `0.6.0` ships PLAN_010 so

@@ -54,6 +54,20 @@ The examples apply to this tree:
 | `replace`: replace the subtree at `path` (`[]` replaces the root) | `{ "op": "replace", "path": [0], "node": { "id": "blocks-text", "props": { "block": { "type": "heading", "level": 2, "text": "Summary" } } } }` | `{ "op": "replace", "path": [0], "node": <the old node> }` |
 | `replaceAll`: replace the whole tree (a JSON commit, a template, a full agent turn) | `{ "op": "replaceAll", "tree": { "id": "layout-page", "props": { "title": "New" } } }` | `{ "op": "replaceAll", "tree": <the old tree> }` |
 
+| `patchDocument` (spec 0.7.0): apply a bounded RFC 6902 patch (at most `MAX_DOCUMENT_PATCH_OPS`, 1,000 operations of `add`, `remove`, `replace`, `move`, `copy` or `test`) to the `doc` of the `document` node at `path`, **or** of the node whose `key` is given (exactly one) | `{ "op": "patchDocument", "key": "brief", "patch": [{ "op": "test", "path": "/meta/title", "value": "Launch brief" }, { "op": "replace", "path": "/meta/title", "value": "Launch brief, revised" }] }` | `{ "op": "patchDocument", "path": <the node's path>, "patch": <the inverse patch> }` |
+
+`patchDocument` needs the host's document patcher: `applyEditOps(tree,
+ops, { patchDocument })` (and `createEditHistory(tree, { patchDocument })`)
+takes a `DocumentPatcher`, usually `applyDocumentPatch` from
+`@texuli/document/ops` on the validated document. It applies the patch all
+or none, refuses prototype paths and malformed pointers, validates the
+result and returns the exact inverse. Without a patcher the op is refused
+(`invalid-op`); a failing `test`, a refused pointer or an invalid result is
+`invalid-value`; a node that is not a `document` is `invalid-op`.
+`findNodeKey(tree, key)` resolves a key to its path, `isNodeKey` and
+`isDocumentPatch` are the shape checks, and the commit gate validates the
+whole draft again (pass `checkDocument` to `draftCommitGate`).
+
 ### Ops are untrusted input
 
 `applyEditOps` re-checks every op with `parseEditOp` before applying it, so

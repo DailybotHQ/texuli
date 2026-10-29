@@ -32,6 +32,7 @@ replay provider; there is no real model provider and no key.
 | Run the agent service locally, or read its contract | **E** — service |
 | Keep the cross-language contract in step | **F** — spec |
 | Send a whole working screen as JSON: state, bindings, actions, drag, workflows | **G** — interaction |
+| Write or patch a document (a brief, report or notes) as data | **I** — documents |
 
 Building screens by hand stays in [`../build-ui/SKILL.md`](../build-ui/SKILL.md).
 Package entries and layers: [`../router/packages.md`](../router/packages.md).
@@ -105,7 +106,8 @@ Doc: `packages/catalog/docs/envelope.md`.
 ## C — Edit (`@texuli/catalog/edit`)
 
 - **Ops:** a closed op set (`insert`, `remove`, `move`, `setProp`,
-  `unsetProp`, `replace`, `replaceAll`) addressed by child-index paths.
+  `unsetProp`, `replace`, `replaceAll`) addressed by child-index paths, and
+  from spec 0.7.0 `patchDocument` (stage I), addressed by path or node `key`.
 - **Guarantees:** ops apply all or none, copy-on-write, with exact inverse ops.
 - **History:** `createEditHistory` adds undo and redo.
 - **Gate:** pass `draftCommitGate` from `@texuli/catalog/validate` so an edit
@@ -180,7 +182,7 @@ developer decisions.
   subpaths: `@texuli/spec/workflow` (`validateWorkflowGraph`),
   `@texuli/spec/migrate` (`migrateBlueprint`) and `@texuli/spec/surface`
   (the state surface rules every validator shares).
-- **Goldens:** `fixtures/golden/` holds nine blueprints that must validate
+- **Goldens:** `fixtures/golden/` holds ten blueprints that must validate
   and paint; a new golden moves the spec digest, so it needs a
   `versions.json` pin and refreshed native traces.
 
@@ -243,4 +245,34 @@ New in the `0.6.0` packages; `0.5.0` predates it.
 ```bash
 pnpm vitest run packages/catalog/tests/validate-motion.test.ts
 pnpm vitest run packages/player/tests/streaming.test.ts
+```
+
+## I — Documents (spec 0.7.0)
+
+In the repository for the `0.7.0` packages (not on npm yet; `0.6.0`
+predates it). Detail and the commands:
+[`references/documents.md`](references/documents.md).
+
+- **A document is one node.** The root `{"key": "brief", "id": "document",
+  "props": {"doc": …}}` carries a Texuli document (`format:
+  "texuli-document"`, `formatVersion: 1`, `meta.title`, `blocks`). Its
+  blocks reuse the catalog: a `block` wraps a `@texuli/blocks` block
+  (`family`, `block`, `props`), checked as `blocks-<family>`; an `embed` of
+  kind `component` holds one catalog node (`inline: {id, props}`), checked
+  as that id at the same tier. A document never embeds a document.
+- **No validator, no document.** `validateDraft` refuses every `document`
+  node unless the host passes `checkDocument` (`document-unchecked`);
+  `checkDocumentDraft` from `@texuli/pages/host` is the one to pass. The
+  player paints a document only through `documentHost`
+  (`createDocumentPlayerHost()` from `@texuli/pages/host`).
+- **Edit with patches, not rewrites.** `patchDocument` carries at most
+  1,000 RFC 6902 operations for the node's `doc`, addressed by `key`; put a
+  `test` first so a stale patch fails instead of overwriting.
+- **Keys** (`^[A-Za-z0-9._:-]{1,64}$`) are unique in the tree
+  (`duplicate-key`); streaming and patches address nodes by them.
+
+```bash
+pnpm vitest run packages/catalog/tests/validate-document.test.ts
+pnpm vitest run packages/catalog/tests/edit-document.test.ts
+pnpm vitest run packages/tools/tests/document.test.ts
 ```

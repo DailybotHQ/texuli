@@ -1,7 +1,7 @@
 import { validateCatalogTreeLimits } from '../render/limits/validate.ts';
 import type { CatalogTreeInput } from '../render/renderer/types.ts';
 import { applyEditOps } from './ops.ts';
-import type { EditError, EditOp, EditValidation } from './types.ts';
+import type { ApplyEditOptions, EditError, EditOp, EditValidation } from './types.ts';
 
 /** Default number of undo steps kept. */
 export const DEFAULT_HISTORY_LIMIT = 200;
@@ -36,6 +36,8 @@ export interface EditHistoryOptions {
   validate?: (tree: CatalogTreeInput) => EditValidation;
   /** Undo steps kept; older steps are dropped. Default {@link DEFAULT_HISTORY_LIMIT}. */
   limit?: number;
+  /** The document patcher `patchDocument` ops need (spec 0.7.0). */
+  patchDocument?: ApplyEditOptions['patchDocument'];
 }
 
 export type HistoryApplyResult =
@@ -95,7 +97,7 @@ export function createEditHistory(
     },
     apply(input, applyOptions = {}) {
       const ops: readonly EditOp[] = Array.isArray(input) ? input : [input as EditOp];
-      const result = applyEditOps(tree, ops);
+      const result = applyEditOps(tree, ops, { patchDocument: options.patchDocument });
       if (!result.ok) return result;
       if (!result.changed) return { ok: true, tree, changed: false };
       const gate = validate(result.tree);

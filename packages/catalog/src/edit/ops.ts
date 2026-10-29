@@ -1,6 +1,6 @@
 import type { CatalogTreeInput } from '../render/renderer/types.ts';
 import { parseEditOp } from './parse.ts';
-import type { EditError, EditOp, EditResult, NodePath } from './types.ts';
+import type { ApplyEditOptions, EditError, EditOp, EditResult, NodePath } from './types.ts';
 
 type Applied =
   | { ok: true; tree: CatalogTreeInput; inverse: EditOp }
@@ -22,6 +22,21 @@ export function getNode(tree: CatalogTreeInput, path: NodePath): CatalogTreeInpu
     if (node === undefined) return undefined;
   }
   return node;
+}
+
+/** The path of the first node whose `key` is `key` (keys are unique in a valid tree). */
+export function findNodeKey(tree: CatalogTreeInput, key: string): NodePath | undefined {
+  const stack: { node: CatalogTreeInput; path: number[] }[] = [{ node: tree, path: [] }];
+  while (stack.length > 0) {
+    const { node, path } = stack.pop() as { node: CatalogTreeInput; path: number[] };
+    if (node.key === key) return path;
+    const children = node.children ?? [];
+    for (let i = children.length - 1; i >= 0; i -= 1) {
+      const child = children[i];
+      if (child) stack.push({ node: child, path: [...path, i] });
+    }
+  }
+  return undefined;
 }
 
 /**
@@ -89,7 +104,7 @@ function removeChild(tree: CatalogTreeInput, path: NodePath): Applied {
   return { ok: true, tree: next, inverse: { op: 'insert', parent, index, node: removed } };
 }
 
-function applyOne(tree: CatalogTreeInput, op: EditOp): Applied {
+function applyOne(tree: CatalogTreeInput, op: EditOp, options: ApplyEditOptions): Applied {
   switch (op.op) {
     case 'insert':
       return insertChild(tree, op.parent, op.index, op.node);
@@ -159,6 +174,32 @@ function applyOne(tree: CatalogTreeInput, op: EditOp): Applied {
     }
     case 'replaceAll':
       return { ok: true, tree: op.tree, inverse: { op: 'replaceAll', tree } };
+    case 'patchDocument': {
+      const path = op.key !== undefined ? findNodeKey(tree, op.key) : op.path;
+      const where = op.key !== undefined ? `the node keyed "${op.key}"` : describe(op.path ?? []);
+      const node = path === undefined ? undefined : getNode(tree, path);
+      if (path === undefined || node === undefined)
+        return fail('path-not-found', `No ${where} to patch.`);
+      if (node.id !== 'document' || node.props === undefined || !Object.hasOwn(node.props, 'doc'))
+        return fail('invalid-op', `${where} is not a document node with a "doc".`);
+      if (!options.patchDocument)
+        return fail('invalid-op', '"patchDocument" needs the host document patcher.');
+      let patched: ReturnType<NonNullable<ApplyEditOptions['patchDocument']>>;
+      try {
+        patched = options.patchDocument(node.props.doc, op.patch);
+      } catch (cause) {
+        return fail(
+          'invalid-value',
+          `The document patcher failed: ${cause instanceof Error ? cause.message : String(cause)}`
+        );
+      }
+      if (!patched.ok) return fail('invalid-value', patched.message);
+      return {
+        ok: true,
+        tree: updateAt(tree, path, (current) => withProp(current, 'doc', patched.document)),
+        inverse: { op: 'patchDocument', path, patch: patched.inverse },
+      };
+    }
   }
 }
 
@@ -168,15 +209,21 @@ function applyOne(tree: CatalogTreeInput, op: EditOp): Applied {
  * ops that restore the input exactly (for undo, or to send back as a patch).
  *
  * This checks shape and addressing only. Catalog ids, tiers, limits and
- * grammar are the commit gate's job (see `createEditHistory`).
+ * grammar are the commit gate's job (see `createEditHistory`). A
+ * `patchDocument` op needs `options.patchDocument` (the document engine's
+ * validated patch); its inverse addresses the node by path.
  */
-export function applyEditOps(tree: CatalogTreeInput, ops: readonly EditOp[]): EditResult {
+export function applyEditOps(
+  tree: CatalogTreeInput,
+  ops: readonly EditOp[],
+  options: ApplyEditOptions = {}
+): EditResult {
   let current = tree;
   const inverses: EditOp[] = [];
   for (const [index, candidate] of ops.entries()) {
     const parsed = parseEditOp(candidate);
     if (!parsed.ok) return { ok: false, error: { ...parsed.error, opIndex: index } };
-    const applied = applyOne(current, parsed.op);
+    const applied = applyOne(current, parsed.op, options);
     if (!applied.ok) return { ok: false, error: { ...applied.error, opIndex: index } };
     current = applied.tree;
     inverses.unshift(applied.inverse);
@@ -185,6 +232,10 @@ export function applyEditOps(tree: CatalogTreeInput, ops: readonly EditOp[]): Ed
 }
 
 /** Apply one op. See {@link applyEditOps}. */
-export function applyEditOp(tree: CatalogTreeInput, op: EditOp): EditResult {
-  return applyEditOps(tree, [op]);
+export function applyEditOp(
+  tree: CatalogTreeInput,
+  op: EditOp,
+  options: ApplyEditOptions = {}
+): EditResult {
+  return applyEditOps(tree, [op], options);
 }

@@ -32,6 +32,7 @@ import {
   setPlayerStateAccess,
 } from './context.ts';
 import { type DeckPlayerHost, isLayoutDeckTree } from './deck-host.ts';
+import { type DocumentPlayerHost, documentRoot } from './document-host.ts';
 import type { PlayerDiagnosticsEvent, PlayerSize } from './embed/types.ts';
 import type { PlayerNodeError, PlayerNodeErrorPhase } from './errors.ts';
 import { withoutHostChrome, withoutHostChromeLoaders } from './host-chrome.ts';
@@ -220,6 +221,15 @@ type Props = {
    * slides stage supplies the adapter. Document paint remains the default.
    */
   deckHost?: DeckPlayerHost | null;
+  /**
+   * Host seam for `document` roots (spec 0.7.0): its `checkDocument` joins
+   * validation, and a valid document root is handed to its `present` instead
+   * of being painted. Without one a document blueprint is refused
+   * (`document-unchecked`). `@texuli/pages/host` supplies the adapter; the
+   * player (L7) cannot import `@texuli/pages` (L8). Read when the player
+   * mounts.
+   */
+  documentHost?: DocumentPlayerHost | null;
 };
 
 let {
@@ -259,6 +269,7 @@ let {
   landmarks = true,
   chrome = true,
   deckHost = null,
+  documentHost = null,
 }: Props = $props();
 
 // The user's reduced-motion preference, followed live.
@@ -1058,6 +1069,8 @@ $effect(() => {
       status,
       invalidPolicy: effectivePolicy,
       checkBlock: checkFamilyBlock,
+      // Documents (spec 0.7.0) are checked only with the host's validator; none refuses them.
+      checkDocument: documentHost?.checkDocument,
       // `when` conditions (G07) read the local state, mapped to numbers.
       conditions: formulaConditions,
       conditionInputs: untrack(() => {
@@ -1117,6 +1130,7 @@ function streamValidateOptions(): ValidateDraftOptions {
     catalogHash,
     tier,
     checkBlock: checkFamilyBlock,
+    checkDocument: documentHost?.checkDocument,
     conditions: formulaConditions,
     conditionInputs,
     roles: PLAYER_GRAMMAR_ROLES,
@@ -1276,6 +1290,47 @@ $effect(() => {
   );
   if (typeof cleanup === 'function') return cleanup;
 });
+
+// Document host seam (spec 0.7.0): a valid `document` root is the host's to paint.
+let documentTarget = $state<HTMLElement | null>(null);
+let documentNode = $derived(
+  documentHost && !previewing && playerState?.surface === 'tree' && !stateRefused
+    ? documentRoot(playerState.validation.ok ? playerState.validation.roots : [])
+    : null
+);
+let documentHostActive = $derived(documentNode !== null);
+let documentPresenter = $derived(documentHost);
+let documentSource = $derived(source);
+let documentTier = $derived(tier);
+$effect(() => {
+  const host = documentPresenter;
+  const presentTier = documentTier;
+  void documentSource;
+  const target = documentTarget;
+  if (!host || !documentHostActive || !target) return;
+  const node = untrack(() => documentNode);
+  if (!node) return;
+  const docLabel = typeof node.props.label === 'string' ? node.props.label : undefined;
+  const cleanup = untrack(() =>
+    host.present({
+      doc: node.props.doc,
+      ...(docLabel !== undefined ? { docLabel } : {}),
+      outline: node.props.outline !== false,
+      ...(node.key !== undefined ? { key: node.key } : {}),
+      tier: presentTier,
+      get label() {
+        return label;
+      },
+      get active() {
+        return active;
+      },
+      get target() {
+        return documentTarget;
+      },
+    })
+  );
+  if (typeof cleanup === 'function') return cleanup;
+});
 </script>
 
 
@@ -1358,6 +1413,9 @@ $effect(() => {
       {#if deckHostActive}
         <!-- Host seam: the slides stage (or a mock) owns the paint. -->
         <div class="tx-player__deck-host" data-tx-player-deck-host-surface role="presentation"></div>
+      {:else if documentHostActive}
+        <!-- Host seam: the document reader (or a mock) owns the paint. -->
+        <div class="tx-player__document-host" data-tx-player-document-host-surface bind:this={documentTarget}></div>
       {:else if !hasReorder}
         {@render painted()}
       {:else if ReorderScope}

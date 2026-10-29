@@ -17,25 +17,31 @@
       "specVersion": "0.3.0",
       "specDigest": "a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848",
       "change": "minor",
-      "summary": "Additive: envelope spec/state/flow, node bind/on, $defs binding, stateDeclaration, flow, action (closed), eventMap, reorder; catalog events/bindable/propSchema/deprecated; warnings; schemas/workflow.schema.json; codes state, unknown-state, binding, action, unknown-event, workflow; migrations 0.2.0\u21920.3.0."
+      "summary": "Additive: envelope spec/state/flow, node bind/on, $defs binding, stateDeclaration, flow, action (closed), eventMap, reorder; catalog events/bindable/propSchema/deprecated; warnings; schemas/workflow.schema.json; codes state, unknown-state, binding, action, unknown-event, workflow; migrations 0.2.0→0.3.0."
     },
     {
       "specVersion": "0.4.0",
       "specDigest": "fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3",
       "change": "minor",
-      "summary": "Additive (PLAN_008 T-catalog-player, ADR-009 deck encoding): layout-deck and deck-slide optional model-v2 props (aspect 9:16, transitions slide/zoom/morph, motion, navigation, outline, layout, background, steps, component). Migration 0.3.0\u21920.4.0 stamps spec only."
+      "summary": "Additive (PLAN_008 T-catalog-player, ADR-009 deck encoding): layout-deck and deck-slide optional model-v2 props (aspect 9:16, transitions slide/zoom/morph, motion, navigation, outline, layout, background, steps, component). Migration 0.3.0→0.4.0 stamps spec only."
     },
     {
       "specVersion": "0.5.0",
       "specDigest": "1ba15e8b082f68140c4b2768b8fd69c9f760e655dd117fac756f356a71525b2d",
       "change": "minor",
-      "summary": "Additive (PLAN_009 catalog coverage): new catalog ids data-cohort-table, data-notification-inbox and data-filter-builder (agent-emittable data views) and time-field (app-tier form input). Migration 0.4.0\u21920.5.0 stamps spec only."
+      "summary": "Additive (PLAN_009 catalog coverage): new catalog ids data-cohort-table, data-notification-inbox and data-filter-builder (agent-emittable data views) and time-field (app-tier form input). Migration 0.4.0→0.5.0 stamps spec only."
     },
     {
       "specVersion": "0.6.0",
       "specDigest": "37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc",
       "change": "minor",
-      "summary": "Additive (PLAN_010 T-motion-spec, ADR-012 and ADR-013): the closed motion vocabulary: node motion (enter and exit presets fade, rise, scale, slide-start and slide-end; layout; stagger none, fast or base; duration fast, base or slow) and the envelope motion level (full, subtle, none); $defs motionPreset, motionDuration, motionStagger, motionLevel, nodeMotion and envelopeMotion; the motion goldens in app-dashboard and four motion invalid fixtures. Migration 0.5.0\u21920.6.0 stamps spec only."
+      "summary": "Additive (PLAN_010 T-motion-spec, ADR-012 and ADR-013): the closed motion vocabulary: node motion (enter and exit presets fade, rise, scale, slide-start and slide-end; layout; stagger none, fast or base; duration fast, base or slow) and the envelope motion level (full, subtle, none); $defs motionPreset, motionDuration, motionStagger, motionLevel, nodeMotion and envelopeMotion; the motion goldens in app-dashboard and four motion invalid fixtures. Migration 0.5.0→0.6.0 stamps spec only."
+    },
+    {
+      "specVersion": "0.7.0",
+      "specDigest": "43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2",
+      "change": "minor",
+      "summary": "Additive (PLAN_010 T-doc-agents, ADR-011, ADR-012 and ADR-014): the optional node key ($defs.nodeKey, unique in the tree: the duplicate-key code); the agent-emittable document catalog id whose doc prop has the document shape ($defs.document, a contract $ref); the patchDocument edit op addressed by path or key with its bounded RFC 6902 patch ($defs.documentPatch, documentPatchOperation); schemas/document.schema.json pinned from @texuli/document (not in the dialect, no projection); the document-brief golden and the duplicate-key, node-key, document-format, document-extra-field and document-patch-op invalid fixtures. Migration 0.6.0→0.7.0 stamps spec only."
     }
   ]
 }

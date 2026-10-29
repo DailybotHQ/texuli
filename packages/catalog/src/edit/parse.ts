@@ -1,15 +1,23 @@
 import type { CatalogTreeInput } from '../render/renderer/types.ts';
-import type { EditError, EditOp, NodePath } from './types.ts';
+import type { DocumentPatchOp, EditError, EditOp, NodePath } from './types.ts';
 
 /** Deepest path an op may name (well past the default tree `maxDepth`). */
 export const MAX_PATH_LENGTH = 64;
 /** Most ops one batch may carry. */
 export const MAX_BATCH_OPS = 256;
+/** Most operations one `patchDocument` patch may carry (ADR-011). */
+export const MAX_DOCUMENT_PATCH_OPS = 1000;
+/** Longest RFC 6901 pointer a document patch operation may name. */
+const MAX_POINTER_LENGTH = 2048;
+const PATCH_OPS = new Set(['add', 'remove', 'replace', 'move', 'copy', 'test']);
+const PATCH_FIELDS = new Set(['op', 'path', 'from', 'value']);
+/** A node key (spec 0.7.0 `$defs.nodeKey`). */
+const NODE_KEY = /^[A-Za-z0-9._:-]{1,64}$/;
 /** Deepest node or value the shape checks walk before refusing. */
 const MAX_DATA_DEPTH = 256;
 
 const PROP_NAME = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/;
-const NODE_KEYS = new Set(['id', 'props', 'children', 'slot', 'when']);
+const NODE_KEYS = new Set(['key', 'id', 'props', 'children', 'slot', 'when']);
 
 const OP_FIELDS: Readonly<Record<EditOp['op'], readonly string[]>> = {
   insert: ['op', 'parent', 'index', 'node'],
@@ -19,6 +27,7 @@ const OP_FIELDS: Readonly<Record<EditOp['op'], readonly string[]>> = {
   unsetProp: ['op', 'path', 'name'],
   replace: ['op', 'path', 'node'],
   replaceAll: ['op', 'tree'],
+  patchDocument: ['op', 'path', 'key', 'patch'],
 };
 
 export type ParseOpResult = { ok: true; op: EditOp } | { ok: false; error: EditError };
@@ -48,7 +57,7 @@ export function isPropName(name: unknown): name is string {
 }
 
 /**
- * Shape check for a tree node: only `id`, `props`, `children`, `slot` and
+ * Shape check for a tree node: only `key`, `id`, `props`, `children`, `slot` and
  * `when`; plain JSON props and condition, a string slot, nested nodes.
  * Catalog membership, slot names, condition syntax and tiers are the commit
  * gate's job.
@@ -65,8 +74,35 @@ export function isTreeNode(value: unknown, depth = 0): value is CatalogTreeInput
     if (!value.children.every((child) => isTreeNode(child, depth + 1))) return false;
   }
   if (value.slot !== undefined && typeof value.slot !== 'string') return false;
+  if (value.key !== undefined && !isNodeKey(value.key)) return false;
   if (value.when !== undefined && !isPlainJson(value.when, depth + 1)) return false;
   return true;
+}
+
+/** A node key an op may address (spec 0.7.0): 1–64 letters, digits or `. _ : -`. */
+export function isNodeKey(value: unknown): value is string {
+  return typeof value === 'string' && NODE_KEY.test(value);
+}
+
+/**
+ * Shape check for a document patch: at most {@link MAX_DOCUMENT_PATCH_OPS}
+ * plain operations with a closed `op`, string pointers and plain JSON
+ * values. The patcher checks pointers, prototype paths and the result.
+ */
+export function isDocumentPatch(value: unknown): value is readonly DocumentPatchOp[] {
+  if (!Array.isArray(value) || value.length > MAX_DOCUMENT_PATCH_OPS) return false;
+  return value.every(
+    (item) =>
+      isPlainObject(item) &&
+      Object.keys(item).every((key) => PATCH_FIELDS.has(key)) &&
+      typeof item.op === 'string' &&
+      PATCH_OPS.has(item.op) &&
+      typeof item.path === 'string' &&
+      item.path.length <= MAX_POINTER_LENGTH &&
+      (item.from === undefined ||
+        (typeof item.from === 'string' && item.from.length <= MAX_POINTER_LENGTH)) &&
+      (item.value === undefined || isPlainJson(item.value, 1))
+  );
 }
 
 function isIndex(value: unknown): value is number {
@@ -95,6 +131,24 @@ export function parseEditOp(value: unknown): ParseOpResult {
   const extra = Object.keys(value).find((key) => !fields.includes(key));
   if (extra !== undefined) return refuse(`"${kind}" does not take a "${extra}" field.`);
 
+  if (kind === 'patchDocument') {
+    if ((value.path === undefined) === (value.key === undefined)) {
+      return refuse('"patchDocument" needs exactly one of a path and a key.');
+    }
+    if (value.path !== undefined && !isPath(value.path)) {
+      return refuse('"patchDocument" needs a path of child indexes.');
+    }
+    if (value.key !== undefined && !isNodeKey(value.key)) {
+      return refuse('"patchDocument" needs a node key (1–64 letters, digits or . _ : -).');
+    }
+    if (!isDocumentPatch(value.patch)) {
+      return refuse(
+        `"patchDocument" needs a patch of at most ${MAX_DOCUMENT_PATCH_OPS} RFC 6902 operations.`,
+        'invalid-value'
+      );
+    }
+    return { ok: true, op: value as unknown as EditOp };
+  }
   if (fields.includes('path') && !isPath(value.path)) {
     return refuse(`"${kind}" needs a path of child indexes.`);
   }

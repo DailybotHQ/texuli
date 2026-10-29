@@ -37,5 +37,7 @@ class LayoutWidgetsTest {
         assertEquals(BindingStatus.IMPLEMENTED, NativeRegistry.status("layout-doc"))
         assertEquals(BindingStatus.IMPLEMENTED, NativeRegistry.status("layout-grid"))
         assertEquals(BindingStatus.PLACEHOLDER, NativeRegistry.status("layout-sidebar"))
+        // Spec 0.7.0 documents validate natively but paint as a visible placeholder (planned).
+        assertEquals(BindingStatus.PLACEHOLDER, NativeRegistry.status("document"))
     }
 }

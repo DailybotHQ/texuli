@@ -26,6 +26,7 @@ export const PLAYER_LOADERS: Readonly<Record<string, PlayerLoader>> = Object.fre
   'form-submit': async () => (await import('./actions/FormSubmit.svelte')).default,
   'layout-deck': async () => (await import('./layouts/ContentLayout.svelte')).default,
   'deck-slide': async () => (await import('./layouts/ContentLayout.svelte')).default,
+  document: async () => (await import('./layouts/DocumentFallback.svelte')).default,
   'blocks-text': async () =>
     (await import('@texuli/blocks/text')).loadTextFamily().then((m) => m.default),
   'blocks-data': async () =>

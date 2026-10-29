@@ -105,6 +105,19 @@ a system animation scale of 0 as reduced motion. Exit specs are mapped but
 have no trigger yet: the native renderer paints a static plan with no `when`
 state, so nodes never leave while painted (planned with native state).
 
+**Documents and node keys (spec 0.7.0).** Validation parity, painting
+planned. The generated decoders read a node's optional `key`, the
+`document` id's `doc` (the `$defs.document` shape: format, version, members)
+and the `patchDocument` edit op with its RFC 6902 patch. `SpecValidator`
+refuses a malformed key (`schema`), a repeated key (`duplicate-key`) and a
+doc over 2,000 top-level blocks (`prop-type`), as TypeScript does; the five
+0.7.0 invalid fixtures run in `InvalidFixtureParityTest`, and the
+`document-brief` golden's trace (`article`, named by its label) matches the
+web trace. The document's own vocabulary (block types, marks, URL policy)
+is checked by `@texuli/document` on the web only. The Compose renderer
+fails closed: `document` is not in `NativeRegistry`, so it paints a visible
+`not-on-this-target` placeholder. Painting documents natively is planned.
+
 ## Modules
 
 | Module | What it holds | Targets |

@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { ENVELOPE_STATUSES, MAX_PROVENANCE, MAX_SOURCES } from '@texuli/catalog/envelope';
 import { describe, expect, it } from 'vitest';
 import { projectLiveCatalog } from '../scripts/bootstrap-catalog.ts';
-import { buildSpec, KOTLIN_OUT, TS_OUT } from '../src/build.ts';
+import { buildSpec, EXTERNAL_SCHEMAS, KOTLIN_OUT, TS_OUT } from '../src/build.ts';
 import { canonicalJson, sha256 } from '../src/canonical.ts';
 import type { SpecCatalog } from '../src/catalog.ts';
 import { kotlinString } from '../src/codegen/kotlin.ts';
@@ -84,8 +84,13 @@ describe('canonical JSON and sha256', () => {
 describe('the closed dialect', () => {
   it('accepts every committed schema and refuses keywords, open objects, refs and dialects', () => {
     const schemas = Object.keys(normative).filter((p) => p.startsWith('schemas/'));
-    expect(schemas).toHaveLength(5);
-    for (const path of schemas) expect(checkSchemaDocument(json(path)), path).toEqual([]);
+    expect(schemas).toHaveLength(6);
+    // The pinned document schema is @texuli/document's export: pinned, not in the dialect.
+    expect(EXTERNAL_SCHEMAS).toEqual(['schemas/document.schema.json']);
+    const dialect = schemas.filter((path) => !EXTERNAL_SCHEMAS.includes(path));
+    expect(dialect).toHaveLength(5);
+    for (const path of dialect) expect(checkSchemaDocument(json(path)), path).toEqual([]);
+    expect(checkSchemaDocument(json('schemas/document.schema.json')).length).toBeGreaterThan(0);
     const base = { $schema: DIALECT_URI };
     expect(codes(checkSchemaDocument({ ...base, type: 'string', format: 'email' }))).toEqual([
       'unsupported-keyword',
@@ -342,6 +347,7 @@ describe('conformance harness', () => {
       'fixtures/golden/app-dashboard.json',
       'fixtures/golden/conditional-report.json',
       'fixtures/golden/dashboard.json',
+      'fixtures/golden/document-brief.json',
       'fixtures/golden/lego.json',
       'fixtures/golden/mobile-flow.json',
       'fixtures/golden/proactive-deck.json',
@@ -382,6 +388,12 @@ describe('conformance harness', () => {
       ['motion-raw-css', ['schema']],
       ['motion-duration-ms', ['schema']],
       ['motion-level', ['schema']],
+      // Spec 0.7.0: node keys and documents (ADR-011, ADR-012, ADR-014).
+      ['duplicate-key', ['duplicate-key']],
+      ['node-key', ['schema']],
+      ['document-format', ['prop-type']],
+      ['document-extra-field', ['prop-type']],
+      ['document-patch-op', ['schema']],
     ] as const) {
       const fixture = json<{ expect: string[]; blueprint: unknown }>(
         `fixtures/invalid/${name}.json`
@@ -436,6 +448,7 @@ describe('the 0.3.0 contract mirrors its schemas', () => {
       ['flowName', SPEC_PATTERNS.flowName],
       ['intentName', SPEC_PATTERNS.intentName],
       ['itemKey', SPEC_PATTERNS.itemKey],
+      ['nodeKey', SPEC_PATTERNS.nodeKey],
       ['groupName', SPEC_PATTERNS.groupName],
     ] as const) {
       expect(d[name]?.pattern, name).toBe(pattern);
@@ -455,6 +468,9 @@ describe('the 0.3.0 contract mirrors its schemas', () => {
     expect(workflow.properties.edges?.maxItems).toBe(SPEC_LIMITS.workflowEdges);
     expect(workflow.properties.nodeTypes?.maxItems).toBe(SPEC_LIMITS.workflowNodeTypes);
     expect(workflow.properties.groups?.maxItems).toBe(SPEC_LIMITS.workflowGroups);
+    expect(d.document?.properties?.blocks?.maxItems).toBe(SPEC_LIMITS.documentBlocks);
+    expect(d.documentPatch?.maxItems).toBe(SPEC_LIMITS.documentPatchOps);
+    expect(field('editOp', 'op').enum).toContain('patchDocument');
   });
 });
 
@@ -489,7 +505,7 @@ describe('migrations', () => {
       expect(result, path).toMatchObject({
         from: '0.2.0',
         to: SPEC_VERSION,
-        applied: ['0.2.0->0.3.0', '0.3.0->0.4.0', '0.4.0->0.5.0', '0.5.0->0.6.0'],
+        applied: ['0.2.0->0.3.0', '0.3.0->0.4.0', '0.4.0->0.5.0', '0.5.0->0.6.0', '0.6.0->0.7.0'],
       });
       expect(result.blueprint, path).toEqual({ ...input, spec: SPEC_VERSION });
       expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);

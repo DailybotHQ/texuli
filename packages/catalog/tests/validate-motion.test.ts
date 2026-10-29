@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { readFileSync } from 'node:fs';
+import { SPEC_VERSION } from '@texuli/spec';
 import { SPEC_MOTION_LEVELS, SPEC_MOTION_PRESETS } from '@texuli/spec/motion';
 import { describe, expect, it } from 'vitest';
 import { buildCatalog } from '../src/build/index.ts';
@@ -108,7 +109,7 @@ describe('spec 0.6.0 motion in the catalog', () => {
   it('migrates a 0.5.0 envelope before checking, and takes motion only where the spec allows', () => {
     const migrated = run(envelope(card({ enter: 'fade' }), { spec: '0.5.0' }));
     expect(errors(migrated)).toEqual([]);
-    expect(migrated.envelope?.spec).toBe('0.6.0');
+    expect(migrated.envelope?.spec).toBe(SPEC_VERSION);
     // A motion-like field outside `motion` is still an unknown node field.
     const stray = run({ ...card(), animation: 'fade' });
     expect(errors(stray)).toContain('structure:unknown-field');

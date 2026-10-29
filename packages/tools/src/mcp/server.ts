@@ -7,6 +7,11 @@ import {
   loadFullLibraryTheme,
 } from '@texuli/tokens/library-expand';
 import { DECK_COMMANDS, type DeckCommandName, runDeckCommand } from '../deck/index.ts';
+import {
+  DOCUMENT_COMMANDS,
+  type DocumentCommandName,
+  runDocumentCommand,
+} from '../document/index.ts';
 
 const PROTOCOL_VERSION = '2025-11-25';
 const SERVER_VERSION = '0.0.0';
@@ -98,6 +103,42 @@ const TOOLS: readonly ToolDefinition[] = [
           maxLength: 2000000,
           description: 'A deck Markdown document for from-markdown.',
         },
+      },
+      required: ['command'],
+      additionalProperties: false,
+    },
+    annotations: COMMON_ANNOTATIONS,
+  },
+  {
+    name: 'document',
+    description:
+      'Create, validate, patch and convert a Texuli document (spec 0.7.0): from Markdown, bounded RFC 6902 patches, a document blueprint, and Markdown, DOCX or PDF export (bytes as base64; no files are written).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        command: { type: 'string', enum: DOCUMENT_COMMANDS },
+        document: {
+          type: 'object',
+          description:
+            'A Texuli document (format texuli-document, formatVersion 1) for every command but capabilities, schema and from-markdown.',
+        },
+        markdown: {
+          type: 'string',
+          maxLength: 2000000,
+          description: 'Markdown text for from-markdown.',
+        },
+        patch: {
+          type: 'array',
+          maxItems: 1000,
+          items: { type: 'object' },
+          description: 'RFC 6902 operations for patch (add, remove, replace, move, copy, test).',
+        },
+        tier: {
+          type: 'string',
+          enum: ['developer', 'untrusted'],
+          description: 'The URL policy tier; default untrusted.',
+        },
+        key: { type: 'string', description: 'The node key for to-blueprint.' },
       },
       required: ['command'],
       additionalProperties: false,
@@ -229,6 +270,39 @@ export function createTexuliMcpServer(): (
       const result = runDeckCommand(command, {
         ...(Object.hasOwn(args, 'deck') ? { deck: args.deck } : {}),
         ...(typeof args.markdown === 'string' ? { markdown: args.markdown } : {}),
+      });
+      return { result };
+    }
+
+    if (name === 'document') {
+      rejectUnknownArgs(args, ['command', 'document', 'markdown', 'patch', 'tier', 'key']);
+      const command = stringArg(args, 'command', true) as DocumentCommandName;
+      if (!(DOCUMENT_COMMANDS as readonly string[]).includes(command))
+        throw new TypeError(`Unknown document command "${command}".`);
+      if (Object.hasOwn(args, 'markdown') && typeof args.markdown !== 'string')
+        throw new TypeError('"markdown" must be a string.');
+      if (
+        typeof args.markdown === 'string' &&
+        new TextEncoder().encode(args.markdown).byteLength > 2_000_000
+      )
+        throw new TypeError('Document Markdown exceeds 2000000 bytes.');
+      if (Object.hasOwn(args, 'patch') && !Array.isArray(args.patch))
+        throw new TypeError('"patch" must be an array of RFC 6902 operations.');
+      const tier = stringArg(args, 'tier');
+      if (tier !== undefined && tier !== 'developer' && tier !== 'untrusted')
+        throw new TypeError('"tier" must be "developer" or "untrusted".');
+      const key = stringArg(args, 'key');
+      if (
+        Object.hasOwn(args, 'document') &&
+        new TextEncoder().encode(JSON.stringify(args.document) ?? '').byteLength > 2_000_000
+      )
+        throw new TypeError('The document exceeds 2000000 bytes.');
+      const result = await runDocumentCommand(command, {
+        ...(Object.hasOwn(args, 'document') ? { document: args.document } : {}),
+        ...(typeof args.markdown === 'string' ? { markdown: args.markdown } : {}),
+        ...(Object.hasOwn(args, 'patch') ? { patch: args.patch } : {}),
+        ...(tier ? { tier } : {}),
+        ...(key ? { key } : {}),
       });
       return { result };
     }
@@ -394,7 +468,7 @@ export function createTexuliMcpServer(): (
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: 'texuli', version: SERVER_VERSION },
         instructions:
-          'Read-only catalog, component, validation, example, theme and deck tools. No files or network are modified.',
+          'Read-only catalog, component, validation, example, theme, deck and document tools. No files or network are modified.',
       });
     }
 

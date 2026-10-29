@@ -480,6 +480,7 @@ describe('tier semantics (D5)', () => {
     'data-timeline',
     'data-tree-view',
     'deck-slide',
+    'document',
     'flow-action',
     'flow-view',
     'form-field',

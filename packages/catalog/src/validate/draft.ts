@@ -16,6 +16,7 @@ import type {
   RenderOptions,
   RenderTier,
 } from '../render/renderer/types.ts';
+import { checkDocuments, type DraftDocumentCheck } from './document.ts';
 import { resolveInteraction } from './interaction.ts';
 import { scanSinks } from './sinks.ts';
 
@@ -30,6 +31,7 @@ export const DRAFT_CHECKS = [
   'limits',
   'render',
   'blocks',
+  'documents',
   'grammar',
   'root',
 ] as const;
@@ -40,6 +42,7 @@ export const DRAFT_FRAME_IDS: readonly string[] = Object.freeze([
   'layout-page',
   'layout-doc',
   'layout-deck',
+  'document',
 ]);
 
 /** Whitespace headroom for text input on top of the tree's `maxBytes`. */
@@ -95,6 +98,15 @@ export interface ValidateDraftOptions {
    */
   checkBlock?: (block: unknown, id: string) => DraftBlockCheck;
   /**
+   * The document validator for `document` nodes (spec 0.7.0), usually
+   * `validateDocument` from `@texuli/document/schema` at the given tier
+   * (see `DraftDocumentCheck`). Injected like `checkBlock`, so this module
+   * stays free of the document engine. Without it every `document` node is
+   * refused (`document-unchecked`); with it the document's wrapped blocks
+   * and component embeds are also checked as catalog nodes at the tier.
+   */
+  checkDocument?: DraftDocumentCheck;
+  /**
    * The condition runtime for `when` (audit G07), usually `formulaConditions`
    * from `@texuli/catalog/render/conditions`. Without it a node with `when`
    * is an error (`invalid-condition`). Injected like `checkBlock`, so this
@@ -126,7 +138,7 @@ export interface DraftValidation {
   status: DraftStatus;
   tier: RenderTier;
   /**
-   * The draft with only `id`, `props`, `children`, `slot`, `when`, `bind`, `on` and `motion` on each node, or `null`
+   * The draft with only `key`, `id`, `props`, `children`, `slot`, `when`, `bind`, `on` and `motion` on each node, or `null`
    * when it could not be read (bad JSON, not a tree, over the limits).
    */
   draft: CatalogTreeInput | readonly CatalogTreeInput[] | null;
@@ -143,7 +155,19 @@ export interface DraftValidation {
   checks: Readonly<Record<DraftCheck, DraftCheckStatus>>;
 }
 
-const NODE_KEYS = new Set(['id', 'props', 'children', 'slot', 'when', 'bind', 'on', 'motion']);
+const NODE_KEYS = new Set([
+  'key',
+  'id',
+  'props',
+  'children',
+  'slot',
+  'when',
+  'bind',
+  'on',
+  'motion',
+]);
+/** A node key (spec 0.7.0 `$defs.nodeKey`): unique in the tree. */
+const NODE_KEY = /^[A-Za-z0-9._:-]{1,64}$/;
 const PROTOTYPE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 /** Values nested deeper than this are refused, not walked (depth bombs). */
 const MAX_VALUE_DEPTH = 128;
@@ -303,6 +327,18 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
       checks.blocks = 'pass';
     }
 
+    // ── Documents (spec 0.7.0) ───────────────────────────────
+    const documents = checkDocuments(roots, {
+      catalog: options.catalog,
+      tier,
+      checkDocument: options.checkDocument,
+      checkBlock: options.checkBlock,
+    });
+    for (const finding of documents) {
+      error('documents', finding.code, finding.path, finding.message, 'document');
+    }
+    if (options.checkDocument) checks.documents = 'pass';
+
     // ── Grammar ──────────────────────────────────────────────
     if (roots.length > 0) {
       const grammar = checkCompositionGrammar(roots, {
@@ -391,6 +427,7 @@ function normalize(
   }
   if (tooDeep) return [];
 
+  const keys = new Set<string>();
   const node = (raw: unknown, path: string): CatalogTreeInput => {
     if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
       // The renderer reports the bad node; keep the shape it expects.
@@ -402,11 +439,27 @@ function normalize(
         report(
           'unknown-field',
           `${path}.${key}`,
-          'Catalog nodes take only id, props, children, slot, when, bind, on and motion.'
+          'Catalog nodes take only key, id, props, children, slot, when, bind, on and motion.'
         );
       }
     }
-    const out: Record<string, unknown> = { id: record.id };
+    const out: Record<string, unknown> = {};
+    if (record.key !== undefined) {
+      // Spec 0.7.0 (ADR-014): a stable instance id, unique in the tree.
+      if (typeof record.key !== 'string' || !NODE_KEY.test(record.key)) {
+        report('invalid-key', `${path}.key`, 'A node key is 1–64 letters, digits or . _ : -.');
+      } else if (keys.has(record.key)) {
+        report(
+          'duplicate-key',
+          `${path}.key`,
+          `The key "${record.key}" is already used in this tree.`
+        );
+      } else {
+        keys.add(record.key);
+        out.key = record.key;
+      }
+    }
+    out.id = record.id;
     if (record.props !== undefined) out.props = record.props;
     if (record.slot !== undefined) out.slot = record.slot;
     if (record.when !== undefined) out.when = record.when;

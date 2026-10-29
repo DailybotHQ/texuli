@@ -169,6 +169,16 @@ on that stage instead, and `chrome={false}` paints a component with no frame
 chrome, as the slides stage does for every component on a slide
 ([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md)).
 
+## In the repository for 0.7.0
+
+Not on npm yet (planned for `0.7.0`): the `documentHost` seam paints agent
+`document` blueprints (spec 0.7.0) through a host such as
+`createDocumentPlayerHost()` from `@texuli/pages/host`, which also supplies
+the document check validation runs; without one a document is refused
+([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md#document-hosts)).
+Node `key`s ride on the render tree, and a streamed node that repeats a key
+already painted is held (`duplicate-key`).
+
 ## New in 0.6.0
 
 Ships in `0.6.0`; the `0.5.0` release predates it: streaming mode

@@ -95,6 +95,15 @@ commands as a read-only `deck` tool. None of this is in `0.3.0`; it ships
 in `0.4.0` with the first release of `@texuli/deck`; see
 [deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md).
 
+**Document commands (in development, in the repository for `0.7.0`).**
+Not on npm yet: a `@texuli/tools/document` subpath and the `document`
+command of the `texuli` bin, with ten commands on `@texuli/document`
+(spec 0.7.0): `capabilities`, `schema`, `validate`, `inspect`, `patch`
+(bounded RFC 6902), `from-markdown`, `to-markdown`, `to-blueprint`,
+`to-docx` and `to-pdf`. The local MCP server has the same commands as a
+read-only `document` tool; see
+[document.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/document.md).
+
 ## Key guarantees
 
 - **Local only.** The CLIs read and write local files and never use the
@@ -122,6 +131,7 @@ in `0.4.0` with the first release of `@texuli/deck`; see
 - A2UI adapter: [a2ui.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/a2ui.md)
 - Golden set and scorer: [golden.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/golden.md)
 - Deck commands, the `texuli deck` CLI and the `deck` MCP tool (new in `0.4.0`): [deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md)
+- Document commands, the `texuli document` CLI and the `document` MCP tool (in the repository for `0.7.0`): [document.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/document.md)
 
 ## Related packages
 
