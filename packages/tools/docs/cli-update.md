@@ -15,7 +15,7 @@ pnpm exec tsx packages/tools/src/cli-update/cli.ts diff button \
 
 pnpm exec tsx packages/tools/src/cli-update/cli.ts update button \
   --cwd path/to/app --source-root path/to/texuli-new --base-root path/to/texuli-installed \
-  --version 0.5.0 [--base-version 0.4.0] [--dry-run] [--prune] [--conflicts markers] [--json]
+  --version 0.6.0 [--base-version 0.5.0] [--dry-run] [--prune] [--conflicts markers] [--json]
 ```
 
 - `diff` prints each file's status and a unified diff from the local file to the file `update` would write. It never writes.
@@ -63,11 +63,11 @@ The markers carry the base, so the consumer sees all three versions:
 ```text
 <<<<<<< local
   <strong>{label}</strong>
-||||||| base 0.4.0
+||||||| base 0.5.0
   {label}
 =======
   <span class="tx-button-label">{label}</span>
->>>>>>> texuli 0.5.0
+>>>>>>> texuli 0.6.0
 ```
 
 ## Merge
@@ -95,8 +95,8 @@ Primitives are refused. The provenance headers must agree on one installed versi
 ```ts
 import { diffComponent, updateComponent } from '@texuli/tools/cli-update';
 
-const plan = await diffComponent({ id: 'button', cwd, sourceRoot, baseRoot, version: '0.5.0' });
-const result = await updateComponent({ id: 'button', cwd, sourceRoot, baseRoot, version: '0.5.0' });
+const plan = await diffComponent({ id: 'button', cwd, sourceRoot, baseRoot, version: '0.6.0' });
+const result = await updateComponent({ id: 'button', cwd, sourceRoot, baseRoot, version: '0.6.0' });
 ```
 
 `merge3`, `unifiedDiff`, `matchLines`, `splitLines` and `parseProvenance` are exported too.

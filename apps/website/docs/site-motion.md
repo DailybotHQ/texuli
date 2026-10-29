@@ -4,7 +4,7 @@
 **Path:** `/motion-page/` (Components group, after Drag and drop)
 **Packages:** `@texuli/core/motion`, `@texuli/tokens/motion`, `texuli/motion`,
 `@texuli/player` (node motion), `@texuli/data/board`; all of it in
-development, shipping in `0.6.0` (spec `0.6.0` is unreleased)
+development, on npm from `0.6.0` (spec `0.6.0`, in `@texuli/spec@0.6.0`)
 **Decision:** [ADR-013](../../../docs/DECISIONS.md#adr-013-motion-runtime-web-animations-with-an-owned-spring-solver)
 **Tests:** `apps/website/tests/site-motion.test.ts`, `tests/e2e/site-motion.spec.ts`
 
@@ -19,7 +19,7 @@ every demo, so a reader sees the same code play or commit at once.
 
 | Section | Island | What it shows |
 | --- | --- | --- |
-| Hero | static | Status (in development, ships in `0.6.0`; npm has `0.5.0` without it) and the texels as pieces. |
+| Hero | static | Status (in development, on npm from `0.6.0`; the previous release, `0.5.0`, is without it) and the texels as pieces. |
 | `#settings` | `MotionConsole.svelte` | Level (`full`, `subtle`, `none`) as a radio group, a reduced-motion override, the reader's system setting (`createReducedMotionSource`), the duration tokens at the chosen level, and a staggered sample that reports its outcome (`Played: finished`, `Instant: reduced-motion`, `Instant: level-none`). |
 | `#presence` | `PresenceDemo.svelte` | `Dialog`, `Sheet` and a contained `Toaster` under one `MotionProvider`; the enter, exit and duration selects are the closed spec names. |
 | `#layout` | `LayoutList.svelte`, `BoardDemo.svelte` | A keyed list on `createListMotion` (move up and down, remove, add, shuffle, sort; focus stays on the moved item) and the `@texuli/data` Board (drag, keyboard, Move menu, or "Advance a card"). |
@@ -50,7 +50,7 @@ would render the provider passes `pageMotionSettings` as the seam's
 
 The contract is a section of this page (`#api-contract`), with a search
 entry ("Component API contract") pointing at it. Motion is one prop of that
-contract and both ship in `0.6.0`. A guide page would need a new
+contract and both ship from `0.6.0`. A guide page would need a new
 `GUIDES_SECTIONS` entry, and `scripts/tests/site-loaders.test.ts` pins the
 guide list; moving the section to a guide is a follow-up if the guides grow
 a reference section.

@@ -14,9 +14,9 @@ which is built on these primitives. They are built from scratch on the
 not depend on any other component library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
-> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
+> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
+> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
 
 ## Install
 
@@ -120,19 +120,37 @@ from subpaths to keep bundles narrow.
   and label them with `Intl.DateTimeFormat`. Only the Gregorian calendar is
   supported; `CalendarDate` is re-exported from `@texuli/date`.
 
-### Planned for the next release
+### New in 0.6.0
 
-In the working tree, not released yet: `bind:ref` on every rendering part
-(menus, combobox, select, popover, navigation menu, sheet, command, radio,
-number field, tooltip and the rest), caller handlers composed on menu items
-(focus and blur; every handler of checkbox and radio items and sub
-triggers), the navigation menu root, list, trigger and link, toast roots and
-viewports, the tree, splitter handles and the command input (tooltip
-triggers, scroll areas and sortable handles already composed them), `TagsInput.Root` `readonly`, `DateField.Root` and `TimeField.Root`
-`inputId` (and `aria-describedby` / `aria-invalid` reach their segments),
-`ScrollArea.Corner` `forceMount`, `Command.Input` `onkeydown`, and rest
-attributes on `CollapsibleContent` and `NavigationMenu.Content` (also when
-the viewport renders it).
+Ships in `0.6.0`; the `0.5.0` release predates it. Under `0.x` the new minor
+may break; see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md).
+
+- **One API contract:** `bind:ref` on every rendering part (menus,
+  combobox, select, popover, navigation menu, sheet, command, radio, number
+  field, tooltip and the rest) and rest attributes on its root, checked by
+  `tests/contract.test.ts` over every export
+  ([STANDARDS](https://github.com/DailybotHQ/texuli/blob/main/docs/STANDARDS.md#component-api-contract)).
+- **Caller handlers compose on more parts** (caller first;
+  `event.preventDefault()` skips the part's action): menu items (focus and
+  blur; every handler of checkbox and radio items and sub-triggers), the
+  navigation menu root, list, trigger and link, toast roots and viewports,
+  the tree, splitter handles and the command input.
+- **Motion hooks:** overlay contents take `motionHooks` (enter, and an exit
+  that keeps the closed part mounted and `inert` until it ends)
+  ([prim-dialog](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-dialog.md#motion-hooks)).
+- `TagsInput.Root` `readonly` and a list or RegExp `delimiter`
+  (`isDelimiterKey`, G60, G61); `DateField.Root` and `TimeField.Root`
+  `inputId`, with `aria-describedby` and `aria-invalid` on their segments
+  (G63); calendar `onFocusedValueChange` (G64); a date only for a
+  four-digit year (G65, **breaking**); `DateRangePicker.Field` `required`
+  and `onInvalid(text, reason, { side })` (G66); toast viewports `active`,
+  `mode="contained"` and `container` (G77); the avatar's loading image
+  hidden by style, never `[hidden]` (G79); backdrops that stay under
+  overlays opened inside a modal (G75).
+- `ScrollArea.Corner` `forceMount`, `Command.Input` `onkeydown`, and rest
+  attributes on `CollapsibleContent` and `NavigationMenu.Content`.
+- `AccordionRootProps` and `SliderRootProps` members are type aliases a
+  consumer's checker can key (TS2590).
 
 ### New in 0.5.0
 
@@ -149,7 +167,7 @@ spins with the APG spinbutton keys, the calendar and date picker's `today`, `wee
 `sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) ships in `0.4.0`; it
 is not in `0.3.0`. It binds the drag engine
 [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md),
-which is in development and on npm as `0.5.0`
+which is in development and on npm as `0.6.0`
 ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 Contract: [prim-sortable.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-sortable.md).
 

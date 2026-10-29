@@ -88,4 +88,4 @@ export const SLIDES_KEYS: readonly SlidesKey[] = [
 
 /** Honest status line (the 0.4.0 release was the first with the v2 stage). */
 export const SLIDES_STATUS =
-  'The slides stage and @texuli/deck are in development and on npm as 0.5.0, a pre-1.0 release; @texuli/slides 0.3.0 has the previous deck model.';
+  'The slides stage and @texuli/deck are in development and on npm as 0.6.0, a pre-1.0 release; @texuli/slides 0.3.0 has the previous deck model.';

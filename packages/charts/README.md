@@ -9,10 +9,10 @@ plain TypeScript you can use without any component. It is part of
 Svelte 5 component library by Dailybot, Inc., for application developers and
 for agents that render charts from validated data.
 
-> **Status: 0.x release.** `@texuli/charts` is published on npm as `0.5.0`, a
+> **Status: 0.x release.** `@texuli/charts` is published on npm as `0.6.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.6.0`) may contain breaking changes, so pin the exact version or
-> use `^0.5.0`, which accepts only 0.5.x.
+> minor (`0.7.0`) may contain breaking changes, so pin the exact version or
+> use `^0.6.0`, which accepts only 0.6.x.
 
 ## Install
 
@@ -109,6 +109,12 @@ const keep = lttbIndices(xs, ys, 500); // downsample a long series to 500 points
 | `@texuli/charts/math/color` | A sequential color fallback |
 | `@texuli/charts/streaming` | Immutable, bounded append helpers for live numeric series |
 | `@texuli/charts/worker`, `@texuli/charts/worker/entry` | Opt-in Web Worker offload for binning and downsampling very large series, with a main-thread fallback; load the entry with `new Worker(new URL('@texuli/charts/worker/entry', import.meta.url), { type: 'module' })` |
+
+## New in 0.6.0
+
+Ships in `0.6.0`; the `0.5.0` release predates it: the chart components that
+render a data-table fallback share one stylesheet per table look, so the
+lazily loaded chart CSS fell from 34,528 to 29,731 B raw. No API change.
 
 ## New in 0.5.0
 

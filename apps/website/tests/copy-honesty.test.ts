@@ -62,24 +62,24 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   { phrase: /production[- ]ready/i, why: 'nothing is released as stable' },
   {
     phrase: /Nothing is on npm/i,
-    why: 'every package is on npm as 0.5.0, and the site is deployed',
+    why: 'every published package is on npm as 0.6.0, and the site is deployed',
   },
   {
     phrase: /\b0\.1\.0\b/,
-    why: 'the 0.1.0-next.N previews are superseded: name the current release, 0.5.0',
+    why: 'the 0.1.0-next.N previews are superseded: name the current release, 0.6.0',
   },
   {
     // A URL segment such as the agentskills discovery schema `/0.2.0/` is not a release claim.
     phrase: /(?<![/\w.-])0\.2\.0\b/,
-    why: '0.2.0 is superseded: name the current release, 0.5.0',
+    why: '0.2.0 is superseded: name the current release, 0.6.0',
   },
   {
     phrase: /texuli(?:\/[a-z-]+)?@next\b/,
-    why: 'install plainly: latest and next both name 0.5.0',
+    why: 'install plainly: latest and next both name 0.6.0',
   },
   {
     phrase: /not released yet/i,
-    why: '0.5.0 is published; say "no stable release yet" instead',
+    why: '0.6.0 is published; say "no stable release yet" instead',
   },
   { phrase: /token engine/i, why: 'the word list calls @texuli/tokens the theme engine' },
   {
@@ -88,7 +88,7 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   },
   {
     phrase: /stable release is (out|available|published)/i,
-    why: '0.5.0 is pre-1.0; 1.0.0 will be the first stable release',
+    why: '0.6.0 is pre-1.0; 1.0.0 will be the first stable release',
   },
 ];
 
@@ -120,15 +120,16 @@ describe('site copy honesty', () => {
   });
 
   it('never calls a published package unpublished', () => {
-    // All 20 packages of the 0.5.0 release are on npm, @texuli/editor
+    // All 20 packages of the 0.6.0 release are on npm, @texuli/editor
     // included (first published in 0.5.0). Not on npm: the private 0.0.0
-    // examples workspace.
+    // examples workspace, and @texuli/document and @texuli/pages, which are
+    // in the repository only (0.0.0) until their first release.
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
       try {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')
         ) as { version?: string };
-        return pkg.version === '0.5.0';
+        return pkg.version === '0.6.0';
       } catch {
         return false;
       }

@@ -8,10 +8,10 @@ announcements, and it renders message text without ever injecting HTML. It
 is part of [Texuli](https://texuli.com), "Small pieces. Infinite
 possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
-> **Status: 0.x release.** `@texuli/chat` is published on npm as `0.5.0`, a
+> **Status: 0.x release.** `@texuli/chat` is published on npm as `0.6.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.6.0`) may contain breaking changes, so pin the exact version or
-> use `^0.5.0`, which accepts only 0.5.x.
+> minor (`0.7.0`) may contain breaking changes, so pin the exact version or
+> use `^0.6.0`, which accepts only 0.6.x.
 
 ## Install
 
@@ -104,6 +104,18 @@ Everything is exported from the package root, `@texuli/chat`:
   measured row heights, and keeps your place when older history is
   prepended.
 
+## New in 0.6.0
+
+Ships in `0.6.0`; the `0.5.0` release predates it:
+
+- `MessageList` and `ChatThread`: a reading position (`bind:anchor`,
+  `onAnchorChange`) restored when you set it (G71), `ChatAuthor.avatarSrcset`
+  through the untrusted image URL policy (G59), and `onEditUnchanged` for an
+  edit saved unchanged (G85)
+  ([chat-thread](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-thread.md)).
+- **Breaking:** day separators are their own full-width row above the
+  avatar and bubbles (G70); host CSS on the group's structure needs a look.
+
 ## New in 0.5.0
 
 Ships in `0.5.0`; the `0.4.0` release predates it:
@@ -111,7 +123,7 @@ Ships in `0.5.0`; the `0.4.0` release predates it:
 - `Composer`: `streaming` with `onStop` (a Stop button and Escape), an
   `onkeydown` hook that runs before the built-in keys, and an `actions`
   snippet ([chat-composer](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-composer.md)).
-- `MessageList`: per-message `actions`, inline edit with `onEdit` (and `onEditUnchanged` for an edit saved unchanged), and a
+- `MessageList`: per-message `actions`, inline edit with `onEdit`, and a
   bottom-anchored scroll with "Jump to latest"
   ([chat-thread](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-thread.md)). `ChatThread` forwards all
   of these.

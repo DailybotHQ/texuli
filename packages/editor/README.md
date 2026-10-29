@@ -10,10 +10,10 @@ the URL policy. It is part of [Texuli](https://texuli.com), "Small pieces.
 Infinite possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
 > **Status: in development (pre-1.0).** `@texuli/editor` is published on
-> npm for the first time as `0.5.0`, with provenance (the publish workflow
-> publishes it after `texuli`). Under 0.x a new minor (`0.6.0`) may contain
-> breaking changes, so pin the exact version or use `^0.5.0`, which accepts
-> only 0.5.x. The architecture
+> npm as `0.6.0`, with provenance (first published as `0.5.0`; the publish
+> workflow publishes it after `texuli`). Under 0.x a new minor (`0.7.0`) may contain
+> breaking changes, so pin the exact version or use `^0.6.0`, which accepts
+> only 0.6.x. The architecture
 > contract is ADR-003 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)
 > and [EDITOR_ARCHITECTURE](https://github.com/DailybotHQ/texuli/blob/main/docs/EDITOR_ARCHITECTURE.md).
@@ -66,6 +66,16 @@ Each subpath has its own gzip budget in `texuli.budgets.json`
 editor texels, so `@texuli/editor/editor` measures about 34 KiB gzip;
 `@texuli/editor/markdown` about 8.5 KiB, and `./paste` and `./controller`
 load no UI.
+
+## New in 0.6.0
+
+Ships in `0.6.0`; the `0.5.0` release predates it: host inline extensions
+(G48). Mentions and references register a sigil from a closed set
+(`createInlineExtensions` in `@texuli/core/editor-model`) and round-trip
+through `@texuli/editor/markdown` as `<sigil>{id|label}` with an
+`extension` mark that keeps their id; the editor renders them as a
+`tx-editor-extension` span
+([editor-markdown](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-markdown.md#host-inline-extensions)).
 
 ## Key guarantees
 

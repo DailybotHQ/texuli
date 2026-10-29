@@ -302,11 +302,11 @@ host without the tokens' `base.css` still gets it:
 | `motion="reduce"` (host) | Stops motion inside the player whatever the user setting. Also a frame-protocol option |
 | `motion="auto"` (default) | Follows `prefers-reduced-motion`, live, through `matchMedia` |
 | Root attribute | Under either, the root carries the tokens' `data-tx-motion="reduce"` |
-| Scoped override | `player.css` zeroes `--tx-motion-fast`, `--tx-motion-base` and `--tx-motion-slow`, sets `--tx-motion-easing: linear`, and cuts animation and transition durations to `0.01ms` for the player and everything painted inside it, under `data-tx-motion="reduce"` and the media query. The selectors are scoped to `.tx-player`, so host content outside is untouched |
+| Scoped override | `player.css` zeroes `--tx-motion-fast`, `--tx-motion-base` and `--tx-motion-slow`, sets `--tx-motion-easing: linear`, and sets animation and transition durations and delays to `0s` (G78) for the player and everything painted inside it, under `data-tx-motion="reduce"` and the media query. The selectors are scoped to `.tx-player`, so host content outside is untouched |
 | Player-owned motion | Every player transition is timed with `--tx-motion-*` tokens (a test checks the stylesheet), so the policy reaches it |
 | Blueprint motion | A slide `transition` and a block `reveal` are presenter fields: the document flow paints them as nothing, so nothing animates or stays hidden |
 
-#### Node motion (spec 0.6.0, unreleased)
+#### Node motion (spec 0.6.0)
 
 A node's checked `motion` ([the vocabulary](../../spec/docs/motion.md))
 plays through `@texuli/core/motion`

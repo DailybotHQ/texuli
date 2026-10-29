@@ -14,9 +14,14 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
-> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
+> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
+> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
+
+> **New in `0.6.0`.** `@texuli/spec@0.6.0` carries **spec 0.6.0**: the
+> closed motion vocabulary (`@texuli/spec/motion`, below), and the new
+> `@texuli/spec/stream` subpath reads streamed blueprints. Every `0.5.0`
+> envelope migrates by stamping `spec`.
 
 > **New in `0.4.0`.** `@texuli/spec@0.4.0` carries **spec 0.4.0**: spec
 > 0.3.0 (state, bindings, closed actions, `reorder`, workflow graphs), spec
@@ -56,7 +61,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.5.0' in @texuli/spec@0.5.0 (this checkout: unreleased '0.6.0')
+SPEC_VERSION;                         // the spec version: '0.6.0' in @texuli/spec@0.6.0
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -120,8 +125,8 @@ warning without failing.
 | `@texuli/spec/workflow` | Runtime, opt-in: workflow graph validation | `validateWorkflowGraph` (pass it in `SpecDocuments.validateWorkflowGraph`) |
 | `@texuli/spec/migrate` | Runtime, opt-in: envelope migrations | `migrateBlueprint`, `SPEC_MIGRATIONS`, `UNDECLARED_SPEC_VERSION` |
 | `@texuli/spec/surface` | Runtime: the state surface rules every validator shares (no imports) | `checkStateSurface`, `surfaceInputs`, `SPEC_CONTROL_STATE_TYPES`, `SURFACE_PLAYER_CODES`, `LIST_TEXT_PATTERN` |
-| `@texuli/spec/motion` | Runtime (unreleased, spec `0.6.0`): the closed motion vocabulary and its check, shared by the catalog and the player ([motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/motion.md)) | `SPEC_MOTION_PRESETS`, `SPEC_MOTION_DURATIONS`, `SPEC_MOTION_STAGGERS`, `SPEC_MOTION_LEVELS`, `checkNodeMotion`, `checkEnvelopeMotion` |
-| `@texuli/spec/stream` | Runtime, opt-in (unreleased, planned for `0.7.0`): streamed blueprints ([stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)) | `createJsonTokenizer`, `createBlueprintAssembler`, `createBlueprintStream`, `STREAM_NODE_ORDER` |
+| `@texuli/spec/motion` | Runtime (new in `0.6.0`, spec `0.6.0`): the closed motion vocabulary and its check, shared by the catalog and the player ([motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/motion.md)) | `SPEC_MOTION_PRESETS`, `SPEC_MOTION_DURATIONS`, `SPEC_MOTION_STAGGERS`, `SPEC_MOTION_LEVELS`, `checkNodeMotion`, `checkEnvelopeMotion` |
+| `@texuli/spec/stream` | Runtime, opt-in (new in `0.6.0`): streamed blueprints ([stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)) | `createJsonTokenizer`, `createBlueprintAssembler`, `createBlueprintStream`, `STREAM_NODE_ORDER` |
 | `@texuli/spec/codegen` | Build time: generation and conformance | `buildSpec`, `projectCatalog`, `checkConformance`, `checkCatalogContract`, `formatJson`, `nextSpecVersion`, `checkVersionHistory` |
 
 ## Key guarantees
@@ -150,14 +155,14 @@ warning without failing.
   component slides. The change is additive: every 0.3.0 envelope is a valid
   0.4.0 envelope, and the `0.3.0 → 0.4.0` migration only stamps `spec`. The
   deck model itself is validated by `@texuli/deck`, not by this package.
-- **Motion as data (spec 0.6.0, unreleased).** A node may declare `motion`
+- **Motion as data (spec 0.6.0, new in `0.6.0`).** A node may declare `motion`
   (`enter` and `exit` presets `fade`, `rise`, `scale`, `slide-start` and
   `slide-end`; `layout`; `stagger` and `duration` in token steps) and the
   envelope a `motion.level` (`full`, `subtle`, `none`). Names map to the
   motion tokens: a blueprint never carries CSS, keyframes, milliseconds or
   code, and anything else is refused. The `0.5.0 → 0.6.0` migration only
   stamps `spec`.
-- **Streams parse, never guess.** `@texuli/spec/stream` (unreleased)
+- **Streams parse, never guess.** `@texuli/spec/stream` (new in `0.6.0`)
   reads a blueprint split anywhere in linear time under a byte budget and a
   depth cap, reports a node only once its shell (everything but
   `children`) has closed, and refuses duplicate and prototype keys. It
@@ -206,14 +211,15 @@ written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 (`@texuli/spec/migrate`) brings an
 envelope up to the current spec with pure, per-version steps
 (`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0` and
-the unreleased `0.5.0 → 0.6.0`, each of which only stamps `spec`); a compatible version range is planned,
-not built. `@texuli/spec@0.5.0` carries spec `0.5.0`, which adds the
-`data-cohort-table`, `data-notification-inbox`, `data-filter-builder` and
-`time-field` catalog ids; `@texuli/spec@0.4.0` carried spec `0.4.0` (digest
-`fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3`). This
-checkout carries the open, unreleased spec `0.6.0` pin (the motion
-vocabulary, ADR-012), planned for release 0.6.0. Every pin is in
-`versions.json`.
+`0.5.0 → 0.6.0`, each of which only stamps `spec`); a compatible version range is planned,
+not built. `@texuli/spec@0.6.0` carries spec `0.6.0` (digest
+`37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc`), which
+adds the closed motion vocabulary (ADR-012); `@texuli/spec@0.5.0` carried
+spec `0.5.0`, which added the `data-cohort-table`,
+`data-notification-inbox`, `data-filter-builder` and `time-field` catalog
+ids, and `@texuli/spec@0.4.0` spec `0.4.0` (digest
+`fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3`). Every
+pin is in `versions.json`.
 
 The full rules (the digest, `versions.json` pins, regeneration and the
 conformance harness) are in
@@ -228,10 +234,10 @@ conformance harness) are in
   [packages/spec](https://github.com/DailybotHQ/texuli/tree/main/packages/spec)
 - The contract in depth (the JSON Schema dialect, projections, conformance
   and versioning): [contract.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/contract.md)
-- The motion vocabulary (spec 0.6.0, unreleased):
+- The motion vocabulary (spec 0.6.0):
   [motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/motion.md)
 - Streamed blueprints (the incremental tokenizer, the canonical order and
-  node shells; unreleased): [stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)
+  node shells; new in `0.6.0`): [stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)
 - The Kotlin Multiplatform twin that consumes the generated models:
   [native/README.md](https://github.com/DailybotHQ/texuli/blob/main/native/README.md)
 - Architecture: [ARCHITECTURE.md](https://github.com/DailybotHQ/texuli/blob/main/docs/ARCHITECTURE.md)

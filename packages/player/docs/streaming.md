@@ -6,8 +6,8 @@
 **Tests:** `packages/player/tests/streaming.test.ts` (the component),
 `packages/player/tests/stream-session.test.ts` (the session),
 `tests/e2e/player-streaming.spec.ts` (the browser)  
-**Status:** in the repository, unreleased. It is planned to ship with the
-`0.7.0` release; no published `@texuli/player` has it yet.
+**Status:** new in `0.6.0` (in development, pre-1.0); `@texuli/player@0.5.0`
+and earlier don't have it.
 
 ## Goal
 

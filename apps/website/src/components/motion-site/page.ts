@@ -4,7 +4,7 @@
  * the page and its tests share one source (labels are text, never HTML).
  */
 
-/** The release the motion system ships in (unreleased: in development). */
+/** The release the motion system first ships in (on npm, in development, pre-1.0). */
 export const MOTION_RELEASE = '0.6.0';
 
 export interface MotionPiece {

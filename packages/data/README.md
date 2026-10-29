@@ -9,10 +9,10 @@ own, in Node or behind a view of your own. It is part of
 Svelte 5 component library by Dailybot, Inc., for teams building
 data-heavy product screens.
 
-> **Status: 0.x release.** `@texuli/data` is published on npm as `0.5.0`, a
+> **Status: 0.x release.** `@texuli/data` is published on npm as `0.6.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.6.0`) may contain breaking changes, so pin the exact version or
-> use `^0.5.0`, which accepts only 0.5.x.
+> minor (`0.7.0`) may contain breaking changes, so pin the exact version or
+> use `^0.6.0`, which accepts only 0.6.x.
 
 ## Install
 
@@ -123,6 +123,27 @@ The package root, `@texuli/data`, re-exports the main views and helpers.
 
 **Known limit:** fence editing on the map is not implemented yet; fences are
 drawn and listed only.
+
+## New in 0.6.0
+
+Ships in `0.6.0`; the `0.5.0` release predates it:
+
+- `@texuli/data/filter-builder`: a property catalog of host operators with
+  typed editors, validation and predicates, field groups, and saved
+  segments (G49). **Breaking:** `FilterCondition.operator` widens to
+  `FilterOperator | FilterCustomOperatorId`
+  ([data-filter-builder](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-filter-builder.md)).
+- `@texuli/data/activity/inbox`: `allowMarkUnread` and `onMarkUnread` (G50).
+- `@texuli/data/cohort`: `heatScale` and `heatText` with a 4.5:1 contrast
+  check (G51).
+- `DataGrid`: `activateOnClick`, `mode="table"`, column `hideBelow`, an
+  `empty` snippet with `{ query, filtered }` (G55), and rows that glide to
+  their new place (`motion`)
+  ([data-grid-core](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-grid-core.md)).
+- `Board`: column `description`, a `columnHeader` snippet, column-only mode
+  without `getRank` (G67, G69), a positioned scroller that can't widen a
+  phone page (G76), and cards that glide on a move (`motion`)
+  ([data-board](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-board.md)).
 
 ## New in 0.5.0
 

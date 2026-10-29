@@ -10,9 +10,9 @@ model for pages, navigation, metadata and a sitemap. Use Texuli's Svelte
 components as islands wherever a page needs interaction.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
-> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
+> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
+> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
 
 ## Install
 
@@ -82,6 +82,13 @@ import Section from '@texuli/astro/sections/Section';
 | `@texuli/astro/layouts/ContentLayout` | A semantic HTML document shell |
 | `@texuli/astro/sections/Hero` | A static hero section |
 | `@texuli/astro/sections/Section` | A static, width-constrained section |
+
+## New in 0.6.0
+
+`AppearanceSwitcher` `size="sm"`, and same-tab sync between switchers of
+one namespace (`APPEARANCE_CHANGE_EVENT`, G74), ship in `0.6.0`; the
+`0.5.0` release predates them
+([appearance](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/appearance.md)).
 
 ## New in 0.5.0
 

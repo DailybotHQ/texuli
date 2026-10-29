@@ -16,12 +16,12 @@ Svelte 5 stage on top of it
 ([ADR-009](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 
 > **Status: 0.x release, in development.** The stage described here is
-> published on npm as `0.5.0` (first published in `0.4.0`, together with
+> published on npm as `0.6.0` (first published in `0.4.0`, together with
 > the first release of `@texuli/deck`). `@texuli/slides@0.3.0` has the
 > previous deck model (model v1) and its stage. Texuli is pre-1.0: under 0.x
 > a new minor may contain breaking changes, and `0.4.0` was one, so pin the
 > exact version or use
-> `^0.5.0`, which accepts only 0.5.x.
+> `^0.6.0`, which accepts only 0.6.x.
 > The upgrade path is in
 > [migration.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/migration.md).
 
@@ -254,6 +254,26 @@ the templates and the main export functions. New code builds v2 decks with
   ([stage.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/stage.md)).
 - **Local, deterministic export.** Print and PPTX upload nothing; the same
   deck always gives the same PPTX bytes.
+
+## New in 0.6.0
+
+Ships in `0.6.0`; the `0.5.0` release predates it:
+
+- `@texuli/slides/stage-core` (`DeckStageCore`): the stage with no
+  reference to the default renderer tables (G72); `DeckStage` is the core
+  with the defaults set.
+- `loadDeckMigration` and `loadedDeckMigration` on `@texuli/slides/stage`
+  (G73), a `tools` toolbar snippet (G82), and prepared decks:
+  `prepareDeckV2`, `isPreparedDeck` and `PreparedDeckOk`, painted at the
+  `developer` tier without migrating or validating again (G83)
+  ([stage](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/stage.md)).
+- `@texuli/slides/export`: `preloadDeckPrintView` (G81), and print
+  isolation only while a print view with `isolate` is mounted (G80)
+  ([export](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/export.md)).
+- Server builds keep slide content: the stage preloads its default
+  renderers through the package's `#deck-ssr` import.
+- **Breaking:** transitions and v2 fragments play through
+  `@texuli/core/motion`; the `tx-deck-slide-*` CSS keyframes are gone.
 
 ## Documentation
 

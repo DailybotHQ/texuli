@@ -65,15 +65,40 @@ Never `@texuli/core` root barrel for app code.
 | Chat | `@texuli/chat` (`ChatThread`, `Composer`, `parseMessageText`) |
 | Content blocks | `@texuli/blocks/<family>` (lazy) or `@texuli/blocks/<family>/renderers` |
 | Decks (v2 engine) | `@texuli/deck/model` (`parseDeck`, `loadUntrustedDeck`, `DECK_LAYOUTS`), `@texuli/deck/markdown` (`parseDeckMarkdown`, `deckToMarkdown`), `@texuli/deck/authoring`, `@texuli/deck/templates`, `@texuli/deck/engine`, `@texuli/deck/math`; in development, on npm from `0.4.0`. See [`decks.md`](decks.md) |
-| Decks (stage and v1) | `@texuli/slides/stage` (`DeckStage`, `prepareDeck`), `@texuli/slides/export` (`DeckPrintView`, print plan, PDF seam, PPTX), `@texuli/slides/model`, `@texuli/slides/grammar`, `@texuli/slides/templates` (report, pitch, review; v1) |
-| Rich text editor | `@texuli/editor/editor` (`RichTextEditor`), `@texuli/editor/toolbar`, `@texuli/editor/controller`, `@texuli/editor/markdown` (`markdownToDocument`, `documentToMarkdown`); in development, on npm from `0.5.0` |
+| Decks (stage and v1) | `@texuli/slides/stage` (`DeckStage`, `prepareDeck`), `@texuli/slides/stage-core` (`DeckStageCore`, new in `0.6.0`), `@texuli/slides/export` (`DeckPrintView`, print plan, PDF seam, PPTX), `@texuli/slides/model`, `@texuli/slides/grammar`, `@texuli/slides/templates` (report, pitch, review; v1) |
+| Rich text editor | `@texuli/editor/editor` (`RichTextEditor`), `@texuli/editor/toolbar`, `@texuli/editor/controller`, `@texuli/editor/markdown` (`markdownToDocument`, `documentToMarkdown`); in development, on npm from `0.5.0` (host inline extensions new in `0.6.0`) |
 | Astro sites | `@texuli/astro` (`texuli()` integration), `@texuli/astro/styles.css`, `@texuli/astro/site` (`defineSite`, `sitePageMeta`, `siteSitemap`), `@texuli/astro/layouts/ContentLayout`, `@texuli/astro/appearance` (`AppearanceSwitcher`; new in `0.5.0`) |
 | Paint a validated blueprint | `@texuli/player` (+ `@texuli/player/styles.css`) |
 | Drag and drop (Svelte) | `@texuli/primitives/sortable` (`Sortable`); views: `@texuli/data/board`, `@texuli/data/tree-view` |
-| Drag engine (framework-free) | `@texuli/drag/sortable`, `@texuli/drag/gesture`, `@texuli/drag/spatial`, `@texuli/drag/graph`, `@texuli/drag/messages`; in development, on npm as `0.5.0` |
-| Workflows | `@texuli/workflows/editor`, `@texuli/workflows/viewer`, `@texuli/workflows/inspector`, `@texuli/workflows/model`, `@texuli/workflows/layout`, `@texuli/workflows/spec-adapter`; in development, on npm as `0.5.0` |
+| Drag engine (framework-free) | `@texuli/drag/sortable`, `@texuli/drag/gesture`, `@texuli/drag/spatial`, `@texuli/drag/graph`, `@texuli/drag/messages`; in development, on npm as `0.6.0` |
+| Workflows | `@texuli/workflows/editor`, `@texuli/workflows/viewer`, `@texuli/workflows/inspector`, `@texuli/workflows/model`, `@texuli/workflows/layout`, `@texuli/workflows/spec-adapter`; in development, on npm as `0.6.0` |
 | Dates | `@texuli/date` (`CalendarDate`, Gregorian only) |
 | Class helpers from those packages | `texuli/cx` only |
+
+## New in 0.6.0
+
+These APIs ship in `0.6.0`; `0.5.0` does not have them. Use them with
+`^0.6.0`, and keep code pinned to `^0.5.0` on the old API.
+
+| Need | Use |
+| --- | --- |
+| Motion on components | `motion` prop (`{ enter, exit, layout, duration }` by name, or `false`) on dialogs, sheets, popovers, menus, tooltips, toasts, tabs, accordions, `Board` and `DataGrid`; `MotionProvider` (`level`: `full`, `subtle`, `none`; `reducedMotion`) from `texuli/motion` |
+| Motion in your own code | `animate`, `createMotionPresence`, `createFlip`, `createSharedElements`, `timeline`, `stagger` from `@texuli/core/motion`; springs from `@texuli/core/motion/spring`; tokens from `@texuli/tokens/motion` (`MOTION_DURATIONS`, `MOTION_EASINGS`, `MOTION_SPRINGS`). Instant on the server and under reduced motion |
+| One component contract | `bind:ref` and rest attributes (`id`, `aria-*`, `data-*`, `class`, `style`, handlers) on every exported primitive part and styled component; caller handlers run first (`preventDefault()` skips the part's action); a `Field`'s `{...control.props}` reach the focusable control (`docs/STANDARDS.md`, "Component API contract") |
+| Paint while an agent writes | `<Player stream={source}>` (`@texuli/player`) with `createBlueprintStream` from `@texuli/spec/stream`; check a streamed node yourself with `validateStreamNode` (`@texuli/catalog/validate`). `validateDraft` stays the only verdict |
+| Motion in a blueprint | Node `motion` and envelope `motion.level` (spec 0.6.0): closed preset names, never CSS or milliseconds; checks in `@texuli/spec/motion` |
+| A stage without the default renderers | `DeckStageCore` from `@texuli/slides/stage-core`; prepared decks (`prepareDeckV2`, `isPreparedDeck`, developer tier only), `loadDeckMigration`, a `tools` toolbar snippet on `@texuli/slides/stage`; `preloadDeckPrintView` on `@texuli/slides/export` |
+| Escaped XML or HTML, ZIP files | `el`, `serializeHtml`, `serializeXml`, `linkUrl`, `imageUrl` from `@texuli/core/markup`; `writeZip`, `writeZipAsync` from `@texuli/core/zip` |
+| Mentions in Markdown | `createInlineExtensions` (`@texuli/core/editor-model`) passed as `extensions` to `markdownToDocument` and `documentToMarkdown` (`<sigil>{id\|label}`) |
+| Filter catalogs and saved segments | `operators`, `groups`, `parseSegment`, `serializeSegment` in `@texuli/data/filter-builder` |
+| Dialogs in a framed preview | `mode="contained"` + `container`, `onDismissRequest`, `onCloseAutoFocus` on `Dialog`, `AlertDialog`, `CommandPalette`; `Toaster` `mode="contained"` |
+| Chat reading position | `bind:anchor` + `onAnchorChange`, `avatarSrcset`, `onEditUnchanged` on `MessageList` / `ChatThread` |
+| Grid and board options | `DataGrid` `activateOnClick`, `mode="table"`, column `hideBelow`; `Board` column `description`, `columnHeader` snippet, column-only mode without `getRank` |
+| Other additions | Tab `badgeLabel`; toast `action.retryOnError`; `TagsInput` `readonly` and list `delimiter`; `CardGrid` `gap`; date `hideLabel`, `defaultFocusedValue`, `DateRangePicker` `required`; `ContentLayout` `onActiveHeadingChange`; `MarketingSectionHeader` (`texuli/layouts/marketing/section`); `AppearanceSwitcher` `size="sm"`; inbox `allowMarkUnread`; cohort `heatScale` |
+
+Behavior changes to expect in `0.6.0` are in
+[`../../upgrade/SKILL.md`](../../upgrade/SKILL.md) and `docs/RELEASE.md` in
+the Texuli repository ("0.6.0").
 
 ## New in 0.5.0
 

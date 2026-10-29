@@ -87,7 +87,7 @@ interpreting arbitrary CSS.
   media (no golden uses a media id yet, so no cross-target trace covers these
   widgets).
 
-**Motion (spec 0.6.0, unreleased).** The generated decoders read a node's
+**Motion (spec 0.6.0).** The generated decoders read a node's
 closed `motion` and the envelope's `motion.level`; anything outside the
 vocabulary is refused with `schema`, the same code as TypeScript (the four
 `motion-*` invalid fixtures run in `InvalidFixtureParityTest`). The render

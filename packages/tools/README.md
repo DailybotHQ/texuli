@@ -10,9 +10,9 @@ catalog trees in any host, Svelte or not. A golden set of interface tasks
 with an offline scorer measures how well an agent builds with the catalog.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
-> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
+> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
+> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
 
 ## Install
 

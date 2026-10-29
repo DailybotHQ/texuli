@@ -216,7 +216,7 @@ reflect this decision.
   `io.github.dailybothq` — a GitHub-account namespace, verifiable without a
   domain.
 - **Choice:** `com.texuli`, artifacts `texuli-spec` and `texuli-compose`,
-  versions tracking the npm release line they mirror (`0.5.0`).
+  versions tracking the npm release line they mirror (`0.6.0`).
 - **Why:** texuli.com is owned and deployed, so the Central Portal can verify
   the namespace by DNS, and the group matches the Kotlin package names the
   sources already use (`com.texuli.spec.runtime`, `com.texuli.compose`).
@@ -687,6 +687,8 @@ reflect this decision.
   painting registry into an L8 integration and the editor down, as ADR-009
   describes for slides). The engine must never take a framework; split the
   framework part out instead.
+
+- **Addendum (2026-10-29, PLAN_010 T-doc-collab): `@texuli/document/collab`.** The document-to-CRDT binding (projection, diff, commit, comments, suggestions, versions and presence for documents) is its own subpath, `collab`, next to `sync`: ADR-010 keeps `sync` free of any other `@texuli/document` import so canvas, sheets and dashboards can reuse it, and the binding needs the model, ops and schema. `@texuli/pages/collab` is its UI.
 
 ## ADR-012: Spec evolution: one additive minor per release wave
 

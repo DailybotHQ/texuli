@@ -159,7 +159,7 @@ the behavior scenario `tests/behavior/scenarios/sortable.spec.ts`.
 
 **Brief shape:** an automation, approval or pipeline the person edits as
 nodes and edges, or a read-only diagram of one. `@texuli/workflows` is in
-development and on npm as `0.5.0`.
+development and on npm as `0.6.0`.
 
 ```svelte
 <script lang="ts">

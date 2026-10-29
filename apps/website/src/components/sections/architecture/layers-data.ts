@@ -78,7 +78,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       },
       {
         name: '@texuli/document',
-        role: 'In development, in the repository only (first release planned for 0.7.0): the framework-free, DOM-free document engine: the block document format with persisted ids, the validator on the deck schema kit, typed operations and bounded RFC 6902 patches with inverses and an op log, Markdown through the core codec, and the CRDT sync core (sync); pagination, DOCX and PDF are planned',
+        role: 'In development, in the repository only (first release planned for 0.7.0): the framework-free, DOM-free document engine: the block document format with persisted ids, the validator on the deck schema kit, typed operations and bounded RFC 6902 patches with inverses and an op log, Markdown through the core codec, the pagination engine (paged), owned DOCX and PDF writers (docx, pdf), and the CRDT sync core (sync)',
         dependsOn: ['core', 'deck'],
       },
     ],
@@ -206,7 +206,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       },
       {
         name: '@texuli/pages',
-        role: 'In development, in the repository only (first release planned for 0.7.0): the block document editor and reader on @texuli/document: text through @texuli/editor, a slash menu, block selection and drag on @texuli/drag, nested pages, resizable columns and live embeds painted by the player (editor, reader); the paged view, export and collaboration are planned',
+        role: 'In development, in the repository only (first release planned for 0.7.0): the block document editor and reader on @texuli/document: text through @texuli/editor, a slash menu, block selection and drag on @texuli/drag, nested pages, resizable columns and live embeds painted by the player (editor, reader), the paged view and print (paged) and Markdown, DOCX and PDF export (export); collaboration is planned',
         dependsOn: [
           'blocks',
           'core',
@@ -331,7 +331,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
     layer: 'L3',
     runtimes: {
       web: {
-        text: 'Ships: styled components are published on npm as 0.5.0.',
+        text: 'Ships: styled components are published on npm as 0.6.0.',
         sources: [],
       },
       native: {

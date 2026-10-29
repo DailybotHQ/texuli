@@ -141,6 +141,54 @@ Move the backup back into the host's skills folder and verify it with
 - **Offline-safe.** An unreachable network ends with a report, never a
   partial install.
 
+## Texuli packages 0.6.0: breaking changes
+
+This sub-skill never upgrades packages; moving an app from `^0.5.0` to
+`^0.6.0` is the developer's install ([`../components/SKILL.md`](../components/SKILL.md)).
+Under 0.x a new minor may break. Before that move, check the app for:
+
+- **Field ids reach the focusable control:** `FileUpload`'s `id` lands on
+  the file input and `TagsInput`'s on its text input (both were on the
+  wrapper); `DatePicker`, `DateRangePicker` and `TimeField` put `id` on
+  their first segment and, inside a `Field`, hide their own label (the
+  Field's label names them).
+- **`InputGroup`:** `id`, `aria-*`, `data-*` and handlers reach the input
+  (`aria-*` and `data-*` were on the group).
+- **Caller handlers on more parts:** menu items, the navigation menu, toast
+  roots and viewports, the tree, splitter handles, the command input, the
+  carousel and the input group run a caller's handler first, then their
+  own unless the caller called `event.preventDefault()`; they no longer
+  drop or replace it.
+- **`texuli/avatar`:** `data-avatar` is `initials` after an image error.
+- **Dates:** `@texuli/primitives/date-field` (and the styled date
+  controls) report no value until the year has four digits.
+- **Reduced motion is `0s`:** `base.css` and the player set durations and
+  delays to `0s` (it was `0.01ms`), so no `transitionend` fires under
+  reduced motion.
+- **Motion through the runtime:** the toast, tooltip and slides stage CSS
+  keyframes (`tx-toast-in`, `tx-toast-out`, `tx-tooltip-in`,
+  `tx-deck-slide-*`) are gone; a closing overlay stays mounted, `inert`,
+  until its exit ends (at most 1.2 s). Override with the `motion` prop or a
+  `MotionProvider` from `texuli/motion`, not CSS keyframes; tests that
+  expect an overlay to leave at once run under reduced motion or
+  `motion={false}`.
+- **`Toaster`:** no top-layer viewport while it has no toasts.
+- **`@texuli/chat`:** the day separator is its own row above the avatar and
+  bubbles; CSS on the old structure needs a look.
+- **Types:** `FilterCondition.operator` widens to
+  `FilterOperator | FilterCustomOperatorId` (add a default branch to an
+  exhaustive `switch`); `AccordionRootProps` and `SliderRootProps` members
+  are type aliases.
+- **Spec 0.6.0:** validated drafts carry `spec: "0.6.0"`; a host that
+  compares the string must accept it.
+
+Not breaking: `DeckStage` now preloads its default renderers in server
+builds, so the server render keeps slide content; `DateRangePicker`'s
+`onInvalid` gains a third `{ side }` argument.
+
+New APIs in `0.6.0` (none of them in `0.5.0`) are listed in
+[`../build-ui/references/imports.md`](../build-ui/references/imports.md).
+
 ## Texuli packages 0.5.0: breaking changes
 
 This sub-skill never upgrades packages; moving an app from `^0.4.0` to

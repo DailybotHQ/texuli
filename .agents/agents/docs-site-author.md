@@ -48,7 +48,7 @@ from `main` to Cloudflare Pages, so merged copy is public.
 5. CSS: the site's `--tx-*` tokens, logical properties, light, dark and
    forced colors.
 6. Copy: mark planned features as planned. The packages are on npm
-   as `0.5.0` (pre-1.0), not a stable release; the agent service and
+   as `0.6.0` (pre-1.0), not a stable release; the agent service and
    analytics are not provisioned. Never invent numbers, URLs or status.
 7. Agent surfaces: a new area updates `src/components/seo/llms-site.ts` and
    the regenerated `public/llms.txt`; docs pages get their Markdown twin

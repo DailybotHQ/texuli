@@ -203,7 +203,7 @@ deck.
 A host that paints a blueprint while an agent writes it (ADR-014;
 `<Player stream>` in `@texuli/player`) checks each node as its shell
 arrives: every member but `children`, read by `@texuli/spec/stream`. These
-functions are in the repository and unreleased (planned for `0.7.0`).
+functions are new in `0.6.0`.
 
 | Export | What it does |
 | --- | --- |

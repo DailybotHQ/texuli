@@ -57,17 +57,20 @@ afterEach(() => {
 });
 
 describe('motion page: copy and safety', () => {
-  it('says the motion system is in development and ships in 0.6.0, and names 0.5.0 as on npm', () => {
+  it('says the motion system is in development and on npm from 0.6.0, and that 0.5.0 is without it', () => {
     const copy = PAGE.replace(/\s+/g, ' ');
     expect(MOTION_RELEASE).toBe('0.6.0');
-    expect(copy).toContain('texuli/motion · in development · ships in {MOTION_RELEASE}');
+    expect(copy).toContain('texuli/motion · in development · on npm from {MOTION_RELEASE}');
     expect(copy).toContain(
-      'The motion system is in development and ships in <code>{MOTION_RELEASE}</code>; the packages on npm today are <code>0.5.0</code>, a pre-1.0 release, without it.'
+      'The motion system is in development and on npm from <code>{MOTION_RELEASE}</code>, a pre-1.0 release; the previous release, <code>0.5.0</code>, is without it.'
     );
-    expect(copy).toContain('Spec <code>0.6.0</code> is unreleased.');
+    expect(copy).toContain(
+      'Spec <code>0.6.0</code> ships in the <code>0.6.0</code> release of <code>@texuli/spec</code>.'
+    );
+    expect(copy).not.toMatch(/unreleased|ships in \{MOTION_RELEASE\}/);
     // The contract story separates what 0.5.0 shipped from what 0.6.0 adds.
     expect(copy).toMatch(/<code>0\.5\.0<\/code> brought <code>bind:ref<\/code>/);
-    expect(copy).toContain('The rest is in development for <code>{MOTION_RELEASE}</code>');
+    expect(copy).toContain('<code>{MOTION_RELEASE}</code> brings the rest');
     for (const [path, source] of SOURCES) {
       expect(source, path).not.toMatch(/not (?:yet )?on npm|production[- ]ready|is released/i);
     }

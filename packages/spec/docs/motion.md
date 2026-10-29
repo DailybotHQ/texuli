@@ -10,9 +10,9 @@
 **Decisions:** [ADR-012](../../../docs/DECISIONS.md#adr-012-spec-evolution-one-additive-minor-per-release-wave),
 [ADR-013](../../../docs/DECISIONS.md#adr-013-motion-runtime-web-animations-with-an-owned-spring-solver)
 
-> **Status: unreleased.** Spec `0.6.0` is the open pin for release 0.6.0;
-> until that release publishes, later normative changes amend this pin
-> (ADR-012). `@texuli/spec@0.5.0` on npm carries spec `0.5.0`, without motion.
+> **Status: released in `@texuli/spec@0.6.0`.** Spec `0.6.0` is pinned for
+> release 0.6.0 (ADR-012); a later normative change takes a new spec
+> version. `@texuli/spec@0.5.0` carries spec `0.5.0`, without motion.
 
 Agents declare motion as data: named presets and token steps. A blueprint
 never carries CSS, keyframes, easing curves, durations in milliseconds or

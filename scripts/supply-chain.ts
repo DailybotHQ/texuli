@@ -69,6 +69,10 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   '@texuli/chat': [],
   // @texuli/editor has only internal runtime deps (published from 0.5.0).
   '@texuli/editor': [],
+  // In the repository only until their first release (planned for 0.7.0);
+  // only internal runtime deps.
+  '@texuli/document': [],
+  '@texuli/pages': [],
   '@texuli/data': [],
   '@texuli/media': [],
   '@texuli/blocks': [],
@@ -271,7 +275,7 @@ export function checkRuntimeAllowlist(packages: readonly WorkspacePackage[]): Su
     const deps = pkg.manifest.dependencies ?? {};
     for (const [dep, range] of Object.entries(deps)) {
       if (isWorkspaceRange(range) || isInternalName(dep)) {
-        // Internal deps may be pinned to exact versions (0.5.0)
+        // Internal deps may be pinned to exact versions (0.6.0)
         // instead of workspace: ranges; they are still
         // workspace packages, resolved by the workspace, not externals.
         if (!isInternalName(dep) && !names.has(dep)) {

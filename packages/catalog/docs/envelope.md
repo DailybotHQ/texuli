@@ -148,7 +148,7 @@ no `spec`, which was written for the undeclared baseline `0.2.0`. An explicit
 envelope carries it. `parseEnvelope` alone refuses `"spec": "0.2.0"`, like
 any other version off the list, with `unsupported-spec`.
 
-From spec 0.6.0 (unreleased) the envelope may declare `motion: { level }`
+From spec 0.6.0 (new in `0.6.0`) the envelope may declare `motion: { level }`
 (`full`, `subtle` or `none`), the level its node motion plays at. Anything
 else (another field, a duration, a level off the list) is an
 `invalid-motion` error. Node `motion` is checked by the renderer with the

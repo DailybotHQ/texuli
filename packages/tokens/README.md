@@ -13,9 +13,9 @@ components, or on its own as a framework-free token engine for any CSS
 runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
-> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
+> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
+> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
 
 ## Install
 
@@ -89,6 +89,7 @@ const css = compileThemeCss(theme);
 | Forced colors | `forced-colors` | `compileForcedColorsCss` and the system-color role map |
 | Style presets | `style-presets` | Shared style presets on top of the contract |
 | Tailwind 4 | `tailwind` | Utilities mapped onto the `--tx-*` contract |
+| Motion tokens | `motion` | New in `0.6.0`: 5 durations, 5 easings and 3 springs as data (`MOTION_DURATIONS`, `MOTION_EASINGS`, `MOTION_SPRINGS`), behind the `--tx-motion-*` properties in `base.css` |
 
 The root entry (`@texuli/tokens`) re-exports the engine areas; the theme
 libraries and `build` stay behind their subpaths so unused themes are never
@@ -113,6 +114,17 @@ With Tailwind 4, import in this order: `tailwindcss`, then
   `dir="rtl"`.
 - **SSR-friendly.** No module touches `window` or `document` at import time;
   only the functions that write to an element or read storage do.
+
+## New in 0.6.0
+
+Ships in `0.6.0`; the `0.5.0` release predates it:
+
+- `@texuli/tokens/motion` and the `--tx-motion-*` properties, which reduced
+  motion zeroes ([tokens-motion](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-motion.md)).
+- **Breaking:** under `prefers-reduced-motion: reduce`, `base.css` sets
+  animation and transition durations and delays to `0s` (it was `0.01ms`),
+  so `visibility` changes are instant (G78); a `0s` transition fires no
+  `transitionend`.
 
 ## Documentation
 

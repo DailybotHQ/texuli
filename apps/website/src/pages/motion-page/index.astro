@@ -52,18 +52,18 @@ await run.finished; // "finished", or "instant" under reduced motion`;
 
 <BaseLayout
   title="Motion"
-  description="Texuli motion (in development, ships in 0.6.0): presence, FLIP layout, shared elements, timelines and springs on the Web Animations API, motion tokens, levels, reduced motion, and motion as blueprint data."
+  description="Texuli motion (in development, on npm from 0.6.0): presence, FLIP layout, shared elements, timelines and springs on the Web Animations API, motion tokens, levels, reduced motion, and motion as blueprint data."
 >
   <div class="motion-page" data-tx-motion-page="">
     <header class="motion-page__hero">
-      <p class="eyebrow">texuli/motion · in development · ships in {MOTION_RELEASE}</p>
+      <p class="eyebrow">texuli/motion · in development · on npm from {MOTION_RELEASE}</p>
       <h1>Motion that respects the reader</h1>
       <p class="lead">
         One small runtime moves every Texuli surface: overlays enter and leave, lists glide, a card
         grows into its detail view, timelines play on one clock, springs settle. The browser does the
         interpolation through the Web Animations API, and reduced motion is instant by construction.
-        The motion system is in development and ships in <code>{MOTION_RELEASE}</code>; the packages
-        on npm today are <code>0.5.0</code>, a pre-1.0 release, without it.
+        The motion system is in development and on npm from <code>{MOTION_RELEASE}</code>, a pre-1.0
+        release; the previous release, <code>0.5.0</code>, is without it.
       </p>
       <ol class="pieces" aria-label="The pieces of @texuli/core/motion">
         {
@@ -153,7 +153,7 @@ await run.finished; // "finished", or "instant" under reduced motion`;
             <code>layout</code>, <code>stagger</code> (<code>none</code>, <code>fast</code>, <code
               >base</code
             >) and <code>duration</code> (<code>fast</code>, <code>base</code>, <code>slow</code>); the
-            envelope may set a <code>level</code>. Spec <code>0.6.0</code> is unreleased.
+            envelope may set a <code>level</code>. Spec <code>0.6.0</code> ships in the <code>0.6.0</code> release of <code>@texuli/spec</code>.
           </p>
           <GuideCode code={MOTION_BLUEPRINT_JSON} label="The motion blueprint (JSON)" lang="text" />
           <h3>The refused node</h3>
@@ -191,9 +191,9 @@ await run.finished; // "finished", or "instant" under reduced motion`;
       <p>{section('api-contract').summary}</p>
       <p class="status">
         <code>0.5.0</code> brought <code>bind:ref</code> and rest attributes to about 40 components and
-        made the inputs and 14 primitive parts compose a caller's handlers. The rest is in development
-        for <code>{MOTION_RELEASE}</code>: the remaining parts, the Field rule, and a contract test that
-        derives every component from the package exports, so a new export without a case fails.
+        made the inputs and 14 primitive parts compose a caller's handlers. <code>{MOTION_RELEASE}</code>
+        brings the rest: the remaining parts, the Field rule, and a contract test that derives every
+        component from the package exports, so a new export without a case fails.
       </p>
       <ul class="contract">
         {
