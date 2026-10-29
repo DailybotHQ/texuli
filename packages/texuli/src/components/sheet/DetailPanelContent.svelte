@@ -6,8 +6,14 @@ import { detailPanelContentClass, type SheetSize } from './variants.ts';
 import './sheet.css';
 
 type Props = ComponentProps<typeof Primitive.Content> & { size?: SheetSize; class?: ClassValue };
-let { size = 'md', side = 'end', class: className, ...rest }: Props = $props();
+let {
+  size = 'md',
+  side = 'end',
+  class: className,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 const classes = $derived(cx(detailPanelContentClass({ size }), className));
 </script>
 
-<Primitive.Content {...rest} {side} class={classes} data-tx-detail-panel="" data-size={size} />
+<Primitive.Content bind:ref {...rest} {side} class={classes} data-tx-detail-panel="" data-size={size} />

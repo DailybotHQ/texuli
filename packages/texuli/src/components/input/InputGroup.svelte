@@ -1,9 +1,16 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes, HTMLInputAttributes } from 'svelte/elements';
+import { splitControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import './field.css';
 
+/**
+ * Extra attributes follow the control rule: `id`, `aria-*`, `data-*`, handlers
+ * and form attributes reach the input (the focusable control, also `ref`);
+ * layout hooks (`style`, `hidden`…) stay on the group. With `children` (a
+ * custom control) they all stay on the group.
+ */
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   class?: ClassValue;
   /** Start adornment (icon, unit, …). */
@@ -13,6 +20,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Native input attributes applied to the control. */
   inputProps?: Omit<HTMLInputAttributes, 'value' | 'class' | 'files'>;
   value?: string;
+  /** The input element (bindable). */
   ref?: HTMLInputElement | null;
   disabled?: boolean;
   readonly?: boolean;
@@ -40,15 +48,23 @@ let {
   onValueChange,
   onClear,
   children,
+  id,
   ...rest
 }: Props = $props();
 
+const split = $derived(splitControlProps(rest));
+
 const showClear = $derived(clearable && !disabled && !readonly && Boolean(value));
 
-/** Sync `value` first, then run `inputProps.oninput` (it never replaces this one). */
+/**
+ * Sync `value` first, then run the caller's `oninput` (it never replaces this
+ * one): `input` cannot be prevented, and the caller reads the new `value`.
+ */
 function onInput(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
   value = event.currentTarget.value;
   onValueChange?.(value);
+  const caller = split.control.oninput;
+  if (typeof caller === 'function') caller(event);
   inputProps.oninput?.(event as Parameters<NonNullable<typeof inputProps.oninput>>[0]);
 }
 
@@ -65,7 +81,7 @@ function clear() {
   data-tx-input-group=""
   data-tx-disabled={disabled ? 'true' : undefined}
   data-tx-invalid={invalid ? 'true' : undefined}
-  {...rest}
+  {...children ? { ...rest, id } : split.wrapper}
 >
   {#if start}
     <span class="tx-input-group__adornment" data-tx-slot="start">
@@ -78,11 +94,13 @@ function clear() {
   {:else}
     <input
       bind:this={ref}
+      {...split.control}
+      {id}
       class="tx-input-group__control"
       {value}
       {disabled}
       {readonly}
-      aria-invalid={invalid ? 'true' : undefined}
+      aria-invalid={invalid ? 'true' : (split.control['aria-invalid'] as 'true' | undefined)}
       data-tx-input=""
       {...inputProps}
       oninput={onInput}

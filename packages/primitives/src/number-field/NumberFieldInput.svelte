@@ -3,6 +3,7 @@ import { untrack } from 'svelte';
 import { createAttachmentKey } from 'svelte/attachments';
 import type { HTMLInputAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { numberFieldContext } from './context.ts';
 import { inputModeFor, isPartialNumber } from './number.ts';
 
@@ -17,7 +18,7 @@ type NumberFieldInputProps = Omit<HTMLInputAttributes, 'value' | 'type'> & {
   child?: ChildSnippet<Record<string, unknown>>;
 };
 
-let { child, ...rest }: NumberFieldInputProps = $props();
+let { child, ref = $bindable(null), ...rest }: NumberFieldInputProps & RefProp = $props();
 const field = numberFieldContext.get();
 // A consumer id wins: the context records it, so every reference follows.
 field.claimId(
@@ -129,5 +130,5 @@ const inputProps = $derived({
 {#if child}
   {@render child({ props: { ...inputProps, [attachKey]: attachInput } })}
 {:else}
-  <input {...inputProps} {@attach attachInput} />
+  <input bind:this={ref} {...inputProps} {@attach attachInput} />
 {/if}

@@ -1,6 +1,8 @@
 <script lang="ts">
 import { onDestroy, type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { menuLevelContext } from './context.ts';
 import { graceArea } from './grace.ts';
 
@@ -10,9 +12,22 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Milliseconds a pointer rests before the submenu opens. Default 100. */
   openDelay?: number;
   children?: Snippet;
-};
+} & RefProp;
 
-let { disabled = false, textValue, openDelay = 100, children, ...rest }: Props = $props();
+let {
+  disabled = false,
+  textValue,
+  openDelay = 100,
+  children,
+  ref = $bindable(null),
+  onfocus,
+  onblur,
+  onkeydown,
+  onpointerenter,
+  onpointerleave,
+  onclick,
+  ...rest
+}: Props = $props();
 const sub = menuLevelContext.get();
 // A consumer id wins: the context records it, so every reference follows.
 sub.claimId(
@@ -76,7 +91,7 @@ function pointerLeave(event: PointerEvent): void {
 }
 </script>
 
-<div
+<div bind:this={ref}
   {...rest}
   id={sub.triggerId}
   role="menuitem"
@@ -89,14 +104,14 @@ function pointerLeave(event: PointerEvent): void {
   data-disabled={disabled ? '' : undefined}
   data-highlighted={highlighted ? '' : undefined}
   data-typeahead={textValue}
-  onfocus={() => (highlighted = true)}
-  onblur={() => (highlighted = false)}
-  onkeydown={openFromKeyboard}
-  onpointerenter={pointerEnter}
-  onpointerleave={pointerLeave}
-  onclick={() => {
+  onfocus={chainHandlers(onfocus, () => (highlighted = true))}
+  onblur={chainHandlers(onblur, () => (highlighted = false))}
+  onkeydown={composeHandlers(onkeydown, openFromKeyboard)}
+  onpointerenter={composeHandlers(onpointerenter, pointerEnter)}
+  onpointerleave={chainHandlers(onpointerleave, pointerLeave)}
+  onclick={composeHandlers(onclick, () => {
     if (!disabled && !sub.open) sub.setOpen(true, 'first');
-  }}
+  })}
   {@attach register}
 >
   {@render children?.()}

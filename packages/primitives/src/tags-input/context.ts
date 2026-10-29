@@ -4,6 +4,7 @@ import type { TagsInputLabels } from './labels.ts';
 export interface TagsInputContext {
   readonly tags: readonly string[];
   readonly disabled: boolean;
+  readonly readonly: boolean;
   readonly invalid: boolean;
   readonly labels: TagsInputLabels;
   /** The one-character delimiter that adds a tag when typed, if any. */

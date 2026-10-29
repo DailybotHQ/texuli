@@ -3,19 +3,20 @@ import { directionOf } from '@texuli/core/dir-locale';
 import { getNavigationIntent } from '@texuli/core/keyboard';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { navigationMenuContext } from './context.ts';
 
 type ListProps = HTMLAttributes<HTMLUListElement> & { children?: Snippet };
 
-let { children, ...rest }: ListProps = $props();
+let { children, ref = $bindable(null), onkeydown, ...rest }: ListProps & RefProp = $props();
 const context = navigationMenuContext.get();
-let list: HTMLUListElement | undefined = $state();
 
 /** The top-level controls: each item's trigger or link (not content inside it). */
 function controls(): HTMLElement[] {
-  if (!list) return [];
+  if (!ref) return [];
   return Array.from(
-    list.querySelectorAll<HTMLElement>(
+    ref.querySelectorAll<HTMLElement>(
       ':scope > li > [data-nav-trigger], :scope > li > [data-nav-link]'
     )
   ).filter((element) => !element.hasAttribute('disabled'));
@@ -25,10 +26,10 @@ function controls(): HTMLElement[] {
 function onKeydown(event: KeyboardEvent): void {
   const items = controls();
   const index = items.indexOf(event.target as HTMLElement);
-  if (index < 0 || !list) return;
+  if (index < 0 || !ref) return;
   const intent = getNavigationIntent(event, {
     orientation: context.orientation,
-    direction: directionOf(list),
+    direction: directionOf(ref),
   });
   const target =
     intent === 'next'
@@ -46,6 +47,11 @@ function onKeydown(event: KeyboardEvent): void {
 }
 </script>
 
-<ul bind:this={list} data-orientation={context.orientation} {...rest} onkeydown={onKeydown}>
+<ul
+  bind:this={ref}
+  data-orientation={context.orientation}
+  {...rest}
+  onkeydown={composeHandlers(onkeydown, onKeydown)}
+>
   {@render children?.()}
 </ul>

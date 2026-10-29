@@ -3,15 +3,16 @@ import { type Snippet, untrack } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getHoverCardContext } from './context.ts';
 
 type TriggerProps = Record<string, unknown> & { attach: Attachment<HTMLElement> };
 type Props = Omit<HTMLButtonAttributes, 'children'> & {
   child?: ChildSnippet<TriggerProps>;
   children?: Snippet;
-};
+} & RefProp;
 
-let { child, children, ...consumerProps }: Props = $props();
+let { child, children, ref = $bindable(null), ...consumerProps }: Props = $props();
 const context = getHoverCardContext();
 // A consumer id wins: the context records it, so every reference follows.
 context.claimId(
@@ -49,7 +50,7 @@ const triggerProps = $derived(composeChildProps(baseProps, consumerProps));
   {@render child({ props: triggerProps })}
 {:else}
   {@const { attach: _attach, ...domProps } = triggerProps}
-  <button {@attach triggerAttachment} {...domProps}>
+  <button bind:this={ref} {@attach triggerAttachment} {...domProps}>
     {@render children?.()}
   </button>
 {/if}

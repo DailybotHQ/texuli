@@ -11,6 +11,7 @@ import {
   rangeLimit,
   toCalendarDate,
 } from '@texuli/primitives/date-picker';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type DateSize, dateCalendarClass } from './variants.ts';
 import './date.css';
@@ -22,7 +23,7 @@ import './date.css';
  * (`aria-selected` on every day, start and end marked) and two picks choose
  * a new range.
  */
-interface Props {
+interface OwnProps {
   /** `bind:value`: the selected day as `YYYY-MM-DD`, or `null`. */
   value?: string | null;
   onValueChange?: (value: string) => void;
@@ -53,6 +54,12 @@ interface Props {
   class?: ClassValue;
 }
 
+type Props = OwnProps &
+  Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'> & {
+    /** The rendered calendar root (bindable). */
+    ref?: HTMLElement | null;
+  };
+
 let {
   value = $bindable(null),
   onValueChange,
@@ -74,6 +81,8 @@ let {
   nextLabel = 'Next month',
   label,
   class: className,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
 
 const selected = $derived(toCalendarDate(value));
@@ -139,9 +148,11 @@ provideDateRange({
 </script>
 
 <Primitive.Root
+  bind:ref
   class={dateCalendarClass({ size, class: cx(className) })}
   role="group"
   aria-label={label}
+  {...rest}
   value={rangeMode ? null : selected}
   {...focusStart ? { defaultFocusedValue: focusStart } : {}}
   {locale}

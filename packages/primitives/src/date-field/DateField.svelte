@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { RefProp } from '../internal/ref.ts';
 import {
   type DateSegment,
   dateSegmentLabel,
@@ -13,6 +14,7 @@ let {
   value = $bindable(null),
   locale,
   label = 'Date',
+  inputId,
   name,
   disabled = false,
   required = false,
@@ -22,8 +24,9 @@ let {
   onInvalid,
   children,
   class: className,
+  ref = $bindable(null),
   ...rest
-}: DateFieldRootProps = $props();
+}: DateFieldRootProps & RefProp = $props();
 
 const order = $derived(dateSegmentOrder(locale));
 const parsed = $derived(parseDate(value));
@@ -106,14 +109,14 @@ const limits: Record<DateSegment, { min: number; max: number }> = {
 };
 </script>
 
-<div
+<div bind:this={ref}
   {...rest}
   class={className}
   role="group"
-  aria-label={label}
+  aria-label={rest['aria-label'] ?? label}
   data-tx-date-field-root=""
 >
-  {#each order as segment (segment)}
+  {#each order as segment, index (segment)}
     <input
       type="number"
       inputmode="numeric"
@@ -122,8 +125,10 @@ const limits: Record<DateSegment, { min: number; max: number }> = {
       aria-valuemax={limits[segment].max}
       min={limits[segment].min}
       max={limits[segment].max}
+      id={index === 0 ? inputId : undefined}
       value={fields[segment]}
-      aria-invalid={issue ? 'true' : undefined}
+      aria-describedby={rest['aria-describedby']}
+      aria-invalid={issue ? 'true' : rest['aria-invalid']}
       {disabled}
       {required}
       oninput={(event) => commit(segment, event.currentTarget.value)}

@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLInputAttributes } from 'svelte/elements';
 import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import {
   acceptsValue,
   clampLength,
@@ -60,10 +61,15 @@ let {
   onselect,
   onkeyup,
   onpointerup,
+  ref = $bindable(null),
   ...rest
-}: RootProps = $props();
+}: RootProps & RefProp = $props();
 
 const generatedId = $props.id();
+// `ref` is the real input: the element that receives the other attributes.
+$effect(() => {
+  ref = inputRef ?? null;
+});
 const length = $derived(clampLength(maxlength));
 const rules = $derived({ maxlength: length, pattern });
 let isFocused = $state(false);

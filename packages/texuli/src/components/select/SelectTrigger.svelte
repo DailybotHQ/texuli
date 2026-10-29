@@ -11,7 +11,14 @@ type Props = ComponentProps<typeof PrimitiveTrigger> & {
   variant?: SelectVariant;
 };
 
-let { children, class: className, size = 'md', variant = 'outline', ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  size = 'md',
+  variant = 'outline',
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const classes = $derived(
   selectTriggerClass({
@@ -22,7 +29,7 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveTrigger class={classes} data-tx-select-trigger data-size={size} data-variant={variant} {...rest}>
+<PrimitiveTrigger bind:ref class={classes} data-tx-select-trigger data-size={size} data-variant={variant} {...rest}>
   <span class="tx-select-trigger__body">
     {@render children?.()}
   </span>

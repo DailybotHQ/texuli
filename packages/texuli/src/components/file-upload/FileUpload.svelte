@@ -6,19 +6,26 @@ import {
   type FileDropRejectReason,
 } from '@texuli/primitives/file-drop';
 import type { HTMLAttributes } from 'svelte/elements';
+import { joinIds } from '../../internal/control-props.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { chainHandlers } from '../../internal/handlers.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import type { FileUploadLabels, FileUploadProgressMap } from './types.ts';
 import { type FileUploadVariant, fileUploadClass } from './variants.ts';
 import './file-upload.css';
 
 /**
- * Extra attributes land on the wrapper (`aria-*` and `data-*` on the file
- * input). Caller `onchange`, `ondrop` and drag handlers run on the wrapper as
+ * Extra attributes land on the wrapper (`id`, `aria-*`, `data-*`, `onfocus` and
+ * `onblur` on the file input, so `<label for>` and Field reach the focusable
+ * control). Caller `onchange`, `ondrop` and drag handlers run on the wrapper as
  * the events bubble out of the drop zone: after the zone's own handling,
  * never instead of it.
  */
-type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'id'> & {
+  /** The file input's id (`<label for>`, Field). Generated when omitted. */
+  id?: string;
+  /** Same as `id`; `inputId` wins when both are given. */
+  inputId?: string;
   files?: File[];
   rejects?: FileDropRejection[];
   accept?: string;
@@ -62,12 +69,15 @@ let {
   onFilesAdd,
   onFileRemove,
   class: className,
+  id,
+  inputId,
   onchange,
   ondrop,
   onchangecapture,
   ondropcapture,
+  ref = $bindable(null),
   ...rest
-}: Props = $props();
+}: Props & RefProp = $props();
 
 /** The list before a pick or drop reaches the zone (set in the capture phase). */
 let before: File[] | null = null;
@@ -185,17 +195,15 @@ function itemStatus(file: File): 'pending' | 'uploading' | 'done' | 'error' {
   return 'pending';
 }
 
-// aria-* and data-* name and wire the file input (the focusable control);
-// handlers and layout hooks stay on the drop-zone wrapper.
+// aria-*, data-* and the focus handlers (focus does not bubble) name and
+// wire the file input (the focusable control); other handlers and layout
+// hooks stay on the drop-zone wrapper.
+const toInput = (key: string) => /^(?:aria-|data-|onfocus$|onblur$)/.test(key);
 const inputAttrs = $derived(
-  Object.fromEntries(
-    Object.entries(rest).filter(([key]) => key.startsWith('aria-') || key.startsWith('data-'))
-  )
+  Object.fromEntries(Object.entries(rest).filter(([key]) => toInput(key)))
 );
 const wrapperAttrs = $derived(
-  Object.fromEntries(
-    Object.entries(rest).filter(([key]) => !key.startsWith('aria-') && !key.startsWith('data-'))
-  )
+  Object.fromEntries(Object.entries(rest).filter(([key]) => !toInput(key)))
 );
 
 function itemProgress(file: File): number | null | undefined {
@@ -203,7 +211,7 @@ function itemProgress(file: File): number | null | undefined {
 }
 </script>
 
-<div
+<div bind:this={ref}
   class={rootClass}
   data-tx-file-upload
   data-variant={variant}
@@ -223,6 +231,7 @@ function itemProgress(file: File): number | null | undefined {
     {disabled}
     {required}
     {name}
+    {...(inputId ?? id) ? { inputId: inputId ?? id } : {}}
     label={labels.label}
     inputLabel={labels.inputLabel}
     browseLabel={labels.browse}
@@ -233,7 +242,16 @@ function itemProgress(file: File): number | null | undefined {
   >
     {#snippet child({ props })}
       <label class="tx-file-upload__browse" for={String(props.id)}>{labels.browse}</label>
-      <input {...props} {...inputAttrs} class="tx-file-upload__input" />
+      <input
+        {...props}
+        {...inputAttrs}
+        aria-invalid={inputAttrs['aria-invalid'] ?? props['aria-invalid']}
+        aria-describedby={joinIds(
+          props['aria-describedby'] as string | undefined,
+          inputAttrs['aria-describedby'] as string | undefined
+        )}
+        class="tx-file-upload__input"
+      />
     {/snippet}
 
     {#snippet children({ files: selected, removeFile })}

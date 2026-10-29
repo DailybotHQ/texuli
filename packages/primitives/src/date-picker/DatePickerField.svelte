@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
 import { DateField } from '../date-field/index.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getShell, getSingle } from './shared.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
@@ -9,14 +10,16 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Submits the value with a form under this name. */
   name?: string;
   required?: boolean;
-};
+  /** Id of the first segment, for a `<label for>` or a Field. */
+  inputId?: string;
+} & RefProp;
 
-let { label, name, required = false, ...rest }: Props = $props();
+let { label, name, required = false, ref = $bindable(null), ...rest }: Props = $props();
 const shell = getShell();
 const single = getSingle();
 </script>
 
-<DateField.Root
+<DateField.Root bind:ref
   {...rest}
   value={single.value}
   onValueChange={(next) => single.setValue(next)}

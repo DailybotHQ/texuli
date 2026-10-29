@@ -2,6 +2,7 @@
 import { type ComboboxItemData, Viewport as PrimitiveViewport } from '@texuli/primitives/combobox';
 import type { Snippet } from 'svelte';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import './combobox.css';
 
 type Props = {
@@ -11,10 +12,17 @@ type Props = {
   class?: ClassValue;
 };
 
-let { children: renderItem, itemSize, windowSize, class: className, ...rest }: Props = $props();
+let {
+  children: renderItem,
+  itemSize,
+  windowSize,
+  class: className,
+  ref = $bindable(null),
+  ...rest
+}: Props & RefProp = $props();
 </script>
 
-<PrimitiveViewport
+<PrimitiveViewport bind:ref
   class={className}
   data-tx-combobox-viewport
   {itemSize}

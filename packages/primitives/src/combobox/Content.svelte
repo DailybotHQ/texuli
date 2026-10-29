@@ -3,13 +3,14 @@ import { createOverlayCore, type OverlayController } from '@texuli/core/overlay-
 import { positionFloating } from '@texuli/core/position-dom';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { getComboboxContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   children?: Snippet;
   sideOffset?: number;
-};
-let { children, sideOffset = 4, ...rest }: Props = $props();
+} & RefProp;
+let { children, sideOffset = 4, ref = $bindable(null), ...rest }: Props = $props();
 const context = getComboboxContext();
 // A consumer id wins: the context records it, so every reference follows.
 context.claimId(
@@ -76,7 +77,7 @@ function attach(node: HTMLDivElement): () => void {
 </script>
 
 {#if context.open}
-  <div {...rest} id={context.listId} role="listbox" aria-multiselectable={context.multiple ? 'true' : undefined} tabindex="-1" data-state="open" {@attach attach}>
+  <div bind:this={ref} {...rest} id={context.listId} role="listbox" aria-multiselectable={context.multiple ? 'true' : undefined} tabindex="-1" data-state="open" {@attach attach}>
     {@render children?.()}
   </div>
 {/if}

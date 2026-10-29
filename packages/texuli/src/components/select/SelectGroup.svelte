@@ -9,7 +9,7 @@ type Props = Omit<ComponentProps<typeof PrimitiveGroup>, 'children'> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 </script>
 
 <!--
@@ -17,6 +17,6 @@ let { children, class: className, ...rest }: Props = $props();
   the Select.Label inside it publishes its id through the select group
   context and the primitive wires `aria-labelledby` (APG listbox grouping).
 -->
-<PrimitiveGroup class={selectGroupClass({ class: className })} data-tx-select-group {...rest}>
+<PrimitiveGroup bind:ref class={selectGroupClass({ class: className })} data-tx-select-group {...rest}>
   {@render children?.()}
 </PrimitiveGroup>

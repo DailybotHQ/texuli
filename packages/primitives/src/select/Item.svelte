@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
 import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { getSelectContext } from './context.ts';
 
@@ -9,7 +10,7 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   label?: string;
   disabled?: boolean;
   children?: import('svelte').Snippet;
-};
+} & RefProp;
 
 let {
   value,
@@ -19,6 +20,7 @@ let {
   class: className,
   onclick,
   onpointermove,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -68,7 +70,7 @@ const itemProps = $derived({
 });
 </script>
 
-<div {...itemProps} {@attach register}>
+<div bind:this={ref} {...itemProps} {@attach register}>
   {#if children}
     {@render children()}
   {:else}

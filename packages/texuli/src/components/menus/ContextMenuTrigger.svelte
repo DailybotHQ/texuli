@@ -10,10 +10,10 @@ type Props = ComponentProps<typeof ContextMenu.Trigger> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 const classes = $derived(contextTriggerClass({ class: className }));
 </script>
 
-<ContextMenu.Trigger class={classes} data-tx-context-menu-trigger {...rest}>
+<ContextMenu.Trigger bind:ref class={classes} data-tx-context-menu-trigger {...rest}>
   {@render children?.()}
 </ContextMenu.Trigger>

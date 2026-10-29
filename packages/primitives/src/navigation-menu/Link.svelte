@@ -3,6 +3,8 @@ import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { Snippet } from 'svelte';
 import type { HTMLAnchorAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { navigationMenuContext } from './context.ts';
 
 type LinkProps = HTMLAnchorAttributes & {
@@ -23,8 +25,9 @@ let {
   onSelect,
   child,
   children,
+  ref = $bindable(null),
   ...rest
-}: LinkProps = $props();
+}: LinkProps & RefProp = $props();
 const context = navigationMenuContext.get();
 const safe = $derived(typeof href === 'string' ? safeHref(href, hrefTrust) : undefined);
 
@@ -35,15 +38,15 @@ const linkProps = $derived({
   'data-active': active ? '' : undefined,
   'data-nav-link': '',
   'data-href-blocked': href !== undefined && !safe ? '' : undefined,
-  onclick: (event: MouseEvent) => {
+  onclick: composeHandlers(rest.onclick, (event: MouseEvent) => {
     onSelect?.(event);
     if (!event.defaultPrevented) context.close();
-  },
+  }),
 });
 </script>
 
 {#if child}
   {@render child({ props: composeChildProps(linkProps, {}) })}
 {:else}
-  <a {...linkProps}>{@render children?.()}</a>
+  <a bind:this={ref} {...linkProps}>{@render children?.()}</a>
 {/if}

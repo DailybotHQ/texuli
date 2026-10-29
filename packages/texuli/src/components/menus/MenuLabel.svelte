@@ -10,8 +10,8 @@ type Props = ComponentProps<typeof Primitive> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 const classes = $derived(menuLabelClass({ class: className }));
 </script>
 
-<Primitive class={classes} data-tx-menu-label {...rest}>{@render children?.()}</Primitive>
+<Primitive bind:ref class={classes} data-tx-menu-label {...rest}>{@render children?.()}</Primitive>

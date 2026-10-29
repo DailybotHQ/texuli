@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { radioGroupContext } from './context.ts';
 
@@ -11,7 +12,7 @@ type Props = Omit<HTMLButtonAttributes, 'value' | 'disabled' | 'children'> & {
   id?: string;
   class?: string;
   children?: Snippet<[{ checked: boolean }]>;
-};
+} & RefProp;
 
 let {
   value,
@@ -21,6 +22,7 @@ let {
   children,
   onclick,
   onkeydown,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -31,6 +33,10 @@ const checked = $derived(group.value() === value);
 const attrs = $derived(stateAttributes(checked ? 'checked' : 'unchecked', itemDisabled));
 
 let buttonEl = $state<HTMLButtonElement | null>(null);
+// `ref` follows the element the part binds for its own behavior.
+$effect(() => {
+  ref = buttonEl ?? null;
+});
 
 $effect(() => {
   if (!buttonEl) return;

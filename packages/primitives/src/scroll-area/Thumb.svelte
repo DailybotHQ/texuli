@@ -1,5 +1,6 @@
 <script lang="ts">
 import { composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { scrollAreaContext } from './context.ts';
 import type { ScrollAreaOrientation, ScrollAreaThumbProps } from './types.ts';
 
@@ -8,8 +9,9 @@ let {
   class: className,
   children,
   child,
+  ref = $bindable(null),
   ...rest
-}: ScrollAreaThumbProps & Record<string, unknown> = $props();
+}: RefProp & ScrollAreaThumbProps & Record<string, unknown> = $props();
 
 const context = scrollAreaContext.get();
 
@@ -125,7 +127,7 @@ const thumbProps = $derived({
 {#if child}
   {@render child({ props: composeChildProps({ ...thumbProps, attach: bindHandlers }, {}) })}
 {:else}
-  <div {...thumbProps} {@attach bindHandlers}>
+  <div bind:this={ref} {...thumbProps} {@attach bindHandlers}>
     {@render children?.()}
   </div>
 {/if}

@@ -2,6 +2,7 @@
 import type { HTMLAttributes } from 'svelte/elements';
 import { getCalendarContext } from '../calendar/context.ts';
 import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getRange, inRange } from './shared.ts';
 
 /**
@@ -10,7 +11,10 @@ import { getRange, inRange } from './shared.ts';
  * range previews to the hovered or focused day. A caller's `onkeydown` runs
  * first; calling `preventDefault()` in it skips the grid's keyboard model.
  */
-let { ...rest }: Omit<HTMLAttributes<HTMLTableElement>, 'children'> = $props();
+let {
+  ref = $bindable(null),
+  ...rest
+}: Omit<HTMLAttributes<HTMLTableElement>, 'children'> & RefProp = $props();
 const calendar = getCalendarContext();
 const range = getRange();
 let hovered = $state<string | null>(null);
@@ -27,7 +31,7 @@ const bounds = $derived.by(() => {
 });
 </script>
 
-<table
+<table bind:this={ref}
   {...rest}
   role="grid"
   aria-label={rest['aria-label'] ?? calendar.monthLabel}

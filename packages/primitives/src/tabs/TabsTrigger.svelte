@@ -2,6 +2,7 @@
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { tabsContext } from './context.ts';
 
@@ -10,7 +11,7 @@ type Props = Omit<HTMLButtonAttributes, 'value' | 'disabled' | 'children'> & {
   disabled?: boolean | null;
   class?: string;
   children?: Snippet;
-};
+} & RefProp;
 
 let {
   value,
@@ -19,6 +20,7 @@ let {
   children,
   onclick,
   onkeydown,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -42,6 +44,10 @@ const id = $derived(tabs.triggerId(value));
 const controls = $derived(tabs.contentId(value));
 
 let buttonEl = $state<HTMLButtonElement | null>(null);
+// `ref` follows the element the part binds for its own behavior.
+$effect(() => {
+  ref = buttonEl ?? null;
+});
 
 $effect(() => {
   if (!buttonEl) return;

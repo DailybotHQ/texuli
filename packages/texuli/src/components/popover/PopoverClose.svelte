@@ -9,11 +9,11 @@ type Props = ComponentProps<typeof PrimitiveClose> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 
 const classes = $derived(popoverCloseClass({ class: className }));
 </script>
 
-<PrimitiveClose class={classes} data-tx-popover-close {...rest}>
+<PrimitiveClose bind:ref class={classes} data-tx-popover-close {...rest}>
   {@render children?.()}
 </PrimitiveClose>

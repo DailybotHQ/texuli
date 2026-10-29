@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { validateFiles } from './accept.ts';
 import type {
   FileDropChildren,
@@ -9,7 +10,7 @@ import type {
   FileDropRootProps,
 } from './types.ts';
 
-type Props = FileDropRootProps;
+type Props = RefProp & FileDropRootProps;
 
 const uid = $props.id();
 let {
@@ -35,6 +36,7 @@ let {
   id,
   class: className,
   'aria-label': ariaLabel,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -167,7 +169,7 @@ const inputProps = $derived<FileDropInputProps>({
 });
 </script>
 
-<div {...rootProps}>
+<div bind:this={ref} {...rootProps}>
   {#if description}
     <p id={descriptionId}>{description}</p>
   {/if}

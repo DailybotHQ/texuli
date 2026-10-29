@@ -1,12 +1,13 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import * as Popover from '../popover/index.ts';
 import { getShell } from './shared.ts';
 
-type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & { children?: Snippet };
+type Props = RefProp & Omit<HTMLAttributes<HTMLElement>, 'children'> & { children?: Snippet };
 
-let { children, ...rest }: Props = $props();
+let { children, ref = $bindable(null), ...rest }: Props = $props();
 const shell = getShell();
 let content: HTMLElement | undefined;
 
@@ -21,7 +22,7 @@ function startDay(): HTMLElement | null {
 </script>
 
 <!-- A dialog (role="dialog") named for choosing a date. -->
-<Popover.Content
+<Popover.Content bind:ref
   {...rest}
   aria-label={rest['aria-label'] ?? shell.labels.dialog}
   data-tx-date-picker-content

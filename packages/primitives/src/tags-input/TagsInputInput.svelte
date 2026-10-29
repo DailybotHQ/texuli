@@ -120,7 +120,9 @@ const partProps = $derived({
   type: 'text' as const,
   value: draft,
   disabled: tagsInput.disabled || undefined,
-  'aria-invalid': tagsInput.invalid ? ('true' as const) : undefined,
+  readonly: tagsInput.readonly || rest.readonly || undefined,
+  // A refused tag marks the input; otherwise a caller's (or a Field's) `aria-invalid` stays.
+  'aria-invalid': tagsInput.invalid ? ('true' as const) : rest['aria-invalid'],
   'data-invalid': tagsInput.invalid ? '' : undefined,
   onkeydown: handleKeydown,
   onpaste: handlePaste,

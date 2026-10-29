@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { getComboboxContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
@@ -8,8 +9,17 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   label?: string;
   disabled?: boolean;
   children?: Snippet;
-};
-let { value, label, disabled = false, children, onpointermove, onclick, ...rest }: Props = $props();
+} & RefProp;
+let {
+  value,
+  label,
+  disabled = false,
+  children,
+  onpointermove,
+  onclick,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 type ClickEvent = Parameters<NonNullable<HTMLAttributes<HTMLDivElement>['onclick']>>[0];
 type PointerMoveEvent = Parameters<NonNullable<HTMLAttributes<HTMLDivElement>['onpointermove']>>[0];
 const context = getComboboxContext();
@@ -29,7 +39,7 @@ function handlePointerMove(event: PointerMoveEvent): void {
 }
 </script>
 
-<div
+<div bind:this={ref}
   {...rest}
   id={context.itemId(value)}
   role="option"

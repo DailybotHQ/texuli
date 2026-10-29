@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { createToastManager } from './manager.ts';
 import Provider from './Provider.svelte';
 import Root from './Root.svelte';
@@ -14,7 +15,7 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   manager?: ToastManager;
   toast?: Snippet<[ToastRecord]>;
   children?: Snippet;
-};
+} & RefProp;
 
 let {
   label = 'Notifications',
@@ -22,6 +23,7 @@ let {
   manager: managerProp,
   toast: toastSnippet,
   children,
+  ref = $bindable(null),
   ...viewportProps
 }: Props = $props();
 
@@ -37,7 +39,7 @@ $effect(() =>
 
 <Provider {label} {hotkey} {manager}>
   {@render children?.()}
-  <Viewport {...viewportProps}>
+  <Viewport bind:ref {...viewportProps}>
     <ol data-tx-toast-list>
       {#each toasts as item (item.id)}
         {#if toastSnippet}

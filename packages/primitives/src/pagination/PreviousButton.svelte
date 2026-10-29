@@ -1,5 +1,6 @@
 <script lang="ts">
 import { composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { paginationContext } from './context.ts';
 import type { PaginationClickEvent, PaginationNavigationButtonProps } from './types.ts';
 
@@ -10,8 +11,9 @@ let {
   children,
   onclick,
   class: className,
+  ref = $bindable(null),
   ...rest
-}: PaginationNavigationButtonProps = $props();
+}: PaginationNavigationButtonProps & RefProp = $props();
 const context = paginationContext.get();
 const isDisabled = $derived(Boolean(disabled || context.disabled() || context.page() <= 1));
 
@@ -36,7 +38,7 @@ const childProps = $derived(child ? composeChildProps(attrs, {}) : attrs);
 {#if child}
   {@render child({ props: childProps })}
 {:else}
-  <button {...childProps}>
+  <button bind:this={ref} {...childProps}>
     {#if children}{@render children()}{:else}{label}{/if}
   </button>
 {/if}

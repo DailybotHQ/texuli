@@ -3,6 +3,7 @@ import { createRovingFocus, indexOfSelected } from '@texuli/core/roving';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
 import { chainHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { type RadioGroupOrientation, radioGroupContext } from './context.ts';
 
 type Props = HTMLAttributes<HTMLDivElement> & {
@@ -16,7 +17,7 @@ type Props = HTMLAttributes<HTMLDivElement> & {
   loop?: boolean;
   class?: string;
   children?: import('svelte').Snippet;
-};
+} & RefProp;
 
 let {
   value = $bindable(''),
@@ -30,6 +31,7 @@ let {
   class: className,
   children,
   onfocusin,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -66,6 +68,10 @@ radioGroupContext.set({
 });
 
 let rootEl = $state<HTMLDivElement | null>(null);
+// `ref` follows the element the part binds for its own behavior.
+$effect(() => {
+  ref = rootEl ?? null;
+});
 let proxyInput: HTMLInputElement | undefined;
 const resetValue = value;
 

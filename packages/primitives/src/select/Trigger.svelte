@@ -2,16 +2,25 @@
 import { untrack } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { getSelectContext } from './context.ts';
 
 type Props = Omit<HTMLButtonAttributes, 'children'> & {
   children?: import('svelte').Snippet;
   child?: ChildSnippet<Record<string, unknown>>;
-};
+} & RefProp;
 type ButtonClickEvent = Parameters<NonNullable<HTMLButtonAttributes['onclick']>>[0];
 
-let { children, child, onclick, onkeydown, type = 'button', ...rest }: Props = $props();
+let {
+  children,
+  child,
+  onclick,
+  onkeydown,
+  type = 'button',
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 const context = getSelectContext();
 // A consumer id wins: the context records it, so every reference follows.
 context.claimId(
@@ -75,7 +84,7 @@ const triggerProps = $derived({
 {#if child}
   {@render child({ props: triggerProps })}
 {:else}
-  <button {...triggerProps} {@attach register}>
+  <button bind:this={ref} {...triggerProps} {@attach register}>
     {@render children?.()}
   </button>
 {/if}

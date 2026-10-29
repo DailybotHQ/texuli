@@ -1,8 +1,12 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
+import type { FocusRestoreEvent } from '@texuli/core/focus-scope';
+import { getInertRegistry } from '@texuli/core/inert';
+import type { OverlayDismissEvent } from '@texuli/core/overlay';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createToastStore, resetToastStore } from '../src/components/toast/toast-store.ts';
 import AlertDialogHarness from './fixtures/AlertDialogHarness.svelte';
 import CommandHarness from './fixtures/CommandHarness.svelte';
+import ContainedOverlayHarness from './fixtures/ContainedOverlayHarness.svelte';
 import HoverCardFixture from './fixtures/HoverCardFixture.svelte';
 import MenusHarness from './fixtures/MenusHarness.svelte';
 import PopoverFixture from './fixtures/PopoverFixture.svelte';
@@ -75,6 +79,50 @@ describe('dialog', () => {
       });
     });
   });
+});
+
+describe('contained overlays and dismissal callbacks (G53)', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  const kinds = ['dialog', 'alert', 'palette'] as const;
+  const roleOf = (kind: (typeof kinds)[number]) => (kind === 'alert' ? 'alertdialog' : 'dialog');
+
+  for (const kind of kinds) {
+    it(`${kind}: mode="contained" renders in the container and scopes inertness to it`, async () => {
+      render(ContainedOverlayHarness, { props: { kind } });
+      const dialog = await screen.findByRole(roleOf(kind));
+      const frame = screen.getByTestId('frame');
+      expect(frame.contains(dialog)).toBe(true);
+      const inert = getInertRegistry().inertElements();
+      const frameAction = screen.getByRole('button', { name: 'Frame action', hidden: true });
+      const outside = screen.getByRole('button', { name: 'Outside action', hidden: true });
+      expect(inert.some((element) => element.contains(frameAction))).toBe(true);
+      expect(inert.some((element) => element.contains(outside))).toBe(false);
+      expect(document.documentElement.style.overflow).toBe('');
+    });
+
+    it(`${kind}: onDismissRequest can veto an Escape`, async () => {
+      const onDismissRequest = vi.fn((event: OverlayDismissEvent) => event.preventDefault());
+      render(ContainedOverlayHarness, { props: { kind, onDismissRequest } });
+      const dialog = await screen.findByRole(roleOf(kind));
+      await fireEvent.keyDown(dialog, { key: 'Escape' });
+      expect(onDismissRequest).toHaveBeenCalled();
+      expect(screen.getByRole(roleOf(kind))).toBeTruthy();
+    });
+
+    it(`${kind}: onCloseAutoFocus runs on close and can keep focus where it is`, async () => {
+      const onCloseAutoFocus = vi.fn((event: FocusRestoreEvent) => event.preventDefault());
+      const view = render(ContainedOverlayHarness, { props: { kind, onCloseAutoFocus } });
+      await screen.findByRole(roleOf(kind));
+      const outside = screen.getByRole('button', { name: 'Outside action', hidden: true });
+      outside.focus();
+      await view.rerender({ kind, onCloseAutoFocus, open: false });
+      await waitFor(() => expect(screen.queryByRole(roleOf(kind))).toBeNull());
+      await waitFor(() => expect(onCloseAutoFocus).toHaveBeenCalled());
+    });
+  }
 });
 
 describe('popover', () => {

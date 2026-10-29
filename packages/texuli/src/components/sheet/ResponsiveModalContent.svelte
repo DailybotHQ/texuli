@@ -6,8 +6,8 @@ import { responsiveModalContentClass, type SheetSize } from './variants.ts';
 import './sheet.css';
 
 type Props = ComponentProps<typeof Primitive.Content> & { size?: SheetSize; class?: ClassValue };
-let { size = 'md', class: className, ...rest }: Props = $props();
+let { size = 'md', class: className, ref = $bindable(null), ...rest }: Props = $props();
 const classes = $derived(cx(responsiveModalContentClass({ size }), className));
 </script>
 
-<Primitive.Content {...rest} class={classes} data-tx-responsive-modal="" data-size={size} />
+<Primitive.Content bind:ref {...rest} class={classes} data-tx-responsive-modal="" data-size={size} />

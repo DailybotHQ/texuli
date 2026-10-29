@@ -29,14 +29,18 @@ not replaced. The helper is `splitControlProps` / `joinIds` in
 | `Input`, `Textarea`, `Select.Trigger`, `Combobox.Input`, `NumberField.Input`, `PinInput.Root` | the input / trigger | they already passed everything to the control |
 | `Slider` | each thumb (`role=slider`) | `aria-label` names the thumb (several thumbs: "label 1", "label 2"); `label` / `thumbLabel` still work |
 | `TextCounter` | the input or textarea | `ref` binds the wrapper root; layout hooks stay on it |
-| `TagsInput` | the text input | `aria-label` replaces `inputLabel`; `label` still names the group |
+| `TagsInput` | the text input | `id` too (so `<label for>` and Field target it); `aria-label` replaces `inputLabel` (inside a Field whose id it takes, the Field label names it); `label` still names the group |
 | `Toggle`, `ToggleGroupItem` | the button | no wrapper |
-| `Rating` (input) | the radio group | `aria-label` / `aria-labelledby` replace the visible label's name; handlers stay on the wrapper (the group binds its own) |
+| `Rating` (input) | the radio group | `aria-label` / `aria-labelledby` replace the visible label's name; `onfocus` and `onblur` go to the group, other handlers stay on the wrapper (the group binds its own); `id` stays on the wrapper |
 | `Rating` (display) | the `role=img` root | `aria-label` replaces the computed summary |
-| `FileUpload` | the file input | `aria-*` / `data-*` only; handlers and layout stay on the drop zone |
-| `DatePicker` | — | always labeled by its required `label`, with `description` and `error` props; it takes no free attributes |
+| `FileUpload` | the file input | `id` (or `inputId`), `aria-*`, `data-*`, `onfocus` and `onblur`; other handlers and layout stay on the drop zone |
+| `InputGroup` | the input | `id`, `aria-*`, `data-*`, handlers; layout hooks stay on the group (with `children`, everything does) |
+| `DatePicker`, `DateRangePicker`, `TimeField` | the segment group | `id` lands on the first segment; `aria-describedby` and `aria-invalid` reach every segment; inside a `Field` (or with `hideLabel`) their own label is hidden and the group is named by the Field label |
 
-Tests: `packages/texuli/tests/forms.test.ts`. For every component it
+Tests: `packages/texuli/tests/forms.test.ts`, and the Field rule in
+`packages/texuli/tests/contract.test.ts` (a `Field`'s `id`,
+`aria-describedby` and `aria-invalid` reach the focusable control of every
+form control). For every component it
 checks that `getByRole(role, { name })` finds the control by its
 `aria-label`, that `aria-describedby` lands on it, and that axe reports no
 name or ARIA-rule violations.

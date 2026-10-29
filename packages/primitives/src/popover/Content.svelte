@@ -8,6 +8,7 @@ import {
 import { type PositionFloatingOptions, positionFloating } from '@texuli/core/position-dom';
 import { untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { getPopoverContext } from './context.ts';
 
 type PopoverContentProps = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
@@ -22,7 +23,12 @@ type PopoverContentProps = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   initialFocus?: FocusTarget | (() => FocusTarget | null);
 };
 
-let { children, initialFocus, ...rest }: PopoverContentProps = $props();
+let {
+  children,
+  initialFocus,
+  ref = $bindable(null),
+  ...rest
+}: PopoverContentProps & RefProp = $props();
 const context = getPopoverContext();
 // A consumer id wins: the context records it, so every reference follows.
 context.claimId(
@@ -120,7 +126,7 @@ const contentProps = $derived({
 </script>
 
 {#if context.open}
-<div {...contentProps} {@attach attach}>
+<div bind:this={ref} {...contentProps} {@attach attach}>
   {@render children?.()}
 </div>
 {/if}

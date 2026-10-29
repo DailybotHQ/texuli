@@ -9,11 +9,11 @@ type Props = ComponentProps<typeof PrimitiveTrigger> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 
 const classes = $derived(hoverCardTriggerClass({ class: className }));
 </script>
 
-<PrimitiveTrigger class={classes} data-tx-hover-card-trigger {...rest}>
+<PrimitiveTrigger bind:ref class={classes} data-tx-hover-card-trigger {...rest}>
   {@render children?.()}
 </PrimitiveTrigger>

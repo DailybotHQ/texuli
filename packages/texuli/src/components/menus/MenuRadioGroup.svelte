@@ -9,10 +9,16 @@ type Props = ComponentProps<typeof Primitive> & {
   class?: ClassValue;
 };
 
-let { children, class: className, value = $bindable(''), ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  value = $bindable(''),
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 </script>
 
-<Primitive
+<Primitive bind:ref
   class={className}
   data-tx-menu-radio-group
   bind:value

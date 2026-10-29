@@ -3,6 +3,8 @@ import { getTabbableElements } from '@texuli/core/tabbable';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { navigationMenuContext, navigationMenuItemContext } from './context.ts';
 
 type TriggerProps = HTMLButtonAttributes & {
@@ -10,7 +12,13 @@ type TriggerProps = HTMLButtonAttributes & {
   children?: Snippet;
 };
 
-let { child, children, disabled = false, ...rest }: TriggerProps = $props();
+let {
+  child,
+  children,
+  disabled = false,
+  ref = $bindable(null),
+  ...rest
+}: TriggerProps & RefProp = $props();
 const context = navigationMenuContext.get();
 const item = navigationMenuItemContext.get();
 // A consumer id wins: the context records it, so every reference follows.
@@ -60,18 +68,18 @@ const triggerProps = $derived({
   'data-state': open ? 'open' : 'closed',
   'data-disabled': disabled ? '' : undefined,
   'data-nav-trigger': '',
-  onclick: () => {
+  onclick: composeHandlers(rest.onclick, () => {
     if (!disabled) context.toggle(item.value);
-  },
-  onpointerenter: (event: PointerEvent) => {
+  }),
+  onpointerenter: chainHandlers(rest.onpointerenter, (event: PointerEvent) => {
     if (!disabled && event.pointerType === 'mouse') context.pointerEnterTrigger(item.value);
-  },
-  onkeydown: onKeydown,
+  }),
+  onkeydown: composeHandlers(rest.onkeydown, onKeydown),
 });
 </script>
 
 {#if child}
   {@render child({ props: composeChildProps(triggerProps, {}) })}
 {:else}
-  <button {...triggerProps}>{@render children?.()}</button>
+  <button bind:this={ref} {...triggerProps}>{@render children?.()}</button>
 {/if}

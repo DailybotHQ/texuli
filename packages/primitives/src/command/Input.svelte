@@ -1,8 +1,16 @@
 <script lang="ts">
+import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { commandContext } from './context.ts';
 import type { CommandInputProps } from './types.ts';
 
-let { value = $bindable(), onValueChange, ...rest }: CommandInputProps = $props();
+let {
+  value = $bindable(),
+  onValueChange,
+  ref = $bindable(null),
+  onkeydown,
+  ...rest
+}: CommandInputProps & RefProp = $props();
 const context = commandContext.get();
 let localValue = $state('');
 const query = $derived(value ?? localValue);
@@ -15,7 +23,7 @@ function setValue(next: string): void {
 }
 </script>
 
-<input
+<input bind:this={ref}
   {...rest}
   role="combobox"
   aria-label={rest['aria-label'] ?? context.label}
@@ -26,6 +34,6 @@ function setValue(next: string): void {
   autocomplete="off"
   value={query}
   oninput={(event) => setValue(event.currentTarget.value)}
-  onkeydown={context.handleInputKeydown}
+  onkeydown={composeHandlers(onkeydown, context.handleInputKeydown)}
   data-command-input=""
 />

@@ -3,6 +3,7 @@ import { List as PrimitiveList } from '@texuli/primitives/command';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import { commandListClass } from './variants.ts';
 import './command.css';
 
@@ -11,7 +12,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props & RefProp = $props();
 
 const classes = $derived(
   commandListClass({
@@ -20,6 +21,6 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveList class={classes} data-tx-command-list {...rest}>
+<PrimitiveList bind:ref class={classes} data-tx-command-list {...rest}>
   {@render children?.()}
 </PrimitiveList>

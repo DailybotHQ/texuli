@@ -1,12 +1,13 @@
 <script lang="ts">
 import { untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { getAlertDialogContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLHeadingElement>, 'children'> & {
   children?: import('svelte').Snippet;
-};
-let { children, id, ...rest }: Props = $props();
+} & RefProp;
+let { children, id, ref = $bindable(null), ...rest }: Props = $props();
 const context = getAlertDialogContext();
 // A consumer id wins: the context records it, so every reference follows.
 context.claimId(
@@ -19,6 +20,6 @@ $effect(() => {
 });
 </script>
 
-<h2 {...rest} id={context.titleId}>
+<h2 bind:this={ref} {...rest} id={context.titleId}>
   {@render children?.()}
 </h2>

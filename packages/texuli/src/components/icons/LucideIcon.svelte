@@ -1,9 +1,10 @@
 <script lang="ts">
+import type { SVGAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import Icon from './Icon.svelte';
 import type { IconComponent, IconSize } from './types.ts';
 
-interface Props {
+interface OwnProps {
   /** Pass an icon component imported by the consumer from `@lucide/svelte`. */
   icon: IconComponent;
   size?: IconSize;
@@ -12,7 +13,21 @@ interface Props {
   class?: ClassValue;
 }
 
-let { icon, size = 'md', strokeWidth = 2, label, class: className }: Props = $props();
+type Props = OwnProps &
+  Omit<SVGAttributes<SVGSVGElement>, keyof OwnProps | 'color'> & {
+    /** The rendered `<svg>` (bindable). */
+    ref?: SVGSVGElement | null;
+  };
+
+let {
+  icon,
+  size = 'md',
+  strokeWidth = 2,
+  label,
+  class: className,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 </script>
 
-<Icon icon={icon} {size} {strokeWidth} {label} class={className} />
+<Icon bind:ref {...rest} icon={icon} {size} {strokeWidth} {label} class={className} />

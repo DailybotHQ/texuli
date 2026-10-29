@@ -1,13 +1,14 @@
 <script lang="ts">
 import type { HTMLInputAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { parseFormattedColor } from './color.ts';
 import { getColorPickerContext } from './context.ts';
 
 type Props = Omit<HTMLInputAttributes, 'type' | 'value' | 'oninput'> & {
   label?: string;
-};
+} & RefProp;
 
-let { label = 'Color value', ...rest }: Props = $props();
+let { label = 'Color value', ref = $bindable(null), ...rest }: Props = $props();
 const context = getColorPickerContext();
 let draft = $state(context.value);
 const valid = $derived(parseFormattedColor(draft) !== undefined);
@@ -23,7 +24,7 @@ function oninput(event: Event): void {
 }
 </script>
 
-<input
+<input bind:this={ref}
   {...rest}
   type="text"
   value={draft}

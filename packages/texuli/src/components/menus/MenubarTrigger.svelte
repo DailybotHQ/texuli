@@ -12,7 +12,14 @@ type Props = ComponentProps<typeof MenubarPrimitive.Trigger> & {
   variant?: MenuVariant;
 };
 
-let { children, class: className, size = 'md', variant = 'default', ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  size = 'md',
+  variant = 'default',
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const classes = $derived(
   menuTriggerClass({
@@ -23,7 +30,7 @@ const classes = $derived(
 );
 </script>
 
-<MenubarPrimitive.Trigger
+<MenubarPrimitive.Trigger bind:ref
   class={classes}
   data-tx-menubar-trigger
   data-size={size}

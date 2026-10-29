@@ -4,6 +4,7 @@ import { positionFloating } from '@texuli/core/position-dom';
 import type { Placement } from '@texuli/core/position-math';
 import { getContext, type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { TOOLTIP_CONTEXT, type TooltipContext } from './context.ts';
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -20,8 +21,9 @@ let {
   sideOffset = 6,
   class: className,
   children,
+  ref = $bindable(null),
   ...attributes
-}: Props = $props();
+}: Props & RefProp = $props();
 const tooltip = getContext<TooltipContext>(TOOLTIP_CONTEXT);
 // A consumer id wins: the context records it, so every reference follows.
 tooltip.claimId(
@@ -33,6 +35,10 @@ $effect(() => {
   return () => tooltip.claimId('content', undefined);
 });
 let element = $state<HTMLDivElement | null>(null);
+// `ref` follows the element the part binds for its own behavior.
+$effect(() => {
+  ref = element ?? null;
+});
 
 const placement = $derived((align === 'center' ? side : `${side}-${align}`) as Placement);
 

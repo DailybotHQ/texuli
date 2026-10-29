@@ -5,6 +5,8 @@ export type DateFieldRootProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'
   value?: string | null;
   locale?: string;
   label?: string;
+  /** Id of the first segment, so a `<label for>` (or a Field) focuses it. */
+  inputId?: string;
   name?: string;
   disabled?: boolean;
   required?: boolean;
@@ -31,6 +33,8 @@ export type TimeFieldRootProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'
   value?: string | null;
   locale?: string;
   label?: string;
+  /** Id of the first segment, so a `<label for>` (or a Field) focuses it. */
+  inputId?: string;
   name?: string;
   disabled?: boolean;
   required?: boolean;

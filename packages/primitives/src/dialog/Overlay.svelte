@@ -1,14 +1,15 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
 import { registerBackdrop } from '../internal/backdrop.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getDialogContext } from './context.ts';
 
 type PointerDownEvent = Parameters<NonNullable<HTMLAttributes<HTMLDivElement>['onpointerdown']>>[0];
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   children?: import('svelte').Snippet;
-};
+} & RefProp;
 
-let { children, onpointerdown, ...rest }: Props = $props();
+let { children, onpointerdown, ref = $bindable(null), ...rest }: Props = $props();
 const context = getDialogContext();
 let isOpen = $state(context.open);
 
@@ -31,7 +32,7 @@ function handlePointerDown(event: PointerDownEvent): void {
 }
 </script>
 
-<div
+<div bind:this={ref}
   {...rest}
   aria-hidden="true"
   data-state={isOpen ? 'open' : 'closed'}

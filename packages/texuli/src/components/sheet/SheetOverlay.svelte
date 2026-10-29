@@ -5,7 +5,7 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import './sheet.css';
 
 type Props = ComponentProps<typeof Primitive.Overlay> & { class?: ClassValue };
-let { class: className, ...rest }: Props = $props();
+let { class: className, ref = $bindable(null), ...rest }: Props = $props();
 </script>
 
-<Primitive.Overlay {...rest} class={cx('tx-sheet-overlay', className)} data-tx-sheet-overlay="" />
+<Primitive.Overlay bind:ref {...rest} class={cx('tx-sheet-overlay', className)} data-tx-sheet-overlay="" />

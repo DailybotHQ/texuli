@@ -11,9 +11,10 @@ let {
   side = 'end',
   class: className,
   activeSnapPoint = $bindable(),
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 const classes = $derived(cx(drawerContentClass({ size }), className));
 </script>
 
-<Primitive.Content {...rest} {side} bind:activeSnapPoint class={classes} data-tx-drawer="" data-size={size} />
+<Primitive.Content bind:ref {...rest} {side} bind:activeSnapPoint class={classes} data-tx-drawer="" data-size={size} />

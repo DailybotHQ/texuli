@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import type { ComboboxItemData } from './context.ts';
 import { getComboboxContext } from './context.ts';
 
@@ -8,8 +9,15 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   children?: Snippet<[item: ComboboxItemData]>;
   itemSize?: number;
   windowSize?: number;
-};
-let { children, itemSize = 36, windowSize = 8, onscroll, ...rest }: Props = $props();
+} & RefProp;
+let {
+  children,
+  itemSize = 36,
+  windowSize = 8,
+  onscroll,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 type ScrollEvent = Parameters<NonNullable<HTMLAttributes<HTMLDivElement>['onscroll']>>[0];
 const context = getComboboxContext();
 let scrollTop = $state(0);
@@ -20,6 +28,10 @@ const last = $derived(
 );
 const visibleItems = $derived(context.items.slice(first, last));
 let viewport: HTMLDivElement | undefined;
+// `ref` follows the element the part binds for its own behavior.
+$effect(() => {
+  ref = viewport ?? null;
+});
 
 $effect(() => {
   if (!virtualized || !viewport || !context.activeValue) return;

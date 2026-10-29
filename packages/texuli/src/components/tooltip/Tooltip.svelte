@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Tooltip as TooltipPrimitive } from '@texuli/primitives/tooltip';
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { Kbd } from '../kbd-code/index.ts';
 import { type TooltipAlign, type TooltipSide, tooltipContentClass } from './variants.ts';
@@ -8,7 +9,9 @@ import './tooltip.css';
 
 type TriggerSnippet = Snippet<[{ props: Record<string, unknown> }]>;
 
-type Props = {
+type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'content'> & {
+  /** The tooltip element (bindable; `null` while hidden). Other attributes land on it too. */
+  ref?: HTMLElement | null;
   /** Tooltip text, or a snippet for rich content. */
   content: string | Snippet;
   /**
@@ -38,6 +41,8 @@ let {
   disabled = false,
   open = $bindable(false),
   class: className,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
 
 const shortcuts = $derived(
@@ -66,7 +71,15 @@ const contentClass = $derived(
         {@render children({ props })}
       {/snippet}
     </TooltipPrimitive.Trigger>
-    <TooltipPrimitive.Content {side} {align} {sideOffset} class={contentClass} data-tx-tooltip>
+    <TooltipPrimitive.Content
+      bind:ref
+      {...rest}
+      {side}
+      {align}
+      {sideOffset}
+      class={contentClass}
+      data-tx-tooltip
+    >
       <span class="tx-tooltip__body">
         <span class="tx-tooltip__text">
           {#if typeof content === 'string'}

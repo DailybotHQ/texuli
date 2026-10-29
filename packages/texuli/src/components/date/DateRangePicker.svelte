@@ -7,7 +7,10 @@ import {
   rangeDays,
   rangeLimit,
 } from '@texuli/primitives/date-picker';
+import type { HTMLAttributes } from 'svelte/elements';
+import { joinIds, splitControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import { getFieldLabelContext } from '../field/context.ts';
 import CalendarIcon from './CalendarIcon.svelte';
 import type { DateLabels } from './labels.ts';
 import { type DateRangePreset, dateRangePresets, matchingPreset } from './presets.ts';
@@ -19,8 +22,15 @@ import './date.css';
  * and a dialog with a range calendar and optional presets (today, last 7
  * days…). Values are `YYYY-MM-DD`.
  */
-interface Props {
+interface OwnProps {
   label: string;
+  /**
+   * Hide the visible label (it still names the field group). Inside a Field
+   * the label is always hidden: the Field label names the group instead.
+   */
+  hideLabel?: boolean;
+  /** Id of the first segment, so `<label for>` and Field reach the focusable control. */
+  id?: string;
   description?: string;
   error?: string;
   value?: DateRange;
@@ -54,8 +64,17 @@ interface Props {
   class?: ClassValue;
 }
 
+/** Field attributes (`aria-*`, `data-*`, handlers) reach the field group; the rest the wrapper. */
+type Props = OwnProps &
+  Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'> & {
+    /** The rendered wrapper (bindable). */
+    ref?: HTMLElement | null;
+  };
+
 let {
   label,
+  hideLabel = false,
+  id,
   description,
   error,
   value = $bindable({ start: null, end: null }),
@@ -76,7 +95,13 @@ let {
   size = 'md',
   labels,
   class: className,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
+
+const split = $derived(splitControlProps(rest));
+const field = getFieldLabelContext();
+const showLabel = $derived(!hideLabel && !field);
 
 const uid = $props.id();
 const descriptionId = `${uid}-description`;
@@ -107,12 +132,14 @@ function choose(preset: DateRangePreset): void {
 </script>
 
 <div
+  bind:this={ref}
+  {...split.wrapper}
   class={dateFieldClass({ size, class: cx('tx-date--range', className) })}
   data-tx-date
   data-invalid={error ? 'true' : undefined}
   data-disabled={disabled ? 'true' : undefined}
 >
-  <span class="tx-date__label" aria-hidden="true">{label}</span>
+  {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}</span>{/if}
   <Primitive.Root
     bind:value
     bind:open
@@ -130,12 +157,15 @@ function choose(preset: DateRangePreset): void {
   >
     <div class="tx-date__control">
       <Primitive.Field
+      {...split.control}
+      {...id ? { inputId: id } : {}}
+      aria-labelledby={(split.control['aria-labelledby'] as string | undefined) ?? field?.labelId}
         class="tx-date__field"
         {label}
         {...startName ? { startName } : {}}
         {...endName ? { endName } : {}}
-        aria-describedby={describedBy}
-        aria-invalid={error ? 'true' : undefined}
+        aria-describedby={joinIds(describedBy, split.control['aria-describedby'] as string | undefined)}
+        aria-invalid={error ? 'true' : (split.control['aria-invalid'] as 'true' | undefined)}
       />
       <Primitive.Trigger class="tx-date__trigger"><CalendarIcon /></Primitive.Trigger>
     </div>

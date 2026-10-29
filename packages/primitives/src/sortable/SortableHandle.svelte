@@ -3,15 +3,16 @@ import { formatDragMessage } from '@texuli/drag/messages';
 import type { Snippet } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLButtonAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { sortableContext, sortableItemContext } from './context.ts';
 
 type Props = Omit<HTMLButtonAttributes, 'children' | 'type'> & {
   /** Accessible name. Default: the item's label. */
   label?: string;
   children?: Snippet;
-};
+} & RefProp;
 
-let { label, children, ...rest }: Props = $props();
+let { label, children, ref = $bindable(null), ...rest }: Props = $props();
 const context = sortableContext.get();
 const item = sortableItemContext.get();
 
@@ -31,7 +32,7 @@ const attach: Attachment<HTMLElement> = (node) => {
 };
 </script>
 
-<button
+<button bind:this={ref}
   type="button"
   {...rest}
   class={`tx-sortable__handle ${rest.class ?? ''}`.trim()}

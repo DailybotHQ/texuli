@@ -56,6 +56,7 @@ let index = $state(0);
 | `class` | — | Merged last onto the root, so it wins (see [Styling](#styling)). |
 | `onIndexChange(index)` | — | Fires after any change: buttons, picker, keys, swipe or rotation. |
 | `onPlayingChange(playing)` | — | Fires when rotation starts or stops. |
+| `ref`, other attributes | — | `bind:ref` is the root `section`; `id`, `aria-*`, `data-*` and handlers land on it. A caller `onkeydown` runs first (`event.preventDefault()` skips the arrow-key navigation); caller focus and pointer handlers run before the autoplay bookkeeping, which always runs. |
 
 A single slide renders no controls. An empty list renders the labelled
 region with nothing to move.

@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { sortableContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children' | 'id'> & {
@@ -13,9 +14,9 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'children' | 'id'> & {
   as?: 'ul' | 'ol' | 'div';
   /** Renders the items in their current (preview) order. */
   children?: Snippet<[{ items: readonly string[] }]>;
-};
+} & RefProp;
 
-let { id, label, as = 'ul', children, ...rest }: Props = $props();
+let { id, label, as = 'ul', children, ref = $bindable(null), ...rest }: Props = $props();
 const context = sortableContext.get();
 
 const items = $derived(context.order(id));
@@ -27,6 +28,7 @@ const attach: Attachment<HTMLElement> = (node) =>
 </script>
 
 <svelte:element
+  bind:this={ref}
   this={as}
   aria-label={rest['aria-label'] ?? label}
   {...rest}

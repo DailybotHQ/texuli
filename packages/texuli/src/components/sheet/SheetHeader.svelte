@@ -3,6 +3,7 @@ import { Sheet as Primitive } from '@texuli/primitives/sheet';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import SheetCloseButton from './SheetCloseButton.svelte';
 import { sheetDescriptionClass, sheetHeaderClass, sheetTitleClass } from './variants.ts';
 import './sheet.css';
@@ -31,11 +32,12 @@ let {
   closeLabel = 'Close',
   hideClose = false,
   class: className,
+  ref = $bindable(null),
   ...rest
-}: Props = $props();
+}: Props & RefProp = $props();
 </script>
 
-<div {...rest} class={sheetHeaderClass({ class: className })} data-tx-sheet-header="">
+<div bind:this={ref} {...rest} class={sheetHeaderClass({ class: className })} data-tx-sheet-header="">
   <div class="tx-sheet__heading">
     {#if title}
       <Primitive.Title class={sheetTitleClass()}>{title}</Primitive.Title>

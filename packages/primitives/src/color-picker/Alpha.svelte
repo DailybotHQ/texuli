@@ -1,13 +1,14 @@
 <script lang="ts">
 import type { HTMLInputAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { withAlpha } from './color.ts';
 import { getColorPickerContext } from './context.ts';
 
 type Props = Omit<HTMLInputAttributes, 'type' | 'min' | 'max' | 'value' | 'oninput'> & {
   label?: string;
-};
+} & RefProp;
 
-let { label = 'Opacity', ...rest }: Props = $props();
+let { label = 'Opacity', ref = $bindable(null), ...rest }: Props = $props();
 const context = getColorPickerContext();
 
 function oninput(event: Event): void {
@@ -16,7 +17,7 @@ function oninput(event: Event): void {
 }
 </script>
 
-<input
+<input bind:this={ref}
   {...rest}
   type="range"
   min="0"

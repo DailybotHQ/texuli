@@ -3,13 +3,14 @@ import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
 import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getCalendarContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLTableElement>, 'children'> & {
   child?: ChildSnippet<Record<string, unknown>>;
   children?: Snippet;
-};
-let { child, children, ...rest }: Props = $props();
+} & RefProp;
+let { child, children, ref = $bindable(null), ...rest }: Props = $props();
 const calendar = getCalendarContext();
 const partProps = $derived({
   ...rest,
@@ -23,7 +24,7 @@ const partProps = $derived({
 {#if child}
   {@render child({ props: partProps })}
 {:else}
-  <table {...partProps}>
+  <table bind:this={ref} {...partProps}>
     <thead>
       <tr>
         {#each calendar.weekdays as weekday}

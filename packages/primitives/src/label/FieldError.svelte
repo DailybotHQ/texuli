@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { fieldContext } from './context.ts';
 
 /**
@@ -16,7 +17,13 @@ type FieldErrorProps = HTMLAttributes<HTMLElement> & {
   children?: Snippet;
 };
 
-let { forceMount = false, child, children, ...rest }: FieldErrorProps = $props();
+let {
+  forceMount = false,
+  child,
+  children,
+  ref = $bindable(null),
+  ...rest
+}: FieldErrorProps & RefProp = $props();
 const field = fieldContext.get();
 // A consumer id wins: the context records it, so every reference follows.
 field.claimId(
@@ -42,5 +49,5 @@ const partProps = $derived({
 {#if child}
   {@render child({ props: partProps, show })}
 {:else}
-  <p {...partProps}>{#if show}{@render children?.()}{/if}</p>
+  <p bind:this={ref} {...partProps}>{#if show}{@render children?.()}{/if}</p>
 {/if}

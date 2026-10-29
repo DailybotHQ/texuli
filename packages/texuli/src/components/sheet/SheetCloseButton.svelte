@@ -12,10 +12,10 @@ type Props = Omit<ComponentProps<typeof Primitive.Close>, 'children' | 'child'> 
   label?: string;
   class?: ClassValue;
 };
-let { label = 'Close', class: className, ...rest }: Props = $props();
+let { label = 'Close', class: className, ref = $bindable(null), ...rest }: Props = $props();
 </script>
 
-<Primitive.Close {...rest} class={sheetCloseClass({ class: className })} data-tx-sheet-close="">
+<Primitive.Close bind:ref {...rest} class={sheetCloseClass({ class: className })} data-tx-sheet-close="">
   <Icon icon="close" size="sm" aria-hidden="true" />
   <span class="tx-sheet__close-label">{label}</span>
 </Primitive.Close>

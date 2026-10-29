@@ -1,5 +1,7 @@
 <script lang="ts">
+import type { FocusRestoreEvent } from '@texuli/core/focus-scope';
 import type { LayerStack } from '@texuli/core/layer-stack';
+import type { OverlayDismissEvent, OverlayMode } from '@texuli/core/overlay';
 import type { PortalTarget } from '@texuli/core/portal';
 import * as DialogPrimitive from '@texuli/primitives/dialog';
 import type { Snippet } from 'svelte';
@@ -44,6 +46,24 @@ type OwnProps = {
    * page-wide stack. Read when the dialog opens.
    */
   stack?: LayerStack;
+  /**
+   * `'top-layer'` (default) or `'contained'`: with a `container`, the overlay
+   * renders inside it, and inertness, focus containment and the backdrop stay
+   * scoped to it (document scrolling is left alone). For framed previews.
+   */
+  mode?: OverlayMode;
+  /** The element a `'contained'` overlay renders in and is scoped to. */
+  container?: Element | null;
+  /**
+   * Called before an Escape, outside press or outside focus closes it;
+   * `event.preventDefault()` keeps it open.
+   */
+  onDismissRequest?: (event: OverlayDismissEvent) => void;
+  /**
+   * Called before focus returns on close; `event.preventDefault()` keeps
+   * focus where it is (move it yourself to redirect).
+   */
+  onCloseAutoFocus?: (event: FocusRestoreEvent) => void;
   /** The dialog content element while open, `null` while closed (bindable). */
   ref?: HTMLElement | null;
 };
@@ -65,6 +85,10 @@ let {
   class: className,
   portal,
   stack,
+  mode = 'top-layer',
+  container = null,
+  onDismissRequest,
+  onCloseAutoFocus,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
@@ -90,7 +114,15 @@ function setOpen(next: boolean): void {
 }
 </script>
 
-<DialogPrimitive.Root bind:open onOpenChange={setOpen} {stack}>
+<DialogPrimitive.Root
+  bind:open
+  onOpenChange={setOpen}
+  {stack}
+  {mode}
+  {container}
+  {...onDismissRequest ? { onDismissRequest } : {}}
+  {...onCloseAutoFocus ? { onCloseAutoFocus } : {}}
+>
   {#if trigger}
     <DialogPrimitive.Trigger>
       {#snippet child({ props })}

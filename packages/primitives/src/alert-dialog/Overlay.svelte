@@ -1,13 +1,14 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
 import { registerBackdrop } from '../internal/backdrop.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getAlertDialogContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   children?: import('svelte').Snippet;
-};
+} & RefProp;
 
-let { children, ...rest }: Props = $props();
+let { children, ref = $bindable(null), ...rest }: Props = $props();
 const context = getAlertDialogContext();
 let isOpen = $state(context.open);
 
@@ -25,7 +26,7 @@ function register(node: HTMLDivElement): () => void {
 </script>
 
 <!-- Alert dialogs never dismiss on backdrop pointer; Escape and Cancel/Action close. -->
-<div
+<div bind:this={ref}
   {...rest}
   aria-hidden="true"
   data-state={isOpen ? 'open' : 'closed'}

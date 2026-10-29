@@ -1,4 +1,6 @@
 <script lang="ts">
+import type { FocusRestoreEvent } from '@texuli/core/focus-scope';
+import type { OverlayDismissEvent, OverlayMode } from '@texuli/core/overlay';
 import {
   Content as DialogContent,
   Description as DialogDescription,
@@ -24,6 +26,23 @@ import { type CommandSize, type CommandVariant, commandPaletteClass } from './va
 import './command.css';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  /**
+   * `'top-layer'` (default) or `'contained'`: with a `container`, the palette
+   * renders inside it, and inertness, focus containment and the backdrop stay
+   * scoped to it. For framed previews.
+   */
+  mode?: OverlayMode;
+  /** The element a `'contained'` palette renders in and is scoped to. */
+  container?: Element | null;
+  /** Called before Escape or an outside press closes it; `event.preventDefault()` keeps it open. */
+  onDismissRequest?: (event: OverlayDismissEvent) => void;
+  /**
+   * Called before focus returns to the opener on close; `event.preventDefault()`
+   * keeps focus where it is (move it yourself to redirect).
+   */
+  onCloseAutoFocus?: (event: FocusRestoreEvent) => void;
+  /** The palette's dialog element (bindable; `null` while closed). */
+  ref?: HTMLElement | null;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   /** Async or sync search when the query is non-empty. */
@@ -69,6 +88,11 @@ let {
   size = 'md',
   variant = 'outline',
   class: className,
+  mode = 'top-layer',
+  container = null,
+  onDismissRequest,
+  onCloseAutoFocus,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -195,6 +219,10 @@ onMount(() => {
 
 <DialogRoot
   bind:open
+  {mode}
+  {container}
+  {...onDismissRequest ? { onDismissRequest } : {}}
+  {...onCloseAutoFocus ? { onCloseAutoFocus } : {}}
   onOpenChange={(next) => {
     if (next !== open) setOpen(next);
   }}
@@ -202,13 +230,16 @@ onMount(() => {
   <DialogPortal>
     <DialogOverlay class="tx-command-palette__overlay" data-tx-command-palette-overlay />
     <DialogContent
+      bind:ref
       class="tx-command-palette__content {paletteClasses}"
       data-tx-command-palette
       data-size={size}
       onCloseAutoFocus={(event) => {
-        event.preventDefault();
         const target = returnFocusTo;
         returnFocusTo = null;
+        // The caller's onCloseAutoFocus (on the root) ran first and kept focus.
+        if (event.defaultPrevented) return;
+        event.preventDefault();
         queueMicrotask(() => {
           if (target?.isConnected) target.focus();
         });

@@ -1,14 +1,15 @@
 <script lang="ts">
 import type { HTMLButtonAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { colorToHex, parseFormattedColor } from './color.ts';
 import { getColorPickerContext } from './context.ts';
 
 type Props = Omit<HTMLButtonAttributes, 'type' | 'value'> & {
   value: string;
   label: string;
-};
+} & RefProp;
 
-let { value, label, ...rest }: Props = $props();
+let { value, label, ref = $bindable(null), ...rest }: Props = $props();
 const context = getColorPickerContext();
 const parsed = $derived(parseFormattedColor(value));
 const selected = $derived(parsed !== undefined && colorToHex(parsed) === colorToHex(context.color));
@@ -19,7 +20,7 @@ function onclick(event: MouseEvent): void {
 }
 </script>
 
-<button
+<button bind:this={ref}
   {...rest}
   type="button"
   aria-label={label}

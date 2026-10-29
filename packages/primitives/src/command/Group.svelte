@@ -1,14 +1,15 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { commandContext, commandGroupContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   children?: Snippet;
   disabled?: boolean;
   value: string;
-};
-let { children, disabled = false, value, id, ...rest }: Props = $props();
+} & RefProp;
+let { children, disabled = false, value, id, ref = $bindable(null), ...rest }: Props = $props();
 const command = commandContext.get();
 const generatedId = $props.id();
 const headingId = $derived(`${id ?? generatedId}-heading`);
@@ -25,7 +26,7 @@ commandGroupContext.set({
 });
 </script>
 
-<div
+<div bind:this={ref}
   {...rest}
   id={id}
   role="group"

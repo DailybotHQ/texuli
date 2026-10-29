@@ -6,14 +6,15 @@ import { lockScroll } from '@texuli/core/scroll-lock';
 import { untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { ensurePositioned } from '../internal/backdrop.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getDialogContext, getDialogPortalContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   children?: import('svelte').Snippet;
   onCloseAutoFocus?: (event: import('@texuli/core/focus-scope').FocusRestoreEvent) => void;
-};
+} & RefProp;
 
-let { children, onCloseAutoFocus, ...rest }: Props = $props();
+let { children, onCloseAutoFocus, ref = $bindable(null), ...rest }: Props = $props();
 const context = getDialogContext();
 const portal = getDialogPortalContext();
 // A consumer id wins: the context records it, so every reference follows.
@@ -85,7 +86,7 @@ function attach(node: HTMLDivElement): () => void {
 </script>
 
 {#if isOpen}
-<div
+<div bind:this={ref}
   {...rest}
   id={context.contentId}
   role="dialog"

@@ -1,6 +1,8 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { menuLevelContext, menuRadioContext } from './context.ts';
 import { activationKey, type MenuSelectEvent, selectItem } from './item.ts';
 
@@ -12,7 +14,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onselect'> & {
   /** Close the menu after choosing. Default `true`. */
   closeOnSelect?: boolean;
   children?: Snippet<[{ checked: boolean }]>;
-};
+} & RefProp;
 
 let {
   value,
@@ -21,6 +23,11 @@ let {
   onSelect,
   closeOnSelect = true,
   children,
+  ref = $bindable(null),
+  onfocus,
+  onblur,
+  onclick,
+  onkeydown,
   ...rest
 }: Props = $props();
 const level = menuLevelContext.get();
@@ -35,7 +42,7 @@ function run(event: Event & { currentTarget: EventTarget & HTMLElement }): void 
 }
 </script>
 
-<div
+<div bind:this={ref}
   {...rest}
   role="menuitemradio"
   tabindex="-1"
@@ -45,14 +52,14 @@ function run(event: Event & { currentTarget: EventTarget & HTMLElement }): void 
   data-disabled={disabled ? '' : undefined}
   data-highlighted={highlighted ? '' : undefined}
   data-typeahead={textValue}
-  onfocus={() => (highlighted = true)}
-  onblur={() => (highlighted = false)}
-  onclick={(event) => run(event)}
-  onkeydown={(event) => {
+  onfocus={chainHandlers(onfocus, () => (highlighted = true))}
+  onblur={chainHandlers(onblur, () => (highlighted = false))}
+  onclick={composeHandlers(onclick, run)}
+  onkeydown={composeHandlers(onkeydown, (event: KeyboardEvent & { currentTarget: EventTarget & HTMLElement }) => {
     if (!activationKey(event)) return;
     event.preventDefault();
     run(event);
-  }}
+  })}
 >
   {@render children?.({ checked })}
 </div>

@@ -10,7 +10,7 @@ type Props = ComponentProps<typeof PrimitiveTrigger> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 
 const classes = $derived(
   comboboxTriggerClass({
@@ -19,7 +19,7 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveTrigger class={classes} data-tx-combobox-trigger {...rest}>
+<PrimitiveTrigger bind:ref class={classes} data-tx-combobox-trigger {...rest}>
   {#if children}
     {@render children()}
   {:else}

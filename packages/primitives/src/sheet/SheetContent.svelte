@@ -9,6 +9,7 @@ import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { getDialogContext, getDialogPortalContext } from '../dialog/context.ts';
 import { ensurePositioned } from '../internal/backdrop.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { drawerContext } from './context.ts';
 import { dismissDirection, releaseTarget, resolveSheetSide, type SheetSide } from './model.ts';
 
@@ -40,7 +41,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   dismissible?: boolean;
   onCloseAutoFocus?: (event: FocusRestoreEvent) => void;
   children?: Snippet;
-};
+} & RefProp;
 
 let {
   side = 'right',
@@ -54,6 +55,7 @@ let {
   dismissible = true,
   onCloseAutoFocus,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -281,7 +283,7 @@ const transform = $derived.by(() => {
 </script>
 
 {#if isOpen}
-<div
+<div bind:this={ref}
   {...rest}
   id={context.contentId}
   role="dialog"

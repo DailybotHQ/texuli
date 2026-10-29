@@ -24,6 +24,7 @@ let {
   variant = 'elevated',
   size = 'md',
   arrow = true,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -36,7 +37,7 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveContent
+<PrimitiveContent bind:ref
   class={classes}
   data-tx-hover-card-content
   data-variant={variant}

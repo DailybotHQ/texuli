@@ -1,6 +1,7 @@
 <script lang="ts">
 import { composeChildProps } from '../internal/child.ts';
 import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { toggleGroupContext } from './context.ts';
 import type { ToggleGroupItemAttrs, ToggleGroupItemProps } from './types.ts';
 
@@ -15,8 +16,9 @@ let {
   onclick: consumerClick,
   onkeydown: consumerKeydown,
   onkeyup: consumerKeyup,
+  ref = $bindable(null),
   ...rest
-}: ToggleGroupItemProps & Record<string, unknown> = $props();
+}: ToggleGroupItemProps & RefProp & Record<string, unknown> = $props();
 
 const group = toggleGroupContext.get();
 const isDisabled = $derived(Boolean(disabled) || group.disabled);
@@ -83,6 +85,7 @@ function bindNode(el: HTMLElement | null): void {
   {@render child({ props: childProps })}
 {:else}
   <button
+    bind:this={ref}
     {id}
     type="button"
     value={attrs.value}

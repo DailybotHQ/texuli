@@ -9,10 +9,10 @@ type Props = ComponentProps<typeof Primitive.Page> & {
   class?: ClassValue;
 };
 
-let { children, class: className, page, ...rest }: Props = $props();
+let { children, class: className, page, ref = $bindable(null), ...rest }: Props = $props();
 </script>
 
-<Primitive.Page
+<Primitive.Page bind:ref
   {page}
   data-tx-pagination-page=""
   class={paginationButtonClass({

@@ -2,6 +2,7 @@
 import { getContext, onMount, type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { TOOLTIP_CONTEXT, type TooltipContext } from './context.ts';
 
 interface TriggerNodeProps extends Record<string, unknown> {
@@ -25,7 +26,13 @@ interface Props extends HTMLAttributes<HTMLElement> {
   disabled?: boolean;
 }
 
-let { child, children, disabled: triggerDisabled = false, ...rest }: Props = $props();
+let {
+  child,
+  children,
+  disabled: triggerDisabled = false,
+  ref = $bindable(null),
+  ...rest
+}: Props & RefProp = $props();
 const tooltip = getContext<TooltipContext>(TOOLTIP_CONTEXT);
 // A consumer id wins: the context records it, so every reference follows.
 tooltip.claimId(
@@ -87,5 +94,5 @@ onMount(() => {
 {#if child}
   {@render child({ props: forwarded })}
 {:else}
-  <button {...forwarded}>{@render children?.()}</button>
+  <button bind:this={ref} {...forwarded}>{@render children?.()}</button>
 {/if}

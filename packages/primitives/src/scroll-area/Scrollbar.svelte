@@ -1,5 +1,6 @@
 <script lang="ts">
 import { composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { scrollAreaContext } from './context.ts';
 import type { ScrollAreaOrientation, ScrollAreaScrollbarProps } from './types.ts';
 
@@ -9,8 +10,9 @@ let {
   class: className,
   children,
   child,
+  ref = $bindable(null),
   ...rest
-}: ScrollAreaScrollbarProps & Record<string, unknown> = $props();
+}: RefProp & ScrollAreaScrollbarProps & Record<string, unknown> = $props();
 
 const context = scrollAreaContext.get();
 const shown = $derived(forceMount || context.scrollbarVisible(orientation));
@@ -31,7 +33,7 @@ const scrollbarProps = $derived({
   {#if child}
     {@render child({ props: composeChildProps(scrollbarProps, {}) })}
   {:else}
-    <div {...scrollbarProps}>
+    <div bind:this={ref} {...scrollbarProps}>
       {@render children?.()}
     </div>
   {/if}

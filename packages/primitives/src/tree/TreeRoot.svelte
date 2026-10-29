@@ -2,6 +2,8 @@
 import { createTypeahead } from '@texuli/core/roving';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import {
   assertUniqueTreeIds,
   flattenVisibleTree,
@@ -48,12 +50,17 @@ let {
   item,
   id: suppliedId,
   class: className,
+  ref = $bindable(null),
   ...attributes
-}: Props = $props();
+}: Props & RefProp = $props();
 
 const generatedId = $props.id();
 const treeId = $derived(suppliedId ?? generatedId);
 let rootElement = $state<HTMLDivElement | null>(null);
+// `ref` follows the element the part binds for its own behavior.
+$effect(() => {
+  ref = rootElement ?? null;
+});
 let activeId = $state<string | undefined>();
 let scrollTop = $state(0);
 let loadedChildren = $state(new Map<string, readonly TreeNode[]>());
@@ -261,8 +268,8 @@ function toggleFromPointer(event: MouseEvent, row: VisibleTreeNode): void {
   data-virtualized={virtualized ? '' : undefined}
   style:block-size={virtualized ? `${safeHeight}px` : undefined}
   style:overflow-y={virtualized ? 'auto' : undefined}
-  onkeydown={onKeydown}
-  onscroll={onScroll}
+  onkeydown={composeHandlers(attributes.onkeydown, onKeydown)}
+  onscroll={chainHandlers(attributes.onscroll, onScroll)}
 >
   {#if treeWindow.paddingStart > 0}
     <div role="presentation" aria-hidden="true" style:block-size={`${treeWindow.paddingStart}px`}></div>

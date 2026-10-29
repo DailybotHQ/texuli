@@ -19,6 +19,8 @@ type Props = {
   card?: boolean;
   class?: ClassValue;
   children?: Snippet;
+  /** The rendered root: the field wrapper when labeled, the radio when not (bindable). */
+  ref?: HTMLElement | null;
 } & Omit<HTMLAttributes<HTMLElement>, 'id' | 'class' | 'children'>;
 
 const uid = $props.id();
@@ -33,6 +35,7 @@ let {
   card = false,
   class: className,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -51,6 +54,7 @@ const controlClass = $derived(choiceControlClass({ size, class: 'tx-choice-contr
 
 {#if card && label}
   <label
+    bind:this={ref}
     class={cx('tx-radio-card', className)}
     for={id}
     data-tx-choice-field="radio-card"
@@ -82,6 +86,7 @@ const controlClass = $derived(choiceControlClass({ size, class: 'tx-choice-contr
   </label>
 {:else if label}
   <div
+    bind:this={ref}
     class={cx('tx-choice', className)}
     data-tx-choice-field="radio"
     {...split.wrapper}
@@ -110,6 +115,7 @@ const controlClass = $derived(choiceControlClass({ size, class: 'tx-choice-contr
   </div>
 {:else}
   <RadioGroupPrimitive.Item
+    bind:ref
     {...split.wrapper}
     {...split.control}
     {id}

@@ -12,7 +12,14 @@ type Props = ComponentProps<typeof ContextMenu.Content> & {
   variant?: MenuVariant;
 };
 
-let { children, class: className, size = 'md', variant = 'default', ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  size = 'md',
+  variant = 'default',
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const classes = $derived(
   menuContentClass({
@@ -23,7 +30,7 @@ const classes = $derived(
 );
 </script>
 
-<ContextMenu.Content
+<ContextMenu.Content bind:ref
   class={classes}
   data-tx-context-menu-content
   data-size={size}

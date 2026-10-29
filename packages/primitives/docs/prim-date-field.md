@@ -26,6 +26,10 @@ that does not exist (`2/30/2026`) and `out-of-range` outside `min`/`max`.
 `text` is the segments in locale order; the segments carry
 `aria-invalid="true"` until the entry is fixed.
 
+Both roots take `inputId` (the first segment's id, so a `<label for>` or a
+Field focuses it); an `aria-describedby` or `aria-invalid` you pass reaches
+every segment as well as the group, and `bind:ref` is the group.
+
 TimeField accepts `hourCycle={12 | 24}` (otherwise it uses the locale's
 cycle), a `minuteStep` and `labels` (`hour`, `minute`, `dayPeriod`); values
 remain 24-hour strings. Each segment is a native spinbutton for keyboard and

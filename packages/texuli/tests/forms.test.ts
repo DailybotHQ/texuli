@@ -25,6 +25,7 @@ import TextCounter from '../src/components/input/TextCounter.svelte';
 import { CopyButton, copyText } from '../src/components/kbd-code/index.ts';
 import { formatRatingLabel, Rating } from '../src/components/rating/index.ts';
 import ColorPicker from '../src/components/tags-color/ColorPicker.svelte';
+import TagsInput from '../src/components/tags-color/TagsInput.svelte';
 import BannerRefHarness from './BannerRefHarness.svelte';
 import FieldHarness from './FieldHarness.svelte';
 import ApiRefHarness from './fixtures/ApiRefHarness.svelte';
@@ -1354,5 +1355,35 @@ describe('input-api', () => {
       expect(writeText).not.toHaveBeenCalled();
       expect(onCopy).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('tags-input readonly and id (G60)', () => {
+  it('readonly keeps the tags: typing, Enter and Backspace add or remove nothing', async () => {
+    const onValueChange = vi.fn();
+    render(TagsInput, {
+      props: { value: ['alpha'], readonly: true, label: 'Tags', onValueChange },
+    });
+    const input = screen.getByRole('textbox', { name: 'Add a tag' }) as HTMLInputElement;
+    expect(input.readOnly).toBe(true);
+    input.value = 'beta';
+    await fireEvent.input(input);
+    await fireEvent.keyDown(input, { key: 'Enter' });
+    const tag = document.querySelector('[data-tx-tags-input-tag]') as HTMLElement;
+    await fireEvent.keyDown(tag, { key: 'Backspace' });
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(document.querySelectorAll('[data-tx-tags-input-tag]')).toHaveLength(1);
+    expect(document.querySelector('[data-tx-tags-input-root]')?.hasAttribute('data-readonly')).toBe(
+      true
+    );
+    const remove = document.querySelector('.tx-tags-input__remove') as HTMLButtonElement;
+    expect(remove.disabled).toBe(true);
+  });
+
+  it('puts `id` on the text input, so `<label for>` targets the focusable control', () => {
+    render(TagsInput, { props: { id: 'tags-field', label: 'Tags' } });
+    const input = document.getElementById('tags-field');
+    expect(input?.tagName).toBe('INPUT');
+    expect(document.querySelector('[data-tx-tags-input-root]')?.id).not.toBe('tags-field');
   });
 });

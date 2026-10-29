@@ -5,6 +5,7 @@ import { type Snippet, untrack } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getHoverCardContext } from './context.ts';
 
 type ContentProps = Record<string, unknown> & { attach: Attachment<HTMLDivElement> };
@@ -12,9 +13,9 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   'aria-label': string;
   child?: ChildSnippet<ContentProps>;
   children?: Snippet;
-};
+} & RefProp;
 
-let { child, children, ...consumerProps }: Props = $props();
+let { child, children, ref = $bindable(null), ...consumerProps }: Props = $props();
 const context = getHoverCardContext();
 // A consumer id wins: the context records it, so every reference follows.
 context.claimId(
@@ -91,7 +92,7 @@ const contentProps: ContentProps = $derived({
   {@render child({ props: contentProps })}
 {:else}
   {@const { attach: _attach, ...domProps } = contentProps}
-  <div {@attach overlayAttachment} {...domProps}>
+  <div bind:this={ref} {@attach overlayAttachment} {...domProps}>
     {@render children?.()}
   </div>
 {/if}

@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import { setFieldLabelContext } from './context.ts';
 import Description from './Description.svelte';
 import FieldError from './FieldError.svelte';
 import Label from './Label.svelte';
@@ -45,6 +46,15 @@ let {
 }: Props = $props();
 
 const descriptionId = $derived(`${id}-description`);
+const labelId = $derived(`${id}-label`);
+setFieldLabelContext({
+  get id() {
+    return id;
+  },
+  get labelId() {
+    return labelId;
+  },
+});
 const errorId = $derived(`${id}-error`);
 const invalid = $derived(Boolean(error));
 const describedBy = $derived(
@@ -78,7 +88,7 @@ const classes = $derived(cx(fieldRootClass({ orientation }), className));
   data-required={required ? '' : undefined}
   {...rest}
 >
-  <Label for={id} {required} srOnly={hideLabel}>{label}</Label>
+  <Label id={labelId} for={id} {required} srOnly={hideLabel}>{label}</Label>
   <div class="tx-field-control">
     {@render children(control)}
   </div>

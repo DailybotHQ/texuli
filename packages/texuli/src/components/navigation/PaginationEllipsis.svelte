@@ -2,6 +2,7 @@
 import { Pagination as Primitive } from '@texuli/primitives/pagination';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import { paginationEllipsisClass } from './variants.ts';
 
 /**
@@ -12,10 +13,10 @@ type Props = Omit<HTMLAttributes<HTMLSpanElement>, 'children' | 'class'> & {
   class?: ClassValue;
 };
 
-let { class: className, ...rest }: Props = $props();
+let { class: className, ref = $bindable(null), ...rest }: Props & RefProp = $props();
 </script>
 
-<span {...rest} data-tx-pagination-ellipsis>
+<span bind:this={ref} {...rest} data-tx-pagination-ellipsis>
   <Primitive.Ellipsis
     class={paginationEllipsisClass({
       class: className,

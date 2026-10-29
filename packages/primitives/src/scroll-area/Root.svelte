@@ -1,6 +1,7 @@
 <script lang="ts">
 import { untrack } from 'svelte';
 import { composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import {
   EMPTY_METRICS,
   overflowX,
@@ -19,8 +20,9 @@ let {
   child,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledby,
+  ref = $bindable(null),
   ...rest
-}: ScrollAreaRootProps & Record<string, unknown> = $props();
+}: RefProp & ScrollAreaRootProps & Record<string, unknown> = $props();
 
 let viewport = $state<HTMLElement | undefined>(undefined);
 let metrics = $state<ScrollMetrics>({ ...EMPTY_METRICS });
@@ -184,7 +186,7 @@ const rootProps = $derived({
 {#if child}
   {@render child({ props: composeChildProps(rootProps, {}) })}
 {:else}
-  <div {...rootProps}>
+  <div bind:this={ref} {...rootProps}>
     {@render children?.()}
   </div>
 {/if}

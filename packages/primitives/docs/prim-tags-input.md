@@ -41,11 +41,11 @@ let topics = $state(['design', 'research']);
 
 | Part | Renders | Props |
 | --- | --- | --- |
-| `TagsInput.Root` | `div role="group"` | `value` (bindable `string[]`), `onValueChange`, `onInvalid({ tag, reason, message? })`, `delimiter` (`,` default; a string or a RegExp), `addOnPaste` (true), `addOnBlur` (false), `allowDuplicates` (false), `max`, `validate(tag, tags)` (return `false` or a message to refuse), `disabled`, `name`, `form`, `required`, `labels`, `ref`. Name the group with `aria-label` or `aria-labelledby` |
+| `TagsInput.Root` | `div role="group"` | `value` (bindable `string[]`), `onValueChange`, `onInvalid({ tag, reason, message? })`, `delimiter` (`,` default; a string or a RegExp), `addOnPaste` (true), `addOnBlur` (false), `allowDuplicates` (false), `max`, `validate(tag, tags)` (return `false` or a message to refuse), `disabled`, `readonly` (tags stay visible and focusable, nothing is added or removed: the input is read-only, the remove buttons disabled, `data-readonly` on the root), `name`, `form`, `required`, `labels`, `ref`. Name the group with `aria-label` or `aria-labelledby` |
 | `TagsInput.List` | `ul role="list"` | The tags' container |
 | `TagsInput.Tag` | `li tabindex="-1"` | `index`. Focus comes from the arrow keys; it is not a Tab stop |
 | `TagsInput.TagRemove` | `button tabindex="-1"` | `index`. Named "Remove {tag}" by default; for pointer and touch |
-| `TagsInput.Input` | `input type="text" autocomplete="off"` | The only Tab stop. Give it an accessible name. `value` is the draft (bindable, cleared once it becomes tags); `onValueChange(value)` reports every draft change the input makes |
+| `TagsInput.Input` | `input type="text" autocomplete="off"` | The only Tab stop. Give it an accessible name. `value` is the draft (bindable, cleared once it becomes tags); `onValueChange(value)` reports every draft change the input makes. A caller `aria-invalid` stays until a tag is refused |
 
 - The root's `children` snippet receives `{ tags }`.
 - Every part takes a `child` snippet. The root's hidden form fields and its

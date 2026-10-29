@@ -10,12 +10,18 @@ type Props = ComponentProps<typeof MenubarPrimitive.Root> & {
   class?: ClassValue;
 };
 
-let { children, class: className, value = $bindable(''), ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  value = $bindable(''),
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const classes = $derived(menubarRootClass({ class: className }));
 </script>
 
-<MenubarPrimitive.Root
+<MenubarPrimitive.Root bind:ref
   class={classes}
   data-tx-menubar
   bind:value

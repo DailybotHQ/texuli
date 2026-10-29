@@ -20,6 +20,7 @@ let {
   shortcut,
   disabled = false,
   value,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -31,7 +32,7 @@ const classes = $derived(
 );
 </script>
 
-<Primitive class={classes} data-tx-menu-radio-item {value} {disabled} {...rest}>
+<Primitive bind:ref class={classes} data-tx-menu-radio-item {value} {disabled} {...rest}>
   {#snippet children({ checked })}
     <span class={menuIndicatorClass()} data-tx-menu-indicator aria-hidden="true">
       {#if checked}●{/if}

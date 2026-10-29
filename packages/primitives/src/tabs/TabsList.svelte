@@ -3,14 +3,15 @@ import { createRovingFocus, indexOfSelected } from '@texuli/core/roving';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
 import { chainHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { tabsContext } from './context.ts';
 
 type Props = HTMLAttributes<HTMLDivElement> & {
   class?: string;
   children?: import('svelte').Snippet;
-};
+} & RefProp;
 
-let { class: className, children, onfocusin, ...rest }: Props = $props();
+let { class: className, children, onfocusin, ref = $bindable(null), ...rest }: Props = $props();
 
 const tabs = tabsContext.get();
 
@@ -68,7 +69,7 @@ function onFocusIn(event: FocusEvent): void {
 }
 </script>
 
-<div
+<div bind:this={ref}
   role="tablist"
   class={className}
   data-orientation={tabs.orientation()}

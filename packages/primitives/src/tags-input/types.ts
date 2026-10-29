@@ -33,6 +33,8 @@ export interface TagsInputRootProps extends Omit<HTMLAttributes<HTMLDivElement>,
   /** Return `false` or a message to refuse a tag. */
   validate?: (tag: string, tags: readonly string[]) => boolean | string;
   disabled?: boolean;
+  /** Tags stay visible and focusable but cannot be added or removed; the input is read-only. */
+  readonly?: boolean;
   /** Submit one field per tag under this name. */
   name?: string;
   form?: string;

@@ -4,6 +4,7 @@ import { getOwnerDocument } from '@texuli/core/env';
 import { createFormBridge, type FormBridge } from '@texuli/core/form-bridge';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { switchContext } from './context.ts';
 
@@ -26,7 +27,7 @@ type Props = Omit<HTMLButtonAttributes, 'type' | 'role' | 'aria-checked' | 'chil
   /** Composition snippet; receives switch trigger props. */
   child?: ChildSnippet<Record<string, unknown>>;
   children?: import('svelte').Snippet;
-};
+} & RefProp;
 
 let {
   checked = $bindable(undefined),
@@ -43,6 +44,7 @@ let {
   children,
   onclick,
   onkeydown,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -63,6 +65,10 @@ const checkedState = createControllableState({
 });
 
 let rootEl: HTMLButtonElement | null = $state(null);
+// `ref` follows the element the part binds for its own behavior.
+$effect(() => {
+  ref = rootEl ?? null;
+});
 let bridge: FormBridge | null = null;
 
 const isChecked = $derived(checkedState.value);

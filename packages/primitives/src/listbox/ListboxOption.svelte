@@ -2,6 +2,7 @@
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { listboxContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'value'> & {
@@ -10,9 +11,17 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'value'> & {
   disabled?: boolean;
   child?: ChildSnippet<Record<string, unknown>>;
   children?: Snippet;
-};
+} & RefProp;
 
-let { value, label, disabled = false, child, children, ...rest }: Props = $props();
+let {
+  value,
+  label,
+  disabled = false,
+  child,
+  children,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const context = listboxContext.get();
 // A consumer id wins: the context records it, so aria-activedescendant follows.
@@ -65,7 +74,7 @@ const optionProps = $derived({
 {#if child}
   {@render child({ props: optionProps })}
 {:else}
-  <div {...optionProps}>
+  <div bind:this={ref} {...optionProps}>
     {@render children?.()}
   </div>
 {/if}

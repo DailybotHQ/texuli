@@ -97,6 +97,12 @@ from subpaths to keep bundles narrow.
   part's behavior still runs; call `event.preventDefault()` in a click or
   key handler to skip it. Bookkeeping handlers (focus, input, pointer up)
   always run. Handlers a part fully owns are left out of its prop types.
+- **`bind:ref` and rest attributes on every part.** Every part that renders
+  an element takes `bind:ref` (that element) and puts the attributes it does
+  not consume on it. Roots that only hold state (menu, select, popover,
+  dialog, tooltip roots) and portals render no element and take neither.
+  `tests/contract.test.ts` checks every exported part
+  ([Component API contract](https://github.com/DailybotHQ/texuli/blob/main/docs/STANDARDS.md#component-api-contract)).
 - **Your ids win.** An `id` you pass on any part replaces the generated one,
   and every `aria-*` reference to that part follows it.
 - **Native forms.** Checkbox, switch, radio group, select, combobox, slider,
@@ -113,6 +119,20 @@ from subpaths to keep bundles narrow.
   compute dates with [`@texuli/date`](https://www.npmjs.com/package/@texuli/date)
   and label them with `Intl.DateTimeFormat`. Only the Gregorian calendar is
   supported; `CalendarDate` is re-exported from `@texuli/date`.
+
+### Planned for the next release
+
+In the working tree, not released yet: `bind:ref` on every rendering part
+(menus, combobox, select, popover, navigation menu, sheet, command, radio,
+number field, tooltip and the rest), caller handlers composed on menu items
+(focus and blur; every handler of checkbox and radio items and sub
+triggers), the navigation menu root, list, trigger and link, toast roots and
+viewports, the tree, splitter handles and the command input (tooltip
+triggers, scroll areas and sortable handles already composed them), `TagsInput.Root` `readonly`, `DateField.Root` and `TimeField.Root`
+`inputId` (and `aria-describedby` / `aria-invalid` reach their segments),
+`ScrollArea.Corner` `forceMount`, `Command.Input` `onkeydown`, and rest
+attributes on `CollapsibleContent` and `NavigationMenu.Content` (also when
+the viewport renders it).
 
 ### New in 0.5.0
 

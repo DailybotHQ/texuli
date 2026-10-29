@@ -25,6 +25,7 @@ let {
   inset = false,
   destructive = false,
   disabled = false,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -38,7 +39,7 @@ const classes = $derived(
 );
 </script>
 
-<Primitive
+<Primitive bind:ref
   class={classes}
   data-tx-menu-item
   data-tone={destructive ? 'destructive' : undefined}

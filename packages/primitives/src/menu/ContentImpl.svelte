@@ -5,6 +5,7 @@ import type { Placement } from '@texuli/core/position-math';
 import { createRovingFocus } from '@texuli/core/roving';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { type MenuLevel, menuItems } from './context.ts';
 import { pointInPolygon } from './grace.ts';
 
@@ -13,9 +14,18 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   placement: Placement;
   sideOffset: number;
   children?: Snippet;
-};
+} & RefProp;
 
-let { level, placement, sideOffset, children, onkeydown, onpointermove, ...rest }: Props = $props();
+let {
+  level,
+  placement,
+  sideOffset,
+  children,
+  onkeydown,
+  onpointermove,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 // A consumer id wins: the context records it, so every reference follows.
 untrack(() => level.claimId('content', rest.id));
 $effect(() => {
@@ -166,7 +176,7 @@ function handlePointerLeave(event: PointerEvent & { currentTarget: HTMLDivElemen
 </script>
 
 {#if level.open}
-  <div
+  <div bind:this={ref}
     {...rest}
     id={level.contentId}
     role="menu"

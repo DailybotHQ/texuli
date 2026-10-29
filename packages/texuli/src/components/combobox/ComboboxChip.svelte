@@ -16,7 +16,15 @@ type Props = ComponentProps<typeof PrimitiveChip> & {
   removable?: boolean;
 };
 
-let { children, class: className, value, label, removable = true, ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  value,
+  label,
+  removable = true,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const context = getComboboxContext();
 const text = $derived(label ?? context.labelFor(value));
@@ -28,7 +36,7 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveChip class={classes} data-tx-combobox-chip {value} label={text} {...rest}>
+<PrimitiveChip bind:ref class={classes} data-tx-combobox-chip {value} label={text} {...rest}>
   <span class="tx-combobox-chip__label">
     {#if children}
       {@render children()}

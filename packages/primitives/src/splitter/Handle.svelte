@@ -1,6 +1,7 @@
 <script lang="ts">
 import { createAttachmentKey } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
+import { chainHandlers } from '../internal/handlers.ts';
 import type { ChildSnippet } from '../internal/index.ts';
 import { splitterContext } from './context.ts';
 import { layoutForKey, paneBounds, resizeLayout, toggleCollapse } from './model.ts';
@@ -109,10 +110,10 @@ const attrs = $derived({
   'data-disabled': inactive ? '' : undefined,
   onkeydown,
   onpointerdown,
-  onpointermove,
-  onpointerup: end,
-  onpointercancel: end,
-  onlostpointercapture: end,
+  onpointermove: chainHandlers(rest.onpointermove, onpointermove),
+  onpointerup: chainHandlers(rest.onpointerup, end),
+  onpointercancel: chainHandlers(rest.onpointercancel, end),
+  onlostpointercapture: chainHandlers(rest.onlostpointercapture, end),
 });
 </script>
 

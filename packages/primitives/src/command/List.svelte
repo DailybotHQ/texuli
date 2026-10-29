@@ -1,10 +1,11 @@
 <script lang="ts">
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { commandContext } from './context.ts';
 
-type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & { children?: Snippet };
-let { children, id, ...rest }: Props = $props();
+type Props = RefProp & Omit<HTMLAttributes<HTMLDivElement>, 'children'> & { children?: Snippet };
+let { children, id, ref = $bindable(null), ...rest }: Props = $props();
 const context = commandContext.get();
 // A consumer id wins: the context records it, so the input's aria-controls follows.
 context.claimId(
@@ -18,7 +19,7 @@ $effect(() => {
 const resolvedId = $derived(context.listId);
 </script>
 
-<div
+<div bind:this={ref}
   {...rest}
   id={resolvedId}
   role="listbox"

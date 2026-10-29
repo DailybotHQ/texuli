@@ -3,6 +3,7 @@ import { PinInput as Primitive } from '@texuli/primitives/pin-input';
 import type { Snippet } from 'svelte';
 import type { HTMLInputAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import { type NumberPinSize, pinInputClass } from './variants.ts';
 import './number-pin.css';
 
@@ -44,12 +45,13 @@ let {
   children,
   value = $bindable(''),
   inputRef = $bindable(null),
+  ref = $bindable(null),
   ...props
-}: Props = $props();
+}: Props & RefProp = $props();
 const classes = $derived(cx(pinInputClass({ size }), className));
 </script>
 
-<Primitive.Root {...props} bind:value bind:inputRef class={classes}>
+<Primitive.Root bind:ref {...props} bind:value bind:inputRef class={classes}>
   {#snippet children(state)}
     <div class="tx-pin-input__cells" aria-hidden="true">
       {@render children?.(state)}

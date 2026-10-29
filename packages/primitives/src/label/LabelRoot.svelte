@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLLabelAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { shouldPreventLabelSelection } from './attributes.ts';
 
 /**
@@ -14,7 +15,7 @@ type LabelRootProps = HTMLLabelAttributes & {
   children?: Snippet;
 };
 
-let { child, children, ...rest }: LabelRootProps = $props();
+let { child, children, ref = $bindable(null), ...rest }: LabelRootProps & RefProp = $props();
 
 const baseProps = {
   onmousedown: (event: MouseEvent) => {
@@ -27,5 +28,5 @@ const labelProps = $derived(composeChildProps(baseProps, rest as Partial<typeof 
 {#if child}
   {@render child({ props: labelProps })}
 {:else}
-  <label {...labelProps}>{@render children?.()}</label>
+  <label bind:this={ref} {...labelProps}>{@render children?.()}</label>
 {/if}

@@ -9,10 +9,10 @@ type Props = ComponentProps<typeof Primitive.NextButton> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 </script>
 
-<Primitive.NextButton
+<Primitive.NextButton bind:ref
   class={paginationButtonClass({
     class: className,
   })}

@@ -114,6 +114,22 @@ the initial chunk.
 `texuli/cx` exports `cx` (class composition) and `variants` (typed variant
 recipes), so you can extend components without `clsx` or `tailwind-merge`.
 
+## Planned for the next release
+
+In the working tree, not released yet: `bind:ref` and rest attributes on
+every exported component (menus, combobox, select, popover, navigation,
+pagination, sheet parts, command, number field, pin input, `Radio`,
+`Tooltip`, `Calendar`, `DatePicker`, `DateRangePicker`, `TimeField`,
+`TagsInput`, `ColorPicker`, `Toggle` and more), one
+[Component API contract](https://github.com/DailybotHQ/texuli/blob/main/docs/STANDARDS.md#component-api-contract)
+checked by `tests/contract.test.ts`; `mode`, `container`,
+`onDismissRequest` and `onCloseAutoFocus` on `Dialog`, `AlertDialog` and
+`CommandPalette`; `FileUpload` `id` / `inputId` on the file input;
+`TagsInput` `readonly` and `id` on its input; `hideLabel` on the date
+controls, which also hide their label inside a `Field`; and `InputGroup`
+sends `id`, `aria-*`, `data-*` and handlers to its input.
+Layouts are not under the contract yet (planned).
+
 ## New in 0.5.0
 
 Ships in `0.5.0`; the `0.4.0` release predates it. Under `0.x` the new minor

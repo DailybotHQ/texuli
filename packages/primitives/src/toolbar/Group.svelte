@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { type ToolbarGroupType, toolbarGroupContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'children'> & {
@@ -11,7 +12,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'children'> & {
   onValueChange?: (value: string | string[]) => void;
   disabled?: boolean;
   children?: Snippet;
-};
+} & RefProp;
 
 let {
   type = 'single',
@@ -19,6 +20,7 @@ let {
   onValueChange,
   disabled = false,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -52,6 +54,6 @@ toolbarGroupContext.set({
 });
 </script>
 
-<div {...rest} role={type === 'single' ? 'radiogroup' : 'group'} data-toolbar-group="" data-type={type}>
+<div bind:this={ref} {...rest} role={type === 'single' ? 'radiogroup' : 'group'} data-toolbar-group="" data-type={type}>
   {@render children?.()}
 </div>

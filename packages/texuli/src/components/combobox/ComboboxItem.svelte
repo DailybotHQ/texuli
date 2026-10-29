@@ -10,7 +10,15 @@ type Props = ComponentProps<typeof PrimitiveItem> & {
   class?: ClassValue;
 };
 
-let { children, class: className, disabled = false, label, value, ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  disabled = false,
+  label,
+  value,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const classes = $derived(
   comboboxItemClass({
@@ -20,7 +28,7 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveItem class={classes} data-tx-combobox-item {value} {label} {disabled} {...rest}>
+<PrimitiveItem bind:ref class={classes} data-tx-combobox-item {value} {label} {disabled} {...rest}>
   <span class="tx-combobox-item__check" aria-hidden="true">
     <svg viewBox="0 0 16 16" width="16" height="16" focusable="false">
       <path

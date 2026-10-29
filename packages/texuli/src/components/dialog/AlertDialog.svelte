@@ -1,6 +1,7 @@
 <script lang="ts">
+import type { FocusRestoreEvent } from '@texuli/core/focus-scope';
 import type { LayerStack } from '@texuli/core/layer-stack';
-import type { OverlayDismissEvent } from '@texuli/core/overlay';
+import type { OverlayDismissEvent, OverlayMode } from '@texuli/core/overlay';
 import type { PortalTarget } from '@texuli/core/portal';
 import * as AlertDialogPrimitive from '@texuli/primitives/alert-dialog';
 import type { Snippet } from 'svelte';
@@ -50,6 +51,24 @@ type OwnProps = {
    * page-wide stack. Read when the alert opens.
    */
   stack?: LayerStack;
+  /**
+   * `'top-layer'` (default) or `'contained'`: with a `container`, the overlay
+   * renders inside it, and inertness, focus containment and the backdrop stay
+   * scoped to it (document scrolling is left alone). For framed previews.
+   */
+  mode?: OverlayMode;
+  /** The element a `'contained'` overlay renders in and is scoped to. */
+  container?: Element | null;
+  /**
+   * Called before an Escape, outside press or outside focus closes it;
+   * `event.preventDefault()` keeps it open.
+   */
+  onDismissRequest?: (event: OverlayDismissEvent) => void;
+  /**
+   * Called before focus returns on close; `event.preventDefault()` keeps
+   * focus where it is (move it yourself to redirect).
+   */
+  onCloseAutoFocus?: (event: FocusRestoreEvent) => void;
   /** The alert dialog content element while open, `null` while closed (bindable). */
   ref?: HTMLElement | null;
 };
@@ -73,6 +92,10 @@ let {
   onOpenChange,
   portal,
   stack,
+  mode = 'top-layer',
+  container = null,
+  onDismissRequest,
+  onCloseAutoFocus,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
@@ -115,6 +138,8 @@ function setOpen(next: boolean): void {
  * still holds (the Cancel control and backdrop are already inert).
  */
 function handleDismiss(event: OverlayDismissEvent): void {
+  onDismissRequest?.(event);
+  // A pending confirm always keeps the alert open.
   if (pending) event.preventDefault();
 }
 
@@ -141,7 +166,15 @@ function cancel(): void {
 }
 </script>
 
-<AlertDialogPrimitive.Root bind:open onOpenChange={setOpen} onDismissRequest={handleDismiss} {stack}>
+<AlertDialogPrimitive.Root
+  bind:open
+  onOpenChange={setOpen}
+  onDismissRequest={handleDismiss}
+  {stack}
+  {mode}
+  {container}
+  {...onCloseAutoFocus ? { onCloseAutoFocus } : {}}
+>
   {#if trigger}
     <AlertDialogPrimitive.Trigger>
       {#snippet child({ props })}

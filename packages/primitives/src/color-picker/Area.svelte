@@ -1,15 +1,16 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
 import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { withArea } from './color.ts';
 import { getColorPickerContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'role'> & {
   label?: string;
   step?: number;
-};
+} & RefProp;
 
-let { label = 'Color area', step = 0.01, ...rest }: Props = $props();
+let { label = 'Color area', step = 0.01, ref = $bindable(null), ...rest }: Props = $props();
 const context = getColorPickerContext();
 let dragging = $state(false);
 
@@ -85,4 +86,4 @@ const attrs = $derived({
 });
 </script>
 
-<div {...attrs} style:touch-action="none"></div>
+<div bind:this={ref} {...attrs} style:touch-action="none"></div>
