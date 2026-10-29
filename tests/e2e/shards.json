@@ -13,6 +13,7 @@
       "site-docs-shell.spec.ts",
       "site-drag-workflows.spec.ts",
       "site-editor.spec.ts",
+      "site-sheets.spec.ts",
       "texuli-polish.spec.ts"
     ],
     [
@@ -34,6 +35,7 @@
       "layouts-app.spec.ts",
       "pages-collab.spec.ts",
       "renderer-hostile.spec.ts",
+      "site-dashboards.spec.ts",
       "site-examples.spec.ts",
       "site-ia.spec.ts",
       "site-keyboard.spec.ts",
@@ -61,6 +63,7 @@
       "site-gallery-themes.spec.ts",
       "site-guides.spec.ts",
       "site-live-primitives.spec.ts",
+      "site-output.spec.ts",
       "site-slides.spec.ts",
       "site-visual.spec.ts"
     ],
@@ -74,7 +77,8 @@
       "site-media-page.spec.ts",
       "site-responsive.spec.ts",
       "site-search.spec.ts",
-      "site-theme-switcher.spec.ts"
+      "site-theme-switcher.spec.ts",
+      "site-whats-new.spec.ts"
     ]
   ]
 }

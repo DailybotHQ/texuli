@@ -173,8 +173,8 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     packages: [
       {
         name: '@texuli/catalog',
-        role: 'The agent catalog (manifests per group, build) and the renderer with no HTML sinks',
-        dependsOn: ['core', 'spec', 'texuli', 'charts', 'data', 'forms', 'blocks', 'media'],
+        role: 'The agent catalog (manifests per group, build) and the renderer with no HTML sinks; schema-form, canvas and spreadsheet drafts are checked by host-injected validators (checkForm, checkCanvas, checkSheet from @texuli/forms, @texuli/canvas and @texuli/sheets), so the catalog depends on none of them and fails closed without one (form-unchecked, canvas-unchecked, sheet-unchecked)',
+        dependsOn: ['core', 'spec', 'texuli', 'charts', 'data', 'blocks', 'media'],
       },
     ],
   },
@@ -207,7 +207,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/tools',
         role: 'Copy-in CLI (texuli-add, texuli-init, texuli-update), texuli-llms, A2UI adapter, custom elements and the golden set',
-        dependsOn: ['core', 'tokens', 'catalog', 'blocks', 'charts', 'media'],
+        dependsOn: ['core', 'tokens', 'catalog', 'blocks', 'charts', 'media', 'deck', 'document'],
       },
       {
         name: '@texuli/astro',

@@ -151,10 +151,6 @@ function toggle(next: boolean): void {
     border-radius: 0.75rem;
     background: var(--tx-background, Canvas);
   }
-  /* The player's diagnostics quote refused values verbatim; long ones wrap here. */
-  .agent-canvas__stage :global(.tx-player__notice) {
-    overflow-wrap: anywhere;
-  }
   @media (forced-colors: active) {
     .agent-canvas__button[aria-pressed='true'] {
       border-color: Highlight;

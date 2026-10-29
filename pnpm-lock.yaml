@@ -168,12 +168,18 @@ importers:
       '@texuli/primitives':
         specifier: workspace:*
         version: link:../../packages/primitives
+      '@texuli/sheets':
+        specifier: workspace:*
+        version: link:../../packages/sheets
       '@texuli/slides':
         specifier: workspace:*
         version: link:../../packages/slides
       '@texuli/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
+      '@texuli/tools':
+        specifier: workspace:*
+        version: link:../../packages/tools
       '@texuli/workflows':
         specifier: workspace:*
         version: link:../../packages/workflows

@@ -222,6 +222,7 @@ import {
   STARTERS,
 } from '../../apps/website/src/components/builder/starters/model.ts';
 import { activeHighlightIndex } from '../../packages/blocks/src/code/token-styles.ts';
+import { clampColumns, DASHBOARD_LIMITS } from '../../packages/data/src/dashboard/engine/limits.ts';
 import { canvasBackingSize } from '../../packages/media/src/composition-canvas/geometry.ts';
 import { IMAGE_LIMITS, intrinsicSize } from '../../packages/media/src/image/model.ts';
 import { HOST_REGION_NAME } from '../../packages/player/src/region-manifests.ts';
@@ -453,8 +454,9 @@ describe('inspector: choice', () => {
         // PLAN_007 T-player-parity: the data views, chat display and workflow graph add 15.
         // PLAN_008 T-catalog-player: the v2 deck root adds its transition and motion enums.
         // PLAN_009: the cohort table, notification inbox and filter builder add 8 (5 booleans).
-        expect(CHOICE_PROPS.length).toBe(65);
-        expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(16);
+        // PLAN_010 (spec 0.8.0): the dashboard adds density, gap, editable and compaction (1 boolean).
+        expect(CHOICE_PROPS.length).toBe(69);
+        expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(17);
         const ids = new Set(CHOICE_PROPS.map((entry) => `${entry.id}.${entry.prop.name}`));
         for (const name of [
           'layout-stack.gap',
@@ -894,7 +896,8 @@ describe('inspector: number', () => {
     it('covers every number prop the builder edits; reads every value exactly as the renderer will: unset, accepted or refused', () => {
       // PLAN_005 task 5 adds the grid tile's span and rowSpan.
       // PLAN_009: cohort table max, filter builder maxDepth, inbox headingLevel.
-      expect(NUMBER_PROPS.length).toBe(49);
+      // PLAN_010 (spec 0.8.0): the dashboard's columns.
+      expect(NUMBER_PROPS.length).toBe(50);
       // reads every value exactly as the renderer will: unset, accepted or refused
       {
         let checked = 0;
@@ -1079,6 +1082,15 @@ describe('inspector: number', () => {
         max: 6,
         integer: true,
       });
+      // The dashboard clamps its columns to 1..DASHBOARD_LIMITS.columns (24), 12 by default.
+      expect(paintNumberHints('data-dashboard', 'columns')?.bounds).toEqual({
+        min: 1,
+        max: DASHBOARD_LIMITS.columns,
+        integer: true,
+      });
+      expect(clampColumns(0)).toBe(1);
+      expect(clampColumns(DASHBOARD_LIMITS.columns + 1)).toBe(DASHBOARD_LIMITS.columns);
+      expect(clampColumns(undefined)).toBe(paintNumberHints('data-dashboard', 'columns')?.default);
       // The image limit is the media package's own constant, and intrinsicSize enforces it.
       expect(paintNumberHints('media-image', 'width')?.bounds?.max).toBe(IMAGE_LIMITS.dimension);
       expect(intrinsicSize(IMAGE_LIMITS.dimension, 10)).toBeDefined();
@@ -2161,10 +2173,12 @@ describe('palette', () => {
       }
       // searches labels, ids and group names case-insensitively
       {
-        // "Grid tile" is the tile's label; the grid layout's summary mentions tiles too.
+        // "Grid tile" is the tile's label; the grid layout's summary mentions tiles too, and
+        // so does the dashboard widget (spec 0.8.0): "placed on the grid", "A tile of a data-dashboard".
         expect(searchPalette(real, 'GRID TILE').map((entry) => entry.id)).toEqual([
           'layout-grid',
           'layout-tile',
+          'data-dashboard-widget',
         ]);
         expect(searchPalette(real, 'LAYOUT-TILE').map((entry) => entry.id)).toEqual([
           'layout-tile',

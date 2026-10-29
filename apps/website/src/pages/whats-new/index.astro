@@ -1,0 +1,433 @@
+---
+import { canvasToSvg } from '@texuli/canvas/export';
+import { validateCanvas } from '@texuli/canvas/model';
+import { documentFromMarkdown } from '@texuli/document/markdown';
+import { SHEET_FUNCTION_NAMES } from '@texuli/sheets/formula';
+/**
+ * /whats-new/ — every new package and capability of 0.6.0, 0.7.0 and
+ * 0.8.0 in one place, grouped by release with its honest status: 0.6.0 and
+ * 0.7.0 are published on npm, 0.8.0 is unreleased. Each feature has a
+ * small live demo (a lazy island, client:visible) or a static preview the
+ * packages build at build time, and a link to the page that shows it in
+ * full.
+ */
+import { AGENT_CANVAS } from '../../components/canvas-site/blueprint.ts';
+import { BLOCK_NOTES } from '../../components/documents-site/inventory.ts';
+import { withBase } from '../../components/foundation/site.ts';
+import GuideCode from '../../components/guides/GuideCode.astro';
+import { CONTRACT_POINTS } from '../../components/motion-site/page.ts';
+import EmailFrame from '../../components/output-site/EmailFrame.svelte';
+import { FEATURES, RELEASES } from '../../components/whats-new/features.ts';
+import HubDashboard from '../../components/whats-new/HubDashboard.svelte';
+import HubForm from '../../components/whats-new/HubForm.svelte';
+import HubLocale from '../../components/whats-new/HubLocale.svelte';
+import HubMotion from '../../components/whats-new/HubMotion.svelte';
+import HubSheet from '../../components/whats-new/HubSheet.svelte';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL;
+const link = (path: string) => withBase(base, path);
+
+const contract = CONTRACT_POINTS.filter(
+  (point) => point.id === 'ref-rest' || point.id === 'handlers'
+)
+  .map((point) => point.code)
+  .join('\n');
+
+const streamFrames = [
+  'bytes arrive: {"id":"layout-page","props":{"title":"Weekly re',
+  'the page node closes: validated, painted, its children wait as skeletons',
+  'a KPI block closes: validated against the catalog, painted in place',
+  'a node fails validation: it becomes its own placeholder, the rest keeps painting',
+  'the envelope closes: the whole draft is validated once more',
+];
+
+const agentSnippet = `POST /drafts  { "prompt": "A weekly report for the ops team" }
+→ a stream of blueprint text, validated by @texuli/catalog
+   before the client paints it (fake replay provider only)`;
+
+const documentMarkdown = `# Launch notes
+
+The beta opens **Monday**.
+
+- Invite the pilot teams
+- Publish the [status page](https://status.example.com)
+
+> Ship small, ship often.`;
+const imported = documentFromMarkdown(documentMarkdown);
+const documentBlocks = imported.ok ? imported.document.blocks.map((block) => block.type) : [];
+
+const sourceSnippet = `"rows": {
+  "$source": "tickets",
+  "query": { "filter": { "type": "condition", "field": "status",
+    "operator": "eq", "value": "open" }, "pageSize": 25 }
+}`;
+
+const canvasChecked = validateCanvas(AGENT_CANVAS);
+const canvasSvg = canvasChecked.ok ? canvasToSvg(canvasChecked.canvas) : '';
+const canvasImage = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(canvasSvg)}`;
+
+const emailPreview = link('/output-page/preview/');
+const blockTypes = Object.keys(BLOCK_NOTES).length;
+const releaseFeatures = RELEASES.map((release) => ({
+  ...release,
+  features: FEATURES.filter((feature) => feature.release === release.id),
+}));
+---
+
+<BaseLayout
+  title="What’s new"
+  description="Every new Texuli package and capability of 0.6.0, 0.7.0 and 0.8.0 with a live demo or preview each: motion, the API contract, live generation, documents and the page editor, forms, data sources, the canvas, spreadsheets, dashboards, email and PDF output, and the i18n catalog."
+>
+  <div class="hub" data-tx-whats-new="">
+    <header class="hub__hero">
+      <p class="hub__eyebrow">0.6.0 and 0.7.0 on npm · 0.8.0 in development</p>
+      <h1>What’s new in Texuli</h1>
+      <p class="hub__lead">
+        Every package and capability added since 0.5.0, each with a small demo or a preview and a link
+        to its full page. <code>0.7.0</code> is the current release on npm (pre-1.0, not a stable
+        release); everything under “Coming in 0.8.0” is unreleased and lives in the repository.
+      </p>
+      <nav class="hub__toc" aria-label="Releases on this page">
+        <ul>
+          {
+            releaseFeatures.map((release) => (
+              <li>
+                <a href={`#release-${release.id.replaceAll('.', '-')}`}>{release.title}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </header>
+
+    {
+      releaseFeatures.map((release) => (
+        <section
+          class="hub__release"
+          id={`release-${release.id.replaceAll('.', '-')}`}
+          aria-labelledby={`release-${release.id.replaceAll('.', '-')}-title`}
+          data-hub-release={release.id}
+        >
+          <h2 id={`release-${release.id.replaceAll('.', '-')}-title`}>{release.title}</h2>
+          <p class="hub__status" data-published={release.published ? 'true' : 'false'}>
+            {release.status}
+          </p>
+          <p class="hub__summary">{release.summary}</p>
+          <ul class="hub__grid">
+            {release.features.map((feature) => (
+              <li class="hub__card" data-hub-feature={feature.id}>
+                <h3>{feature.title}</h3>
+                <p class="hub__packages">
+                  {feature.packages.map((name, index) => (
+                    <>
+                      {index > 0 ? ' · ' : ''}
+                      <code>{name}</code>
+                    </>
+                  ))}
+                </p>
+                <p>{feature.summary}</p>
+                {feature.note ? <p class="hub__note">{feature.note}</p> : null}
+                <div class="hub__demo">
+                  {feature.id === 'motion' && <HubMotion client:visible />}
+                  {feature.id === 'contract' && (
+                    <GuideCode code={contract} label="The contract in two lines" lang="ts" />
+                  )}
+                  {feature.id === 'streaming' && (
+                    <ol class="hub__steps">
+                      {streamFrames.map((frame) => (
+                        <li>{frame}</li>
+                      ))}
+                    </ol>
+                  )}
+                  {feature.id === 'agent-service' && (
+                    <GuideCode code={agentSnippet} label="The agent service in short" lang="text" />
+                  )}
+                  {feature.id === 'documents' && (
+                    <>
+                      <GuideCode code={documentMarkdown} label="Markdown in" lang="text" />
+                      <p class="hub__note" data-hub-document-blocks="">
+                        Imported at build time as {documentBlocks.length} blocks:{' '}
+                        {documentBlocks.join(', ')}.
+                      </p>
+                    </>
+                  )}
+                  {feature.id === 'pages' && (
+                    <p class="hub__note">
+                      The slash menu offers all {blockTypes} block types; every edit is one operation
+                      in one op log, so undo, collaboration and export see the same history.
+                    </p>
+                  )}
+                  {feature.id === 'forms' && <HubForm client:visible />}
+                  {feature.id === 'sources' && (
+                    <GuideCode code={sourceSnippet} label="A source binding in a blueprint" lang="text" />
+                  )}
+                  {feature.id === 'canvas' && (
+                    <img
+                      class="hub__canvas"
+                      src={canvasImage}
+                      alt="A support flow board: a new ticket, a known-issue decision, a saved reply or an escalation, and a sticky note to reply within one business day"
+                      width="600"
+                      height="270"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
+                  {feature.id === 'sheets' && <HubSheet client:visible />}
+                  {feature.id === 'dashboards' && <HubDashboard client:visible />}
+                  {feature.id === 'output' && (
+                    <EmailFrame
+                      client:visible
+                      src={emailPreview}
+                      title="Email preview of the weekly digest (sandboxed, no scripts)"
+                    />
+                  )}
+                  {feature.id === 'i18n' && <HubLocale client:visible />}
+                </div>
+                <p class="hub__more">
+                  <a href={link(feature.href)}>
+                    {feature.linkLabel}
+                    <span class="hub__sr"> ({feature.title})</span>
+                  </a>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+
+    <p class="hub__footnote">
+      The spreadsheet engine above knows {SHEET_FUNCTION_NAMES.length} functions; the canvas preview is
+      the SVG export of the agent board on the canvas page, drawn when this page was built. For every
+      change, release by release, see the <a href={link('/changelog/')}>changelog</a>.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .hub {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+  .hub__hero {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .hub__eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+  }
+  .hub__lead,
+  .hub__summary {
+    margin: 0;
+    max-inline-size: 46rem;
+  }
+  .hub__lead {
+    font-size: 1.0625rem;
+  }
+  .hub__toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hub__toc a,
+  .hub__more a,
+  .hub__footnote a {
+    color: var(--tx-link, LinkText);
+  }
+  .hub__release {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    scroll-margin-block-start: 5rem;
+  }
+  .hub__release h2 {
+    margin: 0;
+    font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+  }
+  .hub__status {
+    margin: 0;
+    max-inline-size: 46rem;
+    padding: 0.6rem 0.9rem;
+    border-inline-start: 4px solid var(--tx-info, CanvasText);
+    border-radius: 0.5rem;
+    background: var(--tx-info-soft, Canvas);
+    color: var(--tx-info-soft-foreground, CanvasText);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .hub__status[data-published='true'] {
+    border-inline-start-color: var(--tx-success, CanvasText);
+    background: var(--tx-success-soft, Canvas);
+    color: var(--tx-success-soft-foreground, CanvasText);
+  }
+  .hub__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hub__card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto 1fr auto;
+    align-content: start;
+    gap: 0.5rem;
+    min-inline-size: 0;
+    padding: 1rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 1rem;
+    background: var(--tx-surface, Canvas);
+  }
+  .hub__card h3 {
+    margin: 0;
+    font-size: 1.125rem;
+  }
+  .hub__card > p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .hub__packages {
+    overflow-wrap: anywhere;
+  }
+  .hub__note {
+    margin: 0;
+    font-size: 0.85rem;
+  }
+  .hub__demo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    min-inline-size: 0;
+    align-content: start;
+  }
+  .hub__steps {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+  }
+  .hub__canvas {
+    inline-size: 100%;
+    block-size: auto;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.6rem;
+    background: var(--tx-background, Canvas);
+  }
+  .hub__more {
+    font-weight: 600;
+  }
+  .hub__sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .hub__footnote {
+    margin: 0;
+    max-inline-size: 46rem;
+    font-size: 0.9rem;
+  }
+
+  .hub :global(pre) {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  .hub :global(.hub-demo) {
+    display: grid;
+    gap: 0.5rem;
+    min-inline-size: 0;
+    padding: 0.75rem;
+    border: 1px dashed var(--tx-border, CanvasText);
+    border-radius: 0.75rem;
+    background: var(--tx-background, Canvas);
+  }
+  .hub :global(.hub-demo__row) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: end;
+  }
+  .hub :global(.hub-demo__field) {
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .hub :global(.hub-demo__field select),
+  .hub :global(.hub-demo__field input) {
+    min-block-size: 2.25rem;
+    box-sizing: border-box;
+    padding-inline: 0.5rem;
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: 0.5rem;
+    background: var(--tx-background, Field);
+    color: var(--tx-foreground, FieldText);
+    font: inherit;
+    font-weight: 400;
+  }
+  .hub :global(.hub-demo__field--wide input) {
+    inline-size: 100%;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .hub :global(.hub-demo__button) {
+    min-block-size: 2.25rem;
+    padding-inline: 0.8rem;
+    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: 0.5rem;
+    background: var(--tx-surface, ButtonFace);
+    color: var(--tx-foreground, ButtonText);
+    font: inherit;
+    cursor: pointer;
+  }
+  .hub :global(.hub-demo__button:focus-visible),
+  .hub :global(.hub-demo__field select:focus-visible),
+  .hub :global(.hub-demo__field input:focus-visible) {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+  .hub :global(.hub-demo__tile) {
+    padding: 0.75rem;
+    border: 1px solid var(--tx-primary, CanvasText);
+    border-radius: 0.6rem;
+    background: var(--tx-primary-soft, Canvas);
+    color: var(--tx-primary-soft-foreground, CanvasText);
+    font-weight: 600;
+  }
+  .hub :global(.hub-demo__out) {
+    margin: 0;
+    min-block-size: 1.25rem;
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+  }
+  .hub :global(.hub-demo__check) {
+    display: inline-flex;
+    gap: 0.4rem;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+  .hub :global(.hub-demo__big) {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+</style>

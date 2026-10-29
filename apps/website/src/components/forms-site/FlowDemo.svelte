@@ -14,7 +14,6 @@ import {
   type FormValues,
   validateFormSchema,
 } from '@texuli/forms/model';
-import { onMount } from 'svelte';
 import { conditionText, FLOW_SCHEMA } from './schemas.ts';
 
 const result = validateFormSchema(FLOW_SCHEMA);
@@ -22,12 +21,6 @@ const form = result.ok ? result.form : null;
 let logic = $state.raw<FormLogicState | null>(form ? computeFormLogic(form, {}) : null);
 let round = $state(0);
 let sent = $state('');
-// SchemaForm paints after mount: texuli's Select.Value recurses when it renders on the
-// server (reported to the lead), and these forms hold select fields.
-let mounted = $state(false);
-onMount(() => {
-  mounted = true;
-});
 
 const conditional = form
   ? form.fields
@@ -55,9 +48,7 @@ function yesNo(value: boolean | undefined): string {
 <div class="flow" data-forms-flow="">
   <div class="flow__form">
     {#key round}
-      {#if !mounted}
-        <p data-forms-pending="">Preparing the form…</p>
-      {:else if form}
+      {#if form}
         <SchemaForm
           {form}
           headingLevel={3}

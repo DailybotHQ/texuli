@@ -7,18 +7,11 @@
  */
 import { SchemaForm } from '@texuli/forms';
 import { type FormValues, validateFormSchema } from '@texuli/forms/model';
-import { onMount } from 'svelte';
 import { FIELDS_SCHEMA, FIELDS_VALUES } from './schemas.ts';
 
 const result = validateFormSchema(FIELDS_SCHEMA);
 let values = $state.raw<FormValues>({});
 let sent = $state('');
-// SchemaForm paints after mount: texuli's Select.Value recurses when it renders on the
-// server (reported to the lead), and these forms hold select fields.
-let mounted = $state(false);
-onMount(() => {
-  mounted = true;
-});
 
 function show(value: unknown): string {
   return JSON.stringify(value, null, 2);
@@ -27,9 +20,7 @@ function show(value: unknown): string {
 
 <div class="gallery" data-forms-gallery="">
   <div class="gallery__form">
-    {#if !mounted}
-      <p class="gallery__hint" data-forms-pending="">Preparing the form…</p>
-    {:else if result.ok}
+    {#if result.ok}
       <SchemaForm
         form={result.form}
         values={FIELDS_VALUES}

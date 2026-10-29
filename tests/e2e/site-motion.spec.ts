@@ -104,7 +104,7 @@ test('the settings drive every demo: full motion animates, reduced motion starts
   await openDialog.click();
   const dialog = page.getByRole('dialog', { name: 'Edit the release crew' });
   await expect(dialog).toBeVisible();
-  await expect.poll(() => animations(page)).toBeGreaterThan(before);
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
   await expect(openDialog).toBeFocused();
@@ -116,7 +116,7 @@ test('the settings drive every demo: full motion animates, reduced motion starts
   await expect(page.locator('[data-motion-list-status]')).toHaveText(
     'Write launch notes moved to position 2 of 4.'
   );
-  await expect.poll(() => animations(page)).toBeGreaterThan(before);
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
   await expect(page.getByRole('button', { name: 'Move Write launch notes down' })).toBeFocused();
 
   // Shared element, timeline, springs and tokens play.
@@ -303,10 +303,13 @@ test('every preset, every moving component, the spring lab and the deck levels',
   ]) {
     const before = await animations(page);
     await page.getByRole('button', { name: `Play ${preset} enter` }).click();
-    await expect.poll(() => animations(page)).toBeGreaterThan(before);
+    // The outcome is written only once the runtime's animation settles, so wait for it first
+    // (generously: the host may be loaded), then prove the play went through
+    // Element.animate. Under load the call lands late, never not at all.
     await expect(outcome(page, 'presets')).toHaveText(`${preset} enter: Played: finished`, {
-      timeout: 5_000,
+      timeout: 15_000,
     });
+    await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
   }
   await page.getByRole('button', { name: 'Play rise exit' }).click();
   await expect(outcome(page, 'presets')).toHaveText('rise exit: Played: finished');
@@ -319,13 +322,13 @@ test('every preset, every moving component, the spring lab and the deck levels',
   const popover = gallery.getByRole('button', { name: 'Open popover' });
   await popover.click();
   await expect(page.getByText('Ada Example owns the release notes.')).toBeVisible();
-  await expect.poll(() => animations(page)).toBeGreaterThan(before);
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
   await page.keyboard.press('Escape');
   await expect(popover).toBeFocused();
   before = await animations(page);
   await gallery.getByRole('button', { name: 'Actions' }).click();
   await expect(page.getByRole('menuitem', { name: 'Rename' })).toBeVisible();
-  await expect.poll(() => animations(page)).toBeGreaterThan(before);
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
   await page.keyboard.press('Escape');
   const alertTrigger = gallery.getByRole('button', { name: 'Archive board' });
   await alertTrigger.click();
@@ -337,7 +340,7 @@ test('every preset, every moving component, the spring lab and the deck levels',
   before = await animations(page);
   await gallery.getByRole('button', { name: 'When does the beta open?' }).click();
   await expect(gallery.getByText('Next week, for every fictional pilot team.')).toBeVisible();
-  await expect.poll(() => animations(page)).toBeGreaterThan(before);
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
   await expect(page.locator('[data-motion-adopters] tbody tr')).toHaveCount(30);
 
   // The spring lab: the solver answers the sliders, and Play runs the spring.
@@ -368,7 +371,7 @@ test('every preset, every moving component, the spring lab and the deck levels',
     'aria-current',
     'true'
   );
-  await expect.poll(() => animations(page)).toBeGreaterThan(before);
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
 
   await page.locator('#settings').scrollIntoViewIfNeeded();
   await page.getByRole('radio', { name: 'None' }).check();

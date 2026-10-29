@@ -182,10 +182,6 @@ function toggle(next: boolean): void {
     background: var(--tx-muted, Canvas);
     font-size: 0.8125rem;
   }
-  /* The player's diagnostics quote refused values verbatim; long ones wrap here. */
-  .agent-form__stage :global(.tx-player__notice) {
-    overflow-wrap: anywhere;
-  }
   @media (forced-colors: active) {
     .agent-form__button[aria-pressed='true'] {
       border-color: Highlight;

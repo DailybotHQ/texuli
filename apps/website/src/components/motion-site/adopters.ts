@@ -144,7 +144,7 @@ export const MOTION_ADOPTERS: readonly MotionAdopter[] = [
     component: 'Dashboard',
     pkg: '@texuli/data',
     motion: 'Widgets glide to their new cell after a change (FLIP), in development',
-    live: '',
+    live: '/dashboards-page/',
   },
   {
     file: 'packages/data/src/grid-core/DataGrid.svelte',

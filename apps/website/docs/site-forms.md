@@ -34,10 +34,10 @@ shared `FeaturePage.astro` (`src/components/feature-site/`), which the later
 
 ## Notes
 
-- The field gallery and the flow paint `SchemaForm` after mount: texuli's
-  `Select.Value` recurses when rendered on the server (a package bug
-  reported to the lead), and both forms hold select fields.
+- The field gallery and the flow server-render `SchemaForm` (texuli's
+  `Select.Value` is SSR-safe since 0232cda5, so the earlier paint-after-mount
+  workaround is gone).
 - Field names avoid `title`, `description` and `summary`, which `SchemaForm`
-  uses for its own element ids (a package bug reported to the lead).
+  once used for its own element ids (fixed in 0232cda5; the names stay).
 - The two Steppers carry their own progress labels so the navigation
   landmarks stay unique.

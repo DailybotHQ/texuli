@@ -1,0 +1,298 @@
+---
+import {
+  DASHBOARD_LIMITS,
+  DEFAULT_DASHBOARD_BREAKPOINTS,
+  DEFAULT_DASHBOARD_MESSAGES,
+} from '@texuli/data/dashboard/engine';
+/**
+ * /dashboards-page/ — the widget grid (@texuli/data/dashboard, unreleased,
+ * coming in 0.8.0): a live, editable dashboard bound to an in-page data
+ * source with breakpoints, compaction and motion controls and its
+ * announcements made visible; the keyboard model and every announcement
+ * template read from the engine; persistence with tampered layouts; and a
+ * dashboard as agent data painted by the player. Every demo is a lazy
+ * island (client:visible).
+ */
+import AgentDashboardDemo from '../../components/dashboards-site/AgentDashboardDemo.svelte';
+import {
+  AGENT_DASHBOARD_JSON,
+  HOSTILE_ROWS_JSON,
+} from '../../components/dashboards-site/blueprint.ts';
+import DashboardWorkbench from '../../components/dashboards-site/DashboardWorkbench.svelte';
+import PersistenceLab from '../../components/dashboards-site/PersistenceLab.svelte';
+import {
+  DASHBOARD_KEYS,
+  DASHBOARDS_DOCS,
+  DASHBOARDS_PIECES,
+  DASHBOARDS_RELEASE,
+  DASHBOARDS_RULES,
+  DASHBOARDS_SECTIONS,
+} from '../../components/dashboards-site/page.ts';
+import FeaturePage from '../../components/feature-site/FeaturePage.astro';
+import GuideCode from '../../components/guides/GuideCode.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const section = (id: string) => {
+  const entry = DASHBOARDS_SECTIONS.find((candidate) => candidate.id === id);
+  if (!entry) throw new Error(`Unknown dashboards section ${id}`);
+  return entry;
+};
+
+/** Every announcement template, read from the engine (refusal reasons are their own table). */
+const messages = Object.entries(DEFAULT_DASHBOARD_MESSAGES).flatMap(([name, template]) =>
+  typeof template === 'string' ? [{ name, template }] : []
+);
+const reasons = Object.entries(DEFAULT_DASHBOARD_MESSAGES).flatMap(([, template]) =>
+  typeof template === 'object' && template !== null
+    ? Object.entries(template as Record<string, string>).map(([code, text]) => ({ code, text }))
+    : []
+);
+
+const limits = [
+  { name: 'Widgets in one layout', value: String(DASHBOARD_LIMITS.widgets) },
+  { name: 'Columns in a grid', value: String(DASHBOARD_LIMITS.columns) },
+  { name: 'Rows one widget may span', value: String(DASHBOARD_LIMITS.height) },
+  { name: 'Last row a widget may start on', value: DASHBOARD_LIMITS.rows.toLocaleString('en') },
+  { name: 'Breakpoints', value: String(DASHBOARD_LIMITS.breakpoints) },
+  { name: 'Saved state', value: `${DASHBOARD_LIMITS.stateBytes / 1024} KiB` },
+];
+
+const viewSnippet = `import {
+  Dashboard, DashboardWidget, parseDashboard, serializeDashboard,
+} from '@texuli/data/dashboard';
+
+// What this person arranged last time: untrusted, so it is normalized.
+const stored = parseDashboard(localStorage.getItem('ops') ?? '');
+let layouts = $state({ ...stored.state?.layouts });
+
+<Dashboard label="Operations" editable bind:layouts
+  onLayoutChange={() => localStorage.setItem('ops', serializeDashboard(layouts))}>
+  <DashboardWidget id="signups" title="Signups" x={0} y={0} w={4} h={2}>…</DashboardWidget>
+  <DashboardWidget id="uptime" title="Uptime" w={4} h={2} locked>…</DashboardWidget>
+</Dashboard>`;
+
+const playerSnippet = `import { createSourceRegistry, defineSource } from '@texuli/core/data-source';
+import { Player } from '@texuli/player';
+
+const tickets = defineSource('tickets', ticketSchema, ticketAdapter);
+const sourceRegistry = createSourceRegistry([tickets]);
+
+<Player blueprint={agentDraft} tier="untrusted" {sourceRegistry} />`;
+---
+
+<BaseLayout
+  title="Dashboards"
+  description="The Texuli dashboard (@texuli/data/dashboard, unreleased, coming in 0.8.0): widgets people move and resize by pointer or keyboard with every step announced, responsive breakpoints, persistence that treats saved layouts as untrusted, host data sources, and dashboards as agent data."
+>
+  <FeaturePage
+    name="dashboards"
+    eyebrow={`@texuli/data/dashboard · unreleased · coming in ${DASHBOARDS_RELEASE}`}
+    title="Dashboards people arrange, from the keyboard too"
+    pieces={DASHBOARDS_PIECES}
+    piecesLabel="The pieces of the dashboard"
+    sections={DASHBOARDS_SECTIONS}
+  >
+    <Fragment slot="lead">
+      <p>
+        A widget grid with pointer and keyboard moves and resizes, announcements for every step, a
+        toolbar for people who cannot drag, breakpoints, a layout glide that respects reduced motion,
+        and persistence that reads saved layouts as untrusted input. The dashboard is a new subpath of
+        <code>@texuli/data</code>: it is unreleased and coming in <code>{DASHBOARDS_RELEASE}</code>,
+        not in the <code>0.7.0</code> published to npm.
+      </p>
+    </Fragment>
+
+    <section class="fx-section" id="live" aria-labelledby="live-title">
+      <h2 id="live-title">{section('live').title}</h2>
+      <p>{section('live').summary}</p>
+      <DashboardWorkbench client:visible />
+      <p class="fx-note">
+        The data source answers from memory after a short delay; nothing leaves your browser. With your
+        system set to reduce motion, changes commit at once whatever the motion switch says.
+      </p>
+    </section>
+
+    <section class="fx-section" id="keyboard" aria-labelledby="keyboard-title">
+      <h2 id="keyboard-title">{section('keyboard').title}</h2>
+      <p>{section('keyboard').summary}</p>
+      <div class="fx-pair">
+        <div class="fx-table-wrap" role="region" aria-label="Dashboard keys" tabindex="0">
+          <table class="fx-table">
+            <caption>Keys on a handle</caption>
+            <thead>
+              <tr>
+                <th scope="col">Keys</th>
+                <th scope="col">What they do</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                DASHBOARD_KEYS.map((row) => (
+                  <tr>
+                    <td>
+                      <kbd>{row.keys}</kbd>
+                    </td>
+                    <td>{row.does}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fx-table-wrap" role="region" aria-label="Refusal reasons" tabindex="0">
+          <table class="fx-table" data-dashboards-reasons="">
+            <caption>Why a change is refused</caption>
+            <tbody>
+              {
+                reasons.map((row) => (
+                  <tr>
+                    <th scope="row">
+                      <code>{row.code}</code>
+                    </th>
+                    <td>{row.text}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="fx-table-wrap" role="region" aria-label="Announcements" tabindex="0">
+        <table class="fx-table" data-dashboards-messages="">
+          <caption>Every announcement template ({messages.length}), localizable through the messages prop</caption>
+          <thead>
+            <tr>
+              <th scope="col">Message</th>
+              <th scope="col">English template</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              messages.map((row) => (
+                <tr>
+                  <th scope="row">
+                    <code>{row.name}</code>
+                  </th>
+                  <td>{row.template}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="fx-section" id="breakpoints" aria-labelledby="breakpoints-title">
+      <h2 id="breakpoints-title">{section('breakpoints').title}</h2>
+      <p>{section('breakpoints').summary}</p>
+      <div class="fx-table-wrap" role="region" aria-label="Default breakpoints" tabindex="0">
+        <table class="fx-table" data-dashboards-breakpoints="">
+          <caption>The default breakpoints of a twelve-column dashboard</caption>
+          <thead>
+            <tr>
+              <th scope="col">Id</th>
+              <th scope="col">From</th>
+              <th scope="col">Columns</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              DEFAULT_DASHBOARD_BREAKPOINTS.map((row) => (
+                <tr>
+                  <th scope="row">
+                    <code>{row.id}</code>
+                  </th>
+                  <td>{row.minWidth.toLocaleString('en')} px</td>
+                  <td>{row.columns}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="fx-section" id="persistence" aria-labelledby="persistence-title">
+      <h2 id="persistence-title">{section('persistence').title}</h2>
+      <p>{section('persistence').summary}</p>
+      <PersistenceLab client:visible />
+    </section>
+
+    <section class="fx-section" id="agents" aria-labelledby="agents-title">
+      <h2 id="agents-title">{section('agents').title}</h2>
+      <p>{section('agents').summary}</p>
+      <div class="fx-pair fx-pair--code">
+        <div class="fx-panel">
+          <h3>The blueprint the agent wrote</h3>
+          <p class="fx-note">
+            Spec <code>0.8.0</code> adds the <code>data-dashboard</code> and
+            <code>data-dashboard-widget</code> catalog ids; they are unreleased and coming in
+            <code>{DASHBOARDS_RELEASE}</code>.
+          </p>
+          <GuideCode code={AGENT_DASHBOARD_JSON} label="The dashboard blueprint (JSON)" lang="text" />
+          <h3>The hostile binding</h3>
+          <GuideCode code={HOSTILE_ROWS_JSON} label="A grid that names a URL" lang="text" />
+        </div>
+        <div class="fx-panel">
+          <h3>Painted by the player</h3>
+          <AgentDashboardDemo client:visible />
+        </div>
+      </div>
+    </section>
+
+    <section class="fx-section" id="safety" aria-labelledby="safety-title">
+      <h2 id="safety-title">{section('safety').title}</h2>
+      <p>{section('safety').summary}</p>
+      <div class="fx-pair">
+        <ul class="fx-rules">
+          {
+            DASHBOARDS_RULES.map((rule) => (
+              <li>
+                <h3>{rule.title}</h3>
+                <p>{rule.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="fx-table-wrap" role="region" aria-label="Limits" tabindex="0">
+          <table class="fx-table">
+            <caption>Limits the engine holds</caption>
+            <tbody>
+              {
+                limits.map((row) => (
+                  <tr>
+                    <th scope="row">{row.name}</th>
+                    <td>{row.value}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <h3>In code</h3>
+      <div class="fx-pair">
+        <GuideCode code={viewSnippet} label="A dashboard that remembers" lang="ts" />
+        <GuideCode code={playerSnippet} label="Agent dashboards with host data" lang="ts" />
+      </div>
+      <p class="fx-note">
+        Planned, not built yet: a sync binding of dashboards onto the document CRDT, and adding or
+        removing widgets from the view (the engine has both operations; the host wires them today).
+      </p>
+    </section>
+
+    <section class="fx-section" id="package-docs" aria-labelledby="package-docs-title">
+      <h2 id="package-docs-title">Package docs</h2>
+      <p>The site does not render the package docs yet. Read them in the repository:</p>
+      <ul class="fx-list">
+        {
+          DASHBOARDS_DOCS.map((doc) => (
+            <li>
+              {doc.label}: <code>{doc.path}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </FeaturePage>
+</BaseLayout>

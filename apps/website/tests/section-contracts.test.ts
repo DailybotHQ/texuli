@@ -240,6 +240,7 @@ describe('links and sinks', () => {
   it('every section link is a path-only on-site route that exists', () => {
     const hrefs = [
       ...webHero.WEB_HERO_ACTIONS,
+      webHero.WEB_HERO_NEWS,
       ...webHero.WEB_HERO_GRID_LINKS,
       ...webAgents.WEB_AGENTS_CTA_LINKS,
       ...webAgents.WEB_AGENTS_SURFACES,

@@ -147,6 +147,42 @@ const SITE_PAGES: readonly SearchEntry[] = [
     ],
   },
   {
+    id: 'page-sheets',
+    title: 'Sheets',
+    description:
+      'Spreadsheets: an owned formula engine with 54 functions, incremental recalculation, cycle and limit errors, CSV that neutralizes formula injection, and agent spreadsheets (in development, coming in 0.8.0).',
+    href: '/sheets-page/',
+    kind: 'page',
+    keywords: ['sheets', 'spreadsheet', 'formula', 'functions', 'csv', 'recalculation', 'workbook'],
+  },
+  {
+    id: 'page-dashboards',
+    title: 'Dashboards',
+    description:
+      'Dashboards: widgets moved and resized by pointer or keyboard with announcements, breakpoints, persisted layouts, host data sources and agent dashboards (unreleased, coming in 0.8.0).',
+    href: '/dashboards-page/',
+    kind: 'page',
+    keywords: ['dashboard', 'widgets', 'grid', 'layout', 'drag', 'resize', 'persistence'],
+  },
+  {
+    id: 'page-output',
+    title: 'Email, PDF and i18n',
+    description:
+      'Multi-target output: email-safe HTML from a blueprint, print mode and PDF, and every component label from one message catalog with lazy locales (unreleased, coming in 0.8.0).',
+    href: '/output-page/',
+    kind: 'page',
+    keywords: ['email', 'pdf', 'print', 'i18n', 'translation', 'locale', 'message catalog'],
+  },
+  {
+    id: 'page-whats-new',
+    title: 'What’s new',
+    description:
+      'Every new package and capability of 0.6.0, 0.7.0 and 0.8.0, with a demo or preview each and honest release status.',
+    href: '/whats-new/',
+    kind: 'page',
+    keywords: ['new', 'release', 'features', 'changelog', '0.8.0', 'roadmap'],
+  },
+  {
     id: 'page-live-generation',
     title: 'Live generation',
     description:
