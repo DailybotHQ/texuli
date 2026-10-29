@@ -14,9 +14,9 @@ which is built on these primitives. They are built from scratch on the
 not depend on any other component library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
-> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
+> published to npm as `0.7.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.8.0`) may contain breaking
+> changes, so pin the exact version or use `^0.7.0`, which accepts only 0.7.x.
 
 ## Install
 
@@ -167,7 +167,7 @@ spins with the APG spinbutton keys, the calendar and date picker's `today`, `wee
 `sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) ships in `0.4.0`; it
 is not in `0.3.0`. It binds the drag engine
 [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md),
-which is in development and on npm as `0.6.0`
+which is in development and on npm as `0.7.0`
 ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 Contract: [prim-sortable.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-sortable.md).
 

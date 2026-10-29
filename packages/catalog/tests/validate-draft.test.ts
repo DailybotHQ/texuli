@@ -61,7 +61,10 @@ describe('validateDraft', () => {
         expect(result).toMatchObject({ ok: true, status: 'valid', tier: 'untrusted' });
         expect(result.checks).toEqual(
           Object.fromEntries(
-            DRAFT_CHECKS.map((c) => [c, c === 'envelope' || c === 'spec' ? 'skipped' : 'pass'])
+            DRAFT_CHECKS.map((c) => [
+              c,
+              c === 'envelope' || c === 'spec' || c === 'documents' ? 'skipped' : 'pass',
+            ])
           )
         );
         expect(result.envelope).toBeNull();

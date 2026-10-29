@@ -5,8 +5,8 @@ built on the escaped `@texuli/core/markup` builders and zipped with
 `@texuli/core/zip`. Load it lazily (`await import('@texuli/document/docx')`,
 as `@texuli/pages/export` does): only an export pays for it.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ```ts
 import { DOCX_MIME, writeDocx } from '@texuli/document/docx';

@@ -1,0 +1,39 @@
+{
+  "$comment": "Must fail spec validation with exactly these diagnostic codes, in order. Spec 0.7.0 (ADR-014): a node key outside 1-64 letters, digits or . _ : - (here with a space and a slash).",
+  "expect": ["schema"],
+  "blueprint": {
+    "format": "texuli-blueprint",
+    "version": 1,
+    "id": "node-key",
+    "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+    "status": "draft",
+    "createdAt": "2026-10-29T09:00:00Z",
+    "updatedAt": "2026-10-29T09:00:00Z",
+    "generator": {
+      "kind": "agent",
+      "name": "Harbor assistant",
+      "model": "example-model"
+    },
+    "tier": "untrusted",
+    "profile": "web",
+    "spec": "0.7.0",
+    "tree": {
+      "key": "summary / week 43",
+      "id": "layout-doc",
+      "props": {
+        "title": "Week 43"
+      },
+      "children": [
+        {
+          "id": "blocks-text",
+          "props": {
+            "block": {
+              "type": "text",
+              "markdown": "Shipped on time."
+            }
+          }
+        }
+      ]
+    }
+  }
+}

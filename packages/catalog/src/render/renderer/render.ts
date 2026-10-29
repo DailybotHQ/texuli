@@ -17,6 +17,8 @@ import type {
 
 const DEFAULT_MAX_CHILDREN = 256;
 const ID_RE = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
+/** A node key (spec 0.7.0 `$defs.nodeKey`); a malformed one is not carried. */
+const NODE_KEY = /^[A-Za-z0-9._:-]{1,64}$/;
 /** The sanctioned inline text node (audit G03): a leaf. */
 const INLINE_TEXT_ID = 'inline-text';
 /** The default slot: a child that names it is an ordinary child. */
@@ -138,6 +140,7 @@ function asTreeNode(
     children = record.children as CatalogTreeInput[];
   }
   return {
+    ...(typeof record.key === 'string' && NODE_KEY.test(record.key) ? { key: record.key } : {}),
     id,
     ...(props ? { props } : {}),
     ...(children ? { children } : {}),
@@ -332,6 +335,7 @@ function renderComponent(
   return Object.freeze({
     kind: 'component' as const,
     id,
+    ...(node.key !== undefined ? { key: node.key } : {}),
     props: sanitized.props,
     children: Object.freeze(children),
     ...slotted,

@@ -215,7 +215,7 @@
         },
         "$ref": {
           "type": "string",
-          "pattern": "^#/\\$defs/(binding|reorder|action|eventMap|condition|workflowGraph)$"
+          "pattern": "^#/\\$defs/(binding|reorder|action|eventMap|condition|workflowGraph|document)$"
         }
       },
       "additionalProperties": false

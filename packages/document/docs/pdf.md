@@ -4,8 +4,8 @@ The owned PDF writer (ADR-016): a PDF 1.7 file drawn from the paged layout
 of `@texuli/document/paged`, measured with font metrics. Load it lazily
 (`await import('@texuli/document/pdf')`, as `@texuli/pages/export` does).
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ```ts
 import { PDF_MIME, writePdf } from '@texuli/document/pdf';

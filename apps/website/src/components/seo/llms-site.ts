@@ -100,7 +100,8 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
     },
     {
       name: 'Agents',
-      description: 'The agent catalog, the sink-free renderer and the agent surfaces.',
+      description:
+        'The agent catalog, the sink-free renderer, streaming generation and the agent surfaces.',
       links: nav('agents'),
     },
     {

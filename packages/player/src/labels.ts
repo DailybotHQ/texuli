@@ -76,6 +76,9 @@ export interface PlayerLabels {
   streamHeld: string;
   /** A node the interrupted stream never finished. */
   streamIncomplete: string;
+
+  /** A `document` node painted without a document host (spec 0.7.0): only previews reach it. */
+  documentNeedsHost: string;
 }
 
 export const DEFAULT_PLAYER_LABELS: PlayerLabels = Object.freeze({
@@ -130,6 +133,8 @@ export const DEFAULT_PLAYER_LABELS: PlayerLabels = Object.freeze({
   streamPending: 'Content',
   streamHeld: 'Waiting for the complete draft.',
   streamIncomplete: 'Not received.',
+
+  documentNeedsHost: 'This document opens in a document reader.',
 });
 
 /** Host overrides; nested maps merge per key. */
@@ -205,6 +210,7 @@ export function resolvePlayerLabels(overrides: PlayerLabelOverrides | undefined)
     streamPending: text(overrides.streamPending, base.streamPending),
     streamHeld: text(overrides.streamHeld, base.streamHeld),
     streamIncomplete: text(overrides.streamIncomplete, base.streamIncomplete),
+    documentNeedsHost: text(overrides.documentNeedsHost, base.documentNeedsHost),
   };
 }
 

@@ -5,8 +5,8 @@
 **Design:** [ADR-014](../../../docs/DECISIONS.md#adr-014-streaming-generation-paint-only-validated-closed-node-shells)  
 **Tests:** `packages/spec/tests/stream.test.ts`  
 **Status:** new in `0.6.0` (in development, pre-1.0); `@texuli/spec@0.5.0`
-and earlier don't have this subpath. Spec `0.7.0` plans the optional node
-`key` (ADR-012).
+and earlier don't have this subpath. Spec `0.7.0` (in
+`@texuli/spec@0.7.0`) admits the optional node `key` (ADR-012).
 
 ## Goal
 
@@ -77,9 +77,12 @@ envelope header is final once `tree` starts.
 Node paths are the ones `validateDraft` and the player use (`0`,
 `0.children.1`, or the index of each root of an array of roots). They stay
 stable while streaming, because streamed children only append. Spec 0.7.0
-plans an optional node `key` (ADR-012); until a spec version admits it, a
-node with `key` is refused by the catalog's node checks, so stream ids are
-paths in practice.
+admits an optional node `key` (`^[A-Za-z0-9._:-]{1,64}$`, unique in the
+tree): a keyed node streams under its key, every other node under its path.
+The tokenizer judges no rule, so a malformed key is refused by the catalog's
+node checks (`invalid-key`), and a key repeated across nodes is refused at
+the node by `validateStreamNode` (its `admittedKeys`) and the player's
+stream session, and by the final `validateDraft` (`duplicate-key`).
 
 `abort(code, message)` stops the assembler with an `aborted` or
 `connection` error (a host whose source dropped).

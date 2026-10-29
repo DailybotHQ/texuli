@@ -2,22 +2,22 @@
 
 Every workspace package, its layer and its public entries. Layers point down
 only: a package imports only from lower layers (the repository's
-`scripts/check-layers.ts` enforces it). **All 20 published packages are on
-npm as `0.6.0`** (published by CI with provenance; `latest` and `next` both
+`scripts/check-layers.ts` enforces it). **All 22 published packages are on
+npm as `0.7.0`** (published by CI with provenance; `latest` and `next` both
 point to it; pre-1.0, not stable; the workspace packages stay
 `private: true`), so install them plainly (`pnpm add texuli`), import them in
 a Texuli workspace, or copy components with the CLI
-([`../components/SKILL.md`](../components/SKILL.md)). `@texuli/editor` (the
-rich text editor) is first published in `0.5.0`. `@texuli/deck` (the deck
-engine, first published in `0.4.0`), `@texuli/drag`, `@texuli/workflows` and
-`@texuli/editor` are in development and on npm as `0.6.0`. Everything marked "new in `0.4.0`"
+([`../components/SKILL.md`](../components/SKILL.md)). `@texuli/document`
+(L1, the block document engine) and `@texuli/pages` (L8, the block document
+editor and reader) are first published in `0.7.0`, and `@texuli/editor`
+(the rich text editor) in `0.5.0`. `@texuli/deck` (the deck engine, first
+published in `0.4.0`), `@texuli/drag`, `@texuli/workflows`,
+`@texuli/editor`, `@texuli/document` and `@texuli/pages` are in development
+and on npm as `0.7.0`. Everything marked "new in `0.4.0`"
 below (spec 0.4.0, the new catalog groups, `sortable`, the data drag
 migrations, the player's interaction, the `@texuli/slides` v2 stage on
 `@texuli/deck`) is not in `0.3.0`. `@texuli/examples` is a
 private registry for tests and the site, not a library, and is left out.
-`@texuli/document` (L1) and `@texuli/pages` (L8) are in the repository
-only: `0.0.0`, not on npm, first release planned for `0.7.0`; never tell a
-consumer app to install them.
 
 **New in `0.5.0`.** Entries marked "new in `0.5.0`" below
 (`@texuli/charts/sparkline-lite`, `@texuli/data/filter-builder`,
@@ -32,7 +32,13 @@ consumer app to install them.
 `texuli/motion`, `@texuli/spec/motion`, `@texuli/spec/stream`,
 `@texuli/slides/stage-core`), spec 0.6.0, the one component API contract
 (`bind:ref`, rest attributes and composed handlers on every export) and the
-streaming player are not in `0.5.0`; install `^0.6.0` to use them.
+streaming player are not in `0.5.0`; install `^0.6.0` or later to use them.
+
+**New in `0.7.0`.** `@texuli/document`, `@texuli/pages`, entries marked
+"new in `0.7.0`" below (`@texuli/catalog/manifests/documents`,
+`@texuli/tools/document`), spec 0.7.0 (node keys, the `document` id and
+`patchDocument`) and the player's `documentHost` are not in `0.6.0`;
+install `^0.7.0` to use them.
 
 This table is derived from each `packages/*/package.json` `exports` map and the
 `LAYERS` map in `scripts/check-layers.ts`. Entries after the root are sorted;
@@ -45,8 +51,9 @@ rest.
 | L0 | `@texuli/date` | Dependency-free Gregorian calendar dates (`CalendarDate`, month and week helpers) behind the calendar and date pickers; first published in `0.3.0`. | `@texuli/date`, `@texuli/date/calendar` |
 | L0 | `@texuli/deck` | Framework-free, dependency-free deck engine: deck model v2 from JSON or Markdown, the 21 layout ids, steps, navigation and hash routing, presenter protocol, lint, patch and templates. **In development: on npm as `0.6.0` (first published in `0.4.0`).** | `@texuli/deck`, `@texuli/deck/authoring`, `@texuli/deck/engine`, `@texuli/deck/markdown`, `@texuli/deck/math`, `@texuli/deck/model`, `@texuli/deck/schema`, `@texuli/deck/templates` |
 | L0 | `@texuli/drag` | Framework-free drag engine: sortable lists and groups, trees, swap, multi-drag, gesture, spatial canvas, graph editing, localized `DragMessages`. **In development: on npm as `0.6.0`.** | `@texuli/drag`, `@texuli/drag/auto-scroll`, `@texuli/drag/collision`, `@texuli/drag/gesture`, `@texuli/drag/graph`, `@texuli/drag/messages`, `@texuli/drag/modifiers`, `@texuli/drag/sortable`, `@texuli/drag/spatial`, `@texuli/drag/testing` |
-| L0 | `@texuli/spec` | The schema-first blueprint contract: JSON schemas, the catalog vocabulary, deterministic TypeScript and Kotlin projections, and the conformance harness. Spec 0.4.0 (spec 0.3.0's state, bindings, closed actions, `reorder`, workflow graphs and state surface, plus deck model v2) is new in `0.4.0`; `0.3.0` carried spec 0.2.0 and only the root and `codegen`. Spec 0.5.0 (four new catalog ids) is new in `0.5.0`; spec 0.6.0 (the closed motion vocabulary) and the `motion` and `stream` subpaths are new in `0.6.0`. | `@texuli/spec`, `@texuli/spec/codegen`, `@texuli/spec/migrate`, `@texuli/spec/motion` (new in `0.6.0`), `@texuli/spec/stream` (new in `0.6.0`), `@texuli/spec/surface`, `@texuli/spec/workflow` |
+| L0 | `@texuli/spec` | The schema-first blueprint contract: JSON schemas, the catalog vocabulary, deterministic TypeScript and Kotlin projections, and the conformance harness. Spec 0.4.0 (spec 0.3.0's state, bindings, closed actions, `reorder`, workflow graphs and state surface, plus deck model v2) is new in `0.4.0`; `0.3.0` carried spec 0.2.0 and only the root and `codegen`. Spec 0.5.0 (four new catalog ids) is new in `0.5.0`; spec 0.6.0 (the closed motion vocabulary) and the `motion` and `stream` subpaths are new in `0.6.0`; spec 0.7.0 (node keys, the `document` id, `patchDocument`) is new in `0.7.0`. | `@texuli/spec`, `@texuli/spec/codegen`, `@texuli/spec/migrate`, `@texuli/spec/motion` (new in `0.6.0`), `@texuli/spec/stream` (new in `0.6.0`), `@texuli/spec/surface`, `@texuli/spec/workflow` |
 | L1 | `@texuli/primitives` | Owned, headless Svelte 5 primitives built on the texels (42, including `sortable` on `@texuli/drag`, new in `0.4.0`). | `@texuli/primitives`, `@texuli/primitives/accordion`, `@texuli/primitives/alert-dialog`, `@texuli/primitives/avatar`, `@texuli/primitives/calendar`, `@texuli/primitives/checkbox`, `@texuli/primitives/collapsible`, `@texuli/primitives/color-picker`, `@texuli/primitives/combobox`, `@texuli/primitives/command`, `@texuli/primitives/context-menu`, `@texuli/primitives/date-field`, `@texuli/primitives/date-picker`, `@texuli/primitives/dialog`, … (43 entries) |
+| L1 | `@texuli/document` | Framework-free, DOM-free block document engine: the format with persisted ids, the untrusted validator, typed operations and bounded RFC 6902 patches with undo, Markdown, pagination, owned DOCX and PDF writers, the CRDT sync core and collaboration (comments, suggestions, versions, presence). **In development: on npm from `0.7.0` (new in `0.7.0`).** | `@texuli/document`, `@texuli/document/collab`, `@texuli/document/docx`, `@texuli/document/markdown`, `@texuli/document/model`, `@texuli/document/ops`, `@texuli/document/paged`, `@texuli/document/pdf`, `@texuli/document/schema`, `@texuli/document/sync` |
 | L2 | `@texuli/tokens` | The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. | `@texuli/tokens`, `@texuli/tokens/aa-gate`, `@texuli/tokens/aa-gate/components`, `@texuli/tokens/base.css`, `@texuli/tokens/build`, `@texuli/tokens/contract`, `@texuli/tokens/css`, `@texuli/tokens/forced-colors`, `@texuli/tokens/forced-colors.css`, `@texuli/tokens/generator`, `@texuli/tokens/library`, `@texuli/tokens/library-expand`, `@texuli/tokens/modes`, `@texuli/tokens/no-flash`, … (19 entries; `@texuli/tokens/motion` is new in `0.6.0`) |
 | L3 | `texuli` | Styled Texuli components, layouts and shells. | `texuli`, `texuli/alert`, `texuli/avatar`, `texuli/badge`, `texuli/button`, `texuli/card`, `texuli/carousel`, `texuli/choice`, `texuli/combobox`, `texuli/command`, `texuli/cx`, `texuli/date`, `texuli/dialog`, `texuli/empty`, … (72 entries; `texuli/layouts/content` is new in `0.5.0`, `texuli/motion` in `0.6.0`) |
 | L4 | `@texuli/charts` | Chart math and every chart family, one lazy subpath per family. | `@texuli/charts`, `@texuli/charts/annotations`, `@texuli/charts/axis`, `@texuli/charts/calendar`, `@texuli/charts/canvas`, `@texuli/charts/cartesian`, `@texuli/charts/colors`, `@texuli/charts/compact`, `@texuli/charts/flow`, `@texuli/charts/geo`, `@texuli/charts/histogram`, `@texuli/charts/interaction`, `@texuli/charts/math`, `@texuli/charts/math/color`, … (27 entries; `@texuli/charts/sparkline-lite` is new in `0.5.0`) |
@@ -56,11 +63,12 @@ rest.
 | L4 | `@texuli/media` | Media: images, galleries, video, audio and layered compositions. | `@texuli/media`, `@texuli/media/animation`, `@texuli/media/animation/player`, `@texuli/media/audio`, `@texuli/media/captions`, `@texuli/media/composition-canvas`, `@texuli/media/composition-canvas/draw`, `@texuli/media/composition-canvas/render`, `@texuli/media/composition-model`, `@texuli/media/composition-svg`, `@texuli/media/composition-v2`, `@texuli/media/export`, `@texuli/media/export/ui`, `@texuli/media/gallery`, … (23 entries) |
 | L4 | `@texuli/workflows` | Accessible workflow graph editor and viewer: model, layered layout, spec adapter, editor, viewer, inspector. **In development: on npm as `0.6.0`.** | `@texuli/workflows`, `@texuli/workflows/editor`, `@texuli/workflows/inspector`, `@texuli/workflows/layout`, `@texuli/workflows/model`, `@texuli/workflows/spec-adapter`, `@texuli/workflows/viewer` |
 | L5 | `@texuli/blocks` | Content blocks: closed vocabulary, untrusted guard, formula AST and catalog metadata for pages, documents and slides. | `@texuli/blocks`, `@texuli/blocks/code`, `@texuli/blocks/code/engine`, `@texuli/blocks/code/renderers`, `@texuli/blocks/code/tokenizer`, `@texuli/blocks/core`, `@texuli/blocks/data`, `@texuli/blocks/data/engine`, `@texuli/blocks/data/renderers`, `@texuli/blocks/diagram`, `@texuli/blocks/diagram/engine`, `@texuli/blocks/diagram/renderers`, `@texuli/blocks/embed`, `@texuli/blocks/embed/engine`, … (32 entries) |
-| L6 | `@texuli/catalog` | The agent catalog (158 ids, 66 agent-emittable in `0.4.0`; the `chat`, `composition`, `data`, `state` and `workflows` groups are new in `0.4.0`; `0.5.0` and `0.6.0` have 162 ids, 69 agent-emittable, with the new `data-cohort-table`, `data-notification-inbox`, `data-filter-builder` and `time-field`) and the renderer with no HTML sinks. | `@texuli/catalog`, `@texuli/catalog/build`, `@texuli/catalog/build/node`, `@texuli/catalog/edit`, `@texuli/catalog/envelope`, `@texuli/catalog/manifest`, `@texuli/catalog/manifests/chat`, `@texuli/catalog/manifests/composition`, `@texuli/catalog/manifests/content`, `@texuli/catalog/manifests/data`, `@texuli/catalog/manifests/display`, `@texuli/catalog/manifests/forms`, `@texuli/catalog/manifests/layouts`, `@texuli/catalog/manifests/overlays`, … (26 entries) |
-| L7 | `@texuli/player` | Svelte paint runtime for validated Texuli catalog blueprints: every emittable id, spec 0.3.0 state and closed actions, one shared drag scope (new in `0.4.0`); streaming (`<Player stream>`) and spec 0.6.0 motion (new in `0.6.0`). | `@texuli/player`, `@texuli/player/styles.css` |
+| L6 | `@texuli/catalog` | The agent catalog (158 ids, 66 agent-emittable in `0.4.0`; the `chat`, `composition`, `data`, `state` and `workflows` groups are new in `0.4.0`; `0.5.0` and `0.6.0` have 162 ids, 69 agent-emittable, with the new `data-cohort-table`, `data-notification-inbox`, `data-filter-builder` and `time-field`; `0.7.0` has 163 ids, 70 agent-emittable, with the new `document` in the `documents` group, and the `patchDocument` edit op) and the renderer with no HTML sinks. | `@texuli/catalog`, `@texuli/catalog/build`, `@texuli/catalog/build/node`, `@texuli/catalog/edit`, `@texuli/catalog/envelope`, `@texuli/catalog/manifest`, `@texuli/catalog/manifests/chat`, `@texuli/catalog/manifests/composition`, `@texuli/catalog/manifests/content`, `@texuli/catalog/manifests/data`, `@texuli/catalog/manifests/display`, `@texuli/catalog/manifests/documents` (new in `0.7.0`), `@texuli/catalog/manifests/forms`, `@texuli/catalog/manifests/layouts`, … (27 entries) |
+| L7 | `@texuli/player` | Svelte paint runtime for validated Texuli catalog blueprints: every emittable id, spec 0.3.0 state and closed actions, one shared drag scope (new in `0.4.0`); streaming (`<Player stream>`) and spec 0.6.0 motion (new in `0.6.0`); the `documentHost` seam for agent documents (new in `0.7.0`). | `@texuli/player`, `@texuli/player/styles.css` |
 | L8 | `@texuli/astro` | Astro integration, content layouts and Svelte islands for Texuli sites. | `@texuli/astro`, `@texuli/astro/appearance` (new in `0.5.0`), `@texuli/astro/content`, `@texuli/astro/integration`, `@texuli/astro/layouts/ContentLayout`, `@texuli/astro/sections/Hero`, `@texuli/astro/sections/Section`, `@texuli/astro/site`, `@texuli/astro/styles.css` |
+| L8 | `@texuli/pages` | Block document editor and reader on `@texuli/document`: slash menu, block drag, nested pages, columns, live embeds painted by the player, the paged view and print, Markdown, DOCX and PDF export, collaboration, and the player's `documentHost` for agent documents. **In development: on npm from `0.7.0` (new in `0.7.0`).** | `@texuli/pages`, `@texuli/pages/collab`, `@texuli/pages/editor`, `@texuli/pages/export`, `@texuli/pages/host`, `@texuli/pages/paged`, `@texuli/pages/reader`, `@texuli/pages/styles.css` |
 | L8 | `@texuli/slides` | The presentation stage on `@texuli/deck`: `DeckStage` (canvas fit, chrome, overview, presenter, deep links), the default component registry, print and PPTX export; the v1 model, grammar and templates remain. The v2 stage is new in `0.4.0`; `0.3.0` ships the v1 stage at L7. | `@texuli/slides`, `@texuli/slides/components`, `@texuli/slides/export`, `@texuli/slides/grammar`, `@texuli/slides/layouts`, `@texuli/slides/model`, `@texuli/slides/stage`, `@texuli/slides/stage-core` (new in `0.6.0`), `@texuli/slides/styles.css`, `@texuli/slides/templates` |
-| L8 | `@texuli/tools` | Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. | `@texuli/tools`, `@texuli/tools/a2ui`, `@texuli/tools/cli-add`, `@texuli/tools/cli-init`, `@texuli/tools/cli-update`, `@texuli/tools/elements`, `@texuli/tools/golden`, `@texuli/tools/llms` |
+| L8 | `@texuli/tools` | Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. | `@texuli/tools`, `@texuli/tools/a2ui`, `@texuli/tools/cli-add`, `@texuli/tools/cli-init`, `@texuli/tools/cli-update`, `@texuli/tools/deck` (new in `0.4.0`), `@texuli/tools/document` (new in `0.7.0`), `@texuli/tools/elements`, `@texuli/tools/golden`, `@texuli/tools/llms` |
 
 Apps that consume the packages (not layers):
 - `apps/website`: texuli.com, built with Astro 7 and Svelte islands. It

@@ -18,7 +18,12 @@ export {
   rangeFor,
   supportsHighlights,
 } from './highlights.ts';
-export { type CollabLabels, DEFAULT_COLLAB_LABELS, resolveCollabLabels } from './labels.ts';
+export {
+  type CollabLabels,
+  DEFAULT_COLLAB_LABELS,
+  landmarkPerson,
+  resolveCollabLabels,
+} from './labels.ts';
 export { default as SuggestionList } from './SuggestionList.svelte';
 export {
   type CollabRange,

@@ -10,10 +10,10 @@ the URL policy. It is part of [Texuli](https://texuli.com), "Small pieces.
 Infinite possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
 > **Status: in development (pre-1.0).** `@texuli/editor` is published on
-> npm as `0.6.0`, with provenance (first published as `0.5.0`; the publish
-> workflow publishes it after `texuli`). Under 0.x a new minor (`0.7.0`) may contain
-> breaking changes, so pin the exact version or use `^0.6.0`, which accepts
-> only 0.6.x. The architecture
+> npm as `0.7.0`, with provenance (first published as `0.5.0`; the publish
+> workflow publishes it after `texuli`). Under 0.x a new minor (`0.8.0`) may contain
+> breaking changes, so pin the exact version or use `^0.7.0`, which accepts
+> only 0.7.x. The architecture
 > contract is ADR-003 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)
 > and [EDITOR_ARCHITECTURE](https://github.com/DailybotHQ/texuli/blob/main/docs/EDITOR_ARCHITECTURE.md).

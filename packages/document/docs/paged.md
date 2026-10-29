@@ -8,8 +8,8 @@ same engine runs in the DOM (the `@texuli/pages` paged view measures
 rendered blocks) and without one (the PDF writer measures with font
 metrics). Framework-free and DOM-free.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ```ts
 import { layoutDocument, PX_PER_PT } from '@texuli/document/paged';

@@ -3,7 +3,7 @@ packages:
   - apps/*
   - tests/fixtures/*
 
-# Internal deps are pinned to exact versions (0.6.0) so the packed
+# Internal deps are pinned to exact versions (0.7.0) so the packed
 # manifests declare exact pins; link them to the workspace projects
 # instead of the registry.
 linkWorkspacePackages: true

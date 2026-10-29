@@ -3,6 +3,7 @@ import { buildCatalog } from '@texuli/catalog/build';
 import { describe, expect, it } from 'vitest';
 import Player from '../src/Player.svelte';
 import { CATALOG_GROUPS } from './catalog-groups.ts';
+import { testDocumentHost } from './document-host.ts';
 
 /**
  * Every manifest example of every agent-emittable id paints in the Player
@@ -112,6 +113,8 @@ describe('every emittable example paints', () => {
             label: 'Parity',
             // Examples are fragments: the frame-root rule is the only refusal allowed.
             invalidPolicy: 'preview',
+            // A document example (spec 0.7.0) is checked and painted through a document host.
+            documentHost: testDocumentHost().host,
             onDiagnostics: (event: {
               diagnostics: readonly {
                 check: string;

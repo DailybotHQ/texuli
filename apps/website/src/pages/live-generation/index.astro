@@ -1,0 +1,212 @@
+---
+/**
+ * /live-generation/ — streaming generation (ADR-014): a recorded agent
+ * draft replayed chunk by chunk into `<Player stream>`. No network, no
+ * model, no key: the drafts are static data in
+ * src/components/live-generation/recording.ts. The island loads the player
+ * on the first Start, so the first paint carries only the controls.
+ */
+import GuideCode from '../../components/guides/GuideCode.astro';
+import LiveGeneration from '../../components/live-generation/LiveGeneration.svelte';
+import { LIVE_DOCS, LIVE_STEPS, STREAMING_RELEASE } from '../../components/live-generation/page.ts';
+import { CHUNK_PATTERN } from '../../components/live-generation/recording.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const hostSnippet = `import { Player } from '@texuli/player';
+import { createBlueprintStream } from '@texuli/spec/stream';
+
+let stream = $state(createBlueprintStream());
+agent.onDelta((text) => stream.write(text));
+agent.onDone(() => stream.end());
+agent.onError(() => stream.abort('The agent stopped.'));
+
+<Player {stream} onStreamRetry={() => (stream = createBlueprintStream())} />`;
+---
+
+<BaseLayout
+  title="Live generation"
+  description="Watch a recorded agent draft stream into the Texuli player chunk by chunk: skeletons, validated nodes painted as they complete, a held node outside the catalog, a dropped connection and Try again. Replayed in your browser, with no network and no model."
+>
+  <div class="live-page" data-tx-live-page="">
+    <header class="live-page__hero">
+      <p class="eyebrow">@texuli/player · streaming mode · in development · on npm from {STREAMING_RELEASE}</p>
+      <h1>Watch an agent's draft paint as it streams</h1>
+      <p class="lead">
+        An agent writes a blueprint token by token. In streaming mode the player paints each node as
+        soon as it is complete and checked, instead of waiting for the whole draft, and adds speed
+        without adding trust: the complete draft still passes the full validation before anything is
+        armed. Streaming mode is in development and in <code>@texuli/player</code> from <code
+          >{STREAMING_RELEASE}</code
+        >, a pre-1.0 release.
+      </p>
+      <p class="status">
+        This playground replays recorded drafts in your browser: no network request, no model and no
+        key. The agent service that streams real drafts is in the repository and is not deployed, so
+        texuli.com runs no model.
+      </p>
+    </header>
+
+    <section class="demo" id="playground" aria-labelledby="playground-title">
+      <h2 id="playground-title">Stream a recorded draft</h2>
+      <p>
+        Pick a draft and a speed, press Start, and pause or step one chunk at a time to see a node
+        wait as a skeleton, then paint. Drop the connection to see what stays.
+      </p>
+      <LiveGeneration client:visible />
+    </section>
+
+    <section class="demo" id="how" aria-labelledby="how-title">
+      <h2 id="how-title">How a node goes from bytes to paint</h2>
+      <ol class="steps">
+        {
+          LIVE_STEPS.map((step) => (
+            <li class="steps__item">
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <p>
+        While the stream is open the surface is busy and inert: nothing to focus, nothing to activate,
+        and no action runs until the complete draft passes validation. The player announces progress
+        politely, at most every few seconds, never once per node.
+      </p>
+    </section>
+
+    <section class="demo" id="replay" aria-labelledby="replay-title">
+      <h2 id="replay-title">What the replay is</h2>
+      <p>
+        Each draft is one blueprint envelope, written the way the agent service streams it (its
+        header first, then the model's tree, children last) and cut into chunks of {
+          CHUNK_PATTERN.join(', ')
+        } characters, in turn, so every replay is the same. The weekly report is the agent service's
+        recorded answer to its first preset prompt. Reduced motion, from your system or the checkbox,
+        is passed to the player: nodes appear in place and nothing on this page glides.
+      </p>
+      <h3>In code</h3>
+      <GuideCode code={hostSnippet} label="Stream an agent's output into the player" lang="ts" />
+    </section>
+
+    <section class="demo" id="package-docs" aria-labelledby="package-docs-title">
+      <h2 id="package-docs-title">Read more</h2>
+      <p>
+        The site does not render the package docs yet. Read them in the repository, or try a whole
+        draft in the <a href="/playground/">playground</a>.
+      </p>
+      <ul class="docs">
+        {
+          LIVE_DOCS.map((doc) => (
+            <li>
+              {doc.label}: <code>{doc.path}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .live-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+  .live-page__hero {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0;
+    max-inline-size: 46rem;
+    font-size: 1.0625rem;
+    color: var(--tx-foreground);
+  }
+  .status {
+    margin: 0;
+    max-inline-size: 46rem;
+    padding: 0.75rem 1rem;
+    border-inline-start: 4px solid var(--tx-info, CanvasText);
+    border-radius: 0.5rem;
+    background: var(--tx-info-soft, Canvas);
+    color: var(--tx-info-soft-foreground, CanvasText);
+    font-size: 0.9rem;
+  }
+  .demo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    min-inline-size: 0;
+    scroll-margin-block-start: 5rem;
+  }
+  .demo h2 {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  }
+  .demo h3 {
+    margin: 0;
+    font-size: 1.0625rem;
+  }
+  .demo > p {
+    margin: 0;
+    max-inline-size: 46rem;
+  }
+  .demo a {
+    color: var(--tx-link, LinkText);
+  }
+  .demo :global(pre) {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+  .steps__item {
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    min-inline-size: 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.85rem;
+    background: var(--tx-surface, Canvas);
+    counter-increment: step;
+  }
+  .steps__item h3::before {
+    content: counter(step) '. ';
+  }
+  .steps__item p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .docs {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+  }
+  .docs code {
+    overflow-wrap: anywhere;
+  }
+</style>

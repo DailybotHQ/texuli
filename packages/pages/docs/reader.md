@@ -4,8 +4,8 @@ The read-only reader: the same document the editor edits, rendered as an
 `article` with anchored headings and an "On this page" outline. It loads no
 editing code.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ```svelte
 <script lang="ts">

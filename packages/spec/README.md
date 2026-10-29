@@ -14,9 +14,16 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
-> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
+> published to npm as `0.7.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.8.0`) may contain breaking
+> changes, so pin the exact version or use `^0.7.0`, which accepts only 0.7.x.
+
+> **New in `0.7.0`.** `@texuli/spec@0.7.0` carries **spec 0.7.0**, which adds
+> an optional node `key` (unique in the tree), the agent-emittable
+> `document` id with its `$defs.document` shape, the `patchDocument` edit
+> op with a bounded RFC 6902 patch, and the pinned
+> `schemas/document.schema.json`. Every `0.6.0` envelope migrates by
+> stamping `spec`.
 
 > **New in `0.6.0`.** `@texuli/spec@0.6.0` carries **spec 0.6.0**: the
 > closed motion vocabulary (`@texuli/spec/motion`, below), and the new
@@ -61,7 +68,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.6.0' in @texuli/spec@0.6.0
+SPEC_VERSION;                         // the spec version: '0.7.0' in @texuli/spec@0.7.0
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -93,7 +100,7 @@ import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
 import { migrateBlueprint } from '@texuli/spec/migrate';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.5.0 → 0.6.0; never throws
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.6.0 → 0.7.0; never throws
 const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
@@ -114,7 +121,8 @@ refused state or flow declaration), `unknown-state` (a binding or action
 names no declared variable), `binding` (a malformed, misplaced, read-only or
 ill-fitting binding), `action` (an action with the wrong fields or target),
 `unknown-event` (an `on` key the component does not fire) and `workflow` (a
-workflow graph rule). Deprecated components and props add a `deprecated`
+workflow graph rule), and, from spec 0.7.0, `duplicate-key` (a node key used
+twice in the tree). Deprecated components and props add a `deprecated`
 warning without failing.
 
 ## What's inside
@@ -162,6 +170,12 @@ warning without failing.
   motion tokens: a blueprint never carries CSS, keyframes, milliseconds or
   code, and anything else is refused. The `0.5.0 → 0.6.0` migration only
   stamps `spec`.
+- **Documents as data (spec 0.7.0, new in `0.7.0`).** A
+  `document` node's `doc` must have the document shape (`$defs.document`);
+  the document's own vocabulary and URL policy are checked by
+  `@texuli/document` through `@texuli/catalog`'s `validateDraft`. Agents
+  edit documents with `patchDocument` (at most 1,000 RFC 6902 operations),
+  addressed by node `key`.
 - **Streams parse, never guess.** `@texuli/spec/stream` (new in `0.6.0`)
   reads a blueprint split anywhere in linear time under a byte budget and a
   depth cap, reports a node only once its shell (everything but
@@ -210,9 +224,12 @@ catalog hash, and from 0.3.0 may declare the exact spec version it was
 written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 (`@texuli/spec/migrate`) brings an
 envelope up to the current spec with pure, per-version steps
-(`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0` and
-`0.5.0 → 0.6.0`, each of which only stamps `spec`); a compatible version range is planned,
-not built. `@texuli/spec@0.6.0` carries spec `0.6.0` (digest
+(`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`,
+`0.5.0 → 0.6.0` and `0.6.0 → 0.7.0`, each of which only stamps `spec`); a
+compatible version range is planned, not built. `@texuli/spec@0.7.0`
+carries spec `0.7.0` (digest
+`43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2`), which
+adds node keys and documents; `@texuli/spec@0.6.0` carried spec `0.6.0` (digest
 `37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc`), which
 adds the closed motion vocabulary (ADR-012); `@texuli/spec@0.5.0` carried
 spec `0.5.0`, which added the `data-cohort-table`,

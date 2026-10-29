@@ -62,6 +62,9 @@ const BROWSER_ROUTES = [
   '/perf/',
   // PLAN_010 T-site-060: nine lazy motion islands; the settings panel is the only one near the top.
   '/motion-page/',
+  // PLAN_010 T-site-070: lazy document and live-generation islands; their large modules load after hydration.
+  '/documents-page/',
+  '/live-generation/',
 ] as const;
 
 const kb = (bytes: number) => Math.round((bytes / 1024) * 10) / 10;

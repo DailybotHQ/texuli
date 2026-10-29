@@ -44,6 +44,7 @@ export const CATALOG_SCHEMA_REFS: readonly string[] = Object.freeze([
   'eventMap',
   'condition',
   'workflowGraph',
+  'document',
 ]);
 
 const SCHEMA_TYPES = new Set(['object', 'array', 'string', 'number', 'integer', 'boolean']);

@@ -15,12 +15,15 @@ export {
   type EditHistoryOptions,
   type HistoryApplyResult,
 } from './history.ts';
-export { applyEditOp, applyEditOps, getNode } from './ops.ts';
+export { applyEditOp, applyEditOps, findNodeKey, getNode } from './ops.ts';
 export {
+  isDocumentPatch,
+  isNodeKey,
   isPlainJson,
   isPropName,
   isTreeNode,
   MAX_BATCH_OPS,
+  MAX_DOCUMENT_PATCH_OPS,
   MAX_PATH_LENGTH,
   type ParseOpResult,
   type ParseOpsResult,
@@ -28,6 +31,9 @@ export {
   parseEditOps,
 } from './parse.ts';
 export type {
+  ApplyEditOptions,
+  DocumentPatcher,
+  DocumentPatchOp,
   EditError,
   EditErrorCode,
   EditOp,

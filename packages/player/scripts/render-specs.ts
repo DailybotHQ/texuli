@@ -18,6 +18,7 @@ import { CHAT_MANIFESTS } from '@texuli/catalog/manifests/chat';
 import { COMPOSITION_MANIFESTS } from '@texuli/catalog/manifests/composition';
 import { CONTENT_MANIFESTS } from '@texuli/catalog/manifests/content';
 import { DATA_MANIFESTS } from '@texuli/catalog/manifests/data';
+import { DOCUMENTS_MANIFESTS } from '@texuli/catalog/manifests/documents';
 import {
   cardLayoutManifest,
   deckLayoutManifest,
@@ -44,6 +45,7 @@ export const PLAYER_MANIFESTS: readonly CatalogManifest[] = [
   ...CHAT_MANIFESTS,
   ...DATA_MANIFESTS,
   ...WORKFLOWS_MANIFESTS,
+  ...DOCUMENTS_MANIFESTS,
 ];
 
 export function projectPlayerSpecs(

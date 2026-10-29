@@ -10,9 +10,11 @@ import { AppearanceSwitcher } from '@texuli/astro/appearance';
 import { TextBlockView } from '@texuli/blocks/text/renderers';
 import { LineChart } from '@texuli/charts/cartesian';
 import { type ChatMessage, ChatThread } from '@texuli/chat';
+import type { TexuliDocument } from '@texuli/document/model';
 import { RichTextEditor } from '@texuli/editor/editor';
 import { markdownToDocument } from '@texuli/editor/markdown';
 import { Image } from '@texuli/media/image';
+import { PageReader } from '@texuli/pages/reader';
 import { Player } from '@texuli/player';
 import '@texuli/player/styles.css';
 import '@texuli/slides/styles.css';
@@ -39,6 +41,18 @@ const messages: ChatMessage[] = [
   },
 ];
 const { doc } = markdownToDocument('Consumer editor text');
+const page: TexuliDocument = {
+  format: 'texuli-document',
+  formatVersion: 1,
+  meta: { title: 'Consumer page' },
+  blocks: [
+    {
+      id: 'p1',
+      type: 'paragraph',
+      content: [{ type: 'text', text: 'Consumer page text', marks: [] }],
+    },
+  ],
+};
 const registry = defineNodeTypes([
   {
     type: 'request',
@@ -107,6 +121,9 @@ const deck = {
   </section>
   <section data-render="@texuli/media">
     <Image src={pixel} trust="developer" alt="Consumer image" width={160} height={90} />
+  </section>
+  <section data-render="@texuli/pages">
+    <PageReader document={page} />
   </section>
   <section data-render="@texuli/player">
     <Player {blueprint} label="Consumer player" />

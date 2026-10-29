@@ -21,7 +21,11 @@ describe('the streaming eval harness', () => {
     expect(golden).toHaveLength(8);
     expect(golden.every((c) => c.expected !== null)).toBe(true);
     expect(spec.length).toBeGreaterThanOrEqual(9);
-    expect(spec.every((c) => c.expected === null && c.id.startsWith('spec/'))).toBe(true);
+    expect(spec.every((c) => c.id.startsWith('spec/'))).toBe(true);
+    // The document task is pinned; the other spec blueprints are measured only.
+    expect(spec.filter((c) => c.expected !== null).map((c) => [c.id, c.expected])).toEqual([
+      ['spec/document-brief', 'valid'],
+    ]);
   });
 
   it('measures validity, refusal reasons, time to first node and total time, deterministically', async () => {
@@ -30,8 +34,12 @@ describe('the streaming eval harness', () => {
     expect(report.harness).toBe(STREAM_EVAL_VERSION);
     expect(report.clock).toBe('virtual');
     expect(report.provider).toBe('replay/fake');
-    expect(report.totals.pinned).toBe(8);
-    expect(report.totals.matched).toBe(8);
+    expect(report.totals.pinned).toBe(9);
+    expect(report.totals.matched).toBe(9);
+    expect(report.cases.find((c) => c.id === 'spec/document-brief')).toMatchObject({
+      status: 'valid',
+      pass: true,
+    });
     expect(report.totals.errors).toBe(0);
     expect(report.totals.validityRate).toBeCloseTo(report.totals.valid / report.totals.cases, 2);
     // The developer-tier golden fixtures are refused for their tier.

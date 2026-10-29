@@ -5,8 +5,8 @@ vocabularies and caps, constructors and read helpers. Framework-free and
 DOM-free; every walk is iterative, so a deep tree never overflows the
 stack.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ## The document
 

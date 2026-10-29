@@ -417,3 +417,72 @@ describe('the endpoint streams server-sent events', () => {
     expect(((await res.json()) as DraftResult).status).toBe('valid');
   });
 });
+
+describe('the service validates document drafts with the host document validator', () => {
+  const PROMPT = 'Draft the brief document.';
+  const brief = JSON.parse(
+    readFileSync(
+      join(import.meta.dirname, '../../../packages/spec/fixtures/golden/document-brief.json'),
+      'utf8'
+    )
+  ) as { tree: { props: { doc: { blocks: unknown[] } & Record<string, unknown> } } };
+  const hostile = {
+    ...brief.tree,
+    props: {
+      doc: {
+        ...brief.tree.props.doc,
+        blocks: [
+          ...brief.tree.props.doc.blocks,
+          {
+            id: 'evil',
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: 'Open',
+                marks: [{ type: 'link', href: 'javascript:alert(1)' }],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  };
+
+  it.each([true, false])('accepts a valid document draft (stream: %s)', async (stream) => {
+    const s = service({ provider: createFakeProvider([recording(PROMPT, brief.tree)]) });
+    const events = await collect(s.draft(request(PROMPT, { stream }), caller));
+    const result = stream
+      ? finalOf(events)
+      : (events.find((e) => e.type === 'result') as { result: DraftResult }).result;
+    expect(result.diagnostics).toEqual([]);
+    expect(result.status).toBe('valid');
+    if (stream) {
+      expect(events.filter((e) => e.type === 'refused')).toEqual([]);
+      expect(events.find((e) => e.type === 'node-ready')).toMatchObject({ id: 'document' });
+    }
+  });
+
+  it.each([true, false])(
+    'refuses a hostile document draft with the schema reason (stream: %s)',
+    async (stream) => {
+      const s = service({ provider: createFakeProvider([recording(PROMPT, hostile)]) });
+      const events = await collect(s.draft(request(PROMPT, { stream }), caller));
+      const result = stream
+        ? finalOf(events)
+        : (events.find((e) => e.type === 'result') as { result: DraftResult }).result;
+      expect(result.status).toBe('invalid');
+      const codes = result.diagnostics.map((d) => d.code);
+      expect(codes).toContain('document-schema');
+      expect(codes).not.toContain('document-unchecked');
+      if (stream) {
+        expect(events.find((e) => e.type === 'refused' && e.attempt === 1)).toMatchObject({
+          path: '0',
+          reason: 'node',
+        });
+        const refused = events.find((e) => e.type === 'refused' && e.attempt === 1);
+        expect(refused?.type === 'refused' && refused.codes).toContain('document-schema');
+      }
+    }
+  );
+});

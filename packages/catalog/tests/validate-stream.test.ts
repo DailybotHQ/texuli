@@ -107,7 +107,7 @@ describe('validateStreamNode', () => {
       'unknown node field': { id: 'badge', props: { label: 'New' }, style: 'color:red' },
       'bad block': { id: 'blocks-text', props: { block: { type: 'text' } } },
       'when without a runtime': { id: 'badge', props: { label: 'New' }, when: { gt: ['x', 1] } },
-      'a key (not in the spec yet)': { key: 'intro', id: 'badge', props: { label: 'New' } },
+      'a malformed key (spec 0.7.0)': { key: 'intro / one', id: 'badge', props: { label: 'New' } },
     };
     for (const [name, shell] of Object.entries(refused)) {
       const result = validateStreamNode(

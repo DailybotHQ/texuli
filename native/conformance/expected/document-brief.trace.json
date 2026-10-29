@@ -1,0 +1,10 @@
+{
+  "golden": "document-brief",
+  "trace": [
+    {
+      "id": "document",
+      "name": "Launch brief",
+      "role": "article"
+    }
+  ]
+}

@@ -35,23 +35,23 @@ project overview.
 | `@texuli/catalog` | [packages/catalog/README.md](../packages/catalog/README.md): The agent catalog and the renderer with no HTML sinks. |
 | `@texuli/charts` | [packages/charts/README.md](../packages/charts/README.md): Chart math and every chart family, one lazy subpath per family. |
 | `@texuli/chat` | [packages/chat/README.md](../packages/chat/README.md): Chat interfaces: thread, message list, composer and typing indicator, generic for people and agents. |
-| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): In development, on npm as `0.6.0` (first published as `0.5.0`): the rich text editor surface, toolbar, link dialog, clipboard import and Markdown in and out on the core editor texels. |
+| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): In development, on npm as `0.7.0` (first published as `0.5.0`): the rich text editor surface, toolbar, link dialog, clipboard import and Markdown in and out on the core editor texels. |
 | `@texuli/core` | [packages/core/README.md](../packages/core/README.md): Texels: framework-free behavior and policy that every Texuli component is built from. |
 | `@texuli/date` | [packages/date/README.md](../packages/date/README.md): Owned Gregorian date arithmetic for Texuli calendars and date fields. |
-| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, on npm as `0.6.0` (first published as `0.4.0`): the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
-| `@texuli/document` | [packages/document/README.md](../packages/document/README.md): In development, in the repository only (first release planned for `0.7.0`): the framework-free block document engine (model, schema, operations, Markdown, sync). |
-| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.6.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
+| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, on npm as `0.7.0` (first published as `0.4.0`): the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
+| `@texuli/document` | [packages/document/README.md](../packages/document/README.md): In development, first on npm as `0.7.0`: the framework-free block document engine (model, schema, operations, Markdown, pagination, DOCX and PDF, sync, collaboration). |
+| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.7.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
 | `@texuli/media` | [packages/media/README.md](../packages/media/README.md): Media: images, galleries, video, audio and layered compositions. |
-| `@texuli/pages` | [packages/pages/README.md](../packages/pages/README.md): In development, in the repository only (first release planned for `0.7.0`): the block document editor and reader on `@texuli/document`. |
+| `@texuli/pages` | [packages/pages/README.md](../packages/pages/README.md): In development, first on npm as `0.7.0`: the block document editor and reader on `@texuli/document` (paged view, export, collaboration, document host). |
 | `@texuli/player` | [packages/player/README.md](../packages/player/README.md): Svelte paint runtime for validated Texuli catalog blueprints. |
 | `@texuli/primitives` | [packages/primitives/README.md](../packages/primitives/README.md): Owned, headless Svelte 5 primitives built on the texels. |
-| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (in development; on npm as `0.6.0`, the v2 stage from `0.4.0`, after the `0.3.0` model v1 stage). |
+| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (in development; on npm as `0.7.0`, the v2 stage from `0.4.0`, after the `0.3.0` model v1 stage). |
 | `@texuli/spec` | [packages/spec/README.md](../packages/spec/README.md): The schema-first blueprint contract: JSON schemas, the catalog vocabulary, TypeScript and Kotlin projections, and the conformance harness. |
 | `texuli` | [packages/texuli/README.md](../packages/texuli/README.md): Styled Texuli components, layouts and shells. |
 | `@texuli/tokens` | [packages/tokens/README.md](../packages/tokens/README.md): The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. |
-| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.6.0`: the accessible workflow graph editor and viewer. |
+| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.7.0`: the accessible workflow graph editor and viewer. |
 | `@texuli/tools` | [packages/tools/README.md](../packages/tools/README.md): Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. |
 | `@texuli/website` | [apps/website/README.md](../apps/website/README.md): texuli.com: the Texuli documentation, catalog and live examples, built with Astro; the Pages Functions live in the root `functions/`. |
 | `@texuli/agent` | [apps/agent/README.md](../apps/agent/README.md): The texuli.com agent service: prompt to validated blueprint draft, fake replay provider only, not deployed. |
@@ -106,6 +106,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-csp](../apps/website/docs/site-csp.md) | Built-site Content Security Policy |
 | [site-drag](../apps/website/docs/site-drag.md) | Drag page (texuli.com) |
 | [site-docs-shell](../apps/website/docs/site-docs-shell.md) | Docs shell (texuli.com) |
+| [site-documents](../apps/website/docs/site-documents.md) | texuli.com: documents page |
 | [site-editor](../apps/website/docs/site-editor.md) | texuli.com: editor area |
 | [site-evidence](../apps/website/docs/site-evidence.md) | texuli.com: Evidence on every component page |
 | [site-examples](../apps/website/docs/site-examples.md) | texuli.com: live examples |
@@ -116,6 +117,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-ia](../apps/website/docs/site-ia.md) | Site information architecture |
 | [site-landing](../apps/website/docs/site-landing.md) | texuli.com landing system |
 | [site-live-components](../apps/website/docs/site-live-components.md) | Live interactive component pages |
+| [site-live-generation](../apps/website/docs/site-live-generation.md) | texuli.com: live generation playground |
 | [site-live-primitives](../apps/website/docs/site-live-primitives.md) | Live primitive demos |
 | [site-media-page](../apps/website/docs/site-media-page.md) | texuli.com: media lab |
 | [site-motion](../apps/website/docs/site-motion.md) | texuli.com: motion page |
@@ -288,6 +290,20 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [schema](../packages/deck/docs/schema.md) | Schema kit (`@texuli/deck/schema`) |
 | [templates](../packages/deck/docs/templates.md) | Templates (`@texuli/deck/templates`) |
 
+### `@texuli/document` (`packages/document/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [collab](../packages/document/docs/collab.md) | Collaboration: comments, suggestions, versions and presence (`@texuli/document/collab`) |
+| [docx](../packages/document/docs/docx.md) | DOCX writer (`@texuli/document/docx`) |
+| [markdown](../packages/document/docs/markdown.md) | Markdown in and out (`@texuli/document/markdown`) |
+| [model](../packages/document/docs/model.md) | Document model (`@texuli/document/model`) |
+| [ops](../packages/document/docs/ops.md) | Operations, patches and the op log (`@texuli/document/ops`) |
+| [paged](../packages/document/docs/paged.md) | Paged layout (`@texuli/document/paged`) |
+| [pdf](../packages/document/docs/pdf.md) | PDF writer (`@texuli/document/pdf`) |
+| [schema](../packages/document/docs/schema.md) | Schema and untrusted loader (`@texuli/document/schema`) |
+| [sync](../packages/document/docs/sync.md) | CRDT sync core (`@texuli/document/sync`) |
+
 ### `@texuli/drag` (`packages/drag/docs/`)
 
 | Doc | Title |
@@ -323,6 +339,18 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [media-export](../packages/media/docs/media-export.md) | Media export |
 | [timeline](../packages/media/docs/timeline.md) | Animation timeline |
 | [video](../packages/media/docs/video.md) | Video player |
+
+### `@texuli/pages` (`packages/pages/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [collab](../packages/pages/docs/collab.md) | Collaboration UI (`@texuli/pages/collab`) |
+| [editor](../packages/pages/docs/editor.md) | Page editor (`@texuli/pages/editor`) |
+| [export](../packages/pages/docs/export.md) | Export (`@texuli/pages/export`) |
+| [host](../packages/pages/docs/host.md) | Document host for the player (`@texuli/pages/host`) |
+| [paged](../packages/pages/docs/paged.md) | Paged view and print (`@texuli/pages/paged`) |
+| [reader](../packages/pages/docs/reader.md) | Page reader (`@texuli/pages/reader`) |
+| [styles](../packages/pages/docs/styles.md) | Stylesheet (`@texuli/pages/styles.css`) |
 
 ### `@texuli/player` (`packages/player/docs/`)
 
@@ -493,6 +521,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [cli-init](../packages/tools/docs/cli-init.md) | `texuli init` and `texuli theme` |
 | [cli-update](../packages/tools/docs/cli-update.md) | `texuli diff` and `texuli update` |
 | [deck](../packages/tools/docs/deck.md) | Deck commands |
+| [document](../packages/tools/docs/document.md) | Document commands |
 | [elements](../packages/tools/docs/elements.md) | Custom elements |
 | [golden](../packages/tools/docs/golden.md) | Agent golden set and scorer |
 | [llms](../packages/tools/docs/llms.md) | llms.txt and agent docs bundle |

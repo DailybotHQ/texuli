@@ -8,7 +8,7 @@ import { getAnnouncer } from '@texuli/core/announcer';
 import type { CollabThread } from '@texuli/document/collab';
 import { tick } from 'svelte';
 import { feedKeydown } from './feed.ts';
-import { type CollabLabels, DEFAULT_COLLAB_LABELS } from './labels.ts';
+import { type CollabLabels, DEFAULT_COLLAB_LABELS, landmarkPerson } from './labels.ts';
 import type { CollabSession, CommentDraft } from './session.svelte.ts';
 
 interface Props {
@@ -113,7 +113,7 @@ function remove(thread: CollabThread, index: number): void {
 }
 </script>
 
-<section class="tx-pages-collab__panel" aria-labelledby={`${uid}-title`}>
+<section class="tx-pages-collab__panel" aria-label={labels.landmark(labels.comments, landmarkPerson(session))}>
   <h2 class="tx-pages-collab__heading" id={`${uid}-title`}>{labels.comments}</h2>
   {#if draft}
     <form class="tx-pages-collab__composer" onsubmit={submit}>

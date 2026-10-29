@@ -18,6 +18,7 @@ import {
   STREAM_PENDING_ID,
   type StreamSnapshot,
 } from '../src/stream/session.ts';
+import { checkDocument } from './document-host.ts';
 
 /**
  * The player's streaming session (ADR-014): every golden streams clean in
@@ -41,6 +42,7 @@ const validate = {
   catalog: withoutHostChrome(catalog),
   tier: 'untrusted' as const,
   checkBlock: checkFamilyBlock,
+  checkDocument,
   conditions: formulaConditions,
   conditionInputs: {},
   roles: PLAYER_GRAMMAR_ROLES,
@@ -175,7 +177,15 @@ describe('streaming session: goldens', () => {
 });
 
 describe('streaming session: refusals', () => {
-  const NODE_CHECKS = new Set(['structure', 'interaction', 'sinks', 'render', 'blocks', 'limits']);
+  const NODE_CHECKS = new Set([
+    'structure',
+    'interaction',
+    'sinks',
+    'render',
+    'blocks',
+    'documents',
+    'limits',
+  ]);
   const hostile: Record<string, unknown> = {
     'javascript-link': {
       id: 'layout-page',

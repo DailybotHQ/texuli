@@ -14,9 +14,9 @@ Svelte, use [`@texuli/player`](https://www.npmjs.com/package/@texuli/player),
 which is built on this package.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
-> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
+> published to npm as `0.7.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.8.0`) may contain breaking
+> changes, so pin the exact version or use `^0.7.0`, which accepts only 0.7.x.
 
 > **New in `0.4.0`.** The `chat`, `composition`, `data`, `state` and
 > `workflows` manifest groups (158 catalog ids, 66 of them agent-emittable;
@@ -103,6 +103,7 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
 | `@texuli/catalog/manifests/chat` | New in `0.4.0`: chat display ids (thread and messages; the composer stays host chrome) |
 | `@texuli/catalog/manifests/state` | New in `0.4.0`: state and action surfaces (controls, forms, flow views and actions, sortable lists, host regions) |
 | `@texuli/catalog/manifests/workflows` | New in `0.4.0`: `workflow-graph`, validated against the spec workflow schema |
+| `@texuli/catalog/manifests/documents` | New in `0.7.0`: `document`, a Texuli document as data (spec 0.7.0) |
 | `@texuli/catalog/build` | `buildCatalog`: a content-addressed catalog (`catalog-<sha256>.json`) |
 | `@texuli/catalog/build/node` | Node only: discover the manifest groups (source or published files) and write the content-addressed catalog file |
 
@@ -137,6 +138,25 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
   state surface rules refuse exactly what `@texuli/player` would refuse at
   paint time, and list item text refuses control, bidirectional and
   invisible formatting characters.
+
+## New in 0.7.0
+
+Ships in `0.7.0`; the `0.6.0` release predates it:
+
+- Spec `0.7.0` documents (ADR-011): the agent-emittable `document` id
+  (`@texuli/catalog/manifests/documents`) whose `doc` is a Texuli document.
+  `validateDraft` checks it with the host's `checkDocument` at the draft's
+  tier, then its wrapped blocks and component embeds as catalog nodes at the
+  same tier; without `checkDocument` it refuses every document
+  (`document-unchecked`). `document` is a frame root
+  ([validate](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/validate.md)).
+- The `patchDocument` edit op: a bounded RFC 6902 patch for a document
+  node's `doc`, addressed by path or node key, applied by the host's patcher
+  with an exact inverse
+  ([edit](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/edit.md)).
+- Spec `0.7.0` node keys: an optional `key` (unique in the tree) on every
+  node, carried on the draft and the render tree; malformed or repeated keys
+  are refused, and `validateStreamNode` refuses a key already admitted.
 
 ## New in 0.6.0
 

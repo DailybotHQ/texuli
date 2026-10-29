@@ -1,0 +1,90 @@
+import { validateDocument } from '@texuli/document/schema';
+import type { DocumentPlayerHost, DraftDocumentCheck } from '@texuli/player';
+import { mount, unmount } from 'svelte';
+import type { EmbedResolver } from '../shared/embeds.ts';
+import type { PagesLabels } from '../shared/labels.ts';
+import type { MediaResolver } from '../shared/media.ts';
+
+/**
+ * The document check `validateDraft` runs for every `document` node:
+ * `validateDocument` from `@texuli/document/schema` at the draft's tier
+ * (the host's, never the draft's). Warnings (orphaned comment anchors) do
+ * not refuse; every error does.
+ */
+export const checkDocumentDraft: DraftDocumentCheck = (doc, tier) => {
+  const result = validateDocument(doc, { trust: tier });
+  const issues = result.issues.map((issue) => ({
+    code: issue.code,
+    path: issue.jsonPath,
+    message: issue.message,
+    severity: issue.severity === 'warning' ? ('warning' as const) : ('error' as const),
+  }));
+  return result.ok ? { ok: true, document: result.document, issues } : { ok: false, issues };
+};
+
+/** What the reader takes besides the document (see `PageReader`). */
+export interface DocumentPlayerHostOptions {
+  labels?: Partial<PagesLabels>;
+  /** Added to every heading level; default 1, so a level-1 heading sits under the player's label. */
+  headingOffset?: number;
+  /** Prefix for heading anchors, so two documents on one page never share an id. */
+  anchorPrefix?: string;
+  onNavigate?: (ref: string) => void;
+  pageHref?: (ref: string) => string | null | undefined;
+  resolveEmbed?: EmbedResolver;
+  resolveMedia?: MediaResolver;
+  /** Paint embeds without motion. */
+  reducedMotion?: boolean;
+}
+
+/**
+ * A `documentHost` for `Player`: `checkDocument` joins the player's
+ * validation, and `present` validates the document again at the tier and
+ * mounts `PageReader` into the player's surface (the reader is imported on
+ * first use). A document that does not validate paints nothing. The cleanup
+ * unmounts the reader, or cancels a mount still loading.
+ */
+export function createDocumentPlayerHost(
+  options: DocumentPlayerHostOptions = {}
+): DocumentPlayerHost {
+  return {
+    checkDocument: checkDocumentDraft,
+    present(request) {
+      const target = request.target;
+      if (!target) return undefined;
+      const checked = validateDocument(request.doc, { trust: request.tier });
+      if (!checked.ok) return undefined;
+      let cancelled = false;
+      let instance: Record<string, unknown> | null = null;
+      void import('../reader/PageReader.svelte').then(({ default: PageReader }) => {
+        if (cancelled) return;
+        instance = mount(PageReader, {
+          target,
+          props: {
+            document: checked.document,
+            outline: request.outline,
+            headingOffset: options.headingOffset ?? 1,
+            ...(options.labels ? { labels: options.labels } : {}),
+            ...(options.anchorPrefix !== undefined
+              ? { anchorPrefix: options.anchorPrefix }
+              : request.key
+                ? { anchorPrefix: `${request.key}-` }
+                : {}),
+            ...(options.onNavigate ? { onNavigate: options.onNavigate } : {}),
+            ...(options.pageHref ? { pageHref: options.pageHref } : {}),
+            ...(options.resolveEmbed ? { resolveEmbed: options.resolveEmbed } : {}),
+            ...(options.resolveMedia ? { resolveMedia: options.resolveMedia } : {}),
+            ...(options.reducedMotion !== undefined
+              ? { reducedMotion: options.reducedMotion }
+              : {}),
+          },
+        });
+      });
+      return () => {
+        cancelled = true;
+        if (instance) void unmount(instance);
+        instance = null;
+      };
+    },
+  };
+}

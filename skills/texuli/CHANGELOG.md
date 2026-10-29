@@ -23,6 +23,26 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ### Content
 
+- The packages move to `0.7.0`: 22 published packages, `@texuli/document`
+  and `@texuli/pages` published for the first time. The router, components,
+  build-ui and blueprints references say "on npm as `0.7.0`" and pin
+  `^0.7.0`; `build-ui/references/imports.md` gains a "New in 0.7.0" table
+  and a block documents row (`@texuli/pages` editor, reader, paged view,
+  export, collaboration and host on the `@texuli/document` engine), the
+  build-ui recipes name the document editor, the package index lists
+  `@texuli/document` (L1) and `@texuli/pages` (L8) with their entries and
+  marks spec 0.7.0, the `document` id, `patchDocument`, the player's
+  `documentHost` and `@texuli/tools/document` as new in `0.7.0`, and the
+  layer map drops "in the repository only".
+- `upgrade/SKILL.md` lists the `0.7.0` breaking changes an app checks
+  before moving from `^0.6.0` (spec 0.7.0 stamps, the new catalog hash,
+  `patchDocument` in `EditOp`).
+- Documents for agents (spec 0.7.0, new in `0.7.0`): `blueprints/SKILL.md` gains stage I (a `document` node whose
+  `doc` is a Texuli document, `checkDocument` and the player's
+  `documentHost` from `@texuli/pages/host`, `patchDocument` edits with a
+  bounded RFC 6902 patch, node keys) and stage C names `patchDocument`;
+  the new `blueprints/references/documents.md` has an example, the patch
+  shape and the document commands of the `texuli` CLI.
 - The packages move to `0.6.0`: the same 20 published packages as `0.5.0`;
   `@texuli/document` and `@texuli/pages` stay in the repository only (not
   on npm, first release planned for `0.7.0`). `0.6.0` ships PLAN_010 so

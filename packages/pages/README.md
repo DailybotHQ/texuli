@@ -10,12 +10,12 @@ components and decks painted by `@texuli/player` at the untrusted tier.
 Every edit is a `@texuli/document` operation in one op log, so undo, redo,
 persistence and sync share one history.
 
-> **Status: in development (pre-1.0).** `@texuli/pages` is not on npm yet.
-> It is built in PLAN_010 and its first release is planned for `0.7.0`
-> (ADR-011 in
+> **Status: in development (pre-1.0).** `@texuli/pages` is published on npm
+> as `0.7.0`, with provenance (its first release, with `@texuli/document`;
+> built in PLAN_010, ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> Its version is the `0.0.0` placeholder until then. Under 0.x a new minor
-> may contain breaking changes
+> Under 0.x a new minor (`0.8.0`) may contain breaking changes, so pin the
+> exact version or use `^0.7.0`, which accepts only 0.7.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L8, above the player, because it paints any catalog
@@ -23,6 +23,16 @@ component the player can paint (as `@texuli/slides` does). It depends on
 `@texuli/document`, `@texuli/editor`, `@texuli/blocks`, `@texuli/player`,
 `@texuli/drag`, `@texuli/primitives`, `@texuli/tokens`, `texuli` and
 `@texuli/core`; `svelte` (^5.57.2) is a peer dependency.
+
+## Install
+
+```bash
+npm install @texuli/pages @texuli/document @texuli/tokens
+```
+
+In the Texuli workspace, depend on it as `"@texuli/pages": "workspace:*"`.
+Import the token stylesheet once (`@texuli/tokens/base.css`); the editor
+and reader import their own CSS.
 
 ## Quick start
 
@@ -61,6 +71,7 @@ Keep the document in `$state.raw`: every change is a new immutable value.
 | `reader` | `PageReader`, the read-only reader with anchored headings and an outline, and `documentOutline` | [reader](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/reader.md) |
 | `paged` | `PagedView`, the paged view and print: real pages (size, margins, breaks, headers and footers with page numbers) laid out by `@texuli/document/paged`, printed one sheet per page, isolated to the view | [paged](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/paged.md) |
 | `export` | `exportDocument` (Markdown, DOCX and PDF as a `Blob`, writers loaded lazily), `exportFileName` and `downloadBlob` | [export](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/export.md) |
+| `host` | `createDocumentPlayerHost`, the `documentHost` that lets `@texuli/player` paint agent `document` blueprints (spec 0.7.0) with the reader, and `checkDocumentDraft`, the document check for `validateDraft` | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/host.md) |
 | `collab` | `CollabEditor` and its parts on a `CollabSession` of `@texuli/document/collab`: comments anchored to the text, suggestions with accept and reject, version history with restore, remote carets and an accessible collaborator list (import it lazily) | [collab](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/collab.md) |
 | `styles.css` | The editor and reader stylesheet (both components import it) | [styles](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/styles.md) |
 
@@ -131,6 +142,7 @@ Keep the document in `$state.raw`: every change is a new immutable value.
 
 - [Editor](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/editor.md)
 - [Reader](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/reader.md)
+- [Host](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/host.md)
 - [Paged view and print](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/paged.md)
 - [Export](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/export.md)
 - [Collaboration](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/collab.md)

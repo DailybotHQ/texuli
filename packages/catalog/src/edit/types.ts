@@ -7,6 +7,36 @@ import type { CatalogTreeInput } from '../render/renderer/types.ts';
 export type NodePath = readonly number[];
 
 /**
+ * One RFC 6902 operation on a document (spec 0.7.0 `$defs.documentPatchOperation`).
+ * `path` and `from` are RFC 6901 pointers into the document.
+ */
+export interface DocumentPatchOp {
+  op: 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test';
+  path: string;
+  from?: string;
+  value?: unknown;
+}
+
+/**
+ * Applies a bounded RFC 6902 patch to a document and validates the result,
+ * all or none: usually `applyDocumentPatch` from `@texuli/document/ops`
+ * (injected, so this module stays free of the document engine). `inverse`
+ * restores the input document exactly.
+ */
+export type DocumentPatcher = (
+  doc: unknown,
+  patch: readonly DocumentPatchOp[]
+) =>
+  | { ok: true; document: unknown; inverse: readonly DocumentPatchOp[] }
+  | { ok: false; message: string };
+
+/** Options for {@link EditOp} application. */
+export interface ApplyEditOptions {
+  /** Required by `patchDocument`; without it that op is refused (`invalid-op`). */
+  patchDocument?: DocumentPatcher;
+}
+
+/**
  * The closed edit vocabulary for a blueprint tree. Every op is plain JSON,
  * so the builder, the agent service (as patches) and server-side hosts share
  * it. Unknown op kinds and fields are refused by {@link parseEditOp}.
@@ -29,7 +59,18 @@ export type EditOp =
   /** Replace the subtree at `path` (`[]` replaces the root). */
   | { op: 'replace'; path: NodePath; node: CatalogTreeInput }
   /** Replace the whole tree (a JSON commit, a template, a full agent turn). */
-  | { op: 'replaceAll'; tree: CatalogTreeInput };
+  | { op: 'replaceAll'; tree: CatalogTreeInput }
+  /**
+   * Apply a bounded RFC 6902 patch (at most 1,000 operations) to the `doc`
+   * of the `document` node at `path`, or the node whose `key` is given
+   * (spec 0.7.0): exactly one of `path` and `key`.
+   */
+  | {
+      op: 'patchDocument';
+      path?: NodePath;
+      key?: string;
+      patch: readonly DocumentPatchOp[];
+    };
 
 export type EditOpKind = EditOp['op'];
 

@@ -6,8 +6,8 @@ numbers) by the `@texuli/document/paged` engine, measured in the DOM. On
 screen the pages stack like sheets of paper; in print each page is one
 sheet at the page size, and only the mounted view prints.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`). The paged view is read-only: editing in paged mode is planned;
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0). The paged view is read-only: editing in paged mode is planned;
 > edit with `PageEditor` and show `PagedView` as the print preview.
 
 ```svelte

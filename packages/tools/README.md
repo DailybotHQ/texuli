@@ -10,9 +10,9 @@ catalog trees in any host, Svelte or not. A golden set of interface tasks
 with an offline scorer measures how well an agent builds with the catalog.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
-> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
+> published to npm as `0.7.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.8.0`) may contain breaking
+> changes, so pin the exact version or use `^0.7.0`, which accepts only 0.7.x.
 
 ## Install
 
@@ -95,6 +95,15 @@ commands as a read-only `deck` tool. None of this is in `0.3.0`; it ships
 in `0.4.0` with the first release of `@texuli/deck`; see
 [deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md).
 
+**Document commands (in development, new in `0.7.0`).**
+A `@texuli/tools/document` subpath and the `document`
+command of the `texuli` bin, with ten commands on `@texuli/document`
+(spec 0.7.0): `capabilities`, `schema`, `validate`, `inspect`, `patch`
+(bounded RFC 6902), `from-markdown`, `to-markdown`, `to-blueprint`,
+`to-docx` and `to-pdf`. The local MCP server has the same commands as a
+read-only `document` tool; see
+[document.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/document.md).
+
 ## Key guarantees
 
 - **Local only.** The CLIs read and write local files and never use the
@@ -122,6 +131,7 @@ in `0.4.0` with the first release of `@texuli/deck`; see
 - A2UI adapter: [a2ui.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/a2ui.md)
 - Golden set and scorer: [golden.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/golden.md)
 - Deck commands, the `texuli deck` CLI and the `deck` MCP tool (new in `0.4.0`): [deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md)
+- Document commands, the `texuli document` CLI and the `document` MCP tool (new in `0.7.0`): [document.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/document.md)
 
 ## Related packages
 

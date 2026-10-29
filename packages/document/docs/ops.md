@@ -5,8 +5,8 @@ RFC 6902 patches with inverse patches; and the op log with undo and redo.
 The input is never mutated, a failure changes nothing, and every result is
 validated (at the `untrusted` tier by default).
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ## Operations
 

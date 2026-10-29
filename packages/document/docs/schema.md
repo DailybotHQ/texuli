@@ -4,8 +4,8 @@ The document validator, written with the `@texuli/deck/schema` kit
 (ADR-011): the same schema data drives validation, the JSON Schema export
 and the types.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ## Validating
 

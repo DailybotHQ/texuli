@@ -40,23 +40,26 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 20 published packages are on npm as `0.6.0` (published by CI with
+   All 22 published packages are on npm as `0.7.0` (published by CI with
    provenance; `latest` and `next` both point to it; pre-1.0, so a new minor
    may break and 1.0.0 will be the first stable release), so install them
-   plainly (`pnpm add texuli`) and pin `0.6.0` or `^0.6.0`; the workspace packages
+   plainly (`pnpm add texuli`) and pin `0.7.0` or `^0.7.0`; the workspace packages
    stay `private: true`. `@texuli/drag` (the drag engine),
    `@texuli/workflows` (the workflow editor), `@texuli/deck` (the deck
-   engine behind the deck generator, first published in `0.4.0`) and
-   `@texuli/editor` (the rich text editor, first published in `0.5.0`) are
-   in development but on npm as `0.6.0`. `@texuli/document` and
-   `@texuli/pages` are in the repository only (not on npm; first release
-   planned for `0.7.0`), so never tell a consumer app to install them. The
-   APIs marked "new in `0.6.0`" in the package index (motion, the one API
-   contract, streamed blueprints and spec 0.6.0, `@texuli/slides/stage-core`,
-   `@texuli/core/markup` and `@texuli/core/zip`, the G48 to G85 additions)
-   are not in `0.5.0`, and `0.6.0` changes some behavior (Field ids, caller
-   handlers on more parts, reduced motion at `0s`, motion instead of CSS
-   keyframes; see [`upgrade/SKILL.md`](upgrade/SKILL.md)). `0.5.0` added
+   engine behind the deck generator, first published in `0.4.0`),
+   `@texuli/editor` (the rich text editor, first published in `0.5.0`),
+   `@texuli/document` (the block document engine) and `@texuli/pages` (the
+   block document editor and reader; both first published in `0.7.0`) are
+   in development but on npm as `0.7.0`. The APIs marked "new in `0.7.0`"
+   in the package index (both document packages, spec 0.7.0 node keys and
+   the `document` id, `patchDocument`, the player's `documentHost`,
+   `@texuli/tools/document`) are not in `0.6.0`, and `0.7.0` changes some
+   behavior (spec `0.7.0` stamps, a new catalog hash, the `patchDocument`
+   edit op; see [`upgrade/SKILL.md`](upgrade/SKILL.md)). `0.6.0` added
+   motion, the one API contract, streamed blueprints and spec 0.6.0,
+   `@texuli/slides/stage-core`, `@texuli/core/markup` and `@texuli/core/zip`,
+   and the G48 to G85 additions, and changed some behavior (Field ids,
+   caller handlers on more parts, reduced motion at `0s`). `0.5.0` added
    spec 0.5.0, the filter builder, notification inbox and cohort table,
    `sparkline-lite`, `texuli/layouts/content`, `@texuli/astro/appearance`
    and `@texuli/editor/markdown`. `0.4.0` shipped spec 0.4.0, the new catalog groups,

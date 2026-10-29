@@ -3,6 +3,7 @@ package com.texuli.spec.runtime
 import com.texuli.spec.BlueprintAction
 import com.texuli.spec.BlueprintBinding
 import com.texuli.spec.BlueprintCondition
+import com.texuli.spec.BlueprintDocument
 import com.texuli.spec.BlueprintReorder
 import com.texuli.spec.JsonValue
 import com.texuli.spec.SpecDecodeException
@@ -22,7 +23,7 @@ data class PropSchemaIssue(val code: String, val path: String, val message: Stri
  * type, properties (objects closed unless `additionalProperties` gives a
  * map), required, items, enum, string bounds in code points, number and
  * array bounds. A `ref` dispatches to the generated decoders (`binding`,
- * `reorder`, `action`, `eventMap`, `condition`) or to [validateWorkflowGraph].
+ * `reorder`, `action`, `eventMap`, `condition`, `document`) or to [validateWorkflowGraph].
  *
  * With a [context] (inside a blueprint), binding, reorder, action and
  * workflow positions also add their semantic diagnostics to the context,
@@ -163,6 +164,14 @@ internal class PropSchemaValidator(private val context: NodeContext?, private va
                     return
                 }
                 decode(path, issues) { BlueprintCondition.decode(value, path) }
+            }
+            "document" -> {
+                // Spec 0.7.0: the document's envelope only (format, version, members, the block cap);
+                // its closed vocabulary is the runtime validator's (`@texuli/document/schema`).
+                val document = decode(path, issues) { BlueprintDocument.decode(value, path) } ?: return
+                if (document.blocks.size > SpecContract.DOCUMENT_BLOCKS) {
+                    issues += PropSchemaIssue("max-items", "$path.blocks", "At most ${SpecContract.DOCUMENT_BLOCKS} items.")
+                }
             }
             "workflowGraph" -> {
                 for (d in validateWorkflowGraph(value).diagnostics) {

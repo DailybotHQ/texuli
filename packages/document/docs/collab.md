@@ -11,8 +11,8 @@ are attributed marks, named versions restore with new operations, and
 presence carries carets between peers. Framework-free and DOM-free; it
 loads lazily (only a collaborative session imports it).
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`). The editor UI is `@texuli/pages/collab`.
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0). The editor UI is `@texuli/pages/collab`.
 
 ```ts
 import { createDocumentSync } from '@texuli/document/collab';

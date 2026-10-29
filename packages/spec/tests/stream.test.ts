@@ -278,7 +278,8 @@ describe('the assembler', () => {
         for (const event of shells) {
           const { children: _children, ...shell } = nodes.get(event.path) as Node;
           expect(event.shell).toEqual(shell);
-          expect(event.streamId).toBe(event.path);
+          // Spec 0.7.0: a keyed node streams under its key, every other node under its path.
+          expect(event.streamId).toBe(typeof shell.key === 'string' ? shell.key : event.path);
         }
         expect(events.filter((e) => e.type === 'node-end')).toHaveLength(nodes.size);
         const headers = events.filter((e) => e.type === 'header');

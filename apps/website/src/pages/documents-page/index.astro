@@ -1,0 +1,380 @@
+---
+import AgentDocumentDemo from '../../components/documents-site/AgentDocumentDemo.svelte';
+import {
+  DOCUMENT_BLUEPRINT_JSON,
+  DOCUMENT_PATCH_JSON,
+  HOSTILE_PATCH_JSON,
+} from '../../components/documents-site/blueprint.ts';
+import CollabDemo from '../../components/documents-site/CollabDemo.svelte';
+import DocumentWorkbench from '../../components/documents-site/DocumentWorkbench.svelte';
+import {
+  DOCUMENTS_DOCS,
+  DOCUMENTS_KEYS,
+  DOCUMENTS_PIECES,
+  DOCUMENTS_RELEASE,
+  DOCUMENTS_RULES,
+  DOCUMENTS_SECTIONS,
+} from '../../components/documents-site/page.ts';
+/**
+ * /documents-page/ — Texuli documents (ADR-010, ADR-011, ADR-016): the
+ * block editor of @texuli/pages on the @texuli/document engine, the
+ * reader, the paged view, export, collaboration, and documents as agent
+ * data painted by the player. Every demo is a lazy island
+ * (client:visible), and each island imports its large modules (the editor,
+ * the collaboration layer, the writers, the player) only after it
+ * hydrates, so none of them is on the first paint.
+ */
+import GuideCode from '../../components/guides/GuideCode.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const section = (id: string) => {
+  const entry = DOCUMENTS_SECTIONS.find((candidate) => candidate.id === id);
+  if (!entry) throw new Error(`Unknown documents section ${id}`);
+  return entry;
+};
+
+const editorSnippet = `import { loadUntrustedDocument } from '@texuli/document/schema';
+import { PageEditor } from '@texuli/pages/editor';
+
+const loaded = loadUntrustedDocument(json); // a file, a link or an agent: validated first
+let doc = $state.raw(loaded.ok ? loaded.document : null);
+
+<PageEditor document={doc} onChange={(next) => (doc = next)} />`;
+
+const exportSnippet = `import { downloadBlob, exportDocument } from '@texuli/pages/export';
+
+const { blob, filename } = await exportDocument(doc, 'pdf'); // or 'markdown', 'docx'
+downloadBlob(blob, filename); // opens only the blob: URL it created`;
+
+const hostSnippet = `import { createDocumentPlayerHost } from '@texuli/pages/host';
+import { Player } from '@texuli/player';
+
+<Player blueprint={draft} tier="untrusted" documentHost={createDocumentPlayerHost()} />`;
+---
+
+<BaseLayout
+  title="Documents"
+  description="Texuli documents (in development, on npm from 0.7.0): a block editor with a slash menu, drag, nested pages, columns and live embeds, a reader, paged view and print, Markdown, DOCX and PDF export, collaboration, and documents as agent data."
+>
+  <div class="documents-page" data-tx-documents-page="">
+    <header class="documents-page__hero">
+      <p class="eyebrow">@texuli/pages · @texuli/document · in development · on npm from {DOCUMENTS_RELEASE}</p>
+      <h1>Documents people edit and agents write</h1>
+      <p class="lead">
+        A block editor, a reader, real pages and three export formats on one document engine. Every
+        edit is an operation in one log, so undo, collaboration and agent patches share one history,
+        and every document is validated before it paints. Both packages are in development and on npm
+        from <code>{DOCUMENTS_RELEASE}</code>, a pre-1.0 release; the previous release,
+        <code>0.6.0</code>, is without them.
+      </p>
+      <ol class="pieces" aria-label="The pieces of the two document packages">
+        {
+          DOCUMENTS_PIECES.map((piece) => (
+            <li class="pieces__item">
+              <code>{piece.name}</code>
+              <span>{piece.role}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </header>
+
+    <nav class="toc" aria-label="Sections on this page">
+      <ul>
+        {
+          DOCUMENTS_SECTIONS.map((entry) => (
+            <li>
+              <a href={`#${entry.id}`}>{entry.title}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <section class="demo" id="workbench" aria-labelledby="workbench-title">
+      <h2 id="workbench-title">{section('workbench').title}</h2>
+      <p>{section('workbench').summary}</p>
+      <DocumentWorkbench client:visible />
+      <p class="demo__note">
+        Editing in the paged view is planned; edit in the editor and use Pages as the print preview.
+        Sheet and canvas embeds stay typed references until their packages ship.
+      </p>
+    </section>
+
+    <section class="demo" id="collab" aria-labelledby="collab-title">
+      <h2 id="collab-title">{section('collab').title}</h2>
+      <p>{section('collab').summary}</p>
+      <CollabDemo client:visible />
+      <p class="demo__note">
+        Network transports and storage (a WebSocket, IndexedDB, a server) are adapters the host
+        provides; suggestions track text insertions and deletions, and a people picker for mentions is
+        planned.
+      </p>
+    </section>
+
+    <section class="demo" id="agents" aria-labelledby="agents-title">
+      <h2 id="agents-title">{section('agents').title}</h2>
+      <p>{section('agents').summary}</p>
+      <div class="demo__pair demo__pair--code">
+        <div class="demo__panel">
+          <h3>The blueprint the agent wrote</h3>
+          <p class="demo__note">
+            Spec <code>0.7.0</code> adds the <code>document</code> catalog id, an optional node
+            <code>key</code> and the <code>patchDocument</code> op. It ships in the
+            <code>{DOCUMENTS_RELEASE}</code> release of <code>@texuli/spec</code>.
+          </p>
+          <GuideCode code={DOCUMENT_BLUEPRINT_JSON} label="The document blueprint (JSON)" lang="text" />
+          <h3>The bounded patch</h3>
+          <GuideCode code={DOCUMENT_PATCH_JSON} label="A patchDocument op addressed by key" lang="text" />
+          <h3>The hostile patch</h3>
+          <GuideCode code={HOSTILE_PATCH_JSON} label="A patch with a prototype path" lang="text" />
+        </div>
+        <div class="demo__panel">
+          <h3>Painted by the player</h3>
+          <AgentDocumentDemo client:visible />
+        </div>
+      </div>
+    </section>
+
+    <section class="demo" id="keyboard" aria-labelledby="keyboard-title">
+      <h2 id="keyboard-title">{section('keyboard').title}</h2>
+      <p>{section('keyboard').summary}</p>
+      <div class="table-wrap">
+        <table class="keys">
+          <caption class="visually-hidden">Keyboard shortcuts of the document editor</caption>
+          <thead>
+            <tr>
+              <th scope="col">Where</th>
+              <th scope="col">Keys</th>
+              <th scope="col">Effect</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              DOCUMENTS_KEYS.map((row) => (
+                <tr>
+                  <td>{row.where}</td>
+                  <td>
+                    <kbd>{row.keys}</kbd>
+                  </td>
+                  <td>{row.effect}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="demo" id="safety" aria-labelledby="safety-title">
+      <h2 id="safety-title">{section('safety').title}</h2>
+      <p>{section('safety').summary}</p>
+      <ul class="rules">
+        {
+          DOCUMENTS_RULES.map((rule) => (
+            <li class="rules__item">
+              <h3>{rule.title}</h3>
+              <p>{rule.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <h3>In code</h3>
+      <div class="demo__pair">
+        <GuideCode code={editorSnippet} label="Validate, then edit" lang="ts" />
+        <GuideCode code={exportSnippet} label="Export as a Blob" lang="ts" />
+        <GuideCode code={hostSnippet} label="Agent documents in the player" lang="ts" />
+      </div>
+    </section>
+
+    <section class="demo" id="package-docs" aria-labelledby="package-docs-title">
+      <h2 id="package-docs-title">Package docs</h2>
+      <p>
+        The site does not render the package docs yet. Read them in the repository; agents can read
+        the <a href="/llms/components/document.md">document catalog entry</a>.
+      </p>
+      <ul class="docs">
+        {
+          DOCUMENTS_DOCS.map((doc) => (
+            <li>
+              {doc.label}: <code>{doc.path}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .documents-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+  .documents-page__hero {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0;
+    max-inline-size: 46rem;
+    font-size: 1.0625rem;
+    color: var(--tx-foreground);
+  }
+  .pieces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pieces__item {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.75rem;
+    background: var(--tx-surface, Canvas);
+    font-size: 0.8125rem;
+  }
+  .pieces__item code {
+    font-weight: 600;
+  }
+  .pieces__item span {
+    color: var(--tx-muted-foreground, CanvasText);
+  }
+  .toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .toc a,
+  .demo a {
+    color: var(--tx-link, LinkText);
+  }
+  .demo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    min-inline-size: 0;
+    scroll-margin-block-start: 5rem;
+  }
+  .demo h2 {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  }
+  .demo h3 {
+    margin: 0;
+    font-size: 1.0625rem;
+  }
+  .demo > p {
+    margin: 0;
+    max-inline-size: 46rem;
+  }
+  .demo__note {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  .demo__pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+  .demo__pair > :global(*) {
+    min-inline-size: 0;
+  }
+  .demo :global(pre) {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  .demo__panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.6rem;
+    min-inline-size: 0;
+  }
+  .demo__pair--code :global(pre) {
+    max-block-size: 22rem;
+    overflow: auto;
+  }
+  .table-wrap {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  .keys {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .keys th,
+  .keys td {
+    padding: 0.45rem 0.6rem;
+    border-block-end: 1px solid var(--tx-border, CanvasText);
+    text-align: start;
+    vertical-align: top;
+  }
+  .keys kbd {
+    font-family: var(--tx-font-mono, monospace);
+    font-size: 0.85em;
+    overflow-wrap: anywhere;
+  }
+  .visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .rules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .rules__item {
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    min-inline-size: 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.85rem;
+    background: var(--tx-surface, Canvas);
+  }
+  .rules__item p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .docs {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+  }
+  .docs code {
+    overflow-wrap: anywhere;
+  }
+</style>

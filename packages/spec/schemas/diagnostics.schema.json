@@ -62,7 +62,8 @@
         "binding",
         "action",
         "unknown-event",
-        "workflow"
+        "workflow",
+        "duplicate-key"
       ]
     },
     "warning": {

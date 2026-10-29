@@ -48,6 +48,7 @@ export const GOLDEN_FIXTURE_FILES = [
   '06-presentation-slide.json',
   '07-report-on-demand.json',
   '08-proactive-deck.json',
+  '09-document-brief.json',
 ] as const;
 
 const EXPECTATIONS_FILE = 'golden-expectations.json';

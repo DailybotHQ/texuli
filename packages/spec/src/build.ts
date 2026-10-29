@@ -13,6 +13,15 @@ export { SPEC_VERSION };
 /** Where normative files live inside the package. */
 export const NORMATIVE_DIRS = ['schemas/', 'catalog/', 'fixtures/'] as const;
 
+/**
+ * Normative schemas that are pinned by digest but are not in the dialect and
+ * generate nothing: they are exported by a higher-layer engine and kept here
+ * so the contract pins the exact version agents write against. Spec 0.7.0
+ * pins `@texuli/document`'s JSON Schema export (ADR-011); a freshness test in
+ * `@texuli/catalog` keeps it equal to `documentJsonSchema()`.
+ */
+export const EXTERNAL_SCHEMAS: readonly string[] = Object.freeze(['schemas/document.schema.json']);
+
 /** The schema documents, their generated names and output files. */
 export const SCHEMA_UNITS = [
   { name: 'blueprint', prefix: 'Blueprint', ts: 'blueprint.ts', kt: 'Blueprint.kt' },

@@ -7,6 +7,7 @@
 
 export {
   buildSpec,
+  EXTERNAL_SCHEMAS,
   KOTLIN_OUT,
   NORMATIVE_DIRS,
   SCHEMA_UNITS,

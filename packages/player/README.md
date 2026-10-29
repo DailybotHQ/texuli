@@ -10,9 +10,9 @@ output stays inside a labelled frame with a visible trust badge, and the
 player never navigates, fetches or persists anything on its own.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
-> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
+> published to npm as `0.7.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.8.0`) may contain breaking
+> changes, so pin the exact version or use `^0.7.0`, which accepts only 0.7.x.
 
 > **New in `0.4.0`.** Spec 0.3.0 and 0.4.0 envelopes (`state`, `flow`,
 > `bind`, `on` and the closed actions), the data view, chat display,
@@ -168,6 +168,16 @@ host that has both packages passes a `deckHost` to present a deck blueprint
 on that stage instead, and `chrome={false}` paints a component with no frame
 chrome, as the slides stage does for every component on a slide
 ([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md)).
+
+## New in 0.7.0
+
+Ships in `0.7.0`; the `0.6.0` release predates it: the `documentHost` seam paints agent
+`document` blueprints (spec 0.7.0) through a host such as
+`createDocumentPlayerHost()` from `@texuli/pages/host`, which also supplies
+the document check validation runs; without one a document is refused
+([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md#document-hosts)).
+Node `key`s ride on the render tree, and a streamed node that repeats a key
+already painted is held (`duplicate-key`).
 
 ## New in 0.6.0
 

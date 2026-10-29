@@ -5,17 +5,18 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-`0.6.0` is the current release of all 20 published packages (owner GO
-2026-10-29): the same 20 packages as `0.5.0`, which published
-`@texuli/editor` for the first time. The publish workflow publishes from
-`main` after the merge, from the verified tarballs with signed provenance,
-and moves both the `latest` and `next` dist-tags to the published version,
-so a bare `npm install texuli` or `pnpm add texuli` gets it.
-`@texuli/drag`, `@texuli/workflows`, `@texuli/deck` and `@texuli/editor`
+`0.7.0` is the current release of all 22 published packages (owner GO
+2026-10-29): the 20 packages of `0.6.0` plus `@texuli/document` and
+`@texuli/pages`, which are published for the first time in `0.7.0`. The
+publish workflow publishes from `main` after the merge, from the verified
+tarballs with signed provenance, and moves both the `latest` and `next`
+dist-tags to the published version, so a bare `npm install texuli` or
+`pnpm add texuli` gets it. `@texuli/drag`, `@texuli/workflows`,
+`@texuli/deck`, `@texuli/editor`, `@texuli/document` and `@texuli/pages`
 are still **in development** (pre-1.0).
 
-`0.6.0` is a breaking `0.x` minor: it carries the PLAN_010 changes listed
-under "0.6.0" below, none of which were in the `0.5.0` tarballs. It is
+`0.7.0` is a breaking `0.x` minor: it carries the PLAN_010 changes listed
+under "0.7.0" below, none of which were in the `0.6.0` tarballs. It is
 still pre-1.0, not a stable release: see "0.x versioning" below. Workspace
 manifests remain `private: true`, and every future version and wave
 requires a fresh, explicit developer GO. Publishing never overwrites a
@@ -25,13 +26,221 @@ published version.
 
 - `@texuli/examples` is never packed (`NEVER_PACKED` in
   `scripts/packages.ts`).
-- `@texuli/document` and `@texuli/pages` are in the repository only: they
-  keep the `0.0.0` placeholder version and `private: true`, and they are not
-  in `publish.yml` (which refuses a `0.0.0` version anyway). Their first
-  release is planned for `0.7.0` (PLAN_010). `pnpm verify:packages` packs
-  `@texuli/document` (it publishes nothing); `@texuli/pages` does not pack
-  yet, because the packer refuses its `0.0.0` pin on `@texuli/document`
-  until that package has a real version (open, planned with `0.7.0`).
+- The apps (`apps/website`, `apps/agent`) and the native twin (`native/`)
+  publish nothing.
+
+### 0.7.0
+
+Every published package moves to `0.7.0` together, and every internal
+`@texuli/*` dependency between them is pinned to exactly `0.7.0`.
+`@texuli/document` (L1) and `@texuli/pages` (L8) are published for the
+first time (ADR-010, ADR-011): they leave the `0.0.0` placeholder,
+`@texuli/pages` leaves `NEVER_PACKED`, and both join `publish.yml`
+(`@texuli/document` after `@texuli/primitives`, once `@texuli/core` and
+`@texuli/deck` are out; `@texuli/pages` after `@texuli/player`, once
+`@texuli/document`, `@texuli/editor`, `@texuli/blocks` and `texuli` are
+out). `0.7.0` carries the PLAN_010 document wave: the document engine and
+its editor, blueprint spec `0.7.0` (documents as agent data and node keys),
+the catalog, player, tools and agent-service support for documents, and two
+texuli.com pages.
+
+**`@texuli/document` (new on npm, L1, framework-free and DOM-free).**
+
+- `model`: the block document format (`texuli-document`, `formatVersion`
+  1) with persisted ids: the core editor's text blocks plus `callout`,
+  `toggle`, `columns`, `page-link`, wrapped `@texuli/blocks` blocks and
+  catalog, deck, sheet and canvas embeds; caps of 2,000 blocks, 200,000
+  characters, 8 levels and 64-character ids.
+- `schema`: the validator on the `@texuli/deck` schema kit, the URL policy
+  for links and media, `loadUntrustedDocument` (bytes capped before
+  parsing) and the JSON Schema export (`documentJsonSchema`, the file spec
+  `0.7.0` pins as `schemas/document.schema.json`).
+- `ops`: typed operations by persisted id with exact inverses, bounded
+  RFC 6902 patches with inverse patches (`applyDocumentPatch`, all or none)
+  and the op log with undo and redo.
+- `markdown`: Markdown in and out through the linear-time core editor
+  codec; raw HTML stays literal text.
+- `paged`: the pagination engine (page sizes and margins in points,
+  explicit breaks, headings kept with what follows, widow and orphan
+  control, headers and footers with page fields) over a measurer the
+  caller injects.
+- `docx` and `pdf`: owned DOCX (WordprocessingML) and PDF 1.7 writers on
+  `@texuli/core/markup` and `@texuli/core/zip` (ADR-016), loaded lazily.
+- `sync`: the owned CRDT core (a Fugue sequence, a move-safe tree,
+  last-writer-wins registers, selective undo, presence, and in-memory and
+  `BroadcastChannel` `SyncAdapter`s); every remote batch is validated
+  before it integrates.
+- `collab`: documents on the CRDT: a `DocumentSync` session from an
+  editor's op log to replica operations and back, comments anchored to item
+  ids, suggestions, named versions with restore, and presence.
+
+**`@texuli/pages` (new on npm, L8).**
+
+- `editor`: `PageEditor`: text rows through `@texuli/editor`, an APG slash
+  menu of every block type, block selection and drag on `@texuli/drag` with
+  keyboard equivalents, nested pages with a breadcrumb, resizable columns,
+  and live component and deck embeds painted by `@texuli/player` at the
+  `untrusted` tier; every edit is a `@texuli/document` operation in one op
+  log.
+- `reader`: `PageReader`, read-only, with anchored headings and an outline.
+- `paged`: `PagedView`, real pages laid out by `@texuli/document/paged`,
+  printed one sheet per page and isolated to the view.
+- `export`: `exportDocument` (Markdown, DOCX or PDF as a `Blob`, writers
+  loaded on first use), `exportFileName` and `downloadBlob`.
+- `collab`: `CollabEditor` on a `CollabSession`: comments (an APG feed),
+  suggestion mode with accept and reject, version history with restore,
+  remote carets (`aria-hidden`) and an accessible collaborator list. Every
+  landmark it names carries the person whose view it is
+  (`CollabLabels.landmark`, "Comments (Ada)"), so two editors on one page
+  never repeat a landmark name (axe `landmark-unique`).
+- `host`: `createDocumentPlayerHost()`, the player's `documentHost` that
+  paints agent `document` blueprints with the reader, and
+  `checkDocumentDraft`, the document check for `validateDraft`.
+
+**Blueprint spec 0.7.0** (ADR-011, ADR-012, ADR-014). Additive: an
+optional node `key` (`$defs.nodeKey`, `^[A-Za-z0-9._:-]{1,64}$`, unique in
+the tree; a repeat is `duplicate-key`); the agent-emittable `document`
+catalog id whose `doc` prop has the document shape (`$defs.document`); the
+`patchDocument` edit op addressed by path or key, with a bounded RFC 6902
+patch (`$defs.documentPatch`, at most 1,000 operations); and
+`schemas/document.schema.json`, pinned from `@texuli/document`. The
+`0.6.0 → 0.7.0` migration only stamps `spec`; the digest
+(`43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2`) is
+pinned in `packages/spec/versions.json`, and the generated TypeScript and
+Kotlin are regenerated (the native twin validates documents and keys with
+the TypeScript codes and paints a document as a placeholder).
+
+**Documents as agent data.**
+
+- `@texuli/catalog`: the `document` id
+  (`@texuli/catalog/manifests/documents`, 163 ids, 70 agent-emittable).
+  `validateDraft` checks a document with the host's `checkDocument` at the
+  draft's tier, then its wrapped blocks and component embeds as catalog
+  nodes at the same tier; with no `checkDocument` every document is refused
+  (`document-unchecked`). `document` is a frame root. The `patchDocument`
+  edit op (`applyEditOps(tree, ops, { patchDocument })`) applies all or
+  none through the host's patcher with an exact inverse, and the commit
+  gate validates the result again. Node keys ride on the draft and the
+  render tree, and `validateStreamNode` refuses a key already admitted.
+- `@texuli/player`: the `documentHost` seam paints `document` blueprints
+  through a host such as `createDocumentPlayerHost()` from
+  `@texuli/pages/host`, which also supplies the document check; without a
+  host a document is refused. A streamed node that repeats a painted key is
+  held (`duplicate-key`).
+- `@texuli/tools`: the `@texuli/tools/document` subpath and the `document`
+  command of the `texuli` bin, with ten commands (`capabilities`,
+  `schema`, `validate`, `inspect`, `patch`, `from-markdown`,
+  `to-markdown`, `to-blueprint`, `to-docx`, `to-pdf`); the local MCP
+  server has them as a read-only `document` tool.
+- The agent service (`apps/agent`, not published, not deployed) validates
+  document drafts with `@texuli/document` at the `untrusted` tier, so valid
+  documents pass and hostile ones are refused (`document-schema`).
+
+**Breaking changes under `0.x`.** A new minor may break; these need a look
+when upgrading from `0.6.0`:
+
+- **Spec `0.7.0`.** `validateDraft` migrates a `0.6.0` envelope and stamps
+  `spec: "0.7.0"`; hosts that compare the `spec` string need to accept it.
+  A `0.7.0` envelope with node keys or a `document` node is refused by
+  `0.6.0` validators.
+- **The catalog hash changes** with the new `document` id
+  (`c6bd7047…` instead of `4ac7eced…`): a host that pins `catalogHash`
+  refuses envelopes written for the `0.6.0` catalog (`catalog-mismatch`)
+  until it pins the new hash or drops the pin.
+- **`EditOp` gains `patchDocument`.** An exhaustive `switch` over `EditOp`
+  or `EditOpKind` needs a branch; `applyEditOps` and `applyEditOp` take an
+  optional third argument (`ApplyEditOptions`), and without
+  `patchDocument` that op is refused (`invalid-op`).
+
+Also changed, not breaking: `RenderNode` and `CatalogTreeInput` carry an
+optional `key`; `PlayerOptions` takes `checkDocument`; the `texuli` bin
+gains the `document` command.
+
+**Packaging and consumers.** `pnpm verify:packages` packs all 22 packages
+(`@texuli/examples` is the only package it skips), and the consumers
+harness installs every one of them from its tarball into Vite, Astro and
+SvelteKit apps, imports every exported subpath and renders one component
+per UI package, a `PageReader` for `@texuli/pages` included
+([consumers](quality/consumers.md)). The harness's installed-graph walk now
+follows package `imports` (the `#deck-ssr` and `#deck-ssr-core` specifiers
+of `@texuli/slides`), which it used to report as undeclared packages.
+
+**Size budgets** (`texuli.budgets.json`). Every entry of
+`@texuli/document` and `@texuli/pages` has an exact row at measured plus 4%,
+and `@texuli/catalog/manifests/documents` gets its own (1,664 B; measured
+1,566 B). No row of the packages whose code changed in this wave
+(`@texuli/document`, `@texuli/pages`, `@texuli/catalog`, `@texuli/spec`,
+`@texuli/player`) had more than 4% of headroom, so none was tightened;
+`@texuli/tools` is not size-budgeted. `@texuli/slides` (53,632 B; measured
+51,535 B) and `@texuli/slides/grammar` (44,352 B; measured 42,629 B) were
+over at the release's starting point, after the document check and node
+keys joined `@texuli/catalog/validate`, which both bundle; they are raised
+to measured plus 4%.
+
+**Security notes.**
+
+- **Documents are validated twice.** A document from an agent passes
+  `@texuli/document` at the `untrusted` tier (shape, closed vocabulary, URL
+  policy on every link and media ref, caps), and its wrapped blocks and
+  embeds are validated again as catalog nodes and by their own renderers
+  (two-phase validation, ADR-011). No validator, no paint.
+- **Patches are bounded.** `patchDocument` carries at most 1,000 RFC 6902
+  operations, refuses prototype paths (`/__proto__/…`), applies all or
+  none and validates the result again; the inverse restores the input
+  exactly.
+- **Static outputs escape by construction.** DOCX parts come from the
+  escaped `@texuli/core/markup` builders and the PDF writer writes every
+  string as a hex string, with no JavaScript, forms or embedded files;
+  links pass `safeHref` at the `untrusted` tier.
+- **Sync is not authorization.** Remote batches are validated before they
+  integrate, and the host decides who may write
+  ([SECURITY](SECURITY.md#19-documents-as-agent-data-patches-and-collaboration)).
+
+**Also in PLAN_010:** the texuli.com `/documents-page/` (the live block
+editor, the reader and paged view, Markdown, DOCX and PDF export, two
+collaborators side by side, and an agent document with a bounded patch and a
+refused hostile one) and `/live-generation/` (recorded drafts streamed into
+the player, with no network, model or key).
+
+**Publish order** (`publish.yml`): core, date, spec, drag, deck, tokens,
+primitives, document, texuli, workflows, editor, charts, data, media, chat,
+blocks, catalog, tools, astro, player, pages, slides.
+
+### Known gaps and next steps (planned for the next version, not started)
+
+0.7.0 publishes the document packages with collaboration; these remain.
+They are planned, not done:
+
+- **Documents.** Editing in the paged view (`PagedView` is read-only);
+  network transports for sync (the in-memory and `BroadcastChannel`
+  adapters ship, any other transport is the host's); `sheet` and `canvas`
+  embeds stay typed references until their packages ship; a mention people
+  picker in the comment composer; a callout's landmark name comes from the
+  document, so two editors showing the same callout repeat it; the native
+  twin paints a `document` as a placeholder.
+- **API contract on layouts.** The contract tests exclude the layouts
+  (`texuli/layouts/*`); they join in a follow-up. `onValueChange` reporting
+  only person-made changes is a written rule, not yet checked by a test.
+- **Motion coverage.** `Collapsible`, `NavigationMenu`, `Select`,
+  `Combobox`, `CommandPalette`, the `Drawer` backdrop and the layout drawers
+  don't take `motion` yet; shared-element transitions between components and
+  springs in the `motion` prop are planned (the runtime has them); the v1
+  slide reveal steps keep their CSS animation.
+- **Size.** Trim the entries raised in 0.5.0 (`@texuli/catalog` root,
+  `@texuli/data/grid-editing`, `@texuli/blocks/structure/renderers`) and
+  in 0.6.0 (`@texuli/core/editor-model`, `@texuli/core/editor-markdown`,
+  `@texuli/editor/markdown`, `@texuli/editor/paste`,
+  `@texuli/media/gallery/lightbox`).
+- **Chat.** A label for each message article, and an option for `actions`
+  to replace the built-in send button.
+- **Smaller items.** A toast replaced by `id` keeps only the newest
+  `onSettle`; `Pagination` `stableCount` writes a numeric `style` attribute
+  (strict `style-src-attr` hosts need a hash per value); the catalog `tag`
+  manifest still states the old remove label; `texuli/icons` needs an
+  `icons.css.d.ts`.
+- **PLAN_010 waves.** Forms, data sources, dashboards, canvas, sheets and
+  the static output targets are planned for `0.8.0`
+  ([ARCHITECTURE](ARCHITECTURE.md#planned-plan010)).
 
 ### 0.6.0
 
@@ -311,40 +520,6 @@ spec, drag, deck, tokens, primitives, texuli, workflows, editor, charts,
 data, media, chat, blocks, catalog, tools, astro, player, slides.
 `@texuli/document` and `@texuli/pages` are not in it.
 
-### Known gaps and next steps (planned for the next version, not started)
-
-0.6.0 closes every gap Protoyard reported on `0.5.0` (G48 to G85), the one
-API contract, the proof from npm for every package, and most of the size
-items 0.5.0 listed. These remain; they are planned, not done:
-
-- **API contract on layouts.** The contract tests exclude the layouts
-  (`texuli/layouts/*`); they join in a follow-up. `onValueChange` reporting
-  only person-made changes is a written rule, not yet checked by a test.
-- **Motion coverage.** `Collapsible`, `NavigationMenu`, `Select`,
-  `Combobox`, `CommandPalette`, the `Drawer` backdrop and the layout drawers
-  don't take `motion` yet; shared-element transitions between components and
-  springs in the `motion` prop are planned (the runtime has them); the v1
-  slide reveal steps keep their CSS animation.
-- **Size.** Trim the entries raised in 0.5.0 (`@texuli/catalog` root,
-  `@texuli/data/grid-editing`, `@texuli/blocks/structure/renderers`) and
-  in 0.6.0 (`@texuli/core/editor-model`, `@texuli/core/editor-markdown`,
-  `@texuli/editor/markdown`, `@texuli/editor/paste`,
-  `@texuli/media/gallery/lightbox`); `@texuli/primitives/date-field` has
-  6 B of headroom.
-- **Chat.** A label for each message article, and an option for `actions`
-  to replace the built-in send button.
-- **Smaller items.** A toast replaced by `id` keeps only the newest
-  `onSettle`; `Pagination` `stableCount` writes a numeric `style` attribute
-  (strict `style-src-attr` hosts need a hash per value); the catalog `tag`
-  manifest still states the old remove label; `texuli/icons` needs an
-  `icons.css.d.ts`; the website's layer data should name the 0.5.0 data views
-  and editor Markdown so the [ARCHITECTURE](ARCHITECTURE.md) layer table can.
-- **PLAN_010 waves.** `@texuli/document` and `@texuli/pages` (paged view,
-  DOCX and PDF, collaboration) are planned for `0.7.0`, with spec `0.7.0`
-  (node `key` for streams); forms, data sources, dashboards, canvas, sheets
-  and the static output targets for `0.8.0`
-  ([ARCHITECTURE](ARCHITECTURE.md#planned-plan010)).
-
 ### 0.5.0
 
 Every packable package moves to `0.5.0` together, and every internal
@@ -562,6 +737,12 @@ tools, astro, player, slides. `@texuli/deck` goes out before
 
 ### History
 
+- `0.6.0` (2026-10-29; merged and published from `main` on 2026-10-29
+  UTC): a breaking `0.x` minor for 20 packages, with no first publication
+  (PLAN_010 waves 0 and 1: the one API contract, motion, streamed
+  blueprints, `@texuli/core/markup` and `zip`, and Protoyard's gaps G48 to
+  G85; see "0.6.0" above). Its tarballs ship blueprint spec `0.6.0`;
+  `@texuli/document` and `@texuli/pages` were in the repository only.
 - `0.5.0` (2026-10-28; merged and published from `main` on 2026-10-29
   UTC): a breaking `0.x` minor for 20 packages, the first publication of
   `@texuli/editor` (PLAN_009; see "0.5.0" above). Its tarballs ship
@@ -592,10 +773,10 @@ tools, astro, player, slides. `@texuli/deck` goes out before
 
 ### 0.x versioning
 
-Until 1.0.0, a breaking change bumps the minor (`0.6.0` to `0.7.0`) and a
-fix bumps the patch (`0.6.0` to `0.6.1`). Consumers pin the exact version or
-use `~0.6.0` or `^0.6.0`; for a `0.x` version both ranges accept only
-`0.6.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
+Until 1.0.0, a breaking change bumps the minor (`0.7.0` to `0.8.0`) and a
+fix bumps the patch (`0.7.0` to `0.7.1`). Consumers pin the exact version or
+use `~0.7.0` or `^0.7.0`; for a `0.x` version both ranges accept only
+`0.7.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
 release.
 
 ## Independent package versions
@@ -630,14 +811,15 @@ default.
 - **`next`** points to the newest owner-approved version, including any
   future `0.x.y-next.N` or other pre-release. The publish workflow always
   publishes with `--tag next`, so it moves only with a new version and a
-  fresh GO. It names `0.6.0` once the publish workflow runs after the merge
-  (`0.5.0` before that).
+  fresh GO. It names `0.7.0` once the publish workflow runs after the merge
+  (`0.6.0` before that; `@texuli/document` and `@texuli/pages` have no
+  earlier version).
 - **`latest`** is npm's default install tag, and npm's package page shows
   the README of the version it names. It tracks the newest release, before
   and after 1.0.0: the publish workflow moves it together with `next`
   (owner decision 2026-10-27; before that, `latest` was reserved for 1.0.0
-  and stayed on the first upload, `0.1.0-next.0`). It names `0.6.0` once the
-  publish workflow runs after the merge (`0.5.0` before that).
+  and stayed on the first upload, `0.1.0-next.0`). It names `0.7.0` once the
+  publish workflow runs after the merge (`0.6.0` before that).
   The workflow moves `latest` on every run, so publishing a future
   pre-release without moving `latest` needs a workflow change first.
 - Dailybot v4 and other production consumers must pin exact package versions
@@ -652,12 +834,10 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (for `0.6.0`, every internal pin is exactly `0.6.0`; compatibility
+versions (for `0.7.0`, every internal pin is exactly `0.7.0`; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`) keep the
-pnpm `workspace:` protocol. `@texuli/document` and `@texuli/pages`, in the
-repository only, pin the published packages they use to exactly `0.6.0`
-too. The release packer enforces that boundary
+pnpm `workspace:` protocol. The release packer enforces that boundary
 (`scripts/packages.ts` rewrites `workspace:` to the exact workspace version
 and fails the pack when a published manifest would still carry
 `workspace:*`, `link:`, `file:` or `0.0.0`).
@@ -674,15 +854,16 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 20 npm packages | `0.6.0` (dist-tags `latest` and `next`) | Each package manifest, with exact `0.6.0` internal pins; published by the publish workflow after the merge (before it: `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
-| `@texuli/editor` | `0.6.0` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
-| `@texuli/deck` | `0.6.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
-| `@texuli/drag`, `@texuli/workflows` | `0.6.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
-| Blueprint spec | `0.6.0`, digest `37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.6.0`. |
-| Blueprint spec in `@texuli/spec@0.5.0` | `0.5.0`, digest `1ba15e8b082f68140c4b2768b8fd69c9f760e655dd117fac756f356a71525b2d` | The previous release's generated sources carry the `0.5.0` stamp. |
+| 22 npm packages | `0.7.0` (dist-tags `latest` and `next`) | Each package manifest, with exact `0.7.0` internal pins; published by the publish workflow after the merge (before it: `0.6.0` for 20 packages on 2026-10-29 UTC; `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| `@texuli/document`, `@texuli/pages` | `0.7.0` (first published as `0.7.0`) | Each package manifest (and `PAGES_PACKAGE_VERSION`); `@texuli/document` is published after `@texuli/core` and `@texuli/deck` and before `@texuli/tools` and `@texuli/pages`, which depend on it; `@texuli/pages` after `@texuli/player`. In development (ADR-010, ADR-011), pre-1.0. |
+| `@texuli/editor` | `0.7.0` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
+| `@texuli/deck` | `0.7.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
+| `@texuli/drag`, `@texuli/workflows` | `0.7.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
+| Blueprint spec | `0.7.0`, digest `43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.7.0`. |
+| Blueprint spec in `@texuli/spec@0.6.0` | `0.6.0`, digest `37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc` | The previous release's generated sources carry the `0.6.0` stamp. |
+| Blueprint spec in `@texuli/spec@0.5.0` | `0.5.0`, digest `1ba15e8b082f68140c4b2768b8fd69c9f760e655dd117fac756f356a71525b2d` | The `0.5.0` release's generated sources carry the `0.5.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.4.0` | `0.4.0`, digest `fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3` (after `0.3.0`, digest `a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848`, which was never on npm) | The `0.4.0` release's generated sources carry the `0.4.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.3.0` | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | The `0.3.0` release's generated sources carry the `0.2.0` stamp. |
-| `@texuli/document`, `@texuli/pages` | `0.0.0`, in the repository only | `private`, not in `publish.yml`; first release planned for `0.7.0` (ADR-011). |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 
 - A normative spec change takes a new spec version and a fresh digest pin in
@@ -712,21 +893,24 @@ tag. Any GO for Task 170's name reservation covers only that reservation.
 | 176 | Styled package | `texuli` | Fresh owner GO after core, primitives, and tokens compatibility plus style and consumer gates pass. |
 | 0.5.0 | Editor | `@texuli/editor`, after `texuli` (first published in `0.5.0`) | Fresh owner GO for each version; it must be published **after** `@texuli/core`, `@texuli/primitives`, `@texuli/tokens` and `texuli`, which it depends on. |
 | 0.3.0 | Workflows | `@texuli/workflows`, after `@texuli/drag` and `texuli`, before `@texuli/player` (first published as `0.3.0` on 2026-10-28) | Fresh owner GO for each version; it must be published **before** `@texuli/player`, which depends on it. |
-| 0.4.0 | Deck engine | `@texuli/deck`, after `@texuli/drag`, before `@texuli/tools` and `@texuli/slides` (first published in `0.4.0`) | Fresh owner GO for each version; it must be published **before** `@texuli/slides` and `@texuli/tools`, which depend on it. |
+| 0.4.0 | Deck engine | `@texuli/deck`, after `@texuli/drag`, before `@texuli/tools` and `@texuli/slides` (first published in `0.4.0`) | Fresh owner GO for each version; it must be published **before** `@texuli/document`, `@texuli/slides` and `@texuli/tools`, which depend on it. |
+| 0.7.0 | Document engine | `@texuli/document`, after `@texuli/core`, `@texuli/deck` and `@texuli/primitives`, before `@texuli/tools` and `@texuli/pages` (first published in `0.7.0`) | Fresh owner GO for each version; it must be published **after** `@texuli/core` and `@texuli/deck` and **before** `@texuli/tools` and `@texuli/pages`, which depend on it. |
+| 0.7.0 | Document editor | `@texuli/pages`, after `@texuli/player` and before `@texuli/slides` (first published in `0.7.0`) | Fresh owner GO for each version; it must be published **after** `@texuli/document`, `@texuli/editor`, `@texuli/blocks`, `@texuli/player`, `@texuli/drag`, `@texuli/primitives`, `@texuli/tokens`, `texuli` and `@texuli/core`, which it depends on. |
 | 177 | Domain packages | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/blocks` | Fresh owner GO for the exact ready set after dependency order, package checks, size, pack, and consumer gates pass. |
 | 178 | Catalog and integration tools | `@texuli/catalog`, `@texuli/tools`, `@texuli/astro`, `@texuli/player`, `@texuli/slides`, `@texuli/spec` (the order in `publish.yml`; all six went out in the 2026-10-25 `0.1.0-next.1` run) | Fresh owner GO for each exact release set after implementation, dependency, pack, consumer, and relevant website/build gates pass. |
 
-The date, drag, workflows, deck and editor rows are in
+The date, drag, workflows, deck, editor, document and pages rows are in
 `.github/workflows/publish.yml` (order: core, date, spec, drag, deck,
-tokens, primitives, texuli, workflows, editor, charts, data, media, chat,
-blocks, catalog, tools, astro, player, slides; `@texuli/editor` goes out
-from `0.5.0`, after `texuli`). Every published package is `0.6.0`, and every
-internal dependency between them is pinned to exactly `0.6.0`;
-`@texuli/document` and `@texuli/pages` are not in the workflow (in the
-repository only, `0.0.0`). `pnpm verify:packages` still refuses any
+tokens, primitives, document, texuli, workflows, editor, charts, data,
+media, chat, blocks, catalog, tools, astro, player, pages, slides;
+`@texuli/editor` goes out from `0.5.0`, after `texuli`, and
+`@texuli/document` and `@texuli/pages` from `0.7.0`). Every published
+package is `0.7.0`, and every internal dependency between them is pinned to
+exactly `0.7.0`; the workflow refuses to start publishing while any listed
+package is still `0.0.0`. `pnpm verify:packages` still refuses any
 `0.0.0` or `workspace:` range in a published manifest, the guard that keeps
 an unversioned dependency out. The publish loop skips versions npm already
-has, so a package changed after `0.6.0` needs a new version before its
+has, so a package changed after `0.7.0` needs a new version before its
 change reaches npm.
 
 Each outward wave must also pass its task's `pnpm verify:packages` gate and
@@ -739,7 +923,7 @@ new version rather than reusing a published version.
 ## Honesty in documentation
 
 The npm name reservation (`0.1.0-next.0`) was a prerelease publication by
-the owner, not a supported product release. `0.6.0` is a release but not a
+the owner, not a supported product release. `0.7.0` is a release but not a
 stable one: keep `private: true`, the pre-1.0 status, and the absence of a
 stable 1.0.0 clear until the corresponding approved stable release actually
 exists. A passing pack gate proves only that a tarball

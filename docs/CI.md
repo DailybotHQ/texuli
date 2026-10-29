@@ -90,19 +90,22 @@ browser visual test.
 then publishes the packable packages in the wave order documented in
 [RELEASE](RELEASE.md), always `--tag next`, then points `latest` at the
 same versions: `latest` tracks the newest release (owner decision
-2026-10-27; both name `0.6.0` once the post-merge run publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
+2026-10-27; both name `0.7.0` once the post-merge run publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
 GitHub's OIDC token (`id-token: write`).
 
 `publish.yml` lists `@texuli/drag`, `@texuli/workflows` and
 `@texuli/deck` (all in development) ahead of the packages that depend on
-them (owner decision 2026-10-27), and `@texuli/editor` (in development)
-after `texuli`. A manual `workflow_dispatch` run on `main`
+them (owner decision 2026-10-27), `@texuli/editor` (in development)
+after `texuli`, `@texuli/document` after `@texuli/primitives` (before
+`@texuli/tools`, which imports it) and `@texuli/pages` after
+`@texuli/player`. A manual `workflow_dispatch` run on `main`
 (run 40616266068, 2026-10-28 UTC) published drag and workflows for the
 first time as `0.3.0`; `@texuli/deck` was first published in `0.4.0`, and
-`@texuli/editor` was first published in `0.5.0`; in `0.6.0` all 20
-published packages move together again. `@texuli/document` and
-`@texuli/pages` are not in `publish.yml` (in the repository only, `0.0.0`;
-first release planned for `0.7.0`). The publish loop
+`@texuli/editor` was first published in `0.5.0`, and `@texuli/document`
+and `@texuli/pages` are first published in `0.7.0`, the release in which
+all 22 packable packages move together. A pre-flight step refuses the run,
+before the first `npm publish`, when any listed package is still `0.0.0`.
+The publish loop
 skips versions npm already has, so a package changed since its published
 version needs a new version first
 ([RELEASE](RELEASE.md#publication-waves)).
@@ -112,7 +115,7 @@ granular access token of the publishing account with read-and-write on
 the `@texuli` packages. CI tokens bypass the 2FA one-time-password flow
 that blocks terminal publishes.
 
-To release: push a tag (`v0.6.0`) or run the workflow from the
+To release: push a tag (`v0.7.0`) or run the workflow from the
 Actions tab against `main`. Never overwrite a published version; new
 content means a new version.
 

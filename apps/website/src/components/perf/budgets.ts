@@ -82,6 +82,18 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 162, htmlGzipKb: 28 },
   },
   {
+    route: '/documents-page/',
+    reason:
+      'PLAN_010 T-site-070: three lazy document islands (client:visible) that import the editor, the reader, the paged view, the collaboration layer, the writers and the player only after they hydrate, so JS at the ready signal is 57.6 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk those islands can import lazily (pages, editor, player loaders, charts): 69.5 KB of CSS, the same follow-up as /motion-page/ and /slides-page/. Measured 2026-10-29: 147.5 KB page (+4% headroom).',
+    budget: { pageGzipKb: 154 },
+  },
+  {
+    route: '/live-generation/',
+    reason:
+      'PLAN_010 T-site-070: one island near the top hydrates at once (the replay controls and the recorded drafts); the player loads on the first Start, not before. Measured 2026-10-29: 96.1 KB page and 63.0 KB JS at the ready signal (+4% headroom).',
+    budget: { pageGzipKb: 100, jsGzipKb: 66 },
+  },
+  {
     route: '/workflows-page/',
     reason:
       'PLAN_007: the workflow editor is the subject of the page and sits in the first screen (editor plus the workflow model). Measured 126.5 KB page, 92.3 KB JS (+4% headroom).',

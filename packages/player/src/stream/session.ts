@@ -235,6 +235,16 @@ export function createStreamSession(options: StreamSessionOptions): StreamSessio
       issue(record.path, first?.code ?? 'invalid', first?.message ?? 'The node did not validate.');
       return false;
     }
+    // Spec 0.7.0: a key is unique in the tree, so a key already painted refuses this node.
+    const key = record.shell.key;
+    if (typeof key === 'string') {
+      for (const other of records.values()) {
+        if (other !== record && other.status === 'ready' && other.shell?.key === key) {
+          issue(record.path, 'duplicate-key', `The key "${key}" is already used in this tree.`);
+          return false;
+        }
+      }
+    }
     // Rules between siblings (one field name per form, …): the partial tree with this node.
     const siblings = resolveDraft(partial(record, null, false));
     if (siblings.issues.length > 0) {

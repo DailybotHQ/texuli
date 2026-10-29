@@ -157,6 +157,8 @@ export const SLIDE_COMPONENT_EXCLUSIONS: Readonly<Record<string, string>> = Obje
   'layout-stack': 'A container of catalog child nodes: a free slide already stacks its items.',
   'layout-tile':
     'A container of catalog child nodes: use `three-column-cards` or `blocks-structure` cards.',
+  document:
+    'A whole document (spec 0.7.0): the player paints it only through a host `documentHost` (`@texuli/pages/host`), which the slides stage does not carry; put text on a slide with a layout or the blocks families.',
 });
 
 /** Whole catalog groups the player has no painter for, with their ids and the reason. */

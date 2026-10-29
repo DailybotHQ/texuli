@@ -5,8 +5,8 @@ Markdown import and export through the `@texuli/core` editor codec
 in or out: raw tags stay literal text, links pass `safeHref` and images
 pass `safeImageSrc` at the tier.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ```ts
 import { documentFromMarkdown, documentToMarkdown } from '@texuli/document/markdown';

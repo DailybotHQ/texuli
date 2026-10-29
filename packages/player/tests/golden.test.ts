@@ -11,6 +11,7 @@ import { tick } from 'svelte';
 import { describe, expect, it, vi } from 'vitest';
 import Player from '../src/Player.svelte';
 import { CATALOG_GROUPS } from './catalog-groups.ts';
+import { checkDocument, testDocumentHost } from './document-host.ts';
 
 /**
  * The spec golden blueprints are complete JSON interfaces. Each one validates
@@ -93,6 +94,7 @@ describe('the spec goldens', () => {
           tier: 'untrusted',
           conditions: formulaConditions,
           conditionInputs: { closed: 38, blocked: 2 },
+          checkDocument,
         });
         expect(draft.ok).toBe(true);
         expect(draft.diagnostics).toEqual([]);
@@ -105,7 +107,8 @@ describe('the spec goldens', () => {
       });
 
       it('paints with no placeholder and no error', { timeout: 30_000 }, async () => {
-        const { container, errors } = paint(envelope);
+        // A document golden paints through a document host (spec 0.7.0).
+        const { container, errors } = paint(envelope, { documentHost: testDocumentHost().host });
         await painted(container);
         expect(errors).toEqual([]);
       });

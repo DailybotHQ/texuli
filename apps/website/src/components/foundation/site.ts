@@ -73,6 +73,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       { href: '/editor-page/', label: 'Editor' },
       { href: '/drag-page/', label: 'Drag and drop' },
       { href: '/motion-page/', label: 'Motion' },
+      { href: '/documents-page/', label: 'Documents' },
       { href: '/workflows-page/', label: 'Workflow editor' },
       { href: '/workflows-page/json/', label: 'JSON live preview' },
     ],
@@ -100,6 +101,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     links: [
       { href: '/agents-page/', label: 'Agents' },
       { href: '/playground/', label: 'Playground' },
+      { href: '/live-generation/', label: 'Live generation' },
       { href: '/builder/', label: 'Builder' },
       { href: '/agent-chat/', label: 'Agent chat' },
     ],

@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import CollabEditor from '../src/collab/CollabEditor.svelte';
 import { feedKeydown } from '../src/collab/feed.ts';
 import { HIGHLIGHT_NAMES, HighlightLayer } from '../src/collab/highlights.ts';
+import { landmarkPerson } from '../src/collab/labels.ts';
 import {
   type CollabSession,
   createCollabSession,
@@ -36,7 +37,12 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-function mount(hub: MemorySyncHub, replica: string, color: number) {
+function mount(
+  hub: MemorySyncHub,
+  replica: string,
+  color: number,
+  extra: Record<string, unknown> = {}
+) {
   const session = createCollabSession({
     replica,
     document: samplePage(),
@@ -48,6 +54,7 @@ function mount(hub: MemorySyncHub, replica: string, color: number) {
   let editor: PagesEditor | undefined;
   const view = render(CollabEditor, {
     props: {
+      ...extra,
       session,
       motion: false,
       announce,
@@ -90,10 +97,10 @@ function mount(hub: MemorySyncHub, replica: string, color: number) {
   return { session, root, announce, state: () => editor as PagesEditor, select, type, button };
 }
 
-function pair() {
+function pair(extra: Record<string, unknown> = {}) {
   const hub = createMemorySyncHub({ manual: true });
-  const ada = mount(hub, 'ada', 1);
-  const lin = mount(hub, 'lin', 4);
+  const ada = mount(hub, 'ada', 1, extra);
+  const lin = mount(hub, 'lin', 4, extra);
   const flush = async () => {
     for (let i = 0; i < 4; i += 1) hub.flush();
     await tick();
@@ -233,6 +240,65 @@ describe('CollabEditor', () => {
       'true'
     );
     expect(presenceColor(9)).toBe('var(--tx-chart-2, Highlight)');
+  });
+
+  it('names every landmark for its person, so two editors on one page never repeat one', async () => {
+    // axe `landmark-unique`: before, both editors named their region after the
+    // document title and their sidebar, people list and panels "Collaboration",
+    // "People here", "Comments", "Suggestions" and "Version history".
+    const { ada, lin, flush } = pair({ trail: [{ ref: 'pages/home', title: 'Home' }] });
+    await flush();
+    for (const side of [ada, lin]) await fireEvent.click(side.button('Version history'));
+    const roles: Record<string, string> = {
+      SECTION: 'region',
+      ASIDE: 'complementary',
+      NAV: 'navigation',
+    };
+    // Callouts are document content (an `aside` named by its title), not the
+    // collaboration UI: two views of one document show the same callout.
+    const landmarks = [
+      ...document.body.querySelectorAll('section, aside:not(.tx-pages-callout), nav'),
+    ].flatMap((element) => {
+      const labelledby = element.getAttribute('aria-labelledby');
+      const name =
+        element.getAttribute('aria-label') ??
+        (labelledby
+          ? labelledby
+              .split(/\s+/)
+              .map((id) => document.getElementById(id)?.textContent?.trim() ?? '')
+              .join(' ')
+          : '');
+      // An unnamed section is not a landmark.
+      if (element.tagName === 'SECTION' && !name) return [];
+      return [`${roles[element.tagName]}: ${name}`];
+    });
+    expect(landmarks.length).toBeGreaterThanOrEqual(14);
+    expect(new Set(landmarks).size).toBe(landmarks.length);
+    for (const person of ['Ada', 'Lin']) {
+      for (const landmark of [
+        `region: Field notes (${person})`,
+        `navigation: Breadcrumb (${person})`,
+        `complementary: Collaboration (${person})`,
+        `region: People here (${person})`,
+        `region: Comments (${person})`,
+        `region: Suggestions (${person})`,
+        `region: Version history (${person})`,
+      ])
+        expect(landmarks).toContain(landmark);
+    }
+    // The visible headings stay plain; a host label and `landmark` override still win.
+    expect(ada.root.querySelector('.tx-pages-collab__heading')?.textContent).toBe('Comments');
+    expect(landmarkPerson({ author: { name: '  ' }, replica: 'r-7' })).toBe('r-7');
+    const named = mount(createMemorySyncHub({ manual: true }), 'kim', 2, {
+      label: 'Kim’s draft',
+      collabLabels: { landmark: (name: string) => `${name}, review copy` },
+    });
+    expect(named.root.querySelector('section.tx-pages-editor')?.getAttribute('aria-label')).toBe(
+      'Kim’s draft'
+    );
+    expect(
+      named.root.querySelector('aside.tx-pages-collab__sidebar')?.getAttribute('aria-label')
+    ).toBe('Collaboration, review copy');
   });
 });
 

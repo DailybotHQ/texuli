@@ -6,7 +6,7 @@
 import { getAnnouncer } from '@texuli/core/announcer';
 import { tick } from 'svelte';
 import { feedKeydown } from './feed.ts';
-import { type CollabLabels, DEFAULT_COLLAB_LABELS } from './labels.ts';
+import { type CollabLabels, DEFAULT_COLLAB_LABELS, landmarkPerson } from './labels.ts';
 import type { CollabSession } from './session.svelte.ts';
 
 interface Props {
@@ -44,7 +44,7 @@ function settleAll(accept: boolean): void {
 }
 </script>
 
-<section class="tx-pages-collab__panel" aria-labelledby={`${uid}-title`}>
+<section class="tx-pages-collab__panel" aria-label={labels.landmark(labels.suggestions, landmarkPerson(session))}>
   <h2 class="tx-pages-collab__heading" id={`${uid}-title`}>{labels.suggestions}</h2>
   {#if suggestions.length === 0}
     <p class="tx-pages-collab__empty">{labels.noSuggestions}</p>

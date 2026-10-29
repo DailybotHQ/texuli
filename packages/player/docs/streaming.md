@@ -130,7 +130,8 @@ Hosts localize the streaming copy through `labels`: `status.streaming`,
 
 ## Not covered
 
-- Stable node keys: spec 0.7.0 plans an optional node `key`; until a spec
-  version admits it, streamed nodes are matched by path (stable, because
-  streamed children only append).
+- Matching streamed nodes by key: spec 0.7.0 node `key`s are checked while
+  streaming (a key already painted is held with `duplicate-key`), but
+  streamed nodes are still matched by path (stable, because streamed
+  children only append); matching by key is planned.
 - Native streaming in the Kotlin twin is planned.

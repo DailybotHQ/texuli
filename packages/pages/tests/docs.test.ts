@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -35,6 +35,7 @@ const SUBPATH_DOCS: Record<string, { doc: string; entry?: string; component?: st
     component: 'src/paged/PagedView.svelte',
   },
   './export': { doc: 'docs/export.md', entry: 'src/export/index.ts' },
+  './host': { doc: 'docs/host.md', entry: 'src/host/index.ts' },
   './styles.css': { doc: 'docs/styles.md' },
 };
 const PLANNED: string[] = [];
@@ -136,5 +137,23 @@ describe('pages documentation', () => {
     }
     expect(readme).toMatch(/Status: in development/);
     expect(readme).toContain('utm_source=dailybotopensource');
+  });
+
+  it('states the release status honestly: published from 0.7.0, never the placeholder', () => {
+    const manifest = JSON.parse(read('package.json')) as { version: string };
+    // First published in 0.7.0; the 0.0.0 placeholder is gone for good.
+    expect(manifest.version).not.toBe('0.0.0');
+    const readme = read('README.md');
+    expect(readme).toMatch(/published on\s+(?:>\s+)?npm/);
+    expect(readme).toContain(`\`${manifest.version}\``);
+    const pages = [readme, ...readdirSync(`${ROOT}/docs`).map((file) => read(`docs/${file}`))];
+    for (const page of pages)
+      expect(page).not.toMatch(
+        /not on npm yet|0\.0\.0` placeholder|repository only|first release (?:is )?planned/i
+      );
+    // The exported constant tracks the manifest version.
+    expect(read('src/index.ts')).toContain(
+      `export const PAGES_PACKAGE_VERSION = '${manifest.version}';`
+    );
   });
 });

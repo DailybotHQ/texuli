@@ -144,8 +144,8 @@ describe('spec 0.6.0: the closed motion vocabulary', () => {
     const input: Record<string, unknown> = { ...withMotion(undefined), spec: '0.5.0' };
     delete input.motion;
     const result = migrateBlueprint(input);
-    expect(result.applied).toEqual(['0.5.0->0.6.0']);
-    expect(result.blueprint).toEqual({ ...input, spec: '0.6.0' });
+    expect(result.applied.slice(0, 1)).toEqual(['0.5.0->0.6.0']);
+    expect(result.blueprint).toEqual({ ...input, spec: SPEC_VERSION });
     expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);
     expect(codes(result.blueprint)).toEqual([]);
   });

@@ -8,8 +8,8 @@ document format of ADR-011) and keeps the editor's op log the single edit
 path: local transactions become replica operations, merged changes come
 back as `sync` entries of the log, and undo reverts only your own steps.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 Import it lazily, so only a collaborative page pays for it:
 
@@ -46,7 +46,7 @@ collaborator list, decorations over the text and a sidebar.
 | Prop | Default | What it does |
 | --- | --- | --- |
 | `session` | required | The `CollabSession` |
-| `label` | document title | The editor region's accessible name |
+| `label` | document title, in your view | The editor region's accessible name (by default `collabLabels.landmark(title, person)`, for example "Field notes (Ada)") |
 | `labels` | English | Page editor strings (`PagesLabels`, partial) |
 | `collabLabels` | English | Collaboration strings (`CollabLabels`, partial) |
 | `readonly` | `false` | Read only (no review bar) |
@@ -73,6 +73,15 @@ collaborator list, decorations over the text and a sidebar.
   painted and the sidebar remains the full view.
 - **Sidebar** (`aside`): `CommentSidebar`, `SuggestionList` and, when
   open, `VersionHistory`.
+- **Landmark names:** every landmark the collaboration UI names (the
+  editor region, the breadcrumb, the sidebar, the collaborator list and
+  the comment, suggestion and version panels) carries the person it
+  belongs to, through `CollabLabels.landmark(name, person)` with
+  `landmarkPerson(session)` (the author's name, or the replica id when the
+  name is empty): "Comments (Ada)" and "Comments (Lin)". So two editors on
+  one page never repeat a landmark name (axe `landmark-unique`) without any
+  host labels. The visible headings stay "Comments", "Suggestions" and
+  "Version history". An explicit `label` is used as given.
 
 ## Parts
 
@@ -134,7 +143,9 @@ finds a block's text element, and `supportsHighlights()` reports support.
 
 `DEFAULT_COLLAB_LABELS` holds every string (`CollabLabels`);
 `resolveCollabLabels(overrides)` merges partial overrides (empty strings
-never replace a default).
+never replace a default). `landmark(name, person)` builds every landmark
+name (default `"<name> (<person>)"`); `landmarkPerson(session)` is the
+person it is called with.
 
 ## Styles
 

@@ -50,12 +50,16 @@ object SpecContract {
     const val WORKFLOW_FIELDS: Int = 32
     const val WORKFLOW_LABEL_LENGTH: Int = 200
     const val WORKFLOW_STRING_LENGTH: Int = 2000
+    /** Top-level blocks a `document` node's doc may hold (spec 0.7.0 `$defs.document`). */
+    const val DOCUMENT_BLOCKS: Int = 2000
 
     val STATE_NAME: Regex = Regex("^[a-z][A-Za-z0-9_]{0,31}\$")
     val DATA_NAME: Regex = Regex("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)*\$")
     val FLOW_NAME: Regex = Regex("^[a-z][a-z0-9-]{0,31}\$")
     val INTENT_NAME: Regex = Regex("^[A-Za-z][A-Za-z0-9_-]{0,63}\$")
     val ITEM_KEY: Regex = Regex("^[A-Za-z0-9._:-]{1,64}\$")
+    /** A node's stable instance id (spec 0.7.0 `$defs.nodeKey`), unique in its tree. */
+    val NODE_KEY: Regex = Regex("^[A-Za-z0-9._:-]{1,64}\$")
     val WORKFLOW_ID: Regex = Regex("^[A-Za-z0-9._:-]{1,64}\$")
     val WORKFLOW_FIELD_NAME: Regex = Regex("^[a-z][A-Za-z0-9_]{0,31}\$")
 
