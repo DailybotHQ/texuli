@@ -1,4 +1,5 @@
-import type { FilterGroup, FilterOperator } from '../engines/grid/filter.ts';
+import type { FilterGroup } from '../engines/grid/filter.ts';
+import type { FilterAnyOperator, FilterFieldGroup, FilterOperatorDef } from './catalog.ts';
 import type { FilterBuilderLabels } from './labels.ts';
 import type { FilterField, FilterPath } from './model.ts';
 
@@ -7,12 +8,14 @@ export type FilterAction =
   | { kind: 'addCondition' | 'addGroup' | 'remove'; path: FilterPath }
   | { kind: 'combinator'; path: FilterPath; op: FilterGroup['op'] }
   | { kind: 'field'; path: FilterPath; key: string }
-  | { kind: 'operator'; path: FilterPath; operator: FilterOperator }
+  | { kind: 'operator'; path: FilterPath; operator: FilterAnyOperator }
   | { kind: 'value'; path: FilterPath; value: unknown };
 
 /** What every nested group and condition reads from the builder. */
 export interface FilterBuilderContext {
   fields: readonly FilterField[];
+  operators: readonly FilterOperatorDef[] | undefined;
+  groups: readonly FilterFieldGroup[] | undefined;
   labels: FilterBuilderLabels;
   /** Prefix of every element id inside this builder. */
   uid: string;

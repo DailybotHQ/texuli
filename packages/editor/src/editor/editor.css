@@ -105,6 +105,13 @@ h4.tx-editor-heading {
   text-decoration: underline wavy var(--tx-destructive, Mark);
 }
 
+.tx-editor-extension {
+  padding-inline: 0.15em;
+  border-radius: 0.25rem;
+  background: var(--tx-accent, color-mix(in oklab, CanvasText 8%, Canvas));
+  color: var(--tx-accent-foreground, inherit);
+}
+
 .tx-editor-quote {
   margin-block: 0 0.5rem;
   margin-inline: 0;

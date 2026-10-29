@@ -39,13 +39,15 @@ const saved = toMarkdown(history.present.doc); // re-render sink-free
     host).
   - Paragraphs and headings hold flat runs, `{ type: 'text', text, marks }`
     or `{ type: 'break' }`.
-  - Marks: `strong`, `em`, `strike`, `code` and `link` (with `href`).
+  - Marks: `strong`, `em`, `strike`, `code`, `link` (with `href`) and
+    `extension` (a host inline entity, `name` and `id`, over its label).
   - Every block and list item has a runtime-only `id`.
 - **Invariants.** `normalizeDocument` repairs them and `validateEditorDocument`
   lists what is broken; it never throws.
   - Runs are non-empty and neighbors differ in marks.
-  - Marks are unique and sorted (`link`, `strong`, `em`, `strike`, `code`),
-    and `code` excludes every mark but `link`.
+  - Marks are unique and sorted (`link`, `strong`, `em`, `strike`, `code`,
+    `extension`); `extension` excludes `link` and `code`, and `code`
+    excludes every other mark but `link`.
   - Containers are non-empty, and a list item starts with a paragraph.
   - `checked` appears only on todo items, and `start` only on ordered lists
     (omitted when it is 1).
@@ -65,6 +67,18 @@ const saved = toMarkdown(history.present.doc); // re-render sink-free
     object and 5,000 blocks are in the tests.
   - Each degradation is reported once in `diagnostics`.
   - Versions other than 1 are refused.
+  - `extension` marks are kept only for the `extensions` passed in the
+    options; others keep their text (`mark-dropped`).
+- **Host inline extensions (G48).** `createInlineExtensions(list)` validates
+  a closed set of `EditorInlineExtension` entries (`name`, a `sigil` from
+  `EDITOR_EXTENSION_SIGILS`, optional `accepts(id)` and `href(id)`) and
+  throws on a bad name or sigil, a duplicate or more than 16
+  (`EDITOR_EXTENSION_LIMITS`). `toInlineExtensions` accepts a list or a
+  registry, `acceptsExtensionId` checks an id against the charset, the
+  128-character cap and the host check, and `extensionHref` returns the host
+  link through `safeHref` (`untrusted` by default). The Markdown form is
+  `<sigil>{id|label}` (see the codec below and
+  [`@texuli/editor/markdown`](../../editor/docs/editor-markdown.md#host-inline-extensions)).
 - **Selection.** An `EditorPoint` is `{ block, offset }`: a block id and a
   UTF-16 offset, where a break counts 1. An `EditorSelection` is a text
   selection (`anchor`, `focus`) or a node selection of a divider or media
@@ -78,7 +92,8 @@ const saved = toMarkdown(history.present.doc); // re-render sink-free
   `nextWord` and `previousWord` use `Intl.Segmenter`, falling back to code
   points.
 - **Inline trees.** `inlineToTree` folds runs into the nested shape the
-  renderers walk (`text`, `code`, `break`, `strong`, `em`, `strike`, `link`).
+  renderers walk (`text`, `code`, `break`, `strong`, `em`, `strike`, `link`,
+  `extension` with `name` and `id`).
   `inlineFromTree` reads that shape back, untrusted by default.
   - It also accepts the catalog's `value` text key and the blocks tree's
     `del`.
@@ -151,8 +166,13 @@ The composition types map to `composition`, and unsupported types (such as
 
 ## Markdown codec (`editor-markdown`)
 
-`fromMarkdown(source, { trust, limits, maxSource })` reads the closed subset
-that blocks text and catalog rich text use. `toMarkdown(doc)` writes it.
+`fromMarkdown(source, { trust, limits, maxSource, extensions })` reads the
+closed subset that blocks text and catalog rich text use.
+`toMarkdown(doc, { extensions })` writes it. With `extensions`, the tokens
+`<sigil>{id|label}` of the registered sigils read as `extension` marks and
+write back unchanged; a token is matched in constant time after two linear
+passes (the id-character run from each index and the next unescaped `}`),
+and plain text that spells a token is written with its `{` escaped.
 
 **Reading:**
 

@@ -1,7 +1,8 @@
 import { cleanup, render, waitFor } from '@testing-library/svelte';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { buildToc, normalizeTocEntries, resolveTocLevels } from '../src/layouts/content/index.ts';
 import ContentLayoutDirectHarness from './fixtures/ContentLayoutDirectHarness.svelte';
+import ContentLayoutTrackingHarness from './fixtures/ContentLayoutTrackingHarness.svelte';
 
 // G39: ContentLayout takes declarative content, chooses its heading levels,
 // keeps authored heading ids on request and accepts host-supplied TOC entries.
@@ -170,5 +171,118 @@ describe('layouts-content: ContentLayout TOC control (G39)', () => {
     await waitFor(() =>
       expect(tocLinks(view.container).map(([label]) => label)).toContain('Mounted section')
     );
+  });
+});
+
+describe('layouts-content: active heading tracking (G52)', () => {
+  /** A stand-in IntersectionObserver: records its options and targets; `fire()` runs the callback. */
+  class FakeObserver {
+    static instances: FakeObserver[] = [];
+    readonly targets = new Set<Element>();
+    readonly callback: IntersectionObserverCallback;
+    readonly options: IntersectionObserverInit | undefined;
+    constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {
+      this.callback = callback;
+      this.options = options;
+      FakeObserver.instances.push(this);
+    }
+    observe(target: Element) {
+      this.targets.add(target);
+    }
+    unobserve(target: Element) {
+      this.targets.delete(target);
+    }
+    disconnect() {
+      this.targets.clear();
+    }
+    takeRecords() {
+      return [];
+    }
+    fire() {
+      this.callback([], this as unknown as IntersectionObserver);
+    }
+  }
+  const tops: Record<string, number> = {};
+  const scrollTo = (positions: Record<string, number>) => {
+    Object.assign(tops, positions);
+    for (const observer of FakeObserver.instances) observer.fire();
+  };
+  const current = (container: HTMLElement) =>
+    Array.from(container.querySelectorAll('.tx-content-layout__toc a[aria-current]')).map(
+      (link) => [link.textContent?.trim(), link.getAttribute('aria-current')]
+    );
+
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    FakeObserver.instances = [];
+  });
+
+  it('marks the heading being read with aria-current="location", reports it and binds activeId, for scanned and host entries', async () => {
+    vi.stubGlobal('IntersectionObserver', FakeObserver);
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      return { top: tops[this.id] ?? 10_000 } as DOMRect;
+    });
+    for (const toc of [
+      undefined,
+      [
+        { id: 'two', label: 'Second part', level: 2 as const },
+        { id: 'three', label: 'Third part', level: 3 as const },
+      ],
+    ]) {
+      const changes: Array<[string, string | undefined]> = [];
+      const view = render(ContentLayoutTrackingHarness, {
+        props: {
+          toc,
+          onChange: (id: string, item?: { label: string }) => changes.push([id, item?.label]),
+        },
+      });
+      const first = toc ? 'Second part' : 'One';
+      await waitFor(() => expect(current(view.container)).toEqual([[first, 'location']]));
+      const observer = FakeObserver.instances.at(-1) as FakeObserver;
+      // The reading band is the top 30% of the viewport, and every listed heading is watched.
+      expect(observer.options?.rootMargin).toBe('0px 0px -70% 0px');
+      expect([...observer.targets].map((target) => target.id)).toEqual(
+        toc ? ['two', 'three'] : ['one', 'two', 'three']
+      );
+      // Scrolling down: "three" passes the reading line (30% of 768 px).
+      scrollTo({ one: -900, two: -300, three: 120 });
+      await waitFor(() =>
+        expect(current(view.container)).toEqual([[toc ? 'Third part' : 'Three', 'location']])
+      );
+      expect(view.getByTestId('active').textContent).toBe('three');
+      // Scrolling back up: "two" is the last heading above the line.
+      scrollTo({ one: -200, two: 100, three: 600 });
+      await waitFor(() => expect(view.getByTestId('active').textContent).toBe('two'));
+      // Above every heading, the first entry is current.
+      scrollTo({ one: 400, two: 900, three: 1_400 });
+      await waitFor(() => expect(view.getByTestId('active').textContent).toBe(toc ? 'two' : 'one'));
+      expect(changes).toEqual(
+        toc
+          ? [
+              ['two', 'Second part'],
+              ['three', 'Third part'],
+              ['two', 'Second part'],
+            ]
+          : [
+              ['one', 'One'],
+              ['three', 'Three'],
+              ['two', 'Two'],
+              ['one', 'One'],
+            ]
+      );
+      view.unmount();
+      for (const key of Object.keys(tops)) delete tops[key];
+    }
+  });
+
+  it('honors a bound activeId and needs no observer (server rendering, old browsers)', async () => {
+    vi.stubGlobal('IntersectionObserver', undefined);
+    const view = render(ContentLayoutTrackingHarness, { props: { initial: 'two' } });
+    await waitFor(() => expect(current(view.container)).toEqual([['Two', 'location']]));
+    expect(view.getByTestId('active').textContent).toBe('two');
   });
 });

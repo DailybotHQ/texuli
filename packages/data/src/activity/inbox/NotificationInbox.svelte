@@ -24,6 +24,14 @@ interface Props {
   onFilterChange?: (filter: InboxFilter) => void;
   /** Read state changes: one item (toggle, open) or every unread one (mark all). */
   onReadChange?: (ids: string[], read: boolean) => void;
+  /**
+   * Read items offer "Mark unread". Default `true`; `false` hides that toggle
+   * (unread items still offer "Mark read"), for hosts that persist only
+   * mark-read.
+   */
+  allowMarkUnread?: boolean;
+  /** An item marked unread (after `onReadChange`), for hosts that store it separately. */
+  onMarkUnread?: (ids: string[]) => void;
   /** Opening an item: its title link (with `href`) or button. */
   onOpen?: (item: T) => void;
   /** Opening an unread item marks it read. Default `true`. */
@@ -48,6 +56,8 @@ let {
   filter = $bindable('all'),
   onFilterChange,
   onReadChange,
+  allowMarkUnread = true,
+  onMarkUnread,
   onOpen,
   markReadOnOpen = true,
   hrefTrust = 'untrusted',
@@ -91,9 +101,10 @@ function setFilter(next: InboxFilter): void {
 }
 
 function setRead(ids: string[], read: boolean): void {
-  if (ids.length === 0) return;
+  if (ids.length === 0 || (!read && !allowMarkUnread)) return;
   if (filter === 'unread' && read) kept = new Set([...kept, ...ids]);
   onReadChange?.(ids, read);
+  if (!read) onMarkUnread?.(ids);
 }
 
 function open(item: T): void {
@@ -175,13 +186,15 @@ function when(item: T): { iso: string; label: string } {
               {#if time.iso}<time class="tx-inbox__time" datetime={time.iso}>{time.label}</time>{/if}
             </div>
             <div class="tx-inbox__actions">
-              <button
-                type="button"
-                class="tx-inbox__button"
-                aria-label={item.read ? text.markUnreadItem(item.title) : text.markReadItem(item.title)}
-                onclick={() => setRead([item.id], !item.read)}
-                >{item.read ? text.markUnread : text.markRead}</button
-              >
+              {#if !item.read || allowMarkUnread}
+                <button
+                  type="button"
+                  class="tx-inbox__button"
+                  aria-label={item.read ? text.markUnreadItem(item.title) : text.markReadItem(item.title)}
+                  onclick={() => setRead([item.id], !item.read)}
+                  >{item.read ? text.markUnread : text.markRead}</button
+                >
+              {/if}
               {@render actions?.(item)}
             </div>
           </article>

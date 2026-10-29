@@ -44,6 +44,16 @@ type Props = {
    * of contents. Also read from `options.preserveHeadingIds`.
    */
   preserveHeadingIds?: boolean;
+  /**
+   * The id of the heading being read (`bind:activeId`): its table of contents
+   * link gets `aria-current="location"`. The layout tracks it while the page
+   * scrolls (the last listed heading above the top 30% of the viewport) once
+   * it runs in a browser; on the server it is this value, else the first
+   * entry.
+   */
+  activeId?: string;
+  /** The active heading changed while reading (scroll, content changes). */
+  onActiveHeadingChange?: (id: string, item: TocItem | undefined) => void;
   nav?: import('../host/nav-model.ts').NavModel;
   path?: string;
   options?: import('../host/contract.ts').LayoutOptions;
@@ -59,6 +69,8 @@ let {
   toc,
   tocLevels,
   preserveHeadingIds,
+  activeId = $bindable(''),
+  onActiveHeadingChange,
   nav,
   path,
   options,
@@ -66,7 +78,6 @@ let {
 }: Props = $props();
 let screenTarget = $state<HTMLElement>();
 let scannedItems = $state<TocItem[]>([]);
-let activeId = $state('');
 const instanceId = $props.id();
 let root = $state<HTMLElement | undefined>();
 let nested = $state(false);
@@ -86,6 +97,20 @@ const levels = $derived(resolveTocLevels(tocLevels ?? options?.tocLevels));
 const keepIds = $derived(preserveHeadingIds ?? options?.preserveHeadingIds === true);
 const providedItems = $derived(toc ? normalizeTocEntries(toc) : undefined);
 const tocItems = $derived(providedItems ?? scannedItems);
+/** Before tracking starts (server rendering), the first entry reads as current. */
+const currentId = $derived(activeId || (tocItems[0]?.id ?? ''));
+
+/** The share of the viewport, from its top, a heading must pass to become the current one. */
+const READING_LINE = 0.3;
+
+function setActive(id: string, items: readonly TocItem[]): void {
+  if (id === activeId) return;
+  activeId = id;
+  onActiveHeadingChange?.(
+    id,
+    items.find((item) => item.id === id)
+  );
+}
 
 function textOption(key: string): string | undefined {
   const value = options?.[key];
@@ -173,6 +198,7 @@ $effect(() => {
   const IntersectionObserverCtor =
     observerWindow?.IntersectionObserver ?? globalThis.IntersectionObserver;
   let intersection: IntersectionObserver | undefined;
+  let current: readonly TocItem[] = [];
   const observed = (): HTMLElement[] => {
     if (!entries) {
       return Array.from(target.querySelectorAll<HTMLElement>('[data-tx-content-heading]'));
@@ -190,20 +216,38 @@ $effect(() => {
       items = collectHeadings(target, selectorLevels, keep);
       scannedItems = items as TocItem[];
     }
+    current = items;
     if (intersection) {
       intersection.disconnect();
       for (const heading of observed()) intersection.observe(heading);
     }
-    if (!items.some((item) => item.id === activeId)) activeId = items[0]?.id ?? '';
+    const kept = untrack(() => activeId);
+    if (!items.some((item) => item.id === kept)) setActive(items[0]?.id ?? '', items);
+  };
+  /**
+   * The heading being read: the last listed one (in document order) whose top
+   * passed the reading line, or the first one above them all. The observer
+   * only says when a heading crosses the line; positions are read then.
+   */
+  const track = () => {
+    const headings = observed().sort((a, b) =>
+      a === b ? 0 : a.compareDocumentPosition(b) & 4 ? -1 : 1
+    );
+    if (headings.length === 0) return;
+    const line = (win?.innerHeight ?? 0) * READING_LINE;
+    let reading = headings[0] as HTMLElement;
+    for (const heading of headings) {
+      if (heading.getBoundingClientRect().top <= line) reading = heading;
+      else break;
+    }
+    setActive(reading.id, current);
   };
 
   if (typeof IntersectionObserverCtor === 'function') {
-    intersection = new IntersectionObserverCtor((observerEntries) => {
-      const visible = observerEntries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-      const id = visible?.target.id;
-      if (id) activeId = id;
+    // The band is the top 30% of the viewport: crossing its lower edge moves the reading line.
+    intersection = new IntersectionObserverCtor(track, {
+      rootMargin: `0px 0px -${100 - READING_LINE * 100}% 0px`,
+      threshold: [0, 1],
     });
   }
   untrack(refresh);
@@ -302,7 +346,7 @@ function safeNavHref(href: string): string | undefined {
               {@const href = fragmentHref(item.id)}
               {#if href}
                 <li data-level={item.level}>
-                  <a href={href} aria-current={activeId === item.id ? 'location' : undefined}>
+                  <a href={href} aria-current={currentId === item.id ? 'location' : undefined}>
                     {item.label}
                   </a>
                 </li>

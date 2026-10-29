@@ -1,4 +1,12 @@
 import { normalizeDocument, paragraph } from './document.ts';
+import {
+  acceptsExtensionId,
+  EDITOR_EXTENSION_LIMITS,
+  type EditorInlineExtension,
+  type EditorInlineExtensions,
+  isExtensionIdChar,
+  toInlineExtensions,
+} from './extensions.ts';
 import { markKey, normalizeInline, sortMarks } from './inline.ts';
 import { type EditorLoadOptions, type EditorLoadResult, LoadBudget } from './load.ts';
 import type {
@@ -29,6 +37,15 @@ export interface MarkdownReadOptions extends EditorLoadOptions {
   maxSource?: number;
 }
 
+export interface MarkdownWriteOptions {
+  /**
+   * Host inline extensions written as `<sigil>{id|label}`. Extension marks of
+   * other names are written as their label text, and plain text that would
+   * read as a token gets its `{` escaped.
+   */
+  extensions?: EditorInlineExtensions | readonly EditorInlineExtension[];
+}
+
 // Line patterns stay linear on hostile lines: no two neighboring quantifiers
 // can match the same characters, and `.` uses the `s` flag so U+2028 and
 // U+2029 inside a line never make a `(.*)$` tail backtrack. The fence info
@@ -44,8 +61,6 @@ const ORDERED = /^( {0,3})(\d{1,9})[.)][ \t]+(.*)$/s;
 const TASK = /^\[([ xX])\][ \t]+/;
 const IMAGE_ONLY = /^!\[((?:[^\]\\\n]|\\.)*)\]\(\s*<?([^\s()<>]+)>?\s*\)$/;
 const ESCAPABLE = /[\\`*_{}[\]()#+\-.!~<>|]/;
-/** The characters that can start an inline construct (see `parseInline`). */
-const INLINE_SPECIAL = /[\\\n`*_~![<]/g;
 
 const isBlank = (line: string) => line.trim() === '';
 const isSpace = (char: string | undefined) => char === ' ' || char === '\t';
@@ -326,9 +341,50 @@ class Scan {
   readonly source: string;
   private readonly closers = new Map<string, { at: number[]; first: Int32Array }>();
   private brackets: Int32Array | null = null;
+  private tokens: { idRun: Int32Array; close: Int32Array } | null = null;
 
   constructor(source: string) {
     this.source = source;
+  }
+
+  /**
+   * The extension token `<sigil>{id|label}` whose sigil is at `at`, or null.
+   * Two linear passes the first time (the id-character run from each index,
+   * and the next unescaped `}` before a newline), then constant time.
+   */
+  extension(
+    at: number
+  ): { idStart: number; idEnd: number; labelStart: number; labelEnd: number; end: number } | null {
+    const { source } = this;
+    if (source[at + 1] !== '{') return null;
+    if (!this.tokens) {
+      const n = source.length;
+      const idRun = new Int32Array(n + 1);
+      for (let j = n - 1; j >= 0; j -= 1)
+        idRun[j] = isExtensionIdChar(source.charCodeAt(j)) ? (idRun[j + 1] as number) + 1 : 0;
+      const escaped = new Uint8Array(n);
+      for (let j = 0; j < n; j += 1) {
+        if (source[j] === '\\') {
+          if (j + 1 < n) escaped[j + 1] = 1;
+          j += 1;
+        }
+      }
+      const close = new Int32Array(n + 1).fill(-1);
+      for (let j = n - 1; j >= 0; j -= 1) {
+        const c = source[j];
+        close[j] = c === '\n' ? -1 : c === '}' && !escaped[j] ? j : (close[j + 1] as number);
+      }
+      this.tokens = { idRun, close };
+    }
+    const idStart = at + 2;
+    const idEnd = idStart + (this.tokens.idRun[idStart] ?? 0);
+    if (idEnd === idStart || idEnd - idStart > EDITOR_EXTENSION_LIMITS.id) return null;
+    if (source[idEnd] !== '|') return null;
+    const labelStart = idEnd + 1;
+    const labelEnd = this.tokens.close[labelStart] ?? -1;
+    if (labelEnd <= labelStart || labelEnd - labelStart > EDITOR_EXTENSION_LIMITS.label)
+      return null;
+    return { idStart, idEnd, labelStart, labelEnd, end: labelEnd + 1 };
   }
 
   /** The first valid closer of `marker` at or after `from`, or -1. */
@@ -425,6 +481,9 @@ function parseInline(
     out.push(...budget.inline(text, sortMarks([...marks, ...extra])));
   };
   const scan = new Scan(source);
+  const extensions = budget.extensions;
+  // The characters that can start an inline construct, registered sigils included.
+  const special = extensions.special;
   let i = 0;
   while (i < source.length) {
     const ch = source[i] ?? '';
@@ -453,6 +512,18 @@ function parseInline(
       } else append('\n');
       i += 1;
       continue;
+    }
+    const extension = inLink ? undefined : extensions.bySigil.get(ch);
+    if (extension) {
+      const token = scan.extension(i);
+      const id = token ? source.slice(token.idStart, token.idEnd) : '';
+      if (token && acceptsExtensionId(extensions, extension.name, id)) {
+        push(unescapeMarkdown(source.slice(token.labelStart, token.labelEnd)), [
+          { type: 'extension', name: extension.name, id },
+        ]);
+        i = token.end;
+        continue;
+      }
     }
     if (ch === '`') {
       const run = /^`+/.exec(source.slice(i, i + 64))?.[0] ?? '`';
@@ -521,8 +592,8 @@ function parseInline(
     }
     // Plain text up to the next character that can open a construct is
     // copied in one slice, not one character at a time.
-    INLINE_SPECIAL.lastIndex = i + 1;
-    const stop = INLINE_SPECIAL.test(source) ? INLINE_SPECIAL.lastIndex - 1 : source.length;
+    special.lastIndex = i + 1;
+    const stop = special.test(source) ? special.lastIndex - 1 : source.length;
     append(source.slice(i, stop));
     i = stop;
   }
@@ -626,6 +697,21 @@ function readLinkTarget(source: string, open: number): { href: string; end: numb
 
 const escapeText = (text: string) => text.replace(/[\\`*_[\]~<!]/g, '\\$&');
 
+/** Plain text: a registered sigil before `{` would read as a token, so `{` is escaped. */
+const escapePlain = (text: string, extensions: EditorInlineExtensions) =>
+  extensions.literal ? escapeText(text).replace(extensions.literal, '$1\\{') : escapeText(text);
+
+/** An extension token: the label escaped so no closer or delimiter inside it counts. */
+function extensionToken(
+  mark: Extract<EditorMark, { type: 'extension' }>,
+  label: string,
+  extensions: EditorInlineExtensions
+): string | null {
+  const extension = extensions.byName.get(mark.name);
+  if (!extension) return null;
+  return `${extension.sigil}{${mark.id}|${escapeText(label).replace(/[{}]/g, '\\$&')}}`;
+}
+
 /** A line that would start another block gets its first marker escaped. */
 function escapeLineStart(line: string): string {
   const ordered = /^( {0,3}\d{1,9})([.)])([ \t]|$)/.exec(line);
@@ -722,11 +808,17 @@ function prepareMarks(content: readonly EditorInline[]): EditorInline[] {
   ) as EditorInline[];
 }
 
-function writeInline(content: readonly EditorInline[], em: '*' | '_'): string {
+function writeInline(
+  content: readonly EditorInline[],
+  em: '*' | '_',
+  extensions: EditorInlineExtensions
+): string {
   const open: Record<string, string> = { strong: '**', em, strike: '~~' };
   const texts = content.flatMap((node) => (node.type === 'text' ? [{ node }] : []));
   const stack: EditorMark[] = [];
-  const outer = (marks: readonly EditorMark[]) => marks.filter((m) => m.type !== 'code');
+  // Code spans and extension tokens are leaves: other marks nest around them.
+  const outer = (marks: readonly EditorMark[]) =>
+    marks.filter((m) => m.type !== 'code' && m.type !== 'extension');
   // Where the span of each mark starting at text `t` ends (marks that end
   // later nest outside), computed once from the end so long spans stay linear.
   const ends: Map<string, number>[] = new Array(texts.length);
@@ -755,7 +847,7 @@ function writeInline(content: readonly EditorInline[], em: '*' | '_'): string {
   const close = (to: number) => {
     while (stack.length > to) {
       const mark = stack.pop() as EditorMark;
-      out += mark.type === 'link' ? `](${encodeRef(mark.href)})` : open[mark.type];
+      out += mark.type === 'link' ? `](${encodeRef(mark.href)})` : (open[mark.type] ?? '');
     }
   };
   const keepCommon = (wanted: readonly EditorMark[]) => {
@@ -784,10 +876,16 @@ function writeInline(content: readonly EditorInline[], em: '*' | '_'): string {
     const wanted = ordered(t);
     const common = keepCommon(wanted);
     for (const mark of wanted.slice(common)) {
-      out += mark.type === 'link' ? '[' : open[mark.type];
+      out += mark.type === 'link' ? '[' : (open[mark.type] ?? '');
       stack.push(mark);
     }
-    out += node.marks.some((m) => m.type === 'code') ? codeSpan(node.text) : escapeText(node.text);
+    const entity = node.marks.find((m) => m.type === 'extension');
+    const token = entity ? extensionToken(entity, node.text, extensions) : null;
+    out +=
+      token ??
+      (node.marks.some((m) => m.type === 'code')
+        ? codeSpan(node.text)
+        : escapePlain(node.text, extensions));
     t += 1;
   });
   close(0);
@@ -805,8 +903,8 @@ const sameInline = (a: readonly EditorInline[], b: readonly EditorInline[]) =>
   });
 
 /** Read inline Markdown back without caps or policy changes (for the write check). */
-function reread(markdown: string): readonly EditorInline[] {
-  const budget = new LoadBudget({ trust: 'developer' });
+function reread(markdown: string, extensions: EditorInlineExtensions): readonly EditorInline[] {
+  const budget = new LoadBudget({ trust: 'developer', extensions });
   const out: EditorInline[] = [];
   parseInline(markdown, 0, [], false, out, budget);
   return normalizeInline(out);
@@ -819,12 +917,13 @@ function reread(markdown: string): readonly EditorInline[] {
  */
 function inlineMarkdown(
   content: readonly EditorInline[],
-  lineStart: (line: string) => string
+  lineStart: (line: string) => string,
+  extensions: EditorInlineExtensions
 ): string {
-  let prepared = prepareMarks(content);
+  let prepared = prepareMarks(withRegistered(content, extensions));
   const attempt = (em: '*' | '_') => {
-    const text = writeInline(prepared, em).split('\n').map(lineStart).join('\n');
-    return sameInline(reread(text), prepared) ? text : null;
+    const text = writeInline(prepared, em, extensions).split('\n').map(lineStart).join('\n');
+    return sameInline(reread(text, extensions), prepared) ? text : null;
   };
   for (const drop of [null, 'em', 'strike', 'strong'] as const) {
     if (drop)
@@ -836,7 +935,24 @@ function inlineMarkdown(
     const text = attempt('*') ?? attempt('_');
     if (text !== null) return text;
   }
-  return writeInline(prepared, '*').split('\n').map(lineStart).join('\n');
+  return writeInline(prepared, '*', extensions).split('\n').map(lineStart).join('\n');
+}
+
+/** Extension marks of unregistered names leave (their label stays plain text). */
+function withRegistered(
+  content: readonly EditorInline[],
+  extensions: EditorInlineExtensions
+): readonly EditorInline[] {
+  const foreign = (mark: EditorMark) =>
+    mark.type === 'extension' && !extensions.byName.has(mark.name);
+  if (!content.some((n) => n.type === 'text' && n.marks.some(foreign))) return content;
+  return normalizeInline(
+    content.map((n) =>
+      n.type === 'text' && n.marks.some(foreign)
+        ? { ...n, marks: n.marks.filter((m) => !foreign(m)) }
+        : n
+    )
+  );
 }
 
 const indent = (text: string, by: string) =>
@@ -845,22 +961,22 @@ const indent = (text: string, by: string) =>
     .map((line) => (line ? by + line : line))
     .join('\n');
 
-function writeBlocks(blocks: readonly EditorBlock[]): string {
+function writeBlocks(blocks: readonly EditorBlock[], extensions: EditorInlineExtensions): string {
   return blocks
-    .map(writeBlock)
+    .map((block) => writeBlock(block, extensions))
     .filter((text) => text !== '')
     .join('\n\n');
 }
 
-function writeBlock(block: EditorBlock): string {
+function writeBlock(block: EditorBlock, extensions: EditorInlineExtensions): string {
   switch (block.type) {
     case 'paragraph':
-      return inlineMarkdown(trimEdges(block.content), escapeLineStart);
+      return inlineMarkdown(trimEdges(block.content), escapeLineStart, extensions);
     case 'heading': {
       const flat = block.content.map(
         (n): EditorInline => (n.type === 'break' ? { type: 'text', text: ' ', marks: [] } : n)
       );
-      const text = inlineMarkdown(trimEdges(normalizeInline(flat)), (line) => line);
+      const text = inlineMarkdown(trimEdges(normalizeInline(flat)), (line) => line, extensions);
       return `${'#'.repeat(block.level)}${text ? ` ${text}` : ''}${text.endsWith('#') ? ' #' : ''}`;
     }
     case 'code': {
@@ -881,13 +997,13 @@ function writeBlock(block: EditorBlock): string {
                 ? `- [${item.checked ? 'x' : ' '}] `
                 : '- ';
           const [first, ...rest] = item.blocks;
-          const head = first ? indent(writeBlock(first), '    ').trimStart() : '';
-          const tail = writeBlocks(rest);
+          const head = first ? indent(writeBlock(first, extensions), '    ').trimStart() : '';
+          const tail = writeBlocks(rest, extensions);
           return `${marker}${head}${tail ? `\n\n${indent(tail, '    ')}` : ''}`;
         })
         .join('\n');
     case 'quote':
-      return writeBlocks(block.blocks)
+      return writeBlocks(block.blocks, extensions)
         .split('\n')
         .map((line) => (line ? `> ${line}` : '>'))
         .join('\n');
@@ -904,7 +1020,8 @@ function trimEdges(content: readonly EditorInline[]): readonly EditorInline[] {
   while (out[0]?.type === 'break') out.shift();
   while (out.at(-1)?.type === 'break') out.pop();
   const plain = (node: EditorInline | undefined): node is Extract<EditorInline, { type: 'text' }> =>
-    node?.type === 'text' && !node.marks.some((mark) => mark.type === 'code');
+    node?.type === 'text' &&
+    !node.marks.some((mark) => mark.type === 'code' || mark.type === 'extension');
   const first = out[0];
   if (plain(first)) out[0] = { ...first, text: first.text.trimStart() };
   const last = out.at(-1);
@@ -918,6 +1035,6 @@ function trimEdges(content: readonly EditorInline[]): readonly EditorInline[] {
  * paragraphs, breaks in headings (written as spaces), breaks at the edges of
  * a block, and whitespace at the edges of a paragraph or a mark.
  */
-export function toMarkdown(doc: EditorDocument): string {
-  return writeBlocks(doc.blocks);
+export function toMarkdown(doc: EditorDocument, options: MarkdownWriteOptions = {}): string {
+  return writeBlocks(doc.blocks, toInlineExtensions(options.extensions));
 }

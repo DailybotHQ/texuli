@@ -375,7 +375,15 @@ export function validateEditorDocument(doc: unknown): EditorIssue[] {
       for (const mark of node.marks) {
         if (mark?.type === 'link' && (typeof mark.href !== 'string' || mark.href === '')) {
           issues.push(issue('invalid-shape', 'A link mark has an href.', id));
-        } else if (!['link', 'strong', 'em', 'strike', 'code'].includes(mark?.type)) {
+        } else if (
+          mark?.type === 'extension' &&
+          (typeof mark.name !== 'string' ||
+            mark.name === '' ||
+            typeof mark.id !== 'string' ||
+            mark.id === '')
+        ) {
+          issues.push(issue('invalid-shape', 'An extension mark has a name and an id.', id));
+        } else if (!['link', 'strong', 'em', 'strike', 'code', 'extension'].includes(mark?.type)) {
           issues.push(issue('unknown-mark', `Unknown mark "${String(mark?.type)}".`, id));
         }
       }

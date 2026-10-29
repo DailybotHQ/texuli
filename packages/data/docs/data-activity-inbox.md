@@ -44,6 +44,8 @@ changes through `onReadChange`, and the pure helpers apply them.
 | `filter` | `all` | `bind:filter`: `all` or `unread`. `onFilterChange` |
 | `onReadChange` | none | `(ids, read)` from an item's toggle, opening an unread item, or Mark all as read |
 | `onOpen` | none | Opening an item from its title (a link with `href`, else a button when `onOpen` is set) |
+| `allowMarkUnread` | `true` | Read items offer "Mark unread". `false` hides that toggle (unread items still offer "Mark read"), for hosts that persist only mark-read |
+| `onMarkUnread` | none | `(ids)` after `onReadChange` when an item is marked unread, for hosts that store it separately |
 | `markReadOnOpen` | `true` | Opening an unread item also marks it read |
 | `hrefTrust` | `untrusted` | URL policy tier for `href` (`safeHref`): `untrusted` allows `https:`, `mailto:` and `#fragment` links; `developer` also allows app routes such as `/deals/1`. A refused link renders as plain text |
 | `actions`, `body` | none | Snippets: per-item actions after the read toggle, and a custom body under the title |
@@ -68,7 +70,7 @@ framework-free; `setRead` keeps the identity of items it does not change.
 
 ## Verified
 
-- `pnpm vitest run packages/data/tests/inbox.test.ts`: **3 tests**: the pure helpers; the heading count, unread text, `datetime`, the URL policy at both tiers, toggle names and state, open marks read, the unread view keeping items and focus, mark all and its `aria-disabled`, item actions, the arrival announcement, and a `javascript:` link and markup title rendered as text.
+- `pnpm vitest run packages/data/tests/inbox.test.ts`: **4 tests**: the pure helpers; `allowMarkUnread={false}` hiding the toggle on read items and `onMarkUnread` reporting a mark-unread (G50); the heading count, unread text, `datetime`, the URL policy at both tiers, toggle names and state, open marks read, the unread view keeping items and focus, mark all and its `aria-disabled`, item actions, the arrival announcement, and a `javascript:` link and markup title rendered as text.
 - In the browser (a scratch spec on port 4937): the `data-inbox` example, after a simulated arrival, passes axe in light, dark and forced colors on Chromium, WebKit and the Pixel 7.
 
 ## Limits

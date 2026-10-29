@@ -102,7 +102,7 @@ export interface EditorActiveState {
 }
 
 /** The marks the toolbar can toggle. */
-export type EditorToggleMark = Exclude<EditorMarkType, 'link'>;
+export type EditorToggleMark = Exclude<EditorMarkType, 'link' | 'extension'>;
 
 const MARK_INTENTS: Partial<Record<EditorKeyIntent | EditorInputIntent, EditorToggleMark>> = {
   'toggle-strong': 'strong',

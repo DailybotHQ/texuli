@@ -2,8 +2,11 @@
  * Cohort retention table on the texuli Table: sticky row headers and fixed
  * heat steps. Steps 0–3 tint the surface with the primary color under the
  * normal text color; step 4 is the solid primary with its paired foreground,
- * so every step keeps the theme's text contrast. Forced colors drop the
- * tints and keep the numbers. @layer tx.components.
+ * so every step keeps the theme's text contrast. A host `heatScale` sets
+ * `--tx-cohort-heat-<n>` and `--tx-cohort-heat-<n>-text` on the root (checked
+ * at 4.5:1, or gated token pairs); until they are set, a step shows the plain
+ * surface. Forced colors drop the tints and keep the numbers.
+ * @layer tx.components.
  */
 @layer tx.components {
   .tx-cohort {
@@ -52,6 +55,56 @@
     color: var(--tx-primary-foreground, HighlightText);
   }
 
+  .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat="0"] {
+    background: var(--tx-cohort-heat-0, var(--tx-surface, Canvas));
+    color: var(--tx-cohort-heat-0-text, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat="1"] {
+    background: var(--tx-cohort-heat-1, var(--tx-surface, Canvas));
+    color: var(--tx-cohort-heat-1-text, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat="2"] {
+    background: var(--tx-cohort-heat-2, var(--tx-surface, Canvas));
+    color: var(--tx-cohort-heat-2-text, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat="3"] {
+    background: var(--tx-cohort-heat-3, var(--tx-surface, Canvas));
+    color: var(--tx-cohort-heat-3-text, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat="4"] {
+    background: var(--tx-cohort-heat-4, var(--tx-surface, Canvas));
+    color: var(--tx-cohort-heat-4-text, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat="5"] {
+    background: var(--tx-cohort-heat-5, var(--tx-surface, Canvas));
+    color: var(--tx-cohort-heat-5-text, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat="6"] {
+    background: var(--tx-cohort-heat-6, var(--tx-surface, Canvas));
+    color: var(--tx-cohort-heat-6-text, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat="7"] {
+    background: var(--tx-cohort-heat-7, var(--tx-surface, Canvas));
+    color: var(--tx-cohort-heat-7-text, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat="8"] {
+    background: var(--tx-cohort-heat-8, var(--tx-surface, Canvas));
+    color: var(--tx-cohort-heat-8-text, var(--tx-foreground, CanvasText));
+  }
+
+  .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat="9"] {
+    background: var(--tx-cohort-heat-9, var(--tx-surface, Canvas));
+    color: var(--tx-cohort-heat-9-text, var(--tx-foreground, CanvasText));
+  }
+
   .tx-cohort__sr-only {
     position: absolute;
     inline-size: 1px;
@@ -65,7 +118,8 @@
   }
 
   @media (forced-colors: active) {
-    .tx-cohort .tx-cohort__cell[data-heat] {
+    .tx-cohort .tx-cohort__cell[data-heat],
+    .tx-cohort[data-heat-scale] .tx-cohort__cell[data-heat] {
       background: Canvas;
       color: CanvasText;
     }

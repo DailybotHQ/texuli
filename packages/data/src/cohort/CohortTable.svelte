@@ -13,6 +13,7 @@ import {
 import { type CohortTableLabels, DEFAULT_COHORT_TABLE_LABELS } from './labels.ts';
 import {
   type CohortCell,
+  type CohortHeatText,
   type CohortRow,
   type CohortValueKind,
   cellValue,
@@ -21,6 +22,7 @@ import {
   heatLevel,
   heatMax,
   periodCount,
+  resolveHeatScale,
 } from './model.ts';
 import './cohort.css';
 
@@ -38,6 +40,16 @@ interface Props {
   format?: (value: number, kind: CohortValueKind) => string;
   /** Tints cells by value with fixed, contrast-safe steps; the number stays the content. */
   heat?: boolean;
+  /**
+   * Own heat steps, lightest first (2 to 10): hex colors, whose text is
+   * picked from `heatText` for the higher contrast, or `COHORT_HEAT_TOKENS`
+   * names painted with their gated foreground. A palette with a step under
+   * 4.5:1, or an entry that is neither, is refused with a console warning
+   * and the built-in steps are used.
+   */
+  heatScale?: readonly string[];
+  /** The text colors a hex step picks from (default white and black). */
+  heatText?: CohortHeatText;
   /** Top of the heat scale (default: 1 for rates, the largest cell for counts). */
   max?: number;
   /** Adds an averages row (`tfoot`), weighted by cohort size when every cohort has one. */
@@ -56,6 +68,8 @@ let {
   valueKind = 'rate',
   format,
   heat = false,
+  heatScale,
+  heatText,
   max,
   average = false,
   density = 'compact',
@@ -79,7 +93,32 @@ const averageSize = $derived.by(() => {
 });
 const show = (value: number) =>
   (format ?? ((v, kind) => formatCohortValue(v, kind, locale)))(value, valueKind);
-const level = (value: number | null) => (heat ? heatLevel(value, top) : null);
+const palette = $derived(heatScale ? resolveHeatScale(heatScale, heatText) : null);
+const steps = $derived(palette?.ok ? palette.steps : null);
+const level = (value: number | null) =>
+  heat ? heatLevel(value, top, steps ? steps.length : undefined) : null;
+
+let root: HTMLDivElement | undefined = $state();
+$effect(() => {
+  if (palette && !palette.ok && typeof console !== 'undefined')
+    console.warn(`CohortTable: ${palette.error} The built-in heat steps are used.`);
+});
+// The steps' colors are custom properties set through CSSOM (a strict CSP
+// refuses style attributes); the stylesheet paints each step from them.
+$effect(() => {
+  const node = root;
+  if (!node || !steps) return;
+  steps.forEach((step, index) => {
+    node.style.setProperty(`--tx-cohort-heat-${index}`, step.background);
+    node.style.setProperty(`--tx-cohort-heat-${index}-text`, step.color);
+  });
+  return () => {
+    steps.forEach((_, index) => {
+      node.style.removeProperty(`--tx-cohort-heat-${index}`);
+      node.style.removeProperty(`--tx-cohort-heat-${index}-text`);
+    });
+  };
+});
 </script>
 
 {#snippet valueCell(cell: CohortCell | undefined, header: string)}
@@ -101,7 +140,13 @@ const level = (value: number | null) => (heat ? heatLevel(value, top) : null);
   </TableCell>
 {/snippet}
 
-<div class={cx('tx-cohort', className)} data-tx-cohort data-heat={heat || undefined}>
+<div
+  bind:this={root}
+  class={cx('tx-cohort', className)}
+  data-tx-cohort
+  data-heat={heat || undefined}
+  data-heat-scale={(heat && steps?.length) || undefined}
+>
   <Table {density}>
     <TableCaption hidden={captionHidden}>{caption}</TableCaption>
     <TableHeader>

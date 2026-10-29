@@ -65,6 +65,27 @@ describe('editor', () => {
       );
     });
 
+    it('renders host extension entities as a span with their name and id, keeping them through edits (G48)', async () => {
+      const extensions = [{ name: 'mention', sigil: '@' as const }];
+      const doc = fromMarkdown('Hi @{person-1|Ada}', {
+        newId: createEditorIds('ext'),
+        extensions,
+      }).doc;
+      const onChange = vi.fn<(doc: EditorDocument) => void>();
+      render(RichTextEditor, { props: { value: doc, onChange, label: 'Notes' } });
+      const surface = screen.getByRole('textbox', { name: 'Notes' });
+      const entity = surface.querySelector('.tx-editor-extension');
+      expect(entity?.getAttribute('data-tx-extension')).toBe('mention');
+      expect(entity?.getAttribute('data-tx-entity')).toBe('person-1');
+      expect(entity?.textContent).toBe('Ada');
+      placeCaret(surface, 0, 6);
+      await beforeinput(surface, 'insertText', '.');
+      // Typing right after the entity keeps it, and it does not grow.
+      expect(toMarkdown(onChange.mock.lastCall?.[0] ?? doc, { extensions })).toBe(
+        'Hi @{person-1|Ada}.'
+      );
+    });
+
     it('renders hostile content as text: no script, no handler, no unsafe link (fails with an HTML sink)', () => {
       const { surface } = mount(
         '<script>window.__x=1</script> <img src=x onerror=alert(1)> [js](javascript:alert(1)) [data](data:text/html,x)'

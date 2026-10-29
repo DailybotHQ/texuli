@@ -2,6 +2,7 @@
 import { tick } from 'svelte';
 import { type ClassValue, cx } from 'texuli/cx';
 import { FILTER_LIMITS, type FilterGroup } from '../engines/grid/filter.ts';
+import type { FilterFieldGroup, FilterOperatorDef } from './catalog.ts';
 import { type FilterAction, type FilterBuilderContext, pathKey } from './context.ts';
 import FilterBuilderGroup from './FilterBuilderGroup.svelte';
 import { type FilterBuilderLabels, resolveFilterBuilderLabels } from './labels.ts';
@@ -27,6 +28,13 @@ interface Props {
   value?: FilterGroup;
   /** Every edit, with the new model. Run it with `applyFilter` or a DataGrid's `filter`. */
   onValueChange?: (value: FilterGroup) => void;
+  /**
+   * Host operators (a property catalog): each with a label, a typed value
+   * editor, optional validation and the predicate `applyFilter` runs.
+   */
+  operators?: readonly FilterOperatorDef[];
+  /** Labels and order of the field groups the field menu shows (`field.group`). */
+  groups?: readonly FilterFieldGroup[];
   /** Deepest group level offered (the root is 1). Capped at 5, where the engine's 6-level limit stops nesting. */
   maxDepth?: number;
   disabled?: boolean;
@@ -38,6 +46,8 @@ let {
   fields,
   value = $bindable(emptyFilter()),
   onValueChange,
+  operators,
+  groups,
   maxDepth = 3,
   disabled = false,
   labels,
@@ -50,7 +60,9 @@ let root: HTMLDivElement | undefined = $state();
 let announcement = $state('');
 
 const issues = $derived(
-  new Map(filterIssues(value, fields).map((issue) => [pathKey(issue.path), issue.message]))
+  new Map(
+    filterIssues(value, fields, operators).map((issue) => [pathKey(issue.path), issue.message])
+  )
 );
 
 /** Focus after a change: a key from `data-filter-focus`, else the nearest group's add button. */
@@ -76,14 +88,14 @@ function act(action: FilterAction): void {
     case 'addCondition': {
       const group = nodeAt(value, path);
       const index = group?.type === 'group' ? group.children.length : 0;
-      commit(addCondition(value, path, fields), text.added);
+      commit(addCondition(value, path, fields, operators), text.added);
       void focusAfter(`${pathKey([...path, index])}:field`);
       return;
     }
     case 'addGroup': {
       const group = nodeAt(value, path);
       const index = group?.type === 'group' ? group.children.length : 0;
-      commit(addGroup(value, path, fields), text.groupAdded);
+      commit(addGroup(value, path, fields, operators), text.groupAdded);
       void focusAfter(`${pathKey([...path, index])}:op`);
       return;
     }
@@ -96,13 +108,13 @@ function act(action: FilterAction): void {
       return;
     case 'field': {
       const next = field(action.key);
-      if (next) commit(changeField(value, path, next));
+      if (next) commit(changeField(value, path, next, operators));
       return;
     }
     case 'operator': {
       const condition = nodeAt(value, path);
       const current = condition?.type === 'condition' ? field(condition.field) : undefined;
-      if (current) commit(changeOperator(value, path, action.operator, current));
+      if (current) commit(changeOperator(value, path, action.operator, current, operators));
       return;
     }
     case 'value':
@@ -112,6 +124,8 @@ function act(action: FilterAction): void {
 
 const ctx = $derived<FilterBuilderContext>({
   fields,
+  operators,
+  groups,
   labels: text,
   uid,
   maxDepth: Math.min(FILTER_LIMITS.depth - 1, Math.max(1, maxDepth)),

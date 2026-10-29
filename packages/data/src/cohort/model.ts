@@ -1,3 +1,5 @@
+import { contrastRatio, parseHex } from '@texuli/tokens/palette';
+
 /**
  * Cohort retention tables without a framework: cell values, period
  * averages, display text and heat levels. Values are rates (0–1) or counts;
@@ -78,13 +80,116 @@ export function formatCohortValue(
 export const HEAT_LEVELS = 5;
 
 /**
- * The heat level (0 to 4) of a value against `max` (a rate's max is 1).
- * Levels map to fixed tints so text keeps its contrast on every one.
+ * The heat level (0 to `levels - 1`, default 0 to 4) of a value against
+ * `max` (a rate's max is 1). The built-in levels map to fixed tints so text
+ * keeps its contrast on every one; a `heatScale` brings its own steps.
  */
-export function heatLevel(value: number | null, max: number): number | null {
-  if (value === null || !(max > 0)) return null;
+export function heatLevel(value: number | null, max: number, levels = HEAT_LEVELS): number | null {
+  if (value === null || !(max > 0) || !(levels >= 1)) return null;
   const ratio = Math.min(1, Math.max(0, value / max));
-  return Math.min(HEAT_LEVELS - 1, Math.floor(ratio * HEAT_LEVELS));
+  return Math.min(levels - 1, Math.floor(ratio * levels));
+}
+
+/**
+ * Theme token pairs a heat step can name: the fill `--tx-<name>` with its
+ * text `--tx-<name>-foreground`. The tokens' AA gate checks every one of
+ * these pairs at 4.5:1 in every theme, so they keep the guarantee.
+ */
+export const COHORT_HEAT_TOKENS = [
+  'primary',
+  'secondary',
+  'accent',
+  'destructive',
+  'success',
+  'warning',
+  'info',
+  'primary-soft',
+  'destructive-soft',
+  'success-soft',
+  'warning-soft',
+  'info-soft',
+] as const;
+export type CohortHeatToken = (typeof COHORT_HEAT_TOKENS)[number];
+
+/** Steps a `heatScale` may have. */
+export const HEAT_SCALE_LIMITS = Object.freeze({ min: 2, max: 10 });
+/** WCAG AA for the numbers in heat cells. */
+export const HEAT_TEXT_MINIMUM = 4.5;
+
+/** The two text colors a hex step chooses from (hex). */
+export interface CohortHeatText {
+  light: string;
+  dark: string;
+}
+export const DEFAULT_HEAT_TEXT: Readonly<CohortHeatText> = Object.freeze({
+  light: '#ffffff',
+  dark: '#000000',
+});
+
+/** One resolved step: CSS colors for the fill and the text, and the measured ratio of a hex step. */
+export interface CohortHeatStep {
+  background: string;
+  color: string;
+  /** Contrast of a hex step with its text; `null` for a token pair (gated by the theme). */
+  ratio: number | null;
+}
+
+export type CohortHeatScale = { ok: true; steps: CohortHeatStep[] } | { ok: false; error: string };
+
+/**
+ * Check a heat palette, lightest step first: each entry is a hex color
+ * (`#rgb` or `#rrggbb`), whose text is the `light` or `dark` color with the
+ * higher contrast, or a `COHORT_HEAT_TOKENS` name, painted with its gated
+ * foreground. The palette is refused (`ok: false`, with the reason) when it
+ * has fewer than 2 or more than 10 steps, an entry is neither, or a hex step
+ * reaches less than 4.5:1 with its best text. With the default black and
+ * white text, every hex color passes.
+ */
+export function resolveHeatScale(
+  scale: readonly string[],
+  text: CohortHeatText = DEFAULT_HEAT_TEXT
+): CohortHeatScale {
+  if (
+    !Array.isArray(scale) ||
+    scale.length < HEAT_SCALE_LIMITS.min ||
+    scale.length > HEAT_SCALE_LIMITS.max
+  ) {
+    return {
+      ok: false,
+      error: `heatScale needs ${HEAT_SCALE_LIMITS.min} to ${HEAT_SCALE_LIMITS.max} steps.`,
+    };
+  }
+  if (!parseHex(String(text.light)) || !parseHex(String(text.dark)))
+    return { ok: false, error: 'heatText colors must be #rgb or #rrggbb.' };
+  const steps: CohortHeatStep[] = [];
+  for (const [index, entry] of scale.entries()) {
+    const value = typeof entry === 'string' ? entry.trim() : '';
+    if ((COHORT_HEAT_TOKENS as readonly string[]).includes(value)) {
+      steps.push({
+        background: `var(--tx-${value})`,
+        color: `var(--tx-${value}-foreground)`,
+        ratio: null,
+      });
+      continue;
+    }
+    if (!parseHex(value)) {
+      return {
+        ok: false,
+        error: `heatScale step ${index + 1} ("${String(entry).slice(0, 40)}") is not a hex color or a heat token.`,
+      };
+    }
+    const light = contrastRatio(text.light, value);
+    const dark = contrastRatio(text.dark, value);
+    const ratio = Math.max(light, dark);
+    if (ratio < HEAT_TEXT_MINIMUM) {
+      return {
+        ok: false,
+        error: `heatScale step ${index + 1} (${value}) reaches ${ratio.toFixed(2)}:1 with its text; ${HEAT_TEXT_MINIMUM}:1 is the minimum.`,
+      };
+    }
+    steps.push({ background: value, color: light >= dark ? text.light : text.dark, ratio });
+  }
+  return { ok: true, steps };
 }
 
 /** The heat scale's top: 1 for rates, the largest cell for counts (period 0 skipped when asked). */

@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { FilterCondition, FilterOperator } from '../engines/grid/filter.ts';
+import { customOperator, type FilterAnyOperator, groupFields } from './catalog.ts';
 import { type FilterBuilderContext, pathKey } from './context.ts';
 import { type FilterPath, operatorsFor } from './model.ts';
 
@@ -16,16 +17,50 @@ let { condition, path, position, ctx }: Props = $props();
 const key = $derived(pathKey(path));
 const id = $derived(`${ctx.uid}-${key}`);
 const field = $derived(ctx.fields.find((entry) => entry.key === condition.field));
-const type = $derived(field?.type ?? 'text');
+const fieldType = $derived(field?.type ?? 'text');
 const operator = $derived(condition.operator);
+/** A catalog operator: its editor decides the value control. */
+const custom = $derived(customOperator(operator, ctx.operators));
+const options = $derived(custom?.options ?? field?.options ?? []);
+/** The value type the controls edit: the field's, or the one a catalog editor implies. */
+const type = $derived.by(() => {
+  if (!custom) return fieldType;
+  switch (custom.editor) {
+    case 'number':
+    case 'date':
+    case 'boolean':
+      return custom.editor;
+    case 'option':
+    case 'options':
+      return options.length > 0 ? 'enum' : 'text';
+    case 'range':
+      return fieldType === 'date' ? 'date' : 'number';
+    default:
+      return 'text';
+  }
+});
 const issue = $derived(ctx.issues.get(key));
 const shape = $derived(
-  operator === 'isEmpty' || operator === 'isNotEmpty'
-    ? 'none'
-    : operator === 'in' || operator === 'between'
-      ? operator
-      : 'one'
+  custom
+    ? custom.editor === 'none'
+      ? 'none'
+      : custom.editor === 'options'
+        ? 'in'
+        : custom.editor === 'range'
+          ? 'between'
+          : 'one'
+    : operator === 'isEmpty' || operator === 'isNotEmpty'
+      ? 'none'
+      : operator === 'in' || operator === 'between'
+        ? operator
+        : 'one'
 );
+const sections = $derived(groupFields(ctx.fields, ctx.groups));
+/** The menu text of an operator: the labels for built-ins, the catalog label otherwise. */
+const operatorLabel = (option: FilterAnyOperator) =>
+  ctx.labels.operators[option as FilterOperator] ??
+  customOperator(option, ctx.operators)?.label ??
+  option;
 /** The native input type of a typed value (text otherwise). */
 const inputType = $derived(type === 'number' ? 'number' : type === 'date' ? 'date' : 'text');
 const list = $derived(Array.isArray(condition.value) ? condition.value : []);
@@ -86,8 +121,18 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
     onchange={(event) => ctx.act({ kind: 'field', path, key: event.currentTarget.value })}
   >
     {#if !field}<option value={condition.field}>{condition.field}</option>{/if}
-    {#each ctx.fields as option (option.key)}
-      <option value={option.key}>{option.header}</option>
+    {#each sections as section (section.group?.id ?? '')}
+      {#if section.group}
+        <optgroup label={section.group.label}>
+          {#each section.fields as option (option.key)}
+            <option value={option.key}>{option.header}</option>
+          {/each}
+        </optgroup>
+      {:else}
+        {#each section.fields as option (option.key)}
+          <option value={option.key}>{option.header}</option>
+        {/each}
+      {/if}
     {/each}
   </select>
   <label class="tx-filter-builder__sr-only" for="{id}-operator">{ctx.labels.operator}</label>
@@ -97,10 +142,11 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
     disabled={ctx.disabled}
     value={operator}
     onchange={(event) =>
-      ctx.act({ kind: 'operator', path, operator: event.currentTarget.value as FilterOperator })}
+      ctx.act({ kind: 'operator', path, operator: event.currentTarget.value })}
   >
-    {#each operatorsFor({ type }) as option (option)}
-      <option value={option}>{ctx.labels.operators[option]}</option>
+    {#if field && !operatorsFor(field, ctx.operators).includes(operator)}<option value={operator}>{operatorLabel(operator)}</option>{/if}
+    {#each operatorsFor(field ?? { type: fieldType }, ctx.operators) as option (option)}
+      <option value={option}>{operatorLabel(option)}</option>
     {/each}
   </select>
   {#if shape === 'between'}
@@ -127,14 +173,14 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
         id="{id}-value"
         class="tx-filter-builder__control tx-filter-builder__value"
         multiple
-        size={Math.min(4, field?.options?.length ?? 1)}
+        size={Math.min(4, options.length || 1)}
         disabled={ctx.disabled}
         aria-invalid={issue ? 'true' : undefined}
         aria-describedby={issue ? `${id}-issue` : undefined}
         onchange={(event) =>
           setValue([...event.currentTarget.selectedOptions].map((option) => option.value))}
       >
-        {#each field?.options ?? [] as option (option)}
+        {#each options as option (option)}
           <option value={option} selected={list.includes(option)}>{option}</option>
         {/each}
       </select>
@@ -168,7 +214,7 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
           <option value="false">{ctx.labels.no}</option>
         {:else}
           <option value="">{ctx.labels.choose}</option>
-          {#each field?.options ?? [] as option (option)}
+          {#each options as option (option)}
             <option value={option}>{option}</option>
           {/each}
         {/if}

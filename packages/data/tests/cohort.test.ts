@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, render, screen, within } from '@testing-library/svelte';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   type CohortRow,
   CohortTable,
@@ -11,6 +11,7 @@ import {
   heatLevel,
   heatMax,
   periodCount,
+  resolveHeatScale,
 } from '../src/cohort/index.ts';
 
 afterEach(() => cleanup());
@@ -150,5 +151,80 @@ describe('CohortTable (G20)', () => {
     }
     expect(css).toMatch(/data-heat=["']4["']\][^{]*\{[^}]*color: var\(--tx-primary-foreground/);
     expect(css).toMatch(/forced-colors: active/);
+  });
+
+  it('takes a host heat palette, picks the text per step for contrast and refuses unsafe palettes (G51)', async () => {
+    // Model: hex steps get the text with the higher contrast; tokens use their gated pair.
+    const scale = resolveHeatScale(['#f5f7ff', '#1e3a8a', 'primary-soft', 'success']);
+    expect(scale.ok).toBe(true);
+    if (!scale.ok) return;
+    expect(scale.steps.map((step) => step.color)).toEqual([
+      '#000000',
+      '#ffffff',
+      'var(--tx-primary-soft-foreground)',
+      'var(--tx-success-foreground)',
+    ]);
+    expect(scale.steps[1]?.background).toBe('#1e3a8a');
+    expect(scale.steps.every((step) => step.ratio === null || step.ratio >= 4.5)).toBe(true);
+    // Refused: a mid gray between two grays, unknown entries, too few or many steps.
+    expect(
+      resolveHeatScale(['#eeeeee', '#777777'], { light: '#dddddd', dark: '#333333' })
+    ).toMatchObject({
+      ok: false,
+      error: expect.stringContaining('4.5:1'),
+    });
+    for (const bad of [
+      ['red', '#000000'],
+      ['var(--x)', 'primary'],
+      ['#ffffff'],
+      Array(11).fill('#ffffff'),
+    ]) {
+      expect(resolveHeatScale(bad).ok, bad.join()).toBe(false);
+    }
+    // Levels follow the step count.
+    expect(heatLevel(1, 1, 3)).toBe(2);
+    expect(heatLevel(0.4, 1, 3)).toBe(1);
+
+    // View: N steps through CSSOM custom properties on the root.
+    const heatRows: CohortRow[] = [{ label: 'Jan', cells: [1, 0.5, 0.1] }];
+    render(CohortTable, {
+      props: {
+        rows: heatRows,
+        caption: 'Retention',
+        heat: true,
+        heatScale: ['#f5f7ff', '#93c5fd', '#1e3a8a'],
+      },
+    });
+    const root = document.querySelector('[data-tx-cohort]') as HTMLElement;
+    await Promise.resolve();
+    expect(root.getAttribute('data-heat-scale')).toBe('3');
+    expect(root.getAttribute('style') ?? '').not.toContain('background');
+    expect(root.style.getPropertyValue('--tx-cohort-heat-2')).toBe('#1e3a8a');
+    expect(root.style.getPropertyValue('--tx-cohort-heat-2-text')).toBe('#ffffff');
+    expect(
+      [...document.querySelectorAll('td[data-heat]')].map((cell) => cell.getAttribute('data-heat'))
+    ).toEqual(['2', '1', '0']);
+    cleanup();
+    // A refused palette warns and keeps the built-in steps.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(CohortTable, {
+      props: {
+        rows: heatRows,
+        caption: 'Retention',
+        heat: true,
+        heatScale: ['#777777', 'hotpink'],
+      },
+    });
+    await Promise.resolve();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('heatScale step 2'));
+    warn.mockRestore();
+    expect(document.querySelector('[data-tx-cohort]')?.hasAttribute('data-heat-scale')).toBe(false);
+    expect(document.querySelector('td[data-heat]')?.getAttribute('data-heat')).toBe('4');
+    const css = readFileSync(join(process.cwd(), 'packages/data/src/cohort/cohort.css'), 'utf8');
+    for (let step = 0; step < 10; step += 1)
+      expect(css).toContain(`var(--tx-cohort-heat-${step}-text, var(--tx-foreground, CanvasText))`);
+    expect(css).toMatch(
+      /forced-colors: active\) \{\s*\.tx-cohort \.tx-cohort__cell\[data-heat\],\s*\.tx-cohort\[data-heat-scale\]/
+    );
   });
 });
