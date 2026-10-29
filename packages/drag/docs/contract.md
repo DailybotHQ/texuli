@@ -5,7 +5,7 @@ Every surface built on `@texuli/drag` meets this contract: the
 `@texuli/primitives/sortable` binding, `@texuli/workflows`, the
 `@texuli/data` board, tree view, calendar, timeline and grid column moves,
 the `@texuli/player` shared drag scope for `sortable-list` nodes, and the
-texuli.com builder outline. The package is on npm as `0.6.0` (in
+texuli.com builder outline. The package is on npm as `0.7.0` (in
 development); the integrations above ship from the `0.4.0` release of each
 consuming package. The engine is general purpose: strategies,
 collisions, modifiers and messages are pluggable, so a new surface composes

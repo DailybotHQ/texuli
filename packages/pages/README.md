@@ -10,12 +10,12 @@ components and decks painted by `@texuli/player` at the untrusted tier.
 Every edit is a `@texuli/document` operation in one op log, so undo, redo,
 persistence and sync share one history.
 
-> **Status: in development (pre-1.0).** `@texuli/pages` is not on npm yet.
-> It is built in PLAN_010 and its first release is planned for `0.7.0`
-> (ADR-011 in
+> **Status: in development (pre-1.0).** `@texuli/pages` is published on npm
+> as `0.7.0`, with provenance (its first release, with `@texuli/document`;
+> built in PLAN_010, ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> Its version is the `0.0.0` placeholder until then. Under 0.x a new minor
-> may contain breaking changes
+> Under 0.x a new minor (`0.8.0`) may contain breaking changes, so pin the
+> exact version or use `^0.7.0`, which accepts only 0.7.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L8, above the player, because it paints any catalog
@@ -23,6 +23,16 @@ component the player can paint (as `@texuli/slides` does). It depends on
 `@texuli/document`, `@texuli/editor`, `@texuli/blocks`, `@texuli/player`,
 `@texuli/drag`, `@texuli/primitives`, `@texuli/tokens`, `texuli` and
 `@texuli/core`; `svelte` (^5.57.2) is a peer dependency.
+
+## Install
+
+```bash
+npm install @texuli/pages @texuli/document @texuli/tokens
+```
+
+In the Texuli workspace, depend on it as `"@texuli/pages": "workspace:*"`.
+Import the token stylesheet once (`@texuli/tokens/base.css`); the editor
+and reader import their own CSS.
 
 ## Quick start
 

@@ -4,8 +4,8 @@ Export a document as Markdown, DOCX or PDF, as a `Blob`. Each format's
 writer loads on first use (`@texuli/document/markdown`, `docx` and `pdf`),
 so a page that never exports never pays for them.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ```ts
 import { downloadBlob, exportDocument } from '@texuli/pages/export';

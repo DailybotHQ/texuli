@@ -91,13 +91,6 @@ onMount(() => {
           <collab.CollabEditor
             {session}
             label={`${person.name}’s copy of the draft`}
-            collabLabels={{
-              region: `${person.name}’s review`,
-              collaborators: `Who is here (${person.name}’s view)`,
-              comments: `Comments (${person.name}’s view)`,
-              suggestions: `Suggestions (${person.name}’s view)`,
-              versions: `Versions (${person.name}’s view)`,
-            }}
           />
         </section>
       {/each}

@@ -71,6 +71,10 @@
       "gzip": 6592,
       "note": "Authored manifest data (schemas, useWhen, examples) for display components; measured 8,989 B. Owner decision 2026-10-27 (PLAN_007): raised to measured 11,004 B + 4% headroom; manifests carry events, bindable and prop schemas. PLAN_010 T-release-060 (2026-10-29): 11456 -> 6592 B, tightened to measured + 4% (measured 6,307 B)."
     },
+    "@texuli/catalog/manifests/documents": {
+      "gzip": 1664,
+      "note": "PLAN_010 T-release-070 (2026-10-29, developer GO for the 0.7.0 release): new exact row at measured + 4% for the documents manifest group (the agent-emittable document id, spec 0.7.0), first published in 0.7.0; it was under the @texuli/catalog/* default cap; measured 1,566 B."
+    },
     "@texuli/catalog/manifests/forms": {
       "gzip": 9344,
       "note": "Authored form manifests (26 components); measured 10,491 B (lead decision 2026-10-23). Owner decision 2026-10-27 (PLAN_007): raised to measured 13,115 B + 4% headroom; manifests carry events, bindable and prop schemas. PLAN_010 T-release-060 (2026-10-29): 13696 -> 9344 B, tightened to measured + 4% (measured 8,929 B)."
@@ -826,16 +830,16 @@
       "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 9,766 B gzip, cap = measured + 4% headroom. Lazy: only a collaborative session imports it (ADR-010)."
     },
     "@texuli/slides": {
-      "gzip": 50416,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 48,476 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+      "gzip": 53632,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 48,476 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_010 T-release-070 (2026-10-29, developer GO for the 0.7.0 release): 50416 -> 53632 B, measured + 4% (measured 51,535 B; over at HEAD) after the document check and node keys (spec 0.7.0) in @texuli/catalog/validate, which the stage bundles."
     },
     "@texuli/slides/model": {
       "gzip": 22336,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 21,437 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/grammar": {
-      "gzip": 42112,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 39872 -> 42112 B, measured + 4% after the four new catalog manifests and the G21 block fields in the deck grammar; measured 40,474 B."
+      "gzip": 44352,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 39872 -> 42112 B, measured + 4% after the four new catalog manifests and the G21 block fields in the deck grammar; measured 40,474 B. PLAN_010 T-release-070 (2026-10-29, developer GO for the 0.7.0 release): 42112 -> 44352 B, measured + 4% (measured 42,629 B; over at HEAD) after the document check and node keys (spec 0.7.0) in @texuli/catalog/validate, which the grammar bundles."
     },
     "@texuli/slides/components": {
       "gzip": 58432,

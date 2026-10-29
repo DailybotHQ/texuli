@@ -168,8 +168,9 @@ Full checklists: [`references/recipes.md`](references/recipes.md).
 | Form flow | `texuli/input`, field, button, stepper; forms manifests |
 | Slide / deck | Deck v2 from JSON or Markdown: `@texuli/deck` (model, markdown, authoring, templates; in development, on npm from `0.4.0`) presented by `@texuli/slides/stage` `DeckStage`, exported by `@texuli/slides/export`; 21 layout ids, `deck` CLI and MCP tool: [`references/decks.md`](references/decks.md). `@texuli/slides` `0.3.0` is the v1 model |
 | Media story | [`../media/SKILL.md`](../media/SKILL.md) + content card |
-| Drag and drop (lists, groups, boards, trees) | `@texuli/primitives/sortable`, `@texuli/data/board`, `@texuli/data/tree-view`; engine `@texuli/drag` (in development, on npm as `0.6.0`; `sortable` and the data drag migrations are new in `0.4.0`) |
-| Workflow editor or diagram | `@texuli/workflows` editor, viewer, inspector, model, layout (in development, on npm as `0.6.0`) |
+| Drag and drop (lists, groups, boards, trees) | `@texuli/primitives/sortable`, `@texuli/data/board`, `@texuli/data/tree-view`; engine `@texuli/drag` (in development, on npm as `0.7.0`; `sortable` and the data drag migrations are new in `0.4.0`) |
+| Workflow editor or diagram | `@texuli/workflows` editor, viewer, inspector, model, layout (in development, on npm as `0.7.0`) |
+| Block document editor, reader, pages, export, collaboration | `@texuli/pages` (`editor`, `reader`, `paged`, `export`, `collab`, `host`) on `@texuli/document` (in development, both new in `0.7.0`); an agent writes documents as data: [`../blueprints/SKILL.md`](../blueprints/SKILL.md) stage **I** |
 | A whole stateful screen as JSON (an agent sends it) | [`../blueprints/SKILL.md`](../blueprints/SKILL.md) stage **G** |
 
 ## Offline gates for this skill pack
@@ -183,7 +184,10 @@ pnpm vitest run scripts/tests/skill.test.ts
 ## Imports cheat sheet
 
 See [`references/imports.md`](references/imports.md), including the APIs
-new in `0.6.0` (not in `0.5.0`): the `motion` prop and `MotionProvider`,
+new in `0.7.0` (not in `0.6.0`): `@texuli/document`, `@texuli/pages`, node
+keys and documents in blueprints, `patchDocument`, the player's
+`documentHost` and `@texuli/tools/document`; those new in `0.6.0`: the
+`motion` prop and `MotionProvider`,
 `@texuli/core/motion`, the one component contract (`bind:ref`, rest
 attributes, composed handlers), `<Player stream>`, `DeckStageCore`,
 `@texuli/core/markup` and `@texuli/core/zip`, and those new in `0.5.0`:

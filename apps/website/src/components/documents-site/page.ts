@@ -4,11 +4,11 @@
  * so the page and its tests share one source (labels are text, never HTML).
  */
 
-/** The release the document packages are planned to ship in first. */
+/** The release the document packages first ship in (on npm, in development, pre-1.0). */
 export const DOCUMENTS_RELEASE = '0.7.0';
 
 /** The status line every surface of this page repeats. */
-export const DOCUMENTS_STATUS = `In development, in the repository only. First release planned for ${DOCUMENTS_RELEASE}.`;
+export const DOCUMENTS_STATUS = `In development, on npm from ${DOCUMENTS_RELEASE}, a pre-1.0 release.`;
 
 export interface DocumentsPiece {
   readonly name: string;

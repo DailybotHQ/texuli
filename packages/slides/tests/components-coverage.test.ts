@@ -6,6 +6,7 @@ import { COMPOSITION_MANIFESTS } from '@texuli/catalog/manifests/composition';
 import { CONTENT_MANIFESTS } from '@texuli/catalog/manifests/content';
 import { DATA_MANIFESTS } from '@texuli/catalog/manifests/data';
 import { DISPLAY_MANIFESTS } from '@texuli/catalog/manifests/display';
+import { DOCUMENTS_MANIFESTS } from '@texuli/catalog/manifests/documents';
 import { FORMS_MANIFESTS } from '@texuli/catalog/manifests/forms';
 import { LAYOUTS_MANIFESTS } from '@texuli/catalog/manifests/layouts';
 import { OVERLAYS_MANIFESTS } from '@texuli/catalog/manifests/overlays';
@@ -41,6 +42,7 @@ const GROUPS: readonly ManifestGroup[] = [
   { name: 'content', manifests: CONTENT_MANIFESTS },
   { name: 'data', manifests: DATA_MANIFESTS },
   { name: 'display', manifests: DISPLAY_MANIFESTS },
+  { name: 'documents', manifests: DOCUMENTS_MANIFESTS },
   { name: 'forms', manifests: FORMS_MANIFESTS },
   { name: 'layouts', manifests: LAYOUTS_MANIFESTS },
   { name: 'overlays', manifests: OVERLAYS_MANIFESTS },
@@ -136,7 +138,7 @@ describe('slide components: coverage of the catalog', () => {
     const tables = [Object.keys(SLIDE_COMPONENTS), Object.keys(SLIDE_COMPONENT_EXCLUSIONS), groups];
     const all = tables.flat();
     expect(new Set(all).size).toBe(all.length);
-    expect(entries.length).toBe(162);
+    expect(entries.length).toBe(163);
     for (const entry of entries) {
       expect(slideComponentSupport(entry.id).kind, entry.id).not.toBe('unknown');
     }

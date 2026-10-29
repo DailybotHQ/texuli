@@ -5,9 +5,9 @@
 **Packages:** `@texuli/document` (model, ops, sync, collab, paged, docx,
 pdf), `@texuli/pages` (editor, reader, paged, export, collab, host),
 `@texuli/player`, `@texuli/catalog/edit`; both document packages are in
-development, in the repository only (`0.0.0`), first release planned for
-`0.7.0`; the `document` catalog id, node keys and `patchDocument` are spec
-`0.7.0`, in the repository
+development and on npm from `0.7.0`, their first release (pre-1.0); the
+`document` catalog id, node keys and `patchDocument` are spec `0.7.0`, in
+`@texuli/spec@0.7.0`
 **Decisions:** ADR-010 (sync), ADR-011 (document packages), ADR-016 (static
 outputs) in [DECISIONS](../../../docs/DECISIONS.md)
 **Tests:** `apps/website/tests/site-documents.test.ts`,
@@ -24,7 +24,7 @@ painted by the player and edited by a bounded patch.
 
 | Section | Island | What it shows |
 | --- | --- | --- |
-| Hero | static | Status (in development, in the repository only, first release planned for `0.7.0`) and the subpaths as pieces. |
+| Hero | static | Status (in development, on npm from `0.7.0`; the previous release, `0.6.0`, is without them) and the subpaths as pieces. |
 | `#workbench` | `DocumentWorkbench.svelte` | A fictional team handbook in `PageEditor`: slash menu, block drag and Alt+Arrow moves, resizable columns, a callout, a toggle, a quote, nested pages (`pages/onboarding`, `pages/rituals`, and new pages from the menu) with a breadcrumb, and a `charts-donut` embed painted by the player. A View radio group switches to `PageReader` or `PagedView` (A4, header with the title, footer "Page N of M", an explicit break), with Print. Export writes Markdown, DOCX or PDF with `exportDocument` and saves the Blob with `downloadBlob`; a status line names the file and its size. |
 | `#collab` | `CollabDemo.svelte` | Ada's and Lin's `CollabEditor`s on two replicas of one draft, synced by `createMemorySyncHub` (the BroadcastChannel adapter is named in the copy): typing converges, comments, Suggesting with accept and reject, version history with restore, remote carets and the collaborator list. Start over opens two new sessions. |
 | `#agents` | `AgentDocumentDemo.svelte` | The blueprint JSON, the patch and the hostile patch (static), and the real `<Player>` at the untrusted tier with `createDocumentPlayerHost()` as its `documentHost`. Apply runs `applyEditOps([patchDocument])` with the host patcher (validate, apply all or none, validate again at the untrusted tier); Undo applies the inverse; the hostile patch (`/__proto__/polluted`) is refused with `invalid-value` and nothing changes. |
@@ -45,11 +45,11 @@ one by default.
 
 ## Two collaborators on one page
 
-`CollabEditor` names its panels "Comments", "Suggestions", "Versions" and
-the collaborator list the same in every instance, which makes duplicate
-landmarks when two editors share a page (axe `landmark-unique`). The demo
-passes per-person `collabLabels` ("Comments (Ada's view)", …). A default
-that stays unique without host labels is a package follow-up.
+`CollabEditor` names every landmark it owns for the person whose view it
+is (`CollabLabels.landmark` with the session author: "Comments (Ada)",
+"Collaboration (Lin)"), so two editors on one page never repeat a landmark
+name (axe `landmark-unique`) without host labels; the demo passes only each
+editor's `label` ("Ada’s copy of the draft").
 
 ## Performance
 

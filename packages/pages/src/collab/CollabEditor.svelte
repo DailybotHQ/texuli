@@ -16,13 +16,13 @@ import PageEditor from '../editor/PageEditor.svelte';
 import type { ComponentEmbedOption } from '../editor/slash.ts';
 import type { PagesEditor } from '../editor/state.svelte.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
-import type { PagesLabels } from '../shared/labels.ts';
+import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
 import type { PageRef } from '../shared/types.ts';
 import CollabOverlay from './CollabOverlay.svelte';
 import CollaboratorList from './CollaboratorList.svelte';
 import CommentSidebar from './CommentSidebar.svelte';
-import { type CollabLabels, resolveCollabLabels } from './labels.ts';
+import { type CollabLabels, landmarkPerson, resolveCollabLabels } from './labels.ts';
 import SuggestionList from './SuggestionList.svelte';
 import type { CollabSession, CommentDraft } from './session.svelte.ts';
 import VersionHistory from './VersionHistory.svelte';
@@ -31,7 +31,10 @@ import './collab.css';
 interface Props {
   /** The collaboration session (`createCollabSession`). */
   session: CollabSession;
-  /** The editor region's accessible name. Default: the document title. */
+  /**
+   * The editor region's accessible name. Default: the document title in this
+   * person's view (`collabLabels.landmark`), unique per editor on a page.
+   */
   label?: string;
   /** Page editor strings. */
   labels?: Partial<PagesLabels>;
@@ -80,6 +83,17 @@ let {
 
 const uid = $props.id();
 const strings = $derived(resolveCollabLabels(collabLabels));
+// Every landmark name carries this author's name (or the replica id), so two
+// editors on one page never repeat one (axe `landmark-unique`).
+const person = $derived(landmarkPerson(session));
+const pageStrings = $derived(resolvePagesLabels(labels));
+const editorLabels = $derived({
+  ...labels,
+  breadcrumb: strings.landmark(pageStrings.breadcrumb, person),
+});
+const editorLabel = $derived(
+  label ?? strings.landmark(session.document.meta.title || pageStrings.editor, person)
+);
 const initial = untrack(() => session.document);
 let docRoot: HTMLDivElement | undefined = $state();
 let commentButton: HTMLButtonElement | undefined = $state();
@@ -202,8 +216,8 @@ function keys(node: HTMLElement): () => void {
       <PageEditor
         document={initial}
         bind:editor
-        {label}
-        {labels}
+        label={editorLabel}
+        labels={editorLabels}
         {readonly}
         {trail}
         {onNavigate}
@@ -218,7 +232,7 @@ function keys(node: HTMLElement): () => void {
       />
       <CollabOverlay {session} root={docRoot} />
     </div>
-    <aside class="tx-pages-collab__sidebar" aria-label={strings.region}>
+    <aside class="tx-pages-collab__sidebar" aria-label={strings.landmark(strings.region, person)}>
       <CommentSidebar
         {session}
         bind:draft

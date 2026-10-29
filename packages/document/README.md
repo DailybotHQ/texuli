@@ -9,17 +9,28 @@ import and export, the pagination engine, owned DOCX and PDF writers, and
 the CRDT sync core. It has no Svelte and no DOM: Node tools, agents and the
 `@texuli/pages` editor all use the same engine.
 
-> **Status: in development (pre-1.0).** `@texuli/document` is not on npm
-> yet. It is built in PLAN_010 and its first release is planned for `0.7.0`
-> (ADR-010 and ADR-011 in
+> **Status: in development (pre-1.0).** `@texuli/document` is published on
+> npm as `0.7.0`, with provenance (its first release; built in PLAN_010,
+> ADR-010 and ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> Its version is the `0.0.0` placeholder until then. Under 0.x a new minor
-> may contain breaking changes
+> Under 0.x a new minor (`0.8.0`) may contain breaking changes, so pin the
+> exact version or use `^0.7.0`, which accepts only 0.7.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L1: it imports `@texuli/core` (the editor text model, the
 Markdown codec and the URL policy) and `@texuli/deck` (the schema kit and
 deck validation) downward, and nothing else.
+
+## Install
+
+```bash
+npm install @texuli/document
+```
+
+In the Texuli workspace, depend on it as
+`"@texuli/document": "workspace:*"`. It has no peer dependencies and no
+third-party runtime dependencies; `@texuli/core` and `@texuli/deck` come
+with it.
 
 ## Quick start
 

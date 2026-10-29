@@ -5,7 +5,7 @@
 // and one undo brings the edits back.
 import { getAnnouncer } from '@texuli/core/announcer';
 import type { CollabVersion, DocumentChange } from '@texuli/document/collab';
-import { type CollabLabels, DEFAULT_COLLAB_LABELS } from './labels.ts';
+import { type CollabLabels, DEFAULT_COLLAB_LABELS, landmarkPerson } from './labels.ts';
 import type { CollabSession } from './session.svelte.ts';
 
 interface Props {
@@ -51,7 +51,7 @@ function restore(version: CollabVersion): void {
 }
 </script>
 
-<section class="tx-pages-collab__panel" aria-labelledby={`${uid}-title`}>
+<section class="tx-pages-collab__panel" aria-label={labels.landmark(labels.versions, landmarkPerson(session))}>
   <h2 class="tx-pages-collab__heading" id={`${uid}-title`}>{labels.versions}</h2>
   <form class="tx-pages-collab__save" onsubmit={save}>
     <label class="tx-pages-collab__label" for={`${uid}-name`}>{labels.versionName}</label>

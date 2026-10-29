@@ -22,15 +22,14 @@ end to end and native for agents:
   blueprint contract (`@texuli/spec`) also feeds a Kotlin Multiplatform
   twin in `native/`.
 
-**Status: in development, pre-1.0.** All 20 published packages (all of
-`packages/` except `@texuli/examples`, `@texuli/document` and
-`@texuli/pages`) are released as `0.6.0`, which the publish workflow
-publishes from `main` after the merge and points `latest` and `next` to
-(the previous release, `0.5.0`, was the first of `@texuli/editor`), and
-`@texuli/drag`, `@texuli/workflows`, `@texuli/deck` and `@texuli/editor`
-are still in development ([RELEASE](docs/RELEASE.md)). `@texuli/document`
-and `@texuli/pages` are in the repository only (`0.0.0`, first release
-planned for `0.7.0`). Workspace packages stay
+**Status: in development, pre-1.0.** All 22 published packages (all of
+`packages/` except `@texuli/examples`) are released as `0.7.0`, which the
+publish workflow publishes from `main` after the merge and points `latest`
+and `next` to; `@texuli/document` and `@texuli/pages` are published for the
+first time in `0.7.0` (the previous release, `0.6.0`, had 20 packages), and
+`@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
+`@texuli/document` and `@texuli/pages` are still in development
+([RELEASE](docs/RELEASE.md)). Workspace packages stay
 `private: true`, and no stable release is out (1.0.0 will be the first; under
 0.x a new minor may break; see [RELEASE](docs/RELEASE.md)),
 and texuli.com deploys from `main` to Cloudflare Pages, with the Pages
@@ -74,10 +73,10 @@ texuli/
 ├── packages/            layers point down only (scripts/check-layers.ts)
 │   ├── core/            L0 @texuli/core: texels (overlay engine, roving, positioning, URL policy…)  (README, docs/)
 │   ├── date/            L0 @texuli/date: Gregorian date arithmetic and locale week starts      (README)
-│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.6.0) (README, docs/)
-│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.6.0) (README, docs/)
+│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.7.0) (README, docs/)
+│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.7.0) (README, docs/)
 │   ├── primitives/      L1 @texuli/primitives: 42 owned headless primitives, APG patterns      (README, docs/)
-│   ├── document/        L1 @texuli/document: block document engine, ops, Markdown, CRDT sync (in development, in the repository only) (README, docs/)
+│   ├── document/        L1 @texuli/document: block document engine, ops, Markdown, CRDT sync (in development, first on npm as 0.7.0) (README, docs/)
 │   ├── tokens/          L2 @texuli/tokens: OKLCH theme engine, --tx-* contract, 200+ themes, CSS (README, docs/)
 │   ├── texuli/          L3 texuli: styled components, cx/variants, icons, layouts, shells      (README, docs/)
 │   ├── charts/          L4 @texuli/charts: chart math + every family, one subpath each         (README, docs/)
@@ -93,7 +92,7 @@ texuli/
 │   ├── slides/          L8 @texuli/slides: presentation stage on @texuli/deck, print, PPTX (README, docs/)
 │   ├── tools/           L8 @texuli/tools: CLI, llms, A2UI, custom elements, golden set, MCP     (README, docs/)
 │   ├── astro/           L8 @texuli/astro: Astro integration, content layouts, sections          (README, docs/)
-│   ├── pages/           L8 @texuli/pages: block document editor and reader (in development, in the repository only) (README, docs/)
+│   ├── pages/           L8 @texuli/pages: block document editor and reader (in development, first on npm as 0.7.0) (README, docs/)
 │   └── examples/        @texuli/examples (private): the examples registry for tests, visuals and the site
 ├── apps/
 │   ├── website/         @texuli/website: texuli.com, Astro 7 + Svelte islands                  (README, docs/)
@@ -200,15 +199,13 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The 20 published packages, including `@texuli/editor`
-    (first published in `0.5.0`, the previous release), are released on npm
-    as `0.6.0` (dist-tags `latest` and `next`, published by CI with
-    provenance); `@texuli/drag`, `@texuli/workflows`, `@texuli/deck` and
-    `@texuli/editor` are still in development, and the blueprint spec in
-    `@texuli/spec@0.6.0` is `0.6.0`. `@texuli/document` and `@texuli/pages`
-    are in the repository only (`0.0.0`, not in the publish workflow; first
-    release planned for `0.7.0`). `@texuli/examples`, the apps and
-    `native/` publish nothing. 0.6.0 is a
+    check results. The 22 published packages, including `@texuli/document`
+    and `@texuli/pages` (first published in `0.7.0`), are released on npm
+    as `0.7.0` (dist-tags `latest` and `next`, published by CI with
+    provenance); `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`,
+    `@texuli/editor`, `@texuli/document` and `@texuli/pages` are still in
+    development, and the blueprint spec in `@texuli/spec@0.7.0` is `0.7.0`.
+    `@texuli/examples`, the apps and `native/` publish nothing. 0.7.0 is a
     pre-1.0 release, not stable (1.0.0 will be the first
     stable release; `latest` tracks the newest release). texuli.com
     deploys from `main` (Cloudflare Pages); the agent service is not

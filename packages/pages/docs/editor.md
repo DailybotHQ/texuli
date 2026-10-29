@@ -5,8 +5,8 @@ and never mutates it: every edit (typing, a slash insert, a move, a resize,
 an undo) is a transaction of `@texuli/document/ops` operations applied
 through one op log.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ```svelte
 <script lang="ts">

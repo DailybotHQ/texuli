@@ -61,22 +61,19 @@ const errorsOf = (blueprint: unknown) =>
   }).diagnostics.filter((entry) => entry.severity === 'error');
 
 describe('documents page: copy and safety', () => {
-  it('says both packages are in development, in the repository only, first release planned for 0.7.0', () => {
-    // When the packages ship, this test fails: update the page's status copy.
-    expect(pkg('pages').version).toBe('0.0.0');
-    expect(pkg('document').version).toBe('0.0.0');
+  it('says both packages are in development and on npm from 0.7.0, their first release', () => {
+    // Both packages were first published in 0.7.0; the copy names that release.
+    expect(pkg('pages').version).toBe(DOCUMENTS_RELEASE);
+    expect(pkg('document').version).toBe(DOCUMENTS_RELEASE);
     expect(DOCUMENTS_RELEASE).toBe('0.7.0');
-    expect(DOCUMENTS_STATUS).toBe(
-      'In development, in the repository only. First release planned for 0.7.0.'
-    );
+    expect(DOCUMENTS_STATUS).toBe('In development, on npm from 0.7.0, a pre-1.0 release.');
     const copy = PAGE.replace(/\s+/g, ' ');
-    expect(copy).toContain('in development · in the repository only');
+    expect(copy).toContain('in development · on npm from {DOCUMENTS_RELEASE}');
     expect(copy).toContain(
-      'Both packages are in development and in the repository only; their first release is planned for <code>{DOCUMENTS_RELEASE}</code>.'
+      'Both packages are in development and on npm from <code>{DOCUMENTS_RELEASE}</code>, a pre-1.0 release; the previous release, <code>0.6.0</code>, is without them.'
     );
-    expect(copy).toContain(
-      'description="Texuli documents (in development, in the repository only, first release planned for 0.7.0)'
-    );
+    expect(copy).toContain('description="Texuli documents (in development, on npm from 0.7.0)');
+    expect(copy).not.toMatch(/repository only|planned (?:for|with) (?:the )?.?0\.7\.0/i);
     for (const [path, source] of SOURCES) {
       expect(source, path).not.toMatch(
         /not (?:yet )?on npm|production[- ]ready|is released|available on npm|npm install @texuli\/(pages|document)/i

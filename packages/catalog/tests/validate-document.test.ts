@@ -80,7 +80,11 @@ describe('documents in validateDraft', () => {
         'documents:document-schema',
       ],
       ['an HTML string', withBlocks(paragraph('x', '<img src=x onerror=alert(1)>')), 'sinks:sink'],
-      ['a bidi override', withBlocks(paragraph('x', 'evil\u202Etxt.exe')), 'documents:document-schema'],
+      [
+        'a bidi override',
+        withBlocks(paragraph('x', 'evil\u202Etxt.exe')),
+        'documents:document-schema',
+      ],
       [
         'an unknown block type',
         withBlocks({ id: 'x', type: 'script', text: 'alert(1)' }),

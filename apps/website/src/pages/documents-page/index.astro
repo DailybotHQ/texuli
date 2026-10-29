@@ -54,18 +54,18 @@ import { Player } from '@texuli/player';
 
 <BaseLayout
   title="Documents"
-  description="Texuli documents (in development, in the repository only, first release planned for 0.7.0): a block editor with a slash menu, drag, nested pages, columns and live embeds, a reader, paged view and print, Markdown, DOCX and PDF export, collaboration, and documents as agent data."
+  description="Texuli documents (in development, on npm from 0.7.0): a block editor with a slash menu, drag, nested pages, columns and live embeds, a reader, paged view and print, Markdown, DOCX and PDF export, collaboration, and documents as agent data."
 >
   <div class="documents-page" data-tx-documents-page="">
     <header class="documents-page__hero">
-      <p class="eyebrow">@texuli/pages · @texuli/document · in development · in the repository only</p>
+      <p class="eyebrow">@texuli/pages · @texuli/document · in development · on npm from {DOCUMENTS_RELEASE}</p>
       <h1>Documents people edit and agents write</h1>
       <p class="lead">
         A block editor, a reader, real pages and three export formats on one document engine. Every
         edit is an operation in one log, so undo, collaboration and agent patches share one history,
-        and every document is validated before it paints. Both packages are in development and in the
-        repository only; their first release is planned for <code>{DOCUMENTS_RELEASE}</code>. Until
-        then, everything on this page runs from the repository's source.
+        and every document is validated before it paints. Both packages are in development and on npm
+        from <code>{DOCUMENTS_RELEASE}</code>, a pre-1.0 release; the previous release,
+        <code>0.6.0</code>, is without them.
       </p>
       <ol class="pieces" aria-label="The pieces of the two document packages">
         {
@@ -120,8 +120,8 @@ import { Player } from '@texuli/player';
           <h3>The blueprint the agent wrote</h3>
           <p class="demo__note">
             Spec <code>0.7.0</code> adds the <code>document</code> catalog id, an optional node
-            <code>key</code> and the <code>patchDocument</code> op. It is in the repository and ships
-            with the planned <code>{DOCUMENTS_RELEASE}</code> release of <code>@texuli/spec</code>.
+            <code>key</code> and the <code>patchDocument</code> op. It ships in the
+            <code>{DOCUMENTS_RELEASE}</code> release of <code>@texuli/spec</code>.
           </p>
           <GuideCode code={DOCUMENT_BLUEPRINT_JSON} label="The document blueprint (JSON)" lang="text" />
           <h3>The bounded patch</h3>

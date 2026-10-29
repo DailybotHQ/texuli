@@ -249,8 +249,8 @@ pnpm vitest run packages/player/tests/streaming.test.ts
 
 ## I — Documents (spec 0.7.0)
 
-In the repository for the `0.7.0` packages (not on npm yet; `0.6.0`
-predates it). Detail and the commands:
+New in the `0.7.0` packages, the first release of `@texuli/document` and
+`@texuli/pages`; `0.6.0` predates it. Detail and the commands:
 [`references/documents.md`](references/documents.md).
 
 - **A document is one node.** The root `{"key": "brief", "id": "document",

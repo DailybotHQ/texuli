@@ -5,11 +5,7 @@ import { cleanup, render, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createPlayerCatalog } from '../src/catalog.ts';
-import {
-  DOCUMENT_HOST_PACKAGE,
-  documentRoot,
-  isDocumentTree,
-} from '../src/document-host.ts';
+import { DOCUMENT_HOST_PACKAGE, documentRoot, isDocumentTree } from '../src/document-host.ts';
 import Player from '../src/Player.svelte';
 import { createStreamSession } from '../src/stream/session.ts';
 import { checkDocument, testDocumentHost } from './document-host.ts';

@@ -8,6 +8,13 @@ import type { DocumentChange } from '@texuli/document/collab';
 export interface CollabLabels {
   /** The collaboration region's name. */
   region: string;
+  /**
+   * A landmark's name in one person's view: every landmark the collaboration
+   * UI names (the editor region, the breadcrumb, the sidebar and its panels)
+   * goes through it with the session author's name (or the replica id), so two
+   * editors on one page never repeat a landmark name (axe `landmark-unique`).
+   */
+  landmark: (name: string, person: string) => string;
   toolbar: string;
   comment: string;
   /** The keyboard shortcut hint of the comment button. */
@@ -72,6 +79,7 @@ const quote = (text: string) => (text.length > 60 ? `${text.slice(0, 57)}…` : 
 
 export const DEFAULT_COLLAB_LABELS: CollabLabels = {
   region: 'Collaboration',
+  landmark: (name, person) => (person ? `${name} (${person})` : name),
   toolbar: 'Review',
   comment: 'Comment',
   commentShortcut: 'Control+Alt+M',
@@ -147,6 +155,11 @@ export const DEFAULT_COLLAB_LABELS: CollabLabels = {
   versionRestored: (name) => `Restored the version “${name}”.`,
   selectText: 'Select text or place the caret in a block to comment.',
 };
+
+/** The person a session's landmarks are named for: the author's name, or the replica id. */
+export function landmarkPerson(session: { author: { name: string }; replica: string }): string {
+  return session.author.name.trim() || session.replica;
+}
 
 /** Merge partial overrides (empty strings never replace a default). */
 export function resolveCollabLabels(overrides: Partial<CollabLabels> = {}): CollabLabels {

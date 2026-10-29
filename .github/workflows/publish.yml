@@ -52,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           refused=0
-          for dir in core date spec drag deck tokens primitives texuli workflows editor charts data media chat blocks catalog tools astro player slides; do
+          for dir in core date spec drag deck tokens primitives document texuli workflows editor charts data media chat blocks catalog tools astro player pages slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             if [ "$version" = "0.0.0" ]; then
@@ -107,8 +107,10 @@ jobs:
           # L0: the deck engine that the slides stage depends on (ADR-009).
           publish packages/deck
           publish packages/tokens
-          # Wave 175 — L1 headless primitives.
+          # Wave 175 — L1 headless primitives, and the L1 document engine
+          # (core and deck first; first published in 0.7.0; tools imports it).
           publish packages/primitives
+          publish packages/document
           # Wave 176 — L3 styled components.
           publish packages/texuli
           # L4: the workflow editor, after texuli and before the player.
@@ -126,6 +128,9 @@ jobs:
           publish packages/tools
           publish packages/astro
           publish packages/player
+          # L8: the block document editor and reader (document, blocks, texuli,
+          # editor and player first; first published in 0.7.0).
+          publish packages/pages
           publish packages/slides
           echo "All packable packages published under dist-tag next."
       - name: Point latest at this release
@@ -133,7 +138,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          for dir in core date spec drag deck tokens primitives texuli workflows editor charts data media chat blocks catalog tools astro player slides; do
+          for dir in core date spec drag deck tokens primitives document texuli workflows editor charts data media chat blocks catalog tools astro player pages slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             npm dist-tag add "${name}@${version}" latest

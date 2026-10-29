@@ -2,11 +2,11 @@
 
 > **Small pieces. Infinite possibilities.**
 >
-> Status on 2026-10-29: **pre-1.0.** All 20 published packages are
-> released on npm as `0.6.0` (dist-tags
+> Status on 2026-10-29: **pre-1.0.** All 22 published packages are
+> released on npm as `0.7.0` (dist-tags
 > `latest` and `next`; published by CI from verified tarballs, with signed
-> provenance); `@texuli/document` and `@texuli/pages` are in the
-> repository only (first release planned for `0.7.0`); texuli.com deploys
+> provenance), including the first release of `@texuli/document` and
+> `@texuli/pages`; texuli.com deploys
 > from `main` to Cloudflare Pages. The
 > implementation itself is substantial: every layer from L0 texels to L8
 > tools exists in source with tests, all in this private workspace. The
@@ -96,27 +96,27 @@ closed, documented catalog that can be validated before anything renders.
 | L0 texels: the two-tier URL policy (`safeHref`, `safeImageSrc`, `safeMediaSrc`), ids, roving focus and typeahead, focus scope, the layer stack, scroll lock, positioning, dismissable layers, inert, portal, announcer, and the rest of `@texuli/core` | **Exists**, unit tests per texel | [`packages/core`](../packages/core/README.md) |
 | `@texuli/date` (L0): dependency-free Gregorian calendar dates for the calendar, date field and date picker | **Exists**, unit tests | [`packages/date`](../packages/date/README.md) |
 | `@texuli/primitives` (L1): 42 owned headless primitives (`sortable` new in `0.4.0`) and the behavior suite (44 scenario specs, including `sortable` and `workflow-editor`, on chromium, webkit and a Pixel 7 profile) | **Exists**, private | [`packages/primitives`](../packages/primitives/README.md), [`tests/behavior`](../tests/behavior/README.md) |
-| `@texuli/drag` (L0): the framework-free drag engine (sortable, collision, modifiers, auto-scroll, gesture, spatial, graph, messages) | **In development**, on npm as `0.6.0` (first published as `0.3.0` on 2026-10-28); used by primitives, data, workflows and the player from `0.4.0` | [`packages/drag`](../packages/drag/README.md) |
-| `@texuli/workflows` (L4): workflow model, layout, spec adapter, editor, viewer and inspector | **In development**, on npm as `0.6.0` (first published as `0.3.0` on 2026-10-28); the player's `workflow-graph` painter ships from `0.4.0` | [`packages/workflows`](../packages/workflows/README.md) |
+| `@texuli/drag` (L0): the framework-free drag engine (sortable, collision, modifiers, auto-scroll, gesture, spatial, graph, messages) | **In development**, on npm as `0.7.0` (first published as `0.3.0` on 2026-10-28); used by primitives, data, workflows and the player from `0.4.0` | [`packages/drag`](../packages/drag/README.md) |
+| `@texuli/workflows` (L4): workflow model, layout, spec adapter, editor, viewer and inspector | **In development**, on npm as `0.7.0` (first published as `0.3.0` on 2026-10-28); the player's `workflow-graph` painter ships from `0.4.0` | [`packages/workflows`](../packages/workflows/README.md) |
 | Tokens + CSS, OKLCH theme engine (L2): the `--tx-*` contract, 210 themes, compiled CSS, forced colors, the AA gate, the Tailwind preset | **Exists**, private | [`packages/tokens`](../packages/tokens/README.md) |
 | `texuli` styled components, layouts and app shells (L3) | **Exists**, private | [`packages/texuli`](../packages/texuli/README.md) |
 | Charts, data, media and chat packages (L4) | **Exists**, private | [`packages/charts`](../packages/charts/README.md), [`packages/data`](../packages/data/README.md), [`packages/media`](../packages/media/README.md), [`packages/chat`](../packages/chat/README.md) |
-| Blueprint contract (L0): JSON schemas, catalog vocabulary, TypeScript and Kotlin codegen, conformance harness; spec 0.3.0 (state, bindings, closed actions, `reorder`, workflow graphs, the state surface) spec 0.4.0 (deck model v2 on `layout-deck` and `deck-slide`), spec 0.5.0 (the cohort table, notification inbox, filter builder and time field ids) and spec 0.6.0 (the closed motion vocabulary); streamed blueprints (`@texuli/spec/stream`) | **Exists**, private; npm `@texuli/spec@0.6.0` carries spec 0.6.0 (`@texuli/spec@0.5.0` carried spec 0.5.0, `@texuli/spec@0.4.0` spec 0.4.0, `@texuli/spec@0.3.0` spec 0.2.0) | [`packages/spec`](../packages/spec/README.md) |
-| Rich text editor (L4), with Markdown in and out (`@texuli/editor/markdown`) | **In development**, on npm as `0.6.0` (first published as `0.5.0`) | [`packages/editor`](../packages/editor/README.md) |
+| Blueprint contract (L0): JSON schemas, catalog vocabulary, TypeScript and Kotlin codegen, conformance harness; spec 0.3.0 (state, bindings, closed actions, `reorder`, workflow graphs, the state surface) spec 0.4.0 (deck model v2 on `layout-deck` and `deck-slide`), spec 0.5.0 (the cohort table, notification inbox, filter builder and time field ids), spec 0.6.0 (the closed motion vocabulary) and spec 0.7.0 (node keys, the `document` id and `patchDocument`); streamed blueprints (`@texuli/spec/stream`) | **Exists**, private; npm `@texuli/spec@0.7.0` carries spec 0.7.0 (`@texuli/spec@0.6.0` carried spec 0.6.0, `@texuli/spec@0.5.0` carried spec 0.5.0, `@texuli/spec@0.4.0` spec 0.4.0, `@texuli/spec@0.3.0` spec 0.2.0) | [`packages/spec`](../packages/spec/README.md) |
+| Rich text editor (L4), with Markdown in and out (`@texuli/editor/markdown`) | **In development**, on npm as `0.7.0` (first published as `0.5.0`) | [`packages/editor`](../packages/editor/README.md) |
 | Content blocks (L5) | **Exists**, private | [`packages/blocks`](../packages/blocks/README.md) |
 | Agent catalog and the sink-free renderer (L6) | **Exists**, private | [`packages/catalog`](../packages/catalog/README.md) |
-| `@texuli/deck` (L0): deck model v2, the JSON loader and Markdown dialect, math, layouts, backgrounds, engine, lint, patch, builder and templates | **In development**, on npm as `0.6.0` (first published as `0.4.0`); in the publish waves before `@texuli/slides` | [`packages/deck`](../packages/deck/README.md) |
-| Blueprint player (L7) | **Exists**, private; the player's spec 0.3.0 interaction, its data, chat, sortable and workflow painters, the `deckHost` seam and `chrome={false}` ship from `0.4.0`; streaming (`<Player stream>`) and spec 0.6.0 node motion from `0.6.0` | [`packages/player`](../packages/player/README.md) |
+| `@texuli/deck` (L0): deck model v2, the JSON loader and Markdown dialect, math, layouts, backgrounds, engine, lint, patch, builder and templates | **In development**, on npm as `0.7.0` (first published as `0.4.0`); in the publish waves before `@texuli/slides` | [`packages/deck`](../packages/deck/README.md) |
+| Blueprint player (L7) | **Exists**, private; the player's spec 0.3.0 interaction, its data, chat, sortable and workflow painters, the `deckHost` seam and `chrome={false}` ship from `0.4.0`; streaming (`<Player stream>`) and spec 0.6.0 node motion from `0.6.0`; the `documentHost` seam for agent documents from `0.7.0` | [`packages/player`](../packages/player/README.md) |
 | Motion: tokens (`@texuli/tokens/motion`), the Web Animations runtime with an owned spring solver (`@texuli/core/motion`), and the `motion` prop and `MotionProvider` (`texuli/motion`) used by overlays, toasts, tabs, accordions, the Board, the DataGrid and the slides stage | **Exists**, private; on npm from `0.6.0` (ADR-013) | [`packages/core`](../packages/core/README.md), [`packages/texuli`](../packages/texuli/README.md) |
 | One component API contract (`bind:ref`, rest attributes, composed handlers, the Field rule), checked by contract tests over every export of `@texuli/primitives` and `texuli` | **Exists**, from `0.6.0`; the layouts join later (planned) | [STANDARDS](STANDARDS.md#component-api-contract) |
-| `@texuli/document` (L1): block document model, untrusted schema, typed operations and bounded patches, Markdown, CRDT sync core; `@texuli/pages` (L8): the block document editor and reader | **In development**, in the repository only (`0.0.0`, not in the publish workflow; first release planned for `0.7.0`, ADR-011) | [`packages/document`](../packages/document/README.md), [`packages/pages`](../packages/pages/README.md) |
-| Slides (L8): the v2 stage, layouts, backgrounds, components on slides, print and PPTX | **In development**, on npm as `0.6.0` (the v2 stage from `0.4.0`; `@texuli/slides@0.3.0` has the previous deck model) | [`packages/slides`](../packages/slides/README.md) |
+| `@texuli/document` (L1): block document model, untrusted schema, typed operations and bounded patches, Markdown, pagination, DOCX and PDF writers, CRDT sync and collaboration; `@texuli/pages` (L8): the block document editor and reader, paged view, export, collaboration and the player's document host; documents as agent data (the `document` catalog id, `patchDocument`, the `texuli document` CLI and MCP tool) | **In development**, on npm from `0.7.0`, their first release (ADR-010, ADR-011) | [`packages/document`](../packages/document/README.md), [`packages/pages`](../packages/pages/README.md) |
+| Slides (L8): the v2 stage, layouts, backgrounds, components on slides, print and PPTX | **In development**, on npm as `0.7.0` (the v2 stage from `0.4.0`; `@texuli/slides@0.3.0` has the previous deck model) | [`packages/slides`](../packages/slides/README.md) |
 | Astro integration (L8) | **Exists**, private | [`packages/astro`](../packages/astro/README.md) |
 | Kotlin Multiplatform twin (`texuli-spec`, `texuli-compose`, conformance) | **In development**, nothing published; app shells and most chart families are placeholders | [`native`](../native/README.md) |
 | Agent service (prompt → validated blueprint draft) | **In development**, fake replay provider only, not deployed | [`apps/agent`](../apps/agent/README.md) |
 | Tools (L8): the copy-in CLIs (`texuli-add`, `texuli-init`, `texuli-update`, `texuli-llms`), A2UI, custom elements, the golden set, and the read-only local MCP server source | **Exists as source**, private; no published binaries | [`packages/tools`](../packages/tools/README.md) |
 | Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, deployed at https://texuli.com (Cloudflare Pages) with two Pages Functions (`functions/`: agent-facing request shaping and a same-origin Umami analytics proxy, off until the owner provisions it) | [`apps/website`](../apps/website/README.md) |
-| npm 0.x release | **Done** — all 20 published packages as `0.6.0` (after `0.5.0` for 20 packages, the first release of `@texuli/editor`; `0.4.0` for 19 packages, `0.3.0` for 18, `0.2.0` for 15 and the `0.1.0-next.0`–`next.3` previews), dist-tags `latest` and `next`, CI-published with provenance | [RELEASE](RELEASE.md) |
+| npm 0.x release | **Done** — all 22 published packages as `0.7.0`, the first release of `@texuli/document` and `@texuli/pages` (after `0.6.0` for 20 packages; `0.5.0` for 20 packages, the first release of `@texuli/editor`; `0.4.0` for 19 packages, `0.3.0` for 18, `0.2.0` for 15 and the `0.1.0-next.0`–`next.3` previews), dist-tags `latest` and `next`, CI-published with provenance | [RELEASE](RELEASE.md) |
 | npm stable release (1.0.0) | Planned; needs the developer's explicit go. texuli.com deploys from `main` (Cloudflare Pages) | — |
 
 ## Success criteria
@@ -148,7 +148,7 @@ closed, documented catalog that can be validated before anything renders.
 
 ## Honest boundaries
 
-- The implementation is pre-1.0. All 20 published packages are on npm as `0.6.0`
+- The implementation is pre-1.0. All 22 published packages are on npm as `0.7.0`
   (published by CI with provenance; `latest` and `next` both point to it; not
   a stable release: under 0.x a new minor may contain breaking changes, and
   1.0.0 will be the first stable release), and the

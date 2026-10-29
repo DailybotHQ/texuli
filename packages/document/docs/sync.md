@@ -7,8 +7,8 @@ operations holds the same state. Hosts own networking and storage behind a
 `@texuli/document`) and loads lazily: only a collaborative session pays for
 it. Canvases, sheets and dashboards reuse it.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`). Documents bind to this core in
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0). Documents bind to this core in
 > [`@texuli/document/collab`](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/collab.md)
 > (the tree diff, comments, suggestions, versions and presence); this
 > subpath stays generic for canvases, sheets and dashboards.

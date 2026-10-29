@@ -141,6 +141,34 @@ Move the backup back into the host's skills folder and verify it with
 - **Offline-safe.** An unreachable network ends with a report, never a
   partial install.
 
+## Texuli packages 0.7.0: breaking changes
+
+This sub-skill never upgrades packages; moving an app from `^0.6.0` to
+`^0.7.0` is the developer's install ([`../components/SKILL.md`](../components/SKILL.md)).
+`0.7.0` publishes `@texuli/document` and `@texuli/pages` for the first time;
+an app that does not use them sees only these changes. Before the move,
+check the app for:
+
+- **Spec 0.7.0:** validated drafts carry `spec: "0.7.0"`; a host that
+  compares the string must accept it. A `0.7.0` envelope with node keys or
+  a `document` node is refused by `0.6.0` validators, so upgrade the
+  validating side first.
+- **A new catalog hash:** the `document` id changes the catalog hash; a
+  host that pins `catalogHash` refuses envelopes written for the `0.6.0`
+  catalog (`catalog-mismatch`) until it pins the new hash.
+- **`EditOp` gains `patchDocument`:** an exhaustive `switch` over `EditOp`
+  or `EditOpKind` (`@texuli/catalog/edit`) needs a branch;
+  `applyEditOps` and `applyEditOp` take an optional third argument, and
+  without its `patchDocument` patcher that op is refused (`invalid-op`).
+
+Not breaking: nodes may carry an optional `key` (unique in the tree),
+`RenderNode` carries it, the player takes a `documentHost`, and the
+`texuli` bin gains a `document` command.
+
+New APIs in `0.7.0` (none of them in `0.6.0`) are listed in
+[`../build-ui/references/imports.md`](../build-ui/references/imports.md);
+agent documents are stage I of [`../blueprints/SKILL.md`](../blueprints/SKILL.md).
+
 ## Texuli packages 0.6.0: breaking changes
 
 This sub-skill never upgrades packages; moving an app from `^0.5.0` to

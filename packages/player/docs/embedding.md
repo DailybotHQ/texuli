@@ -1,6 +1,6 @@
 # Embedding the player
 
-**Package:** `@texuli/player` (on npm as `0.6.0`, a pre-1.0 release; no
+**Package:** `@texuli/player` (on npm as `0.7.0`, a pre-1.0 release; no
 stable 1.0.0 yet)
 
 How to put a validated catalog blueprint on a page: quick start, the props a
@@ -269,7 +269,7 @@ one).
 
 ## Document hosts
 
-In the repository for `0.7.0` (not on npm yet). A `document` blueprint
+New in `0.7.0`. A `document` blueprint
 (spec 0.7.0, ADR-011) is one node whose `doc` is a Texuli document. The
 player (L7) cannot import `@texuli/pages` (L8), and the document validator
 is too large for its eager chunk, so both come from the host through

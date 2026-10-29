@@ -251,6 +251,12 @@ describe('consumer surface', () => {
             './node': './dist/node.js',
             './comp': './dist/comp.js',
             './broken': './dist/broken.js',
+            './stage': './dist/stage.js',
+            './bad-import': './dist/bad-import.js',
+          },
+          imports: {
+            '#ssr': { browser: './dist/ssr-browser.js', default: './dist/ssr-server.js' },
+            '#gone': { browser: './dist/gone-browser.js', default: './dist/ssr-server.js' },
           },
           dependencies: { '@texuli/b': '1.0.0' },
         })
@@ -263,6 +269,14 @@ describe('consumer surface', () => {
         "import C from './C.astro';\nimport './c.css';\n"
       );
       write('node_modules/@texuli/a/dist/C.astro', '---\n---\n<p />\n');
+      // Package `imports`: the browser target is walked, the server one only checked.
+      write('node_modules/@texuli/a/dist/stage.js', "import { preload } from '#ssr';\n");
+      write('node_modules/@texuli/a/dist/ssr-browser.js', 'export const preload = null;\n');
+      write('node_modules/@texuli/a/dist/ssr-server.js', "import 'node:fs';\n");
+      write(
+        'node_modules/@texuli/a/dist/bad-import.js',
+        "import '#gone';\nimport '#undeclared';\n"
+      );
       write('node_modules/@texuli/a/dist/c.css', '.tx-c{}');
       write(
         'node_modules/@texuli/a/dist/broken.js',
@@ -293,6 +307,18 @@ describe('consumer surface', () => {
       expect(broken.missing[0]).toContain('gone.js');
       expect(broken.undeclared).toEqual([expect.stringContaining('imports left-pad')]);
       expect(broken.unexported).toEqual([expect.stringContaining('does not export ./hidden')]);
+
+      // Before: `#ssr` counted as an undeclared bare package.
+      const stage = walkInstalled(dir, '@texuli/a/stage');
+      expect([stage.missing, stage.undeclared, stage.unexported]).toEqual([[], [], []]);
+      expect(stage.files).toBe(2);
+      expect(detectedEnvironment(stage)).toBe('browser');
+      const badImport = walkInstalled(dir, '@texuli/a/bad-import');
+      expect(badImport.missing).toEqual([expect.stringContaining('gone-browser.js')]);
+      expect(badImport.unexported).toEqual([
+        expect.stringContaining('#undeclared: @texuli/a declares no such import'),
+      ]);
+      expect(badImport.undeclared).toEqual([]);
 
       const absent = walkInstalled(dir, '@texuli/a/nope');
       expect(absent.unexported).toEqual([expect.stringContaining('does not export ./nope')]);

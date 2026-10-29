@@ -1,9 +1,9 @@
 # Documents as data (spec 0.7.0)
 
 Agents write documents (briefs, reports, notes, pages) as data and edit
-them with bounded patches. Everything here is offline, and nothing is on
-npm yet: `@texuli/document` and `@texuli/pages` are first released with
-`0.7.0` (planned).
+them with bounded patches. Everything here is offline. `@texuli/document`
+and `@texuli/pages` are on npm from `0.7.0`, their first release (with
+spec `0.7.0` in `@texuli/spec@0.7.0`); `0.6.0` predates them.
 
 ## The node
 

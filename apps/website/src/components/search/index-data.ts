@@ -95,7 +95,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-documents',
     title: 'Documents',
     description:
-      'A block editor with a slash menu, drag, nested pages, columns and live embeds; reader, paged view, Markdown, DOCX and PDF export, collaboration, and documents as agent data (in development, in the repository only).',
+      'A block editor with a slash menu, drag, nested pages, columns and live embeds; reader, paged view, Markdown, DOCX and PDF export, collaboration, and documents as agent data (in development, on npm from 0.7.0).',
     href: '/documents-page/',
     kind: 'page',
     keywords: [

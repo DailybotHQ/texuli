@@ -5,10 +5,10 @@
 by `src/cli/document.ts`) · **MCP:** the read-only `document` tool of the
 local server in `src/mcp/` · **Path:** `src/document/`
 
-> **Status: in development, in the repository for `0.7.0`.** Not on npm yet:
-> the `./document` subpath, the `document` command and the `document` MCP
-> tool are planned for `@texuli/tools` `0.7.0`, with the first release of
-> `@texuli/document` ([RELEASE](../../../docs/RELEASE.md)).
+> **Status: in development, new in `0.7.0`.** The `./document` subpath, the
+> `document` command and the `document` MCP tool ship in `@texuli/tools`
+> `0.7.0`, with the first release of `@texuli/document`
+> ([RELEASE](../../../docs/RELEASE.md)); `0.6.0` predates them.
 
 Agent and developer commands for Texuli documents (spec 0.7.0, ADR-011), on
 `@texuli/document`: read what the format supports, create a document from

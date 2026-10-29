@@ -91,6 +91,22 @@ pnpm verify:packages && TEXULI_E2E_PORT=4953 pnpm exec playwright test tests/con
 
 ## Last verified
 
+2026-10-29 on `feat/plan-010-070` (`011a2eec` plus the working tree),
+T-release-070: `pnpm verify:packages` passed for 22 packages
+(`@texuli/document` and `@texuli/pages` included), then
+`TEXULI_E2E_PORT=4970 pnpm exec playwright test
+tests/consumers/consumers.spec.ts --project chromium` reported 7 passed in
+2.4 min: the six tarball-mode apps installed all 22 tarballs with
+`--offline`, imported 390 subpaths (18 of them from the two document
+packages) and rendered one component per UI package (a `PageReader` for
+`@texuli/pages`), plus the matrix check. Registry mode was not run (`0.7.0`
+is not on npm before the post-merge publish). The run first failed on the
+installed-graph walk, which reported `@texuli/slides`'s package `imports`
+(`#deck-ssr`, `#deck-ssr-core`) as undeclared packages; the walk now
+resolves `#` specifiers through the owner's `imports` map
+(`scripts/tests/consumers-harness.test.ts`).
+
+Before that:
 2026-10-28 on `feat/plan-010-universal-generator` (`a3a5586d` plus the
 working tree), T-std-consumers: `bash -c 'pnpm verify:packages &&
 TEXULI_E2E_PORT=4953 pnpm exec playwright test tests/consumers --project

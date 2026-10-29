@@ -3,7 +3,7 @@
 // caret is in. The colored carets over the text are decorative
 // (aria-hidden); this list is what assistive technology reads.
 import { findNode, ownText } from '@texuli/document/model';
-import { type CollabLabels, DEFAULT_COLLAB_LABELS } from './labels.ts';
+import { type CollabLabels, DEFAULT_COLLAB_LABELS, landmarkPerson } from './labels.ts';
 import { type CollabSession, presenceColor } from './session.svelte.ts';
 
 interface Props {
@@ -23,7 +23,7 @@ const people = $derived(
 );
 </script>
 
-<section class="tx-pages-collab__people" aria-labelledby={`${uid}-title`}>
+<section class="tx-pages-collab__people" aria-label={labels.landmark(labels.collaborators, landmarkPerson(session))}>
   <h2 class="tx-pages-visually-hidden" id={`${uid}-title`}>{labels.collaborators}</h2>
   <ul class="tx-pages-collab__people-list">
     <li class="tx-pages-collab__person" data-replica={session.replica}>

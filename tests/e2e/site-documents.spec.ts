@@ -125,7 +125,7 @@ test('the workbench edits, reads, paginates and exports one document', async ({ 
     'Documents people edit and agents write'
   );
   await expect(
-    page.getByText('@texuli/pages · @texuli/document · in development · in the repository only')
+    page.getByText('@texuli/pages · @texuli/document · in development · on npm from 0.7.0')
   ).toBeVisible();
 
   await hydrated(page, '[data-documents-workbench]');

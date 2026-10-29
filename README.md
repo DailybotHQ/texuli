@@ -37,10 +37,10 @@ the same pieces are safe to hand to a machine.
 ![The Texuli website](docs/assets/screenshots/homepage.png)
 
 > **Status: in development, pre-1.0.** The screenshot above is the
-> texuli.com website, which deploys from `main` to Cloudflare Pages. The 20
-> published packages are released on npm as `0.6.0` (published by CI with
-> provenance; `latest` and `next` both point to it); `@texuli/document` and
-> `@texuli/pages` are in the repository only. It is not a stable
+> texuli.com website, which deploys from `main` to Cloudflare Pages. The 22
+> published packages are released on npm as `0.7.0` (published by CI with
+> provenance; `latest` and `next` both point to it), including the first
+> release of `@texuli/document` and `@texuli/pages`. It is not a stable
 > release: under 0.x a new minor may contain breaking changes, and 1.0.0 will
 > be the first stable release. The workspace packages stay `private: true`
 > ([RELEASE](docs/RELEASE.md)).
@@ -191,12 +191,11 @@ every verified command.
 
 ## Honest boundaries
 
-- **No stable release yet.** The 20 published packages are on npm as
-  `0.6.0`, a pre-1.0 release (`npm install texuli`; `latest` and `next` both
-  point to it). Under 0.x a new minor (`0.7.0`) may contain breaking changes,
-  so pin the exact version or use `^0.6.0`; 1.0.0 will be the first stable
-  release. `@texuli/document` and `@texuli/pages` are in the repository
-  only (first release planned for `0.7.0`).
+- **No stable release yet.** The 22 published packages are on npm as
+  `0.7.0`, a pre-1.0 release (`npm install texuli`; `latest` and `next` both
+  point to it). Under 0.x a new minor (`0.8.0`) may contain breaking changes,
+  so pin the exact version or use `^0.7.0`; 1.0.0 will be the first stable
+  release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with
   `pnpm dev`.

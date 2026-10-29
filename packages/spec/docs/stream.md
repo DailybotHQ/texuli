@@ -5,8 +5,8 @@
 **Design:** [ADR-014](../../../docs/DECISIONS.md#adr-014-streaming-generation-paint-only-validated-closed-node-shells)  
 **Tests:** `packages/spec/tests/stream.test.ts`  
 **Status:** new in `0.6.0` (in development, pre-1.0); `@texuli/spec@0.5.0`
-and earlier don't have this subpath. Spec `0.7.0` (in the repository for
-the `0.7.0` packages) admits the optional node `key` (ADR-012).
+and earlier don't have this subpath. Spec `0.7.0` (in
+`@texuli/spec@0.7.0`) admits the optional node `key` (ADR-012).
 
 ## Goal
 

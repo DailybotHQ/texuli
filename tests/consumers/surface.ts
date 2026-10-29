@@ -188,6 +188,8 @@ export interface InstalledGraph {
 interface InstalledManifest {
   name: string;
   exports?: unknown;
+  /** Package `imports` (`#…` specifiers), mapped to `dist` by the packer. */
+  imports?: unknown;
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
   optionalDependencies?: Record<string, string>;
@@ -195,6 +197,19 @@ interface InstalledManifest {
 
 const NODE_BUILTIN = /^node:/;
 const isTexuli = (name: string) => name === 'texuli' || name.startsWith('@texuli/');
+
+/** Every file target of a package `imports` value, whatever the condition. */
+export function importTargets(value: unknown): string[] {
+  if (typeof value === 'string') return [value];
+  if (!isRecord(value)) return [];
+  return Object.values(value).flatMap(importTargets);
+}
+
+/** The target a browser bundler resolves for an `imports` value (`browser` first). */
+export function browserImportTarget(value: unknown): string | undefined {
+  if (isRecord(value) && value.browser !== undefined) return browserImportTarget(value.browser);
+  return runtimeTarget(value);
+}
 
 /**
  * Walk the runtime import graph of `specifier` inside an installed
@@ -286,6 +301,32 @@ export function walkInstalled(installDir: string, specifier: string): InstalledG
           continue;
         }
         queue.push(target);
+        continue;
+      }
+      if (spec.startsWith('#')) {
+        // A package `imports` specifier (e.g. `#deck-ssr`): resolved through
+        // the owner's own manifest. Every condition's file must be in the
+        // tarball; the walk follows the one a browser bundler picks.
+        const imports = isRecord(ownManifest?.imports) ? ownManifest.imports : {};
+        const value = imports[spec];
+        const targets = importTargets(value);
+        if (targets.length === 0) {
+          graph.unexported.push(`${where} imports ${spec}: ${owner} declares no such import`);
+          continue;
+        }
+        const base = join(consumerDir, 'node_modules', ...owner.split('/'));
+        for (const target of targets) {
+          if (!target.startsWith('./')) {
+            graph.missing.push(
+              `${where} imports ${spec}: target ${target} is not a file in ${owner}`
+            );
+          } else if (!existsSync(join(base, target))) {
+            graph.missing.push(`${where} imports ${spec}: ${target} is not in the tarball`);
+          }
+        }
+        const picked = browserImportTarget(value);
+        if (picked?.startsWith('./') && existsSync(join(base, picked)))
+          queue.push(join(base, picked));
         continue;
       }
       if (spec.startsWith('/') || /^[a-z]+:/.test(spec)) {
@@ -418,6 +459,12 @@ export const RENDER_CHECKS: Readonly<Record<string, RenderCheck>> = {
     region: '[data-render="@texuli/media"]',
     client: 'Consumer image',
     ssr: 'Consumer image',
+    styled: true,
+  },
+  '@texuli/pages': {
+    region: '[data-render="@texuli/pages"]',
+    client: 'Consumer page text',
+    ssr: 'Consumer page text',
     styled: true,
   },
   '@texuli/player': {

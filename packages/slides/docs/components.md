@@ -78,6 +78,7 @@ a slide, each with its reason:
 | `flow-view`, `flow-action` | Blueprint flows: the deck owns navigation (slides and steps) |
 | `layout-page`, `layout-doc` | Page and document shells with landmarks: a slide is not a page |
 | `layout-card`, `layout-grid`, `layout-row`, `layout-split`, `layout-stack`, `layout-tile` | Containers of catalog child nodes: a component item has no children; use a slide layout, a master or `blocks-structure` |
+| `document` | A whole document (spec 0.7.0, new in `0.7.0`): the player paints it only through a host `documentHost` (`@texuli/pages/host`), which the stage does not carry; put text on a slide with a layout or the blocks families |
 
 `SLIDE_EXCLUDED_GROUPS` holds whole catalog groups the player has no painter
 for:

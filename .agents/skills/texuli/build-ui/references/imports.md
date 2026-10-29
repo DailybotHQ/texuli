@@ -70,10 +70,28 @@ Never `@texuli/core` root barrel for app code.
 | Astro sites | `@texuli/astro` (`texuli()` integration), `@texuli/astro/styles.css`, `@texuli/astro/site` (`defineSite`, `sitePageMeta`, `siteSitemap`), `@texuli/astro/layouts/ContentLayout`, `@texuli/astro/appearance` (`AppearanceSwitcher`; new in `0.5.0`) |
 | Paint a validated blueprint | `@texuli/player` (+ `@texuli/player/styles.css`) |
 | Drag and drop (Svelte) | `@texuli/primitives/sortable` (`Sortable`); views: `@texuli/data/board`, `@texuli/data/tree-view` |
-| Drag engine (framework-free) | `@texuli/drag/sortable`, `@texuli/drag/gesture`, `@texuli/drag/spatial`, `@texuli/drag/graph`, `@texuli/drag/messages`; in development, on npm as `0.6.0` |
-| Workflows | `@texuli/workflows/editor`, `@texuli/workflows/viewer`, `@texuli/workflows/inspector`, `@texuli/workflows/model`, `@texuli/workflows/layout`, `@texuli/workflows/spec-adapter`; in development, on npm as `0.6.0` |
+| Drag engine (framework-free) | `@texuli/drag/sortable`, `@texuli/drag/gesture`, `@texuli/drag/spatial`, `@texuli/drag/graph`, `@texuli/drag/messages`; in development, on npm as `0.7.0` |
+| Workflows | `@texuli/workflows/editor`, `@texuli/workflows/viewer`, `@texuli/workflows/inspector`, `@texuli/workflows/model`, `@texuli/workflows/layout`, `@texuli/workflows/spec-adapter`; in development, on npm as `0.7.0` |
+| Block documents | `@texuli/pages/editor` (`PageEditor`), `@texuli/pages/reader` (`PageReader`), `@texuli/pages/paged` (`PagedView`), `@texuli/pages/export` (`exportDocument`, `downloadBlob`), `@texuli/pages/collab` (`CollabEditor`, `createCollabSession`; lazy), `@texuli/pages/host` (`createDocumentPlayerHost`, `checkDocumentDraft`); the engine `@texuli/document/*` (`model`, `schema`, `ops`, `markdown`, `paged`, `docx`, `pdf`, `sync`, `collab`); in development, new in `0.7.0` |
 | Dates | `@texuli/date` (`CalendarDate`, Gregorian only) |
 | Class helpers from those packages | `texuli/cx` only |
+
+## New in 0.7.0
+
+These APIs ship in `0.7.0`, the first release of `@texuli/document` and
+`@texuli/pages`; `0.6.0` does not have them. Use them with `^0.7.0`.
+
+| Need | Use |
+| --- | --- |
+| A block document engine (no Svelte, no DOM) | `@texuli/document/model` (the format, `createDocument`), `/schema` (`loadUntrustedDocument`, `documentJsonSchema`), `/ops` (`applyOperations`, `applyDocumentPatch`, `createDocumentHistory`), `/markdown` (`documentFromMarkdown`, `documentToMarkdown`), `/paged` (`paginate`), `/docx` (`writeDocx`), `/pdf` (`writePdf`), `/sync` (`createMemorySyncHub`, `createBroadcastChannelAdapter`), `/collab` (`createDocumentSync`) |
+| Edit, read, page and export documents | `PageEditor` (`@texuli/pages/editor`), `PageReader` (`/reader`), `PagedView` (`/paged`), `exportDocument` and `downloadBlob` (`/export`); keep the document in `$state.raw` and validate untrusted input with `loadUntrustedDocument` first |
+| Collaboration | `createCollabSession` and `CollabEditor` from `@texuli/pages/collab` (import lazily): comments, suggestions, versions, presence; landmark names carry each person (`CollabLabels.landmark`), so two editors share a page |
+| Documents from an agent | A `document` node (spec 0.7.0) validated with `checkDocument: checkDocumentDraft` and painted through `<Player documentHost={createDocumentPlayerHost()}>` (`@texuli/pages/host`); edit it with the `patchDocument` op (`applyEditOps(tree, ops, { patchDocument })` from `@texuli/catalog/edit`), addressed by node `key` |
+| Document commands | `runDocumentCommand` (`@texuli/tools/document`), the `document` command of the `texuli` bin and the read-only `document` MCP tool |
+
+Behavior changes to expect in `0.7.0` are in
+[`../../upgrade/SKILL.md`](../../upgrade/SKILL.md) and `docs/RELEASE.md` in
+the Texuli repository ("0.7.0").
 
 ## New in 0.6.0
 

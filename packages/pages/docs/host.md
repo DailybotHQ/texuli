@@ -5,8 +5,8 @@ write a `document` blueprint node (spec 0.7.0, ADR-011) and the player paints
 it with the read-only reader. The player (L7) cannot import this package
 (L8), so it takes the host through its `documentHost` seam.
 
-> **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`).
+> **Status: in development.** On npm from `0.7.0`, the package's first
+> release (pre-1.0).
 
 ```svelte
 <script lang="ts">
