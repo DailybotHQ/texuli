@@ -187,7 +187,7 @@ add(
   'texuli',
   'chrome',
   'A section of the marketing layout (manifest layout-marketing), placed by the host.',
-  ['MarketingSection']
+  ['MarketingSection', 'MarketingSectionHeader']
 );
 add('texuli', 'chrome', 'Uploading files is host chrome: a blueprint never asks for local files.', [
   'FileUpload',
@@ -204,6 +204,12 @@ add('texuli', 'utility', 'A layout or accessibility helper with no content of it
   'Separator',
   'VisuallyHidden',
 ]);
+add(
+  'texuli',
+  'utility',
+  'A motion level provider with no content of its own; blueprints declare motion as data (spec 0.6.0).',
+  ['MotionProvider']
+);
 add(
   'texuli',
   'utility',
@@ -369,5 +375,7 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // four sheet parts, three mobile shell parts and the matrix RampLegend can't
 // be manifests: overlays and shells are never agent-emittable
 // (src/build/tiers.ts) and chart parts are composed by their families. New
-// content components still get a manifest.
-export const EXCLUSION_CEILING = 208;
+// content components still get a manifest. Raised to 210 under the same
+// decision (PLAN_010): MarketingSectionHeader is marketing chrome placed by
+// the host and MotionProvider a contentless utility.
+export const EXCLUSION_CEILING = 210;
