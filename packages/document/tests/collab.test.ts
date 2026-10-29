@@ -405,7 +405,7 @@ describe('the projection repairs merges deterministically', () => {
         node: 'p2',
         field: 'content',
         origin: { parent: null, side: 'R' },
-        text: '‮evil\u0000',
+        text: '\u202Eevil\u0000',
       },
       {
         ...base,
@@ -523,7 +523,7 @@ describe('comments anchored to item ids', () => {
   it('refuses empty or control-character bodies, unknown blocks and empty ranges', () => {
     const { session } = peer('ada');
     expect(session.addComment({ block: 'p1', from: 0, to: 3 }, '   ')).toBeNull();
-    expect(session.addComment({ block: 'p1', from: 0, to: 3 }, 'bad‮')).toBeNull();
+    expect(session.addComment({ block: 'p1', from: 0, to: 3 }, 'bad\u202E')).toBeNull();
     expect(session.addComment({ block: 'missing' }, 'x')).toBeNull();
     expect(session.addComment({ block: 'p1', from: 3, to: 3 }, 'x')).toBeNull();
     expect(session.reply('p1', 'x')).toBeNull();
@@ -693,7 +693,7 @@ describe('presence', () => {
     const b = peer('lin');
     const evil = hub.adapter();
     a.session.connect(hub.adapter());
-    evil.presence?.send({ replica: 'evil', name: 'x‮', color: 3 } as never);
+    evil.presence?.send({ replica: 'evil', name: 'x\u202E', color: 3 } as never);
     evil.presence?.send({ replica: 'evil', name: 'Eve', color: 99 } as never);
     hub.flush();
     expect(a.session.collaborators()).toEqual([]);

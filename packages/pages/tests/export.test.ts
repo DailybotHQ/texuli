@@ -43,7 +43,7 @@ describe('export', () => {
     expect(exportFileName('CON', 'pdf')).toBe('CON-document.pdf');
     expect(exportFileName('Título 日本', 'pdf')).toBe('Título-日本.pdf');
     expect(exportFileName('x'.repeat(500), 'pdf')).toHaveLength(84);
-    expect(exportFileName('a‮exe.pdf', 'docx')).toBe('a-exe-pdf.docx');
+    expect(exportFileName('a\u202Eexe.pdf', 'docx')).toBe('a-exe-pdf.docx');
   });
 
   it('downloads through a blob URL it creates and revokes, and nothing else', async () => {
