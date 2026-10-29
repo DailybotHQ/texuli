@@ -74,6 +74,10 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       { href: '/drag-page/', label: 'Drag and drop' },
       { href: '/motion-page/', label: 'Motion' },
       { href: '/documents-page/', label: 'Documents' },
+      // The 0.8.0 feature pages (in development): later pages (sheets,
+      // dashboards, multi-target output) join here, after Canvas.
+      { href: '/forms-page/', label: 'Forms' },
+      { href: '/canvas-page/', label: 'Canvas' },
       { href: '/workflows-page/', label: 'Workflow editor' },
       { href: '/workflows-page/json/', label: 'JSON live preview' },
     ],

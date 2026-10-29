@@ -78,14 +78,26 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/motion-page/',
     reason:
-      'PLAN_010 T-site-060: nine lazy motion islands (client:visible); only the settings panel is near the first screen, so JS at the ready signal is 57.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import lazily (the player loaders, the Board, the overlays): 72 stylesheets. The HTML carries the server-rendered spring plot, the tokens tables, the blueprint JSON and the API contract. Measured 2026-10-29: 154.8 KB page, 26.3 KB gzip of HTML (+4% headroom). Follow-up shared with /slides-page/: ship the player CSS as one lazily loaded stylesheet.',
-    budget: { pageGzipKb: 162, htmlGzipKb: 28 },
+      'PLAN_010 T-site-060: nine lazy motion islands (client:visible); only the settings panel is near the first screen, so JS at the ready signal is 57.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import lazily (the player loaders, the Board, the overlays): 72 stylesheets. The HTML carries the server-rendered spring plot, the tokens tables, the blueprint JSON and the API contract. Measured 2026-10-29: 154.8 KB page, 26.3 KB gzip of HTML (+4% headroom). Follow-up shared with /slides-page/: ship the player CSS as one lazily loaded stylesheet. PLAN_010 T-site-features (every animation): four more lazy islands (every preset, every moving component, the spring lab, the deck on the slides stage) and the build-time inventory (every export, custom property, adopter and slide transition) in the HTML; the slides stage CSS joins the hoisted stylesheets. Measured 2026-10-29: 188.9 KB page, 59.2 KB JS at the ready signal, 230.1 KB raw and 35.6 KB gzip of HTML (+4% headroom; a proposal for the owner).',
+    budget: { pageGzipKb: 197, htmlGzipKb: 38, htmlRawKb: 240 },
   },
   {
     route: '/documents-page/',
     reason:
       'PLAN_010 T-site-070: three lazy document islands (client:visible) that import the editor, the reader, the paged view, the collaboration layer, the writers and the player only after they hydrate, so JS at the ready signal is 57.6 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk those islands can import lazily (pages, editor, player loaders, charts): 69.5 KB of CSS, the same follow-up as /motion-page/ and /slides-page/. Measured 2026-10-29: 147.5 KB page (+4% headroom).',
     budget: { pageGzipKb: 154 },
+  },
+  {
+    route: '/forms-page/',
+    reason:
+      'PLAN_010 T-site-features: seven lazy form islands (client:visible); the player loads only in the agent demo, after hydration, so JS at the ready signal is 59.2 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (SchemaForm and every texuli control it paints, the player loaders), the same follow-up as /motion-page/. The HTML carries the field-type, rule and keyboard tables and the agent blueprint JSON. Measured 2026-10-29: 161.4 KB page, 27 KB gzip of HTML (+4% headroom; a proposal for the owner).',
+    budget: { pageGzipKb: 168, htmlGzipKb: 29 },
+  },
+  {
+    route: '/canvas-page/',
+    reason:
+      'PLAN_010 T-site-features: three lazy canvas islands (client:visible) that import the editor, the sync layer and the player only after they hydrate, so JS at the ready signal is 59.2 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk those islands can import (the canvas editor, the player loaders), the same follow-up as /motion-page/. Measured 2026-10-29: 147.1 KB page, 20.7 KB gzip of HTML (+4% headroom; a proposal for the owner).',
+    budget: { pageGzipKb: 153 },
   },
   {
     route: '/live-generation/',
@@ -144,8 +156,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/web-and-native/',
     reason:
-      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom). PLAN_010: the layer diagrams gained @texuli/document and @texuli/pages and the nav the motion link, measured 100.9 KB page, limit 105 (+4% headroom).',
-    budget: { htmlGzipKb: 26, pageGzipKb: 105 },
+      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom). PLAN_010: the layer diagrams gained @texuli/document and @texuli/pages and the nav the motion link, measured 100.9 KB page, limit 105 (+4% headroom). PLAN_010 wave 6 (@texuli/sheets in the layer diagrams, the canvas and forms nav links): measured 26.4 KB HTML gzip, limit 27.5 (+4% headroom).',
+    budget: { htmlGzipKb: 27.5, pageGzipKb: 105 },
   },
   {
     route: '/gallery-themes/',
@@ -156,14 +168,14 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/theme-switcher/',
     reason:
-      'The first themes are in the HTML; the full catalog is fetched as /theme-catalog.json. The PLAN_006 gallery audit (T-83) enriched the cards: measured 103.2 KB page, limit 108. PLAN_010 (motion and the API contract in the shared components): measured 64.8 KB JS, limit 68 (+4% headroom).',
-    budget: { jsGzipKb: 68, pageGzipKb: 108 },
+      'The first themes are in the HTML; the full catalog is fetched as /theme-catalog.json. The PLAN_006 gallery audit (T-83) enriched the cards: measured 103.2 KB page, limit 108. PLAN_010 (motion and the API contract in the shared components): measured 64.8 KB JS, limit 68 (+4% headroom). PLAN_010 wave 6 (component labels through the i18n message catalog): measured 109.4 KB page, limit 114 (+4% headroom).',
+    budget: { jsGzipKb: 68, pageGzipKb: 114 },
   },
   {
     route: '/playground/',
     reason:
-      'The playground stage mounts on open; the PLAN_006 studio polish (T-82) extended the presets: measured 100.6 KB page / 69.6 KB JS, limits 104 / 72. PLAN_009 (handler composition and ref props in the shared components) measured 104.1 KB page in CI on Linux, limit 109 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 74.4 KB JS, limit 78 (+4% headroom).',
-    budget: { pageGzipKb: 109, jsGzipKb: 78 },
+      'The playground stage mounts on open; the PLAN_006 studio polish (T-82) extended the presets: measured 100.6 KB page / 69.6 KB JS, limits 104 / 72. PLAN_009 (handler composition and ref props in the shared components) measured 104.1 KB page in CI on Linux, limit 109 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 74.4 KB JS, limit 78 (+4% headroom). PLAN_010 wave 6 (component labels through the i18n message catalog): measured 109.3 KB page, limit 114 (+4% headroom).',
+    budget: { pageGzipKb: 114, jsGzipKb: 78 },
   },
   {
     route: '/search/',
@@ -174,8 +186,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/color-explorer/',
     reason:
-      'The theme list and one theme payload are inline; other payloads load as /theme-data/<id>.json on selection. Measured 291.5 KB raw / 30.8 KB gzip before the docs sidebar; the PLAN_006 studio polish (T-82) enriched the controls: 311.2 KB raw / 34.1 KB gzip of HTML, 114.8 KB page / 64.8 KB JS, limits 316 / 36 / 120 / 68. PLAN_010 (motion and the API contract in the shared components): measured 69.4 KB JS, limit 73 (+4% headroom).',
-    budget: { htmlRawKb: 316, htmlGzipKb: 36, pageGzipKb: 120, jsGzipKb: 73 },
+      'The theme list and one theme payload are inline; other payloads load as /theme-data/<id>.json on selection. Measured 291.5 KB raw / 30.8 KB gzip before the docs sidebar; the PLAN_006 studio polish (T-82) enriched the controls: 311.2 KB raw / 34.1 KB gzip of HTML, 114.8 KB page / 64.8 KB JS, limits 316 / 36 / 120 / 68. PLAN_010 (motion and the API contract in the shared components): measured 69.4 KB JS, limit 73 (+4% headroom). PLAN_010 wave 6 (component labels through the i18n message catalog): measured 120.9 KB page, limit 126 (+4% headroom).',
+    budget: { htmlRawKb: 316, htmlGzipKb: 36, pageGzipKb: 126, jsGzipKb: 73 },
   },
   {
     route: '/gallery-components/',

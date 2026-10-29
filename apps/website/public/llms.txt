@@ -45,6 +45,8 @@ Every styled component with live examples; each page documents props, behavior a
 - [Drag and drop](https://texuli.com/drag-page/)
 - [Motion](https://texuli.com/motion-page/)
 - [Documents](https://texuli.com/documents-page/)
+- [Forms](https://texuli.com/forms-page/)
+- [Canvas](https://texuli.com/canvas-page/)
 - [Workflow editor](https://texuli.com/workflows-page/)
 - [JSON live preview](https://texuli.com/workflows-page/json/)
 - [Blocks](https://texuli.com/blocks-page/)

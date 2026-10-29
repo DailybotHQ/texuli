@@ -1,4 +1,10 @@
 ---
+import {
+  BLOCK_FAMILIES,
+  CALLOUT_TONES,
+  DOCUMENT_BLOCK_TYPES,
+  PAGE_SIZES,
+} from '@texuli/document/model';
 import AgentDocumentDemo from '../../components/documents-site/AgentDocumentDemo.svelte';
 import {
   DOCUMENT_BLUEPRINT_JSON,
@@ -7,6 +13,12 @@ import {
 } from '../../components/documents-site/blueprint.ts';
 import CollabDemo from '../../components/documents-site/CollabDemo.svelte';
 import DocumentWorkbench from '../../components/documents-site/DocumentWorkbench.svelte';
+import {
+  BLOCK_NOTES,
+  EMBED_STATUSES,
+  SLASH_GROUP_LABELS,
+  slashInventory,
+} from '../../components/documents-site/inventory.ts';
 import {
   DOCUMENTS_DOCS,
   DOCUMENTS_KEYS,
@@ -32,6 +44,17 @@ const section = (id: string) => {
   if (!entry) throw new Error(`Unknown documents section ${id}`);
   return entry;
 };
+
+const SLASH = await slashInventory();
+const SLASH_GROUPS = (Object.keys(SLASH_GROUP_LABELS) as (keyof typeof SLASH_GROUP_LABELS)[])
+  .map((group) => ({
+    group,
+    label: SLASH_GROUP_LABELS[group],
+    items: SLASH.filter((item) => item.group === group),
+  }))
+  .filter((entry) => entry.items.length > 0);
+const insertedBy = (type: string) =>
+  SLASH.filter((item) => item.creates === type).map((item) => item.label);
 
 const editorSnippet = `import { loadUntrustedDocument } from '@texuli/document/schema';
 import { PageEditor } from '@texuli/pages/editor';
@@ -97,7 +120,88 @@ import { Player } from '@texuli/player';
       <DocumentWorkbench client:visible />
       <p class="demo__note">
         Editing in the paged view is planned; edit in the editor and use Pages as the print preview.
-        Sheet and canvas embeds stay typed references until their packages ship.
+        Sheet and canvas embeds are typed references today; painting them inside a document is
+        planned.
+      </p>
+    </section>
+
+    <section class="demo" id="blocks" aria-labelledby="blocks-title">
+      <h2 id="blocks-title">{section('blocks').title}</h2>
+      <p>{section('blocks').summary}</p>
+      <div class="table-wrap" role="region" aria-label="Block types" tabindex="0">
+        <table class="keys" data-documents-block-types="">
+          <caption>{DOCUMENT_BLOCK_TYPES.length} block types</caption>
+          <thead>
+            <tr>
+              <th scope="col">Type</th>
+              <th scope="col">What it holds</th>
+              <th scope="col">Slash items that insert it</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              DOCUMENT_BLOCK_TYPES.map((type) => (
+                <tr data-documents-block-type={type}>
+                  <th scope="row">
+                    <code>{type}</code>
+                  </th>
+                  <td>{BLOCK_NOTES[type]}</td>
+                  <td>
+                    {insertedBy(type).length > 0
+                      ? `${insertedBy(type).length}: ${insertedBy(type).slice(0, 6).join(', ')}${insertedBy(type).length > 6 ? '…' : ''}`
+                      : 'From a file, an import or an agent'}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <h3>The slash menu: {SLASH.length} items</h3>
+      <ul class="slash" data-documents-slash="">
+        {
+          SLASH_GROUPS.map((entry) => (
+            <li class="slash__group">
+              <h4>
+                {entry.label} ({entry.items.length})
+              </h4>
+              <ul class="slash__items">
+                {entry.items.map((item) => (
+                  <li>{item.label}</li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="table-wrap" role="region" aria-label="Embed kinds" tabindex="0">
+        <table class="keys" data-documents-embeds="">
+          <caption>Embeds</caption>
+          <thead>
+            <tr>
+              <th scope="col">Kind</th>
+              <th scope="col">What it paints today</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              EMBED_STATUSES.map((row) => (
+                <tr data-documents-embed={row.kind}>
+                  <th scope="row">
+                    <code>{row.kind}</code>
+                  </th>
+                  <td>{row.paints}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="demo__note">
+        Callout tones: {CALLOUT_TONES.join(', ')}. Content block families:
+        {BLOCK_FAMILIES.join(', ')}. Page sizes for the paged view and PDF: {PAGE_SIZES.join(', ')}.
+        The canvas has its own page: <a href="/canvas-page/">Canvas</a>; schema-driven forms are on
+        <a href="/forms-page/">Forms</a>.
       </p>
     </section>
 
@@ -337,6 +441,42 @@ import { Player } from '@texuli/player';
     font-family: var(--tx-font-mono, monospace);
     font-size: 0.85em;
     overflow-wrap: anywhere;
+  }
+  .slash {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .slash__group {
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.75rem;
+    background: var(--tx-surface, Canvas);
+  }
+  .slash__group h4 {
+    margin: 0 0 0.35rem;
+    font-size: 0.9375rem;
+  }
+  .slash__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+  }
+  .slash__items li {
+    padding: 0.05rem 0.45rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 999px;
+  }
+  .table-wrap:focus-visible {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
   }
   .visually-hidden {
     position: absolute;

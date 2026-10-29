@@ -23,6 +23,7 @@
       "player-streaming.spec.ts",
       "site-builder.spec.ts",
       "site-docs-nav.spec.ts",
+      "site-forms.spec.ts",
       "site-perf.spec.ts",
       "site-seo.spec.ts",
       "toaster-viewport.spec.ts"
@@ -45,6 +46,7 @@
       "data.spec.ts",
       "slides-print.spec.ts",
       "site-agent-chat.spec.ts",
+      "site-canvas.spec.ts",
       "site-color-explorer.spec.ts",
       "site-foundation.spec.ts",
       "site-theme-studio.spec.ts",

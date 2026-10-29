@@ -9,10 +9,11 @@ middleware and the analytics proxy.
 
 ## What exists today
 
-A multi-page static site: 57 `.astro` files under `src/pages/` — the landing,
+A multi-page static site: 65 `.astro` files under `src/pages/` — the landing,
 the native landing and the architecture page,
 guides, foundation, component pages, the primitives, charts, media, blocks
-and agents pages, component and theme galleries, live examples, the
+and agents pages, the slides, editor, drag, motion, documents, workflows,
+forms and canvas showcases, live generation, component and theme galleries, live examples, the
 playground, the theme studio and switcher, the color explorer, search, an
 agent-chat demo, the builder, showcase, brand, skill and changelog pages,
 and the evidence and perf reports. Each area has a design doc in
@@ -52,7 +53,7 @@ islands (`client:load`, `client:visible`, …).
 | Search | [site-search.md](docs/site-search.md) |
 | Guides | [site-guides.md](docs/site-guides.md) |
 | Component and primitive pages | [site-component-pages.md](docs/site-component-pages.md) · [site-live-components.md](docs/site-live-components.md) · [site-primitives-page.md](docs/site-primitives-page.md) · [site-live-primitives.md](docs/site-live-primitives.md) · [site-evidence.md](docs/site-evidence.md) |
-| Area pages | [site-blocks-page.md](docs/site-blocks-page.md) · [site-charts-page.md](docs/site-charts-page.md) · [site-media-page.md](docs/site-media-page.md) · [site-slides-page.md](docs/site-slides-page.md) · [site-editor.md](docs/site-editor.md) |
+| Area pages | [site-blocks-page.md](docs/site-blocks-page.md) · [site-charts-page.md](docs/site-charts-page.md) · [site-media-page.md](docs/site-media-page.md) · [site-slides-page.md](docs/site-slides-page.md) · [site-editor.md](docs/site-editor.md) · [site-motion.md](docs/site-motion.md) · [site-documents.md](docs/site-documents.md) · [site-forms.md](docs/site-forms.md) · [site-canvas.md](docs/site-canvas.md) |
 | Galleries, examples, showcase | [site-gallery-components.md](docs/site-gallery-components.md) · [site-gallery-themes.md](docs/site-gallery-themes.md) · [site-examples.md](docs/site-examples.md) · [site-showcase.md](docs/site-showcase.md) |
 | Themes | [site-theme-switcher.md](docs/site-theme-switcher.md) · [site-theme-studio.md](docs/site-theme-studio.md) · [site-theme-swatches.md](docs/site-theme-swatches.md) · [site-color-explorer.md](docs/site-color-explorer.md) |
 | Theme sweep tooling | [site-theme-sweep.md](docs/site-theme-sweep.md) |

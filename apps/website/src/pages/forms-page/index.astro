@@ -1,0 +1,268 @@
+---
+/**
+ * /forms-page/ — schema-driven forms (@texuli/forms, ADR-015, in
+ * development, coming in 0.8.0): every field type, every named format,
+ * every closed rule with announced errors, multi-step flows with
+ * conditional logic, drafts and autosave, fields backed by host data
+ * sources, and forms as agent data painted by the player. Every demo is a
+ * lazy island (client:visible); the tables (field types, rules, keyboard)
+ * are enumerated from the package's own constants at build time.
+ */
+import FeaturePage from '../../components/feature-site/FeaturePage.astro';
+import AgentFormDemo from '../../components/forms-site/AgentFormDemo.svelte';
+import { AGENT_FORM_JSON, HOSTILE_FIELD_JSON } from '../../components/forms-site/blueprint.ts';
+import DraftsDemo from '../../components/forms-site/DraftsDemo.svelte';
+import FieldGallery from '../../components/forms-site/FieldGallery.svelte';
+import FlowDemo from '../../components/forms-site/FlowDemo.svelte';
+import FormatLab from '../../components/forms-site/FormatLab.svelte';
+import {
+  FIELD_VALUE_TYPES,
+  FORMS_A11Y,
+  FORMS_DOCS,
+  FORMS_KEYS,
+  FORMS_PIECES,
+  FORMS_RELEASE,
+  FORMS_RULES,
+  FORMS_SECTIONS,
+} from '../../components/forms-site/page.ts';
+import SourceDemo from '../../components/forms-site/SourceDemo.svelte';
+import { FIELD_ROWS, RULE_COVERAGE } from '../../components/forms-site/schemas.ts';
+import ValidationDemo from '../../components/forms-site/ValidationDemo.svelte';
+import GuideCode from '../../components/guides/GuideCode.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const section = (id: string) => {
+  const entry = FORMS_SECTIONS.find((candidate) => candidate.id === id);
+  if (!entry) throw new Error(`Unknown forms section ${id}`);
+  return entry;
+};
+
+const schemaSnippet = `import { SchemaForm } from '@texuli/forms';
+import { validateFormSchema } from '@texuli/forms/model';
+
+const result = validateFormSchema(schema); // untrusted tier by default
+
+{#if result.ok}
+  <SchemaForm
+    form={result.form}
+    validators={{ 'handle-free': checkHandle }}
+    drafts={{ storage: createWebStorageDrafts(localStorage), key: 'signup' }}
+    onSubmit={async ({ values, files }) => save(values, files)}
+  />
+{/if}`;
+
+const hostSnippet = `import { createFormPlayerHost } from '@texuli/forms/host';
+import { Player } from '@texuli/player';
+
+const formHost = createFormPlayerHost({ validators: { 'handle-free': checkHandle } });
+
+<Player {blueprint} tier="untrusted" {formHost} onAction={(intent) => 'confirmed'} />`;
+---
+
+<BaseLayout
+  title="Forms"
+  description="Texuli schema-driven forms (@texuli/forms, in development, coming in 0.8.0): every field type, named formats, validation with announced errors, multi-step flows, conditional logic, drafts and autosave, data-source fields and agent-generated forms."
+>
+  <FeaturePage
+    name="forms"
+    eyebrow={`@texuli/forms · in development · coming in ${FORMS_RELEASE}`}
+    title="Forms as data, painted accessibly"
+    pieces={FORMS_PIECES}
+    piecesLabel="The pieces of schema-driven forms"
+    sections={FORMS_SECTIONS}
+  >
+    <Fragment slot="lead">
+      <p>
+        A closed form schema becomes an accessible form: typed fields in sections or steps,
+        conditions over earlier answers, named formats, host validators and cross-field rules, with
+        announced errors, drafts and autosave. Agents send the same schema as data. Everything below is
+        live. <code>@texuli/forms</code> is in development and coming in <code>{FORMS_RELEASE}</code>;
+        it is not published to npm yet. For hand-written forms with <code>Field</code> and
+        <code>Form</code>, read the <a href="/guides/forms/">forms guide</a>.
+      </p>
+    </Fragment>
+
+    <section class="fx-section" id="fields" aria-labelledby="fields-title">
+      <h2 id="fields-title">{section('fields').title}</h2>
+      <p>{section('fields').summary}</p>
+      <FieldGallery client:visible />
+      <div class="fx-table-wrap" role="region" aria-label="Field types" tabindex="0">
+        <table class="fx-table" data-forms-types="">
+          <caption>{FIELD_ROWS.length} field types</caption>
+          <thead>
+            <tr>
+              <th scope="col">Type</th>
+              <th scope="col">Painted by</th>
+              <th scope="col">Value</th>
+              <th scope="col">Sample label</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              FIELD_ROWS.map((row) => (
+                <tr data-forms-type={row.type}>
+                  <th scope="row">
+                    <code>{row.type}</code>
+                  </th>
+                  <td>{row.control}</td>
+                  <td>{FIELD_VALUE_TYPES[row.type]}</td>
+                  <td>{row.field.label}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="fx-section" id="formats" aria-labelledby="formats-title">
+      <h2 id="formats-title">{section('formats').title}</h2>
+      <p>{section('formats').summary}</p>
+      <FormatLab client:visible />
+    </section>
+
+    <section class="fx-section" id="validation" aria-labelledby="validation-title">
+      <h2 id="validation-title">{section('validation').title}</h2>
+      <p>{section('validation').summary}</p>
+      <ValidationDemo client:visible />
+      <div class="fx-table-wrap" role="region" aria-label="Closed rules" tabindex="0">
+        <table class="fx-table" data-forms-rules="">
+          <caption>{RULE_COVERAGE.length} closed rules, and where the form above shows each</caption>
+          <thead>
+            <tr>
+              <th scope="col">Rule</th>
+              <th scope="col">In this form</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              RULE_COVERAGE.map((row) => (
+                <tr data-forms-rule={row.rule}>
+                  <th scope="row">
+                    <code>{row.rule}</code>
+                  </th>
+                  <td>{row.where}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="fx-note">
+        Plus a host validator by name (the handle check, asynchronous and abortable) and cross-field
+        rules as expressions (the trial must end after it starts). A field’s <code>messages</code>
+        override any rule’s text.
+      </p>
+    </section>
+
+    <section class="fx-section" id="flow" aria-labelledby="flow-title">
+      <h2 id="flow-title">{section('flow').title}</h2>
+      <p>{section('flow').summary}</p>
+      <FlowDemo client:visible />
+    </section>
+
+    <section class="fx-section" id="drafts" aria-labelledby="drafts-title">
+      <h2 id="drafts-title">{section('drafts').title}</h2>
+      <p>{section('drafts').summary}</p>
+      <DraftsDemo client:visible />
+    </section>
+
+    <section class="fx-section" id="sources" aria-labelledby="sources-title">
+      <h2 id="sources-title">{section('sources').title}</h2>
+      <p>{section('sources').summary}</p>
+      <SourceDemo client:visible />
+      <p class="fx-note">
+        The form names nothing of the source: the host reads it and hands the form its choices and a
+        validator. <code>@texuli/core/data-source</code> is in development and coming in
+        <code>{FORMS_RELEASE}</code> too.
+      </p>
+    </section>
+
+    <section class="fx-section" id="agents" aria-labelledby="agents-title">
+      <h2 id="agents-title">{section('agents').title}</h2>
+      <p>{section('agents').summary}</p>
+      <div class="fx-pair fx-pair--code">
+        <div class="fx-panel">
+          <h3>The blueprint the agent wrote</h3>
+          <p class="fx-note">
+            Spec <code>0.8.0</code> adds the <code>schema-form</code> catalog id; it is in development
+            and coming in <code>{FORMS_RELEASE}</code>. Conditions travel as expression trees.
+          </p>
+          <GuideCode code={AGENT_FORM_JSON} label="The schema-form blueprint (JSON)" lang="text" />
+          <h3>The hostile field</h3>
+          <GuideCode code={HOSTILE_FIELD_JSON} label="A field with an agent pattern" lang="text" />
+        </div>
+        <div class="fx-panel">
+          <h3>Painted by the player</h3>
+          <AgentFormDemo client:visible />
+        </div>
+      </div>
+    </section>
+
+    <section class="fx-section" id="keyboard" aria-labelledby="keyboard-title">
+      <h2 id="keyboard-title">{section('keyboard').title}</h2>
+      <p>{section('keyboard').summary}</p>
+      <div class="fx-table-wrap" role="region" aria-label="Keyboard" tabindex="0">
+        <table class="fx-table">
+          <caption>Keys in a schema form</caption>
+          <thead>
+            <tr>
+              <th scope="col">Where</th>
+              <th scope="col">Keys</th>
+              <th scope="col">Effect</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              FORMS_KEYS.map((row) => (
+                <tr>
+                  <td>{row.where}</td>
+                  <td>
+                    <kbd>{row.keys}</kbd>
+                  </td>
+                  <td>{row.effect}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <h3>What a screen reader hears</h3>
+      <ul class="fx-list">{FORMS_A11Y.map((line) => <li>{line}</li>)}</ul>
+    </section>
+
+    <section class="fx-section" id="safety" aria-labelledby="safety-title">
+      <h2 id="safety-title">{section('safety').title}</h2>
+      <p>{section('safety').summary}</p>
+      <ul class="fx-rules">
+        {
+          FORMS_RULES.map((rule) => (
+            <li>
+              <h3>{rule.title}</h3>
+              <p>{rule.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <h3>In code</h3>
+      <div class="fx-pair">
+        <GuideCode code={schemaSnippet} label="Validate, then paint" lang="ts" />
+        <GuideCode code={hostSnippet} label="Agent forms in the player" lang="ts" />
+      </div>
+    </section>
+
+    <section class="fx-section" id="package-docs" aria-labelledby="package-docs-title">
+      <h2 id="package-docs-title">Package docs</h2>
+      <p>The site does not render the package docs yet. Read them in the repository:</p>
+      <ul class="fx-list">
+        {
+          FORMS_DOCS.map((doc) => (
+            <li>
+              {doc.label}: <code>{doc.path}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </FeaturePage>
+</BaseLayout>

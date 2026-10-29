@@ -160,6 +160,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         role: 'Content blocks (text, code, data, diagram, embed, interactive, map, media, structure): closed vocabulary, untrusted guard, formula AST',
         dependsOn: ['core', 'tokens', 'texuli', 'charts', 'data', 'media'],
       },
+      {
+        name: '@texuli/sheets',
+        role: 'In development (unreleased; first release planned for 0.8.0): spreadsheets: the formula language (a linear-time parser into the @texuli/core/expression AST, 54 documented functions, criteria, closed TEXT formats, reference rewriting; formula, framework-free); the sheet format, its untrusted validator, the dependency graph with incremental and bounded recalculation and cycle reports, and the workbook engine (model, framework-free); CSV import and export that neutralizes formula injection (csv); SheetView over the data grid editing (view); the sheet half of a player host (host)',
+        dependsOn: ['core', 'date', 'data', 'texuli'],
+      },
     ],
   },
   {

@@ -42,6 +42,12 @@ export const DOCUMENTS_SECTIONS: readonly DocumentsSection[] = [
       'A live editor on a fictional team handbook. Type / in an empty paragraph for the block menu, drag a handle or press Alt+Up and Alt+Down to move a block, resize the columns, open the nested pages and watch the embedded chart paint. Switch the view to read it, or to lay it out on A4 pages with a header, a footer and page numbers. Export writes the same document as Markdown, DOCX or PDF, in your browser.',
   },
   {
+    id: 'blocks',
+    title: 'Every block, every slash item, every embed',
+    summary:
+      'The editor’s whole vocabulary, read from the packages when this page was built: the thirteen block types of the document format, every item the slash menu offers (the content blocks of @texuli/blocks included) with the block it inserts, and what each embed kind paints today.',
+  },
+  {
     id: 'collab',
     title: 'Two editors, one document',
     summary:

@@ -1,0 +1,320 @@
+---
+import { CANVAS_TOOLS, TOOL_KEYS, ZOOM_LIMITS } from '@texuli/canvas/editor';
+import {
+  CANVAS_ANCHORS,
+  CANVAS_CAPS,
+  CANVAS_COLORS,
+  CANVAS_DASHES,
+  CANVAS_FONT_SIZES,
+  CANVAS_LIMITS,
+  CANVAS_ROUTINGS,
+  SHAPE_TYPES,
+} from '@texuli/canvas/model';
+/**
+ * /canvas-page/ — the infinite canvas (@texuli/canvas, in development,
+ * coming in 0.8.0): the editor on a board with every shape type, the
+ * closed vocabulary read from the package, the keyboard model, two local
+ * peers on one CRDT, export, and canvases as agent data painted by the
+ * player. Every demo is a lazy island (client:visible) that imports the
+ * editor, the sync layer or the player only after it hydrates.
+ */
+import AgentCanvasDemo from '../../components/canvas-site/AgentCanvasDemo.svelte';
+import { AGENT_CANVAS_JSON, HOSTILE_STICKY_JSON } from '../../components/canvas-site/blueprint.ts';
+import { SHAPE_NOTES } from '../../components/canvas-site/board.ts';
+import CanvasWorkbench from '../../components/canvas-site/CanvasWorkbench.svelte';
+import CollabCanvas from '../../components/canvas-site/CollabCanvas.svelte';
+import {
+  CANVAS_DOCS,
+  CANVAS_KEYS,
+  CANVAS_PIECES,
+  CANVAS_RELEASE,
+  CANVAS_RULES,
+  CANVAS_SECTIONS,
+  TOOL_NAMES,
+} from '../../components/canvas-site/page.ts';
+import FeaturePage from '../../components/feature-site/FeaturePage.astro';
+import GuideCode from '../../components/guides/GuideCode.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const section = (id: string) => {
+  const entry = CANVAS_SECTIONS.find((candidate) => candidate.id === id);
+  if (!entry) throw new Error(`Unknown canvas section ${id}`);
+  return entry;
+};
+
+const keyOf = (tool: string) =>
+  Object.entries(TOOL_KEYS)
+    .find(([, value]) => value === tool)?.[0]
+    ?.toUpperCase() ?? '—';
+
+const vocabulary = [
+  { name: 'Connector routes', values: CANVAS_ROUTINGS },
+  { name: 'Connector caps', values: CANVAS_CAPS },
+  { name: 'Anchors', values: CANVAS_ANCHORS },
+  { name: 'Colors (theme tokens)', values: CANVAS_COLORS },
+  { name: 'Dashes', values: CANVAS_DASHES },
+  { name: 'Text sizes', values: CANVAS_FONT_SIZES },
+];
+
+const limits = [
+  { name: 'Shapes, nested ones included', value: CANVAS_LIMITS.shapes.toLocaleString('en') },
+  { name: 'Connectors', value: CANVAS_LIMITS.connectors.toLocaleString('en') },
+  { name: 'Frames and groups nested', value: String(CANVAS_LIMITS.depth) },
+  { name: 'Points in one line or path', value: CANVAS_LIMITS.pathPoints.toLocaleString('en') },
+  { name: 'Undo steps kept', value: String(CANVAS_LIMITS.history) },
+  { name: 'Zoom', value: `${ZOOM_LIMITS.min * 100}% to ${ZOOM_LIMITS.max * 100}%` },
+];
+
+const editorSnippet = `import { CanvasEditor } from '@texuli/canvas/editor';
+import { loadUntrustedCanvas } from '@texuli/canvas/model';
+
+const loaded = loadUntrustedCanvas(json); // a file, a link or an agent: validated first
+let canvas = $state.raw(loaded.ok ? loaded.canvas : null);
+
+<CanvasEditor bind:canvas resolveImage={(ref) => \`https://cdn.example.com/\${ref}.png\`} />`;
+
+const syncSnippet = `import { createMemorySyncHub } from '@texuli/document/sync';
+import { createCanvasSync } from '@texuli/canvas/sync';
+
+const hub = createMemorySyncHub(); // or your WebSocket or BroadcastChannel adapter
+const ada = createCanvasSync({ replica: 'ada-1', canvas });
+ada.connect(hub.adapter(), { name: 'Ada', color: 1 });
+
+<CanvasEditor sync={ada} />`;
+---
+
+<BaseLayout
+  title="Canvas"
+  description="The Texuli infinite canvas (@texuli/canvas, in development, coming in 0.8.0): shapes, text, sticky notes, frames, connectors, selection, snapping, zoom and pan, a full keyboard model, collaboration between two local peers, SVG and PNG export, and canvases as agent data."
+>
+  <FeaturePage
+    name="canvas"
+    eyebrow={`@texuli/canvas · in development · coming in ${CANVAS_RELEASE}`}
+    title="An infinite canvas you can use from the keyboard"
+    pieces={CANVAS_PIECES}
+    piecesLabel="The pieces of the canvas package"
+    sections={CANVAS_SECTIONS}
+  >
+    <Fragment slot="lead">
+      <p>
+        Shapes, text, sticky notes, images, frames and groups, connectors that route straight, elbow
+        or curved, snapping and guides, alignment, z-order and undo, all as validated data; an
+        accessible editor and viewer; collaboration on the same CRDT as the documents; SVG and PNG
+        export. <code>@texuli/canvas</code> is in development and coming in
+        <code>{CANVAS_RELEASE}</code>; it is not published to npm yet.
+      </p>
+    </Fragment>
+
+    <section class="fx-section" id="editor" aria-labelledby="editor-title">
+      <h2 id="editor-title">{section('editor').title}</h2>
+      <p>{section('editor').summary}</p>
+      <CanvasWorkbench client:visible />
+      <p class="fx-note">
+        The image is a host reference with no resolver on this page, so it paints its alt text. The
+        editor does not paint other people’s cursors yet; presence is listed beside the shared canvas
+        below.
+      </p>
+    </section>
+
+    <section class="fx-section" id="vocabulary" aria-labelledby="vocabulary-title">
+      <h2 id="vocabulary-title">{section('vocabulary').title}</h2>
+      <p>{section('vocabulary').summary}</p>
+      <div class="fx-pair">
+        <div class="fx-table-wrap" role="region" aria-label="Shape types" tabindex="0">
+          <table class="fx-table" data-canvas-shapes="">
+            <caption>{SHAPE_TYPES.length} shape types</caption>
+            <thead>
+              <tr>
+                <th scope="col">Type</th>
+                <th scope="col">What it is</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                SHAPE_TYPES.map((type) => (
+                  <tr data-canvas-shape-type={type}>
+                    <th scope="row">
+                      <code>{type}</code>
+                    </th>
+                    <td>{SHAPE_NOTES[type]}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fx-table-wrap" role="region" aria-label="Tools" tabindex="0">
+          <table class="fx-table" data-canvas-tools="">
+            <caption>{CANVAS_TOOLS.length} tools, each one key</caption>
+            <thead>
+              <tr>
+                <th scope="col">Tool</th>
+                <th scope="col">Key</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                CANVAS_TOOLS.map((tool) => (
+                  <tr data-canvas-tool={tool}>
+                    <th scope="row">{TOOL_NAMES[tool]}</th>
+                    <td>
+                      <kbd>{keyOf(tool)}</kbd>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="fx-pair">
+        <div class="fx-table-wrap" role="region" aria-label="Styles and routes" tabindex="0">
+          <table class="fx-table">
+            <caption>Styles and connectors</caption>
+            <tbody>
+              {
+                vocabulary.map((row) => (
+                  <tr>
+                    <th scope="row">{row.name}</th>
+                    <td>
+                      {row.values.map((value, index) => (
+                        <>
+                          {index > 0 ? ', ' : ''}
+                          <code>{value}</code>
+                        </>
+                      ))}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fx-table-wrap" role="region" aria-label="Limits" tabindex="0">
+          <table class="fx-table">
+            <caption>Limits the validator holds</caption>
+            <tbody>
+              {
+                limits.map((row) => (
+                  <tr>
+                    <th scope="row">{row.name}</th>
+                    <td>{row.value}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="fx-section" id="keyboard" aria-labelledby="keyboard-title">
+      <h2 id="keyboard-title">{section('keyboard').title}</h2>
+      <p>{section('keyboard').summary}</p>
+      <div class="fx-table-wrap" role="region" aria-label="Canvas keys" tabindex="0">
+        <table class="fx-table">
+          <caption>Keys on the canvas</caption>
+          <thead>
+            <tr>
+              <th scope="col">Keys</th>
+              <th scope="col">On a shape</th>
+              <th scope="col">On the empty surface</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              CANVAS_KEYS.map((row) => (
+                <tr>
+                  <td>
+                    <kbd>{row.keys}</kbd>
+                  </td>
+                  <td>{row.onShape}</td>
+                  <td>{row.onSurface}</td>
+                </tr>
+              ))
+            }
+            <tr>
+              <td>
+                <kbd>{CANVAS_TOOLS.map((tool) => keyOf(tool)).join(' ')}</kbd>
+              </td>
+              <td colspan="2">
+                Tools: {CANVAS_TOOLS.map((tool) => TOOL_NAMES[tool].toLowerCase()).join(', ')}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fx-note">
+        Pointers: drag to move (snapping, guides, drop into a frame), drag the background for a marquee
+        (Shift adds), drag handles to resize (Shift keeps the aspect) and the round handle to rotate.
+        The wheel pans; Control or Command with the wheel zooms at the pointer; two fingers pinch. The
+        shape tree is a WAI-ARIA tree: arrows, Home and End, Space selects, Enter goes to the shape.
+      </p>
+    </section>
+
+    <section class="fx-section" id="collab" aria-labelledby="collab-title">
+      <h2 id="collab-title">{section('collab').title}</h2>
+      <p>{section('collab').summary}</p>
+      <CollabCanvas client:visible />
+      <p class="fx-note">
+        Network transports and storage are adapters the host provides; this page connects the two
+        replicas in memory, so nothing leaves your browser.
+      </p>
+    </section>
+
+    <section class="fx-section" id="agents" aria-labelledby="agents-title">
+      <h2 id="agents-title">{section('agents').title}</h2>
+      <p>{section('agents').summary}</p>
+      <div class="fx-pair fx-pair--code">
+        <div class="fx-panel">
+          <h3>The blueprint the agent wrote</h3>
+          <p class="fx-note">
+            Spec <code>0.8.0</code> adds the <code>canvas</code> catalog id; it is in development and
+            coming in <code>{CANVAS_RELEASE}</code>.
+          </p>
+          <GuideCode code={AGENT_CANVAS_JSON} label="The canvas blueprint (JSON)" lang="text" />
+          <h3>The hostile sticky note</h3>
+          <GuideCode code={HOSTILE_STICKY_JSON} label="A sticky note with a raw CSS paint" lang="text" />
+        </div>
+        <div class="fx-panel">
+          <h3>Painted by the player</h3>
+          <AgentCanvasDemo client:visible />
+        </div>
+      </div>
+    </section>
+
+    <section class="fx-section" id="safety" aria-labelledby="safety-title">
+      <h2 id="safety-title">{section('safety').title}</h2>
+      <p>{section('safety').summary}</p>
+      <ul class="fx-rules">
+        {
+          CANVAS_RULES.map((rule) => (
+            <li>
+              <h3>{rule.title}</h3>
+              <p>{rule.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <h3>In code</h3>
+      <div class="fx-pair">
+        <GuideCode code={editorSnippet} label="Validate, then edit" lang="ts" />
+        <GuideCode code={syncSnippet} label="Edit together" lang="ts" />
+      </div>
+    </section>
+
+    <section class="fx-section" id="package-docs" aria-labelledby="package-docs-title">
+      <h2 id="package-docs-title">Package docs</h2>
+      <p>The site does not render the package docs yet. Read them in the repository:</p>
+      <ul class="fx-list">
+        {
+          CANVAS_DOCS.map((doc) => (
+            <li>
+              {doc.label}: <code>{doc.path}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </FeaturePage>
+</BaseLayout>

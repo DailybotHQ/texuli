@@ -111,6 +111,42 @@ const SITE_PAGES: readonly SearchEntry[] = [
     ],
   },
   {
+    id: 'page-forms',
+    title: 'Forms',
+    description:
+      'Schema-driven forms: every field type, named formats, validation with announced errors, multi-step flows, conditional logic, drafts and autosave, data-source fields and agent-generated forms (in development, coming in 0.8.0).',
+    href: '/forms-page/',
+    kind: 'page',
+    keywords: [
+      'forms',
+      'schema form',
+      'validation',
+      'steps',
+      'wizard',
+      'conditional',
+      'drafts',
+      'autosave',
+      'data source',
+    ],
+  },
+  {
+    id: 'page-canvas',
+    title: 'Canvas',
+    description:
+      'An infinite canvas: shapes, text, sticky notes, frames, connectors, snapping, zoom and pan, a full keyboard model, collaboration, SVG and PNG export (in development, coming in 0.8.0).',
+    href: '/canvas-page/',
+    kind: 'page',
+    keywords: [
+      'canvas',
+      'whiteboard',
+      'diagram',
+      'shapes',
+      'connectors',
+      'sticky notes',
+      'collaboration',
+    ],
+  },
+  {
     id: 'page-live-generation',
     title: 'Live generation',
     description:

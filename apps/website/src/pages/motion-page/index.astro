@@ -7,16 +7,25 @@
  * page's level and reduced-motion settings; the tables, the spring plot's
  * data and the API contract are static.
  */
+import * as coreMotion from '@texuli/core/motion';
+import * as springMotion from '@texuli/core/motion/spring';
+import * as tokensMotion from '@texuli/tokens/motion';
+import * as texuliMotion from 'texuli/motion';
 import GuideCode from '../../components/guides/GuideCode.astro';
+import { MOTION_ADOPTERS } from '../../components/motion-site/adopters.ts';
 import BlueprintDemo from '../../components/motion-site/BlueprintDemo.svelte';
 import BoardDemo from '../../components/motion-site/BoardDemo.svelte';
 import {
   HOSTILE_MOTION_JSON,
   MOTION_BLUEPRINT_JSON,
 } from '../../components/motion-site/blueprint.ts';
+import ComponentGallery from '../../components/motion-site/ComponentGallery.svelte';
+import DeckMotionDemo from '../../components/motion-site/DeckMotionDemo.svelte';
+import { DECK_LEVEL_COLUMNS, TRANSITION_TABLE } from '../../components/motion-site/deck.ts';
 import LayoutList from '../../components/motion-site/LayoutList.svelte';
 import MotionConsole from '../../components/motion-site/MotionConsole.svelte';
 import PresenceDemo from '../../components/motion-site/PresenceDemo.svelte';
+import PresetGallery from '../../components/motion-site/PresetGallery.svelte';
 import {
   CONTRACT_POINTS,
   MOTION_DOCS,
@@ -26,6 +35,7 @@ import {
   MOTION_SECTIONS,
 } from '../../components/motion-site/page.ts';
 import SharedDemo from '../../components/motion-site/SharedDemo.svelte';
+import SpringLab from '../../components/motion-site/SpringLab.svelte';
 import SpringsDemo from '../../components/motion-site/SpringsDemo.svelte';
 import TimelineDemo from '../../components/motion-site/TimelineDemo.svelte';
 import TokensExplorer from '../../components/motion-site/TokensExplorer.svelte';
@@ -36,6 +46,23 @@ const section = (id: string) => {
   if (!entry) throw new Error(`Unknown motion section ${id}`);
   return entry;
 };
+
+/** The public surface, read from the packages at build time (values only; types are erased). */
+const INVENTORY = [
+  { module: '@texuli/core/motion', role: 'The runtime texels', names: Object.keys(coreMotion) },
+  {
+    module: '@texuli/core/motion/spring',
+    role: 'The spring solver',
+    names: Object.keys(springMotion),
+  },
+  { module: '@texuli/tokens/motion', role: 'The motion tokens', names: Object.keys(tokensMotion) },
+  {
+    module: 'texuli/motion',
+    role: 'The component contract and seams',
+    names: Object.keys(texuliMotion),
+  },
+].map((entry) => ({ ...entry, names: [...entry.names].sort() }));
+const MOTION_VARIABLES = Object.entries(tokensMotion.motionVariables());
 
 const providerSnippet = `import { MotionProvider } from 'texuli/motion';
 import { Dialog } from 'texuli/dialog';
@@ -95,10 +122,55 @@ await run.finished; // "finished", or "instant" under reduced motion`;
       <MotionConsole client:visible />
     </section>
 
+    <section class="demo" id="presets" aria-labelledby="presets-title">
+      <h2 id="presets-title">{section('presets').title}</h2>
+      <p>{section('presets').summary}</p>
+      <PresetGallery client:visible />
+    </section>
+
     <section class="demo" id="presence" aria-labelledby="presence-title">
       <h2 id="presence-title">{section('presence').title}</h2>
       <p>{section('presence').summary}</p>
       <PresenceDemo client:visible />
+    </section>
+
+    <section class="demo" id="components" aria-labelledby="components-title">
+      <h2 id="components-title">{section('components').title}</h2>
+      <p>{section('components').summary}</p>
+      <ComponentGallery client:visible />
+      <div class="table-wrap" role="region" aria-label="Every motion adopter" tabindex="0">
+        <table class="inventory-table" data-motion-adopters="">
+          <caption>{MOTION_ADOPTERS.length} package sources that animate through the runtime</caption>
+          <thead>
+            <tr>
+              <th scope="col">Component</th>
+              <th scope="col">Package</th>
+              <th scope="col">What moves</th>
+              <th scope="col">See it</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              MOTION_ADOPTERS.map((adopter) => (
+                <tr>
+                  <th scope="row">{adopter.component}</th>
+                  <td>
+                    <code>{adopter.pkg}</code>
+                  </td>
+                  <td>{adopter.motion}</td>
+                  <td>
+                    {adopter.live ? (
+                      <a href={adopter.live}>{adopter.live.startsWith('#') ? 'On this page' : adopter.live}</a>
+                    ) : (
+                      'Its showcase page is planned'
+                    )}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section class="demo" id="layout" aria-labelledby="layout-title">
@@ -134,10 +206,50 @@ await run.finished; // "finished", or "instant" under reduced motion`;
       <SpringsDemo client:visible />
     </section>
 
+    <section class="demo" id="spring-lab" aria-labelledby="spring-lab-title">
+      <h2 id="spring-lab-title">{section('spring-lab').title}</h2>
+      <p>{section('spring-lab').summary}</p>
+      <SpringLab client:visible />
+    </section>
+
     <section class="demo" id="tokens" aria-labelledby="tokens-title">
       <h2 id="tokens-title">{section('tokens').title}</h2>
       <p>{section('tokens').summary}</p>
       <TokensExplorer client:visible />
+    </section>
+
+    <section class="demo" id="deck" aria-labelledby="deck-title">
+      <h2 id="deck-title">{section('deck').title}</h2>
+      <p>{section('deck').summary}</p>
+      <DeckMotionDemo client:visible />
+      <div class="table-wrap" role="region" aria-label="Slide transitions by level" tabindex="0">
+        <table class="inventory-table" data-motion-deck-table="">
+          <caption>What each slide transition plays, from <code>resolveSlideTransition</code></caption>
+          <thead>
+            <tr>
+              <th scope="col">Transition</th>
+              {DECK_LEVEL_COLUMNS.map((column) => <th scope="col">{column}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              TRANSITION_TABLE.map((row) => (
+                <tr data-motion-transition={row.transition}>
+                  <th scope="row">
+                    <code>{row.transition}</code>
+                  </th>
+                  {row.cells.map((cell) => (
+                    <td>
+                      {cell.name === 'none' ? 'cut' : <code>{cell.name}</code>}
+                      {cell.ms > 0 ? `, ${cell.ms} ms` : ''}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section class="demo" id="blueprint" aria-labelledby="blueprint-title">
@@ -163,6 +275,57 @@ await run.finished; // "finished", or "instant" under reduced motion`;
           <h3>Painted by the player</h3>
           <BlueprintDemo client:visible />
         </div>
+      </div>
+    </section>
+
+    <section class="demo" id="inventory" aria-labelledby="inventory-title">
+      <h2 id="inventory-title">{section('inventory').title}</h2>
+      <p>{section('inventory').summary}</p>
+      <ul class="inventory" data-motion-inventory="">
+        {
+          INVENTORY.map((entry) => (
+            <li class="inventory__item" data-motion-module={entry.module}>
+              <h3>
+                <code>{entry.module}</code>
+              </h3>
+              <p>
+                {entry.role}: {entry.names.length} exports
+              </p>
+              <ul class="inventory__names">
+                {entry.names.map((name) => (
+                  <li>
+                    <code>{name}</code>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="table-wrap" role="region" aria-label="Motion custom properties" tabindex="0">
+        <table class="inventory-table" data-motion-variables="">
+          <caption>{MOTION_VARIABLES.length} custom properties with their theme defaults</caption>
+          <thead>
+            <tr>
+              <th scope="col">Custom property</th>
+              <th scope="col">Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              MOTION_VARIABLES.map(([name, value]) => (
+                <tr>
+                  <th scope="row">
+                    <code>{name}</code>
+                  </th>
+                  <td>
+                    <code class="inventory__value">{value.length > 90 ? `${value.slice(0, 87)}…` : value}</code>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
       </div>
     </section>
 
@@ -379,6 +542,71 @@ await run.finished; // "finished", or "instant" under reduced motion`;
     padding-inline-start: 1.25rem;
   }
   .docs code {
+    overflow-wrap: anywhere;
+  }
+  .table-wrap {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  .table-wrap:focus-visible {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+  .inventory-table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .inventory-table caption {
+    padding-block-end: 0.4rem;
+    text-align: start;
+    font-weight: 600;
+  }
+  .inventory-table th,
+  .inventory-table td {
+    padding: 0.4rem 0.55rem;
+    border-block-end: 1px solid var(--tx-border, CanvasText);
+    text-align: start;
+    vertical-align: top;
+  }
+  .inventory {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .inventory__item {
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    min-inline-size: 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.85rem;
+    background: var(--tx-surface, Canvas);
+  }
+  .inventory__item p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  .inventory__names {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.75rem;
+  }
+  .inventory__names code {
+    display: inline-block;
+    padding: 0.05rem 0.4rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.4rem;
+  }
+  .inventory__value {
     overflow-wrap: anywhere;
   }
 </style>

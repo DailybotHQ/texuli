@@ -38,10 +38,22 @@ export const MOTION_SECTIONS: readonly MotionSection[] = [
       'Every demo on this page reads these two settings through MotionProvider or the runtime options. Lower the level, or turn on reduced motion, and watch the same code commit its end state at once.',
   },
   {
+    id: 'presets',
+    title: 'Every preset',
+    summary:
+      'The five enter and exit presets of the closed vocabulary, the same names a component prop or an agent blueprint uses, plus the edge slides sheets and drawers play. Replay any of them at any duration step; each card shows the keyframes its preset resolves to.',
+  },
+  {
     id: 'presence',
     title: 'Presence: overlays that enter and leave',
     summary:
       'Dialog, Sheet and the Toaster animate through the shared runtime. Pick the presets: they are the same closed names an agent can use. A closed overlay gives focus back and lifts inert at once; only the paint waits for the exit.',
+  },
+  {
+    id: 'components',
+    title: 'Every component that moves',
+    summary:
+      'Tooltips, popovers, hover cards and the four menus scale in; the alert dialog scales over its backdrop; drawers, detail panels and responsive modals slide from their edge; the accordion opens its height and the tabs indicator glides. All of them follow the settings above. The table lists every package source that animates, checked against the code.',
   },
   {
     id: 'layout',
@@ -68,16 +80,34 @@ export const MOTION_SECTIONS: readonly MotionSection[] = [
       'Three spring tokens solved by the owned damped-oscillator solver. Each curve is precomputed as a CSS linear() easing, so the browser plays it on its compositor; the plot below is drawn from the same solver.',
   },
   {
+    id: 'spring-lab',
+    title: 'Spring lab',
+    summary:
+      'Any spring, solved live. Move stiffness, damping, mass and the initial velocity and watch the curve, the damping ratio, the settle time and the linear() easing the browser plays. Every spring settles within 1,000 ms; parameters outside the solver’s ranges are clamped.',
+  },
+  {
     id: 'tokens',
     title: 'Tokens explorer',
     summary:
       'Five durations, five easings and three springs, as data in @texuli/tokens/motion and as --tx-motion-* custom properties. Play any token to see it; under reduced motion every duration is 0 ms.',
   },
   {
+    id: 'deck',
+    title: 'Deck motion: transitions, fragments and levels',
+    summary:
+      'Slides share the same three levels. Every slide transition and every fragment effect, on the slides stage, at the level chosen in the settings: subtle shortens everything and plays zoom as a fade, none cuts, and reduced motion turns every transition into a short fade. Press the right arrow on the stage to step through the fragments.',
+  },
+  {
     id: 'blueprint',
     title: 'Motion as data: an agent declares it, the player paints it',
     summary:
       'A blueprint names presets and token steps, never keyframes, CSS or milliseconds. The player checks the vocabulary, plays the checked copy through the same runtime, and paints a refused motion without animating it.',
+  },
+  {
+    id: 'inventory',
+    title: 'Every export and every token',
+    summary:
+      'The complete public surface of the motion system, read from the packages when this page was built, so nothing is missing: the runtime texels, the spring solver, the motion tokens with their custom properties, and the component contract.',
   },
   {
     id: 'rules',
