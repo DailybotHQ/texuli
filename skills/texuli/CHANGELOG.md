@@ -15,6 +15,13 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-10-29
+
+### Changes
+
+- chore(deps): release 0.7.0 of all 22 packages, @texuli/document and @texuli/pages for the first time
+- feat(catalog): documents as agent data — a document catalog id, host-validated documents, bounded document patches addressed by node key, a player document host, and texuli document CLI and MCP tools (spec 0.7.0)
+
 ## [0.2.5] — 2026-10-29
 
 ### Changes
