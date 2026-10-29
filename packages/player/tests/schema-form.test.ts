@@ -66,7 +66,9 @@ describe('schema-form in the player', () => {
     ).toBe('register-attendee');
     expect(screen.getByRole('heading', { name: 'About you' })).toBeTruthy();
     expect(screen.getByRole('textbox', { name: /Full name/ })).toBeTruthy();
-    expect(screen.getByRole('navigation', { name: 'Progress' })).toBeTruthy();
+    expect(
+      screen.getByRole('navigation', { name: 'Community day registration progress' })
+    ).toBeTruthy();
   });
 
   it('proposes the action with the submitted values only once the form is valid', {

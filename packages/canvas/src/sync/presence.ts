@@ -3,9 +3,11 @@
  * what they have selected (shape ids). Ephemeral and never in the op log;
  * carried on the adapter's presence channel next to `@texuli/document/sync`
  * presence and validated before it is kept. Entries expire `PRESENCE_TTL`
- * after their last heartbeat.
+ * after their last heartbeat, and the store keeps at most
+ * `SYNC_LIMITS.replicas` of them: states from new replicas past the cap are
+ * dropped until entries expire or leave.
  */
-import { PRESENCE_TTL, REPLICA_PATTERN } from '@texuli/document/sync';
+import { PRESENCE_TTL, REPLICA_PATTERN, SYNC_LIMITS } from '@texuli/document/sync';
 import { CANVAS_ID_PATTERN, CANVAS_LIMITS } from '../model/limits.ts';
 
 /** Shape ids a presence selection carries at most. */
@@ -29,8 +31,10 @@ export interface CanvasPresenceEntry extends CanvasPresenceState {
 }
 
 export interface CanvasPresenceStore {
-  /** Keep or refresh a state; false when it is malformed. */
+  /** Keep or refresh a state; false when it is malformed or the store is full. */
   update(state: unknown): boolean;
+  /** Whether a live entry exists for this replica (no sorting). */
+  has(replica: string): boolean;
   remove(replica: string): void;
   /** Live entries, sorted by replica id; expired ones are pruned. */
   list(): CanvasPresenceEntry[];
@@ -83,23 +87,46 @@ export function checkCanvasPresence(value: unknown): CanvasPresenceState | null 
 }
 
 export function createCanvasPresenceStore(
-  options: { ttl?: number; now?: () => number } = {}
+  options: { ttl?: number; now?: () => number; capacity?: number } = {}
 ): CanvasPresenceStore {
   const ttl = options.ttl ?? PRESENCE_TTL;
   const now = options.now ?? (() => Date.now());
+  const capacity = Math.max(
+    1,
+    Math.min(options.capacity ?? SYNC_LIMITS.replicas, SYNC_LIMITS.replicas)
+  );
+  // Kept in heartbeat order (a refresh moves an entry to the end), so the
+  // expired ones are always at the front: pruning stops at the first live
+  // entry, constant amortized work per update.
   const entries = new Map<string, CanvasPresenceEntry>();
+  const prune = (at: number) => {
+    for (const [replica, entry] of entries) {
+      if (at - entry.seen <= ttl) break;
+      entries.delete(replica);
+    }
+  };
   return {
     update(value) {
       const state = checkCanvasPresence(value);
       if (!state) return false;
-      entries.set(state.replica, { ...state, seen: now() });
+      const at = now();
+      prune(at);
+      const known = entries.delete(state.replica);
+      if (!known && entries.size >= capacity) return false;
+      entries.set(state.replica, { ...state, seen: at });
       return true;
+    },
+    has(replica) {
+      const entry = entries.get(replica);
+      return entry !== undefined && now() - entry.seen <= ttl;
     },
     remove(replica) {
       entries.delete(replica);
     },
     list() {
       const at = now();
+      prune(at);
+      // A clock that steps back can leave an expired entry behind a live one.
       for (const [replica, entry] of entries) if (at - entry.seen > ttl) entries.delete(replica);
       return [...entries.values()].sort((a, b) => (a.replica < b.replica ? -1 : 1));
     },

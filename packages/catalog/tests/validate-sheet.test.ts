@@ -60,7 +60,7 @@ describe('spreadsheets in validateDraft', () => {
       ['an unknown function', { E1: '=WEBSERVICE("https://evil.example")' }],
       ['a dynamic reference', { E1: '=INDIRECT("A1")' }],
       ['a missing sheet', { E1: '=Secrets!A1' }],
-      ['a bidi override', { E1: 'evil‮txt' }],
+      ['a bidi override', { E1: 'evil\u202Etxt' }],
       ['an address off the sheet', { Z99: 1 }],
       ['an object input', { E1: { html: '<b>' } }],
     ];

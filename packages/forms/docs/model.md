@@ -28,7 +28,9 @@ exactly one of `fields` (one page), `sections` (`FormSection`: groups, a
 fieldset when titled) or `steps` (`FormStep`: a multi-step flow, each step
 with fields or sections), and optional cross-field `rules` (`FormRule`).
 
-A `FormField` has a `name` (`FORM_NAME`, unique in the form), a `type`
+A `FormField` has a `name` (`FORM_NAME`, unique in the form, and never one
+of `FORM_RESERVED_NAMES`, the `Object.prototype` members such as
+`toString` or `constructor` that the pattern would accept), a `type`
 (`FormFieldType`, one of `FORM_FIELD_TYPES`), a `label` and optionally:
 
 | Member | Applies to | Meaning |

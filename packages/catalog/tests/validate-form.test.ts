@@ -114,6 +114,9 @@ describe('schema-form in validateDraft', () => {
         '0.children.0.props.schema.fields[0].when.show.fn',
       ],
       [schema(field(), field()), '0.children.0.props.schema.fields[1].name'],
+      // Object.prototype members match the name pattern but are reserved.
+      [schema(field({ name: 'toString' })), '0.children.0.props.schema.fields[0].name'],
+      [schema(field({ name: 'constructor' })), '0.children.0.props.schema.fields[0].name'],
       [{ title: 'Empty' }, '0.children.0.props.schema'],
     ];
     for (const [input, path] of cases) {

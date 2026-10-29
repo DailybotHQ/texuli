@@ -214,6 +214,55 @@ describe('canvas sync', () => {
   });
 });
 
+describe('hostile presence', () => {
+  it('caps the store at SYNC_LIMITS.replicas and drops new ids past it, in bounded time', () => {
+    let now = 0;
+    const store = createCanvasPresenceStore({ now: () => now });
+    const start = performance.now();
+    for (let i = 0; i < 5_000; i += 1) {
+      now += 1;
+      store.update({ replica: `peer-${i}`, name: 'P', color: 1 });
+    }
+    expect(store.list().length).toBeLessThanOrEqual(SYNC_LIMITS.replicas);
+    expect(store.list().length).toBe(SYNC_LIMITS.replicas);
+    // A known peer still refreshes; a new one waits until entries expire.
+    expect(store.update({ replica: 'peer-0', name: 'P', color: 2 })).toBe(true);
+    expect(store.update({ replica: 'late', name: 'L', color: 1 })).toBe(false);
+    now += 31_000;
+    expect(store.update({ replica: 'late', name: 'L', color: 1 })).toBe(true);
+    expect(store.list().map((entry) => entry.replica)).toEqual(['late']);
+    expect(performance.now() - start).toBeLessThan(1500);
+  });
+
+  it('answers a burst of newcomers with one broadcast, not one per id', async () => {
+    const listeners = new Set<(state: unknown) => void>();
+    let sent = 0;
+    const adapter = {
+      send() {},
+      subscribe: () => () => {},
+      presence: {
+        send() {
+          sent += 1;
+        },
+        subscribe(listener: (state: unknown) => void) {
+          listeners.add(listener);
+          return () => listeners.delete(listener);
+        },
+      },
+    } as unknown as Parameters<CanvasSync['connect']>[0];
+    const session = createCanvasSync({ replica: 'ada' });
+    session.connect(adapter, { name: 'Ada', color: 1 });
+    expect(sent).toBe(1);
+    const start = performance.now();
+    for (let i = 0; i < 5_000; i += 1)
+      for (const listener of listeners) listener({ replica: `peer-${i}`, name: 'P', color: 1 });
+    await tick();
+    expect(session.peers().length).toBeLessThanOrEqual(SYNC_LIMITS.replicas);
+    expect(sent).toBeLessThanOrEqual(2);
+    expect(performance.now() - start).toBeLessThan(2000);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Convergence: three replicas, random canvas edits, reordered and duplicated delivery.
 

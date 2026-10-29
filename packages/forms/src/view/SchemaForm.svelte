@@ -159,7 +159,10 @@ const stepErrors = $derived(
 );
 const problems = $derived(stepErrors.length + (last ? formState.formErrors.length : 0));
 
-const controlId = (name: string) => `${base}-${name}`;
+// Field ids live under `-field-`, so no field name (a letter, then letters,
+// digits or `_`) can collide with the form's own `-title`, `-description`
+// and `-summary` ids.
+const controlId = (name: string) => `${base}-field-${name}`;
 
 function focusField(name: string): void {
   const element = ref?.ownerDocument.getElementById(controlId(name));
@@ -286,7 +289,7 @@ const draftText = $derived(
       class="tx-forms__progress"
       steps={steps.map((step) => ({ id: step.id, label: step.title }))}
       current={position}
-      label={labels.progress}
+      label={formatMessage(labels.progress, { title })}
       onStepClick={(index: number) => void onStepClick(index)}
     />
   {/if}

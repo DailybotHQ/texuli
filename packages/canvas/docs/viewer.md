@@ -4,7 +4,10 @@
 content is fitted into an SVG image (`role="img"`, named by `label` or the
 canvas title), and the same shapes and connectors are listed as visually
 hidden text in reading order, so a screen reader gets the structure the
-picture shows. The player host and document embeds paint canvases with it.
+picture shows. The player host (`@texuli/canvas/host`) paints canvases with
+it. Canvas embeds in `@texuli/pages` documents are typed references today:
+the editor and reader show the reference and pass no `canvasHost` to the
+player, so painting a canvas embed with this viewer is planned.
 
 > **Status: in development.** Not on npm yet (`0.0.0` placeholder).
 

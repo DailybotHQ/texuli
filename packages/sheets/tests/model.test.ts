@@ -288,7 +288,7 @@ describe('validateSheet', () => {
       [base([tab({ cells: { $A$1: 1 } })]), 'bad-address'],
       [base([tab({ cells: { A1: { html: '<b>' } } })]), 'bad-input'],
       [base([tab({ cells: { A1: Number.NaN } })]), 'bad-input'],
-      [base([tab({ cells: { A1: 'evil‮txt' } })]), 'unsafe-text'],
+      [base([tab({ cells: { A1: 'evil\u202Etxt' } })]), 'unsafe-text'],
       [base([tab({ cells: { A1: '=SUM(' } })]), 'formula'],
       [base([tab({ cells: { A1: '=INDIRECT("B1")' } })]), 'formula'],
       [base([tab({ cells: { A1: '=Missing!A1' } })]), 'formula'],

@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SchemaForm } from '../src/index.ts';
 import { createMemoryDrafts, FORM_FIELD_TYPES } from '../src/model/index.ts';
 import { compiled, REGISTRATION } from './fixtures.ts';
+import MultiFormHarness from './MultiFormHarness.svelte';
 
 afterEach(() => cleanup());
 
@@ -71,7 +72,7 @@ describe('SchemaForm', () => {
       screen
         .getByRole('textbox', { name: /^Field text\b(?!area)/ })
         .getAttribute('aria-describedby')
-    ).toContain('all-ftext-description');
+    ).toContain('all-field-ftext-description');
     expect(screen.getByRole('spinbutton', { name: /Field number/ })).toBeTruthy();
     expect(screen.getByRole('checkbox', { name: /Field checkbox/ })).toBeTruthy();
     expect(screen.getByRole('switch', { name: /Field switch/ })).toBeTruthy();
@@ -164,6 +165,57 @@ describe('SchemaForm', () => {
       selector: '.tx-forms__done',
     });
     await waitFor(() => expect(document.activeElement).toBe(done));
+  });
+
+  it('keeps field ids apart from its own ids, whatever the field names (title, description, summary)', async () => {
+    const names = ['title', 'description', 'summary'];
+    const { container } = render(SchemaForm, {
+      props: {
+        id: 'clash',
+        form: compiled({
+          title: 'Clashing names',
+          description: 'Fields named after the form parts.',
+          fields: names.map((name) => ({
+            name,
+            type: 'text',
+            label: `Field ${name}`,
+            description: `About ${name}`,
+            required: true,
+          })),
+        }),
+      },
+    });
+    await fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await screen.findByRole('heading', { name: 'There is a problem' });
+    expect(screen.getByRole('form', { name: 'Clashing names' })).toBeTruthy();
+    for (const name of names) {
+      const control = screen.getByRole('textbox', { name: `Field ${name}` });
+      expect(control.id, name).not.toBe(`clash-${name}`);
+    }
+    const ids = [...container.querySelectorAll('[id]')].map((el) => el.id);
+    expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
+    const result = await axe.run(container, {
+      runOnly: { type: 'rule', values: [...RULES, 'duplicate-id'] },
+    });
+    expect(result.violations.map((v) => v.id)).toEqual([]);
+  });
+
+  it('names each multi-step progress landmark after its form, so two forms pass landmark-unique (axe)', async () => {
+    const { container } = render(MultiFormHarness, {
+      props: {
+        first: compiled(REGISTRATION),
+        second: compiled({ ...REGISTRATION, title: 'Volunteer signup' }),
+      },
+    });
+    const navs = screen.getAllByRole('navigation');
+    expect(navs.map((nav) => nav.getAttribute('aria-label'))).toEqual([
+      'Event registration progress',
+      'Volunteer signup progress',
+    ]);
+    const result = await axe.run(container, {
+      runOnly: { type: 'rule', values: ['landmark-unique'] },
+    });
+    expect(result.violations.map((v) => v.id)).toEqual([]);
   });
 
   it('restores a draft on mount, announces it, autosaves and uses localized labels', async () => {

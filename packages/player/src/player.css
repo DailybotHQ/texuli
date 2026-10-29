@@ -128,6 +128,9 @@
 
 .tx-player__notice,
 .tx-player__preview-warning {
+  /* Notices quote agent values (ids, paths, text): long ones wrap anywhere. */
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
   margin: clamp(0.75rem, 3vw, 1.5rem);
   padding: 1rem;
   border-inline-start: 0.25rem solid var(--tx-danger, Mark);

@@ -1,10 +1,12 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { parseCsv } from '../src/csv/index.ts';
+import { csvToSheet, parseCsv } from '../src/csv/index.ts';
 import { evaluateFormula, FORMULA_LIMITS, parseFormula } from '../src/formula/index.ts';
 import {
+  checkSheetDraft,
   createWorkbook,
   displayValue,
+  loadUntrustedSheet,
   SHEET_LIMITS,
   type SheetInput,
   validateSheet,
@@ -52,6 +54,60 @@ describe('hostile formulas', () => {
           code
         ).toContain(code);
       expect(ms, code).toBeLessThan(200);
+    }
+  });
+
+  it('refuses long chains of operators that are not rebalanced, at every entry point', () => {
+    // `%`, `^`, comparisons, `*` and `/` nest to the left without rebalancing:
+    // each chain must end in a too-deep refusal, never a stack overflow.
+    const chains = [
+      `=1${'%'.repeat(4095)}`,
+      `=${Array(4090).fill('2').join('^')}`,
+      `=${Array(4090).fill('1').join('=')}`,
+      `=${Array(4090).fill('1').join('<')}`,
+      `=${Array(4090).fill('2').join('*')}`,
+      `=${Array(4090).fill('2').join('/')}`,
+      `=(${Array(2000).fill('2').join('*')})+1`,
+    ];
+    for (const source of chains) {
+      const label = source.slice(0, 12);
+      const parsed = timed(() => parseFormula(source));
+      expect(parsed.value.ok, label).toBe(false);
+      if (!parsed.value.ok)
+        expect(
+          parsed.value.diagnostics.map((d) => d.code),
+          label
+        ).toContain('too-deep');
+      expect(parsed.ms, label).toBeLessThan(500);
+
+      const doc = sheet(2, 2, { A1: source });
+      const entry = timed(() => {
+        const validated = validateSheet(doc);
+        const loaded = loadUntrustedSheet(JSON.stringify(doc));
+        const draft = checkSheetDraft(doc);
+        const csv = csvToSheet(`"${source.replaceAll('"', '""')}"`, { formulas: true });
+        const workbook = createWorkbook(sheet(2, 2, { A1: 1 }));
+        workbook.setInput('s1', 0, 1, source);
+        return { validated, loaded, draft, csv, shown: displayValue(workbook.value('s1', 0, 1)) };
+      });
+      for (const result of [entry.value.validated, entry.value.loaded, entry.value.draft]) {
+        expect(result.ok, label).toBe(false);
+        expect(result.issues.length, label).toBeGreaterThan(0);
+      }
+      expect(entry.value.csv.ok, label).toBe(false);
+      expect(entry.value.shown, label).toBe('#VALUE!');
+      expect(entry.ms, label).toBeLessThan(2000);
+    }
+  });
+
+  it('keeps short operator chains and long rebalanced sums legal', () => {
+    for (const source of [
+      `=${Array(20).fill('2').join('*')}`,
+      `=1${'%'.repeat(20)}`,
+      `=${Array(400).fill('1').join('+')}`,
+      `=${Array(400).fill('"a"').join('&')}`,
+    ]) {
+      expect(parseFormula(source).ok, source.slice(0, 12)).toBe(true);
     }
   });
 

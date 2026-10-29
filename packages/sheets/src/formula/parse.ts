@@ -313,6 +313,9 @@ function widthOf(node: ExpressionNode): number {
   return Math.abs(to.col - from.col) + 1;
 }
 
+/** Operators whose left-nested chains `balance` flattens. */
+const REBALANCED: ReadonlySet<string> = new Set(['+', '-', '&']);
+
 class Parser {
   private index = 0;
   private depth = 0;
@@ -369,11 +372,26 @@ class Parser {
 
   parseExpr(rbp: number): ExpressionNode {
     let left = this.parsePrefix();
+    // Operators at one level nest to the left. `+`, `-` and `&` chains are
+    // rebalanced after parsing; every other operator (`%`, `^`, `*`, `/`,
+    // comparisons) adds a level, so a long chain is refused as too deep
+    // here instead of growing a tree no walk can follow.
+    let chain = 0;
     for (;;) {
       const token = this.peek();
       if (token.kind !== 'op') break;
       const lbp = INFIX[token.text];
       if (lbp === undefined || lbp <= rbp) break;
+      if (!REBALANCED.has(token.text)) {
+        chain += 1;
+        if (this.depth + chain > FORMULA_LIMITS.depth) {
+          throw new FormulaSyntaxError(
+            'too-deep',
+            token.start,
+            `Formulas nest at most ${FORMULA_LIMITS.depth} levels.`
+          );
+        }
+      }
       this.next();
       if (token.text === '%') {
         left = { op: 'div', left, right: { op: 'num', value: 100 } };
@@ -535,6 +553,9 @@ class Parser {
 /** Chains longer than this are rebalanced so their depth grows with log2 of the terms. */
 const CHAIN_BALANCE_AT = 8;
 
+/** Recursion levels `balance` follows (parsed trees stay far below it). */
+const BALANCE_DEPTH = FORMULA_LIMITS.depth * (CHAIN_BALANCE_AT + 1);
+
 /**
  * Rebalance long left-nested chains of `+`/`-` and `&` (associative for
  * values that reach them: subtraction becomes adding a negation), so a
@@ -542,7 +563,17 @@ const CHAIN_BALANCE_AT = 8;
  * chains keep their left-to-right shape. Iterative along each chain; the
  * terms themselves are bounded by the parser's nesting limit.
  */
-function balance(node: ExpressionNode): ExpressionNode {
+function balance(node: ExpressionNode, level = 0): ExpressionNode {
+  // The parser bounds nesting, so this guard is a backstop: a tree deeper
+  // than any the parser builds is refused instead of exhausting the stack.
+  if (level > BALANCE_DEPTH) {
+    throw new FormulaSyntaxError(
+      'too-deep',
+      0,
+      `Formulas nest at most ${FORMULA_LIMITS.depth} levels.`
+    );
+  }
+  const next = (child: ExpressionNode): ExpressionNode => balance(child, level + 1);
   const additive = node.op === 'add' || node.op === 'sub';
   const textual = node.op === 'concat' && node.args.length === 2;
   if (additive || textual) {
@@ -561,7 +592,7 @@ function balance(node: ExpressionNode): ExpressionNode {
     terms.reverse();
     if (terms.length > CHAIN_BALANCE_AT) {
       const join = (from: number, to: number): ExpressionNode => {
-        if (to - from === 1) return balance(terms[from] as ExpressionNode);
+        if (to - from === 1) return next(terms[from] as ExpressionNode);
         const mid = (from + to) >> 1;
         const left = join(from, mid);
         const right = join(mid, to);
@@ -570,7 +601,7 @@ function balance(node: ExpressionNode): ExpressionNode {
       return join(0, terms.length);
     }
   }
-  return mapChildren(node, balance);
+  return mapChildren(node, next);
 }
 
 function mapChildren(
@@ -635,19 +666,19 @@ export function parseFormula(source: unknown): FormulaParseResult {
   if (source.length > FORMULA_LIMITS.length) {
     return failure('too-long', 0, `A formula has at most ${FORMULA_LIMITS.length} characters.`);
   }
-  let ast: ExpressionNode;
   let parser: Parser;
+  let checked: ReturnType<typeof parseExpression>;
   try {
     parser = new Parser(tokenizeFormula(source.slice(1), 1));
-    ast = parser.parseFormula();
+    const ast = parser.parseFormula();
+    checked = parseExpression(balance(ast), {
+      functions: SHEET_FUNCTIONS,
+      references: SHEET_REFERENCE_DIALECT,
+    });
   } catch (cause) {
     if (cause instanceof FormulaSyntaxError) return failure(cause.code, cause.at, cause.message);
     return failure('syntax', 0, 'The formula could not be read.');
   }
-  const checked = parseExpression(balance(ast), {
-    functions: SHEET_FUNCTIONS,
-    references: SHEET_REFERENCE_DIALECT,
-  });
   if (!checked.ok) {
     return Object.freeze({
       ok: false,

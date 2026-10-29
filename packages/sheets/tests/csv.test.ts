@@ -37,7 +37,7 @@ describe('parseCsv', () => {
       ['a,,c,', [['a', '', 'c', '']], ','],
       [',', [['', '']], ','],
       ['""', [['']], ','],
-      ['﻿a,b', [['a', 'b']], ','],
+      ['\uFEFFa,b', [['a', 'b']], ','],
       ['a;b', [['a', 'b']], ';'],
       ['a\tb', [['a', 'b']], '\t'],
       ['5" screen,x', [['5" screen', 'x']], ','],
@@ -175,7 +175,7 @@ describe('csvToSheet', () => {
   it('refuses malformed CSV and unsafe text through the sheet validator', () => {
     expect(csvToSheet('"open').ok).toBe(false);
     expect(csvToSheet('"open').csv?.code).toBe('unterminated-quote');
-    const bidi = csvToSheet('a‮b');
+    const bidi = csvToSheet('a\u202Eb');
     expect(bidi.ok).toBe(false);
     expect(bidi.issues[0]?.code).toBe('unsafe-text');
   });

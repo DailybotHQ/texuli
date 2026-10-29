@@ -72,7 +72,12 @@ host-provided name, a token color index (0 to 11), an optional world
 `point` and an optional `selection` (at most `PRESENCE_SELECTION_LIMIT` ids).
 `checkCanvasPresence` validates a remote state; `createCanvasPresenceStore`
 returns a `CanvasPresenceStore` whose `list()` gives live
-`CanvasPresenceEntry`s (expired 30 seconds after the last heartbeat).
+`CanvasPresenceEntry`s (expired 30 seconds after the last heartbeat) and
+whose `has(replica)` tells whether a peer is live. The store keeps at most
+`SYNC_LIMITS.replicas` (1,024) entries: `update` returns `false` for a new
+replica past the cap until entries expire or leave, and expiry work is
+constant amortized per update. A session answers a burst of newcomers with
+one presence broadcast, not one per new replica.
 Hosts read `peers()` to show who is here; painting remote pointers and
 selections inside `CanvasEditor` is planned.
 

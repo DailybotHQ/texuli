@@ -13,6 +13,7 @@ import {
   FORM_ID,
   FORM_LIMITS,
   FORM_NAME,
+  FORM_RESERVED_NAMES,
   FORM_RULE_NAMES,
   FORM_VALIDATOR_NAME,
   type FormField,
@@ -376,6 +377,10 @@ export function validateFormSchema(
         `${path}.name`,
         'A field name is a lowercase letter, then up to 63 letters, digits or _.'
       );
+      return null;
+    }
+    if (FORM_RESERVED_NAMES.has(name)) {
+      report('name', `${path}.name`, `"${name}" is reserved; choose another field name.`);
       return null;
     }
     if (names.has(name)) {

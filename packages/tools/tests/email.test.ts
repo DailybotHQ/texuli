@@ -206,7 +206,7 @@ describe('tools/email: validated blueprint to email-safe HTML', () => {
       'vbscript:x',
       'data:text/html,x',
       'https://bank.example@evil.example',
-      'https://exa​mple.com',
+      'https://exa\u200Bmple.com',
       '#section',
       'ftp://example.com/file',
     ]) {

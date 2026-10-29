@@ -7,7 +7,8 @@ export const DEFAULT_SCHEMA_FORM_LABELS = Object.freeze({
   submit: 'Submit',
   submitting: 'Sending…',
   submitted: 'Thank you. Your answers were sent.',
-  progress: 'Progress',
+  /** The step navigation's name; `{title}` is the form title, so two forms' landmarks differ. */
+  progress: '{title} progress',
   stepOf: 'Step {current} of {total}: {title}',
   errorSummary: 'There is a problem',
   errorCountOne: '1 answer needs attention.',

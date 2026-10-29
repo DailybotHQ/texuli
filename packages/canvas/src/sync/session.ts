@@ -182,13 +182,23 @@ export class CanvasSync {
       color: identity.color,
     };
     const channel = adapter.presence;
+    let replyQueued = false;
+    let open = true;
     const off = channel?.subscribe((value) => {
       const replica = (value as { replica?: unknown } | null)?.replica;
-      if (replica === this.replica.id) return;
-      const known = this.presence.list().some((entry) => entry.replica === replica);
+      if (replica === this.replica.id || typeof replica !== 'string') return;
+      const known = this.presence.has(replica);
       if (!this.presence.update(value)) return;
-      // Answer a newcomer once, so peers that joined later see us too.
-      if (!known) channel.send(state);
+      // Answer newcomers so peers that joined later see us too: one reply
+      // per burst (the channel broadcasts it to all of them), never one per
+      // new id.
+      if (!known && !replyQueued) {
+        replyQueued = true;
+        queueMicrotask(() => {
+          replyQueued = false;
+          if (open) channel.send(state);
+        });
+      }
       for (const listener of this.#listeners) listener(this.#canvas, 'remote');
     });
     channel?.send(state);
@@ -198,6 +208,7 @@ export class CanvasSync {
         channel?.send(state);
       },
       close: () => {
+        open = false;
         off?.();
         connection.close();
       },

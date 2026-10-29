@@ -117,8 +117,26 @@ export const FORM_LIMITS = Object.freeze({
   maxFileSize: 1_073_741_824,
 });
 
-/** A field or rule name: a lowercase letter, then letters, digits or `_`. */
+/**
+ * A field or rule name: a lowercase letter, then letters, digits or `_`.
+ * Names in `FORM_RESERVED_NAMES` match it but are refused by the schema
+ * validator.
+ */
 export const FORM_NAME = /^[a-z][A-Za-z0-9_]{0,63}$/;
+/**
+ * `Object.prototype` members that `FORM_NAME` would accept. A field with one
+ * of these names could read an inherited function as its answer, so the
+ * schema validator refuses them.
+ */
+export const FORM_RESERVED_NAMES: ReadonlySet<string> = new Set([
+  'constructor',
+  'hasOwnProperty',
+  'isPrototypeOf',
+  'propertyIsEnumerable',
+  'toLocaleString',
+  'toString',
+  'valueOf',
+]);
 /** A step, section or rule id: lowercase letters, digits and hyphens. */
 export const FORM_ID = /^[a-z][a-z0-9-]{0,63}$/;
 /** A host validator name. */

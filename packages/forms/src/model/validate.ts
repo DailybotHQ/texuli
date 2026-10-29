@@ -17,6 +17,7 @@ import {
   isListType,
   isNumericType,
   isTextType,
+  ownValue,
 } from './values.ts';
 
 /*
@@ -263,7 +264,7 @@ export function computeFormLogic(
     fields[entry.field.name] = Object.freeze({ visible, required, enabled });
     effective.set(
       entry.field.name,
-      visible && enabled ? expressionValueOf(values[entry.field.name]) : null
+      visible && enabled ? expressionValueOf(ownValue(values, entry.field.name)) : null
     );
   }
   reach(form.steps.length, form.sections.length);
@@ -272,6 +273,11 @@ export function computeFormLogic(
     sections: Object.freeze(sections),
     steps: Object.freeze(steps),
   });
+}
+
+/** A field's logic state, read as an own member only. */
+function ownState(logic: FormLogicState, name: string): FormFieldState | undefined {
+  return Object.hasOwn(logic.fields, name) ? logic.fields[name] : undefined;
 }
 
 /** The values a submission carries: visible, enabled fields only. */
@@ -283,9 +289,9 @@ export function submittedValues(
   const out: Record<string, FormValue> = {};
   for (const entry of form.fields) {
     const name = entry.field.name;
-    const state = logic.fields[name];
-    if (state?.visible && state.enabled && values[name] !== undefined)
-      out[name] = values[name] as FormValue;
+    const state = ownState(logic, name);
+    const value = ownValue(values, name);
+    if (state?.visible && state.enabled && value !== undefined) out[name] = value;
   }
   return Object.freeze(out);
 }
@@ -320,16 +326,21 @@ export function validateFormValues(
   for (const entry of form.fields) {
     const name = entry.field.name;
     if (scope && !scope.has(name)) continue;
-    const state = logic.fields[name];
+    const state = ownState(logic, name);
     if (!state?.visible || !state.enabled) continue;
-    const error = checkFieldValue(entry.field, values[name], state.required, options.messages);
+    const error = checkFieldValue(
+      entry.field,
+      ownValue(values, name),
+      state.required,
+      options.messages
+    );
     if (error) errors[name] = error;
   }
   if (options.rules !== false) {
     const env: ExpressionEnv = {
       field: (name) => {
-        const state = logic.fields[name];
-        return state?.visible && state.enabled ? expressionValueOf(values[name]) : null;
+        const state = ownState(logic, name);
+        return state?.visible && state.enabled ? expressionValueOf(ownValue(values, name)) : null;
       },
       ...(options.now ? { now: options.now } : {}),
     };

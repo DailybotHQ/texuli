@@ -41,13 +41,18 @@ the `CompiledForm`, `FormController`, `FormDraftOptions`,
 | `restoreDraft` | Restore a saved draft on mount (default `true` with `drafts`) |
 | `onSubmit` | Receives a `SchemaFormSubmission`: `values` (visible, enabled fields) and `files` (the `File`s of submitted file fields); may return server errors |
 | `onValueChange` | Called after each change with the name, the new value and every value |
-| `labels` | Interface text (`SchemaFormLabels`, defaults in `DEFAULT_SCHEMA_FORM_LABELS`) |
+| `labels` | Interface text (`SchemaFormLabels`, defaults in `DEFAULT_SCHEMA_FORM_LABELS`); `progress` names the step navigation and fills `{title}` with the form title (default `{title} progress`), so two multi-step forms on a page have distinct landmarks |
 | `messages` | Validation messages (`FormMessages`) |
 | `headingLevel` | Level of the form title (2–6, default 2); step and summary headings go one deeper |
 | `now` | The host clock (`today()` in conditions, draft times) |
 | `motion` | Step transitions through `texuli/motion` (default a fast fade; `false` turns it off) |
 | `ref` | The `<form>` element (bindable) |
 | `class` | Classes on the form; other attributes (`id`, `aria-label`, `data-*`) reach the form too |
+
+With `id="signup"`, the form's own parts are `signup-title`,
+`signup-description` and `signup-summary`, and each field's control is
+`signup-field-<name>` (its error `signup-field-<name>-error`), so no field
+name collides with the form's ids.
 
 ## Controls
 

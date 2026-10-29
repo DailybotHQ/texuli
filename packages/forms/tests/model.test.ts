@@ -13,6 +13,7 @@ import {
   type FormTimers,
   formatMessage,
   matchesFormat,
+  submittedValues,
   validateFormSchema,
   validateFormValues,
 } from '../src/model/index.ts';
@@ -193,6 +194,58 @@ describe('the schema validator', () => {
     expect(validateFormSchema(named, { validators: [] }).issues[0]?.path).toBe(
       '$.fields[0].validator'
     );
+  });
+
+  it('refuses field and rule names that are Object.prototype members', () => {
+    const inherited = [
+      'constructor',
+      'hasOwnProperty',
+      'isPrototypeOf',
+      'propertyIsEnumerable',
+      'toLocaleString',
+      'toString',
+      'valueOf',
+    ];
+    for (const name of inherited) {
+      const result = validateFormSchema(schemaWith(field(name)));
+      expect(result.ok, name).toBe(false);
+      expect(result.issues[0], name).toMatchObject({ code: 'name', path: '$.fields[0].name' });
+      const rule = validateFormSchema({
+        ...schemaWith(field('a')),
+        rules: [{ id: 'r', test: { op: 'bool', value: true }, message: 'M', field: name }],
+      });
+      expect(rule.ok, name).toBe(false);
+    }
+    // `__proto__` never matches the name pattern.
+    expect(validateFormSchema(schemaWith(field('__proto__'))).ok).toBe(false);
+  });
+
+  it('reads answers as own members only, so inherited members never satisfy a field', () => {
+    // A compiled form forged around the schema check: the value logic itself
+    // must not read `toString` or `constructor` from Object.prototype.
+    const base = compiled({
+      title: 'T',
+      fields: [
+        { name: 'first', type: 'text', label: 'First', required: true },
+        { name: 'second', type: 'text', label: 'Second', required: true },
+        { name: 'agree', type: 'checkbox', label: 'Agree' },
+      ],
+    });
+    const renamed = ['toString', 'constructor', 'agree'];
+    const forged = {
+      ...base,
+      fields: base.fields.map((entry, i) => ({
+        ...entry,
+        field: { ...entry.field, name: renamed[i] as string },
+      })),
+    } as typeof base;
+    const payload = JSON.parse('{"agree":true}');
+    const result = validateFormValues(forged, payload);
+    expect(Object.keys(result.errors).sort()).toEqual(['constructor', 'toString']);
+    const logic = computeFormLogic(forged, payload);
+    const sent = submittedValues(forged, payload, logic);
+    expect(Object.keys(sent)).toEqual(['agree']);
+    for (const value of Object.values(sent)) expect(typeof value).not.toBe('function');
   });
 
   it('stays linear on hostile schemas', () => {

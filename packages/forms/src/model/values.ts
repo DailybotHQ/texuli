@@ -5,6 +5,7 @@ import {
   type FormFieldType,
   type FormFile,
   type FormValue,
+  type FormValues,
 } from './types.ts';
 
 /* Typed values: what each field type holds, its empty value and coercion. */
@@ -19,6 +20,11 @@ export const isListType = (type: FormFieldType) => LIST_TYPES.has(type);
 export const isNumericType = (type: FormFieldType) => type === 'number' || type === 'slider';
 export const isToggleType = (type: FormFieldType) => type === 'checkbox' || type === 'switch';
 export const hasOptions = (type: FormFieldType) => isChoiceType(type) || type === 'multiselect';
+
+/** A field's answer, read as an own member only (never an inherited one). */
+export function ownValue(values: FormValues, name: string): FormValue | undefined {
+  return Object.hasOwn(values, name) ? values[name] : undefined;
+}
 
 /** The expression type a field's value has inside conditions and rules. */
 export function expressionTypeOf(type: FormFieldType): ExpressionType {

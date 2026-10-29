@@ -100,8 +100,11 @@ Keep the document in `$state.raw`: every change is a new immutable value.
 - **Embeds:** `component` and `deck` embeds paint through `@texuli/player`
   at the untrusted tier (the player loads on first use); a payload that
   fails validation shows a refusal. Decks present on a stage when the host
-  passes `deckHost` (the player's seam). `sheet` and `canvas` embeds stay
-  typed references until their packages ship.
+  passes `deckHost` (the player's seam). `sheet` and `canvas` embeds are
+  typed references today (painting them through `@texuli/sheets` and
+  `@texuli/canvas` is planned). Embedded players get no `formHost`,
+  `canvasHost` or sheet host, so a component embed holding a
+  `schema-form`, `canvas` or `spreadsheet` node is refused rather than painted.
 - **Undo and redo** replay the document op log (typing in one block within
   a second is one step); undos are log entries too.
 - **Motion:** inserts, removes and reorders glide (FLIP) on the shared
