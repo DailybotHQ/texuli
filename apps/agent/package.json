@@ -19,6 +19,7 @@
     "@texuli/blocks": "workspace:*",
     "@texuli/catalog": "workspace:*",
     "@texuli/core": "workspace:*",
+    "@texuli/document": "workspace:*",
     "@texuli/spec": "workspace:*"
   },
   "devDependencies": {

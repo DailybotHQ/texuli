@@ -18,7 +18,9 @@ import { expectedOutcome, GOLDEN_DIR, loadGoldenSuite } from './harness.ts';
  * The cases are the eight golden audit fixtures (`tests/fixtures/golden`,
  * with their pinned expected outcome) and the spec's golden blueprints
  * (`packages/spec/fixtures/golden`, measured only: their trees use state
- * and flows an agent tool call does not carry). Both are only read.
+ * and flows an agent tool call does not carry), except the ones in
+ * {@link SPEC_PINNED}, whose trees an agent tool call can carry. Both are
+ * only read.
  *
  * Offline by default: the fake replay provider streams each fixture's tree
  * as `tool-delta` pieces with a configured latency, on a virtual clock, so
@@ -30,6 +32,15 @@ import { expectedOutcome, GOLDEN_DIR, loadGoldenSuite } from './harness.ts';
 export const STREAM_EVAL_VERSION = 'agent-stream-eval/v1';
 
 export const SPEC_GOLDEN_DIR = join(import.meta.dirname, '../../../packages/spec/fixtures/golden');
+
+/**
+ * Spec golden blueprints with a pinned untrusted-tier outcome. The document
+ * task (spec 0.7.0): a `document` frame root, checked by the service's host
+ * document validator, must stream valid.
+ */
+export const SPEC_PINNED: Readonly<Record<string, 'valid' | 'invalid'>> = {
+  'spec/document-brief': 'valid',
+};
 
 export interface StreamEvalCase {
   id: string;
@@ -68,7 +79,7 @@ export function loadStreamEvalCases(
         source: 'spec',
         prompt: `Build the ${envelope.id ?? id} interface.`,
         tree: envelope.tree,
-        expected: null,
+        expected: SPEC_PINNED[id] ?? null,
       };
     });
   return [...golden, ...spec];

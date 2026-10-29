@@ -16,11 +16,13 @@ import {
   renderCatalogFromBuild,
 } from '@texuli/catalog/render/renderer';
 import {
+  type DraftDocumentCheck,
   type DraftValidation,
   type ValidateDraftOptions,
   validateDraft,
 } from '@texuli/catalog/validate';
 import { createFamilyBlockCheck, diagramFamilyCheck } from '@texuli/catalog/validate/blocks';
+import { validateDocument } from '@texuli/document/schema';
 import {
   createMemoryTokenUsageStore,
   DEFAULT_TOKEN_BUDGETS,
@@ -66,6 +68,23 @@ import { blueprintTool, systemPrompt, TOOL_NAME } from './tools.ts';
  * The family parsers injected per `blocks-*` id (the catalog entry stays
  * under its 8 KiB budget because the engines are injected here).
  */
+/**
+ * The host document validator for `document` nodes: `validateDocument` from
+ * `@texuli/document/schema` at the draft's tier (always `untrusted` here).
+ * Warnings (orphaned comment anchors) do not refuse; every error does. The
+ * same check runs for each streamed node and for the final `validateDraft`.
+ */
+export const checkDocumentDraft: DraftDocumentCheck = (doc, tier) => {
+  const result = validateDocument(doc, { trust: tier });
+  const issues = result.issues.map((issue) => ({
+    code: issue.code,
+    path: issue.jsonPath,
+    message: issue.message,
+    severity: issue.severity === 'warning' ? ('warning' as const) : ('error' as const),
+  }));
+  return result.ok ? { ok: true, document: result.document, issues } : { ok: false, issues };
+};
+
 let familyEngines: ReturnType<typeof createFamilyBlockCheck> | undefined;
 // The factory runs on first use instead of at module init: an init-time
 // call made loading order-sensitive under transformed module graphs.
@@ -229,6 +248,8 @@ export function createAgentService(config: AgentConfig): AgentService {
     tier: 'untrusted',
     catalogHash: config.catalogHash,
     checkBlock: (block, id) => checkFamilyBlock(block, id),
+    // Documents (spec 0.7.0): without the host validator every `document` node is refused.
+    checkDocument: checkDocumentDraft,
   };
   const gate = (input: unknown): DraftValidation => validateDraft(input, gateOptions);
 
