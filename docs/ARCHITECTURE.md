@@ -25,7 +25,7 @@ packages in lower layers.
 | L0 | `@texuli/drag` | In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing) | none |
 | L0 | `@texuli/spec` | Framework-free blueprint contract and code generation | none |
 | L1 | `@texuli/primitives` | 42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core, date, drag |
-| L1 | `@texuli/document` | In development (not on npm yet, first release planned for 0.7.0): the framework-free, DOM-free document engine: the block document format with persisted ids, the validator on the deck schema kit, typed operations and bounded RFC 6902 patches with inverses and an op log, Markdown through the core codec, and the CRDT sync core (`sync`); pagination, DOCX and PDF are planned | core, deck |
+| L1 | `@texuli/document` | In development, in the repository only (first release planned for 0.7.0): the framework-free, DOM-free document engine: the block document format with persisted ids, the validator on the deck schema kit, typed operations and bounded RFC 6902 patches with inverses and an op log, Markdown through the core codec, and the CRDT sync core (`sync`); pagination, DOCX and PDF are planned | core, deck |
 | L2 | `@texuli/tokens` | The OKLCH theme engine, the `--tx-*` token contract, 200+ themes, compiled CSS, forced colors, the AA gate, the Tailwind preset | none |
 | L3 | `texuli` | Styled components (Button … Tree), the class helpers (`cx`, `variants`), icons, layouts and app shells | core, primitives, tokens |
 | L4 | `@texuli/charts` | Chart math and every chart family, one lazy subpath per family | core, primitives, tokens, texuli |
@@ -40,7 +40,7 @@ packages in lower layers.
 | L8 | `@texuli/tools` | Copy-in CLI (`texuli-add`, `texuli-init`, `texuli-update`), `texuli-llms`, A2UI adapter, custom elements and the golden set | core, tokens, catalog, blocks, charts, media |
 | L8 | `@texuli/astro` | Astro integration, site helpers and content layouts | blocks, core, tokens |
 | L8 | `@texuli/slides` | The Svelte 5 presentation stage on `@texuli/deck` (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from `0.3.0`; in development | blocks, catalog, deck, media, player, tokens |
-| L8 | `@texuli/pages` | In development (not on npm yet, first release planned for 0.7.0): the block document editor and reader on `@texuli/document`: text through `@texuli/editor`, a slash menu, block selection and drag on `@texuli/drag`, nested pages, resizable columns and live embeds painted by the player (`editor`, `reader`); the paged view, export and collaboration are planned | blocks, core, document, drag, editor, player, primitives, tokens, texuli |
+| L8 | `@texuli/pages` | In development, in the repository only (first release planned for 0.7.0): the block document editor and reader on `@texuli/document`: text through `@texuli/editor`, a slash menu, block selection and drag on `@texuli/drag`, nested pages, resizable columns and live embeds painted by the player (`editor`, `reader`); the paged view, export and collaboration are planned | blocks, core, document, drag, editor, player, primitives, tokens, texuli |
 
 Not layers, because they consume the library:
 - **`@texuli/examples`** (private) is the examples registry. Every component

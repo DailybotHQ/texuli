@@ -76,6 +76,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 112, jsGzipKb: 76 },
   },
   {
+    route: '/motion-page/',
+    reason:
+      'PLAN_010 T-site-060: nine lazy motion islands (client:visible); only the settings panel is near the first screen, so JS at the ready signal is 57.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import lazily (the player loaders, the Board, the overlays): 72 stylesheets. The HTML carries the server-rendered spring plot, the tokens tables, the blueprint JSON and the API contract. Measured 2026-10-29: 154.8 KB page, 26.3 KB gzip of HTML (+4% headroom). Follow-up shared with /slides-page/: ship the player CSS as one lazily loaded stylesheet.',
+    budget: { pageGzipKb: 162, htmlGzipKb: 28 },
+  },
+  {
     route: '/workflows-page/',
     reason:
       'PLAN_007: the workflow editor is the subject of the page and sits in the first screen (editor plus the workflow model). Measured 126.5 KB page, 92.3 KB JS (+4% headroom).',
@@ -126,8 +132,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/web-and-native/',
     reason:
-      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom).',
-    budget: { htmlGzipKb: 26, pageGzipKb: 100 },
+      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom). PLAN_010: the layer diagrams gained @texuli/document and @texuli/pages and the nav the motion link, measured 100.9 KB page, limit 105 (+4% headroom).',
+    budget: { htmlGzipKb: 26, pageGzipKb: 105 },
   },
   {
     route: '/gallery-themes/',

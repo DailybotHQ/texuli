@@ -1,0 +1,384 @@
+---
+/**
+ * /motion-page/ — the Texuli motion system (ADR-013): the runtime texels of
+ * @texuli/core/motion, the motion tokens, the motion prop and
+ * MotionProvider of texuli/motion, and motion as blueprint data painted by
+ * the player. Every demo is a lazy island (client:visible) that reads the
+ * page's level and reduced-motion settings; the tables, the spring plot's
+ * data and the API contract are static.
+ */
+import GuideCode from '../../components/guides/GuideCode.astro';
+import BlueprintDemo from '../../components/motion-site/BlueprintDemo.svelte';
+import BoardDemo from '../../components/motion-site/BoardDemo.svelte';
+import {
+  HOSTILE_MOTION_JSON,
+  MOTION_BLUEPRINT_JSON,
+} from '../../components/motion-site/blueprint.ts';
+import LayoutList from '../../components/motion-site/LayoutList.svelte';
+import MotionConsole from '../../components/motion-site/MotionConsole.svelte';
+import PresenceDemo from '../../components/motion-site/PresenceDemo.svelte';
+import {
+  CONTRACT_POINTS,
+  MOTION_DOCS,
+  MOTION_PIECES,
+  MOTION_RELEASE,
+  MOTION_RULES,
+  MOTION_SECTIONS,
+} from '../../components/motion-site/page.ts';
+import SharedDemo from '../../components/motion-site/SharedDemo.svelte';
+import SpringsDemo from '../../components/motion-site/SpringsDemo.svelte';
+import TimelineDemo from '../../components/motion-site/TimelineDemo.svelte';
+import TokensExplorer from '../../components/motion-site/TokensExplorer.svelte';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const section = (id: string) => {
+  const entry = MOTION_SECTIONS.find((candidate) => candidate.id === id);
+  if (!entry) throw new Error(`Unknown motion section ${id}`);
+  return entry;
+};
+
+const providerSnippet = `import { MotionProvider } from 'texuli/motion';
+import { Dialog } from 'texuli/dialog';
+
+<MotionProvider level="subtle">
+  <Dialog title="Edit crew" motion={{ enter: 'rise', exit: 'fade', duration: 'slow' }} />
+</MotionProvider>`;
+
+const runtimeSnippet = `import { animate, createFlip, stagger, timeline } from '@texuli/core/motion';
+
+const run = animate(card, [{ opacity: 0 }, { opacity: 1 }], { duration: 150 });
+await run.finished; // "finished", or "instant" under reduced motion`;
+---
+
+<BaseLayout
+  title="Motion"
+  description="Texuli motion (in development, ships in 0.6.0): presence, FLIP layout, shared elements, timelines and springs on the Web Animations API, motion tokens, levels, reduced motion, and motion as blueprint data."
+>
+  <div class="motion-page" data-tx-motion-page="">
+    <header class="motion-page__hero">
+      <p class="eyebrow">texuli/motion · in development · ships in {MOTION_RELEASE}</p>
+      <h1>Motion that respects the reader</h1>
+      <p class="lead">
+        One small runtime moves every Texuli surface: overlays enter and leave, lists glide, a card
+        grows into its detail view, timelines play on one clock, springs settle. The browser does the
+        interpolation through the Web Animations API, and reduced motion is instant by construction.
+        The motion system is in development and ships in <code>{MOTION_RELEASE}</code>; the packages
+        on npm today are <code>0.5.0</code>, a pre-1.0 release, without it.
+      </p>
+      <ol class="pieces" aria-label="The pieces of @texuli/core/motion">
+        {
+          MOTION_PIECES.map((piece) => (
+            <li class="pieces__item">
+              <code>{piece.name}</code>
+              <span>{piece.role}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </header>
+
+    <nav class="toc" aria-label="Sections on this page">
+      <ul>
+        {
+          MOTION_SECTIONS.map((entry) => (
+            <li>
+              <a href={`#${entry.id}`}>{entry.title}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <section class="demo" id="settings" aria-labelledby="settings-title">
+      <h2 id="settings-title">{section('settings').title}</h2>
+      <p>{section('settings').summary}</p>
+      <MotionConsole client:visible />
+    </section>
+
+    <section class="demo" id="presence" aria-labelledby="presence-title">
+      <h2 id="presence-title">{section('presence').title}</h2>
+      <p>{section('presence').summary}</p>
+      <PresenceDemo client:visible />
+    </section>
+
+    <section class="demo" id="layout" aria-labelledby="layout-title">
+      <h2 id="layout-title">{section('layout').title}</h2>
+      <p>{section('layout').summary}</p>
+      <div class="demo__pair">
+        <div class="demo__panel">
+          <h3>A keyed list</h3>
+          <LayoutList client:visible />
+        </div>
+        <div class="demo__panel">
+          <h3>A board</h3>
+          <BoardDemo client:visible />
+        </div>
+      </div>
+    </section>
+
+    <section class="demo" id="shared" aria-labelledby="shared-title">
+      <h2 id="shared-title">{section('shared').title}</h2>
+      <p>{section('shared').summary}</p>
+      <SharedDemo client:visible />
+    </section>
+
+    <section class="demo" id="timeline" aria-labelledby="timeline-title">
+      <h2 id="timeline-title">{section('timeline').title}</h2>
+      <p>{section('timeline').summary}</p>
+      <TimelineDemo client:visible />
+    </section>
+
+    <section class="demo" id="springs" aria-labelledby="springs-title">
+      <h2 id="springs-title">{section('springs').title}</h2>
+      <p>{section('springs').summary}</p>
+      <SpringsDemo client:visible />
+    </section>
+
+    <section class="demo" id="tokens" aria-labelledby="tokens-title">
+      <h2 id="tokens-title">{section('tokens').title}</h2>
+      <p>{section('tokens').summary}</p>
+      <TokensExplorer client:visible />
+    </section>
+
+    <section class="demo" id="blueprint" aria-labelledby="blueprint-title">
+      <h2 id="blueprint-title">{section('blueprint').title}</h2>
+      <p>{section('blueprint').summary}</p>
+      <div class="demo__pair demo__pair--code">
+        <div class="demo__panel">
+          <h3>The blueprint</h3>
+          <p class="demo__note">
+            A node may carry <code>motion</code> with <code>enter</code> and <code>exit</code> (<code
+              >fade</code
+            >, <code>rise</code>, <code>scale</code>, <code>slide-start</code>, <code>slide-end</code>),
+            <code>layout</code>, <code>stagger</code> (<code>none</code>, <code>fast</code>, <code
+              >base</code
+            >) and <code>duration</code> (<code>fast</code>, <code>base</code>, <code>slow</code>); the
+            envelope may set a <code>level</code>. Spec <code>0.6.0</code> is unreleased.
+          </p>
+          <GuideCode code={MOTION_BLUEPRINT_JSON} label="The motion blueprint (JSON)" lang="text" />
+          <h3>The refused node</h3>
+          <GuideCode code={HOSTILE_MOTION_JSON} label="A node with motion outside the vocabulary" lang="text" />
+        </div>
+        <div class="demo__panel">
+          <h3>Painted by the player</h3>
+          <BlueprintDemo client:visible />
+        </div>
+      </div>
+    </section>
+
+    <section class="demo" id="rules" aria-labelledby="rules-title">
+      <h2 id="rules-title">{section('rules').title}</h2>
+      <p>{section('rules').summary}</p>
+      <ul class="rules">
+        {
+          MOTION_RULES.map((rule) => (
+            <li class="rules__item">
+              <h3>{rule.title}</h3>
+              <p>{rule.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <h3>In code</h3>
+      <div class="demo__pair">
+        <GuideCode code={providerSnippet} label="MotionProvider and the motion prop" lang="ts" />
+        <GuideCode code={runtimeSnippet} label="The runtime texels" lang="ts" />
+      </div>
+    </section>
+
+    <section class="demo" id="api-contract" aria-labelledby="api-contract-title">
+      <h2 id="api-contract-title">{section('api-contract').title}</h2>
+      <p>{section('api-contract').summary}</p>
+      <p class="status">
+        <code>0.5.0</code> brought <code>bind:ref</code> and rest attributes to about 40 components and
+        made the inputs and 14 primitive parts compose a caller's handlers. The rest is in development
+        for <code>{MOTION_RELEASE}</code>: the remaining parts, the Field rule, and a contract test that
+        derives every component from the package exports, so a new export without a case fails.
+      </p>
+      <ul class="contract">
+        {
+          CONTRACT_POINTS.map((point) => (
+            <li class="contract__item" id={`contract-${point.id}`}>
+              <h3>{point.title}</h3>
+              <p>{point.body}</p>
+              <GuideCode code={point.code} label={`${point.title}: example`} lang="html" />
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="demo" id="package-docs" aria-labelledby="package-docs-title">
+      <h2 id="package-docs-title">Package docs</h2>
+      <p>The site does not render the package docs yet. Read them in the repository:</p>
+      <ul class="docs">
+        {
+          MOTION_DOCS.map((doc) => (
+            <li>
+              {doc.label}: <code>{doc.path}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .motion-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+  .motion-page__hero {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tx-foreground);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+    color: var(--tx-foreground);
+  }
+  .lead {
+    margin: 0;
+    max-inline-size: 46rem;
+    font-size: 1.0625rem;
+    color: var(--tx-foreground);
+  }
+  .pieces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pieces__item {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.75rem;
+    background: var(--tx-surface, Canvas);
+    font-size: 0.8125rem;
+  }
+  .pieces__item code {
+    font-weight: 600;
+  }
+  .pieces__item span {
+    color: var(--tx-muted-foreground, CanvasText);
+  }
+  .toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .toc a {
+    color: var(--tx-link, LinkText);
+  }
+  .demo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    min-inline-size: 0;
+    scroll-margin-block-start: 5rem;
+  }
+  .demo h2 {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  }
+  .demo h3 {
+    margin: 0;
+    font-size: 1.0625rem;
+  }
+  .demo > p,
+  .status {
+    margin: 0;
+    max-inline-size: 46rem;
+  }
+  .demo__pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+  .demo__pair > :global(*) {
+    min-inline-size: 0;
+  }
+  .demo :global(pre) {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  .demo__panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.6rem;
+    min-inline-size: 0;
+  }
+  .demo__note {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  .demo__pair--code :global(pre) {
+    max-block-size: 22rem;
+    overflow: auto;
+  }
+  .rules,
+  .contract {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .rules__item,
+  .contract__item {
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    min-inline-size: 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.85rem;
+    background: var(--tx-surface, Canvas);
+  }
+  .rules__item p,
+  .contract__item p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .contract__item :global(pre) {
+    overflow-x: auto;
+    font-size: 0.8rem;
+  }
+  .status {
+    padding: 0.75rem 1rem;
+    border-inline-start: 4px solid var(--tx-info, CanvasText);
+    border-radius: 0.5rem;
+    background: var(--tx-info-soft, Canvas);
+    color: var(--tx-info-soft-foreground, CanvasText);
+    font-size: 0.9rem;
+  }
+  .docs {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+  }
+  .docs code {
+    overflow-wrap: anywhere;
+  }
+</style>

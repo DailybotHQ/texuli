@@ -33,6 +33,9 @@ let errors = $state<FieldErrorMap>({});
     <code>Field</code> owns the label, description and error message and hands control props to any
     input-like child. <code>Input</code> (and Textarea) live under <code>texuli/input</code>.
   </p>
+  <p>
+    The <code>id</code>, <code>aria-describedby</code>, <code>aria-invalid</code> and <code>disabled</code> that a Field hands its control reach the focusable element, so the label focuses it and its description and error are announced. That is the Field rule of the <a href="/motion-page/#contract-field">component API contract</a>; it covers every control in <code>0.6.0</code>, which is in development.
+  </p>
 
   <h2 id="validation">Validation</h2>
   <p>

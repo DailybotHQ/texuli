@@ -116,6 +116,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-live-components](../apps/website/docs/site-live-components.md) | Live interactive component pages |
 | [site-live-primitives](../apps/website/docs/site-live-primitives.md) | Live primitive demos |
 | [site-media-page](../apps/website/docs/site-media-page.md) | texuli.com: media lab |
+| [site-motion](../apps/website/docs/site-motion.md) | texuli.com: motion page |
 | [site-native](../apps/website/docs/site-native.md) | texuli.com native landing |
 | [site-perf](../apps/website/docs/site-perf.md) | Site performance |
 | [site-playground](../apps/website/docs/site-playground.md) | Agent playground (texuli.com) |
