@@ -30,7 +30,10 @@ another framework passes its own loaders and a paint adapter.
      `…Url`, and `srcset` / `…Srcset`, where every candidate URL must pass the
      image policy or the whole value is removed), whatever tier validated the
      tree. A child that fills a named slot (audit G04) keeps its `slot`, so
-     the adapter mounts it in that snippet. Forbidden, event-handler and
+     the adapter mounts it in that snippet. A node with a checked spec 0.6.0
+     `motion` keeps it (`PaintNode.motion`, also passed to
+     `adapter.component`); the host decides whether and how it plays.
+     Forbidden, event-handler and
      prototype keys are dropped at any depth, and so are values nested too
      deep to police. Everything removed is listed in `paintIssues`;
    - or a placeholder: `unknown-id` and `tier-denied` from the renderer, and
@@ -66,7 +69,7 @@ const painted = await player.paint(adapter);
 | Member | What it does |
 | --- | --- |
 | `state` | `status`, `surface`, `error`, `plan`, `validation`, `paintIssues` |
-| `update({ blueprint, status, catalogHash, conditionInputs })` | Re-validates and re-plans (new `conditionInputs` re-evaluate every `when`); pending intents are dropped |
+| `update({ blueprint, status, catalogHash, conditionInputs, invalidPolicy })` | Re-validates and re-plans (new `conditionInputs` re-evaluate every `when`; a new `invalidPolicy` applies on the same handle, as a streamed draft does when it moves from preview to its final verdict); pending intents are dropped |
 | `receipt()` | `catalogHash`, `envelopeId`, `tier`, `ok`, `validationStatus`, `checks`, `errors`, `warnings` |
 | `digest()` | A promise of the SHA-256 of the validated tree's canonical JSON (`blueprintDigest`), or `null` for an invalid draft |
 | `propose` / `confirm` / `reject` / `intents()` | The closed intent queue (below) |

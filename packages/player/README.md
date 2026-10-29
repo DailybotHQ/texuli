@@ -93,6 +93,7 @@ Everything is exported from the root entry, `@texuli/player`.
 | Host data and regions | `sanitizeDataSources`, `hostRegionManifest`, `HOST_CHROME_IDS` |
 | Iframe embedding | `PlayerFrame`, `createPlayerFrameHost`, `mountPlayerFrame`, `createPlayerFrameClient` |
 | Media policy | `applyMediaPolicy`, `TRUST_PINNED_IDS` |
+| Streaming (unreleased, planned for `0.7.0`) | `<Player stream>`, `BlueprintStreamSource`, `PlayerStreamProgress`, `STREAM_PENDING_ID`; the push handle is `createBlueprintStream` from `@texuli/spec/stream` ([streaming.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/streaming.md)) |
 | Stylesheet | `@texuli/player/styles.css` |
 
 The TypeScript declarations list the full surface.
@@ -136,6 +137,20 @@ The TypeScript declarations list the full surface.
   refuse the same state surface errors the player refuses (form nodes
   outside an `action-form`, unbound controls, unmatched flow nodes, writes
   to host-bound variables).
+- **Streams add speed, not trust (unreleased).** With `stream`, a node
+  paints only once its shell (everything but `children`) has arrived and
+  passed every node-level check, under an `aria-busy`, `inert` surface with
+  polite progress at most every few seconds. Nothing is armed until the
+  complete draft passes `validateDraft`; a refused draft replaces the
+  painted prefix with the notice, and an interrupted stream keeps its
+  painted nodes with a recoverable error
+  ([streaming](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/streaming.md)).
+- **Motion as data (spec 0.6.0, unreleased).** A node's closed `motion`
+  (enter and exit presets, layout, stagger and duration in token steps)
+  plays through `@texuli/core/motion`, loaded only when a node declares it:
+  never on the server or for what the first paint shows, instant under
+  reduced motion, and capped by the host's `motionLevel`
+  ([reference](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/reference.md#node-motion-spec-060-unreleased)).
 - **Accessible frame.** A skip link, F6 between frames, Escape walking
   outward, `inert` for inactive frames, one polite live region, and reduced
   motion honored.
@@ -162,6 +177,7 @@ chrome, as the slides stage does for every component on a slide
 - Embedding guide (start here): [embedding.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md)
 - Validate, edit and activate around the player: [blueprint-flow.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/blueprint-flow.md)
 - Full reference (loaders, layouts, keyboard, state, flows, actions, iframe protocol): [reference.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/reference.md)
+- Streaming mode (paint a blueprint while an agent writes it; unreleased): [streaming.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/streaming.md)
 - Security property: [paint-proof.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/paint-proof.md)
 - Security model: [SECURITY.md](https://github.com/DailybotHQ/texuli/blob/main/docs/SECURITY.md)
 

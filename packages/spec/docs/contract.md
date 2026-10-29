@@ -181,7 +181,10 @@ chain starts from, passes through with `applied: []` (validation then
 refuses an unknown `spec`). It is idempotent, touches only the `spec`
 field (the tree, status, provenance and activation digest stay valid), and
 keeps a parsed `__proto__` key as an own property, which validation still
-refuses. `0.2.0 → 0.3.0` is additive: it stamps `spec: "0.3.0"`. The tests
+refuses. `0.2.0 → 0.3.0` is additive: it stamps `spec: "0.3.0"`. Every later step
+(`0.3.0 → 0.4.0`, `0.4.0 → 0.5.0` and the unreleased `0.5.0 → 0.6.0`, the
+motion vocabulary in [motion.md](motion.md)) is additive and stamps only
+`spec` as well. The tests
 check that `SPEC_MIGRATIONS` covers every consecutive pinned pair in
 `versions.json` from 0.2.0 to `SPEC_VERSION`. Inside a plan that has not
 published a spec version, later normative changes amend that version's pin

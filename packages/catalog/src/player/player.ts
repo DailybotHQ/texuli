@@ -1,3 +1,4 @@
+import type { BlueprintNodeMotion } from '@texuli/spec/motion';
 import { blueprintDigest } from '../edit/digest.ts';
 import { resolveTier } from '../render/renderer/tier.ts';
 import type { RenderCatalog, RenderNode, RenderTier } from '../render/renderer/types.ts';
@@ -47,6 +48,8 @@ export type PaintNode =
       children: readonly PaintNode[];
       /** The parent's named slot, when not the default one (audit G04). */
       slot?: string;
+      /** The node's checked motion (spec 0.6.0); the host decides whether it plays. */
+      motion?: Readonly<BlueprintNodeMotion>;
     }
   | {
       kind: 'placeholder';
@@ -85,10 +88,17 @@ export interface ValidationReceipt {
  * How a host turns the plan into output (DOM nodes, Svelte mounts, strings).
  * `slot` names the parent's named slot a node fills (audit G04); a host
  * routes it to that snippet, and its absence means the default slot.
+ * `motion` is the node's checked spec 0.6.0 motion, which a host may play.
  */
 export interface PaintAdapter<T> {
   component(
-    node: { id: string; path: string; props: Readonly<Record<string, unknown>>; slot?: string },
+    node: {
+      id: string;
+      path: string;
+      props: Readonly<Record<string, unknown>>;
+      slot?: string;
+      motion?: Readonly<BlueprintNodeMotion>;
+    },
     component: unknown,
     children: readonly T[]
   ): T;
@@ -106,9 +116,18 @@ export type ProposeResult = { ok: true; intent: PlayerIntent } | { ok: false; re
  */
 export interface PlayerHandle {
   readonly state: PlayerState;
-  /** New `conditionInputs` re-evaluate every `when`, as a new blueprint would. */
+  /**
+   * New `conditionInputs` re-evaluate every `when`, as a new blueprint would.
+   * A new `invalidPolicy` applies to the same handle, so loaded components are
+   * kept (a streamed draft is previewed, then judged with the host's policy).
+   */
   update(
-    next: Partial<Pick<PlayerOptions, 'blueprint' | 'status' | 'catalogHash' | 'conditionInputs'>>
+    next: Partial<
+      Pick<
+        PlayerOptions,
+        'blueprint' | 'status' | 'catalogHash' | 'conditionInputs' | 'invalidPolicy'
+      >
+    >
   ): void;
   receipt(): ValidationReceipt;
   /** SHA-256 of the validated tree's canonical JSON, or `null` for an invalid draft. */
@@ -153,6 +172,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
     status: options.status ?? 'draft',
     catalogHash: options.catalogHash,
     conditionInputs: options.conditionInputs,
+    invalidPolicy: options.invalidPolicy,
   };
   let intents: PlayerIntent[] = [];
   let sequence = 0;
@@ -179,7 +199,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
         : validation.diagnostics.some((d) => d.code === 'catalog-mismatch')
           ? 'catalog-mismatch'
           : 'invalid';
-    const refuse = !validation.ok && (options.invalidPolicy ?? 'refuse') === 'refuse';
+    const refuse = !validation.ok && (config.invalidPolicy ?? 'refuse') === 'refuse';
     return {
       status: validation.ok ? config.status : 'invalid',
       surface: refuse ? 'notice' : 'tree',
@@ -222,6 +242,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
         plan(child, `${path}.children.${index}`, issues)
       ),
       ...slotOf(node),
+      ...(node.motion ? { motion: node.motion } : {}),
     };
   }
 

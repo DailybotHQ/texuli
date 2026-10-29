@@ -16,7 +16,7 @@
     },
     "tier": "untrusted",
     "profile": "web",
-    "spec": "0.5.0",
+    "spec": "0.6.0",
     "state": {
       "email": {
         "type": "string"

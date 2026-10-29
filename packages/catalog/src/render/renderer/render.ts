@@ -1,4 +1,5 @@
 import type { FormulaInputs } from '@texuli/blocks/formula';
+import { type BlueprintNodeMotion, checkNodeMotion } from '@texuli/spec/motion';
 import { blockFamilyMismatch } from './block-families.ts';
 import { sanitizeProps } from './props.ts';
 import { resolveTier } from './tier.ts';
@@ -46,6 +47,9 @@ interface RenderContext {
  *   (`invalid-condition`); a valid condition that is false or unknown for
  *   `conditionInputs` hides the node, after its subtree was still checked;
  *   the root cannot be conditional
+ * - a `motion` must use the closed spec 0.6.0 vocabulary (presets and token
+ *   steps) → otherwise the motion is **dropped** (`invalid-motion`) and the
+ *   node paints without it
  * - `class` / `style` (and related) never pass through
  * - no HTML strings, no functions, no host slots/events from the tree
  */
@@ -139,6 +143,7 @@ function asTreeNode(
     ...(children ? { children } : {}),
     ...(record.slot !== undefined ? { slot: record.slot as string } : {}),
     ...(record.when !== undefined ? { when: record.when } : {}),
+    ...(record.motion !== undefined ? { motion: record.motion } : {}),
   };
 }
 
@@ -323,13 +328,33 @@ function renderComponent(
     if (rendered) children.push(rendered);
   }
 
+  const motion = resolveMotion(node, path, diagnostics);
   return Object.freeze({
     kind: 'component' as const,
     id,
     props: sanitized.props,
     children: Object.freeze(children),
     ...slotted,
+    ...(motion ? { motion } : {}),
   });
+}
+
+/** The node's checked motion, or `undefined` (none declared, or refused and reported). */
+function resolveMotion(
+  node: CatalogTreeInput,
+  path: string,
+  diagnostics: RenderDiagnostic[]
+): Readonly<BlueprintNodeMotion> | undefined {
+  if (node.motion === undefined) return undefined;
+  const checked = checkNodeMotion(node.motion);
+  if (checked.ok) return checked.motion;
+  diagnostics.push({
+    code: 'invalid-motion',
+    path,
+    id: node.id,
+    message: `motion${checked.path}: ${checked.message} The node paints without motion.`,
+  });
+  return undefined;
 }
 
 function defaultAllows(

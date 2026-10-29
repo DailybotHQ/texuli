@@ -30,6 +30,12 @@
       "specDigest": "1ba15e8b082f68140c4b2768b8fd69c9f760e655dd117fac756f356a71525b2d",
       "change": "minor",
       "summary": "Additive (PLAN_009 catalog coverage): new catalog ids data-cohort-table, data-notification-inbox and data-filter-builder (agent-emittable data views) and time-field (app-tier form input). Migration 0.4.0\u21920.5.0 stamps spec only."
+    },
+    {
+      "specVersion": "0.6.0",
+      "specDigest": "37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc",
+      "change": "minor",
+      "summary": "Additive (PLAN_010 T-motion-spec, ADR-012 and ADR-013): the closed motion vocabulary: node motion (enter and exit presets fade, rise, scale, slide-start and slide-end; layout; stagger none, fast or base; duration fast, base or slow) and the envelope motion level (full, subtle, none); $defs motionPreset, motionDuration, motionStagger, motionLevel, nodeMotion and envelopeMotion; the motion goldens in app-dashboard and four motion invalid fixtures. Migration 0.5.0\u21920.6.0 stamps spec only."
     }
   ]
 }

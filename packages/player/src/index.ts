@@ -109,7 +109,6 @@ export {
   withoutHostChrome,
   withoutHostChromeLoaders,
 } from './host-chrome.ts';
-
 export {
   applyHostData,
   checkHostBoundWriters,
@@ -131,6 +130,7 @@ export {
   DEFAULT_PLAYER_LABELS,
   type PlayerLabelOverrides,
   type PlayerLabels,
+  type PlayerShownStatus,
   resolvePlayerLabels,
   safeLang,
 } from './labels.ts';
@@ -251,4 +251,12 @@ export {
   type StateValue,
   type WorkflowValue,
 } from './state/schema.ts';
+export {
+  type BlueprintStreamSource,
+  type PlayerStreamProgress,
+  STREAM_ANNOUNCE_INTERVAL_MS,
+  STREAM_PAINT_INTERVAL_MS,
+  STREAM_PENDING_ID,
+  type StreamNodeState,
+} from './stream/marker.ts';
 export type { PlayerPaintNode } from './types.ts';

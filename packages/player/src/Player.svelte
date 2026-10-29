@@ -8,10 +8,11 @@ import {
 } from '@texuli/catalog/player';
 import { formulaConditions } from '@texuli/catalog/render/conditions';
 import type { RenderCatalog, RenderTier } from '@texuli/catalog/render/renderer';
+import type { ValidateDraftOptions } from '@texuli/catalog/validate';
 import { type Component, type Snippet, tick, untrack } from 'svelte';
 import './player.css';
 import { createActionAccess } from './action-access.ts';
-import { type ActionHandler, checkActionNodes } from './actions.ts';
+import type { ActionHandler } from './actions.ts';
 import {
   createAnnouncer,
   formatAnnouncement,
@@ -34,9 +35,14 @@ import { type DeckPlayerHost, isLayoutDeckTree } from './deck-host.ts';
 import type { PlayerDiagnosticsEvent, PlayerSize } from './embed/types.ts';
 import type { PlayerNodeError, PlayerNodeErrorPhase } from './errors.ts';
 import { withoutHostChrome, withoutHostChromeLoaders } from './host-chrome.ts';
-import { applyHostData, checkHostBoundWriters, type DataSources } from './host-data.ts';
+import { applyHostData, type DataSources } from './host-data.ts';
 import { handleSurfaceKeydown, normalizeTabOrder } from './keyboard.ts';
-import { type PlayerLabelOverrides, resolvePlayerLabels, safeLang } from './labels.ts';
+import {
+  type PlayerLabelOverrides,
+  type PlayerShownStatus,
+  resolvePlayerLabels,
+  safeLang,
+} from './labels.ts';
 import { PLAYER_GRAMMAR_ROLES } from './layout-manifests.ts';
 import { planFrames } from './layouts/outline.ts';
 import {
@@ -48,6 +54,8 @@ import {
 } from './live-update.ts';
 import { PLAYER_LOADERS } from './loaders.ts';
 import { applyMediaPolicy } from './media-policy.ts';
+import { createPlayerMotion, playerMotionLevel, setPlayerMotion } from './motion/context.ts';
+import { planHasMotion, pruneExited, retainLeaving, withStagger } from './motion/plan.ts';
 import PlayerNode from './PlayerNode.svelte';
 import { withNodePath } from './painters/interactive.ts';
 import { isHostRegionName } from './region-manifests.ts';
@@ -64,15 +72,14 @@ import {
   siblingPaths,
 } from './selection.ts';
 import { DEFAULT_LOAD_TIMEOUT_MS, skeletonFamily, withLoadTimeout } from './skeletons.ts';
-import {
-  type NodeInteraction,
-  type ResolveOptions,
-  resolveStateBindings,
-  splitStatefulBlueprint,
-} from './state/bind.ts';
-import { checkControlBindings } from './state/controls.ts';
-import { checkFlowNodes, nextFlowView } from './state/flow.ts';
+import { type ResolveOptions, splitStatefulBlueprint } from './state/bind.ts';
+import { nextFlowView } from './state/flow.ts';
 import { type EventDetail, moveListItem, runActions } from './state/reducers.ts';
+import {
+  playerResolveOptions,
+  type ResolvedBlueprint,
+  resolveSplitBlueprint,
+} from './state/resolve.ts';
 import {
   coerceStateValue,
   initialSnapshot,
@@ -81,10 +88,32 @@ import {
   type StateSnapshot,
   type StateValue,
 } from './state/schema.ts';
+import {
+  type BlueprintStreamSource,
+  type PlayerStreamProgress,
+  STREAM_ANNOUNCE_INTERVAL_MS,
+  STREAM_PENDING_ID,
+  type StreamNodeState,
+} from './stream/marker.ts';
+import type { StreamSnapshot } from './stream/session.ts';
 import type { PlayerPaintNode } from './types.ts';
 
 type Props = {
-  blueprint: unknown;
+  /** A tree or an envelope, as text or data. Ignored while `stream` is set. */
+  blueprint?: unknown;
+  /**
+   * Streaming mode (ADR-014): the blueprint as it is generated, as text
+   * chunks split anywhere (an `AsyncIterable<string | Uint8Array>`, such as
+   * `createBlueprintStream()` from `@texuli/spec/stream`). Each node paints
+   * once its shell is final and passes every node-level check; the tree
+   * stays inert and its actions disarmed until the complete draft passes
+   * the full validation. A new source restarts the paint (a retry).
+   */
+  stream?: BlueprintStreamSource | null;
+  /** Shown as a retry button when a stream stops early; the host passes a new `stream`. */
+  onStreamRetry?: () => void;
+  /** Called as a stream paints, stops or completes. */
+  onStreamProgress?: (progress: PlayerStreamProgress) => void;
   catalog?: RenderCatalog;
   catalogHash?: string;
   tier?: RenderTier;
@@ -145,6 +174,13 @@ type Props = {
    */
   motion?: 'auto' | 'reduce';
   /**
+   * The host's motion level for the blueprint's motion (spec 0.6.0):
+   * `full`, `subtle` (shorter, no travel or scale) or `none`. It wins over
+   * the blueprint's `motion.level`; reduced motion still makes it instant.
+   * Default: the blueprint's level, else `full`.
+   */
+  motionLevel?: 'full' | 'subtle' | 'none';
+  /**
    * The current flow view (G09), when the host mirrors it (for example from
    * its URL). Ignored unless it names a declared view; default the flow's
    * `initial`.
@@ -188,6 +224,9 @@ type Props = {
 
 let {
   blueprint,
+  stream = null,
+  onStreamRetry,
+  onStreamProgress,
   catalog = createPlayerCatalog(),
   catalogHash,
   tier = 'untrusted',
@@ -212,6 +251,7 @@ let {
   selection,
   onSelectionChange,
   motion = 'auto',
+  motionLevel,
   view,
   onFlowChange,
   onAction,
@@ -389,8 +429,24 @@ function onFocusIn(event: FocusEvent): void {
 
 const NO_STATE: StateSnapshot = Object.freeze({});
 
+// ── Streaming (ADR-014) ──────────────────────────────────────
+// The session (tokenizer, assembler, node checks) loads only with a stream.
+let streamView = $state.raw<StreamSnapshot | null>(null);
+// Before the first snapshot: one pending root.
+const PENDING_TREE = Object.freeze({ id: STREAM_PENDING_ID });
+let streamPhase = $derived<StreamSnapshot['phase'] | null>(
+  stream ? (streamView?.phase ?? 'streaming') : null
+);
+// While streaming, and after an interruption, the partial draft is previewed, never judged.
+let previewing = $derived(streamPhase === 'streaming' || streamPhase === 'interrupted');
+// Actions run only on a blueprint that is not streaming, or once the complete draft is in.
+let armed = $derived(streamPhase === null || streamPhase === 'complete');
+// What the player validates and paints: the blueprint, or the stream's partial or final draft.
+let source = $derived(stream ? (streamView?.blueprint ?? PENDING_TREE) : blueprint);
+let effectivePolicy = $derived<'refuse' | 'preview'>(previewing ? 'preview' : invalidPolicy);
+
 // Local state (G01): declared by the blueprint, held in this player only.
-let split = $derived(splitStatefulBlueprint(blueprint));
+let split = $derived(splitStatefulBlueprint(source));
 // The values the reader holds now. A new blueprint (a live update, R20)
 // keeps each one its declarations still accept; the rest start over.
 let liveState: StateSnapshot = NO_STATE;
@@ -417,56 +473,14 @@ $effect.pre(() => {
     untrack(() => onStateChange?.(next));
   }
 });
-const NO_INTERACTIONS: ReadonlyMap<string, NodeInteraction> = new Map();
 // What bind, on and reorder name, read by the resolver: bindable props come from the catalog.
-let resolveOptions = $derived<ResolveOptions>({
-  ...(dataSources ? { dataSources } : {}),
-  bindable: (id) => catalog.get(id)?.bindable,
-  writable: (name) =>
-    split.kind === 'stateful' &&
-    Object.hasOwn(split.declarations, name) &&
-    split.declarations[name]?.source === undefined,
-});
+let resolveOptions = $derived<ResolveOptions>(
+  playerResolveOptions(split, (id) => catalog.get(id)?.bindable, dataSources)
+);
+// State-only controls must each name a declared variable of the type they write.
+// Flow nodes must name declared views and events (G09).
 let resolved = $derived.by(
-  (): {
-    blueprint: unknown;
-    issues: readonly StateIssue[];
-    interactions: ReadonlyMap<string, NodeInteraction>;
-  } => {
-    if (split.kind === 'invalid') {
-      return { blueprint: null, issues: split.issues, interactions: NO_INTERACTIONS };
-    }
-    // State-only controls must each name a declared variable of the type they write.
-    // Flow nodes must name declared views and events (G09).
-    if (split.kind === 'plain') {
-      // A plain tree still reads host data and may run actions that need no state.
-      const plain = resolveStateBindings(split.blueprint, NO_STATE, resolveOptions);
-      return {
-        blueprint: plain.blueprint,
-        interactions: plain.interactions,
-        issues: [
-          ...plain.issues,
-          ...checkControlBindings(split.blueprint, null),
-          ...checkFlowNodes(split.blueprint, null),
-          ...checkActionNodes(split.blueprint, null),
-        ],
-      };
-    }
-    const bound = resolveStateBindings(split.blueprint, stateValues, resolveOptions);
-    const controls = [
-      ...checkControlBindings(split.blueprint, split.declarations),
-      ...checkFlowNodes(split.blueprint, split.flow),
-      ...checkActionNodes(split.blueprint, split.declarations),
-      ...checkHostBoundWriters(split.blueprint, split.declarations),
-    ];
-    return controls.length > 0
-      ? {
-          blueprint: bound.blueprint,
-          issues: [...bound.issues, ...controls],
-          interactions: bound.interactions,
-        }
-      : bound;
-  }
+  (): ResolvedBlueprint => resolveSplitBlueprint(split, stateValues, resolveOptions)
 );
 let interactions = $derived(resolved.interactions);
 let stateIssues = $derived(resolved.issues);
@@ -520,7 +534,8 @@ $effect.pre(() => {
 
 /** Fire a declared flow event. Returns `false` (and changes nothing) when no transition applies. */
 export function dispatchFlow(event: string): boolean {
-  if (!flow || flowView === null) return false;
+  // A streamed draft moves nothing until it is complete and validated (ADR-014).
+  if (!armed || !flow || flowView === null) return false;
   const to = nextFlowView(flow, flowView, event, conditionInputs);
   if (to === null) return false;
   const from = flowView;
@@ -561,7 +576,8 @@ setPlayerLandmarks(() => landmarks);
 // State-only controls (G06/D14) read and write declared state through this, and nothing else.
 setPlayerStateAccess({
   read: (name) => (Object.hasOwn(stateValues, name) ? stateValues[name] : undefined),
-  write: (name, value) => setState(name, value),
+  // A streamed draft changes no state until it is complete and validated (ADR-014).
+  write: (name, value) => armed && setState(name, value),
   declaration: (name) =>
     split.kind === 'stateful' && Object.hasOwn(split.declarations, name)
       ? split.declarations[name]
@@ -594,7 +610,8 @@ function insideHostRegion(target: EventTarget | null): boolean {
 // Action forms (G17) propose intents to the host through this and get receipts.
 setPlayerActionAccess(
   createActionAccess({
-    handler: () => onAction,
+    // Disarmed while a stream is not complete: the receipt says "unavailable".
+    handler: () => (armed ? onAction : undefined),
     labels: () => resolvedLabels,
     announce: (text) => announcePolite(text),
   })
@@ -604,6 +621,7 @@ setPlayerActionAccess(
 setPlayerFlowAccess({
   view: () => flowView,
   can: (event) =>
+    armed &&
     flow !== null &&
     flowView !== null &&
     nextFlowView(flow, flowView, event, conditionInputs) !== null,
@@ -712,12 +730,18 @@ function planMove(fromPath: string, item: string, toPath: string, index: number)
 setPlayerInteraction({
   dispatch(path, event, detail, form) {
     const actions = interactions.get(path)?.on?.[event];
-    return actions ? runNodeActions(actions, event, detail, form) : true;
+    if (!actions) return true;
+    // A streamed draft runs no action until it is complete and validated (ADR-014).
+    if (!armed) {
+      announcePolite(resolvedLabels.actionUnavailable);
+      return false;
+    }
+    return runNodeActions(actions, event, detail, form);
   },
   bound: (path, prop) => interactions.get(path)?.bind?.[prop] !== undefined,
   write(path, prop, value) {
     const name = interactions.get(path)?.bind?.[prop];
-    return name !== undefined && setState(name, value);
+    return armed && name !== undefined && setState(name, value);
   },
   reorder(path) {
     const found = reorderOf(path);
@@ -737,9 +761,10 @@ setPlayerInteraction({
       locked: stringList(reorder.locked),
     };
   },
-  canMove: (fromPath, item, toPath, index) => planMove(fromPath, item, toPath, index) !== null,
+  canMove: (fromPath, item, toPath, index) =>
+    armed && planMove(fromPath, item, toPath, index) !== null,
   move(fromPath, item, toPath, index) {
-    const planned = planMove(fromPath, item, toPath, index);
+    const planned = armed ? planMove(fromPath, item, toPath, index) : null;
     if (!planned) {
       announcePolite(resolvedLabels.actionRefused);
       return false;
@@ -804,9 +829,15 @@ const adapter: PaintAdapter<PlayerPaintNode> = {
       children,
       ...(frames.has(node.path) ? { frame: frames.get(node.path) } : {}),
       ...(node.slot !== undefined ? { slot: node.slot } : {}),
+      ...(node.motion ? { motion: node.motion, children: withStagger(children, node.motion) } : {}),
     };
   },
   placeholder: (node) => {
+    // A streamed node not admitted yet paints as a skeleton of its family (ADR-014).
+    if (node.id === STREAM_PENDING_ID && previewing) {
+      const marker = streamView?.pending.get(node.path);
+      return streamSkeleton(node, marker?.id ?? null, marker?.state ?? 'pending');
+    }
     // The core only produces `node-error` placeholders when a load failed.
     if (node.reason === 'node-error') report(node.id, node.path, 'load');
     return {
@@ -828,19 +859,88 @@ const adapter: PaintAdapter<PlayerPaintNode> = {
   }),
 };
 
+function streamSkeleton(
+  node: { path: string; slot?: string },
+  id: string | null,
+  state: StreamNodeState
+): PlayerPaintNode {
+  return {
+    kind: 'skeleton',
+    id: id ?? STREAM_PENDING_ID,
+    path: node.path,
+    label: id ? (catalog.get(id)?.label ?? id) : resolvedLabels.streamPending,
+    family: id ? skeletonFamily(id) : 'generic',
+    stream: state,
+    ...(node.slot !== undefined ? { slot: node.slot } : {}),
+  };
+}
+
 let player = $state<PlayerHandle | null>(null);
 let playerState = $state<PlayerState | null>(null);
+// Spec 0.6.0 motion: the host's level, then the blueprint's; reduced motion makes it instant.
+let motionSettings = $derived({
+  level: playerMotionLevel({
+    host: motionLevel,
+    document: playerState?.validation.envelope?.motion?.level,
+    reducedMotion,
+  }),
+  reducedMotion,
+});
+const playerMotion = createPlayerMotion({
+  settings: () => motionSettings,
+  onExited: (path) => {
+    exitedPaths.add(path);
+    loadRevision += 1;
+  },
+});
+setPlayerMotion(playerMotion);
 // Heading ranks, frame ids and contents for content layouts, from the plan.
 let frames = $derived(planFrames(playerState?.plan ?? [], skipTargetId));
 
-let shownStatus = $derived<PlayerStatus>(
-  stateRefused ? 'invalid' : (playerState?.status ?? status)
+let shownStatus = $derived<PlayerShownStatus>(
+  previewing && streamPhase !== null
+    ? streamPhase === 'interrupted'
+      ? 'interrupted'
+      : 'streaming'
+    : stateRefused
+      ? 'invalid'
+      : (playerState?.status ?? status)
 );
 let loadRevision = $state(0);
+// Spec 0.6.0 motion: nodes that left the plan stay, inert, while their exit plays.
+const exitedPaths = new Set<string>();
+let previousPaint: readonly PlayerPaintNode[] | null = null;
 let paintNodes = $derived.by(() => {
   playerState;
   loadRevision;
-  return player?.paintNow(adapter) ?? [];
+  const fresh = player?.paintNow(adapter) ?? [];
+  pruneExited(fresh, exitedPaths);
+  const settings = untrack(() => playerMotion.settings());
+  const next =
+    settings.level === 'none' || settings.reducedMotion
+      ? fresh
+      : retainLeaving(fresh, previousPaint, exitedPaths);
+  previousPaint = next;
+  return next;
+});
+
+// The motion runtime loads only once a painted node declares motion.
+$effect(() => {
+  if (planHasMotion(paintNodes)) playerMotion.preload();
+});
+// Layout motion: measure before each repaint, play after it.
+$effect.pre(() => {
+  void paintNodes;
+  untrack(() => playerMotion.measure());
+});
+$effect(() => {
+  void paintNodes;
+  untrack(() => playerMotion.play());
+});
+// Nodes painted from here on are new content and may enter (never on the first paint).
+$effect(() => {
+  playerMotion.markPainted();
+  return () => playerMotion.dispose();
 });
 
 // The shared drag scope (spec 0.3.0 reorder), loaded only when a node reorders.
@@ -866,6 +966,8 @@ function countKind(nodes: readonly PlayerPaintNode[], kind: PlayerPaintNode['kin
 // when what was painted changes. A refusal is the notice's (assertive) to say.
 $effect(() => {
   const nodes = paintNodes;
+  // While streaming, progress is announced on its own schedule (below).
+  if (previewing) return;
   const refused = stateRefused || playerState?.surface === 'notice';
   if (refused || !playerState) {
     untrack(() => {
@@ -883,7 +985,10 @@ $effect(() => {
       preview: !playerState.validation.ok,
       // Draft is the default, and an invalid draft is already said by the preview warning.
       status:
-        shownStatus === 'draft' || shownStatus === 'invalid'
+        shownStatus === 'draft' ||
+        shownStatus === 'invalid' ||
+        shownStatus === 'streaming' ||
+        shownStatus === 'interrupted'
           ? null
           : resolvedLabels.status[shownStatus],
     },
@@ -908,6 +1013,8 @@ function reportDiagnostics(handle: PlayerHandle): void {
 // The blueprint the current handle validated; a state change re-validates
 // the newly resolved tree on the same handle (loaded painters are kept).
 let validatedBlueprint: unknown;
+// The invalid policy the current handle applies (`preview` while streaming).
+let appliedPolicy: 'refuse' | 'preview' = 'refuse';
 
 // What the handle is built from. A live update (R20) keeps the handle, and
 // with it the loaded painters, unless one of these really changed: hosts
@@ -941,6 +1048,7 @@ $effect(() => {
   }
   void handleInputs;
   const initial = untrack(() => resolved.blueprint);
+  appliedPolicy = untrack(() => effectivePolicy);
   const handle = createPlayer(
     untrack(() => ({
       blueprint: initial,
@@ -948,7 +1056,7 @@ $effect(() => {
       catalogHash,
       tier,
       status,
-      invalidPolicy,
+      invalidPolicy: effectivePolicy,
       checkBlock: checkFamilyBlock,
       // `when` conditions (G07) read the local state, mapped to numbers.
       conditions: formulaConditions,
@@ -965,7 +1073,8 @@ $effect(() => {
   player = handle;
   reported = new Set();
   playerState = handle.state;
-  reportDiagnostics(handle);
+  // A streamed partial draft is previewed, not judged: diagnostics come with the final verdict.
+  if (!untrack(() => previewing)) reportDiagnostics(handle);
   const unsubscribe = handle.subscribe((next) => {
     playerState = next;
     loadRevision += 1;
@@ -982,8 +1091,82 @@ $effect(() => {
   if (!handle || next === validatedBlueprint) return;
   validatedBlueprint = next;
   reported = new Set();
-  handle.update({ blueprint: next });
-  reportDiagnostics(handle);
+  const policy = untrack(() => effectivePolicy);
+  handle.update(
+    policy === appliedPolicy ? { blueprint: next } : { blueprint: next, invalidPolicy: policy }
+  );
+  appliedPolicy = policy;
+  if (!untrack(() => previewing)) reportDiagnostics(handle);
+});
+
+// The end of a stream judges the draft with the host's policy on the same handle.
+$effect(() => {
+  const policy = effectivePolicy;
+  const handle = untrack(() => player);
+  if (!handle || policy === appliedPolicy) return;
+  appliedPolicy = policy;
+  reported = new Set();
+  handle.update({ invalidPolicy: policy });
+  if (!untrack(() => previewing)) reportDiagnostics(handle);
+});
+
+/** The options the core validates with, for the streaming node checks. */
+function streamValidateOptions(): ValidateDraftOptions {
+  return {
+    catalog: withoutHostChrome(catalog),
+    catalogHash,
+    tier,
+    checkBlock: checkFamilyBlock,
+    conditions: formulaConditions,
+    conditionInputs,
+    roles: PLAYER_GRAMMAR_ROLES,
+  };
+}
+
+// Read the stream (the session loads only now); a new source is a retry.
+$effect(() => {
+  const input = stream;
+  if (!input) {
+    untrack(() => {
+      streamView = null;
+    });
+    return;
+  }
+  let stopped = false;
+  let stop: (() => void) | null = null;
+  void import('./stream/session.ts').then(({ startStreamPaint }) => {
+    if (stopped) return;
+    stop = untrack(() =>
+      startStreamPaint(input, {
+        validate: streamValidateOptions(),
+        bindable: (id) => catalog.get(id)?.bindable,
+        ...(dataSources ? { dataSources } : {}),
+        previous: streamView,
+        onSnapshot: (view, progress) => {
+          streamView = view;
+          onStreamProgress?.(progress);
+        },
+      })
+    );
+  });
+  return () => {
+    stopped = true;
+    stop?.();
+  };
+});
+
+// Polite progress while streaming: once at the start, then at most every few seconds.
+$effect(() => {
+  if (streamPhase !== 'streaming') return;
+  untrack(() => {
+    announcer.reset('polite');
+    announcePolite(resolvedLabels.streamStarted);
+  });
+  const timer = setInterval(() => {
+    const count = untrack(() => streamView?.painted ?? 0);
+    announcePolite(formatAnnouncement(resolvedLabels.streamProgress, { count }));
+  }, STREAM_ANNOUNCE_INTERVAL_MS);
+  return () => clearInterval(timer);
 });
 
 // A state change re-evaluates every `when` condition (G07).
@@ -994,7 +1177,7 @@ $effect(() => {
   appliedInputs = inputs;
   reported = new Set();
   handle.update({ conditionInputs: inputs });
-  reportDiagnostics(handle);
+  if (!untrack(() => previewing)) reportDiagnostics(handle);
 });
 
 // Painted content cannot pull focus out of reading order (positive tabindex).
@@ -1054,6 +1237,7 @@ $effect(() => {
 let deckHostActive = $derived(
   Boolean(
     deckHost &&
+      !previewing &&
       playerState?.surface === 'tree' &&
       !stateRefused &&
       isLayoutDeckTree(playerState.validation.draft ?? playerState.validation.roots[0])
@@ -1064,7 +1248,7 @@ let deckHostActive = $derived(
 // rerender) with the same values never re-presents; the validated tree is read
 // untracked, and `label`, `active` and `root` are live getters, so toggling
 // them never re-presents the deck (and never loses its position).
-let deckSource = $derived(blueprint);
+let deckSource = $derived(source);
 let deckTier = $derived(tier);
 let deckPresenter = $derived(deckHost);
 $effect(() => {
@@ -1163,7 +1347,9 @@ $effect(() => {
       class="tx-player__surface"
       data-tx-player-surface
       bind:this={surface}
-      inert={!active}
+      inert={!active || streamPhase === 'streaming'}
+      aria-busy={streamPhase === 'streaming' ? 'true' : undefined}
+      data-tx-player-stream={streamPhase ?? undefined}
       data-selectable={selectable || undefined}
       onkeydown={onSurfaceKeydown}
       onclick={onSurfaceClick}
@@ -1179,10 +1365,25 @@ $effect(() => {
         <ReorderScope children={painted} />
       {/if}
     </div>
-    {#if !playerState.validation.ok}
+    {#if !playerState.validation.ok && !previewing}
       <p class="tx-player__preview-warning">
         {resolvedLabels.previewWarning}
       </p>
+    {/if}
+    {#if streamPhase === 'interrupted'}
+      <!-- The painted nodes stay, marked incomplete; nothing is ever armed. -->
+      <div
+        class="tx-player__stream-error"
+        role="alert"
+        data-tx-player-stream-error={streamView?.error?.code}
+      >
+        <p>{resolvedLabels.streamInterrupted}</p>
+        {#if onStreamRetry}
+          <button type="button" class="tx-player__stream-retry" onclick={() => onStreamRetry?.()}>
+            {resolvedLabels.streamRetry}
+          </button>
+        {/if}
+      </div>
     {/if}
   {/if}
 

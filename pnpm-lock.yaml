@@ -89,6 +89,9 @@ importers:
       '@texuli/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@texuli/spec':
+        specifier: workspace:*
+        version: link:../../packages/spec
     devDependencies:
       '@texuli/tools':
         specifier: workspace:*
@@ -405,6 +408,9 @@ importers:
       '@texuli/chat':
         specifier: 0.5.0
         version: link:../chat
+      '@texuli/core':
+        specifier: 0.5.0
+        version: link:../core
       '@texuli/data':
         specifier: 0.5.0
         version: link:../data

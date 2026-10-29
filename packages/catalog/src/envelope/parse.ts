@@ -1,4 +1,5 @@
 import { safeHref } from '@texuli/core/url-policy';
+import { checkEnvelopeMotion } from '@texuli/spec/motion';
 import { parseEditOps } from '../edit/parse.ts';
 import type { CatalogTreeInput } from '../render/renderer/types.ts';
 import {
@@ -58,6 +59,7 @@ const FIELDS: Readonly<Record<string, readonly string[]>> = {
     'spec',
     'state',
     'flow',
+    'motion',
     'tree',
   ],
   generator: ['kind', 'name', 'model'],
@@ -277,6 +279,11 @@ export function parseEnvelope(
     ) {
       error('invalid-field', `$.${key}`, `"${key}" must be an object.`);
     }
+  }
+  if (root.motion !== undefined) {
+    // Spec 0.6.0: a level from the closed vocabulary, never durations or CSS.
+    const motion = checkEnvelopeMotion(root.motion);
+    if (!motion.ok) error('invalid-motion', `$.motion${motion.path}`, motion.message);
   }
 
   return {

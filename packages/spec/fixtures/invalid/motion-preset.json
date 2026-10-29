@@ -1,0 +1,41 @@
+{
+  "$comment": "Must fail spec validation with exactly these diagnostic codes, in order. Spec 0.6.0: a motion preset outside the closed vocabulary.",
+  "expect": ["schema"],
+  "blueprint": {
+    "format": "texuli-blueprint",
+    "version": 1,
+    "id": "motion-preset",
+    "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+    "status": "draft",
+    "createdAt": "2026-10-24T09:00:00Z",
+    "updatedAt": "2026-10-24T09:00:00Z",
+    "generator": {
+      "kind": "agent",
+      "name": "Harbor assistant",
+      "model": "example-model"
+    },
+    "tier": "untrusted",
+    "profile": "web",
+    "spec": "0.6.0",
+    "tree": {
+      "id": "layout-doc",
+      "props": {
+        "title": "Week 42"
+      },
+      "children": [
+        {
+          "id": "blocks-text",
+          "props": {
+            "block": {
+              "type": "text",
+              "markdown": "Shipped on time."
+            }
+          },
+          "motion": {
+            "enter": "spin"
+          }
+        }
+      ]
+    }
+  }
+}

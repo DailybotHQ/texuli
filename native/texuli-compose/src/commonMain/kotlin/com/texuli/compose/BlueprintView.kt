@@ -31,23 +31,47 @@ import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.CollectionItemInfo
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.CompositionLocalProvider
+import com.texuli.spec.BlueprintMotionLevel
 import com.texuli.spec.JsonValue
 import com.texuli.spec.runtime.PlanNode
+import com.texuli.spec.runtime.childMotionDelays
+import com.texuli.spec.runtime.nativeMotionOf
 
 /**
  * Paint a validated render plan (design §4, step 5). Each id resolves through
  * [NativeRegistry]; anything else paints a visible placeholder. Text is shown
  * as text: nothing in a blueprint is executed or interpreted as markup.
+ *
+ * `motionLevel` is the level spec 0.6.0 motion plays at
+ * (`resolveMotionLevel(host, envelope.motion?.level, reducedMotion)`);
+ * `NONE` paints every node at once.
  */
 @Composable
-fun BlueprintView(plan: List<PlanNode>, onIntent: (TexuliIntent) -> Unit = {}) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        plan.forEachIndexed { index, node -> PlanNodeView(node, "$index", onIntent) }
+fun BlueprintView(
+    plan: List<PlanNode>,
+    onIntent: (TexuliIntent) -> Unit = {},
+    motionLevel: BlueprintMotionLevel = BlueprintMotionLevel.FULL,
+) {
+    CompositionLocalProvider(LocalMotionLevel provides motionLevel) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            plan.forEachIndexed { index, node -> PlanNodeView(node, "$index", onIntent) }
+        }
     }
 }
 
 @Composable
-private fun PlanNodeView(node: PlanNode, path: String, onIntent: (TexuliIntent) -> Unit) {
+private fun PlanNodeView(node: PlanNode, path: String, onIntent: (TexuliIntent) -> Unit, delayMs: Int = 0) {
+    val motion = (node as? PlanNode.Component)?.let { nativeMotionOf(it.motion, LocalMotionLevel.current, delayMs) }
+    if (motion != null) {
+        MotionNode(motion) { PlanNodeContent(node, path, onIntent) }
+    } else {
+        PlanNodeContent(node, path, onIntent)
+    }
+}
+
+@Composable
+private fun PlanNodeContent(node: PlanNode, path: String, onIntent: (TexuliIntent) -> Unit) {
     when (node) {
         is PlanNode.Placeholder -> Placeholder(node.id, node.reason)
         is PlanNode.Component -> when (node.id) {
@@ -79,7 +103,10 @@ private fun PlanNodeView(node: PlanNode, path: String, onIntent: (TexuliIntent) 
 
 @Composable
 private fun Children(node: PlanNode.Component, path: String, onIntent: (TexuliIntent) -> Unit) {
-    node.children.forEachIndexed { index, child -> PlanNodeView(child, "$path.children.$index", onIntent) }
+    val delays = childMotionDelays(node.children, node.motion?.stagger)
+    node.children.forEachIndexed { index, child ->
+        PlanNodeView(child, "$path.children.$index", onIntent, delays.getOrElse(index) { 0 })
+    }
 }
 
 @Composable
@@ -181,12 +208,13 @@ private fun GridLayout(node: PlanNode.Component, path: String, onIntent: (Texuli
     }
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         val columns = nativeResponsiveGridColumns(grid.requestedColumns, maxWidth.value.toInt(), grid.gapDp)
+        val delays = childMotionDelays(node.children, node.motion?.stagger)
         Column(verticalArrangement = Arrangement.spacedBy(grid.gapDp.dp)) {
             nativeGridRows(node.children.withIndex().toList(), columns).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(grid.gapDp.dp)) {
                     row.forEach { (index, child) ->
                         Column(Modifier.weight(1f).semantics { isTraversalGroup = true }) {
-                            PlanNodeView(child, "$path.children.$index", onIntent)
+                            PlanNodeView(child, "$path.children.$index", onIntent, delays.getOrElse(index) { 0 })
                         }
                     }
                     repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }

@@ -43,6 +43,14 @@
     "./surface": {
       "types": "./src/surface.ts",
       "default": "./src/surface.ts"
+    },
+    "./motion": {
+      "types": "./src/motion.ts",
+      "default": "./src/motion.ts"
+    },
+    "./stream": {
+      "types": "./src/stream/index.ts",
+      "default": "./src/stream/index.ts"
     }
   },
   "scripts": {

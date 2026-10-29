@@ -2,7 +2,7 @@
 import type { Component, Snippet } from 'svelte';
 import type { PlayerNodeError } from './errors.ts';
 import PlayerNode from './PlayerNode.svelte';
-import SlottedPaint from './SlottedPaint.svelte';
+import Self from './SlottedPaint.svelte';
 import type { SlotGroups } from './slots.ts';
 
 /**
@@ -38,7 +38,7 @@ const name = $derived(remaining[0]);
 {/snippet}
 
 {#if name !== undefined}
-  <SlottedPaint
+  <Self
     {component}
     {props}
     {slots}

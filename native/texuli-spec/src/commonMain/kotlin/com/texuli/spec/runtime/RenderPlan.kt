@@ -2,6 +2,7 @@ package com.texuli.spec.runtime
 
 import com.texuli.spec.BlueprintEnvelope
 import com.texuli.spec.BlueprintNode
+import com.texuli.spec.BlueprintNodeMotion
 import com.texuli.spec.JsonValue
 import com.texuli.spec.SpecComponent
 import com.texuli.spec.SpecComponentEmit
@@ -14,11 +15,15 @@ import com.texuli.spec.SpecVocabulary
 sealed interface PlanNode {
     val id: String
 
-    /** A catalog component with its portable props only. */
+    /**
+     * A catalog component with its portable props only, and its spec 0.6.0
+     * motion (presets and token steps; see [nativeMotionOf]).
+     */
     data class Component(
         override val id: String,
         val props: Map<String, JsonValue>,
         val children: List<PlanNode>,
+        val motion: BlueprintNodeMotion? = null,
     ) : PlanNode
 
     /** A visible placeholder: never a blank region, never a crash. */
@@ -76,5 +81,6 @@ fun planOf(
         id = node.id,
         props = (node.props ?: emptyMap()).filterKeys { it in portable },
         children = node.children.orEmpty().map { planOf(it, components, tier) },
+        motion = node.motion,
     )
 }
