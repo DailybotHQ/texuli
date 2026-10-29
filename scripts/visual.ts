@@ -7,7 +7,8 @@
  * It runs Playwright with a JSON report in tmp/visual/report.json, then
  * prints the changed examples, the missing baselines and any other failure.
  * `--update` writes new baselines (`--update-snapshots`); review them before
- * committing. Exit 0 when nothing changed (or after an update), 1 otherwise,
+ * committing. Exit 0 when nothing changed (or after an update), 1 otherwise
+ * (including a run where no test matched),
  * 2 on a usage error. The fixture app port comes from TEXULI_E2E_PORT, as for
  * every browser check.
  */
@@ -73,6 +74,18 @@ export function playwrightArgs(args: VisualArgs): string[] {
   ];
 }
 
+/** True when the run captured nothing (a `-g` that matched no test): never report that as clean. */
+export function ranNothing(summary: {
+  passed: number;
+  changed: readonly unknown[];
+  missing: readonly unknown[];
+  errors: readonly unknown[];
+}): boolean {
+  return (
+    summary.passed + summary.changed.length + summary.missing.length + summary.errors.length === 0
+  );
+}
+
 function main(): number {
   let args: VisualArgs;
   try {
@@ -95,6 +108,12 @@ function main(): number {
     return run.status || 1;
   }
   const summary = summarizeVisualReport(JSON.parse(readFileSync(report, 'utf8')));
+  if (ranNothing(summary)) {
+    console.error(
+      `\nVisual suite: no test matched${args.grep ? ` "${args.grep}"` : ''}; nothing was captured${args.update ? ' or updated' : ''}.`
+    );
+    return 1;
+  }
   console.log(`\n${formatVisualSummary(summary, args.update)}`);
   if (args.update) return summary.errors.length > 0 ? 1 : 0;
   return summary.changed.length + summary.missing.length + summary.errors.length > 0 ? 1 : 0;
