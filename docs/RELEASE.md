@@ -172,7 +172,7 @@ package exports, so a new export without a case fails. The rules (rest
 attributes and `ref`, the form-control split, the Field rule, handler order,
 callback naming, `onValueChange` payloads) are in
 [STANDARDS](STANDARDS.md#component-api-contract). The layouts
-(`texuli/layouts/*`) are not under the contract yet (planned).
+(`texuli/layouts/*`) are not under the contract yet (planned). The catalog coverage gate lists the new `MarketingSectionHeader` (marketing chrome) and `MotionProvider` (a contentless utility) as exclusions, raising its ceiling from 208 to 210 under the same rule as 0.5.0: chrome and parts get exclusion rows, content gets a manifest.
 
 **Motion (ADR-013).** `@texuli/tokens/motion` holds 5 durations, 5 easings
 and 3 springs (precomputed `linear()` curves) and the `--tx-motion-*`
