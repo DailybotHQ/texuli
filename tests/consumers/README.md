@@ -66,8 +66,9 @@ every Texuli dependency at its tarball and runs `npm install --offline
    `svelte-check` over the app, `Smoke.svelte`, `Packages.svelte` and the
    generated files in the Vite and SvelteKit apps. Diagnostics in
    third-party declarations (Astro's own types, for one) are counted and
-   ignored. A Texuli diagnostic fails unless it is in `KNOWN_TYPE_DEFECTS`,
-   and a listed defect that no longer reproduces fails as stale.
+   ignored. A Texuli diagnostic fails unless it is in `KNOWN_TYPE_DEFECTS`
+   (empty today), and a listed defect that no longer reproduces fails as
+   stale.
 5. **Build:** `npm run build` (Vite client; SvelteKit server build and
    prerender; Astro static build with the server render of the islands).
 6. **Browser** (Chromium): the subpath list is complete in the server HTML

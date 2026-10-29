@@ -11,6 +11,7 @@ import {
   installArgs,
   judgeDiagnostics,
   KNOWN_TYPE_DEFECTS,
+  type KnownTypeDefect,
   parseSvelteCheckDiagnostics,
   parseTscDiagnostics,
   REPO_ROOT,
@@ -300,29 +301,37 @@ describe('consumer surface', () => {
     }
   });
 
+  it('lists no known type defect: every packed declaration type-checks', () => {
+    expect(KNOWN_TYPE_DEFECTS).toEqual([]);
+  });
+
   it('judges type diagnostics: third-party ignored, known Texuli defects counted, anything else or a stale known defect fails', () => {
+    const knownDefects: KnownTypeDefect[] = [
+      { file: 'node_modules/@texuli/a/dist/A.svelte.d.ts', code: 2440, reason: 'clash' },
+      { file: 'node_modules/@texuli/a/dist/b/index.d.ts', code: 2590, reason: 'union' },
+    ];
     const tsc = parseTscDiagnostics(
       [
         'node_modules/astro/dist/x.d.ts(1,2): error TS2307: Cannot find module.',
-        `${KNOWN_TYPE_DEFECTS[0]?.file}(3,10): error TS${KNOWN_TYPE_DEFECTS[0]?.code}: conflict`,
+        `${knownDefects[0]?.file}(3,10): error TS${knownDefects[0]?.code}: conflict`,
         'node_modules/@texuli/core/dist/y.d.ts(4,5): error TS2322: Type mismatch.',
       ].join('\n')
     );
-    expect(tsc.map((d) => d.code)).toEqual([2307, KNOWN_TYPE_DEFECTS[0]?.code, 2322]);
-    const verdict = judgeDiagnostics('tsc', tsc);
+    expect(tsc.map((d) => d.code)).toEqual([2307, 2440, 2322]);
+    const verdict = judgeDiagnostics('tsc', tsc, knownDefects);
     expect(verdict.thirdParty).toBe(1);
     expect(verdict.known).toBe(1);
     expect(verdict.failures.filter((f) => f.includes('TS2322'))).toHaveLength(1);
-    expect(verdict.failures.filter((f) => f.includes('no longer reproduces'))).toHaveLength(
-      KNOWN_TYPE_DEFECTS.length - 1
-    );
+    expect(verdict.failures.filter((f) => f.includes('no longer reproduces'))).toHaveLength(1);
 
-    const all = KNOWN_TYPE_DEFECTS.map((k) => ({ file: k.file, code: k.code, message: 'm' }));
-    expect(judgeDiagnostics('tsc', all)).toEqual({
+    const all = knownDefects.map((k) => ({ file: k.file, code: k.code, message: 'm' }));
+    expect(judgeDiagnostics('tsc', all, knownDefects)).toEqual({
       failures: [],
       thirdParty: 0,
-      known: KNOWN_TYPE_DEFECTS.length,
+      known: knownDefects.length,
     });
+    // With the real (empty) list, any Texuli diagnostic fails.
+    expect(judgeDiagnostics('tsc', all).failures).toHaveLength(2);
 
     const svelte = parseSvelteCheckDiagnostics(
       [

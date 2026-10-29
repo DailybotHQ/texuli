@@ -5,13 +5,13 @@
  * on a component slide are its `steps` labels: the stage exposes the
  * current one on `data-tx-deck-step`, for components that follow it.
  */
-import type { ComponentSlide } from '@texuli/deck/model';
+import type { ComponentSlide as ComponentSlideData } from '@texuli/deck/model';
 import { slideStateKey } from '../registry/state.ts';
 import { getDeckStepContext } from '../stage/context.ts';
 import type { DeckSlideRendererProps } from '../stage/renderers.ts';
 import CatalogNode from './CatalogNode.svelte';
 
-let { slide, context }: DeckSlideRendererProps<ComponentSlide> = $props();
+let { slide, context }: DeckSlideRendererProps<ComponentSlideData> = $props();
 const fromContext = getDeckStepContext();
 let step = $derived(fromContext ?? context.step);
 </script>

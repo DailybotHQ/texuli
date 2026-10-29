@@ -1,13 +1,13 @@
 <script lang="ts">
 import { layoutTree } from './layout.ts';
-import type { TreeDiagram } from './schema.ts';
+import type { TreeDiagram as TreeDiagramData } from './schema.ts';
 import { DIAGRAM_PAD, toneBorder } from './tones.ts';
 import './diagram.css';
 
 /**
  * Tree: file-tree is a nested list; org is layoutTree elbows + sr list alt text.
  */
-let { block }: { block: TreeDiagram } = $props();
+let { block }: { block: TreeDiagramData } = $props();
 
 const layout = $derived(layoutTree(block));
 const byId = $derived(new Map(block.nodes.map((node) => [node.id, node])));

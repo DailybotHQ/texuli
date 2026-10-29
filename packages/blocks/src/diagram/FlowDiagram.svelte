@@ -1,6 +1,6 @@
 <script lang="ts">
 import { layoutFlow } from './layout.ts';
-import type { FlowDiagram } from './schema.ts';
+import type { FlowDiagram as FlowDiagramData } from './schema.ts';
 import { DIAGRAM_PAD, toneBorder } from './tones.ts';
 import './diagram.css';
 
@@ -8,7 +8,7 @@ import './diagram.css';
  * Flow steps left to right from layoutFlow, joined by arrows, optional loop-back.
  * Ordered list is the text alternative; drawing is aria-hidden.
  */
-let { block }: { block: FlowDiagram } = $props();
+let { block }: { block: FlowDiagramData } = $props();
 
 const uid = $props.id();
 const arrow = `tx-flow-arrow-${uid}`;

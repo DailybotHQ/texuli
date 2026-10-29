@@ -1,12 +1,12 @@
 <script lang="ts">
 import type { InteractiveBlockLabels } from './labels.ts';
-import { type CalculatorBlock, evaluateCalculator } from './schema.ts';
+import { type CalculatorBlock as CalculatorBlockData, evaluateCalculator } from './schema.ts';
 
 let {
   block,
   labels,
 }: {
-  block: CalculatorBlock;
+  block: CalculatorBlockData;
   labels: InteractiveBlockLabels;
 } = $props();
 

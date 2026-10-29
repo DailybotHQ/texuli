@@ -12,7 +12,7 @@
  * Everything else paints exactly as the stage's own free renderer does
  * (same regions, morph ids, fragments and code highlights).
  */
-import type { FreeSlide, SlideItem } from '@texuli/deck/model';
+import type { FreeSlide as FreeSlideData, SlideItem } from '@texuli/deck/model';
 import { extendedItem, withStandInSize } from '../registry/extended.ts';
 import { slideStateKey } from '../registry/state.ts';
 import BlockRenderer from '../stage/BlockRenderer.svelte';
@@ -26,7 +26,7 @@ import MathBlock from './MathBlock.svelte';
 import MeasuredImage from './MeasuredImage.svelte';
 
 interface Props {
-  slide: FreeSlide;
+  slide: FreeSlideData;
   context: DeckSlideRenderContext;
 }
 

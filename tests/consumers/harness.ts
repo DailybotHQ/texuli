@@ -97,18 +97,18 @@ export const TYPECHECK_FRAMEWORKS = ['vite', 'sveltekit'] as const;
  * Reported to the owners of the packages; they are source fixes, not
  * consumer-harness ones.
  */
-export const KNOWN_TYPE_DEFECTS: ReadonlyArray<{ file: string; code: number; reason: string }> = [
-  ...['CalculatorBlock', 'ChecklistBlock', 'PollBlock', 'QuizBlock'].map((name) => ({
-    file: `node_modules/@texuli/blocks/dist/interactive/${name}.svelte.d.ts`,
-    code: 2440,
-    reason: `the component imports a type named ${name} from ./schema, which collides with the component declaration svelte2tsx emits`,
-  })),
-  ...['accordion', 'slider'].map((name) => ({
-    file: `node_modules/@texuli/primitives/dist/${name}/index.d.ts`,
-    code: 2590,
-    reason: `the emitted ${name} namespace object type is a union too complex for TypeScript to represent`,
-  })),
-];
+export interface KnownTypeDefect {
+  file: string;
+  code: number;
+  reason: string;
+}
+
+/**
+ * None today: the TS2440 component-name clashes in `@texuli/blocks` and the
+ * TS2590 root-props unions in `@texuli/primitives` accordion and slider were
+ * fixed at the source (T-std-consumers).
+ */
+export const KNOWN_TYPE_DEFECTS: readonly KnownTypeDefect[] = [];
 
 export type ConsumerKind =
   | 'vite-plain'
@@ -707,7 +707,8 @@ const THIRD_PARTY = /^node_modules\/(?!texuli\/|@texuli\/)/;
  */
 export function judgeDiagnostics(
   tool: string,
-  diagnostics: readonly TypeDiagnostic[]
+  diagnostics: readonly TypeDiagnostic[],
+  knownDefects: readonly KnownTypeDefect[] = KNOWN_TYPE_DEFECTS
 ): { failures: string[]; thirdParty: number; known: number } {
   const failures: string[] = [];
   let thirdParty = 0;
@@ -718,14 +719,14 @@ export function judgeDiagnostics(
       thirdParty += 1;
       continue;
     }
-    const known = KNOWN_TYPE_DEFECTS.find((k) => k.file === file && k.code === d.code);
+    const known = knownDefects.find((k) => k.file === file && k.code === d.code);
     if (known) {
       seenKnown.add(`${known.file}#${known.code}`);
       continue;
     }
     failures.push(`${tool}: ${file}: TS${d.code} ${d.message}`);
   }
-  for (const k of KNOWN_TYPE_DEFECTS) {
+  for (const k of knownDefects) {
     if (!seenKnown.has(`${k.file}#${k.code}`)) {
       failures.push(
         `${tool}: KNOWN_TYPE_DEFECTS lists ${k.file} TS${k.code}, which no longer reproduces; remove the entry`

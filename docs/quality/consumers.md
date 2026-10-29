@@ -45,9 +45,13 @@ Vite and SvelteKit apps also run **svelte-check**, with
 `declare module '*.css'`. Packed packages must ship CSS types (sibling
 `*.css.d.ts`, root `css-modules.d.ts`, entry `/// <reference path>`; see
 `docs/quality/packaging.md`). Third-party declaration errors are counted and
-ignored; Texuli errors fail unless listed in `KNOWN_TYPE_DEFECTS` (six today:
-four `@texuli/blocks` interactive component declarations, TS2440, and the
-`@texuli/primitives` accordion and slider namespace types, TS2590).
+ignored; Texuli errors fail unless listed in `KNOWN_TYPE_DEFECTS`, which is
+empty. The six it listed were fixed at the source: four `@texuli/blocks`
+interactive components imported a type named like the component (TS2440 in
+the emitted `.svelte.d.ts`; guarded for every package by
+`scripts/tests/svelte-self-named-imports.test.ts`), and the `@texuli/primitives`
+accordion and slider root-props unions made `keyof` too complex (TS2590;
+guarded by `packages/primitives/tests/root-props.types.ts`).
 
 ## Install policy
 

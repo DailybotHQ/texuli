@@ -11,7 +11,7 @@
  * (the n-th item of that type on the slide), so consecutive `morph` slides
  * pair their titles, first images, first charts… like reveal.js.
  */
-import type { FreeSlide } from '@texuli/deck/model';
+import type { FreeSlide as FreeSlideData } from '@texuli/deck/model';
 import BlockRenderer from './BlockRenderer.svelte';
 import { getDeckStepContext } from './context.ts';
 import { composeFreeSlide, type FreeSlideEntry } from './free.ts';
@@ -20,7 +20,7 @@ import { type DeckSlideRenderContext, resolveItemRenderer } from './renderers.ts
 import SlidePlaceholder from './SlidePlaceholder.svelte';
 
 interface Props {
-  slide: FreeSlide;
+  slide: FreeSlideData;
   context: DeckSlideRenderContext;
 }
 

@@ -1,5 +1,9 @@
 <script lang="ts">
-import { type EditorBlock, type EditorInline, inlineToTree } from '@texuli/core/editor-model';
+import {
+  type EditorBlock as EditorBlockData,
+  type EditorInline,
+  inlineToTree,
+} from '@texuli/core/editor-model';
 import { type HrefTrust, safeImageSrc } from '@texuli/core/url-policy';
 import type { EditorController } from '../controller/controller.svelte.ts';
 import Self from './EditorBlock.svelte';
@@ -7,7 +11,7 @@ import EditorInlineView from './EditorInline.svelte';
 import type { EditorMediaResolver } from './types.ts';
 
 type Props = {
-  block: EditorBlock;
+  block: EditorBlockData;
   controller: EditorController;
   trust: HrefTrust;
   depth?: number;
