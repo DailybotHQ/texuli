@@ -17,6 +17,7 @@
       "a11y-site-1.spec.ts",
       "astro-islands.spec.ts",
       "chat.spec.ts",
+      "player-streaming.spec.ts",
       "site-builder.spec.ts",
       "site-docs-nav.spec.ts",
       "site-perf.spec.ts",

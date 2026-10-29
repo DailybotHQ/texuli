@@ -923,7 +923,7 @@ describe('motion', () => {
         ];
         expect(declarations.length).toBeGreaterThan(0);
         for (const [, property, value] of declarations) {
-          if (value?.includes('0.01ms !important')) continue; // the reduced-motion override itself
+          if (value?.includes('0s !important')) continue; // the reduced-motion override itself
           // A literal duration may only appear as a var() fallback.
           const outsideVars = value?.replace(/var\([^)]*\)/g, '') ?? '';
           expect(outsideVars, `${property}: ${value}`).not.toMatch(/\d+m?s\b/);
@@ -944,8 +944,10 @@ describe('motion', () => {
           for (const token of [
             '--tx-motion-fast: 0ms',
             '--tx-motion-slow: 0ms',
-            'animation-duration: 0.01ms',
-            'transition-duration: 0.01ms',
+            'animation-duration: 0s',
+            'animation-delay: 0s',
+            'transition-duration: 0s',
+            'transition-delay: 0s',
             'scroll-behavior: auto',
           ]) {
             expect(block).toContain(token);
@@ -995,8 +997,8 @@ describe('motion', () => {
           const computed = getComputedStyle(card);
           expect(computed.getPropertyValue('--tx-motion-base').trim()).toBe('0ms');
           expect(computed.getPropertyValue('--tx-motion-fast').trim()).toBe('0ms');
-          expect(computed.animationDuration).toBe('0.01ms');
-          expect(computed.transitionDuration).toBe('0.01ms');
+          expect(computed.animationDuration).toBe('0s');
+          expect(computed.transitionDuration).toBe('0s');
         }
       );
       await scenario('never animates blueprint-declared motion in the document flow', async () => {
