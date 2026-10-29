@@ -38,8 +38,9 @@ Draft request:
 }
 ```
 
-`history` and `draft` are optional. Unknown top-level or history fields are
-rejected. The raw body limit is 64 KiB, prompt limit is 4,096 characters,
+`history`, `draft` and `stream` are optional. `stream` must be `true` or
+`false`; `true` turns on streaming generation (below). Unknown top-level or
+history fields are rejected. The raw body limit is 64 KiB, prompt limit is 4,096 characters,
 history is reduced to the last six turns, and each history text is limited to
 4,096 characters. The request hash must match the service catalog hash or the
 request receives `409 catalog-mismatch`. Incoming drafts are fully re-validated
@@ -121,9 +122,28 @@ data: {"type":"accepted","requestId":"<request id>"}
 The server emits `accepted`, optional plain-text `generating`, `validating`,
 optional `repairing` with stable diagnostic codes, and then `result` followed
 by `done`; refusal or failure uses `error` followed by `done`. The `result`
-event contains the same `DraftResult` shape as JSON mode. Partial trees are
-never streamed. The stream reads provider progress on demand, and cancellation
-aborts the provider request.
+event contains the same `DraftResult` shape as JSON mode. Without
+`"stream": true`, partial trees are never streamed. The stream reads provider
+progress on demand, and cancellation aborts the provider request.
+
+### Streaming generation (`"stream": true`)
+
+With `"stream": true` in the body (ADR-014), the same SSE response also
+carries the draft while the model writes it, and ends with `final` instead of
+`result`:
+
+| Event | Payload | Meaning |
+| --- | --- | --- |
+| `draft-chunk` | `attempt`, `text` | Envelope text. Concatenated in order, the chunks of one attempt are one untrusted `draft` envelope: the service's header, then the model's tree text as written, then `}` |
+| `node-ready` | `attempt`, `path`, `streamId`, `id` | A node's shell (every member but `children`) is final and passed every node-level check |
+| `refused` | `attempt`, `path`, `reason`, `codes` | That node and its subtree are held until the final verdict: `node` (a check refused it), `held` (an ancestor is held), `stream-order` (a member after `children`), `stream-error` (path `$`: the JSON stopped, nothing more is forwarded) |
+| `final` | `result` | The full `validateDraft` verdict, the same `DraftResult` as `result` |
+
+A repair starts a new attempt and a new envelope (`attempt` goes up). A
+provider failure mid-stream sends `error` with `retryable` and no `final`.
+JSON mode accepts `"stream": true` and answers with the final `DraftResult`.
+How a client feeds the chunks to `<Player stream>` is in
+[streaming.md](streaming.md).
 
 ## Receipts and guard stack
 
@@ -188,8 +208,10 @@ pricing API. See the [README token-ceiling note](../README.md#token-ceilings).
 
 ## Key-store boundary
 
-No real provider adapter exists. A key is not needed for local development or
-tests. `AGENT_PROVIDER_KEY` and `AGENT_PROVIDER` may be passed from the shell
+Real provider adapters exist as library code
+([providers.md](providers.md)), but neither the Node adapter nor the worker
+constructs one: wiring one in with a key is a developer decision. A key is not
+needed for local development or tests. `AGENT_PROVIDER_KEY` and `AGENT_PROVIDER` may be passed from the shell
 to the Node adapter or from the platform secret binding to the worker, and the
 Node adapter can read the provider block from
 `~/.config/texuli/agent.json`. No adapter consumes the resolved key today: the
@@ -219,8 +241,15 @@ shared HTTP handler and writes its report under ignored `tmp/`:
 pnpm exec tsx apps/agent/evals/run.ts
 ```
 
-It proves the replay and validation path, not model quality. See
-[eval harness details](evals.md). The focused operational checks and full
+It proves the replay and validation path, not model quality. The streaming
+harness measures validity, refusal reasons, time to first node and total time
+over the same fixtures plus the spec's golden blueprints:
+
+```bash
+pnpm exec tsx apps/agent/evals/stream-run.ts
+```
+
+See [eval harness details](evals.md). The focused operational checks and full
 service test suite are:
 
 ```bash
@@ -228,6 +257,8 @@ pnpm --filter @texuli/agent exec vitest run tests/guard.test.ts
 pnpm --filter @texuli/agent exec vitest run tests/http.test.ts
 pnpm --filter @texuli/agent exec vitest run tests/keys.test.ts
 pnpm --filter @texuli/agent exec vitest run tests/hostile-worker.test.ts
+pnpm --filter @texuli/agent exec vitest run tests/streaming.test.ts
+pnpm --filter @texuli/agent exec vitest run tests/providers.test.ts
 pnpm --filter @texuli/agent exec vitest run
 pnpm --filter @texuli/agent typecheck
 ```

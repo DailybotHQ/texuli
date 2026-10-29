@@ -2,7 +2,7 @@
   "name": "@texuli/agent",
   "version": "0.0.0",
   "private": true,
-  "description": "The texuli.com agent service: a stateless edge worker that turns a chat prompt into a validated, untrusted blueprint draft. Fake replay provider only; never a real model key in the repository.",
+  "description": "The texuli.com agent service: a stateless edge worker that turns a chat prompt into a validated, untrusted blueprint draft, streamed as server-sent events. Fake replay provider by default; real provider adapters take a key from the host at run time; never a model key in the repository.",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -18,7 +18,8 @@
   "dependencies": {
     "@texuli/blocks": "workspace:*",
     "@texuli/catalog": "workspace:*",
-    "@texuli/core": "workspace:*"
+    "@texuli/core": "workspace:*",
+    "@texuli/spec": "workspace:*"
   },
   "devDependencies": {
     "@texuli/tools": "workspace:*"

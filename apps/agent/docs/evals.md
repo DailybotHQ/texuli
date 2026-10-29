@@ -1,8 +1,9 @@
 # Agent service: offline eval harness
 
-**Status: the offline harness runs today. Real-provider evals are planned, not
-built.** No key, no network and no provider account are involved: the harness
-uses the replay provider (`src/provider.ts`) only.
+**Status: the offline harnesses run today. Real-provider evals are planned, not
+built.** No key, no network and no provider account are involved: both
+harnesses use the replay provider (`src/provider.ts`) unless a caller passes
+another `Provider`, and no script in the repository builds a real one.
 
 ## What it does
 
@@ -65,6 +66,44 @@ checks this).
 (Abridged: each fixture also records its tier, error code, attempts,
 diagnostic codes, components and placeholders.)
 
+## The streaming harness
+
+`evals/stream-harness.ts` (`runStreamEval`) runs a provider over the golden
+set through the streaming endpoint (`POST /v1/draft` with `"stream": true`,
+read as server-sent events, [streaming.md](streaming.md)) and measures:
+
+| Measure | Per case | Totals |
+| --- | --- | --- |
+| Validity | `status` (`valid`, `invalid`, `error`), `pass` against the pinned outcome | `valid`, `invalid`, `errors`, `validityRate`, `matched` of `pinned` |
+| Refusal reasons | `diagnosticCodes` of the final verdict, `streamRefusals` seen node by node, `nodesReady`, `nodesRefused` (summed over attempts) | `refusalReasons`: final codes with counts |
+| Time to first node | `timeToFirstNodeMs`: request to the first `node-ready` frame | median, p95, max |
+| Total time | `totalMs`: request to the last frame | median, p95, max |
+
+The cases are the eight golden audit fixtures (with their pinned outcome)
+and the spec's golden blueprints in
+[`packages/spec/fixtures/golden`](../../../packages/spec/fixtures/golden),
+whose trees are measured only: they use state, bindings and flows that a
+bare `emit_blueprint` tree does not declare, so most are refused for that.
+
+By default the fake provider streams each tree as `tool-delta` pieces
+(sizes 24, 7, 61, cycling) with 15 ms before each event, on a **virtual
+clock**: waits advance the clock and nothing sleeps, so the report is
+deterministic (CI-like mode, `tests/stream-eval.test.ts` compares two runs
+byte for byte). The times are then the fake latency the stream would take,
+not a model's speed. `--wall` uses real timers.
+
+```bash
+pnpm exec tsx apps/agent/evals/stream-run.ts
+pnpm exec tsx apps/agent/evals/stream-run.ts --wall
+```
+
+It prints one line per case (`PASS`, `FAIL` or `MEASURED`) and writes
+`tmp/agent-evals/stream-report.json` (`agent-stream-eval/v1`). The exit code
+is 1 when a pinned case misses its outcome. A developer who wants
+real-provider numbers calls `runStreamEval({ catalog, catalogHash, provider })`
+from their own script with an adapter they construct
+([providers.md](providers.md)); that is a developer step, not done here.
+
 ## What it does and does not prove
 
 - It tests the **service code**: admission, the validation gate, the repair
@@ -82,9 +121,10 @@ diagnostic codes, components and placeholders.)
 - **Real-provider evals** (agent-service design §9): a developer-run script
   that sends the briefs through a real adapter with a key read at run time
   from outside the repository (`docs/key-store.md`), saves the trees, and
-  scores them with this harness plus `texuli-golden` and an `axe` check. It
-  stays report-only, with results recorded by date and model label. No real
-  adapter exists yet.
+  scores them with these harnesses plus `texuli-golden` and an `axe` check.
+  It stays report-only, with results recorded by date and model label. The
+  adapters exist ([providers.md](providers.md)) and `runStreamEval` accepts
+  one, but no such script exists and no adapter has called a provider.
 - Running the 30 `@texuli/tools/golden` briefs through this harness (today
   `tests/evals.test.ts` replays them inside the test suite only).
 - CI wiring.
