@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.2.5] — 2026-10-29
+
+### Changes
+
+- chore(deps): release 0.6.0 of all 20 packages
+
 ### Content
 
 - The packages move to `0.7.0`: 22 published packages, `@texuli/document`
