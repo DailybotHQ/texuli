@@ -206,11 +206,21 @@ export const WHY_KMP_EXCERPTS: WhyKmpExcerpt[] = [
  * Paint a validated render plan (design §4, step 5). Each id resolves through
  * [NativeRegistry]; anything else paints a visible placeholder. Text is shown
  * as text: nothing in a blueprint is executed or interpreted as markup.
+ *
+ * \`motionLevel\` is the level spec 0.6.0 motion plays at
+ * (\`resolveMotionLevel(host, envelope.motion?.level, reducedMotion)\`);
+ * \`NONE\` paints every node at once.
  */
 @Composable
-fun BlueprintView(plan: List<PlanNode>, onIntent: (TexuliIntent) -> Unit = {}) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        plan.forEachIndexed { index, node -> PlanNodeView(node, "$index", onIntent) }
+fun BlueprintView(
+    plan: List<PlanNode>,
+    onIntent: (TexuliIntent) -> Unit = {},
+    motionLevel: BlueprintMotionLevel = BlueprintMotionLevel.FULL,
+) {
+    CompositionLocalProvider(LocalMotionLevel provides motionLevel) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            plan.forEachIndexed { index, node -> PlanNodeView(node, "$index", onIntent) }
+        }
     }
 }`,
   },

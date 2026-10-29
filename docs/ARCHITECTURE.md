@@ -40,6 +40,7 @@ packages in lower layers.
 | L8 | `@texuli/tools` | Copy-in CLI (`texuli-add`, `texuli-init`, `texuli-update`), `texuli-llms`, A2UI adapter, custom elements and the golden set | core, tokens, catalog, blocks, charts, media |
 | L8 | `@texuli/astro` | Astro integration, site helpers and content layouts | blocks, core, tokens |
 | L8 | `@texuli/slides` | The Svelte 5 presentation stage on `@texuli/deck` (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from `0.3.0`; in development | blocks, catalog, deck, media, player, tokens |
+| L8 | `@texuli/pages` | In development (not on npm yet, first release planned for 0.7.0): the block document editor and reader on `@texuli/document`: text through `@texuli/editor`, a slash menu, block selection and drag on `@texuli/drag`, nested pages, resizable columns and live embeds painted by the player (`editor`, `reader`); the paged view, export and collaboration are planned | blocks, core, document, drag, editor, player, primitives, tokens, texuli |
 
 Not layers, because they consume the library:
 - **`@texuli/examples`** (private) is the examples registry. Every component
@@ -57,10 +58,10 @@ Not layers, because they consume the library:
   website (see [The website](#the-website)).
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
-`scripts/packages.ts`); `pnpm verify:packages` packs the other 21.
-`@texuli/document` is new in PLAN_010: it keeps the `0.0.0` placeholder
-version and is not in `publish.yml` until its first release (planned for
-`0.7.0`). The other 20 are released on npm as `0.5.0`, the first release of
+`scripts/packages.ts`); `pnpm verify:packages` packs the other 22.
+`@texuli/document` and `@texuli/pages` are new in PLAN_010: they keep the
+`0.0.0` placeholder version and are not in `publish.yml` until their first
+release (planned for `0.7.0`). The other 20 are released on npm as `0.5.0`, the first release of
 `@texuli/editor` (the previous release, `0.4.0`, had 19 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck` and `@texuli/editor`
 are in development
@@ -68,7 +69,7 @@ and sit in the `publish.yml` wave order ahead of their dependents
 ([RELEASE](RELEASE.md)).
 
 ```text
-L8  tools · astro · slides
+L8  tools · astro · slides · pages
 L7  player
 L6  catalog
 L5  blocks
@@ -80,9 +81,10 @@ L0  core · date · deck · drag · spec (framework-free)
           ▲ dependencies point down only (scripts/check-layers.ts)
 ```
 
-The packages and subpaths PLAN_010 plans (forms, canvas, sheets, pages,
-motion and more) are not in this table or in `LAYERS` until they land;
-`@texuli/document` has landed (in development, not on npm). Their decided
+The packages and subpaths PLAN_010 plans (forms, canvas, sheets, motion
+and more) are not in this table or in `LAYERS` until they land;
+`@texuli/document` and `@texuli/pages` (its `editor` and `reader`) have
+landed (in development, not on npm). Their decided
 names and layers are listed in
 [Planned (PLAN_010)](#planned-plan010).
 
@@ -125,6 +127,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/examples` (private) | `.` |
 | `@texuli/media` (private) | `.`, `animation`, `animation/player`, `audio`, `captions`, `composition-canvas`, `composition-canvas/draw`, `composition-canvas/render`, `composition-model`, `composition-svg`, `composition-v2`, `export`, `export/ui`, `gallery`, `gallery/lightbox`, `generator-slot`, `image`, `image-editor`, `image-editor/model`, `image-editor/render`, `timeline`, `timeline/model`, `video` |
 | `@texuli/player` (private) | `.`, `styles.css` |
+| `@texuli/pages` (private, in development) | `.`, `editor`, `reader`, `styles.css` |
 | `@texuli/primitives` (private) | `.`, `accordion`, `alert-dialog`, `color-picker`, `context-menu`, `label`, `number-field`, `progress`, `separator`, `sheet`, `slider`, `tags-input`, `toolbar`, `tooltip`, `collapsible`, `command`, `date-picker`, `date-field`, `file-drop`, `radio-group`, `switch`, `checkbox`, `calendar`, `toggle`, `menu`, `menubar`, `popover`, `tabs`, `hover-card`, `tree`, `listbox`, `select`, `splitter`, `portal`, `navigation-menu`, `scroll-area`, `pagination`, `toast`, `dialog`, `pin-input`, `combobox`, `avatar`, `sortable` |
 | `@texuli/slides` (private) | `.`, `model`, `grammar`, `export`, `templates`, `stage`, `components`, `layouts`, `styles.css` |
 | `@texuli/spec` (private) | `.`, `workflow`, `migrate`, `codegen`, `surface` |
@@ -241,8 +244,8 @@ document and offers a `deckHost` seam (and `chrome={false}`) so a host with
 ## Planned (PLAN_010)
 
 **Planned, not shipped.** Nothing in this section is on npm yet, and only
-`@texuli/document` (without `paged`, `docx` and `pdf`) exists in the
-repository. These are the package names, layers and subpaths decided by
+`@texuli/document` (without `paged`, `docx` and `pdf`) and `@texuli/pages`
+(without `paged`, `collab` and `export`) exist in the repository. These are the package names, layers and subpaths decided by
 ADR-010 to ADR-016 in [DECISIONS](DECISIONS.md) for the 0.6.0, 0.7.0 and
 0.8.0 release waves. Each package stays "in development" until a release
 the developer approves publishes it, and joins the layer table,
@@ -257,7 +260,7 @@ New packages:
 | L4 | `@texuli/forms` | `.`, `model` (framework-free), view components | Schema-driven forms: fields, steps, conditional logic on the shared expression AST, closed validation rules, drafts and autosave | core, primitives, tokens, texuli | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
 | L4 | `@texuli/canvas` | `.`, `model` (framework-free), view components | Infinite canvas: shapes, text, connectors, frames, selection, zoom and pan on `@texuli/drag` spatial geometry (shared with workflows), synced through `@texuli/document/sync` | core, document, drag, primitives, tokens, texuli | 0.8.0 | [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
 | L5 | `@texuli/sheets` | `.`, `formula` (framework-free), `model` (framework-free), `csv`, view components | Spreadsheets: the owned formula engine (parser, function set, dependency graph, incremental and bounded recalculation), a sheet view over the data grid editing, CSV import and export; L5 because it builds on `@texuli/data` (L4) | core, date, data, document, drag, primitives, tokens, texuli | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
-| L8 | `@texuli/pages` | `.`, `editor`, `reader`, `paged`, `collab`, `export`, `styles.css` | The block document editor and reader on `@texuli/editor`: slash menu, block drag, nested pages, columns, live embeds painted by the player, paged view and print, comments, suggestions, history and presence | document, editor, blocks, catalog, player, drag, primitives, tokens, texuli, core | 0.7.0 | [ADR-011](DECISIONS.md#adr-011-document-packages-texulidocument-l1-engine-and-texulipages-l8-editor) |
+| L8 | `@texuli/pages` (landed: `.`, `editor`, `reader`, `styles.css`; in the layer table) | `paged`, `collab`, `export` still planned | The block document editor and reader on `@texuli/editor`: slash menu, block drag, nested pages, columns, live embeds painted by the player, paged view and print, comments, suggestions, history and presence | document, editor, blocks, player, drag, primitives, tokens, texuli, core | 0.7.0 | [ADR-011](DECISIONS.md#adr-011-document-packages-texulidocument-l1-engine-and-texulipages-l8-editor) |
 
 New subpaths in existing packages:
 

@@ -204,6 +204,21 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         role: 'The Svelte 5 presentation stage on @texuli/deck (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from 0.3.0; in development',
         dependsOn: ['blocks', 'catalog', 'deck', 'media', 'player', 'tokens'],
       },
+      {
+        name: '@texuli/pages',
+        role: 'In development (not on npm yet, first release planned for 0.7.0): the block document editor and reader on @texuli/document: text through @texuli/editor, a slash menu, block selection and drag on @texuli/drag, nested pages, resizable columns and live embeds painted by the player (editor, reader); the paged view, export and collaboration are planned',
+        dependsOn: [
+          'blocks',
+          'core',
+          'document',
+          'drag',
+          'editor',
+          'player',
+          'primitives',
+          'tokens',
+          'texuli',
+        ],
+      },
     ],
   },
 ];

@@ -705,6 +705,26 @@
       "gzip": 22016,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom. PLAN_008 T-catalog-player (2026-10-28): validateDeckDraft and the deck v2 tree mapping joined this entry; measured 19,857 B gzip, cap = measured + 4% (was 18,240 B). PLAN_010 (2026-10-29, consented plan): 20652 -> 22016 B, measured + 4% after validateStreamNode (ADR-014) and the node motion check (ADR-013); measured 21,115 B."
     },
+    "@texuli/pages": {
+      "gzip": 98048,
+      "cssGzip": 3648,
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the root barrel (editor + reader); measured 94,277 B, CSS 3,455 B."
+    },
+    "@texuli/pages/editor": {
+      "gzip": 95296,
+      "cssGzip": 3648,
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the the block editor: editor surface and the document validator that runs on every edit; the player and block renderers load lazily; measured 91,608 B, CSS 3,455 B."
+    },
+    "@texuli/pages/reader": {
+      "gzip": 9088,
+      "cssGzip": 2432,
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B."
+    },
+    "@texuli/pages/styles.css": {
+      "gzip": 64,
+      "cssGzip": 2432,
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the stylesheet only; measured 0 B, CSS 2,296 B."
+    },
     "@texuli/player": {
       "gzip": 85184,
       "cssGzip": 15872,

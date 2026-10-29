@@ -56,6 +56,9 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   // tools wraps the player, so it sits above it per roadmap D4).
   '@texuli/astro': 8,
   '@texuli/slides': 8,
+  // L8: the page editor and reader paint any catalog component through the
+  // player (L7), like the slides stage (ADR-011).
+  '@texuli/pages': 8,
 });
 
 /**

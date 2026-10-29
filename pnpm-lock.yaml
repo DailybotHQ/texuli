@@ -394,6 +394,39 @@ importers:
         specifier: 0.5.0
         version: link:../texuli
 
+  packages/pages:
+    dependencies:
+      '@texuli/blocks':
+        specifier: 0.5.0
+        version: link:../blocks
+      '@texuli/core':
+        specifier: 0.5.0
+        version: link:../core
+      '@texuli/document':
+        specifier: 0.0.0
+        version: link:../document
+      '@texuli/drag':
+        specifier: 0.5.0
+        version: link:../drag
+      '@texuli/editor':
+        specifier: 0.5.0
+        version: link:../editor
+      '@texuli/player':
+        specifier: 0.5.0
+        version: link:../player
+      '@texuli/primitives':
+        specifier: 0.5.0
+        version: link:../primitives
+      '@texuli/tokens':
+        specifier: 0.5.0
+        version: link:../tokens
+      svelte:
+        specifier: ^5.57.2
+        version: 5.57.2
+      texuli:
+        specifier: 0.5.0
+        version: link:../texuli
+
   packages/player:
     dependencies:
       '@texuli/blocks':
