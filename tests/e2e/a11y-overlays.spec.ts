@@ -37,13 +37,12 @@ async function gotoExample(page: Page, id: OverlayExample, mode: 'light' | 'dark
   if (open) await expect(page.getByRole(open.role)).toHaveCount(open.count);
 }
 
-async function expectExampleA11y(page: Page, id: OverlayExample): Promise<void> {
-  const target =
-    (await page.locator(`[data-example="${id}"]`).count()) > 0
-      ? `[data-example="${id}"]`
-      : `[data-example-host="${id}"]`;
-  // Open overlays fade in (tooltips: --tx-motion-fast, 150ms). Contrast is
-  // checked on the settled state, once every finite animation has finished.
+/**
+ * Open overlays fade in (tooltips: --tx-motion-fast, 150ms; dialogs and
+ * sheets: their texuli/motion enter, opacity 0 to 1). Contrast is checked on
+ * the settled state, once every finite animation has finished.
+ */
+async function settleAnimations(page: Page): Promise<void> {
   await page.evaluate(() =>
     Promise.all(
       document
@@ -52,6 +51,14 @@ async function expectExampleA11y(page: Page, id: OverlayExample): Promise<void> 
         .map((animation) => animation.finished.catch(() => undefined))
     )
   );
+}
+
+async function expectExampleA11y(page: Page, id: OverlayExample): Promise<void> {
+  const target =
+    (await page.locator(`[data-example="${id}"]`).count()) > 0
+      ? `[data-example="${id}"]`
+      : `[data-example-host="${id}"]`;
+  await settleAnimations(page);
   const results = await new AxeBuilder({ page })
     .include(target)
     // Dialogs and menus are portalled outside the example root.
@@ -149,6 +156,7 @@ test('Escape restores focus; forced colors and RTL; every sheet size, side and k
   await test.step('every sheet size and side opens, and each kind passes axe open, light and dark', async () => {
     const example = page.locator('[data-example="texuli-sheet"]');
     const scan = async () => {
+      await settleAnimations(page);
       const result = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
