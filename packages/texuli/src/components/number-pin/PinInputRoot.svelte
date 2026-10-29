@@ -1,12 +1,19 @@
 <script lang="ts">
 import { PinInput as Primitive } from '@texuli/primitives/pin-input';
 import type { Snippet } from 'svelte';
-import type { HTMLAttributes } from 'svelte/elements';
+import type { HTMLInputAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type NumberPinSize, pinInputClass } from './variants.ts';
 import './number-pin.css';
 
-type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'value'> & {
+/**
+ * Extra attributes (`name`, `form`, `required`, `autocomplete`, `aria-*`,
+ * `data-*`, handlers…) reach the one real input, like the primitive's.
+ */
+type Props = Omit<
+  HTMLInputAttributes,
+  'children' | 'class' | 'value' | 'maxlength' | 'pattern' | 'type' | 'size'
+> & {
   class?: ClassValue;
   size?: NumberPinSize;
   value?: string;
@@ -17,6 +24,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'value'
   onComplete?: (value: string) => void;
   disabled?: boolean;
   inputId?: string;
+  /** The real input element (`bind:inputRef`). */
   inputRef?: HTMLInputElement | null;
   mask?: boolean;
   children?: Snippet<
@@ -30,11 +38,18 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'value'
   >;
 };
 
-let { size = 'md', class: className, children, value = $bindable(''), ...props }: Props = $props();
+let {
+  size = 'md',
+  class: className,
+  children,
+  value = $bindable(''),
+  inputRef = $bindable(null),
+  ...props
+}: Props = $props();
 const classes = $derived(cx(pinInputClass({ size }), className));
 </script>
 
-<Primitive.Root {...props} bind:value class={classes}>
+<Primitive.Root {...props} bind:value bind:inputRef class={classes}>
   {#snippet children(state)}
     <div class="tx-pin-input__cells" aria-hidden="true">
       {@render children?.(state)}

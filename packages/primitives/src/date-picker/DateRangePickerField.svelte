@@ -26,6 +26,7 @@ const range = getRange();
     disabled={shell.disabled}
     {...shell.minValue ? { min: shell.minValue } : {}}
     {...range.end ? { max: range.end } : shell.maxValue ? { max: shell.maxValue } : {}}
+    {...shell.onInvalid ? { onInvalid: shell.onInvalid } : {}}
   />
   <span aria-hidden="true" data-tx-date-range-separator>–</span>
   <DateField.Root
@@ -37,5 +38,6 @@ const range = getRange();
     disabled={shell.disabled}
     {...range.start ? { min: range.start } : shell.minValue ? { min: shell.minValue } : {}}
     {...shell.maxValue ? { max: shell.maxValue } : {}}
+    {...shell.onInvalid ? { onInvalid: shell.onInvalid } : {}}
   />
 </div>

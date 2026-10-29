@@ -8,6 +8,7 @@ import {
   pageItems,
   reactionChips,
   sortActivity,
+  whenLabel,
 } from '../src/activity/index.ts';
 import ActivityFeedHarness from './fixtures/ActivityFeedHarness.svelte';
 
@@ -54,6 +55,29 @@ describe('@texuli/data/activity model helpers', () => {
       timeZone: 'UTC',
     });
     expect(groups.map((group) => group.label)).toEqual(['Today', 'Yesterday']);
+  });
+});
+
+describe('day labels with blueprint strings', () => {
+  it('falls back to UTC for an unknown time zone and en-US for an invalid locale instead of throwing', () => {
+    const now = '2026-02-12T18:00:00.000Z';
+    const at = '2026-02-12T15:04:00.000Z';
+    const expected = whenLabel(at, { now, timeZone: 'UTC', locale: 'en-US' });
+    expect(expected).toBe('Today, 3:04 PM');
+    for (const options of [
+      { timeZone: 'Not/AZone' },
+      { locale: 'not a locale!' },
+      { timeZone: '', locale: '' },
+      { timeZone: 'Mars/Olympus_Mons', locale: 'xx-!!' },
+    ]) {
+      expect(whenLabel(at, { now, ...options }), JSON.stringify(options)).toBe(expected);
+      expect(
+        groupByDay([{ at }], { at: (item) => item.at, now, ...options }).map((g) => g.label),
+        JSON.stringify(options)
+      ).toEqual(['Today']);
+    }
+    // A valid zone and locale still apply.
+    expect(whenLabel(at, { now, timeZone: 'Asia/Tokyo', locale: 'en-GB' })).toBe('Today, 0:04');
   });
 });
 

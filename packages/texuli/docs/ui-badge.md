@@ -39,6 +39,10 @@ Styles live in `@layer tx.components`. Import `@texuli/tokens/base.css` once at 
 ## A11y
 
 - Badge is a `span` (decorative status next to named content).
-- Tag remove is a real `button` with `aria-label` including the tag word.
+- Tag remove is a real `button` whose name always names the tag: by
+  default "Remove Design". `removeLabel` customizes it: a template with
+  `{label}` (`'Quitar «{label}»'`), a prefix that gets the label appended
+  (`'Delete'` → "Delete Design"; a string that already contains the label is
+  used as is), or a function `(label) => string` for translations.
 - Chip is a `button` with `aria-pressed` when used as a toggle.
 - Forced-colors: border falls back to `ButtonText`.

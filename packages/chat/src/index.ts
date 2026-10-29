@@ -2,6 +2,7 @@
 
 export {
   Composer,
+  type ComposerActionContext,
   type ComposerLabels,
   DEFAULT_COMPOSER_LABELS,
   TypingIndicator,
@@ -19,6 +20,7 @@ export {
   applyChatStreamEvent,
   type ChatAuthor,
   type ChatMessage,
+  type ChatMessageActions,
   type ChatMessageStatus,
   type ChatStreamEvent,
   ChatThread,
@@ -27,6 +29,7 @@ export {
   MESSAGE_STATUS_TONES,
   type MessageGroup,
   MessageList,
+  type MessageListLabels,
   type MessageStatusTone,
   type MessageTextPart,
   messageTokens,

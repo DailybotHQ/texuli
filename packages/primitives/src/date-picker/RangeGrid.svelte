@@ -1,12 +1,14 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
 import { getCalendarContext } from '../calendar/context.ts';
+import { composeHandlers } from '../internal/handlers.ts';
 import { getRange, inRange } from './shared.ts';
 
 /**
  * The calendar grid for a range: the calendar's keyboard model, with
  * `aria-selected` on every day of the range. While the end is pending, the
- * range previews to the hovered or focused day.
+ * range previews to the hovered or focused day. A caller's `onkeydown` runs
+ * first; calling `preventDefault()` in it skips the grid's keyboard model.
  */
 let { ...rest }: Omit<HTMLAttributes<HTMLTableElement>, 'children'> = $props();
 const calendar = getCalendarContext();
@@ -16,6 +18,7 @@ let hovered = $state<string | null>(null);
 const previewEnd = $derived(
   range.pending ? (hovered ?? calendar.focusedValue.toString()) : range.end
 );
+const onkeydown = $derived(composeHandlers(rest.onkeydown, calendar.keydown));
 const bounds = $derived.by(() => {
   const start = range.start;
   const end = previewEnd;
@@ -31,7 +34,7 @@ const bounds = $derived.by(() => {
   aria-multiselectable="true"
   data-tx-calendar-grid
   data-tx-range-grid
-  onkeydown={calendar.keydown}
+  {onkeydown}
 >
   <thead>
     <tr>
@@ -82,3 +85,12 @@ const bounds = $derived.by(() => {
     {/each}
   </tbody>
 </table>
+<!-- Polite announcement of a refused range (longer than maxDays). -->
+<span
+  role="status"
+  data-tx-range-status
+  {@attach (node) => {
+    node.style.cssText =
+      'position:absolute;inline-size:1px;block-size:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0';
+  }}
+>{range.message ?? ''}</span>

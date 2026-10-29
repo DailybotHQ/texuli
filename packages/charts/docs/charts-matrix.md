@@ -1,7 +1,7 @@
 # Charts: heatmap, scatter and bubble
 
 **Package:** `@texuli/charts`  
-**Import:** `import { HeatmapChart, ScatterChart, BubbleChart } from '@texuli/charts/matrix'`  
+**Import:** `import { HeatmapChart, ScatterChart, BubbleChart, RampLegend } from '@texuli/charts/matrix'`  
 **Task:** T-charts-matrix
 
 Lazy SVG family on the token chart palette. Every chart requires a non-empty
@@ -23,6 +23,42 @@ is `'light' | 'dark'` for chart token fallbacks.
 
 `assertHeatmapCells`, `assertScatterPoints`, `createHeatmapLayout`,
 `createScatterLayout`, `heatmapFill`, `formatMatrixNumber`.
+
+## `RampLegend`
+
+A labeled color-ramp legend to place beside a heatmap (or any chart that
+paints with the theme's sequential or diverging ramp). It shows the title,
+the ramp in 2–9 swatches and the values at its ends. Screen readers get one
+image whose name is the whole sentence, "Weekly volume, color scale from 0
+to 120"; the visible text stays text. The swatches paint through SVG `fill`
+attributes (no inline styles, so it is CSP-safe), keep their colors in
+forced-colors mode, and the ramp follows the writing direction (it flips on
+right-to-left pages, together with its end labels). It is a chart part, not
+a catalog component: blueprints do not emit it (the coverage gate lists it
+with `Legend` and `Axis`).
+
+```svelte
+<HeatmapChart {title} {description} {cells} />
+<RampLegend label="Weekly volume" min={0} max={120} />
+```
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `label` | string | yes | — | Visible title and the start of the accessible name. |
+| `min` | number | no | — | Value at the start of the ramp (lightest, or the negative end when diverging). |
+| `max` | number | no | — | Value at the end of the ramp (darkest, or the positive end when diverging). |
+| `minLabel` | string | no | — | Text at the start of the ramp ("Low"); wins over the formatted `min`. |
+| `maxLabel` | string | no | — | Text at the end of the ramp ("High"); wins over the formatted `max`. |
+| `ramp` | `'sequential'` \| `'diverging'` | no | `"sequential"` | Which theme ramp to show; `sequential` is the heatmap's. |
+| `steps` | number (2–9) | no | `9` | Swatches; the ramps have nine steps. |
+| `formatValue` | `(value: number) => string` | no | `formatMatrixNumber` | Formats `min` and `max` (units such as `%`). |
+| `description` | string | no | — | Replaces the derived range sentence after the label. |
+| `labels` | `Partial<RampLegendLabels>` | no | English | `range` (`{label}, color scale from {min} to {max}`) and `scale` (`{label}, color scale`, used when an end is missing). |
+| `class` | string | no | `""` | Application-authored class value. |
+
+`RAMP_LEGEND_LABELS`, `rampLegendLabels(overrides)` and
+`rampLegendText(labels, label, min, max, description?)` give hosts the same
+sentence for their own text.
 
 ## Props
 

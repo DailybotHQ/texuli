@@ -34,6 +34,13 @@ Tested in `packages/texuli/tests/forms.test.ts`.
 - `label` / `copiedLabel`: translatable idle and success labels
 - `feedbackMs`: how long the copied state stays (default 1500)
 - `size`: `sm` | `md`
+- `onCopy(value)`: runs after the text reached the clipboard
+- `onCopyError(value)`: runs when the write failed (no clipboard access,
+  denied permission, no fallback). They are camelCase callbacks, not the
+  native `oncopy` / `onerror` DOM events.
+- `onclick` composes: your handler runs first, and `event.preventDefault()`
+  in it skips the copy
+- `bind:ref` binds the button
 - Uses `navigator.clipboard.writeText` with a textarea fallback
 - `aria-live="polite"` announces label changes
 

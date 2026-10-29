@@ -35,21 +35,21 @@ project overview.
 | `@texuli/catalog` | [packages/catalog/README.md](../packages/catalog/README.md): The agent catalog and the renderer with no HTML sinks. |
 | `@texuli/charts` | [packages/charts/README.md](../packages/charts/README.md): Chart math and every chart family, one lazy subpath per family. |
 | `@texuli/chat` | [packages/chat/README.md](../packages/chat/README.md): Chat interfaces: thread, message list, composer and typing indicator, generic for people and agents. |
-| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): The rich text editor surface, toolbar, link dialog and clipboard import on the core editor texels. |
+| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): In development, first on npm as `0.5.0`: the rich text editor surface, toolbar, link dialog, clipboard import and Markdown in and out on the core editor texels. |
 | `@texuli/core` | [packages/core/README.md](../packages/core/README.md): Texels: framework-free behavior and policy that every Texuli component is built from. |
 | `@texuli/date` | [packages/date/README.md](../packages/date/README.md): Owned Gregorian date arithmetic for Texuli calendars and date fields. |
-| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, first on npm as `0.4.0`: the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
-| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.4.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
+| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, on npm as `0.5.0` (first published as `0.4.0`): the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
+| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.5.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
 | `@texuli/media` | [packages/media/README.md](../packages/media/README.md): Media: images, galleries, video, audio and layered compositions. |
 | `@texuli/player` | [packages/player/README.md](../packages/player/README.md): Svelte paint runtime for validated Texuli catalog blueprints. |
 | `@texuli/primitives` | [packages/primitives/README.md](../packages/primitives/README.md): Owned, headless Svelte 5 primitives built on the texels. |
-| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (in development; on npm as `0.4.0`, after the `0.3.0` model v1 stage). |
+| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (in development; on npm as `0.5.0`, the v2 stage from `0.4.0`, after the `0.3.0` model v1 stage). |
 | `@texuli/spec` | [packages/spec/README.md](../packages/spec/README.md): The schema-first blueprint contract: JSON schemas, the catalog vocabulary, TypeScript and Kotlin projections, and the conformance harness. |
 | `texuli` | [packages/texuli/README.md](../packages/texuli/README.md): Styled Texuli components, layouts and shells. |
 | `@texuli/tokens` | [packages/tokens/README.md](../packages/tokens/README.md): The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. |
-| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.4.0`: the accessible workflow graph editor and viewer. |
+| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.5.0`: the accessible workflow graph editor and viewer. |
 | `@texuli/tools` | [packages/tools/README.md](../packages/tools/README.md): Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. |
 | `@texuli/website` | [apps/website/README.md](../apps/website/README.md): texuli.com: the Texuli documentation, catalog and live examples, built with Astro; the Pages Functions live in the root `functions/`. |
 | `@texuli/agent` | [apps/agent/README.md](../apps/agent/README.md): The texuli.com agent service: prompt to validated blueprint draft, fake replay provider only, not deployed. |
@@ -102,6 +102,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-color-explorer](../apps/website/docs/site-color-explorer.md) | texuli.com: Color and token explorer |
 | [site-component-pages](../apps/website/docs/site-component-pages.md) | Component pages generator |
 | [site-csp](../apps/website/docs/site-csp.md) | Built-site Content Security Policy |
+| [site-drag](../apps/website/docs/site-drag.md) | Drag page (texuli.com) |
 | [site-docs-shell](../apps/website/docs/site-docs-shell.md) | Docs shell (texuli.com) |
 | [site-editor](../apps/website/docs/site-editor.md) | texuli.com: editor area |
 | [site-evidence](../apps/website/docs/site-evidence.md) | texuli.com: Evidence on every component page |
@@ -131,6 +132,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-theme-sweep](../apps/website/docs/site-theme-sweep.md) | Theme sweep tooling |
 | [site-theme-switcher](../apps/website/docs/site-theme-switcher.md) | texuli.com: theme and mode switcher |
 | [site-visual](../apps/website/docs/site-visual.md) | Visual polish |
+| [site-workflows](../apps/website/docs/site-workflows.md) | Workflows pages (texuli.com) |
 
 ### Agent service (`apps/agent/docs/`)
 
@@ -145,6 +147,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 
 | Doc | Title |
 | --- | --- |
+| [appearance](../packages/astro/docs/appearance.md) | Appearance switcher (`@texuli/astro/appearance`) |
 | [content](../packages/astro/docs/content.md) | Content block parser |
 | [integration](../packages/astro/docs/integration.md) | Astro integration |
 | [layouts-content-layout](../packages/astro/docs/layouts-content-layout.md) | `ContentLayout` |
@@ -206,6 +209,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [charts-part-whole](../packages/charts/docs/charts-part-whole.md) | Charts: pie, donut, sunburst and treemap |
 | [charts-rtl](../packages/charts/docs/charts-rtl.md) | Charts in right-to-left layouts |
 | [charts-schemas](../packages/charts/docs/charts-schemas.md) | Charts: prop schemas and tiers |
+| [charts-sparkline-lite](../packages/charts/docs/charts-sparkline-lite.md) | Charts: light sparkline |
 | [charts-statistical](../packages/charts/docs/charts-statistical.md) | Charts: statistical marks |
 | [charts-worker](../packages/charts/docs/charts-worker.md) | Charts: worker offload |
 
@@ -248,9 +252,12 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | Doc | Title |
 | --- | --- |
 | [data-activity](../packages/data/docs/data-activity.md) | Activity feed |
+| [data-activity-inbox](../packages/data/docs/data-activity-inbox.md) | Notification inbox (`@texuli/data/activity/inbox`) |
 | [data-board](../packages/data/docs/data-board.md) | Board (kanban) |
 | [data-calendar-reschedule](../packages/data/docs/data-calendar-reschedule.md) | Calendar rescheduling, creating and the clock |
+| [data-cohort](../packages/data/docs/data-cohort.md) | Cohort retention table (`@texuli/data/cohort`) |
 | [data-files](../packages/data/docs/data-files.md) | File browser |
+| [data-filter-builder](../packages/data/docs/data-filter-builder.md) | Filter builder (`@texuli/data/filter-builder`) |
 | [data-grid-columns](../packages/data/docs/data-grid-columns.md) | Data grid column operations |
 | [data-grid-core](../packages/data/docs/data-grid-core.md) | Data grid core |
 | [data-grid-edit-a11y](../packages/data/docs/data-grid-edit-a11y.md) | Editable grid accessibility: read-only cells, editor focus, tab stop |
@@ -286,6 +293,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | --- | --- |
 | [editor-controller](../packages/editor/docs/editor-controller.md) | Editor controller |
 | [editor-link-dialog](../packages/editor/docs/editor-link-dialog.md) | Link dialog |
+| [editor-markdown](../packages/editor/docs/editor-markdown.md) | Markdown in and out |
 | [editor-paste](../packages/editor/docs/editor-paste.md) | Clipboard import |
 | [editor-surface](../packages/editor/docs/editor-surface.md) | Editor surface |
 | [editor-toolbar](../packages/editor/docs/editor-toolbar.md) | Editor toolbar |
@@ -395,6 +403,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [layout-host](../packages/texuli/docs/layout-host.md) | LayoutHost and the layout contract |
 | [layout-register-subpaths](../packages/texuli/docs/layout-register-subpaths.md) | Layout register-only subpaths |
 | [layouts-auth-settings](../packages/texuli/docs/layouts-auth-settings.md) | Auth, onboarding and settings layouts |
+| [layouts-content](../packages/texuli/docs/layouts-content.md) | Content layouts (`texuli/layouts/content`) |
 | [layouts-dashboard](../packages/texuli/docs/layouts-dashboard.md) | Dashboard grid and analytics layouts |
 | [layouts-marketing](../packages/texuli/docs/layouts-marketing.md) | Marketing layouts |
 | [layouts-mobile](../packages/texuli/docs/layouts-mobile.md) | Mobile layouts: tab bar and drawer, with stacked navigation |
@@ -470,6 +479,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [cli-add](../packages/tools/docs/cli-add.md) | `texuli add` |
 | [cli-init](../packages/tools/docs/cli-init.md) | `texuli init` and `texuli theme` |
 | [cli-update](../packages/tools/docs/cli-update.md) | `texuli diff` and `texuli update` |
+| [deck](../packages/tools/docs/deck.md) | Deck commands |
 | [elements](../packages/tools/docs/elements.md) | Custom elements |
 | [golden](../packages/tools/docs/golden.md) | Agent golden set and scorer |
 | [llms](../packages/tools/docs/llms.md) | llms.txt and agent docs bundle |

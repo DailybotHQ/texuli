@@ -3,15 +3,16 @@
  * One mounted slide on the canvas (the stage mounts at most three: the
  * active slide and its neighbours). It provides the slide's step context,
  * paints the background layers with their contrast scrim, and asks the
- * renderer list for the body; the built-in free-slide renderer and the
- * labelled placeholder are the fallbacks. Inactive slides are `inert` and
- * `aria-hidden`, so only the active one is reachable.
+ * renderer list for the body; the built-in free-slide renderer (imported on
+ * first use, `BUILTIN_FREE_RENDERER`) and the labelled placeholder are the
+ * fallbacks. Inactive slides are `inert` and `aria-hidden`, so only the
+ * active one is reachable.
  */
-import type { Deck, DeckBackgroundPalette, DeckSlide, FreeSlide } from '@texuli/deck/model';
+import type { Deck, DeckBackgroundPalette, DeckSlide } from '@texuli/deck/model';
 import { resolveDeckBackground } from '@texuli/deck/model';
+import { BUILTIN_FREE_RENDERER } from './builtin-loader.ts';
 import { setDeckStepContext } from './context.ts';
 import { deckCssVars } from './css-vars.ts';
-import FreeSlideRenderer from './FreeSlide.svelte';
 import type { DeckMediaTrust } from './media.ts';
 import type { DeckTranslate } from './messages.ts';
 import RendererHost from './RendererHost.svelte';
@@ -138,7 +139,8 @@ let backgroundRenderer = $derived(resolveBackgroundRenderer(renderers, backgroun
     {#if renderer}
       <RendererHost entry={renderer} props={{ slide, context }} {t} />
     {:else if slide.layout === 'free'}
-      <FreeSlideRenderer slide={slide as FreeSlide} {context} />
+      <!-- The built-in free renderer loads on first use (the stage preloads it when it needs it). -->
+      <RendererHost entry={BUILTIN_FREE_RENDERER} props={{ slide, context }} {t} />
     {:else}
       <SlidePlaceholder {t} {slide} {title} />
     {/if}

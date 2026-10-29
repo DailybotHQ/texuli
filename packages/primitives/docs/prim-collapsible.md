@@ -25,7 +25,8 @@ let open = $state(false);
 </CollapsibleRoot>
 ```
 
-`defaultOpen` initializes uncontrolled state; `open` with `bind:open` keeps the
+`CollapsibleRoot` spreads extra attributes (`aria-*`, `data-*`, handlers) on
+its root element and binds it with `bind:ref`. `defaultOpen` initializes uncontrolled state; `open` with `bind:open` keeps the
 parent synchronized. `onOpenChange` reports changes. Set `disabled` on the root
 or trigger to prevent changes. The closed panel remains inert and hidden from
 assistive technology.

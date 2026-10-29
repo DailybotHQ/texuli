@@ -26,6 +26,7 @@ let {
   slide: slideSnippet,
   children,
   renderers,
+  defaultRenderers = true,
   tier = 'untrusted',
   messages,
   loadTheme,
@@ -58,7 +59,7 @@ let notePages = $derived(
 $effect(() => {
   if (custom) return;
   const current = deck;
-  const options = { renderers, tier, messages, loadTheme, resolveAvatar };
+  const options = { renderers, defaultRenderers, tier, messages, loadTheme, resolveAvatar };
   let live = true;
   painter = null;
   import('./print-paint.ts')

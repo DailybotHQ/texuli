@@ -17,11 +17,13 @@
 </Calendar.Root>
 ```
 
-`Root` supports controlled `value` and `focusedValue` bindings, `defaultValue`, `defaultFocusedValue`, `locale`, `calendar="gregory"`, `minValue`, `maxValue`, `isDateUnavailable`, `isDateDisabled`, `disabled`, and `readOnly`. `onValueChange` receives a `CalendarDate`. Prev/Next buttons honor the available date range. Other calendar systems are outside the current `@texuli/date` contract.
+`Root` supports controlled `value` and `focusedValue` bindings, `defaultValue`, `defaultFocusedValue`, `locale`, `calendar="gregory"`, `weekStartsOn` (`0` Sunday to `6` Saturday; default the locale's first day), `today`, `minValue`, `maxValue`, `isDateUnavailable`, `isDateDisabled`, `disabled`, and `readOnly`.
+
+**`today` (a `CalendarDate`).** The day marked with `aria-current="date"` and `data-today`, and the starting day when nothing is selected. When it is given, the calendar never reads the clock (`Date.now()` or `new Date()`), so a simulated or server-provided day renders deterministically. `onValueChange` receives a `CalendarDate`. Prev/Next buttons honor the available date range. Other calendar systems are outside the current `@texuli/date` contract.
 
 The grid follows the APG keyboard model: arrow keys move by day or week, Home/End move within the locale's week, PageUp/PageDown move by month, and Shift+PageUp/PageDown move by year. Horizontal movement reverses in RTL. Only the focused available day participates in the Tab order. Pointer clicks and touch taps use the same selection path.
 
 This is headless: it supplies semantic table/grid roles and state attributes, but no visual treatment. Consumers own focus indicators, selected/disabled states, contrast, forced-colors styling, and touch target dimensions.
 
-**Starting day.** The calendar starts on `defaultFocusedValue`, else the value, else today. When that day is disabled, it starts on the first enabled day of its month, else the next enabled day, so the grid always has a tab stop (unless every day is disabled).
+**Starting day.** The calendar starts on `defaultFocusedValue`, else the value, else `today` (the prop, else the local day). When that day is disabled, it starts on the first enabled day of its month, else the next enabled day, so the grid always has a tab stop (unless every day is disabled).
 

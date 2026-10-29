@@ -2,6 +2,7 @@ import type { Component } from 'svelte';
 import type { TextBlockViewProps } from './engine.ts';
 
 export {
+  type BlockIconResolver,
   isTextFamilyBlock,
   TEXT_BLOCK_TYPES,
   type TextBlockViewProps,

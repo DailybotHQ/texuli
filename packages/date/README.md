@@ -11,10 +11,10 @@ you need small, framework-free date-only math (add months, find the start of
 a locale's week, count the weeks in a month) without a larger date library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
 > stable release); `@texuli/date` was first released in `0.3.0`. Under 0.x,
-> a new minor (`0.5.0`) may contain breaking changes, so pin the exact
-> version or use `^0.4.0`, which accepts only 0.4.x.
+> a new minor (`0.6.0`) may contain breaking changes, so pin the exact
+> version or use `^0.5.0`, which accepts only 0.5.x.
 
 ## Install
 
@@ -36,9 +36,11 @@ ESM-only and ships TypeScript declarations.
 ```ts
 import {
   CalendarDate,
+  daysBetween,
   getLocalTimeZone,
   getWeeksInMonth,
   isSameMonth,
+  localeWeekStart,
   parseDate,
   startOfMonth,
   startOfWeek,
@@ -55,6 +57,8 @@ startOfWeek(date, 'en-US').toString();          // '2026-03-15' (weeks start on 
 startOfWeek(date, 'en-GB').toString();          // '2026-03-09' (weeks start on Monday)
 getWeeksInMonth(date, 'en-US');                 // 5
 isSameMonth(date, startOfMonth(date));          // true
+localeWeekStart('en-GB');                       // 1 (Monday)
+daysBetween(date, parseDate('2026-03-20'));     // 5
 
 const now = today(getLocalTimeZone());          // today's date in the user's zone
 now.toDate('UTC');                              // a Date at midnight UTC
@@ -89,8 +93,15 @@ export the same surface:
 | `parseDate` | Parses an ISO `YYYY-MM-DD` string; throws a `RangeError` on an invalid date |
 | `today`, `getLocalTimeZone` | Today's date in an IANA time zone; the runtime's zone |
 | `startOfMonth`, `startOfWeek`, `getWeeksInMonth`, `isSameMonth` | Month and week helpers; weeks start on the locale's first day unless you pass one |
+| `localeWeekStart`, `weekStartDay` | The locale's first day of the week as `0` (Sunday) to `6` (Saturday), Sunday when the runtime has no week info; a `weekStartsOn` number as a `DayOfWeek` (`undefined` when out of range) |
+| `daysBetween` | Whole days from one `CalendarDate` to another (negative when the second is earlier) |
 | `GregorianCalendar`, `createCalendar`, `toCalendar` | The calendar object a `CalendarDate` carries; `createCalendar('gregory')` is the only supported identifier |
 | Types | `CalendarIdentifier` (`'gregory'`), `DateDuration`, `DateFields`, `DayOfWeek` |
+
+## New in 0.5.0
+
+`localeWeekStart`, `weekStartDay` and `daysBetween` ship in `0.5.0`; the
+`0.4.0` release predates them.
 
 ## Key guarantees
 

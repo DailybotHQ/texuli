@@ -67,10 +67,10 @@ afterEach(() => {
 });
 
 describe('slides page: copy and safety', () => {
-  it('says "in development" and names the 0.4.0 release', () => {
+  it('says "in development" and names the 0.5.0 release', () => {
     expect(PAGE).toMatch(/@texuli\/slides · in development/);
     const status = read('components/slides-site/page.ts');
-    expect(status).toMatch(/in development and on npm as 0\.4\.0, a pre-1\.0 release/);
+    expect(status).toMatch(/in development and on npm as 0\.5\.0, a pre-1\.0 release/);
     expect(status).toMatch(/@texuli\/slides 0\.3\.0 has the previous deck model/);
   });
 

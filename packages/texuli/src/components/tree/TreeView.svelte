@@ -26,8 +26,16 @@ let {
   density = 'default',
   item,
   class: className,
+  ref = $bindable(null),
   ...attributes
 }: TreeViewProps = $props();
+
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 const rootClass = $derived(cx(treeViewClass({ variant, density }), className));
 </script>
@@ -64,6 +72,7 @@ const rootClass = $derived(cx(treeViewClass({ variant, density }), className));
 
 <TreeRoot
   {...attributes}
+  {@attach bindRef}
   {items}
   bind:expanded
   bind:selected

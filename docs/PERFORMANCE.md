@@ -129,6 +129,42 @@ The editor rows run in happy-dom (no layout, no paint), so they bound the
 Svelte and model work, not a browser frame; the browser drag is covered by
 `tests/behavior/scenarios/workflow-editor.spec.ts` without a timing limit.
 
+### PLAN_009 packaging and first-screen weight (2026-10-28)
+
+Released in `0.5.0`; the `0.4.0` packages predate it.
+
+- **Dist parity (G22).** Protoyard measured app bundles about 11% bigger
+  from the npm `0.3.0` dist than from the `0.3.0` source. Rebuilt the same
+  way on this branch, a consumer bundle from the packed `dist/` matched the
+  source bundle (+0.01% raw), so no packaging defect was found.
+  `scripts/dist-parity.ts` keeps it that way: it builds one consumer entry
+  (styled components, chart families, block loaders, the slides stage) from
+  both and fails when the dist build is over 2% bigger, raw or gzip, or
+  emits more files (`pnpm exec tsx scripts/dist-parity.ts`; gate:
+  `pnpm vitest run scripts/tests/dist-parity.test.ts`).
+- **Light sparkline (G23).** `@texuli/charts/sparkline-lite` draws the
+  compact `Sparkline` without its data table. First-screen JavaScript it
+  adds to a page (production Vite build, Svelte bundled, gzip 9):
+
+  | Harness | compact `Sparkline` | light `Sparkline` |
+  | --- | ---: | ---: |
+  | Two pages (chart, baseline) | 3,373 B | 2,210 B |
+  | Three pages (`packages/charts/tests/sparkline-lite.test.ts`) | 3,566 B | 2,628 B |
+
+  Its scoped CSS is 163 B gzip (424 B for the compact one); the test keeps
+  the light entry under 3,300 B and below the compact one
+  ([charts-sparkline-lite](../packages/charts/docs/charts-sparkline-lite.md)).
+  The wider first-screen CSS diet stays a follow-up.
+- **Lazy slide renderers (G24, G25).** `DeckStage` and the print path import
+  the default renderer tables only when `defaultRenderers` is on, and a
+  renderer table can load its block validator lazily. `@texuli/slides/stage`
+  measured 104,263 B gzip (about 106,875 B before); a host with
+  `defaultRenderers={false}` ships no default renderer module
+  (`packages/slides/tests/bundle-graph.test.ts`).
+- **Budgets.** The entries the gap fixes grew got new caps at the measured
+  size plus 4% (owner-consented release plan); each row's `note` in
+  `texuli.budgets.json` names the gap.
+
 ## Hot paths (planned)
 
 - **Overlay open to focus** (dialog, popover, menu): the layer stack, focus
@@ -212,8 +248,8 @@ truth. CI's `audits` job runs `pnpm size` as a required check
 
 ## Slides and deck (PLAN_008)
 
-`@texuli/deck` and `@texuli/slides` `0.4.0` are in the repository and not on
-npm. Their size caps are owner decisions of 2026-10-28 (PLAN_008
+`@texuli/deck` and the `@texuli/slides` v2 stage are on npm from `0.4.0`.
+Their size caps are owner decisions of 2026-10-28 (PLAN_008
 T-perf-budgets): each cap is the measured size on the final PLAN_008 code
 plus 4% headroom, with the reason in the row's `note` in
 `texuli.budgets.json`. `pnpm size --filter deck` and

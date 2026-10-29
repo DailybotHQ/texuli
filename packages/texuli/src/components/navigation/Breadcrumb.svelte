@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import type { BreadcrumbItem } from './types.ts';
 import {
@@ -14,7 +15,7 @@ import {
 } from './variants.ts';
 import './navigation.css';
 
-type Props = {
+type OwnProps = {
   items: readonly BreadcrumbItem[];
   /** Landmark name (default "Breadcrumb"). */
   label?: string;
@@ -27,7 +28,12 @@ type Props = {
   maxItems?: number;
   hrefTrust?: HrefTrust;
   class?: ClassValue;
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
 };
+
+/** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the root element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps | 'children'>;
 
 let {
   items,
@@ -38,7 +44,16 @@ let {
   maxItems = 0,
   hrefTrust = 'developer',
   class: className,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
+
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 type DisplayItem = { kind: 'crumb'; item: BreadcrumbItem; index: number } | { kind: 'ellipsis' };
 
@@ -67,6 +82,8 @@ function isCurrent(item: BreadcrumbItem, index: number): boolean {
 </script>
 
 <nav
+  {...rest}
+  {@attach bindRef}
   class={breadcrumbClass({
     size,
     class: className,

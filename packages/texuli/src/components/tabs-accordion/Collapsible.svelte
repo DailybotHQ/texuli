@@ -5,11 +5,12 @@ import {
   CollapsibleTrigger,
 } from '@texuli/primitives/collapsible';
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import Chevron from './Chevron.svelte';
 import './tabs-accordion.css';
 
-type Props = {
+type OwnProps = {
   open?: boolean;
   defaultOpen?: boolean;
   disabled?: boolean;
@@ -20,7 +21,12 @@ type Props = {
   onOpenChange?: (open: boolean) => void;
   trigger?: Snippet;
   children?: Snippet;
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
 };
+
+/** Extra attributes (`data-*`, `aria-*`, handlers…) land on the root element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps>;
 
 let {
   open = $bindable(undefined),
@@ -32,10 +38,14 @@ let {
   onOpenChange,
   trigger,
   children,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
 </script>
 
 <CollapsibleRoot
+  {...rest}
+  bind:ref
   bind:open
   {defaultOpen}
   {disabled}

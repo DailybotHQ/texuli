@@ -10,6 +10,8 @@ import { appNavClass, type SidebarVariant } from './variants.ts';
 import './sidebar.css';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   items?: readonly SidebarItem[];
   sections?: readonly SidebarSection[];
   collapsed?: boolean;
@@ -56,6 +58,7 @@ let {
   hrefTrust = 'developer',
   mobileOpen = $bindable(false),
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -98,6 +101,7 @@ const rootClass = $derived(
 </script>
 
 <div
+  bind:this={ref}
   class={rootClass}
   data-tx-app-nav
   data-collapsed={collapsed ? '' : undefined}

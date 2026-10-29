@@ -1,7 +1,9 @@
 <script lang="ts">
+import type { LayerStack } from '@texuli/core/layer-stack';
 import type { PortalTarget } from '@texuli/core/portal';
 import * as DialogPrimitive from '@texuli/primitives/dialog';
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { Icon } from '../icons/index.ts';
 import {
@@ -19,7 +21,7 @@ import './dialog.css';
 
 type TriggerSnippet = Snippet<[{ props: Record<string, unknown> }]>;
 
-type Props = {
+type OwnProps = {
   open?: boolean;
   /** Required accessible title. */
   title: string;
@@ -36,7 +38,18 @@ type Props = {
   class?: ClassValue;
   /** Mount the portal somewhere other than document.body (scoped previews). */
   portal?: PortalTarget;
+  /**
+   * The layer stack (`@texuli/core/layer-stack`) this overlay registers on, for
+   * apps that keep their own Escape and outside-press order. Default: the
+   * page-wide stack. Read when the dialog opens.
+   */
+  stack?: LayerStack;
+  /** The dialog content element while open, `null` while closed (bindable). */
+  ref?: HTMLElement | null;
 };
+
+/** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the dialog content element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'role'>;
 
 let {
   open = $bindable(false),
@@ -51,7 +64,17 @@ let {
   onOpenChange,
   class: className,
   portal,
+  stack,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
+
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 const contentClass = $derived(
   dialogContentClass({
@@ -67,7 +90,7 @@ function setOpen(next: boolean): void {
 }
 </script>
 
-<DialogPrimitive.Root bind:open onOpenChange={setOpen}>
+<DialogPrimitive.Root bind:open onOpenChange={setOpen} {stack}>
   {#if trigger}
     <DialogPrimitive.Trigger>
       {#snippet child({ props })}
@@ -78,10 +101,12 @@ function setOpen(next: boolean): void {
   <DialogPrimitive.Portal to={portal}>
     <DialogPrimitive.Overlay class={dialogOverlayClass()} data-tx-dialog-overlay="" />
     <DialogPrimitive.Content
+      {...rest}
       class={contentClass}
       data-tx-dialog=""
       data-size={size}
       data-state={open ? 'open' : 'closed'}
+      {@attach bindRef}
     >
       <div class={dialogHeaderClass()} data-tx-dialog-header="">
         <div class="tx-dialog__heading">

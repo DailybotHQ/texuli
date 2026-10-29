@@ -4,6 +4,7 @@ import { Avatar as AvatarPrimitive } from '@texuli/primitives/avatar';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { avatarInitials, avatarToneIndex } from './initials.ts';
+import { avatarSrcset } from './srcset.ts';
 import {
   AVATAR_PIXELS,
   type AvatarSize,
@@ -18,8 +19,16 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   name: string;
   /** Optional image URL (URL policy via the avatar primitive). */
   src?: string | null;
-  /** Trust tier for `src`. Default `untrusted`. */
+  /** Trust tier for `src` and every `srcset` candidate. Default `untrusted`. */
   srcTrust?: HrefTrust;
+  /**
+   * Responsive candidates for the image (`a.webp 1x, b.webp 2x` or width
+   * descriptors). Each candidate URL passes the image URL policy at
+   * `srcTrust`; refused ones are dropped. Used only with `src`.
+   */
+  srcset?: string | null;
+  /** The `sizes` attribute for width-descriptor candidates. */
+  sizes?: string;
   size?: AvatarSize;
   /** Presence indicator. Omit for none. */
   status?: AvatarStatus;
@@ -41,6 +50,8 @@ let {
   name,
   src = null,
   srcTrust = 'untrusted',
+  srcset,
+  sizes,
   size = 'md',
   status,
   decorative = false,
@@ -74,6 +85,7 @@ const label = $derived(
 const letters = $derived(initialsProp ?? avatarInitials(name));
 const tone = $derived(avatarToneIndex(name));
 const pixels = $derived(AVATAR_PIXELS[size]);
+const safeSrcset = $derived(avatarSrcset(srcset, srcTrust));
 const rootClass = $derived(
   avatarRootClass({
     size,
@@ -105,6 +117,8 @@ const rootClass = $derived(
       <AvatarPrimitive.Image
         {src}
         {srcTrust}
+        srcset={safeSrcset}
+        sizes={safeSrcset ? sizes : undefined}
         alt=""
         width={pixels}
         height={pixels}

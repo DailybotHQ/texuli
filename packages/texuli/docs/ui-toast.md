@@ -16,11 +16,44 @@ import { Toaster, toast, createToastStore } from 'texuli/toast';
 
 | Export | Role |
 | --- | --- |
-| `Toaster` | Styled region over `@texuli/primitives/toast` (R16 viewport + timers) |
-| `toast` / `createToastStore()` | `success` / `error` / `info` / `warning` / `promise` / `dismiss` |
+| `Toaster` | Styled region over `@texuli/primitives/toast` (R16 viewport and announcer) |
+| `toast` / `createToastStore()` | `success` / `error` / `info` / `warning` / `promise` / `dismiss` / `action` / `pause` / `resume` / `isPaused` (store) / `announcement` |
 | `label` | Landmark name (default `"Notifications"`) |
 | `offset` | Lift above bottom nav (`--tx-toast-offset`) |
 | `dismissLabel` | Localizable close control prefix |
+| other attributes | Land on the Toaster's wrapper `div`. Caller `onpointerenter`, `onpointerleave`, `onfocusin` and `onfocusout` run first, then the Toaster's own pause handling (never replaced) |
+
+### Settle reasons (undo)
+
+`onSettle(reason)` on a toast's options is called exactly once when it
+leaves: `'timeout'` when its timer ran out, `'action'` after its action ran
+(also when the action rejected), and `'dismiss'` for every other way out (the
+close button, a swipe, `dismiss()`, or being pushed out by the `max` cap).
+Replacing a toast by `id` keeps one toast, and only the newest `onSettle` is
+called. An error thrown by `onSettle` is rethrown on a microtask.
+
+```ts
+const id = toast.info('Message archived', {
+  duration: 6000,
+  action: { label: 'Undo', onClick: () => {} },
+  onSettle: (reason) => (reason === 'action' ? restore() : commitArchive()),
+});
+```
+
+### Timers, pause and announcements
+
+The store owns the auto-dismiss timers (`ToastStore.pause(key?)`,
+`resume(key?)`, `isPaused()`). A paused timer keeps its remaining time.
+Holds stack by key (default `'host'`): timers run again only when every hold
+is released. Each Toaster holds its own key while the pointer or focus is in
+its region. Timers count from the moment a toast is published, whether or
+not a Toaster is mounted.
+
+`store.announcement(id?)` returns `{ message, politeness }` for a toast, or
+for the newest one without an id: the text the region announces (`title.
+description`) and `assertive` for errors, `polite` otherwise. Each `ToastItem`
+carries the same `announcement`. `ToastSettleReason` and `ToastAnnouncement`
+are exported types.
 
 ### Kinds
 
@@ -29,9 +62,10 @@ import { Toaster, toast, createToastStore } from 'texuli/toast';
 ### Actions
 
 `action: { label, onClick }` renders a real button. The toast stays mounted
-and interactive while `onClick` runs, then dismisses when its promise settles
-(failures surface through the action's own UI); sync actions dismiss on the
-next tick.
+and interactive while `onClick` runs (its timer stops), then dismisses when
+its promise settles (failures surface through the action's own UI); sync
+actions dismiss on the next tick. A second click while it runs does nothing.
+`store.action(id)` runs the same path from host code.
 
 ### Promise toasts
 

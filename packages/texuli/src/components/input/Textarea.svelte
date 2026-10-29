@@ -24,6 +24,7 @@ let {
   readonly = false,
   rows = 3,
   onValueChange,
+  oninput,
   ...rest
 }: Props = $props();
 
@@ -35,10 +36,12 @@ $effect(() => {
   if (autosize) autosizeTextarea(ref as HTMLTextAreaElement | null);
 });
 
-function onInput(event: Event & { currentTarget: HTMLTextAreaElement }) {
+/** Sync `value` first, then run the caller's `oninput` (it never replaces this one). */
+function onInput(event: Event & { currentTarget: EventTarget & HTMLTextAreaElement }) {
   value = event.currentTarget.value;
   onValueChange?.(value);
   if (autosize) autosizeTextarea(event.currentTarget);
+  oninput?.(event as Parameters<NonNullable<typeof oninput>>[0]);
 }
 </script>
 
@@ -51,6 +54,6 @@ function onInput(event: Event & { currentTarget: HTMLTextAreaElement }) {
   {rows}
   data-tx-textarea=""
   data-tx-autosize={autosize ? 'true' : undefined}
-  oninput={onInput}
   {...rest}
+  oninput={onInput}
 ></textarea>

@@ -2,13 +2,13 @@
  * The print view's default slide renderer, loaded on first use: the stage's
  * own `DeckSlidePreview` (the same layouts, component registry, backgrounds
  * and step context) with every theme the deck references resolved, so a
- * printed page is the slide the stage paints at its last step.
+ * printed page is the slide the stage paints at its last step. The default
+ * tables are imported only when `defaultRenderers` is on (the default).
  */
 import type { Deck, DeckSlide } from '@texuli/deck/model';
 import { resolveDeckStyle } from '@texuli/deck/model';
 import type { Theme } from '@texuli/tokens/contract';
-import { layoutRenderers } from '../layouts/index.ts';
-import { componentRenderers } from '../registry/index.ts';
+import { loadDefaultDeckRenderers } from '../stage/defaults.ts';
 import type { DeckMediaTrust } from '../stage/media.ts';
 import { createDeckTranslator, type DeckStageMessages } from '../stage/messages.ts';
 import DeckSlidePreview from '../stage/presenter/DeckSlidePreview.svelte';
@@ -28,6 +28,11 @@ export { DeckSlidePreview };
 
 export interface DeckPrintPaintOptions {
   renderers?: DeckRenderers | readonly DeckRenderers[];
+  /**
+   * Append the stage's default tables (layouts, component registry) after
+   * `renderers`, imported on first use. Default true; `false` never loads them.
+   */
+  defaultRenderers?: boolean;
   tier?: DeckMediaTrust;
   messages?: DeckStageMessages;
   /** Catalog theme loader; `null` leaves catalog themes to host CSS. */
@@ -71,7 +76,8 @@ export async function createDeckPrintPaint(
   };
   const aspect = isDeckExportAspect(deck.style?.aspect) ? deck.style.aspect : '16:9';
   const t = createDeckTranslator(options.messages);
-  const renderers = [...deckRendererList(options.renderers), layoutRenderers, componentRenderers];
+  const defaults = options.defaultRenderers === false ? [] : await loadDefaultDeckRenderers();
+  const renderers = [...deckRendererList(options.renderers), ...defaults];
   const paint: DeckPreviewPaint = {
     deck,
     renderers,

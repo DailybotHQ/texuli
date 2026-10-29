@@ -1,16 +1,20 @@
 <script lang="ts">
-import { safeImageSrc } from '@texuli/core/url-policy';
+import { filterImageSrcset, safeImageSrc } from '@texuli/core/url-policy';
 import { type PrimitiveState, stateAttributes } from '../internal/index.ts';
 import { avatarContext } from './context.ts';
 import type { AvatarImageProps } from './types.ts';
 
 /**
- * Avatar image: runs `src` through the image URL policy, tracks load/error,
- * and only paints once the root status is `loaded` (after optional delayMs).
+ * Avatar image: runs `src` through the image URL policy and every `srcset`
+ * candidate through `filterImageSrcset` at the same trust (dropping `sizes`
+ * when no candidate survives), tracks load/error, and only paints once the
+ * root status is `loaded` (after optional delayMs).
  */
 let {
   src = null,
   srcTrust = 'untrusted',
+  srcset,
+  sizes,
   alt = '',
   ref = $bindable(null),
   class: className,
@@ -27,6 +31,7 @@ const SRC_UNSET = Symbol('avatar-src-unset');
 let trackedSrc: string | undefined | typeof SRC_UNSET = SRC_UNSET;
 
 const safeSrc = $derived(src == null || src === '' ? undefined : safeImageSrc(src, srcTrust));
+const safeSrcset = $derived(filterImageSrcset(srcset, srcTrust));
 const status = $derived(avatar.status());
 const visible = $derived(status === 'loaded');
 
@@ -112,5 +117,7 @@ $effect(() => {
     onload={handleLoad}
     onerror={handleError}
     {...rest}
+    srcset={safeSrcset}
+    sizes={safeSrcset ? sizes : undefined}
   />
 {/if}

@@ -40,6 +40,8 @@ fallback. Image URLs go through `@texuli/core/url-policy` `safeImageSrc`. Parts:
 | --- | --- | --- |
 | `src` | — | Validated; unsafe values force `error` |
 | `srcTrust` | `"untrusted"` | `safeImageSrc` trust (`developer` allows data URIs) |
+| `srcset` | — | Responsive candidates; each candidate URL passes `filterImageSrcset` at `srcTrust`, and refused candidates are dropped |
+| `sizes` | — | Kept only while at least one `srcset` candidate survives |
 | `alt` | `""` | Host supplies a real name when the image is meaningful |
 
 ## Behavior

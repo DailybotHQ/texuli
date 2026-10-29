@@ -6,6 +6,8 @@ import { type TableAlign, tableCellClass } from './variants.ts';
 import './table.css';
 
 type Props = Omit<HTMLThAttributes, 'align'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Text alignment; `end` for numbers. */
   align?: TableAlign;
   /** Tabular figures, aligned to the end. */
@@ -18,6 +20,7 @@ let {
   scope = 'col',
   class: className,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -25,6 +28,7 @@ const context = getTableContext();
 </script>
 
 <th
+  bind:this={ref}
   {scope}
   class={tableCellClass({
     align: align ?? (numeric ? 'end' : 'start'),

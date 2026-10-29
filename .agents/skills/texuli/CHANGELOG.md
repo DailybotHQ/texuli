@@ -15,6 +15,24 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+### Content
+
+- The packages move to `0.5.0`: all 20 packable packages, including the
+  first publication of `@texuli/editor`. `0.5.0` ships PLAN_009 (the
+  Protoyard adoption gaps): `build-ui/references/imports.md` gains a "New in
+  0.5.0" table (composer `streaming` and `onStop`, message actions and
+  inline edit, `DataGrid` paging and snippets, toast `onSettle`,
+  `TimeField`, date pickers' `today`, `@texuli/charts/sparkline-lite`,
+  `@texuli/editor/markdown`, the filter builder, notification inbox and
+  cohort table, `texuli/layouts/content`), and the package index marks
+  those entries, spec 0.5.0 and the 162-id catalog as new in `0.5.0`. The
+  router, components, blueprints and build-ui references say "on npm as
+  `0.5.0`" and pin `^0.5.0`.
+- `upgrade/SKILL.md` lists the `0.5.0` breaking changes an app checks
+  before moving from `^0.4.0` (numeric and file inputs, composed caller
+  handlers, the `Tag` remove label, toast timers, the lazy `DeckStage`
+  defaults, wider TOC levels, camelCase callbacks).
+
 ## [0.2.3] — 2026-10-28
 
 ### Changes

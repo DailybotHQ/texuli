@@ -27,7 +27,8 @@ export default defineConfig({
 ```
 
 Load `@texuli/astro/styles.css` in a site-owned stylesheet. Match `namespace`
-to the value used by the code that writes Texuli appearance preferences. The
+to the value used by the code that writes Texuli appearance preferences, such
+as the [appearance switcher](appearance.md). The
 default namespace is `site`; invalid namespaces are rejected during config
 setup. Namespaces keep separate applications on the same origin from sharing
 an appearance cache.

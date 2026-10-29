@@ -79,6 +79,101 @@ describe('safeParseBlocks', () => {
       expect(parsed.success).toBe(false);
     }
   });
+
+  it('keeps the presentation fields (align, size, list markers, quote role and avatar, icons, divider label, stat title, source and trend) and refuses bad values', () => {
+    const accepted: readonly (readonly [Record<string, unknown>, Record<string, unknown>])[] = [
+      [{ type: 'heading', level: 2, text: 'Plan', align: 'center' }, { align: 'center' }],
+      [
+        { type: 'text', markdown: 'Body', size: 'lg', align: 'start' },
+        { size: 'lg', align: 'start' },
+      ],
+      [
+        {
+          type: 'list',
+          style: 'check',
+          items: [{ text: 'Ship', done: true }, { text: 'Measure' }],
+        },
+        { style: 'check', items: [{ text: 'Ship', done: true }, { text: 'Measure' }] },
+      ],
+      [
+        { type: 'list', style: 'icon', items: [{ text: 'Fast', icon: 'circle-check' }] },
+        { style: 'icon', items: [{ text: 'Fast', icon: 'circle-check' }] },
+      ],
+      [
+        { type: 'list', ordered: true, style: 'number', items: [{ text: 'One' }] },
+        { ordered: true, style: 'number' },
+      ],
+      [
+        { type: 'quote', quote: 'Q', cite: 'Ada', role: 'CTO', avatar: 'avatar:av-007' },
+        { role: 'CTO', avatar: 'avatar:av-007' },
+      ],
+      [{ type: 'quote', quote: 'Q', avatar: 'people/ada.webp' }, { avatar: 'people/ada.webp' }],
+      [{ type: 'callout', body: 'B', icon: 'info' }, { icon: 'info' }],
+      [{ type: 'divider', label: 'Part two' }, { label: 'Part two' }],
+      [{ type: 'divider', variant: 'space' }, { variant: 'space' }],
+      [
+        { type: 'cards', items: [{ title: 'Fast', icon: 'rocket' }] },
+        { items: [{ title: 'Fast', icon: 'rocket' }] },
+      ],
+      [
+        {
+          type: 'stat',
+          title: 'Q3',
+          source: 'Fictional data',
+          items: [{ label: 'Active', value: '128', trend: [1, 2.5, 3] }],
+        },
+        {
+          title: 'Q3',
+          source: 'Fictional data',
+          items: [{ label: 'Active', value: '128', trend: [1, 2.5, 3] }],
+        },
+      ],
+    ];
+    for (const [input, kept] of accepted) {
+      const parsed = safeParseBlocks([input]);
+      expect(parsed.success, JSON.stringify(input)).toBe(true);
+      if (parsed.success) expect(parsed.data[0], JSON.stringify(input)).toMatchObject(kept);
+    }
+
+    const refused: readonly (readonly [Record<string, unknown>, readonly (string | number)[]])[] = [
+      [{ type: 'heading', level: 2, text: 'x', align: 'end' }, ['align']],
+      [{ type: 'heading', level: 2, text: 'x', align: 'justify' }, ['align']],
+      [{ type: 'text', markdown: 'x', size: 'xl' }, ['size']],
+      [{ type: 'list', style: 'stars', items: [{ text: 'x' }] }, ['style']],
+      [{ type: 'list', ordered: true, style: 'bullet', items: [{ text: 'x' }] }, ['ordered']],
+      [{ type: 'list', items: [{ text: 'x', done: true }] }, ['items', 0, 'done']],
+      [{ type: 'list', style: 'check', items: [{ text: 'x', done: 'yes' }] }, ['items', 0, 'done']],
+      [{ type: 'list', style: 'icon', items: [{ text: 'x' }] }, ['items', 0, 'icon']],
+      [{ type: 'list', items: [{ text: 'x', icon: '<svg onload=x>' }] }, ['items', 0, 'icon']],
+      [{ type: 'quote', quote: 'q', role: 'line\nbreak' }, ['role']],
+      [{ type: 'quote', quote: 'q', avatar: 'https://example.com/a.png' }, ['avatar']],
+      [{ type: 'quote', quote: 'q', avatar: 'javascript:alert(1)' }, ['avatar']],
+      [{ type: 'quote', quote: 'q', avatar: 'data:image/svg+xml;base64,PHN2Zz4=' }, ['avatar']],
+      [{ type: 'quote', quote: 'q', avatar: 'avatar:av-999' }, ['avatar']],
+      [{ type: 'callout', body: 'b', icon: 'Info' }, ['icon']],
+      [{ type: 'callout', body: 'b', icon: 'a'.repeat(49) }, ['icon']],
+      [{ type: 'divider', variant: 'dots' }, ['variant']],
+      [{ type: 'divider', variant: 'space', label: 'x' }, ['label']],
+      [{ type: 'cards', items: [{ title: 't', icon: 'url(x)' }] }, ['items', 0, 'icon']],
+      [{ type: 'stat', title: '', items: [{ label: 'a', value: '1' }] }, ['title']],
+      [{ type: 'stat', source: 5, items: [{ label: 'a', value: '1' }] }, ['source']],
+      [{ type: 'stat', items: [{ label: 'a', value: '1', trend: [1] }] }, ['items', 0, 'trend']],
+      [
+        { type: 'stat', items: [{ label: 'a', value: '1', trend: [1, Number.NaN] }] },
+        ['items', 0, 'trend', 1],
+      ],
+      [
+        { type: 'stat', items: [{ label: 'a', value: '1', trend: Array(61).fill(1) }] },
+        ['items', 0, 'trend'],
+      ],
+    ];
+    for (const [input, path] of refused) {
+      const parsed = safeParseBlocks([input]);
+      expect(parsed.success, JSON.stringify(input)).toBe(false);
+      if (!parsed.success)
+        expect(parsed.issues[0]?.path, JSON.stringify(input)).toEqual([0, ...path]);
+    }
+  });
 });
 
 describe('parseUntrustedBlocks', () => {

@@ -12,7 +12,7 @@
  * - `part`: a part of a compound whose root has the named manifest; it
  *   paints inside that manifest and is not addressable alone.
  * - `chrome`: an overlay, focus trap or app shell. Overlays and shells are
- *   never agent-emittable (ADR-001); the host composes them.
+ *   never agent-emittable (`src/build/tiers.ts`); the host composes them.
  * - `utility`: a helper with no content of its own (an icon set, a visually
  *   hidden span, a scroll container).
  * - `painted-by`: data that a catalog id paints under another name.
@@ -124,7 +124,11 @@ add(
     'DrawerContent',
     'Panel',
     'ResponsiveModalContent',
+    'SheetBody',
+    'SheetCloseButton',
     'SheetContent',
+    'SheetFooter',
+    'SheetHeader',
     'SheetOverlay',
   ]
 );
@@ -168,9 +172,12 @@ add(
   [
     'AppShell',
     'AuthSplitHostLayout',
+    'BottomNav',
     'DrawerScope',
     'MasterDetailLayout',
+    'MobileAppFrame',
     'MobileDrawerLayout',
+    'MobileHeader',
     'MobileTabsLayout',
     'RailLayout',
     'WizardHostLayout',
@@ -299,6 +306,7 @@ add(
     'InteractivePlot',
     'Legend',
     'MatrixFrame',
+    'RampLegend',
     'TableToggle',
     'Tooltip',
     'TooltipCrosshairLayer',
@@ -357,4 +365,9 @@ add('@texuli/blocks', 'part', 'A renderer inside its block family (manifests blo
 export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(rows);
 
 /** The current number of rows. It may only go down. */
-export const EXCLUSION_CEILING = 200;
+// Raised once from 200 to 208 (PLAN_009, developer decision 2026-10-28):
+// four sheet parts, three mobile shell parts and the matrix RampLegend can't
+// be manifests: overlays and shells are never agent-emittable
+// (src/build/tiers.ts) and chart parts are composed by their families. New
+// content components still get a manifest.
+export const EXCLUSION_CEILING = 208;

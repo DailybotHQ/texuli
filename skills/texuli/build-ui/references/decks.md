@@ -5,7 +5,7 @@ as Markdown, presented by the `@texuli/slides` stage and exported to print,
 PDF and PPTX.
 
 **Status: in development, on npm from `0.4.0`.** `@texuli/deck` (the L0
-engine) is first published in `0.4.0`. The `@texuli/slides` `0.4.0` stage is
+engine) is first published in `0.4.0`. The `@texuli/slides` v2 stage (from `0.4.0`) is
 built on it (L8); `@texuli/slides` `0.3.0` carries the previous model (the v1
 recipe in [`recipes.md`](recipes.md) section 4). Spec `0.4.0`, which encodes
 deck model v2, ships in `@texuli/spec` `0.4.0`. A consumer app installs

@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { FocusRestoreEvent, FocusTarget } from '@texuli/core/focus-scope';
+import type { LayerStack } from '@texuli/core/layer-stack';
 import type { OverlayController, OverlayDismissEvent, OverlayMode } from '@texuli/core/overlay';
 import { type Snippet, setContext } from 'svelte';
 import type { AlertDialogContext } from './context.ts';
@@ -9,6 +10,11 @@ interface Props {
   open?: boolean;
   mode?: OverlayMode;
   container?: Element | null;
+  /**
+   * The layer stack (`@texuli/core/layer-stack`) the content registers on.
+   * Default: the page-wide stack. Read when the content opens.
+   */
+  stack?: LayerStack;
   /**
    * Where focus lands when the alert opens. Defaults to the Cancel control
    * (the safe choice). Pass an element or a getter to override.
@@ -24,6 +30,7 @@ let {
   open = $bindable(false),
   mode = 'top-layer',
   container = null,
+  stack,
   initialFocus,
   onOpenChange,
   onDismissRequest,
@@ -82,6 +89,9 @@ const context: AlertDialogContext = {
   },
   get container() {
     return container;
+  },
+  get stack() {
+    return stack;
   },
   get triggerId() {
     return claimedIds.trigger || `${uid}-trigger`;

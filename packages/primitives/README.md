@@ -14,9 +14,9 @@ which is built on these primitives. They are built from scratch on the
 not depend on any other component library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.5.0`) may contain breaking
-> changes, so pin the exact version or use `^0.4.0`, which accepts only 0.4.x.
+> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
+> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
 
 ## Install
 
@@ -91,6 +91,12 @@ from subpaths to keep bundles narrow.
 - **Shared layering.** Escape reaches only the topmost layer, so nested
   dialogs, menus and popovers close in order; overlays portal through one
   implementation.
+- **Your handlers add, never replace.** A handler you pass to a part that
+  binds its own (`onclick` on a radio item, tab or toggle, `onkeydown` on a
+  listbox or calendar grid, `oninput` on the pin input…) runs first, and the
+  part's behavior still runs; call `event.preventDefault()` in a click or
+  key handler to skip it. Bookkeeping handlers (focus, input, pointer up)
+  always run. Handlers a part fully owns are left out of its prop types.
 - **Your ids win.** An `id` you pass on any part replaces the generated one,
   and every `aria-*` reference to that part follows it.
 - **Native forms.** Checkbox, switch, radio group, select, combobox, slider,
@@ -108,12 +114,22 @@ from subpaths to keep bundles narrow.
   and label them with `Intl.DateTimeFormat`. Only the Gregorian calendar is
   supported; `CalendarDate` is re-exported from `@texuli/date`.
 
+### New in 0.5.0
+
+Ships in `0.5.0` (the `0.4.0` release predates it): caller handlers compose with
+the parts' own instead of replacing them, the `date-field` `TimeField`
+spins with the APG spinbutton keys, the calendar and date picker's `today`, `weekStartsOn` and range options, `ToggleGroup`
+`name` and its first-pressed Tab stop, and `PinInput.Root` `name` and
+`inputRef` ([prim-calendar](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-calendar.md),
+[prim-date-field](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-date-field.md),
+[prim-toggle](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-toggle.md)).
+
 ### New in 0.4.0
 
 `sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) ships in `0.4.0`; it
 is not in `0.3.0`. It binds the drag engine
 [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md),
-which is in development and on npm as `0.4.0`
+which is in development and on npm as `0.5.0`
 ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 Contract: [prim-sortable.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-sortable.md).
 

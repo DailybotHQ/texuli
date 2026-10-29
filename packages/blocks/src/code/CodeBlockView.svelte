@@ -2,7 +2,7 @@
 import { onDestroy } from 'svelte';
 import { copyText } from 'texuli/kbd-code';
 import { checkCodeBlock } from './check.ts';
-import type { CodeBlockViewProps } from './family.ts';
+import type { CodeBlockBarContext, CodeBlockViewProps } from './family.ts';
 import { loadCodeGrammar, resolveCodeLanguage } from './grammars.ts';
 import { resolveHighlightSteps } from './highlight.ts';
 import { fillCodeLabel, resolveCodeBlockLabels } from './labels.ts';
@@ -26,6 +26,8 @@ let {
   hostStep,
   step,
   copyable = true,
+  header,
+  toolbar,
 }: CodeBlockViewProps = $props();
 
 const check = $derived(checkCodeBlock(block));
@@ -84,6 +86,15 @@ async function copy(): Promise<void> {
     status = 'idle';
   }, 2000);
 }
+
+const bar = $derived<CodeBlockBarContext>({
+  name,
+  filename: check.ok ? check.block.filename : undefined,
+  lang,
+  code,
+  copy,
+  copyStatus: status,
+});
 </script>
 
 {#if !check.ok}
@@ -99,7 +110,9 @@ async function copy(): Promise<void> {
     data-tone={check.block.tone}
   >
     <div class="tx-code__bar">
-      <span id={nameId} class="tx-code__name">{name}</span>
+      <span id={nameId} class={header ? 'tx-code__sr-only' : 'tx-code__name'}>{name}</span>
+      {#if header}<div class="tx-code__header">{@render header(bar)}</div>{/if}
+      {#if toolbar}<div class="tx-code__toolbar">{@render toolbar(bar)}</div>{/if}
       {#if copyable}
         <button
           type="button"

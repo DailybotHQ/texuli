@@ -63,6 +63,7 @@ export { default as PaginationNext } from './PaginationNext.svelte';
 export { default as PaginationPage } from './PaginationPage.svelte';
 export { default as PaginationPrevious } from './PaginationPrevious.svelte';
 export { default as PaginationRoot } from './PaginationRoot.svelte';
+export { getStablePageTokens, stablePageSlots } from './pagination-tokens.ts';
 export type { BreadcrumbItem } from './types.ts';
 
 export {

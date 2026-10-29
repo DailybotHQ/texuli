@@ -4,9 +4,10 @@ import { cleanup, render, screen } from '@testing-library/svelte';
 import { createMemoryPresenterTransport, resolveDeckTransition } from '@texuli/deck/engine';
 import type { DeckSlide } from '@texuli/deck/model';
 import { generateThemeFromSeed } from '@texuli/tokens/generator';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { deckCssVars } from '../src/stage/css-vars.ts';
 import DeckStage from '../src/stage/DeckStage.svelte';
+import { loadDefaultDeckRenderers } from '../src/stage/defaults.ts';
 import { composeFreeSlide } from '../src/stage/free.ts';
 import { createSwipeTracker } from '../src/stage/input.ts';
 import { createDeckTranslator, DECK_STAGE_MESSAGES } from '../src/stage/messages.ts';
@@ -42,6 +43,9 @@ import {
 } from '../src/stage/transition.ts';
 import HostFreeSlide from './fixtures/HostFreeSlide.svelte';
 import { scenario } from './scenario.ts';
+
+// The default renderer tables load on first use; preload them, as a host that paints at once does.
+beforeAll(() => loadDefaultDeckRenderers());
 
 const reset = () => {
   vi.restoreAllMocks();

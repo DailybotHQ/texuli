@@ -1,6 +1,11 @@
 <script lang="ts">
 import type { CalendarDate } from '@texuli/date';
-import { DatePicker, type DateRange, DateRangePicker } from '../../src/date-picker/index.ts';
+import {
+  type DateInvalidHandler,
+  DatePicker,
+  type DateRange,
+  DateRangePicker,
+} from '../../src/date-picker/index.ts';
 
 interface Props {
   value?: string | null;
@@ -12,6 +17,10 @@ interface Props {
   isDateUnavailable?: (date: CalendarDate) => boolean;
   closeOnSelect?: boolean;
   labels?: Record<string, string>;
+  today?: string;
+  weekStartsOn?: number;
+  maxDays?: number;
+  onInvalid?: DateInvalidHandler;
 }
 
 let {
@@ -24,6 +33,10 @@ let {
   isDateUnavailable,
   closeOnSelect = true,
   labels = {},
+  today,
+  weekStartsOn,
+  maxDays,
+  onInvalid,
 }: Props = $props();
 </script>
 
@@ -36,6 +49,9 @@ let {
   {...isDateUnavailable ? { isDateUnavailable } : {}}
   {closeOnSelect}
   {labels}
+  {...today ? { today } : {}}
+  {...weekStartsOn !== undefined ? { weekStartsOn } : {}}
+  {...onInvalid ? { onInvalid } : {}}
 >
   <DatePicker.Field label="Due date" name="due" />
   <DatePicker.Trigger>Pick</DatePicker.Trigger>
@@ -48,6 +64,10 @@ let {
   bind:value={range}
   bind:open={rangeOpen}
   locale="en-US"
+  {...today ? { today } : {}}
+  {...weekStartsOn !== undefined ? { weekStartsOn } : {}}
+  {...maxDays !== undefined ? { maxDays } : {}}
+  {...onInvalid ? { onInvalid } : {}}
   labels={{ trigger: 'Choose stay', triggerWithValue: 'Choose stay, {date}', dialog: 'Choose stay dates' }}
 >
   <DateRangePicker.Field label="Stay" startName="from" endName="to" />

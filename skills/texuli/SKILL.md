@@ -40,16 +40,21 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 19 published packages are on npm as `0.4.0` (published by CI with
+   All 20 published packages are on npm as `0.5.0` (published by CI with
    provenance; `latest` and `next` both point to it; pre-1.0, so a new minor
    may break and 1.0.0 will be the first stable release), so install them
-   plainly (`pnpm add texuli`) and pin `0.4.0` or `^0.4.0`; the workspace packages
+   plainly (`pnpm add texuli`) and pin `0.5.0` or `^0.5.0`; the workspace packages
    stay `private: true`. `@texuli/drag` (the drag engine),
-   `@texuli/workflows` (the workflow editor) and `@texuli/deck` (the deck
-   engine behind the deck generator, first published in `0.4.0`) are in
-   development but on npm as `0.4.0`. `@texuli/editor` (the rich text
-   editor) is in development and not on npm: only a Texuli workspace can
-   import it. `0.4.0` ships spec 0.4.0, the new catalog groups,
+   `@texuli/workflows` (the workflow editor), `@texuli/deck` (the deck
+   engine behind the deck generator, first published in `0.4.0`) and
+   `@texuli/editor` (the rich text editor, first published in `0.5.0`) are
+   in development but on npm as `0.5.0`. The APIs marked "new in `0.5.0`"
+   in the package index (spec 0.5.0, the filter builder, notification inbox
+   and cohort table, `sparkline-lite`, `texuli/layouts/content`,
+   `@texuli/astro/appearance`, `@texuli/editor/markdown`) are not in
+   `0.4.0`; `0.5.0` also changes some behavior (numeric and file inputs,
+   composed caller handlers; see [`upgrade/SKILL.md`](upgrade/SKILL.md)).
+   `0.4.0` shipped spec 0.4.0, the new catalog groups,
    `@texuli/primitives/sortable`, the data drag migrations, the player's
    interaction and the `@texuli/slides` v2 stage on `@texuli/deck`;
    `0.3.0` predates them all. The

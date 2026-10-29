@@ -8,6 +8,8 @@ import { type AvatarSize, type AvatarStatus, avatarGroupClass } from './variants
 import './avatar.css';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** People to show (fictional names only in demos). */
   items: readonly AvatarGroupItem[];
   /** How many faces to show before a +N overflow chip. Default: all. */
@@ -27,6 +29,7 @@ let {
   label,
   overflowLabel = '+{n}',
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -43,6 +46,7 @@ const classes = $derived(
 </script>
 
 <div
+  bind:this={ref}
   class={classes}
   role="group"
   aria-label={label}
@@ -55,6 +59,8 @@ const classes = $derived(
       name={item.name}
       src={item.src}
       srcTrust={item.srcTrust}
+      srcset={item.srcset}
+      sizes={item.sizes}
       status={item.status}
       decorative={item.decorative ?? Boolean(label)}
       {size}

@@ -79,6 +79,29 @@ follow the card's lane.
 />
 ```
 
+### Column footers and heading levels
+
+`columnFooter` renders at the end of each column (an "add card" button,
+totals) and receives the column and its card count. `headingLevel` (2–6,
+default 3) sets the level of the column headings so the board fits the page
+outline: the board's visually hidden title sits one level above (a plain
+paragraph at level 2, still naming the board), swimlane titles one below
+(capped at 6), and the unplaced-cards heading matches the columns.
+
+```svelte
+<Board {columns} items={tasks} headingLevel={4} {/* accessors */} {onMove}>
+  {#snippet card(task)}<span>{task.title}</span>{/snippet}
+  {#snippet columnFooter(column, { count })}
+    <button type="button" onclick={() => add(column.id)}>Add to {column.title}</button>
+    <span>{count} cards</span>
+  {/snippet}
+</Board>
+```
+
+Example: `data-board-footer`. Test: the "Board column footers and heading
+levels (G14)" block in `packages/data/tests/board.test.ts` (levels 2, 3, 4
+and 6, lanes on and off, one footer per column with its count).
+
 ## Keyboard map
 
 Focus a card's handle (announced as `Drag <card>`), then:

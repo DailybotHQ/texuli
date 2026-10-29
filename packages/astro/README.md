@@ -10,9 +10,9 @@ model for pages, navigation, metadata and a sitemap. Use Texuli's Svelte
 components as islands wherever a page needs interaction.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.5.0`) may contain breaking
-> changes, so pin the exact version or use `^0.4.0`, which accepts only 0.4.x.
+> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
+> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
 
 ## Install
 
@@ -44,8 +44,9 @@ export default defineConfig({
 });
 ```
 
-Use the same `namespace` in Texuli's appearance switcher so the early
-bootstrap reads the appearance the site stores. The default namespace is
+Use the same `namespace` in the appearance switcher
+(`@texuli/astro/appearance`) so the early bootstrap reads the appearance the
+site stores. The default namespace is
 `site`.
 
 Then build pages from the static components:
@@ -74,6 +75,7 @@ import Section from '@texuli/astro/sections/Section';
 | --- | --- |
 | `@texuli/astro` | `texuli`, `themeBootstrapScript`, `parseTexuliBlocks` and `defineSite`, with their types |
 | `@texuli/astro/integration` | The integration and the theme bootstrap (namespace, fallback mode, density and radius) |
+| `@texuli/astro/appearance` | `AppearanceSwitcher`: a light, dark or system island that persists per site in the bootstrap's appearance cache, with its framework-free model |
 | `@texuli/astro/content` | `parseTexuliBlocks`: validates unknown input against the `@texuli/blocks` schemas |
 | `@texuli/astro/site` | `defineSite` and helpers: a validated, frozen site model with page metadata and a sitemap |
 | `@texuli/astro/styles.css` | Token base, forced-colors rules, density and radius variants, and print rules |
@@ -81,10 +83,18 @@ import Section from '@texuli/astro/sections/Section';
 | `@texuli/astro/sections/Hero` | A static hero section |
 | `@texuli/astro/sections/Section` | A static, width-constrained section |
 
+## New in 0.5.0
+
+`@texuli/astro/appearance` (`AppearanceSwitcher`) and `ContentLayout`
+children, host TOC entries, TOC levels and preserved heading ids ship in `0.5.0`;
+the `0.4.0` release predates them
+([appearance](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/appearance.md)).
+
 ## Key guarantees
 
 - **Static by default.** The layout and section components render HTML
-  and never hydrate themselves.
+  and never hydrate themselves. The appearance switcher is the one island,
+  hydrated only where a page places it.
 - **Closed content schema.** `parseTexuliBlocks` returns typed blocks or
   schema issues. It renders no HTML and does not interpret unknown block
   types.
@@ -100,6 +110,7 @@ import Section from '@texuli/astro/sections/Section';
 
 - Website: [texuli.com](https://texuli.com) and the
   [getting started guide](https://texuli.com/guides/getting-started/)
+- Appearance switcher: [appearance.md](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/appearance.md)
 - Integration setup and CSP: [integration.md](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/integration.md)
 - Stylesheet contents: [styles.md](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/styles.md)
 - Content parsing: [content.md](https://github.com/DailybotHQ/texuli/blob/main/packages/astro/docs/content.md)

@@ -28,6 +28,7 @@ not replaced. The helper is `splitControlProps` / `joinIds` in
 | `RadioGroup` | the `role=radiogroup` root | it is the control |
 | `Input`, `Textarea`, `Select.Trigger`, `Combobox.Input`, `NumberField.Input`, `PinInput.Root` | the input / trigger | they already passed everything to the control |
 | `Slider` | each thumb (`role=slider`) | `aria-label` names the thumb (several thumbs: "label 1", "label 2"); `label` / `thumbLabel` still work |
+| `TextCounter` | the input or textarea | `ref` binds the wrapper root; layout hooks stay on it |
 | `TagsInput` | the text input | `aria-label` replaces `inputLabel`; `label` still names the group |
 | `Toggle`, `ToggleGroupItem` | the button | no wrapper |
 | `Rating` (input) | the radio group | `aria-label` / `aria-labelledby` replace the visible label's name; handlers stay on the wrapper (the group binds its own) |

@@ -1,5 +1,5 @@
 {
-  "catalogHash": "8a449985d45c7bfd1dc2285f3513dfd6ca0e3e38260c0a541fdb7b17e9213006",
+  "catalogHash": "4ac7ecedd1c59d1999a9f7eea2f523c7653fececb97258a478f09253f6b6057f",
   "components": [
     {
       "capability": "web-only",
@@ -2853,6 +2853,102 @@
       "summary": "Events on a month, week, day or agenda view; people open, and when allowed move, events."
     },
     {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "group": "data",
+      "id": "data-cohort-table",
+      "label": "Cohort table",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "average"
+        },
+        {
+          "kind": "string",
+          "name": "caption",
+          "required": true
+        },
+        {
+          "kind": "boolean",
+          "name": "captionHidden"
+        },
+        {
+          "enumValues": ["compact", "default", "comfortable"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "kind": "boolean",
+          "name": "heat"
+        },
+        {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "array",
+          "name": "periods",
+          "schema": {
+            "items": {
+              "maxLength": 60,
+              "type": "string"
+            },
+            "maxItems": 60,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "array",
+          "name": "rows",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "cells": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 60,
+                  "type": "array"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "incomplete": {
+                  "type": "boolean"
+                },
+                "label": {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                "size": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": ["label", "cells"],
+              "type": "object"
+            },
+            "maxItems": 120,
+            "type": "array"
+          }
+        },
+        {
+          "enumValues": ["rate", "count"],
+          "kind": "enum",
+          "name": "valueKind"
+        }
+      ],
+      "summary": "A retention table: one row per cohort, one column per period after it started, as rates or counts, with optional heat tints and an averages row."
+    },
+    {
       "bindable": ["layout"],
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
@@ -2926,6 +3022,71 @@
         }
       ],
       "summary": "Folders and files in a grid or list with breadcrumbs, selection and type previews."
+    },
+    {
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change"],
+      "group": "data",
+      "id": "data-filter-builder",
+      "label": "Filter builder",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "array",
+          "name": "fields",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "header": {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                "key": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "options": {
+                  "items": {
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "maxItems": 100,
+                  "type": "array"
+                },
+                "type": {
+                  "enum": ["text", "number", "date", "boolean", "enum"],
+                  "type": "string"
+                }
+              },
+              "required": ["key", "header", "type"],
+              "type": "object"
+            },
+            "maxItems": 48,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "maxDepth"
+        },
+        {
+          "kind": "object",
+          "name": "value"
+        }
+      ],
+      "summary": "Nested and/or groups of conditions (field, operator by field type, value) that people add, edit and remove."
     },
     {
       "capability": "web-only",
@@ -3082,6 +3243,85 @@
         }
       ],
       "summary": "Places as markers on an offline vector basemap, clustered when close, with a place list beside it."
+    },
+    {
+      "bindable": ["filter"],
+      "capability": "web-only",
+      "emit": ["developer", "untrusted"],
+      "events": ["change", "select"],
+      "group": "data",
+      "id": "data-notification-inbox",
+      "label": "Notification inbox",
+      "placement": "content",
+      "props": [
+        {
+          "enumValues": ["all", "unread"],
+          "kind": "enum",
+          "name": "filter"
+        },
+        {
+          "kind": "number",
+          "name": "headingLevel"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "at": {
+                  "description": "An ISO 8601 date (2026-10-27) or time (2026-10-27T09:00:00Z).",
+                  "maxLength": 35,
+                  "minLength": 10,
+                  "type": "string"
+                },
+                "body": {
+                  "maxLength": 500,
+                  "type": "string"
+                },
+                "href": {
+                  "maxLength": 2048,
+                  "type": "string"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "read": {
+                  "type": "boolean"
+                },
+                "title": {
+                  "maxLength": 200,
+                  "type": "string"
+                }
+              },
+              "required": ["id", "title", "at", "read"],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
+          "kind": "boolean",
+          "name": "markReadOnOpen"
+        },
+        {
+          "kind": "string",
+          "name": "now"
+        },
+        {
+          "kind": "string",
+          "name": "timeZone"
+        }
+      ],
+      "summary": "Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view."
     },
     {
       "bindable": ["zoom"],
@@ -7193,6 +7433,77 @@
         }
       ],
       "summary": "A multi-line text control with optional autosize."
+    },
+    {
+      "capability": "web-only",
+      "emit": [],
+      "group": "forms",
+      "id": "time-field",
+      "label": "TimeField",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "error"
+        },
+        {
+          "kind": "number",
+          "name": "hourCycle"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
+          "kind": "number",
+          "name": "minuteStep"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "enumValues": ["sm", "md"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "summary": "A labelled time of day typed or stepped by segment (hour, minute, AM/PM), with a 24-hour HH:mm value."
     },
     {
       "capability": "web-only",

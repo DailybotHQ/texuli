@@ -46,7 +46,7 @@ checks this).
   "harness": "agent-golden-eval/v1",
   "provider": "replay/fake",
   "catalogHash": "<64 hex>",
-  "catalogEntries": { "pinned": 132, "actual": 132 },
+  "catalogEntries": { "pinned": 162, "actual": 162 },
   "fixtures": [
     {
       "id": "01-landing-page",

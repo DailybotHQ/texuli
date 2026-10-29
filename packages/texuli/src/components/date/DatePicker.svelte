@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { CalendarDate } from '@texuli/primitives/calendar';
-import { DatePicker as Primitive } from '@texuli/primitives/date-picker';
+import { type DateInvalidHandler, DatePicker as Primitive } from '@texuli/primitives/date-picker';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import CalendarIcon from './CalendarIcon.svelte';
 import type { DateLabels } from './labels.ts';
@@ -25,6 +25,12 @@ interface Props {
   minValue?: string;
   maxValue?: string;
   isDateUnavailable?: (date: CalendarDate) => boolean;
+  /** The day marked as today (`YYYY-MM-DD`); when set, the clock is never read. */
+  today?: string;
+  /** First day of the week, `0` (Sunday) to `6` (Saturday); default the locale's. */
+  weekStartsOn?: number;
+  /** Typed text that is not a real date (`invalid`) or is out of bounds (`out-of-range`). */
+  onInvalid?: DateInvalidHandler;
   disabled?: boolean;
   required?: boolean;
   /** Submits the value with a form. */
@@ -45,6 +51,9 @@ let {
   minValue,
   maxValue,
   isDateUnavailable,
+  today,
+  weekStartsOn,
+  onInvalid,
   disabled = false,
   required = false,
   name,
@@ -75,6 +84,9 @@ const describedBy = $derived(
     {...minValue ? { minValue } : {}}
     {...maxValue ? { maxValue } : {}}
     {...isDateUnavailable ? { isDateUnavailable } : {}}
+    {...today ? { today } : {}}
+    {...weekStartsOn !== undefined ? { weekStartsOn } : {}}
+    {...onInvalid ? { onInvalid } : {}}
     {disabled}
     {...labels ? { labels } : {}}
     {...onValueChange ? { onValueChange } : {}}

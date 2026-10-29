@@ -1,4 +1,4 @@
-import { type CalendarDate, parseDate } from '@texuli/date';
+import { type CalendarDate, daysBetween, parseDate } from '@texuli/date';
 import { getContext, setContext } from 'svelte';
 
 /** A canonical `YYYY-MM-DD` string as a `CalendarDate`, or `null` when empty or invalid. */
@@ -25,6 +25,32 @@ export function inRange(date: string, start: string | null, end: string | null):
   return start !== null && end !== null && date >= start && date <= end;
 }
 
+/** Days in `[start, end]`, both ends included (`0` when either end is missing or invalid). */
+export function rangeDays(start: string | null, end: string | null): number {
+  const from = toCalendarDate(start);
+  const to = toCalendarDate(end);
+  if (!from || !to) return 0;
+  return Math.abs(daysBetween(from, to)) + 1;
+}
+
+/** A valid `maxDays` (a positive integer), else `undefined` (no limit). */
+export function rangeLimit(maxDays: number | undefined): number | undefined {
+  return maxDays !== undefined && Number.isInteger(maxDays) && maxDays > 0 ? maxDays : undefined;
+}
+
+/**
+ * Why a typed date or a picked range was refused: `invalid` (the typed date
+ * does not exist), `out-of-range` (before `minValue` or after `maxValue`) or
+ * `too-long` (a range longer than `maxDays`).
+ */
+export type DateInvalidReason = 'invalid' | 'out-of-range' | 'too-long';
+
+/**
+ * Reports a refused entry: the text as typed (segments in locale order, like
+ * `2/30/2026`), or the refused range as an ISO interval (`start/end`).
+ */
+export type DateInvalidHandler = (text: string, reason: DateInvalidReason) => void;
+
 /** Every visible or announced string of the pickers. Pass translations to override. */
 export interface DatePickerLabels {
   /** Trigger name without a value, and with one (`{date}` is the formatted value). */
@@ -37,6 +63,8 @@ export interface DatePickerLabels {
   /** Range fields. */
   start: string;
   end: string;
+  /** Announced when a range longer than `maxDays` is refused (`{max}` is the limit). */
+  tooLong: string;
 }
 
 export const DEFAULT_DATE_PICKER_LABELS: Readonly<DatePickerLabels> = /* @__PURE__ */ Object.freeze(
@@ -48,6 +76,7 @@ export const DEFAULT_DATE_PICKER_LABELS: Readonly<DatePickerLabels> = /* @__PURE
     nextMonth: 'Next month',
     start: 'Start date',
     end: 'End date',
+    tooLong: 'Choose a range of {max} days or fewer.',
   }
 );
 
@@ -85,6 +114,12 @@ export interface PickerShell {
   /** The trigger's accessible name (it says the current value). */
   readonly triggerLabel: string;
   readonly closeOnSelect: boolean;
+  /** The day marked as today (`YYYY-MM-DD`); when set, the clock is never read. */
+  readonly today: string | undefined;
+  /** First day of the week, `0` (Sunday) to `6`; `undefined` for the locale's. */
+  readonly weekStartsOn: number | undefined;
+  /** Reports typed text that does not parse or is out of range. */
+  readonly onInvalid: DateInvalidHandler | undefined;
   /** Opens or closes; closing from a choice returns focus to the trigger. */
   setOpen(next: boolean): void;
 }
@@ -133,13 +168,15 @@ export interface RangeState {
   setStart(next: string | null): void;
   setEnd(next: string | null): void;
   pick(date: string): void;
+  /** The polite announcement (a refused range), or `''`. */
+  readonly message?: string;
 }
 
 const SINGLE = Symbol('texuli.date-picker.single');
 const RANGE = Symbol('texuli.date-picker.range');
 
 export const provideSingle = (state: SingleState) => setContext(SINGLE, state);
-export const provideRange = (state: RangeState) => setContext(RANGE, state);
+export const provideRange = (state: RangeState): RangeState => setContext(RANGE, state);
 
 export function getSingle(): SingleState {
   const state = getContext<SingleState | undefined>(SINGLE);

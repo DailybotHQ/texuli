@@ -75,7 +75,7 @@ describe('lifecycle and banned packages (unit)', () => {
         fakePkg('@texuli/core', { dependencies: { lodash: '^4.0.0' } }, 'packages/core'),
         fakePkg(
           '@texuli/primitives',
-          { dependencies: { '@texuli/date': '0.4.0', '@texuli/core': 'workspace:*' } },
+          { dependencies: { '@texuli/date': '0.5.0', '@texuli/core': 'workspace:*' } },
           'packages/primitives'
         ),
         fakePkg(
@@ -111,7 +111,7 @@ describe('CycloneDX SBOM builder', () => {
         {
           dependencies: {
             '@texuli/core': 'workspace:*',
-            '@texuli/date': '0.4.0',
+            '@texuli/date': '0.5.0',
           },
           peerDependencies: { svelte: '^5.57.2' },
         },

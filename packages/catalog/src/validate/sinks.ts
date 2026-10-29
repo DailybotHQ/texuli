@@ -25,7 +25,9 @@ const FORBIDDEN_KEYS = new Set([
   'dangerouslysetinnerhtml',
 ]);
 
-const HTML_TAG = /<\s*\/?\s*[a-z][a-z0-9-]*(?:\s[^<>]*)?>/i;
+// One whitespace run before the optional slash and one after it: two adjacent
+// `\s*` around an optional `/` backtracked quadratically on '<' + spaces.
+const HTML_TAG = /<\s*(?:\/\s*)?[a-z][a-z0-9-]*(?:\s[^<>]*)?>/i;
 // Bidi overrides and isolates (U+202A–U+202E, U+2066–U+2069), written as escapes.
 const BIDI_CONTROL = /[\u202a-\u202e\u2066-\u2069]/;
 const MAX_DEPTH = 32;

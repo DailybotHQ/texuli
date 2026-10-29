@@ -40,6 +40,32 @@ let navOpen = $state(false);
 
 Every label can be translated.
 
+## Height: `--tx-app-height`
+
+The shell is as tall as `var(--tx-app-height, 100dvh)`: its minimum block
+size and the sticky sidebar column both read the variable, and the same
+variable sizes the app layouts (`texuli/layouts/app`), the auth and settings
+layouts and the mobile `MobileAppFrame`.
+
+- **Unset** (a full-page app): the shell fills the dynamic viewport height,
+  `100dvh`, which follows mobile browser toolbars.
+- **Contained** (a device frame, a preview pane, an embedded demo): `100dvh`
+  would be the *page's* height, not the frame's. Set the variable on an
+  ancestor to the frame's height:
+
+```css
+.device-frame {
+  block-size: 812px;
+  --tx-app-height: 100%; /* or a fixed length: 812px */
+}
+```
+
+- **Behind a fixed bar** (an app banner): subtract it,
+  `--tx-app-height: calc(100dvh - 3rem)`.
+
+The variable is inherited, so one declaration on the frame covers every
+shell or layout inside it. Texuli never sets it itself.
+
 ## Behavior
 
 - **Wide and narrow.**

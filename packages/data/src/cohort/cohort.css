@@ -1,0 +1,73 @@
+/**
+ * Cohort retention table on the texuli Table: sticky row headers and fixed
+ * heat steps. Steps 0–3 tint the surface with the primary color under the
+ * normal text color; step 4 is the solid primary with its paired foreground,
+ * so every step keeps the theme's text contrast. Forced colors drop the
+ * tints and keep the numbers. @layer tx.components.
+ */
+@layer tx.components {
+  .tx-cohort {
+    min-inline-size: 0;
+  }
+
+  .tx-cohort .tx-table__head,
+  .tx-cohort .tx-table__cell {
+    white-space: nowrap;
+  }
+
+  .tx-cohort .tx-cohort__label {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 1;
+    background: var(--tx-surface, Canvas);
+  }
+
+  .tx-cohort__cell--incomplete {
+    outline: 1px dashed var(--tx-border-strong, CanvasText);
+    outline-offset: -3px;
+  }
+
+  .tx-cohort .tx-cohort__cell[data-heat] {
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-cohort .tx-cohort__cell[data-heat="0"] {
+    background: color-mix(in oklab, var(--tx-primary, Highlight) 6%, var(--tx-surface, Canvas));
+  }
+
+  .tx-cohort .tx-cohort__cell[data-heat="1"] {
+    background: color-mix(in oklab, var(--tx-primary, Highlight) 14%, var(--tx-surface, Canvas));
+  }
+
+  .tx-cohort .tx-cohort__cell[data-heat="2"] {
+    background: color-mix(in oklab, var(--tx-primary, Highlight) 24%, var(--tx-surface, Canvas));
+  }
+
+  .tx-cohort .tx-cohort__cell[data-heat="3"] {
+    background: color-mix(in oklab, var(--tx-primary, Highlight) 34%, var(--tx-surface, Canvas));
+  }
+
+  .tx-cohort .tx-cohort__cell[data-heat="4"] {
+    background: var(--tx-primary, Highlight);
+    color: var(--tx-primary-foreground, HighlightText);
+  }
+
+  .tx-cohort__sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (forced-colors: active) {
+    .tx-cohort .tx-cohort__cell[data-heat] {
+      background: Canvas;
+      color: CanvasText;
+    }
+  }
+}

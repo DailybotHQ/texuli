@@ -9,6 +9,7 @@
 export { type CodeBlockCheck, checkCodeBlock } from './check.ts';
 export {
   CODE_BLOCK_TYPES,
+  type CodeBlockBarContext,
   type CodeBlockViewProps,
   type CodeFamilyBlock,
   type CodeFamilyBlockType,

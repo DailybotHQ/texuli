@@ -6,13 +6,15 @@ import { visuallyHiddenClass } from './variants.ts';
 import './separator-aspect.css';
 
 type Props = HTMLAttributes<HTMLElement> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Rendered element. Default `span`. */
   as?: 'span' | 'div' | 'p' | 'label';
   children?: Snippet;
   class?: ClassValue;
 };
 
-let { as = 'span', children, class: className, ...rest }: Props = $props();
+let { as = 'span', children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 
 const classes = $derived(
   visuallyHiddenClass({
@@ -22,11 +24,11 @@ const classes = $derived(
 </script>
 
 {#if as === 'div'}
-  <div class={classes} data-tx-visually-hidden {...rest}>{@render children?.()}</div>
+  <div bind:this={ref} class={classes} data-tx-visually-hidden {...rest}>{@render children?.()}</div>
 {:else if as === 'p'}
-  <p class={classes} data-tx-visually-hidden {...rest}>{@render children?.()}</p>
+  <p bind:this={ref} class={classes} data-tx-visually-hidden {...rest}>{@render children?.()}</p>
 {:else if as === 'label'}
-  <label class={classes} data-tx-visually-hidden {...rest}>{@render children?.()}</label>
+  <label bind:this={ref} class={classes} data-tx-visually-hidden {...rest}>{@render children?.()}</label>
 {:else}
-  <span class={classes} data-tx-visually-hidden {...rest}>{@render children?.()}</span>
+  <span bind:this={ref} class={classes} data-tx-visually-hidden {...rest}>{@render children?.()}</span>
 {/if}

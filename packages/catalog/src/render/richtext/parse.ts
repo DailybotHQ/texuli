@@ -10,6 +10,8 @@ import type {
 import { RICHTEXT_LIMITS } from './types.ts';
 
 const ESCAPABLE = /[\\`*_[\]()]/;
+/** What `.` refuses to match in a JavaScript regex without the `s` flag. */
+const LINE_TERMINATOR = /[\n\r\u2028\u2029]/;
 
 /**
  * Parse an untrusted inline Markdown subset into sink-free nodes.
@@ -36,7 +38,7 @@ export function renderRichText(source: unknown, options: RichTextOptions = {}): 
     text = text.slice(0, maxSource);
   }
 
-  if (/<\/?[a-zA-Z][^>]*>/.test(text)) {
+  if (hasHtmlLikeTag(text)) {
     diagnostics.push({
       code: 'html-as-text',
       message: 'HTML-like tags are kept as literal text; nothing is interpreted as markup.',
@@ -54,6 +56,31 @@ export function renderRichText(source: unknown, options: RichTextOptions = {}): 
   };
 
   return { document, diagnostics };
+}
+
+/**
+ * True when the text holds `<tag…>` or `</tag…>`: the old `/<\/?[a-zA-Z][^>]*>/`
+ * test, read by index. That pattern restarted at every `<` and ran to the end
+ * of the text when no `>` followed, so a run of `<a` was quadratic.
+ */
+function hasHtmlLikeTag(text: string): boolean {
+  const lastClose = text.lastIndexOf('>');
+  if (lastClose < 0) return false;
+  for (let at = text.indexOf('<'); at !== -1 && at < lastClose; at = text.indexOf('<', at + 1)) {
+    let letter = at + 1;
+    if (!isAsciiLetter(text.charCodeAt(letter))) {
+      if (text[letter] !== '/') continue;
+      letter += 1;
+      if (!isAsciiLetter(text.charCodeAt(letter))) continue;
+    }
+    // `[^>]*>` holds whenever any `>` comes after the letter.
+    if (letter < lastClose) return true;
+  }
+  return false;
+}
+
+function isAsciiLetter(code: number): boolean {
+  return (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
 }
 
 /** Flatten a document to plain text (for search, titles, plain fallbacks). */
@@ -108,6 +135,43 @@ function splitParagraphs(source: string): string[] {
   return chunks;
 }
 
+/**
+ * Closer lookups for one inline source. Each table is built on first use in
+ * one right-to-left pass and answers in constant time; a forward scan per
+ * opener made a run of `[`, unclosed `*` or `_`, or an unclosed link target
+ * quadratic on 4,000 characters of agent text. Every table encodes the old
+ * forward scan exactly: `t[p]` is what that scan returned when started at
+ * `p`. A `\` skips the character after it and a newline ends the scan;
+ * `hit` decides every other character (`undefined` moves on to `p + 1`).
+ */
+type InlineScan = (
+  key: string,
+  from: number,
+  hit: (p: number, t: Int32Array) => number | undefined
+) => number;
+
+function inlineScan(source: string): InlineScan {
+  const tables = new Map<string, Int32Array>();
+  return (key, from, hit) => {
+    let t = tables.get(key);
+    if (!t) {
+      // Two spare slots: `p + 2` past the end reads -1 (not found).
+      t = new Int32Array(source.length + 2).fill(-1);
+      for (let p = source.length - 1; p >= 0; p -= 1) {
+        const ch = source[p];
+        t[p] =
+          ch === '\\'
+            ? (t[p + 2] as number)
+            : ch === '\n'
+              ? -1
+              : (hit(p, t) ?? (t[p + 1] as number));
+      }
+      tables.set(key, t);
+    }
+    return t[from] ?? -1;
+  };
+}
+
 function parseInline(
   source: string,
   depth: number,
@@ -117,6 +181,8 @@ function parseInline(
   inLink = false
 ): RichTextInline[] {
   const out: RichTextInline[] = [];
+  const scan = inlineScan(source);
+  let codeMiss = Number.POSITIVE_INFINITY;
   let buffer = '';
   const flush = () => {
     if (buffer) {
@@ -148,10 +214,14 @@ function parseInline(
       continue;
     }
 
-    // Soft newline → space; trailing two spaces → hard break.
+    // Soft newline → space; two or more trailing spaces → hard break. The
+    // trailing run is counted from the end (a `/ {2,}$/` test re-read the
+    // whole buffer at every newline).
     if (ch === '\n') {
-      if (/ {2,}$/.test(buffer)) {
-        buffer = buffer.replace(/ +$/, '');
+      let kept = buffer.length;
+      while (kept > 0 && buffer.charCodeAt(kept - 1) === 32) kept -= 1;
+      if (buffer.length - kept >= 2) {
+        buffer = buffer.slice(0, kept);
         flush();
         out.push({ type: 'break' });
       } else {
@@ -163,24 +233,30 @@ function parseInline(
 
     // Inline code.
     if (ch === '`') {
-      const run = /^`+/.exec(source.slice(i))?.[0] ?? '`';
-      const close = source.indexOf(run, i + run.length);
+      let length = 1;
+      while (source[i + length] === '`') length += 1;
+      // `i` only grows, so once no run of `length` backticks follows, no
+      // longer run follows later either: skip the search. Failed searches
+      // then come in falling lengths (at most ~90 at the cap) and a hit is
+      // consumed, so the searches stay near linear.
+      const close = length < codeMiss ? source.indexOf('`'.repeat(length), i + length) : -1;
+      if (close < 0) codeMiss = Math.min(codeMiss, length);
       if (close !== -1) {
         flush();
-        let code = source.slice(i + run.length, close).replace(/\n/g, ' ');
-        if (code.length > 2 && /^ .* $/.test(code)) code = code.slice(1, -1);
+        let code = source.slice(i + length, close).replace(/\n/g, ' ');
+        if (isPaddedCode(code)) code = code.slice(1, -1);
         out.push({ type: 'code', value: code });
-        i = close + run.length;
+        i = close + length;
         continue;
       }
-      buffer += run;
-      i += run.length;
+      buffer += source.slice(i, i + length);
+      i += length;
       continue;
     }
 
     // Links: [label](href) — not inside another link.
     if (ch === '[' && !inLink) {
-      const link = matchLink(source, i);
+      const link = matchLink(source, i, scan);
       if (link) {
         flush();
         if (depth >= maxDepth) {
@@ -215,7 +291,7 @@ function parseInline(
 
     // Emphasis / strong when depth allows.
     if (depth < maxDepth && (ch === '*' || ch === '_')) {
-      const emphasis = matchEmphasis(source, i);
+      const emphasis = matchEmphasis(source, i, scan);
       if (emphasis) {
         flush();
         out.push({
@@ -251,6 +327,20 @@ function parseInline(
   return mergeAdjacentText(out);
 }
 
+/**
+ * A code span padded with one space on each side (longer than two
+ * characters) loses the padding. Same test as `/^ .* $/`: `.` stops at every
+ * line terminator, so a newline, CR, U+2028 or U+2029 inside keeps the padding.
+ */
+function isPaddedCode(code: string): boolean {
+  return (
+    code.length > 2 &&
+    code.charCodeAt(0) === 32 &&
+    code.charCodeAt(code.length - 1) === 32 &&
+    !LINE_TERMINATOR.test(code)
+  );
+}
+
 function mergeAdjacentText(nodes: RichTextInline[]): RichTextInline[] {
   const out: RichTextInline[] = [];
   for (const node of nodes) {
@@ -266,45 +356,23 @@ function mergeAdjacentText(nodes: RichTextInline[]): RichTextInline[] {
 
 function matchLink(
   source: string,
-  start: number
+  start: number,
+  scan: InlineScan
 ): { label: string; href: string; end: number } | null {
   if (source[start] !== '[') return null;
-  let i = start + 1;
-  let depth = 1;
-  let labelEnd = -1;
-  while (i < source.length) {
-    const ch = source[i] ?? '';
-    if (ch === '\\') {
-      i += 2;
-      continue;
-    }
-    if (ch === '[') depth += 1;
-    if (ch === ']') {
-      depth -= 1;
-      if (depth === 0) {
-        labelEnd = i;
-        break;
-      }
-    }
-    if (ch === '\n') return null;
-    i += 1;
-  }
+  // The `]` that balances this `[`; a nested label is skipped whole.
+  const labelEnd = scan('label', start + 1, (p, t) => {
+    const ch = source[p];
+    if (ch === ']') return p;
+    if (ch !== '[') return undefined;
+    const inner = t[p + 1] as number;
+    return inner < 0 ? -1 : (t[inner + 1] as number);
+  });
   if (labelEnd < 0 || source[labelEnd + 1] !== '(') return null;
-  let j = labelEnd + 2;
-  let hrefEnd = -1;
-  while (j < source.length) {
-    const ch = source[j] ?? '';
-    if (ch === '\\') {
-      j += 2;
-      continue;
-    }
-    if (ch === ')') {
-      hrefEnd = j;
-      break;
-    }
-    if (ch === '\n' || ch === ' ') return null;
-    j += 1;
-  }
+  // The `)` that ends the target; a space ends it unmatched.
+  const hrefEnd = scan('href', labelEnd + 2, (p) =>
+    source[p] === ')' ? p : source[p] === ' ' ? -1 : undefined
+  );
   if (hrefEnd < 0) return null;
   return {
     label: source.slice(start + 1, labelEnd),
@@ -315,17 +383,19 @@ function matchLink(
 
 function matchEmphasis(
   source: string,
-  start: number
+  start: number,
+  scan: InlineScan
 ): { type: 'strong' | 'em'; innerStart: number; innerEnd: number; end: number } | null {
   const marker = source[start] ?? '';
   if (marker !== '*' && marker !== '_') return null;
   const next = source[start + 1] ?? '';
   // Strong: ** or __
   if (next === marker) {
-    const close = findClose(source, start + 2, marker + marker);
-    if (close === null) return null;
-    // Disallow empty
-    if (close === start + 2) return null;
+    const close = scan(marker + marker, start + 2, (p) =>
+      source[p] === marker && source[p + 1] === marker ? p : undefined
+    );
+    // Unclosed or empty.
+    if (close < 0 || close === start + 2) return null;
     return {
       type: 'strong',
       innerStart: start + 2,
@@ -333,37 +403,15 @@ function matchEmphasis(
       end: close + 2,
     };
   }
-  // Em: * or _ (not part of strong)
-  const close = findClose(source, start + 1, marker);
-  if (close === null) return null;
-  if (close === start + 1) return null;
-  // Avoid matching the second * of ** as em open
+  // Em: * or _ (never closing on the first half of a double marker)
+  const close = scan(marker, start + 1, (p, t) =>
+    source[p] !== marker ? undefined : source[p + 1] === marker ? (t[p + 2] as number) : p
+  );
+  if (close < 0 || close === start + 1) return null;
   return {
     type: 'em',
     innerStart: start + 1,
     innerEnd: close,
     end: close + 1,
   };
-}
-
-function findClose(source: string, from: number, token: string): number | null {
-  let i = from;
-  while (i < source.length) {
-    const ch = source[i] ?? '';
-    if (ch === '\\') {
-      i += 2;
-      continue;
-    }
-    if (ch === '\n') return null;
-    if (source.startsWith(token, i)) {
-      // For single-char em, do not close on the first half of **
-      if (token.length === 1 && source[i + 1] === token) {
-        i += 2;
-        continue;
-      }
-      return i;
-    }
-    i += 1;
-  }
-  return null;
 }

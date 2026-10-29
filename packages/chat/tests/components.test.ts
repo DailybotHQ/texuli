@@ -1,9 +1,9 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
-import { tick } from 'svelte';
+import { createRawSnippet, tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Composer from '../src/composer/Composer.svelte';
 import { applyChatStreamEvent, ChatMessageDisplay, MessageList } from '../src/index.ts';
-import { type ChatMessage } from '../src/thread/types.ts';
+import { type ChatMessage, type ChatMessageActions } from '../src/thread/types.ts';
 
 // Chat components: hostile text renders as text, the live log announces a
 // streamed message once, scroll anchoring, and composer send rules.
@@ -209,6 +209,131 @@ describe('stream', () => {
   });
 });
 
+describe('message-actions', () => {
+  afterEach(cleanup);
+  const avery = { id: 'avery', name: 'Avery Chen' };
+  const agent = { id: 'agent', name: 'Fictional Agent' };
+  const at = '2026-10-24T10:00:00.000Z';
+
+  // An actions snippet with one Edit button per message (G33).
+  const editActions = createRawSnippet(
+    (message: () => ChatMessage, actions: () => ChatMessageActions) => ({
+      render: () => `<button type="button">Edit ${message().id}</button>`,
+      setup(node: Element) {
+        node.addEventListener('click', () => actions().edit());
+      },
+    })
+  );
+
+  describe('G33 per-message actions and inline edit', () => {
+    it('renders actions per finished message, edits inline with keyboard save/cancel and restores focus', async () => {
+      const onEdit = vi.fn().mockResolvedValueOnce(false).mockResolvedValue(undefined);
+      render(MessageList, {
+        props: {
+          currentUserId: 'avery',
+          actions: editActions,
+          onEdit,
+          messages: [
+            { id: 'm1', author: avery, at, body: 'First draft' },
+            { id: 'r1', author: agent, at, body: 'Writing', streaming: true },
+          ],
+        },
+      });
+      expect(screen.getByRole('button', { name: 'Edit m1' })).toBeTruthy();
+      // No actions while a reply is still streaming.
+      expect(screen.queryByRole('button', { name: 'Edit r1' })).toBeNull();
+
+      for (const [key, expected] of [
+        ['Escape', 0],
+        ['Enter', 1],
+      ] as const) {
+        const trigger = screen.getByRole('button', { name: 'Edit m1' });
+        trigger.focus();
+        await fireEvent.click(trigger);
+        const field = screen.getByRole('textbox', { name: 'Edit message' }) as HTMLTextAreaElement;
+        expect(document.activeElement).toBe(field);
+        expect(field.value).toBe('First draft');
+        await fireEvent.input(field, { target: { value: ' Final draft ' } });
+        await fireEvent.keyDown(field, { key });
+        await tick();
+        expect(onEdit).toHaveBeenCalledTimes(expected);
+      }
+      // The host returned false: the editor stays open with the draft.
+      expect(onEdit).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'm1' }), 'Final draft');
+      expect(screen.getByRole('textbox', { name: 'Edit message' })).toBeTruthy();
+      await fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+      await waitFor(() =>
+        expect(screen.queryByRole('textbox', { name: 'Edit message' })).toBeNull()
+      );
+      expect(onEdit).toHaveBeenCalledTimes(2);
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Edit m1' }));
+    });
+  });
+
+  describe('G33 streaming scroll anchor and jump to latest', () => {
+    it('follows a streaming reply at the bottom, stays put once the reader scrolls up, and offers a jump to latest', async () => {
+      const original = globalThis.ResizeObserver;
+      // Inert observers: the list must follow the stream on its own.
+      globalThis.ResizeObserver = class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      } as unknown as typeof ResizeObserver;
+      try {
+        const start = [{ id: 'r1', author: agent, at, body: 'One', streaming: true }];
+        const view = render(MessageList, { props: { messages: start } });
+        const log = screen.getByRole('log');
+        // Layout stand-in: the content height follows the rendered text.
+        Object.defineProperty(log, 'clientHeight', { value: 200, configurable: true });
+        Object.defineProperty(log, 'scrollHeight', {
+          get: () => 200 + (log.firstElementChild?.textContent?.length ?? 0) * 10,
+          configurable: true,
+        });
+        await tick();
+        log.scrollTop = log.scrollHeight;
+        await fireEvent.scroll(log);
+        let messages = applyChatStreamEvent(start, {
+          type: 'delta',
+          id: 'r1',
+          text: ' two three four five six',
+        });
+        await view.rerender({ messages });
+        await tick();
+        expect(log.scrollTop).toBe(log.scrollHeight);
+        expect(screen.queryByRole('button', { name: 'Jump to latest' })).toBeNull();
+
+        // The reader scrolls up: more text does not move the view.
+        log.scrollTop = 0;
+        await fireEvent.scroll(log);
+        messages = applyChatStreamEvent(messages, {
+          type: 'delta',
+          id: 'r1',
+          text: ' seven eight nine ten',
+        });
+        await view.rerender({ messages });
+        await tick();
+        expect(log.scrollTop).toBe(0);
+        const status = screen.getByRole('status');
+        expect(status.textContent).toBe('');
+        messages = [...messages, { id: 'm2', author: avery, at, body: 'Another message' }];
+        await view.rerender({ messages });
+        await tick();
+        expect(log.scrollTop).toBe(0);
+        expect(status.textContent).toBe('New messages below');
+
+        await fireEvent.click(screen.getByRole('button', { name: 'Jump to latest' }));
+        await tick();
+        expect(log.scrollTop).toBe(log.scrollHeight);
+        expect(document.activeElement).toBe(log);
+        expect(screen.queryByRole('button', { name: 'Jump to latest' })).toBeNull();
+        expect(status.textContent).toBe('');
+      } finally {
+        globalThis.ResizeObserver = original;
+      }
+    });
+  });
+});
+
 describe('inline-tokens', () => {
   const avery = { id: 'avery', name: 'Avery Chen' };
 
@@ -301,6 +426,71 @@ describe('composer', () => {
       expect((await screen.findByRole('alert')).textContent).toContain('Could not send this note.');
       expect(screen.getByRole('alert').textContent).not.toContain('private backend detail');
       expect((field as HTMLTextAreaElement).value).toBe('Keep this draft');
+    });
+  });
+
+  describe('G32 streaming stop, keydown hook and actions', () => {
+    it('swaps send for a named Stop control while streaming; the button and Escape stop and keep focus in the field', async () => {
+      const onSubmit = vi.fn();
+      const onStop = vi.fn();
+      const view = render(Composer, {
+        props: { onSubmit, onStop, streaming: true, value: 'Next' },
+      });
+      const field = screen.getByRole('textbox', { name: 'Message' });
+      expect(screen.queryByRole('button', { name: 'Send message' })).toBeNull();
+      const stop = screen.getByRole('button', { name: 'Stop generating' });
+      expect(stop.getAttribute('aria-keyshortcuts')).toBe('Escape');
+      // Enter does not send over a running reply.
+      await fireEvent.keyDown(field, { key: 'Enter' });
+      expect(onSubmit).not.toHaveBeenCalled();
+      for (const press of [
+        () => fireEvent.click(stop),
+        () => fireEvent.keyDown(field, { key: 'Escape' }),
+      ]) {
+        stop.focus();
+        await press();
+        expect(document.activeElement).toBe(field);
+      }
+      expect(onStop).toHaveBeenCalledTimes(2);
+      await view.rerender({ streaming: false });
+      expect(screen.getByRole('button', { name: 'Send message' })).toBeTruthy();
+      await fireEvent.keyDown(field, { key: 'Escape' });
+      expect(onStop).toHaveBeenCalledTimes(2);
+    });
+
+    it('runs the onkeydown hook first: preventDefault takes a key over, otherwise Enter still sends', async () => {
+      const onSubmit = vi.fn();
+      const seen: string[] = [];
+      const onkeydown = vi.fn((event: KeyboardEvent) => {
+        seen.push(event.key);
+        if (event.key === 'Enter' && event.altKey) event.preventDefault();
+      });
+      render(Composer, { props: { onSubmit, onkeydown, value: 'Hello' } });
+      const field = screen.getByRole('textbox', { name: 'Message' });
+      await fireEvent.keyDown(field, { key: 'Enter', altKey: true });
+      expect(onSubmit).not.toHaveBeenCalled();
+      await fireEvent.keyDown(field, { key: 'Enter' });
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledWith('Hello'));
+      expect(seen).toEqual(['Enter', 'Enter']);
+    });
+
+    it('renders the actions snippet beside the send control with the composer state and commands', async () => {
+      const onSubmit = vi.fn();
+      const actions = createRawSnippet(
+        (context: () => { canSend: boolean; submit: () => Promise<void> }) => ({
+          render: () =>
+            `<button type="button" data-can-send="${context().canSend}">Custom send</button>`,
+          setup(node: Element) {
+            node.addEventListener('click', () => void context().submit());
+          },
+        })
+      );
+      render(Composer, { props: { onSubmit, actions, value: 'From actions' } });
+      const custom = screen.getByRole('button', { name: 'Custom send' });
+      expect(custom.closest('.tx-chat-composer__end')?.textContent).toContain('Send message');
+      expect(custom.getAttribute('data-can-send')).toBe('true');
+      await fireEvent.click(custom);
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledWith('From actions'));
     });
   });
 });

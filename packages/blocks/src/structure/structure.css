@@ -108,6 +108,33 @@
     border-block-start: 1px solid var(--tx-color-border, CanvasText);
   }
 
+  .tx-structure-divider-space {
+    block-size: 2rem;
+  }
+
+  .tx-structure-divider-labeled {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-block: 1rem;
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: 0.8125rem;
+  }
+
+  .tx-structure-divider-labeled::before,
+  .tx-structure-divider-labeled::after {
+    flex: 1;
+    min-inline-size: 1rem;
+    border-block-start: 1px solid var(--tx-border, CanvasText);
+    content: "";
+  }
+
+  .tx-structure-card-icon {
+    display: inline-flex;
+    margin-block-end: 0.25rem;
+    color: var(--tx-primary, currentColor);
+  }
+
   .tx-structure-cta {
     display: flex;
     flex-wrap: wrap;
@@ -158,7 +185,9 @@
   @media (forced-colors: active) {
     .tx-structure-cell,
     .tx-structure-cta a,
-    .tx-structure-divider {
+    .tx-structure-divider,
+    .tx-structure-divider-labeled::before,
+    .tx-structure-divider-labeled::after {
       border-color: CanvasText;
     }
   }

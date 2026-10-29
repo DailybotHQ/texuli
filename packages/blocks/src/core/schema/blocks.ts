@@ -31,10 +31,19 @@ import {
   ok,
   type ParseResult,
   parseBlockBase,
+  parseOptionalEnum,
+  parseOptionalPlainText,
   parsePlainText,
   toJsonPath,
 } from './primitives.ts';
 import { parseTextFamilyBlock } from './text-family.ts';
+import {
+  type BlockAlign,
+  type BlockTextSize,
+  DIVIDER_VARIANTS,
+  type DividerVariant,
+  type ListStyle,
+} from './vocabulary.ts';
 
 /**
  * Closed core vocabulary for the untrusted guard and catalog (T-blocks-core).
@@ -47,17 +56,31 @@ export type HeadingBlock = BlockBase & {
   text: string;
   eyebrow?: string;
   subtitle?: string;
+  /** Inline alignment; `start` (the default) follows the writing direction. */
+  align?: BlockAlign;
 };
 
 export type TextBlock = BlockBase & {
   type: 'text';
   markdown: string;
+  /** Type scale step; `md` (the default) is the body size. */
+  size?: BlockTextSize;
+  align?: BlockAlign;
 };
 
-export type ListItem = { text: string };
+export type ListItem = {
+  text: string;
+  /** The item's marker in a `style: "icon"` list (required there). */
+  icon?: string;
+  /** Done or open in a `style: "check"` list (only there); open by default. */
+  done?: boolean;
+};
 export type ListBlock = BlockBase & {
   type: 'list';
+  /** Same as `style: "number"`; kept for older data. */
   ordered?: boolean;
+  /** Markers: bullets (default), numbers, done/open checks or one icon per item. */
+  style?: ListStyle;
   items: ListItem[];
 };
 
@@ -65,15 +88,31 @@ export type QuoteBlock = BlockBase & {
   type: 'quote';
   quote: string;
   cite?: string;
+  /** The quoted person's role, shown after `cite`. */
+  role?: string;
+  /**
+   * A decorative portrait beside the attribution, under the block media
+   * policy: `avatar:av-001`…`av-175` (resolved by the host), a small raster
+   * `data:` image or a relative image path. Remote URLs are refused.
+   */
+  avatar?: string;
 };
 
 export type CalloutBlock = BlockBase & {
   type: 'callout';
   title?: string;
   body: string;
+  /** A decorative icon before the title (see `BLOCK_ICON_NAME`). */
+  icon?: string;
 };
 
-export type DividerBlock = BlockBase & { type: 'divider' };
+export type DividerBlock = BlockBase & {
+  type: 'divider';
+  /** Visible text centered on the rule, also its accessible name. Not for `space`. */
+  label?: string;
+  /** A rule (default) or blank vertical space. */
+  variant?: DividerVariant;
+};
 
 export type CodeBlock = BlockBase & {
   type: 'code';
@@ -271,6 +310,35 @@ function parseCta(
   return ok({ ...base, type: 'cta', actions });
 }
 
+function parseDivider(
+  record: Record<string, unknown>,
+  path: (string | number)[],
+  base: BlockBase
+): ParseResult<DividerBlock> {
+  const variant = parseOptionalEnum<DividerVariant>(
+    record.variant,
+    [...path, 'variant'],
+    DIVIDER_VARIANTS,
+    'variant'
+  );
+  if (!variant.success) return variant;
+  const label = parseOptionalPlainText(
+    record.label,
+    [...path, 'label'],
+    BLOCK_CONTENT_LIMITS.heading
+  );
+  if (!label.success) return label;
+  if (label.data !== undefined && variant.data === 'space') {
+    return fail([...path, 'label'], 'a "space" divider has no label');
+  }
+  return ok({
+    ...base,
+    type: 'divider',
+    ...(label.data !== undefined ? { label: label.data } : {}),
+    ...(variant.data !== undefined ? { variant: variant.data } : {}),
+  });
+}
+
 function parseColumns(
   record: Record<string, unknown>,
   path: (string | number)[],
@@ -319,7 +387,7 @@ function parseOneBlock(
 
   switch (record.type) {
     case 'divider':
-      return ok({ ...base.data, type: 'divider' });
+      return parseDivider(record, path, base.data);
     case 'cta':
       return parseCta(record, path, base.data);
     case 'columns':

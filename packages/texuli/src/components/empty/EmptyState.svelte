@@ -6,6 +6,8 @@ import { variants } from '../../internal/variants.ts';
 import './empty.css';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   title: string;
   description?: string;
   /** Optional illustration / icon (decorative; wrapped aria-hidden). */
@@ -33,11 +35,13 @@ let {
   action,
   size = 'md',
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 </script>
 
 <div
+  bind:this={ref}
   class={emptyClass({
     size,
     class: className,

@@ -29,6 +29,8 @@ Options:
 | --- | --- |
 | `initialFocus` | Optional element or getter. A focusable element inside the scope takes precedence. |
 | `onBeforeRestoreFocus` | Runs before focus returns to the element active at activation; `preventDefault()` cancels restoration. |
+| `cycleTabNavigation` | Move focus on every Tab instead of only at the ends (portaled or top-layer content can break native order). |
+| `exemptRegions` | Getter for focus-exempt regions outside the container (an undo toaster). While focus is inside one, Tab and Shift+Tab move natively between its stops; past its last (or before its first) stop, focus wraps back into the scope. The overlay engine passes the inert registry's exemptions. |
 
 Initial focus follows this order: valid explicit target, first focusable
 `[autofocus]` descendant, first tabbable descendant in sequential Tab order,
@@ -55,4 +57,6 @@ pnpm vitest run packages/core/tests/focus-scope.test.ts
 ```
 
 Tests cover initial-focus precedence, Tab wrapping in both directions,
-empty scopes, nested scopes, preventable focus restoration, and reactivation.
+empty scopes, nested scopes, preventable focus restoration, reactivation,
+and Tab inside a focus-exempt region (native between its stops, wrapping
+back into the scope at either end, with and without `cycleTabNavigation`).

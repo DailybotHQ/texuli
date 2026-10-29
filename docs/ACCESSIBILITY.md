@@ -113,8 +113,8 @@ Every drag surface (the `@texuli/primitives/sortable` binding, the
 `@texuli/workflows` and the player's `sortable-list`) follows one contract,
 [`@texuli/drag`'s interaction, accessibility and i18n contract](../packages/drag/docs/contract.md).
 `@texuli/drag` and `@texuli/workflows` are in development and on npm as
-`0.4.0`; the sortable binding, the data migrations and the player's
-`sortable-list` ship in the `0.4.0` release of `@texuli/primitives`,
+`0.5.0`; the sortable binding, the data migrations and the player's
+`sortable-list` ship from the `0.4.0` release of `@texuli/primitives`,
 `@texuli/data` and `@texuli/player`.
 
 - **Keyboard first.** Space or Enter on a handle picks up, arrows move
@@ -150,7 +150,7 @@ run on these surfaces yet.
 
 ## Slides stage
 
-The `@texuli/slides` `0.4.0` stage (on npm from `0.4.0`; the full
+The `@texuli/slides` v2 stage (on npm from `0.4.0`; the full
 contract is [stage.md](../packages/slides/docs/stage.md)) follows this
 contract:
 
@@ -205,7 +205,7 @@ chrome, tab order, reveal steps, full screen and motion
 move and the help dialog. The VoiceOver transcripts in
 [quality/sr-transcripts-slides.md](quality/sr-transcripts-slides.md) were
 authored for the `0.3.0` stage (PLAN_004); no screen-reader session has been
-run on the `0.4.0` stage yet.
+run on the v2 stage (`0.4.0` and later) yet.
 
 ## Related docs
 

@@ -9,6 +9,8 @@ import './kbd-code.css';
  * never pass HTML. Prefer the `value` prop for agent/user content.
  */
 type Props = HTMLAttributes<HTMLElement> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /** Plain source text (escaped on render). Takes precedence over children. */
   value?: string;
   variant?: CodeVariant;
@@ -24,6 +26,7 @@ let {
   language = undefined,
   class: className,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -43,6 +46,7 @@ const text = $derived(typeof value === 'string' ? value : undefined);
     data-tx-code-block
     data-language={language || undefined}
   ><code
+      bind:this={ref}
       class={classes}
       data-tx-code
       data-variant="block"
@@ -53,6 +57,7 @@ const text = $derived(typeof value === 'string' ? value : undefined);
   >
 {:else}
   <code
+    bind:this={ref}
     class={classes}
     data-tx-code
     data-variant="inline"

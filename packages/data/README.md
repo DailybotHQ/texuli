@@ -9,10 +9,10 @@ own, in Node or behind a view of your own. It is part of
 Svelte 5 component library by Dailybot, Inc., for teams building
 data-heavy product screens.
 
-> **Status: 0.x release.** `@texuli/data` is published on npm as `0.4.0`, a
+> **Status: 0.x release.** `@texuli/data` is published on npm as `0.5.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.5.0`) may contain breaking changes, so pin the exact version or
-> use `^0.4.0`, which accepts only 0.4.x.
+> minor (`0.6.0`) may contain breaking changes, so pin the exact version or
+> use `^0.5.0`, which accepts only 0.5.x.
 
 ## Install
 
@@ -71,16 +71,19 @@ visible and announced string is translatable through `labels`.
 
 | Import | What it gives you |
 | --- | --- |
-| `@texuli/data/grid-core` | `DataGrid`: sorting, search, filtering, row selection and grid keyboard navigation |
+| `@texuli/data/grid-core` | `DataGrid`: sorting, search, filtering, row selection, client paging, toolbar and bulk-action snippets, and grid keyboard navigation |
+| `@texuli/data/filter-builder` | `FilterBuilder`: nested and/or filter groups with operators by field type, plus the pure `applyFilter` |
 | `@texuli/data/grid-columns` | `ColumnGrid`: resize, reorder, pin, hide, group headers and column menus |
 | `@texuli/data/grid-virtual` | `VirtualDataGrid`: independent row and column windows for large tables |
 | `@texuli/data/grid-editing` | `EditableDataGrid`: inline cell editors, validation, undo and redo, TSV clipboard |
 | `@texuli/data/tree-view` | `TreeDataView`: outline and file-tree view with lazy children, drag reorder and checkboxes |
-| `@texuli/data/board` | `Board`: columns and swimlanes with WIP limits and keyboard moves |
+| `@texuli/data/board` | `Board`: columns and swimlanes with WIP limits, keyboard moves, column footers and heading levels |
 | `@texuli/data/calendar/view` | `CalendarView`: month, time-grid and agenda views with move and reschedule |
 | `@texuli/data/timeline` | `TimelineView`: virtualized Gantt timeline with dependencies, zoom and critical path |
 | `@texuli/data/map` | `MapView`: an offline, fictional vector basemap with markers, clusters, routes and fences |
 | `@texuli/data/activity` | `ActivityFeed`: day-grouped activity with avatars, reactions and pagination |
+| `@texuli/data/activity/inbox` | `NotificationInbox`: unread state, mark read and unread, mark all, item actions and arrival announcements |
+| `@texuli/data/cohort` | `CohortTable`: a cohort retention table with row and period headers, readable numbers and heat cells |
 | `@texuli/data/files` | `FileBrowser`: grid or list browser with breadcrumbs, previews and multi-select |
 | `@texuli/data/virtual-list` | `createVirtualList` and `createInfiniteLoader` for windowed lists |
 
@@ -94,7 +97,7 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/calendar` | Dates in an explicit IANA zone, an RFC 5545 recurrence subset, overlap layout and rescheduling, with no date library |
 | `@texuli/data/timeline/engine` | Working-day calendars, dependencies with lag, critical path and cascading moves |
 | `@texuli/data/geo` | The offline map engine: Web Mercator views, clustering, geofences, distances and routes |
-| `@texuli/data/activity/engine` | Mention tokens, day groups, change summaries, threads and reactions |
+| `@texuli/data/activity/engine` | Mention tokens, day groups, change summaries, threads, reactions and inbox read state |
 | `@texuli/data/files/engine` | Natural-order children, breadcrumbs, name and move checks, deterministic thumbnails |
 
 The package root, `@texuli/data`, re-exports the main views and helpers.
@@ -121,6 +124,21 @@ The package root, `@texuli/data`, re-exports the main views and helpers.
 **Known limit:** fence editing on the map is not implemented yet; fences are
 drawn and listed only.
 
+## New in 0.5.0
+
+Ships in `0.5.0`; the `0.4.0` release predates it:
+
+- `DataGrid`: client paging (`pageSize`, `bind:page`), `rowClass(row)`, and
+  `filters`, `toolbar` and selection-aware `bulkActions` snippets
+  ([data-grid-core](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-grid-core.md)).
+- `Board`: a `columnFooter(column, { count })` snippet and `headingLevel`
+  ([data-board](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-board.md)).
+- New subpaths: `@texuli/data/filter-builder`
+  ([data-filter-builder](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-filter-builder.md)),
+  `@texuli/data/activity/inbox`
+  ([data-activity-inbox](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-activity-inbox.md)) and
+  `@texuli/data/cohort` ([data-cohort](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-cohort.md)).
+
 ## New in 0.4.0
 
 Not in the `0.3.0` release:
@@ -128,15 +146,18 @@ Not in the `0.3.0` release:
 - **One drag engine.** The board, tree view, calendar, timeline and grid
   column moves run on
   [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md)
-  (in development, on npm as `0.4.0`; `@texuli/data` `0.3.0` predates this
+  (in development, on npm as `0.5.0`; `@texuli/data` `0.3.0` predates this
   migration):
   one pointer gesture tracker (capture, threshold, `pointercancel` as
   cancel). The board and tree view also announce moves from localized
   `DragMessages` templates, overridable with their new `messages` prop.
 - **Breaking:** `@texuli/data/board` and `@texuli/data/tree-view` no longer
-  export `DRAG_THRESHOLD_PX` or `indexFromPointer`. The threshold lives in
-  `@texuli/drag/gesture` and the pointer index in
-  `@texuli/drag/collision` (`midpointIndex`).
+  export `DRAG_THRESHOLD_PX` or `indexFromPointer` (`0.3.0` had them). The
+  threshold is the `threshold` option of `createPointerTracker` in
+  `@texuli/drag/gesture` (default 4 px, the old constant's value; there is
+  no exported constant), and the pointer index is `midpointIndex(midpoints,
+  coordinate)` in `@texuli/drag/collision` (the same index as
+  `indexFromPointer(middles, y)` for ascending midpoints).
 
 ## Documentation
 
@@ -156,6 +177,9 @@ Not in the `0.3.0` release:
   [timeline](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-timeline.md),
   [offline map](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-map.md),
   [activity feed](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-activity.md),
+  [notification inbox](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-activity-inbox.md),
+  [cohort table](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-cohort.md),
+  [filter builder](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-filter-builder.md),
   [file browser](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-files.md)
 - Source: [github.com/DailybotHQ/texuli](https://github.com/DailybotHQ/texuli)
   · Issues: [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues)

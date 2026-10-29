@@ -7,6 +7,8 @@ type RootProps = ComponentProps<typeof TreeRoot>;
 
 export type TreeViewProps = Omit<RootProps, 'item' | 'class' | 'aria-label'> &
   Pick<HTMLAttributes<HTMLDivElement>, 'class'> & {
+    /** The rendered root element (bindable). */
+    ref?: HTMLElement | null;
     label?: string;
     variant?: TreeVariant;
     density?: TreeDensity;

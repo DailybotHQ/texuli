@@ -13,6 +13,8 @@ interface Props {
   name?: string;
   src?: string | null;
   srcTrust?: HrefTrust;
+  srcset?: string | null;
+  sizes?: string;
   size?: AvatarSize;
   status?: AvatarStatus;
   decorative?: boolean;
@@ -26,6 +28,8 @@ let {
   name = 'Ada Example',
   src = null,
   srcTrust = 'untrusted',
+  srcset,
+  sizes,
   size = 'md',
   status,
   decorative = false,
@@ -38,5 +42,5 @@ let {
 {#if mode === 'group'}
   <AvatarGroup {items} {max} {size} {label} />
 {:else}
-  <Avatar {name} {src} {srcTrust} {size} {status} {decorative} />
+  <Avatar {name} {src} {srcTrust} {srcset} {sizes} {size} {status} {decorative} />
 {/if}

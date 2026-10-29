@@ -56,6 +56,13 @@ function joinParts(parts: readonly string[]): string {
     .trim();
 }
 
+/**
+ * A `[label](target)` link: the label stops at the next bracket and the
+ * target allows one level of parentheses, so every attempt ends at the next
+ * bracket or parenthesis and a run of unclosed `[` or `(` stays linear.
+ */
+const LIGHT_LINK = /\[([^[\]]+)\]\((?:[^()]|\([^()]*\))+\)/g;
+
 /** Strip a few markdown markers for plain-text summaries (not a full parser). */
 export function stripLightMarkdown(source: string): string {
   return source
@@ -63,7 +70,7 @@ export function stripLightMarkdown(source: string): string {
     .replace(/`([^`]+)`/g, '$1')
     .replace(/\*\*([^*]+)\*\*/g, '$1')
     .replace(/\*([^*]+)\*/g, '$1')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(LIGHT_LINK, '$1')
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/\s+/g, ' ')
     .trim();

@@ -2,6 +2,7 @@
 import { createRovingFocus, indexOfSelected } from '@texuli/core/roving';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
+import { chainHandlers } from '../internal/handlers.ts';
 import { type RadioGroupOrientation, radioGroupContext } from './context.ts';
 
 type Props = HTMLAttributes<HTMLDivElement> & {
@@ -28,6 +29,7 @@ let {
   loop = true,
   class: className,
   children,
+  onfocusin,
   ...rest
 }: Props = $props();
 
@@ -185,9 +187,9 @@ function onFocusIn(event: FocusEvent): void {
   data-disabled={disabled ? '' : undefined}
   aria-disabled={disabled ? 'true' : undefined}
   aria-orientation={orientation}
-  onfocusin={onFocusIn}
   {@attach roving}
   {...rest}
+  onfocusin={chainHandlers(onfocusin, onFocusIn)}
 >
   {@render children?.()}
 </div>

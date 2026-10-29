@@ -452,8 +452,9 @@ describe('inspector: choice', () => {
         // PLAN_005 task 6: the deck root adds its aspect enum.
         // PLAN_007 T-player-parity: the data views, chat display and workflow graph add 15.
         // PLAN_008 T-catalog-player: the v2 deck root adds its transition and motion enums.
-        expect(CHOICE_PROPS.length).toBe(57);
-        expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(11);
+        // PLAN_009: the cohort table, notification inbox and filter builder add 8 (5 booleans).
+        expect(CHOICE_PROPS.length).toBe(65);
+        expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(16);
         const ids = new Set(CHOICE_PROPS.map((entry) => `${entry.id}.${entry.prop.name}`));
         for (const name of [
           'layout-stack.gap',
@@ -892,7 +893,8 @@ describe('inspector: number', () => {
   describe('number props in the builder manifests', () => {
     it('covers every number prop the builder edits; reads every value exactly as the renderer will: unset, accepted or refused', () => {
       // PLAN_005 task 5 adds the grid tile's span and rowSpan.
-      expect(NUMBER_PROPS.length).toBe(46);
+      // PLAN_009: cohort table max, filter builder maxDepth, inbox headingLevel.
+      expect(NUMBER_PROPS.length).toBe(49);
       // reads every value exactly as the renderer will: unset, accepted or refused
       {
         let checked = 0;

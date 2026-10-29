@@ -37,10 +37,10 @@ the same pieces are safe to hand to a machine.
 ![The Texuli website](docs/assets/screenshots/homepage.png)
 
 > **Status: in development, pre-1.0.** The screenshot above is the
-> texuli.com website, which deploys from `main` to Cloudflare Pages. The 19
-> packable packages are released on npm as `0.4.0` (published by CI with
+> texuli.com website, which deploys from `main` to Cloudflare Pages. The 20
+> packable packages are released on npm as `0.5.0` (published by CI with
 > provenance; `latest` and `next` both point to it), including the first
-> release of `@texuli/deck`. It is not a stable
+> release of `@texuli/editor`. It is not a stable
 > release: under 0.x a new minor may contain breaking changes, and 1.0.0 will
 > be the first stable release. The workspace packages stay `private: true`
 > ([RELEASE](docs/RELEASE.md)).
@@ -97,7 +97,7 @@ Every layer is a package with one job, and every dependency points down only
 | L1 | [`@texuli/primitives`](packages/primitives/README.md) | 41 owned headless primitives, one subpath each, held to the APG patterns |
 | L2 | [`@texuli/tokens`](packages/tokens/README.md) | The OKLCH theme engine, the `--tx-*` token contract, 200+ themes, compiled CSS |
 | L3 | [`texuli`](packages/texuli/README.md) | Styled components, icons, layouts and app shells |
-| L4 | [`@texuli/data`](packages/data/README.md) · [`@texuli/charts`](packages/charts/README.md) · [`@texuli/media`](packages/media/README.md) · [`@texuli/chat`](packages/chat/README.md) · [`@texuli/workflows`](packages/workflows/README.md) · [`@texuli/editor`](packages/editor/README.md) | Domain packages: data views, every chart family, media, chat, workflow graphs (in development), the rich text editor (in development, not packed) |
+| L4 | [`@texuli/data`](packages/data/README.md) · [`@texuli/charts`](packages/charts/README.md) · [`@texuli/media`](packages/media/README.md) · [`@texuli/chat`](packages/chat/README.md) · [`@texuli/workflows`](packages/workflows/README.md) · [`@texuli/editor`](packages/editor/README.md) | Domain packages: data views, every chart family, media, chat, workflow graphs (in development), the rich text editor (in development) |
 | L5 | [`@texuli/blocks`](packages/blocks/README.md) | Content blocks for pages, documents and slides |
 | L6 | [`@texuli/catalog`](packages/catalog/README.md) | The agent catalog and its sink-free renderer |
 | L7 | [`@texuli/player`](packages/player/README.md) | The runtime that paints validated blueprints |
@@ -191,10 +191,10 @@ every verified command.
 
 ## Honest boundaries
 
-- **No stable release yet.** The 19 packable packages are on npm as `0.4.0`,
+- **No stable release yet.** The 20 packable packages are on npm as `0.5.0`,
   a pre-1.0 release (`npm install texuli`; `latest` and `next` both point to
-  it). Under 0.x a new minor (`0.5.0`) may contain breaking changes, so pin
-  the exact version or use `^0.4.0`; 1.0.0 will be the first stable release.
+  it). Under 0.x a new minor (`0.6.0`) may contain breaking changes, so pin
+  the exact version or use `^0.5.0`; 1.0.0 will be the first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with
   `pnpm dev`.

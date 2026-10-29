@@ -2,6 +2,7 @@
 import { createRovingFocus, indexOfSelected } from '@texuli/core/roving';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
+import { chainHandlers } from '../internal/handlers.ts';
 import { tabsContext } from './context.ts';
 
 type Props = HTMLAttributes<HTMLDivElement> & {
@@ -9,7 +10,7 @@ type Props = HTMLAttributes<HTMLDivElement> & {
   children?: import('svelte').Snippet;
 };
 
-let { class: className, children, ...rest }: Props = $props();
+let { class: className, children, onfocusin, ...rest }: Props = $props();
 
 const tabs = tabsContext.get();
 
@@ -72,9 +73,9 @@ function onFocusIn(event: FocusEvent): void {
   class={className}
   data-orientation={tabs.orientation()}
   aria-orientation={tabs.orientation()}
-  onfocusin={onFocusIn}
   {@attach roving}
   {...rest}
+  onfocusin={chainHandlers(onfocusin, onFocusIn)}
 >
   {@render children?.()}
 </div>

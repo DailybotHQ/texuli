@@ -24,6 +24,7 @@ Shared chrome: items with optional `icon` snippet and `shortcut` string (rendere
 | `icon` | Leading icon snippet |
 | `shortcut` | Keyboard hint (display only; host still wires the shortcut) |
 | `inset` | Extra start padding when no icon |
+| `destructive` | `Item` only: the danger tone for a destructive action (delete, remove). Adds `tx-menu-item--destructive` and `data-tone="destructive"`; the label still says what happens, so color is never the only signal |
 | `disabled`, `onSelect`, `textValue`, `closeOnSelect` | From the primitive |
 
 ### Variants / sizes

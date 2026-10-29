@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/svelte';
+import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import { safeParseBlock } from '../src/core/index.ts';
 import { checkDataBlock } from '../src/data/check.ts';
@@ -246,6 +246,52 @@ describe('checkDataBlock + DataBlockView', () => {
       expect(stats).toHaveLength(2);
       expect(stats[0]?.getAttribute('data-tone')).toBe('success');
       expect(stats[1]?.hasAttribute('data-tone')).toBe(false);
+    }
+  });
+});
+
+describe('stat presentation fields', () => {
+  it('names the group by its title, shows the source and draws a labeled trend sparkline per item', async () => {
+    const cases = [
+      {
+        block: {
+          type: 'stat',
+          title: 'Q3 at a glance',
+          source: 'Source: fictional sample data',
+          items: [
+            { label: 'Active', value: '128', trend: [90, 104, 128] },
+            { label: 'Churn', value: '2%' },
+          ],
+        },
+        labels: undefined,
+        group: 'Q3 at a glance',
+        trends: ['Active trend'],
+        source: 'Source: fictional sample data',
+      },
+      {
+        block: {
+          type: 'kpi',
+          items: [{ label: 'Revenue', value: '$1.2M', trend: [1, 1.2] }],
+        },
+        labels: { trendName: 'Tendencia de {label}' },
+        group: 'Key performance indicators',
+        trends: ['Tendencia de Revenue'],
+        source: undefined,
+      },
+    ] as const;
+    for (const { block, labels, group, trends, source } of cases) {
+      const { container } = render(DataBlockView, { props: { block, labels } });
+      const region = screen.getByRole('group', { name: group });
+      // The sparkline module loads on first use.
+      await waitFor(() =>
+        expect(
+          [...region.querySelectorAll('svg[role="img"]')].map((svg) =>
+            svg.getAttribute('aria-label')
+          )
+        ).toEqual(trends)
+      );
+      expect(container.querySelector('.tx-stat-source')?.textContent).toBe(source);
+      cleanup();
     }
   });
 });

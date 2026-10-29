@@ -37,6 +37,11 @@ when the default English labels are not appropriate.
 </PinInput.Root>
 ```
 
+`PinInput.Root` passes its extra attributes to that real input, typed as
+input attributes: `name`, `form`, `required`, `autocomplete`, `aria-*`,
+`data-*` and handlers (a handler you pass runs before the part's own and
+never replaces it). `bind:inputRef` binds the real input element.
+
 The pin field remains one real, labeled input for typing, paste, autofill and
 assistive technology. Its cells are decorative and hidden from the accessibility
 tree. `mask` renders a password input and masked cells. The registered

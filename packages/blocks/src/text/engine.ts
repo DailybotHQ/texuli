@@ -12,7 +12,10 @@ import type {
   QuoteBlock,
   TextBlock,
 } from '../core/index.ts';
+import type { BlockIconResolver } from '../icons/types.ts';
 import type { TextBlockLabelOverrides } from './labels.ts';
+
+export type { BlockIconResolver } from '../icons/types.ts';
 
 export { checkTextBlock, type TextBlockCheck } from './check.ts';
 export {
@@ -33,5 +36,9 @@ export function isTextFamilyBlock(block: Block): block is TextFamilyBlock {
 export interface TextBlockViewProps {
   block: unknown;
   labels?: TextBlockLabelOverrides;
+  /** Maps a quote's `avatar:av-…` id to an image URL (the result passes the image URL policy). */
+  resolveAvatar?: (id: string) => string | undefined;
+  /** Maps list and callout icon names to icons; built-in Texuli icon names draw without it. */
+  resolveIcon?: BlockIconResolver;
   oninvalid?: (issues: FieldIssue[]) => void;
 }

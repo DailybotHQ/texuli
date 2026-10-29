@@ -57,6 +57,14 @@ density and width descriptors; a candidate without a descriptor is treated
 as density mode. Commas inside URLs and data URLs are unsupported. Any empty,
 malformed or unsafe candidate rejects the complete `srcset`.
 
+`filterImageSrcset(value, trust?)` is the forgiving form for components that
+take a `srcset` prop (the `Avatar.Image` primitive and the styled `Avatar`):
+it splits candidates the way the HTML parser does, runs each through
+`safeImageSrcset` at `trust`, drops a refused or malformed candidate (or one
+whose URL holds a comma, such as a data URL), keeps the descriptor kind of the
+first kept candidate, and returns `undefined` when nothing is left, so the
+caller can drop `sizes` with it.
+
 ## Untrusted-tier decisions (catalog security review)
 
 The hostile corpus (`@texuli/catalog`, `render/hostile`) found four values

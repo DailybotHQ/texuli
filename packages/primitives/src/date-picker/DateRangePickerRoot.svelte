@@ -3,12 +3,15 @@ import type { CalendarDate } from '@texuli/date';
 import type { Snippet } from 'svelte';
 import * as Popover from '../popover/index.ts';
 import {
+  type DateInvalidHandler,
   type DatePickerLabels,
   focusTrigger,
   formatLongDate,
   orderedRange,
   provideRange,
   provideShell,
+  rangeDays,
+  rangeLimit,
   resolveDatePickerLabels,
   toCalendarDate,
 } from './shared.ts';
@@ -27,6 +30,18 @@ interface Props {
   disabled?: boolean;
   /** Close the dialog when the range is complete. Default `true`. */
   closeOnSelect?: boolean;
+  /** The day marked as today (`YYYY-MM-DD`); when set, the clock is never read. */
+  today?: string;
+  /** First day of the week, `0` (Sunday) to `6`; default the locale's. */
+  weekStartsOn?: number;
+  /**
+   * The longest range in days, both ends included. A longer pick or typed
+   * end is refused: the value stays, `onInvalid(start/end, 'too-long')` runs
+   * and the grid announces `labels.tooLong`.
+   */
+  maxDays?: number;
+  /** Reports typed text that does not parse or is out of range, and refused ranges. */
+  onInvalid?: DateInvalidHandler;
   labels?: Partial<DatePickerLabels>;
   children?: Snippet;
 }
@@ -42,6 +57,10 @@ let {
   isDateUnavailable,
   disabled = false,
   closeOnSelect = true,
+  today,
+  weekStartsOn,
+  maxDays,
+  onInvalid,
   labels,
   children,
 }: Props = $props();
@@ -49,14 +68,32 @@ let {
 const text = $derived(resolveDatePickerLabels(labels));
 const uid = $props.id();
 let pending = $state(false);
+let message = $state('');
 
 const valid = (iso: string | null) => (iso && toCalendarDate(iso) ? iso : null);
 
-function commit(next: DateRange): void {
+/** Clear first, then set, so the same refusal is read again. */
+function announce(said: string): void {
+  message = '';
+  queueMicrotask(() => {
+    message = said;
+  });
+}
+
+/** Applies a range; `false` when it is longer than `maxDays` (and refused). */
+function commit(next: DateRange): boolean {
   const ordered = orderedRange(valid(next.start), valid(next.end));
-  if (ordered.start === value.start && ordered.end === value.end) return;
+  const limit = rangeLimit(maxDays);
+  if (limit !== undefined && rangeDays(ordered.start, ordered.end) > limit) {
+    announce(text.tooLong.split('{max}').join(String(limit)));
+    onInvalid?.(`${ordered.start}/${ordered.end}`, 'too-long');
+    return false;
+  }
+  message = '';
+  if (ordered.start === value.start && ordered.end === value.end) return true;
   value = ordered;
   onValueChange?.(ordered);
+  return true;
 }
 
 provideRange({
@@ -68,6 +105,9 @@ provideRange({
   },
   get pending() {
     return pending;
+  },
+  get message() {
+    return message;
   },
   setStart(next) {
     commit({ start: next, end: value.end });
@@ -82,8 +122,9 @@ provideRange({
       commit({ start: date, end: null });
       return;
     }
+    // A range longer than maxDays is refused; the end stays pending.
+    if (!commit({ start: value.start, end: date })) return;
     pending = false;
-    commit({ start: value.start, end: date });
     if (closeOnSelect) {
       open = false;
       focusTrigger(uid);
@@ -121,6 +162,15 @@ provideShell({
   },
   get closeOnSelect() {
     return closeOnSelect;
+  },
+  get today() {
+    return today;
+  },
+  get weekStartsOn() {
+    return weekStartsOn;
+  },
+  get onInvalid() {
+    return onInvalid;
   },
   get triggerLabel() {
     const start = formatLongDate(value.start, locale);

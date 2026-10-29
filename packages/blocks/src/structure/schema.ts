@@ -15,6 +15,7 @@ import {
   type ParseResult,
   parseBlockId,
   parseMultilineText,
+  parseOptionalIconName,
   parsePlainText,
 } from '../core/schema/primitives.ts';
 import { type BlockTone, isBlockTone } from '../core/schema/vocabulary.ts';
@@ -60,6 +61,8 @@ export type AccordionBlock = BlockBase & {
 
 export type CardItem = {
   title: string;
+  /** A decorative icon above the title (see `BLOCK_ICON_NAME`). */
+  icon?: string;
   eyebrow?: string;
   body?: string;
   href?: string;
@@ -371,8 +374,12 @@ export function parseCardsBlock(
     const tone = parseTone(item.data.tone, [...itemPath, 'tone']);
     if (!tone.success) return tone;
 
+    const icon = parseOptionalIconName(item.data.icon, [...itemPath, 'icon']);
+    if (!icon.success) return icon;
+
     items.push({
       title: cardTitle.data,
+      ...(icon.data !== undefined ? { icon: icon.data } : {}),
       ...(eyebrow !== undefined ? { eyebrow } : {}),
       ...(body !== undefined ? { body } : {}),
       ...(href !== undefined ? { href } : {}),

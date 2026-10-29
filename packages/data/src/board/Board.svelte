@@ -60,6 +60,13 @@ interface BoardProps<T> {
   /** When true, the card cannot be dragged or moved via the menu (WCAG lock). */
   isLocked?: (item: T) => boolean;
   card: Snippet<[T, { pending: boolean }]>;
+  /** Rendered at the end of each column (add a card, totals…), with the column's card count. */
+  columnFooter?: Snippet<[BoardColumnDef, { count: number }]>;
+  /**
+   * Level of the column headings (2–6, default 3). The board's hidden title
+   * sits one level above (no heading at 2), swimlane titles one below.
+   */
+  headingLevel?: 2 | 3 | 4 | 5 | 6;
   onMove: (move: BoardMove, item: T) => void | Promise<void>;
   canMove?: MoveRules<T>['canMove'];
   labels?: BoardLabelOverrides;
@@ -112,6 +119,8 @@ let {
   getLabel = (item: T) => getId(item),
   isLocked,
   card,
+  columnFooter,
+  headingLevel = 3,
   onMove,
   canMove,
   labels: labelOverrides,
@@ -122,6 +131,7 @@ let {
 }: BoardProps<T> = $props();
 
 const uid = $props.id();
+const level = $derived(Math.min(6, Math.max(2, Math.trunc(headingLevel) || 3)));
 const instructionsId = `board-${uid}-instructions`;
 const titleId = `board-${uid}-title`;
 const labels = $derived<BoardLabels>({
@@ -536,7 +546,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
   aria-labelledby={titleId}
   dir={dir}
 >
-  <h2 id={titleId} class="tx-board__sr-only">{labels.board}</h2>
+  <svelte:element this={level > 2 ? `h${level - 1}` : 'p'} id={titleId} class="tx-board__sr-only">{labels.board}</svelte:element>
   <p id={instructionsId} class="tx-board__sr-only">{labels.instructions}</p>
   <div class="tx-board__scroller" data-board-scroller>
     <div class="tx-board__columns">
@@ -545,7 +555,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
         {@const wip = evaluateWip(column, count)}
         <section class="tx-board__column" data-wip={wip.status}>
           <header class="tx-board__column-header">
-            <h3>{column.title}</h3>
+            <svelte:element this={`h${level}`} class="tx-board__column-title">{column.title}</svelte:element>
             <span class="tx-board__count" dir="ltr">
               <span aria-hidden="true"
                 ><bdi>{new Intl.NumberFormat().format(count)}</bdi>{#if column.wip?.hard
@@ -567,7 +577,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
               data-lane-id={lane.id}
               data-drop-target={drag?.target?.columnId === column.id && drag.target.laneId === lane.id ? 'true' : undefined}
             >
-              {#if grid.lanes.length > 1}<h4 class="tx-board__lane-title">{lane.title}</h4>{/if}
+              {#if grid.lanes.length > 1}<svelte:element this={`h${Math.min(6, level + 1)}`} class="tx-board__lane-title">{lane.title}</svelte:element>{/if}
               {#if shownCell?.items.length}
                 {#each shownCell.items as item (getId(item))}
                   {@const id = getId(item)}
@@ -635,13 +645,16 @@ function dragFrom(id: string): Attachment<HTMLElement> {
               {/if}
             </div>
           {/each}
+          {#if columnFooter}
+            <footer class="tx-board__column-footer">{@render columnFooter(column, { count })}</footer>
+          {/if}
         </section>
       {/each}
     </div>
   </div>
   {#if grid.unplaced.length > 0}
     <section class="tx-board__unplaced" aria-label={labels.unplaced}>
-      <h3>{labels.unplaced}</h3>
+      <svelte:element this={`h${level}`} class="tx-board__column-title">{labels.unplaced}</svelte:element>
       {#each grid.unplaced as item (getId(item))}
         {@render card(item, { pending: false })}
       {/each}
@@ -714,10 +727,13 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       border-block-end: 1px solid var(--tx-border, CanvasText);
     }
 
-    .tx-board__column-header h3,
-    .tx-board__unplaced h3 {
+    .tx-board__column-title {
       margin: 0;
       font-size: 1rem;
+    }
+
+    .tx-board__column-footer {
+      padding: 0.5rem 0.75rem 0.75rem;
     }
 
     .tx-board__count {

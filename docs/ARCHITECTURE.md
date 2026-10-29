@@ -55,11 +55,12 @@ Not layers, because they consume the library:
 - **`functions/`** holds the Cloudflare Pages Functions deployed with the
   website (see [The website](#the-website)).
 
-`@texuli/editor` and `@texuli/examples` are never packed
-(`NEVER_PACKED` in `scripts/packages.ts`); `pnpm verify:packages` packs the
-other 19. All 19 are released on npm as `0.4.0`, the first release of
-`@texuli/deck` (the previous release, `0.3.0`, had 18 packages);
-`@texuli/drag`, `@texuli/workflows` and `@texuli/deck` are in development
+`@texuli/examples` is never packed (`NEVER_PACKED` in
+`scripts/packages.ts`); `pnpm verify:packages` packs the other 20.
+All 20 are released on npm as `0.5.0`, the first release of
+`@texuli/editor` (the previous release, `0.4.0`, had 19 packages);
+`@texuli/drag`, `@texuli/workflows`, `@texuli/deck` and `@texuli/editor`
+are in development
 and sit in the `publish.yml` wave order ahead of their dependents
 ([RELEASE](RELEASE.md)).
 
@@ -100,27 +101,27 @@ cap in `texuli.budgets.json` (`pnpm size`).
 
 | Package | `package.json` export subpaths |
 | --- | --- |
-| `@texuli/astro` (private) | `.`, `content`, `integration`, `site`, `styles.css`, `layouts/ContentLayout`, `sections/Hero`, `sections/Section` |
+| `@texuli/astro` (private) | `.`, `appearance`, `content`, `integration`, `site`, `styles.css`, `layouts/ContentLayout`, `sections/Hero`, `sections/Section` |
 | `@texuli/blocks` (private) | `.`, `code`, `code/engine`, `code/renderers`, `code/tokenizer`, `core`, `data`, `data/engine`, `data/renderers`, `diagram`, `diagram/engine`, `diagram/renderers`, `embed`, `embed/engine`, `embed/renderers`, `formula`, `interactive`, `interactive/engine`, `interactive/renderers`, `map`, `map/engine`, `map/renderers`, `media`, `media/engine`, `media/renderers`, `structure`, `structure/engine`, `structure/renderers`, `text`, `text/engine`, `text/markdown`, `text/renderers` |
 | `@texuli/catalog` (private) | `.`, `build`, `build/node`, `edit`, `envelope`, `manifest`, `manifests/content`, `manifests/chat`, `manifests/composition`, `manifests/data`, `manifests/display`, `manifests/forms`, `manifests/layouts`, `manifests/overlays`, `manifests/state`, `manifests/workflows`, `player`, `render/frame`, `render/grammar`, `render/hostile`, `render/limits`, `render/conditions`, `render/renderer`, `render/richtext`, `validate`, `validate/blocks` |
-| `@texuli/charts` (private) | `.`, `canvas`, `colors`, `calendar`, `annotations`, `axis`, `cartesian`, `compact`, `flow`, `geo`, `histogram`, `interaction`, `math`, `math/scales`, `math/shapes`, `math/layout`, `math/downsample`, `math/color`, `matrix`, `part-whole`, `pack`, `statistical`, `streaming`, `schemas`, `worker`, `worker/entry` |
+| `@texuli/charts` (private) | `.`, `canvas`, `colors`, `calendar`, `annotations`, `axis`, `cartesian`, `compact`, `sparkline-lite`, `flow`, `geo`, `histogram`, `interaction`, `math`, `math/scales`, `math/shapes`, `math/layout`, `math/downsample`, `math/color`, `matrix`, `part-whole`, `pack`, `statistical`, `streaming`, `schemas`, `worker`, `worker/entry` |
 | `@texuli/chat` (private) | `.` |
-| `@texuli/editor` (private) | `.`, `controller`, `editor`, `link-dialog`, `paste`, `toolbar` |
+| `@texuli/editor` (private, in development) | `.`, `controller`, `editor`, `link-dialog`, `markdown`, `paste`, `toolbar` |
 | `@texuli/core` (private) | `.`, `announcer`, `controllable`, `dir-locale`, `dismiss`, `editor-history`, `editor-keymap`, `editor-markdown`, `editor-model`, `editor-transforms`, `env`, `focus-scope`, `form-bridge`, `ids`, `inert`, `keyboard`, `layer-stack`, `lazy`, `overlay`, `overlay-core`, `portal`, `position-dom`, `position-math`, `presence`, `roving`, `scroll-lock`, `tabbable`, `url-policy` |
 | `@texuli/date` (private) | `.`, `calendar` |
 | `@texuli/deck` (private, in development) | `.`, `model`, `schema`, `engine`, `markdown`, `math`, `authoring`, `templates` |
 | `@texuli/drag` (private, in development) | `.`, `sortable`, `collision`, `modifiers`, `auto-scroll`, `gesture`, `spatial`, `graph`, `messages`, `testing` |
-| `@texuli/data` (private) | `.`, `activity`, `activity/engine`, `board`, `board/engine`, `calendar`, `files`, `files/engine`, `geo`, `grid`, `grid-columns`, `grid-core`, `grid-virtual`, `map`, `timeline`, `timeline/engine`, `tree`, `tree-view`, `virtual-list`, `calendar/view`, `grid-editing` |
+| `@texuli/data` (private) | `.`, `activity`, `activity/engine`, `activity/inbox`, `board`, `board/engine`, `calendar`, `cohort`, `files`, `files/engine`, `filter-builder`, `geo`, `grid`, `grid-columns`, `grid-core`, `grid-virtual`, `map`, `timeline`, `timeline/engine`, `tree`, `tree-view`, `virtual-list`, `calendar/view`, `grid-editing` |
 | `@texuli/examples` (private) | `.` |
 | `@texuli/media` (private) | `.`, `animation`, `animation/player`, `audio`, `captions`, `composition-canvas`, `composition-canvas/draw`, `composition-canvas/render`, `composition-model`, `composition-svg`, `composition-v2`, `export`, `export/ui`, `gallery`, `gallery/lightbox`, `generator-slot`, `image`, `image-editor`, `image-editor/model`, `image-editor/render`, `timeline`, `timeline/model`, `video` |
 | `@texuli/player` (private) | `.`, `styles.css` |
 | `@texuli/primitives` (private) | `.`, `accordion`, `alert-dialog`, `color-picker`, `context-menu`, `label`, `number-field`, `progress`, `separator`, `sheet`, `slider`, `tags-input`, `toolbar`, `tooltip`, `collapsible`, `command`, `date-picker`, `date-field`, `file-drop`, `radio-group`, `switch`, `checkbox`, `calendar`, `toggle`, `menu`, `menubar`, `popover`, `tabs`, `hover-card`, `tree`, `listbox`, `select`, `splitter`, `portal`, `navigation-menu`, `scroll-area`, `pagination`, `toast`, `dialog`, `pin-input`, `combobox`, `avatar`, `sortable` |
-| `@texuli/slides` (private) | `.`, `model`, `grammar`, `export`, `templates`, `stage`, `styles.css` |
+| `@texuli/slides` (private) | `.`, `model`, `grammar`, `export`, `templates`, `stage`, `components`, `layouts`, `styles.css` |
 | `@texuli/spec` (private) | `.`, `workflow`, `migrate`, `codegen`, `surface` |
 | `@texuli/workflows` (private, in development) | `.`, `model`, `layout`, `spec-adapter`, `editor`, `viewer`, `inspector` |
-| `texuli` (private) | `.`, `alert`, `avatar`, `badge`, `button`, `card`, `carousel`, `choice`, `combobox`, `command`, `cx`, `date`, `dialog`, `empty`, `feedback`, `field`, `file-upload`, `icons`, `icons/lucide`, `input`, `kbd-code`, `layouts/app`, `layouts/app/dual-sidebar`, `layouts/app/master-detail`, `layouts/app/rail`, `layouts/app/sidebar`, `layouts/app/split-view`, `layouts/app/top-nav`, `layouts/auth-settings`, `layouts/auth-settings/register`, `layouts/content/blog`, `layouts/content/docs`, `layouts/content/editorial`, `layouts/dashboard`, `layouts/dashboard/register`, `layouts/host`, `layouts/host/chrome`, `layouts/host/drawer`, `layouts/marketing`, `layouts/marketing/entry`, `layouts/marketing/landing`, `layouts/marketing/pricing`, `layouts/marketing/register`, `layouts/marketing/section`, `layouts/mobile`, `layouts/mobile/register`, `layouts/shells`, `menus`, `navigation`, `number-pin`, `popover`, `rating`, `resizable`, `scroll-area`, `select`, `separator-aspect`, `sheet`, `sidebar`, `slider`, `stat`, `stepper`, `table`, `tabs-accordion`, `tags-color`, `timeline`, `toast`, `toggle`, `toolbar`, `tooltip`, `tree` |
+| `texuli` (private) | `.`, `alert`, `avatar`, `badge`, `button`, `card`, `carousel`, `choice`, `combobox`, `command`, `cx`, `date`, `dialog`, `empty`, `feedback`, `field`, `file-upload`, `icons`, `icons/lucide`, `input`, `kbd-code`, `layouts/app`, `layouts/app/dual-sidebar`, `layouts/app/master-detail`, `layouts/app/rail`, `layouts/app/sidebar`, `layouts/app/split-view`, `layouts/app/top-nav`, `layouts/auth-settings`, `layouts/auth-settings/register`, `layouts/content`, `layouts/content/blog`, `layouts/content/docs`, `layouts/content/editorial`, `layouts/dashboard`, `layouts/dashboard/register`, `layouts/host`, `layouts/host/chrome`, `layouts/host/drawer`, `layouts/marketing`, `layouts/marketing/entry`, `layouts/marketing/landing`, `layouts/marketing/pricing`, `layouts/marketing/register`, `layouts/marketing/section`, `layouts/mobile`, `layouts/mobile/register`, `layouts/shells`, `menus`, `navigation`, `number-pin`, `popover`, `rating`, `resizable`, `scroll-area`, `select`, `separator-aspect`, `sheet`, `sidebar`, `slider`, `stat`, `stepper`, `table`, `tabs-accordion`, `tags-color`, `timeline`, `toast`, `toggle`, `toolbar`, `tooltip`, `tree` |
 | `@texuli/tokens` (private) | `.`, `aa-gate`, `aa-gate/components`, `base.css`, `build`, `contract`, `css`, `forced-colors`, `forced-colors.css`, `generator`, `library`, `library-expand`, `modes`, `no-flash`, `palette`, `style-presets`, `tailwind`, `tailwind/preset.css` |
-| `@texuli/tools` (private) | `.`, `a2ui`, `cli-add`, `cli-init`, `cli-update`, `llms`, `elements`, `golden` |
+| `@texuli/tools` (private) | `.`, `a2ui`, `cli-add`, `cli-init`, `cli-update`, `llms`, `elements`, `golden`, `deck` |
 
 This inventory is checked against each package's `package.json` `exports`;
 each package's README and `docs/*.md` describe its subpaths
@@ -171,7 +172,7 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
   controls, forms and flows, `sortable-list` (one shared drag scope per
   player) and `workflow-graph` (`@texuli/workflows`). `tests/loader-parity`
   fails when an emittable id has no painter.
-- **Decks as data.** Spec 0.4.0 (ADR-009, in the repository) adds the
+- **Decks as data.** Spec 0.4.0 (ADR-009) adds the
   deck model v2 props to `layout-deck` and `deck-slide`; see
   [Decks: engine and stage](#decks-engine-and-stage).
 - **Interaction as data.** Spec 0.3.0 (ADR-008) adds `state`, `flow`,
@@ -192,8 +193,8 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.4.0`,
-the first release of `@texuli/deck`):
+ADR-009 splits presentations in two packages (both on npm as `0.5.0`;
+`@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
   (`formatVersion: 2`; slides told apart by `layout`: 20 catalog layouts,
@@ -218,8 +219,7 @@ the first release of `@texuli/deck`):
   catalog id classified). Hosts answer first through `renderers`. The URL
   policy applies at paint with the host's tier (`untrusted` by default).
 
-Agent decks travel as catalog trees under spec `0.4.0` (in the repository
-only), whose `layout-deck` and `deck-slide` manifests carry the model v2
+Agent decks travel as catalog trees under spec `0.4.0` and later, whose `layout-deck` and `deck-slide` manifests carry the model v2
 props. `validateDeckDraft` in `@texuli/catalog/validate` maps a tree to a
 v2 deck without depending on `@texuli/deck`; the host then runs
 `migrateDeck` and `parseDeck`. `@texuli/player` keeps painting decks as a
@@ -264,8 +264,8 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 19 packable packages, `@texuli/deck` included, to npm as the
-    `0.4.0` release (dist-tags `latest` and `next`), with provenance
+    the 20 packable packages, `@texuli/editor` included, to npm as the
+    `0.5.0` release (dist-tags `latest` and `next`), with provenance
     ([RELEASE](RELEASE.md)).
 - **Tests:**
   - **Unit:** Vitest (happy-dom) in `packages/*/tests/`,

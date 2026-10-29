@@ -18,6 +18,8 @@ type Props = {
   thresholds?: readonly number[];
   bandLabels?: readonly string[];
   format?: ChartFormatSpec;
+  /** Formats every visible and accessible value (units such as `%`); wins over `format`. */
+  formatValue?: (value: number) => string;
   size?: number;
   thickness?: number;
   labels?: Partial<CompactChartLabels>;
@@ -32,6 +34,7 @@ let {
   thresholds = [],
   bandLabels = [],
   format,
+  formatValue: customFormat,
   size = 144,
   thickness = 12,
   labels,
@@ -50,7 +53,8 @@ const band = $derived(layout.bands[layout.band]);
 // Label sizes in user units, so they scale with the viewBox (see gaugeLabelSizes).
 const labelSizes = $derived(gaugeLabelSizes(diameter));
 const bandLabel = $derived(bandLabels[layout.band] ?? '');
-const formatValue = (value: number) => formatChartValue(value, format);
+const formatValue = (value: number) =>
+  customFormat ? customFormat(value) : formatChartValue(value, format);
 const description = $derived(
   customDescription ??
     `${formatValue(safeValue)} of ${formatValue(rangeMax)}${bandLabel ? `; ${bandLabel}` : ''}.`

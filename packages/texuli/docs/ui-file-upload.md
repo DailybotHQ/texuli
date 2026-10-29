@@ -18,6 +18,9 @@ Styled drop zone on `@texuli/primitives/file-drop`:
 | `progress` | Map of `name:size:lastModified` → 0–100 or `null` (indeterminate) |
 | `status` | Optional per-file `pending` \| `uploading` \| `done` \| `error` |
 | `labels` | Translatable chrome strings |
+| `onFilesAdd(files)` | Once per pick or drop, with the accepted files it added (not for `files` the host sets) |
+| `onFileRemove(file)` | When the person removes a file with its remove button |
+| other attributes | Land on the wrapper (`aria-*` and `data-*` on the file input). Caller `onchange`, `ondrop` and drag handlers run on the wrapper as the events bubble out of the drop zone: after the zone's handling, never instead of it |
 
 ### Behavior
 

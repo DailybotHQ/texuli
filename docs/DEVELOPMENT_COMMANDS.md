@@ -36,7 +36,7 @@ Every root script, verbatim.
 | `pnpm visual` | `tsx scripts/visual.ts` | Visual regression against `tests/visual/visual.spec.ts-snapshots` (light and dark, desktop and Pixel 7) |
 | `pnpm visual:update` | `tsx scripts/visual.ts --update` | Write new baselines (review the PNGs before committing) |
 | `pnpm test:perf` | `TEXULI_PERF=1 vitest run tests/perf packages/blocks/tests/code.test.ts packages/blocks/tests/text.test.ts` | Wall-clock and scale limits (opt-in; never in the default suite) |
-| `pnpm verify:packages` | `tsx scripts/packages.ts` | Build, pack and check the 19 packable packages as npm would publish them (publint, attw; `@texuli/editor` and `@texuli/examples` are never packed); publishes nothing |
+| `pnpm verify:packages` | `tsx scripts/packages.ts` | Build, pack and check the 20 packable packages as npm would publish them (publint, attw; `@texuli/examples` is never packed); publishes nothing |
 | `pnpm check:docs` | `tsx scripts/check-docs.ts` | Every relative Markdown link and documented command is real (see Other tools) |
 | `pnpm check:trojan-source` | `tsx scripts/check-trojan-source.ts` | Fail on literal bidi and zero-width control characters in tracked text files (part of `pnpm lint`); gate: `pnpm vitest run scripts/tests/trojan-source.test.ts` |
 
@@ -88,6 +88,7 @@ budget rows (2026-10-26).
 | `pnpm exec tsx scripts/supply-chain.ts [--json]` | Supply-chain report and CycloneDX SBOM (`tmp/supply-chain/sbom.cdx.json`); gate: `pnpm vitest run scripts/tests/supply-chain.test.ts` |
 | `pnpm exec tsx scripts/check-docs.ts` | Every relative link in tracked Markdown resolves (headings included) and every documented `pnpm`/`npx`/`tsx`/`bash` command names a real script, package, binary or path; gate: `pnpm vitest run scripts/tests/check-docs.test.ts` |
 | `pnpm exec tsx scripts/check-css.ts` | No dead CSS in the package stylesheets: no repeated declaration in a rule, no rule identical to an earlier one, no declaration a later same-selector rule always overrides, and no `tx-*` class selector that no source file can produce (template-built classes count); gate: `pnpm vitest run scripts/tests/check-css.test.ts` |
+| `pnpm exec tsx scripts/dist-parity.ts [--tarballs] [--json]` | Build one consumer entry (styled components, chart families, block loaders, the slides stage) twice with Vite, from the workspace sources and from the svelte-package `dist/` (or, with `--tarballs`, from `tmp/packages/tarballs/` after `pnpm verify:packages`), and fail when the dist build is over 2 % bigger (raw or gzip) or emits more files; output in `tmp/dist-parity/`; tests: `pnpm vitest run scripts/tests/dist-parity.test.ts` |
 | `pnpm exec tsx scripts/check-llms-parity.ts` | Reconcile the component catalog, built Markdown twins, llms component docs and example registry; tests: `pnpm vitest run scripts/tests/check-llms-parity.test.ts`; T-24 recorded exit 0 (133 components, 157 examples, 108 directories) |
 | `node scripts/audit-seo.mjs --dist apps/website/dist` | Offline SEO audit of a completed website build; tests: `pnpm vitest run scripts/tests/audit-seo.test.ts`; T-29 recorded exit 0 (550 pages, 0 critical, 33 warnings, 4 planned). Opt-in |
 | `node scripts/audit-aeo.mjs --dist apps/website/dist` | Offline agent-surface audit of a completed website build; tests: `pnpm vitest run scripts/tests/audit-aeo.test.ts`; T-30 recorded exit 0 (26 top routes, 187 twins, 0 critical, 2 warnings, 3 planned). Opt-in |
@@ -119,8 +120,8 @@ budget rows (2026-10-26).
 ## Not available
 
 There are no release, publish or deploy commands. Packages are
-`private: true`; npm carries the 19 packable packages as the CI-published
-`0.4.0` release (dist-tags `latest` and `next`; pre-1.0, not stable) — publishing runs
+`private: true`; npm carries the 20 packable packages as the CI-published
+`0.5.0` release (dist-tags `latest` and `next`; pre-1.0, not stable) — publishing runs
 through the publish workflow (see [CI](CI.md)). See [RELEASE](RELEASE.md)
 for the version and owner-GO policy. texuli.com deploys from `main`
 (CI in [CI](CI.md)); pushing and adding a remote stay gated on the

@@ -3,6 +3,7 @@ import type { CalendarDate } from '@texuli/date';
 import type { Snippet } from 'svelte';
 import * as Popover from '../popover/index.ts';
 import {
+  type DateInvalidHandler,
   type DatePickerLabels,
   focusTrigger,
   formatLongDate,
@@ -27,6 +28,12 @@ interface Props {
   disabled?: boolean;
   /** Close the dialog when a day is chosen. Default `true`. */
   closeOnSelect?: boolean;
+  /** The day marked as today (`YYYY-MM-DD`); when set, the clock is never read. */
+  today?: string;
+  /** First day of the week, `0` (Sunday) to `6`; default the locale's. */
+  weekStartsOn?: number;
+  /** Reports typed text that does not parse or is out of range. */
+  onInvalid?: DateInvalidHandler;
   labels?: Partial<DatePickerLabels>;
   children?: Snippet;
 }
@@ -42,6 +49,9 @@ let {
   isDateUnavailable,
   disabled = false,
   closeOnSelect = true,
+  today,
+  weekStartsOn,
+  onInvalid,
   labels,
   children,
 }: Props = $props();
@@ -88,6 +98,15 @@ provideShell({
   },
   get closeOnSelect() {
     return closeOnSelect;
+  },
+  get today() {
+    return today;
+  },
+  get weekStartsOn() {
+    return weekStartsOn;
+  },
+  get onInvalid() {
+    return onInvalid;
   },
   get triggerLabel() {
     const long = formatLongDate(value, locale);

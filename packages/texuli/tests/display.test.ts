@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Alert from '../src/components/alert/Alert.svelte';
 import { alertRole } from '../src/components/alert/tones.ts';
 import { avatarInitials, avatarToneIndex, hashString } from '../src/components/avatar/initials.ts';
+import { avatarSrcset } from '../src/components/avatar/srcset.ts';
 import Chip from '../src/components/badge/Chip.svelte';
 import Tag from '../src/components/badge/Tag.svelte';
 import Card from '../src/components/card/Card.svelte';
@@ -123,6 +124,63 @@ describe('avatar', () => {
     });
   });
 
+  describe('Avatar srcset (G10)', () => {
+    it('keeps only the srcset candidates the URL policy accepts, at the given trust', () => {
+      const cases: {
+        srcset: string;
+        srcTrust: 'untrusted' | 'developer';
+        sizes?: string;
+        expected: string | null;
+        expectedSizes?: string | null;
+      }[] = [
+        {
+          srcset: 'https://cdn.example/ada-64.webp 1x, https://cdn.example/ada-128.webp 2x',
+          srcTrust: 'untrusted',
+          expected: 'https://cdn.example/ada-64.webp 1x, https://cdn.example/ada-128.webp 2x',
+        },
+        {
+          srcset: 'javascript:alert(1) 1x, https://cdn.example/ada-128.webp 2x',
+          srcTrust: 'untrusted',
+          expected: 'https://cdn.example/ada-128.webp 2x',
+        },
+        {
+          srcset: 'https://cdn.example/a.webp 64w, data:text/html;base64,AAAA 128w, /b.webp 2x',
+          srcTrust: 'untrusted',
+          sizes: '40px',
+          expected: 'https://cdn.example/a.webp 64w',
+          expectedSizes: '40px',
+        },
+        {
+          srcset: 'javascript:alert(1) 1x, vbscript:x 2x',
+          srcTrust: 'developer',
+          sizes: '40px',
+          expected: null,
+          expectedSizes: null,
+        },
+      ];
+      for (const { srcset, srcTrust, sizes, expected, expectedSizes } of cases) {
+        const view = render(AvatarFixture, {
+          props: {
+            name: 'Ada Example',
+            src: 'https://cdn.example/ada-64.webp',
+            srcTrust,
+            srcset,
+            ...(sizes ? { sizes } : {}),
+          },
+        });
+        const img = view.container.querySelector('img');
+        expect(img, srcset).toBeTruthy();
+        expect(img?.getAttribute('srcset'), srcset).toBe(expected);
+        if (expectedSizes !== undefined) expect(img?.getAttribute('sizes')).toBe(expectedSizes);
+        cleanup();
+      }
+      expect(avatarSrcset('https://cdn.example/a.webp 2x, javascript:x 1x')).toBe(
+        'https://cdn.example/a.webp 2x'
+      );
+      expect(avatarSrcset('   ')).toBeUndefined();
+    });
+  });
+
   describe('AvatarGroup', () => {
     it('stacks items and shows a +N overflow chip when max is set', () => {
       render(AvatarFixture, {
@@ -184,11 +242,31 @@ describe('badge', () => {
       });
       const onRemove = vi.fn(() => gate);
       const view = render(Tag, { props: { label: 'Ops', onRemove } });
-      const btn = view.getByRole('button', { name: /Remove: Ops/ });
+      const btn = view.getByRole('button', { name: 'Remove Ops' });
       await fireEvent.click(btn);
       expect(btn.getAttribute('aria-busy')).toBe('true');
       resolve();
       await waitFor(() => expect(btn.getAttribute('aria-busy')).not.toBe('true'));
+    });
+  });
+
+  describe('G37: Tag remove name', () => {
+    it('names the tag by default and takes a template, a prefix or a function', () => {
+      const onRemove = vi.fn();
+      const cases: { removeLabel?: string | ((label: string) => string); name: string }[] = [
+        { name: 'Remove Design' },
+        { removeLabel: 'Delete', name: 'Delete Design' },
+        { removeLabel: 'Quitar «{label}»', name: 'Quitar «Design»' },
+        { removeLabel: 'Remove Design tag', name: 'Remove Design tag' },
+        { removeLabel: (label) => `${label} entfernen`, name: 'Design entfernen' },
+      ];
+      for (const { removeLabel, name } of cases) {
+        const view = render(Tag, {
+          props: { label: 'Design', onRemove, ...(removeLabel ? { removeLabel } : {}) },
+        });
+        expect(view.getByRole('button').getAttribute('aria-label')).toBe(name);
+        view.unmount();
+      }
     });
   });
 
@@ -245,6 +323,54 @@ describe('card', () => {
     });
   });
 
+  describe('G34: Card link attributes', () => {
+    it('passes target, rel and download on a link card, adds noopener for _blank, and drops them on a div', () => {
+      const cases = [
+        { props: { target: '_blank' }, rel: 'noopener', target: '_blank', download: null },
+        {
+          props: { target: '_blank', rel: 'noreferrer' },
+          rel: 'noreferrer noopener',
+          target: '_blank',
+          download: null,
+        },
+        // Browsers read the target keyword case-insensitively: `_BLANK` is a new context too.
+        { props: { target: '_BLANK' }, rel: 'noopener', target: '_BLANK', download: null },
+        {
+          props: { target: '_Blank', rel: 'NoOpener' },
+          rel: 'NoOpener',
+          target: '_Blank',
+          download: null,
+        },
+        { props: { rel: 'external' }, rel: 'external', target: null, download: null },
+        { props: { download: true }, rel: null, target: null, download: '' },
+        { props: { download: 'report.csv' }, rel: null, target: null, download: 'report.csv' },
+      ] as const;
+      for (const entry of cases) {
+        const view = render(Card, {
+          props: { href: 'https://example.com/report', ...entry.props, children: text('Go') },
+        });
+        const link = view.container.querySelector('a[data-tx-card]');
+        expect(link?.getAttribute('href')).toBe('https://example.com/report');
+        expect(link?.getAttribute('rel') ?? null).toBe(entry.rel);
+        expect(link?.getAttribute('target') ?? null).toBe(entry.target);
+        expect(link?.getAttribute('download') ?? null).toBe(entry.download);
+        view.unmount();
+      }
+      const unsafe = render(Card, {
+        props: {
+          href: 'javascript:alert(1)',
+          target: '_blank',
+          download: true,
+          children: text('No'),
+        },
+      });
+      const div = unsafe.container.querySelector('[data-tx-card]');
+      expect(div?.tagName.toLowerCase()).toBe('div');
+      expect(div?.hasAttribute('target')).toBe(false);
+      expect(div?.hasAttribute('download')).toBe(false);
+    });
+  });
+
   describe('CardMedia', () => {
     it('renders img when src is safe and skips hostile schemes', () => {
       const ok = render(CardMedia, {
@@ -279,6 +405,28 @@ describe('card', () => {
         hostile.container.querySelector('[data-tx-card-grid]')?.getAttribute('style') ?? '';
       expect(style).toContain('16rem');
       expect(style).not.toContain('color');
+    });
+
+    it('G43: caps the columns with maxColumns and ignores invalid caps', () => {
+      const capped = render(CardGrid, { props: { maxColumns: 3, children: text('c') } });
+      const grid = capped.container.querySelector('[data-tx-card-grid]') as HTMLElement;
+      expect(grid.getAttribute('data-max-columns')).toBe('3');
+      expect(grid.getAttribute('style')).toContain(
+        'calc((100% - 2 * var(--tx-card-grid-gap)) / 3)'
+      );
+      capped.unmount();
+      for (const maxColumns of [0, -2, Number.NaN]) {
+        const view = render(CardGrid, { props: { maxColumns, children: text('c') } });
+        const el = view.container.querySelector('[data-tx-card-grid]') as HTMLElement;
+        expect(el.hasAttribute('data-max-columns')).toBe(false);
+        expect(el.getAttribute('style')).not.toContain('calc(');
+        view.unmount();
+      }
+      const css = readFileSync(
+        join(import.meta.dirname, '../src/components/card/card.css'),
+        'utf8'
+      );
+      expect(css).toMatch(/\.tx-card-grid\s*\{[^}]*gap:\s*var\(--tx-card-grid-gap\)/);
     });
   });
 });

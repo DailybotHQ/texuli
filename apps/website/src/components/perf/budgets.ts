@@ -90,8 +90,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/component-pages/charts-pie/',
     reason:
-      'The first live demo is a chart: the chart stage family and the part-whole chart chunk load on open: 113.9 KB page, 77.5 KB JS (104.4 KB JS before per-family stages); 124 KB page, 85.8 KB JS measured 2026-10-27, so the owner raised the caps to 132 and 92 (measured + 4%, rounded up to 4 KB; PLAN_006 follow-up).',
-    budget: { pageGzipKb: 132, jsGzipKb: 92, cls: 0.15 },
+      'The first live demo is a chart: the chart stage family and the part-whole chart chunk load on open: 113.9 KB page, 77.5 KB JS (104.4 KB JS before per-family stages); 124 KB page, 85.8 KB JS measured 2026-10-27, so the owner raised the caps to 132 and 92 (measured + 4%, rounded up to 4 KB; PLAN_006 follow-up). PLAN_009 (formatValue on the compact charts, handler composition and ref props in the shared components): 132.3 KB page in CI on Linux, so the page cap is 140 (measured + 4%, rounded up to 4 KB).',
+    budget: { pageGzipKb: 140, jsGzipKb: 92, cls: 0.15 },
   },
   {
     route: '/charts-page/',
@@ -114,8 +114,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/builder/',
     reason:
-      'The builder page mounts the BuilderApp studio island (structure tree, props and theme controls) on open: measured 31.7 KB gzip of HTML after the PLAN_006 builder polish (T-82). PLAN_007: the palette now lists the data, chat, workflows and state groups of the 158-id catalog inline, measured 234.9 KB raw (+4% headroom). PLAN_008: the deck root and slide manifests now carry the v2 deck props (layout, background, steps, motion, navigation, outline), measured 35.8 KB gzip of HTML (+4% headroom).',
-    budget: { htmlGzipKb: 38, htmlRawKb: 248 },
+      'The builder page mounts the BuilderApp studio island (structure tree, props and theme controls) on open: measured 31.7 KB gzip of HTML after the PLAN_006 builder polish (T-82). PLAN_007: the palette now lists the data, chat, workflows and state groups of the 158-id catalog inline, measured 234.9 KB raw (+4% headroom). PLAN_008: the deck root and slide manifests now carry the v2 deck props (layout, background, steps, motion, navigation, outline), measured 35.8 KB gzip of HTML (+4% headroom). PLAN_009: four new catalog manifests (cohort table, notification inbox, filter builder, time field) and the G21 block fields in the palette, measured 251 KB raw (+4% headroom).',
+    budget: { htmlGzipKb: 38, htmlRawKb: 262 },
   },
   {
     route: '/component-pages/',
@@ -132,8 +132,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/gallery-themes/',
     reason:
-      'The first 24 cards are in the HTML (18.8 KB gzip at FIX-site-perf-routes); the full 210-card list is fetched as /theme-gallery.json (17.9 KB) and each shown card loads its theme CSS. The PLAN_006 gallery audit (T-83) enriched the cards: 228.6 KB raw, 64.9 KB JS, limits 232 / 68.',
-    budget: { htmlRawKb: 232, pageGzipKb: 132, jsGzipKb: 68 },
+      'The first 24 cards are in the HTML (18.8 KB gzip at FIX-site-perf-routes); the full 210-card list is fetched as /theme-gallery.json (17.9 KB) and each shown card loads its theme CSS. The PLAN_006 gallery audit (T-83) enriched the cards: 228.6 KB raw, 64.9 KB JS, limits 232 / 68. PLAN_009 (handler composition and ref props in the shared components) measured 24.1 KB gzip of HTML, limit 26 (+4% headroom).',
+    budget: { htmlRawKb: 232, htmlGzipKb: 26, pageGzipKb: 132, jsGzipKb: 68 },
   },
   {
     route: '/theme-switcher/',
@@ -144,14 +144,14 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/playground/',
     reason:
-      'The playground stage mounts on open; the PLAN_006 studio polish (T-82) extended the presets: measured 100.6 KB page / 69.6 KB JS, limits 104 / 72.',
-    budget: { pageGzipKb: 104, jsGzipKb: 72 },
+      'The playground stage mounts on open; the PLAN_006 studio polish (T-82) extended the presets: measured 100.6 KB page / 69.6 KB JS, limits 104 / 72. PLAN_009 (handler composition and ref props in the shared components) measured 104.1 KB page in CI on Linux, limit 109 (+4% headroom).',
+    budget: { pageGzipKb: 109, jsGzipKb: 72 },
   },
   {
     route: '/search/',
     reason:
-      'The results island ships the static search index; it grew with the site content (PLAN_006 T-80/T-83): measured 104.4 KB page / 75.1 KB JS, limits 108 / 80.',
-    budget: { jsGzipKb: 80, pageGzipKb: 108 },
+      'The results island ships the static search index; it grew with the site content (PLAN_006 T-80/T-83): measured 104.4 KB page / 75.1 KB JS, limits 108 / 80. PLAN_009 (new package docs pages in the index) measured 108.1 KB page, limit 113 (+4% headroom).',
+    budget: { jsGzipKb: 80, pageGzipKb: 113 },
   },
   {
     route: '/color-explorer/',
@@ -162,8 +162,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/gallery-components/',
     reason:
-      'The living gallery: server-rendered cards, each with its preview frame, light/dark and RTL controls, props toggle and tag filters. Measured 845.8 KB raw / 46.4 KB gzip at FIX-site-perf-routes; the PLAN_006 gallery audit (T-83) added card content: 888.2 KB raw / 48.5 KB gzip of HTML and 90.1 KB JS, limits 892 / 50 / 92. PLAN_007 (owned sortable and drag engine in the shared component code) brought JS to 92.0 KB locally and 92.1 KB in CI at the ready signal; the JS cap is now 96 (measured + 4%). T-93 still owns slimming the raw size.',
-    budget: { htmlRawKb: 892, htmlGzipKb: 50, pageGzipKb: 184, jsGzipKb: 96 },
+      'The living gallery: server-rendered cards, each with its preview frame, light/dark and RTL controls, props toggle and tag filters. Measured 845.8 KB raw / 46.4 KB gzip at FIX-site-perf-routes; the PLAN_006 gallery audit (T-83) added card content: 888.2 KB raw / 48.5 KB gzip of HTML and 90.1 KB JS, limits 892 / 50 / 92. PLAN_007 (owned sortable and drag engine in the shared component code) brought JS to 92.0 KB locally and 92.1 KB in CI at the ready signal; the JS cap is now 96 (measured + 4%). T-93 still owns slimming the raw size. PLAN_009 (ref, rest props and handler composition on the shared components, sheet parts and new examples) measured 905.2 KB raw, limit 942 (+4% headroom).',
+    budget: { htmlRawKb: 942, htmlGzipKb: 50, pageGzipKb: 184, jsGzipKb: 96 },
   },
   {
     route: '/examples/',

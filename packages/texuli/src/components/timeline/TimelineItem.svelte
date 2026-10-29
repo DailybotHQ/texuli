@@ -7,6 +7,8 @@ import { type TimelineStatus, type TimelineTone, timelineItemClass } from './var
 import './timeline.css';
 
 type Props = Omit<HTMLLiAttributes, 'title'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   title: string;
   /** Visible time label, e.g. "Mar 4". */
   time?: string;
@@ -34,6 +36,7 @@ let {
   icon,
   children,
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -43,6 +46,7 @@ const link = $derived(href ? safeHref(href, context?.hrefTrust ?? 'developer') :
 </script>
 
 <li
+  bind:this={ref}
   class={timelineItemClass({ tone, class: className })}
   data-tx-timeline-item
   data-tone={tone}

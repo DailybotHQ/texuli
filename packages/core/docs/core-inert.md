@@ -86,6 +86,10 @@ outside clicks*; this texel decides *what outside is reachable at all*. A modal
 primitive registers in both and releases both on close; a non-modal popover
 registers only in the layer stack.
 
+An exemption is also the **focus-exempt region** API: the overlay engine
+treats exempt regions as inside for dismissal and lets Tab move through them
+under its focus trap (see "Focus-exempt regions" in `overlay-engine.md`).
+
 ## Verified
 
 - `pnpm vitest run packages/core/tests/inert.test.ts`: 8 tests (pure target

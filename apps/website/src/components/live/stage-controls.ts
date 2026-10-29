@@ -153,6 +153,7 @@ export const STAGE_CONTROLS: Readonly<Record<string, readonly string[]>> = Objec
     'remainingLabel',
   ],
   textarea: ['autosize', 'disabled', 'readonly', 'rows'],
+  'time-field': ['label', 'description', 'error', 'minuteStep', 'disabled', 'required', 'size'],
   timeline: ['orientation', 'label'],
   toaster: ['label', 'position', 'dismissLabel'],
   tooltip: ['content', 'shortcut', 'side', 'align', 'sideOffset', 'delayDuration', 'disabled'],

@@ -8,10 +8,10 @@ announcements, and it renders message text without ever injecting HTML. It
 is part of [Texuli](https://texuli.com), "Small pieces. Infinite
 possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
-> **Status: 0.x release.** `@texuli/chat` is published on npm as `0.4.0`, a
+> **Status: 0.x release.** `@texuli/chat` is published on npm as `0.5.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.5.0`) may contain breaking changes, so pin the exact version or
-> use `^0.4.0`, which accepts only 0.4.x.
+> minor (`0.6.0`) may contain breaking changes, so pin the exact version or
+> use `^0.5.0`, which accepts only 0.5.x.
 
 ## Install
 
@@ -76,8 +76,8 @@ Everything is exported from the package root, `@texuli/chat`:
 | Export | What it does |
 | --- | --- |
 | `ChatThread` | The full conversation view: message list plus composer, typing indicator and header slots |
-| `MessageList` | The message log on its own: grouping, date separators, avatars, timestamps, status and virtualization |
-| `Composer` | Message input: Enter to send, Shift+Enter for a new line, auto-growing, with attachments and pending states |
+| `MessageList` | The message log on its own: grouping, date separators, avatars, timestamps, status, virtualization, per-message actions, inline edit and jump to latest |
+| `Composer` | Message input: Enter to send, Shift+Enter for a new line, auto-growing, with attachments, actions, a key hook, pending states and Stop for a streaming reply |
 | `TypingIndicator` | Localized "is typing" labels for one or more authors |
 | `ChatThreadDisplay`, `ChatMessageDisplay` | A static transcript view (no composer, no live region) for rendering saved or generated conversations |
 | `CHAT_DISPLAY_LOADERS` | Loaders that map the display components for a `@texuli/player` host |
@@ -103,6 +103,18 @@ Everything is exported from the package root, `@texuli/chat`:
 - **Scales to long threads.** The list virtualizes from 100 messages with
   measured row heights, and keeps your place when older history is
   prepended.
+
+## New in 0.5.0
+
+Ships in `0.5.0`; the `0.4.0` release predates it:
+
+- `Composer`: `streaming` with `onStop` (a Stop button and Escape), an
+  `onkeydown` hook that runs before the built-in keys, and an `actions`
+  snippet ([chat-composer](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-composer.md)).
+- `MessageList`: per-message `actions`, inline edit with `onEdit`, and a
+  bottom-anchored scroll with "Jump to latest"
+  ([chat-thread](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-thread.md)). `ChatThread` forwards all
+  of these.
 
 ## Not yet available
 

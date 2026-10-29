@@ -11,7 +11,8 @@
 
 A day-grouped activity feed over `ActivityItem` rows with:
 
-- Day labels relative to a runtime clock (`groupByDay` / `whenLabel`)
+- Day labels relative to a runtime clock (`groupByDay` / `whenLabel`); an
+  unknown `timeZone` falls back to UTC and an invalid `locale` to `en-US`
 - Avatars (`texuli/avatar`) and optional kind filters
 - Comment bodies with `@{id}` / `#{id}` mention tokens
 - Reactions via `toggleReaction` (host persists)

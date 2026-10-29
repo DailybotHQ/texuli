@@ -19,6 +19,7 @@ let {
   min,
   max,
   onValueChange,
+  onInvalid,
   children,
   class: className,
   ...rest
@@ -36,10 +37,39 @@ $effect(() => {
       year: parsed ? String(parsed.year) : '',
     };
     syncedValue = value;
+    issue = null;
   }
 });
 const low = $derived(parseDate(min));
 const high = $derived(parseDate(max));
+/** The refused complete text (`text|reason`), so each refusal reports once. */
+let issue = $state<string | null>(null);
+
+/**
+ * Typed text is complete with a month, a day and a four-digit year. A
+ * complete entry that is not a real date, or is out of bounds, is refused and
+ * reported through `onInvalid` (once per distinct text).
+ */
+function check(current: { month: string; day: string; year: string }): void {
+  let reason: 'invalid' | 'out-of-range' | null = null;
+  if (current.month && current.day && current.year.length > 3) {
+    const parts = { year: +current.year, month: +current.month, day: +current.day };
+    const iso = parseDateSafe(parts) ? formatDate(parts) : null;
+    if (!iso) reason = 'invalid';
+    else if ((low && iso < formatDate(low)) || (high && iso > formatDate(high)))
+      reason = 'out-of-range';
+  }
+  const text = order
+    .map(
+      (segment, index) =>
+        current[segment] + (index < 2 ? dateSegmentSeparator(locale, segment) : '')
+    )
+    .join('');
+  const key = reason && `${text}|${reason}`;
+  if (issue === key) return;
+  issue = key;
+  if (reason) onInvalid?.(text, reason);
+}
 
 function commit(segment: DateSegment, raw: string): void {
   fields = { ...fields, [segment]: raw };
@@ -50,6 +80,7 @@ function commit(segment: DateSegment, raw: string): void {
     month: segment === 'month' ? (number ?? 0) : Number(current.month) || 0,
     day: segment === 'day' ? (number ?? 0) : Number(current.day) || 0,
   };
+  check(current);
   const candidate = number === null || !parseDateSafe(next) ? null : formatDate(next);
   if (candidate && ((low && candidate < formatDate(low)) || (high && candidate > formatDate(high))))
     return;
@@ -75,7 +106,13 @@ const limits: Record<DateSegment, { min: number; max: number }> = {
 };
 </script>
 
-<div {...rest} class={className} role="group" aria-label={label} data-tx-date-field-root="">
+<div
+  {...rest}
+  class={className}
+  role="group"
+  aria-label={label}
+  data-tx-date-field-root=""
+>
   {#each order as segment (segment)}
     <input
       type="number"
@@ -86,6 +123,7 @@ const limits: Record<DateSegment, { min: number; max: number }> = {
       min={limits[segment].min}
       max={limits[segment].max}
       value={fields[segment]}
+      aria-invalid={issue ? 'true' : undefined}
       {disabled}
       {required}
       oninput={(event) => commit(segment, event.currentTarget.value)}

@@ -7,14 +7,18 @@ import {
 } from '@texuli/primitives/file-drop';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import { chainHandlers } from '../../internal/handlers.ts';
 import type { FileUploadLabels, FileUploadProgressMap } from './types.ts';
 import { type FileUploadVariant, fileUploadClass } from './variants.ts';
 import './file-upload.css';
 
-type Props = Omit<
-  HTMLAttributes<HTMLDivElement>,
-  'children' | 'ondragenter' | 'ondragover' | 'ondragleave' | 'ondrop'
-> & {
+/**
+ * Extra attributes land on the wrapper (`aria-*` and `data-*` on the file
+ * input). Caller `onchange`, `ondrop` and drag handlers run on the wrapper as
+ * the events bubble out of the drop zone: after the zone's own handling,
+ * never instead of it.
+ */
+type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   files?: File[];
   rejects?: FileDropRejection[];
   accept?: string;
@@ -29,6 +33,14 @@ type Props = Omit<
   progress?: FileUploadProgressMap;
   status?: Readonly<Record<string, 'pending' | 'uploading' | 'done' | 'error' | undefined>>;
   labels?: Partial<FileUploadLabels>;
+  /**
+   * Called once per pick or drop with the files it added (only accepted
+   * files; rejected ones land in `rejects`). Not called for `files` the host
+   * sets.
+   */
+  onFilesAdd?: (files: File[]) => void;
+  /** Called with the file the person took out of the list with its remove button. */
+  onFileRemove?: (file: File) => void;
   class?: ClassValue;
 };
 
@@ -47,9 +59,37 @@ let {
   progress = {},
   status = {},
   labels: labelOverrides,
+  onFilesAdd,
+  onFileRemove,
   class: className,
+  onchange,
+  ondrop,
+  onchangecapture,
+  ondropcapture,
   ...rest
 }: Props = $props();
+
+/** The list before a pick or drop reaches the zone (set in the capture phase). */
+let before: File[] | null = null;
+
+function snapshot(): void {
+  before = files;
+}
+
+/** After the zone handled a pick or drop: report the files it added. */
+function report(): void {
+  const previous = before;
+  before = null;
+  if (previous === null || previous === files) return;
+  const added = files.filter((file) => !previous.includes(file));
+  if (added.length > 0) onFilesAdd?.(added);
+}
+
+function removeFromList(file: File, removeFile: (file: File) => void): void {
+  const previous = files;
+  removeFile(file);
+  if (files !== previous && !files.includes(file)) onFileRemove?.(file);
+}
 
 const labels = $derived<FileUploadLabels>({
   label: 'Upload files',
@@ -163,7 +203,16 @@ function itemProgress(file: File): number | null | undefined {
 }
 </script>
 
-<div class={rootClass} data-tx-file-upload data-variant={variant} {...wrapperAttrs}>
+<div
+  class={rootClass}
+  data-tx-file-upload
+  data-variant={variant}
+  {...wrapperAttrs}
+  onchangecapture={chainHandlers(onchangecapture, snapshot)}
+  ondropcapture={chainHandlers(ondropcapture, snapshot)}
+  onchange={chainHandlers(onchange, report)}
+  ondrop={chainHandlers(ondrop, report)}
+>
   <FileDrop.Root
     bind:files
     bind:rejects
@@ -232,7 +281,7 @@ function itemProgress(file: File): number | null | undefined {
                 class="tx-file-upload__remove"
                 disabled={disabled}
                 aria-label={`${labels.remove} ${file.name}`}
-                onclick={() => removeFile(file)}
+                onclick={() => removeFromList(file, removeFile)}
               >
                 ×
               </button>

@@ -70,7 +70,7 @@
     "spec": {
       "description": "The spec version the envelope was written for. Omitted means 0.2.0; migrateBlueprint stamps it.",
       "type": "string",
-      "enum": ["0.3.0", "0.4.0"]
+      "enum": ["0.3.0", "0.4.0", "0.5.0"]
     },
     "state": {
       "description": "Local state declarations (ADR-008), at most 64. Names, counts and per-type rules are checked by the validator.",

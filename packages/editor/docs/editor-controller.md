@@ -23,9 +23,15 @@ editor.undo();
 | `onChange` | Every accepted document change, undo and redo included |
 | `now` | Clock for undo grouping (tests) |
 
+The options type is `EditorControllerOptions`.
+
 Reactive state (Svelte runes): `history`, `state`, `doc`, `canUndo`,
-`canRedo`, `active` (marks, block kind, list, quote and link at the
-selection), `composing`, `errors` (the last refusal).
+`canRedo`, `active`, `composing`, `errors` (the last refusal). `active` is an
+`EditorActiveState`: the `marks` at the selection, the `block` kind (an
+`EditorBlockKind`: paragraph, heading with its level, code or a void block),
+the `list` kind, whether it is in a `quote`, and the `link` href.
+`EditorToggleMark` names the marks `toggleMark` takes (`strong`, `em`,
+`strike`, `code`).
 
 Commands: `runKey(intent)` and `runInput(intent, data)` for the keymap and
 `beforeinput` intents (each returns whether it handled the event);

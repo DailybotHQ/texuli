@@ -1,8 +1,9 @@
 <script lang="ts">
 import { type Snippet, untrack } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type CollapsibleContextValue, collapsibleContext } from './context.ts';
 
-interface CollapsibleRootProps {
+interface CollapsibleRootOwnProps {
   open?: boolean;
   defaultOpen?: boolean;
   disabled?: boolean;
@@ -10,7 +11,13 @@ interface CollapsibleRootProps {
   class?: string;
   onOpenChange?: (open: boolean) => void;
   children?: Snippet;
+  /** The root element (bindable). */
+  ref?: HTMLElement | null;
 }
+
+/** Extra attributes (`data-*`, `aria-*`, handlers…) land on the root element. */
+type CollapsibleRootProps = CollapsibleRootOwnProps &
+  Omit<HTMLAttributes<HTMLDivElement>, keyof CollapsibleRootOwnProps>;
 
 let {
   open = $bindable(),
@@ -20,6 +27,8 @@ let {
   class: className,
   onOpenChange,
   children,
+  ref = $bindable(null),
+  ...rest
 }: CollapsibleRootProps = $props();
 
 const initialOpen = open;
@@ -69,6 +78,8 @@ collapsibleContext.set(context);
 </script>
 
 <div
+  bind:this={ref}
+  {...rest}
   id={id ?? generatedId}
   class={className}
   data-state={currentOpen ? 'open' : 'closed'}

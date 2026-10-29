@@ -1,4 +1,9 @@
 export {
+  type BuiltinDeckBlocks,
+  loadBuiltinDeckBlocks,
+  loadedBuiltinDeckBlocks,
+} from './builtin-loader.ts';
+export {
   claimFirstRunHint,
   copyDeckText,
   createDeckChromeState,
@@ -31,6 +36,7 @@ export {
 export { deckCssVars } from './css-vars.ts';
 export { default as DeckPrint } from './DeckPrint.svelte';
 export { default as DeckStage } from './DeckStage.svelte';
+export { loadDefaultDeckRenderers, loadedDefaultDeckRenderers } from './defaults.ts';
 export {
   DECK_STAGE_EVENTS,
   type DeckStageEvent,
@@ -77,6 +83,8 @@ export { DeckPresenterPane } from './presenter/index.ts';
 export { createPresenterTimer, formatElapsed, type PresenterTimer } from './presenter.ts';
 export {
   type DeckBackgroundRendererProps,
+  type DeckBlockValidator,
+  type DeckBlockValidatorModule,
   type DeckItemRendererProps,
   type DeckLazyRenderer,
   type DeckRendererEntry,
@@ -86,7 +94,9 @@ export {
   type DeckSlideRendererProps,
   deckRendererList,
   deckValidationHooks,
+  deckValidatorsReady,
   isLazyRenderer,
+  loadDeckValidators,
   loadRenderer,
   readyRenderer,
   resolveBackgroundRenderer,

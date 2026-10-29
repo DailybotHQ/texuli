@@ -2,6 +2,7 @@ import { isRecord } from '../dialect.ts';
 import { SPEC_VERSION } from '../version.ts';
 import { migration020to030 } from './0.2.0-0.3.0.ts';
 import { migration030to040 } from './0.3.0-0.4.0.ts';
+import { migration040to050 } from './0.4.0-0.5.0.ts';
 import type { SpecMigration, SpecMigrationResult } from './types.ts';
 
 export type { SpecMigration, SpecMigrationResult };
@@ -13,6 +14,7 @@ export const UNDECLARED_SPEC_VERSION = '0.2.0';
 export const SPEC_MIGRATIONS: readonly SpecMigration[] = Object.freeze([
   migration020to030,
   migration030to040,
+  migration040to050,
 ]);
 
 /**

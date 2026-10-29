@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import { composeHandlers } from '../internal/handlers.ts';
 import { getCalendarContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLTableElement>, 'children'> & {
@@ -15,7 +16,7 @@ const partProps = $derived({
   role: 'grid' as const,
   'aria-label': rest['aria-label'] ?? calendar.monthLabel,
   'data-tx-calendar-grid': '',
-  onkeydown: calendar.keydown,
+  onkeydown: composeHandlers(rest.onkeydown, calendar.keydown),
 });
 </script>
 

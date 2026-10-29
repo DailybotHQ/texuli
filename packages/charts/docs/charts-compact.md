@@ -3,7 +3,10 @@
 **Package:** `@texuli/charts`  
 **Import:** `import { Sparkline, BulletChart, Gauge, ProgressRing } from '@texuli/charts/compact'`
 
-Small single-measure views for tables, cards and KPI rows.
+Small single-measure views for tables, cards and KPI rows. For a first
+screen that only needs the trend and its description, without the data
+table, import `Sparkline` from [`@texuli/charts/sparkline-lite`](charts-sparkline-lite.md)
+instead: same props, no table.
 
 ## Charts
 
@@ -26,6 +29,7 @@ Small single-measure views for tables, cards and KPI rows.
 | `period` | string | no | — | blueprint | Optional period text for the data table. |
 | `variant` | `'line'` \| `'area'` \| `'bar'` | no | `"line"` | blueprint | Line, area, or bar rendering. |
 | `format` | JSON format spec | no | — | blueprint | Declarative number or epoch-millisecond date format; the same output is used for visible and accessible text. |
+| `formatValue` | `(value: number) => string` | no | — | developer | Formats every visible and accessible value (units such as `%`); wins over `format`. A host callback, so blueprints never set it. |
 | `height` | number (> 0) | no | `32` | blueprint | View-box height in pixels. |
 | `showLast` | boolean | no | `true` | blueprint | Show the latest finite value beside the sparkline. |
 | `labels` | { tableSummary, measure, point, value, noData, current, minimum, maximum, target, range, complete, total, percent } | no | labels object | blueprint | Localized labels for the accessible data table and chart text. |
@@ -41,6 +45,7 @@ Small single-measure views for tables, cards and KPI rows.
 | `target` | number | no | — | blueprint | Optional target marker. |
 | `ranges` | number[] | no | `[]` | blueprint | Ordered qualitative range boundaries. |
 | `format` | JSON format spec | no | — | blueprint | Declarative number or epoch-millisecond date format; the same output is used for visible and accessible text. |
+| `formatValue` | `(value: number) => string` | no | — | developer | Formats every visible and accessible value (units such as `%`); wins over `format`. A host callback, so blueprints never set it. |
 | `labels` | { tableSummary, measure, point, value, noData, current, minimum, maximum, target, range, complete, total, percent } | no | labels object | blueprint | Localized labels for the accessible data table and chart text. |
 
 ### `Gauge` (`charts-gauge`)
@@ -55,6 +60,7 @@ Small single-measure views for tables, cards and KPI rows.
 | `thresholds` | number[] | no | `[]` | blueprint | Ordered band boundaries. |
 | `bandLabels` | string[] | no | `[]` | blueprint | Labels aligned with threshold bands. |
 | `format` | JSON format spec | no | — | blueprint | Declarative number or epoch-millisecond date format; the same output is used for visible and accessible text. |
+| `formatValue` | `(value: number) => string` | no | — | developer | Formats every visible and accessible value (units such as `%`); wins over `format`. A host callback, so blueprints never set it. |
 | `size` | number (> 0) | no | `144` | blueprint | Square rendered size in pixels. |
 | `thickness` | number (> 0) | no | `12` | blueprint | Gauge stroke thickness in pixels. |
 | `labels` | { tableSummary, measure, point, value, noData, current, minimum, maximum, target, range, complete, total, percent } | no | labels object | blueprint | Localized labels for the accessible data table and chart text. |
@@ -68,6 +74,7 @@ Small single-measure views for tables, cards and KPI rows.
 | `value` | number | yes | — | blueprint | Current finite value. |
 | `max` | number (> 0) | no | `100` | blueprint | Maximum progress value. |
 | `format` | JSON format spec | no | — | blueprint | Declarative number or epoch-millisecond date format; the same output is used for visible and accessible text. |
+| `formatValue` | `(value: number) => string` | no | — | developer | Formats every visible and accessible value (units such as `%`); wins over `format`. A host callback, so blueprints never set it. |
 | `size` | number (> 0) | no | `64` | blueprint | Square rendered size in pixels. |
 | `thickness` | number (> 0) | no | `7` | blueprint | Ring stroke thickness in pixels. |
 | `labels` | { tableSummary, measure, point, value, noData, current, minimum, maximum, target, range, complete, total, percent } | no | labels object | blueprint | Localized labels for the accessible data table and chart text. |

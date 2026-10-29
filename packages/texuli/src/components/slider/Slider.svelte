@@ -11,6 +11,8 @@ type Orientation = 'horizontal' | 'vertical';
 type Mark = { value: number; label?: string };
 
 type Props = {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   type?: 'single' | 'multiple';
   value?: number | number[];
   onValueChange?: (value: number | number[]) => void;
@@ -68,6 +70,7 @@ let {
   id,
   thumbLabel = 'Value',
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -156,7 +159,12 @@ const markByIndex = $derived.by(() => {
   {@render children?.()}
 {/snippet}
 
-<div class={cx('tx-slider-field')} data-tx-slider-field="" {...split.wrapper}>
+<div
+  bind:this={ref}
+  class={cx('tx-slider-field')}
+  data-tx-slider-field=""
+  {...split.wrapper}
+>
   {#if label || showValue}
     <div class="tx-slider-field__header">
       {#if label}

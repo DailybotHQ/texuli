@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { FocusRestoreEvent, FocusTarget } from '@texuli/core/focus-scope';
+import type { LayerStack } from '@texuli/core/layer-stack';
 import type { OverlayController, OverlayDismissEvent, OverlayMode } from '@texuli/core/overlay';
 import { type Snippet, setContext } from 'svelte';
 import type { DialogContext } from './context.ts';
@@ -9,6 +10,11 @@ interface Props {
   open?: boolean;
   mode?: OverlayMode;
   container?: Element | null;
+  /**
+   * The layer stack (`@texuli/core/layer-stack`) the content registers on.
+   * Default: the page-wide stack. Read when the content opens.
+   */
+  stack?: LayerStack;
   initialFocus?: FocusTarget | (() => FocusTarget | null);
   onOpenChange?: (open: boolean) => void;
   onDismissRequest?: (event: OverlayDismissEvent) => void;
@@ -20,6 +26,7 @@ let {
   open = $bindable(false),
   mode = 'top-layer',
   container = null,
+  stack,
   initialFocus,
   onOpenChange,
   onDismissRequest,
@@ -70,6 +77,9 @@ const context: DialogContext = {
   },
   get container() {
     return container;
+  },
+  get stack() {
+    return stack;
   },
   get triggerId() {
     return claimedIds.trigger || `${uid}-trigger`;

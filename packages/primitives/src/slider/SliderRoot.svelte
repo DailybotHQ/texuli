@@ -1,6 +1,7 @@
 <script lang="ts">
 import { untrack } from 'svelte';
 import { type Attachment, createAttachmentKey } from 'svelte/attachments';
+import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
 import { sliderContext } from './context.ts';
 import {
   clamp,
@@ -200,10 +201,10 @@ const partProps = $derived({
   'data-orientation': orientation,
   'data-disabled': disabled ? '' : undefined,
   dir,
-  onpointerdown,
-  onpointermove,
-  onpointerup: onpointerend,
-  onpointercancel: onpointerend,
+  onpointerdown: composeHandlers(rest.onpointerdown, onpointerdown),
+  onpointermove: composeHandlers(rest.onpointermove, onpointermove),
+  onpointerup: chainHandlers(rest.onpointerup, onpointerend),
+  onpointercancel: chainHandlers(rest.onpointercancel, onpointerend),
   [attachKey]: attach,
 });
 </script>

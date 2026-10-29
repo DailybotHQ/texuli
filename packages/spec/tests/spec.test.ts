@@ -484,7 +484,7 @@ describe('migrations', () => {
       expect(result, path).toMatchObject({
         from: '0.2.0',
         to: SPEC_VERSION,
-        applied: ['0.2.0->0.3.0', '0.3.0->0.4.0'],
+        applied: ['0.2.0->0.3.0', '0.3.0->0.4.0', '0.4.0->0.5.0'],
       });
       expect(result.blueprint, path).toEqual({ ...input, spec: SPEC_VERSION });
       expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);

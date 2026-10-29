@@ -6,6 +6,8 @@ import { type AspectRatioValue, aspectRatioClass } from './variants.ts';
 import './separator-aspect.css';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   /**
    * Named ratio class. Ignored when `custom` is set.
    * Default `16/9`.
@@ -20,7 +22,14 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   class?: ClassValue;
 };
 
-let { ratio = '16/9', custom, children, class: className, ...rest }: Props = $props();
+let {
+  ratio = '16/9',
+  custom,
+  children,
+  class: className,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 // Only a plain ratio (a number or `number / number`), so a caller cannot
 // inject other declarations into the style attribute — the same guard shape
@@ -44,6 +53,7 @@ const customStyle = $derived(isCustom ? `--tx-aspect-ratio: ${safeCustom}` : und
 </script>
 
 <div
+  bind:this={ref}
   class={classes}
   data-tx-aspect-ratio
   data-ratio={isCustom ? 'custom' : ratio}

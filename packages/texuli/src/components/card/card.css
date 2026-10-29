@@ -104,20 +104,22 @@
   }
 
   .tx-card-grid {
+    --tx-card-grid-gap: 1rem;
     display: grid;
+    gap: var(--tx-card-grid-gap);
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
   .tx-card-grid--gap-sm {
-    gap: 0.5rem;
+    --tx-card-grid-gap: 0.5rem;
   }
   .tx-card-grid--gap-md {
-    gap: 1rem;
+    --tx-card-grid-gap: 1rem;
   }
   .tx-card-grid--gap-lg {
-    gap: 1.5rem;
+    --tx-card-grid-gap: 1.5rem;
   }
 
   @media (forced-colors: active) {

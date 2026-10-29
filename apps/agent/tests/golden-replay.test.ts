@@ -45,6 +45,8 @@ describe('golden conversations through the service loop', () => {
         blocks: 'pass',
         grammar: 'pass',
         root: 'pass',
+        interaction: 'pass',
+        spec: 'skipped',
       },
       attempts: 1,
       model: 'replay/fake',

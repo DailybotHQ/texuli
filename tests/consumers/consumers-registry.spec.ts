@@ -1,7 +1,7 @@
 /// <reference types="node" />
 /**
  * Consumers matrix, registry mode (T-p10-consumers-matrix): the same six
- * consumer fixtures install the *published* `0.4.0` tarballs from
+ * consumer fixtures install the *published* `0.5.0` tarballs from
  * the npm registry — not local `file:` packs — and must build, typecheck
  * and render the same smoke surface. This failed before the 2026-10-25
  * publish: the registry had no such version to install.

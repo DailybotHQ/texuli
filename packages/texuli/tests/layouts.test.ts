@@ -587,6 +587,13 @@ describe('layouts-content', () => {
 
     it('creates stable readable ids and disambiguates duplicates', () => {
       expect(headingSlug('  Café & tea / notes  ')).toBe('cafe-tea-notes');
+      expect(headingSlug('Ångström Ñu')).toBe('angstrom-nu');
+      // The diacritic range stays an escape: literal combining marks hide in review.
+      const source = readFileSync(
+        join(import.meta.dirname, '../src/layouts/content/toc.ts'),
+        'utf8'
+      );
+      expect(source).not.toMatch(/[\u0300-\u036f]/);
       expect(
         buildToc([
           { text: 'Getting started', level: 2 },

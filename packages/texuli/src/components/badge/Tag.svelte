@@ -7,8 +7,15 @@ type Props = HTMLAttributes<HTMLSpanElement> & {
   /** Visible label (required word; never color alone). */
   label: string;
   variant?: BadgeVariant;
-  /** Accessible name for the remove control. */
-  removeLabel?: string;
+  /**
+   * Accessible name of the remove button, which always names the tag.
+   * A string is a template: `{label}` is replaced by the tag's label, and a
+   * string without it gets the label appended (`'Remove'` → "Remove Design")
+   * unless it already contains the label.
+   * A function receives the label and returns the whole name, for
+   * translations that place the label elsewhere. Default: "Remove {label}".
+   */
+  removeLabel?: string | ((label: string) => string);
   /** When set, shows a remove button that calls this (may return a promise). */
   onRemove?: () => unknown | Promise<unknown>;
   disabled?: boolean;
@@ -20,7 +27,7 @@ let {
   ref = $bindable(null),
   label,
   variant = 'secondary',
-  removeLabel = 'Remove',
+  removeLabel = 'Remove {label}',
   onRemove,
   disabled = false,
   class: className,
@@ -28,6 +35,16 @@ let {
 }: Props = $props();
 
 let pending = $state(false);
+
+const removeName = $derived(tagRemoveName(removeLabel, label));
+
+function tagRemoveName(template: string | ((label: string) => string), tag: string): string {
+  if (typeof template === 'function') return template(tag);
+  if (template.includes('{label}')) return template.replaceAll('{label}', tag);
+  // A name that already names the tag is used as is.
+  if (tag !== '' && template.includes(tag)) return template;
+  return `${template} ${tag}`.trim();
+}
 
 async function remove(): Promise<void> {
   if (!onRemove || disabled || pending) return;
@@ -51,7 +68,7 @@ async function remove(): Promise<void> {
     <button
       type="button"
       class="tx-tag__remove"
-      aria-label={`${removeLabel}: ${label}`}
+      aria-label={removeName}
       disabled={disabled || pending}
       aria-busy={pending ? 'true' : undefined}
       onclick={() => void remove()}

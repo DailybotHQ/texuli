@@ -40,6 +40,8 @@ type Props = Omit<HTMLFormAttributes, 'onsubmit' | 'children'> & {
   children?: Snippet;
   /** Form-level error slot (e.g. `_form` message). */
   formError?: Snippet<[string | undefined]>;
+  /** The rendered `<form>` element (bindable). */
+  ref?: HTMLElement | null;
 };
 
 let {
@@ -52,8 +54,16 @@ let {
   class: className,
   children,
   formError,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 let formEl = $state<HTMLFormElement | null>(null);
 let busy = $state(false);
@@ -116,6 +126,7 @@ function handleInput(event: Event & { currentTarget: EventTarget & HTMLFormEleme
   onsubmit={handleSubmit}
   {...rest}
   oninput={handleInput}
+  {@attach bindRef}
 >
   {#if formLevelError}
     {#if formError}

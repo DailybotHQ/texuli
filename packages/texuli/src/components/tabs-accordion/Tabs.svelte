@@ -1,7 +1,9 @@
 <script lang="ts">
 import { Tabs as TabsPrimitive } from '@texuli/primitives/tabs';
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import { Icon } from '../icons/index.ts';
 import type { TabItem } from './types.ts';
 import {
   type TabsOrientation,
@@ -12,7 +14,7 @@ import {
 } from './variants.ts';
 import './tabs-accordion.css';
 
-type Props = {
+type OwnProps = {
   items: readonly TabItem[];
   value?: string;
   onValueChange?: (value: string) => void;
@@ -29,7 +31,12 @@ type Props = {
   /** Renders the panel body for each item. */
   content?: Snippet<[TabItem]>;
   children?: Snippet;
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
 };
+
+/** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the root element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps>;
 
 let {
   items,
@@ -45,7 +52,16 @@ let {
   listClass,
   content,
   children,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
+
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 $effect.pre(() => {
   if (value === undefined || value === '') {
@@ -70,6 +86,7 @@ const triggerClass = $derived(tabsTriggerClass({ variant }));
 </script>
 
 <TabsPrimitive.Root
+  {...rest}
   bind:value
   {onValueChange}
   {orientation}
@@ -79,6 +96,7 @@ const triggerClass = $derived(tabsTriggerClass({ variant }));
   class={rootClass}
   data-tx-tabs=""
   data-variant={variant}
+  {@attach bindRef}
 >
   <div class="tx-tabs__scroller">
     <TabsPrimitive.List class={listClassName} aria-label={label} data-tx-tabs-list="">
@@ -89,6 +107,9 @@ const triggerClass = $derived(tabsTriggerClass({ variant }));
           class={triggerClass}
           data-tx-tabs-trigger=""
         >
+          {#if item.icon}
+            <Icon icon={item.icon} size="sm" class="tx-tabs__icon" data-tx-tabs-icon="" />
+          {/if}
           {item.label}
           {#if item.badge !== undefined}
             <span class="tx-tabs__badge" aria-hidden="true">{item.badge}</span>

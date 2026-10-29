@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CalendarDate as CalendarDateCalendar } from '../src/calendar/index.ts';
 import { type ComboboxItemData } from '../src/combobox/context.ts';
 import { createFoldedFilter, foldSearchText } from '../src/combobox/index.ts';
+import { DateField, TimeField } from '../src/date-field/index.ts';
 import ComboboxFormHarness from './ComboboxFormHarness.svelte';
 import ComboboxHarness from './ComboboxHarness.svelte';
 import CalendarFixture from './calendar-fixture.svelte';
@@ -14,6 +15,7 @@ import CheckboxHarness from './fixtures/CheckboxHarness.svelte';
 import ColorPickerFixture from './fixtures/ColorPickerFixture.svelte';
 import DateFieldHarness from './fixtures/DateFieldHarness.svelte';
 import DatePickerHarness from './fixtures/DatePickerHarness.svelte';
+import RangeGridHarness from './fixtures/RangeGridHarness.svelte';
 import SelectHarness from './fixtures/SelectHarness.svelte';
 import LabelChildHarness from './LabelChildHarness.svelte';
 import LabelFieldHarness from './LabelFieldHarness.svelte';
@@ -907,8 +909,104 @@ describe('date-field', () => {
       });
       expect(screen.getByLabelText('Selected time').textContent).toBe('06:05');
     });
+
+    it('reports complete typed text that is not a date or is out of bounds, once each', async () => {
+      const onInvalid = vi.fn();
+      render(DateField.Root, {
+        props: {
+          value: '2026-02-10',
+          locale: 'en-US',
+          label: 'Due',
+          min: '2026-01-01',
+          max: '2026-12-31',
+          onInvalid,
+        },
+      });
+      const day = screen.getByRole('spinbutton', { name: 'Day' });
+      const year = screen.getByRole('spinbutton', { name: 'Year' });
+      await fireEvent.input(day, { target: { value: '30' } });
+      await fireEvent.input(day, { target: { value: '30' } });
+      expect(onInvalid.mock.calls).toEqual([['2/30/2026', 'invalid']]);
+      expect(day.getAttribute('aria-invalid')).toBe('true');
+      await fireEvent.input(day, { target: { value: '28' } });
+      expect(day.getAttribute('aria-invalid')).toBeNull();
+      // A partial year is not complete text yet: no report while typing it.
+      await fireEvent.input(year, { target: { value: '202' } });
+      await fireEvent.input(year, { target: { value: '2027' } });
+      expect(onInvalid.mock.calls.at(-1)).toEqual(['2/28/2027', 'out-of-range']);
+      expect(onInvalid).toHaveBeenCalledTimes(2);
+    });
+
+    it('spins time segments with the arrow keys: minute steps wrap, hours cross AM/PM', async () => {
+      const onValueChange = vi.fn();
+      render(TimeField.Root, {
+        props: {
+          value: '11:50',
+          locale: 'en-US',
+          label: 'Start',
+          hourCycle: 12,
+          minuteStep: 15,
+          labels: { hour: 'Hora' },
+          onValueChange,
+        },
+      });
+      const hour = screen.getByRole('spinbutton', { name: 'Hora' });
+      const minute = screen.getByRole('spinbutton', { name: 'Minute' });
+      const period = screen.getByRole('combobox', { name: 'AM or PM' }) as HTMLSelectElement;
+      const steps: [HTMLElement, string, string][] = [
+        [minute, 'ArrowUp', '11:00'],
+        [minute, 'ArrowDown', '11:45'],
+        [minute, 'ArrowDown', '11:30'],
+        [hour, 'ArrowUp', '12:30'],
+        [hour, 'ArrowUp', '13:30'],
+        [hour, 'ArrowDown', '12:30'],
+        [hour, 'ArrowDown', '11:30'],
+        [minute, 'End', '11:45'],
+        [minute, 'Home', '11:00'],
+      ];
+      for (const [segment, key, expected] of steps) {
+        await fireEvent.keyDown(segment, { key });
+        expect(onValueChange.mock.calls.at(-1)?.[0], `${key} → ${expected}`).toBe(expected);
+      }
+      await fireEvent.keyDown(hour, { key: 'ArrowUp' });
+      expect(period.value).toBe('PM');
+      expect((hour as HTMLInputElement).value).toBe('12');
+    });
+
+    it('starts an empty 24-hour segment at its last value on ArrowDown', async () => {
+      const onValueChange = vi.fn();
+      render(TimeField.Root, {
+        props: { value: null, locale: 'en-GB', label: 'Start', hourCycle: 24, onValueChange },
+      });
+      await fireEvent.keyDown(screen.getByRole('spinbutton', { name: 'Hour' }), {
+        key: 'ArrowDown',
+      });
+      expect(onValueChange).not.toHaveBeenCalled();
+      await fireEvent.keyDown(screen.getByRole('spinbutton', { name: 'Minute' }), {
+        key: 'ArrowUp',
+      });
+      expect(onValueChange).toHaveBeenLastCalledWith('23:00');
+    });
   });
 });
+
+/**
+ * Makes reading the clock throw: `Date.now()` and `new Date()` with no
+ * arguments. Dates built from a value (date arithmetic, formatting) still work.
+ */
+function stubClock(): void {
+  const RealDate = Date;
+  class NoClock extends RealDate {
+    constructor(...args: unknown[]) {
+      if (args.length === 0) throw new Error('read the clock: new Date()');
+      super(...(args as [string]));
+    }
+    static override now(): number {
+      throw new Error('read the clock: Date.now()');
+    }
+  }
+  vi.stubGlobal('Date', NoClock);
+}
 
 describe('date-picker', () => {
   const state = () => JSON.parse(screen.getByTestId('state').textContent ?? '{}');
@@ -955,6 +1053,60 @@ describe('date-picker', () => {
       });
       await settle();
       expect(state().range).toEqual({ start: '2026-03-10', end: '2026-03-13' });
+    });
+  });
+
+  describe('today, week start and maxDays', () => {
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('marks the given today and week start without reading the clock', async () => {
+      stubClock();
+      render(DatePickerHarness, {
+        props: { value: null, today: '2026-03-18', weekStartsOn: 1 },
+      });
+      await fireEvent.click(screen.getByRole('button', { name: /^Choose date/ }));
+      await settle();
+      const dialog = screen.getByRole('dialog', { name: 'Choose date' });
+      const today = within(dialog).getByRole('button', { name: 'Wednesday, March 18, 2026' });
+      expect(today.getAttribute('aria-current')).toBe('date');
+      expect(today.getAttribute('tabindex')).toBe('0');
+      expect(within(dialog).getAllByRole('columnheader')[0]?.textContent).toBe('Mon');
+    });
+
+    it('refuses and announces a range longer than maxDays, keeping the end pending', async () => {
+      const onInvalid = vi.fn();
+      render(DatePickerHarness, { props: { today: '2026-03-15', maxDays: 7, onInvalid } });
+      await fireEvent.click(screen.getByRole('button', { name: 'Choose stay' }));
+      await settle();
+      const dialog = screen.getByRole('dialog', { name: 'Choose stay dates' });
+      const day = (name: string) => within(dialog).getByRole('button', { name });
+      await fireEvent.click(day('Monday, March 2, 2026'));
+      await fireEvent.click(day('Friday, March 20, 2026'));
+      await settle();
+      expect(onInvalid).toHaveBeenCalledWith('2026-03-02/2026-03-20', 'too-long');
+      expect(state().range).toEqual({ start: '2026-03-02', end: null });
+      expect(within(dialog).getByRole('status').textContent).toBe(
+        'Choose a range of 7 days or fewer.'
+      );
+      await fireEvent.click(day('Sunday, March 8, 2026'));
+      await settle();
+      expect(state().range).toEqual({ start: '2026-03-02', end: '2026-03-08' });
+    });
+
+    it('refuses a typed end that makes the range longer than maxDays', async () => {
+      const onInvalid = vi.fn();
+      render(DatePickerHarness, {
+        props: { range: { start: '2026-03-10', end: '2026-03-12' }, maxDays: 5, onInvalid },
+      });
+      const end = within(screen.getByRole('group', { name: 'Stay' })).getByRole('group', {
+        name: 'End date',
+      });
+      await fireEvent.input(within(end).getByRole('spinbutton', { name: 'Day' }), {
+        target: { value: '20' },
+      });
+      await settle();
+      expect(onInvalid).toHaveBeenCalledWith('2026-03-10/2026-03-20', 'too-long');
+      expect(state().range).toEqual({ start: '2026-03-10', end: '2026-03-12' });
     });
   });
 
@@ -1042,6 +1194,31 @@ describe('calendar', () => {
       ).toContain('15');
     });
 
+    it('composes a caller onkeydown on the range grid, and never reads the clock with today', async () => {
+      stubClock();
+      try {
+        const onkeydown = vi.fn();
+        const view = render(RangeGridHarness, { props: { onkeydown } });
+        const focused = () =>
+          view.container
+            .querySelector('[data-calendar-date][tabindex="0"]')
+            ?.getAttribute('data-calendar-date');
+        const grid = screen.getByRole('grid');
+        expect(
+          grid.querySelector('[aria-current="date"]')?.getAttribute('data-calendar-date')
+        ).toBe('2026-03-11');
+        await fireEvent.keyDown(grid, { key: 'ArrowRight' });
+        expect(onkeydown).toHaveBeenCalledOnce();
+        expect(focused()).toBe('2026-03-12');
+        onkeydown.mockImplementation((event: KeyboardEvent) => event.preventDefault());
+        await fireEvent.keyDown(grid, { key: 'ArrowRight' });
+        expect(onkeydown).toHaveBeenCalledTimes(2);
+        expect(focused()).toBe('2026-03-12');
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
+
     it('allows an explicit week start to override the locale', () => {
       render(CalendarFixture, { props: { weekStartsOn: 1 } });
       expect(within(grid()).getAllByRole('columnheader')[0]?.textContent).toBe('Mon');
@@ -1062,6 +1239,18 @@ describe('color-picker', () => {
       await fireEvent.input(input, { target: { value: 'url(https://bad.example)' } });
       expect(input.getAttribute('aria-invalid')).toBe('true');
       expect(input.dataset.state).toBe('invalid');
+    });
+
+    it("runs the caller's Area onkeydown once per key, before the part moves the color", async () => {
+      const onAreaKeydown = vi.fn();
+      const view = render(ColorPickerFixture, { props: { onAreaKeydown } });
+      const input = view.getByRole('textbox', { name: 'Color value' }) as HTMLInputElement;
+      const before = input.value;
+      await fireEvent.keyDown(view.getByRole('slider', { name: 'Color area' }), {
+        key: 'ArrowRight',
+      });
+      expect(onAreaKeydown).toHaveBeenCalledTimes(1);
+      expect(input.value).not.toBe(before);
     });
 
     it('disables pointer, keyboard, text and swatch changes when disabled', async () => {

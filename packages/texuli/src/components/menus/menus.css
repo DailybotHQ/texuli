@@ -141,6 +141,17 @@
     color: var(--tx-accent-foreground, var(--tx-foreground, CanvasText));
   }
 
+  /* Destructive: the danger color at rest, a danger tint when highlighted. */
+  .tx-menu-item--destructive {
+    color: var(--tx-destructive, crimson);
+  }
+
+  .tx-menu-item--destructive[data-highlighted],
+  .tx-menu-item--destructive:focus {
+    background: color-mix(in srgb, var(--tx-destructive, crimson) 12%, transparent);
+    color: var(--tx-destructive, crimson);
+  }
+
   .tx-menu-item--disabled,
   .tx-menu-item[data-disabled],
   .tx-menu-item[aria-disabled="true"] {

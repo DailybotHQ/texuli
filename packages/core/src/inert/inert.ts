@@ -33,8 +33,16 @@ const SKIPPED_TAGS = new Set([
   'TITLE',
 ]);
 
+// Realm-independent: an element from another window, or one whose timer runs
+// after the global Element binding is gone, is still an element.
 function isElement(value: unknown): value is Element {
-  return typeof Element !== 'undefined' && value instanceof Element;
+  if (typeof value !== 'object' || value === null) return false;
+  const node = value as Partial<Element>;
+  return (
+    node.nodeType === 1 &&
+    typeof node.setAttribute === 'function' &&
+    typeof node.contains === 'function'
+  );
 }
 
 /**

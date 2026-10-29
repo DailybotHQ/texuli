@@ -54,4 +54,9 @@ export interface TagsInputTagRemoveProps extends Part<HTMLButtonAttributes> {
   index: number;
 }
 
-export type TagsInputInputProps = Omit<Part<HTMLInputAttributes>, 'value'>;
+export type TagsInputInputProps = Omit<Part<HTMLInputAttributes>, 'value'> & {
+  /** The draft text (bindable). Cleared when the typed text becomes tags. */
+  value?: string;
+  /** Called with each draft change the input makes (typing, clearing). */
+  onValueChange?: (value: string) => void;
+};

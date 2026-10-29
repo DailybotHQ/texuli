@@ -66,14 +66,39 @@ Never `@texuli/core` root barrel for app code.
 | Content blocks | `@texuli/blocks/<family>` (lazy) or `@texuli/blocks/<family>/renderers` |
 | Decks (v2 engine) | `@texuli/deck/model` (`parseDeck`, `loadUntrustedDeck`, `DECK_LAYOUTS`), `@texuli/deck/markdown` (`parseDeckMarkdown`, `deckToMarkdown`), `@texuli/deck/authoring`, `@texuli/deck/templates`, `@texuli/deck/engine`, `@texuli/deck/math`; in development, on npm from `0.4.0`. See [`decks.md`](decks.md) |
 | Decks (stage and v1) | `@texuli/slides/stage` (`DeckStage`, `prepareDeck`), `@texuli/slides/export` (`DeckPrintView`, print plan, PDF seam, PPTX), `@texuli/slides/model`, `@texuli/slides/grammar`, `@texuli/slides/templates` (report, pitch, review; v1) |
-| Rich text editor | `@texuli/editor/editor` (`RichTextEditor`), `@texuli/editor/toolbar`, `@texuli/editor/controller`; in development, workspace only (not on npm) |
-| Astro sites | `@texuli/astro` (`texuli()` integration), `@texuli/astro/styles.css`, `@texuli/astro/site` (`defineSite`, `sitePageMeta`, `siteSitemap`), `@texuli/astro/layouts/ContentLayout` |
+| Rich text editor | `@texuli/editor/editor` (`RichTextEditor`), `@texuli/editor/toolbar`, `@texuli/editor/controller`, `@texuli/editor/markdown` (`markdownToDocument`, `documentToMarkdown`); in development, on npm from `0.5.0` |
+| Astro sites | `@texuli/astro` (`texuli()` integration), `@texuli/astro/styles.css`, `@texuli/astro/site` (`defineSite`, `sitePageMeta`, `siteSitemap`), `@texuli/astro/layouts/ContentLayout`, `@texuli/astro/appearance` (`AppearanceSwitcher`; new in `0.5.0`) |
 | Paint a validated blueprint | `@texuli/player` (+ `@texuli/player/styles.css`) |
 | Drag and drop (Svelte) | `@texuli/primitives/sortable` (`Sortable`); views: `@texuli/data/board`, `@texuli/data/tree-view` |
-| Drag engine (framework-free) | `@texuli/drag/sortable`, `@texuli/drag/gesture`, `@texuli/drag/spatial`, `@texuli/drag/graph`, `@texuli/drag/messages`; in development, on npm as `0.4.0` |
-| Workflows | `@texuli/workflows/editor`, `@texuli/workflows/viewer`, `@texuli/workflows/inspector`, `@texuli/workflows/model`, `@texuli/workflows/layout`, `@texuli/workflows/spec-adapter`; in development, on npm as `0.4.0` |
+| Drag engine (framework-free) | `@texuli/drag/sortable`, `@texuli/drag/gesture`, `@texuli/drag/spatial`, `@texuli/drag/graph`, `@texuli/drag/messages`; in development, on npm as `0.5.0` |
+| Workflows | `@texuli/workflows/editor`, `@texuli/workflows/viewer`, `@texuli/workflows/inspector`, `@texuli/workflows/model`, `@texuli/workflows/layout`, `@texuli/workflows/spec-adapter`; in development, on npm as `0.5.0` |
 | Dates | `@texuli/date` (`CalendarDate`, Gregorian only) |
 | Class helpers from those packages | `texuli/cx` only |
+
+## New in 0.5.0
+
+These APIs ship in `0.5.0`; `0.4.0` does not have them. Use them with
+`^0.5.0`, and keep code pinned to `^0.4.0` on the old API.
+
+| Need | Use |
+| --- | --- |
+| Stop a streaming reply | `Composer` (and `ChatThread`) `streaming` + `onStop`: the send button becomes Stop, Escape stops; `onkeydown` runs before the built-in keys (`preventDefault()` takes a key over); an `actions` snippet gets `{ canSend, busy, streaming, submit, stop }` |
+| Message actions and edit | `MessageList` / `ChatThread` `actions` snippet (`edit()`, `canEdit`) and `onEdit(message, body)`; return `false` to keep the editor open |
+| Page a client-side table | `DataGrid` (`@texuli/data/grid-core`) `pageSize` + `bind:page`, `rowClass(row)`, `filters`, `toolbar` and `bulkActions` (`{ selected, rows, clear }`) snippets |
+| Undo after a toast | `toast.info(msg, { action, onSettle(reason) })` from `texuli/toast`: `reason` is `timeout`, `action` or `dismiss`, called once; `pause()`, `resume()`, `announcement(id?)` on the store |
+| A time of day | `TimeField` from `texuli/date` (`bind:value` as `"HH:mm"`, `hourCycle`, `minuteStep`) |
+| Deterministic dates | `today="YYYY-MM-DD"` on `Calendar`, `DatePicker` and `DateRangePicker` (no clock reads), plus `weekStartsOn`, `maxDays` and `onInvalid` |
+| A trend in a KPI tile | `Sparkline` from `@texuli/charts/sparkline-lite`: the compact props, no data table, lighter first screen; use `@texuli/charts/compact` when readers need the values table |
+| Markdown in an editor | `markdownToDocument(source)` (untrusted tier by default, HTML stays text) and `documentToMarkdown(doc)` from `@texuli/editor/markdown` |
+| Nested filters, inbox, cohorts | `FilterBuilder` (`bind:value` or `onValueChange`) + `applyFilter` (`@texuli/data/filter-builder`), `NotificationInbox` (`@texuli/data/activity/inbox`), `CohortTable` (`@texuli/data/cohort`) |
+| A content page with its own TOC | `ContentLayout` from `texuli/layouts/content` (children, `toc` entries, `tocLevels`) |
+
+Behavior changes to expect in `0.5.0`: `Input` with `type="number"` or
+`range` binds a number or `null`; `type="file"` binds `files` as `null`
+until a pick; a caller `oninput` (or `onclick`, `onkeydown` on primitives)
+runs before the built-in handler instead of replacing it. Full list:
+[`../../upgrade/SKILL.md`](../../upgrade/SKILL.md) and `docs/RELEASE.md` in
+the Texuli repository ("0.5.0").
 
 ## CSS layers
 

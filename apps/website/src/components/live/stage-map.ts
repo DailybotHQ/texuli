@@ -190,6 +190,7 @@ export const STAGE_MAP: Readonly<Record<string, StageEntry>> = Object.freeze({
   switch: e('choice', 'texuli/choice', 'Switch', 'sm'),
   'text-counter': e('field', 'texuli/input', 'TextCounter', 'sm'),
   textarea: e('field', 'texuli/input', 'Textarea', 'md'),
+  'time-field': e('field', 'texuli/date', 'TimeField', 'sm'),
 
   // Layouts.
   'analytics-grid': e('layout', 'texuli/layouts/dashboard', 'AnalyticsGrid', 'lg', {

@@ -6,8 +6,9 @@ and unpublished.** This is the long-form companion to
 contracts that the editor tasks implement. The framework-free model exists
 as core texels: the document, selection, transforms, history, key intents
 and the Markdown codec ([core-editor](../packages/core/docs/core-editor.md)).
-The private `@texuli/editor` package holds the paste import, the DOM
-selection mapping and the Svelte 5 editing surface
+The `@texuli/editor` package (on npm from `0.5.0`, its first release)
+holds the paste import, Markdown in and out, the DOM selection mapping and
+the Svelte 5 editing surface
 ([packages/editor](../packages/editor/README.md)). The browser behavior
 scenario, CSP matrix row, perf limit and the blocks and catalog adapters are
 still planned. Each section says what is fixed, the option chosen, one
@@ -55,6 +56,7 @@ waiting for a new package. The table shows where things live now.
 | L0 `@texuli/core` | `editor-keymap` | Key chords and `beforeinput` input types to editing intents, platform-aware (`Mod` is Cmd on Apple platforms, Ctrl elsewhere) | Exists |
 | L0 `@texuli/core` | `editor-markdown` | The Markdown-subset codec | Exists |
 | L4 `@texuli/editor` | `paste` | Framework-free clipboard import (section 8) | Exists |
+| L4 `@texuli/editor` | `markdown` | `markdownToDocument` and `documentToMarkdown` over the core codec (section 9), outside the barrel | Exists |
 | L4 `@texuli/editor` | `controller` | The headless editor: history, commands, composition guard, announcements | Exists |
 | L4 `@texuli/editor` | `editor` | `RichTextEditor` and `EditorSurface`, plus the DOM selection mapping through `data-*` block markers (the planned core `editable-selection` texel lives here) | Exists |
 | L4 `@texuli/editor` | `toolbar`, `link-dialog` | The formatting toolbar and the link dialog (Svelte 5), built on primitives and texuli components | Exists |
@@ -443,7 +445,9 @@ behind `@texuli/editor/paste`. The allowlist mapping to the vocabulary stays.
 that blocks `text` fields and the catalog's rich text already parse.
 
 - **Markdown codec.** `@texuli/core/editor-markdown` exports `toMarkdown(doc)` and
-  `fromMarkdown(source, { trust })`. It is an owned codec of the same subset
+  `fromMarkdown(source, { trust })`; `@texuli/editor/markdown` wraps them as
+  `markdownToDocument` and `documentToMarkdown` (which checks every link
+  again at its `trust` before writing). It is an owned codec of the same subset
   as `@texuli/blocks/text/markdown`, with the same escapes, limits and
   literal-text rule for HTML.
 - **Edit agent output.** `fromMarkdown` loads the untrusted string into the

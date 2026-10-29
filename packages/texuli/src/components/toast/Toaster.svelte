@@ -1,13 +1,15 @@
 <script lang="ts">
 import { Toast } from '@texuli/primitives/toast';
 import { untrack } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import { chainHandlers } from '../../internal/handlers.ts';
 import { getToastStore, type ToastStore } from './toast-store.ts';
 import type { ToastItem, ToastKind } from './types.ts';
 import { type ToasterPosition, toasterClass, toastItemClass } from './variants.ts';
 import './toast.css';
 
-type Props = {
+type OwnProps = {
   /** Accessible name for the notification region. */
   label?: string;
   /**
@@ -25,6 +27,12 @@ type Props = {
   class?: ClassValue;
 };
 
+/**
+ * Extra attributes land on the wrapper element. Its pointer and focus
+ * handlers (which pause the timers) run after the caller's, never instead.
+ */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'>;
+
 let {
   label = 'Notifications',
   position = 'bottom-end',
@@ -32,9 +40,47 @@ let {
   store: storeProp,
   dismissLabel = 'Dismiss notification',
   class: className,
+  onpointerenter,
+  onpointerleave,
+  onfocusin,
+  onfocusout,
+  ...rest
 }: Props = $props();
 
+const uid = $props.id();
 const store = untrack(() => storeProp) ?? getToastStore();
+/** This Toaster's pause hold on the store (hover or focus in the region). */
+const holdKey = `toaster:${uid}`;
+let hovered = false;
+let focused = false;
+
+function syncHold(): void {
+  if (hovered || focused) store.pause(holdKey);
+  else store.resume(holdKey);
+}
+
+function pointerEnter(): void {
+  hovered = true;
+  syncHold();
+}
+
+function pointerLeave(): void {
+  hovered = false;
+  syncHold();
+}
+
+function focusIn(): void {
+  focused = true;
+  syncHold();
+}
+
+function focusOut(event: FocusEvent): void {
+  const node = event.currentTarget;
+  const next = event.relatedTarget;
+  if (node instanceof Node && next instanceof Node && node.contains(next)) return;
+  focused = false;
+  syncHold();
+}
 
 /** A rendered toast; `leaving` keeps a dismissed one mounted for its exit motion. */
 type Rendered = { item: ToastItem; leaving: boolean };
@@ -88,6 +134,7 @@ $effect(() => {
   const unsubscribe = store.subscribe((next) => untrack(() => sync(next)));
   return () => {
     unsubscribe();
+    store.resume(holdKey);
     for (const timer of leaveTimers.values()) clearTimeout(timer);
     leaveTimers.clear();
   };
@@ -106,29 +153,24 @@ const KIND_MARK: Record<ToastKind, string> = {
   warning: '!',
 };
 
-async function runAction(item: ToastItem): Promise<void> {
-  const action = item.action;
-  if (!action) return;
-  // The toast always dismisses after its action. A rejection is not swallowed:
-  // it is rethrown on a microtask so it reaches the host's error reporting
-  // (window "error") without leaving the toast stuck.
-  try {
-    await action.onClick();
-  } catch (error) {
-    queueMicrotask(() => {
-      throw error;
-    });
-  } finally {
-    store.dismiss(item.id);
-  }
+// The store runs the action: the toast always dismisses after it and settles
+// with 'action'. A rejection is rethrown on a microtask so it reaches the
+// host's error reporting (window "error") without leaving the toast stuck.
+function runAction(item: ToastItem): void {
+  void store.action(item.id);
 }
 </script>
 
 <Toast.Provider manager={store.manager} {label}>
   <div
+    {...rest}
     class={classes}
     data-tx-toaster=""
     style:--tx-toast-offset={offsetValue}
+    onpointerenter={chainHandlers(onpointerenter, pointerEnter)}
+    onpointerleave={chainHandlers(onpointerleave, pointerLeave)}
+    onfocusin={chainHandlers(onfocusin, focusIn)}
+    onfocusout={chainHandlers(onfocusout, focusOut)}
   >
     <Toast.Viewport class="tx-toaster__viewport" data-position={position}>
       {#if rendered.length > 0}
@@ -139,7 +181,8 @@ async function runAction(item: ToastItem): Promise<void> {
                 id: item.id,
                 title: item.title,
                 description: item.description ?? '',
-                duration: leaving ? 0 : item.duration,
+                // The store owns the timers (pause, resume, settle reasons).
+                duration: 0,
                 priority: item.priority,
                 tone: item.tone,
                 createdAt: item.createdAt,
@@ -164,7 +207,7 @@ async function runAction(item: ToastItem): Promise<void> {
                       // Keep the toast mounted while the action runs; the
                       // primitive would dismiss it before the promise settles.
                       event.preventDefault();
-                      void runAction(item);
+                      runAction(item);
                     }}
                   >
                     {item.action.label}

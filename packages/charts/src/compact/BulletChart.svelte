@@ -15,6 +15,8 @@ type Props = {
   target?: number;
   ranges?: readonly number[];
   format?: ChartFormatSpec;
+  /** Formats every visible and accessible value (units such as `%`); wins over `format`. */
+  formatValue?: (value: number) => string;
   labels?: Partial<CompactChartLabels>;
 };
 
@@ -26,6 +28,7 @@ let {
   target,
   ranges = [],
   format,
+  formatValue: customFormat,
   labels,
 }: Props = $props();
 
@@ -45,7 +48,8 @@ const segments = $derived(
     .map((start, index) => ({ start, end: [0, ...stops, upper][index + 1] as number }))
 );
 const text = $derived(chartLabels(labels));
-const formatValue = (value: number) => formatChartValue(value, format);
+const formatValue = (value: number) =>
+  customFormat ? customFormat(value) : formatChartValue(value, format);
 const description = $derived(
   customDescription ??
     `${formatValue(safeValue)} of ${formatValue(upper)}${safeTarget === null ? '' : `; ${text.target.toLowerCase()} ${formatValue(safeTarget)}`}.`

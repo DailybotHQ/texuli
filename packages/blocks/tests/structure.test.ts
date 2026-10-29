@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, render, screen } from '@testing-library/svelte';
+import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import { BLOCK_CONTENT_LIMITS, type FieldIssue, safeParseBlock } from '../src/core/index.ts';
 import { checkStructureBlock } from '../src/structure/check.ts';
@@ -9,6 +9,7 @@ import {
   STRUCTURE_BLOCK_TYPES,
 } from '../src/structure/family.ts';
 import StructureFamily from '../src/structure/StructureFamily.svelte';
+import Glyph from './fixtures/Glyph.svelte';
 
 afterEach(() => cleanup());
 
@@ -276,5 +277,77 @@ describe('structure family renderer', () => {
       const mod = await loadStructureFamily();
       expect(typeof mod.default).toBe('function');
     })();
+  });
+});
+
+describe('structure presentation fields', () => {
+  it('renders labeled and space dividers, card icons, and forwards resolvers to nested blocks', async () => {
+    const resolveIcon = (name: string) => (name === 'rocket' ? Glyph : undefined);
+    const cases: readonly {
+      block: Record<string, unknown>;
+      check: (root: HTMLElement) => void | Promise<void>;
+    }[] = [
+      {
+        block: { type: 'divider', label: 'Part two' },
+        check: (root) => {
+          const separator = screen.getByRole('separator', { name: 'Part two' });
+          expect(separator.textContent).toBe('Part two');
+          expect(root.querySelector('hr')).toBeNull();
+        },
+      },
+      {
+        block: { type: 'divider', variant: 'space' },
+        check: (root) => {
+          const space = root.querySelector<HTMLElement>('[data-tx-block="divider"]');
+          expect([space?.dataset.variant, space?.getAttribute('aria-hidden')]).toEqual([
+            'space',
+            'true',
+          ]);
+          expect(screen.queryByRole('separator')).toBeNull();
+        },
+      },
+      {
+        block: { type: 'divider' },
+        check: (root) => expect(root.querySelector('hr[data-tx-block="divider"]')).not.toBeNull(),
+      },
+      {
+        block: {
+          type: 'cards',
+          items: [
+            { title: 'Fast', icon: 'rocket' },
+            { title: 'Checked', icon: 'check' },
+            { title: 'Plain' },
+          ],
+        },
+        check: async (root) => {
+          const icons = [...root.querySelectorAll<HTMLElement>('.tx-structure-card-icon')];
+          expect(icons.map((icon) => icon.dataset.icon)).toEqual(['rocket', 'check']);
+          expect(root.querySelector('[data-glyph="rocket"]')).not.toBeNull();
+          expect(root.querySelector('[data-icon="check"] svg[data-tx-icon]')).not.toBeNull();
+        },
+      },
+      {
+        block: {
+          type: 'columns',
+          columns: [
+            [{ type: 'list', style: 'icon', items: [{ text: 'Nested', icon: 'rocket' }] }],
+            [{ type: 'divider', label: 'Nested rule' }],
+          ],
+        },
+        check: async (root) => {
+          await waitFor(() => expect(root.querySelector('[data-glyph="rocket"]')).not.toBeNull());
+          expect(screen.getByRole('separator', { name: 'Nested rule' })).toBeTruthy();
+        },
+      },
+    ];
+    for (const { block, check } of cases) {
+      const { container } = render(StructureFamily, { props: { block, resolveIcon } });
+      expect(
+        container.querySelector('[data-tx-block="invalid"]'),
+        JSON.stringify(block)
+      ).toBeNull();
+      await check(container);
+      cleanup();
+    }
   });
 });

@@ -2,10 +2,13 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   CalendarDate,
   createCalendar,
+  daysBetween,
   getWeeksInMonth,
+  localeWeekStart,
   parseDate,
   startOfWeek,
   today,
+  weekStartDay,
 } from '../src/index.ts';
 
 describe('Gregorian date arithmetic', () => {
@@ -32,6 +35,24 @@ describe('Gregorian date arithmetic', () => {
     expect(startOfWeek(date, 'en-US', 'mon').toString()).toBe('2024-02-12');
     expect(getWeeksInMonth(date, 'en-US')).toBe(5);
     expect(getWeeksInMonth(new CalendarDate(2026, 2, 15), 'en-US')).toBe(4);
+  });
+
+  it('reports the locale week start as 0–6 and maps weekStartsOn numbers to days', () => {
+    expect(localeWeekStart('en-US')).toBe(0);
+    expect(localeWeekStart('en-GB')).toBe(1);
+    expect(localeWeekStart('ar-EG')).toBe(6);
+    expect(localeWeekStart('not a locale!')).toBe(0);
+    expect(weekStartDay(1)).toBe('mon');
+    expect(weekStartDay(0)).toBe('sun');
+    for (const bad of [7, -1, 1.5, Number.NaN, undefined])
+      expect(weekStartDay(bad)).toBeUndefined();
+  });
+
+  it('counts whole days between dates across months, leap days and DST', () => {
+    expect(daysBetween(parseDate('2024-02-28'), parseDate('2024-03-01'))).toBe(2);
+    expect(daysBetween(parseDate('2026-03-01'), parseDate('2026-03-31'))).toBe(30);
+    expect(daysBetween(parseDate('2026-03-31'), parseDate('2026-03-01'))).toBe(-30);
+    expect(daysBetween(parseDate('2025-12-31'), parseDate('2026-01-01'))).toBe(1);
   });
 
   it('reads today in the requested time zone', () => {

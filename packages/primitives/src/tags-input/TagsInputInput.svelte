@@ -9,11 +9,15 @@ import type { TagsInputInputProps } from './types.ts';
 /**
  * The text input, the group's only Tab stop. Enter (or the delimiter key)
  * adds the typed text; Backspace on an empty input and ArrowLeft at its start
- * move to the last tag; pasted text is split into tags.
+ * move to the last tag; pasted text is split into tags. `value` is the draft
+ * (bindable); `onValueChange` reports every draft change the input makes
+ * (typing, and clearing after a tag is added).
  */
 let {
   child,
   ref = $bindable(null),
+  value: draft = $bindable(''),
+  onValueChange,
   onkeydown,
   onpaste,
   onblur,
@@ -22,10 +26,15 @@ let {
 }: TagsInputInputProps = $props();
 
 const tagsInput = tagsInputContext.get();
-let draft = $state('');
+
+function setDraft(next: string) {
+  if (next === draft) return;
+  draft = next;
+  onValueChange?.(next);
+}
 
 function take(text: string) {
-  if (tagsInput.add(text)) draft = '';
+  if (tagsInput.add(text)) setDraft('');
 }
 
 function handleKeydown(event: KeyboardEvent & { currentTarget: HTMLInputElement }) {
@@ -65,7 +74,7 @@ function handleBlur(event: FocusEvent) {
 
 function handleInput(event: Event & { currentTarget: HTMLInputElement }) {
   (oninput as ((e: Event) => void) | undefined)?.(event);
-  draft = event.currentTarget.value;
+  setDraft(event.currentTarget.value);
   tagsInput.clearInvalid();
 }
 

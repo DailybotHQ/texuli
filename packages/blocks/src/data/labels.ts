@@ -4,6 +4,8 @@ export interface DataBlockLabels {
   tableSummary: string;
   statGroup: string;
   kpiGroup: string;
+  /** Accessible name of an item's trend sparkline (template with `{label}`). */
+  trendName: string;
 }
 
 export type DataBlockLabelOverrides = Partial<DataBlockLabels>;
@@ -14,6 +16,7 @@ export const DEFAULT_DATA_BLOCK_LABELS: DataBlockLabels = {
   tableSummary: 'Data table',
   statGroup: 'Statistics',
   kpiGroup: 'Key performance indicators',
+  trendName: '{label} trend',
 };
 
 export function resolveDataBlockLabels(overrides?: DataBlockLabelOverrides): DataBlockLabels {

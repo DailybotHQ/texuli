@@ -51,9 +51,12 @@ Root attributes: `role="button"`, `aria-pressed`, `data-state="on"|"off"`,
 | `orientation` | `horizontal` \| `vertical` (roving keys) |
 | `rovingFocus` | Arrow-key focus (default true) |
 | `loop` | Wrap at ends (default true) |
+| `name` / `form` | Form field: one hidden `name=value` input per pressed item (none while disabled) |
 
 Single mode: activating the pressed item clears the selection. Multiple mode
-adds/removes values. Items mark `data-roving-item` for the attachment.
+adds/removes values. Items mark `data-roving-item` for the attachment. The
+Tab stop starts on the first pressed item in both modes (no pressed item: the
+first enabled one).
 
 ## Budget
 

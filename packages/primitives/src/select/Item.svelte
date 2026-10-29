@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
+import { composeHandlers } from '../internal/handlers.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { getSelectContext } from './context.ts';
 
@@ -10,7 +11,16 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   children?: import('svelte').Snippet;
 };
 
-let { value, label, disabled = false, children, class: className, ...rest }: Props = $props();
+let {
+  value,
+  label,
+  disabled = false,
+  children,
+  class: className,
+  onclick,
+  onpointermove,
+  ...rest
+}: Props = $props();
 
 const context = getSelectContext();
 const text = $derived(label ?? value);
@@ -53,8 +63,8 @@ const itemProps = $derived({
   'data-typeahead': text,
   ...stateAttributes(selected ? 'checked' : 'unchecked', inactive),
   class: className,
-  onclick: onClick,
-  onpointermove: onPointerMove,
+  onclick: composeHandlers(onclick, onClick),
+  onpointermove: composeHandlers(onpointermove, onPointerMove),
 });
 </script>
 

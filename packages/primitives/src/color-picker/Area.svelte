@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
+import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
 import { withArea } from './color.ts';
 import { getColorPickerContext } from './context.ts';
 
@@ -41,8 +42,8 @@ function end(): void {
 }
 
 function onkeydown(event: KeyboardEvent): void {
-  rest.onkeydown?.(event as KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement });
-  if (event.defaultPrevented || context.disabled) return;
+  // composeHandlers ran the caller's onkeydown first and skips this when it prevented the default.
+  if (context.disabled) return;
   const delta = event.shiftKey ? step * 10 : step;
   const { l, c } = context.color;
   const next =
@@ -75,12 +76,12 @@ const attrs = $derived({
   'aria-disabled': context.disabled ? true : undefined,
   tabindex: context.disabled ? undefined : 0,
   'data-state': dragging ? 'active' : 'inactive',
-  onpointerdown,
-  onpointermove,
-  onpointerup: end,
-  onpointercancel: end,
-  onlostpointercapture: end,
-  onkeydown,
+  onpointerdown: composeHandlers(rest.onpointerdown, onpointerdown),
+  onpointermove: composeHandlers(rest.onpointermove, onpointermove),
+  onpointerup: chainHandlers(rest.onpointerup, end),
+  onpointercancel: chainHandlers(rest.onpointercancel, end),
+  onlostpointercapture: chainHandlers(rest.onlostpointercapture, end),
+  onkeydown: composeHandlers(rest.onkeydown, onkeydown),
 });
 </script>
 

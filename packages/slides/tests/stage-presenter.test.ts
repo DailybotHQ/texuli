@@ -8,9 +8,10 @@ import {
   presenterChannelName,
 } from '@texuli/deck/engine';
 import { flushSync } from 'svelte';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { DeckStageContext, DeckStageSlideEntry } from '../src/stage/context.ts';
 import DeckStage from '../src/stage/DeckStage.svelte';
+import { loadDefaultDeckRenderers } from '../src/stage/defaults.ts';
 import { createDeckTranslator } from '../src/stage/messages.ts';
 import { prepareDeck } from '../src/stage/prepare.ts';
 import DeckPresenterWindow from '../src/stage/presenter/DeckPresenterWindow.svelte';
@@ -26,6 +27,9 @@ import {
 import { mirrorStageRoot } from '../src/stage/presenter/popup.ts';
 import { DECK_FALLBACK_PALETTES } from '../src/stage/style.ts';
 import { clearDeckHash, scenario } from './scenario.ts';
+
+// The default renderer tables load on first use; preload them, as a host that paints at once does.
+beforeAll(() => loadDefaultDeckRenderers());
 
 // ---------------------------------------------------------------------------
 // Fixtures

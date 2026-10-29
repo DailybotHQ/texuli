@@ -4,10 +4,12 @@ import { type ClassValue } from '../../internal/cx.ts';
 import { selectSeparatorClass } from './variants.ts';
 
 type Props = HTMLAttributes<HTMLDivElement> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   class?: ClassValue;
 };
 
-let { class: className, ...rest }: Props = $props();
+let { class: className, ref = $bindable(null), ...rest }: Props = $props();
 </script>
 
 <!--
@@ -15,6 +17,7 @@ let { class: className, ...rest }: Props = $props();
   hidden from assistive tech instead of being an <hr> (role separator).
 -->
 <div
+  bind:this={ref}
   class={selectSeparatorClass({ class: className })}
   data-tx-select-separator
   aria-hidden="true"

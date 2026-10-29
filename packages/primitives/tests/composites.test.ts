@@ -20,6 +20,7 @@ import CommandHarness from './CommandHarness.svelte';
 import ContextFixture from './context-fixture.svelte';
 import AvatarHarness from './fixtures/AvatarHarness.svelte';
 import CollapsibleHarness from './fixtures/CollapsibleHarness.svelte';
+import HandlerComposeHarness from './fixtures/HandlerComposeHarness.svelte';
 import RovingSelectedFixture from './fixtures/RovingSelectedFixture.svelte';
 import ScrollAreaFixture from './fixtures/ScrollAreaFixture.svelte';
 import ToggleGroupFixture from './fixtures/ToggleGroupFixture.svelte';
@@ -407,6 +408,17 @@ describe('toggle', () => {
 
       await fireEvent.click(center);
       expect(onValueChange).toHaveBeenLastCalledWith('');
+    });
+
+    it('submits a repeated pressed value once instead of throwing', () => {
+      const view = render(ToggleGroupFixture, {
+        props: { type: 'multiple', value: ['bold', 'italic', 'bold'], name: 'marks' },
+      });
+      const fields = [...view.container.querySelectorAll<HTMLInputElement>('input[type="hidden"]')];
+      expect(fields.map((field) => [field.name, field.value])).toEqual([
+        ['marks', 'bold'],
+        ['marks', 'italic'],
+      ]);
     });
   });
 });
@@ -835,6 +847,33 @@ describe('avatar', () => {
       expect(view.container.querySelector('[data-tx-avatar-fallback]')).toBeNull();
     });
 
+    it('filters srcset candidates through the URL policy at the trust tier and drops sizes when none survive', () => {
+      const image = (props: Record<string, unknown>) => {
+        const view = render(AvatarHarness, {
+          props: { src: 'https://cdn.example/a.webp', alt: 'Ada', ...props },
+        });
+        const img = view.container.querySelector('[data-tx-avatar-image]');
+        const attributes = [
+          img?.getAttribute('srcset') ?? null,
+          img?.getAttribute('sizes') ?? null,
+        ];
+        view.unmount();
+        return attributes;
+      };
+      const hostile = `${PNG} 1x, javascript:alert(1) 2x, http://cdn.example/b.webp 3x`;
+      // Untrusted: data:, javascript: and http: candidates are all refused.
+      expect(image({ srcset: hostile, sizes: '48px' })).toEqual([null, null]);
+      // Only the safe candidate survives; sizes stays with it.
+      expect(image({ srcset: `${hostile}, https://cdn.example/c.webp 4x`, sizes: '48px' })).toEqual(
+        ['https://cdn.example/c.webp 4x', '48px']
+      );
+      // Developer: http passes; javascript: never does, nor a URL holding a comma (the data image).
+      expect(image({ srcset: hostile, srcTrust: 'developer' })).toEqual([
+        'http://cdn.example/b.webp 3x',
+        null,
+      ]);
+    });
+
     it('shows fallback on error and for unsafe sources', async () => {
       const onLoadingStatusChange = vi.fn();
       const bad = render(AvatarHarness, {
@@ -870,5 +909,128 @@ describe('avatar', () => {
       });
       expect(fail.container.querySelector('[data-tx-avatar-fallback]')).toBeTruthy();
     });
+  });
+});
+
+describe('handler-compose', () => {
+  afterEach(() => cleanup());
+
+  // G26 audit: a consumer handler on a part never replaces the part's own
+  // handler, and a handler that used to be silently dropped now runs.
+  it('runs the consumer handler and keeps the part behavior on every audited part', async () => {
+    const cases: {
+      kind: Parameters<typeof HandlerComposeHarness>[1]['kind'];
+      act: () => Promise<unknown>;
+      log: string[];
+      state?: string;
+      check?: () => string;
+      expected?: RegExp;
+    }[] = [
+      {
+        kind: 'radio-item',
+        act: () => fireEvent.click(screen.getByRole('radio', { name: 'B' })),
+        log: ['click'],
+        state: 'b',
+      },
+      {
+        kind: 'toggle',
+        act: () => fireEvent.click(screen.getByRole('button', { name: 'Bold' })),
+        log: ['click'],
+        state: 'true',
+      },
+      {
+        kind: 'toggle-group-item',
+        act: () => fireEvent.click(screen.getByRole('button', { name: 'Left' })),
+        log: ['click'],
+        state: 'left',
+      },
+      {
+        kind: 'tabs-trigger',
+        act: () => fireEvent.click(screen.getByRole('tab', { name: 'B' })),
+        log: ['click'],
+        state: 'b',
+      },
+      {
+        kind: 'listbox',
+        act: async () => {
+          const box = screen.getByRole('listbox', { name: 'Colors' });
+          box.focus();
+          await fireEvent.keyDown(box, { key: 'ArrowDown' });
+          await fireEvent.keyDown(box, { key: 'Enter' });
+        },
+        log: ['keydown', 'keydown'],
+        state: 'amber',
+      },
+      {
+        kind: 'pin-input',
+        act: async () => {
+          const input = screen.getByRole('textbox', { name: 'Code' });
+          await fireEvent.focus(input);
+          await fireEvent.input(input, { target: { value: '12' } });
+        },
+        log: ['focus', 'input'],
+        state: '12',
+      },
+      {
+        kind: 'tags-input-tag',
+        act: () => fireEvent.focus(screen.getByText('design').closest('li') as HTMLElement),
+        log: ['focus'],
+      },
+      {
+        kind: 'calendar-grid',
+        act: async () => {
+          const grid = screen.getByRole('grid');
+          const cell = grid.querySelector<HTMLElement>('button[tabindex="0"]') ?? grid;
+          await fireEvent.keyDown(cell, { key: 'ArrowRight' });
+        },
+        log: ['keydown'],
+        // The grid's own keydown still moved the focused date.
+        check: () =>
+          screen
+            .getByRole('grid')
+            .querySelector('button[tabindex="0"]')
+            ?.getAttribute('aria-label') ?? '',
+        expected: /February 16, 2024/,
+      },
+    ];
+    for (const { kind, act, log, state, check, expected } of cases) {
+      const seen: string[] = [];
+      const view = render(HandlerComposeHarness, { props: { kind, log: seen } });
+      await act();
+      await tick();
+      expect(seen, kind).toEqual(log);
+      if (state !== undefined) expect(view.getByTestId('state').textContent, kind).toBe(state);
+      if (check && expected) expect(check(), kind).toMatch(expected);
+      view.unmount();
+    }
+  });
+
+  it('lets a consumer cancel the part behavior with preventDefault', async () => {
+    const seen: string[] = [];
+    const view = render(HandlerComposeHarness, {
+      props: { kind: 'radio-item', log: seen, prevent: true },
+    });
+    await fireEvent.click(view.getByRole('radio', { name: 'B' }));
+    expect(seen).toEqual(['click']);
+    expect(view.getByTestId('state').textContent).toBe('a');
+  });
+
+  it('gives CollapsibleRoot a bindable ref and spreads its rest attributes', async () => {
+    const box: { current: HTMLElement | null } = { current: null };
+    const view = render(HandlerComposeHarness, {
+      props: {
+        kind: 'collapsible',
+        get ref() {
+          return box.current;
+        },
+        set ref(value: HTMLElement | null) {
+          box.current = value;
+        },
+      },
+    });
+    await vi.waitFor(() => expect(box.current).toBeInstanceOf(HTMLElement));
+    expect(box.current?.getAttribute('data-probe')).toBe('probe');
+    expect(box.current?.getAttribute('aria-describedby')).toBe('note');
+    view.unmount();
   });
 });

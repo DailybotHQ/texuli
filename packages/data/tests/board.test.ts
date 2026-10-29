@@ -184,3 +184,41 @@ describe('@texuli/data/board', () => {
     }
   }, 20_000);
 });
+
+describe('Board column footers and heading levels (G14)', () => {
+  it('renders a footer per column and honors the heading level', async () => {
+    const { default: BoardFooterHarness } = await import('./fixtures/BoardFooterHarness.svelte');
+    const headings = (level: number) =>
+      screen.queryAllByRole('heading', { level }).map((heading) => heading.textContent?.trim());
+    for (const [headingLevel, lanes, expected] of [
+      // default: hidden board title h2, columns h3
+      [undefined, false, { title: 2, columns: 3, lanes: 0 }],
+      [4, true, { title: 3, columns: 4, lanes: 5 }],
+      // level 2: the board title is not a heading; lanes are capped below columns
+      [2, true, { title: 0, columns: 2, lanes: 3 }],
+      [6, true, { title: 5, columns: 6, lanes: 6 }],
+    ] as const) {
+      const { container } = render(BoardFooterHarness, {
+        props: { ...(headingLevel ? { headingLevel } : {}), lanes },
+      });
+      if (expected.title) expect(headings(expected.title)).toContain('Board');
+      else
+        expect(screen.queryAllByRole('heading').map((h) => h.textContent)).not.toContain('Board');
+      expect(headings(expected.columns)).toEqual(expect.arrayContaining(['To do', 'Done']));
+      if (expected.lanes) expect(headings(expected.lanes)).toEqual(expect.arrayContaining(['Web']));
+      // The board stays named by its title, heading or not.
+      const board = container.querySelector('section.tx-board') as HTMLElement;
+      expect(
+        document.getElementById(board.getAttribute('aria-labelledby') ?? '')?.textContent
+      ).toBe('Board');
+      // One footer per column, after its cells, receiving the column and its count.
+      const footers = [...container.querySelectorAll('.tx-board__column-footer')];
+      expect(footers.map((footer) => footer.textContent?.trim())).toEqual([
+        'Add to To do (2)',
+        'Add to Done (1)',
+      ]);
+      expect(footers[0]?.parentElement?.lastElementChild).toBe(footers[0]);
+      cleanup();
+    }
+  });
+});

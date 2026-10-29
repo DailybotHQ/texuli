@@ -10,4 +10,10 @@ export {
   parseMessageText,
 } from './rich-text.ts';
 export { applyChatStreamEvent, type ChatStreamEvent, MAX_STREAM_BODY } from './stream.ts';
-export type { ChatAuthor, ChatMessage, ChatMessageStatus, MessageGroup } from './types.ts';
+export type {
+  ChatAuthor,
+  ChatMessage,
+  ChatMessageActions,
+  ChatMessageStatus,
+  MessageGroup,
+} from './types.ts';

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   computeInertTargets,
   createInertRegistry,
@@ -418,6 +418,26 @@ describe('getInertRegistry', () => {
       resetInertRegistry(fake);
       expect(inertIds()).toEqual([]);
       expect(INERT_REGISTRY_GLOBAL_KEY in fake).toBe(false);
+    }
+  });
+});
+
+describe('element checks without a global Element', () => {
+  it('exempts a real element after the global Element binding is gone, and still refuses look-alikes', () => {
+    const element = document.createElement('div');
+    document.body.appendChild(element);
+    const registry = createInertRegistry();
+    vi.stubGlobal('Element', undefined);
+    try {
+      const exemption = registry.exempt({ element, label: 'late' });
+      expect(exemption).toBeDefined();
+      exemption.release();
+      expect(() =>
+        registry.exempt({ element: { nodeType: 1 } as unknown as Element, label: 'fake' })
+      ).toThrow(TypeError);
+    } finally {
+      vi.unstubAllGlobals();
+      element.remove();
     }
   });
 });

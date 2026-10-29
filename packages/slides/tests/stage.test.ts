@@ -5,10 +5,11 @@ import type { DeckController, DeckPlugin } from '@texuli/deck/engine';
 import { generateThemeFromSeed } from '@texuli/tokens/generator';
 import { createHighContrastPalette } from '@texuli/tokens/modes';
 import { flushSync } from 'svelte';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { parseDeckGrammar, toDeckGrammar } from '../src/grammar/index.ts';
 import { DECK_TRANSITIONS, parseDeck, resolveSlideTransition } from '../src/model/index.ts';
 import DeckStage from '../src/stage/DeckStage.svelte';
+import { loadDefaultDeckRenderers } from '../src/stage/defaults.ts';
 import FreeSlide from '../src/stage/FreeSlide.svelte';
 import { createPresenterTimer, formatElapsed } from '../src/stage/presenter.ts';
 import {
@@ -18,6 +19,9 @@ import {
   resolveDeckThemeMode,
 } from '../src/stage/theme.ts';
 import { clearDeckHash, scenario } from './scenario.ts';
+
+// The default renderer tables load on first use; preload them, as a host that paints at once does.
+beforeAll(() => loadDefaultDeckRenderers());
 
 // ---------------------------------------------------------------------------
 // Fixtures

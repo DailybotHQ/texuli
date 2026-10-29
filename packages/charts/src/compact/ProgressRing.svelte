@@ -14,6 +14,8 @@ type Props = {
   value: number;
   max?: number;
   format?: ChartFormatSpec;
+  /** Formats every visible and accessible value (units such as `%`); wins over `format`. */
+  formatValue?: (value: number) => string;
   size?: number;
   thickness?: number;
   labels?: Partial<CompactChartLabels>;
@@ -25,6 +27,7 @@ let {
   value,
   max = 100,
   format,
+  formatValue: customFormat,
   size = 64,
   thickness = 7,
   labels,
@@ -39,7 +42,8 @@ const ringWidth = $derived(
   Number.isFinite(thickness) ? Math.max(1, Math.min(diameter / 3, thickness)) : 7
 );
 const radius = $derived(diameter / 2 - ringWidth / 2);
-const formatValue = (value: number) => formatChartValue(value, format);
+const formatValue = (value: number) =>
+  customFormat ? customFormat(value) : formatChartValue(value, format);
 const description = $derived(
   customDescription ?? `${formatValue(current)} of ${formatValue(upper)}; ${percent}%.`
 );

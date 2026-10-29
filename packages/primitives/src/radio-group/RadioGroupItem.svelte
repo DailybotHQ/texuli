@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
+import { composeHandlers } from '../internal/handlers.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { radioGroupContext } from './context.ts';
 
@@ -12,7 +13,16 @@ type Props = Omit<HTMLButtonAttributes, 'value' | 'disabled' | 'children'> & {
   children?: Snippet<[{ checked: boolean }]>;
 };
 
-let { value, disabled = false, id, class: className, children, ...rest }: Props = $props();
+let {
+  value,
+  disabled = false,
+  id,
+  class: className,
+  children,
+  onclick,
+  onkeydown,
+  ...rest
+}: Props = $props();
 
 const group = radioGroupContext.get();
 
@@ -55,15 +65,9 @@ function onKeydown(event: KeyboardEvent): void {
   data-disabled={attrs['data-disabled']}
   disabled={itemDisabled || undefined}
   tabindex={checked ? 0 : -1}
-  onclick={(event) => {
-    if (event.defaultPrevented) return;
-    onSelect();
-  }}
-  onkeydown={(event) => {
-    if (event.defaultPrevented) return;
-    onKeydown(event);
-  }}
   {...rest}
+  onclick={composeHandlers(onclick, onSelect)}
+  onkeydown={composeHandlers(onkeydown, onKeydown)}
 >
   {#if children}
     {@render children({ checked })}

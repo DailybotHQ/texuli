@@ -6,6 +6,7 @@ import { performance } from 'node:perf_hooks';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/svelte';
 import { contrastRatio } from '@texuli/tokens';
 import { loadAllFullLibraryThemes } from '@texuli/tokens/library-expand';
+import { createRawSnippet } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   bashGrammar,
@@ -28,6 +29,7 @@ import {
   typescriptGrammar,
   yamlGrammar,
 } from '../src/code/engine.ts';
+import type { CodeBlockBarContext } from '../src/code/family.ts';
 import {
   activeHighlightIndex,
   CODE_BLOCK_TYPES,
@@ -1243,6 +1245,56 @@ describe('CodeBlockView reads the schema fields', () => {
       expect(view.container.querySelector('figcaption')).toBeNull();
       expect(view.container.querySelector('mark')).toBeNull();
       expect(view.container.querySelector('[data-highlight-step]')).toBeNull();
+    }
+  });
+});
+
+describe('CodeBlockView header and toolbar snippets', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('renders host header and toolbar snippets with the bar context, keeping the region name and copy', async () => {
+    const writeText = vi.fn(async () => {});
+    vi.stubGlobal('navigator', { clipboard: { writeText } });
+    const statusReaders: (() => string)[] = [];
+    const header = createRawSnippet((bar: () => CodeBlockBarContext) => ({
+      render: () => '<span class="host-header"></span>',
+      setup: (node: Element) => {
+        node.textContent = `${bar().lang} · ${bar().filename} · ${bar().name}`;
+      },
+    }));
+    const toolbar = createRawSnippet((bar: () => CodeBlockBarContext) => ({
+      render: () => '<button type="button" class="host-action">Run</button>',
+      setup: (node: Element) => {
+        node.addEventListener('click', () => void bar().copy());
+        statusReaders.push(() => bar().copyStatus);
+      },
+    }));
+    const block = { type: 'code', lang: 'ts', filename: 'demo.ts', code: 'export const a = 1;' };
+    const cases = [
+      { copyable: true, buttons: ['Run', 'Copy demo.ts code'] },
+      { copyable: false, buttons: ['Run'] },
+    ];
+    for (const { copyable, buttons } of cases) {
+      const view = render(CodeBlockView, { props: { block, header, toolbar, copyable } });
+      const bar = view.container.querySelector('.tx-code__bar');
+      expect(bar?.querySelector('.host-header')?.textContent).toBe('ts · demo.ts · demo.ts');
+      // The default name leaves the screen but still names the code region.
+      expect(bar?.querySelector('.tx-code__name')).toBeNull();
+      expect(view.getByRole('region', { name: 'demo.ts' })).toBeTruthy();
+      expect(
+        [...(bar?.querySelectorAll('button') ?? [])].map(
+          (button) => button.getAttribute('aria-label') ?? button.textContent
+        )
+      ).toEqual(buttons);
+      await fireEvent.click(view.getByRole('button', { name: 'Run' }));
+      expect(writeText).toHaveBeenLastCalledWith('export const a = 1;');
+      await waitFor(() => expect(statusReaders.at(-1)?.()).toBe('copied'));
+      expect(view.container.querySelector('[aria-live="polite"]')?.textContent).toBe(
+        'Code copied to the clipboard.'
+      );
+      cleanup();
     }
   });
 });

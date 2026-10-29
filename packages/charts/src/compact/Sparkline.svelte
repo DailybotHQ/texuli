@@ -18,6 +18,8 @@ type Props = {
   period?: string;
   variant?: 'line' | 'area' | 'bar';
   format?: ChartFormatSpec;
+  /** Formats every visible and accessible value (units such as `%`); wins over `format`. */
+  formatValue?: (value: number) => string;
   height?: number;
   showLast?: boolean;
   labels?: Partial<CompactChartLabels>;
@@ -30,6 +32,7 @@ let {
   period,
   variant = 'line',
   format,
+  formatValue: customFormat,
   height = 32,
   showLast = true,
   labels,
@@ -40,7 +43,8 @@ const safeHeight = $derived(Number.isFinite(height) ? Math.max(12, Math.min(120,
 const data = $derived(sparklineGeometry(values, variant, safeHeight, width));
 
 const text = $derived(chartLabels(labels));
-const formatValue = (value: number) => formatChartValue(value, format);
+const formatValue = (value: number) =>
+  customFormat ? customFormat(value) : formatChartValue(value, format);
 // Long series render a scroll window of table rows; every row stays reachable by scrolling.
 const ROW_HEIGHT = 32;
 const windowed = $derived(values.length > SPARKLINE_TABLE_WINDOW);

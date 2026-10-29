@@ -9,7 +9,7 @@
     container: tx-app-shell / inline-size;
     position: relative;
     display: flex;
-    min-block-size: var(--tx-app-height, var(--tx-app-height, 100dvh));
+    min-block-size: var(--tx-app-height, 100dvh);
     background-color: var(--tx-background, Canvas);
     color: var(--tx-foreground, CanvasText);
   }
@@ -44,7 +44,7 @@
     inset-block-start: 0;
     display: none;
     flex-shrink: 0;
-    block-size: var(--tx-app-height, var(--tx-app-height, 100dvh));
+    block-size: var(--tx-app-height, 100dvh);
   }
 
   .tx-app-shell__column {

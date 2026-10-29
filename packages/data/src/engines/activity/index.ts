@@ -6,6 +6,15 @@
  */
 export { type DayGroup, type DayGroupOptions, dayLabel, groupByDay, whenLabel } from './days.ts';
 export {
+  filterInbox,
+  type InboxFilter,
+  type InboxNotification,
+  markAllRead,
+  newArrivals,
+  setRead,
+  unreadCount,
+} from './inbox.ts';
+export {
   type ActivitySegment,
   decodeMentions,
   encodeMentions,

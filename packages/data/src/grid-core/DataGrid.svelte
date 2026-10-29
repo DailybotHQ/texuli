@@ -25,6 +25,7 @@ import {
   type CellPosition,
   cellText,
   clampCell,
+  type DataGridBulkContext,
   type DataGridColumn,
   gridRows,
   moveCell,
@@ -64,6 +65,22 @@ interface Props {
   editable?: boolean;
   /** Shown instead of rows when nothing matches. */
   empty?: Snippet;
+  /** Extra classes for a body row (status tints, emphasis). */
+  rowClass?: (row: T) => ClassValue | undefined;
+  /** Filter controls, rendered in the toolbar after the search field. */
+  filters?: Snippet;
+  /** Toolbar actions (export, create…), rendered at the toolbar's end. */
+  toolbar?: Snippet;
+  /**
+   * Shown while rows are selected: the selected ids (every page), their rows
+   * and `clear()`. Rendered in a group named by the `bulkActions` label.
+   */
+  bulkActions?: Snippet<[DataGridBulkContext<T>]>;
+  /** Client paging: rows per page (`0`, the default, shows every row). */
+  pageSize?: number;
+  /** The current page, from 1 (`bind:page`); kept in range as rows change. */
+  page?: number;
+  onPageChange?: (page: number) => void;
   loading?: boolean;
   /** Caps the height (a plain CSS length) so the body scrolls under a sticky header. */
   maxBlockSize?: string;
@@ -103,6 +120,13 @@ let {
   cell,
   editable = false,
   empty,
+  rowClass,
+  filters,
+  toolbar,
+  bulkActions,
+  pageSize = 0,
+  page = $bindable(1),
+  onPageChange,
   loading = false,
   maxBlockSize,
   density = 'default',
@@ -123,13 +147,21 @@ const instructionsId = `${uid}-instructions`;
 const visible = $derived(
   gridRows(rows, { columns, sort, search, filter, ...(locale ? { locale } : {}) })
 );
-const visibleIds = $derived(visible.map(getRowId));
+const pageCount = $derived(pageSize > 0 ? Math.max(1, Math.ceil(visible.length / pageSize)) : 1);
+const currentPage = $derived(Math.min(Math.max(1, page), pageCount));
+/** Index of the page's first row among the visible rows. */
+const offset = $derived(pageSize > 0 ? (currentPage - 1) * pageSize : 0);
+/** The rows the body shows: the visible rows, or one page of them. */
+const shown = $derived(pageSize > 0 ? visible.slice(offset, offset + pageSize) : visible);
+const allIds = $derived(visible.map(getRowId));
+/** Ids of the rows on screen: the header checkbox and Shift ranges act on these. */
+const visibleIds = $derived(shown.map(getRowId));
 const allState = $derived(selectionState(selected, visibleIds));
 const selectedSet = $derived(new Set(selected));
 /** Grid columns, the selection column included. */
 const colCount = $derived(columns.length + (selectable ? 1 : 0));
 /** Grid rows, the header row included (an empty grid keeps one body row for its message). */
-const rowCount = $derived(1 + Math.max(visible.length, 1));
+const rowCount = $derived(1 + Math.max(shown.length, 1));
 
 let active = $state<CellPosition>({ row: 0, col: 0 });
 let anchor: string | null = null;
@@ -139,13 +171,13 @@ const tableElement = () => root?.querySelector('table') ?? null;
 // Row windowing: the body renders the rows in view plus overscan, with spacer
 // rows standing in for the rest. The active row stays rendered wherever it
 // is, so focus and an open editor survive scrolling it out of view.
-const virtual = $derived(visible.length > virtualizeAbove);
+const virtual = $derived(shown.length > virtualizeAbove);
 let scrollTop = $state(0);
 let areaHeight = $state(0);
 type Slot = { index: number; gap?: undefined } | { index: number; gap: number };
 const slots = $derived.by((): Slot[] => {
-  const count = visible.length;
-  if (!virtual) return visible.map((_, index) => ({ index }));
+  const count = shown.length;
+  if (!virtual) return shown.map((_, index) => ({ index }));
   const first = Math.floor(scrollTop / rowSize);
   const start = Math.max(0, first - overscanRows);
   const end = Math.min(
@@ -175,6 +207,16 @@ function onScroll(event: Event): void {
   areaHeight = area.clientHeight;
 }
 
+// Keeps a bound page in range when filtering or search shrinks the rows.
+$effect(() => {
+  if (pageSize > 0 && page !== currentPage) setPage(currentPage);
+});
+
+function setPage(next: number): void {
+  page = next;
+  onPageChange?.(next);
+}
+
 $effect(() => {
   const next = clampCell(active, rowCount, colCount);
   if (next.row !== active.row || next.col !== active.col) active = next;
@@ -185,9 +227,15 @@ function setSort(next: GridSort): void {
   onSortChange?.(next);
 }
 
+/**
+ * Keeps the selection in row order across every page: the paging helpers
+ * order by the page they act on, which would put a later page's rows first.
+ */
 function setSelected(next: string[]): void {
-  selected = next;
-  onSelectionChange?.(next);
+  const wanted = new Set(next);
+  const ordered = [...allIds.filter((id) => wanted.delete(id)), ...wanted];
+  selected = ordered;
+  onSelectionChange?.(ordered);
 }
 
 function labelOf(row: T): string {
@@ -247,10 +295,12 @@ function handleKeydown(event: KeyboardEvent): void {
     void focusCell(next);
     return;
   }
-  const bodyRow = position.row > 0 ? visible[position.row - 1] : undefined;
+  const bodyRow = position.row > 0 ? shown[position.row - 1] : undefined;
   if (selectable && (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'a') {
     event.preventDefault();
-    setSelected(setVisibleSelected(selected, visibleIds, allState !== 'all'));
+    // Every visible row, across pages.
+    const every = selectionState(selected, allIds) !== 'all';
+    setSelected(setVisibleSelected(selected, allIds, every));
     return;
   }
   const onWidget = (event.target as Element).matches('[data-tx-grid-widget]');
@@ -279,6 +329,15 @@ function handleFocusIn(event: FocusEvent): void {
 }
 </script>
 
+{#snippet pageButton(target: number, label: string)}
+  <button
+    type="button"
+    class="tx-data-grid__page"
+    disabled={target < 1 || target > pageCount}
+    onclick={() => setPage(target)}>{label}</button
+  >
+{/snippet}
+
 <div
   bind:this={root}
   class={cx('tx-data-grid', className)}
@@ -286,16 +345,29 @@ function handleFocusIn(event: FocusEvent): void {
   data-virtual={virtual || undefined}
   onscrollcapture={onScroll}
 >
-  {#if searchable}
+  {#if searchable || filters || toolbar}
     <div class="tx-data-grid__toolbar">
-      <label class="tx-data-grid__search-label" for={searchId}>{text.search}</label>
-      <input
-        id={searchId}
-        class="tx-data-grid__search"
-        type="search"
-        autocomplete="off"
-        bind:value={search}
-      />
+      {#if searchable}
+        <label class="tx-data-grid__search-label" for={searchId}>{text.search}</label>
+        <input
+          id={searchId}
+          class="tx-data-grid__search"
+          type="search"
+          autocomplete="off"
+          bind:value={search}
+        />
+      {/if}
+      {@render filters?.()}
+      {#if toolbar}<div class="tx-data-grid__actions">{@render toolbar()}</div>{/if}
+    </div>
+  {/if}
+  {#if selectable && bulkActions && selected.length > 0}
+    <div class="tx-data-grid__bulk" role="group" aria-label={text.bulkActions}>
+      {@render bulkActions({
+        selected,
+        rows: rows.filter((row) => selectedSet.has(getRowId(row))),
+        clear: () => setSelected([]),
+      })}
     </div>
   {/if}
   <p id={instructionsId} class="tx-data-grid__sr-only">{text.instructions}</p>
@@ -376,25 +448,26 @@ function handleFocusIn(event: FocusEvent): void {
       </TableRow>
     </TableHeader>
     <TableBody>
-      {#if loading || visible.length === 0}
+      {#if loading || shown.length === 0}
         <TableEmpty colspan={colCount} role="gridcell" data-tx-grid-cell={`1:0`} tabindex={isActive(1, 0) ? 0 : -1}>
           {#if loading}{text.loading}{:else if empty}{@render empty()}{:else}{text.noResults}{/if}
         </TableEmpty>
       {:else}
-        {#each slots as slot (slot.gap === undefined ? getRowId(visible[slot.index] as T) : slot)}
+        {#each slots as slot (slot.gap === undefined ? getRowId(shown[slot.index] as T) : slot)}
           {#if slot.gap !== undefined}
             <tr class="tx-data-grid__spacer" aria-hidden="true">
               <td colspan={colCount} style:block-size="{slot.gap}px"></td>
             </tr>
           {:else}
-          {@const row = visible[slot.index] as T}
+          {@const row = shown[slot.index] as T}
           {@const rowIndex = slot.index}
           {@const id = getRowId(row)}
           {@const r = rowIndex + 1}
           {@const isSelected = selectedSet.has(id)}
           <TableRow
+            class={rowClass?.(row)}
             selected={isSelected}
-            aria-rowindex={r + 1}
+            aria-rowindex={offset + r + 1}
             aria-selected={selectable ? isSelected : undefined}
           >
             {#if selectable}
@@ -433,6 +506,13 @@ function handleFocusIn(event: FocusEvent): void {
       {/if}
     </TableBody>
   </Table>
+  {#if pageSize > 0 && pageCount > 1}
+    <nav class="tx-data-grid__pager" aria-label={text.pagination(caption)}>
+      {@render pageButton(currentPage - 1, text.previousPage)}
+      <span aria-live="polite">{text.pageOf(currentPage, pageCount)}</span>
+      {@render pageButton(currentPage + 1, text.nextPage)}
+    </nav>
+  {/if}
   <p class="tx-data-grid__status" role="status" aria-live="polite">
     {text.rowCount(visible.length, rows.length)}{selectable && selected.length > 0 ? ` · ${text.selectedCount(selected.length)}` : ''}
   </p>

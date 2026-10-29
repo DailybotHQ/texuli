@@ -48,6 +48,31 @@ Consumer classes compose through `cx` / `variants` and win by source order in
 - **Character count:** `aria-live="polite"` region; visually shown near the limit while focused.
 - **RTL:** padding and absolute count use logical properties (`inline-size`, `inset-inline-end`).
 
+## Values, handlers and refs
+
+- **Caller handlers compose (G26).** An `oninput` you pass never replaces the
+  internal one: the field updates `value` first (so `bind:value` keeps
+  working), then your handler runs and already sees the new value. The same
+  holds for `Textarea`, `InputGroup` (`inputProps.oninput`) and `TextCounter`.
+- **Numbers (G44).** With `type="number"` or `type="range"`, `bind:value`
+  binds a number, and `null` while the field is empty (`Input` takes
+  `value?: string | number | null`). `onValueChange` still receives the
+  field's text. The clear control resets a numeric field to `null`.
+- **Files (G38).** With `type="file"`, `bind:files` is `null` until the user
+  picks files (an empty pick is `null` too). Setting `files = null` resets the
+  input. A `null` is never written onto the element, so `input.value` stays
+  readable (axe in unit tests).
+- **TextCounter ref and attributes (G5).** `bind:ref` binds the wrapper root.
+  `aria-*`, `data-*` and handlers reach the input or textarea; layout hooks
+  (`style`, `hidden`…) stay on the wrapper, like every styled form control
+  ([control-props](control-props.md)).
+
+```svelte
+<Input type="number" aria-label="Seats" bind:value={seats} oninput={track} />
+<Input type="file" aria-label="Attachment" bind:files />
+<button type="button" onclick={() => (files = null)}>Remove file</button>
+```
+
 ## Examples
 
 Registry id `texuli-input` (`packages/examples/src/input/`): default, clearable,

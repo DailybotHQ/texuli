@@ -46,11 +46,14 @@ export function menuItemClass(input?: {
   class?: ClassValue;
   disabled?: boolean;
   inset?: boolean;
+  /** The danger tone for a destructive action. */
+  destructive?: boolean;
 }): string {
   return cx(
     'tx-menu-item',
     input?.disabled && 'tx-menu-item--disabled',
     input?.inset && 'tx-menu-item--inset',
+    input?.destructive && 'tx-menu-item--destructive',
     input?.class
   );
 }

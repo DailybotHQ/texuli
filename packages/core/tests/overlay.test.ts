@@ -268,6 +268,35 @@ describe('top-layer mode, modal', () => {
   });
 });
 
+describe('focus-exempt regions (R16)', () => {
+  it('keeps Tab order inside an exempt region under a trapping modal, then wraps back, on a passed layer stack', () => {
+    const dismiss = document.createElement('button');
+    dismiss.textContent = 'Dismiss';
+    page.toasts.append(dismiss);
+    const tab = (shiftKey = false) => key(document.activeElement as Element, 'Tab', { shiftKey });
+    withPopover(page.dialog);
+    inert.exempt({ element: page.toasts, label: 'toast-region' });
+    // `stack` is the injected layer stack; the engine registers there only.
+    const engine = overlay({ element: page.dialog, modal: true, cycleTabNavigation: true });
+    engine.open();
+    expect(stack.top()?.element).toBe(page.dialog);
+    expect(page.toasts.hasAttribute('inert')).toBe(false);
+
+    page.toastAction.focus();
+    expect(tab().defaultPrevented).toBe(false);
+    dismiss.focus();
+    expect(tab().defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(page.first);
+    page.toastAction.focus();
+    expect(tab(true).defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(page.last);
+    // A pointer in the region neither closes the modal nor counts as outside.
+    pointerDown(page.toastAction);
+    expect(engine.isOpen()).toBe(true);
+    engine.close();
+  });
+});
+
 describe('dismissal', () => {
   it('closes only the topmost layer on Escape and restores focus in order, and 3 related cases', async () => {
     // closes only the topmost layer on Escape and restores focus in order

@@ -32,17 +32,32 @@ let { block }: { block: unknown } = $props();
 - `block: unknown`: the untrusted block.
 - `labels?`: translations, merged over the English defaults. The keys are
   `invalid`, `codeBlock`, `taskDone`, `taskOpen` and `tones.<tone>`.
+- `resolveAvatar?(id)`: maps a quote's `avatar:av-…` id to an image URL. The
+  result passes `safeImageSrc` (developer tier) before it paints; without a
+  resolver an avatar id draws nothing.
+- `resolveIcon?(name)`: maps a list or callout icon name to an icon (a Svelte
+  SVG component such as a Lucide icon, or a Texuli built-in name). Without it,
+  or when it returns `undefined`, the Texuli built-in icon of that name draws
+  (`check`, `info`, `warning`, `plus`, …), and any other name draws nothing.
+  The type is `BlockIconResolver`.
 - `oninvalid?(issues)`: receives the schema issues when a block is rejected.
 
 ## What each block renders
 
 | Block | Markup |
 | --- | --- |
-| `heading` | `<hgroup>` with an optional eyebrow `<p>`, `h1`–`h4` from `level` (with the block `id` as the anchor id), and an optional subtitle `<p>` |
-| `text` | Markdown through `RichText` |
-| `list` | `<ul>` or `<ol>` (`ordered`); each item is inline Markdown |
-| `quote` | `<figure>` with a `<blockquote>`, and a `<figcaption><cite>` when `cite` is set |
-| `callout` | `<div role="note">` with a visible tone label (not color alone), an optional title and a Markdown body |
+| `heading` | `<hgroup>` with an optional eyebrow `<p>`, `h1`–`h4` from `level` (with the block `id` as the anchor id), and an optional subtitle `<p>`; `align: "center"` centers it (`start`, the default, follows the writing direction) |
+| `text` | Markdown through `RichText`; `size` is `sm`, `md` (default) or `lg`, and `align` is `start` or `center` |
+| `list` | `<ul>` or `<ol>`; each item is inline Markdown. `style` picks the markers: `bullet` (default), `number` (an `<ol>`, the same as `ordered: true`), `check` (each item a disabled checkbox named "Done" or "Not done" from its `done`) or `icon` (each item's `icon`, decorative). `done` is only valid in a `check` list, and an `icon` list needs an icon on every item; `ordered` may not contradict `style` |
+| `quote` | `<figure>` with a `<blockquote>`, and a `<figcaption>` with the decorative `avatar` image, `<cite>` from `cite` and the plain-text `role` after it, when any is set |
+| `callout` | `<div role="note">` with a decorative `icon`, a visible tone label (not color alone), an optional title and a Markdown body |
+
+Icon names (`list` items, `callout`, and `cards` items in the structure
+family) are lowercase kebab-case tokens of at most 48 characters, such as
+`circle-check`, matched by `BLOCK_ICON_NAME`. They are never URLs or markup.
+A quote `avatar` follows the media family's source policy: `avatar:av-001`…
+`av-175`, a small png, jpeg, webp or gif `data:` image, or a relative image
+path. Remote URLs are refused when the block is parsed.
 
 ## The Markdown subset
 
@@ -68,9 +83,19 @@ Its safety rules:
 - **Hostile nesting degrades to text.** Quotes and lists nest at most 4
   levels, inline emphasis and links 6. The parser reads at most 4,000
   characters, the same cap as the schema's markdown field. Unmatched markers
-  are literal. Pathological 4,000-character inputs (`*a `, `_a `, `**a `,
-  unclosed brackets, deep `>`) parsed in 0–50 ms on an Apple-silicon laptop
-  (2026-10-23), and the test bounds them at 1 s.
+  are literal.
+- **Linear time.** Heading, fence and rule lines are read by hand, and the
+  inline parser finds emphasis closers and bracket matches from one table
+  per source, and a link target `(<href> "title")` is read by index, so no
+  line, run of markers or whitespace run makes it backtrack. U+2028 and
+  U+2029 end a line like `\n`. Before this, `# a` + 2,000 spaces + `x` took
+  over 20 s; on 2026-10-28, with the host at load average 133, each of 14
+  hostile 4,000-character shapes (space runs in headings, fences and
+  U+2028-ended list lines, long hard-break runs, unclosed `*`, `_`, `**`,
+  `~~`, `[` and `![`) parsed in about 1 ms, and `text.test.ts` bounds each
+  at 100 ms. A link target of `[a](` + 3,990 spaces + `x` took about 250 ms
+  before it was read by index and about 1 ms after; `text.test.ts` bounds
+  three such targets at 20 ms.
 - **Relative headings.** The top Markdown heading level renders as
   `headingBase` (h3 by default) and deeper levels follow without gaps. Author
   text cannot outrank heading blocks or skip outline levels.

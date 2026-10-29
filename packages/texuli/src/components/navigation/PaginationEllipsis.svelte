@@ -1,16 +1,21 @@
 <script lang="ts">
 import { Pagination as Primitive } from '@texuli/primitives/pagination';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { paginationEllipsisClass } from './variants.ts';
 
-type Props = {
+/**
+ * The visual gap between page runs (hidden from assistive tech). Extra
+ * attributes and handlers land on the wrapper; the class on the mark.
+ */
+type Props = Omit<HTMLAttributes<HTMLSpanElement>, 'children' | 'class'> & {
   class?: ClassValue;
 };
 
-let { class: className }: Props = $props();
+let { class: className, ...rest }: Props = $props();
 </script>
 
-<span data-tx-pagination-ellipsis>
+<span {...rest} data-tx-pagination-ellipsis>
   <Primitive.Ellipsis
     class={paginationEllipsisClass({
       class: className,

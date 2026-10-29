@@ -6,13 +6,44 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import LayoutChrome from '../host/LayoutChrome.svelte';
 import { isNavPathActive } from '../host/nav-model.ts';
 import { isNestedInMain } from '../host/nested-main.ts';
-import { buildToc, type TocItem } from './toc.ts';
+import {
+  buildToc,
+  normalizeTocEntries,
+  resolveTocLevels,
+  type TocEntry,
+  type TocItem,
+  type TocLevel,
+  tocSelector,
+} from './toc.ts';
 import './content.css';
 
 type Kind = 'docs' | 'blog' | 'editorial';
 type Props = {
   kind: Kind;
-  mountScreen: (target: HTMLElement) => void;
+  /**
+   * Imperative mount (the layout-host contract): called once with the
+   * content element. Optional when the content comes as `children`.
+   */
+  mountScreen?: (target: HTMLElement) => void;
+  /** Declarative article content, rendered inside the content region. */
+  children?: import('svelte').Snippet;
+  /**
+   * Host-supplied table of contents. When set, the layout lists exactly these
+   * entries (blank and repeated ids dropped) and never scans, renames or marks
+   * a heading; each `id` names an element already on the page.
+   */
+  toc?: readonly TocEntry[];
+  /**
+   * Heading levels the scanned table of contents lists (default `[2, 3]`).
+   * Also read from `options.tocLevels` as a comma list (`"2,3,4"`).
+   */
+  tocLevels?: readonly TocLevel[];
+  /**
+   * Keep authored heading ids exactly as written: the layout never assigns or
+   * changes an id, and id-less or repeated-id headings stay out of the table
+   * of contents. Also read from `options.preserveHeadingIds`.
+   */
+  preserveHeadingIds?: boolean;
   nav?: import('../host/nav-model.ts').NavModel;
   path?: string;
   options?: import('../host/contract.ts').LayoutOptions;
@@ -21,9 +52,20 @@ type Props = {
   class?: ClassValue;
 };
 
-let { kind, mountScreen, nav, path, options, class: className }: Props = $props();
+let {
+  kind,
+  mountScreen,
+  children,
+  toc,
+  tocLevels,
+  preserveHeadingIds,
+  nav,
+  path,
+  options,
+  class: className,
+}: Props = $props();
 let screenTarget = $state<HTMLElement>();
-let tocItems = $state<TocItem[]>([]);
+let scannedItems = $state<TocItem[]>([]);
 let activeId = $state('');
 const instanceId = $props.id();
 let root = $state<HTMLElement | undefined>();
@@ -40,6 +82,10 @@ const eyebrow = $derived(textOption('eyebrow'));
 const author = $derived(textOption('author'));
 const date = $derived(textOption('date'));
 const readingTime = $derived(textOption('readingTime'));
+const levels = $derived(resolveTocLevels(tocLevels ?? options?.tocLevels));
+const keepIds = $derived(preserveHeadingIds ?? options?.preserveHeadingIds === true);
+const providedItems = $derived(toc ? normalizeTocEntries(toc) : undefined);
+const tocItems = $derived(providedItems ?? scannedItems);
 
 function textOption(key: string): string | undefined {
   const value = options?.[key];
@@ -52,29 +98,69 @@ function defaultTitle(layout: Kind): string {
   return 'Documentation';
 }
 
-function collectHeadings(container: HTMLElement): TocItem[] {
-  const elements = Array.from(container.querySelectorAll<HTMLElement>('h2, h3')).filter(
-    (heading) => !heading.closest('[data-toc-ignore]')
-  );
+function headingLevel(heading: HTMLElement): TocLevel {
+  const level = Number(heading.tagName.slice(1));
+  return level === 3 || level === 4 || level === 5 || level === 6 ? level : 2;
+}
+
+function collectHeadings(
+  container: HTMLElement,
+  selectorLevels: readonly TocLevel[],
+  keep: boolean
+): TocItem[] {
+  const elements = Array.from(
+    container.querySelectorAll<HTMLElement>(tocSelector(selectorLevels))
+  ).filter((heading) => !heading.closest('[data-toc-ignore]'));
   const headings = elements.map((heading) => ({
     ...(heading.id ? { id: heading.id } : {}),
     text: heading.textContent?.trim() ?? '',
-    level: heading.tagName === 'H3' ? (3 as const) : (2 as const),
+    level: headingLevel(heading),
   }));
-  const items = buildToc(headings);
-  for (const [index, item] of items.entries()) {
-    const element = elements[index];
-    if (element && element.id !== item.id) element.id = item.id;
-    element?.setAttribute('tabindex', '-1');
-    element?.setAttribute('data-tx-content-heading', '');
+  const items = buildToc(headings, { preserveIds: keep });
+  const listed = new Set<HTMLElement>();
+  if (keep) {
+    const byId = new Map(items.map((item) => [item.id, item]));
+    for (const element of elements) {
+      if (byId.has(element.id) && !listed.has(element)) {
+        byId.delete(element.id);
+        listed.add(element);
+      }
+    }
+  } else {
+    let index = 0;
+    for (const [elementIndex, heading] of headings.entries()) {
+      if (!heading.text.trim()) continue;
+      const element = elements[elementIndex];
+      const item = items[index];
+      index += 1;
+      if (!element || !item) continue;
+      if (element.id !== item.id) element.id = item.id;
+      listed.add(element);
+    }
+  }
+  for (const marked of container.querySelectorAll<HTMLElement>('[data-tx-content-heading]')) {
+    if (!listed.has(marked)) marked.removeAttribute('data-tx-content-heading');
+  }
+  for (const element of listed) {
+    if (!element.hasAttribute('tabindex')) element.setAttribute('tabindex', '-1');
+    element.setAttribute('data-tx-content-heading', '');
   }
   return items;
 }
 
+// Mount imperative content once per content element.
+$effect(() => {
+  const target = screenTarget;
+  if (!target || !mountScreen) return;
+  untrack(() => mountScreen(target));
+});
+
 $effect(() => {
   const target = screenTarget;
   if (!target) return;
-  mountScreen(target);
+  const selectorLevels = levels;
+  const keep = keepIds;
+  const entries = providedItems;
 
   const win = getOwnerWindow(target);
   const observerWindow = win as
@@ -87,20 +173,33 @@ $effect(() => {
   const IntersectionObserverCtor =
     observerWindow?.IntersectionObserver ?? globalThis.IntersectionObserver;
   let intersection: IntersectionObserver | undefined;
+  const observed = (): HTMLElement[] => {
+    if (!entries) {
+      return Array.from(target.querySelectorAll<HTMLElement>('[data-tx-content-heading]'));
+    }
+    const doc = target.ownerDocument;
+    return entries.flatMap((entry) => {
+      const element = doc.getElementById(entry.id);
+      return element ? [element] : [];
+    });
+  };
   const refresh = () => {
-    tocItems = collectHeadings(target);
+    let items: readonly TocItem[];
+    if (entries) items = entries;
+    else {
+      items = collectHeadings(target, selectorLevels, keep);
+      scannedItems = items as TocItem[];
+    }
     if (intersection) {
       intersection.disconnect();
-      for (const heading of target.querySelectorAll<HTMLElement>('[data-tx-content-heading]')) {
-        intersection.observe(heading);
-      }
+      for (const heading of observed()) intersection.observe(heading);
     }
-    if (!tocItems.some((item) => item.id === activeId)) activeId = tocItems[0]?.id ?? '';
+    if (!items.some((item) => item.id === activeId)) activeId = items[0]?.id ?? '';
   };
 
   if (typeof IntersectionObserverCtor === 'function') {
-    intersection = new IntersectionObserverCtor((entries) => {
-      const visible = entries
+    intersection = new IntersectionObserverCtor((observerEntries) => {
+      const visible = observerEntries
         .filter((entry) => entry.isIntersecting)
         .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
       const id = visible?.target.id;
@@ -191,7 +290,7 @@ function safeNavHref(href: string): string | undefined {
         class="tx-content-layout__main"
         role="region"
         tabindex="-1"
-      ></div>
+      >{@render children?.()}</div>
     </article>
 
     <aside class="tx-content-layout__toc" aria-label="On this page">

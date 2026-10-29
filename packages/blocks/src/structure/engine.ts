@@ -3,6 +3,7 @@
  */
 
 import type { Block, ColumnsBlock, CtaBlock, DividerBlock, FieldIssue } from '../core/index.ts';
+import type { BlockIconResolver } from '../icons/types.ts';
 import type { StructureBlockLabelOverrides } from './labels.ts';
 import type { AccordionBlock, CardsBlock, GridBlock, TabsBlock } from './schema.ts';
 
@@ -60,5 +61,9 @@ export function isStructureFamilyBlock(block: Block): block is StructureFamilyBl
 export interface StructureBlockViewProps {
   block: unknown;
   labels?: StructureBlockLabelOverrides;
+  /** Maps card icon names to icons (and reaches nested blocks); built-in Texuli icon names draw without it. */
+  resolveIcon?: BlockIconResolver;
+  /** Reaches nested quote blocks: maps an `avatar:av-…` id to an image URL. */
+  resolveAvatar?: (id: string) => string | undefined;
   oninvalid?: (issues: FieldIssue[]) => void;
 }

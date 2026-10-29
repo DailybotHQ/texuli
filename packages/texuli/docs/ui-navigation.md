@@ -73,8 +73,23 @@ Links use `safeHref` (default developer trust). Unsafe hrefs render without `hre
 | --- | --- |
 | `variant` | `outline` (default), `soft` |
 | `size` | `sm`, `md`, `lg` |
+| `stableCount` | `false`. When `true`, the control keeps the same number of tokens (pages and ellipses) on every page and sizes each page button for the widest page number, so nothing shifts under the pointer |
+| `siblings`, `boundaries` | `1`, `1`: pages beside the current one and at each end |
 
 Compose with `Pagination.Page` / `PreviousButton` / `NextButton` / `Ellipsis` when you need a custom list.
+
+- **Stable count.** `getStablePageTokens(page, pageCount, siblings?, boundaries?)`
+  returns exactly `stablePageSlots(siblings, boundaries)` tokens
+  (`2 × boundaries + 2 × siblings + 3`, 7 by default) once the page count
+  exceeds that: near either end the page run widens to fill the slot an
+  ellipsis would leave. Custom `children` of a `stableCount` root receive
+  these `pages`. The default list sets `--tx-pagination-digits` (the widest
+  number's digit count) and page buttons (`data-tx-pagination-page`) take
+  that width; set the variable yourself on a custom list. Page numbers use
+  tabular figures in every mode.
+- **`Pagination.Ellipsis`** forwards attributes and handlers (`id`,
+  `title`, `data-*`, `onclick`…) to its wrapper; `class` styles the mark.
+  The mark stays hidden from assistive tech.
 
 ## Rules
 

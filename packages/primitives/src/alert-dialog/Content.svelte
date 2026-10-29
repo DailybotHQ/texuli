@@ -40,6 +40,7 @@ function attach(node: HTMLDivElement): () => void {
       element: node,
       mode: context.mode,
       container: context.container,
+      ...(context.stack ? { stack: context.stack } : {}),
       modal: true,
       cycleTabNavigation: true,
       // Alert dialogs never close on outside pointer or focus loss.

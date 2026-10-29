@@ -23,7 +23,11 @@ export const DatePicker: {
   Calendar: DatePickerCalendar,
 };
 
-/** The same pattern for a range: start and end fields, and a range calendar. */
+/**
+ * The same pattern for a range: start and end fields, and a range calendar.
+ * `Grid` also works inside a plain `Calendar.Root` when `provideDateRange`
+ * supplies the range state (the styled Calendar's range mode does this).
+ */
 export const DateRangePicker: {
   Root: typeof DateRangePickerRoot;
   Field: typeof DateRangePickerField;
@@ -41,10 +45,16 @@ export const DateRangePicker: {
 };
 
 export {
+  type DateInvalidHandler,
+  type DateInvalidReason,
   type DatePickerLabels,
   DEFAULT_DATE_PICKER_LABELS,
   inRange,
   orderedRange,
+  provideRange as provideDateRange,
+  type RangeState as DateRangeState,
+  rangeDays,
+  rangeLimit,
   resolveDatePickerLabels,
   toCalendarDate,
 } from './shared.ts';

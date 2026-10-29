@@ -10,9 +10,9 @@ edits the graph without the canvas. It is part of
 MIT Svelte 5 component library by Dailybot, Inc.
 
 > **Status: in development (pre-1.0).** `@texuli/workflows` is on npm as
-> `0.4.0`, with provenance (first published as `0.3.0` on 2026-10-28). It
+> `0.5.0`, with provenance (first published as `0.3.0` on 2026-10-28). It
 > is the `workflow-graph` painter of `@texuli/player`, so an agent can send
-> a workflow as JSON; that painter ships in `@texuli/player` `0.4.0`
+> a workflow as JSON; that painter ships in `@texuli/player` from `0.4.0`
 > (`0.3.0` predates it; see
 > [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 

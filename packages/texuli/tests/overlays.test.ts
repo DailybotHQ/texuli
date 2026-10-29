@@ -351,6 +351,143 @@ describe('toast', () => {
     });
   });
 
+  describe('settle reasons, pause and announcements (G9, G45)', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('settles every toast exactly once with the reason it left', async () => {
+      const cases: {
+        reason: 'timeout' | 'dismiss' | 'action';
+        leave: (store: ReturnType<typeof createToastStore>, id: string) => Promise<void>;
+      }[] = [
+        {
+          reason: 'timeout',
+          leave: async () => {
+            vi.advanceTimersByTime(1000);
+          },
+        },
+        {
+          reason: 'dismiss',
+          leave: async (store, id) => {
+            store.dismiss(id);
+          },
+        },
+        {
+          reason: 'dismiss',
+          leave: async () => {
+            await fireEvent.click(screen.getByRole('button', { name: /Dismiss notification/ }));
+          },
+        },
+        {
+          reason: 'action',
+          leave: async () => {
+            await fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+            await vi.runAllTimersAsync();
+          },
+        },
+      ];
+      for (const { reason, leave } of cases) {
+        vi.useFakeTimers();
+        const store = createToastStore();
+        const onSettle = vi.fn();
+        const onClick = vi.fn();
+        const id = store.info('Archived', {
+          duration: 1000,
+          action: { label: 'Undo', onClick },
+          onSettle,
+        });
+        render(ToastHarness, { props: { store } });
+        await leave(store, id);
+        expect(store.items(), reason).toEqual([]);
+        // Later timers, dismissals and a second action never settle it again.
+        vi.advanceTimersByTime(5000);
+        store.dismiss(id);
+        store.dismiss();
+        await store.action(id);
+        expect(onSettle.mock.calls, reason).toEqual([[reason]]);
+        expect(onClick).toHaveBeenCalledTimes(reason === 'action' ? 1 : 0);
+        cleanup();
+        vi.useRealTimers();
+      }
+    });
+
+    it('settles a toast pushed out by the max cap as a dismissal', () => {
+      const store = createToastStore({ duration: 0, max: 1 });
+      const first = vi.fn();
+      store.info('First', { onSettle: first });
+      store.info('Second');
+      expect(first.mock.calls).toEqual([['dismiss']]);
+    });
+
+    it('pauses and resumes the timers from the host, keeping the remaining time', () => {
+      vi.useFakeTimers();
+      const store = createToastStore();
+      const onSettle = vi.fn();
+      store.success('Saved', { duration: 1000, onSettle });
+      vi.advanceTimersByTime(400);
+      store.pause();
+      expect(store.isPaused()).toBe(true);
+      vi.advanceTimersByTime(5000);
+      expect(store.items()).toHaveLength(1);
+      // Holds stack by key: the host hold alone keeps the timers paused.
+      store.pause('drawer');
+      store.resume('drawer');
+      vi.advanceTimersByTime(5000);
+      expect(store.items()).toHaveLength(1);
+      store.resume();
+      vi.advanceTimersByTime(599);
+      expect(store.items()).toHaveLength(1);
+      vi.advanceTimersByTime(1);
+      expect(store.items()).toHaveLength(0);
+      expect(onSettle.mock.calls).toEqual([['timeout']]);
+    });
+
+    it('pauses while the pointer or focus is in the region, running caller handlers too', async () => {
+      vi.useFakeTimers();
+      const store = createToastStore();
+      store.info('Synced', { duration: 1000 });
+      const onpointerenter = vi.fn();
+      const onfocusin = vi.fn();
+      const view = render(ToastHarness, { props: { store, onpointerenter, onfocusin } });
+      const wrapper = view.container.ownerDocument.querySelector(
+        '[data-probe="toaster"]'
+      ) as HTMLElement;
+      expect(wrapper.hasAttribute('data-tx-toaster')).toBe(true);
+      await fireEvent.pointerEnter(wrapper);
+      expect(onpointerenter).toHaveBeenCalledTimes(1);
+      expect(store.isPaused()).toBe(true);
+      vi.advanceTimersByTime(5000);
+      expect(store.items()).toHaveLength(1);
+      await fireEvent.focusIn(wrapper);
+      expect(onfocusin).toHaveBeenCalledTimes(1);
+      await fireEvent.pointerLeave(wrapper);
+      // Focus still holds the timers.
+      expect(store.isPaused()).toBe(true);
+      await fireEvent.focusOut(wrapper);
+      expect(store.isPaused()).toBe(false);
+      vi.advanceTimersByTime(1000);
+      expect(store.items()).toHaveLength(0);
+    });
+
+    it('exposes the announcement of each toast and of the newest one', () => {
+      let now = 0;
+      const store = createToastStore({ duration: 0, now: () => ++now });
+      const saved = store.success('Saved', { description: 'Draft 3 is live' });
+      store.error('Sync failed');
+      expect(store.announcement(saved)).toEqual({
+        message: 'Saved. Draft 3 is live',
+        politeness: 'polite',
+      });
+      expect(store.announcement()).toEqual({ message: 'Sync failed', politeness: 'assertive' });
+      expect(store.items().map((item) => item.announcement.politeness)).toEqual([
+        'assertive',
+        'polite',
+      ]);
+      expect(store.announcement('missing')).toBeUndefined();
+    });
+  });
+
   describe('Toaster viewport placement and motion', () => {
     it('keeps a dismissed toast mounted, inert, for its exit motion', async () => {
       const store = createToastStore({ duration: 0 });

@@ -52,6 +52,21 @@ Unknown fields are dropped. Markup in `code` is data: `<script>` renders as the 
 | `hostStep` | none | The host's current step (a deck fragment). Host step `block.step + i` shows highlight step `i`, clamped |
 | `step` | none | Picks the highlight step directly (clamped); wins over `hostStep`. With neither, the first step shows |
 | `copyable` | `true` | Shows the copy button |
+| `header` | none | A snippet that replaces the visible name at the start of the bar (a language badge, a filename with an icon). The name stays in the bar, visually hidden, as the code region's accessible name |
+| `toolbar` | none | A snippet of extra actions at the end of the bar, before the copy button |
+
+Both snippets receive a `CodeBlockBarContext`: `name` (the filename, the
+language in capitals, or the `code` label), `filename`, `lang`, `code`,
+`copy()` (copies with the built-in status and announcement, so a host copy
+button behaves like the default one) and `copyStatus` (`idle`, `copying`,
+`copied` or `failed`).
+
+```svelte
+<CodeBlockView {block} copyable={false}>
+  {#snippet header(bar)}<span class="badge">{bar.lang}</span> {bar.filename}{/snippet}
+  {#snippet toolbar(bar)}<button type="button" onclick={bar.copy}>Copy</button>{/snippet}
+</CodeBlockView>
+```
 
 Labels (`resolveCodeBlockLabels`): `invalid`, `code` (the name of a block with no filename or language), `copy`, `copied`, `copyFailed`, `copyName` (a template with `{name}`, by default `Copy {name} code`), `copiedAnnouncement` and `copyFailedAnnouncement`.
 
@@ -78,12 +93,12 @@ The renderer loads only the grammar of the block's language (`loadCodeGrammar`, 
 
 ## Verified
 
-- `pnpm vitest run packages/blocks/tests/code.test.ts`: 12 tests.
+- `pnpm vitest run packages/blocks/tests/code.test.ts`: 13 tests.
   - Golden tokens for all nine grammars, plus invariants, seeded round trips, linear time, the capture-group refusal and highlight steps.
   - The guard, accepting valid blocks and rejecting 12 hostile shapes.
   - Labels, token styles and the theme contrast sweep.
   - The grammar loader.
-  - The renderer: exact text, inert markup, unknown languages, region names, highlights and line numbers, copy success and failure, `copyable`, and the invalid notice.
+  - The renderer: exact text, inert markup, unknown languages, region names, highlights and line numbers, copy success and failure, `copyable`, the `header` and `toolbar` snippets, and the invalid notice.
   - Hygiene: no HTML sinks, and the engine imports nothing outside its folder.
 - In the browser, on Chromium, WebKit and the Pixel 7 in light and dark, the `blocks-code` and `blocks-code-hostile` examples pass axe (also with forced colors on Chromium and the Pixel 7). On the phone, the page does not overflow and long lines scroll inside the block.
 - Visual baselines: `blocks-code` and `blocks-code-hostile`, light and dark, Chromium and the Pixel 7.

@@ -54,7 +54,7 @@ unlocks its mutations.
 | Blocks (9) | `blocks-text`, `blocks-media`, `blocks-data`, `blocks-code`, `blocks-structure`, `blocks-interactive`, `blocks-map`, `blocks-embed`, `blocks-diagram` | Each family is its own lazy chunk. Interactive blocks (poll, quiz, calculator, counter, tabs, reveal) keep their state in memory. `blocks-embed` paints its safe start card only (the `embeds` capability is reserved, see [Capabilities](#capabilities)) |
 | Charts (23) | `charts-area`, `charts-bar`, `charts-cartesian`, `charts-combo`, `charts-line`, `charts-stacked-bar`, `charts-bullet`, `charts-gauge`, `charts-progress-ring`, `charts-sparkline`, `charts-funnel`, `charts-network`, `charts-sankey`, `charts-geo-map`, `charts-geo-point-map`, `charts-bubble`, `charts-heatmap`, `charts-scatter`, `charts-donut`, `charts-pie`, `charts-sunburst`, `charts-treemap`, `charts-canvas-renderer` | One chunk per chart family (cartesian, compact, flow, geo, matrix, part-whole, canvas) |
 | Media (3) | `media-image`, `media-composition-svg`, `media-composition-canvas` | |
-| Data views (7) | `data-board`, `data-tree-view`, `data-calendar`, `data-grid`, `data-files`, `data-map`, `data-timeline` | Board card moves need `reorder` |
+| Data views (10) | `data-board`, `data-tree-view`, `data-calendar`, `data-grid`, `data-files`, `data-map`, `data-timeline`, `data-cohort-table`, `data-notification-inbox`, `data-filter-builder` | Board card moves need `reorder` |
 | Chat (2) | `chat-thread`, `chat-message` | Display only; the composer is host chrome |
 | Workflows (1) | `workflow-graph` | View mode; `edit` needs `workflow-edit` |
 | Sortable (1) | `sortable-list` | Reordering needs `reorder` |
@@ -87,7 +87,7 @@ for:
 | `display` (17 ids: `alert`, `badge`, `callout`, `card`, `kpi`, `stat`, `table`, `timeline`, …) | Developer-tier styled components; slides paint the same content through the blocks families |
 | `overlays` (26 ids: `dialog`, `drawer`, `popover`, `tooltip`, `command-palette`, …) | Overlays and app navigation need a focus trap, a portal and an Escape lifecycle owned by the host app |
 | `layouts` (21 ids: `layout-dashboard-grid`, `layout-sidebar`, `layout-wizard`, …) | Application shells and route hosts own routing and page chrome, which a slide never does |
-| `forms` (28 ids: `button`, `input`, `select`, `checkbox`, …) | Developer-tier form primitives with callbacks; slides use the `control-*` and `form-*` components |
+| `forms` (29 ids: `button`, `input`, `select`, `checkbox`, …) | Developer-tier form primitives with callbacks; slides use the `control-*` and `form-*` components |
 
 An excluded id fails deck validation with `component-excluded`, whose
 message carries the reason and whose fix points to a slide layout, a master

@@ -185,13 +185,46 @@ export function isSameMonth(a: CalendarDate, b: CalendarDate): boolean {
   return a.year === b.year && a.month === b.month;
 }
 
-function firstDayOfWeek(locale: string): DayOfWeek {
+type WeekInfoLocale = Intl.Locale & {
+  getWeekInfo?: () => { firstDay: number };
+  weekInfo?: { firstDay: number };
+};
+
+/**
+ * The first day of the week for `locale` as a number, `0` (Sunday) to `6`
+ * (Saturday), from `Intl.Locale` week info; Sunday when the runtime has no
+ * week info. Pass it as a calendar's `weekStartsOn` default.
+ */
+export function localeWeekStart(locale: string): number {
   // TypeScript's Intl declarations still omit getWeekInfo in the configured lib.
-  const info = (
-    new Intl.Locale(locale) as Intl.Locale & { getWeekInfo(): { firstDay: number } }
-  ).getWeekInfo();
-  const firstDay = info.firstDay;
-  return WEEK_DAYS[firstDay % 7] ?? 'sun';
+  let firstDay: number | undefined;
+  try {
+    const intlLocale = new Intl.Locale(locale) as WeekInfoLocale;
+    firstDay = intlLocale.getWeekInfo?.().firstDay ?? intlLocale.weekInfo?.firstDay;
+  } catch {
+    firstDay = undefined;
+  }
+  // Week info numbers Monday 1 to Sunday 7.
+  return typeof firstDay === 'number' && Number.isInteger(firstDay) ? firstDay % 7 : 0;
+}
+
+/** A `weekStartsOn` number (`0` Sunday to `6` Saturday) as a `DayOfWeek`; `undefined` for anything else. */
+export function weekStartDay(weekStartsOn: number | undefined): DayOfWeek | undefined {
+  if (weekStartsOn === undefined || !Number.isInteger(weekStartsOn)) return undefined;
+  return WEEK_DAYS[weekStartsOn];
+}
+
+function firstDayOfWeek(locale: string): DayOfWeek {
+  return WEEK_DAYS[localeWeekStart(locale)] ?? 'sun';
+}
+
+/** Whole days from `start` to `end` (negative when `end` is earlier). */
+export function daysBetween(start: CalendarDate, end: CalendarDate): number {
+  return Math.round(
+    (utcDate(end.year, end.month, end.day).getTime() -
+      utcDate(start.year, start.month, start.day).getTime()) /
+      DAY_MS
+  );
 }
 
 export function startOfWeek(

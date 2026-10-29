@@ -38,6 +38,13 @@ object cannot hold (own `__proto__` keys, duplicate keys).
 3. `renderRichText` — link URLs through `safeHref('untrusted')`  
 4. `assertInertRoots` — no executable strings, no class/style  
 
+`looksExecutable(value)` flags script schemes (`javascript:`, `vbscript:`,
+`data: text/html`), `<script` and event-handler assignments (`onerror=`,
+`onclick =`, any `on…` word before `=`). It runs in time linear in the value:
+the draft sink scan calls it on every string, with no length cap
+(`packages/catalog/tests/render-hostile.test.ts` holds an 8,000-character `on`
+run under 20 ms).
+
 ## Usage
 
 ```ts

@@ -254,6 +254,8 @@
     background: var(--tx-surface, Canvas);
     color: inherit;
     font: inherit;
+    /* Page numbers never change width with their digits. */
+    font-variant-numeric: tabular-nums;
     line-height: 1;
     cursor: pointer;
   }
@@ -306,6 +308,27 @@
     color: var(--tx-muted-foreground, GrayText);
     letter-spacing: 0.08em;
     user-select: none;
+  }
+
+  /* Stable count: every page button reserves the widest number's width
+     (--tx-pagination-digits, set by PaginationRoot), so nothing shifts. */
+  .tx-pagination[data-stable-count] [data-tx-pagination-page],
+  .tx-pagination[data-stable-count] .tx-pagination__ellipsis {
+    inline-size: calc(var(--tx-pagination-digits, 1) * 1ch + 1.1rem + 2px);
+  }
+
+  /* An ellipsis takes a page button's slot, so swapping one for the other
+     never moves the controls after it. */
+  .tx-pagination[data-stable-count] .tx-pagination__ellipsis {
+    min-inline-size: 2.25rem;
+  }
+
+  .tx-pagination--sm[data-stable-count] .tx-pagination__ellipsis {
+    min-inline-size: 1.9rem;
+  }
+
+  .tx-pagination--lg[data-stable-count] .tx-pagination__ellipsis {
+    min-inline-size: 2.6rem;
   }
 
   /* Forced colors strip the tint backgrounds: keep current/selected state on

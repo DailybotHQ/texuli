@@ -13,7 +13,9 @@ The sheet family supplies token-styled overlays built on
 | `ResponsiveModal` | Centered modal on wide screens and bottom drawer on phones |
 
 Each namespace exposes the primitive `Root`, `Trigger`, `Portal`, `Title`,
-`Description`, and `Close` parts. Content accepts a `size` (`sm`, `md`, `lg`,
+`Description`, and `Close` parts, and the styled `Header`, `Body`, `Footer`
+and `CloseButton` parts (see "Parts" below). `Root` also takes `stack`, a
+`LayerStack` to register on instead of the page-wide one. Content accepts a `size` (`sm`, `md`, `lg`,
 or `xl`) and a consumer `class`. `Sheet.Content` defaults to logical `start`;
 `Drawer.Content` and `DetailPanel.Content` default to logical `end`. These
 follow the trigger direction across portals. Explicit `left` and `right` sides
@@ -63,6 +65,54 @@ insets, theme tokens, focus indicators, reduced-motion behavior and forced
 colors. The `texuli-sheet` example includes all size variants, logical sides,
 RTL, a drawer with snap points, a non-modal detail panel and the responsive
 modal.
+
+## Parts: header, body, footer and close
+
+Every surface (`Sheet`, `Drawer`, `DetailPanel`, `ResponsiveModal`) takes the
+same styled parts. They read plain `--tx-*` tokens, so they look the same on
+every surface:
+
+| Part | Renders |
+| --- | --- |
+| `Header` | `title` (the primitive `Title`: it names the sheet), `description` (`Description`), extra `children`, and a `CloseButton` unless `hideClose`. `closeLabel` names it (default `Close`). Omit `title` to render your own `Title` in `children` |
+| `Body` | The region that scrolls between the header and the footer |
+| `Footer` | The actions row; it stays visible while the body scrolls and pads for the bottom safe area |
+| `CloseButton` | An icon close control; `label` is its accessible name (default `Close`) |
+
+With a `Body` part the surface drops its own padding and scrolling, so the
+header and footer stay put. Class builders: `sheetHeaderClass`,
+`sheetBodyClass`, `sheetFooterClass`, `sheetTitleClass`,
+`sheetDescriptionClass`, `sheetCloseClass` (use the title and description
+classes on your own `Title` and `Description`).
+
+```svelte
+<Drawer.Root bind:open>
+  <Drawer.Portal>
+    <Drawer.Overlay />
+    <Drawer.Content>
+      <Drawer.Header title="Cart" description="Two items." closeLabel="Close cart" />
+      <Drawer.Body>…</Drawer.Body>
+      <Drawer.Footer><Drawer.Close>Check out</Drawer.Close></Drawer.Footer>
+    </Drawer.Content>
+  </Drawer.Portal>
+</Drawer.Root>
+```
+
+## ResponsiveModal: `force` and host sizing
+
+`ResponsiveModal.Content` is a centered dialog when there is room and a
+bottom drawer when there is not (`data-side` is `center` or `bottom`,
+`data-presentation` is `dialog` or `sheet`).
+
+| Prop | Default | Role |
+| --- | --- | --- |
+| `query` | `(max-width: 40rem)` | Viewport media query that picks the sheet |
+| `force` | `auto` | `dialog` or `sheet` always shows that presentation and ignores the width |
+| `host` | none | Size by this element's inline size instead of the viewport (a preview frame, a split pane), observed with a `ResizeObserver`; `query` is then ignored |
+| `breakpoint` | `640` | With `host`: the inline size in px at or below which the sheet shows |
+
+The server render and the first client frame show the dialog; the width is
+read after mount, so the markup is SSR-safe.
 
 ## Non-modal dismissal (FIX-sheet-dismiss-outside)
 

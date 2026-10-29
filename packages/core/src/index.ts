@@ -253,6 +253,7 @@ export {
   isTabbable,
 } from './tabbable/index.ts';
 export { type HrefTrust, safeHref } from './url/safe-href.ts';
+export { filterImageSrcset } from './url-policy/filter-image-srcset.ts';
 export { safeImageSrc } from './url-policy/safe-image-src.ts';
 export { safeImageSrcset } from './url-policy/safe-image-srcset.ts';
 export { type SafeMediaSrcOptions, safeMediaSrc } from './url-policy/safe-media-src.ts';

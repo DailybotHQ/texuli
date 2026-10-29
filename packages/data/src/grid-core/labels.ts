@@ -16,6 +16,14 @@ export interface DataGridLabels {
   selectedCount: (count: number) => string;
   /** How to use the grid from the keyboard (a hidden description). */
   instructions: string;
+  /** Names the group around the `bulkActions` snippet. */
+  bulkActions: string;
+  /** Names the pager landmark (client paging) from the grid's caption. */
+  pagination: (caption: string) => string;
+  previousPage: string;
+  nextPage: string;
+  /** The pager's position (a polite live region). */
+  pageOf: (page: number, pageCount: number) => string;
 }
 
 export const DEFAULT_DATA_GRID_LABELS: Readonly<DataGridLabels> = /* @__PURE__ */ Object.freeze({
@@ -30,6 +38,11 @@ export const DEFAULT_DATA_GRID_LABELS: Readonly<DataGridLabels> = /* @__PURE__ *
   selectedCount: (count: number) => `${count} selected`,
   instructions:
     'Arrow keys move between cells. Enter or Space on a column header sorts it; Shift adds a sort. Space selects a row; Control or Command plus A selects every row.',
+  bulkActions: 'Selected rows',
+  pagination: (caption: string) => `${caption} pages`,
+  previousPage: 'Previous page',
+  nextPage: 'Next page',
+  pageOf: (page: number, pageCount: number) => `Page ${page} of ${pageCount}`,
 });
 
 /** Merges overrides over the English defaults; values of the wrong type are ignored. */

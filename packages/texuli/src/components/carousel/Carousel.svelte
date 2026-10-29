@@ -4,6 +4,7 @@ import { getOwnerDocument, getOwnerWindow, listen, matchesMedia } from '@texuli/
 import { getNavigationIntent } from '@texuli/core/keyboard';
 import { createRovingFocus } from '@texuli/core/roving';
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import './carousel.css';
 import { type ClassValue } from '../../internal/cx.ts';
 import {
@@ -19,7 +20,7 @@ import {
 } from './carousel.ts';
 import type { CarouselItem } from './types.ts';
 
-interface Props {
+type OwnProps = {
   /** Slides in display order; each `id` is unique. */
   items: CarouselItem[];
   /** 0-based index of the active slide (`bind:index`). */
@@ -52,7 +53,28 @@ interface Props {
   onIndexChange?: (index: number) => void;
   /** Fires when rotation starts or stops. */
   onPlayingChange?: (playing: boolean) => void;
-}
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
+};
+
+/**
+ * Extra attributes (`data-*`, `aria-*`, `id`…) land on the root element. The
+ * handlers the carousel binds on its root are not props, so a caller handler
+ * can never replace them.
+ */
+type Props = OwnProps &
+  Omit<
+    HTMLAttributes<HTMLElement>,
+    | keyof OwnProps
+    | 'children'
+    | 'onkeydown'
+    | 'onfocusin'
+    | 'onpointerdowncapture'
+    | 'onpointerupcapture'
+    | 'onpointercancelcapture'
+    | 'onpointerenter'
+    | 'onpointerleave'
+  >;
 
 let {
   items,
@@ -70,7 +92,16 @@ let {
   class: className,
   onIndexChange,
   onPlayingChange,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
+
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 
 const uid = $props.id();
 const t = $derived(resolveCarouselMessages(messages));
@@ -242,6 +273,8 @@ const status = $derived(formatMessage(t.status, { index: active + 1, total: coun
 <!-- The region takes focus only when it renders no controls, so arrows still reach it. -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_no_noninteractive_tabindex -->
 <section
+  {...rest}
+  {@attach bindRef}
   bind:this={root}
   class={rootClass}
   aria-roledescription="carousel"

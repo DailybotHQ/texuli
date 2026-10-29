@@ -113,6 +113,9 @@ export const SLIDE_COMPONENTS: Readonly<Record<string, SlideComponentInfo>> = Ob
   'data-files': info('data'),
   'data-map': info('data'),
   'data-timeline': info('data'),
+  'data-cohort-table': info('data'),
+  'data-notification-inbox': info('data'),
+  'data-filter-builder': info('data'),
   // Chat (display only) and workflows (view; edit needs `workflow-edit`).
   'chat-thread': info('chat'),
   'chat-message': info('chat'),
@@ -274,6 +277,7 @@ export const SLIDE_EXCLUDED_GROUPS: Readonly<
       'switch',
       'text-counter',
       'textarea',
+      'time-field',
     ],
   },
 });

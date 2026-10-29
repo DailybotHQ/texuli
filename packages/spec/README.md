@@ -14,9 +14,9 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.5.0`) may contain breaking
-> changes, so pin the exact version or use `^0.4.0`, which accepts only 0.4.x.
+> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
+> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
 
 > **New in `0.4.0`.** `@texuli/spec@0.4.0` carries **spec 0.4.0**: spec
 > 0.3.0 (state, bindings, closed actions, `reorder`, workflow graphs), spec
@@ -56,7 +56,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.4.0'
+SPEC_VERSION;                         // the spec version: '0.5.0' in @texuli/spec@0.5.0 ('0.4.0' in @texuli/spec@0.4.0)
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -88,7 +88,7 @@ import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
 import { migrateBlueprint } from '@texuli/spec/migrate';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const migrated = migrateBlueprint(blueprint); // 0.2.0 → 0.3.0 → 0.4.0; never throws
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → 0.3.0 → 0.4.0 → 0.5.0; never throws
 const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
@@ -190,11 +190,13 @@ catalog hash, and from 0.3.0 may declare the exact spec version it was
 written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 (`@texuli/spec/migrate`) brings an
 envelope up to the current spec with pure, per-version steps
-(`src/migrations/`: `0.2.0 → 0.3.0` and `0.3.0 → 0.4.0`, both of which only
-stamp `spec`); a compatible version range is planned, not built. The
-repository pins spec `0.4.0` to digest
-`fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3` in
-`versions.json`.
+(`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0` and `0.4.0 → 0.5.0`,
+each of which only stamps `spec`); a compatible version range is planned,
+not built. `@texuli/spec@0.5.0` carries spec `0.5.0`, which adds the
+`data-cohort-table`, `data-notification-inbox`, `data-filter-builder` and
+`time-field` catalog ids; `@texuli/spec@0.4.0` carried spec `0.4.0` (digest
+`fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3`). Every
+pin is in `versions.json`.
 
 The full rules (the digest, `versions.json` pins, regeneration and the
 conformance harness) are in

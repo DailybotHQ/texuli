@@ -51,6 +51,14 @@ export type ToggleGroupRootProps = {
   children?: import('svelte').Snippet;
   'aria-label'?: string;
   'aria-labelledby'?: string;
+  /**
+   * Form field name. When set, the group submits one `name=value` entry per
+   * pressed item (hidden inputs), so a `multiple` group inside a `<form>`
+   * submits every pressed value. Nothing is submitted while disabled.
+   */
+  name?: string;
+  /** Id of the `<form>` the hidden inputs belong to, when the group sits outside it. */
+  form?: string;
 };
 
 export type ToggleGroupItemAttrs = ToggleRootAttrs & {

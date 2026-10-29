@@ -45,6 +45,22 @@ jobs:
       # Packs the tarballs into tmp/packages/tarballs/ and records
       # SHA-256 digests; publint warnings fail the job.
       - run: pnpm verify:packages
+      # Pre-flight, before the first `npm publish`: 0.0.0 is the unreleased
+      # placeholder, so any package in the publish list still on it fails the
+      # job here, with nothing published (never halfway through a wave).
+      - name: Refuse unreleased placeholder versions
+        run: |
+          set -euo pipefail
+          refused=0
+          for dir in core date spec drag deck tokens primitives texuli workflows editor charts data media chat blocks catalog tools astro player slides; do
+            name=$(node -p "require('./packages/${dir}/package.json').name")
+            version=$(node -p "require('./packages/${dir}/package.json').version")
+            if [ "$version" = "0.0.0" ]; then
+              echo "Refusing to publish ${name}@0.0.0: bump the version first"
+              refused=1
+            fi
+          done
+          exit "$refused"
       - name: Publish in wave order (docs/RELEASE.md)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -97,6 +113,8 @@ jobs:
           publish packages/texuli
           # L4: the workflow editor, after texuli and before the player.
           publish packages/workflows
+          # L4: the rich text editor (core, primitives, tokens and texuli first).
+          publish packages/editor
           # Wave 177 — L4 domain packages.
           publish packages/charts
           publish packages/data
@@ -115,7 +133,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          for dir in core date spec drag deck tokens primitives texuli workflows charts data media chat blocks catalog tools astro player slides; do
+          for dir in core date spec drag deck tokens primitives texuli workflows editor charts data media chat blocks catalog tools astro player slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             npm dist-tag add "${name}@${version}" latest

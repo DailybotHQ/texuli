@@ -7,6 +7,8 @@ import { type CommandSize, type CommandVariant, commandRootClass } from './varia
 import './command.css';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  /** The rendered root element (bindable). */
+  ref?: HTMLElement | null;
   children?: Snippet;
   size?: CommandSize;
   variant?: CommandVariant;
@@ -32,6 +34,7 @@ let {
   onSearchError,
   onSelect,
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -44,7 +47,7 @@ const classes = $derived(
 );
 </script>
 
-<div class={classes} data-tx-command data-size={size} data-variant={variant} {...rest}>
+<div bind:this={ref} class={classes} data-tx-command data-size={size} data-variant={variant} {...rest}>
   <PrimitiveRoot
     {label}
     {loop}

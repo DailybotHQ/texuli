@@ -29,17 +29,57 @@ export interface MarkdownReadOptions extends EditorLoadOptions {
   maxSource?: number;
 }
 
-const FENCE = /^ {0,3}(`{3,}|~{3,})\s*([a-z][a-z0-9+-]{0,31})?\s*$/i;
-const HEADING = /^ {0,3}(#{1,6})(?:[ \t]+(.*?))?[ \t]*#*[ \t]*$/;
+// Line patterns stay linear on hostile lines: no two neighboring quantifiers
+// can match the same characters, and `.` uses the `s` flag so U+2028 and
+// U+2029 inside a line never make a `(.*)$` tail backtrack. The fence info
+// string and the heading closing sequence are read by hand (their regex
+// forms backtracked quadratically, and cubically, on runs of spaces).
+const FENCE_OPEN = /^ {0,3}(`{3,}|~{3,})/;
+const FENCE_LANG = /^[a-z][a-z0-9+-]{0,31}$/i;
+const HEADING_OPEN = /^ {0,3}(#+)/;
 const RULE = /^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/;
-const QUOTE = /^ {0,3}> ?(.*)$/;
-const BULLET = /^( {0,3})([-*+])[ \t]+(.*)$/;
-const ORDERED = /^( {0,3})(\d{1,9})[.)][ \t]+(.*)$/;
+const QUOTE = /^ {0,3}> ?(.*)$/s;
+const BULLET = /^( {0,3})([-*+])[ \t]+(.*)$/s;
+const ORDERED = /^( {0,3})(\d{1,9})[.)][ \t]+(.*)$/s;
 const TASK = /^\[([ xX])\][ \t]+/;
 const IMAGE_ONLY = /^!\[((?:[^\]\\\n]|\\.)*)\]\(\s*<?([^\s()<>]+)>?\s*\)$/;
 const ESCAPABLE = /[\\`*_{}[\]()#+\-.!~<>|]/;
 
 const isBlank = (line: string) => line.trim() === '';
+const isSpace = (char: string | undefined) => char === ' ' || char === '\t';
+
+/** A fence opening line: its marker and the optional language. */
+function readFence(line: string): { marker: string; lang?: string } | null {
+  const open = FENCE_OPEN.exec(line);
+  if (!open) return null;
+  const info = line.slice(open[0].length).trim();
+  if (info !== '' && !FENCE_LANG.test(info)) return null;
+  return info
+    ? { marker: open[1] as string, lang: info.toLowerCase() }
+    : { marker: open[1] as string };
+}
+
+/**
+ * An ATX heading line: up to 6 `#` (a 7th or later reads as part of the
+ * closing sequence), then text after a space or tab, with the closing
+ * sequence of spaces, `#` and spaces dropped from the end.
+ */
+function readHeading(line: string): { level: number; text: string } | null {
+  const open = HEADING_OPEN.exec(line);
+  if (!open) return null;
+  const hashes = open[1] as string;
+  const level = Math.min(hashes.length, 6);
+  const rest = line.slice(open[0].length - hashes.length + level);
+  let start = 0;
+  while (isSpace(rest[start])) start += 1;
+  let end = rest.length;
+  while (end > start && isSpace(rest[end - 1])) end -= 1;
+  while (end > start && rest[end - 1] === '#') end -= 1;
+  while (end > start && isSpace(rest[end - 1])) end -= 1;
+  // Without a space or tab after the opening, only a closing sequence may follow.
+  if (start === 0 && end > 0) return null;
+  return { level, text: rest.slice(start, end) };
+}
 
 function listMarker(line: string): { ordered: boolean; start: number; content: string } | null {
   const bullet = BULLET.exec(line);
@@ -50,8 +90,8 @@ function listMarker(line: string): { ordered: boolean; start: number; content: s
 }
 
 const startsBlock = (line: string) =>
-  FENCE.test(line) ||
-  HEADING.test(line) ||
+  readFence(line) !== null ||
+  readHeading(line) !== null ||
   RULE.test(line) ||
   QUOTE.test(line) ||
   listMarker(line) !== null;
@@ -103,9 +143,9 @@ class Reader {
         i += 1;
         continue;
       }
-      const fence = FENCE.exec(line);
+      const fence = readFence(line);
       if (fence) {
-        const marker = fence[1] ?? '```';
+        const marker = fence.marker;
         const body: string[] = [];
         i += 1;
         while (i < lines.length && !(lines[i] ?? '').trim().startsWith(marker)) {
@@ -113,7 +153,7 @@ class Reader {
           i += 1;
         }
         i += 1;
-        const lang = fence[2]?.toLowerCase();
+        const lang = fence.lang;
         push(() => {
           const code = this.budget.text(this.budget.clean(body.join('\n'), '\n\t'));
           return lang
@@ -122,16 +162,16 @@ class Reader {
         });
         continue;
       }
-      const heading = HEADING.exec(line);
+      const heading = readHeading(line);
       if (heading) {
-        const level = (heading[1] ?? '#').length;
+        const level = heading.level;
         if (level > 4)
           this.budget.report('heading-clamped', 'Headings deeper than level 4 became level 4.');
         push(() => ({
           id: this.budget.newId(),
           type: 'heading',
           level: Math.min(level, 4) as 1 | 2 | 3 | 4,
-          content: trimEdges(this.inline((heading[2] ?? '').trim())),
+          content: trimEdges(this.inline(heading.text.trim())),
         }));
         i += 1;
         continue;
@@ -391,8 +431,12 @@ function parseInline(
       }
     }
     if (ch === '\n') {
-      if (/ {2,}$/.test(buffer)) {
-        buffer = buffer.replace(/ +$/, '');
+      // Count trailing spaces by hand: an unanchored `/ {2,}$/` rescans the
+      // whole buffer on every soft line break (quadratic in a long paragraph).
+      let spaces = 0;
+      while (buffer.charCodeAt(buffer.length - 1 - spaces) === 32) spaces += 1;
+      if (spaces >= 2) {
+        buffer = buffer.slice(0, buffer.length - spaces);
         flush();
         out.push({ type: 'break' });
         budget.chars += 1;
@@ -503,16 +547,64 @@ function matchLink(
   const { source } = scan;
   const labelEnd = scan.bracket(at);
   if (labelEnd === -1 || source[labelEnd + 1] !== '(') return null;
-  const target = /^\(\s*<?((?:[^\s()<>]|\([^\s()<>]*\))*)>?(?:\s+"[^"\n]*")?\s*\)/.exec(
-    source.slice(labelEnd + 1, labelEnd + 1 + 2_100)
-  );
+  // A target is read from at most 2,100 characters after the label.
+  const target = readLinkTarget(source.slice(labelEnd + 1, labelEnd + 1 + 2_100), 0);
   if (!target) return null;
-  return {
-    labelStart: at + 1,
-    labelEnd,
-    href: target[1] ?? '',
-    end: labelEnd + 1 + target[0].length,
+  return { labelStart: at + 1, labelEnd, href: target.href, end: labelEnd + 1 + target.end };
+}
+
+const isWhitespace = (char: string | undefined) => char !== undefined && /\s/.test(char);
+/** A target character: not whitespace, a parenthesis or an angle bracket. */
+const isTargetChar = (char: string | undefined) => char !== undefined && !/[\s()<>]/.test(char);
+
+/**
+ * Reads a link target `(<href> "title")` whose `(` is at `open`, by hand.
+ * It returns what `/\(\s*<?((?:[^\s()<>]|\([^\s()<>]*\))*)>?(?:\s+"[^"\n]*")?\s*\)/y`
+ * returned (the href and the index after `)`), but in linear time: in that
+ * regex `\(\s*`, `\s+"` and `\s*\)` competed for one whitespace run, so
+ * `[a](` + 3,990 spaces + `x` took about 250 ms.
+ */
+function readLinkTarget(source: string, open: number): { href: string; end: number } | null {
+  // The optional title and the closing parenthesis from `from`: the index
+  // after `)`, or -1.
+  const close = (from: number) => {
+    let at = from;
+    while (isWhitespace(source[at])) at += 1;
+    if (source[at] === ')') return at + 1;
+    if (at === from || source[at] !== '"') return -1;
+    at += 1;
+    while (at < source.length && source[at] !== '"' && source[at] !== '\n') at += 1;
+    if (source[at] !== '"') return -1;
+    at += 1;
+    while (isWhitespace(source[at])) at += 1;
+    return source[at] === ')' ? at + 1 : -1;
   };
+  let at = open + 1;
+  while (isWhitespace(source[at])) at += 1;
+  const afterSpace = at;
+  if (source[at] === '<') at += 1;
+  const hrefStart = at;
+  // Plain characters and balanced `(…)` groups without whitespace inside.
+  for (;;) {
+    if (isTargetChar(source[at])) at += 1;
+    else if (source[at] === '(') {
+      let inner = at + 1;
+      while (isTargetChar(source[inner])) inner += 1;
+      if (source[inner] !== ')') break;
+      at = inner + 1;
+    } else break;
+  }
+  const href = source.slice(hrefStart, at);
+  if (source[at] === '>') at += 1;
+  const end = close(at);
+  if (end !== -1) return { href, end };
+  // The regex backtracked into the leading whitespace: `( "title")` is an
+  // empty href with a title.
+  if (afterSpace > open + 1) {
+    const titled = close(open + 1);
+    if (titled !== -1) return { href: '', end: titled };
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -553,17 +645,26 @@ function prepareMarks(content: readonly EditorInline[]): EditorInline[] {
     if (node.type === 'break') chars.push(null);
     else for (const ch of node.text) chars.push({ ch, marks: node.marks });
   }
+  // The nearest character on each side of every position, so a run of
+  // breaks is crossed in constant time (linear, not quadratic, in breaks).
+  const previous: number[] = new Array(chars.length);
+  const next: number[] = new Array(chars.length);
+  for (let k = 0, last = -1; k < chars.length; k += 1) {
+    previous[k] = last;
+    if (chars[k] !== null) last = k;
+  }
+  for (let k = chars.length - 1, last = chars.length; k >= 0; k -= 1) {
+    next[k] = last;
+    if (chars[k] !== null) last = k;
+  }
   for (const type of ['strong', 'em', 'strike'] as const) {
     let i = 0;
     const marked = (c: Char | undefined) => c?.marks.some((m) => m.type === type) === true;
     // A break inside a span (marked text on both sides) does not end it.
     const has = (k: number): boolean => {
       if (chars[k] !== null) return marked(chars[k]);
-      let left = k - 1;
-      while (chars[left] === null) left -= 1;
-      let right = k + 1;
-      while (chars[right] === null) right += 1;
-      return left >= 0 && marked(chars[left]) && marked(chars[right]);
+      const left = previous[k] as number;
+      return left >= 0 && marked(chars[left]) && marked(chars[next[k] as number]);
     };
     while (i < chars.length) {
       if (!has(i)) {
@@ -591,15 +692,21 @@ function prepareMarks(content: readonly EditorInline[]): EditorInline[] {
 
 function writeInline(content: readonly EditorInline[], em: '*' | '_'): string {
   const open: Record<string, string> = { strong: '**', em, strike: '~~' };
-  const texts = content.flatMap((node, index) => (node.type === 'text' ? [{ node, index }] : []));
+  const texts = content.flatMap((node) => (node.type === 'text' ? [{ node }] : []));
   const stack: EditorMark[] = [];
   const outer = (marks: readonly EditorMark[]) => marks.filter((m) => m.type !== 'code');
-  /** Where the span of `mark` starting at text `t` ends (marks that end later nest outside). */
-  const spanEnd = (t: number, mark: EditorMark): number => {
-    let end = t;
-    while (texts[end + 1]?.node.marks.some((m) => markKey(m) === markKey(mark))) end += 1;
-    return end;
-  };
+  // Where the span of each mark starting at text `t` ends (marks that end
+  // later nest outside), computed once from the end so long spans stay linear.
+  const ends: Map<string, number>[] = new Array(texts.length);
+  for (let t = texts.length - 1; t >= 0; t -= 1) {
+    const here = new Map<string, number>();
+    for (const mark of (texts[t] as (typeof texts)[number]).node.marks) {
+      const key = markKey(mark);
+      here.set(key, ends[t + 1]?.get(key) ?? t);
+    }
+    ends[t] = here;
+  }
+  const spanEnd = (t: number, mark: EditorMark): number => ends[t]?.get(markKey(mark)) ?? t;
   const ordered = (t: number): EditorMark[] => {
     const marks = outer((texts[t] as { node: Extract<EditorInline, { type: 'text' }> }).node.marks);
     const opened = (mark: EditorMark) => {
@@ -631,10 +738,11 @@ function writeInline(content: readonly EditorInline[], em: '*' | '_'): string {
     return common;
   };
   let t = 0;
-  content.forEach((node, index) => {
+  content.forEach((node) => {
     if (node.type === 'break') {
       // Marks the next text keeps stay open across the break.
-      const next = texts.findIndex((entry) => entry.index > index);
+      // `t` texts are written, so the next one is `texts[t]`.
+      const next = t < texts.length ? t : -1;
       keepCommon(
         next === -1 ? [] : ordered(next).filter((m) => stack.some((s) => markKey(s) === markKey(m)))
       );

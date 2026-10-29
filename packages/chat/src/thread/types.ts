@@ -22,3 +22,11 @@ export interface MessageGroup {
   messages: ChatMessage[];
   dayStart: Date | null;
 }
+
+/** What the `MessageList` `actions` snippet receives beside the message. */
+export interface ChatMessageActions {
+  /** Opens inline edit for this message (needs `onEdit` on the list). */
+  edit: () => void;
+  /** True when the list accepts edits (`onEdit` is set). */
+  canEdit: boolean;
+}

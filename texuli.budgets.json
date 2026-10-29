@@ -15,12 +15,12 @@
       "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
     },
     "@texuli/blocks/core": {
-      "gzip": 24576,
-      "note": "@texuli/blocks/core holds every family parser plus the catalog metadata by contract (hosts that parse arbitrary documents use it); renderers no longer bundle it. Measured 20.88 KiB."
+      "gzip": 26176,
+      "note": "@texuli/blocks/core holds every family parser plus the catalog metadata by contract (hosts that parse arbitrary documents use it); renderers no longer bundle it. Measured 20.88 KiB. PLAN_009 (2026-10-28, owner-consented release plan): 24576 -> 26176 B, measured + 4% after the new block field schemas (G21) and the linear-time Markdown parser that replaces the backtracking regexes; measured 25,166 B."
     },
     "@texuli/blocks/data/renderers": {
-      "gzip": 12800,
-      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,288 B + 4% headroom so platform drift does not flip it."
+      "gzip": 13632,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,288 B + 4% headroom so platform drift does not flip it. PLAN_009 (2026-10-28, owner-consented release plan): 12800 -> 13632 B, measured + 4% after stat title, source and trend (G21); measured 13,052 B."
     },
     "@texuli/blocks/formula": {
       "gzip": 4096,
@@ -36,16 +36,16 @@
       "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
     },
     "@texuli/blocks/structure/renderers": {
-      "gzip": 32768,
-      "note": "Eager structure renderers include the styled Tabs, Accordion and Card components and the nested-block host; measured 32,051 B. Hosts that care about first load use the lazy @texuli/blocks/structure entry (lead decision 2026-10-23)."
+      "gzip": 35840,
+      "note": "Eager structure renderers include the styled Tabs, Accordion and Card components and the nested-block host; measured 32,051 B. Hosts that care about first load use the lazy @texuli/blocks/structure entry (lead decision 2026-10-23). PLAN_009 (2026-10-28, owner-consented release plan): 32768 -> 35840 B, measured + 4% after list, quote, callout, card and divider fields (G21), the linear-time Markdown parser and the avatar safeImageSrc re-check; measured 34,425 B."
     },
     "@texuli/blocks/text/renderers": {
       "gzip": 12288,
       "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
     },
     "@texuli/catalog": {
-      "gzip": 54080,
-      "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up."
+      "gzip": 57024,
+      "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 54080 -> 57024 B, measured + 4% after four new manifests (time-field, data-cohort-table, data-notification-inbox, data-filter-builder) and the linear-time rich text parser and sink scan; measured 54,821 B."
     },
     "@texuli/catalog/*": {
       "gzip": 8192,
@@ -84,8 +84,8 @@
       "note": "Authored overlays manifests; measured 10,170 B (26 manifests) (lead decision 2026-10-23). Explicit entry: the manifests/* pattern does not take precedence over @texuli/catalog/*."
     },
     "@texuli/catalog/render/hostile": {
-      "gzip": 15168,
-      "note": "Hostile test corpus (16 attack samples: script URLs, fake dialogs, bidi, giant trees, injection) plus hardenInertRoots; loaded only by tests and security tooling, never by a renderer. Measured 9,247 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 12,288 B to measured 12,927 B + 4% headroom; already over at T-01. Trimming stays a follow-up. Owner decision 2026-10-27 (PLAN_007): raised to measured 14,573 B + 4% headroom; the hostile corpus gained workflow, reorder, bidi and unknown-action attacks."
+      "gzip": 15744,
+      "note": "Hostile test corpus (16 attack samples: script URLs, fake dialogs, bidi, giant trees, injection) plus hardenInertRoots; loaded only by tests and security tooling, never by a renderer. Measured 9,247 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 12,288 B to measured 12,927 B + 4% headroom; already over at T-01. Trimming stays a follow-up. Owner decision 2026-10-27 (PLAN_007): raised to measured 14,573 B + 4% headroom; the hostile corpus gained workflow, reorder, bidi and unknown-action attacks. PLAN_009 (2026-10-28, owner-consented release plan): 15168 -> 15744 B, measured + 4% after the linear-time looksExecutable and new hostile shapes; measured about 15,124 B; Linux CI measures about 0.2% above macOS."
     },
     "@texuli/charts": {
       "gzip": 16384,
@@ -204,8 +204,8 @@
       "note": "The editor document model, loader with hostile-input caps and grapheme selection (measured 7,995 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package)."
     },
     "@texuli/core/editor-markdown": {
-      "gzip": 7680,
-      "note": "The owned Markdown codec with precomputed closers and bracket pairs (measured 7,203 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package)."
+      "gzip": 8000,
+      "note": "The owned Markdown codec with precomputed closers and bracket pairs (measured 7,203 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package). PLAN_009 (2026-10-28, owner-consented release plan): 7680 -> 8000 B, measured + 4% after the linear-time heading, fence, list, quote and link-target readers; measured about 7,660 B; Linux CI measures about 0.2% above macOS."
     },
     "@texuli/core/overlay": {
       "gzip": 14336,
@@ -235,9 +235,13 @@
       "gzip": 17408,
       "note": "Column operations compose the grid core (10.1 KiB) with resize, reorder, pinning, groups and a lazy column menu; measured 15,083 B (lead decision 2026-10-23). Owner decision 2026-10-27 (PLAN_007): raised to measured 16,727 B + 4% headroom; reorder and resize run on the shared @texuli/drag engine, inlined per entry by the size tool."
     },
+    "@texuli/data/activity": {
+      "gzip": 13184,
+      "note": "PLAN_009 (2026-10-28, owner-consented release plan): default 12288 -> 13184 B, measured + 4% after the styled Avatar it renders filters srcset candidates through the URL policy and composes handlers (G10, G26); measured 12,664 B."
+    },
     "@texuli/data/grid-editing": {
-      "gzip": 16448,
-      "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 15,360 B to measured 15,808 B + 4% headroom; already over at T-01. Trimming stays a follow-up."
+      "gzip": 17280,
+      "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 15,360 B to measured 15,808 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 16448 -> 17280 B, measured + 4% after DataGrid paging, rowClass and toolbar/filters/bulkActions snippets (G7); measured 16,601 B."
     },
     "@texuli/data/timeline": {
       "gzip": 11520,
@@ -303,15 +307,19 @@
       "cssGzip": 1024,
       "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
     },
+    "@texuli/primitives/date-field": {
+      "gzip": 4224,
+      "note": "PLAN_009 (2026-10-28, owner-consented release plan): default 4096 -> 4224 B, measured + 4% after onInvalid, the TimeField spin keys and translatable segment labels (G12, G13); measured about 4,055 B; Linux CI measures about 0.2% above macOS."
+    },
     "@texuli/primitives/date-picker": {
       "gzip": 29696,
       "cssGzip": 1024,
       "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 29,016 B. DatePicker composes DateField, Calendar (@internationalized/date) and a position-only Popover (modal features now load lazily); measured 28,354 B after FIX-popover-modal-lazy (was 31,938 B). The 24 KiB target is not met: Calendar and DateField carry the locale and calendar logic (lead decision 2026-10-23)."
     },
     "@texuli/primitives/dialog": {
-      "gzip": 12288,
+      "gzip": 12736,
       "cssGzip": 1024,
-      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_009 (2026-10-28, owner-consented release plan): 12288 -> 12736 B, measured + 4% after the layer stack and focus-exempt regions (G4) and handler composition (G26); measured about 12,216 B; Linux CI measures about 0.2% above macOS."
     },
     "@texuli/primitives/hover-card": {
       "gzip": 16384,
@@ -369,9 +377,9 @@
       "note": "APG window splitter with drag, collapse, RTL and a persistence hook; measured 4,413 B (lead decision 2026-10-23)."
     },
     "@texuli/primitives/tabs": {
-      "gzip": 4608,
+      "gzip": 4800,
       "cssGzip": 1024,
-      "note": "APG composite with roving focus (and ticks for the slider); measured 4,274 B (lead decision 2026-10-23)."
+      "note": "APG composite with roving focus (and ticks for the slider); measured 4,274 B (lead decision 2026-10-23). PLAN_009 (2026-10-28, owner-consented release plan): 4608 -> 4800 B, measured + 4% after handler composition on TabsTrigger and TabsList (G26); measured 4,609 B."
     },
     "@texuli/primitives/tags-input": {
       "gzip": 4608,
@@ -384,9 +392,9 @@
       "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further."
     },
     "@texuli/primitives/toggle": {
-      "gzip": 5120,
+      "gzip": 5568,
       "cssGzip": 1024,
-      "note": "Roving focus and the native form bridge put this group primitive slightly over the 4 KiB default (lead decision 2026-10-23)."
+      "note": "Roving focus and the native form bridge put this group primitive slightly over the 4 KiB default (lead decision 2026-10-23). PLAN_009 (2026-10-28, owner-consented release plan): 5120 -> 5568 B, measured + 4% after ToggleGroup form submission by name, rest props and first-pressed roving start (G40, G41) plus handler composition (G26); measured 5,345 B."
     },
     "@texuli/primitives/toolbar": {
       "gzip": 5120,
@@ -472,8 +480,12 @@
       "note": "Styled Calendar, DatePicker and DateRangePicker over the 28 KiB DatePicker primitive plus presets and styling; measured 31,244 B (lead decision 2026-10-23)."
     },
     "texuli/dialog": {
-      "gzip": 17408,
-      "note": "Styled component over the floating primitive(s) dialog, alert-dialog: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+      "gzip": 18176,
+      "note": "Styled component over the floating primitive(s) dialog, alert-dialog: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_009 (2026-10-28, owner-consented release plan): 17408 -> 18176 B, measured + 4% after the overlay layer stack and focus-exempt regions (G4), ref and rest props (G5) and handler composition (G26); measured 17,431 B in CI on Linux (16.99 KiB locally)."
+    },
+    "texuli/layouts/content": {
+      "gzip": 13056,
+      "note": "PLAN_009 T-content-layout (G39): new public subpath for direct (declarative) ContentLayout use; the same component the docs/blog/editorial subpaths already load lazily (lazy gzip 12.23 KiB there) with the layout chrome and the TOC helpers. Measured 12,537 B gzip, 3.75 KiB CSS, cap = measured + 4% headroom."
     },
     "texuli/layouts/dashboard/register": {
       "gzip": 1536,
@@ -579,47 +591,57 @@
       "note": "FINAL-texuli-check: component chrome pair matrix split from aa-gate so the gate entry stays under budget after map marker pairs. Checking tool only."
     },
     "@texuli/editor": {
-      "gzip": 34048,
-      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
+      "gzip": 35456,
+      "cssGzip": 2368,
+      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,086 B (CSS 2,221 B); the Markdown codec is not in the barrel."
     },
     "@texuli/editor/controller": {
       "gzip": 19136,
       "note": "The headless controller: history, commands, composition guard, paste; bundles the core editor model, transforms and history (measured 18,361 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 18,365 B + 4% headroom so platform drift does not flip it."
     },
     "@texuli/editor/editor": {
-      "gzip": 36032,
+      "gzip": 36160,
       "cssGzip": 2368,
-      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it."
+      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,737 B (CSS 2,221 B)."
     },
     "@texuli/editor/link-dialog": {
       "gzip": 1600,
       "cssGzip": 1600,
       "note": "The link dialog; addresses go through the controller and the URL policy (measured 1,469 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 1,484 B + 4% headroom so platform drift does not flip it."
     },
+    "@texuli/editor/markdown": {
+      "gzip": 9088,
+      "note": "Framework-free Markdown in and out of the editor document: the core editor-markdown codec plus the untrusted loader that re-checks links on write. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: new row, measured 8,690 B."
+    },
     "@texuli/editor/paste": {
-      "gzip": 7488,
-      "note": "Framework-free clipboard import: owned HTML tokenizer, allowlist and the untrusted loader (measured 7,429 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed."
+      "gzip": 7808,
+      "note": "Framework-free clipboard import: owned HTML tokenizer, allowlist and the untrusted loader (measured 7,429 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,452 B."
     },
     "@texuli/editor/toolbar": {
-      "gzip": 7232,
-      "cssGzip": 2240,
-      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it."
+      "gzip": 7360,
+      "cssGzip": 2304,
+      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,023 B (CSS 2,214 B)."
     },
     "@texuli/astro": {
-      "gzip": 18688,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 17,958 B gzip, cap = measured + 4% headroom."
+      "gzip": 19520,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 17,958 B gzip, cap = measured + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 18688 -> 19520 B, measured + 4% after ContentLayout children, toc entries and preserved ids (G39) and caller-handler composition in the texuli components it renders (G26); measured 18,757 B."
+    },
+    "@texuli/astro/appearance": {
+      "gzip": 2432,
+      "cssGzip": 544,
+      "note": "PLAN_009 T-content-layout (G16): new row for the appearance switcher island (radio group + cache model over @texuli/tokens no-flash and modes); measured 2,334 B gzip, 519 B CSS, cap = measured + 4% headroom."
     },
     "@texuli/astro/content": {
-      "gzip": 14848,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,248 B gzip, cap = measured + 4% headroom."
+      "gzip": 15680,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,248 B gzip, cap = measured + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 14848 -> 15680 B, measured + 4% after ContentLayout children, toc entries and preserved ids (G39) and caller-handler composition in the texuli components it renders (G26); measured 15,022 B."
     },
     "@texuli/astro/integration": {
       "gzip": 2560,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 2,443 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/astro/site": {
-      "gzip": 16320,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 15,690 B gzip, cap = measured + 4% headroom."
+      "gzip": 17152,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 15,690 B gzip, cap = measured + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 16320 -> 17152 B, measured + 4% after ContentLayout children, toc entries and preserved ids (G39) and caller-handler composition in the texuli components it renders (G26); measured 16,476 B."
     },
     "@texuli/astro/styles.css": {
       "gzip": 64,
@@ -701,8 +723,8 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 21,437 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/grammar": {
-      "gzip": 39872,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom."
+      "gzip": 42112,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 39872 -> 42112 B, measured + 4% after the four new catalog manifests and the G21 block fields in the deck grammar; measured 40,474 B."
     },
     "@texuli/slides/components": {
       "gzip": 55613,
@@ -721,9 +743,9 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 22,361 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/stage": {
-      "gzip": 110085,
+      "gzip": 108480,
       "cssGzip": 11264,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 105,851 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 105,851 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_009 T-slides-lazy (G24, G25): the default renderer tables load on first use; measured 104,263 B gzip (104.37 KiB, about 106,875 B, before), tightened to measured + 4% headroom."
     },
     "@texuli/slides/styles.css": {
       "gzip": 64,
