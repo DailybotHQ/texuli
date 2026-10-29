@@ -143,8 +143,31 @@ export async function settle(page: Page): Promise<void> {
   );
 }
 
-/** axe with zero exclusions (no disabled rules, no excluded selectors). */
+/**
+ * Wait until every finite animation has finished (infinite ones, such as
+ * spinners, are ignored), so checks like axe's color contrast never measure a
+ * part mid-fade. Gives up quietly after `timeout` ms.
+ */
+export async function settleAnimations(page: Page, timeout = 3000): Promise<void> {
+  await page
+    .waitForFunction(
+      () =>
+        document
+          .getAnimations()
+          .every(
+            (animation) =>
+              animation.playState !== 'running' ||
+              animation.effect?.getTiming().iterations === Number.POSITIVE_INFINITY
+          ),
+      undefined,
+      { timeout, polling: 50 }
+    )
+    .catch(() => undefined);
+}
+
+/** axe with zero exclusions (no disabled rules, no excluded selectors), once animations settle. */
 export async function axeViolations(page: Page): Promise<string[]> {
+  await settleAnimations(page);
   const result = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
   return result.violations.map(
     (violation) =>
