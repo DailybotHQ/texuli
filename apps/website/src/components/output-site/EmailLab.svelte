@@ -64,7 +64,10 @@ function pick(id: string): void {
 function download(): void {
   if (!result?.ok) return;
   const label = OUTPUT_DRAFTS.find((draft) => draft.id === chosen)?.label ?? 'Edited draft';
-  const name = `${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}.html`;
+  const name = `${label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')}.html`;
   saveBlob(new Blob([result.html], { type: 'text/html;charset=utf-8' }), name);
   saved = `Saved ${name}.`;
 }
