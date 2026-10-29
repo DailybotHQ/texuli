@@ -467,10 +467,39 @@ export async function compileGeneratedTypeScript(
 }
 
 /**
+ * The manifest svelte-package reads while it builds: the source one without
+ * conditional subpath imports.
+ *
+ * svelte-package turns every `#name` entry of `imports` into a build-time
+ * alias, and for a conditional entry it takes the `default` target. A
+ * `{ browser, default }` pair such as `@texuli/slides`' `#deck-ssr` would be
+ * resolved once, at pack time, to its server file: every packed browser
+ * bundle would then import the server-only preload. Without those entries
+ * svelte-package keeps the `#name` specifier, and the packed manifest maps
+ * `imports` to the dist tree ({@link publishManifest}), so the consumer's
+ * bundler picks the condition, as it does from source. Plain string entries
+ * stay: one target, so resolving them early changes nothing.
+ */
+export function svelteToolManifest(manifest: Manifest): Manifest {
+  const imports = manifest.imports;
+  if (!isRecord(imports)) return manifest;
+  const kept = Object.fromEntries(
+    Object.entries(imports).filter(([, target]) => typeof target === 'string')
+  );
+  const { imports: _dropped, ...rest } = manifest;
+  return Object.keys(kept).length > 0 ? { ...rest, imports: kept } : rest;
+}
+
+/**
  * Build `pkg`'s `src/` with svelte-package into `<stage>/dist`, exactly as it
  * is packed. `types: false` skips the declarations (the emitted JavaScript and
  * Svelte files are the same), for checks that only bundle the output, such as
  * the dist-parity check (`scripts/dist-parity.ts`).
+ *
+ * svelte-package runs in a scratch folder under the stage that holds
+ * {@link svelteToolManifest} as its `package.json` (it reads the manifest of
+ * its working directory), with the package's `src/` as an absolute input; its
+ * `.svelte-kit/` scratch output stays in that folder too.
  */
 export async function buildPackage(
   pkg: WorkspacePackage,
@@ -496,26 +525,27 @@ export async function buildPackage(
     })
   );
   const dist = join(stage, 'dist');
-  // svelte-package writes a `.svelte-kit/` folder into the package; remove it when it created it.
-  const kit = join(packageDir, '.svelte-kit');
-  const hadKit = existsSync(kit);
+  const cwd = join(stage, '.svelte-package');
+  mkdirSync(cwd);
+  writeFileSync(
+    join(cwd, 'package.json'),
+    `${JSON.stringify(svelteToolManifest(pkg.manifest), null, 2)}\n`
+  );
   const { code, output } = await run(
-    'pnpm',
+    join(ROOT, 'node_modules', '.bin', 'svelte-package'),
     [
-      'exec',
-      'svelte-package',
       '--input',
-      'src',
+      join(packageDir, 'src'),
       '--output',
       dist,
       '--tsconfig',
       tsconfig,
       ...(types ? [] : ['--no-types']),
     ],
-    packageDir
+    cwd
   );
   rmSync(tsconfig);
-  if (!hadKit) rmSync(kit, { recursive: true, force: true });
+  rmSync(cwd, { recursive: true, force: true });
   const problems = declarationDiagnostics(output).map((line) => `build: ${line}`);
   if (code !== 0)
     problems.push(`build: svelte-package exited ${code}: ${output.trim().slice(0, 2000)}`);
