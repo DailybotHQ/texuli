@@ -77,6 +77,11 @@ L0  core · date · deck · drag · spec (framework-free)
           ▲ dependencies point down only (scripts/check-layers.ts)
 ```
 
+The packages and subpaths PLAN_010 plans (documents, forms, canvas,
+sheets, motion and more) are not in this table or in `LAYERS` until they
+ship; their decided names and layers are listed in
+[Planned (PLAN_010)](#planned-plan010).
+
 ### What the layer guard enforces
 
 `pnpm check:layers` reads every workspace manifest and every shipped source
@@ -227,6 +232,40 @@ document and offers a `deckHost` seam (and `chrome={false}`) so a host with
 `@texuli/slides` presents them on the stage. Package docs:
 [packages/deck](../packages/deck/README.md) and
 [packages/slides](../packages/slides/README.md).
+
+## Planned (PLAN_010)
+
+**Planned, not shipped.** Nothing in this section exists in the repository
+or on npm yet. These are the package names, layers and subpaths decided by
+ADR-010 to ADR-016 in [DECISIONS](DECISIONS.md) for the 0.6.0, 0.7.0 and
+0.8.0 release waves. Each package stays "in development" until a release
+the developer approves publishes it, and joins the layer table,
+`LAYERS` in `scripts/check-layers.ts` and the package subpaths table only
+when it lands.
+
+New packages:
+
+| Planned layer | Package | Subpaths | What it will hold | Will depend on | Release wave | Decision |
+| --- | --- | --- | --- | --- | --- | --- |
+| L1 | `@texuli/document` | `.`, `model`, `schema`, `ops`, `markdown`, `paged`, `docx`, `pdf`, `sync` | Framework-free, DOM-free document engine: the block document format with persisted ids, typed operations and bounded RFC 6902 patches, the untrusted loader, Markdown through the core codec, pagination, DOCX and PDF writers, and the CRDT sync layer | core, deck | 0.7.0 | [ADR-011](DECISIONS.md#adr-011-document-packages-texulidocument-l1-engine-and-texulipages-l8-editor), [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
+| L4 | `@texuli/forms` | `.`, `model` (framework-free), view components | Schema-driven forms: fields, steps, conditional logic on the shared expression AST, closed validation rules, drafts and autosave | core, primitives, tokens, texuli | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
+| L4 | `@texuli/canvas` | `.`, `model` (framework-free), view components | Infinite canvas: shapes, text, connectors, frames, selection, zoom and pan on `@texuli/drag` spatial geometry (shared with workflows), synced through `@texuli/document/sync` | core, document, drag, primitives, tokens, texuli | 0.8.0 | [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
+| L5 | `@texuli/sheets` | `.`, `formula` (framework-free), `model` (framework-free), `csv`, view components | Spreadsheets: the owned formula engine (parser, function set, dependency graph, incremental and bounded recalculation), a sheet view over the data grid editing, CSV import and export; L5 because it builds on `@texuli/data` (L4) | core, date, data, document, drag, primitives, tokens, texuli | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
+| L8 | `@texuli/pages` | `.`, `editor`, `reader`, `paged`, `collab`, `export`, `styles.css` | The block document editor and reader on `@texuli/editor`: slash menu, block drag, nested pages, columns, live embeds painted by the player, paged view and print, comments, suggestions, history and presence | document, editor, blocks, catalog, player, drag, primitives, tokens, texuli, core | 0.7.0 | [ADR-011](DECISIONS.md#adr-011-document-packages-texulidocument-l1-engine-and-texulipages-l8-editor) |
+
+New subpaths in existing packages:
+
+| Package | Planned subpaths | What they will hold | Release wave | Decision |
+| --- | --- | --- | --- | --- |
+| `@texuli/core` | `motion` | Presence enter and exit, FLIP layout, shared elements, sequences and timelines, the spring solver, on the Web Animations API; reduced motion is instant | 0.6.0 | [ADR-013](DECISIONS.md#adr-013-motion-runtime-web-animations-with-an-owned-spring-solver) |
+| `@texuli/core` | `markup`, `zip` | Typed, escaped XML and HTML builders with URL-policy attributes, and the deterministic stored ZIP writer | 0.7.0 | [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
+| `@texuli/core` | `expression`, `data-source` | The bounded expression evaluator with a closed function table; host-registered data sources with pagination, filters, sorting, optimistic updates and cancellation | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
+| `@texuli/core` | `i18n` | The message catalog, placeholder and plural formatting, lazy locale loading | 0.8.0 | [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
+| `@texuli/tokens` | motion tokens in the existing entries | Durations, easings and springs as data and `--tx-motion-*` properties | 0.6.0 | [ADR-013](DECISIONS.md#adr-013-motion-runtime-web-animations-with-an-owned-spring-solver) |
+| `@texuli/spec` | `stream` | The incremental, bounded JSON tokenizer for streamed blueprints; spec minors 0.6.0, 0.7.0 and 0.8.0 | 0.7.0 | [ADR-014](DECISIONS.md#adr-014-streaming-generation-paint-only-validated-closed-node-shells), [ADR-012](DECISIONS.md#adr-012-spec-evolution-one-additive-minor-per-release-wave) |
+| `@texuli/data` | `dashboard`, `dashboard/engine` | The widget grid with drag and resize, keyboard equivalents, breakpoints and persistence | 0.8.0 | [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
+| `@texuli/tools` | `email` | Email-safe HTML and plain text from validated blueprints, with typed inline styles | 0.8.0 | [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
+| `@texuli/player` | streaming mode, print mode (no new subpath) | Paint validated node shells while a blueprint streams; print styles for blueprints | 0.7.0, 0.8.0 | [ADR-014](DECISIONS.md#adr-014-streaming-generation-paint-only-validated-closed-node-shells), [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
 
 ## The website
 
