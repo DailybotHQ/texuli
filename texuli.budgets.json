@@ -88,8 +88,8 @@
       "note": "Authored overlays manifests; measured 10,170 B (26 manifests) (lead decision 2026-10-23). Explicit entry: the manifests/* pattern does not take precedence over @texuli/catalog/*. PLAN_010 T-release-060 (2026-10-29): 12288 -> 7552 B, tightened to measured + 4% (measured 7,226 B)."
     },
     "@texuli/catalog/render/hostile": {
-      "gzip": 15744,
-      "note": "Hostile test corpus (16 attack samples: script URLs, fake dialogs, bidi, giant trees, injection) plus hardenInertRoots; loaded only by tests and security tooling, never by a renderer. Measured 9,247 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 12,288 B to measured 12,927 B + 4% headroom; already over at T-01. Trimming stays a follow-up. Owner decision 2026-10-27 (PLAN_007): raised to measured 14,573 B + 4% headroom; the hostile corpus gained workflow, reorder, bidi and unknown-action attacks. PLAN_009 (2026-10-28, owner-consented release plan): 15168 -> 15744 B, measured + 4% after the linear-time looksExecutable and new hostile shapes; measured about 15,124 B; Linux CI measures about 0.2% above macOS."
+      "gzip": 16448,
+      "note": "Hostile test corpus (16 attack samples: script URLs, fake dialogs, bidi, giant trees, injection) plus hardenInertRoots; loaded only by tests and security tooling, never by a renderer. Measured 9,247 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 12,288 B to measured 12,927 B + 4% headroom; already over at T-01. Trimming stays a follow-up. Owner decision 2026-10-27 (PLAN_007): raised to measured 14,573 B + 4% headroom; the hostile corpus gained workflow, reorder, bidi and unknown-action attacks. PLAN_009 (2026-10-28, owner-consented release plan): 15168 -> 15744 B, measured + 4% after the linear-time looksExecutable and new hostile shapes; measured about 15,124 B; Linux CI measures about 0.2% above macOS. PLAN_010 T-release-070 (consented plan): 15744 -> 16448 B, measured + 4% after the hostile document shapes (spec 0.7.0); measured 15,757 B in CI on Linux."
     },
     "@texuli/charts": {
       "gzip": 12864,
