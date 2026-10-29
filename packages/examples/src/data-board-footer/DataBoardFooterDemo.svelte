@@ -82,6 +82,11 @@ function add(columnId: string): void {
     padding: 1.5rem;
     color: var(--tx-foreground, CanvasText);
   }
+  /* A grid item's automatic minimum is its content's min-content width (the board's
+     columns): without this the board's section, and the page, grew on a phone. */
+  .demo > * {
+    min-inline-size: 0;
+  }
   .demo h2,
   .demo h3 {
     margin: 0 0 0.5rem;

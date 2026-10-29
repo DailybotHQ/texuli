@@ -84,7 +84,9 @@ network behavior.
 - `onEdit(message, body)` enables inline edit. `edit()` swaps the bubble
   for a labelled textarea ("Edit message") with Save and Cancel, and
   focuses it. Enter saves, Shift+Enter adds a line, and Escape cancels.
-  An unchanged body just closes. Return `false`, or reject, to keep the
+  An unchanged body (after trimming) closes without calling `onEdit`;
+  `onEditUnchanged(message)` (G85) is called then, so a host can treat it
+  as a resend. Return `false`, or reject, to keep the
   editor open with the draft. On close, focus returns to the control that
   opened the editor (or the log when it is gone).
 - While the reader is at the bottom, the list follows a streaming reply as
@@ -94,8 +96,8 @@ network behavior.
   bottom and moves focus to the log.
 
 The labels `jumpToLatest`, `newBelow`, `editInput`, `saveEdit` and
-`cancelEdit` translate these controls. `ChatThread` forwards `actions` and
-`onEdit`.
+`cancelEdit` translate these controls. `ChatThread` forwards `actions`,
+`onEdit` and `onEditUnchanged`.
 
 ## Reading position, avatars and day separators (G59, G70, G71)
 

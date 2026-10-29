@@ -39,6 +39,8 @@ interface Props {
   actions?: Snippet<[ChatMessage, ChatMessageActions]>;
   /** Inline edit save, forwarded to the list. */
   onEdit?: (message: ChatMessage, body: string) => unknown;
+  /** An inline edit saved unchanged, forwarded to the list. */
+  onEditUnchanged?: (message: ChatMessage) => void;
   /** The list's reading position (`bind:anchor`), forwarded to the list. */
   anchor?: ChatReadingAnchor | null;
   /** Reading position changes, forwarded to the list. */
@@ -70,6 +72,7 @@ let {
   overscan,
   actions,
   onEdit,
+  onEditUnchanged,
   anchor = $bindable(null),
   onAnchorChange,
   streaming = false,
@@ -92,6 +95,7 @@ let {
     {overscan}
     {actions}
     {onEdit}
+    {onEditUnchanged}
     bind:anchor
     {onAnchorChange}
   >

@@ -284,7 +284,12 @@ function previewPaint(value: DeckPrintPaint): DeckPreviewPaint {
       padding-inline: 0.5in;
     }
 
-    /* Isolation: only the print view and its ancestors print, without their box spacing. */
+    /*
+     * Isolation: only the print view and its ancestors print, without their box spacing.
+     * Both rules apply only while a target is mounted (`:root:has(…)`), so a print
+     * started before the view mounts (or after it unmounts) prints the page as is,
+     * never a blank sheet. A browser without `:has()` drops the rules and prints the page.
+     */
     :global(*:has([data-tx-print-isolate="true"])) {
       display: block !important;
       margin: 0 !important;
@@ -297,7 +302,8 @@ function previewPaint(value: DeckPrintPaint): DeckPreviewPaint {
     }
 
     :global(
-        body
+        :root:has([data-tx-print-isolate="true"])
+          body
           *:not(:has([data-tx-print-isolate="true"])):not([data-tx-print-isolate="true"]):not(
             [data-tx-print-isolate="true"] *
           )

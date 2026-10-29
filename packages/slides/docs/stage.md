@@ -33,7 +33,7 @@ scoped styles.
 
 | Prop | Default | What it does |
 | --- | --- | --- |
-| `deck` | required | A v2 deck, or any input `migrateDeck` understands (Texuli v1, grammar tree, Protoyard). An invalid deck shows its diagnostics and is never painted |
+| `deck` | required | A v2 deck, or any input `migrateDeck` understands (Texuli v1, grammar tree, Protoyard), or a prepared deck (an `ok` result of `prepareDeck` or `prepareDeckV2`, see [prepared decks](#preparation-canvas-and-mounting)). An invalid deck shows its diagnostics and is never painted |
 | `syncHash` | `true` | Keep `#/<slide>/<step>` in the URL (`replaceState`) and follow `hashchange` and deep links. Only the first stage on a page claims the hash |
 | `fit` | `container` | `container` letterboxes the canvas inside the host box; `viewport` fills the window height |
 | `tier` | `untrusted` | URL policy tier for every link and media source painted (`DeckMediaTrust`) |
@@ -58,6 +58,7 @@ scoped styles.
 | `resolveAvatar` | — | Host adapter for `avatar:` image ids |
 | `controller` | `null` | Read-only binding to the engine `DeckController` for imperative hosts |
 | `chrome` | — | Snippet that replaces the default toolbar and progress bar (the [chrome layers](#chrome) stay) |
+| `tools` | — | Snippet of host controls added to the default toolbar as its last group, labelled "More tools" (`stage.groupTools`), G82. They follow the stage's own tools in Tab order, stay out of the "More" fold, and the progress bar stays. Not rendered when `chrome` replaces the toolbar |
 | `toolbarPosition` | `bottom` | Where the toolbar (or the `chrome` snippet) sits: `bottom` puts it below the slide, aligned to the inline end, with its popups opening upward; `top` puts it above the slide. DOM order follows, so Tab reaches the controls after the slide content by default. The root carries `data-tx-deck-toolbar` |
 | `overviewView` | — | Snippet that replaces the default overview |
 | `presenterView` | — | Snippet that replaces the default presenter pane |
@@ -160,6 +161,24 @@ scoped styles.
   before mounting and the first stage paints without its loading status
   (G73). It is the stage's own cache, so it lives here rather than in
   `@texuli/deck` (whose `migrateDeck` is a plain synchronous import).
+- **Prepared decks (G83):** an `ok` result of `prepareDeck(input, hooks)`
+  or of `prepareDeckV2(input, hooks)` (the light variant: a v2 deck only,
+  checked with the host's own `hooks.validateBlock`, a `DeckBlockCheck`,
+  so neither `migrateDeck` nor `@texuli/blocks` is imported) is a prepared
+  deck (`PreparedDeckOk`). Hand it to the stage as `deck` with
+  `tier="developer"` and the stage paints it on its first render without
+  migrating or validating it again: no migration, built-in block check or
+  lazy validator chunk loads for it (with the default tables on, their own
+  load still brings those chunks; use `defaultRenderers={false}` or the
+  stage core to keep them out). The brand is the prepare functions' own
+  record, not the object's shape: `isPreparedDeck(value)` is true only for
+  a result they returned in this page, and its wrapper is frozen. A
+  look-alike object (agent output, a JSON or `structuredClone` copy) is
+  validated like any input, and at the `untrusted` tier the stage
+  validates a prepared deck's `deck` again. Never prepare agent content
+  for the developer tier: the hooks you pass are the only checks it gets
+  (`tests/stage-prepared.test.ts`, and `tests/bundle-graph.test.ts` for a
+  stage-core host with `prepareDeckV2`).
 - **Stage core (`@texuli/slides/stage-core`, G72):** `DeckStageCore` is the
   whole stage without any reference to the default tables: `DeckStage` is
   `DeckStageCore` with `defaults` set to `DECK_DEFAULT_RENDERERS_SOURCE`
@@ -271,6 +290,8 @@ Every string comes from the messages (`DECK_CHROME_MESSAGES` joins
   Help groups fold into “More”, a disclosure (Escape closes it). By default
   it sits below the slide, aligned to the inline end (right in left-to-right
   decks, left in right-to-left ones); `toolbarPosition="top"` puts it above.
+  Its `tools` prop (the stage's `tools` snippet, G82) renders host controls
+  as a last group, "More tools", that never folds into “More”.
   The toolbar hides in full screen.
 - **Slide list:** the counter (“3 / 12”, named “Choose a slide, 3 / 12”)
   opens a listbox of every slide by number and title. Focus starts on the

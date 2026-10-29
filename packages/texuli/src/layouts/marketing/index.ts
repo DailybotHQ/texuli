@@ -5,6 +5,7 @@
 export { default as LandingLayout } from './LandingLayout.svelte';
 export { default as MarketingLayout } from './MarketingLayout.svelte';
 export { default as MarketingSection } from './MarketingSection.svelte';
+export { default as MarketingSectionHeader } from './MarketingSectionHeader.svelte';
 export {
   formatPriceCents,
   MARKETING_LIMITS,

@@ -2,6 +2,7 @@
 
 import { configure, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { DECK_CONTROLS } from '@texuli/deck/engine';
+import { createRawSnippet } from 'svelte';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   createDeckTooltip,
@@ -301,6 +302,42 @@ describe('DeckStage chrome', () => {
         expect(order()).toEqual(expected);
       });
     }
+  });
+
+  it('tools: host controls join the toolbar as its last group, in Tab order, and keep the progress bar (G82)', async () => {
+    const onDebug = vi.fn();
+    const tools = createRawSnippet(() => ({
+      render: () => '<button type="button" data-host-tool>Debug panel</button>',
+      setup: (node: Element) => {
+        node.addEventListener('click', onDebug);
+      },
+    }));
+    const chrome = createRawSnippet(() => ({ render: () => '<div data-host-chrome></div>' }));
+
+    await scenario('the tools group is the last group of the toolbar', async () => {
+      stageWith({ tools, deck: deckOf({ style: { progress: 'bottom' } }) });
+      const toolbar = screen.getByRole('group', { name: 'Presentation controls' });
+      const group = screen.getByRole('group', { name: 'More tools' });
+      expect(group.parentElement).toBe(toolbar);
+      expect(toolbar.querySelector(':scope > .tx-deck-chrome-group:last-of-type')).toBe(group);
+      // Tab order is DOM order: the host tool is the last focusable control of the toolbar.
+      const focusable = [...toolbar.querySelectorAll<HTMLElement>('button, [tabindex="0"]')];
+      expect(focusable.at(-1)?.textContent).toBe('Debug panel');
+      expect(focusable.some((node) => node.dataset.txDeckTool === 'next')).toBe(true);
+      const host = screen.getByRole('button', { name: 'Debug panel' });
+      host.focus();
+      expect(document.activeElement).toBe(host);
+      await fireEvent.click(host);
+      expect(onDebug).toHaveBeenCalledTimes(1);
+      // The stage keeps its progress bar (a host `chrome` would replace it).
+      expect(document.querySelector('.tx-deck-stage [role="progressbar"]')).toBeTruthy();
+    });
+
+    await scenario('a host chrome replaces the toolbar, and its tools with it', async () => {
+      stageWith({ tools, chrome });
+      expect(document.querySelector('[data-host-chrome]')).toBeTruthy();
+      expect(document.querySelector('[data-host-tool]')).toBeNull();
+    });
   });
 
   it('trust badge: in the chrome row at the untrusted tier, overridable, never at developer or with trustBadge false', async () => {

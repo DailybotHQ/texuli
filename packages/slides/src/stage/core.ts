@@ -82,9 +82,13 @@ export type { SlideNavigationIntent, SlideStepIntent } from './navigation.ts';
 export { DeckOverview } from './overview/index.ts';
 export { prefetchDeckSlides, slideBlockFamilies, whenIdle } from './prefetch.ts';
 export {
+  type DeckBlockCheck,
   type DeckValidationHooks,
+  isPreparedDeck,
   type PreparedDeck,
+  type PreparedDeckOk,
   prepareDeck,
+  prepareDeckV2,
   validateDeckBlock,
 } from './prepare.ts';
 export { DeckPresenterPane } from './presenter/index.ts';

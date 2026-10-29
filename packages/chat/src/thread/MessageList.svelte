@@ -33,6 +33,12 @@ interface Props {
   /** Saves an inline edit; return false or reject to keep the editor open. */
   onEdit?: (message: ChatMessage, body: string) => unknown;
   /**
+   * Called when an inline edit is saved with the text unchanged (G85), so a
+   * host can treat it as a resend. `onEdit` is not called; the editor closes
+   * as before.
+   */
+  onEditUnchanged?: (message: ChatMessage) => void;
+  /**
    * The reading position (`bind:anchor`): the list writes the first message
    * in view as the reader scrolls, and scrolls to an anchor the host sets
    * (on mount, or when it swaps conversations), across the virtual window.
@@ -61,6 +67,7 @@ let {
   overscan = 5,
   actions,
   onEdit,
+  onEditUnchanged,
   anchor = $bindable(null),
   onAnchorChange,
   class: className,
@@ -347,7 +354,11 @@ function endEdit(): void {
 async function saveEdit(message: ChatMessage): Promise<void> {
   const next = editDraft.trim();
   if (editSaving || next === '') return;
-  if (next === message.body) return endEdit();
+  if (next === message.body) {
+    endEdit();
+    onEditUnchanged?.(message);
+    return;
+  }
   editSaving = true;
   try {
     if ((await onEdit?.(message, next)) !== false) endEdit();

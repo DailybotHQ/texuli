@@ -111,7 +111,7 @@ Ships in `0.5.0`; the `0.4.0` release predates it:
 - `Composer`: `streaming` with `onStop` (a Stop button and Escape), an
   `onkeydown` hook that runs before the built-in keys, and an `actions`
   snippet ([chat-composer](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-composer.md)).
-- `MessageList`: per-message `actions`, inline edit with `onEdit`, and a
+- `MessageList`: per-message `actions`, inline edit with `onEdit` (and `onEditUnchanged` for an edit saved unchanged), and a
   bottom-anchored scroll with "Jump to latest"
   ([chat-thread](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/docs/chat-thread.md)). `ChatThread` forwards all
   of these.

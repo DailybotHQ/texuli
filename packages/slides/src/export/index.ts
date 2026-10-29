@@ -59,4 +59,5 @@ export {
   type ZipEntry,
 } from './api.ts';
 export { default as DeckPrintView } from './DeckPrintView.svelte';
+export { type PreloadDeckPrintViewOptions, preloadDeckPrintView } from './print-preload.ts';
 export type { DeckPrintViewProps } from './print-types.ts';

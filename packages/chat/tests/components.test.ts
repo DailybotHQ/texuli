@@ -447,6 +447,48 @@ describe('message-actions', () => {
     });
   });
 
+  describe('G85 an edit saved unchanged', () => {
+    it('calls onEditUnchanged (never onEdit), closes the editor and restores focus, by key and by Save', async () => {
+      const onEdit = vi.fn();
+      const onEditUnchanged = vi.fn();
+      render(MessageList, {
+        props: {
+          currentUserId: 'avery',
+          actions: editActions,
+          onEdit,
+          onEditUnchanged,
+          messages: [{ id: 'm1', author: avery, at, body: 'Same words' }],
+        },
+      });
+      const saves: ((field: HTMLTextAreaElement) => Promise<unknown>)[] = [
+        (field) => fireEvent.keyDown(field, { key: 'Enter' }),
+        () => fireEvent.click(screen.getByRole('button', { name: 'Save' })),
+      ];
+      for (const [index, save] of saves.entries()) {
+        const trigger = screen.getByRole('button', { name: 'Edit m1' });
+        trigger.focus();
+        await fireEvent.click(trigger);
+        const field = screen.getByRole('textbox', { name: 'Edit message' }) as HTMLTextAreaElement;
+        // Surrounding spaces are trimmed: still unchanged.
+        await fireEvent.input(field, { target: { value: '  Same words ' } });
+        await save(field);
+        await waitFor(() =>
+          expect(screen.queryByRole('textbox', { name: 'Edit message' })).toBeNull()
+        );
+        expect(onEditUnchanged).toHaveBeenCalledTimes(index + 1);
+        expect(onEditUnchanged).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'm1' }));
+        expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Edit m1' }));
+      }
+      expect(onEdit).not.toHaveBeenCalled();
+      // Cancel is not a save: no call.
+      await fireEvent.click(screen.getByRole('button', { name: 'Edit m1' }));
+      await fireEvent.keyDown(screen.getByRole('textbox', { name: 'Edit message' }), {
+        key: 'Escape',
+      });
+      expect(onEditUnchanged).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe('G33 streaming scroll anchor and jump to latest', () => {
     it('follows a streaming reply at the bottom, stays put once the reader scrolls up, and offers a jump to latest', async () => {
       const original = globalThis.ResizeObserver;

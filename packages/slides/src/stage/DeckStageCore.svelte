@@ -79,7 +79,7 @@ import { loadDeckMigration, loadedDeckMigration } from './migration.ts';
 import { captureFragments, loadStageMotion, stageMotionLevel } from './motion-capture.ts';
 import type { SlideNavigationIntent, SlideStepIntent } from './navigation.ts';
 import DeckOverview from './overview/DeckOverview.svelte';
-import { isDeckV2Input, prepareDeckWith } from './prepare-core.ts';
+import { isDeckV2Input, isPreparedDeck, prepareDeckWith } from './prepare-core.ts';
 import DeckPresenterPane from './presenter/DeckPresenterPane.svelte';
 import type { DeckPresenterHost } from './presenter/host.ts';
 import type { DeckPreviewPaint } from './presenter/paint.ts';
@@ -118,7 +118,14 @@ import {
 } from './transition.ts';
 
 interface Props {
-  /** A v2 deck, or any input `migrateDeck` understands (Texuli v1, grammar tree, Protoyard). */
+  /**
+   * A v2 deck, or any input `migrateDeck` understands (Texuli v1, grammar
+   * tree, Protoyard), or a prepared deck (G83: an `ok` result of
+   * `prepareDeck` / `prepareDeckV2`). At the `developer` tier a prepared deck
+   * paints without migrating or validating again (no migration, block check
+   * or validator chunk loads for it); at the `untrusted` tier its `deck` is
+   * validated like any input. A look-alike object is never trusted.
+   */
   deck: unknown;
   /**
    * Keep `#/<slide>/<step>` in the URL (replaceState) and follow `hashchange`
@@ -190,6 +197,12 @@ interface Props {
   /** Replaces the default toolbar and progress bar. */
   chrome?: Snippet;
   /**
+   * Host controls added to the default toolbar as its last group (G82): they
+   * follow the stage's tools in focus order and keep the progress bar. Not
+   * rendered when `chrome` replaces the toolbar.
+   */
+  tools?: Snippet;
+  /**
    * Where the toolbar (or the host `chrome` snippet) sits: `bottom` (default)
    * below the slide, aligned to the inline end, or `top` above it.
    */
@@ -235,6 +248,7 @@ let {
   resolveAvatar,
   controller = $bindable(null),
   chrome,
+  tools,
   toolbarPosition = 'bottom',
   overviewView,
   presenterView,
@@ -253,6 +267,13 @@ const instance = namespace ?? uid;
 // svelte-ignore state_referenced_locally
 const ownsHash = browser && syncHash && claimDeckHash(window, instance);
 
+let paintTier = $derived<DeckMediaTrust>(tier ?? mediaTrust ?? 'untrusted');
+// G83: a prepared deck (the brand is `prepareDeck`'s own record, never the object's shape) skips
+// migration and validation at the developer tier only; otherwise its deck is validated as input.
+let preparedInput = $derived(isPreparedDeck(deck) ? deck : null);
+let trustedPrepared = $derived(paintTier === 'developer' ? preparedInput : null);
+let input = $derived<unknown>(preparedInput ? preparedInput.deck : deck);
+
 // Host renderers win; the default layouts and component registry answer last (unless turned
 // off). They are imported on first use: until they (and any lazy host block check) arrive, the
 // stage validates and paints nothing and shows a loading status (also during SSR).
@@ -268,34 +289,37 @@ let rendererList = $derived(
 );
 let validatorsReady = $derived.by(() => {
   void validatorsVersion;
-  return deckValidatorsReady(rendererList);
+  return trustedPrepared !== null || deckValidatorsReady(rendererList);
 });
 // The built-in block support (the default block check and free-slide renderer, one lazy chunk):
 // needed before validating only when no table brings a block check (G46).
 let builtin = $state.raw(loadedBuiltinDeckBlocks());
 let needsBuiltinCheck = $derived(
-  !rendererList.some(
-    (table) =>
-      typeof table.validateBlock === 'function' || typeof table.loadValidateBlock === 'function'
-  )
+  trustedPrepared === null &&
+    !rendererList.some(
+      (table) =>
+        typeof table.validateBlock === 'function' || typeof table.loadValidateBlock === 'function'
+    )
 );
 let builtinReady = $derived(!needsBuiltinCheck || builtin !== undefined);
 // `migrateDeck` loads only for a deck in an earlier shape (a v2 deck needs none); `null` = failed.
 let migrate = $state.raw<ReturnType<typeof loadedDeckMigration> | null>(loadedDeckMigration());
-let needsMigration = $derived(!isDeckV2Input(deck));
+let needsMigration = $derived(trustedPrepared === null && !isDeckV2Input(input));
 let migrationReady = $derived(!needsMigration || migrate !== undefined);
 let prepared = $derived.by<PreparedDeck | null>(() => {
-  if (!defaultsReady || !validatorsReady || !builtinReady || !migrationReady) return null;
+  if (!defaultsReady) return null;
+  if (trustedPrepared) return trustedPrepared;
+  if (!validatorsReady || !builtinReady || !migrationReady) return null;
   const hooks = deckValidationHooks(rendererList);
   const check = hooks.validateBlock ?? builtin?.validateBlock;
   // Unreachable (builtinReady), kept so a missing check never means "accept every block".
   if (!check) return null;
-  return prepareDeckWith(deck, hooks, check, migrate ?? undefined);
+  return prepareDeckWith(input, hooks, check, migrate ?? undefined);
 });
 let model = $derived(prepared?.ok ? prepared.deck : null);
 // The landmark's name: the validated title, else the input's own title while it loads (never a
 // shared "Presentation: " name across stages; an untitled loading stage stays unnamed).
-let stageTitle = $derived(model ? model.meta.title : deckInputTitle(deck));
+let stageTitle = $derived(model ? model.meta.title : deckInputTitle(input));
 
 $effect.pre(() => {
   if (!useDefaults || !defaults || defaultTables !== undefined) return;
@@ -347,7 +371,6 @@ $effect.pre(() => {
   };
 });
 let t = $derived(createDeckTranslator(messages));
-let paintTier = $derived<DeckMediaTrust>(tier ?? mediaTrust ?? 'untrusted');
 let showTrustBadge = $derived(trustBadge !== false && paintTier === 'untrusted');
 let localeInfo = $derived(resolveDeckLocale(model?.meta, { locale, dir }));
 
@@ -1275,7 +1298,7 @@ $effect(() => {
   {#if chrome}
     {@render chrome()}
   {:else}
-    <DeckToolbar />
+    <DeckToolbar {tools} />
   {/if}
 {/snippet}
 

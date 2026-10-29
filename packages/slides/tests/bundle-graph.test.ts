@@ -172,6 +172,34 @@ const renderers = { validateBlock: () => undefined, free: () => HostFree };
     );
   }, 180_000);
 
+  it('a host handing the stage core a prepared deck (G83) has no migration or block schema in its initial graph', async () => {
+    const chunks = await buildHost(
+      `<script lang="ts">
+import { DeckStageCore, prepareDeckV2 } from ${JSON.stringify(`${SRC}/stage/core.ts`)};
+import HostFree from './HostFree.svelte';
+let { input }: { input: unknown } = $props();
+const validateBlock = () => undefined;
+const deck = $derived(prepareDeckV2(input, { validateBlock }));
+const renderers = { free: () => HostFree };
+</script>
+<DeckStageCore {deck} tier="developer" {renderers} loadTheme={null} />
+`,
+      { 'HostFree.svelte': '<p>host</p>\n' }
+    );
+    const entries = [...chunks.values()].filter((chunk) => chunk.isEntry).map((c) => c.fileName);
+    const modules = staticModules(chunks, entries);
+    expect(modules.some((id) => id.endsWith('/slides/src/stage/prepare-core.ts'))).toBe(true);
+    expect(HOST_REPLACED.filter((part) => modules.some((id) => id.includes(part)))).toEqual([]);
+    expect(defaultsIn(modules)).toEqual([]);
+    // The stage still ships its fallbacks as lazy chunks; a prepared deck never asks for them
+    // (tests/stage-prepared.test.ts proves the first paint loads neither).
+    for (const suffix of ['/slides/src/stage/builtin.ts', '/deck/src/model/migrate.ts']) {
+      const lazy = chunkWith(chunks, suffix);
+      expect(lazy, suffix).toBeTruthy();
+      expect(entries).not.toContain(lazy?.fileName);
+    }
+  }, 180_000);
+
   it('keeps the server preload out of a browser build with the defaults on', async () => {
     const chunks = await buildHost(`<script lang="ts">
 import { DeckStage } from ${JSON.stringify(`${SRC}/stage/index.ts`)};
