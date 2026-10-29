@@ -201,10 +201,16 @@ export function createOverlayCore(
   /**
    * R16: an exempt region shown in the top layer (the toast region as a
    * `popover`) must keep painting above the overlay that just joined it.
-   * The top layer orders by show time, so re-show it.
+   * The top layer orders by show time, so re-show it. Exemptions registered
+   * with `raise: false` (a dialog backdrop, a menu or listbox opened inside a
+   * modal) stay where they are: re-showing them would cover this overlay.
    */
   function raiseExemptPopovers() {
-    for (const region of exemptElements()) {
+    const regions = (inertRegistry()?.exemptions() ?? [])
+      .filter((entry) => entry.raise !== false)
+      .map((entry) => entry.element)
+      .filter((region) => region !== element && !element.contains(region));
+    for (const region of regions) {
       const popover = region as PopoverElement;
       try {
         if (!popover.matches(':popover-open')) continue;
@@ -274,7 +280,12 @@ export function createOverlayCore(
     } else if (inert && inert.size() > 0 && isLive(element)) {
       // A menu or popover opened from inside a modal: keep it live while open,
       // even when it sits outside the modal (portaled to the body).
-      liveExemption = inert.exempt({ element, label: options.label ?? 'overlay' });
+      // `raise: false`: an overlay opened later from this one must stay above it.
+      liveExemption = inert.exempt({
+        element,
+        label: options.label ?? 'overlay',
+        raise: false,
+      });
     }
     if (wantsTrap && features.focusScope) {
       focusScope = features.focusScope(element, {

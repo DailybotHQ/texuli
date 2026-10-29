@@ -141,7 +141,9 @@ entering layers; take the easing from the token, never a literal.
 
 **Reduced motion (enforced globally):** under `prefers-reduced-motion: reduce`,
 or inside `[data-tx-motion="reduce"]`, `base.css` forces all three durations
-to `0ms`, the easing to `linear`, animations and transitions to `0.01ms`, and
+to `0ms`, the easing to `linear`, animation and transition durations and delays
+to `0s` (so a `visibility` change is instant and nested content never appears
+one level per frame), and
 `scroll-behavior` to `auto`. `themeVariables({ reducedMotion: true })` emits the
 same zeros. Components with looping or meaningful animation also opt out
 locally (36 source files reference `prefers-reduced-motion`; for example, the

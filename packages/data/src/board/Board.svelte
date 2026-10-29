@@ -687,7 +687,13 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       border: 0;
     }
 
+    /*
+     * Positioned, so it is the containing block of the absolute screen-reader
+     * labels inside the columns: without it they escape the scroll box at
+     * their static position and widen the page on narrow screens (G76).
+     */
     .tx-board__scroller {
+      position: relative;
       overflow-x: auto;
       overscroll-behavior-inline: contain;
       padding: 0.25rem;

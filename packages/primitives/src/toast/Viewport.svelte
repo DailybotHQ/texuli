@@ -1,19 +1,55 @@
 <script lang="ts">
 import { getInertRegistry } from '@texuli/core/inert';
+import { createPortal } from '@texuli/core/portal';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { ensurePositioned } from '../internal/backdrop.ts';
+import { chainHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getToastProviderContext, setToastViewportContext } from './context.ts';
 
 type Props = HTMLAttributes<HTMLElement> & {
   /** Max visible toasts (default all queued). */
   hotkeyLabel?: string;
   children?: Snippet;
-};
+  /**
+   * `'top-layer'` (default): the region is a manual popover in the top layer.
+   * `'contained'`: it never enters the top layer; it renders where it is
+   * mounted, or inside `container` (which becomes its containing block), for
+   * framed previews.
+   */
+  mode?: 'top-layer' | 'contained';
+  /** The element a `'contained'` region renders in. */
+  container?: Element | null;
+  /**
+   * Whether a top-layer region is shown (default `true`). Pass `false` while
+   * there is nothing to show: an empty region then stays out of the top layer
+   * (and out of the page) instead of sitting at the viewport corner.
+   */
+  active?: boolean;
+} & RefProp;
 
-let { class: className, hotkeyLabel, children, ...rest }: Props = $props();
+let {
+  class: className,
+  hotkeyLabel,
+  children,
+  mode = 'top-layer',
+  container = null,
+  active = true,
+  ref = $bindable(null),
+  onpointerenter,
+  onpointerleave,
+  onfocusin,
+  onfocusout,
+  ...rest
+}: Props = $props();
 
 const provider = getToastProviderContext();
 let regionEl: HTMLElement | null = $state(null);
+// `ref` follows the element the part binds for its own behavior.
+$effect(() => {
+  ref = regionEl ?? null;
+});
 
 setToastViewportContext({
   element: () => regionEl,
@@ -30,6 +66,35 @@ $effect(() => {
   } catch {
     exemption = null;
   }
+
+  provider.setFocusHandler(() => {
+    const focusable = node.querySelector<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    focusable?.focus();
+  });
+
+  return () => {
+    provider.setFocusHandler(null);
+    exemption?.release();
+  };
+});
+
+// Contained: render inside the container (a containing block), never in the top layer.
+$effect(() => {
+  const node = regionEl;
+  if (!node || mode !== 'contained' || !container) return;
+  const restorePosition = ensurePositioned(container);
+  const portal = createPortal(node, { target: container });
+  return () => {
+    portal.destroy();
+    restorePosition();
+  };
+});
+
+$effect(() => {
+  const node = regionEl;
+  if (!node || mode !== 'top-layer' || !active) return;
 
   // Top-layer popover when supported.
   try {
@@ -61,17 +126,8 @@ $effect(() => {
   };
   doc.addEventListener('toggle', onToggle, true);
 
-  provider.setFocusHandler(() => {
-    const focusable = node.querySelector<HTMLElement>(
-      'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    );
-    focusable?.focus();
-  });
-
   return () => {
     doc.removeEventListener('toggle', onToggle, true);
-    provider.setFocusHandler(null);
-    exemption?.release();
     try {
       if (typeof node.hidePopover === 'function' && node.matches(':popover-open')) {
         node.hidePopover();
@@ -110,16 +166,17 @@ function onFocusOut(event: FocusEvent): void {
   bind:this={regionEl}
   {...rest}
   class={typeof className === 'string' ? className : undefined}
-  popover="manual"
+  popover={mode === 'top-layer' ? 'manual' : undefined}
+  data-mode={mode}
   role="region"
   aria-label={provider.label}
   data-tx-toast-viewport
   data-state={provider.manager.list().length > 0 ? 'visible' : 'empty'}
   tabindex="-1"
-  onpointerenter={onPointerEnter}
-  onpointerleave={onPointerLeave}
-  onfocusin={onFocusIn}
-  onfocusout={onFocusOut}
+  onpointerenter={chainHandlers(onpointerenter, onPointerEnter)}
+  onpointerleave={chainHandlers(onpointerleave, onPointerLeave)}
+  onfocusin={chainHandlers(onfocusin, onFocusIn)}
+  onfocusout={chainHandlers(onfocusout, onFocusOut)}
 >
   {#if hotkeyLabel}
     <span data-tx-toast-hotkey-hint class="tx-toast-hotkey-hint">{hotkeyLabel}</span>

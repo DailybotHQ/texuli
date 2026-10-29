@@ -46,7 +46,10 @@ fallback. Image URLs go through `@texuli/core/url-policy` `safeImageSrc`. Parts:
 
 ## Behavior
 
-1. Mount / `src` change → status `loading`, Fallback visible, Image loads (hidden).
+1. Mount / `src` change → status `loading`, Fallback visible, Image loads
+   visually hidden (`opacity: 0`, one pixel, out of flow, `aria-hidden`). It is
+   never `hidden`: a host `[hidden] { display: none !important }` (Tailwind v4
+   preflight) would stop a lazy image from ever loading (G79).
 2. Load event → after `delayMs`, status `loaded`, Image shown, Fallback removed.
 3. Error or rejected `src` → status `error`, Fallback stays, Image removed.
 

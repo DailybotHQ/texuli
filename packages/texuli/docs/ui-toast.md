@@ -21,6 +21,8 @@ import { Toaster, toast, createToastStore } from 'texuli/toast';
 | `label` | Landmark name (default `"Notifications"`) |
 | `offset` | Lift above bottom nav (`--tx-toast-offset`) |
 | `dismissLabel` | Localizable close control prefix |
+| `mode` | `'top-layer'` (default) or `'contained'`: out of the top layer, pinned to the edges of `container` (or of the Toaster's nearest positioned ancestor), for framed previews |
+| `container` | The element a `'contained'` stack renders in; it becomes the containing block |
 | other attributes | Land on the Toaster's wrapper `div`. Caller `onpointerenter`, `onpointerleave`, `onfocusin` and `onfocusout` run first, then the Toaster's own pause handling (never replaced) |
 
 ### Settle reasons (undo)
@@ -95,6 +97,12 @@ toast.promise(save(), {
   `margin: 0`, no border, padding, background or overflow) and uses logical
   insets from `data-position`. Centered positions use auto inline margins,
   which are RTL-safe. `offset` adds space from the stack's edge.
+- **Nothing while empty (G77):** the viewport enters the top layer only
+  while it has toasts (including one on its way out), so an empty Toaster
+  never sits at the page corner, outside a framed preview.
+- **Contained (G77):** `mode="contained"` with a `container` keeps the stack
+  inside that element (`position: absolute`, above contained dialogs), never
+  in the top layer.
 - **Motion:** toasts slide in from the stack's edge. A dismissed toast stays
   mounted (`data-leaving`, inert, `aria-hidden`) for a 160 ms exit. Under
   reduced motion there is no animation and the toast leaves at once.

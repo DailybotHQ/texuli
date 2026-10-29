@@ -58,6 +58,27 @@
     );
   }
 
+  /*
+   * Contained (framed previews): out of the top layer, pinned to the edges of
+   * its container (the containing block) and above contained dialogs, which
+   * stack from z-index 1000 (OVERLAY_Z_BASE).
+   */
+  .tx-toaster__viewport[data-mode="contained"] {
+    position: absolute;
+    z-index: 2000;
+    max-block-size: 100%;
+  }
+
+  /*
+   * A top-layer viewport is shown only while it has toasts (the Toaster
+   * passes `active`): the closed popover must not paint at the corner.
+   */
+  @supports selector(:popover-open) {
+    .tx-toaster__viewport[popover]:not(:popover-open) {
+      display: none;
+    }
+  }
+
   .tx-toaster__viewport[data-position^="top"] {
     --tx-toast-enter: -0.5rem;
     inset-block-start: 0;

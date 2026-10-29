@@ -5,6 +5,7 @@
       "a11y-display.spec.ts",
       "a11y-overlays.spec.ts",
       "analytics.spec.ts",
+      "bugs-75-79.spec.ts",
       "csp-report.spec.ts",
       "responsive-sweep.spec.ts",
       "site-docs-shell.spec.ts",

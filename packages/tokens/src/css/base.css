@@ -243,10 +243,18 @@
       --tx-motion-spring-snappy-duration: 0ms !important;
       --tx-motion-spring-bouncy: linear !important;
       --tx-motion-spring-bouncy-duration: 0ms !important;
-      animation-duration: 0.01ms !important;
+      /*
+       * 0s duration AND delay, never a tiny duration: with 0.01ms a `visibility`
+       * transition (part of `transition-property: all`) still runs, so content
+       * nested in a container that turns visible appears one level per frame,
+       * and presence waits for motion end events instead of finishing (G78).
+       */
+      animation-duration: 0s !important;
+      animation-delay: 0s !important;
       animation-iteration-count: 1 !important;
       scroll-behavior: auto !important;
-      transition-duration: 0.01ms !important;
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
     }
   }
 
@@ -269,10 +277,18 @@
     --tx-motion-spring-snappy-duration: 0ms !important;
     --tx-motion-spring-bouncy: linear !important;
     --tx-motion-spring-bouncy-duration: 0ms !important;
-    animation-duration: 0.01ms !important;
+    /*
+     * 0s duration AND delay, never a tiny duration: with 0.01ms a `visibility`
+     * transition (part of `transition-property: all`) still runs, so content
+     * nested in a container that turns visible appears one level per frame,
+     * and presence waits for motion end events instead of finishing (G78).
+     */
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
   }
 
   @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {

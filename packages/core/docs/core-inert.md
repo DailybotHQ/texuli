@@ -24,7 +24,7 @@ lets those regions opt out once, page-wide, whichever island mounted them.
 | `getInertRegistry(globalObject?)` | Page-wide registry on `globalThis` (default) or a test fake. |
 | `resetInertRegistry(globalObject?)` | Restore everything and drop the shared instance (tests). |
 | `INERT_REGISTRY_GLOBAL_KEY` | `__TEXULI_INERT_REGISTRY_V1__`. Bump only on a breaking shape. |
-| `registry.exempt({ element, label? })` | Keep a region reachable under every current and future scope. Returns `{ release }`. |
+| `registry.exempt({ element, label?, raise? })` | Keep a region reachable under every current and future scope. Returns `{ release }`. `raise` (default `true`) lets the overlay engine re-show the region in the top layer above each overlay that opens later (the toast region); pass `false` for a region that belongs under later overlays (a dialog backdrop, a menu or listbox opened inside a modal). |
 | `registry.inertOutside(layer, { root?, ariaHidden?, observe?, label? })` | Open a modal scope. Returns `{ release, isActive }`. |
 | `registry.refresh()` | Recompute after the DOM under the scope's root changed. |
 | `registry.size()` / `inertElements()` / `exemptions()` / `isExempt(el)` | Inspect state. |

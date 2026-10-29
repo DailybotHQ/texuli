@@ -1,9 +1,11 @@
 <script lang="ts">
+import type { OverlayMode } from '@texuli/core/overlay';
 import { Toast } from '@texuli/primitives/toast';
 import { untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { chainHandlers } from '../../internal/handlers.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import { getToastStore, type ToastStore } from './toast-store.ts';
 import type { ToastItem, ToastKind } from './types.ts';
 import { type ToasterPosition, toasterClass, toastItemClass } from './variants.ts';
@@ -25,6 +27,16 @@ type OwnProps = {
   /** Override dismiss control label (localizable). */
   dismissLabel?: string;
   class?: ClassValue;
+  /**
+   * `'top-layer'` (default): the stack is a popover in the top layer, at the
+   * viewport edge. `'contained'`: it stays out of the top layer and sits at
+   * the edge of `container` (or of the nearest positioned ancestor of the
+   * Toaster), for framed previews. Either way nothing is shown while there are
+   * no toasts.
+   */
+  mode?: OverlayMode;
+  /** The element a `'contained'` stack renders in; it becomes the containing block. */
+  container?: Element | null;
 };
 
 /**
@@ -40,12 +52,15 @@ let {
   store: storeProp,
   dismissLabel = 'Dismiss notification',
   class: className,
+  mode = 'top-layer',
+  container = null,
   onpointerenter,
   onpointerleave,
   onfocusin,
   onfocusout,
+  ref = $bindable(null),
   ...rest
-}: Props = $props();
+}: Props & RefProp = $props();
 
 const uid = $props.id();
 const store = untrack(() => storeProp) ?? getToastStore();
@@ -128,6 +143,13 @@ function sync(next: readonly ToastItem[]): void {
     }
   }
   rendered = result;
+  // The region leaves the page when it empties, so a pointer or focus inside
+  // it never gets its leave event: drop the pause hold with it.
+  if (result.length === 0 && (hovered || focused)) {
+    hovered = false;
+    focused = false;
+    syncHold();
+  }
 }
 
 $effect(() => {
@@ -162,7 +184,7 @@ function runAction(item: ToastItem): void {
 </script>
 
 <Toast.Provider manager={store.manager} {label}>
-  <div
+  <div bind:this={ref}
     {...rest}
     class={classes}
     data-tx-toaster=""
@@ -172,7 +194,14 @@ function runAction(item: ToastItem): void {
     onfocusin={chainHandlers(onfocusin, focusIn)}
     onfocusout={chainHandlers(onfocusout, focusOut)}
   >
-    <Toast.Viewport class="tx-toaster__viewport" data-position={position}>
+    <!-- No top-layer region while empty: it would sit at the viewport corner (G77). -->
+    <Toast.Viewport
+      class="tx-toaster__viewport"
+      data-position={position}
+      {mode}
+      {container}
+      active={rendered.length > 0}
+    >
       {#if rendered.length > 0}
         <ol class="tx-toaster__list" data-tx-toast-list>
           {#each rendered as { item, leaving } (item.id)}
