@@ -117,6 +117,24 @@ describe('sheets documentation', () => {
     );
   });
 
+  it('describes the player sheetHost as built, since packages/player ships it', () => {
+    expect(existsSync('packages/player/src/sheet-host.ts')).toBe(true);
+    const texts = {
+      readme,
+      host: read('docs/host.md'),
+      source: read('src/host/sheet-host.ts'),
+      entry: read('src/host/index.ts'),
+      manifest: readFileSync('packages/catalog/src/manifests/sheets/index.ts', 'utf8'),
+    };
+    for (const [name, text] of Object.entries(texts)) {
+      const flat = text.replace(/\s+/g, ' ');
+      expect(flat, name).not.toMatch(
+        /(sheetHost|player[- ]side|player host)[^.]{0,80}\bplanned\b/i
+      );
+      expect(flat, name).not.toMatch(/\bplanned\b[^.]{0,40}`?sheetHost/i);
+    }
+  });
+
   it('keeps formula, model and csv framework-free and every source sink-free', () => {
     for (const file of [
       ...sources('src/formula'),

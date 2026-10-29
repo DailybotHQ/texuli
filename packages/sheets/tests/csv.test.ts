@@ -172,6 +172,27 @@ describe('csvToSheet', () => {
     expect(workbook.value('sheet1', 1, 1)).toBe(4);
   });
 
+  it('reports each CSV failure under its own code, in the issue and in csv', () => {
+    const cases: [string, unknown][] = [
+      ['unterminated-quote', 'a,"open\nb'],
+      ['too-large', 'x'.repeat(CSV_LIMITS.length + 1)],
+      ['too-many-rows', 'a\n'.repeat(CSV_LIMITS.rows + 1)],
+      ['too-many-columns', ','.repeat(CSV_LIMITS.columns)],
+      ['field-too-long', 'y'.repeat(CSV_LIMITS.field + 1)],
+      ['not-text', 42],
+    ];
+    for (const [code, text] of cases) {
+      const result = csvToSheet(text as string);
+      expect(result.ok, code).toBe(false);
+      expect(result.csv?.code, code).toBe(code);
+      expect(
+        result.issues.map((issue) => issue.code),
+        code
+      ).toEqual([code]);
+      expect(result.issues[0]?.severity, code).toBe('error');
+    }
+  });
+
   it('refuses malformed CSV and unsafe text through the sheet validator', () => {
     expect(csvToSheet('"open').ok).toBe(false);
     expect(csvToSheet('"open').csv?.code).toBe('unterminated-quote');

@@ -423,6 +423,40 @@ function handleGesture(id: string, mode: Mode): Attachment<HTMLElement> {
   };
 }
 
+// ── Scrolling content ──────────────────────────────────────────────────
+/**
+ * Widgets whose content overflows its box. Such a content box scrolls, so
+ * it becomes a tab stop named by the widget title (axe
+ * `scrollable-region-focusable`): keyboard users can reach and scroll it.
+ * Content that fits stays out of the tab order.
+ */
+let overflowing = $state<Record<string, boolean>>({});
+const scrollAttachments = new Map<string, Attachment<HTMLElement>>();
+function scrollRegion(id: string): Attachment<HTMLElement> {
+  let cached = scrollAttachments.get(id);
+  if (!cached) {
+    cached = (node) => {
+      // `untrack`: the attachment runs in an effect, and this writes what it reads.
+      const measure = () =>
+        untrack(() => {
+          overflowing[id] =
+            node.scrollHeight > node.clientHeight + 1 || node.scrollWidth > node.clientWidth + 1;
+        });
+      measure();
+      const resize = new ResizeObserver(measure);
+      const mutation = new MutationObserver(measure);
+      resize.observe(node);
+      mutation.observe(node, { childList: true, subtree: true, characterData: true });
+      return () => {
+        resize.disconnect();
+        mutation.disconnect();
+      };
+    };
+    scrollAttachments.set(id, cached);
+  }
+  return cached;
+}
+
 const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
 </script>
 
@@ -493,7 +527,14 @@ const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
               <button type="button" data-dashboard-cancel onclick={cancel}>{labels.cancel}</button>
             </div>
           {/if}
-          <div class="tx-dashboard__content">
+          <!-- svelte-ignore a11y_no_noninteractive_tabindex -- overflowing content scrolls; keyboard users must reach it (WCAG 2.1.1). -->
+          <div
+            class="tx-dashboard__content"
+            tabindex={overflowing[item.id] ? 0 : undefined}
+            role={overflowing[item.id] ? 'group' : undefined}
+            aria-labelledby={overflowing[item.id] ? `${rootId}-${item.id}-title` : undefined}
+            {@attach scrollRegion(item.id)}
+          >
             {@render entry?.content?.()}
           </div>
           {#if editable && !item.locked}
@@ -642,6 +683,7 @@ const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
 
     .tx-dashboard__handle:focus-visible,
     .tx-dashboard__resize:focus-visible,
+    .tx-dashboard__content:focus-visible,
     .tx-dashboard__toolbar button:focus-visible {
       outline: 2px solid var(--tx-ring, Highlight);
       outline-offset: 2px;

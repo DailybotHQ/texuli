@@ -19,7 +19,13 @@ layout) and refuses with a reason instead of throwing.
 - `DashboardChange`: `{ ok: true, layout, item }` or `{ ok: false, reason }`
   with `DashboardRefusal`: `unknown-item`, `locked`, `edge` or `size`.
 - `DashboardBreakpoint`: `{ id, minWidth, columns }`.
-- `DashboardIssue`: `{ path, message }`, what reading untrusted input dropped or clamped.
+- `DashboardIssue`: `{ code, path, message }`, what reading untrusted input
+  refused, dropped or clamped. `DashboardIssueCode` is `refused` (the whole
+  input was rejected and nothing was restored), `dropped` (an entry, a
+  layout or a breakpoint was left out) or `clamped` (one per number that did
+  not survive as written, rounding aside: outside the grid or the widget's
+  bounds, or not a number, with the value used in the message; a position
+  is compared only when the widget had both `x` and `y`).
 - `DashboardState`: `{ format: 'texuli-dashboard', formatVersion: 1, layouts }`.
 
 ## Layout

@@ -321,8 +321,44 @@ describe('persistence', () => {
     );
     expect(Object.keys(parsed.state?.layouts ?? {})).toEqual(['lg']);
     expect(parsed.state?.layouts.lg?.[0]?.w).toBe(12);
-    expect(parsed.issues.length).toBe(2);
+    expect(parsed.issues.map((issue) => issue.code)).toEqual(['dropped', 'clamped', 'dropped']);
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+  });
+
+  it('lists every clamped number as an issue with its path, and nothing for numbers that fit', () => {
+    const parsed = parseDashboard(
+      {
+        format: 'texuli-dashboard',
+        formatVersion: 1,
+        layouts: {
+          lg: [
+            { id: 'a', x: 0, y: 0, w: 400, h: 2 },
+            { id: 'b', x: -3, y: 1e9, w: 2, h: 0, minW: 0, maxH: 999 },
+            { id: 'c', x: 0, y: 4, w: 'wide', h: 2.4 },
+            { id: 'd', x: 4, y: 6, w: 3, h: 2, minW: 2, maxW: 6, minH: 1, maxH: 4 },
+          ],
+        },
+      },
+      { breakpoints: dashboardBreakpoints(12) }
+    );
+    const clamped = parsed.issues.filter((issue) => issue.code === 'clamped');
+    expect(clamped.map((issue) => issue.path).sort()).toEqual(
+      [
+        'layouts.lg[0].w',
+        'layouts.lg[1].h',
+        'layouts.lg[1].maxH',
+        'layouts.lg[1].minW',
+        'layouts.lg[1].x',
+        'layouts.lg[1].y',
+        'layouts.lg[2].w',
+      ].sort()
+    );
+    const first = clamped.find((issue) => issue.path === 'layouts.lg[0].w');
+    expect(first?.message).toContain('12');
+    expect(parsed.issues.every((issue) => typeof issue.code === 'string')).toBe(true);
+    // A valid stored dashboard reports nothing.
+    const json = serializeDashboard({ lg: base, sm: reflowLayout(base, 12, 1) });
+    expect(parseDashboard(json, { breakpoints: dashboardBreakpoints(12) }).issues).toEqual([]);
   });
 
   it('diffs two layouts into per-widget registers for a sync binding', () => {

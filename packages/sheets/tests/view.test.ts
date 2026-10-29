@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+import { readdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { EditableDataGrid } from '@texuli/data/grid-editing';
@@ -133,6 +134,38 @@ describe('SheetView', () => {
     });
     expect(result.violations.map((v) => v.id)).toEqual([]);
     expect(grid()).toBeTruthy();
+  });
+});
+
+describe('SheetView class names', () => {
+  // texuli's Sheet drawer (packages/texuli/src/components/sheet) styles `.tx-sheet`
+  // as a fixed overlay; a page loading both stylesheets must not match the view.
+  const drawerDir = 'packages/texuli/src/components/sheet';
+  const drawerSource = readdirSync(drawerDir)
+    .map((file) => readFileSync(`${drawerDir}/${file}`, 'utf8'))
+    .join('\n');
+  const drawerClasses = new Set(drawerSource.match(/tx-sheet[\w-]*/g) ?? []);
+  const drawerAttributes = new Set(drawerSource.match(/data-tx-sheet[\w-]*/g) ?? []);
+  const ownCss = readFileSync('packages/sheets/src/view/sheet-view.css', 'utf8');
+
+  it("never uses a class or marker of texuli's Sheet drawer", () => {
+    expect(drawerClasses.has('tx-sheet')).toBe(true);
+    expect(drawerClasses.has('tx-sheet__header')).toBe(true);
+    expect(drawerAttributes.has('data-tx-sheet')).toBe(true);
+    const { container } = setup();
+    const root = container.firstElementChild as HTMLElement;
+    const nodes = [root, ...root.querySelectorAll('*')];
+    const classes = new Set(nodes.flatMap((node) => [...node.classList]));
+    const attributes = new Set(nodes.flatMap((node) => node.getAttributeNames()));
+    expect(classes.size).toBeGreaterThan(3);
+    for (const name of classes) {
+      expect(drawerClasses.has(name), name).toBe(false);
+      expect(/^tx-sheet(?:$|__|--)/.test(name), name).toBe(false);
+    }
+    for (const name of attributes) expect(drawerAttributes.has(name), name).toBe(false);
+    for (const selector of ownCss.match(/\.tx-[\w-]+/g) ?? []) {
+      expect(drawerClasses.has(selector.slice(1)), selector).toBe(false);
+    }
   });
 });
 

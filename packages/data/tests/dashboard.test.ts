@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module';
 import { cleanup, fireEvent, render } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { loadMotionRuntime } from 'texuli/motion';
@@ -318,5 +319,91 @@ describe('Dashboard motion', () => {
       else expect(started, JSON.stringify(props)).toHaveLength(0);
       view.unmount();
     }
+  });
+});
+
+// axe-core comes with the root's @axe-core/playwright; resolve it from there.
+const req = createRequire(import.meta.url);
+type AxeResult = { violations: { id: string; nodes: { target: string[] }[] }[] };
+const axe = req(createRequire(req.resolve('@axe-core/playwright')).resolve('axe-core')) as {
+  run(context: Element, options: unknown): Promise<AxeResult>;
+};
+
+describe('Dashboard widget scroll region (axe scrollable-region-focusable)', () => {
+  /** Content boxes of 100px; the widget whose id is in `tall` holds 400px of content. */
+  function sizeContent(tall: Set<string>): void {
+    const own = (node: HTMLElement) =>
+      node.classList.contains('tx-dashboard__content') ? node : null;
+    const id = (node: HTMLElement) =>
+      node.closest<HTMLElement>('[data-dashboard-widget]')?.dataset.widgetId ?? '';
+    for (const key of ['clientHeight', 'clientWidth', 'scrollWidth'] as const) {
+      const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, key)?.get;
+      vi.spyOn(HTMLElement.prototype, key, 'get').mockImplementation(function (this: Element) {
+        return own(this as HTMLElement) ? 100 : (original?.call(this) ?? 0);
+      });
+    }
+    const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'scrollHeight')?.get;
+    vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockImplementation(function (
+      this: Element
+    ) {
+      const node = own(this as HTMLElement);
+      if (!node) return original?.call(this) ?? 0;
+      return tall.has(id(node)) ? 400 : 100;
+    });
+    // Boxes for axe: a content box is 100px square; text in a tall widget sits below it.
+    const box = (top: number, height: number) =>
+      ({
+        top,
+        bottom: top + height,
+        left: 0,
+        right: 100,
+        width: 100,
+        height,
+        x: 0,
+        y: top,
+      }) as DOMRect;
+    const originalBox = HTMLElement.prototype.getBoundingClientRect;
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      return own(this) ? box(0, 100) : originalBox.call(this);
+    });
+    vi.spyOn(Range.prototype, 'getClientRects').mockImplementation(function (this: Range) {
+      const start = this.startContainer as Node;
+      const element = start instanceof HTMLElement ? start : start.parentElement;
+      const below = element ? tall.has(id(element)) : false;
+      return [box(below ? 300 : 10, 20)] as unknown as DOMRectList;
+    });
+  }
+
+  it('makes only an overflowing widget content a named tab stop, and passes axe', async () => {
+    sizeContent(new Set(['b']));
+    const { container } = render(DashboardHarness, { props: { widgets, editable: false } });
+    await settle();
+    const content = (id: string) =>
+      container.querySelector<HTMLElement>(
+        `[data-widget-id="${id}"] .tx-dashboard__content`
+      ) as HTMLElement;
+    // Inline overflow so axe sees a scroll container whatever the injected CSS.
+    for (const id of ['a', 'b', 'c']) {
+      content(id).style.overflowX = 'auto';
+      content(id).style.overflowY = 'auto';
+    }
+    const tall = content('b');
+    expect(tall.getAttribute('tabindex')).toBe('0');
+    expect(tall.getAttribute('role')).toBe('group');
+    const titleId = tall.getAttribute('aria-labelledby') as string;
+    expect(container.querySelector(`[id="${titleId}"]`)?.textContent).toBe('Bravo');
+    for (const id of ['a', 'c']) {
+      expect(content(id).hasAttribute('tabindex'), id).toBe(false);
+      expect(content(id).hasAttribute('role'), id).toBe(false);
+    }
+    const result = await axe.run(container, {
+      runOnly: {
+        type: 'rule',
+        values: ['scrollable-region-focusable', 'aria-allowed-attr', 'aria-prohibited-attr'],
+      },
+    });
+    expect(result.violations.map((v) => v.id)).toEqual([]);
   });
 });

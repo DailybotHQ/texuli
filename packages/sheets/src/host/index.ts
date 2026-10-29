@@ -1,6 +1,7 @@
 /**
- * @texuli/sheets/host: the sheet half of a player host seam (the player's
- * `sheetHost` is planned) and the draft check it carries.
+ * @texuli/sheets/host: the sheet half of the player's `sheetHost` seam
+ * (pass `createSheetPlayerHost()` as `sheetHost` on `Player`) and the draft
+ * check it carries.
  */
 export {
   createSheetPlayerHost,

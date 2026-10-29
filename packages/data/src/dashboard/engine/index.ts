@@ -64,6 +64,7 @@ export type {
   DashboardCompaction,
   DashboardGridOptions,
   DashboardIssue,
+  DashboardIssueCode,
   DashboardItem,
   DashboardLayout,
   DashboardRefusal,

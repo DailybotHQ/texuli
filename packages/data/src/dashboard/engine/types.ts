@@ -68,8 +68,17 @@ export interface DashboardGridOptions {
   readonly compaction?: DashboardCompaction;
 }
 
+/**
+ * What reading untrusted input did about a value: `refused` (the whole
+ * input was rejected, nothing restored), `dropped` (an entry or a layout
+ * was left out) or `clamped` (a number was out of range, or not a number,
+ * and a value inside the grid was used instead).
+ */
+export type DashboardIssueCode = 'refused' | 'dropped' | 'clamped';
+
 /** A finding while reading an untrusted layout or dashboard state. */
 export interface DashboardIssue {
+  readonly code: DashboardIssueCode;
   /** JSON-style path of the value (`layouts.lg[3].w`). */
   readonly path: string;
   readonly message: string;

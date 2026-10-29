@@ -14,10 +14,12 @@ grid editing layer.
 > its version is the `0.0.0` placeholder and it is private to the workspace
 > until a release the developer approves publishes it (planned for `0.8.0`,
 > PLAN_010; see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
-> Agents emit sheets as data through the `sheet` catalog id of blueprint
-> spec `0.8.0`, checked by `checkSheetDraft`. Planned, not shipped:
-> collaboration on `@texuli/document/sync`, a player host that paints
-> `sheet` nodes, localized formula display, and native (Kotlin) evaluation.
+> Agents emit sheets as data through the `spreadsheet` catalog id of
+> blueprint spec `0.8.0`, checked by `checkSheetDraft`, and
+> `@texuli/player` paints them through its `sheetHost` seam with
+> `createSheetPlayerHost()` from `./host`. Planned, not shipped:
+> collaboration on `@texuli/document/sync`, localized formula display, and
+> native (Kotlin) evaluation.
 
 It sits on layer L5 ([ADR-015](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic)):
 the view builds on `@texuli/data` (L4), so the package sits above it. It
@@ -54,7 +56,7 @@ import no Svelte and no DOM.
 | `./model` | Framework-free: the sheet format, `validateSheet` and `loadUntrustedSheet`, the dependency graph and the workbook engine | [model](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/model.md) |
 | `./csv` | Framework-free: CSV parse and write, import as a sheet, export a sheet | [csv](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/csv.md) |
 | `./view` | `SheetView`: the accessible spreadsheet with tabs and a formula bar | [view](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/view.md) |
-| `./host` | `createSheetPlayerHost`: the sheet half of a player host seam (the player side is planned) and its draft check | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/host.md) |
+| `./host` | `createSheetPlayerHost`: the sheet half of the player's `sheetHost` seam (pass it as `sheetHost` on `Player`) and its draft check | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/host.md) |
 
 `SHEETS_PACKAGE_VERSION` is `0.0.0` until the first release.
 

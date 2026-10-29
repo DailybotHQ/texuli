@@ -259,7 +259,7 @@ export function csvToSheet(
       sheet: null,
       issues: Object.freeze([
         Object.freeze({
-          code: 'too-large' as const,
+          code: parsed.issue.code,
           path: `$:${parsed.issue.line}`,
           message: parsed.issue.message,
           severity: 'error' as const,

@@ -206,6 +206,41 @@ export function firstFit(
   return { x: 0, y: layoutBottom(layout) };
 }
 
+const CLAMPED_FIELDS = ['x', 'y', 'w', 'h', 'minW', 'maxW', 'minH', 'maxH'] as const;
+
+/**
+ * One `clamped` issue per number of an untrusted widget that did not survive
+ * as written (rounding aside): out of the grid or its bounds, or not a
+ * number at all. A position is only compared when the widget was placed
+ * (a widget without both `x` and `y` is placed in the first free cell).
+ */
+function clampIssues(
+  input: Record<string, unknown>,
+  read: { item: DashboardItem; placed: boolean },
+  columns: number,
+  at: string
+): DashboardIssue[] {
+  // The item repeats its bounds whenever it keeps them, so it wins over them.
+  const used: Record<string, unknown> = {
+    ...sizeBounds(input as Parameters<typeof sizeBounds>[0], columns),
+    ...read.item,
+  };
+  const issues: DashboardIssue[] = [];
+  for (const field of CLAMPED_FIELDS) {
+    const value = input[field];
+    if (value === undefined || (!read.placed && (field === 'x' || field === 'y'))) continue;
+    const n = typeof value === 'number' && Number.isFinite(value) ? Math.round(value) : Number.NaN;
+    if (n !== used[field]) {
+      issues.push({
+        code: 'clamped',
+        path: `${at}.${field}`,
+        message: `${field} was clamped to ${used[field]}.`,
+      });
+    }
+  }
+  return issues;
+}
+
 /**
  * Reads an untrusted layout (storage, a sync peer, an agent): drops entries
  * that are not widgets and duplicate ids, caps the count, clamps every
@@ -218,7 +253,9 @@ export function normalizeLayout(
 ): { layout: DashboardItem[]; issues: DashboardIssue[] } {
   const issues: DashboardIssue[] = [];
   if (!Array.isArray(input)) {
-    if (input !== undefined) issues.push({ path: '', message: 'A layout is an array of widgets.' });
+    if (input !== undefined) {
+      issues.push({ code: 'dropped', path: '', message: 'A layout is an array of widgets.' });
+    }
     return { layout: [], issues };
   }
   const cols = clampColumns(options.columns);
@@ -228,6 +265,7 @@ export function normalizeLayout(
   const count = Math.min(input.length, DASHBOARD_LIMITS.widgets);
   if (input.length > count) {
     issues.push({
+      code: 'dropped',
       path: '',
       message: `At most ${DASHBOARD_LIMITS.widgets} widgets; the rest were dropped.`,
     });
@@ -235,14 +273,23 @@ export function normalizeLayout(
   for (let i = 0; i < count; i += 1) {
     const read = normalizeItem(input[i], cols);
     if (!read) {
-      issues.push({ path: `[${i}]`, message: 'Not a widget: it needs a valid id.' });
+      issues.push({
+        code: 'dropped',
+        path: `[${i}]`,
+        message: 'Not a widget: it needs a valid id.',
+      });
       continue;
     }
     if (seen.has(read.item.id)) {
-      issues.push({ path: `[${i}].id`, message: `Duplicate widget id "${read.item.id}".` });
+      issues.push({
+        code: 'dropped',
+        path: `[${i}].id`,
+        message: `Duplicate widget id "${read.item.id}".`,
+      });
       continue;
     }
     seen.add(read.item.id);
+    issues.push(...clampIssues(input[i] as Record<string, unknown>, read, cols, `[${i}]`));
     (read.placed ? placed : unplaced).push(read.item);
   }
   // Locked widgets keep their place unless they overlap an earlier locked one.

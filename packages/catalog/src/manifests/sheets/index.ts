@@ -5,9 +5,10 @@
  * starts with `=` is a formula in the closed sheet grammar). `validateDraft`
  * refuses a `spreadsheet` node unless the host supplies the sheet validator
  * (`checkSheet`, usually `checkSheetDraft` from `@texuli/sheets/model`), so
- * every agent formula is parsed at draft time. Painting `spreadsheet` nodes in
- * `@texuli/player` (a sheet host) is planned. Build-time only; a subpath
- * group the catalog root does not re-export.
+ * every agent formula is parsed at draft time. `@texuli/player` paints
+ * `spreadsheet` nodes through its `sheetHost` seam (`createSheetPlayerHost`
+ * from `@texuli/sheets/host`). Build-time only; a subpath group the catalog
+ * root does not re-export.
  */
 import { manifestData } from '../../manifest/data.ts';
 import type { CatalogManifest } from '../../manifest/types.ts';

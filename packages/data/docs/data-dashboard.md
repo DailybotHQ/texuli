@@ -126,6 +126,11 @@ content in place.
 - Focus stays on the handle as the widget moves; the live region announces
   pick up, every step, refusals (a locked widget in the way, an edge, a size
   limit), the drop and a cancel.
+- A widget whose content overflows its box (so it scrolls) makes that box
+  a tab stop: `tabindex="0"`, `role="group"` and `aria-labelledby` the
+  widget title, measured on mount and whenever the box or its content
+  changes. Content that fits stays out of the tab order (axe
+  `scrollable-region-focusable`).
 - Logical CSS only; forced colors keep borders, handles and the picked-up
   outline visible.
 

@@ -22,6 +22,16 @@ regular expression.
 It stops at the first cap it crosses (`CSV_LIMITS`: 8,000,000 characters,
 10,000 rows, 256 fields per row, 32,768 characters per field) or at an
 unclosed quote, with a `CsvIssue` (`code`, 1-based `line`, `message`).
+Each failure has its own code:
+
+| `code` | When |
+| --- | --- |
+| `not-text` | The input is not a string |
+| `too-large` | The text is longer than `CSV_LIMITS.length` |
+| `too-many-rows` | More than `CSV_LIMITS.rows` rows |
+| `too-many-columns` | A row with more than `CSV_LIMITS.columns` fields |
+| `field-too-long` | A field longer than `CSV_LIMITS.field` characters |
+| `unterminated-quote` | A quoted field is never closed (`line` is where it opened) |
 
 `csvToSheet(text, options)` imports a one-sheet document and validates it
 with `validateSheet` (`CsvToSheetOptions`: `id`, `name`, `title`,
@@ -29,7 +39,10 @@ with `validateSheet` (`CsvToSheetOptions`: `id`, `name`, `title`,
 numbers and booleans unless `types` is `false`. **A field that starts with
 `=` stays text** (written `'=…`) unless `formulas` is `true`, because a CSV
 from elsewhere is untrusted; with it, formulas still pass the sheet grammar
-and caps. Text with control or bidi characters is refused.
+and caps. Text with control or bidi characters is refused. When the CSV
+itself cannot be read, the result is `ok: false` with one error
+`SheetIssue` whose `code` is the `CsvIssue` code from the table above (path
+`$:<line>`), and the `CsvIssue` itself as `csv`.
 
 ## Export
 

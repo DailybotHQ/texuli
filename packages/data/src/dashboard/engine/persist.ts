@@ -67,43 +67,73 @@ export function parseDashboard(
   let value = input;
   if (typeof input === 'string') {
     if (input.length > DASHBOARD_LIMITS.stateBytes) {
-      return { state: null, issues: [{ path: '', message: 'The saved dashboard is too large.' }] };
+      return {
+        state: null,
+        issues: [{ code: 'refused', path: '', message: 'The saved dashboard is too large.' }],
+      };
     }
     try {
       value = JSON.parse(input);
     } catch {
-      return { state: null, issues: [{ path: '', message: 'The saved dashboard is not JSON.' }] };
+      return {
+        state: null,
+        issues: [{ code: 'refused', path: '', message: 'The saved dashboard is not JSON.' }],
+      };
     }
   }
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
-    return { state: null, issues: [{ path: '', message: 'A saved dashboard is an object.' }] };
+    return {
+      state: null,
+      issues: [{ code: 'refused', path: '', message: 'A saved dashboard is an object.' }],
+    };
   }
   const record = value as Record<string, unknown>;
   if (record.format !== 'texuli-dashboard' || record.formatVersion !== 1) {
     return {
       state: null,
-      issues: [{ path: 'format', message: 'Not a texuli-dashboard document at version 1.' }],
+      issues: [
+        {
+          code: 'refused',
+          path: 'format',
+          message: 'Not a texuli-dashboard document at version 1.',
+        },
+      ],
     };
   }
   const raw = record.layouts;
   if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
-    return { state: null, issues: [{ path: 'layouts', message: 'layouts is an object.' }] };
+    return {
+      state: null,
+      issues: [{ code: 'refused', path: 'layouts', message: 'layouts is an object.' }],
+    };
   }
   const breakpoints = options.breakpoints ? normalizeBreakpoints(options.breakpoints) : null;
   const layouts: Record<string, DashboardLayout> = {};
   let count = 0;
   for (const id of Object.keys(raw)) {
     if (!isDashboardId(id)) {
-      issues.push({ path: 'layouts', message: 'A breakpoint id was not valid; it was dropped.' });
+      issues.push({
+        code: 'dropped',
+        path: 'layouts',
+        message: 'A breakpoint id was not valid; it was dropped.',
+      });
       continue;
     }
     const breakpoint = breakpoints?.find((entry) => entry.id === id);
     if (breakpoints && !breakpoint) {
-      issues.push({ path: `layouts.${id}`, message: `No breakpoint "${id}"; it was dropped.` });
+      issues.push({
+        code: 'dropped',
+        path: `layouts.${id}`,
+        message: `No breakpoint "${id}"; it was dropped.`,
+      });
       continue;
     }
     if (count >= DASHBOARD_LIMITS.breakpoints) {
-      issues.push({ path: `layouts.${id}`, message: 'Too many layouts; the rest were dropped.' });
+      issues.push({
+        code: 'dropped',
+        path: `layouts.${id}`,
+        message: 'Too many layouts; the rest were dropped.',
+      });
       break;
     }
     count += 1;
@@ -112,7 +142,7 @@ export function parseDashboard(
       compaction: options.compaction ?? 'vertical',
     });
     for (const issue of read.issues) {
-      issues.push({ path: `layouts.${id}${issue.path}`, message: issue.message });
+      issues.push({ ...issue, path: `layouts.${id}${issue.path}` });
     }
     layouts[id] = read.layout;
   }

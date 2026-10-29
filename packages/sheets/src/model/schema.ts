@@ -36,7 +36,13 @@ export interface SheetIssue {
     | 'unsafe-text'
     | 'formula'
     | 'too-many'
-    | 'too-large';
+    | 'too-large'
+    // From `csvToSheet` only: the `CsvIssue` code of the CSV that could not be read.
+    | 'unterminated-quote'
+    | 'too-many-rows'
+    | 'too-many-columns'
+    | 'field-too-long'
+    | 'not-text';
   /** A JSON path (`sheets[0].cells.B3`). */
   readonly path: string;
   readonly message: string;

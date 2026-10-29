@@ -1,11 +1,12 @@
 /**
- * The sheet half of a planned `sheetHost` seam of `@texuli/player` (spec
- * 0.8.0), shaped like `canvasHost`: agents emit a `spreadsheet` catalog
- * node whose `sheet` prop holds a sheet; the player runs `checkSheet` inside
- * its validation and hands a valid sheet to `present`, which mounts a
- * read-only `SheetView` (loaded on first use) into the player's surface.
- * The types are declared here structurally, because this package (L5)
- * cannot import the player (L7). The player-side seam is planned.
+ * The sheet half of the `sheetHost` seam of `@texuli/player` (spec 0.8.0,
+ * `packages/player/src/sheet-host.ts`), shaped like `canvasHost`: agents
+ * emit a `spreadsheet` catalog node whose `sheet` prop holds a sheet; the
+ * player runs `checkSheet` inside its validation and hands a valid sheet to
+ * `present`, which mounts a read-only `SheetView` (loaded on first use) in
+ * the node's place. The types are declared here structurally, because this
+ * package (L5) cannot import the player (L7); pass the result as
+ * `sheetHost` on `Player`.
  */
 import { mount, unmount } from 'svelte';
 import { validateSheet } from '../model/schema.ts';

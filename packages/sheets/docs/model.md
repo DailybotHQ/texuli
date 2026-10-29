@@ -65,7 +65,9 @@ that are not numbers, booleans, text or formulas, control and bidi
 characters in text, and formulas that do not parse or that read a sheet
 that does not exist. A formula that reads past the edge of its sheet is a
 warning (it shows `#REF!`). Linear in the input; a hostile document stops
-at the first cap it crosses.
+at the first cap it crosses. `csvToSheet` adds the CSV reader's own codes
+(`not-text`, `too-many-rows`, `too-many-columns`, `field-too-long`,
+`unterminated-quote`, besides `too-large`; see [csv.md](csv.md)).
 
 `loadUntrustedSheet(json)` caps and parses JSON text, then validates.
 `checkSheetDraft(sheet, tier)` is the draft check to inject as `checkSheet`

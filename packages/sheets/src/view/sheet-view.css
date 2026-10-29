@@ -3,19 +3,19 @@
  * @layer tx.components so consumer utilities can override.
  */
 @layer tx.components {
-  .tx-sheet {
+  .tx-sheets-view {
     display: grid;
     gap: 0.5rem;
     min-inline-size: 0;
   }
 
-  .tx-sheet__tabs {
+  .tx-sheets-view__tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 0.25rem;
   }
 
-  .tx-sheet__tab {
+  .tx-sheets-view__tab {
     min-block-size: var(--tx-target-size, 2.25rem);
     padding-inline: 0.75rem;
     border: var(--tx-border-width, 1px) solid var(--tx-border, ButtonBorder);
@@ -26,17 +26,17 @@
     cursor: pointer;
   }
 
-  .tx-sheet__tab[aria-pressed="true"] {
+  .tx-sheets-view__tab[aria-pressed="true"] {
     border-color: var(--tx-primary, Highlight);
     font-weight: 600;
   }
 
-  .tx-sheet__tab:focus-visible {
+  .tx-sheets-view__tab:focus-visible {
     outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
     outline-offset: 2px;
   }
 
-  .tx-sheet__bar {
+  .tx-sheets-view__bar {
     display: flex;
     gap: 0.75rem;
     align-items: baseline;
@@ -49,22 +49,22 @@
     overflow-wrap: anywhere;
   }
 
-  .tx-sheet__address {
+  .tx-sheets-view__address {
     min-inline-size: 3.5rem;
     font-weight: 600;
   }
 
-  .tx-sheet__input {
+  .tx-sheets-view__input {
     font-family: var(--tx-font-mono, ui-monospace, monospace);
     white-space: pre-wrap;
   }
 
-  .tx-sheet [data-tx-edit-cell] {
+  .tx-sheets-view [data-tx-edit-cell] {
     font-variant-numeric: tabular-nums;
   }
 
   @media (forced-colors: active) {
-    .tx-sheet__tab[aria-pressed="true"] {
+    .tx-sheets-view__tab[aria-pressed="true"] {
       border-color: Highlight;
     }
   }

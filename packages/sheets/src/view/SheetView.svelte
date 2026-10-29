@@ -173,13 +173,13 @@ function apply(rowId: string, columnKey: string, value: unknown): void {
 }
 </script>
 
-<div class={cx('tx-sheet', className)} data-tx-sheet>
+<div class={cx('tx-sheets-view', className)} data-tx-sheets-view>
   {#if workbook.sheets.length > 1}
-    <div class="tx-sheet__tabs" role="group" aria-label={text.sheets}>
+    <div class="tx-sheets-view__tabs" role="group" aria-label={text.sheets}>
       {#each workbook.sheets as tab (tab.id)}
         <button
           type="button"
-          class="tx-sheet__tab"
+          class="tx-sheets-view__tab"
           aria-pressed={tab.id === sheetId}
           onclick={() => {
             activeSheet = tab.id;
@@ -193,9 +193,9 @@ function apply(rowId: string, columnKey: string, value: unknown): void {
   {/if}
 
   {#if formulaBar}
-    <div class="tx-sheet__bar" role="group" aria-label={text.formulaBar} data-tx-sheet-bar>
-      <span class="tx-sheet__address">{where?.address ?? ''}</span>
-      <span class="tx-sheet__input">{where?.input ?? ''}</span>
+    <div class="tx-sheets-view__bar" role="group" aria-label={text.formulaBar} data-tx-sheet-bar>
+      <span class="tx-sheets-view__address">{where?.address ?? ''}</span>
+      <span class="tx-sheets-view__input">{where?.input ?? ''}</span>
     </div>
   {/if}
 

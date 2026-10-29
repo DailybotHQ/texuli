@@ -1,15 +1,27 @@
 # Player host (`@texuli/sheets/host`)
 
-The sheet half of a host seam for `@texuli/player`, shaped like the
-`canvasHost` seam of `@texuli/canvas/host`. **The player-side `sheetHost`
-seam is planned**: today the player does not paint `spreadsheet` nodes, and
-a host validates them through `validateDraft` with `checkSheet`.
+The sheet half of the `sheetHost` seam of `@texuli/player`, shaped like the
+`canvasHost` seam of `@texuli/canvas/host`. Pass it as `sheetHost` on
+`Player`: the player runs its `checkSheet` inside validation (every formula
+is parsed at draft time) and paints each valid `spreadsheet` node in place
+through `present`. Without a sheet host the player refuses `spreadsheet`
+nodes (`sheet-unchecked`). Outside the player, a host can pass the same
+check to `validateDraft`. Both sides are on this branch and not yet
+published.
+
+```svelte
+<script lang="ts">
+  import { Player } from '@texuli/player';
+  import { createSheetPlayerHost } from '@texuli/sheets/host';
+  let { draft } = $props();
+  const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
+</script>
+
+<Player blueprint={draft} label="Agent sheet" {sheetHost} />
+```
 
 ```ts
-import { createSheetPlayerHost } from '@texuli/sheets/host';
-
-const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
-// validateDraft(draft, { catalog, checkSheet: sheetHost.checkSheet });
+// Without the player: validateDraft(draft, { catalog, checkSheet: sheetHost.checkSheet });
 ```
 
 `createSheetPlayerHost(options)` returns a `SheetHost`:

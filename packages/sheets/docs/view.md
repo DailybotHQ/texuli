@@ -60,4 +60,6 @@ TSV blocks. Columns are named by their letters and the first column holds
 row numbers. The formula bar is a named group (`Formula bar`). Rows window
 past `virtualizeAbove` with focus kept. The view is axe-clean in its tests;
 CSS uses logical properties and keeps focus and the active tab visible in
-forced colors.
+forced colors. The root class is `tx-sheets-view` (parts `tx-sheets-view__*`,
+marker `data-tx-sheets-view`), never texuli's `tx-sheet` drawer classes, so a
+page can load both stylesheets; a test keeps the two apart.
