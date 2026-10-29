@@ -175,18 +175,13 @@ describe('reading Markdown', () => {
     // A long paragraph read slower than linear: every soft line break read
     // the end of the text being built, which flattened the whole string
     // (101 ms at 100,000 characters and 3.7 s at 400,000 before the fix), and
-    // the mark pass made one object per character. Fastest of three, compared at N and 4N with the
-    // caps raised, so a loaded host slows both sides alike; the floor keeps
-    // sub-millisecond timings from deciding.
+    // the mark pass made one object per character. Compared at N and 4N with
+    // the caps raised.
     const limits = { maxSource: 400_000, limits: { chars: 400_000 } };
-    const fastest = (source: string) => {
-      let best = Number.POSITIVE_INFINITY;
-      for (let k = 0; k < 3; k += 1) {
-        const started = performance.now();
-        fromMarkdown(source, limits);
-        best = Math.min(best, performance.now() - started);
-      }
-      return best;
+    const time = (source: string) => {
+      const started = performance.now();
+      fromMarkdown(source, limits);
+      return performance.now() - started;
     };
     const shapes = {
       'soft line breaks': (n: number) => 'ab\n'.repeat(Math.floor(n / 3)),
@@ -196,11 +191,22 @@ describe('reading Markdown', () => {
     for (const [name, make] of Object.entries(shapes)) {
       const read = fromMarkdown(make(400_000), limits);
       expect(editorPlainText(read.doc).length, name).toBeGreaterThan(390_000);
-      const small = fastest(make(100_000));
-      const large = fastest(make(400_000));
-      expect(large, `${name}: ${small.toFixed(1)} ms -> ${large.toFixed(1)} ms`).toBeLessThan(
-        Math.max(8 * small, 25)
-      );
+      // Interleaved fastest-of-seven, so a load spike hits both sizes alike.
+      // Linear growth is 4x and the old quadratic paths were 16x or more
+      // (3.7 s at 400,000); a 10x ratio with a 150 ms floor separates them
+      // on a loaded host without flaking on sub-millisecond noise.
+      const small = make(100_000);
+      const large = make(400_000);
+      let bestSmall = Number.POSITIVE_INFINITY;
+      let bestLarge = Number.POSITIVE_INFINITY;
+      for (let k = 0; k < 7; k += 1) {
+        bestSmall = Math.min(bestSmall, time(small));
+        bestLarge = Math.min(bestLarge, time(large));
+      }
+      expect(
+        bestLarge,
+        `${name}: ${bestSmall.toFixed(1)} ms -> ${bestLarge.toFixed(1)} ms`
+      ).toBeLessThan(Math.max(10 * bestSmall, 150));
     }
   }, 60_000);
 });
