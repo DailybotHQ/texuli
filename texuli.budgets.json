@@ -657,8 +657,8 @@
     },
     "@texuli/astro/styles.css": {
       "gzip": 64,
-      "cssGzip": 2112,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 1,985 B CSS, cap = measured + 4% headroom."
+      "cssGzip": 2624,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 1,985 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 2112 -> 2624 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 2,488 B."
     },
     "@texuli/astro/layouts/ContentLayout": {
       "gzip": 64,
@@ -763,8 +763,8 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 39872 -> 42112 B, measured + 4% after the four new catalog manifests and the G21 block fields in the deck grammar; measured 40,474 B."
     },
     "@texuli/slides/components": {
-      "gzip": 55613,
-      "note": "Owner decision 2026-10-28 (PLAN_008, owner consent in analysis_results/owner-consent.md): new public subpath for hosts such as Protoyard (the component registry: the renderer table, the slide-component outline (53 ids, exclusions with reasons), the state host and capabilities; painters and player families load lazily); measured 53,473 B gzip, cap = measured + 4% headroom."
+      "gzip": 58432,
+      "note": "Owner decision 2026-10-28 (PLAN_008, owner consent in analysis_results/owner-consent.md): new public subpath for hosts such as Protoyard (the component registry: the renderer table, the slide-component outline (53 ids, exclusions with reasons), the state host and capabilities; painters and player families load lazily); measured 53,473 B gzip, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): 55613 -> 58432 B, measured + 4% after ref, rest props and composed handlers on the texuli components it registers (T-std-contract); measured 56,146 B."
     },
     "@texuli/slides/layouts": {
       "gzip": 40575,
@@ -785,8 +785,8 @@
     },
     "@texuli/slides/styles.css": {
       "gzip": 64,
-      "cssGzip": 4931,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 4,741 B CSS gzip on the final PLAN_008 stage, cap = measured + 4% headroom."
+      "cssGzip": 5632,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 4,741 B CSS gzip on the final PLAN_008 stage, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 4931 -> 5632 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 5,411 B."
     },
     "@texuli/spec/motion": {
       "gzip": 960,
