@@ -1,4 +1,5 @@
 <script lang="ts">
+import '../table/grid.css';
 import { fitChartWidth } from '../math/layout/fit-width.ts';
 import {
   createViolinLayout,
@@ -87,7 +88,7 @@ $effect(() => {
       {/each}
     </g>
   </svg>
-  <details class="data-table">
+  <details class="tx-chart-data tx-chart-data--scroll">
     <summary>{text.table}</summary>
     <table>
       <caption>{title} data</caption>
@@ -131,10 +132,6 @@ $effect(() => {
   .tick, .category { fill: var(--tx-muted-foreground, GrayText); font-size: 0.75rem; }
   .violin { fill: color-mix(in oklab, var(--violin-color) 32%, transparent); stroke: var(--violin-color); stroke-width: 1.5; }
   .median { stroke: var(--tx-foreground, CanvasText); stroke-width: 2.5; }
-  .data-table { margin-block-start: 0.75rem; overflow-x: auto; }
-  summary { cursor: pointer; min-block-size: 2.75rem; align-content: center; }
-  table { border-collapse: collapse; inline-size: 100%; }
-  th, td { border: 1px solid var(--tx-chart-grid, var(--tx-border, GrayText)); padding: 0.375rem 0.5rem; text-align: start; }
   @media (forced-colors: active) {
     figcaption p, .tick, .category { color: CanvasText; fill: CanvasText; }
     .violin { fill: Canvas; stroke: Highlight; }

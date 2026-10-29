@@ -49,6 +49,9 @@ import { resolveImageSources } from '@texuli/media/image';
 import type { Theme } from '@texuli/tokens/contract';
 import { defineTheme } from '@texuli/tokens/contract';
 import { flushSync, onMount, type Snippet, tick, untrack } from 'svelte';
+// A server build preloads the stage's lazy code here, so the server render keeps the slides
+// (`./ssr-server.ts`); a browser build imports nothing (`./ssr-browser.ts`).
+import '#deck-ssr';
 import { loadBuiltinDeckBlocks, loadedBuiltinDeckBlocks } from './builtin-loader.ts';
 import DeckChrome from './chrome/DeckChrome.svelte';
 import DeckProgress from './chrome/DeckProgress.svelte';

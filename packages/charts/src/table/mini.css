@@ -1,0 +1,19 @@
+/*
+ * Compact look of the chart data-table fallback (sparkline, gauge, progress
+ * ring, bullet). Shared by the compact charts (see grid.css).
+ */
+
+.tx-chart-mini {
+  font-size: 0.875rem;
+}
+
+.tx-chart-mini table {
+  border-collapse: collapse;
+  inline-size: 100%;
+}
+
+.tx-chart-mini :is(th, td) {
+  border: 1px solid var(--tx-border, currentColor);
+  padding: 0.25em 0.5em;
+  text-align: start;
+}

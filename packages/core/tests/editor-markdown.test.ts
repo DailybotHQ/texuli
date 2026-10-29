@@ -163,6 +163,39 @@ describe('reading Markdown', () => {
     expect(blocks.doc.blocks.length).toBeLessThanOrEqual(EDITOR_LIMITS.blocks);
     expect(blocks.diagnostics.map((d) => d.code)).toContain('blocks-capped');
   }, 30_000);
+
+  it('reads long plain paragraphs in linear time', () => {
+    // A long paragraph read slower than linear: every soft line break read
+    // the end of the text being built, which flattened the whole string
+    // (101 ms at 100,000 characters and 3.7 s at 400,000 before the fix), and
+    // the mark pass made one object per character. Fastest of three, compared at N and 4N with the
+    // caps raised, so a loaded host slows both sides alike; the floor keeps
+    // sub-millisecond timings from deciding.
+    const limits = { maxSource: 400_000, limits: { chars: 400_000 } };
+    const fastest = (source: string) => {
+      let best = Number.POSITIVE_INFINITY;
+      for (let k = 0; k < 3; k += 1) {
+        const started = performance.now();
+        fromMarkdown(source, limits);
+        best = Math.min(best, performance.now() - started);
+      }
+      return best;
+    };
+    const shapes = {
+      'soft line breaks': (n: number) => 'ab\n'.repeat(Math.floor(n / 3)),
+      'one long word': (n: number) => 'x'.repeat(n),
+      'words and breaks': (n: number) => 'one two\nthree '.repeat(Math.floor(n / 14)),
+    };
+    for (const [name, make] of Object.entries(shapes)) {
+      const read = fromMarkdown(make(400_000), limits);
+      expect(editorPlainText(read.doc).length, name).toBeGreaterThan(390_000);
+      const small = fastest(make(100_000));
+      const large = fastest(make(400_000));
+      expect(large, `${name}: ${small.toFixed(1)} ms -> ${large.toFixed(1)} ms`).toBeLessThan(
+        Math.max(8 * small, 25)
+      );
+    }
+  }, 60_000);
 });
 
 describe('writing Markdown', () => {

@@ -141,6 +141,21 @@ let { deck }: { deck: unknown } = $props();
     expect(entries).not.toContain(lazy?.fileName);
   }, 180_000);
 
+  it('keeps the server preload out of a browser build with the defaults on', async () => {
+    const chunks = await buildHost(`<script lang="ts">
+import { DeckStage } from ${JSON.stringify(`${SRC}/stage/index.ts`)};
+let { deck }: { deck: unknown } = $props();
+</script>
+<DeckStage {deck} />
+`);
+    const entries = [...chunks.values()].filter((chunk) => chunk.isEntry).map((c) => c.fileName);
+    // The browser takes the empty `#deck-ssr` (`ssr-browser.ts`): no chunk preloads anything.
+    const every = [...chunks.values()].flatMap((chunk) => chunk.modules);
+    expect(every.filter((id) => /\/stage\/ssr-(preload|server)\.ts$/.test(id))).toEqual([]);
+    expect(defaultsIn(staticModules(chunks, entries))).toEqual([]);
+    expect(chunkWith(chunks, '/slides/src/stage/default-renderers.ts')).toBeTruthy();
+  }, 180_000);
+
   it('keeps them out of the print view when it turns them off', async () => {
     const chunks = await buildHost(`<script lang="ts">
 import { DeckPrintView } from ${JSON.stringify(`${SRC}/export/index.ts`)};

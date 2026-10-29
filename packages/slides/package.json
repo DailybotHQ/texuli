@@ -21,8 +21,15 @@
   },
   "type": "module",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./src/stage/ssr-server.ts"
   ],
+  "imports": {
+    "#deck-ssr": {
+      "browser": "./src/stage/ssr-browser.ts",
+      "default": "./src/stage/ssr-server.ts"
+    }
+  },
   "exports": {
     ".": {
       "types": "./src/index.ts",

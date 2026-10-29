@@ -110,11 +110,22 @@ scoped styles.
   `loadedDefaultDeckRenderers()` returns them synchronously once loaded (or
   `undefined`). The stage and the print view call it only when their
   `defaultRenderers` is on; a failed import paints without them (their
-  slides show placeholders). The stage does not validate or paint the deck
-  until the tables are there, also during SSR, where it renders the loading
-  status. The same call also loads the built-in block support and
-  `migrateDeck` (below), so awaiting it before mounting still paints the
-  first stage at once, whatever the input.
+  slides show placeholders). In the browser, the stage does not validate or
+  paint the deck until the tables are there. The same call also loads the
+  built-in block support and `migrateDeck` (below), so awaiting it before
+  mounting still paints the first stage at once, whatever the input.
+- **Server rendering:** a server build preloads all of it before it
+  renders, so the server HTML keeps the slides (no-JS readers and
+  crawlers), not the loading status. `DeckStage` imports `#deck-ssr`, a
+  package `imports` entry: the `browser` condition is an empty module, and
+  the default condition (Vite server builds, Node) awaits every layout and
+  registry painter, the built-in block support, `migrateDeck` and the six
+  block families at module load (a part that fails keeps its loading
+  status; it never stops the server). Browser bundles get none of it
+  (`tests/bundle-graph.test.ts`). Lazy code inside a painter (a chart
+  family in a data block, say) still loads on first use. In the browser,
+  hydration still starts from the lazy path: each part shows its loading
+  status until its chunk arrives, then the slide paints again.
 - **Built-in block support (lazy):** the default block check
   (`validateDeckBlock`, the `@texuli/blocks` schema), the built-in
   free-slide renderer and the block-family prefetch are one chunk that the

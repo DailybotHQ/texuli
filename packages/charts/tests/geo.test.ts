@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
-import { compile } from 'svelte/compiler';
 import { afterEach, describe, expect, it } from 'vitest';
 import GeoMap from '../src/geo/GeoMap.svelte';
 import GeoPointMap from '../src/geo/GeoPointMap.svelte';
@@ -95,11 +94,16 @@ describe('GeoMap', () => {
 });
 
 describe('geo data-table disclosure', () => {
+  // Every chart family gives its `details` summary the 2.75rem tap-target
+  // row; this table takes it from the shared fallback stylesheet.
   it('gives the summary the family tap-target height', () => {
     const source = readFileSync(resolve(__dirname, '../src/geo/GeoDataTable.svelte'), 'utf8');
-    const css = compile(source, { filename: 'GeoDataTable.svelte', css: 'external' }).css?.code;
-    expect(css).toContain('min-block-size: 2.75rem');
-    expect(css).toContain('align-content: center');
+    expect(source).toContain("import '../table/ruled.css'");
+    expect(source).toContain('<details class="tx-chart-ruled">');
+    const shared = readFileSync(resolve(__dirname, '../src/table/ruled.css'), 'utf8');
+    const summary = /\.tx-chart-ruled > summary \{([^}]*)\}/.exec(shared)?.[1] ?? '';
+    expect(summary).toContain('min-block-size: 2.75rem');
+    expect(summary).toContain('align-content: center');
   });
 });
 

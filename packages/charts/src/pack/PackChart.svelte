@@ -1,4 +1,6 @@
 <script lang="ts">
+import '../table/grid.css';
+import '../table/depth.css';
 import {
   createPackLayout,
   formatPackValue,
@@ -73,7 +75,7 @@ $effect(() => {
       </circle>
     {/each}
   </svg>
-  <details class="data-table">
+  <details class="tx-chart-data">
     <summary>{text.table}</summary>
     <table>
       <caption>{title} data</caption>
@@ -95,16 +97,6 @@ $effect(() => {
   figcaption h3 { font-size: 1rem; margin-block: 0; }
   figcaption p { color: var(--tx-muted-foreground, GrayText); margin-block: 0.25rem 0.75rem; }
   svg { display: block; inline-size: 100%; max-block-size: 26rem; }
-  .data-table { margin-block-start: 0.75rem; }
-  summary { cursor: pointer; min-block-size: 2.75rem; align-content: center; }
-  table { border-collapse: collapse; inline-size: 100%; }
-  th, td { border: 1px solid var(--tx-chart-grid, var(--tx-border, GrayText)); padding: 0.375rem 0.5rem; text-align: start; }
-  th[scope='row'][data-depth='1'] { padding-inline-start: 1.5rem; }
-  th[scope='row'][data-depth='2'] { padding-inline-start: 2.5rem; }
-  th[scope='row'][data-depth='3'] { padding-inline-start: 3.5rem; }
-  th[scope='row'][data-depth='4'] { padding-inline-start: 4.5rem; }
-  th[scope='row'][data-depth='5'] { padding-inline-start: 5.5rem; }
-  th[scope='row'][data-depth='6'] { padding-inline-start: 6.5rem; }
   @media (forced-colors: active) {
     figcaption p { color: CanvasText; }
     svg circle { fill: Canvas; stroke: CanvasText; }

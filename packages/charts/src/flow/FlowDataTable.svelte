@@ -1,4 +1,5 @@
 <script lang="ts">
+import '../table/ruled.css';
 import { formatFlowValue } from './model.ts';
 
 type Props = {
@@ -11,9 +12,9 @@ type Props = {
 let { title, summary, headers, rows }: Props = $props();
 </script>
 
-<details class="flow-table">
+<details class="tx-chart-ruled">
   <summary>{summary}</summary>
-  <div class="table-scroll">
+  <div class="tx-chart-ruled__scroll">
     <table>
       <caption>{title}</caption>
       <thead>
@@ -29,12 +30,5 @@ let { title, summary, headers, rows }: Props = $props();
 </details>
 
 <style>
-  .flow-table { color: var(--tx-foreground, CanvasText); font: inherit; font-size: 0.875rem; }
-  .flow-table summary { align-content: center; cursor: pointer; inline-size: fit-content; min-block-size: 2.75rem; padding-block: 0.5rem; text-decoration: underline; text-underline-offset: 0.2em; }
-  .table-scroll { max-inline-size: 100%; overflow-x: auto; }
-  table { border-collapse: collapse; inline-size: 100%; text-align: start; }
-  caption { padding-block: 0.5rem; text-align: start; }
-  th, td { border-block-end: 1px solid var(--tx-border, currentColor); padding-block: 0.35rem; padding-inline: 0.5rem; }
   th { font-weight: 600; text-align: start; }
-  @media (forced-colors: active) { .flow-table summary:focus-visible { outline: 2px solid Highlight; outline-offset: 2px; } }
 </style>

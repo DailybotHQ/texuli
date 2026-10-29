@@ -1,4 +1,5 @@
 <script lang="ts">
+import '../table/grid.css';
 import { fitChartWidth } from '../math/layout/fit-width.ts';
 import {
   createEcdfLayout,
@@ -98,7 +99,7 @@ $effect(() => {
       {/each}
     </ul>
   {/if}
-  <details class="data-table">
+  <details class="tx-chart-data tx-chart-data--scroll">
     <summary>{text.table}</summary>
     <table>
       <caption>{title} data</caption>
@@ -138,10 +139,6 @@ $effect(() => {
   .legend { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; list-style: none; margin: 0.5rem 0 0; padding: 0; font-size: 0.875rem; }
   .legend li { display: inline-flex; align-items: center; gap: 0.375rem; }
   .legend li::before { content: ''; inline-size: 1rem; block-size: 0.1875rem; background: var(--ecdf-color); }
-  .data-table { margin-block-start: 0.75rem; overflow-x: auto; }
-  summary { cursor: pointer; min-block-size: 2.75rem; align-content: center; }
-  table { border-collapse: collapse; inline-size: 100%; }
-  th, td { border: 1px solid var(--tx-chart-grid, var(--tx-border, GrayText)); padding: 0.375rem 0.5rem; text-align: start; }
   @media (forced-colors: active) {
     figcaption p, .tick { color: CanvasText; fill: CanvasText; }
     .step { stroke: Highlight; }

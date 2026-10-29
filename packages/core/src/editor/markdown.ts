@@ -44,6 +44,8 @@ const ORDERED = /^( {0,3})(\d{1,9})[.)][ \t]+(.*)$/s;
 const TASK = /^\[([ xX])\][ \t]+/;
 const IMAGE_ONLY = /^!\[((?:[^\]\\\n]|\\.)*)\]\(\s*<?([^\s()<>]+)>?\s*\)$/;
 const ESCAPABLE = /[\\`*_{}[\]()#+\-.!~<>|]/;
+/** The characters that can start an inline construct (see `parseInline`). */
+const INLINE_SPECIAL = /[\\\n`*_~![<]/g;
 
 const isBlank = (line: string) => line.trim() === '';
 const isSpace = (char: string | undefined) => char === ' ' || char === '\t';
@@ -403,9 +405,20 @@ function parseInline(
   budget: LoadBudget
 ): void {
   let buffer = '';
+  // Spaces at the end of `buffer`, kept as it grows: reading the buffer's
+  // last characters would flatten the string being built on every soft line
+  // break (quadratic in a long paragraph).
+  let spaces = 0;
+  const append = (text: string) => {
+    buffer += text;
+    let end = text.length;
+    while (end > 0 && text.charCodeAt(end - 1) === 32) end -= 1;
+    spaces = end === 0 ? spaces + text.length : text.length - end;
+  };
   const flush = () => {
     if (buffer) out.push(...budget.inline(buffer.replace(/\n/g, ' '), marks));
     buffer = '';
+    spaces = 0;
   };
   const push = (text: string, extra: readonly EditorMark[]) => {
     flush();
@@ -425,22 +438,19 @@ function parseInline(
         continue;
       }
       if (ESCAPABLE.test(next)) {
-        buffer += next;
+        append(next);
         i += 2;
         continue;
       }
     }
     if (ch === '\n') {
-      // Count trailing spaces by hand: an unanchored `/ {2,}$/` rescans the
-      // whole buffer on every soft line break (quadratic in a long paragraph).
-      let spaces = 0;
-      while (buffer.charCodeAt(buffer.length - 1 - spaces) === 32) spaces += 1;
+      // Two or more trailing spaces make a hard break.
       if (spaces >= 2) {
         buffer = buffer.slice(0, buffer.length - spaces);
         flush();
         out.push({ type: 'break' });
         budget.chars += 1;
-      } else buffer += '\n';
+      } else append('\n');
       i += 1;
       continue;
     }
@@ -453,7 +463,7 @@ function parseInline(
         i = close + run.length;
         continue;
       }
-      buffer += run;
+      append(run);
       i += run.length;
       continue;
     }
@@ -476,7 +486,7 @@ function parseInline(
       if (ch === '!' && source[i + 1] === '[') {
         const image = matchLink(scan, i + 1);
         if (image) {
-          buffer += unescapeMarkdown(source.slice(image.labelStart, image.labelEnd));
+          append(unescapeMarkdown(source.slice(image.labelStart, image.labelEnd)));
           i = image.end;
           continue;
         }
@@ -509,8 +519,12 @@ function parseInline(
         }
       }
     }
-    buffer += ch;
-    i += 1;
+    // Plain text up to the next character that can open a construct is
+    // copied in one slice, not one character at a time.
+    INLINE_SPECIAL.lastIndex = i + 1;
+    const stop = INLINE_SPECIAL.test(source) ? INLINE_SPECIAL.lastIndex - 1 : source.length;
+    append(source.slice(i, stop));
+    i = stop;
   }
   flush();
 }
@@ -636,58 +650,76 @@ function codeSpan(text: string): string {
   return `${fence}${pad}${text}${pad}${fence}`;
 }
 
-type Char = { ch: string; marks: readonly EditorMark[] } | null;
+type Run = { text: string; marks: readonly EditorMark[] } | null;
 
-/** Move whitespace and trailing backslashes out of strong, em and strike spans (Markdown cannot open or close there). */
+/**
+ * Move whitespace and trailing backslashes out of strong, em and strike spans
+ * (Markdown cannot open or close there). Works on runs, splitting a run only
+ * where a span edge moves: one pass per mark type, no object per character.
+ */
 function prepareMarks(content: readonly EditorInline[]): EditorInline[] {
-  const chars: Char[] = [];
-  for (const node of content) {
-    if (node.type === 'break') chars.push(null);
-    else for (const ch of node.text) chars.push({ ch, marks: node.marks });
-  }
-  // The nearest character on each side of every position, so a run of
-  // breaks is crossed in constant time (linear, not quadratic, in breaks).
-  const previous: number[] = new Array(chars.length);
-  const next: number[] = new Array(chars.length);
-  for (let k = 0, last = -1; k < chars.length; k += 1) {
-    previous[k] = last;
-    if (chars[k] !== null) last = k;
-  }
-  for (let k = chars.length - 1, last = chars.length; k >= 0; k -= 1) {
-    next[k] = last;
-    if (chars[k] !== null) last = k;
-  }
+  let runs: Run[] = content.flatMap((node) =>
+    node.type === 'break' ? [null] : node.text ? [{ text: node.text, marks: node.marks }] : []
+  );
   for (const type of ['strong', 'em', 'strike'] as const) {
+    const marked = (run: Run | undefined) => run?.marks.some((m) => m.type === type) === true;
+    const strip = (run: NonNullable<Run>, text: string) => ({
+      text,
+      marks: run.marks.filter((m) => m.type !== type),
+    });
+    const out: Run[] = [];
     let i = 0;
-    const marked = (c: Char | undefined) => c?.marks.some((m) => m.type === type) === true;
-    // A break inside a span (marked text on both sides) does not end it.
-    const has = (k: number): boolean => {
-      if (chars[k] !== null) return marked(chars[k]);
-      const left = previous[k] as number;
-      return left >= 0 && marked(chars[left]) && marked(chars[next[k] as number]);
-    };
-    while (i < chars.length) {
-      if (!has(i)) {
+    while (i < runs.length) {
+      if (!marked(runs[i])) {
+        out.push(runs[i] as Run);
         i += 1;
         continue;
       }
+      // A span: marked text, and breaks with marked text on both sides.
       let end = i;
-      while (has(end + 1)) end += 1;
-      const drop = (k: number) => {
-        const c = chars[k] as NonNullable<Char>;
-        chars[k] = { ch: c.ch, marks: c.marks.filter((m) => m.type !== type) };
-      };
-      let a = i;
-      while (a <= end && chars[a] && /\s/.test((chars[a] as NonNullable<Char>).ch)) drop(a++);
-      let b = end;
-      while (b >= a && chars[b] && /[\s\\]/.test((chars[b] as NonNullable<Char>).ch)) drop(b--);
+      for (let k = i + 1; k < runs.length; k += 1) {
+        if (runs[k] === null) continue;
+        if (!marked(runs[k])) break;
+        end = k;
+      }
+      const span = runs.slice(i, end + 1);
+      // Leading whitespace leaves the span, up to the first other character
+      // or break; then trailing whitespace and backslashes, from the end.
+      const head: Run[] = [];
+      const tail: Run[] = [];
+      let a = 0;
+      let b = span.length - 1;
+      for (; a <= b; a += 1) {
+        const run = span[a] as Run;
+        if (!run) break;
+        let cut = 0;
+        while (/\s/.test(run.text[cut] ?? '')) cut += 1;
+        if (cut) head.push(strip(run, run.text.slice(0, cut)));
+        if (cut < run.text.length) {
+          span[a] = { text: run.text.slice(cut), marks: run.marks };
+          break;
+        }
+      }
+      for (; b >= a; b -= 1) {
+        const run = span[b] as Run;
+        if (!run) break;
+        let cut = run.text.length;
+        while (/[\s\\]/.test(run.text[cut - 1] ?? '')) cut -= 1;
+        if (cut < run.text.length) tail.push(strip(run, run.text.slice(cut)));
+        if (cut) {
+          span[b] = { text: run.text.slice(0, cut), marks: run.marks };
+          break;
+        }
+      }
+      // One push per run: a spread of a long span could overflow the call stack.
+      for (const run of [...head, ...span.slice(a, b + 1), ...tail.reverse()]) out.push(run);
       i = end + 1;
     }
+    runs = out;
   }
-  const out: EditorInline[] = [];
-  for (const c of chars)
-    out.push(c ? { type: 'text', text: c.ch, marks: c.marks } : { type: 'break' });
-  return normalizeInline(out) as EditorInline[];
+  return normalizeInline(
+    runs.map((run) => (run ? { type: 'text', ...run } : { type: 'break' }))
+  ) as EditorInline[];
 }
 
 function writeInline(content: readonly EditorInline[], em: '*' | '_'): string {

@@ -1,4 +1,5 @@
 <script lang="ts">
+import '../table/mini.css';
 import { gaugeLabelSizes, gaugeLayout } from '../math/layout/gauge.ts';
 import { arcPath } from '../math/shapes/arc.ts';
 import {
@@ -73,7 +74,7 @@ const text = $derived(chartLabels(labels));
     <text x="0" y={labelSizes.value.y} font-size={labelSizes.value.fontSize} text-anchor="middle" class="value-label">{formatValue(safeValue)}</text>
     {#if bandLabel}<text x="0" y={labelSizes.band.y} font-size={labelSizes.band.fontSize} text-anchor="middle" class="band-label">{bandLabel}</text>{/if}
   </svg>
-  <details class="data-fallback">
+  <details class="tx-chart-mini">
     <summary>{text.tableSummary}</summary>
     <table><caption>{label}</caption><thead><tr><th scope="col">{text.measure}</th><th scope="col">{text.value}</th></tr></thead><tbody>
       <tr><th scope="row">{text.current}</th><td>{formatValue(safeValue)}</td></tr><tr><th scope="row">{text.minimum}</th><td>{formatValue(rangeMin)}</td></tr><tr><th scope="row">{text.maximum}</th><td>{formatValue(rangeMax)}</td></tr>{#if bandLabel}<tr><th scope="row">{text.range}</th><td>{bandLabel}</td></tr>{/if}
@@ -92,8 +93,5 @@ const text = $derived(chartLabels(labels));
   /* No font-size here: it is the text's font-size attribute, in user units (CSS would override it). */
   .value-label { fill: var(--tx-foreground, CanvasText); font-family: var(--tx-font-sans, system-ui, sans-serif); font-weight: 600; font-variant-numeric: tabular-nums; }
   .band-label { fill: var(--tx-muted-foreground, GrayText); font-family: var(--tx-font-sans, system-ui, sans-serif); }
-  .data-fallback { font-size: 0.875rem; }
-  table { border-collapse: collapse; inline-size: 100%; }
-  th, td { border: 1px solid var(--tx-border, currentColor); padding: 0.25em 0.5em; text-align: start; }
   @media (forced-colors: active) { .track { fill: Canvas; stroke: CanvasText; } .band { fill: Canvas; stroke: CanvasText; stroke-dasharray: 2 2; } .value { fill: Highlight; } }
 </style>

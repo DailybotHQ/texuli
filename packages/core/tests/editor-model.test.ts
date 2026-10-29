@@ -79,6 +79,29 @@ describe('editor inline content', () => {
     expect(cleanText('a\tb\nc', '\n\t')).toEqual({ text: 'a\tb\nc', stripped: false });
     expect(cleanText('a\r\nb\u2028c', '\n').text).toBe('a\nb\nc');
     {
+      // strips every unsafe character and keeps every other one
+      const unsafe = [
+        [0x00, 0x1f],
+        [0x7f, 0x9f],
+        [0x061c, 0x061c],
+        [0x200b, 0x200b],
+        [0x200e, 0x200f],
+        [0x202a, 0x202e],
+        [0x2060, 0x2060],
+        [0x2066, 0x2069],
+        [0xfeff, 0xfeff],
+      ];
+      const isUnsafe = (code: number) =>
+        unsafe.some(([low, high]) => code >= (low as number) && code <= (high as number));
+      for (let code = 0; code < 0xd800; code += 1) {
+        // Line breaks and separators become `\n` first (kept only through `keep`).
+        if (code === 0x0a || code === 0x0d || code === 0x2028 || code === 0x2029) continue;
+        const { text, stripped } = cleanText(`a${String.fromCharCode(code)}`);
+        expect(stripped, code.toString(16)).toBe(isUnsafe(code));
+        expect(text.length, code.toString(16)).toBe(isUnsafe(code) ? 1 : 2);
+      }
+    }
+    {
       // continues a link only strictly inside it
       const link = { type: 'link' as const, href: 'https://example.com' };
       const content: EditorInline[] = [
