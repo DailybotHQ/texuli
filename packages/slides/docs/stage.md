@@ -112,15 +112,54 @@ scoped styles.
   `defaultRenderers` is on; a failed import paints without them (their
   slides show placeholders). The stage does not validate or paint the deck
   until the tables are there, also during SSR, where it renders the loading
-  status.
+  status. The same call also loads the built-in block support and
+  `migrateDeck` (below), so awaiting it before mounting still paints the
+  first stage at once, whatever the input.
+- **Built-in block support (lazy):** the default block check
+  (`validateDeckBlock`, the `@texuli/blocks` schema), the built-in
+  free-slide renderer and the block-family prefetch are one chunk that the
+  stage imports on first use. `loadBuiltinDeckBlocks()` imports it once and
+  never rejects (a `BuiltinDeckBlocks`: `validateBlock`, `prefetch`, and
+  `ok`, false when the import failed); `loadedBuiltinDeckBlocks()` returns
+  it synchronously once loaded. The stage waits for it before validating
+  only when no renderer table brings a block check (`validateBlock` or
+  `loadValidateBlock`), showing the loading status meanwhile; if the import
+  fails, every free-slide block is refused (the error state, never
+  unchecked content). The built-in free-slide renderer loads like any lazy
+  renderer, only for a free slide no table's `free` answers (a host that
+  brings its own check but not a `free` renderer sees the slide's loading
+  status once). The block families of the next slides are prefetched only
+  for those slides. A host with `defaultRenderers={false}`, its own
+  `validateBlock` and a `free` renderer for every free slide has no
+  `@texuli/blocks` code in its initial graph and never loads the chunk; a
+  host with `defaultRenderers={false}` and no block check awaits
+  `loadBuiltinDeckBlocks()` before mounting to paint at once. `prepareDeck`
+  and `validateDeckBlock` stay synchronous (they import the check
+  statically).
+- **Migration (lazy):** a v2 deck (`formatVersion` present) needs no
+  migration, so the stage imports `migrateDeck` only for a deck in an
+  earlier shape (Texuli v1, a grammar tree, a Protoyard deck) and validates
+  it once that import arrives; if the import fails, the deck is refused
+  ("The deck could not be migrated."). A v2 deck never loads the migration
+  code.
 - **Canvas:** a fixed virtual canvas (1280 × 720 for 16:9) is scaled into
   the stage with a `ResizeObserver` and letterboxed. CSS variables go on the
   stage root through `deckCssVars` (the CSSOM, never a static `style`).
 - **Mounting:** at most three slides are mounted (the active one and its
-  neighbours, `inert` and hidden from assistive tech). The block families of
-  the next slides load when the browser is idle (`prefetchDeckSlides`,
-  `slideBlockFamilies`, `whenIdle`); `loadDeckBlockFamily` loads one family
+  neighbours, `inert` and hidden from assistive tech). While the browser is
+  idle (`whenIdle`) the stage runs every table's `prefetch` for the next
+  slides and loads the block families of the next free slides the built-in
+  renderer paints (`prefetchDeckSlides` and `slideBlockFamilies` do the
+  same for a list of slides); `loadDeckBlockFamily` loads one family
   (`DeckBlockRendererProps` is what a family renderer receives).
+- **Landmark:** the stage root is a `region` named "Presentation: <title>"
+  (`stage.label`). Before the deck has validated (SSR, lazy chunks) the name
+  comes from the input's own `meta.title` (or a Protoyard `outline.title`),
+  so several stages on one page keep distinct names; a loading stage whose
+  input names no title has no name, and an unnamed region is not a
+  landmark. The loading status is a `status`, never a second landmark. Two
+  decks with the same title on one page get the same name: give them
+  distinct titles, or a distinct `stage.label` through `messages`.
 - **Slides** are `role="group"` with `aria-roledescription="slide"`, named
   by their title (or "Slide n"), and carry `data-step` and `data-step-count`.
 
@@ -374,8 +413,13 @@ slide's theme overrides the deck's.
 
 - **Loading:** embedded themes apply directly. Catalog ids go through
   `loadTheme` (a `DeckThemeLoader`). The default, `loadDeckLibraryTheme`,
-  imports `@texuli/tokens/library-expand` on first use. On mount, every id the
-  deck references (`deckCatalogThemeIds`) loads once, through
+  imports `@texuli/tokens/library-expand` on first use, and a palette seed
+  imports `@texuli/tokens/generator` on first use, so a host that passes its
+  own `loadTheme` (or `null`) has neither the theme library records nor the
+  generator in its initial graph (`tests/bundle-graph.test.ts` checks it by
+  module id). Until a catalog or seed theme resolves, the stage paints with
+  inherited or host CSS and `data-theme-status="loading"`. On mount, every
+  id the deck references (`deckCatalogThemeIds`) loads once, through
   `createDeckThemeCache`, which validates each theme with `defineTheme` again.
 - **Applying:** `deckThemeVariables(theme, mode)` produces the `--tx-*`
   properties and `color-scheme` written on the stage element, with

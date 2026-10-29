@@ -36,7 +36,7 @@ import { createDiagnostic, type DeckDiagnostic, type PathSegment } from '@texuli
 import type { Component } from 'svelte';
 import type { DeckMediaTrust } from './media.ts';
 import type { DeckTranslate } from './messages.ts';
-import type { DeckValidationHooks } from './prepare.ts';
+import type { DeckValidationHooks } from './prepare-core.ts';
 import type { DeckStepContext } from './steps.ts';
 
 /** A component imported on first use. `load` may resolve to the component or its module. */

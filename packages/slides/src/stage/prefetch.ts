@@ -10,6 +10,8 @@ import { BLOCK_CATALOG_IDS, type DeckBlockCatalogId } from '../grammar/index.ts'
 import { loadDeckBlockFamily } from './loaders.ts';
 import type { DeckRenderers } from './renderers.ts';
 
+export { whenIdle } from './idle.ts';
+
 const MAX_DEPTH = 12;
 
 function collectTypes(list: unknown, into: Set<string>, depth: number): void {
@@ -73,21 +75,4 @@ export function prefetchDeckSlides(
     }
   }
   return Promise.allSettled(work).then(() => undefined);
-}
-
-interface IdleWindow {
-  requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
-  cancelIdleCallback?: (handle: number) => void;
-  setTimeout(callback: () => void, delay: number): unknown;
-  clearTimeout(handle: unknown): void;
-}
-
-/** Run `task` when the browser is idle (or after a short timeout); returns the cancel. */
-export function whenIdle(win: IdleWindow, task: () => void, timeoutMs = 2_000): () => void {
-  if (typeof win.requestIdleCallback === 'function') {
-    const handle = win.requestIdleCallback(task, { timeout: timeoutMs });
-    return () => win.cancelIdleCallback?.(handle);
-  }
-  const handle = win.setTimeout(task, 200);
-  return () => win.clearTimeout(handle);
 }

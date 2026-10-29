@@ -4,13 +4,18 @@
  * tables off (`defaultRenderers={false}`) must not have the layouts table, the
  * component registry or its catalog outline in its initial graph, nor in the
  * print view's chunks; with the defaults on, they live in their own lazy
- * chunk. Each host is built the way `pnpm size` builds an entry (Vite,
- * minified, `svelte` external), and the chunk graph is read from the output.
+ * chunk. A host that also brings its own block check, free-slide renderer
+ * and theme loader (G46, G47) has no `@texuli/blocks`, no `migrateDeck`
+ * (for a v2 deck), no theme library records and no theme generator in its
+ * initial graph. Each host is built the way `pnpm size` builds an entry
+ * (Vite, minified, `svelte` external), and the chunk graph is read from the
+ * output.
  */
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
 
 const SRC = resolve(dirname(fileURLToPath(import.meta.url)), '../src');
@@ -23,15 +28,31 @@ const DEFAULT_ONLY = [
   '/slides/src/registry/catalog-ids.ts',
 ];
 
+/** Module id fragments a host with its own block check, free renderer and theme loader never loads. */
+const HOST_REPLACED = [
+  '/blocks/src/',
+  '/deck/src/model/migrate.ts',
+  '/tokens/src/library-port/',
+  '/tokens/src/library-expand/',
+  '/tokens/src/generator/',
+  '/slides/src/stage/block-check.ts',
+  '/slides/src/stage/FreeSlide.svelte',
+  '/slides/src/stage/loaders.ts',
+];
+
 interface Chunk {
   fileName: string;
+  code: string;
   isEntry: boolean;
   imports: readonly string[];
   dynamicImports: readonly string[];
   modules: readonly string[];
 }
 
-async function buildHost(source: string): Promise<Map<string, Chunk>> {
+async function buildHost(
+  source: string,
+  extra: Readonly<Record<string, string>> = {}
+): Promise<Map<string, Chunk>> {
   const [{ build }, { svelte }] = await Promise.all([
     import('vite'),
     import('@sveltejs/vite-plugin-svelte'),
@@ -39,6 +60,7 @@ async function buildHost(source: string): Promise<Map<string, Chunk>> {
   const dir = await mkdtemp(join(tmpdir(), 'texuli-slides-graph-'));
   try {
     await writeFile(join(dir, 'Host.svelte'), source);
+    for (const [name, text] of Object.entries(extra)) await writeFile(join(dir, name), text);
     const main = join(dir, 'entry.js');
     await writeFile(main, "export { default } from './Host.svelte';\n");
     const result = await build({
@@ -64,6 +86,7 @@ async function buildHost(source: string): Promise<Map<string, Chunk>> {
       if (file.type !== 'chunk') continue;
       chunks.set(file.fileName, {
         fileName: file.fileName,
+        code: file.code,
         isEntry: file.isEntry,
         imports: file.imports,
         dynamicImports: file.dynamicImports,
@@ -76,8 +99,8 @@ async function buildHost(source: string): Promise<Map<string, Chunk>> {
   }
 }
 
-/** The modules of `roots` and every chunk they import statically. */
-function staticModules(chunks: Map<string, Chunk>, roots: readonly string[]): string[] {
+/** `roots` and every chunk they import statically. */
+function staticChunks(chunks: Map<string, Chunk>, roots: readonly string[]): Chunk[] {
   const seen = new Set<string>();
   const visit = (name: string) => {
     if (seen.has(name) || !chunks.has(name)) return;
@@ -85,7 +108,12 @@ function staticModules(chunks: Map<string, Chunk>, roots: readonly string[]): st
     for (const imported of chunks.get(name)?.imports ?? []) visit(imported);
   };
   for (const root of roots) visit(root);
-  return [...seen].flatMap((name) => chunks.get(name)?.modules ?? []);
+  return [...seen].flatMap((name) => chunks.get(name) ?? []);
+}
+
+/** The modules of `roots` and every chunk they import statically. */
+function staticModules(chunks: Map<string, Chunk>, roots: readonly string[]): string[] {
+  return staticChunks(chunks, roots).flatMap((chunk) => chunk.modules);
 }
 
 function chunkWith(chunks: Map<string, Chunk>, suffix: string): Chunk | undefined {
@@ -129,5 +157,37 @@ let { deck }: { deck: never } = $props();
       expect(defaultsIn(staticModules(chunks, [chunk?.fileName ?? ''])), suffix).toEqual([]);
     }
     expect(chunkWith(chunks, '/slides/src/stage/default-renderers.ts')).toBeTruthy();
+  }, 180_000);
+
+  it('keeps the default block check, free renderer, migration and theme library out of a host that replaces them', async () => {
+    const chunks = await buildHost(
+      `<script lang="ts">
+import { DeckStage } from ${JSON.stringify(`${SRC}/stage/index.ts`)};
+import HostFree from './HostFree.svelte';
+let { deck }: { deck: unknown } = $props();
+const renderers = { validateBlock: () => undefined, free: () => HostFree };
+const loadTheme = async (id: string) => ({ id }) as never;
+</script>
+<DeckStage {deck} defaultRenderers={false} {renderers} {loadTheme} />
+`,
+      { 'HostFree.svelte': '<p>host</p>\n' }
+    );
+    const entries = [...chunks.values()].filter((chunk) => chunk.isEntry).map((c) => c.fileName);
+    const initial = staticChunks(chunks, entries);
+    const modules = initial.flatMap((chunk) => chunk.modules);
+    expect(modules.some((id) => id.endsWith('/slides/src/stage/DeckStage.svelte'))).toBe(true);
+    expect(HOST_REPLACED.filter((part) => modules.some((id) => id.includes(part)))).toEqual([]);
+    expect(defaultsIn(modules)).toEqual([]);
+    // The fallbacks are still there, as lazy chunks, for stages that need them.
+    for (const suffix of ['/slides/src/stage/builtin.ts', '/deck/src/model/migrate.ts']) {
+      const lazy = chunkWith(chunks, suffix);
+      expect(lazy, suffix).toBeTruthy();
+      expect(initial).not.toContain(lazy);
+    }
+    const gzip = initial.reduce((sum, chunk) => sum + gzipSync(chunk.code, { level: 9 }).length, 0);
+    // Reported, not asserted (the size budgets own the numbers).
+    console.info(
+      `[bundle-graph] replacing host: initial JS ${gzip} B gzip in ${initial.length} chunks`
+    );
   }, 180_000);
 });

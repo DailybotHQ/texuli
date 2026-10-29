@@ -47,11 +47,12 @@ afterEach(() => {
 
 describe('lazy default renderers and block checks', () => {
   it('loads the default tables only when they are on, and paints once they arrive', async () => {
-    await scenario('defaultRenderers={false} paints at once and never loads them', async () => {
+    await scenario('defaultRenderers={false} never loads them', async () => {
       render(DeckStage, {
         props: { deck: layoutDeck, loadTheme: null, defaultRenderers: false },
       });
-      expect(stageRoot()?.getAttribute('aria-busy')).toBeNull();
+      // No table brings a block check: the stage waits for its built-in one (G46), not the tables.
+      await waitFor(() => expect(stageRoot()?.getAttribute('aria-busy')).toBeNull());
       expect(quote()?.querySelector('[data-tx-deck-placeholder="quote"]')).toBeTruthy();
       const paint = await createDeckPrintPaint(layoutDeck as never, {
         defaultRenderers: false,

@@ -93,6 +93,8 @@ Texuli from npm (PLAN_007 there); the ids below match its register.
 | G43 | `texuli/card` | `CardGrid` `maxColumns` |
 | G44 | `texuli/input` | `type="number"` and `type="range"` bind a number, or `null` while empty |
 | G45 | `texuli/toast` | `pause`, `resume` and `isPaused` on the store (stacked holds by key), and `announcement(id?)` |
+| G46 | `@texuli/slides/stage` | The default block check, the built-in free-slide renderer and `migrateDeck` load on first use (`loadBuiltinDeckBlocks`), only when no table brings a block check, a free slide falls back to the built-in renderer, or the deck is not v2; until then the stage validates nothing, and a failed import refuses the deck. A host with `defaultRenderers={false}`, its own `validateBlock`, `free` renderer and `loadTheme` and a v2 deck: 115,885 B to 85,113 B gzip of initial JavaScript in `tests/bundle-graph.test.ts`. The stage's landmark name comes from the deck's title also while it loads |
+| G47 | `@texuli/slides/stage` theme | No stage defect: the default `loadDeckLibraryTheme` and the seed generator were already dynamic imports in `0.4.0` (the theme records in the reported first chunk come from a host package that imports the token library); `tests/bundle-graph.test.ts` now checks that a host with its own `loadTheme` has no library records and no generator in its initial graph |
 
 **Breaking changes under `0.x`.** A new minor may break; these need a look
 when upgrading from `0.4.0`:
@@ -116,7 +118,11 @@ when upgrading from `0.4.0`:
   renderer tables load on first use, so the first stage on a page paints a
   polite loading status (`aria-busy`) for one chunk, also in server-side
   rendering. Await `loadDefaultDeckRenderers()` before mounting to paint at
-  once.
+  once. With `defaultRenderers={false}`, a stage whose tables bring no block
+  check, or whose deck is not v2, also waits for one lazy chunk (the
+  built-in block support or `migrateDeck`); await `loadBuiltinDeckBlocks()`
+  to paint at once. A loading stage is named after its input's title, and
+  is unnamed (no landmark) when the input names none.
 - **`texuli/layouts/content`:** `TocItem.level` and `TocHeading.level` widen
   from `2 | 3` to `TocLevel` (`2 | 3 | 4 | 5 | 6`); exhaustive checks on the
   old union need the new levels.

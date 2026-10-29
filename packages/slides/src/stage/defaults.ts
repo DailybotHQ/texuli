@@ -7,7 +7,15 @@
  * them synchronously (`loadedDefaultDeckRenderers()`), so later stages
  * paint on their first render. A host that wants the first stage to paint
  * at once awaits `loadDefaultDeckRenderers()` before mounting it.
+ *
+ * The default tables bring no block check, so the same call also imports
+ * the stage's built-in block support (`loadBuiltinDeckBlocks`: the default
+ * `validateDeckBlock` and the built-in free-slide renderer) and
+ * `migrateDeck` (for decks in an earlier shape), keeping "await the
+ * defaults, then mount" a first-render paint for every input.
  */
+import { loadBuiltinDeckBlocks } from './builtin-loader.ts';
+import { loadDeckMigration } from './migration.ts';
 import type { DeckRenderers } from './renderers.ts';
 
 let loaded: readonly DeckRenderers[] | undefined;
@@ -16,8 +24,12 @@ let loading: Promise<readonly DeckRenderers[]> | undefined;
 /** Import the default tables once; later calls share the import. */
 export function loadDefaultDeckRenderers(): Promise<readonly DeckRenderers[]> {
   if (loaded) return Promise.resolve(loaded);
-  loading ??= import('./default-renderers.ts').then(
-    (module) => {
+  loading ??= Promise.all([
+    import('./default-renderers.ts'),
+    loadBuiltinDeckBlocks(),
+    loadDeckMigration(),
+  ]).then(
+    ([module]) => {
       loaded = module.DEFAULT_DECK_RENDERERS;
       return loaded;
     },

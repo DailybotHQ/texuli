@@ -1,4 +1,9 @@
 export {
+  type BuiltinDeckBlocks,
+  loadBuiltinDeckBlocks,
+  loadedBuiltinDeckBlocks,
+} from './builtin-loader.ts';
+export {
   claimFirstRunHint,
   copyDeckText,
   createDeckChromeState,
