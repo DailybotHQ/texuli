@@ -2,6 +2,7 @@
 import { untrack } from 'svelte';
 import type { HTMLInputAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { controlAttributes } from './attributes.ts';
 import { fieldContext } from './context.ts';
 
@@ -20,8 +21,9 @@ let {
   child,
   value = $bindable(),
   'aria-describedby': describedBy,
+  ref = $bindable(null),
   ...rest
-}: FieldControlProps = $props();
+}: FieldControlProps & RefProp = $props();
 const field = fieldContext.get();
 // A consumer id wins: the context records it, so every reference follows.
 field.claimId(
@@ -47,5 +49,5 @@ const controlProps = $derived({
 {#if child}
   {@render child({ props: controlProps })}
 {:else}
-  <input {...controlProps} bind:value />
+  <input bind:this={ref} {...controlProps} bind:value />
 {/if}

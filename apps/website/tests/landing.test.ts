@@ -107,7 +107,14 @@ describe('landing', () => {
     const reduced = read('../../packages/tokens/src/css/base.css').split(
       '@media (prefers-reduced-motion: reduce)'
     )[1];
-    expect(reduced).toContain('animation-duration: 0.01ms !important;');
-    expect(reduced).toContain('transition-duration: 0.01ms !important;');
+    // 0s durations AND delays (G78): a tiny duration still lets visibility lag.
+    for (const rule of [
+      'animation-duration: 0s !important;',
+      'animation-delay: 0s !important;',
+      'transition-duration: 0s !important;',
+      'transition-delay: 0s !important;',
+    ]) {
+      expect(reduced).toContain(rule);
+    }
   });
 });

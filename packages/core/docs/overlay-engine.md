@@ -118,6 +118,14 @@ region. Then:
   that is an open popover, so it keeps painting **above** the new modal (the
   top layer orders by show time).
 
+Only exemptions registered with `raise` left at its default (`true`) are
+re-shown. A dialog backdrop and an overlay opened inside a modal (which the
+engine exempts so it stays live) register with `raise: false`: re-showing them
+when a Select, menu, popover or date picker opens from the dialog would put
+them above it, and every click would land on the backdrop (G75). A newly
+opened overlay therefore always ends above the dialog, its backdrop and the
+overlay it was opened from; only the toast region stays above it.
+
 A keyboard shortcut (F6) to reach the toasts belongs to the toast primitive
 (T-prim-toast-region) and the R16 spike (T-overlay-r16).
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+import '../table/mini.css';
 import { tableWindow } from '../interaction/model.ts';
 import {
   type ChartFormatSpec,
@@ -90,7 +91,7 @@ const describe = $derived(
       {#if last?.y !== null && last?.y !== undefined}<circle data-marker="last" cx={last.x} cy={last.y} r="2.5" fill="var(--tx-chart-1, currentColor)" vector-effect="non-scaling-stroke" />{/if}
     {/if}
   </svg>
-  <details class="data-fallback">
+  <details class="tx-chart-mini data-fallback">
     <summary>{text.tableSummary}</summary>
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
     <div
@@ -120,9 +121,7 @@ const describe = $derived(
 <style>
   .compact-chart { margin: 0; color: var(--tx-foreground, CanvasText); }
   .sparkline { display: block; inline-size: 100%; overflow: visible; color: var(--tx-chart-1, currentColor); }
-  .data-fallback { color: var(--tx-foreground, CanvasText); font-size: 0.875rem; }
-  .data-fallback table { border-collapse: collapse; inline-size: 100%; }
-  .data-fallback th, .data-fallback td { border: 1px solid var(--tx-border, currentColor); padding: 0.25em 0.5em; text-align: start; }
+  .data-fallback { color: var(--tx-foreground, CanvasText); }
   .table-viewport.windowed { max-block-size: 20rem; overflow-y: auto; overscroll-behavior: contain; }
   .table-viewport.windowed tr { block-size: 32px; }
   .table-viewport.windowed .spacer td { border: 0; padding: 0; }

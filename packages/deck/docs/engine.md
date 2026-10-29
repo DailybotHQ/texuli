@@ -261,6 +261,12 @@ matches elements across the pair. This module is self-contained and does not
 import the model's motion module (the model has the same rule as
 `resolveSlideTransition`).
 
+The deck resolves motion as data only (it is L0 and imports no runtime); the
+slides stage plays the resolved transition and fragments through the shared
+runtime, `@texuli/core/motion`, whose levels are these same `full`,
+`subtle` and `none` (ADR-013). See `packages/slides/docs/stage.md`,
+"Transitions and motion".
+
 ## Auto-slide
 
 ```ts

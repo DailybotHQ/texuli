@@ -119,7 +119,8 @@ test('the toaster viewport: logical edges, exits, reachable under a modal, axe i
     await page.goto(`/?fixture=${ID}&mode=light`);
     await expect(page.locator('[data-tx-toast-root]')).toHaveCount(8);
     const top = region(page, 'Account notifications');
-    // The exit lasts 160 ms: record it as it happens instead of racing it.
+    // The exit plays through texuli/motion (Web Animations, ADR-013): record it
+    // a frame after the toast starts leaving instead of racing its end.
     await page.evaluate(() => {
       const seen: string[] = [];
       (window as unknown as { __leaving: string[] }).__leaving = seen;
@@ -127,7 +128,9 @@ test('the toaster viewport: logical edges, exits, reachable under a modal, axe i
         for (const record of records) {
           const node = record.target as Element;
           if (node.getAttribute?.('data-leaving') === 'true') {
-            seen.push(`${node.hasAttribute('inert')}|${getComputedStyle(node).animationName}`);
+            requestAnimationFrame(() =>
+              seen.push(`${node.hasAttribute('inert')}|${node.getAnimations().length > 0}`)
+            );
           }
         }
       }).observe(document.body, {
@@ -141,7 +144,7 @@ test('the toaster viewport: logical edges, exits, reachable under a modal, axe i
     const seen = await page.evaluate(
       () => (window as unknown as { __leaving: string[] }).__leaving
     );
-    expect(seen).toContain('true|tx-toast-out');
+    expect(seen).toContain('true|true');
   });
 
   for (const [label, mode, forced] of [

@@ -10,7 +10,7 @@ const toc = [
   { id: 'live-example', label: 'Live example', level: 2 as const },
 ];
 
-const installSnippet = `# Texuli is in development: every package ships as 0.5.0, a pre-1.0 release — 1.0.0 will be the first stable release.
+const installSnippet = `# Texuli is in development: every published package ships as 0.6.0, a pre-1.0 release — 1.0.0 will be the first stable release.
 pnpm add texuli @texuli/tokens @texuli/primitives @texuli/core`;
 
 const initSnippet = `# The copy path: run the init CLI from a checkout of the Texuli repository.
@@ -42,10 +42,10 @@ import '@texuli/tokens/base.css';`;
 >
   <h2 id="install">Install</h2>
   <p>
-    Texuli is in development: every package is published as <code>0.5.0</code>, a pre-1.0
+    Texuli is in development: every published package is <code>0.6.0</code>, a pre-1.0
     release, and there is no stable release yet (1.0.0 will be the first). Under 0.x a new minor
-    may contain breaking changes, so pin the exact version or use <code>^0.5.0</code>, which
-    accepts only 0.5.x. Install the published release into your app:
+    may contain breaking changes, so pin the exact version or use <code>^0.6.0</code>, which
+    accepts only 0.6.x. Install the published release into your app:
   </p>
   <GuideCode code={installSnippet} label="Install the published release" lang="bash" />
   <p>

@@ -1,6 +1,6 @@
 {
   "name": "@texuli/slides",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Presentation deck model, grammar, and responsive stage runtime.",
   "keywords": [
@@ -21,8 +21,20 @@
   },
   "type": "module",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "**/stage/ssr-server.*",
+    "**/stage/ssr-core-server.*"
   ],
+  "imports": {
+    "#deck-ssr": {
+      "browser": "./src/stage/ssr-browser.ts",
+      "default": "./src/stage/ssr-server.ts"
+    },
+    "#deck-ssr-core": {
+      "browser": "./src/stage/ssr-browser.ts",
+      "default": "./src/stage/ssr-core-server.ts"
+    }
+  },
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -50,6 +62,11 @@
       "svelte": "./src/stage/index.ts",
       "default": "./src/stage/index.ts"
     },
+    "./stage-core": {
+      "types": "./src/stage/core.ts",
+      "svelte": "./src/stage/core.ts",
+      "default": "./src/stage/core.ts"
+    },
     "./components": {
       "types": "./src/registry/index.ts",
       "svelte": "./src/registry/index.ts",
@@ -66,12 +83,13 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/blocks": "0.5.0",
-    "@texuli/catalog": "0.5.0",
-    "@texuli/deck": "0.5.0",
-    "@texuli/media": "0.5.0",
-    "@texuli/player": "0.5.0",
-    "@texuli/tokens": "0.5.0"
+    "@texuli/blocks": "0.6.0",
+    "@texuli/catalog": "0.6.0",
+    "@texuli/core": "0.6.0",
+    "@texuli/deck": "0.6.0",
+    "@texuli/media": "0.6.0",
+    "@texuli/player": "0.6.0",
+    "@texuli/tokens": "0.6.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

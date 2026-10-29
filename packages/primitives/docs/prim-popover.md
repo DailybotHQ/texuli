@@ -30,3 +30,7 @@ Parts expose state through `data-state`; `Trigger` supplies the dialog relations
 <Popover.Content initialFocus={() => grid?.querySelector('[aria-selected="true"]') ?? null}>…</Popover.Content>
 ```
 
+
+## Motion hooks
+
+The content takes `motionHooks` (enter and exit, the closed part held `inert` while its exit plays); see [prim-dialog](prim-dialog.md#motion-hooks).

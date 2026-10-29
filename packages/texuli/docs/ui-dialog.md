@@ -46,6 +46,9 @@ Styled modal surfaces on the `--tx-*` token contract: a general **Dialog** with 
 | `open` / `onOpenChange` | Controlled open state |
 | `ref` | Bindable: the dialog content element while open, `null` while closed |
 | `stack` | A `LayerStack` (`@texuli/core/layer-stack`) to register on instead of the page-wide one, for apps that keep their own Escape and outside-press order (`AlertDialog` too) |
+| `mode` / `container` | `mode="contained"` with a `container` element renders the overlay inside it, and scopes inertness, focus containment and the backdrop to it (document scrolling is left alone): for framed previews. Default `top-layer` (`AlertDialog` and `CommandPalette` too) |
+| `onDismissRequest` | Called before Escape, an outside press or outside focus closes it; `event.preventDefault()` keeps it open (`AlertDialog` also stays open while a confirm is pending; `CommandPalette` too) |
+| `onCloseAutoFocus` | Called before focus returns on close; `event.preventDefault()` keeps focus where it is, so you can move it yourself (`AlertDialog` and `CommandPalette` too) |
 | other attributes | `id`, `aria-*`, `data-*` and handlers land on the dialog content element (`AlertDialog` too) |
 
 Escape and backdrop pointer dismiss close a Dialog. Focus is trapped while open.
@@ -116,3 +119,13 @@ AlertDialog does **not** close on outside pointer. Cancel is the default initial
 - Layers: `@layer tx.components`
 - AA contrast in light, dark and forced-colors (token fallbacks + `forced-colors` rules)
 - Labels are props so hosts can translate them
+
+## Motion
+
+`motion` (`Dialog` and `AlertDialog`): the panel scales in and out and the
+backdrop fades, through `@texuli/core/motion`
+([ui-motion](ui-motion.md)). `motion={false}` turns it off; reduced motion and
+a `MotionProvider` level of `none` make it instant. A closing dialog gives
+focus back and lifts `inert` at once; only the panel's exit (inert,
+`data-state="closed"`) waits. A dialog open on the first render does not
+animate in.

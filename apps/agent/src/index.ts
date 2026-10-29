@@ -29,6 +29,7 @@ export {
   type HistoryTurn,
   LIMITS,
   type Receipt,
+  type StreamRefusalReason,
 } from './contract.ts';
 export {
   CSP_REPORT_TYPES,
@@ -43,6 +44,13 @@ export {
   parseCspReports,
 } from './csp-reports.ts';
 export { DEMO_PROMPTS, DEMO_RECORDINGS } from './demo.ts';
+export {
+  createDraftStreamer,
+  type DraftStreamEnd,
+  type DraftStreamEvent,
+  type DraftStreamer,
+  type DraftStreamerOptions,
+} from './draft-stream.ts';
 export {
   type ActionReceiptStore,
   type AgentDraftRecord,
@@ -101,15 +109,48 @@ export {
   type NodeAgentSettingsInput,
 } from './node-config.ts';
 export {
+  canonicalJson,
+  chunkText,
   createFakeProvider,
   createReplayProvider,
   type FakeCall,
+  type FakeProviderOptions,
+  type InjectedOutcome,
   type Provider,
+  type ProviderErrorCode,
   type ProviderEvent,
   type ProviderMessage,
   type ProviderRequest,
   type Recording,
 } from './provider.ts';
+export {
+  ANTHROPIC_API_VERSION,
+  ANTHROPIC_DEFAULT_BASE_URL,
+  type AnthropicProviderOptions,
+  anthropicRequestBody,
+  createAnthropicProvider,
+  toAnthropicMessages,
+} from './providers/anthropic.ts';
+export {
+  DEFAULT_MAX_TOKENS,
+  DEFAULT_TIMEOUT_MS,
+  type HttpProviderOptions,
+} from './providers/http.ts';
+export {
+  chatRequestBody,
+  createOpenAICompatibleProvider,
+  OPENAI_DEFAULT_BASE_URL,
+  type OpenAICompatibleProviderOptions,
+  toChatMessages,
+} from './providers/openai.ts';
+export {
+  createSseParser,
+  readSse,
+  SseLimitError,
+  type SseMessage,
+  type SseParser,
+  type SseParserOptions,
+} from './providers/sse.ts';
 export {
   type AgentConfig,
   type AgentService,

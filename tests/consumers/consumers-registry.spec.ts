@@ -1,7 +1,7 @@
 /// <reference types="node" />
 /**
  * Consumers matrix, registry mode (T-p10-consumers-matrix): the same six
- * consumer fixtures install the *published* `0.5.0` tarballs from
+ * consumer fixtures install the *published* `0.6.0` tarballs from
  * the npm registry — not local `file:` packs — and must build, typecheck
  * and render the same smoke surface. This failed before the 2026-10-25
  * publish: the registry had no such version to install.
@@ -15,7 +15,6 @@ import {
   assertInstalledFromRegistry,
   buildConsumer,
   CONSUMERS,
-  ensureConsumerTarballs,
   REPO_ROOT,
   run,
   type TarballMap,
@@ -82,17 +81,16 @@ async function publishedVersion(): Promise<string> {
 }
 
 let version: string;
-let tarballs: TarballMap;
+// buildConsumer's signature takes a tarball map; registry mode never reads
+// it, so nothing is packed for this spec.
+const tarballs: TarballMap = { dir: '', byName: {}, nameByDir: {} };
 
 test.describe.configure({ mode: 'serial' });
 
 test.beforeAll(async () => {
   test.setTimeout(600_000);
   version = await publishedVersion();
-  // The tarball map stays required by buildConsumer's signature; registry
-  // mode never reads the files.
-  tarballs = await ensureConsumerTarballs();
-}, 600_000);
+});
 
 for (const consumer of CONSUMERS) {
   test.describe(consumer.id, () => {

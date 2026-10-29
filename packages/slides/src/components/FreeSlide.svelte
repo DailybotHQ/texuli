@@ -12,39 +12,25 @@
  * Everything else paints exactly as the stage's own free renderer does
  * (same regions, morph ids, fragments and code highlights).
  */
-import type { FreeSlide, SlideItem } from '@texuli/deck/model';
+import type { FreeSlide as FreeSlideData, SlideItem } from '@texuli/deck/model';
 import { extendedItem, withStandInSize } from '../registry/extended.ts';
 import { slideStateKey } from '../registry/state.ts';
 import BlockRenderer from '../stage/BlockRenderer.svelte';
 import { getDeckStepContext } from '../stage/context.ts';
 import { composeFreeSlide, type FreeSlideEntry } from '../stage/free.ts';
 import RendererHost from '../stage/RendererHost.svelte';
-import {
-  type DeckLazyRenderer,
-  type DeckSlideRenderContext,
-  resolveItemRenderer,
-} from '../stage/renderers.ts';
+import { type DeckSlideRenderContext, resolveItemRenderer } from '../stage/renderers.ts';
 import SlidePlaceholder from '../stage/SlidePlaceholder.svelte';
+import { CATALOG_NODE_RENDERER } from './catalog-node.ts';
 import MathBlock from './MathBlock.svelte';
 import MeasuredImage from './MeasuredImage.svelte';
 
 interface Props {
-  slide: FreeSlide;
+  slide: FreeSlideData;
   context: DeckSlideRenderContext;
 }
 
-interface NodeProps extends Record<string, unknown> {
-  id: string;
-  props: Record<string, unknown>;
-  context: DeckSlideRenderContext;
-  stateKey: string;
-  label: string;
-}
-
-/** The catalog node painter, imported only when a family block needs the player. */
-const catalogNode = {
-  load: () => import('./CatalogNode.svelte'),
-} as unknown as DeckLazyRenderer<NodeProps>;
+const catalogNode = CATALOG_NODE_RENDERER;
 
 let { slide, context }: Props = $props();
 const fromContext = getDeckStepContext();

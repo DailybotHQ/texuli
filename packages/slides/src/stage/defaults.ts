@@ -16,7 +16,7 @@
  */
 import { loadBuiltinDeckBlocks } from './builtin-loader.ts';
 import { loadDeckMigration } from './migration.ts';
-import type { DeckRenderers } from './renderers.ts';
+import type { DeckDefaultRenderersSource, DeckRenderers } from './renderers.ts';
 
 let loaded: readonly DeckRenderers[] | undefined;
 let loading: Promise<readonly DeckRenderers[]> | undefined;
@@ -46,3 +46,9 @@ export function loadDefaultDeckRenderers(): Promise<readonly DeckRenderers[]> {
 export function loadedDefaultDeckRenderers(): readonly DeckRenderers[] | undefined {
   return loaded;
 }
+
+/** The built-in defaults source `DeckStage` hands its core (`DeckStageCore`). */
+export const DECK_DEFAULT_RENDERERS_SOURCE: DeckDefaultRenderersSource = Object.freeze({
+  load: loadDefaultDeckRenderers,
+  loaded: loadedDefaultDeckRenderers,
+});

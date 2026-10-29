@@ -21,6 +21,7 @@ let {
   disabled = false,
   label,
   value,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -32,7 +33,7 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveItem
+<PrimitiveItem bind:ref
   class={classes}
   data-tx-select-item
   {value}

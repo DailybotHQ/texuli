@@ -6,6 +6,10 @@ export interface NavigationMenuContentEntry {
   id: string;
   class?: string | undefined;
   children?: Snippet | undefined;
+  /** The content part's other attributes, spread on the rendered element. */
+  attributes?: Record<string, unknown> | undefined;
+  /** Binds the content part's `ref` to the rendered element. */
+  attach?: ((node: HTMLElement) => () => void) | undefined;
 }
 
 export interface NavigationMenuContextValue {

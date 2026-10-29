@@ -24,7 +24,7 @@
     "kind": "request",
     "label": "Revenue dashboard requested in chat"
   },
-  "spec": "0.5.0",
+  "spec": "0.6.0",
   "state": {
     "region": {
       "type": "enum",
@@ -39,6 +39,9 @@
       "type": "boolean",
       "initial": false
     }
+  },
+  "motion": {
+    "level": "full"
   },
   "tree": {
     "id": "layout-page",
@@ -175,6 +178,10 @@
               }
             ]
           }
+        },
+        "motion": {
+          "enter": "fade",
+          "duration": "fast"
         }
       },
       {
@@ -182,12 +189,18 @@
         "props": {
           "columns": 3
         },
+        "motion": {
+          "stagger": "fast"
+        },
         "children": [
           {
             "id": "layout-tile",
             "props": {
               "title": "Pipeline per day",
               "span": 2
+            },
+            "motion": {
+              "enter": "rise"
             },
             "children": [
               {
@@ -274,6 +287,9 @@
             "props": {
               "title": "Deals by stage"
             },
+            "motion": {
+              "enter": "rise"
+            },
             "children": [
               {
                 "id": "charts-donut",
@@ -311,6 +327,9 @@
             "props": {
               "title": "Revenue by region"
             },
+            "motion": {
+              "enter": "rise"
+            },
             "children": [
               {
                 "id": "charts-bar",
@@ -347,6 +366,9 @@
               "title": "Quota attainment",
               "span": 2
             },
+            "motion": {
+              "enter": "rise"
+            },
             "children": [
               {
                 "id": "charts-gauge",
@@ -365,6 +387,10 @@
         "id": "layout-card",
         "props": {
           "title": "Accounts"
+        },
+        "motion": {
+          "enter": "rise",
+          "layout": true
         },
         "children": [
           {

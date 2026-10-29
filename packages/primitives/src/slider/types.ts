@@ -20,7 +20,8 @@ export interface SliderRootSnippetProps {
   tickItems: SliderTickItem[];
 }
 
-interface RootShared extends Omit<HTMLAttributes<HTMLElement>, 'children' | 'dir'> {
+/** The root's own shared props; the native attributes stay a separate constituent. */
+interface RootOwn {
   min?: number;
   max?: number;
   /** Step between values. Default `1`. */
@@ -44,22 +45,36 @@ interface RootShared extends Omit<HTMLAttributes<HTMLElement>, 'children' | 'dir
   ref?: HTMLElement | null;
 }
 
-export interface SliderSingleRootProps extends RootShared {
+/**
+ * Why the members are written as `RootShared & { … }` with an inline object
+ * type (T-std-consumers): a consumer's checker evaluates `keyof` of this union
+ * for the component's bindings (`Component<Props, {}, 'ref' | 'value'>`), which
+ * is the intersection of each member's key union. Those unions hold several
+ * hundred native attribute keys plus the `data-${string}` pattern, so unless
+ * both members yield the very same union TypeScript multiplies them and fails
+ * with TS2590 ("union type that is too complex to represent"). Interfaces, or
+ * named aliases for the member-specific part, give each key union a distinct
+ * origin and trigger it. Keep the inline parts and the same key set in both
+ * members; `tests/root-props.types.ts` checks it.
+ */
+type RootShared = Omit<HTMLAttributes<HTMLElement>, 'children' | 'dir'> & RootOwn;
+
+export type SliderSingleRootProps = RootShared & {
   type?: 'single';
   /** Bindable. Defaults to `min`. */
   value?: number;
   onValueChange?: (value: number) => void;
   /** After a keyboard change, and when a pointer drag ends. */
   onValueCommit?: (value: number) => void;
-}
+};
 
-export interface SliderMultipleRootProps extends RootShared {
+export type SliderMultipleRootProps = RootShared & {
   type: 'multiple';
   /** Bindable, ascending. Defaults to `[min]`. */
   value?: number[];
   onValueChange?: (value: number[]) => void;
   onValueCommit?: (value: number[]) => void;
-}
+};
 
 export type SliderRootProps = SliderSingleRootProps | SliderMultipleRootProps;
 

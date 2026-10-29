@@ -1,8 +1,10 @@
 <script lang="ts">
 import { Tabs as TabsPrimitive } from '@texuli/primitives/tabs';
-import type { Snippet } from 'svelte';
+import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { MotionProp } from '../../motion/contract.ts';
+import { createIndicatorMotion } from '../../motion/seam.ts';
 import { Icon } from '../icons/index.ts';
 import type { TabItem } from './types.ts';
 import {
@@ -31,6 +33,11 @@ type OwnProps = {
   /** Renders the panel body for each item. */
   content?: Snippet<[TabItem]>;
   children?: Snippet;
+  /**
+   * Motion (`texuli/motion`): the active indicator glides to the new tab
+   * (`layout`, default on); `false` for none.
+   */
+  motion?: MotionProp;
   /** The rendered root element (bindable). */
   ref?: HTMLElement | null;
 };
@@ -52,9 +59,44 @@ let {
   listClass,
   content,
   children,
+  motion,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+const indicatorMotion = createIndicatorMotion({
+  motion: () => motion,
+  defaults: { layout: true, duration: 'base' },
+});
+let listElement = $state<HTMLElement | null>(null);
+let previousTab: Element | null = null;
+let indicatorReady = false;
+const activeTab = () =>
+  listElement?.querySelector(':scope > [role="tab"][data-state="active"]') ?? null;
+// Before the change: remember the active tab. After it: glide from there.
+// The first run (mount and hydration) only records it.
+$effect.pre(() => {
+  void value;
+  untrack(() => {
+    previousTab = activeTab();
+  });
+});
+$effect(() => {
+  void value;
+  untrack(() => {
+    const next = activeTab();
+    const from = previousTab;
+    previousTab = next;
+    if (!indicatorReady) {
+      indicatorReady = true;
+      return;
+    }
+    if (!listElement || !from || !next || from === next) return;
+    const shape =
+      variant !== 'line' ? 'fill' : orientation === 'vertical' ? 'inline-end' : 'block-end';
+    indicatorMotion.glide(listElement, from, next, shape);
+  });
+});
 
 function bindRef(node: HTMLElement): () => void {
   ref = node;
@@ -99,7 +141,12 @@ const triggerClass = $derived(tabsTriggerClass({ variant }));
   {@attach bindRef}
 >
   <div class="tx-tabs__scroller">
-    <TabsPrimitive.List class={listClassName} aria-label={label} data-tx-tabs-list="">
+    <TabsPrimitive.List
+      bind:ref={listElement}
+      class={listClassName}
+      aria-label={label}
+      data-tx-tabs-list=""
+    >
       {#each items as item (item.value)}
         <TabsPrimitive.Trigger
           value={item.value}
@@ -113,6 +160,7 @@ const triggerClass = $derived(tabsTriggerClass({ variant }));
           {item.label}
           {#if item.badge !== undefined}
             <span class="tx-tabs__badge" aria-hidden="true">{item.badge}</span>
+            <span class="tx-tabs__sr-only">&#32;{item.badgeLabel ?? item.badge}</span>
           {/if}
         </TabsPrimitive.Trigger>
       {/each}

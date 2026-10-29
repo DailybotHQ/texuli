@@ -41,6 +41,7 @@ let {
   boundaries = 1,
   stableCount = false,
   onPageChange,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -67,7 +68,7 @@ const digitsStyle = (ctx: PaginationSnippetProps) =>
   `--tx-pagination-digits: ${String(ctx.pageCount).length}`;
 </script>
 
-<Primitive.Root
+<Primitive.Root bind:ref
   class={classes}
   data-tx-pagination
   data-size={size}

@@ -50,6 +50,8 @@ const toc: TocEntry[] = [
 | `toc` | — | Host-supplied entries `{ id, label, level }`. When set, the layout lists exactly these (blank ids or labels and repeated ids dropped, an unknown level becomes 2) and never scans, renames or marks a heading. Each `id` names an element already on the page; the active entry follows those elements. |
 | `tocLevels` | `[2, 3]` | Heading levels (2–6) the scanned TOC lists. Also read from `options.tocLevels` as a comma list (`"2,3,4"`); the prop wins. |
 | `preserveHeadingIds` | `false` | Keep authored heading ids exactly as written: no id is assigned or changed, and headings without an id (or repeating an id already listed) stay out of the TOC. Also read from `options.preserveHeadingIds`; the prop wins. |
+| `activeId` | `''` | `bind:activeId`: the id of the heading being read; its TOC link gets `aria-current="location"`. Set it to choose the current entry; until tracking starts (server rendering, no `IntersectionObserver`) an empty value marks the first entry. |
+| `onActiveHeadingChange` | — | `(id, item)` when the layout moves the current heading (scrolling, content changes), with the TOC item. |
 | `nav`, `path`, `options`, `storageKey`, `aside`, `class` | — | As in the [layout contract](layout-host.md). `options` keys `title`, `summary`, `eyebrow`, `author`, `date`, `readingTime` fill the article header. |
 
 ## Table of contents
@@ -63,6 +65,17 @@ taken; a repeated authored id is suffixed too. Listed headings get
 `preserveHeadingIds` turns off every id write; `toc` turns off the scan and
 every heading write. Every TOC link is a fragment (`#id`, URL-encoded) checked
 by `safeHref`.
+
+**Active heading (G52).** In the browser the layout watches every listed
+heading (scanned, or the host `toc` entries' elements) with an
+`IntersectionObserver` whose band is the top 30% of the viewport. Whenever a
+heading crosses it, the current heading becomes the last listed one (in
+document order) whose top has passed the reading line at 30% of the viewport
+height, or the first one when the reader is above them all. Its link gets
+`aria-current="location"`, `activeId` updates and `onActiveHeadingChange`
+fires. Nothing runs on the server: the markup marks `activeId`, else the
+first entry, and without `IntersectionObserver` the current entry only
+changes through `activeId`.
 
 Compatibility: the scanned behavior with no new props is unchanged, except
 that a heading's own `tabindex` is no longer overwritten. `TocItem.level` and

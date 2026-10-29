@@ -11,7 +11,14 @@ type Props = ComponentProps<typeof Primitive> & {
   icon?: Snippet;
 };
 
-let { children, class: className, icon, disabled = false, ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  icon,
+  disabled = false,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const classes = $derived(
   menuItemClass({
@@ -21,7 +28,7 @@ const classes = $derived(
 );
 </script>
 
-<Primitive class={classes} data-tx-menu-sub-trigger {disabled} {...rest}>
+<Primitive bind:ref class={classes} data-tx-menu-sub-trigger {disabled} {...rest}>
   {#if icon}
     <span class={menuIconClass()} aria-hidden="true">{@render icon()}</span>
   {/if}

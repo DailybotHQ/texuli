@@ -15,9 +15,9 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
-> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
+> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
+> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
 
 ## Install
 
@@ -114,6 +114,59 @@ the initial chunk.
 `texuli/cx` exports `cx` (class composition) and `variants` (typed variant
 recipes), so you can extend components without `clsx` or `tailwind-merge`.
 
+`texuli/motion` holds the motion prop contract and `MotionProvider` (new in
+`0.6.0`): overlays, toasts, tabs, accordions and the
+`@texuli/data` Board and DataGrid animate through `@texuli/core/motion`,
+instant under reduced motion and at level `none`
+([ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)).
+
+## New in 0.6.0
+
+Ships in `0.6.0`; the `0.5.0` release predates it. Under `0.x` the new minor
+may break; the breaking items are marked.
+
+- **One API contract:** `bind:ref` and rest attributes on every exported
+  component (menus, combobox, select, popover, navigation, pagination,
+  sheet parts, command, number field, pin input, `Radio`, `Tooltip`,
+  `Calendar`, the date controls, `TagsInput`, `ColorPicker`, `Toggle` and
+  more), the [Component API contract](https://github.com/DailybotHQ/texuli/blob/main/docs/STANDARDS.md#component-api-contract)
+  checked by `tests/contract.test.ts`. Layouts are not under the contract
+  yet (planned).
+- **Motion:** `texuli/motion` (`MotionProvider`, the `motion` prop):
+  dialogs, sheets, popovers, hover cards, menus, tooltips, toasts, tabs and
+  accordions animate through `@texuli/core/motion`
+  ([ui-motion](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)). **Breaking:** the
+  toast and tooltip CSS keyframes are gone, and a closing overlay stays
+  mounted, `inert`, until its exit ends.
+- **Breaking, Field ids:** `FileUpload`'s `id` (or `inputId`) reaches the
+  file input and `TagsInput`'s its text input (G56, G60); the date controls
+  take `hideLabel`, hide their own label inside a `Field`, and put `id` on
+  their first segment (G63).
+- **Breaking, `InputGroup`:** `id`, `aria-*`, `data-*` and handlers reach
+  the input ([ui-input](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-input.md)).
+- **Breaking, `avatar`:** `data-avatar` is `initials` after an image error
+  (G58).
+- `dialog`, `command`: `mode`, `container`, `onDismissRequest` and
+  `onCloseAutoFocus` on `Dialog`, `AlertDialog` and `CommandPalette` (G53).
+- `tabs-accordion`: the tab badge is part of the name, or `badgeLabel` (G54).
+- `toast`: `action.retryOnError` and `errorText` (G57); the `Toaster` has no
+  top-layer viewport while empty, and `mode="contained"` with a `container`
+  (G77).
+- `tags-color`: `TagsInput` `readonly` and a list or RegExp `delimiter`
+  (G60, G61).
+- `card`: `CardGrid` `gap` values, and a caller `style` keeps the column
+  template (G62).
+- `date`: `Calendar` `defaultFocusedValue`, `bind:focusedValue` and
+  `onFocusedValueChange` (G64); `DateRangePicker` `required` and
+  `onInvalid(text, reason, { side })` (G66).
+- `layouts/content`: active-heading tracking with `aria-current="location"`,
+  `activeId` and `onActiveHeadingChange` (G52).
+- `layouts/mobile`: no wrapper for an empty `stickyFooter` (G68).
+- `layouts/marketing` and `layouts/marketing/section`:
+  `MarketingSectionHeader`, a heading-only section header with no landmark
+  or padding (G84).
+- `Tooltip` `bind:ref` (the tooltip element, `null` while hidden).
+
 ## New in 0.5.0
 
 Ships in `0.5.0`; the `0.4.0` release predates it. Under `0.x` the new minor
@@ -187,6 +240,7 @@ may break; the breaking items are marked.
 - Using Texuli with your own CSS: [using-with-your-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/using-with-your-css.md)
 - Class values and variants: [class-value.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/class-value.md)
   and [variants-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/variants-css.md)
+- Motion: [ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)
 - Icons: [ui-icons.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)
 - Layouts: [layouts-shells.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-shells.md),
   [layouts-dashboard.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-dashboard.md),

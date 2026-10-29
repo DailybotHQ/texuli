@@ -29,10 +29,19 @@ export type FilterOperator = (typeof FILTER_OPERATORS)[number];
 
 type Scalar = string | number | boolean | null;
 
+/**
+ * A host operator id from a filter builder catalog (`@texuli/data/filter-builder`):
+ * `[a-z][a-zA-Z0-9_-]{0,31}`, never a built-in name. The grid engine refuses
+ * conditions on them; the builder's `applyFilter` runs them through the host
+ * predicate.
+ */
+export type FilterCustomOperatorId = string & {};
+
 export interface FilterCondition {
   type: 'condition';
   field: string;
-  operator: FilterOperator;
+  /** A built-in operator, or a catalog operator id (filter builder only). */
+  operator: FilterOperator | FilterCustomOperatorId;
   /** eq/neq: a scalar; contains: text; in: a list; between: [low, high]; before/after: a date. */
   value?: Scalar | Scalar[];
 }
@@ -185,7 +194,7 @@ export function filterSchemaFor<T>(columns: readonly GridColumnDef<T>[]) {
       }
       const column = byKey.get(node.field);
       if (!column) throw new ValidationError(`unknown field "${node.field}"`);
-      if (!OPERATORS_BY_TYPE[column.type].includes(node.operator)) {
+      if (!OPERATORS_BY_TYPE[column.type].includes(node.operator as FilterOperator)) {
         throw new ValidationError(
           `${node.operator} does not apply to ${column.header} (${column.type})`
         );
@@ -251,6 +260,9 @@ function compileCondition<T>(condition: FilterCondition, column: GridColumnDef<T
         return typeof v === 'number' && (before ? v < bound : v > bound);
       };
     }
+    default:
+      // Catalog operators never reach the engine (its parser refuses them).
+      return () => false;
   }
 }
 

@@ -102,3 +102,7 @@ Content uses `createOverlayCore` from `@texuli/core/overlay-core` with only the 
 - **Pointer selection.** Items run on click; press-drag-release across items is not supported.
 - **Grace area.** It is a 300 ms polygon. Very slow diagonal moves may close the submenu.
 - **RTL.** Direction is read from the trigger's computed `direction` when a submenu opens; changing `dir` while it is open does not move it.
+
+## Motion hooks
+
+The content takes `motionHooks` (enter and exit, the closed part held `inert` while its exit plays); see [prim-dialog](prim-dialog.md#motion-hooks).

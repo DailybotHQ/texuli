@@ -13,7 +13,13 @@ type Props = ComponentProps<typeof PrimitiveEmpty> & {
   announce?: string;
 };
 
-let { children, class: className, announce = 'No results', ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  announce = 'No results',
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const classes = $derived(
   comboboxEmptyClass({
@@ -34,7 +40,7 @@ $effect(() => {
 });
 </script>
 
-<PrimitiveEmpty class={classes} data-tx-combobox-empty {...rest}>
+<PrimitiveEmpty bind:ref class={classes} data-tx-combobox-empty {...rest}>
   {#if children}
     {@render children()}
   {:else}

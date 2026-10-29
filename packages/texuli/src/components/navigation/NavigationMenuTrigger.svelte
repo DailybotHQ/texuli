@@ -11,10 +11,16 @@ type Props = ComponentProps<typeof Primitive.Trigger> & {
   hideChevron?: boolean;
 };
 
-let { children, class: className, hideChevron = false, ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  hideChevron = false,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 </script>
 
-<Primitive.Trigger
+<Primitive.Trigger bind:ref
   class={navigationMenuTriggerClass({
     class: className,
   })}

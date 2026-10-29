@@ -22,7 +22,7 @@ closed with an `internal-error` diagnostic.
 | `input` | Text: a byte cap before `JSON.parse` (`maxBytes` + 8 KiB), then parse. The value must be an object or an array | yes |
 | `envelope` | For a [blueprint envelope](./envelope.md): strict field rules, the catalog binding (`catalogHash`), and trust warnings for a declared status, activation or tier; then the tree runs the checks below. `skipped` for a bare tree | on an unsupported version or a missing tree |
 | `spec` | For an envelope, after `migrateBlueprint` (`@texuli/spec/migrate`) brings an older envelope (undeclared or `"spec": "0.2.0"`) to the current spec version: the host's `checkSpec` (for example `@texuli/spec`'s `validateBlueprint` with the spec documents); `skipped` without one | no |
-| `structure` | One iterative pass: prototype keys (`__proto__`, `constructor`, `prototype`) anywhere, values nested deeper than 128 levels, node fields other than `id`, `props`, `children`, `slot`, `when`, `bind`, `on` | only on a depth bomb |
+| `structure` | One iterative pass: prototype keys (`__proto__`, `constructor`, `prototype`) anywhere, values nested deeper than 128 levels, node fields other than `id`, `props`, `children`, `slot`, `when`, `bind`, `on`, `motion` | only on a depth bomb |
 | `interaction` | Spec 0.3.0 interaction, catalog-local: `$state` and `$data` bindings name declared variables (and are replaced by their first-paint values for the checks below), `bind` only on `bindable` props, `on` only for events the component fires, closed action ops and fields; list item text follows `SPEC_PATTERNS.listText`; and, for an envelope, the state surface rules from `@texuli/spec/surface` (form nodes inside an `action-form`, controls and fields bound to declared variables of their type, flow nodes matching the flow, no writes to host-bound variables), as `@texuli/player` refuses them | no |
 | `sinks` | The raw sink scan (`scanSinks`): executable strings, HTML strings, `class` / `style` / `innerHTML` / `srcdoc` keys, `on…` keys, functions, bidi controls, and URLs the host tier's policy refuses for their kind of key (links through the link policy, `src` and `poster` through the image or media policy, and every `srcset` candidate through the image-set policy) | no |
 | `limits` | `validateCatalogTreeLimits` (depth, nodes, bytes, branching, roots) | yes |
@@ -197,6 +197,28 @@ the mapped `deck` (only when `ok`), `diagnostics` (catalog findings, then
 This function is not the model v1 `validateDeckDraft` of
 `@texuli/slides/grammar`, which validates `0.3.0` decks and returns a v1
 deck.
+
+## Streamed nodes
+
+A host that paints a blueprint while an agent writes it (ADR-014;
+`<Player stream>` in `@texuli/player`) checks each node as its shell
+arrives: every member but `children`, read by `@texuli/spec/stream`. These
+functions are new in `0.6.0`.
+
+| Export | What it does |
+| --- | --- |
+| `validateStreamNode(input, options)` | `checkStreamTotals`, then `validateStreamChain` on the node's chain. `input` (`StreamNodeInput`) is the envelope `header` (or `null`), its `treeMember`, the admitted `ancestors`' shells, the node's `shell`, its `index`, `root` for a root of an array, and how many nodes were `admitted` so far. Returns a `StreamNodeValidation` (`ok`, `diagnostics`, `validation`) |
+| `validateStreamChain(chain, options)` | The real `validateDraft` on a prepared chain with the host's options and `frameRoots: false`; any error outside `STREAM_WHOLE_TREE_CHECKS` (`grammar`, `root`) refuses the node. The player calls it after resolving `$state` bindings itself |
+| `streamNodeChain(input)` | The header, each ancestor's shell and the node as one draft whose only leaf is the node |
+| `checkStreamTotals(input, limits)` | The totals measured so far against the limits: `nodes-exceeded`, `branching-exceeded`, `roots-exceeded` |
+
+The chain carries the context a node rule needs (the header's state and
+flow, the form an action field sits in), and every rule `validateDraft`
+applies to a node applies unchanged: nothing is weakened. Only grammar and
+the root rule wait for the complete draft, and the complete draft goes
+through `validateDraft` itself, which stays the only path to a valid draft.
+A node whose member arrives after `children` is the host's to hold (the
+`stream-order` event of `@texuli/spec/stream`).
 
 ## Edit history
 

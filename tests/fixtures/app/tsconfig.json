@@ -7,6 +7,12 @@
       "@texuli/charts/worker/entry": ["../../../packages/charts/src/worker/entry.ts"],
       "@texuli/charts/math/*": ["../../../packages/charts/src/math/*/index.ts"],
       "@texuli/player": ["../../../packages/player/src/index.ts"],
+      "@texuli/pages/editor": ["../../../packages/pages/src/editor/index.ts"],
+      "@texuli/pages/paged": ["../../../packages/pages/src/paged/index.ts"],
+      "@texuli/pages/collab": ["../../../packages/pages/src/collab/index.ts"],
+      "@texuli/document/model": ["../../../packages/document/src/model/index.ts"],
+      "@texuli/document/sync": ["../../../packages/document/src/sync/index.ts"],
+      "@texuli/document/paged": ["../../../packages/document/src/paged/index.ts"],
       "@texuli/media/timeline": ["../../../packages/media/src/timeline/index.ts"]
     }
   }

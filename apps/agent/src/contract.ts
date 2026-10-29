@@ -38,6 +38,12 @@ export interface DraftRequest {
   /** The current draft, re-validated before use (the client copy is untrusted). */
   draft?: CatalogTreeInput;
   history?: readonly HistoryTurn[];
+  /**
+   * Stream the draft as it is written (ADR-014): `draft-chunk`, `node-ready`
+   * and `refused` events while the model writes, then `final` instead of
+   * `result`. Default false (the v1 event stream, unchanged).
+   */
+  stream?: boolean;
 }
 
 /** What the receipt says ran, per check of the shared validator. */
@@ -115,21 +121,52 @@ export interface GuardReceipt {
   budget?: { scope: 'session' | 'global'; limit: number; used: number; unit: 'reported-token' };
 }
 
-/** The server-sent event stream: progress text, never unvalidated UI. */
+/** Why a streamed node is held until the final verdict (`refused` events). */
+export type StreamRefusalReason = 'node' | 'held' | 'stream-order' | 'stream-error';
+
+/**
+ * The server-sent event stream. Without `stream`, progress text and one
+ * validated `result`. With `stream: true`, also the draft as it is written
+ * (ADR-014): `draft-chunk` texts that concatenate to one untrusted draft
+ * envelope per attempt (feed them to `<Player stream>`), the service's
+ * node-level verdicts (`node-ready`, `refused`), and `final`, the full
+ * `validateDraft` verdict, which is the only one that counts.
+ */
 export type AgentEvent =
   | { type: 'accepted'; requestId: string }
   | { type: 'generating'; text: string }
   | { type: 'validating'; attempt: number }
   | { type: 'repairing'; attempt: number; codes: readonly string[] }
+  /** Envelope text of attempt `attempt`; a new attempt starts a new envelope. */
+  | { type: 'draft-chunk'; attempt: number; text: string }
+  /** A node's shell is final and passed every node-level check. */
+  | { type: 'node-ready'; attempt: number; path: string; streamId: string; id: string }
+  /** A node (path `$`: the whole attempt) is held with its subtree until the final verdict. */
+  | {
+      type: 'refused';
+      attempt: number;
+      path: string;
+      reason: StreamRefusalReason;
+      codes: readonly string[];
+    }
   | { type: 'result'; result: DraftResult }
-  | { type: 'error'; code: AgentErrorCode; message: string; receipt?: GuardReceipt }
+  /** The final verdict of a streamed request (the `result` of the v1 stream). */
+  | { type: 'final'; result: DraftResult }
+  | {
+      type: 'error';
+      code: AgentErrorCode;
+      message: string;
+      receipt?: GuardReceipt;
+      /** Present for provider failures: whether the same request may succeed later. */
+      retryable?: boolean;
+    }
   | { type: 'done' };
 
 export type AdmissionResult =
   | { ok: true; request: DraftRequest }
   | { ok: false; code: 'too-large' | 'bad-request'; message: string };
 
-const FIELDS = new Set(['prompt', 'catalogHash', 'draft', 'history']);
+const FIELDS = new Set(['prompt', 'catalogHash', 'draft', 'history', 'stream']);
 const HASH = /^[0-9a-f]{64}$/;
 
 function utf8Bytes(text: string): number {
@@ -169,7 +206,7 @@ export function admitRequest(body: string): AdmissionResult {
   const record = value as Record<string, unknown>;
   const unknown = Object.keys(record).find((key) => !FIELDS.has(key));
   if (unknown !== undefined) return bad(`"${unknown}" is not a request field.`);
-  const { prompt, catalogHash, draft, history } = record;
+  const { prompt, catalogHash, draft, history, stream } = record;
   if (typeof prompt !== 'string' || prompt.trim() === '') return bad('"prompt" must be text.');
   if ([...prompt].length > LIMITS.promptChars) {
     return {
@@ -187,6 +224,8 @@ export function admitRequest(body: string): AdmissionResult {
   ) {
     return bad('"draft" must be one catalog tree.');
   }
+  if (stream !== undefined && typeof stream !== 'boolean')
+    return bad('"stream" must be true or false.');
   let turns: HistoryTurn[] | undefined;
   if (history !== undefined) {
     if (!Array.isArray(history)) return bad('"history" must be a list of turns.');
@@ -214,6 +253,7 @@ export function admitRequest(body: string): AdmissionResult {
       catalogHash,
       ...(draft !== undefined ? { draft: draft as CatalogTreeInput } : {}),
       ...(turns ? { history: turns } : {}),
+      ...(stream === true ? { stream: true } : {}),
     },
   };
 }

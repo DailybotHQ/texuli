@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { setCheckboxGroupContext } from './context.ts';
 
 type Props = HTMLAttributes<HTMLDivElement> & {
@@ -12,7 +13,7 @@ type Props = HTMLAttributes<HTMLDivElement> & {
   required?: boolean;
   onValueChange?: (value: string[]) => void;
   children?: Snippet;
-};
+} & RefProp;
 
 let {
   value = $bindable(),
@@ -23,6 +24,7 @@ let {
   onValueChange,
   children,
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -59,7 +61,7 @@ setCheckboxGroupContext({
 });
 </script>
 
-<div
+<div bind:this={ref}
   class={className}
   role="group"
   data-tx-checkbox-group=""

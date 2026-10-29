@@ -35,21 +35,23 @@ project overview.
 | `@texuli/catalog` | [packages/catalog/README.md](../packages/catalog/README.md): The agent catalog and the renderer with no HTML sinks. |
 | `@texuli/charts` | [packages/charts/README.md](../packages/charts/README.md): Chart math and every chart family, one lazy subpath per family. |
 | `@texuli/chat` | [packages/chat/README.md](../packages/chat/README.md): Chat interfaces: thread, message list, composer and typing indicator, generic for people and agents. |
-| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): In development, first on npm as `0.5.0`: the rich text editor surface, toolbar, link dialog, clipboard import and Markdown in and out on the core editor texels. |
+| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): In development, on npm as `0.6.0` (first published as `0.5.0`): the rich text editor surface, toolbar, link dialog, clipboard import and Markdown in and out on the core editor texels. |
 | `@texuli/core` | [packages/core/README.md](../packages/core/README.md): Texels: framework-free behavior and policy that every Texuli component is built from. |
 | `@texuli/date` | [packages/date/README.md](../packages/date/README.md): Owned Gregorian date arithmetic for Texuli calendars and date fields. |
-| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, on npm as `0.5.0` (first published as `0.4.0`): the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
-| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.5.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
+| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, on npm as `0.6.0` (first published as `0.4.0`): the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
+| `@texuli/document` | [packages/document/README.md](../packages/document/README.md): In development, in the repository only (first release planned for `0.7.0`): the framework-free block document engine (model, schema, operations, Markdown, sync). |
+| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.6.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
 | `@texuli/media` | [packages/media/README.md](../packages/media/README.md): Media: images, galleries, video, audio and layered compositions. |
+| `@texuli/pages` | [packages/pages/README.md](../packages/pages/README.md): In development, in the repository only (first release planned for `0.7.0`): the block document editor and reader on `@texuli/document`. |
 | `@texuli/player` | [packages/player/README.md](../packages/player/README.md): Svelte paint runtime for validated Texuli catalog blueprints. |
 | `@texuli/primitives` | [packages/primitives/README.md](../packages/primitives/README.md): Owned, headless Svelte 5 primitives built on the texels. |
-| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (in development; on npm as `0.5.0`, the v2 stage from `0.4.0`, after the `0.3.0` model v1 stage). |
+| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (in development; on npm as `0.6.0`, the v2 stage from `0.4.0`, after the `0.3.0` model v1 stage). |
 | `@texuli/spec` | [packages/spec/README.md](../packages/spec/README.md): The schema-first blueprint contract: JSON schemas, the catalog vocabulary, TypeScript and Kotlin projections, and the conformance harness. |
 | `texuli` | [packages/texuli/README.md](../packages/texuli/README.md): Styled Texuli components, layouts and shells. |
 | `@texuli/tokens` | [packages/tokens/README.md](../packages/tokens/README.md): The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. |
-| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.5.0`: the accessible workflow graph editor and viewer. |
+| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.6.0`: the accessible workflow graph editor and viewer. |
 | `@texuli/tools` | [packages/tools/README.md](../packages/tools/README.md): Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. |
 | `@texuli/website` | [apps/website/README.md](../apps/website/README.md): texuli.com: the Texuli documentation, catalog and live examples, built with Astro; the Pages Functions live in the root `functions/`. |
 | `@texuli/agent` | [apps/agent/README.md](../apps/agent/README.md): The texuli.com agent service: prompt to validated blueprint draft, fake replay provider only, not deployed. |
@@ -116,6 +118,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-live-components](../apps/website/docs/site-live-components.md) | Live interactive component pages |
 | [site-live-primitives](../apps/website/docs/site-live-primitives.md) | Live primitive demos |
 | [site-media-page](../apps/website/docs/site-media-page.md) | texuli.com: media lab |
+| [site-motion](../apps/website/docs/site-motion.md) | texuli.com: motion page |
 | [site-native](../apps/website/docs/site-native.md) | texuli.com native landing |
 | [site-perf](../apps/website/docs/site-perf.md) | Site performance |
 | [site-playground](../apps/website/docs/site-playground.md) | Agent playground (texuli.com) |
@@ -141,7 +144,9 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [csp-reports](../apps/agent/docs/csp-reports.md) | Agent service: CSP report intake |
 | [evals](../apps/agent/docs/evals.md) | Agent service: offline eval harness |
 | [key-store](../apps/agent/docs/key-store.md) | Agent service: provider key store and local dev boundary |
+| [providers](../apps/agent/docs/providers.md) | Agent service: the provider interface and adapters |
 | [service-runbook](../apps/agent/docs/service-runbook.md) | Agent service contract and runbook |
+| [streaming](../apps/agent/docs/streaming.md) | Agent service: streaming generation |
 
 ### `@texuli/astro` (`packages/astro/docs/`)
 
@@ -236,6 +241,8 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [core-inert](../packages/core/docs/core-inert.md) | Texel: inert outside, with an exemption registry |
 | [core-keyboard](../packages/core/docs/core-keyboard.md) | Keyboard model |
 | [core-layer-stack](../packages/core/docs/core-layer-stack.md) | Texel: dismissable-layer stack |
+| [core-markup](../packages/core/docs/core-markup.md) | Core markup: escaped XML and HTML builders (new in `0.6.0`) |
+| [core-motion](../packages/core/docs/core-motion.md) | Core motion: Web Animations with an owned spring solver (new in `0.6.0`) |
 | [core-overlay-core](../packages/core/docs/core-overlay-core.md) | Overlay core (per-feature overlay engine) |
 | [core-portal](../packages/core/docs/core-portal.md) | Core portal |
 | [core-position-dom](../packages/core/docs/core-position-dom.md) | Positioning on the page |
@@ -245,6 +252,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [core-scroll-lock](../packages/core/docs/core-scroll-lock.md) | Scroll lock |
 | [core-tabbable](../packages/core/docs/core-tabbable.md) | Texel: tabbable query |
 | [core-url-policy](../packages/core/docs/core-url-policy.md) | Core URL policy |
+| [core-zip](../packages/core/docs/core-zip.md) | Core ZIP writer (new in `0.6.0`) |
 | [overlay-engine](../packages/core/docs/overlay-engine.md) | Overlay engine |
 
 ### `@texuli/data` (`packages/data/docs/`)
@@ -324,6 +332,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [embedding](../packages/player/docs/embedding.md) | Embedding the player |
 | [paint-proof](../packages/player/docs/paint-proof.md) | Untrusted at paint: the player's security property |
 | [reference](../packages/player/docs/reference.md) | Player reference: loaders, layouts, keyboard, state, flows, actions, drag between lists, iframe protocol |
+| [streaming](../packages/player/docs/streaming.md) | Streaming mode (new in `0.6.0`) |
 
 ### `@texuli/primitives` (`packages/primitives/docs/`)
 
@@ -393,6 +402,8 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | Doc | Title |
 | --- | --- |
 | [contract](../packages/spec/docs/contract.md) | The spec contract: files, generation, conformance, versioning, spec 0.3.0 and the state surface |
+| [motion](../packages/spec/docs/motion.md) | Spec motion: the closed motion vocabulary (spec 0.6.0) |
+| [stream](../packages/spec/docs/stream.md) | Streamed blueprints (new in `0.6.0`) |
 
 ### `texuli` (`packages/texuli/docs/`)
 
@@ -428,6 +439,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [ui-input](../packages/texuli/docs/ui-input.md) | Components: Input, InputGroup and Textarea |
 | [ui-kbd-code](../packages/texuli/docs/ui-kbd-code.md) | Kbd, Code and CopyButton |
 | [ui-menus](../packages/texuli/docs/ui-menus.md) | DropdownMenu, ContextMenu and Menubar |
+| [ui-motion](../packages/texuli/docs/ui-motion.md) | Motion: the motion prop and MotionProvider (new in `0.6.0`) |
 | [ui-navigation](../packages/texuli/docs/ui-navigation.md) | NavigationMenu, Breadcrumb and Pagination |
 | [ui-number-pin](../packages/texuli/docs/ui-number-pin.md) | NumberField and PinInput |
 | [ui-popover](../packages/texuli/docs/ui-popover.md) | Popover and HoverCard |
@@ -465,6 +477,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [tokens-library-expand](../packages/tokens/docs/tokens-library-expand.md) | Tokens: Expand the library to 200+ themes |
 | [tokens-library-port](../packages/tokens/docs/tokens-library-port.md) | Theme library (64-theme port) |
 | [tokens-modes](../packages/tokens/docs/tokens-modes.md) | Color modes |
+| [tokens-motion](../packages/tokens/docs/tokens-motion.md) | Motion tokens (new in `0.6.0`) |
 | [tokens-no-flash](../packages/tokens/docs/tokens-no-flash.md) | No-flash appearance bootstrap |
 | [tokens-palette](../packages/tokens/docs/tokens-palette.md) | OKLCH palette engine |
 | [tokens-style-presets](../packages/tokens/docs/tokens-style-presets.md) | Style presets |

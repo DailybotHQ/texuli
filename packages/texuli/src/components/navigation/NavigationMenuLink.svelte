@@ -9,10 +9,16 @@ type Props = ComponentProps<typeof Primitive.Link> & {
   class?: ClassValue;
 };
 
-let { children, class: className, active = false, ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  active = false,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 </script>
 
-<Primitive.Link
+<Primitive.Link bind:ref
   class={navigationMenuLinkClass({
     class: className,
     active: Boolean(active),

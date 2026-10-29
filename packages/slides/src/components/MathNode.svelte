@@ -4,14 +4,14 @@
  * markup string). Only the closed `MATH_TAGS` and `MATH_ATTRIBUTES` pass;
  * anything else becomes an `mrow` or is dropped, and token text is text.
  */
-import { MATH_ATTRIBUTES, MATH_TAGS, type MathNode } from '@texuli/deck/math';
+import { MATH_ATTRIBUTES, MATH_TAGS, type MathNode as MathNodeData } from '@texuli/deck/math';
 import Self from './MathNode.svelte';
 
 const MATHML = 'http://www.w3.org/1998/Math/MathML';
 const TAGS: readonly string[] = MATH_TAGS;
 const ATTRIBUTES: readonly string[] = MATH_ATTRIBUTES;
 
-let { node, depth = 0 }: { node: MathNode; depth?: number } = $props();
+let { node, depth = 0 }: { node: MathNodeData; depth?: number } = $props();
 
 let tag = $derived(TAGS.includes(node.tag) ? node.tag : 'mrow');
 let attributes = $derived(

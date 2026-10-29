@@ -8,7 +8,7 @@ import {
   summarizeVisualReport,
   visualTargets,
 } from '../../tests/visual/visual-lib.ts';
-import { parseVisualArgs, playwrightArgs, VISUAL_SPEC } from '../visual.ts';
+import { parseVisualArgs, playwrightArgs, ranNothing, VISUAL_SPEC } from '../visual.ts';
 
 /**
  * The visual suite's pure half (Task 4 of PLAN_001_texuli_master): example
@@ -299,5 +299,13 @@ describe('the runner arguments', () => {
     expect(() => parseVisualArgs(['--project'])).toThrow(/needs a value/);
     expect(() => parseVisualArgs(['-g', '--update'])).toThrow(/needs a value/);
     expect(() => parseVisualArgs(['--headed'])).toThrow(/Unknown argument "--headed"/);
+  });
+});
+
+describe('an empty run', () => {
+  it('is never reported as clean: a -g that matched no test captured nothing', () => {
+    const empty = summarizeVisualReport({ suites: [] });
+    expect(ranNothing(empty)).toBe(true);
+    expect(ranNothing({ ...empty, passed: 1 })).toBe(false);
   });
 });

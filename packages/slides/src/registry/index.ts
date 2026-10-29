@@ -22,12 +22,7 @@
 import { createDiagnostic, type DeckDiagnostic } from '@texuli/deck/schema';
 import type { ActionHandler } from '@texuli/player';
 import type { Component } from 'svelte';
-import type {
-  DeckItemRendererProps,
-  DeckLazyRenderer,
-  DeckRenderers,
-  DeckSlideRendererProps,
-} from '../stage/renderers.ts';
+import type { DeckRenderers, DeckSlideRendererProps } from '../stage/renderers.ts';
 import type { SlideCapabilities } from './blueprint.ts';
 import {
   SLIDE_COMPONENT_EXCLUSIONS,
@@ -35,6 +30,7 @@ import {
   SLIDE_EXCLUDED_GROUPS,
   slideComponentSupport,
 } from './catalog-ids.ts';
+import { REGISTRY_RENDERER_ENTRIES } from './entries.ts';
 import { extendedItem } from './extended.ts';
 import { createMemoryStateHost, type SlideStateHost } from './state.ts';
 
@@ -178,15 +174,7 @@ export function createComponentRenderers(
     overrides: Object.freeze({ ...(options.overrides ?? {}) }),
     exclude: new Set(options.exclude ?? []),
   });
-  const slideEntry: DeckLazyRenderer<DeckSlideRendererProps> = {
-    load: () => import('../components/ComponentSlide.svelte'),
-  } as unknown as DeckLazyRenderer<DeckSlideRendererProps>;
-  const itemEntry: DeckLazyRenderer<DeckItemRendererProps> = {
-    load: () => import('../components/ComponentItem.svelte'),
-  } as unknown as DeckLazyRenderer<DeckItemRendererProps>;
-  const freeEntry: DeckLazyRenderer<DeckSlideRendererProps> = {
-    load: () => import('../components/FreeSlide.svelte'),
-  } as unknown as DeckLazyRenderer<DeckSlideRendererProps>;
+  const { slide: slideEntry, item: itemEntry, free: freeEntry } = REGISTRY_RENDERER_ENTRIES;
   const tier = options.validationTier ?? 'untrusted';
 
   return {

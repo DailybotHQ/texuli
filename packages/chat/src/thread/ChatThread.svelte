@@ -6,7 +6,7 @@ import type { ComposerLabels } from '../composer/labels.ts';
 import TypingIndicator from '../composer/TypingIndicator.svelte';
 import type { MessageListLabels } from './labels.ts';
 import MessageList from './MessageList.svelte';
-import type { ChatMessage, ChatMessageActions } from './types.ts';
+import type { ChatMessage, ChatMessageActions, ChatReadingAnchor } from './types.ts';
 
 interface Props {
   messages: ChatMessage[];
@@ -39,6 +39,12 @@ interface Props {
   actions?: Snippet<[ChatMessage, ChatMessageActions]>;
   /** Inline edit save, forwarded to the list. */
   onEdit?: (message: ChatMessage, body: string) => unknown;
+  /** An inline edit saved unchanged, forwarded to the list. */
+  onEditUnchanged?: (message: ChatMessage) => void;
+  /** The list's reading position (`bind:anchor`), forwarded to the list. */
+  anchor?: ChatReadingAnchor | null;
+  /** Reading position changes, forwarded to the list. */
+  onAnchorChange?: (anchor: ChatReadingAnchor) => void;
   /** A reply is streaming: the built-in composer shows Stop (with `onStop`). */
   streaming?: boolean;
   onStop?: () => void;
@@ -66,6 +72,9 @@ let {
   overscan,
   actions,
   onEdit,
+  onEditUnchanged,
+  anchor = $bindable(null),
+  onAnchorChange,
   streaming = false,
   onStop,
   class: className,
@@ -86,6 +95,9 @@ let {
     {overscan}
     {actions}
     {onEdit}
+    {onEditUnchanged}
+    bind:anchor
+    {onAnchorChange}
   >
     {#snippet footer()}
       <TypingIndicator names={typing} class="tx-chat-thread__typing" />

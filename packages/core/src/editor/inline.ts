@@ -44,24 +44,32 @@ export function cleanText(text: string, keep = ''): { text: string; stripped: bo
   return { text: out, stripped };
 }
 
-/** The identity of a mark: its type, plus the href for links. */
+/** The identity of a mark: its type, plus the href for links and the entity for extensions. */
 export const markKey = (mark: EditorMark): string =>
-  mark.type === 'link' ? `link:${mark.href}` : mark.type;
+  mark.type === 'link'
+    ? `link:${mark.href}`
+    : mark.type === 'extension'
+      ? `extension:${mark.name}:${mark.id}`
+      : mark.type;
 
 export const hasMark = (marks: readonly EditorMark[], type: EditorMarkType): boolean =>
   marks.some((mark) => mark.type === type);
 
 /**
  * Canonical mark set: one mark per type (the first wins), sorted in
- * `EDITOR_MARK_ORDER`, and `code` excludes every mark but `link`.
+ * `EDITOR_MARK_ORDER`; `extension` excludes `link` and `code`, and `code`
+ * excludes every other mark but `link`.
  */
 export function sortMarks(marks: readonly EditorMark[]): readonly EditorMark[] {
   const byType = new Map<EditorMarkType, EditorMark>();
   for (const mark of marks) if (!byType.has(mark.type)) byType.set(mark.type, mark);
-  const code = byType.has('code');
+  const extension = byType.has('extension');
+  const code = !extension && byType.has('code');
+  const keep = (type: EditorMarkType) =>
+    extension ? type !== 'link' && type !== 'code' : !code || type === 'link' || type === 'code';
   const out = EDITOR_MARK_ORDER.flatMap((type) => {
     const mark = byType.get(type);
-    return mark && (!code || type === 'link' || type === 'code') ? [mark] : [];
+    return mark && keep(type) ? [mark] : [];
   });
   return out.length === marks.length && out.every((mark, i) => mark === marks[i]) ? marks : out;
 }
@@ -167,7 +175,8 @@ function textAt(content: readonly EditorInline[], offset: number): Text | undefi
 
 /**
  * The marks text typed at `offset` gets: those of the character before (the
- * first character at offset 0). A link continues only strictly inside it.
+ * first character at offset 0). A link or an extension entity continues only
+ * strictly inside it.
  */
 export function inheritedMarks(
   content: readonly EditorInline[],
@@ -175,13 +184,16 @@ export function inheritedMarks(
 ): readonly EditorMark[] {
   const before = offset > 0 ? textAt(content, offset - 1) : undefined;
   const after = textAt(content, offset);
-  const marks = (offset > 0 ? before : after)?.marks ?? [];
-  const link = marks.find((mark) => mark.type === 'link');
-  const inside =
-    link !== undefined &&
-    before !== undefined &&
-    after?.marks.some((mark) => markKey(mark) === markKey(link)) === true;
-  return link && !inside ? withoutMark(marks, 'link') : marks;
+  let marks = (offset > 0 ? before : after)?.marks ?? [];
+  for (const type of ['link', 'extension'] as const) {
+    const edge = marks.find((mark) => mark.type === type);
+    const inside =
+      edge !== undefined &&
+      before !== undefined &&
+      after?.marks.some((mark) => markKey(mark) === markKey(edge)) === true;
+    if (edge && !inside) marks = withoutMark(marks, type);
+  }
+  return marks;
 }
 
 /** Apply `update` to the marks of every text character in `[from, to)`. */

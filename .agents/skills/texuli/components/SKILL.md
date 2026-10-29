@@ -15,16 +15,17 @@ consume the packages, or copy a styled component's source into the app and
 own it, then theme it, adjust it and keep it updatable.
 
 The copy path is **local**: its commands run from a Texuli monorepo checkout
-against folders on disk. All 20 packages are on npm as
-`0.5.0`, a pre-1.0 release (`latest` and `next` both point to it; 1.0.0 will
+against folders on disk. All 20 published packages are on npm as
+`0.6.0`, a pre-1.0 release (`latest` and `next` both point to it; 1.0.0 will
 be the first stable release). Install them plainly (`pnpm add texuli`), pin
-the exact version or `^0.5.0` (for 0.x it accepts only 0.5.x, since a new
+the exact version or `^0.6.0` (for 0.x it accepts only 0.6.x, since a new
 minor may break), and never suggest a download URL. `@texuli/drag`,
 `@texuli/workflows`, `@texuli/deck` and `@texuli/editor` (first published
-in `0.5.0`) are in development and on npm as `0.5.0`. Features such as
+in `0.5.0`) are in development and on npm as `0.6.0`; `@texuli/document`
+and `@texuli/pages` are in the repository only. Features such as
 `@texuli/primitives/sortable` and spec 0.3.0 and 0.4.0 need `0.4.0` or
-later (they are not in `0.3.0`); the `0.5.0` additions and its breaking
-changes are in [`../upgrade/SKILL.md`](../upgrade/SKILL.md).
+later (they are not in `0.3.0`); the `0.6.0` and `0.5.0` breaking changes
+are in [`../upgrade/SKILL.md`](../upgrade/SKILL.md).
 
 ## Choose a path
 
@@ -76,7 +77,7 @@ pnpm exec tsx packages/tools/src/cli-init/cli.ts theme apply ocean --cwd ../my-a
 
 # Path D: see and apply a newer Texuli, keeping local edits
 pnpm exec tsx packages/tools/src/cli-update/cli.ts diff button --cwd ../my-app --source-root . --base-root ../texuli-0.1.0
-pnpm exec tsx packages/tools/src/cli-update/cli.ts update button --cwd ../my-app --source-root . --base-root ../texuli-0.1.0 --version 0.5.0 --dry-run
+pnpm exec tsx packages/tools/src/cli-update/cli.ts update button --cwd ../my-app --source-root . --base-root ../texuli-0.1.0 --version 0.6.0 --dry-run
 ```
 
 Each command prints `--help`. Add `--json` for machine-readable results.

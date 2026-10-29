@@ -162,8 +162,13 @@ pnpm --filter @texuli/agent typecheck
 Its tests run with the app's own Vitest config: from `apps/agent`, run
 `pnpm exec vitest run` (the root config does not collect app tests yet).
 
-There is no real provider, no key and no deployment. Choosing a provider and
-deploying are developer decisions.
+From `0.6.0` the service has a provider interface with fetch-based
+Anthropic Messages and OpenAI-compatible adapters (every setting, the key
+included, comes from constructor options) and can stream validated drafts
+over server-sent events (`stream: true`). The adapters are tested only
+against recorded bytes: no key is configured, no adapter has called a
+provider, and nothing is deployed. Choosing a provider and deploying are
+developer decisions.
 
 ## F — Spec contract (`@texuli/spec`, L0)
 
@@ -214,4 +219,28 @@ validated example: [`references/interaction.md`](references/interaction.md).
 ```bash
 pnpm vitest run packages/player/tests/golden.test.ts
 pnpm vitest run packages/player/tests/lego.test.ts
+```
+
+## H — Motion and streaming (spec 0.6.0)
+
+New in the `0.6.0` packages; `0.5.0` predates it.
+
+- **Motion is data, never CSS.** A node may carry `motion` with `enter` and
+  `exit` presets (`fade`, `rise`, `scale`, `slide-start`, `slide-end`),
+  `layout: true`, `stagger` (`none`, `fast`, `base`) and `duration`
+  (`fast`, `base`, `slow`); the envelope may set `motion.level` (`full`,
+  `subtle`, `none`). Raw CSS, keyframes, milliseconds and unknown names are
+  refused (`invalid-motion`); the node still paints, without motion. The
+  player plays it through `@texuli/core/motion`, never on the server or on
+  hydration, instant under reduced motion; a host caps it with
+  `motionLevel`.
+- **Streams add speed, not trust.** `<Player stream={source}>` paints each
+  node once its shell (everything but `children`) has arrived and passed
+  `validateStreamNode`; actions stay disarmed until `validateDraft`
+  accepts the complete draft, which stays the only verdict. Write streamed
+  nodes with `children` last (`STREAM_NODE_ORDER` in `@texuli/spec/stream`).
+
+```bash
+pnpm vitest run packages/catalog/tests/validate-motion.test.ts
+pnpm vitest run packages/player/tests/streaming.test.ts
 ```

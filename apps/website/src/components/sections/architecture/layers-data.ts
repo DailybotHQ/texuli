@@ -76,6 +76,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         role: '42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns',
         dependsOn: ['core', 'date', 'drag'],
       },
+      {
+        name: '@texuli/document',
+        role: 'In development, in the repository only (first release planned for 0.7.0): the framework-free, DOM-free document engine: the block document format with persisted ids, the validator on the deck schema kit, typed operations and bounded RFC 6902 patches with inverses and an op log, Markdown through the core codec, the pagination engine (paged), owned DOCX and PDF writers (docx, pdf), and the CRDT sync core (sync)',
+        dependsOn: ['core', 'deck'],
+      },
     ],
   },
   {
@@ -199,6 +204,21 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         role: 'The Svelte 5 presentation stage on @texuli/deck (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from 0.3.0; in development',
         dependsOn: ['blocks', 'catalog', 'deck', 'media', 'player', 'tokens'],
       },
+      {
+        name: '@texuli/pages',
+        role: 'In development, in the repository only (first release planned for 0.7.0): the block document editor and reader on @texuli/document: text through @texuli/editor, a slash menu, block selection and drag on @texuli/drag, nested pages, resizable columns and live embeds painted by the player (editor, reader), the paged view and print (paged) and Markdown, DOCX and PDF export (export); collaboration is planned',
+        dependsOn: [
+          'blocks',
+          'core',
+          'document',
+          'drag',
+          'editor',
+          'player',
+          'primitives',
+          'tokens',
+          'texuli',
+        ],
+      },
     ],
   },
 ];
@@ -311,7 +331,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
     layer: 'L3',
     runtimes: {
       web: {
-        text: 'Ships: styled components are published on npm as 0.5.0.',
+        text: 'Ships: styled components are published on npm as 0.6.0.',
         sources: [],
       },
       native: {

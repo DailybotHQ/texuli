@@ -1,4 +1,5 @@
 <script lang="ts">
+import '../table/mini.css';
 import {
   type ChartFormatSpec,
   type CompactChartLabels,
@@ -65,7 +66,7 @@ const description = $derived(
     <rect class="measure" x="0" y="8" width={safeValue / upper * 100} height="8" />
     {#if safeTarget !== null}<line data-target="" x1={safeTarget / upper * 100} x2={safeTarget / upper * 100} y1="2" y2="22" />{/if}
   </svg>
-  <details class="data-fallback">
+  <details class="tx-chart-mini">
     <summary>{text.tableSummary}</summary>
     <table><caption>{label}</caption><thead><tr><th scope="col">{text.measure}</th><th scope="col">{text.value}</th></tr></thead>
       <tbody><tr><th scope="row">{text.current}</th><td>{formatValue(safeValue)}</td></tr><tr><th scope="row">{text.maximum}</th><td>{formatValue(upper)}</td></tr>{#if safeTarget !== null}<tr><th scope="row">{text.target}</th><td>{formatValue(safeTarget)}</td></tr>{/if}</tbody>
@@ -82,8 +83,5 @@ const description = $derived(
   .range-2 { fill: var(--tx-chart-sequential-9, color-mix(in oklab, var(--tx-chart-1, var(--tx-primary, CanvasText)) 98%, var(--tx-background, Canvas))); }
   .measure { fill: var(--tx-chart-1, currentColor); }
   line { stroke: var(--tx-foreground, CanvasText); stroke-width: 2; vector-effect: non-scaling-stroke; }
-  .data-fallback { font-size: 0.875rem; }
-  table { border-collapse: collapse; inline-size: 100%; }
-  th, td { border: 1px solid var(--tx-border, currentColor); padding: 0.25em 0.5em; text-align: start; }
   @media (forced-colors: active) { .range { fill: Canvas; stroke: CanvasText; stroke-dasharray: 2 2; opacity: 1; } .measure { fill: Highlight; } line { stroke: CanvasText; } }
 </style>

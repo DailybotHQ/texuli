@@ -1,0 +1,77 @@
+{
+  "name": "@texuli/pages",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Block document editor and reader for Texuli on @texuli/document: text through @texuli/editor, a slash menu, block drag, nested pages, columns and live embeds painted by the player.",
+  "keywords": [
+    "svelte",
+    "svelte-5",
+    "document",
+    "editor",
+    "blocks",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
+  "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/pages"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./editor": {
+      "types": "./src/editor/index.ts",
+      "svelte": "./src/editor/index.ts",
+      "default": "./src/editor/index.ts"
+    },
+    "./reader": {
+      "types": "./src/reader/index.ts",
+      "svelte": "./src/reader/index.ts",
+      "default": "./src/reader/index.ts"
+    },
+    "./paged": {
+      "types": "./src/paged/index.ts",
+      "svelte": "./src/paged/index.ts",
+      "default": "./src/paged/index.ts"
+    },
+    "./export": {
+      "types": "./src/export/index.ts",
+      "svelte": "./src/export/index.ts",
+      "default": "./src/export/index.ts"
+    },
+    "./collab": {
+      "types": "./src/collab/index.ts",
+      "svelte": "./src/collab/index.ts",
+      "default": "./src/collab/index.ts"
+    },
+    "./styles.css": "./src/styles.css"
+  },
+  "scripts": {
+    "typecheck": "node ../../scripts/typecheck-svelte.mjs"
+  },
+  "dependencies": {
+    "@texuli/blocks": "0.6.0",
+    "@texuli/core": "0.6.0",
+    "@texuli/document": "0.0.0",
+    "@texuli/drag": "0.6.0",
+    "@texuli/editor": "0.6.0",
+    "@texuli/player": "0.6.0",
+    "@texuli/primitives": "0.6.0",
+    "@texuli/tokens": "0.6.0",
+    "texuli": "0.6.0"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2"
+  }
+}

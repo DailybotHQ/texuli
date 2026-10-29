@@ -18,6 +18,7 @@ let {
   size = 'md',
   value = $bindable(''),
   onValueChange,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -34,7 +35,7 @@ function handleValueChange(next: string): void {
 }
 </script>
 
-<Primitive.Root
+<Primitive.Root bind:ref
   class={classes}
   data-size={size}
   bind:value

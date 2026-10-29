@@ -62,6 +62,12 @@ Consumer classes compose through `cx` / `variants` and win by source order in
   picks files (an empty pick is `null` too). Setting `files = null` resets the
   input. A `null` is never written onto the element, so `input.value` stays
   readable (axe in unit tests).
+- **InputGroup attributes.** `id`, `aria-*`, `data-*`, handlers and the form
+  and focus attributes reach the input (also `bind:ref`), so a `Field`'s
+  `{...control.props}` names and describes it; layout hooks stay on the
+  group. With `children` (your own control) everything stays on the group.
+  **Breaking (planned for the next release):** `aria-*` and `data-*` used to
+  land on the group.
 - **TextCounter ref and attributes (G5).** `bind:ref` binds the wrapper root.
   `aria-*`, `data-*` and handlers reach the input or textarea; layout hooks
   (`style`, `hidden`…) stay on the wrapper, like every styled form control

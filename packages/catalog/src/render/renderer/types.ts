@@ -1,4 +1,5 @@
 import type { FormulaInputs } from '@texuli/blocks/formula';
+import type { BlueprintNodeMotion } from '@texuli/spec/motion';
 import type { CatalogEventName, CatalogPropSchema } from '../../manifest/types.ts';
 
 /**
@@ -32,6 +33,12 @@ export interface CatalogTreeInput {
   bind?: Readonly<Record<string, unknown>>;
   /** Event handlers (spec 0.3.0): `{ <event>: action[] }` from the closed action set. */
   on?: Readonly<Record<string, unknown>>;
+  /**
+   * How the node moves (spec 0.6.0): the closed vocabulary of
+   * `@texuli/spec/motion` (presets and token steps). Anything else is
+   * refused (`invalid-motion`) and the node paints without motion.
+   */
+  motion?: unknown;
 }
 
 /** Who is allowed to emit component ids into the tree. */
@@ -49,7 +56,8 @@ export type RenderIssueCode =
   | 'missing-required'
   | 'block-family-mismatch'
   | 'invalid-slot'
-  | 'invalid-condition';
+  | 'invalid-condition'
+  | 'invalid-motion';
 
 export interface RenderDiagnostic {
   code: RenderIssueCode;
@@ -72,6 +80,8 @@ export type RenderNode =
       children: readonly RenderNode[];
       /** The parent's named slot, when not the default one (audit G04). */
       slot?: string;
+      /** The node's checked motion (spec 0.6.0), a frozen copy; absent when it declares none. */
+      motion?: Readonly<BlueprintNodeMotion>;
     }
   | {
       kind: 'placeholder';

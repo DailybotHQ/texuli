@@ -49,7 +49,17 @@ export type DateInvalidReason = 'invalid' | 'out-of-range' | 'too-long';
  * Reports a refused entry: the text as typed (segments in locale order, like
  * `2/30/2026`), or the refused range as an ISO interval (`start/end`).
  */
-export type DateInvalidHandler = (text: string, reason: DateInvalidReason) => void;
+export type DateInvalidHandler = (
+  text: string,
+  reason: DateInvalidReason,
+  detail?: DateInvalidDetail
+) => void;
+
+/** Context for a refusal in a range: which end caused it. Absent for a single date. */
+export interface DateInvalidDetail {
+  /** The range end that was typed or picked when it was refused. */
+  side?: 'start' | 'end';
+}
 
 /** Every visible or announced string of the pickers. Pass translations to override. */
 export interface DatePickerLabels {

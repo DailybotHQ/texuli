@@ -3,6 +3,7 @@ import { Item as PrimitiveItem } from '@texuli/primitives/command';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import { commandItemClass } from './variants.ts';
 import './command.css';
 
@@ -29,8 +30,9 @@ let {
   onSelect,
   hideIcon = false,
   class: className,
+  ref = $bindable(null),
   ...rest
-}: Props = $props();
+}: Props & RefProp = $props();
 
 const classes = $derived(
   commandItemClass({
@@ -41,7 +43,7 @@ const classes = $derived(
 const text = $derived(label ?? value);
 </script>
 
-<PrimitiveItem
+<PrimitiveItem bind:ref
   class={classes}
   data-tx-command-item
   {value}

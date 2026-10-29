@@ -4,6 +4,7 @@ import type { Snippet } from 'svelte';
 import { getContext } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import { TOGGLE_GROUP_STYLE } from './style-context.ts';
 import { toggleClass } from './variants.ts';
 import './toggle.css';
@@ -27,8 +28,9 @@ let {
   id,
   'aria-label': ariaLabel,
   // aria-*, data-* and handlers go to the item (there is no wrapper).
+  ref = $bindable(null),
   ...rest
-}: Props = $props();
+}: Props & RefProp = $props();
 
 const style = getContext<ToggleGroupStyleContext | undefined>(TOGGLE_GROUP_STYLE);
 
@@ -41,6 +43,6 @@ const classes = $derived(
 );
 </script>
 
-<ToggleGroupPrimitive.Item {...rest} {value} {disabled} {id} aria-label={ariaLabel} class={classes}>
+<ToggleGroupPrimitive.Item bind:ref {...rest} {value} {disabled} {id} aria-label={ariaLabel} class={classes}>
   {@render children?.()}
 </ToggleGroupPrimitive.Item>

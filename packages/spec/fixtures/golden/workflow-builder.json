@@ -24,7 +24,7 @@
     "kind": "request",
     "label": "Workflow builder requested in chat"
   },
-  "spec": "0.5.0",
+  "spec": "0.6.0",
   "state": {
     "expenses": {
       "type": "workflow",

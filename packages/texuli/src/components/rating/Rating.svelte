@@ -75,15 +75,13 @@ let {
 // handlers stay on the wrapper (the group binds its own, and events bubble),
 // as do layout hooks. A consumer aria-label or aria-labelledby replaces the
 // visible label's name.
+// `onfocus` and `onblur` (which do not bubble) go to the group too.
+const toGroup = (key: string) => /^(?:aria-|data-|onfocus$|onblur$)/.test(key);
 const controlAttrs = $derived(
-  Object.fromEntries(
-    Object.entries(rest).filter(([key]) => key.startsWith('aria-') || key.startsWith('data-'))
-  )
+  Object.fromEntries(Object.entries(rest).filter(([key]) => toGroup(key)))
 );
 const wrapperAttrs = $derived(
-  Object.fromEntries(
-    Object.entries(rest).filter(([key]) => !key.startsWith('aria-') && !key.startsWith('data-'))
-  )
+  Object.fromEntries(Object.entries(rest).filter(([key]) => !toGroup(key)))
 );
 const consumerNamed = $derived('aria-label' in rest || 'aria-labelledby' in rest);
 

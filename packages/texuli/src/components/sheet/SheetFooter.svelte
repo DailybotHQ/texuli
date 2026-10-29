@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import { sheetFooterClass } from './variants.ts';
 import './sheet.css';
 
@@ -10,9 +11,9 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'class'> & {
   children?: Snippet;
   class?: ClassValue;
 };
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props & RefProp = $props();
 </script>
 
-<div {...rest} class={sheetFooterClass({ class: className })} data-tx-sheet-footer="">
+<div bind:this={ref} {...rest} class={sheetFooterClass({ class: className })} data-tx-sheet-footer="">
   {@render children?.()}
 </div>

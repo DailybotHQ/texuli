@@ -1,7 +1,12 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 
-let { class: className, ...rest }: Omit<HTMLAttributes<HTMLSpanElement>, 'children'> = $props();
+let {
+  class: className,
+  ref = $bindable(null),
+  ...rest
+}: Omit<HTMLAttributes<HTMLSpanElement>, 'children'> & RefProp = $props();
 </script>
 
-<span {...rest} aria-hidden="true" data-state="inactive" class={className}>…</span>
+<span bind:this={ref} {...rest} aria-hidden="true" data-state="inactive" class={className}>…</span>

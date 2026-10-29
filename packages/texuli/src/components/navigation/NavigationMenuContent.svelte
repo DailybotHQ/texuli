@@ -9,7 +9,7 @@ type Props = ComponentProps<typeof Primitive.Content> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 
 const classes = $derived(
   navigationMenuContentClass({
@@ -20,7 +20,7 @@ const classes = $derived(
 
 <!-- Primitive Content only accepts class + children; wrap for host data hooks. -->
 <div data-tx-nav-menu-content class="tx-nav-menu__content-host">
-  <Primitive.Content class={classes} {...rest}>
+  <Primitive.Content bind:ref class={classes} {...rest}>
     {@render children?.()}
   </Primitive.Content>
 </div>

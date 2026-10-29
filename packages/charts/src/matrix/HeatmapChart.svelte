@@ -1,4 +1,5 @@
 <script lang="ts">
+import '../table/grid.css';
 import { type ClassValue } from 'texuli/cx';
 import AnnotationLayer from '../annotations/AnnotationLayer.svelte';
 import {
@@ -132,7 +133,7 @@ const interactionSeries = $derived(
   </MatrixPlot>
 
   {#snippet table()}
-    <details class="data-table">
+    <details class="tx-chart-data">
       <summary>View data table</summary>
       <table>
         <caption>{title} data</caption>

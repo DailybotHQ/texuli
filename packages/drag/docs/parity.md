@@ -7,7 +7,7 @@ check per row; the last test in that file fails when this table and the
 tests drift apart. Deeper coverage per subpath is in the files in the last
 column.
 
-Status: **in development** (on npm as `0.5.0`, pre-1.0). The package
+Status: **in development** (on npm as `0.6.0`, pre-1.0). The package
 is framework-free; the Svelte binding is `@texuli/primitives/sortable`.
 
 | Capability | Parity test | Subpath | Deeper tests |

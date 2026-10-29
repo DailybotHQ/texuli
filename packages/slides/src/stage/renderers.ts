@@ -105,6 +105,18 @@ export type DeckBlockValidatorModule =
   | { readonly validateBlock: DeckBlockValidator }
   | { readonly default: DeckBlockValidator };
 
+/**
+ * Where a stage gets the default renderer tables: `load()` imports them once
+ * (later calls share the import), `loaded()` returns them synchronously once
+ * they arrived. `DeckStage` passes the built-in source
+ * (`DECK_DEFAULT_RENDERERS_SOURCE`); `DeckStageCore` without one never
+ * references the defaults (G72).
+ */
+export interface DeckDefaultRenderersSource {
+  load: () => Promise<readonly DeckRenderers[]>;
+  loaded: () => readonly DeckRenderers[] | undefined;
+}
+
 export interface DeckRenderers extends DeckValidationHooks {
   /**
    * `validateBlock`, imported on first use (`() => import('./validate-block.ts')`).

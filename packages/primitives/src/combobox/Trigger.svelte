@@ -2,14 +2,15 @@
 import type { Snippet } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getComboboxContext } from './context.ts';
 
 type Props = Omit<HTMLButtonAttributes, 'children'> & {
   children?: Snippet;
   child?: ChildSnippet<Record<string, unknown>>;
-};
+} & RefProp;
 type ClickEvent = Parameters<NonNullable<HTMLButtonAttributes['onclick']>>[0];
-let { children, child, onclick, ...rest }: Props = $props();
+let { children, child, onclick, ref = $bindable(null), ...rest }: Props = $props();
 const context = getComboboxContext();
 
 function handleClick(event: ClickEvent): void {
@@ -33,5 +34,5 @@ const triggerProps = $derived({
 {#if child}
   {@render child({ props: triggerProps })}
 {:else}
-  <button {...triggerProps}>{@render children?.()}</button>
+  <button bind:this={ref} {...triggerProps}>{@render children?.()}</button>
 {/if}

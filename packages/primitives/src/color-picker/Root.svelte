@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { type ColorFormat, formatColor, parseColor, parseFormattedColor } from './color.ts';
 import { setColorPickerContext } from './context.ts';
 
@@ -14,7 +15,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   label?: string;
   children?: Snippet;
   child?: ChildSnippet<Record<string, unknown>>;
-};
+} & RefProp;
 
 let {
   value = $bindable(),
@@ -25,6 +26,7 @@ let {
   label = 'Choose color',
   children,
   child,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -71,5 +73,5 @@ const attrs = $derived({
 {#if child}
   {@render child({ props: attrs as Record<string, unknown> })}
 {:else}
-  <div {...attrs}>{@render children?.()}</div>
+  <div bind:this={ref} {...attrs}>{@render children?.()}</div>
 {/if}

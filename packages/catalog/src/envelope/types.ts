@@ -1,4 +1,5 @@
 import { SPEC_MIGRATIONS } from '@texuli/spec/migrate';
+import type { BlueprintEnvelopeMotion } from '@texuli/spec/motion';
 import type { EditOp } from '../edit/types.ts';
 import type { CatalogTreeInput, RenderTier } from '../render/renderer/types.ts';
 
@@ -119,6 +120,12 @@ export interface BlueprintEnvelope {
   state?: Readonly<Record<string, unknown>>;
   /** The declared flow of views (spec 0.3.0 `flow`), checked by `@texuli/spec`. */
   flow?: Readonly<Record<string, unknown>>;
+  /**
+   * The blueprint's motion level (spec 0.6.0 `motion`): `full`, `subtle` or
+   * `none`. A host level and the reader's reduced-motion preference can only
+   * lower it.
+   */
+  motion?: Readonly<BlueprintEnvelopeMotion>;
   tree: CatalogTreeInput;
 }
 

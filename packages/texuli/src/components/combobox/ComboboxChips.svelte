@@ -10,7 +10,7 @@ type Props = ComponentProps<typeof PrimitiveChips> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 
 const classes = $derived(
   comboboxChipsClass({
@@ -19,6 +19,6 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveChips class={classes} data-tx-combobox-chips {...rest}>
+<PrimitiveChips bind:ref class={classes} data-tx-combobox-chips {...rest}>
   {@render children?.()}
 </PrimitiveChips>

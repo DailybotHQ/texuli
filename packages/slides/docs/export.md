@@ -97,7 +97,7 @@ A deck route prints when its URL asks for it:
 | `contentReady` | `true` | Hosts keep it `false` until their own content (chart snapshots, fonts) is ready. |
 | `onReady(plan)`, `onError(error)` | — | Readiness and load failures. |
 | `mediaTimeoutMs` | `10000` | Longest wait for renderers and images before reporting ready anyway. |
-| `isolate` | `true` | While printing, hide the rest of the host page and its margins so page 1 is slide 1. Turn it off when the host prints its own frame. |
+| `isolate` | `true` | While printing, hide the rest of the host page and its margins so page 1 is slide 1. Turn it off when the host prints its own frame. The isolation rules apply only while a view with `isolate` is mounted (`:root:has([data-tx-print-isolate])`, G80): a print started before the view mounts, or after it unmounts, prints the page as it is, never a blank sheet. A browser without `:has()` drops the rules and prints the whole page. |
 
 What it prints:
 
@@ -125,6 +125,15 @@ attribute before it prints.
 `DeckPrintView` is a thin wrapper that imports its body on first use, so
 importing `@texuli/slides/export` for PPTX or the print plan costs no print
 code.
+
+**Preload (G81).** `preloadDeckPrintView(options?)` warms what the view
+imports on first use: its body, the slide painter and, unless
+`{ defaultRenderers: false }` (a `PreloadDeckPrintViewOptions`), the
+default renderer tables. It resolves once they have loaded (and rejects if
+one fails; the view retries on mount), and is safe to call more than once.
+A view mounted after it renders its pages on the first render and then
+waits only for themes, images and fonts, so a host that calls it when the
+deck opens (or on idle) has the sheet ready by the time the user prints.
 
 ```svelte
 <script lang="ts">

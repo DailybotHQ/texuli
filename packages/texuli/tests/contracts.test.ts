@@ -916,8 +916,11 @@ describe('toast', () => {
           }
           expect(css).toMatch(/\[data-position\$=["']-center["']\]/);
           expect(css).toContain('margin-inline: auto;');
+          // Enter, exit and the stack reflow play through texuli/motion (instant
+          // under reduced motion there); CSS keeps only the pending pulse.
+          expect(css).not.toMatch(/@keyframes tx-toast-(in|out)/);
           expect(css).toMatch(
-            /prefers-reduced-motion: reduce\)[^}]*\.tx-toast,[^}]*animation: none;/s
+            /prefers-reduced-motion: reduce\)[^}]*\.tx-toast__icon[^}]*animation: none;/s
           );
         },
         'keeps safe-area padding direction-independent (physical env insets, not inline slots)':

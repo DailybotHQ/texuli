@@ -2,6 +2,7 @@
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { fieldDataAttributes } from './attributes.ts';
 import { type FieldContextValue, fieldContext } from './context.ts';
 
@@ -26,8 +27,9 @@ let {
   required = false,
   child,
   children,
+  ref = $bindable(null),
   ...rest
-}: FieldRootProps = $props();
+}: FieldRootProps & RefProp = $props();
 
 const generatedId = $props.id();
 let descriptions = $state(0);
@@ -101,5 +103,5 @@ const rootProps = $derived({
 {#if child}
   {@render child({ props: rootProps })}
 {:else}
-  <div {...rootProps}>{@render children?.()}</div>
+  <div bind:this={ref} {...rootProps}>{@render children?.()}</div>
 {/if}

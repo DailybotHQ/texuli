@@ -1,16 +1,26 @@
 <script lang="ts">
 import { type Snippet, untrack } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { contentBehavior } from './content-behavior.ts';
 import { navigationMenuContext, navigationMenuItemContext } from './context.ts';
 
-interface ContentProps {
+type ContentProps = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class'> & {
   /** Consumer id for the content; the trigger's `aria-controls` follows it. */
   id?: string;
   class?: string;
   children?: Snippet;
-}
+} & RefProp;
 
-let { id, class: className, children }: ContentProps = $props();
+let { id, class: className, children, ref = $bindable(null), ...rest }: ContentProps = $props();
+
+// The element renders here or in the Viewport; either way `ref` follows it.
+function bindRef(node: HTMLElement): () => void {
+  ref = node;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
 const context = navigationMenuContext.get();
 const item = navigationMenuItemContext.get();
 // A consumer id wins: the context records it, so every reference follows.
@@ -34,6 +44,8 @@ $effect(() => {
     id: context.contentId(value),
     class: className,
     children,
+    attributes: rest,
+    attach: bindRef,
   });
   return () => context.contents.delete(value);
 });
@@ -41,6 +53,7 @@ $effect(() => {
 
 {#if open && !context.viewport}
   <div
+    {...rest}
     id={context.contentId(item.value)}
     class={className}
     data-state="open"
@@ -48,6 +61,7 @@ $effect(() => {
     aria-labelledby={context.triggerId(item.value)}
     role="group"
     {@attach contentBehavior(context, item.value)}
+    {@attach bindRef}
   >
     {@render children?.()}
   </div>

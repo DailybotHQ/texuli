@@ -1,12 +1,13 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { drawerContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   /** The button's name when the drawer has several snap points. */
   label?: string;
-};
-let { label = 'Resize', ...rest }: Props = $props();
+} & RefProp;
+let { label = 'Resize', ref = $bindable(null), ...rest }: Props = $props();
 const drawer = drawerContext.get();
 
 // With several snap points the handle is a button that steps through them
@@ -21,7 +22,7 @@ function onclick(event: MouseEvent & { currentTarget: EventTarget & HTMLElement 
 </script>
 
 {#if drawer.snapPoints.length > 1}
-  <button
+  <button bind:this={ref}
     {...rest}
     type="button"
     aria-label={label}
@@ -31,5 +32,5 @@ function onclick(event: MouseEvent & { currentTarget: EventTarget & HTMLElement 
     {onclick}
   ></button>
 {:else}
-  <div {...rest} aria-hidden="true" data-drawer-handle="" style:touch-action="none"></div>
+  <div bind:this={ref} {...rest} aria-hidden="true" data-drawer-handle="" style:touch-action="none"></div>
 {/if}

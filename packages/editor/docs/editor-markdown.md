@@ -20,8 +20,8 @@ const saved = documentToMarkdown(doc); // '# Plan\n\n- [ ] Draft\n- [x] Review'
 | --- | --- |
 | `markdownToDocument(source, options?)` | Reads Markdown into `{ doc, diagnostics }`, a valid `EditorDocument`. Never throws; a non-string source is read as its string form |
 | `documentToMarkdown(doc, options?)` | Writes the document as Markdown that reads back to the same document |
-| `MarkdownToDocumentOptions` | `trust` (`'untrusted'` by default), `newId`, lower `limits`, and `maxSource` (the source cap) |
-| `DocumentToMarkdownOptions` | `trust` (`'untrusted'` by default): the tier every link is checked at again before it is written |
+| `MarkdownToDocumentOptions` | `trust` (`'untrusted'` by default), `newId`, lower `limits`, `maxSource` (the source cap) and `extensions` (host inline extensions, below) |
+| `DocumentToMarkdownOptions` | `trust` (`'untrusted'` by default): the tier every link is checked at again before it is written; `extensions`: the host inline extensions written as tokens |
 | `MARKDOWN_CODEC_LIMITS` | `source` 100,000 characters, `inlineDepth` 6 |
 
 ## What it reads and writes
@@ -48,6 +48,49 @@ nested list. Writing is stable: what it writes reads and writes back
 unchanged. What the subset cannot spell is dropped on write: empty
 paragraphs, breaks in a heading (written as spaces), and breaks or
 whitespace at the edges of a block or a mark.
+
+## Host inline extensions
+
+Mentions, references and other host entities round trip with their entity
+id when the host registers them and passes the same `extensions` both ways.
+A host registers a name and a sigil, never a pattern: the grammar is fixed,
+`<sigil>{<id>|<label>}`.
+
+```ts
+import { createInlineExtensions } from '@texuli/core/editor-model';
+import { documentToMarkdown, markdownToDocument } from '@texuli/editor/markdown';
+
+const extensions = createInlineExtensions([
+  { name: 'mention', sigil: '@', accepts: (id) => id.startsWith('person-') },
+  { name: 'reference', sigil: '#', href: (id) => `https://example.com/records/${id}` },
+]);
+const { doc } = markdownToDocument('Ask @{person-1|Ada} about #{record-7|Roadmap}', { extensions });
+documentToMarkdown(doc, { extensions }); // 'Ask @{person-1|Ada} about #{record-7|Roadmap}'
+```
+
+- **In the document** an entity is an `extension` mark (`name`, `id`) over
+  its label text, so offsets, selection and editing stay plain text; typing
+  right after it does not extend it, and it never shares a run with `link`
+  or `code`. The editor surface renders it as
+  `<span class="tx-editor-extension" data-tx-extension="mention" data-tx-entity="person-1">`.
+- **Closed and bounded.** Sigils come from `EDITOR_EXTENSION_SIGILS`
+  (`@ # $ % & + = ^`); names are `[a-z][a-z0-9-]{0,31}`; ids are 1 to 128
+  characters of `[A-Za-z0-9_.:-]`; labels are 1 to 512 characters on one
+  line, with `\}` and `\\` escapes. `createInlineExtensions` throws on a
+  bad name or sigil, a duplicate, or more than 16 extensions. A host
+  `accepts(id)` only sees ids that already passed the charset and length.
+- **Untrusted by default.** A token whose sigil is not registered, whose id
+  is refused, or whose label is empty or unclosed stays literal text.
+  Without `extensions` nothing changes: the grammar is plain text, and an
+  extension mark loaded or written without its registry keeps only its
+  label (`mark-dropped`). Plain text that spells a token is written with its
+  `{` escaped (`@\{`), so it reads back as text.
+- **Links.** `extensionHref(extensions, mark)` returns the host `href(id)`
+  checked by `safeHref` (`untrusted` by default), or `undefined`.
+- **Linear time.** A token is matched in constant time after two linear
+  passes over the span; floods of open tokens, long ids, unclosed labels and
+  escaped closers are in the tests, compared at 100,000 and 400,000
+  characters.
 
 ## Guarantees
 

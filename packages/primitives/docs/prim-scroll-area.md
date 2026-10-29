@@ -36,7 +36,7 @@ Custom scrollbars are decorative (`aria-hidden`) and pointer-draggable.
 | `Viewport` | Focusable overflow container (`tabindex=0`), native scroll |
 | `Scrollbar` | Track for one axis; hidden when no overflow |
 | `Thumb` | Draggable size/offset from scroll metrics |
-| `Corner` | Shown only when both axes overflow |
+| `Corner` | Shown only when both axes overflow, or with `forceMount` |
 
 ## `type`
 

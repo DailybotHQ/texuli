@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
-import { tick } from 'svelte';
-import { describe, expect, it } from 'vitest';
+import { createRawSnippet, tick } from 'svelte';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import DataGrid from '../src/grid-core/DataGrid.svelte';
 import {
   ariaSort,
   cellText,
@@ -535,5 +536,122 @@ describe('DataGrid paging, row classes and toolbar snippets (G7)', () => {
       expect(state().selected).toEqual([]);
       expect(screen.queryByRole('group', { name: 'Selected rows' })).toBeNull();
     }
+  });
+});
+
+describe('DataGrid adoption gaps (G55)', () => {
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
+  const people = [
+    { id: 'p1', name: 'Ada Example', email: 'ada@example.com', amount: 3 },
+    { id: 'p2', name: 'Bea Example', email: 'bea@example.com', amount: 5 },
+  ];
+  type Person = (typeof people)[number];
+  const personColumns: DataGridColumn<Person>[] = [
+    { key: 'name', header: 'Name', type: 'text' },
+    { key: 'email', header: 'Email', type: 'text', hideBelow: 'md' },
+    { key: 'amount', header: 'Amount', type: 'number', hideBelow: 1200 },
+  ];
+  const base = { columns: personColumns, getRowId: (row: Person) => row.id, caption: 'People' };
+  /** A viewport `width` px wide, as matchMedia sees it. */
+  const viewport = (width: number) => {
+    vi.stubGlobal('matchMedia', (query: string) => {
+      const min = Number(/min-width:\s*(\d+)px/.exec(query)?.[1] ?? 0);
+      return {
+        matches: width >= min,
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      };
+    });
+  };
+
+  it('activates a row on a pointer click (not on its controls), in grid and table mode', async () => {
+    for (const mode of ['grid', 'table'] as const) {
+      const activated: string[] = [];
+      render(DataGrid<Person>, {
+        props: {
+          ...base,
+          rows: people,
+          mode,
+          selectable: true,
+          activateOnClick: true,
+          onRowActivate: (row: Person) => activated.push(row.id),
+        },
+      });
+      await fireEvent.click(screen.getByText('Bea Example'));
+      expect(activated, mode).toEqual(['p2']);
+      // A click on the row's checkbox selects; it never activates the row.
+      await fireEvent.click(screen.getByRole('checkbox', { name: 'Select Ada Example' }));
+      expect(activated, mode).toEqual(['p2']);
+      cleanup();
+    }
+    // Without activateOnClick, a click only focuses (Enter still activates).
+    const activated: string[] = [];
+    render(DataGrid<Person>, {
+      props: { ...base, rows: people, onRowActivate: (row: Person) => activated.push(row.id) },
+    });
+    await fireEvent.click(screen.getByText('Bea Example'));
+    expect(activated).toEqual([]);
+  });
+
+  it('renders a static table with no grid role, tab stops or keyboard model in table mode', async () => {
+    viewport(1300);
+    const activated: string[] = [];
+    const { container } = render(DataGrid<Person>, {
+      props: {
+        ...base,
+        rows: people,
+        mode: 'table',
+        onRowActivate: (row: Person) => activated.push(row.id),
+      },
+    });
+    expect(screen.queryByRole('grid')).toBeNull();
+    const table = screen.getByRole('table', { name: 'People' });
+    expect(table.getAttribute('aria-rowcount')).toBeNull();
+    expect(table.getAttribute('aria-describedby')).toBeNull();
+    expect(within(table).queryAllByRole('gridcell')).toHaveLength(0);
+    expect(within(table).getAllByRole('cell')).toHaveLength(6);
+    // No roving tab stops: cells are not focusable; the sort buttons are plain buttons.
+    expect(container.querySelectorAll('table [tabindex]')).toHaveLength(0);
+    const cell = screen.getByText('Ada Example');
+    await fireEvent.keyDown(cell, { key: 'Enter' });
+    expect(activated).toEqual([]);
+  });
+
+  it('hides columns below their breakpoint and gives the empty snippet the query', async () => {
+    for (const [width, headers] of [
+      [500, ['Name']],
+      [800, ['Name', 'Email']],
+      [1300, ['Name', 'Email', 'Amount']],
+    ] as const) {
+      viewport(width);
+      render(DataGrid<Person>, { props: { ...base, rows: people } });
+      await tick();
+      const grid = screen.getByRole('grid', { name: 'People' });
+      expect(
+        within(grid)
+          .getAllByRole('columnheader')
+          .map((th) => th.textContent?.trim()),
+        String(width)
+      ).toEqual(headers);
+      expect(grid.getAttribute('aria-colcount'), String(width)).toBe(String(headers.length));
+      expect(within(grid).getAllByRole('gridcell'), String(width)).toHaveLength(headers.length * 2);
+      cleanup();
+      vi.unstubAllGlobals();
+    }
+    const empty = createRawSnippet((context: () => { query: string; filtered: boolean }) => ({
+      render: () =>
+        `<span data-testid="empty">${context().filtered ? 'No match' : 'Nothing'}: ${context().query.length}</span>`,
+    }));
+    render(DataGrid<Person>, { props: { ...base, rows: people, search: 'zzz', empty } });
+    await tick();
+    expect(screen.getByTestId('empty').textContent).toBe('No match: 3');
+    cleanup();
+    render(DataGrid<Person>, { props: { ...base, rows: [], empty } });
+    expect(screen.getByTestId('empty').textContent).toBe('Nothing: 0');
   });
 });

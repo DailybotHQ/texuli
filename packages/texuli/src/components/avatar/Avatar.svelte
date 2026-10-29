@@ -1,6 +1,9 @@
 <script lang="ts">
 import type { HrefTrust } from '@texuli/core/url-policy';
-import { Avatar as AvatarPrimitive } from '@texuli/primitives/avatar';
+import {
+  type AvatarImageLoadingStatus,
+  Avatar as AvatarPrimitive,
+} from '@texuli/primitives/avatar';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { avatarInitials, avatarToneIndex } from './initials.ts';
@@ -86,6 +89,8 @@ const letters = $derived(initialsProp ?? avatarInitials(name));
 const tone = $derived(avatarToneIndex(name));
 const pixels = $derived(AVATAR_PIXELS[size]);
 const safeSrcset = $derived(avatarSrcset(srcset, srcTrust));
+/** The primitive's image status: `error` (failed or refused) shows the initials. */
+let loadingStatus = $state<AvatarImageLoadingStatus>('loading');
 const rootClass = $derived(
   avatarRootClass({
     size,
@@ -100,7 +105,7 @@ const rootClass = $derived(
   data-tx-avatar
   data-size={size}
   data-status={status}
-  data-avatar={src ? 'image' : 'initials'}
+  data-avatar={src && loadingStatus !== 'error' ? 'image' : 'initials'}
   role={decorative ? undefined : 'img'}
   aria-label={label}
   aria-hidden={decorative ? true : undefined}
@@ -111,6 +116,7 @@ const rootClass = $derived(
     class="tx-avatar__surface"
     data-tone={tone}
     {delayMs}
+    bind:loadingStatus
     aria-hidden="true"
   >
     {#if src}

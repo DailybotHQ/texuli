@@ -131,3 +131,7 @@ once.
 - The size variables come from `scrollHeight` and `scrollWidth`. A panel
   whose content changes size while open updates them on its next open or
   close.
+
+## Motion hooks
+
+`Content` takes `motionHooks`: `enter` plays when a panel opens, and the hold `exit` returns keeps a closing panel mounted until its animation ends (texuli animates the height); see [prim-dialog](prim-dialog.md#motion-hooks).

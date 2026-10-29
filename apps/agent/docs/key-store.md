@@ -1,8 +1,10 @@
 # Agent service: provider key store and local dev boundary
 
-**Status: design plus the code that holds a key safely. No key exists, no
-provider account exists, and no real provider adapter exists.** The service
-answers with the deterministic replay provider (`src/provider.ts`). Choosing a
+**Status: design plus the code that holds a key safely. No key exists and no
+provider account exists.** Real provider adapters exist as library code
+([providers.md](providers.md)); they take the key as a constructor option and
+read nothing themselves, and nothing in the repository constructs one. The
+service answers with the deterministic replay provider (`src/provider.ts`). Choosing a
 provider, creating an account, placing a key and deploying are developer
 decisions (agent-service design §7 and §12).
 
@@ -88,12 +90,14 @@ the Node adapter prints at startup, for example
   other provider.
 - Local development uses the replay provider by default. A key placed in the
   operator file today is resolved, wrapped and reported as present, and then
-  **unused**, because no adapter consumes it yet.
+  **unused**: neither the Node adapter nor the worker passes it to an adapter.
+  Wiring one in is a developer decision ([providers.md](providers.md#plugging-in-a-real-provider-a-developer-step)).
 
 ## Planned, not done
 
-- A real provider adapter that calls `key.reveal()` only inside the request
-  it signs, and passes upstream errors through `redactSecrets`.
+- Wiring an adapter into the Node dev server or the worker. The adapters
+  (`src/providers/`) already call `key.reveal()` only while building the
+  request headers, and their error messages carry no upstream text.
 - Key rotation: the Node adapter re-reads the operator file each second today,
   but no adapter caches or refreshes provider sessions.
 - A model eval script that reads the key at run time (agent-service design

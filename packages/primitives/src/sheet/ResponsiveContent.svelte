@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { ComponentProps } from 'svelte';
+import type { RefProp } from '../internal/ref.ts';
 import { type ResponsivePresentation, resolveResponsivePresentation } from './model.ts';
 import SheetContent from './SheetContent.svelte';
 
@@ -19,13 +20,14 @@ type Props = Omit<ComponentProps<typeof SheetContent>, 'side' | 'drag' | 'modal'
   host?: Element | null;
   /** With `host`: the inline size in px at or below which the sheet shows. Default 640 (40rem). */
   breakpoint?: number;
-};
+} & RefProp;
 let {
   query = '(max-width: 40rem)',
   force = 'auto',
   host = null,
   breakpoint = 640,
   activeSnapPoint = $bindable(),
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -55,7 +57,7 @@ const presentation = $derived(resolveResponsivePresentation(force, narrow));
 </script>
 
 <!-- A dialog on wide screens (or hosts) and a bottom drawer on narrow ones (data-side tells which). -->
-<SheetContent
+<SheetContent bind:ref
   {...rest}
   side={presentation === 'sheet' ? 'bottom' : 'center'}
   drag={presentation === 'sheet'}

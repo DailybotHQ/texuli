@@ -142,6 +142,14 @@ Released in `0.5.0`; the `0.4.0` packages predate it.
   both and fails when the dist build is over 2% bigger, raw or gzip, or
   emits more files (`pnpm exec tsx scripts/dist-parity.ts`; gate:
   `pnpm vitest run scripts/tests/dist-parity.test.ts`).
+  It caught a real regression before 0.6.0: `@sveltejs/package` turned
+  conditional `#name` subpath imports (the slides `#deck-ssr` server
+  preload) into their `default` branch at build time, so the packed stage
+  would have loaded the server-only renderer preload in every browser
+  (dist 506 files against 468). The packer now hands svelte-package a
+  manifest without conditional `imports`, packed code keeps `import
+  '#deck-ssr'`, and the consumer's bundler picks the branch: 468/468 files,
+  gzip 1.0000. 0.5.0 on npm predates the bug.
 - **Light sparkline (G23).** `@texuli/charts/sparkline-lite` draws the
   compact `Sparkline` without its data table. First-screen JavaScript it
   adds to a page (production Vite build, Svelte bundled, gzip 9):

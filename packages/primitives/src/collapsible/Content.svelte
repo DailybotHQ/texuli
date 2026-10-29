@@ -1,15 +1,23 @@
 <script lang="ts">
 import { type Snippet, untrack } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { collapsibleContext } from './context.ts';
 
-interface CollapsibleContentProps {
+type CollapsibleContentProps = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class'> & {
   /** A consumer id; the trigger's aria-controls follows it. */
   id?: string;
   class?: string;
   children?: Snippet;
-}
+} & RefProp;
 
-let { id, class: className, children }: CollapsibleContentProps = $props();
+let {
+  id,
+  class: className,
+  children,
+  ref = $bindable(null),
+  ...rest
+}: CollapsibleContentProps = $props();
 
 const context = collapsibleContext.get();
 // A consumer id wins: the context records it, so every reference follows.
@@ -24,6 +32,8 @@ $effect(() => {
 </script>
 
 <div
+  bind:this={ref}
+  {...rest}
   id={context.contentId}
   class={`tx-collapsible__content ${className ?? ''}`.trim()}
   data-state={context.open ? 'open' : 'closed'}

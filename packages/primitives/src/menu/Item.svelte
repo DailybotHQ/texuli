@@ -2,6 +2,8 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import { chainHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { menuLevelContext } from './context.ts';
 import { activationKey, type MenuSelectEvent, selectItem } from './item.ts';
 
@@ -15,7 +17,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onselect'> & {
   closeOnSelect?: boolean;
   children?: Snippet;
   child?: ChildSnippet<Record<string, unknown>>;
-};
+} & RefProp;
 
 let {
   disabled = false,
@@ -26,6 +28,9 @@ let {
   child,
   onclick,
   onkeydown,
+  onfocus,
+  onblur,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 const level = menuLevelContext.get();
@@ -44,8 +49,8 @@ const itemProps = $derived({
   'data-disabled': disabled ? '' : undefined,
   'data-highlighted': highlighted ? '' : undefined,
   'data-typeahead': textValue,
-  onfocus: () => (highlighted = true),
-  onblur: () => (highlighted = false),
+  onfocus: chainHandlers(onfocus, () => (highlighted = true)),
+  onblur: chainHandlers(onblur, () => (highlighted = false)),
   onclick: (event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) => {
     onclick?.(event);
     if (!event.defaultPrevented) run(event);
@@ -62,5 +67,5 @@ const itemProps = $derived({
 {#if child}
   {@render child({ props: itemProps })}
 {:else}
-  <div {...itemProps}>{@render children?.()}</div>
+  <div bind:this={ref} {...itemProps}>{@render children?.()}</div>
 {/if}

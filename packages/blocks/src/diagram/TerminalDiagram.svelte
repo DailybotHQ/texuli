@@ -1,12 +1,12 @@
 <script lang="ts">
-import type { TerminalDiagram } from './schema.ts';
+import type { TerminalDiagram as TerminalDiagramData } from './schema.ts';
 import './diagram.css';
 
 /**
  * Terminal session as text: prompts, output and comments in order.
  * `$` is decoration; assistive tech hears "Command:".
  */
-let { block }: { block: TerminalDiagram } = $props();
+let { block }: { block: TerminalDiagramData } = $props();
 
 const commands = $derived(block.lines.filter((line) => line.kind === 'prompt').length);
 </script>

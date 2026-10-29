@@ -43,7 +43,7 @@ function handleKeydown(event: KeyboardEvent & { currentTarget: HTMLInputElement 
   const field = event.currentTarget;
   const atStart = field.selectionStart === 0 && field.selectionEnd === 0;
   const rtl = isRtl(field);
-  if (event.key === 'Enter' || (tagsInput.delimiterKey && event.key === tagsInput.delimiterKey)) {
+  if (event.key === 'Enter' || tagsInput.isDelimiterKey(event.key)) {
     // Enter never submits the form while there is text to add.
     if (field.value.trim() === '' && event.key === 'Enter') return;
     event.preventDefault();
@@ -120,7 +120,9 @@ const partProps = $derived({
   type: 'text' as const,
   value: draft,
   disabled: tagsInput.disabled || undefined,
-  'aria-invalid': tagsInput.invalid ? ('true' as const) : undefined,
+  readonly: tagsInput.readonly || rest.readonly || undefined,
+  // A refused tag marks the input; otherwise a caller's (or a Field's) `aria-invalid` stays.
+  'aria-invalid': tagsInput.invalid ? ('true' as const) : rest['aria-invalid'],
   'data-invalid': tagsInput.invalid ? '' : undefined,
   onkeydown: handleKeydown,
   onpaste: handlePaste,

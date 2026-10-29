@@ -21,13 +21,16 @@ import { Toaster, toast, createToastStore } from 'texuli/toast';
 | `label` | Landmark name (default `"Notifications"`) |
 | `offset` | Lift above bottom nav (`--tx-toast-offset`) |
 | `dismissLabel` | Localizable close control prefix |
+| `mode` | `'top-layer'` (default) or `'contained'`: out of the top layer, pinned to the edges of `container` (or of the Toaster's nearest positioned ancestor), for framed previews |
+| `container` | The element a `'contained'` stack renders in; it becomes the containing block |
 | other attributes | Land on the Toaster's wrapper `div`. Caller `onpointerenter`, `onpointerleave`, `onfocusin` and `onfocusout` run first, then the Toaster's own pause handling (never replaced) |
 
 ### Settle reasons (undo)
 
 `onSettle(reason)` on a toast's options is called exactly once when it
 leaves: `'timeout'` when its timer ran out, `'action'` after its action ran
-(also when the action rejected), and `'dismiss'` for every other way out (the
+(also when the action rejected, unless it sets `retryOnError`), and
+`'dismiss'` for every other way out (the
 close button, a swipe, `dismiss()`, or being pushed out by the `max` cap).
 Replacing a toast by `id` keeps one toast, and only the newest `onSettle` is
 called. An error thrown by `onSettle` is rethrown on a microtask.
@@ -67,6 +70,22 @@ its promise settles (failures surface through the action's own UI); sync
 actions dismiss on the next tick. A second click while it runs does nothing.
 `store.action(id)` runs the same path from host code.
 
+A rejected action is rethrown on a microtask (host error reporting). By
+default the toast still dismisses and settles with `'action'`. With
+`retryOnError: true` it stays instead, unsettled, with an error line
+(`role="alert"`, `data-error="true"` on the toast, `ToastItem.error`) and a
+fresh timer, so the person can run the action again; `errorText` (a string or
+`(error) => string`, default `DEFAULT_TOAST_ACTION_ERROR`) sets the message.
+The toast still settles exactly once: `'action'` after a run that succeeds,
+`'timeout'` or `'dismiss'` if the person gives up.
+
+```ts
+toast.info('Message archived', {
+  action: { label: 'Undo', onClick: restoreOnServer, retryOnError: true },
+  onSettle: (reason) => (reason === 'action' ? restoreLocally() : commitArchive()),
+});
+```
+
 ### Promise toasts
 
 ```ts
@@ -95,9 +114,19 @@ toast.promise(save(), {
   `margin: 0`, no border, padding, background or overflow) and uses logical
   insets from `data-position`. Centered positions use auto inline margins,
   which are RTL-safe. `offset` adds space from the stack's edge.
-- **Motion:** toasts slide in from the stack's edge. A dismissed toast stays
-  mounted (`data-leaving`, inert, `aria-hidden`) for a 160 ms exit. Under
-  reduced motion there is no animation and the toast leaves at once.
+- **Nothing while empty (G77):** the viewport enters the top layer only
+  while it has toasts (including one on its way out), so an empty Toaster
+  never sits at the page corner, outside a framed preview.
+- **Contained (G77):** `mode="contained"` with a `container` keeps the stack
+  inside that element (`position: absolute`, above contained dialogs), never
+  in the top layer.
+- **Motion (`motion` prop, [ui-motion](ui-motion.md)):** new toasts rise in
+  from the stack's edge and the stack reflows (FLIP) through
+  `@texuli/core/motion`; nothing plays for the toasts of the first render. A
+  dismissed toast stays mounted (`data-leaving`, inert, `aria-hidden`) until
+  its fade-out ends (at most 1.2 s). Under reduced motion, a `MotionProvider`
+  level of `none` or `motion={false}` there is no animation and the toast
+  leaves at once.
 - **Under a modal (R16):** the region stays exempt from inert. When another
   popover opens, the viewport re-enters the top layer so toasts stay above
   the overlay and clickable. F6 reaches them from the keyboard.

@@ -83,6 +83,24 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['drag', 'drop', 'sortable', 'board', 'tree', 'canvas', 'reorder'],
   },
   {
+    id: 'page-motion',
+    title: 'Motion',
+    description:
+      'Presence, FLIP layout, shared elements, timelines and springs on one runtime; motion levels, reduced motion, tokens and motion as blueprint data (in development).',
+    href: '/motion-page/',
+    kind: 'page',
+    keywords: ['motion', 'animation', 'transition', 'spring', 'reduced motion', 'flip', 'stagger'],
+  },
+  {
+    id: 'page-api-contract',
+    title: 'Component API contract',
+    description:
+      'Rest attributes and ref, composed handlers, callback naming, the Field rule and the motion prop.',
+    href: '/motion-page/#api-contract',
+    kind: 'page',
+    keywords: ['ref', 'rest props', 'handlers', 'field', 'contract', 'api'],
+  },
+  {
     id: 'page-workflows',
     title: 'Workflow editor',
     description:

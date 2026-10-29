@@ -72,6 +72,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       { href: '/slides-page/', label: 'Slides' },
       { href: '/editor-page/', label: 'Editor' },
       { href: '/drag-page/', label: 'Drag and drop' },
+      { href: '/motion-page/', label: 'Motion' },
       { href: '/workflows-page/', label: 'Workflow editor' },
       { href: '/workflows-page/json/', label: 'JSON live preview' },
     ],

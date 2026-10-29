@@ -1,13 +1,18 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
-import { tick } from 'svelte';
+import { tick, untrack } from 'svelte';
 import { Avatar } from 'texuli/avatar';
 import { Button } from 'texuli/button';
 import { type ClassValue, cx } from 'texuli/cx';
 import { groupMessages } from './group-messages.ts';
 import { DEFAULT_MESSAGE_LIST_LABELS, type MessageListLabels } from './labels.ts';
 import MessageText from './MessageText.svelte';
-import type { ChatMessage, ChatMessageActions, ChatMessageStatus } from './types.ts';
+import type {
+  ChatMessage,
+  ChatMessageActions,
+  ChatMessageStatus,
+  ChatReadingAnchor,
+} from './types.ts';
 import { MessageVirtualWindow, type VirtualWindow } from './virtual-window.ts';
 
 interface Props {
@@ -27,7 +32,24 @@ interface Props {
   actions?: Snippet<[ChatMessage, ChatMessageActions]>;
   /** Saves an inline edit; return false or reject to keep the editor open. */
   onEdit?: (message: ChatMessage, body: string) => unknown;
+  /**
+   * Called when an inline edit is saved with the text unchanged (G85), so a
+   * host can treat it as a resend. `onEdit` is not called; the editor closes
+   * as before.
+   */
+  onEditUnchanged?: (message: ChatMessage) => void;
+  /**
+   * The reading position (`bind:anchor`): the list writes the first message
+   * in view as the reader scrolls, and scrolls to an anchor the host sets
+   * (on mount, or when it swaps conversations), across the virtual window.
+   * `null` or unset opens at the latest message.
+   */
+  anchor?: ChatReadingAnchor | null;
+  /** Called when the reading position changes (at most once per frame). */
+  onAnchorChange?: (anchor: ChatReadingAnchor) => void;
   class?: ClassValue;
+  /** The scrolling log element (bindable). */
+  ref?: HTMLElement | null;
 }
 
 const uid = $props.id();
@@ -45,7 +67,11 @@ let {
   overscan = 5,
   actions,
   onEdit,
+  onEditUnchanged,
+  anchor = $bindable(null),
+  onAnchorChange,
   class: className,
+  ref = $bindable(null),
 }: Props = $props();
 
 let viewport = $state<HTMLDivElement | null>(null);
@@ -79,6 +105,10 @@ interface ScrollAnchor {
   start: number;
   scrollTop: number;
 }
+
+$effect(() => {
+  ref = viewport;
+});
 
 const groups = $derived(groupMessages(messages));
 const labels = $derived({ ...DEFAULT_MESSAGE_LIST_LABELS, ...labelOverrides });
@@ -160,7 +190,131 @@ function onScroll(event: Event): void {
   viewportSize = element.clientHeight || viewportSize;
   stickToBottom = nearBottom(element);
   setAtBottom(stickToBottom);
+  scheduleReport();
 }
+
+// Reading position (G71). `anchorKey` is the anchor last reported or restored,
+// so the list's own writes to `bind:anchor` never trigger a restore.
+let anchorKey = '';
+/** A host anchor waiting for its messages to render. */
+let pendingRestore: ChatReadingAnchor | null = null;
+let reportFrame = 0;
+
+function keyOf(value: ChatReadingAnchor | null | undefined): string {
+  return value ? `${value.messageId}\u0000${value.offset}\u0000${value.atLatest}` : '';
+}
+
+function messageNodes(element: HTMLElement): HTMLElement[] {
+  return Array.from(element.querySelectorAll<HTMLElement>('[data-message-id]'));
+}
+
+function captureReading(element: HTMLElement): ChatReadingAnchor | null {
+  const top = element.getBoundingClientRect().top;
+  const nodes = messageNodes(element);
+  const node = nodes.find((item) => item.getBoundingClientRect().bottom > top) ?? nodes.at(-1);
+  const messageId = node?.getAttribute('data-message-id');
+  if (!node || !messageId) return null;
+  return {
+    messageId,
+    offset: Math.round(node.getBoundingClientRect().top - top),
+    atLatest: nearBottom(element),
+  };
+}
+
+function report(): void {
+  const element = viewport;
+  if (!element || pendingRestore) return;
+  const next = captureReading(element);
+  if (!next || keyOf(next) === anchorKey) return;
+  anchorKey = keyOf(next);
+  anchor = next;
+  onAnchorChange?.(next);
+}
+
+function scheduleReport(): void {
+  if (reportFrame || (!onAnchorChange && anchor === null && !anchorKey)) return;
+  if (typeof requestAnimationFrame !== 'function') {
+    report();
+    return;
+  }
+  reportFrame = requestAnimationFrame(() => {
+    reportFrame = 0;
+    report();
+  });
+}
+
+$effect(() => () => {
+  if (reportFrame) cancelAnimationFrame(reportFrame);
+  reportFrame = 0;
+});
+
+/** Scrolls so the anchor message sits `offset` px below the viewport top. */
+async function restoreReading(target: ChatReadingAnchor): Promise<void> {
+  const element = viewport;
+  if (!element) return;
+  if (target.atLatest) {
+    stickToBottom = true;
+    await tick();
+    toBottom(element);
+    pendingRestore = null;
+    return;
+  }
+  const index = renderGroups.findIndex((row) =>
+    row.messages.some((message) => message.id === target.messageId)
+  );
+  if (index < 0) {
+    // Not in this list: open at the latest message, as without an anchor.
+    pendingRestore = null;
+    stickToBottom = true;
+    toBottom(element);
+    return;
+  }
+  stickToBottom = false;
+  if (useVirtual) {
+    // Bring the row into the virtual window at its estimated offset first.
+    element.scrollTop = list.offsetOf(index);
+    scrollTop = element.scrollTop;
+    await tick();
+  }
+  // Two passes: a row measured on first render moves the rows after it.
+  for (let pass = 0; pass < 2; pass++) {
+    if (pass > 0) await tick();
+    const node = messageNodes(element).find(
+      (item) => item.getAttribute('data-message-id') === target.messageId
+    );
+    if (!node) break;
+    const delta =
+      node.getBoundingClientRect().top - element.getBoundingClientRect().top - target.offset;
+    if (Math.abs(delta) < 1) break;
+    element.scrollTop += delta;
+    scrollTop = element.scrollTop;
+  }
+  stickToBottom = nearBottom(element);
+  setAtBottom(stickToBottom);
+  unseen = false;
+  pendingRestore = null;
+}
+
+// A host-set anchor (not one this list reported) is restored once its
+// messages are rendered.
+$effect.pre(() => {
+  const target = anchor;
+  const key = keyOf(target);
+  if (key === anchorKey) return;
+  anchorKey = key;
+  if (!target) return;
+  untrack(() => {
+    pendingRestore = target;
+    if (!target.atLatest) stickToBottom = false;
+  });
+});
+
+$effect(() => {
+  void messages;
+  const target = pendingRestore;
+  if (!target || !viewport) return;
+  untrack(() => void restoreReading(target));
+});
 
 function setAtBottom(value: boolean): void {
   atBottom = value;
@@ -200,7 +354,11 @@ function endEdit(): void {
 async function saveEdit(message: ChatMessage): Promise<void> {
   const next = editDraft.trim();
   if (editSaving || next === '') return;
-  if (next === message.body) return endEdit();
+  if (next === message.body) {
+    endEdit();
+    onEditUnchanged?.(message);
+    return;
+  }
   editSaving = true;
   try {
     if ((await onEdit?.(message, next)) !== false) endEdit();
@@ -341,11 +499,11 @@ $effect(() => {
   previousCount = count;
   previousFirstId = firstId;
   previousLastId = last?.id;
-  if (!viewport) return;
+  if (!viewport || pendingRestore) return;
   const element = viewport;
   if (shouldStick) {
     void tick().then(() => toBottom(element));
-  } else if (count > previousCountBefore && !prepended) {
+  } else if (count > previousCountBefore && !prepended && previousCountBefore > 0) {
     unseen = true;
   } else if (prepended) {
     // Virtual rows: keep the anchor row still, using model offsets that the
@@ -421,8 +579,9 @@ $effect(() => {
                 <span>{formatDay(group.dayStart)}</span>
               </div>
             {/if}
+            <div class="tx-chat-message-group__row">
             {#if !own && group.showHeader}
-              <Avatar name={group.author.name} src={group.author.avatarUrl} size="sm" decorative class="tx-chat-message-group__avatar" />
+              <Avatar name={group.author.name} src={group.author.avatarUrl} srcset={group.author.avatarSrcset} size="sm" decorative class="tx-chat-message-group__avatar" />
             {:else if !own}
               <span class="tx-chat-message-group__avatar-spacer" aria-hidden="true"></span>
             {/if}
@@ -438,6 +597,7 @@ $effect(() => {
                   <form
                     class="tx-chat-message-edit"
                     data-tx-chat-edit
+                    data-message-id={message.id}
                     aria-live="off"
                     onsubmit={(event) => {
                       event.preventDefault();
@@ -463,12 +623,12 @@ $effect(() => {
                 {:else if message.streaming}
                   <!-- Partial text is hidden from the live log so it is not read token by token;
                        the finished message replaces this node and is announced once. -->
-                  <div class={cx('tx-chat-message', own && 'tx-chat-message--own', 'tx-chat-message--streaming')} data-streaming aria-busy="true">
+                  <div class={cx('tx-chat-message', own && 'tx-chat-message--own', 'tx-chat-message--streaming')} data-message-id={message.id} data-streaming aria-busy="true">
                     <span class="tx-chat-message__sr">{labels.streaming}</span>
                     <span aria-hidden="true">{@render content(message)}</span><span class="tx-chat-message__caret" aria-hidden="true"></span>
                   </div>
                 {:else}
-                  <div class={cx('tx-chat-message', own && 'tx-chat-message--own', message.status === 'failed' && 'tx-chat-message--failed')}>
+                  <div class={cx('tx-chat-message', own && 'tx-chat-message--own', message.status === 'failed' && 'tx-chat-message--failed')} data-message-id={message.id}>
                     {@render content(message)}
                   </div>
                 {/if}
@@ -484,6 +644,7 @@ $effect(() => {
                   </div>
                 {/if}
               {/each}
+            </div>
             </div>
           </div>
         {/if}
@@ -522,7 +683,9 @@ $effect(() => {
     .tx-chat-message-list__canvas { display: flex; flex-direction: column; gap: 0.75rem; }
     .tx-chat-message-list__canvas--virtual { position: relative; display: block; flex: none; }
     .tx-chat-message-group--virtual { position: absolute; inset-inline: 0; }
-    .tx-chat-message-group { display: flex; align-items: flex-start; gap: 0.625rem; min-inline-size: 0; }
+    .tx-chat-message-group { display: flex; flex-direction: column; min-inline-size: 0; }
+    /* The day separator is its own full-width row; the avatar and bubbles share the row after it (G70). */
+    .tx-chat-message-group__row { display: flex; align-items: flex-start; gap: 0.625rem; min-inline-size: 0; }
     :global(.tx-chat-message-group__avatar .tx-avatar__surface[data-tone]) { color: CanvasText; }
     .tx-chat-message-group__avatar { margin-block-start: 1.25rem; flex: none; }
     .tx-chat-message-group__avatar-spacer { inline-size: 1.75rem; flex: none; }

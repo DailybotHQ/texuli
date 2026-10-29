@@ -2,11 +2,18 @@
 import { describe, expect, it } from 'vitest';
 import { fromMarkdown, MARKDOWN_CODEC_LIMITS, toMarkdown } from '../src/editor/markdown.ts';
 import {
+  createInlineExtensions,
   EDITOR_LIMITS,
   type EditorBlock,
   type EditorDocument,
   editorLeaves,
   editorPlainText,
+  extensionHref,
+  inheritedMarks,
+  inlineFromTree,
+  inlineToTree,
+  loadEditorDocument,
+  sortMarks,
   validateEditorDocument,
 } from '../src/editor/model.ts';
 
@@ -163,6 +170,46 @@ describe('reading Markdown', () => {
     expect(blocks.doc.blocks.length).toBeLessThanOrEqual(EDITOR_LIMITS.blocks);
     expect(blocks.diagnostics.map((d) => d.code)).toContain('blocks-capped');
   }, 30_000);
+
+  it('reads long plain paragraphs in linear time', () => {
+    // A long paragraph read slower than linear: every soft line break read
+    // the end of the text being built, which flattened the whole string
+    // (101 ms at 100,000 characters and 3.7 s at 400,000 before the fix), and
+    // the mark pass made one object per character. Compared at N and 4N with
+    // the caps raised.
+    const limits = { maxSource: 800_000, limits: { chars: 800_000 } };
+    const time = (source: string) => {
+      const started = performance.now();
+      fromMarkdown(source, limits);
+      return performance.now() - started;
+    };
+    const shapes = {
+      'soft line breaks': (n: number) => 'ab\n'.repeat(Math.floor(n / 3)),
+      'one long word': (n: number) => 'x'.repeat(n),
+      'words and breaks': (n: number) => 'one two\nthree '.repeat(Math.floor(n / 14)),
+    };
+    for (const [name, make] of Object.entries(shapes)) {
+      const read = fromMarkdown(make(800_000), limits);
+      expect(editorPlainText(read.doc).length, name).toBeGreaterThan(780_000);
+      // Interleaved fastest-of-seven, so a load spike hits both sizes alike.
+      // Linear growth is 4x and the old quadratic paths were 16x or more
+      // (3.7 s at 400,000); sizes large enough that noise can't dominate and a
+      // 10x ratio with a 300 ms floor separate them
+      // on a loaded host without flaking on sub-millisecond noise.
+      const small = make(200_000);
+      const large = make(800_000);
+      let bestSmall = Number.POSITIVE_INFINITY;
+      let bestLarge = Number.POSITIVE_INFINITY;
+      for (let k = 0; k < 7; k += 1) {
+        bestSmall = Math.min(bestSmall, time(small));
+        bestLarge = Math.min(bestLarge, time(large));
+      }
+      expect(
+        bestLarge,
+        `${name}: ${bestSmall.toFixed(1)} ms -> ${bestLarge.toFixed(1)} ms`
+      ).toBeLessThan(Math.max(10 * bestSmall, 300));
+    }
+  }, 60_000);
 });
 
 describe('writing Markdown', () => {
@@ -336,3 +383,209 @@ describe('round-trip property', () => {
  * the escaped delimiter next to the closer reads back as literal text.
  */
 const LOSSY_BUDGET = 5;
+
+describe('host inline extensions (G48)', () => {
+  const extensions = createInlineExtensions([
+    { name: 'mention', sigil: '@', href: (id) => `https://example.com/people/${id}` },
+    { name: 'reference', sigil: '#', accepts: (id) => id.startsWith('rec-') },
+  ]);
+  const runs = (doc: EditorDocument) =>
+    (doc.blocks[0] as Extract<EditorBlock, { type: 'paragraph' }>).content;
+
+  it('reads, writes and round trips mentions and references with their entity id', () => {
+    const source = 'Ask @{person-1|Ada} about #{rec-7|Roadmap} and **@{person-2|Bob}**.';
+    const { doc, diagnostics } = fromMarkdown(source, { extensions });
+    expect(diagnostics).toEqual([]);
+    expect(validateEditorDocument(doc)).toEqual([]);
+    expect(runs(doc)).toEqual([
+      { type: 'text', text: 'Ask ', marks: [] },
+      {
+        type: 'text',
+        text: 'Ada',
+        marks: [{ type: 'extension', name: 'mention', id: 'person-1' }],
+      },
+      { type: 'text', text: ' about ', marks: [] },
+      {
+        type: 'text',
+        text: 'Roadmap',
+        marks: [{ type: 'extension', name: 'reference', id: 'rec-7' }],
+      },
+      { type: 'text', text: ' and ', marks: [] },
+      {
+        type: 'text',
+        text: 'Bob',
+        marks: [{ type: 'strong' }, { type: 'extension', name: 'mention', id: 'person-2' }],
+      },
+      { type: 'text', text: '.', marks: [] },
+    ]);
+    const written = toMarkdown(doc, { extensions });
+    expect(written).toBe(source);
+    expect(shape(fromMarkdown(written, { extensions }).doc)).toEqual(shape(doc));
+    // Labels with delimiters, escapes and Markdown characters survive.
+    for (const label of ['a}b', 'x|y', 'back\\slash', '*not em*', '[no](link)', '@{inner|x}']) {
+      const once = fromMarkdown(`@{person-1|${label.replace(/[\\{}*[\]]/g, '\\$&')}}`, {
+        extensions,
+      }).doc;
+      expect(runs(once), label).toEqual([
+        {
+          type: 'text',
+          text: label,
+          marks: [{ type: 'extension', name: 'mention', id: 'person-1' }],
+        },
+      ]);
+      expect(shape(fromMarkdown(toMarkdown(once, { extensions }), { extensions }).doc)).toEqual(
+        shape(once)
+      );
+    }
+    // In lists, quotes and headings too.
+    const nested = fromMarkdown('# Hi @{p1|Ada}\n\n> - [x] #{rec-1|Plan}', { extensions }).doc;
+    expect(shape(fromMarkdown(toMarkdown(nested, { extensions }), { extensions }).doc)).toEqual(
+      shape(nested)
+    );
+  });
+
+  it('keeps unregistered or refused tokens as literal text, and plain text never becomes a token', () => {
+    // Without extensions the grammar is plain text, as before.
+    expect(editorPlainText(fromMarkdown('@{person-1|Ada}').doc)).toBe('@{person-1|Ada}');
+    // A refused id (host check, charset, length), an empty label, a newline
+    // inside or an unknown sigil stay literal.
+    for (const source of [
+      '#{doc-7|Roadmap}',
+      '@{bad id|Ada}',
+      `@{${'x'.repeat(129)}|Ada}`,
+      '@{p1|}',
+      '@{p1|Ada',
+      // An unregistered sigil (`$`).
+      ['$', '{p1|Ada}'].join(''),
+    ]) {
+      const { doc } = fromMarkdown(source, { extensions });
+      expect(
+        runs(doc).every((run) => run.type !== 'text' || run.marks.length === 0),
+        source
+      ).toBe(true);
+    }
+    // Plain text that spells a token is escaped on the way out.
+    const plain: EditorDocument = {
+      version: 1,
+      blocks: [
+        {
+          id: 'p',
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'mail @{p1|Ada}', marks: [] }],
+        },
+      ],
+    };
+    const written = toMarkdown(plain, { extensions });
+    expect(written).toBe('mail @\\{p1|Ada}');
+    expect(runs(fromMarkdown(written, { extensions }).doc)).toEqual(runs(plain));
+    // Unregistered extension marks are written (and loaded) as their label.
+    const foreign: EditorDocument = {
+      version: 1,
+      blocks: [
+        {
+          id: 'p',
+          type: 'paragraph',
+          content: [
+            { type: 'text', text: 'Ada', marks: [{ type: 'extension', name: 'team', id: 't1' }] },
+          ],
+        },
+      ],
+    };
+    expect(toMarkdown(foreign, { extensions })).toBe('Ada');
+    const loaded = loadEditorDocument(foreign, { extensions });
+    expect(runs(loaded.doc)).toEqual([{ type: 'text', text: 'Ada', marks: [] }]);
+    expect(loaded.diagnostics.map((d) => d.code)).toContain('mark-dropped');
+  });
+
+  it('loads extension marks from JSON and trees, and checks hrefs with the URL policy', () => {
+    const mark = { type: 'extension', name: 'mention', id: 'person-1' } as const;
+    const json = {
+      version: 1,
+      blocks: [{ type: 'paragraph', content: [{ type: 'text', text: 'Ada', marks: [mark] }] }],
+    };
+    expect(runs(loadEditorDocument(json, { extensions }).doc)).toEqual([
+      { type: 'text', text: 'Ada', marks: [mark] },
+    ]);
+    const tree = inlineToTree([{ type: 'text', text: 'Ada', marks: [{ type: 'em' }, mark] }]);
+    expect(tree).toEqual([
+      {
+        type: 'em',
+        children: [
+          {
+            type: 'extension',
+            name: 'mention',
+            id: 'person-1',
+            children: [{ type: 'text', text: 'Ada' }],
+          },
+        ],
+      },
+    ]);
+    expect(inlineFromTree(tree, { extensions }).content).toEqual([
+      { type: 'text', text: 'Ada', marks: [{ type: 'em' }, mark] },
+    ]);
+    expect(extensionHref(extensions, mark)).toBe('https://example.com/people/person-1');
+    const hostile = createInlineExtensions([
+      { name: 'mention', sigil: '@', href: () => 'javascript:alert(1)' },
+    ]);
+    expect(extensionHref(hostile, mark)).toBeUndefined();
+    expect(() => createInlineExtensions([{ name: 'Bad Name', sigil: '@' }])).toThrow(TypeError);
+    expect(() =>
+      createInlineExtensions([
+        { name: 'a', sigil: '@' },
+        { name: 'b', sigil: '@' },
+      ])
+    ).toThrow(TypeError);
+    // A link and code never share a run with an entity; typing after it leaves it.
+    expect(
+      sortMarks([{ type: 'link', href: 'https://example.com' }, { type: 'code' }, mark])
+    ).toEqual([mark]);
+    expect(inheritedMarks([{ type: 'text', text: 'Ada', marks: [mark] }], 3)).toEqual([]);
+    expect(inheritedMarks([{ type: 'text', text: 'Ada', marks: [mark] }], 1)).toEqual([mark]);
+  });
+
+  it('reads hostile extension input in linear time', { retry: 2, timeout: 120_000 }, () => {
+    // A token is matched in constant time after two linear passes. A matcher
+    // that searched for the closing `}` from every sigil would take seconds
+    // on the unclosed and escaped shapes at 400,000 characters (about 10^10
+    // steps); the linear one takes tens of milliseconds. Fastest of five,
+    // with a bound a loaded host stays far under. (The N-to-4N ratio is not
+    // asserted here: these shapes spend their time in the text buffer every
+    // special character already goes through, whose garbage collection makes
+    // the ratio swing between 5x and 13x under load.)
+    const limits = { maxSource: 400_000, limits: { chars: 400_000 }, extensions };
+    const fastest = (source: string) => {
+      let best = Number.POSITIVE_INFINITY;
+      for (let k = 0; k < 5; k += 1) {
+        const started = performance.now();
+        fromMarkdown(source, limits);
+        best = Math.min(best, performance.now() - started);
+      }
+      return best;
+    };
+    const shapes = {
+      'open tokens': '@{'.repeat(200_000),
+      'long ids': `@{${'a'.repeat(127)}`.repeat(Math.floor(400_000 / 129)),
+      'unclosed labels': '@{a|'.repeat(100_000),
+      'escaped closers': `@{a|${'\\}'.repeat(300)}`.repeat(Math.floor(400_000 / 604)),
+      'labels past the cap': `@{a|${'x'.repeat(600)}}`.repeat(Math.floor(400_000 / 606)),
+      tokens: '@{p1|Ada} '.repeat(40_000),
+    };
+    for (const [name, source] of Object.entries(shapes)) {
+      const doc = fromMarkdown(source, limits).doc;
+      expect(
+        validateEditorDocument(doc).filter((issue) => issue.code !== 'text-truncated'),
+        name
+      ).toEqual([]);
+      const took = fastest(source);
+      expect(took, `${name}: ${took.toFixed(1)} ms`).toBeLessThan(1_500);
+    }
+    // The tokens all read as entities.
+    const read = fromMarkdown(shapes.tokens, limits).doc;
+    const entities = editorLeaves(read).flatMap(({ block }) =>
+      block.type === 'paragraph'
+        ? block.content.filter((run) => run.type === 'text' && run.marks.length > 0)
+        : []
+    );
+    expect(entities).toHaveLength(40_000);
+  });
+});

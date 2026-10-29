@@ -3,6 +3,7 @@ import { NumberField as Primitive } from '@texuli/primitives/number-field';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import { type NumberPinSize, numberFieldClass } from './variants.ts';
 import './number-pin.css';
 
@@ -31,8 +32,14 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'value'
   children?: Snippet;
 };
 
-let { size = 'md', class: className, value = $bindable(), ...props }: Props = $props();
+let {
+  size = 'md',
+  class: className,
+  value = $bindable(),
+  ref = $bindable(null),
+  ...props
+}: Props & RefProp = $props();
 const classes = $derived(cx(numberFieldClass({ size }), className));
 </script>
 
-<Primitive.Root {...props} bind:value class={classes} data-tx-number-field="" />
+<Primitive.Root bind:ref {...props} bind:value class={classes} data-tx-number-field="" />

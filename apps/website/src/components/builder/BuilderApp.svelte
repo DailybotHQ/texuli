@@ -607,5 +607,5 @@ function reset() {
   .builder__keys kbd { border: 1px solid var(--tx-border, ButtonBorder); border-radius: .3rem; padding: 0 .3rem; font-family: var(--tx-font-mono, ui-monospace, monospace); font-size: .8125rem; }
   @media (max-width: 68rem) { .builder__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .builder__palette { grid-column: 1 / -1; } }
   @media (max-width: 44rem) { .builder__grid { grid-template-columns: minmax(0, 1fr); } .builder__palette { grid-column: auto; } }
-  @media (prefers-reduced-motion: reduce) { .builder *, .builder *::before, .builder *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }
+  @media (prefers-reduced-motion: reduce) { .builder *, .builder *::before, .builder *::after { scroll-behavior: auto !important; transition-duration: 0s !important; transition-delay: 0s !important; animation-duration: 0s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; } }
 </style>

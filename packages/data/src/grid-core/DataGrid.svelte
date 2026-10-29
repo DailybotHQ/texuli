@@ -1,7 +1,8 @@
 <script lang="ts" generics="T">
 import type { Snippet } from 'svelte';
-import { tick } from 'svelte';
+import { tick, untrack } from 'svelte';
 import { type ClassValue, cx } from 'texuli/cx';
+import { createListMotion, type MotionProp } from 'texuli/motion';
 import {
   Table,
   TableBody,
@@ -22,11 +23,13 @@ import type { GridSort } from '../engines/grid/sort.ts';
 import { type DataGridLabels, resolveDataGridLabels } from './labels.ts';
 import {
   ariaSort,
+  breakpointWidth,
   type CellPosition,
   cellText,
   clampCell,
   type DataGridBulkContext,
   type DataGridColumn,
+  type DataGridEmptyContext,
   gridRows,
   moveCell,
   nextSort,
@@ -57,14 +60,27 @@ interface Props {
   onSelectionChange?: (selected: string[]) => void;
   /** Names a row for its checkbox (default: the first column's text). */
   rowLabel?: (row: T) => string;
-  /** Enter on a body cell. */
+  /** Enter on a body cell (and a click on the row with `activateOnClick`). */
   onRowActivate?: (row: T) => void;
+  /**
+   * A pointer click on a body row calls `onRowActivate`, except on a control
+   * inside the row (a link, button, input, the selection checkbox). Keep a
+   * keyboard path: Enter in `grid` mode, or a link or button in a cell.
+   */
+  activateOnClick?: boolean;
+  /**
+   * `grid` (default): an APG grid with one tab stop and arrow-key cell
+   * navigation. `table`: a static table (native table semantics, no
+   * `role="grid"`, no roving focus or grid keys); controls inside it stay in
+   * the tab order.
+   */
+  mode?: 'grid' | 'table';
   /** Custom cell content (receives the row and the column). */
   cell?: Snippet<[T, DataGridColumn<T>]>;
   /** Cells can be edited: those of columns without `editable` are `aria-readonly`. */
   editable?: boolean;
-  /** Shown instead of rows when nothing matches. */
-  empty?: Snippet;
+  /** Shown instead of rows when nothing matches; receives the query and whether rows were filtered out. */
+  empty?: Snippet<[DataGridEmptyContext]>;
   /** Extra classes for a body row (status tints, emphasis). */
   rowClass?: (row: T) => ClassValue | undefined;
   /** Filter controls, rendered in the toolbar after the search field. */
@@ -99,6 +115,12 @@ interface Props {
   locale?: string;
   labels?: Partial<DataGridLabels>;
   class?: ClassValue;
+  /**
+   * Motion (`texuli/motion`): rows glide to their new place when the shown
+   * order changes (sort, filter, a row added or removed; `layout`, default
+   * on). `false` for none; instant under reduced motion and at level `none`.
+   */
+  motion?: MotionProp;
 }
 
 let {
@@ -117,6 +139,8 @@ let {
   onSelectionChange,
   rowLabel,
   onRowActivate,
+  activateOnClick = false,
+  mode = 'grid',
   cell,
   editable = false,
   empty,
@@ -137,9 +161,43 @@ let {
   locale,
   labels,
   class: className,
+  motion,
 }: Props = $props();
 
 const text = $derived(resolveDataGridLabels(labels));
+const isGrid = $derived(mode !== 'table');
+
+// Breakpoint column hiding: a column with `hideBelow` leaves the grid while
+// the viewport is narrower. Every column shows during SSR and before mount.
+const widths = $derived([
+  ...new Set(columns.map((column) => breakpointWidth(column.hideBelow)).filter((w) => w !== null)),
+]);
+let wide = $state<Record<number, boolean>>({});
+$effect(() => {
+  if (typeof matchMedia !== 'function') return;
+  const stops: Array<() => void> = [];
+  const next: Record<number, boolean> = {};
+  for (const width of widths) {
+    const query = matchMedia(`(min-width: ${width}px)`);
+    next[width] = query.matches;
+    const update = (): void => {
+      wide = { ...wide, [width]: query.matches };
+    };
+    query.addEventListener?.('change', update);
+    stops.push(() => query.removeEventListener?.('change', update));
+  }
+  wide = next;
+  return () => {
+    for (const stop of stops) stop();
+  };
+});
+/** The columns on screen (breakpoint hiding applied). */
+const shownColumns = $derived(
+  columns.filter((column) => {
+    const width = breakpointWidth(column.hideBelow);
+    return width === null || wide[width] !== false;
+  })
+);
 const uid = $props.id();
 const searchId = `${uid}-search`;
 const instructionsId = `${uid}-instructions`;
@@ -159,13 +217,32 @@ const visibleIds = $derived(shown.map(getRowId));
 const allState = $derived(selectionState(selected, visibleIds));
 const selectedSet = $derived(new Set(selected));
 /** Grid columns, the selection column included. */
-const colCount = $derived(columns.length + (selectable ? 1 : 0));
+const colCount = $derived(shownColumns.length + (selectable ? 1 : 0));
 /** Grid rows, the header row included (an empty grid keeps one body row for its message). */
 const rowCount = $derived(1 + Math.max(shown.length, 1));
 
 let active = $state<CellPosition>({ row: 0, col: 0 });
 let anchor: string | null = null;
 let root: HTMLDivElement | undefined = $state();
+
+// Layout motion: measure the rows before the shown order changes, play after.
+const rowMotion = createListMotion({
+  motion: () => motion,
+  defaults: { layout: true, duration: 'base' },
+  items: () =>
+    Array.from(
+      root?.querySelectorAll<HTMLElement>('tr[data-tx-row-id]') ?? [],
+      (element) => [element.getAttribute('data-tx-row-id') ?? '', element] as const
+    ),
+});
+$effect.pre(() => {
+  void shown;
+  untrack(() => rowMotion.measure());
+});
+$effect(() => {
+  void shown;
+  untrack(() => rowMotion.play());
+});
 const tableElement = () => root?.querySelector('table') ?? null;
 
 // Row windowing: the body renders the rows in view plus overscan, with spacer
@@ -279,7 +356,23 @@ function positionOf(target: EventTarget | null): CellPosition | null {
   return { row: row ?? 0, col: col ?? 0 };
 }
 
+/** A click on a row's own control (link, button, field, label) never activates the row. */
+const ROW_CONTROL =
+  'a[href], button, input, select, textarea, label, summary, [contenteditable=""], [contenteditable="true"], [role="button"], [role="link"], [role="checkbox"], [data-tx-grid-widget]';
+
+function handleRowClick(event: MouseEvent, row: T): void {
+  if (!activateOnClick || !onRowActivate || event.defaultPrevented || event.button !== 0) return;
+  const target = event.target as Element | null;
+  const control = target?.closest?.(ROW_CONTROL);
+  if (control && (event.currentTarget as Element).contains(control)) return;
+  // A drag that selected text is not a click on the row.
+  const selection = typeof getSelection === 'function' ? getSelection() : null;
+  if (selection && !selection.isCollapsed && selection.toString().trim()) return;
+  onRowActivate(row);
+}
+
 function handleKeydown(event: KeyboardEvent): void {
+  if (!isGrid) return;
   const position = positionOf(event.target);
   if (!position || event.altKey) return;
   const grid = tableElement();
@@ -370,32 +463,37 @@ function handleFocusIn(event: FocusEvent): void {
       })}
     </div>
   {/if}
-  <p id={instructionsId} class="tx-data-grid__sr-only">{text.instructions}</p>
+  {#if isGrid}<p id={instructionsId} class="tx-data-grid__sr-only">{text.instructions}</p>{/if}
   <Table
     {density}
     stickyHeader={Boolean(maxBlockSize) || virtual}
     {...maxBlockSize || virtual ? { maxBlockSize: maxBlockSize ?? `${viewportHeight}px` } : {}}
     busy={loading}
-    role="grid"
-    aria-rowcount={visible.length + 1}
-    aria-colcount={colCount}
-    aria-multiselectable={selectable ? 'true' : undefined}
-    aria-describedby={instructionsId}
-    onkeydown={handleKeydown}
-    onfocusin={handleFocusIn}
-    onfocusout={() => (inWidget = false)}
+    {...isGrid
+      ? {
+          role: 'grid',
+          'aria-rowcount': visible.length + 1,
+          'aria-colcount': colCount,
+          'aria-multiselectable': selectable ? 'true' : undefined,
+          'aria-describedby': instructionsId,
+          onkeydown: handleKeydown,
+          onfocusin: handleFocusIn,
+          onfocusout: () => (inWidget = false),
+        }
+      : {}}
+    data-mode={mode}
   >
     <TableCaption hidden={captionHidden}>{caption}</TableCaption>
     <TableHeader>
       <TableRow aria-rowindex={1}>
         {#if selectable}
-          <TableHead class="tx-data-grid__select" data-tx-grid-cell="0:0" aria-colindex={1}>
+          <TableHead class="tx-data-grid__select" data-tx-grid-cell="0:0" aria-colindex={isGrid ? 1 : undefined}>
             <span class="tx-data-grid__sr-only">{text.selection}</span>
             <input
               type="checkbox"
               class="tx-data-grid__checkbox"
               data-tx-grid-widget
-              tabindex={isActive(0, 0) ? 0 : -1}
+              tabindex={isGrid ? (isActive(0, 0) ? 0 : -1) : undefined}
               aria-label={text.selectAll}
               checked={allState === 'all'}
               indeterminate={allState === 'some'}
@@ -404,15 +502,15 @@ function handleFocusIn(event: FocusEvent): void {
             />
           </TableHead>
         {/if}
-        {#each columns as column, index (column.key)}
+        {#each shownColumns as column, index (column.key)}
           {@const col = index + (selectable ? 1 : 0)}
           {@const sortable = column.sortable !== false}
           <TableHead
             align={align(column)}
             data-tx-grid-cell={`0:${col}`}
-            aria-colindex={col + 1}
+            aria-colindex={isGrid ? col + 1 : undefined}
             aria-sort={sortable ? ariaSort(sort, column.key) : undefined}
-            tabindex={!sortable && isActive(0, col) ? 0 : !sortable ? -1 : undefined}
+            tabindex={!isGrid || sortable ? undefined : isActive(0, col) ? 0 : -1}
           >
             {#if sortable}
               {@const direction = sort.find((entry) => entry.key === column.key)?.direction}
@@ -421,7 +519,7 @@ function handleFocusIn(event: FocusEvent): void {
                 class="tx-data-grid__sort"
                 data-tx-grid-widget
                 data-direction={direction}
-                tabindex={isActive(0, col) ? 0 : -1}
+                tabindex={isGrid ? (isActive(0, col) ? 0 : -1) : undefined}
                 onclick={(event) => setSort(nextSort(sort, column.key, event.shiftKey))}
               >
                 {column.header}
@@ -449,8 +547,12 @@ function handleFocusIn(event: FocusEvent): void {
     </TableHeader>
     <TableBody>
       {#if loading || shown.length === 0}
-        <TableEmpty colspan={colCount} role="gridcell" data-tx-grid-cell={`1:0`} tabindex={isActive(1, 0) ? 0 : -1}>
-          {#if loading}{text.loading}{:else if empty}{@render empty()}{:else}{text.noResults}{/if}
+        <TableEmpty
+          colspan={colCount}
+          {...isGrid ? { role: 'gridcell', tabindex: isActive(1, 0) ? 0 : -1 } : {}}
+          data-tx-grid-cell={`1:0`}
+        >
+          {#if loading}{text.loading}{:else if empty}{@render empty({ query: search, filtered: rows.length > 0 })}{:else}{text.noResults}{/if}
         </TableEmpty>
       {:else}
         {#each slots as slot (slot.gap === undefined ? getRowId(shown[slot.index] as T) : slot)}
@@ -467,16 +569,23 @@ function handleFocusIn(event: FocusEvent): void {
           <TableRow
             class={rowClass?.(row)}
             selected={isSelected}
-            aria-rowindex={offset + r + 1}
-            aria-selected={selectable ? isSelected : undefined}
+            aria-rowindex={isGrid ? offset + r + 1 : undefined}
+            aria-selected={selectable && isGrid ? isSelected : undefined}
+            data-tx-row-id={id}
+            data-activatable={activateOnClick && onRowActivate ? '' : undefined}
+            onclick={(event: MouseEvent) => handleRowClick(event, row)}
           >
             {#if selectable}
-              <TableCell class="tx-data-grid__select" role="gridcell" data-tx-grid-cell={`${r}:0`} aria-colindex={1}>
+              <TableCell
+                class="tx-data-grid__select"
+                {...isGrid ? { role: 'gridcell', 'aria-colindex': 1 } : {}}
+                data-tx-grid-cell={`${r}:0`}
+              >
                 <input
                   type="checkbox"
                   class="tx-data-grid__checkbox"
                   data-tx-grid-widget
-                  tabindex={isActive(r, 0) ? 0 : -1}
+                  tabindex={isGrid ? (isActive(r, 0) ? 0 : -1) : undefined}
                   aria-label={text.selectRow(labelOf(row))}
                   checked={isSelected}
                   onclick={(event) => {
@@ -486,16 +595,20 @@ function handleFocusIn(event: FocusEvent): void {
                 />
               </TableCell>
             {/if}
-            {#each columns as column, index (column.key)}
+            {#each shownColumns as column, index (column.key)}
               {@const col = index + (selectable ? 1 : 0)}
               <TableCell
-                role="gridcell"
+                {...isGrid
+                  ? {
+                      role: 'gridcell',
+                      'aria-colindex': col + 1,
+                      'aria-readonly': editable && !column.editable ? 'true' : undefined,
+                      tabindex: isActive(r, col) && !inWidget ? 0 : -1,
+                    }
+                  : {}}
                 align={align(column)}
                 numeric={column.type === 'number'}
                 data-tx-grid-cell={`${r}:${col}`}
-                aria-colindex={col + 1}
-                aria-readonly={editable && !column.editable ? 'true' : undefined}
-                tabindex={isActive(r, col) && !inWidget ? 0 : -1}
               >
                 {#if cell}{@render cell(row, column)}{:else}{cellText(row, column)}{/if}
               </TableCell>

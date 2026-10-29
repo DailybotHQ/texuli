@@ -30,6 +30,7 @@ Use the same `namespace` (and `fallbackMode`, when you set one) as the
 | `label` | `Appearance` | Accessible name of the radio group (visually hidden). |
 | `labels` | `Light`, `Dark`, `System` | Visible option names, per choice. |
 | `onValueChange` | — | Called with the choice after it is stored and applied. |
+| `size` | `md` | `sm` is a compact control for headers and toolbars (smaller option padding and height, `data-size="sm"`). The switcher never resets the font, so a host class such as `text-xs` sets its text size. |
 | `class` | — | Extra class on the group. |
 
 ## Behavior
@@ -48,6 +49,11 @@ Use the same `namespace` (and `fallbackMode`, when you set one) as the
 - A cached `high-contrast` mode is shown with no option selected.
 - Another tab writing the same namespace updates the selection and the mode
   on the root through the `storage` event.
+- **Same tab:** every `applyAppearanceChoice` call (a switcher, a command
+  palette, host code) dispatches `APPEARANCE_CHANGE_EVENT`
+  (`tx-appearance-change`) on `window` with an `AppearanceChangeDetail`
+  (`{ namespace, choice }`), so two switchers of one namespace on a page stay
+  in step, and a host can listen too. Switchers of other namespaces ignore it.
 - Before it mounts (server render), no option is selected, so the server
   never guesses the stored choice.
 
@@ -76,7 +82,8 @@ control:
 | `readAppearanceChoice(namespace, storage?)` | The stored `light`, `dark` or `high-contrast` mode; a missing or malformed cache is `system`. |
 | `applyAppearanceChoice(namespace, choice, options?)` | Stores and applies a choice as described above; returns the resolved mode. Options: `root`, `storage`, `themeId`, `fallbackMode`, `matchMedia`. |
 | `APPEARANCE_CHOICES` | `['light', 'dark', 'system']`. |
+| `APPEARANCE_CHANGE_EVENT` | `'tx-appearance-change'`, the window event `applyAppearanceChoice` dispatches after each choice (detail: `AppearanceChangeDetail`). |
 
-Types: `AppearanceChoice`, `StoredAppearanceChoice`, `ApplyAppearanceOptions`.
+Types: `AppearanceChoice`, `StoredAppearanceChoice`, `ApplyAppearanceOptions`, `AppearanceChangeDetail`.
 
 Tests: [`appearance.test.ts`](../tests/appearance.test.ts).

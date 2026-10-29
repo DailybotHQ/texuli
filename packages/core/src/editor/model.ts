@@ -2,7 +2,8 @@
  * `@texuli/core/editor-model`: the rich text editor document model (ADR-003).
  * Types and caps, the closed vocabularies, constructors, normalization,
  * validation, the untrusted loader, selection helpers, grapheme and word
- * boundaries, and the nested inline interchange shape. Framework-free.
+ * boundaries, the nested inline interchange shape, and host inline
+ * extensions (mentions, references). Framework-free.
  */
 export {
   blockLength,
@@ -27,6 +28,17 @@ export {
   replaceItem,
   validateEditorDocument,
 } from './document.ts';
+export {
+  acceptsExtensionId,
+  createInlineExtensions,
+  EDITOR_EXTENSION_LIMITS,
+  EDITOR_EXTENSION_SIGILS,
+  type EditorExtensionSigil,
+  type EditorInlineExtension,
+  type EditorInlineExtensions,
+  extensionHref,
+  toInlineExtensions,
+} from './extensions.ts';
 export {
   graphemeBoundaries,
   nextGrapheme,

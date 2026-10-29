@@ -5,6 +5,7 @@ import { getNavigationIntent } from '@texuli/core/keyboard';
 import { createRovingFocus } from '@texuli/core/roving';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { chainHandlers, composeHandlers } from '../../internal/handlers.ts';
 import './carousel.css';
 import { type ClassValue } from '../../internal/cx.ts';
 import {
@@ -58,23 +59,12 @@ type OwnProps = {
 };
 
 /**
- * Extra attributes (`data-*`, `aria-*`, `id`…) land on the root element. The
- * handlers the carousel binds on its root are not props, so a caller handler
- * can never replace them.
+ * Extra attributes (`data-*`, `aria-*`, `id`…) land on the root element.
+ * Caller handlers on the root run first and never replace the carousel's:
+ * `event.preventDefault()` in `onkeydown` skips its arrow-key navigation; the
+ * focus and pointer bookkeeping (autoplay pause) always runs.
  */
-type Props = OwnProps &
-  Omit<
-    HTMLAttributes<HTMLElement>,
-    | keyof OwnProps
-    | 'children'
-    | 'onkeydown'
-    | 'onfocusin'
-    | 'onpointerdowncapture'
-    | 'onpointerupcapture'
-    | 'onpointercancelcapture'
-    | 'onpointerenter'
-    | 'onpointerleave'
-  >;
+type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps | 'children'>;
 
 let {
   items,
@@ -93,6 +83,13 @@ let {
   onIndexChange,
   onPlayingChange,
   ref = $bindable(null),
+  onkeydown,
+  onfocusin,
+  onpointerdowncapture,
+  onpointerupcapture,
+  onpointercancelcapture,
+  onpointerenter,
+  onpointerleave,
   ...rest
 }: Props = $props();
 
@@ -284,13 +281,13 @@ const status = $derived(formatMessage(t.status, { index: active + 1, total: coun
   data-controls={controls}
   data-index={active}
   data-playing={playing ? 'true' : undefined}
-  onkeydown={onRootKeydown}
-  onfocusin={onFocusIn}
-  onpointerdowncapture={onPointerDownCapture}
-  onpointerupcapture={onPointerUpCapture}
-  onpointercancelcapture={onPointerUpCapture}
-  onpointerenter={() => rotator.hold('hover')}
-  onpointerleave={() => rotator.release('hover')}
+  onkeydown={composeHandlers(onkeydown, onRootKeydown)}
+  onfocusin={chainHandlers(onfocusin, onFocusIn)}
+  onpointerdowncapture={chainHandlers(onpointerdowncapture, onPointerDownCapture)}
+  onpointerupcapture={chainHandlers(onpointerupcapture, onPointerUpCapture)}
+  onpointercancelcapture={chainHandlers(onpointercancelcapture, onPointerUpCapture)}
+  onpointerenter={chainHandlers(onpointerenter, () => rotator.hold('hover'))}
+  onpointerleave={chainHandlers(onpointerleave, () => rotator.release('hover'))}
 >
   {#if autoplay && multiple}
     <div class="tx-carousel-top">

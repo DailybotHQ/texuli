@@ -1,0 +1,75 @@
+{
+  "name": "@texuli/document",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Framework-free, DOM-free document engine for Texuli: the block document format with persisted ids, the untrusted validator, typed operations and bounded RFC 6902 patches with undo, Markdown through the core codec, and the CRDT sync core.",
+  "keywords": [
+    "document",
+    "blocks",
+    "markdown",
+    "crdt",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
+  "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/document"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./model": {
+      "types": "./src/model/index.ts",
+      "default": "./src/model/index.ts"
+    },
+    "./schema": {
+      "types": "./src/schema/index.ts",
+      "default": "./src/schema/index.ts"
+    },
+    "./ops": {
+      "types": "./src/ops/index.ts",
+      "default": "./src/ops/index.ts"
+    },
+    "./markdown": {
+      "types": "./src/markdown/index.ts",
+      "default": "./src/markdown/index.ts"
+    },
+    "./paged": {
+      "types": "./src/paged/index.ts",
+      "default": "./src/paged/index.ts"
+    },
+    "./docx": {
+      "types": "./src/docx/index.ts",
+      "default": "./src/docx/index.ts"
+    },
+    "./pdf": {
+      "types": "./src/pdf/index.ts",
+      "default": "./src/pdf/index.ts"
+    },
+    "./sync": {
+      "types": "./src/sync/index.ts",
+      "default": "./src/sync/index.ts"
+    },
+    "./collab": {
+      "types": "./src/collab/index.ts",
+      "default": "./src/collab/index.ts"
+    }
+  },
+  "dependencies": {
+    "@texuli/core": "0.6.0",
+    "@texuli/deck": "0.6.0"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

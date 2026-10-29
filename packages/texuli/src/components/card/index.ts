@@ -10,6 +10,7 @@ export {
   CARD_GAPS,
   CARD_VARIANTS,
   type CardGridGap,
+  type CardGridGapValue,
   type CardVariant,
   cardClass,
   cardGridClass,

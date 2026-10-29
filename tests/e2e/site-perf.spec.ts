@@ -60,6 +60,8 @@ const BROWSER_ROUTES = [
   '/search/',
   '/docs-shell/',
   '/perf/',
+  // PLAN_010 T-site-060: nine lazy motion islands; the settings panel is the only one near the top.
+  '/motion-page/',
 ] as const;
 
 const kb = (bytes: number) => Math.round((bytes / 1024) * 10) / 10;

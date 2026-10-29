@@ -10,7 +10,7 @@ type Props = Omit<ComponentProps<typeof PrimitiveInput>, 'size'> & {
   class?: ClassValue;
 };
 
-let { class: className, size = 'md', ...rest }: Props = $props();
+let { class: className, size = 'md', ref = $bindable(null), ...rest }: Props = $props();
 
 const classes = $derived(
   comboboxInputClass({
@@ -20,4 +20,4 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveInput class={classes} data-tx-combobox-input data-size={size} {...rest} />
+<PrimitiveInput bind:ref class={classes} data-tx-combobox-input data-size={size} {...rest} />

@@ -141,6 +141,80 @@ let { deck }: { deck: unknown } = $props();
     expect(entries).not.toContain(lazy?.fileName);
   }, 180_000);
 
+  it('emits no default-table chunk at all for a host on the stage core (G72)', async () => {
+    const chunks = await buildHost(
+      `<script lang="ts">
+import { DeckStageCore } from ${JSON.stringify(`${SRC}/stage/core.ts`)};
+import HostFree from './HostFree.svelte';
+let { deck }: { deck: unknown } = $props();
+const renderers = { validateBlock: () => undefined, free: () => HostFree };
+</script>
+<DeckStageCore {deck} {renderers} loadTheme={null} />
+`,
+      { 'HostFree.svelte': '<p>host</p>\n' }
+    );
+    const every = [...chunks.values()].flatMap((chunk) => chunk.modules);
+    expect(every.some((id) => id.endsWith('/slides/src/stage/DeckStageCore.svelte'))).toBe(true);
+    // Not in the initial graph, and not as a lazy chunk either: nothing references them.
+    expect(defaultsIn(every)).toEqual([]);
+    expect(every.filter((id) => id.endsWith('/slides/src/stage/defaults.ts'))).toEqual([]);
+    expect(chunkWith(chunks, '/slides/src/stage/default-renderers.ts')).toBeUndefined();
+    const entries = [...chunks.values()].filter((chunk) => chunk.isEntry).map((c) => c.fileName);
+    const initial = staticChunks(chunks, entries);
+    const gzip = initial.reduce((sum, chunk) => sum + gzipSync(chunk.code, { level: 9 }).length, 0);
+    const all = [...chunks.values()].reduce(
+      (sum, chunk) => sum + gzipSync(chunk.code, { level: 9 }).length,
+      0
+    );
+    // Reported, not asserted (the size budgets own the numbers).
+    console.info(
+      `[bundle-graph] stage-core host: initial JS ${gzip} B gzip, every chunk ${all} B gzip in ${chunks.size} chunks`
+    );
+  }, 180_000);
+
+  it('a host handing the stage core a prepared deck (G83) has no migration or block schema in its initial graph', async () => {
+    const chunks = await buildHost(
+      `<script lang="ts">
+import { DeckStageCore, prepareDeckV2 } from ${JSON.stringify(`${SRC}/stage/core.ts`)};
+import HostFree from './HostFree.svelte';
+let { input }: { input: unknown } = $props();
+const validateBlock = () => undefined;
+const deck = $derived(prepareDeckV2(input, { validateBlock }));
+const renderers = { free: () => HostFree };
+</script>
+<DeckStageCore {deck} tier="developer" {renderers} loadTheme={null} />
+`,
+      { 'HostFree.svelte': '<p>host</p>\n' }
+    );
+    const entries = [...chunks.values()].filter((chunk) => chunk.isEntry).map((c) => c.fileName);
+    const modules = staticModules(chunks, entries);
+    expect(modules.some((id) => id.endsWith('/slides/src/stage/prepare-core.ts'))).toBe(true);
+    expect(HOST_REPLACED.filter((part) => modules.some((id) => id.includes(part)))).toEqual([]);
+    expect(defaultsIn(modules)).toEqual([]);
+    // The stage still ships its fallbacks as lazy chunks; a prepared deck never asks for them
+    // (tests/stage-prepared.test.ts proves the first paint loads neither).
+    for (const suffix of ['/slides/src/stage/builtin.ts', '/deck/src/model/migrate.ts']) {
+      const lazy = chunkWith(chunks, suffix);
+      expect(lazy, suffix).toBeTruthy();
+      expect(entries).not.toContain(lazy?.fileName);
+    }
+  }, 180_000);
+
+  it('keeps the server preload out of a browser build with the defaults on', async () => {
+    const chunks = await buildHost(`<script lang="ts">
+import { DeckStage } from ${JSON.stringify(`${SRC}/stage/index.ts`)};
+let { deck }: { deck: unknown } = $props();
+</script>
+<DeckStage {deck} />
+`);
+    const entries = [...chunks.values()].filter((chunk) => chunk.isEntry).map((c) => c.fileName);
+    // The browser takes the empty `#deck-ssr` (`ssr-browser.ts`): no chunk preloads anything.
+    const every = [...chunks.values()].flatMap((chunk) => chunk.modules);
+    expect(every.filter((id) => /\/stage\/ssr-(preload|server)\.ts$/.test(id))).toEqual([]);
+    expect(defaultsIn(staticModules(chunks, entries))).toEqual([]);
+    expect(chunkWith(chunks, '/slides/src/stage/default-renderers.ts')).toBeTruthy();
+  }, 180_000);
+
   it('keeps them out of the print view when it turns them off', async () => {
     const chunks = await buildHost(`<script lang="ts">
 import { DeckPrintView } from ${JSON.stringify(`${SRC}/export/index.ts`)};

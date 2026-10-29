@@ -377,6 +377,11 @@ describe('conformance harness', () => {
       ['state-list-text', ['state']],
       ['form-outside', ['action', 'action']],
       ['surface-nodes', ['binding', 'state']],
+      // Spec 0.6.0 motion: presets and token steps only (ADR-012, ADR-013).
+      ['motion-preset', ['schema']],
+      ['motion-raw-css', ['schema']],
+      ['motion-duration-ms', ['schema']],
+      ['motion-level', ['schema']],
     ] as const) {
       const fixture = json<{ expect: string[]; blueprint: unknown }>(
         `fixtures/invalid/${name}.json`
@@ -484,7 +489,7 @@ describe('migrations', () => {
       expect(result, path).toMatchObject({
         from: '0.2.0',
         to: SPEC_VERSION,
-        applied: ['0.2.0->0.3.0', '0.3.0->0.4.0', '0.4.0->0.5.0'],
+        applied: ['0.2.0->0.3.0', '0.3.0->0.4.0', '0.4.0->0.5.0', '0.5.0->0.6.0'],
       });
       expect(result.blueprint, path).toEqual({ ...input, spec: SPEC_VERSION });
       expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);

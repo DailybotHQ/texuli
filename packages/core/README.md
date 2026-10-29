@@ -12,9 +12,9 @@ when you need Texuli's URL policy to sanitize links and media from agents
 or users. It has no runtime dependencies and imports no UI framework.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
-> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
+> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
+> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
 
 ## Install
 
@@ -59,8 +59,8 @@ window.addEventListener('keydown', (event) => {
 
 Everything in the table below is available from the root entry
 (`@texuli/core`) and from its own subpath (`@texuli/core/<subpath>`), except
-the editor and lazy-chunk texels, which are subpath-only. Import subpaths to
-keep bundles narrow.
+the editor, lazy-chunk, motion, markup and ZIP texels, which are
+subpath-only. Import subpaths to keep bundles narrow.
 
 ## What's inside
 
@@ -88,6 +88,8 @@ keep bundles narrow.
 | Environment | `env` | `isBrowser`, `getOwnerDocument`, `listen`, `matchesMedia`, `requestFrame` |
 | Lazy chunks | `lazy` | `lazyChunk`, `hasLazyChunk` (subpath only) |
 | Rich text editor model | `editor-model`, `editor-transforms`, `editor-history`, `editor-keymap`, `editor-markdown` | Document model, transforms, undo history, keymap, Markdown import and export (subpath only) |
+| Markup builders | `markup` | `el`, `text`, `linkUrl`, `imageUrl`, `serializeXml`, `serializeHtml`: escaped XML and HTML with no raw-markup API (subpath only) |
+| ZIP writer | `zip` | `writeZip`, `writeZipAsync`, `crc32`, `compressBytes`: deterministic archives, deflated where the platform can (subpath only) |
 
 The table names the headline exports; each subpath's TypeScript
 declarations list the full surface.
@@ -123,6 +125,26 @@ through this policy, and you can use it the same way. Rejected values return
 - **Right-to-left aware.** Direction helpers map logical sides to physical
   ones, and positioning resolves placements for the current direction.
 
+## New in 0.6.0
+
+Ships in `0.6.0`; the `0.5.0` release predates it:
+
+- `@texuli/core/motion` and `@texuli/core/motion/spring`: presence, FLIP
+  layout, shared elements, sequences and timelines, and an owned spring
+  solver over the Web Animations API, instant on the server and under
+  reduced motion ([core-motion](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-motion.md)).
+- `@texuli/core/markup` and `@texuli/core/zip`: escaped XML and HTML
+  builders and a deterministic ZIP writer for static outputs
+  ([core-markup](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-markup.md),
+  [core-zip](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-zip.md)).
+- Inline extensions in the editor model and Markdown codec (G48:
+  `createInlineExtensions`, the `extension` mark and `<sigil>{id|label}`
+  tokens), and a reader that is linear on long plain text
+  ([core-editor](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-editor.md)).
+- Inert exemptions take `raise: false`, so an overlay opened inside a modal
+  dialog stays above its backdrop (G75,
+  [core-inert](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-inert.md)).
+
 ## Documentation
 
 - Website: [texuli.com](https://texuli.com) and the
@@ -134,6 +156,8 @@ through this policy, and you can use it the same way. Rejected values return
 - Positioning: [core-position-math.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-position-math.md)
   and [core-position-dom.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-position-dom.md)
 - Rich text editor model: [core-editor.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-editor.md)
+- Static outputs: [core-markup.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-markup.md) (escaped XML and HTML builders) and [core-zip.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-zip.md) (the ZIP writer)
+- Motion (`@texuli/core/motion`: animate, presence, FLIP, shared elements, timelines, springs): [core-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-motion.md)
 - Every texel's contract: [packages/core/docs](https://github.com/DailybotHQ/texuli/tree/main/packages/core/docs)
 - Security model: [SECURITY.md](https://github.com/DailybotHQ/texuli/blob/main/docs/SECURITY.md)
 

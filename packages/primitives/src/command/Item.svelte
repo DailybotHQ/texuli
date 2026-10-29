@@ -2,6 +2,7 @@
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { commandContext, getOptionalCommandGroupContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'value' | 'children'> & {
@@ -12,7 +13,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'value' | 'children'> & {
   label?: string;
   onSelect?: (value: string) => void;
   value: string;
-};
+} & RefProp;
 let {
   child,
   children,
@@ -21,6 +22,7 @@ let {
   label,
   onSelect,
   value,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 const context = commandContext.get();
@@ -81,5 +83,5 @@ const optionProps = $derived(
 {#if child}
   {@render child({ props: optionProps })}
 {:else}
-  <div {...optionProps} data-command-item="">{@render children?.()}</div>
+  <div bind:this={ref} {...optionProps} data-command-item="">{@render children?.()}</div>
 {/if}

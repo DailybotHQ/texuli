@@ -1,9 +1,10 @@
 // @vitest-environment node
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  buildPackage,
   CSS_FILE_DTS_SOURCE,
   CSS_MODULES_DTS,
   CSS_MODULES_DTS_SOURCE,
@@ -20,6 +21,7 @@ import {
   rewriteDeclarationSpecifiers,
   rewriteGeneratedTypeScriptSpecifiers,
   selectPackages,
+  svelteToolManifest,
   type WorkspacePackage,
 } from '../packages.ts';
 
@@ -326,6 +328,108 @@ describe('workspace selection', () => {
   });
 });
 
+describe('publishManifest subpath imports', () => {
+  const versions = new Map([['demo', '0.3.0']]);
+  it('maps package.json `imports` to the dist tree, so #-specifiers resolve from the tarball', () => {
+    const { manifest, problems } = publishManifest(
+      pkg({
+        name: 'demo',
+        version: '0.3.0',
+        type: 'module',
+        sideEffects: ['**/*.css'],
+        exports: { '.': './src/index.ts' },
+        imports: {
+          '#ssr': { browser: './src/stage/ssr-browser.ts', default: './src/stage/ssr-server.ts' },
+        },
+      }),
+      versions
+    );
+    expect(problems).toEqual([]);
+    expect(manifest.imports).toEqual({
+      '#ssr': { browser: './dist/stage/ssr-browser.js', default: './dist/stage/ssr-server.js' },
+    });
+  });
+
+  it('svelte-package sees only the plain entries: a conditional entry is left to the consumer', () => {
+    const manifest = {
+      name: 'demo',
+      imports: {
+        '#ssr': { browser: './src/ssr-browser.ts', default: './src/ssr-server.ts' },
+        '#plain': './src/plain.ts',
+      },
+    };
+    expect(svelteToolManifest(manifest)).toEqual({
+      name: 'demo',
+      imports: { '#plain': './src/plain.ts' },
+    });
+    expect(
+      svelteToolManifest({ name: 'demo', imports: { '#ssr': { default: './src/a.ts' } } })
+    ).toEqual({ name: 'demo' });
+    expect(svelteToolManifest({ name: 'demo' })).toEqual({ name: 'demo' });
+  });
+
+  // svelte-package aliases `#name` imports to their `default` target. For a
+  // `{ browser, default }` pair that baked the server file into the packed
+  // components, and every browser bundle built from the tarball imported the
+  // server-only preload (@texuli/slides' #deck-ssr; caught by dist parity).
+  it('keeps a conditional #-specifier in the packed output, so the consumer bundler picks the condition', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'tx-subpath-imports-'));
+    try {
+      const dir = join(root, 'packages', 'demo');
+      mkdirSync(join(dir, 'src'), { recursive: true });
+      const manifest = {
+        name: 'demo',
+        version: '0.3.0',
+        type: 'module',
+        exports: { '.': { svelte: './src/index.ts', default: './src/index.ts' } },
+        imports: {
+          '#ssr': { browser: './src/ssr-browser.ts', default: './src/ssr-server.ts' },
+        },
+        peerDependencies: { svelte: '^5.0.0' },
+      };
+      writeFileSync(join(dir, 'package.json'), JSON.stringify(manifest));
+      writeFileSync(
+        join(dir, 'tsconfig.json'),
+        JSON.stringify({
+          compilerOptions: {
+            target: 'ES2022',
+            module: 'ESNext',
+            moduleResolution: 'bundler',
+            allowImportingTsExtensions: true,
+            verbatimModuleSyntax: true,
+            strict: true,
+          },
+        })
+      );
+      writeFileSync(join(dir, 'src', 'ssr-browser.ts'), 'export {};\n');
+      writeFileSync(join(dir, 'src', 'ssr-server.ts'), "console.log('server');\n");
+      writeFileSync(join(dir, 'src', 'Stage.svelte'), "<script>\nimport '#ssr';\n</script>\n");
+      writeFileSync(
+        join(dir, 'src', 'index.ts'),
+        "import '#ssr';\nexport { default as Stage } from './Stage.svelte';\n"
+      );
+      const stage = join(root, 'stage');
+      const problems = await buildPackage(
+        { dir: 'demo', name: 'demo', version: '0.3.0', manifest },
+        root,
+        stage,
+        { types: false }
+      );
+      expect(problems).toEqual([]);
+      for (const file of ['Stage.svelte', 'index.js']) {
+        const text = readFileSync(join(stage, 'dist', file), 'utf8');
+        expect(text, file).toMatch(/import ["']#ssr["']/);
+        expect(text, file).not.toContain('ssr-server');
+      }
+      // svelte-package's scratch folder never lands in the package or the stage.
+      expect(existsSync(join(dir, '.svelte-kit'))).toBe(false);
+      expect(existsSync(join(stage, '.svelte-package'))).toBe(false);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  }, 120_000);
+});
+
 describe('sideEffects', () => {
   it('every package declares CSS-only sideEffects (examples also register entries)', () => {
     const all = readWorkspace();
@@ -340,6 +444,15 @@ describe('sideEffects', () => {
           './src/index.ts',
           './src/**/entry.ts',
           './src/**/entries.ts',
+        ]);
+      } else if (pkg.name === '@texuli/slides') {
+        // The server-only renderer preloads (#deck-ssr and #deck-ssr-core's
+        // default conditions) load their tables at module evaluation; a glob
+        // keeps them in both the source and the packed dist tree.
+        expect(side as string[]).toEqual([
+          '**/*.css',
+          '**/stage/ssr-server.*',
+          '**/stage/ssr-core-server.*',
         ]);
       } else if (pkg.name === '@texuli/charts') {
         // The worker offload entry self-registers its message listener, so it

@@ -37,3 +37,9 @@ Styled tooltip on `@texuli/primitives/tooltip` and the token contract:
   {/snippet}
 </Tooltip>
 ```
+
+## Motion
+
+`motion`: a quick scale in and fade out through `@texuli/core/motion`
+([ui-motion](ui-motion.md)), replacing the former CSS keyframes. Instant under
+reduced motion.

@@ -17,6 +17,7 @@ export const DECK_CHROME_MESSAGES = Object.freeze({
   'stage.groupShare': 'Share and print',
   'stage.groupHelp': 'Help',
   'stage.groupDebug': 'Debug',
+  'stage.groupTools': 'More tools',
   'stage.linkCopied': 'Link to this slide copied.',
   'stage.linkCopyFailed': 'Could not copy the link.',
   'stage.laserOff': 'Laser off',

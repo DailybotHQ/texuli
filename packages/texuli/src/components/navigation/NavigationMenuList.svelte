@@ -9,10 +9,10 @@ type Props = ComponentProps<typeof Primitive.List> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 </script>
 
-<Primitive.List
+<Primitive.List bind:ref
   class={navigationMenuListClass({ class: className })}
   {...rest}
 >

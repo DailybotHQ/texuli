@@ -3,6 +3,8 @@ import { bindDismissLayer } from '@texuli/core/dismiss';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { SvelteMap } from 'svelte/reactivity';
+import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { type NavigationMenuContextValue, navigationMenuContext } from './context.ts';
 import { createNavigationMenuController, motionBetween } from './controller.ts';
 
@@ -27,8 +29,12 @@ let {
   orientation = 'horizontal',
   dir,
   children,
+  ref = $bindable(null),
+  onkeydown,
+  onfocusin,
+  onpointerleave,
   ...rest
-}: RootProps = $props();
+}: RootProps & RefProp = $props();
 
 const uid = $props.id();
 /** Consumer ids claimed by item parts, keyed by item value; they win over the generated ones. */
@@ -110,6 +116,9 @@ const context: NavigationMenuContextValue = $state({
   },
 });
 navigationMenuContext.set(context);
+$effect(() => {
+  ref = context.root;
+});
 
 // Pressing or focusing outside the navigation closes the open item.
 function dismissOutside(node: HTMLElement) {
@@ -145,11 +154,11 @@ function onFocusIn(event: FocusEvent): void {
   data-state={current ? 'open' : 'closed'}
   {dir}
   {...rest}
-  onkeydown={onKeydown}
-  onfocusin={onFocusIn}
-  onpointerleave={(event) => {
+  onkeydown={composeHandlers(onkeydown, onKeydown)}
+  onfocusin={chainHandlers(onfocusin, onFocusIn)}
+  onpointerleave={chainHandlers(onpointerleave, (event: PointerEvent) => {
     if (event.pointerType === 'mouse') controller.pointerLeave();
-  }}
+  })}
   {@attach current ? dismissOutside : undefined}
 >
   {@render children?.()}

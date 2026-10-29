@@ -9,6 +9,12 @@ import type { AvatarImageProps } from './types.ts';
  * candidate through `filterImageSrcset` at the same trust (dropping `sizes`
  * when no candidate survives), tracks load/error, and only paints once the
  * root status is `loaded` (after optional delayMs).
+ *
+ * While loading, the image is rendered but visually hidden (opacity 0, one
+ * pixel, out of flow), never `hidden`: a host rule such as
+ * `[hidden] { display: none !important }` would stop the browser from
+ * rendering, and so from ever fetching, a lazy image (G79). It stays
+ * `aria-hidden`, so assistive technology meets the fallback only.
  */
 let {
   src = null,
@@ -18,6 +24,7 @@ let {
   alt = '',
   ref = $bindable(null),
   class: className,
+  style,
   onload,
   onerror,
   ...rest
@@ -34,6 +41,17 @@ const safeSrc = $derived(src == null || src === '' ? undefined : safeImageSrc(sr
 const safeSrcset = $derived(filterImageSrcset(srcset, srcTrust));
 const status = $derived(avatar.status());
 const visible = $derived(status === 'loaded');
+/**
+ * Visually hidden while loading, but rendered and intersecting the viewport,
+ * so a lazy image still loads. No `clip-path`: Chromium does not fetch a lazy
+ * image clipped to nothing.
+ */
+const LOADING_STYLE =
+  'position:absolute;inline-size:1px;block-size:1px;margin:0;padding:0;border:0;' +
+  'opacity:0;pointer-events:none';
+const imageStyle = $derived(
+  visible ? (style ?? undefined) : style ? `${style};${LOADING_STYLE}` : LOADING_STYLE
+);
 
 function clearDelay(): void {
   if (delayTimer !== undefined) {
@@ -102,8 +120,9 @@ $effect(() => {
 
 {#if safeSrc && status !== 'error'}
   <!--
-    Keep the img in the DOM while loading so the browser can fire load/error.
-    Hide it until status is loaded (after delayMs).
+    Keep the img in the DOM, and rendered, while loading so the browser
+    fetches it and fires load/error. Visually hidden until status is loaded
+    (after delayMs).
   -->
   <img
     bind:this={ref}
@@ -112,11 +131,11 @@ $effect(() => {
     class={typeof className === 'string' ? className : undefined}
     {...stateAttributes(status as PrimitiveState)}
     data-tx-avatar-image=""
-    hidden={!visible}
     aria-hidden={visible ? undefined : true}
     onload={handleLoad}
     onerror={handleError}
     {...rest}
+    style={imageStyle}
     srcset={safeSrcset}
     sizes={safeSrcset ? sizes : undefined}
   />

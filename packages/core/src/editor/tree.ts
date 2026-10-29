@@ -12,11 +12,16 @@ export type EditorInlineNode =
   | { type: 'code'; text: string }
   | { type: 'break' }
   | { type: 'strong' | 'em' | 'strike'; children: EditorInlineNode[] }
-  | { type: 'link'; href: string; children: EditorInlineNode[] };
+  | { type: 'link'; href: string; children: EditorInlineNode[] }
+  /** A host inline extension entity (`name`, `id`) around its label. */
+  | { type: 'extension'; name: string; id: string; children: EditorInlineNode[] };
 
 type Container = Extract<EditorInlineNode, { children: EditorInlineNode[] }>;
 
-/** Fold runs into nested nodes, outermost mark first (`link`, `strong`, `em`, `strike`). */
+/**
+ * Fold runs into nested nodes, outermost mark first (`link`, `strong`, `em`,
+ * `strike`, then `extension` innermost around its label).
+ */
 export function inlineToTree(content: readonly EditorInline[]): EditorInlineNode[] {
   const root: EditorInlineNode[] = [];
   const stack: { mark: EditorMark; node: Container }[] = [];
@@ -41,7 +46,9 @@ export function inlineToTree(content: readonly EditorInline[]): EditorInlineNode
       const node: Container =
         mark.type === 'link'
           ? { type: 'link', href: mark.href, children: [] }
-          : { type: mark.type as 'strong' | 'em' | 'strike', children: [] };
+          : mark.type === 'extension'
+            ? { type: 'extension', name: mark.name, id: mark.id, children: [] }
+            : { type: mark.type as 'strong' | 'em' | 'strike', children: [] };
       children().push(node);
       stack.push({ mark, node });
     }
@@ -88,6 +95,8 @@ export function inlineFromTree(
         text?: unknown;
         value?: unknown;
         href?: unknown;
+        name?: unknown;
+        id?: unknown;
         children?: unknown;
       };
       const text =
@@ -124,6 +133,9 @@ export function inlineFromTree(
           href ? sortMarks([...marks, { type: 'link', href }]) : marks,
           depth + 1
         );
+      } else if (type === 'extension') {
+        const extension = budget.extension(node.name, node.id);
+        visit(node.children, extension ? sortMarks([...marks, extension]) : marks, depth + 1);
       } else {
         budget.report('unknown-node', 'Unknown inline nodes kept only their text.');
         if (text !== undefined) out.push(...budget.inline(text, marks));

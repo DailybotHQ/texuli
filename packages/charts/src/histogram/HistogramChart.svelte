@@ -1,4 +1,5 @@
 <script lang="ts">
+import '../table/grid.css';
 import Axis from '../axis/Axis.svelte';
 import { fitChartWidth } from '../math/layout/fit-width.ts';
 import {
@@ -95,7 +96,7 @@ $effect(() => {
       </rect>
     {/each}
   </svg>
-  <details class="data-table">
+  <details class="tx-chart-data">
     <summary>{text.table}</summary>
     <table>
       <caption>{title} data</caption>
@@ -115,10 +116,6 @@ $effect(() => {
   figcaption p { color: var(--tx-muted-foreground, GrayText); margin-block: 0.25rem 0.75rem; }
   svg { display: block; inline-size: 100%; max-block-size: 22rem; }
   rect { fill: var(--tx-chart-1, var(--tx-primary, Highlight)); }
-  .data-table { margin-block-start: 0.75rem; }
-  summary { cursor: pointer; min-block-size: 2.75rem; align-content: center; }
-  table { border-collapse: collapse; inline-size: 100%; }
-  th, td { border: 1px solid var(--tx-chart-grid, var(--tx-border, GrayText)); padding: 0.375rem 0.5rem; text-align: start; }
   @media (forced-colors: active) {
     figcaption p { color: CanvasText; }
     rect { fill: Highlight; stroke: CanvasText; }

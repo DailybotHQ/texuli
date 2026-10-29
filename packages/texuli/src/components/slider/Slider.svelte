@@ -147,6 +147,7 @@ const markByIndex = $derived.by(() => {
   {#each thumbItems as thumb (thumb.index)}
     <SliderPrimitive.Thumb
       {...split.control}
+      id={thumb.index === 0 ? id : undefined}
       index={thumb.index}
       class="tx-slider__thumb"
       aria-label={consumerLabel

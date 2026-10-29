@@ -803,7 +803,7 @@ export function toggleQuote(
  */
 export function toggleMark(
   state: EditorState,
-  type: Exclude<EditorMarkType, 'link'>,
+  type: Exclude<EditorMarkType, 'link' | 'extension'>,
   options?: EditorTransformOptions
 ): EditorTransformResult {
   const c = context(options);

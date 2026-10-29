@@ -78,7 +78,14 @@ export function blueprintTool(catalog: Catalog): {
   };
 }
 
-/** The system prompt: the rules, then each Tier U component's guidance. */
+/**
+ * The system prompt: closed text built only from the catalog (no request
+ * data), so every provider adapter sends the same instructions. The rules
+ * teach the grammar the gate checks (the frame root, headings, nesting) and
+ * the streaming canonical order (ADR-014: `children` last, so each node's
+ * shell can be checked and painted as soon as its children start), then
+ * each Tier U component's guidance.
+ */
 export function systemPrompt(catalog: Catalog): string {
   const lines = [
     'You build interfaces for texuli.com from the Texuli catalog.',
@@ -88,6 +95,11 @@ export function systemPrompt(catalog: Catalog): string {
     '- Use fictional data only (example.com). Never write HTML, scripts, styles or event handlers.',
     '- Links must be https URLs. Leave navigation, sign-in and purchases to the host app.',
     '- Keep one h1 (the frame title) and do not skip heading levels.',
+    '- Never put a heading, a link or a button inside a link or a button.',
+    'Structure:',
+    '- Every node is { "id", "props", "children" } with members in that order: children last.',
+    '- props holds only the props the tool schema lists for that id; leave out what you do not need.',
+    '- children is a list of nodes; leave it out for a node without children.',
     '',
     'Components:',
   ];

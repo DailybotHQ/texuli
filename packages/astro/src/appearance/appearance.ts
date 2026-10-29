@@ -32,6 +32,27 @@ export type ApplyAppearanceOptions = {
 
 const THEME_ID = /^[a-z][a-z0-9-]{0,79}$/;
 
+/**
+ * The window event `applyAppearanceChoice` dispatches after every choice, so
+ * every `AppearanceSwitcher` of the namespace on the page (and any host
+ * listener) follows a change made in the same tab. Other tabs follow through
+ * the `storage` event. Its `detail` is an `AppearanceChangeDetail`.
+ */
+export const APPEARANCE_CHANGE_EVENT = 'tx-appearance-change';
+
+/** The `detail` of an `APPEARANCE_CHANGE_EVENT`. */
+export type AppearanceChangeDetail = {
+  namespace: string;
+  choice: AppearanceChoice;
+};
+
+function announceChange(namespace: string, choice: AppearanceChoice): void {
+  const target = globalThis as Partial<Pick<Window, 'dispatchEvent'>>;
+  if (typeof target.dispatchEvent !== 'function' || typeof CustomEvent !== 'function') return;
+  const detail: AppearanceChangeDetail = { namespace, choice };
+  target.dispatchEvent(new CustomEvent(APPEARANCE_CHANGE_EVENT, { detail }));
+}
+
 /** Read the stored choice for a site namespace; nothing or a malformed cache is `system`. */
 export function readAppearanceChoice(
   namespace: string,
@@ -75,7 +96,9 @@ export function applyAppearanceChoice(
       // Blocked storage: the page still switches for this visit.
     }
     const fallback = options.fallbackMode ?? 'system';
-    return root ? applyColorMode(root, fallback, matchMedia) : 'light';
+    const resolved = root ? applyColorMode(root, fallback, matchMedia) : 'light';
+    announceChange(namespace, choice);
+    return resolved;
   }
 
   const rootTheme = root?.dataset.txTheme;
@@ -99,5 +122,6 @@ export function applyAppearanceChoice(
     root.dataset.txTheme = themeId;
     applyColorMode(root, choice, matchMedia);
   }
+  announceChange(namespace, choice);
   return choice;
 }

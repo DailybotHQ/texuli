@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLButtonAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { menuLevelContext } from '../menu/context.ts';
 import MenuTrigger from '../menu/Trigger.svelte';
 import { menubarContext, menubarMenuContext } from './context.ts';
@@ -12,9 +13,17 @@ import { menubarContext, menubarMenuContext } from './context.ts';
  */
 type Props = Omit<HTMLButtonAttributes, 'children' | 'role'> & {
   children?: import('svelte').Snippet;
-};
+} & RefProp;
 
-let { children, disabled = false, onkeydown, onpointerenter, onfocus, ...rest }: Props = $props();
+let {
+  children,
+  disabled = false,
+  onkeydown,
+  onpointerenter,
+  onfocus,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const bar = menubarContext.get();
 const menu = menubarMenuContext.get();
@@ -66,7 +75,7 @@ function handleFocus(event: FocusEvent & { currentTarget: EventTarget & HTMLButt
 }
 </script>
 
-<MenuTrigger
+<MenuTrigger bind:ref
   {...rest}
   {disabled}
   role="menuitem"

@@ -42,8 +42,10 @@ describe('the stage landmark name', () => {
       for (const title of ['Alpha', 'Beta']) {
         render(DeckStage, { props: { deck: deck(title), loadTheme: null, syncHash: false } });
       }
-      await waitFor(() =>
-        expect(stages().every((stage) => !stage.hasAttribute('aria-busy'))).toBe(true)
+      // The default tables load lazily; on a loaded host that can take more than a second.
+      await waitFor(
+        () => expect(stages().every((stage) => !stage.hasAttribute('aria-busy'))).toBe(true),
+        { timeout: 10_000 }
       );
       expect(names()).toEqual(['Presentation: Alpha', 'Presentation: Beta']);
     });
@@ -58,7 +60,9 @@ describe('the stage landmark name', () => {
       render(DeckStage, {
         props: { deck: hostile, loadTheme: null, syncHash: false, defaultRenderers: false },
       });
-      await waitFor(() => expect(stages()[0]?.getAttribute('data-tx-deck-invalid')).toBe('true'));
+      await waitFor(() => expect(stages()[0]?.getAttribute('data-tx-deck-invalid')).toBe('true'), {
+        timeout: 10_000,
+      });
       expect(names()).toEqual([null]);
     });
   });

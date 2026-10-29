@@ -1,14 +1,21 @@
-import type { GridColumnDef, GridValueType } from '../engines/grid/columns.ts';
+import type { GridValueType } from '../engines/grid/columns.ts';
 import {
-  compileFilter,
   FILTER_LIMITS,
   type FilterCondition,
   type FilterGroup,
   type FilterNode,
-  type FilterOperator,
-  filterSchemaFor,
-  OPERATORS_BY_TYPE,
 } from '../engines/grid/filter.ts';
+import {
+  catalogSchema,
+  compileCatalogFilter,
+  completeFor,
+  customDefault,
+  customOperator,
+  type FilterAnyOperator,
+  type FilterField,
+  type FilterOperatorDef,
+  offeredOperators,
+} from './catalog.ts';
 
 /**
  * The filter builder's model is the grid engine's filter AST (`FilterGroup`
@@ -19,15 +26,14 @@ import {
  * `pruneFilter` drops those before the filter runs.
  */
 
+export type { FilterField };
+
 /**
- * A field the builder offers: a grid column (`key`, `header`, `type`,
- * `options` for enums, `accessor`). DataGrid columns can be passed as-is.
- * `T` is the row type; the bare `FilterField` accepts fields of any row type.
+ * Every helper below takes an optional `operators` catalog
+ * (`FilterOperatorDef[]`, see `catalog.ts`): host operators are offered,
+ * defaulted, completed, validated and run like the built-ins.
  */
-export type FilterField<T = never> = Pick<
-  GridColumnDef<T>,
-  'key' | 'header' | 'type' | 'options' | 'accessor'
->;
+type Operators = readonly FilterOperatorDef<never>[] | undefined;
 
 /** A node's position: child indexes from the root group (`[]` is the root). */
 export type FilterPath = readonly number[];
@@ -39,13 +45,30 @@ export function emptyFilter(op: FilterGroup['op'] = 'and'): FilterGroup {
   return { type: 'group', op, children: [] };
 }
 
-/** The operators that fit a field's type, in menu order. */
-export function operatorsFor(field: Pick<FilterField, 'type'>): readonly FilterOperator[] {
-  return OPERATORS_BY_TYPE[field.type];
+/**
+ * The operators a field offers, in menu order: the built-ins that fit its
+ * type, then the catalog operators that fit it (or the field's own
+ * `operators` list).
+ */
+export function operatorsFor(
+  field: Pick<FilterField, 'type' | 'operators'>,
+  operators?: Operators
+): readonly FilterAnyOperator[] {
+  return offeredOperators(field, operators);
 }
 
-/** The starting value of an operator: booleans start true, enums at their first option, the rest empty. */
-export function defaultValue(operator: FilterOperator, field: FilterField): Value {
+/**
+ * The starting value of an operator: booleans start true, enums at their
+ * first option, the rest empty; a catalog operator's `defaultValue`, else by
+ * its editor.
+ */
+export function defaultValue(
+  operator: FilterAnyOperator,
+  field: FilterField,
+  operators?: Operators
+): Value {
+  const custom = customOperator(operator, operators);
+  if (custom) return customDefault(custom, field);
   if (operator === 'isEmpty' || operator === 'isNotEmpty') return undefined;
   if (operator === 'in') return [];
   if (operator === 'between') return [null, null];
@@ -56,12 +79,19 @@ export function defaultValue(operator: FilterOperator, field: FilterField): Valu
   return undefined;
 }
 
-/** A new condition on `field`: `contains` for text, else its first operator, with that operator's starting value. */
-export function newCondition(field: FilterField): FilterCondition {
-  const operator = field.type === 'text' ? 'contains' : (operatorsFor(field)[0] as FilterOperator);
+/**
+ * A new condition on `field`: `contains` for text (when offered), else its
+ * first operator, with that operator's starting value.
+ */
+export function newCondition(field: FilterField, operators?: Operators): FilterCondition {
+  const offered = operatorsFor(field, operators);
+  const operator =
+    field.type === 'text' && offered.includes('contains')
+      ? 'contains'
+      : ((offered[0] ?? 'isNotEmpty') as FilterAnyOperator);
   return withValue(
     { type: 'condition', field: field.key, operator },
-    defaultValue(operator, field)
+    defaultValue(operator, field, operators)
   );
 }
 
@@ -73,8 +103,10 @@ function withValue(condition: FilterCondition, value: Value): FilterCondition {
 const blank = (value: unknown) => value === undefined || value === null || value === '';
 
 /** True when a condition can run: it has every value its operator needs. */
-export function isComplete(condition: FilterCondition): boolean {
+export function isComplete(condition: FilterCondition, operators?: Operators): boolean {
   const { operator, value } = condition;
+  const custom = customOperator(operator, operators);
+  if (custom) return completeFor(custom.editor, value);
   if (operator === 'isEmpty' || operator === 'isNotEmpty') return true;
   if (operator === 'in') return Array.isArray(value) && value.length > 0 && !value.some(blank);
   if (operator === 'between')
@@ -121,10 +153,11 @@ function appendTo(root: FilterGroup, groupPath: FilterPath, child: FilterNode): 
 export function addCondition(
   root: FilterGroup,
   groupPath: FilterPath,
-  fields: readonly FilterField[]
+  fields: readonly FilterField[],
+  operators?: Operators
 ): FilterGroup {
   const field = fields[0];
-  return field ? appendTo(root, groupPath, newCondition(field)) : root;
+  return field ? appendTo(root, groupPath, newCondition(field, operators)) : root;
 }
 
 /**
@@ -136,7 +169,8 @@ export function addCondition(
 export function addGroup(
   root: FilterGroup,
   groupPath: FilterPath,
-  fields: readonly FilterField[]
+  fields: readonly FilterField[],
+  operators?: Operators
 ): FilterGroup {
   const parent = nodeAt(root, groupPath);
   const field = fields[0];
@@ -147,7 +181,7 @@ export function addGroup(
   return appendTo(root, groupPath, {
     type: 'group',
     op: parent.op === 'and' ? 'or' : 'and',
-    children: [newCondition(field)],
+    children: [newCondition(field, operators)],
   });
 }
 
@@ -170,35 +204,57 @@ export function setCombinator(
  * the new field's type allows it (else its first operator), and the value
  * resets when the type changes.
  */
-export function changeField(root: FilterGroup, path: FilterPath, field: FilterField): FilterGroup {
+export function changeField(
+  root: FilterGroup,
+  path: FilterPath,
+  field: FilterField,
+  operators?: Operators
+): FilterGroup {
   return updateAt(root, path, (node) => {
     if (node.type !== 'condition') return node;
-    const operators = operatorsFor(field);
-    const operator = operators.includes(node.operator)
+    const offered = operatorsFor(field, operators);
+    const operator = offered.includes(node.operator)
       ? node.operator
-      : (operators[0] as FilterOperator);
-    return withValue({ ...node, field: field.key, operator }, defaultValue(operator, field));
+      : ((offered[0] ?? 'isNotEmpty') as FilterAnyOperator);
+    return withValue(
+      { ...node, field: field.key, operator },
+      defaultValue(operator, field, operators)
+    );
   });
 }
 
-const shape = (operator: FilterOperator) =>
-  operator === 'in' || operator === 'between'
+const shape = (operator: FilterAnyOperator, operators: Operators) => {
+  const custom = customOperator(operator, operators);
+  if (custom)
+    return custom.editor === 'none'
+      ? 'none'
+      : custom.editor === 'options'
+        ? 'in'
+        : custom.editor === 'range'
+          ? 'between'
+          : 'one';
+  return operator === 'in' || operator === 'between'
     ? operator
     : operator === 'isEmpty' || operator === 'isNotEmpty'
       ? 'none'
       : 'one';
+};
 
 /** Changes the operator at `path`, keeping the value when its shape still fits. */
 export function changeOperator(
   root: FilterGroup,
   path: FilterPath,
-  operator: FilterOperator,
-  field: FilterField
+  operator: FilterAnyOperator,
+  field: FilterField,
+  operators?: Operators
 ): FilterGroup {
   return updateAt(root, path, (node) => {
     if (node.type !== 'condition') return node;
-    const keep = shape(node.operator) === shape(operator);
-    return withValue({ ...node, operator }, keep ? node.value : defaultValue(operator, field));
+    const keep = shape(node.operator, operators) === shape(operator, operators);
+    return withValue(
+      { ...node, operator },
+      keep ? node.value : defaultValue(operator, field, operators)
+    );
   });
 }
 
@@ -214,10 +270,14 @@ export function changeValue(root: FilterGroup, path: FilterPath, value: Value): 
  * `fields`, those with a `filterIssues` problem), then the groups that
  * leaves empty. The root stays, possibly empty.
  */
-export function pruneFilter(root: FilterGroup, fields?: readonly FilterField[]): FilterGroup {
-  const schema = fields ? filterSchemaFor(fields) : null;
+export function pruneFilter(
+  root: FilterGroup,
+  fields?: readonly FilterField[],
+  operators?: Operators
+): FilterGroup {
+  const schema = fields ? catalogSchema(fields, operators) : null;
   const runs = (node: FilterCondition) =>
-    isComplete(node) && (!schema || schema.safeParse(node).success);
+    isComplete(node, operators) && (!schema || schema.safeParse(node).success);
   const visit = (node: FilterNode): FilterNode | null => {
     if (node.type === 'condition') return runs(node) ? node : null;
     const children = node.children.map(visit).filter((child) => child !== null);
@@ -237,8 +297,12 @@ export interface FilterIssue {
  * operators that do not fit, and values of the wrong kind (for example an
  * enum value outside its options). Incomplete conditions are not issues.
  */
-export function filterIssues(root: FilterGroup, fields: readonly FilterField[]): FilterIssue[] {
-  const schema = filterSchemaFor(fields);
+export function filterIssues(
+  root: FilterGroup,
+  fields: readonly FilterField[],
+  operators?: Operators
+): FilterIssue[] {
+  const schema = catalogSchema(fields, operators);
   const issues: FilterIssue[] = [];
   const visit = (node: FilterNode, path: number[]) => {
     if (node.type === 'group') {
@@ -247,7 +311,7 @@ export function filterIssues(root: FilterGroup, fields: readonly FilterField[]):
       });
       return;
     }
-    if (!isComplete(node)) return;
+    if (!isComplete(node, operators)) return;
     const result = schema.safeParse(node);
     if (!result.success) issues.push({ path, message: result.error.message });
   };
@@ -259,8 +323,12 @@ export function filterIssues(root: FilterGroup, fields: readonly FilterField[]):
  * Reads a saved model (untrusted JSON) and checks it against `fields`;
  * throws a `ValidationError`. A bare condition is wrapped in an `and` group.
  */
-export function parseFilter(input: unknown, fields: readonly FilterField[]): FilterGroup {
-  const node = filterSchemaFor(fields).parse(input);
+export function parseFilter(
+  input: unknown,
+  fields: readonly FilterField[],
+  operators?: Operators
+): FilterGroup {
+  const node = catalogSchema(fields, operators).parse(input);
   return node.type === 'group' ? node : { type: 'group', op: 'and', children: [node] };
 }
 
@@ -295,17 +363,20 @@ function fieldsOf(root: FilterGroup): FilterField[] {
  * `filterIssues`) are skipped, text compares without case, and an empty
  * model keeps every row. Pass the `fields` (or grid columns) for typed
  * comparison and custom accessors; without them each field reads `row[key]`
- * and its type is inferred from the model's values. A model past
+ * and its type is inferred from the model's values. Catalog `operators` run
+ * through their host `test` (a throw does not match). A model past
  * `FILTER_LIMITS` throws a `ValidationError`.
  */
 export function applyFilter<T>(
   rows: readonly T[],
   model: FilterGroup,
-  fields?: readonly FilterField<T>[]
+  fields?: readonly FilterField<T>[],
+  operators?: readonly FilterOperatorDef<T>[]
 ): T[] {
-  const columns = (fields ?? fieldsOf(model)) as readonly GridColumnDef<T>[];
-  const runnable = pruneFilter(model, columns);
+  const columns = fields ?? (fieldsOf(model) as FilterField<T>[]);
+  const ops = operators as Operators;
+  const runnable = pruneFilter(model, columns as readonly FilterField[], ops);
   if (runnable.children.length === 0) return [...rows];
-  const test = compileFilter<T>(runnable, columns);
+  const test = compileCatalogFilter<T>(runnable, columns, operators);
   return rows.filter(test);
 }

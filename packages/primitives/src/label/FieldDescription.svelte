@@ -2,6 +2,7 @@
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { fieldContext } from './context.ts';
 
 /** Help text the control is described by while this part is mounted. */
@@ -10,7 +11,7 @@ type FieldDescriptionProps = HTMLAttributes<HTMLElement> & {
   children?: Snippet;
 };
 
-let { child, children, ...rest }: FieldDescriptionProps = $props();
+let { child, children, ref = $bindable(null), ...rest }: FieldDescriptionProps & RefProp = $props();
 const field = fieldContext.get();
 // A consumer id wins: the context records it, so every reference follows.
 field.claimId(
@@ -29,5 +30,5 @@ const partProps = $derived({ ...rest, id: field.descriptionId, 'data-field-descr
 {#if child}
   {@render child({ props: partProps })}
 {:else}
-  <p {...partProps}>{@render children?.()}</p>
+  <p bind:this={ref} {...partProps}>{@render children?.()}</p>
 {/if}

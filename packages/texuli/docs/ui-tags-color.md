@@ -21,11 +21,18 @@ Styled tags field and color picker on owned primitives
 <TagsInput bind:value={topics} label="Topics" inputLabel="Add a topic" max={8} />
 ```
 
-Supports delimiter (default `,`), paste split, blur-add, duplicates policy,
+Supports delimiter (default `,`; a list such as `delimiter={[',', ';', ' ']}`
+adds a tag on any of those keys, and a RegExp adds one on every character it
+matches), paste split, blur-add, duplicates policy,
 `max`, and `validate`. Each refused tag fires `onInvalid({ tag, reason,
 message? })` with `reason` `'duplicate'`, `'max'` or `'invalid'` (refused by
 `validate`; a returned string is `message`), and the draft stays for
 correction.
+
+`readonly` keeps the tags visible and focusable but nothing can be added or
+removed (the input is read-only, the remove buttons are disabled, the root
+has `data-readonly`). `id` lands on the text input, so `<label for>` and a
+`Field` target the focusable control; `bind:ref` is the root group.
 
 The draft text is bindable: `bind:inputValue` reads and writes it (cleared
 once it becomes tags), and `onInputValueChange(value)` reports every change

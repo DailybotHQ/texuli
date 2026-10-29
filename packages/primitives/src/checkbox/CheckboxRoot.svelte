@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { getCheckboxGroupContext } from './context.ts';
 import { type CheckboxFormBridge, createCheckboxFormBridge } from './form.ts';
@@ -20,7 +21,7 @@ type Props = Omit<HTMLButtonAttributes, 'type' | 'children' | 'value' | 'disable
   onIndeterminateChange?: (indeterminate: boolean) => void;
   child?: ChildSnippet<Record<string, unknown>>;
   children?: Snippet<[{ checked: boolean; indeterminate: boolean }]>;
-};
+} & RefProp;
 
 let {
   checked = $bindable(),
@@ -40,6 +41,7 @@ let {
   class: className,
   onclick,
   onkeydown,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -106,6 +108,10 @@ function toggle(): void {
 }
 
 let rootEl = $state<HTMLButtonElement | null>(null);
+// `ref` follows the element the part binds for its own behavior.
+$effect(() => {
+  ref = rootEl ?? null;
+});
 let bridge: CheckboxFormBridge | null = null;
 
 $effect(() => {

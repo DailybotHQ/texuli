@@ -3,6 +3,7 @@ import { createTypeahead } from '@texuli/core/roving';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { type ListboxItemData, listboxContext } from './context.ts';
 
 type Selection = string | readonly string[] | undefined;
@@ -17,7 +18,7 @@ type Props = HTMLAttributes<HTMLDivElement> & {
   onValueChange?: (value: Selection) => void;
   onActiveChange?: (value: string, index: number) => void;
   children?: Snippet;
-};
+} & RefProp;
 
 let {
   value = $bindable(),
@@ -31,6 +32,7 @@ let {
   onActiveChange,
   children,
   onkeydown,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -170,7 +172,7 @@ const context = {
 listboxContext.set(context);
 </script>
 
-<div
+<div bind:this={ref}
   {...rest}
   id={id ?? generatedId}
   role="listbox"

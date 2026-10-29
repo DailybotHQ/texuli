@@ -111,6 +111,7 @@ The host owns every option; the blueprint can set none of them.
 | `composer`, `hostRegions` | Host snippets painted outside the validated tree (see Composer host chrome and Host regions) |
 | `selectable`, `selection`, `onSelectionChange` | Frame selection for a builder preview (see Selection) |
 | `motion` | `auto` (default) follows `prefers-reduced-motion`; `reduce` stops motion whatever the user setting (see Motion) |
+| `motionLevel` | `full`, `subtle` or `none`: the host's level for spec 0.6.0 node motion, over the blueprint's `motion.level`; default the blueprint's, else `full` (see Motion) |
 | `view`, `onFlowChange` | The current flow view and its transitions (see Views and flows) |
 | `onAction` | Answers action-form intents; without it, actions are unavailable (see Action surface and receipts) |
 | `dataSources` | Host values for host-bound state variables (see Host data binding) |
@@ -301,9 +302,30 @@ host without the tokens' `base.css` still gets it:
 | `motion="reduce"` (host) | Stops motion inside the player whatever the user setting. Also a frame-protocol option |
 | `motion="auto"` (default) | Follows `prefers-reduced-motion`, live, through `matchMedia` |
 | Root attribute | Under either, the root carries the tokens' `data-tx-motion="reduce"` |
-| Scoped override | `player.css` zeroes `--tx-motion-fast`, `--tx-motion-base` and `--tx-motion-slow`, sets `--tx-motion-easing: linear`, and cuts animation and transition durations to `0.01ms` for the player and everything painted inside it, under `data-tx-motion="reduce"` and the media query. The selectors are scoped to `.tx-player`, so host content outside is untouched |
+| Scoped override | `player.css` zeroes `--tx-motion-fast`, `--tx-motion-base` and `--tx-motion-slow`, sets `--tx-motion-easing: linear`, and sets animation and transition durations and delays to `0s` (G78) for the player and everything painted inside it, under `data-tx-motion="reduce"` and the media query. The selectors are scoped to `.tx-player`, so host content outside is untouched |
 | Player-owned motion | Every player transition is timed with `--tx-motion-*` tokens (a test checks the stylesheet), so the policy reaches it |
 | Blueprint motion | A slide `transition` and a block `reveal` are presenter fields: the document flow paints them as nothing, so nothing animates or stays hidden |
+
+#### Node motion (spec 0.6.0)
+
+A node's checked `motion` ([the vocabulary](../../spec/docs/motion.md))
+plays through `@texuli/core/motion`
+(`src/motion/`, tests in `tests/motion.test.ts`):
+
+| Rule | How |
+| --- | --- |
+| Wrapper | A node with motion paints inside `<div class="tx-player__motion" data-tx-player-motion="<path>">`, `display: contents`, so layouts see the node's own element; the animations play on its element children (at most 8) and leave no inline style (`fill: "none"`) |
+| Names to tokens | Durations read the theme's `--tx-motion-fast`, `--tx-motion-base` and `--tx-motion-slow` (150, 200 and 300 ms by default); easings are the `enter`, `exit` and `standard` tokens; `rise` travels 8 px, the slides 16 px (mirrored right to left), `scale` grows from 96% |
+| Enter | Plays when a node appears after the first paint: once its painter loads, after a `when` change, a flow view, a live update or a stream. Nothing plays on the server, and nothing for a node present at the first paint, so a hydrated page shows its end state |
+| Stagger | A node's `stagger` delays its entering children by 30 ms (`fast`) or 40 ms (`base`) each; the spread is held to 1,000 ms |
+| Exit | A node with `exit` that leaves the plan stays painted, `inert` and marked `data-tx-player-motion-leaving`, while the reversed preset plays (at most 64 at once, and at most 1,200 ms if the runtime never reports), then goes |
+| Layout | Nodes with `layout: true` animate from where they were after each repaint (FLIP), measured before the repaint and played after it |
+| Level | The host's `motionLevel`, else the blueprint's `motion.level`, else `full`; `subtle` shortens durations and keeps only the fade; `none`, `motion="reduce"` and `prefers-reduced-motion` paint at once and drop leaving nodes at once |
+| Loading | The runtime (`src/motion/runtime.ts` with `@texuli/core/motion`) loads only once a painted node declares motion |
+| Refused motion | A motion outside the vocabulary is an `invalid-motion` error in validation; in `preview` the node paints without it |
+
+Not covered yet: the frame protocol has no `motionLevel` option, and a node
+that gains or loses `motion` in a live update remounts its component.
 
 ### Announcements
 

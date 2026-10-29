@@ -3,6 +3,8 @@ import { Accordion as AccordionPrimitive } from '@texuli/primitives/accordion';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { MotionProp } from '../../motion/contract.ts';
+import { createSizeMotion } from '../../motion/seam.ts';
 import Chevron from './Chevron.svelte';
 import type { AccordionItemDef } from './types.ts';
 import { type AccordionVariant, accordionRootClass } from './variants.ts';
@@ -20,6 +22,11 @@ type OwnProps = {
   disabled?: boolean;
   class?: ClassValue;
   content?: Snippet<[AccordionItemDef]>;
+  /**
+   * Motion (`texuli/motion`): panels animate their height open and closed
+   * (`layout`, default on); `false` for none.
+   */
+  motion?: MotionProp;
   /** The rendered root element (bindable). */
   ref?: HTMLElement | null;
 };
@@ -42,9 +49,15 @@ let {
   disabled = false,
   class: className,
   content,
+  motion,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+const panelMotion = createSizeMotion({
+  motion: () => motion,
+  defaults: { layout: true, duration: 'base' },
+});
 
 // Local bindables so the primitive can own open state and still notify hosts.
 let singleValue = $state(typeof value === 'string' ? value : '');
@@ -80,7 +93,11 @@ const rootClass = $derived(
           <Chevron class="tx-accordion__chevron" />
         </AccordionPrimitive.Trigger>
       </AccordionPrimitive.Header>
-      <AccordionPrimitive.Content class="tx-accordion__content" data-tx-accordion-content="">
+      <AccordionPrimitive.Content
+        class="tx-accordion__content"
+        data-tx-accordion-content=""
+        motionHooks={panelMotion}
+      >
         <div class="tx-accordion__content-inner">
           {#if content}
             {@render content(item)}

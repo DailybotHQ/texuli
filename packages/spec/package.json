@@ -1,6 +1,6 @@
 {
   "name": "@texuli/spec",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "The schema-first blueprint contract: JSON schemas, the catalog vocabulary, deterministic TypeScript and Kotlin projections, and the conformance harness.",
   "keywords": [
@@ -43,6 +43,14 @@
     "./surface": {
       "types": "./src/surface.ts",
       "default": "./src/surface.ts"
+    },
+    "./motion": {
+      "types": "./src/motion.ts",
+      "default": "./src/motion.ts"
+    },
+    "./stream": {
+      "types": "./src/stream/index.ts",
+      "default": "./src/stream/index.ts"
     }
   },
   "scripts": {

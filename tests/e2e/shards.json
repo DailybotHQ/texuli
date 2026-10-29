@@ -5,7 +5,9 @@
       "a11y-display.spec.ts",
       "a11y-overlays.spec.ts",
       "analytics.spec.ts",
+      "bugs-75-79.spec.ts",
       "csp-report.spec.ts",
+      "pages-editor.spec.ts",
       "responsive-sweep.spec.ts",
       "site-docs-shell.spec.ts",
       "site-drag-workflows.spec.ts",
@@ -16,6 +18,8 @@
       "a11y-site-1.spec.ts",
       "astro-islands.spec.ts",
       "chat.spec.ts",
+      "pages-print.spec.ts",
+      "player-streaming.spec.ts",
       "site-builder.spec.ts",
       "site-docs-nav.spec.ts",
       "site-perf.spec.ts",
@@ -26,10 +30,12 @@
       "a11y-site-2.spec.ts",
       "charts.spec.ts",
       "layouts-app.spec.ts",
+      "pages-collab.spec.ts",
       "renderer-hostile.spec.ts",
       "site-examples.spec.ts",
       "site-ia.spec.ts",
       "site-keyboard.spec.ts",
+      "site-motion.spec.ts",
       "site-playground.spec.ts"
     ],
     [
@@ -45,6 +51,7 @@
     ],
     [
       "csp.spec.ts",
+      "gaps-80-85.spec.ts",
       "site-blocks-page.spec.ts",
       "site-component-pages.spec.ts",
       "site-gallery-themes.spec.ts",
@@ -55,6 +62,7 @@
     ],
     [
       "a11y-forms.spec.ts",
+      "print-isolation.spec.ts",
       "site-charts-page.spec.ts",
       "site-landing.spec.ts",
       "site-live-gallery.spec.ts",

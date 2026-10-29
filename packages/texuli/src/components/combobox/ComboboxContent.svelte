@@ -11,7 +11,7 @@ type Props = ComponentProps<typeof PrimitiveContent> & {
   class?: ClassValue;
 };
 
-let { children, class: className, size = 'md', ...rest }: Props = $props();
+let { children, class: className, size = 'md', ref = $bindable(null), ...rest }: Props = $props();
 
 const classes = $derived(
   comboboxContentClass({
@@ -21,6 +21,6 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveContent class={classes} data-tx-combobox-content data-size={size} {...rest}>
+<PrimitiveContent bind:ref class={classes} data-tx-combobox-content data-size={size} {...rest}>
   {@render children?.()}
 </PrimitiveContent>

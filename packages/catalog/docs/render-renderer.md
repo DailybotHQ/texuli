@@ -23,6 +23,8 @@ Turn an untrusted **catalog tree** (component ids + props + children) into a
 | `when` that is not a valid condition, or no condition runtime | **Node dropped** (`invalid-condition`) |
 | Valid `when` that is false or unknown | Node hidden, no diagnostic; its subtree was still checked |
 | `when` on a root node | Ignored, node kept (`invalid-condition`) |
+| `motion` outside the spec 0.6.0 vocabulary (CSS, keyframes, milliseconds, unknown names) | Motion dropped, node kept (`invalid-motion`) |
+| Valid `motion` | A frozen copy on the render node (`RenderNode.motion`), passed to the paint plan |
 
 ## Named slots (audit G04)
 

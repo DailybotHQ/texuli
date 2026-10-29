@@ -1,0 +1,207 @@
+/* biome-ignore-all lint/complexity/noImportantStyles: print must win over the host page: the sheets print 1:1 and print isolation hides everything outside the view (the G80 pattern of the slides print view). */
+/* @texuli/pages/paged: real pages on screen and in print. Page boxes are
+   sized in millimetres from the page settings; theme through --tx-* tokens;
+   logical properties only. */
+
+.tx-pages-paged {
+  --tx-pages-paged-desk: var(--tx-muted, color-mix(in oklab, Canvas 92%, CanvasText));
+  --tx-pages-paged-paper: var(--tx-background, Canvas);
+  --tx-pages-paged-band: var(--tx-muted-foreground, GrayText);
+  position: relative;
+  padding: 1.5rem 0.75rem;
+  background: var(--tx-pages-paged-desk);
+  overflow-x: clip;
+}
+
+.tx-pages-paged__sheets {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.tx-pages-paged__page {
+  position: relative;
+  box-sizing: border-box;
+  flex: none;
+  overflow: hidden;
+  background: var(--tx-pages-paged-paper);
+  color: var(--tx-foreground, CanvasText);
+  border: 1px solid var(--tx-border, color-mix(in oklab, CanvasText 15%, transparent));
+  border-radius: 2px;
+  box-shadow: 0 1px 3px color-mix(in oklab, CanvasText 18%, transparent);
+}
+
+.tx-pages-paged__body {
+  position: absolute;
+}
+
+.tx-pages-paged__slice {
+  position: absolute;
+  inset-inline: 0;
+  overflow: hidden;
+}
+
+.tx-pages-paged__unit {
+  display: flow-root;
+}
+
+/* Blocks own their spacing through the paginator's gap, not their margins. */
+.tx-pages-paged__unit > :first-child {
+  margin-block-start: 0;
+}
+.tx-pages-paged__unit > :last-child {
+  margin-block-end: 0;
+}
+
+.tx-pages-paged__band {
+  position: absolute;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: var(--tx-pages-paged-band);
+  font-variant-numeric: tabular-nums;
+}
+
+.tx-pages-paged__band > :nth-child(2) {
+  text-align: center;
+}
+.tx-pages-paged__band > :last-child {
+  text-align: end;
+}
+
+/* The measuring copy: laid out at the content width, never seen or reached. */
+.tx-pages-paged__measure {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  visibility: hidden;
+  pointer-events: none;
+  contain: layout style;
+}
+
+@media (forced-colors: active) {
+  .tx-pages-paged__page {
+    border-color: CanvasText;
+  }
+}
+
+@page tx-pages-a4-portrait {
+  size: 210mm 297mm;
+  margin: 0;
+}
+@page tx-pages-a4-landscape {
+  size: 297mm 210mm;
+  margin: 0;
+}
+@page tx-pages-a5-portrait {
+  size: 148mm 210mm;
+  margin: 0;
+}
+@page tx-pages-a5-landscape {
+  size: 210mm 148mm;
+  margin: 0;
+}
+@page tx-pages-letter-portrait {
+  size: 215.9mm 279.4mm;
+  margin: 0;
+}
+@page tx-pages-letter-landscape {
+  size: 279.4mm 215.9mm;
+  margin: 0;
+}
+@page tx-pages-legal-portrait {
+  size: 215.9mm 355.6mm;
+  margin: 0;
+}
+@page tx-pages-legal-landscape {
+  size: 355.6mm 215.9mm;
+  margin: 0;
+}
+
+@media print {
+  .tx-pages-paged {
+    padding: 0;
+    background: none;
+  }
+
+  .tx-pages-paged__sheets {
+    display: block;
+    zoom: 1 !important;
+  }
+
+  .tx-pages-paged__measure {
+    display: none;
+  }
+
+  .tx-pages-paged__page {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    break-after: page;
+    break-inside: avoid;
+  }
+
+  .tx-pages-paged__page:last-child {
+    break-after: auto;
+  }
+
+  .tx-pages-paged__page[data-page-name="tx-pages-a4-portrait"] {
+    page: tx-pages-a4-portrait;
+  }
+  .tx-pages-paged__page[data-page-name="tx-pages-a4-landscape"] {
+    page: tx-pages-a4-landscape;
+  }
+  .tx-pages-paged__page[data-page-name="tx-pages-a5-portrait"] {
+    page: tx-pages-a5-portrait;
+  }
+  .tx-pages-paged__page[data-page-name="tx-pages-a5-landscape"] {
+    page: tx-pages-a5-landscape;
+  }
+  .tx-pages-paged__page[data-page-name="tx-pages-letter-portrait"] {
+    page: tx-pages-letter-portrait;
+  }
+  .tx-pages-paged__page[data-page-name="tx-pages-letter-landscape"] {
+    page: tx-pages-letter-landscape;
+  }
+  .tx-pages-paged__page[data-page-name="tx-pages-legal-portrait"] {
+    page: tx-pages-legal-portrait;
+  }
+  .tx-pages-paged__page[data-page-name="tx-pages-legal-landscape"] {
+    page: tx-pages-legal-landscape;
+  }
+  .tx-pages-paged__page[data-page-name="tx-pages-custom"] {
+    page: tx-pages-custom;
+  }
+
+  /*
+   * Isolation (the G80 pattern): only a paged view marked
+   * `data-tx-print-isolate` and its ancestors print, without their box
+   * spacing. Both rules apply only while such a target is mounted
+   * (`:root:has(…)`), so a print before the view mounts (or after it
+   * unmounts) prints the page as is, never a blank sheet. A browser without
+   * `:has()` drops the rules and prints the page.
+   */
+  *:has([data-tx-print-isolate="true"]) {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    inline-size: auto !important;
+    max-inline-size: none !important;
+    min-block-size: 0 !important;
+    transform: none !important;
+  }
+
+  :root:has([data-tx-print-isolate="true"])
+    body
+    *:not(:has([data-tx-print-isolate="true"])):not([data-tx-print-isolate="true"]):not(
+      [data-tx-print-isolate="true"] *
+    ) {
+    display: none !important;
+  }
+}

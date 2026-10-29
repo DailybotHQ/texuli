@@ -1,5 +1,6 @@
 <script lang="ts">
 import { composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { paginationContext } from './context.ts';
 import { getPageCount, getPageTokens } from './pages.ts';
@@ -21,8 +22,9 @@ let {
   child,
   children,
   class: className,
+  ref = $bindable(null),
   ...rest
-}: PaginationRootProps = $props();
+}: PaginationRootProps & RefProp = $props();
 
 const count = $derived(getPageCount(pageCount, total, pageSize));
 const currentPage = $derived(
@@ -66,7 +68,7 @@ const childProps = $derived(child ? composeChildProps(rootProps, {}) : rootProps
 {#if child}
   {@render child({ props: childProps })}
 {:else}
-  <nav {...childProps}>
+  <nav bind:this={ref} {...childProps}>
     {#if children}
       {@render children(snippetArgs)}
     {:else}

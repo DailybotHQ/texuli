@@ -14,7 +14,13 @@ export type EditorMark =
   | { type: 'em' }
   | { type: 'strike' }
   | { type: 'code' }
-  | { type: 'link'; href: string };
+  | { type: 'link'; href: string }
+  /**
+   * A host inline extension entity (a mention, a reference) over its label
+   * text: `name` is a registered extension, `id` the entity (G48). Excludes
+   * `link` and `code` on the same run.
+   */
+  | { type: 'extension'; name: string; id: string };
 
 export type EditorMarkType = EditorMark['type'];
 
@@ -141,6 +147,7 @@ export const EDITOR_MARK_ORDER: readonly EditorMarkType[] = [
   'em',
   'strike',
   'code',
+  'extension',
 ];
 
 export const EDITOR_BLOCK_TYPES: readonly EditorBlockType[] = [

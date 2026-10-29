@@ -1,4 +1,5 @@
 <script lang="ts">
+import { createAttachmentKey } from 'svelte/attachments';
 import type { SVGAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { ICON_SIZES, iconClass } from './icon-variants.ts';
@@ -26,8 +27,12 @@ let {
   label,
   class: className,
   'aria-label': ariaLabel,
+  ref = $bindable(null),
   ...rest
-}: Props = $props();
+}: Props & {
+  /** The rendered `<svg>` (bindable). */
+  ref?: SVGSVGElement | null;
+} = $props();
 
 const pixelSize = $derived(ICON_SIZES[size]);
 const name = $derived(typeof icon === 'string' && isIconName(icon) ? icon : undefined);
@@ -42,8 +47,21 @@ const glyphColor = $derived(color === null || color === undefined ? undefined : 
  * Props for a custom Glyph. Built as a plain object so the spread stays a
  * finite type (avoiding Svelte's "union too complex" on rest + overrides).
  */
+/**
+ * A component icon (Lucide) spreads its props on its `<svg>`, so an attachment
+ * in them binds `ref` to that element.
+ */
+const refKey = createAttachmentKey();
+function bindGlyph(node: Element): () => void {
+  ref = node as SVGSVGElement;
+  return () => {
+    if (ref === node) ref = null;
+  };
+}
+
 const glyphProps = $derived({
   ...rest,
+  [refKey]: bindGlyph,
   class: classes,
   size: pixelSize,
   strokeWidth,
@@ -60,7 +78,7 @@ const glyphProps = $derived({
 </script>
 
 {#if path}
-  <svg
+  <svg bind:this={ref}
     {...rest}
     class={classes}
     width={pixelSize}

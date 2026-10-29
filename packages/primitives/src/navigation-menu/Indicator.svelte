@@ -2,11 +2,12 @@
 import { directionOf } from '@texuli/core/dir-locale';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { navigationMenuContext } from './context.ts';
 
 type IndicatorProps = HTMLAttributes<HTMLDivElement> & { children?: Snippet };
 
-let { children, ...rest }: IndicatorProps = $props();
+let { children, ref = $bindable(null), ...rest }: IndicatorProps & RefProp = $props();
 const context = navigationMenuContext.get();
 let box = $state({ offset: 0, size: 0 });
 
@@ -31,7 +32,7 @@ $effect(() => {
 });
 </script>
 
-<div
+<div bind:this={ref}
   aria-hidden="true"
   data-state={context.value ? 'visible' : 'hidden'}
   data-orientation={context.orientation}

@@ -292,7 +292,8 @@ function conditionChip<T>(
       : value === null
         ? '(empty)'
         : String(value));
-  const operator = FILTER_OPERATOR_LABELS[condition.operator];
+  const operator =
+    FILTER_OPERATOR_LABELS[condition.operator as FilterOperator] ?? condition.operator;
   const raw = condition.value;
   const value =
     raw === undefined

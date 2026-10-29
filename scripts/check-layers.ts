@@ -34,6 +34,9 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   // consumed by every layer (spec-compose-design.md B1).
   '@texuli/spec': 0,
   '@texuli/primitives': 1,
+  // L1: the framework-free, DOM-free document engine; it imports core and
+  // deck downward, which the same-layer rule forbids at L0 (ADR-011).
+  '@texuli/document': 1,
   '@texuli/tokens': 2,
   texuli: 3,
   '@texuli/charts': 4,
@@ -53,6 +56,9 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   // tools wraps the player, so it sits above it per roadmap D4).
   '@texuli/astro': 8,
   '@texuli/slides': 8,
+  // L8: the page editor and reader paint any catalog component through the
+  // player (L7), like the slides stage (ADR-011).
+  '@texuli/pages': 8,
 });
 
 /**

@@ -30,6 +30,7 @@ import {
 import { type Snippet, tick, untrack } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { type DropIndicator, sortableContext } from './context.ts';
 import {
   directionOf,
@@ -79,7 +80,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   onMove?: (move: SortableMove) => boolean | void;
   onEvent?: (event: SortableEvent) => void;
   children?: Snippet;
-};
+} & RefProp;
 
 let {
   containers = $bindable(),
@@ -103,6 +104,7 @@ let {
   onMove,
   onEvent,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -519,7 +521,7 @@ const attachRoot: Attachment<HTMLElement> = (node) => {
 const instructions = $derived(formatDragMessage(resolved.instructions, {}));
 </script>
 
-<div
+<div bind:this={ref}
   {...rest}
   class={['tx-sortable', rest.class]}
   data-dragging={dragState.phase === 'dragging' ? '' : undefined}

@@ -14,9 +14,9 @@ Svelte, use [`@texuli/player`](https://www.npmjs.com/package/@texuli/player),
 which is built on this package.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
-> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
+> published to npm as `0.6.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.7.0`) may contain breaking
+> changes, so pin the exact version or use `^0.6.0`, which accepts only 0.6.x.
 
 > **New in `0.4.0`.** The `chat`, `composition`, `data`, `state` and
 > `workflows` manifest groups (158 catalog ids, 66 of them agent-emittable;
@@ -137,6 +137,20 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
   state surface rules refuse exactly what `@texuli/player` would refuse at
   paint time, and list item text refuses control, bidirectional and
   invisible formatting characters.
+
+## New in 0.6.0
+
+Ships in `0.6.0`; the `0.5.0` release predates it:
+
+- Spec `0.6.0` motion: node `motion` and the envelope `motion.level` are
+  checked against the closed vocabulary; CSS, keyframes, milliseconds and
+  unknown names are refused (`invalid-motion`), and the renderer drops the
+  motion and keeps the node
+  ([envelope](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/envelope.md)).
+- `validateStreamNode` in `@texuli/catalog/validate`: the node-level checks
+  of `validateDraft` for one streamed node's chain, so a host paints only
+  what the full draft would accept
+  ([validate](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/validate.md)).
 
 ## Documentation
 

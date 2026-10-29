@@ -1,6 +1,6 @@
 {
   "name": "texuli",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Styled Texuli components, layouts and shells.",
   "keywords": [
@@ -260,6 +260,11 @@
       "svelte": "./src/components/menus/index.ts",
       "default": "./src/components/menus/index.ts"
     },
+    "./motion": {
+      "types": "./src/motion/index.ts",
+      "svelte": "./src/motion/index.ts",
+      "default": "./src/motion/index.ts"
+    },
     "./navigation": {
       "types": "./src/components/navigation/index.ts",
       "svelte": "./src/components/navigation/index.ts",
@@ -375,9 +380,9 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.5.0",
-    "@texuli/primitives": "0.5.0",
-    "@texuli/tokens": "0.5.0"
+    "@texuli/core": "0.6.0",
+    "@texuli/primitives": "0.6.0",
+    "@texuli/tokens": "0.6.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

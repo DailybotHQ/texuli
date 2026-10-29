@@ -2,15 +2,16 @@
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLInputAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getComboboxContext } from './context.ts';
 
 type Props = Omit<HTMLInputAttributes, 'value' | 'children'> & {
   value?: string;
   children?: Snippet;
   child?: ChildSnippet<Record<string, unknown>>;
-};
+} & RefProp;
 
-let { value, child, oninput, onkeydown, ...rest }: Props = $props();
+let { value, child, oninput, onkeydown, ref = $bindable(null), ...rest }: Props = $props();
 const context = getComboboxContext();
 // A consumer id wins: the context records it, so every reference follows.
 context.claimId(
@@ -82,5 +83,5 @@ const inputProps = $derived({
 {#if child}
   {@render child({ props: inputProps })}
 {:else}
-  <input {...inputProps} {@attach attach} />
+  <input bind:this={ref} {...inputProps} {@attach attach} />
 {/if}

@@ -55,3 +55,33 @@ The primitive supplies no visual theme or backdrop color. Consumers should provi
   (`-t dialog-contained-focus`: dialog, alert dialog and sheet), plus the behavior rows
   `contained-backdrop-under-content` and `mounted-open-keeps-focus` in
   `tests/behavior/scenarios/dialog.spec.ts`.
+
+## Motion hooks
+
+Overlay parts animate nothing on their own. A styled layer passes
+`motionHooks` (texuli builds them from its `motion` prop through
+[`texuli/motion`](../../texuli/docs/ui-motion.md), on
+`@texuli/core/motion`, ADR-013):
+
+```ts
+interface OverlayMotionHooks {
+  enter?: (node: HTMLElement) => void; // after the part opens
+  exit?: (node: HTMLElement) => { finished: Promise<unknown>; cancel(): void } | null;
+}
+```
+
+- **Which parts take it:** dialog `Content` and `Overlay`, alert dialog
+  `Content` and `Overlay`, every sheet content (`Sheet`, `Drawer`, `Panel`,
+  `ResponsiveModal`), popover `Content`, hover card `Content`, menu,
+  context-menu, menubar and submenu contents, tooltip `Content`, and accordion
+  `Content` (its height).
+- **Enter** runs once per opening, after the part is shown; never for a part
+  that is open when it is created (first render, hydration).
+- **Exit:** when `exit` returns a hold, the closed part stays mounted with
+  `data-state="closed"` and `inert` until `finished` settles (at most
+  1,200 ms, `MOTION_HOLD_MAX_MS`). Reopening during the exit cancels it and
+  plays the enter again on the same element.
+- **Unchanged without hooks:** focus returns, `inert` lifts, the layer stack
+  and dismissal are released at close in either case; with a hold only the
+  paint (the top layer, the scroll lock, the portal) waits for the unmount.
+  A held backdrop takes no pointer presses.

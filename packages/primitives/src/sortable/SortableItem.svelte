@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { sortableContext, sortableItemContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children' | 'id'> & {
@@ -12,9 +13,9 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'children' | 'id'> & {
   /** Element to render. Default `li`. */
   as?: 'li' | 'div';
   children?: Snippet<[{ dragging: boolean; selected: boolean; locked: boolean }]>;
-};
+} & RefProp;
 
-let { id, label, as = 'li', children, ...rest }: Props = $props();
+let { id, label, as = 'li', children, ref = $bindable(null), ...rest }: Props = $props();
 const context = sortableContext.get();
 sortableItemContext.set({ id: () => id, label: () => label });
 
@@ -28,6 +29,7 @@ const attach: Attachment<HTMLElement> = (node) => context.registerItem(id, node,
 </script>
 
 <svelte:element
+  bind:this={ref}
   this={as}
   {...rest}
   class={`tx-sortable__item ${rest.class ?? ''}`.trim()}

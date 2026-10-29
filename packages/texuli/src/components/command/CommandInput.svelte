@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type CommandInputProps, Input as PrimitiveInput } from '@texuli/primitives/command';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import { commandInputClass, commandInputRowClass } from './variants.ts';
 import './command.css';
 
@@ -22,8 +23,9 @@ let {
   placeholder = 'Search commands…',
   class: className,
   rowClass,
+  ref = $bindable(null),
   ...rest
-}: Props = $props();
+}: Props & RefProp = $props();
 
 const rowClasses = $derived(
   commandInputRowClass({
@@ -53,7 +55,7 @@ const inputClasses = $derived(
       stroke-linecap="round"
     />
   </svg>
-  <PrimitiveInput
+  <PrimitiveInput bind:ref
     class={inputClasses}
     data-tx-command-input
     bind:value

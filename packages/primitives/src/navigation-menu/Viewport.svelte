@@ -1,9 +1,10 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { contentBehavior } from './content-behavior.ts';
 import { navigationMenuContext } from './context.ts';
 
-let { ...rest }: HTMLAttributes<HTMLDivElement> = $props();
+let { ref = $bindable(null), ...rest }: HTMLAttributes<HTMLDivElement> & RefProp = $props();
 const context = navigationMenuContext.get();
 context.viewport = true;
 $effect(() => () => {
@@ -25,7 +26,7 @@ function measure(node: HTMLElement) {
 }
 </script>
 
-<div
+<div bind:this={ref}
   data-state={entry ? 'open' : 'closed'}
   data-orientation={context.orientation}
   style:--tx-navigation-menu-viewport-width={`${size.width}px`}
@@ -35,6 +36,7 @@ function measure(node: HTMLElement) {
   {#if entry}
     {#key entry.id}
       <div
+        {...entry.attributes}
         id={entry.id}
         class={entry.class}
         data-state="open"
@@ -43,6 +45,7 @@ function measure(node: HTMLElement) {
         role="group"
         {@attach contentBehavior(context, context.value)}
         {@attach measure}
+        {@attach entry.attach}
       >
         {@render entry.children?.()}
       </div>

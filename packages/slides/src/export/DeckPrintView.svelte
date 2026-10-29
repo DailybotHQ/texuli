@@ -6,19 +6,23 @@
  * images and the slide renderers have settled. See `DeckPrintViewProps`.
  *
  * This wrapper loads the view's body on first use, so importing
- * `@texuli/slides/export` for PPTX or the print plan costs no print code.
+ * `@texuli/slides/export` for PPTX or the print plan costs no print code;
+ * `preloadDeckPrintView()` warms it (G81).
  */
 import type { Component } from 'svelte';
+import { loadDeckPrintBody, loadedDeckPrintBody } from './print-preload.ts';
 import type { DeckPrintViewProps } from './print-types.ts';
 
 let props: DeckPrintViewProps = $props();
-let Body = $state.raw<Component<DeckPrintViewProps> | null>(null);
+// After `preloadDeckPrintView()` (or an earlier view) the body renders on the first render.
+let Body = $state.raw<Component<DeckPrintViewProps> | null>(loadedDeckPrintBody() ?? null);
 
 $effect(() => {
+  if (Body) return;
   let live = true;
-  import('./DeckPrintPages.svelte').then(
-    (module) => {
-      if (live) Body = module.default;
+  loadDeckPrintBody().then(
+    (loaded) => {
+      if (live) Body = loaded;
     },
     (error: unknown) => {
       if (live) props.onError?.(error);

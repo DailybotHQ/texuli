@@ -34,7 +34,14 @@ export interface BackdropOptions {
  * containing block) and stacks just below contained content.
  */
 export function registerBackdrop(node: HTMLElement, options: BackdropOptions): () => void {
-  const exemption = getInertRegistry().exempt({ element: node, label: options.label });
+  // `raise: false`: the backdrop sits under its dialog, and under every overlay
+  // opened from the dialog (a Select, a menu, a date picker). Re-raising it
+  // when one of them opens would cover them and the dialog (G75).
+  const exemption = getInertRegistry().exempt({
+    element: node,
+    label: options.label,
+    raise: false,
+  });
   if (options.contained) {
     node.setAttribute('data-contained', '');
     const previousZIndex = node.style.zIndex;

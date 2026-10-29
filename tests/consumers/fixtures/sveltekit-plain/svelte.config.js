@@ -4,7 +4,7 @@ import adapter from '@sveltejs/adapter-static';
 const config = {
   compilerOptions: { runes: true },
   kit: {
-    adapter: adapter({ fallback: 'index.html' }),
+    adapter: adapter({ fallback: '200.html' }),
   },
 };
 export default config;

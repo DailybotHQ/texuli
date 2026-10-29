@@ -45,6 +45,37 @@ export type PreparedDeck =
       truncated: boolean;
     };
 
+/** A successful `PreparedDeck`. */
+export type PreparedDeckOk = Extract<PreparedDeck, { ok: true }>;
+
+/**
+ * The results `prepareDeck` and `prepareDeckV2` produced (G83). Membership
+ * is the brand: an object with the same fields (agent output, a JSON copy,
+ * a `structuredClone`) is not in the set, so it is validated like any input.
+ */
+const preparedResults = new WeakSet<object>();
+
+/**
+ * Record an `ok` result of the public prepare functions as stage-trusted,
+ * and freeze its wrapper so its `deck` cannot be swapped afterwards.
+ */
+export function markPreparedDeck(result: PreparedDeck): PreparedDeck {
+  if (!result.ok) return result;
+  Object.freeze(result);
+  preparedResults.add(result);
+  return result;
+}
+
+/**
+ * True only for an `ok` result returned by `prepareDeck` or `prepareDeckV2`
+ * in this realm (never for a look-alike object). At the `developer` tier the
+ * stage paints such a result without migrating or validating it again.
+ * Never throws.
+ */
+export function isPreparedDeck(value: unknown): value is PreparedDeckOk {
+  return typeof value === 'object' && value !== null && preparedResults.has(value);
+}
+
 /** One free-slide block check: the diagnostics of one block, if any. */
 export type DeckBlockCheck = NonNullable<DeckValidationHooks['validateBlock']>;
 
@@ -125,4 +156,18 @@ export function prepareDeckWith(
       truncated: false,
     };
   }
+}
+
+/**
+ * The light, public prepare (G83): validate a v2 deck with the host's own
+ * free-slide block check, without `migrateDeck` or the `@texuli/blocks`
+ * schema (an earlier deck shape is refused). An `ok` result is a prepared
+ * deck the stage paints at the `developer` tier without validating again.
+ * Never throws.
+ */
+export function prepareDeckV2(
+  input: unknown,
+  hooks: DeckValidationHooks & { validateBlock: DeckBlockCheck }
+): PreparedDeck {
+  return markPreparedDeck(prepareDeckWith(input, hooks, hooks.validateBlock));
 }

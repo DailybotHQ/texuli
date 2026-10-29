@@ -10,6 +10,11 @@
  * hides in full screen, where the full screen overlay takes over. Below the
  * slide (`toolbarPosition`, default) it aligns to the inline end and its
  * popups open upward.
+ *
+ * `tools` (G82) adds host controls as the toolbar's last group (labelled by
+ * `stage.groupTools`), after the stage's own: they follow its focus order,
+ * stay visible when the secondary groups fold into "More", and keep the
+ * progress bar (a host `chrome` snippet replaces both).
  */
 import {
   availableDeckControls,
@@ -18,13 +23,15 @@ import {
   type DeckControlGroup,
   type DeckControlKey,
 } from '@texuli/deck/engine';
-import { onMount, untrack } from 'svelte';
+import { onMount, type Snippet, untrack } from 'svelte';
 import { getDeckStageContext } from '../context.ts';
 import type { DeckStageMessageKey } from '../messages.ts';
 import ChromeIcon from './ChromeIcon.svelte';
 import { deckChromeEnvironment, deckShortcutText } from './links.ts';
 import { getDeckChromeContext, runDeckChromeAction } from './state.svelte.ts';
 import type { DeckTooltip, DeckTooltipContent } from './tooltip.ts';
+
+let { tools }: { tools?: Snippet } = $props();
 
 const stage = getDeckStageContext();
 const chrome = getDeckChromeContext();
@@ -323,6 +330,11 @@ onMount(() => {
           {/each}
         </div>
       {/each}
+    {/if}
+    {#if tools}
+      <div class="tx-deck-chrome-group" role="group" aria-label={t('stage.groupTools')} data-tx-deck-host-tools>
+        {@render tools()}
+      </div>
     {/if}
     {#if tooltip}
       {#await import('./ChromeTooltip.svelte') then view}

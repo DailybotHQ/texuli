@@ -1,5 +1,6 @@
 <script lang="ts">
 import { composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { scrollAreaContext } from './context.ts';
 import type { ScrollAreaViewportProps } from './types.ts';
 
@@ -9,8 +10,9 @@ let {
   child,
   id,
   tabindex = 0,
+  ref = $bindable(null),
   ...rest
-}: ScrollAreaViewportProps & Record<string, unknown> = $props();
+}: RefProp & ScrollAreaViewportProps & Record<string, unknown> = $props();
 
 const context = scrollAreaContext.get();
 
@@ -53,7 +55,7 @@ const viewportProps = $derived({
 {#if child}
   {@render child({ props: composeChildProps({ ...viewportProps, attach }, {}) })}
 {:else}
-  <div {...viewportProps} {@attach attach}>
+  <div bind:this={ref} {...viewportProps} {@attach attach}>
     {@render children?.()}
   </div>
 {/if}

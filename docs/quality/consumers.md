@@ -14,38 +14,44 @@ Prove packed Texuli tarballs install and render in real consumer apps:
 | Astro + Svelte | `astro-plain` | `astro-tailwind` |
 | SvelteKit (static) | `sveltekit-plain` | `sveltekit-tailwind` |
 
-Every fixture depends on **file:** tarballs of `@texuli/core`, `@texuli/tokens`,
-`@texuli/primitives`, `texuli` and `@texuli/data`, produced by
-`scripts/packages.ts` (the same code as `pnpm verify:packages`). Two fixtures
-install more:
+Since T-std-consumers (PLAN_010), every fixture installs the packed tarball
+of **every packable package** (every package `scripts/packages.ts` packs) and
+imports **every exported subpath**, derived from the source `exports` maps by
+`tests/consumers/surface.ts`. The kinds, the checks and what fails an app are
+in [tests/consumers/README.md](../../tests/consumers/README.md). Two fixtures
+add more:
 
-| Fixture | Extra packed packages | What it adds |
-| --- | --- | --- |
-| `astro-plain` | `@texuli/astro`, `@texuli/blocks`, `@texuli/charts`, `@texuli/media` | The packed Astro integration: `texuli({ namespace, fallbackMode })` in `astro.config.mjs`, `ContentLayout`, `Hero` and `Section`. The spec checks the appearance script key, `data-tx-theme="sky"` and `data-tx-mode="dark"` on `<html>`, the static Hero and Section content, and a token stylesheet with `@layer tx.base`. |
-| `vite-plain` | `@texuli/charts` | `worker.html` builds `@texuli/charts/worker` and its entry URL as a module worker. The spec checks the emitted worker chunk still holds the handler and that it answers in the browser with results equal to the sync math. |
+| Fixture | What it adds |
+| --- | --- |
+| `astro-plain` | The packed Astro integration: `texuli({ namespace, fallbackMode })` in `astro.config.mjs`, `ContentLayout`, `Hero` and `Section`. The spec checks the appearance script key, `data-tx-theme="sky"` and `data-tx-mode="dark"` on `<html>` and the static Hero and Section content. |
+| `vite-plain` | `worker.html` builds `@texuli/charts/worker` and its entry URL as a module worker. The spec checks the emitted worker chunk still holds the handler and that it answers in the browser with results equal to the sync math. |
 
-The harness packs `core`, `tokens`, `primitives`, `texuli`, `data`, `astro`,
-`blocks`, `charts` and `media` when any of those tarballs is missing.
+The harness repacks a package when its tarball is missing or older than its
+sources.
 
 **Nothing is ever published** by this gate. Tarballs stay `private: true` and
 live under `tmp/packages/tarballs/` (gitignored).
 
-The shared `Smoke.svelte` mounts:
+`Smoke.svelte` mounts `safeHref` (`@texuli/core/url-policy`), a primitives
+`Checkbox`, `texuli` `Button`, `Badge` and `Select`, and the `@texuli/data`
+grid; `Packages.svelte` mounts one component from each other UI package
+(astro, blocks, charts, chat, editor, media, player, slides, workflows).
 
-- `safeHref` from `@texuli/core/url-policy`
-- `Checkbox` from `@texuli/primitives/checkbox`
-- `Button` / `Badge` from `texuli`
-- `Select` from `texuli/select`
-- `DataGrid` from `@texuli/data/grid-core`
-- `@texuli/tokens/base.css` (and Tailwind preset when enabled)
+### Typecheck
 
-### Typecheck (Vite + SvelteKit)
-
-After install, Vite and SvelteKit fixtures run **svelte-check** and
-**tsc --noEmit** with `noUncheckedSideEffectImports` and **no** consumer-local
-`declare module '*.css'`. Packed packages must ship CSS types
-(sibling `*.css.d.ts`, root `css-modules.d.ts`, entry `/// <reference path>` —
-see `docs/quality/packaging.md`). Astro fixtures build only (no svelte-check gate).
+Every app runs **tsc --noEmit** over every subpath except the Node-only ones;
+Vite and SvelteKit apps also run **svelte-check**, with
+`noUncheckedSideEffectImports` and **no** consumer-local
+`declare module '*.css'`. Packed packages must ship CSS types (sibling
+`*.css.d.ts`, root `css-modules.d.ts`, entry `/// <reference path>`; see
+`docs/quality/packaging.md`). Third-party declaration errors are counted and
+ignored; Texuli errors fail unless listed in `KNOWN_TYPE_DEFECTS`, which is
+empty. The six it listed were fixed at the source: four `@texuli/blocks`
+interactive components imported a type named like the component (TS2440 in
+the emitted `.svelte.d.ts`; guarded for every package by
+`scripts/tests/svelte-self-named-imports.test.ts`), and the `@texuli/primitives`
+accordion and slider root-props unions made `keyof` too complex (TS2590;
+guarded by `packages/primitives/tests/root-props.types.ts`).
 
 ## Install policy
 
@@ -55,7 +61,8 @@ see `docs/quality/packaging.md`). Astro fixtures build only (no svelte-check gat
 | --- | --- |
 | *(no `--legacy-peer-deps`)* | Peer conflicts must surface. Fix Texuli `peerDependencies` (for example `svelte`) at the package source, never hide them. |
 | `--ignore-scripts` | Supply-chain: lifecycle scripts are forbidden in consumer installs (see `docs/quality/supply-chain.md`). |
-| `--prefer-offline` | Prefer the local npm cache for exact third-party pins. |
+| `--offline` (tarball mode) | Never fetch: a third-party pin missing from the npm cache fails with `ENOTCACHED` and is reported. |
+| `--prefer-offline` (registry mode) | Prefer the local npm cache; the registry spec must reach npm for the Texuli packages. |
 | `--no-fund` / `--no-audit` | Quiet CI noise; not a security substitute. |
 
 Third-party versions in fixture `package.json` files are **exact pins** (no `^`
@@ -63,52 +70,47 @@ or `~`) so installs are reproducible once the cache is warm.
 
 ### First run
 
-The first run on a machine needs the npm cache populated for those exact
-versions **and their transitive dependencies** (for example `rolldown` under
-Vite 8). With a cold or stale packument cache, `--prefer-offline` can fail
-with `ETARGET` until the registry metadata is fetched once (network). Later
-runs complete from cache via `--prefer-offline`. Packing the four Texuli
-packages also takes a few minutes the first time; later runs reuse
-`tmp/packages/tarballs/`.
-
-**Nothing is ever published** — tarballs stay private under
-`tmp/packages/tarballs/` and fixtures are never `npm publish`ed.
+Tarball mode needs the exact third-party versions **and their transitive
+dependencies** (for example `rolldown` under Vite 8, `astro` under
+`@texuli/astro`) in the npm cache; on a cold cache the install fails with
+`ENOTCACHED` instead of downloading. Warm it once with the registry spec or
+a networked `npm install` of a fixture.
 
 ### Tarball assertion
 
 After install, the harness (and the Playwright spec) assert that every
-`@texuli/*` and `texuli` entry in `package-lock.json` has
-`resolved: "file:…/<name>-0.0.0.tgz"` pointing at the packed tarball path —
-never a registry URL.
+packable package's entry in `package-lock.json` has
+`resolved: "file:…/<name>-<version>.tgz"` pointing at the packed tarball of
+its workspace version, never a registry URL.
 
 ## Run
 
 ```sh
-# Prefer a free lane port; the default Playwright webServer is unused here
-# (fixtures serve their own static dist).
-TEXULI_E2E_PORT=4930 pnpm exec playwright test tests/consumers/consumers.spec.ts --project=chromium
+pnpm verify:packages && TEXULI_E2E_PORT=4953 pnpm exec playwright test tests/consumers/consumers.spec.ts --project=chromium
 ```
-
-**Stale tarballs:** the harness reuses existing tarballs in
-`tmp/packages/tarballs/`. After changing a package, repack it first
-(`pnpm verify:packages --filter <dir>`) or delete `tmp/packages/`, or the spec
-tests the old code.
 
 ## Last verified
 
-2026-10-25 on dev `852b8d2a`, after `pnpm verify:packages` packed and checked all
-15 eligible packages (publint and attw passed; `@texuli/examples` remains excluded).
-Then `npm_config_offline=true TEXULI_E2E_PORT=4965 pnpm exec playwright test
-tests/consumers/consumers.spec.ts --project=chromium` passed all 7 checks (six fixture
-apps plus the matrix assertion) in 58 s with the local cache. No registry was contacted.
+2026-10-28 on `feat/plan-010-universal-generator` (`a3a5586d` plus the
+working tree), T-std-consumers: `bash -c 'pnpm verify:packages &&
+TEXULI_E2E_PORT=4953 pnpm exec playwright test tests/consumers --project
+chromium'` exited 0 in 6 min 30 s wall. `pnpm verify:packages` passed for 21
+packages; Playwright reported 14 passed in 3.0 min: the six tarball-mode apps
+plus the matrix check (each app installed all 21 tarballs with `--offline`
+and imported 372 subpaths), and the seven registry-mode checks against the
+published `0.5.0` (network). A deliberately defective `@texuli/chat` tarball
+(the `texuli` dependency removed from its packed manifest) failed
+`sveltekit-plain` with 49 undeclared-import problems while its build alone
+still passed; the good tarball was restored.
 
 ## Limits
 
 - The spec runs in Chromium. The consumer builds do not depend on the browser,
   but WebKit and mobile renders of the consumer pages are not run.
-- Astro fixtures build only; they do not run `astro check` (no svelte-check
-  gate for Astro). Adding it needs `@astrojs/check` pinned in the fixtures and
-  present in the npm cache: **planned**.
-- `@texuli/catalog`, `@texuli/chat`, `@texuli/tools`, `@texuli/player` and
-  `@texuli/slides` are not installed by any consumer.
+- Astro fixtures run tsc but not `astro check` (no svelte-check gate for
+  Astro). Adding it needs `@astrojs/check` pinned in the fixtures and present
+  in the npm cache: **planned**.
+- The Node-only subpaths are imported by plain Node but not type-checked:
+  their declarations reference `@types/node`, which this host's npm cache
+  cannot install offline (`undici-types` is missing).
 - Firefox is not in the Playwright matrix on this host.

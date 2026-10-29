@@ -3,6 +3,7 @@ import { Toggle as TogglePrimitive } from '@texuli/primitives/toggle';
 import type { Snippet } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import { type ToggleSize, type ToggleVariant, toggleClass } from './variants.ts';
 import './toggle.css';
 
@@ -38,8 +39,9 @@ let {
   'aria-labelledby': ariaLabelledby,
   'aria-describedby': ariaDescribedby,
   // Other aria-*, data-* and handlers go to the button (there is no wrapper).
+  ref = $bindable(null),
   ...rest
-}: Props = $props();
+}: Props & RefProp = $props();
 
 const classes = $derived(
   toggleClass({
@@ -50,7 +52,7 @@ const classes = $derived(
 );
 </script>
 
-<TogglePrimitive.Root
+<TogglePrimitive.Root bind:ref
   {...rest}
   bind:pressed
   {defaultPressed}

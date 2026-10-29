@@ -9,6 +9,8 @@ import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { getDialogContext, getDialogPortalContext } from '../dialog/context.ts';
 import { ensurePositioned } from '../internal/backdrop.ts';
+import { createMotionHold, type OverlayMotionHooks } from '../internal/motion-hold.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { drawerContext } from './context.ts';
 import { dismissDirection, releaseTarget, resolveSheetSide, type SheetSide } from './model.ts';
 
@@ -39,8 +41,14 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Whether a drag past the last snap point closes it. Default `true`. */
   dismissible?: boolean;
   onCloseAutoFocus?: (event: FocusRestoreEvent) => void;
+  /**
+   * Enter and exit motion (texuli passes `texuli/motion` hooks): while the
+   * exit plays, the closed sheet stays mounted, inert. Focus, inert and the
+   * layer stack are released at close, as without motion.
+   */
+  motionHooks?: OverlayMotionHooks;
   children?: Snippet;
-};
+} & RefProp;
 
 let {
   side = 'right',
@@ -53,7 +61,9 @@ let {
   onSnapPointChange,
   dismissible = true,
   onCloseAutoFocus,
+  motionHooks,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -69,7 +79,27 @@ $effect(() => {
   return () => context.claimId('content', undefined);
 });
 let isOpen = $state(context.open);
-$effect(() => context.subscribeOpen((next) => (isOpen = next)));
+let held = $state(false);
+// Open when it is created (first render, hydration): no enter animation.
+let appeared = untrack(() => context.open);
+let entered: HTMLElement | null = null;
+const hold = createMotionHold(
+  () => motionHooks,
+  (next) => (held = next)
+);
+let node: HTMLDivElement | null = null;
+$effect(() =>
+  context.subscribeOpen((next) => {
+    // Closing: start the exit before the content would unmount (a bound
+    // `open` changes before the engine closes).
+    if (!next && isOpen) {
+      entered = null;
+      hold.begin(node);
+    }
+    isOpen = next;
+  })
+);
+$effect(() => () => hold.cancel());
 let resolvedDirection = $state<TextDirection>(
   context.triggerElement ? directionOf(context.triggerElement) : 'ltr'
 );
@@ -112,7 +142,22 @@ function dismissEvent(originalEvent: Event): OverlayDismissEvent {
   };
 }
 
-function attach(node: HTMLDivElement): () => void {
+function attach(element: HTMLDivElement): () => void {
+  node = element;
+  // Inside a Portal, open only once it is placed (moving a focused node blurs
+  // it). Re-registers if the mode or the container changes; the open state it
+  // reads while registering must not re-run it (a close would hide it mid-exit).
+  if (portal && !portal.placed) return () => {};
+  void context.mode;
+  void context.container;
+  const release = untrack(() => attachContent(element));
+  return () => {
+    release();
+    if (node === element) node = null;
+  };
+}
+
+function attachContent(node: HTMLDivElement): () => void {
   // Inside a Portal, open only once it is placed: moving a focused node blurs it.
   if (portal && !portal.placed) return () => {};
   // Contained: positioned, so its z-index stacks it above the contained backdrop.
@@ -130,6 +175,7 @@ function attach(node: HTMLDivElement): () => void {
       restoreFocusTarget: () => context.triggerElement ?? null,
       branches: () => [context.triggerElement],
       label: modal ? 'sheet' : 'panel',
+      presence: { isMotionPending: hold.isMotionPending },
       ...(modal
         ? { cycleTabNavigation: true, initialFocus: context.initialFocus }
         : {
@@ -140,8 +186,19 @@ function attach(node: HTMLDivElement): () => void {
             },
           }),
       onOpenChange: (open) => {
+        // Before the engine's presence reads `isMotionPending`.
+        if (!open) {
+          entered = null;
+          hold.begin(node);
+        }
         context.onOverlayOpenChange(open);
         if (!open) return;
+        // Once per opening (the attachment may re-run while open).
+        if (entered !== node) {
+          entered = node;
+          if (appeared) appeared = false;
+          else hold.enter(node);
+        }
         const view = node.ownerDocument.defaultView;
         if (!modal) {
           // A non-modal panel still takes focus when it opens (APG dialog).
@@ -280,8 +337,8 @@ const transform = $derived.by(() => {
 });
 </script>
 
-{#if isOpen}
-<div
+{#if isOpen || held}
+<div bind:this={ref}
   {...rest}
   id={context.contentId}
   role="dialog"
@@ -289,7 +346,8 @@ const transform = $derived.by(() => {
   aria-labelledby={rest['aria-labelledby'] ?? context.titleId}
   aria-describedby={rest['aria-describedby'] ??
     (context.hasDescription ? context.descriptionId : undefined)}
-  data-state="open"
+  data-state={isOpen ? 'open' : 'closed'}
+  inert={!isOpen || undefined}
   data-side={resolvedSide}
   dir={rest.dir === 'ltr' || rest.dir === 'rtl' ? rest.dir : resolvedDirection}
   data-dragging={offset === null ? undefined : ''}

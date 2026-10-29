@@ -381,6 +381,7 @@ describe('controls', () => {
       type: 'error',
       code: 'provider-error',
       message: 'The model could not answer; try again.',
+      retryable: true,
     });
   });
 
@@ -397,6 +398,7 @@ describe('controls', () => {
         type: 'error',
         code: 'provider-error',
         message: 'The model could not answer; try again.',
+        retryable: true,
       });
       expect(events.at(-1)).toEqual({ type: 'done' });
     }

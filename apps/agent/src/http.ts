@@ -15,7 +15,8 @@ import type { AgentService } from './service.ts';
  * the edge worker and the Node dev server share it. Routes:
  * `GET /v1/health`, `POST /v1/session`, `GET /v1/receipts`,
  * `POST /v1/draft` (server-sent events with `Accept: text/event-stream`, else
- * one JSON result) and, when a report store is given, `POST /v1/csp-reports`
+ * one JSON result; with `"stream": true` the events carry the draft as it is
+ * written, ADR-014) and, when a report store is given, `POST /v1/csp-reports`
  * (CSP violation reports from texuli.com pages). Anything else is 404: there is no activate, publish or send
  * route.
  */
@@ -268,7 +269,7 @@ export async function handleRequest(request: Request, options: HttpOptions): Pro
       await events.return(undefined);
       return error(request, options, event.code, event.message, event.receipt);
     }
-    if (event.type === 'result') {
+    if (event.type === 'result' || event.type === 'final') {
       await events.return(undefined);
       return json(request, options, 200, event.result);
     }

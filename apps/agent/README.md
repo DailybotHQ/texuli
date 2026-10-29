@@ -5,13 +5,18 @@ turns a chat prompt into a **validated blueprint draft**, in the untrusted
 tier, streamed as server-sent events with a validation receipt.
 
 **Status: local service implementation in development. Nothing is deployed.**
-There is no real model provider and no API key: tests and evals use a
-deterministic fake adapter that replays prompt-keyed text, blueprint tool
-calls and usage events, with injectable provider failure and timeout
-outcomes. A real key would only ever live outside the
-repository (`~/.config/texuli/` locally, or the hosting platform's secret
-store), and choosing a provider, placing a key and deploying are developer
-decisions.
+There is no API key, and no real model provider has been called. Tests and
+evals use a deterministic fake adapter that replays prompt-keyed text,
+blueprint tool calls (whole, or streamed as `tool-delta` pieces) and usage
+events, with configurable latency and injectable failures, timeouts and
+mid-draft interruptions. Real adapters for the Anthropic Messages and
+OpenAI-compatible Chat Completions streaming APIs exist as library code
+(`fetch`, no SDK, key passed in at run time), tested only against fixture
+byte streams, and nothing constructs one
+([providers.md](docs/providers.md)). A real key would only ever live outside
+the repository (`~/.config/texuli/` locally, or the hosting platform's secret
+store), and choosing a provider, placing a key, wiring an adapter in and
+deploying are developer decisions.
 The worker requires `AGENT_SESSION_SECRET` with at least 32 UTF-8 bytes
 before it issues or accepts session tokens; a future deployment must provide a
 random secret through the platform secret store.
@@ -55,7 +60,8 @@ service returns a `rate-limited` refusal with a `token-budget` receipt and
 
 The `POST /v1/draft` SSE response emits `accepted`, per-provider-step
 `generating`, `validating`, optional `repairing`, and terminal `result` then
-`done` events; failures emit `error` then `done`. The result contains the
+`done` events; failures emit `error` (with `retryable` for provider failures)
+then `done`. The result contains the
 validated envelope and receipt. The stream advances only when the consumer
 requests data; canceling the response aborts the provider request. The complete
 request/response shapes and operations guide are in the
@@ -63,6 +69,39 @@ request/response shapes and operations guide are in the
 
 The service drafts; validation gates; the owner activates. It has no
 activate, publish or send endpoint.
+
+## Streaming generation
+
+With `"stream": true` in the request (ADR-014), the SSE response also carries
+the draft while the model writes it: `draft-chunk` texts that concatenate to
+one untrusted draft envelope per attempt (ready for `<Player stream>`),
+`node-ready` for each node shell that passed the catalog's node-level checks
+(`validateStreamNode`, the gate's own options), `refused` for a node held with
+its subtree (or `$` when the JSON itself stopped), and `final`, the full
+`validateDraft` verdict, which is the only one that counts. See
+[streaming.md](docs/streaming.md).
+
+```bash
+pnpm --filter @texuli/agent exec vitest run tests/streaming.test.ts
+```
+
+## Providers
+
+`src/provider.ts` defines the provider interface: a request (closed system
+prompt, the `emit_blueprint` tool, bounded turns, abort signal) becomes an
+async stream of `text-delta`, `tool-delta` (`callId`, `name`, JSON text),
+`usage`, `done`, or `error` with a `retryable` flag. `createFakeProvider`
+replays recordings with deterministic chunking (`chunkSize`), latency
+(`latencyMs`, injectable `sleep`) and injected stops (`outcome`, `cutAt`).
+`createAnthropicProvider` and `createOpenAICompatibleProvider` speak the
+documented streaming APIs with `fetch`, take every setting (key included)
+from their options, and map HTTP and stream failures to typed errors.
+Plugging one in with a key is a developer step: see
+[providers.md](docs/providers.md).
+
+```bash
+pnpm --filter @texuli/agent exec vitest run tests/providers.test.ts
+```
 
 ## Kill switch and circuit breaker
 
@@ -128,7 +167,8 @@ replays it:
   activated.
 - A fictional session secret never reaches the model or a response.
 
-Not covered: a real model provider. The hostile corpus includes a regression
+Not covered: a real model provider (the adapters run against fixture streams
+only). The hostile corpus includes a regression
 where a guarded excerpt is split across streamed text deltas.
 
 ```bash
@@ -137,7 +177,8 @@ pnpm --filter @texuli/agent exec vitest run tests/hostile-worker.test.ts
 
 ## Provider keys
 
-There is no key and no real provider adapter. How a key would be held, where
+There is no key, and no real provider adapter is wired in (the adapters in
+`src/providers/` take a key only from their caller). How a key would be held, where
 it may live (`~/.config/texuli/agent.json` or the shell for local dev, the
 platform's secret store for the edge worker), how it stays out of logs and
 responses, and the xAI boundary are in [docs/key-store.md](docs/key-store.md).
@@ -146,8 +187,12 @@ responses, and the xAI boundary are in [docs/key-store.md](docs/key-store.md).
 
 `pnpm exec tsx apps/agent/evals/run.ts` drives the service with the replay
 provider across the golden audit fixtures and writes a deterministic summary
-to `tmp/agent-evals/` (never committed). Real-provider evals are planned. See
-[docs/evals.md](docs/evals.md).
+to `tmp/agent-evals/` (never committed).
+`pnpm exec tsx apps/agent/evals/stream-run.ts` streams the golden audit
+fixtures and the spec's golden blueprints through the SSE endpoint and
+reports validity rate, refusal reasons, time to first node and total time to
+`tmp/agent-evals/stream-report.json`, offline and deterministic on a virtual
+clock. Real-provider evals are planned. See [docs/evals.md](docs/evals.md).
 
 For every endpoint's request and response shape, guard order, local replay
 runbook, receipt details, CSP deployment preconditions and incident steps, see

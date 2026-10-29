@@ -5,17 +5,17 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-`0.5.0` is the current release of all 20 packable packages (owner GO
-2026-10-28): the 19 packages of the `0.4.0` line plus `@texuli/editor`,
-which is published for the first time in `0.5.0`. The publish workflow
-publishes from `main` after the merge, from the verified tarballs with
-signed provenance, and moves both the `latest` and `next` dist-tags to the
-published version, so a bare `npm install texuli` or `pnpm add texuli` gets
-it. `@texuli/drag`, `@texuli/workflows`, `@texuli/deck` and
-`@texuli/editor` are still **in development** (pre-1.0).
+`0.6.0` is the current release of all 20 published packages (owner GO
+2026-10-29): the same 20 packages as `0.5.0`, which published
+`@texuli/editor` for the first time. The publish workflow publishes from
+`main` after the merge, from the verified tarballs with signed provenance,
+and moves both the `latest` and `next` dist-tags to the published version,
+so a bare `npm install texuli` or `pnpm add texuli` gets it.
+`@texuli/drag`, `@texuli/workflows`, `@texuli/deck` and `@texuli/editor`
+are still **in development** (pre-1.0).
 
-`0.5.0` is a breaking `0.x` minor: it carries the PLAN_009 changes listed
-under "0.5.0" below, none of which were in the `0.4.0` tarballs. It is
+`0.6.0` is a breaking `0.x` minor: it carries the PLAN_010 changes listed
+under "0.6.0" below, none of which were in the `0.5.0` tarballs. It is
 still pre-1.0, not a stable release: see "0.x versioning" below. Workspace
 manifests remain `private: true`, and every future version and wave
 requires a fresh, explicit developer GO. Publishing never overwrites a
@@ -25,6 +25,325 @@ published version.
 
 - `@texuli/examples` is never packed (`NEVER_PACKED` in
   `scripts/packages.ts`).
+- `@texuli/document` and `@texuli/pages` are in the repository only: they
+  keep the `0.0.0` placeholder version and `private: true`, and they are not
+  in `publish.yml` (which refuses a `0.0.0` version anyway). Their first
+  release is planned for `0.7.0` (PLAN_010). `pnpm verify:packages` packs
+  `@texuli/document` (it publishes nothing); `@texuli/pages` does not pack
+  yet, because the packer refuses its `0.0.0` pin on `@texuli/document`
+  until that package has a real version (open, planned with `0.7.0`).
+
+### 0.6.0
+
+Every published package moves to `0.6.0` together, and every internal
+`@texuli/*` dependency between them is pinned to exactly `0.6.0`. No package
+is published for the first time: `@texuli/document` and `@texuli/pages`
+exist in the repository only (`0.0.0`, `private`, not in `publish.yml`;
+their first release is planned for `0.7.0`). `0.6.0` carries PLAN_010 so
+far: the one API contract, motion, streamed blueprints, blueprint spec
+`0.6.0`, packaging fixes proven by a consumers harness over every package,
+and the gaps Protoyard reported on `0.5.0` (G48 to G85). The ids below match
+Protoyard's register.
+
+**Closed gaps.**
+
+| Gap | Package / subpath | What changed |
+| --- | --- | --- |
+| G48 | `@texuli/editor/markdown`, `@texuli/core/editor-model`, `@texuli/core/editor-markdown` | Host inline extensions: mentions and references register a sigil from a closed set (`createInlineExtensions`, `EDITOR_EXTENSION_SIGILS`) and round-trip as `<sigil>{id\|label}` with an `extension` mark that keeps their id; ids and labels are bounded and matched in linear time, and host links pass `safeHref` at the `untrusted` tier |
+| G49 | `@texuli/data/filter-builder` | A property catalog: host operators (`FilterOperatorDef`) with typed value editors, validation and predicates, field groups (`groupFields`), `catalogSchema` and `compileCatalogFilter`, and serializable saved segments (`serializeSegment`, `parseSegment`, bounded metadata) |
+| G50 | `@texuli/data/activity/inbox` | `allowMarkUnread={false}` hides "Mark unread", and `onMarkUnread(ids)` reports it separately |
+| G51 | `@texuli/data/cohort` | `heatScale` (2 to 10 hex steps or token names) and `heatText`; a palette with a step under 4.5:1 is refused, and each step picks its text color (`resolveHeatScale`) |
+| G52 | `texuli/layouts/content` | Active-heading tracking: the current TOC link gets `aria-current="location"`, with `activeId` and `onActiveHeadingChange` |
+| G53 | `texuli/dialog`, `texuli/command` | `Dialog`, `AlertDialog` and `CommandPalette` take `mode` and `container` (contained in a framed preview), `onDismissRequest` and `onCloseAutoFocus` (both can be vetoed with `preventDefault()`) |
+| G54 | `texuli/tabs-accordion` | A tab's `badge` is part of its accessible name, or `badgeLabel` names it |
+| G55 | `@texuli/data/grid-core` | `DataGrid` `activateOnClick` (pointer row activation), `mode="table"` (native table semantics, no `role="grid"`), per-column `hideBelow`, and an `empty` snippet that receives `{ query, filtered }` |
+| G56 | `texuli/file-upload` | `id` (or `inputId`) reaches the file input, so `<label for>` and a `Field` name it |
+| G57 | `texuli/toast` | `action.retryOnError` keeps the toast open with an error line (`errorText`) when the action rejects, so an undo can be retried; it still settles exactly once |
+| G58 | `texuli/avatar` | `data-avatar` becomes `initials` after the image fails to load (and for a refused `src`) |
+| G59 | `@texuli/chat` | `ChatAuthor.avatarSrcset`, each candidate through the `untrusted` image URL policy |
+| G60 | `texuli/tags-color`, `@texuli/primitives/tags-input` | `TagsInput` `readonly`; `id` lands on the input, so `<label for>` works |
+| G61 | `texuli/tags-color`, `@texuli/primitives/tags-input` | `delimiter` takes a list of keys (`[',', ';', ' ']`) or a RegExp (`isDelimiterKey`) |
+| G62 | `texuli/card` | `CardGrid` `gap` takes a step, a plain CSS length or a custom property name (anything else is ignored), and a caller `style` no longer replaces the column template |
+| G63 | `texuli/date`, `@texuli/primitives/date-field` | `DatePicker`, `DateRangePicker` and `TimeField` take `hideLabel` and hide their own label inside a `Field`; `id` reaches the first segment and `aria-describedby` / `aria-invalid` every segment (`inputId` on the primitive roots) |
+| G64 | `texuli/date`, `@texuli/primitives/calendar` | `Calendar` opens on a chosen month with nothing selected: `defaultFocusedValue`, `bind:focusedValue` and `onFocusedValueChange` |
+| G65 | `@texuli/primitives/date-field` | A date is reported only once the year has four digits (never `0002-…`) |
+| G66 | `@texuli/primitives/date-picker`, `texuli/date` | `DateRangePicker` `required` (both fields), and `onInvalid(text, reason, { side })` says whether the start or the end caused a refusal |
+| G67 | `@texuli/data/board` | `BoardColumnDef.description` (describes the column's lists) and a `columnHeader(column, { count })` snippet |
+| G68 | `texuli/layouts/mobile` | `MobileAppFrame` renders no padded, bordered wrapper for an empty `stickyFooter` |
+| G69 | `@texuli/data/board` | Column-only mode: without `getRank`, cards keep the `items` order and only move between columns |
+| G70 | `@texuli/chat` | `MessageList` day separators are their own full-width row above the avatar and bubbles |
+| G71 | `@texuli/chat` | A reading position: `bind:anchor` (`ChatReadingAnchor`: `messageId`, `offset`, `atLatest`) and `onAnchorChange`, restored when the host sets it; `ChatThread` forwards them |
+| G72 | `@texuli/slides/stage-core` (new) | `DeckStageCore`: the stage with no reference to the default renderer tables, so a host that brings every renderer emits none of their chunks, CSS or prefetches |
+| G73 | `@texuli/slides/stage` | `loadDeckMigration()` and `loadedDeckMigration()`, so a host awaits the migration chunk before mounting an earlier-shape deck |
+| G74 | `@texuli/astro/appearance` | `AppearanceSwitcher` `size="sm"`, and same-tab sync between switchers of one namespace (`APPEARANCE_CHANGE_EVENT`) |
+| G75 | `@texuli/core/inert`, `@texuli/core/overlay`, `@texuli/primitives` | An overlay opened inside a modal dialog stays above its backdrop: exemptions take `raise: false` (dialog backdrops and overlays nested in a modal), so only the toast region is re-raised |
+| G76 | `@texuli/data/board` | The board scroller is positioned, so its screen-reader text can't widen a phone page |
+| G77 | `texuli/toast`, `@texuli/primitives/toast` | No top-layer viewport while the `Toaster` is empty, and `mode="contained"` with a `container` for framed previews |
+| G78 | `@texuli/tokens` (`base.css`), `@texuli/player` | Reduced motion sets `0s` durations and delays (it was `0.01ms`), so `visibility` changes are instant and nested content never appears one level per frame; the player and the website builder follow |
+| G79 | `@texuli/primitives/avatar`, `texuli/avatar` | The loading image is hidden by style, never `[hidden]`, so a host reset (`[hidden] { display: none !important }`) can't stop it loading |
+| G80 | `@texuli/slides/export` | Print isolation applies only while a print view with `isolate` is mounted (`:root:has([data-tx-print-isolate])`), so an early Ctrl/Cmd+P no longer prints a blank page |
+| G81 | `@texuli/slides/export` | `preloadDeckPrintView(options?)` readies the print view before the user prints |
+| G82 | `@texuli/slides/stage` | A `tools` snippet adds host controls to the toolbar as a last "More tools" group |
+| G83 | `@texuli/slides/stage` | A prepared deck input: an `ok` result of `prepareDeck` or the new `prepareDeckV2` (`isPreparedDeck`, `PreparedDeckOk`) paints at the `developer` tier without migrating or validating again; look-alikes and `untrusted` stages are still validated |
+| G84 | `texuli/layouts/marketing/section`, `texuli/layouts/marketing` | `MarketingSectionHeader`: the section header type scale on a plain `div`, with no landmark and no padding |
+| G85 | `@texuli/chat` | `MessageList` `onEditUnchanged(message)` when an edit is saved unchanged (a host can treat it as a resend); `ChatThread` forwards it |
+
+**Breaking changes under `0.x`.** A new minor may break; these need a look
+when upgrading from `0.5.0`:
+
+- **Field ids reach the focusable control (G56, G60, G63).** `FileUpload`'s
+  `id` lands on the file input and `TagsInput`'s on its text input (both
+  landed on the wrapper); `DatePicker`, `DateRangePicker` and `TimeField`
+  put `id` on their first segment. CSS or tests that found these components
+  by `id` need the wrapper's own hook instead.
+- **Date controls inside a `Field` hide their own label (G63).** The Field's
+  label names the group instead, so the label is no longer shown twice; pass
+  your label to the `Field`.
+- **`InputGroup` sends attributes to its input.** `id`, `aria-*`, `data-*`,
+  handlers and the form and focus attributes reach the input (`aria-*` and
+  `data-*` used to land on the group); layout hooks stay on the group, and
+  with `children` (your own control) everything stays on the group.
+- **Caller handlers compose on more parts.** Menu items (focus and blur;
+  every handler of checkbox and radio items and sub-triggers), the
+  navigation menu root, list, trigger and link, toast roots and viewports,
+  the tree, splitter handles, the command input, the carousel and the input
+  group run a caller's handler first and then their own, unless the caller
+  called `event.preventDefault()` (actions) or always (bookkeeping such as
+  focus and blur). Before, some of them dropped or replaced it. The order is
+  in [STANDARDS](STANDARDS.md#component-api-contract).
+- **`texuli/avatar` (G58):** after an image error, `data-avatar` is
+  `initials` (it stayed `image`). Host styles keyed on it change state.
+- **`@texuli/primitives/date-field` (G65):** `onValueChange` and
+  `bind:value` stay `null` until the year has four digits; a value such as
+  `0002-01-05` while typing is no longer reported.
+- **Reduced motion is `0s` (G78).** `base.css` (and the player) set
+  animation and transition durations and delays to `0s` instead of
+  `0.01ms` under `prefers-reduced-motion: reduce`. A transition of `0s`
+  starts no transition, so code that waits for `transitionend` under reduced
+  motion no longer gets one.
+- **Motion through the runtime, not CSS keyframes.** The toast
+  (`tx-toast-in`, `tx-toast-out`), tooltip (`tx-tooltip-in`) and slides
+  stage transition keyframes (`tx-deck-slide-*`) are gone: enter, exit,
+  reflow, slide transitions and v2 fragments play through
+  `@texuli/core/motion` (Web Animations), and `styles.css` holds only end
+  states. Host CSS that overrode those keyframes no longer applies; use the
+  `motion` prop or a `MotionProvider` (`texuli/motion`).
+- **Overlay exits keep the part mounted.** With motion on, a closing dialog,
+  sheet, popover, menu, hover card, tooltip or accordion panel stays mounted
+  with `data-state="closed"` and `inert` until its exit ends (at most
+  1.2 s); focus, `inert` and the layer stack are released at once. Tests that
+  expect the part to leave the DOM synchronously should run under reduced
+  motion or `motion={false}`.
+- **`Toaster` (G77):** the top-layer viewport is not rendered while there
+  are no toasts.
+- **`@texuli/chat` (G70):** the day separator moved out of the group's flex
+  row into its own row above it (`.tx-chat-message-group__row` holds the
+  avatar and bubbles). Host CSS on that structure needs a look.
+- **`@texuli/data` `FilterCondition.operator` (G49)** widens from
+  `FilterOperator` to `FilterOperator | FilterCustomOperatorId` (a catalog
+  operator id); an exhaustive `switch` over it needs a default branch. The
+  grid engine still refuses catalog operators.
+- **`AccordionRootProps` and `SliderRootProps`** members are type aliases
+  (`RootShared & { … }`) instead of interfaces, so consumers' checkers no
+  longer fail with TS2590; they can't be augmented by declaration merging.
+- **Spec `0.6.0`.** `validateDraft` migrates a `0.5.0` envelope and stamps
+  `spec: "0.6.0"`; hosts that compare the `spec` string need to accept it. A
+  `0.6.0` envelope with motion is refused by `0.5.0` validators.
+
+Also changed, not breaking:
+
+- `Tooltip` takes `bind:ref` (the tooltip element, `null` while hidden) and
+  rest attributes, which land on the tooltip element.
+- `DateRangePicker`'s `onInvalid` gains a third argument (`{ side }`);
+  two-argument handlers keep working.
+- `DeckStage` is now `DeckStageCore` with the default renderer tables set
+  (`defaults`); its props and behavior are unchanged, and
+  `@texuli/slides/stage` exports both.
+- `DataGrid`'s `empty` snippet receives `{ query, filtered }`; snippets that
+  ignore it keep working.
+
+**One API contract (G53, G56, G60, G63).** About 150 primitive parts and 100
+styled components take `bind:ref` and pass unused attributes (`id`,
+`aria-*`, `data-*`, `class`, `style`, handlers) to their root; providers that
+render nothing are listed as exclusions. Contract tests
+(`packages/primitives/tests/contract.test.ts`,
+`packages/texuli/tests/contract.test.ts`) derive the component list from the
+package exports, so a new export without a case fails. The rules (rest
+attributes and `ref`, the form-control split, the Field rule, handler order,
+callback naming, `onValueChange` payloads) are in
+[STANDARDS](STANDARDS.md#component-api-contract). The layouts
+(`texuli/layouts/*`) are not under the contract yet (planned). The catalog coverage gate lists the new `MarketingSectionHeader` (marketing chrome) and `MotionProvider` (a contentless utility) as exclusions, raising its ceiling from 208 to 210 under the same rule as 0.5.0: chrome and parts get exclusion rows, content gets a manifest.
+
+**Motion (ADR-013).** `@texuli/tokens/motion` holds 5 durations, 5 easings
+and 3 springs (precomputed `linear()` curves) and the `--tx-motion-*`
+properties, which reduced motion zeroes. `@texuli/core/motion` animates
+through the Web Animations API: presence, FLIP layout, shared elements,
+sequences and timelines, and an owned spring solver
+(`@texuli/core/motion/spring`), instant on the server, under reduced motion,
+at level `none`, without the API and on a detached element. `texuli/motion`
+holds the `motion` prop contract and `MotionProvider` (levels `full`,
+`subtle`, `none`): dialogs, sheets, popovers, hover cards, menus, tooltips,
+toasts, tabs, accordions and the `@texuli/data` Board and DataGrid animate,
+and the slides stage plays transitions and fragments through the same
+runtime. Nothing animates on the server or on hydration.
+
+**Streamed blueprints (ADR-014).** `@texuli/spec/stream` tokenizes chunked
+JSON in linear time with byte and depth caps and assembles node events;
+`validateStreamNode` (`@texuli/catalog/validate`) runs `validateDraft`'s
+checks on each node's chain, so nothing `validateDraft` refuses ever paints.
+`<Player stream={source}>` shows skeletons, stays busy and inert, announces
+progress politely, keeps actions disarmed until the full draft validates,
+and keeps painted nodes with a retry on interruption. `validateDraft` stays
+the only verdict.
+
+**New packages and subpaths.**
+
+- `@texuli/core/motion` and `@texuli/core/motion/spring`.
+- `@texuli/core/markup` (ADR-016): typed, escaped XML and HTML builders
+  (`el`, `text`, `serializeXml`, `serializeHtml`) with no raw-markup API;
+  URL attributes only through `linkUrl` and `imageUrl`, which apply the URL
+  policy; allowlisted HTML elements; iterative serialization.
+- `@texuli/core/zip` (ADR-016): a deterministic ZIP writer (`writeZip`,
+  `writeZipAsync` with `CompressionStream` deflate where the platform has
+  it, `crc32`). The `@texuli/document` writers that use these two stay in
+  the repository only.
+- `@texuli/tokens/motion`.
+- `texuli/motion`; `MarketingSectionHeader` in the existing
+  `texuli/layouts/marketing` and `texuli/layouts/marketing/section`.
+- `@texuli/spec/motion` and `@texuli/spec/stream`.
+- `@texuli/slides/stage-core`.
+- `@texuli/slides` declares package `imports` (`#deck-ssr`,
+  `#deck-ssr-core`) that preload the default renderers in server builds;
+  the packer now maps `imports` to `dist`.
+- No new packages on npm. `@texuli/document` (`.`, `model`, `schema`, `ops`,
+  `markdown`, `sync`) and `@texuli/pages` (`.`, `editor`, `reader`,
+  `styles.css`) are in the repository only.
+
+**Blueprint spec 0.6.0** (ADR-012, ADR-013). Additive: the closed motion
+vocabulary. A node may carry `motion` (`enter` and `exit` presets `fade`,
+`rise`, `scale`, `slide-start` and `slide-end`; `layout`; `stagger` `none`,
+`fast` or `base`; `duration` `fast`, `base` or `slow`) and the envelope
+`motion.level` (`full`, `subtle`, `none`). The catalog refuses raw CSS,
+keyframes, milliseconds and unknown names (`invalid-motion`; the renderer
+drops the motion and keeps the node), the player plays motion lazily through
+`@texuli/core/motion`, never on the server or on hydration, and the Kotlin
+twin decodes and maps it to Compose. No new catalog ids (162). The
+`0.5.0 → 0.6.0` migration only stamps `spec`; the digest
+(`37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc`) is
+pinned in `packages/spec/versions.json`, and the generated TypeScript and
+Kotlin are regenerated.
+
+**Static output foundations.** `@texuli/core/markup` and `@texuli/core/zip`
+are the shared base ADR-016 decides for every static output: escaping
+happens in one place, by construction, and archives are byte-for-byte
+reproducible. The DOCX and PDF writers and the paged view built on them
+(`@texuli/document/paged`, `docx`, `pdf`; `@texuli/pages` paged view and
+export) are in the repository only, planned for `0.7.0`.
+
+**Packaging and consumers.**
+
+- **Packed declarations type-check.** svelte2tsx names each component's
+  declaration after its file, so 15 components (in blocks, slides, editor and
+  player) that imported a binding with their own name shipped a broken
+  `.d.ts` (TS2440); the imports are aliased and a test scans every
+  component. `AccordionRootProps` and `SliderRootProps` no longer make
+  consumers' checkers give up (TS2590).
+- **The packer maps `imports`**, so `@texuli/slides` from npm resolves
+  `#deck-ssr`.
+- **Proof from npm for every package.** The consumers harness installs every
+  packable package from its tarball into Vite, Astro and SvelteKit apps,
+  imports every exported subpath (372 across 21 packages, `@texuli/document`
+  included), type-checks every app, runs every bin and checks server-rendered
+  and hydrated output ([consumers](quality/consumers.md)).
+
+**Size and performance.**
+
+- The sixteen chart components that render a data-table fallback share one
+  stylesheet per table look (lazily loaded chart CSS 34,528 to 29,731 B raw).
+- The core editor Markdown reader is linear on long plain text (99,000
+  characters with soft breaks: 106 to 6.5 ms).
+- `DeckStage` preloads its default renderers in server builds, so server
+  output keeps the slide content; browser graphs are unchanged.
+- A test checks that importing only the `texuli/layouts/mobile` model
+  helpers drops the components.
+- Size budgets: entries that grew with motion, the API contract and G48 are
+  at measured plus 4%, and entries with room were tightened to measured plus
+  4% (`texuli.budgets.json`).
+
+**Security notes.**
+
+- **Streams add speed, not trust.** The stream tokenizer runs in linear time
+  with bounded memory (a 264 KiB byte budget and 128 nested containers by
+  default) and refuses duplicate keys and `__proto__`, `constructor` and
+  `prototype` anywhere. A streamed node paints only after the same checks
+  `validateDraft` runs on its chain, actions stay disarmed until the whole
+  draft validates, and `validateDraft` is still the only path to a valid
+  draft ([SECURITY](SECURITY.md#18-streamed-blueprints-and-motion-as-data)).
+- **Motion is data, never CSS.** Agents name motion only with the closed
+  spec vocabulary; CSS, keyframes, durations and unknown names are refused.
+- **Bounded host extensions.** Editor inline extensions use a closed sigil
+  set, bounded ids and labels, linear-time matching and `safeHref` at the
+  `untrusted` tier; filter segments bound their metadata and JSON
+  (200,000 characters), and catalog filters are checked like the grid
+  engine's (6 levels, 200 nodes); cohort palettes accept hex colors or
+  token names only, and `CardGrid` `gap` only a step, a plain length or a
+  custom property name, so no value can carry a CSS declaration.
+- **Prepared decks are developer-tier only (G83).** The prepared brand is
+  the prepare functions' own record, not the object's shape: a look-alike
+  (agent output, a JSON or `structuredClone` copy) is validated like any
+  input, and an `untrusted` stage validates a prepared deck again. Never
+  prepare agent content for the developer tier.
+- **Agent service (`apps/agent`, not published, not deployed).** The new
+  provider interface streams typed events; the Anthropic Messages and
+  OpenAI-compatible adapters take every setting, the key included, from
+  constructor options and are tested only against recorded server-sent
+  event bytes through a fake fetch. No adapter has called a provider.
+
+**Also in PLAN_010:** ADR-010 to ADR-016 (document sync, the document
+packages, spec evolution, motion, streaming, expressions, static outputs and
+i18n) in [DECISIONS](DECISIONS.md); the `@texuli/document` engine and the
+`@texuli/pages` editor and reader, in the repository only; the texuli.com
+`/motion-page/`; and an offline evaluation harness and server-sent event
+streaming of validated drafts in the agent service.
+
+**Publish order** (`publish.yml`), unchanged from `0.5.0`: core, date,
+spec, drag, deck, tokens, primitives, texuli, workflows, editor, charts,
+data, media, chat, blocks, catalog, tools, astro, player, slides.
+`@texuli/document` and `@texuli/pages` are not in it.
+
+### Known gaps and next steps (planned for the next version, not started)
+
+0.6.0 closes every gap Protoyard reported on `0.5.0` (G48 to G85), the one
+API contract, the proof from npm for every package, and most of the size
+items 0.5.0 listed. These remain; they are planned, not done:
+
+- **API contract on layouts.** The contract tests exclude the layouts
+  (`texuli/layouts/*`); they join in a follow-up. `onValueChange` reporting
+  only person-made changes is a written rule, not yet checked by a test.
+- **Motion coverage.** `Collapsible`, `NavigationMenu`, `Select`,
+  `Combobox`, `CommandPalette`, the `Drawer` backdrop and the layout drawers
+  don't take `motion` yet; shared-element transitions between components and
+  springs in the `motion` prop are planned (the runtime has them); the v1
+  slide reveal steps keep their CSS animation.
+- **Size.** Trim the entries raised in 0.5.0 (`@texuli/catalog` root,
+  `@texuli/data/grid-editing`, `@texuli/blocks/structure/renderers`) and
+  in 0.6.0 (`@texuli/core/editor-model`, `@texuli/core/editor-markdown`,
+  `@texuli/editor/markdown`, `@texuli/editor/paste`,
+  `@texuli/media/gallery/lightbox`); `@texuli/primitives/date-field` has
+  6 B of headroom.
+- **Chat.** A label for each message article, and an option for `actions`
+  to replace the built-in send button.
+- **Smaller items.** A toast replaced by `id` keeps only the newest
+  `onSettle`; `Pagination` `stableCount` writes a numeric `style` attribute
+  (strict `style-src-attr` hosts need a hash per value); the catalog `tag`
+  manifest still states the old remove label; `texuli/icons` needs an
+  `icons.css.d.ts`; the website's layer data should name the 0.5.0 data views
+  and editor Markdown so the [ARCHITECTURE](ARCHITECTURE.md) layer table can.
+- **PLAN_010 waves.** `@texuli/document` and `@texuli/pages` (paged view,
+  DOCX and PDF, collaboration) are planned for `0.7.0`, with spec `0.7.0`
+  (node `key` for streams); forms, data sources, dashboards, canvas, sheets
+  and the static output targets for `0.8.0`
+  ([ARCHITECTURE](ARCHITECTURE.md#planned-plan010)).
 
 ### 0.5.0
 
@@ -165,56 +484,6 @@ catalog, tools, astro, player, slides. `@texuli/editor` goes out after
 `@texuli/tokens`, which it pins); the other dependency rules are those of
 `0.4.0` below.
 
-### Known gaps and next steps (planned for the next version, not started)
-
-0.5.0 closes every gap Protoyard reported. These are the known gaps on the
-way to a library that every product consumes from npm with one consistent
-contract. They are planned, not done; the detailed backlog with sources is
-in the PLAN_009 analysis (`next-version-backlog.md`).
-
-- **One API contract everywhere.**
-  - `ref`: styled components that wrap a primitive without an element ref
-    (menus, combobox, select, popover, navigation menu, sheet and command
-    parts, `Radio`, `NumberField.Root`, `Tooltip`) don't take `bind:ref`
-    yet; the primitives need ref support first.
-  - Caller handlers: menu items, navigation menu, toast, tooltip, tree,
-    scroll area, splitter and the sortable handle can still drop or replace
-    a caller's handler. 0.5.0 fixed the inputs and 14 primitive parts.
-  - A library-wide test that every component spreads rest props, takes
-    `ref` and composes handlers, so new components can't regress.
-  - Conventions written in [STANDARDS](STANDARDS.md): handler order
-    (`Input` and `Textarea` sync their value before the caller; the
-    primitives run the caller first), what `headingLevel` sets (`Board`
-    columns vs the `NotificationInbox` heading), `onValueChange` payloads
-    (`Input` reports text while a numeric `bind:value` holds a number), and
-    camelCase callbacks (`onStop`, `onCopy`) vs DOM events.
-- **Proof from npm for every package.** The consumers harness installs the
-  packed tarballs of 5 packages (core, tokens, primitives, texuli, data) in
-  Vite, Astro and SvelteKit apps; extend it to all 20 packable packages, with
-  a smoke import of every subpath.
-- **Size.** Share the chart families' data-table fallback styles (about
-  4.1 KB gzip of lazily loaded CSS); trim the entries raised in 0.5.0
-  (`@texuli/catalog` root, `@texuli/data/grid-editing`,
-  `@texuli/blocks/structure/renderers`); `@texuli/primitives/date-field` has
-  43 B of headroom; confirm that importing only the `texuli/layouts/mobile`
-  model helpers drops the new components.
-- **Slides.** With lazy default renderers, `DeckStage` renders a loading
-  status on the server; preload the defaults in server builds so no-JS and
-  SEO output keep the slides.
-- **Chat.** Per-conversation scroll positions (`scrollKey`), a label for each
-  message article, and an option for `actions` to replace the built-in send
-  button.
-- **Smaller items.** A toast replaced by `id` keeps only the newest
-  `onSettle`; `Pagination` `stableCount` writes a numeric `style` attribute
-  (strict `style-src-attr` hosts need a hash per value); the catalog `tag`
-  manifest still states the old remove label; `texuli/icons` needs an
-  `icons.css.d.ts`; the website's layer data should name the 0.5.0 data views
-  and editor Markdown so the [ARCHITECTURE](ARCHITECTURE.md) layer table can.
-- **Editor codec on long plain text.** The core editor Markdown reader is
-  linear on hostile Markdown but grows faster than linear on very long plain
-  paragraphs (hundreds of milliseconds near its 100,000-character cap);
-  profile its inline loop.
-
 ### 0.4.0
 
 Every packable package moves to `0.4.0` together, and every internal
@@ -293,6 +562,10 @@ tools, astro, player, slides. `@texuli/deck` goes out before
 
 ### History
 
+- `0.5.0` (2026-10-28; merged and published from `main` on 2026-10-29
+  UTC): a breaking `0.x` minor for 20 packages, the first publication of
+  `@texuli/editor` (PLAN_009; see "0.5.0" above). Its tarballs ship
+  blueprint spec `0.5.0` and predate PLAN_010.
 - `0.4.0` (2026-10-28): a breaking `0.x` minor for 19 packages, the first
   publication of `@texuli/deck` (PLAN_007 and PLAN_008; see "0.4.0"
   above). Its tarballs ship blueprint spec `0.4.0` and predate PLAN_009.
@@ -319,10 +592,10 @@ tools, astro, player, slides. `@texuli/deck` goes out before
 
 ### 0.x versioning
 
-Until 1.0.0, a breaking change bumps the minor (`0.5.0` to `0.6.0`) and a
-fix bumps the patch (`0.5.0` to `0.5.1`). Consumers pin the exact version or
-use `~0.5.0` or `^0.5.0`; for a `0.x` version both ranges accept only
-`0.5.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
+Until 1.0.0, a breaking change bumps the minor (`0.6.0` to `0.7.0`) and a
+fix bumps the patch (`0.6.0` to `0.6.1`). Consumers pin the exact version or
+use `~0.6.0` or `^0.6.0`; for a `0.x` version both ranges accept only
+`0.6.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
 release.
 
 ## Independent package versions
@@ -357,14 +630,14 @@ default.
 - **`next`** points to the newest owner-approved version, including any
   future `0.x.y-next.N` or other pre-release. The publish workflow always
   publishes with `--tag next`, so it moves only with a new version and a
-  fresh GO. It names `0.5.0` once the publish workflow runs after the merge
-  (`0.4.0` before that).
+  fresh GO. It names `0.6.0` once the publish workflow runs after the merge
+  (`0.5.0` before that).
 - **`latest`** is npm's default install tag, and npm's package page shows
   the README of the version it names. It tracks the newest release, before
   and after 1.0.0: the publish workflow moves it together with `next`
   (owner decision 2026-10-27; before that, `latest` was reserved for 1.0.0
-  and stayed on the first upload, `0.1.0-next.0`). It names `0.5.0` once the
-  publish workflow runs after the merge (`0.4.0` before that).
+  and stayed on the first upload, `0.1.0-next.0`). It names `0.6.0` once the
+  publish workflow runs after the merge (`0.5.0` before that).
   The workflow moves `latest` on every run, so publishing a future
   pre-release without moving `latest` needs a workflow change first.
 - Dailybot v4 and other production consumers must pin exact package versions
@@ -379,10 +652,12 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (for `0.5.0`, every internal pin is exactly `0.5.0`; compatibility
+versions (for `0.6.0`, every internal pin is exactly `0.6.0`; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`) keep the
-pnpm `workspace:` protocol. The release packer enforces that boundary
+pnpm `workspace:` protocol. `@texuli/document` and `@texuli/pages`, in the
+repository only, pin the published packages they use to exactly `0.6.0`
+too. The release packer enforces that boundary
 (`scripts/packages.ts` rewrites `workspace:` to the exact workspace version
 and fails the pack when a published manifest would still carry
 `workspace:*`, `link:`, `file:` or `0.0.0`).
@@ -399,13 +674,15 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 20 npm packages | `0.5.0` (dist-tags `latest` and `next`) | Each package manifest, with exact `0.5.0` internal pins; published by the publish workflow after the merge (before it: `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
-| `@texuli/editor` | `0.5.0` (first publication) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
-| `@texuli/deck` | `0.5.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
-| `@texuli/drag`, `@texuli/workflows` | `0.5.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
-| Blueprint spec | `0.5.0`, digest `1ba15e8b082f68140c4b2768b8fd69c9f760e655dd117fac756f356a71525b2d` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.5.0`. |
-| Blueprint spec in `@texuli/spec@0.4.0` | `0.4.0`, digest `fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3` (after `0.3.0`, digest `a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848`, which was never on npm) | The previous release's generated sources carry the `0.4.0` stamp. |
+| 20 npm packages | `0.6.0` (dist-tags `latest` and `next`) | Each package manifest, with exact `0.6.0` internal pins; published by the publish workflow after the merge (before it: `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| `@texuli/editor` | `0.6.0` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
+| `@texuli/deck` | `0.6.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
+| `@texuli/drag`, `@texuli/workflows` | `0.6.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
+| Blueprint spec | `0.6.0`, digest `37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.6.0`. |
+| Blueprint spec in `@texuli/spec@0.5.0` | `0.5.0`, digest `1ba15e8b082f68140c4b2768b8fd69c9f760e655dd117fac756f356a71525b2d` | The previous release's generated sources carry the `0.5.0` stamp. |
+| Blueprint spec in `@texuli/spec@0.4.0` | `0.4.0`, digest `fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3` (after `0.3.0`, digest `a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848`, which was never on npm) | The `0.4.0` release's generated sources carry the `0.4.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.3.0` | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | The `0.3.0` release's generated sources carry the `0.2.0` stamp. |
+| `@texuli/document`, `@texuli/pages` | `0.0.0`, in the repository only | `private`, not in `publish.yml`; first release planned for `0.7.0` (ADR-011). |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 
 - A normative spec change takes a new spec version and a fresh digest pin in
@@ -443,11 +720,13 @@ The date, drag, workflows, deck and editor rows are in
 `.github/workflows/publish.yml` (order: core, date, spec, drag, deck,
 tokens, primitives, texuli, workflows, editor, charts, data, media, chat,
 blocks, catalog, tools, astro, player, slides; `@texuli/editor` goes out
-from `0.5.0`, after `texuli`). Every packable package is `0.5.0`, and every
-internal dependency between them is pinned to exactly `0.5.0`. `pnpm verify:packages` still refuses any
+from `0.5.0`, after `texuli`). Every published package is `0.6.0`, and every
+internal dependency between them is pinned to exactly `0.6.0`;
+`@texuli/document` and `@texuli/pages` are not in the workflow (in the
+repository only, `0.0.0`). `pnpm verify:packages` still refuses any
 `0.0.0` or `workspace:` range in a published manifest, the guard that keeps
 an unversioned dependency out. The publish loop skips versions npm already
-has, so a package changed after `0.5.0` needs a new version before its
+has, so a package changed after `0.6.0` needs a new version before its
 change reaches npm.
 
 Each outward wave must also pass its task's `pnpm verify:packages` gate and
@@ -460,7 +739,7 @@ new version rather than reusing a published version.
 ## Honesty in documentation
 
 The npm name reservation (`0.1.0-next.0`) was a prerelease publication by
-the owner, not a supported product release. `0.5.0` is a release but not a
+the owner, not a supported product release. `0.6.0` is a release but not a
 stable one: keep `private: true`, the pre-1.0 status, and the absence of a
 stable 1.0.0 clear until the corresponding approved stable release actually
 exists. A passing pack gate proves only that a tarball

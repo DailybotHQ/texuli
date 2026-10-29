@@ -156,4 +156,37 @@ describe('NotificationInbox (G19)', () => {
     expect(screen.queryByRole('link')).toBeNull();
     expect(screen.getByText('Bad <b>link</b>')).toBeTruthy();
   });
+
+  it('hides mark-unread for hosts that persist only mark-read, and reports mark-unread separately (G50)', async () => {
+    const { default: Inbox } = await import('../src/activity/inbox/NotificationInbox.svelte');
+    const items = [
+      { id: 'u', title: 'Unread one', at: 0, read: false },
+      { id: 'r', title: 'Read one', at: 0, read: true },
+    ];
+    const changes: [string[], boolean][] = [];
+    const unread: string[][] = [];
+    for (const allowMarkUnread of [false, true]) {
+      render(Inbox, {
+        props: {
+          now: 0,
+          items,
+          allowMarkUnread,
+          onReadChange: (ids: string[], read: boolean) => changes.push([ids, read]),
+          onMarkUnread: (ids: string[]) => unread.push(ids),
+        },
+      });
+      // Unread items always offer "Mark read".
+      await fireEvent.click(screen.getByRole('button', { name: 'Mark as read: Unread one' }));
+      const toggle = screen.queryByRole('button', { name: 'Mark as unread: Read one' });
+      expect(toggle === null, `allowMarkUnread ${allowMarkUnread}`).toBe(!allowMarkUnread);
+      if (toggle) await fireEvent.click(toggle);
+      cleanup();
+    }
+    expect(changes).toEqual([
+      [['u'], true],
+      [['u'], true],
+      [['r'], false],
+    ]);
+    expect(unread).toEqual([['r']]);
+  });
 });

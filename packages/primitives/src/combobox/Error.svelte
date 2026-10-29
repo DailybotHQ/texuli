@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { getComboboxContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
@@ -8,9 +9,15 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Show a retry control that re-runs `loadOptions`. Default `true`. */
   showRetry?: boolean;
   retryLabel?: string;
-};
+} & RefProp;
 
-let { children, showRetry = true, retryLabel = 'Retry', ...rest }: Props = $props();
+let {
+  children,
+  showRetry = true,
+  retryLabel = 'Retry',
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 const context = getComboboxContext();
 const visible = $derived(context.open && context.status === 'error');
 
@@ -20,7 +27,7 @@ function handleRetry(): void {
 </script>
 
 {#if visible}
-  <div
+  <div bind:this={ref}
     {...rest}
     role="alert"
     data-tx-combobox-error=""

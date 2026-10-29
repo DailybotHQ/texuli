@@ -1,6 +1,8 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { getToastProviderContext, setToastItemContext } from './context.ts';
 import type { ToastRecord } from './types.ts';
@@ -8,12 +10,26 @@ import type { ToastRecord } from './types.ts';
 type Props = HTMLAttributes<HTMLLIElement> & {
   toast: ToastRecord;
   children?: Snippet;
-};
+} & RefProp;
 
-let { toast, class: className, children, ...rest }: Props = $props();
+let {
+  toast,
+  class: className,
+  children,
+  ref = $bindable(null),
+  onpointerdown,
+  onpointermove,
+  onpointerup,
+  onpointercancel,
+  ...rest
+}: Props = $props();
 
 const provider = getToastProviderContext();
 let itemEl: HTMLLIElement | null = $state(null);
+// `ref` follows the element the part binds for its own behavior.
+$effect(() => {
+  ref = itemEl ?? null;
+});
 let remaining = $state(0);
 let durationReady = $state(false);
 let running = $state(false);
@@ -121,10 +137,10 @@ function onPointerUp(event: PointerEvent): void {
   data-priority={toast.priority}
   data-tone={toast.tone}
   {...stateAttributes('open')}
-  onpointerdown={onPointerDown}
-  onpointermove={onPointerMove}
-  onpointerup={onPointerUp}
-  onpointercancel={onPointerUp}
+  onpointerdown={composeHandlers(onpointerdown, onPointerDown)}
+  onpointermove={chainHandlers(onpointermove, onPointerMove)}
+  onpointerup={chainHandlers(onpointerup, onPointerUp)}
+  onpointercancel={chainHandlers(onpointercancel, onPointerUp)}
 >
   {@render children?.()}
 </li>

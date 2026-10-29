@@ -113,7 +113,7 @@ Every drag surface (the `@texuli/primitives/sortable` binding, the
 `@texuli/workflows` and the player's `sortable-list`) follows one contract,
 [`@texuli/drag`'s interaction, accessibility and i18n contract](../packages/drag/docs/contract.md).
 `@texuli/drag` and `@texuli/workflows` are in development and on npm as
-`0.5.0`; the sortable binding, the data migrations and the player's
+`0.6.0`; the sortable binding, the data migrations and the player's
 `sortable-list` ship from the `0.4.0` release of `@texuli/primitives`,
 `@texuli/data` and `@texuli/player`.
 

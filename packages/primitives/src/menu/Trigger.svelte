@@ -3,16 +3,25 @@ import { untrack } from 'svelte';
 import { createAttachmentKey } from 'svelte/attachments';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { menuLevelContext } from './context.ts';
 
 type Props = Omit<HTMLButtonAttributes, 'children'> & {
   children?: import('svelte').Snippet;
   child?: ChildSnippet<Record<string, unknown>>;
-};
+} & RefProp;
 type Click = Parameters<NonNullable<HTMLButtonAttributes['onclick']>>[0];
 type Key = Parameters<NonNullable<HTMLButtonAttributes['onkeydown']>>[0];
 
-let { children, child, onclick, onkeydown, type = 'button', ...rest }: Props = $props();
+let {
+  children,
+  child,
+  onclick,
+  onkeydown,
+  type = 'button',
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 const level = menuLevelContext.get();
 // A consumer id wins: the context records it, so every reference follows.
 level.claimId(
@@ -71,7 +80,7 @@ const triggerProps = $derived({
 {#if child}
   {@render child({ props: triggerProps })}
 {:else}
-  <button {...triggerProps}>
+  <button bind:this={ref} {...triggerProps}>
     {@render children?.()}
   </button>
 {/if}

@@ -1,0 +1,35 @@
+/*
+ * The chart families render a data-table fallback under the plot (a
+ * <details> with a caption and a plain <table>). Each look is one shared
+ * stylesheet, so an app that loads several families loads it once, in the
+ * shared chunk, instead of one scoped copy per component.
+ *
+ * Grid look (calendar, histogram, pack, statistical, matrix):
+ *   .tx-chart-data           the disclosure
+ *   .tx-chart-data--scroll   it scrolls sideways (statistical)
+ */
+
+.tx-chart-data {
+  margin-block-start: 0.75rem;
+}
+
+.tx-chart-data--scroll {
+  overflow-x: auto;
+}
+
+.tx-chart-data > summary {
+  align-content: center;
+  cursor: pointer;
+  min-block-size: 2.75rem;
+}
+
+.tx-chart-data table {
+  border-collapse: collapse;
+  inline-size: 100%;
+}
+
+.tx-chart-data :is(th, td) {
+  border: 1px solid var(--tx-chart-grid, var(--tx-border, GrayText));
+  padding: 0.375rem 0.5rem;
+  text-align: start;
+}

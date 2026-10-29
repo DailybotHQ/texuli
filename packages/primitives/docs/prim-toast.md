@@ -61,6 +61,12 @@ For reactive lists, subscribe to `manager.subscribe` or use `Toast.Toaster` with
   hides and re-shows itself so it returns to the top of the top layer. That
   keeps toasts clickable as well as keyboard-reachable (R16). Other toast
   regions are ignored, so two toasters do not loop.
+- **`active`** (default `true`): whether a top-layer viewport is shown. Pass
+  `false` while there is nothing to show; the styled Toaster passes
+  `rendered.length > 0`, so an empty region never sits in the top layer.
+- **`mode`** (`'top-layer'` default or `'contained'`) and **`container`**:
+  a contained viewport has no `popover` attribute, never enters the top
+  layer, and is moved into `container`, which becomes its containing block.
 - Toasts published in the same millisecond list newest first, deterministically.
 - `Toast.Toaster` forwards extra attributes (`class`, `data-*`) to its
   viewport, so a consumer can style or place it (for example

@@ -2,6 +2,8 @@
 import { HoverCardContent as PrimitiveContent } from '@texuli/primitives/hover-card';
 import type { ComponentProps, Snippet } from 'svelte';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { MotionProp } from '../../motion/contract.ts';
+import { createOverlayMotion } from '../../motion/seam.ts';
 import {
   hoverCardArrowClass,
   hoverCardContentClass,
@@ -16,6 +18,8 @@ type Props = ComponentProps<typeof PrimitiveContent> & {
   variant?: PopoverVariant;
   size?: PopoverSize;
   arrow?: boolean;
+  /** Enter and exit motion (`texuli/motion`): default a quick scale-and-fade in, a fade out; `false` for none. */
+  motion?: MotionProp;
 };
 
 let {
@@ -24,8 +28,15 @@ let {
   variant = 'elevated',
   size = 'md',
   arrow = true,
+  motion,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+const overlayMotion = createOverlayMotion({
+  motion: () => motion,
+  defaults: { enter: 'scale', exit: 'fade', duration: 'fast' },
+});
 
 const classes = $derived(
   hoverCardContentClass({
@@ -36,7 +47,8 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveContent
+<PrimitiveContent bind:ref
+  motionHooks={overlayMotion}
   class={classes}
   data-tx-hover-card-content
   data-variant={variant}

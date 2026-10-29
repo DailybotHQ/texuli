@@ -1,5 +1,6 @@
 <script lang="ts">
 import {
+  type TagDelimiter,
   type TagsInputInvalidDetail,
   type TagsInputLabels,
   TagsInput as TagsInputPrimitive,
@@ -7,6 +8,7 @@ import {
 import type { HTMLAttributes } from 'svelte/elements';
 import { splitControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import { getFieldLabelContext } from '../field/context.ts';
 import './tags-color.css';
 
 type Props = {
@@ -22,13 +24,20 @@ type Props = {
   inputValue?: string;
   /** Called with each draft change the input makes (typing, clearing). */
   onInputValueChange?: (value: string) => void;
-  delimiter?: string | RegExp;
+  /**
+   * Splits typed and pasted text: a string, several strings (any of them,
+   * e.g. `[',', ';', ' ']`) or a RegExp. Typing a one-character delimiter, or
+   * a character the RegExp matches, adds the draft as a tag. Default `,`.
+   */
+  delimiter?: TagDelimiter;
   addOnPaste?: boolean;
   addOnBlur?: boolean;
   allowDuplicates?: boolean;
   max?: number;
   validate?: (tag: string, tags: readonly string[]) => boolean | string;
   disabled?: boolean;
+  /** Tags stay visible and focusable but cannot be added or removed. */
+  readonly?: boolean;
   name?: string;
   form?: string;
   required?: boolean;
@@ -39,10 +48,13 @@ type Props = {
   inputLabel?: string;
   placeholder?: string;
   class?: ClassValue;
+  /** The text input's id, so `<label for>` and Field target the focusable control. */
   id?: string;
+  /** The rendered root group (bindable). */
+  ref?: HTMLElement | null;
 } & Omit<
   HTMLAttributes<HTMLDivElement>,
-  'class' | 'id' | 'children' | 'onInvalid' | 'placeholder' | 'onchange'
+  'class' | 'id' | 'children' | 'onInvalid' | 'placeholder' | 'onchange' | 'readonly'
 >;
 
 let {
@@ -58,6 +70,7 @@ let {
   max = Number.POSITIVE_INFINITY,
   validate,
   disabled = false,
+  readonly = false,
   name,
   form,
   required = false,
@@ -67,8 +80,13 @@ let {
   placeholder = 'Add…',
   class: className,
   id,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+// Inside a Field whose label points at this input, the label names it.
+const field = getFieldLabelContext();
+const namedByField = $derived(Boolean(field && id && field.id === id));
 
 // aria-*, data-*, handlers and form attributes name and wire the text input
 // (the focusable control); layout hooks (style, hidden…) stay on the root.
@@ -85,12 +103,13 @@ const split = $derived(splitControlProps(rest));
   {allowDuplicates}
   {max}
   {validate}
+  bind:ref
   {disabled}
+  {readonly}
   {name}
   {form}
   {required}
   {labels}
-  {id}
   class={cx('tx-tags-input', className)}
   aria-label={label}
   data-tx-tags-input=""
@@ -116,10 +135,12 @@ const split = $derived(splitControlProps(rest));
     </TagsInputPrimitive.List>
     <TagsInputPrimitive.Input
       {...split.control}
+      {id}
       bind:value={inputValue}
       onValueChange={onInputValueChange}
       class="tx-tags-input__input"
-      aria-label={(split.control['aria-label'] as string | undefined) ?? inputLabel}
+      aria-label={(split.control['aria-label'] as string | undefined) ??
+        (namedByField ? undefined : inputLabel)}
       {placeholder}
       data-tx-tags-field=""
     />

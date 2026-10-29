@@ -12,7 +12,13 @@ type Props = ComponentProps<typeof PrimitiveLoading> & {
   announce?: string;
 };
 
-let { children, class: className, announce = 'Loading options', ...rest }: Props = $props();
+let {
+  children,
+  class: className,
+  announce = 'Loading options',
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const classes = $derived(
   comboboxLoadingClass({
@@ -32,7 +38,7 @@ $effect(() => {
 });
 </script>
 
-<PrimitiveLoading class={classes} data-tx-combobox-loading {...rest}>
+<PrimitiveLoading bind:ref class={classes} data-tx-combobox-loading {...rest}>
   {#if children}
     {@render children()}
   {:else}

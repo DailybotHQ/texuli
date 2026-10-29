@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { expectLiveStage } from './support/live-stage.ts';
-import { serveDist, settle } from './support/site.ts';
+import { serveDist, settle, settleAnimations } from './support/site.ts';
 
 /*
  * Component pages (/component-pages/<id>/), in the browser: the props panel
@@ -69,6 +69,7 @@ test('props panel drives the code, the menu stage is interactive, families pass 
   for (const id of FAMILY_SAMPLES) {
     await page.goto(`${origin()}/component-pages/${id}/`);
     await expectLiveStage(page, id);
+    await settleAnimations(page);
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
       .analyze();

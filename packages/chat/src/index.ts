@@ -22,6 +22,7 @@ export {
   type ChatMessage,
   type ChatMessageActions,
   type ChatMessageStatus,
+  type ChatReadingAnchor,
   type ChatStreamEvent,
   ChatThread,
   groupMessages,

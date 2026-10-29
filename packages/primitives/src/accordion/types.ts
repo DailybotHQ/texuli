@@ -1,6 +1,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/index.ts';
+import type { OverlayMotionHooks } from '../internal/motion-hold.ts';
 
 export type AccordionType = 'single' | 'multiple';
 export type AccordionOrientation = 'vertical' | 'horizontal';
@@ -12,7 +13,8 @@ type Base<Attributes> = Omit<Attributes, 'children'> & {
   children?: Snippet;
 };
 
-interface RootShared extends Base<HTMLAttributes<HTMLDivElement>> {
+/** The root's own shared props; the native attributes stay a separate constituent. */
+interface RootOwn {
   /** Disable every item. */
   disabled?: boolean;
   /** Which arrow keys move between triggers. Default `vertical`. */
@@ -24,7 +26,21 @@ interface RootShared extends Base<HTMLAttributes<HTMLDivElement>> {
   ref?: HTMLElement | null;
 }
 
-export interface AccordionSingleRootProps extends RootShared {
+/**
+ * Why the members are written as `RootShared & { … }` with an inline object
+ * type (T-std-consumers): a consumer's checker evaluates `keyof` of this union
+ * for the component's bindings (`Component<Props, {}, 'ref' | 'value'>`), which
+ * is the intersection of each member's key union. Those unions hold several
+ * hundred native attribute keys plus the `data-${string}` pattern, so unless
+ * both members yield the very same union TypeScript multiplies them and fails
+ * with TS2590 ("union type that is too complex to represent"). Interfaces, or
+ * named aliases for the member-specific part, give each key union a distinct
+ * origin and trigger it. Keep the inline parts and the same key set in both
+ * members; `tests/root-props.types.ts` checks it.
+ */
+type RootShared = Base<HTMLAttributes<HTMLDivElement>> & RootOwn;
+
+export type AccordionSingleRootProps = RootShared & {
   /** One item open at a time. */
   type: 'single';
   /** The open item's value, or `''` when none is open. Bindable. */
@@ -32,16 +48,16 @@ export interface AccordionSingleRootProps extends RootShared {
   onValueChange?: (value: string) => void;
   /** Whether the open item can be closed again, leaving none open. Default `true`. */
   collapsible?: boolean;
-}
+};
 
-export interface AccordionMultipleRootProps extends RootShared {
+export type AccordionMultipleRootProps = RootShared & {
   /** Any number of items open. */
   type: 'multiple';
   /** The open items' values. Bindable. */
   value?: string[];
   onValueChange?: (value: string[]) => void;
   collapsible?: never;
-}
+};
 
 export type AccordionRootProps = AccordionSingleRootProps | AccordionMultipleRootProps;
 
@@ -68,5 +84,10 @@ export interface AccordionContentProps extends Base<HTMLAttributes<HTMLDivElemen
    * for find-in-page or a CSS-only animation. Default `false`.
    */
   forceMount?: boolean;
+  /**
+   * Open and close motion (texuli passes `texuli/motion` hooks): the panel
+   * stays mounted while its close animation plays.
+   */
+  motionHooks?: OverlayMotionHooks;
   ref?: HTMLElement | null;
 }

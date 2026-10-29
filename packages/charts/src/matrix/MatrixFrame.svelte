@@ -137,28 +137,6 @@ $effect(() => {
     flex: none;
   }
 
-  .chart :global(.data-table) {
-    margin-block-start: 0.75rem;
-  }
-
-  .chart :global(.data-table summary) {
-    cursor: pointer;
-    min-block-size: 2.75rem;
-    align-content: center;
-  }
-
-  .chart :global(table) {
-    border-collapse: collapse;
-    inline-size: 100%;
-  }
-
-  .chart :global(th),
-  .chart :global(td) {
-    border: 1px solid var(--tx-chart-grid, var(--tx-border, GrayText));
-    padding: 0.375rem 0.5rem;
-    text-align: start;
-  }
-
   @media (forced-colors: active) {
     .chart :global(.grid line) {
       stroke: CanvasText;

@@ -485,44 +485,10 @@
 
 /*
  * Slide transitions, CSS fallback (no View Transitions): the slide that just
- * became active carries `data-tx-deck-enter`. Opacity-only fades also run
- * under reduced motion (the engine resolves every transition to a 150 ms
- * fade there); movement runs only with no motion preference.
+ * became active carries `data-tx-deck-enter`, and the stage plays its
+ * entrance through @texuli/core/motion (ADR-013). These keyframes serve the
+ * v1 reveal steps below.
  */
-.tx-deck-stage__slide[data-tx-deck-enter] {
-  animation: tx-deck-slide-fade var(--tx-deck-transition-duration, 300ms) ease-out both;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .tx-deck-stage__slide[data-tx-deck-enter="fade-up"] {
-    animation-name: tx-deck-slide-fade-up;
-  }
-
-  .tx-deck-stage__slide[data-tx-deck-enter="zoom"] {
-    animation-name: tx-deck-slide-zoom;
-  }
-
-  .tx-deck-stage__slide[data-tx-deck-enter="slide"] {
-    --tx-deck-enter-from: 100%;
-    animation-name: tx-deck-slide-in;
-  }
-
-  .tx-deck-stage__slide[data-tx-deck-enter="slide"][data-tx-deck-direction="backward"],
-  .tx-deck-stage[dir="rtl"] .tx-deck-stage__slide[data-tx-deck-enter="slide"] {
-    --tx-deck-enter-from: -100%;
-  }
-
-  .tx-deck-stage[dir="rtl"]
-    .tx-deck-stage__slide[data-tx-deck-enter="slide"][data-tx-deck-direction="backward"] {
-    --tx-deck-enter-from: 100%;
-  }
-}
-
-.tx-deck-stage[data-tx-deck-motion="none"] .tx-deck-stage__slide[data-tx-deck-enter],
-.tx-deck-stage[data-motion="reduce"] .tx-deck-stage__slide[data-tx-deck-enter] {
-  animation-name: tx-deck-slide-fade;
-}
-
 @keyframes tx-deck-slide-fade {
   from {
     opacity: 0;
@@ -542,28 +508,6 @@
 
   to {
     opacity: 1;
-    translate: 0 0;
-  }
-}
-
-@keyframes tx-deck-slide-zoom {
-  from {
-    opacity: 0;
-    scale: 0.92;
-  }
-
-  to {
-    opacity: 1;
-    scale: 1;
-  }
-}
-
-@keyframes tx-deck-slide-in {
-  from {
-    translate: var(--tx-deck-enter-from, 100%) 0;
-  }
-
-  to {
     translate: 0 0;
   }
 }
@@ -596,28 +540,17 @@
  * (`hidden`, `visible`, `active`, `gone`) and `data-tx-deck-effect` the
  * effect. Hidden and gone fragments keep their space. Layout renderers put
  * the attributes on the element itself; the free-slide renderer puts them on
- * a box-less wrapper, so its child carries the motion (500 ms, as Protoyard).
+ * a box-less wrapper, so its child carries the motion. CSS holds the end
+ * states only: the stage animates a phase change through @texuli/core/motion
+ * (500 ms at full motion, as Protoyard).
  */
 :where(.tx-deck-stage__canvas)
 :is(
-  [data-tx-deck-fragment]:not(.tx-deck-stage__fragment),
-  .tx-deck-stage__fragment[data-tx-deck-fragment] > *
+  [data-tx-deck-fragment="hidden"]:not(.tx-deck-stage__fragment),
+  [data-tx-deck-fragment="gone"]:not(.tx-deck-stage__fragment),
+  .tx-deck-stage__fragment[data-tx-deck-fragment="hidden"] > *,
+  .tx-deck-stage__fragment[data-tx-deck-fragment="gone"] > *
 ) {
-  transition:
-    opacity 500ms ease-out,
-    translate 500ms ease-out,
-    scale 500ms ease-out,
-    background-color 500ms ease-out,
-    visibility 500ms;
-}
-
-:where(.tx-deck-stage__canvas)
-  :is(
-    [data-tx-deck-fragment="hidden"]:not(.tx-deck-stage__fragment),
-    [data-tx-deck-fragment="gone"]:not(.tx-deck-stage__fragment),
-    .tx-deck-stage__fragment[data-tx-deck-fragment="hidden"] > *,
-    .tx-deck-stage__fragment[data-tx-deck-fragment="gone"] > *
-  ) {
   visibility: hidden;
   opacity: 0;
 }
@@ -690,7 +623,6 @@
       [data-tx-deck-fragment]:not(.tx-deck-stage__fragment),
       .tx-deck-stage__fragment[data-tx-deck-fragment] > *
     ) {
-    transition: none;
     translate: none;
     scale: none;
   }
@@ -701,7 +633,6 @@
     [data-tx-deck-fragment]:not(.tx-deck-stage__fragment),
     .tx-deck-stage__fragment[data-tx-deck-fragment] > *
   ) {
-  transition: none;
   translate: none;
   scale: none;
 }

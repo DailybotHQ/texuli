@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { menuGroupContext, menuRadioContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
@@ -8,9 +9,15 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   value?: string;
   onValueChange?: (value: string) => void;
   children?: Snippet;
-};
+} & RefProp;
 
-let { value = $bindable(), onValueChange, children, ...rest }: Props = $props();
+let {
+  value = $bindable(),
+  onValueChange,
+  children,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 let headingId = $state<string | undefined>();
 
 menuGroupContext.set({
@@ -30,4 +37,4 @@ menuRadioContext.set({
 });
 </script>
 
-<div {...rest} role="group" aria-labelledby={headingId}>{@render children?.()}</div>
+<div bind:this={ref} {...rest} role="group" aria-labelledby={headingId}>{@render children?.()}</div>

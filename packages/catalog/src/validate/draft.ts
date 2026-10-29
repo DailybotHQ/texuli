@@ -126,7 +126,7 @@ export interface DraftValidation {
   status: DraftStatus;
   tier: RenderTier;
   /**
-   * The draft with only `id`, `props`, `children`, `slot`, `when`, `bind` and `on` on each node, or `null`
+   * The draft with only `id`, `props`, `children`, `slot`, `when`, `bind`, `on` and `motion` on each node, or `null`
    * when it could not be read (bad JSON, not a tree, over the limits).
    */
   draft: CatalogTreeInput | readonly CatalogTreeInput[] | null;
@@ -143,7 +143,7 @@ export interface DraftValidation {
   checks: Readonly<Record<DraftCheck, DraftCheckStatus>>;
 }
 
-const NODE_KEYS = new Set(['id', 'props', 'children', 'slot', 'when', 'bind', 'on']);
+const NODE_KEYS = new Set(['id', 'props', 'children', 'slot', 'when', 'bind', 'on', 'motion']);
 const PROTOTYPE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 /** Values nested deeper than this are refused, not walked (depth bombs). */
 const MAX_VALUE_DEPTH = 128;
@@ -402,7 +402,7 @@ function normalize(
         report(
           'unknown-field',
           `${path}.${key}`,
-          'Catalog nodes take only id, props, children, slot, when, bind and on.'
+          'Catalog nodes take only id, props, children, slot, when, bind, on and motion.'
         );
       }
     }
@@ -412,6 +412,7 @@ function normalize(
     if (record.when !== undefined) out.when = record.when;
     if (record.bind !== undefined) out.bind = record.bind;
     if (record.on !== undefined) out.on = record.on;
+    if (record.motion !== undefined) out.motion = record.motion;
     if (Array.isArray(record.children)) {
       out.children = record.children.map((child, index) =>
         node(child, `${path}.children.${index}`)

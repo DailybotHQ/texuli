@@ -2,6 +2,8 @@
 import { Content as PrimitiveContent } from '@texuli/primitives/popover';
 import type { ComponentProps, Snippet } from 'svelte';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { MotionProp } from '../../motion/contract.ts';
+import { createOverlayMotion } from '../../motion/seam.ts';
 import {
   type PopoverSize,
   type PopoverVariant,
@@ -19,6 +21,8 @@ type Props = ComponentProps<typeof PrimitiveContent> & {
   arrow?: boolean;
   /** Accessible name when content has no visible heading. */
   'aria-label'?: string;
+  /** Enter and exit motion (`texuli/motion`): default a quick scale-and-fade; `false` for none. */
+  motion?: MotionProp;
 };
 
 let {
@@ -27,8 +31,15 @@ let {
   variant = 'elevated',
   size = 'md',
   arrow = true,
+  motion,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
+
+const overlayMotion = createOverlayMotion({
+  motion: () => motion,
+  defaults: { enter: 'scale', exit: 'scale', duration: 'fast' },
+});
 
 const classes = $derived(
   popoverContentClass({
@@ -39,7 +50,8 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveContent
+<PrimitiveContent bind:ref
+  motionHooks={overlayMotion}
   class={classes}
   data-tx-popover-content
   data-variant={variant}

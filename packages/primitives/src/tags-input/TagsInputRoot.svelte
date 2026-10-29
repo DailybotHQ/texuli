@@ -3,7 +3,7 @@ import { untrack } from 'svelte';
 import { type Attachment, createAttachmentKey } from 'svelte/attachments';
 import { tagsInputContext, visuallyHidden } from './context.ts';
 import { DEFAULT_TAGS_INPUT_LABELS } from './labels.ts';
-import { addTags, splitTags } from './tags.ts';
+import { addTags, isDelimiterKey, splitTags } from './tags.ts';
 import type { TagsInputRootProps } from './types.ts';
 
 /**
@@ -22,6 +22,7 @@ let {
   max = Number.POSITIVE_INFINITY,
   validate,
   disabled = false,
+  readonly = false,
   name,
   form,
   required = false,
@@ -63,7 +64,7 @@ function tagElement(index: number): HTMLElement | null {
 }
 
 function add(raw: string): boolean {
-  if (disabled) return false;
+  if (disabled || readonly) return false;
   const candidates = splitTags(raw, delimiter);
   if (candidates.length === 0) return raw.trim() === '';
   const decision = addTags(tags, candidates, { delimiter, allowDuplicates, max, validate });
@@ -88,7 +89,7 @@ function add(raw: string): boolean {
 
 function remove(index: number, focus: 'previous' | 'next' | 'input') {
   const removed = tags[index];
-  if (disabled || removed === undefined) return;
+  if (disabled || readonly || removed === undefined) return;
   const next = tags.filter((_, i) => i !== index);
   commit(next, text.removed(removed));
   invalid = false;
@@ -107,15 +108,16 @@ tagsInputContext.set({
   get disabled() {
     return disabled;
   },
+  get readonly() {
+    return readonly;
+  },
   get invalid() {
     return invalid;
   },
   get labels() {
     return text;
   },
-  get delimiterKey() {
-    return typeof delimiter === 'string' && delimiter.length === 1 ? delimiter : undefined;
-  },
+  isDelimiterKey: (key) => isDelimiterKey(key, delimiter),
   get addOnPaste() {
     return addOnPaste;
   },
@@ -154,6 +156,7 @@ const partProps = $derived({
   role: 'group',
   'data-tx-tags-input-root': '',
   'data-disabled': disabled ? '' : undefined,
+  'data-readonly': readonly ? '' : undefined,
   'data-invalid': invalid ? '' : undefined,
   [attachKey]: attach,
 });

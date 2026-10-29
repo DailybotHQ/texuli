@@ -2,12 +2,31 @@
 import { Panel as Primitive } from '@texuli/primitives/sheet';
 import type { ComponentProps } from 'svelte';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import type { MotionProp } from '../../motion/contract.ts';
+import { createOverlayMotion, sheetEdge } from '../../motion/seam.ts';
 import { detailPanelContentClass, type SheetSize } from './variants.ts';
 import './sheet.css';
 
-type Props = ComponentProps<typeof Primitive.Content> & { size?: SheetSize; class?: ClassValue };
-let { size = 'md', side = 'end', class: className, ...rest }: Props = $props();
+type Props = ComponentProps<typeof Primitive.Content> & {
+  size?: SheetSize;
+  class?: ClassValue;
+  /** Enter and exit motion (`texuli/motion`): default a slide from its edge (centered: a rise); `false` for none. */
+  motion?: MotionProp;
+};
+let {
+  size = 'md',
+  side = 'end',
+  class: className,
+  motion,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
+const sheetMotion = createOverlayMotion({
+  motion: () => motion,
+  defaults: { enter: 'rise', exit: 'rise', duration: 'base' },
+  edge: sheetEdge,
+});
 const classes = $derived(cx(detailPanelContentClass({ size }), className));
 </script>
 
-<Primitive.Content {...rest} {side} class={classes} data-tx-detail-panel="" data-size={size} />
+<Primitive.Content bind:ref {...rest} motionHooks={sheetMotion} {side} class={classes} data-tx-detail-panel="" data-size={size} />

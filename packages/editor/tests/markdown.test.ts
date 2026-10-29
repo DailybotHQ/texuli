@@ -164,3 +164,30 @@ describe('@texuli/editor/markdown', () => {
     }
   }, 180_000);
 });
+
+describe('host inline extensions (G48)', () => {
+  it('keeps mentions and references with their entity id through markdownToDocument and documentToMarkdown', () => {
+    const extensions = [
+      { name: 'mention', sigil: '@' as const },
+      { name: 'reference', sigil: '#' as const },
+    ];
+    const source = 'Ping @{person-1|Ada} on #{record-7|Roadmap}';
+    const { doc, diagnostics } = markdownToDocument(source, { extensions });
+    expect(diagnostics).toEqual([]);
+    const marks = editorMarks(doc);
+    expect(marks).toEqual([
+      { type: 'extension', name: 'mention', id: 'person-1' },
+      { type: 'extension', name: 'reference', id: 'record-7' },
+    ]);
+    expect(documentToMarkdown(doc, { extensions })).toBe(source);
+    // Without the registry the writer keeps only the labels.
+    expect(documentToMarkdown(doc)).toBe('Ping Ada on Roadmap');
+  });
+});
+
+/** Every mark in a one-paragraph document, in order. */
+function editorMarks(doc: EditorDocument): unknown[] {
+  const block = doc.blocks[0];
+  if (block?.type !== 'paragraph') return [];
+  return block.content.flatMap((node) => (node.type === 'text' ? node.marks : []));
+}

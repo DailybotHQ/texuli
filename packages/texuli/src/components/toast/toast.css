@@ -58,6 +58,27 @@
     );
   }
 
+  /*
+   * Contained (framed previews): out of the top layer, pinned to the edges of
+   * its container (the containing block) and above contained dialogs, which
+   * stack from z-index 1000 (OVERLAY_Z_BASE).
+   */
+  .tx-toaster__viewport[data-mode="contained"] {
+    position: absolute;
+    z-index: 2000;
+    max-block-size: 100%;
+  }
+
+  /*
+   * A top-layer viewport is shown only while it has toasts (the Toaster
+   * passes `active`): the closed popover must not paint at the corner.
+   */
+  @supports selector(:popover-open) {
+    .tx-toaster__viewport[popover]:not(:popover-open) {
+      display: none;
+    }
+  }
+
   .tx-toaster__viewport[data-position^="top"] {
     --tx-toast-enter: -0.5rem;
     inset-block-start: 0;
@@ -103,7 +124,6 @@
   }
 
   .tx-toast {
-    animation: tx-toast-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
     pointer-events: auto;
     display: flex;
     align-items: flex-start;
@@ -169,6 +189,13 @@
     font-size: var(--tx-font-size-sm, 0.875rem);
   }
 
+  .tx-toast__error {
+    margin: 0;
+    color: var(--tx-destructive, CanvasText);
+    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-weight: 500;
+  }
+
   .tx-toast__action {
     margin-block-start: 0.25rem;
     justify-self: start;
@@ -227,25 +254,13 @@
     animation: tx-toast-pulse 1s ease-in-out infinite;
   }
 
-  /* A dismissed toast stays mounted (inert) while it fades out. */
+  /*
+   * A dismissed toast stays mounted (inert) while it fades out. Enter, exit
+   * and the stack reflow play through texuli/motion (ADR-013), not CSS
+   * keyframes.
+   */
   .tx-toast[data-leaving="true"] {
-    animation: tx-toast-out 160ms ease-in forwards;
     pointer-events: none;
-  }
-
-  /* Enter and exit slide from the stack's edge (`--tx-toast-enter`). */
-  @keyframes tx-toast-in {
-    from {
-      opacity: 0;
-      translate: 0 var(--tx-toast-enter, 0.5rem);
-    }
-  }
-
-  @keyframes tx-toast-out {
-    to {
-      opacity: 0;
-      translate: 0 var(--tx-toast-enter, 0.5rem);
-    }
   }
 
   @keyframes tx-toast-pulse {
@@ -255,8 +270,6 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .tx-toast,
-    .tx-toast[data-leaving="true"],
     .tx-toast[data-pending="true"] .tx-toast__icon {
       animation: none;
     }

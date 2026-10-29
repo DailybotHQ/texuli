@@ -2,13 +2,13 @@
 import { Button } from 'texuli/button';
 import { RadioGroup } from 'texuli/choice';
 import type { InteractiveBlockLabels } from './labels.ts';
-import type { QuizBlock } from './schema.ts';
+import type { QuizBlock as QuizBlockData } from './schema.ts';
 
 let {
   block,
   labels,
 }: {
-  block: QuizBlock;
+  block: QuizBlockData;
   labels: InteractiveBlockLabels;
 } = $props();
 

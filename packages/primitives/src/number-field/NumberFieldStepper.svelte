@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { numberFieldContext } from './context.ts';
 import { createPressRepeat } from './press-repeat.ts';
 
@@ -19,7 +20,13 @@ type StepperProps = HTMLButtonAttributes & {
   children?: Snippet;
 };
 
-let { direction, child, children, ...rest }: StepperProps = $props();
+let {
+  direction,
+  child,
+  children,
+  ref = $bindable(null),
+  ...rest
+}: StepperProps & RefProp = $props();
 const field = numberFieldContext.get();
 
 const enabled = $derived(direction > 0 ? field.canIncrement : field.canDecrement);
@@ -71,7 +78,7 @@ const buttonProps = $derived(composeChildProps(baseProps, rest as Partial<typeof
 {#if child}
   {@render child({ props: buttonProps })}
 {:else}
-  <button {...buttonProps} style:touch-action="manipulation">
+  <button bind:this={ref} {...buttonProps} style:touch-action="manipulation">
     {#if children}{@render children()}{:else}<span aria-hidden="true">{direction > 0 ? '+' : '\u2212'}</span>{/if}
   </button>
 {/if}

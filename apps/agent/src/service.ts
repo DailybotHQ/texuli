@@ -15,7 +15,11 @@ import {
   type RenderCatalog,
   renderCatalogFromBuild,
 } from '@texuli/catalog/render/renderer';
-import { type DraftValidation, validateDraft } from '@texuli/catalog/validate';
+import {
+  type DraftValidation,
+  type ValidateDraftOptions,
+  validateDraft,
+} from '@texuli/catalog/validate';
 import { createFamilyBlockCheck, diagramFamilyCheck } from '@texuli/catalog/validate/blocks';
 import {
   createMemoryTokenUsageStore,
@@ -34,6 +38,7 @@ import {
   LIMITS,
   type Receipt,
 } from './contract.ts';
+import { createDraftStreamer, type DraftStreamEvent, type DraftStreamer } from './draft-stream.ts';
 import {
   type ActionReceiptStore,
   createMemoryActionReceiptStore,
@@ -54,7 +59,7 @@ import {
   DEFAULT_RATE_LIMITS,
   type RateLimits,
 } from './limits.ts';
-import type { Provider, ProviderMessage } from './provider.ts';
+import { canonicalJson, type Provider, type ProviderMessage } from './provider.ts';
 import { blueprintTool, systemPrompt, TOOL_NAME } from './tools.ts';
 
 /**
@@ -138,6 +143,15 @@ export interface AgentService {
   receipts(session: string): Promise<readonly ActionReceipt[]>;
 }
 
+/** A provider `error` event, thrown inside the call loop so one path handles every failure. */
+class ProviderStop extends Error {
+  readonly retryable: boolean;
+  constructor(retryable: boolean) {
+    super('The provider stopped.');
+    this.retryable = retryable;
+  }
+}
+
 const MAX_NOTE = 500;
 const MAX_REPAIR_DIAGNOSTICS = 20;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -210,13 +224,13 @@ export function createAgentService(config: AgentConfig): AgentService {
     };
   };
 
-  const gate = (input: unknown): DraftValidation =>
-    validateDraft(input, {
-      catalog: renderCatalog,
-      tier: 'untrusted',
-      catalogHash: config.catalogHash,
-      checkBlock: (block, id) => checkFamilyBlock(block, id),
-    });
+  const gateOptions: ValidateDraftOptions = {
+    catalog: renderCatalog,
+    tier: 'untrusted',
+    catalogHash: config.catalogHash,
+    checkBlock: (block, id) => checkFamilyBlock(block, id),
+  };
+  const gate = (input: unknown): DraftValidation => validateDraft(input, gateOptions);
 
   const tokenBudgetRefusal = (
     requestId: string,
@@ -366,11 +380,48 @@ export function createAgentService(config: AgentConfig): AgentService {
       let validation: DraftValidation | null = null;
       let extraCodes: { code: string; path: string; message: string }[] = [];
 
+      const streamMode = request.stream === true;
+      const envelopeFor = (tree: unknown, at: string) =>
+        createEnvelope({
+          id: `draft-${requestId}`,
+          catalog: config.catalogHash,
+          generator: {
+            kind: 'agent',
+            name: 'texuli.com agent',
+            model: config.provider.label,
+          },
+          tree: tree as CatalogTreeInput,
+          at,
+        });
+
       while (attempts <= LIMITS.repairs) {
         attempts += 1;
         let toolInput: unknown;
         let sawTool = false;
         let attemptText = '';
+        // Streamed tool input (ADR-014): one call, parsed as it arrives and,
+        // in stream mode, checked node by node and re-framed for clients.
+        const attemptAt = new Date(clock()).toISOString();
+        const { tree: _placeholder, ...header } = envelopeFor(null, attemptAt);
+        let streamer: DraftStreamer | null = null;
+        let streamCallId: string | null = null;
+        let streamIssue: { code: string; message: string } | null = null;
+        const relay = (events: readonly DraftStreamEvent[]): AgentEvent[] =>
+          streamMode
+            ? events.map((event): AgentEvent => {
+                if (event.type === 'chunk') {
+                  return { type: 'draft-chunk', attempt: attempts, text: event.text };
+                }
+                if (event.type === 'node-ready') {
+                  const { path, streamId, id } = event;
+                  return { type: 'node-ready', attempt: attempts, path, streamId, id };
+                }
+                const { path, reason, codes } = event;
+                return { type: 'refused', attempt: attempts, path, reason, codes };
+              })
+            : [];
+        const openStreamer = () =>
+          createDraftStreamer({ header, validation: gateOptions, check: streamMode });
         // Hard stop: the kill switch and the breaker are checked before every
         // provider call, so turning the agent off also ends a repair loop.
         const stop = killed(attempts - 1) ?? tripped(attempts - 1);
@@ -387,13 +438,37 @@ export function createAgentService(config: AgentConfig): AgentService {
             signal,
           })) {
             if (signal?.aborted) return;
-            if (event.type === 'text') {
+            if (event.type === 'text' || event.type === 'text-delta') {
               const text = consumeModelText(event.text);
               if (noteWithheld) attemptText = WITHHELD_NOTE;
               else if (text) attemptText += text;
-            } else if (event.type === 'tool' && event.name === TOOL_NAME && !sawTool) {
+            } else if (
+              event.type === 'tool' &&
+              event.name === TOOL_NAME &&
+              !sawTool &&
+              streamer === null
+            ) {
               sawTool = true;
               toolInput = event.input;
+              if (streamMode) {
+                // A whole call streams as one chunk, so clients see one shape.
+                const whole = openStreamer();
+                const text =
+                  JSON.stringify(toolInput) === undefined ? '' : canonicalJson(toolInput);
+                yield* relay(whole.write(text));
+                yield* relay(whole.end().events);
+              }
+            } else if (
+              event.type === 'tool-delta' &&
+              event.name === TOOL_NAME &&
+              !sawTool &&
+              (streamCallId === null || streamCallId === event.callId)
+            ) {
+              streamCallId = event.callId;
+              streamer ??= openStreamer();
+              yield* relay(streamer.write(event.text));
+            } else if (event.type === 'error') {
+              throw new ProviderStop(event.retryable);
             } else if (event.type === 'usage') {
               const inputTokens = Number.isFinite(event.inputTokens)
                 ? Math.max(0, Math.floor(event.inputTokens))
@@ -424,6 +499,15 @@ export function createAgentService(config: AgentConfig): AgentService {
               );
             }
           }
+          if (streamer !== null && !sawTool) {
+            const ended = streamer.end();
+            yield* relay(ended.events);
+            if (ended.issue) streamIssue = ended.issue;
+            else {
+              sawTool = true;
+              toolInput = ended.input;
+            }
+          }
           if (textCarry && !noteWithheld) {
             const remaining = Math.max(0, MAX_NOTE - note.length);
             const tail = [...textCarry].slice(0, remaining).join('');
@@ -436,12 +520,20 @@ export function createAgentService(config: AgentConfig): AgentService {
           if (attemptText) yield { type: 'generating', text: attemptText };
           callOpen = false;
           breaker.recordSuccess();
-        } catch {
+        } catch (cause) {
           callOpen = false;
           // A caller hanging up is not a provider failure.
           if (signal?.aborted) breaker.recordAbort();
           else breaker.recordFailure();
-          yield* fail('provider-error', 'The model could not answer; try again.');
+          // A thrown failure (a dropped connection, a timeout) may pass on a retry.
+          const retryable = cause instanceof ProviderStop ? cause.retryable : true;
+          yield {
+            type: 'error',
+            code: 'provider-error',
+            message: 'The model could not answer; try again.',
+            retryable,
+          };
+          yield { type: 'done' };
           return;
         }
 
@@ -473,21 +565,18 @@ export function createAgentService(config: AgentConfig): AgentService {
           !Array.isArray(toolInput)
             ? (toolInput as { tree?: unknown }).tree
             : undefined;
-        if (tree === undefined) {
+        if (streamIssue) {
+          validation = null;
+          extraCodes = [{ code: streamIssue.code, path: '', message: streamIssue.message }];
+        } else if (tree === undefined) {
           validation = null;
           extraCodes = [{ code: 'no-tree', path: '', message: `Call ${TOOL_NAME} with { tree }.` }];
         } else {
-          const candidate = createEnvelope({
-            id: `draft-${requestId}`,
-            catalog: config.catalogHash,
-            generator: {
-              kind: 'agent',
-              name: 'texuli.com agent',
-              model: config.provider.label,
-            },
-            tree: tree as CatalogTreeInput,
-            at: new Date(clock()).toISOString(),
-          });
+          // In stream mode the envelope is the one clients were sent, header and all.
+          const candidate = envelopeFor(
+            tree,
+            streamMode ? attemptAt : new Date(clock()).toISOString()
+          );
           validation = gate(candidate);
           if (validation.ok) {
             for (const failure of assertInertRoots(validation.roots)) {
@@ -585,7 +674,7 @@ export function createAgentService(config: AgentConfig): AgentService {
             receipt,
             note: `I could not produce a valid draft (${[...new Set(diagnostics.map((d) => d.code))].slice(0, 5).join(', ')}).`,
           };
-      yield { type: 'result', result };
+      yield streamMode ? { type: 'final', result } : { type: 'result', result };
       yield { type: 'done' };
     } finally {
       // The stream was closed mid-call (the client went away): no verdict.

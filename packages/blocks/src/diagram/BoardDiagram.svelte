@@ -1,10 +1,10 @@
 <script lang="ts">
-import type { BoardDiagram } from './schema.ts';
+import type { BoardDiagram as BoardDiagramData } from './schema.ts';
 import { toneBorder } from './tones.ts';
 import './diagram.css';
 
 /** Board: columns of cards as labelled lists (structure is the text alternative). */
-let { block }: { block: BoardDiagram } = $props();
+let { block }: { block: BoardDiagramData } = $props();
 
 const cards = $derived(block.columns.reduce((sum, column) => sum + column.cards.length, 0));
 const summary = $derived(

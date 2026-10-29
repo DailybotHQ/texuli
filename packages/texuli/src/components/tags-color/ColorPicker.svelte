@@ -4,6 +4,7 @@ import {
   ColorPicker as ColorPickerPrimitive,
 } from '@texuli/primitives/color-picker';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import type { RefProp } from '../../internal/ref.ts';
 import type { ColorSwatch } from './types.ts';
 import './tags-color.css';
 
@@ -40,13 +41,14 @@ let {
   swatches = DEFAULT_SWATCHES,
   class: className,
   id,
+  ref = $bindable(null),
   ...rest
-}: Props = $props();
+}: Props & RefProp = $props();
 
 const preview = $derived(value ?? defaultValue);
 </script>
 
-<ColorPickerPrimitive.Root
+<ColorPickerPrimitive.Root bind:ref
   bind:value
   bind:format
   {defaultValue}

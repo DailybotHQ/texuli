@@ -24,7 +24,8 @@ function isAuthor(value: unknown): value is ChatAuthor {
     isBag(value) &&
     typeof value.id === 'string' &&
     typeof value.name === 'string' &&
-    (value.avatarUrl === undefined || typeof value.avatarUrl === 'string')
+    (value.avatarUrl === undefined || typeof value.avatarUrl === 'string') &&
+    (value.avatarSrcset === undefined || typeof value.avatarSrcset === 'string')
   );
 }
 
@@ -57,6 +58,7 @@ export function applyChatStreamEvent(
       id: event.author.id,
       name: event.author.name,
       ...(event.author.avatarUrl ? { avatarUrl: event.author.avatarUrl } : {}),
+      ...(event.author.avatarSrcset ? { avatarSrcset: event.author.avatarSrcset } : {}),
     };
     const body = typeof event.body === 'string' ? cap(event.body) : '';
     return [...messages, { id, author, at: event.at, body, streaming: true }];

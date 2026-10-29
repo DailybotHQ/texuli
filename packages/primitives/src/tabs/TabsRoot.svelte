@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { type TabsActivationMode, type TabsOrientation, tabsContext } from './context.ts';
 
 type Props = HTMLAttributes<HTMLDivElement> & {
@@ -12,7 +13,7 @@ type Props = HTMLAttributes<HTMLDivElement> & {
   disabled?: boolean;
   class?: string;
   children?: import('svelte').Snippet;
-};
+} & RefProp;
 
 let {
   value = $bindable(''),
@@ -23,6 +24,7 @@ let {
   disabled = false,
   class: className,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -76,7 +78,7 @@ tabsContext.set({
 });
 </script>
 
-<div
+<div bind:this={ref}
   class={className}
   data-orientation={orientation}
   data-disabled={disabled ? '' : undefined}

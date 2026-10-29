@@ -52,6 +52,8 @@ export type ScrollAreaThumbProps = {
 };
 
 export type ScrollAreaCornerProps = {
+  /** Render even when only one axis (or none) overflows. */
+  forceMount?: boolean;
   class?: string;
   children?: import('svelte').Snippet;
   child?: ChildSnippet<Record<string, unknown>>;

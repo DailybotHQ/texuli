@@ -3,8 +3,9 @@ import type { Component } from 'svelte';
 import { getPlayerLabels } from './context.ts';
 import type { PlayerNodeError } from './errors.ts';
 import { isContentLayoutId } from './layouts/outline.ts';
+import MotionFrame from './motion/MotionFrame.svelte';
 import NodePlaceholder from './NodePlaceholder.svelte';
-import PlayerNode from './PlayerNode.svelte';
+import Self from './PlayerNode.svelte';
 import SlottedPaint from './SlottedPaint.svelte';
 import { groupSlots } from './slots.ts';
 import type { PlayerPaintNode } from './types.ts';
@@ -25,11 +26,25 @@ function onBoundaryError(error: unknown): void {
 
 {#if node.kind === 'placeholder'}
   <NodePlaceholder id={node.id} path={node.path} label={node.label} reason={node.reason} />
+{:else if node.kind === 'skeleton' && node.stream !== undefined && node.stream !== 'pending'}
+  <!-- A streamed node held until the final verdict, or never finished: static, not busy. -->
+  <div
+    class="tx-player__skeleton tx-player__stream-node"
+    data-family={node.family}
+    data-tx-player-stream-node={node.stream}
+    data-tx-player-path={node.path}
+    role="note"
+  >
+    <span class="tx-player__stream-node-label">
+      {node.stream === 'held' ? labels().streamHeld : labels().streamIncomplete}
+    </span>
+  </div>
 {:else if node.kind === 'skeleton'}
   <div
     class="tx-player__skeleton"
     data-family={node.family}
     data-tx-player-skeleton={node.id}
+    data-tx-player-stream-node={node.stream}
     aria-busy="true"
     inert
   >
@@ -54,7 +69,7 @@ function onBoundaryError(error: unknown): void {
         <Component {...node.props} {...layoutProps}>
           {#snippet children()}
             {#each node.children as child (child.path)}
-              <PlayerNode node={child} {onNodeError} />
+              <Self node={child} {onNodeError} />
             {/each}
           {/snippet}
         </Component>
@@ -69,12 +84,27 @@ function onBoundaryError(error: unknown): void {
       {/snippet}
     </svelte:boundary>
   {/snippet}
-  {#if node.frame?.anchor}
-    <!-- A contents link focuses this generated anchor; the heading inside is the section start. -->
-    <div class="tx-player__anchor" id={node.frame.frameId} tabindex="-1" data-tx-player-anchor>
+  {#snippet framed()}
+    {#if node.frame?.anchor}
+      <!-- A contents link focuses this generated anchor; the heading inside is the section start. -->
+      <div class="tx-player__anchor" id={node.frame.frameId} tabindex="-1" data-tx-player-anchor>
+        {@render painted()}
+      </div>
+    {:else}
       {@render painted()}
-    </div>
+    {/if}
+  {/snippet}
+  {#if node.motion}
+    <!-- Spec 0.6.0 motion: a box-less wrapper the motion runtime animates. -->
+    <MotionFrame
+      motion={node.motion}
+      path={node.path}
+      delay={node.motionDelay}
+      leaving={node.leaving === true}
+    >
+      {@render framed()}
+    </MotionFrame>
   {:else}
-    {@render painted()}
+    {@render framed()}
   {/if}
 {/if}

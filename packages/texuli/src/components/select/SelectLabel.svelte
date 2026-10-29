@@ -9,7 +9,7 @@ type Props = Omit<ComponentProps<typeof PrimitiveGroupLabel>, 'children'> & {
   class?: ClassValue;
 };
 
-let { children, class: className, ...rest }: Props = $props();
+let { children, class: className, ref = $bindable(null), ...rest }: Props = $props();
 </script>
 
 <!--
@@ -17,6 +17,6 @@ let { children, class: className, ...rest }: Props = $props();
   that group (select group context → aria-labelledby). Like the primitive,
   it must sit inside a Select.Group.
 -->
-<PrimitiveGroupLabel class={selectLabelClass({ class: className })} data-tx-select-label {...rest}>
+<PrimitiveGroupLabel bind:ref class={selectLabelClass({ class: className })} data-tx-select-label {...rest}>
   {@render children?.()}
 </PrimitiveGroupLabel>

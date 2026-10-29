@@ -2,6 +2,7 @@
 import { getNavigationIntent, isActivationKey } from '@texuli/core/keyboard';
 import { onDestroy, type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { type CommandContextValue, type CommandItemRecord, commandContext } from './context.ts';
 import type { CommandSearch } from './types.ts';
 
@@ -14,7 +15,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   onSearchError?: (error: unknown) => void;
   onSelect?: (value: string) => void;
   shouldFilter?: boolean;
-};
+} & RefProp;
 
 let {
   children,
@@ -25,6 +26,7 @@ let {
   onSearchError,
   onSelect,
   shouldFilter = true,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -232,6 +234,6 @@ onDestroy(() => {
 });
 </script>
 
-<div {...rest} data-command-root="">
+<div bind:this={ref} {...rest} data-command-root="">
   {@render children?.()}
 </div>

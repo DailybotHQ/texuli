@@ -1,0 +1,58 @@
+/*
+ * Ruled look of the chart data-table fallback (geo, flow, part-whole): a
+ * caption, rules between rows, and an underlined summary. Shared by the
+ * families (see grid.css).
+ *
+ *   .tx-chart-ruled          the disclosure
+ *   .tx-chart-ruled__scroll  the scroll wrapper around the table
+ */
+
+.tx-chart-ruled {
+  color: var(--tx-foreground, CanvasText);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.tx-chart-ruled > summary {
+  align-content: center;
+  cursor: pointer;
+  inline-size: fit-content;
+  min-block-size: 2.75rem;
+  padding-block: 0.5rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.tx-chart-ruled__scroll {
+  max-inline-size: 100%;
+  overflow-x: auto;
+}
+
+.tx-chart-ruled table {
+  border-collapse: collapse;
+  inline-size: 100%;
+  text-align: start;
+}
+
+.tx-chart-ruled caption {
+  padding-block: 0.5rem;
+  text-align: start;
+}
+
+.tx-chart-ruled :is(th, td) {
+  border-block-end: 1px solid var(--tx-border, currentColor);
+  padding-block: 0.35rem;
+  padding-inline: 0.5rem;
+}
+
+.tx-chart-ruled th[scope="row"] {
+  font-weight: 500;
+  text-align: start;
+}
+
+@media (forced-colors: active) {
+  .tx-chart-ruled > summary:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}

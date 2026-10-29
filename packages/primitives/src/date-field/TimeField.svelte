@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { RefProp } from '../internal/ref.ts';
 import {
   dayPeriod,
   formatHour,
@@ -14,6 +15,7 @@ let {
   value = $bindable(null),
   locale,
   label = 'Time',
+  inputId,
   name,
   disabled = false,
   required = false,
@@ -23,8 +25,9 @@ let {
   onValueChange,
   children,
   class: className,
+  ref = $bindable(null),
   ...rest
-}: TimeFieldRootProps = $props();
+}: TimeFieldRootProps & RefProp = $props();
 
 const cycle = $derived(
   hourCycle ??
@@ -137,15 +140,15 @@ function isLast(segment: TimeSegment): boolean {
 }
 </script>
 
-<div {...rest} class={className} role="group" aria-label={label} data-tx-time-field-root="">
-  {#each order as segment (segment)}
+<div bind:this={ref} {...rest} class={className} role="group" aria-label={rest['aria-label'] ?? label} data-tx-time-field-root="">
+  {#each order as segment, index (segment)}
     {#if segment !== 'dayPeriod'}
       {@const hour = segment === 'hour'}
       {@const low = hour && cycle === 12 ? 1 : 0}
       {@const high = hour ? (cycle === 12 ? 12 : 23) : 59}
-      <input type="number" inputmode="numeric" aria-label={hour ? (labels?.hour ?? 'Hour') : (labels?.minute ?? 'Minute')} aria-valuemin={low} aria-valuemax={high} min={low} max={high} step={hour ? undefined : step} value={hour ? displayHour : displayMinute} {disabled} {required} oninput={(event) => commit(segment, event.currentTarget.value)} onkeydown={(event) => spin(segment, event)} />
+      <input id={index === 0 ? inputId : undefined} aria-describedby={rest['aria-describedby']} aria-invalid={rest['aria-invalid']} type="number" inputmode="numeric" aria-label={hour ? (labels?.hour ?? 'Hour') : (labels?.minute ?? 'Minute')} aria-valuemin={low} aria-valuemax={high} min={low} max={high} step={hour ? undefined : step} value={hour ? displayHour : displayMinute} {disabled} {required} oninput={(event) => commit(segment, event.currentTarget.value)} onkeydown={(event) => spin(segment, event)} />
     {:else}
-      <select aria-label={labels?.dayPeriod ?? 'AM or PM'} value={period} {disabled} {required} onchange={(event) => changePeriod(event.currentTarget.value === 'PM' ? 'PM' : 'AM')}>
+      <select id={index === 0 ? inputId : undefined} aria-describedby={rest['aria-describedby']} aria-invalid={rest['aria-invalid']} aria-label={labels?.dayPeriod ?? 'AM or PM'} value={period} {disabled} {required} onchange={(event) => changePeriod(event.currentTarget.value === 'PM' ? 'PM' : 'AM')}>
         <option value="AM">AM</option><option value="PM">PM</option>
       </select>
     {/if}

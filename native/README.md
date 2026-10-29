@@ -87,6 +87,24 @@ interpreting arbitrary CSS.
   media (no golden uses a media id yet, so no cross-target trace covers these
   widgets).
 
+**Motion (spec 0.6.0).** The generated decoders read a node's
+closed `motion` and the envelope's `motion.level`; anything outside the
+vocabulary is refused with `schema`, the same code as TypeScript (the four
+`motion-*` invalid fixtures run in `InvalidFixtureParityTest`). The render
+plan keeps the checked motion (`PlanNode.Component.motion`), and
+`texuli-spec`'s `Motion.kt` maps names to the same token values as the web
+(`MotionTokens`: 150, 200 and 300 ms, a fifth of a duration per stagger step,
+a 1,000 ms stagger cap, the 0.6 `subtle` scale) with `resolveMotionLevel`
+(host, then blueprint, then `full`; reduced motion gives `none`).
+`BlueprintView(plan, onIntent, motionLevel)` plays each node's `enter`
+preset with Compose `AnimatedVisibility` (fade, slide by 8dp, or scale from
+96%, mirrored right to left) when the node first appears, and `layout` as
+`animateContentSize`; at `none` it paints the end state. The host passes
+`resolveMotionLevel(host, envelope.motion?.level, reducedMotion)`, treating
+a system animation scale of 0 as reduced motion. Exit specs are mapped but
+have no trigger yet: the native renderer paints a static plan with no `when`
+state, so nodes never leave while painted (planned with native state).
+
 ## Modules
 
 | Module | What it holds | Targets |
@@ -201,12 +219,14 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `JsonReaderTest` | `texuli-spec` | Strict JSON: every type, refusals of non-JSON, depth bombs and oversized text |
 | `SpecValidatorTest` | `texuli-spec` | `validateBlueprint` reports the TypeScript validator's codes, fails the portable profile closed, judges named slots; spec 0.3.0 state, bindings, `bind`, `on` actions, property schemas and `deprecated` warnings with the TypeScript codes and paths |
 | `WorkflowValidatorTest` | `texuli-spec` | Workflow graph rules (ids, types, fields, ports, multiplicity, kinds, cycles), label control and bidi refusals, and the 500-node / 2,000-edge limits |
+| `MotionTest` | `texuli-spec` | Spec 0.6.0 motion: closed decoding into the plan, `schema` refusals of CSS, milliseconds, unknown names and a huge stagger, level precedence, `subtle`, and the stagger cap |
 | `RenderPlanTest` | `texuli-spec` | The render plan's tier gate: ids whose catalog `emit` list lacks the tier become `tier-denied` placeholders (default tier `untrusted`), checked for every catalog id |
 | `AccessibilityTest` | `texuli-compose` | Image alternatives (blank alt is decorative) and heading ranks clamped to 1-6 |
 | `ChartWidgetsTest` | `texuli-compose` | Compact chart props: gaps, variants, title-over-label naming, bounded scales, refusals |
 | `LayoutWidgetsTest` | `texuli-compose` | Responsive grid columns, gap mapping, document outline order, deck-slide labels |
 | `ListBoardTest` | `texuli-compose` | List ordering and board columns/cards, with column, card and unique-id caps |
 | `MediaWidgetsTest` | `texuli-compose` | Untrusted media source rules, `media-image` and `blocks-media` projections, gallery columns |
+| `MotionTest` (compose) | `texuli-compose` | Every motion preset maps to Compose enter and exit transitions in both directions; absent presets and level `none` play nothing |
 | `TableGridTest` | `texuli-compose` | Table column/row normalization, inert cells, bounded grid columns and rows |
 | `HostilePropsTest` | `texuli-compose` | The hostile matrix: every projection's props replaced by each value in `HOSTILE_VALUES` (wrong types, JSON null, non-finite and extreme numbers, huge, bidi, zero-width, control and surrogate strings, huge and deep containers) never throws and stays in bounds |
 | `GoldenConformanceTest` | `conformance` | Each spec golden's native trace equals the web trace; prints native coverage per id |

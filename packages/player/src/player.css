@@ -148,6 +148,50 @@
   border-inline-start-color: var(--tx-warning, Mark);
 }
 
+/* Streaming (ADR-014): the recoverable error after a stream stopped early. */
+.tx-player__stream-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: clamp(0.75rem, 3vw, 1.5rem);
+  padding: 1rem;
+  border-inline-start: 0.25rem solid var(--tx-warning, Mark);
+  background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+  color: var(--tx-foreground, CanvasText);
+}
+
+.tx-player__stream-error p {
+  flex: 1 1 16rem;
+  margin: 0;
+}
+
+.tx-player__stream-retry {
+  padding-block: 0.375rem;
+  padding-inline: 0.875rem;
+  border: 1px solid var(--tx-border, ButtonBorder);
+  border-radius: var(--tx-radius, 0.5rem);
+  background: var(--tx-background, Canvas);
+  color: var(--tx-foreground, CanvasText);
+  font: inherit;
+  cursor: pointer;
+}
+
+.tx-player__stream-retry:focus-visible {
+  outline: 2px solid var(--tx-ring, Highlight);
+  outline-offset: 2px;
+}
+
+/* A streamed node held until the final verdict, or never received: static. */
+.tx-player__stream-node {
+  min-block-size: 2.5rem;
+  align-content: center;
+}
+
+.tx-player__stream-node-label {
+  font-size: 0.875rem;
+}
+
 .tx-player__placeholder,
 .tx-player__skeleton {
   display: grid;
@@ -572,6 +616,7 @@
   .tx-player__trust,
   .tx-player__placeholder,
   .tx-player__skeleton,
+  .tx-player__stream-retry,
   .tx-player-layout--card {
     border-color: CanvasText;
   }
@@ -591,10 +636,12 @@
   --tx-motion-base: 0ms !important;
   --tx-motion-slow: 0ms !important;
   --tx-motion-easing: linear !important;
-  animation-duration: 0.01ms !important;
+  animation-delay: 0s !important;
+  animation-duration: 0s !important;
   animation-iteration-count: 1 !important;
   scroll-behavior: auto !important;
-  transition-duration: 0.01ms !important;
+  transition-delay: 0s !important;
+  transition-duration: 0s !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -606,9 +653,22 @@
     --tx-motion-base: 0ms !important;
     --tx-motion-slow: 0ms !important;
     --tx-motion-easing: linear !important;
-    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    transition-duration: 0s !important;
   }
+}
+
+/* Spec 0.6.0 motion: the wrapper has no box, so layouts see the node itself;
+   animations play on its children through @texuli/core/motion (no inline style). */
+.tx-player__motion {
+  display: contents;
+}
+
+/* A leaving node whose exit finished stays hidden until the player drops it. */
+.tx-player__motion[data-tx-player-motion-done] > * {
+  opacity: 0;
 }

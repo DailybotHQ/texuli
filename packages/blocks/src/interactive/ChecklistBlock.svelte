@@ -1,13 +1,13 @@
 <script lang="ts">
 import { Checkbox } from 'texuli/choice';
 import type { InteractiveBlockLabels } from './labels.ts';
-import type { ChecklistBlock } from './schema.ts';
+import type { ChecklistBlock as ChecklistBlockData } from './schema.ts';
 
 let {
   block,
   labels,
 }: {
-  block: ChecklistBlock;
+  block: ChecklistBlockData;
   labels: InteractiveBlockLabels;
 } = $props();
 

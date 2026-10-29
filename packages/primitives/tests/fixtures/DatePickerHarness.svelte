@@ -21,6 +21,8 @@ interface Props {
   weekStartsOn?: number;
   maxDays?: number;
   onInvalid?: DateInvalidHandler;
+  /** Marks the range fields required. */
+  required?: boolean;
 }
 
 let {
@@ -37,6 +39,7 @@ let {
   weekStartsOn,
   maxDays,
   onInvalid,
+  required = false,
 }: Props = $props();
 </script>
 
@@ -70,7 +73,7 @@ let {
   {...onInvalid ? { onInvalid } : {}}
   labels={{ trigger: 'Choose stay', triggerWithValue: 'Choose stay, {date}', dialog: 'Choose stay dates' }}
 >
-  <DateRangePicker.Field label="Stay" startName="from" endName="to" />
+  <DateRangePicker.Field label="Stay" startName="from" endName="to" {required} />
   <DateRangePicker.Trigger>Pick range</DateRangePicker.Trigger>
   <DateRangePicker.Content>
     <DateRangePicker.Calendar />

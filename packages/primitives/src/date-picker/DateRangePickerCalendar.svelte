@@ -1,10 +1,12 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
 import { Calendar } from '../calendar/index.ts';
+import type { RefProp } from '../internal/ref.ts';
 import RangeGrid from './RangeGrid.svelte';
 import { getRange, getShell, toCalendarDate } from './shared.ts';
 
-let { ...rest }: Omit<HTMLAttributes<HTMLDivElement>, 'children'> = $props();
+let { ref = $bindable(null), ...rest }: Omit<HTMLAttributes<HTMLDivElement>, 'children'> & RefProp =
+  $props();
 const shell = getShell();
 const range = getRange();
 const start = $derived(toCalendarDate(range.start));
@@ -13,7 +15,7 @@ const max = $derived(toCalendarDate(shell.maxValue));
 const todayDate = $derived(toCalendarDate(shell.today));
 </script>
 
-<div {...rest} data-tx-date-picker-calendar>
+<div bind:this={ref} {...rest} data-tx-date-picker-calendar>
   <!-- The calendar supplies navigation and focus; the range grid owns selection. -->
   <Calendar.Root
     value={null}

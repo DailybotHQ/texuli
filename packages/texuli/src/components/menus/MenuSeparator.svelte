@@ -7,8 +7,8 @@ import './menus.css';
 
 type Props = ComponentProps<typeof Primitive> & { class?: ClassValue };
 
-let { class: className, ...rest }: Props = $props();
+let { class: className, ref = $bindable(null), ...rest }: Props = $props();
 const classes = $derived(menuSeparatorClass({ class: className }));
 </script>
 
-<Primitive class={classes} data-tx-menu-separator {...rest} />
+<Primitive bind:ref class={classes} data-tx-menu-separator {...rest} />

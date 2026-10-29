@@ -81,11 +81,22 @@ export interface InertExemptionInput {
   element: Element;
   /** Optional debug label (`toast-region`, `announcer`, …). */
   label?: string;
+  /**
+   * Whether the region stays above overlays opened after it (default `true`):
+   * when it is open as a popover, the overlay engine re-shows it in the top
+   * layer each time another overlay opens, so the toast region keeps painting
+   * on top. Pass `false` for exemptions that belong under later overlays: a
+   * dialog backdrop, or a menu or listbox opened inside a modal, which must
+   * never cover the overlay opened from it.
+   */
+  raise?: boolean;
 }
 
 export interface InertExemption {
   readonly element: Element;
   readonly label?: string;
+  /** `false` when the region must not be re-raised above later overlays (omitted means `true`). */
+  readonly raise?: false;
 }
 
 export interface InertExemptionHandle {
@@ -221,10 +232,11 @@ export function createInertRegistry(): InertRegistry {
       if (!isElement(input.element)) {
         throw new TypeError('InertRegistry.exempt: element must be a DOM Element');
       }
-      const entry: InertExemption =
-        input.label === undefined
-          ? { element: input.element }
-          : { element: input.element, label: input.label };
+      const entry: InertExemption = {
+        element: input.element,
+        ...(input.label === undefined ? {} : { label: input.label }),
+        ...(input.raise === false ? { raise: false as const } : {}),
+      };
       exemptions.push(entry);
       apply();
       let released = false;

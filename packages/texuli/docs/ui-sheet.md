@@ -125,3 +125,13 @@ to `false`.
 
 `Drawer` is always modal, so they have no effect there. The catalog
 manifests list them as host props.
+
+## Motion
+
+`motion` on `Sheet.Content`, `Drawer.Content`, `DetailPanel.Content` and
+`ResponsiveModal.Content`: the panel slides from the edge it is attached to
+(a centered one rises), and `Sheet.Overlay` fades, through
+`@texuli/core/motion` ([ui-motion](ui-motion.md)). A drawer's slide ends at
+its snap point. The CSS `transform` transition stays only for drag snapping.
+`Drawer.Overlay` is the unstyled primitive backdrop and does not animate yet
+(planned).

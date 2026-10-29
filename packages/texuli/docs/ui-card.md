@@ -69,6 +69,13 @@ by `gap`.
 <CardGrid minItemWidth="14rem" maxColumns={3}>…</CardGrid>
 ```
 
+`gap` takes a step (`none` 0, `xs` 0.25rem, `sm` 0.5rem, `md` 1rem, `lg`
+1.5rem, `xl` 2rem), a plain CSS length (`0.75rem`, `12px`, `0`) or a custom
+property name (`--my-gutter`, used as `var(--my-gutter)`). Anything else
+(a declaration break, a function) is ignored and the grid keeps `md`. A
+caller `style` is added after the grid's own declarations, so
+`style="margin-block: 2rem"` keeps the column template.
+
 ## Styles
 
 `@layer tx.components` in `card.css`. Import `@texuli/tokens/base.css` at the app root. Logical properties (`padding-inline`, `border-block-start`, …).

@@ -19,6 +19,7 @@ let {
   announce,
   retryLabel = 'Retry',
   showRetry = true,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -41,7 +42,7 @@ $effect(() => {
 });
 </script>
 
-<PrimitiveErrorPart
+<PrimitiveErrorPart bind:ref
   class={classes}
   data-tx-combobox-error
   {showRetry}

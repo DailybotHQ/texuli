@@ -12,7 +12,32 @@ lazy subpath. `MarketingLayout` registers with LayoutHost as `marketing`.
 | `texuli/layouts/marketing` | `MarketingLayout` (+ register) |
 | `texuli/layouts/marketing/landing` | `LandingLayout` |
 | `texuli/layouts/marketing/pricing` | `PricingLayout` |
-| `texuli/layouts/marketing/section` | `MarketingSection` |
+| `texuli/layouts/marketing/section` | `MarketingSection`, `MarketingSectionHeader` |
+
+## MarketingSectionHeader
+
+`MarketingSection` is a labelled `<section>` with block padding. Inside a
+section the page already labels, use `MarketingSectionHeader` instead: the
+same eyebrow, heading and description type scale on a plain `div`, with no
+landmark, no `aria-label` and no padding.
+
+| Prop | Default | Notes |
+| --- | --- | --- |
+| `title` | (required) | The heading text |
+| `level` | `2` | Heading level, `2` to `6` |
+| `headingId` | — | The heading's `id`, for the section's `aria-labelledby` |
+| `eyebrow`, `description` | — | Optional lines above and below the heading |
+| `align` | `start` | `start` or `center` |
+| `children` | — | Content after the description (actions, badges) |
+
+Other attributes land on the root `div`, and `bind:ref` binds it.
+
+```svelte
+<section aria-labelledby="why">
+  <MarketingSectionHeader title="Why teams switch" headingId="why" level={2} />
+  …
+</section>
+```
 
 ## Notes
 

@@ -33,3 +33,12 @@ export {
 } from './draft.ts';
 export { draftCommitGate } from './gate.ts';
 export { type SinkFinding, type SinkUrlTier, scanSinks } from './sinks.ts';
+export {
+  checkStreamTotals,
+  STREAM_WHOLE_TREE_CHECKS,
+  type StreamNodeInput,
+  type StreamNodeValidation,
+  streamNodeChain,
+  validateStreamChain,
+  validateStreamNode,
+} from './stream.ts';

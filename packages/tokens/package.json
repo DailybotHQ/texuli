@@ -1,6 +1,6 @@
 {
   "name": "@texuli/tokens",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS.",
   "keywords": [
@@ -40,6 +40,7 @@
     "./library": "./src/library-port/index.ts",
     "./library-expand": "./src/library-expand/index.ts",
     "./modes": "./src/modes/index.ts",
+    "./motion": "./src/motion/index.ts",
     "./no-flash": "./src/no-flash/index.ts",
     "./palette": "./src/palette/index.ts",
     "./style-presets": "./src/style-presets/index.ts",

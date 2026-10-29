@@ -8,6 +8,8 @@ import {
 import { type PositionFloatingOptions, positionFloating } from '@texuli/core/position-dom';
 import { untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { createMotionHold, type OverlayMotionHooks } from '../internal/motion-hold.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getPopoverContext } from './context.ts';
 
 type PopoverContentProps = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
@@ -20,10 +22,46 @@ type PopoverContentProps = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
    * `[autofocus]` element), else the content itself.
    */
   initialFocus?: FocusTarget | (() => FocusTarget | null);
+  /**
+   * Enter and exit motion (texuli passes `texuli/motion` hooks): while the
+   * exit plays, the closed content stays mounted, inert. Focus and dismissal
+   * are released at close, as without motion.
+   */
+  motionHooks?: OverlayMotionHooks;
 };
 
-let { children, initialFocus, ...rest }: PopoverContentProps = $props();
+let {
+  children,
+  initialFocus,
+  motionHooks,
+  ref = $bindable(null),
+  ...rest
+}: PopoverContentProps & RefProp = $props();
 const context = getPopoverContext();
+let held = $state(false);
+// Open when it is created (first render, hydration): no enter animation.
+let appeared = untrack(() => context.open);
+let entered: HTMLElement | null = null;
+const hold = createMotionHold(
+  () => motionHooks,
+  (next) => (held = next)
+);
+let node: HTMLElement | null = null;
+let wasOpen = untrack(() => context.open);
+// A bound `open` changes before the engine closes: start the exit before the
+// content would unmount. (A close the engine starts begins it in onOpenChange.)
+$effect.pre(() => {
+  const open = context.open;
+  untrack(() => {
+    if (open === wasOpen) return;
+    wasOpen = open;
+    if (!open) {
+      entered = null;
+      hold.begin(node);
+    }
+  });
+});
+$effect(() => () => hold.cancel());
 // A consumer id wins: the context records it, so every reference follows.
 context.claimId(
   'content',
@@ -42,7 +80,22 @@ function resolveInitialFocus(node: HTMLElement): HTMLElement | null {
   return target;
 }
 
-function attach(node: HTMLElement): () => void {
+function attach(element: HTMLElement): () => void {
+  node = element;
+  // Re-created when its placement or mode changes; the open state it reads
+  // while registering must not re-run it (a close would hide it mid-exit).
+  void context.placement;
+  void context.sideOffset;
+  void context.modal;
+  void context.positioning;
+  const release = untrack(() => attachContent(element));
+  return () => {
+    release();
+    if (node === element) node = null;
+  };
+}
+
+function attachContent(node: HTMLElement): () => void {
   const anchor =
     context.triggerElement ??
     (node.ownerDocument.getElementById(context.triggerId) as HTMLElement | null) ??
@@ -74,12 +127,24 @@ function attach(node: HTMLElement): () => void {
             }
           : {}),
         label: 'popover',
+        presence: { isMotionPending: hold.isMotionPending },
         // Modal: the focus trap takes the target and falls back on its own.
         ...(context.modal && initialFocus ? { initialFocus: () => resolveInitialFocus(node) } : {}),
         onOpenChange: (open: boolean) => {
+          // Before the engine's presence reads `isMotionPending`.
+          if (!open) {
+            entered = null;
+            hold.begin(node);
+          }
           // Non-modal: the root focuses the first control on open; the target,
           // when there is one, takes focus right after, in the same task.
           context.onOverlayOpenChange(open);
+          // Once per opening (the attachment may re-run while open).
+          if (open && entered !== node) {
+            entered = node;
+            if (appeared) appeared = false;
+            else hold.enter(node);
+          }
           if (!open || context.modal || !initialFocus) return;
           resolveInitialFocus(node)?.focus({ preventScroll: true });
         },
@@ -114,13 +179,14 @@ const contentProps = $derived({
   role: 'dialog' as const,
   'aria-modal': context.modal ? ('true' as const) : undefined,
   'data-state': context.open ? 'open' : 'closed',
+  inert: !context.open || undefined,
   tabindex: -1,
   popover: 'manual' as const,
 });
 </script>
 
-{#if context.open}
-<div {...contentProps} {@attach attach}>
+{#if context.open || held}
+<div bind:this={ref} {...contentProps} {@attach attach}>
   {@render children?.()}
 </div>
 {/if}

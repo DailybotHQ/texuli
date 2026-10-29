@@ -7,6 +7,12 @@ import {
   normalizeDocument,
   paragraph,
 } from './document.ts';
+import {
+  acceptsExtensionId,
+  type EditorInlineExtension,
+  type EditorInlineExtensions,
+  toInlineExtensions,
+} from './extensions.ts';
 import { cleanText, normalizeInline, textToInline } from './inline.ts';
 import {
   EDITOR_LIMITS,
@@ -27,6 +33,12 @@ export interface EditorLoadOptions {
   newId?: EditorIdSource;
   /** Lower caps (a blocks `text` field holds 4,000 characters). */
   limits?: Partial<EditorLimits>;
+  /**
+   * Host inline extensions whose `extension` marks are kept (mentions,
+   * references). Marks of other names, or with a refused id, are dropped and
+   * keep their label text. None by default.
+   */
+  extensions?: EditorInlineExtensions | readonly EditorInlineExtension[];
 }
 
 export interface EditorLoadResult {
@@ -42,6 +54,7 @@ export class LoadBudget {
   readonly limits: EditorLimits;
   readonly trust: HrefTrust;
   readonly newId: EditorIdSource;
+  readonly extensions: EditorInlineExtensions;
   blocks = 0;
   chars = 0;
   private readonly once = new Set<string>();
@@ -50,6 +63,15 @@ export class LoadBudget {
     this.limits = { ...EDITOR_LIMITS, ...options.limits };
     this.trust = options.trust === 'developer' ? 'developer' : 'untrusted';
     this.newId = options.newId ?? nextEditorId;
+    this.extensions = toInlineExtensions(options.extensions);
+  }
+
+  /** An extension mark for a registered name and an accepted id, or `undefined` (reported). */
+  extension(name: unknown, id: unknown): EditorMark | undefined {
+    if (acceptsExtensionId(this.extensions, name, id))
+      return { type: 'extension', name: name as string, id: id as string };
+    this.report('mark-dropped', 'Unregistered or refused inline extensions kept only their text.');
+    return undefined;
   }
 
   report(code: EditorIssueCode, message: string, onlyOnce = true): void {
@@ -138,6 +160,10 @@ function loadMarks(raw: unknown, budget: LoadBudget): EditorMark[] {
     else if (type === 'link') {
       const href = budget.href((mark as Record<string, unknown>).href);
       if (href) marks.push({ type: 'link', href });
+    } else if (type === 'extension') {
+      const record = mark as Record<string, unknown>;
+      const extension = budget.extension(record.name, record.id);
+      if (extension) marks.push(extension);
     } else budget.report('unknown-mark', 'Unknown marks were dropped.');
   }
   return marks;

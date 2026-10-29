@@ -31,6 +31,7 @@ import {
   registerLayout,
   unregisterLayout,
 } from '../src/layouts/host/registry.ts';
+import { MarketingSectionHeader } from '../src/layouts/marketing/index.ts';
 import LandingLayout from '../src/layouts/marketing/LandingLayout.svelte';
 import MarketingLayout from '../src/layouts/marketing/MarketingLayout.svelte';
 import {
@@ -39,6 +40,7 @@ import {
   normalizePricingTiers,
 } from '../src/layouts/marketing/model.ts';
 import { unregisterMarketingLayouts } from '../src/layouts/marketing/register.ts';
+import { MarketingSectionHeader as SectionHeaderFromSubpath } from '../src/layouts/marketing/section.ts';
 import {
   MOBILE_LAYOUTS,
   MOBILE_TAB_LIMIT,
@@ -754,6 +756,45 @@ describe('layouts-marketing', () => {
       expect(mountScreen).toHaveBeenCalled();
       const target = mountScreen.mock.calls[0]?.[0] as HTMLElement;
       expect(target.getAttribute('data-tx-layout-screen-target')).toBe('');
+    });
+  });
+
+  describe('MarketingSectionHeader (G84)', () => {
+    it('renders a heading-only header: no landmark, no label, any level, a heading id', () => {
+      expect(SectionHeaderFromSubpath).toBe(MarketingSectionHeader);
+      for (const level of [2, 3, 4] as const) {
+        const { container } = render(MarketingSectionHeader, {
+          props: {
+            title: 'Why teams switch',
+            level,
+            headingId: `why-${level}`,
+            eyebrow: 'Customers',
+            description: 'Three reasons, in their words.',
+            align: 'center',
+            'data-testid': 'header',
+          },
+        });
+        const root = container.querySelector('[data-tx-marketing-section-header]') as HTMLElement;
+        expect(root.tagName).toBe('DIV');
+        expect(root.dataset.testid).toBe('header');
+        expect(root.dataset.align).toBe('center');
+        // No landmark or labelled region of its own.
+        expect(root.querySelector('section, header, [role], [aria-label]')).toBeNull();
+        expect(root.hasAttribute('aria-label')).toBe(false);
+        const heading = screen.getByRole('heading', { level, name: 'Why teams switch' });
+        expect(heading.id).toBe(`why-${level}`);
+        expect(root.contains(heading)).toBe(true);
+        expect(root.textContent).toContain('Three reasons, in their words.');
+        cleanup();
+      }
+      // No block padding: the header is not a section.
+      const css = readFileSync(
+        join(import.meta.dirname, '../src/layouts/marketing/marketing.css'),
+        'utf8'
+      );
+      const rule = css.match(/\.tx-marketing-section-header \{[^}]*\}/u)?.[0] ?? '';
+      expect(rule).not.toBe('');
+      expect(rule).not.toMatch(/padding/u);
     });
   });
 

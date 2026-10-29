@@ -429,6 +429,12 @@
     background: var(--tx-surface, Canvas);
   }
 
+  /* A footer snippet that renders nothing leaves no strip (G68). */
+  .tx-mobile-frame__footer[data-empty],
+  .tx-mobile-frame__footer:empty {
+    display: none;
+  }
+
   .tx-mobile-frame > .tx-mobile-tabs {
     position: static;
     flex: none;

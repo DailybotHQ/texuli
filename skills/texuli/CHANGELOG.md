@@ -15,6 +15,31 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+### Content
+
+- The packages move to `0.6.0`: the same 20 published packages as `0.5.0`;
+  `@texuli/document` and `@texuli/pages` stay in the repository only (not
+  on npm, first release planned for `0.7.0`). `0.6.0` ships PLAN_010 so
+  far: `build-ui/references/imports.md` gains a "New in 0.6.0" table (the
+  `motion` prop and `MotionProvider`, `@texuli/core/motion` and its
+  springs, the motion tokens, the one component API contract,
+  `<Player stream>` and `validateStreamNode`, spec 0.6.0 motion,
+  `DeckStageCore`, prepared decks, `@texuli/core/markup` and
+  `@texuli/core/zip`, editor inline extensions and the G48 to G85
+  additions); the package index marks the new subpaths, spec 0.6.0 and the
+  streaming player as new in `0.6.0`; `blueprints/SKILL.md` gains stage H
+  (motion as data and streaming) and states the agent service's provider
+  adapters (tested on recorded bytes, never called, not deployed); the
+  layer map lists `@texuli/document` and `@texuli/pages`. The router,
+  components, blueprints and build-ui references say "on npm as `0.6.0`"
+  and pin `^0.6.0`.
+- `upgrade/SKILL.md` lists the `0.6.0` breaking changes an app checks
+  before moving from `^0.5.0` (Field ids on the focusable control,
+  `InputGroup` attributes, caller handlers on more parts, avatar initials,
+  four-digit years, reduced motion at `0s`, motion instead of CSS keyframes,
+  the empty `Toaster`, chat day separators, widened filter operators, spec
+  0.6.0 stamps).
+
 ## [0.2.4] — 2026-10-29
 
 ### Changes

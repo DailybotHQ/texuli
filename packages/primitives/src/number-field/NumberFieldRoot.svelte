@@ -3,6 +3,7 @@ import { createFormBridge, type FormBridge } from '@texuli/core/form-bridge';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { type NumberFieldContextValue, numberFieldContext } from './context.ts';
 import {
   clampNumber,
@@ -70,8 +71,9 @@ let {
   onValueChange,
   child,
   children,
+  ref = $bindable(null),
   ...rest
-}: NumberFieldRootProps = $props();
+}: NumberFieldRootProps & RefProp = $props();
 
 const generatedId = $props.id();
 const base = $derived(id ?? generatedId);
@@ -230,5 +232,5 @@ const rootProps = $derived({
 {#if child}
   {@render child({ props: rootProps })}
 {:else}
-  <div {...rootProps}>{@render children?.()}</div>
+  <div bind:this={ref} {...rootProps}>{@render children?.()}</div>
 {/if}

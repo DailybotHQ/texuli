@@ -234,6 +234,7 @@ const OG_AREAS: readonly (readonly [prefix: string, area: OgArea])[] = [
   ['/examples/', { label: 'Components', accent: '#60a5fa' }],
   ['/slides-page/', { label: 'Components', accent: '#60a5fa' }],
   ['/editor-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/motion-page/', { label: 'Components', accent: '#60a5fa' }],
   ['/gallery-themes/', { label: 'Themes', accent: '#fbbf24' }],
   ['/theme-switcher/', { label: 'Themes', accent: '#fbbf24' }],
   ['/theme-studio/', { label: 'Themes', accent: '#fbbf24' }],

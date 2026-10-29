@@ -11,6 +11,8 @@ export interface WipLimit {
 export interface BoardColumnDef {
   id: string;
   title: string;
+  /** A short sentence under the column title; it also describes the column's card list. */
+  description?: string;
   wip?: WipLimit;
 }
 
@@ -173,6 +175,12 @@ export type MoveResult =
 export interface MoveRules<T> {
   /** Extra rule (permissions, required fields…): `false` or a reason string rejects. */
   canMove?: (item: T, target: { columnId: string; laneId: string }) => boolean | string;
+  /**
+   * `false` refuses a move to another position in the same column and lane
+   * (a board whose host keeps no order: column-only mode). A drop in place
+   * stays allowed. Default `true`.
+   */
+  reorder?: boolean;
 }
 
 /** Checks a move and computes the item's new rank. Pure: nothing is written. */
@@ -221,6 +229,12 @@ export function validateMove<T>(
   );
   const index = Math.max(0, Math.min(Math.trunc(target.index), others.length));
   const unchanged = !changesColumn && laneIndex === from.laneIndex && index === from.index;
+  if (rules.reorder === false && !changesColumn && laneIndex === from.laneIndex && !unchanged) {
+    return {
+      ok: false,
+      reason: `${label} keeps its place in ${column.title}; move it to another column.`,
+    };
+  }
   const before = index > 0 ? options.rank(others[index - 1] as T) : null;
   const after = index < others.length ? options.rank(others[index] as T) : null;
 

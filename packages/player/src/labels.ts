@@ -2,9 +2,12 @@ import type { PlayerStatus } from '@texuli/catalog/player';
 import type { PlayerNodeErrorCode } from './errors.ts';
 import { placeholderMessage } from './errors.ts';
 
+/** The status the player shows: the host's or its own verdict, or a streaming state (ADR-014). */
+export type PlayerShownStatus = PlayerStatus | 'streaming' | 'interrupted';
+
 /** Every piece of chrome copy the player paints; hosts localize it through `labels`. */
 export interface PlayerLabels {
-  status: Readonly<Record<PlayerStatus, string>>;
+  status: Readonly<Record<PlayerShownStatus, string>>;
   /** Heading of the notice shown when an invalid draft is refused. */
   invalidNotice: string;
   /** Banner under an invalid draft painted with `invalidPolicy="preview"`. */
@@ -58,6 +61,21 @@ export interface PlayerLabels {
   fieldPattern: string;
   fieldLength: string;
   fieldRange: string;
+
+  /** Streaming (ADR-014): said once when a stream starts painting. */
+  streamStarted: string;
+  /** Polite progress while streaming, at most every few seconds: "{count}" parts shown. */
+  streamProgress: string;
+  /** The recoverable error after a stream stopped early. */
+  streamInterrupted: string;
+  /** The retry button of that error (shown when the host passes `onStreamRetry`). */
+  streamRetry: string;
+  /** A skeleton whose catalog id has not arrived yet. */
+  streamPending: string;
+  /** A node held until the whole draft is checked (a node-level refusal or a member out of order). */
+  streamHeld: string;
+  /** A node the interrupted stream never finished. */
+  streamIncomplete: string;
 }
 
 export const DEFAULT_PLAYER_LABELS: PlayerLabels = Object.freeze({
@@ -66,6 +84,8 @@ export const DEFAULT_PLAYER_LABELS: PlayerLabels = Object.freeze({
     draft: 'Draft',
     active: 'Active',
     superseded: 'Superseded',
+    streaming: 'Generating',
+    interrupted: 'Interrupted',
   }),
   invalidNotice: 'This blueprint could not be validated.',
   previewWarning: 'Preview only. This invalid blueprint cannot be activated.',
@@ -101,6 +121,15 @@ export const DEFAULT_PLAYER_LABELS: PlayerLabels = Object.freeze({
   fieldPattern: '{label} is not in the expected format.',
   fieldLength: '{label} must be {min} to {max} characters.',
   fieldRange: '{label} must be between {min} and {max}.',
+
+  streamStarted: 'Generating content.',
+  streamProgress: '{count} parts shown so far.',
+  streamInterrupted:
+    'Generation stopped before the content was complete. What is shown is incomplete.',
+  streamRetry: 'Try again',
+  streamPending: 'Content',
+  streamHeld: 'Waiting for the complete draft.',
+  streamIncomplete: 'Not received.',
 });
 
 /** Host overrides; nested maps merge per key. */
@@ -131,6 +160,8 @@ export function resolvePlayerLabels(overrides: PlayerLabelOverrides | undefined)
       draft: text(status.draft, base.status.draft),
       active: text(status.active, base.status.active),
       superseded: text(status.superseded, base.status.superseded),
+      streaming: text(status.streaming, base.status.streaming),
+      interrupted: text(status.interrupted, base.status.interrupted),
     },
     invalidNotice: text(overrides.invalidNotice, base.invalidNotice),
     previewWarning: text(overrides.previewWarning, base.previewWarning),
@@ -166,6 +197,14 @@ export function resolvePlayerLabels(overrides: PlayerLabelOverrides | undefined)
     fieldPattern: text(overrides.fieldPattern, base.fieldPattern),
     fieldLength: text(overrides.fieldLength, base.fieldLength),
     fieldRange: text(overrides.fieldRange, base.fieldRange),
+
+    streamStarted: text(overrides.streamStarted, base.streamStarted),
+    streamProgress: text(overrides.streamProgress, base.streamProgress),
+    streamInterrupted: text(overrides.streamInterrupted, base.streamInterrupted),
+    streamRetry: text(overrides.streamRetry, base.streamRetry),
+    streamPending: text(overrides.streamPending, base.streamPending),
+    streamHeld: text(overrides.streamHeld, base.streamHeld),
+    streamIncomplete: text(overrides.streamIncomplete, base.streamIncomplete),
   };
 }
 

@@ -3,6 +3,7 @@ import { untrack } from 'svelte';
 import { createAttachmentKey } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { menuLevelContext } from '../menu/context.ts';
 import {
   type ContextMenuPoint,
@@ -16,10 +17,10 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   disabled?: boolean;
   children?: import('svelte').Snippet;
   child?: ChildSnippet<Record<string, unknown>>;
-};
+} & RefProp;
 type Div<E extends Event> = E & { currentTarget: EventTarget & HTMLDivElement };
 
-let { disabled = false, children, child, ...rest }: Props = $props();
+let { disabled = false, children, child, ref = $bindable(null), ...rest }: Props = $props();
 const level = menuLevelContext.get();
 // A consumer id wins: the context records it, so every reference follows.
 level.claimId(
@@ -138,7 +139,7 @@ const triggerProps = $derived({
 {#if child}
   {@render child({ props: triggerProps })}
 {:else}
-  <div {...triggerProps}>
+  <div bind:this={ref} {...triggerProps}>
     {@render children?.()}
   </div>
 {/if}

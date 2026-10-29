@@ -1,0 +1,25 @@
+/* Hierarchical rows of a chart data table (pack, part-whole) indent by depth. */
+
+:is(.tx-chart-data, .tx-chart-ruled) th[scope="row"][data-depth="1"] {
+  padding-inline-start: 1.5rem;
+}
+
+:is(.tx-chart-data, .tx-chart-ruled) th[scope="row"][data-depth="2"] {
+  padding-inline-start: 2.5rem;
+}
+
+:is(.tx-chart-data, .tx-chart-ruled) th[scope="row"][data-depth="3"] {
+  padding-inline-start: 3.5rem;
+}
+
+:is(.tx-chart-data, .tx-chart-ruled) th[scope="row"][data-depth="4"] {
+  padding-inline-start: 4.5rem;
+}
+
+:is(.tx-chart-data, .tx-chart-ruled) th[scope="row"][data-depth="5"] {
+  padding-inline-start: 5.5rem;
+}
+
+:is(.tx-chart-data, .tx-chart-ruled) th[scope="row"][data-depth="6"] {
+  padding-inline-start: 6.5rem;
+}

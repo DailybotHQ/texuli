@@ -28,7 +28,7 @@ const partProps = $derived({
   ...rest,
   type: 'button' as const,
   tabindex: -1,
-  disabled: tagsInput.disabled || undefined,
+  disabled: tagsInput.disabled || tagsInput.readonly || undefined,
   onclick: handleClick,
 });
 </script>

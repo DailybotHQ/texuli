@@ -2,14 +2,15 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { Calendar } from '../calendar/index.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { getShell, getSingle, toCalendarDate } from './shared.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Replaces the default header (previous, heading, next) and grid. */
   children?: Snippet;
-};
+} & RefProp;
 
-let { children, ...rest }: Props = $props();
+let { children, ref = $bindable(null), ...rest }: Props = $props();
 const shell = getShell();
 const single = getSingle();
 const selected = $derived(toCalendarDate(single.value));
@@ -18,7 +19,7 @@ const max = $derived(toCalendarDate(shell.maxValue));
 const todayDate = $derived(toCalendarDate(shell.today));
 </script>
 
-<div {...rest} data-tx-date-picker-calendar>
+<div bind:this={ref} {...rest} data-tx-date-picker-calendar>
   <Calendar.Root
     value={selected}
     {...selected ? { defaultFocusedValue: selected } : {}}

@@ -2,6 +2,7 @@
 import { untrack } from 'svelte';
 import { composeChildProps } from '../internal/child.ts';
 import { composeHandlers } from '../internal/handlers.ts';
+import type { RefProp } from '../internal/ref.ts';
 import type { ToggleRootAttrs, ToggleRootProps } from './types.ts';
 
 let {
@@ -19,8 +20,9 @@ let {
   onclick: consumerClick,
   onkeydown: consumerKeydown,
   onkeyup: consumerKeyup,
+  ref = $bindable(null),
   ...rest
-}: ToggleRootProps & { pressed?: boolean } & Record<string, unknown> = $props();
+}: RefProp & ToggleRootProps & { pressed?: boolean } & Record<string, unknown> = $props();
 
 // defaultPressed seeds uncontrolled state once.
 let localPressed = $state(untrack(() => defaultPressed));
@@ -93,7 +95,7 @@ const childProps = $derived(child ? composeChildProps(attrs, {}) : attrs);
 {#if child}
   {@render child({ props: childProps })}
 {:else}
-  <button
+  <button bind:this={ref}
     {id}
     type="button"
     aria-pressed={isPressed}

@@ -84,7 +84,9 @@ network behavior.
 - `onEdit(message, body)` enables inline edit. `edit()` swaps the bubble
   for a labelled textarea ("Edit message") with Save and Cancel, and
   focuses it. Enter saves, Shift+Enter adds a line, and Escape cancels.
-  An unchanged body just closes. Return `false`, or reject, to keep the
+  An unchanged body (after trimming) closes without calling `onEdit`;
+  `onEditUnchanged(message)` (G85) is called then, so a host can treat it
+  as a resend. Return `false`, or reject, to keep the
   editor open with the draft. On close, focus returns to the control that
   opened the editor (or the log when it is gone).
 - While the reader is at the bottom, the list follows a streaming reply as
@@ -94,8 +96,32 @@ network behavior.
   bottom and moves focus to the log.
 
 The labels `jumpToLatest`, `newBelow`, `editInput`, `saveEdit` and
-`cancelEdit` translate these controls. `ChatThread` forwards `actions` and
-`onEdit`.
+`cancelEdit` translate these controls. `ChatThread` forwards `actions`,
+`onEdit` and `onEditUnchanged`.
+
+## Reading position, avatars and day separators (G59, G70, G71)
+
+- **Reading position.** `bind:anchor` (a `ChatReadingAnchor`) holds where
+  the reader is: `messageId` (the first message in view, the one crossing
+  the top edge or the first below it), `offset` (px from the viewport's top
+  edge to that message's top, negative when it starts above the view) and
+  `atLatest` (the reader is at the bottom). The list writes it as the reader
+  scrolls, at most once per frame, and calls `onAnchorChange(anchor)` when it
+  changes. An anchor the host sets (on mount, or with a new `messages` array
+  when it swaps conversations) is restored: the list scrolls the message to
+  `offset` (moving the virtual window to its estimated row first, then
+  correcting from the rendered row), or to the bottom for `atLatest`.
+  Restoring is not announced as new messages. An anchor whose message is not
+  in the list, or `null`, opens at the latest message. `ChatThread` forwards
+  `anchor` and `onAnchorChange`. `bind:ref` binds the scrolling log element.
+- **Avatars.** `ChatAuthor.avatarSrcset` passes responsive candidates to the
+  author's avatar (`srcset` on texuli `Avatar`); each candidate goes through
+  the untrusted image URL policy, and refused ones are dropped. Stream
+  `start` events carry it too (a non-string value rejects the event).
+- **Day separators** are their own full-width row at the top of a group,
+  above the row that holds the avatar and the bubbles
+  (`.tx-chat-message-group__row`), so a narrow screen never squeezes the date
+  beside the avatar. Each message bubble carries `data-message-id`.
 
 ## Display transcript for the player (G10)
 

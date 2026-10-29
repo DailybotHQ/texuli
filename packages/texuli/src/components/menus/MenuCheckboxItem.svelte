@@ -21,6 +21,7 @@ let {
   disabled = false,
   checked = $bindable(false),
   indeterminate = $bindable(false),
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -32,7 +33,7 @@ const classes = $derived(
 );
 </script>
 
-<Primitive
+<Primitive bind:ref
   class={classes}
   data-tx-menu-checkbox-item
   bind:checked

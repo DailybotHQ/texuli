@@ -2,6 +2,7 @@
 import { indexOfSelected } from '@texuli/core/roving';
 import { untrack } from 'svelte';
 import { attachRovingFocus } from '../internal/attachments.ts';
+import type { RefProp } from '../internal/ref.ts';
 import type { ToggleGroupContext } from './context.ts';
 import { toggleGroupContext } from './context.ts';
 import type { ToggleGroupOrientation, ToggleGroupRootProps, ToggleGroupType } from './types.ts';
@@ -21,8 +22,10 @@ let {
   'aria-labelledby': ariaLabelledby,
   name,
   form,
+  ref = $bindable(null),
   ...rest
-}: ToggleGroupRootProps & { value?: string | string[] } & Record<string, unknown> = $props();
+}: RefProp &
+  ToggleGroupRootProps & { value?: string | string[] } & Record<string, unknown> = $props();
 
 // type / defaultValue seed uncontrolled state once.
 let localValue = $state<string | string[]>(
@@ -111,7 +114,7 @@ const rovingAttachment = attachRovingFocus({
 {/snippet}
 
 {#if rovingFocus}
-  <div
+  <div bind:this={ref}
     role="group"
     class={typeof className === 'string' ? className : undefined}
     data-orientation={orientation}

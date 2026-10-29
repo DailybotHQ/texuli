@@ -15,5 +15,6 @@ export type {
   ChatMessage,
   ChatMessageActions,
   ChatMessageStatus,
+  ChatReadingAnchor,
   MessageGroup,
 } from './types.ts';

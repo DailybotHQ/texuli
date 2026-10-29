@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { stateAttributes } from '../internal/state.ts';
 import { tabsContext } from './context.ts';
 
@@ -10,9 +11,16 @@ type Props = HTMLAttributes<HTMLDivElement> & {
   forceMount?: boolean;
   class?: string;
   children?: Snippet;
-};
+} & RefProp;
 
-let { value, forceMount = true, class: className, children, ...rest }: Props = $props();
+let {
+  value,
+  forceMount = true,
+  class: className,
+  children,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 
 const tabs = tabsContext.get();
 // A consumer id wins: the context records it, so every reference follows.
@@ -36,7 +44,7 @@ const shouldRender = $derived(forceMount || selected);
 </script>
 
 {#if shouldRender}
-  <div
+  <div bind:this={ref}
     role="tabpanel"
     {id}
     class={className}

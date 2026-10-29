@@ -2,13 +2,13 @@
 import { Button } from 'texuli/button';
 import { Checkbox, RadioGroup } from 'texuli/choice';
 import type { InteractiveBlockLabels } from './labels.ts';
-import type { PollBlock } from './schema.ts';
+import type { PollBlock as PollBlockData } from './schema.ts';
 
 let {
   block,
   labels,
 }: {
-  block: PollBlock;
+  block: PollBlockData;
   labels: InteractiveBlockLabels;
 } = $props();
 

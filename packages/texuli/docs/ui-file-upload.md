@@ -20,7 +20,9 @@ Styled drop zone on `@texuli/primitives/file-drop`:
 | `labels` | Translatable chrome strings |
 | `onFilesAdd(files)` | Once per pick or drop, with the accepted files it added (not for `files` the host sets) |
 | `onFileRemove(file)` | When the person removes a file with its remove button |
-| other attributes | Land on the wrapper (`aria-*` and `data-*` on the file input). Caller `onchange`, `ondrop` and drag handlers run on the wrapper as the events bubble out of the drop zone: after the zone's handling, never instead of it |
+| `id` / `inputId` | The file input's id, so `<label for>` and a `Field` reach it (`inputId` wins when both are set) |
+| `ref` | Bindable: the wrapper |
+| other attributes | Land on the wrapper (`aria-*`, `data-*`, `onfocus` and `onblur` on the file input). Caller `onchange`, `ondrop` and drag handlers run on the wrapper as the events bubble out of the drop zone: after the zone's handling, never instead of it |
 
 ### Behavior
 

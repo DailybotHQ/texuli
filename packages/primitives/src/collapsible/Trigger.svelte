@@ -2,6 +2,7 @@
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { type ChildSnippet, composeChildProps } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { collapsibleContext } from './context.ts';
 
 type TriggerProps = HTMLButtonAttributes & {
@@ -9,7 +10,13 @@ type TriggerProps = HTMLButtonAttributes & {
   children?: Snippet;
 };
 
-let { child, children, disabled = false, ...rest }: TriggerProps = $props();
+let {
+  child,
+  children,
+  disabled = false,
+  ref = $bindable(null),
+  ...rest
+}: TriggerProps & RefProp = $props();
 
 const context = collapsibleContext.get();
 // A consumer id wins: the context records it, so every reference follows.
@@ -40,7 +47,7 @@ const triggerProps = $derived(composeChildProps(baseProps, rest as Partial<typeo
 {#if child}
   {@render child({ props: triggerProps })}
 {:else}
-  <button {...triggerProps}>
+  <button bind:this={ref} {...triggerProps}>
     {@render children?.()}
   </button>
 {/if}

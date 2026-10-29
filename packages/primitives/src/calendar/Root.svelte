@@ -17,6 +17,7 @@ import {
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { ChildSnippet } from '../internal/child.ts';
+import type { RefProp } from '../internal/ref.ts';
 import { type CalendarContextValue, provideCalendarContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onchange'> & {
@@ -43,9 +44,11 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onchange'> & {
   previousLabel?: string;
   nextLabel?: string;
   onValueChange?: (value: CalendarDate) => void;
+  /** The focused day moved (arrow keys, paging, a pick, the month buttons). */
+  onFocusedValueChange?: (value: CalendarDate) => void;
   child?: ChildSnippet<Record<string, unknown>>;
   children?: Snippet;
-};
+} & RefProp;
 
 let {
   value = $bindable(),
@@ -65,8 +68,10 @@ let {
   previousLabel = 'Previous month',
   nextLabel = 'Next month',
   onValueChange,
+  onFocusedValueChange,
   child,
   children,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 
@@ -124,8 +129,10 @@ function firstEnabledFocus(date: CalendarDate): CalendarDate {
 
 function updateFocus(date: CalendarDate): void {
   if (isDisabledDate(date)) return;
+  const changed = currentFocus.compare(date) !== 0;
   if (focusedValue !== undefined) focusedValue = date;
   else localFocusedValue = date;
+  if (changed) onFocusedValueChange?.(date);
 }
 
 function updateValue(date: CalendarDate): void {
@@ -339,5 +346,5 @@ const rootProps = $derived({
 {#if child}
   {@render child({ props: rootProps })}
 {:else}
-  <div {...rootProps}>{@render children?.()}</div>
+  <div bind:this={ref} {...rootProps}>{@render children?.()}</div>
 {/if}

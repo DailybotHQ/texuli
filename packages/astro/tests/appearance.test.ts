@@ -1,7 +1,10 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/svelte';
 import { appearanceCacheKey, cacheAppearance } from '@texuli/tokens/no-flash';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  APPEARANCE_CHANGE_EVENT,
   AppearanceSwitcher,
   applyAppearanceChoice,
   readAppearanceChoice,
@@ -176,5 +179,61 @@ describe('@texuli/astro appearance switcher (G16)', () => {
     expect(view.container.querySelector('script, [style]')).toBeNull();
     expect(view.getByRole('radiogroup', { name: 'Appearance' })).toBeTruthy();
     expect(view.getByRole('radio', { name: 'Oscuro' })).toBeTruthy();
+  });
+});
+
+describe('AppearanceSwitcher compact size and same-tab sync (G74)', () => {
+  afterEach(() => {
+    cleanup();
+    localStorage.clear();
+  });
+
+  it('keeps two switchers on one page in step, and follows applyAppearanceChoice in the same tab', async () => {
+    const changes: unknown[] = [];
+    const onChange = (event: Event) => changes.push((event as CustomEvent).detail);
+    window.addEventListener(APPEARANCE_CHANGE_EVENT, onChange);
+    try {
+      const header = render(AppearanceSwitcher, {
+        props: { namespace: 'gallery', label: 'Header' },
+      });
+      const footer = render(AppearanceSwitcher, {
+        props: { namespace: 'gallery', label: 'Footer' },
+      });
+      const other = render(AppearanceSwitcher, { props: { namespace: 'docs', label: 'Other' } });
+      const checked = (view: typeof header) =>
+        radios(view.container).find((radio) => radio.checked)?.value;
+      await fireEvent.click(
+        radios(header.container).find((radio) => radio.value === 'dark') as HTMLInputElement
+      );
+      await waitFor(() => expect(checked(footer)).toBe('dark'));
+      // A command palette (no switcher involved) applies a choice in the same tab.
+      applyAppearanceChoice('gallery', 'light');
+      await waitFor(() => {
+        expect(checked(header)).toBe('light');
+        expect(checked(footer)).toBe('light');
+      });
+      // Another namespace is untouched.
+      expect(checked(other)).toBe('system');
+      expect(changes).toEqual([
+        { namespace: 'gallery', choice: 'dark' },
+        { namespace: 'gallery', choice: 'light' },
+      ]);
+    } finally {
+      window.removeEventListener(APPEARANCE_CHANGE_EVENT, onChange);
+    }
+  });
+
+  it('offers a compact size that leaves the font to the host', () => {
+    const view = render(AppearanceSwitcher, { props: { size: 'sm', class: 'text-xs' } });
+    const group = view.getByRole('radiogroup', { name: 'Appearance' });
+    expect(group.dataset.size).toBe('sm');
+    expect(render(AppearanceSwitcher).container.querySelector('[data-size="md"]')).toBeTruthy();
+    const source = readFileSync(
+      join(process.cwd(), 'packages/astro/src/appearance/AppearanceSwitcher.svelte'),
+      'utf8'
+    );
+    // The root no longer resets the font, so a host class such as text-xs applies.
+    expect(source).not.toMatch(/\n\s*font:\s*inherit;/);
+    expect(source).toMatch(/\[data-size='sm'\]/);
   });
 });

@@ -26,7 +26,7 @@
 
 | Prop | Default | Meaning |
 | --- | --- | --- |
-| `rows`, `columns`, `getRowId` | required | Rows, `DataGridColumn<T>[]` (an engine column plus `sortable`, `searchable`, `align` and `format`), and a stable row id |
+| `rows`, `columns`, `getRowId` | required | Rows, `DataGridColumn<T>[]` (an engine column plus `sortable`, `searchable`, `align`, `format` and `hideBelow`), and a stable row id |
 | `caption` | required | The grid's accessible name (`<caption>`); `captionHidden` keeps it for assistive technology only |
 | `sort` | `[]` | `bind:sort`: the engine's `GridSort`, primary key first. `onSortChange` |
 | `search`, `searchable` | `''`, `false` | `bind:search`; `searchable` shows a labelled search field |
@@ -34,8 +34,10 @@
 | `selectable`, `selected` | `false`, `[]` | A selection column; `bind:selected` holds row ids in row order. `onSelectionChange` |
 | `rowLabel` | first column's text | Names a row for its checkbox |
 | `onRowActivate` | none | Enter on a body cell |
+| `activateOnClick` | `false` | A pointer click on a body row also calls `onRowActivate`, except a click on a control in the row (link, button, field, label, the row checkbox) or a drag that selected text. Keep a keyboard path: Enter in `grid` mode, or a link or button in a cell in `table` mode |
+| `mode` | `grid` | `grid`: the APG grid below. `table`: a static table with native table semantics (no `role="grid"`, no `aria-rowcount`/`aria-colindex`, no roving tab stop and no grid keys); the sort buttons and checkboxes stay ordinary tab stops |
 | `cell` | none | Snippet `(row, column)` for custom cell content; default is the column's text |
-| `empty`, `loading` | none, `false` | Empty snippet; `loading` shows a row and sets `aria-busy` |
+| `empty`, `loading` | none, `false` | Empty snippet, called with `{ query, filtered }` (the search text, and whether rows exist but none matched) so it can say "No results for …"; `loading` shows a row and sets `aria-busy` |
 | `pageSize`, `page` | `0` (off), `1` | Client paging: `pageSize` rows per page and `bind:page` (from 1, kept in range as rows change). `onPageChange`. A pager (Previous, "Page N of M" as a polite live region, Next) renders in a `nav` named by `labels.pagination(caption)` when there is more than one page |
 | `rowClass` | none | `(row) => class` for a body row (status tints, emphasis); pair a color with text, since a class is visual only |
 | `filters`, `toolbar` | none | Snippets in the toolbar row: `filters` after the search field, `toolbar` at its end (export, create…). The toolbar renders when any of `searchable`, `filters` or `toolbar` is set |
@@ -61,6 +63,7 @@
   - Shift, on click or Space, selects a range from the last toggled row.
   - Rows carry `aria-selected`, and the table carries `aria-multiselectable`.
   - Selection uses the engine's helpers (`toggleRow`, `selectRange`, `setVisibleSelected`, `selectionState`).
+- **Breakpoint columns:** a column with `hideBelow` (`sm` 640px, `md` 768px, `lg` 1024px, `xl` 1280px, or a width in px) leaves the grid while the viewport is narrower (`matchMedia`): its header and cells are not rendered, `aria-colcount` and the keyboard model skip it, and search and filters still read it. Every column renders during SSR and until the island mounts.
 - **Status:** a polite live region reports "N of M rows" and "K selected".
 - **Paging (`pageSize` > 0):**
   - The body shows one page of the filtered, searched and sorted rows; `aria-rowcount` stays the full count and `aria-rowindex` is each row's position in it.
@@ -87,7 +90,7 @@ The keys are described to assistive technology through `aria-describedby` (the `
 
 ## Verified
 
-- `pnpm vitest run packages/data/tests/grid-core.test.ts`: **4 tests**.
+- `pnpm vitest run packages/data/tests/grid-core.test.ts`: **7 tests**.
   - Model: sort cycling and Shift keys, `aria-sort`, accent-folding search, filter then search then sort, invalid filters rejected, `cellText`, every APG key including RTL and the edges, clamping, labels.
   - Component: grid roles and counts, one tab stop, header sorting with Shift, non-sortable headers, search with the count, filter, keyboard movement, Space and Shift+Space selection, the header tri-state, Ctrl/Cmd+A, Enter activation, loading and empty states, translations, and hostile cell text kept as text.
   - Windowing: the view plus overscan renders with spacer rows for the rest, `aria-rowcount` stays the full set, scrolling moves the window, the focused row stays rendered past it, and windowed cells never wrap (the `rowSize` math).
@@ -100,6 +103,8 @@ The keys are described to assistive technology through `aria-describedby` (the `
 
 - Paging, row classes and snippets (G7): the "DataGrid paging, row classes and toolbar snippets (G7)" block in `grid-core.test.ts` covers the page slice, `aria-rowcount` and offset `aria-rowindex`, the pager and its live position, clamping a bound page, search shrinking the pages, `pageSize` 0, `rowClass`, the `filters` and `toolbar` snippets, page-scoped select-all, the bulk-actions context across pages, Ctrl/Cmd+A across pages and `clear()`. Example: `data-grid-paging` (axe clean in light, dark and forced colors on Chromium, WebKit and the Pixel 7 in a scratch spec on port 4937).
 
+- Adoption gaps (G55): the "DataGrid adoption gaps (G55)" block in `grid-core.test.ts` covers pointer row activation in both modes (controls in the row never activate it, and nothing activates without `activateOnClick`), the static `table` mode (no grid role, counts, tab stops or Enter activation), `hideBelow` at three viewport widths (headers, cells and `aria-colcount`) and the `empty` snippet's `{ query, filtered }`.
+
 ## Limits
 
 - **Windowed rows must stay single-line.** The scroll math derives positions from `rowSize`, so windowed cells never wrap at any width — their table scrolls sideways instead. A large grid can also use `@texuli/data/virtual-list`.
@@ -107,3 +112,13 @@ The keys are described to assistive technology through `aria-describedby` (the `
 - **No column resizing, reordering or pinning UI.** The engine's column state supports them.
 - **No cell editing.** Cells are read-only; an editable grid is a separate task.
 - **Wide grids scroll inside the Table's wrapper,** which becomes a focusable, named region.
+
+## Motion
+
+`motion` (`layout` on by default): when the shown rows change order (a sort,
+a filter, a row added or removed) they glide to their new place (FLIP through
+`texuli/motion` on `@texuli/core/motion`,
+[ui-motion](../../texuli/docs/ui-motion.md)). Rows carry `data-tx-row-id`
+for it. Nothing plays on the first render; reduced motion, a
+`MotionProvider` level of `none` and `motion={false}` commit at once.
+Tests: `packages/data/tests/motion.test.ts`.

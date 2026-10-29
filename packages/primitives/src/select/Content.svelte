@@ -3,14 +3,15 @@ import { createOverlayCore, type OverlayController } from '@texuli/core/overlay-
 import { positionFloating } from '@texuli/core/position-dom';
 import { untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { RefProp } from '../internal/ref.ts';
 import { getSelectContext } from './context.ts';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   children?: import('svelte').Snippet;
   sideOffset?: number;
-};
+} & RefProp;
 
-let { children, sideOffset, class: className, ...rest }: Props = $props();
+let { children, sideOffset, class: className, ref = $bindable(null), ...rest }: Props = $props();
 const context = getSelectContext();
 // A consumer id wins: the context records it, so every reference follows.
 context.claimId(
@@ -96,7 +97,7 @@ const contentProps = $derived({
 </script>
 
 {#if context.open}
-  <div {...contentProps} {@attach attach}>
+  <div bind:this={ref} {...contentProps} {@attach attach}>
     {@render children?.()}
   </div>
 {/if}
