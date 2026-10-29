@@ -57,10 +57,10 @@ Not layers, because they consume the library:
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
 `scripts/packages.ts`); `pnpm verify:packages` packs the other 20.
-`@texuli/editor` is publishable from `0.5.0` and not on npm yet; the other
-19 are released on npm as `0.4.0`, the first release of
-`@texuli/deck` (the previous release, `0.3.0`, had 18 packages);
-`@texuli/drag`, `@texuli/workflows` and `@texuli/deck` are in development
+All 20 are released on npm as `0.5.0`, the first release of
+`@texuli/editor` (the previous release, `0.4.0`, had 19 packages);
+`@texuli/drag`, `@texuli/workflows`, `@texuli/deck` and `@texuli/editor`
+are in development
 and sit in the `publish.yml` wave order ahead of their dependents
 ([RELEASE](RELEASE.md)).
 
@@ -172,7 +172,7 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
   controls, forms and flows, `sortable-list` (one shared drag scope per
   player) and `workflow-graph` (`@texuli/workflows`). `tests/loader-parity`
   fails when an emittable id has no painter.
-- **Decks as data.** Spec 0.4.0 (ADR-009, in the repository) adds the
+- **Decks as data.** Spec 0.4.0 (ADR-009) adds the
   deck model v2 props to `layout-deck` and `deck-slide`; see
   [Decks: engine and stage](#decks-engine-and-stage).
 - **Interaction as data.** Spec 0.3.0 (ADR-008) adds `state`, `flow`,
@@ -193,8 +193,8 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.4.0`,
-the first release of `@texuli/deck`):
+ADR-009 splits presentations in two packages (both on npm as `0.5.0`;
+`@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
   (`formatVersion: 2`; slides told apart by `layout`: 20 catalog layouts,
@@ -219,8 +219,7 @@ the first release of `@texuli/deck`):
   catalog id classified). Hosts answer first through `renderers`. The URL
   policy applies at paint with the host's tier (`untrusted` by default).
 
-Agent decks travel as catalog trees under spec `0.4.0` (in the repository
-only), whose `layout-deck` and `deck-slide` manifests carry the model v2
+Agent decks travel as catalog trees under spec `0.4.0` and later, whose `layout-deck` and `deck-slide` manifests carry the model v2
 props. `validateDeckDraft` in `@texuli/catalog/validate` maps a tree to a
 v2 deck without depending on `@texuli/deck`; the host then runs
 `migrateDeck` and `parseDeck`. `@texuli/player` keeps painting decks as a
@@ -265,8 +264,8 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 19 packable packages, `@texuli/deck` included, to npm as the
-    `0.4.0` release (dist-tags `latest` and `next`), with provenance
+    the 20 packable packages, `@texuli/editor` included, to npm as the
+    `0.5.0` release (dist-tags `latest` and `next`), with provenance
     ([RELEASE](RELEASE.md)).
 - **Tests:**
   - **Unit:** Vitest (happy-dom) in `packages/*/tests/`,

@@ -8,10 +8,10 @@ announcements, and it renders message text without ever injecting HTML. It
 is part of [Texuli](https://texuli.com), "Small pieces. Infinite
 possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
-> **Status: 0.x release.** `@texuli/chat` is published on npm as `0.4.0`, a
+> **Status: 0.x release.** `@texuli/chat` is published on npm as `0.5.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.5.0`) may contain breaking changes, so pin the exact version or
-> use `^0.4.0`, which accepts only 0.4.x.
+> minor (`0.6.0`) may contain breaking changes, so pin the exact version or
+> use `^0.5.0`, which accepts only 0.5.x.
 
 ## Install
 
@@ -104,9 +104,9 @@ Everything is exported from the package root, `@texuli/chat`:
   measured row heights, and keeps your place when older history is
   prepended.
 
-## Unreleased (prepared for 0.5.0, not on npm yet)
+## New in 0.5.0
 
-In the repository, not in the `0.4.0` tarball:
+Ships in `0.5.0`; the `0.4.0` release predates it:
 
 - `Composer`: `streaming` with `onStop` (a Stop button and Escape), an
   `onkeydown` hook that runs before the built-in keys, and an `actions`

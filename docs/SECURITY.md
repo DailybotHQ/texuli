@@ -241,7 +241,7 @@ Released in the `0.4.0` packages; the `0.3.0` packages predate it.
 
 ### 17. Linear-time parsing of untrusted text (ReDoS)
 
-In the repository, prepared for `0.5.0` and not in the `0.4.0` packages.
+Released in the `0.5.0` packages; the `0.4.0` packages predate it.
 
 | | |
 | --- | --- |

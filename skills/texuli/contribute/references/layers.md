@@ -8,7 +8,7 @@
 | L1 | `@texuli/primitives` | Owned headless Svelte controls on the texels | `texuli`, another component library |
 | L2 | `@texuli/tokens` | Theme engine, `--tx-*` contract, themes, CSS | Components |
 | L3 | `texuli` | Styled components, layouts, shells | Domain packages |
-| L4 | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/editor` | Domain kits (the editor is in development and not on npm yet; publishable from `0.5.0`) | Blocks, catalog and above |
+| L4 | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/editor` | Domain kits (the editor is in development, on npm from `0.5.0`) | Blocks, catalog and above |
 | L5 | `@texuli/blocks` | Content blocks for pages, documents and slides | Catalog and above |
 | L6 | `@texuli/catalog` | Manifests, the sink-free renderer, validation, envelope, edit ops, player core | Svelte paint above it |
 | L7 | `@texuli/player` | The Svelte paint of validated blueprints | Tools, adapters |

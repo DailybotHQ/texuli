@@ -7,10 +7,8 @@
 `tests/export.test.ts` and `tests/export-v2.test.ts` (both export paths)
 
 `0.4.0` is a new minor of a pre-1.0 package, so it may break; it changes
-the deck model and the stage's defaults. It is not published yet: the
-upgrade below describes the code in the repository, and it ships when the
-owner approves the release, together with the first publication of
-`@texuli/deck` ([RELEASE](../../../docs/RELEASE.md)).
+the deck model and the stage's defaults. It shipped together with the first
+publication of `@texuli/deck` ([RELEASE](../../../docs/RELEASE.md)).
 
 ## What changes
 

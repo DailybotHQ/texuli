@@ -10,9 +10,9 @@ output stays inside a labelled frame with a visible trust badge, and the
 player never navigates, fetches or persists anything on its own.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.5.0`) may contain breaking
-> changes, so pin the exact version or use `^0.4.0`, which accepts only 0.4.x.
+> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
+> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
 
 > **New in `0.4.0`.** Spec 0.3.0 and 0.4.0 envelopes (`state`, `flow`,
 > `bind`, `on` and the closed actions), the data view, chat display,
@@ -122,8 +122,8 @@ The TypeScript declarations list the full surface.
   `workflow-graph` (the `@texuli/workflows` viewer or editor). Node `on`
   runs only the closed actions (`setState`, `toggleState`, `moveItem`,
   `flowGo`, `emit`, `submit`), and `bind` writes back only to declared
-  variables. The chat composer stays host chrome. In the repository (not on
-  npm yet), three more data views paint from JSON: `data-cohort-table`,
+  variables. The chat composer stays host chrome. New in
+  `0.5.0`, three more data views paint from JSON: `data-cohort-table`,
   `data-notification-inbox` (read changes stay in view, `filter` is
   bindable, links always pass the untrusted URL policy) and
   `data-filter-builder` (a starting filter is parsed against its fields;

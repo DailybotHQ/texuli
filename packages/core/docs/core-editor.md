@@ -15,7 +15,7 @@ and [EDITOR_ARCHITECTURE](../../../docs/EDITOR_ARCHITECTURE.md) decided:
 document, selection, transforms, history, key intents and the Markdown codec.
 No DOM, no HTML and no framework. The Svelte binding that renders it is
 the in-development [`@texuli/editor`](../../editor/README.md) package
-(publishable from `0.5.0`, not on npm yet); nothing here touches the page.
+(on npm from `0.5.0`); nothing here touches the page.
 
 ```ts
 import { fromMarkdown, toMarkdown } from '@texuli/core/editor-markdown';

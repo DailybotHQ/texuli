@@ -161,7 +161,7 @@ reflect this decision.
 - **Status note (2026-10-28, PLAN_009 G17):** on the owner's approval the
   package became publishable: it left `NEVER_PACKED`, gained
   `@texuli/editor/markdown` and joined the publish workflow after `texuli`.
-  It is first published with `0.5.0`; until then it is not on npm.
+  It is first published with `0.5.0`.
 
 ## ADR-004: Versioned blueprint envelope with host-owned activation
 
@@ -216,7 +216,7 @@ reflect this decision.
   `io.github.dailybothq` — a GitHub-account namespace, verifiable without a
   domain.
 - **Choice:** `com.texuli`, artifacts `texuli-spec` and `texuli-compose`,
-  versions tracking the npm release line they mirror (`0.4.0`).
+  versions tracking the npm release line they mirror (`0.5.0`).
 - **Why:** texuli.com is owned and deployed, so the Central Portal can verify
   the namespace by DNS, and the group matches the Kotlin package names the
   sources already use (`com.texuli.spec.runtime`, `com.texuli.compose`).

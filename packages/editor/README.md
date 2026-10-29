@@ -9,14 +9,14 @@ the rendering is sink-free: no `{@html}`, no `innerHTML`, every link through
 the URL policy. It is part of [Texuli](https://texuli.com), "Small pieces.
 Infinite possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
-> **Status: in development, not on npm yet.** The package is publishable
-> (`pnpm verify:packages` packs it, and it is in the publish workflow after
-> `texuli`) but its version is still the `0.0.0` placeholder; it is first
-> published with the next release (planned `0.5.0`). The architecture
+> **Status: in development (pre-1.0).** `@texuli/editor` is published on
+> npm for the first time as `0.5.0`, with provenance (the publish workflow
+> publishes it after `texuli`). Under 0.x a new minor (`0.6.0`) may contain
+> breaking changes, so pin the exact version or use `^0.5.0`, which accepts
+> only 0.5.x. The architecture
 > contract is ADR-003 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)
 > and [EDITOR_ARCHITECTURE](https://github.com/DailybotHQ/texuli/blob/main/docs/EDITOR_ARCHITECTURE.md).
-> Texuli is pre-1.0: under 0.x a new minor may contain breaking changes.
 
 ## Install
 
@@ -24,7 +24,7 @@ Infinite possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 npm install @texuli/editor
 ```
 
-Once it is published. In the Texuli workspace, depend on it as
+In the Texuli workspace, depend on it as
 `"@texuli/editor": "workspace:*"`. It builds on `@texuli/core`,
 `@texuli/primitives`, `@texuli/tokens` and `texuli`; `svelte` (^5.57.2) is a
 peer dependency. Import the token stylesheet once

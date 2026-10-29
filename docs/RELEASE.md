@@ -5,44 +5,35 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-`0.4.0` is the current release of all 19 packable packages (owner GO
-2026-10-28): the 18 packages of the `0.3.0` line plus `@texuli/deck`, which
-is published for the first time in `0.4.0`. The publish workflow publishes
-from `main` after the merge, from the verified tarballs with signed
-provenance, and moves both the `latest` and `next` dist-tags to the
+`0.5.0` is the current release of all 20 packable packages (owner GO
+2026-10-28): the 19 packages of the `0.4.0` line plus `@texuli/editor`,
+which is published for the first time in `0.5.0`. The publish workflow
+publishes from `main` after the merge, from the verified tarballs with
+signed provenance, and moves both the `latest` and `next` dist-tags to the
 published version, so a bare `npm install texuli` or `pnpm add texuli` gets
-it. `@texuli/drag`, `@texuli/workflows` and `@texuli/deck` are still **in
-development** (pre-1.0).
+it. `@texuli/drag`, `@texuli/workflows`, `@texuli/deck` and
+`@texuli/editor` are still **in development** (pre-1.0).
 
-`0.4.0` is a breaking `0.x` minor: it carries the PLAN_007 and PLAN_008
-changes listed under "0.4.0" below, none of which were in the `0.3.0`
-tarballs. It is still pre-1.0, not a stable release: see "0.x versioning"
-below. Workspace manifests remain `private: true`, and every future version
-and wave requires a fresh, explicit developer GO. Publishing never
-overwrites a published version.
-
-`0.5.0` is **prepared, not published**: the PLAN_009 changes listed under
-"0.5.0 (unreleased, prepared)" below are in the repository, but no package
-has been bumped to `0.5.0` and npm still serves `0.4.0`. This page is
-updated after that release is actually published.
+`0.5.0` is a breaking `0.x` minor: it carries the PLAN_009 changes listed
+under "0.5.0" below, none of which were in the `0.4.0` tarballs. It is
+still pre-1.0, not a stable release: see "0.x versioning" below. Workspace
+manifests remain `private: true`, and every future version and wave
+requires a fresh, explicit developer GO. Publishing never overwrites a
+published version.
 
 ### Not on npm
 
 - `@texuli/examples` is never packed (`NEVER_PACKED` in
   `scripts/packages.ts`).
-- `@texuli/editor` is publishable from `0.5.0` (PLAN_009 G17, owner approval
-  2026-10-28): `pnpm verify:packages` packs it and the publish workflow
-  publishes it after `texuli`, but it is not on npm yet. Its version stays
-  the `0.0.0` placeholder until the release bumps it, and the publish
-  workflow refuses to publish a `0.0.0` version.
 
-### 0.5.0 (unreleased, prepared)
+### 0.5.0
 
-**Not on npm.** Prepared on the PLAN_009 branch: the packages are still at
-`0.4.0` (and `@texuli/editor` at the `0.0.0` placeholder) until the release
-task bumps every packable package to `0.5.0` with exact internal pins and the
-developer gives a fresh GO. It closes the gaps Protoyard found while adopting
-Texuli from npm (PLAN_007 there); the ids below match its register.
+Every packable package moves to `0.5.0` together, and every internal
+`@texuli/*` dependency between them is pinned to exactly `0.5.0`.
+`@texuli/editor` is published for the first time (PLAN_009 G17, owner
+approval 2026-10-28; the publish workflow refuses a `0.0.0` placeholder
+version). It closes the gaps Protoyard found while adopting Texuli from npm
+(PLAN_007 there); the ids below match its register.
 
 **Closed gaps.**
 
@@ -164,8 +155,15 @@ parser, and the catalog's draft sink scan (`looksExecutable` and the
 HTML-tag check). Differential fuzzing matched the old parsers' output. See
 [SECURITY](SECURITY.md#17-linear-time-parsing-of-untrusted-text-redos).
 
-**Also in the branch:** the agent service's catalog imports every manifest
+**Also in PLAN_009:** the agent service's catalog imports every manifest
 group, so its hash matches the site catalog (`apps/agent`, not published).
+
+**Publish order** (`publish.yml`): core, date, spec, drag, deck, tokens,
+primitives, texuli, workflows, editor, charts, data, media, chat, blocks,
+catalog, tools, astro, player, slides. `@texuli/editor` goes out after
+`texuli` (and after `@texuli/core`, `@texuli/primitives` and
+`@texuli/tokens`, which it pins); the other dependency rules are those of
+`0.4.0` below.
 
 ### Known gaps and next steps (planned for the next version, not started)
 
@@ -286,8 +284,8 @@ Every packable package moves to `0.4.0` together, and every internal
   `CalendarIdentifier` narrowing to `'gregory'` already shipped in `0.3.0`.
 
 **Publish order** (`publish.yml`): core, date, spec, drag, deck, tokens,
-primitives, texuli, workflows, editor, charts, data, media, chat, blocks,
-catalog, tools, astro, player, slides (`@texuli/editor` from `0.5.0`). `@texuli/deck` goes out before
+primitives, texuli, workflows, charts, data, media, chat, blocks, catalog,
+tools, astro, player, slides. `@texuli/deck` goes out before
 `@texuli/slides` (and before `@texuli/tools`, which pins it);
 `@texuli/drag` before `@texuli/primitives`, `@texuli/data` and
 `@texuli/workflows`; `@texuli/workflows` before `@texuli/player`; and
@@ -295,6 +293,9 @@ catalog, tools, astro, player, slides (`@texuli/editor` from `0.5.0`). `@texuli/
 
 ### History
 
+- `0.4.0` (2026-10-28): a breaking `0.x` minor for 19 packages, the first
+  publication of `@texuli/deck` (PLAN_007 and PLAN_008; see "0.4.0"
+  above). Its tarballs ship blueprint spec `0.4.0` and predate PLAN_009.
 - `0.3.0` (2026-10-27): a breaking `0.x` minor for 16 packages, the first
   publication of `@texuli/date`. `@texuli/primitives` re-exports
   `CalendarDate` from `@texuli/date` instead of `@internationalized/date`
@@ -318,10 +319,10 @@ catalog, tools, astro, player, slides (`@texuli/editor` from `0.5.0`). `@texuli/
 
 ### 0.x versioning
 
-Until 1.0.0, a breaking change bumps the minor (`0.4.0` to `0.5.0`) and a
-fix bumps the patch (`0.4.0` to `0.4.1`). Consumers pin the exact version or
-use `~0.4.0` or `^0.4.0`; for a `0.x` version both ranges accept only
-`0.4.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
+Until 1.0.0, a breaking change bumps the minor (`0.5.0` to `0.6.0`) and a
+fix bumps the patch (`0.5.0` to `0.5.1`). Consumers pin the exact version or
+use `~0.5.0` or `^0.5.0`; for a `0.x` version both ranges accept only
+`0.5.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
 release.
 
 ## Independent package versions
@@ -345,8 +346,8 @@ Before a package reaches 1.0.0, its `0.x` minor is the API compatibility line:
   to `1.0.0` under a separate developer GO. Packages make that transition
   independently.
 
-For example, a fix candidate can progress from `0.4.1-next.0` to
-`0.4.1-next.1`; a new feature or breaking change starts `0.5.0-next.0`.
+For example, a fix candidate can progress from `0.5.1-next.0` to
+`0.5.1-next.1`; a new feature or breaking change starts `0.6.0-next.0`.
 Pre-release dependencies between Texuli packages use exact compatible
 pre-release versions. Ordinary ranges do not select prerelease versions by
 default.
@@ -356,14 +357,14 @@ default.
 - **`next`** points to the newest owner-approved version, including any
   future `0.x.y-next.N` or other pre-release. The publish workflow always
   publishes with `--tag next`, so it moves only with a new version and a
-  fresh GO. It names `0.4.0` once the publish workflow runs after the merge
-  (`0.3.0` before that).
+  fresh GO. It names `0.5.0` once the publish workflow runs after the merge
+  (`0.4.0` before that).
 - **`latest`** is npm's default install tag, and npm's package page shows
   the README of the version it names. It tracks the newest release, before
   and after 1.0.0: the publish workflow moves it together with `next`
   (owner decision 2026-10-27; before that, `latest` was reserved for 1.0.0
-  and stayed on the first upload, `0.1.0-next.0`). It names `0.4.0` once the
-  publish workflow runs after the merge (`0.3.0` before that).
+  and stayed on the first upload, `0.1.0-next.0`). It names `0.5.0` once the
+  publish workflow runs after the merge (`0.4.0` before that).
   The workflow moves `latest` on every run, so publishing a future
   pre-release without moving `latest` needs a workflow change first.
 - Dailybot v4 and other production consumers must pin exact package versions
@@ -378,7 +379,7 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (for `0.4.0`, every internal pin is exactly `0.4.0`; compatibility
+versions (for `0.5.0`, every internal pin is exactly `0.5.0`; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary
@@ -398,12 +399,13 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 19 npm packages | `0.4.0` (dist-tags `latest` and `next`) | Each package manifest, with exact `0.4.0` internal pins; published by the publish workflow after the merge (before it: `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
-| `@texuli/deck` | `0.4.0` (first publication) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
-| `@texuli/drag`, `@texuli/workflows` | `0.4.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
-| Blueprint spec | `0.4.0`, digest `fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3` (after `0.3.0`, digest `a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848`, which was never on npm) | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.4.0`. |
-| Blueprint spec `0.5.0` (prepared, not on npm) | `0.5.0`, digest `1ba15e8b082f68140c4b2768b8fd69c9f760e655dd117fac756f356a71525b2d` | `packages/spec/versions.json` in the repository; ships only when `@texuli/spec@0.5.0` is published. |
-| Blueprint spec in `@texuli/spec@0.3.0` | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | The previous release's generated sources carry the `0.2.0` stamp. |
+| 20 npm packages | `0.5.0` (dist-tags `latest` and `next`) | Each package manifest, with exact `0.5.0` internal pins; published by the publish workflow after the merge (before it: `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| `@texuli/editor` | `0.5.0` (first publication) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
+| `@texuli/deck` | `0.5.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
+| `@texuli/drag`, `@texuli/workflows` | `0.5.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
+| Blueprint spec | `0.5.0`, digest `1ba15e8b082f68140c4b2768b8fd69c9f760e655dd117fac756f356a71525b2d` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.5.0`. |
+| Blueprint spec in `@texuli/spec@0.4.0` | `0.4.0`, digest `fac29f542b16ddb78ab401c508e5b8346f655991c56e25aa811f4931661a8cb3` (after `0.3.0`, digest `a95f691514814a39e5f7f1b98b1598ab08af0e2151a2c019c51eb8d58c0a7848`, which was never on npm) | The previous release's generated sources carry the `0.4.0` stamp. |
+| Blueprint spec in `@texuli/spec@0.3.0` | `0.2.0`, digest `d9eccaba1826e7d87648a4a33787d873245592dda843607a10b2c68a77f1806f` | The `0.3.0` release's generated sources carry the `0.2.0` stamp. |
 | Native modules (`texuli-spec`, `texuli-compose`) | source-consumed, no artifact | `native/` builds from `packages/spec/generated/kotlin`; planned Maven coordinates `com.texuli` (decision [ADR-005](DECISIONS.md)). Not published. |
 
 - A normative spec change takes a new spec version and a fresh digest pin in
@@ -431,20 +433,21 @@ tag. Any GO for Task 170's name reservation covers only that reservation.
 | 0.3.0 | Drag foundation | `@texuli/drag`, before `@texuli/primitives`, `@texuli/data` and `@texuli/workflows` (first published as `0.3.0` on 2026-10-28) | Fresh owner GO for each version; it must be published **before** every package that depends on it (`@texuli/primitives`, `@texuli/data`, `@texuli/workflows`). |
 | 175 | Controls | `@texuli/primitives` | Fresh owner GO after its core dependency and behavior, accessibility, size, pack, and consumer gates pass. |
 | 176 | Styled package | `texuli` | Fresh owner GO after core, primitives, and tokens compatibility plus style and consumer gates pass. |
+| 0.5.0 | Editor | `@texuli/editor`, after `texuli` (first published in `0.5.0`) | Fresh owner GO for each version; it must be published **after** `@texuli/core`, `@texuli/primitives`, `@texuli/tokens` and `texuli`, which it depends on. |
 | 0.3.0 | Workflows | `@texuli/workflows`, after `@texuli/drag` and `texuli`, before `@texuli/player` (first published as `0.3.0` on 2026-10-28) | Fresh owner GO for each version; it must be published **before** `@texuli/player`, which depends on it. |
 | 0.4.0 | Deck engine | `@texuli/deck`, after `@texuli/drag`, before `@texuli/tools` and `@texuli/slides` (first published in `0.4.0`) | Fresh owner GO for each version; it must be published **before** `@texuli/slides` and `@texuli/tools`, which depend on it. |
 | 177 | Domain packages | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/blocks` | Fresh owner GO for the exact ready set after dependency order, package checks, size, pack, and consumer gates pass. |
 | 178 | Catalog and integration tools | `@texuli/catalog`, `@texuli/tools`, `@texuli/astro`, `@texuli/player`, `@texuli/slides`, `@texuli/spec` (the order in `publish.yml`; all six went out in the 2026-10-25 `0.1.0-next.1` run) | Fresh owner GO for each exact release set after implementation, dependency, pack, consumer, and relevant website/build gates pass. |
 
-The date, drag, workflows and deck rows are in `.github/workflows/publish.yml`
-(order: core, date, spec, drag, deck, tokens, primitives, texuli, workflows,
-editor, charts, data, media, chat, blocks, catalog, tools, astro, player,
-slides; `@texuli/editor` goes out from `0.5.0`, after `texuli`).
-Every packable package is `0.4.0`, and every internal dependency between
-them is pinned to exactly `0.4.0`. `pnpm verify:packages` still refuses any
+The date, drag, workflows, deck and editor rows are in
+`.github/workflows/publish.yml` (order: core, date, spec, drag, deck,
+tokens, primitives, texuli, workflows, editor, charts, data, media, chat,
+blocks, catalog, tools, astro, player, slides; `@texuli/editor` goes out
+from `0.5.0`, after `texuli`). Every packable package is `0.5.0`, and every
+internal dependency between them is pinned to exactly `0.5.0`. `pnpm verify:packages` still refuses any
 `0.0.0` or `workspace:` range in a published manifest, the guard that keeps
 an unversioned dependency out. The publish loop skips versions npm already
-has, so a package changed after `0.4.0` needs a new version before its
+has, so a package changed after `0.5.0` needs a new version before its
 change reaches npm.
 
 Each outward wave must also pass its task's `pnpm verify:packages` gate and
@@ -457,7 +460,7 @@ new version rather than reusing a published version.
 ## Honesty in documentation
 
 The npm name reservation (`0.1.0-next.0`) was a prerelease publication by
-the owner, not a supported product release. `0.4.0` is a release but not a
+the owner, not a supported product release. `0.5.0` is a release but not a
 stable one: keep `private: true`, the pre-1.0 status, and the absence of a
 stable 1.0.0 clear until the corresponding approved stable release actually
 exists. A passing pack gate proves only that a tarball

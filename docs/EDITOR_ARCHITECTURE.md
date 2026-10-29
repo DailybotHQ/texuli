@@ -6,7 +6,7 @@ and unpublished.** This is the long-form companion to
 contracts that the editor tasks implement. The framework-free model exists
 as core texels: the document, selection, transforms, history, key intents
 and the Markdown codec ([core-editor](../packages/core/docs/core-editor.md)).
-The `@texuli/editor` package (publishable from `0.5.0`, not on npm yet)
+The `@texuli/editor` package (on npm from `0.5.0`, its first release)
 holds the paste import, Markdown in and out, the DOM selection mapping and
 the Svelte 5 editing surface
 ([packages/editor](../packages/editor/README.md)). The browser behavior

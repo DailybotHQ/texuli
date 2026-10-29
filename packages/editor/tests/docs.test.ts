@@ -94,9 +94,19 @@ describe('editor documentation', () => {
   });
 
   it('states the release status honestly', () => {
-    // Publishable (packed by scripts/packages.ts) but not on npm until a release bumps it.
-    expect(readme).toMatch(/not on npm yet/i);
+    // Publishable (packed by scripts/packages.ts); first published as 0.5.0.
     expect(readme).not.toMatch(/never packed|excluded from packing/i);
-    if (manifest.version === '0.0.0') expect(readme).toMatch(/0\.0\.0/);
+    if (manifest.version === '0.0.0') {
+      expect(readme).toMatch(/not on npm yet/i);
+      expect(readme).toMatch(/0\.0\.0/);
+    } else {
+      // A released version: the README names it and no longer says unpublished.
+      expect(readme).not.toMatch(/not on npm yet|0\.0\.0` placeholder/i);
+      expect(readme).toContain(`\`${manifest.version}\``);
+    }
+    // The exported constant tracks the manifest version.
+    expect(read('src/index.ts')).toContain(
+      `export const EDITOR_PACKAGE_VERSION = '${manifest.version}';`
+    );
   });
 });

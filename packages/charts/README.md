@@ -9,10 +9,10 @@ plain TypeScript you can use without any component. It is part of
 Svelte 5 component library by Dailybot, Inc., for application developers and
 for agents that render charts from validated data.
 
-> **Status: 0.x release.** `@texuli/charts` is published on npm as `0.4.0`, a
+> **Status: 0.x release.** `@texuli/charts` is published on npm as `0.5.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.5.0`) may contain breaking changes, so pin the exact version or
-> use `^0.4.0`, which accepts only 0.4.x.
+> minor (`0.6.0`) may contain breaking changes, so pin the exact version or
+> use `^0.5.0`, which accepts only 0.5.x.
 
 ## Install
 
@@ -110,9 +110,9 @@ const keep = lttbIndices(xs, ys, 500); // downsample a long series to 500 points
 | `@texuli/charts/streaming` | Immutable, bounded append helpers for live numeric series |
 | `@texuli/charts/worker`, `@texuli/charts/worker/entry` | Opt-in Web Worker offload for binning and downsampling very large series, with a main-thread fallback; load the entry with `new Worker(new URL('@texuli/charts/worker/entry', import.meta.url), { type: 'module' })` |
 
-## Unreleased (prepared for 0.5.0, not on npm yet)
+## New in 0.5.0
 
-In the repository, not in the `0.4.0` tarball:
+Ships in `0.5.0`; the `0.4.0` release predates it:
 
 - New subpath `@texuli/charts/sparkline-lite`: a light `Sparkline` with the
   same props, without the data table

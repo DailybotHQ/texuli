@@ -140,3 +140,39 @@ Move the backup back into the host's skills folder and verify it with
 - **No silent loss.** `setup.sh --replace` keeps the previous copy.
 - **Offline-safe.** An unreachable network ends with a report, never a
   partial install.
+
+## Texuli packages 0.5.0: breaking changes
+
+This sub-skill never upgrades packages; moving an app from `^0.4.0` to
+`^0.5.0` is the developer's install ([`../components/SKILL.md`](../components/SKILL.md)).
+Under 0.x a new minor may break. Before that move, check the app for:
+
+- **`texuli/input`:** with `type="number"` or `type="range"`, `bind:value`
+  holds a `number`, or `null` while empty (it was the field's text);
+  `onValueChange` still receives the text. With `type="file"`, `files`
+  starts as `null` and resets with `null`.
+- **Caller handlers compose:** a handler passed to `Input`, `Textarea`,
+  `InputGroup` and `TextCounter` (`oninput`), to `CopyButton` and to 14
+  primitive parts (`onclick`, `onkeydown` and others) runs first and no
+  longer replaces the built-in one; call `event.preventDefault()` in a click
+  or key handler to skip the built-in behavior.
+- **`Tag`:** the remove button is named "Remove {label}" (it was
+  "Remove: {label}"); a `removeLabel` prefix gets the label appended
+  without a colon.
+- **`toast`:** the store owns the auto-dismiss timers; they count from
+  publication, with or without a mounted `Toaster`, and each toast settles
+  exactly once (`onSettle(reason)`).
+- **`DeckStage`:** the default renderer tables load on first use, so the
+  first stage paints a polite loading status (`aria-busy`) for one chunk,
+  also on the server. Await `loadDefaultDeckRenderers()` (or, with
+  `defaultRenderers={false}`, `loadBuiltinDeckBlocks()`) before mounting to
+  paint at once.
+- **`texuli/layouts/content`:** `TocItem.level` and `TocHeading.level`
+  widen from `2 | 3` to `2 | 3 | 4 | 5 | 6`; exhaustive checks need the new
+  levels.
+- **Callback names:** `onStop`, `onCopy`, `onCopyError` and `onSettle` are
+  camelCase props, not the native DOM events.
+
+New APIs in `0.5.0` (none of them in `0.4.0`) are listed in
+[`../build-ui/references/imports.md`](../build-ui/references/imports.md);
+`@texuli/editor` is published for the first time.

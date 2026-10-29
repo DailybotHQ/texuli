@@ -129,8 +129,7 @@ Layout-specific behavior:
 import { layoutRenderers } from '@texuli/slides/layouts';
 ```
 
-The `@texuli/slides/layouts` subpath (in `0.4.0`, in development and not on
-npm yet) exports the layout renderer table and the helpers the renderers
+The `@texuli/slides/layouts` subpath (new in `0.4.0`, in development) exports the layout renderer table and the helpers the renderers
 are built from. `DeckStage` (and the print paint) already install
 `layoutRenderers` after the host's `renderers`, so a host does not need to
 pass it. Import it to compose or wrap it: for example, a table that answers

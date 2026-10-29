@@ -131,7 +131,7 @@ Svelte and model work, not a browser frame; the browser drag is covered by
 
 ### PLAN_009 packaging and first-screen weight (2026-10-28)
 
-Prepared for `0.5.0`, not on npm yet.
+Released in `0.5.0`; the `0.4.0` packages predate it.
 
 - **Dist parity (G22).** Protoyard measured app bundles about 11% bigger
   from the npm `0.3.0` dist than from the `0.3.0` source. Rebuilt the same
@@ -248,8 +248,8 @@ truth. CI's `audits` job runs `pnpm size` as a required check
 
 ## Slides and deck (PLAN_008)
 
-`@texuli/deck` and `@texuli/slides` `0.4.0` are in the repository and not on
-npm. Their size caps are owner decisions of 2026-10-28 (PLAN_008
+`@texuli/deck` and the `@texuli/slides` v2 stage are on npm from `0.4.0`.
+Their size caps are owner decisions of 2026-10-28 (PLAN_008
 T-perf-budgets): each cap is the measured size on the final PLAN_008 code
 plus 4% headroom, with the reason in the row's `note` in
 `texuli.budgets.json`. `pnpm size --filter deck` and

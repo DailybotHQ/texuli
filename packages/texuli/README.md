@@ -15,9 +15,9 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.5.0`) may contain breaking
-> changes, so pin the exact version or use `^0.4.0`, which accepts only 0.4.x.
+> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.6.0`) may contain breaking
+> changes, so pin the exact version or use `^0.5.0`, which accepts only 0.5.x.
 
 ## Install
 
@@ -114,9 +114,9 @@ the initial chunk.
 `texuli/cx` exports `cx` (class composition) and `variants` (typed variant
 recipes), so you can extend components without `clsx` or `tailwind-merge`.
 
-## Unreleased (prepared for 0.5.0, not on npm yet)
+## New in 0.5.0
 
-In the repository, not in the `0.4.0` tarball. Under `0.x` the new minor
+Ships in `0.5.0`; the `0.4.0` release predates it. Under `0.x` the new minor
 may break; the breaking items are marked.
 
 - **Breaking, `input`:** with `type="number"` or `type="range"`,

@@ -11,10 +11,10 @@ you need small, framework-free date-only math (add months, find the start of
 a locale's week, count the weeks in a month) without a larger date library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.4.0`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.5.0`, a pre-1.0 release (1.0.0 will be the first
 > stable release); `@texuli/date` was first released in `0.3.0`. Under 0.x,
-> a new minor (`0.5.0`) may contain breaking changes, so pin the exact
-> version or use `^0.4.0`, which accepts only 0.4.x.
+> a new minor (`0.6.0`) may contain breaking changes, so pin the exact
+> version or use `^0.5.0`, which accepts only 0.5.x.
 
 ## Install
 
@@ -98,10 +98,10 @@ export the same surface:
 | `GregorianCalendar`, `createCalendar`, `toCalendar` | The calendar object a `CalendarDate` carries; `createCalendar('gregory')` is the only supported identifier |
 | Types | `CalendarIdentifier` (`'gregory'`), `DateDuration`, `DateFields`, `DayOfWeek` |
 
-## Unreleased (prepared for 0.5.0, not on npm yet)
+## New in 0.5.0
 
-`localeWeekStart`, `weekStartDay` and `daysBetween` are in the repository,
-not in the `0.4.0` tarball.
+`localeWeekStart`, `weekStartDay` and `daysBetween` ship in `0.5.0`; the
+`0.4.0` release predates them.
 
 ## Key guarantees
 
