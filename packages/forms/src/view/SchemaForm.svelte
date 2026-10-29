@@ -25,9 +25,15 @@ import {
 import '../styles.css';
 
 interface Props extends Omit<HTMLFormAttributes, 'onsubmit' | 'class' | 'children'> {
-  /** A validated form (`validateFormSchema(schema).form`). */
+  /**
+   * A validated form (`validateFormSchema(schema).form`). A new form builds a
+   * new internal controller (values start over from `values`).
+   */
   form: CompiledForm;
-  /** Drive the form from your own controller (it must be made for the same `form`). */
+  /**
+   * Drive the form from your own controller, made for the same `form`. The
+   * view shows `controller.form`; a different `form` prop logs a warning.
+   */
   controller?: FormController | null;
   /** Starting values (coerced per field). */
   values?: Readonly<Record<string, unknown>>;
@@ -55,7 +61,7 @@ interface Props extends Omit<HTMLFormAttributes, 'onsubmit' | 'class' | 'childre
 }
 
 let {
-  form,
+  form: formProp,
   controller: external = null,
   values: initial,
   validators,
@@ -79,10 +85,10 @@ const base = $derived(id ?? `tx-forms-${uid}`);
 const labels = $derived<SchemaFormLabels>({ ...DEFAULT_SCHEMA_FORM_LABELS, ...labelOverrides });
 const files = $state<Record<string, File[]>>({});
 
-const controller: FormController = untrack(
-  () =>
-    external ??
-    createFormController(form, {
+/** The internal controller for one compiled form (options are read once, untracked). */
+function build(compiled: CompiledForm): FormController {
+  return untrack(() =>
+    createFormController(compiled, {
       ...(initial ? { values: initial } : {}),
       ...(validators ? { validators } : {}),
       ...(messages ? { messages: { ...DEFAULT_FORM_MESSAGES, ...messages } } : {}),
@@ -96,30 +102,61 @@ const controller: FormController = untrack(
         return onSubmit?.({ values: submission.values, files: sent });
       },
     })
-);
+  );
+}
 
-let formState = $state.raw<FormState>(controller.getState());
+// A new `form` (or `controller`) swaps the controller; the subscription
+// effect below destroys the internal one it replaced.
+const controller: FormController = $derived(external ?? build(formProp));
+// The view always paints the controller's form, so structure and state agree.
+const form = $derived(controller.form);
+
+$effect(() => {
+  if (external && external.form !== formProp && typeof console !== 'undefined') {
+    console.warn(
+      'SchemaForm: `controller` was made for another form; the controller form is shown. Pass `controller.form` as `form`, or no controller.'
+    );
+  }
+});
+
+/** The last state heard, tagged with the controller it came from. */
+let observed = $state.raw<{ controller: FormController; state: FormState } | null>(null);
+const formState = $derived(
+  observed && observed.controller === controller ? observed.state : controller.getState()
+);
 let live = $state('');
 let summaryOpen = $state(false);
 let summary = $state<HTMLElement | null>(null);
 let stepHeading = $state<HTMLElement | null>(null);
 let panel = $state<HTMLElement | null>(null);
 let done = $state<HTMLElement | null>(null);
+/** The step last painted, so only a step change animates. */
+let shownStep: number | null = null;
 
 $effect(() => {
-  const stop = controller.subscribe((next) => {
-    formState = next;
+  const current = controller;
+  const owned = current !== untrack(() => external);
+  untrack(() => {
+    // A swapped controller starts the view over: no summary, files or announcement.
+    summaryOpen = false;
+    live = '';
+    shownStep = null;
+    for (const name of Object.keys(files)) delete files[name];
   });
-  formState = controller.getState();
+  const stop = current.subscribe((next) => {
+    observed = { controller: current, state: next };
+  });
+  observed = { controller: current, state: current.getState() };
   return () => {
     stop();
-    if (!external) controller.destroy();
+    if (owned) current.destroy();
   };
 });
 
 $effect(() => {
+  const current = controller;
   if (!drafts || !restoreDraft) return;
-  void untrack(() => controller.restoreDraft()).then((restored) => {
+  void untrack(() => current.restoreDraft()).then((restored) => {
     if (restored) live = labels.draftRestored;
   });
 });
@@ -128,7 +165,6 @@ const presence = createPresenceMotion({
   motion: () => motion,
   defaults: { enter: 'fade', exit: false, layout: false, duration: 'fast' },
 });
-let shownStep: number | null = null;
 $effect(() => {
   const step = formState.step;
   const node = panel;

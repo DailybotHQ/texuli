@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/sv
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SchemaForm } from '../src/index.ts';
-import { createMemoryDrafts, FORM_FIELD_TYPES } from '../src/model/index.ts';
+import { createFormController, createMemoryDrafts, FORM_FIELD_TYPES } from '../src/model/index.ts';
 import { compiled, REGISTRATION } from './fixtures.ts';
 import MultiFormHarness from './MultiFormHarness.svelte';
 
@@ -165,6 +165,83 @@ describe('SchemaForm', () => {
       selector: '.tx-forms__done',
     });
     await waitFor(() => expect(document.activeElement).toBe(done));
+  });
+
+  it('rebuilds its controller for a new form: new fields respond, steps and errors follow', async () => {
+    const onSubmit = vi.fn(async () => ({ ok: true }) as const);
+    const onValueChange = vi.fn();
+    const first = compiled({
+      title: 'Contact',
+      fields: [{ name: 'email', type: 'email', label: 'Email', required: true }],
+    });
+    const second = compiled({
+      title: 'Profile',
+      submitLabel: 'Save profile',
+      steps: [
+        {
+          id: 'who',
+          title: 'Who',
+          fields: [
+            { name: 'email', type: 'email', label: 'Email', required: true },
+            { name: 'nickname', type: 'text', label: 'Nickname', required: true },
+          ],
+        },
+        {
+          id: 'wrap',
+          title: 'Wrap up',
+          fields: [{ name: 'notes', type: 'textarea', label: 'Notes' }],
+        },
+      ],
+    });
+    const view = render(SchemaForm, {
+      props: { form: first, onSubmit, onValueChange, id: 'swap' },
+    });
+    await fireEvent.input(screen.getByRole('textbox', { name: /Email/ }), {
+      target: { value: 'ada@example.com' },
+    });
+    await view.rerender({ form: second, onSubmit, onValueChange, id: 'swap' });
+    expect(screen.getByRole('form', { name: 'Profile' })).toBeTruthy();
+    // The new form's steps: Next checks its required fields (values started over).
+    await fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    const summary = await screen.findByRole('heading', { name: 'There is a problem' });
+    expect(summary.parentElement?.textContent).toContain('Nickname: Nickname is required.');
+    await fireEvent.input(screen.getByRole('textbox', { name: /Email/ }), {
+      target: { value: 'grace@example.com' },
+    });
+    await fireEvent.input(screen.getByRole('textbox', { name: /Nickname/ }), {
+      target: { value: 'Grace' },
+    });
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      'nickname',
+      'Grace',
+      expect.objectContaining({ nickname: 'Grace' })
+    );
+    expect(screen.getByRole('textbox', { name: /Nickname/ })).toHaveProperty('value', 'Grace');
+    await fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    await screen.findByRole('heading', { name: 'Wrap up' });
+    await fireEvent.click(screen.getByRole('button', { name: 'Save profile' }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
+    const [submission] = onSubmit.mock.calls[0] as unknown as [{ values: Record<string, unknown> }];
+    expect(submission.values).toMatchObject({ email: 'grace@example.com', nickname: 'Grace' });
+  });
+
+  it('paints a passed controller form and warns when the form prop differs', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const mine = compiled({
+        title: 'Mine',
+        fields: [{ name: 'email', type: 'email', label: 'Email' }],
+      });
+      const other = compiled({ title: 'Other', fields: [{ name: 'x', type: 'text', label: 'X' }] });
+      const controller = createFormController(mine);
+      render(SchemaForm, { props: { form: other, controller } });
+      await tick();
+      expect(screen.getByRole('form', { name: 'Mine' })).toBeTruthy();
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('another form'));
+      controller.destroy();
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   it('keeps field ids apart from its own ids, whatever the field names (title, description, summary)', async () => {

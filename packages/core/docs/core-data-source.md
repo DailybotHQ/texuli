@@ -136,7 +136,10 @@ returns a `SourceLoader`. Its methods never throw or reject; each resolves a
   30 seconds; `cache: false` disables it). `peek` reads a fresh page
   synchronously. `invalidate(name?, origin?)` drops a source's pages and
   tells its `subscribe` listeners; a page that started loading before an
-  invalidation is not cached.
+  invalidation is not cached, and new calls no longer join it (they start a
+  fresh read, so a list after a write sees post-write rows). The detached
+  read is not aborted: the callers already waiting on it still settle.
+  `inFlight()` counts only the reads a new call can join.
 - **Writes:** `create`, `update` and `remove` check their values against the
   declaration first (declared, `editable`, fitting the type; `required`
   fields on create; never the key) and fail as `invalid-input` with issues

@@ -155,7 +155,7 @@ export interface SourceLoader {
   invalidate(name?: string, origin?: unknown): void;
   /** Hear invalidations of one source. Returns the unsubscribe. */
   subscribe(name: string, listener: (event: SourceInvalidation) => void): () => void;
-  /** Shared reads in flight. */
+  /** Shared reads in flight that a new call can join (an invalidation detaches them). */
   inFlight(): number;
 }
 
@@ -252,6 +252,8 @@ function checkValues(
 }
 
 interface Inflight {
+  /** The source the read belongs to: `invalidate` detaches it by name. */
+  readonly source: string;
   readonly controller: AbortController;
   readonly promise: Promise<SourceResult<SourceListResult>>;
   waiters: number;
@@ -615,7 +617,7 @@ export function createSourceLoader(options: SourceLoaderOptions): SourceLoader {
         if (read.ok && (generations.get(name) ?? 0) === generation) cacheSet(key, name, read.value);
         return read;
       });
-      const created: Inflight = { controller, promise, waiters: 0 };
+      const created: Inflight = { source: name, controller, promise, waiters: 0 };
       entry = created;
       inflight.set(key, created);
     }
@@ -656,6 +658,12 @@ export function createSourceLoader(options: SourceLoaderOptions): SourceLoader {
       name === undefined ? [...new Set([...generations.keys(), ...listeners.keys()])] : [name];
     for (const [key, entry] of cache) {
       if (name === undefined || entry.source === name) cache.delete(key);
+    }
+    // A read that started before the invalidation may hold pre-write rows:
+    // detach it so a later call starts a fresh read. It is not aborted, so
+    // its current callers still settle (and its page is not cached).
+    for (const [key, entry] of inflight) {
+      if (name === undefined || entry.source === name) inflight.delete(key);
     }
     for (const each of names) {
       generations.set(each, (generations.get(each) ?? 0) + 1);

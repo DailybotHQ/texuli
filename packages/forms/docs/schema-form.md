@@ -33,8 +33,8 @@ the `CompiledForm`, `FormController`, `FormDraftOptions`,
 
 | Prop | Meaning |
 | --- | --- |
-| `form` | A `CompiledForm` from `validateFormSchema` |
-| `controller` | Drive the form from your own `FormController` (made for the same form) |
+| `form` | A `CompiledForm` from `validateFormSchema`; a new form builds a new internal controller (see below) |
+| `controller` | Drive the form from your own `FormController` (made for the same form; the view paints `controller.form`) |
 | `values` | Starting values (coerced per field) |
 | `validators` | Host validators by the names fields give |
 | `drafts` | `FormDraftOptions`: storage, key and debounce for autosave |
@@ -53,6 +53,23 @@ With `id="signup"`, the form's own parts are `signup-title`,
 `signup-description` and `signup-summary`, and each field's control is
 `signup-field-<name>` (its error `signup-field-<name>-error`), so no field
 name collides with the form's ids.
+
+## Changing the form
+
+Without a `controller`, passing a new `form` builds a new internal
+controller and destroys the old one: values start over from `values`,
+errors, the error summary, kept files and the status line are cleared, and
+steps and validation follow the new form. With `drafts`, the new controller
+restores the saved draft under its `key` (coerced to the new form's fields)
+and autosaves there; an autosave still pending on the old controller is
+dropped. Give each form its own drafts `key` when forms should not share a
+draft. To keep values across a form change, read them in `onValueChange`
+and pass them back as `values`.
+
+With a `controller`, the view paints `controller.form`, so structure and
+state always agree; a `form` prop that differs from `controller.form` logs
+a `console.warn`. Swapping in another controller re-subscribes the view;
+the view never destroys a controller it did not create.
 
 ## Controls
 
@@ -96,4 +113,5 @@ uploading is the host's (`onSubmit` receives the files).
 Tests: `packages/forms/tests/view.test.ts` (every field type named by its
 label with no name or ARIA violations under axe, the error summary and its
 links, step focus and announcements, conditional fields, submission with
-files, drafts and localized labels).
+files, drafts and localized labels, a new form rebuilding the controller,
+and the warning for a controller made for another form).

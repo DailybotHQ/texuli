@@ -255,6 +255,33 @@ describe('core/data-source loader: requests', () => {
     expect(heard).toEqual(['mine']);
   });
 
+  it('detaches in-flight reads on invalidation: current callers settle, later calls read fresh', async () => {
+    // One source by name, then every source.
+    for (const target of ['tickets', undefined] as const) {
+      const memory = memorySource({ hold: true });
+      const { loader } = loaderFor(memory);
+      const before = loader.list('tickets', { pageSize: 2 });
+      await flush();
+      loader.invalidate(target); // what a landed write does
+      expect(loader.inFlight()).toBe(0);
+      const after = loader.list('tickets', { pageSize: 2 });
+      await flush();
+      expect(memory.lists).toHaveLength(2);
+      // The detached read is not aborted: its caller still gets its rows.
+      expect(memory.lists[0]?.request.signal.aborted).toBe(false);
+      const stale = tickets(2);
+      const fresh = tickets(2).map((row) => ({ ...row, title: `${row.title} (written)` }));
+      memory.lists[0]?.resolve({ rows: stale });
+      memory.lists[1]?.resolve({ rows: fresh });
+      const early = await before;
+      const late = await after;
+      expect(early.ok && early.value.rows[0]?.title).toBe('Ticket 1');
+      expect(late.ok && late.value.rows[0]?.title).toBe('Ticket 1 (written)');
+      // Only the post-invalidation page is cached.
+      expect(loader.peek('tickets', { pageSize: 2 })?.rows[0]?.title).toBe('Ticket 1 (written)');
+    }
+  });
+
   it('validates writes, never retries them, and invalidates the source after one lands', async () => {
     const memory = memorySource();
     const { loader } = loaderFor(memory);
@@ -390,6 +417,35 @@ describe('core/data-source collection: paging and optimistic writes', () => {
     await flush();
     expect(memory.calls.filter((call) => call.startsWith('list')).length).toBe(before + 1);
     expect(collection.state.rows[1]?.title).toBe('Theirs');
+  });
+
+  it('reloads every view with post-write rows when a write lands while they share a read', async () => {
+    const memory = memorySource({ hold: true });
+    const { loader } = loaderFor(memory);
+    const views = [
+      createSourceCollection(loader, 'tickets', { pageSize: 2 }),
+      createSourceCollection(loader, 'tickets', { pageSize: 2 }),
+    ];
+    for (const view of views) void view.load();
+    await flush();
+    expect(memory.lists).toHaveLength(1);
+    const write = loader.update('tickets', 't1', { title: 'Written' }, { origin: 'elsewhere' });
+    await flush();
+    memory.writes[0]?.resolve({ ...tickets(1)[0], title: 'Written' });
+    expect((await write).ok).toBe(true);
+    await flush();
+    // Both views reload through one fresh read, not the pre-write one.
+    expect(memory.lists).toHaveLength(2);
+    memory.lists[0]?.resolve({ rows: tickets(2) });
+    memory.lists[1]?.resolve({
+      rows: tickets(2).map((row) => (row.id === 't1' ? { ...row, title: 'Written' } : row)),
+    });
+    await flush();
+    for (const view of views) {
+      expect(view.state.status).toBe('ready');
+      expect(view.state.rows[0]?.title).toBe('Written');
+      view.destroy();
+    }
   });
 
   it('reports a refused source or query as an error state without loading', async () => {
