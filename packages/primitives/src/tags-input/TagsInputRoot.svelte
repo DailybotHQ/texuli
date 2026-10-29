@@ -1,6 +1,8 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import { untrack } from 'svelte';
 import { type Attachment, createAttachmentKey } from 'svelte/attachments';
+import { useMessages } from '../i18n/use-messages.ts';
 import { tagsInputContext, visuallyHidden } from './context.ts';
 import { DEFAULT_TAGS_INPUT_LABELS } from './labels.ts';
 import { addTags, isDelimiterKey, splitTags } from './tags.ts';
@@ -32,8 +34,12 @@ let {
   ref = $bindable(null),
   ...rest
 }: TagsInputRootProps = $props();
+const msg = useMessages();
 
-const text = $derived({ ...DEFAULT_TAGS_INPUT_LABELS, ...labels });
+const text = $derived({
+  ...localizeLabels(msg, 'primitives.tags-input', DEFAULT_TAGS_INPUT_LABELS),
+  ...labels,
+});
 const tags = $derived(Array.isArray(value) ? value : []);
 // A form reset goes back to the tags the input started with.
 const initial = untrack(() => [...tags]);

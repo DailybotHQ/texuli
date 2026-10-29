@@ -2,6 +2,7 @@
 import { Slider as SliderPrimitive } from '@texuli/primitives/slider';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type SliderSize, sliderRootClass } from './variants.ts';
@@ -68,11 +69,13 @@ let {
   required = false,
   class: className,
   id,
-  thumbLabel = 'Value',
+  thumbLabel: thumbLabelProp,
   children,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const thumbLabel = $derived(thumbLabelProp ?? msg('texuli.slider.thumb-label', 'Value'));
 
 // aria-*, data-*, handlers and form attributes go to the thumbs (the focusable
 // sliders); layout hooks (style, hidden…) stay on the field wrapper.

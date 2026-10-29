@@ -99,12 +99,13 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
 | `@texuli/catalog/manifests/layouts` | Authored manifests for layouts, decks and app shells |
 | `@texuli/catalog/manifests/overlays` | Authored manifests for overlays and navigation chrome (app tier) |
 | `@texuli/catalog/manifests/composition` | New in `0.4.0`: composition layouts (`layout-stack`, `layout-row`, `layout-split`, `layout-tile`) |
-| `@texuli/catalog/manifests/data` | New in `0.4.0`: data views as JSON (grid, tree, board, calendar, timeline, map, files), with their `bind` props and `on` events; `0.5.0` adds the cohort table, notification inbox and filter builder |
+| `@texuli/catalog/manifests/data` | New in `0.4.0`: data views as JSON (grid, tree, board, calendar, timeline, map, files), with their `bind` props and `on` events; `0.5.0` adds the cohort table, notification inbox and filter builder; `0.8.0` (unreleased) adds `data-dashboard` and `data-dashboard-widget` |
 | `@texuli/catalog/manifests/chat` | New in `0.4.0`: chat display ids (thread and messages; the composer stays host chrome) |
 | `@texuli/catalog/manifests/state` | New in `0.4.0`: state and action surfaces (controls, forms, flow views and actions, sortable lists, host regions) |
 | `@texuli/catalog/manifests/workflows` | New in `0.4.0`: `workflow-graph`, validated against the spec workflow schema |
 | `@texuli/catalog/manifests/documents` | New in `0.7.0`: `document`, a Texuli document as data (spec 0.7.0) |
 | `@texuli/catalog/manifests/schema-forms` | Unreleased (planned for `0.8.0`): `schema-form`, a form as data (spec 0.8.0), painted by `@texuli/forms` through the player's `formHost` |
+| `@texuli/catalog/manifests/sheets` | Unreleased (planned for `0.8.0`): `spreadsheet`, a sheet as data (spec 0.8.0; not `sheet`, which is the texuli `Sheet` drawer), painted by `@texuli/sheets` through the player's `sheetHost` |
 | `@texuli/catalog/build` | `buildCatalog`: a content-addressed catalog (`catalog-<sha256>.json`) |
 | `@texuli/catalog/build/node` | Node only: discover the manifest groups (source or published files) and write the content-addressed catalog file |
 
@@ -152,6 +153,16 @@ On this branch, not yet published:
   (`checkFormDraft` from `@texuli/forms/model`) at the draft's tier;
   without it every form is refused (`form-unchecked`)
   ([validate](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/docs/validate.md)).
+- Spec `0.8.0` sheets (ADR-015): the agent-emittable `spreadsheet` id
+  (`@texuli/catalog/manifests/sheets`) whose `sheet` holds tabs of cells
+  and formulas in the closed sheet grammar. `validateDraft` checks it with
+  the host's `checkSheet` (`checkSheetDraft` from `@texuli/sheets/model`,
+  which parses every formula) under the `sheets` check; without it every
+  spreadsheet is refused (`sheet-unchecked`).
+- Spec `0.8.0` dashboards: `data-dashboard` and `data-dashboard-widget` in
+  `@texuli/catalog/manifests/data`, with composition rules the `render`
+  check enforces (`dashboard-child`, `dashboard-parent`,
+  `dashboard-widgets`, `dashboard-widget-id`).
 
 ## New in 0.7.0
 

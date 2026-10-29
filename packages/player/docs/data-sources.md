@@ -67,8 +67,11 @@ load lazily, only when one of these props is set.
 
 The catalog's `sourceable` list (spec 0.8.0): `data-grid.rows`,
 `data-board.items`, `data-tree-view.items`, `data-calendar.events`,
-`data-files.entries`, `data-timeline.tasks` and
-`data-notification-inbox.items`. A `$source` binding anywhere else (another
+`data-files.entries`, `data-timeline.tasks`,
+`data-notification-inbox.items` and, from spec 0.8.0 (0.8.0, unreleased),
+`data-dashboard.layout` (a host source that persists a dashboard's layout:
+one record per widget, `id` the `widgetId`, with `x`, `y`, `w`, `h`, the
+`min`/`max` sizes and `locked` in grid units, at most 200). A `$source` binding anywhere else (another
 prop, a value nested inside a prop, or next to `$state`) is refused.
 Charts and the cohort table do not read sources yet (planned).
 
@@ -81,8 +84,8 @@ Rows become items by the prop's shape (`src/sources/shapes.ts`):
 - **Cells** (`data-grid.rows`): the grid's column ids name source fields,
   and each cell is the field's value as display text.
 
-At most the prop's `maxItems` rows are shown (200 for the inbox, 500 for the
-others); load-more stops there. The items then meet the same validation and
+At most the prop's `maxItems` rows are shown (200 for the inbox and the
+dashboard layout, 500 for the others); load-more stops there. The items then meet the same validation and
 paint-time URL policy (untrusted tier) as literal props: a row's `href` that
 the policy refuses is removed.
 

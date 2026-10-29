@@ -2,6 +2,7 @@
 import { type CommandSearch, Root as PrimitiveRoot } from '@texuli/primitives/command';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type CommandSize, type CommandVariant, commandRootClass } from './variants.ts';
 import './command.css';
@@ -26,7 +27,7 @@ let {
   children,
   size = 'md',
   variant = 'outline',
-  label = 'Commands',
+  label: labelProp,
   loop = true,
   shouldFilter = true,
   debounceMs = 0,
@@ -37,6 +38,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.command-root.label', 'Commands'));
 
 const classes = $derived(
   commandRootClass({

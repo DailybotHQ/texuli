@@ -12,6 +12,7 @@ import { checkCatalogContract, projectCatalog } from '@texuli/spec/codegen';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 import { describe, expect, it } from 'vitest';
 import { checkFormDraft } from '../../forms/src/model/index.ts';
+import { checkSheetDraft } from '../../sheets/src/model/index.ts';
 import blueprintJson from '../../spec/schemas/blueprint.schema.json';
 import workflowJson from '../../spec/schemas/workflow.schema.json';
 import { buildCatalog } from '../src/build/index.ts';
@@ -75,6 +76,8 @@ const CONTROL_TYPES: Readonly<Record<string, Record<string, unknown>>> = {
 
 /** Fields and submits sit in a form (the state surface rule); examples are fragments. */
 const IN_FORM = new Set(['form-field', 'form-submit']);
+/** A dashboard widget sits in a dashboard (spec 0.8.0 composition rule). */
+const IN_DASHBOARD = new Set(['data-dashboard-widget']);
 
 /**
  * An example as a valid blueprint: the `$state` lists it reads, the variable a
@@ -119,7 +122,9 @@ function envelopeFor(id: string, example: string, props: Readonly<Record<string,
           props: { action: 'send-request', label: 'Send request' },
           children: [node],
         }
-      : node,
+      : IN_DASHBOARD.has(id)
+        ? { id: 'data-dashboard', props: { label: 'Example dashboard' }, children: [node] }
+        : node,
   };
 }
 
@@ -152,15 +157,20 @@ describe('manifest examples round-trip', () => {
         checkDocument,
         checkCanvas,
         checkForm: checkFormDraft,
+        checkSheet: checkSheetDraft,
         checkSpec: (value) => validateBlueprint(value, documents, { catalogHash: build.hash }),
       });
       const errors = result.diagnostics.filter((d) => d.severity === 'error');
       expect(errors, JSON.stringify(errors)).toEqual([]);
       expect(result.checks.spec).toBe('pass');
-      const wrapped = IN_FORM.has(entry.id);
+      const wrapped = IN_FORM.has(entry.id) || IN_DASHBOARD.has(entry.id);
       expect(result.roots[0]).toMatchObject({
         kind: 'component',
-        id: wrapped ? 'action-form' : entry.id,
+        id: IN_FORM.has(entry.id)
+          ? 'action-form'
+          : IN_DASHBOARD.has(entry.id)
+            ? 'data-dashboard'
+            : entry.id,
       });
 
       const root = result.draft as CatalogTreeInput;

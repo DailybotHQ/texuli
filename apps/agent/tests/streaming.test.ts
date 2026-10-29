@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { spreadsheetManifest } from '@texuli/catalog/manifests/sheets';
 import { createBlueprintAssembler } from '@texuli/spec/stream';
 import { describe, expect, it } from 'vitest';
 import type { AgentEvent, DraftResult } from '../src/contract.ts';
@@ -568,6 +569,34 @@ describe('the service validates forms, canvases and source bindings (spec 0.8.0)
       const { result, codes } = await verdict(sourced, stream);
       expect(result.status).toBe('invalid');
       expect(codes).toContain('source');
+    }
+  );
+
+  // Sheets (spec 0.8.0): every agent formula is parsed by the sheet validator at draft time.
+  const budget = spreadsheetManifest.examples?.[0]?.props.sheet as {
+    sheets: { cells: Record<string, unknown> }[];
+  } & Record<string, unknown>;
+  const sheetTree = (sheet: unknown) => ({
+    id: 'layout-page',
+    props: { title: 'Offsite' },
+    children: [{ id: 'spreadsheet', props: { sheet } }],
+  });
+  const firstTab = budget.sheets[0] as { cells: Record<string, unknown> } & Record<string, unknown>;
+  const hostileSheet = {
+    ...budget,
+    sheets: [{ ...firstTab, cells: { ...firstTab.cells, E1: '=INDIRECT("A1")' } }],
+  };
+
+  it.each([true, false])(
+    'accepts a valid spreadsheet and refuses a bad formula with the schema reason (stream: %s)',
+    async (stream) => {
+      const ok = await verdict(sheetTree(budget), stream);
+      expect(ok.result.diagnostics).toEqual([]);
+      expect(ok.result.status).toBe('valid');
+      const bad = await verdict(sheetTree(hostileSheet), stream);
+      expect(bad.result.status).toBe('invalid');
+      expect(bad.codes).toContain('sheet-schema');
+      expect(bad.codes).not.toContain('sheet-unchecked');
     }
   );
 });

@@ -47,6 +47,7 @@ describe('golden conversations through the service loop', () => {
         documents: 'pass', // the host document validator is wired (spec 0.7.0)
         forms: 'pass', // the forms validator is wired (spec 0.8.0)
         canvases: 'pass', // the canvas validator is wired (spec 0.8.0)
+        sheets: 'pass', // the sheet validator is wired (spec 0.8.0)
         grammar: 'pass',
         root: 'pass',
         interaction: 'pass',

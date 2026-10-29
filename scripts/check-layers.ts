@@ -51,6 +51,9 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   '@texuli/media': 4,
   '@texuli/workflows': 4,
   '@texuli/blocks': 5,
+  // L5: spreadsheets; the formula and model subpaths are framework-free and the
+  // sheet view builds on @texuli/data grid editing (L4), so not L4 (ADR-015).
+  '@texuli/sheets': 5,
   '@texuli/catalog': 6,
   '@texuli/tools': 8,
   // L7: the Svelte player paints validated blueprints (roadmap D4).

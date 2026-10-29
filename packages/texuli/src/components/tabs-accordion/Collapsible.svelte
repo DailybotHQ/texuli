@@ -6,6 +6,7 @@ import {
 } from '@texuli/primitives/collapsible';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import Chevron from './Chevron.svelte';
 import './tabs-accordion.css';
@@ -33,7 +34,7 @@ let {
   defaultOpen = false,
   disabled = false,
   id,
-  label = 'Details',
+  label: labelProp,
   class: className,
   onOpenChange,
   trigger,
@@ -41,6 +42,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.collapsible.label', 'Details'));
 </script>
 
 <CollapsibleRoot

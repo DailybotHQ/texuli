@@ -1,4 +1,5 @@
 <script lang="ts">
+import { useMessages } from '../i18n/use-messages.ts';
 import { composeChildProps } from '../internal/child.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { paginationContext } from './context.ts';
@@ -6,7 +7,7 @@ import type { PaginationClickEvent, PaginationNavigationButtonProps } from './ty
 
 let {
   disabled = false,
-  label = 'Next page',
+  label: labelProp,
   child,
   children,
   onclick,
@@ -14,6 +15,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: PaginationNavigationButtonProps & RefProp = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('primitives.pagination.next-button.label', 'Next page'));
 const context = paginationContext.get();
 const isDisabled = $derived(
   Boolean(disabled || context.disabled() || context.page() >= context.pageCount())

@@ -1,5 +1,5 @@
 {
-  "catalogHash": "55d8be63fe2b80cbf116bdd0ccbad77696c12faf4d9b0aea1f5b66608f8efcac",
+  "catalogHash": "598075e391ed95dcba46e120d2fbb706e8ff67d0d5bdeb3c0741f334f439b264",
   "components": [
     {
       "capability": "web-only",
@@ -2972,6 +2972,203 @@
         }
       ],
       "summary": "A retention table: one row per cohort, one column per period after it started, as rates or counts, with optional heat tints and an averages row."
+    },
+    {
+      "bindable": ["layout"],
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "events": ["change"],
+      "group": "data",
+      "id": "data-dashboard",
+      "label": "Dashboard",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "number",
+          "name": "columns"
+        },
+        {
+          "enumValues": ["vertical", "none"],
+          "kind": "enum",
+          "name": "compaction"
+        },
+        {
+          "enumValues": ["compact", "default", "comfortable"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "kind": "boolean",
+          "name": "editable"
+        },
+        {
+          "enumValues": ["none", "small", "medium", "large"],
+          "kind": "enum",
+          "name": "gap"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "array",
+          "name": "layout",
+          "schema": {
+            "items": {
+              "properties": {
+                "h": {
+                  "description": "Height in rows.",
+                  "maximum": 48,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "locked": {
+                  "description": "A locked widget never moves or resizes.",
+                  "type": "boolean"
+                },
+                "maxH": {
+                  "maximum": 48,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "maxW": {
+                  "maximum": 24,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "minH": {
+                  "maximum": 48,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "minW": {
+                  "maximum": 24,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "w": {
+                  "description": "Width in columns.",
+                  "maximum": 24,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "x": {
+                  "description": "First column, from 0 (the inline start).",
+                  "maximum": 23,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "y": {
+                  "description": "First row, from 0.",
+                  "maximum": 4096,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": ["id"],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          }
+        }
+      ],
+      "sourceable": ["layout"],
+      "summary": "A widget grid people can rearrange: data-dashboard-widget children on columns and rows, moved and resized by drag or keyboard, reflowing on narrow screens."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "data",
+      "id": "data-dashboard-widget",
+      "label": "Dashboard widget",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "object",
+          "name": "place",
+          "schema": {
+            "properties": {
+              "h": {
+                "description": "Height in rows.",
+                "maximum": 48,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "locked": {
+                "description": "A locked widget never moves or resizes.",
+                "type": "boolean"
+              },
+              "maxH": {
+                "maximum": 48,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "maxW": {
+                "maximum": 24,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "minH": {
+                "maximum": 48,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "minW": {
+                "maximum": 24,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "w": {
+                "description": "Width in columns.",
+                "maximum": 24,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "x": {
+                "description": "First column, from 0 (the inline start).",
+                "maximum": 23,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "y": {
+                "description": "First row, from 0.",
+                "maximum": 4096,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "widgetId",
+          "required": true
+        }
+      ],
+      "summary": "One titled widget of a data-dashboard, placed on the grid; its child is any content node, such as a chart, a KPI or a grid bound to a host data source."
     },
     {
       "bindable": ["layout"],
@@ -7123,6 +7320,29 @@
         }
       ],
       "summary": "Master-detail split with list and detail panes."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "sheets",
+      "id": "spreadsheet",
+      "label": "Spreadsheet",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "object",
+          "name": "sheet",
+          "required": true,
+          "schema": {
+            "$ref": "#/$defs/sheet"
+          }
+        }
+      ],
+      "summary": "A spreadsheet as data: tabs of cells holding numbers, text, booleans and formulas that recalculate."
     },
     {
       "capability": "web-only",

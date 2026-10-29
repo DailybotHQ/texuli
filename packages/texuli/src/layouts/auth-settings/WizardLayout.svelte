@@ -2,6 +2,7 @@
 import type { Snippet } from 'svelte';
 import { Wizard } from '../../components/stepper/index.ts';
 import type { StepperStep } from '../../components/stepper/types.ts';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { isNestedInMain } from '../host/nested-main.ts';
 import './auth-settings.css';
@@ -48,6 +49,7 @@ let {
   brand,
   class: className,
 }: Props = $props();
+const msg = useMessages();
 
 let screenTarget = $state<HTMLDivElement | undefined>();
 let root = $state<HTMLElement | undefined>();
@@ -69,7 +71,7 @@ $effect(() => {
   data-tx-layout="wizard"
   data-tx-wizard-layout
   role={nested ? 'region' : undefined}
-  aria-label={nested ? (title ?? 'Wizard') : undefined}
+  aria-label={nested ? (title ?? msg('texuli.wizard-layout.wizard', 'Wizard')) : undefined}
   tabindex={nested ? 0 : undefined}
 >
   <div class="tx-wizard-layout__frame">

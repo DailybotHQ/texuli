@@ -473,6 +473,8 @@ describe('tier semantics (D5)', () => {
     'data-board',
     'data-calendar',
     'data-cohort-table',
+    'data-dashboard',
+    'data-dashboard-widget',
     'data-files',
     'data-filter-builder',
     'data-grid',
@@ -501,6 +503,7 @@ describe('tier semantics (D5)', () => {
     'media-image',
     'schema-form',
     'sortable-list',
+    'spreadsheet',
     'workflow-graph',
   ];
 

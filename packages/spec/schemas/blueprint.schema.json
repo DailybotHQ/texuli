@@ -1426,6 +1426,62 @@
       "required": ["format", "formatVersion", "shapes", "connectors"],
       "additionalProperties": false
     },
+    "sheet": {
+      "description": "A Texuli sheet, the sheet prop of a spreadsheet node (spec 0.8.0, ADR-012 and ADR-015): the format, version, metadata and tabs of @texuli/sheets. This contract checks the envelope of the sheet only (format, version, members, at most 16 tabs, each with an id, a name, a row and column count within the caps, and cells keyed by A1 address); the cell inputs, the formula grammar and its closed function set, text safety and the cell cap are checked by @texuli/sheets/model (validateSheet) inside the runtime validator, @texuli/catalog's validateDraft (the host supplies checkSheet).",
+      "type": "object",
+      "properties": {
+        "format": {
+          "const": "texuli-sheet"
+        },
+        "formatVersion": {
+          "const": 1
+        },
+        "meta": {
+          "description": "The title.",
+          "type": "object",
+          "additionalProperties": {}
+        },
+        "sheets": {
+          "description": "The tabs, in order: { id, name, rows (1 to 10,000), columns (1 to 256), cells } where cells maps A1 addresses to a number, a boolean, text or formula text that starts with =.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/sheetTab"
+          }
+        }
+      },
+      "required": ["format", "formatVersion", "sheets"],
+      "additionalProperties": false
+    },
+    "sheetTab": {
+      "description": "One tab of a sheet: a stable id, the name formulas use, the row and column counts, and the cell inputs by A1 address.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "cells": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      },
+      "required": ["id", "name", "rows", "columns"],
+      "additionalProperties": false
+    },
     "sourceName": {
       "description": "A data source the host registered (spec 0.8.0, ADR-015): an opaque name, never a URL. Checked against the host's registry; with no registry a binding is refused.",
       "type": "string",

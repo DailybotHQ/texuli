@@ -16,6 +16,7 @@ import {
 } from '@texuli/date';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../i18n/use-messages.ts';
 import type { ChildSnippet } from '../internal/child.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { type CalendarContextValue, provideCalendarContext } from './context.ts';
@@ -65,8 +66,8 @@ let {
   isDateDisabled,
   disabled = false,
   readOnly = false,
-  previousLabel = 'Previous month',
-  nextLabel = 'Next month',
+  previousLabel: previousLabelProp,
+  nextLabel: nextLabelProp,
   onValueChange,
   onFocusedValueChange,
   child,
@@ -74,6 +75,11 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const previousLabel = $derived(
+  previousLabelProp ?? msg('primitives.calendar.previous-label', 'Previous month')
+);
+const nextLabel = $derived(nextLabelProp ?? msg('primitives.calendar.next-label', 'Next month'));
 
 const calendar = $derived(createCalendar(calendarId));
 const firstDayOfWeek = $derived<DayOfWeek | undefined>(weekStartDay(weekStartsOn));

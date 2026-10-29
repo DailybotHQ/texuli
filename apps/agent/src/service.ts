@@ -20,6 +20,7 @@ import {
   type DraftCanvasCheck,
   type DraftDocumentCheck,
   type DraftFormCheck,
+  type DraftSheetCheck,
   type DraftValidation,
   type ValidateDraftOptions,
   validateDraft,
@@ -27,6 +28,7 @@ import {
 import { createFamilyBlockCheck, diagramFamilyCheck } from '@texuli/catalog/validate/blocks';
 import { validateDocument } from '@texuli/document/schema';
 import { checkFormDraft } from '@texuli/forms/model';
+import { checkSheetDraft } from '@texuli/sheets/model';
 import {
   createMemoryTokenUsageStore,
   DEFAULT_TOKEN_BUDGETS,
@@ -118,6 +120,15 @@ export const checkCanvasSchemaDraft: DraftCanvasCheck = (canvas, tier) => {
   }));
   return result.ok ? { ok: true, canvas: result.canvas, issues } : { ok: false, issues };
 };
+
+/**
+ * The host sheet validator for `spreadsheet` nodes (spec 0.8.0, ADR-015):
+ * `checkSheetDraft` from `@texuli/sheets/model` (`validateSheet`: closed
+ * members, the caps, text safety, and every formula parsed with the sheet
+ * grammar), so agent formulas are refused at draft time. Sheets are data at
+ * every tier; the worker paints nothing.
+ */
+export const checkSheetSchemaDraft: DraftSheetCheck = (sheet, tier) => checkSheetDraft(sheet, tier);
 
 let familyEngines: ReturnType<typeof createFamilyBlockCheck> | undefined;
 // The factory runs on first use instead of at module init: an init-time
@@ -284,9 +295,10 @@ export function createAgentService(config: AgentConfig): AgentService {
     checkBlock: (block, id) => checkFamilyBlock(block, id),
     // Documents (spec 0.7.0): without the host validator every `document` node is refused.
     checkDocument: checkDocumentDraft,
-    // Forms and canvases (spec 0.8.0): checked by their engines' validators.
+    // Forms, canvases and sheets (spec 0.8.0): checked by their engines' validators.
     checkForm: checkFormSchemaDraft,
     checkCanvas: checkCanvasSchemaDraft,
+    checkSheet: checkSheetSchemaDraft,
     // Data sources (spec 0.8.0): the service holds no source registry, so it
     // passes no `sources` and every `{"$source": …}` binding is refused, in
     // the stream and in the final validation alike (as in validateDraft).

@@ -23,6 +23,7 @@ export interface PlayerOptions
     | 'checkBlock'
     | 'checkDocument'
     | 'checkCanvas'
+    | 'checkSheet'
     | 'checkForm'
     | 'formValidators'
     | 'limits'
@@ -196,6 +197,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
       checkBlock: options.checkBlock,
       checkDocument: options.checkDocument,
       checkCanvas: options.checkCanvas,
+      checkSheet: options.checkSheet,
       checkForm: options.checkForm,
       formValidators: options.formValidators,
       limits: options.limits,

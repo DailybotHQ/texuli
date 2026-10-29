@@ -74,7 +74,11 @@ describe('canvases in validateDraft', () => {
         'canvases:canvas-schema',
       ],
       ['an unknown shape', withShapes({ id: 'x', type: 'script' }), 'canvases:canvas-schema'],
-      ['a bidi override', withShapes(rect({ text: 'evil‮txt.exe' })), 'canvases:canvas-schema'],
+      [
+        'a bidi override',
+        withShapes(rect({ text: 'evil\u202Etxt.exe' })),
+        'canvases:canvas-schema',
+      ],
       [
         'a raw CSS color',
         withShapes(rect({ paint: { fill: 'url(#steal)' } })),

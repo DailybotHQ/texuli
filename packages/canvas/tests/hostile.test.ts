@@ -73,7 +73,7 @@ describe('hostile canvases', () => {
       timed(() => (result = validateCanvas({ ...createCanvas(), shapes: [deep] })))
     ).toBeLessThan(2_000);
     expect(result.ok).toBe(false);
-    const huge = { ...rects(1)[0], text: '‮'.repeat(5_000_000) };
+    const huge = { ...rects(1)[0], text: '\u202E'.repeat(5_000_000) };
     expect(timed(() => (result = validateCanvas(canvasOf([huge as CanvasShape]))))).toBeLessThan(
       2_000
     );

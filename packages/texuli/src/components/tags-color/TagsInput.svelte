@@ -6,6 +6,7 @@ import {
   TagsInput as TagsInputPrimitive,
 } from '@texuli/primitives/tags-input';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { splitControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { getFieldLabelContext } from '../field/context.ts';
@@ -76,13 +77,16 @@ let {
   required = false,
   labels,
   label,
-  inputLabel = 'Add a tag',
-  placeholder = 'Add…',
+  inputLabel: inputLabelProp,
+  placeholder: placeholderProp,
   class: className,
   id,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const inputLabel = $derived(inputLabelProp ?? msg('texuli.tags-input.input-label', 'Add a tag'));
+const placeholder = $derived(placeholderProp ?? msg('texuli.tags-input.placeholder', 'Add…'));
 
 // Inside a Field whose label points at this input, the label names it.
 const field = getFieldLabelContext();

@@ -120,6 +120,16 @@ recipes), so you can extend components without `clsx` or `tailwind-merge`.
 instant under reduced motion and at level `none`
 ([ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)).
 
+## Unreleased (planned for 0.8.0)
+
+On this branch, not yet published: component labels resolve through the
+`@texuli/core/i18n` message catalog (ADR-016). `setI18nContext(i18n)` puts
+a catalog in context, `useMessages()` is the lookup components read, and
+`TEXULI_MESSAGES_EN` lists every label id with its English default; label
+props keep winning, and English stays the only shipped language
+(translations beyond English are planned)
+([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md)).
+
 ## New in 0.6.0
 
 Ships in `0.6.0`; the `0.5.0` release predates it. Under `0.x` the new minor
@@ -241,6 +251,7 @@ may break; the breaking items are marked.
 - Class values and variants: [class-value.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/class-value.md)
   and [variants-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/variants-css.md)
 - Motion: [ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)
+- Component messages (i18n, 0.8.0 unreleased): [i18n.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md)
 - Icons: [ui-icons.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)
 - Layouts: [layouts-shells.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-shells.md),
   [layouts-dashboard.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-dashboard.md),

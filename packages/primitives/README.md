@@ -120,6 +120,15 @@ from subpaths to keep bundles narrow.
   and label them with `Intl.DateTimeFormat`. Only the Gregorian calendar is
   supported; `CalendarDate` is re-exported from `@texuli/date`.
 
+### Unreleased (planned for 0.8.0)
+
+On this branch, not yet published: the labels primitives write themselves
+resolve through the `@texuli/core/i18n` message catalog (ADR-016):
+`setI18nContext`, `useMessages` and `PRIMITIVES_MESSAGES_EN` (every label id
+with its English default); instance props keep winning, and English stays
+the only shipped language
+([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/i18n.md)).
+
 ### New in 0.6.0
 
 Ships in `0.6.0`; the `0.5.0` release predates it. Under `0.x` the new minor
@@ -191,6 +200,7 @@ the date picker from about 28.60 to 20.26 KiB.
   and [prim-combobox.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-combobox.md)
 - Dates: [prim-calendar.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-calendar.md)
   and [prim-date-picker.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-date-picker.md)
+- Messages (i18n, 0.8.0 unreleased): [i18n.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/i18n.md)
 - Consumer ids: [consumer-ids.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/consumer-ids.md)
 - How the texels bind to Svelte 5 attachments: [svelte-attachments.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/svelte-attachments.md)
 - Accessibility contract: [ACCESSIBILITY.md](https://github.com/DailybotHQ/texuli/blob/main/docs/ACCESSIBILITY.md)

@@ -55,6 +55,10 @@ object SpecContract {
     /** Shapes and connectors a `canvas` node's canvas may hold at its top level (spec 0.8.0 `$defs.canvas`). */
     const val CANVAS_SHAPES: Int = 5000
     const val CANVAS_CONNECTORS: Int = 5000
+    /** Tabs, rows and columns of a `spreadsheet` node's sheet (spec 0.8.0 `$defs.sheet`, ADR-015). */
+    const val SHEET_TABS: Int = 16
+    const val SHEET_ROWS: Long = 10000L
+    const val SHEET_COLUMNS: Long = 256L
     /** List caps of a `schema-form` node's schema (spec 0.8.0 `$defs.formSchema`, ADR-015). */
     const val FORM_FIELDS: Int = 200
     const val FORM_SECTIONS: Int = 50

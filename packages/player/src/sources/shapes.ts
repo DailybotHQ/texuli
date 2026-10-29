@@ -29,6 +29,13 @@ export const SOURCE_SHAPES: Readonly<Record<string, SourceShape>> = Object.freez
     fields: ['id', 'title', 'start', 'end', 'allDay', 'tone'],
     maxItems: 500,
   },
+  // Spec 0.8.0 (T-dashboard): a host source persists a dashboard's layout,
+  // one row per widget in grid units.
+  'data-dashboard.layout': {
+    kind: 'records',
+    fields: ['id', 'x', 'y', 'w', 'h', 'minW', 'minH', 'maxW', 'maxH', 'locked'],
+    maxItems: 200,
+  },
   'data-files.entries': {
     kind: 'records',
     fields: ['id', 'name', 'kind', 'parent', 'size', 'type', 'updatedAt'],

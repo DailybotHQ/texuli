@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
+import { useMessages } from '../i18n/use-messages.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { getToastItemContext } from './context.ts';
 
@@ -16,6 +17,7 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
 
 const item = getToastItemContext();
 
@@ -30,7 +32,7 @@ function onClick(event: MouseEvent): void {
   {type}
   class={typeof className === 'string' ? className : undefined}
   data-tx-toast-close
-  aria-label={rest['aria-label'] ?? 'Dismiss notification'}
+  aria-label={rest['aria-label'] ?? msg('primitives.toast.close.dismiss-notification', 'Dismiss notification')}
   onclick={onClick}
 >
   {#if children}

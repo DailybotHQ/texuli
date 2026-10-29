@@ -91,9 +91,10 @@ export const DEFAULT_DATE_PICKER_LABELS: Readonly<DatePickerLabels> = /* @__PURE
 );
 
 export function resolveDatePickerLabels(
-  overrides: Partial<DatePickerLabels> = {}
+  overrides: Partial<DatePickerLabels> = {},
+  base: Readonly<DatePickerLabels> = DEFAULT_DATE_PICKER_LABELS
 ): DatePickerLabels {
-  const labels = { ...DEFAULT_DATE_PICKER_LABELS };
+  const labels = { ...base };
   for (const key of Object.keys(labels) as (keyof DatePickerLabels)[]) {
     const value = overrides[key];
     if (typeof value === 'string') labels[key] = value;

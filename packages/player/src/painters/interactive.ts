@@ -12,6 +12,7 @@ export const INTERACTIVE_PAINTER_IDS: ReadonlySet<string> = new Set([
   'control-toggle',
   'data-board',
   'data-calendar',
+  'data-dashboard',
   'data-files',
   'data-filter-builder',
   'data-grid',

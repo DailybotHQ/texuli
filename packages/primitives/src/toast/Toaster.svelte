@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../i18n/use-messages.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { createToastManager } from './manager.ts';
 import Provider from './Provider.svelte';
@@ -18,7 +19,7 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
 } & RefProp;
 
 let {
-  label = 'Notifications',
+  label: labelProp,
   hotkey = 'F6',
   manager: managerProp,
   toast: toastSnippet,
@@ -26,6 +27,8 @@ let {
   ref = $bindable(null),
   ...viewportProps
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('primitives.toast.toaster.label', 'Notifications'));
 
 const manager = untrack(() => managerProp) ?? createToastManager();
 let toasts = $state<readonly ToastRecord[]>([]);

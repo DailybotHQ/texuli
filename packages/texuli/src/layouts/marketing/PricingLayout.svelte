@@ -2,6 +2,7 @@
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { Snippet } from 'svelte';
 import { Button } from '../../components/button/index.ts';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import MarketingLayout from './MarketingLayout.svelte';
 import MarketingSection from './MarketingSection.svelte';
@@ -31,7 +32,7 @@ let {
   brandLabel,
   brandHref = '#/',
   navLinks,
-  title = 'Pricing',
+  title: titleProp,
   lede,
   tiers,
   locale = 'en-US',
@@ -40,6 +41,8 @@ let {
   footer,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const title = $derived(titleProp ?? msg('texuli.pricing-layout.title', 'Pricing'));
 
 const links = $derived(normalizeNavLinks(navLinks));
 const safeTiers = $derived(normalizePricingTiers(tiers));

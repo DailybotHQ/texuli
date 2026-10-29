@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLButtonAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type CommandSize, type CommandVariant, commandTriggerClass } from './variants.ts';
 import './command.css';
@@ -26,7 +27,7 @@ type Props = Omit<HTMLButtonAttributes, 'children'> & {
 };
 
 let {
-  label = 'Search commands…',
+  label: labelProp,
   keys = ['⌘', 'K'],
   size = 'md',
   variant = 'outline',
@@ -38,6 +39,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.command-trigger.label', 'Search commands…'));
 
 const classes = $derived(
   commandTriggerClass({

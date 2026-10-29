@@ -218,6 +218,25 @@ warning without failing.
   forms validator (`@texuli/forms/model`, `checkForm` in `validateDraft`)
   checks the rest at the host's tier. The Kotlin twin decodes the shape and
   its list caps and paints a placeholder (planned).
+- **Dashboards as data (spec 0.8.0, unreleased).** The agent-emittable
+  `data-dashboard` id holds `data-dashboard-widget` children (`widgetId`,
+  `title` and a `place` in grid units); widget content is ordinary catalog
+  nodes, so its data comes only from host sources. The dashboard's `layout`
+  (a bounded list of `{id, x, y, w, h}` grid units) is bindable and
+  sourceable, so a state or a host source persists what people arrange. The
+  schema bounds the grid units; `@texuli/catalog` checks the composition
+  (widgets only directly in a dashboard, unique ids) on the web. The Kotlin
+  twin decodes the props and paints a placeholder (planned).
+- **Spreadsheets as data, formulas in a closed grammar (spec 0.8.0,
+  unreleased).** The agent-emittable `spreadsheet` id (not `sheet`, which
+  is the texuli `Sheet` overlay) carries a sheet in its `sheet` prop
+  (`$defs.sheet`, `$defs.sheetTab`): `format` `texuli-sheet`, 1 to 16 tabs
+  of `{ id, name, rows, columns, cells }` with cells keyed by A1 address.
+  The schema checks that envelope and its caps; the sheet validator
+  (`@texuli/sheets/model`, `checkSheet` in `validateDraft`) parses every
+  formula with the sheet grammar (no `INDIRECT`, `OFFSET` or `RAND`, a
+  closed function set). The Kotlin twin decodes the envelope and its caps;
+  painting it is planned.
 - **List item text never hides or reorders itself.** String fields of list
   state items refuse control characters, bidirectional overrides and
   isolates, and invisible formatting characters (`SPEC_PATTERNS.listText`;

@@ -2,6 +2,7 @@
 import type { TreeNode, TreeSelectionMode, VisibleTreeNode } from '@texuli/primitives/tree';
 import { TreeRoot } from '@texuli/primitives/tree';
 import type { Snippet } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { cx } from '../../internal/cx.ts';
 import type { TreeViewProps } from './props.ts';
 import { type TreeDensity, type TreeVariant, treeViewClass } from './variants.ts';
@@ -21,7 +22,7 @@ let {
   loadChildren,
   onExpandedChange,
   onSelectedChange,
-  label = 'Tree',
+  label: labelProp,
   variant = 'default',
   density = 'default',
   item,
@@ -29,6 +30,8 @@ let {
   ref = $bindable(null),
   ...attributes
 }: TreeViewProps = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.tree-view.label', 'Tree'));
 
 function bindRef(node: HTMLElement): () => void {
   ref = node;

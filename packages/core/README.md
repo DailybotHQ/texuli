@@ -59,8 +59,8 @@ window.addEventListener('keydown', (event) => {
 
 Everything in the table below is available from the root entry
 (`@texuli/core`) and from its own subpath (`@texuli/core/<subpath>`), except
-the editor, lazy-chunk, motion, markup, ZIP, expression and data-source
-texels, which are subpath-only. Import subpaths to keep bundles narrow.
+the editor, lazy-chunk, motion, markup, ZIP, expression, data-source and
+i18n texels, which are subpath-only. Import subpaths to keep bundles narrow.
 
 ## What's inside
 
@@ -92,6 +92,7 @@ texels, which are subpath-only. Import subpaths to keep bundles narrow.
 | ZIP writer | `zip` | `writeZip`, `writeZipAsync`, `crc32`, `compressBytes`: deterministic archives, deflated where the platform can (subpath only) |
 | Expressions | `expression` | `parseExpression`, `parseExpressionText`, `analyzeExpression`, `evaluateExpression`, `CORE_FUNCTIONS`: the closed, bounded expression language of ADR-015 (subpath only; unreleased, planned for 0.8.0) |
 | Data sources | `data-source` | `defineSource`, `createSourceRegistry`, `checkSourceQuery`, `createSourceLoader`, `createSourceCollection`, `sourceError`: host-registered sources, the closed query, deduplicated, cancellable, retried and cached reads, optimistic writes with rollback, typed errors (ADR-015; subpath only; unreleased, planned for 0.8.0) |
+| Message catalogs | `i18n` | `createI18n`, `parseCatalog`, `formatMessage`, `resolveLabel`, `I18N_CONTEXT`, `pseudoLocalize`: component labels through one catalog, with lazy locales (ADR-016; subpath only; unreleased, planned for 0.8.0) |
 
 The table names the headline exports; each subpath's TypeScript
 declarations list the full surface.
@@ -162,6 +163,7 @@ Ships in `0.6.0`; the `0.5.0` release predates it:
 - Motion (`@texuli/core/motion`: animate, presence, FLIP, shared elements, timelines, springs): [core-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-motion.md)
 - Expressions (`@texuli/core/expression`: the closed AST, its text form, analysis and the bounded evaluator; unreleased, planned for 0.8.0): [core-expression.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-expression.md)
 - Data sources (`@texuli/core/data-source`: declarations, the closed query, the loader, collections and errors; unreleased, planned for 0.8.0): [core-data-source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-data-source.md)
+- Message catalogs (`@texuli/core/i18n`: catalogs, lazy locales, plural and select messages, the instance prop → context → English resolution and the pseudo-locale; unreleased, planned for 0.8.0): [core-i18n.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-i18n.md)
 - Every texel's contract: [packages/core/docs](https://github.com/DailybotHQ/texuli/tree/main/packages/core/docs)
 - Security model: [SECURITY.md](https://github.com/DailybotHQ/texuli/blob/main/docs/SECURITY.md)
 

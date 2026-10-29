@@ -1,6 +1,7 @@
 <script lang="ts">
 import AppNav from '../../components/sidebar/AppNav.svelte';
 import type { SidebarItem } from '../../components/sidebar/types.ts';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import LayoutChrome from '../host/LayoutChrome.svelte';
 import { onNavigate } from '../host/layout-kit.ts';
@@ -26,6 +27,7 @@ let {
   closeLabel,
   class: className,
 }: Props = $props();
+const msg = useMessages();
 
 const uid = $props.id();
 const mainId = `${uid}-main`;
@@ -58,7 +60,7 @@ const sections = $derived(appSidebarSections(resolved));
     {sections}
     label="Main"
     {menuLabel}
-    closeLabel={closeLabel ?? 'Close navigation'}
+    closeLabel={closeLabel ?? msg('texuli.sidebar-layout.close-navigation', 'Close navigation')}
     hrefTrust="developer"
   >
     {#snippet itemIcon(item: SidebarItem)}

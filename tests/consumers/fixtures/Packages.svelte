@@ -21,6 +21,7 @@ import { PageReader } from '@texuli/pages/reader';
 import { Player } from '@texuli/player';
 import '@texuli/player/styles.css';
 import '@texuli/slides/styles.css';
+import { type SheetDocument, SheetView } from '@texuli/sheets';
 import { DeckStage } from '@texuli/slides/stage';
 import { applyWorkflowOps, createWorkflow, defineNodeTypes } from '@texuli/workflows/model';
 import { WorkflowViewer } from '@texuli/workflows/viewer';
@@ -118,6 +119,20 @@ const consumerForm = validateFormSchema({
   submitLabel: 'Send',
   fields: [{ name: 'email', type: 'email', label: 'Consumer form email', required: true }],
 });
+const sheet: SheetDocument = {
+  format: 'texuli-sheet',
+  formatVersion: 1,
+  meta: { title: 'Consumer sheet' },
+  sheets: [
+    {
+      id: 'main',
+      name: 'Main',
+      rows: 3,
+      columns: 2,
+      cells: { A1: 'Consumer sheet total', A2: 2, A3: 3, B1: '=SUM(A2:A3)' },
+    },
+  ],
+};
 /** A 1×1 PNG: app-authored, so the developer tier accepts it, and nothing is fetched. */
 const pixel =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -160,6 +175,9 @@ const deck = {
   </section>
   <section data-render="@texuli/player">
     <Player {blueprint} label="Consumer player" />
+  </section>
+  <section data-render="@texuli/sheets">
+    <SheetView {sheet} readonly label="Consumer sheet" />
   </section>
   <section data-render="@texuli/slides">
     <DeckStage {deck} syncHash={false} />

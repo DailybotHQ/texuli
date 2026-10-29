@@ -15,6 +15,14 @@ export {
   MAX_CANVAS_FINDINGS,
 } from './canvas.ts';
 export {
+  checkDashboards,
+  DASHBOARD_ID,
+  DASHBOARD_WIDGET_ID,
+  type DashboardFinding,
+  MAX_DASHBOARD_FINDINGS,
+  MAX_DASHBOARD_WIDGETS,
+} from './dashboard.ts';
+export {
   DECK_ROOT_CATALOG_ID,
   DECK_SLIDE_CATALOG_ID,
   type DeckDraftDiagnostic,
@@ -61,6 +69,15 @@ export {
   schemaFormNodes,
 } from './form.ts';
 export { draftCommitGate } from './gate.ts';
+export {
+  checkSheets,
+  type DraftSheetCheck,
+  type DraftSheetIssue,
+  MAX_SHEET_FINDINGS,
+  type SheetFinding,
+  SPREADSHEET_ID,
+  sheetNodes,
+} from './sheet.ts';
 export { type SinkFinding, type SinkUrlTier, scanSinks } from './sinks.ts';
 export {
   checkStreamTotals,

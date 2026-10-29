@@ -3,6 +3,7 @@ import {
   type ColorFormat,
   ColorPicker as ColorPickerPrimitive,
 } from '@texuli/primitives/color-picker';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import type { RefProp } from '../../internal/ref.ts';
 import type { ColorSwatch } from './types.ts';
@@ -37,13 +38,15 @@ let {
   onValueChange,
   format = $bindable('hex' as ColorFormat),
   disabled = false,
-  label = 'Choose color',
+  label: labelProp,
   swatches = DEFAULT_SWATCHES,
   class: className,
   id,
   ref = $bindable(null),
   ...rest
 }: Props & RefProp = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.color-picker.label', 'Choose color'));
 
 const preview = $derived(value ?? defaultValue);
 // A color picker always holds a value, and its `group` role does not support
@@ -87,7 +90,7 @@ const groupRest = $derived.by(() => {
       Named list of presets (APG list pattern). Each button sits in a listitem
       so aria-required-children is satisfied (list → listitem → button).
     -->
-    <div class="tx-color-picker__swatches" role="list" aria-label="Color swatches">
+    <div class="tx-color-picker__swatches" role="list" aria-label={msg('texuli.color-picker.color-swatches', 'Color swatches')}>
       {#each swatches as swatch (swatch.value)}
         <div class="tx-color-picker__swatch-item" role="listitem">
           <ColorPickerPrimitive.Swatch

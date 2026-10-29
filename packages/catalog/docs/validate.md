@@ -26,10 +26,12 @@ closed with an `internal-error` diagnostic.
 | `interaction` | Spec 0.3.0 interaction, catalog-local: `$state` and `$data` bindings name declared variables (and are replaced by their first-paint values for the checks below), `bind` only on `bindable` props, `on` only for events the component fires, closed action ops and fields; from spec 0.8.0, `$source` data-source bindings on `sourceable` props, checked against the host's `sources` (see Data-source bindings below) and replaced by an empty list; list item text follows `SPEC_PATTERNS.listText`; and, for an envelope, the state surface rules from `@texuli/spec/surface` (form nodes inside an `action-form`, controls and fields bound to declared variables of their type, flow nodes matching the flow, no writes to host-bound variables), as `@texuli/player` refuses them | no |
 | `sinks` | The raw sink scan (`scanSinks`): executable strings, HTML strings, `class` / `style` / `innerHTML` / `srcdoc` keys, `on…` keys, functions, bidi controls, and URLs the host tier's policy refuses for their kind of key (links through the link policy, `src` and `poster` through the image or media policy, and every `srcset` candidate through the image-set policy) | no |
 | `limits` | `validateCatalogTreeLimits` (depth, nodes, bytes, branching, roots) | yes |
-| `render` | `renderCatalogTree` at the host's tier: closed ids, tiers, prop schemas, the block family check, named slots and `when` conditions (with the host's `conditions` and `conditionInputs`; a `when` without a runtime is an error) | no |
+| `render` | `renderCatalogTree` at the host's tier: closed ids, tiers, prop schemas, the block family check, named slots and `when` conditions (with the host's `conditions` and `conditionInputs`; a `when` without a runtime is an error); from spec 0.8.0 the dashboard composition rules (`dashboard-child`, `dashboard-parent`, `dashboard-widgets`, `dashboard-widget-id`; see Dashboards below) | no |
 | `blocks` | The host's `checkBlock` on every `blocks-*` block (assemble one with `createFamilyBlockCheck` from `@texuli/catalog/validate/blocks`; see the Block families section); `skipped` without one | no |
 | `documents` | Spec 0.7.0: every `document` node (see Documents below). Without the host's `checkDocument` each one fails with `document-unchecked`; `skipped` only when the host passed none (it still fails the draft that holds a document) | no |
 | `forms` | Spec 0.8.0: every `schema-form` node's schema (see Forms below). Without the host's `checkForm` each one fails with `form-unchecked`; `skipped` only when the host passed none (it still fails the draft that holds a form) | no |
+| `canvases` | Spec 0.8.0: every `canvas` node's `canvas` through the host's `checkCanvas` (`checkCanvasDraft` from `@texuli/canvas/host`). Without it each one fails with `canvas-unchecked`; issues report as `canvas-schema`; `skipped` only when the host passed none | no |
+| `sheets` | Spec 0.8.0: every `spreadsheet` node's `sheet` (see Sheets below). Without the host's `checkSheet` each one fails with `sheet-unchecked`; issues report as `sheet-schema`. Always `pass` or `fail`: a draft with no spreadsheet passes | no |
 | `grammar` | `checkCompositionGrammar` with `defaultGrammarRoles` (or `roles`); warnings do not fail | no |
 | `root` | One component root whose id is a frame (`DRAFT_FRAME_IDS`: `layout-page`, `layout-doc`, `layout-deck` and, from spec 0.7.0, `document`); `frameRoots: false` turns it off | no |
 
@@ -269,6 +271,54 @@ import { checkFormDraft } from '@texuli/forms/model';
 
 const result = validateDraft(agentOutput, { catalog, checkForm: checkFormDraft, formValidators: ['uniqueEmail'] });
 ```
+
+## Sheets
+
+A `spreadsheet` node (spec 0.8.0, ADR-015; 0.8.0, unreleased) carries a
+Texuli sheet in its `sheet` prop (`$defs.sheet`): tabs of A1-addressed
+inputs, where text that starts with `=` is a formula in the closed sheet
+grammar. The catalog id is `spreadsheet` (`SPREADSHEET_ID`), not `sheet`,
+which is the texuli `Sheet` drawer in the overlays group. The `sheets`
+check runs the host's `checkSheet` (`DraftSheetCheck`), usually
+`checkSheetDraft` from `@texuli/sheets/model`, which runs `validateSheet`:
+closed members, the caps (16 sheets, 10,000 rows, 256 columns, 100,000
+cells), text safety, and every formula parsed with the sheet grammar, so an
+agent formula that names an unknown function or does not parse is refused
+at draft time. Sheets are data at every tier. Injected like
+`checkCanvas`, so `@texuli/catalog/validate` never bundles the formula
+engine. **Without `checkSheet` every `spreadsheet` node fails with
+`sheet-unchecked`**; a throwing check fails closed (`sheet-schema`). Issues
+report as `sheet-schema` with the node path and the sheet path, at most
+`MAX_SHEET_FINDINGS` (20) per sheet (`DraftSheetIssue` is one issue,
+`SheetFinding` one finding). `checkSheets(roots, options)` runs the check
+alone on a render tree, and `sheetNodes(roots)` lists the `spreadsheet`
+nodes with their paths.
+
+```ts
+import { validateDraft } from '@texuli/catalog/validate';
+import { checkSheetDraft } from '@texuli/sheets/model';
+
+const result = validateDraft(agentOutput, { catalog, checkSheet: checkSheetDraft });
+```
+
+## Dashboards
+
+A `data-dashboard` node (spec 0.8.0; 0.8.0, unreleased) lays out
+`data-dashboard-widget` children on a grid (`layout`: each widget's place
+by `widgetId`). The prop schemas cannot say how the nodes compose, so the
+`render` check runs `checkDashboards(roots)` on the render tree
+(`DashboardFinding`), linear in the tree and never throwing:
+
+| Code | Refused when |
+| --- | --- |
+| `dashboard-child` | A `data-dashboard` holds a child that is not a `data-dashboard-widget` |
+| `dashboard-parent` | A `data-dashboard-widget` sits anywhere but directly inside a `data-dashboard` |
+| `dashboard-widgets` | A dashboard holds more than `MAX_DASHBOARD_WIDGETS` (200) widgets, the cap of `@texuli/data/dashboard/engine` |
+| `dashboard-widget-id` | A widget's `widgetId` is not an id (letters, digits, `-` and `_`, at most 64 characters, starting with a letter or digit) or is used twice in its dashboard |
+
+At most `MAX_DASHBOARD_FINDINGS` (20) findings are reported per draft.
+Widget content stays ordinary catalog nodes, so data reaches a widget only
+through host-registered sources (`$source`), never URLs or code.
 
 ## Data-source bindings (spec 0.8.0)
 

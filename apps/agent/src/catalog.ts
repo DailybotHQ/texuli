@@ -10,6 +10,7 @@ import { FORMS_MANIFESTS } from '@texuli/catalog/manifests/forms';
 import { LAYOUTS_MANIFESTS } from '@texuli/catalog/manifests/layouts';
 import { OVERLAYS_MANIFESTS } from '@texuli/catalog/manifests/overlays';
 import { SCHEMA_FORMS_MANIFESTS } from '@texuli/catalog/manifests/schema-forms';
+import { SPREADSHEET_MANIFESTS } from '@texuli/catalog/manifests/sheets';
 import { STATE_MANIFESTS } from '@texuli/catalog/manifests/state';
 import { WORKFLOWS_MANIFESTS } from '@texuli/catalog/manifests/workflows';
 
@@ -35,6 +36,7 @@ export function loadCatalog(): Promise<CatalogBuild> {
     { name: 'layouts', manifests: LAYOUTS_MANIFESTS },
     { name: 'overlays', manifests: OVERLAYS_MANIFESTS },
     { name: 'schema-forms', manifests: SCHEMA_FORMS_MANIFESTS },
+    { name: 'sheets', manifests: SPREADSHEET_MANIFESTS },
     { name: 'state', manifests: STATE_MANIFESTS },
     { name: 'workflows', manifests: WORKFLOWS_MANIFESTS },
   ]);

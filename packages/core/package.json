@@ -39,6 +39,7 @@
     "./expression": "./src/expression/index.ts",
     "./focus-scope": "./src/focus-scope/index.ts",
     "./form-bridge": "./src/form-bridge/form-bridge.ts",
+    "./i18n": "./src/i18n/index.ts",
     "./ids": "./src/ids/ids.ts",
     "./inert": "./src/inert/index.ts",
     "./keyboard": "./src/keyboard/index.ts",

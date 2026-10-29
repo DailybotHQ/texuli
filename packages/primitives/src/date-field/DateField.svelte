@@ -1,4 +1,5 @@
 <script lang="ts">
+import { useMessages } from '../i18n/use-messages.ts';
 import type { RefProp } from '../internal/ref.ts';
 import {
   type DateSegment,
@@ -13,7 +14,7 @@ import type { DateFieldRootProps } from './types.ts';
 let {
   value = $bindable(null),
   locale,
-  label = 'Date',
+  label: labelProp,
   inputId,
   name,
   disabled = false,
@@ -27,6 +28,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: DateFieldRootProps & RefProp = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('primitives.date-field.date-field.label', 'Date'));
 
 const order = $derived(dateSegmentOrder(locale));
 const parsed = $derived(parseDate(value));

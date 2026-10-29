@@ -60,6 +60,14 @@
     "./document": {
       "types": "./src/document/index.ts",
       "default": "./src/document/index.ts"
+    },
+    "./email": {
+      "types": "./src/email/index.ts",
+      "default": "./src/email/index.ts"
+    },
+    "./print": {
+      "types": "./src/print/index.ts",
+      "default": "./src/print/index.ts"
     }
   },
   "bin": {

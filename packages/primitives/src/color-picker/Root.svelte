@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../i18n/use-messages.ts';
 import type { ChildSnippet } from '../internal/child.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { type ColorFormat, formatColor, parseColor, parseFormattedColor } from './color.ts';
@@ -23,12 +24,14 @@ let {
   onValueChange,
   format = $bindable(),
   disabled = false,
-  label = 'Choose color',
+  label: labelProp,
   children,
   child,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('primitives.color-picker.label', 'Choose color'));
 
 const valueControlled = value !== undefined;
 // svelte-ignore state_referenced_locally

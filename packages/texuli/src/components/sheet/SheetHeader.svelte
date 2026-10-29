@@ -2,6 +2,7 @@
 import { Sheet as Primitive } from '@texuli/primitives/sheet';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import type { RefProp } from '../../internal/ref.ts';
 import SheetCloseButton from './SheetCloseButton.svelte';
@@ -29,12 +30,14 @@ let {
   title,
   description,
   children,
-  closeLabel = 'Close',
+  closeLabel: closeLabelProp,
   hideClose = false,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props & RefProp = $props();
+const msg = useMessages();
+const closeLabel = $derived(closeLabelProp ?? msg('texuli.sheet-header.close-label', 'Close'));
 </script>
 
 <div bind:this={ref} {...rest} class={sheetHeaderClass({ class: className })} data-tx-sheet-header="">

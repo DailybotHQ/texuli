@@ -3,6 +3,7 @@ import { getContext, type Snippet, setContext } from 'svelte';
 import type { ActionStatus } from './actions.ts';
 import type { FormPlayerHost } from './form-host.ts';
 import { DEFAULT_PLAYER_LABELS, type PlayerLabels } from './labels.ts';
+import type { SheetPlayerHost } from './sheet-host.ts';
 import type { EventDetail } from './state/reducers.ts';
 import type { ListItem, StateDeclaration, StateValue } from './state/schema.ts';
 
@@ -260,5 +261,29 @@ export function getPlayerFormHost(): () => PlayerFormHostAccess {
   return (
     getContext<(() => PlayerFormHostAccess) | undefined>(FORM_HOST) ??
     (() => ({ host: null, tier: 'untrusted', active: false }))
+  );
+}
+
+const SHEET_HOST = Symbol('tx-player-sheet-host');
+
+/** The host's sheet seam under one player (spec 0.8.0) and the tier it validated at. */
+export interface PlayerSheetHostAccess {
+  host: SheetPlayerHost | null;
+  tier: RenderTier;
+  /** False while the enclosing surface is inactive (`inert`). */
+  active: boolean;
+  /** Accessible name of the player region. */
+  label: string;
+}
+
+export function setPlayerSheetHost(get: () => PlayerSheetHostAccess): void {
+  setContext(SHEET_HOST, get);
+}
+
+/** The enclosing player's sheet host (none outside a player: sheets then do not paint). */
+export function getPlayerSheetHost(): () => PlayerSheetHostAccess {
+  return (
+    getContext<(() => PlayerSheetHostAccess) | undefined>(SHEET_HOST) ??
+    (() => ({ host: null, tier: 'untrusted', active: false, label: '' }))
   );
 }

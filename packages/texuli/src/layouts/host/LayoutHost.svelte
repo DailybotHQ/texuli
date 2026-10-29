@@ -1,6 +1,7 @@
 <script lang="ts">
 import { getOwnerWindow } from '@texuli/core/env';
 import type { Snippet } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import {
   isLayoutId,
@@ -62,9 +63,13 @@ let {
   storageKey,
   aside,
   dir,
-  loadingLabel = 'Loading layout',
+  loadingLabel: loadingLabelProp,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const loadingLabel = $derived(
+  loadingLabelProp ?? msg('texuli.layout-host.loading-label', 'Loading layout')
+);
 
 let host = $state<HTMLDivElement | undefined>();
 /**

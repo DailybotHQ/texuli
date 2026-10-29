@@ -47,6 +47,12 @@
     },
     "./board/engine": "./src/engines/board/index.ts",
     "./calendar": "./src/engines/calendar/index.ts",
+    "./dashboard": {
+      "types": "./src/dashboard/index.ts",
+      "svelte": "./src/dashboard/index.ts",
+      "default": "./src/dashboard/index.ts"
+    },
+    "./dashboard/engine": "./src/dashboard/engine/index.ts",
     "./cohort": {
       "types": "./src/cohort/index.ts",
       "svelte": "./src/cohort/index.ts",

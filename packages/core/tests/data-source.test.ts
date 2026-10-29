@@ -338,7 +338,7 @@ describe('core/data-source: hostile queries', () => {
       '../../etc/passwd',
       'https://attacker.example/?q=1',
       '<script>alert(1)</script>',
-      'ticket\u0000‮evil',
+      'ticket\u0000\u202Eevil',
     ];
     const received: SourceListRequest[] = [];
     const source = defineSource('tickets', TICKET_SCHEMA, {

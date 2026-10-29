@@ -2,6 +2,7 @@
 import { getAnnouncer } from '@texuli/core/announcer';
 import { Loading as PrimitiveLoading } from '@texuli/primitives/combobox';
 import type { ComponentProps, Snippet } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { comboboxLoadingClass } from './variants.ts';
 import './combobox.css';
@@ -15,10 +16,14 @@ type Props = ComponentProps<typeof PrimitiveLoading> & {
 let {
   children,
   class: className,
-  announce = 'Loading options',
+  announce: announceProp,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const announce = $derived(
+  announceProp ?? msg('texuli.combobox-loading.announce', 'Loading options')
+);
 
 const classes = $derived(
   comboboxLoadingClass({

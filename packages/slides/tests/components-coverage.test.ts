@@ -12,6 +12,7 @@ import { FORMS_MANIFESTS } from '@texuli/catalog/manifests/forms';
 import { LAYOUTS_MANIFESTS } from '@texuli/catalog/manifests/layouts';
 import { OVERLAYS_MANIFESTS } from '@texuli/catalog/manifests/overlays';
 import { SCHEMA_FORMS_MANIFESTS } from '@texuli/catalog/manifests/schema-forms';
+import { SPREADSHEET_MANIFESTS } from '@texuli/catalog/manifests/sheets';
 import { STATE_MANIFESTS } from '@texuli/catalog/manifests/state';
 import { WORKFLOWS_MANIFESTS } from '@texuli/catalog/manifests/workflows';
 import type { Deck, DeckSlide, FreeSlide as FreeSlideModel } from '@texuli/deck/model';
@@ -50,6 +51,7 @@ const GROUPS: readonly ManifestGroup[] = [
   { name: 'layouts', manifests: LAYOUTS_MANIFESTS },
   { name: 'overlays', manifests: OVERLAYS_MANIFESTS },
   { name: 'schema-forms', manifests: SCHEMA_FORMS_MANIFESTS },
+  { name: 'sheets', manifests: SPREADSHEET_MANIFESTS },
   { name: 'state', manifests: STATE_MANIFESTS },
   { name: 'workflows', manifests: WORKFLOWS_MANIFESTS },
 ];
@@ -142,7 +144,7 @@ describe('slide components: coverage of the catalog', () => {
     const tables = [Object.keys(SLIDE_COMPONENTS), Object.keys(SLIDE_COMPONENT_EXCLUSIONS), groups];
     const all = tables.flat();
     expect(new Set(all).size).toBe(all.length);
-    expect(entries.length).toBe(165);
+    expect(entries.length).toBe(168);
     for (const entry of entries) {
       expect(slideComponentSupport(entry.id).kind, entry.id).not.toBe('unknown');
     }

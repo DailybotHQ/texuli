@@ -54,6 +54,8 @@ export const SPEC_PROP_REFS = [
   'formSchema',
   // Spec 0.8.0 (ADR-012): the canvas a `canvas` node carries (envelope only).
   'canvas',
+  // Spec 0.8.0 (ADR-015): the sheet a `spreadsheet` node carries (envelope only).
+  'sheet',
 ] as const;
 
 /** The fields each action op takes (besides `op`) and the ones it needs. */

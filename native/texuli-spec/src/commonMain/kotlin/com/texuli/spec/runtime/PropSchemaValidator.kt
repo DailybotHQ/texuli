@@ -7,6 +7,7 @@ import com.texuli.spec.BlueprintCondition
 import com.texuli.spec.BlueprintDocument
 import com.texuli.spec.BlueprintFormSchema
 import com.texuli.spec.BlueprintReorder
+import com.texuli.spec.BlueprintSheet
 import com.texuli.spec.JsonValue
 import com.texuli.spec.SpecDecodeException
 import com.texuli.spec.SpecDiagnosticCode
@@ -194,6 +195,26 @@ internal class PropSchemaValidator(private val context: NodeContext?, private va
                 }
                 if (canvas.connectors.size > SpecContract.CANVAS_CONNECTORS) {
                     issues += PropSchemaIssue("max-items", "$path.connectors", "At most ${SpecContract.CANVAS_CONNECTORS} items.")
+                }
+            }
+            "sheet" -> {
+                // Spec 0.8.0 (ADR-015): the sheet's envelope only (format, version, members, 1 to 16
+                // tabs, each tab's row and column counts); cell inputs, the formula grammar and its
+                // closed function set are the runtime validator's (`@texuli/sheets/model`).
+                val sheet = decode(path, issues) { BlueprintSheet.decode(value, path) } ?: return
+                if (sheet.sheets.isEmpty()) issues += PropSchemaIssue("min-items", "$path.sheets", "At least 1 item.")
+                if (sheet.sheets.size > SpecContract.SHEET_TABS) {
+                    issues += PropSchemaIssue("max-items", "$path.sheets", "At most ${SpecContract.SHEET_TABS} items.")
+                }
+                sheet.sheets.forEachIndexed { i, tab ->
+                    if (tab.rows < 1L) issues += PropSchemaIssue("minimum", "$path.sheets[$i].rows", "At least 1.")
+                    if (tab.rows > SpecContract.SHEET_ROWS) {
+                        issues += PropSchemaIssue("maximum", "$path.sheets[$i].rows", "At most ${SpecContract.SHEET_ROWS}.")
+                    }
+                    if (tab.columns < 1L) issues += PropSchemaIssue("minimum", "$path.sheets[$i].columns", "At least 1.")
+                    if (tab.columns > SpecContract.SHEET_COLUMNS) {
+                        issues += PropSchemaIssue("maximum", "$path.sheets[$i].columns", "At most ${SpecContract.SHEET_COLUMNS}.")
+                    }
                 }
             }
             "formSchema" -> {

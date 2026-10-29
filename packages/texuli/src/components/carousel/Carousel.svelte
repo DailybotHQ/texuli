@@ -1,10 +1,12 @@
 <script lang="ts">
 import { directionOf } from '@texuli/core/dir-locale';
 import { getOwnerDocument, getOwnerWindow, listen, matchesMedia } from '@texuli/core/env';
+import { localizeLabels } from '@texuli/core/i18n';
 import { getNavigationIntent } from '@texuli/core/keyboard';
 import { createRovingFocus } from '@texuli/core/roving';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { chainHandlers, composeHandlers } from '../../internal/handlers.ts';
 import './carousel.css';
 import { type ClassValue } from '../../internal/cx.ts';
@@ -14,6 +16,7 @@ import {
   canStep,
   carouselVariants,
   createAutoplay,
+  DEFAULT_CAROUSEL_MESSAGES,
   formatMessage,
   resolveCarouselMessages,
   resolveIndex,
@@ -92,6 +95,7 @@ let {
   onpointerleave,
   ...rest
 }: Props = $props();
+const msg = useMessages();
 
 function bindRef(node: HTMLElement): () => void {
   ref = node;
@@ -101,7 +105,12 @@ function bindRef(node: HTMLElement): () => void {
 }
 
 const uid = $props.id();
-const t = $derived(resolveCarouselMessages(messages));
+const t = $derived(
+  resolveCarouselMessages(
+    messages,
+    localizeLabels(msg, 'texuli.carousel', DEFAULT_CAROUSEL_MESSAGES)
+  )
+);
 const count = $derived(items.length);
 const multiple = $derived(count > 1);
 const active = $derived(resolveIndex(index, count, false));

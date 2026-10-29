@@ -27,6 +27,7 @@
     "@texuli/media": "workspace:*",
     "@texuli/player": "workspace:*",
     "@texuli/primitives": "workspace:*",
+    "@texuli/sheets": "workspace:*",
     "@texuli/slides": "workspace:*",
     "@texuli/tokens": "workspace:*",
     "@texuli/workflows": "workspace:*",

@@ -1,0 +1,27 @@
+{
+  "$comment": "Shared interpolation vectors (ADR-016): @texuli/core/i18n `interpolate` (packages/core/tests/i18n.test.ts) and the native `interpolateMessage` (native/conformance) must produce `expected` for each. String values only: number formatting is locale-specific per target.",
+  "vectors": [
+    { "template": "Close", "values": {}, "expected": "Close" },
+    { "template": "Remove {label}", "values": { "label": "Urgent" }, "expected": "Remove Urgent" },
+    {
+      "template": "Page {page} of {pages}",
+      "values": { "page": "2", "pages": "10" },
+      "expected": "Page 2 of 10"
+    },
+    {
+      "template": "Hi {missing} {bad name} {",
+      "values": {},
+      "expected": "Hi {missing} {bad name} {"
+    },
+    { "template": "{a}", "values": { "a": "{b}", "b": "boom" }, "expected": "{b}" },
+    { "template": "{{x}}", "values": { "x": "y" }, "expected": "{y}" },
+    {
+      "template": "“{id}” is not shown here ({reason})",
+      "values": { "id": "blocks-map", "reason": "not-on-this-target" },
+      "expected": "“blocks-map” is not shown here (not-on-this-target)"
+    },
+    { "template": "{dotted.name-1_x}", "values": { "dotted.name-1_x": "ok" }, "expected": "ok" },
+    { "template": "<b>{x}</b>", "values": { "x": "<i>" }, "expected": "<b><i></b>" },
+    { "template": "{0} added", "values": { "0": "Design" }, "expected": "Design added" }
+  ]
+}

@@ -73,6 +73,10 @@
       "types": "./src/manifests/documents/index.ts",
       "default": "./src/manifests/documents/index.ts"
     },
+    "./manifests/sheets": {
+      "types": "./src/manifests/sheets/index.ts",
+      "default": "./src/manifests/sheets/index.ts"
+    },
     "./manifests/display": {
       "types": "./src/manifests/display/index.ts",
       "default": "./src/manifests/display/index.ts"

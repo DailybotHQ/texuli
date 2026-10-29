@@ -741,6 +741,153 @@ export const dataFilterBuilderManifest: CatalogManifest = /* @__PURE__ */ manife
   related: ['data-grid', 'control-filter'],
 });
 
+/** Catalog id of a dashboard (spec 0.8.0, PLAN_010 T-dashboard). */
+export const DASHBOARD_CATALOG_ID = 'data-dashboard' as const;
+/** Catalog id of one dashboard widget; it belongs inside a `data-dashboard`. */
+export const DASHBOARD_WIDGET_CATALOG_ID = 'data-dashboard-widget' as const;
+
+/** Grid units of a widget's place (the caps of `@texuli/data/dashboard/engine`). */
+const gridInt = (maximum: number, minimum = 0): CatalogValueSchema => ({
+  type: 'integer',
+  minimum,
+  maximum,
+});
+const placeProperties: Record<string, CatalogValueSchema> = {
+  x: { ...gridInt(23), description: 'First column, from 0 (the inline start).' },
+  y: { ...gridInt(4096), description: 'First row, from 0.' },
+  w: { ...gridInt(24, 1), description: 'Width in columns.' },
+  h: { ...gridInt(48, 1), description: 'Height in rows.' },
+  minW: gridInt(24, 1),
+  minH: gridInt(48, 1),
+  maxW: gridInt(24, 1),
+  maxH: gridInt(48, 1),
+  locked: { type: 'boolean', description: 'A locked widget never moves or resizes.' },
+};
+
+export const dataDashboardManifest: CatalogManifest = /* @__PURE__ */ manifestData({
+  id: DASHBOARD_CATALOG_ID,
+  package: PKG,
+  label: 'Dashboard',
+  summary:
+    'A widget grid people can rearrange: data-dashboard-widget children on columns and rows, moved and resized by drag or keyboard, reflowing on narrow screens.',
+  tier: 'content',
+  agentEmittable: true,
+  useWhen: [
+    'An overview of several views (KPIs, charts, grids bound to host data sources) people arrange themselves',
+    'A home or operations screen whose layout should persist per person',
+  ],
+  dontUseWhen: [
+    'A fixed grid of cards: use layout-grid',
+    'One chart or one table: paint it on its own',
+  ],
+  a11y: [
+    'A named region whose widgets are a list in reading order (row, then column), whatever order they were written in',
+    'Each widget has a move handle and a resize handle: Space or Enter picks up, arrows move or resize one column or row, Space or Enter drops, Escape cancels; every step is announced with its column, row and size',
+    'A click on a handle opens an arrange toolbar, so nothing needs a drag (WCAG 2.5.7); handles are at least 24 by 24 px',
+    'Widgets glide to their new cell only when motion is allowed; reduced motion commits at once',
+  ],
+  props: [
+    labelProp,
+    {
+      name: 'columns',
+      kind: 'number',
+      default: 12,
+      description:
+        'Columns of the widest grid (1 to 24). Narrower screens reflow onto at most 6 columns from 640 px and one column below.',
+    },
+    densityProp(['compact', 'default', 'comfortable']),
+    { name: 'gap', kind: 'enum', enumValues: ['none', 'small', 'medium', 'large'] },
+    {
+      name: 'editable',
+      kind: 'boolean',
+      default: false,
+      description: 'Shows the move and resize handles.',
+    },
+    {
+      name: 'compaction',
+      kind: 'enum',
+      enumValues: ['vertical', 'none'],
+      default: 'vertical',
+      description: '"vertical" floats widgets up to close gaps; "none" keeps gaps.',
+    },
+    {
+      name: 'layout',
+      kind: 'array',
+      description:
+        "The saved layout of the widest grid: one {id, x, y, w, h} per widget, id matching a widget's widgetId. Bind it to a list state, or read it from a host data source, to persist what people arrange; without it the widgets' own place props lay out the grid.",
+      schema: list({ id, ...placeProperties }, ['id'], 200),
+    },
+    {
+      name: 'children',
+      kind: 'slot',
+      description: 'data-dashboard-widget nodes only (at most 200).',
+    },
+  ],
+  events: ['change'],
+  bindable: ['layout'],
+  sourceable: ['layout'],
+  examples: [
+    {
+      id: 'operations',
+      title: 'Operations overview',
+      props: {
+        label: 'Operations',
+        columns: 12,
+        editable: true,
+      },
+    },
+  ],
+  related: [DASHBOARD_WIDGET_CATALOG_ID, 'layout-grid', 'data-grid'],
+});
+
+export const dataDashboardWidgetManifest: CatalogManifest = /* @__PURE__ */ manifestData({
+  id: DASHBOARD_WIDGET_CATALOG_ID,
+  package: PKG,
+  label: 'Dashboard widget',
+  summary:
+    'One titled widget of a data-dashboard, placed on the grid; its child is any content node, such as a chart, a KPI or a grid bound to a host data source.',
+  tier: 'content',
+  agentEmittable: true,
+  useWhen: ['A tile of a data-dashboard'],
+  dontUseWhen: ['Anywhere outside a data-dashboard: use layout-card'],
+  a11y: [
+    "Its title is a heading, and it names the widget's move and resize handles",
+    'Its content is ordinary catalog nodes: no HTML, and data only from host-registered sources',
+  ],
+  props: [
+    {
+      name: 'widgetId',
+      kind: 'string',
+      required: true,
+      description:
+        'Stable id, unique in the dashboard: letters, digits, "-" and "_", at most 64 characters. The key of this widget in every saved layout.',
+    },
+    {
+      name: 'title',
+      kind: 'string',
+      required: true,
+      trust: 'untrusted',
+      description: 'Visible title; also names the handles.',
+    },
+    {
+      name: 'place',
+      kind: 'object',
+      description:
+        'Where the widget starts on the widest grid when the dashboard has no saved layout for it: {x, y, w, h} in columns and rows, with optional minW, minH, maxW, maxH and locked. Without x and y it takes the first free slot.',
+      schema: { type: 'object', properties: placeProperties },
+    },
+    { name: 'children', kind: 'slot', description: 'The widget content.' },
+  ],
+  examples: [
+    {
+      id: 'revenue',
+      title: 'Revenue tile',
+      props: { widgetId: 'revenue', title: 'Revenue', place: { x: 0, y: 0, w: 4, h: 2 } },
+    },
+  ],
+  related: [DASHBOARD_CATALOG_ID],
+});
+
 export const DATA_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
   dataBoardManifest,
   dataTreeViewManifest,
@@ -752,6 +899,8 @@ export const DATA_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object
   dataCohortTableManifest,
   dataNotificationInboxManifest,
   dataFilterBuilderManifest,
+  dataDashboardManifest,
+  dataDashboardWidgetManifest,
 ]);
 
 /** Data views are interactive widgets. */
@@ -768,4 +917,6 @@ export const DATA_GRAMMAR_ROLES: readonly GrammarComponentMeta[] = Object.freeze
   { id: 'data-cohort-table', role: 'static' },
   { id: 'data-notification-inbox', role: 'interactive' },
   { id: 'data-filter-builder', role: 'interactive' },
+  { id: 'data-dashboard', role: 'container' },
+  { id: 'data-dashboard-widget', role: 'container' },
 ]);

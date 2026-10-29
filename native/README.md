@@ -59,6 +59,27 @@ minimum-width tiles where possible. Its `gap` accepts only a fixed spacing set
 values); unsupported values produce a visible placeholder rather than
 interpreting arbitrary CSS.
 
+**Composition, code and structure (unreleased, planned for 0.8.0;
+ADR-016).** `layout-stack`, `layout-row` (wrapping lines of 160dp items, or
+one scrolling line with `wrap: false`), `layout-split` (two panes at the
+catalog's ratios, stacked below 600dp) and `layout-tile` (a titled card;
+its `span` and `rowSpan` are clamped but not yet laid out across grid
+columns, planned) paint natively, with only the catalog's closed gap,
+align and ratio values. `blocks-code` paints code as inert monospace text
+(never highlighted or run); `blocks-structure` paints calls to action (an
+`https` href becomes a navigate intent, anything else stays text),
+dividers, and `columns` of text, data, code, media and structure blocks
+(one level; nested columns are a placeholder). Other structure blocks
+(tabs, accordions, cards, grids) stay placeholders.
+
+**Labels (ADR-016).** The renderer's own words (placeholders, the table and
+code names) resolve through `TexuliMessages`, the `@texuli/core/i18n`
+catalog format with the same ids and `{name}` placeholders (string messages
+only; plural and select are planned). Pass one as `BlueprintView(messages =
+…)`, or build it from a translation file with `TexuliMessages.fromJson`.
+`MessagesParityTest` checks the native interpolation against the web's
+shared vectors.
+
 **Media.** `media-image` and the `blocks-media` blocks (`image`, `figure`,
 `video`, `gallery`) render natively (`MediaWidgets.kt`):
 - **Sources** pass the same untrusted rules as the web. Blocks accept
@@ -160,12 +181,34 @@ renderer fails closed: `canvas` is not in `NativeRegistry`, so it paints a
 visible `not-on-this-target` placeholder. Painting canvases natively is
 planned.
 
+**Sheets (spec 0.8.0, unreleased).** Validation of the envelope, painting
+planned. The generated decoders read the `spreadsheet` id's `sheet`
+(`$defs.sheet`: format, version and members), and `PropSchemaValidator`
+applies the 1-to-16-tab cap and each tab's row (10,000) and column (256)
+ranges, as TypeScript does; the `sheet-format` invalid fixture runs in
+`InvalidFixtureParityTest`. Cell inputs, the formula grammar and its closed
+function set are checked by `@texuli/sheets/model` on the web only. The
+Compose renderer fails closed: `spreadsheet` is not in `NativeRegistry`, so
+it paints a visible `not-on-this-target` placeholder. Painting sheets
+natively is planned.
+
+**Dashboards (spec 0.8.0, unreleased).** Validation parity for the props,
+painting planned. `data-dashboard` and `data-dashboard-widget` are in the
+generated vocabulary, so their prop schemas (the closed `layout` places in
+grid units, `columns`, `widgetId`) are checked natively as in TypeScript,
+and `data-dashboard.layout` is a sourceable prop for the source checks
+above. The composition rules `@texuli/catalog` adds (`dashboard-child`,
+`dashboard-parent`, `dashboard-widgets`, `dashboard-widget-id`) run in the
+catalog's draft validation only; a native check is planned. The Compose
+renderer fails closed: neither id is in `NativeRegistry`, so they paint a
+visible `not-on-this-target` placeholder.
+
 ## Modules
 
 | Module | What it holds | Targets |
 | --- | --- | --- |
 | `texuli-spec` | The generated models, enums and decoders from `packages/spec/generated/kotlin` (compiled in place through `srcDir`, never copied), plus a strict JSON reader, the spec validator (the twin of `validateBlueprint`), the render plan and the semantic trace | JVM, iOS (arm64 and simulator) |
-| `texuli-compose` | The token theme, the native registry (translation dictionary, native side), typed host intents (no activate intent) and Compose components: page, doc, deck, card, deck-slide and bounded responsive grid layouts, text blocks and lists, static board diagrams, stat, KPI, accessible table data blocks, image, figure, video and gallery media frames, and a subset of compact charts, each with a visible placeholder for anything else | JVM (Compose Desktop) |
+| `texuli-compose` | The token theme, the native registry (translation dictionary, native side), typed host intents (no activate intent) and Compose components: page, doc, deck, card, deck-slide and bounded responsive grid layouts, text blocks and lists, static board diagrams, stat, KPI, accessible table data blocks, stack, row, split and tile layouts, code blocks, calls to action, dividers and columns, image, figure, video and gallery media frames, and a subset of compact charts, each with a visible placeholder for anything else | JVM (Compose Desktop) |
 | `conformance` | The native half of the dual-target golden gate, the validator parity test and the six KMP app migration checks | JVM tests |
 
 The native flow follows design §4:
@@ -283,9 +326,12 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `ListBoardTest` | `texuli-compose` | List ordering and board columns/cards, with column, card and unique-id caps |
 | `MediaWidgetsTest` | `texuli-compose` | Untrusted media source rules, `media-image` and `blocks-media` projections, gallery columns |
 | `MotionTest` (compose) | `texuli-compose` | Every motion preset maps to Compose enter and exit transitions in both directions; absent presets and level `none` play nothing |
+| `CompositionWidgetsTest` | `texuli-compose` | Stack, row, split and tile props (closed gaps, aligns and ratios, clamped spans), inert code blocks with a size cap, https-only call-to-action hrefs, columns and dividers, the nested-block families, and the hostile matrix on every new projection |
+| `MessagesTest` | `texuli-compose` | `TexuliMessages`: one-pass `{name}` interpolation, catalog lookups with English defaults, untrusted catalog JSON, linear time on runs of braces |
 | `TableGridTest` | `texuli-compose` | Table column/row normalization, inert cells, bounded grid columns and rows |
 | `HostilePropsTest` | `texuli-compose` | The hostile matrix: every projection's props replaced by each value in `HOSTILE_VALUES` (wrong types, JSON null, non-finite and extreme numbers, huge, bidi, zero-width, control and surrogate strings, huge and deep containers) never throws and stays in bounds |
 | `GoldenConformanceTest` | `conformance` | Each spec golden's native trace equals the web trace; prints native coverage per id |
+| `MessagesParityTest` | `conformance` | Native label interpolation equals `@texuli/core/i18n` on the shared vectors (`packages/core/tests/fixtures/i18n-vectors.json`), and every composition layout the spec goldens use paints natively |
 | `InvalidFixtureParityTest` | `conformance` | Every spec invalid fixture is refused with exactly the TypeScript codes |
 | `WorkflowFixtureParityTest` | `conformance` | Every spec workflow golden validates and every workflow invalid fixture is refused with exactly the TypeScript codes |
 | `KmpStarterMigrationTest` | `conformance` | The KMPStarter blueprint loads natively and each widget keeps its documented status |

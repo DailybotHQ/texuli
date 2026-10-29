@@ -1,5 +1,6 @@
 <script lang="ts">
 import { safeHref } from '@texuli/core/url-policy';
+import { useMessages } from '../../i18n/use-messages.ts';
 import type { ClassValue } from '../../internal/cx.ts';
 import { cx } from '../../internal/cx.ts';
 import LayoutChrome from '../host/LayoutChrome.svelte';
@@ -21,10 +22,14 @@ let {
   mountScreen,
   nav,
   path,
-  navigationLabel = 'Main navigation',
+  navigationLabel: navigationLabelProp,
   skipLabel,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const navigationLabel = $derived(
+  navigationLabelProp ?? msg('texuli.top-nav-layout.navigation-label', 'Main navigation')
+);
 
 const uid = $props.id();
 const mainId = `${uid}-main`;

@@ -32,6 +32,7 @@ import {
   setPlayerInteraction,
   setPlayerLabels,
   setPlayerLandmarks,
+  setPlayerSheetHost,
   setPlayerSources,
   setPlayerStateAccess,
 } from './context.ts';
@@ -77,6 +78,7 @@ import {
   selectablePaths,
   siblingPaths,
 } from './selection.ts';
+import type { SheetPlayerHost } from './sheet-host.ts';
 import { DEFAULT_LOAD_TIMEOUT_MS, skeletonFamily, withLoadTimeout } from './skeletons.ts';
 import type { SourceViewEvent, SourceViews } from './sources/views.ts';
 import { type ResolveOptions, type SourceResolver, splitStatefulBlueprint } from './state/bind.ts';
@@ -221,6 +223,16 @@ type Props = {
    */
   chrome?: boolean;
   /**
+   * Print mode (ADR-016): a static, printable paint. The surface is inert,
+   * motion is off, the skip link, retry button and composer are hidden,
+   * and the print styles (page breaks kept out of frames, tables, figures
+   * and code; headings kept with what follows) apply on screen too, as a
+   * preview. The player also enters print mode on its own between the
+   * browser's `beforeprint` and `afterprint` events, so "Save as PDF"
+   * from the browser prints the static form. Default `false`.
+   */
+  print?: boolean;
+  /**
    * Optional host seam for `layout-deck` roots. When set and the validated
    * tree is a deck, the player calls the host instead of painting the deck
    * as a document. The player (L7) cannot import `@texuli/slides` (L8); the
@@ -255,6 +267,15 @@ type Props = {
    * chunk. Read when the player mounts.
    */
   formHost?: FormPlayerHost | null;
+  /**
+   * Host seam for `spreadsheet` nodes (spec 0.8.0, ADR-015): its
+   * `checkSheet` joins validation (every formula is parsed at draft time),
+   * and each valid `spreadsheet` node hands its sheet to its `present`.
+   * Without one a `spreadsheet` blueprint is refused (`sheet-unchecked`).
+   * `@texuli/sheets/host` supplies the adapter, which keeps the formula
+   * engine out of the player's first-load chunk. Read when the player mounts.
+   */
+  sheetHost?: SheetPlayerHost | null;
   /**
    * The host's data sources (spec 0.8.0, ADR-015): a registry from
    * `@texuli/core/data-source`. A blueprint prop
@@ -305,10 +326,12 @@ let {
   dataSources,
   landmarks = true,
   chrome = true,
+  print = false,
   deckHost = null,
   documentHost = null,
   canvasHost = null,
   formHost = null,
+  sheetHost = null,
   sourceRegistry = null,
   sourceLoader = null,
 }: Props = $props();
@@ -328,7 +351,25 @@ $effect(() => {
   media.addEventListener?.('change', update);
   return () => media.removeEventListener?.('change', update);
 });
-let reducedMotion = $derived(motion === 'reduce' || prefersReducedMotion);
+// Print mode (ADR-016): the prop, or the browser's print dialog while it is open.
+let browserPrinting = $state(false);
+$effect(() => {
+  if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
+  const before = () => {
+    browserPrinting = true;
+  };
+  const after = () => {
+    browserPrinting = false;
+  };
+  window.addEventListener('beforeprint', before);
+  window.addEventListener('afterprint', after);
+  return () => {
+    window.removeEventListener('beforeprint', before);
+    window.removeEventListener('afterprint', after);
+  };
+});
+let printing = $derived(print || browserPrinting);
+let reducedMotion = $derived(motion === 'reduce' || prefersReducedMotion || printing);
 
 const skipTargetId = $props.id();
 let surface = $state<HTMLElement | null>(null);
@@ -681,6 +722,8 @@ function insideHostRegion(target: EventTarget | null): boolean {
 
 // Forms (spec 0.8.0): `schema-form` nodes paint through the host's form seam.
 setPlayerFormHost(() => ({ host: formHost, tier, active }));
+// Sheets (spec 0.8.0): `spreadsheet` nodes paint through the host's sheet seam.
+setPlayerSheetHost(() => ({ host: sheetHost, tier, active, label }));
 
 // Action forms (G17) propose intents to the host through this and get receipts.
 setPlayerActionAccess(
@@ -1266,6 +1309,8 @@ $effect(() => {
       // Forms (spec 0.8.0) likewise: only the host's form validator admits one.
       checkForm: formHost?.checkForm,
       ...(formHost?.validators ? { formValidators: formHost.validators } : {}),
+      // Sheets (spec 0.8.0) likewise: only the host's sheet validator admits one.
+      checkSheet: sheetHost?.checkSheet,
       // `when` conditions (G07) read the local state, mapped to numbers.
       conditions: formulaConditions,
       conditionInputs: untrack(() => {
@@ -1329,6 +1374,7 @@ function streamValidateOptions(): ValidateDraftOptions {
     checkCanvas: canvasHost?.checkCanvas,
     checkForm: formHost?.checkForm,
     ...(formHost?.validators ? { formValidators: formHost.validators } : {}),
+    checkSheet: sheetHost?.checkSheet,
     conditions: formulaConditions,
     conditionInputs,
     roles: PLAYER_GRAMMAR_ROLES,
@@ -1591,6 +1637,7 @@ $effect(() => {
   class="tx-player"
   data-tx-player
   data-tx-player-chrome={chrome ? undefined : 'off'}
+  data-tx-player-print={printing ? '' : undefined}
   data-tx-player-deck-host={deckHostActive ? 'pending' : undefined}
   data-status={shownStatus}
   data-density={density}
@@ -1601,7 +1648,7 @@ $effect(() => {
   aria-label={label}
   onfocusin={onFocusIn}
 >
-  {#if chrome && playerState?.surface === 'tree' && !stateRefused}
+  {#if chrome && !printing && playerState?.surface === 'tree' && !stateRefused}
     <a class="tx-player__skip" href={`#${skipTargetId}`} onclick={skipPast}>
       {resolvedLabels.skip} {label}
     </a>
@@ -1648,7 +1695,7 @@ $effect(() => {
       class="tx-player__surface"
       data-tx-player-surface
       bind:this={surface}
-      inert={!active || streamPhase === 'streaming'}
+      inert={!active || streamPhase === 'streaming' || printing}
       aria-busy={streamPhase === 'streaming' ? 'true' : undefined}
       data-tx-player-stream={streamPhase ?? undefined}
       data-selectable={selectable || undefined}
@@ -1685,7 +1732,7 @@ $effect(() => {
         data-tx-player-stream-error={streamView?.error?.code}
       >
         <p>{resolvedLabels.streamInterrupted}</p>
-        {#if onStreamRetry}
+        {#if onStreamRetry && !printing}
           <button type="button" class="tx-player__stream-retry" onclick={() => onStreamRetry?.()}>
             {resolvedLabels.streamRetry}
           </button>
@@ -1694,7 +1741,7 @@ $effect(() => {
     {/if}
   {/if}
 
-  {#if composer}
+  {#if composer && !printing}
     <footer class="tx-player__host-chrome" data-tx-player-host-chrome="composer">
       {@render composer()}
     </footer>
@@ -1703,7 +1750,7 @@ $effect(() => {
   <span class="tx-player__visually-hidden" aria-live="polite" aria-atomic="true" data-tx-player-announcer>
     {politeText}
   </span>
-  {#if chrome && playerState?.surface === 'tree' && !stateRefused}
+  {#if chrome && !printing && playerState?.surface === 'tree' && !stateRefused}
     <span class="tx-player__end" id={skipTargetId} tabindex="-1">
       <span class="tx-player__visually-hidden">{label}</span>
     </span>

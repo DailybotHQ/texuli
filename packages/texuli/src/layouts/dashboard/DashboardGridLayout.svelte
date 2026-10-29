@@ -1,5 +1,6 @@
 <script lang="ts">
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import LayoutChrome from '../host/LayoutChrome.svelte';
 import { onNavigate } from '../host/layout-kit.ts';
@@ -34,6 +35,7 @@ let {
   class: className,
   hrefTrust = 'developer',
 }: Props = $props();
+const msg = useMessages();
 
 const uid = $props.id();
 const mainId = `tx-dashboard-${uid}-main`;
@@ -41,7 +43,7 @@ const dense = $derived(options?.dense === true);
 const title = $derived(
   typeof options?.title === 'string' && options.title.length > 0
     ? options.title
-    : (nav?.brand?.label ?? 'Dashboard')
+    : (nav?.brand?.label ?? msg('texuli.dashboard-grid-layout.dashboard', 'Dashboard'))
 );
 const gap = $derived(
   typeof options?.gap === 'string' && options.gap.length > 0 ? options.gap : '1rem'
@@ -103,7 +105,7 @@ function itemActive(item: ResolvedNavItem): boolean {
   <header class="tx-layout-dashboard__header" data-tx-layout-chrome="header">
     <LayoutChrome part="brand" {nav} />
     {#if primaryItems.length > 0}
-      <nav aria-label="Main">
+      <nav aria-label={msg('texuli.dashboard-grid-layout.main', 'Main')}>
         <ul class="tx-layout-dashboard__nav">
           {#each primaryItems as item (item.id)}
             {@const href = itemHref(item)}

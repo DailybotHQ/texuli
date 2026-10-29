@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import NavIcon from '../host/NavIcon.svelte';
 import { type BottomNavItem, bottomNavCurrent } from './model.ts';
@@ -28,13 +29,15 @@ type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps>;
 
 let {
   items,
-  label = 'Primary',
+  label: labelProp,
   fixed = false,
   hrefTrust = 'developer',
   onSelect,
   class: className,
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.bottom-nav.label', 'Primary'));
 </script>
 
 <nav

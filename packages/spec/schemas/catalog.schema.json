@@ -224,7 +224,7 @@
         },
         "$ref": {
           "type": "string",
-          "pattern": "^#/\\$defs/(binding|reorder|action|eventMap|condition|workflowGraph|document|formSchema|canvas)$"
+          "pattern": "^#/\\$defs/(binding|reorder|action|eventMap|condition|workflowGraph|document|formSchema|canvas|sheet)$"
         }
       },
       "additionalProperties": false

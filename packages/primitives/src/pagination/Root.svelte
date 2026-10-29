@@ -1,4 +1,5 @@
 <script lang="ts">
+import { useMessages } from '../i18n/use-messages.ts';
 import { composeChildProps } from '../internal/child.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { stateAttributes } from '../internal/state.ts';
@@ -14,10 +15,10 @@ let {
   siblings = 1,
   boundaries = 1,
   disabled = false,
-  label = 'Pagination',
-  previousLabel = 'Previous page',
-  nextLabel = 'Next page',
-  getPageLabel = (value: number) => `Page ${value}`,
+  label: labelProp,
+  previousLabel: previousLabelProp,
+  nextLabel: nextLabelProp,
+  getPageLabel: getPageLabelProp,
   onPageChange,
   child,
   children,
@@ -25,6 +26,17 @@ let {
   ref = $bindable(null),
   ...rest
 }: PaginationRootProps & RefProp = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('primitives.pagination.label', 'Pagination'));
+const previousLabel = $derived(
+  previousLabelProp ?? msg('primitives.pagination.previous-label', 'Previous page')
+);
+const nextLabel = $derived(nextLabelProp ?? msg('primitives.pagination.next-label', 'Next page'));
+const getPageLabel = $derived(
+  getPageLabelProp ??
+    ((value: number) =>
+      msg('primitives.pagination.page-label', 'Page {page}', { page: String(value) }))
+);
 
 const count = $derived(getPageCount(pageCount, total, pageSize));
 const currentPage = $derived(

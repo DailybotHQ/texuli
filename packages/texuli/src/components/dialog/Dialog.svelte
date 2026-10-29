@@ -6,6 +6,7 @@ import type { PortalTarget } from '@texuli/core/portal';
 import * as DialogPrimitive from '@texuli/primitives/dialog';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import type { MotionProp } from '../../motion/contract.ts';
 import { createOverlayMotion } from '../../motion/seam.ts';
@@ -88,7 +89,7 @@ let {
   footer,
   children,
   hideClose = false,
-  closeLabel = 'Close',
+  closeLabel: closeLabelProp,
   onOpenChange,
   class: className,
   portal,
@@ -101,6 +102,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const closeLabel = $derived(closeLabelProp ?? msg('texuli.dialog.close-label', 'Close'));
 
 const panelMotion = createOverlayMotion({
   motion: () => motion,

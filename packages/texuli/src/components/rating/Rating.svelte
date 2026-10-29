@@ -1,6 +1,8 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import { RadioGroup as RadioGroupPrimitive } from '@texuli/primitives/radio-group';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { cx } from '../../internal/cx.ts';
 import {
   clampDisplay,
@@ -70,6 +72,7 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
 
 // Input mode: aria-* and data-* name and wire the radio group (the control);
 // handlers stay on the wrapper (the group binds its own, and events bubble),
@@ -86,7 +89,10 @@ const wrapperAttrs = $derived(
 const consumerNamed = $derived('aria-label' in rest || 'aria-labelledby' in rest);
 
 const uid = $props.id();
-const text = $derived({ ...DEFAULT_RATING_LABELS, ...labels });
+const text = $derived({
+  ...localizeLabels(msg, 'texuli.rating', DEFAULT_RATING_LABELS),
+  ...labels,
+});
 const count = $derived(normalizeMax(max));
 const stars = $derived(Array.from({ length: count }, (_, i) => i + 1));
 const current = $derived(

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { useMessages } from '../../i18n/use-messages.ts';
 /**
  * Master-detail layout: list of primary destinations + detail screen.
  * Wide: list and detail side by side. Narrow: list or detail with a Back link.
@@ -28,12 +29,22 @@ let {
   path,
   options,
   skipLabel,
-  listLabel = 'List',
-  detailLabel = 'Detail',
-  backLabel = 'Back',
-  emptyLabel = 'Select an item to open details.',
+  listLabel: listLabelProp,
+  detailLabel: detailLabelProp,
+  backLabel: backLabelProp,
+  emptyLabel: emptyLabelProp,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const listLabel = $derived(listLabelProp ?? msg('texuli.master-detail-layout.list-label', 'List'));
+const detailLabel = $derived(
+  detailLabelProp ?? msg('texuli.master-detail-layout.detail-label', 'Detail')
+);
+const backLabel = $derived(backLabelProp ?? msg('texuli.master-detail-layout.back-label', 'Back'));
+const emptyLabel = $derived(
+  emptyLabelProp ??
+    msg('texuli.master-detail-layout.empty-label', 'Select an item to open details.')
+);
 
 const uid = $props.id();
 const mainId = `${uid}-main`;

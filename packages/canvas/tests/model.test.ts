@@ -76,7 +76,7 @@ describe('the canvas format', () => {
       ],
       [
         'a bidi override in text',
-        (d) => ({ ...d, shapes: [{ ...d.shapes[1], text: 'evil‮txt.exe' }] }),
+        (d) => ({ ...d, shapes: [{ ...d.shapes[1], text: 'evil\u202Etxt.exe' }] }),
         'unsafe-text',
       ],
       [

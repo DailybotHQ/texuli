@@ -672,3 +672,27 @@
 .tx-player__motion[data-tx-player-motion-done] > * {
   opacity: 0;
 }
+
+/* Print mode (ADR-016): in print mode the player omits its controls; the
+   page-break rules apply whenever the page prints. */
+.tx-player[data-tx-player-print] .tx-player__surface[inert] {
+  opacity: 1;
+}
+
+@media print {
+  .tx-player {
+    print-color-adjust: exact;
+  }
+
+  .tx-player :is(.tx-player__skip, .tx-player__stream-retry, .tx-player__host-chrome) {
+    display: none;
+  }
+
+  .tx-player :is([data-tx-player-frame], table, figure, pre, blockquote, img) {
+    break-inside: avoid;
+  }
+
+  .tx-player :is(h1, h2, h3, h4, h5, h6) {
+    break-after: avoid;
+  }
+}

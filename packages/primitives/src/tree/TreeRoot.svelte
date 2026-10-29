@@ -2,6 +2,7 @@
 import { createTypeahead } from '@texuli/core/roving';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../i18n/use-messages.ts';
 import { chainHandlers, composeHandlers } from '../internal/handlers.ts';
 import type { RefProp } from '../internal/ref.ts';
 import {
@@ -42,8 +43,8 @@ let {
   height = 320,
   rowHeight = 36,
   overscan = 3,
-  loadingLabel = 'Loading children',
-  loadErrorLabel = 'Children could not be loaded',
+  loadingLabel: loadingLabelProp,
+  loadErrorLabel: loadErrorLabelProp,
   loadChildren,
   onExpandedChange,
   onSelectedChange,
@@ -53,6 +54,13 @@ let {
   ref = $bindable(null),
   ...attributes
 }: Props & RefProp = $props();
+const msg = useMessages();
+const loadingLabel = $derived(
+  loadingLabelProp ?? msg('primitives.tree.loading-label', 'Loading children')
+);
+const loadErrorLabel = $derived(
+  loadErrorLabelProp ?? msg('primitives.tree.load-error-label', 'Children could not be loaded')
+);
 
 const generatedId = $props.id();
 const treeId = $derived(suppliedId ?? generatedId);

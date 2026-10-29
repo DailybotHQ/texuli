@@ -75,6 +75,8 @@ describe('spec 0.8.0: data-source bindings', () => {
     expect(sourceable).toEqual({
       'data-board': ['items'],
       'data-calendar': ['events'],
+      // Spec 0.8.0 (T-dashboard): a host source can persist a dashboard's layout.
+      'data-dashboard': ['layout'],
       'data-files': ['entries'],
       'data-grid': ['rows'],
       'data-notification-inbox': ['items'],

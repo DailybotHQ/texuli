@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { isNestedInMain } from '../host/nested-main.ts';
 import type { LayoutProps } from '../host/registry.ts';
@@ -43,11 +44,21 @@ let {
   hero,
   sections,
   footer,
-  navigationLabel = 'Main navigation',
-  heroLabel = 'Introduction',
-  contentLabel = 'Page content',
+  navigationLabel: navigationLabelProp,
+  heroLabel: heroLabelProp,
+  contentLabel: contentLabelProp,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const navigationLabel = $derived(
+  navigationLabelProp ?? msg('texuli.marketing-layout.navigation-label', 'Main navigation')
+);
+const heroLabel = $derived(
+  heroLabelProp ?? msg('texuli.marketing-layout.hero-label', 'Introduction')
+);
+const contentLabel = $derived(
+  contentLabelProp ?? msg('texuli.marketing-layout.content-label', 'Page content')
+);
 
 let screenTarget = $state<HTMLDivElement | undefined>();
 let root = $state<HTMLElement | undefined>();

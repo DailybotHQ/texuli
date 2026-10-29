@@ -1120,6 +1120,26 @@ reflect this decision.
   `expression` member of the query, evaluated by the adapter's own engine,
   never by turning the filter into code.
 
+- **Addendum (2026-10-29, PLAN_010 T-sheets, 0.8.0, unreleased): the
+  catalog id of a spreadsheet is `spreadsheet`, not `sheet`.** Agents emit a
+  sheet as a `spreadsheet` node whose `sheet` prop holds the
+  `@texuli/sheets` format (`$defs.sheet` in spec 0.8.0). The natural id
+  `sheet` is already taken: it is the texuli `Sheet` overlay (a drawer) in
+  the catalog's `overlays` group, and catalog ids are one flat namespace,
+  so reusing it would make one id mean two components (and break every
+  draft, manifest and llms page that names the drawer). `validateDraft`
+  checks each `spreadsheet` node under its `sheets` check with the host's
+  `checkSheet` (`checkSheetDraft` from `@texuli/sheets/model`, which parses
+  every formula at draft time) and refuses it without one
+  (`sheet-unchecked`). The player paints it through a `sheetHost` seam
+  (`createSheetPlayerHost` from `@texuli/sheets/host`), like `canvasHost`
+  and `formHost`, so the formula engine stays out of the player's first
+  chunk and the player (L7) never imports `@texuli/sheets` (L5). Native
+  painting of sheets is planned (the twin validates the sheet's envelope
+  and paints a placeholder). Reverse when the drawer is renamed in a
+  breaking minor; then `sheet` could become an alias, never a second
+  meaning.
+
 ## ADR-016: Static output targets and i18n
 
 - **Date:** 2026-10-28 · **Ratification:** decided by the PLAN_010
@@ -1215,3 +1235,15 @@ reflect this decision.
   becomes available and passes the CSP and security matrix (then swap a
   writer behind its subpath), or a single static-output package becomes
   possible without a layer conflict.
+
+- **Note (2026-10-29, PLAN_010 T-targets, 0.8.0, unreleased): email dark
+  mode is planned.** The decision above planned a head rule set with "a
+  dark-mode media query". The `@texuli/core/markup` builders have no
+  `<style>` element (deliberately: a style sheet is free text, and the
+  builders accept only typed, escaped nodes), so `@texuli/tools/email`
+  inlines typed styles only and the output declares `color-scheme: light`.
+  A host can render a dark variant with `mode: 'dark'`, which resolves the
+  theme's dark palette into the inline styles. A `prefers-color-scheme`
+  rule set in the head is planned; it needs a typed, closed `<style>`
+  builder (selectors and properties from an allowlist, values escaped)
+  before it can ship.

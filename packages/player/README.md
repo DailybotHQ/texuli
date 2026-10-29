@@ -183,6 +183,16 @@ Also on this branch, not yet published: the `canvasHost` seam paints agent
 `@texuli/canvas/host`, which also supplies the canvas check validation
 runs; without one a canvas is refused
 ([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md#canvas-hosts)).
+Also on this branch, not yet published: the `sheetHost` seam paints
+`spreadsheet` nodes (spec 0.8.0) in place through
+`createSheetPlayerHost()` from `@texuli/sheets/host`, which also supplies the
+sheet check validation runs (every formula is parsed at draft time) and
+mounts a read-only `SheetView`; without one a spreadsheet is refused
+(`sheet-unchecked`), and a preview shows its title and `sheetNeedsHost`
+([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md#sheet-hosts)).
+`data-dashboard` and `data-dashboard-widget` nodes paint a dashboard grid,
+and `data-dashboard.layout` may read a host source
+([data sources](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/data-sources.md)).
 
 ## New in 0.7.0
 

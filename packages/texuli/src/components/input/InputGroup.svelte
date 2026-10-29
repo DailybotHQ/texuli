@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes, HTMLInputAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { splitControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import './field.css';
@@ -44,13 +45,15 @@ let {
   readonly = false,
   invalid = false,
   clearable = false,
-  clearLabel = 'Clear',
+  clearLabel: clearLabelProp,
   onValueChange,
   onClear,
   children,
   id,
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const clearLabel = $derived(clearLabelProp ?? msg('texuli.input-group.clear-label', 'Clear'));
 
 const split = $derived(splitControlProps(rest));
 

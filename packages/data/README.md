@@ -78,6 +78,7 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/grid-editing` | `EditableDataGrid`: inline cell editors, validation, undo and redo, TSV clipboard |
 | `@texuli/data/tree-view` | `TreeDataView`: outline and file-tree view with lazy children, drag reorder and checkboxes |
 | `@texuli/data/board` | `Board`: columns and swimlanes with WIP limits, keyboard moves, column footers and heading levels |
+| `@texuli/data/dashboard` | `Dashboard` and `DashboardWidget`: a widget grid moved and resized by pointer, keyboard or an arrange toolbar, with breakpoints and a saved layout (unreleased, planned for `0.8.0`; [docs](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-dashboard.md)) |
 | `@texuli/data/calendar/view` | `CalendarView`: month, time-grid and agenda views with move and reschedule |
 | `@texuli/data/timeline` | `TimelineView`: virtualized Gantt timeline with dependencies, zoom and critical path |
 | `@texuli/data/map` | `MapView`: an offline, fictional vector basemap with markers, clusters, routes and fences |
@@ -94,13 +95,14 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/grid` | Windowing, column state, multi-sort, grouping, a validated filter AST and saved views |
 | `@texuli/data/tree` | Flattening with ARIA level and position, cycle-safe moves, indent and outdent |
 | `@texuli/data/board/engine` | Fractional rank keys, grouping, WIP limits and move validation |
+| `@texuli/data/dashboard/engine` | Dashboard layout math: packing, collision, moves, resizes, keyboard steps, breakpoints and persistence, bounded on hostile input (unreleased, planned for `0.8.0`; [docs](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-dashboard-engine.md)) |
 | `@texuli/data/calendar` | Dates in an explicit IANA zone, an RFC 5545 recurrence subset, overlap layout and rescheduling, with no date library |
 | `@texuli/data/timeline/engine` | Working-day calendars, dependencies with lag, critical path and cascading moves |
 | `@texuli/data/geo` | The offline map engine: Web Mercator views, clustering, geofences, distances and routes |
 | `@texuli/data/activity/engine` | Mention tokens, day groups, change summaries, threads, reactions and inbox read state |
 | `@texuli/data/files/engine` | Natural-order children, breadcrumbs, name and move checks, deterministic thumbnails |
 
-The package root, `@texuli/data`, re-exports the main views and helpers.
+The package root, `@texuli/data`, re-exports the main views and helpers. The dashboard is subpath-only.
 
 ## Key guarantees
 

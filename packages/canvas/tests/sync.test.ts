@@ -191,7 +191,7 @@ describe('canvas sync', () => {
       color: 3,
     });
     const bad = [
-      { replica: 'ada', name: 'evil‮', color: 1 },
+      { replica: 'ada', name: 'evil\u202E', color: 1 },
       { replica: 'ada', name: 'Ada', color: 12 },
       { replica: 'a b', name: 'Ada', color: 1 },
       { replica: 'ada', name: 'Ada', color: 1, point: { x: Number.NaN, y: 0 } },

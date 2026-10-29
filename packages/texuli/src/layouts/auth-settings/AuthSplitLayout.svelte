@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { isNestedInMain } from '../host/nested-main.ts';
 import './auth-settings.css';
@@ -42,10 +43,15 @@ let {
   brandTitle,
   brandDescription,
   brandEyebrow,
-  formLabel = 'Sign in',
-  panelLabel = 'About this workspace',
+  formLabel: formLabelProp,
+  panelLabel: panelLabelProp,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const formLabel = $derived(formLabelProp ?? msg('texuli.auth-split-layout.form-label', 'Sign in'));
+const panelLabel = $derived(
+  panelLabelProp ?? msg('texuli.auth-split-layout.panel-label', 'About this workspace')
+);
 
 let screenTarget = $state<HTMLDivElement | undefined>();
 let root = $state<HTMLElement | undefined>();

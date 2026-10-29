@@ -49,6 +49,8 @@ export const CATALOG_SCHEMA_REFS: readonly string[] = Object.freeze([
   'formSchema',
   // Spec 0.8.0 (ADR-012): a canvas, checked again by the host's validateCanvas.
   'canvas',
+  // Spec 0.8.0 (ADR-015): a sheet, checked again by the host's validateSheet (formulas included).
+  'sheet',
 ]);
 
 const SCHEMA_TYPES = new Set(['object', 'array', 'string', 'number', 'integer', 'boolean']);

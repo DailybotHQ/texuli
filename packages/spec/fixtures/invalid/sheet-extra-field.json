@@ -1,0 +1,48 @@
+{
+  "$comment": "Must fail spec validation with exactly these diagnostic codes, in order. Spec 0.8.0 (ADR-012, ADR-015): a sheet tab with a member outside the closed shape (a macro); sheets are data, never code.",
+  "expect": ["prop-type"],
+  "blueprint": {
+    "format": "texuli-blueprint",
+    "version": 1,
+    "id": "sheet-extra-field",
+    "catalog": "598075e391ed95dcba46e120d2fbb706e8ff67d0d5bdeb3c0741f334f439b264",
+    "status": "draft",
+    "createdAt": "2026-10-29T09:00:00Z",
+    "updatedAt": "2026-10-29T09:00:00Z",
+    "generator": {
+      "kind": "agent",
+      "name": "Harbor assistant",
+      "model": "example-model"
+    },
+    "tier": "untrusted",
+    "profile": "web",
+    "spec": "0.8.0",
+    "tree": {
+      "key": "budget",
+      "id": "spreadsheet",
+      "props": {
+        "sheet": {
+          "format": "texuli-sheet",
+          "formatVersion": 1,
+          "meta": {
+            "title": "Budget"
+          },
+          "sheets": [
+            {
+              "id": "costs",
+              "name": "Costs",
+              "rows": 4,
+              "columns": 2,
+              "cells": {
+                "A1": "Desk",
+                "B1": 120,
+                "B2": "=SUM(B1:B1)"
+              },
+              "macro": "Sub Run()"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

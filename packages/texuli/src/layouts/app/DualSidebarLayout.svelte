@@ -1,6 +1,7 @@
 <script lang="ts">
 import AppNav from '../../components/sidebar/AppNav.svelte';
 import type { SidebarItem } from '../../components/sidebar/types.ts';
+import { useMessages } from '../../i18n/use-messages.ts';
 import type { ClassValue } from '../../internal/cx.ts';
 import { cx } from '../../internal/cx.ts';
 import LayoutChrome from '../host/LayoutChrome.svelte';
@@ -25,12 +26,16 @@ let {
   nav,
   path,
   aside,
-  contextLabel = 'Context panel',
+  contextLabel: contextLabelProp,
   skipLabel,
   menuLabel,
   closeLabel,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const contextLabel = $derived(
+  contextLabelProp ?? msg('texuli.dual-sidebar-layout.context-label', 'Context panel')
+);
 
 const uid = $props.id();
 const mainId = `${uid}-main`;
@@ -74,7 +79,7 @@ const sections = $derived(appSidebarSections(resolved));
     mainLandmark={!nested}
     label="Main"
     {menuLabel}
-    closeLabel={closeLabel ?? 'Close navigation'}
+    closeLabel={closeLabel ?? msg('texuli.dual-sidebar-layout.close-navigation', 'Close navigation')}
     hrefTrust="developer"
   >
     {#snippet itemIcon(item: SidebarItem)}

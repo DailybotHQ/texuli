@@ -2,6 +2,7 @@
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import { Avatar } from '../../components/avatar/index.ts';
 import { Button } from '../../components/button/index.ts';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import NavIcon from './NavIcon.svelte';
 import type { NavModel } from './nav-model.ts';
@@ -31,9 +32,13 @@ let {
   mainId,
   compact = false,
   hrefTrust = 'developer',
-  skipLabel = 'Skip to content',
+  skipLabel: skipLabelProp,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const skipLabel = $derived(
+  skipLabelProp ?? msg('texuli.layout-chrome.skip-label', 'Skip to content')
+);
 
 const brandHref = $derived(
   nav?.brand?.href !== undefined ? safeHref(nav.brand.href, hrefTrust) : safeHref('#/', hrefTrust)

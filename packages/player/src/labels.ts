@@ -81,6 +81,8 @@ export interface PlayerLabels {
   documentNeedsHost: string;
   /** A `canvas` node painted without a canvas host (spec 0.8.0): only previews reach it. */
   canvasNeedsHost: string;
+  /** A `spreadsheet` node painted without a sheet host (spec 0.8.0): only previews reach it. */
+  sheetNeedsHost: string;
 
   // Data sources (spec 0.8.0): a node whose rows come from the host's source.
   /** Shown while a bound node's first rows load. `{label}`: the node's caption or label. */
@@ -158,6 +160,7 @@ export const DEFAULT_PLAYER_LABELS: PlayerLabels = Object.freeze({
 
   documentNeedsHost: 'This document opens in a document reader.',
   canvasNeedsHost: 'This canvas opens in a canvas viewer.',
+  sheetNeedsHost: 'This spreadsheet opens in a spreadsheet viewer.',
 
   sourceLoading: 'Loading {label}…',
   sourceEmpty: 'Nothing to show yet.',
@@ -257,6 +260,7 @@ export function resolvePlayerLabels(overrides: PlayerLabelOverrides | undefined)
     streamIncomplete: text(overrides.streamIncomplete, base.streamIncomplete),
     documentNeedsHost: text(overrides.documentNeedsHost, base.documentNeedsHost),
     canvasNeedsHost: text(overrides.canvasNeedsHost, base.canvasNeedsHost),
+    sheetNeedsHost: text(overrides.sheetNeedsHost, base.sheetNeedsHost),
     sourceLoading: text(overrides.sourceLoading, base.sourceLoading),
     sourceEmpty: text(overrides.sourceEmpty, base.sourceEmpty),
     sourceFailed: text(overrides.sourceFailed, base.sourceFailed),

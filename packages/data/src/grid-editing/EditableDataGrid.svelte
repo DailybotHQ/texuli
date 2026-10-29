@@ -54,6 +54,8 @@ interface Props {
   labels?: Partial<DataGridLabels> & GridEditingLabelOverrides;
   /** External undo stack (tests). Default: an internal stack of 50. */
   undoStack?: UndoStack;
+  /** Called when focus moves to another body cell (a formula bar, a status line). */
+  onFocusCell?: (cell: { rowId: string; columnKey: string }) => void;
   class?: ClassValue;
 }
 
@@ -76,6 +78,7 @@ let {
   overscanRows = 4,
   labels,
   undoStack: undoStackProp,
+  onFocusCell,
   class: className,
 }: Props = $props();
 
@@ -231,7 +234,10 @@ function rememberFocus(event: FocusEvent): void {
   if (!host) return;
   const rowId = host.getAttribute('data-row-id');
   const columnKey = host.getAttribute('data-column-key');
-  if (rowId && columnKey) focusCell = { rowId, columnKey };
+  if (!rowId || !columnKey) return;
+  if (focusCell?.rowId !== rowId || focusCell.columnKey !== columnKey)
+    onFocusCell?.({ rowId, columnKey });
+  focusCell = { rowId, columnKey };
 }
 
 function focusedEditable(): { row: T; column: EditableColumn<T>; colIndex: number } | null {

@@ -22,6 +22,7 @@
     "@texuli/core": "workspace:*",
     "@texuli/document": "workspace:*",
     "@texuli/forms": "workspace:*",
+    "@texuli/sheets": "workspace:*",
     "@texuli/spec": "workspace:*"
   },
   "devDependencies": {

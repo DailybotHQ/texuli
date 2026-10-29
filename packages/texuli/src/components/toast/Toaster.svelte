@@ -3,6 +3,7 @@ import type { OverlayMode } from '@texuli/core/overlay';
 import { Toast } from '@texuli/primitives/toast';
 import { untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { chainHandlers } from '../../internal/handlers.ts';
 import type { RefProp } from '../../internal/ref.ts';
@@ -55,11 +56,11 @@ type OwnProps = {
 type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'>;
 
 let {
-  label = 'Notifications',
+  label: labelProp,
   position = 'bottom-end',
   offset,
   store: storeProp,
-  dismissLabel = 'Dismiss notification',
+  dismissLabel: dismissLabelProp,
   class: className,
   mode = 'top-layer',
   container = null,
@@ -71,6 +72,11 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props & RefProp = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.toaster.label', 'Notifications'));
+const dismissLabel = $derived(
+  dismissLabelProp ?? msg('texuli.toaster.dismiss-label', 'Dismiss notification')
+);
 
 const uid = $props.id();
 const store = untrack(() => storeProp) ?? getToastStore();

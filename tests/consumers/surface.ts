@@ -461,6 +461,13 @@ export const RENDER_CHECKS: Readonly<Record<string, RenderCheck>> = {
     ssr: 'Consumer editor text',
     styled: true,
   },
+  '@texuli/sheets': {
+    region: '[data-render="@texuli/sheets"]',
+    client: 'Consumer sheet total',
+    // The sheet view is the data grid's editing layer, which mounts after hydration.
+    ssr: null,
+    styled: true,
+  },
   '@texuli/forms': {
     region: '[data-render="@texuli/forms"]',
     client: 'Consumer form email',
