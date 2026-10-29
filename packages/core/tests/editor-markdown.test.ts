@@ -177,7 +177,7 @@ describe('reading Markdown', () => {
     // (101 ms at 100,000 characters and 3.7 s at 400,000 before the fix), and
     // the mark pass made one object per character. Compared at N and 4N with
     // the caps raised.
-    const limits = { maxSource: 400_000, limits: { chars: 400_000 } };
+    const limits = { maxSource: 800_000, limits: { chars: 800_000 } };
     const time = (source: string) => {
       const started = performance.now();
       fromMarkdown(source, limits);
@@ -189,14 +189,15 @@ describe('reading Markdown', () => {
       'words and breaks': (n: number) => 'one two\nthree '.repeat(Math.floor(n / 14)),
     };
     for (const [name, make] of Object.entries(shapes)) {
-      const read = fromMarkdown(make(400_000), limits);
-      expect(editorPlainText(read.doc).length, name).toBeGreaterThan(390_000);
+      const read = fromMarkdown(make(800_000), limits);
+      expect(editorPlainText(read.doc).length, name).toBeGreaterThan(780_000);
       // Interleaved fastest-of-seven, so a load spike hits both sizes alike.
       // Linear growth is 4x and the old quadratic paths were 16x or more
-      // (3.7 s at 400,000); a 10x ratio with a 150 ms floor separates them
+      // (3.7 s at 400,000); sizes large enough that noise can't dominate and a
+      // 10x ratio with a 300 ms floor separate them
       // on a loaded host without flaking on sub-millisecond noise.
-      const small = make(100_000);
-      const large = make(400_000);
+      const small = make(200_000);
+      const large = make(800_000);
       let bestSmall = Number.POSITIVE_INFINITY;
       let bestLarge = Number.POSITIVE_INFINITY;
       for (let k = 0; k < 7; k += 1) {
@@ -206,7 +207,7 @@ describe('reading Markdown', () => {
       expect(
         bestLarge,
         `${name}: ${bestSmall.toFixed(1)} ms -> ${bestLarge.toFixed(1)} ms`
-      ).toBeLessThan(Math.max(10 * bestSmall, 150));
+      ).toBeLessThan(Math.max(10 * bestSmall, 300));
     }
   }, 60_000);
 });
