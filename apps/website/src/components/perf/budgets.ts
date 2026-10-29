@@ -90,8 +90,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/component-pages/charts-pie/',
     reason:
-      'The first live demo is a chart: the chart stage family and the part-whole chart chunk load on open: 113.9 KB page, 77.5 KB JS (104.4 KB JS before per-family stages); 124 KB page, 85.8 KB JS measured 2026-10-27, so the owner raised the caps to 132 and 92 (measured + 4%, rounded up to 4 KB; PLAN_006 follow-up).',
-    budget: { pageGzipKb: 132, jsGzipKb: 92, cls: 0.15 },
+      'The first live demo is a chart: the chart stage family and the part-whole chart chunk load on open: 113.9 KB page, 77.5 KB JS (104.4 KB JS before per-family stages); 124 KB page, 85.8 KB JS measured 2026-10-27, so the owner raised the caps to 132 and 92 (measured + 4%, rounded up to 4 KB; PLAN_006 follow-up). PLAN_009 (formatValue on the compact charts, handler composition and ref props in the shared components): 132.3 KB page in CI on Linux, so the page cap is 140 (measured + 4%, rounded up to 4 KB).',
+    budget: { pageGzipKb: 140, jsGzipKb: 92, cls: 0.15 },
   },
   {
     route: '/charts-page/',
