@@ -1,0 +1,325 @@
+/* @texuli/pages/collab: the collaboration UI. Theme through --tx-* tokens;
+   logical properties only. Highlights use ::highlight() (no DOM change in
+   the editor); forced colors fall back to system colors. */
+
+.tx-pages-collab {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.tx-pages-collab__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.tx-pages-collab__tools,
+.tx-pages-collab__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tx-pages-collab__tools .tx-pages-action[aria-pressed="true"] {
+  border-color: var(--tx-accent, Highlight);
+  background: var(--tx-accent-soft, var(--tx-muted, Canvas));
+}
+
+.tx-pages-collab__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 60rem) {
+  .tx-pages-collab__body {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+    align-items: start;
+  }
+}
+
+.tx-pages-collab__doc {
+  position: relative;
+  min-inline-size: 0;
+}
+
+.tx-pages-collab__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.tx-pages-collab__caret {
+  position: absolute;
+  inset-block-start: 0;
+  /* Physical on purpose: the caret is moved by a transform of measured
+     client coordinates, which are physical in both directions. */
+  left: 0;
+  inline-size: 2px;
+  background: var(--tx-pages-caret-color, Highlight);
+}
+
+.tx-pages-collab__caret-name {
+  position: absolute;
+  inset-block-end: 100%;
+  inset-inline-start: 0;
+  padding-inline: 0.25rem;
+  /* Theme surface and text keep the contrast; the collaborator's color is the border. */
+  border: 1px solid var(--tx-pages-caret-color, Highlight);
+  border-inline-start-width: 3px;
+  border-radius: 0.25rem;
+  background: var(--tx-surface, Canvas);
+  color: var(--tx-foreground, CanvasText);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.tx-pages-collab__sidebar {
+  display: grid;
+  gap: 1rem;
+  min-inline-size: 0;
+}
+
+.tx-pages-collab__panel {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tx-pages-collab__heading {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.tx-pages-collab__empty {
+  margin: 0;
+  color: var(--tx-muted-foreground, GrayText);
+  font-size: 0.875rem;
+}
+
+.tx-pages-collab__feed {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tx-pages-collab__thread,
+.tx-pages-collab__suggestion,
+.tx-pages-collab__version {
+  display: grid;
+  gap: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  border: var(--tx-border-width, 1px) solid var(--tx-border, CanvasText);
+  border-radius: var(--tx-radius, 0.5rem);
+  background: var(--tx-surface, Canvas);
+  font-size: 0.875rem;
+}
+
+.tx-pages-collab__thread[data-active] {
+  border-color: var(--tx-warning, Highlight);
+}
+
+.tx-pages-collab__thread[data-status="resolved"] {
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+.tx-pages-collab__thread:focus-visible,
+.tx-pages-collab__suggestion:focus-visible,
+.tx-pages-collab__input:focus-visible {
+  outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+  outline-offset: 2px;
+}
+
+.tx-pages-collab__thread-name {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.tx-pages-collab__badge {
+  margin-inline-start: 0.5rem;
+  padding-inline: 0.375rem;
+  border-radius: 999px;
+  background: var(--tx-muted, Canvas);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.tx-pages-collab__quote {
+  margin: 0;
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+.tx-pages-collab__messages,
+.tx-pages-collab__changes,
+.tx-pages-collab__versions,
+.tx-pages-collab__people-list {
+  display: grid;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tx-pages-collab__message {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+}
+
+.tx-pages-collab__author,
+.tx-pages-collab__version-name {
+  font-weight: 600;
+}
+
+.tx-pages-collab__time {
+  color: var(--tx-muted-foreground, GrayText);
+  font-size: 0.75rem;
+}
+
+.tx-pages-collab__text {
+  flex-basis: 100%;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.tx-pages-collab__mention {
+  color: var(--tx-info, LinkText);
+  font-weight: 600;
+}
+
+.tx-pages-collab__change[data-kind="insert"] {
+  text-decoration: underline;
+}
+
+.tx-pages-collab__change[data-kind="delete"] {
+  text-decoration: line-through;
+}
+
+.tx-pages-collab__composer,
+.tx-pages-collab__reply,
+.tx-pages-collab__save {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.tx-pages-collab__reply,
+.tx-pages-collab__save {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.tx-pages-collab__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.tx-pages-collab__save > .tx-pages-collab__label {
+  grid-column: 1 / -1;
+}
+
+.tx-pages-collab__input {
+  box-sizing: border-box;
+  inline-size: 100%;
+  padding: 0.375rem 0.5rem;
+  border: var(--tx-border-width, 1px) solid var(--tx-border-strong, var(--tx-border, ButtonBorder));
+  border-radius: var(--tx-radius, 0.5rem);
+  background: var(--tx-background, Field);
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+
+.tx-pages-collab__people {
+  font-size: 0.875rem;
+}
+
+.tx-pages-collab__people-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+}
+
+.tx-pages-collab__person {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.tx-pages-collab__swatch {
+  inline-size: 0.625rem;
+  block-size: 0.625rem;
+  border-radius: 999px;
+  background: var(--tx-pages-caret-color, Highlight);
+}
+
+/* Highlights (CSS Custom Highlight API). */
+::highlight(tx-pages-comment) {
+  background-color: var(--tx-warning-soft, rgb(250 204 21 / 0.3));
+}
+
+::highlight(tx-pages-comment-active) {
+  background-color: var(--tx-warning, rgb(250 204 21 / 0.6));
+  color: var(--tx-warning-foreground, inherit);
+}
+
+::highlight(tx-pages-suggest-insert) {
+  color: var(--tx-success, green);
+  text-decoration: underline;
+}
+
+::highlight(tx-pages-suggest-delete) {
+  color: var(--tx-danger, firebrick);
+  text-decoration: line-through;
+}
+
+::highlight(tx-pages-remote-1) {
+  background-color: color-mix(in oklch, var(--tx-chart-1, Highlight) 25%, transparent);
+}
+::highlight(tx-pages-remote-2) {
+  background-color: color-mix(in oklch, var(--tx-chart-2, Highlight) 25%, transparent);
+}
+::highlight(tx-pages-remote-3) {
+  background-color: color-mix(in oklch, var(--tx-chart-3, Highlight) 25%, transparent);
+}
+::highlight(tx-pages-remote-4) {
+  background-color: color-mix(in oklch, var(--tx-chart-4, Highlight) 25%, transparent);
+}
+::highlight(tx-pages-remote-5) {
+  background-color: color-mix(in oklch, var(--tx-chart-5, Highlight) 25%, transparent);
+}
+::highlight(tx-pages-remote-6) {
+  background-color: color-mix(in oklch, var(--tx-chart-6, Highlight) 25%, transparent);
+}
+::highlight(tx-pages-remote-7) {
+  background-color: color-mix(in oklch, var(--tx-chart-7, Highlight) 25%, transparent);
+}
+::highlight(tx-pages-remote-8) {
+  background-color: color-mix(in oklch, var(--tx-chart-8, Highlight) 25%, transparent);
+}
+
+@media (forced-colors: active) {
+  ::highlight(tx-pages-comment),
+  ::highlight(tx-pages-comment-active) {
+    background-color: Mark;
+    color: MarkText;
+  }
+
+  ::highlight(tx-pages-suggest-insert),
+  ::highlight(tx-pages-suggest-delete) {
+    color: Highlight;
+  }
+
+  .tx-pages-collab__caret,
+  .tx-pages-collab__swatch {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  .tx-pages-collab__caret-name {
+    border-color: Highlight;
+  }
+}

@@ -24,9 +24,20 @@ const SUBPATH_DOCS: Record<string, { doc: string; entry?: string; component?: st
     entry: 'src/reader/index.ts',
     component: 'src/reader/PageReader.svelte',
   },
+  './collab': {
+    doc: 'docs/collab.md',
+    entry: 'src/collab/index.ts',
+    component: 'src/collab/CollabEditor.svelte',
+  },
+  './paged': {
+    doc: 'docs/paged.md',
+    entry: 'src/paged/index.ts',
+    component: 'src/paged/PagedView.svelte',
+  },
+  './export': { doc: 'docs/export.md', entry: 'src/export/index.ts' },
   './styles.css': { doc: 'docs/styles.md' },
 };
-const PLANNED = ['paged', 'collab', 'export'];
+const PLANNED: string[] = [];
 
 function exportedNames(path: string, seen = new Set<string>()): string[] {
   if (seen.has(path)) return [];
@@ -101,6 +112,19 @@ describe('pages documentation', () => {
     const hooks = new Set([...css.matchAll(/\.(tx-pages[\w-]*)/g)].map((m) => m[1] as string));
     const page = read('docs/styles.md');
     expect([...hooks].filter((hook) => !page.includes(`.${hook}`))).toEqual([]);
+  });
+
+  it('documents every class hook and named page the paged stylesheet defines', () => {
+    const css = read('src/paged/paged.css');
+    const hooks = new Set(
+      [...css.matchAll(/\.(tx-pages-paged[\w-]*)/g)].map((m) => m[1] as string)
+    );
+    const pages = new Set([...css.matchAll(/@page (tx-pages-[\w-]+)/g)].map((m) => m[1] as string));
+    expect(hooks.size).toBeGreaterThan(5);
+    expect(pages.size).toBe(8);
+    const page = read('docs/paged.md');
+    expect([...hooks].filter((hook) => !page.includes(`.${hook}`))).toEqual([]);
+    expect([...pages].filter((name) => !page.includes(name))).toEqual([]);
   });
 
   it('marks the planned subpaths as planned and does not export them', () => {

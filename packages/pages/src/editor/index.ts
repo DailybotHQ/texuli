@@ -54,6 +54,7 @@ export {
   type Located,
   PagesEditor,
   type PagesEditorOptions,
+  type PagesEditorSync,
   type PagesFocusRequest,
   type PagesSlashRequest,
 } from './state.svelte.ts';

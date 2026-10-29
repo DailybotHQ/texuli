@@ -85,7 +85,13 @@ export const BLOCK_FAMILIES: readonly BlockFamily[] = Object.freeze([
   'embed',
 ]);
 
-export const PAGE_SIZES: readonly PageSize[] = Object.freeze(['a4', 'a5', 'letter', 'legal']);
+export const PAGE_SIZES: readonly PageSize[] = Object.freeze([
+  'a4',
+  'a5',
+  'letter',
+  'legal',
+  'custom',
+]);
 
 /** Persisted ids: a letter or digit, then letters, digits, `_` and `-`. */
 export const DOCUMENT_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;

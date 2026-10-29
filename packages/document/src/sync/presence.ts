@@ -19,7 +19,10 @@ export interface PresenceState {
   name: string;
   /** A token color index, 0 to 11. */
   color: number;
+  /** The caret (a selection's focus end). */
   cursor?: PresenceCursor;
+  /** A selection's other end (absent for a bare caret). */
+  anchor?: PresenceCursor;
 }
 
 export interface PresenceEntry extends PresenceState {
@@ -47,6 +50,28 @@ function unsafeName(name: string): boolean {
   return false;
 }
 
+function checkCursor(value: unknown): PresenceCursor | null {
+  const cursor = value as Record<string, unknown> | null;
+  if (cursor === null || typeof cursor !== 'object' || Array.isArray(cursor)) return null;
+  if (typeof cursor.node !== 'string' || !NODE_PATTERN.test(cursor.node)) return null;
+  if (typeof cursor.field !== 'string' || !KEY_PATTERN.test(cursor.field)) return null;
+  let after: ItemId | null = null;
+  if (cursor.after !== null) {
+    const id = cursor.after;
+    if (
+      !Array.isArray(id) ||
+      id.length !== 2 ||
+      typeof id[0] !== 'string' ||
+      !REPLICA_PATTERN.test(id[0]) ||
+      !Number.isSafeInteger(id[1]) ||
+      id[1] < 0
+    )
+      return null;
+    after = [id[0], id[1]];
+  }
+  return { node: cursor.node, field: cursor.field, after };
+}
+
 /** Validate a presence state into a fresh copy, or `null`. */
 export function checkPresence(value: unknown): PresenceState | null {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return null;
@@ -56,26 +81,11 @@ export function checkPresence(value: unknown): PresenceState | null {
   if (!Number.isInteger(raw.color) || (raw.color as number) < 0 || (raw.color as number) > 11)
     return null;
   const state: PresenceState = { replica: raw.replica, name: raw.name, color: raw.color as number };
-  if (raw.cursor !== undefined) {
-    const cursor = raw.cursor as Record<string, unknown> | null;
-    if (cursor === null || typeof cursor !== 'object') return null;
-    if (typeof cursor.node !== 'string' || !NODE_PATTERN.test(cursor.node)) return null;
-    if (typeof cursor.field !== 'string' || !KEY_PATTERN.test(cursor.field)) return null;
-    let after: ItemId | null = null;
-    if (cursor.after !== null) {
-      const id = cursor.after;
-      if (
-        !Array.isArray(id) ||
-        id.length !== 2 ||
-        typeof id[0] !== 'string' ||
-        !REPLICA_PATTERN.test(id[0]) ||
-        !Number.isSafeInteger(id[1]) ||
-        id[1] < 0
-      )
-        return null;
-      after = [id[0], id[1]];
-    }
-    state.cursor = { node: cursor.node, field: cursor.field, after };
+  for (const key of ['cursor', 'anchor'] as const) {
+    if (raw[key] === undefined) continue;
+    const cursor = checkCursor(raw[key]);
+    if (!cursor) return null;
+    state[key] = cursor;
   }
   return state;
 }

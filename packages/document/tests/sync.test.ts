@@ -512,3 +512,73 @@ describe('transports and presence', () => {
     expect(store.list()).toEqual([]);
   });
 });
+
+describe('anchors, containers and retyping (T-doc-collab additions)', () => {
+  it('resolves item anchors to visible indices through concurrent edits', () => {
+    const ada = createReplica({ replica: 'ada' });
+    const lin = createReplica({ replica: 'lin' });
+    const note = ada.insertNode('p', ROOT, 0, { id: 'n1' });
+    ada.insertText(note, 'text', 0, 'Hello world');
+    lin.receive({ ops: ada.opsSince() });
+    const start = ada.itemAt(note, 'text', 6) as [string, number];
+    const end = ada.itemAt(note, 'text', 10) as [string, number];
+    expect(ada.itemAt(note, 'text', 11)).toBeNull();
+    lin.insertText(note, 'text', 0, 'Oh, ');
+    ada.receive({ ops: lin.opsSince(ada.versionVector()) });
+    expect(ada.anchorIndex(note, 'text', { id: start, side: 'before' })).toBe(10);
+    expect(ada.anchorIndex(note, 'text', { id: end, side: 'after' })).toBe(15);
+    ada.deleteText(note, 'text', 10, 5);
+    expect(ada.isVisible(note, 'text', start)).toBe(false);
+    // A deleted item's anchors collapse onto the same index.
+    expect(ada.anchorIndex(note, 'text', { id: start, side: 'before' })).toBe(10);
+    expect(ada.anchorIndex(note, 'text', { id: end, side: 'after' })).toBe(10);
+    expect(ada.anchorIndex(note, 'text', { id: ['zed', 1], side: 'after' })).toBeNull();
+    expect(ada.anchorIndex(note, 'missing', 'end')).toBe(0);
+  });
+
+  it('registers detached containers once, retypes nodes undoably, and counts undo steps', () => {
+    const ada = createReplica({ replica: 'ada' });
+    const lin = createReplica({ replica: 'lin' });
+    ada.ensureNode('x:box', 'box');
+    lin.ensureNode('x:box', 'box');
+    expect(ada.editCount).toBe(0);
+    ada.insertNode('item', 'x:box', 0, { id: 'a1' });
+    lin.insertNode('item', 'x:box', 0, { id: 'l1' });
+    ada.receive({ ops: lin.opsSince() });
+    lin.receive({ ops: ada.opsSince() });
+    expect(ada.children('x:box')).toEqual(lin.children('x:box'));
+    expect(ada.attached('a1')).toBe(false);
+    const note = ada.insertNode('p', ROOT, 0, { id: 'n1' });
+    expect(ada.attached(note)).toBe(true);
+    const before = ada.editCount;
+    ada.setNodeType(note, 'h');
+    expect(ada.node(note)?.type).toBe('h');
+    expect(ada.editCount).toBe(before + 1);
+    ada.undo();
+    expect(ada.node(note)?.type).toBe('p');
+    expect(() => ada.setNodeType(ROOT, 'x')).toThrow(RangeError);
+  });
+
+  it('keeps a selection anchor in presence and refuses a malformed one', () => {
+    const store = createPresenceStore({ now: () => 0 });
+    const cursor = { node: 'n1', field: 'text', after: ['ada', 3] };
+    expect(
+      store.update({
+        replica: 'lin',
+        name: 'Lin',
+        color: 1,
+        cursor,
+        anchor: { ...cursor, after: null },
+      })
+    ).toBe(true);
+    expect(store.list()[0]?.anchor).toEqual({ node: 'n1', field: 'text', after: null });
+    expect(
+      store.update({
+        replica: 'kai',
+        name: 'Kai',
+        color: 1,
+        anchor: { node: 'bad id', field: 'text', after: null },
+      })
+    ).toBe(false);
+  });
+});

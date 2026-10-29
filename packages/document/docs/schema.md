@@ -78,3 +78,4 @@ others), `DOCUMENT_CODES` lists the document's own (`DocumentCode`):
 | `invalid-component`, `invalid-deck` | An inline component or deck that is malformed |
 | `unknown-anchor`, `anchor-range` | Orphaned comment anchors (warnings) |
 | `invalid-input` | The loader could not read the input |
+| `page-size` | A `custom` page without both `width` and `height`, or a preset size with them |

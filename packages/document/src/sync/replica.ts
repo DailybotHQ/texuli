@@ -77,6 +77,7 @@ export interface SyncSnapshot {
 
 type Intent =
   | { kind: 'remove'; node: string }
+  | { kind: 'retype'; node: string; type: string }
   | { kind: 'place'; node: string; parent: string | null; after: ItemId | null }
   | { kind: 'set'; node: string; key: string; value: SyncJson }
   | { kind: 'hide' | 'show'; node: string; field: string; ranges: [string, number, number][] }
@@ -116,6 +117,7 @@ export class Replica {
   private readonly undoStack: Intent[][] = [];
   private readonly redoStack: Intent[][] = [];
   private capture: Intent[] | null = null;
+  private steps = 0;
   private outbox: SyncOp[] | null = null;
 
   constructor(options: ReplicaOptions) {
@@ -174,6 +176,33 @@ export class Replica {
   /** The visible text of a node's field as runs with marks. */
   textRuns(node: string, field: string): SyncTextRun[] {
     return this.tree.nodes.get(node)?.texts.get(field)?.textRuns() ?? [];
+  }
+
+  /** The id of the visible unit at a code-point `index` of a node's field, or `null`. */
+  itemAt(node: string, field: string, index: number): ItemId | null {
+    const unit = this.tree.nodes.get(node)?.texts.get(field)?.visibleOrder()[index];
+    return unit ? [unit.run.replica, unit.run.counter + unit.offset] : null;
+  }
+
+  /**
+   * The visible code-point index an anchor stands for in a node's field
+   * (comments, cursors and suggestions follow item ids through concurrent
+   * edits), or `null` when the anchor names no item there.
+   */
+  anchorIndex(node: string, field: string, anchor: Anchor): number | null {
+    const sequence = this.tree.nodes.get(node)?.texts.get(field);
+    if (!sequence) return typeof anchor === 'string' ? 0 : null;
+    return sequence.indexOfAnchor(anchor);
+  }
+
+  /** Whether an item of a node's field is visible (`false` when deleted or unknown). */
+  isVisible(node: string, field: string, id: ItemId): boolean {
+    return this.tree.nodes.get(node)?.texts.get(field)?.isVisible(id) ?? false;
+  }
+
+  /** Whether a node is attached under the root (not removed, not in a detached subtree). */
+  attached(id: string): boolean {
+    return this.tree.attached(id);
   }
 
   private propsOf(node: TreeNode): { [key: string]: SyncJson } {
@@ -436,6 +465,7 @@ export class Replica {
       this.capture = null;
       this.outbox = null;
       if (mode === 'edit' && intents.length > 0) {
+        this.steps += 1;
         this.undoStack.push(intents);
         if (this.undoStack.length > this.undoLimit) this.undoStack.shift();
         this.redoStack.length = 0;
@@ -488,6 +518,31 @@ export class Replica {
       this.emit({ kind: 'move', node: id, parent, slot });
       this.record({ kind: 'remove', node: id });
       return id;
+    });
+  }
+
+  /**
+   * Register a node that no parent holds (a container for annotations, for
+   * example), once: concurrent calls with the same id merge. Not an undo
+   * step. Returns the id.
+   */
+  ensureNode(id: string, type: string): string {
+    if (this.tree.nodes.has(id)) return id;
+    this.batch(() => {
+      this.emit({ kind: 'create', node: id, type });
+    }, 'edit');
+    return id;
+  }
+
+  /** Change a node's type (last writer wins; undo restores the previous type). */
+  setNodeType(id: string, type: string): void {
+    this.edit(() => {
+      const node = this.requireNode(id);
+      if (id === ROOT) throw new RangeError('The root keeps its type.');
+      if (node.type === type) return;
+      const previous = node.type;
+      this.emit({ kind: 'create', node: id, type });
+      this.record({ kind: 'retype', node: id, type: previous });
     });
   }
 
@@ -611,6 +666,11 @@ export class Replica {
 
   // ── undo ─────────────────────────────────────────────────────────────
 
+  /** Local transactions recorded as undo steps since the replica was created (monotonic). */
+  get editCount(): number {
+    return this.steps;
+  }
+
   get canUndo(): boolean {
     return this.undoStack.length > 0;
   }
@@ -643,6 +703,9 @@ export class Replica {
       switch (intent.kind) {
         case 'remove':
           if (node.parent !== TRASH) this.removeNode(intent.node);
+          break;
+        case 'retype':
+          this.setNodeType(intent.node, intent.type);
           break;
         case 'place': {
           const parent = intent.parent;

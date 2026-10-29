@@ -8,9 +8,10 @@ operations holds the same state. Hosts own networking and storage behind a
 it. Canvases, sheets and dashboards reuse it.
 
 > **Status: in development.** Not on npm yet (first release planned for
-> `0.7.0`). The binding that turns a `TexuliDocument` into a synced tree
-> (and patches into operations), comments anchored to item ids,
-> suggestions and version history are planned (PLAN_010 T-doc-collab).
+> `0.7.0`). Documents bind to this core in
+> [`@texuli/document/collab`](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/collab.md)
+> (the tree diff, comments, suggestions, versions and presence); this
+> subpath stays generic for canvases, sheets and dashboards.
 
 ```ts
 import { connectReplica, createMemorySyncHub, createReplica, ROOT } from '@texuli/document/sync';
@@ -73,6 +74,16 @@ dropped), and `undoLimit`.
   (hide what was inserted, revive what was deleted, move back while the old
   parent exists, rewrite the previous value). Shared history is never
   rewound.
+- `ensureNode(id, type)` registers a node no parent holds (a container,
+  once; concurrent calls merge), and `setNodeType(id, type)` changes a
+  node's type (last writer wins; undoable). `editCount` counts the local
+  transactions recorded as undo steps (monotonic), so a host can group
+  them.
+- Anchors: `itemAt(node, field, index)` is the item id at a visible
+  index, `anchorIndex(node, field, anchor)` the visible index an `Anchor`
+  stands for now (comments and cursors follow item ids through concurrent
+  edits), `isVisible(node, field, id)` whether an item is visible, and
+  `attached(id)` whether a node hangs under the root.
 - Reading: `children`, `node`, `text`, `textRuns`, `toJSON()` (a
   `SyncNodeJson` tree, identical on converged replicas), `versionVector()`,
   `opsSince(have)`, `snapshot()` (a `SyncSnapshot`), `pending`, and
@@ -113,8 +124,9 @@ WebSocket, IndexedDB and server transports are host adapters.
 ## Presence
 
 Ephemeral and never in the log. A `PresenceState` holds the replica, a
-host-provided display name, a token color index (0 to 11) and an optional
-`PresenceCursor` anchored to an item id. `createPresenceStore({ ttl, now })`
+host-provided display name, a token color index (0 to 11), an optional
+`PresenceCursor` (the caret, `cursor`) anchored to an item id, and an
+optional `anchor` cursor for the other end of a selection. `createPresenceStore({ ttl, now })`
 returns a `PresenceStore` whose `list()` gives the live `PresenceEntry`s;
 entries expire `PRESENCE_TTL` (30 seconds) after their last heartbeat.
 `checkPresence` validates a remote state.

@@ -241,6 +241,24 @@ describe('document operations', () => {
     expect(history.log()[0]?.origin).toBe('local');
     expect(seen).toEqual([1, 2, 3, 4, 5, 6]);
   });
+
+  it('logs non-undoable sync entries off the undo and redo stacks', () => {
+    const history = createDocumentHistory(everyBlock());
+    expect(history.apply([{ op: 'insert-text', id: 'h1', offset: 0, text: 'A' }]).ok).toBe(true);
+    const remote = history.apply([{ op: 'remove-node', id: 'd1' }], {
+      origin: 'remote',
+      undoable: false,
+    });
+    expect(remote.ok).toBe(true);
+    expect(history.log().map((entry) => [entry.kind, entry.origin])).toEqual([
+      ['edit', undefined],
+      ['sync', 'remote'],
+    ]);
+    // Undo reverts the local edit only; the remote removal stays.
+    expect(history.undo()).toBe(true);
+    expect(history.canUndo).toBe(false);
+    expect(history.document.blocks.some((block) => block.id === 'd1')).toBe(false);
+  });
 });
 
 describe('document patches', () => {

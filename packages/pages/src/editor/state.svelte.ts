@@ -7,7 +7,7 @@
  * in the op log a host can persist or forward.
  */
 import { getAnnouncer } from '@texuli/core/announcer';
-import type { EditorBlock, EditorSelection } from '@texuli/core/editor-model';
+import type { EditorBlock, EditorPoint, EditorSelection } from '@texuli/core/editor-model';
 import type { HrefTrust } from '@texuli/core/url-policy';
 import {
   childrenOf,
@@ -51,8 +51,25 @@ export interface PagesSlashRequest {
   replace: boolean;
 }
 
+/**
+ * A synced session behind the editor (`@texuli/pages/collab` provides one
+ * over `@texuli/document/collab`): accepted local transactions go to
+ * `commit`, and undo and redo are the session's (operations that revert
+ * this author's steps only).
+ */
+export interface PagesEditorSync {
+  /** A local transaction was accepted; `group` names a typing run (or `null`). */
+  commit(doc: TexuliDocument, group: string | null): void;
+  undo(): boolean;
+  redo(): boolean;
+  readonly canUndo: boolean;
+  readonly canRedo: boolean;
+}
+
 export interface PagesEditorOptions {
   document: TexuliDocument;
+  /** Prefix of new block ids (default `n`); a synced editor uses one per replica. */
+  idPrefix?: string;
   labels?: PagesLabels;
   /** Polite announcements. Default: `@texuli/core/announcer` for this document. */
   announce?: (message: string) => void;
@@ -105,11 +122,16 @@ export class PagesEditor {
   #redo: UndoGroup[] = [];
   #seq = 0;
   #limit: number;
+  #sync: PagesEditorSync | null = null;
+  #prefix: string;
+  /** Recent external transactions, for mapping carets through them. */
+  #external: { seq: number; operations: readonly DocumentOperation[] }[] = [];
 
   constructor(options: PagesEditorOptions) {
     this.options = options;
     this.labels = options.labels ?? DEFAULT_PAGES_LABELS;
     this.#limit = Math.max(1, Math.floor(options.limit ?? 500));
+    this.#prefix = options.idPrefix ?? 'n';
     this.#history = this.#createHistory(options.document);
     this.doc = options.document;
     this.newId = this.#idSource(options.document);
@@ -129,7 +151,7 @@ export class PagesEditor {
   }
 
   #idSource(doc: TexuliDocument): DocumentIdSource {
-    const source = freshIdSource(doc, 'n');
+    const source = freshIdSource(doc, this.#prefix);
     return () => {
       let id = source();
       while (findNode(this.doc, id)) id = source();
@@ -139,12 +161,84 @@ export class PagesEditor {
 
   get canUndo(): boolean {
     void this.revision;
-    return this.#undo.length > 0;
+    return this.#sync ? this.#sync.canUndo : this.#undo.length > 0;
   }
 
   get canRedo(): boolean {
     void this.revision;
-    return this.#redo.length > 0;
+    return this.#sync ? this.#sync.canRedo : this.#redo.length > 0;
+  }
+
+  /** True while a synced session is connected. */
+  get synced(): boolean {
+    void this.revision;
+    return this.#sync !== null;
+  }
+
+  /**
+   * Connect a synced session (or `null` to disconnect): local transactions
+   * go to it and undo and redo become its. The local undo stack is dropped.
+   */
+  connectSync(sync: PagesEditorSync | null): void {
+    this.#sync = sync;
+    this.#undo = [];
+    this.#redo = [];
+    this.revision += 1;
+  }
+
+  /** Make new block ids with this prefix from now on (a synced editor uses one per replica). */
+  setIdPrefix(prefix: string): void {
+    this.#prefix = prefix;
+    this.newId = this.#idSource(this.doc);
+  }
+
+  /**
+   * Apply a transaction that did not come from this editor (a merged remote
+   * change, a session undo, a restore): logged as a `sync` entry that is
+   * never on the local undo stack. Carets in text rows follow it.
+   */
+  applyExternal(operations: readonly DocumentOperation[], origin = 'remote'): ApplyResult {
+    const result = this.#history.apply(operations, { origin, undoable: false });
+    if (result.ok && operations.length > 0) {
+      const entry = this.#history.log().at(-1);
+      if (entry) {
+        this.#external.push({ seq: entry.seq, operations: entry.operations });
+        if (this.#external.length > 64) this.#external.shift();
+      }
+      if (this.selected && !findNode(this.doc, this.selected)) this.selected = null;
+      this.revision += 1;
+    }
+    return result;
+  }
+
+  /** The newest op log sequence number (0 before any change). */
+  lastSeq(): number {
+    return this.#history.log().at(-1)?.seq ?? 0;
+  }
+
+  /**
+   * Map a point in a text leaf through the external transactions applied
+   * after `since`: text inserted or removed before it shifts it. Text
+   * inserted exactly at the point stays after it (`bias: 'before'`, the
+   * default) or moves it past the insertion (`bias: 'after'`).
+   */
+  mapPoint(point: EditorPoint, since: number, bias: 'before' | 'after' = 'before'): EditorPoint {
+    let offset = point.offset;
+    for (const { seq, operations } of this.#external) {
+      if (seq <= since) continue;
+      for (const operation of operations) {
+        if (operation.op !== 'replace-text' || operation.id !== point.block) continue;
+        let length = 0;
+        for (const part of operation.content)
+          length += part.type === 'break' ? 1 : part.text.length;
+        const insertion = operation.from === operation.to;
+        if (insertion && offset === operation.from) {
+          if (bias === 'after') offset += length;
+        } else if (offset >= operation.to) offset += length - (operation.to - operation.from);
+        else if (offset > operation.from) offset = operation.from + length;
+      }
+    }
+    return offset === point.offset ? point : { block: point.block, offset };
   }
 
   /** The op log of this session (edits, undos and redos), oldest first. */
@@ -157,6 +251,7 @@ export class PagesEditor {
     this.#history = this.#createHistory(doc);
     this.#undo = [];
     this.#redo = [];
+    this.#external = [];
     this.doc = doc;
     this.newId = this.#idSource(doc);
     this.selected = null;
@@ -182,6 +277,11 @@ export class PagesEditor {
       return result;
     }
     if (operations.length === 0) return result;
+    if (this.#sync) {
+      this.#sync.commit(result.document, options.group ?? null);
+      this.revision += 1;
+      return result;
+    }
     const now = (this.options.now ?? Date.now)();
     const last = this.#undo.at(-1);
     const key = options.group ?? null;
@@ -227,11 +327,30 @@ export class PagesEditor {
   }
 
   undo(): boolean {
+    if (this.#sync) return this.#syncStep(this.#sync.undo(), this.labels.undone);
     return this.#replay(this.#undo, this.#redo, () => this.#history.undo(), this.labels.undone);
   }
 
   redo(): boolean {
+    if (this.#sync) return this.#syncStep(this.#sync.redo(), this.labels.redone);
     return this.#replay(this.#redo, this.#undo, () => this.#history.redo(), this.labels.redone);
+  }
+
+  /** After a session undo or redo (applied through `applyExternal`): focus and announce. */
+  #syncStep(done: boolean, message: string): boolean {
+    this.revision += 1;
+    if (!done) {
+      this.say(this.labels.nothingToUndo);
+      return false;
+    }
+    const entry = this.#history.log().at(-1);
+    const target = entry ? touched(entry.operations) : null;
+    if (target) {
+      const row = this.rowOf(target);
+      if (row) this.requestFocus(row, { edge: 'end' });
+    }
+    this.say(message);
+    return true;
   }
 
   /** A node with its parent id, index and siblings. */

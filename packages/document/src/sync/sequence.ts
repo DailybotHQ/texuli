@@ -101,6 +101,8 @@ export class Sequence {
   private readonly marks: MarkEntry[] = [];
   private order: UnitRef[] | null = null;
   private visible: UnitRef[] | null = null;
+  /** Visible units before each full-order position (built with `visible`). */
+  private before: Int32Array | null = null;
 
   /** Find a unit by id. */
   find(id: ItemId): UnitRef | null {
@@ -155,6 +157,7 @@ export class Sequence {
     runs.push(run);
     this.order = null;
     this.visible = null;
+    this.before = null;
   }
 
   /** Whether every unit of the ranges belongs to this sequence. */
@@ -196,6 +199,7 @@ export class Sequence {
       }
     }
     this.visible = null;
+    this.before = null;
   }
 
   hasAnchor(anchor: Anchor): boolean {
@@ -245,8 +249,41 @@ export class Sequence {
   /** Visible units in order. */
   visibleOrder(): UnitRef[] {
     if (this.visible) return this.visible;
-    this.visible = this.fullOrder().filter((ref) => !ref.run.deleted(ref.offset));
-    return this.visible;
+    const order = this.fullOrder();
+    const visible: UnitRef[] = [];
+    const before = new Int32Array(order.length + 1);
+    for (let pos = 0; pos < order.length; pos += 1) {
+      before[pos] = visible.length;
+      const ref = order[pos] as UnitRef;
+      if (!ref.run.deleted(ref.offset)) visible.push(ref);
+    }
+    before[order.length] = visible.length;
+    this.visible = visible;
+    this.before = before;
+    return visible;
+  }
+
+  /**
+   * The visible index a boundary stands for: `before` a unit is the count of
+   * visible units ahead of it, `after` adds the unit when it is visible.
+   * `null` when the anchor names no unit of this sequence.
+   */
+  indexOfAnchor(anchor: Anchor): number | null {
+    const visible = this.visibleOrder();
+    if (anchor === 'start') return 0;
+    if (anchor === 'end') return visible.length;
+    const ref = this.find(anchor.id);
+    if (!ref) return null;
+    const pos = ref.run.pos[ref.offset] as number;
+    const before = (this.before as Int32Array)[pos] as number;
+    if (anchor.side === 'before') return before;
+    return before + (ref.run.deleted(ref.offset) ? 0 : 1);
+  }
+
+  /** Whether the unit with this id is visible (`false` when deleted or unknown). */
+  isVisible(id: ItemId): boolean {
+    const ref = this.find(id);
+    return ref !== null && !ref.run.deleted(ref.offset);
   }
 
   get length(): number {

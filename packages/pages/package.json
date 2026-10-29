@@ -40,21 +40,36 @@
       "svelte": "./src/reader/index.ts",
       "default": "./src/reader/index.ts"
     },
+    "./paged": {
+      "types": "./src/paged/index.ts",
+      "svelte": "./src/paged/index.ts",
+      "default": "./src/paged/index.ts"
+    },
+    "./export": {
+      "types": "./src/export/index.ts",
+      "svelte": "./src/export/index.ts",
+      "default": "./src/export/index.ts"
+    },
+    "./collab": {
+      "types": "./src/collab/index.ts",
+      "svelte": "./src/collab/index.ts",
+      "default": "./src/collab/index.ts"
+    },
     "./styles.css": "./src/styles.css"
   },
   "scripts": {
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/blocks": "0.5.0",
-    "@texuli/core": "0.5.0",
+    "@texuli/blocks": "0.6.0",
+    "@texuli/core": "0.6.0",
     "@texuli/document": "0.0.0",
-    "@texuli/drag": "0.5.0",
-    "@texuli/editor": "0.5.0",
-    "@texuli/player": "0.5.0",
-    "@texuli/primitives": "0.5.0",
-    "@texuli/tokens": "0.5.0",
-    "texuli": "0.5.0"
+    "@texuli/drag": "0.6.0",
+    "@texuli/editor": "0.6.0",
+    "@texuli/player": "0.6.0",
+    "@texuli/primitives": "0.6.0",
+    "@texuli/tokens": "0.6.0",
+    "texuli": "0.6.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

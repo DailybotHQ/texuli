@@ -13,7 +13,8 @@ import {
   type DocumentOperation,
 } from './operations.ts';
 
-export type OpLogKind = 'edit' | 'undo' | 'redo';
+/** `sync`: an entry applied with `undoable: false` (a remote change, a merge correction). */
+export type OpLogKind = 'edit' | 'undo' | 'redo' | 'sync';
 
 export interface OpLogEntry {
   /** 1, 2, 3, … in application order. */
@@ -37,8 +38,15 @@ export interface DocumentHistory {
   readonly document: TexuliDocument;
   readonly canUndo: boolean;
   readonly canRedo: boolean;
-  /** Apply a transaction and record it. */
-  apply(operations: readonly DocumentOperation[], options?: { origin?: string }): ApplyResult;
+  /**
+   * Apply a transaction and record it. `undoable: false` logs it as a
+   * `sync` entry that stays off the undo and redo stacks (remote changes in
+   * a synced session, whose undo is the replica's).
+   */
+  apply(
+    operations: readonly DocumentOperation[],
+    options?: { origin?: string; undoable?: boolean }
+  ): ApplyResult;
   /** Undo the newest edit; false when there is nothing to undo or it no longer applies. */
   undo(): boolean;
   redo(): boolean;
@@ -98,6 +106,8 @@ export function createDocumentHistory(
       return redoStack.length > 0;
     },
     apply(operations, applyOptionsForEntry = {}) {
+      if (applyOptionsForEntry.undoable === false)
+        return record('sync', operations, applyOptionsForEntry.origin);
       const result = record('edit', operations, applyOptionsForEntry.origin);
       if (result.ok && operations.length > 0) {
         undoStack.push(result.inverse);

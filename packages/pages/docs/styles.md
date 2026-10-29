@@ -1,6 +1,7 @@
 # `@texuli/pages/styles.css`
 
-The stylesheet of the editor and the reader. `PageEditor` and `PageReader`
+The stylesheet of the editor and the reader (the paged view adds its own,
+documented with [`PagedView`](paged.md#stylesheet-hooks)). `PageEditor` and `PageReader`
 import it, so a bundler that keeps CSS side effects (`sideEffects:
 ["**/*.css"]`) needs nothing else; import `@texuli/pages/styles.css` yourself
 when yours drops them. Import the token stylesheet once

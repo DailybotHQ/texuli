@@ -70,6 +70,9 @@ Every applied transaction (edits, undos and redos alike) is appended as an
 `OpLogEntry` (`seq`, `kind` as an `OpLogKind`, `operations`, `inverse`,
 `origin`), so a host can persist, replay or forward it; undo applies the
 recorded inverse as a new entry instead of rewinding the log.
+`apply(operations, { undoable: false })` logs a `sync` entry that stays off
+the undo and redo stacks: a synced editor applies remote changes this way,
+and its undo is the replica's (`@texuli/document/collab`).
 `DocumentHistoryOptions` sets the undo `limit` (200), the kept `logLimit`
 (10,000) and `validate`.
 

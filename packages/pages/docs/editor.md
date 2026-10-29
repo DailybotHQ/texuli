@@ -77,8 +77,8 @@ walks the text; other blocks' handles are in the Tab order.
 
 ## State: `PagesEditor`
 
-`new PagesEditor(options)` (`PagesEditorOptions`: `document`, `labels`,
-`announce`, `onChange`, `tier`, `groupMs`, `limit`, `now`) wraps
+`new PagesEditor(options)` (`PagesEditorOptions`: `document`, `idPrefix`,
+`labels`, `announce`, `onChange`, `tier`, `groupMs`, `limit`, `now`) wraps
 `createDocumentHistory` from `@texuli/document/ops`. Reactive fields: `doc`,
 `selected` (block selection), `focus` (a `PagesFocusRequest` a row takes),
 `slash` (a `PagesSlashRequest`), `revision`, `canUndo`, `canRedo`.
@@ -98,6 +98,10 @@ walks the text; other blocks' handles are in the Tab order.
 | `remove(id)`, `moveBy(id, delta)`, `moveTo(id, parent, index)` | Remove and move blocks |
 | `setColumnWidths(id, widths)`, `setAttrs(id, attrs)` | Attribute changes |
 | `openSlash`, `closeSlash`, `select`, `requestFocus`, `focused`, `say`, `typeLabel`, `nameOf` | UI state and names |
+| `connectSync(sync)` | Put the editor on a synced session (a `PagesEditorSync`: `commit`, `undo`, `redo`, `canUndo`, `canRedo`): accepted transactions go to `commit`, undo and redo become the session's; `null` disconnects. `synced` tells whether one is connected |
+| `applyExternal(operations, origin)` | Apply a merged remote change, a session undo or a restore as a `sync` entry of the op log, never on the local undo stack |
+| `setIdPrefix(prefix)` | New block ids start with `prefix` (a synced editor uses one per replica, so concurrent inserts never share an id) |
+| `lastSeq()`, `mapPoint(point, since)` | The newest log sequence number, and a text point moved through the external entries after `since` (text rows keep the caret where it was when a peer types before it) |
 
 ## Text rows
 
@@ -165,8 +169,8 @@ replace a default).
 ## Not done yet
 
 - Text selection across rows, multi-block selection and copy of blocks.
-- Comments, suggestions, history and presence (`collab`, planned), and the
-  paged view and export (`paged`, `export`, planned).
+- Comments, suggestions, history and presence ship in `@texuli/pages/collab`
+  (`CollabEditor`); the paged view and export are `paged` and `export`.
 - Sheet and canvas embeds show their reference until those packages ship.
 - Editing a callout's tone, a code block's language and an embed's payload
   from the UI.

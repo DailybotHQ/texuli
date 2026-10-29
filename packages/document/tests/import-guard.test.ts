@@ -12,7 +12,9 @@ const syncDir = join(srcDir, 'sync');
 const ALLOWED = [
   '@texuli/core/editor-model',
   '@texuli/core/editor-markdown',
+  '@texuli/core/markup',
   '@texuli/core/url-policy',
+  '@texuli/core/zip',
   '@texuli/deck/model',
   '@texuli/deck/schema',
 ];
@@ -141,6 +143,8 @@ describe('importing the engine is inert', () => {
     vi.resetModules();
     const root = await import('../src/index.ts');
     const sync = await import('../src/sync/index.ts');
+    const collab = await import('../src/collab/index.ts');
+    expect(collab.COMMENTS_NODE).toBe('x:comments');
     expect(root.DOCUMENT_FORMAT).toBe('texuli-document');
     expect(sync.syncChannelName('doc')).toBe('texuli-sync/1:doc');
   });

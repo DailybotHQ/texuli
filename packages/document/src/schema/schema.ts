@@ -51,6 +51,7 @@ export const DOCUMENT_CODES = Object.freeze({
   unknownAnchor: 'unknown-anchor',
   anchorRange: 'anchor-range',
   invalidInput: 'invalid-input',
+  pageSize: 'page-size',
 } as const);
 
 export type DocumentCode = (typeof DOCUMENT_CODES)[keyof typeof DOCUMENT_CODES];
@@ -294,13 +295,42 @@ function build(trust: HrefTrust): Schema {
     updated: t.optional(isoTime),
   });
   const margin = t.number({ min: 0, max: 100 });
-  const page = t.object({
-    size: t.enum(PAGE_SIZES as [string, ...string[]]),
-    orientation: t.enum(['portrait', 'landscape']),
-    margins: t.optional(
-      t.object({ top: margin, bottom: margin, inlineStart: margin, inlineEnd: margin })
-    ),
+  const pageSide = t.number({ min: 50, max: 1_000 });
+  const band = t.object({
+    start: t.optional(line(L.title)),
+    center: t.optional(line(L.title)),
+    end: t.optional(line(L.title)),
   });
+  const page = t.refine(
+    t.object({
+      size: t.enum(PAGE_SIZES as [string, ...string[]]),
+      orientation: t.enum(['portrait', 'landscape']),
+      width: t.optional(pageSide),
+      height: t.optional(pageSide),
+      margins: t.optional(
+        t.object({ top: margin, bottom: margin, inlineStart: margin, inlineEnd: margin })
+      ),
+      header: t.optional(band),
+      footer: t.optional(band),
+      breaks: t.optional(t.array(id, { max: L.blocks })),
+    }),
+    {
+      code: C.pageSize,
+      description: 'A custom page has a width and a height; a preset size has neither.',
+      check(value, context) {
+        const custom = value.size === 'custom';
+        const some = value.width !== undefined || value.height !== undefined;
+        if (custom ? value.width === undefined || value.height === undefined : some) {
+          context.issue({
+            message: custom
+              ? 'A custom page needs both width and height (millimetres).'
+              : 'Only a custom page has width and height.',
+            fix: custom ? 'Add width and height, from 50 to 1,000 mm.' : "Set size to 'custom'.",
+          });
+        }
+      },
+    }
+  );
   const offset = t.int({ min: 0, max: L.chars });
   const thread = t.object({
     id,

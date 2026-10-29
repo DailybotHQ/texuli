@@ -2,13 +2,19 @@
 // One text row: an `@texuli/editor` surface over a one-block editor
 // document. Edits come back from the controller and go to the page editor
 // as document operations (`commitText`); a change from outside (an undo, a
-// remote edit) resyncs the controller and keeps the caret when it can.
+// remote edit) resyncs the controller and keeps the caret, moved through
+// the text the change inserted or removed before it.
 import { getAnnouncer } from '@texuli/core/announcer';
 import type { EditorDocument, EditorSelection } from '@texuli/core/editor-model';
 import type { DocumentBlock, DocumentBlockId } from '@texuli/document/model';
 import { equalData } from '@texuli/document/ops';
-import { EditorSurface } from '@texuli/editor/editor';
-import { untrack } from 'svelte';
+import {
+  EditorSurface,
+  readDomSelection,
+  sameSelection,
+  writeDomSelection,
+} from '@texuli/editor/editor';
+import { tick, untrack } from 'svelte';
 import { getPagesContext } from './context.ts';
 import { RowController } from './row-controller.ts';
 import type { PagesFocusRequest } from './state.svelte.ts';
@@ -33,16 +39,74 @@ let surface: { focus(): void } | undefined = $state();
 let root: HTMLDivElement | undefined = $state();
 /** The document block this controller last matched. */
 let synced: DocumentBlock = untrack(() => block);
+/** The op log entry the controller last matched (carets map through later external entries). */
+let seen = untrack(() => editor.lastSeq());
 
 function say(message: string): void {
   if (editor.options.announce) editor.options.announce(message);
   else if (typeof document !== 'undefined') getAnnouncer(document).announce(message, 'polite');
 }
 
+/** The last input type, so a correction keeps the caret on the side the edit went. */
+let lastInput = '';
+/** Which side of text inserted at the caret the next resync keeps it on. */
+let bias: 'before' | 'after' = 'before';
+
 function commit(doc: EditorDocument): void {
+  const before = editor.lastSeq();
   const next = editor.commitText(block.id, doc.blocks, controller.state.selection);
-  if (next) synced = next;
-  else resync(block, null);
+  if (!next) {
+    resync(block, null);
+    seen = editor.lastSeq();
+    return;
+  }
+  if (editor.lastSeq() > before + 1) {
+    // A synced session answered the edit with corrections (suggestion mode
+    // keeps struck text visible). `synced` stays on the old block, so the
+    // effect below resyncs once this input is done, the caret moved through
+    // the corrections only (Backspace lands before struck text, Delete after).
+    seen = before + 1;
+    bias = lastInput === 'deleteContentForward' ? 'after' : 'before';
+    return;
+  }
+  synced = next;
+  seen = editor.lastSeq();
+}
+
+/** A caret or selection moved through the external edits applied since `seen`. */
+function mapped(selection: EditorSelection, bias: 'before' | 'after' = 'before'): EditorSelection {
+  if (selection.kind !== 'text') return selection;
+  return {
+    kind: 'text',
+    anchor: editor.mapPoint(selection.anchor, seen, bias),
+    focus: editor.mapPoint(selection.focus, seen, bias),
+  };
+}
+
+/**
+ * Bring the controller's selection up to the DOM's before the surface acts:
+ * a key pressed right after a click or a caret move can arrive before the
+ * `selectionchange` that would tell it, and Backspace would then join rows
+ * from a stale caret.
+ */
+function syncSelection(): void {
+  if (!root || controller.composing) return;
+  const read = readDomSelection(root, document.getSelection());
+  if (read && !sameSelection(read, controller.state.selection)) controller.select(read);
+}
+
+/** Keys and input types reach the row before the surface handles them (an attachment). */
+function inputs(node: HTMLElement): () => void {
+  const onbeforeinput = (event: Event) => {
+    lastInput = (event as InputEvent).inputType ?? '';
+    syncSelection();
+  };
+  node.addEventListener('beforeinput', onbeforeinput, { capture: true });
+  node.addEventListener('keydown', syncSelection, { capture: true });
+  return () => {
+    node.removeEventListener('beforeinput', onbeforeinput, { capture: true });
+    node.removeEventListener('keydown', syncSelection, { capture: true });
+  };
 }
 
 const controller = new RowController(
@@ -69,8 +133,16 @@ const controller = new RowController(
 /** Put the controller back on the document's block, keeping the caret when its block survives. */
 function resync(current: DocumentBlock, selection: EditorSelection | null): void {
   controller.replace(rowEditorDocument(current));
-  if (selection && selection.kind === 'text' && containsId(current, selection.focus.block))
+  if (selection && selection.kind === 'text' && containsId(current, selection.focus.block)) {
     controller.select(selection);
+    // Rewriting a text node collapses a live DOM caret in it to its start;
+    // once the surface has rendered the new text, put the caret back.
+    if (root?.contains(document.activeElement))
+      tick().then(() => {
+        if (root?.contains(document.activeElement))
+          writeDomSelection(root, controller.state.selection, document.getSelection());
+      });
+  }
 }
 
 // Document → controller: a change that did not come from this controller.
@@ -80,8 +152,13 @@ $effect(() => {
     if (current === synced) return;
     synced = current;
     const blocks = controller.doc.blocks;
-    if (blocks.length === 1 && equalData(blocks[0], current)) return;
-    resync(current, controller.state.selection);
+    if (blocks.length === 1 && equalData(blocks[0], current)) {
+      seen = editor.lastSeq();
+      return;
+    }
+    resync(current, mapped(controller.state.selection, bias));
+    bias = 'before';
+    seen = editor.lastSeq();
   });
 });
 
@@ -176,7 +253,7 @@ function caretAtLeafEdge(edge: 'start' | 'end'): boolean {
 }
 </script>
 
-<div class="tx-pages-text" data-block-type={block.type} bind:this={root} {@attach keys}>
+<div class="tx-pages-text" data-block-type={block.type} bind:this={root} {@attach keys} {@attach inputs}>
   <EditorSurface
     bind:this={surface}
     {controller}

@@ -18,9 +18,13 @@ const SUBPATH_DOCS: Record<string, { doc: string; entry: string }> = {
   './schema': { doc: 'docs/schema.md', entry: 'src/schema/index.ts' },
   './ops': { doc: 'docs/ops.md', entry: 'src/ops/index.ts' },
   './markdown': { doc: 'docs/markdown.md', entry: 'src/markdown/index.ts' },
+  './paged': { doc: 'docs/paged.md', entry: 'src/paged/index.ts' },
+  './docx': { doc: 'docs/docx.md', entry: 'src/docx/index.ts' },
+  './pdf': { doc: 'docs/pdf.md', entry: 'src/pdf/index.ts' },
   './sync': { doc: 'docs/sync.md', entry: 'src/sync/index.ts' },
+  './collab': { doc: 'docs/collab.md', entry: 'src/collab/index.ts' },
 };
-const PLANNED = ['paged', 'docx', 'pdf'];
+const PLANNED: string[] = [];
 
 function exportedNames(path: string, seen = new Set<string>()): string[] {
   if (seen.has(path)) return [];
@@ -71,6 +75,7 @@ describe('document documentation', () => {
     const root = exportedNames('src/index.ts');
     expect(root.length).toBeGreaterThan(60);
     expect(root).not.toContain('createReplica');
+    expect(root).not.toContain('createDocumentSync');
   });
 
   it('marks the planned subpaths as planned and does not export them', () => {

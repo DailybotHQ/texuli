@@ -31,9 +31,14 @@ stack.
 - `DocumentMeta`: `title`, and optional `description`, `locale` (BCP 47),
   `dir`, `authors`, `tags`, `created` and `updated` (ISO 8601).
 - `PageSettings`: a `PageSize` (`PAGE_SIZES`: `a4`, `a5`, `letter`,
-  `legal`), an orientation and optional margins in millimetres
-  (`top`, `bottom`, `inlineStart`, `inlineEnd`). The paged view that uses
-  them (`@texuli/document/paged`) is planned.
+  `legal`, `custom`), an orientation, the `width` and `height` of a
+  `custom` page (50 to 1,000 mm), optional margins in millimetres (`top`,
+  `bottom`, `inlineStart`, `inlineEnd`), a `header` and a `footer` (each a
+  `PageBand`: `start`, `center` and `end` text where `{page}`, `{pages}`
+  and `{title}` are replaced), and `breaks`, the ids of the top-level
+  blocks that start a new page (explicit page breaks; unknown ids are
+  ignored). The paged view, print and the DOCX and PDF writers use them
+  (`@texuli/document/paged`, `docx` and `pdf`).
 - `DocumentAnnotations`: `CommentThread`s, each with a `CommentAnchor` (a
   block id, optionally a UTF-16 range of its text), a quoted text, a status
   and `CommentMessage`s. A thread whose block is gone is kept as orphaned.

@@ -225,13 +225,31 @@ export interface DocumentMeta {
   updated?: string;
 }
 
-export type PageSize = 'a4' | 'a5' | 'letter' | 'legal';
+export type PageSize = 'a4' | 'a5' | 'letter' | 'legal' | 'custom';
 
-/** Page settings for the paged view and print (`@texuli/document/paged` is planned). Millimetres. */
+/**
+ * A header or footer line: text at the inline start, center and inline end.
+ * `{page}`, `{pages}` and `{title}` are replaced with the page number, the
+ * page count and the document title; any other text is kept as is.
+ */
+export interface PageBand {
+  start?: string;
+  center?: string;
+  end?: string;
+}
+
+/** Page settings for the paged view, print and the DOCX and PDF writers (`@texuli/document/paged`). Millimetres. */
 export interface PageSettings {
   size: PageSize;
   orientation: 'portrait' | 'landscape';
+  /** The portrait width and height of a `custom` page (only with `size: 'custom'`), 50 to 1,000 mm. */
+  width?: number;
+  height?: number;
   margins?: { top: number; bottom: number; inlineStart: number; inlineEnd: number };
+  header?: PageBand;
+  footer?: PageBand;
+  /** Explicit page breaks: the top-level blocks that start a new page (unknown ids are ignored). */
+  breaks?: DocumentBlockId[];
 }
 
 /** Where a comment points: a block, or a UTF-16 range of a text block's text (a break counts 1). */

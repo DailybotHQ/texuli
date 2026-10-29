@@ -44,14 +44,30 @@
       "types": "./src/markdown/index.ts",
       "default": "./src/markdown/index.ts"
     },
+    "./paged": {
+      "types": "./src/paged/index.ts",
+      "default": "./src/paged/index.ts"
+    },
+    "./docx": {
+      "types": "./src/docx/index.ts",
+      "default": "./src/docx/index.ts"
+    },
+    "./pdf": {
+      "types": "./src/pdf/index.ts",
+      "default": "./src/pdf/index.ts"
+    },
     "./sync": {
       "types": "./src/sync/index.ts",
       "default": "./src/sync/index.ts"
+    },
+    "./collab": {
+      "types": "./src/collab/index.ts",
+      "default": "./src/collab/index.ts"
     }
   },
   "dependencies": {
-    "@texuli/core": "0.5.0",
-    "@texuli/deck": "0.5.0"
+    "@texuli/core": "0.6.0",
+    "@texuli/deck": "0.6.0"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

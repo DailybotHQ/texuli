@@ -1,6 +1,6 @@
 {
   "name": "@texuli/core",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Texels: framework-free behavior and policy that every Texuli component is built from.",
   "keywords": [
@@ -42,6 +42,7 @@
     "./keyboard": "./src/keyboard/index.ts",
     "./layer-stack": "./src/layer-stack/index.ts",
     "./lazy": "./src/lazy/index.ts",
+    "./markup": "./src/markup/index.ts",
     "./motion": "./src/motion/index.ts",
     "./motion/spring": "./src/motion/spring.ts",
     "./overlay": "./src/overlay/index.ts",
@@ -53,7 +54,8 @@
     "./roving": "./src/roving/index.ts",
     "./scroll-lock": "./src/scroll-lock/scroll-lock.ts",
     "./tabbable": "./src/tabbable/index.ts",
-    "./url-policy": "./src/url-policy/index.ts"
+    "./url-policy": "./src/url-policy/index.ts",
+    "./zip": "./src/zip/index.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

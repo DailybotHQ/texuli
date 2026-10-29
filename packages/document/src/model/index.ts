@@ -72,6 +72,7 @@ export type {
   ListBlock,
   ListItem,
   MediaBlock,
+  PageBand,
   PageLinkBlock,
   PageSettings,
   PageSize,
