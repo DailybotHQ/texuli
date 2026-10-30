@@ -1,9 +1,10 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import { tick, untrack } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { Avatar } from 'texuli/avatar';
 import { Button } from 'texuli/button';
-import { type ClassValue, cx } from 'texuli/cx';
+import { type ClassValue, chainHandlers, cx } from 'texuli/cx';
 import { groupMessages } from './group-messages.ts';
 import { DEFAULT_MESSAGE_LIST_LABELS, type MessageListLabels } from './labels.ts';
 import MessageText from './MessageText.svelte';
@@ -15,7 +16,7 @@ import type {
 } from './types.ts';
 import { MessageVirtualWindow, type VirtualWindow } from './virtual-window.ts';
 
-interface Props {
+interface OwnProps {
   messages: ChatMessage[];
   currentUserId?: string;
   /** Optional renderer for attachments or application-owned rich content. */
@@ -51,6 +52,12 @@ interface Props {
   /** The scrolling log element (bindable). */
   ref?: HTMLElement | null;
 }
+/**
+ * Other attributes (`id`, `data-*`, `style`, handlers) land on the log
+ * element; a caller `onscroll` runs first and the list's own scroll
+ * bookkeeping always runs after it.
+ */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'>;
 
 const uid = $props.id();
 
@@ -72,6 +79,8 @@ let {
   onAnchorChange,
   class: className,
   ref = $bindable(null),
+  onscroll: callerScroll,
+  ...rest
 }: Props = $props();
 
 let viewport = $state<HTMLDivElement | null>(null);
@@ -543,6 +552,7 @@ $effect(() => {
 <!-- The focusable log provides keyboard scrolling and polite announcements for appended messages. -->
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
+  {...rest}
   bind:this={viewport}
   class={cx('tx-chat-message-list', className)}
   data-tx-chat-message-list
@@ -552,7 +562,7 @@ $effect(() => {
   aria-live="polite"
   aria-relevant="additions text"
   tabindex="0"
-  onscroll={onScroll}
+  onscroll={chainHandlers(callerScroll, onScroll)}
 >
   {#if messages.length === 0}
     <p class="tx-chat-message-list__empty">{emptyText}</p>

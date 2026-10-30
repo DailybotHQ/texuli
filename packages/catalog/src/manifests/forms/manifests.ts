@@ -88,7 +88,7 @@ export const buttonManifest = /* @__PURE__ */ manifestData({
   ],
   a11y: [
     'Real button or link element with an accessible name',
-    'Busy state exposes aria-busy and disables further activation',
+    'Busy state exposes aria-busy and aria-disabled, keeps focus and blocks further activation',
     'Rejected href schemes render as a non-interactive control',
   ],
   props: propsFrom(buttonPropNames, {

@@ -67,6 +67,12 @@ Sizes: `sm` \| `md` \| `lg`. Variants: `outline` \| `soft`.
 
 - Empty query shows `recentItems` under `recentLabel` (default “Recent”).
 - Non-empty query calls `search` (sync or Promise) after `debounceMs`.
+  While the promise is pending the list is `aria-busy` and a polite
+  `role="status"` shows `loadingLabel` (default “Searching…”).
+- `Command.Root` takes `loading` for a search you run yourself (without
+  `onSearch`): `Command.Loading` shows its status, `Command.Empty` hides and
+  the list is `aria-busy` while it is `true`. The palette passes its own
+  pending state this way.
 - ⌘/Ctrl+K toggles the palette when `shortcut` is true (default).
 - Selecting an item closes the dialog and restores focus to the opener.
 

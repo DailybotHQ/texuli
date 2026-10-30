@@ -42,8 +42,8 @@ the same pieces are safe to hand to a machine.
 > provenance; `latest` and `next` point to the newest), including the first
 > release of `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets`. It is not a stable
 > release: under 0.x a new minor may contain breaking changes, and 1.0.0 will
-> be the first stable release. The workspace packages stay `private: true`
-> ([RELEASE](docs/RELEASE.md)).
+> be the first stable release. `0.9.0` is in development and not on npm yet.
+> The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 
 </div>
 
@@ -192,11 +192,11 @@ every verified command.
 
 ## Honest boundaries
 
-- **No stable release yet.** The 25 published packages are on npm as
-  `0.8.0`, a pre-1.0 release (`npm install texuli`; `latest` and `next` both
-  point to it). Under 0.x a new minor (`0.9.0`) may contain breaking changes,
-  so pin the exact version or use `^0.8.0`; 1.0.0 will be the first stable
-  release.
+- **No stable release yet.** The 25 published packages are on npm in the
+  0.8 line, a pre-1.0 release (`npm install texuli`; `latest` and `next` both
+  point to it). Under 0.x a new minor (`0.9.0`, in development) may contain
+  breaking changes, so pin the exact version or use `^0.8.0`; 1.0.0 will be
+  the first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with
   `pnpm dev`.

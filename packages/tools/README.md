@@ -82,9 +82,23 @@ llms helpers.
 `npx texuli-llms --out <dir>` writes `llms.txt`, `llms-full.txt` and
 one Markdown page per catalog component from the published manifests.
 
-Not shipped in this package: the read-only MCP server over the catalog and
-themes exists in the repository source, but has no export and no published
-command yet.
+In development for `0.9.0`, not in any published version: the read-only
+MCP server, exported as `@texuli/tools/mcp` and started with `texuli mcp`
+(stdio). MCP hosts install it with `npx -y @texuli/mcp`, the thin
+`@texuli/mcp` package first published in `0.9.0`; host setup is in its
+[README](https://github.com/DailybotHQ/texuli/blob/main/packages/mcp/README.md).
+A remote endpoint at texuli.com is planned. The server speaks MCP `2025-11-25` (negotiating the
+three earlier versions) through a transport-independent handler: tools with
+output schemas and structured results, resources (the catalog, component
+manifests and pages, themes, the deck and document schemas), prompts
+(`build-ui`, `theme-blueprint`, `convert-deck`) and completions; see
+[mcp.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/mcp.md).
+Its tools come from an operations registry (`./ops`, in development and
+planned for `0.9.0`, not in any published version): one declaration per
+operation (`catalog.search`, `component.get`, `blueprint.validate`,
+`theme.preview`, `deck.run` …)
+with JSON Schema input and output, limits and examples; see
+[ops.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md).
 
 **Deck commands (in development, new in `0.4.0`).** `@texuli/tools` adds
 a `@texuli/tools/deck` subpath and two bins, `texuli` (its `deck`
@@ -141,6 +155,8 @@ document and writes a headless PDF with the owned writer; see
 - Golden set and scorer: [golden.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/golden.md)
 - Deck commands, the `texuli deck` CLI and the `deck` MCP tool (new in `0.4.0`): [deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md)
 - Document commands, the `texuli document` CLI and the `document` MCP tool (new in `0.7.0`): [document.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/document.md)
+- The operations registry behind the MCP tools and the CLI (in development, not released): [ops.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md)
+- The MCP protocol layer: tools, resources, prompts and completions (in development, not released): [mcp.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/mcp.md)
 - Email-safe HTML from blueprints (new in `0.8.0`): [email.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/email.md)
 - Print and headless PDF of blueprints (new in `0.8.0`): [print.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/print.md)
 

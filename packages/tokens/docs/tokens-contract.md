@@ -15,6 +15,30 @@
 
 CSS custom properties use the **`--tx-*`** prefix (`tokenToCssVar`, `semanticTokenToCssVar`).
 
+## Token contract v2 (unreleased, ADR-020)
+
+Contract v2 adds two tiers on top of the three above, additively:
+
+- **System families** (`@texuli/tokens/system`): space, size, type roles,
+  elevation, shape (`--tx-shape-radius-*`), layers, opacity, layout, icons,
+  status and data-viz, 151 tokens. Their defaults reproduce today's rendered
+  values. No stylesheet declares them (`base.css` is unchanged, 0 B eager):
+  CSS reads `systemVar(name)`, for example `var(--tx-z-modal, 60)`, which
+  carries the default as its fallback. Themes emit the data-viz family.
+- **Component tokens** (`@texuli/tokens/components`): 333 tokens for 48
+  components, each defaulting to a system or theme token. No stylesheet
+  declares them: CSS reads `componentVar(component, key)`, for example
+  `var(--tx-button-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))`,
+  so a component token exists on a page only when a theme, design system or
+  host sets it. Design systems set component tokens on their scope element
+  (`data-tx-theme` or `data-tx-scope`). `checkTokenReads(source)` fails any
+  read of a system or component token whose fallback differs from the registry.
+
+`THEME_JSON_SCHEMA.definitions.systemTokens` lists the system names, and
+`getComponentTokensJsonSchema()` describes the component vocabulary. No
+component stylesheet reads the new tokens yet; that is the adoption tasks'
+work. The full generated tables are in [tokens-components.md](tokens-components.md).
+
 ## Theme document
 
 Agents emit a JSON theme that `validateTheme` / `defineTheme` accept:

@@ -1,6 +1,6 @@
 {
   "name": "@texuli/tokens",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "description": "The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS.",
   "keywords": [
@@ -32,8 +32,10 @@
       "default": "./src/css/base.css"
     },
     "./build": "./src/build/index.ts",
+    "./components": "./src/components/index.ts",
     "./contract": "./src/contract/index.ts",
     "./css": "./src/css/index.ts",
+    "./data-viz": "./src/data-viz/index.ts",
     "./forced-colors": "./src/forced-colors/index.ts",
     "./forced-colors.css": "./src/forced-colors/forced-colors.css",
     "./generator": "./src/generator/index.ts",
@@ -43,7 +45,10 @@
     "./motion": "./src/motion/index.ts",
     "./no-flash": "./src/no-flash/index.ts",
     "./palette": "./src/palette/index.ts",
+    "./renames": "./src/renames/index.ts",
+    "./renames.json": "./src/renames/renames.json",
     "./style-presets": "./src/style-presets/index.ts",
+    "./system": "./src/system/index.ts",
     "./tailwind": "./src/tailwind/index.ts",
     "./tailwind/preset.css": "./src/tailwind/preset.css"
   },

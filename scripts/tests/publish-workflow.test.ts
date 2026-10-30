@@ -71,6 +71,8 @@ describe('publish workflow pre-flight', () => {
     expect(loopDirs(latest.run)).toEqual(waves);
     // The refusal no longer lives inside publish(), mid-wave.
     expect(publish.run).not.toContain('0.0.0');
+    // @texuli/mcp pins @texuli/tools exactly, so it publishes right after it (ADR-019).
+    expect(waves.indexOf('mcp')).toBe(waves.indexOf('tools') + 1);
     // Provenance and the next dist-tag stay on every publish.
     expect(publish.run).toContain('npm publish "$tarball" --tag next --access public --provenance');
   });

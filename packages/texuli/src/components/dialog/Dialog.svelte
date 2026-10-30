@@ -128,9 +128,12 @@ const contentClass = $derived(
   })
 );
 
+/**
+ * The primitive root owns `open` through `bind:open` and has already written
+ * the new value when it calls this, so this only reports the change: one
+ * `onOpenChange` per open-state change, bound or not (G87).
+ */
 function setOpen(next: boolean): void {
-  if (open === next) return;
-  open = next;
   onOpenChange?.(next);
 }
 </script>

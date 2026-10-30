@@ -15,6 +15,10 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are still installed from the 0.8 line on npm; a Texuli
+  checkout whose manifests say `0.9.0` is ahead of npm (0.9.0 is in
+  development).
+
 ## [0.3.3] — 2026-10-30
 
 ### Changes

@@ -3,6 +3,7 @@ import ComboboxContract from './ComboboxContract.svelte';
 import CommandContract from './CommandContract.svelte';
 import DisplayContract from './DisplayContract.svelte';
 import FormsContract from './FormsContract.svelte';
+import LayoutsContract from './LayoutsContract.svelte';
 import MenusContract from './MenusContract.svelte';
 import NavigationContract from './NavigationContract.svelte';
 import NumberPinContract from './NumberPinContract.svelte';
@@ -35,18 +36,25 @@ export const EXCLUDED: Record<string, string> = {
 };
 
 /**
- * Layouts (`texuli/layouts/*`) are not under this contract yet: in this wave
- * `packages/texuli/src/layouts/**` belongs to another task (T-std-size), and
- * most layouts take neither `ref` nor rest attributes today. Planned: the
- * layout contract lands with the next layouts task. Listed by prefix, so a
- * new layout is excluded with the same reason.
+ * Layouts (`texuli/layouts/*`) are not all under this contract yet: the
+ * standalone parts a host composes (AppShell, SplitView, BottomNav,
+ * MobileHeader, MobileAppFrame) are cases below (G93); the page layouts that
+ * take neither `ref` nor rest attributes today stay excluded by prefix, so a
+ * new layout is excluded with the same reason until it joins. Planned: the
+ * remaining layouts join in a follow-up task.
  */
 export const EXCLUDED_PREFIXES: Record<string, string> = {
-  'layouts/': 'planned: layouts join the contract in a follow-up task (owned elsewhere this wave)',
+  'layouts/': 'planned: the page layouts join the contract in a follow-up task',
 };
 
 /** One case per exported rendering component, each mounted in its family harness. */
 export const CASES: ContractCase[] = [
+  // Layout parts a host composes on its own (G93): `ref` and rest on the root.
+  { key: 'layouts/shells/AppShell', harness: LayoutsContract },
+  { key: 'layouts/app/SplitView', harness: LayoutsContract },
+  { key: 'layouts/mobile/BottomNav', harness: LayoutsContract },
+  { key: 'layouts/mobile/MobileHeader', harness: LayoutsContract },
+  { key: 'layouts/mobile/MobileAppFrame', harness: LayoutsContract },
   { key: 'components/alert/Alert', harness: DisplayContract },
   { key: 'components/alert/ToneIcon', harness: DisplayContract },
   { key: 'components/alert/AlertSurface', harness: DisplayContract },

@@ -1,3 +1,4 @@
+export { type FieldLabelContext, getFieldLabelContext, useFieldLabel } from './context.ts';
 export { default as Description } from './Description.svelte';
 export { default as Field } from './Field.svelte';
 export { default as FieldError } from './FieldError.svelte';

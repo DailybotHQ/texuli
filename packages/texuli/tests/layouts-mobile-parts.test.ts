@@ -89,6 +89,32 @@ describe('MobileAppFrame empty sticky footer (G68)', () => {
   });
 });
 
+describe('MobileAppFrame unstyled sticky footer (G95)', () => {
+  afterEach(cleanup);
+
+  it('keeps the footer slot but drops its strip styling with stickyFooterUnstyled', async () => {
+    for (const unstyled of [false, true]) {
+      render(Harness, { props: { items, footerUnstyled: unstyled } });
+      await tick();
+      const strip = document.querySelector<HTMLElement>('[data-tx-mobile-frame-footer]');
+      expect(strip?.classList.contains('tx-mobile-frame__footer'), `unstyled=${unstyled}`).toBe(
+        true
+      );
+      expect(strip?.hasAttribute('data-unstyled'), `unstyled=${unstyled}`).toBe(unstyled);
+      expect(screen.getByRole('button', { name: 'Save' })).toBeTruthy();
+      cleanup();
+    }
+    const css = readFileSync(
+      join(process.cwd(), 'packages/texuli/src/layouts/mobile/mobile.css'),
+      'utf8'
+    );
+    const rule = /\.tx-mobile-frame__footer\[data-unstyled\]\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
+    for (const declaration of [/padding:\s*0/, /border:\s*0/, /background:\s*none/]) {
+      expect(rule).toMatch(declaration);
+    }
+  });
+});
+
 function within(root: HTMLElement, role: 'heading', name: string): boolean {
   return Array.from(root.querySelectorAll('h1,h2,h3')).some(
     (node) => node.textContent?.trim() === name && role === 'heading'

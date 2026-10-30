@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from 'texuli/cx';
 import Composer from '../composer/Composer.svelte';
 import type { ComposerLabels } from '../composer/labels.ts';
@@ -8,7 +9,7 @@ import type { MessageListLabels } from './labels.ts';
 import MessageList from './MessageList.svelte';
 import type { ChatMessage, ChatMessageActions, ChatReadingAnchor } from './types.ts';
 
-interface Props {
+interface OwnProps {
   messages: ChatMessage[];
   currentUserId?: string;
   typing?: string[];
@@ -49,7 +50,11 @@ interface Props {
   streaming?: boolean;
   onStop?: () => void;
   class?: ClassValue;
+  /** The thread's root `section` (bindable). */
+  ref?: HTMLElement | null;
 }
+/** Other attributes (`id`, `aria-*`, `data-*`, `style`, handlers) land on the root `section`. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps | 'children'>;
 
 let {
   messages,
@@ -78,10 +83,12 @@ let {
   streaming = false,
   onStop,
   class: className,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
 </script>
 
-<section class={cx('tx-chat-thread', className)} data-tx-chat-thread>
+<section {...rest} bind:this={ref} class={cx('tx-chat-thread', className)} data-tx-chat-thread>
   {@render header?.()}
   <MessageList
     {messages}

@@ -196,6 +196,7 @@ export {
   type FieldControl,
   FieldError,
   type FieldErrorMap,
+  type FieldLabelContext,
   type FieldOrientation,
   Form,
   fieldErrorClass,
@@ -203,11 +204,13 @@ export {
   fieldRootClass,
   formClass,
   formDataToRecord,
+  getFieldLabelContext,
   isValidErrorMap,
   Label,
   labelClass,
   setNativeCustomValidity,
   toFieldErrorMap,
+  useFieldLabel,
   type ValidateResult,
 } from './components/field/index.ts';
 export {
@@ -614,6 +617,8 @@ export {
   TEXULI_MESSAGES_EN,
   useMessages,
 } from './i18n/index.ts';
+// The "caller first" handler order of every component (docs/STANDARDS.md), also in `texuli/cx`.
+export { chainHandlers, composeHandlers } from './internal/handlers.ts';
 export {
   AUTH_SETTINGS_LAYOUTS,
   AuthSplitHostLayout,

@@ -96,6 +96,10 @@
       "gzip": 57024,
       "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 54080 -> 57024 B, measured + 4% after four new manifests (time-field, data-cohort-table, data-notification-inbox, data-filter-builder) and the linear-time rich text parser and sink scan; measured 54,821 B."
     },
+    "@texuli/catalog/manifests/all": {
+      "gzip": 45312,
+      "note": "PLAN_011 T-ops-core (ADR-017): the edge-safe static list of every manifest group, imported by the remote MCP and apps/agent instead of fs discovery; it bundles every group by design (the root barrel is 54 KiB). Measured 43,531 B gzip; cap = measured + 4% rounded up to 64 B."
+    },
     "@texuli/catalog/*": {
       "gzip": 8192,
       "note": "Default per-subpath cap (lead decision 2026-10-23) so a new lazy entry is budgeted from its first commit; exact entries override it and `pnpm size --update` tightens."
@@ -297,8 +301,8 @@
       "note": "Default per-view cap (lead decision 2026-10-23): a data view ships its framework-free engine (sort, collation, filter compiler, validation) with its component; measured grid-core 10,342 B."
     },
     "@texuli/data/grid-core": {
-      "gzip": 13632,
-      "note": "PLAN_010 T-gaps-53-69 (G55): pointer row activation, the static table mode, breakpoint column hiding and the query-aware empty snippet, over the shared checkout where T-gaps-48-52 also changed the grid filter engine it bundles; measured 13,416 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B. G86 (Protoyard): list motion loads lazily (2026-10-30): 14016 -> 13632 B, measured + 4% rounded up to 64 B; measured 13,082 B (13,416 B before); the view takes list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change, so the seams, the contract and the provider context leave its initial graph (never loaded with motion={false}, level none or reduced motion)."
+      "gzip": 14336,
+      "note": "PLAN_010 T-gaps-53-69 (G55): pointer row activation, the static table mode, breakpoint column hiding and the query-aware empty snippet, over the shared checkout where T-gaps-48-52 also changed the grid filter engine it bundles; measured 13,416 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B. G86 (Protoyard): list motion loads lazily (2026-10-30): 14016 -> 13632 B, measured + 4% rounded up to 64 B; measured 13,082 B (13,416 B before); the view takes list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change, so the seams, the contract and the provider context leave its initial graph (never loaded with motion={false}, level none or reduced motion). PLAN_011 T-gaps-87-95 (G92, Protoyard): table-mode rowFocusable rows, a searchPredicate and the opt-in numbered pager (page buttons from @texuli/primitives/pagination getPageTokens, about 0.23 KiB, plus their markup and styles) (2026-10-30): 13632 -> 14336 B, measured + 4% rounded up to 64 B; measured 13,736 B (12.95 KiB with rowFocusable and searchPredicate, before the pager)."
     },
     "@texuli/data/board": {
       "gzip": 12864,
@@ -524,8 +528,8 @@
       "note": "FIX-port-compact: buildLibraryTheme without defineTheme in prod path. Measured ~5.71 KiB. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 5,904 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 6144 -> 6080 B, tightened to measured + 4% (measured 5,843 B)."
     },
     "@texuli/tokens/contract": {
-      "gzip": 7616,
-      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 7,347 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 7680 -> 7616 B, tightened to measured + 4% (measured 7,288 B)."
+      "gzip": 8192,
+      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 7,347 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 7680 -> 7616 B, tightened to measured + 4% (measured 7,288 B). PLAN_011 T-tokens-v2 (ADR-020): 7616 -> 8192 B, measured + 4% after THEME_JSON_SCHEMA lists the token contract v2 system vocabulary (definitions.systemTokens, 151 names); measured 7,874 B."
     },
     "@texuli/tokens/css": {
       "gzip": 6111,
@@ -542,6 +546,27 @@
     "@texuli/tokens/palette": {
       "gzip": 4352,
       "note": "FIX-tokens-palette-subpath: OKLCH/contrast/scale/chart derivation only; no library port/expand. Measured 4,283 B (pnpm size)."
+    },
+    "@texuli/tokens/base.css": {
+      "gzip": 64,
+      "cssGzip": 1792,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new exact row (was the @texuli/tokens/* default, which caps JS only); measured 0 B gzip and 1,680 B CSS gzip. Token contract v2 adds no declaration here: system and component tokens are read with their default as the fallback (systemVar, componentVar), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/components": {
+      "gzip": 8768,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the component token registry (48 components covering the 41 styled texuli subpaths, 333 tokens), componentVar and the checkTokenReads guard over the system fallback model, and its JSON Schema. A tooling and authoring entry: component CSS uses the generated var() expressions, not this module. Measured 8,409 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/data-viz": {
+      "gzip": 4032,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for complete chart tokens for any theme (deriveChartTokens over the palette); measured 3,838 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/renames": {
+      "gzip": 448,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the machine-readable rename list and its JSON Schema (empty list); measured 424 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/system": {
+      "gzip": 4352,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the token contract v2 system families with defaults and descriptions, and systemVar for the fallback model; measured 4,164 B, cap = measured + 4% rounded up to 64 B."
     },
     "texuli": {
       "gzip": 217920,

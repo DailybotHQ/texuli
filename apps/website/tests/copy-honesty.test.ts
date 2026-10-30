@@ -16,6 +16,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { isLineVersion, releaseLine } from '../../../scripts/release-line.ts';
 
 const siteRoot = join(import.meta.dirname, '..');
 const srcRoot = join(siteRoot, 'src');
@@ -120,15 +121,21 @@ describe('site copy honesty', () => {
   });
 
   it('never calls a published package unpublished', () => {
-    // All 25 packages of the 0.8 line are on npm (16 at 0.8.0, 9 patch releases), @texuli/forms,
+    // All 25 packages are on npm in the published line of docs/RELEASE.md
+    // (the 0.8 line while 0.9.0 is in development), @texuli/forms,
     // @texuli/canvas and @texuli/sheets included (first published in 0.8.0).
-    // Not on npm: the private 0.0.0 examples workspace.
+    // Their manifests carry that line or the version in development. Not on
+    // npm: the private 0.0.0 examples workspace, and @texuli/mcp, first
+    // published with 0.9.0 (ADR-019), so copy may still say it is not on npm.
+    const line = releaseLine();
+    const firstInDevelopment = new Set(['mcp']);
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
+      if (firstInDevelopment.has(dir)) return false;
       try {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')
         ) as { version?: string };
-        return /^0\.8\.\d+$/.test(pkg.version ?? '');
+        return isLineVersion(pkg.version ?? '', line);
       } catch {
         return false;
       }

@@ -8,6 +8,7 @@ let {
   backHref,
   nested = false,
   footer = true,
+  footerUnstyled = false,
 }: {
   items: BottomNavItem[];
   onBack?: (event: MouseEvent) => void;
@@ -15,11 +16,13 @@ let {
   nested?: boolean;
   /** The sticky footer snippet renders its button (else it renders nothing). */
   footer?: boolean;
+  /** Pass `stickyFooterUnstyled` (G95). */
+  footerUnstyled?: boolean;
 } = $props();
 </script>
 
 {#snippet frame()}
-  <MobileAppFrame mainId="screen">
+  <MobileAppFrame mainId="screen" stickyFooterUnstyled={footerUnstyled}>
     {#snippet header()}
       <MobileHeader title="Deal 42" subtitle="Orbit Labs" {backHref} {onBack} backTarget="Deals">
         {#snippet actions()}<button type="button">Edit</button>{/snippet}

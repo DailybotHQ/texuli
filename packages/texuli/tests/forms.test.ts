@@ -30,12 +30,14 @@ import BannerRefHarness from './BannerRefHarness.svelte';
 import FieldHarness from './FieldHarness.svelte';
 import ApiRefHarness from './fixtures/ApiRefHarness.svelte';
 import { API_REF_KINDS } from './fixtures/api-ref-kind.ts';
+import ButtonFormHarness from './fixtures/ButtonFormHarness.svelte';
 import ButtonHarness from './fixtures/ButtonHarness.svelte';
 import ClassValueHarness from './fixtures/ClassValueHarness.svelte';
 import CodeHarness from './fixtures/CodeHarness.svelte';
 import ComboboxHarness from './fixtures/ComboboxHarness.svelte';
 import Fixture from './fixtures/ControlAriaFixture.svelte';
 import CopyButtonHarness from './fixtures/CopyButtonHarness.svelte';
+import FieldLabelHarness from './fixtures/FieldLabelHarness.svelte';
 import FileUploadHarness from './fixtures/FileUploadHarness.svelte';
 import FormControlsHarness from './fixtures/FormControlsHarness.svelte';
 import IconButtonHarness from './fixtures/IconButtonHarness.svelte';
@@ -126,6 +128,26 @@ describe('control-aria', () => {
       expect(control.getAttribute('aria-describedby') ?? '').toContain('probe-desc');
       expect(control.getAttribute('data-probe')).toBe('control');
     });
+  });
+});
+
+describe('field label context (G91)', () => {
+  afterEach(cleanup);
+
+  it('exports useFieldLabel and getFieldLabelContext from texuli/field', async () => {
+    const field = (await import('../src/components/field/index.ts')) as Record<string, unknown>;
+    const root = (await import('../src/index.ts')) as Record<string, unknown>;
+    for (const name of ['useFieldLabel', 'getFieldLabelContext']) {
+      expect(typeof field[name], name).toBe('function');
+      expect(root[name], name).toBe(field[name]);
+    }
+  });
+
+  it('names a custom control group from the Field label, and nothing outside a Field', () => {
+    render(FieldLabelHarness);
+    const [inside, outside] = screen.getAllByTestId('custom-group');
+    expect(within(document.body).getByRole('group', { name: 'Priority' })).toBe(inside);
+    expect(outside?.hasAttribute('aria-labelledby')).toBe(false);
   });
 });
 
@@ -319,17 +341,50 @@ describe('button', () => {
         props: { label: 'Submit', onclick },
       });
       const button = getByRole('button', { name: 'Submit' });
+      button.focus();
       await fireEvent.click(button);
-      expect(onclick).toHaveBeenCalled();
+      expect(onclick).toHaveBeenCalledTimes(1);
       expect(button.getAttribute('aria-busy')).toBe('true');
       expect(container.querySelector('[data-tx-button-spinner]')).toBeTruthy();
-      expect((button as HTMLButtonElement).disabled).toBe(true);
+      // G94: pending keeps focus (aria-disabled, not native disabled) and
+      // suppresses further clicks until the promise settles.
+      expect((button as HTMLButtonElement).disabled).toBe(false);
+      expect(button.getAttribute('aria-disabled')).toBe('true');
+      expect(document.activeElement).toBe(button);
+      await fireEvent.click(button);
+      expect(onclick).toHaveBeenCalledTimes(1);
       resolve();
       await promise;
       await vi.waitFor(() => {
         expect(button.getAttribute('aria-busy')).toBeNull();
-        expect((button as HTMLButtonElement).disabled).toBe(false);
+        expect(button.hasAttribute('aria-disabled')).toBe(false);
       });
+      await fireEvent.click(button);
+      expect(onclick).toHaveBeenCalledTimes(2);
+    });
+
+    it('a pending submit button keeps focus and blocks a second submit (G94)', async () => {
+      let resolve!: () => void;
+      const onclick = vi.fn(
+        () =>
+          new Promise<void>((r) => {
+            resolve = r;
+          })
+      );
+      const onsubmit = vi.fn();
+      const { getByRole } = render(ButtonFormHarness, { props: { onclick, onsubmit } });
+      const button = getByRole('button', { name: 'Send' });
+      button.focus();
+      await fireEvent.click(button);
+      expect(onsubmit).toHaveBeenCalledTimes(1);
+      expect(document.activeElement).toBe(button);
+      await fireEvent.click(button);
+      expect(onsubmit).toHaveBeenCalledTimes(1);
+      expect(onclick).toHaveBeenCalledTimes(1);
+      resolve();
+      await vi.waitFor(() => expect(button.hasAttribute('aria-disabled')).toBe(false));
+      await fireEvent.click(button);
+      expect(onsubmit).toHaveBeenCalledTimes(2);
     });
 
     it('renders safe href anchors and blocks unsafe ones', () => {

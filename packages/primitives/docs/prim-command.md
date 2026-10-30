@@ -37,7 +37,10 @@ substring scoring (exact match, prefix, then substring). `shouldFilter={false}`
 leaves result visibility to the caller. `onSearch` optionally starts a debounced
 async search; the list reports `aria-busy`, `Command.Loading` is exposed while
 the latest request is pending, and stale request completions cannot clear the
-latest loading state. The host controls its own dynamic item snippets and can
+latest loading state. A caller that runs its own search (no `onSearch`)
+passes `loading` to the root: while it is `true`, `Command.Loading` shows,
+`Command.Empty` hides and the list is `aria-busy`, combined with the root's
+own `onSearch` state. The host controls its own dynamic item snippets and can
 render `Command.Empty` for a zero-result state.
 
 Arrow Up and Down move the active option, wrapping by default (`loop={false}`

@@ -30,6 +30,8 @@ type OwnProps = {
   /** Stick to the top of the scroll container. Default `true`. */
   sticky?: boolean;
   class?: ClassValue;
+  /** The `header` element (bindable). */
+  ref?: HTMLElement | null;
 };
 type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps>;
 
@@ -45,6 +47,7 @@ let {
   actions,
   sticky = true,
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 const msg = useMessages();
@@ -62,6 +65,7 @@ const backName = $derived(backTarget ? `${backLabel}: ${backTarget}` : undefined
 
 <header
   {...rest}
+  bind:this={ref}
   class={cx(
     'tx-mobile-layout__header tx-mobile-header',
     !sticky && 'tx-mobile-header--static',

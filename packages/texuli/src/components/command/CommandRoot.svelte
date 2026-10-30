@@ -14,6 +14,11 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   size?: CommandSize;
   variant?: CommandVariant;
   label?: string;
+  /**
+   * Busy state from a search you run yourself (no `onSearch`): `CommandLoading`
+   * shows its polite status, `CommandEmpty` hides and the list is `aria-busy`.
+   */
+  loading?: boolean;
   loop?: boolean;
   shouldFilter?: boolean;
   debounceMs?: number;
@@ -28,6 +33,7 @@ let {
   size = 'md',
   variant = 'outline',
   label: labelProp,
+  loading = false,
   loop = true,
   shouldFilter = true,
   debounceMs = 0,
@@ -53,6 +59,7 @@ const classes = $derived(
 <div bind:this={ref} class={classes} data-tx-command data-size={size} data-variant={variant} {...rest}>
   <PrimitiveRoot
     {label}
+    {loading}
     {loop}
     {shouldFilter}
     {debounceMs}

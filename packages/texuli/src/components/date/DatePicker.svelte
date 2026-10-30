@@ -2,7 +2,7 @@
 import type { CalendarDate } from '@texuli/primitives/calendar';
 import { type DateInvalidHandler, DatePicker as Primitive } from '@texuli/primitives/date-picker';
 import type { HTMLAttributes } from 'svelte/elements';
-import { joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
+import { isAriaInvalid, joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { getFieldLabelContext } from '../field/context.ts';
 import CalendarIcon from './CalendarIcon.svelte';
@@ -48,6 +48,8 @@ interface OwnProps {
   size?: DateSize;
   labels?: DateLabels;
   class?: ClassValue;
+  /** Classes for the bordered control (`.tx-date__control`: segments and button); `class` styles the wrapper. */
+  controlClass?: ClassValue;
 }
 
 /** Field attributes (`aria-*`, `data-*`, handlers) reach the field group; the rest the wrapper. */
@@ -79,6 +81,7 @@ let {
   size = 'md',
   labels,
   class: className,
+  controlClass,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
@@ -93,6 +96,8 @@ const showLabel = $derived(!hideLabel && !field);
 const uid = $props.id();
 const descriptionId = `${uid}-description`;
 const errorId = `${uid}-error`;
+// Invalid from the own `error` or from `aria-invalid` (a Field's error) (G90).
+const invalid = $derived(Boolean(error) || isAriaInvalid(split.control['aria-invalid']));
 const describedBy = $derived(
   [description ? descriptionId : '', error ? errorId : ''].filter(Boolean).join(' ') || undefined
 );
@@ -103,7 +108,7 @@ const describedBy = $derived(
   {...split.wrapper}
   class={dateFieldClass({ size, class: cx(className) })}
   data-tx-date
-  data-invalid={error ? 'true' : undefined}
+  data-invalid={invalid ? 'true' : undefined}
   data-disabled={disabled ? 'true' : undefined}
 >
   {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}{#if isRequired}<span class="tx-date__required"> *</span>{/if}</span>{/if}
@@ -121,7 +126,7 @@ const describedBy = $derived(
     {...labels ? { labels } : {}}
     {...onValueChange ? { onValueChange } : {}}
   >
-    <div class="tx-date__control">
+    <div class={cx('tx-date__control', controlClass)}>
       <Primitive.Field
       {...split.control}
       {...id ? { inputId: id } : {}}
@@ -131,7 +136,7 @@ const describedBy = $derived(
         {...name ? { name } : {}}
         required={isRequired}
         aria-describedby={joinIds(describedBy, split.control['aria-describedby'] as string | undefined)}
-        aria-invalid={error ? 'true' : (split.control['aria-invalid'] as 'true' | undefined)}
+        aria-invalid={invalid ? 'true' : undefined}
       />
       <Primitive.Trigger class="tx-date__trigger"><CalendarIcon /></Primitive.Trigger>
     </div>

@@ -31,7 +31,7 @@ exist at runtime.
 | Kind | Details |
 | --- | --- |
 | `@custom-variant dark` | `[data-tx-mode="dark"]` and legacy `.dark` |
-| `@theme inline` | Colors (50 semantic roles + interaction + charts), radius scale, fonts, text sizes, `--spacing` × density, durations, shadows |
+| `@theme inline` | Colors (50 semantic roles + interaction + charts), radius scale, fonts, text sizes, `--spacing` from `--tx-space-unit` (0.25rem × density, so `p-4` equals `--tx-space-4`), durations, shadows |
 | Safe-area utilities | `pt-safe`, `pb-safe`, `ps-safe`, `pe-safe`, `px-safe`, `py-safe` using **logical** properties and RTL-swapped `env()` insets |
 | App / touch | `h-app`, `min-h-app`, `max-h-app`, `min-h-touch` (`--tx-target-size`, default 44px) |
 
