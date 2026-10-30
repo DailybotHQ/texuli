@@ -61,7 +61,7 @@ the branch `release/0.9.0`:
   catalog projection refresh (PLAN_011 T-gaps-87-95: the button pending
   note and the gap props that reach the agent catalog manifests); no
   vocabulary is removed. The `0.8.0 → 0.9.0` migration only stamps `spec`;
-  the digest `2e8a5c134c52af5b3d89a3f4c3291e3979760b06f21eba9f34d22ca57f876906`
+  the digest `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d`
   is pinned in `packages/spec/versions.json`, and the generated TypeScript
   and Kotlin are regenerated. `validateDraft` migrates a `0.8.0` envelope and
   stamps `spec: "0.9.0"`; hosts that compare the `spec` string need to
@@ -1183,7 +1183,7 @@ the package-to-package contract outside this repository.
 | `@texuli/drag`, `@texuli/workflows` | `0.8.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
 | `@texuli/mcp` | not on npm; first published as `0.9.0` | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
 | Blueprint spec | `0.8.0`, digest `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.8.0`. |
-| Blueprint spec on `release/0.9.0` (in development, not on npm) | `0.9.0`, digest `2e8a5c134c52af5b3d89a3f4c3291e3979760b06f21eba9f34d22ca57f876906` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.9.0` stamp. Ships only when `@texuli/spec@0.9.0` publishes. |
+| Blueprint spec on `release/0.9.0` (in development, not on npm) | `0.9.0`, digest `` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.9.0` stamp. Ships only when `@texuli/spec@0.9.0` publishes. |
 | Blueprint spec in `@texuli/spec@0.7.0` | `0.7.0`, digest `43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2` | The previous release's generated sources carry the `0.7.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.6.0` | `0.6.0`, digest `37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc` | The `0.6.0` release's generated sources carry the `0.6.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.5.0` | `0.5.0`, digest `1ba15e8b082f68140c4b2768b8fd69c9f760e655dd117fac756f356a71525b2d` | The `0.5.0` release's generated sources carry the `0.5.0` stamp. |

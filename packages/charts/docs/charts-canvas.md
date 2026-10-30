@@ -13,6 +13,16 @@ A cartesian chart's `renderer` prop decides: `'svg'` always uses SVG marks,
 canvas at 5,000 source points (`CANVAS_POINT_THRESHOLD`). `useCanvas(mode,
 pointCount)` applies the same rule.
 
+## Placement
+
+The canvas layer covers the plot's own box, never the whole figure: the same
+inline-start corner, width and aspect ratio as the SVG with the axes. An
+interactive chart's plot stops at its layout width (640 pixels), so in a wider
+figure the canvas stops there too and the marks stay on the axes and under
+the keyboard explorer; a static chart (`interactive={false}`) scales its SVG
+and canvas up together. `tests/e2e/charts.spec.ts` checks the two boxes match
+in a 1,062-pixel figure.
+
 ## What stays accessible
 
 - The canvas is `aria-hidden`; the chart keeps its named SVG `role="img"` with

@@ -21,6 +21,7 @@ import {
   zoomDomain,
 } from '../src/interaction/model.ts';
 import TableToggle from '../src/interaction/TableToggle.svelte';
+import MotionPlot from './harness/MotionPlot.svelte';
 
 afterEach(cleanup);
 
@@ -283,6 +284,54 @@ describe('InteractivePlot', () => {
       await fireEvent.pointerLeave(app);
       expect(document.querySelector('[data-chart-tooltip]')).toBeNull();
     })();
+  });
+});
+
+describe('InteractivePlot reduced motion (G98)', () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it('follows a MotionProvider reducedMotion override, else the OS preference', async () => {
+    // [provider reducedMotion, OS prefers reduce, expected data-reduced-motion]
+    const cases: [boolean | undefined | 'none', boolean, string | null][] = [
+      ['none', true, 'true'],
+      ['none', false, null],
+      [undefined, true, 'true'],
+      [undefined, false, null],
+      [true, false, 'true'],
+      [true, true, 'true'],
+      [false, true, null],
+      [false, false, null],
+    ];
+    for (const [reducedMotion, osReduce, expected] of cases) {
+      vi.stubGlobal('matchMedia', (query: string) => ({
+        matches: osReduce && query.includes('reduce'),
+        media: query,
+        addEventListener() {},
+        removeEventListener() {},
+      }));
+      if (reducedMotion === 'none')
+        render(InteractivePlot, {
+          label: 'Motion plot',
+          series,
+          width: 480,
+          height: 220,
+          plot,
+          formatters,
+        });
+      else render(MotionPlot, { reducedMotion, series, formatters });
+      const plotEl = document.querySelector('[data-chart-plot]');
+      expect(
+        plotEl?.getAttribute('data-reduced-motion') ?? null,
+        `${reducedMotion}/${osReduce}`
+      ).toBe(expected);
+      cleanup();
+    }
+    // A host toggle on the provider applies to a mounted plot.
+    const toggled = render(MotionPlot, { reducedMotion: false, series, formatters });
+    const attr = () =>
+      document.querySelector('[data-chart-plot]')?.getAttribute('data-reduced-motion') ?? null;
+    expect(attr()).toBeNull();
+    await toggled.rerender({ reducedMotion: true, series, formatters });
+    expect(attr()).toBe('true');
   });
 });
 
