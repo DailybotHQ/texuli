@@ -367,9 +367,9 @@
       "note": "Owner decision 2026-10-27 (PLAN_007 T-sortable-binding): the Svelte binding carries the general-purpose @texuli/drag sortable engine (session, sortable, gesture, collision, auto-scroll) plus keyboard, announcements, FLIP and overlay preview; measured 15,475 B + 4% headroom (CSS 458 B)."
     },
     "@texuli/primitives/alert-dialog": {
-      "gzip": 13312,
+      "gzip": 14528,
       "cssGzip": 192,
-      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 155 B)."
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 155 B). PLAN_011 T-scope-portals (ADR-023): 13312 -> 14528 B, measured + 4% rounded up to 64 B; measured 13,939 B (12.96 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "@texuli/primitives/calendar": {
       "gzip": 6016,
@@ -406,9 +406,9 @@
       "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 29,016 B. DatePicker composes DateField, Calendar (@internationalized/date) and a position-only Popover (modal features now load lazily); measured 28,354 B after FIX-popover-modal-lazy (was 31,938 B). The 24 KiB target is not met: Calendar and DateField carry the locale and calendar logic (lead decision 2026-10-23). PLAN_010 T-release-060 (2026-10-29): 29696 -> 23488 B, tightened to measured + 4% (measured 22,544 B). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 0 B, tightened to measured + 4% (measured 0 B)."
     },
     "@texuli/primitives/dialog": {
-      "gzip": 13632,
+      "gzip": 14336,
       "cssGzip": 192,
-      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_009 (2026-10-28, owner-consented release plan): 12288 -> 12736 B, measured + 4% after the layer stack and focus-exempt regions (G4) and handler composition (G26); measured about 12,216 B; Linux CI measures about 0.2% above macOS. PLAN_010 T-motion-adopt (ADR-013): 12736 -> 13632 B, measured + 4% rounded up to 64 B after motionHooks on Content and Overlay: the exit hold and the backdrop presence that keep a closing dialog painted, inert, while its exit plays; measured 13,055 B (12,371 B at HEAD). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 157 B)."
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_009 (2026-10-28, owner-consented release plan): 12288 -> 12736 B, measured + 4% after the layer stack and focus-exempt regions (G4) and handler composition (G26); measured about 12,216 B; Linux CI measures about 0.2% above macOS. PLAN_010 T-motion-adopt (ADR-013): 12736 -> 13632 B, measured + 4% rounded up to 64 B after motionHooks on Content and Overlay: the exit hold and the backdrop presence that keep a closing dialog painted, inert, while its exit plays; measured 13,055 B (12,371 B at HEAD). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 157 B). PLAN_011 T-scope-portals (ADR-023): 13632 -> 14336 B, measured + 4% rounded up to 64 B; measured 13,730 B (12.75 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "@texuli/primitives/accordion": {
       "gzip": 4672,
@@ -456,9 +456,9 @@
       "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): 20480 -> 15104 B, tightened to measured + 4% (measured 14,469 B). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 0 B, tightened to measured + 4% (measured 0 B)."
     },
     "@texuli/primitives/sheet": {
-      "gzip": 16384,
+      "gzip": 17600,
       "cssGzip": 192,
-      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 157 B)."
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 157 B). PLAN_011 T-scope-portals (ADR-023): 16384 -> 17600 B, measured + 4% rounded up to 64 B; measured 16,863 B (15.81 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "@texuli/primitives/slider": {
       "gzip": 4544,
@@ -591,16 +591,16 @@
       "note": "Styled component over the floating primitive(s) combobox: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 28672 -> 22080 B, tightened to measured + 4% (measured 21,207 B)."
     },
     "texuli/command": {
-      "gzip": 21952,
-      "note": "Styled component over the floating primitive(s) command: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 24576 -> 21952 B, tightened to measured + 4% (measured 21,054 B)."
+      "gzip": 23104,
+      "note": "Styled component over the floating primitive(s) command: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 24576 -> 21952 B, tightened to measured + 4% (measured 21,054 B). PLAN_011 T-scope-portals (ADR-023): 21952 -> 23104 B, measured + 4% rounded up to 64 B; measured 22,168 B (20.98 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/date": {
       "gzip": 30144,
       "note": "Styled Calendar, DatePicker and DateRangePicker over the 28 KiB DatePicker primitive plus presets and styling; measured 31,244 B (lead decision 2026-10-23). PLAN_010 T-release-060 (2026-10-29): 32768 -> 30144 B, tightened to measured + 4% (measured 28,934 B)."
     },
     "texuli/dialog": {
-      "gzip": 19968,
-      "note": "Styled component over the floating primitive(s) dialog, alert-dialog: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_009 (2026-10-28, owner-consented release plan): 17408 -> 18176 B, measured + 4% after the overlay layer stack and focus-exempt regions (G4), ref and rest props (G5) and handler composition (G26); measured 17,431 B in CI on Linux (16.99 KiB locally). PLAN_010 T-motion-adopt (ADR-013): 18176 -> 19968 B, measured + 4% rounded up to 64 B after the motion prop on Dialog and AlertDialog (texuli/motion seam; the runtime is a lazy chunk) over the primitive motion hooks; measured 19,155 B (17,699 B at HEAD)."
+      "gzip": 20928,
+      "note": "Styled component over the floating primitive(s) dialog, alert-dialog: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_009 (2026-10-28, owner-consented release plan): 17408 -> 18176 B, measured + 4% after the overlay layer stack and focus-exempt regions (G4), ref and rest props (G5) and handler composition (G26); measured 17,431 B in CI on Linux (16.99 KiB locally). PLAN_010 T-motion-adopt (ADR-013): 18176 -> 19968 B, measured + 4% rounded up to 64 B after the motion prop on Dialog and AlertDialog (texuli/motion seam; the runtime is a lazy chunk) over the primitive motion hooks; measured 19,155 B (17,699 B at HEAD). PLAN_011 T-scope-portals (ADR-023): 19968 -> 20928 B, measured + 4% rounded up to 64 B; measured 20,110 B (18.97 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/layouts/content": {
       "gzip": 13760,
@@ -615,8 +615,8 @@
       "note": "FIX-layout-register-subpaths: register-only dashboard-grid. PLAN_010 T-release-060 (2026-10-29): 1536 -> 576 B, tightened to measured + 4% (measured 537 B)."
     },
     "texuli/layouts/host/drawer": {
-      "gzip": 15360,
-      "note": "Layout drawer composes the Dialog primitive with the layout chrome CSS for mobile navigation; measured 13,240 B (lead decision 2026-10-23). PLAN_010 T-motion-adopt (ADR-013): 14336 -> 15360 B, measured + 4% rounded up to 64 B after the Dialog primitive motion hooks it composes; measured 14,718 B (14,051 B at HEAD)."
+      "gzip": 16128,
+      "note": "Layout drawer composes the Dialog primitive with the layout chrome CSS for mobile navigation; measured 13,240 B (lead decision 2026-10-23). PLAN_010 T-motion-adopt (ADR-013): 14336 -> 15360 B, measured + 4% rounded up to 64 B after the Dialog primitive motion hooks it composes; measured 14,718 B (14,051 B at HEAD). PLAN_011 T-scope-portals (ADR-023): 15360 -> 16128 B, measured + 4% rounded up to 64 B; measured 15,455 B (14.43 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/layouts/marketing/register": {
       "gzip": 576,
@@ -643,8 +643,8 @@
       "note": "Styled component over the floating primitive(s) select: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 24576 -> 17216 B, tightened to measured + 4% (measured 16,532 B)."
     },
     "texuli/sheet": {
-      "gzip": 20480,
-      "note": "Styled component over the floating primitive(s) sheet: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+      "gzip": 21568,
+      "note": "Styled component over the floating primitive(s) sheet: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_011 T-scope-portals (ADR-023): 20480 -> 21568 B, measured + 4% rounded up to 64 B; measured 20,720 B (19.62 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/sidebar": {
       "gzip": 21056,
@@ -659,8 +659,8 @@
       "note": "PLAN_010 T-motion-adopt (ADR-013): new subpath; the motion prop contract, MotionProvider and the static seams (the runtime on @texuli/core/motion loads lazily, about 5.3 KiB gzip). Measured 1,867 B gzip, cap = measured + 4% rounded up to 64 B."
     },
     "texuli/toast": {
-      "gzip": 12672,
-      "note": "Styled component over the floating primitive(s) toast: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 20480 -> 12672 B, tightened to measured + 4% (measured 12,135 B)."
+      "gzip": 13248,
+      "note": "Styled component over the floating primitive(s) toast: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 20480 -> 12672 B, tightened to measured + 4% (measured 12,135 B). PLAN_011 T-scope-portals (2026-10-30): the toast bundles the scoped portal resolution through the overlay engine; CI on Linux measured 12,681 B; cap = measured + 4% rounded up to 64 B."
     },
     "texuli/tooltip": {
       "gzip": 15808,

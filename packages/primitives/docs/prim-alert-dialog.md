@@ -14,7 +14,7 @@
 
 - `Root` — controlled `open` (`bind:open`), `onOpenChange`, `mode`, `container`, `initialFocus`, `onDismissRequest`, preventable `onCloseAutoFocus`, and `stack` (a `LayerStack` to register on instead of the page-wide one).
 - `Trigger` — button with `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`, `data-state`.
-- `Portal` — moves children to `document.body` (or `Root.container` in contained mode).
+- `Portal` — moves children to `document.body` (or `Root.container` in contained mode). Inside a token scope (`[data-tx-scope]`) it uses a scoped portal root that mirrors the scope's theme, placed again before each open (ADR-023); `to` picks a target, `scope={null}` keeps the plain `body` portal.
 - `Overlay` — full-viewport backdrop; pointer presses do **not** close the alert.
 - `Content` — `role="alertdialog"` surface with focus trap and no outside dismiss.
 - `Title` / `Description` — accessible name and description ids.

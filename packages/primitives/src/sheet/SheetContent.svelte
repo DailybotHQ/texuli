@@ -10,6 +10,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { getDialogContext, getDialogPortalContext } from '../dialog/context.ts';
 import { ensurePositioned } from '../internal/backdrop.ts';
 import { createMotionHold, type OverlayMotionHooks } from '../internal/motion-hold.ts';
+import { placeBeforeOpen } from '../internal/portal-scope.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { drawerContext } from './context.ts';
 import { dismissDirection, releaseTarget, resolveSheetSide, type SheetSide } from './model.ts';
@@ -232,7 +233,7 @@ function attachContent(node: HTMLDivElement): () => void {
     // (inside a modal the core still exempts it), and nothing is anchored.
     modal ? { focusScope: createFocusScope, inert: getInertRegistry, scrollLock: lockScroll } : {}
   );
-  context.registerController(controller);
+  context.registerController(placeBeforeOpen(controller, portal));
   return () => {
     controller.destroy();
     context.registerController(undefined);

@@ -46,6 +46,8 @@ export type DialogPortalContext = {
    * focus) only then: moving a focused node blurs it.
    */
   readonly placed: boolean;
+  /** Place the wrapper again (before opening): follows a token scope applied after mount. */
+  refresh(): void;
 };
 
 export function getDialogContext(): DialogContext {

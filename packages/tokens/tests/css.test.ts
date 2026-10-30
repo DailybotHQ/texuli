@@ -98,11 +98,23 @@ describe('theme CSS', () => {
       expect(preview.dataset.txMode).toBe('dark');
       expect(preview.style.getPropertyValue('--tx-background')).toBe('#111827');
       expect(root.dataset.txTheme).toBeUndefined();
+      // ADR-023: the element is a token scope that overlay portals follow.
+      expect(preview.getAttribute('data-tx-scope')).toBe('');
+      expect(root.hasAttribute('data-tx-scope')).toBe(false);
 
       clearTheme(preview);
+      expect(preview.hasAttribute('data-tx-scope')).toBe(false);
       expect(preview.dataset.txTheme).toBeUndefined();
       expect(preview.dataset.txMode).toBeUndefined();
       expect(preview.style.getPropertyValue('--tx-background')).toBe('');
+
+      // A host-named scope keeps its value through apply and clear.
+      const named = document.createElement('section');
+      named.setAttribute('data-tx-scope', 'studio-preview');
+      applyTheme(named, { theme: theme(), mode: 'light' });
+      expect(named.getAttribute('data-tx-scope')).toBe('studio-preview');
+      clearTheme(named);
+      expect(named.getAttribute('data-tx-scope')).toBe('studio-preview');
     }
   });
 });

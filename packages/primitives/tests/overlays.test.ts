@@ -14,6 +14,7 @@ import MenubarFixture from './menubar-fixture.svelte';
 import NavigationMenuFixture from './navigation-menu-fixture.svelte';
 import PortalHarness from './PortalHarness.svelte';
 import PopoverFixture from './popover-fixture.svelte';
+import ScopedPortalHarness from './ScopedPortalHarness.svelte';
 import Fixture from './sheet-fixture.svelte';
 import ToastContainedFixture from './toast-contained-fixture.svelte';
 import ToastFixture from './toast-fixture.svelte';
@@ -951,6 +952,59 @@ describe('portal', () => {
       const root = portalRoot(doc);
       const frame = doc.querySelector('[data-custom-target]');
       expect(root?.parentElement).toBe(frame);
+    });
+  });
+
+  describe('token scopes (ADR-023)', () => {
+    afterEach(() => getInertRegistry().clear());
+
+    /** The scoped portal root around `selector`, or null. */
+    function scopedRoot(doc: Document, selector: string): HTMLElement | null {
+      return doc.querySelector(selector)?.closest<HTMLElement>('[data-tx-portal-root]') ?? null;
+    }
+
+    it('Portal, Dialog.Portal and AlertDialog.Portal mount in a root that mirrors the scope', async () => {
+      const view = render(ScopedPortalHarness);
+      const doc = view.container.ownerDocument;
+      await tick();
+      for (const selector of [
+        '[data-generic-portaled]',
+        '[data-dialog-portal]',
+        '[data-alert-dialog-portal]',
+      ]) {
+        const root = scopedRoot(doc, selector);
+        expect(root, selector).not.toBeNull();
+        expect(root?.parentElement).toBe(doc.body);
+        expect(root?.dataset.txTheme).toBe('ocean');
+        expect(root?.dataset.txMode).toBe('dark');
+        expect(root?.style.getPropertyValue('--tx-background')).toBe('rgb(1, 2, 3)');
+        expect(doc.querySelector('[data-scope-a]')?.contains(doc.querySelector(selector))).toBe(
+          false
+        );
+      }
+      // Focus still moves into the open dialog (the portal placed it first).
+      await waitFor(() =>
+        expect(doc.activeElement?.closest('[role="dialog"], [role="alertdialog"]')).not.toBeNull()
+      );
+
+      await fireEvent.click(doc.querySelector('[data-toggle-mode]') as HTMLElement);
+      await waitFor(() =>
+        expect(scopedRoot(doc, '[data-dialog-portal]')?.dataset.txMode).toBe('light')
+      );
+
+      view.unmount();
+      expect(doc.querySelector('[data-tx-portal-root]')).toBeNull();
+    });
+
+    it('scope={null} keeps the body portal', async () => {
+      const view = render(ScopedPortalHarness, { props: { optOut: true } });
+      const doc = view.container.ownerDocument;
+      await tick();
+      expect(doc.querySelector('[data-tx-portal-root]')).toBeNull();
+      expect(doc.querySelector('[data-dialog-portal]')?.parentElement).toBe(doc.body);
+      expect(
+        doc.querySelector('[data-generic-portaled]')?.closest('[data-tx-portal]')?.parentElement
+      ).toBe(doc.body);
     });
   });
 });
