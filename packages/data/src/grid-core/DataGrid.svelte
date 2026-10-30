@@ -59,8 +59,19 @@ interface Props {
   /** Selected row ids (`bind:selected`), in row order. */
   selected?: string[];
   onSelectionChange?: (selected: string[]) => void;
-  /** Names a row for its checkbox (default: the first column's text). */
+  /**
+   * Names a row for its checkbox, and a `rowFocusable` row itself (default:
+   * the first column's text).
+   */
   rowLabel?: (row: T) => string;
+  /**
+   * `table` mode only: each body row joins the tab order (`tabindex="0"`,
+   * named by `rowLabel`), and Enter or Space on the focused row calls
+   * `onRowActivate`. Native table semantics stay (no `role="grid"`, no roving
+   * cell focus); controls inside a row keep their own keys. Default `false`;
+   * ignored in `grid` mode, which has its own keyboard model.
+   */
+  rowFocusable?: boolean;
   /** Enter on a body cell (and a click on the row with `activateOnClick`). */
   onRowActivate?: (row: T) => void;
   /**
@@ -139,6 +150,7 @@ let {
   selected = $bindable([]),
   onSelectionChange,
   rowLabel,
+  rowFocusable = false,
   onRowActivate,
   activateOnClick = false,
   mode = 'grid',
@@ -167,6 +179,8 @@ let {
 
 const text = $derived(resolveDataGridLabels(labels));
 const isGrid = $derived(mode !== 'table');
+/** Table mode with keyboard-reachable rows (G92). */
+const focusableRows = $derived(!isGrid && rowFocusable);
 
 // Breakpoint column hiding: a column with `hideBelow` leaves the grid while
 // the viewport is narrower. Every column shows during SSR and before mount.
@@ -372,6 +386,15 @@ function handleRowClick(event: MouseEvent, row: T): void {
   onRowActivate(row);
 }
 
+/** Enter or Space on a focused `rowFocusable` row (not a control inside it) activates it. */
+function handleRowKeydown(event: KeyboardEvent, row: T): void {
+  if (!focusableRows || event.defaultPrevented || event.target !== event.currentTarget) return;
+  if (event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  onRowActivate?.(row);
+}
+
 function handleKeydown(event: KeyboardEvent): void {
   if (!isGrid) return;
   const position = positionOf(event.target);
@@ -574,6 +597,14 @@ function handleFocusIn(event: FocusEvent): void {
             aria-selected={selectable && isGrid ? isSelected : undefined}
             data-tx-row-id={id}
             data-activatable={activateOnClick && onRowActivate ? '' : undefined}
+            {...focusableRows
+              ? {
+                  tabindex: 0,
+                  'aria-label': labelOf(row),
+                  'data-focusable': '',
+                  onkeydown: (event: KeyboardEvent) => handleRowKeydown(event, row),
+                }
+              : {}}
             onclick={(event: MouseEvent) => handleRowClick(event, row)}
           >
             {#if selectable}

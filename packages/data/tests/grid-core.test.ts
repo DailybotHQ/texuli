@@ -655,3 +655,69 @@ describe('DataGrid adoption gaps (G55)', () => {
     expect(screen.getByTestId('empty').textContent).toBe('Nothing: 0');
   });
 });
+
+describe('DataGrid table mode keyboard row activation (G92)', () => {
+  afterEach(cleanup);
+
+  const people = [
+    { id: 'p1', name: 'Ada Example', email: 'ada@example.com' },
+    { id: 'p2', name: 'Bea Example', email: 'bea@example.com' },
+  ];
+  type Person = (typeof people)[number];
+  const columns: DataGridColumn<Person>[] = [
+    { key: 'name', header: 'Name', type: 'text' },
+    { key: 'email', header: 'Email', type: 'text' },
+  ];
+  const base = { columns, rows: people, getRowId: (row: Person) => row.id, caption: 'People' };
+
+  it('rowFocusable puts each body row in the tab order; Enter and Space activate it', async () => {
+    const activated: string[] = [];
+    render(DataGrid<Person>, {
+      props: {
+        ...base,
+        mode: 'table',
+        rowFocusable: true,
+        rowLabel: (row: Person) => `Open ${row.name}`,
+        onRowActivate: (row: Person) => activated.push(row.id),
+      },
+    });
+    // Table semantics are kept: no grid role, gridcells or roving cell stops.
+    expect(screen.queryByRole('grid')).toBeNull();
+    const table = screen.getByRole('table', { name: 'People' });
+    expect(within(table).queryAllByRole('gridcell')).toHaveLength(0);
+    const rows = people.map((person) => screen.getByRole('row', { name: `Open ${person.name}` }));
+    for (const row of rows) {
+      expect(row.getAttribute('tabindex')).toBe('0');
+      expect(row.tagName).toBe('TR');
+    }
+    expect(table.querySelectorAll('td[tabindex], th[tabindex]')).toHaveLength(0);
+    for (const [key, row, id] of [
+      ['Enter', rows[0], 'p1'],
+      [' ', rows[1], 'p2'],
+    ] as const) {
+      row?.focus();
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+      row?.dispatchEvent(event);
+      expect(event.defaultPrevented, key).toBe(true);
+      expect(activated.at(-1), key).toBe(id);
+    }
+    expect(activated).toEqual(['p1', 'p2']);
+    // Other keys, and keys from a control inside the row, do not activate it.
+    await fireEvent.keyDown(rows[0] as HTMLElement, { key: 'a' });
+    await fireEvent.keyDown(screen.getByText('Ada Example'), { key: 'Enter' });
+    expect(activated).toEqual(['p1', 'p2']);
+  });
+
+  it('is opt-in, and grid mode keeps its own cell keyboard model', () => {
+    for (const props of [
+      { mode: 'table' as const },
+      { mode: 'grid' as const, rowFocusable: true },
+    ]) {
+      const { container } = render(DataGrid<Person>, {
+        props: { ...base, ...props, onRowActivate: () => {} },
+      });
+      expect(container.querySelectorAll('tr[tabindex]'), props.mode).toHaveLength(0);
+      cleanup();
+    }
+  });
+});

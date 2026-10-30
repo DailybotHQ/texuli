@@ -81,6 +81,7 @@
   .tx-data-grid__search:focus-visible,
   .tx-data-grid__page:focus-visible,
   .tx-data-grid [data-tx-grid-cell]:focus-visible,
+  .tx-data-grid tr[data-focusable]:focus-visible,
   .tx-data-grid__sort:focus-visible,
   .tx-data-grid__checkbox:focus-visible {
     outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
