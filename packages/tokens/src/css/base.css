@@ -456,3 +456,26 @@
     }
   }
 }
+
+/*
+ * Tier-3 focus ring hook (ComponentHooks.focusRing). `data-tx-focus-ring-style`
+ * on any ancestor (the no-flash script and the Astro integration write it on
+ * <html>) sets the focus ring tokens on the focused element, which every focus
+ * rule reads: `ring` (or no attribute) keeps the theme ring, `outline` hugs the
+ * element, `inset` draws it inside, `glow` hugs it with a soft halo. In
+ * tx.components so the glow halo is not hidden by a component shadow.
+ */
+@layer tx.components {
+  :where([data-tx-focus-ring-style="outline"], [data-tx-focus-ring-style="glow"]) :focus-visible {
+    --tx-focus-ring-offset: 0px;
+  }
+
+  :where([data-tx-focus-ring-style="inset"]) :focus-visible {
+    --tx-focus-ring-offset: calc(var(--tx-focus-ring-width, 2px) * -1);
+  }
+
+  [data-tx-focus-ring-style="glow"] :focus-visible {
+    box-shadow: 0 0 0 calc(var(--tx-focus-ring-width, 2px) * 2)
+      color-mix(in srgb, var(--tx-ring, Highlight) 35%, transparent);
+  }
+}

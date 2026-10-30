@@ -996,6 +996,10 @@ describe('token contract v2: generated surfaces', () => {
       expect(matches, token.name).toHaveLength(1);
       expect(baseCss).toContain(`${token.name}: ${token.value};`);
     }
+    // The focus ring hook rules live here, in tx.components.
+    for (const style of ['outline', 'inset', 'glow']) {
+      expect(baseCss).toContain(`[data-tx-focus-ring-style="${style}"]`);
+    }
     for (const name of [...DATA_VIZ_TOKEN_NAMES, ...COMPONENT_TOKENS.map((t) => t.token)]) {
       expect(baseCss, name).not.toMatch(new RegExp(`${name}\\s*:`));
     }

@@ -55,7 +55,7 @@ sets component tokens, so a token set closer to the component still wins.
 | `data-tx-button-style` | `pill`, `square` (`default`: theme radius) | `--tx-button-radius` |
 | `data-tx-card-style` | `bordered`, `glass` (`solid`: default) | `bordered` drops `--tx-card-elevation`; `glass` mixes `--tx-card-background` with transparency and blurs the backdrop |
 | `data-tx-input-style` | `compact`, `comfortable` (`default`) | `--tx-input-height` and `--tx-input-padding-inline` one control step down or up |
-| `data-tx-focus-ring-style` | `outline`, `inset`, `glow` (`ring`: default) | sets `--tx-focus-ring-offset` (and a halo for `glow`) on the focused element |
+| `data-tx-focus-ring-style` | `outline`, `inset`, `glow` (`ring`: default) | sets `--tx-focus-ring-offset` (and a halo for `glow`) on the focused element (the rules live in `@texuli/tokens/base.css`) |
 
 ## Defaults
 
