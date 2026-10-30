@@ -12,8 +12,8 @@ check:surfaces` fails on drift) through `src/components/mcp-server/page.ts`
 ## Goal
 
 One page for the whole MCP server (PLAN_011 T-site-090): what it is, the two
-doors (remote `https://texuli.com/mcp`, local `npx -y @texuli/mcp` or
-`npx -p @texuli/tools texuli mcp`), setup for Claude Code, Cursor, VS Code,
+doors (remote `https://texuli.com/mcp`, local `npx -y @texuli/mcp`, or `texuli mcp` from an
+installed `@texuli/tools`), setup for Claude Code, Cursor, VS Code,
 Windsurf, Codex and any other host, the tools by runtime (edge, node, site)
 with their doors and limits, resources and templates, prompts, limits and
 security (links to SECURITY sections 6, 21, 21a and 23), versions and the
