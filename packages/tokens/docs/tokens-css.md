@@ -38,6 +38,25 @@ clearTheme(previewElement);
 custom properties there. `clearTheme` removes those properties and attributes.
 Neither function accesses `window` or `document` at module initialization.
 
+### Element scopes (ADR-023)
+
+`applyTheme` also marks the element as a token scope, `data-tx-scope` (an
+empty value; a value the host already set, such as `data-tx-scope="studio"`,
+is kept, and `clearTheme` removes only the empty marker). Several scopes can
+share a page, each with its own theme and mode:
+
+- `base.css` declares the system token defaults on
+  `:where(:root, [data-tx-theme], [data-tx-scope])`, so space, radius and
+  type steps derive from the nearest scope's density and radius;
+- overlays rendered in place inherit the scope; portaled ones (dialogs and
+  sheets) mount in a scoped portal root that mirrors the scope's `data-tx-*`
+  attributes and inline `--tx-*` variables and follows their changes
+  ([core-portal](../../core/docs/core-portal.md#token-scopes-adr-023));
+- `tests/e2e/theme-scopes.spec.ts` renders two themes side by side, one
+  dark, with open overlays in each, and checks their computed colors and axe.
+
+A theme applied to `<html>` is page-wide: body portals inherit it as before.
+
 Theme presets, the theme library, mode preference resolution and share-link
 encoding are owned by separate tasks. The base stylesheet currently leaves
 forced-colors mapping to the forced-colors task.

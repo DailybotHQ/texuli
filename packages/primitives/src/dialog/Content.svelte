@@ -7,6 +7,7 @@ import { untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { ensurePositioned } from '../internal/backdrop.ts';
 import { createMotionHold, type OverlayMotionHooks } from '../internal/motion-hold.ts';
+import { placeBeforeOpen } from '../internal/portal-scope.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { getDialogContext, getDialogPortalContext } from './context.ts';
 
@@ -129,7 +130,7 @@ function attachContent(node: HTMLDivElement): () => void {
     // A dialog is modal and never anchored: focus scope, inert and scroll lock, no positioning.
     { focusScope: createFocusScope, inert: getInertRegistry, scrollLock: lockScroll }
   );
-  context.registerController(controller);
+  context.registerController(placeBeforeOpen(controller, portal));
   return () => {
     controller.destroy();
     context.registerController(undefined);

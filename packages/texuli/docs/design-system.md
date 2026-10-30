@@ -57,6 +57,34 @@ sets component tokens, so a token set closer to the component still wins.
 | `data-tx-input-style` | `compact`, `comfortable` (`default`) | `--tx-input-height` and `--tx-input-padding-inline` one control step down or up |
 | `data-tx-focus-ring-style` | `outline`, `inset`, `glow` (`ring`: default) | sets `--tx-focus-ring-offset` (and a halo for `glow`) on the focused element (the rules live in `@texuli/tokens/base.css`) |
 
+## Scopes and overlays
+
+A scope is any element carrying `data-tx-scope` (ADR-023). `applyTheme(el)`
+(`@texuli/tokens`) writes it (empty unless the host already named the
+scope), and the planned `applyDesignSystem` will too. `@texuli/tokens/base.css`
+declares the system token defaults on `:where(:root, [data-tx-theme],
+[data-tx-scope])`, so derived tokens (space, radius and type steps) resolve
+against the nearest scope; nothing needs `:root`.
+
+Overlays keep their scope:
+
+- **In place** (menus, context menus, menubars, selects, comboboxes,
+  popovers, hover cards, tooltips, navigation menus, date pickers, the
+  Toaster): they render inside the subtree and show in the top layer, so they
+  inherit its tokens and its `[data-tx-scope="…"]` rules directly.
+- **Portaled** (Dialog, AlertDialog, Sheet, Drawer, DetailPanel,
+  ResponsiveModal, CommandPalette, the app navigation drawers, the media
+  Lightbox): `Dialog.Portal` and `AlertDialog.Portal` mount in a scoped
+  portal root, a `display: contents` child of `body` that mirrors the
+  scope's `data-tx-*` attributes (including a named `data-tx-scope="acme"`,
+  so the rules above match it too) and its inline custom properties, kept in
+  sync while it lives. A host that wants a frame passes the target instead
+  (`portal` on Dialog and AlertDialog, `to` on the primitives).
+
+Custom properties a scope gets only through a class rule are not mirrored;
+put them on a `[data-tx-scope="…"]` rule or inline. Details:
+[core-portal](../../core/docs/core-portal.md#token-scopes-adr-023).
+
 ## Defaults
 
 CSS cannot choose a default variant or size, so `texuli/defaults` provides

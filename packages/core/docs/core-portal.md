@@ -38,3 +38,54 @@ When the controller is destroyed, later updates return `false`.
 The core package owns only the DOM move and restoration mechanics. A Svelte
 wrapper can keep component context and reactive state in its normal component
 tree while using this controller to move the rendered host element.
+
+## Token scopes (ADR-023)
+
+A theme or design system applied to an element (`applyTheme(el)` from
+`@texuli/tokens`) marks it `[data-tx-scope]` and writes its `--tx-*` custom
+properties inline. Content moved to `body` would leave that subtree and lose
+its theme. `createPortal` itself never looks for a scope (its default stays
+`body`); `createScopedPortal` adds scope following, so only the overlays that
+portal pay for it:
+
+- **Scope resolution.** `findPortalScope(node)` returns the nearest
+  `[data-tx-scope]` or `[data-tx-theme]` element (itself included). It
+  returns `null` with no scope, and when the scope already holds `body` (a
+  page-wide theme on `<html>`, which body content inherits anyway). Inside a
+  scoped portal root it returns the scope that root mirrors, so a nested
+  overlay mirrors the scope rather than the root.
+- **Scoped portal root.** `createScopedPortalRoot(scope)` appends a
+  `div[data-tx-portal-root]` to `body`, styled `display: contents` (no box,
+  so it paints nothing and positions nothing). It mirrors the scope's
+  `data-tx-*` attributes (except the `data-tx-portal*` and `data-tx-overlay`
+  markers) and its inline custom properties (`--*`). A `MutationObserver` on
+  the scope's attributes keeps it in sync; `destroy()` disconnects the
+  observer and removes the root. Ordinary inline properties, `id`, `class`
+  and other attributes are not copied, so a scope themed only through a class
+  rule is not followed: give it `data-tx-*` attributes or inline variables,
+  or pass a target.
+- **`createScopedPortal(source, { target, scope })`.** With no `target` (or
+  `null`), the source goes to the portal root of its scope (created on
+  demand, removed once the source leaves it), or to `body` without one. An
+  explicit `target` wins and nothing is mirrored. `scope` is `'auto'`
+  (default: the nearest scope of the source's original position), an
+  element, a function returning one, or `null` (always `body`). It is
+  resolved on every placement, so a theme applied after the portal was
+  created is followed by the next `setTarget`.
+- **Hooks.** `createPortal` accepts `fallback(origin)` (where an omitted or
+  `null` target goes, asked on each placement with the source's original
+  parent) and `settled(parent)` (after each placement and at destroy);
+  `createScopedPortal` is built on them. The overlay engine takes
+  `createScopedPortal` as its `portal` feature to follow scopes too.
+
+```ts
+import { createScopedPortal } from '@texuli/core/portal';
+
+const portal = createScopedPortal(dialogWrapper); // follows the nearest [data-tx-scope]
+portal.setTarget(null); // place again: picks up a scope applied since
+const bodyOnly = createScopedPortal(other, { scope: null }); // opt out
+```
+
+`PORTAL_ROOT_ATTRIBUTE`, `SCOPE_ATTRIBUTE` and `SCOPE_SELECTOR` are exported.
+Tests: `packages/core/tests/portal-scope.test.ts`; browser check:
+`tests/e2e/theme-scopes.spec.ts`.
