@@ -5,9 +5,12 @@
  */
 @layer tx.components {
   .tx-timeline {
-    --tx-timeline-marker: 1rem;
+    --tx-timeline-marker: var(--tx-timeline-marker-size, var(--tx-size-icon-sm, 1rem));
     --tx-timeline-line: 2px;
-    --tx-timeline-gap: 1.5rem;
+    --tx-timeline-gap: var(
+      --tx-space-6,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6)
+    );
     --tx-timeline-tone: var(--tx-primary, LinkText);
     --tx-timeline-tone-foreground: var(--tx-primary-foreground, Canvas);
     /*
@@ -24,7 +27,8 @@
   .tx-timeline__item {
     position: relative;
     display: grid;
-    gap: 0.25rem 0.75rem;
+    gap: var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1))
+      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3));
   }
 
   /* The line to the next item (none after the last). */
@@ -41,7 +45,7 @@
     place-items: center;
     inline-size: var(--tx-timeline-marker);
     block-size: var(--tx-timeline-marker);
-    border-radius: var(--tx-radius-full, 9999px);
+    border-radius: var(--tx-timeline-marker-radius, var(--tx-shape-radius-full, 9999px));
     border: var(--tx-timeline-line) solid var(--tx-timeline-tone);
     background-color: var(--tx-background, Canvas);
     color: var(--tx-timeline-tone-foreground);
@@ -71,19 +75,25 @@
 
   .tx-timeline__content {
     display: grid;
-    gap: 0.125rem;
+    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
     min-inline-size: 0;
   }
 
   .tx-timeline__time {
-    font-size: var(--tx-font-size-xs, 0.75rem);
-    font-weight: var(--tx-font-weight-medium, 500);
+    font-size: var(
+      --tx-timeline-time-font-size,
+      var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem))
+    );
+    font-weight: var(
+      --tx-timeline-time-font-weight,
+      var(--tx-type-label-weight, var(--tx-font-weight-medium, 500))
+    );
     color: var(--tx-timeline-muted);
   }
 
   .tx-timeline__title {
     margin: 0;
-    font-weight: var(--tx-font-weight-medium, 500);
+    font-weight: var(--tx-type-label-weight, var(--tx-font-weight-medium, 500));
   }
 
   .tx-timeline__link {
@@ -101,7 +111,7 @@
 
   .tx-timeline__description {
     margin: 0;
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem));
     color: var(--tx-timeline-muted);
   }
 
@@ -169,7 +179,10 @@
     gap: var(--tx-timeline-gap);
     overflow-x: auto;
     overscroll-behavior-inline: contain;
-    padding-block: 0.25rem;
+    padding-block: var(
+      --tx-space-1,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
+    );
   }
 
   .tx-timeline--horizontal:focus-visible {
