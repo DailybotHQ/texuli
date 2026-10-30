@@ -11,7 +11,7 @@ What Texuli is and where to begin.
 - [Texuli](https://texuli.com/): The product landing.
 - [Introduction](https://texuli.com/guides/): The docs home and reading order.
 - [Getting started](https://texuli.com/guides/getting-started/)
-- [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0, 0.7.0 and 0.8.0 (all on npm; 0.8.0 is current), with demos.
+- [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0, 0.7.0 and 0.8.0 (all on npm; 0.8.0 is current) and of 0.9.0 (in development), with demos.
 - [Skill](https://texuli.com/skill/): The distributable agent skill for building with Texuli.
 
 ## Platform
@@ -65,12 +65,14 @@ The headless, APG-aligned primitives beneath the styled components; every primit
 
 ## Themes
 
-The OKLCH theme engine and the interactive theme tools.
+The OKLCH theme engine, the interactive theme tools and the design token reference.
 
 - [Theme gallery](https://texuli.com/gallery-themes/)
 - [Switcher](https://texuli.com/theme-switcher/)
 - [Studio](https://texuli.com/theme-studio/)
 - [Colors](https://texuli.com/color-explorer/)
+- [Design tokens](https://texuli.com/tokens/)
+- [Component tokens](https://texuli.com/tokens/components/)
 
 ## Agents
 
@@ -82,6 +84,7 @@ The agent catalog, the sink-free renderer, streaming generation and the agent su
 - [Builder](https://texuli.com/builder/)
 - [Agent chat](https://texuli.com/agent-chat/)
 - [Developers](https://texuli.com/developers/)
+- [Texuli MCP](https://texuli.com/mcp-server/)
 
 ## Project
 

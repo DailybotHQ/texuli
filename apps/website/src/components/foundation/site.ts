@@ -101,6 +101,9 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       { href: '/theme-switcher/', label: 'Switcher' },
       { href: '/theme-studio/', label: 'Studio' },
       { href: '/color-explorer/', label: 'Colors' },
+      // PLAN_011 T-site-090: the token contract v2 reference, generated from the registries.
+      { href: '/tokens/', label: 'Design tokens' },
+      { href: '/tokens/components/', label: 'Component tokens' },
     ],
   },
   {
@@ -114,6 +117,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       { href: '/agent-chat/', label: 'Agent chat' },
       // PLAN_011 T-ar-api: the JSON API, MCP, CLI, limits and versioning.
       { href: '/developers/', label: 'Developers' },
+      // PLAN_011 T-site-090: the MCP server (the route is /mcp-server/: functions/mcp.ts owns /mcp).
+      { href: '/mcp-server/', label: 'Texuli MCP' },
     ],
   },
   {

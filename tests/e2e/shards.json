@@ -38,6 +38,7 @@
       "renderer-hostile.spec.ts",
       "site-dashboards.spec.ts",
       "site-examples.spec.ts",
+      "site-tokens.spec.ts",
       "site-ia.spec.ts",
       "site-keyboard.spec.ts",
       "site-motion.spec.ts",
@@ -68,7 +69,8 @@
       "site-live-primitives.spec.ts",
       "site-output.spec.ts",
       "site-slides.spec.ts",
-      "site-visual.spec.ts"
+      "site-visual.spec.ts",
+      "site-mcp.spec.ts"
     ],
     [
       "a11y-forms.spec.ts",

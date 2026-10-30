@@ -171,6 +171,9 @@ export const DOC_SHELL_ROUTES: readonly string[] = [
   '/primitives-page/',
   '/web-and-native/',
   '/developers/',
+  '/mcp-server/',
+  '/tokens/',
+  '/tokens/components/',
 ];
 
 export function isDocsPath(current: string): boolean {
