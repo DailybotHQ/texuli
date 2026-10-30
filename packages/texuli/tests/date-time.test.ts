@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/sve
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Calendar, DatePicker, DateRangePicker, TimeField } from '../src/components/date/index.ts';
+import DateFieldHarness from './fixtures/DateFieldHarness.svelte';
 
 // G12 (today, weekStartsOn, range highlight, maxDays, onInvalid) and G13
 // (the styled TimeField).
@@ -244,6 +245,38 @@ describe('DateRangePicker required (G66)', () => {
     expect(segments).toHaveLength(6);
     for (const segment of segments) expect(segment.hasAttribute('required')).toBe(true);
     expect(view.container.querySelector('.tx-date__required')?.textContent?.trim()).toBe('*');
+  });
+});
+
+describe('date and time controls in a Field (G89, G90)', () => {
+  afterEach(cleanup);
+  const kinds = ['date', 'range', 'time'] as const;
+
+  it('puts controlClass on the bordered .tx-date__control, not the wrapper', () => {
+    for (const kind of ['date', 'range'] as const) {
+      const view = render(DateFieldHarness, { props: { kind, controlClass: 'host-control' } });
+      const control = view.container.querySelector('.tx-date__control');
+      expect(control?.classList.contains('host-control'), kind).toBe(true);
+      expect(view.container.querySelector('.tx-date')?.classList.contains('host-control')).toBe(
+        false
+      );
+      cleanup();
+    }
+  });
+
+  it('shows the invalid state when aria-invalid comes from the Field error', () => {
+    for (const kind of kinds) {
+      const valid = render(DateFieldHarness, { props: { kind } });
+      expect(valid.container.querySelector('.tx-date')?.hasAttribute('data-invalid')).toBe(false);
+      cleanup();
+      const view = render(DateFieldHarness, { props: { kind, error: 'Pick a date.' } });
+      const wrapper = view.container.querySelector('.tx-date');
+      expect(wrapper?.getAttribute('data-invalid'), kind).toBe('true');
+      for (const segment of view.container.querySelectorAll('[role="spinbutton"]')) {
+        expect(segment.getAttribute('aria-invalid')).toBe('true');
+      }
+      cleanup();
+    }
   });
 });
 
