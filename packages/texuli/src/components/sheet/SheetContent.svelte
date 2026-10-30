@@ -6,6 +6,7 @@ import type { MotionProp } from '../../motion/contract.ts';
 import { createOverlayMotion, sheetEdge } from '../../motion/seam.ts';
 import { type SheetSize, sheetContentClass } from './variants.ts';
 import './sheet.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Props = ComponentProps<typeof Primitive.Content> & {
   size?: SheetSize;
@@ -14,13 +15,15 @@ type Props = ComponentProps<typeof Primitive.Content> & {
   motion?: MotionProp;
 };
 let {
-  size = 'md',
+  size: sizeProp,
   side = 'start',
   class: className,
   motion,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('sheet');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const sheetMotion = createOverlayMotion({
   motion: () => motion,
   defaults: { enter: 'rise', exit: 'rise', duration: 'base' },

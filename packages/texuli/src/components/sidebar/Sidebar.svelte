@@ -15,6 +15,7 @@ import {
   sidebarToggleClass,
 } from './variants.ts';
 import './sidebar.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -51,7 +52,7 @@ let {
   collapsed = $bindable(false),
   collapsible = true,
   drawer = false,
-  variant = 'default',
+  variant: variantProp,
   header,
   footer,
   itemIcon,
@@ -64,6 +65,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('sidebar');
+const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
 const msg = useMessages();
 const label = $derived(labelProp ?? msg('texuli.sidebar.label', 'Main'));
 const collapseLabel = $derived(

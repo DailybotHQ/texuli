@@ -7,6 +7,7 @@ import { type ClassValue } from '../../internal/cx.ts';
 import { TOOLBAR_STYLE } from './style-context.ts';
 import { type ToolbarSize, type ToolbarVariant, toolbarRootClass } from './variants.ts';
 import './toolbar.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Orientation = 'horizontal' | 'vertical';
 
@@ -29,8 +30,8 @@ type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'c
 let {
   orientation = 'horizontal',
   loop = true,
-  variant = 'default',
-  size = 'md',
+  variant: variantProp,
+  size: sizeProp,
   class: className,
   children,
   'aria-label': ariaLabel,
@@ -38,6 +39,9 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('toolbar');
+const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 setContext(TOOLBAR_STYLE, {
   get size() {

@@ -3,6 +3,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type CodeVariant, codeClass } from './variants.ts';
 import './kbd-code.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 /**
  * Inline or block code. Text is always escaped (Svelte text interpolation);
@@ -22,13 +23,15 @@ type Props = HTMLAttributes<HTMLElement> & {
 
 let {
   value = undefined,
-  variant = 'inline',
+  variant: variantProp,
   language = undefined,
   class: className,
   children,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('code');
+const variant = $derived(withDefault(variantProp, txDefaults().variant, 'inline'));
 
 const classes = $derived(
   codeClass({

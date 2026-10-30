@@ -4,6 +4,7 @@ import type { ComponentProps, Snippet } from 'svelte';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type NavSize, navigationMenuClass } from './variants.ts';
 import './navigation.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Props = ComponentProps<typeof Primitive.Root> & {
   children?: Snippet;
@@ -15,12 +16,14 @@ type Props = ComponentProps<typeof Primitive.Root> & {
 let {
   children,
   class: className,
-  size = 'md',
+  size: sizeProp,
   value = $bindable(''),
   onValueChange,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('navigation');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 const classes = $derived(
   navigationMenuClass({

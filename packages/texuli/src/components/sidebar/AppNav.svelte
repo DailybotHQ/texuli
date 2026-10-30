@@ -9,6 +9,7 @@ import Sidebar from './Sidebar.svelte';
 import type { SidebarItem, SidebarSection } from './types.ts';
 import { appNavClass, type SidebarVariant } from './variants.ts';
 import './sidebar.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -45,7 +46,7 @@ let {
   sections,
   collapsed = $bindable(false),
   collapsible = true,
-  variant = 'default',
+  variant: variantProp,
   header,
   footer,
   itemIcon,
@@ -62,6 +63,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('sidebar');
+const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
 const msg = useMessages();
 const label = $derived(labelProp ?? msg('texuli.app-nav.label', 'Main'));
 const menuLabel = $derived(menuLabelProp ?? msg('texuli.app-nav.menu-label', 'Open navigation'));

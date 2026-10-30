@@ -5,6 +5,7 @@ import { joinIds, splitControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type ChoiceSize, switchControlClass } from './variants.ts';
 import './choice.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Props = {
   checked?: boolean;
@@ -35,12 +36,14 @@ let {
   id = `tx-switch-${uid}`,
   label,
   description,
-  size = 'md',
+  size: sizeProp,
   onCheckedChange,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('choice');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 // aria-*, data-*, handlers and form attributes name and wire the control;
 // layout hooks (style, hidden…) stay on the wrapper.

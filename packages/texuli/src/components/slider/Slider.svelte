@@ -7,6 +7,7 @@ import { splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type SliderSize, sliderRootClass } from './variants.ts';
 import './slider.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Orientation = 'horizontal' | 'vertical';
 type Mark = { value: number; label?: string };
@@ -57,7 +58,7 @@ let {
   orientation = 'horizontal',
   dir,
   disabled = false,
-  size = 'md',
+  size: sizeProp,
   showTicks = false,
   marks = [],
   label = '',
@@ -74,6 +75,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('slider');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const msg = useMessages();
 const thumbLabel = $derived(thumbLabelProp ?? msg('texuli.slider.thumb-label', 'Value'));
 

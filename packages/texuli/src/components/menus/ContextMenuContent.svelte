@@ -6,6 +6,7 @@ import type { MotionProp } from '../../motion/contract.ts';
 import { createOverlayMotion } from '../../motion/seam.ts';
 import { type MenuSize, type MenuVariant, menuContentClass } from './variants.ts';
 import './menus.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Props = ComponentProps<typeof ContextMenu.Content> & {
   children?: Snippet;
@@ -19,12 +20,15 @@ type Props = ComponentProps<typeof ContextMenu.Content> & {
 let {
   children,
   class: className,
-  size = 'md',
-  variant = 'default',
+  size: sizeProp,
+  variant: variantProp,
   motion,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('menu');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
+const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
 
 const overlayMotion = createOverlayMotion({
   motion: () => motion,

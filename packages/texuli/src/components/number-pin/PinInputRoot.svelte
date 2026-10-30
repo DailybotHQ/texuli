@@ -6,6 +6,7 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import type { RefProp } from '../../internal/ref.ts';
 import { type NumberPinSize, pinInputClass } from './variants.ts';
 import './number-pin.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 /**
  * Extra attributes (`name`, `form`, `required`, `autocomplete`, `aria-*`,
@@ -40,7 +41,7 @@ type Props = Omit<
 };
 
 let {
-  size = 'md',
+  size: sizeProp,
   class: className,
   children,
   value = $bindable(''),
@@ -48,6 +49,8 @@ let {
   ref = $bindable(null),
   ...props
 }: Props & RefProp = $props();
+const txDefaults = designDefaults('pin-input');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const classes = $derived(cx(pinInputClass({ size }), className));
 </script>
 

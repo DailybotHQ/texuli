@@ -6,6 +6,7 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import { getFieldLabelContext } from '../field/context.ts';
 import { type DateSize, dateFieldClass } from './variants.ts';
 import './date.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 /**
  * A styled time field on the owned TimeField: hour and minute spinbuttons
@@ -66,12 +67,14 @@ let {
   disabled = false,
   required = false,
   name,
-  size = 'md',
+  size: sizeProp,
   labels,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('date');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 const split = $derived(splitRequiredControlProps(rest));
 // `aria-required` (a Field's control props) is not allowed on a group or a

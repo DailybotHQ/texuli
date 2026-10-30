@@ -23,6 +23,7 @@ import {
   dialogTitleClass,
 } from './variants.ts';
 import './dialog.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type TriggerSnippet = Snippet<[{ props: Record<string, unknown> }]>;
 
@@ -84,7 +85,7 @@ let {
   open = $bindable(false),
   title,
   description,
-  size = 'md',
+  size: sizeProp,
   trigger,
   footer,
   children,
@@ -102,6 +103,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('dialog');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const msg = useMessages();
 const closeLabel = $derived(closeLabelProp ?? msg('texuli.dialog.close-label', 'Close'));
 

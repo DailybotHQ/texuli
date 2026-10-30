@@ -2,6 +2,7 @@
 import { createAttachmentKey } from 'svelte/attachments';
 import type { SVGAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 import { ICON_SIZES, iconClass } from './icon-variants.ts';
 import { iconPath, isIconName } from './icons.ts';
 import type { IconComponentProps, IconRef, IconSize } from './types.ts';
@@ -21,7 +22,7 @@ type Props = Omit<SVGAttributes<SVGSVGElement>, 'class' | 'color'> & {
 
 let {
   icon,
-  size = 'md',
+  size: sizeProp,
   strokeWidth,
   color = undefined,
   label,
@@ -33,6 +34,8 @@ let {
   /** The rendered `<svg>` (bindable). */
   ref?: SVGSVGElement | null;
 } = $props();
+const txDefaults = designDefaults('icon');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 const pixelSize = $derived(ICON_SIZES[size]);
 /** An explicit `strokeWidth` wins over the `--tx-icon-stroke-width` token (icons.css). */

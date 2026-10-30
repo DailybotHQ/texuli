@@ -16,6 +16,7 @@ import {
   paginationListClass,
 } from './variants.ts';
 import './navigation.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Props = Omit<ComponentProps<typeof Primitive.Root>, 'children'> & {
   children?: Snippet<[PaginationSnippetProps]>;
@@ -34,8 +35,8 @@ type Props = Omit<ComponentProps<typeof Primitive.Root>, 'children'> & {
 let {
   children,
   class: className,
-  size = 'md',
-  variant = 'outline',
+  size: sizeProp,
+  variant: variantProp,
   page = $bindable(1),
   siblings = 1,
   boundaries = 1,
@@ -44,6 +45,9 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('pagination');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
+const variant = $derived(withDefault(variantProp, txDefaults().variant, 'outline'));
 
 const classes = $derived(
   paginationClass({

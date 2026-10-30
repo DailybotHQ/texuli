@@ -609,6 +609,19 @@ export {
   type VisibleTreeNode,
 } from './components/tree/index.ts';
 export {
+  type ComponentDefaults,
+  DESIGN_DEFAULTS_COMPONENTS,
+  DESIGN_DEFAULTS_VOCABULARY,
+  type DesignDefaults,
+  type DesignDefaultsComponent,
+  type DesignDefaultsIssue,
+  getDesignDefaults,
+  isDesignDefaultsComponent,
+  mergeDesignDefaults,
+  setDesignDefaults,
+  validateDesignDefaults,
+} from './defaults/index.ts';
+export {
   getI18nContext,
   setI18nContext,
   TEXULI_MESSAGES_EN,

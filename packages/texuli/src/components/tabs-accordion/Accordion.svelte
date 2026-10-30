@@ -9,6 +9,7 @@ import Chevron from './Chevron.svelte';
 import type { AccordionItemDef } from './types.ts';
 import { type AccordionVariant, accordionRootClass } from './variants.ts';
 import './tabs-accordion.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type OwnProps = {
   items: readonly AccordionItemDef[];
@@ -45,7 +46,7 @@ let {
   onValueChange,
   collapsible = true,
   headingLevel = 3,
-  variant = 'default',
+  variant: variantProp,
   disabled = false,
   class: className,
   content,
@@ -53,6 +54,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('accordion');
+const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
 
 const panelMotion = createSizeMotion({
   motion: () => motion,

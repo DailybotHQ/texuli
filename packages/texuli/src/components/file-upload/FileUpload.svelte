@@ -19,6 +19,7 @@ import {
 } from './types.ts';
 import { type FileUploadVariant, fileUploadClass } from './variants.ts';
 import './file-upload.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 /**
  * Extra attributes land on the wrapper (`id`, `aria-*`, `data-*`, `onfocus` and
@@ -67,7 +68,7 @@ let {
   disabled = false,
   required = false,
   name,
-  variant = 'default',
+  variant: variantProp,
   showPreviews = true,
   progress = {},
   status = {},
@@ -84,6 +85,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props & RefProp = $props();
+const txDefaults = designDefaults('file-upload');
+const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
 const msg = useMessages();
 
 /** The list before a pick or drop reaches the zone (set in the capture phase). */

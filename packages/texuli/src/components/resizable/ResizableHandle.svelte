@@ -3,6 +3,7 @@ import { Splitter } from '@texuli/primitives/splitter';
 import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 import { type ResizableHandleSize, resizableHandleClass } from './variants.ts';
 
 /**
@@ -27,11 +28,13 @@ let {
   label: labelProp,
   disabled = false,
   withGrip = true,
-  size = 'md',
+  size: sizeProp,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('resizable-handle');
+const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const msg = useMessages();
 const label = $derived(labelProp ?? msg('texuli.resizable-handle.label', 'Resize'));
 

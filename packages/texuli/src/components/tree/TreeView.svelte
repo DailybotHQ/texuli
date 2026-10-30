@@ -7,6 +7,7 @@ import { cx } from '../../internal/cx.ts';
 import type { TreeViewProps } from './props.ts';
 import { type TreeDensity, type TreeVariant, treeViewClass } from './variants.ts';
 import './tree.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 let {
   items,
@@ -23,13 +24,15 @@ let {
   onExpandedChange,
   onSelectedChange,
   label: labelProp,
-  variant = 'default',
+  variant: variantProp,
   density = 'default',
   item,
   class: className,
   ref = $bindable(null),
   ...attributes
 }: TreeViewProps = $props();
+const txDefaults = designDefaults('tree');
+const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
 const msg = useMessages();
 const label = $derived(labelProp ?? msg('texuli.tree-view.label', 'Tree'));
 

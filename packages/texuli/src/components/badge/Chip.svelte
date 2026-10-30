@@ -2,6 +2,7 @@
 import type { HTMLButtonAttributes } from 'svelte/elements';
 import { type BadgeVariant, chipClass } from './variants.ts';
 import './badge.css';
+import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Props = HTMLButtonAttributes & {
   /** Visible label (required word). */
@@ -16,13 +17,15 @@ type Props = HTMLButtonAttributes & {
 let {
   ref = $bindable(null),
   label,
-  variant = 'outline',
+  variant: variantProp,
   selected = false,
   disabled = false,
   class: className,
   type = 'button',
   ...rest
 }: Props = $props();
+const txDefaults = designDefaults('chip');
+const variant = $derived(withDefault(variantProp, txDefaults().variant, 'outline'));
 </script>
 
 <button bind:this={ref}
