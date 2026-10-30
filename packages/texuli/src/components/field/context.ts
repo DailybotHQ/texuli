@@ -18,7 +18,15 @@ export function setFieldLabelContext(value: FieldLabelContext): void {
   setContext(KEY, value);
 }
 
-/** The enclosing Field, or `undefined` outside one. */
+/**
+ * The enclosing Field, or `undefined` outside one. Call it during component
+ * initialization (it reads Svelte context). A control built from primitives
+ * names its group with `aria-labelledby={field?.labelId}` and can put `id`
+ * on its first focusable element so the `<label for>` reaches it.
+ */
 export function getFieldLabelContext(): FieldLabelContext | undefined {
   return getContext<FieldLabelContext | undefined>(KEY);
 }
+
+/** {@link getFieldLabelContext} under a hook-style name: `const field = useFieldLabel()`. */
+export const useFieldLabel: () => FieldLabelContext | undefined = getFieldLabelContext;

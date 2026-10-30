@@ -14,6 +14,8 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** On narrow containers the caller selects which pane is visible. */
   detailActive?: boolean;
   class?: ClassValue;
+  /** The root element (bindable). */
+  ref?: HTMLElement | null;
 };
 
 let {
@@ -24,6 +26,7 @@ let {
   detailLabel: detailLabelProp,
   detailActive = $bindable(false),
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 const msg = useMessages();
@@ -35,6 +38,7 @@ const selectedDetail = $derived(detailActive && hasDetail);
 </script>
 
 <div
+  bind:this={ref}
   class={cx('tx-app-layout__split', className)}
   data-tx-split-view
   data-has-detail={hasDetail ? 'true' : 'false'}

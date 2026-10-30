@@ -1,6 +1,7 @@
 <script lang="ts">
 import { lazyChunk } from '@texuli/core/lazy';
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { closeWhenWide } from '../host/layout-kit.ts';
@@ -18,7 +19,7 @@ import './shells.css';
  * drawer through `getAppShellContext()`. The drawer (`texuli/layouts/host/drawer`)
  * loads on its first open, so a wide-only app never pays for it.
  */
-type Props = {
+type OwnProps = {
   /** Usually a sidebar: a column on wide shells, the drawer's content on narrow ones. */
   sidebar?: Snippet;
   /** Usually a header; its menu button toggles the drawer through the shell context. */
@@ -47,7 +48,11 @@ type Props = {
   class?: ClassValue;
   mainClass?: ClassValue;
   sidebarClass?: ClassValue;
+  /** The shell's root element (bindable). */
+  ref?: HTMLElement | null;
 };
+/** Other attributes (`id`, `aria-*`, `data-*`, `style`, handlers) land on the root element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'>;
 
 let {
   sidebar,
@@ -66,6 +71,8 @@ let {
   class: className,
   mainClass,
   sidebarClass,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
 const msg = useMessages();
 const sidebarLabel = $derived(
@@ -79,7 +86,7 @@ const notificationsLabel = $derived(
   notificationsLabelProp ?? msg('texuli.app-shell.notifications-label', 'Notifications')
 );
 
-let root = $state<HTMLElement>();
+const root = $derived(ref ?? undefined);
 /** Previews inside a page `<main>` drop nested landmarks (one main per page). */
 let nested = $state(false);
 $effect(() => {
@@ -151,7 +158,8 @@ setAppShellContext({
 </script>
 
 <div
-  bind:this={root}
+  {...rest}
+  bind:this={ref}
   class={cx('tx-app-shell', className)}
   data-tx-app-shell=""
   data-drawer-ready={drawerReady ? 'true' : 'false'}

@@ -280,6 +280,7 @@ onMount(() => {
       <DialogDescription class="tx-sr-only">{description}</DialogDescription>
       <CommandRoot
         label={title}
+        {loading}
         shouldFilter={false}
         loop
         {size}

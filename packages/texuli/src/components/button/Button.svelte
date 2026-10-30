@@ -138,11 +138,17 @@ function handleClick(event: any): void {
     {@render content()}
   </button>
 {:else}
+  <!--
+    Busy (loading or a pending onclick promise) is aria-disabled with the
+    click suppressed in handleClick, never native `disabled`: a focused
+    button keeps focus instead of dropping it to <body> (G94).
+  -->
   <button
     bind:this={ref}
     class={classes}
     {type}
-    disabled={inactive}
+    disabled={Boolean(disabled)}
+    aria-disabled={busy && !disabled ? 'true' : undefined}
     aria-busy={busy || undefined}
     data-tx-button
     data-variant={variant}

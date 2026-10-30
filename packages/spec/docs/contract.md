@@ -183,8 +183,9 @@ field (the tree, status, provenance and activation digest stay valid), and
 keeps a parsed `__proto__` key as an own property, which validation still
 refuses. `0.2.0 → 0.3.0` is additive: it stamps `spec: "0.3.0"`. Every later step
 (`0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`, `0.5.0 → 0.6.0`, the
-motion vocabulary in [motion.md](motion.md), and `0.6.0 → 0.7.0`, node keys
-and documents) is additive and stamps only `spec` as well. The tests
+motion vocabulary in [motion.md](motion.md), `0.6.0 → 0.7.0`, node keys
+and documents, `0.7.0 → 0.8.0`, data sources, forms, canvases and sheets,
+and `0.8.0 → 0.9.0`, a catalog projection refresh) is additive and stamps only `spec` as well. The tests
 check that `SPEC_MIGRATIONS` covers every consecutive pinned pair in
 `versions.json` from 0.2.0 to `SPEC_VERSION`. Inside a plan that has not
 published a spec version, later normative changes amend that version's pin
@@ -256,6 +257,18 @@ additions of the wave are described with their tasks.)
   `form-field-type`, `form-format` and `form-expression-op` invalid
   fixtures. The Kotlin twin decodes the shape and applies the list caps;
   painting forms natively is planned (a visible placeholder).
+
+## Spec 0.9.0: a catalog projection refresh (T-gaps-87-95)
+
+PLAN_011; additive, so the `0.8.0 → 0.9.0` migration stamps `spec` only.
+The Protoyard gap fixes G87–G95 changed agent catalog manifests (the button
+pending note and the gap props that reach the manifests), which moved the
+catalog hash in `catalog/components.json` and with it the spec digest. The
+envelope shape, the `$defs` and the diagnostic codes are unchanged; the
+`spec` enum gains `0.9.0`, and every committed golden and invalid fixture
+is stamped `0.9.0`. Spec 0.9.0 is in development on `release/0.9.0`; it
+ships only with `@texuli/spec@0.9.0` (npm has spec `0.8.0` in
+`@texuli/spec@0.8.0`).
 
 ## Named slots and conditions
 

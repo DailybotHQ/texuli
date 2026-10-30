@@ -109,6 +109,8 @@ export {
   setI18nContext,
   useMessages,
 } from './i18n/index.ts';
+// The "caller first" handler order every part follows (docs/STANDARDS.md), public for host-built parts.
+export { chainHandlers, composeHandlers } from './internal/handlers.ts';
 export {
   controlAttributes,
   Field,

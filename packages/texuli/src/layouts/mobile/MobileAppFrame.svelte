@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import './mobile.css';
@@ -10,7 +11,7 @@ import './mobile.css';
  * navigation. It fills `--tx-app-height` (default `100dvh`); set that variable
  * on an ancestor to fit a contained frame such as a device preview.
  */
-type Props = {
+type OwnProps = {
   /** Usually a `MobileHeader`; outside the scroll region. */
   header?: Snippet;
   /** Usually a `BottomNav`; outside the scroll region. */
@@ -21,6 +22,13 @@ type Props = {
    * strip is hidden (`hidden`, `data-empty`).
    */
   stickyFooter?: Snippet;
+  /**
+   * Drop the footer strip's padding, top border and background, so the
+   * `stickyFooter` snippet draws its own footer. It keeps its place (between
+   * the screen and the bottom nav, outside the scroll region) and still hides
+   * while it renders nothing. Default `false`.
+   */
+  stickyFooterUnstyled?: boolean;
   children: Snippet;
   /** The skip link's text. Default "Skip to content". */
   skipLabel?: string;
@@ -32,12 +40,17 @@ type Props = {
   resetScrollOnNavigate?: boolean;
   class?: ClassValue;
   mainClass?: ClassValue;
+  /** The frame's root element (bindable). */
+  ref?: HTMLElement | null;
 };
+/** Other attributes (`id`, `aria-*`, `data-*`, `style`, handlers) land on the root element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'>;
 
 let {
   header,
   bottomNav,
   stickyFooter,
+  stickyFooterUnstyled = false,
   children,
   skipLabel: skipLabelProp,
   mainId,
@@ -45,6 +58,8 @@ let {
   resetScrollOnNavigate = true,
   class: className,
   mainClass,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
 const msg = useMessages();
 const skipLabel = $derived(
@@ -53,7 +68,7 @@ const skipLabel = $derived(
 
 const uid = $props.id();
 const screenId = $derived(mainId ?? `${uid}-main`);
-let frame = $state<HTMLElement>();
+const frame = $derived(ref ?? undefined);
 let screen = $state<HTMLElement>();
 let nested = $state(false);
 
@@ -102,7 +117,7 @@ function focusScreen(event: MouseEvent): void {
 }
 </script>
 
-<div bind:this={frame} class={cx('tx-mobile-frame', className)} data-tx-mobile-frame="">
+<div {...rest} bind:this={ref} class={cx('tx-mobile-frame', className)} data-tx-mobile-frame="">
   <a class="tx-mobile-frame__skip" href={`#${screenId}`} onclick={focusScreen}>{skipLabel}</a>
   {@render header?.()}
   <svelte:element
@@ -121,6 +136,7 @@ function focusScreen(event: MouseEvent): void {
       class="tx-mobile-frame__footer"
       data-tx-mobile-frame-footer=""
       data-empty={footerEmpty ? '' : undefined}
+      data-unstyled={stickyFooterUnstyled ? '' : undefined}
       hidden={footerEmpty}
     >{@render stickyFooter()}</div>
   {/if}

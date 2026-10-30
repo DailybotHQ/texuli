@@ -37,6 +37,8 @@ let navOpen = $state(false);
 | `mainId` | `main-content` | `id` of the main region |
 | `mainElement` | `main` | `div` for a shell nested inside another page's `<main>`. It renders no landmarks |
 | `class`, `mainClass`, `sidebarClass` | — | Consumer classes, merged last |
+| `ref` | `null` | The shell's root element (bindable) |
+| other attributes | — | `id`, `aria-*`, `data-*`, `style` and handlers land on the root element |
 
 Every label can be translated.
 
