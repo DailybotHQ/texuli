@@ -1,0 +1,263 @@
+Usage: texuli <group> <verb> [--json <object> | --file <path>] [--out <path> [--overwrite]]
+       texuli <command> [options]
+       texuli help [<group>]
+
+Operations (the @texuli/tools registry; the same names are MCP tools):
+  catalog search      Search the component catalog
+  catalog validate    Validate catalog manifests
+  component get       Read a component manifest
+  example search      Find component examples
+  blueprint validate  Validate a blueprint draft
+  theme search        Search the theme library
+  theme get           Read a full theme
+  theme preview       Preview a theme
+  deck run            Run a deck command
+  document run        Run a document command
+  document export     Export a document as PDF or DOCX (node only)
+
+Commands:
+  deck <command>      The deck commands (capabilities, schema, layouts, lint, inspect, from-markdown, to-markdown)
+  document <command>  The document commands (validate, patch, from-markdown, to-pdf … with --out)
+  mcp                 Run the local MCP server over stdio (every operation)
+  init                Wire Texuli tokens and CSS into a Vite, Astro or SvelteKit project
+  theme list          List the theme library
+  theme preview <id>  Show a theme's key tokens and its WCAG AA report
+  theme apply <id>    Switch an initialized project to another theme
+  add <component>     Copy a styled component's source into the app
+  diff <component>    Show what an update of a copied component would change
+  update <component>  Three-way merge a copied component with a new source
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+Run texuli <group> --help or texuli <group> <verb> --help for details.
+
+----
+Usage: texuli catalog <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  catalog search    Search the component catalog [catalog.search]
+  catalog validate  Validate catalog manifests [catalog.validate]
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli component <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  component get  Read a component manifest [component.get]
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli example <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  example search  Find component examples [example.search]
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli blueprint <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  blueprint validate  Validate a blueprint draft [blueprint.validate]
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli theme <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  theme search        Search the theme library [theme.search]
+  theme get           Read a full theme [theme.get]
+  theme preview       Preview a theme [theme.preview]
+
+Commands kept from 0.8:
+  theme list          List the theme library
+  theme preview <id>  Show a theme's key tokens and its WCAG AA report
+  theme apply <id>    Switch an initialized project to another theme
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli deck <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  deck run        Run a deck command [deck.run]
+
+Commands kept from 0.8:
+  deck <command>  The deck commands (capabilities, schema, layouts, lint, inspect, from-markdown, to-markdown)
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli document <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  document run        Run a document command [document.run]
+  document export     Export a document as PDF or DOCX [document.export]
+
+Commands kept from 0.8:
+  document <command>  The document commands (validate, patch, from-markdown, to-pdf … with --out)
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli catalog search [--json <object> | --file <path>] [--out <path>]
+
+Search the component catalog (catalog.search, runtime edge)
+Search the built, content-addressed Texuli component catalog by text, group and emit tier. Returns the catalog hash and file name, the match count and one summary per component (id, package, label, summary, tier, group, emit tiers).
+
+Arguments (JSON object keys):
+  query: string. Text to match against component ids, labels and summaries.
+  group: string. An exact manifest group id, e.g. "display" or "forms".
+  tier: "developer" | "untrusted". Keep only components this emit tier may place: untrusted is what agent output may use; developer is app-authored code.
+  limit: integer. How many results to return (1 to 100, default 50).
+
+Limits: input up to 4096 bytes, at most 100 items, 5000 ms budget.
+Example (Cards an agent may place): texuli catalog search --json '{"query":"card","tier":"untrusted","limit":5}'
+
+----
+Usage: texuli catalog validate [--json <object> | --file <path>] [--out <path>]
+
+Validate catalog manifests (catalog.validate, runtime edge)
+Validate one candidate catalog manifest, or a set (which also catches duplicate ids), without writing files. Returns valid and a list of diagnostics, each with a code, a JSONPath, a message and a hint.
+
+Arguments (JSON object keys):
+  manifest: object. A candidate catalog manifest (id, package, label, summary, tier, props, examples …).
+  manifests: array. A candidate manifest set (at most 500).
+
+Limits: input up to 1000000 bytes, at most 500 items, 5000 ms budget.
+
+----
+Usage: texuli component get [--json <object> | --file <path>] [--out <path>]
+
+Read a component manifest (component.get, runtime edge)
+Read one component manifest from the catalog: its props with kinds and schemas, events, examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it.
+
+Arguments (JSON object keys):
+  id (required): string. A catalog component id, e.g. "card" (find ids with catalog.search).
+
+Limits: input up to 1024 bytes, 5000 ms budget.
+Example (The card manifest): texuli component get --json '{"id":"card"}'
+
+----
+Usage: texuli example search [--json <object> | --file <path>] [--out <path>]
+
+Find component examples (example.search, runtime edge)
+Find worked manifest examples (props an agent can copy) by component id and/or example id, or search their titles and descriptions. Returns the match count and each example with its component id and package.
+
+Arguments (JSON object keys):
+  componentId: string. A catalog component id, e.g. "card" (find ids with catalog.search).
+  exampleId: string. An exact example id within the component, e.g. "basic".
+  query: string. Text to match against example ids, titles and descriptions.
+  limit: integer. How many results to return (1 to 100, default 50).
+
+Limits: input up to 4096 bytes, at most 100 items, 5000 ms budget.
+Example (Every card example): texuli example search --json '{"componentId":"card"}'
+
+----
+Usage: texuli blueprint validate [--json <object> | --file <path>] [--out <path>]
+
+Validate a blueprint draft (blueprint.validate, runtime edge)
+Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's draft checks: structure, sinks, tree limits, component ids, tiers and prop schemas, deep block and document schemas, grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with the catalog's stable codes.
+
+Arguments (JSON object keys):
+  draft (required): object | array. The blueprint: a catalog tree { id, props, children }, an array of trees, or a texuli-blueprint envelope (format, version, id, catalog hash from catalog.search, status, createdAt, updatedAt, generator, tree). At most 512 nodes. schema-form, canvas and spreadsheet nodes and data-source bindings are refused: this server has no validator for them.
+  tier: "untrusted" | "developer". The tier to validate at: untrusted (agent output, the default) or developer (app-authored). A tier the draft declares is ignored.
+  fragment: boolean. Accept any roots (a fragment). Default false: one frame root (layout-page, layout-doc, layout-deck, document, canvas or data-dashboard).
+
+Limits: input up to 270336 bytes, at most 512 items, 5000 ms budget.
+
+----
+Usage: texuli theme search [--json <object> | --file <path>] [--out <path>]
+
+Search the theme library (theme.search, runtime edge)
+Search the Texuli theme library (200+ offline themes) by words, category, collection, mood or tag. Returns the match count and each theme’s metadata: id, name, description, category, collection, mood, tags, contrast level and whether it is dark-first.
+
+Arguments (JSON object keys):
+  query: string. Words that must all match the id, name, tags, mood, category, collection or description; results are ranked.
+  category: string. An exact category, e.g. "Technology".
+  collection: "industry" | "brand-like" | "high-contrast" | "colorblind-safe" | "seasonal" | "mono". One theme collection.
+  mood: "calm" | "bold" | "playful" | "corporate" | "editorial" | "technical" | "warm" | "fresh" | "luxurious" | "minimal". One mood the theme must have.
+  tag: string. An exact tag.
+  limit: integer. How many themes to return (1 to 500, default 50).
+
+Limits: input up to 4096 bytes, at most 500 items, 5000 ms budget.
+Example (Violet themes): texuli theme search --json '{"query":"violet","limit":5}'
+
+----
+Usage: texuli theme get [--json <object> | --file <path>] [--out <path>]
+
+Read a full theme (theme.get, runtime edge)
+Read the full token definition of one library theme: its id, name and every light and dark color, radius, font and chart token, ready to compile or apply.
+
+Arguments (JSON object keys):
+  id (required): string. A theme id from theme.search, e.g. "violet" or "enterprise-neutral".
+
+Limits: input up to 1024 bytes, 5000 ms budget.
+Example (The violet theme): texuli theme get --json '{"id":"violet"}'
+
+----
+Usage: texuli theme preview [--json <object> | --file <path>] [--out <path>]
+
+Preview a theme (theme.preview, runtime edge)
+Preview one library theme in light or dark mode: its key tokens (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes, with issue counts.
+
+Arguments (JSON object keys):
+  id (required): string. A theme id from theme.search, e.g. "violet" or "enterprise-neutral".
+  mode: "light" | "dark". The mode whose tokens to show (default light); the AA report covers both.
+
+Limits: input up to 1024 bytes, 5000 ms budget.
+Example (Ocean in dark mode): texuli theme preview --json '{"id":"ocean","mode":"dark"}'
+
+----
+Usage: texuli deck run [--json <object> | --file <path>] [--out <path>]
+
+Run a deck command (deck.run, runtime edge)
+Inspect, lint and convert a Texuli deck on the shared v2 model: capabilities, the JSON Schema, layouts, lint, inspect, from-markdown and to-markdown. Pure compute; returns { result } with the command output (ok, issues, deck, markdown …).
+
+Arguments (JSON object keys):
+  command (required): "capabilities" | "schema" | "layouts" | "lint" | "inspect" | "from-markdown" | "to-markdown". capabilities, schema and layouts take nothing; lint, inspect and to-markdown take deck; from-markdown takes markdown.
+  deck: object. A JSON deck (formatVersion 2) for lint, inspect or to-markdown.
+  markdown: string. Deck Markdown (front matter, one section per slide) for from-markdown.
+
+Limits: input up to 2100000 bytes, 10000 ms budget.
+Example (What the deck format supports): texuli deck run --json '{"command":"capabilities"}'
+
+----
+Usage: texuli document run [--json <object> | --file <path>] [--out <path>]
+
+Run a document command (document.run, runtime edge)
+Create, validate, inspect, patch and convert a Texuli document (spec 0.7.0): capabilities, the JSON Schema, validate, inspect, a bounded RFC 6902 patch (at most 1000 operations), from-markdown, to-markdown and to-blueprint. Returns { result } with the command output; PDF and DOCX are document.export.
+
+Arguments (JSON object keys):
+  command (required): "capabilities" | "schema" | "validate" | "inspect" | "patch" | "from-markdown" | "to-markdown" | "to-blueprint". capabilities and schema take nothing; from-markdown takes markdown; every other command takes document.
+  document: object. A Texuli document (format texuli-document, formatVersion 1).
+  markdown: string. Markdown text for from-markdown.
+  patch: array. RFC 6902 operations for patch (add, remove, replace, move, copy, test).
+  tier: "developer" | "untrusted". The URL policy tier links and media are checked at (default untrusted).
+  key: string. The node key for to-blueprint (default "document").
+
+Limits: input up to 2100000 bytes, at most 1000 items, 10000 ms budget.
+Example (Import Markdown): texuli document run --json '{"command":"from-markdown","markdown":"# Brief\n\nA fictional plan."}'
+
+----
+Usage: texuli document export [--json <object> | --file <path>] [--out <path>]
+
+Export a document as PDF or DOCX (document.export, runtime node)
+Write a Texuli document as PDF or DOCX bytes with the owned writers, links and media checked at the tier. Returns { result } with ok, mime, byteLength, base64 bytes (no files are written), diagnostics and, for PDF, pageCount. Needs Node.
+
+Arguments (JSON object keys):
+  format (required): "pdf" | "docx". The file format to write.
+  document (required): object. A Texuli document (format texuli-document, formatVersion 1).
+  tier: "developer" | "untrusted". The URL policy tier links and media are checked at (default untrusted).
+
+Limits: input up to 2100000 bytes, 30000 ms budget.

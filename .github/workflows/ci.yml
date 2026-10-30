@@ -9,6 +9,11 @@
 #                browser e2e suite except the budget tests, in six shards.
 #   - audits:    size budgets and the site-perf budgets (docs/CI.md).
 #   - setup-smoke-macos: the skill's setup.sh under macOS /bin/bash 3.2.
+#
+# Only on pushes to main, never required (continue-on-error):
+#   - mcp-remote-smoke: after the Cloudflare Pages deploy of the same
+#                commit, a read-only tools/list against https://texuli.com/mcp
+#                must equal the registry (scripts/mcp-remote-smoke.sh).
 name: CI
 
 on:
@@ -180,3 +185,26 @@ jobs:
             /bin/bash "$SETUP" --host "$host" --home "$HOME_DIR" | grep 'Already installed: no change.'
             /bin/bash "$SETUP" --verify --dir "$HOME_DIR/${folder#\~/}" --expect-version "$VERSION"
           done < "$HOME_DIR/hosts.txt"
+
+  # The remote MCP (functions/mcp.ts) deploys with the site, outside GitHub
+  # Actions, so this job polls until the deploy of this commit serves the
+  # registry's tools: a read-only tools/list with curl, compared with the
+  # committed server card (generated from the registry; pnpm check:surfaces
+  # keeps them equal). It retries for up to 10 minutes. It never runs on
+  # pull requests and never fails the workflow (continue-on-error), so a
+  # slow deploy cannot block publishing; a drift shows as a failed job with
+  # an error annotation.
+  mcp-remote-smoke:
+    name: Remote MCP matches the registry (main, after deploy)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      # curl and jq ship on the Ubuntu image; nothing is installed.
+      - run: bash scripts/mcp-remote-smoke.sh
+        env:
+          MCP_SMOKE_ATTEMPTS: '20'
+          MCP_SMOKE_DELAY: '30'

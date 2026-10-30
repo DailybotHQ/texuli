@@ -87,7 +87,9 @@ MCP server, exported as `@texuli/tools/mcp` and started with `texuli mcp`
 (stdio). MCP hosts install it with `npx -y @texuli/mcp`, the thin
 `@texuli/mcp` package first published in `0.9.0`; host setup is in its
 [README](https://github.com/DailybotHQ/texuli/blob/main/packages/mcp/README.md).
-A remote endpoint at texuli.com is planned. The server speaks MCP `2025-11-25` (negotiating the
+The remote endpoint `https://texuli.com/mcp` (`functions/mcp.ts`, `edge`
+operations only) is in the repository and goes live when release 0.9.0
+deploys from `main`. The server speaks MCP `2025-11-25` (negotiating the
 three earlier versions) through a transport-independent handler: tools with
 output schemas and structured results, resources (the catalog, component
 manifests and pages, themes, the deck and document schemas), prompts
@@ -99,6 +101,12 @@ operation (`catalog.search`, `component.get`, `blueprint.validate`,
 `theme.preview`, `deck.run` …)
 with JSON Schema input and output, limits and examples; see
 [ops.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md).
+From `0.9.0` the `texuli` bin runs each one as `texuli <group> <verb>`
+(JSON from stdin, `--json` or `--file`; `--out` writes a new file inside the
+working directory), with `texuli help` written from the registry; the 0.8
+commands (`texuli deck …`, `texuli document …`, `texuli mcp`) stay, and
+`texuli init`, `theme`, `add`, `diff` and `update` now route to their own
+bins' commands.
 
 **Deck commands (in development, new in `0.4.0`).** `@texuli/tools` adds
 a `@texuli/tools/deck` subpath and two bins, `texuli` (its `deck`

@@ -98,15 +98,15 @@ or none, its result is validated, and the inverse restores the input.
 
 ## Commands
 
-The `document` command of the `texuli` CLI in `@texuli/tools` (and the read-only
-`document` MCP tool, same commands) prints JSON; `--out` writes a new file
-and never overwrites one:
+The `document` command of the `texuli` bin of `@texuli/tools` (and the
+read-only `document.run` and `document.export` MCP tools, same commands)
+prints JSON; `--out` writes a new file and never overwrites one:
 
 ```bash
-pnpm exec tsx packages/tools/src/cli/texuli.ts document capabilities
-pnpm exec tsx packages/tools/src/cli/texuli.ts document from-markdown --file <notes.md>
-pnpm exec tsx packages/tools/src/cli/texuli.ts document validate --file <doc.json>
-pnpm exec tsx packages/tools/src/cli/texuli.ts document patch --file <doc.json> --patch <patch.json>
-pnpm exec tsx packages/tools/src/cli/texuli.ts document to-blueprint --file <doc.json> --key brief
-pnpm exec tsx packages/tools/src/cli/texuli.ts document to-pdf --file <doc.json> --out <brief.pdf>
+npx texuli document capabilities
+npx texuli document from-markdown --file <notes.md>
+npx texuli document validate --file <doc.json>
+npx texuli document patch --file <doc.json> --patch <patch.json>
+npx texuli document to-blueprint --file <doc.json> --key brief
+npx texuli document to-pdf --file <doc.json> --out <brief.pdf>
 ```

@@ -164,7 +164,7 @@ Texuli is designed to be built *by* agents as much as by people.
 | **Agent catalog** | A declarative catalog of components and props. An agent emits catalog nodes; the renderer turns them into real components | [Catalog](packages/catalog/README.md) |
 | **No HTML sinks** | Never `{@html}`, `innerHTML`, `eval` or `new Function` on props, content or agent output. Structure is trusted; markup never is | [Security](docs/SECURITY.md) |
 | **Two-tier URL policy** | Every link and media source passes `safeHref` / `safeMediaSrc`: `developer` for app-authored props, `untrusted` for agent and user content | [URL policy](docs/SECURITY.md) |
-| **MCP server** | A local stdio MCP server over the tools package — no hosted endpoint | [Tools](packages/tools/README.md) |
+| **MCP server** | Every operation of one registry as an MCP tool: local over stdio (`npx -y @texuli/mcp`) and remote over Streamable HTTP at `https://texuli.com/mcp` (the edge operations, read-only, no key); the same operations run as `texuli <group> <verb>`. New in `0.9.0`, in development: not on npm yet, and the remote goes live when release 0.9.0 deploys from `main` | [MCP](packages/mcp/README.md) · [Tools](packages/tools/docs/mcp.md) |
 | **LLM docs & A2UI** | Docs generated for LLM consumption and an A2UI adapter for agent-to-UI flows | [Tools](packages/tools/README.md) |
 
 Inside the repository, [AGENTS.md](AGENTS.md) is the single entry point for

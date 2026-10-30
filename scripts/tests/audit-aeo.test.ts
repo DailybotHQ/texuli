@@ -1,9 +1,10 @@
 // @vitest-environment node
 import { createHash } from 'node:crypto';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
+import { texuliOps } from '../../packages/tools/src/ops/index.ts';
 import { AEO_CONFIG, auditAeo, collectAeo, distPathFor, renderMarkdown } from '../audit-aeo.mjs';
 
 const sha256 = (text: string) => `sha256:${createHash('sha256').update(text).digest('hex')}`;
@@ -55,8 +56,11 @@ function greenSurface() {
       }),
       'mcp/server-card.json': JSON.stringify({
         serverInfo: { name: 'texuli' },
-        transport: { stdio: { launch: 'pnpm exec tsx src/mcp/stdio.ts' } },
-        tools: [{ name: 'catalog' }],
+        transport: {
+          stdio: { launch: 'npx -y @texuli/mcp' },
+          streamableHttp: { url: 'https://texuli.com/mcp' },
+        },
+        tools: texuliOps.list().map((operation) => ({ name: operation.name })),
       }),
       'agent-skills/index.json': JSON.stringify(skills),
     },
@@ -188,9 +192,32 @@ describe('auditAeo red cases', () => {
       );
       expect(cardFindings.some((finding) => finding.detail.includes('serverInfo.name'))).toBe(true);
       expect(cardFindings.some((finding) => finding.detail.includes('no tools'))).toBe(true);
+      expect(cardFindings.some((finding) => finding.detail.includes('no transport'))).toBe(true);
+
+      // The card is compared with the operations registry, not a literal list.
+      const registry = { ...AEO_CONFIG, mcpTools: texuliOps.list().map((op) => op.name) };
+      expect(criticals(auditAeo(greenSurface(), registry))).toEqual([]);
+      const stale = greenSurface();
+      stale.wellKnown['mcp/server-card.json'] = JSON.stringify({
+        serverInfo: { name: 'texuli' },
+        transport: { streamableHttp: { url: 'http://texuli.com/mcp' } },
+        tools: ['catalog', ...registry.mcpTools.slice(1)],
+      });
+      const staleDetails = criticals(auditAeo(stale, registry)).map((f) => f.detail);
+      expect(staleDetails).toContain('transport.streamableHttp.url is not an https URL');
+      expect(staleDetails).toContain(
+        `the registry operation "${registry.mcpTools[0]}" is not advertised`
+      );
+      expect(staleDetails).toContain('advertises "catalog", which is not a registry operation');
+      // The committed card passes against the registry.
+      const committed = greenSurface();
+      committed.wellKnown['mcp/server-card.json'] = readFileSync(
+        join(import.meta.dirname, '../../apps/website/public/.well-known/mcp/server-card.json'),
+        'utf8'
+      );
       expect(
-        cardFindings.some((finding) => finding.detail.includes('transport.stdio.launch'))
-      ).toBe(true);
+        criticals(auditAeo(committed, registry)).filter((f) => f.page === 'mcp/server-card.json')
+      ).toEqual([]);
 
       const drifted = greenSurface();
       drifted.readBytes = () => Buffer.from('changed body');

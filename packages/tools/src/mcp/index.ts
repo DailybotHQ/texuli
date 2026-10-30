@@ -29,4 +29,4 @@ export {
 } from './protocol.ts';
 export { MCP_SCHEMA_NAMES, texuliResources } from './resources.ts';
 export { createTexuliMcpServer } from './server.ts';
-export { runMcpStdio } from './stdio.ts';
+export { MCP_STDIO_MAX_MESSAGE_BYTES, runMcpStdio } from './stdio.ts';

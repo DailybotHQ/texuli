@@ -27,10 +27,11 @@ Every root script, verbatim.
 | `pnpm typecheck` | `pnpm -r --if-present typecheck` | Every package's `typecheck` (stops at the first failure; add `--no-bail` via `pnpm -r --no-bail typecheck` to see all) |
 | `pnpm test` | `vitest run` | Unit and component tests: `packages/*/tests`, `apps/website/tests`, `scripts/tests` (not `apps/agent/tests`) |
 | `pnpm test:watch` | `vitest` | Watch mode (runs once without a TTY) |
-| `pnpm check` | `pnpm lint && pnpm typecheck && pnpm test && pnpm check:layers` | The fast full gate |
+| `pnpm check` | `pnpm lint && pnpm typecheck && pnpm test && pnpm check:layers && pnpm check:surfaces` | The fast full gate |
 | `pnpm test:e2e` | `playwright test` | Every browser check (e2e, behavior, visual, consumers) on Chromium, WebKit and Pixel 7 against the fixture app on `TEXULI_E2E_PORT` (default 4870) |
 | `pnpm test:e2e:install` | `playwright install chromium webkit` | Install the browsers |
 | `pnpm check:layers` | `tsx scripts/check-layers.ts` | Layer guard: down-only dependencies, no deep imports, no HTML/code sinks, no static `style=` |
+| `pnpm check:surfaces` | `tsx scripts/generate-surfaces.ts --check` | Regenerate the agent surfaces (MCP server card, llms Tools section, `packages/tools/docs/ops.md` tables, `/mcp-server/` data) from the operations registry into a temp dir and fail on any diff; `pnpm exec tsx scripts/generate-surfaces.ts` rewrites them |
 | `pnpm check:skill` | `tsx scripts/check-skill.ts` | Validate the `skills/texuli` agent skill: frontmatter, links, commands, CLI references, snippets, checksums |
 | `pnpm size` | `tsx scripts/size.ts` | Build every export subpath alone (Svelte external) and compare gzip against `texuli.budgets.json`. 2026-10-26, after the owner's budget rows: `307 entries within budget`, exit 0 (local macOS run; history in [CI](CI.md#budget-audits)) |
 | `pnpm visual` | `tsx scripts/visual.ts` | Visual regression against `tests/visual/visual.spec.ts-snapshots` (light and dark, desktop and Pixel 7) |
