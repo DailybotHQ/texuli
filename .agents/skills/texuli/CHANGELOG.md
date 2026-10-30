@@ -15,6 +15,25 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages move to `0.9.0`: 26 published packages, `@texuli/mcp`
+  published for the first time. The router, components, install and
+  build-ui references say "on npm as `0.9.0`" and pin `^0.9.0`; the
+  "0.9.0 is in development" install note is gone.
+- `router/packages.md` gains a "New in `0.9.0`" paragraph and marks the new
+  entries (`@texuli/tools/ops`, `@texuli/tools/mcp`,
+  `@texuli/catalog/manifests/all`, the token contract v2 subpaths of
+  `@texuli/tokens`, `texuli/defaults`) and an L9 row for `@texuli/mcp`;
+  `router/hosts.md` states that both MCP servers are live from `0.9.0`.
+- `build-ui/references/imports.md` gains a "New in 0.9.0" table (component
+  and system tokens on a scope, `setDesignDefaults`, scoped portals, the
+  chart time axis, keyboard rows in table grids, `useFieldLabel`,
+  `composeHandlers`, the operations registry).
+- `upgrade/SKILL.md` lists the `0.9.0` breaking changes an app checks
+  before moving from `^0.8.0` (spec 0.9.0 stamps, the new catalog hash, the
+  MCP tool aliases deprecated until `0.10.0` and `-32600` before
+  `initialize`, token contract v2, the `aria-disabled` pending Button,
+  `aria-invalid` on date controls, the tree block `variant`).
+
 ## [0.3.3] — 2026-10-30
 
 ### Changes

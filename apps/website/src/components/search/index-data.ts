@@ -18,6 +18,40 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['texuli', 'landing'],
   },
   {
+    id: 'page-developers',
+    title: 'Developers',
+    description: 'The JSON API, OpenAPI, the MCP server, the CLI, limits and versioning.',
+    href: '/developers/',
+    kind: 'page',
+    keywords: ['api', 'openapi', 'mcp', 'cli', 'rate limit', 'developers', 'json'],
+  },
+  {
+    id: 'page-mcp-server',
+    title: 'Texuli MCP',
+    description:
+      'The MCP server: remote and npx, setup for every host, tools, resources, prompts and limits.',
+    href: '/mcp-server/',
+    kind: 'page',
+    keywords: ['mcp', 'model context protocol', 'claude', 'cursor', 'codex', 'tools', 'webmcp'],
+  },
+  {
+    id: 'page-tokens',
+    title: 'Design tokens',
+    description:
+      'Token contract v2: system families, the scope model, hooks and setDesignDefaults.',
+    href: '/tokens/',
+    kind: 'page',
+    keywords: ['tokens', 'design tokens', 'design system', 'scope', 'defaults', 'css variables'],
+  },
+  {
+    id: 'page-component-tokens',
+    title: 'Component tokens',
+    description: 'Every component token with the fallback its read carries.',
+    href: '/tokens/components/',
+    kind: 'page',
+    keywords: ['component tokens', 'tokens', 'fallback', 'design system'],
+  },
+  {
     id: 'page-brand',
     title: 'Brand',
     description: 'Brand story, live demos, and why Texuli.',
@@ -177,10 +211,10 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-whats-new',
     title: 'What’s new',
     description:
-      'Every new package and capability of 0.6.0, 0.7.0 and 0.8.0, with a demo or preview each and honest release status.',
+      'Every new package and capability of 0.6.0, 0.7.0, 0.8.0 and 0.9.0, with a demo or preview each and honest release status.',
     href: '/whats-new/',
     kind: 'page',
-    keywords: ['new', 'release', 'features', 'changelog', '0.8.0', 'roadmap'],
+    keywords: ['new', 'release', 'features', 'changelog', '0.9.0', '0.8.0', 'roadmap'],
   },
   {
     id: 'page-live-generation',

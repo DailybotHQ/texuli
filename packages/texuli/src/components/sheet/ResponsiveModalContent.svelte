@@ -6,6 +6,7 @@ import type { MotionProp } from '../../motion/contract.ts';
 import { createOverlayMotion, sheetEdge } from '../../motion/seam.ts';
 import { responsiveModalContentClass, type SheetSize } from './variants.ts';
 import './sheet.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = ComponentProps<typeof Primitive.Content> & {
   size?: SheetSize;
@@ -13,7 +14,14 @@ type Props = ComponentProps<typeof Primitive.Content> & {
   /** Enter and exit motion (`texuli/motion`): default a slide from its edge (centered: a rise); `false` for none. */
   motion?: MotionProp;
 };
-let { size = 'md', class: className, motion, ref = $bindable(null), ...rest }: Props = $props();
+const txDefaults = designDefaults('sheet');
+let {
+  size = txDefaults().size ?? 'md',
+  class: className,
+  motion,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 const sheetMotion = createOverlayMotion({
   motion: () => motion,
   defaults: { enter: 'rise', exit: 'rise', duration: 'base' },

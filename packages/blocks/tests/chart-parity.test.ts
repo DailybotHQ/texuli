@@ -170,18 +170,24 @@ describe('cartesian and matrix extras', () => {
   ];
   const withProps = (kind: string, props: unknown) =>
     chartBlock(kind, { ...FIXTURES[kind as ChartKind], props });
-  it('accepts annotations, renderer, interactive and fullDomain on cartesian kinds, and 2 related cases', async () => {
-    // accepts annotations, renderer, interactive and fullDomain on cartesian kinds
+  it('accepts annotations, renderer, interactive, fullDomain, xKind and locale on cartesian kinds, and 2 related cases', async () => {
+    // accepts annotations, renderer, interactive, fullDomain, xKind and locale on cartesian kinds
     await (async () => {
       const block = withProps('line', {
         annotations,
         renderer: 'svg',
         interactive: false,
         fullDomain: [0, 10],
+        xKind: 'category',
+        locale: 'en-US',
       });
       const parsed = safeParseBlock(block);
       expect(parsed.issues).toEqual([]);
-      expect(parsed.data).toMatchObject({ props: { renderer: 'svg', interactive: false } });
+      expect(parsed.data).toMatchObject({
+        props: { renderer: 'svg', interactive: false, xKind: 'category', locale: 'en-US' },
+      });
+      // G97: an unknown x-axis kind is refused like any closed-set value.
+      expect(safeParseBlock(withProps('line', { xKind: 'calendar' })).issues).not.toEqual([]);
       render(DataBlockView, { props: { block } });
       expect(await screen.findAllByText('Fictional line')).not.toHaveLength(0);
       expect(document.querySelector('.tx-block-chart-error')).toBeNull();
@@ -547,7 +553,13 @@ describe('chart block rendering', () => {
           const cssRule = rule as CSSStyleRule;
           const selector = cssRule.selectorText.replace(/\.svelte-[a-z0-9]+/g, '');
           if (!notice.matches(selector)) continue;
-          for (const property of ['border-style', 'padding', 'border-radius', 'font-size']) {
+          for (const property of [
+            'border',
+            'border-style',
+            'padding',
+            'border-radius',
+            'font-size',
+          ]) {
             const value = cssRule.style.getPropertyValue(property);
             if (value) declarations.set(property, value);
           }
@@ -555,7 +567,10 @@ describe('chart block rendering', () => {
         style.remove();
         // The text, code, structure and media families all paint the invalid
         // notice with a dashed currentColor border, inner padding and an em size.
-        expect(declarations.get('border-style')).toBe('dashed');
+        // A border shorthand with a var() width stays a shorthand in the CSSOM.
+        expect(
+          `${declarations.get('border') ?? ''} ${declarations.get('border-style') ?? ''}`
+        ).toMatch(/\bdashed\b/);
         expect(declarations.get('padding')).not.toBe('');
         expect(declarations.get('border-radius')).not.toBe('');
         expect(declarations.get('font-size')).toBe('0.875em');

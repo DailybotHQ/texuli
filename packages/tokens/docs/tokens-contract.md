@@ -15,6 +15,36 @@
 
 CSS custom properties use the **`--tx-*`** prefix (`tokenToCssVar`, `semanticTokenToCssVar`).
 
+## Token contract v2 (unreleased, ADR-020)
+
+Contract v2 adds two tiers on top of the three above, additively:
+
+- **System families** (`@texuli/tokens/system`): space, size, type roles,
+  elevation, shape (`--tx-shape-radius-*`), layers, opacity, layout, icons,
+  status and data-viz, 151 tokens. Their defaults reproduce today's rendered
+  values. `base.css` declares every system default once per token scope
+  (`:where(:root, [data-tx-theme], [data-tx-scope])`), so CSS reads
+  `systemVar(name)` plainly, for example `var(--tx-z-modal)`. Themes emit the
+  data-viz family (only for themes that carry chart colors; emitting it for
+  every theme moves chart pixels and waits for a visual review).
+- **Component tokens** (`@texuli/tokens/components`): 364 tokens for 57
+  components (48 `texuli` families and 9 domain families: data grid, board,
+  chart frame, chat bubble and composer, canvas toolbar, workflow node,
+  sheet view and schema form), each defaulting to a system or theme token.
+  No stylesheet declares them: CSS reads `componentVar(component, key)`, one
+  fallback level, for example `var(--tx-button-radius, var(--tx-shape-radius-lg))`,
+  so a component token exists on a page only when a theme, design system or
+  host sets it. Design systems set component tokens on their scope element
+  (`data-tx-theme` or `data-tx-scope`). `checkTokenReads(source)` fails any
+  read of a system or component token that is not in its exact form.
+
+`THEME_JSON_SCHEMA.definitions.systemTokens` lists the system names, and
+`getComponentTokensJsonSchema()` describes the component vocabulary. `texuli`
+and the domain packages read these tokens; `scripts/check-token-usage.ts`
+fails on literal colors, spaces, radii, font sizes and high z-indexes in
+package stylesheets outside its allowlist (each entry with a reason). The full
+generated tables are in [tokens-components.md](tokens-components.md).
+
 ## Theme document
 
 Agents emit a JSON theme that `validateTheme` / `defineTheme` accept:

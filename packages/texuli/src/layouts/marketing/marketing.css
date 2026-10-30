@@ -1,6 +1,11 @@
 /**
  * Marketing layouts — landing, pricing and section frames.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: hero and pricing type weights and sizes, the 1px highlighted-
+ * tier ring and section widths are page design, not component tokens.
  */
 @layer tx.components {
   .tx-marketing-layout {
@@ -15,28 +20,28 @@
   .tx-marketing-layout__header {
     border-block-end: 1px solid var(--tx-border, ButtonBorder);
     background-color: color-mix(in oklab, var(--tx-background, Canvas) 90%, transparent);
-    padding-inline: 1rem;
+    padding-inline: var(--tx-space-4);
     padding-block-start: max(0.25rem, var(--tx-safe-top, 0px));
   }
 
   @media (min-width: 40rem) {
     .tx-marketing-layout__header {
-      padding-inline: 1.5rem;
+      padding-inline: var(--tx-space-6);
     }
   }
 
   .tx-marketing-layout__header-inner {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: var(--tx-space-4);
     min-block-size: 4rem;
-    max-inline-size: 80rem;
+    max-inline-size: var(--tx-layout-wide-max);
     margin-inline: auto;
   }
 
   @media (min-width: 40rem) {
     .tx-marketing-layout__header-inner {
-      gap: 1.5rem;
+      gap: var(--tx-space-6);
     }
   }
 
@@ -52,7 +57,7 @@
   .tx-marketing-layout__nav-list {
     display: none;
     flex-wrap: wrap;
-    gap: 0.25rem 1rem;
+    gap: var(--tx-space-1) var(--tx-space-4);
     list-style: none;
     margin: 0;
     padding: 0;
@@ -80,7 +85,7 @@
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
   }
 
   /*
@@ -96,19 +101,19 @@
     flex: 1 1 auto;
     flex-direction: column;
     inline-size: 100%;
-    max-inline-size: 80rem;
+    max-inline-size: var(--tx-layout-wide-max);
     margin-inline: auto;
-    padding-inline: 1rem;
+    padding-inline: var(--tx-space-4);
   }
 
   @media (min-width: 40rem) {
     .tx-marketing-layout__main {
-      padding-inline: 1.5rem;
+      padding-inline: var(--tx-space-6);
     }
   }
 
   .tx-marketing-layout__hero {
-    padding-block: 3rem;
+    padding-block: var(--tx-space-12);
   }
 
   @media (min-width: 40rem) {
@@ -119,39 +124,39 @@
 
   .tx-marketing-layout__screen {
     min-inline-size: 0;
-    padding-block: 2rem;
+    padding-block: var(--tx-space-8);
   }
 
   @media (min-width: 40rem) {
     .tx-marketing-layout__screen {
-      padding-block: 3rem;
+      padding-block: var(--tx-space-12);
     }
   }
 
   .tx-marketing-layout__footer {
-    margin-block-start: 3rem;
+    margin-block-start: var(--tx-space-12);
     border-block-start: 1px solid var(--tx-border, ButtonBorder);
     background-color: color-mix(in oklab, var(--tx-muted, CanvasText) 8%, transparent);
-    padding-inline: 1rem;
+    padding-inline: var(--tx-space-4);
     padding-block: 2rem max(2rem, var(--tx-safe-bottom, 0px));
   }
 
   @media (min-width: 40rem) {
     .tx-marketing-layout__footer {
-      padding-inline: 1.5rem;
+      padding-inline: var(--tx-space-6);
     }
   }
 
   .tx-marketing-layout__footer-inner {
-    max-inline-size: 80rem;
+    max-inline-size: var(--tx-layout-wide-max);
     margin-inline: auto;
   }
 
   /* Section */
   .tx-marketing-section {
     display: grid;
-    gap: 1.25rem;
-    padding-block: 2.5rem;
+    gap: var(--tx-space-5);
+    padding-block: var(--tx-space-10);
   }
 
   @media (min-width: 40rem) {
@@ -167,7 +172,7 @@
   /* Section header (heading only): no landmark, no block padding. */
   .tx-marketing-section-header {
     display: grid;
-    gap: 0.75rem;
+    gap: var(--tx-space-3);
     min-inline-size: 0;
   }
 
@@ -211,7 +216,7 @@
   /* Landing hero */
   .tx-landing-hero {
     display: grid;
-    gap: 1.5rem;
+    gap: var(--tx-space-6);
     max-inline-size: 48rem;
   }
 
@@ -240,7 +245,7 @@
   .tx-landing-hero__ctas {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: var(--tx-space-3);
   }
 
   .tx-landing-hero[data-align="center"] .tx-landing-hero__ctas {
@@ -250,7 +255,7 @@
   /* Pricing */
   .tx-pricing-grid {
     display: grid;
-    gap: 1.25rem;
+    gap: var(--tx-space-5);
     grid-template-columns: 1fr;
     margin: 0;
     padding: 0;
@@ -274,11 +279,11 @@
 
   .tx-pricing-tier {
     display: grid;
-    gap: 1rem;
+    gap: var(--tx-space-4);
     align-content: start;
-    padding: 1.25rem;
+    padding: var(--tx-space-5);
     border: 1px solid var(--tx-border, ButtonBorder);
-    border-radius: var(--tx-radius-lg, 0.5rem);
+    border-radius: var(--tx-shape-radius-lg);
     background-color: var(--tx-surface, Canvas);
     color: inherit;
   }
@@ -320,12 +325,12 @@
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
   }
 
   .tx-pricing-tier__feature {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
     align-items: flex-start;
     font-size: var(--tx-text-sm, 0.875rem);
     line-height: 1.4;
@@ -339,7 +344,7 @@
 
   .tx-pricing-tier__cta {
     margin-block-start: auto;
-    padding-block-start: 0.5rem;
+    padding-block-start: var(--tx-space-2);
   }
 
   @media (forced-colors: active) {

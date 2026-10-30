@@ -533,8 +533,8 @@ function boxStyle(box: Box): string {
       min-block-size: 20rem;
       color: var(--tx-foreground, CanvasText);
       background: var(--tx-surface, Canvas);
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-lg, 0.75rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-xl);
       color-scheme: light dark;
       overflow: hidden;
     }
@@ -609,7 +609,7 @@ function boxStyle(box: Box): string {
 
     .tx-workflow-edge__label {
       fill: var(--tx-foreground, CanvasText);
-      font-size: 0.75rem;
+      font-size: var(--tx-type-caption-size);
       paint-order: stroke;
       stroke: var(--tx-surface, Canvas);
       stroke-width: 4;
@@ -622,21 +622,21 @@ function boxStyle(box: Box): string {
 
     .tx-workflow-group {
       position: absolute;
-      border: 1px dashed var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-lg, 0.75rem);
+      border: var(--tx-border-width-thin) dashed var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-xl);
       background: color-mix(in oklab, var(--tx-muted, Canvas) 60%, transparent);
     }
 
     .tx-workflow-group__label {
       display: block;
-      padding: 0.25rem 0.5rem;
-      font-size: 0.75rem;
+      padding: var(--tx-space-1) var(--tx-space-2);
+      font-size: var(--tx-type-caption-size);
       color: var(--tx-muted-foreground, GrayText);
     }
 
     .tx-workflow-marquee {
       position: absolute;
-      border: 1px solid var(--tx-primary, Highlight);
+      border: var(--tx-border-width-thin) solid var(--tx-primary, Highlight);
       background: color-mix(in oklab, var(--tx-primary, Highlight) 12%, transparent);
       pointer-events: none;
     }

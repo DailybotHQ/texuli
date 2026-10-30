@@ -17,6 +17,9 @@ let {
   onzoom,
   onbrush,
   onselect,
+  xKind,
+  formatX,
+  locale,
 }: CartesianChartProps = $props();
 </script>
 
@@ -36,4 +39,7 @@ let {
   {onzoom}
   {onbrush}
   {onselect}
+  {xKind}
+  {formatX}
+  {locale}
 />

@@ -394,19 +394,19 @@ function onKeydown(event: KeyboardEvent): void {
     .tx-workflow-outline {
       inline-size: 100%;
       border-collapse: collapse;
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
     }
 
     .tx-workflow-outline th {
       text-align: start;
       font-weight: 600;
-      padding: 0.25rem 0.5rem;
-      border-block-end: 1px solid var(--tx-border, CanvasText);
+      padding: var(--tx-space-1) var(--tx-space-2);
+      border-block-end: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
     }
 
     .tx-workflow-outline td {
-      padding: 0.125rem 0.5rem;
-      border-block-end: 1px solid color-mix(in oklab, var(--tx-border, CanvasText) 50%, transparent);
+      padding: calc(var(--tx-space-unit) * 0.5) var(--tx-space-2);
+      border-block-end: var(--tx-border-width-thin) solid color-mix(in oklab, var(--tx-border, CanvasText) 50%, transparent);
     }
 
     .tx-workflow-outline tr[aria-selected='true'] {
@@ -422,7 +422,7 @@ function onKeydown(event: KeyboardEvent): void {
     }
 
     .tx-workflow-outline__child {
-      padding-inline-start: 2rem;
+      padding-inline-start: var(--tx-space-8);
     }
 
     .tx-workflow-outline__toggle {
@@ -444,11 +444,11 @@ function onKeydown(event: KeyboardEvent): void {
     }
 
     .tx-workflow-outline__action {
-      padding: 0 0.5rem;
+      padding: 0 var(--tx-space-2);
       color: inherit;
       background: var(--tx-surface, ButtonFace);
-      border: 1px solid var(--tx-border, ButtonText);
-      border-radius: var(--tx-radius-sm, 0.25rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, ButtonText);
+      border-radius: var(--tx-shape-radius-sm);
       cursor: pointer;
     }
 

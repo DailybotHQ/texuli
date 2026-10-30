@@ -127,7 +127,12 @@ export function createOperationRegistry(
     let output: unknown;
     try {
       const result = await Promise.race([
-        Promise.resolve().then(() => operation.handler(input, { signal: controller.signal })),
+        Promise.resolve().then(() =>
+          operation.handler(input, {
+            signal: controller.signal,
+            ...(options.site ? { site: options.site } : {}),
+          })
+        ),
         timeout,
       ]);
       if (result === 'timeout' && controller.signal.aborted)

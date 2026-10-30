@@ -283,9 +283,20 @@ for (const file of files) {
 if (manifestRoutes.size) {
   fail(`manifest has entries for unbuilt routes: ${[...manifestRoutes].sort().join(', ')}`);
 }
-const headerRoutes = [...headers.keys()].filter(
-  (route) => !manifest.pages.some((page) => page.route === route)
-);
+// Rules for built non-HTML files (the agent discovery files: content types
+// and CORS, PLAN_011 T-ar-discovery) carry no policy and need no entry.
+// A splat rule (`/api/*`, the JSON API of PLAN_011 T-ar-api) covers a built
+// directory of files; it may not carry a policy either.
+const isNonHtmlFileRule = async (route: string) =>
+  !route.endsWith('.html') &&
+  !headers.get(route)?.has('Content-Security-Policy') &&
+  (route.endsWith('/*')
+    ? ((await stat(join(DIST, route.slice(0, -2))).catch(() => null))?.isDirectory() ?? false)
+    : await isFile(join(DIST, route)));
+const headerRoutes: string[] = [];
+for (const route of headers.keys())
+  if (!manifest.pages.some((page) => page.route === route) && !(await isNonHtmlFileRule(route)))
+    headerRoutes.push(route);
 if (headerRoutes.length) {
   fail(`_headers has rules without manifest entries: ${headerRoutes.sort().join(', ')}`);
 }

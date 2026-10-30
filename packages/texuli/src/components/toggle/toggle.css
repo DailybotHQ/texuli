@@ -1,6 +1,12 @@
 /**
  * Toggle and ToggleGroup styles. @layer tx.components so consumer CSS wins.
  * Logical properties only; colors from --tx-* tokens.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: the 0.8125rem small text, the 0.2rem and 0.15rem default-
+ * group padding and gap and the 0.1rem nested-radius inset are tuned geometry
+ * off the token steps.
  */
 @layer tx.components {
   .tx-toggle {
@@ -9,15 +15,15 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    gap: 0.375rem;
+    gap: var(--tx-toggle-gap, calc(var(--tx-space-unit) * 1.5));
     margin: 0;
     border-style: solid;
     border-width: 0;
-    border-radius: var(--tx-radius, 0.5rem);
+    border-radius: var(--tx-toggle-radius, var(--tx-shape-radius-lg));
     font-family: inherit;
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1.25;
+    font-size: var(--tx-toggle-font-size, var(--tx-type-label-size));
+    font-weight: var(--tx-toggle-font-weight, var(--tx-type-label-weight));
+    line-height: var(--tx-toggle-line-height, var(--tx-type-label-line));
     white-space: nowrap;
     user-select: none;
     cursor: pointer;
@@ -35,40 +41,40 @@
 
   .tx-toggle:disabled,
   .tx-toggle[data-disabled] {
-    opacity: 0.5;
+    opacity: var(--tx-toggle-disabled-opacity, var(--tx-opacity-disabled));
     pointer-events: none;
     cursor: not-allowed;
   }
 
   .tx-toggle :where(svg) {
-    inline-size: 1rem;
-    block-size: 1rem;
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
     flex-shrink: 0;
     pointer-events: none;
   }
 
   /* Sizes */
   .tx-toggle--sm {
-    min-block-size: 2rem;
-    min-inline-size: 2rem;
-    padding-block: 0.25rem;
-    padding-inline: 0.5rem;
+    min-block-size: var(--tx-toggle-height-sm, var(--tx-size-control-sm));
+    min-inline-size: var(--tx-toggle-height-sm, var(--tx-size-control-sm));
+    padding-block: var(--tx-space-1);
+    padding-inline: var(--tx-toggle-padding-inline-sm, var(--tx-space-2));
     font-size: 0.8125rem;
   }
 
   .tx-toggle--md {
-    min-block-size: 2.25rem;
-    min-inline-size: 2.25rem;
-    padding-block: 0.375rem;
-    padding-inline: 0.75rem;
+    min-block-size: var(--tx-toggle-height-md, var(--tx-size-control-md));
+    min-inline-size: var(--tx-toggle-height-md, var(--tx-size-control-md));
+    padding-block: calc(var(--tx-space-unit) * 1.5);
+    padding-inline: var(--tx-toggle-padding-inline-md, var(--tx-space-3));
   }
 
   .tx-toggle--lg {
-    min-block-size: 2.75rem;
-    min-inline-size: 2.75rem;
-    padding-block: 0.5rem;
-    padding-inline: 1rem;
-    font-size: 1rem;
+    min-block-size: var(--tx-toggle-height-lg, var(--tx-size-control-lg));
+    min-inline-size: var(--tx-toggle-height-lg, var(--tx-size-control-lg));
+    padding-block: var(--tx-space-2);
+    padding-inline: var(--tx-toggle-padding-inline-lg, var(--tx-space-4));
+    font-size: var(--tx-type-body-size);
   }
 
   /* Variants */
@@ -87,7 +93,7 @@
   }
 
   .tx-toggle--outline {
-    border-width: 1px;
+    border-width: var(--tx-toggle-border-width, var(--tx-border-width-thin));
     border-color: var(--tx-input, var(--tx-border, ButtonBorder));
     background-color: var(--tx-surface, Canvas);
   }
@@ -108,7 +114,7 @@
     display: inline-flex;
     align-items: stretch;
     gap: 0;
-    border-radius: var(--tx-radius, 0.5rem);
+    border-radius: var(--tx-toggle-radius, var(--tx-shape-radius-lg));
   }
 
   .tx-toggle-group--horizontal {
@@ -126,7 +132,8 @@
   }
 
   .tx-toggle-group--outline {
-    border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
+    border: var(--tx-toggle-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-input, var(--tx-border, ButtonBorder));
     background-color: var(--tx-surface, Canvas);
   }
 
@@ -137,29 +144,41 @@
   }
 
   .tx-toggle-group--outline.tx-toggle-group--horizontal .tx-toggle:not(:last-child) {
-    border-inline-end-width: 1px;
+    border-inline-end-width: var(--tx-toggle-border-width, var(--tx-border-width-thin));
     border-inline-end-style: solid;
     border-inline-end-color: var(--tx-input, var(--tx-border, ButtonBorder));
   }
 
   .tx-toggle-group--outline.tx-toggle-group--vertical .tx-toggle:not(:last-child) {
-    border-block-end-width: 1px;
+    border-block-end-width: var(--tx-toggle-border-width, var(--tx-border-width-thin));
     border-block-end-style: solid;
     border-block-end-color: var(--tx-input, var(--tx-border, ButtonBorder));
   }
 
   .tx-toggle-group--outline.tx-toggle-group--horizontal .tx-toggle:first-child {
-    border-start-start-radius: calc(var(--tx-radius, 0.5rem) - 1px);
-    border-end-start-radius: calc(var(--tx-radius, 0.5rem) - 1px);
+    border-start-start-radius: calc(
+      var(--tx-toggle-radius, var(--tx-shape-radius-lg)) -
+      var(--tx-toggle-border-width, var(--tx-border-width-thin))
+    );
+    border-end-start-radius: calc(
+      var(--tx-toggle-radius, var(--tx-shape-radius-lg)) -
+      var(--tx-toggle-border-width, var(--tx-border-width-thin))
+    );
   }
 
   .tx-toggle-group--outline.tx-toggle-group--horizontal .tx-toggle:last-child {
-    border-start-end-radius: calc(var(--tx-radius, 0.5rem) - 1px);
-    border-end-end-radius: calc(var(--tx-radius, 0.5rem) - 1px);
+    border-start-end-radius: calc(
+      var(--tx-toggle-radius, var(--tx-shape-radius-lg)) -
+      var(--tx-toggle-border-width, var(--tx-border-width-thin))
+    );
+    border-end-end-radius: calc(
+      var(--tx-toggle-radius, var(--tx-shape-radius-lg)) -
+      var(--tx-toggle-border-width, var(--tx-border-width-thin))
+    );
   }
 
   .tx-toggle-group--default .tx-toggle {
-    border-radius: calc(var(--tx-radius, 0.5rem) - 0.1rem);
+    border-radius: calc(var(--tx-toggle-radius, var(--tx-shape-radius-lg)) - 0.1rem);
   }
 
   /* Wrapping rows: items flow onto more lines; outline items become chips. */
@@ -169,14 +188,15 @@
   }
 
   .tx-toggle-group--outline.tx-toggle-group--wrap {
-    gap: 0.375rem;
+    gap: var(--tx-toggle-gap, calc(var(--tx-space-unit) * 1.5));
     border: 0;
     background-color: transparent;
   }
 
   .tx-toggle-group--outline.tx-toggle-group--horizontal.tx-toggle-group--wrap .tx-toggle {
-    border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
-    border-radius: var(--tx-radius, 0.5rem);
+    border: var(--tx-toggle-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-input, var(--tx-border, ButtonBorder));
+    border-radius: var(--tx-toggle-radius, var(--tx-shape-radius-lg));
   }
 
   .tx-toggle-group--outline.tx-toggle-group--horizontal.tx-toggle-group--wrap
@@ -185,7 +205,7 @@
   }
 
   .tx-toggle-group[data-disabled] {
-    opacity: 0.5;
+    opacity: var(--tx-toggle-disabled-opacity, var(--tx-opacity-disabled));
     pointer-events: none;
   }
 

@@ -80,6 +80,9 @@ task.
     `onfocusin`, `onpointerleave`, `onscroll`, drag state) the component's
     behavior always runs (`chainHandlers`); `focus` and `blur` cannot be
     prevented anyway.
+  - Both composers are public (`@texuli/primitives`, `texuli` and
+    `texuli/cx`), so hosts and domain packages build their own parts with
+    the same order.
   - **Value sync is the one exception:** Input, Textarea, InputGroup and
     TextCounter update `value` first and then call the caller's `oninput`, so
     the caller reads the new value. `input` cannot be prevented, so the order

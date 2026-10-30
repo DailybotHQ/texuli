@@ -571,8 +571,8 @@ function tickWidth(): number {
     --tx-tl-critical-fg: var(--tx-destructive-foreground, MarkText);
     color: var(--tx-tl-ink);
     background: var(--tx-tl-surface);
-    border: 1px solid var(--tx-tl-line);
-    border-radius: 0.75rem;
+    border: var(--tx-border-width-thin) solid var(--tx-tl-line);
+    border-radius: var(--tx-shape-radius-xl);
     overflow: hidden;
     font: inherit;
   }
@@ -581,18 +581,18 @@ function tickWidth(): number {
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    padding-block: 0.75rem;
-    padding-inline: 1rem;
-    border-block-end: 1px solid var(--tx-tl-line);
+    gap: var(--tx-space-4);
+    padding-block: var(--tx-space-3);
+    padding-inline: var(--tx-space-4);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-tl-line);
   }
   h2 {
-    font-size: 1rem;
+    font-size: var(--tx-type-body-size);
     margin: 0;
   }
   .zooms {
     display: flex;
-    gap: 0.25rem;
+    gap: var(--tx-space-1);
   }
   .zooms button,
   .toolbar > button,
@@ -600,10 +600,10 @@ function tickWidth(): number {
   .unscheduled button,
   .status button {
     background: transparent;
-    border: 1px solid var(--tx-tl-line);
-    border-radius: 0.375rem;
-    padding-block: 0.3rem;
-    padding-inline: 0.55rem;
+    border: var(--tx-border-width-thin) solid var(--tx-tl-line);
+    border-radius: var(--tx-shape-radius-md);
+    padding-block: calc(var(--tx-space-unit) * 1.2);
+    padding-inline: calc(var(--tx-space-unit) * 2.2);
     color: inherit;
     cursor: pointer;
   }
@@ -624,7 +624,7 @@ function tickWidth(): number {
     min-block-size: 18rem;
   }
   .task-table {
-    border-inline-end: 1px solid var(--tx-tl-line);
+    border-inline-end: var(--tx-border-width-thin) solid var(--tx-tl-line);
     min-inline-size: 0;
     min-block-size: 0;
   }
@@ -636,15 +636,15 @@ function tickWidth(): number {
     grid-template-columns: minmax(6rem, 1fr) minmax(4.5rem, 7.2rem) minmax(4.5rem, 7.2rem)
       minmax(3.5rem, 5.6rem);
     align-items: center;
-    gap: 0.4rem;
-    padding-inline: 0.65rem;
+    gap: calc(var(--tx-space-unit) * 1.6);
+    padding-inline: calc(var(--tx-space-unit) * 2.6);
   }
   .table-head {
     block-size: 3rem;
     font-size: 0.72rem;
     color: var(--tx-tl-muted);
     font-weight: 600;
-    border-block-end: 1px solid var(--tx-tl-line);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-tl-line);
   }
   .table-viewport {
     position: relative;
@@ -653,7 +653,7 @@ function tickWidth(): number {
   .table-row {
     position: absolute;
     inset-inline: 0;
-    border-block-end: 1px solid color-mix(in srgb, var(--tx-tl-line) 65%, transparent);
+    border-block-end: var(--tx-border-width-thin) solid color-mix(in srgb, var(--tx-tl-line) 65%, transparent);
     font-size: 0.72rem;
     white-space: nowrap;
   }
@@ -670,11 +670,11 @@ function tickWidth(): number {
   .critical-mark {
     color: var(--tx-tl-critical);
     font-size: 0.65rem;
-    margin-inline-end: 0.35rem;
+    margin-inline-end: calc(var(--tx-space-unit) * 1.4);
   }
   .group-label {
     color: var(--tx-tl-muted);
-    margin-inline-end: 0.35rem;
+    margin-inline-end: calc(var(--tx-space-unit) * 1.4);
   }
   .canvas-scroll {
     min-inline-size: 0;
@@ -692,7 +692,7 @@ function tickWidth(): number {
     inset-block-start: 0;
     z-index: 4;
     background: var(--tx-tl-surface);
-    border-block-end: 1px solid var(--tx-tl-line);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-tl-line);
     white-space: nowrap;
     overflow: hidden;
   }
@@ -701,14 +701,14 @@ function tickWidth(): number {
     inset-block: 0;
     display: flex;
     align-items: center;
-    padding-inline-start: 0.45rem;
-    border-inline-start: 1px solid var(--tx-tl-line);
+    padding-inline-start: calc(var(--tx-space-unit) * 1.8);
+    border-inline-start: var(--tx-border-width-thin) solid var(--tx-tl-line);
     font-size: 0.7rem;
     color: var(--tx-tl-muted);
   }
   .today-line {
     position: absolute;
-    border-inline-start: 2px solid var(--tx-tl-critical);
+    border-inline-start: var(--tx-border-width-thick) solid var(--tx-tl-critical);
     z-index: 3;
     pointer-events: none;
   }
@@ -740,7 +740,7 @@ function tickWidth(): number {
   .bar-row {
     position: absolute;
     inset-inline: 0;
-    border-block-end: 1px solid color-mix(in srgb, var(--tx-tl-line) 65%, transparent);
+    border-block-end: var(--tx-border-width-thin) solid color-mix(in srgb, var(--tx-tl-line) 65%, transparent);
     z-index: 2;
   }
   .task-bar {
@@ -749,13 +749,13 @@ function tickWidth(): number {
     block-size: 29px;
     display: flex;
     align-items: center;
-    border: 1px solid var(--tx-tl-accent);
-    border-radius: 0.35rem;
+    border: var(--tx-border-width-thin) solid var(--tx-tl-accent);
+    border-radius: calc(var(--tx-shape-radius-lg) * 0.7);
     background: color-mix(in srgb, var(--tx-tl-accent) 12%, var(--tx-tl-surface));
     color: var(--tx-tl-ink);
     text-align: start;
     overflow: hidden;
-    padding-inline: 0.35rem;
+    padding-inline: calc(var(--tx-space-unit) * 1.4);
     touch-action: none;
     cursor: grab;
   }
@@ -830,7 +830,7 @@ function tickWidth(): number {
     /* Critical stays distinguishable by a heavier system-color border; the
        progress stripe opts out of forcing so it is not erased to Canvas. */
     .task-bar.critical {
-      border: 2px solid CanvasText;
+      border: var(--tx-border-width-thick) solid CanvasText;
       background: Canvas;
       color: CanvasText;
     }
@@ -842,18 +842,18 @@ function tickWidth(): number {
   .notice,
   .unscheduled,
   .status {
-    padding-block: 0.5rem;
-    padding-inline: 0.75rem;
-    border-block-end: 1px solid var(--tx-tl-line);
+    padding-block: var(--tx-space-2);
+    padding-inline: var(--tx-space-3);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-tl-line);
   }
   .unscheduled h3 {
     font-size: 0.8rem;
-    margin: 0 0 0.35rem;
+    margin: 0 0 calc(var(--tx-space-unit) * 1.4);
   }
   .unscheduled ul {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: calc(var(--tx-space-unit) * 1.4);
     list-style: none;
     margin: 0;
     padding: 0;

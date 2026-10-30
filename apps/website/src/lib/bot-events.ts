@@ -23,6 +23,9 @@ export type BotEventName =
   | typeof EVENTS.UNKNOWN_BOT_VISIT
   | typeof EVENTS.MARKDOWN_REQUEST;
 
+/** The counters-only event of the remote MCP endpoint (T-mcp-remote). */
+export type McpEventName = typeof EVENTS.MCP_CALL;
+
 /** Tokens naming known AI crawlers — the robots.txt AI list, lowercase. */
 const AI_BOT_TOKENS = [
   'gptbot',
@@ -112,6 +115,51 @@ export function buildBotEventBody(
       data: { path: botEventPath(pathname) },
       // The class, never the raw UA: the header below matches it.
       userAgent: event === EVENTS.MARKDOWN_REQUEST ? 'markdown-client' : 'bot',
+    },
+  });
+}
+
+/** The duration buckets a remote MCP counter carries (never the exact time). */
+export type McpDurationBucket = 'lt10ms' | 'lt100ms' | 'lt1s' | 'lt5s' | 'gte5s';
+
+/** The bucket a measured duration falls into. */
+export function mcpDurationBucket(milliseconds: number): McpDurationBucket {
+  if (milliseconds < 10) return 'lt10ms';
+  if (milliseconds < 100) return 'lt100ms';
+  if (milliseconds < 1000) return 'lt1s';
+  if (milliseconds < 5000) return 'lt5s';
+  return 'gte5s';
+}
+
+/** The longest operation label a counter carries. */
+const MCP_OPERATION_MAX = 64;
+
+/**
+ * The edge event body for one remote MCP request (`mcp_call`): the
+ * operation label, the HTTP status and a duration bucket, nothing else —
+ * never arguments, ids, the client IP or the user agent. The caller passes a
+ * label from a closed list (a served tool or a known method, `batch` or
+ * `unknown`); it is still capped here. Null when analytics is not
+ * provisioned.
+ */
+export function buildMcpEventBody(
+  counter: { operation: string; status: number; durationMs: number },
+  websiteId: string | undefined,
+  hostname: string
+): string | null {
+  if (!websiteId) return null;
+  return JSON.stringify({
+    type: 'event',
+    payload: {
+      website: websiteId,
+      name: EVENTS.MCP_CALL,
+      hostname,
+      data: {
+        operation: counter.operation.slice(0, MCP_OPERATION_MAX),
+        status: counter.status,
+        duration: mcpDurationBucket(counter.durationMs),
+      },
+      userAgent: 'mcp-client',
     },
   });
 }

@@ -229,13 +229,20 @@ export function compileThemeCss(input: Theme): string {
   return `@layer tx.base, tx.components;\n\n@layer tx.base {\n${rules.join('\n\n')}\n}\n`;
 }
 
-/** Write a theme to any element and scope it to that element's descendants. */
+/**
+ * Write a theme to any element and scope it to that element's descendants.
+ * The element is marked `[data-tx-scope]` (ADR-023): `base.css` declares the
+ * system token defaults on every scope, and overlay portals opened inside it
+ * mount in a portal root that mirrors its attributes and inline variables.
+ * An existing `data-tx-scope` value (a host-named scope) is kept.
+ */
 export function applyTheme(target: HTMLElement, input: ThemeAppearanceInput): AppliedTheme {
   const theme = defineTheme(input.theme);
   const vars = themeVariables({ ...input, theme });
   for (const name of THEME_VARIABLE_NAMES) target.style.removeProperty(name);
   for (const [name, value] of Object.entries(vars)) target.style.setProperty(name, value);
   const reducedMotion = input.reducedMotion ?? false;
+  if (!target.hasAttribute('data-tx-scope')) target.setAttribute('data-tx-scope', '');
   target.dataset.txTheme = theme.id;
   target.dataset.txMode = input.mode;
   target.dataset.txMotion = reducedMotion ? 'reduce' : 'full';
@@ -249,8 +256,12 @@ export function applyTheme(target: HTMLElement, input: ThemeAppearanceInput): Ap
   };
 }
 
-/** Remove theme properties and attributes written by {@link applyTheme}. */
+/**
+ * Remove theme properties and attributes written by {@link applyTheme}. The
+ * scope marker goes too, unless the host named it (a non-empty value).
+ */
 export function clearTheme(target: HTMLElement): void {
+  if (target.getAttribute('data-tx-scope') === '') target.removeAttribute('data-tx-scope');
   for (const name of THEME_VARIABLE_NAMES) target.style.removeProperty(name);
   delete target.dataset.txTheme;
   delete target.dataset.txMode;

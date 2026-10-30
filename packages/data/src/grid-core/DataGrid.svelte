@@ -1,4 +1,5 @@
 <script lang="ts" generics="T">
+import { getPageTokens } from '@texuli/primitives/pagination';
 import type { Snippet } from 'svelte';
 import { tick, untrack } from 'svelte';
 import { type ClassValue, cx } from 'texuli/cx';
@@ -52,6 +53,11 @@ interface Props {
   search?: string;
   /** Shows a search field above the grid. */
   searchable?: boolean;
+  /**
+   * Your own match rule for a non-empty `search` (instead of the built-in
+   * folded substring over the searchable columns): `(row, query) => boolean`.
+   */
+  searchPredicate?: (row: T, query: string) => boolean;
   /** A filter AST (`FilterNode`), validated against the columns. */
   filter?: unknown;
   /** Adds a selection column. */
@@ -59,8 +65,19 @@ interface Props {
   /** Selected row ids (`bind:selected`), in row order. */
   selected?: string[];
   onSelectionChange?: (selected: string[]) => void;
-  /** Names a row for its checkbox (default: the first column's text). */
+  /**
+   * Names a row for its checkbox, and a `rowFocusable` row itself (default:
+   * the first column's text).
+   */
   rowLabel?: (row: T) => string;
+  /**
+   * `table` mode only: each body row joins the tab order (`tabindex="0"`,
+   * named by `rowLabel`), and Enter or Space on the focused row calls
+   * `onRowActivate`. Native table semantics stay (no `role="grid"`, no roving
+   * cell focus); controls inside a row keep their own keys. Default `false`;
+   * ignored in `grid` mode, which has its own keyboard model.
+   */
+  rowFocusable?: boolean;
   /** Enter on a body cell (and a click on the row with `activateOnClick`). */
   onRowActivate?: (row: T) => void;
   /**
@@ -98,6 +115,13 @@ interface Props {
   /** The current page, from 1 (`bind:page`); kept in range as rows change. */
   page?: number;
   onPageChange?: (page: number) => void;
+  /**
+   * `compact` (default): Previous, "Page N of M", Next. `numbered`: a button
+   * per page (the first, the last and the current one's neighbors, with
+   * gaps), the current one `aria-current="page"`; the position stays
+   * announced.
+   */
+  pager?: 'compact' | 'numbered';
   loading?: boolean;
   /** Caps the height (a plain CSS length) so the body scrolls under a sticky header. */
   maxBlockSize?: string;
@@ -134,11 +158,13 @@ let {
   onSortChange,
   search = $bindable(''),
   searchable = false,
+  searchPredicate,
   filter,
   selectable = false,
   selected = $bindable([]),
   onSelectionChange,
   rowLabel,
+  rowFocusable = false,
   onRowActivate,
   activateOnClick = false,
   mode = 'grid',
@@ -152,6 +178,7 @@ let {
   pageSize = 0,
   page = $bindable(1),
   onPageChange,
+  pager = 'compact',
   loading = false,
   maxBlockSize,
   density = 'default',
@@ -167,6 +194,8 @@ let {
 
 const text = $derived(resolveDataGridLabels(labels));
 const isGrid = $derived(mode !== 'table');
+/** Table mode with keyboard-reachable rows (G92). */
+const focusableRows = $derived(!isGrid && rowFocusable);
 
 // Breakpoint column hiding: a column with `hideBelow` leaves the grid while
 // the viewport is narrower. Every column shows during SSR and before mount.
@@ -204,7 +233,14 @@ const searchId = `${uid}-search`;
 const instructionsId = `${uid}-instructions`;
 
 const visible = $derived(
-  gridRows(rows, { columns, sort, search, filter, ...(locale ? { locale } : {}) })
+  gridRows(rows, {
+    columns,
+    sort,
+    search,
+    filter,
+    ...(searchPredicate ? { searchPredicate } : {}),
+    ...(locale ? { locale } : {}),
+  })
 );
 const pageCount = $derived(pageSize > 0 ? Math.max(1, Math.ceil(visible.length / pageSize)) : 1);
 const currentPage = $derived(Math.min(Math.max(1, page), pageCount));
@@ -370,6 +406,15 @@ function handleRowClick(event: MouseEvent, row: T): void {
   const selection = typeof getSelection === 'function' ? getSelection() : null;
   if (selection && !selection.isCollapsed && selection.toString().trim()) return;
   onRowActivate(row);
+}
+
+/** Enter or Space on a focused `rowFocusable` row (not a control inside it) activates it. */
+function handleRowKeydown(event: KeyboardEvent, row: T): void {
+  if (!focusableRows || event.defaultPrevented || event.target !== event.currentTarget) return;
+  if (event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  onRowActivate?.(row);
 }
 
 function handleKeydown(event: KeyboardEvent): void {
@@ -574,6 +619,14 @@ function handleFocusIn(event: FocusEvent): void {
             aria-selected={selectable && isGrid ? isSelected : undefined}
             data-tx-row-id={id}
             data-activatable={activateOnClick && onRowActivate ? '' : undefined}
+            {...focusableRows
+              ? {
+                  tabindex: 0,
+                  'aria-label': labelOf(row),
+                  'data-focusable': '',
+                  onkeydown: (event: KeyboardEvent) => handleRowKeydown(event, row),
+                }
+              : {}}
             onclick={(event: MouseEvent) => handleRowClick(event, row)}
           >
             {#if selectable}
@@ -623,7 +676,24 @@ function handleFocusIn(event: FocusEvent): void {
   {#if pageSize > 0 && pageCount > 1}
     <nav class="tx-data-grid__pager" aria-label={text.pagination(caption)}>
       {@render pageButton(currentPage - 1, text.previousPage)}
-      <span aria-live="polite">{text.pageOf(currentPage, pageCount)}</span>
+      {#if pager === 'numbered'}
+        {#each getPageTokens(currentPage, pageCount) as token (token)}
+          {#if typeof token === 'number'}
+            <button
+              type="button"
+              class="tx-data-grid__page tx-data-grid__page--number"
+              aria-label={text.page(token)}
+              aria-current={token === currentPage ? 'page' : undefined}
+              onclick={() => setPage(token)}>{token}</button
+            >
+          {:else}
+            <span class="tx-data-grid__page-gap" data-tx-page-gap aria-hidden="true">…</span>
+          {/if}
+        {/each}
+      {/if}
+      <span class={pager === 'numbered' ? 'tx-data-grid__sr-only' : undefined} aria-live="polite"
+        >{text.pageOf(currentPage, pageCount)}</span
+      >
       {@render pageButton(currentPage + 1, text.nextPage)}
     </nav>
   {/if}

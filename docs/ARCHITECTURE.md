@@ -44,6 +44,7 @@ packages in lower layers.
 | L8 | `@texuli/astro` | Astro integration, site helpers and content layouts | blocks, core, tokens |
 | L8 | `@texuli/slides` | The Svelte 5 presentation stage on `@texuli/deck` (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from `0.3.0`; in development | blocks, catalog, deck, media, player, tokens |
 | L8 | `@texuli/pages` | In development (on npm from `0.7.0`): the block document editor and reader on `@texuli/document`: text through `@texuli/editor`, a slash menu, block selection and drag on `@texuli/drag`, nested pages, resizable columns and live embeds painted by the player (`editor`, `reader`), the paged view and print (`paged`), Markdown, DOCX and PDF export (`export`), collaboration with comments, suggestions, version history and presence (`collab`), and the document host that lets the player paint agent documents (`host`) | blocks, core, document, drag, editor, player, primitives, tokens, texuli |
+| L9 | `@texuli/mcp` | In development, on npm since `0.9.0` (its first release): the local MCP server for agent hosts: the bin `texuli-mcp` (`npx -y @texuli/mcp`) and `startTexuliMcp` serve the stdio server of `@texuli/tools` with every `edge` and `node` operation; pinned exactly to `@texuli/tools` and published right after it (ADR-019) | tools |
 
 Not layers, because they consume the library:
 - **`@texuli/examples`** (private) is the examples registry. Every component
@@ -61,17 +62,17 @@ Not layers, because they consume the library:
   website (see [The website](#the-website)).
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
-`scripts/packages.ts`); `pnpm verify:packages` packs the other 25, and all
-25 are released on npm as `0.8.0`, the first release of `@texuli/forms`,
-`@texuli/canvas` and `@texuli/sheets` (new in PLAN_010; the previous
-release, `0.7.0`, had 22 packages);
+`scripts/packages.ts`); `pnpm verify:packages` packs the other 26, and all
+26 are released on npm as `0.9.0`, the first release of `@texuli/mcp` (new
+in PLAN_011; the 0.8 line had 25 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
-`@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas` and
-`@texuli/sheets` are in development
+`@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
+`@texuli/sheets` and `@texuli/mcp` are in development
 and sit in the `publish.yml` wave order ahead of their dependents
 ([RELEASE](RELEASE.md)).
 
 ```text
+L9  mcp (the local MCP server bin, over tools)
 L8  tools · astro · slides · pages
 L7  player
 L6  catalog
@@ -87,8 +88,8 @@ L0  core · date · deck · drag · spec (framework-free)
 Every package PLAN_010 decided has landed and is in this table and in
 `LAYERS` (the motion, streaming, markup, ZIP and stage-core subpaths landed
 in `0.6.0`; `@texuli/document` and `@texuli/pages` are on npm from `0.7.0`,
-and `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` from `0.8.0`, all
-in development). What is still planned, and the decided
+`@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` from `0.8.0`, and
+`@texuli/mcp` from `0.9.0`, all in development). What is still planned, and the decided
 names and layers, are listed in
 [Planned (PLAN_010)](#planned-plan010).
 
@@ -139,9 +140,10 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/slides` (private) | `.`, `model`, `grammar`, `export`, `templates`, `stage`, `stage-core`, `components`, `layouts`, `styles.css` |
 | `@texuli/spec` (private) | `.`, `workflow`, `migrate`, `codegen`, `surface`, `motion`, `stream`, `source` |
 | `@texuli/workflows` (private, in development) | `.`, `model`, `layout`, `spec-adapter`, `editor`, `viewer`, `inspector` |
-| `texuli` (private) | `.`, `alert`, `avatar`, `badge`, `button`, `card`, `carousel`, `choice`, `combobox`, `command`, `cx`, `date`, `dialog`, `empty`, `feedback`, `field`, `file-upload`, `icons`, `icons/lucide`, `input`, `kbd-code`, `layouts/app`, `layouts/app/dual-sidebar`, `layouts/app/master-detail`, `layouts/app/rail`, `layouts/app/sidebar`, `layouts/app/split-view`, `layouts/app/top-nav`, `layouts/auth-settings`, `layouts/auth-settings/register`, `layouts/content`, `layouts/content/blog`, `layouts/content/docs`, `layouts/content/editorial`, `layouts/dashboard`, `layouts/dashboard/register`, `layouts/host`, `layouts/host/chrome`, `layouts/host/drawer`, `layouts/marketing`, `layouts/marketing/entry`, `layouts/marketing/landing`, `layouts/marketing/pricing`, `layouts/marketing/register`, `layouts/marketing/section`, `layouts/mobile`, `layouts/mobile/register`, `layouts/shells`, `menus`, `motion`, `navigation`, `number-pin`, `popover`, `rating`, `resizable`, `scroll-area`, `select`, `separator-aspect`, `sheet`, `sidebar`, `slider`, `stat`, `stepper`, `table`, `tabs-accordion`, `tags-color`, `timeline`, `toast`, `toggle`, `toolbar`, `tooltip`, `tree` |
-| `@texuli/tokens` (private) | `.`, `aa-gate`, `aa-gate/components`, `base.css`, `build`, `contract`, `css`, `forced-colors`, `forced-colors.css`, `generator`, `library`, `library-expand`, `modes`, `motion`, `no-flash`, `palette`, `style-presets`, `tailwind`, `tailwind/preset.css` |
-| `@texuli/tools` (private) | `.`, `a2ui`, `cli-add`, `cli-init`, `cli-update`, `llms`, `elements`, `golden`, `deck`, `document`, `email`, `print`, `ops` (the operations registry, ADR-017) |
+| `texuli` (private) | `.`, `alert`, `avatar`, `badge`, `button`, `card`, `carousel`, `choice`, `combobox`, `command`, `cx`, `date`, `defaults`, `dialog`, `empty`, `feedback`, `field`, `file-upload`, `icons`, `icons/lucide`, `input`, `kbd-code`, `layouts/app`, `layouts/app/dual-sidebar`, `layouts/app/master-detail`, `layouts/app/rail`, `layouts/app/sidebar`, `layouts/app/split-view`, `layouts/app/top-nav`, `layouts/auth-settings`, `layouts/auth-settings/register`, `layouts/content`, `layouts/content/blog`, `layouts/content/docs`, `layouts/content/editorial`, `layouts/dashboard`, `layouts/dashboard/register`, `layouts/host`, `layouts/host/chrome`, `layouts/host/drawer`, `layouts/marketing`, `layouts/marketing/entry`, `layouts/marketing/landing`, `layouts/marketing/pricing`, `layouts/marketing/register`, `layouts/marketing/section`, `layouts/mobile`, `layouts/mobile/register`, `layouts/shells`, `menus`, `motion`, `navigation`, `number-pin`, `popover`, `rating`, `resizable`, `scroll-area`, `select`, `separator-aspect`, `sheet`, `sidebar`, `slider`, `stat`, `stepper`, `table`, `tabs-accordion`, `tags-color`, `timeline`, `toast`, `toggle`, `toolbar`, `tooltip`, `tree` |
+| `@texuli/tokens` (private) | `.`, `aa-gate`, `aa-gate/components`, `base.css`, `build`, `components`, `contract`, `css`, `data-viz`, `forced-colors`, `forced-colors.css`, `generator`, `library`, `library-expand`, `modes`, `motion`, `no-flash`, `palette`, `renames`, `renames.json`, `style-presets`, `system`, `tailwind`, `tailwind/preset.css` |
+| `@texuli/tools` (private) | `.`, `a2ui`, `cli-add`, `cli-init`, `cli-update`, `llms`, `elements`, `golden`, `deck`, `document`, `email`, `print`, `ops` (the operations registry, ADR-017), `mcp` (the MCP protocol layer, its stdio transport and `runMcpCli`) |
+| `@texuli/mcp` (private, in development) | `.` (`startTexuliMcp`, `runTexuliMcpCli`, `TEXULI_MCP_VERSION`; the bin `texuli-mcp`) |
 
 This inventory is checked against each package's `package.json` `exports`;
 each package's README and `docs/*.md` describe its subpaths
@@ -214,16 +216,34 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
 - `texuli-llms` (LLM-readable docs);
 - the A2UI adapter;
 - custom elements;
-- the local stdio MCP server (`packages/tools/src/mcp`, tested in
-  `packages/tools/tests/mcp.test.ts`; no published binary yet).
+- the local stdio MCP server (`packages/tools/src/mcp`, exported as
+  `@texuli/tools/mcp`), which `texuli mcp` and the `texuli-mcp` bin of
+  `@texuli/mcp` (L9, on npm since `0.9.0`) both run; tested in
+  `packages/tools/tests/mcp-protocol.test.ts`, `mcp-cli.test.ts` and the
+  consumer test `tests/consumers/mcp.spec.ts`.
 
-One operations registry behind all of these, a published MCP binary and a
-remote MCP endpoint at texuli.com are planned; see
-[Planned (PLAN_011)](#planned-plan011).
+- the `texuli` router (`packages/tools/src/cli/router.ts`): `texuli <group>
+  <verb>` for every operation, generated from the registry, plus the 0.8
+  commands; `texuli help` is a snapshot test;
+- the remote MCP (`functions/mcp.ts`, live at `https://texuli.com/mcp` since
+  release 0.9.0, deployed with the site from `main`): the same handler,
+  stateless, the `edge` and `site` operations.
+
+Every agent-facing description of these doors is generated from the
+operations registry by `scripts/generate-surfaces.ts` (builders in
+`scripts/agent-surfaces.ts`): the server card
+(`apps/website/public/.well-known/mcp/server-card.json`), the "Tools" section
+of the site `llms.txt`, the tables of `packages/tools/docs/ops.md` and the
+`/mcp-server/` page data. `pnpm check:surfaces` (inside `pnpm check`)
+regenerates them into a temporary directory and fails on any difference;
+`check-skill` parses every `texuli …` command with the router and checks
+every operation name and argument the skill cites; and the CI job
+`mcp-remote-smoke` compares texuli.com's `tools/list` with the registry
+after each deploy of `main`.
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.8.0`;
+ADR-009 splits presentations in two packages (both on npm as `0.9.0`;
 `@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
@@ -302,35 +322,26 @@ New subpaths in existing packages:
 
 ## Planned (PLAN_011)
 
-**Planned (PLAN_011), not shipped.** Nothing in this section exists yet.
-These are the package, subpath and file names, layers and release waves
-decided by ADR-017 to ADR-024 in [DECISIONS](DECISIONS.md) for the 0.9.0
-(agent surfaces) and 0.10.0 (design systems) release waves. Each entry joins
-the layer table, `LAYERS` in `scripts/check-layers.ts` and the package
-subpaths table above only when it lands, and each release needs the
-developer's GO.
+**Planned (PLAN_011), not shipped.** The 0.9.0 wave of ADR-017 to ADR-020
+and ADR-023 has landed and is released: `@texuli/mcp` (L9) is in the layer
+table, and `@texuli/tools` `ops` and `mcp`, `@texuli/catalog`
+`manifests/all`, the token contract v2 subpaths of `@texuli/tokens`
+(`system`, `components`, `data-viz`, `renames`, `renames.json`) and
+`texuli/defaults` are in the package subpaths table above; the remote MCP
+(`functions/mcp.ts`) is described under [The website](#the-website). What
+remains are the package, subpath and file names decided by ADR-021 to
+ADR-024 in [DECISIONS](DECISIONS.md) for the 0.10.0 (design systems) release
+wave. Each entry joins the package subpaths table only when it lands, and
+the release needs the developer's GO.
 
-New packages:
-
-| Planned layer | Package | Subpaths | What it will hold | Will depend on | Release wave | Decision |
-| --- | --- | --- | --- | --- | --- | --- |
-| L9 (a new top layer: an L8 package cannot depend on `@texuli/tools`, also L8, under the same-layer rule; the developer confirms the exception) | `@texuli/mcp` | `.` and the bin `texuli-mcp` | planned (PLAN_011): a thin package whose bin runs the local stdio MCP server from `@texuli/tools` with every `edge` and `node` operation; version pinned exactly to `@texuli/tools` and published in the same wave | tools | 0.9.0 | [ADR-019](DECISIONS.md#adr-019-the-texulimcp-package-and-its-binary) |
+New packages: none left.
 
 New subpaths in existing packages:
 
 | Package | Planned subpaths | What they will hold | Release wave | Decision |
 | --- | --- | --- | --- | --- |
-| `@texuli/tools` | `ops` (planned, PLAN_011) | The framework-free operations registry: `group.verb` operations with JSON Schema input and output, annotations, a runtime class (`edge`, `node`, `site`), limits and examples, and a schema-checked `invoke()`; the MCP tools, the CLI router, the server card, the llms tools section and the ops docs are generated from it | 0.9.0 | [ADR-017](DECISIONS.md#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface) |
-| `@texuli/catalog` | `manifests/all` (planned, PLAN_011) | The static, edge-safe manifest list shared by the remote MCP and `apps/agent`, with a hash parity test against file-system discovery | 0.9.0 | [ADR-017](DECISIONS.md#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface) |
-| `@texuli/tokens` | `components`, `renames.json` (planned, PLAN_011) | Token contract v2: the component token registry (each component's tokens and default reference, the closed vocabulary a design system may set), and the machine-readable rename list `{ from, to, since, removeIn }`; the new system families (space, size, type roles, elevation, shape, layers, opacity, layout, icons, always-on data-viz and status) join the existing CSS with defaults that reproduce today's values | 0.9.0 (families), 0.10.0 (component tier and adoption) | [ADR-020](DECISIONS.md#adr-020-token-contract-v2-additive-families-and-a-real-component-tier) |
 | `@texuli/tokens` | `design-system/validate`, `design-system/compile`, `design-system/apply`, `design-system/emit/*`, `design-system/fixtures` (planned, PLAN_011) | The design-system runtime, all lazy: the small validator, the compiler (`extends`, variants, patches, the pinned-color solver, enforced guarantees, `CompiledDesignSystem`), `applyDesignSystem` and `designSystemStyle` for element scope, SSR and no flash, the static emitters, and the fictional `protoyard-theme/v1` fixture; `@texuli/tokens` gains a down-only dependency on `@texuli/spec` | 0.10.0 | [ADR-021](DECISIONS.md#adr-021-the-design-system-document), [ADR-022](DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported), [ADR-023](DECISIONS.md#adr-023-design-system-runtime-and-scoping), [ADR-024](DECISIONS.md#adr-024-design-systems-on-every-surface) |
 | `@texuli/spec` | the design-system schema and spec `0.10.0` (planned, PLAN_011) | The `texuli/design-system` document (`formatVersion` 1): schema, TypeScript types, `DesignSystemPatch`, the JSON-path validator, `migrate`, stable error codes and generated Kotlin; spec `0.10.0` adds `designSystem` (`ref` or `inline`) to blueprints, decks and documents | 0.10.0 | [ADR-021](DECISIONS.md#adr-021-the-design-system-document), [ADR-024](DECISIONS.md#adr-024-design-systems-on-every-surface) |
-
-Edge and site files:
-
-| File | What it will hold | Release wave | Decision |
-| --- | --- | --- | --- |
-| `functions/mcp.ts` (planned, PLAN_011) | The remote MCP at texuli.com: stateless Streamable HTTP (`POST`, JSON responses, no session) at `/mcp` and `/.well-known/mcp`, serving only the registry's `edge` and `site` operations, with body, batch, item and time caps, Origin and Host checks, its own security headers, a per-isolate rate limit, and no fetch, storage or secrets; the site also registers WebMCP tools in the page | 0.9.0 | [ADR-018](DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions) |
 
 ## The website
 
@@ -345,15 +356,22 @@ static site with `client:visible` islands:
 - SEO with compile-time social images.
 
 It imports the workspace packages directly, so a broken component breaks
-`pnpm build`. Two Cloudflare Pages Functions in the repository-root
+`pnpm build`. Cloudflare Pages Functions in the repository-root
 `functions/` run beside the static output:
-- `_middleware.ts` serves Markdown twins of docs pages on an explicit
-  `text/markdown` preference, a stripped `robots.txt` to audit tools and a
-  `problem+json` 404 to agents, and sends bot-hit events; every other
-  request gets the static asset response back untouched, so its `_headers`
-  (CSP, and `Vary: Accept` on negotiable docs pages) survive;
+- `_middleware.ts` serves the Markdown twin of any page (`/index.md` for
+  `/`) on an explicit `text/markdown` preference, labels `.md` files
+  `text/markdown`, a stripped `robots.txt` to audit tools and a Markdown
+  404 to agents (`problem+json` under `/api/` and for JSON clients), and
+  sends bot-hit and `markdown_request` events; every other request gets the
+  static asset response back untouched, so its `_headers` (CSP, and
+  `Vary: Accept` on every page with a twin) survive;
 - `api/umami/[[path]].ts` is the same-origin Umami analytics proxy, off
   until the owner provisions it.
+- `mcp.ts` is the remote MCP endpoint for `/mcp` (the middleware routes
+  `/.well-known/mcp` to the same server): the `edge` and `site` operations,
+  with its own limits and headers
+  ([SECURITY](SECURITY.md#21-remote-mcp-endpoint)). It is live with
+  texuli.com since release 0.9.0.
 
 The pure decisions live in `apps/website/src/lib/` and are tested in
 `apps/website/tests/` ([SECURITY](SECURITY.md#15-website-edge-functions-and-analytics)). Per-route budgets live in
@@ -368,8 +386,8 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 25 packable packages, `@texuli/forms`, `@texuli/canvas` and
-    `@texuli/sheets` included, to npm as the `0.8.0` release (dist-tags
+    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.9.0`
+    release (dist-tags
     `latest` and `next`), with provenance
     ([RELEASE](RELEASE.md)).
 - **Tests:**

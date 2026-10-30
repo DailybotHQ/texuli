@@ -22,7 +22,7 @@ export interface LayerPackage {
 
 /** One floor of the layer graph, lowest (L0) first. */
 export interface ArchLayer {
-  /** Layer number, 0–8. */
+  /** Layer number, 0–9. */
   readonly level: number;
   /** Label as the doc prints it, for example `L0`. */
   readonly label: string;
@@ -31,7 +31,7 @@ export interface ArchLayer {
 
 /**
  * The layer graph, transcribed from `docs/ARCHITECTURE.md` ("The layer
- * graph"): L0 at the bottom, L8 at the top, dependencies point down only.
+ * graph"): L0 at the bottom, L9 at the top, dependencies point down only.
  * Each `role` is the doc's "What it holds" cell (backticks stripped, since
  * the site renders it as plain text).
  */
@@ -236,6 +236,17 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       },
     ],
   },
+  {
+    level: 9,
+    label: 'L9',
+    packages: [
+      {
+        name: '@texuli/mcp',
+        role: 'In development, on npm since 0.9.0 (its first release): the local MCP server for agent hosts: the bin texuli-mcp (npx -y @texuli/mcp) and startTexuliMcp serve the stdio server of @texuli/tools with every edge and node operation; pinned exactly to @texuli/tools and published right after it (ADR-019)',
+        dependsOn: ['tools'],
+      },
+    ],
+  },
 ];
 
 /** The same layers, top floor first — the order the diagram bands render in. */
@@ -346,7 +357,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
     layer: 'L3',
     runtimes: {
       web: {
-        text: 'Ships: styled components are published on npm as 0.8.0.',
+        text: 'Ships: styled components are published on npm as 0.9.0.',
         sources: [],
       },
       native: {

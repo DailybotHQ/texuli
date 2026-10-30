@@ -878,6 +878,23 @@ describe('icons', () => {
       expect(icon.getAttribute('data-tx-icon')).toBe('custom');
     });
 
+    it('leaves the default stroke to the --tx-icon-stroke-width token; another strokeWidth keeps its own', () => {
+      const css = readFileSync(join(__dirname, '../src/components/icons/icons.css'), 'utf8');
+      expect(css).toContain(
+        ':where(.tx-icon[stroke-width="2"]) {\n    stroke-width: var(--tx-icon-stroke-width, var(--tx-icon-stroke));'
+      );
+      for (const [strokeWidth, attr] of [
+        [undefined, '2'],
+        [1.5, '1.5'],
+      ] as const) {
+        const { container, unmount } = render(Icon, { props: { icon: 'info', strokeWidth } });
+        const svg = container.querySelector('svg');
+        expect(svg?.getAttribute('stroke-width')).toBe(attr);
+        expect(svg?.matches('.tx-icon[stroke-width="2"]')).toBe(attr === '2');
+        unmount();
+      }
+    });
+
     it('renders nothing for a runtime name outside the built-in set', () => {
       const { container } = render(Icon, { props: { icon: 'unknown' as IconName } });
       expect(container.querySelector('svg')).toBeNull();

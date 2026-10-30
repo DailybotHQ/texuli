@@ -16,6 +16,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { siteLlmsSections } from '../apps/website/src/components/seo/llms-site.ts';
 import { formatSiteLlmsTxt } from '../packages/tools/src/llms/site.ts';
+import { toolsLlmsSection } from './agent-surfaces.ts';
 
 export const SITE_URL = 'https://texuli.com';
 
@@ -28,9 +29,16 @@ export const SITE_LLMS_CONFIG = {
     'Texuli is an open-source (MIT) Svelte 5 component system built from scratch: framework-free texels compose into headless primitives, the token engine styles them, and a closed agent catalog renders agent output with no HTML sinks. A Kotlin Multiplatform renderer for the same interfaces is in development.',
 } as const;
 
-/** The llms.txt body the generator writes, for a site origin. */
+/**
+ * The llms.txt body the generator writes, for a site origin: the nav
+ * sections, then the "Tools" section generated from the operations registry
+ * (`scripts/agent-surfaces.ts`; `pnpm check:surfaces` checks it too).
+ */
 export function buildSiteLlmsTxt(siteUrl: string = SITE_URL): string {
-  return formatSiteLlmsTxt({ ...SITE_LLMS_CONFIG, sections: siteLlmsSections(siteUrl) });
+  return formatSiteLlmsTxt({
+    ...SITE_LLMS_CONFIG,
+    sections: [...siteLlmsSections(siteUrl), toolsLlmsSection(siteUrl)],
+  });
 }
 
 const invokedDirectly =

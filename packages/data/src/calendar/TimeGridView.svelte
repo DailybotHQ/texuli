@@ -170,21 +170,21 @@ const timed = $derived(dates.map((date) => layoutDay(items, { date, timeZone }))
 
 <style>
   .tx-calendar__time-header, .tx-calendar__time-grid { display: grid; grid-template-columns: 3.5rem repeat(var(--tx-calendar-columns), minmax(0, 1fr)); }
-  .tx-calendar__time-header { border-block-end: 1px solid var(--tx-border, ButtonBorder); }
-  .tx-calendar__day-heading { border: 0; background: transparent; padding: .5rem .25rem; text-align: center; color: var(--tx-muted-foreground, GrayText); font: inherit; font-size: .75rem; }
+  .tx-calendar__time-header { border-block-end: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); }
+  .tx-calendar__day-heading { border: 0; background: transparent; padding: var(--tx-space-2) var(--tx-space-1); text-align: center; color: var(--tx-muted-foreground, GrayText); font: inherit; font-size: var(--tx-type-caption-size); }
   .tx-calendar__day-heading strong { color: var(--tx-foreground, CanvasText); }
-  .tx-calendar__all-day-label { padding: .4rem; color: var(--tx-muted-foreground, GrayText); font-size: .7rem; }
-  .tx-calendar__all-day { display: grid; min-block-size: 2rem; align-content: start; gap: .2rem; border-inline-start: 1px solid var(--tx-border, ButtonBorder); padding: .2rem; }
+  .tx-calendar__all-day-label { padding: calc(var(--tx-space-unit) * 1.6); color: var(--tx-muted-foreground, GrayText); font-size: .7rem; }
+  .tx-calendar__all-day { display: grid; min-block-size: 2rem; align-content: start; gap: calc(var(--tx-space-unit) * 0.8); border-inline-start: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); padding: calc(var(--tx-space-unit) * 0.8); }
   .tx-calendar__scroller { max-block-size: min(36rem, 65vh); overflow: auto; }
   .tx-calendar__time-grid { min-block-size: 72rem; }
   .tx-calendar__hours { display: grid; grid-template-rows: repeat(24, 3rem); color: var(--tx-muted-foreground, GrayText); font-size: .65rem; text-align: end; }
-  .tx-calendar__hours span { padding-inline-end: .35rem; transform: translateY(-.45em); }
-  .tx-calendar__day-column { position: relative; min-inline-size: 0; border-inline-start: 1px solid var(--tx-border, ButtonBorder); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(3rem - 1px), var(--tx-border, ButtonBorder) calc(3rem - 1px), var(--tx-border, ButtonBorder) 3rem); }
+  .tx-calendar__hours span { padding-inline-end: calc(var(--tx-space-unit) * 1.4); transform: translateY(-.45em); }
+  .tx-calendar__day-column { position: relative; min-inline-size: 0; border-inline-start: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(3rem - 1px), var(--tx-border, ButtonBorder) calc(3rem - 1px), var(--tx-border, ButtonBorder) 3rem); }
   .tx-calendar__now { position: absolute; z-index: 1; inset-inline: 0; block-size: 2px; background: var(--tx-destructive, Highlight); pointer-events: none; }
-  .tx-calendar__now::before { position: absolute; inset-inline-start: -.3rem; inset-block-start: -.25rem; inline-size: .55rem; block-size: .55rem; border-radius: 999px; background: inherit; content: ''; }
-  .tx-calendar__slot { position: absolute; inset-inline: .1rem; border: 1px dashed transparent; border-radius: .25rem; background: transparent; padding: 0; }
-  .tx-calendar__slot:focus-visible { border-color: var(--tx-ring, Highlight); background: color-mix(in srgb, var(--tx-primary, Highlight) 8%, transparent); outline: 2px solid var(--tx-ring, Highlight); outline-offset: 0; }
-  .tx-calendar__positioned-event { position: absolute; overflow: hidden; padding-inline: .05rem; }
+  .tx-calendar__now::before { position: absolute; inset-inline-start: -.3rem; inset-block-start: -.25rem; inline-size: .55rem; block-size: .55rem; border-radius: var(--tx-shape-radius-full); background: inherit; content: ''; }
+  .tx-calendar__slot { position: absolute; inset-inline: .1rem; border: var(--tx-border-width-thin) dashed transparent; border-radius: var(--tx-shape-radius-sm); background: transparent; padding: 0; }
+  .tx-calendar__slot:focus-visible { border-color: var(--tx-ring, Highlight); background: color-mix(in srgb, var(--tx-primary, Highlight) 8%, transparent); outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight); outline-offset: 0; }
+  .tx-calendar__positioned-event { position: absolute; overflow: hidden; padding-inline: calc(var(--tx-space-unit) * 0.2); }
   .tx-calendar__positioned-event :global(.tx-calendar__event) { block-size: 100%; inline-size: 100%; }
   .tx-calendar__time-view { display: grid; min-inline-size: 0; overflow-x: auto; }
   /* Phones: each day keeps a readable 5.5rem column and the view scrolls sideways. */

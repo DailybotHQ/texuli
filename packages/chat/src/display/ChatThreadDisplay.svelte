@@ -11,6 +11,6 @@ let { label, children }: { label?: string; children?: Snippet } = $props();
 
 <style>
   @layer tx.components {
-    .tx-chat-display { display: flex; flex-direction: column; gap: 0.75rem; min-inline-size: 0; margin-block: 1rem; padding: 1rem; border: 1px solid var(--tx-border, ButtonBorder); border-radius: var(--tx-radius-lg, 0.75rem); background: var(--tx-surface, Canvas); color: var(--tx-foreground, CanvasText); }
+    .tx-chat-display { display: flex; flex-direction: column; gap: var(--tx-space-3); min-inline-size: 0; margin-block: var(--tx-space-4); padding: var(--tx-space-4); border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); border-radius: var(--tx-shape-radius-xl); background: var(--tx-surface, Canvas); color: var(--tx-foreground, CanvasText); }
   }
 </style>

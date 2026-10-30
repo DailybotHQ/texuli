@@ -5,6 +5,7 @@ import { type ClassValue } from '../../internal/cx.ts';
 import { type ClipboardLike, copyText } from './copy-text.ts';
 import { type CopyButtonSize, copyButtonClass } from './variants.ts';
 import './kbd-code.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLButtonAttributes & {
   /** The rendered root element (bindable). */
@@ -28,12 +29,13 @@ type Props = HTMLButtonAttributes & {
   children?: import('svelte').Snippet;
 };
 
+const txDefaults = designDefaults('copy-button');
 let {
   value,
   label: labelProp,
   copiedLabel: copiedLabelProp,
   feedbackMs = 1500,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   clipboard = undefined,
   onCopy,
   onCopyError,

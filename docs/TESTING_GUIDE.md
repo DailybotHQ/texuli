@@ -34,7 +34,10 @@ against its 152 KB budget.
 | The fast full gate | `pnpm check` (lint, typecheck, test, layers) | 2026-10-27: exit 0 (about 1 min 20 s) |
 | Docs links and commands | `pnpm exec tsx scripts/check-docs.ts` | 2026-10-27: 537 docs, every relative link and command is real (also a test in `pnpm test`) |
 | Dead CSS | `pnpm exec tsx scripts/check-css.ts` | 71 package stylesheets, no dead CSS (also a test in `pnpm test`: `scripts/tests/check-css.test.ts`) |
+| Token hardcodes | `pnpm exec tsx scripts/check-token-usage.ts` | 782 package stylesheets, no literal outside the allowlist (839 kept, each with a reason; most are the deck-scope and pending-adoption entries); also a test in `pnpm test`: `scripts/tests/check-token-usage.test.ts` |
 | Agent skill | `pnpm check:skill` | `skills/texuli pack is valid` (2 s) |
+| Agent surfaces | `pnpm check:surfaces` | `check:surfaces ✓ 4 generated surfaces match the registry` |
+| Agent evals (scripted MCP sessions, no model) | `pnpm vitest run tests/agent-evals` | 2026-10-30 (T-agent-evals): 2 files, 10 passed, 2 skipped (the design-system jobs, planned in T-ds-agent-tools); also part of `pnpm test` |
 | Size budgets | `pnpm size` | 251 entries: 250 within budget, `@texuli/tokens/aa-gate` over (10,817 B > 10,624 B); exit 1 (1 min 44 s, machine under load). Superseded: 2026-10-26, 307 entries within budget, exit 0 (row below) |
 | Packaging (pack, publint, attw; publishes nothing) | `pnpm verify:packages` | all packages pass; tarballs and SHA256SUMS in `tmp/packages/` (2 min 2 s) |
 | Perf and scale limits (opt-in) | `pnpm test:perf` | 6 files, 128 passed (36 s under load, 2026-10-25) |
@@ -42,6 +45,8 @@ against its 152 KB budget.
 | Harness conformance | `bash .agents/skills/deepworkplan/verify/conformance.sh --repo-only` | 16 of 17 pass in a lane worktree; the one miss is `.dwp/plans`, which lives only in the main checkout (`.dwp/` is git-ignored) |
 | PLAN_006 SEO audit (opt-in, after build) | `node scripts/audit-seo.mjs --dist apps/website/dist` | T-29: exit 0; 550 pages, 0 critical, 33 warnings, 4 planned. Evidence (local plan evidence, git-ignored): `analysis_results/29.task_seo-audit-script.md` |
 | PLAN_006 agent-surface audit (opt-in, after build) | `node scripts/audit-aeo.mjs --dist apps/website/dist` | T-30: exit 0; 26 top routes, 187 twins, 0 critical, 2 warnings, 3 planned. Evidence (local plan evidence, git-ignored): `analysis_results/30.task_aeo-verify-script.md` |
+| Markdown twin parity (after build) | `pnpm exec tsx scripts/check-md-parity.ts --strict` | PLAN_011 T-ar-twins: exit 0; 649 of 650 HTML pages have a valid twin, 1 exempt (`/404.html`). CI: website shard 1 |
+| Markdown twins on the built site | `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-twins.spec.ts --project chromium` | PLAN_011 T-ar-twins: 4 passed on chromium (the real middleware in front of `dist`: `/index.md` and non-docs twins with their header block, Accept negotiation with `Vary`, the head link, the Markdown 404) |
 | PLAN_006 llms parity | `pnpm exec tsx scripts/check-llms-parity.ts` | T-24: exit 0; 133 component pages, 157 examples across 108 directories reconciled. Evidence (local plan evidence, git-ignored): `analysis_results/24.task_aeo-markdown-catalog.md` |
 | PLAN_006 theme token sweep (static, opt-in) | `pnpm vitest run scripts/tests/theme-sweep.test.ts` | T-76 unit and lint gates passed; T-77's temporary runner reported 14/14 sample and 210/210 full cells with no red cells. It does not render components in a browser (findings: `analysis_results/themes-sweep-findings.md`, local plan evidence, git-ignored). No durable sweep CLI exists yet |
 | PLAN_006 size and website performance | `pnpm size`; `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-perf.spec.ts --project=chromium` | 2026-10-26 (T-93, T-98): `pnpm size` exit 1, 26 then 27 of 307 entries fail; after the owner's budget rows the same day, `307 entries within budget`, exit 0 (see [CI](CI.md#budget-audits)). site-perf: 10 passed on chromium (T-98 run); `/` 83.8 KB against 152 KB |
@@ -169,12 +174,16 @@ then the package, then its consumers (the layers above it).
 | `packages/player/src/**` | `pnpm vitest run packages/player`: `examples-paint` (every emittable example paints), `loader-parity` (every emittable id has a painter), `interaction` (state, actions, bindings, sortable lists, workflow graphs), `spec-mirror` (constants equal `@texuli/spec`), `surface-parity`, `golden`, `lego` (the shared drag scope across lists), `render-specs` (the lean specs match the manifests) | `pnpm exec tsx packages/player/scripts/render-specs.ts --check`; `pnpm size --filter player`; `tests/e2e/site-builder.spec.ts` |
 | `packages/astro/src/**` | `pnpm vitest run packages/astro` (`appearance.test.ts`: the appearance switcher model and island) | `tests/e2e/astro-islands.spec.ts` and `tests/consumers/consumers.spec.ts` (the `astro-plain` consumer installs the packed `@texuli/astro`) |
 | `packages/catalog/src/**` (manifests, build, render) | `pnpm vitest run packages/catalog`: `coverage` (every component of the published packages is covered or excluded with a reason), `examples-roundtrip` (every manifest example validates against the spec and hashes stably), `validate-interaction` (bindings, `bind`, `on`, the state surface and list text without a spec check), `render-hostile-blueprints` (the 0.3.0 hostile corpus); linear time on untrusted text: `render-richtext` (rich text parsing), `render-hostile` (`looksExecutable`) and `validate-sinks-linear` (the draft sink scan's HTML-tag check) | `pnpm exec tsx scripts/coverage-matrix.ts`; `tests/e2e/renderer-hostile.spec.ts`; `tests/perf/catalog-render-limits.test.ts` (`pnpm test:perf`); the site's live-components tests |
-| `packages/tools/src/**` (CLI, llms, a2ui, elements, golden, mcp) | `pnpm vitest run packages/tools` | `pnpm check:skill` when the skill references a command |
+| `packages/tools/src/**` (CLI, llms, a2ui, elements, golden, mcp) | `pnpm vitest run packages/tools` | `pnpm check:skill` when the skill references a command; `pnpm check:surfaces` when an operation, the MCP handler or the router changes (then `pnpm exec tsx scripts/generate-surfaces.ts` and review the diff) |
+| `packages/tools/src/ops/**`, `packages/tools/src/mcp/**`, `functions/mcp.ts`, `functions/_lib/mcp-*.ts` (what an agent sees through the MCP) | `pnpm vitest run tests/agent-evals`: `sessions.test.ts` replays scripted sessions (discovery from cold including `block.list`, a pricing page through `blueprint.validate` whose table block is written only from `block.schema`, theming with the `theme-blueprint` prompt, a Markdown deck conversion) on the stateful stdio handler and on the remote Function with real `Request` objects, and requires identical results for every edge operation; `tool-descriptions.test.ts` lints every operation's summary (80–400 characters, says what it returns, no marketing words), stated limits, argument descriptions and bounds, closed input schema and examples, and the inputs the deprecated aliases still list | `pnpm check:surfaces` after any summary change (then `pnpm exec tsx scripts/generate-surfaces.ts`); `pnpm vitest run packages/tools apps/website/tests/mcp-function.test.ts` |
+| `scripts/agent-surfaces.ts`, `scripts/generate-surfaces.ts`, `scripts/mcp-remote-smoke.sh` | `pnpm vitest run scripts/tests/surfaces.test.ts scripts/tests/mcp-remote-smoke.test.ts apps/website/tests/site-build-guards.test.ts` | `pnpm check:surfaces` |
+| `packages/mcp/**` (in development; the `texuli-mcp` bin) | `pnpm vitest run packages/mcp packages/tools/tests/mcp-cli.test.ts` | `pnpm check:layers`; `pnpm verify:packages --filter tools,mcp`, then `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/consumers/mcp.spec.ts --project chromium` (spawns the packed bin over stdio) |
 | `packages/examples/src/index.ts`, `packages/examples/package.json` `sideEffects` | `pnpm vitest run packages/examples/tests/registration-side-effects.test.ts` | `tests/e2e/csp.spec.ts` (builds the fixture app for production) |
 | `packages/examples/src/**` | `pnpm vitest run packages/examples` | `TEXULI_E2E_PORT=<port> pnpm visual -g <example-id>` (commit the new baselines) |
 | `skills/texuli/**`, `scripts/check-skill.ts` | `pnpm check:skill && pnpm vitest run scripts/tests/skill.test.ts` | after an intentional pack edit: `pnpm exec tsx scripts/check-skill.ts --write-sums` |
 | `scripts/check-layers.ts` | `pnpm vitest run scripts/tests/layers.test.ts` | `pnpm check:layers` |
 | `scripts/check-docs.ts`, `scripts/check-css.ts`, `scripts/check-trojan-source.ts` | `pnpm vitest run scripts/tests/check-docs.test.ts scripts/tests/check-css.test.ts scripts/tests/trojan-source.test.ts` | `pnpm check:docs`; `pnpm check:trojan-source` |
+| `scripts/check-token-usage.ts` | `pnpm vitest run scripts/tests/check-token-usage.test.ts` | `pnpm exec tsx scripts/check-token-usage.ts` |
 | `scripts/size.ts`, `texuli.budgets.json` | `pnpm vitest run scripts/tests/size.test.ts` | `pnpm size` |
 | `scripts/packages.ts` | `pnpm vitest run scripts/tests/packages.test.ts` | `pnpm verify:packages` |
 | `scripts/dist-parity.ts` (a consumer bundle from the packed `dist/` against one from source) | `pnpm vitest run scripts/tests/dist-parity.test.ts` (helpers, then two real Vite builds; up to 10 minutes) | `pnpm exec tsx scripts/dist-parity.ts` (`--tarballs` after `pnpm verify:packages`, `--json`) |
@@ -191,11 +200,13 @@ then the package, then its consumers (the layers above it).
 | `apps/website` agent discovery, llms.txt and Markdown twins | `pnpm vitest run apps/website` (the committed `.well-known` files and llms.txt sections: `site-build-guards.test.ts`) | `tests/e2e/site-seo.spec.ts` (runs `scripts/audit-aeo.mjs` on the build); `pnpm exec tsx scripts/check-llms-parity.ts`; the same audit by hand: `node scripts/audit-aeo.mjs --dist apps/website/dist` |
 | `apps/website` analytics loader, proxy and event wiring | `pnpm vitest run apps/website` | `tests/e2e/analytics.spec.ts`: per-route Trusted Types policy names and the default-off build (no markup, no requests); its enabled-path test runs only against a fixture build (`PUBLIC_UMAMI_WEBSITE_ID=fixture-analytics-id`, see `apps/website/docs/site-analytics.md`) |
 | `apps/website` landing and platform pages | `pnpm vitest run apps/website` | `tests/e2e/site-landing.spec.ts`, `tests/e2e/site-ia.spec.ts`, `tests/e2e/site-keyboard.spec.ts`, `tests/e2e/site-responsive.spec.ts` (the native and architecture pages' content is `apps/website/tests/section-contracts.test.ts`) |
-| `functions/_middleware.ts`, `functions/api/umami/[[path]].ts`, `functions/_lib/` (Cloudflare Pages Functions) | `pnpm vitest run apps/website/tests/edge-middleware.test.ts apps/website/tests/umami-proxy.test.ts` | Type-checked through the website tests that import them (`pnpm --filter @texuli/website typecheck`); the real Pages runtime is checked only after a deploy ([CI](CI.md#website-deployment-texulicom)) |
+| `functions/_middleware.ts`, `functions/mcp.ts`, `functions/api/umami/[[path]].ts`, `functions/_lib/` (Cloudflare Pages Functions) | `pnpm vitest run apps/website/tests/edge-middleware.test.ts apps/website/tests/umami-proxy.test.ts apps/website/tests/mcp-function.test.ts`, and `pnpm size --filter functions` for the MCP bundle | Type-checked by `pnpm --filter @texuli/website typecheck` (the website `tsconfig.json` includes `../../functions`); the real Pages runtime is checked only after a deploy ([CI](CI.md#website-deployment-texulicom)) |
 | `apps/agent/**` (agent service) | `pnpm --filter @texuli/agent exec vitest run` (not collected by `pnpm test`) | `pnpm --filter @texuli/agent typecheck`; `tests/e2e/site-agent-chat.spec.ts`; evals: `pnpm exec tsx apps/agent/evals/run.ts` |
 | `native/**` (Kotlin Multiplatform twin) | — | `./native/gradlew -p native check` (JDK 21; not in CI) |
 | `apps/website` CSP headers and reports | `pnpm vitest run apps/website` | `tests/e2e/csp.spec.ts`, `tests/e2e/csp-report.spec.ts`; CSP build integration also runs `pnpm --filter @texuli/website check:csp` |
 | `scripts/audit-seo.mjs`, `scripts/audit-aeo.mjs` | `pnpm vitest run scripts/tests/audit-seo.test.ts scripts/tests/audit-aeo.test.ts` | After a website build, run each offline audit against `apps/website/dist`; the PLAN_006 runs (results in the gate table above) are recorded in `analysis_results/29.task_seo-audit-script.md` and `analysis_results/30.task_aeo-verify-script.md` (local plan evidence, git-ignored) |
+| `scripts/check-md-parity.ts` | `pnpm vitest run scripts/tests/check-md-parity.test.ts` | After a website build, `pnpm exec tsx scripts/check-md-parity.ts --strict` |
+| `apps/website` Markdown twins (`src/components/docs/twins.ts`, `twin-notes.ts`, `integration.ts`, `markdown.ts`), negotiation (`src/lib/md-negotiate.ts`) and `functions/_middleware.ts` | `pnpm vitest run apps/website/tests/twins.test.ts apps/website/tests/edge-middleware.test.ts` | `pnpm build`, then `pnpm exec tsx scripts/check-md-parity.ts --strict` and `tests/e2e/site-twins.spec.ts` |
 | `scripts/check-llms-parity.ts` | `pnpm vitest run scripts/tests/check-llms-parity.test.ts` | `pnpm exec tsx scripts/check-llms-parity.ts`; T-24 recorded exit 0 and reconciled the component docs, twins and example registry |
 | `scripts/theme-sweep.ts` | `pnpm vitest run scripts/tests/theme-sweep.test.ts` | Static helper only; there is no durable CLI. T-77 used a temporary runner (14/14 sample and 210/210 full cells, no red cells); findings and the browser-measurement boundary are in `analysis_results/themes-sweep-findings.md` (local plan evidence, git-ignored) |
 | `scripts/generate-site-llms.ts` | `pnpm vitest run packages/tools/tests/llms-site.test.ts` | `pnpm exec tsx scripts/generate-site-llms.ts` regenerates the checked-in root `llms.txt`; its freshness is checked by `scripts/tests/site-loaders.test.ts` and the built copy by the AEO audit in `tests/e2e/site-seo.spec.ts` |
@@ -216,14 +227,26 @@ suite and `pnpm build`.
 ## 3. Blind spots
 
 - **Vitest collects** `packages/*/tests/**/*.test.ts`,
-  `apps/website/tests/**/*.test.ts`, `scripts/tests/**/*.test.ts` and, only
+  `apps/website/tests/**/*.test.ts`, `scripts/tests/**/*.test.ts`,
+  `tests/agent-evals/**/*.test.ts` and, only
   with `TEXULI_PERF=1` or an explicit path, `tests/perf/**`. A test in `src/`
   or named `*.spec.ts` outside Playwright's folders never runs. The
   `apps/website/tests` entry was added to the owner-held `vitest.config.ts` in
-  commit `e6c5d205` (PLAN_006); the owner's acknowledgement of that change is
-  pending. `apps/agent/tests` is **not** collected: run it with
+  commit `e6c5d205` (PLAN_006), and the `tests/agent-evals` entry by
+  T-agent-evals (PLAN_011); the owner's acknowledgement of both is pending.
+  No package typecheck covers the root `tests/` folders, so
+  `pnpm typecheck` does not check `tests/agent-evals` (Vitest strips types
+  without checking them). `apps/agent/tests` is **not** collected: run it with
   `pnpm --filter @texuli/agent exec vitest run` (its own config). CI runs
   neither those tests nor the native Gradle build.
+- **The agent evals are scripted, not a model.** `tests/agent-evals`
+  proves that the calls an agent needs exist, answer the same on both
+  doors and validate; it does not prove that a model picks those calls,
+  reads the descriptions well or recovers from diagnostics on its own. The
+  remote door runs in-process (the deployed `/mcp` is checked only by the
+  post-deploy smoke), the stdio door is the handler without the line
+  transport (the packed bin is `tests/consumers/mcp.spec.ts`), and the
+  design-system jobs are skipped until T-ds-agent-tools.
 - **The Pages Functions run under Vitest, not Cloudflare's runtime.** How
   Pages applies `_headers` to Function responses is only observable after a
   deploy (see the S-2 note in [SECURITY](SECURITY.md#15-website-edge-functions-and-analytics)).

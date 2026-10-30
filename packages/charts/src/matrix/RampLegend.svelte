@@ -79,7 +79,7 @@ const name = $derived(rampLegendText(text, label, start, end, description));
 <style>
   .tx-ramp-legend {
     display: grid;
-    gap: 0.25rem;
+    gap: var(--tx-space-1);
     inline-size: min(100%, 16rem);
     min-inline-size: 6rem;
     color: var(--tx-foreground, CanvasText);
@@ -93,8 +93,8 @@ const name = $derived(rampLegendText(text, label, start, end, description));
     display: block;
     inline-size: 100%;
     block-size: 0.75rem;
-    border: 1px solid var(--tx-border, currentColor);
-    border-radius: 2px;
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-xs);
     forced-color-adjust: none;
   }
   /* The ramp reads in the inline direction, so it flips with the ends on right-to-left pages. */
@@ -104,7 +104,7 @@ const name = $derived(rampLegendText(text, label, start, end, description));
   .tx-ramp-legend__ends {
     display: flex;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
     color: var(--tx-muted-foreground, GrayText);
     font-variant-numeric: tabular-nums;
   }

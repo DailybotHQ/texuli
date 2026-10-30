@@ -27,6 +27,8 @@
       "site-forms.spec.ts",
       "site-perf.spec.ts",
       "site-seo.spec.ts",
+      "site-agent-discovery.spec.ts",
+      "theme-scopes.spec.ts",
       "toaster-viewport.spec.ts"
     ],
     [
@@ -37,6 +39,7 @@
       "renderer-hostile.spec.ts",
       "site-dashboards.spec.ts",
       "site-examples.spec.ts",
+      "site-tokens.spec.ts",
       "site-ia.spec.ts",
       "site-keyboard.spec.ts",
       "site-motion.spec.ts",
@@ -52,7 +55,9 @@
       "site-color-explorer.spec.ts",
       "site-foundation.spec.ts",
       "site-theme-studio.spec.ts",
-      "ssr.spec.ts"
+      "site-webmcp.spec.ts",
+      "ssr.spec.ts",
+      "site-developers.spec.ts"
     ],
     [
       "csp.spec.ts",
@@ -65,7 +70,8 @@
       "site-live-primitives.spec.ts",
       "site-output.spec.ts",
       "site-slides.spec.ts",
-      "site-visual.spec.ts"
+      "site-visual.spec.ts",
+      "site-mcp.spec.ts"
     ],
     [
       "a11y-forms.spec.ts",
@@ -78,6 +84,7 @@
       "site-responsive.spec.ts",
       "site-search.spec.ts",
       "site-theme-switcher.spec.ts",
+      "site-twins.spec.ts",
       "site-whats-new.spec.ts"
     ]
   ]

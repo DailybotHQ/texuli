@@ -4,14 +4,15 @@ import type { CommandSearch } from '../src/command/index.ts';
 
 interface Props {
   debounceMs?: number;
+  loading?: boolean;
   onSearch?: CommandSearch;
   onSelect?: (value: string) => void;
 }
 
-let { debounceMs = 0, onSearch, onSelect }: Props = $props();
+let { debounceMs = 0, loading = false, onSearch, onSelect }: Props = $props();
 </script>
 
-<Command.Root label="Search commands" {debounceMs} {onSearch} {onSelect}>
+<Command.Root label="Search commands" {debounceMs} {loading} {onSearch} {onSelect}>
   <Command.Input placeholder="Type to search" maxlength={40} spellcheck={false} inputmode="search" />
   <Command.List>
     <Command.Loading>Searching…</Command.Loading>

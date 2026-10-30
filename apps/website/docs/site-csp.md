@@ -5,8 +5,9 @@ rendering, and every artifact is proven by a check over the built output:
 
 - `dist/_headers` — Cloudflare Pages shape: one enforcing
   `Content-Security-Policy` and one `Content-Security-Policy-Report-Only`
-  header per route, plus `Vary: Accept` on every docs-class route that has
-  a Markdown twin (`varyHeaderLine`; see [site-aeo.md](site-aeo.md)).
+  header per route, plus `Vary: Accept` on every route whose Markdown twin
+  was built, which is every page but the 404 (`varyHeaderLine`; see
+  [site-aeo.md](site-aeo.md)).
 - `dist/csp-manifest.json` — host-neutral: the same routes and policy
   strings as data (versioned JSON, sorted routes, no timestamps), so any
   static host or proxy can emit the headers without re-parsing HTML.
@@ -79,8 +80,7 @@ Requirements a host configuration must meet, whatever the mechanism:
 2. The policy string for that exact route — hashes are per page.
 3. No header on non-HTML assets is required (the policy governs documents).
 4. `csp-manifest.json` carries only the two CSP values; a host that also
-   negotiates Markdown twins sends `Vary: Accept` on those docs pages
-   itself.
+   negotiates Markdown twins sends `Vary: Accept` on those pages itself.
 
 `astro preview` and `astro dev` do not apply either artifact; they serve
 without CSP. Verify on a host that sends the headers (or a local static

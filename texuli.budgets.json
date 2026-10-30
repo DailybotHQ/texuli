@@ -76,8 +76,8 @@
     },
     "@texuli/forms": {
       "gzip": 83008,
-      "cssGzip": 8832,
-      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B)."
+      "cssGzip": 9792,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 8832 B before adoption): cssGzip 10368 -> 9792 B, measured + 4% (measured 9,403 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/forms/model": {
       "gzip": 19392,
@@ -301,8 +301,8 @@
       "note": "Default per-view cap (lead decision 2026-10-23): a data view ships its framework-free engine (sort, collation, filter compiler, validation) with its component; measured grid-core 10,342 B."
     },
     "@texuli/data/grid-core": {
-      "gzip": 13632,
-      "note": "PLAN_010 T-gaps-53-69 (G55): pointer row activation, the static table mode, breakpoint column hiding and the query-aware empty snippet, over the shared checkout where T-gaps-48-52 also changed the grid filter engine it bundles; measured 13,416 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B. G86 (Protoyard): list motion loads lazily (2026-10-30): 14016 -> 13632 B, measured + 4% rounded up to 64 B; measured 13,082 B (13,416 B before); the view takes list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change, so the seams, the contract and the provider context leave its initial graph (never loaded with motion={false}, level none or reduced motion)."
+      "gzip": 14336,
+      "note": "PLAN_010 T-gaps-53-69 (G55): pointer row activation, the static table mode, breakpoint column hiding and the query-aware empty snippet, over the shared checkout where T-gaps-48-52 also changed the grid filter engine it bundles; measured 13,416 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B. G86 (Protoyard): list motion loads lazily (2026-10-30): 14016 -> 13632 B, measured + 4% rounded up to 64 B; measured 13,082 B (13,416 B before); the view takes list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change, so the seams, the contract and the provider context leave its initial graph (never loaded with motion={false}, level none or reduced motion). PLAN_011 T-gaps-87-95 (G92, Protoyard): table-mode rowFocusable rows, a searchPredicate and the opt-in numbered pager (page buttons from @texuli/primitives/pagination getPageTokens, about 0.23 KiB, plus their markup and styles) (2026-10-30): 13632 -> 14336 B, measured + 4% rounded up to 64 B; measured 13,736 B (12.95 KiB with rowFocusable and searchPredicate, before the pager)."
     },
     "@texuli/data/board": {
       "gzip": 12864,
@@ -367,9 +367,9 @@
       "note": "Owner decision 2026-10-27 (PLAN_007 T-sortable-binding): the Svelte binding carries the general-purpose @texuli/drag sortable engine (session, sortable, gesture, collision, auto-scroll) plus keyboard, announcements, FLIP and overlay preview; measured 15,475 B + 4% headroom (CSS 458 B)."
     },
     "@texuli/primitives/alert-dialog": {
-      "gzip": 13312,
+      "gzip": 14528,
       "cssGzip": 192,
-      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 155 B)."
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 155 B). PLAN_011 T-scope-portals (ADR-023): 13312 -> 14528 B, measured + 4% rounded up to 64 B; measured 13,939 B (12.96 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "@texuli/primitives/calendar": {
       "gzip": 6016,
@@ -406,9 +406,9 @@
       "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 29,016 B. DatePicker composes DateField, Calendar (@internationalized/date) and a position-only Popover (modal features now load lazily); measured 28,354 B after FIX-popover-modal-lazy (was 31,938 B). The 24 KiB target is not met: Calendar and DateField carry the locale and calendar logic (lead decision 2026-10-23). PLAN_010 T-release-060 (2026-10-29): 29696 -> 23488 B, tightened to measured + 4% (measured 22,544 B). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 0 B, tightened to measured + 4% (measured 0 B)."
     },
     "@texuli/primitives/dialog": {
-      "gzip": 13632,
+      "gzip": 14336,
       "cssGzip": 192,
-      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_009 (2026-10-28, owner-consented release plan): 12288 -> 12736 B, measured + 4% after the layer stack and focus-exempt regions (G4) and handler composition (G26); measured about 12,216 B; Linux CI measures about 0.2% above macOS. PLAN_010 T-motion-adopt (ADR-013): 12736 -> 13632 B, measured + 4% rounded up to 64 B after motionHooks on Content and Overlay: the exit hold and the backdrop presence that keep a closing dialog painted, inert, while its exit plays; measured 13,055 B (12,371 B at HEAD). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 157 B)."
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_009 (2026-10-28, owner-consented release plan): 12288 -> 12736 B, measured + 4% after the layer stack and focus-exempt regions (G4) and handler composition (G26); measured about 12,216 B; Linux CI measures about 0.2% above macOS. PLAN_010 T-motion-adopt (ADR-013): 12736 -> 13632 B, measured + 4% rounded up to 64 B after motionHooks on Content and Overlay: the exit hold and the backdrop presence that keep a closing dialog painted, inert, while its exit plays; measured 13,055 B (12,371 B at HEAD). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 157 B). PLAN_011 T-scope-portals (ADR-023): 13632 -> 14336 B, measured + 4% rounded up to 64 B; measured 13,730 B (12.75 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "@texuli/primitives/accordion": {
       "gzip": 4672,
@@ -456,9 +456,9 @@
       "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): 20480 -> 15104 B, tightened to measured + 4% (measured 14,469 B). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 0 B, tightened to measured + 4% (measured 0 B)."
     },
     "@texuli/primitives/sheet": {
-      "gzip": 16384,
+      "gzip": 17600,
       "cssGzip": 192,
-      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 157 B)."
+      "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 192 B, tightened to measured + 4% (measured 157 B). PLAN_011 T-scope-portals (ADR-023): 16384 -> 17600 B, measured + 4% rounded up to 64 B; measured 16,863 B (15.81 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "@texuli/primitives/slider": {
       "gzip": 4544,
@@ -528,8 +528,8 @@
       "note": "FIX-port-compact: buildLibraryTheme without defineTheme in prod path. Measured ~5.71 KiB. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 5,904 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 6144 -> 6080 B, tightened to measured + 4% (measured 5,843 B)."
     },
     "@texuli/tokens/contract": {
-      "gzip": 7616,
-      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 7,347 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 7680 -> 7616 B, tightened to measured + 4% (measured 7,288 B)."
+      "gzip": 8192,
+      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 7,347 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 7680 -> 7616 B, tightened to measured + 4% (measured 7,288 B). PLAN_011 T-tokens-v2 (ADR-020): 7616 -> 8192 B, measured + 4% after THEME_JSON_SCHEMA lists the token contract v2 system vocabulary (definitions.systemTokens, 151 names); measured 7,874 B."
     },
     "@texuli/tokens/css": {
       "gzip": 6111,
@@ -546,6 +546,27 @@
     "@texuli/tokens/palette": {
       "gzip": 4352,
       "note": "FIX-tokens-palette-subpath: OKLCH/contrast/scale/chart derivation only; no library port/expand. Measured 4,283 B (pnpm size)."
+    },
+    "@texuli/tokens/base.css": {
+      "gzip": 64,
+      "cssGzip": 2944,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new exact row (was the @texuli/tokens/* default, which caps JS only); measured 0 B gzip and 1,680 B CSS gzip. Token contract v2 adds no declaration here: system and component tokens are read with their default as the fallback (systemVar, componentVar), cap = measured + 4% rounded up to 64 B. PLAN_011 T-adopt-core (2026-10-30, lead decision): cssGzip 1792 -> 2944 B, measured + 4% (measured 2,781 B): base.css declares the 123 token contract v2 system defaults once per token scope (so every component read carries one fallback level at most) and the focus ring hook rules."
+    },
+    "@texuli/tokens/components": {
+      "gzip": 9152,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the component token registry (48 components covering the 41 styled texuli subpaths, 333 tokens), componentVar and the checkTokenReads guard over the system fallback model, and its JSON Schema. A tooling and authoring entry: component CSS uses the generated var() expressions, not this module. Measured 8,409 B, cap = measured + 4% rounded up to 64 B. PLAN_011 T-adopt-domain (2026-10-30): 8768 -> 9152 B, measured + 4% (measured 8,797 B): nine domain component families (data-grid, board, chart-frame, chat-bubble, chat-composer, canvas-toolbar, workflow-node, spreadsheet, forms; 29 tokens) join the closed vocabulary, and families name their package."
+    },
+    "@texuli/tokens/data-viz": {
+      "gzip": 4032,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for complete chart tokens for any theme (deriveChartTokens over the palette); measured 3,838 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/renames": {
+      "gzip": 448,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the machine-readable rename list and its JSON Schema (empty list); measured 424 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/system": {
+      "gzip": 4352,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the token contract v2 system families with defaults and descriptions, and systemVar for the fallback model; measured 4,164 B, cap = measured + 4% rounded up to 64 B."
     },
     "texuli": {
       "gzip": 217920,
@@ -570,16 +591,16 @@
       "note": "Styled component over the floating primitive(s) combobox: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 28672 -> 22080 B, tightened to measured + 4% (measured 21,207 B)."
     },
     "texuli/command": {
-      "gzip": 21952,
-      "note": "Styled component over the floating primitive(s) command: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 24576 -> 21952 B, tightened to measured + 4% (measured 21,054 B)."
+      "gzip": 23104,
+      "note": "Styled component over the floating primitive(s) command: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 24576 -> 21952 B, tightened to measured + 4% (measured 21,054 B). PLAN_011 T-scope-portals (ADR-023): 21952 -> 23104 B, measured + 4% rounded up to 64 B; measured 22,168 B (20.98 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/date": {
       "gzip": 30144,
       "note": "Styled Calendar, DatePicker and DateRangePicker over the 28 KiB DatePicker primitive plus presets and styling; measured 31,244 B (lead decision 2026-10-23). PLAN_010 T-release-060 (2026-10-29): 32768 -> 30144 B, tightened to measured + 4% (measured 28,934 B)."
     },
     "texuli/dialog": {
-      "gzip": 19968,
-      "note": "Styled component over the floating primitive(s) dialog, alert-dialog: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_009 (2026-10-28, owner-consented release plan): 17408 -> 18176 B, measured + 4% after the overlay layer stack and focus-exempt regions (G4), ref and rest props (G5) and handler composition (G26); measured 17,431 B in CI on Linux (16.99 KiB locally). PLAN_010 T-motion-adopt (ADR-013): 18176 -> 19968 B, measured + 4% rounded up to 64 B after the motion prop on Dialog and AlertDialog (texuli/motion seam; the runtime is a lazy chunk) over the primitive motion hooks; measured 19,155 B (17,699 B at HEAD)."
+      "gzip": 20928,
+      "note": "Styled component over the floating primitive(s) dialog, alert-dialog: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_009 (2026-10-28, owner-consented release plan): 17408 -> 18176 B, measured + 4% after the overlay layer stack and focus-exempt regions (G4), ref and rest props (G5) and handler composition (G26); measured 17,431 B in CI on Linux (16.99 KiB locally). PLAN_010 T-motion-adopt (ADR-013): 18176 -> 19968 B, measured + 4% rounded up to 64 B after the motion prop on Dialog and AlertDialog (texuli/motion seam; the runtime is a lazy chunk) over the primitive motion hooks; measured 19,155 B (17,699 B at HEAD). PLAN_011 T-scope-portals (ADR-023): 19968 -> 20928 B, measured + 4% rounded up to 64 B; measured 20,110 B (18.97 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/layouts/content": {
       "gzip": 13760,
@@ -594,8 +615,8 @@
       "note": "FIX-layout-register-subpaths: register-only dashboard-grid. PLAN_010 T-release-060 (2026-10-29): 1536 -> 576 B, tightened to measured + 4% (measured 537 B)."
     },
     "texuli/layouts/host/drawer": {
-      "gzip": 15360,
-      "note": "Layout drawer composes the Dialog primitive with the layout chrome CSS for mobile navigation; measured 13,240 B (lead decision 2026-10-23). PLAN_010 T-motion-adopt (ADR-013): 14336 -> 15360 B, measured + 4% rounded up to 64 B after the Dialog primitive motion hooks it composes; measured 14,718 B (14,051 B at HEAD)."
+      "gzip": 16128,
+      "note": "Layout drawer composes the Dialog primitive with the layout chrome CSS for mobile navigation; measured 13,240 B (lead decision 2026-10-23). PLAN_010 T-motion-adopt (ADR-013): 14336 -> 15360 B, measured + 4% rounded up to 64 B after the Dialog primitive motion hooks it composes; measured 14,718 B (14,051 B at HEAD). PLAN_011 T-scope-portals (ADR-023): 15360 -> 16128 B, measured + 4% rounded up to 64 B; measured 15,455 B (14.43 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/layouts/marketing/register": {
       "gzip": 576,
@@ -622,8 +643,8 @@
       "note": "Styled component over the floating primitive(s) select: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 24576 -> 17216 B, tightened to measured + 4% (measured 16,532 B)."
     },
     "texuli/sheet": {
-      "gzip": 20480,
-      "note": "Styled component over the floating primitive(s) sheet: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine."
+      "gzip": 21568,
+      "note": "Styled component over the floating primitive(s) sheet: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_011 T-scope-portals (ADR-023): 20480 -> 21568 B, measured + 4% rounded up to 64 B; measured 20,720 B (19.62 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/sidebar": {
       "gzip": 21056,
@@ -638,8 +659,8 @@
       "note": "PLAN_010 T-motion-adopt (ADR-013): new subpath; the motion prop contract, MotionProvider and the static seams (the runtime on @texuli/core/motion loads lazily, about 5.3 KiB gzip). Measured 1,867 B gzip, cap = measured + 4% rounded up to 64 B."
     },
     "texuli/toast": {
-      "gzip": 12672,
-      "note": "Styled component over the floating primitive(s) toast: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 20480 -> 12672 B, tightened to measured + 4% (measured 12,135 B)."
+      "gzip": 13248,
+      "note": "Styled component over the floating primitive(s) toast: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 20480 -> 12672 B, tightened to measured + 4% (measured 12,135 B). PLAN_011 T-scope-portals (2026-10-30): the toast bundles the scoped portal resolution through the overlay engine; CI on Linux measured 12,681 B; cap = measured + 4% rounded up to 64 B."
     },
     "texuli/tooltip": {
       "gzip": 15808,
@@ -702,8 +723,8 @@
     },
     "@texuli/editor": {
       "gzip": 35456,
-      "cssGzip": 2368,
-      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,086 B (CSS 2,221 B); the Markdown codec is not in the barrel."
+      "cssGzip": 2496,
+      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,086 B (CSS 2,221 B); the Markdown codec is not in the barrel. PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2368 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,376 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/editor/controller": {
       "gzip": 19136,
@@ -711,13 +732,13 @@
     },
     "@texuli/editor/editor": {
       "gzip": 36160,
-      "cssGzip": 2368,
-      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,737 B (CSS 2,221 B)."
+      "cssGzip": 2496,
+      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,737 B (CSS 2,221 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2368 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,376 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/editor/link-dialog": {
       "gzip": 1600,
-      "cssGzip": 1600,
-      "note": "The link dialog; addresses go through the controller and the URL policy (measured 1,469 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 1,484 B + 4% headroom so platform drift does not flip it."
+      "cssGzip": 1728,
+      "note": "The link dialog; addresses go through the controller and the URL policy (measured 1,469 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 1,484 B + 4% headroom so platform drift does not flip it. PLAN_011 T-adopt-domain (2026-10-30): cssGzip 1600 -> 1728 B, measured + 4% (measured 1,608 B): the bundled editor.css reads token contract v2 system tokens (spaces, radii, type roles, border widths) instead of literals."
     },
     "@texuli/editor/markdown": {
       "gzip": 10688,
@@ -729,8 +750,8 @@
     },
     "@texuli/editor/toolbar": {
       "gzip": 7360,
-      "cssGzip": 2304,
-      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,023 B (CSS 2,214 B)."
+      "cssGzip": 2496,
+      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,023 B (CSS 2,214 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2304 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,356 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/astro": {
       "gzip": 19520,
@@ -755,8 +776,8 @@
     },
     "@texuli/astro/styles.css": {
       "gzip": 64,
-      "cssGzip": 2624,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 1,985 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 2112 -> 2624 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 2,488 B."
+      "cssGzip": 3712,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 1,985 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 2112 -> 2624 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 2,488 B. PLAN_011 T-adopt-core (2026-10-30, lead decision): cssGzip 2624 -> 3712 B, measured + 4% (measured 3,560 B): it bundles base.css, which now declares the token contract v2 system defaults."
     },
     "@texuli/astro/layouts/ContentLayout": {
       "gzip": 64,
@@ -904,8 +925,8 @@
     },
     "@texuli/sheets": {
       "gzip": 46528,
-      "cssGzip": 2624,
-      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: the root barrel re-exports formula, model, csv, view and host; consumers import the subpaths. Measured 44,680 B (CSS 2,488 B; the lazy cell editor 6,262 B)."
+      "cssGzip": 2752,
+      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: the root barrel re-exports formula, model, csv, view and host; consumers import the subpaths. Measured 44,680 B (CSS 2,488 B; the lazy cell editor 6,262 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2624 B before adoption): cssGzip 2816 -> 2752 B, measured + 4% (measured 2,635 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/sheets/formula": {
       "gzip": 19392,
@@ -921,8 +942,8 @@
     },
     "@texuli/sheets/view": {
       "gzip": 43264,
-      "cssGzip": 2624,
-      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: SheetView over @texuli/data grid editing (grid core, editing engine) with the workbook model; the cell editor loads lazily (6,262 B). Measured 41,584 B (CSS 2,488 B)."
+      "cssGzip": 2752,
+      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: SheetView over @texuli/data grid editing (grid core, editing engine) with the workbook model; the cell editor loads lazily (6,262 B). Measured 41,584 B (CSS 2,488 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2624 B before adoption): cssGzip 2816 -> 2752 B, measured + 4% (measured 2,635 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/sheets/host": {
       "gzip": 19584,
@@ -968,8 +989,8 @@
     },
     "@texuli/slides/styles.css": {
       "gzip": 64,
-      "cssGzip": 5440,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 4,741 B CSS gzip on the final PLAN_008 stage, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 4931 -> 5632 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 5,411 B. PLAN_010 T-release-060 (2026-10-29): CSS 5632 -> 5440 B, tightened to measured + 4% (measured 5,216 B)."
+      "cssGzip": 6528,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 4,741 B CSS gzip on the final PLAN_008 stage, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 4931 -> 5632 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 5,411 B. PLAN_010 T-release-060 (2026-10-29): CSS 5632 -> 5440 B, tightened to measured + 4% (measured 5,216 B). PLAN_011 T-adopt-core (2026-10-30, lead decision): cssGzip 5440 -> 6528 B, measured + 4% (measured 6,245 B): it bundles base.css, which now declares the token contract v2 system defaults."
     },
     "@texuli/spec/motion": {
       "gzip": 960,
@@ -1004,9 +1025,13 @@
       "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the data-source binding shapes and their check against host descriptors (spec 0.8.0, ADR-015). Measured 2,964 B."
     },
     "@texuli/charts/cartesian": {
-      "gzip": 12736,
+      "gzip": 14656,
       "cssGzip": 832,
-      "note": "Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,228 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): CSS 2048 -> 832 B, tightened to measured + 4% (measured 784 B)."
+      "note": "Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,228 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): CSS 2048 -> 832 B, tightened to measured + 4% (measured 784 B). PLAN_011 T-gaps-96-98 (2026-10-30, G97 time x-axis): gzip 12736 -> 14656 B, measured 14,039 B + 4% rounded up to the 64 B step; the time axis (UTC nice time ticks, locale date labels, the xKind, formatX and locale props) is eager because a static or server-rendered chart labels its axis synchronously."
+    },
+    "functions/mcp": {
+      "gzip": 218368,
+      "note": "PLAN_011 T-mcp-remote (2026-10-30): the remote MCP Pages Function (functions/mcp.ts), a server bundle, not a browser entry: the stateless handler, the edge operations, the static catalog manifests and the deck and document engines. Measured 209,909 B gzip initial (46,398 B lazy, the theme loaders and conversion chunks); budget = measured + 4%, rounded up to 64 B. Cloudflare's bundler does not split, so the deployed worker is about initial + lazy."
     }
   }
 }

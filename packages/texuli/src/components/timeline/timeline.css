@@ -2,12 +2,18 @@
  * Timeline — @layer tx.components, logical properties only (it mirrors in
  * right-to-left), token colors with system-color fallbacks. Status is a marker
  * shape (filled with a check, ringed, hollow) and a spoken word; tone is color.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: the 2px line width (--tx-timeline-line), the 0.625rem marker
+ * glyph, the 3px current halo, the 10rem horizontal track and the 0.125rem
+ * marker offsets that center the line are proportional geometry.
  */
 @layer tx.components {
   .tx-timeline {
-    --tx-timeline-marker: 1rem;
+    --tx-timeline-marker: var(--tx-timeline-marker-size, var(--tx-size-icon-sm));
     --tx-timeline-line: 2px;
-    --tx-timeline-gap: 1.5rem;
+    --tx-timeline-gap: var(--tx-space-6);
     --tx-timeline-tone: var(--tx-primary, LinkText);
     --tx-timeline-tone-foreground: var(--tx-primary-foreground, Canvas);
     /*
@@ -24,7 +30,7 @@
   .tx-timeline__item {
     position: relative;
     display: grid;
-    gap: 0.25rem 0.75rem;
+    gap: var(--tx-space-1) var(--tx-space-3);
   }
 
   /* The line to the next item (none after the last). */
@@ -41,7 +47,7 @@
     place-items: center;
     inline-size: var(--tx-timeline-marker);
     block-size: var(--tx-timeline-marker);
-    border-radius: var(--tx-radius-full, 9999px);
+    border-radius: var(--tx-timeline-marker-radius, var(--tx-shape-radius-full));
     border: var(--tx-timeline-line) solid var(--tx-timeline-tone);
     background-color: var(--tx-background, Canvas);
     color: var(--tx-timeline-tone-foreground);
@@ -71,19 +77,19 @@
 
   .tx-timeline__content {
     display: grid;
-    gap: 0.125rem;
+    gap: calc(var(--tx-space-unit) * 0.5);
     min-inline-size: 0;
   }
 
   .tx-timeline__time {
-    font-size: var(--tx-font-size-xs, 0.75rem);
-    font-weight: var(--tx-font-weight-medium, 500);
+    font-size: var(--tx-timeline-time-font-size, var(--tx-type-caption-size));
+    font-weight: var(--tx-timeline-time-font-weight, var(--tx-type-label-weight));
     color: var(--tx-timeline-muted);
   }
 
   .tx-timeline__title {
     margin: 0;
-    font-weight: var(--tx-font-weight-medium, 500);
+    font-weight: var(--tx-type-label-weight);
   }
 
   .tx-timeline__link {
@@ -101,7 +107,7 @@
 
   .tx-timeline__description {
     margin: 0;
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
     color: var(--tx-timeline-muted);
   }
 
@@ -169,7 +175,7 @@
     gap: var(--tx-timeline-gap);
     overflow-x: auto;
     overscroll-behavior-inline: contain;
-    padding-block: 0.25rem;
+    padding-block: var(--tx-space-1);
   }
 
   .tx-timeline--horizontal:focus-visible {

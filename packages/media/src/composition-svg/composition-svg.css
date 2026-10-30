@@ -18,17 +18,17 @@
   }
 
   .tx-composition-svg--error {
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--tx-destructive, Mark);
-    border-radius: var(--tx-radius, 0.5rem);
+    padding: var(--tx-space-3) var(--tx-space-4);
+    border: var(--tx-border-width-thin) solid var(--tx-destructive, Mark);
+    border-radius: var(--tx-shape-radius-lg);
     color: var(--tx-foreground, CanvasText);
     background: var(--tx-surface, Canvas);
-    font-size: 0.875rem;
+    font-size: var(--tx-type-label-size);
   }
 
   .tx-composition-svg--error ul {
-    margin: 0.5rem 0 0;
-    padding-inline-start: 1.25rem;
+    margin: var(--tx-space-2) 0 0;
+    padding-inline-start: var(--tx-space-5);
   }
 
   @media (forced-colors: active) {
@@ -37,7 +37,7 @@
     }
 
     .tx-composition-svg--error {
-      border: 1px solid ButtonText;
+      border: var(--tx-border-width-thin) solid ButtonText;
     }
   }
 }

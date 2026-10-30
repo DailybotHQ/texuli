@@ -6,6 +6,7 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import type { RefProp } from '../../internal/ref.ts';
 import { type NumberPinSize, pinInputClass } from './variants.ts';
 import './number-pin.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 /**
  * Extra attributes (`name`, `form`, `required`, `autocomplete`, `aria-*`,
@@ -39,8 +40,9 @@ type Props = Omit<
   >;
 };
 
+const txDefaults = designDefaults('pin-input');
 let {
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   class: className,
   children,
   value = $bindable(''),

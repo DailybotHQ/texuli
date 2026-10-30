@@ -23,6 +23,7 @@ import {
   dialogTitleClass,
 } from './variants.ts';
 import './dialog.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type TriggerSnippet = Snippet<[{ props: Record<string, unknown> }]>;
 
@@ -41,7 +42,10 @@ type OwnProps = {
   closeLabel?: string;
   onOpenChange?: (open: boolean) => void;
   class?: ClassValue;
-  /** Mount the portal somewhere other than document.body (scoped previews). */
+  /**
+   * Mount the portal in this element (a framed preview). Omitted: the portal
+   * root of the nearest token scope (`[data-tx-scope]`, ADR-023), or `body`.
+   */
   portal?: PortalTarget;
   /**
    * The layer stack (`@texuli/core/layer-stack`) this overlay registers on, for
@@ -80,11 +84,12 @@ type OwnProps = {
 /** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the dialog content element. */
 type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'role'>;
 
+const txDefaults = designDefaults('dialog');
 let {
   open = $bindable(false),
   title,
   description,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   trigger,
   footer,
   children,
@@ -128,9 +133,12 @@ const contentClass = $derived(
   })
 );
 
+/**
+ * The primitive root owns `open` through `bind:open` and has already written
+ * the new value when it calls this, so this only reports the change: one
+ * `onOpenChange` per open-state change, bound or not (G87).
+ */
 function setOpen(next: boolean): void {
-  if (open === next) return;
-  open = next;
   onOpenChange?.(next);
 }
 </script>

@@ -435,7 +435,7 @@ function onPlayerKeydown(event: KeyboardEvent): void {
       inline-size: 100%;
       max-block-size: 75vh;
       background: var(--tx-surface, Canvas);
-      border-radius: var(--tx-radius, 0.5rem);
+      border-radius: var(--tx-shape-radius-lg);
     }
     .tx-video-player__caption-overlay {
       position: absolute;
@@ -506,12 +506,12 @@ function onPlayerKeydown(event: KeyboardEvent): void {
       min-block-size: 2.5rem;
       padding-inline: 0.75rem;
       border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
-      border-radius: var(--tx-radius, 0.5rem);
+      border-radius: var(--tx-shape-radius-lg);
       /* Canvas pair stays AA even when theme surface/foreground are soft greys. */
       background: var(--tx-background, Canvas);
       color: CanvasText;
       font: inherit;
-      font-size: var(--tx-font-size-sm, 0.875rem);
+      font-size: var(--tx-type-label-size);
     }
     /* Selects match the buttons: no native chrome, a chevron drawn with gradients. */
     .tx-video-player__rate select {

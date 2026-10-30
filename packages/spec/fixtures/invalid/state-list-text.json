@@ -16,7 +16,7 @@
     },
     "tier": "untrusted",
     "profile": "web",
-    "spec": "0.8.0",
+    "spec": "0.9.0",
     "state": {
       "tasks": {
         "type": "list",

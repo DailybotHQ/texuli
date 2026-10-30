@@ -3,8 +3,8 @@
 **Package:** `@texuli/charts`  
 **Import:** `import { LineChart, AreaChart, BarChart, StackedBarChart, ComboChart, CartesianChart } from '@texuli/charts/cartesian'`
 
-The cartesian family draws categorical or numeric x values against a linear y
-axis. All five charts share one renderer (`CartesianChart`, which takes a
+The cartesian family draws categorical, numeric or time x values against a
+linear y axis. All five charts share one renderer (`CartesianChart`, which takes a
 `kind`) and one prop set.
 
 ## Charts
@@ -19,12 +19,15 @@ axis. All five charts share one renderer (`CartesianChart`, which takes a
 
 **Layout width.** A cartesian chart lays out at its measured width, between
 240 and 640 pixels, so tick labels and margins keep their size in a narrow
-column instead of shrinking with the drawing. Wider boxes scale the 640-pixel
-layout up. A render with no measured box (server rendering) uses 640.
+column instead of shrinking with the drawing. In a wider box the interactive
+plot keeps its 640-pixel box (a canvas layer included), and a static chart
+(`interactive={false}`) scales the 640-pixel layout up. A render with no
+measured box (server rendering) uses 640.
 
 Model helpers: `assertCartesianSeries` (throws on empty or duplicate ids,
 duplicate x values within a series, non-finite values, or mixed category and
-numeric x), `xDomain`, `windowCartesianSeries`, `createCartesianLayout`,
+numeric x), `assertCartesianXKind`, `CARTESIAN_X_KINDS`, `cartesianXFormatter`,
+`resolveChartLocale`, `xDomain`, `windowCartesianSeries`, `createCartesianLayout`,
 `toInteractionSeries`, `lineCoordinates`.
 
 ## Props
@@ -46,15 +49,53 @@ All five charts take the same props (`LineChart` shown).
 | `brushInvert` | callback `(pixel: number) => number` | no | — | developer | Developer callback that converts brush pixels into domain values. |
 | `fullDomain` | [number, number] | no | — | blueprint | Numeric x-axis domain used by zoom and reset controls. |
 | `visibleDomain` | [number, number] | no | — | blueprint | Numeric x-axis domain to render for a windowed cartesian series. |
+| `xKind` | `'linear'` \| `'category'` \| `'time'` | no | inferred | blueprint | How x values read: category bands, a linear number scale, or time (epoch milliseconds shown as dates). See [time x-axis](#time-x-axis). |
+| `formatX` | callback `(value: number \| string) => string` | no | — | developer | Formats x values on the axis, live region, tooltip and data table. |
+| `locale` | string (BCP 47) | no | runtime locale | blueprint | Language tag for dates and announced values. A malformed tag falls back to the runtime locale. |
 | `onzoom` | callback `(domain: [number, number]) => void` | no | — | developer | Developer zoom event callback. |
 | `onbrush` | callback `(domain: [number, number], pixels: BrushRange) => void` | no | — | developer | Developer brush event callback. |
 | `onselect` | callback `(selection: ChartSelection) => void` | no | — | developer | Developer point-selection callback. |
+
+## Time x-axis
+
+Set `xKind="time"` when x values are epoch milliseconds (`Date.UTC(2026, 2, 1)`):
+
+```svelte
+<LineChart
+  title="Daily signups"
+  description="Signups per day in March."
+  xKind="time"
+  locale="en-US"
+  series={[{ id: 'signups', label: 'Signups', points: [{ x: Date.UTC(2026, 2, 1), y: 127 }] }]}
+/>
+```
+
+- **Axis:** a continuous scale over the data's extent with nice UTC time
+  ticks (about one per 96 pixels: hours, days, weeks, months, quarters or
+  years), labeled at their granularity (`Mar 8`, `Mar 2026`).
+- **Live region, tooltip and data table:** the full date in `locale`
+  (`Signups, Mar 1, 2026: 127`), with the time of day when any x is not at
+  UTC midnight.
+- **Time zone:** UTC everywhere, so ticks and labels never shift with the
+  reader's time zone or daylight saving.
+- **`formatX`** (code only) replaces the date text on all four surfaces.
+- `xKind="linear"` puts numbers on the same continuous scale with nice
+  numeric ticks; `xKind="category"` is a band per value. Without `xKind`, the
+  chart infers today's behavior: a band per value, or a linear window with
+  `visibleDomain`. A `linear` or `time` axis refuses non-numeric x with a
+  `TypeError`, as other invalid props do.
+- Canvas charts announce the source x values (dates on a time axis), not
+  canvas pixels.
+- Agents declare it in a blueprint or chart block with `xKind` and `locale`
+  (the catalog entries `charts-line`, `charts-area`, `charts-bar`,
+  `charts-stacked-bar`, `charts-combo` and `charts-cartesian`).
 
 ## Scales and layout
 
 - **x:** a band scale over the x values in input order (numeric x sort
   ascending). With `visibleDomain`, numeric x use a linear scale over that
-  window instead; see [windowed series](charts-large-series.md).
+  window instead; see [windowed series](charts-large-series.md). With
+  `xKind="linear"` or `"time"`, x use a continuous scale with nice ticks.
 - **y:** a linear scale with nice bounds and about five ticks. Every kind except
   `line` includes zero.
 - **View box:** 640 × 320; the SVG scales down to its container.

@@ -6,7 +6,7 @@
 
 - `Root` owns the controlled `open` state and supports `bind:open`, `onOpenChange`, `mode`, `container`, `initialFocus`, `onDismissRequest` and preventable `onCloseAutoFocus`. `stack` (a `LayerStack` from `@texuli/core/layer-stack`) makes `Content` register on that stack instead of the page-wide one; it is read when the content opens. The sheet family shares this `Root`.
 - `Trigger` is a button with `aria-haspopup="dialog"`, `aria-expanded` and `aria-controls`.
-- `Portal` moves its stable wrapper to `document.body` by default. In contained mode it portals into `Root.container`; pass `to` to choose a top-layer target.
+- `Portal` moves its stable wrapper to `document.body` by default, or, inside a token scope (`[data-tx-scope]`, as `applyTheme(el)` writes), to a scoped portal root that mirrors the scope's theme attributes and variables (ADR-023). The wrapper is placed again right before each open, so a theme applied after mount is followed. In contained mode it portals into `Root.container`; pass `to` to choose a top-layer target, and `scope={null}` to keep the plain `body` portal.
 - `Overlay` is a full-viewport backdrop target. Style it with the consumer's class; pointer presses on the backdrop close the dialog unless prevented.
 - `Content` is the modal `role="dialog"` surface. It wires title and description ids, traps focus, makes outside content inert and locks page scroll in top-layer mode.
 - `Title` and `Description` provide the ids used by `Content`.

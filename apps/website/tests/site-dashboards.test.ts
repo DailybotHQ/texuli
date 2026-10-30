@@ -16,6 +16,7 @@ import {
 } from '@texuli/data/dashboard/engine';
 import { createPlayerCatalog } from '@texuli/player';
 import { describe, expect, it } from 'vitest';
+import { isLineVersion } from '../../../scripts/release-line.ts';
 import {
   AGENT_DASHBOARD_BLUEPRINT,
   DASHBOARDS_SPEC,
@@ -55,8 +56,9 @@ describe('dashboards page: copy and safety', () => {
       version: string;
     };
     // The subpath ships with @texuli/data from 0.8.0 (the copy names that
-    // release); the package itself is on the 0.8 line (0.8.1 with G86).
-    expect(data.version).toMatch(/^0\.8\.\d+$/);
+    // release); the manifest carries a version of the release line in
+    // docs/RELEASE.md.
+    expect(isLineVersion(data.version), data.version).toBe(true);
     expect(DASHBOARDS_STATUS).toBe(
       'New in 0.8.0: on npm in @texuli/data from 0.8.0, a pre-1.0 release.'
     );

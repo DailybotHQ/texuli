@@ -2,18 +2,25 @@
  * Parity gate for the agent-facing surfaces (T-24). Four id sets must
  * reconcile, and every mismatch is listed with a severity:
  *
- * - **catalog ids** (`packages/catalog/src/manifests/*`) — the source of
- *   truth; every component page exists because of one;
+ * - **catalog ids** (every group of `@texuli/catalog/manifests/all`) — the
+ *   source of truth;
  * - **component-page twins** (`md-manifest.json`, keys
- *   `/component-pages/<id>/`) — what an agent fetching `page.md` receives;
+ *   `/component-pages/<id>/`) — what an agent fetching `page.md` receives,
+ *   for every id of a group with component pages;
  * - **llms component docs** (`dist/llms/components/<id>.md`) — the
- *   pre-rendered agent docs;
+ *   pre-rendered agent docs, for every catalog id;
  * - **example entries** (`generated/catalog.json`) — ids unique, every
  *   `sourcePath` on disk, every example directory covered by at least one
  *   entry (an uncovered directory is an orphan demo that can never render).
  *
- * **Policy.** Fatal (exit 1): a catalog id without a twin or a component
- * doc; an orphan twin or doc id with no catalog manifest; duplicate example
+ * **Policy.** Every catalog id needs an llms component doc. Only the groups
+ * in `COMPONENT_PAGE_GROUPS` (the website's `load-manifests.ts`) have
+ * component pages, so only their ids need a twin; the other groups are named
+ * in `DOCS_ONLY_GROUPS` (agents read their `/llms/components/<id>.md` doc
+ * and the family page). A group in neither list, or in both, is fatal, so a
+ * new manifest group cannot slip past the rule. Fatal (exit 1): a page id
+ * without a twin, any catalog id without a doc; an orphan twin or doc id
+ * with no catalog manifest; a twin for a docs-only id; duplicate example
  * ids; a missing `sourcePath`; an example directory no entry references
  * (`SHARED_EXAMPLE_DIRS` names the helper directories that hold no demo).
  * The twin axis covers the component-page twins only: the manifest also
@@ -26,18 +33,37 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { CONTENT_MANIFESTS } from '../packages/catalog/src/manifests/content/index.ts';
-import { DISPLAY_MANIFESTS } from '../packages/catalog/src/manifests/display/index.ts';
-import { FORMS_MANIFESTS } from '../packages/catalog/src/manifests/forms/index.ts';
-import { LAYOUTS_MANIFESTS } from '../packages/catalog/src/manifests/layouts/index.ts';
-import { OVERLAYS_MANIFESTS } from '../packages/catalog/src/manifests/overlays/index.ts';
+import { COMPONENT_PAGE_GROUPS } from '../apps/website/src/components/component-pages/load-manifests.ts';
+import { ALL_MANIFEST_GROUPS } from '../packages/catalog/src/manifests/all.ts';
 
 /** One fatal mismatch, print-ready. */
 export type ParityFinding = string;
 
+/**
+ * Catalog groups without component pages: their ids are documented by the
+ * llms component docs only, so they need no twin. A new group goes here or
+ * into the website's `COMPONENT_PAGE_GROUPS`.
+ */
+export const DOCS_ONLY_GROUPS: readonly string[] = [
+  'canvas',
+  'chat',
+  'composition',
+  'data',
+  'documents',
+  'schema-forms',
+  'sheets',
+  'state',
+  'workflows',
+];
+
 export interface ParityInput {
   /** Catalog manifest ids (the source of truth). */
   catalogIds: readonly string[];
+  /**
+   * Ids that have no component page (docs-only groups). Default none: every
+   * catalog id needs a twin.
+   */
+  docsOnlyIds?: readonly string[];
   /** Raw twin keys from `md-manifest.json` (`/component-pages/<id>/`). */
   twinKeys: readonly string[];
   /** Raw llms component doc file names (`<id>.md`). */
@@ -85,8 +111,12 @@ export function compareParity(input: ParityInput): ParityFinding[] {
   const catalogSet = new Set(catalog);
   const twinSet = new Set(twinIds);
   const docSet = new Set(docIds);
+  const docsOnly = new Set(input.docsOnlyIds ?? []);
   for (const id of catalog) {
-    if (!twinSet.has(id)) fatal.push(`[fatal] catalog id "${id}" has no component-page twin`);
+    if (!docsOnly.has(id) && !twinSet.has(id))
+      fatal.push(`[fatal] catalog id "${id}" has no component-page twin`);
+    if (docsOnly.has(id) && twinSet.has(id))
+      fatal.push(`[fatal] docs-only id "${id}" has a component-page twin; move its group`);
     if (!docSet.has(id)) fatal.push(`[fatal] catalog id "${id}" has no llms component doc`);
   }
   for (const id of twinIds)
@@ -114,6 +144,30 @@ export function compareParity(input: ParityInput): ParityFinding[] {
   return fatal;
 }
 
+/**
+ * Groups the rule does not classify: in neither list, or in both. Pure.
+ */
+export function unclassifiedGroups(
+  groups: readonly string[],
+  pageGroups: readonly string[],
+  docsOnlyGroups: readonly string[]
+): ParityFinding[] {
+  const fatal: ParityFinding[] = [];
+  for (const group of groups) {
+    const page = pageGroups.includes(group);
+    const docs = docsOnlyGroups.includes(group);
+    if (page && docs)
+      fatal.push(`[fatal] manifest group "${group}" is both a page group and docs-only`);
+    else if (!page && !docs)
+      fatal.push(
+        `[fatal] manifest group "${group}" is neither a component-page group nor docs-only`
+      );
+  }
+  for (const group of [...pageGroups, ...docsOnlyGroups])
+    if (!groups.includes(group)) fatal.push(`[fatal] "${group}" is not a catalog manifest group`);
+  return fatal;
+}
+
 function pathExists(path: string): boolean {
   try {
     return statSync(path).isFile();
@@ -126,13 +180,13 @@ function main(): number {
   const root = join(import.meta.dirname, '..');
   const dist = join(root, 'apps/website/dist');
   const examplesRoot = join(root, 'packages/examples/src');
-  const catalogIds = [
-    ...CONTENT_MANIFESTS,
-    ...DISPLAY_MANIFESTS,
-    ...FORMS_MANIFESTS,
-    ...LAYOUTS_MANIFESTS,
-    ...OVERLAYS_MANIFESTS,
-  ].map((manifest) => manifest.id);
+  const catalogIds = ALL_MANIFEST_GROUPS.flatMap((group) => group.manifests.map((m) => m.id));
+  const pageIds = new Set(
+    ALL_MANIFEST_GROUPS.filter((group) =>
+      (COMPONENT_PAGE_GROUPS as readonly string[]).includes(group.name)
+    ).flatMap((group) => group.manifests.map((m) => m.id))
+  );
+  const docsOnlyIds = catalogIds.filter((id) => !pageIds.has(id));
   const manifest = JSON.parse(readFileSync(join(dist, 'md-manifest.json'), 'utf8')) as {
     twins: Record<string, string>;
   };
@@ -142,18 +196,27 @@ function main(): number {
   const exampleDirs = readdirSync(examplesRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name);
-  const fatal = compareParity({
-    catalogIds,
-    twinKeys: Object.keys(manifest.twins).filter((key) => twinIdOf(key) !== null),
-    llmsFiles: readdirSync(join(dist, 'llms/components')),
-    examples,
-    exampleDirs: exampleDirs.filter((dir) => !SHARED_EXAMPLE_DIRS.includes(dir)),
-    pathExists: (sourcePath) => pathExists(join(examplesRoot, sourcePath)),
-  });
+  const fatal = unclassifiedGroups(
+    ALL_MANIFEST_GROUPS.map((group) => group.name),
+    COMPONENT_PAGE_GROUPS,
+    DOCS_ONLY_GROUPS
+  );
+  fatal.push(
+    ...compareParity({
+      catalogIds,
+      docsOnlyIds,
+      twinKeys: Object.keys(manifest.twins).filter((key) => twinIdOf(key) !== null),
+      llmsFiles: readdirSync(join(dist, 'llms/components')),
+      examples,
+      exampleDirs: exampleDirs.filter((dir) => !SHARED_EXAMPLE_DIRS.includes(dir)),
+      pathExists: (sourcePath) => pathExists(join(examplesRoot, sourcePath)),
+    })
+  );
 
   if (fatal.length === 0) {
     console.log(
-      `llms parity ✓ ${new Set(catalogIds).size} components: twins, llms docs, ` +
+      `llms parity ✓ ${new Set(catalogIds).size} components (${pageIds.size} with component-page twins, ` +
+        `${new Set(docsOnlyIds).size} docs-only in ${DOCS_ONLY_GROUPS.length} groups): llms docs, ` +
         `${examples.length} examples over ${exampleDirs.length} directories all reconcile`
     );
     return 0;

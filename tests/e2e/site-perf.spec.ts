@@ -74,6 +74,10 @@ const BROWSER_ROUTES = [
   '/dashboards-page/',
   '/output-page/',
   '/whats-new/',
+  // PLAN_011 T-site-090: static reference pages with large generated tables, no island.
+  '/mcp-server/',
+  '/tokens/',
+  '/tokens/components/',
 ] as const;
 
 const kb = (bytes: number) => Math.round((bytes / 1024) * 10) / 10;

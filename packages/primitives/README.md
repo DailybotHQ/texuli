@@ -14,9 +14,9 @@ which is built on these primitives. They are built from scratch on the
 not depend on any other component library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.8.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
-> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
+> published to npm as `0.9.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
+> changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
 
 ## Install
 
@@ -97,6 +97,10 @@ from subpaths to keep bundles narrow.
   part's behavior still runs; call `event.preventDefault()` in a click or
   key handler to skip it. Bookkeeping handlers (focus, input, pointer up)
   always run. Handlers a part fully owns are left out of its prop types.
+  The two composers are public from `@texuli/primitives` for parts you build
+  yourself: `composeHandlers(callerHandler, own)` (`own` is skipped when the
+  caller called `preventDefault()`) and `chainHandlers(callerHandler, own)`
+  (`own` always runs).
 - **`bind:ref` and rest attributes on every part.** Every part that renders
   an element takes `bind:ref` (that element) and puts the attributes it does
   not consume on it. Roots that only hold state (menu, select, popover,

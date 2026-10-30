@@ -15,9 +15,9 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.8.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
-> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
+> published to npm as `0.9.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
+> changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
 
 ## Install
 
@@ -113,12 +113,25 @@ the initial chunk.
 
 `texuli/cx` exports `cx` (class composition) and `variants` (typed variant
 recipes), so you can extend components without `clsx` or `tailwind-merge`.
+It also exports `composeHandlers` and `chainHandlers` (also from `texuli`),
+the "caller first" handler order every component follows, for parts you
+build yourself: `composeHandlers(callerHandler, own)` runs the caller's
+handler, then `own` unless the caller called `event.preventDefault()`;
+`chainHandlers(callerHandler, own)` always runs `own` (focus tracking, drag
+state). A `callerHandler` that is not a function is ignored.
 
 `texuli/motion` holds the motion prop contract and `MotionProvider` (new in
 `0.6.0`): overlays, toasts, tabs, accordions and the
 `@texuli/data` Board and DataGrid animate through `@texuli/core/motion`,
 instant under reduced motion and at level `none`
 ([ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)).
+
+`texuli/defaults` (new in `0.9.0`) holds
+`setDesignDefaults`: default `variant` and `size` props from a closed,
+typed vocabulary, used only when a prop is omitted. Every component also
+reads its component tokens (`--tx-button-radius`, `--tx-card-padding-inline`…)
+and the tier-3 hooks (`data-tx-button-style` and friends)
+([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/design-system.md)).
 
 ## New in 0.8.0
 

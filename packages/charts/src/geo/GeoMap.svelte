@@ -81,11 +81,11 @@ const rows = $derived(
 
 <style>
   .geo-chart { color: var(--tx-foreground, CanvasText); margin: 0; max-inline-size: 100%; }
-  figcaption h3 { font-size: 1rem; margin-block: 0; }
-  figcaption p { color: var(--tx-muted-foreground, CanvasText); margin-block: 0.25rem 0.75rem; }
+  figcaption h3 { font-size: var(--tx-type-body-size); margin-block: 0; }
+  figcaption p { color: var(--tx-muted-foreground, CanvasText); margin-block: var(--tx-space-1) var(--tx-space-3); }
   .map { display: block; inline-size: 100%; max-block-size: 24rem; }
-  .legend { align-items: center; display: flex; font-size: 0.75rem; gap: 0.5rem; justify-content: center; }
-  .legend ol { display: flex; gap: 0.15rem; list-style: none; margin: 0; padding: 0; }
+  .legend { align-items: center; display: flex; font-size: var(--tx-type-caption-size); gap: var(--tx-space-2); justify-content: center; }
+  .legend ol { display: flex; gap: calc(var(--tx-space-unit) * 0.6); list-style: none; margin: 0; padding: 0; }
   .legend li { background: var(--tx-chart-sequential-1, color-mix(in oklab, var(--tx-chart-1, var(--tx-primary, CanvasText)) 18%, var(--tx-background, Canvas))); block-size: 0.7rem; inline-size: 1.1rem; }
   .legend .step-1 { background: var(--tx-chart-sequential-2, color-mix(in oklab, var(--tx-chart-1, var(--tx-primary, CanvasText)) 28%, var(--tx-background, Canvas))); }
   .legend .step-2 { background: var(--tx-chart-sequential-3, color-mix(in oklab, var(--tx-chart-1, var(--tx-primary, CanvasText)) 38%, var(--tx-background, Canvas))); }
@@ -95,7 +95,7 @@ const rows = $derived(
   .legend .step-6 { background: var(--tx-chart-sequential-7, color-mix(in oklab, var(--tx-chart-1, var(--tx-primary, CanvasText)) 78%, var(--tx-background, Canvas))); }
   .legend .step-7 { background: var(--tx-chart-sequential-8, color-mix(in oklab, var(--tx-chart-1, var(--tx-primary, CanvasText)) 88%, var(--tx-background, Canvas))); }
   .legend .step-8 { background: var(--tx-chart-sequential-9, color-mix(in oklab, var(--tx-chart-1, var(--tx-primary, CanvasText)) 98%, var(--tx-background, Canvas))); }
-  @media (forced-colors: active) { rect { fill: Canvas; stroke: CanvasText; } .legend li { background: Canvas; border: 1px solid CanvasText; } }
+  @media (forced-colors: active) { rect { fill: Canvas; stroke: CanvasText; } .legend li { background: Canvas; border: var(--tx-border-width-thin) solid CanvasText; } }
   @media (forced-colors: active) {
     figcaption h3, figcaption p { color: CanvasText; }
   }

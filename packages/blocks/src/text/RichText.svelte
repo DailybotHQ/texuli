@@ -135,19 +135,19 @@ const emphasisTag = (type: 'strong' | 'em' | 'del') => type;
   }
   .tx-md-code {
     padding-inline: 0.25em;
-    border-radius: var(--tx-radius, 0.25em);
+    border-radius: var(--tx-shape-radius-lg);
     background: var(--tx-muted, color-mix(in srgb, currentColor 10%, transparent));
   }
   .tx-md-pre {
     overflow-x: auto;
     padding: 0.75em 1em;
-    border: 1px solid var(--tx-border, color-mix(in srgb, currentColor 30%, transparent));
-    border-radius: var(--tx-radius, 0.375em);
+    border: var(--tx-border-width-thin) solid var(--tx-border, color-mix(in srgb, currentColor 30%, transparent));
+    border-radius: var(--tx-shape-radius-lg);
     white-space: pre;
   }
   .tx-md-pre:focus-visible,
   .tx-md-link:focus-visible {
-    outline: 2px solid var(--tx-ring, Highlight);
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
     outline-offset: 2px;
   }
   /* Link color stays the host's (or the UA's); the underline marks links in every scheme. */
@@ -157,7 +157,7 @@ const emphasisTag = (type: 'strong' | 'em' | 'del') => type;
   }
   .tx-md-rule {
     border: 0;
-    border-block-start: 1px solid var(--tx-border, color-mix(in srgb, currentColor 40%, transparent));
+    border-block-start: var(--tx-border-width-thin) solid var(--tx-border, color-mix(in srgb, currentColor 40%, transparent));
   }
   @media (forced-colors: active) {
     .tx-md-quote,

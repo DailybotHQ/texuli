@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -8,6 +8,7 @@ import {
   budgetFor,
   compare,
   discoverEntries,
+  discoverFunctionEntries,
   exportFile,
   formatTable,
   isExternal,
@@ -120,6 +121,28 @@ describe('measureEntry', () => {
       const result = await measureEntry(css as NonNullable<typeof css>);
       expect(result.cssGzip).toBeGreaterThan(0);
       expect(result.gzip).toBe(0);
+    },
+    BUILD
+  );
+
+  it(
+    'discovers Pages Functions as functions/<route> entries and measures them, lazy chunks apart',
+    async () => {
+      await mkdir(join(workspace, 'functions'), { recursive: true });
+      await writeFile(
+        join(workspace, 'functions', 'probe.ts'),
+        "export const onRequest = async () => (await import('./lazy.ts')).answer();\n"
+      );
+      await writeFile(
+        join(workspace, 'functions', 'lazy.ts'),
+        `export const answer = () => new Response(${JSON.stringify('lazy '.repeat(400))});\n`
+      );
+      const entries = await discoverFunctionEntries(workspace, ['probe', 'missing']);
+      expect(entries.map((entry) => entry.id)).toEqual(['functions/probe']);
+      expect(entries[0]?.packageName).toBe('functions');
+      const result = await measureEntry(entries[0] as NonNullable<(typeof entries)[0]>);
+      expect(result.gzip).toBeGreaterThan(0);
+      expect(result.lazyGzip).toBeGreaterThan(0);
     },
     BUILD
   );

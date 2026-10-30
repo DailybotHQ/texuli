@@ -67,6 +67,10 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   // L8: the page editor and reader paint any catalog component through the
   // player (L7), like the slides stage (ADR-011).
   '@texuli/pages': 8,
+  // L9: the one-word install for MCP hosts (`npx -y @texuli/mcp`), a thin bin
+  // over the stdio server in @texuli/tools (L8); a new top layer because the
+  // same-layer rule refuses an L8 package depending on tools (ADR-019).
+  '@texuli/mcp': 9,
 });
 
 /**

@@ -8,16 +8,21 @@ the home page hero)
 
 ## Goal
 
-Every new package and capability of `0.6.0`, `0.7.0` and `0.8.0` on one page
-(PLAN_010 Amendment 8), grouped by release with the status the repository
-states: `0.6.0`, `0.7.0` and `0.8.0` are published on npm (`0.8.0` is
-current, pre-1.0). Each feature has a small demo or a preview and a link
+Every new package and capability of `0.6.0` to `0.9.0` on one page
+(PLAN_010 Amendment 8, PLAN_011 T-site-090), grouped by release with the
+status the repository states: all four are published on npm, and `0.9.0`
+is current (pre-1.0), the published line of `docs/RELEASE.md`; the unit
+test requires the current release's status to say so, and a version in
+development (none today) to be marked as such. Each feature has a small demo or a preview and a link
 to its full page.
 
 ## Cards
 
 | Release | Feature | Demo or preview |
 | --- | --- | --- |
+| 0.9.0 | Texuli MCP | The two doors (the remote URL and the npx command) from the generated MCP data |
+| 0.9.0 | An agent-ready site, scoped portals, fixes from Protoyard | Static cards linking `/developers/`, `/tokens/#scope` and `/changelog/` |
+| 0.9.0 | Design tokens v2 | The system and component token counts, read from the registries at build time |
 | 0.8.0 | Canvas | The agent board as an SVG image (`canvasToSvg` at build time, a `data:` URL) |
 | 0.8.0 | Data sources | A `$source` binding |
 | 0.8.0 | Spreadsheets | `HubSheet.svelte`: a formula over the order log |

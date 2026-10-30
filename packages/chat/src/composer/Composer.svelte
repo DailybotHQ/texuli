@@ -1,7 +1,8 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
+import type { HTMLFormAttributes } from 'svelte/elements';
 import { Button } from 'texuli/button';
-import { type ClassValue, cx } from 'texuli/cx';
+import { type ClassValue, chainHandlers, cx } from 'texuli/cx';
 import { autosizeTextarea } from 'texuli/input';
 import {
   type ComposerActionContext,
@@ -9,7 +10,7 @@ import {
   DEFAULT_COMPOSER_LABELS,
 } from './labels.ts';
 
-interface Props {
+interface OwnProps {
   value?: string;
   /** Return false to keep the draft, or reject to show the translated error. */
   onSubmit: (message: string) => unknown;
@@ -37,7 +38,16 @@ interface Props {
    */
   onkeydown?: (event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }) => void;
   class?: ClassValue;
+  /** The composer's root `form` (bindable). */
+  ref?: HTMLFormElement | null;
 }
+/**
+ * Other attributes (`id`, `aria-*`, `data-*`, `style`, handlers) land on the
+ * root `form`. A caller `onsubmit` runs first; the composer's own submit
+ * always runs after it (it prevents the page navigation itself).
+ * `onkeydown` is the exception: it reaches the textarea (see above).
+ */
+type Props = OwnProps & Omit<HTMLFormAttributes, keyof OwnProps | 'children'>;
 
 const id = $props.id();
 let {
@@ -54,6 +64,9 @@ let {
   onStop,
   onkeydown,
   class: className,
+  ref = $bindable(null),
+  onsubmit: callerSubmit,
+  ...rest
 }: Props = $props();
 
 let field = $state<HTMLTextAreaElement | null>(null);
@@ -128,12 +141,14 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
 </script>
 
 <form
+  {...rest}
+  bind:this={ref}
   class={cx('tx-chat-composer', className)}
   data-tx-chat-composer
-  onsubmit={(event) => {
+  onsubmit={chainHandlers(callerSubmit, (event: SubmitEvent) => {
     event.preventDefault();
     void submit();
-  }}
+  })}
 >
   <label class="visually-hidden" for={`chat-composer-${id}`}>{labels.input}</label>
   <textarea
@@ -186,11 +201,11 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
   @layer tx.components {
     .tx-chat-composer {
       display: grid;
-      gap: 0.5rem;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius, 0.75rem);
+      gap: var(--tx-chat-composer-gap, var(--tx-space-2));
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-chat-composer-radius, var(--tx-shape-radius-lg));
       background: var(--tx-surface, Canvas);
-      padding: 0.75rem;
+      padding: var(--tx-chat-composer-padding, var(--tx-space-3));
     }
 
     .tx-chat-composer:focus-within {
@@ -204,16 +219,16 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
     min-block-size: 2.5rem;
     max-block-size: none;
     margin: 0;
-    border: 1px solid var(--tx-input, var(--tx-border, CanvasText));
-    border-radius: var(--tx-radius, 0.375rem);
+    border: var(--tx-border-width-thin) solid var(--tx-input, var(--tx-border, CanvasText));
+    border-radius: var(--tx-chat-composer-radius, var(--tx-shape-radius-lg));
     background: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
-    padding: 0.625rem 0.75rem;
+    padding: calc(var(--tx-space-unit) * 2.5) var(--tx-space-3);
     font-family: var(--tx-font-sans, system-ui, sans-serif);
     line-height: 1.4;
     resize: none;
     overflow-y: hidden;
-    font-size: 1rem;
+    font-size: var(--tx-type-body-size);
     outline: none;
     }
 
@@ -236,13 +251,13 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
       display: flex;
       align-items: end;
       justify-content: space-between;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
     }
 
     .tx-chat-composer__end {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
     }
 
     .tx-chat-composer__attachments {
@@ -250,13 +265,13 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
       min-inline-size: 0;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
     }
 
     .tx-chat-composer__error {
       margin: 0;
       color: var(--tx-destructive, Mark);
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
     }
 
     .visually-hidden {
@@ -270,7 +285,7 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
 
     @media (min-width: 640px) {
       .tx-chat-composer__field {
-        font-size: 0.875rem;
+        font-size: var(--tx-type-label-size);
       }
     }
   }

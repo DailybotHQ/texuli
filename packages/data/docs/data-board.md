@@ -137,6 +137,13 @@ data source (blueprint spec 0.8.0, new in 0.8.0): the move is saved through the
 source, optimistically
 ([player data sources](../../player/docs/data-sources.md)).
 
+### `ref` and other attributes
+
+`bind:ref` is the board's root `section`; `id`, `aria-*`, `data-*`, `style`
+and handlers land there too, and a caller `id` replaces the generated one
+(the board finds its cards through `ref`, not the id). Covered by the
+uniform contract test (`packages/data/tests/contract.test.ts`).
+
 ## Keyboard map
 
 Focus a card's handle (announced as `Drag <card>`), then:

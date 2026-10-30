@@ -171,7 +171,7 @@ function cueLabel(template: string, index: number): string {
   @layer tx.components {
     .tx-video-edit {
       display: grid;
-      gap: 1rem;
+      gap: var(--tx-space-4);
       inline-size: 100%;
       color: var(--tx-foreground, CanvasText);
       font: inherit;
@@ -180,24 +180,24 @@ function cueLabel(template: string, index: number): string {
     .tx-video-edit fieldset {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
       min-inline-size: 0;
       margin: 0;
-      padding: 1rem;
-      border: 1px solid var(--tx-border, ButtonBorder);
-      border-radius: var(--tx-radius, 0.5rem);
+      padding: var(--tx-space-4);
+      border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+      border-radius: var(--tx-shape-radius-lg);
       background: var(--tx-surface, Canvas);
     }
 
     .tx-video-edit legend {
-      padding-inline: 0.35rem;
+      padding-inline: calc(var(--tx-space-unit) * 1.4);
       font-weight: 650;
       color: var(--tx-foreground, CanvasText);
     }
 
     .tx-video-edit label {
       display: grid;
-      gap: 0.35rem;
+      gap: calc(var(--tx-space-unit) * 1.4);
       min-inline-size: 0;
     }
 
@@ -207,7 +207,7 @@ function cueLabel(template: string, index: number): string {
       box-sizing: border-box;
       max-inline-size: 100%;
       min-block-size: 2.5rem;
-      padding: 0.5rem;
+      padding: var(--tx-space-2);
       color: inherit;
       font: inherit;
     }
@@ -215,8 +215,8 @@ function cueLabel(template: string, index: number): string {
     .tx-video-edit input,
     .tx-video-edit textarea {
       inline-size: 100%;
-      border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
-      border-radius: var(--tx-radius-sm, 0.3rem);
+      border: var(--tx-border-width-thin) solid var(--tx-input, var(--tx-border, ButtonBorder));
+      border-radius: calc(var(--tx-shape-radius-lg) * 0.6);
       background: var(--tx-background, Canvas);
       color: var(--tx-foreground, CanvasText);
     }
@@ -228,8 +228,8 @@ function cueLabel(template: string, index: number): string {
 
     .tx-video-edit button {
       justify-self: start;
-      border: 1px solid var(--tx-border, ButtonBorder);
-      border-radius: var(--tx-radius-sm, 0.3rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+      border-radius: calc(var(--tx-shape-radius-lg) * 0.6);
       background: var(--tx-background, Canvas);
       color: var(--tx-foreground, CanvasText);
       cursor: pointer;
@@ -250,9 +250,9 @@ function cueLabel(template: string, index: number): string {
       grid-column: 1 / -1;
       grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
       align-items: end;
-      gap: 0.75rem;
-      padding-block: 0.5rem;
-      border-block-end: 1px solid var(--tx-border, ButtonBorder);
+      gap: var(--tx-space-3);
+      padding-block: var(--tx-space-2);
+      border-block-end: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
     }
 
     .tx-video-edit__text {
@@ -291,8 +291,8 @@ function cueLabel(template: string, index: number): string {
 
       .tx-video-edit [role='alert'] {
         color: CanvasText;
-        border: 2px solid CanvasText;
-        padding: 0.35rem 0.5rem;
+        border: var(--tx-border-width-thick) solid CanvasText;
+        padding: calc(var(--tx-space-unit) * 1.4) var(--tx-space-2);
         font-weight: 600;
       }
     }

@@ -655,3 +655,167 @@ describe('DataGrid adoption gaps (G55)', () => {
     expect(screen.getByTestId('empty').textContent).toBe('Nothing: 0');
   });
 });
+
+describe('DataGrid table mode keyboard row activation (G92)', () => {
+  afterEach(cleanup);
+
+  const people = [
+    { id: 'p1', name: 'Ada Example', email: 'ada@example.com' },
+    { id: 'p2', name: 'Bea Example', email: 'bea@example.com' },
+  ];
+  type Person = (typeof people)[number];
+  const columns: DataGridColumn<Person>[] = [
+    { key: 'name', header: 'Name', type: 'text' },
+    { key: 'email', header: 'Email', type: 'text' },
+  ];
+  const base = { columns, rows: people, getRowId: (row: Person) => row.id, caption: 'People' };
+
+  it('rowFocusable puts each body row in the tab order; Enter and Space activate it', async () => {
+    const activated: string[] = [];
+    render(DataGrid<Person>, {
+      props: {
+        ...base,
+        mode: 'table',
+        rowFocusable: true,
+        rowLabel: (row: Person) => `Open ${row.name}`,
+        onRowActivate: (row: Person) => activated.push(row.id),
+      },
+    });
+    // Table semantics are kept: no grid role, gridcells or roving cell stops.
+    expect(screen.queryByRole('grid')).toBeNull();
+    const table = screen.getByRole('table', { name: 'People' });
+    expect(within(table).queryAllByRole('gridcell')).toHaveLength(0);
+    const rows = people.map((person) => screen.getByRole('row', { name: `Open ${person.name}` }));
+    for (const row of rows) {
+      expect(row.getAttribute('tabindex')).toBe('0');
+      expect(row.tagName).toBe('TR');
+    }
+    expect(table.querySelectorAll('td[tabindex], th[tabindex]')).toHaveLength(0);
+    for (const [key, row, id] of [
+      ['Enter', rows[0], 'p1'],
+      [' ', rows[1], 'p2'],
+    ] as const) {
+      row?.focus();
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+      row?.dispatchEvent(event);
+      expect(event.defaultPrevented, key).toBe(true);
+      expect(activated.at(-1), key).toBe(id);
+    }
+    expect(activated).toEqual(['p1', 'p2']);
+    // Other keys, and keys from a control inside the row, do not activate it.
+    await fireEvent.keyDown(rows[0] as HTMLElement, { key: 'a' });
+    await fireEvent.keyDown(screen.getByText('Ada Example'), { key: 'Enter' });
+    expect(activated).toEqual(['p1', 'p2']);
+  });
+
+  it('is opt-in, and grid mode keeps its own cell keyboard model', () => {
+    for (const props of [
+      { mode: 'table' as const },
+      { mode: 'grid' as const, rowFocusable: true },
+    ]) {
+      const { container } = render(DataGrid<Person>, {
+        props: { ...base, ...props, onRowActivate: () => {} },
+      });
+      expect(container.querySelectorAll('tr[tabindex]'), props.mode).toHaveLength(0);
+      cleanup();
+    }
+  });
+});
+
+describe('DataGrid search predicate (G92 stretch)', () => {
+  afterEach(cleanup);
+
+  // Match the start of any word in the name, or an exact id: a rule the
+  // default substring search over the visible columns cannot express.
+  const byWordStart = (row: Row, query: string) =>
+    row.id === query ||
+    row.name
+      .toLowerCase()
+      .split(/\s+/)
+      .some((word) => word.startsWith(query.toLowerCase()));
+
+  it('gridRows uses searchPredicate instead of the column search, after the filter', () => {
+    expect(gridRows(rows, { columns, search: 'ights' }).map((row) => row.id)).toEqual(['c']);
+    for (const [query, ids] of [
+      ['ights', []],
+      ['li', ['c']],
+      ['b', ['b']],
+      ['', ['a', 'b', 'c']],
+    ] as const) {
+      expect(
+        gridRows(rows, { columns, search: query, searchPredicate: byWordStart }).map(
+          (row) => row.id
+        ),
+        query
+      ).toEqual(ids);
+    }
+  });
+
+  it('DataGrid passes searchPredicate to its search field', async () => {
+    render(DataGrid<Row>, {
+      props: {
+        rows,
+        columns,
+        getRowId: (row: Row) => row.id,
+        caption: 'Places',
+        searchable: true,
+        searchPredicate: byWordStart,
+      },
+    });
+    await fireEvent.input(screen.getByRole('searchbox'), { target: { value: 'ights' } });
+    expect(screen.queryByText('Harbor Lights')).toBeNull();
+    await fireEvent.input(screen.getByRole('searchbox'), { target: { value: 'li' } });
+    expect(screen.getByText('Harbor Lights')).toBeTruthy();
+    expect(screen.queryByText('harbor notes')).toBeNull();
+  });
+});
+
+describe('DataGrid numbered pager (G92 stretch)', () => {
+  afterEach(cleanup);
+
+  type Item = { id: string; name: string };
+  const items: Item[] = Array.from({ length: 30 }, (_, index) => ({
+    id: `i${index + 1}`,
+    name: `Item ${index + 1}`,
+  }));
+  const itemColumns: DataGridColumn<Item>[] = [{ key: 'name', header: 'Name', type: 'text' }];
+
+  it('pager="numbered" renders page buttons with aria-current and ellipses', async () => {
+    const pages: number[] = [];
+    render(DataGrid<Item>, {
+      props: {
+        rows: items,
+        columns: itemColumns,
+        getRowId: (item: Item) => item.id,
+        caption: 'Items',
+        pageSize: 3,
+        pager: 'numbered',
+        onPageChange: (page: number) => pages.push(page),
+      },
+    });
+    const pager = screen.getByRole('navigation', { name: 'Items pages' });
+    const pageButtons = () =>
+      within(pager)
+        .getAllByRole('button')
+        .map((button) => button.textContent?.trim());
+    expect(pageButtons()).toEqual(['Previous page', '1', '2', '10', 'Next page']);
+    expect(within(pager).getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe(
+      'page'
+    );
+    // The position stays announced, as with the compact pager.
+    expect(within(pager).getByText('Page 1 of 10')).toBeTruthy();
+    await fireEvent.click(within(pager).getByRole('button', { name: 'Page 2' }));
+    expect(pages).toEqual([2]);
+    expect(pageButtons()).toEqual(['Previous page', '1', '2', '3', '10', 'Next page']);
+    await fireEvent.click(within(pager).getByRole('button', { name: 'Page 10' }));
+    expect(pageButtons()).toEqual(['Previous page', '1', '9', '10', 'Next page']);
+    expect(pager.querySelectorAll('[data-tx-page-gap]').length).toBe(1);
+    expect(screen.getByText('Item 30')).toBeTruthy();
+    expect(
+      within(pager).getByRole('button', { name: 'Page 10' }).getAttribute('aria-current')
+    ).toBe('page');
+    expect(within(pager).getByRole('button', { name: 'Page 1' }).hasAttribute('aria-current')).toBe(
+      false
+    );
+  });
+});

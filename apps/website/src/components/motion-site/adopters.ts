@@ -161,6 +161,14 @@ export const MOTION_ADOPTERS: readonly MotionAdopter[] = [
     live: '#layout',
   },
   {
+    file: 'packages/charts/src/interaction/InteractivePlot.svelte',
+    component: 'InteractivePlot (every interactive chart)',
+    pkg: '@texuli/charts',
+    motion:
+      'Follows the MotionProvider reduced-motion setting and the OS preference (data-reduced-motion)',
+    live: '#settings',
+  },
+  {
     file: 'packages/data/src/motion/lazy-list-motion.ts',
     component: 'Board, DataGrid and Dashboard list motion',
     pkg: '@texuli/data',

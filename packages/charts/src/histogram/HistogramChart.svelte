@@ -112,8 +112,8 @@ $effect(() => {
 
 <style>
   .histogram { color: var(--tx-foreground, CanvasText); margin: 0; max-inline-size: 100%; }
-  figcaption h3 { font-size: 1rem; margin-block: 0; }
-  figcaption p { color: var(--tx-muted-foreground, GrayText); margin-block: 0.25rem 0.75rem; }
+  figcaption h3 { font-size: var(--tx-type-body-size); margin-block: 0; }
+  figcaption p { color: var(--tx-muted-foreground, GrayText); margin-block: var(--tx-space-1) var(--tx-space-3); }
   svg { display: block; inline-size: 100%; max-block-size: 22rem; }
   rect { fill: var(--tx-chart-1, var(--tx-primary, Highlight)); }
   @media (forced-colors: active) {

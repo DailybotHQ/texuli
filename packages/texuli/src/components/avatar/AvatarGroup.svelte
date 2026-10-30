@@ -6,6 +6,7 @@ import Avatar from './Avatar.svelte';
 import type { AvatarGroupItem } from './types.ts';
 import { type AvatarSize, type AvatarStatus, avatarGroupClass } from './variants.ts';
 import './avatar.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -22,10 +23,11 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('avatar');
 let {
   items,
   max,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   label,
   overflowLabel = '+{n}',
   class: className,

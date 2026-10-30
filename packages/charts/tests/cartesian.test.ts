@@ -545,6 +545,171 @@ describe('Cartesian chart renderers', () => {
   }, 20_000);
 });
 
+describe('Cartesian time x-axis (G97)', () => {
+  const DAY = 86_400_000;
+  const start = Date.UTC(2026, 2, 1);
+  const daily: CartesianSeries[] = [
+    {
+      id: 'signups',
+      label: 'Signups',
+      points: Array.from({ length: 30 }, (_, i) => ({ x: start + i * DAY, y: 127 + (i % 5) })),
+    },
+  ];
+  const xLabels = () =>
+    [...(document.querySelector('[data-chart-axis="x"]')?.querySelectorAll('text') ?? [])].map(
+      (text) => text.textContent?.trim() ?? ''
+    );
+  const live = () => document.querySelector('[data-chart-live]')?.textContent ?? '';
+
+  async function surfaces(props: Record<string, unknown>) {
+    render(LineChart, {
+      title: 'Daily signups',
+      description: 'Signups per day in March.',
+      series: daily,
+      renderer: 'svg',
+      ...props,
+    });
+    await waitForInteractiveChart(/Daily signups/);
+    const axis = xLabels();
+    const explorer = screen.getByRole('application', { name: /Daily signups/ });
+    await fireEvent.focus(explorer);
+    await waitFor(() => expect(live()).not.toBe(''));
+    const announced = live();
+    const tooltip = document.querySelector('[data-chart-tooltip]')?.textContent ?? '';
+    await fireEvent.click(screen.getByRole('button', { name: 'Show data table' }));
+    const table = await screen.findByRole('table', { name: 'Daily signups data' });
+    const firstRow = table.querySelector('tbody tr:not([aria-hidden]) th')?.textContent ?? '';
+    cleanup();
+    return { axis, announced, tooltip, firstRow };
+  }
+
+  it('formats epoch milliseconds as locale dates on the axis, live region, tooltip and table', async () => {
+    const cases: [Record<string, unknown>, RegExp, RegExp][] = [
+      // [props, the first point's date, an axis tick]
+      [{ xKind: 'time', locale: 'en-US' }, /^Mar 1, 2026$/, /^Mar \d{1,2}$/],
+      [{ xKind: 'time', locale: 'de-DE' }, /^1\. März 2026$/, /^\d{1,2}\. März$/],
+      // Canvas marks announce the source dates, not canvas pixels.
+      [{ xKind: 'time', locale: 'en-US', renderer: 'canvas' }, /^Mar 1, 2026$/, /^Mar \d{1,2}$/],
+      [
+        {
+          xKind: 'time',
+          locale: 'en-US',
+          formatX: (x: number | string) => `day ${(Number(x) - start) / DAY}`,
+        },
+        /^day 0$/,
+        /^day \d+$/,
+      ],
+    ];
+    for (const [props, date, tick] of cases) {
+      const { axis, announced, tooltip, firstRow } = await surfaces(props);
+      const name = JSON.stringify(props);
+      expect(announced, name).toMatch(/^Signups, (.+): 127\. Point 1 of 30\.$/);
+      expect(announced.replace(/^Signups, (.+): 127\..*$/, '$1'), name).toMatch(date);
+      expect(tooltip, name).toContain(announced.replace(/^Signups, (.+): 127\..*$/, '$1'));
+      expect(firstRow, name).toMatch(date);
+      expect(axis.length, `${name} ${axis.join('|')}`).toBeGreaterThanOrEqual(2);
+      expect(axis.length, `${name} ${axis.join('|')}`).toBeLessThanOrEqual(10);
+      for (const label of axis) expect(label, name).toMatch(tick);
+      expect(`${announced}${tooltip}${firstRow}${axis.join(' ')}`, name).not.toMatch(/1,77\d/);
+    }
+  }, 30_000);
+
+  it('places nice UTC time ticks on day boundaries, and keeps inference when xKind is absent', () => {
+    render(LineChart, {
+      title: 'Daily signups',
+      description: 'Signups per day in March.',
+      series: daily,
+      xKind: 'time',
+      locale: 'en-US',
+      interactive: false,
+    });
+    const ticks = [...document.querySelectorAll('[data-chart-axis="x"] text')].map(
+      (text) => text.textContent?.trim() ?? ''
+    );
+    // Nice ticks are aligned dates, not every sixth sample: they start on or after Mar 1.
+    expect(ticks[0]).toMatch(/^Mar \d{1,2}$/);
+    expect(new Set(ticks).size).toBe(ticks.length);
+    cleanup();
+    // No xKind: numeric x keep today's numeric labels.
+    render(LineChart, {
+      title: 'Daily signups',
+      description: 'Signups per day in March.',
+      series: daily,
+      interactive: false,
+    });
+    expect(xLabels().join(' ')).toMatch(/1,77\d/);
+  });
+
+  it('refuses non-numeric x on a time or linear axis and an unknown xKind, and survives a hostile locale', () => {
+    for (const xKind of ['time', 'linear'] as const) {
+      expect(() =>
+        render(LineChart, {
+          title: 'Weekly signups',
+          description: 'Signups by day.',
+          series,
+          xKind,
+          interactive: false,
+        })
+      ).toThrow(TypeError);
+      cleanup();
+    }
+    expect(() =>
+      render(LineChart, {
+        title: 'Weekly signups',
+        description: 'Signups by day.',
+        series,
+        xKind: 'calendar' as 'time',
+        interactive: false,
+      })
+    ).toThrow(TypeError);
+    cleanup();
+    for (const locale of ['not a locale!!', '', 'x'.repeat(500), 'en-US-u-ca-<script>']) {
+      expect(() =>
+        render(LineChart, {
+          title: 'Daily signups',
+          description: 'Signups per day in March.',
+          series: daily,
+          xKind: 'time',
+          locale,
+          interactive: false,
+        })
+      ).not.toThrow();
+      expect(xLabels().length).toBeGreaterThan(1);
+      cleanup();
+    }
+  });
+
+  it('positions x on a continuous scale for linear and time axes', () => {
+    const uneven: CartesianSeries[] = [
+      {
+        id: 'v',
+        label: 'Values',
+        points: [
+          { x: 0, y: 1 },
+          { x: 1, y: 2 },
+          { x: 10, y: 3 },
+        ],
+      },
+    ];
+    for (const xKind of ['linear', 'time'] as const) {
+      render(LineChart, {
+        title: 'Uneven',
+        description: 'Uneven x spacing.',
+        series: uneven,
+        xKind,
+        renderer: 'svg',
+        interactive: false,
+      });
+      const d = document.querySelector('[data-line="v"]')?.getAttribute('d') ?? '';
+      const xs = [...d.matchAll(/[ML]\s*([\d.]+)[ ,]/g)].map((m) => Number(m[1]));
+      expect(xs, xKind).toHaveLength(3);
+      // The gap 1 → 10 is nine times the gap 0 → 1.
+      expect((xs[2]! - xs[1]!) / (xs[1]! - xs[0]!), xKind).toBeCloseTo(9, 1);
+      cleanup();
+    }
+  });
+});
+
 describe('Cartesian chart family cohesion', () => {
   it('renders the grammar-mandated h2 figure title, and 3 related cases', () => {
     {
@@ -570,7 +735,10 @@ describe('Cartesian chart family cohesion', () => {
         css: 'external',
       }).css?.code;
       // The grammar assigns Cartesian titles rank 2; keep the visual title size at 1rem.
-      expect(css).toMatch(/figcaption[^{]*h2[^{]*\{[^}]*font-size:\s*1rem/);
+      // The chart-frame title token defaults to the body type role (1rem under every library theme).
+      expect(css).toMatch(
+        /figcaption[^{]*h2[^{]*\{[^}]*font-size:\s*var\(--tx-chart-frame-title-font-size, var\(--tx-type-body-size\)\)/
+      );
       expect(css).toMatch(/figcaption[^{]*h2[^{]*\{[^}]*margin-block:\s*0/);
       expect(css).toMatch(/figcaption[^{]*p[^{]*\{[^}]*margin-block:\s*0\.25rem\s+0\.75rem/);
     }

@@ -11,11 +11,11 @@ Every edit is a `@texuli/document` operation in one op log, so undo, redo,
 persistence and sync share one history.
 
 > **Status: in development (pre-1.0).** `@texuli/pages` is published on npm
-> as `0.8.1`, with provenance (first published as `0.7.0`, with `@texuli/document`;
+> as `0.9.0`, with provenance (first published as `0.7.0`, with `@texuli/document`;
 > built in PLAN_010, ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> Under 0.x a new minor (`0.9.0`) may contain breaking changes, so pin the
-> exact version or use `^0.8.0`, which accepts only 0.8.x
+> Under 0.x a new minor (`0.10.0`) may contain breaking changes, so pin the
+> exact version or use `^0.9.0`, which accepts only 0.9.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L8, above the player, because it paints any catalog

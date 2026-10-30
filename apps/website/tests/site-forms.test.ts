@@ -24,6 +24,7 @@ import {
 } from '@texuli/forms/model';
 import { createPlayerCatalog } from '@texuli/player';
 import { describe, expect, it } from 'vitest';
+import { isLineVersion } from '../../../scripts/release-line.ts';
 import {
   AGENT_FORM_BLUEPRINT,
   FORM_SPEC,
@@ -93,8 +94,9 @@ describe('forms page: copy and safety', () => {
       version: string;
       private?: boolean;
     };
-    // First published in 0.8.0; the copy names that release.
-    expect(pkg.version).toBe(FORMS_RELEASE);
+    // First published in 0.8.0 (the copy names that release); the manifest
+    // carries a version of the release line in docs/RELEASE.md.
+    expect(isLineVersion(pkg.version), pkg.version).toBe(true);
     expect(pkg.private).toBe(true);
     expect(FORMS_RELEASE).toBe('0.8.0');
     expect(FORMS_STATUS).toBe('In development, on npm from 0.8.0, a pre-1.0 release.');

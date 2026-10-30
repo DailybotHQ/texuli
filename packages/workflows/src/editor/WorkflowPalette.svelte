@@ -113,13 +113,13 @@ function onPointerDown(event: PointerEvent, type: string, label: string): void {
   @layer tx.components {
     .tx-workflow-palette {
       display: grid;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       align-content: start;
     }
 
     .tx-workflow-palette__list {
       display: grid;
-      gap: 0.25rem;
+      gap: var(--tx-space-1);
       margin: 0;
       padding: 0;
       list-style: none;
@@ -128,14 +128,14 @@ function onPointerDown(event: PointerEvent, type: string, label: string): void {
     .tx-workflow-palette__item {
       inline-size: 100%;
       min-block-size: 2rem;
-      padding: 0.25rem 0.75rem;
+      padding: var(--tx-space-1) var(--tx-space-3);
       font: inherit;
       text-align: start;
       color: inherit;
       background: var(--tx-surface, ButtonFace);
-      border: 1px solid var(--tx-border, ButtonText);
+      border: var(--tx-border-width-thin) solid var(--tx-border, ButtonText);
       border-inline-start: 4px solid var(--tx-workflow-accent, var(--tx-primary, ButtonText));
-      border-radius: var(--tx-radius-md, 0.5rem);
+      border-radius: var(--tx-shape-radius-lg);
       cursor: grab;
       touch-action: none;
     }
@@ -154,10 +154,10 @@ function onPointerDown(event: PointerEvent, type: string, label: string): void {
     .tx-workflow-palette__ghost {
       position: fixed;
       z-index: 10;
-      padding: 0.25rem 0.75rem;
+      padding: var(--tx-space-1) var(--tx-space-3);
       background: var(--tx-surface, Canvas);
-      border: 1px solid var(--tx-primary, Highlight);
-      border-radius: var(--tx-radius-md, 0.5rem);
+      border: var(--tx-border-width-thin) solid var(--tx-primary, Highlight);
+      border-radius: var(--tx-shape-radius-lg);
       pointer-events: none;
       transform: translate(-50%, -50%);
     }

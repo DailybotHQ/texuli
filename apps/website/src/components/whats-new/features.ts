@@ -2,11 +2,12 @@
  * The features /whats-new/ showcases, grouped by the release that carries
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
- * the page and its tests share one source. Releases: 0.6.0, 0.7.0 and 0.8.0
- * are published on npm (0.8.0 is `latest`).
+ * the page and its tests share one source. Releases: 0.6.0 to 0.9.0 are
+ * published on npm, and 0.9.0 is `latest` (the release line in
+ * docs/RELEASE.md).
  */
 
-export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0';
+export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0' | '0.9.0';
 
 export interface Release {
   readonly id: ReleaseId;
@@ -18,9 +19,17 @@ export interface Release {
 
 export const RELEASES: readonly Release[] = [
   {
+    id: '0.9.0',
+    title: '0.9.0: MCP, an agent-ready site and design tokens',
+    status: 'Published on npm as 0.9.0, the current release (pre-1.0).',
+    published: true,
+    summary:
+      'An MCP server for agents (remote and local), texuli.com readable by agents end to end, token contract v2 with a component tier, overlays that keep their scope, and the fixes Protoyard asked for. @texuli/mcp is a new package, first published in 0.9.0, and still in development.',
+  },
+  {
     id: '0.8.0',
     title: '0.8.0: forms, canvas, sheets and output',
-    status: 'Published on npm as 0.8.0, the current release (pre-1.0).',
+    status: 'Published on npm as 0.8.0; everything in it is also in 0.9.0.',
     published: true,
     summary:
       'Forms, data sources, the canvas, spreadsheets, dashboards, email and PDF output, and one message catalog for every label, with blueprint spec 0.8.0. @texuli/forms, @texuli/canvas and @texuli/sheets were published for the first time; all three are still in development.',
@@ -28,7 +37,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.7.0',
     title: '0.7.0: documents',
-    status: 'Published on npm as 0.7.0; everything in it is also in 0.8.0.',
+    status: 'Published on npm as 0.7.0; everything in it is also in 0.8.0 and 0.9.0.',
     published: true,
     summary:
       'A block document engine with collaboration, the Notion-like page editor, and documents as agent data in blueprint spec 0.7.0. @texuli/document and @texuli/pages were published for the first time; both are still in development.',
@@ -36,7 +45,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.6.0',
     title: '0.6.0: motion and live generation',
-    status: 'Published on npm as 0.6.0; everything in it is also in 0.7.0 and 0.8.0.',
+    status: 'Published on npm as 0.6.0; everything in it is also in 0.7.0 to 0.9.0.',
     published: true,
     summary:
       'One API contract for every component, a motion system with a closed vocabulary, and blueprints that paint while they stream, with blueprint spec 0.6.0.',
@@ -56,7 +65,12 @@ export type DemoKind =
   | 'sheets'
   | 'dashboards'
   | 'output'
-  | 'i18n';
+  | 'i18n'
+  | 'mcp'
+  | 'agent-ready'
+  | 'tokens'
+  | 'portals'
+  | 'protoyard';
 
 export interface Feature {
   readonly id: DemoKind;
@@ -216,5 +230,61 @@ export const FEATURES: readonly Feature[] = [
     href: '/output-page/#i18n',
     linkLabel: 'Switch the locale',
     demo: 'live',
+  },
+  {
+    id: 'mcp',
+    release: '0.9.0',
+    title: 'Texuli MCP',
+    packages: ['@texuli/mcp', '@texuli/tools/mcp'],
+    summary:
+      'One operations registry served as MCP tools, resources and prompts: remotely at texuli.com/mcp, or locally with npx -y @texuli/mcp, with setup for every major host.',
+    href: '/mcp-server/',
+    linkLabel: 'Connect your agent',
+    demo: 'preview',
+    note: 'The remote server is live at texuli.com/mcp; @texuli/mcp is in development.',
+  },
+  {
+    id: 'agent-ready',
+    release: '0.9.0',
+    title: 'An agent-ready site',
+    packages: ['apps/website', 'functions'],
+    summary:
+      'A read-only JSON API with an OpenAPI description, Markdown twins of every page, discovery files, site tools on the MCP and a WebMCP bridge for browser agents.',
+    href: '/developers/',
+    linkLabel: 'The developer portal',
+    demo: 'preview',
+  },
+  {
+    id: 'tokens',
+    release: '0.9.0',
+    title: 'Design tokens v2',
+    packages: ['@texuli/tokens/system', '@texuli/tokens/components', 'texuli/defaults'],
+    summary:
+      'System families for space, size, type, elevation, shape, layers and more, plus a component tier every styled component reads, and default variants and sizes for design systems and agents.',
+    href: '/tokens/',
+    linkLabel: 'The token reference',
+    demo: 'preview',
+  },
+  {
+    id: 'portals',
+    release: '0.9.0',
+    title: 'Scoped portals',
+    packages: ['@texuli/core', '@texuli/primitives', 'texuli'],
+    summary:
+      'Every token is element-scoped with data-tx-scope, and overlays (dialogs, menus, popovers, tooltips, toasts) keep the theme and tokens of the scope that opened them.',
+    href: '/tokens/#scope',
+    linkLabel: 'The scope model',
+    demo: 'preview',
+  },
+  {
+    id: 'protoyard',
+    release: '0.9.0',
+    title: 'Fixes from Protoyard',
+    packages: ['texuli', '@texuli/data', '@texuli/charts', '@texuli/chat', '@texuli/primitives'],
+    summary:
+      'Gaps a production adopter reported: dialog and command palette callbacks, date control hooks and invalid state, keyboard rows in table grids, ref and rest on every layout, a time x-axis for charts and contained toasts without a forced layout.',
+    href: '/changelog/',
+    linkLabel: 'The changelog',
+    demo: 'preview',
   },
 ];

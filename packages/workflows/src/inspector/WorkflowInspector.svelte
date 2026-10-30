@@ -220,19 +220,19 @@ const errorId = (name: string) => `${uid}-${name}-error`;
   @layer tx.components {
     .tx-workflow-inspector {
       display: grid;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
       align-content: start;
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
     }
 
     .tx-workflow-inspector__title {
       margin: 0;
-      font-size: 1rem;
+      font-size: var(--tx-type-body-size);
     }
 
     .tx-workflow-inspector__subtitle {
       margin: 0;
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
     }
 
     .tx-workflow-inspector__type,
@@ -244,24 +244,24 @@ const errorId = (name: string) => `${uid}-${name}-error`;
     .tx-workflow-inspector__row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
     }
 
     .tx-workflow-inspector__field {
       display: grid;
-      gap: 0.25rem;
+      gap: var(--tx-space-1);
     }
 
     .tx-workflow-inspector__field :global(input:not([type='checkbox'])),
     .tx-workflow-inspector__field :global(select),
     .tx-workflow-inspector__field :global(textarea) {
       min-block-size: 2rem;
-      padding: 0.25rem 0.5rem;
+      padding: var(--tx-space-1) var(--tx-space-2);
       font: inherit;
       color: inherit;
       background: var(--tx-surface, Field);
-      border: 1px solid var(--tx-border, FieldText);
-      border-radius: var(--tx-radius-sm, 0.25rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, FieldText);
+      border-radius: var(--tx-shape-radius-sm);
     }
 
     .tx-workflow-inspector__field :global(:focus-visible) {
@@ -272,7 +272,7 @@ const errorId = (name: string) => `${uid}-${name}-error`;
     .tx-workflow-inspector__check {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       min-block-size: 24px;
     }
 
@@ -287,12 +287,12 @@ const errorId = (name: string) => `${uid}-${name}-error`;
     }
 
     .tx-workflow-inspector__preview {
-      border-radius: var(--tx-radius-sm, 0.25rem);
+      border-radius: var(--tx-shape-radius-sm);
     }
 
     .tx-workflow-inspector__ports {
       margin: 0;
-      padding-inline-start: 1.25rem;
+      padding-inline-start: var(--tx-space-5);
     }
   }
 </style>

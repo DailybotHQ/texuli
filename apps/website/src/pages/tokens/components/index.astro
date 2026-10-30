@@ -1,0 +1,185 @@
+---
+/**
+ * /tokens/components/ — the component tier of token contract v2 (PLAN_011
+ * T-site-090, ADR-020): every component's tokens with their one-level
+ * fallback, grouped by package, with an index of anchors. Split from
+ * /tokens/ to keep each document inside the default HTML budget. Static:
+ * no island. Rows come from `@texuli/tokens/components` at build time
+ * (`src/components/tokens-page/tokens.ts`).
+ */
+import {
+  componentAnchor,
+  componentPageFor,
+  EXAMPLE_READ,
+  exportOf,
+  familiesByPackage,
+  TOKEN_COUNTS,
+  TOKENS_PATH,
+} from '../../../components/tokens-page/tokens.ts';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const description = `Every Texuli component token: ${TOKEN_COUNTS.component} tokens for ${TOKEN_COUNTS.components} components, each with the fallback its read carries, generated from @texuli/tokens/components.`;
+const packages = familiesByPackage();
+const packageAnchor = (name: string) =>
+  `package-${name.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+---
+
+<BaseLayout title="Component tokens" {description}>
+  <div class="tx-tokens-ref">
+    <h1>Component tokens</h1>
+    <p class="lead">
+      <span data-tokens-count-component>{TOKEN_COUNTS.component}</span> tokens for <span data-tokens-count-components>{TOKEN_COUNTS.components}</span> components. None is
+      declared: each read carries one fallback, the registry default, so a token exists on a page
+      only when a theme, design system or host sets it on its scope.
+    </p>
+    <p>
+      A component's tokens are <code>--tx-&lt;component&gt;-&lt;key&gt;</code>, and every read has
+      the form <code>var(&lt;token&gt;, &lt;fallback&gt;)</code>, for example <code>{EXAMPLE_READ}</code>. The tables list each key with its fallback; the fallbacks reference
+      system tokens. The scope model, hooks and defaults are on <a href={TOKENS_PATH}>Design tokens</a>. Token contract v2 shipped in 0.9.0.
+    </p>
+
+    <nav class="jump" aria-label="Components">
+      {
+        packages.map((group) => (
+          <div>
+            <p class="jump__title">
+              <a href={`#${packageAnchor(group.name)}`}>{group.name}</a>
+            </p>
+            <ul>
+              {group.families.map((family) => (
+                <li>
+                  <a href={`#${componentAnchor(family.component)}`}>{family.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </nav>
+
+    {
+      packages.map((group) => (
+        <section aria-labelledby={packageAnchor(group.name)} data-tokens-package={group.name}>
+          <h2 id={packageAnchor(group.name)}>
+            <code>{group.name}</code>
+          </h2>
+          {group.families.map((family) => {
+            const page = componentPageFor(family.component);
+            return (
+              <>
+                <h3 id={componentAnchor(family.component)}>
+                  {family.title} <span class="count">({family.tokens.length})</span>
+                </h3>
+                <p class="meta">
+                  <code>--tx-{family.component}-*</code> · <code>{exportOf(family)}</code> {page && (
+                    <>
+                      {' · '} <a href={page}>
+                        Component page<span class="sr"> ({family.title})</span>
+                      </a>
+                    </>
+                  )}
+                </p>
+                <table data-tokens-component={family.component}>
+                  <thead>
+                    <tr>
+                      <th scope="col">Key</th>
+                      <th scope="col">Fallback</th>
+                      <th scope="col">Meaning</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {family.tokens.map((token) => (
+                      <tr>
+                        <td>{token.key}</td>
+                        <td>{token.default}</td>
+                        <td>{token.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            );
+          })}
+        </section>
+      ))
+    }
+    <p>Back to <a href={TOKENS_PATH}>Design tokens</a>.</p>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  /* Global, under one wrapper class: scoped styles would stamp an attribute
+     on each of the ~1,500 table cells and push the document over its budget. */
+  .tx-tokens-ref h1 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
+  .tx-tokens-ref h2 {
+    margin-block: 2rem 0.5rem;
+    font-size: 1.4rem;
+  }
+  .tx-tokens-ref h3 {
+    margin-block: 1.25rem 0.25rem;
+    font-size: 1.0625rem;
+  }
+  .tx-tokens-ref p {
+    max-inline-size: 48rem;
+  }
+  .tx-tokens-ref .lead {
+    font-size: 1.1rem;
+  }
+  .tx-tokens-ref code {
+    overflow-wrap: anywhere;
+  }
+  .tx-tokens-ref .jump {
+    display: grid;
+    gap: 0.75rem;
+    margin-block: 1rem;
+  }
+  .tx-tokens-ref .jump__title {
+    margin: 0 0 0.25rem;
+    font-weight: 600;
+  }
+  .tx-tokens-ref .jump ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tx-tokens-ref .count,
+  .tx-tokens-ref .meta {
+    color: var(--tx-muted-foreground);
+    font-weight: 400;
+  }
+  .tx-tokens-ref .meta {
+    margin: 0 0 0.5rem;
+    font-size: 0.875rem;
+  }
+  .tx-tokens-ref .sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .tx-tokens-ref table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .tx-tokens-ref th,
+  .tx-tokens-ref td {
+    padding: 0.35rem 0.5rem;
+    border-block-end: 1px solid var(--tx-border);
+    text-align: start;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+  .tx-tokens-ref td:nth-child(-n + 2) {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.8125rem;
+  }
+</style>

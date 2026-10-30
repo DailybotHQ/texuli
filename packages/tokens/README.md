@@ -13,9 +13,9 @@ components, or on its own as a framework-free token engine for any CSS
 runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.8.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
-> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
+> published to npm as `0.9.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
+> changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
 
 ## Install
 
@@ -90,6 +90,10 @@ const css = compileThemeCss(theme);
 | Style presets | `style-presets` | Shared style presets on top of the contract |
 | Tailwind 4 | `tailwind` | Utilities mapped onto the `--tx-*` contract |
 | Motion tokens | `motion` | New in `0.6.0`: 5 durations, 5 easings and 3 springs as data (`MOTION_DURATIONS`, `MOTION_EASINGS`, `MOTION_SPRINGS`), behind the `--tx-motion-*` properties in `base.css` |
+| System tokens | `system` | Unreleased (token contract v2, ADR-020): 151 system tokens in 11 families (space, size, type roles, elevation, shape, layers, opacity, layout, icons, status, data-viz). `base.css` declares the 123 non-chart defaults once per token scope (generated); CSS reads them plainly with `systemVar(name)` (`var(--tx-space-4)`) |
+| Component tokens | `components` | Unreleased: the component token registry (57 components, 364 tokens: the `texuli` styled families plus 9 domain families). Component tokens are never declared (0 B until set): CSS reads them with `componentVar(component, key)`, one fallback level (`var(--tx-button-radius, var(--tx-shape-radius-lg))`), and design systems set them on their scope. `checkTokenReads` guards the read forms; every `texuli` styled component reads its tokens, and the domain packages read theirs |
+| Chart tokens | `data-viz` | Unreleased: `dataVizVariables(theme, mode)` returns all 28 `--tx-chart-*` values for any theme, derived when the theme has no `charts` |
+| Renames | `renames`, `renames.json` | Unreleased: the machine-readable `--tx-*` rename list for codemods (empty: contract v2 renames nothing) |
 
 The root entry (`@texuli/tokens`) re-exports the engine areas; the theme
 libraries and `build` stay behind their subpaths so unused themes are never
@@ -134,6 +138,7 @@ Ships in `0.6.0`; the `0.5.0` release predates it:
   [theming guide](https://texuli.com/guides/theming/)
 - Compiled CSS and scoped themes: [tokens-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-css.md)
 - Token contract: [tokens-contract.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-contract.md)
+- Token contract v2 tables (system families and component tokens, generated): [tokens-components.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-components.md)
 - Motion tokens (durations, easings, springs): [tokens-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-motion.md)
 - Theme generator: [tokens-generator.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-generator.md)
 - Theme libraries: [tokens-library-port.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-port.md)

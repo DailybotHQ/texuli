@@ -15,6 +15,15 @@ localized `labels.sendError`. Unexpected exception details are not shown.
 Successful sends clear the draft. Override any `ComposerLabels` field for
 translated input, placeholder, keyboard hint, send, pending, and error text.
 
+## `ref` and other attributes
+
+`Composer`'s `bind:ref` is its root `form`; `id`, `aria-*`, `data-*`,
+`style` and handlers land there. A caller `onsubmit` runs first and the
+composer's own submit always runs after it. `onkeydown` is the exception: it
+reaches the textarea (see below). `TypingIndicator`'s `bind:ref` is its
+status element, which takes the same attributes. Both are covered by the
+uniform contract test (`packages/chat/tests/contract.test.ts`).
+
 ## Streaming stop, key hook and actions (G32)
 
 - `streaming` marks a running reply. With `onStop`, the send button becomes

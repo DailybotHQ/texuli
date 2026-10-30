@@ -1,4 +1,6 @@
 // @vitest-environment node
+
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   annotationInteractionSeries,
@@ -1465,5 +1467,31 @@ describe('chart annotations', () => {
         )
       ).toThrow(/at most 100/);
     });
+  });
+});
+
+describe('categorical fallbacks (T-adopt-domain)', () => {
+  // The one hex set the frame-drawn charts paint when a theme carries no
+  // --tx-chart-N (ColorBrewer, per mode). Emitting data-viz tokens for every
+  // theme by default moves these pixels, so it waits for a visual review.
+  const CANONICAL = {
+    light: ['#2166ac', '#b35806', '#1b7837', '#762a83', '#d73027', '#018571', '#5e3c99', '#a6611a'],
+    dark: ['#6baed6', '#fd8d3c', '#74c476', '#9e9ac8', '#fb6a4a', '#41b6c4', '#bcbddc', '#fdae6b'],
+  };
+  const fallbacks = (file: string) => {
+    const source = readFileSync(new URL(`../src/${file}`, import.meta.url), 'utf8');
+    const [light, dark] = source.split(/\[data-mode='dark'\]/u);
+    const read = (css = '') =>
+      Array.from({ length: 8 }, (_, i) => {
+        const match = new RegExp(`var\\(--tx-chart-${i + 1}, (#[0-9a-f]{6})\\)`, 'u').exec(css);
+        return match?.[1];
+      });
+    return { light: read(light), dark: read(dark) };
+  };
+
+  it('the cartesian and matrix frames read --tx-chart-N with the same canonical set', () => {
+    for (const file of ['cartesian/CartesianChart.svelte', 'matrix/MatrixFrame.svelte']) {
+      expect(fallbacks(file), file).toEqual(CANONICAL);
+    }
   });
 });

@@ -119,9 +119,15 @@ describe('output page: data', () => {
         '<!doctype html><html lang="en" dir="ltr"><head><meta name="robots" content="noindex">'
       )
     ).toBe(true);
-    expect(html.replace('<meta name="robots" content="noindex">', '')).toBe(
-      renderEmail(WEEKLY_DIGEST, EMAIL_OPTIONS).html
+    // The fixed noindex meta and the Markdown twin link (PLAN_011 T-ar-twins).
+    expect(html).toContain(
+      '<link rel="alternate" type="text/markdown" href="/output-page/preview.md">'
     );
+    expect(
+      html
+        .replace('<meta name="robots" content="noindex">', '')
+        .replace('<link rel="alternate" type="text/markdown" href="/output-page/preview.md">', '')
+    ).toBe(renderEmail(WEEKLY_DIGEST, EMAIL_OPTIONS).html);
   });
 
   it('maps the digest to a document and a one-page PDF with no JavaScript', async () => {

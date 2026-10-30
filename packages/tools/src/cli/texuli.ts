@@ -1,17 +1,16 @@
 #!/usr/bin/env node
 /// <reference types="node" />
+/**
+ * The `texuli` bin: `texuli <group> <verb>` for every operation of the
+ * registry plus the commands kept from 0.8 (see `router.ts`).
+ */
 import { isMainModule } from '../internal/is-main.ts';
-import { runDeckCli } from './deck.ts';
-import { runDocumentCli } from './document.ts';
+import { type RouterResult, runRouter } from './router.ts';
 
-export async function runTexuliCli(argv: readonly string[] = process.argv.slice(2)) {
-  const [command, ...rest] = argv;
-  if (command === 'deck') return runDeckCli(rest);
-  if (command === 'document') return runDocumentCli(rest);
-  const message = command ? `Unknown texuli command "${command}".` : 'Expected a texuli command.';
-  process.stderr.write(`${message} Available: deck, document.\n`);
-  process.exitCode = 1;
-  return { ok: false, error: message };
+export async function runTexuliCli(
+  argv: readonly string[] = process.argv.slice(2)
+): Promise<RouterResult> {
+  return runRouter(argv);
 }
 
 if (isMainModule(import.meta.url)) void runTexuliCli();

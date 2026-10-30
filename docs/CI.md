@@ -9,14 +9,27 @@ integration.
 
 | Workflow | File | Trigger | Jobs |
 | --- | --- | --- | --- |
-| CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | push to `main`, pull requests | `check`, `behavior`, `website`, `audits`, `setup-smoke-macos` |
+| CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | push to `main`, pull requests | `check`, `behavior`, `website`, `audits`, `setup-smoke-macos`; `mcp-remote-smoke` on pushes to `main` only |
 | Publish packages | [.github/workflows/publish.yml](../.github/workflows/publish.yml) | CI success on a push to `main` (a merged PR), `v*` tag push, manual dispatch | `publish` |
 | Skill release | [.github/workflows/skill-release.yml](../.github/workflows/skill-release.yml) | `workflow_run` after a successful CI run for a push to `main` | `release` (`contents: write`), `smoke` (read-only) |
 
 - **`check`** — `pnpm check` (Biome lint, typecheck, unit and component
-  tests, layer guard) plus `scripts/supply-chain.ts`, `scripts/check-docs.ts`,
+  tests, layer guard, and `pnpm check:surfaces`, which fails when the
+  server card, the llms Tools section, the ops docs tables or the
+  `/mcp-server/` data drift from the operations registry) plus `scripts/supply-chain.ts`, `scripts/check-docs.ts`,
   `pnpm check:skill` and `shellcheck skills/texuli/setup.sh` (the skill's
   only shell script; shellcheck ships on the Ubuntu image).
+- **`mcp-remote-smoke`** — only on pushes to `main`, after `check`, and
+  never on pull requests. Cloudflare Pages deploys the site and
+  `functions/mcp.ts` outside GitHub Actions, so the job runs
+  `scripts/mcp-remote-smoke.sh`: a read-only `tools/list` POST to
+  `https://texuli.com/mcp` with curl, compared with the remote tool names
+  of the committed server card (generated from the registry), retried
+  every 30 s up to 20 times while the deploy of the commit rolls out. It is
+  `continue-on-error`, so a slow or failed deploy never blocks publishing;
+  a drift shows as a failed job with an error annotation. The endpoint is
+  live from release 0.9.0, deployed from `main`. Tests: `scripts/tests/mcp-remote-smoke.test.ts` (a local
+  stand-in server).
 - **`setup-smoke-macos`** — on `macos-latest`, confirms `/bin/bash` is
   3.2 and runs the skill's `setup.sh` under it: `--help`, `--version`,
   `--verify`, then for every host from `--list-hosts` a dry run, an install
@@ -39,7 +52,8 @@ integration.
   test tests/behavior`. Failed runs upload `test-results/` as an artifact.
 - **`website`** — `pnpm build` (which runs `astro check`, the examples
   catalog prebuild, sitemap/robots/social images and the CSP integration),
-  `pnpm --filter @texuli/website check:csp`, then the browser e2e suite on
+  `pnpm --filter @texuli/website check:csp`, the Markdown twin parity check
+  (`pnpm exec tsx scripts/check-md-parity.ts --strict`), then the browser e2e suite on
   chromium with the site-perf budget tests excluded (the audit job owns
   them). The job is a six-way matrix: each runner builds the site and runs
   one shard of the same suite. `tests/e2e/shards.json` deals the spec files
@@ -47,7 +61,7 @@ integration.
   minutes per shard on four workers); `scripts/tests/e2e-shards.test.ts`
   fails when a spec is in no shard or in two, so a new spec must be added
   to a shard. The a11y page sweep is three files (`a11y-site-1..3.spec.ts`)
-  so it spreads over shards. `check:csp` runs on shard 1. Locally,
+  so it spreads over shards. `check:csp` and the twin parity check run on shard 1. Locally,
   `pnpm exec playwright test tests/e2e` runs every spec.
 - **Runners and browsers:** every job runs on `ubuntu-24.04` with a
   `timeout-minutes` limit. `behavior`, `website` and `audits` run in
@@ -90,7 +104,8 @@ browser visual test.
 then publishes the packable packages in the wave order documented in
 [RELEASE](RELEASE.md), always `--tag next`, then points `latest` at the
 same versions: `latest` tracks the newest release (owner decision
-2026-10-27; both name `0.8.0` once the post-merge run publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
+2026-10-27; both name `0.9.0` once the post-merge run of the
+`release/0.9.0` merge publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
 GitHub's OIDC token (`id-token: write`).
 
 `publish.yml` lists `@texuli/drag`, `@texuli/workflows` and
@@ -104,13 +119,14 @@ also needs `@texuli/deck`, `@texuli/document` and `@texuli/drag`), and
 `@texuli/sheets` (in development) after `@texuli/blocks`, once
 `@texuli/date` and `@texuli/data` are out; no published package imports
 the three (the catalog and the player take their checks and painters from
-the host). A manual `workflow_dispatch` run on `main`
+the host); and `@texuli/mcp` (in development) right after
+`@texuli/tools`, which it pins exactly. A manual `workflow_dispatch` run on `main`
 (run 40616266068, 2026-10-28 UTC) published drag and workflows for the
 first time as `0.3.0`; `@texuli/deck` was first published in `0.4.0`, and
 `@texuli/editor` was first published in `0.5.0`, `@texuli/document`
 and `@texuli/pages` in `0.7.0`, and `@texuli/forms`, `@texuli/canvas` and
-`@texuli/sheets` are first published in `0.8.0`, the release in which all
-25 packable packages move together. A pre-flight step refuses the run,
+`@texuli/sheets` in `0.8.0`, and `@texuli/mcp` is first published in
+`0.9.0`, the release in which all 26 packable packages move together. A pre-flight step refuses the run,
 before the first `npm publish`, when any listed package is still `0.0.0`.
 The publish loop
 skips versions npm already has, so a package changed since its published
@@ -178,6 +194,21 @@ project settings, owner-provisioned; analytics stays off without them. Every pus
 `main` deploys; a pull request gets a preview deployment. The per-page
 social images, sitemap and robots.txt are generated at build time against
 `https://texuli.com` (the `site` in `apps/website/astro.config.mjs`).
+
+The remote MCP endpoint (`functions/mcp.ts`, PLAN_011 T-mcp-remote) deploys
+with the site from `main` and is live from release 0.9.0. It needs no
+environment variable, binding or secret: Pages bundles it with the other
+Functions, it answers `/mcp`, and the middleware answers `/.well-known/mcp`
+with the same server. It sets its own CSP, `nosniff`, `no-store`,
+`noindex` and CORS headers, because `_headers` does not apply to Function
+responses ([SECURITY](SECURITY.md#21-remote-mcp-endpoint)). Its bundle is
+budgeted in `pnpm size` as `functions/mcp`. After the first deploy,
+confirm by hand that `POST https://texuli.com/mcp` answers `initialize`
+and `tools/list` with the `edge` operations, that a `GET` gets `405`, and
+that the security headers are present; a post-deploy smoke job that
+compares `tools/list` with the registry is planned (ADR-018), not wired.
+The optional Cloudflare rate-limiting rule for `/mcp` is an owner action
+in the dashboard, described in the same SECURITY section.
 
 ## Budget audits
 

@@ -142,9 +142,12 @@ describe('the layer table', () => {
       '@texuli/blocks',
       '@texuli/catalog',
       '@texuli/tools',
+      '@texuli/mcp',
     ];
     const layers = order.map((name) => LAYERS[name]);
     expect(layers).toEqual([...layers].sort((a = 0, b = 0) => a - b));
+    // @texuli/mcp depends on @texuli/tools, so it sits strictly above it (ADR-019).
+    expect(LAYERS['@texuli/mcp']).toBe((LAYERS['@texuli/tools'] ?? 0) + 1);
     expect(LAYERS['@texuli/charts']).toBe(LAYERS['@texuli/data']);
     expect(LAYERS['@texuli/charts']).toBe(LAYERS['@texuli/media']);
   });

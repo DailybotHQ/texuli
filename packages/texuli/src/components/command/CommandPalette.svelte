@@ -25,6 +25,7 @@ import CommandRoot from './CommandRoot.svelte';
 import type { CommandItemData, CommandPaletteSearch, CommandPaletteSelect } from './types.ts';
 import { type CommandSize, type CommandVariant, commandPaletteClass } from './variants.ts';
 import './command.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /**
@@ -70,6 +71,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('command');
 let {
   open = $bindable(false),
   onOpenChange,
@@ -86,8 +88,8 @@ let {
   recentEmptyLabel: recentEmptyLabelProp,
   loadingLabel: loadingLabelProp,
   errorLabel: errorLabelProp,
-  size = 'md',
-  variant = 'outline',
+  size = txDefaults().size ?? 'md',
+  variant = txDefaults().variant ?? 'outline',
   class: className,
   mode = 'top-layer',
   container = null,
@@ -280,6 +282,7 @@ onMount(() => {
       <DialogDescription class="tx-sr-only">{description}</DialogDescription>
       <CommandRoot
         label={title}
+        {loading}
         shouldFilter={false}
         loop
         {size}

@@ -7,6 +7,7 @@ import { splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type SliderSize, sliderRootClass } from './variants.ts';
 import './slider.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Orientation = 'horizontal' | 'vertical';
 type Mark = { value: number; label?: string };
@@ -44,6 +45,7 @@ type Props = {
   children?: Snippet;
 } & Omit<HTMLAttributes<HTMLDivElement>, 'id' | 'class' | 'children' | 'dir'>;
 
+const txDefaults = designDefaults('slider');
 let {
   type = 'single',
   value = $bindable(),
@@ -57,7 +59,7 @@ let {
   orientation = 'horizontal',
   dir,
   disabled = false,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   showTicks = false,
   marks = [],
   label = '',

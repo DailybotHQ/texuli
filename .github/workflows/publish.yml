@@ -67,7 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           refused=0
-          for dir in core date spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools astro player pages slides; do
+          for dir in core date spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools mcp astro player pages slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             if [ "$version" = "0.0.0" ]; then
@@ -150,6 +150,10 @@ jobs:
           # Wave 178 — L6/L7 and the newer surfaces.
           publish packages/catalog
           publish packages/tools
+          # L9: the one-word MCP install (`npx -y @texuli/mcp`), pinned exactly to
+          # tools and published right after it in the same wave (ADR-019; first
+          # published in 0.9.0).
+          publish packages/mcp
           publish packages/astro
           publish packages/player
           # L8: the block document editor and reader (document, blocks, texuli,
@@ -162,7 +166,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          for dir in core date spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools astro player pages slides; do
+          for dir in core date spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools mcp astro player pages slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             npm dist-tag add "${name}@${version}" latest

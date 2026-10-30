@@ -11,7 +11,7 @@ What Texuli is and where to begin.
 - [Texuli](https://texuli.com/): The product landing.
 - [Introduction](https://texuli.com/guides/): The docs home and reading order.
 - [Getting started](https://texuli.com/guides/getting-started/)
-- [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0, 0.7.0 and 0.8.0 (all on npm; 0.8.0 is current), with demos.
+- [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0, 0.7.0, 0.8.0 and 0.9.0 (all on npm; 0.9.0 is current), with demos.
 - [Skill](https://texuli.com/skill/): The distributable agent skill for building with Texuli.
 
 ## Platform
@@ -65,12 +65,14 @@ The headless, APG-aligned primitives beneath the styled components; every primit
 
 ## Themes
 
-The OKLCH theme engine and the interactive theme tools.
+The OKLCH theme engine, the interactive theme tools and the design token reference.
 
 - [Theme gallery](https://texuli.com/gallery-themes/)
 - [Switcher](https://texuli.com/theme-switcher/)
 - [Studio](https://texuli.com/theme-studio/)
 - [Colors](https://texuli.com/color-explorer/)
+- [Design tokens](https://texuli.com/tokens/)
+- [Component tokens](https://texuli.com/tokens/components/)
 
 ## Agents
 
@@ -81,6 +83,8 @@ The agent catalog, the sink-free renderer, streaming generation and the agent su
 - [Live generation](https://texuli.com/live-generation/)
 - [Builder](https://texuli.com/builder/)
 - [Agent chat](https://texuli.com/agent-chat/)
+- [Developers](https://texuli.com/developers/)
+- [Texuli MCP](https://texuli.com/mcp-server/)
 
 ## Project
 
@@ -100,3 +104,27 @@ Machine-readable documentation served as static files.
 - [Catalog llms.txt](https://texuli.com/llms/llms.txt): The agent-facing component index.
 - [Catalog llms-full.txt](https://texuli.com/llms/llms-full.txt): Every component doc in one file.
 - [Catalog JSON](https://texuli.com/catalog/catalog.json): The full catalog manifest as JSON.
+- [OpenAPI description](https://texuli.com/openapi.json): OpenAPI 3.1 for the read-only JSON API under /api/v1/ and POST /mcp (since 0.9.0).
+- [API index](https://texuli.com/api/index.json): Every JSON endpoint (the versioned /api/v1/ URLs) with its operationId, the limits and the versioning policy.
+
+## Tools
+
+Every Texuli operation is an MCP tool and a texuli CLI command (texuli <group> <verb>), from one registry. Local MCP: npx -y @texuli/mcp over stdio, the edge and node operations. Remote MCP: Streamable HTTP POST to https://texuli.com/mcp, the edge operations plus site.pages, site.read and site.search (texuli.com's pages as Markdown; remote only). Read-only; no account or key.
+
+- [MCP server card](https://texuli.com/.well-known/mcp/server-card.json): Transports, protocol versions, capabilities and every tool, as JSON.
+- [catalog.search](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Search the component catalog. Search the built, content-addressed Texuli component catalog by text, group and emit tier. Returns the catalog hash and file name, the match count and one summary per component (id, package, label, summary, tier, group, emit tiers). Local and remote.
+- [catalog.validate](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Validate catalog manifests. Validate one candidate catalog manifest, or a set (which also catches duplicate ids), without writing files. Returns valid and a list of diagnostics, each with a code, a JSONPath, a message and a hint. Local and remote.
+- [component.get](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Read a component manifest. Read one component manifest from the catalog by id. Returns { component }: its props with kinds and schemas, events, worked examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it (an empty emit list means agent output may not). Local and remote.
+- [example.search](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Find component examples. Find worked manifest examples (props an agent can copy) by component id and/or example id, or search their titles and descriptions. Returns the match count and each example with its component id and package. Local and remote.
+- [blueprint.validate](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Validate a blueprint draft. Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's draft checks: structure, sinks, tree limits, component ids, tiers and prop schemas, deep block and document schemas, grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with the catalog's stable codes. Local and remote.
+- [block.list](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): List block types. List the content block types the blocks-* components render (table, stat, cta, poll …), optionally for one component or matching words. Returns the match count and, per type, the component that renders it, a label and when to use it; read one shape with block.schema. Local and remote.
+- [block.schema](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Read a block shape. Read the shape of one content block type: the component that renders it, its fields as compact text and as a JSON Schema (required fields are the ones the validator refuses a block without), examples that validate in a blueprint, limits, when to use it and whether it can pass blueprint.validate today. Returns what a blocks-* node’s block prop needs. Local and remote.
+- [theme.search](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Search the theme library. Search the Texuli theme library (200+ offline themes) by words, category, collection, mood or tag. Returns the match count and each theme’s metadata: id, name, description, category, collection, mood, tags, contrast level and whether it is dark-first. Local and remote.
+- [theme.get](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Read a full theme. Read the full token definition of one library theme by id. Returns { theme }: its id, name, description and every light and dark color, radius, font and chart token, ready to compile or apply. Local and remote.
+- [theme.preview](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Preview a theme. Preview one library theme in light or dark mode. Returns its summary, the key tokens of that mode (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes (aa.pass and issue counts). Local and remote.
+- [deck.run](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Run a deck command. Inspect, lint and convert a Texuli deck on the shared v2 model: capabilities, the JSON Schema, layouts, lint, inspect, from-markdown and to-markdown. Pure compute; returns { result } with the command output (ok, issues, deck, markdown …). Local and remote.
+- [document.run](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Run a document command. Create, validate, inspect, patch and convert a Texuli document (spec 0.7.0): capabilities, the JSON Schema, validate, inspect, a bounded RFC 6902 patch (at most 1000 operations), from-markdown, to-markdown and to-blueprint. Returns { result } with the command output; PDF and DOCX are document.export. Local and remote.
+- [document.export](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Export a document as PDF or DOCX. Write a Texuli document as PDF or DOCX bytes with the owned writers, links and media checked at the tier. Returns { result } with ok, mime, byteLength, base64 bytes (no files are written), diagnostics and, for PDF, pageCount. Needs Node. Local only (needs Node).
+- [site.pages](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): List texuli.com pages. List the pages of texuli.com from its Markdown twin manifest, in path order, optionally under a path prefix, a page at a time. Returns the total, the offset, the next offset when more follow, and each page’s path, twin path, URL, title and description. Remote only (reads the built texuli.com).
+- [site.read](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Read a texuli.com page as Markdown. Read one texuli.com page as its Markdown twin: the page’s own content with a header block (title, description, canonical URL, last updated). Accepts a route, its .md twin path or a texuli.com URL. Returns the path, twin, URL, title, the Markdown, its size and whether it was cut at the size cap. Remote only (reads the built texuli.com).
+- [site.search](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Search texuli.com pages. Search texuli.com pages by words in their titles, headings, descriptions and paths, ranked deterministically (more matched words first, then title over path over heading over description). Returns the total and, per hit, the path, twin, URL, title, description, score and up to three matching headings. Remote only (reads the built texuli.com).

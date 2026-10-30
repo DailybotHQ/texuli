@@ -44,7 +44,7 @@ const SITE_NAME = 'Texuli';
  * `src/pages/**` file; the dynamic `[id].astro` routes map to their template
  * plus the package area that feeds them. Unmapped routes fall back to HEAD.
  */
-const sourceDates = new Map<string, string>();
+const sourceDates = new Map<string, string | undefined>();
 
 /**
  * The last commit date (for `gitArgs`, e.g. `['--', path]`) as a UTC
@@ -68,7 +68,10 @@ function gitDate(path: string): string | undefined {
     } catch {
       date = '';
     }
-    if (date) sourceDates.set(path, date);
+    // Misses are cached too: the twins (docs/integration.ts) ask for every
+    // built route, most of them dynamic, so a path with no history is asked
+    // about once, not once per page.
+    sourceDates.set(path, date || undefined);
   }
   return sourceDates.get(path);
 }
@@ -78,7 +81,11 @@ function headDate(): string {
   return gitCommitDateUtc([]);
 }
 
-function routeLastmod(path: string): string {
+/**
+ * A route's last-modified day (`YYYY-MM-DD`, UTC), deterministic for a
+ * commit: the sitemap's `lastmod` and every Markdown twin's `Last Updated`.
+ */
+export function routeLastmod(path: string): string {
   const latest = (...candidates: string[]) => {
     const dates = candidates
       .map(gitDate)

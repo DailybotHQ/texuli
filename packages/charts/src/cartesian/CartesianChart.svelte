@@ -16,16 +16,30 @@ import {
   useCanvas,
 } from '../canvas/model.ts';
 import type { BrushRange, ChartFormatters, DomainPair, PlotSeries } from '../interaction/model.ts';
-import { bandScale, extent, linearScale, stack, ticks } from '../math/index.ts';
+import {
+  bandScale,
+  chooseTimeInterval,
+  extent,
+  formatTimeTick,
+  linearScale,
+  stack,
+  ticks,
+  timeTicks,
+} from '../math/index.ts';
 import { fitChartWidth } from '../math/layout/fit-width.ts';
 import {
   assertCartesianSeries,
+  assertCartesianXKind,
   type CartesianDomain,
   type CartesianKind,
   type CartesianPoint,
   type CartesianSeries,
+  type CartesianXFormatter,
+  type CartesianXKind,
+  cartesianXFormatter,
   createCartesianLayout,
   lineCoordinates,
+  resolveChartLocale,
   toInteractionSeries,
   windowCartesianSeries,
   xDomain,
@@ -55,6 +69,15 @@ interface Props {
     x: number | string;
     y: number | null;
   }) => void;
+  /**
+   * How x values read: `category`, `linear` or `time` (epoch milliseconds,
+   * shown as UTC dates). Omitted: inferred as before (a band per value).
+   */
+  xKind?: CartesianXKind;
+  /** Formats x values on the axis, live region, tooltip and data table. */
+  formatX?: CartesianXFormatter;
+  /** BCP 47 tag for dates and announced values; default the runtime's locale. */
+  locale?: string;
 }
 
 let {
@@ -73,6 +96,9 @@ let {
   onzoom,
   onbrush,
   onselect,
+  xKind,
+  formatX,
+  locale,
 }: Props = $props();
 
 const id = $props.id();
@@ -93,10 +119,9 @@ const plotRect = $derived({
 let tableOpen = $state(false);
 let hidden = $state(new Set<string>());
 
-const formatters: ChartFormatters = {
-  x: (value) => display(value),
-  y: (value) => display(value),
-};
+const chartLocale = $derived(resolveChartLocale(locale));
+const numberFormat = $derived(new Intl.NumberFormat(chartLocale, { maximumFractionDigits: 2 }));
+const continuousX = $derived(xKind === 'linear' || xKind === 'time');
 
 const visibleSeries = $derived(series.filter((item) => !hidden.has(item.id)));
 
@@ -107,6 +132,7 @@ $effect.pre(() => {
     throw new TypeError('Cartesian charts need an accessible description.');
   }
   assertCartesianSeries(series);
+  assertCartesianXKind(series, xKind);
   assertCartesianAnnotations(annotations);
 });
 
@@ -135,13 +161,23 @@ const model = $derived.by(() => {
     paddingOuter: 0.1,
   });
   const band = category.bandwidth();
+  const hasBars = kind === 'bar' || kind === 'stacked-bar' || kind === 'combo';
+  // A linear or time axis spans the data extent; bars keep half a slot inside each edge.
+  const keyExtent = continuousX ? extent(keys as number[]) : null;
+  const edgePad = hasBars ? innerWidth / Math.max(2, keys.length) / 2 : 0;
   const visibleXScale = visibleDomain
     ? linearScale({
         domain: visibleDomain,
         range: [margin.left, width - margin.right],
         nice: false,
       })
-    : null;
+    : keyExtent
+      ? linearScale({
+          domain: keyExtent[0] === keyExtent[1] ? [keyExtent[0] - 1, keyExtent[1] + 1] : keyExtent,
+          range: [margin.left + edgePad, width - margin.right - edgePad],
+          nice: false,
+        })
+      : null;
   const rows = renderedSeries.map((item) => {
     const values = new Map(item.points.map((point) => [point.x, point.y]));
     return keys.map((key) => values.get(key) ?? null);
@@ -179,7 +215,7 @@ const model = $derived.by(() => {
       .filter((key): key is number => typeof key === 'number')
       .map((key) => Math.abs(xPosition(key) - xPosition(current)))
       .filter((distance) => distance > 0);
-    return Math.max(1, Math.min(...distances, innerWidth));
+    return Math.max(1, Math.min(...distances, edgePad > 0 ? edgePad * 2 : innerWidth));
   };
   const chartLayout = {
     ...layout,
@@ -311,40 +347,55 @@ const model = $derived.by(() => {
             visibleKeys[Math.round((index * (visibleKeys.length - 1)) / 5)] as number | string
         )
       : visibleKeys;
-  const xAxisTicks = tickKeys.map((value, index) => ({
-    value,
-    position:
-      (visibleXScale
-        ? xPosition(value)
-        : (category(String(value)) ??
-            margin.left + (index / Math.max(1, tickKeys.length - 1)) * innerWidth) +
-          (category(String(value)) === undefined ? 0 : category.bandwidth() / 2)) - margin.left,
-  }));
+  const xAxisTicks =
+    visibleXScale && continuousX
+      ? continuousTicks(visibleXScale.domain).map(({ value, label }) => ({
+          value: label,
+          position: visibleXScale(value) - margin.left,
+        }))
+      : tickKeys.map((value, index) => ({
+          value: formatX ? formatX(value) : value,
+          position:
+            (visibleXScale
+              ? xPosition(value)
+              : (category(String(value)) ??
+                  margin.left + (index / Math.max(1, tickKeys.length - 1)) * innerWidth) +
+                (category(String(value)) === undefined ? 0 : category.bandwidth() / 2)) -
+            margin.left,
+        }));
   const yAxisTicks = yTicks.map((value) => ({ value, position: yScale(value) - margin.top }));
   const pointLookups = series.map(
     (item) => new Map(item.points.map((point) => [point.x, point.y]))
   );
   // Dense canvas series keep keyboard/tooltip exploration on a downsampled
   // point set so 100k+ source points never freeze the interaction layer.
+  // Announce source values, not canvas pixels: each kept point maps back to its datum.
   const interactionSeries: PlotSeries[] = canvasEnabled
-    ? canvasSeries.map((item) => ({
-        id: item.id,
-        label: item.label,
-        color: item.color,
-        points: downsampleCanvasPoints(
-          item.points.map((point) => ({
-            x: point.x,
-            y: point.y,
-            y0: point.y0,
-          })),
-          Math.max(64, Math.floor(width / 2))
-        ).map((point) => ({
-          x: point.x,
-          y: point.y,
-          xValue: point.x,
-          yValue: point.y,
-        })),
-      }))
+    ? canvasSeries.map((item, seriesIndex) => {
+        const sourcePoints = renderedSeries[seriesIndex]?.points ?? [];
+        const sources = new Map<object, CartesianPoint | undefined>();
+        const pixels = item.points.map((point, pointIndex) => {
+          const pixel = { x: point.x, y: point.y, y0: point.y0 };
+          sources.set(pixel, sourcePoints[pointIndex]);
+          return pixel;
+        });
+        return {
+          id: item.id,
+          label: item.label,
+          color: item.color,
+          points: downsampleCanvasPoints(pixels, Math.max(64, Math.floor(width / 2))).map(
+            (point) => {
+              const source = sources.get(point);
+              return {
+                x: point.x,
+                y: point.y,
+                xValue: source ? source.x : point.x,
+                yValue: source ? source.y : point.y,
+              };
+            }
+          ),
+        };
+      })
     : toInteractionSeries(renderedSeries, {
         keys,
         xPosition,
@@ -382,6 +433,10 @@ const model = $derived.by(() => {
   });
   return {
     keys,
+    formatters: {
+      x: cartesianXFormatter({ xKind, formatX, locale: chartLocale, keys, fallback: display }),
+      y: (value: number | null) => display(value),
+    } satisfies ChartFormatters,
     tickKeys,
     xAxisTicks,
     yAxisTicks,
@@ -423,9 +478,28 @@ const model = $derived.by(() => {
 
 function display(value: number | string | null): string {
   if (value === null) return 'No value';
-  return typeof value === 'number'
-    ? new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value)
-    : value;
+  return typeof value === 'number' ? numberFormat.format(value) : value;
+}
+
+/**
+ * Nice ticks for a linear or time x-axis, about one per 96 pixels: aligned
+ * UTC boundaries labeled at their granularity (`formatTimeTick`), or round
+ * numbers. The host's `formatX` labels them when given.
+ */
+function continuousTicks(domain: readonly [number, number]): { value: number; label: string }[] {
+  const [lo, hi] = domain[0] <= domain[1] ? domain : [domain[1], domain[0]];
+  const count = Math.max(2, Math.min(8, Math.floor(innerWidth / 96)));
+  if (xKind === 'time') {
+    const interval = chooseTimeInterval(lo, hi, count);
+    return timeTicks(lo, hi, interval).map((value) => ({
+      value,
+      label: formatX ? formatX(value) : formatTimeTick(value, interval, { locale: chartLocale }),
+    }));
+  }
+  return ticks(lo, hi, count).map((value) => ({
+    value,
+    label: formatX ? formatX(value) : numberFormat.format(value),
+  }));
 }
 
 /**
@@ -510,7 +584,7 @@ const interactionModules = $derived(
           {width}
           {height}
           plot={plotRect}
-          {formatters}
+          formatters={model.formatters}
           crosshair="x"
           {brushInvert}
           fullDomain={fullDomain ?? model.defaultDomain}
@@ -592,7 +666,12 @@ const interactionModules = $derived(
           {/snippet}
         </I.InteractivePlot>
         {#if model.useCanvas}
-          <div class="canvas-layer" aria-hidden="true">
+          <!-- Shares the interactive plot's box (G96): capped at the layout width, so marks stay on the axes. -->
+          <div
+            class="canvas-layer"
+            style={`max-inline-size: ${width}px; aspect-ratio: ${width} / ${height}`}
+            aria-hidden="true"
+          >
             <CanvasRenderer kind={kind} series={model.canvasSeries} {width} {height} />
           </div>
         {/if}
@@ -603,7 +682,7 @@ const interactionModules = $derived(
       {#if tableOpen}
         <I.ChartTable
           series={model.tableSeries}
-          {formatters}
+          formatters={model.formatters}
           caption="{title} data"
         />
       {/if}
@@ -676,7 +755,8 @@ const interactionModules = $derived(
         <AnnotationLayer annotations={model.renderedAnnotations} plot={plotRect} />
       </svg>
       {#if model.useCanvas}
-        <div class="canvas-layer" aria-hidden="true">
+        <!-- The static SVG fills the figure, so its canvas does too, at the same aspect ratio. -->
+        <div class="canvas-layer" style={`aspect-ratio: ${width} / ${height}`} aria-hidden="true">
           <CanvasRenderer kind={kind} series={model.canvasSeries} {width} {height} />
         </div>
       {/if}
@@ -713,7 +793,7 @@ const interactionModules = $derived(
   }
 
   figcaption h2 {
-    font-size: 1rem;
+    font-size: var(--tx-chart-frame-title-font-size, var(--tx-type-body-size));
     margin-block: 0;
   }
 
@@ -728,9 +808,17 @@ const interactionModules = $derived(
   .plot {
     position: relative;
   }
+  /*
+   * The canvas layer sits over the plot's own box, not the figure: the same
+   * inline-start corner, width and aspect ratio (its max-inline-size is
+   * inline, as on .tx-chart-plot). `inset: 0` stretched it across a wide
+   * figure while the axes kept their 640px box (G96).
+   */
   .canvas-layer {
     position: absolute;
-    inset: 0;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: 100%;
     pointer-events: none;
   }
   .plot :global(svg) {

@@ -1,0 +1,447 @@
+---
+/**
+ * /mcp-server/ — Texuli MCP (PLAN_011 T-site-090): what the server offers,
+ * its two doors (remote https://texuli.com/mcp, local npx), setup for every
+ * host, the tools, resources and prompts, limits and security, versions, the
+ * site tools and WebMCP, and a curl example. The route is /mcp-server/
+ * because functions/mcp.ts owns /mcp. Static: no island, no client script.
+ * Every table renders the registry's generated data (`mcp-server-data.ts`,
+ * `pnpm check:surfaces`) through `src/components/mcp-server/page.ts`.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import {
+  COUNTS,
+  CURL_TOOLS_CALL,
+  CURL_TOOLS_LIST,
+  doorsOf,
+  LOCAL_LIMITS,
+  limitsOf,
+  MCP,
+  MCP_HOSTS,
+  RELEASE,
+  REMOTE_LIMITS,
+  TOOL_GROUPS,
+  TOOLS_LAUNCH,
+  toolsIn,
+  WEBMCP_TOOLS,
+} from '../../components/mcp-server/page.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const description = `Texuli MCP: ${COUNTS.tools} tools, ${COUNTS.resources + COUNTS.templates} resources and ${COUNTS.prompts} prompts for agents, from the remote server at texuli.com/mcp or locally with npx -y @texuli/mcp. Setup for every host, limits, security and versions.`;
+const repo = (path: string) =>
+  safeHref(`https://github.com/DailybotHQ/texuli/blob/main/${path}`, 'developer');
+const security21 = repo('docs/SECURITY.md#21-remote-mcp-endpoint');
+const security21a = repo('docs/SECURITY.md#21a-webmcp-bridge-in-the-site-pages');
+const security23 = repo('docs/SECURITY.md#23-public-json-api-api');
+const security6 = repo('docs/SECURITY.md#6-mcp-stdio-server-texulitools');
+const mcpDocs = repo('packages/tools/docs/mcp.md');
+const mcpReadme = repo('packages/mcp/README.md');
+const npmMcp = safeHref('https://www.npmjs.com/package/@texuli/mcp', 'developer');
+const released = RELEASE.state === 'released';
+---
+
+<BaseLayout title="Texuli MCP" {description}>
+  <div class="tx-mcp-ref">
+  <h1>Texuli MCP</h1>
+  <p class="lead">
+    A Model Context Protocol server that lets an agent search the Texuli component catalog, read
+    manifests and worked examples, validate blueprint drafts, pick and check themes, run the deck
+    and document commands, and read texuli.com itself. Every tool is read-only.
+  </p>
+  {
+    !released && (
+      <p class="status" data-mcp-status>
+        <strong>Status:</strong> {RELEASE.note} <code>@texuli/mcp</code> is first published in <code>{MCP.version}</code>; until then the packages on npm are the 0.8 line.
+      </p>
+    )
+  }
+  <dl class="facts">
+    <dt>Remote</dt>
+    <dd><code data-mcp-remote>{MCP.remote.url}</code></dd>
+    <dt>Local</dt>
+    <dd><code data-mcp-local>{MCP.local.launch}</code></dd>
+    <dt>Protocol</dt>
+    <dd><code>{MCP.protocolVersion}</code></dd>
+    <dt>Server card</dt>
+    <dd><a href={MCP.serverCard}><code>{MCP.serverCard}</code></a></dd>
+    <dt>Serves</dt>
+    <dd>
+      <span data-mcp-count-tools>{COUNTS.tools}</span> tools, {COUNTS.resources} resources, {COUNTS.templates} resource templates and {COUNTS.prompts} prompts, with completions
+    </dd>
+  </dl>
+  <p>
+    The <a href="/developers/">developer portal</a> puts the server next to the JSON API and the CLI;
+    this page is the whole server.
+  </p>
+
+  <h2 id="doors">Two doors, one registry</h2>
+  <p>
+    Both servers are generated from the same operations registry (<code>@texuli/tools/ops</code>),
+    so a tool has one name, one input schema and one set of limits wherever it runs.
+  </p>
+  <ul class="points">
+    <li>
+      <strong>Remote:</strong> <code>{MCP.remote.url}</code>. Stateless Streamable HTTP: POST
+      JSON-RPC, JSON answers, no session and no key. It serves {COUNTS.remote} tools: the edge tools
+      and the site tools.
+    </li>
+    <li>
+      <strong>Local:</strong> <code>{MCP.local.launch}</code>, or <code>{TOOLS_LAUNCH}</code> when a
+      project already has <code>@texuli/tools</code>. Over stdio, on Node.js, offline once
+      installed. It serves {COUNTS.local} tools: the edge tools and the Node tools.
+    </li>
+  </ul>
+
+  <h2 id="setup">Set up your host</h2>
+  <p>
+    Each host takes either door. The local one runs the same command everywhere; the remote one is a
+    URL. On Windows, hosts that cannot start <code>npx</code> directly take <code>"command": "cmd"</code> with <code>"args": ["/c", "npx", "-y", "@texuli/mcp"]</code>.
+  </p>
+  {
+    MCP_HOSTS.map((host) => (
+      <section class="host" aria-labelledby={`host-${host.id}`} data-mcp-host={host.id}>
+        <h3 id={`host-${host.id}`}>{host.name}</h3>
+        <p class="where">In {host.where}.</p>
+        <p class="door">Local</p>
+        <pre><code>{host.local}</code></pre>
+        <p class="door">Remote</p>
+        <pre><code>{host.remote}</code></pre>
+      </section>
+    ))
+  }
+
+  <h2 id="tools">Tools</h2>
+  <p>
+    <span data-mcp-tools-total>{COUNTS.tools}</span> tools, grouped by where they can run. Each one
+    has an input and an output JSON Schema and read-only annotations; a failure is an <code>isError</code> result with a stable code. Limits are the input size, the item cap and the
+    time budget.
+  </p>
+  {
+    TOOL_GROUPS.map((group) => (
+      <>
+        <h3 id={`tools-${group.runtime}`}>{group.title}</h3>
+        <p>{group.note}</p>
+        <div class="table-wrap" role="region" aria-labelledby={`tools-${group.runtime}`} tabindex="0">
+          <table data-mcp-tools={group.runtime}>
+            <thead>
+              <tr>
+                <th scope="col">Tool</th>
+                <th scope="col">What it does</th>
+                <th scope="col">Arguments</th>
+                <th scope="col">Doors</th>
+                <th scope="col">Limits</th>
+              </tr>
+            </thead>
+            <tbody>
+              {toolsIn(group.runtime).map((tool) => (
+                <tr data-mcp-tool={tool.name}>
+                  <th scope="row">
+                    <code>{tool.name}</code>
+                  </th>
+                  <td>{tool.summary}</td>
+                  <td>
+                    {tool.arguments.map((argument, index) => (
+                      <>
+                        {index > 0 && ', '}<code>{argument.name}</code>{argument.required && ' (required)'}
+                      </>
+                    ))}
+                  </td>
+                  <td>{doorsOf(tool)}</td>
+                  <td>{limitsOf(tool)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </>
+    ))
+  }
+
+  <h2 id="resources">Resources and templates</h2>
+  <div class="table-wrap" role="region" aria-label="Resources" tabindex="0">
+    <table data-mcp-resources>
+      <thead>
+        <tr>
+          <th scope="col">URI</th>
+          <th scope="col">Title</th>
+          <th scope="col">What it holds</th>
+          <th scope="col">Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          MCP.resources.map((resource) => (
+            <tr data-mcp-resource={resource.uri}>
+              <th scope="row">
+                <code>{resource.uri}</code>
+              </th>
+              <td>{resource.title}</td>
+              <td>{resource.description}</td>
+              <td>
+                <code>{resource.mimeType}</code>
+              </td>
+            </tr>
+          ))
+        }
+        {
+          MCP.resourceTemplates.map((template) => (
+            <tr data-mcp-template={template.uriTemplate}>
+              <th scope="row">
+                <code>{template.uriTemplate}</code>
+              </th>
+              <td>{template.title}</td>
+              <td>{template.description}</td>
+              <td>
+                <code>{template.mimeType}</code>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="prompts">Prompts</h2>
+  <div class="table-wrap" role="region" aria-label="Prompts" tabindex="0">
+    <table data-mcp-prompts>
+      <thead>
+        <tr>
+          <th scope="col">Prompt</th>
+          <th scope="col">What it does</th>
+          <th scope="col">Arguments</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          MCP.prompts.map((prompt) => (
+            <tr data-mcp-prompt={prompt.name}>
+              <th scope="row">
+                <code>{prompt.name}</code>
+              </th>
+              <td>{prompt.description}</td>
+              <td>
+                {prompt.arguments.map((argument, index) => (
+                  <>
+                    {index > 0 && ', '}<code>{argument.name}</code>{argument.required && ' (required)'}
+                  </>
+                ))}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p>Completions suggest values for the prompt arguments and the resource template variables.</p>
+
+  <h2 id="limits">Limits and security</h2>
+  <h3 id="limits-remote">Remote</h3>
+  <ul class="points" data-mcp-limits="remote">
+    {REMOTE_LIMITS.map((line) => <li>{line}</li>)}
+  </ul>
+  <h3 id="limits-local">Local</h3>
+  <ul class="points" data-mcp-limits="local">
+    {LOCAL_LIMITS.map((line) => <li>{line}</li>)}
+  </ul>
+  <p>
+    No tool writes files, stores anything or fetches from the network. The remote logs nothing;
+    when the site's analytics is provisioned it counts calls by tool name, status and duration
+    bucket, never arguments or addresses. The threat models: <a href={security21}>SECURITY section 21, the remote MCP endpoint</a>, <a href={security21a}>section 21a, the WebMCP bridge</a>, <a href={security23}>section 23, the public JSON API</a>, and <a href={security6}>section 6, the local stdio server</a>.
+  </p>
+
+  <h2 id="versions">Versions</h2>
+  <ul class="points">
+    <li>
+      Server <code data-mcp-version>{MCP.version}</code>: <code>@texuli/mcp</code> depends on exactly
+      one <code>@texuli/tools</code> version, its own, and both publish in the same release wave.
+      Under 0.x a new minor may break, so pin the exact version (<a href={npmMcp}>@texuli/mcp on
+      npm</a>).
+    </li>
+    <li>
+      Protocol versions: {
+        MCP.protocolVersions.map((version, index) => (
+          <>
+            {index > 0 && ', '}<code>{version}</code>
+          </>
+        ))
+      }. The remote reads the <code>MCP-Protocol-Version</code> header and answers 400 to an
+      unsupported one.
+    </li>
+    <li>
+      Renamed tools still answer under their old names until <code>{MCP.deprecatedTools[0]?.removeIn}</code>:
+    </li>
+  </ul>
+  <div class="table-wrap" role="region" aria-label="Deprecated tool names" tabindex="0">
+    <table data-mcp-deprecated>
+      <thead>
+        <tr>
+          <th scope="col">Old name</th>
+          <th scope="col">Use</th>
+          <th scope="col">Removed in</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          MCP.deprecatedTools.map((tool) => (
+            <tr>
+              <th scope="row">
+                <code>{tool.name}</code>
+              </th>
+              <td>
+                {tool.replacedBy.map((name, index) => (
+                  <>
+                    {index > 0 && ', '}<code>{name}</code>
+                  </>
+                ))}
+              </td>
+              <td>
+                <code>{tool.removeIn}</code>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="site-tools">Site tools and WebMCP</h2>
+  <p>
+    The site tools ({
+      toolsIn('site').map((tool, index) => (
+        <>
+          {index > 0 && ', '}<code>{tool.name}</code>
+        </>
+      ))
+    }) list, search and read the pages of texuli.com as their Markdown twins. They read the deployed
+    build only, never the network, so the remote door serves them and the local one does not.
+  </p>
+  <p>
+    A browser agent gets the same pages without any setup: when the browser offers WebMCP
+    (<code>navigator.modelContext</code>), every page registers {WEBMCP_TOOLS.length} read-only tools
+    that call this site only. Without WebMCP, nothing more loads.
+  </p>
+  <div class="table-wrap" role="region" aria-label="WebMCP tools" tabindex="0">
+    <table data-mcp-webmcp>
+      <thead>
+        <tr>
+          <th scope="col">WebMCP tool</th>
+          <th scope="col">What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          WEBMCP_TOOLS.map((tool) => (
+            <tr>
+              <th scope="row">
+                <code>{tool.name}</code>
+              </th>
+              <td>{tool.description}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="try-it">Try it</h2>
+  <p>
+    List the remote tools with curl (once {MCP.version} is deployed; until then the URL answers with
+    the site's 404):
+  </p>
+  <pre><code data-mcp-curl>{CURL_TOOLS_LIST}</code></pre>
+  <p>Then call one:</p>
+  <pre><code>{CURL_TOOLS_CALL}</code></pre>
+  <p>
+    The protocol details (lifecycle, errors, every limit) are in <a href={mcpDocs}>mcp.md</a>, and
+    the local server in the <a href={mcpReadme}>@texuli/mcp README</a>.
+  </p>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  /* Global under one wrapper class: scoped styles stamp an attribute on every table cell. */
+  .tx-mcp-ref h1 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
+  .tx-mcp-ref h2 {
+    margin-block: 2rem 0.75rem;
+    font-size: 1.5rem;
+  }
+  .tx-mcp-ref h3 {
+    margin-block: 1.25rem 0.5rem;
+    font-size: 1.125rem;
+  }
+  .tx-mcp-ref p {
+    max-inline-size: 48rem;
+  }
+  .tx-mcp-ref .lead {
+    font-size: 1.1rem;
+  }
+  .tx-mcp-ref .status {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tx-border);
+    border-inline-start-width: 4px;
+    border-radius: var(--tx-radius, 0.5rem);
+  }
+  .tx-mcp-ref .facts {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.375rem 1rem;
+    margin: 1rem 0;
+  }
+  .tx-mcp-ref .facts dt {
+    color: var(--tx-muted-foreground);
+  }
+  .tx-mcp-ref dd {
+    margin: 0;
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .tx-mcp-ref code {
+    overflow-wrap: anywhere;
+  }
+  .tx-mcp-ref .where,
+  .tx-mcp-ref .door {
+    margin-block: 0.25rem;
+  }
+  .tx-mcp-ref .door {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--tx-muted-foreground);
+  }
+  .tx-mcp-ref pre {
+    margin: 0 0 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-muted, Canvas);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 0.875rem;
+  }
+  .tx-mcp-ref .table-wrap {
+    overflow-x: auto;
+  }
+  .tx-mcp-ref table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .tx-mcp-ref th,
+  .tx-mcp-ref td {
+    padding: 0.5rem;
+    border-block-end: 1px solid var(--tx-border);
+    text-align: start;
+    vertical-align: top;
+  }
+  .tx-mcp-ref tbody th {
+    font-weight: 400;
+  }
+  .tx-mcp-ref .points {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0 0 0.75rem;
+    padding-inline-start: 1.25rem;
+  }
+</style>

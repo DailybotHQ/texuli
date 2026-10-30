@@ -1,9 +1,29 @@
-/** A DOM element that can receive a portal, or `null` to use the document body. */
+export {
+  createScopedPortal,
+  createScopedPortalRoot,
+  findPortalScope,
+  PORTAL_ROOT_ATTRIBUTE,
+  type PortalScope,
+  SCOPE_ATTRIBUTE,
+  SCOPE_SELECTOR,
+  type ScopedPortalOptions,
+  type ScopedPortalRoot,
+} from './scope.ts';
+
+/** A DOM element that can receive a portal, or `null` for the default (the document body). */
 export type PortalTarget = Element | null | undefined;
 
 /** Initial target for a portal. Omitting it sends the source to `body`. */
 export type PortalOptions = {
   target?: PortalTarget;
+  /**
+   * Where an omitted or `null` target goes instead of `body`, asked on every
+   * placement with the source's original parent (`null` falls back to body).
+   * `createScopedPortal` uses it to follow a token scope.
+   */
+  fallback?: (origin: Element | null) => Element | null;
+  /** Called after every placement and at destroy, with the source's parent. */
+  settled?: (parent: Node | null) => void;
 };
 
 /** Controls the target of one portaled element and restores its original place. */
@@ -58,47 +78,16 @@ export function createPortal(
   const controller: PortalController = {
     setTarget(target) {
       if (disposed || !source || !ownerDocument) return false;
-      const destination = target ?? ownerDocument.body;
-      if (!destination) {
-        restoreToOrigin();
-        return true;
-      }
-      if (
-        destination.ownerDocument !== ownerDocument ||
-        destination === source ||
-        source.contains(destination)
-      ) {
-        return false;
-      }
-
-      if (originMarker?.parentNode === destination && originalParent === destination) {
-        restoreToOrigin();
-        return true;
-      }
-      if (source.parentNode === destination) return true;
-
-      const createdMarker = originMarker === null && originalParent !== null;
-      if (createdMarker && originalParent) {
-        originMarker = ownerDocument.createComment('texuli-portal-origin');
-        originalParent.insertBefore(originMarker, source);
-      }
-
-      try {
-        destination.append(source);
-      } catch {
-        if (createdMarker && originMarker?.parentNode) {
-          originMarker.parentNode.removeChild(originMarker);
-          originMarker = null;
-        }
-        return false;
-      }
-      return true;
+      const moved = place(target);
+      options.settled?.(source.parentNode);
+      return moved;
     },
 
     destroy() {
       if (disposed) return;
       disposed = true;
       restoreToOrigin();
+      options.settled?.(source?.parentNode ?? null);
     },
 
     get currentTarget() {
@@ -109,6 +98,49 @@ export function createPortal(
       return source !== null && source !== undefined && source.parentNode !== originalParent;
     },
   };
+
+  function place(target: PortalTarget): boolean {
+    if (!source || !ownerDocument) return false;
+    const origin = originMarker?.parentNode ?? originalParent;
+    const destination =
+      target ??
+      options.fallback?.(origin?.nodeType === 1 ? (origin as Element) : null) ??
+      ownerDocument.body;
+    if (!destination) {
+      restoreToOrigin();
+      return true;
+    }
+    if (
+      destination.ownerDocument !== ownerDocument ||
+      destination === source ||
+      source.contains(destination)
+    ) {
+      return false;
+    }
+
+    if (originMarker?.parentNode === destination && originalParent === destination) {
+      restoreToOrigin();
+      return true;
+    }
+    if (source.parentNode === destination) return true;
+
+    const createdMarker = originMarker === null && originalParent !== null;
+    if (createdMarker && originalParent) {
+      originMarker = ownerDocument.createComment('texuli-portal-origin');
+      originalParent.insertBefore(originMarker, source);
+    }
+
+    try {
+      destination.append(source);
+    } catch {
+      if (createdMarker && originMarker?.parentNode) {
+        originMarker.parentNode.removeChild(originMarker);
+        originMarker = null;
+      }
+      return false;
+    }
+    return true;
+  }
 
   if (source) controller.setTarget(options.target);
   return controller;

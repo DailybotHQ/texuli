@@ -6,49 +6,49 @@
 @layer tx.components {
   .tx-inbox {
     display: grid;
-    gap: 0.75rem;
+    gap: var(--tx-space-3);
     color: var(--tx-foreground, CanvasText);
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
   }
 
   .tx-inbox__header {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
   }
 
   .tx-inbox__title {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
     margin: 0;
     margin-inline-end: auto;
-    font-size: 1rem;
+    font-size: var(--tx-type-body-size);
   }
 
   .tx-inbox__count {
     min-inline-size: 1.5rem;
-    padding: 0.125rem 0.5rem;
-    border-radius: 999px;
+    padding: calc(var(--tx-space-unit) * 0.5) var(--tx-space-2);
+    border-radius: var(--tx-shape-radius-full);
     background: var(--tx-primary, Highlight);
     color: var(--tx-primary-foreground, HighlightText);
-    font-size: 0.75rem;
+    font-size: var(--tx-type-caption-size);
     font-variant-numeric: tabular-nums;
     text-align: center;
   }
 
   .tx-inbox__views {
     display: inline-flex;
-    border: var(--tx-border-width, 1px) solid var(--tx-border, ButtonBorder);
-    border-radius: var(--tx-radius, 0.5rem);
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-shape-radius-lg);
     overflow: hidden;
   }
 
   .tx-inbox__view,
   .tx-inbox__button {
     min-block-size: var(--tx-target-size, 2.25rem);
-    padding-inline: 0.75rem;
+    padding-inline: var(--tx-space-3);
     border: 0;
     background: var(--tx-surface, ButtonFace);
     color: var(--tx-surface-foreground, ButtonText);
@@ -62,8 +62,8 @@
   }
 
   .tx-inbox__button {
-    border: var(--tx-border-width, 1px) solid var(--tx-border, ButtonBorder);
-    border-radius: var(--tx-radius, 0.5rem);
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-shape-radius-lg);
     white-space: nowrap;
   }
 
@@ -83,21 +83,21 @@
     display: grid;
     margin: 0;
     padding: 0;
-    border: var(--tx-border-width, 1px) solid var(--tx-border, CanvasText);
-    border-radius: var(--tx-radius, 0.5rem);
+    border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+    border-radius: var(--tx-shape-radius-lg);
     list-style: none;
   }
 
   .tx-inbox__item + .tx-inbox__item {
-    border-block-start: var(--tx-border-width, 1px) solid var(--tx-border, CanvasText);
+    border-block-start: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
   }
 
   .tx-inbox__article {
     display: grid;
     grid-template-columns: 0.5rem minmax(0, 1fr) auto;
     align-items: start;
-    gap: 0.75rem;
-    padding: 0.75rem;
+    gap: var(--tx-space-3);
+    padding: var(--tx-space-3);
   }
 
   .tx-inbox__item[data-unread] .tx-inbox__article {
@@ -107,7 +107,7 @@
   .tx-inbox__dot {
     inline-size: 0.5rem;
     block-size: 0.5rem;
-    margin-block-start: 0.375rem;
+    margin-block-start: calc(var(--tx-space-unit) * 1.5);
     border-radius: 50%;
   }
 
@@ -117,7 +117,7 @@
 
   .tx-inbox__content {
     display: grid;
-    gap: 0.25rem;
+    gap: var(--tx-space-1);
     min-inline-size: 0;
   }
 
@@ -150,7 +150,7 @@
   }
 
   .tx-inbox__time {
-    font-size: 0.75rem;
+    font-size: var(--tx-type-caption-size);
   }
 
   .tx-inbox__empty {
@@ -161,7 +161,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
   }
 
   .tx-inbox__sr-only {

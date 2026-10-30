@@ -1252,8 +1252,8 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (release
-  0.9.0); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.9.0.
 - **Context:** `@texuli/tools` exposes the library to agents through seven
   read-only MCP tools (`packages/tools/src/mcp/server.ts`: `catalog`,
   `component`, `validate`, `example`, `theme`, `deck`, `document`), a CLI
@@ -1334,9 +1334,9 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (release
-  0.9.0 for library operations, the site operations with the agent-ready
-  website work of the same plan); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.9.0 (the library operations and the site operations); live at
+  `https://texuli.com/mcp`.
 - **Context:** many MCP hosts accept only a URL, and an agent on a phone or
   in a hosted IDE cannot run a local binary. texuli.com already runs
   Cloudflare Pages Functions (`functions/_middleware.ts` serves Markdown
@@ -1436,8 +1436,9 @@ reflect this decision.
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
   developer may override this decision, and the layer below is an
-  exception the developer confirms. **Status: planned** (first published
-  in release 0.9.0); nothing below is shipped yet.
+  exception the developer confirms. **Status: shipped:** `@texuli/mcp`
+  is first published in release 0.9.0 (in development, pre-1.0), with
+  `texuli mcp`, the L9 entry and the consumer test (T-mcp-local).
 - **Context:** the stdio server exists in `packages/tools/src/mcp` with no
   published binary. Every MCP host documents a one-word install of the
   form "npx -y" plus a package name, and `@texuli/tools` is a library
@@ -1499,9 +1500,11 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (the families
-  in release 0.9.0, adoption across packages and the component tier in
-  0.10.0); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.9.0: the families, the component tier and their adoption across the
+  styled packages (moved forward from 0.10.0; see the amendments below).
+  Data-viz tokens stay per theme, and components inside decks keep their
+  literals, until the 0.10.0 design-system work.
 - **Context:** `@texuli/tokens` has a strong color engine (OKLCH seeds with
   AA guarantees, 210 seed-defined themes, a validated `Theme`), but a
   design system cannot reach most of the UI. Tier-3 component hooks are
@@ -1572,6 +1575,8 @@ reflect this decision.
   cannot reach zero visual diff in a package (then that package keeps its
   literals on the guard's allowlist with a reason, and the gap is
   documented).
+
+**Amendment (2026-10-30, T-tokens-v2):** the shape scale ships as `--tx-shape-radius-{none,xs,sm,md,lg,xl,full}`, not `--tx-radius-*`. Components already read `--tx-radius-sm/md/lg/xl/full` with conflicting fallbacks (for example `--tx-radius-md` falls back to 0.375rem in some places and 0.5rem in others), so reusing those names would change pixels; adoption maps each component to the shape scale and retires the old reads with an alias entry in `renames.json`. Chart data-viz tokens are available for every library theme through `dataVizVariables(theme, mode)` (`@texuli/tokens/data-viz`); emitting them by default waits for T-adopt-domain, which unifies the components' conflicting chart fallbacks first so the default theme keeps its pixels. **Second amendment (2026-10-30, T-adopt-core, lead decision):** `base.css` declares the system token defaults once per token scope (`:where(:root, [data-tx-theme], [data-tx-scope])`, inside `@layer tx.base`), and reads carry at most one fallback level: system reads are plain `var(--tx-space-4)`, component reads `var(--tx-button-gap, var(--tx-space-2))`; component tokens stay undeclared. Why: the fallback-only draft repeated the whole default chain in every read, and the bytes measured on every component outweigh the `base.css` cost: the `texuli` CSS grew by 5.5 KB gzip and pushed `texuli` past the `@protoyard/ui` ceiling and other entries past their caps, while the declarations cost about 1 KB gzip once in `base.css`. Reverse if `base.css` must stay token-free again (then generate the long reads).
 
 ## ADR-021: The design-system document
 
@@ -1724,9 +1729,9 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (scoping and
-  portals with the 0.10.0 adoption work, the runtime in 0.10.0); nothing
-  below is shipped yet.
+  developer may override this decision. **Status: partly shipped:**
+  scoping (`[data-tx-scope]`) and scoped portals shipped in release 0.9.0;
+  the design-system runtime is planned for 0.10.0.
 - **Context:** `applyTheme` already writes `--tx-*` properties on an
   element through the CSSOM, and the no-flash script replays a cached,
   filtered variable map before first paint (it rejects `var(`, `url(` and

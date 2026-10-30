@@ -7,6 +7,7 @@ import { type ClassValue } from '../../internal/cx.ts';
 import { TOOLBAR_STYLE } from './style-context.ts';
 import { type ToolbarSize, type ToolbarVariant, toolbarRootClass } from './variants.ts';
 import './toolbar.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Orientation = 'horizontal' | 'vertical';
 
@@ -26,11 +27,12 @@ type OwnProps = {
 /** Extra attributes (`data-*`, `aria-*`, handlers…) land on the rendered element. */
 type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'>;
 
+const txDefaults = designDefaults('toolbar');
 let {
   orientation = 'horizontal',
   loop = true,
-  variant = 'default',
-  size = 'md',
+  variant = txDefaults().variant ?? 'default',
+  size = txDefaults().size ?? 'md',
   class: className,
   children,
   'aria-label': ariaLabel,

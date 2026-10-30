@@ -8,9 +8,12 @@ interface Props {
   position?: ToasterPosition;
   onpointerenter?: (event: PointerEvent) => void;
   onfocusin?: (event: FocusEvent) => void;
+  mode?: 'top-layer' | 'contained';
+  container?: Element | null;
+  positioned?: boolean;
 }
 
-let { store, position, onpointerenter, onfocusin }: Props = $props();
+let { store, position, onpointerenter, onfocusin, mode, container, positioned }: Props = $props();
 </script>
 
-<Toaster {store} {position} label="Notifications" data-probe="toaster" {onpointerenter} {onfocusin} />
+<Toaster {store} {position} label="Notifications" data-probe="toaster" {onpointerenter} {onfocusin} {mode} {container} {positioned} />

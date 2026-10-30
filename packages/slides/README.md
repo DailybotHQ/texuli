@@ -16,12 +16,12 @@ Svelte 5 stage on top of it
 ([ADR-009](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 
 > **Status: 0.x release, in development.** The stage described here is
-> published on npm as `0.8.2` (first published in `0.4.0`, together with
+> published on npm as `0.9.0` (first published in `0.4.0`, together with
 > the first release of `@texuli/deck`). `@texuli/slides@0.3.0` has the
 > previous deck model (model v1) and its stage. Texuli is pre-1.0: under 0.x
 > a new minor may contain breaking changes, and `0.4.0` was one, so pin the
 > exact version or use
-> `^0.8.0`, which accepts only 0.8.x.
+> `^0.9.0`, which accepts only 0.9.x.
 > The upgrade path is in
 > [migration.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/migration.md).
 

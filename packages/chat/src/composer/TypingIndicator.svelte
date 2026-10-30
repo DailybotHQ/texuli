@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from 'texuli/cx';
 import type { TypingLabels } from './typing-labels.ts';
 
@@ -8,14 +9,25 @@ const DEFAULT_LABELS: TypingLabels = {
   many: (count) => `${count} people are typing`,
 };
 
-interface Props {
+interface OwnProps {
   names: readonly string[];
   labels?: Partial<TypingLabels>;
   showLabel?: boolean;
   class?: ClassValue;
+  /** The status element (bindable). */
+  ref?: HTMLElement | null;
 }
+/** Other attributes (`id`, `data-*`, `style`, handlers) land on the status element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'>;
 
-let { names, labels: labelOverrides = {}, showLabel = false, class: className }: Props = $props();
+let {
+  names,
+  labels: labelOverrides = {},
+  showLabel = false,
+  class: className,
+  ref = $bindable(null),
+  ...rest
+}: Props = $props();
 const labels = $derived({ ...DEFAULT_LABELS, ...labelOverrides });
 const message = $derived.by(() => {
   if (names.length === 0) return '';
@@ -25,7 +37,14 @@ const message = $derived.by(() => {
 });
 </script>
 
-<div class={cx('tx-chat-typing', className)} role="status" aria-live="polite" aria-atomic="true">
+<div
+  {...rest}
+  bind:this={ref}
+  class={cx('tx-chat-typing', className)}
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+>
   {#if message}
     <span class={cx('tx-chat-typing__label', !showLabel && 'visually-hidden')}>{message}</span>
     <span class="tx-chat-typing__dots" aria-hidden="true">
@@ -41,13 +60,13 @@ const message = $derived.by(() => {
       min-block-size: 1.5rem;
       align-items: center;
       color: var(--tx-muted-foreground, GrayText);
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
     }
 
     .tx-chat-typing__dots {
       display: inline-flex;
-      gap: 0.25rem;
-      margin-inline-start: 0.5rem;
+      gap: var(--tx-space-1);
+      margin-inline-start: var(--tx-space-2);
     }
 
     .tx-chat-typing__dots span {

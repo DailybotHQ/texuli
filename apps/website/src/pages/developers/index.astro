@@ -1,0 +1,326 @@
+---
+/**
+ * /developers/ — the developer portal (PLAN_011 T-ar-api): the read-only
+ * JSON API, the MCP server (remote and local), the CLI, the files for
+ * agents, limits, errors, versioning, access and the license. Static: no
+ * island, no client script. Every row comes from a typed source
+ * (`src/components/developers/developers.ts`), and the WebAPI JSON-LD from
+ * `src/lib/schema.ts`. Its Markdown twin is written at build like every
+ * docs page.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import {
+  AGENT_FILES,
+  CLI_COMMANDS,
+  ENDPOINTS,
+  ERROR_CODES,
+  LIMITS,
+  MCP,
+  PATHS,
+  PREFIX,
+  PROBLEM_EXAMPLE,
+  RELEASE,
+  SITE_ORIGIN,
+  VERSION,
+  VERSIONING,
+} from '../../components/developers/developers.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { webApiJsonLd } from '../../lib/schema';
+
+const description =
+  'The texuli.com developer portal: a read-only JSON API with an OpenAPI 3.1 description, the MCP server (remote and npx), the CLI, files for agents, limits, errors and versioning.';
+const jsonLd = webApiJsonLd(
+  'Read-only JSON files of texuli.com (the component catalog, themes, the Markdown twins manifest, health) under /api/v1/, described by an OpenAPI 3.1 document, plus a read-only MCP server at /mcp. Anonymous, rate limited, MIT.'
+);
+const external = (url: string) => safeHref(url, 'developer');
+const repository = external('https://github.com/DailybotHQ/texuli');
+const mcpDocs = external(
+  'https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/mcp.md'
+);
+const opsDocs = external(
+  'https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md'
+);
+const license = external('https://github.com/DailybotHQ/texuli/blob/main/LICENSE');
+const released = RELEASE.state === 'released';
+---
+
+<BaseLayout title="Developers" {description} {jsonLd}>
+  <h1>Developers</h1>
+  <p class="lead">
+    Everything on texuli.com an agent or a program can call: read-only JSON files with an OpenAPI
+    description, an MCP server, and a CLI. No account and no key.
+  </p>
+  {
+    !released && (
+      <p class="status" data-api-status>
+        <strong>Status:</strong> {RELEASE.note} Until then, the packages on npm are the
+        0.8 line.
+      </p>
+    )
+  }
+  <dl class="facts">
+    <dt>Base URL</dt>
+    <dd><code>{SITE_ORIGIN}{PREFIX}/</code></dd>
+    <dt>Version</dt>
+    <dd><code data-api-version>{VERSION}</code>, sent as <code>X-API-Version</code></dd>
+    <dt>Description</dt>
+    <dd><a href={PATHS.openapi}>OpenAPI 3.1 (<code>/openapi.json</code>)</a></dd>
+    <dt>Access</dt>
+    <dd>Anonymous and read-only (<a href="/auth.md">auth.md</a>)</dd>
+    <dt>License</dt>
+    <dd><a href={license}>MIT</a></dd>
+  </dl>
+
+  <h2 id="quick-start">Quick start</h2>
+  <pre><code>{`curl -s ${SITE_ORIGIN}${PREFIX}/index.json
+curl -s ${SITE_ORIGIN}${PREFIX}/themes.json
+curl -sI ${SITE_ORIGIN}${PATHS.health}`}</code></pre>
+  <p>
+    The index lists every endpoint with its operationId. Every answer under <code>/api/</code> is
+    JSON, with CORS open to any origin.
+  </p>
+
+  <h2 id="endpoints">Endpoints</h2>
+  <p>
+    Each endpoint reads a file the build writes: the edge serves a <code>{PREFIX}/</code> path
+    from the file the site itself fetches, byte for byte. Pin the versioned path, because the site
+    file follows the site.
+  </p>
+  <div class="table-wrap" role="region" aria-label="Endpoints" tabindex="0">
+    <table data-api-endpoints>
+      <caption>GET endpoints under {PREFIX}/</caption>
+      <thead>
+        <tr>
+          <th scope="col">Endpoint</th>
+          <th scope="col">operationId</th>
+          <th scope="col">What it holds</th>
+          <th scope="col">Site file</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          ENDPOINTS.map((row) => (
+            <tr>
+              <td>
+                <code>{row.path}</code>
+              </td>
+              <td>
+                <code>{row.operationId}</code>
+              </td>
+              <td>{row.summary}</td>
+              <td>
+                <code>{row.siteFile}</code>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p>
+    <code>{'{id}'}</code> is a theme id from <code>{PREFIX}/themes.json</code>. The OpenAPI
+    document also describes <code>POST /mcp</code> as JSON-RPC.
+  </p>
+
+  <h2 id="mcp">MCP server</h2>
+  <ul class="points">
+    <li>
+      <strong>Remote:</strong> <code>{MCP.remote}</code>, stateless Streamable HTTP (protocol
+      <code>{MCP.protocolVersion}</code>). POST JSON-RPC; no session, no sign-in. It serves {
+        MCP.remoteTools.length
+      } read-only tools.
+    </li>
+    <li>
+      <strong>Local:</strong> <code>{MCP.local}</code>, over stdio, in any MCP host. It serves
+      every tool, including the ones that need Node ({MCP.localOnlyTools.join(', ')}). The
+      <code>@texuli/mcp</code> package is on npm since 0.9.0.
+    </li>
+    <li>
+      <strong>Server card:</strong> <a href={MCP.serverCard}><code>{MCP.serverCard}</code></a>.
+      The tools, resources and prompts are documented in <a href={mcpDocs}>mcp.md</a>.
+    </li>
+    <li>
+      <strong>Setup for every host</strong>, every tool with its limits, and the site tools:
+      <a href="/mcp-server/">Texuli MCP</a>.
+    </li>
+  </ul>
+
+  <h2 id="cli">Command line</h2>
+  <p>
+    The <code>texuli</code> command of <code>@texuli/tools</code> runs the same operations as the
+    MCP server: <code>texuli &lt;group&gt; &lt;verb&gt;</code>, with JSON input from stdin,
+    <code>--json</code> or <code>--file</code>. In a project that has <code>@texuli/tools</code>
+    installed, run <code>npx texuli &lt;group&gt; &lt;verb&gt;</code>; without installing it:
+  </p>
+  <pre><code>{`npx -p @texuli/tools texuli help
+echo '{"query":"date"}' | npx -p @texuli/tools texuli catalog search`}</code></pre>
+  <p>
+    The <code>&lt;group&gt; &lt;verb&gt;</code> commands are new in 0.9.0; the
+    <code>deck</code> and <code>document</code> commands date from the 0.8 line. Every command:
+    {' '}
+    <a href={opsDocs}>ops.md</a>.
+  </p>
+  <ul class="commands" data-cli-commands>
+    {
+      CLI_COMMANDS.map((command) => (
+        <li>
+          <code>{command}</code>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 id="agents">Files for agents</h2>
+  <ul class="points">
+    {
+      AGENT_FILES.map((file) => (
+        <li>
+          <a href={file.href}>{file.label}</a>: {file.note}.
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 id="limits">Limits</h2>
+  <div class="table-wrap" role="region" aria-label="Rate limits" tabindex="0">
+    <table data-api-limits>
+      <caption>Rate limits per client</caption>
+      <thead>
+        <tr>
+          <th scope="col">Surface</th>
+          <th scope="col">RateLimit-Policy</th>
+          <th scope="col">Limit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          LIMITS.map((row) => (
+            <tr>
+              <td>
+                <code>{row.surface}</code>
+              </td>
+              <td>
+                <code>{row.policy}</code>
+              </td>
+              <td>{row.rule}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Answers carry <code>RateLimit-Policy</code> and <code>RateLimit</code>. Past a limit the answer
+    is <code>429</code> with <code>Retry-After</code>: wait that many seconds. The limits are
+    best-effort: each edge isolate counts on its own. They come from the Pages middleware; if a
+    file is ever served without it, it still carries <code>X-API-Version</code> and CORS, but no
+    rate-limit fields.
+  </p>
+
+  <h2 id="errors">Errors</h2>
+  <p>
+    Every failed request under <code>/api/</code> is RFC 9457 <code>application/problem+json</code>,
+    never an HTML page. The <code>error</code> object adds a stable code (
+    {ERROR_CODES.map((code, index) => (
+      <>
+        {index > 0 && ', '}
+        <code>{code}</code>
+      </>
+    ))}), a message, a recovery hint and this page's URL.
+  </p>
+  <pre><code>{PROBLEM_EXAMPLE}</code></pre>
+
+  <h2 id="versioning">Versioning and deprecation</h2>
+  <p>
+    <code>X-API-Version</code> is the release line that built the files (<code>{VERSION}</code>).
+    {VERSIONING.policy}
+  </p>
+
+  <h2 id="access">Access and license</h2>
+  <p>
+    Every endpoint is anonymous and read-only: there is no account, key or token, and the OAuth
+    documents under <code>/.well-known/</code> are discovery stubs that say so (see
+    <a href="/auth.md">auth.md</a>). Texuli is open source under the <a href={license}>MIT
+    license</a>; the source is on <a href={repository}>GitHub</a>.
+  </p>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
+  h2 {
+    margin-block: 2rem 0.75rem;
+    font-size: 1.5rem;
+  }
+  p {
+    max-inline-size: 48rem;
+  }
+  .lead {
+    font-size: 1.1rem;
+  }
+  .status {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tx-border);
+    border-inline-start-width: 4px;
+    border-radius: var(--tx-radius, 0.5rem);
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.375rem 1rem;
+    margin: 1rem 0 0;
+  }
+  .facts dt {
+    color: var(--tx-muted-foreground);
+  }
+  dd {
+    margin: 0;
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  code {
+    overflow-wrap: anywhere;
+  }
+  pre {
+    margin: 0 0 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-muted, Canvas);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 0.875rem;
+  }
+  .table-wrap {
+    overflow-x: auto;
+  }
+  table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  caption {
+    text-align: start;
+    font-weight: 600;
+    padding-block-end: 0.5rem;
+  }
+  th,
+  td {
+    padding: 0.5rem;
+    border-block-end: 1px solid var(--tx-border);
+    text-align: start;
+    vertical-align: top;
+  }
+  .points,
+  .commands {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0 0 0.75rem;
+    padding-inline-start: 1.25rem;
+  }
+  .commands {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  }
+</style>
