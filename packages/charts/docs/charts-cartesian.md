@@ -19,8 +19,10 @@ axis. All five charts share one renderer (`CartesianChart`, which takes a
 
 **Layout width.** A cartesian chart lays out at its measured width, between
 240 and 640 pixels, so tick labels and margins keep their size in a narrow
-column instead of shrinking with the drawing. Wider boxes scale the 640-pixel
-layout up. A render with no measured box (server rendering) uses 640.
+column instead of shrinking with the drawing. In a wider box the interactive
+plot keeps its 640-pixel box (a canvas layer included), and a static chart
+(`interactive={false}`) scales the 640-pixel layout up. A render with no
+measured box (server rendering) uses 640.
 
 Model helpers: `assertCartesianSeries` (throws on empty or duplicate ids,
 duplicate x values within a series, non-finite values, or mixed category and

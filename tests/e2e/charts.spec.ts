@@ -158,6 +158,34 @@ test('charts: tooltips beside their point in LTR and RTL, RTL labels, forced col
   });
 });
 
+// G96 (Protoyard): in a figure wider than the 640px layout, the plot keeps
+// its 640px box while the canvas layer used to stretch across the figure, so
+// the marks drew off the axes and the keyboard explorer.
+test('G96: the canvas layer shares the plot box in a 1062px figure', async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.setViewportSize({ width: 1400, height: 900 });
+  const host = await openExample(page, 'charts-canvas');
+  const figure = host.locator('figure[data-kind="line"]').first();
+  await figure.evaluate((node) => {
+    (node as HTMLElement).style.inlineSize = '1062px';
+  });
+  await expect.poll(async () => (await box(figure)).width).toBe(1062);
+  const canvas = figure.locator('.plot > .canvas-layer canvas');
+  await expect(canvas).toBeAttached();
+  const svg = figure.locator('svg[data-chart-svg]');
+  await expect
+    .poll(async () => {
+      const [c, s] = [await box(canvas), await box(svg)];
+      return [c.x - s.x, c.y - s.y, c.width - s.width, c.height - s.height].map((d) =>
+        Math.round(Math.abs(d))
+      );
+    })
+    .toEqual([0, 0, 0, 0]);
+  const plot = await box(figure.locator('[data-chart-plot]'));
+  expect(plot.width).toBeLessThanOrEqual(640);
+  expect((await box(canvas)).width).toBeCloseTo(plot.width, 0);
+});
+
 test('every chart family on a 320px phone: readable text, no page scroll, and Tab and Enter open its data table', async ({
   page,
 }) => {

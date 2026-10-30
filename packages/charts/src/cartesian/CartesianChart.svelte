@@ -592,7 +592,12 @@ const interactionModules = $derived(
           {/snippet}
         </I.InteractivePlot>
         {#if model.useCanvas}
-          <div class="canvas-layer" aria-hidden="true">
+          <!-- Shares the interactive plot's box (G96): capped at the layout width, so marks stay on the axes. -->
+          <div
+            class="canvas-layer"
+            style={`max-inline-size: ${width}px; aspect-ratio: ${width} / ${height}`}
+            aria-hidden="true"
+          >
             <CanvasRenderer kind={kind} series={model.canvasSeries} {width} {height} />
           </div>
         {/if}
@@ -676,7 +681,8 @@ const interactionModules = $derived(
         <AnnotationLayer annotations={model.renderedAnnotations} plot={plotRect} />
       </svg>
       {#if model.useCanvas}
-        <div class="canvas-layer" aria-hidden="true">
+        <!-- The static SVG fills the figure, so its canvas does too, at the same aspect ratio. -->
+        <div class="canvas-layer" style={`aspect-ratio: ${width} / ${height}`} aria-hidden="true">
           <CanvasRenderer kind={kind} series={model.canvasSeries} {width} {height} />
         </div>
       {/if}
@@ -728,9 +734,17 @@ const interactionModules = $derived(
   .plot {
     position: relative;
   }
+  /*
+   * The canvas layer sits over the plot's own box, not the figure: the same
+   * inline-start corner, width and aspect ratio (its max-inline-size is
+   * inline, as on .tx-chart-plot). `inset: 0` stretched it across a wide
+   * figure while the axes kept their 640px box (G96).
+   */
   .canvas-layer {
     position: absolute;
-    inset: 0;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: 100%;
     pointer-events: none;
   }
   .plot :global(svg) {
