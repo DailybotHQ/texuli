@@ -112,6 +112,10 @@ jobs:
       - run: pnpm build
       - run: pnpm --filter @texuli/website check:csp
         if: matrix.shard == 1
+      # Every built HTML page but the allowlist has a Markdown twin with a
+      # valid header block, linked from its head (PLAN_011 T-ar-twins).
+      - run: pnpm exec tsx scripts/check-md-parity.ts --strict
+        if: matrix.shard == 1
       # The site-perf budget tests ("performance budgets") run in the
       # audits job below, not here.
       - name: E2E shard ${{ matrix.shard }}
