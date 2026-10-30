@@ -1,0 +1,41 @@
+{
+  "name": "@texuli/mcp",
+  "version": "0.9.0",
+  "private": true,
+  "description": "The Texuli MCP server for local agents: npx -y @texuli/mcp runs every Texuli operation over stdio.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "agents",
+    "svelte",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli/tree/main/packages/mcp#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
+  "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/mcp"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "bin": {
+    "texuli-mcp": "./src/bin.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@texuli/tools": "0.9.0"
+  }
+}

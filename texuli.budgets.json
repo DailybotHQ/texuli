@@ -528,8 +528,8 @@
       "note": "FIX-port-compact: buildLibraryTheme without defineTheme in prod path. Measured ~5.71 KiB. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 5,904 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 6144 -> 6080 B, tightened to measured + 4% (measured 5,843 B)."
     },
     "@texuli/tokens/contract": {
-      "gzip": 7616,
-      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 7,347 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 7680 -> 7616 B, tightened to measured + 4% (measured 7,288 B)."
+      "gzip": 8192,
+      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 7,347 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 7680 -> 7616 B, tightened to measured + 4% (measured 7,288 B). PLAN_011 T-tokens-v2 (ADR-020): 7616 -> 8192 B, measured + 4% after THEME_JSON_SCHEMA lists the token contract v2 system vocabulary (definitions.systemTokens, 151 names); measured 7,874 B."
     },
     "@texuli/tokens/css": {
       "gzip": 6111,
@@ -546,6 +546,27 @@
     "@texuli/tokens/palette": {
       "gzip": 4352,
       "note": "FIX-tokens-palette-subpath: OKLCH/contrast/scale/chart derivation only; no library port/expand. Measured 4,283 B (pnpm size)."
+    },
+    "@texuli/tokens/base.css": {
+      "gzip": 64,
+      "cssGzip": 1792,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new exact row (was the @texuli/tokens/* default, which caps JS only); measured 0 B gzip and 1,680 B CSS gzip. Token contract v2 adds no declaration here: system and component tokens are read with their default as the fallback (systemVar, componentVar), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/components": {
+      "gzip": 8768,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the component token registry (48 components covering the 41 styled texuli subpaths, 333 tokens), componentVar and the checkTokenReads guard over the system fallback model, and its JSON Schema. A tooling and authoring entry: component CSS uses the generated var() expressions, not this module. Measured 8,409 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/data-viz": {
+      "gzip": 4032,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for complete chart tokens for any theme (deriveChartTokens over the palette); measured 3,838 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/renames": {
+      "gzip": 448,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the machine-readable rename list and its JSON Schema (empty list); measured 424 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/system": {
+      "gzip": 4352,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the token contract v2 system families with defaults and descriptions, and systemVar for the fallback model; measured 4,164 B, cap = measured + 4% rounded up to 64 B."
     },
     "texuli": {
       "gzip": 217920,

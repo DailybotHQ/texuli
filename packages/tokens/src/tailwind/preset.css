@@ -157,8 +157,11 @@
   --text-8xl: var(--tx-font-size-8xl, 6rem);
   --text-9xl: var(--tx-font-size-9xl, 8rem);
 
-  /* Density scales the whole spacing system (compact … comfortable). */
-  --spacing: calc(0.25rem * var(--tx-density, 1));
+  /*
+   * The --tx-space-* unit (0.25rem times --tx-density): p-4 equals --tx-space-4.
+   * The fallback keeps the preset working without base.css.
+   */
+  --spacing: var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1)));
 
   --default-border-width: var(--tx-border-width, 1px);
   --duration-fast: var(--tx-motion-fast, 150ms);

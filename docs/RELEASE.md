@@ -66,6 +66,10 @@ the branch `release/0.9.0`:
   and Kotlin are regenerated. `validateDraft` migrates a `0.8.0` envelope and
   stamps `spec: "0.9.0"`; hosts that compare the `spec` string need to
   accept it.
+- `@texuli/mcp` (in development, ADR-019) is first published in `0.9.0`,
+  the 26th package: the local MCP server bin `texuli-mcp`
+  (`npx -y @texuli/mcp`), pinned exactly to `@texuli/tools` and published
+  right after it in the same wave. It is not on npm before `0.9.0`.
 - Feature work merges into `release/0.9.0`, not `main`. Nothing on the
   branch is published.
 - Only the final merge of `release/0.9.0` into `main`, after the
@@ -1177,6 +1181,7 @@ the package-to-package contract outside this repository.
 | `@texuli/editor` | `0.8.0` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
 | `@texuli/deck` | `0.8.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
 | `@texuli/drag`, `@texuli/workflows` | `0.8.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
+| `@texuli/mcp` | not on npm; first published as `0.9.0` | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
 | Blueprint spec | `0.8.0`, digest `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.8.0`. |
 | Blueprint spec on `release/0.9.0` (in development, not on npm) | `0.9.0`, digest `2e8a5c134c52af5b3d89a3f4c3291e3979760b06f21eba9f34d22ca57f876906` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.9.0` stamp. Ships only when `@texuli/spec@0.9.0` publishes. |
 | Blueprint spec in `@texuli/spec@0.7.0` | `0.7.0`, digest `43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2` | The previous release's generated sources carry the `0.7.0` stamp. |
@@ -1220,17 +1225,19 @@ the versions into `main` is that GO: once CI passes on the merge commit,
 | 0.7.0 | Document engine | `@texuli/document`, after `@texuli/core`, `@texuli/deck` and `@texuli/primitives`, before `@texuli/tools` and `@texuli/pages` (first published in `0.7.0`) | Fresh owner GO for each version; it must be published **after** `@texuli/core` and `@texuli/deck` and **before** `@texuli/tools` and `@texuli/pages`, which depend on it. |
 | 0.7.0 | Document editor | `@texuli/pages`, after `@texuli/player` and before `@texuli/slides` (first published in `0.7.0`) | Fresh owner GO for each version; it must be published **after** `@texuli/document`, `@texuli/editor`, `@texuli/blocks`, `@texuli/player`, `@texuli/drag`, `@texuli/primitives`, `@texuli/tokens`, `texuli` and `@texuli/core`, which it depends on. |
 | 0.8.0 | Forms and canvas | `@texuli/forms` and `@texuli/canvas`, after `@texuli/editor` (first published in `0.8.0`) | Fresh owner GO for each version; `@texuli/forms` must be published **after** `@texuli/core` and `texuli`, and `@texuli/canvas` **after** `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli`, which they depend on. No published package depends on either. |
+| 0.9.0 | Local MCP server | `@texuli/mcp`, right after `@texuli/tools` (first published in `0.9.0`) | Fresh owner GO for each version (the merge of `release/0.9.0`); it must be published **after** `@texuli/tools`, which it pins exactly. No published package depends on it. |
 | 0.8.0 | Spreadsheets | `@texuli/sheets`, after `@texuli/blocks` and before `@texuli/catalog` (first published in `0.8.0`) | Fresh owner GO for each version; it must be published **after** `@texuli/core`, `@texuli/date`, `@texuli/data` and `texuli`, which it depends on. No published package depends on it. |
 | 177 | Domain packages | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/blocks` | Fresh owner GO for the exact ready set after dependency order, package checks, size, pack, and consumer gates pass. |
 | 178 | Catalog and integration tools | `@texuli/catalog`, `@texuli/tools`, `@texuli/astro`, `@texuli/player`, `@texuli/slides`, `@texuli/spec` (the order in `publish.yml`; all six went out in the 2026-10-25 `0.1.0-next.1` run) | Fresh owner GO for each exact release set after implementation, dependency, pack, consumer, and relevant website/build gates pass. |
 
-The date, drag, workflows, deck, editor, document, pages, forms, canvas
-and sheets rows are in `.github/workflows/publish.yml` (order: core, date,
+The date, drag, workflows, deck, editor, document, pages, forms, canvas,
+sheets and mcp rows are in `.github/workflows/publish.yml` (order: core, date,
 spec, drag, deck, tokens, primitives, document, texuli, workflows, editor,
 forms, canvas, charts, data, media, chat, blocks, sheets, catalog, tools,
-astro, player, pages, slides; `@texuli/editor` goes out from `0.5.0`,
-after `texuli`, `@texuli/document` and `@texuli/pages` from `0.7.0`, and
-`@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` from `0.8.0`).
+mcp, astro, player, pages, slides; `@texuli/editor` goes out from `0.5.0`,
+after `texuli`, `@texuli/document` and `@texuli/pages` from `0.7.0`,
+`@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` from `0.8.0`, and
+`@texuli/mcp` from `0.9.0`).
 Every published package is `0.8.0`, and every internal dependency between
 them is pinned to exactly `0.8.0`; the workflow refuses to start publishing while any listed
 package is still `0.0.0`. `pnpm verify:packages` still refuses any

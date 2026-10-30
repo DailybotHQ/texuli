@@ -1436,8 +1436,10 @@ reflect this decision.
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
   developer may override this decision, and the layer below is an
-  exception the developer confirms. **Status: planned** (first published
-  in release 0.9.0); nothing below is shipped yet.
+  exception the developer confirms. **Status: in development:**
+  `packages/mcp`, `texuli mcp`, the L9 entry and the consumer test exist
+  in the repository (T-mcp-local); first published in release 0.9.0, not
+  on npm yet.
 - **Context:** the stdio server exists in `packages/tools/src/mcp` with no
   published binary. Every MCP host documents a one-word install of the
   form "npx -y" plus a package name, and `@texuli/tools` is a library
@@ -1572,6 +1574,8 @@ reflect this decision.
   cannot reach zero visual diff in a package (then that package keeps its
   literals on the guard's allowlist with a reason, and the gap is
   documented).
+
+**Amendment (2026-10-30, T-tokens-v2):** the shape scale ships as `--tx-shape-radius-{none,xs,sm,md,lg,xl,full}`, not `--tx-radius-*`. Components already read `--tx-radius-sm/md/lg/xl/full` with conflicting fallbacks (for example `--tx-radius-md` falls back to 0.375rem in some places and 0.5rem in others), so reusing those names would change pixels; adoption maps each component to the shape scale and retires the old reads with an alias entry in `renames.json`. Chart data-viz tokens are available for every library theme through `dataVizVariables(theme, mode)` (`@texuli/tokens/data-viz`); emitting them by default waits for T-adopt-domain, which unifies the components' conflicting chart fallbacks first so the default theme keeps its pixels.
 
 ## ADR-021: The design-system document
 
