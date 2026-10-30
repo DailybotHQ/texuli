@@ -72,6 +72,10 @@
     "./ops": {
       "types": "./src/ops/index.ts",
       "default": "./src/ops/index.ts"
+    },
+    "./mcp": {
+      "types": "./src/mcp/index.ts",
+      "default": "./src/mcp/index.ts"
     }
   },
   "bin": {
