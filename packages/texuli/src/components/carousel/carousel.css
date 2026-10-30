@@ -16,7 +16,10 @@
   }
   .tx-carousel {
     --tx-carousel-sign: 1;
-    --tx-carousel-gap: calc(0.75rem * var(--tx-density, 1));
+    --tx-carousel-gap: var(
+      --tx-space-3,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
+    );
     --tx-carousel-control-size: 2.5rem;
     position: relative;
     display: flex;
@@ -24,7 +27,7 @@
     gap: var(--tx-carousel-gap);
     min-inline-size: 0;
     color: var(--tx-foreground, CanvasText);
-    border-radius: var(--tx-radius, 0.5rem);
+    border-radius: var(--tx-carousel-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
     outline: none;
   }
   .tx-carousel:dir(rtl) {
@@ -54,7 +57,7 @@
   .tx-carousel-viewport {
     contain: inline-size;
     overflow: hidden;
-    border-radius: var(--tx-radius, 0.5rem);
+    border-radius: var(--tx-carousel-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
     touch-action: pan-y;
     user-select: none;
   }
@@ -79,12 +82,15 @@
   .tx-carousel-slide {
     flex: 0 0 100%;
     min-inline-size: 0;
-    padding-inline: 0.125rem;
+    padding-inline: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
   }
 
   .tx-carousel-fallback {
     margin: 0;
-    padding: 1rem;
+    padding: var(
+      --tx-carousel-fallback-padding,
+      var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4))
+    );
     color: var(--tx-muted-foreground, light-dark(#52525b, #a1a1aa));
   }
 
@@ -97,7 +103,7 @@
 
   .tx-carousel-buttons {
     display: flex;
-    gap: 0.25rem;
+    gap: var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1));
   }
 
   .tx-carousel-button {
@@ -106,8 +112,9 @@
     inline-size: var(--tx-carousel-control-size);
     block-size: var(--tx-carousel-control-size);
     padding: 0;
-    border: var(--tx-border-width, 1px) solid var(--tx-border-strong, ButtonText);
-    border-radius: var(--tx-radius, 0.5rem);
+    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
+      var(--tx-border-strong, ButtonText);
+    border-radius: var(--tx-carousel-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
     background: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     cursor: pointer;
@@ -122,11 +129,11 @@
   }
   .tx-carousel-button:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: var(--tx-opacity-disabled, 0.5);
   }
   .tx-carousel-button svg {
-    inline-size: 1rem;
-    block-size: 1rem;
+    inline-size: var(--tx-size-icon-sm, 1rem);
+    block-size: var(--tx-size-icon-sm, 1rem);
     fill: currentColor;
   }
   .tx-carousel-button .tx-carousel-chevron {
@@ -145,15 +152,21 @@
     inset-block-start: 50%;
     z-index: 1;
     translate: 0 -50%;
-    border-radius: 999px;
+    border-radius: var(--tx-shape-radius-full, 9999px);
     background: var(--tx-elevated, Canvas);
     box-shadow: var(--tx-shadow-float, 0 2px 8px rgb(0 0 0 / 0.18));
   }
   .tx-carousel-edge[data-edge="start"] {
-    inset-inline-start: 0.5rem;
+    inset-inline-start: var(
+      --tx-space-2,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
+    );
   }
   .tx-carousel-edge[data-edge="end"] {
-    inset-inline-end: 0.5rem;
+    inset-inline-end: var(
+      --tx-space-2,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
+    );
   }
 
   /*
@@ -166,7 +179,7 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 0.25rem;
+    gap: var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1));
     min-inline-size: 0;
   }
   .tx-carousel-dot {
@@ -186,7 +199,7 @@
     inline-size: 0.5rem;
     block-size: 0.5rem;
     translate: -50% -50%;
-    border-radius: 999px;
+    border-radius: var(--tx-shape-radius-full, 9999px);
     background: var(--tx-muted-foreground, light-dark(#6b6b76, #a1a1aa));
     transition:
       inline-size var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease-out),
@@ -202,7 +215,7 @@
   .tx-carousel-dot:focus-visible {
     outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
     outline-offset: 0;
-    border-radius: 999px;
+    border-radius: var(--tx-shape-radius-full, 9999px);
   }
 
   .tx-carousel-count {

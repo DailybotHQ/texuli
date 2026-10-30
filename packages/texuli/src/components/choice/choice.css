@@ -6,13 +6,19 @@
   .tx-choice {
     display: flex;
     align-items: flex-start;
-    gap: 0.625rem;
+    gap: var(
+      --tx-choice-gap,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5)
+    );
     color: var(--tx-foreground, CanvasText);
   }
 
   .tx-choice--switch {
     justify-content: space-between;
-    gap: 1rem;
+    gap: var(
+      --tx-choice-switch-gap,
+      var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4))
+    );
   }
 
   .tx-choice__hit {
@@ -24,7 +30,7 @@
 
   .tx-choice__copy {
     display: grid;
-    gap: 0.125rem;
+    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
   }
 
   .tx-choice--switch .tx-choice__copy {
@@ -34,8 +40,14 @@
 
   .tx-choice__label {
     margin: 0;
-    font-size: var(--tx-font-size-sm, 0.875rem);
-    font-weight: var(--tx-font-weight-medium, 500);
+    font-size: var(
+      --tx-choice-label-font-size,
+      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
+    );
+    font-weight: var(
+      --tx-choice-label-font-weight,
+      var(--tx-type-label-weight, var(--tx-font-weight-medium, 500))
+    );
     line-height: 1.25rem;
     color: var(--tx-foreground, CanvasText);
     cursor: pointer;
@@ -44,7 +56,10 @@
 
   .tx-choice__description {
     margin: 0;
-    font-size: var(--tx-font-size-xs, 0.75rem);
+    font-size: var(
+      --tx-choice-description-font-size,
+      var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem))
+    );
     line-height: 1.25;
     color: var(--tx-muted-foreground, #575757);
   }
@@ -58,13 +73,17 @@
     justify-content: center;
     margin: 0;
     padding: 0;
-    border: 1px solid var(--tx-border, currentColor);
-    border-radius: var(--tx-radius-sm, 0.25rem);
+    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
+      var(--tx-border, currentColor);
+    border-radius: var(
+      --tx-shape-radius-sm,
+      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-4, 4px))
+    );
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-primary-foreground, Canvas);
     cursor: pointer;
     outline: none;
-    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 8%, transparent));
+    box-shadow: var(--tx-elevation-1, var(--tx-shadow-soft, none));
     transition:
       background-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease),
       border-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
@@ -95,8 +114,8 @@
   }
 
   .tx-choice-control--md {
-    inline-size: 1rem;
-    block-size: 1rem;
+    inline-size: var(--tx-size-icon-sm, 1rem);
+    block-size: var(--tx-size-icon-sm, 1rem);
   }
 
   .tx-choice-control:focus-visible {
@@ -113,7 +132,7 @@
   .tx-choice-control[data-disabled],
   .tx-choice-control:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: var(--tx-choice-disabled-opacity, var(--tx-opacity-disabled, 0.5));
   }
 
   .tx-choice-control[aria-invalid="true"] {
@@ -122,8 +141,8 @@
 
   .tx-choice-control__icon {
     display: block;
-    inline-size: 0.75rem;
-    block-size: 0.75rem;
+    inline-size: var(--tx-size-icon-xs, 0.75rem);
+    block-size: var(--tx-size-icon-xs, 0.75rem);
     pointer-events: none;
   }
 
@@ -134,7 +153,7 @@
 
   /* Radio is round */
   .tx-choice-control--radio {
-    border-radius: var(--tx-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full, 9999px);
   }
 
   .tx-choice-control--radio[data-state="checked"] {
@@ -145,7 +164,7 @@
     display: block;
     inline-size: 0.5rem;
     block-size: 0.5rem;
-    border-radius: var(--tx-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full, 9999px);
     background-color: var(--tx-primary, Highlight);
   }
 
@@ -162,12 +181,12 @@
     align-items: center;
     margin: 0;
     padding: 0;
-    border: 1px solid transparent;
-    border-radius: var(--tx-radius-full, 9999px);
+    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid transparent;
+    border-radius: var(--tx-shape-radius-full, 9999px);
     background-color: var(--tx-input, var(--tx-muted, Canvas));
     cursor: pointer;
     outline: none;
-    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 8%, transparent));
+    box-shadow: var(--tx-elevation-1, var(--tx-shadow-soft, none));
     transition: background-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
   }
 
@@ -206,7 +225,7 @@
   .tx-switch-control[data-disabled],
   .tx-switch-control:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: var(--tx-choice-disabled-opacity, var(--tx-opacity-disabled, 0.5));
   }
 
   .tx-switch-thumb {
@@ -214,9 +233,9 @@
     inset-block-start: 50%;
     inset-inline-start: 0.125rem;
     display: block;
-    border-radius: var(--tx-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full, 9999px);
     background-color: var(--tx-surface, Canvas);
-    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 12%, transparent));
+    box-shadow: var(--tx-elevation-2, var(--tx-shadow-soft, none));
     transform: translateY(-50%);
     transition:
       inset-inline-start var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease),
@@ -245,24 +264,24 @@
   /* Radio group */
   .tx-radio-group {
     display: grid;
-    gap: 0.75rem;
+    gap: var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3));
   }
 
   .tx-radio-group--horizontal {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
   }
 
   .tx-radio-group--card.tx-radio-group--vertical {
     display: grid;
-    gap: 0.75rem;
+    gap: var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3));
   }
 
   .tx-radio-group--card.tx-radio-group--horizontal {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3));
   }
 
   .tx-radio-card {
@@ -270,15 +289,19 @@
     display: flex;
     inline-size: 100%;
     align-items: flex-start;
-    gap: 0.75rem;
-    padding-block: 0.875rem;
-    padding-inline: 0.875rem;
-    border: 1px solid var(--tx-border, currentColor);
-    border-radius: var(--tx-radius-xl, 0.75rem);
+    gap: var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3));
+    padding-block: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3.5);
+    padding-inline: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3.5);
+    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
+      var(--tx-border, currentColor);
+    border-radius: var(
+      --tx-shape-radius-xl,
+      calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px))
+    );
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     text-align: start;
-    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 8%, transparent));
+    box-shadow: var(--tx-elevation-1, var(--tx-shadow-soft, none));
     cursor: pointer;
     transition:
       border-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease),
@@ -307,11 +330,11 @@
   .tx-radio-card:has([data-disabled]),
   .tx-radio-card:has(:disabled) {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: var(--tx-choice-disabled-opacity, var(--tx-opacity-disabled, 0.5));
   }
 
   .tx-radio-card__control {
-    margin-block-start: 0.125rem;
+    margin-block-start: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
   }
 
   @media (prefers-reduced-motion: reduce) {
