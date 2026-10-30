@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, render } from '@testing-library/svelte';
 import { contrastRatio, SEMANTIC_ROLES, tokenToCssVar } from '@texuli/tokens';
+import { SYSTEM_TOKEN_NAMES } from '@texuli/tokens/system';
 import { describe, expect, it, vi } from 'vitest';
 import { stripLightMarkdown } from '../src/core/text.ts';
 import { checkTextBlock, loadTextFamily, TEXT_BLOCK_TYPES } from '../src/index.ts';
@@ -561,6 +562,8 @@ describe('text family styles use the token contract', () => {
         '--tx-font-weight-bold',
         '--tx-focus-ring-width',
         '--tx-target-size',
+        // Token contract v2 system tokens (base.css declares them).
+        ...SYSTEM_TOKEN_NAMES,
       ]);
       for (const source of [...styled, 'code/code.css']) {
         const text = styleSource(source);
@@ -644,8 +647,9 @@ describe('text family styles use the token contract', () => {
       const rules = rulesOf(styleSource(source), selector);
       expect(rules.length, `${source}: ${selector}`).toBeGreaterThan(0);
       expect(
-        rules.some((rule) => rule.includes('var(--tx-radius')),
-        `${source}: ${selector} must take its radius from --tx-radius`
+        // --tx-shape-radius-* derive from the theme's --tx-radius (token contract v2).
+        rules.some((rule) => /var\(--tx-(shape-)?radius/u.test(rule)),
+        `${source}: ${selector} must take its radius from the theme radius`
       ).toBe(true);
     }
   });

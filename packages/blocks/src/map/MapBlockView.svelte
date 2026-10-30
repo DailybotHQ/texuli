@@ -218,19 +218,19 @@ function select(id: string) {
       --map-water: color-mix(in srgb, var(--tx-primary, #2563eb) 16%, var(--tx-background, Canvas));
       --map-land: color-mix(in srgb, var(--tx-muted, #e5e7eb) 70%, var(--tx-background, Canvas));
       display: grid;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
       color: var(--tx-foreground, CanvasText);
     }
     .tx-map-title {
       margin: 0;
-      font-size: 1.125rem;
+      font-size: var(--tx-type-heading-size);
       line-height: 1.3;
     }
     .tx-map-frame {
       position: relative;
       overflow: hidden;
-      border: 1px solid var(--tx-border, currentColor);
-      border-radius: var(--tx-radius, 0.5rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+      border-radius: var(--tx-shape-radius-lg);
       background: var(--map-water);
     }
     .tx-map-canvas {
@@ -333,20 +333,20 @@ function select(id: string) {
     }
     .tx-map-controls {
       display: flex;
-      gap: 0.25rem;
+      gap: var(--tx-space-1);
       justify-content: flex-end;
     }
     button {
       min-block-size: 2rem;
       min-inline-size: 2rem;
-      padding-block: 0.25rem;
-      padding-inline: 0.5rem;
-      border: 1px solid var(--tx-border-strong, currentColor);
-      border-radius: var(--tx-radius, 0.375rem);
+      padding-block: var(--tx-space-1);
+      padding-inline: var(--tx-space-2);
+      border: var(--tx-border-width-thin) solid var(--tx-border-strong, currentColor);
+      border-radius: var(--tx-shape-radius-lg);
       background: var(--tx-background, Canvas);
       color: var(--tx-foreground, CanvasText);
       font: inherit;
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
       cursor: pointer;
     }
     button:focus-visible {
@@ -368,11 +368,11 @@ function select(id: string) {
     }
     .tx-map-panel {
       display: grid;
-      gap: 1rem;
+      gap: var(--tx-space-4);
       grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
     }
     .tx-map-panel-title {
-      margin: 0 0 0.375rem;
+      margin: 0 0 calc(var(--tx-space-unit) * 1.5);
       font-weight: 600;
     }
     .tx-map-places,
@@ -382,12 +382,12 @@ function select(id: string) {
     }
     .tx-map-places {
       display: grid;
-      gap: 0.25rem;
+      gap: var(--tx-space-1);
       list-style: none;
     }
     .tx-map-places button {
       display: flex;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       align-items: flex-start;
       inline-size: 100%;
       border-color: transparent;
@@ -398,13 +398,13 @@ function select(id: string) {
       background: var(--tx-muted, Canvas);
     }
     .tx-map-stops {
-      padding-inline-start: 1.5rem;
+      padding-inline-start: var(--tx-space-6);
     }
     .swatch {
       flex: none;
       inline-size: 0.75rem;
       block-size: 0.75rem;
-      margin-block-start: 0.25rem;
+      margin-block-start: var(--tx-space-1);
       border-radius: 50%;
       background: var(--marker, var(--tx-primary, #2563eb));
     }
@@ -419,7 +419,7 @@ function select(id: string) {
       font-size: 0.8125rem;
     }
     .tx-map-route-summary {
-      margin: 0 0 0.25rem;
+      margin: 0 0 var(--tx-space-1);
     }
     .tx-map-visually-hidden {
       position: absolute;
@@ -430,10 +430,10 @@ function select(id: string) {
       white-space: nowrap;
     }
     .tx-map-invalid {
-      padding: 0.5rem 0.75rem;
-      border: 1px dashed currentColor;
-      border-radius: 0.375rem;
-      font-size: 0.875rem;
+      padding: var(--tx-space-2) var(--tx-space-3);
+      border: var(--tx-border-width-thin) dashed currentColor;
+      border-radius: var(--tx-shape-radius-md);
+      font-size: var(--tx-type-label-size);
     }
     @media (forced-colors: active) {
       .feature.land,

@@ -25,7 +25,7 @@ $effect(() => {
   .tx-embed-invalid {
     margin: 0;
     padding: 0.625em 0.875em;
-    border: 1px dashed currentColor;
+    border: var(--tx-border-width-thin) dashed currentColor;
     border-radius: 0.375em;
     overflow-wrap: anywhere;
   }

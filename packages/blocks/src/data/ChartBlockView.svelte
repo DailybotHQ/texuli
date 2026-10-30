@@ -134,10 +134,10 @@ $effect(() => {
 <style>
   .tx-block-chart-title {
     margin: 0;
-    font-size: var(--tx-font-size-base, 1rem);
+    font-size: var(--tx-type-body-size);
   }
   .tx-block-chart-description {
-    margin-block: 0.25rem 0.75rem;
+    margin-block: var(--tx-space-1) var(--tx-space-3);
     color: var(--tx-muted-foreground, CanvasText);
     white-space: pre-line;
   }
@@ -145,6 +145,6 @@ $effect(() => {
   .tx-block-chart-error {
     margin: 0;
     color: var(--tx-muted-foreground, GrayText);
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
   }
 </style>
