@@ -47,6 +47,7 @@ islands (`client:load`, `client:visible`, …).
 | Foundation, brand, visual polish | [site-foundation.md](docs/site-foundation.md) · [site-brand.md](docs/site-brand.md) · [site-visual.md](docs/site-visual.md) |
 | Analytics (Umami, default-off, owner checkpoint) | [site-analytics.md](docs/site-analytics.md) |
 | Agent surfaces (llms.txt, Markdown twins, `.well-known`, middleware) | [site-aeo.md](docs/site-aeo.md) |
+| Public JSON API, `/openapi.json`, rate limits, the `/developers/` portal | [site-api.md](docs/site-api.md) |
 | SEO, structured data, social images, sitemap, robots | [site-seo.md](docs/site-seo.md) |
 | Content Security Policy | [site-csp.md](docs/site-csp.md) |
 | Performance budgets | [site-perf.md](docs/site-perf.md) |
