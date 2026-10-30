@@ -291,7 +291,7 @@ envelope up to the current spec with pure, per-version steps
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0` and
 `0.9.0 → 0.10.0`, each of which only stamps `spec`); a compatible version
 range is planned, not built. The workspace is at spec `0.10.0` (digest
-`0a10e9ff369432effc1d9ca3323be6607b3c2400acacbc3043301c882cd29799`), which adds the
+`fb523b3dd45a05910723a160f5767a6b11ea83bda0dd1b03341bd04520af48eb`), which adds the
 design-system document (PLAN_011 T-ds-spec); it is in development on
 `release/0.10.0` and ships only with `@texuli/spec@0.10.0`, which is not on
 npm yet. `@texuli/spec@0.9.0` carries spec `0.9.0` (digest

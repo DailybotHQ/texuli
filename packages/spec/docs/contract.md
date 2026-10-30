@@ -289,7 +289,7 @@ Kotlin generator turns hyphenated wire names into camelCase properties
 (`height-md` → `heightMd`) for the component keys; the wire name is
 unchanged. Rules and API: [design-system.md](design-system.md). Spec 0.10.0
 is in development on `release/0.10.0` (digest
-`0a10e9ff369432effc1d9ca3323be6607b3c2400acacbc3043301c882cd29799`); it ships only with
+`fb523b3dd45a05910723a160f5767a6b11ea83bda0dd1b03341bd04520af48eb`); it ships only with
 `@texuli/spec@0.10.0`.
 
 ## Named slots and conditions
