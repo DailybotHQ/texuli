@@ -560,6 +560,14 @@
       "gzip": 4032,
       "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for complete chart tokens for any theme (deriveChartTokens over the palette); measured 3,838 B, cap = measured + 4% rounded up to 64 B."
     },
+    "@texuli/tokens/design-system/compile": {
+      "gzip": 32064,
+      "note": "PLAN_011 T-ds-compiler (ADR-021, ADR-022; owner-approved new row): the lazy design-system compiler: extends resolution, variants and patches, the pinned-color contrast solver over the seed generator, guarantees, concrete variables per mode, fontFaces, assets, report and the SHA-256 hash. It bundles the @texuli/spec/design-system validator (about 7 KB) and the system token families; library themes for texuli:<id> load in lazy chunks (21.9 KB, not counted). Loaded only by the studio, CLI, builds and MCP; the @texuli/tokens root never imports it. Measured 30,780 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/design-system/validate": {
+      "gzip": 10304,
+      "note": "PLAN_011 T-ds-compiler (ADR-022; owner-approved new row): the spec's validateDesignSystem, patch and migrate (7.1 KB on their own, see @texuli/spec/design-system) plus checkDesignSystemGuarantees over compiled variables (contrast pairs, focus width, targets) and DESIGN_SYSTEM_ATTRIBUTES, without the compiler or the color engine. Measured 9,850 B, cap = measured + 4% rounded up to 64 B."
+    },
     "@texuli/tokens/renames": {
       "gzip": 448,
       "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the machine-readable rename list and its JSON Schema (empty list); measured 424 B, cap = measured + 4% rounded up to 64 B."

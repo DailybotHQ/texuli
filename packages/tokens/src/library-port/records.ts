@@ -535,7 +535,7 @@ export const PORT_THEME_RECORDS: readonly LibraryThemeDefinition[] = Object.free
         secondary: '#f59e0b',
         neutral: 'zinc',
         font: 'grotesk',
-        radius: '0px',
+        radius: '0',
         density: 1,
         style: {
           elevation: 'flat',
