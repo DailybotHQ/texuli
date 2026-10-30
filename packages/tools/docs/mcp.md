@@ -270,3 +270,14 @@ oversized stdio lines and operation inputs, stateless and stateful handlers,
 and the runtime filter. It also checks that the llms resources are
 byte-identical to the site's committed snapshots. `mcp.test.ts`,
 `deck.test.ts` and `document.test.ts` cover the tools themselves.
+
+`tests/agent-evals/` (`pnpm vitest run tests/agent-evals`) replays scripted
+agent sessions, with no model, on both doors: the stateful handler as the
+stdio server builds it, and the remote Function with real `Request`
+objects. The jobs are discovery from cold, a pricing page validated with
+`blueprint.validate`, theming with the `theme-blueprint` prompt and a
+Markdown deck conversion; every edge operation must answer identically on
+both doors. `tool-descriptions.test.ts` there lints every operation's
+summary, stated limits, argument descriptions and bounds, closed input
+schema and examples. The design-system jobs are skipped until their
+operations exist.

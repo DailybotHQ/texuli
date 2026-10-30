@@ -36,6 +36,7 @@ against its 152 KB budget.
 | Dead CSS | `pnpm exec tsx scripts/check-css.ts` | 71 package stylesheets, no dead CSS (also a test in `pnpm test`: `scripts/tests/check-css.test.ts`) |
 | Agent skill | `pnpm check:skill` | `skills/texuli pack is valid` (2 s) |
 | Agent surfaces | `pnpm check:surfaces` | `check:surfaces ✓ 4 generated surfaces match the registry` |
+| Agent evals (scripted MCP sessions, no model) | `pnpm vitest run tests/agent-evals` | 2026-10-30 (T-agent-evals): 2 files, 10 passed, 2 skipped (the design-system jobs, planned in T-ds-agent-tools); also part of `pnpm test` |
 | Size budgets | `pnpm size` | 251 entries: 250 within budget, `@texuli/tokens/aa-gate` over (10,817 B > 10,624 B); exit 1 (1 min 44 s, machine under load). Superseded: 2026-10-26, 307 entries within budget, exit 0 (row below) |
 | Packaging (pack, publint, attw; publishes nothing) | `pnpm verify:packages` | all packages pass; tarballs and SHA256SUMS in `tmp/packages/` (2 min 2 s) |
 | Perf and scale limits (opt-in) | `pnpm test:perf` | 6 files, 128 passed (36 s under load, 2026-10-25) |
@@ -171,6 +172,7 @@ then the package, then its consumers (the layers above it).
 | `packages/astro/src/**` | `pnpm vitest run packages/astro` (`appearance.test.ts`: the appearance switcher model and island) | `tests/e2e/astro-islands.spec.ts` and `tests/consumers/consumers.spec.ts` (the `astro-plain` consumer installs the packed `@texuli/astro`) |
 | `packages/catalog/src/**` (manifests, build, render) | `pnpm vitest run packages/catalog`: `coverage` (every component of the published packages is covered or excluded with a reason), `examples-roundtrip` (every manifest example validates against the spec and hashes stably), `validate-interaction` (bindings, `bind`, `on`, the state surface and list text without a spec check), `render-hostile-blueprints` (the 0.3.0 hostile corpus); linear time on untrusted text: `render-richtext` (rich text parsing), `render-hostile` (`looksExecutable`) and `validate-sinks-linear` (the draft sink scan's HTML-tag check) | `pnpm exec tsx scripts/coverage-matrix.ts`; `tests/e2e/renderer-hostile.spec.ts`; `tests/perf/catalog-render-limits.test.ts` (`pnpm test:perf`); the site's live-components tests |
 | `packages/tools/src/**` (CLI, llms, a2ui, elements, golden, mcp) | `pnpm vitest run packages/tools` | `pnpm check:skill` when the skill references a command; `pnpm check:surfaces` when an operation, the MCP handler or the router changes (then `pnpm exec tsx scripts/generate-surfaces.ts` and review the diff) |
+| `packages/tools/src/ops/**`, `packages/tools/src/mcp/**`, `functions/mcp.ts`, `functions/_lib/mcp-*.ts` (what an agent sees through the MCP) | `pnpm vitest run tests/agent-evals`: `sessions.test.ts` replays scripted sessions (discovery from cold, a pricing page through `blueprint.validate`, theming with the `theme-blueprint` prompt, a Markdown deck conversion) on the stateful stdio handler and on the remote Function with real `Request` objects, and requires identical results for every edge operation; `tool-descriptions.test.ts` lints every operation's summary (80–400 characters, says what it returns, no marketing words), stated limits, argument descriptions and bounds, closed input schema and examples, and the inputs the deprecated aliases still list | `pnpm check:surfaces` after any summary change (then `pnpm exec tsx scripts/generate-surfaces.ts`); `pnpm vitest run packages/tools apps/website/tests/mcp-function.test.ts` |
 | `scripts/agent-surfaces.ts`, `scripts/generate-surfaces.ts`, `scripts/mcp-remote-smoke.sh` | `pnpm vitest run scripts/tests/surfaces.test.ts scripts/tests/mcp-remote-smoke.test.ts apps/website/tests/site-build-guards.test.ts` | `pnpm check:surfaces` |
 | `packages/mcp/**` (in development; the `texuli-mcp` bin) | `pnpm vitest run packages/mcp packages/tools/tests/mcp-cli.test.ts` | `pnpm check:layers`; `pnpm verify:packages --filter tools,mcp`, then `TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/consumers/mcp.spec.ts --project chromium` (spawns the packed bin over stdio) |
 | `packages/examples/src/index.ts`, `packages/examples/package.json` `sideEffects` | `pnpm vitest run packages/examples/tests/registration-side-effects.test.ts` | `tests/e2e/csp.spec.ts` (builds the fixture app for production) |
@@ -219,14 +221,26 @@ suite and `pnpm build`.
 ## 3. Blind spots
 
 - **Vitest collects** `packages/*/tests/**/*.test.ts`,
-  `apps/website/tests/**/*.test.ts`, `scripts/tests/**/*.test.ts` and, only
+  `apps/website/tests/**/*.test.ts`, `scripts/tests/**/*.test.ts`,
+  `tests/agent-evals/**/*.test.ts` and, only
   with `TEXULI_PERF=1` or an explicit path, `tests/perf/**`. A test in `src/`
   or named `*.spec.ts` outside Playwright's folders never runs. The
   `apps/website/tests` entry was added to the owner-held `vitest.config.ts` in
-  commit `e6c5d205` (PLAN_006); the owner's acknowledgement of that change is
-  pending. `apps/agent/tests` is **not** collected: run it with
+  commit `e6c5d205` (PLAN_006), and the `tests/agent-evals` entry by
+  T-agent-evals (PLAN_011); the owner's acknowledgement of both is pending.
+  No package typecheck covers the root `tests/` folders, so
+  `pnpm typecheck` does not check `tests/agent-evals` (Vitest strips types
+  without checking them). `apps/agent/tests` is **not** collected: run it with
   `pnpm --filter @texuli/agent exec vitest run` (its own config). CI runs
   neither those tests nor the native Gradle build.
+- **The agent evals are scripted, not a model.** `tests/agent-evals`
+  proves that the calls an agent needs exist, answer the same on both
+  doors and validate; it does not prove that a model picks those calls,
+  reads the descriptions well or recovers from diagnostics on its own. The
+  remote door runs in-process (the deployed `/mcp` is checked only by the
+  post-deploy smoke), the stdio door is the handler without the line
+  transport (the packed bin is `tests/consumers/mcp.spec.ts`), and the
+  design-system jobs are skipped until T-ds-agent-tools.
 - **The Pages Functions run under Vitest, not Cloudflare's runtime.** How
   Pages applies `_headers` to Function responses is only observable after a
   deploy (see the S-2 note in [SECURITY](SECURITY.md#15-website-edge-functions-and-analytics)).
