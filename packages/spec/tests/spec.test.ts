@@ -7,7 +7,7 @@ import { projectLiveCatalog } from '../scripts/bootstrap-catalog.ts';
 import { buildSpec, EXTERNAL_SCHEMAS, KOTLIN_OUT, TS_OUT } from '../src/build.ts';
 import { canonicalJson, sha256 } from '../src/canonical.ts';
 import type { SpecCatalog } from '../src/catalog.ts';
-import { kotlinString } from '../src/codegen/kotlin.ts';
+import { kotlinProperty, kotlinString, schemaToKotlin } from '../src/codegen/kotlin.ts';
 import { checkConformance } from '../src/conformance.ts';
 import {
   ACTION_FIELDS,
@@ -85,14 +85,14 @@ describe('canonical JSON and sha256', () => {
 describe('the closed dialect', () => {
   it('accepts every committed schema and refuses keywords, open objects, refs and dialects', () => {
     const schemas = Object.keys(normative).filter((p) => p.startsWith('schemas/'));
-    expect(schemas).toHaveLength(7);
+    expect(schemas).toHaveLength(8);
     // The pinned document and canvas schemas are their engines' exports: pinned, not in the dialect.
     expect(EXTERNAL_SCHEMAS).toEqual([
       'schemas/canvas.schema.json',
       'schemas/document.schema.json',
     ]);
     const dialect = schemas.filter((path) => !EXTERNAL_SCHEMAS.includes(path));
-    expect(dialect).toHaveLength(5);
+    expect(dialect).toHaveLength(6);
     for (const path of dialect) expect(checkSchemaDocument(json(path)), path).toEqual([]);
     expect(checkSchemaDocument(json('schemas/document.schema.json')).length).toBeGreaterThan(0);
     expect(checkSchemaDocument(json('schemas/canvas.schema.json')).length).toBeGreaterThan(0);
@@ -171,6 +171,7 @@ describe('deterministic generation', () => {
     expect(Object.keys(build.generated)).toEqual([
       `${KOTLIN_OUT}Blueprint.kt`,
       `${KOTLIN_OUT}CatalogSchema.kt`,
+      `${KOTLIN_OUT}DesignSystem.kt`,
       `${KOTLIN_OUT}Diagnostics.kt`,
       `${KOTLIN_OUT}Json.kt`,
       `${KOTLIN_OUT}Manifest.kt`,
@@ -178,6 +179,7 @@ describe('deterministic generation', () => {
       `${KOTLIN_OUT}Workflow.kt`,
       `${TS_OUT}blueprint.ts`,
       `${TS_OUT}catalog-schema.ts`,
+      `${TS_OUT}design-system.ts`,
       `${TS_OUT}diagnostics.ts`,
       `${TS_OUT}manifest.ts`,
       `${TS_OUT}vocabulary.ts`,
@@ -235,7 +237,7 @@ function code(text: string): string {
 
 describe('generated Kotlin (text artifacts; no Kotlin toolchain here)', () => {
   it('is well formed, defines every type it references, decodes closed and escapes strings', () => {
-    expect(kotlin).toHaveLength(7);
+    expect(kotlin).toHaveLength(8);
     for (const [path, text] of kotlin) {
       expect(text, path).toContain('\npackage com.texuli.spec\n');
       expect(text, path).not.toContain('\t');
@@ -289,6 +291,41 @@ describe('generated Kotlin (text artifacts; no Kotlin toolchain here)', () => {
       ...all.matchAll(/(?:^|\n)(?:data class|enum class|typealias)\s+([A-Z]\w*)/g),
     ].map((m) => m[1]);
     expect(new Set(names).size, 'generated Kotlin type names are unique').toBe(names.length);
+  });
+
+  it('turns hyphenated wire names into camelCase properties and keeps the wire name', () => {
+    for (const [wire, property] of [
+      ['height-md', 'heightMd'],
+      ['padding-inline-sm', 'paddingInlineSm'],
+      ['icon-button', 'iconButton'],
+      ['$state', 'state'],
+      ['radius', 'radius'],
+    ] as const) {
+      expect(kotlinProperty(wire), wire).toBe(property);
+    }
+    const schema: Schema = {
+      $schema: DIALECT_URI,
+      title: 'Probe',
+      type: 'object',
+      properties: { 'height-md': { type: 'number' }, 'icon-button': { type: 'string' } },
+      additionalProperties: false,
+    };
+    const text = schemaToKotlin(
+      { source: 'schemas/probe.schema.json', schema, prefix: 'Probe' },
+      build.stamp
+    );
+    expect(text).toContain('val heightMd: Double? = null,');
+    expect(text).toContain('heightMd = fields["height-md"]?.let');
+    expect(text).toContain('val iconButton: String? = null,');
+    expect(text).toContain('private val FIELDS = setOf("height-md", "icon-button")');
+    // Two wire names that camelCase to one property collide and fail generation.
+    const clash: Schema = { ...schema, properties: { 'a-b': {}, aB: {} } };
+    expect(() =>
+      schemaToKotlin(
+        { source: 'schemas/probe.schema.json', schema: clash, prefix: 'Probe' },
+        build.stamp
+      )
+    ).toThrow(/collides/);
   });
 });
 
@@ -531,6 +568,7 @@ describe('migrations', () => {
           '0.6.0->0.7.0',
           '0.7.0->0.8.0',
           '0.8.0->0.9.0',
+          '0.9.0->0.10.0',
         ],
       });
       expect(result.blueprint, path).toEqual({ ...input, spec: SPEC_VERSION });
@@ -572,9 +610,22 @@ describe('migrations', () => {
     expect(migrateBlueprint(result.blueprint, '0.9.0').applied).toEqual([]);
   });
 
+  it('migrates a 0.9.0 envelope to 0.10.0 by stamping spec only (the additive design-system schema)', () => {
+    const input: Readonly<Record<string, unknown>> = Object.freeze({
+      ...json<Record<string, unknown>>('fixtures/golden/lego.json'),
+      spec: '0.9.0',
+    });
+    const result = migrateBlueprint(input, '0.10.0');
+    expect(result).toMatchObject({ from: '0.9.0', to: '0.10.0', applied: ['0.9.0->0.10.0'] });
+    expect(result.blueprint).toEqual({ ...input, spec: '0.10.0' });
+    expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);
+    expect(migrateBlueprint(result.blueprint, '0.10.0').applied).toEqual([]);
+  });
+
   it('keeps workflow validation and migrations out of the root, in their own subpaths', () => {
     expect(Object.keys(root)).not.toContain('validateWorkflowGraph');
     expect(Object.keys(root)).not.toContain('migrateBlueprint');
+    expect(Object.keys(root)).not.toContain('validateDesignSystem');
     const { exports } = JSON.parse(
       readFileSync(new URL('../package.json', import.meta.url), 'utf8')
     ) as { exports: Record<string, { default: string }> };

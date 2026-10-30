@@ -420,8 +420,8 @@ it('validates blueprint drafts with the catalog draft checks and reports the cat
       };
       const migrated = await validate({ draft: envelope });
       expect(migrated).toMatchObject({ valid: true, migratedFrom: '0.2.0' });
-      // The current blueprint spec (0.9.0): already current, so nothing migrates.
-      const current = await validate({ draft: { ...envelope, spec: '0.9.0' } });
+      // The current blueprint spec (0.10.0): already current, so nothing migrates.
+      const current = await validate({ draft: { ...envelope, spec: '0.10.0' } });
       expect(current.migratedFrom).toBeUndefined();
       const foreign = await validate({ draft: { ...envelope, catalog: 'a'.repeat(64) } });
       expect(foreign.valid).toBe(false);

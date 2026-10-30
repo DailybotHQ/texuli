@@ -18,6 +18,13 @@ DOM, no Svelte, no Node APIs and no runtime dependencies.
 > stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
 > changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
 
+> **In development (`0.10.0`, not on npm).** The workspace is at **spec
+> 0.10.0**: the design-system document (`schemas/design-system.schema.json`,
+> format `texuli/design-system`) with its new `@texuli/spec/design-system`
+> subpath, and `$defs.designSystemReference` in the blueprint schema (not
+> carried by the envelope yet). Every `0.9.0` envelope migrates by stamping
+> `spec`. It ships only with `@texuli/spec@0.10.0`.
+
 > **New in `0.9.0`.** `@texuli/spec@0.9.0` carries **spec 0.9.0**, a
 > stamp-only catalog projection refresh (the Button pending note and the
 > cartesian charts' `xKind` and `locale`, from the Protoyard gaps G94 and
@@ -113,7 +120,7 @@ import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
 import { migrateBlueprint } from '@texuli/spec/migrate';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.8.0 → 0.9.0; never throws
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.9.0 → 0.10.0 (in development); never throws
 const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
@@ -152,6 +159,7 @@ warning without failing.
 | `@texuli/spec/motion` | Runtime (new in `0.6.0`, spec `0.6.0`): the closed motion vocabulary and its check, shared by the catalog and the player ([motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/motion.md)) | `SPEC_MOTION_PRESETS`, `SPEC_MOTION_DURATIONS`, `SPEC_MOTION_STAGGERS`, `SPEC_MOTION_LEVELS`, `checkNodeMotion`, `checkEnvelopeMotion` |
 | `@texuli/spec/stream` | Runtime, opt-in (new in `0.6.0`): streamed blueprints ([stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)) | `createJsonTokenizer`, `createBlueprintAssembler`, `createBlueprintStream`, `STREAM_NODE_ORDER` |
 | `@texuli/spec/source` | Runtime (new in `0.8.0`, spec `0.8.0`): data-source bindings, shared by the spec validator, `@texuli/catalog` and the player ([source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)) | `checkSourceBinding`, `isSourceBinding`, `SOURCE_BINDING_KEY`, `SPEC_SOURCE_LIMITS`, `SPEC_SOURCE_FILTER_OPERATORS`, `SpecSourceDescriptor` |
+| `@texuli/spec/design-system` | Runtime, opt-in (in development for `0.10.0`, spec `0.10.0`; not on npm): the design-system document contract (ADR-021) ([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/design-system.md)) | `validateDesignSystem`, `validateDesignSystemPatch`, `applyDesignSystemPatch`, `migrateDesignSystem`, `checkDesignSystemReference`, `DesignSystem`, `DesignSystemPatch`, `DESIGN_SYSTEM_CODES`, `DESIGN_SYSTEM_LIMITS` |
 | `@texuli/spec/codegen` | Build time: generation and conformance | `buildSpec`, `projectCatalog`, `checkConformance`, `checkCatalogContract`, `formatJson`, `nextSpecVersion`, `checkVersionHistory` |
 
 ## Key guarantees
@@ -280,9 +288,13 @@ written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 (`@texuli/spec/migrate`) brings an
 envelope up to the current spec with pure, per-version steps
 (`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`,
-`0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0` and `0.8.0 → 0.9.0`,
-each of which only stamps `spec`); a compatible version range is planned,
-not built. `@texuli/spec@0.9.0` carries spec `0.9.0` (digest
+`0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0` and
+`0.9.0 → 0.10.0`, each of which only stamps `spec`); a compatible version
+range is planned, not built. The workspace is at spec `0.10.0` (digest
+`0a10e9ff369432effc1d9ca3323be6607b3c2400acacbc3043301c882cd29799`), which adds the
+design-system document (PLAN_011 T-ds-spec); it is in development on
+`release/0.10.0` and ships only with `@texuli/spec@0.10.0`, which is not on
+npm yet. `@texuli/spec@0.9.0` carries spec `0.9.0` (digest
 `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d`), an
 additive catalog projection refresh (PLAN_011 T-gaps-87-95 and
 T-gaps-96-98); `@texuli/spec@0.8.0` carried spec `0.8.0` (digest
@@ -318,6 +330,8 @@ conformance harness) are in
   node shells; new in `0.6.0`): [stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)
 - Data-source bindings (spec 0.8.0; new in `0.8.0`):
   [source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)
+- The design-system document (spec 0.10.0; in development, not on npm):
+  [design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/design-system.md)
 - The Kotlin Multiplatform twin that consumes the generated models:
   [native/README.md](https://github.com/DailybotHQ/texuli/blob/main/native/README.md)
 - Architecture: [ARCHITECTURE.md](https://github.com/DailybotHQ/texuli/blob/main/docs/ARCHITECTURE.md)

@@ -53,7 +53,7 @@ const codes = (blueprint: unknown, withSources = true) =>
 describe('spec 0.8.0: data-source bindings', () => {
   it('stamps 0.8.0 and migrates a 0.7.0 envelope by stamping spec only', () => {
     // Spec 0.8.0 introduced data-source bindings; later minors keep them.
-    expect(['0.8.0', '0.9.0']).toContain(SPEC_VERSION);
+    expect(['0.8.0', '0.9.0', '0.10.0']).toContain(SPEC_VERSION);
     const input = { ...golden, spec: '0.7.0' };
     const result = migrateBlueprint(input, '0.8.0');
     expect(result.applied).toEqual(['0.7.0->0.8.0']);

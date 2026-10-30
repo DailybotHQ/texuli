@@ -1,0 +1,8 @@
+{
+  "format": "texuli/design-system",
+  "formatVersion": 1,
+  "id": "minimal",
+  "version": "1.0.0",
+  "name": "Minimal",
+  "color": { "brand": { "seed": "#4f46e5" } }
+}

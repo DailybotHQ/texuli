@@ -1,0 +1,16 @@
+{
+  "description": "A brand without its seed.",
+  "expect": [["required", "$.color.brand.seed"]],
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "acme",
+    "version": "1.0.0",
+    "name": "Acme",
+    "color": {
+      "brand": {
+        "secondary": "#0ea5e9"
+      }
+    }
+  }
+}

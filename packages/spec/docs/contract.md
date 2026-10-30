@@ -22,11 +22,12 @@ fixtures are not part of the npm package.
 
 | Path | What it holds |
 | --- | --- |
-| `schemas/` | The normative JSON schemas: `blueprint` (envelope v1, local state, flow and the node tree), `catalog`, `diagnostics`, `manifest`, `workflow` (workflow graphs), and from 0.7.0 `document`, `@texuli/document`'s JSON Schema export pinned by digest (`EXTERNAL_SCHEMAS`: not in the dialect, no projection; `packages/catalog/tests/validate-document.test.ts` keeps it equal to `documentJsonSchema()`), and from 0.8.0 `canvas`, `@texuli/canvas`'s export pinned the same way (`packages/catalog/tests/validate-canvas.test.ts` keeps it equal to `canvasJsonSchema()`; the blueprint's `$defs.canvas` checks a `canvas` node's envelope) |
+| `schemas/` | The normative JSON schemas: `blueprint` (envelope v1, local state, flow and the node tree), `catalog`, `diagnostics`, `manifest`, `workflow` (workflow graphs), and from 0.7.0 `document`, `@texuli/document`'s JSON Schema export pinned by digest (`EXTERNAL_SCHEMAS`: not in the dialect, no projection; `packages/catalog/tests/validate-document.test.ts` keeps it equal to `documentJsonSchema()`), and from 0.8.0 `canvas`, `@texuli/canvas`'s export pinned the same way (`packages/catalog/tests/validate-canvas.test.ts` keeps it equal to `canvasJsonSchema()`; the blueprint's `$defs.canvas` checks a `canvas` node's envelope), and from 0.10.0 `design-system` (the design-system document, generated from `src/design-system/vocabulary.ts` by `scripts/design-system-schema.ts`; in the dialect, projected like the others) |
 | `catalog/components.json` | The closed vocabulary, projected from the built catalog: id, label, summary, group, placement (`app`/`content`), emit tiers, capability and props |
 | `catalog/capabilities.json` | Reviewed capability claims. Empty: no id is audited portable yet, so every capability is `unknown` (ADR-003) |
 | `fixtures/golden/` | Ten blueprints that must validate (fictional data): a report, a dashboard, a proactive deck and a report with a named slot and a `when` condition (0.2.0 envelopes), and five 0.3.0 interfaces: `app-dashboard` (filters bound to state), `mobile-flow` (flow views, forms, `flowGo`), `sortable-board` (reorder groups, locked, clone, `on.move`), `workflow-builder` (an edit-mode `workflow-graph` bound to state) and `lego` (layouts, a data board, charts, media, blocks, a sortable palette and outline, and a workflow editor in one tree). `@texuli/player`'s `golden.test.ts` and `lego.test.ts` paint them |
 | `fixtures/invalid/` | Blueprints that must fail with exact diagnostic codes, one or more per code, including slot and condition cases (an undeclared or root `slot`, an unknown condition `op`, an extra condition field) and the 0.3.0 cases (a refused state declaration, an unknown variable, a two-key binding, an undeclared event, an action missing its fields, an unknown `spec` version) and the state surface cases (bidi in a list item, form nodes outside an `action-form`, a control and a flow view with nothing declared) |
+| `fixtures/design-systems/` | From 0.10.0: `acme.json` (every section) and `minimal.json`, which must validate; `invalid/` documents (`{ description, expect, trust?, resolve?, document }`, one per validate code) that must fail with exact codes and paths; and `migrations/v<n>.json`, one per `formatVersion`. Kept out of `golden/` and `invalid/`, which hold blueprints |
 | `fixtures/workflow/` | `golden/` workflow graphs that must validate (a six-node pipeline) and `invalid/` graphs (`{ expect, graph }`) that must fail with exact codes: a dangling edge, an undeclared node type, a forbidden cycle |
 | `manifest.json` | The spec version, the dialect and a SHA-256 per normative file |
 | `versions.json` | Every released spec version pinned to its spec digest (not normative: it pins the normative files) |
@@ -185,7 +186,8 @@ refuses. `0.2.0 → 0.3.0` is additive: it stamps `spec: "0.3.0"`. Every later s
 (`0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`, `0.5.0 → 0.6.0`, the
 motion vocabulary in [motion.md](motion.md), `0.6.0 → 0.7.0`, node keys
 and documents, `0.7.0 → 0.8.0`, data sources, forms, canvases and sheets,
-and `0.8.0 → 0.9.0`, a catalog projection refresh) is additive and stamps only `spec` as well. The tests
+`0.8.0 → 0.9.0`, a catalog projection refresh, and `0.9.0 → 0.10.0`, the
+design-system document) is additive and stamps only `spec` as well. The tests
 check that `SPEC_MIGRATIONS` covers every consecutive pinned pair in
 `versions.json` from 0.2.0 to `SPEC_VERSION`. Inside a plan that has not
 published a spec version, later normative changes amend that version's pin
@@ -269,6 +271,26 @@ envelope shape, the `$defs` and the diagnostic codes are unchanged; the
 is stamped `0.9.0`. Spec 0.9.0 ships in `@texuli/spec@0.9.0` (digest
 `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d`; the
 cartesian charts' `xKind` and `locale`, G97, reached the projection too).
+
+## Spec 0.10.0: the design-system document (T-ds-spec)
+
+PLAN_011, ADR-021; additive, so the `0.9.0 → 0.10.0` migration stamps
+`spec` only. It adds `schemas/design-system.schema.json` (format
+`texuli/design-system`, `formatVersion` 1), its TypeScript and Kotlin
+projections (`generated/typescript/design-system.ts`,
+`generated/kotlin/.../DesignSystem.kt`), the `fixtures/design-systems/`
+documents, and `$defs.designSystemReference` in the blueprint schema
+(`{ ref }` or `{ inline }`), which the envelope does not carry yet. The
+`spec` enum gains `0.10.0`, and every committed golden and invalid fixture
+is stamped `0.10.0`. The schema is generated: edit the vocabulary table,
+then run `pnpm exec tsx packages/spec/scripts/design-system-schema.ts` and
+the spec generator (`tests/design-system.test.ts` fails on drift). The
+Kotlin generator turns hyphenated wire names into camelCase properties
+(`height-md` → `heightMd`) for the component keys; the wire name is
+unchanged. Rules and API: [design-system.md](design-system.md). Spec 0.10.0
+is in development on `release/0.10.0` (digest
+`0a10e9ff369432effc1d9ca3323be6607b3c2400acacbc3043301c882cd29799`); it ships only with
+`@texuli/spec@0.10.0`.
 
 ## Named slots and conditions
 

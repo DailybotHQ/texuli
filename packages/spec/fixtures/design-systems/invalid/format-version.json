@@ -1,0 +1,16 @@
+{
+  "description": "A future formatVersion: refused with a code, never thrown.",
+  "expect": [["format-version", "$.formatVersion"]],
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 2,
+    "id": "acme",
+    "version": "1.0.0",
+    "name": "Acme",
+    "color": {
+      "brand": {
+        "seed": "#4f46e5"
+      }
+    }
+  }
+}

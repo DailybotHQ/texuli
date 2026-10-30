@@ -80,11 +80,14 @@ function field(name: string): string {
 
 /**
  * The Kotlin property for a wire name: a leading `$` is stripped (`$state` →
- * `state`), because `$` starts a string template in Kotlin. The wire name
+ * `state`), because `$` starts a string template in Kotlin, and a hyphen
+ * joins camelCase (`height-md` → `heightMd`), because kebab-case keys (the
+ * design-system component registry) are not Kotlin names. The wire name
  * itself is always emitted through {@link kotlinString}.
  */
 export function kotlinProperty(name: string): string {
-  return name.startsWith('$') ? name.slice(1) : name;
+  const bare = name.startsWith('$') ? name.slice(1) : name;
+  return bare.replace(/-([A-Za-z0-9])/g, (_, char: string) => char.toUpperCase());
 }
 
 /** `$` escaped for a Kotlin string template (`\$state`). */

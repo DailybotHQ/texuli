@@ -55,6 +55,10 @@
     "./source": {
       "types": "./src/source.ts",
       "default": "./src/source.ts"
+    },
+    "./design-system": {
+      "types": "./src/design-system/index.ts",
+      "default": "./src/design-system/index.ts"
     }
   },
   "scripts": {

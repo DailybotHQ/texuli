@@ -1,0 +1,32 @@
+{
+  "description": "A chain that returns to the document.",
+  "expect": [["extends-cycle", "$.extends"]],
+  "resolve": {
+    "base@1.0.0": {
+      "format": "texuli/design-system",
+      "formatVersion": 1,
+      "id": "base",
+      "version": "1.0.0",
+      "name": "Acme",
+      "color": {
+        "brand": {
+          "seed": "#4f46e5"
+        }
+      },
+      "extends": "acme@1.0.0"
+    }
+  },
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "acme",
+    "version": "1.0.0",
+    "name": "Acme",
+    "color": {
+      "brand": {
+        "seed": "#4f46e5"
+      }
+    },
+    "extends": "base@1.0.0"
+  }
+}
