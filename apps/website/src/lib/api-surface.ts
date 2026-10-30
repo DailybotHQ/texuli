@@ -29,12 +29,13 @@ export const API_VERSION = '0.9.0';
 
 /**
  * Where the API stands in the release line (docs/RELEASE.md). One switch:
- * the release task of 0.9.0 flips it when the branch is published and
- * deployed, and the index, health file, OpenAPI document and portal follow.
+ * the release task of 0.9.0 flipped it to `released` for the merge that
+ * publishes 0.9.0 and deploys texuli.com from main, and the index, health
+ * file, OpenAPI document and portal follow.
  */
 export const API_RELEASE_STATUS = Object.freeze({
-  state: 'in-development' as 'in-development' | 'released',
-  note: 'In development: built on the release/0.9.0 branch, live on texuli.com once 0.9.0 is published and deployed from main.',
+  state: 'released' as 'in-development' | 'released',
+  note: 'Released in 0.9.0: published on npm and served by texuli.com, deployed from main.',
 });
 
 /** The path prefix of the current API major version. */

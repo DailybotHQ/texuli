@@ -15,9 +15,9 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.8.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
-> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
+> published to npm as `0.9.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
+> changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
 
 ## Install
 
@@ -126,7 +126,7 @@ state). A `callerHandler` that is not a function is ignored.
 instant under reduced motion and at level `none`
 ([ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)).
 
-`texuli/defaults` (in the `0.9.0` workspace, not on npm yet) holds
+`texuli/defaults` (new in `0.9.0`) holds
 `setDesignDefaults`: default `variant` and `size` props from a closed,
 typed vocabulary, used only when a prop is omitted. Every component also
 reads its component tokens (`--tx-button-radius`, `--tx-card-padding-inline`…)

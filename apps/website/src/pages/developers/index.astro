@@ -133,7 +133,7 @@ curl -sI ${SITE_ORIGIN}${PATHS.health}`}</code></pre>
     <li>
       <strong>Local:</strong> <code>{MCP.local}</code>, over stdio, in any MCP host. It serves
       every tool, including the ones that need Node ({MCP.localOnlyTools.join(', ')}). The
-      <code>@texuli/mcp</code> package is first published in 0.9.0.
+      <code>@texuli/mcp</code> package is on npm since 0.9.0.
     </li>
     <li>
       <strong>Server card:</strong> <a href={MCP.serverCard}><code>{MCP.serverCard}</code></a>.
@@ -155,8 +155,8 @@ curl -sI ${SITE_ORIGIN}${PATHS.health}`}</code></pre>
   <pre><code>{`npx -p @texuli/tools texuli help
 echo '{"query":"date"}' | npx -p @texuli/tools texuli catalog search`}</code></pre>
   <p>
-    The <code>&lt;group&gt; &lt;verb&gt;</code> commands are new in 0.9.0 (in development); the
-    0.8 line on npm has the <code>deck</code> and <code>document</code> commands. Every command:
+    The <code>&lt;group&gt; &lt;verb&gt;</code> commands are new in 0.9.0; the
+    <code>deck</code> and <code>document</code> commands date from the 0.8 line. Every command:
     {' '}
     <a href={opsDocs}>ops.md</a>.
   </p>

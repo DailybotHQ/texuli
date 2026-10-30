@@ -1,6 +1,6 @@
 # Design systems: component tokens, hooks and defaults
 
-> **Status:** in the `0.9.0` workspace (in development, not on npm yet).
+> **Status:** released in `0.9.0` (pre-1.0).
 > Token contract v2 is [ADR-020](../../../docs/DECISIONS.md#adr-020-token-contract-v2-additive-families-and-a-real-component-tier);
 > the design-system document that sets all of this from one JSON file is
 > planned (ADR-021).

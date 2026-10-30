@@ -76,9 +76,9 @@ test('every feature by release, each demo working, links that resolve; axe light
     'Published on npm as 0.7.0'
   );
   await expect(page.locator('[data-hub-release="0.8.0"] [data-hub-feature]')).toHaveCount(7);
-  // PLAN_011 T-site-090: 0.9.0 is on the hub, in development.
+  // PLAN_011 T-release-090: 0.9.0 is on the hub as the current release.
   await expect(page.locator('[data-hub-release="0.9.0"] .hub__status')).toContainText(
-    'In development'
+    'Published on npm as 0.9.0, the current release'
   );
   await expect(page.locator('[data-hub-release="0.9.0"] [data-hub-feature]')).toHaveCount(5);
 

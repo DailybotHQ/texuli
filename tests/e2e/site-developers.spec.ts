@@ -138,7 +138,8 @@ test('the portal: facts from the typed sources, WebAPI JSON-LD, axe-clean in lig
   await settle(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Developers');
   await expect(page.locator('[data-api-version]')).toHaveText(API_VERSION);
-  await expect(page.locator('[data-api-status]')).toContainText('In development');
+  // Released with 0.9.0: the in-development status line is gone.
+  await expect(page.locator('[data-api-status]')).toHaveCount(0);
   await expect(page.locator('[data-api-endpoints] tbody tr')).toHaveCount(API_RESOURCES.length);
   const text = await page.locator('main').innerText();
   for (const fact of [

@@ -686,7 +686,7 @@ export function aiCatalog(facts: Pick<DiscoveryFacts, 'origin' | 'openapi'>): un
       type: NPM_TYPE,
       url: `${NPM}texuli`,
       description:
-        'The Texuli package on npm (the 0.8 line, a pre-1.0 release): styled components built on owned primitives, tokens and the agent catalog. Scoped @texuli/* packages ship alongside it.',
+        'The Texuli package on npm (the 0.9 line, a pre-1.0 release): styled components built on owned primitives, tokens and the agent catalog. Scoped @texuli/* packages ship alongside it.',
       tags: ['npm', 'svelte', 'components', 'pre-1.0'],
       representativeQueries: ['install Texuli from npm', 'which @texuli packages exist on npm'],
     },
@@ -708,7 +708,7 @@ export function aiCatalog(facts: Pick<DiscoveryFacts, 'origin' | 'openapi'>): un
       type: NPM_TYPE,
       url: `${NPM}@texuli/tools`,
       description:
-        'The Texuli developer tools: the `texuli` CLI (`texuli <group> <verb>` for every operation from 0.9.0, in development; deck and document commands since the 0.8 line), init, theme, add and update commands, and the llms generator. Run without installing with `npx -p @texuli/tools texuli help`.',
+        'The Texuli developer tools: the `texuli` CLI (`texuli <group> <verb>` for every operation since 0.9.0; deck and document commands since the 0.8 line), init, theme, add and update commands, and the llms generator. Run without installing with `npx -p @texuli/tools texuli help`.',
       tags: ['npm', 'cli', 'tools'],
       representativeQueries: [
         'search the Texuli catalog from the command line',

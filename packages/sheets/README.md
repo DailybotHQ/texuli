@@ -11,9 +11,9 @@ injection, and an accessible Svelte 5 sheet view over the `@texuli/data`
 grid editing layer.
 
 > **Status: in development (pre-1.0).** `@texuli/sheets` is published on
-> npm as `0.8.1`, with provenance (first released as `0.8.0`; built in PLAN_010).
-> Under 0.x a new minor (`0.9.0`) may contain breaking changes, so pin the
-> exact version or use `^0.8.0`, which accepts only 0.8.x
+> npm as `0.9.0`, with provenance (first released as `0.8.0`; built in PLAN_010).
+> Under 0.x a new minor (`0.10.0`) may contain breaking changes, so pin the
+> exact version or use `^0.9.0`, which accepts only 0.9.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 > Agents emit sheets as data through the `spreadsheet` catalog id of
 > blueprint spec `0.8.0`, checked by `checkSheetDraft`, and
@@ -70,7 +70,7 @@ dependencies come with it. Import the token stylesheet once
 | `./view` | `SheetView`: the accessible spreadsheet with tabs and a formula bar | [view](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/view.md) |
 | `./host` | `createSheetPlayerHost`: the sheet half of the player's `sheetHost` seam (pass it as `sheetHost` on `Player`) and its draft check | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/host.md) |
 
-`SHEETS_PACKAGE_VERSION` equals the package version (`0.8.1`).
+`SHEETS_PACKAGE_VERSION` equals the package version (`0.9.0`).
 
 ## Security
 

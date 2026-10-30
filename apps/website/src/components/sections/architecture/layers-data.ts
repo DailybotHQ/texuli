@@ -242,7 +242,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     packages: [
       {
         name: '@texuli/mcp',
-        role: 'In development (first published in 0.9.0): the local MCP server for agent hosts: the bin texuli-mcp (npx -y @texuli/mcp) and startTexuliMcp serve the stdio server of @texuli/tools with every edge and node operation; pinned exactly to @texuli/tools and published right after it (ADR-019)',
+        role: 'In development, on npm since 0.9.0 (its first release): the local MCP server for agent hosts: the bin texuli-mcp (npx -y @texuli/mcp) and startTexuliMcp serve the stdio server of @texuli/tools with every edge and node operation; pinned exactly to @texuli/tools and published right after it (ADR-019)',
         dependsOn: ['tools'],
       },
     ],
@@ -357,7 +357,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
     layer: 'L3',
     runtimes: {
       web: {
-        text: 'Ships: styled components are published on npm as 0.8.0.',
+        text: 'Ships: styled components are published on npm as 0.9.0.',
         sources: [],
       },
       native: {

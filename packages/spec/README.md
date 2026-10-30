@@ -14,11 +14,17 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.8.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
-> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
+> published to npm as `0.9.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
+> changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
 
-> **New in `0.8.0`.** `@texuli/spec@0.8.0` carries **spec 0.8.0**, which adds
+> **New in `0.9.0`.** `@texuli/spec@0.9.0` carries **spec 0.9.0**, a
+> stamp-only catalog projection refresh (the Button pending note and the
+> cartesian charts' `xKind` and `locale`, from the Protoyard gaps G94 and
+> G97): the envelope, the `$defs` and the diagnostic codes are unchanged,
+> and every `0.8.0` envelope migrates by stamping `spec`.
+
+> **New in `0.8.0`.** `@texuli/spec@0.8.0` carried **spec 0.8.0**, which adds
 > data-source bindings (the `@texuli/spec/source` subpath), the
 > agent-emittable `schema-form`, `canvas`, `spreadsheet`, `data-dashboard`
 > and `data-dashboard-widget` ids with their closed shapes, the closed
@@ -75,7 +81,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.8.0' in @texuli/spec@0.8.0
+SPEC_VERSION;                         // the spec version: '0.9.0' in @texuli/spec@0.9.0
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -276,12 +282,10 @@ envelope up to the current spec with pure, per-version steps
 (`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`,
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0` and `0.8.0 → 0.9.0`,
 each of which only stamps `spec`); a compatible version range is planned,
-not built. The workspace is at spec `0.9.0` (digest
-`2e8a5c134c52af5b3d89a3f4c3291e3979760b06f21eba9f34d22ca57f876906`), an
-additive catalog projection refresh for the 0.9.0 release (PLAN_011
-T-gaps-87-95); it is in development on the release branch and ships only
-with `@texuli/spec@0.9.0`, which is not on npm yet.
-`@texuli/spec@0.8.0` carries spec `0.8.0` (digest
+not built. `@texuli/spec@0.9.0` carries spec `0.9.0` (digest
+`497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d`), an
+additive catalog projection refresh (PLAN_011 T-gaps-87-95 and
+T-gaps-96-98); `@texuli/spec@0.8.0` carried spec `0.8.0` (digest
 `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf`), which
 adds data-source bindings, forms, canvases, dashboards and spreadsheets;
 `@texuli/spec@0.7.0` carried spec `0.7.0` (digest

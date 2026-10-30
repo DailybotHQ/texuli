@@ -27,9 +27,8 @@ integration.
   of the committed server card (generated from the registry), retried
   every 30 s up to 20 times while the deploy of the commit rolls out. It is
   `continue-on-error`, so a slow or failed deploy never blocks publishing;
-  a drift shows as a failed job with an error annotation. It cannot pass
-  before release 0.9.0 is deployed from `main` (the endpoint does not exist
-  there yet). Tests: `scripts/tests/mcp-remote-smoke.test.ts` (a local
+  a drift shows as a failed job with an error annotation. The endpoint is
+  live from release 0.9.0, deployed from `main`. Tests: `scripts/tests/mcp-remote-smoke.test.ts` (a local
   stand-in server).
 - **`setup-smoke-macos`** — on `macos-latest`, confirms `/bin/bash` is
   3.2 and runs the skill's `setup.sh` under it: `--help`, `--version`,
@@ -105,7 +104,8 @@ browser visual test.
 then publishes the packable packages in the wave order documented in
 [RELEASE](RELEASE.md), always `--tag next`, then points `latest` at the
 same versions: `latest` tracks the newest release (owner decision
-2026-10-27; both name `0.8.0` once the post-merge run publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
+2026-10-27; both name `0.9.0` once the post-merge run of the
+`release/0.9.0` merge publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
 GitHub's OIDC token (`id-token: write`).
 
 `publish.yml` lists `@texuli/drag`, `@texuli/workflows` and
@@ -119,13 +119,14 @@ also needs `@texuli/deck`, `@texuli/document` and `@texuli/drag`), and
 `@texuli/sheets` (in development) after `@texuli/blocks`, once
 `@texuli/date` and `@texuli/data` are out; no published package imports
 the three (the catalog and the player take their checks and painters from
-the host). A manual `workflow_dispatch` run on `main`
+the host); and `@texuli/mcp` (in development) right after
+`@texuli/tools`, which it pins exactly. A manual `workflow_dispatch` run on `main`
 (run 40616266068, 2026-10-28 UTC) published drag and workflows for the
 first time as `0.3.0`; `@texuli/deck` was first published in `0.4.0`, and
 `@texuli/editor` was first published in `0.5.0`, `@texuli/document`
 and `@texuli/pages` in `0.7.0`, and `@texuli/forms`, `@texuli/canvas` and
-`@texuli/sheets` are first published in `0.8.0`, the release in which all
-25 packable packages move together. A pre-flight step refuses the run,
+`@texuli/sheets` in `0.8.0`, and `@texuli/mcp` is first published in
+`0.9.0`, the release in which all 26 packable packages move together. A pre-flight step refuses the run,
 before the first `npm publish`, when any listed package is still `0.0.0`.
 The publish loop
 skips versions npm already has, so a package changed since its published
@@ -194,9 +195,8 @@ project settings, owner-provisioned; analytics stays off without them. Every pus
 social images, sitemap and robots.txt are generated at build time against
 `https://texuli.com` (the `site` in `apps/website/astro.config.mjs`).
 
-The remote MCP endpoint (`functions/mcp.ts`, PLAN_011 T-mcp-remote) is in
-the repository for release 0.9.0 and deploys with the site once that
-release merges to `main`; it is not live before then. It needs no
+The remote MCP endpoint (`functions/mcp.ts`, PLAN_011 T-mcp-remote) deploys
+with the site from `main` and is live from release 0.9.0. It needs no
 environment variable, binding or secret: Pages bundles it with the other
 Functions, it answers `/mcp`, and the middleware answers `/.well-known/mcp`
 with the same server. It sets its own CSP, `nosniff`, `no-store`,

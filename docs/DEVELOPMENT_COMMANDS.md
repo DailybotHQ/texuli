@@ -123,8 +123,8 @@ budget rows (2026-10-26).
 ## Not available
 
 There are no release, publish or deploy commands. Packages are
-`private: true`; npm carries the 25 packable packages as the CI-published
-`0.8.0` release (dist-tags `latest` and `next`; pre-1.0, not stable) — publishing runs
+`private: true`; npm carries the 26 packable packages as the CI-published
+`0.9.0` release (dist-tags `latest` and `next`; pre-1.0, not stable) — publishing runs
 through the publish workflow (see [CI](CI.md)). See [RELEASE](RELEASE.md)
 for the version and owner-GO policy. texuli.com deploys from `main`
 (CI in [CI](CI.md)); pushing and adding a remote stay gated on the

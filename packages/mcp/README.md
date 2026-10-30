@@ -7,11 +7,11 @@ connected to it can search the component catalog, read manifests and worked
 examples, validate blueprint drafts, search and preview themes with their
 WCAG AA report, and run the deck and document commands.
 
-> **Status: in development, not on npm yet.** `@texuli/mcp` is new in
-> `0.9.0`, which is in development on the `release/0.9.0` branch. It is
-> first published when `0.9.0` is released; until then the commands below
-> work from a checkout only (see [From a checkout](#from-a-checkout)). Under
-> 0.x a new minor may break, so pin the exact version once it is out.
+> **Status: in development (pre-1.0).** `@texuli/mcp` is published on npm
+> as `0.9.0`, with provenance (its first release). Under 0.x a new minor
+> (`0.10.0`) may contain breaking changes, so pin the exact version or use
+> `^0.9.0`, which accepts only 0.9.x
+> (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 ## Connect your agent
 
@@ -72,11 +72,10 @@ hosts that cannot start `npx` directly take `"command": "cmd"` with
 **Already using `@texuli/tools`?** `npx texuli mcp` runs the same server
 from that package; no second install is needed.
 
-**Remote (live once deployed):** a read-only remote endpoint at
-`https://texuli.com/mcp` (stateless Streamable HTTP, `edge` operations
-only; no key) is in the repository (`functions/mcp.ts`) and goes live when
-release 0.9.0 deploys from `main`. Until then it answers with the site's
-404, so do not configure it yet. After each deploy, the CI job
+**Remote:** a read-only remote endpoint at `https://texuli.com/mcp`
+(stateless Streamable HTTP, the `edge` operations plus the `site` tools
+that read texuli.com; no key), served by `functions/mcp.ts` with the site.
+Hosts that take a URL connect to it directly. After each deploy, the CI job
 `mcp-remote-smoke` checks that its `tools/list` matches the registry. The
 server card at `https://texuli.com/.well-known/mcp/server-card.json` lists
 both transports and every tool.
@@ -131,7 +130,8 @@ To embed the protocol in another transport, use `createMcpHandler` from
 
 ## From a checkout
 
-Until `0.9.0` is on npm, run the server from a Texuli checkout:
+To run the server from a Texuli checkout (for example, to try a change
+before it is released):
 
 ```bash
 pnpm exec tsx packages/mcp/src/bin.ts --help

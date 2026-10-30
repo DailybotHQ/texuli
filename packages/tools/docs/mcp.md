@@ -5,12 +5,11 @@
 [ADR-018](../../../docs/DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions),
 [ADR-019](../../../docs/DECISIONS.md#adr-019-the-texulimcp-package-and-its-binary)
 
-> **Status: in development, not released.** The protocol layer, the
+> **Status: released in `0.9.0` (pre-1.0).** The protocol layer, the
 > `@texuli/tools/mcp` export, `texuli mcp` and the `@texuli/mcp` package
-> are new in `0.9.0`, which is in development and not on npm yet. The
-> remote endpoint for texuli.com is in the repository (see
-> [The remote door](#the-remote-door)) but is not deployed until release
-> 0.9.0 merges to `main`.
+> are new in `0.9.0`, and the remote endpoint is live at
+> `https://texuli.com/mcp` (see [The remote door](#the-remote-door)). The
+> seven 0.8 tool names stay as deprecated aliases until `0.10.0`.
 
 ## The local door
 
@@ -24,8 +23,8 @@ Two commands start the same stdio server (`runMcpCli`): every `edge` and
 
 Host setup (Claude Code, Cursor, VS Code, Windsurf, Codex, generic stdio
 hosts) is in the [`@texuli/mcp` README](../../mcp/README.md). From a
-checkout, `pnpm exec tsx packages/mcp/src/bin.ts` runs it before `0.9.0` is
-on npm.
+checkout, `pnpm exec tsx packages/mcp/src/bin.ts` runs the workspace
+source.
 
 - **Flags:** `--help` and `--version` print to stdout and exit; any other
   argument is refused on stderr with exit code 1, without starting the
@@ -237,8 +236,7 @@ URIs at 2,048 and cursors at 512.
 over stateless Streamable HTTP at `https://texuli.com/mcp`, and the site
 middleware answers `/.well-known/mcp` with the same server
 ([ADR-018](../../../docs/DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions)).
-**It is not deployed yet:** it goes live when release 0.9.0 merges to
-`main`. Until then, the URL below answers with the site's 404.
+It is live from release 0.9.0 and deploys with the site from `main`.
 
 ```text
 POST https://texuli.com/mcp

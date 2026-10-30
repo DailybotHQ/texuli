@@ -88,9 +88,9 @@ describe('whats-new hub', () => {
       // PLAN_011 T-site-090: the version in development is on the hub, marked so.
       expect(byId[line.development]?.status).toMatch(/^In development/);
     }
-    // The manifests carry a version of the release line, the three packages
-    // 0.8.0 publishes for the first time included.
-    for (const name of ['forms', 'canvas', 'sheets', 'document']) {
+    // The manifests carry a version of the release line, the packages first
+    // published in 0.7.0 to 0.9.0 included.
+    for (const name of ['forms', 'canvas', 'sheets', 'document', 'mcp']) {
       const pkg = JSON.parse(readFileSync(resolve(`packages/${name}/package.json`), 'utf8')) as {
         version: string;
       };

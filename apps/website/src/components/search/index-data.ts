@@ -211,10 +211,10 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-whats-new',
     title: 'What’s new',
     description:
-      'Every new package and capability of 0.6.0, 0.7.0 and 0.8.0, with a demo or preview each and honest release status.',
+      'Every new package and capability of 0.6.0, 0.7.0, 0.8.0 and 0.9.0, with a demo or preview each and honest release status.',
     href: '/whats-new/',
     kind: 'page',
-    keywords: ['new', 'release', 'features', 'changelog', '0.8.0', 'roadmap'],
+    keywords: ['new', 'release', 'features', 'changelog', '0.9.0', '0.8.0', 'roadmap'],
   },
   {
     id: 'page-live-generation',
