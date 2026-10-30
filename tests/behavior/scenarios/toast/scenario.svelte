@@ -3,6 +3,10 @@ import { createToastManager, Toast, type ToastRecord } from '@texuli/primitives/
 import { behaviorEvent } from '../../harness/client/events.ts';
 
 const manager = createToastManager({ duration: 0 });
+// Contained regions (G99): one frame left static, one declared positioned.
+const framedManager = createToastManager({ duration: 0 });
+let staticFrame = $state<HTMLElement | null>(null);
+let positionedFrame = $state<HTMLElement | null>(null);
 let toasts = $state<readonly ToastRecord[]>(manager.list());
 
 $effect(() =>
@@ -41,4 +45,13 @@ function publish(): void {
       {/each}
     </ol>
   </Toast.Viewport>
+</Toast.Provider>
+
+<div data-testid="static-frame" bind:this={staticFrame}></div>
+<div data-testid="positioned-frame" style="position: absolute" bind:this={positionedFrame}></div>
+<Toast.Provider manager={framedManager} label="Framed alerts" hotkey="F7">
+  <Toast.Viewport mode="contained" container={staticFrame} data-testid="static-region"></Toast.Viewport>
+</Toast.Provider>
+<Toast.Provider manager={framedManager} label="Pinned alerts" hotkey="F8">
+  <Toast.Viewport mode="contained" container={positionedFrame} positioned data-testid="positioned-region"></Toast.Viewport>
 </Toast.Provider>
