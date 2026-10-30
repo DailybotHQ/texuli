@@ -120,6 +120,13 @@ recipes), so you can extend components without `clsx` or `tailwind-merge`.
 instant under reduced motion and at level `none`
 ([ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)).
 
+`texuli/defaults` (in the `0.9.0` workspace, not on npm yet) holds
+`setDesignDefaults`: default `variant` and `size` props from a closed,
+typed vocabulary, used only when a prop is omitted. Every component also
+reads its component tokens (`--tx-button-radius`, `--tx-card-padding-inline`…)
+and the tier-3 hooks (`data-tx-button-style` and friends)
+([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/design-system.md)).
+
 ## New in 0.8.0
 
 Ships in `0.8.0`; the `0.7.0` release predates it: component labels resolve through the
