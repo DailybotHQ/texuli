@@ -12,6 +12,7 @@ import { catalogSearch, catalogValidate, componentGet, exampleSearch } from './c
 import { deckRun } from './deck.ts';
 import { documentExport, documentRun } from './document.ts';
 import { createOperationRegistry } from './registry.ts';
+import { sitePages, siteRead, siteSearch } from './site.ts';
 import { themeGet, themePreview, themeSearch } from './themes.ts';
 import type { Operation } from './types.ts';
 
@@ -33,6 +34,17 @@ export {
   validateJson,
 } from './schema.ts';
 export {
+  normalizeSitePath,
+  rankSitePages,
+  SITE_MANIFEST_PATH,
+  SITE_READ_MAX_BYTES,
+  type SitePage,
+  type SitePathResult,
+  type SiteSearchHit,
+  siteIndexPages,
+  siteSearchTerms,
+} from './site.ts';
+export {
   buildThemePreview,
   PREVIEW_TOKENS,
   searchThemes,
@@ -48,6 +60,7 @@ export {
   type InvokeFailure,
   type InvokeOptions,
   type InvokeResult,
+  LOCAL_RUNTIMES,
   OPERATION_ERROR_CODES,
   type Operation,
   type OperationAlias,
@@ -58,6 +71,9 @@ export {
   type OperationExample,
   type OperationLimits,
   type OperationRuntime,
+  REMOTE_RUNTIMES,
+  type SiteAssets,
+  type SiteContext,
 } from './types.ts';
 export { TOOLS_VERSION } from './version.ts';
 
@@ -76,6 +92,9 @@ export const TEXULI_OPERATIONS: readonly Operation[] = Object.freeze([
   deckRun,
   documentRun,
   documentExport,
+  sitePages,
+  siteRead,
+  siteSearch,
 ]);
 
 /** The shared registry every door uses. */

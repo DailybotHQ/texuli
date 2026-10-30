@@ -2,8 +2,11 @@
  * The remote MCP server (T-mcp-remote, ADR-018): the isolate's handler,
  * limiter and counters, shared by `functions/mcp.ts` (`/mcp`) and the
  * middleware route for `/.well-known/mcp`, so both URLs are the same
- * server. Only `edge` operations are served: `node` operations (file
+ * server. `edge` and `site` operations are served: `node` operations (file
  * writes, PDF and DOCX conversion) are not listed and answer
+ * `runtime-unavailable`. The `site` operations (`site.pages`, `site.read`,
+ * `site.search`, T-ar-site-mcp) read the built site through this request's
+ * `env.ASSETS` binding, never the network; without the binding they answer
  * `runtime-unavailable`.
  *
  * The handler is imported from the `@texuli/tools` source because the
@@ -12,9 +15,9 @@
  * not apply here, and the website's own sources stay free of this import.
  */
 import { buildBotEventRequest, buildMcpEventBody } from '../../apps/website/src/lib/bot-events.ts';
-import { createMcpHandler } from '../../packages/tools/src/mcp/handler.ts';
+import { createMcpHandler, type McpHandler } from '../../packages/tools/src/mcp/handler.ts';
 import { MCP_SUPPORTED_PROTOCOL_VERSIONS } from '../../packages/tools/src/mcp/protocol.ts';
-import { texuliOps } from '../../packages/tools/src/ops/index.ts';
+import { REMOTE_RUNTIMES, type SiteAssets, texuliOps } from '../../packages/tools/src/ops/index.ts';
 import {
   createTokenBucket,
   handleMcpHttp,
@@ -25,20 +28,21 @@ import {
 /** The pieces of the Pages function context the endpoint touches. */
 export interface McpContext {
   request: Request;
-  env: { PUBLIC_UMAMI_WEBSITE_ID?: string; ASSETS?: unknown };
+  env: { PUBLIC_UMAMI_WEBSITE_ID?: string; ASSETS?: SiteAssets };
   waitUntil?: (promise: Promise<unknown>) => void;
 }
 
-const RUNTIMES = ['edge'] as const;
+const RUNTIMES = REMOTE_RUNTIMES;
 
-/** Every tool name the edge handler serves: operations, then their 0.8 aliases. */
+/** Every tool name the remote handler serves: operations, then their 0.8 aliases. */
 const servedNames = new Set(texuliOps.list({ runtimes: RUNTIMES }).map((op) => op.name));
 for (const alias of texuliOps.aliases())
   if (alias.targets.every((target) => servedNames.has(target))) servedNames.add(alias.name);
 
 /** One handler and one bucket per isolate; nothing else lives between requests. */
+const handler: McpHandler = createMcpHandler({ mode: 'stateless', runtimes: RUNTIMES });
 const deps: McpEndpointDeps = {
-  handler: createMcpHandler({ mode: 'stateless', runtimes: RUNTIMES }),
+  handler,
   supportedVersions: MCP_SUPPORTED_PROTOCOL_VERSIONS,
   limiter: createTokenBucket(MCP_RATE_POLICY),
   knownOperations: servedNames,
@@ -51,7 +55,12 @@ const deps: McpEndpointDeps = {
  * provisioned; otherwise nothing leaves the Function.
  */
 export async function serveMcp(context: McpContext): Promise<Response> {
-  const { response, counter } = await handleMcpHttp(context.request, deps);
+  const assets = context.env.ASSETS;
+  const site = assets ? { assets, origin: new URL(context.request.url).origin } : undefined;
+  const { response, counter } = await handleMcpHttp(
+    context.request,
+    site ? { ...deps, handler: (message, request) => handler(message, { ...request, site }) } : deps
+  );
   if (counter && context.waitUntil) {
     const url = new URL(context.request.url);
     const body = buildMcpEventBody(counter, context.env.PUBLIC_UMAMI_WEBSITE_ID, url.hostname);

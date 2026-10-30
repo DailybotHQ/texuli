@@ -4,9 +4,30 @@ import type { JsonSchema, SchemaIssue } from './schema.ts';
  * Where an operation can run:
  * - `edge`: pure compute, runs anywhere (local MCP, CLI, the remote endpoint);
  * - `node`: needs Node (the file system, the PDF and DOCX writers, local writes);
- * - `site`: remote only, reads the built site (none yet; ADR-018).
+ * - `site`: remote only, reads the built texuli.com through the door's
+ *   assets binding (`site.pages`, `site.read`, `site.search`; ADR-018).
  */
 export type OperationRuntime = 'edge' | 'node' | 'site';
+
+/** The runtime classes the local doors (stdio MCP, CLI) serve. */
+export const LOCAL_RUNTIMES: readonly OperationRuntime[] = Object.freeze(['edge', 'node']);
+/** The runtime classes the remote door (`https://texuli.com/mcp`) serves. */
+export const REMOTE_RUNTIMES: readonly OperationRuntime[] = Object.freeze(['edge', 'site']);
+
+/**
+ * An `env.ASSETS`-shaped reader of the built site: one request in, the
+ * static file (or a 404) out. Never a network fetch.
+ */
+export interface SiteAssets {
+  fetch(request: Request): Promise<Response>;
+}
+
+/** What a door that serves `site` operations passes them. */
+export interface SiteContext {
+  assets: SiteAssets;
+  /** The origin page URLs are reported under (default `https://texuli.com`). */
+  origin?: string;
+}
 
 /** Behavior hints every door publishes (MCP maps them to `*Hint` annotations). */
 export interface OperationAnnotations {
@@ -40,6 +61,8 @@ export interface OperationExample {
 export interface OperationContext {
   /** Aborted when the time budget runs out. */
   signal: AbortSignal;
+  /** The built site, when the door serves `site` operations. */
+  site?: SiteContext;
 }
 
 /** One agent-facing capability, declared once and served by every door. */
@@ -110,4 +133,6 @@ export type InvokeResult = { ok: true; operation: string; output: unknown } | In
 export interface InvokeOptions {
   /** The runtime classes the calling door serves (default: all). */
   runtimes?: readonly OperationRuntime[];
+  /** The built site `site` operations read (the remote door passes `env.ASSETS`). */
+  site?: SiteContext;
 }

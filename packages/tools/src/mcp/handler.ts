@@ -12,10 +12,12 @@
  */
 import {
   type InvokeFailure,
+  LOCAL_RUNTIMES,
   type Operation,
   type OperationAnnotations,
   type OperationRegistry,
   type OperationRuntime,
+  type SiteContext,
   TOOLS_VERSION,
   texuliOps,
 } from '../ops/index.ts';
@@ -47,7 +49,7 @@ export interface McpHandlerOptions {
   registry?: OperationRegistry;
   /** `stateful` (stdio, the default) keeps the initialization gate; `stateless` (HTTP) never requires it. */
   mode?: McpMode;
-  /** The runtime classes this door serves (default `edge` and `node`; a remote door passes `['edge']`). */
+  /** The runtime classes this door serves (default `edge` and `node`; the remote door passes `['edge', 'site']`). */
   runtimes?: readonly OperationRuntime[];
   capabilities?: McpCapabilityOptions;
   /** Resource sources (default: the Texuli resources). An empty list advertises no resources. */
@@ -62,6 +64,8 @@ export interface McpHandlerOptions {
 export interface McpRequestContext {
   /** Stateless only: the request's protocol version (the HTTP `MCP-Protocol-Version` header). */
   protocolVersion?: string;
+  /** The built site `site` operations read (the remote door passes its `env.ASSETS`). */
+  site?: SiteContext;
 }
 
 export type McpHandler = (
@@ -69,7 +73,6 @@ export type McpHandler = (
   context?: McpRequestContext
 ) => Promise<JsonRpcResponse | undefined>;
 
-const LOCAL_RUNTIMES: readonly OperationRuntime[] = ['edge', 'node'];
 const DEFAULT_PAGE_SIZE = 100;
 const MAX_COMPLETIONS = 100;
 const MAX_URI_LENGTH = 2048;
@@ -78,7 +81,7 @@ const MAX_CURSOR_LENGTH = 512;
 const DEFAULT_ARGUMENT_LENGTH = 10_000;
 
 const INSTRUCTIONS =
-  'Texuli is a Svelte 5 component library with a closed agent catalog. Tools are group.verb operations: search the component catalog (catalog.search), read manifests (component.get) and worked examples (example.search), list content block types and read the shape and examples of each (block.list, block.schema), validate blueprint drafts (blueprint.validate) and catalog manifests, search, read and preview themes with their WCAG AA report, and run deck and document commands. Every tool states its limits and returns structured JSON; failures are isError results with a stable code (invalid-input, input-too-large, not-found, runtime-unavailable, timeout …). Resources: texuli://catalog, texuli://llms/full, texuli://component/{id}, texuli://docs/{slug}, texuli://theme/{id} and texuli://schema/{name}. Prompts build-ui, theme-blueprint and convert-deck walk through the main jobs. The 0.8 tool names (catalog, component, validate, example, theme, deck, document) are deprecated aliases. Read-only: nothing writes files or reaches the network.';
+  'Texuli is a Svelte 5 component library with a closed agent catalog. Tools are group.verb operations: search the component catalog (catalog.search), read manifests (component.get) and worked examples (example.search), list content block types and read the shape and examples of each (block.list, block.schema), validate blueprint drafts (blueprint.validate) and catalog manifests, search, read and preview themes with their WCAG AA report, and run deck and document commands. Every tool states its limits and returns structured JSON; failures are isError results with a stable code (invalid-input, input-too-large, not-found, runtime-unavailable, timeout …). Resources: texuli://catalog, texuli://llms/full, texuli://component/{id}, texuli://docs/{slug}, texuli://theme/{id} and texuli://schema/{name}. Prompts build-ui, theme-blueprint and convert-deck walk through the main jobs. The remote endpoint also lists site.pages, site.read and site.search, which list, read (as Markdown) and search the pages of texuli.com. The 0.8 tool names (catalog, component, validate, example, theme, deck, document) are deprecated aliases. Read-only: nothing writes files or reaches the network.';
 
 type Failure = { code: number; message: string; data?: unknown };
 class RpcFailure extends Error {
@@ -244,7 +247,11 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
     };
   }
 
-  async function callTool(params: unknown, version: string): Promise<JsonObject> {
+  async function callTool(
+    params: unknown,
+    version: string,
+    site: SiteContext | undefined
+  ): Promise<JsonObject> {
     if (!isObject(params) || typeof params.name !== 'string')
       throw invalidParams('tools/call requires params.name, a tool name from tools/list.');
     const name = params.name;
@@ -252,7 +259,10 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
       throw invalidParams(
         `Unknown tool: ${name.slice(0, MAX_NAME_LENGTH)}. List tools with tools/list.`
       );
-    const outcome = await registry.invoke(name, params.arguments ?? {}, { runtimes });
+    const outcome = await registry.invoke(name, params.arguments ?? {}, {
+      runtimes,
+      ...(site ? { site } : {}),
+    });
     if (outcome.ok) {
       return {
         content: [{ type: 'text', text: JSON.stringify(outcome.output) }],
@@ -363,7 +373,12 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
     throw invalidParams('params.ref.type must be ref/prompt or ref/resource.');
   }
 
-  async function dispatch(method: string, params: unknown, version: string): Promise<JsonObject> {
+  async function dispatch(
+    method: string,
+    params: unknown,
+    version: string,
+    site: SiteContext | undefined
+  ): Promise<JsonObject> {
     if (method === 'tools/list')
       return page(
         tools.map((tool) => shape(tool, version)),
@@ -372,7 +387,7 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
         'tools',
         pageSize
       );
-    if (method === 'tools/call') return callTool(params, version);
+    if (method === 'tools/call') return callTool(params, version, site);
     if (resourcesOn) {
       if (method === 'resources/list')
         return page(
@@ -496,7 +511,7 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
     }
 
     try {
-      return reply(id, await dispatch(message.method, message.params, version));
+      return reply(id, await dispatch(message.method, message.params, version, context.site));
     } catch (error) {
       if (error instanceof RpcFailure) return fail(id, error.failure);
       return fail(id, { code: MCP_ERROR_CODES.internalError, message: 'Internal error' });

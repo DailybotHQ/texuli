@@ -21,8 +21,10 @@ import {
   parseTwinHeader,
   renderTwin,
   TWIN_EXEMPTIONS,
+  TWIN_INDEX_MAX_HEADINGS,
   twinExemption,
   twinHeader,
+  twinIndexEntry,
   twinPathFor,
 } from '../src/components/docs/twins.ts';
 
@@ -274,5 +276,35 @@ describe('"For agents" notes', () => {
     expect(preview).toContain('(/examples/blocks-code.md)');
     expect(agentNoteMarkdown('/guides/theming/', EDGE_OPS, ORIGIN)).toBeUndefined();
     expect(() => agentNoteMarkdown('/builder/', [], ORIGIN)).toThrow(/unknown operation/);
+  });
+});
+
+describe('the twin manifest pages index (T-ar-site-mcp)', () => {
+  it('lists title, description and plain h2/h3 headings outside code fences', () => {
+    const markdown = renderTwin({
+      route: '/guides/theming/',
+      html: '<main><h1>Theming</h1><h2>CSS <a href="/x/">layers</a></h2><p>Text.</p><pre><code>## not a heading</code></pre><h3>Dark <code>mode</code></h3><h4>Too deep</h4></main>',
+      facts: { title: 'Theming · Texuli', description: '  Pick a\n theme. ', language: 'en' },
+      origin: ORIGIN,
+      lastUpdated: '2026-10-30',
+    });
+    expect(
+      twinIndexEntry('/guides/theming/', '/guides/theming.md', markdown, '  Pick a\n theme. ')
+    ).toEqual({
+      path: '/guides/theming/',
+      twin: '/guides/theming.md',
+      title: 'Theming',
+      description: 'Pick a theme.',
+      headings: ['CSS layers', 'Dark mode'],
+    });
+    const fenced = '# T\n\n```md\n## inside\n```\n\n## outside\n';
+    expect(twinIndexEntry('/t/', '/t.md', fenced, '').headings).toEqual(['outside']);
+  });
+
+  it('caps the headings of one page', () => {
+    const many = `# Many\n\n${Array.from({ length: 100 }, (_, i) => `## H${i}`).join('\n\n')}\n`;
+    const entry = twinIndexEntry('/many/', '/many.md', many, '');
+    expect(entry.headings).toHaveLength(TWIN_INDEX_MAX_HEADINGS);
+    expect(entry.title).toBe('Many');
   });
 });

@@ -41,10 +41,16 @@ describe('texuli help', () => {
     const text = [
       routerHelp(),
       ...groups.map((group) => groupHelp(group)),
-      ...texuliOps.list().map((operation) => operationHelp(operation.name)),
+      ...routerOperations().map(({ operation }) => operationHelp(operation.name)),
     ].join('\n----\n');
     await expect(text).toMatchFileSnapshot('./__snapshots__/texuli-help.txt');
-    for (const operation of texuliOps.list()) {
+    // The CLI is a local door: every edge and node operation, never a site one.
+    expect(routerOperations().map(({ operation }) => operation.name)).toEqual(
+      texuliOps.list({ runtimes: ['edge', 'node'] }).map((operation) => operation.name)
+    );
+    expect(routerHelp()).not.toMatch(/\bsite\b/u);
+    expect(parseRouterArgs(['site', 'read'])).toMatchObject({ kind: 'error' });
+    for (const { operation } of routerOperations()) {
       const [group, verb] = operation.name.split('.') as [string, string];
       expect(routerHelp(), operation.name).toContain(`  ${group} ${verb} `);
       expect(groupHelp(group)).toContain(`[${operation.name}]`);

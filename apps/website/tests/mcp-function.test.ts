@@ -23,11 +23,13 @@ import {
 } from '../../../functions/_lib/mcp-endpoint.ts';
 import { onRequest as middleware } from '../../../functions/_middleware.ts';
 import { onRequest } from '../../../functions/mcp.ts';
+import { fakeSiteAssets } from '../../../packages/tools/tests/fixtures/site-assets.ts';
 import { buildMcpEventBody, mcpDurationBucket } from '../src/lib/bot-events.ts';
 
 const ORIGIN = 'https://texuli.com';
 const EDGE_NAMES = texuliOps.list({ runtimes: ['edge'] }).map((operation) => operation.name);
 const NODE_NAMES = texuliOps.list({ runtimes: ['node'] }).map((operation) => operation.name);
+const SITE_NAMES = texuliOps.list({ runtimes: ['site'] }).map((operation) => operation.name);
 
 // Every request gets its own client IP unless a test pins one, so the
 // per-isolate bucket (shared module state) never couples two tests.
@@ -95,8 +97,8 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('the protocol through POST /mcp (edge operations only)', () => {
-  it('answers initialize with the negotiated version and tools/list with edge operations only', async () => {
+describe('the protocol through POST /mcp (edge and site operations)', () => {
+  it('answers initialize with the negotiated version and tools/list with edge and site operations, never node', async () => {
     const init = await rpc({
       jsonrpc: '2.0',
       id: 1,
@@ -123,6 +125,8 @@ describe('the protocol through POST /mcp (edge operations only)', () => {
       (tool: { name: string }) => tool.name
     );
     for (const name of EDGE_NAMES) expect(names, name).toContain(name);
+    expect(SITE_NAMES).toEqual(['site.pages', 'site.read', 'site.search']);
+    for (const name of SITE_NAMES) expect(names, name).toContain(name);
     expect(NODE_NAMES.length).toBeGreaterThan(0);
     for (const name of NODE_NAMES) expect(names, name).not.toContain(name);
   });
@@ -219,6 +223,92 @@ describe('the protocol through POST /mcp (edge operations only)', () => {
     );
     expect(response.status).toBe(400);
     expect((await response.json()).error.code).toBe(-32600);
+  });
+});
+
+describe('site operations through env.ASSETS (T-ar-site-mcp)', () => {
+  // biome-ignore lint/suspicious/noExplicitAny: tool results are checked JSON.
+  type Json = any;
+  async function siteCall(
+    name: string,
+    args: unknown,
+    env: { ASSETS?: ReturnType<typeof fakeSiteAssets> },
+    url = `${ORIGIN}/mcp`
+  ): Promise<Json> {
+    const response = await onRequest({
+      request: mcpRequest({
+        url,
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/call',
+          params: { name, arguments: args },
+        }),
+        headers: { 'mcp-protocol-version': '2025-11-25' },
+      }),
+      env,
+    });
+    expect(response.status).toBe(200);
+    expectSecurityHeaders(response, name);
+    return (await response.json()).result;
+  }
+
+  it('lists, searches and reads the twins through the binding, never the network', async () => {
+    const fetchSpy = vi.fn(async () => new Response('network', { status: 500 }));
+    vi.stubGlobal('fetch', fetchSpy);
+    const assets = fakeSiteAssets();
+    const pages = await siteCall('site.pages', { prefix: '/guides/' }, { ASSETS: assets });
+    expect(pages.structuredContent.pages.map((page: Json) => page.path)).toEqual([
+      '/guides/',
+      '/guides/dark-mode/',
+      '/guides/theming/',
+    ]);
+    const search = await siteCall(
+      'site.search',
+      { query: 'dark mode', limit: 1 },
+      { ASSETS: assets }
+    );
+    expect(search.structuredContent.results[0]).toMatchObject({
+      path: '/guides/dark-mode/',
+      url: 'https://texuli.com/guides/dark-mode/',
+    });
+    const read = await siteCall('site.read', { path: '/guides/theming.md' }, { ASSETS: assets });
+    expect(read.isError).toBeUndefined();
+    expect(read.structuredContent.markdown).toContain('## Dark mode');
+    expect(JSON.parse(read.content[0].text)).toEqual(read.structuredContent);
+    expect(assets.requested).toEqual(['/md-manifest.json', '/guides/theming.md']);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('names URLs under the request origin (a preview host)', async () => {
+    const read = await siteCall(
+      'site.read',
+      { path: '/' },
+      { ASSETS: fakeSiteAssets() },
+      'https://abc123.texuli.pages.dev/mcp'
+    );
+    expect(read.structuredContent.url).toBe('https://abc123.texuli.pages.dev/');
+  });
+
+  it('refuses traversal and unknown paths with stable codes, fetching only the manifest', async () => {
+    const assets = fakeSiteAssets();
+    for (const [path, code] of [
+      ['/../_headers', 'invalid-input'],
+      ['/guides/%2e%2e/_headers', 'invalid-input'],
+      ['https://evil.example/', 'invalid-input'],
+      ['/_headers', 'not-found'],
+    ]) {
+      const result = await siteCall('site.read', { path }, { ASSETS: assets });
+      expect(result.isError, path).toBe(true);
+      expect(JSON.parse(result.content[0].text).code, path).toBe(code);
+    }
+    expect(new Set(assets.requested)).toEqual(new Set(['/md-manifest.json']));
+  });
+
+  it('answers runtime-unavailable without the binding', async () => {
+    const result = await siteCall('site.search', { query: 'card' }, {});
+    expect(result.isError).toBe(true);
+    expect(JSON.parse(result.content[0].text).code).toBe('runtime-unavailable');
   });
 });
 

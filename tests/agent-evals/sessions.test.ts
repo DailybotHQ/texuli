@@ -38,6 +38,14 @@ describe('scripted agent sessions on the stdio and remote doors', () => {
       it.skip(`${session.name} (skipped: ${session.skip})`, () => {});
       continue;
     }
+    if (session.doors && !session.doors.includes('stdio')) {
+      // A site job: only the remote door serves it (the stdio refusal is checked below).
+      it(session.name, async () => {
+        const remote = await runSession(session, 'remote');
+        expect(remote.filter((item) => item.method === 'tools/call').length).toBeGreaterThan(0);
+      });
+      continue;
+    }
     it(session.name, async () => {
       const stdio = await runSession(session, 'stdio');
       const remote = await runSession(session, 'remote');
@@ -56,10 +64,37 @@ describe('scripted agent sessions on the stdio and remote doors', () => {
 });
 
 describe('what differs between the doors, and only that', () => {
-  it('serves every runtime locally and only edge operations remotely', async () => {
-    // "Every runtime": no operation is site-only yet, so edge + node is all of them.
-    expect(texuliOps.list({ runtimes: ['site'] })).toEqual([]);
-    expect(texuliOps.list({ runtimes: STDIO_RUNTIMES })).toEqual(texuliOps.list());
+  it('serves edge and node operations locally, edge and site operations remotely', async () => {
+    const siteOnly = texuliOps.list({ runtimes: ['site'] }).map((operation) => operation.name);
+    expect(siteOnly).toEqual(['site.pages', 'site.read', 'site.search']);
+    expect(texuliOps.list({ runtimes: STDIO_RUNTIMES })).toEqual(
+      texuliOps.list().filter((operation) => operation.runtime !== 'site')
+    );
+    // Locally a site operation is refused with a stable code; it is not listed either.
+    await runSession(
+      {
+        name: 'site operation (stdio)',
+        steps: [
+          {
+            label: 'tools',
+            method: 'tools/list',
+            expect: (result) =>
+              expect(result.tools.map((tool: Json) => tool.name)).not.toContain('site.read'),
+          },
+          {
+            label: 'read',
+            method: 'tools/call',
+            params: { name: 'site.read', arguments: { path: '/' } },
+            toolError(failure) {
+              expect(failure.code).toBe('runtime-unavailable');
+              expect(failure.error).toMatch(/needs the site runtime/u);
+            },
+          },
+        ],
+        final() {},
+      },
+      'stdio'
+    );
     const nodeOnly = texuliOps.list({ runtimes: ['node'] }).map((operation) => operation.name);
     expect(nodeOnly).toEqual(['document.export']);
 
@@ -101,7 +136,7 @@ describe('what differs between the doors, and only that', () => {
       },
       'remote'
     );
-    expect(REMOTE_RUNTIMES).toEqual(['edge']);
+    expect(REMOTE_RUNTIMES).toEqual(['edge', 'site']);
     expect(isEdgeTool('document')).toBe(false);
     expect(isEdgeTool('theme')).toBe(true);
   });
