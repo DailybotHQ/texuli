@@ -51,12 +51,11 @@ const attach: Attachment<HTMLElement> = (node) => {
 </button>
 
 <style>
-  /* The handle target reads the system target size (token contract v2); the
-     2px focus and drop outlines stay currentColor geometry, since a headless
-     primitive carries no theme. */
+  /* A headless primitive cannot assume @texuli/tokens/base.css, so the 24px
+     target (WCAG 2.2 minimum) and the 2px currentColor outlines stay literal. */
   .tx-sortable__handle {
-    min-inline-size: var(--tx-size-target-min, 24px);
-    min-block-size: var(--tx-size-target-min, 24px);
+    min-inline-size: 24px;
+    min-block-size: 24px;
     touch-action: none;
     cursor: grab;
   }
