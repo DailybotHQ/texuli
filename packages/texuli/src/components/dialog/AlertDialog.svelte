@@ -149,13 +149,14 @@ const confirmClass = $derived(
   buttonVariants({ variant: destructive ? 'destructive' : 'default', size: 'md' })
 );
 
+/**
+ * The primitive root owns `open` through `bind:open` and has already written
+ * the new value when it calls this, so this only reports the change: one
+ * `onOpenChange` per open-state change, bound or not (G87). A pending confirm
+ * cannot get here closed: the dismiss veto and the inert Cancel hold it open.
+ */
 function setOpen(next: boolean): void {
-  if (!next) {
-    if (pending) return;
-    error = null;
-  }
-  if (open === next) return;
-  open = next;
+  if (!next) error = null;
   onOpenChange?.(next);
 }
 

@@ -7,6 +7,7 @@ import { createToastStore, resetToastStore } from '../src/components/toast/toast
 import AlertDialogHarness from './fixtures/AlertDialogHarness.svelte';
 import CommandHarness from './fixtures/CommandHarness.svelte';
 import ContainedOverlayHarness from './fixtures/ContainedOverlayHarness.svelte';
+import DialogOpenChangeHarness from './fixtures/DialogOpenChangeHarness.svelte';
 import HoverCardFixture from './fixtures/HoverCardFixture.svelte';
 import MenusHarness from './fixtures/MenusHarness.svelte';
 import PopoverFixture from './fixtures/PopoverFixture.svelte';
@@ -78,6 +79,49 @@ describe('dialog', () => {
         expect(screen.queryByRole('alertdialog')).toBeNull();
       });
     });
+  });
+});
+
+describe('onOpenChange on an inside close (G87)', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  type Close = 'close' | 'escape' | 'outside' | 'cancel' | 'confirm';
+  const rows: { kind: 'dialog' | 'alert'; close: Close }[] = [
+    { kind: 'dialog', close: 'close' },
+    { kind: 'dialog', close: 'escape' },
+    { kind: 'dialog', close: 'outside' },
+    { kind: 'alert', close: 'escape' },
+    { kind: 'alert', close: 'cancel' },
+    { kind: 'alert', close: 'confirm' },
+  ];
+
+  it('calls onOpenChange(false) exactly once, with open passed once or bound', async () => {
+    for (const bound of [false, true]) {
+      for (const { kind, close } of rows) {
+        const onOpenChange = vi.fn();
+        render(DialogOpenChangeHarness, { props: { kind, bound, onOpenChange } });
+        const role = kind === 'alert' ? 'alertdialog' : 'dialog';
+        const dialog = await screen.findByRole(role);
+        if (close === 'close') {
+          await fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }));
+        } else if (close === 'cancel' || close === 'confirm') {
+          const name = close === 'cancel' ? 'Cancel' : 'Delete';
+          await fireEvent.click(within(dialog).getByRole('button', { name }));
+        } else if (close === 'escape') {
+          await fireEvent.keyDown(dialog, { key: 'Escape' });
+        } else {
+          const outside = screen.getByRole('button', { name: 'Outside', hidden: true });
+          await fireEvent.pointerDown(outside, { pointerType: 'mouse', button: 0 });
+          await fireEvent.pointerUp(outside, { pointerType: 'mouse', button: 0 });
+          await fireEvent.click(outside);
+        }
+        await waitFor(() => expect(screen.queryByRole(role)).toBeNull());
+        expect(onOpenChange.mock.calls, `${kind} ${close} bound=${bound}`).toEqual([[false]]);
+        cleanup();
+      }
+    }
   });
 });
 
