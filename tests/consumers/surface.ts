@@ -82,6 +82,14 @@ export const NON_BROWSER_SUBPATHS: Readonly<
     kind: 'node',
     reason: 'the texuli-llms CLI writes llms.txt bundles (node:fs)',
   },
+  '@texuli/tools/mcp': {
+    kind: 'node',
+    reason: 'the MCP protocol layer re-exports the stdio transport (node:readline)',
+  },
+  '@texuli/mcp': {
+    kind: 'node',
+    reason: 'the local MCP server: serves stdio through @texuli/tools/mcp (node:readline)',
+  },
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
