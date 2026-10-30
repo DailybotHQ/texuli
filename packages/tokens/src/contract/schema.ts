@@ -3,6 +3,7 @@
  * enum lists so agents can validate offline without a schema library at runtime.
  */
 
+import { SYSTEM_TOKEN_NAMES } from '../system/names.ts';
 import {
   BUTTON_HOOK_VALUES,
   CARD_HOOK_VALUES,
@@ -136,6 +137,12 @@ export const THEME_JSON_SCHEMA = {
     interactionStates: { type: 'string', enum: [...INTERACTION_STATES] },
     semanticRoles: { type: 'string', enum: [...SEMANTIC_ROLES] },
     referenceScaleIds: { type: 'string', enum: [...REFERENCE_SCALE_IDS] },
+    /**
+     * Token contract v2 system tokens (ADR-020): the closed vocabulary of
+     * `--tx-*` system names a design system may set. Component tokens are
+     * listed by `getComponentTokensJsonSchema()` in `@texuli/tokens/components`.
+     */
+    systemTokens: { type: 'string', enum: [...SYSTEM_TOKEN_NAMES] },
   },
 } as const;
 

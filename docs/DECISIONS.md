@@ -1575,6 +1575,8 @@ reflect this decision.
   literals on the guard's allowlist with a reason, and the gap is
   documented).
 
+**Amendment (2026-10-30, T-tokens-v2):** the shape scale ships as `--tx-shape-radius-{none,xs,sm,md,lg,xl,full}`, not `--tx-radius-*`. Components already read `--tx-radius-sm/md/lg/xl/full` with conflicting fallbacks (for example `--tx-radius-md` falls back to 0.375rem in some places and 0.5rem in others), so reusing those names would change pixels; adoption maps each component to the shape scale and retires the old reads with an alias entry in `renames.json`. Chart data-viz tokens are available for every library theme through `dataVizVariables(theme, mode)` (`@texuli/tokens/data-viz`); emitting them by default waits for T-adopt-domain, which unifies the components' conflicting chart fallbacks first so the default theme keeps its pixels.
+
 ## ADR-021: The design-system document
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
