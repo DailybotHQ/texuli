@@ -41,7 +41,7 @@ are never reordered visually; DOM order is reading order.
 | `tx-deck-stage__progress-fill` | The progress bar fill (reads `--tx-deck-progress-ratio`) |
 | `tx-deck-stage__toolbar` | The “Presentation controls” group |
 | `tx-deck-chrome-toolbar` | The default toolbar's own class (scoped styles); a chrome row that holds it hides in full screen |
-| `tx-deck-stage__chrome-row` | At the `untrusted` tier: the row that holds the trust badge and the toolbar (or the host `chrome` snippet); hidden in print |
+| `tx-deck-stage__chrome-row` | At the `untrusted` tier: the row that holds the trust badge and the toolbar (or the host `chrome` snippet); it wraps the toolbar onto its own line when less than 16rem would be left beside the badge; hidden in print |
 | `tx-deck-stage__trust` | The **Untrusted content** trust badge (`data-tx-deck-trust="untrusted"`, `trustBadge`), plain text at the inline start of the chrome row |
 | `tx-deck-stage__control` | A presenter-pane or presenter-window button |
 | `tx-deck-stage__fullscreen-note` | The visible status note when fullscreen falls back to filling the window |
