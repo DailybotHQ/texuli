@@ -16,7 +16,10 @@
  * fetches assets and shapes responses. No secrets, no PII, no request
  * bodies are read or logged. `/.well-known/mcp` is routed to the remote MCP
  * server (functions/_lib/mcp-server.ts), and `/mcp` passes straight to its
- * Function (T-mcp-remote).
+ * Function (T-mcp-remote). Every `/api` and `/api/…` request is answered by
+ * the JSON API envelope (functions/_lib/api-endpoint.ts: version and
+ * rate-limit headers, the limit itself, problem+json for every miss) before
+ * any other shaping (PLAN_011 T-ar-api).
  */
 
 import { prefersMarkdown } from '../apps/website/src/components/docs/markdown-negotiation.ts';
@@ -25,6 +28,7 @@ import {
   formatLinkHeader,
 } from '../apps/website/src/components/seo/agent-discovery.ts';
 import { agentProblem, isAgentRequest } from '../apps/website/src/lib/agent-request.ts';
+import { isApiPath } from '../apps/website/src/lib/api-surface.ts';
 import {
   type BotEventName,
   botEventFor,
@@ -42,6 +46,7 @@ import {
   isStrictParserAudit,
   stripDirectivesForStrictParsers,
 } from '../apps/website/src/lib/robots-variants.ts';
+import { createApiLimiter, handleApiRequest } from './_lib/api-endpoint.ts';
 
 /** The pieces of the Pages environment this middleware touches. */
 interface Env {
@@ -77,11 +82,14 @@ function sendBotEvent(context: Context, event: BotEventName, pathname: string): 
 /**
  * The discovery `Link` value of a Markdown twin this middleware builds:
  * `_headers` never applies to a Function response (SECURITY S-2), so the
- * twin carries the same targets as its HTML page, minus `service-desc`
- * (only the build knows whether `/openapi.json` exists; the API catalog
- * names it) and minus the twin itself.
+ * twin carries the same targets as its HTML page, minus the twin itself.
+ * `service-desc` is included: the build always writes `/openapi.json` and
+ * fails when it cannot (src/integrations/api-surface.ts, PLAN_011 T-ar-api).
  */
-const TWIN_LINK = formatLinkHeader(discoveryLinks({ openapi: false }));
+const TWIN_LINK = formatLinkHeader(discoveryLinks({ openapi: true }));
+
+/** The `/api/` token bucket of this isolate (separate from the MCP's). */
+const apiLimiter = createApiLimiter();
 
 /** The well-known alias of the remote MCP endpoint (`/mcp` is functions/mcp.ts). */
 const MCP_WELL_KNOWN = '/.well-known/mcp';
@@ -96,6 +104,17 @@ export const onRequest = async (context: Context): Promise<Response> => {
     return serveMcp(context);
   }
   if (url.pathname === '/mcp') return context.next();
+  if (isApiPath(url.pathname)) {
+    return handleApiRequest(context.request, {
+      limiter: apiLimiter,
+      fetchAsset: (path, headers) => {
+        const asset = new URL(context.request.url);
+        asset.pathname = path;
+        asset.search = '';
+        return context.env.ASSETS.fetch(new Request(asset, { headers }));
+      },
+    });
+  }
   const userAgent = context.request.headers.get('user-agent');
   // Auditing tools see the stripped robots variant (one text file, no other
   // change): the full policy stays the default for every real crawler.

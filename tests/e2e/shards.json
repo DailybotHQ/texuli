@@ -54,7 +54,8 @@
       "site-foundation.spec.ts",
       "site-theme-studio.spec.ts",
       "site-webmcp.spec.ts",
-      "ssr.spec.ts"
+      "ssr.spec.ts",
+      "site-developers.spec.ts"
     ],
     [
       "csp.spec.ts",

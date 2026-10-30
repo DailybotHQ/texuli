@@ -112,6 +112,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       { href: '/live-generation/', label: 'Live generation' },
       { href: '/builder/', label: 'Builder' },
       { href: '/agent-chat/', label: 'Agent chat' },
+      // PLAN_011 T-ar-api: the JSON API, MCP, CLI, limits and versioning.
+      { href: '/developers/', label: 'Developers' },
     ],
   },
   {

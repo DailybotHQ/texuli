@@ -5,7 +5,9 @@ The website also ships Cloudflare Pages Functions under `functions/` (a
 request-shaping middleware and a same-origin analytics proxy, see
 [section 15](#15-website-edge-functions-and-analytics); and the remote MCP
 endpoint, in the repository for release 0.9.0 and not deployed yet, see
-[section 21](#21-remote-mcp-endpoint)). The agent service
+[section 21](#21-remote-mcp-endpoint); the middleware also fronts the
+read-only JSON API under `/api/`, see
+[section 23](#23-public-json-api-api)). The agent service
 in `apps/agent` is a local implementation on a fake replay provider and is
 not deployed ([apps/agent/README.md](../apps/agent/README.md)). There is no
 other Texuli server, accounts database, or secrets store in the repository.
@@ -26,6 +28,7 @@ Related detail: [CSP and Trusted Types](quality/csp.md),
 | Content from a model, agent, or end user | `untrusted` (default) | Strict allowlists (HTTPS/mailto/fragment for links; media/image rules below) |
 | Agent UI trees (catalog) | `untrusted` | Closed catalog, sink-free renderer, tree limits, grammar |
 | CLI / MCP on a developer machine | local trust | Path containment; MCP tools are read-only |
+| Requests to the JSON API (`/api/`) | `untrusted` | Public, anonymous, read-only static files: GET/HEAD/OPTIONS only, a rate limit, problem details that echo the path only as capped text ([section 23](#23-public-json-api-api)) |
 | Requests to the remote MCP endpoint (`/mcp`) | `untrusted` | Public and unauthenticated: `edge` operations only, body, batch, item and time caps, a rate limit, Origin and Host checks ([section 21](#21-remote-mcp-endpoint)) |
 | Third-party packages | supply chain | Lockfile + runtime allowlist + no install lifecycle scripts |
 
@@ -335,6 +338,22 @@ served once that release deploys from `main`.
 | **Enforced** | `apps/website/src/components/seo/agent-discovery.ts`, `apps/website/src/integrations/agent-discovery.ts`, `apps/website/src/components/security/csp.ts` (`linkHeaderLine`, the discovery rules in `_headers`), `functions/_middleware.ts` |
 | **Tests** | `apps/website/tests/agent-discovery.test.ts` (fields, content types, the `read` scope, `Link` syntax and refused targets, `_headers` rules, security.txt expiry, robots directives), `tests/e2e/site-agent-discovery.spec.ts` (the built files with the generated rules applied), `apps/website/tests/edge-middleware.test.ts` (the twin's `Link`) |
 | **Residual** | A stub endpoint that some client probes anyway gets the site's 404 (problem JSON for agents). The headers are checked against the generated `_headers`, not against Cloudflare's application of it; a scan after the deploy confirms them. A build older than a year serves an expired `security.txt`. |
+
+---
+
+### 23. Public JSON API (`/api/`)
+
+PLAN_011 T-ar-api, [site-api](../apps/website/docs/site-api.md).
+**Status:** in the repository for release 0.9.0; served once that release
+deploys from `main`.
+
+| | |
+| --- | --- |
+| **Threat** | A client hammering the API, a write method or a crafted path reaching something other than a built file, a hostile path reflected into a response, an HTML error page (or a script context) served under `/api/`, the API shadowing another Function under `/api/` (the analytics proxy), or documents that describe endpoints the build does not serve |
+| **Control** | **Static data only:** every resource is a file the build writes (`/api/index.json`, `/api/health.json` and the site's own JSON files); nothing is computed per request and nothing is stored. The `/api/v1/` aliases are not files: `aliasSource` maps each to one source file, read from `env.ASSETS` (the same deployment, no network fetch); a path that maps to no resource is answered `404` without touching the asset store, and a path parameter must be a plain id (`^[a-z0-9]+(-[a-z0-9]+)*$`), so dots, slashes, encoded bytes or upper case can never name another file. **Envelope** (`functions/_lib/api-endpoint.ts`, called first by the middleware for `/api` and `/api/…`, except `/api/umami/…`): `OPTIONS` answers CORS; any method but `GET`, `HEAD` and `OPTIONS` gets `405` with `Allow`; then a per-isolate token bucket keyed by `CF-Connecting-IP` (`createTokenBucket` from the MCP endpoint; 300 requests per client per 60 s, at most 10,000 clients tracked, oldest dropped first) answers `429` with `Retry-After`; then the file is fetched from `env.ASSETS` by its (mapped) path (only `If-None-Match` and `If-Modified-Since` are forwarded, so a `304` works). A `200` or `304` is answered as JSON; anything else (a miss, the host's HTML 404, a failure) becomes RFC 9457 `application/problem+json` with a stable code, for every client: HTML is never returned under `/api/`. The problem's `instance` is the client's path with control characters removed and capped at 200 characters, as JSON string data. **Headers** (the envelope builds the response, so `_headers` does not reach it, S-2): `X-API-Version`, `RateLimit-Policy`, `RateLimit`, `Access-Control-Allow-Origin: *` (public, anonymous, read-only data; no credentials are ever accepted), `Access-Control-Expose-Headers`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, `Cache-Control` (problems: `no-store`) and a `Link` to `/openapi.json` and `/developers/`. The `/api/*` rule in `_headers` sends the version, CORS, `nosniff` and cache headers on the static `/api/index.json` and `/api/health.json` when no Function answers. **Description:** `/openapi.json` is generated at build and the build fails if an operationId repeats, a `$ref` does not resolve or a described path is not built. **Never:** a request body read, query parameters, storage, secrets or logging |
+| **Enforced** | `functions/_middleware.ts`, `functions/_lib/api-endpoint.ts`, `functions/_lib/mcp-endpoint.ts` (`createTokenBucket`, `rateLimitHeaders`), `apps/website/src/lib/api-surface.ts`, `apps/website/src/lib/openapi.ts`, `apps/website/src/integrations/api-surface.ts` |
+| **Tests** | `apps/website/tests/site-api.test.ts` (the alias mapping and hostile ids, an alias read from its source file, headers on every kind of answer, HEAD, 304, directory URLs, 404 for hostile and traversal paths with a capped clean `instance`, 405 for writes, preflight, 429 with `Retry-After` per client, 500 on an asset failure, the middleware route and the analytics-proxy exclusion, the OpenAPI checker), `apps/website/tests/edge-middleware.test.ts`, `tests/e2e/site-developers.spec.ts` (the real middleware in front of `dist`) |
+| **Residual** | The limit is **best-effort**, as for the MCP: per isolate, shared by clients behind one address; durable limits need a KV binding only the owner can create. Without Functions there are no `/api/v1/` aliases at all; the static `/api/` files are served with the `_headers` rule but with no rate limit, and misses get the HTML 404. Nothing has run on Cloudflare yet: after the deploy, check `X-API-Version` and `RateLimit-Policy` on `/api/v1/health.json` and a problem body on a miss. **Optional owner rule (Cloudflare dashboard, never changed by the plan):** a WAF rate-limiting rule on `starts_with(http.request.uri.path, "/api/v1/")`, counting by IP, action Block, as a cross-isolate layer |
 
 ---
 

@@ -376,9 +376,10 @@ describe('the middleware: twins, host headers, agent 404', () => {
     expect(response.headers.get('vary')).toBe('Accept');
     expect(response.headers.get('x-content-negotiation')).toBe('markdown');
     // A Function response gets no _headers rule, so the twin carries the
-    // discovery Link itself (PLAN_011 T-ar-discovery).
+    // discovery Link itself (PLAN_011 T-ar-discovery), service-desc included
+    // now that every build writes /openapi.json (T-ar-api).
     expect(response.headers.get('link')).toBe(
-      '</.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="describedby", </.well-known/ai-catalog.json>; rel="ai-catalog"'
+      '</.well-known/api-catalog>; rel="api-catalog", </openapi.json>; rel="service-desc", </llms.txt>; rel="describedby", </.well-known/ai-catalog.json>; rel="ai-catalog"'
     );
     expect(await response.text()).toBe('# Twin\n# Twin\n# Twin\n');
 
@@ -513,12 +514,20 @@ describe('the middleware: twins, host headers, agent 404', () => {
     };
     expect(agentProblem('/no/such/page/', 'https://texuli.com')).toEqual(problem);
 
-    // problem+json stays for /api/ paths and for JSON clients.
-    const api = makeContext('/api/no-such', 'text/html', { '*404*': 1 }, CLAUDEBOT);
-    const apiResponse = await onRequest(api.context);
-    expect(apiResponse.status).toBe(404);
-    expect(apiResponse.headers.get('content-type')).toBe('application/problem+json');
-    expect(await apiResponse.json()).toMatchObject({ ...problem, instance: '/api/no-such' });
+    // problem+json stays for /api/ paths (now the API envelope's typed
+    // problem, for every client, PLAN_011 T-ar-api) and for JSON clients.
+    for (const userAgent of [CLAUDEBOT, 'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/131']) {
+      const api = makeContext('/api/no-such', 'text/html', { '*404*': 1 }, userAgent);
+      const apiResponse = await onRequest(api.context);
+      expect(apiResponse.status).toBe(404);
+      expect(apiResponse.headers.get('content-type')).toBe('application/problem+json');
+      expect(await apiResponse.json()).toMatchObject({
+        status: 404,
+        instance: '/api/no-such',
+        error: { code: 'resource_not_found' },
+      });
+      expect(api.next).not.toHaveBeenCalled();
+    }
     for (const accept of ['application/json', 'application/problem+json, */*;q=0.1']) {
       const json = makeContext('/no/such/page/', accept, { '*404*': 1 }, 'curl/8.4.0');
       const jsonResponse = await onRequest(json.context);

@@ -100,6 +100,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-agent-chat](../apps/website/docs/site-agent-chat.md) | texuli.com: agent chat |
 | [site-agents-page](../apps/website/docs/site-agents-page.md) | texuli.com: Texuli for agents |
 | [site-analytics](../apps/website/docs/site-analytics.md) | texuli.com analytics (Umami) |
+| [site-api](../apps/website/docs/site-api.md) | texuli.com public API and developer portal |
 | [site-architecture](../apps/website/docs/site-architecture.md) | texuli.com architecture page (web and native) |
 | [site-blocks-page](../apps/website/docs/site-blocks-page.md) | Blocks and templates |
 | [site-brand](../apps/website/docs/site-brand.md) | texuli.com: brand and home page |
