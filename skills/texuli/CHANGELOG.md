@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.2] — 2026-10-30
+
+### Changes
+
+- chore(slides): release @texuli/slides 0.8.1 with the trust badge row fix
+
 ## [0.3.1] — 2026-10-30
 
 ### Changes
