@@ -24,8 +24,15 @@
   }
 
   .tx-resizable--bordered {
-    border: var(--tx-border-width, 1px) solid var(--tx-resizable-line);
-    border-radius: var(--tx-radius-lg, 0.75rem);
+    border: var(
+        --tx-resizable-border-width,
+        var(--tx-border-width-thin, var(--tx-border-width, 1px))
+      )
+      solid var(--tx-resizable-line);
+    border-radius: var(
+      --tx-resizable-radius,
+      var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px)))
+    );
     background-color: var(--tx-surface, Canvas);
     overflow: hidden;
   }
@@ -93,7 +100,7 @@
 
   .tx-resizable__handle[data-disabled] {
     cursor: default;
-    opacity: 0.5;
+    opacity: var(--tx-opacity-disabled, 0.5);
   }
 
   .tx-resizable__handle[data-disabled]:hover {
@@ -110,8 +117,9 @@
     box-sizing: border-box;
     /* Outlined in the muted text color (held to AA by the theme gate), so the
        grip, which identifies the control, clears 3:1 (WCAG 1.4.11). */
-    border: var(--tx-border-width, 1px) solid var(--tx-resizable-grip-fg);
-    border-radius: var(--tx-radius-full, 999px);
+    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
+      var(--tx-resizable-grip-fg);
+    border-radius: var(--tx-shape-radius-full, 9999px);
     background-color: var(--tx-resizable-grip-bg);
     background-image: radial-gradient(circle, var(--tx-resizable-grip-fg) 1px, transparent 1.5px);
     pointer-events: none;
