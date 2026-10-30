@@ -5,6 +5,9 @@ import { behaviorEvent } from '../../harness/client/events.ts';
 
 let due = $state<string | null>('2026-03-15');
 let stay = $state<DateRange>({ start: null, end: null });
+// The empty range opens on today: pin it so the range row never depends on
+// the clock (a range started on the last days of a month spills into the
+// next month, which one grid cannot show).
 </script>
 
 <section class="behavior-date-picker" dir="ltr">
@@ -26,6 +29,7 @@ let stay = $state<DateRange>({ start: null, end: null });
     <DateRangePicker.Root
       bind:value={stay}
       locale="en-US"
+      today="2026-03-10"
       onValueChange={(next) => behaviorEvent('rangeChange', `${next.start}/${next.end}`)}
       labels={{ trigger: 'Choose stay dates', triggerWithValue: 'Choose stay dates', dialog: 'Stay calendar' }}
     >

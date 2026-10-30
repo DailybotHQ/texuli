@@ -90,8 +90,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/forms-page/',
     reason:
-      'PLAN_010 T-site-features: seven lazy form islands (client:visible); the player loads only in the agent demo, after hydration, so JS at the ready signal is 59.2 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (SchemaForm and every texuli control it paints, the player loaders), the same follow-up as /motion-page/. The HTML carries the field-type, rule and keyboard tables and the agent blueprint JSON. Measured 2026-10-29: 161.4 KB page, 27 KB gzip of HTML (+4% headroom; a proposal for the owner). PLAN_010 T-site-080: the field gallery and the flow server-render again (the Select.Value SSR fix in 0232cda5 removed the paint-after-mount workaround), and the nav gained four links: measured 30.4 KB gzip of HTML, limit 32 (+4% headroom).',
-    budget: { pageGzipKb: 168, htmlGzipKb: 32 },
+      'PLAN_010 T-site-features: seven lazy form islands (client:visible); the player loads only in the agent demo, after hydration, so JS at the ready signal is 59.2 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (SchemaForm and every texuli control it paints, the player loaders), the same follow-up as /motion-page/. The HTML carries the field-type, rule and keyboard tables and the agent blueprint JSON. Measured 2026-10-29: 161.4 KB page, 27 KB gzip of HTML (+4% headroom; a proposal for the owner). PLAN_010 T-site-080: the field gallery and the flow server-render again (the Select.Value SSR fix in 0232cda5 removed the paint-after-mount workaround), and the nav gained four links: measured 30.4 KB gzip of HTML, limit 32 (+4% headroom). CI on Linux: the field gallery sits at the 720 px fold (system fonts), so it hydrates on open there: 267.5 KB page, 162 KB JS measured 2026-10-30 (+4% headroom).',
+    budget: { pageGzipKb: 279, jsGzipKb: 169, htmlGzipKb: 32 },
   },
   {
     route: '/canvas-page/',
@@ -108,8 +108,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/dashboards-page/',
     reason:
-      'PLAN_010 T-site-080: three lazy dashboard islands (client:visible); the player loads only in the agent demo, after hydration, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (the dashboard, the player loaders and the painters its blueprint uses), the same follow-up as /motion-page/. Measured 2026-10-29: 148.3 KB page (+4% headroom; a proposal for the owner).',
-    budget: { pageGzipKb: 155 },
+      'PLAN_010 T-site-080: three lazy dashboard islands (client:visible); the player loads only in the agent demo, after hydration, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (the dashboard, the player loaders and the painters its blueprint uses), the same follow-up as /motion-page/. Measured 2026-10-29: 148.3 KB page (+4% headroom; a proposal for the owner). CI on Linux: the dashboard workbench sits at the 720 px fold (system fonts), so it hydrates on open there: 176.9 KB page, 90.1 KB JS measured 2026-10-30 (+4% headroom).',
+    budget: { pageGzipKb: 184, jsGzipKb: 94 },
   },
   {
     route: '/output-page/',

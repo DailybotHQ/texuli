@@ -393,8 +393,8 @@
       "note": "Floating primitive cap (lead decision 2026-10-23): positioning, layer stack, dismissal and presence make 4 KiB unrealistic. The overlay engine is being made per-feature (T-quality-perf-primitives) to shrink these further. PLAN_010 T-release-060 (2026-10-29): 22528 -> 19136 B, tightened to measured + 4% (measured 18,353 B). PLAN_010 T-release-060 (2026-10-29): CSS 1024 -> 0 B, tightened to measured + 4% (measured 0 B)."
     },
     "@texuli/primitives/date-field": {
-      "gzip": 4416,
-      "note": "PLAN_009 (2026-10-28, owner-consented release plan): default 4096 -> 4224 B, measured + 4% after onInvalid, the TimeField spin keys and translatable segment labels (G12, G13); measured about 4,055 B; Linux CI measures about 0.2% above macOS. 4224 -> 4416 B after G65 four-digit-year reporting and G66 required/refusal side (T-gaps-53-69); measured 4,239 B in CI on Linux, + 4%."
+      "gzip": 4608,
+      "note": "PLAN_009 (2026-10-28, owner-consented release plan): default 4096 -> 4224 B, measured + 4% after onInvalid, the TimeField spin keys and translatable segment labels (G12, G13); measured about 4,055 B; Linux CI measures about 0.2% above macOS. 4224 -> 4416 B after G65 four-digit-year reporting and G66 required/refusal side (T-gaps-53-69); measured 4,239 B in CI on Linux, + 4%. PLAN_010 0.8.0 (PR #16 CI): 4416 -> 4608 B, measured + 4% rounded up to 64 B after the DateField and TimeField default labels moved to the @texuli/core/i18n message catalog (useMessages); measured 4,429 B in CI on Linux (about 4,403 B on macOS)."
     },
     "@texuli/primitives/date-picker": {
       "gzip": 23488,
@@ -580,6 +580,10 @@
     "texuli/layouts/content": {
       "gzip": 13760,
       "note": "PLAN_009 T-content-layout (G39): new public subpath for direct (declarative) ContentLayout use; the same component the docs/blog/editorial subpaths already load lazily (lazy gzip 12.23 KiB there) with the layout chrome and the TOC helpers. Measured 12,537 B gzip, 3.75 KiB CSS, cap = measured + 4% headroom. PLAN_010 T-targets (ADR-016): 13056 -> 13760 B at measured + 4% (measured 13,213 B): its navigation landmark names resolve through the @texuli/core/i18n message catalog (useMessages and the English-path formatter)."
+    },
+    "texuli/layouts/dashboard": {
+      "gzip": 12800,
+      "note": "PLAN_010 0.8.0 (PR #16 CI): explicit entry over the 12,288 B texuli/* default, measured + 4% rounded up to 64 B after the dashboard layout labels moved to the @texuli/core/i18n message catalog (useMessages); measured 12,299 B in CI on Linux (about 12,196 B on macOS)."
     },
     "texuli/layouts/dashboard/register": {
       "gzip": 576,

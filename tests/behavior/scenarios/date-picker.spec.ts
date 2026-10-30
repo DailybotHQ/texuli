@@ -17,9 +17,6 @@ async function openDue(page: Page) {
   await expectFocus(page, 'button', 'Sunday, March 15, 2026');
 }
 
-/** Days from an ISO date string, for checking a range relative to today. */
-const dayNumber = (iso: string) => Math.round(Date.parse(`${iso}T00:00:00Z`) / 86_400_000);
-
 scenario(
   'date-picker',
   defineRows([
@@ -118,8 +115,8 @@ scenario(
         await page.keyboard.press('ArrowRight');
         await page.keyboard.press('Enter');
         await expect(range).toHaveCount(0);
-        const [start = '', end = ''] = ((await stay(page).textContent()) ?? '').split('/');
-        expect(dayNumber(end) - dayNumber(start)).toBe(2);
+        // The fixture pins today to 2026-03-10, so the range stays in one month.
+        await expect(stay(page)).toHaveText('2026-03-10/2026-03-12');
         await stayTrigger(page).click();
         await expect(
           page.locator('[data-behavior-range-layer]').getByRole('gridcell', { selected: true })
