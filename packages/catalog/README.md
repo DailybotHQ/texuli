@@ -106,6 +106,7 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
 | `@texuli/catalog/manifests/documents` | New in `0.7.0`: `document`, a Texuli document as data (spec 0.7.0) |
 | `@texuli/catalog/manifests/schema-forms` | New in `0.8.0`: `schema-form`, a form as data (spec 0.8.0), painted by `@texuli/forms` through the player's `formHost` |
 | `@texuli/catalog/manifests/sheets` | New in `0.8.0`: `spreadsheet`, a sheet as data (spec 0.8.0; not `sheet`, which is the texuli `Sheet` drawer), painted by `@texuli/sheets` through the player's `sheetHost` |
+| `@texuli/catalog/manifests/all` | In development, not released: every manifest group as one static, edge-safe list (`ALL_MANIFEST_GROUPS`, no file system), with the same catalog hash as `build/node` discovery; used by `@texuli/tools/ops` and the agent service |
 | `@texuli/catalog/build` | `buildCatalog`: a content-addressed catalog (`catalog-<sha256>.json`) |
 | `@texuli/catalog/build/node` | Node only: discover the manifest groups (source or published files) and write the content-addressed catalog file |
 

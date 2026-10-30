@@ -574,6 +574,8 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [email](../packages/tools/docs/email.md) | Email from blueprints (new in `0.8.0`) |
 | [golden](../packages/tools/docs/golden.md) | Agent golden set and scorer |
 | [llms](../packages/tools/docs/llms.md) | llms.txt and agent docs bundle |
+| [mcp](../packages/tools/docs/mcp.md) | The MCP protocol layer: tools, resources, prompts, completions (in development) |
+| [ops](../packages/tools/docs/ops.md) | The operations registry behind the MCP tools and CLI commands (ADR-017) |
 | [print](../packages/tools/docs/print.md) | Print and PDF of blueprints (new in `0.8.0`) |
 
 ### Native (`native/docs/`)

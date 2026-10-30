@@ -1,13 +1,9 @@
 #!/usr/bin/env node
 /// <reference types="node" />
 import { writeFile } from 'node:fs/promises';
-import {
-  DOCUMENT_COMMANDS,
-  type DocumentCommandInput,
-  type DocumentCommandName,
-  runDocumentCommand,
-} from '../document/index.ts';
+import { DOCUMENT_COMMANDS, type DocumentCommandName } from '../document/index.ts';
 import { isMainModule } from '../internal/is-main.ts';
+import { texuliOps } from '../ops/index.ts';
 import { readDeckFile } from './deck.ts';
 
 const MAX_INPUT_BYTES = 2_000_000;
@@ -126,7 +122,8 @@ export async function runDocumentCli(argv: readonly string[] = process.argv.slic
     if (raw === undefined && reads) raw = await readStdin();
     if (raw !== undefined && new TextEncoder().encode(raw).byteLength > MAX_INPUT_BYTES)
       throw new RangeError(`Input exceeds ${MAX_INPUT_BYTES} bytes.`);
-    const input: DocumentCommandInput = {
+    const input: Record<string, unknown> = {
+      command: args.command,
       ...(args.tier ? { tier: args.tier } : {}),
       ...(args.key ? { key: args.key } : {}),
     };
@@ -135,7 +132,20 @@ export async function runDocumentCli(argv: readonly string[] = process.argv.slic
       input.document = parseJson(raw ?? '', 'Document input');
     if (args.patch !== undefined)
       input.patch = parseJson(await readDeckFile(args.patch), 'The patch');
-    const result = (await runDocumentCommand(args.command, input)) as Record<string, unknown>;
+    // PDF and DOCX run through document.export (node); the rest through document.run (edge).
+    const exporting = args.command === 'to-docx' || args.command === 'to-pdf';
+    const outcome = await texuliOps.invoke(
+      exporting ? 'document.export' : 'document.run',
+      exporting
+        ? {
+            format: args.command === 'to-docx' ? 'docx' : 'pdf',
+            document: input.document,
+            ...(args.tier ? { tier: args.tier } : {}),
+          }
+        : input
+    );
+    if (!outcome.ok) throw new TypeError(outcome.error.message);
+    const result = (outcome.output as { result: Record<string, unknown> }).result;
     const ok =
       typeof result === 'object' && result !== null && 'ok' in result ? Boolean(result.ok) : true;
     if (ok && args.out !== undefined) {

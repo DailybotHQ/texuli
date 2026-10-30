@@ -96,6 +96,10 @@
       "gzip": 57024,
       "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 54080 -> 57024 B, measured + 4% after four new manifests (time-field, data-cohort-table, data-notification-inbox, data-filter-builder) and the linear-time rich text parser and sink scan; measured 54,821 B."
     },
+    "@texuli/catalog/manifests/all": {
+      "gzip": 45312,
+      "note": "PLAN_011 T-ops-core (ADR-017): the edge-safe static list of every manifest group, imported by the remote MCP and apps/agent instead of fs discovery; it bundles every group by design (the root barrel is 54 KiB). Measured 43,531 B gzip; cap = measured + 4% rounded up to 64 B."
+    },
     "@texuli/catalog/*": {
       "gzip": 8192,
       "note": "Default per-subpath cap (lead decision 2026-10-23) so a new lazy entry is budgeted from its first commit; exact entries override it and `pnpm size --update` tightens."

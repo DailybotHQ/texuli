@@ -1,7 +1,13 @@
 // @vitest-environment node
+import { readFileSync } from 'node:fs';
 import { PassThrough } from 'node:stream';
 import { expect, it } from 'vitest';
-import { createTexuliMcpServer, MCP_PROTOCOL_VERSION, runMcpStdio } from '../src/mcp/index.ts';
+import {
+  createTexuliMcpServer,
+  MCP_ERROR_CODES,
+  MCP_PROTOCOL_VERSION,
+  runMcpStdio,
+} from '../src/mcp/index.ts';
 import { scenario } from './scenario.ts';
 
 type Response = {
@@ -54,7 +60,7 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
     async () => {
       const handle = createTexuliMcpServer();
       const early = (await callTool(handle, 'catalog')) as Response;
-      expect(early.error?.code).toBe(-32002);
+      expect(early.error?.code).toBe(MCP_ERROR_CODES.notInitialized);
 
       const init = (await handle({
         jsonrpc: '2.0',
@@ -63,7 +69,12 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         params: { protocolVersion: MCP_PROTOCOL_VERSION },
       })) as Response;
       expect(init.result?.protocolVersion).toBe(MCP_PROTOCOL_VERSION);
-      expect(init.result?.capabilities).toEqual({ tools: { listChanged: false } });
+      expect(init.result?.capabilities).toEqual({
+        tools: { listChanged: false },
+        resources: { subscribe: false, listChanged: false },
+        prompts: { listChanged: false },
+        completions: {},
+      });
       await handle({ jsonrpc: '2.0', method: 'notifications/initialized' });
 
       const listed = (await handle({ jsonrpc: '2.0', id: 2, method: 'tools/list' })) as Response;
@@ -72,6 +83,17 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         annotations: Record<string, unknown>;
       }[];
       expect(tools.map(({ name }) => name)).toEqual([
+        'catalog.search',
+        'catalog.validate',
+        'component.get',
+        'example.search',
+        'blueprint.validate',
+        'theme.search',
+        'theme.get',
+        'theme.preview',
+        'deck.run',
+        'document.run',
+        'document.export',
         'deck',
         'document',
         'catalog',
@@ -80,6 +102,10 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'example',
         'theme',
       ]);
+      const described = tools as unknown as { name: string; description: string }[];
+      for (const legacy of described.slice(11)) {
+        expect(legacy.description, legacy.name).toMatch(/^Deprecated alias of [a-z]+\.[a-z-]+/u);
+      }
       expect(tools.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
       expect(tools.every(({ annotations }) => annotations.destructiveHint === false)).toBe(true);
     }
@@ -156,8 +182,14 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
       const badArgs = await callTool(handle, 'catalog', { limit: 0 });
       expect(badArgs.result?.isError).toBe(true);
       expect(toolData(badArgs).error).toContain('limit');
+      expect(toolData(badArgs).code).toBe('invalid-input');
       const missing = await callTool(handle, 'component', { id: 'not-in-catalog' });
       expect(missing.result?.isError).toBe(true);
+      expect(toolData(missing).code).toBe('not-found');
+      const renamed = await callTool(handle, 'component.get', { id: 'card' });
+      expect(toolData(renamed)).toEqual(
+        toolData(await callTool(handle, 'component', { id: 'card' }))
+      );
       const unknown = await callTool(handle, 'execute', {});
       expect(unknown.error?.code).toBe(-32602);
     }
@@ -190,8 +222,12 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
         .split('\n')
         .map((line) => JSON.parse(line) as Response);
       expect(messages.map(({ id }) => id)).toEqual([1, 2]);
-      expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version: '0.0.0' });
-      expect(messages[1]?.result?.tools).toHaveLength(7);
+      const { version } = JSON.parse(
+        readFileSync(new URL('../package.json', import.meta.url), 'utf8')
+      ) as { version: string };
+      expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version });
+      expect(version).not.toBe('0.0.0');
+      expect(messages[1]?.result?.tools).toHaveLength(18);
     }
   );
 });
