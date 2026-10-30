@@ -15,8 +15,8 @@ consume the packages, or copy a styled component's source into the app and
 own it, then theme it, adjust it and keep it updatable.
 
 The copy path is **local**: its commands run from a Texuli monorepo checkout
-against folders on disk. All 25 published packages are on npm as
-`0.8.0` (`@texuli/slides` as `0.8.1`, a layout fix; `@texuli/data` as `0.8.1`, lazy list motion), a pre-1.0 release (`latest` and `next` both point to it; 1.0.0 will
+against folders on disk. All 25 published packages are on npm in
+the 0.8 line (see docs/RELEASE.md), a pre-1.0 line (`latest` and `next` point to the newest; 1.0.0 will
 be the first stable release). Install them plainly (`pnpm add texuli`), pin
 the exact version or `^0.8.0` (for 0.x it accepts only 0.8.x, since a new
 minor may break), and never suggest a download URL. `@texuli/drag`,

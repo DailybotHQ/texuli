@@ -3,7 +3,7 @@
 > **Small pieces. Infinite possibilities.**
 >
 > Status on 2026-10-29: **pre-1.0.** All 25 published packages are
-> released on npm as `0.8.0` (`@texuli/slides` as `0.8.1`, a layout fix; `@texuli/data` as `0.8.1`, lazy list motion) (dist-tags
+> released on npm in the 0.8 line: 16 at `0.8.0`, plus patch releases (`@texuli/slides` `0.8.2`; `0.8.1` for `@texuli/data`, `@texuli/blocks`, `@texuli/catalog`, `@texuli/pages`, `@texuli/player`, `@texuli/sheets`, `@texuli/tools` and `@texuli/astro`) (dist-tags
 > `latest` and `next`; published by CI from verified tarballs, with signed
 > provenance), including the first release of `@texuli/forms`,
 > `@texuli/canvas` and `@texuli/sheets`; texuli.com deploys
@@ -120,7 +120,7 @@ closed, documented catalog that can be validated before anything renders.
 | Agent service (prompt → validated blueprint draft) | **In development**, fake replay provider only, not deployed | [`apps/agent`](../apps/agent/README.md) |
 | Tools (L8): the copy-in CLIs (`texuli-add`, `texuli-init`, `texuli-update`, `texuli-llms`), A2UI, custom elements, the golden set, and the read-only local MCP server source | **Exists as source**, private; no published binaries | [`packages/tools`](../packages/tools/README.md) |
 | Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, deployed at https://texuli.com (Cloudflare Pages) with two Pages Functions (`functions/`: agent-facing request shaping and a same-origin Umami analytics proxy, off until the owner provisions it) | [`apps/website`](../apps/website/README.md) |
-| npm 0.x release | **Done** — all 25 published packages as `0.8.0` (`@texuli/slides` as `0.8.1`, a layout fix; `@texuli/data` as `0.8.1`, lazy list motion), the first release of `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (after `0.7.0` for 22 packages, the first release of `@texuli/document` and `@texuli/pages`; `0.6.0` for 20 packages; `0.5.0` for 20 packages, the first release of `@texuli/editor`; `0.4.0` for 19 packages, `0.3.0` for 18, `0.2.0` for 15 and the `0.1.0-next.0`–`next.3` previews), dist-tags `latest` and `next`, CI-published with provenance | [RELEASE](RELEASE.md) |
+| npm 0.x release | **Done** — all 25 published packages in the 0.8 line (see [RELEASE](RELEASE.md)), the first release of `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (after `0.7.0` for 22 packages, the first release of `@texuli/document` and `@texuli/pages`; `0.6.0` for 20 packages; `0.5.0` for 20 packages, the first release of `@texuli/editor`; `0.4.0` for 19 packages, `0.3.0` for 18, `0.2.0` for 15 and the `0.1.0-next.0`–`next.3` previews), dist-tags `latest` and `next`, CI-published with provenance | [RELEASE](RELEASE.md) |
 | npm stable release (1.0.0) | Planned; needs the developer's explicit go. texuli.com deploys from `main` (Cloudflare Pages) | — |
 
 ## Success criteria
@@ -152,7 +152,7 @@ closed, documented catalog that can be validated before anything renders.
 
 ## Honest boundaries
 
-- The implementation is pre-1.0. All 25 published packages are on npm as `0.8.0` (`@texuli/slides` as `0.8.1`, a layout fix; `@texuli/data` as `0.8.1`, lazy list motion)
+- The implementation is pre-1.0. All 25 published packages are on npm in the 0.8 line (see [RELEASE](RELEASE.md))
   (published by CI with provenance; `latest` and `next` both point to it; not
   a stable release: under 0.x a new minor may contain breaking changes, and
   1.0.0 will be the first stable release), and the

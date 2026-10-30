@@ -5,12 +5,13 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-`0.8.0` is the current release of all 25 published packages (owner GO
-2026-10-29); `@texuli/slides` has since moved to `0.8.1`, a
-backwards-compatible fix (the untrusted trust badge row wraps instead of
-pushing the toolbar past a phone's edge), and `@texuli/data` to `0.8.1`
-(list motion loads lazily), each published from `main` on the merge that
-bumps it: the 22 packages of `0.7.0` plus `@texuli/forms`,
+All 25 published packages are on npm in the 0.8 line. `0.8.0` was the
+release of all 25 (owner GO 2026-10-29), and 16 are still at `0.8.0`.
+Patch releases since: `@texuli/slides` `0.8.2`, and `0.8.1` for
+`@texuli/data`, `@texuli/blocks`, `@texuli/catalog`, `@texuli/pages`,
+`@texuli/player`, `@texuli/sheets`, `@texuli/tools` and `@texuli/astro`
+(see "0.8.x patch releases (G86)" and "@texuli/slides 0.8.1" below), each
+published from `main` on the merge that bumps it. `0.8.0` covered the 22 packages of `0.7.0` plus `@texuli/forms`,
 `@texuli/canvas` and `@texuli/sheets`, which are published for the first
 time in `0.8.0`. The
 publish workflow publishes from `main` after the merge, from the verified
@@ -35,25 +36,48 @@ published version.
 - The apps (`apps/website`, `apps/agent`) and the native twin (`native/`)
   publish nothing.
 
-### @texuli/data 0.8.1
+### 0.8.x patch releases (G86)
 
-A backwards-compatible fix with no new public API; no other package
-changes version. The Board, the DataGrid and the Dashboard took list motion
-from `texuli/motion` statically, so every consumer paid for its seams, its
-contract and its provider context even with `motion={false}`, reduced motion
-or level `none` (G86, reported by Protoyard). They now go through a small
-internal shim that reads the `MotionProvider` settings at init and loads
-`texuli/motion` with `import()` the first time a mounted list could animate a
-change; with `motion={false}`, `layout: false`, level `none` or reduced
-motion (forced by the provider, or the reader's) it never loads, and a change
-before it has loaded commits at once. Measured gzip of the initial graph:
+Backwards-compatible fixes with no new public API:
+
+| Package | Version | Why |
+| --- | --- | --- |
+| `@texuli/data` | `0.8.1` | The fix: list motion loads lazily |
+| `@texuli/blocks` | `0.8.1` | Pins `@texuli/data` `0.8.1` |
+| `@texuli/catalog` | `0.8.1` | Pins `@texuli/data` and `@texuli/blocks` `0.8.1` |
+| `@texuli/player` | `0.8.1` | Pins `@texuli/data`, `@texuli/blocks` and `@texuli/catalog` `0.8.1` |
+| `@texuli/sheets` | `0.8.1` | Pins `@texuli/data` `0.8.1` |
+| `@texuli/pages` | `0.8.1` | Pins `@texuli/blocks` and `@texuli/player` `0.8.1` |
+| `@texuli/tools` | `0.8.1` | Pins `@texuli/blocks` and `@texuli/catalog` `0.8.1` |
+| `@texuli/astro` | `0.8.1` | Pins `@texuli/blocks` `0.8.1` |
+| `@texuli/slides` | `0.8.2` | Pins `@texuli/blocks`, `@texuli/catalog` and `@texuli/player` `0.8.1` |
+
+**The fix (`@texuli/data`).** The Board, the DataGrid and the Dashboard
+took list motion from `texuli/motion` statically, so every consumer paid
+for its seams, its contract and its provider context even with
+`motion={false}`, reduced motion or level `none` (G86, reported by
+Protoyard). They now go through a small internal shim that reads the
+`MotionProvider` settings at init and loads `texuli/motion` with
+`import()` the first time a mounted list could animate a change. With
+`motion={false}`, `layout: false`, level `none` or reduced motion (forced
+by the provider, or the reader's), it never loads. A change before it has
+loaded commits at once. Measured gzip of the initial graph:
 `@texuli/data/board` 12,833 to 12,339 B, `@texuli/data/grid-core` 13,416 to
 13,082 B, `@texuli/data/grid-editing` 18,224 to 17,889 B,
 `@texuli/data/dashboard` 11,529 to 11,194 B and the `@texuli/data` barrel
-84,899 to 84,261 B. It still pins `texuli` `0.8.0`, whose motion context key
-it reads. Covered by `packages/data/tests/motion.test.ts` and
-`packages/data/tests/motion-bundle.test.ts`. Published by the publish
-workflow after the merge that bumps it.
+84,899 to 84,261 B. `texuli` is unchanged and stays at `0.8.0`. Covered by
+`packages/data/tests/motion.test.ts` and
+`packages/data/tests/motion-bundle.test.ts`.
+
+**Why the dependents moved.** Internal dependencies are exact pins (see
+"Workspace dependencies and consumers"), so a published package that pins
+`@texuli/data@0.8.0` would keep installing the unfixed version. Every
+package that depends on `@texuli/data` directly or through another pinned
+package gets a patch release that pins the new versions. The workspace
+links them by version (`linkWorkspacePackages`), so the lockfile moves with
+them. The `workspace:*` ranges of `@texuli/examples` and the apps are
+unchanged. Each is published by the publish workflow after the merge that
+bumps it.
 
 ### @texuli/slides 0.8.1
 
