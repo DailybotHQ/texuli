@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /// <reference types="node" />
 import { readFile, stat } from 'node:fs/promises';
-import { DECK_COMMANDS, type DeckCommandName, runDeckCommand } from '../deck/index.ts';
+import { DECK_COMMANDS, type DeckCommandName } from '../deck/index.ts';
 import { isMainModule } from '../internal/is-main.ts';
+import { texuliOps } from '../ops/index.ts';
 
 const MAX_INPUT_BYTES = 2_000_000;
 
@@ -87,12 +88,13 @@ export async function runDeckCli(argv: readonly string[] = process.argv.slice(2)
       raw = await readStdin();
     if (raw !== undefined && new TextEncoder().encode(raw).byteLength > MAX_INPUT_BYTES)
       throw new RangeError(`Input exceeds ${MAX_INPUT_BYTES} bytes.`);
-    const result =
-      args.command === 'from-markdown'
-        ? runDeckCommand(args.command, { markdown: raw ?? '' })
-        : ['lint', 'inspect', 'to-markdown'].includes(args.command)
-          ? runDeckCommand(args.command, { deck: parseInput(raw ?? '') })
-          : runDeckCommand(args.command);
+    const input: Record<string, unknown> = { command: args.command };
+    if (args.command === 'from-markdown') input.markdown = raw ?? '';
+    else if (['lint', 'inspect', 'to-markdown'].includes(args.command))
+      input.deck = parseInput(raw ?? '');
+    const outcome = await texuliOps.invoke('deck.run', input);
+    if (!outcome.ok) throw new TypeError(outcome.error.message);
+    const result = (outcome.output as { result: unknown }).result;
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     const ok =
       typeof result === 'object' && result !== null && 'ok' in result

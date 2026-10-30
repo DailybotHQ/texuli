@@ -1,28 +1,21 @@
-import { buildCatalog } from '@texuli/catalog/build';
-import { discoverManifestGroups } from '@texuli/catalog/build/node';
-import { validateCatalogManifest, validateCatalogManifests } from '@texuli/catalog/manifest';
 import {
-  getFullThemeLibraryMeta,
-  listFullThemeLibrary,
-  loadFullLibraryTheme,
-} from '@texuli/tokens/library-expand';
-import { DECK_COMMANDS, type DeckCommandName, runDeckCommand } from '../deck/index.ts';
-import {
-  DOCUMENT_COMMANDS,
-  type DocumentCommandName,
-  runDocumentCommand,
-} from '../document/index.ts';
+  type Operation,
+  type OperationAnnotations,
+  type OperationRegistry,
+  type OperationRuntime,
+  TOOLS_VERSION,
+  texuliOps,
+} from '../ops/index.ts';
 
 const PROTOCOL_VERSION = '2025-11-25';
-const SERVER_VERSION = '0.0.0';
-const DEFAULT_LIMIT = 50;
-const MAX_LIMIT = 100;
 const SUPPORTED_PROTOCOL_VERSIONS = new Set([
   '2024-11-05',
   '2025-03-26',
   '2025-06-18',
   PROTOCOL_VERSION,
 ]);
+/** The local server runs every operation but the site-only ones. */
+const LOCAL_RUNTIMES: readonly OperationRuntime[] = ['edge', 'node'];
 
 type JsonObject = Record<string, unknown>;
 type JsonRpcId = string | number;
@@ -33,44 +26,19 @@ type JsonRpcResponse =
 
 interface ToolDefinition {
   name: string;
+  title?: string;
   description: string;
   inputSchema: JsonObject;
   annotations: {
-    readOnlyHint: true;
-    destructiveHint: false;
-    openWorldHint: false;
+    readOnlyHint: boolean;
+    destructiveHint: boolean;
+    idempotentHint: boolean;
+    openWorldHint: boolean;
   };
 }
 
 function isObject(value: unknown): value is JsonObject {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function stringArg(args: JsonObject, name: string, required = false): string | undefined {
-  const value = args[name];
-  if (value === undefined && !required) return undefined;
-  if (typeof value !== 'string' || value.trim() === '') {
-    throw new TypeError(`"${name}" must be a non-empty string${required ? '' : ' when provided'}.`);
-  }
-  return value.trim();
-}
-
-function limitArg(args: JsonObject): number {
-  const value = args.limit;
-  if (value === undefined) return DEFAULT_LIMIT;
-  if (!Number.isInteger(value) || (value as number) < 1 || (value as number) > MAX_LIMIT) {
-    throw new TypeError(`"limit" must be an integer from 1 to ${MAX_LIMIT}.`);
-  }
-  return value as number;
-}
-
-function rejectUnknownArgs(args: JsonObject, allowed: readonly string[]): void {
-  const unknown = Object.keys(args).filter((key) => !allowed.includes(key));
-  if (unknown.length > 0) {
-    throw new TypeError(
-      `Unknown argument${unknown.length === 1 ? '' : 's'}: ${unknown.join(', ')}.`
-    );
-  }
 }
 
 function textResult(value: unknown, isError = false): JsonObject {
@@ -80,151 +48,41 @@ function textResult(value: unknown, isError = false): JsonObject {
   };
 }
 
-const COMMON_ANNOTATIONS = {
-  readOnlyHint: true,
-  destructiveHint: false,
-  openWorldHint: false,
-} as const;
+function hints(annotations: OperationAnnotations): ToolDefinition['annotations'] {
+  return {
+    readOnlyHint: annotations.readOnly,
+    destructiveHint: annotations.destructive,
+    idempotentHint: annotations.idempotent,
+    openWorldHint: annotations.openWorld,
+  };
+}
 
-const TOOLS: readonly ToolDefinition[] = [
-  {
-    name: 'deck',
-    description: 'Inspect, validate and convert a Texuli deck with the shared v2 model.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        command: { type: 'string', enum: DECK_COMMANDS },
-        deck: {
-          type: 'object',
-          description: 'A JSON deck value for lint, inspect or to-markdown.',
-        },
-        markdown: {
-          type: 'string',
-          maxLength: 2000000,
-          description: 'A deck Markdown document for from-markdown.',
-        },
-      },
-      required: ['command'],
-      additionalProperties: false,
-    },
-    annotations: COMMON_ANNOTATIONS,
-  },
-  {
-    name: 'document',
-    description:
-      'Create, validate, patch and convert a Texuli document (spec 0.7.0): from Markdown, bounded RFC 6902 patches, a document blueprint, and Markdown, DOCX or PDF export (bytes as base64; no files are written).',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        command: { type: 'string', enum: DOCUMENT_COMMANDS },
-        document: {
-          type: 'object',
-          description:
-            'A Texuli document (format texuli-document, formatVersion 1) for every command but capabilities, schema and from-markdown.',
-        },
-        markdown: {
-          type: 'string',
-          maxLength: 2000000,
-          description: 'Markdown text for from-markdown.',
-        },
-        patch: {
-          type: 'array',
-          maxItems: 1000,
-          items: { type: 'object' },
-          description: 'RFC 6902 operations for patch (add, remove, replace, move, copy, test).',
-        },
-        tier: {
-          type: 'string',
-          enum: ['developer', 'untrusted'],
-          description: 'The URL policy tier; default untrusted.',
-        },
-        key: { type: 'string', description: 'The node key for to-blueprint.' },
-      },
-      required: ['command'],
-      additionalProperties: false,
-    },
-    annotations: COMMON_ANNOTATIONS,
-  },
-  {
-    name: 'catalog',
-    description: 'Search the built, content-addressed Texuli component catalog.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        query: {
-          type: 'string',
-          description: 'Text to match against component ids, labels and summaries.',
-        },
-        group: { type: 'string', description: 'Exact manifest group id.' },
-        tier: { type: 'string', enum: ['developer', 'untrusted'] },
-        limit: { type: 'integer', minimum: 1, maximum: MAX_LIMIT },
-      },
-      additionalProperties: false,
-    },
-    annotations: COMMON_ANNOTATIONS,
-  },
-  {
-    name: 'component',
-    description: 'Read one component manifest, including props, examples and allowed emit tiers.',
-    inputSchema: {
-      type: 'object',
-      properties: { id: { type: 'string', minLength: 1 } },
-      required: ['id'],
-      additionalProperties: false,
-    },
-    annotations: COMMON_ANNOTATIONS,
-  },
-  {
-    name: 'validate',
-    description: 'Validate one catalog manifest or a list of manifests without writing files.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        manifest: { type: 'object', description: 'One candidate manifest.' },
-        manifests: {
-          type: 'array',
-          items: { type: 'object' },
-          description: 'A candidate manifest set.',
-        },
-      },
-      additionalProperties: false,
-    },
-    annotations: COMMON_ANNOTATIONS,
-  },
-  {
-    name: 'example',
-    description: 'Find manifest examples by component and/or example id, or search their titles.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        componentId: { type: 'string', minLength: 1 },
-        exampleId: { type: 'string', minLength: 1 },
-        query: { type: 'string' },
-        limit: { type: 'integer', minimum: 1, maximum: MAX_LIMIT },
-      },
-      additionalProperties: false,
-    },
-    annotations: COMMON_ANNOTATIONS,
-  },
-  {
-    name: 'theme',
-    description: 'Search theme metadata or read the full token definition for one theme id.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', minLength: 1 },
-        query: { type: 'string' },
-        category: { type: 'string' },
-        collection: { type: 'string' },
-        mood: { type: 'string' },
-        tag: { type: 'string' },
-        limit: { type: 'integer', minimum: 1, maximum: MAX_LIMIT },
-      },
-      additionalProperties: false,
-    },
-    annotations: COMMON_ANNOTATIONS,
-  },
-];
+/**
+ * The tool list, generated from the registry: every operation the local
+ * runtimes serve, then the deprecated 0.8 aliases whose targets are served.
+ */
+function toolsFrom(registry: OperationRegistry): ToolDefinition[] {
+  const served = registry.list({ runtimes: LOCAL_RUNTIMES });
+  const names = new Set(served.map((operation) => operation.name));
+  const tools: ToolDefinition[] = served.map((operation) => ({
+    name: operation.name,
+    title: operation.title,
+    description: registry.describe(operation.name) as string,
+    inputSchema: operation.input as JsonObject,
+    annotations: hints(operation.annotations),
+  }));
+  for (const alias of registry.aliases()) {
+    if (!alias.targets.every((target) => names.has(target))) continue;
+    const target = registry.get(alias.targets[0] as string) as Operation;
+    tools.push({
+      name: alias.name,
+      description: registry.describe(alias.name) as string,
+      inputSchema: registry.inputSchema(alias.name) as JsonObject,
+      annotations: hints(target.annotations),
+    });
+  }
+  return tools;
+}
 
 function validId(id: unknown): id is JsonRpcId {
   return typeof id === 'string' || (typeof id === 'number' && Number.isFinite(id));
@@ -238,206 +96,17 @@ function errorResponse(id: JsonRpcId | null, code: number, message: string): Jso
   return { jsonrpc: '2.0', id, error: { code, message } };
 }
 
-/** Create the request handler for a local, read-only MCP server. */
-export function createTexuliMcpServer(): (
-  message: unknown
-) => Promise<JsonRpcResponse | undefined> {
-  let catalogPromise: ReturnType<typeof buildCatalog> | undefined;
+/**
+ * Create the request handler for a local, read-only MCP server whose tools
+ * are the operations of `registry` (default: every Texuli operation).
+ */
+export function createTexuliMcpServer(
+  registry: OperationRegistry = texuliOps
+): (message: unknown) => Promise<JsonRpcResponse | undefined> {
   let initialized = false;
   let initializeReceived = false;
-
-  const getCatalog = () => {
-    catalogPromise ??= discoverManifestGroups().then(buildCatalog);
-    return catalogPromise;
-  };
-
-  async function callTool(name: string, rawArgs: unknown): Promise<JsonObject> {
-    if (!isObject(rawArgs)) throw new TypeError('Tool arguments must be an object.');
-    const args = rawArgs;
-
-    if (name === 'deck') {
-      rejectUnknownArgs(args, ['command', 'deck', 'markdown']);
-      const command = stringArg(args, 'command', true) as DeckCommandName;
-      if (!(DECK_COMMANDS as readonly string[]).includes(command))
-        throw new TypeError(`Unknown deck command "${command}".`);
-      if (Object.hasOwn(args, 'markdown') && typeof args.markdown !== 'string')
-        throw new TypeError('"markdown" must be a string.');
-      if (
-        typeof args.markdown === 'string' &&
-        new TextEncoder().encode(args.markdown).byteLength > 2_000_000
-      )
-        throw new TypeError('Deck Markdown exceeds 2000000 bytes.');
-      const result = runDeckCommand(command, {
-        ...(Object.hasOwn(args, 'deck') ? { deck: args.deck } : {}),
-        ...(typeof args.markdown === 'string' ? { markdown: args.markdown } : {}),
-      });
-      return { result };
-    }
-
-    if (name === 'document') {
-      rejectUnknownArgs(args, ['command', 'document', 'markdown', 'patch', 'tier', 'key']);
-      const command = stringArg(args, 'command', true) as DocumentCommandName;
-      if (!(DOCUMENT_COMMANDS as readonly string[]).includes(command))
-        throw new TypeError(`Unknown document command "${command}".`);
-      if (Object.hasOwn(args, 'markdown') && typeof args.markdown !== 'string')
-        throw new TypeError('"markdown" must be a string.');
-      if (
-        typeof args.markdown === 'string' &&
-        new TextEncoder().encode(args.markdown).byteLength > 2_000_000
-      )
-        throw new TypeError('Document Markdown exceeds 2000000 bytes.');
-      if (Object.hasOwn(args, 'patch') && !Array.isArray(args.patch))
-        throw new TypeError('"patch" must be an array of RFC 6902 operations.');
-      const tier = stringArg(args, 'tier');
-      if (tier !== undefined && tier !== 'developer' && tier !== 'untrusted')
-        throw new TypeError('"tier" must be "developer" or "untrusted".');
-      const key = stringArg(args, 'key');
-      if (
-        Object.hasOwn(args, 'document') &&
-        new TextEncoder().encode(JSON.stringify(args.document) ?? '').byteLength > 2_000_000
-      )
-        throw new TypeError('The document exceeds 2000000 bytes.');
-      const result = await runDocumentCommand(command, {
-        ...(Object.hasOwn(args, 'document') ? { document: args.document } : {}),
-        ...(typeof args.markdown === 'string' ? { markdown: args.markdown } : {}),
-        ...(Object.hasOwn(args, 'patch') ? { patch: args.patch } : {}),
-        ...(tier ? { tier } : {}),
-        ...(key ? { key } : {}),
-      });
-      return { result };
-    }
-
-    if (name === 'catalog') {
-      rejectUnknownArgs(args, ['query', 'group', 'tier', 'limit']);
-      const query = stringArg(args, 'query')?.toLowerCase();
-      const group = stringArg(args, 'group');
-      const tier = stringArg(args, 'tier');
-      const limit = limitArg(args);
-      if (tier !== undefined && tier !== 'developer' && tier !== 'untrusted') {
-        throw new TypeError('"tier" must be "developer" or "untrusted".');
-      }
-      const built = await getCatalog();
-      const filtered = built.catalog.entries.filter((entry) => {
-        if (group && entry.group !== group) return false;
-        if (tier && !entry.emit.includes(tier)) return false;
-        if (query && !`${entry.id} ${entry.label} ${entry.summary}`.toLowerCase().includes(query)) {
-          return false;
-        }
-        return true;
-      });
-      return {
-        hash: built.hash,
-        fileName: built.fileName,
-        total: filtered.length,
-        entries: filtered
-          .slice(0, limit)
-          .map(
-            ({
-              id,
-              package: packageName,
-              label,
-              summary,
-              tier: componentTier,
-              group: groupName,
-              emit,
-            }) => ({
-              id,
-              package: packageName,
-              label,
-              summary,
-              tier: componentTier,
-              group: groupName,
-              emit,
-            })
-          ),
-        limit,
-      };
-    }
-
-    if (name === 'component') {
-      rejectUnknownArgs(args, ['id']);
-      const id = stringArg(args, 'id', true) as string;
-      const entry = (await getCatalog()).catalog.entries.find((item) => item.id === id);
-      if (!entry)
-        throw new TypeError(`Unknown component "${id}". Search with the catalog tool first.`);
-      return { component: entry };
-    }
-
-    if (name === 'validate') {
-      rejectUnknownArgs(args, ['manifest', 'manifests']);
-      const hasManifest = Object.hasOwn(args, 'manifest');
-      const hasManifests = Object.hasOwn(args, 'manifests');
-      if (hasManifest === hasManifests) {
-        throw new TypeError('Provide exactly one of "manifest" or "manifests".');
-      }
-      if (hasManifest) return validateCatalogManifest(args.manifest) as unknown as JsonObject;
-      if (!Array.isArray(args.manifests)) throw new TypeError('"manifests" must be an array.');
-      return validateCatalogManifests(args.manifests) as unknown as JsonObject;
-    }
-
-    if (name === 'example') {
-      rejectUnknownArgs(args, ['componentId', 'exampleId', 'query', 'limit']);
-      const componentId = stringArg(args, 'componentId');
-      const exampleId = stringArg(args, 'exampleId');
-      const query = stringArg(args, 'query')?.toLowerCase();
-      const limit = limitArg(args);
-      const entries = (await getCatalog()).catalog.entries;
-      const component = componentId ? entries.find((entry) => entry.id === componentId) : undefined;
-      if (componentId && !component) {
-        throw new TypeError(
-          `Unknown component "${componentId}". Search with the catalog tool first.`
-        );
-      }
-      const examples = (component ? [component] : entries).flatMap((entry) =>
-        entry.examples
-          .filter((example) => !exampleId || example.id === exampleId)
-          .filter(
-            (example) =>
-              !query ||
-              `${example.id} ${example.title} ${example.description ?? ''}`
-                .toLowerCase()
-                .includes(query)
-          )
-          .map((example) => ({ componentId: entry.id, package: entry.package, example }))
-      );
-      return { total: examples.length, examples: examples.slice(0, limit), limit };
-    }
-
-    if (name === 'theme') {
-      rejectUnknownArgs(args, ['id', 'query', 'category', 'collection', 'mood', 'tag', 'limit']);
-      const id = stringArg(args, 'id');
-      const limit = limitArg(args);
-      if (id) {
-        const themes = await getFullThemeLibraryMeta();
-        if (!themes.some((theme) => theme.id === id)) throw new TypeError(`Unknown theme "${id}".`);
-        return { theme: await loadFullLibraryTheme(id) };
-      }
-      const query = stringArg(args, 'query')?.toLowerCase();
-      const collection = stringArg(args, 'collection');
-      const mood = stringArg(args, 'mood');
-      const matches = (
-        await listFullThemeLibrary({
-          category: stringArg(args, 'category'),
-          tag: stringArg(args, 'tag'),
-        })
-      ).filter((theme) => {
-        if (collection && theme.collection !== collection) return false;
-        if (mood && !theme.mood.includes(mood as (typeof theme.mood)[number])) return false;
-        if (
-          query &&
-          !`${theme.id} ${theme.name} ${theme.description} ${theme.category} ${theme.tags.join(' ')}`
-            .toLowerCase()
-            .includes(query)
-        ) {
-          return false;
-        }
-        return true;
-      });
-      return { total: matches.length, themes: matches.slice(0, limit), limit };
-    }
-
-    throw new Error(`Unknown tool: ${name}`);
-  }
+  const tools = toolsFrom(registry);
+  const toolNames = new Set(tools.map((tool) => tool.name));
 
   return async (message: unknown) => {
     if (!isObject(message) || message.jsonrpc !== '2.0' || typeof message.method !== 'string') {
@@ -466,9 +135,9 @@ export function createTexuliMcpServer(): (
       return response(id, {
         protocolVersion,
         capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: 'texuli', version: SERVER_VERSION },
+        serverInfo: { name: 'texuli', version: TOOLS_VERSION },
         instructions:
-          'Read-only catalog, component, validation, example, theme, deck and document tools. No files or network are modified.',
+          'Texuli operations: search the component catalog, read manifests and examples, validate manifests, search, read and preview themes, and run deck and document commands. Tool names are group.verb; the 0.8 names (catalog, component, validate, example, theme, deck, document) are deprecated aliases. Read-only: no files or network are modified.',
       });
     }
 
@@ -476,7 +145,7 @@ export function createTexuliMcpServer(): (
     if (!initialized) return errorResponse(id, -32002, 'Server not initialized.');
 
     if (message.method === 'tools/list') {
-      return response(id, { tools: TOOLS });
+      return response(id, { tools });
     }
 
     if (message.method === 'tools/call') {
@@ -485,17 +154,22 @@ export function createTexuliMcpServer(): (
         return errorResponse(id, -32602, 'tools/call requires params.name.');
       }
       const toolName = params.name;
-      const tool = TOOLS.find((item) => item.name === toolName);
-      if (!tool) return errorResponse(id, -32602, `Unknown tool: ${toolName}`);
-      try {
-        const data = await callTool(tool.name, params.arguments ?? {});
-        return response(id, textResult(data));
-      } catch (error) {
-        return response(
-          id,
-          textResult({ error: error instanceof Error ? error.message : 'Tool failed.' }, true)
-        );
-      }
+      if (!toolNames.has(toolName)) return errorResponse(id, -32602, `Unknown tool: ${toolName}`);
+      const outcome = await registry.invoke(toolName, params.arguments ?? {}, {
+        runtimes: LOCAL_RUNTIMES,
+      });
+      if (outcome.ok) return response(id, textResult(outcome.output));
+      return response(
+        id,
+        textResult(
+          {
+            error: outcome.error.message,
+            code: outcome.error.code,
+            ...(outcome.error.issues ? { issues: outcome.error.issues } : {}),
+          },
+          true
+        )
+      );
     }
 
     return errorResponse(id, -32601, `Method not found: ${message.method}`);
