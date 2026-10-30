@@ -90,7 +90,7 @@ const css = compileThemeCss(theme);
 | Style presets | `style-presets` | Shared style presets on top of the contract |
 | Tailwind 4 | `tailwind` | Utilities mapped onto the `--tx-*` contract |
 | Motion tokens | `motion` | New in `0.6.0`: 5 durations, 5 easings and 3 springs as data (`MOTION_DURATIONS`, `MOTION_EASINGS`, `MOTION_SPRINGS`), behind the `--tx-motion-*` properties in `base.css` |
-| System tokens | `system` | Unreleased (token contract v2, ADR-020): 151 system tokens in 11 families (space, size, type roles, elevation, shape, layers, opacity, layout, icons, status, data-viz). `base.css` declares only the 46 literal defaults; derived tokens are fallback-only and read with `systemVar(name)` |
+| System tokens | `system` | Unreleased (token contract v2, ADR-020): 151 system tokens in 11 families (space, size, type roles, elevation, shape, layers, opacity, layout, icons, status, data-viz). No stylesheet declares them (0 B eager): CSS reads `systemVar(name)`, which carries the default as the fallback |
 | Component tokens | `components` | Unreleased: the component token registry (48 components, 333 tokens). Component tokens are fallback-only: no stylesheet declares them, CSS reads them with `componentVar(component, key)` (the registry default as the fallback), and design systems set them on their scope. `checkTokenReads` guards the fallbacks; no component stylesheet reads them yet |
 | Chart tokens | `data-viz` | Unreleased: `dataVizVariables(theme, mode)` returns all 28 `--tx-chart-*` values for any theme, derived when the theme has no `charts` |
 | Renames | `renames`, `renames.json` | Unreleased: the machine-readable `--tx-*` rename list for codemods (empty: contract v2 renames nothing) |

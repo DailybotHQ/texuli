@@ -1,8 +1,7 @@
 /**
- * Pure renderers for the generated token surfaces: the system-defaults block
- * of `src/css/base.css`, `src/renames/renames.json` and
- * `docs/tokens-components.md`. `generate.ts` writes them; the tests compare
- * them with the files so a hand edit or a stale file fails.
+ * Pure renderers for the generated token surfaces: `src/renames/renames.json`
+ * and `docs/tokens-components.md`. `generate.ts` writes them; the tests
+ * compare them with the files so a hand edit or a stale file fails.
  */
 import {
   COMPONENT_TOKEN_FAMILIES,
@@ -11,37 +10,11 @@ import {
 } from '../src/components/index.ts';
 import { renderTokenRenamesJson, TOKEN_RENAMES } from '../src/renames/index.ts';
 import {
-  EMITTED_SYSTEM_TOKENS,
   FALLBACK_SYSTEM_TOKENS,
-  GENERATED_END,
-  GENERATED_START,
-  isDerivedValue,
-  renderSystemTokenDeclarations,
   SYSTEM_TOKEN_FAMILIES,
   SYSTEM_TOKENS,
   systemVar,
-  TOKEN_SCOPE_SELECTOR,
 } from '../src/system/index.ts';
-
-/** The generated block inside `@layer tx.base` of `base.css`, markers included. */
-export function renderTokenDefaultsBlock(): string {
-  return [
-    `  ${GENERATED_START}`,
-    `  ${TOKEN_SCOPE_SELECTOR} {`,
-    renderSystemTokenDeclarations().trimEnd(),
-    '  }',
-    `  ${GENERATED_END}`,
-  ].join('\n');
-}
-
-/** Replace the generated block of a `base.css` text. Throws when the markers are missing. */
-export function replaceTokenDefaultsBlock(css: string): string {
-  const start = css.indexOf(`  ${GENERATED_START}`);
-  const endMarker = `  ${GENERATED_END}`;
-  const end = css.indexOf(endMarker);
-  if (start < 0 || end < start) throw new Error('base.css: generated token block markers missing');
-  return css.slice(0, start) + renderTokenDefaultsBlock() + css.slice(end + endMarker.length);
-}
 
 export function renderRenamesJson(): string {
   return renderTokenRenamesJson();
@@ -62,8 +35,8 @@ export function renderTokenTablesDoc(): string {
     '',
     `- **System tokens:** ${SYSTEM_TOKENS.length} in ${SYSTEM_TOKEN_FAMILIES.length} families`,
     `  (${SYSTEM_TOKEN_FAMILIES.map((f) => f.id).join(', ')}).`,
-    `  ${EMITTED_SYSTEM_TOKENS.length} are declared by \`@texuli/tokens/base.css\`, ${FALLBACK_SYSTEM_TOKENS.length} are`,
-    '  fallback-only, and the data-viz family is emitted per theme.',
+    `  ${FALLBACK_SYSTEM_TOKENS.length} are read with their default as the fallback; the`,
+    '  28 data-viz tokens are emitted per theme.',
     `- **Component tokens:** ${COMPONENT_TOKENS.length} for ${COMPONENT_TOKEN_FAMILIES.length} components`,
     '  (`@texuli/tokens/components`), all fallback-only.',
     `- **Renames:** ${TOKEN_RENAMES.length} (\`@texuli/tokens/renames.json\`, schema`,
@@ -71,38 +44,30 @@ export function renderTokenTablesDoc(): string {
     '',
     '## The fallback model',
     '',
-    'A page pays only for tokens something sets. Three kinds of token exist:',
+    'Token contract v2 adds **0 B of eager CSS**: `@texuli/tokens/base.css` declares',
+    'none of these tokens. Every read carries the registry default as its fallback:',
     '',
-    '- **Emitted system tokens.** Their default is a plain literal',
-    '  (`--tx-size-control-md: 2.25rem`, `--tx-z-modal: 60`). `base.css` declares',
-    '  them on `:root`: they are the stable hooks a design system overrides, and',
-    '  they inherit into every scope.',
-    '- **Fallback-only system tokens.** Their default is derived from other',
-    '  variables (`--tx-space-4` → `calc(var(--tx-space-unit) * 4)`,',
-    '  `--tx-type-label-size` → `var(--tx-font-size-sm, 0.875rem)`). No stylesheet',
-    '  declares them. Every read carries the derivation as its fallback, so it',
-    '  resolves where it is read (density and radius follow the nearest theme):',
-    '  `systemVar(name)` from `@texuli/tokens/system` returns that exact expression.',
-    '- **Component tokens.** No stylesheet declares them either. The registry',
-    '  default is the fallback every read carries, and `componentVar(component, key)`',
-    '  returns the exact expression, for example',
-    `  ${code(componentVar('button', 'radius'))}. \`componentTokenFallbacks()\``,
-    '  maps every token to its expression.',
+    `- **System tokens:** \`systemVar(name)\` from \`@texuli/tokens/system\`, for example`,
+    `  ${code(systemVar('--tx-z-modal'))} or ${code(systemVar('--tx-type-label-size'))}.`,
+    '- **Component tokens:** `componentVar(component, key)` from',
+    `  \`@texuli/tokens/components\`, for example ${code(componentVar('button', 'radius'))}.`,
+    '  `componentTokenFallbacks()` maps every component token to its expression.',
     '',
-    'So a fallback-only or component token exists on a page only when a theme, a',
-    'design system or the host sets it. **Design systems set component tokens on',
-    'their scope** (the element that carries `data-tx-theme` or `data-tx-scope`),',
-    'never on `:root` globally, so two design systems can share a page.',
+    'So a token exists on a page only when a theme, a design system or the host',
+    'sets it, and a derived default (space steps, radius steps, type roles)',
+    'resolves where it is read, against the nearest theme. **Design systems set',
+    'tokens on their scope** (the element that carries `data-tx-theme` or',
+    '`data-tx-scope`), never globally, so two design systems can share a page.',
     '',
     '`checkTokenReads(source)` (`@texuli/tokens/components`) is the drift guard:',
-    'every `var()` read of a component token or a fallback-only system token must',
-    'equal `componentVar` / `systemVar` exactly. `tests/token-contract-v2.test.ts`',
-    'runs it over every component stylesheet in the repository.',
+    'every `var()` read of a system or component token must equal `systemVar` /',
+    '`componentVar` exactly. `tests/token-contract-v2.test.ts` runs it over every',
+    'component stylesheet in the repository.',
     '',
     '## Status',
     '',
-    '- **Shipped in this package:** the families, the registry, the emitted defaults',
-    '  in `base.css`, the read helpers and guard, `@texuli/tokens/data-viz`',
+    '- **Shipped in this package:** the families, the registry, the read helpers',
+    '  and guard, `@texuli/tokens/data-viz`',
     '  (complete chart tokens for any theme) and the rename list.',
     '- **Not adopted yet:** no component stylesheet reads these tokens; the',
     '  adoption tasks move component CSS onto `componentVar` expressions, each',
@@ -120,12 +85,7 @@ export function renderTokenTablesDoc(): string {
     '  colors by default would change rendering; that switch belongs to the chart',
     '  adoption task. `dataVizVariables(theme, mode)` returns the complete set now.',
     '',
-    '## Scoping',
-    '',
-    `Emitted system defaults are plain literals declared on ${code(TOKEN_SCOPE_SELECTOR)};`,
-    'they inherit into every scope. Fallback-only and component tokens resolve',
-    'where they are read, against the nearest theme. A design system sets any of',
-    'them on its scope element (`data-tx-theme` or `data-tx-scope`).',
+    '## Naming',
     '',
     'The shape radius scale is `--tx-shape-radius-*`, not `--tx-radius-*`:',
     'components already read `--tx-radius-sm`, `-md`, `-lg`, `-xl` and `-full`',
@@ -143,14 +103,10 @@ export function renderTokenTablesDoc(): string {
         lines.push(`| ${code(token.name)} | ${code(token.value)} | ${token.description} |`);
       }
     } else {
-      lines.push(
-        '| Token | Kind | Default | Read as | Meaning |',
-        '| --- | --- | --- | --- | --- |'
-      );
+      lines.push('| Token | Default | Meaning | Read as |', '| --- | --- | --- | --- |');
       for (const token of family.tokens) {
-        const kind = isDerivedValue(token.value) ? 'fallback-only' : 'emitted';
         lines.push(
-          `| ${code(token.name)} | ${kind} | ${code(token.value)} | ${code(systemVar(token.name))} | ${token.description} |`
+          `| ${code(token.name)} | ${code(token.value)} | ${token.description} | ${code(systemVar(token.name))} |`
         );
       }
     }

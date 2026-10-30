@@ -1,20 +1,20 @@
 /**
  * The fallback model of token contract v2 (ADR-020, PLAN_011 performance
- * contract: no eager bytes for tokens nothing reads).
+ * contract: 0 B eager for tokens nothing reads).
  *
- * - A system token whose default is a plain literal (`2.25rem`, `50`, `72ch`)
- *   is **emitted** by `base.css` on `:root`: it is the stable hook a design
- *   system overrides, and it inherits into every scope.
- * - A system token whose default is derived from other variables
- *   (`--tx-space-4` → `calc(var(--tx-space-unit) * 4)`, `--tx-type-label-size`
- *   → `var(--tx-font-size-sm, 0.875rem)`) is **fallback-only**: no stylesheet
- *   declares it, and every read carries the derivation as its fallback, so it
- *   resolves where it is read and exists on a page only when a theme, design
- *   system or host sets it.
- * - Component tokens are always fallback-only (see `componentVar`).
+ * No stylesheet declares a token contract v2 token: `base.css` is unchanged.
+ * Every read carries the registry default as its fallback, so a token
+ * resolves where it is read (density and radius follow the nearest theme) and
+ * exists on a page only when a theme, design system or host sets it:
  *
- * Reads must use `systemVar(name)` (and `componentVar`) verbatim; the token
- * read guard (`checkTokenReads` in `@texuli/tokens/components`) enforces it.
+ * - system tokens: `systemVar('--tx-z-modal')` → `var(--tx-z-modal, 60)`;
+ *   `systemVar('--tx-type-label-size')` →
+ *   `var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))`;
+ * - component tokens: `componentVar('button', 'radius')` in
+ *   `@texuli/tokens/components`.
+ *
+ * The data-viz family is the exception: themes emit it (`themeVariables`).
+ * Reads must use these expressions verbatim; `checkTokenReads` enforces it.
  */
 
 import { SYSTEM_TOKEN_FAMILIES, type SystemToken } from './families.ts';
@@ -32,24 +32,12 @@ export function closingParen(text: string, open: number): number {
   return -1;
 }
 
-/** True when a default reads other variables (derived), so it stays fallback-only. */
-export function isDerivedValue(value: string): boolean {
-  return value.includes('var(');
-}
-
 const BASE_TOKENS: readonly SystemToken[] = SYSTEM_TOKEN_FAMILIES.filter(
-  (family) => family.emit === 'base'
+  (family) => family.emit === 'fallback'
 ).flatMap((family) => family.tokens);
 
-/** System tokens `base.css` declares on `:root` (their default is a plain literal). */
-export const EMITTED_SYSTEM_TOKENS: readonly SystemToken[] = BASE_TOKENS.filter(
-  (token) => !isDerivedValue(token.value)
-);
-
-/** System tokens no stylesheet declares; reads carry their derivation as the fallback. */
-export const FALLBACK_SYSTEM_TOKENS: readonly SystemToken[] = BASE_TOKENS.filter((token) =>
-  isDerivedValue(token.value)
-);
+/** Every system token read with a fallback (all but the theme-emitted data-viz family). */
+export const FALLBACK_SYSTEM_TOKENS: readonly SystemToken[] = BASE_TOKENS;
 
 const FALLBACK_BY_NAME = new Map(FALLBACK_SYSTEM_TOKENS.map((token) => [token.name, token.value]));
 const KNOWN = new Set(
@@ -83,9 +71,9 @@ export function expandTokenRefs(value: string): string {
 }
 
 /**
- * The exact expression CSS uses to read a system token: `var(--tx-z-modal)`
- * for emitted tokens, `var(--tx-type-label-size, var(--tx-font-size-sm,
- * 0.875rem))` for fallback-only ones. Throws on a name outside the vocabulary.
+ * The exact expression CSS uses to read a system token, with its default as
+ * the fallback (`var(--tx-z-modal, 60)`); data-viz tokens, which themes emit,
+ * read bare (`var(--tx-chart-1)`). Throws on a name outside the vocabulary.
  */
 export function systemVar(name: string): string {
   if (!KNOWN.has(name)) throw new RangeError(`Unknown system token ${name}`);

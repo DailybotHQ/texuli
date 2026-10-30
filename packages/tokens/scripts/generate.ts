@@ -6,13 +6,11 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderRenamesJson, renderTokenTablesDoc, replaceTokenDefaultsBlock } from './render.ts';
+import { renderRenamesJson, renderTokenTablesDoc } from './render.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const BASE_CSS = join(ROOT, 'src/css/base.css');
 
 const outputs: Record<string, string> = {
-  'src/css/base.css': replaceTokenDefaultsBlock(readFileSync(BASE_CSS, 'utf8')),
   'src/renames/renames.json': renderRenamesJson(),
   'docs/tokens-components.md': renderTokenTablesDoc(),
 };

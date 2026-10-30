@@ -10,11 +10,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import {
-  renderRenamesJson,
-  renderTokenDefaultsBlock,
-  renderTokenTablesDoc,
-} from '../scripts/render.ts';
+import { renderRenamesJson, renderTokenTablesDoc } from '../scripts/render.ts';
 import {
   COMPONENT_IDS,
   COMPONENT_TOKEN_FAMILIES,
@@ -38,14 +34,12 @@ import { TOKEN_RENAMES, TOKEN_RENAMES_JSON_SCHEMA } from '../src/renames/index.t
 import {
   BASE_SYSTEM_TOKEN_NAMES,
   DATA_VIZ_TOKEN_NAMES,
-  EMITTED_SYSTEM_TOKENS,
   FALLBACK_SYSTEM_TOKENS,
   isSystemTokenName,
   SYSTEM_TOKEN_FAMILIES,
   SYSTEM_TOKEN_NAMES,
   SYSTEM_TOKENS,
   systemVar,
-  TOKEN_SCOPE_SELECTOR,
 } from '../src/system/index.ts';
 import { TAILWIND_THEME_ENTRIES, themeEntryValue } from '../src/tailwind/index.ts';
 
@@ -744,16 +738,12 @@ const TODAY: Record<string, [string | null, Record<string, string>]> = {
 
 /**
  * Every variable declared at a themed element for one theme and mode: the
- * theme's own variables plus the emitted `base.css` literals. Fallback-only
- * system tokens and component tokens are deliberately absent, so reads resolve
- * through the fallbacks `systemVar` / `componentVar` carry.
+ * theme's own variables only. No system or component token is declared, so
+ * reads resolve through the fallbacks `systemVar` / `componentVar` carry.
  */
 async function scopeVariables(mode: 'light' | 'dark'): Promise<Record<string, string>> {
   const theme = await loadLibraryTheme('enterprise-neutral');
-  return {
-    ...themeVariables({ theme, mode }),
-    ...Object.fromEntries(EMITTED_SYSTEM_TOKENS.map((t) => [t.name, t.value])),
-  };
+  return themeVariables({ theme, mode });
 }
 
 function walk(dir: string, out: string[] = []): string[] {
@@ -800,7 +790,9 @@ describe('token contract v2: system families', () => {
     for (const name of names) expect(name).toMatch(/^--tx-[a-z0-9-]+$/);
     for (const token of SYSTEM_TOKENS) expect(token.description.length).toBeGreaterThan(3);
     expect(names).toEqual([...SYSTEM_TOKEN_NAMES]);
-    const base = SYSTEM_TOKEN_FAMILIES.filter((f) => f.emit === 'base').flatMap((f) => f.tokens);
+    const base = SYSTEM_TOKEN_FAMILIES.filter((f) => f.emit === 'fallback').flatMap(
+      (f) => f.tokens
+    );
     expect(base.map((t) => t.name)).toEqual([...BASE_SYSTEM_TOKEN_NAMES]);
     expect(
       SYSTEM_TOKEN_FAMILIES.find((f) => f.id === 'data-viz')?.tokens.map((t) => t.name)
@@ -974,33 +966,13 @@ describe('token contract v2: component registry', () => {
 });
 
 describe('token contract v2: generated surfaces', () => {
-  it('base.css declares only the emitted literals, once, on :root inside @layer tx.base', () => {
+  it('base.css declares no token contract v2 token (0 B eager)', () => {
     const baseCss = readFileSync(join(TOKENS, 'src/css/base.css'), 'utf8');
-    const block = renderTokenDefaultsBlock();
-    expect(baseCss).toContain(block);
-    const layerStart = baseCss.indexOf('@layer tx.base {');
-    expect(layerStart).toBeGreaterThan(0);
-    expect(baseCss.indexOf(block)).toBeGreaterThan(layerStart);
-    expect(TOKEN_SCOPE_SELECTOR).toBe(':root');
-    expect(block).toContain(`${TOKEN_SCOPE_SELECTOR} {`);
-    expect(EMITTED_SYSTEM_TOKENS.length + FALLBACK_SYSTEM_TOKENS.length).toBe(
-      BASE_SYSTEM_TOKEN_NAMES.length
-    );
-    expect(EMITTED_SYSTEM_TOKENS.length).toBe(46);
-    for (const token of EMITTED_SYSTEM_TOKENS) {
-      expect(token.value, token.name).not.toContain('var(');
-      expect(baseCss.split(`${token.name}:`).length - 1, token.name).toBe(1);
+    expect(FALLBACK_SYSTEM_TOKENS.map((t) => t.name)).toEqual([...BASE_SYSTEM_TOKEN_NAMES]);
+    for (const name of [...SYSTEM_TOKEN_NAMES, ...COMPONENT_TOKENS.map((t) => t.token)]) {
+      expect(baseCss, name).not.toMatch(new RegExp(`${name}\\s*:`));
     }
-    // Fallback-only system tokens, component tokens and data-viz are never declared.
-    for (const name of [
-      ...FALLBACK_SYSTEM_TOKENS.map((t) => t.name),
-      ...COMPONENT_TOKENS.map((t) => t.token),
-      ...DATA_VIZ_TOKEN_NAMES,
-    ]) {
-      expect(baseCss, name).not.toContain(`${name}:`);
-    }
-    // No literal color in a default.
-    expect(block).not.toMatch(/#[0-9a-f]{3,8}\b|rgb\(|oklch\(|hsl\(/i);
+    expect(baseCss).not.toContain('@generated');
   });
 
   it('renames.json and the token tables doc match the generator', () => {
@@ -1034,36 +1006,6 @@ describe('token contract v2: generated surfaces', () => {
       expect(pkg.exports[subpath], subpath).toBeTruthy();
     }
   });
-
-  it('no emitted name is read or declared anywhere else, so base.css changes no rendering', () => {
-    const fresh = EMITTED_SYSTEM_TOKENS.map((t) => t.name);
-    const pattern = new RegExp(
-      `(?:${fresh.map((n) => n.replace(/[-]/g, '\\-')).join('|')})(?![a-z0-9-])`,
-      'g'
-    );
-    const dirs = [
-      ...readdirSync(join(ROOT, 'packages'))
-        .filter((name) => name !== 'tokens')
-        .map((name) => join(ROOT, 'packages', name, 'src')),
-      join(ROOT, 'apps/website/src'),
-      join(ROOT, 'functions'),
-    ];
-    const hits: string[] = [];
-    for (const dir of dirs) {
-      let files: string[];
-      try {
-        files = walk(dir);
-      } catch {
-        continue;
-      }
-      for (const file of files) {
-        for (const match of readFileSync(file, 'utf8').matchAll(pattern)) {
-          hits.push(`${file.slice(ROOT.length + 1)}: ${match[0]}`);
-        }
-      }
-    }
-    expect(hits).toEqual([]);
-  });
 });
 
 describe('token contract v2: the fallback model and the read guard', () => {
@@ -1071,8 +1013,11 @@ describe('token contract v2: the fallback model and the read guard', () => {
     expect(componentVar('button', 'radius')).toBe(
       'var(--tx-button-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))'
     );
-    expect(componentVar('dialog', 'z-index')).toBe('var(--tx-dialog-z-index, var(--tx-z-modal))');
-    expect(systemVar('--tx-z-modal')).toBe('var(--tx-z-modal)');
+    expect(componentVar('dialog', 'z-index')).toBe(
+      'var(--tx-dialog-z-index, var(--tx-z-modal, 60))'
+    );
+    expect(systemVar('--tx-z-modal')).toBe('var(--tx-z-modal, 60)');
+    expect(systemVar('--tx-chart-1')).toBe('var(--tx-chart-1)');
     expect(systemVar('--tx-type-label-size')).toBe(
       'var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))'
     );
@@ -1094,7 +1039,7 @@ describe('token contract v2: the fallback model and the read guard', () => {
   });
 
   it('checkTokenReads flags reads that drop or change the registry fallback', () => {
-    const good = `.tx-button { border-radius: ${componentVar('button', 'radius')}; z-index: var(--tx-z-modal); }`;
+    const good = `.tx-button { border-radius: ${componentVar('button', 'radius')}; z-index: ${systemVar('--tx-z-modal')}; }`;
     expect(checkTokenReads(good)).toEqual([]);
     // Whitespace and line breaks do not matter.
     expect(
@@ -1105,6 +1050,7 @@ describe('token contract v2: the fallback model and the read guard', () => {
       'a { border-radius: var(--tx-button-radius, 4px); }',
       'a { font-size: var(--tx-type-label-size); }',
       'a { padding: var(--tx-space-3, 0.75rem); }',
+      'a { z-index: var(--tx-z-modal); }',
     ];
     for (const source of bad) {
       const issues = checkTokenReads(source);

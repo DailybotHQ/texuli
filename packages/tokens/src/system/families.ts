@@ -1,9 +1,9 @@
 /**
- * Token contract v2 system families (ADR-020). Every `base` family default is
- * written to `@texuli/tokens/base.css` and reproduces today's rendered values
- * (measured from the component stylesheets); nothing reads these tokens until
- * the adoption tasks move component CSS onto them. The `theme` family (data-viz)
- * is emitted per theme by `themeVariables`.
+ * Token contract v2 system families (ADR-020). Each default reproduces today's
+ * rendered values (measured from the component stylesheets). No stylesheet
+ * declares them: reads carry the default as a fallback (`systemVar`), so they
+ * cost no eager bytes; nothing reads them until the adoption tasks. The
+ * `theme` family (data-viz) is emitted per theme by `themeVariables`.
  */
 
 import { STATUS_NAMES, TYPE_ROLES, type TypeRole } from './names.ts';
@@ -12,9 +12,8 @@ import { STATUS_NAMES, TYPE_ROLES, type TypeRole } from './names.ts';
 export interface SystemToken {
   readonly name: string;
   /**
-   * The default. `base.css` declares it when it is a plain literal; when it
-   * reads other variables it is the read fallback instead (`systemVar`). For
-   * the `theme` family it names the theme source.
+   * The default, which every read carries as its fallback (`systemVar`); no
+   * stylesheet declares it. For the `theme` family it names the theme source.
    */
   readonly value: string;
   readonly description: string;
@@ -37,8 +36,8 @@ export interface SystemTokenFamily {
   readonly id: SystemTokenFamilyId;
   readonly title: string;
   readonly description: string;
-  /** `base`: declared by `base.css`. `theme`: emitted by `themeVariables` per theme. */
-  readonly emit: 'base' | 'theme';
+  /** `fallback`: never declared; reads carry the default (`systemVar`). `theme`: emitted by `themeVariables` per theme. */
+  readonly emit: 'fallback' | 'theme';
   readonly tokens: readonly SystemToken[];
 }
 
@@ -330,14 +329,14 @@ export const SYSTEM_TOKEN_FAMILIES: readonly SystemTokenFamily[] = [
     id: 'space',
     title: 'Space',
     description: 'The 0.25rem spacing scale, scaled by `--tx-density`.',
-    emit: 'base',
+    emit: 'fallback',
     tokens: SPACE,
   },
   {
     id: 'size',
     title: 'Size',
     description: 'Control heights, icon sizes and interactive targets.',
-    emit: 'base',
+    emit: 'fallback',
     tokens: SIZE,
   },
   {
@@ -345,14 +344,14 @@ export const SYSTEM_TOKEN_FAMILIES: readonly SystemTokenFamily[] = [
     title: 'Type roles',
     description:
       'Family, size, line height, weight and tracking per role, mapped from the theme type scale.',
-    emit: 'base',
+    emit: 'fallback',
     tokens: TYPE,
   },
   {
     id: 'elevation',
     title: 'Elevation',
     description: 'A six-step shadow ladder over the theme soft and float shadows, plus glass.',
-    emit: 'base',
+    emit: 'fallback',
     tokens: ELEVATION,
   },
   {
@@ -360,21 +359,21 @@ export const SYSTEM_TOKEN_FAMILIES: readonly SystemTokenFamily[] = [
     title: 'Shape',
     description:
       'The radius scale derived from `--tx-radius` and the radius scale, and border widths.',
-    emit: 'base',
+    emit: 'fallback',
     tokens: SHAPE,
   },
   {
     id: 'layer',
     title: 'Layers',
     description: 'Stacking order for sticky chrome, popovers, overlays, dialogs and toasts.',
-    emit: 'base',
+    emit: 'fallback',
     tokens: LAYER,
   },
   {
     id: 'opacity',
     title: 'Opacity',
     description: 'Disabled, muted and scrim opacities.',
-    emit: 'base',
+    emit: 'fallback',
     tokens: OPACITY,
   },
   {
@@ -382,16 +381,22 @@ export const SYSTEM_TOKEN_FAMILIES: readonly SystemTokenFamily[] = [
     title: 'Layout',
     description:
       'Content widths, container breakpoints, grid columns and gutters. CSS cannot read custom properties inside `@media` or `@container` conditions, so the breakpoints are values for tooling and design-system exports.',
-    emit: 'base',
+    emit: 'fallback',
     tokens: LAYOUT,
   },
-  { id: 'icon', title: 'Icons', description: 'Icon stroke and style.', emit: 'base', tokens: ICON },
+  {
+    id: 'icon',
+    title: 'Icons',
+    description: 'Icon stroke and style.',
+    emit: 'fallback',
+    tokens: ICON,
+  },
   {
     id: 'status',
     title: 'Status',
     description:
       'One status set over the semantic roles, shared by badges, alerts, toasts and charts.',
-    emit: 'base',
+    emit: 'fallback',
     tokens: STATUS,
   },
   {

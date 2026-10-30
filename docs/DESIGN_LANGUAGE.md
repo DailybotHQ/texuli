@@ -70,11 +70,10 @@ those steps.
   0.2rem, 0.625rem, 0.65rem). New surfaces should not copy them.
 - **Spacing scale (token contract v2, ADR-020, unreleased):** `--tx-space-unit`
   (`calc(0.25rem * var(--tx-density, 1))`) and `--tx-space-0` … `--tx-space-12`
-  (0 to 3rem at density 1) exist in `@texuli/tokens/system`. They are
-  fallback-only (no stylesheet declares them; reads use `systemVar`, which
-  carries the calculation as the fallback, so density applies where the value
-  is read), and the Tailwind preset's `--spacing` reads `--tx-space-unit` the
-  same way. Components still hard-code their
+  (0 to 3rem at density 1) exist in `@texuli/tokens/system`. No stylesheet
+  declares them: reads use `systemVar`, which carries the calculation as the
+  fallback, so density applies where the value is read. The Tailwind preset's
+  `--spacing` reads `--tx-space-unit` the same way. Components still hard-code their
   `rem` values: **PLANNED:** the adoption tasks move component CSS onto the
   scale through the component tokens (`@texuli/tokens/components`), with no
   visual change under the visual-baseline theme. Tables:
@@ -108,7 +107,7 @@ The button sizes are the reference (`button.css`):
 Below 640 px (`@media (max-width: 639px)`), `sm`, `md` and `icon` grow to
 `max(2.75rem, 44px)`. Token contract v2 names these values
 `--tx-size-control-{sm,md,lg}` (2, 2.25 and 2.75rem, plus `xs` 1.75rem) and
-`--tx-size-target-touch` (`max(2.75rem, 44px)`), declared by `base.css`; the
+`--tx-size-target-touch` (`max(2.75rem, 44px)`), read with `systemVar`; the
 button still uses the literals until adoption. Rule for new surfaces: interactive targets are at least
 44 px on small screens and never below 24 px anywhere. The site's own specs
 assert 44 px targets on the agent chat page (`tests/e2e/site-agent-chat.spec.ts`).

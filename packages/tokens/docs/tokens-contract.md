@@ -22,9 +22,9 @@ Contract v2 adds two tiers on top of the three above, additively:
 - **System families** (`@texuli/tokens/system`): space, size, type roles,
   elevation, shape (`--tx-shape-radius-*`), layers, opacity, layout, icons,
   status and data-viz, 151 tokens. Their defaults reproduce today's rendered
-  values. `base.css` declares only the 46 plain literals (on `:root`); a token
-  derived from other variables is fallback-only and read with
-  `systemVar(name)`, which carries the derivation as its fallback.
+  values. No stylesheet declares them (`base.css` is unchanged, 0 B eager):
+  CSS reads `systemVar(name)`, for example `var(--tx-z-modal, 60)`, which
+  carries the default as its fallback. Themes emit the data-viz family.
 - **Component tokens** (`@texuli/tokens/components`): 333 tokens for 48
   components, each defaulting to a system or theme token. No stylesheet
   declares them: CSS reads `componentVar(component, key)`, for example
@@ -32,7 +32,7 @@ Contract v2 adds two tiers on top of the three above, additively:
   so a component token exists on a page only when a theme, design system or
   host sets it. Design systems set component tokens on their scope element
   (`data-tx-theme` or `data-tx-scope`). `checkTokenReads(source)` fails any
-  read whose fallback differs from the registry.
+  read of a system or component token whose fallback differs from the registry.
 
 `THEME_JSON_SCHEMA.definitions.systemTokens` lists the system names, and
 `getComponentTokensJsonSchema()` describes the component vocabulary. No

@@ -32,7 +32,7 @@ export const TYPE_ROLE_PROPERTIES = ['family', 'size', 'line', 'weight', 'tracki
 /** Status names shared by badges, alerts, toasts and charts. */
 export const STATUS_NAMES = STATUSES;
 
-/** System tokens `base.css` declares (theme-independent or derived from theme tokens). */
+/** System tokens read with their default as the fallback (every family but data-viz). */
 export const BASE_SYSTEM_TOKEN_NAMES: readonly string[] = [
   '--tx-space-unit',
   ...steps('space', range(0, 12)),

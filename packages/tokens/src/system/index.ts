@@ -2,10 +2,8 @@
 
 export {
   closingParen,
-  EMITTED_SYSTEM_TOKENS,
   expandTokenRefs,
   FALLBACK_SYSTEM_TOKENS,
-  isDerivedValue,
   systemVar,
 } from './fallback.ts';
 export {
@@ -25,10 +23,3 @@ export {
   TYPE_ROLES,
   type TypeRole,
 } from './names.ts';
-export {
-  GENERATED_END,
-  GENERATED_START,
-  renderDeclarations,
-  renderSystemTokenDeclarations,
-  TOKEN_SCOPE_SELECTOR,
-} from './render.ts';
