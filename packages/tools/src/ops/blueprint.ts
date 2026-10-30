@@ -15,6 +15,7 @@ import {
 } from '@texuli/catalog/validate';
 import { validateDocument } from '@texuli/document/schema';
 import { checkFamilyBlock } from '../internal/static-draft.ts';
+import { loadBlockShapes } from './block-shapes-loader.ts';
 import { loadOpsCatalog } from './catalog.ts';
 import { defineOperation } from './registry.ts';
 import type { Operation } from './types.ts';
@@ -141,7 +142,7 @@ export const blueprintValidate: Operation = defineOperation({
     { title: 'A hostile card with a script link', input: { draft: INVALID_DRAFT } },
   ],
   async handler(input) {
-    const { catalog, hash } = await viewOfCatalog();
+    const [{ catalog, hash }] = await Promise.all([viewOfCatalog(), loadBlockShapes()]);
     const tier = input.tier === 'developer' ? 'developer' : 'untrusted';
     const result: DraftValidation = validateDraft(input.draft, {
       catalog,

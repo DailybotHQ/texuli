@@ -8,6 +8,8 @@ Operations (the @texuli/tools registry; the same names are MCP tools):
   component get       Read a component manifest
   example search      Find component examples
   blueprint validate  Validate a blueprint draft
+  block list          List block types
+  block schema        Read a block shape
   theme search        Search the theme library
   theme get           Read a full theme
   theme preview       Preview a theme
@@ -64,6 +66,16 @@ Usage: texuli blueprint <verb> [--json <object> | --file <path>] [--out <path>]
 
 Operations:
   blueprint validate  Validate a blueprint draft [blueprint.validate]
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli block <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  block list    List block types [block.list]
+  block schema  Read a block shape [block.schema]
 
 Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
 Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
@@ -175,6 +187,31 @@ Arguments (JSON object keys):
   fragment: boolean. Accept any roots (a fragment). Default false: one frame root (layout-page, layout-doc, layout-deck, document, canvas or data-dashboard).
 
 Limits: input up to 270336 bytes, at most 512 items, 5000 ms budget.
+
+----
+Usage: texuli block list [--json <object> | --file <path>] [--out <path>]
+
+List block types (block.list, runtime edge)
+List the content block types the blocks-* components render (table, stat, cta, poll …), optionally for one component or matching words. Returns the match count and, per type, the component that renders it, a label and when to use it; read one shape with block.schema.
+
+Arguments (JSON object keys):
+  component: "blocks-text" | "blocks-data" | "blocks-media" | "blocks-diagram" | "blocks-embed" | "blocks-structure" | "blocks-code" | "blocks-interactive" | "blocks-map". Only the types this blocks-* component renders, e.g. "blocks-data".
+  query: string. Words to match against the type, its label and its useWhen notes.
+
+Limits: input up to 1024 bytes, at most 32 items, 5000 ms budget.
+Example (What blocks-data renders): texuli block list --json '{"component":"blocks-data"}'
+
+----
+Usage: texuli block schema [--json <object> | --file <path>] [--out <path>]
+
+Read a block shape (block.schema, runtime edge)
+Read the shape of one content block type: the component that renders it, its fields as compact text and as a JSON Schema (required fields are the ones the validator refuses a block without), examples that validate in a blueprint, limits, when to use it and whether it can pass blueprint.validate today. Returns what a blocks-* node’s block prop needs.
+
+Arguments (JSON object keys):
+  type (required): "heading" | "text" | "list" | "quote" | "callout" | "table" | "stat" | "kpi" | "chart" | "image" | "figure" | "video" | "gallery" | "flow" | "tree" | "board" | "terminal" | "embed-app" | "link-preview" | "columns" | "grid" | "tabs" | "accordion" | "cards" | "divider" | "cta" | "code" | "poll" | "quiz" | "calculator" | "checklist" | "map". A block type from block.list, e.g. "table" or "cta".
+
+Limits: input up to 1024 bytes, 5000 ms budget.
+Example (The table block): texuli block schema --json '{"type":"table"}'
 
 ----
 Usage: texuli theme search [--json <object> | --file <path>] [--out <path>]

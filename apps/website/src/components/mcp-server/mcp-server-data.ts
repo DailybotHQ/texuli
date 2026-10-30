@@ -174,6 +174,52 @@ export const MCP_SERVER_DATA = {
       example: 'A valid page with a hero heading',
     },
     {
+      name: 'block.list',
+      title: 'List block types',
+      summary:
+        'List the content block types the blocks-* components render (table, stat, cta, poll …), optionally for one component or matching words. Returns the match count and, per type, the component that renders it, a label and when to use it; read one shape with block.schema.',
+      runtime: 'edge',
+      remote: true,
+      limits: {
+        inputBytes: 1024,
+        items: 32,
+        timeMs: 5000,
+      },
+      arguments: [
+        {
+          name: 'component',
+          required: false,
+          description: 'Only the types this blocks-* component renders, e.g. "blocks-data".',
+        },
+        {
+          name: 'query',
+          required: false,
+          description: 'Words to match against the type, its label and its useWhen notes.',
+        },
+      ],
+      example: 'What blocks-data renders',
+    },
+    {
+      name: 'block.schema',
+      title: 'Read a block shape',
+      summary:
+        'Read the shape of one content block type: the component that renders it, its fields as compact text and as a JSON Schema (required fields are the ones the validator refuses a block without), examples that validate in a blueprint, limits, when to use it and whether it can pass blueprint.validate today. Returns what a blocks-* node’s block prop needs.',
+      runtime: 'edge',
+      remote: true,
+      limits: {
+        inputBytes: 1024,
+        timeMs: 5000,
+      },
+      arguments: [
+        {
+          name: 'type',
+          required: true,
+          description: 'A block type from block.list, e.g. "table" or "cta".',
+        },
+      ],
+      example: 'The table block',
+    },
+    {
       name: 'theme.search',
       title: 'Search the theme library',
       summary:

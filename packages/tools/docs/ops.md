@@ -29,6 +29,8 @@ same registry. The registry is framework-free.
 | `component.get` | Read a component manifest | edge | local and remote MCP, CLI | `texuli component get` | Read one component manifest from the catalog by id. Returns { component }: its props with kinds and schemas, events, worked examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it (an empty emit list means agent output may not). |
 | `example.search` | Find component examples | edge | local and remote MCP, CLI | `texuli example search` | Find worked manifest examples (props an agent can copy) by component id and/or example id, or search their titles and descriptions. Returns the match count and each example with its component id and package. |
 | `blueprint.validate` | Validate a blueprint draft | edge | local and remote MCP, CLI | `texuli blueprint validate` | Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's draft checks: structure, sinks, tree limits, component ids, tiers and prop schemas, deep block and document schemas, grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with the catalog's stable codes. |
+| `block.list` | List block types | edge | local and remote MCP, CLI | `texuli block list` | List the content block types the blocks-* components render (table, stat, cta, poll …), optionally for one component or matching words. Returns the match count and, per type, the component that renders it, a label and when to use it; read one shape with block.schema. |
+| `block.schema` | Read a block shape | edge | local and remote MCP, CLI | `texuli block schema` | Read the shape of one content block type: the component that renders it, its fields as compact text and as a JSON Schema (required fields are the ones the validator refuses a block without), examples that validate in a blueprint, limits, when to use it and whether it can pass blueprint.validate today. Returns what a blocks-* node’s block prop needs. |
 | `theme.search` | Search the theme library | edge | local and remote MCP, CLI | `texuli theme search` | Search the Texuli theme library (200+ offline themes) by words, category, collection, mood or tag. Returns the match count and each theme’s metadata: id, name, description, category, collection, mood, tags, contrast level and whether it is dark-first. |
 | `theme.get` | Read a full theme | edge | local and remote MCP, CLI | `texuli theme get` | Read the full token definition of one library theme by id. Returns { theme }: its id, name, description and every light and dark color, radius, font and chart token, ready to compile or apply. |
 | `theme.preview` | Preview a theme | edge | local and remote MCP, CLI | `texuli theme preview` | Preview one library theme in light or dark mode. Returns its summary, the key tokens of that mode (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes (aa.pass and issue counts). |
@@ -45,6 +47,8 @@ same registry. The registry is framework-free.
 | `component.get` | 1,024 | — | 5 s | `id` (required) |
 | `example.search` | 4,096 | 100 | 5 s | `componentId`, `exampleId`, `query`, `limit` |
 | `blueprint.validate` | 270,336 | 512 | 5 s | `draft` (required), `tier`, `fragment` |
+| `block.list` | 1,024 | 32 | 5 s | `component`, `query` |
+| `block.schema` | 1,024 | — | 5 s | `type` (required) |
 | `theme.search` | 4,096 | 500 | 5 s | `query`, `category`, `collection`, `mood`, `tag`, `limit` |
 | `theme.get` | 1,024 | — | 5 s | `id` (required) |
 | `theme.preview` | 1,024 | — | 5 s | `id` (required), `mode` |
@@ -111,6 +115,14 @@ and `openWorldHint`.
   `severity`, `path`, `message` and, for a node, its `id`. The codes are the
   catalog's own (`sink`, `tier-denied`, `nodes-exceeded`, `frame-root`,
   `catalog-mismatch` …); the catalog has no `hint` field, so none is added.
+  A `block-schema` diagnostic also names the shape expected at the failing
+  path and points at `block.schema`, e.g. `block columns.0: Expected a plain
+  object. Expected shape: { id: string, label: string }. Read block.schema
+  with type "table" for the full shape and examples.` The text is generated
+  from the block shapes below, never written per type. The shapes load as a
+  lazy chunk that `blueprint.validate` and the `block.*` operations load
+  first; the email and print outputs validate synchronously and add the
+  shape only when the chunk has already loaded in that process.
 - **Not checked on this server:** `schema-form`, `canvas` and `spreadsheet`
   nodes and `{"$source": …}` bindings are refused (`form-unchecked`,
   `canvas-unchecked`, `sheet-unchecked`, and source bindings), because `@texuli/tools`
@@ -120,6 +132,35 @@ and `openWorldHint`.
   the catalog-local interaction check always runs. When `when` conditions
   appear, they are refused (`invalid-condition`): no condition runtime is
   passed.
+
+## Block shapes
+
+The `blocks-*` components take a `block` prop whose shape depends on its
+`type`. `block.list` lists every type the validator accepts (the catalog's
+`BLOCK_FAMILY_TYPES`, by component), and `block.schema` returns one type's
+shape. The block families validate with hand-written parsers, not schema
+objects, so the shape is learned from the validator
+(`src/ops/block-shapes.ts`):
+
+- **Types:** exactly the validator's list; a test fails when a validated
+  type is not served.
+- **Examples:** `BLOCK_CATALOG` from `@texuli/blocks/core`, plus fixtures in
+  `block-shapes.ts` for the eleven types it has no entry for yet (diagram,
+  embed, interactive and map families). Only examples that pass the family
+  check and the untrusted sink scan are served, so every served example
+  validates in a blueprint.
+- **Shape:** the examples' merged structure as compact text (`shape`) and
+  as a derived JSON Schema (`schema`). A field is required only when the
+  family parser refuses the example without it. An object keyed by ids
+  declared elsewhere in the block (a table row keyed by column ids) is a
+  record, and a nested block is `Block`. Fields no example shows are not
+  listed, enums show as `string`, and `limits` carries the caps in words:
+  the validator stays authoritative.
+- **Usable in a blueprint:** `usableInBlueprint` is false, and `notes` says
+  why, when no instance passes `blueprint.validate` at the untrusted tier.
+  Today that is `tree`: its parser requires `style`, and the draft sink scan
+  refuses every `style` key. The rich `list` example (`style: "check"`) is
+  not served for the same reason.
 
 ## Library
 
@@ -215,6 +256,11 @@ alias to the same result as its target, reads the version from
 The same file checks `blueprint.validate` on golden and hostile fixtures,
 envelope migration, the catalog hash, deep block checks, the frame root,
 the node cap and the input cap.
+`packages/tools/tests/blocks-ops.test.ts` checks that `block.list` and
+`block.schema` serve every validated block type, that every served example
+passes the family check and `blueprint.validate`, that every required field
+is one the parser refuses a block without, and that `block-schema`
+diagnostics name the expected shape.
 `packages/tools/tests/router.test.ts` checks the router: every operation
 example through `--json`, stdin and `--file`, the kept commands, refusals,
 hostile input, `--out` under the write policy, and the `texuli help`

@@ -76,6 +76,22 @@
       "readOnly": true
     },
     {
+      "name": "block.list",
+      "title": "List block types",
+      "description": "List the content block types the blocks-* components render (table, stat, cta, poll …), optionally for one component or matching words. Returns the match count and, per type, the component that renders it, a label and when to use it; read one shape with block.schema.",
+      "runtime": "edge",
+      "remote": true,
+      "readOnly": true
+    },
+    {
+      "name": "block.schema",
+      "title": "Read a block shape",
+      "description": "Read the shape of one content block type: the component that renders it, its fields as compact text and as a JSON Schema (required fields are the ones the validator refuses a block without), examples that validate in a blueprint, limits, when to use it and whether it can pass blueprint.validate today. Returns what a blocks-* node’s block prop needs.",
+      "runtime": "edge",
+      "remote": true,
+      "readOnly": true
+    },
+    {
       "name": "theme.search",
       "title": "Search the theme library",
       "description": "Search the Texuli theme library (200+ offline themes) by words, category, collection, mood or tag. Returns the match count and each theme’s metadata: id, name, description, category, collection, mood, tags, contrast level and whether it is dark-first.",
