@@ -1247,3 +1247,622 @@ reflect this decision.
   rule set in the head is planned; it needs a typed, closed `<style>`
   builder (selectors and properties from an allowlist, values escaped)
   before it can ship.
+
+## ADR-017: One operations registry (`@texuli/tools/ops`) for every agent surface
+
+- **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
+  architecture task under the developer's trust pre-authorization; the
+  developer may override this decision. **Status: planned** (release
+  0.9.0); nothing below is shipped yet.
+- **Context:** `@texuli/tools` exposes the library to agents through seven
+  read-only MCP tools (`packages/tools/src/mcp/server.ts`: `catalog`,
+  `component`, `validate`, `example`, `theme`, `deck`, `document`), a CLI
+  split across six bins, `texuli-llms`, the server card and the skill. Each
+  surface is written by hand and they have drifted: the server card names 5
+  tools and protocol `2025-06-18` while the server has 7 and `2025-11-25`
+  (and a test locks in the stale card), `SERVER_VERSION` is `0.0.0`, the
+  CLI `theme list` and the MCP `theme` tool use two implementations, and
+  `check-skill` does not check MCP tool names or the `texuli deck|document`
+  commands. The developer's rule for PLAN_011 (amendment 1) is that an agent
+  can drive everything in Texuli, and that every surface stays current.
+- **Options:**
+  1. **Keep hand-written surfaces** and add more parity tests. No new
+     module, but every new tool still needs N edits and N tests, and drift
+     is found in review, not by a gate.
+  2. **A framework-free registry inside `@texuli/tools`** (a new `ops`
+     subpath) from which every door is generated.
+  3. **A separate `@texuli/ops` package.** A clean name, but the handlers
+     need the catalog, deck, document and theme code `@texuli/tools`
+     already depends on, so the package would sit at the same layer as
+     tools and duplicate its dependency set; one more package to version
+     and publish for no consumer that wants the registry without tools.
+- **Decision:** option 2.
+  - **Operation shape:** `{ name, title, summary, input, output,
+    annotations, runtime, limits, examples, handler }`. `input` and
+    `output` are JSON Schemas, so the MCP gets `inputSchema`,
+    `outputSchema` and `structuredContent` from the same source.
+    Annotations mark read-only, idempotent and closed-world operations. A
+    schema-checked `invoke()` validates input and output and returns stable
+    error codes; tool errors are `isError` results, never transport errors.
+  - **Naming:** a `group.verb` namespace (`catalog.search`,
+    `component.get`, `blueprint.validate`, `deck.convert`, `ds.compile`
+    …). Today's seven tool names stay as aliases for one minor (flagged
+    deprecated in their descriptions), then go.
+  - **Runtime class:** `edge` (pure compute, runs anywhere, including the
+    remote endpoint), `node` (needs Node: the file system, the heavier PDF
+    and DOCX writers, local writes) and `site` (remote only, reads the
+    built site through `env.ASSETS`; see
+    [ADR-018](#adr-018-the-remote-mcp-on-pages-functions)). Each door
+    filters by class.
+  - **Limits and examples** live on the operation (input bytes, item caps,
+    a time budget) and feed docs, evals, tests and the remote caps.
+  - **Generated doors:** the MCP `tools/list` (local and remote), the CLI
+    router (`texuli <group> <verb>`, JSON from stdin, `--file`, `--out`;
+    existing commands kept), `texuli help`, the server card, the `/mcp/`
+    docs page, the llms "Tools" section and `packages/tools/docs/ops.md`.
+    The skill names operations; `check-skill` fails on an unknown operation,
+    argument or `texuli …` command. A new root `check:surfaces` script
+    regenerates every artifact and fails on a diff, and `pnpm check` runs
+    it.
+  - **One theme implementation** serves the CLI and the operations, and
+    `serverInfo.version` is read from the package manifest.
+  - **Edge-safe catalog:** the static manifest list moves to
+    `@texuli/catalog/manifests/all` (the `apps/agent` pattern), with a hash
+    parity test against file-system discovery.
+- **Why:** one source makes drift a CI failure instead of a review comment,
+  and it is the cheapest way to keep the doors equal as operations are
+  added (the `ds.*` family of ADR-021 alone adds about ten). Placing the
+  registry in tools keeps the layer graph unchanged: tools already sits
+  above everything the handlers call.
+- **Agent-first and adoption-first:** every capability an agent can call
+  is one named, schema-described, example-carrying operation, identical
+  over local MCP, remote MCP and the CLI. An adopter extends Texuli by
+  adding one operation, not by editing five surfaces.
+- **Consequences:**
+  - **Packages and subpaths:** `@texuli/tools` gains `ops`;
+    `@texuli/catalog` gains `manifests/all`. No new layer edge.
+  - **Owner-held files:** root `package.json` (the `check:surfaces`
+    script and its place in `check`) and `texuli.budgets.json` (an `ops`
+    entry) need the owner.
+  - **Compatibility:** the old MCP tool names keep working for one minor.
+- **Reverse when:** a surface needs behavior the registry cannot describe
+  (then hand-write that one door over `invoke()` and keep the registry for
+  the rest), or a consumer needs the registry without tools (then split it
+  into its own package below tools, with handlers injected).
+
+## ADR-018: The remote MCP on Pages Functions
+
+- **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
+  architecture task under the developer's trust pre-authorization; the
+  developer may override this decision. **Status: planned** (release
+  0.9.0 for library operations, the site operations with the agent-ready
+  website work of the same plan); nothing below is shipped yet.
+- **Context:** many MCP hosts accept only a URL, and an agent on a phone or
+  in a hosted IDE cannot run a local binary. texuli.com already runs
+  Cloudflare Pages Functions (`functions/_middleware.ts` serves Markdown
+  twins and `problem+json` 404s, verified on 2026-10-30), so a Function at
+  `/mcp` needs no new hosting, account, server or secret. The site also has
+  to become agent-ready (Part C of the plan): agents want to read the site
+  itself, and browser agents look for WebMCP tools in the page. The
+  endpoint is public and unauthenticated, so abuse and injection are the
+  main risks; `_headers` does not apply to Function responses
+  ([SECURITY](SECURITY.md#15-website-edge-functions-and-analytics)).
+- **Options:**
+  1. **A Pages Function, stateless Streamable HTTP with JSON responses**,
+     serving the registry's `edge` and `site` operations.
+  2. **A separate Cloudflare Worker project.** More control (bindings,
+     routes, its own deploy), but a new project, deploy pipeline and
+     account configuration that only the owner can create, for no
+     capability the Function lacks today.
+  3. **Stateful sessions with an SSE stream** (Durable Objects or KV for
+     session state). Needed only for server-initiated messages, which no
+     operation uses, and it adds storage and session cleanup.
+  4. **Durable rate limits in KV now.** Stronger limits, but a binding
+     the owner must create; planned and gated on that binding, not
+     required.
+  5. **No remote endpoint** (local only). Leaves URL-only hosts out.
+- **Decision:** option 1.
+  - **Transport:** `functions/mcp.ts` answers `POST /mcp` (and
+    `/.well-known/mcp`, routed by the middleware) with JSON-RPC, single or
+    batched, and JSON responses; no SSE stream and no session id. The
+    handshake is accepted but never required between requests. `GET`
+    returns `405` with a docs pointer (the server card for agent user
+    agents); `OPTIONS` answers CORS. Protocol `2025-11-25`, negotiating
+    the three earlier versions.
+  - **Operations:** only `edge` and `site` operations are bundled. `node`
+    operations (file writes, PDF and DOCX conversion) never run remotely.
+    The `site` class adds `site.pages`, `site.read` (a page's Markdown
+    twin, path-validated) and `site.search` over the built twins, read
+    through `env.ASSETS`. The site gets no second MCP: library and site
+    share this one endpoint.
+  - **Limits:** request body at most 256 KB (counted while streaming,
+    refused early), batch at most 10, per-operation item caps from the
+    registry, and a 5 s wall-clock guard per call. A per-isolate token
+    bucket keyed by the client IP is best-effort; the documented Cloudflare
+    rate-limiting rule is the owner's optional stronger layer.
+  - **Origin and Host:** a browser `Origin` must be on the allowlist
+    (texuli.com and preview hosts); requests without `Origin` (server-side
+    agents) are allowed; `Host` must be texuli.com or a preview host
+    (DNS-rebinding defense).
+  - **Headers:** the Function sets its own CSP (`default-src 'none'`),
+    `nosniff`, `Cache-Control: no-store`, `X-Robots-Tag: noindex` and CORS
+    for the allowed origins. Errors outside JSON-RPC are `problem+json`.
+  - **Never at runtime:** network fetch, storage, secrets, `eval`, HTML
+    sinks or logging of request bodies. Untrusted inputs pass the existing
+    validators at the `untrusted` tier, and returned URLs pass `safeHref`
+    and `safeImageSrc` at the `untrusted` tier.
+  - **Observability:** counters only (operation, status, duration bucket)
+    through the existing bot-event path; no arguments recorded.
+  - **Bundle:** the catalog comes from the static manifest module
+    ([ADR-017](#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface)),
+    theme loaders stay lazy chunks, and the Function gets its own budget in
+    `pnpm size`.
+  - **Currency:** the endpoint deploys from `main` with the site, and its
+    `serverInfo.version` equals the npm packages built from the same
+    commit. A post-deploy CI smoke check compares `tools/list` on
+    texuli.com with the registry.
+  - **WebMCP:** a bridge in the site layout registers a few tools through
+    `navigator.modelContext` on load (search docs and components, read a
+    component page, validate a blueprint in the browser), feature-detected,
+    calling the same registry code, with no network beyond same-origin
+    JSON and the CSP and Trusted Types policy unchanged.
+- **Why:** it uses hosting that already runs, keeps the endpoint
+  read-and-compute only, and a stateless handler has nothing to steal,
+  corrupt or clean up. Every limit is enforceable without a binding, and
+  the stronger layers are owner switches, not code changes.
+- **Agent-first and adoption-first:** any MCP host reaches Texuli with one
+  URL and no install; the same operations answer locally and remotely with
+  identical results for `edge` operations (checked by the agent evals), and
+  the site itself is readable and searchable as tools.
+- **Consequences:**
+  - **Files:** `functions/mcp.ts` (new), a middleware route for
+    `/.well-known/mcp`, pure logic tested in `apps/website/tests/` or
+    `packages/tools/tests/` with real `Request` objects, including hostile
+    and oversized inputs.
+  - **Owner-held files and actions:** `texuli.budgets.json` (the Function
+    entry). The Cloudflare rate-limiting rule and any KV binding are owner
+    actions in the Cloudflare dashboard; the plan never changes Cloudflare
+    settings.
+  - **Docs:** a remote-endpoint section in
+    [SECURITY](SECURITY.md) and a deploy note in [CI](CI.md).
+- **Reverse when:** the endpoint needs server-initiated messages, durable
+  state or authenticated writes (then move it to a Worker project with
+  the bindings it needs, behind the same registry), or abuse outgrows the
+  per-isolate limits and the Cloudflare rule (then make the KV-backed
+  limits required).
+
+## ADR-019: The `@texuli/mcp` package and its binary
+
+- **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
+  architecture task under the developer's trust pre-authorization; the
+  developer may override this decision, and the layer below is an
+  exception the developer confirms. **Status: planned** (first published
+  in release 0.9.0); nothing below is shipped yet.
+- **Context:** the stdio server exists in `packages/tools/src/mcp` with no
+  published binary. Every MCP host documents a one-word install of the
+  form "npx -y" plus a package name, and `@texuli/tools` is a library
+  with six bins whose package name says nothing about MCP. The layer guard forbids same-layer
+  dependencies (`target >= ownLayer` in `scripts/check-layers.ts`), and
+  `@texuli/tools` is L8.
+- **Options:**
+  1. **A thin `@texuli/mcp` package** whose bin `texuli-mcp` runs the
+     stdio server from `@texuli/tools`, pinned exactly.
+  2. **Only a bin in `@texuli/tools`** (run through npx with
+     `-p @texuli/tools`, plus `texuli mcp`). No new package, but an install line
+     hosts do not recognize, and a library package that grows a server
+     role.
+  3. **Move the MCP server code into `@texuli/mcp`.** The server would then
+     depend on tools for the registry anyway, and the CLI's `texuli mcp`
+     would have to depend upward or duplicate it.
+- **Decision:** option 1.
+  - **The package** holds only the bin entry and its README; the server
+    and the registry stay in `@texuli/tools`. Its version always equals
+    `@texuli/tools` (an exact pin, published in the same wave right after
+    tools), and `serverInfo.version` is read from the manifest.
+  - **Operations:** all classes but `site` (`edge` and `node`). Writes
+    (`ds.save`, file outputs of deck and document operations) accept only
+    an explicit path that resolves inside the working directory; traversal
+    is refused. The stdio server keeps the initialization gate the
+    specification requires.
+  - **`texuli mcp`** in the tools CLI runs the same server, so users of
+    the CLI need no second package.
+  - **Layer:** **L9**, a new top layer, because an L8 package cannot
+    depend on `@texuli/tools` (L8) under the same-layer rule. This keeps
+    the down-only rule intact; the plan's sketch said L8, which the guard
+    would refuse. The alternative that keeps the graph at L8 is option 2.
+  - **Tests:** a consumer test installs the packed tarballs, spawns
+    `node_modules/.bin/texuli-mcp`, completes a handshake, `tools/list`
+    and one call, and exits cleanly.
+- **Why:** the install line is the adoption surface for MCP hosts, so it
+  should be the shortest one possible, and an exact pin means the binary
+  can never drift from the library it serves. Keeping the server in tools
+  leaves one implementation.
+- **Agent-first and adoption-first:** one copy-paste line installs the full
+  local server in Claude Code, Cursor, VS Code, Windsurf, Codex or any stdio
+  host, with every operation, including the local-only ones.
+- **Consequences:**
+  - **New package and layer:** `packages/mcp` with an `L9` entry in
+    `LAYERS` in `scripts/check-layers.ts`, the layer table and graph in
+    this file updated when it lands, and `scripts/packages.ts`.
+  - **Owner-held files:** `pnpm-lock.yaml` (the owner runs `pnpm install`;
+    `pnpm-workspace.yaml` already globs `packages/*`), and
+    `texuli.budgets.json` if the bin gets an entry.
+  - **Release:** `.github/workflows/publish.yml` publishes it after
+    `@texuli/tools`, and [RELEASE](RELEASE.md) lists it; first publication
+    needs the developer's GO like every release.
+- **Reverse when:** the extra package costs more than it adds (then drop
+  it, keep the bin in `@texuli/tools` and document running
+  `texuli-mcp` through npx with `-p @texuli/tools`), which also removes
+  L9.
+
+## ADR-020: Token contract v2: additive families and a real component tier
+
+- **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
+  architecture task under the developer's trust pre-authorization; the
+  developer may override this decision. **Status: planned** (the families
+  in release 0.9.0, adoption across packages and the component tier in
+  0.10.0); nothing below is shipped yet.
+- **Context:** `@texuli/tokens` has a strong color engine (OKLCH seeds with
+  AA guarantees, 210 seed-defined themes, a validated `Theme`), but a
+  design system cannot reach most of the UI. Tier-3 component hooks are
+  written and no CSS reads them; `--tx-space-*` is used in 0 files and
+  controls hardcode rem sizes (`button.css`); there are no line-height,
+  type-role, z-index, opacity, elevation-ladder, icon, target-size or
+  layout-grid tokens; chart tokens are optional and fall back to hex.
+  Protoyard, the first consumer, migrates about 2,300 files by codemod and
+  asked (in its PLAN_011 review) for one minor of aliases plus a
+  machine-readable rename list for any change.
+- **Options:**
+  1. **Additive families with defaults that reproduce today's values**,
+     adopted package by package behind a zero-visual-diff gate.
+  2. **A new contract (v2 names) replacing v1** in one minor. Cleaner
+     names, but every adopter rewrites its reads at once and pixels move.
+  3. **Leave sizes and spacing hardcoded** and only theme color. Smallest,
+     but "everything respects the design system" stays false.
+- **Decision:** option 1.
+  - **System families** (all in `base.css` with defaults equal to today's
+    rendered values): space `--tx-space-0…12` (scaled by `--tx-density`),
+    size (`--tx-size-control-{xs,sm,md,lg}`, `--tx-size-icon-{sm,md,lg}`,
+    `--tx-size-target-min`), type roles
+    (`--tx-type-{display,title,heading,body,label,caption,code}-{size,line,weight,tracking}`
+    mapped from the existing scale), elevation (`--tx-elevation-0…5`,
+    glass alpha and blur), shape (`--tx-radius-*` from the radius scale,
+    border widths), layers (`--tx-z-*`), opacity, layout (content widths,
+    grid columns and gutters per breakpoint), icons (stroke and style), and
+    the data-viz and status set, now **always emitted** for every theme.
+  - **Component tier:** a registry, `@texuli/tokens/components`, declares
+    each component's tokens and default reference (for example
+    `--tx-button-radius: var(--tx-radius-md)`). Component CSS reads only
+    its component tokens. The registry is the closed vocabulary a design
+    system may set, the source of each component's generated token table,
+    and the input of the hardcode guard.
+  - **Component defaults** (default `variant` and `size`, which CSS cannot
+    express) come from a small context in `texuli`, read only when a prop
+    is omitted; the cost is zero when nothing is set.
+  - **Migration:** every adoption task must keep `pnpm visual` at no
+    changes under the default themes, so the refactor is invisible until a
+    design system changes something.
+  - **Hardcode guard:** `scripts/check-token-usage.ts` fails on literal
+    colors and literal size or space values in component CSS (an allowlist
+    with reasons). It lands only after adoption, so it never blocks a half
+    migration.
+  - **Renames:** v2 is additive, so 0.9.0 removes nothing. Any later rename
+    keeps the old name as an alias for one minor, and
+    `@texuli/tokens/renames.json` lists `{ from, to, since, removeIn }` for
+    codemods (an empty list is valid).
+- **Why:** additive defaults make every step provable by an existing gate
+  (visual baselines) instead of by review, and the component registry turns
+  "which tokens can a design system set" into data that docs, validators,
+  agents and the guard all read.
+- **Agent-first and adoption-first:** an agent or adopter changes the look
+  of any component through named tokens listed in a machine-readable
+  registry, never by writing CSS; adopters with their own token readers
+  get a rename list they can feed to a codemod.
+- **Consequences:**
+  - **Subpaths:** `@texuli/tokens` gains `components` and `renames.json`;
+    the theme JSON schema, the Tailwind preset (spacing from
+    `--tx-space-*`) and the token docs regenerate.
+  - **Packages:** `texuli`, the primitives' styled consumers and every
+    domain package adopt the tokens, one task per family of packages.
+  - **Owner-held files:** `texuli.budgets.json` (`base.css` and changed
+    entries at measured + 4%); root `package.json` if the guard joins
+    `pnpm check`.
+- **Reverse when:** a family proves wrong for adopters (then deprecate it
+  through the alias and `renames.json` path for one minor), or adoption
+  cannot reach zero visual diff in a package (then that package keeps its
+  literals on the guard's allowlist with a reason, and the gap is
+  documented).
+
+## ADR-021: The design-system document
+
+- **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
+  architecture task under the developer's trust pre-authorization; the
+  developer may override this decision. **Status: planned** (release
+  0.10.0); nothing below is shipped yet.
+- **Context:** a company should describe its brand once, as data, and have
+  every Texuli surface follow it; agents should author and change it with
+  the same closed-vocabulary discipline as blueprints. Today the closest
+  thing is a `Theme` (colors, fonts, radius, a few style knobs), with no
+  versioning, inheritance, overrides, assets, layout, voice or
+  accessibility targets. Protoyard, the first consumer, needs three levels
+  (workspace, prototype, scenario), constrained overrides, a lossless home
+  for every knob of its own `Theme`, and a document that a saved user theme
+  can never "brick" across schema versions (its PLAN_011 input and
+  review).
+- **Options:** for placement, (A) schema and compiler both in
+  `@texuli/tokens`; (B) schema in `@texuli/spec` (L0), compiler in
+  `@texuli/tokens` (L2); (C) a new design-system package. For the
+  vocabulary, (1) closed, versioned by `formatVersion`; (2) open, with
+  free CSS or token passthrough. For overrides, (i) RFC 6902 patches;
+  (ii) typed partial documents.
+- **Decision:** B, 1 and ii.
+  - **Identity and versions:** `format: "texuli/design-system"`,
+    `formatVersion: 1` (the schema), and a semver `version` (the
+    document). `migrate(doc)` is pure and total, with a fixture for every
+    version; an unknown future `formatVersion` is refused with a code,
+    never thrown.
+  - **Placement:** the schema, TypeScript types, `DesignSystemPatch`, the
+    JSON-path validator and `migrate` live in `@texuli/spec`, so blueprints
+    can embed or reference a design system and Kotlin types are generated
+    from the same source. The compiler lives in `@texuli/tokens`, the owner
+    of the OKLCH engine, which gains a down-only dependency on
+    `@texuli/spec`.
+  - **Closed vocabulary:** sections for color (brand seeds, exact pins,
+    explicit role pins per mode, modes, data-viz per mode), typography
+    (family stacks, self-hosted font files, scale, roles), shape, space and
+    density, elevation, surface, motion personality, layout, icons,
+    components (tokens from the ADR-020 registry and defaults), assets,
+    voice and lexicon, accessibility targets, metadata, `extends` and
+    `variants`. Unknown keys are refused with their JSON path. Every
+    Protoyard `Theme` knob has a named field, proven by a fictional
+    `protoyard-theme/v1` fixture published at
+    `@texuli/tokens/design-system/fixtures`.
+  - **Data only:** colors are parsed to OKLCH; lengths are numbers in a
+    closed unit; strings that reach CSS pass the `css-safe` check; fonts and
+    assets are same-origin relative paths or size-capped `data:` URLs,
+    checked with the URL policy; remote URLs are refused; the compiler never
+    fetches and reports total inline bytes; SVG assets render only as
+    `<img>`.
+  - **`extends`:** a library theme (`texuli:<id>`; each of the 210 themes is
+    a valid base, and `fromTheme` turns any `Theme` into a document) or a
+    design system by exact `id@version`, resolved through a caller-supplied
+    resolver. Ranges, cycles and chains deeper than 4 are refused.
+  - **Variants:** named selections (`high-contrast`, `compact`, seasonal)
+    orthogonal to mode; every variant compiles for every declared mode.
+  - **Patches:** `DesignSystemPatch` is a typed partial document. Objects
+    merge, arrays replace, `null` removes an optional field, and the
+    result is re-validated. Precedence is override, then variant, then the
+    `extends` chain. The `hash` is computed over a canonical JSON form, so
+    key order never changes it.
+  - **Stable codes,** shared by `validate`, `compile`, the CLI and the MCP:
+    `unknown-key`, `extends-cycle`, `extends-depth`, `extends-range`,
+    `url-refused`, `inline-bytes`, `format-version`, plus the guarantee
+    codes of [ADR-022](#adr-022-design-system-guarantees-enforced-never-reported).
+- **Why:** the spec is the cross-language contract (TypeScript, Kotlin, the
+  catalog), so a document that blueprints carry belongs there; the compiler
+  needs the color engine and belongs with it. A closed vocabulary is the
+  only way agent-written design systems can never carry CSS or code, and
+  typed partials are easier for agents and reviewers to write than JSON
+  Pointer patches while still being checkable.
+- **Agent-first and adoption-first:** a design system is one JSON document
+  an agent can write, validate and diff through the `ds.*` operations, with
+  machine-readable error codes and JSON paths; adopters keep their own
+  precedence models and map them onto patches, and every library theme is
+  already a valid starting point.
+- **Consequences:**
+  - **Packages:** `@texuli/spec` gains the design-system schema (a schema
+    file next to the existing ones, types and generated Kotlin);
+    `@texuli/tokens` gains `design-system/validate`, `design-system/compile`
+    and `design-system/fixtures`, and the `@texuli/spec` dependency.
+  - **Native twin:** generated Kotlin types and the native check in the
+    same change (ADR-012).
+  - **Adapters:** Protoyard's `fromProtoyardTheme` and `fromBrand` stay in
+    Protoyard over Texuli's generic importers; Texuli never imports
+    `@protoyard/*`.
+- **Reverse when:** the vocabulary needs a field the closed form cannot
+  express safely (then add it in a `formatVersion` bump with a migration,
+  never as passthrough), or the spec dependency weighs on `@texuli/tokens`
+  (then move the compiler-side validator into tokens and keep the schema
+  source in the spec).
+
+## ADR-022: Design-system guarantees: enforced, never reported
+
+- **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
+  architecture task under the developer's trust pre-authorization; the
+  developer may override this decision. **Status: planned** (release
+  0.10.0); nothing below is shipped yet.
+- **Context:** the theme generator already guarantees AA for generated
+  text pairs, and the AA gate (`@texuli/tokens/aa-gate`) checks shipped
+  themes. A design-system document adds inputs the generator does not
+  choose: exact brand colors, explicit role palettes (Protoyard's 33-role
+  palettes per mode), variants and overrides from agents. Agents cannot see
+  the result, and a report they may ignore protects nobody.
+- **Options:**
+  1. **Report only:** compile anything, list failing pairs as warnings.
+  2. **Fix everything:** move any color, pins included, until it passes.
+     Always accessible, but a brand's exact colors silently change.
+  3. **Enforce, with a solver for derived colors only:** keep what the
+     author pinned, derive the rest to pass, and refuse what cannot pass.
+- **Decision:** option 3.
+  - **Guarantees, per mode and per variant:** every text pair meets the
+    declared target (`accessibility.contrast`, AA by default, AAA
+    available); focus indicators meet 3:1 against their surroundings;
+    interactive targets meet `accessibility.targetMin` (24 CSS px by
+    default).
+  - **Pinned brand colors** (`color.pin`) are kept exactly where they are
+    used as fills. The solver derives accessible on-colors, tints and
+    states around them and records every adjustment it made in
+    `report`.
+  - **Explicit role pins** (`color.roles.{light,dark}`) are checked, never
+    moved: if a pinned pair fails, the document is refused.
+  - **Refusal semantics:** a document, variant or patch that breaks a
+    guarantee is refused as a result (not an exception) carrying the code
+    (`aa-text`, `aa-focus`, `target-size`), the failing pairs with their
+    ratios and modes, and JSON paths to the fields involved. Overrides are
+    re-validated after the merge, so a patch can never weaken the result.
+  - **Conformance:** `texuli ds check --json` renders the catalog
+    components under a design system and asserts the guarantees in every
+    mode, with the same codes; adopters run it in their own CI.
+- **Why:** an author's pins are their intent and must not move silently;
+  derived colors are the engine's job and can always be solved. Refusing,
+  with a precise reason, is the only behavior an agent can loop on
+  reliably: fix the named field, re-validate.
+- **Agent-first and adoption-first:** an agent cannot produce an
+  inaccessible design system through any surface, and each refusal names
+  the field to change; adopters get the same codes in the CLI, the MCP and
+  their CI, verbatim.
+- **Consequences:**
+  - **Compiler:** property tests (random valid documents compile and the
+    guarantees hold), snapshot determinism and a compile-time bound in
+    the opt-in perf suite.
+  - **Forced colors** keep today's behavior; the system colors win there.
+- **Reverse when:** a measured, legitimate case cannot meet a guarantee
+  (then add a named, reported waiver field in a `formatVersion` minor that
+  the conformance run still flags; never a silent pass).
+
+## ADR-023: Design-system runtime and scoping
+
+- **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
+  architecture task under the developer's trust pre-authorization; the
+  developer may override this decision. **Status: planned** (scoping and
+  portals with the 0.10.0 adoption work, the runtime in 0.10.0); nothing
+  below is shipped yet.
+- **Context:** `applyTheme` already writes `--tx-*` properties on an
+  element through the CSSOM, and the no-flash script replays a cached,
+  filtered variable map before first paint (it rejects `var(`, `url(` and
+  similar values). Hosts need several design systems on one page (studio
+  previews, galleries), live switching with no rebuild, server rendering
+  that matches the client, and no cost for apps that never use a design
+  system. Overlay portals mount outside the trigger's subtree today, so they
+  lose an element-scoped theme.
+- **Options:**
+  1. **Compile to variables plus attributes, applied per element**, with
+     portals that follow the nearest scope.
+  2. **A generated stylesheet per design system.** Simple selectors, but a
+     CSS bundle per design system, a rebuild to switch, and a
+     stylesheet-injection surface.
+  3. **`:root` only.** Smallest, but one design system per page and no
+     previews.
+- **Decision:** option 1.
+  - **Compiled shape:** `CompiledDesignSystem.vars[mode]` is a flat
+    ``Record<`--tx-${string}`, string>`` of concrete values (no `var()` or
+    `url()`, so the existing replay filter accepts it), and `attrs` keys
+    come from a published allowlist (`DESIGN_SYSTEM_ATTRIBUTES`). It also
+    carries `fontFaces`, `assets`, component `defaults`, `report` and
+    `hash`.
+  - **Apply:** `applyDesignSystem(el, compiled, { mode, variant })`
+    writes the variable map and the allowed attributes on one element,
+    marks it `[data-tx-scope]`, hands component defaults to the context
+    and returns a dispose. Nothing needs `:root`.
+  - **Portals:** the portal texel mounts overlays (dialog, sheet, popover,
+    menu, select, combobox, tooltip, toast, command, date pickers) in a
+    portal root that mirrors the trigger's nearest `[data-tx-scope]`
+    attributes and custom properties, kept in sync, or in a container the
+    host passes.
+  - **SSR and no flash:** `designSystemStyle(compiled, { selector })`
+    returns the same declarations `apply` writes, so server HTML, the
+    no-flash replay and the client produce identical output; a test
+    compares them byte for byte.
+  - **Fonts** load lazily as `FontFace` on first use or on switch, never
+    eagerly, and never from a remote host.
+  - **Cost:** 0 B eager for apps that do not use design systems (proven by
+    a consumer import test); an app that uses one ships its compiled
+    variables plus `apply`; switching is one write per scope, with no
+    per-design-system CSS.
+  - **Budgets:** `design-system/validate` at most 4 KB gz,
+    `design-system/apply` at most 2 KB gz, `design-system/compile` on its
+    own lazy entry (loaded only in the studio, the CLI, builds and the
+    MCP); a perf test switches design systems on a 1,000-node page within
+    one frame on chromium.
+  - **Hosts:** a `DesignSystemProvider` in `texuli` (scope element plus
+    defaults context) and an `@texuli/astro` integration option that
+    inlines the style.
+- **Why:** variables plus attributes are already how themes work, so the
+  runtime is a small extension of proven code and stays inside the CSP
+  posture (CSSOM writes, no style strings in markup). Scoping by element is
+  what makes side-by-side previews and per-blueprint design systems
+  possible, and portals that follow scope are what makes them correct.
+- **Agent-first and adoption-first:** a host can apply a compiled design
+  system to any element with one call and a plain map it can cache, filter
+  and replay itself; nothing assumes a framework, a bundler or a single
+  design system per page.
+- **Consequences:**
+  - **Packages:** `@texuli/tokens` gains `design-system/apply`;
+    `@texuli/core` portal behavior and every overlay family change, held
+    by the behavior suite on chromium and webkit and a new e2e page with
+    two scopes and open overlays in each (computed colors plus axe).
+  - **Owner-held files:** `texuli.budgets.json` (the new entries).
+- **Reverse when:** the platform offers scoped custom properties for
+  top-layer content natively (then drop the mirrored portal root), or a
+  measured case needs more than one write per switch (then batch inside
+  `apply`, keeping the output map unchanged).
+
+## ADR-024: Design systems on every surface
+
+- **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
+  architecture task under the developer's trust pre-authorization; the
+  developer may override this decision. **Status: planned** (release
+  0.10.0, spec `0.10.0`); nothing below is shipped yet.
+- **Context:** blueprints, decks and documents have no design-system
+  reference (only the web-only deck `themeRef`); email covers color and
+  font only and has no dark rule (the ADR-016 note); PDF, DOCX, canvas
+  export and the native twin ignore the theme (`TexuliTheme` hardcodes six
+  colors). Agents emit blueprints that the player paints with no build, so
+  the design system must travel with the content.
+- **Options:** for content, (1) references only (`id@version`); (2) inline
+  documents only; (3) both. For outputs, (A) each writer reads the
+  design-system document itself; (B) the compiler emits plain data per
+  target, and each writer takes that data as input.
+- **Decision:** 3 and B.
+  - **Spec 0.10.0** adds `designSystem: { ref: "id@version" } | { inline:
+    … }` to blueprints, decks (`DeckThemeReference` gains it) and
+    documents, as one additive minor
+    ([ADR-012](#adr-012-spec-evolution-one-additive-minor-per-release-wave));
+    the migration only restamps `spec`. The catalog validates references
+    and inline documents with the ADR-021 and ADR-022 codes.
+  - **Player, deck stage and pages reader** take a host-supplied resolver
+    (no fetch) for references, compile or receive a compiled design
+    system, and apply it to their root scope (ADR-023).
+  - **Emitters** (`@texuli/tokens/design-system/emit/*`, lazy): scoped
+    CSS, a Tailwind preset, DTCG round-trip, compiled JSON, an email
+    palette (color, font, radius, spacing, dark), PDF and DOCX themes,
+    PPTX `theme1.xml`, the canvas export palette, and a static review page
+    (swatches, type ramp, component sheet, contrast table). The writers in
+    `@texuli/document`, `@texuli/canvas`, `@texuli/slides` and
+    `@texuli/tools/email` accept the emitted data, so none of them imports
+    the compiler, and the L1 document engine never depends on L2 tokens.
+  - **Email dark mode** lands through the typed, closed style builder the
+    ADR-016 note requires, never a free-text stylesheet.
+  - **Importers:** the one-line brand, W3C DTCG, Tokens Studio JSON, a
+    flat role palette, an existing `Theme`, and logo pixels to a suggested
+    palette (deterministic). `diff(a, b)` lists changed tokens per mode,
+    contrast regressions and changed defaults.
+  - **Native:** Kotlin token codegen from a compiled design system;
+    `TexuliTheme` reads the generated tokens; conformance tests compare web
+    and native values.
+  - **Agent tools:** `ds.validate`, `ds.compile`, `ds.contrast`,
+    `ds.suggest`, `ds.import`, `ds.diff`, `ds.preview` (deterministic:
+    fixed fonts, no time, stable ids) and `blueprint.theme` as `edge`
+    operations, `ds.save` as `node`, and the `create-design-system` prompt
+    (ADR-017).
+- **Why:** references keep blueprints small and reviewable, and inline
+  documents let the no-install player render a themed blueprint with
+  nothing else; supporting both is one discriminated field. Emitting plain
+  data keeps every writer at its layer and testable on its own values.
+- **Agent-first and adoption-first:** an agent sets one field to brand a
+  whole blueprint, deck or document, and the same document drives web,
+  email, print, office formats, canvas and native, so an adopter describes
+  the brand once.
+- **Consequences:**
+  - **Spec:** a `0.10.0` pin in `versions.json`, a restamp migration,
+    regenerated Kotlin and the native check (ADR-012).
+  - **Packages:** the player, `@texuli/slides`, `@texuli/pages`,
+    `@texuli/document`, `@texuli/canvas`, `@texuli/tools` and `native/`
+    take compiled input; `@texuli/catalog` validates the field; agent docs,
+    llms bundles and the catalog snapshot regenerate.
+  - **Website:** the theme studio grows into a client-only Design System
+    Studio (no server, no storage; sharing through the URL hash).
+- **Reverse when:** a surface needs design-system data the emitters
+  cannot express (then add an emitter for it; writers still never read
+  the document), or inline documents make blueprints too large in practice
+  (then cap inline size in the catalog limits and prefer references).

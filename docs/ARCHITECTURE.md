@@ -217,6 +217,10 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
 - the local stdio MCP server (`packages/tools/src/mcp`, tested in
   `packages/tools/tests/mcp.test.ts`; no published binary yet).
 
+One operations registry behind all of these, a published MCP binary and a
+remote MCP endpoint at texuli.com are planned; see
+[Planned (PLAN_011)](#planned-plan011).
+
 ## Decks: engine and stage
 
 ADR-009 splits presentations in two packages (both on npm as `0.8.0`;
@@ -295,6 +299,38 @@ New subpaths in existing packages:
 | `@texuli/data` | `dashboard`, `dashboard/engine` (released in `0.8.0`) | The widget grid with drag and resize, keyboard equivalents, breakpoints and persistence; painted by the player as `data-dashboard` and `data-dashboard-widget` | 0.8.0 | [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
 | `@texuli/tools` | `email`, `print` (released in `0.8.0`) | Email-safe HTML and plain text from validated blueprints, with typed inline styles (email dark mode is planned); and a headless PDF of a validated blueprint through `@texuli/document` (`print`) | 0.8.0 | [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
 | `@texuli/player` | streaming mode (released in `0.6.0`: `<Player stream>`), print mode (released in `0.8.0`; no new subpath) | Paint validated node shells while a blueprint streams; print styles for blueprints | 0.6.0 (streaming), 0.8.0 (print) | [ADR-014](DECISIONS.md#adr-014-streaming-generation-paint-only-validated-closed-node-shells), [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
+
+## Planned (PLAN_011)
+
+**Planned (PLAN_011), not shipped.** Nothing in this section exists yet.
+These are the package, subpath and file names, layers and release waves
+decided by ADR-017 to ADR-024 in [DECISIONS](DECISIONS.md) for the 0.9.0
+(agent surfaces) and 0.10.0 (design systems) release waves. Each entry joins
+the layer table, `LAYERS` in `scripts/check-layers.ts` and the package
+subpaths table above only when it lands, and each release needs the
+developer's GO.
+
+New packages:
+
+| Planned layer | Package | Subpaths | What it will hold | Will depend on | Release wave | Decision |
+| --- | --- | --- | --- | --- | --- | --- |
+| L9 (a new top layer: an L8 package cannot depend on `@texuli/tools`, also L8, under the same-layer rule; the developer confirms the exception) | `@texuli/mcp` | `.` and the bin `texuli-mcp` | planned (PLAN_011): a thin package whose bin runs the local stdio MCP server from `@texuli/tools` with every `edge` and `node` operation; version pinned exactly to `@texuli/tools` and published in the same wave | tools | 0.9.0 | [ADR-019](DECISIONS.md#adr-019-the-texulimcp-package-and-its-binary) |
+
+New subpaths in existing packages:
+
+| Package | Planned subpaths | What they will hold | Release wave | Decision |
+| --- | --- | --- | --- | --- |
+| `@texuli/tools` | `ops` (planned, PLAN_011) | The framework-free operations registry: `group.verb` operations with JSON Schema input and output, annotations, a runtime class (`edge`, `node`, `site`), limits and examples, and a schema-checked `invoke()`; the MCP tools, the CLI router, the server card, the llms tools section and the ops docs are generated from it | 0.9.0 | [ADR-017](DECISIONS.md#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface) |
+| `@texuli/catalog` | `manifests/all` (planned, PLAN_011) | The static, edge-safe manifest list shared by the remote MCP and `apps/agent`, with a hash parity test against file-system discovery | 0.9.0 | [ADR-017](DECISIONS.md#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface) |
+| `@texuli/tokens` | `components`, `renames.json` (planned, PLAN_011) | Token contract v2: the component token registry (each component's tokens and default reference, the closed vocabulary a design system may set), and the machine-readable rename list `{ from, to, since, removeIn }`; the new system families (space, size, type roles, elevation, shape, layers, opacity, layout, icons, always-on data-viz and status) join the existing CSS with defaults that reproduce today's values | 0.9.0 (families), 0.10.0 (component tier and adoption) | [ADR-020](DECISIONS.md#adr-020-token-contract-v2-additive-families-and-a-real-component-tier) |
+| `@texuli/tokens` | `design-system/validate`, `design-system/compile`, `design-system/apply`, `design-system/emit/*`, `design-system/fixtures` (planned, PLAN_011) | The design-system runtime, all lazy: the small validator, the compiler (`extends`, variants, patches, the pinned-color solver, enforced guarantees, `CompiledDesignSystem`), `applyDesignSystem` and `designSystemStyle` for element scope, SSR and no flash, the static emitters, and the fictional `protoyard-theme/v1` fixture; `@texuli/tokens` gains a down-only dependency on `@texuli/spec` | 0.10.0 | [ADR-021](DECISIONS.md#adr-021-the-design-system-document), [ADR-022](DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported), [ADR-023](DECISIONS.md#adr-023-design-system-runtime-and-scoping), [ADR-024](DECISIONS.md#adr-024-design-systems-on-every-surface) |
+| `@texuli/spec` | the design-system schema and spec `0.10.0` (planned, PLAN_011) | The `texuli/design-system` document (`formatVersion` 1): schema, TypeScript types, `DesignSystemPatch`, the JSON-path validator, `migrate`, stable error codes and generated Kotlin; spec `0.10.0` adds `designSystem` (`ref` or `inline`) to blueprints, decks and documents | 0.10.0 | [ADR-021](DECISIONS.md#adr-021-the-design-system-document), [ADR-024](DECISIONS.md#adr-024-design-systems-on-every-surface) |
+
+Edge and site files:
+
+| File | What it will hold | Release wave | Decision |
+| --- | --- | --- | --- |
+| `functions/mcp.ts` (planned, PLAN_011) | The remote MCP at texuli.com: stateless Streamable HTTP (`POST`, JSON responses, no session) at `/mcp` and `/.well-known/mcp`, serving only the registry's `edge` and `site` operations, with body, batch, item and time caps, Origin and Host checks, its own security headers, a per-isolate rate limit, and no fetch, storage or secrets; the site also registers WebMCP tools in the page | 0.9.0 | [ADR-018](DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions) |
 
 ## The website
 
