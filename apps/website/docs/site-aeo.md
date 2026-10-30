@@ -265,3 +265,35 @@ would resolve the conflict its own way. To change a signal, change the
 constant and rebuild. If the managed setting is ever preferred, remove the
 directive from `buildRobots` in the same change.
 
+
+
+### Measuring the score
+
+`pnpm exec tsx scripts/agent-readiness-scan.ts <https-url> [--out <file.json>] [--require-all-pass] [--allow <check>,…]`
+calls the isitagentready.com scan API (network access, so it never runs in
+`pnpm check` or CI) and prints every check. `--require-all-pass` exits 1
+unless every non-commerce check passes; informational checks may stay
+neutral. The scoring rule lives in `scripts/agent-readiness.ts` (tested in
+`scripts/tests/agent-readiness.test.ts`).
+
+A Cloudflare Pages preview (for example the release branch's) passes every
+check this repository controls, but four checks cannot pass there:
+`oauthProtectedResource` and `personalAgentProtocol` compare their documents
+with the scanned host (they name `https://texuli.com`), `authMd` fetches the
+OAuth metadata from texuli.com itself, and `dnsAid` needs DNS records with
+DNSSEC. Preview scans pass `--allow dnsAid,oauthProtectedResource,authMd,personalAgentProtocol`;
+the texuli.com scan after a release allows only `dnsAid`, and only while the
+owner has not enabled DNSSEC.
+
+Owner-only actions (Cloudflare dashboard and DNS, never this repository):
+
+1. **DNSSEC** for texuli.com (Cloudflare DNS → DNSSEC → enable, then add the
+   DS record at the registrar). The scanner already finds DNS-AID records;
+   it fails only because DNSSEC is not validated.
+2. **Content Signals:** keep Cloudflare's managed Content Signals (AI Crawl
+   Control) off; robots.txt here owns them.
+3. **Crawler access:** confirm AI Crawl Control and Bot Fight Mode do not
+   block ClaudeBot, GPTBot or ChatGPT-User (a 403 to those agents fails the
+   bot-access checks no matter what robots.txt says).
+4. **Optional:** a Cloudflare rate-limiting rule for `/mcp` and `/api/`
+   (SECURITY section 21) on top of the per-isolate limiter.
