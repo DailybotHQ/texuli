@@ -42,6 +42,10 @@ do.
 - `loading` shows a spinner and sets `aria-busy`
 - When `onclick` returns a promise and `autoLoading` is true (default), the
   button stays pending until the promise settles
+- A busy button (`loading` or pending) is `aria-disabled="true"` and ignores
+  clicks (a submit button does not submit again), but it is not natively
+  `disabled`: a focused button keeps focus instead of dropping it to
+  `<body>`. Only the `disabled` prop sets native `disabled`.
 - Wire services as `onclick={() => runService(...)}` so the returned promise
   drives pending feedback
 
@@ -66,7 +70,7 @@ contract (element defaults before `tx.base`; never unlayered global `a {}`).
 ### A11y
 
 - Focus-visible ring from tokens
-- Disabled / busy block activation
+- Disabled / busy block activation; busy keeps focus (`aria-disabled`, not native `disabled`)
 - IconButton requires `label` → `aria-label`
 - Forced-colors border fallbacks
 - Reduced motion stops the spinner animation
