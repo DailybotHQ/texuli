@@ -11,7 +11,9 @@
  * response, silent unless `PUBLIC_UMAMI_WEBSITE_ID` is provisioned).
  * Every decision is pure and lives in the website's lib — this file only
  * fetches assets and shapes responses. No secrets, no PII, no request
- * bodies are read or logged.
+ * bodies are read or logged. `/.well-known/mcp` is routed to the remote MCP
+ * server (functions/_lib/mcp-server.ts), and `/mcp` passes straight to its
+ * Function (T-mcp-remote).
  */
 
 import { agentProblem, isAgentRequest } from '../apps/website/src/lib/agent-request.ts';
@@ -58,8 +60,19 @@ function sendBotEvent(context: Context, event: BotEventName, pathname: string): 
   if (context.waitUntil) context.waitUntil(send);
 }
 
+/** The well-known alias of the remote MCP endpoint (`/mcp` is functions/mcp.ts). */
+const MCP_WELL_KNOWN = '/.well-known/mcp';
+
 export const onRequest = async (context: Context): Promise<Response> => {
   const url = new URL(context.request.url);
+  // The remote MCP: `/.well-known/mcp` is answered here by the same server
+  // as `/mcp`, loaded on first use; `/mcp` goes untouched to its Function,
+  // so no twin, robots or 404 shaping ever rewrites a JSON-RPC answer.
+  if (url.pathname === MCP_WELL_KNOWN) {
+    const { serveMcp } = await import('./_lib/mcp-server.ts');
+    return serveMcp(context);
+  }
+  if (url.pathname === '/mcp') return context.next();
   const userAgent = context.request.headers.get('user-agent');
   // Auditing tools see the stripped robots variant (one text file, no other
   // change): the full policy stays the default for every real crawler.

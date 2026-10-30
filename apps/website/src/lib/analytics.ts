@@ -57,6 +57,8 @@ export const EVENTS = {
   UNKNOWN_BOT_VISIT: 'unknown_bot_visit',
   /** Reserved — edge: a .md twin was served (server-side only). */
   MARKDOWN_REQUEST: 'markdown_request',
+  /** Reserved — edge: one remote MCP request (server-side only): { operation, status, duration }. */
+  MCP_CALL: 'mcp_call',
 } as const;
 
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS];
@@ -65,7 +67,7 @@ export type EventName = (typeof EVENTS)[keyof typeof EVENTS];
  * Client-sent events with their payload shapes — the only names `track`
  * accepts, so a typo is a type error, not a silently mangled dashboard.
  * The reserved edge events (ai_bot_visit, unknown_bot_visit,
- * markdown_request) are sent server-side and never through `track`.
+ * markdown_request, mcp_call) are sent server-side and never through `track`.
  */
 export type ClientEventName =
   | 'theme_switch'

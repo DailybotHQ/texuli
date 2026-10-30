@@ -1028,6 +1028,10 @@
       "gzip": 12736,
       "cssGzip": 832,
       "note": "Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,228 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): CSS 2048 -> 832 B, tightened to measured + 4% (measured 784 B)."
+    },
+    "functions/mcp": {
+      "gzip": 218368,
+      "note": "PLAN_011 T-mcp-remote (2026-10-30): the remote MCP Pages Function (functions/mcp.ts), a server bundle, not a browser entry: the stateless handler, the edge operations, the static catalog manifests and the deck and document engines. Measured 209,909 B gzip initial (46,398 B lazy, the theme loaders and conversion chunks); budget = measured + 4%, rounded up to 64 B. Cloudflare's bundler does not split, so the deployed worker is about initial + lazy."
     }
   }
 }

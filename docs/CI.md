@@ -179,6 +179,22 @@ project settings, owner-provisioned; analytics stays off without them. Every pus
 social images, sitemap and robots.txt are generated at build time against
 `https://texuli.com` (the `site` in `apps/website/astro.config.mjs`).
 
+The remote MCP endpoint (`functions/mcp.ts`, PLAN_011 T-mcp-remote) is in
+the repository for release 0.9.0 and deploys with the site once that
+release merges to `main`; it is not live before then. It needs no
+environment variable, binding or secret: Pages bundles it with the other
+Functions, it answers `/mcp`, and the middleware answers `/.well-known/mcp`
+with the same server. It sets its own CSP, `nosniff`, `no-store`,
+`noindex` and CORS headers, because `_headers` does not apply to Function
+responses ([SECURITY](SECURITY.md#21-remote-mcp-endpoint)). Its bundle is
+budgeted in `pnpm size` as `functions/mcp`. After the first deploy,
+confirm by hand that `POST https://texuli.com/mcp` answers `initialize`
+and `tools/list` with the `edge` operations, that a `GET` gets `405`, and
+that the security headers are present; a post-deploy smoke job that
+compares `tools/list` with the registry is planned (ADR-018), not wired.
+The optional Cloudflare rate-limiting rule for `/mcp` is an owner action
+in the dashboard, described in the same SECURITY section.
+
 ## Budget audits
 
 The `audits` job carries no tracked reds.
