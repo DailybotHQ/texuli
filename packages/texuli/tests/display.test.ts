@@ -878,6 +878,31 @@ describe('icons', () => {
       expect(icon.getAttribute('data-tx-icon')).toBe('custom');
     });
 
+    it('leaves the stroke to the --tx-icon-stroke-width token unless strokeWidth is set', () => {
+      const css = readFileSync(join(__dirname, '../src/components/icons/icons.css'), 'utf8');
+      expect(css).toContain(
+        ':where(.tx-icon:not([data-tx-icon-stroke])) {\n    stroke-width: var(--tx-icon-stroke-width, var(--tx-icon-stroke, 2));'
+      );
+      const cases: [number | undefined, string, string | null][] = [
+        [undefined, '2', null],
+        [1.5, '1.5', 'custom'],
+      ];
+      for (const [strokeWidth, attr, mark] of cases) {
+        for (const props of [
+          { icon: 'info' as const, strokeWidth },
+          { icon: CustomIcon, strokeWidth, label: 'Glyph' },
+        ]) {
+          const { container, unmount } = render(Icon, { props });
+          const svg = container.querySelector('svg');
+          expect(container.querySelector('[stroke-width]')?.getAttribute('stroke-width')).toBe(
+            attr
+          );
+          expect(svg?.getAttribute('data-tx-icon-stroke')).toBe(mark);
+          unmount();
+        }
+      }
+    });
+
     it('renders nothing for a runtime name outside the built-in set', () => {
       const { container } = render(Icon, { props: { icon: 'unknown' as IconName } });
       expect(container.querySelector('svg')).toBeNull();

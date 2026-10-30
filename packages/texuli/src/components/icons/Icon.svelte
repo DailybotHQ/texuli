@@ -22,7 +22,7 @@ type Props = Omit<SVGAttributes<SVGSVGElement>, 'class' | 'color'> & {
 let {
   icon,
   size = 'md',
-  strokeWidth = 2,
+  strokeWidth,
   color = undefined,
   label,
   class: className,
@@ -35,6 +35,9 @@ let {
 } = $props();
 
 const pixelSize = $derived(ICON_SIZES[size]);
+/** An explicit `strokeWidth` wins over the `--tx-icon-stroke-width` token (icons.css). */
+const strokeAttr = $derived(strokeWidth ?? 2);
+const strokeMark = $derived(strokeWidth === undefined ? undefined : 'custom');
 const name = $derived(typeof icon === 'string' && isIconName(icon) ? icon : undefined);
 const component = $derived(typeof icon === 'function' ? icon : undefined);
 const path = $derived(name ? iconPath(name) : undefined);
@@ -64,7 +67,8 @@ const glyphProps = $derived({
   [refKey]: bindGlyph,
   class: classes,
   size: pixelSize,
-  strokeWidth,
+  strokeWidth: strokeAttr,
+  'data-tx-icon-stroke': strokeMark,
   ...(glyphColor !== undefined ? { color: glyphColor } : {}),
   focusable: 'false' as const,
   'aria-hidden': accessibleName ? undefined : ('true' as const),
@@ -74,6 +78,7 @@ const glyphProps = $derived({
 } satisfies IconComponentProps & {
   class?: ClassValue;
   'data-tx-icon'?: string;
+  'data-tx-icon-stroke'?: string;
 });
 </script>
 
@@ -86,7 +91,8 @@ const glyphProps = $derived({
     viewBox="0 0 24 24"
     fill="none"
     stroke={glyphColor ?? 'currentColor'}
-    stroke-width={strokeWidth}
+    stroke-width={strokeAttr}
+    data-tx-icon-stroke={strokeMark}
     stroke-linecap="round"
     stroke-linejoin="round"
     focusable="false"

@@ -22,7 +22,7 @@ type Props = OwnProps &
 let {
   icon,
   size = 'md',
-  strokeWidth = 2,
+  strokeWidth,
   label,
   class: className,
   ref = $bindable(null),
