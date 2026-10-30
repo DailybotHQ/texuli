@@ -132,7 +132,7 @@ let {
 <style>
   @layer tx.components {
     .tx-chat-thread { display: flex; min-block-size: 0; flex: 1; flex-direction: column; background: var(--tx-surface, Canvas); color: var(--tx-foreground, CanvasText); }
-    .tx-chat-thread__composer { border-block-start: 1px solid var(--tx-border, ButtonBorder); padding: 0.75rem; padding-block-end: max(0.75rem, env(safe-area-inset-bottom)); }
-    .tx-chat-thread__typing { margin-block-start: 0.75rem; }
+    .tx-chat-thread__composer { border-block-start: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); padding: var(--tx-space-3); padding-block-end: max(var(--tx-space-3), env(safe-area-inset-bottom)); }
+    .tx-chat-thread__typing { margin-block-start: var(--tx-space-3); }
   }
 </style>

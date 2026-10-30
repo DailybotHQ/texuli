@@ -171,8 +171,8 @@ function onKeydown(event: KeyboardEvent, row: Row): void {
     .tx-canvas-shape-list {
       overflow: auto;
       max-block-size: 100%;
-      padding: 0.25rem;
-      font-size: var(--tx-font-size-sm, 0.875rem);
+      padding: var(--tx-space-1);
+      font-size: var(--tx-type-label-size);
       background: var(--tx-surface, Canvas);
       color: var(--tx-foreground, CanvasText);
     }
@@ -184,9 +184,9 @@ function onKeydown(event: KeyboardEvent, row: Row): void {
     }
 
     .tx-canvas-shape-list__item {
-      padding-block: 0.375rem;
-      padding-inline-end: 0.5rem;
-      border-radius: var(--tx-radius-sm, 0.25rem);
+      padding-block: calc(var(--tx-space-unit) * 1.5);
+      padding-inline-end: var(--tx-space-2);
+      border-radius: var(--tx-shape-radius-sm);
       cursor: pointer;
       overflow-wrap: anywhere;
     }
@@ -206,7 +206,7 @@ function onKeydown(event: KeyboardEvent, row: Row): void {
     }
 
     .tx-canvas-shape-list__empty {
-      margin: 0.5rem;
+      margin: var(--tx-space-2);
     }
 
     @media (forced-colors: active) {

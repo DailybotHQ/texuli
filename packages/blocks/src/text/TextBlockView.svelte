@@ -170,7 +170,7 @@ const avatarSrc = (source: string | undefined) => {
   }
   .tx-heading-subtitle {
     margin: 0.5em 0 0;
-    font-size: 1.125rem;
+    font-size: var(--tx-type-heading-size);
   }
 
   .tx-text {
@@ -251,9 +251,9 @@ const avatarSrc = (source: string | undefined) => {
   .tx-callout {
     padding-block: 0.75em;
     padding-inline: 1em;
-    border: 1px solid var(--tx-block-tone);
+    border: var(--tx-border-width-thin) solid var(--tx-block-tone);
     border-inline-start: 4px solid var(--tx-block-tone);
-    border-radius: var(--tx-radius, 0.5em);
+    border-radius: var(--tx-shape-radius-lg);
     background: var(--tx-block-soft, transparent);
     color: var(--tx-block-soft-foreground, inherit);
   }
@@ -276,8 +276,8 @@ const avatarSrc = (source: string | undefined) => {
 
   .tx-block-invalid {
     padding: 0.5em 0.75em;
-    border: 1px dashed currentColor;
-    border-radius: var(--tx-radius, 0.375em);
+    border: var(--tx-border-width-thin) dashed currentColor;
+    border-radius: var(--tx-shape-radius-lg);
     font-size: 0.875em;
   }
 

@@ -388,7 +388,7 @@ function thumbSrc(entry: FileEntry): string {
       color-scheme: light dark;
       min-inline-size: 0;
       display: grid;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
     }
 
     .tx-files__sr-only {
@@ -408,14 +408,14 @@ function thumbSrc(entry: FileEntry): string {
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
     }
 
     .tx-files__crumb-list {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.25rem;
+      gap: var(--tx-space-1);
       margin: 0;
       padding: 0;
       list-style: none;
@@ -423,9 +423,9 @@ function thumbSrc(entry: FileEntry): string {
 
     .tx-files__crumb-btn {
       margin: 0;
-      padding: 0.35rem 0.5rem;
+      padding: calc(var(--tx-space-unit) * 1.4) var(--tx-space-2);
       border: 0;
-      border-radius: var(--tx-radius-sm, 0.375rem);
+      border-radius: var(--tx-shape-radius-md);
       background: transparent;
       color: inherit;
       font: inherit;
@@ -438,22 +438,22 @@ function thumbSrc(entry: FileEntry): string {
 
     .tx-files__crumb-sep {
       color: var(--tx-foreground, CanvasText);
-      padding-inline: 0.15rem;
+      padding-inline: calc(var(--tx-space-unit) * 0.6);
     }
 
     .tx-files__layout {
       display: inline-flex;
-      gap: 0.25rem;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-md, 0.5rem);
-      padding: 0.15rem;
+      gap: var(--tx-space-1);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-lg);
+      padding: calc(var(--tx-space-unit) * 0.6);
     }
 
     .tx-files__layout-btn {
       margin: 0;
-      padding: 0.35rem 0.65rem;
+      padding: calc(var(--tx-space-unit) * 1.4) calc(var(--tx-space-unit) * 2.6);
       border: 0;
-      border-radius: var(--tx-radius-sm, 0.375rem);
+      border-radius: var(--tx-shape-radius-md);
       background: transparent;
       color: inherit;
       font: inherit;
@@ -472,14 +472,14 @@ function thumbSrc(entry: FileEntry): string {
     .tx-files__item:focus-visible,
     .tx-files__check:focus-visible,
     .tx-files__open:focus-visible {
-      outline: 2px solid var(--tx-ring, Highlight);
+      outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
       outline-offset: 2px;
     }
 
     .tx-files__body {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
-      gap: 1rem;
+      gap: var(--tx-space-4);
       align-items: start;
     }
 
@@ -492,11 +492,11 @@ function thumbSrc(entry: FileEntry): string {
     .tx-files__items {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       margin: 0;
-      padding: 0.5rem;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-lg, 0.75rem);
+      padding: var(--tx-space-2);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-xl);
       background: var(--tx-surface, Canvas);
       min-block-size: 12rem;
     }
@@ -506,19 +506,19 @@ function thumbSrc(entry: FileEntry): string {
     }
 
     .tx-files--compact .tx-files__items {
-      gap: 0.25rem;
-      padding: 0.35rem;
+      gap: var(--tx-space-1);
+      padding: calc(var(--tx-space-unit) * 1.4);
     }
 
     .tx-files__item {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
-      gap: 0.35rem;
+      gap: calc(var(--tx-space-unit) * 1.4);
       align-items: start;
       margin: 0;
-      padding: 0.35rem;
-      border: 1px solid transparent;
-      border-radius: var(--tx-radius-md, 0.5rem);
+      padding: calc(var(--tx-space-unit) * 1.4);
+      border: var(--tx-border-width-thin) solid transparent;
+      border-radius: var(--tx-shape-radius-lg);
       background: transparent;
       color: inherit;
       text-align: start;
@@ -545,10 +545,10 @@ function thumbSrc(entry: FileEntry): string {
       justify-content: center;
       inline-size: 1.25rem;
       block-size: 1.25rem;
-      margin-block-start: 0.35rem;
+      margin-block-start: calc(var(--tx-space-unit) * 1.4);
       padding: 0;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: 0.25rem;
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-sm);
       background: var(--tx-surface, Canvas);
       color: inherit;
       cursor: pointer;
@@ -575,11 +575,11 @@ function thumbSrc(entry: FileEntry): string {
 
     .tx-files__open {
       display: grid;
-      gap: 0.35rem;
+      gap: calc(var(--tx-space-unit) * 1.4);
       margin: 0;
-      padding: 0.25rem;
+      padding: var(--tx-space-1);
       border: 0;
-      border-radius: var(--tx-radius-sm, 0.375rem);
+      border-radius: var(--tx-shape-radius-md);
       background: transparent;
       color: inherit;
       font: inherit;
@@ -591,7 +591,7 @@ function thumbSrc(entry: FileEntry): string {
     .tx-files--list .tx-files__open {
       grid-template-columns: 3rem minmax(0, 1fr);
       align-items: center;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
     }
 
     .tx-files__thumb {
@@ -599,7 +599,7 @@ function thumbSrc(entry: FileEntry): string {
       place-items: center;
       inline-size: 100%;
       aspect-ratio: 1;
-      border-radius: var(--tx-radius-md, 0.5rem);
+      border-radius: var(--tx-shape-radius-lg);
       background: var(--tx-muted, Canvas);
       overflow: hidden;
     }
@@ -618,7 +618,7 @@ function thumbSrc(entry: FileEntry): string {
 
     .tx-files__meta {
       display: grid;
-      gap: 0.15rem;
+      gap: calc(var(--tx-space-unit) * 0.6);
       min-inline-size: 0;
     }
 
@@ -636,28 +636,28 @@ function thumbSrc(entry: FileEntry): string {
 
     .tx-files__empty {
       margin: 0;
-      padding: 1.25rem;
+      padding: var(--tx-space-5);
       color: var(--tx-foreground, CanvasText);
       grid-column: 1 / -1;
     }
 
     .tx-files__preview {
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-lg, 0.75rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-xl);
       background: var(--tx-muted, Canvas);
-      padding: 0.75rem;
+      padding: var(--tx-space-3);
       min-block-size: 12rem;
     }
 
     .tx-files__preview-card {
       display: grid;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
     }
 
     .tx-files__preview-thumb {
       display: grid;
       place-items: center;
-      border-radius: var(--tx-radius-md, 0.5rem);
+      border-radius: var(--tx-shape-radius-lg);
       background: var(--tx-surface, Canvas);
       overflow: hidden;
       aspect-ratio: 1;
@@ -671,21 +671,21 @@ function thumbSrc(entry: FileEntry): string {
 
     .tx-files__preview-name {
       margin: 0;
-      font-size: 1rem;
+      font-size: var(--tx-type-body-size);
       overflow-wrap: anywhere;
     }
 
     .tx-files__preview-dl {
       margin: 0;
       display: grid;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
     }
 
     .tx-files__preview-dl div {
       display: grid;
       grid-template-columns: 5.5rem minmax(0, 1fr);
-      gap: 0.5rem;
-      font-size: 0.875rem;
+      gap: var(--tx-space-2);
+      font-size: var(--tx-type-label-size);
     }
 
     .tx-files__preview-dl dt {
@@ -707,8 +707,8 @@ function thumbSrc(entry: FileEntry): string {
       flex-wrap: wrap;
       align-items: baseline;
       justify-content: space-between;
-      gap: 0.5rem;
-      font-size: 0.875rem;
+      gap: var(--tx-space-2);
+      font-size: var(--tx-type-label-size);
       color: var(--tx-foreground, CanvasText);
     }
 

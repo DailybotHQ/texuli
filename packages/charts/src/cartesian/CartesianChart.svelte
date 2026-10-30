@@ -793,7 +793,7 @@ const interactionModules = $derived(
   }
 
   figcaption h2 {
-    font-size: 1rem;
+    font-size: var(--tx-chart-frame-title-font-size, var(--tx-type-body-size));
     margin-block: 0;
   }
 

@@ -69,8 +69,8 @@ $effect(() => {
     color: var(--tx-foreground);
     background: var(--tx-elevated, var(--tx-surface, var(--tx-background)));
     border: 1px solid var(--tx-border-strong, var(--tx-border));
-    border-radius: var(--tx-radius, 0.5rem);
-    box-shadow: var(--tx-shadow-float, 0 4px 16px rgb(0 0 0 / 0.16));
+    border-radius: var(--tx-shape-radius-lg);
+    box-shadow: var(--tx-elevation-3);
     font-size: 0.8125rem;
     line-height: 1.35;
     text-align: start;

@@ -332,10 +332,12 @@ describe('part-whole charts', () => {
         }).css?.code;
         // Family contract shared with cartesian / histogram / calendar: 1rem h3
         // and a spaced description. No bare h2 figure titles.
-        expect(css, file).toMatch(/figcaption[^{]*h3[^{]*\{[^}]*font-size:\s*1rem/);
+        expect(css, file).toMatch(
+          /figcaption[^{]*h3[^{]*\{[^}]*font-size:\s*var\(--tx-type-body-size\)/
+        );
         expect(css, file).toMatch(/figcaption[^{]*h3[^{]*\{[^}]*margin-block:\s*0/);
         expect(css, file).toMatch(
-          /figcaption[^{]*p[^{]*\{[^}]*margin-block:\s*0\.25rem\s+0\.75rem/
+          /figcaption[^{]*p[^{]*\{[^}]*margin-block:\s*var\(--tx-space-1\)\s+var\(--tx-space-3\)/
         );
         expect(source, file).not.toMatch(/<h2[\s>]/);
       }

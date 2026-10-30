@@ -60,13 +60,13 @@ const message = $derived.by(() => {
       min-block-size: 1.5rem;
       align-items: center;
       color: var(--tx-muted-foreground, GrayText);
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
     }
 
     .tx-chat-typing__dots {
       display: inline-flex;
-      gap: 0.25rem;
-      margin-inline-start: 0.5rem;
+      gap: var(--tx-space-1);
+      margin-inline-start: var(--tx-space-2);
     }
 
     .tx-chat-typing__dots span {

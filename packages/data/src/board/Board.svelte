@@ -769,7 +769,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       position: relative;
       overflow-x: auto;
       overscroll-behavior-inline: contain;
-      padding: 0.25rem;
+      padding: var(--tx-space-1);
     }
 
     .tx-board__columns {
@@ -777,20 +777,20 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       grid-auto-columns: minmax(15rem, 1fr);
       grid-auto-flow: column;
       align-items: start;
-      gap: 1rem;
+      gap: var(--tx-board-column-gap, var(--tx-space-4));
       min-inline-size: max-content;
     }
 
     .tx-board__column {
       min-inline-size: 15rem;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-lg, 0.75rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-board-column-radius, var(--tx-shape-radius-xl));
       background: var(--tx-muted, Canvas);
     }
 
     .tx-board__column[data-wip='warn'] .tx-board__column-header,
     .tx-board__column[data-wip='blocked'] .tx-board__column-header {
-      border-block-end: 2px solid var(--tx-warning, CanvasText);
+      border-block-end: var(--tx-border-width-thick) solid var(--tx-warning, CanvasText);
     }
 
     .tx-board__column[data-wip='blocked'] .tx-board__column-header {
@@ -802,18 +802,18 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       flex-wrap: wrap;
       align-items: baseline;
       justify-content: space-between;
-      gap: 0.75rem;
-      padding: 0.75rem;
-      border-block-end: 1px solid var(--tx-border, CanvasText);
+      gap: var(--tx-space-3);
+      padding: var(--tx-board-column-padding, var(--tx-space-3));
+      border-block-end: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
     }
 
     .tx-board__column-title {
       margin: 0;
-      font-size: 1rem;
+      font-size: var(--tx-type-body-size);
     }
 
     .tx-board__column-footer {
-      padding: 0.5rem 0.75rem 0.75rem;
+      padding: var(--tx-space-2) var(--tx-space-3) var(--tx-space-3);
     }
 
     .tx-board__column-description,
@@ -825,7 +825,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
     .tx-board__column-description {
       margin: 0;
       color: var(--tx-muted-foreground, CanvasText);
-      font-size: var(--tx-font-size-sm, 0.875rem);
+      font-size: var(--tx-type-label-size);
     }
 
     .tx-board__count {
@@ -838,7 +838,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       display: grid;
       align-content: start;
       min-block-size: 5rem;
-      padding: 0.5rem;
+      padding: var(--tx-space-2);
     }
 
     .tx-board__cell[data-drop-target='true'] {
@@ -846,20 +846,20 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       outline-offset: -2px;
     }
 
-    .tx-board--comfortable .tx-board__cell { gap: 0.5rem; }
-    .tx-board--compact .tx-board__cell { gap: 0.25rem; padding: 0.375rem; }
+    .tx-board--comfortable .tx-board__cell { gap: var(--tx-space-2); }
+    .tx-board--compact .tx-board__cell { gap: var(--tx-space-1); padding: calc(var(--tx-space-unit) * 1.5); }
 
     .tx-board__lane-title {
       margin: 0;
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
     }
 
     .tx-board__card {
       min-inline-size: 0;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-md, 0.5rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-board-card-radius, var(--tx-shape-radius-lg));
       background: var(--tx-surface, Canvas);
-      box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 10%, transparent));
+      box-shadow: var(--tx-board-card-elevation, var(--tx-elevation-1));
     }
 
     .tx-board__card--dragging,
@@ -872,9 +872,9 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       display: flex;
       float: inline-end;
       align-items: center;
-      gap: 0.125rem;
-      padding-block-start: 0.25rem;
-      padding-inline-end: 0.25rem;
+      gap: calc(var(--tx-space-unit) * 0.5);
+      padding-block-start: var(--tx-space-1);
+      padding-inline-end: var(--tx-space-1);
     }
 
     .tx-board__handle,
@@ -885,8 +885,8 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       inline-size: 2.75rem;
       min-block-size: 2.75rem;
       border: 0;
-      border-radius: var(--tx-radius-md, 0.5rem);
-      padding: 0.75rem;
+      border-radius: var(--tx-shape-radius-lg);
+      padding: var(--tx-space-3);
       background: transparent;
       color: inherit;
       cursor: pointer;
@@ -912,18 +912,18 @@ function dragFrom(id: string): Attachment<HTMLElement> {
     .tx-board__scroller:focus-visible,
     .tx-board__handle:focus-visible,
     .tx-board__move-menu:focus-visible {
-      outline: 2px solid var(--tx-ring, Highlight);
+      outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
       outline-offset: 2px;
     }
-    .tx-board__content { padding: 0.75rem; }
-    .tx-board__pending { display: block; margin-block-start: 0.5rem; font-size: 0.875rem; }
+    .tx-board__content { padding: var(--tx-space-3); }
+    .tx-board__pending { display: block; margin-block-start: var(--tx-space-2); font-size: var(--tx-type-label-size); }
     .tx-board__empty {
       margin: 0;
-      padding: 0.75rem;
+      padding: var(--tx-space-3);
       color: var(--tx-foreground, CanvasText);
     }
-    .tx-board__unplaced { margin-block-start: 1rem; border: 1px solid var(--tx-danger, CanvasText); padding: 0.75rem; }
-    .tx-board__status { min-block-size: 1.5em; margin-block: 0.5rem 0; }
+    .tx-board__unplaced { margin-block-start: var(--tx-space-4); border: var(--tx-border-width-thin) solid var(--tx-danger, CanvasText); padding: var(--tx-space-3); }
+    .tx-board__status { min-block-size: 1.5em; margin-block: var(--tx-space-2) 0; }
 
     @media (prefers-reduced-motion: no-preference) {
       .tx-board__card { transition: outline-color 120ms ease; }

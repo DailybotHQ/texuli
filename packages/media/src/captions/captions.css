@@ -5,10 +5,10 @@
 @layer tx.components {
   .tx-captions {
     display: grid;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    border: 1px solid var(--tx-border, currentColor);
-    border-radius: var(--tx-radius-lg, 0.5rem);
+    gap: var(--tx-space-3);
+    padding: var(--tx-space-3);
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-lg);
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     max-inline-size: 36rem;
@@ -22,12 +22,12 @@
   .tx-captions__active {
     margin: 0;
     min-block-size: 2.5rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--tx-radius-md, 0.375rem);
+    padding: var(--tx-space-2) var(--tx-space-3);
+    border-radius: var(--tx-shape-radius-md);
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
-    border: 1px solid var(--tx-border, ButtonBorder);
-    font-size: var(--tx-text-sm, 0.875rem);
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    font-size: var(--tx-type-label-size);
     line-height: 1.4;
   }
 
@@ -37,18 +37,18 @@
 
   .tx-captions__message {
     margin: 0;
-    font-size: var(--tx-text-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
     color: CanvasText;
   }
 
   .tx-captions-chapters {
     display: grid;
-    gap: 0.35rem;
+    gap: calc(var(--tx-space-unit) * 1.4);
   }
 
   .tx-captions-chapters__title {
     margin: 0;
-    font-size: var(--tx-text-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
     font-weight: 600;
     color: var(--tx-foreground, CanvasText);
   }
@@ -58,7 +58,7 @@
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.25rem;
+    gap: var(--tx-space-1);
   }
 
   .tx-captions-chapters__item {
@@ -69,12 +69,12 @@
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    gap: 0.75rem;
+    gap: var(--tx-space-3);
     inline-size: 100%;
     margin: 0;
-    padding: 0.4rem 0.6rem;
-    border: 1px solid transparent;
-    border-radius: var(--tx-radius-md, 0.375rem);
+    padding: calc(var(--tx-space-unit) * 1.6) calc(var(--tx-space-unit) * 2.4);
+    border: var(--tx-border-width-thin) solid transparent;
+    border-radius: var(--tx-shape-radius-md);
     background: var(--tx-background, Canvas);
     color: var(--tx-foreground, CanvasText);
     font: inherit;
@@ -113,18 +113,18 @@
   .tx-captions-chapters__time {
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
-    font-size: var(--tx-text-xs, 0.75rem);
+    font-size: var(--tx-type-caption-size);
     color: CanvasText;
   }
 
   .tx-captions-transcript {
     display: grid;
-    gap: 0.35rem;
+    gap: calc(var(--tx-space-unit) * 1.4);
   }
 
   .tx-captions-transcript__title {
     margin: 0;
-    font-size: var(--tx-text-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
     font-weight: 600;
     color: var(--tx-foreground, CanvasText);
   }
@@ -132,13 +132,13 @@
   .tx-captions-transcript__list {
     list-style: none;
     margin: 0;
-    padding: 0.25rem;
+    padding: var(--tx-space-1);
     max-block-size: 14rem;
     overflow: auto;
-    border: 1px solid var(--tx-border, currentColor);
-    border-radius: var(--tx-radius-md, 0.375rem);
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-md);
     display: grid;
-    gap: 0.15rem;
+    gap: calc(var(--tx-space-unit) * 0.6);
   }
 
   .tx-captions-transcript__item {
@@ -148,12 +148,12 @@
   .tx-captions-transcript__button {
     display: grid;
     grid-template-columns: 3.5rem 1fr;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
     inline-size: 100%;
     margin: 0;
-    padding: 0.35rem 0.5rem;
-    border: 1px solid transparent;
-    border-radius: var(--tx-radius-sm, 0.25rem);
+    padding: calc(var(--tx-space-unit) * 1.4) var(--tx-space-2);
+    border: var(--tx-border-width-thin) solid transparent;
+    border-radius: var(--tx-shape-radius-sm);
     background: var(--tx-background, Canvas);
     color: var(--tx-foreground, CanvasText);
     font: inherit;
@@ -190,12 +190,12 @@
 
   .tx-captions-transcript__time {
     font-variant-numeric: tabular-nums;
-    font-size: var(--tx-text-xs, 0.75rem);
+    font-size: var(--tx-type-caption-size);
     color: CanvasText;
   }
 
   .tx-captions-transcript__text {
-    font-size: var(--tx-text-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
     line-height: 1.35;
   }
 
@@ -203,7 +203,7 @@
     .tx-captions,
     .tx-captions-transcript__list,
     .tx-captions-chapters {
-      border: 1px solid ButtonText;
+      border: var(--tx-border-width-thin) solid ButtonText;
       background: Canvas;
       color: CanvasText;
       forced-color-adjust: none;
@@ -212,7 +212,7 @@
     .tx-captions__active {
       background: Canvas;
       color: CanvasText;
-      border: 1px solid ButtonText;
+      border: var(--tx-border-width-thin) solid ButtonText;
     }
 
     .tx-captions__message {
@@ -221,7 +221,7 @@
 
     .tx-captions-chapters__button,
     .tx-captions-transcript__button {
-      border: 1px solid transparent;
+      border: var(--tx-border-width-thin) solid transparent;
       background: Canvas;
       color: ButtonText;
     }

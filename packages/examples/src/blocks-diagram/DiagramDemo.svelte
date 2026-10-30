@@ -32,7 +32,7 @@ const flow = {
 
 const org = {
   type: 'tree',
-  style: 'org',
+  variant: 'org',
   nodes: [
     { id: 'lead', parentId: null, label: 'Product lead' },
     { id: 'design', parentId: 'lead', label: 'Design' },

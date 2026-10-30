@@ -24,6 +24,7 @@
 
 import { prefersMarkdown } from '../apps/website/src/components/docs/markdown-negotiation.ts';
 import {
+  DISCOVERY_FILE_TYPES,
   discoveryLinks,
   formatLinkHeader,
 } from '../apps/website/src/components/seo/agent-discovery.ts';
@@ -94,6 +95,14 @@ const apiLimiter = createApiLimiter();
 /** The well-known alias of the remote MCP endpoint (`/mcp` is functions/mcp.ts). */
 const MCP_WELL_KNOWN = '/.well-known/mcp';
 
+/** Declared types of the discovery files whose path has no extension. */
+const EXTENSIONLESS_DISCOVERY_TYPES: ReadonlyMap<string, string> = new Map(
+  DISCOVERY_FILE_TYPES.filter((file) => !/\.[a-z0-9]+$/i.test(file.path)).map((file) => [
+    file.path,
+    file.contentType,
+  ])
+);
+
 export const onRequest = async (context: Context): Promise<Response> => {
   const url = new URL(context.request.url);
   // The remote MCP: `/.well-known/mcp` is answered here by the same server
@@ -163,6 +172,19 @@ export const onRequest = async (context: Context): Promise<Response> => {
     headers.set('content-type', MARKDOWN_CONTENT_TYPE);
     headers.set('x-content-type-options', 'nosniff');
     if (!headers.has('link')) headers.set('link', TWIN_LINK);
+    return new Response(response.body, { status: 200, headers });
+  }
+  // Extensionless discovery files (the RFC 9727 api-catalog, the RFC 8414
+  // and RFC 9728 OAuth stubs): Pages guesses `application/octet-stream` for
+  // a file with no extension and `_headers` cannot override that type, so
+  // the declared type is set here (PLAN_011 T-ar-score). Only a 200 is
+  // rebuilt, keeping every header the asset already carries.
+  const discoveryType =
+    status === 200 ? EXTENSIONLESS_DISCOVERY_TYPES.get(url.pathname) : undefined;
+  if (discoveryType) {
+    const headers = new Headers(response.headers);
+    headers.set('content-type', discoveryType);
+    headers.set('x-content-type-options', 'nosniff');
     return new Response(response.body, { status: 200, headers });
   }
   // Bot page hits count by class; only real HTML pages answered 200 — never

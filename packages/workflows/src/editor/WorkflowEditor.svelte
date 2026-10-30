@@ -174,14 +174,14 @@ const inspected = $derived.by(() => {
   @layer tx.components {
     .tx-workflow-editor {
       display: grid;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
       container-type: inline-size;
       color: var(--tx-foreground, CanvasText);
     }
 
     .tx-workflow-editor__main {
       display: grid;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
       grid-template-columns: minmax(0, 1fr);
     }
 

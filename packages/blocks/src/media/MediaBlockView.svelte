@@ -163,7 +163,7 @@ function imageAlt(decorative: boolean | undefined, alt: string | undefined): str
   .tx-media-figure,
   .tx-media-gallery-figure {
     display: grid;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
     margin: 0;
   }
 
@@ -172,8 +172,8 @@ function imageAlt(decorative: boolean | undefined, alt: string | undefined): str
     display: block;
     max-inline-size: 100%;
     block-size: auto;
-    border-radius: var(--tx-radius-md, 0.375rem);
-    border: 1px solid var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-md);
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
     background-color: var(--tx-muted, Canvas);
   }
 
@@ -192,7 +192,7 @@ function imageAlt(decorative: boolean | undefined, alt: string | undefined): str
 
   .tx-media-caption {
     margin: 0;
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
     color: var(--tx-muted-foreground, GrayText);
   }
 
@@ -204,29 +204,29 @@ function imageAlt(decorative: boolean | undefined, alt: string | undefined): str
     display: grid;
     place-items: center;
     min-block-size: 6rem;
-    padding: 0.75rem;
-    border: 1px dashed var(--tx-border, currentColor);
-    border-radius: var(--tx-radius-md, 0.375rem);
+    padding: var(--tx-space-3);
+    border: var(--tx-border-width-thin) dashed var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-md);
     background-color: var(--tx-muted, Canvas);
     color: var(--tx-muted-foreground, GrayText);
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
     text-align: center;
   }
 
   .tx-media-gallery {
     display: grid;
-    gap: 0.75rem;
+    gap: var(--tx-space-3);
   }
 
   .tx-media-gallery-title {
     margin: 0;
-    font-size: var(--tx-font-size-base, 1rem);
-    font-weight: var(--tx-font-weight-heading, 600);
+    font-size: var(--tx-type-body-size);
+    font-weight: var(--tx-type-heading-weight);
   }
 
   .tx-media-gallery-list {
     display: grid;
-    gap: 0.75rem;
+    gap: var(--tx-space-3);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -243,7 +243,7 @@ function imageAlt(decorative: boolean | undefined, alt: string | undefined): str
 
   .tx-block-invalid {
     padding: 0.5em 0.75em;
-    border: 1px dashed currentColor;
+    border: var(--tx-border-width-thin) dashed currentColor;
     border-radius: 0.375em;
     font-size: 0.875em;
   }

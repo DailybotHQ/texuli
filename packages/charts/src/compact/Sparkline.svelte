@@ -125,6 +125,6 @@ const describe = $derived(
   .table-viewport.windowed { max-block-size: 20rem; overflow-y: auto; overscroll-behavior: contain; }
   .table-viewport.windowed tr { block-size: 32px; }
   .table-viewport.windowed .spacer td { border: 0; padding: 0; }
-  .table-viewport.windowed:focus-visible { outline: 2px solid var(--tx-ring, Highlight); outline-offset: 2px; }
+  .table-viewport.windowed:focus-visible { outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight); outline-offset: 2px; }
   @media (forced-colors: active) { .sparkline { forced-color-adjust: auto; } }
 </style>

@@ -89,15 +89,15 @@ $effect(() => {
   }
 
   figcaption h2 {
-    margin: 0 0 0.25rem;
-    font-size: 1rem;
+    margin: 0 0 var(--tx-space-1);
+    font-size: var(--tx-type-body-size);
     font-weight: 600;
   }
 
   figcaption p {
-    margin: 0 0 0.75rem;
+    margin: 0 0 var(--tx-space-3);
     color: var(--tx-muted-foreground, GrayText);
-    font-size: 0.875rem;
+    font-size: var(--tx-type-label-size);
   }
 
   .chart :global(svg[data-matrix-static-plot]) {
@@ -119,16 +119,16 @@ $effect(() => {
   .chart :global(.legend) {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem 1.25rem;
+    gap: var(--tx-space-3) var(--tx-space-5);
     list-style: none;
-    margin: 0.5rem 0 0;
+    margin: var(--tx-space-2) 0 0;
     padding: 0;
   }
 
   .chart :global(.legend li) {
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
+    gap: calc(var(--tx-space-unit) * 1.5);
   }
 
   .chart :global(.legend svg) {

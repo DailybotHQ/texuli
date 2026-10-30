@@ -86,7 +86,7 @@ $effect(() => {
     color: #fff;
     background: #b91c1c;
     border-radius: 999px;
-    font-size: var(--tx-font-size-xs, 0.75rem);
+    font-size: var(--tx-type-caption-size);
     font-weight: 600;
   }
 

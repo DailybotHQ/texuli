@@ -154,8 +154,8 @@ const links = $derived(
       margin: 0;
       color: var(--tx-foreground, CanvasText);
       background: var(--tx-surface, Canvas);
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-lg, 0.75rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-xl);
       overflow: hidden;
     }
 

@@ -25,7 +25,8 @@ async function output(name: string, input: Record<string, unknown>): Promise<Jso
  * untrusted tier: the tree parser requires `style`, and the draft sink scan
  * refuses every `style` key. Remove a type when that conflict is fixed.
  */
-const UNUSABLE = ['tree'];
+// Every block type validates in a blueprint since tree.style became tree.variant (0.9.0).
+const UNUSABLE: string[] = [];
 
 const VALIDATED = Object.entries(BLOCK_FAMILY_TYPES).flatMap(([component, types]) =>
   types.map((type) => ({ type, component }))

@@ -176,14 +176,14 @@ async function onKeydown(event: KeyboardEvent): Promise<void> {
       overflow: auto;
       block-size: min(28rem, 70vh);
       inline-size: 100%;
-      border: 1px solid var(--tx-border, ButtonBorder);
-      border-radius: var(--tx-radius-md, 0.5rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+      border-radius: var(--tx-shape-radius-lg);
       color: var(--tx-foreground, CanvasText);
       background: var(--tx-surface, Canvas);
       contain: strict;
     }
     .tx-virtual-data-grid:focus-visible {
-      outline: 2px solid var(--tx-ring, Highlight);
+      outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
       outline-offset: 2px;
     }
     .tx-virtual-data-grid__canvas { position: relative; }
@@ -205,9 +205,9 @@ async function onKeydown(event: KeyboardEvent): Promise<void> {
       display: flex;
       align-items: center;
       overflow: hidden;
-      padding-inline: 0.75rem;
-      border-block-end: 1px solid var(--tx-border, ButtonBorder);
-      border-inline-end: 1px solid var(--tx-border, ButtonBorder);
+      padding-inline: var(--tx-space-3);
+      border-block-end: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+      border-inline-end: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
       white-space: nowrap;
       text-overflow: ellipsis;
     }

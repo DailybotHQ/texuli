@@ -590,7 +590,7 @@ const surfaceHint = $derived(
     --map-tone-neutral: var(--tx-muted-foreground, #4b5563);
     --map-tone-neutral-fg: var(--tx-background, #fff);
     display: grid;
-    gap: 1rem;
+    gap: var(--tx-space-4);
     /* Keep auto rows packed at the start when the host stretches the root. */
     align-content: start;
     min-block-size: 0;
@@ -603,7 +603,7 @@ const surfaceHint = $derived(
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: end;
-    gap: 1rem;
+    gap: var(--tx-space-4);
   }
   h2,
   h3,
@@ -615,7 +615,7 @@ const surfaceHint = $derived(
   }
   .map-header p,
   .selection {
-    margin-block-start: 0.25rem;
+    margin-block-start: var(--tx-space-1);
     color: var(--tx-foreground, CanvasText);
     font-size: 0.8rem;
   }
@@ -625,7 +625,7 @@ const surfaceHint = $derived(
   }
   .controls {
     display: flex;
-    gap: 0.375rem;
+    gap: calc(var(--tx-space-unit) * 1.5);
   }
   button {
     color: inherit;
@@ -634,14 +634,14 @@ const surfaceHint = $derived(
   .controls button,
   .location-list button,
   .legend-row {
-    border: 1px solid var(--tx-border, ButtonBorder);
-    border-radius: 0.55rem;
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: calc(var(--tx-shape-radius-lg) * 1.1);
     background: var(--tx-surface, Canvas);
   }
   .controls button {
     min-inline-size: 2.5rem;
     min-block-size: 2.5rem;
-    padding-inline: 0.65rem;
+    padding-inline: calc(var(--tx-space-unit) * 2.6);
     cursor: pointer;
   }
   button:hover,
@@ -649,13 +649,13 @@ const surfaceHint = $derived(
   .marker:focus-visible,
   .cluster:focus-visible,
   .legend-row:focus-visible {
-    outline: 2px solid var(--tx-ring, Highlight);
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
     outline-offset: 2px;
   }
   .map-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(13rem, 17rem);
-    gap: 0.75rem;
+    gap: var(--tx-space-3);
     min-block-size: 0;
     min-inline-size: 0;
   }
@@ -668,8 +668,8 @@ const surfaceHint = $derived(
     min-inline-size: 0;
     min-block-size: 0;
     overflow: hidden;
-    border: 1px solid var(--tx-border, ButtonBorder);
-    border-radius: 0.8rem;
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: calc(var(--tx-shape-radius-lg) * 1.6);
     background: var(--map-water);
   }
   .map-canvas {
@@ -694,7 +694,7 @@ const surfaceHint = $derived(
     cursor: grabbing;
   }
   .map-canvas:focus-visible {
-    outline: 2px solid var(--tx-ring, Highlight);
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
     outline-offset: 2px;
   }
   .map-canvas svg {
@@ -711,7 +711,7 @@ const surfaceHint = $derived(
     inline-size: 1.25rem;
     block-size: 1.25rem;
     transform: translate(-50%, -50%);
-    border: 1px solid var(--tx-foreground, CanvasText);
+    border: var(--tx-border-width-thin) solid var(--tx-foreground, CanvasText);
     border-radius: 50%;
     pointer-events: none;
     opacity: 0.55;
@@ -735,13 +735,13 @@ const surfaceHint = $derived(
   .pan-controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.25rem;
+    gap: var(--tx-space-1);
   }
   .pan-controls button {
     min-inline-size: 2rem;
     min-block-size: 2rem;
-    border: 1px solid var(--tx-border, ButtonBorder);
-    border-radius: 0.4rem;
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: calc(var(--tx-shape-radius-lg) * 0.8);
     background: var(--tx-surface, Canvas);
     cursor: pointer;
   }
@@ -875,7 +875,7 @@ const surfaceHint = $derived(
     place-items: center;
     transform: translate(-50%, -50%);
     padding: 0;
-    border: 2px solid var(--tx-background, white);
+    border: var(--tx-border-width-thick) solid var(--tx-background, white);
     color: var(--map-tone-primary-fg);
     background: var(--map-tone-primary);
     cursor: pointer;
@@ -897,10 +897,10 @@ const surfaceHint = $derived(
     border-radius: 50%;
   }
   .shape-square {
-    border-radius: 0.2rem;
+    border-radius: calc(var(--tx-shape-radius-lg) * 0.4);
   }
   .shape-diamond {
-    border-radius: 0.2rem;
+    border-radius: calc(var(--tx-shape-radius-lg) * 0.4);
     transform: translate(-50%, -50%) rotate(45deg);
   }
   .shape-diamond .marker-glyph {
@@ -938,7 +938,7 @@ const surfaceHint = $derived(
     color: var(--map-tone-neutral-fg);
   }
   .marker.active {
-    outline: 2px solid var(--tx-ring, Highlight);
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
     outline-offset: 2px;
   }
   .cluster {
@@ -949,37 +949,37 @@ const surfaceHint = $derived(
     font-weight: 700;
   }
   .attribution {
-    padding-block: 0.4rem;
-    padding-inline: 0.65rem;
+    padding-block: calc(var(--tx-space-unit) * 1.6);
+    padding-inline: calc(var(--tx-space-unit) * 2.6);
     background: var(--tx-background, Canvas);
     color: var(--tx-foreground, CanvasText);
-    font-size: 0.75rem;
+    font-size: var(--tx-type-caption-size);
     font-weight: 500;
   }
   .location-panel {
     min-inline-size: 0;
     overflow: hidden;
-    border: 1px solid var(--tx-border, ButtonBorder);
-    border-radius: 0.8rem;
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: calc(var(--tx-shape-radius-lg) * 1.6);
     background: var(--tx-surface, Canvas);
   }
   .location-panel h3 {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: calc(var(--tx-space-unit) * 1.4);
     justify-content: space-between;
-    padding: 0.75rem;
-    border-block-end: 1px solid var(--tx-border, ButtonBorder);
+    padding: var(--tx-space-3);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
     font-size: 0.85rem;
   }
   .selection {
-    padding: 0.55rem 0.75rem 0;
+    padding: calc(var(--tx-space-unit) * 2.2) var(--tx-space-3) 0;
   }
   .location-list {
     position: relative;
     overflow: auto;
     margin: 0;
-    padding: 0.4rem;
+    padding: calc(var(--tx-space-unit) * 1.6);
   }
   .location-list__spacer {
     position: relative;
@@ -993,11 +993,11 @@ const surfaceHint = $derived(
   .legend-row {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: calc(var(--tx-space-unit) * 2.4);
     inline-size: 100%;
     min-block-size: calc(100% - 0.2rem);
-    margin-block: 0.1rem;
-    padding: 0.4rem 0.55rem;
+    margin-block: calc(var(--tx-space-unit) * 0.4);
+    padding: calc(var(--tx-space-unit) * 1.6) calc(var(--tx-space-unit) * 2.2);
     border-color: transparent;
     text-align: start;
     cursor: pointer;
@@ -1018,13 +1018,13 @@ const surfaceHint = $derived(
     background: var(--map-tone-primary);
   }
   .swatch.route {
-    border-radius: 0.1rem;
+    border-radius: calc(var(--tx-shape-radius-lg) * 0.2);
     inline-size: 0.9rem;
     block-size: 0.25rem;
   }
   .swatch.fence {
-    border-radius: 0.15rem;
-    border: 1px dashed currentColor;
+    border-radius: calc(var(--tx-shape-radius-lg) * 0.3);
+    border: var(--tx-border-width-thin) dashed currentColor;
     background: color-mix(in srgb, var(--map-tone-warning) 25%, transparent);
   }
   .swatch.tone-primary {
@@ -1048,7 +1048,7 @@ const surfaceHint = $derived(
   .location-copy {
     display: grid;
     min-inline-size: 0;
-    gap: 0.12rem;
+    gap: calc(var(--tx-space-unit) * 0.48);
   }
   .location-copy strong {
     overflow: hidden;
@@ -1061,7 +1061,7 @@ const surfaceHint = $derived(
     font-size: 0.68rem;
   }
   .empty {
-    padding: 0.8rem;
+    padding: calc(var(--tx-space-unit) * 3.2);
     color: var(--tx-muted-foreground, GrayText);
     font-size: 0.8rem;
   }

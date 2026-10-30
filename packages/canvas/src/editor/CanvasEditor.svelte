@@ -129,8 +129,8 @@ $effect(() => () => editor.destroy());
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto minmax(20rem, 1fr) auto;
       min-block-size: 28rem;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-lg, 0.75rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-xl);
       overflow: hidden;
       background: var(--tx-surface, Canvas);
       container-type: inline-size;
@@ -149,7 +149,7 @@ $effect(() => () => editor.destroy());
 
     .tx-canvas-editor > :global(.tx-canvas-shape-list) {
       max-block-size: 12rem;
-      border-block-start: 1px solid var(--tx-border, CanvasText);
+      border-block-start: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
     }
 
     @media (min-width: 48rem) {
@@ -161,7 +161,7 @@ $effect(() => () => editor.destroy());
       .tx-canvas-editor > :global(.tx-canvas-shape-list) {
         max-block-size: none;
         border-block-start: 0;
-        border-inline-start: 1px solid var(--tx-border, CanvasText);
+        border-inline-start: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
       }
     }
   }

@@ -10,7 +10,7 @@ additive: nothing existing is renamed or removed.
   (space, size, type, elevation, shape, layer, opacity, layout, icon, status, data-viz).
   123 are declared in `@texuli/tokens/base.css`; the
   28 data-viz tokens are emitted per theme.
-- **Component tokens:** 335 for 48 components
+- **Component tokens:** 364 for 57 components
   (`@texuli/tokens/components`), never declared.
 - **Renames:** 0 (`@texuli/tokens/renames.json`, schema
   `TOKEN_RENAMES_JSON_SCHEMA`).
@@ -888,3 +888,77 @@ A design system sets `components.<component>.<key>`; CSS reads it with the
 | `row-padding-block` | `--tx-tree-row-padding-block` | `var(--tx-space-1)` | Row block padding. | `var(--tx-tree-row-padding-block, var(--tx-space-1))` |
 | `checkbox-size` | `--tx-tree-checkbox-size` | `var(--tx-size-icon-sm)` | Checkbox size. | `var(--tx-tree-checkbox-size, var(--tx-size-icon-sm))` |
 | `checkbox-radius` | `--tx-tree-checkbox-radius` | `var(--tx-shape-radius-xs)` | Checkbox corner radius. | `var(--tx-tree-checkbox-radius, var(--tx-shape-radius-xs))` |
+
+### Data grid (`data-grid`, `@texuli/data/grid-core`)
+
+| Key | Token | Default | Meaning | Read as |
+| --- | --- | --- | --- | --- |
+| `gap` | `--tx-data-grid-gap` | `var(--tx-space-2)` | Gap between the toolbar, table and pager, and inside them. | `var(--tx-data-grid-gap, var(--tx-space-2))` |
+| `radius` | `--tx-data-grid-radius` | `var(--tx-shape-radius-lg)` | Corner radius of the bulk bar and pager buttons. | `var(--tx-data-grid-radius, var(--tx-shape-radius-lg))` |
+| `pager-font-size` | `--tx-data-grid-pager-font-size` | `var(--tx-type-label-size)` | Pager font size. | `var(--tx-data-grid-pager-font-size, var(--tx-type-label-size))` |
+
+### Board (`board`, `@texuli/data/board`)
+
+| Key | Token | Default | Meaning | Read as |
+| --- | --- | --- | --- | --- |
+| `column-gap` | `--tx-board-column-gap` | `var(--tx-space-4)` | Gap between columns. | `var(--tx-board-column-gap, var(--tx-space-4))` |
+| `column-radius` | `--tx-board-column-radius` | `var(--tx-shape-radius-xl)` | Column corner radius. | `var(--tx-board-column-radius, var(--tx-shape-radius-xl))` |
+| `column-padding` | `--tx-board-column-padding` | `var(--tx-space-3)` | Column header padding. | `var(--tx-board-column-padding, var(--tx-space-3))` |
+| `card-radius` | `--tx-board-card-radius` | `var(--tx-shape-radius-lg)` | Card corner radius. | `var(--tx-board-card-radius, var(--tx-shape-radius-lg))` |
+| `card-elevation` | `--tx-board-card-elevation` | `var(--tx-elevation-1)` | Card shadow. | `var(--tx-board-card-elevation, var(--tx-elevation-1))` |
+
+### Chart frame (`chart-frame`, `@texuli/charts/cartesian`)
+
+| Key | Token | Default | Meaning | Read as |
+| --- | --- | --- | --- | --- |
+| `title-font-size` | `--tx-chart-frame-title-font-size` | `var(--tx-type-body-size)` | Chart title font size. | `var(--tx-chart-frame-title-font-size, var(--tx-type-body-size))` |
+
+### Chat message bubble (`chat-bubble`, `@texuli/chat`)
+
+| Key | Token | Default | Meaning | Read as |
+| --- | --- | --- | --- | --- |
+| `radius` | `--tx-chat-bubble-radius` | `calc(var(--tx-shape-radius-lg) * 2)` | Bubble corner radius. | `var(--tx-chat-bubble-radius, calc(var(--tx-shape-radius-lg) * 2))` |
+| `tail-radius` | `--tx-chat-bubble-tail-radius` | `var(--tx-shape-radius-sm)` | Radius of the corner on the author side (the tail). | `var(--tx-chat-bubble-tail-radius, var(--tx-shape-radius-sm))` |
+| `padding-block` | `--tx-chat-bubble-padding-block` | `var(--tx-space-2)` | Block padding. | `var(--tx-chat-bubble-padding-block, var(--tx-space-2))` |
+| `padding-inline` | `--tx-chat-bubble-padding-inline` | `calc(var(--tx-space-unit) * 3.5)` | Inline padding. | `var(--tx-chat-bubble-padding-inline, calc(var(--tx-space-unit) * 3.5))` |
+
+### Chat composer (`chat-composer`, `@texuli/chat`)
+
+| Key | Token | Default | Meaning | Read as |
+| --- | --- | --- | --- | --- |
+| `radius` | `--tx-chat-composer-radius` | `var(--tx-shape-radius-lg)` | Corner radius of the composer and its field. | `var(--tx-chat-composer-radius, var(--tx-shape-radius-lg))` |
+| `padding` | `--tx-chat-composer-padding` | `var(--tx-space-3)` | Composer padding. | `var(--tx-chat-composer-padding, var(--tx-space-3))` |
+| `gap` | `--tx-chat-composer-gap` | `var(--tx-space-2)` | Gap between the field and the actions. | `var(--tx-chat-composer-gap, var(--tx-space-2))` |
+
+### Canvas toolbar (`canvas-toolbar`, `@texuli/canvas/editor`)
+
+| Key | Token | Default | Meaning | Read as |
+| --- | --- | --- | --- | --- |
+| `gap` | `--tx-canvas-toolbar-gap` | `var(--tx-space-1)` | Gap between tools. | `var(--tx-canvas-toolbar-gap, var(--tx-space-1))` |
+| `padding` | `--tx-canvas-toolbar-padding` | `calc(var(--tx-space-unit) * 1.5)` | Toolbar padding. | `var(--tx-canvas-toolbar-padding, calc(var(--tx-space-unit) * 1.5))` |
+| `button-radius` | `--tx-canvas-toolbar-button-radius` | `var(--tx-shape-radius-md)` | Tool button corner radius. | `var(--tx-canvas-toolbar-button-radius, var(--tx-shape-radius-md))` |
+| `button-font-size` | `--tx-canvas-toolbar-button-font-size` | `var(--tx-type-body-size)` | Tool button font size. | `var(--tx-canvas-toolbar-button-font-size, var(--tx-type-body-size))` |
+
+### Workflow node (`workflow-node`, `@texuli/workflows/editor`)
+
+| Key | Token | Default | Meaning | Read as |
+| --- | --- | --- | --- | --- |
+| `padding-block` | `--tx-workflow-node-padding-block` | `var(--tx-space-2)` | Block padding. | `var(--tx-workflow-node-padding-block, var(--tx-space-2))` |
+| `padding-inline` | `--tx-workflow-node-padding-inline` | `var(--tx-space-3)` | Inline padding. | `var(--tx-workflow-node-padding-inline, var(--tx-space-3))` |
+| `radius` | `--tx-workflow-node-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-workflow-node-radius, var(--tx-shape-radius-lg))` |
+| `elevation` | `--tx-workflow-node-elevation` | `var(--tx-elevation-1)` | Shadow. | `var(--tx-workflow-node-elevation, var(--tx-elevation-1))` |
+
+### Sheet view (`spreadsheet`, `@texuli/sheets/view`)
+
+| Key | Token | Default | Meaning | Read as |
+| --- | --- | --- | --- | --- |
+| `gap` | `--tx-spreadsheet-gap` | `var(--tx-space-2)` | Gap between the tabs, formula bar and grid. | `var(--tx-spreadsheet-gap, var(--tx-space-2))` |
+| `tab-radius` | `--tx-spreadsheet-tab-radius` | `var(--tx-shape-radius-lg)` | Sheet tab corner radius. | `var(--tx-spreadsheet-tab-radius, var(--tx-shape-radius-lg))` |
+| `tab-padding-inline` | `--tx-spreadsheet-tab-padding-inline` | `var(--tx-space-3)` | Sheet tab inline padding. | `var(--tx-spreadsheet-tab-padding-inline, var(--tx-space-3))` |
+| `bar-radius` | `--tx-spreadsheet-bar-radius` | `calc(var(--tx-shape-radius-lg) * 0.75)` | Formula bar corner radius. | `var(--tx-spreadsheet-bar-radius, calc(var(--tx-shape-radius-lg) * 0.75))` |
+
+### Schema form (`forms`, `@texuli/forms`)
+
+| Key | Token | Default | Meaning | Read as |
+| --- | --- | --- | --- | --- |
+| `gap` | `--tx-forms-gap` | `var(--tx-space-5)` | Gap between fields, sections and steps. | `var(--tx-forms-gap, var(--tx-space-5))` |

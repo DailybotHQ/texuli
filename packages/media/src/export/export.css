@@ -4,19 +4,19 @@
 @layer tx.components {
   .tx-export {
     display: grid;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
   }
 
   .tx-export__buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
   }
 
   .tx-export__note,
   .tx-export__status {
     margin: 0;
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
     color: var(--tx-muted-foreground, CanvasText);
   }
 
@@ -30,7 +30,7 @@
 
   .tx-export__status[data-tone="error"] {
     color: var(--tx-foreground, CanvasText);
-    padding-inline-start: 0.5rem;
+    padding-inline-start: var(--tx-space-2);
     border-inline-start: 3px solid var(--tx-destructive, CanvasText);
   }
 

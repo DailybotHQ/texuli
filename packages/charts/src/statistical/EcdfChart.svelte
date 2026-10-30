@@ -130,14 +130,14 @@ $effect(() => {
 
 <style>
   .statistical { color: var(--tx-foreground, CanvasText); margin: 0; max-inline-size: 100%; }
-  figcaption h3 { font-size: 1rem; margin-block: 0; }
-  figcaption p { color: var(--tx-muted-foreground, GrayText); margin-block: 0.25rem 0.75rem; }
+  figcaption h3 { font-size: var(--tx-type-body-size); margin-block: 0; }
+  figcaption p { color: var(--tx-muted-foreground, GrayText); margin-block: var(--tx-space-1) var(--tx-space-3); }
   svg { display: block; inline-size: 100%; max-block-size: 22rem; overflow: visible; }
   .grid { stroke: var(--tx-chart-grid, var(--tx-border, GrayText)); stroke-dasharray: 2 3; }
-  .tick { fill: var(--tx-muted-foreground, GrayText); font-size: 0.75rem; }
+  .tick { fill: var(--tx-muted-foreground, GrayText); font-size: var(--tx-type-caption-size); }
   .step { fill: none; stroke: var(--ecdf-color); stroke-width: 2; stroke-linejoin: round; }
-  .legend { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; list-style: none; margin: 0.5rem 0 0; padding: 0; font-size: 0.875rem; }
-  .legend li { display: inline-flex; align-items: center; gap: 0.375rem; }
+  .legend { display: flex; flex-wrap: wrap; gap: var(--tx-space-1) var(--tx-space-4); list-style: none; margin: var(--tx-space-2) 0 0; padding: 0; font-size: var(--tx-type-label-size); }
+  .legend li { display: inline-flex; align-items: center; gap: calc(var(--tx-space-unit) * 1.5); }
   .legend li::before { content: ''; inline-size: 1rem; block-size: 0.1875rem; background: var(--ecdf-color); }
   @media (forced-colors: active) {
     figcaption p, .tick { color: CanvasText; fill: CanvasText; }

@@ -281,7 +281,7 @@
   gap: 0.5rem;
   padding: 1rem;
   border: 1px solid var(--tx-destructive, CanvasText);
-  border-radius: var(--tx-radius, 0.625rem);
+  border-radius: var(--tx-shape-radius-lg);
 }
 
 .tx-deck-stage__invalid-title {
@@ -321,7 +321,7 @@
   color: var(--tx-foreground);
   background: var(--tx-surface, var(--tx-background));
   border: 1px solid var(--tx-border-strong, var(--tx-border));
-  border-radius: var(--tx-radius, 0.625rem);
+  border-radius: var(--tx-shape-radius-lg);
   font: inherit;
   cursor: pointer;
 }
@@ -359,7 +359,7 @@
   color: var(--tx-muted-foreground, var(--tx-foreground));
   border: 1px dashed var(--tx-border-strong, var(--tx-border));
   border-radius: 999px;
-  font-size: var(--tx-font-size-xs, 0.75rem);
+  font-size: var(--tx-type-caption-size);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -382,7 +382,7 @@
   padding-inline: 0.75rem;
   color: var(--tx-muted-foreground, var(--tx-foreground));
   border: 1px dashed var(--tx-border-strong, var(--tx-border));
-  border-radius: var(--tx-radius, 0.625rem);
+  border-radius: var(--tx-shape-radius-lg);
 }
 
 .tx-deck-stage[data-fullscreen] {
@@ -450,7 +450,7 @@
   padding-inline: 0.875rem;
   background: var(--tx-surface, var(--tx-background));
   border: 1px solid var(--tx-border);
-  border-radius: var(--tx-radius, 0.625rem);
+  border-radius: var(--tx-shape-radius-lg);
 }
 
 .tx-deck-stage__notes:focus-visible {
@@ -750,7 +750,7 @@
   padding-inline: 0.75rem;
   color: var(--tx-muted-foreground, var(--tx-foreground));
   border: 1px dashed var(--tx-border-strong, var(--tx-border));
-  border-radius: var(--tx-radius, 0.625rem);
+  border-radius: var(--tx-shape-radius-lg);
 }
 
 /*

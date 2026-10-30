@@ -213,12 +213,12 @@ $effect(() => {
       block-size: 100%;
       min-block-size: 4rem;
       min-inline-size: 8rem;
-      padding: 0.75rem;
-      border: 1px dashed var(--tx-border-strong, currentColor);
+      padding: var(--tx-space-3);
+      border: var(--tx-border-width-thin) dashed var(--tx-border-strong, currentColor);
       border-radius: inherit;
       background-color: var(--tx-muted, Canvas);
       color: var(--tx-muted-foreground, CanvasText);
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
       text-align: center;
     }
     .tx-image-action {
@@ -226,7 +226,7 @@ $effect(() => {
       max-inline-size: 100%;
       padding: 0;
       border: 0;
-      border-radius: var(--tx-radius, 0.5rem);
+      border-radius: var(--tx-shape-radius-lg);
       background: none;
       color: inherit;
       font: inherit;
