@@ -127,11 +127,15 @@ An alias returns exactly what its target returns.
 
 ## Doors that use it today
 
-- **MCP (local stdio, in the repository source):** `tools/list` comes from
-  the registry: every `edge` and `node` operation, then the aliases. A call
-  goes through `invoke()`; a failure is an `isError` result whose JSON has
-  `error`, `code` and, for schema failures, `issues`. An unknown tool name
-  is still a JSON-RPC `-32602` error.
+- **MCP (in the repository source):** `createMcpHandler` ([mcp.md](mcp.md))
+  generates `tools/list` from the registry: every operation of the runtime
+  classes the door serves (`edge` and `node` for the local stdio server),
+  with `inputSchema`, `outputSchema`, `annotations` and cursor pagination,
+  then the aliases. A call goes through `invoke()` and returns
+  `structuredContent` plus a text mirror; a failure is an `isError` result
+  whose JSON has `error`, `code` and, for schema failures, `issues`. An
+  unknown tool name is a JSON-RPC `-32602` error. The same handler serves
+  the resources, prompts and completions.
 - **CLI:** `texuli deck …` runs `deck.run`; `texuli document …` runs
   `document.run`, or `document.export` for `to-docx` and `to-pdf`;
   `texuli-init theme list` and `theme preview` run `theme.search` and
@@ -139,9 +143,8 @@ An alias returns exactly what its target returns.
   (`themeExists`, `themeCss`) from `src/ops/themes.ts`.
 
 Planned (not built yet): the generated `texuli <group> <verb>` router, the
-remote endpoint for `edge` operations, MCP `outputSchema` and
-`structuredContent`, and the generated server card, llms section and this
-page.
+`texuli-mcp` binary, the remote endpoint for `edge` operations, and the
+generated server card, llms section and this page.
 
 ## Tests
 
@@ -150,6 +153,7 @@ once in the schema subset, round-trips every example through its input and
 output schemas, refuses bad input with each error code, resolves every
 alias to the same result as its target, reads the version from
 `package.json`, and that the CLI runs through the registry.
-`packages/tools/tests/mcp.test.ts` covers the MCP tool list and calls, and
+`packages/tools/tests/mcp.test.ts` covers the MCP tool list and calls,
+`packages/tools/tests/mcp-protocol.test.ts` is the MCP conformance suite, and
 `packages/catalog/tests/manifests-all.test.ts` checks the static manifest
 list builds the same catalog hash as file-system discovery.
