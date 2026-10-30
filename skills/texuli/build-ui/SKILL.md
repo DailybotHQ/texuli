@@ -74,9 +74,13 @@ idea → catalog (MCP or catalog-*.json) → pick by useWhen
 # Content-addressed catalog file (offline)
 pnpm exec tsx packages/catalog/src/build/cli.ts --json
 
-# MCP stdio (local tools server): tool "catalog" with { "query": "card" }
-# See packages/tools MCP tests for the envelope shape.
+# The same search through the texuli bin of @texuli/tools (or the MCP tool)
+npx texuli catalog search --json '{"query":"card","limit":10}'
 ```
+
+Over MCP (`npx -y @texuli/mcp`, see [`../router/hosts.md`](../router/hosts.md#mcp)),
+call `catalog.search { "query": "card" }`, then `component.get { "id": "card" }`,
+and check the tree with `blueprint.validate { "draft": {} }`.
 
 TypeScript:
 
