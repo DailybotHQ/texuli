@@ -113,7 +113,13 @@ The labels `jumpToLatest`, `newBelow`, `editInput`, `saveEdit` and
   correcting from the rendered row), or to the bottom for `atLatest`.
   Restoring is not announced as new messages. An anchor whose message is not
   in the list, or `null`, opens at the latest message. `ChatThread` forwards
-  `anchor` and `onAnchorChange`. `bind:ref` binds the scrolling log element.
+  `anchor` and `onAnchorChange`.
+- **`ref` and other attributes.** `MessageList`'s `bind:ref` is the
+  scrolling log element, and `id`, `data-*`, `style` and handlers land on it
+  (a caller `onscroll` runs first; the list's scroll bookkeeping always runs
+  after it). `ChatThread`'s `bind:ref` is its root `section`, which takes the
+  same attributes. Both are covered by the uniform contract test
+  (`packages/chat/tests/contract.test.ts`).
 - **Avatars.** `ChatAuthor.avatarSrcset` passes responsive candidates to the
   author's avatar (`srcset` on texuli `Avatar`); each candidate goes through
   the untrusted image URL policy, and refused ones are dropped. Stream
