@@ -1106,9 +1106,9 @@ function connectorStroke(
     .tx-canvas-surface__editor {
       position: absolute;
       box-sizing: border-box;
-      padding: 0.25rem 0.5rem;
+      padding: var(--tx-space-1) var(--tx-space-2);
       border: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
-      border-radius: var(--tx-radius-sm, 0.25rem);
+      border-radius: var(--tx-shape-radius-sm);
       background: var(--tx-surface, Canvas);
       color: var(--tx-foreground, CanvasText);
       font-family: var(--tx-font-sans, system-ui, sans-serif);
