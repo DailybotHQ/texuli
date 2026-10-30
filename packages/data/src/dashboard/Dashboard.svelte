@@ -610,14 +610,14 @@ const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
       min-inline-size: 0;
       min-block-size: 0;
       overflow: hidden;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-lg, 0.75rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-xl);
       background: var(--tx-card, Canvas);
       color: var(--tx-card-foreground, CanvasText);
     }
 
     .tx-dashboard__widget[data-held] {
-      outline: 2px solid var(--tx-ring, Highlight);
+      outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
       outline-offset: 2px;
       z-index: 1;
     }
@@ -630,10 +630,10 @@ const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.5rem;
-      padding-block: 0.5rem;
-      padding-inline: 0.75rem;
-      border-block-end: 1px solid var(--tx-border, CanvasText);
+      gap: var(--tx-space-2);
+      padding-block: var(--tx-space-2);
+      padding-inline: var(--tx-space-3);
+      border-block-end: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
     }
 
     .tx-dashboard__title {
@@ -652,8 +652,8 @@ const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
       min-inline-size: 24px;
       min-block-size: 24px;
       padding: 0;
-      border: 1px solid transparent;
-      border-radius: var(--tx-radius-sm, 0.25rem);
+      border: var(--tx-border-width-thin) solid transparent;
+      border-radius: var(--tx-shape-radius-sm);
       background: transparent;
       color: var(--tx-muted-foreground, CanvasText);
       cursor: grab;
@@ -686,26 +686,26 @@ const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
     .tx-dashboard__resize:focus-visible,
     .tx-dashboard__content:focus-visible,
     .tx-dashboard__toolbar button:focus-visible {
-      outline: 2px solid var(--tx-ring, Highlight);
+      outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
       outline-offset: 2px;
     }
 
     .tx-dashboard__toolbar {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.25rem;
-      padding-block: 0.375rem;
-      padding-inline: 0.75rem;
-      border-block-end: 1px solid var(--tx-border, CanvasText);
+      gap: var(--tx-space-1);
+      padding-block: calc(var(--tx-space-unit) * 1.5);
+      padding-inline: var(--tx-space-3);
+      border-block-end: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
       background: var(--tx-muted, Canvas);
     }
 
     .tx-dashboard__toolbar button {
       min-block-size: 24px;
-      padding-block: 0.125rem;
-      padding-inline: 0.5rem;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-sm, 0.25rem);
+      padding-block: calc(var(--tx-space-unit) * 0.5);
+      padding-inline: var(--tx-space-2);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-sm);
       background: var(--tx-background, Canvas);
       color: var(--tx-foreground, CanvasText);
       font: inherit;
@@ -717,12 +717,12 @@ const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
       flex: 1 1 auto;
       min-block-size: 0;
       overflow: auto;
-      padding: 0.75rem;
+      padding: var(--tx-space-3);
     }
 
     .tx-dashboard__empty {
       margin: 0;
-      padding: 1rem;
+      padding: var(--tx-space-4);
       color: var(--tx-muted-foreground, CanvasText);
     }
 

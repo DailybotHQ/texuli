@@ -691,14 +691,14 @@ const modeLabels = $derived.by(
 </section>
 
 <style>
-  .tx-calendar { display: flex; min-inline-size: 0; flex-direction: column; overflow: hidden; border: 1px solid var(--tx-border, ButtonBorder); border-radius: .75rem; background: var(--tx-background, Canvas); color: var(--tx-foreground, CanvasText); }
-  .tx-calendar__header { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; border-block-end: 1px solid var(--tx-border, ButtonBorder); padding: .5rem; }
-  .tx-calendar__header h2 { min-inline-size: 8rem; flex: 1; margin: 0; font-size: 1rem; font-weight: 650; }
-  .tx-calendar__navigation, .tx-calendar__modes { display: flex; align-items: center; gap: .2rem; }
-  .tx-calendar__navigation button, .tx-calendar__modes button { min-block-size: 2rem; border: 1px solid transparent; border-radius: .375rem; background: transparent; padding-inline: .55rem; color: inherit; font: inherit; font-size: .8rem; }
+  .tx-calendar { display: flex; min-inline-size: 0; flex-direction: column; overflow: hidden; border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); border-radius: var(--tx-shape-radius-xl); background: var(--tx-background, Canvas); color: var(--tx-foreground, CanvasText); }
+  .tx-calendar__header { display: flex; flex-wrap: wrap; align-items: center; gap: var(--tx-space-2); border-block-end: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); padding: var(--tx-space-2); }
+  .tx-calendar__header h2 { min-inline-size: 8rem; flex: 1; margin: 0; font-size: var(--tx-type-body-size); font-weight: 650; }
+  .tx-calendar__navigation, .tx-calendar__modes { display: flex; align-items: center; gap: calc(var(--tx-space-unit) * 0.8); }
+  .tx-calendar__navigation button, .tx-calendar__modes button { min-block-size: 2rem; border: var(--tx-border-width-thin) solid transparent; border-radius: var(--tx-shape-radius-md); background: transparent; padding-inline: calc(var(--tx-space-unit) * 2.2); color: inherit; font: inherit; font-size: .8rem; }
   .tx-calendar__navigation button:hover, .tx-calendar__modes button[aria-pressed="true"] { border-color: var(--tx-border, ButtonBorder); background: var(--tx-muted, ButtonFace); }
-  .tx-calendar button:focus-visible { outline: 2px solid var(--tx-ring, Highlight); outline-offset: 2px; }
-  .tx-calendar__loading, .tx-calendar__note { padding: .75rem 1rem; color: var(--tx-muted-foreground, GrayText); font-size: .875rem; }
+  .tx-calendar button:focus-visible { outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight); outline-offset: 2px; }
+  .tx-calendar__loading, .tx-calendar__note { padding: var(--tx-space-3) var(--tx-space-4); color: var(--tx-muted-foreground, GrayText); font-size: var(--tx-type-label-size); }
   .tx-calendar__sr-only { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: -1px; padding: 0; border: 0; }
   @media (max-width: 40rem) { .tx-calendar__header h2 { order: 1; flex-basis: 100%; } }
   @media (forced-colors: active) { .tx-calendar { border-color: CanvasText; } .tx-calendar__modes button[aria-pressed="true"] { border-color: Highlight; background: Highlight; color: HighlightText; } }

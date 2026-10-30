@@ -5,7 +5,7 @@
 @layer tx.components {
   .tx-filter-builder {
     color: var(--tx-foreground, CanvasText);
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
   }
 
   .tx-filter-builder__group,
@@ -18,20 +18,20 @@
 
   .tx-filter-builder__group {
     display: grid;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
   }
 
   .tx-filter-builder__group:not([data-root]) {
-    padding: 0.5rem 0.75rem 0.75rem;
-    border: var(--tx-border-width, 1px) solid var(--tx-border, CanvasText);
+    padding: var(--tx-space-2) var(--tx-space-3) var(--tx-space-3);
+    border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
     border-inline-start-width: 3px;
-    border-radius: var(--tx-radius, 0.5rem);
+    border-radius: var(--tx-shape-radius-lg);
     background: var(--tx-muted, Canvas);
   }
 
   .tx-filter-builder__legend {
-    padding-inline: 0.25rem;
-    font-weight: var(--tx-font-weight-medium, 500);
+    padding-inline: var(--tx-space-1);
+    font-weight: var(--tx-type-label-weight);
   }
 
   .tx-filter-builder__match,
@@ -40,12 +40,12 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
   }
 
   .tx-filter-builder__list {
     display: grid;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -55,15 +55,15 @@
   .tx-filter-builder__button,
   .tx-filter-builder__remove {
     min-block-size: var(--tx-target-size, 2.25rem);
-    border: var(--tx-border-width, 1px) solid var(--tx-input, currentColor);
-    border-radius: var(--tx-radius, 0.5rem);
+    border: var(--tx-border-width-thin) solid var(--tx-input, currentColor);
+    border-radius: var(--tx-shape-radius-lg);
     background: var(--tx-surface, Field);
     color: var(--tx-surface-foreground, FieldText);
     font: inherit;
   }
 
   .tx-filter-builder__control {
-    padding-inline: 0.5rem;
+    padding-inline: var(--tx-space-2);
   }
 
   .tx-filter-builder__value {
@@ -72,7 +72,7 @@
   }
 
   select.tx-filter-builder__control[multiple] {
-    padding-block: 0.25rem;
+    padding-block: var(--tx-space-1);
   }
 
   .tx-filter-builder__control[aria-invalid="true"] {
@@ -80,7 +80,7 @@
   }
 
   .tx-filter-builder__button {
-    padding-inline: 0.75rem;
+    padding-inline: var(--tx-space-3);
     cursor: pointer;
   }
 
