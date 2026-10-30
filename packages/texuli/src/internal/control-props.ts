@@ -53,6 +53,17 @@ export function splitRequiredControlProps(
   return { ...split, required: flag === true || flag === 'true' };
 }
 
+/**
+ * Whether an `aria-invalid` value (a Field's control props, or the caller's)
+ * marks the control invalid: anything but absent, `false` or `"false"`
+ * (`"grammar"` and `"spelling"` count, as in ARIA).
+ */
+export function isAriaInvalid(value: unknown): boolean {
+  return (
+    value !== undefined && value !== null && value !== false && value !== 'false' && value !== ''
+  );
+}
+
 /** Join id lists for `aria-describedby` / `aria-labelledby`, dropping empties. */
 export function joinIds(...ids: (string | null | undefined | false)[]): string | undefined {
   return ids.filter(Boolean).join(' ') || undefined;

@@ -7,6 +7,7 @@ import { createToastStore, resetToastStore } from '../src/components/toast/toast
 import AlertDialogHarness from './fixtures/AlertDialogHarness.svelte';
 import CommandHarness from './fixtures/CommandHarness.svelte';
 import ContainedOverlayHarness from './fixtures/ContainedOverlayHarness.svelte';
+import DialogOpenChangeHarness from './fixtures/DialogOpenChangeHarness.svelte';
 import HoverCardFixture from './fixtures/HoverCardFixture.svelte';
 import MenusHarness from './fixtures/MenusHarness.svelte';
 import PopoverFixture from './fixtures/PopoverFixture.svelte';
@@ -78,6 +79,49 @@ describe('dialog', () => {
         expect(screen.queryByRole('alertdialog')).toBeNull();
       });
     });
+  });
+});
+
+describe('onOpenChange on an inside close (G87)', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  type Close = 'close' | 'escape' | 'outside' | 'cancel' | 'confirm';
+  const rows: { kind: 'dialog' | 'alert'; close: Close }[] = [
+    { kind: 'dialog', close: 'close' },
+    { kind: 'dialog', close: 'escape' },
+    { kind: 'dialog', close: 'outside' },
+    { kind: 'alert', close: 'escape' },
+    { kind: 'alert', close: 'cancel' },
+    { kind: 'alert', close: 'confirm' },
+  ];
+
+  it('calls onOpenChange(false) exactly once, with open passed once or bound', async () => {
+    for (const bound of [false, true]) {
+      for (const { kind, close } of rows) {
+        const onOpenChange = vi.fn();
+        render(DialogOpenChangeHarness, { props: { kind, bound, onOpenChange } });
+        const role = kind === 'alert' ? 'alertdialog' : 'dialog';
+        const dialog = await screen.findByRole(role);
+        if (close === 'close') {
+          await fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }));
+        } else if (close === 'cancel' || close === 'confirm') {
+          const name = close === 'cancel' ? 'Cancel' : 'Delete';
+          await fireEvent.click(within(dialog).getByRole('button', { name }));
+        } else if (close === 'escape') {
+          await fireEvent.keyDown(dialog, { key: 'Escape' });
+        } else {
+          const outside = screen.getByRole('button', { name: 'Outside', hidden: true });
+          await fireEvent.pointerDown(outside, { pointerType: 'mouse', button: 0 });
+          await fireEvent.pointerUp(outside, { pointerType: 'mouse', button: 0 });
+          await fireEvent.click(outside);
+        }
+        await waitFor(() => expect(screen.queryByRole(role)).toBeNull());
+        expect(onOpenChange.mock.calls, `${kind} ${close} bound=${bound}`).toEqual([[false]]);
+        cleanup();
+      }
+    }
   });
 });
 
@@ -274,6 +318,31 @@ describe('command', () => {
       await fireEvent.keyDown(dialog, { key: 'Escape' });
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
       await waitFor(() => expect(document.activeElement).toBe(trigger));
+    });
+  });
+
+  describe('Command palette search status (G88)', () => {
+    it('shows the polite "Searching…" status and a busy list while search is pending', async () => {
+      const { default: Palette } = await import('../src/components/command/CommandPalette.svelte');
+      let settle: (items: { id: string; label: string }[]) => void = () => {};
+      const search = vi.fn(
+        () =>
+          new Promise<{ id: string; label: string }[]>((resolve) => {
+            settle = resolve;
+          })
+      );
+      render(Palette, { props: { open: true, search } });
+      const dialog = await screen.findByRole('dialog');
+      const input = within(dialog).getByRole('combobox');
+      await fireEvent.input(input, { target: { value: 'inv' } });
+      await waitFor(() => expect(search).toHaveBeenCalledWith('inv'));
+      const status = await within(dialog).findByRole('status');
+      expect(status.textContent).toContain('Searching…');
+      expect(status.getAttribute('aria-live')).toBe('polite');
+      expect(within(dialog).getByRole('listbox').getAttribute('aria-busy')).toBe('true');
+      settle([{ id: 'invite', label: 'Invite member' }]);
+      await waitFor(() => expect(within(dialog).queryByRole('status')).toBeNull());
+      expect(within(dialog).getByRole('option', { name: /Invite member/ })).toBeTruthy();
     });
   });
 
@@ -588,6 +657,49 @@ describe('toast', () => {
   });
 
   describe('Toaster viewport placement and motion', () => {
+    it('reads a contained container position one frame after mount, or never when positioned (G99)', async () => {
+      for (const positioned of [false, true]) {
+        const frames: FrameRequestCallback[] = [];
+        const reads: Element[] = [];
+        const original = window.getComputedStyle.bind(window);
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+          frames.push(callback);
+          return frames.length;
+        });
+        vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+        // happy-dom reports an unset position as '': report 'static' as browsers do.
+        vi.spyOn(window, 'getComputedStyle').mockImplementation((element, pseudo) => {
+          reads.push(element);
+          const style = original(element, pseudo);
+          return new Proxy(style, {
+            get: (target, key) =>
+              key === 'position' ? target.position || 'static' : Reflect.get(target, key, target),
+          });
+        });
+        const container = document.createElement('div');
+        document.body.append(container);
+        try {
+          const store = createToastStore({ duration: 0 });
+          store.success('Saved');
+          const view = render(ToastHarness, {
+            props: { store, mode: 'contained', container, positioned },
+          });
+          expect(container.querySelector('[data-tx-toast-viewport]')).toBeTruthy();
+          expect(reads).not.toContain(container);
+          expect(container.style.position).toBe('');
+          for (const frame of frames.splice(0)) frame(performance.now());
+          expect(reads.includes(container)).toBe(!positioned);
+          expect(container.style.position).toBe(positioned ? '' : 'relative');
+          view.unmount();
+          expect(container.style.position).toBe('');
+        } finally {
+          vi.restoreAllMocks();
+          container.remove();
+          cleanup();
+        }
+      }
+    });
+
     it('keeps a dismissed toast mounted, inert, for its exit motion', async () => {
       const store = createToastStore({ duration: 0 });
       store.success('Copied');

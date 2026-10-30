@@ -24,8 +24,8 @@
       "identifier": "urn:air:texuli.com:content:llms-full-txt",
       "displayName": "Texuli Full Content Corpus for LLMs",
       "type": "text/plain",
-      "url": "https://texuli.com/llms/llms-full.txt",
-      "description": "Expanded llms.txt corpus with the catalog's component documentation for retrieval and grounding. Every docs page also has a Markdown twin at the same path plus .md (guides/theming.md beside guides/theming/).",
+      "url": "https://texuli.com/llms-full.txt",
+      "description": "Expanded llms.txt corpus (also at /llms/llms-full.txt, the same bytes) with the catalog's component documentation for retrieval and grounding. Every docs page also has a Markdown twin at the same path plus .md (guides/theming.md beside guides/theming/).",
       "tags": ["llms-txt", "content", "corpus", "markdown"],
       "representativeQueries": [
         "read the full Texuli component documentation for grounding",
@@ -60,6 +60,19 @@
         "fetch the Texuli catalog snapshot as JSON",
         "what props does the Texuli button component accept",
         "which Texuli components are agent-emittable"
+      ]
+    },
+    {
+      "identifier": "urn:air:texuli.com:server:mcp",
+      "displayName": "Texuli MCP Server",
+      "type": "application/json",
+      "url": "https://texuli.com/mcp",
+      "description": "Read-only MCP server over stateless Streamable HTTP at https://texuli.com/mcp (alias /.well-known/mcp): search and read the component catalog, examples and themes, and validate blueprints. POST JSON-RPC, anonymous, rate limited; the server card is /.well-known/mcp/server-card.json and access is described in /auth.md.",
+      "tags": ["mcp", "catalog", "themes", "read-only"],
+      "representativeQueries": [
+        "search the Texuli component catalog for a date picker",
+        "validate this Texuli blueprint draft",
+        "list Texuli themes with a dark mode"
       ]
     },
     {

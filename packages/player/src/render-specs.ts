@@ -279,6 +279,15 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
         name: 'annotations',
         kind: 'string',
       },
+      {
+        name: 'xKind',
+        kind: 'enum',
+        enumValues: ['linear', 'category', 'time'],
+      },
+      {
+        name: 'locale',
+        kind: 'string',
+      },
     ],
     agentEmittable: true,
     emit: ['developer', 'untrusted'],
@@ -330,6 +339,15 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
       },
       {
         name: 'annotations',
+        kind: 'string',
+      },
+      {
+        name: 'xKind',
+        kind: 'enum',
+        enumValues: ['linear', 'category', 'time'],
+      },
+      {
+        name: 'locale',
         kind: 'string',
       },
     ],
@@ -391,6 +409,15 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
         name: 'annotations',
         kind: 'string',
       },
+      {
+        name: 'xKind',
+        kind: 'enum',
+        enumValues: ['linear', 'category', 'time'],
+      },
+      {
+        name: 'locale',
+        kind: 'string',
+      },
     ],
     agentEmittable: true,
     emit: ['developer', 'untrusted'],
@@ -442,6 +469,15 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
       },
       {
         name: 'annotations',
+        kind: 'string',
+      },
+      {
+        name: 'xKind',
+        kind: 'enum',
+        enumValues: ['linear', 'category', 'time'],
+      },
+      {
+        name: 'locale',
         kind: 'string',
       },
     ],
@@ -497,6 +533,15 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
         name: 'annotations',
         kind: 'string',
       },
+      {
+        name: 'xKind',
+        kind: 'enum',
+        enumValues: ['linear', 'category', 'time'],
+      },
+      {
+        name: 'locale',
+        kind: 'string',
+      },
     ],
     agentEmittable: true,
     emit: ['developer', 'untrusted'],
@@ -548,6 +593,15 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
       },
       {
         name: 'annotations',
+        kind: 'string',
+      },
+      {
+        name: 'xKind',
+        kind: 'enum',
+        enumValues: ['linear', 'category', 'time'],
+      },
+      {
+        name: 'locale',
         kind: 'string',
       },
     ],

@@ -57,3 +57,48 @@ it('content, chart and media manifests are a closed, frozen, content-tier set wi
     expect(result.diagnostics.some((diagnostic) => diagnostic.code === 'unknown-prop')).toBe(true);
   }
 });
+
+it('cartesian chart manifests let an agent declare a time x-axis and its locale (G97)', () => {
+  const cartesian = [
+    'charts-area',
+    'charts-bar',
+    'charts-cartesian',
+    'charts-combo',
+    'charts-line',
+    'charts-stacked-bar',
+  ] as const;
+  for (const id of cartesian) {
+    const manifest = contentManifestsById[id];
+    const xKind = manifest.props.find((prop) => prop.name === 'xKind');
+    expect(xKind, id).toMatchObject({ kind: 'enum', enumValues: ['linear', 'category', 'time'] });
+    expect(xKind?.required, id).toBeUndefined();
+    expect(xKind?.description, id).toMatch(/epoch milliseconds/);
+    expect(
+      manifest.props.find((prop) => prop.name === 'locale'),
+      id
+    ).toMatchObject({
+      kind: 'string',
+    });
+    // formatX is a host callback, never agent data.
+    expect(
+      manifest.props.some((prop) => prop.name === 'formatX'),
+      id
+    ).toBe(false);
+    const declared = validateCatalogManifest({
+      ...manifest,
+      examples: [
+        {
+          id: 'time',
+          title: 'Daily signups',
+          props: {
+            ...manifest.examples[0]?.props,
+            xKind: 'time',
+            locale: 'en-US',
+            series: [{ id: 'signups', label: 'Signups', points: [{ x: 1772323200000, y: 127 }] }],
+          },
+        },
+      ],
+    });
+    expect(declared.diagnostics, id).toEqual([]);
+  }
+});

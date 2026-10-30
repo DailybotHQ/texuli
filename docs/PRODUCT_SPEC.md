@@ -66,8 +66,10 @@ closed, documented catalog that can be validated before anything renders.
 5. **Agent-native by construction.** A closed component catalog generated from
    authored manifests (schema, `useWhen`, `dontUseWhen`, accessibility notes,
    examples); a renderer with no HTML sinks; a two-tier URL policy that
-   separates developer-written props from untrusted content; and a read-only
-   MCP server.
+   separates developer-written props from untrusted content; and one
+   operations registry served as read-only MCP tools (local and remote) and
+   as `texuli <group> <verb>` commands, with the server card, the llms Tools
+   section and the operation docs generated from it.
 6. **Whole interfaces as JSON.** A blueprint (spec 0.3.0) declares local
    state, flows, two-way bindings and a closed action set, so an agent can
    send a working dashboard, form flow, sortable board or workflow builder
@@ -120,6 +122,7 @@ closed, documented catalog that can be validated before anything renders.
 | Kotlin Multiplatform twin (`texuli-spec`, `texuli-compose`, conformance) | **In development**, nothing published; app shells and most chart families are placeholders | [`native`](../native/README.md) |
 | Agent service (prompt → validated blueprint draft) | **In development**, fake replay provider only, not deployed | [`apps/agent`](../apps/agent/README.md) |
 | Tools (L8): the copy-in CLIs (`texuli-add`, `texuli-init`, `texuli-update`, `texuli-llms`), A2UI, custom elements, the golden set, and the read-only local MCP server source | **Exists as source**, private; no published binaries | [`packages/tools`](../packages/tools/README.md) |
+| Agent surfaces (PLAN_011): the operations registry (`@texuli/tools/ops`), the `texuli <group> <verb>` router, the local MCP (`@texuli/mcp`, `npx -y @texuli/mcp`, every operation), the remote MCP at `https://texuli.com/mcp` (`functions/mcp.ts`, edge operations only), and the generated server card, llms Tools section and ops docs (`pnpm check:surfaces` fails on drift) | **In development** for `0.9.0`: in the repository, not on npm; the remote is not deployed until release 0.9.0 merges to `main`, after which a CI job compares its `tools/list` with the registry | [`packages/tools/docs/mcp.md`](../packages/tools/docs/mcp.md), [`packages/mcp`](../packages/mcp/README.md) |
 | Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, deployed at https://texuli.com (Cloudflare Pages) with two Pages Functions (`functions/`: agent-facing request shaping and a same-origin Umami analytics proxy, off until the owner provisions it) | [`apps/website`](../apps/website/README.md) |
 | npm 0.x release | **Done** — all 25 published packages in the 0.8 line (see [RELEASE](RELEASE.md)), the first release of `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (after `0.7.0` for 22 packages, the first release of `@texuli/document` and `@texuli/pages`; `0.6.0` for 20 packages; `0.5.0` for 20 packages, the first release of `@texuli/editor`; `0.4.0` for 19 packages, `0.3.0` for 18, `0.2.0` for 15 and the `0.1.0-next.0`–`next.3` previews), dist-tags `latest` and `next`, CI-published with provenance | [RELEASE](RELEASE.md) |
 | npm stable release (1.0.0) | Planned; needs the developer's explicit go. texuli.com deploys from `main` (Cloudflare Pages) | — |

@@ -1,9 +1,10 @@
 // @vitest-environment node
 import { createHash } from 'node:crypto';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
+import { texuliOps } from '../../packages/tools/src/ops/index.ts';
 import { AEO_CONFIG, auditAeo, collectAeo, distPathFor, renderMarkdown } from '../audit-aeo.mjs';
 
 const sha256 = (text: string) => `sha256:${createHash('sha256').update(text).digest('hex')}`;
@@ -55,17 +56,26 @@ function greenSurface() {
       }),
       'mcp/server-card.json': JSON.stringify({
         serverInfo: { name: 'texuli' },
-        transport: { stdio: { launch: 'pnpm exec tsx src/mcp/stdio.ts' } },
-        tools: [{ name: 'catalog' }],
+        transport: {
+          stdio: { launch: 'npx -y @texuli/mcp' },
+          streamableHttp: { url: 'https://texuli.com/mcp' },
+        },
+        tools: texuliOps.list().map((operation) => ({ name: operation.name })),
       }),
       'agent-skills/index.json': JSON.stringify(skills),
+      'oauth-authorization-server': JSON.stringify({ issuer: 'https://texuli.com' }),
+      'oauth-protected-resource': JSON.stringify({ resource: 'https://texuli.com' }),
+      'agent-card.json': JSON.stringify({ name: 'Texuli', url: 'https://texuli.com/mcp' }),
+      'poppy.json': JSON.stringify({ protocol_version: '0.1' }),
     },
     mdManifest: JSON.stringify({ twins }),
     robots: [
       'User-agent: *',
       'Allow: /',
+      'Content-Signal: ai-train=yes, search=yes, ai-input=yes',
       '',
       'Sitemap: https://texuli.com/sitemap.xml',
+      'Agentmap: https://texuli.com/.well-known/ai-catalog.json',
       ...Array.from({ length: 16 }, (_, i) => `User-agent: Crawler${i}\nAllow: /`),
       '',
     ].join('\n'),
@@ -87,22 +97,23 @@ const criticals = (result: {
 }) => result.findings.filter((finding) => finding.severity === 'critical');
 
 describe('auditAeo on a green fixture surface', () => {
-  it('finds zero criticals, three planned rows and counts the surface; renders a green verdict and the planned section; warns on an indexed top route outside the nav-curated llms.txt', () => {
-    // finds zero criticals, three planned rows and counts the surface
+  it('finds zero criticals, one planned row and counts the surface; renders a green verdict and the planned section; warns on an indexed top route outside the nav-curated llms.txt', () => {
+    // finds zero criticals, one planned row and counts the surface
     {
       const result = auditAeo(greenSurface());
       expect(criticals(result).map((finding) => `${finding.category}: ${finding.detail}`)).toEqual(
         []
       );
       expect(result.summary.findings.critical).toBe(0);
-      expect(result.summary.findings.planned).toBe(3);
-      expect(result.summary.surface).toEqual({ topRoutes: 2, twins: 3, wellKnownFiles: 4 });
+      expect(result.summary.findings.planned).toBe(1);
+      expect(result.summary.surface).toEqual({ topRoutes: 2, twins: 3, wellKnownFiles: 8 });
     }
     // renders a green verdict and the planned section
     {
       const report = renderMarkdown(auditAeo(greenSurface()));
       expect(report).toContain('GREEN — the agent surface holds');
-      expect(report).toContain('Content-Signal');
+      expect(report).toContain('Reachability');
+      expect(report).not.toContain('Content-Signal');
     }
     // warns on an indexed top route outside the nav-curated llms.txt
     {
@@ -188,9 +199,32 @@ describe('auditAeo red cases', () => {
       );
       expect(cardFindings.some((finding) => finding.detail.includes('serverInfo.name'))).toBe(true);
       expect(cardFindings.some((finding) => finding.detail.includes('no tools'))).toBe(true);
+      expect(cardFindings.some((finding) => finding.detail.includes('no transport'))).toBe(true);
+
+      // The card is compared with the operations registry, not a literal list.
+      const registry = { ...AEO_CONFIG, mcpTools: texuliOps.list().map((op) => op.name) };
+      expect(criticals(auditAeo(greenSurface(), registry))).toEqual([]);
+      const stale = greenSurface();
+      stale.wellKnown['mcp/server-card.json'] = JSON.stringify({
+        serverInfo: { name: 'texuli' },
+        transport: { streamableHttp: { url: 'http://texuli.com/mcp' } },
+        tools: ['catalog', ...registry.mcpTools.slice(1)],
+      });
+      const staleDetails = criticals(auditAeo(stale, registry)).map((f) => f.detail);
+      expect(staleDetails).toContain('transport.streamableHttp.url is not an https URL');
+      expect(staleDetails).toContain(
+        `the registry operation "${registry.mcpTools[0]}" is not advertised`
+      );
+      expect(staleDetails).toContain('advertises "catalog", which is not a registry operation');
+      // The committed card passes against the registry.
+      const committed = greenSurface();
+      committed.wellKnown['mcp/server-card.json'] = readFileSync(
+        join(import.meta.dirname, '../../apps/website/public/.well-known/mcp/server-card.json'),
+        'utf8'
+      );
       expect(
-        cardFindings.some((finding) => finding.detail.includes('transport.stdio.launch'))
-      ).toBe(true);
+        criticals(auditAeo(committed, registry)).filter((f) => f.page === 'mcp/server-card.json')
+      ).toEqual([]);
 
       const drifted = greenSurface();
       drifted.readBytes = () => Buffer.from('changed body');
@@ -252,7 +286,38 @@ describe('auditAeo red cases', () => {
           finding.detail.includes('Disallow exists')
         )
       ).toBe(true);
+
+      // PLAN_011 T-ar-discovery: the signals and the Agentmap are required.
+      const unsignalled = greenSurface();
+      unsignalled.robots = greenSurface().robots.replace(/^Content-Signal: .*\n/m, '');
+      expect(
+        criticals(auditAeo(unsignalled)).some((finding) =>
+          finding.detail.includes('no Content-Signal')
+        )
+      ).toBe(true);
+      const unmapped = greenSurface();
+      unmapped.robots = greenSurface().robots.replace(/^Agentmap: .*\n/m, '');
+      expect(
+        criticals(auditAeo(unmapped)).some((finding) => finding.detail.includes('no Agentmap'))
+      ).toBe(true);
     }
+  });
+});
+
+describe('auditAeo and Function routes (PLAN_011 T-ar-discovery)', () => {
+  it('accepts a catalog entry for the remote MCP that dist does not hold, and still flags other missing paths', () => {
+    const surface = greenSurface();
+    surface.wellKnown['ai-catalog.json'] = JSON.stringify({
+      entries: [
+        { identifier: 'urn:air:server:mcp', url: 'https://texuli.com/mcp' },
+        { identifier: 'urn:air:ghost', url: 'https://texuli.com/ghost.json' },
+      ],
+    });
+    surface.exists = () => false;
+    const details = criticals(auditAeo(surface)).map((finding) => finding.page);
+    expect(details).not.toContain('urn:air:server:mcp');
+    expect(details).toContain('urn:air:ghost');
+    expect(AEO_CONFIG.functionRoutes).toEqual(['/mcp', '/.well-known/mcp']);
   });
 });
 

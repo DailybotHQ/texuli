@@ -53,5 +53,22 @@ scenario(
           });
       },
     },
+    {
+      id: 'contained-positions-container',
+      title:
+        'a contained region positions a static container after mount, and leaves a declared one alone',
+      async run({ page }) {
+        const staticFrame = page.getByTestId('static-frame');
+        const positionedFrame = page.getByTestId('positioned-frame');
+        await expect(staticFrame.getByTestId('static-region')).toHaveCount(1);
+        await expect(positionedFrame.getByTestId('positioned-region')).toHaveCount(1);
+        await expect
+          .poll(() => staticFrame.evaluate((node) => (node as HTMLElement).style.position))
+          .toBe('relative');
+        await expect(
+          positionedFrame.evaluate((node) => (node as HTMLElement).style.position)
+        ).resolves.toBe('absolute');
+      },
+    },
   ])
 );

@@ -9,14 +9,28 @@ integration.
 
 | Workflow | File | Trigger | Jobs |
 | --- | --- | --- | --- |
-| CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | push to `main`, pull requests | `check`, `behavior`, `website`, `audits`, `setup-smoke-macos` |
+| CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | push to `main`, pull requests | `check`, `behavior`, `website`, `audits`, `setup-smoke-macos`; `mcp-remote-smoke` on pushes to `main` only |
 | Publish packages | [.github/workflows/publish.yml](../.github/workflows/publish.yml) | CI success on a push to `main` (a merged PR), `v*` tag push, manual dispatch | `publish` |
 | Skill release | [.github/workflows/skill-release.yml](../.github/workflows/skill-release.yml) | `workflow_run` after a successful CI run for a push to `main` | `release` (`contents: write`), `smoke` (read-only) |
 
 - **`check`** — `pnpm check` (Biome lint, typecheck, unit and component
-  tests, layer guard) plus `scripts/supply-chain.ts`, `scripts/check-docs.ts`,
+  tests, layer guard, and `pnpm check:surfaces`, which fails when the
+  server card, the llms Tools section, the ops docs tables or the
+  `/mcp-server/` data drift from the operations registry) plus `scripts/supply-chain.ts`, `scripts/check-docs.ts`,
   `pnpm check:skill` and `shellcheck skills/texuli/setup.sh` (the skill's
   only shell script; shellcheck ships on the Ubuntu image).
+- **`mcp-remote-smoke`** — only on pushes to `main`, after `check`, and
+  never on pull requests. Cloudflare Pages deploys the site and
+  `functions/mcp.ts` outside GitHub Actions, so the job runs
+  `scripts/mcp-remote-smoke.sh`: a read-only `tools/list` POST to
+  `https://texuli.com/mcp` with curl, compared with the remote tool names
+  of the committed server card (generated from the registry), retried
+  every 30 s up to 20 times while the deploy of the commit rolls out. It is
+  `continue-on-error`, so a slow or failed deploy never blocks publishing;
+  a drift shows as a failed job with an error annotation. It cannot pass
+  before release 0.9.0 is deployed from `main` (the endpoint does not exist
+  there yet). Tests: `scripts/tests/mcp-remote-smoke.test.ts` (a local
+  stand-in server).
 - **`setup-smoke-macos`** — on `macos-latest`, confirms `/bin/bash` is
   3.2 and runs the skill's `setup.sh` under it: `--help`, `--version`,
   `--verify`, then for every host from `--list-hosts` a dry run, an install
@@ -178,6 +192,22 @@ project settings, owner-provisioned; analytics stays off without them. Every pus
 `main` deploys; a pull request gets a preview deployment. The per-page
 social images, sitemap and robots.txt are generated at build time against
 `https://texuli.com` (the `site` in `apps/website/astro.config.mjs`).
+
+The remote MCP endpoint (`functions/mcp.ts`, PLAN_011 T-mcp-remote) is in
+the repository for release 0.9.0 and deploys with the site once that
+release merges to `main`; it is not live before then. It needs no
+environment variable, binding or secret: Pages bundles it with the other
+Functions, it answers `/mcp`, and the middleware answers `/.well-known/mcp`
+with the same server. It sets its own CSP, `nosniff`, `no-store`,
+`noindex` and CORS headers, because `_headers` does not apply to Function
+responses ([SECURITY](SECURITY.md#21-remote-mcp-endpoint)). Its bundle is
+budgeted in `pnpm size` as `functions/mcp`. After the first deploy,
+confirm by hand that `POST https://texuli.com/mcp` answers `initialize`
+and `tools/list` with the `edge` operations, that a `GET` gets `405`, and
+that the security headers are present; a post-deploy smoke job that
+compares `tools/list` with the registry is planned (ADR-018), not wired.
+The optional Cloudflare rate-limiting rule for `/mcp` is an owner action
+in the dashboard, described in the same SECURITY section.
 
 ## Budget audits
 

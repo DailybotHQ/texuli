@@ -109,7 +109,7 @@ These APIs ship in `0.7.0`, the first release of `@texuli/document` and
 | Edit, read, page and export documents | `PageEditor` (`@texuli/pages/editor`), `PageReader` (`/reader`), `PagedView` (`/paged`), `exportDocument` and `downloadBlob` (`/export`); keep the document in `$state.raw` and validate untrusted input with `loadUntrustedDocument` first |
 | Collaboration | `createCollabSession` and `CollabEditor` from `@texuli/pages/collab` (import lazily): comments, suggestions, versions, presence; landmark names carry each person (`CollabLabels.landmark`), so two editors share a page |
 | Documents from an agent | A `document` node (spec 0.7.0) validated with `checkDocument: checkDocumentDraft` and painted through `<Player documentHost={createDocumentPlayerHost()}>` (`@texuli/pages/host`); edit it with the `patchDocument` op (`applyEditOps(tree, ops, { patchDocument })` from `@texuli/catalog/edit`), addressed by node `key` |
-| Document commands | `runDocumentCommand` (`@texuli/tools/document`), the `document` command of the `texuli` bin and the read-only `document` MCP tool |
+| Document commands | `runDocumentCommand` (`@texuli/tools/document`), the `document` command of the `texuli` bin and the read-only `document.run` and `document.export` MCP tools |
 
 Behavior changes to expect in `0.7.0` are in
 [`../../upgrade/SKILL.md`](../../upgrade/SKILL.md) and `docs/RELEASE.md` in

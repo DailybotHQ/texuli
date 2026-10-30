@@ -43,7 +43,7 @@ Styled modal surfaces on the `--tx-*` token contract: a general **Dialog** with 
 | `footer` | Snippet for action row |
 | `hideClose` | Hides the header close control |
 | `closeLabel` | Accessible name of the close control (default `Close`) |
-| `open` / `onOpenChange` | Controlled open state |
+| `open` / `onOpenChange` | Open state (bindable). `onOpenChange(next)` runs exactly once per change, whether `open` is bound or passed once, on the close control, Escape, an outside press, Cancel or a resolved confirm (`AlertDialog` too) |
 | `ref` | Bindable: the dialog content element while open, `null` while closed |
 | `stack` | A `LayerStack` (`@texuli/core/layer-stack`) to register on instead of the page-wide one, for apps that keep their own Escape and outside-press order (`AlertDialog` too) |
 | `mode` / `container` | `mode="contained"` with a `container` element renders the overlay inside it, and scopes inertness, focus containment and the backdrop to it (document scrolling is left alone): for framed previews. Default `top-layer` (`AlertDialog` and `CommandPalette` too) |

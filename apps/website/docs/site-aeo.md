@@ -1,9 +1,12 @@
 # texuli.com agent surfaces (AEO)
 
 **App:** `apps/website` + root `functions/`
-**Tasks:** PLAN_006 T-22..T-28 (surfaces), T-30 (audit)
+**Tasks:** PLAN_006 T-22..T-28 (surfaces), T-30 (audit); PLAN_011
+T-ar-discovery (discovery files and headers)
 **Specs:** `tests/e2e/site-seo.spec.ts` runs the AEO audit on the built
-`dist/`; unit tests in `apps/website/tests/` (edge logic, discovery files),
+`dist/`; `tests/e2e/site-agent-discovery.spec.ts` checks the discovery
+files and headers on the built `dist/`; unit tests in `apps/website/tests/`
+(edge logic, discovery files, `agent-discovery.test.ts`),
 `scripts/tests/audit-aeo.test.ts`
 
 ## Purpose
@@ -23,10 +26,13 @@ middleware also does is in [site-analytics.md](site-analytics.md).
 | --- | --- | --- |
 | `/llms.txt` | The whole-site index in the llmstxt.org shape: H1, summary blockquote, one H2 per site area, `- [Title](url): line` links | A **committed** file, `apps/website/public/llms.txt`, written by `scripts/generate-site-llms.ts` from `src/components/seo/llms-site.ts` (sections derived from `NAV_GROUPS`, the guides and the component families) through `formatSiteLlmsTxt` in `@texuli/tools/llms`. Served verbatim, no redirect |
 | `/llms/`, `/catalog/` | The catalog bundle (`llms.txt`, `llms-full.txt`, per-component docs) and the catalog JSON | Committed snapshots under `public/llms/` and `public/catalog/`, unchanged by this plan |
+| `/llms-full.txt` | The same bytes as `/llms/llms-full.txt`, at the root where llmstxt.org readers look | Copied from the built `/llms/llms-full.txt` by `src/integrations/agent-discovery.ts`; no second generator |
 | `<page>.md` twins | One Markdown file beside every docs-class page (`isDocsPath`), plus `md-manifest.json` mapping page → twin | `src/components/docs/integration.ts` at build time: the exact "Copy page" text with root-relative links made absolute (`absolutizeMarkdownLinks`), so the twin and Copy page cannot disagree |
-| `/.well-known/ai-catalog.json`, `/.well-known/api-catalog`, `/.well-known/mcp/server-card.json` | The ARD catalog, the RFC 9727 linkset and the card for the tools package's **local stdio** MCP server (five read-only tools, no hosted endpoint) | Committed under `apps/website/public/.well-known/`. The ARD's `logoUrl` is `https://texuli.com/brand/texuli-logo-light.png`, a committed file in `apps/website/public/brand/` |
+| `/.well-known/ai-catalog.json`, `/.well-known/mcp/server-card.json` | The ARD catalog (including the remote MCP at `https://texuli.com/mcp`) and the MCP server card | Committed under `apps/website/public/.well-known/` (the server card is owned by the operations registry work). The ARD's `logoUrl` is `https://texuli.com/brand/texuli-logo-light.png`, a committed file in `apps/website/public/brand/` |
+| `/.well-known/api-catalog`, OAuth stubs, `/.well-known/jwks.json`, `/auth.md`, `/.well-known/security.txt`, `/.well-known/agent-card.json`, `/.well-known/poppy.json` | The discovery documents of the checklist below | **Generated at build** from one typed source, `src/components/seo/agent-discovery.ts`, written by `src/integrations/agent-discovery.ts`; nothing is committed under `public/` |
+| `Link` response headers, per-file content types and CORS | The discovery `Link` on every HTML page; `application/linkset+json`, `text/markdown`, CORS `*` on the public JSON | Written into `dist/_headers` by the CSP integration (`linkHeaderLine` and `discoveryHeaderRules`); the middleware sets the same `Link` on the twins it builds |
 | `/.well-known/agent-skills/index.json`, `/skill-pack/` | The skill pack copied into the build and indexed with the SHA-256 of each served `SKILL.md` | Generated at build by `src/integrations/skill-pack.ts`, so digests cannot drift |
-| `/robots.txt` | Allow-all default, `Sitemap:` line, an explicit `Allow: /` group for each of the 16 `AI_CRAWLERS`, no `Disallow` | `buildRobots` in `src/components/seo/seo.ts`, written by the SEO integration; there is no `public/robots.txt` |
+| `/robots.txt` | Allow-all default, `Sitemap:` line, `Agentmap:` (the ARD catalog), an explicit `Allow: /` group for each of the 16 `AI_CRAWLERS`, `Content-Signal: ai-train=yes, search=yes, ai-input=yes` in every group, no `Disallow` | `buildRobots` in `src/components/seo/seo.ts` (signals and Agentmap from `agent-discovery.ts`), written by the SEO integration; there is no `public/robots.txt` |
 
 ### The middleware (`functions/_middleware.ts`)
 
@@ -37,14 +43,15 @@ counting it also does is in [site-analytics.md](site-analytics.md)):
 
 1. **Strict-parser robots.** For Lighthouse-family user agents
    (`isStrictParserAudit`) it serves `/robots.txt` through
-   `stripDirectivesForStrictParsers` (`robots-variants.ts`). The shipped
-   policy has no non-standard directives today, so the variant is
-   byte-identical; the machinery waits for `Content-Signal` or `Agentmap`
-   lines.
+   `stripDirectivesForStrictParsers` (`robots-variants.ts`): the shipped
+   policy minus its `Content-Signal` and `Agentmap` lines, which strict
+   parsers flag although RFC 9309 says to ignore unknown directives.
 2. **Markdown negotiation.** `negotiateTwin` (`md-negotiate.ts`) answers
    only an explicit `text/markdown` Accept on a docs-class path: it fetches
    the twin from `env.ASSETS` with `content-type: text/markdown`,
-   `Vary: Accept` and `X-Content-Negotiation: markdown`. A wildcard Accept,
+   `Vary: Accept`, `X-Content-Negotiation: markdown` and the discovery
+   `Link` (the twin is a Function response, so no `_headers` rule reaches
+   it; `service-desc` is left to the API catalog). A wildcard Accept,
    the root and non-docs paths pass through; a missing twin falls through
    to the HTML pipeline instead of inventing a body.
 3. **Agent-shaped 404s.** A 404 for a request `isAgentRequest`
@@ -68,7 +75,7 @@ to every docs-class route that has a twin (see [site-csp.md](site-csp.md)).
 | --- | --- |
 | Root index | `src/components/seo/llms-site.ts`, `scripts/generate-site-llms.ts`, `public/llms.txt`, `packages/tools/src/llms/site.ts` |
 | Twins | `src/components/docs/integration.ts`, `src/components/docs/markdown.ts`, `src/components/docs/markdown-negotiation.ts` |
-| Discovery | `public/.well-known/**`, `src/integrations/skill-pack.ts` |
+| Discovery | `src/components/seo/agent-discovery.ts` (the typed source), `src/integrations/agent-discovery.ts`, `public/.well-known/ai-catalog.json`, `public/.well-known/mcp/server-card.json`, `src/integrations/skill-pack.ts`, `src/lib/mcp-limits.ts` (the MCP limits `/auth.md` states) |
 | Robots | `src/components/seo/seo.ts` (`AI_CRAWLERS`, `buildRobots`), `src/lib/robots-variants.ts` |
 | Edge | `functions/_middleware.ts`, `src/lib/md-negotiate.ts`, `src/lib/agent-request.ts`; the HTML `Vary: Accept` rule in `src/components/security/csp.ts` (`varyHeaderLine`) |
 | Audits | `scripts/audit-aeo.mjs`, `scripts/check-llms-parity.ts` |
@@ -87,6 +94,8 @@ to every docs-class route that has a twin (see [site-csp.md](site-csp.md)).
 | Negotiation decision table, the middleware wrapper over a stubbed `ASSETS`, the untouched pass-through and the `_headers` `Vary: Accept` line | `apps/website/tests/edge-middleware.test.ts` |
 | Agent classification and problem JSON | `apps/website/tests/edge-middleware.test.ts` |
 | Robots variant stripping, pinned against the shipped `buildRobots` output | `apps/website/tests/edge-middleware.test.ts` |
+| Every discovery generator: paths, content types, fields, `scopes_supported: ["read"]`, `Link` syntax and the twin, `_headers` rules, security.txt `Expires`, the robots directives | `apps/website/tests/agent-discovery.test.ts` |
+| The built discovery files and the headers `_headers` gives them, `Link` on `/` | `tests/e2e/site-agent-discovery.spec.ts` |
 | The robots policy and the sitemap | `apps/website/tests/site-build-guards.test.ts`; the SEO audit in `tests/e2e/site-seo.spec.ts` |
 | Offline audit of the whole surface (critical / warning / planned) | `scripts/tests/audit-aeo.test.ts`; real run below |
 | Catalog ids, twins, llms docs and examples reconcile | `scripts/tests/check-llms-parity.test.ts` |
@@ -133,9 +142,54 @@ left out of the nav-curated `llms.txt` by design).
   URLs, agents get the HTML `404.html`, and every crawler gets the one
   robots file. Only negotiation, the problem JSON and the robots variant
   are lost.
-- **No root `llms-full.txt`.** The catalog's `/llms/llms-full.txt` holds
-  the full component text; per-page twins are the whole-site unit.
-- **Planned:** `Content-Signal` and `Agentmap` directives, the
-  `Access-Control-Allow-Origin: *` header on the ARD, and reachability
-  probes against the deployed origin. The audit reports these as
-  `planned`, never as passing.
+- **`_headers` is not checked at the edge locally.** The discovery spec
+  serves `dist` with the generated exact-path rules applied, and asserts the
+  `_headers` text; Cloudflare's own application of those rules is checked
+  only after a deploy (the scan below).
+- **security.txt expires.** `Expires` is one year after the build; a site
+  not rebuilt for a year serves an expired file.
+- **Planned:** reachability probes against the deployed origin. The audit
+  reports them as `planned`, never as passing.
+
+## Agent-readiness checklist (isitagentready.com)
+
+Every non-commerce check of the isitagentready.com scanner (the 2026-10-30
+baseline scored texuli.com level 1) and what answers it. **Status** says
+what this repository ships; nothing here is verified against the deployed
+site until a scan after the deploy of `main` (run
+`curl -s -X POST https://isitagentready.com/api/scan -H "Content-Type: application/json" -d '{"url":"https://texuli.com"}'`).
+
+| Check | Answered by | Status |
+| --- | --- | --- |
+| `robotsTxt` | `/robots.txt` (`buildRobots`) | Shipped (passed in the baseline) |
+| `sitemap` | `/sitemap.xml` (SEO integration) | Shipped (passed in the baseline) |
+| `linkHeaders` | `Link` on every HTML page in `dist/_headers` (`linkHeaderLine`): `api-catalog`, `service-desc` (only when `/openapi.json` is built), `describedby` (`/llms.txt`), `ai-catalog`, and `alternate` `text/markdown` where a twin is built | Shipped in this repo; `service-desc` waits for `openapi.json` (T-ar-api) |
+| `dnsAid` | SVCB/HTTPS records under `_agents.texuli.com` with DNSSEC | Owner action (DNS); not in the repository |
+| `markdownNegotiation` | The middleware's twin negotiation; the root `/` twin is T-ar-twins | Partial: docs pages only until T-ar-twins |
+| `robotsTxtAiRules` | The 16 named `AI_CRAWLERS` groups | Shipped (passed in the baseline) |
+| `contentSignals` | `Content-Signal: ai-train=yes, search=yes, ai-input=yes` in every robots group | Shipped |
+| `webBotAuth` | `/.well-known/http-message-signatures-directory` | Not applicable: texuli.com sends no signed bot requests (informational check) |
+| `apiCatalog` | `/.well-known/api-catalog`, generated, served as `application/linkset+json` | Shipped (the content type was wrong in the baseline) |
+| `oauthDiscovery` | `/.well-known/oauth-authorization-server` (RFC 8414 stub; `jwks_uri` is an empty key set) | Shipped (honest stub: anonymous, read-only) |
+| `oauthProtectedResource` | `/.well-known/oauth-protected-resource` (RFC 9728, no `.json`; `scopes_supported: ["read"]`) | Shipped (honest stub) |
+| `authMd` | `/auth.md`, `text/markdown`: anonymous access, the MCP endpoint, its limits | Shipped |
+| `mcpServerCard` | `/.well-known/mcp/server-card.json` | Shipped; its remote `serverUrl` is the surfaces-sync work |
+| `a2aAgentCard` | `/.well-known/agent-card.json`: points at `https://texuli.com/mcp` with `protocolBinding: "MCP"`; skills are the edge operations | Shipped (a discovery pointer; Texuli runs no A2A agent) |
+| `agentSkills` | `/.well-known/agent-skills/index.json` (skill-pack integration) | Shipped (passed in the baseline) |
+| `webMcp` | Browser tools on page load | Planned (T-ar-site-mcp) |
+| `ard` | `/.well-known/ai-catalog.json` (CORS `*`, `rel="ai-catalog"` in every head and `Link`, `Agentmap` in robots) | Shipped |
+| `personalAgentProtocol` | `/.well-known/poppy.json`: website-only discovery (`protocol_version`, `organization`, empty `web`) | Shipped; informational check. No sessions, sign-in or APIs are declared because none exist |
+| `/.well-known/mcp` | Routed by the middleware to the remote MCP | Shipped (T-mcp-remote) |
+| Commerce (`x402`, `mpp`, `ucp`, `acp`, `ap2`) | — | Not applicable: texuli.com sells nothing |
+
+### Content-Signal ownership (owner runbook)
+
+This repository owns the Content Signals: `CONTENT_SIGNALS` in
+`src/components/seo/agent-discovery.ts` writes them into every robots group.
+**Do not also enable Cloudflare's managed Content Signals (AI Crawl
+Control) for texuli.com.** Managed signals prepend their own block, so
+robots.txt would carry two policies for the same directive and each crawler
+would resolve the conflict its own way. To change a signal, change the
+constant and rebuild. If the managed setting is ever preferred, remove the
+directive from `buildRobots` in the same change.
+

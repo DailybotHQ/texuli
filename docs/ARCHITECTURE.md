@@ -223,8 +223,24 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
   `packages/tools/tests/mcp-protocol.test.ts`, `mcp-cli.test.ts` and the
   consumer test `tests/consumers/mcp.spec.ts`.
 
-A remote MCP endpoint at texuli.com is planned; see
-[Planned (PLAN_011)](#planned-plan011).
+- the `texuli` router (`packages/tools/src/cli/router.ts`): `texuli <group>
+  <verb>` for every operation, generated from the registry, plus the 0.8
+  commands; `texuli help` is a snapshot test;
+- the remote MCP (`functions/mcp.ts`, in the repository, deployed with the
+  site when release 0.9.0 merges to `main`): the same handler, stateless,
+  `edge` operations only.
+
+Every agent-facing description of these doors is generated from the
+operations registry by `scripts/generate-surfaces.ts` (builders in
+`scripts/agent-surfaces.ts`): the server card
+(`apps/website/public/.well-known/mcp/server-card.json`), the "Tools" section
+of the site `llms.txt`, the tables of `packages/tools/docs/ops.md` and the
+`/mcp-server/` page data. `pnpm check:surfaces` (inside `pnpm check`)
+regenerates them into a temporary directory and fails on any difference;
+`check-skill` parses every `texuli …` command with the router and checks
+every operation name and argument the skill cites; and the CI job
+`mcp-remote-smoke` compares texuli.com's `tools/list` with the registry
+after each deploy of `main`.
 
 ## Decks: engine and stage
 
@@ -322,8 +338,8 @@ New subpaths in existing packages:
 
 | Package | Planned subpaths | What they will hold | Release wave | Decision |
 | --- | --- | --- | --- | --- |
-| `@texuli/tools` | `ops` (planned, PLAN_011) | The framework-free operations registry: `group.verb` operations with JSON Schema input and output, annotations, a runtime class (`edge`, `node`, `site`), limits and examples, and a schema-checked `invoke()`; the MCP tools, the CLI router, the server card, the llms tools section and the ops docs are generated from it | 0.9.0 | [ADR-017](DECISIONS.md#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface) |
-| `@texuli/catalog` | `manifests/all` (planned, PLAN_011) | The static, edge-safe manifest list shared by the remote MCP and `apps/agent`, with a hash parity test against file-system discovery | 0.9.0 | [ADR-017](DECISIONS.md#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface) |
+| `@texuli/tools` | `ops` (in the repository, in development, PLAN_011) | The framework-free operations registry: `group.verb` operations with JSON Schema input and output, annotations, a runtime class (`edge`, `node`, `site`), limits and examples, and a schema-checked `invoke()`; the MCP tools, the CLI router, the server card, the llms tools section and the ops docs are generated from it | 0.9.0 | [ADR-017](DECISIONS.md#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface) |
+| `@texuli/catalog` | `manifests/all` (in the repository, in development, PLAN_011) | The static, edge-safe manifest list shared by the remote MCP and `apps/agent`, with a hash parity test against file-system discovery | 0.9.0 | [ADR-017](DECISIONS.md#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface) |
 | `@texuli/tokens` | `components`, `renames.json` (planned, PLAN_011) | Token contract v2: the component token registry (each component's tokens and default reference, the closed vocabulary a design system may set), and the machine-readable rename list `{ from, to, since, removeIn }`; the new system families (space, size, type roles, elevation, shape, layers, opacity, layout, icons, always-on data-viz and status) join the existing CSS with defaults that reproduce today's values | 0.9.0 (families), 0.10.0 (component tier and adoption) | [ADR-020](DECISIONS.md#adr-020-token-contract-v2-additive-families-and-a-real-component-tier) |
 | `@texuli/tokens` | `design-system/validate`, `design-system/compile`, `design-system/apply`, `design-system/emit/*`, `design-system/fixtures` (planned, PLAN_011) | The design-system runtime, all lazy: the small validator, the compiler (`extends`, variants, patches, the pinned-color solver, enforced guarantees, `CompiledDesignSystem`), `applyDesignSystem` and `designSystemStyle` for element scope, SSR and no flash, the static emitters, and the fictional `protoyard-theme/v1` fixture; `@texuli/tokens` gains a down-only dependency on `@texuli/spec` | 0.10.0 | [ADR-021](DECISIONS.md#adr-021-the-design-system-document), [ADR-022](DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported), [ADR-023](DECISIONS.md#adr-023-design-system-runtime-and-scoping), [ADR-024](DECISIONS.md#adr-024-design-systems-on-every-surface) |
 | `@texuli/spec` | the design-system schema and spec `0.10.0` (planned, PLAN_011) | The `texuli/design-system` document (`formatVersion` 1): schema, TypeScript types, `DesignSystemPatch`, the JSON-path validator, `migrate`, stable error codes and generated Kotlin; spec `0.10.0` adds `designSystem` (`ref` or `inline`) to blueprints, decks and documents | 0.10.0 | [ADR-021](DECISIONS.md#adr-021-the-design-system-document), [ADR-024](DECISIONS.md#adr-024-design-systems-on-every-surface) |
@@ -332,7 +348,7 @@ Edge and site files:
 
 | File | What it will hold | Release wave | Decision |
 | --- | --- | --- | --- |
-| `functions/mcp.ts` (planned, PLAN_011) | The remote MCP at texuli.com: stateless Streamable HTTP (`POST`, JSON responses, no session) at `/mcp` and `/.well-known/mcp`, serving only the registry's `edge` and `site` operations, with body, batch, item and time caps, Origin and Host checks, its own security headers, a per-isolate rate limit, and no fetch, storage or secrets; the site also registers WebMCP tools in the page | 0.9.0 | [ADR-018](DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions) |
+| `functions/mcp.ts` (in the repository, not deployed; `site` operations and WebMCP planned, PLAN_011) | The remote MCP at texuli.com: stateless Streamable HTTP (`POST`, JSON responses, no session) at `/mcp` and `/.well-known/mcp`, serving only the registry's `edge` operations (and the planned `site` operations), with body, batch, item and time caps, Origin and Host checks, its own security headers, a per-isolate rate limit, and no fetch, storage or secrets; the site also registers WebMCP tools in the page | 0.9.0 | [ADR-018](DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions) |
 
 ## The website
 
@@ -347,7 +363,7 @@ static site with `client:visible` islands:
 - SEO with compile-time social images.
 
 It imports the workspace packages directly, so a broken component breaks
-`pnpm build`. Two Cloudflare Pages Functions in the repository-root
+`pnpm build`. Cloudflare Pages Functions in the repository-root
 `functions/` run beside the static output:
 - `_middleware.ts` serves Markdown twins of docs pages on an explicit
   `text/markdown` preference, a stripped `robots.txt` to audit tools and a
@@ -356,6 +372,10 @@ It imports the workspace packages directly, so a broken component breaks
   (CSP, and `Vary: Accept` on negotiable docs pages) survive;
 - `api/umami/[[path]].ts` is the same-origin Umami analytics proxy, off
   until the owner provisions it.
+- `mcp.ts` is the remote MCP endpoint for `/mcp` (the middleware routes
+  `/.well-known/mcp` to the same server): `edge` operations only, with its
+  own limits and headers ([SECURITY](SECURITY.md#21-remote-mcp-endpoint)).
+  It is in the repository for release 0.9.0 and not deployed yet.
 
 The pure decisions live in `apps/website/src/lib/` and are tested in
 `apps/website/tests/` ([SECURITY](SECURITY.md#15-website-edge-functions-and-analytics)). Per-route budgets live in

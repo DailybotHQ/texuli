@@ -1,7 +1,8 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
+import type { HTMLFormAttributes } from 'svelte/elements';
 import { Button } from 'texuli/button';
-import { type ClassValue, cx } from 'texuli/cx';
+import { type ClassValue, chainHandlers, cx } from 'texuli/cx';
 import { autosizeTextarea } from 'texuli/input';
 import {
   type ComposerActionContext,
@@ -9,7 +10,7 @@ import {
   DEFAULT_COMPOSER_LABELS,
 } from './labels.ts';
 
-interface Props {
+interface OwnProps {
   value?: string;
   /** Return false to keep the draft, or reject to show the translated error. */
   onSubmit: (message: string) => unknown;
@@ -37,7 +38,16 @@ interface Props {
    */
   onkeydown?: (event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }) => void;
   class?: ClassValue;
+  /** The composer's root `form` (bindable). */
+  ref?: HTMLFormElement | null;
 }
+/**
+ * Other attributes (`id`, `aria-*`, `data-*`, `style`, handlers) land on the
+ * root `form`. A caller `onsubmit` runs first; the composer's own submit
+ * always runs after it (it prevents the page navigation itself).
+ * `onkeydown` is the exception: it reaches the textarea (see above).
+ */
+type Props = OwnProps & Omit<HTMLFormAttributes, keyof OwnProps | 'children'>;
 
 const id = $props.id();
 let {
@@ -54,6 +64,9 @@ let {
   onStop,
   onkeydown,
   class: className,
+  ref = $bindable(null),
+  onsubmit: callerSubmit,
+  ...rest
 }: Props = $props();
 
 let field = $state<HTMLTextAreaElement | null>(null);
@@ -128,12 +141,14 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
 </script>
 
 <form
+  {...rest}
+  bind:this={ref}
   class={cx('tx-chat-composer', className)}
   data-tx-chat-composer
-  onsubmit={(event) => {
+  onsubmit={chainHandlers(callerSubmit, (event: SubmitEvent) => {
     event.preventDefault();
     void submit();
-  }}
+  })}
 >
   <label class="visually-hidden" for={`chat-composer-${id}`}>{labels.input}</label>
   <textarea

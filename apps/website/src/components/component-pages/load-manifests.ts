@@ -16,7 +16,25 @@ export type ComponentPageEntry = CatalogManifest & {
   group: string;
 };
 
-const GROUPS: { name: string; manifests: readonly CatalogManifest[] }[] = [
+/**
+ * The manifest groups that have a `/component-pages/<id>/` page (and so a
+ * Markdown twin). The other catalog groups (canvas, chat, data, sheets …)
+ * are documented for agents by `/llms/components/<id>.md` and their family
+ * pages; `scripts/check-llms-parity.ts` names them and fails on any group
+ * that is in neither list.
+ */
+export const COMPONENT_PAGE_GROUPS = [
+  'content',
+  'display',
+  'forms',
+  'layouts',
+  'overlays',
+] as const;
+
+const GROUPS: {
+  name: (typeof COMPONENT_PAGE_GROUPS)[number];
+  manifests: readonly CatalogManifest[];
+}[] = [
   { name: 'content', manifests: CONTENT_MANIFESTS },
   { name: 'display', manifests: DISPLAY_MANIFESTS },
   { name: 'forms', manifests: FORMS_MANIFESTS },

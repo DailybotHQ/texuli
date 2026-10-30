@@ -355,6 +355,30 @@ const cartesianProps = [
     { kind: 'tuple', items: [finiteNumber, finiteNumber] }
   ),
   prop(
+    'xKind',
+    'X axis kind',
+    'How x values read: category bands, a linear number scale, or time (epoch milliseconds shown as dates). Omitted: inferred.',
+    'axes',
+    { kind: 'enum', enumValues: ['linear', 'category', 'time'] }
+  ),
+  prop(
+    'formatX',
+    'X formatter',
+    'Developer callback that formats x values on the axis, live region, tooltip and data table.',
+    'axes',
+    { kind: 'event', signature: '(value: number | string) => string' },
+    false,
+    undefined,
+    'developer'
+  ),
+  prop(
+    'locale',
+    'Locale',
+    'BCP 47 language tag for dates and announced values; defaults to the runtime locale.',
+    'localization',
+    { kind: 'string', constraints: { nonEmpty: true } }
+  ),
+  prop(
     'onzoom',
     'Zoom event',
     'Developer zoom event callback.',

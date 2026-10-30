@@ -304,7 +304,7 @@ describe('auditSite sitemap checks', () => {
 });
 
 describe('auditSite robots checks', () => {
-  it('flags a missing sitemap line, a Disallow and a static Content-Signal', () => {
+  it('flags a missing sitemap line, a Disallow and a Content-Signal outside a group', () => {
     const base = greenSite();
     for (const [needle, detail] of [
       ['Sitemap: https://texuli.com/sitemap.xml', 'no Sitemap line'],
@@ -320,10 +320,16 @@ describe('auditSite robots checks', () => {
       ).toBe(true);
     }
     const signalling = greenSite();
-    signalling.robots = `${base.robots}Content-Signal: ai-train=yes\n`;
+    signalling.robots = `${base.robots}\nContent-Signal: ai-train=yes\n`;
     expect(
       criticals(auditSite(signalling)).some((finding) => finding.detail.includes('Content-Signal'))
     ).toBe(true);
+    // Inside a group it is the shipped policy (PLAN_011 T-ar-discovery).
+    const grouped = greenSite();
+    grouped.robots = `${base.robots}\nUser-agent: GPTBot\nAllow: /\nContent-Signal: ai-train=yes, search=yes, ai-input=yes\n`;
+    expect(
+      criticals(auditSite(grouped)).some((finding) => finding.detail.includes('Content-Signal'))
+    ).toBe(false);
     const forbidding = greenSite();
     forbidding.robots = `${base.robots}User-agent: *\nDisallow: /private/\n`;
     expect(

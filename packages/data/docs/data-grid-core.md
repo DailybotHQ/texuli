@@ -30,15 +30,18 @@
 | `caption` | required | The grid's accessible name (`<caption>`); `captionHidden` keeps it for assistive technology only |
 | `sort` | `[]` | `bind:sort`: the engine's `GridSort`, primary key first. `onSortChange` |
 | `search`, `searchable` | `''`, `false` | `bind:search`; `searchable` shows a labelled search field |
+| `searchPredicate` | — | `(row, query) => boolean`: your own match rule for a non-empty `search`, instead of the built-in folded substring over the searchable columns (also a `gridRows` option). It runs after `filter` and before the sort |
 | `filter` | none | A `FilterNode` AST, validated by `compileFilter` (an invalid filter throws) |
 | `selectable`, `selected` | `false`, `[]` | A selection column; `bind:selected` holds row ids in row order. `onSelectionChange` |
-| `rowLabel` | first column's text | Names a row for its checkbox |
+| `rowLabel` | first column's text | Names a row for its checkbox, and a `rowFocusable` row itself (`aria-label` on the `tr`) |
 | `onRowActivate` | none | Enter on a body cell |
 | `activateOnClick` | `false` | A pointer click on a body row also calls `onRowActivate`, except a click on a control in the row (link, button, field, label, the row checkbox) or a drag that selected text. Keep a keyboard path: Enter in `grid` mode, or a link or button in a cell in `table` mode |
 | `mode` | `grid` | `grid`: the APG grid below. `table`: a static table with native table semantics (no `role="grid"`, no `aria-rowcount`/`aria-colindex`, no roving tab stop and no grid keys); the sort buttons and checkboxes stay ordinary tab stops |
+| `rowFocusable` | `false` | `table` mode only: each body row is a tab stop (`tabindex="0"`, named by `rowLabel`, with a focus ring), and Enter or Space on the focused row calls `onRowActivate`. The table keeps native table semantics (no `role="grid"`, no roving cell focus); keys pressed on a control inside the row are left to that control. Ignored in `grid` mode, which activates with Enter on a cell |
 | `cell` | none | Snippet `(row, column)` for custom cell content; default is the column's text |
 | `empty`, `loading` | none, `false` | Empty snippet, called with `{ query, filtered }` (the search text, and whether rows exist but none matched) so it can say "No results for …"; `loading` shows a row and sets `aria-busy` |
 | `pageSize`, `page` | `0` (off), `1` | Client paging: `pageSize` rows per page and `bind:page` (from 1, kept in range as rows change). `onPageChange`. A pager (Previous, "Page N of M" as a polite live region, Next) renders in a `nav` named by `labels.pagination(caption)` when there is more than one page |
+| `pager` | `compact` | `numbered`: a button per page between Previous and Next (the first, the last, the current page and its neighbors, with `…` gaps), named `labels.page(n)` (`Page 3`) and `aria-current="page"` on the current one (filled, not color alone); "Page N of M" stays as a visually hidden polite live region |
 | `rowClass` | none | `(row) => class` for a body row (status tints, emphasis); pair a color with text, since a class is visual only |
 | `filters`, `toolbar` | none | Snippets in the toolbar row: `filters` after the search field, `toolbar` at its end (export, create…). The toolbar renders when any of `searchable`, `filters` or `toolbar` is set |
 | `bulkActions` | none | Snippet shown while rows are selected (`selectable`): it receives `{ selected, rows, clear }` (every selected id and row, on every page, and a function that clears the selection), inside a group named by `labels.bulkActions` |
@@ -103,6 +106,7 @@ The keys are described to assistive technology through `aria-describedby` (the `
 
 - Paging, row classes and snippets (G7): the "DataGrid paging, row classes and toolbar snippets (G7)" block in `grid-core.test.ts` covers the page slice, `aria-rowcount` and offset `aria-rowindex`, the pager and its live position, clamping a bound page, search shrinking the pages, `pageSize` 0, `rowClass`, the `filters` and `toolbar` snippets, page-scoped select-all, the bulk-actions context across pages, Ctrl/Cmd+A across pages and `clear()`. Example: `data-grid-paging` (axe clean in light, dark and forced colors on Chromium, WebKit and the Pixel 7 in a scratch spec on port 4937).
 
+- Table-mode row activation (G92): the "DataGrid table mode keyboard row activation (G92)" block in `grid-core.test.ts` covers the focusable, `rowLabel`-named rows, Enter and Space activation (other keys and keys from inside the row do not), the kept table semantics, and that the option is opt-in and ignored in `grid` mode.
 - Adoption gaps (G55): the "DataGrid adoption gaps (G55)" block in `grid-core.test.ts` covers pointer row activation in both modes (controls in the row never activate it, and nothing activates without `activateOnClick`), the static `table` mode (no grid role, counts, tab stops or Enter activation), `hideBelow` at three viewport widths (headers, cells and `aria-colcount`) and the `empty` snippet's `{ query, filtered }`.
 
 ## Limits

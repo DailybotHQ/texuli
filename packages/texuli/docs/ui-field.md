@@ -17,6 +17,7 @@ import {
   Form,
   toFieldErrorMap,
   fieldMessage,
+  useFieldLabel,
 } from 'texuli/field';
 ```
 
@@ -32,6 +33,30 @@ Layout wrapper that wires label, description, error and control ARIA.
 | `required` / `disabled` | Field chrome + control props |
 | `orientation` | `vertical` (default) \| `horizontal` |
 | `children` | Snippet receiving `FieldControl` — spread `control.props` onto the input |
+
+### Custom controls: `useFieldLabel`
+
+A control you build from primitives (a segmented group, a set of toggle
+buttons) can read the enclosing Field the way DatePicker, DateRangePicker and
+TimeField do. `useFieldLabel()` (also exported as `getFieldLabelContext()`)
+returns `{ id, labelId }` inside a Field and `undefined` outside one. Call it
+while the component initializes (it reads Svelte context):
+
+```svelte
+<script lang="ts">
+  import { useFieldLabel } from 'texuli/field';
+  const field = useFieldLabel();
+</script>
+
+<div role="group" aria-labelledby={field?.labelId}>…</div>
+```
+
+- `labelId` is the Field label's id: name a group with
+  `aria-labelledby={field?.labelId}`.
+- `id` is the control id the label's `for` points at: put it on the first
+  focusable element when you do not spread `control.props` there.
+- Hide your own visible label when `field` is defined, so it is not shown
+  twice. The type is `FieldLabelContext`.
 
 ## Form
 

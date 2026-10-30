@@ -91,6 +91,11 @@ export interface GridRowsOptions<T> {
   columns: readonly DataGridColumn<T>[];
   sort?: GridSort;
   search?: string;
+  /**
+   * Replaces the built-in search (a folded substring over the searchable
+   * columns): a row matches a non-empty `search` when this returns true.
+   */
+  searchPredicate?: (row: T, query: string) => boolean;
   /** A filter AST (`FilterNode`) for `compileFilter`; invalid filters throw. */
   filter?: unknown;
   locale?: string;
@@ -104,7 +109,12 @@ export function gridRows<T>(rows: readonly T[], options: GridRowsOptions<T>): T[
     const predicate = compileFilter(options.filter, columns);
     result = result.filter(predicate);
   }
-  if (options.search) result = searchRows(result, columns, options.search);
+  const { search, searchPredicate } = options;
+  if (search) {
+    result = searchPredicate
+      ? result.filter((row) => searchPredicate(row, search))
+      : searchRows(result, columns, search);
+  }
   if (options.sort && options.sort.length > 0) {
     result = sortRows(
       result,

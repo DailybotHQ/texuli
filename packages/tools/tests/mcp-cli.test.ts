@@ -106,6 +106,8 @@ describe('texuli mcp', () => {
     expect(await runTexuliCli(['mcp', '--help'])).toEqual({ ok: true, served: false });
     expect(String(write.mock.calls.at(-1)?.[0])).toBe(mcpUsage('texuli mcp'));
     expect(await runTexuliCli(['nope'])).toMatchObject({ ok: false });
-    expect(String(error.mock.calls.at(-1)?.[0])).toContain('Available: deck, document, mcp.');
+    expect(String(error.mock.calls.at(-1)?.[0])).toContain(
+      'Unknown texuli command "nope". Run texuli help.'
+    );
   });
 });

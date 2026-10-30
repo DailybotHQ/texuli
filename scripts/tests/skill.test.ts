@@ -8,6 +8,7 @@ import {
   checkCliReferences,
   checkCommand,
   checkMirror,
+  checkOperationReferences,
   checkRequiredFiles,
   checkSkillPack,
   checkSnippetImports,
@@ -427,6 +428,11 @@ describe('commands, CLI references and snippets', () => {
       'git merge --no-edit dev',
       'tar -xzf texuli-skill-0.1.0.tar.gz',
       'texuli theme preview <id>',
+      'texuli catalog search --json \'{"query":"card"}\' --out <catalog.json>',
+      'npx texuli deck run --file <input.json>',
+      'pnpm exec tsx packages/tools/src/cli/texuli.ts deck lint --file <deck.json>',
+      'texuli help',
+      'texuli document --help',
     ]) {
       expect(checkCommand(line, ctx), line).toEqual([]);
     }
@@ -446,7 +452,17 @@ describe('commands, CLI references and snippets', () => {
         ['./skills/texuli/setup.sh --frobnicate', /no --frobnicate option/],
         ['git push origin main', /remote/],
         ['git remote add origin x', /remote/],
-        ['texuli explode', /not a Texuli CLI command/],
+        ['texuli explode', /Unknown texuli command "explode"/],
+        // The router parses every `texuli …` form: verbs, flags and kept commands.
+        ['texuli catalog find', /Unknown verb "find" for texuli catalog/],
+        ['texuli catalog search --frob', /Unknown flag "--frob"/],
+        ['texuli deck explode --file <deck.json>', /Unknown deck command/],
+        ['npx texuli theme apply', /theme id is required/],
+        [
+          'pnpm exec tsx packages/tools/src/cli/texuli.ts document validate --key k',
+          /only for to-blueprint/,
+        ],
+        ['npx -y @texuli/mcp --port 4000', /Unknown texuli mcp argument/],
         ['make everything', /unknown command/],
       ];
       for (const [line, message] of cases) {
@@ -461,6 +477,23 @@ describe('commands, CLI references and snippets', () => {
         'Run `texuli theme preview <id>` then `texuli explode`.\n\n```text\ntexuli whatever\n```\n';
       expect(checkCliReferences(markdown, ctx)).toEqual([
         { line: 1, message: '`texuli explode` is not a Texuli CLI command' },
+      ]);
+    }
+    // checks MCP operation names and argument keys cited in prose
+    {
+      const markdown = [
+        'Call `catalog.search { "query": "card", "limit": 5 }` then `component.get`.',
+        'Not operations: `example.com`, `theme.light`, `catalog.json`.',
+        'Typos: `catalog.find`, `theme.get { "name": "violet" }`, `deck.run {}`, `catalog.search { nope`.',
+        '```text',
+        'catalog.find inside a fence is not prose',
+        '```',
+      ].join('\n');
+      expect(checkOperationReferences(markdown)).toEqual([
+        { line: 3, message: '`catalog.find` is not a Texuli operation' },
+        { line: 3, message: 'theme.get has no argument "name" (arguments: id)' },
+        { line: 3, message: 'theme.get needs the argument "id"' },
+        { line: 3, message: 'deck.run needs the argument "command"' },
       ]);
     }
     // checks Texuli imports against real package exports

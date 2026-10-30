@@ -22,6 +22,15 @@ Narrow containers show list **or** detail; detail includes a **Back** link to
 the brand href. At `@container (min-width: 56rem)` both panes show and Back
 hides.
 
+## SplitView
+
+`SplitView` (`texuli/layouts/app/split-view`) is the standalone list and
+detail split: `list` (required), `detail` and `empty` snippets, `listLabel`
+(`List`) and `detailLabel` (`Details`) name the two regions, and
+`detailActive` (bindable) picks the pane narrow containers show. `bind:ref`
+is its root element; `class`, `id`, `aria-*`, `data-*`, `style` and handlers
+land there too.
+
 ## Example
 
 ```svelte

@@ -27,6 +27,7 @@
       "site-forms.spec.ts",
       "site-perf.spec.ts",
       "site-seo.spec.ts",
+      "site-agent-discovery.spec.ts",
       "toaster-viewport.spec.ts"
     ],
     [

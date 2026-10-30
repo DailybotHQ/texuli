@@ -1,5 +1,5 @@
 import type { PlotPoint as InteractionPlotPoint, PlotSeries } from '../interaction/model.ts';
-import { extent, linearScale, stack } from '../math/index.ts';
+import { extent, formatDate, linearScale, stack } from '../math/index.ts';
 import { type AreaPoint, areaPath, linePath } from '../math/shapes/line.ts';
 
 export interface CartesianPoint {
@@ -21,6 +21,85 @@ export interface CartesianSeries {
 export type CartesianDomain = readonly [number, number];
 
 export type CartesianKind = 'line' | 'area' | 'bar' | 'stacked-bar' | 'combo';
+
+/**
+ * How the x values read. `category`: a band per value, in input order (numeric
+ * values sort ascending). `linear`: numbers on a continuous scale with nice
+ * ticks. `time`: epoch milliseconds on a continuous UTC time scale with nice
+ * time ticks, formatted as dates in the chart's locale. When omitted, the chart
+ * infers today's behavior: a band per value (a linear window with
+ * `visibleDomain`).
+ */
+export type CartesianXKind = 'linear' | 'category' | 'time';
+
+export const CARTESIAN_X_KINDS: readonly CartesianXKind[] = Object.freeze([
+  'linear',
+  'category',
+  'time',
+]);
+
+/** A host formatter for x values; it wins on the axis, live region, tooltip and table. */
+export type CartesianXFormatter = (value: number | string) => string;
+
+/**
+ * Throw on an unknown `xKind`, or a `linear` or `time` axis whose x values are
+ * not all numbers (a time axis takes epoch milliseconds).
+ */
+export function assertCartesianXKind(
+  series: readonly CartesianSeries[],
+  xKind: CartesianXKind | undefined
+): void {
+  if (xKind === undefined) return;
+  if (!(CARTESIAN_X_KINDS as readonly unknown[]).includes(xKind)) {
+    throw new TypeError(`Unknown xKind ${JSON.stringify(xKind)}; use linear, category or time.`);
+  }
+  if (xKind === 'category') return;
+  for (const item of series) {
+    if (item.points.some((point) => typeof point.x !== 'number')) {
+      throw new TypeError(
+        `Series "${item.id}" needs numeric x values on a ${xKind} axis${xKind === 'time' ? ' (epoch milliseconds)' : ''}.`
+      );
+    }
+  }
+}
+
+/**
+ * The chart's locale: a valid BCP 47 tag as given (canonicalized), else the
+ * runtime's default. A malformed tag never throws (an agent may send one).
+ */
+export function resolveChartLocale(locale: string | undefined): string {
+  if (typeof locale === 'string' && locale.length > 0 && locale.length <= 64) {
+    try {
+      const [canonical] = Intl.getCanonicalLocales(locale);
+      if (canonical) return canonical;
+    } catch {
+      // Fall through to the runtime default.
+    }
+  }
+  return new Intl.DateTimeFormat().resolvedOptions().locale;
+}
+
+/**
+ * The x formatter every surface shares (live region, tooltip, table): the
+ * host's `formatX`, else a UTC date in `locale` on a time axis (with the time
+ * of day when any key is not at midnight), else `fallback`.
+ */
+export function cartesianXFormatter(options: {
+  xKind?: CartesianXKind;
+  formatX?: CartesianXFormatter;
+  locale: string;
+  keys: readonly (number | string)[];
+  fallback: (value: number | string) => string;
+}): (value: number | string) => string {
+  const { xKind, formatX, locale, keys, fallback } = options;
+  if (formatX) return (value) => formatX(value);
+  if (xKind !== 'time') return fallback;
+  const withTime = keys.some((key) => typeof key === 'number' && key % 86_400_000 !== 0);
+  return (value) =>
+    typeof value === 'number' && Number.isFinite(value)
+      ? formatDate(value, { locale, withTime })
+      : fallback(value);
+}
 
 export interface PlotPoint {
   x: number;

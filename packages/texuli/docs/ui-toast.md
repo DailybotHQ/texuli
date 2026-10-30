@@ -23,6 +23,7 @@ import { Toaster, toast, createToastStore } from 'texuli/toast';
 | `dismissLabel` | Localizable close control prefix |
 | `mode` | `'top-layer'` (default) or `'contained'`: out of the top layer, pinned to the edges of `container` (or of the Toaster's nearest positioned ancestor), for framed previews |
 | `container` | The element a `'contained'` stack renders in; it becomes the containing block |
+| `positioned` | Contained mode: `true` declares `container` already positioned, so its computed style is never read. Default `false`: the read runs one frame after mount (never during the first render, so no forced layout) and a static container gets `position: relative` |
 | other attributes | Land on the Toaster's wrapper `div`. Caller `onpointerenter`, `onpointerleave`, `onfocusin` and `onfocusout` run first, then the Toaster's own pause handling (never replaced) |
 
 ### Settle reasons (undo)
@@ -119,7 +120,9 @@ toast.promise(save(), {
   never sits at the page corner, outside a framed preview.
 - **Contained (G77):** `mode="contained"` with a `container` keeps the stack
   inside that element (`position: absolute`, above contained dialogs), never
-  in the top layer.
+  in the top layer. The container's position is checked one frame after
+  mount, or never with `positioned` (G99), so mounting a contained Toaster
+  never forces a layout during the app's first render.
 - **Motion (`motion` prop, [ui-motion](ui-motion.md)):** new toasts rise in
   from the stack's edge and the stack reflows (FLIP) through
   `@texuli/core/motion`; nothing plays for the toasts of the first render. A

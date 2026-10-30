@@ -746,7 +746,7 @@
     {
       "a11y": [
         "Real button or link element with an accessible name",
-        "Busy state exposes aria-busy and disables further activation",
+        "Busy state exposes aria-busy and aria-disabled, keeps focus and blocks further activation",
         "Rejected href schemes render as a non-interactive control"
       ],
       "agentEmittable": false,
@@ -1109,7 +1109,18 @@
         { "kind": "string", "name": "interactive" },
         { "kind": "string", "name": "fullDomain" },
         { "kind": "string", "name": "visibleDomain" },
-        { "kind": "string", "name": "annotations" }
+        { "kind": "string", "name": "annotations" },
+        {
+          "description": "How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer.",
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
+        },
+        {
+          "description": "BCP 47 language tag for dates and announced values, such as en-US.",
+          "kind": "string",
+          "name": "locale"
+        }
       ],
       "summary": "A categorical area chart with an accessible data table.",
       "tier": "content",
@@ -1144,7 +1155,18 @@
         { "kind": "string", "name": "interactive" },
         { "kind": "string", "name": "fullDomain" },
         { "kind": "string", "name": "visibleDomain" },
-        { "kind": "string", "name": "annotations" }
+        { "kind": "string", "name": "annotations" },
+        {
+          "description": "How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer.",
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
+        },
+        {
+          "description": "BCP 47 language tag for dates and announced values, such as en-US.",
+          "kind": "string",
+          "name": "locale"
+        }
       ],
       "summary": "A categorical bar chart with a zero baseline and accessible data table.",
       "tier": "content",
@@ -1296,7 +1318,18 @@
         { "kind": "string", "name": "interactive" },
         { "kind": "string", "name": "fullDomain" },
         { "kind": "string", "name": "visibleDomain" },
-        { "kind": "string", "name": "annotations" }
+        { "kind": "string", "name": "annotations" },
+        {
+          "description": "How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer.",
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
+        },
+        {
+          "description": "BCP 47 language tag for dates and announced values, such as en-US.",
+          "kind": "string",
+          "name": "locale"
+        }
       ],
       "summary": "The general line, area, bar, stacked bar or combo chart renderer.",
       "tier": "content",
@@ -1335,7 +1368,18 @@
         { "kind": "string", "name": "interactive" },
         { "kind": "string", "name": "fullDomain" },
         { "kind": "string", "name": "visibleDomain" },
-        { "kind": "string", "name": "annotations" }
+        { "kind": "string", "name": "annotations" },
+        {
+          "description": "How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer.",
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
+        },
+        {
+          "description": "BCP 47 language tag for dates and announced values, such as en-US.",
+          "kind": "string",
+          "name": "locale"
+        }
       ],
       "summary": "A categorical chart that combines bar and line series.",
       "tier": "content",
@@ -1585,7 +1629,18 @@
         { "kind": "string", "name": "interactive" },
         { "kind": "string", "name": "fullDomain" },
         { "kind": "string", "name": "visibleDomain" },
-        { "kind": "string", "name": "annotations" }
+        { "kind": "string", "name": "annotations" },
+        {
+          "description": "How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer.",
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
+        },
+        {
+          "description": "BCP 47 language tag for dates and announced values, such as en-US.",
+          "kind": "string",
+          "name": "locale"
+        }
       ],
       "summary": "A categorical line chart with accessible values.",
       "tier": "content",
@@ -1829,7 +1884,18 @@
         { "kind": "string", "name": "interactive" },
         { "kind": "string", "name": "fullDomain" },
         { "kind": "string", "name": "visibleDomain" },
-        { "kind": "string", "name": "annotations" }
+        { "kind": "string", "name": "annotations" },
+        {
+          "description": "How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer.",
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
+        },
+        {
+          "description": "BCP 47 language tag for dates and announced values, such as en-US.",
+          "kind": "string",
+          "name": "locale"
+        }
       ],
       "summary": "A categorical stacked bar chart with accessible values.",
       "tier": "content",

@@ -4,7 +4,9 @@ import type { Readable, Writable } from 'node:stream';
 import { pathToFileURL } from 'node:url';
 import { createMcpHandler } from './handler.ts';
 
-const MAX_MESSAGE_BYTES = 2 * 1024 * 1024;
+/** The longest stdio message (one line) the server parses: 2 MiB. */
+export const MCP_STDIO_MAX_MESSAGE_BYTES = 2 * 1024 * 1024;
+const MAX_MESSAGE_BYTES = MCP_STDIO_MAX_MESSAGE_BYTES;
 
 /**
  * Run the MCP newline-delimited JSON-RPC transport over the supplied streams:

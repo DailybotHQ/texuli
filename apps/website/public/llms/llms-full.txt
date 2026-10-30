@@ -1040,7 +1040,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ### Accessibility
 
 - Real button or link element with an accessible name
-- Busy state exposes aria-busy and disables further activation
+- Busy state exposes aria-busy and aria-disabled, keeps focus and blocks further activation
 - Rejected href schemes render as a non-interactive control
 
 ### Props
@@ -1432,6 +1432,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `fullDomain` | string | no | — | — | — |
 | `visibleDomain` | string | no | — | — | — |
 | `annotations` | string | no | — | — | — |
+| `xKind` | enum(linear | category | time) | no | — | — | How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer. |
+| `locale` | string | no | — | — | BCP 47 language tag for dates and announced values, such as en-US. |
 
 ### Examples
 
@@ -1489,6 +1491,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `fullDomain` | string | no | — | — | — |
 | `visibleDomain` | string | no | — | — | — |
 | `annotations` | string | no | — | — | — |
+| `xKind` | enum(linear | category | time) | no | — | — | How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer. |
+| `locale` | string | no | — | — | BCP 47 language tag for dates and announced values, such as en-US. |
 
 ### Examples
 
@@ -1712,6 +1716,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `fullDomain` | string | no | — | — | — |
 | `visibleDomain` | string | no | — | — | — |
 | `annotations` | string | no | — | — | — |
+| `xKind` | enum(linear | category | time) | no | — | — | How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer. |
+| `locale` | string | no | — | — | BCP 47 language tag for dates and announced values, such as en-US. |
 
 ### Examples
 
@@ -1770,6 +1776,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `fullDomain` | string | no | — | — | — |
 | `visibleDomain` | string | no | — | — | — |
 | `annotations` | string | no | — | — | — |
+| `xKind` | enum(linear | category | time) | no | — | — | How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer. |
+| `locale` | string | no | — | — | BCP 47 language tag for dates and announced values, such as en-US. |
 
 ### Examples
 
@@ -2165,6 +2173,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `fullDomain` | string | no | — | — | — |
 | `visibleDomain` | string | no | — | — | — |
 | `annotations` | string | no | — | — | — |
+| `xKind` | enum(linear | category | time) | no | — | — | How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer. |
+| `locale` | string | no | — | — | BCP 47 language tag for dates and announced values, such as en-US. |
 
 ### Examples
 
@@ -2559,6 +2569,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `fullDomain` | string | no | — | — | — |
 | `visibleDomain` | string | no | — | — | — |
 | `annotations` | string | no | — | — | — |
+| `xKind` | enum(linear | category | time) | no | — | — | How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer. |
+| `locale` | string | no | — | — | BCP 47 language tag for dates and announced values, such as en-US. |
 
 ### Examples
 

@@ -36,6 +36,8 @@
 | `fullDomain` | string | no | — | — | — |
 | `visibleDomain` | string | no | — | — | — |
 | `annotations` | string | no | — | — | — |
+| `xKind` | enum(linear | category | time) | no | — | — | How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer. |
+| `locale` | string | no | — | — | BCP 47 language tag for dates and announced values, such as en-US. |
 
 ### Examples
 

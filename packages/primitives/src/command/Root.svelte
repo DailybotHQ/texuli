@@ -11,6 +11,12 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   children?: Snippet;
   debounceMs?: number;
   label?: string;
+  /**
+   * Busy state from a search the caller runs itself (no `onSearch`): `Loading`
+   * shows, `Empty` hides and the list is `aria-busy` while it is `true`.
+   * Combined with the root's own `onSearch` state.
+   */
+  loading?: boolean;
   loop?: boolean;
   onSearch?: CommandSearch;
   onSearchError?: (error: unknown) => void;
@@ -22,6 +28,7 @@ let {
   children,
   debounceMs = 0,
   label: labelProp,
+  loading: loadingProp = false,
   loop = true,
   onSearch,
   onSearchError,
@@ -188,7 +195,7 @@ const context: CommandContextValue = {
     return query;
   },
   get loading() {
-    return loading;
+    return loading || loadingProp;
   },
   get error() {
     return error;

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { TimeField as Primitive, type TimeFieldLabels } from '@texuli/primitives/date-field';
 import type { HTMLAttributes } from 'svelte/elements';
-import { joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
+import { isAriaInvalid, joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { getFieldLabelContext } from '../field/context.ts';
 import { type DateSize, dateFieldClass } from './variants.ts';
@@ -86,6 +86,8 @@ const showLabel = $derived(!hideLabel && !field);
 const uid = $props.id();
 const descriptionId = `${uid}-description`;
 const errorId = `${uid}-error`;
+// Invalid from the own `error` or from `aria-invalid` (a Field's error) (G90).
+const invalid = $derived(Boolean(error) || isAriaInvalid(split.control['aria-invalid']));
 const describedBy = $derived(
   [description ? descriptionId : '', error ? errorId : ''].filter(Boolean).join(' ') || undefined
 );
@@ -96,7 +98,7 @@ const describedBy = $derived(
   {...split.wrapper}
   class={dateFieldClass({ size, class: cx('tx-date--time', className) })}
   data-tx-time
-  data-invalid={error ? 'true' : undefined}
+  data-invalid={invalid ? 'true' : undefined}
   data-disabled={disabled ? 'true' : undefined}
 >
   {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}{#if isRequired}<span class="tx-date__required"> *</span>{/if}</span>{/if}
@@ -117,7 +119,7 @@ const describedBy = $derived(
       {...labels ? { labels } : {}}
       {...onValueChange ? { onValueChange } : {}}
       aria-describedby={joinIds(describedBy, split.control['aria-describedby'] as string | undefined)}
-      aria-invalid={error ? 'true' : (split.control['aria-invalid'] as 'true' | undefined)}
+      aria-invalid={invalid ? 'true' : undefined}
     />
   </div>
   {#if description}<p id={descriptionId} class="tx-date__description">{description}</p>{/if}
