@@ -657,6 +657,49 @@ describe('toast', () => {
   });
 
   describe('Toaster viewport placement and motion', () => {
+    it('reads a contained container position one frame after mount, or never when positioned (G99)', async () => {
+      for (const positioned of [false, true]) {
+        const frames: FrameRequestCallback[] = [];
+        const reads: Element[] = [];
+        const original = window.getComputedStyle.bind(window);
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+          frames.push(callback);
+          return frames.length;
+        });
+        vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+        // happy-dom reports an unset position as '': report 'static' as browsers do.
+        vi.spyOn(window, 'getComputedStyle').mockImplementation((element, pseudo) => {
+          reads.push(element);
+          const style = original(element, pseudo);
+          return new Proxy(style, {
+            get: (target, key) =>
+              key === 'position' ? target.position || 'static' : Reflect.get(target, key, target),
+          });
+        });
+        const container = document.createElement('div');
+        document.body.append(container);
+        try {
+          const store = createToastStore({ duration: 0 });
+          store.success('Saved');
+          const view = render(ToastHarness, {
+            props: { store, mode: 'contained', container, positioned },
+          });
+          expect(container.querySelector('[data-tx-toast-viewport]')).toBeTruthy();
+          expect(reads).not.toContain(container);
+          expect(container.style.position).toBe('');
+          for (const frame of frames.splice(0)) frame(performance.now());
+          expect(reads.includes(container)).toBe(!positioned);
+          expect(container.style.position).toBe(positioned ? '' : 'relative');
+          view.unmount();
+          expect(container.style.position).toBe('');
+        } finally {
+          vi.restoreAllMocks();
+          container.remove();
+          cleanup();
+        }
+      }
+    });
+
     it('keeps a dismissed toast mounted, inert, for its exit motion', async () => {
       const store = createToastStore({ duration: 0 });
       store.success('Copied');

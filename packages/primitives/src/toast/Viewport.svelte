@@ -22,6 +22,14 @@ type Props = HTMLAttributes<HTMLElement> & {
   /** The element a `'contained'` region renders in. */
   container?: Element | null;
   /**
+   * Contained mode: the caller declares `container` already positioned (a
+   * containing block), so its computed style is never read. Default `false`:
+   * one frame after mount the container's computed position is read, and a
+   * static container gets `position: relative` (restored on unmount). The
+   * read never runs during the first render, where it would force a layout.
+   */
+  positioned?: boolean;
+  /**
    * Whether a top-layer region is shown (default `true`). Pass `false` while
    * there is nothing to show: an empty region then stays out of the top layer
    * (and out of the page) instead of sitting at the viewport corner.
@@ -35,6 +43,7 @@ let {
   children,
   mode = 'top-layer',
   container = null,
+  positioned = false,
   active = true,
   ref = $bindable(null),
   onpointerenter,
@@ -83,10 +92,30 @@ $effect(() => {
 // Contained: render inside the container (a containing block), never in the top layer.
 $effect(() => {
   const node = regionEl;
-  if (!node || mode !== 'contained' || !container) return;
-  const restorePosition = ensurePositioned(container);
-  const portal = createPortal(node, { target: container });
+  const target = container;
+  if (!node || mode !== 'contained' || !target) return;
+  const portal = createPortal(node, { target });
+  // The container must be a containing block. Reading its computed position
+  // forces a layout, so it never runs during the first render (G99): it waits
+  // for the next frame, and is skipped when the caller declares it positioned.
+  let restorePosition = () => {};
+  let cancelRead = () => {};
+  if (!positioned) {
+    const view = target.ownerDocument.defaultView;
+    const read = () => {
+      cancelRead = () => {};
+      restorePosition = ensurePositioned(target);
+    };
+    if (view && typeof view.requestAnimationFrame === 'function') {
+      const frame = view.requestAnimationFrame(read);
+      cancelRead = () => view.cancelAnimationFrame(frame);
+    } else {
+      const timer = setTimeout(read, 0);
+      cancelRead = () => clearTimeout(timer);
+    }
+  }
   return () => {
+    cancelRead();
     portal.destroy();
     restorePosition();
   };

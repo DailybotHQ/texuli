@@ -1,5 +1,5 @@
 {
-  "catalogHash": "42b795c7bd233bb5caffad317ffc99a0e0aba68ca51666ea856502ed648e4710",
+  "catalogHash": "8e72aaa2c94dba6b4245a9778fdd21fd86c6398e5a0fca410da0aa51a3190b72",
   "components": [
     {
       "capability": "web-only",
@@ -958,6 +958,10 @@
           "name": "interactive"
         },
         {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
           "enumValues": ["light", "dark"],
           "kind": "enum",
           "name": "mode"
@@ -981,6 +985,11 @@
         {
           "kind": "string",
           "name": "visibleDomain"
+        },
+        {
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
         }
       ],
       "summary": "A categorical area chart with an accessible data table."
@@ -1016,6 +1025,10 @@
           "name": "interactive"
         },
         {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
           "enumValues": ["light", "dark"],
           "kind": "enum",
           "name": "mode"
@@ -1039,6 +1052,11 @@
         {
           "kind": "string",
           "name": "visibleDomain"
+        },
+        {
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
         }
       ],
       "summary": "A categorical bar chart with a zero baseline and accessible data table."
@@ -1213,6 +1231,10 @@
           "required": true
         },
         {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
           "enumValues": ["light", "dark"],
           "kind": "enum",
           "name": "mode"
@@ -1236,6 +1258,11 @@
         {
           "kind": "string",
           "name": "visibleDomain"
+        },
+        {
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
         }
       ],
       "summary": "The general line, area, bar, stacked bar or combo chart renderer."
@@ -1271,6 +1298,10 @@
           "name": "interactive"
         },
         {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
           "enumValues": ["light", "dark"],
           "kind": "enum",
           "name": "mode"
@@ -1294,6 +1325,11 @@
         {
           "kind": "string",
           "name": "visibleDomain"
+        },
+        {
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
         }
       ],
       "summary": "A categorical chart that combines bar and line series."
@@ -1612,6 +1648,10 @@
           "name": "interactive"
         },
         {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
           "enumValues": ["light", "dark"],
           "kind": "enum",
           "name": "mode"
@@ -1635,6 +1675,11 @@
         {
           "kind": "string",
           "name": "visibleDomain"
+        },
+        {
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
         }
       ],
       "summary": "A categorical line chart with accessible values."
@@ -1958,6 +2003,10 @@
           "name": "interactive"
         },
         {
+          "kind": "string",
+          "name": "locale"
+        },
+        {
           "enumValues": ["light", "dark"],
           "kind": "enum",
           "name": "mode"
@@ -1981,6 +2030,11 @@
         {
           "kind": "string",
           "name": "visibleDomain"
+        },
+        {
+          "enumValues": ["linear", "category", "time"],
+          "kind": "enum",
+          "name": "xKind"
         }
       ],
       "summary": "A categorical stacked bar chart with accessible values."

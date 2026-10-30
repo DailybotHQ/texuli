@@ -115,16 +115,37 @@ const ARRAY_PROPS = new Set([
 
 const ENUMS: Partial<Record<ContentManifestId, Record<string, readonly string[]>>> = {
   'blocks-data': { mode: ['light', 'dark'] },
-  'charts-area': { mode: ['light', 'dark'], renderer: ['svg', 'canvas', 'auto'] },
-  'charts-bar': { mode: ['light', 'dark'], renderer: ['svg', 'canvas', 'auto'] },
+  'charts-area': {
+    mode: ['light', 'dark'],
+    renderer: ['svg', 'canvas', 'auto'],
+    xKind: ['linear', 'category', 'time'],
+  },
+  'charts-bar': {
+    mode: ['light', 'dark'],
+    renderer: ['svg', 'canvas', 'auto'],
+    xKind: ['linear', 'category', 'time'],
+  },
   'charts-cartesian': {
     kind: ['line', 'area', 'bar', 'stacked-bar', 'combo'],
     mode: ['light', 'dark'],
     renderer: ['svg', 'canvas', 'auto'],
+    xKind: ['linear', 'category', 'time'],
   },
-  'charts-combo': { mode: ['light', 'dark'], renderer: ['svg', 'canvas', 'auto'] },
-  'charts-line': { mode: ['light', 'dark'], renderer: ['svg', 'canvas', 'auto'] },
-  'charts-stacked-bar': { mode: ['light', 'dark'], renderer: ['svg', 'canvas', 'auto'] },
+  'charts-combo': {
+    mode: ['light', 'dark'],
+    renderer: ['svg', 'canvas', 'auto'],
+    xKind: ['linear', 'category', 'time'],
+  },
+  'charts-line': {
+    mode: ['light', 'dark'],
+    renderer: ['svg', 'canvas', 'auto'],
+    xKind: ['linear', 'category', 'time'],
+  },
+  'charts-stacked-bar': {
+    mode: ['light', 'dark'],
+    renderer: ['svg', 'canvas', 'auto'],
+    xKind: ['linear', 'category', 'time'],
+  },
   'charts-sparkline': { variant: ['line', 'area', 'bar'] },
   'charts-canvas-renderer': { kind: ['line', 'area', 'bar', 'stacked-bar', 'combo'] },
   'charts-funnel': { orientation: ['vertical', 'horizontal'] },
@@ -203,6 +224,15 @@ function propSchemas(id: ContentManifestId): CatalogManifest['props'] {
                 ? 'Host runtime after user Start. Prefer createSandboxedEmbedMount (sandbox without allow-same-origin, referrerpolicy=no-referrer, HTTPS allowlist). Host CSP frame-src + postMessage origin checks required; never relax sandbox or inject HTML from app data.'
                 : 'Host-provided callback; omit when no host behavior is needed.',
           }
+        : {}),
+      ...(id.startsWith('charts-') && name === 'xKind'
+        ? {
+            description:
+              'How x values read: category bands, a linear number scale, or time (x in epoch milliseconds, shown as UTC dates in locale). Omit to infer.',
+          }
+        : {}),
+      ...(id.startsWith('charts-') && name === 'locale'
+        ? { description: 'BCP 47 language tag for dates and announced values, such as en-US.' }
         : {}),
       ...(name === 'block'
         ? {
