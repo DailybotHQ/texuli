@@ -10,7 +10,7 @@ additive: nothing existing is renamed or removed.
   (space, size, type, elevation, shape, layer, opacity, layout, icon, status, data-viz).
   123 are read with their default as the fallback; the
   28 data-viz tokens are emitted per theme.
-- **Component tokens:** 333 for 48 components
+- **Component tokens:** 335 for 48 components
   (`@texuli/tokens/components`), all fallback-only.
 - **Renames:** 0 (`@texuli/tokens/renames.json`, schema
   `TOKEN_RENAMES_JSON_SCHEMA`).
@@ -367,6 +367,8 @@ A design system sets `components.<component>.<key>`; CSS reads it with the
 | `border-width` | `--tx-card-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-card-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
 | `elevation` | `--tx-card-elevation` | `var(--tx-elevation-1)` | Shadow. | `var(--tx-card-elevation, var(--tx-elevation-1, var(--tx-shadow-soft, none)))` |
 | `padding-inline` | `--tx-card-padding-inline` | `var(--tx-space-5)` | Header, content and footer inline padding. | `var(--tx-card-padding-inline, var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)))` |
+| `padding-block` | `--tx-card-padding-block` | `var(--tx-space-5)` | Block padding at the card edges (header top, last section bottom). | `var(--tx-card-padding-block, var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)))` |
+| `background` | `--tx-card-background` | `var(--tx-surface)` | Surface fill (the glass hook mixes it with transparency). | `var(--tx-card-background, var(--tx-surface))` |
 | `title-font-size` | `--tx-card-title-font-size` | `var(--tx-font-size-base)` | Title font size. | `var(--tx-card-title-font-size, var(--tx-font-size-base))` |
 | `title-font-weight` | `--tx-card-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-card-title-font-weight, var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600)))` |
 | `title-line-height` | `--tx-card-title-line-height` | `var(--tx-type-label-line)` | Title line height. | `var(--tx-card-title-line-height, var(--tx-type-label-line, 1.25))` |

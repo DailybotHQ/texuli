@@ -255,6 +255,8 @@ const TODAY: Record<string, [string | null, Record<string, string>]> = {
       'border-width': '1px',
       elevation: SOFT8,
       'padding-inline': '1.25rem',
+      'padding-block': '1.25rem',
+      background: 'var(--tx-surface, Canvas)',
       'title-font-size': BASE,
       'title-font-weight': HEADING,
       'title-line-height': '1.25',
@@ -936,9 +938,15 @@ describe('token contract v2: component registry', () => {
         const source = file ? normalizeSource(read(file)) : '';
         for (const token of family.tokens) {
           const today = values[token.key] as string;
-          if (file)
-            expect(source, `${token.token}: ${today} in ${file}`).toContain(normalizeSource(today));
           const read = componentVar(token.component, token.key);
+          // Before adoption the stylesheet holds today's value; after, it reads the token.
+          if (file) {
+            const adopted = source.includes(normalizeSource(read));
+            if (!adopted)
+              expect(source, `${token.token}: ${today} in ${file}`).toContain(
+                normalizeSource(today)
+              );
+          }
           expect(computed(read, vars), `${token.token} (${mode})`).toBe(computed(today, vars));
           // A design system that sets the token on its scope wins.
           expect(computed(read, { ...vars, [token.token]: '7px' })).toBe('7px');

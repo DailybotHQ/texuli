@@ -130,6 +130,12 @@ export const COMPONENT_TOKEN_FAMILIES: readonly ComponentTokenFamily[] = [
     ['border-width', THIN, 'Border width.'],
     ['elevation', elevation(1), 'Shadow.'],
     ['padding-inline', space(5), 'Header, content and footer inline padding.'],
+    [
+      'padding-block',
+      space(5),
+      'Block padding at the card edges (header top, last section bottom).',
+    ],
+    ['background', v('surface'), 'Surface fill (the glass hook mixes it with transparency).'],
     ['title-font-size', v('font-size-base'), 'Title font size.'],
     ['title-font-weight', type('heading', 'weight'), 'Title font weight.'],
     ['title-line-height', type('label', 'line'), 'Title line height.'],
