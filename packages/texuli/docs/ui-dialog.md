@@ -112,6 +112,20 @@ AlertDialog does **not** close on outside pointer. Cancel is the default initial
 | `texuli/dialog` | `Dialog`, `AlertDialog`, size helpers and class builders |
 | `texuli` | the same (root barrel) |
 
+## Themed subtrees (ADR-023)
+
+Several themes can share a page: `applyTheme(el)` (`@texuli/tokens`) themes
+one subtree and marks it `[data-tx-scope]`. A Dialog or AlertDialog rendered
+inside that subtree keeps its theme: without `portal`, its portal mounts in a
+scoped portal root at the end of `body` that mirrors the subtree's `data-tx-*`
+attributes and inline `--tx-*` variables, and follows changes (a mode toggle
+while it is open). Pass `portal={element}` to mount it in a frame instead.
+Focus, `inert`, scroll lock, Escape and outside clicks behave as with a body
+portal. Menus, selects, comboboxes, popovers, hover cards, tooltips, date
+pickers and the Toaster render in place (in the top layer), so they inherit
+the subtree's theme without a portal. Checked by
+`tests/e2e/theme-scopes.spec.ts`.
+
 ## Rules
 
 - Logical CSS for padding, gaps and inline size; physical `top`/`left` only to keep the modal centered in LTR and RTL

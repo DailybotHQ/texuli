@@ -42,7 +42,10 @@ type OwnProps = {
   closeLabel?: string;
   onOpenChange?: (open: boolean) => void;
   class?: ClassValue;
-  /** Mount the portal somewhere other than document.body (scoped previews). */
+  /**
+   * Mount the portal in this element (a framed preview). Omitted: the portal
+   * root of the nearest token scope (`[data-tx-scope]`, ADR-023), or `body`.
+   */
   portal?: PortalTarget;
   /**
    * The layer stack (`@texuli/core/layer-stack`) this overlay registers on, for
