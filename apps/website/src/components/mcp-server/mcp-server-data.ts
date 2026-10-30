@@ -423,7 +423,7 @@ export const MCP_SERVER_DATA = {
       uri: 'texuli://catalog',
       title: 'Component catalog',
       description:
-        'The content-addressed Texuli component catalog (catalog-42b795c7bd23…, 168 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
+        'The content-addressed Texuli component catalog (catalog-8e72aaa2c94d…, 168 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
       mimeType: 'application/json',
     },
     {
