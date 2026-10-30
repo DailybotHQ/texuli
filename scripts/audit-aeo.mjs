@@ -302,23 +302,27 @@ export function auditAeo(surface, config = AEO_CONFIG) {
   }
   const card = parse(surface.wellKnown['mcp/server-card.json']);
   if (card) {
-    if (typeof card.serverInfo?.name !== 'string')
-      findings.push(
-        finding('critical', 'well-known', 'mcp/server-card.json', 'serverInfo.name missing')
-      );
-    if (!Array.isArray(card.tools) || card.tools.length === 0)
-      findings.push(
-        finding('critical', 'well-known', 'mcp/server-card.json', 'no tools advertised')
-      );
-    if (typeof card.transport?.stdio?.launch !== 'string')
-      findings.push(
-        finding(
-          'critical',
-          'well-known',
-          'mcp/server-card.json',
-          'transport.stdio.launch missing (the card describes a launch command, not a hosted endpoint)'
-        )
-      );
+    const cardFinding = (detail) =>
+      findings.push(finding('critical', 'well-known', 'mcp/server-card.json', detail));
+    if (typeof card.serverInfo?.name !== 'string') cardFinding('serverInfo.name missing');
+    if (!Array.isArray(card.tools) || card.tools.length === 0) cardFinding('no tools advertised');
+    const stdio = card.transport?.stdio?.launch;
+    const remote = card.transport?.streamableHttp?.url;
+    if (typeof stdio !== 'string' && remote === undefined)
+      cardFinding('no transport: neither transport.stdio.launch nor transport.streamableHttp.url');
+    if (remote !== undefined && !(typeof remote === 'string' && /^https:\/\//.test(remote)))
+      cardFinding('transport.streamableHttp.url is not an https URL');
+    // The tool names the card must advertise (the operations registry, passed
+    // by the tests and generators; the plain CLI run has no registry).
+    if (Array.isArray(config.mcpTools) && Array.isArray(card.tools)) {
+      const names = card.tools.map((tool) => (typeof tool === 'string' ? tool : tool?.name));
+      for (const name of config.mcpTools)
+        if (!names.includes(name))
+          cardFinding(`the registry operation "${name}" is not advertised`);
+      for (const name of names)
+        if (!config.mcpTools.includes(name))
+          cardFinding(`advertises "${name}", which is not a registry operation`);
+    }
   }
   const skills = parse(surface.wellKnown['agent-skills/index.json']);
   if (skills) {

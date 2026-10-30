@@ -15,6 +15,8 @@ export interface AeoConfig {
   twinFamilies: string[];
   robotsMinGroups: number;
   planned: { category: string; detail: string }[];
+  /** The tool names the MCP server card must advertise (the operations registry). */
+  mcpTools?: readonly string[];
 }
 
 export interface AeoSurface {
