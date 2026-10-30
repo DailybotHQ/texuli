@@ -2,8 +2,8 @@
  * Alert, Callout and Banner — token-tinted surfaces in @layer tx.components.
  * Logical properties only; no static style attributes on hosts.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the 1.4 body line height (no type role is 1.4), the 0 banner
  * radius and the dismiss button's line-height 0.
  */
@@ -12,67 +12,42 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: var(
-      --tx-alert-gap,
-      var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-    );
-    border-radius: var(--tx-alert-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
-    border: var(--tx-alert-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))
-      solid transparent;
-    padding-block: var(
-      --tx-alert-padding-block,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
-    padding-inline: var(
-      --tx-alert-padding-inline,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3.5)
-    );
+    gap: var(--tx-alert-gap, var(--tx-space-2));
+    border-radius: var(--tx-alert-radius, var(--tx-shape-radius-lg));
+    border: var(--tx-alert-border-width, var(--tx-border-width-thin)) solid transparent;
+    padding-block: var(--tx-alert-padding-block, var(--tx-space-3));
+    padding-inline: var(--tx-alert-padding-inline, calc(var(--tx-space-unit) * 3.5));
     color: var(--tx-foreground, CanvasText);
     font-family: var(--tx-font-sans, system-ui, sans-serif);
-    font-size: var(
-      --tx-alert-font-size,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
+    font-size: var(--tx-alert-font-size, var(--tx-type-label-size));
     line-height: 1.4;
   }
 
   .tx-alert--layout-callout {
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5);
-    padding-block: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
-    padding-inline: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
-    border-inline-start-width: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    gap: calc(var(--tx-space-unit) * 2.5);
+    padding-block: var(--tx-space-4);
+    padding-inline: var(--tx-space-4);
+    border-inline-start-width: var(--tx-space-1);
   }
 
   .tx-alert--layout-banner {
     border-radius: 0;
     inline-size: 100%;
-    padding-block: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5);
-    padding-inline: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    padding-block: calc(var(--tx-space-unit) * 2.5);
+    padding-inline: var(--tx-space-4);
   }
 
   .tx-alert__row {
     display: flex;
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5);
+    gap: calc(var(--tx-space-unit) * 2.5);
     align-items: flex-start;
   }
 
   .tx-alert__icon {
     flex-shrink: 0;
-    margin-block-start: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
-    inline-size: var(--tx-alert-icon-size, var(--tx-size-icon-md, 1.25rem));
-    block-size: var(--tx-alert-icon-size, var(--tx-size-icon-md, 1.25rem));
+    margin-block-start: calc(var(--tx-space-unit) * 0.5);
+    inline-size: var(--tx-alert-icon-size, var(--tx-size-icon-md));
+    block-size: var(--tx-alert-icon-size, var(--tx-size-icon-md));
     color: var(--tx-alert-title, var(--tx-alert-accent, currentColor));
   }
 
@@ -107,20 +82,17 @@
   .tx-alert__title + .tx-alert__text,
   .tx-alert__title + .tx-alert__content,
   .tx-alert__text + .tx-alert__content {
-    margin-block-start: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    margin-block-start: var(--tx-space-1);
   }
 
   .tx-alert__actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
     padding-inline-start: calc(
-      var(--tx-alert-icon-size, var(--tx-size-icon-md, 1.25rem)) +
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5)
+      var(--tx-alert-icon-size, var(--tx-size-icon-md)) +
+      calc(var(--tx-space-unit) * 2.5)
     );
   }
 
@@ -140,12 +112,9 @@
     justify-content: center;
     margin: 0;
     margin-inline-start: auto;
-    padding: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    padding: var(--tx-space-1);
     border: 0;
-    border-radius: var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem));
+    border-radius: var(--tx-shape-radius-lg);
     background: transparent;
     color: var(--tx-muted-foreground, GrayText);
     cursor: pointer;

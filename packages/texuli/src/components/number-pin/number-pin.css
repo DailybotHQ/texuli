@@ -1,8 +1,8 @@
 /**
  * NumberField and PinInput — token styled controls.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the input inline sizes (6rem to 10rem), the 1.875rem small
  * stepper, the 0.6 disabled opacity, the large cell (3.25rem by 3.5rem), the
  * small cell block size and the 1px fake caret are tuned geometry.
@@ -13,15 +13,9 @@
     align-items: stretch;
     min-inline-size: 0;
     color: var(--tx-foreground, CanvasText);
-    border: var(
-        --tx-number-field-border-width,
-        var(--tx-border-width-thin, var(--tx-border-width, 1px))
-      )
-      solid var(--tx-border, ButtonBorder);
-    border-radius: var(
-      --tx-number-field-radius,
-      var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))
-    );
+    border: var(--tx-number-field-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-number-field-radius, var(--tx-shape-radius-lg));
     background: var(--tx-surface, Canvas);
   }
 
@@ -40,14 +34,8 @@
     min-inline-size: 0;
     border: 0;
     border-radius: inherit;
-    padding-block: var(
-      --tx-number-field-padding-block,
-      var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-    );
-    padding-inline: var(
-      --tx-number-field-padding-inline,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
+    padding-block: var(--tx-number-field-padding-block, var(--tx-space-2));
+    padding-inline: var(--tx-number-field-padding-inline, var(--tx-space-3));
     color: inherit;
     background: transparent;
     font: inherit;
@@ -66,13 +54,10 @@
   .tx-number-field__stepper {
     display: grid;
     place-items: center;
-    min-inline-size: var(--tx-number-field-stepper-size, var(--tx-size-control-md, 2.25rem));
+    min-inline-size: var(--tx-number-field-stepper-size, var(--tx-size-control-md));
     border: 0;
-    border-inline-start: var(
-        --tx-number-field-border-width,
-        var(--tx-border-width-thin, var(--tx-border-width, 1px))
-      )
-      solid var(--tx-border, ButtonBorder);
+    border-inline-start: var(--tx-number-field-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, ButtonBorder);
     color: var(--tx-foreground, CanvasText);
     background: transparent;
     font: inherit;
@@ -90,11 +75,8 @@
 
   .tx-number-field--sm .tx-number-field__input {
     inline-size: 6rem;
-    padding-block: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
-    padding-inline: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    padding-block: calc(var(--tx-space-unit) * 1.5);
+    padding-inline: var(--tx-space-2);
     font-size: var(--tx-font-size-sm, 0.875rem);
   }
 
@@ -104,19 +86,13 @@
 
   .tx-number-field--lg .tx-number-field__input {
     inline-size: 10rem;
-    padding-block: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
-    padding-inline: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    padding-block: var(--tx-space-3);
+    padding-inline: var(--tx-space-4);
     font-size: var(--tx-font-size-lg, 1.125rem);
   }
 
   .tx-number-field--lg .tx-number-field__stepper {
-    min-inline-size: var(--tx-size-control-lg, 2.75rem);
+    min-inline-size: var(--tx-size-control-lg);
   }
 
   .tx-pin-input {
@@ -124,11 +100,8 @@
     display: inline-flex;
     min-inline-size: 0;
     max-inline-size: 100%;
-    padding: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
-    border-radius: var(
-      --tx-pin-input-cell-radius,
-      var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))
-    );
+    padding: calc(var(--tx-space-unit) * 0.5);
+    border-radius: var(--tx-pin-input-cell-radius, var(--tx-shape-radius-lg));
   }
 
   /*
@@ -138,10 +111,7 @@
    */
   .tx-pin-input__cells {
     display: flex;
-    gap: var(
-      --tx-pin-input-gap,
-      var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-    );
+    gap: var(--tx-pin-input-gap, var(--tx-space-2));
     min-inline-size: 0;
   }
 
@@ -149,25 +119,15 @@
     display: grid;
     place-items: center;
     flex: 0 1 auto;
-    inline-size: var(--tx-pin-input-cell-inline-size, var(--tx-size-control-lg, 2.75rem));
-    min-inline-size: var(--tx-size-control-sm, 2rem);
-    block-size: var(
-      --tx-pin-input-cell-block-size,
-      var(--tx-space-12, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 12))
-    );
-    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
-      var(--tx-border, ButtonBorder);
-    border-radius: var(
-      --tx-pin-input-cell-radius,
-      var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))
-    );
+    inline-size: var(--tx-pin-input-cell-inline-size, var(--tx-size-control-lg));
+    min-inline-size: var(--tx-size-control-sm);
+    block-size: var(--tx-pin-input-cell-block-size, var(--tx-space-12));
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-pin-input-cell-radius, var(--tx-shape-radius-lg));
     color: var(--tx-foreground, CanvasText);
     background: var(--tx-surface, Canvas);
     font-family: var(--tx-font-mono, ui-monospace, monospace);
-    font-size: var(
-      --tx-pin-input-cell-font-size,
-      var(--tx-type-heading-size, var(--tx-font-size-lg, 1.125rem))
-    );
+    font-size: var(--tx-pin-input-cell-font-size, var(--tx-type-heading-size));
     font-variant-numeric: tabular-nums;
   }
 
@@ -189,21 +149,18 @@
   }
 
   .tx-pin-input--sm .tx-pin-input__cells {
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
+    gap: calc(var(--tx-space-unit) * 1.5);
   }
 
   .tx-pin-input--sm .tx-pin-input__cell {
-    inline-size: var(--tx-size-control-md, 2.25rem);
-    min-inline-size: var(--tx-size-control-xs, 1.75rem);
-    block-size: var(
-      --tx-space-10,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10)
-    );
+    inline-size: var(--tx-size-control-md);
+    min-inline-size: var(--tx-size-control-xs);
+    block-size: var(--tx-space-10);
     font-size: var(--tx-font-size-md, 1rem);
   }
 
   .tx-pin-input--lg .tx-pin-input__cells {
-    gap: var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3));
+    gap: var(--tx-space-3);
   }
 
   .tx-pin-input--lg .tx-pin-input__cell {

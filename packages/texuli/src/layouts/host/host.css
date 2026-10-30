@@ -2,8 +2,8 @@
  * LayoutHost chrome — token-styled frame.
  * @layer tx.components so consumer utilities can override.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the drawer and overlay z-index 50 (below the sheet layer on
  * purpose), the --tx-shadow-lg drawer shadow (no theme emits it, so a token
  * read would change pixels), drawer widths and the local z-index 10 are layout
@@ -51,18 +51,15 @@
 
   .tx-layout-host__skeleton {
     display: flex;
-    gap: var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
+    gap: var(--tx-space-4);
     min-block-size: 12rem;
-    padding: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    padding: var(--tx-space-4);
   }
 
   .tx-layout-host__skeleton-rail {
     display: none;
     inline-size: 14rem;
-    border-radius: var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem));
+    border-radius: var(--tx-shape-radius-lg);
     background-color: var(--tx-muted, color-mix(in oklab, CanvasText 10%, Canvas));
   }
 
@@ -76,19 +73,19 @@
     flex: 1 1 auto;
     min-inline-size: 0;
     display: grid;
-    gap: var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
+    gap: var(--tx-space-4);
     align-content: start;
   }
 
   .tx-layout-host__skeleton-bar {
     block-size: 2.5rem;
-    border-radius: var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem));
+    border-radius: var(--tx-shape-radius-lg);
     background-color: var(--tx-muted, color-mix(in oklab, CanvasText 10%, Canvas));
   }
 
   .tx-layout-host__skeleton-block {
     block-size: 8rem;
-    border-radius: var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem));
+    border-radius: var(--tx-shape-radius-lg);
     background-color: var(--tx-muted, color-mix(in oklab, CanvasText 10%, Canvas));
   }
 
@@ -113,21 +110,11 @@
   /* Chrome parts */
   .tx-layout-chrome-skip {
     position: absolute;
-    inset-inline-start: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
-    inset-block-start: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
-    z-index: var(--tx-z-top, 70);
-    padding: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3));
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    inset-inline-start: var(--tx-space-3);
+    inset-block-start: var(--tx-space-3);
+    z-index: var(--tx-z-top);
+    padding: var(--tx-space-2) var(--tx-space-3);
+    border-radius: var(--tx-shape-radius-md);
     background-color: var(--tx-primary, Highlight);
     color: var(--tx-primary-foreground, HighlightText);
     font-size: var(--tx-text-sm, 0.875rem);
@@ -151,11 +138,8 @@
     display: flex;
     min-inline-size: 0;
     align-items: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    gap: var(--tx-space-2);
+    border-radius: var(--tx-shape-radius-md);
     color: inherit;
     font-size: var(--tx-text-sm, 0.875rem);
     font-weight: 600;
@@ -178,10 +162,7 @@
     justify-content: center;
     inline-size: 2rem;
     block-size: 2rem;
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    border-radius: var(--tx-shape-radius-md);
     background-color: var(--tx-primary, Highlight);
     color: var(--tx-primary-foreground, HighlightText);
   }
@@ -207,7 +188,7 @@
   .tx-layout-chrome-actions {
     display: flex;
     align-items: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
   }
 
   .tx-layout-chrome-actions[data-compact="true"] {
@@ -218,15 +199,9 @@
     display: flex;
     min-inline-size: 0;
     align-items: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
-    padding: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    gap: var(--tx-space-2);
+    border-radius: var(--tx-shape-radius-md);
+    padding: var(--tx-space-1);
     color: inherit;
     font-size: var(--tx-text-sm, 0.875rem);
     text-decoration: none;
@@ -297,10 +272,7 @@
 
   .tx-layout-drawer__close {
     position: absolute;
-    inset-inline-end: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    inset-inline-end: var(--tx-space-2);
     inset-block-start: max(0.5rem, var(--tx-safe-top, 0px));
     z-index: 10;
     display: inline-flex;
@@ -311,10 +283,7 @@
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    border-radius: var(--tx-shape-radius-md);
     background: transparent;
     color: var(--tx-muted-foreground, GrayText);
     cursor: pointer;

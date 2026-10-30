@@ -1,8 +1,8 @@
 /**
  * EmptyState and ErrorState — feedback surfaces on the token contract.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the 24rem copy measure is a reading width, not a design
  * token.
  */
@@ -17,76 +17,49 @@
   }
 
   .tx-empty--md {
-    gap: var(
-      --tx-empty-gap,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
-    padding-inline: var(
-      --tx-empty-padding-inline,
-      var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6))
-    );
-    padding-block: var(
-      --tx-empty-padding-block,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 14)
-    );
+    gap: var(--tx-empty-gap, var(--tx-space-3));
+    padding-inline: var(--tx-empty-padding-inline, var(--tx-space-6));
+    padding-block: var(--tx-empty-padding-block, calc(var(--tx-space-unit) * 14));
   }
 
   .tx-empty--sm {
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    padding-inline: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
-    padding-block: var(
-      --tx-space-8,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 8)
-    );
+    gap: var(--tx-space-2);
+    padding-inline: var(--tx-space-4);
+    padding-block: var(--tx-space-8);
   }
 
   .tx-empty__icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full);
     background-color: var(--tx-muted, Canvas);
     color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-empty--md .tx-empty__icon {
-    inline-size: var(
-      --tx-space-12,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 12)
-    );
-    block-size: var(
-      --tx-space-12,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 12)
-    );
+    inline-size: var(--tx-space-12);
+    block-size: var(--tx-space-12);
   }
 
   .tx-empty--sm .tx-empty__icon {
-    inline-size: var(
-      --tx-space-10,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10)
-    );
-    block-size: var(
-      --tx-space-10,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10)
-    );
+    inline-size: var(--tx-space-10);
+    block-size: var(--tx-space-10);
   }
 
   .tx-empty__icon svg {
-    inline-size: var(--tx-size-icon-lg, 1.5rem);
-    block-size: var(--tx-size-icon-lg, 1.5rem);
+    inline-size: var(--tx-size-icon-lg);
+    block-size: var(--tx-size-icon-lg);
   }
 
   .tx-empty--sm .tx-empty__icon svg {
-    inline-size: var(--tx-size-icon-md, 1.25rem);
-    block-size: var(--tx-size-icon-md, 1.25rem);
+    inline-size: var(--tx-size-icon-md);
+    block-size: var(--tx-size-icon-md);
   }
 
   .tx-empty__copy {
     display: grid;
-    gap: var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1));
+    gap: var(--tx-space-1);
     max-inline-size: 24rem;
   }
 
@@ -94,19 +67,13 @@
     margin: 0;
     font-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
     font-size: var(--tx-empty-title-font-size, var(--tx-font-size-base));
-    font-weight: var(
-      --tx-empty-title-font-weight,
-      var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600))
-    );
+    font-weight: var(--tx-empty-title-font-weight, var(--tx-type-heading-weight));
     color: var(--tx-foreground, CanvasText);
   }
 
   .tx-empty__description {
     margin: 0;
-    font-size: var(
-      --tx-empty-description-font-size,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
+    font-size: var(--tx-empty-description-font-size, var(--tx-type-label-size));
     color: var(--tx-muted-foreground, GrayText);
   }
 
@@ -114,11 +81,8 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    margin-block-start: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    gap: var(--tx-space-2);
+    margin-block-start: var(--tx-space-2);
   }
 
   .tx-error {
@@ -126,18 +90,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(
-      --tx-empty-gap,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
-    padding-inline: var(
-      --tx-empty-padding-inline,
-      var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6))
-    );
-    padding-block: var(
-      --tx-space-12,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 12)
-    );
+    gap: var(--tx-empty-gap, var(--tx-space-3));
+    padding-inline: var(--tx-empty-padding-inline, var(--tx-space-6));
+    padding-block: var(--tx-space-12);
     text-align: center;
     color: var(--tx-foreground, CanvasText);
   }
@@ -146,27 +101,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    inline-size: var(
-      --tx-space-12,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 12)
-    );
-    block-size: var(
-      --tx-space-12,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 12)
-    );
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    inline-size: var(--tx-space-12);
+    block-size: var(--tx-space-12);
+    border-radius: var(--tx-shape-radius-full);
     background-color: color-mix(in srgb, var(--tx-destructive, crimson) 12%, transparent);
     color: var(--tx-destructive, crimson);
   }
 
   .tx-error__icon svg {
-    inline-size: var(--tx-size-icon-lg, 1.5rem);
-    block-size: var(--tx-size-icon-lg, 1.5rem);
+    inline-size: var(--tx-size-icon-lg);
+    block-size: var(--tx-size-icon-lg);
   }
 
   .tx-error__copy {
     display: grid;
-    gap: var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1));
+    gap: var(--tx-space-1);
     max-inline-size: 24rem;
   }
 
@@ -174,18 +123,12 @@
     margin: 0;
     font-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
     font-size: var(--tx-empty-title-font-size, var(--tx-font-size-base));
-    font-weight: var(
-      --tx-empty-title-font-weight,
-      var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600))
-    );
+    font-weight: var(--tx-empty-title-font-weight, var(--tx-type-heading-weight));
   }
 
   .tx-error__message {
     margin: 0;
-    font-size: var(
-      --tx-empty-description-font-size,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
+    font-size: var(--tx-empty-description-font-size, var(--tx-type-label-size));
     color: var(--tx-muted-foreground, GrayText);
   }
 
@@ -193,11 +136,8 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    margin-block-start: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    gap: var(--tx-space-2);
+    margin-block-start: var(--tx-space-2);
   }
 
   @media (forced-colors: active) {

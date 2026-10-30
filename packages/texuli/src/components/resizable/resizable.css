@@ -4,8 +4,8 @@
  * The handle draws a thin divider but keeps a hit area of at least 24 × 24 px
  * (WCAG 2.5.8) through a transparent ::before.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the 1px divider, its 12px hit insets, the 8rem minimum and
  * the grip sizes and dot pattern are geometry, not design tokens.
  */
@@ -29,15 +29,9 @@
   }
 
   .tx-resizable--bordered {
-    border: var(
-        --tx-resizable-border-width,
-        var(--tx-border-width-thin, var(--tx-border-width, 1px))
-      )
-      solid var(--tx-resizable-line);
-    border-radius: var(
-      --tx-resizable-radius,
-      var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px)))
-    );
+    border: var(--tx-resizable-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-resizable-line);
+    border-radius: var(--tx-resizable-radius, var(--tx-shape-radius-xl));
     background-color: var(--tx-surface, Canvas);
     overflow: hidden;
   }
@@ -105,7 +99,7 @@
 
   .tx-resizable__handle[data-disabled] {
     cursor: default;
-    opacity: var(--tx-opacity-disabled, 0.5);
+    opacity: var(--tx-opacity-disabled);
   }
 
   .tx-resizable__handle[data-disabled]:hover {
@@ -122,9 +116,8 @@
     box-sizing: border-box;
     /* Outlined in the muted text color (held to AA by the theme gate), so the
        grip, which identifies the control, clears 3:1 (WCAG 1.4.11). */
-    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
-      var(--tx-resizable-grip-fg);
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    border: var(--tx-border-width-thin) solid var(--tx-resizable-grip-fg);
+    border-radius: var(--tx-shape-radius-full);
     background-color: var(--tx-resizable-grip-bg);
     background-image: radial-gradient(circle, var(--tx-resizable-grip-fg) 1px, transparent 1.5px);
     pointer-events: none;

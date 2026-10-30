@@ -2,8 +2,8 @@
  * Stepper and Wizard — @layer tx.components so consumer utilities can override.
  * Logical properties only; token colors for AA pairs on step markers.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the connector offsets (1rem, 2.5rem, 0.9375rem) follow the
  * marker geometry, the 1px connector, the 4px current-marker halo and the
  * visually-hidden 1px box are not design tokens.
@@ -23,7 +23,7 @@
   .tx-stepper--horizontal .tx-stepper__list {
     flex-direction: row;
     align-items: flex-start;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
     overflow-x: auto;
   }
 
@@ -41,18 +41,12 @@
   .tx-stepper--horizontal .tx-stepper__item {
     flex: 1 1 0;
     flex-direction: column;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
   }
 
   .tx-stepper--vertical .tx-stepper__item {
-    gap: var(
-      --tx-stepper-gap,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
-    padding-block-end: var(
-      --tx-space-6,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6)
-    );
+    gap: var(--tx-stepper-gap, var(--tx-space-3));
+    padding-block-end: var(--tx-space-6);
   }
 
   .tx-stepper--vertical .tx-stepper__item:last-child {
@@ -87,10 +81,7 @@
   .tx-stepper__body {
     display: flex;
     align-items: flex-start;
-    gap: var(
-      --tx-stepper-gap,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
+    gap: var(--tx-stepper-gap, var(--tx-space-3));
     margin: 0;
     padding: 0;
     border: 0;
@@ -102,10 +93,7 @@
 
   .tx-stepper__trigger {
     cursor: pointer;
-    border-radius: var(
-      --tx-stepper-trigger-radius,
-      var(--tx-shape-radius-md, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px)))
-    );
+    border-radius: var(--tx-stepper-trigger-radius, var(--tx-shape-radius-md));
   }
 
   .tx-stepper__trigger:focus-visible {
@@ -116,17 +104,14 @@
   .tx-stepper--horizontal .tx-stepper__trigger,
   .tx-stepper--horizontal .tx-stepper__body {
     flex-direction: column;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
   }
 
   @media (min-width: 40rem) {
     .tx-stepper--horizontal .tx-stepper__trigger,
     .tx-stepper--horizontal .tx-stepper__body {
       flex-direction: row;
-      gap: var(
-        --tx-stepper-gap,
-        var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-      );
+      gap: var(--tx-stepper-gap, var(--tx-space-3));
     }
   }
 
@@ -137,24 +122,15 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    inline-size: var(--tx-stepper-marker-size, var(--tx-size-control-sm, 2rem));
-    block-size: var(--tx-stepper-marker-size, var(--tx-size-control-sm, 2rem));
-    border-radius: var(--tx-stepper-marker-radius, var(--tx-shape-radius-full, 9999px));
-    border: var(
-        --tx-stepper-marker-border-width,
-        var(--tx-border-width-thin, var(--tx-border-width, 1px))
-      )
-      solid var(--tx-border, currentColor);
+    inline-size: var(--tx-stepper-marker-size, var(--tx-size-control-sm));
+    block-size: var(--tx-stepper-marker-size, var(--tx-size-control-sm));
+    border-radius: var(--tx-stepper-marker-radius, var(--tx-shape-radius-full));
+    border: var(--tx-stepper-marker-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, currentColor);
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-muted-foreground, GrayText);
-    font-size: var(
-      --tx-stepper-marker-font-size,
-      var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem))
-    );
-    font-weight: var(
-      --tx-stepper-marker-font-weight,
-      var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600))
-    );
+    font-size: var(--tx-stepper-marker-font-size, var(--tx-type-caption-size));
+    font-weight: var(--tx-stepper-marker-font-weight, var(--tx-type-heading-weight));
     font-variant-numeric: tabular-nums;
     transition:
       background-color var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease),
@@ -177,14 +153,14 @@
   }
 
   .tx-stepper__check {
-    inline-size: var(--tx-stepper-check-size, var(--tx-size-icon-sm, 1rem));
-    block-size: var(--tx-stepper-check-size, var(--tx-size-icon-sm, 1rem));
+    inline-size: var(--tx-stepper-check-size, var(--tx-size-icon-sm));
+    block-size: var(--tx-stepper-check-size, var(--tx-size-icon-sm));
   }
 
   .tx-stepper__text {
     display: grid;
     min-inline-size: 0;
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
+    gap: calc(var(--tx-space-unit) * 0.5);
   }
 
   .tx-stepper--horizontal .tx-stepper__text {
@@ -206,13 +182,13 @@
   }
 
   .tx-stepper--vertical .tx-stepper__text {
-    padding-block-start: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
+    padding-block-start: calc(var(--tx-space-unit) * 1.5);
   }
 
   .tx-stepper__label {
     margin: 0;
-    font-size: var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem));
-    font-weight: var(--tx-type-label-weight, var(--tx-font-weight-medium, 500));
+    font-size: var(--tx-type-label-size);
+    font-weight: var(--tx-type-label-weight);
     color: var(--tx-muted-foreground, GrayText);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -225,7 +201,7 @@
 
   .tx-stepper__description {
     margin: 0;
-    font-size: var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem));
+    font-size: var(--tx-type-caption-size);
     color: var(--tx-muted-foreground, GrayText);
   }
 
@@ -245,7 +221,7 @@
   .tx-wizard {
     display: flex;
     flex-direction: column;
-    gap: var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6));
+    gap: var(--tx-space-6);
   }
 
   /* The panel takes programmatic focus on step change: show the family ring
@@ -257,35 +233,22 @@
 
   .tx-wizard__error {
     margin: 0;
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
-    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
+    border-radius: var(--tx-shape-radius-md);
+    border: var(--tx-border-width-thin) solid
       color-mix(in srgb, var(--tx-destructive, crimson) 40%, transparent);
     background-color: color-mix(in srgb, var(--tx-destructive, crimson) 10%, transparent);
     color: var(--tx-foreground, CanvasText);
-    padding-block: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
-    padding-inline: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
-    font-size: var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem));
+    padding-block: var(--tx-space-2);
+    padding-inline: var(--tx-space-3);
+    font-size: var(--tx-type-label-size);
   }
 
   .tx-wizard__footer {
     display: flex;
     flex-direction: column-reverse;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    border-block-start: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
-      var(--tx-border, currentColor);
-    padding-block-start: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    gap: var(--tx-space-2);
+    border-block-start: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    padding-block-start: var(--tx-space-4);
   }
 
   @media (min-width: 40rem) {
@@ -298,13 +261,13 @@
 
   .tx-wizard__secondary {
     display: flex;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
   }
 
   .tx-wizard__actions {
     display: flex;
     flex-direction: column-reverse;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
   }
 
   @media (min-width: 40rem) {
@@ -314,8 +277,8 @@
   }
 
   .tx-wizard__chevron {
-    inline-size: var(--tx-size-icon-sm, 1rem);
-    block-size: var(--tx-size-icon-sm, 1rem);
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
   }
 
   /* Back/Next chevrons encode a direction: mirror them in RTL. */

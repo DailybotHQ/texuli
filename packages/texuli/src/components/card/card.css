@@ -2,23 +2,20 @@
  * Card family — surface, media, header, content, footer, grid.
  * @layer tx.components so consumer utilities can override.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: none besides the 0 resets.
  */
 @layer tx.components {
   .tx-card {
     display: flex;
     flex-direction: column;
-    border-radius: var(
-      --tx-card-radius,
-      var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px)))
-    );
-    border: var(--tx-card-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))
-      solid var(--tx-border, currentColor);
+    border-radius: var(--tx-card-radius, var(--tx-shape-radius-xl));
+    border: var(--tx-card-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, currentColor);
     background-color: var(--tx-card-background, var(--tx-surface));
     color: var(--tx-surface-foreground, CanvasText);
-    box-shadow: var(--tx-card-elevation, var(--tx-elevation-1, var(--tx-shadow-soft, none)));
+    box-shadow: var(--tx-card-elevation, var(--tx-elevation-1));
     overflow: clip;
   }
 
@@ -33,7 +30,7 @@
 
   .tx-card--interactive:hover {
     border-color: color-mix(in srgb, var(--tx-ring, Highlight) 40%, var(--tx-border, currentColor));
-    box-shadow: var(--tx-elevation-3, var(--tx-shadow-float, none));
+    box-shadow: var(--tx-elevation-3);
   }
 
   .tx-card--interactive:focus-visible {
@@ -42,7 +39,7 @@
   }
 
   .tx-card--flat {
-    box-shadow: var(--tx-elevation-0, none);
+    box-shadow: var(--tx-elevation-0);
   }
 
   .tx-card__media {
@@ -62,97 +59,58 @@
 
   .tx-card__header {
     display: grid;
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
-    padding-inline: var(
-      --tx-card-padding-inline,
-      var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5))
-    );
-    padding-block-start: var(
-      --tx-card-padding-block,
-      var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5))
-    );
+    gap: calc(var(--tx-space-unit) * 1.5);
+    padding-inline: var(--tx-card-padding-inline, var(--tx-space-5));
+    padding-block-start: var(--tx-card-padding-block, var(--tx-space-5));
   }
 
   .tx-card__header:last-child {
-    padding-block-end: var(
-      --tx-card-padding-block,
-      var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5))
-    );
+    padding-block-end: var(--tx-card-padding-block, var(--tx-space-5));
   }
 
   .tx-card__title {
     margin: 0;
     font-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
     font-size: var(--tx-card-title-font-size, var(--tx-font-size-base));
-    font-weight: var(
-      --tx-card-title-font-weight,
-      var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600))
-    );
+    font-weight: var(--tx-card-title-font-weight, var(--tx-type-heading-weight));
     letter-spacing: var(--tx-letter-spacing-heading, 0);
-    line-height: var(--tx-card-title-line-height, var(--tx-type-label-line, 1.25));
+    line-height: var(--tx-card-title-line-height, var(--tx-type-label-line));
     text-wrap: balance;
   }
 
   .tx-card__description {
     margin: 0;
-    font-size: var(
-      --tx-card-description-font-size,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
+    font-size: var(--tx-card-description-font-size, var(--tx-type-label-size));
     color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-card__content {
-    padding-inline: var(
-      --tx-card-padding-inline,
-      var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5))
-    );
-    padding-block: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
-    font-size: var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem));
+    padding-inline: var(--tx-card-padding-inline, var(--tx-space-5));
+    padding-block: var(--tx-space-4);
+    font-size: var(--tx-type-label-size);
   }
 
   .tx-card__content:first-child {
-    padding-block-start: var(
-      --tx-card-padding-block,
-      var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5))
-    );
+    padding-block-start: var(--tx-card-padding-block, var(--tx-space-5));
   }
 
   .tx-card__content:last-child {
-    padding-block-end: var(
-      --tx-card-padding-block,
-      var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5))
-    );
+    padding-block-end: var(--tx-card-padding-block, var(--tx-space-5));
   }
 
   .tx-card__footer {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    border-block-start: var(
-        --tx-card-border-width,
-        var(--tx-border-width-thin, var(--tx-border-width, 1px))
-      )
-      solid var(--tx-border, currentColor);
-    padding-inline: var(
-      --tx-card-padding-inline,
-      var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5))
-    );
-    padding-block: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
+    gap: var(--tx-space-2);
+    border-block-start: var(--tx-card-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, currentColor);
+    padding-inline: var(--tx-card-padding-inline, var(--tx-space-5));
+    padding-block: var(--tx-space-3);
   }
 
   .tx-card-grid {
-    --tx-card-grid-gap: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    --tx-card-grid-gap: var(--tx-space-4);
     display: grid;
     gap: var(--tx-card-grid-gap);
     list-style: none;
@@ -161,22 +119,13 @@
   }
 
   .tx-card-grid--gap-sm {
-    --tx-card-grid-gap: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    --tx-card-grid-gap: var(--tx-space-2);
   }
   .tx-card-grid--gap-md {
-    --tx-card-grid-gap: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    --tx-card-grid-gap: var(--tx-space-4);
   }
   .tx-card-grid--gap-lg {
-    --tx-card-grid-gap: var(
-      --tx-space-6,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6)
-    );
+    --tx-card-grid-gap: var(--tx-space-6);
   }
 
   @media (forced-colors: active) {
@@ -193,21 +142,21 @@
    * transparency and blurs the backdrop (where supported).
    */
   :where([data-tx-card-style="bordered"]) {
-    --tx-card-elevation: var(--tx-elevation-0, none);
+    --tx-card-elevation: var(--tx-elevation-0);
   }
 
   @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
     :where([data-tx-card-style="glass"]) {
       --tx-card-background: color-mix(
         in srgb,
-        var(--tx-surface, Canvas) var(--tx-surface-glass-alpha, var(--tx-glass-opacity, 82%)),
+        var(--tx-surface, Canvas) var(--tx-surface-glass-alpha),
         transparent
       );
     }
 
     :where([data-tx-card-style="glass"]) .tx-card {
-      backdrop-filter: blur(var(--tx-surface-glass-blur, var(--tx-glass-blur, 16px)));
-      -webkit-backdrop-filter: blur(var(--tx-surface-glass-blur, var(--tx-glass-blur, 16px)));
+      backdrop-filter: blur(var(--tx-surface-glass-blur));
+      -webkit-backdrop-filter: blur(var(--tx-surface-glass-blur));
     }
   }
 }

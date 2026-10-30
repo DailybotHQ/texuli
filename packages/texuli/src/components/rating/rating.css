@@ -2,8 +2,8 @@
  * Rating: star rating input and display on the token contract.
  * @layer tx.components so consumer utilities can override.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the star box sizes (1.25rem to 3rem) and the 24px-wide half-
  * star targets are proportional geometry of each size; the 0.55 disabled
  * opacity has no token.
@@ -14,7 +14,7 @@
     --tx-rating-fill: var(--tx-warning, #b45309);
     --tx-rating-empty: var(--tx-muted-foreground, #575757);
     display: inline-grid;
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
+    gap: calc(var(--tx-space-unit) * 1.5);
     justify-items: start;
     max-inline-size: 100%;
     color: var(--tx-foreground, CanvasText);
@@ -47,7 +47,7 @@
   .tx-rating--display {
     display: inline-flex;
     align-items: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
   }
 
   .tx-rating--display.tx-rating--md {
@@ -55,14 +55,8 @@
   }
 
   .tx-rating__label {
-    font-size: var(
-      --tx-rating-label-font-size,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
-    font-weight: var(
-      --tx-rating-label-font-weight,
-      var(--tx-type-label-weight, var(--tx-font-weight-medium, 500))
-    );
+    font-size: var(--tx-rating-label-font-size, var(--tx-type-label-size));
+    font-weight: var(--tx-rating-label-font-weight, var(--tx-type-label-weight));
   }
 
   .tx-rating__label--hidden {
@@ -82,10 +76,7 @@
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(
-      --tx-rating-stars-gap,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5)
-    );
+    gap: var(--tx-rating-stars-gap, calc(var(--tx-space-unit) * 0.5));
     max-inline-size: 100%;
   }
 
@@ -95,10 +86,7 @@
     flex: none;
     inline-size: var(--tx-rating-box, var(--tx-rating-star));
     block-size: var(--tx-rating-box, var(--tx-rating-star));
-    border-radius: var(
-      --tx-rating-star-radius,
-      var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))
-    );
+    border-radius: var(--tx-rating-star-radius, var(--tx-shape-radius-lg));
   }
 
   .tx-rating__icon {
@@ -139,10 +127,7 @@
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: var(
-      --tx-rating-star-radius,
-      var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))
-    );
+    border-radius: var(--tx-rating-star-radius, var(--tx-shape-radius-lg));
     background: transparent;
     cursor: pointer;
   }
@@ -180,10 +165,7 @@
   }
 
   .tx-rating__value {
-    font-size: var(
-      --tx-rating-label-font-size,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
+    font-size: var(--tx-rating-label-font-size, var(--tx-type-label-size));
     font-variant-numeric: tabular-nums;
     color: var(--tx-muted-foreground, #575757);
   }

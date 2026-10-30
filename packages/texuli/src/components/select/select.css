@@ -2,8 +2,8 @@
  * Styled Select — trigger field chrome + floating listbox.
  * @layer tx.components so consumer utilities can override.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the 1.4 trigger line height, the fractional item and label
  * paddings, the 0.8125em description, the 0.45 disabled item opacity and the
  * menu inline and block size limits are tuned geometry off the token steps.
@@ -21,27 +21,18 @@
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(
-      --tx-select-gap,
-      var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-    );
+    gap: var(--tx-select-gap, var(--tx-space-2));
     inline-size: 100%;
     min-inline-size: 0;
     margin: 0;
-    border: var(--tx-select-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))
-      solid var(--tx-input, var(--tx-border, ButtonBorder));
-    border-radius: var(--tx-select-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
+    border: var(--tx-select-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-input, var(--tx-border, ButtonBorder));
+    border-radius: var(--tx-select-radius, var(--tx-shape-radius-lg));
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     font-family: var(--tx-font-sans, system-ui, sans-serif);
-    font-size: var(
-      --tx-select-font-size-md,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
-    font-weight: var(
-      --tx-select-font-weight,
-      var(--tx-type-body-weight, var(--tx-font-weight-body, 400))
-    );
+    font-size: var(--tx-select-font-size-md, var(--tx-type-label-size));
+    font-weight: var(--tx-select-font-weight, var(--tx-type-body-weight));
     line-height: 1.4;
     text-align: start;
     cursor: pointer;
@@ -51,35 +42,20 @@
   }
 
   .tx-select-trigger--sm {
-    block-size: var(--tx-select-height-sm, var(--tx-size-control-sm, 2rem));
-    padding-inline: var(
-      --tx-select-padding-inline-sm,
-      var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-    );
-    font-size: var(
-      --tx-select-font-size-sm,
-      var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem))
-    );
+    block-size: var(--tx-select-height-sm, var(--tx-size-control-sm));
+    padding-inline: var(--tx-select-padding-inline-sm, var(--tx-space-2));
+    font-size: var(--tx-select-font-size-sm, var(--tx-type-caption-size));
   }
 
   .tx-select-trigger--md {
-    block-size: var(--tx-select-height-md, var(--tx-size-control-md, 2.25rem));
-    padding-inline: var(
-      --tx-select-padding-inline-md,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
+    block-size: var(--tx-select-height-md, var(--tx-size-control-md));
+    padding-inline: var(--tx-select-padding-inline-md, var(--tx-space-3));
   }
 
   .tx-select-trigger--lg {
-    block-size: var(--tx-select-height-lg, var(--tx-size-control-lg, 2.75rem));
-    padding-inline: var(
-      --tx-select-padding-inline-lg,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3.5)
-    );
-    font-size: var(
-      --tx-select-font-size-lg,
-      var(--tx-type-body-size, var(--tx-font-size-base, 1rem))
-    );
+    block-size: var(--tx-select-height-lg, var(--tx-size-control-lg));
+    padding-inline: var(--tx-select-padding-inline-lg, calc(var(--tx-space-unit) * 3.5));
+    font-size: var(--tx-select-font-size-lg, var(--tx-type-body-size));
   }
 
   .tx-select-trigger--soft {
@@ -98,7 +74,7 @@
   .tx-select-trigger:disabled,
   .tx-select-trigger[data-disabled] {
     cursor: not-allowed;
-    opacity: var(--tx-opacity-disabled, 0.5);
+    opacity: var(--tx-opacity-disabled);
   }
 
   /* Invalid chrome mirrors the Input/Textarea field grammar. */
@@ -113,9 +89,9 @@
 
   .tx-select-trigger__chevron {
     flex: none;
-    inline-size: var(--tx-select-chevron-size, var(--tx-size-icon-sm, 1rem));
-    block-size: var(--tx-select-chevron-size, var(--tx-size-icon-sm, 1rem));
-    opacity: var(--tx-select-chevron-opacity, var(--tx-opacity-muted, 0.7));
+    inline-size: var(--tx-select-chevron-size, var(--tx-size-icon-sm));
+    block-size: var(--tx-select-chevron-size, var(--tx-size-icon-sm));
+    opacity: var(--tx-select-chevron-opacity, var(--tx-opacity-muted));
   }
 
   .tx-select-value {
@@ -132,40 +108,28 @@
 
   .tx-select-content {
     box-sizing: border-box;
-    z-index: var(--tx-z-popover, 50);
+    z-index: var(--tx-z-popover);
     min-inline-size: var(--tx-select-trigger-width, 10rem);
     max-inline-size: min(24rem, calc(100vw - 1.5rem));
     max-block-size: min(18rem, 50vh);
     overflow: hidden;
-    border: var(--tx-select-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))
-      solid var(--tx-border, ButtonBorder);
-    border-radius: var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem));
+    border: var(--tx-select-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-shape-radius-lg);
     background-color: var(--tx-elevated, var(--tx-surface, Canvas));
     color: var(--tx-elevated-foreground, var(--tx-foreground, CanvasText));
-    box-shadow: var(--tx-elevation-3, var(--tx-shadow-float, none));
-    padding-block: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    box-shadow: var(--tx-elevation-3);
+    padding-block: var(--tx-space-1);
     font-family: var(--tx-font-sans, system-ui, sans-serif);
-    font-size: var(
-      --tx-select-font-size-md,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
+    font-size: var(--tx-select-font-size-md, var(--tx-type-label-size));
   }
 
   .tx-select-content--sm {
-    font-size: var(
-      --tx-select-font-size-sm,
-      var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem))
-    );
+    font-size: var(--tx-select-font-size-sm, var(--tx-type-caption-size));
   }
 
   .tx-select-content--lg {
-    font-size: var(
-      --tx-select-font-size-lg,
-      var(--tx-type-body-size, var(--tx-font-size-base, 1rem))
-    );
+    font-size: var(--tx-select-font-size-lg, var(--tx-type-body-size));
   }
 
   .tx-select-content[data-state="closed"] {
@@ -176,29 +140,20 @@
     max-block-size: min(16rem, 45vh);
     overflow: auto;
     overscroll-behavior: contain;
-    padding-block: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
-    padding-inline: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    padding-block: calc(var(--tx-space-unit) * 0.5);
+    padding-inline: var(--tx-space-1);
   }
 
   .tx-select-item {
     box-sizing: border-box;
     display: grid;
     grid-template-columns: auto 1fr;
-    column-gap: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
-    row-gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
+    column-gap: var(--tx-space-2);
+    row-gap: calc(var(--tx-space-unit) * 0.5);
     align-items: center;
     padding-block: 0.4rem;
     padding-inline: 0.5rem 0.625rem;
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    border-radius: var(--tx-shape-radius-md);
     cursor: pointer;
     outline: none;
     user-select: none;
@@ -220,8 +175,8 @@
   }
 
   .tx-select-item__check {
-    inline-size: var(--tx-size-icon-sm, 1rem);
-    block-size: var(--tx-size-icon-sm, 1rem);
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
     opacity: 0;
   }
 
@@ -252,28 +207,22 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    inline-size: var(--tx-size-icon-md, 1.25rem);
-    block-size: var(--tx-size-icon-md, 1.25rem);
+    inline-size: var(--tx-size-icon-md);
+    block-size: var(--tx-size-icon-md);
     flex: none;
     color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-select-group {
     display: grid;
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
-    padding-block: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    gap: calc(var(--tx-space-unit) * 0.5);
+    padding-block: var(--tx-space-1);
   }
 
   .tx-select-label {
     padding-block: 0.35rem 0.2rem;
-    padding-inline: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
-    font-size: var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem));
+    padding-inline: var(--tx-space-2);
+    font-size: var(--tx-type-caption-size);
     font-weight: var(--tx-font-weight-medium, 500);
     color: var(--tx-muted-foreground, GrayText);
     letter-spacing: 0.02em;
@@ -282,10 +231,7 @@
 
   .tx-select-separator {
     block-size: 1px;
-    margin-block: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    margin-block: var(--tx-space-1);
     margin-inline: 0.35rem;
     background-color: var(--tx-border, ButtonBorder);
     border: 0;

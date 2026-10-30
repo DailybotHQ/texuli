@@ -2,8 +2,8 @@
  * Dialog and AlertDialog surfaces on the token contract.
  * @layer tx.components so consumer utilities can override.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the per-size inline sizes (22rem to 56rem) and the 2rem
  * viewport margin in min(), the 90vh block limit and the visually-hidden 1px
  * box are layout limits, not design tokens.
@@ -13,7 +13,7 @@
     box-sizing: border-box;
     background: color-mix(
       in srgb,
-      var(--tx-foreground, CanvasText) var(--tx-dialog-scrim-opacity, var(--tx-opacity-scrim, 45%)),
+      var(--tx-foreground, CanvasText) var(--tx-dialog-scrim-opacity, var(--tx-opacity-scrim)),
       transparent
     );
   }
@@ -23,10 +23,7 @@
     --tx-dialog-bg: var(--tx-elevated, var(--tx-surface, Canvas));
     --tx-dialog-fg: var(--tx-elevated-foreground, var(--tx-surface-foreground, CanvasText));
     --tx-dialog-border: var(--tx-border, ButtonBorder);
-    --tx-dialog-shadow: var(
-      --tx-dialog-elevation,
-      var(--tx-elevation-4, var(--tx-shadow-float, none))
-    );
+    --tx-dialog-shadow: var(--tx-dialog-elevation, var(--tx-elevation-4));
     --tx-dialog-muted: var(--tx-muted-foreground, GrayText);
     --tx-dialog-ring: var(--tx-ring, Highlight);
     --tx-dialog-danger: var(--tx-destructive, crimson);
@@ -36,7 +33,7 @@
     /* Physical center anchors stay correct in LTR and RTL. */
     top: 50%;
     left: 50%;
-    z-index: var(--tx-dialog-z-index, var(--tx-z-modal, 60));
+    z-index: var(--tx-dialog-z-index, var(--tx-z-modal));
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -44,17 +41,13 @@
     max-block-size: min(100% - 2rem, 90vh);
     margin: 0;
     padding: 0;
-    border: var(--tx-dialog-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))
-      solid var(--tx-dialog-border);
-    border-radius: var(
-      --tx-dialog-radius,
-      var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px)))
-    );
+    border: var(--tx-dialog-border-width, var(--tx-border-width-thin)) solid var(--tx-dialog-border);
+    border-radius: var(--tx-dialog-radius, var(--tx-shape-radius-xl));
     background-color: var(--tx-dialog-bg);
     color: var(--tx-dialog-fg);
     font-family: var(--tx-font-sans, system-ui, sans-serif);
     font-size: var(--tx-dialog-font-size, var(--tx-font-size-sm));
-    line-height: var(--tx-dialog-line-height, var(--tx-type-body-line, 1.5));
+    line-height: var(--tx-dialog-line-height, var(--tx-type-body-line));
     box-shadow: var(--tx-dialog-shadow);
     outline: none;
     transform: translate(-50%, -50%);
@@ -78,15 +71,9 @@
 
   .tx-alert-dialog {
     inline-size: min(100% - 2rem, 28rem);
-    gap: var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
-    padding-block: var(
-      --tx-dialog-alert-padding,
-      var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5))
-    );
-    padding-inline: var(
-      --tx-dialog-alert-padding,
-      var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5))
-    );
+    gap: var(--tx-space-4);
+    padding-block: var(--tx-dialog-alert-padding, var(--tx-space-5));
+    padding-inline: var(--tx-dialog-alert-padding, var(--tx-space-5));
   }
 
   .tx-dialog:focus-visible,
@@ -98,40 +85,25 @@
   .tx-dialog__header {
     display: flex;
     flex-shrink: 0;
-    gap: var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
+    gap: var(--tx-space-4);
     align-items: flex-start;
     justify-content: space-between;
-    padding-block-start: var(
-      --tx-space-5,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)
-    );
-    padding-block-end: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
-    padding-inline: var(
-      --tx-space-5,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)
-    );
+    padding-block-start: var(--tx-space-5);
+    padding-block-end: var(--tx-space-2);
+    padding-inline: var(--tx-space-5);
   }
 
   .tx-dialog__heading {
     display: grid;
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
+    gap: calc(var(--tx-space-unit) * 1.5);
     min-inline-size: 0;
   }
 
   .tx-dialog__title {
     margin: 0;
-    font-size: var(
-      --tx-dialog-title-font-size,
-      var(--tx-type-heading-size, var(--tx-font-size-lg, 1.125rem))
-    );
-    font-weight: var(
-      --tx-dialog-title-font-weight,
-      var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600))
-    );
-    line-height: var(--tx-dialog-title-line-height, var(--tx-type-heading-line, 1.3));
+    font-size: var(--tx-dialog-title-font-size, var(--tx-type-heading-size));
+    font-weight: var(--tx-dialog-title-font-weight, var(--tx-type-heading-weight));
+    line-height: var(--tx-dialog-title-line-height, var(--tx-type-heading-line));
     text-wrap: balance;
   }
 
@@ -146,22 +118,13 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    inline-size: var(--tx-size-control-md, 2.25rem);
-    block-size: var(--tx-size-control-md, 2.25rem);
-    margin-block-start: calc(
-      var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)) *
-      -1
-    );
-    margin-inline-end: calc(
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5) *
-      -1
-    );
+    inline-size: var(--tx-size-control-md);
+    block-size: var(--tx-size-control-md);
+    margin-block-start: calc(var(--tx-space-1) * -1);
+    margin-inline-end: calc(calc(var(--tx-space-unit) * 1.5) * -1);
     padding: 0;
     border: 0;
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    border-radius: var(--tx-shape-radius-md);
     background: transparent;
     color: var(--tx-dialog-muted);
     cursor: pointer;
@@ -193,33 +156,18 @@
     flex: 1 1 auto;
     min-block-size: 0;
     overflow: auto;
-    padding-block: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
-    padding-inline: var(
-      --tx-space-5,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)
-    );
+    padding-block: var(--tx-space-2);
+    padding-inline: var(--tx-space-5);
   }
 
   .tx-dialog__footer {
     display: flex;
     flex-shrink: 0;
     flex-direction: column-reverse;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    padding-block-start: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
-    padding-block-end: var(
-      --tx-space-5,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)
-    );
-    padding-inline: var(
-      --tx-space-5,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)
-    );
+    gap: var(--tx-space-2);
+    padding-block-start: var(--tx-space-2);
+    padding-block-end: var(--tx-space-5);
+    padding-inline: var(--tx-space-5);
   }
 
   @media (min-width: 40rem) {
@@ -230,15 +178,12 @@
   }
 
   .tx-dialog__footer-spacer {
-    padding-block-end: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    padding-block-end: var(--tx-space-4);
   }
 
   .tx-alert-dialog__row {
     display: flex;
-    gap: var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
+    gap: var(--tx-space-4);
     align-items: flex-start;
   }
 
@@ -246,53 +191,35 @@
     display: grid;
     flex-shrink: 0;
     place-items: center;
-    inline-size: var(
-      --tx-space-10,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10)
-    );
-    block-size: var(
-      --tx-space-10,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10)
-    );
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    inline-size: var(--tx-space-10);
+    block-size: var(--tx-space-10);
+    border-radius: var(--tx-shape-radius-full);
     background: var(--tx-dialog-danger-soft);
     color: var(--tx-dialog-danger);
   }
 
   .tx-alert-dialog__icon svg {
-    inline-size: var(--tx-size-icon-md, 1.25rem);
-    block-size: var(--tx-size-icon-md, 1.25rem);
+    inline-size: var(--tx-size-icon-md);
+    block-size: var(--tx-size-icon-md);
   }
 
   .tx-alert-dialog__copy {
     display: grid;
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
+    gap: calc(var(--tx-space-unit) * 1.5);
     min-inline-size: 0;
   }
 
   .tx-alert-dialog__extra {
-    margin-block-start: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    margin-block-start: var(--tx-space-1);
   }
 
   .tx-alert-dialog__error {
     margin: 0;
-    padding-block: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
-    padding-inline: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
-    border: var(--tx-dialog-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))
-      solid color-mix(in srgb, var(--tx-dialog-danger) 40%, transparent);
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    padding-block: var(--tx-space-2);
+    padding-inline: var(--tx-space-3);
+    border: var(--tx-dialog-border-width, var(--tx-border-width-thin)) solid
+      color-mix(in srgb, var(--tx-dialog-danger) 40%, transparent);
+    border-radius: var(--tx-shape-radius-md);
     background: var(--tx-dialog-danger-soft);
     color: var(--tx-dialog-fg);
     font-size: var(--tx-dialog-font-size, var(--tx-font-size-sm));
@@ -301,7 +228,7 @@
   .tx-alert-dialog__actions {
     display: flex;
     flex-direction: column-reverse;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
   }
 
   @media (min-width: 40rem) {

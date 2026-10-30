@@ -2,8 +2,8 @@
  * Skeleton, Spinner and Progress — loading feedback on the token contract.
  * @layer tx.components so consumer utilities can override.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the circle skeleton sm and lg sizes off the space steps
  * (3.5rem), the spinner lg size (1.75rem) and its 2px and 3px strokes, the
  * progress circle md and lg sizes (3.5rem, 4.5rem), the 0.55 pulse opacity and
@@ -13,10 +13,7 @@
   /* ── Skeleton ─────────────────────────────────────────────────────────── */
   .tx-skeleton {
     display: block;
-    border-radius: var(
-      --tx-skeleton-radius,
-      var(--tx-shape-radius-md, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px)))
-    );
+    border-radius: var(--tx-skeleton-radius, var(--tx-shape-radius-md));
     background-color: var(--tx-muted, Canvas);
     color: transparent;
     pointer-events: none;
@@ -24,46 +21,25 @@
   }
 
   .tx-skeleton--sm {
-    block-size: var(
-      --tx-skeleton-height-sm,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
+    block-size: var(--tx-skeleton-height-sm, var(--tx-space-3));
   }
   .tx-skeleton--md {
-    block-size: var(
-      --tx-skeleton-height-md,
-      var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4))
-    );
+    block-size: var(--tx-skeleton-height-md, var(--tx-space-4));
   }
   .tx-skeleton--lg {
-    block-size: var(
-      --tx-skeleton-height-lg,
-      var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6))
-    );
+    block-size: var(--tx-skeleton-height-lg, var(--tx-space-6));
   }
 
   .tx-skeleton--circle {
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full);
     aspect-ratio: 1;
-    inline-size: var(
-      --tx-skeleton-circle-size,
-      var(--tx-space-10, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10))
-    );
-    block-size: var(
-      --tx-skeleton-circle-size,
-      var(--tx-space-10, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10))
-    );
+    inline-size: var(--tx-skeleton-circle-size, var(--tx-space-10));
+    block-size: var(--tx-skeleton-circle-size, var(--tx-space-10));
   }
 
   .tx-skeleton--circle.tx-skeleton--sm {
-    inline-size: var(
-      --tx-space-6,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6)
-    );
-    block-size: var(
-      --tx-space-6,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6)
-    );
+    inline-size: var(--tx-space-6);
+    block-size: var(--tx-space-6);
   }
   .tx-skeleton--circle.tx-skeleton--lg {
     inline-size: 3.5rem;
@@ -116,7 +92,7 @@
 
   .tx-spinner__icon {
     display: block;
-    border-radius: var(--tx-spinner-radius, var(--tx-shape-radius-full, 9999px));
+    border-radius: var(--tx-spinner-radius, var(--tx-shape-radius-full));
     border-style: solid;
     border-color: color-mix(in srgb, currentColor 25%, transparent);
     border-block-start-color: currentColor;
@@ -124,13 +100,13 @@
   }
 
   .tx-spinner--sm .tx-spinner__icon {
-    inline-size: var(--tx-size-icon-sm, 1rem);
-    block-size: var(--tx-size-icon-sm, 1rem);
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
     border-width: 2px;
   }
   .tx-spinner--md .tx-spinner__icon {
-    inline-size: var(--tx-size-icon-md, 1.25rem);
-    block-size: var(--tx-size-icon-md, 1.25rem);
+    inline-size: var(--tx-size-icon-md);
+    block-size: var(--tx-size-icon-md);
     border-width: 2px;
   }
   .tx-spinner--lg .tx-spinner__icon {
@@ -166,10 +142,7 @@
   /* ── Progress (linear + circular) ─────────────────────────────────────── */
   .tx-progress {
     display: grid;
-    gap: var(
-      --tx-progress-gap,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5)
-    );
+    gap: var(--tx-progress-gap, calc(var(--tx-space-unit) * 1.5));
     color: var(--tx-foreground, CanvasText);
     min-inline-size: 0;
   }
@@ -178,15 +151,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    font-size: var(
-      --tx-progress-font-size,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
+    gap: var(--tx-space-2);
+    font-size: var(--tx-progress-font-size, var(--tx-type-label-size));
   }
 
   .tx-progress__label {
-    font-weight: var(--tx-type-label-weight, var(--tx-font-weight-medium, 500));
+    font-weight: var(--tx-type-label-weight);
   }
 
   .tx-progress__value {
@@ -199,27 +169,18 @@
     position: relative;
     overflow: hidden;
     inline-size: 100%;
-    border-radius: var(--tx-progress-radius, var(--tx-shape-radius-full, 9999px));
+    border-radius: var(--tx-progress-radius, var(--tx-shape-radius-full));
     background-color: var(--tx-muted, Canvas);
   }
 
   .tx-progress--sm .tx-progress__track {
-    block-size: var(
-      --tx-progress-track-height-sm,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5)
-    );
+    block-size: var(--tx-progress-track-height-sm, calc(var(--tx-space-unit) * 1.5));
   }
   .tx-progress--md .tx-progress__track {
-    block-size: var(
-      --tx-progress-track-height-md,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5)
-    );
+    block-size: var(--tx-progress-track-height-md, calc(var(--tx-space-unit) * 2.5));
   }
   .tx-progress--lg .tx-progress__track {
-    block-size: var(
-      --tx-progress-track-height-lg,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3.5)
-    );
+    block-size: var(--tx-progress-track-height-lg, calc(var(--tx-space-unit) * 3.5));
   }
 
   .tx-progress__indicator {
@@ -274,7 +235,7 @@
   .tx-progress--circular {
     display: inline-grid;
     justify-items: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
   }
 
   .tx-progress__circle-wrap {
@@ -294,14 +255,8 @@
   }
 
   .tx-progress--sm .tx-progress__circle {
-    inline-size: var(
-      --tx-space-10,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10)
-    );
-    block-size: var(
-      --tx-space-10,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10)
-    );
+    inline-size: var(--tx-space-10);
+    block-size: var(--tx-space-10);
   }
   .tx-progress--md .tx-progress__circle {
     inline-size: 3.5rem;
@@ -350,9 +305,9 @@
     inset: 0;
     display: grid;
     place-items: center;
-    font-size: var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem));
+    font-size: var(--tx-type-caption-size);
     font-variant-numeric: tabular-nums;
-    font-weight: var(--tx-type-label-weight, var(--tx-font-weight-medium, 500));
+    font-weight: var(--tx-type-label-weight);
     color: var(--tx-foreground, CanvasText);
     pointer-events: none;
   }

@@ -2,8 +2,8 @@
  * Badge, Tag and Chip — @layer tx.components so consumer utilities in later
  * layers can override. Token pairs keep small text AA against the fill.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the tag remove hit box (24px target from 1.5rem plus 0.375rem
  * padding and -0.25rem margins) is fixed accessibility geometry; the 1px
  * selected ring is a hairline.
@@ -16,30 +16,14 @@
     inline-size: fit-content;
     flex-shrink: 0;
     align-items: center;
-    gap: var(
-      --tx-badge-gap,
-      var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1))
-    );
-    border-radius: var(--tx-badge-radius, var(--tx-shape-radius-full, 9999px));
-    border: var(--tx-badge-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))
-      solid transparent;
-    padding-block: var(
-      --tx-badge-padding-block,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5)
-    );
-    padding-inline: var(
-      --tx-badge-padding-inline,
-      var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-    );
-    font-size: var(
-      --tx-badge-font-size,
-      var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem))
-    );
-    font-weight: var(
-      --tx-badge-font-weight,
-      var(--tx-type-label-weight, var(--tx-font-weight-medium, 500))
-    );
-    line-height: var(--tx-badge-line-height, var(--tx-type-label-line, 1.25));
+    gap: var(--tx-badge-gap, var(--tx-space-1));
+    border-radius: var(--tx-badge-radius, var(--tx-shape-radius-full));
+    border: var(--tx-badge-border-width, var(--tx-border-width-thin)) solid transparent;
+    padding-block: var(--tx-badge-padding-block, calc(var(--tx-space-unit) * 0.5));
+    padding-inline: var(--tx-badge-padding-inline, var(--tx-space-2));
+    font-size: var(--tx-badge-font-size, var(--tx-type-caption-size));
+    font-weight: var(--tx-badge-font-weight, var(--tx-type-label-weight));
+    line-height: var(--tx-badge-line-height, var(--tx-type-label-line));
     white-space: nowrap;
     vertical-align: middle;
   }
@@ -47,8 +31,8 @@
   .tx-badge :where(svg),
   .tx-tag :where(svg),
   .tx-chip :where(svg) {
-    inline-size: var(--tx-size-icon-xs, 0.75rem);
-    block-size: var(--tx-size-icon-xs, 0.75rem);
+    inline-size: var(--tx-size-icon-xs);
+    block-size: var(--tx-size-icon-xs);
     flex-shrink: 0;
   }
 
@@ -87,11 +71,8 @@
   }
 
   .tx-tag {
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
-    padding-inline-end: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    gap: calc(var(--tx-space-unit) * 1.5);
+    padding-inline-end: var(--tx-space-1);
   }
 
   .tx-tag__remove {
@@ -108,7 +89,7 @@
     margin: -0.25rem;
     padding: 0.375rem;
     border: 0;
-    border-radius: var(--tx-badge-radius, var(--tx-shape-radius-full, 9999px));
+    border-radius: var(--tx-badge-radius, var(--tx-shape-radius-full));
     background: transparent;
     color: inherit;
     cursor: pointer;
@@ -125,11 +106,8 @@
   }
 
   .tx-chip {
-    padding-block: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
-    padding-inline: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5);
+    padding-block: var(--tx-space-1);
+    padding-inline: calc(var(--tx-space-unit) * 2.5);
     font-weight: var(--tx-font-weight-semibold, 600);
   }
 
@@ -139,7 +117,7 @@
 
   .tx-chip:disabled,
   .tx-chip[aria-disabled="true"] {
-    opacity: var(--tx-opacity-disabled, 0.5);
+    opacity: var(--tx-opacity-disabled);
     cursor: not-allowed;
   }
 

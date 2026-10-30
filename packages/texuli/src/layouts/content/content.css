@@ -1,7 +1,7 @@
 /**
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the 650 and 700 prose heading weights, em-based prose rhythm
  * and the TOC widths are typographic layout, not design tokens.
  */
@@ -17,7 +17,7 @@
   .tx-content-layout__header {
     display: flex;
     align-items: center;
-    gap: var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
+    gap: var(--tx-space-4);
     min-block-size: 3.5rem;
     padding-inline: clamp(1rem, 4vw, 3rem);
     border-block-end: 1px solid var(--tx-border, color-mix(in oklab, CanvasText 16%, Canvas));
@@ -26,7 +26,7 @@
   .tx-content-layout__top-nav {
     display: flex;
     align-items: center;
-    gap: var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
+    gap: var(--tx-space-4);
     margin-inline-start: auto;
     overflow-x: auto;
   }
@@ -75,27 +75,22 @@
   .tx-content-layout__sections {
     align-self: start;
     position: sticky;
-    inset-block-start: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    inset-block-start: var(--tx-space-4);
     max-block-size: calc(var(--tx-app-height, var(--tx-app-height, 100dvh)) - 2rem);
     overflow: auto;
     font-size: var(--tx-text-sm, 0.875rem);
   }
 
   .tx-content-layout__sections h2 {
-    margin-block: 0
-      var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    margin-block: 0 var(--tx-space-2);
     font-size: inherit;
     font-weight: 650;
   }
 
   .tx-content-layout__sections ul {
     display: grid;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    margin: 0 0
-      var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5));
+    gap: var(--tx-space-2);
+    margin: 0 0 var(--tx-space-5);
     padding: 0;
     list-style: none;
   }
@@ -105,7 +100,7 @@
        content and never below its widest child. Fill the track instead. */
     inline-size: 100%;
     min-inline-size: 0;
-    max-inline-size: var(--tx-layout-content-max, 72ch);
+    max-inline-size: var(--tx-layout-content-max);
     margin-inline: auto;
   }
 
@@ -122,8 +117,7 @@
   }
 
   .tx-content-layout__eyebrow {
-    margin-block: 0
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3));
+    margin-block: 0 var(--tx-space-3);
     color: var(--tx-primary, LinkText);
     font-size: var(--tx-text-sm, 0.875rem);
     font-weight: 650;
@@ -143,11 +137,7 @@
 
   .tx-content-layout__summary {
     max-inline-size: 60ch;
-    margin-block: var(
-        --tx-space-4,
-        calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-      )
-      0;
+    margin-block: var(--tx-space-4) 0;
     color: var(--tx-muted-foreground, color-mix(in oklab, CanvasText 72%, Canvas));
     font-size: clamp(1.05rem, 2vw, 1.25rem);
     line-height: 1.6;
@@ -156,13 +146,8 @@
   .tx-content-layout__byline {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-      var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
-    margin-block: var(
-        --tx-space-5,
-        calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)
-      )
-      0;
+    gap: var(--tx-space-2) var(--tx-space-4);
+    margin-block: var(--tx-space-5) 0;
     color: var(--tx-muted-foreground, color-mix(in oklab, CanvasText 72%, Canvas));
     font-size: var(--tx-text-sm, 0.875rem);
   }
@@ -195,20 +180,14 @@
   .tx-content-layout__toc {
     align-self: start;
     position: sticky;
-    inset-block-start: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    inset-block-start: var(--tx-space-4);
     max-block-size: calc(var(--tx-app-height, var(--tx-app-height, 100dvh)) - 2rem);
     overflow: auto;
     font-size: var(--tx-text-sm, 0.875rem);
   }
 
   .tx-content-layout__toc summary {
-    margin-block-end: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
+    margin-block-end: var(--tx-space-3);
     color: var(--tx-foreground, CanvasText);
     font-weight: 650;
     cursor: pointer;
@@ -216,20 +195,14 @@
 
   .tx-content-layout__toc ol {
     display: grid;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
     margin: 0;
-    padding-inline-start: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    padding-inline-start: var(--tx-space-4);
     list-style: none;
   }
 
   .tx-content-layout__toc li[data-level="3"] {
-    padding-inline-start: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
+    padding-inline-start: var(--tx-space-3);
   }
 
   .tx-content-layout__toc a[aria-current="location"] {
@@ -245,7 +218,7 @@
     .tx-content-layout__frame,
     .tx-content-layout__frame[data-content-kind="docs"] {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6));
+      gap: var(--tx-space-6);
     }
 
     .tx-content-layout__sections,
@@ -257,12 +230,8 @@
     .tx-content-layout__sections {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-        var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
-      padding-block-end: var(
-        --tx-space-3,
-        calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-      );
+      gap: var(--tx-space-3) var(--tx-space-4);
+      padding-block-end: var(--tx-space-3);
       border-block-end: 1px solid var(--tx-border, color-mix(in oklab, CanvasText 16%, Canvas));
     }
 
@@ -273,8 +242,7 @@
     .tx-content-layout__sections ul {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-        var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
+      gap: var(--tx-space-2) var(--tx-space-4);
       margin: 0;
     }
 

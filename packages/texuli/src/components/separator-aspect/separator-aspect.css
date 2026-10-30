@@ -3,8 +3,8 @@
  * `@layer tx.components` so consumer CSS wins.
  * Logical properties only.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the 0.35 strong-separator opacity mix and the visually-hidden
  * 1px box are not design tokens.
  */
@@ -30,24 +30,15 @@
   }
 
   .tx-separator--horizontal {
-    block-size: var(
-      --tx-separator-thickness,
-      var(--tx-border-width-thin, var(--tx-border-width, 1px))
-    );
+    block-size: var(--tx-separator-thickness, var(--tx-border-width-thin));
     inline-size: 100%;
   }
 
   .tx-separator--vertical {
-    inline-size: var(
-      --tx-separator-thickness,
-      var(--tx-border-width-thin, var(--tx-border-width, 1px))
-    );
+    inline-size: var(--tx-separator-thickness, var(--tx-border-width-thin));
     block-size: auto;
     align-self: stretch;
-    min-block-size: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    min-block-size: var(--tx-space-4);
   }
 
   .tx-aspect-ratio {
@@ -55,10 +46,7 @@
     display: block;
     inline-size: 100%;
     overflow: hidden;
-    border-radius: var(
-      --tx-aspect-ratio-radius,
-      var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))
-    );
+    border-radius: var(--tx-aspect-ratio-radius, var(--tx-shape-radius-lg));
     background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
     color: var(--tx-foreground, CanvasText);
   }

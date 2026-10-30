@@ -2,8 +2,8 @@
  * Tabs, Accordion and Collapsible — disclosure surfaces on the token contract.
  * @layer tx.components so consumer utilities can override.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the -1px line-trigger overlap and 2px active rule, the 10rem
  * vertical list minimum and the visually-hidden 1px box are tab geometry, not
  * design tokens.
@@ -12,10 +12,7 @@
   /* ── Tabs ─────────────────────────────────────────────────────────────── */
   .tx-tabs {
     display: flex;
-    gap: var(
-      --tx-tabs-gap,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
+    gap: var(--tx-tabs-gap, var(--tx-space-3));
     color: var(--tx-foreground, CanvasText);
     min-inline-size: 0;
   }
@@ -45,10 +42,7 @@
     isolation: isolate;
     display: flex;
     align-items: center;
-    gap: var(
-      --tx-tabs-list-gap,
-      var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1))
-    );
+    gap: var(--tx-tabs-list-gap, var(--tx-space-1));
     margin: 0;
     padding: 0;
     list-style: none;
@@ -67,12 +61,9 @@
   }
 
   :is(.tx-tabs__list--pills, .tx-tabs__list--enclosed) > .tx-tabs__indicator {
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    border-radius: var(--tx-shape-radius-md);
     background-color: var(--tx-surface, Canvas);
-    box-shadow: var(--tx-elevation-2, var(--tx-shadow-soft, none));
+    box-shadow: var(--tx-elevation-2);
   }
 
   .tx-tabs--vertical .tx-tabs__list {
@@ -82,74 +73,47 @@
   }
 
   .tx-tabs__list--line {
-    gap: var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4));
-    border-block-end: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
-      var(--tx-border, currentColor);
+    gap: var(--tx-space-4);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
   }
 
   .tx-tabs--vertical .tx-tabs__list--line {
     border-block-end: 0;
-    border-inline-end: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
-      var(--tx-border, currentColor);
-    padding-inline-end: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    border-inline-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    padding-inline-end: var(--tx-space-2);
   }
 
   .tx-tabs__list--pills {
-    gap: var(
-      --tx-tabs-list-gap,
-      var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1))
-    );
-    padding: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
-    border-radius: var(
-      --tx-tabs-list-radius,
-      var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))
-    );
+    gap: var(--tx-tabs-list-gap, var(--tx-space-1));
+    padding: var(--tx-space-1);
+    border-radius: var(--tx-tabs-list-radius, var(--tx-shape-radius-lg));
     background-color: var(--tx-muted, Canvas);
   }
 
   .tx-tabs__list--enclosed {
     gap: 0;
-    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
-      var(--tx-border, currentColor);
-    border-radius: var(
-      --tx-tabs-list-radius,
-      var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))
-    );
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    border-radius: var(--tx-tabs-list-radius, var(--tx-shape-radius-lg));
     background-color: var(--tx-muted, Canvas);
-    padding: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
+    padding: calc(var(--tx-space-unit) * 0.5);
   }
 
   .tx-tabs__trigger {
     display: inline-flex;
     align-items: center;
-    gap: var(
-      --tx-tabs-trigger-gap,
-      var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-    );
+    gap: var(--tx-tabs-trigger-gap, var(--tx-space-2));
     margin: 0;
     border: 0;
     background: transparent;
     color: inherit;
     font: inherit;
-    font-size: var(
-      --tx-tabs-trigger-font-size,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
-    font-weight: var(
-      --tx-tabs-trigger-font-weight,
-      var(--tx-type-label-weight, var(--tx-font-weight-medium, 500))
-    );
+    font-size: var(--tx-tabs-trigger-font-size, var(--tx-type-label-size));
+    font-weight: var(--tx-tabs-trigger-font-weight, var(--tx-type-label-weight));
     white-space: nowrap;
     cursor: pointer;
     outline: none;
     transition: color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
-    min-block-size: var(--tx-tabs-trigger-height-touch, var(--tx-size-control-lg, 2.75rem));
+    min-block-size: var(--tx-tabs-trigger-height-touch, var(--tx-size-control-lg));
   }
 
   @media (min-width: 40rem) {
@@ -174,13 +138,13 @@
   .tx-tabs__trigger[data-disabled],
   .tx-tabs__trigger:disabled {
     cursor: not-allowed;
-    opacity: var(--tx-tabs-disabled-opacity, var(--tx-opacity-disabled, 0.5));
+    opacity: var(--tx-tabs-disabled-opacity, var(--tx-opacity-disabled));
   }
 
   .tx-tabs__trigger--line {
     margin-block-end: -1px;
-    padding-block: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5);
-    padding-inline: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
+    padding-block: calc(var(--tx-space-unit) * 2.5);
+    padding-inline: calc(var(--tx-space-unit) * 0.5);
     border-block-end: 2px solid transparent;
   }
 
@@ -189,10 +153,7 @@
     margin-inline-end: -1px;
     border-block-end: 0;
     border-inline-end: 2px solid transparent;
-    padding-inline: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
+    padding-inline: var(--tx-space-3);
   }
 
   .tx-tabs__trigger--line[data-state="active"] {
@@ -201,39 +162,27 @@
   }
 
   .tx-tabs__trigger--pills {
-    block-size: var(--tx-size-control-sm, 2rem);
-    padding-inline: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    block-size: var(--tx-size-control-sm);
+    padding-inline: var(--tx-space-3);
+    border-radius: var(--tx-shape-radius-md);
   }
 
   .tx-tabs__trigger--pills[data-state="active"] {
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
-    box-shadow: var(--tx-elevation-2, var(--tx-shadow-soft, none));
+    box-shadow: var(--tx-elevation-2);
   }
 
   .tx-tabs__trigger--enclosed {
-    block-size: var(--tx-size-control-sm, 2rem);
-    padding-inline: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    block-size: var(--tx-size-control-sm);
+    padding-inline: var(--tx-space-3);
+    border-radius: var(--tx-shape-radius-md);
   }
 
   .tx-tabs__trigger--enclosed[data-state="active"] {
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
-    box-shadow: var(--tx-elevation-2, var(--tx-shadow-soft, none));
+    box-shadow: var(--tx-elevation-2);
   }
 
   /* While the indicator glides, the active tab's own indicator waits for it. */
@@ -254,10 +203,10 @@
   .tx-tabs__badge {
     display: inline-flex;
     align-items: center;
-    padding-inline: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    padding-inline: calc(var(--tx-space-unit) * 1.5);
+    border-radius: var(--tx-shape-radius-full);
     background-color: var(--tx-background, Canvas);
-    font-size: var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem));
+    font-size: var(--tx-type-caption-size);
     font-variant-numeric: tabular-nums;
     color: var(--tx-muted-foreground, GrayText);
   }
@@ -276,10 +225,7 @@
 
   .tx-tabs__panel {
     min-inline-size: 0;
-    border-radius: var(
-      --tx-shape-radius-md,
-      max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))
-    );
+    border-radius: var(--tx-shape-radius-md);
     outline: none;
   }
 
@@ -296,15 +242,13 @@
   }
 
   .tx-accordion--bordered {
-    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
-      var(--tx-border, currentColor);
-    border-radius: var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem));
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-lg);
     overflow: hidden;
   }
 
   .tx-accordion__item {
-    border-block-end: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
-      var(--tx-border, currentColor);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
   }
 
   .tx-accordion__item:last-child {
@@ -312,10 +256,7 @@
   }
 
   .tx-accordion--bordered .tx-accordion__item {
-    padding-inline: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
+    padding-inline: var(--tx-space-3);
   }
 
   .tx-accordion__header {
@@ -327,32 +268,20 @@
     inline-size: 100%;
     align-items: center;
     justify-content: space-between;
-    gap: var(
-      --tx-accordion-trigger-gap,
-      var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4))
-    );
+    gap: var(--tx-accordion-trigger-gap, var(--tx-space-4));
     margin: 0;
-    padding-block: var(
-      --tx-accordion-trigger-padding-block,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
+    padding-block: var(--tx-accordion-trigger-padding-block, var(--tx-space-3));
     padding-inline: 0;
     border: 0;
     background: transparent;
     color: var(--tx-foreground, CanvasText);
     font: inherit;
-    font-size: var(
-      --tx-accordion-trigger-font-size,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
-    font-weight: var(
-      --tx-accordion-trigger-font-weight,
-      var(--tx-type-label-weight, var(--tx-font-weight-medium, 500))
-    );
+    font-size: var(--tx-accordion-trigger-font-size, var(--tx-type-label-size));
+    font-weight: var(--tx-accordion-trigger-font-weight, var(--tx-type-label-weight));
     text-align: start;
     cursor: pointer;
     outline: none;
-    min-block-size: var(--tx-size-control-lg, 2.75rem);
+    min-block-size: var(--tx-size-control-lg);
     transition: color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
   }
 
@@ -368,13 +297,13 @@
   .tx-accordion__trigger[data-disabled],
   .tx-accordion__trigger:disabled {
     cursor: not-allowed;
-    opacity: var(--tx-accordion-disabled-opacity, var(--tx-opacity-disabled, 0.5));
+    opacity: var(--tx-accordion-disabled-opacity, var(--tx-opacity-disabled));
   }
 
   .tx-accordion__chevron {
     display: block;
-    inline-size: var(--tx-size-icon-sm, 1rem);
-    block-size: var(--tx-size-icon-sm, 1rem);
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
     flex-shrink: 0;
     color: var(--tx-muted-foreground, GrayText);
     transition: transform var(--tx-motion-base, 200ms) var(--tx-motion-easing, ease);
@@ -386,47 +315,38 @@
 
   .tx-accordion__content {
     overflow: hidden;
-    font-size: var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem));
+    font-size: var(--tx-type-label-size);
     color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-accordion__content-inner {
-    padding-block-end: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    padding-block-end: var(--tx-space-4);
   }
 
   /* ── Collapsible ──────────────────────────────────────────────────────── */
   .tx-collapsible {
     display: flex;
     flex-direction: column;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
     color: var(--tx-foreground, CanvasText);
   }
 
   .tx-collapsible__trigger {
     display: inline-flex;
     align-items: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
+    gap: var(--tx-space-2);
     margin: 0;
-    padding-block: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
+    padding-block: calc(var(--tx-space-unit) * 1.5);
     padding-inline: 0;
     border: 0;
     background: transparent;
     color: var(--tx-foreground, CanvasText);
     font: inherit;
-    font-size: var(
-      --tx-accordion-trigger-font-size,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
-    font-weight: var(
-      --tx-accordion-trigger-font-weight,
-      var(--tx-type-label-weight, var(--tx-font-weight-medium, 500))
-    );
+    font-size: var(--tx-accordion-trigger-font-size, var(--tx-type-label-size));
+    font-weight: var(--tx-accordion-trigger-font-weight, var(--tx-type-label-weight));
     cursor: pointer;
     outline: none;
-    min-block-size: var(--tx-size-control-lg, 2.75rem);
+    min-block-size: var(--tx-size-control-lg);
   }
 
   @media (min-width: 40rem) {
@@ -443,13 +363,13 @@
   .tx-collapsible__trigger[data-disabled],
   .tx-collapsible__trigger:disabled {
     cursor: not-allowed;
-    opacity: var(--tx-accordion-disabled-opacity, var(--tx-opacity-disabled, 0.5));
+    opacity: var(--tx-accordion-disabled-opacity, var(--tx-opacity-disabled));
   }
 
   .tx-collapsible__chevron {
     display: block;
-    inline-size: var(--tx-size-icon-sm, 1rem);
-    block-size: var(--tx-size-icon-sm, 1rem);
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
     color: var(--tx-muted-foreground, GrayText);
     transition: transform var(--tx-motion-base, 200ms) var(--tx-motion-easing, ease);
   }
@@ -459,7 +379,7 @@
   }
 
   .tx-collapsible__content {
-    font-size: var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem));
+    font-size: var(--tx-type-label-size);
     color: var(--tx-muted-foreground, GrayText);
   }
 

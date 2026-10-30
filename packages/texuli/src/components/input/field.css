@@ -2,8 +2,8 @@
  * Shared field chrome for Input, InputGroup and Textarea.
  * Lives in tx.components so consumer utilities in the same cascade can override.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the 1.4 line height (no type role is 1.4), the 0.35rem file
  * input padding (aligns the native file button), the 5rem textarea minimum and
  * the visually-hidden 1px box.
@@ -14,18 +14,15 @@
     inline-size: 100%;
     min-inline-size: 0;
     margin: 0;
-    border: var(--tx-input-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))
-      solid var(--tx-input, var(--tx-border, CanvasText));
-    border-radius: var(--tx-input-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
+    border: var(--tx-input-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-input, var(--tx-border, CanvasText));
+    border-radius: var(--tx-input-radius, var(--tx-shape-radius-lg));
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
-    box-shadow: var(--tx-input-elevation, var(--tx-elevation-1, var(--tx-shadow-soft, none)));
+    box-shadow: var(--tx-input-elevation, var(--tx-elevation-1));
     font-family: var(--tx-font-sans, system-ui, sans-serif);
     font-size: var(--tx-input-font-size-touch, var(--tx-font-size-base));
-    font-weight: var(
-      --tx-input-font-weight,
-      var(--tx-type-body-weight, var(--tx-font-weight-body, 400))
-    );
+    font-weight: var(--tx-input-font-weight, var(--tx-type-body-weight));
     line-height: 1.4;
     transition:
       border-color var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease),
@@ -53,7 +50,7 @@
   .tx-field:disabled,
   .tx-field[aria-disabled="true"] {
     cursor: not-allowed;
-    opacity: var(--tx-input-disabled-opacity, var(--tx-opacity-disabled, 0.5));
+    opacity: var(--tx-input-disabled-opacity, var(--tx-opacity-disabled));
   }
 
   .tx-field[aria-invalid="true"] {
@@ -67,16 +64,10 @@
 
   .tx-input {
     display: flex;
-    block-size: var(--tx-input-height, var(--tx-size-control-md, 2.25rem));
-    min-block-size: var(--tx-input-height-touch, var(--tx-size-control-lg, 2.75rem));
-    padding-block: var(
-      --tx-input-padding-block,
-      var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1))
-    );
-    padding-inline: var(
-      --tx-input-padding-inline,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
+    block-size: var(--tx-input-height, var(--tx-size-control-md));
+    min-block-size: var(--tx-input-height-touch, var(--tx-size-control-lg));
+    padding-block: var(--tx-input-padding-block, var(--tx-space-1));
+    padding-inline: var(--tx-input-padding-inline, var(--tx-space-3));
   }
 
   @media (min-width: 640px) {
@@ -90,10 +81,7 @@
   }
 
   .tx-input[type="file"]::file-selector-button {
-    margin-inline-end: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
+    margin-inline-end: var(--tx-space-3);
     border: 0;
     background: transparent;
     color: var(--tx-foreground, CanvasText);
@@ -104,14 +92,8 @@
   .tx-textarea {
     display: block;
     min-block-size: 5rem;
-    padding-block: var(
-      --tx-input-textarea-padding-block,
-      var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))
-    );
-    padding-inline: var(
-      --tx-input-padding-inline,
-      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
-    );
+    padding-block: var(--tx-input-textarea-padding-block, var(--tx-space-2));
+    padding-inline: var(--tx-input-padding-inline, var(--tx-space-3));
     resize: vertical;
     field-sizing: content;
   }
@@ -126,12 +108,12 @@
     align-items: stretch;
     inline-size: 100%;
     min-inline-size: 0;
-    border: var(--tx-input-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))
-      solid var(--tx-input, var(--tx-border, CanvasText));
-    border-radius: var(--tx-input-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
+    border: var(--tx-input-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-input, var(--tx-border, CanvasText));
+    border-radius: var(--tx-input-radius, var(--tx-shape-radius-lg));
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
-    box-shadow: var(--tx-input-elevation, var(--tx-elevation-1, var(--tx-shadow-soft, none)));
+    box-shadow: var(--tx-input-elevation, var(--tx-elevation-1));
     transition:
       border-color var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease),
       box-shadow var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease);
@@ -154,17 +136,14 @@
 
   .tx-input-group[data-tx-disabled="true"] {
     cursor: not-allowed;
-    opacity: var(--tx-input-disabled-opacity, var(--tx-opacity-disabled, 0.5));
+    opacity: var(--tx-input-disabled-opacity, var(--tx-opacity-disabled));
   }
 
   .tx-input-group__adornment {
     display: inline-flex;
     align-items: center;
-    gap: var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1));
-    padding-inline: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    gap: var(--tx-space-1);
+    padding-inline: var(--tx-space-2);
     color: var(--tx-muted-foreground, GrayText);
     font-size: var(--tx-input-font-size, var(--tx-font-size-sm));
     white-space: nowrap;
@@ -182,16 +161,10 @@
     font: inherit;
     font-size: var(--tx-input-font-size-touch, var(--tx-font-size-base));
     line-height: 1.4;
-    padding-block: var(
-      --tx-input-padding-block,
-      var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1))
-    );
-    padding-inline: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
-    block-size: var(--tx-input-height, var(--tx-size-control-md, 2.25rem));
-    min-block-size: var(--tx-input-height-touch, var(--tx-size-control-lg, 2.75rem));
+    padding-block: var(--tx-input-padding-block, var(--tx-space-1));
+    padding-inline: var(--tx-space-2);
+    block-size: var(--tx-input-height, var(--tx-size-control-md));
+    min-block-size: var(--tx-input-height-touch, var(--tx-size-control-lg));
     outline: none;
   }
 
@@ -218,12 +191,12 @@
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: var(--tx-input-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
+    border-radius: var(--tx-input-radius, var(--tx-shape-radius-lg));
     background: transparent;
     color: var(--tx-muted-foreground, GrayText);
     cursor: pointer;
-    inline-size: var(--tx-size-control-xs, 1.75rem);
-    block-size: var(--tx-size-control-xs, 1.75rem);
+    inline-size: var(--tx-size-control-xs);
+    block-size: var(--tx-size-control-xs);
     font: inherit;
     line-height: 1;
   }
@@ -239,13 +212,13 @@
 
   .tx-input-shell {
     display: grid;
-    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5);
+    gap: calc(var(--tx-space-unit) * 1.5);
   }
 
   .tx-input-shell__label {
     color: var(--tx-foreground, CanvasText);
-    font-size: var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem));
-    font-weight: var(--tx-type-label-weight, var(--tx-font-weight-medium, 500));
+    font-size: var(--tx-type-label-size);
+    font-weight: var(--tx-type-label-weight);
   }
 
   .tx-input-shell__control-wrap {
@@ -254,12 +227,9 @@
 
   .tx-input-shell__count {
     position: absolute;
-    inset-inline-end: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
+    inset-inline-end: var(--tx-space-3);
     color: var(--tx-muted-foreground, GrayText);
-    font-size: var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem));
+    font-size: var(--tx-type-caption-size);
     font-variant-numeric: tabular-nums;
     pointer-events: none;
   }
@@ -270,10 +240,7 @@
   }
 
   .tx-input-shell__count[data-tx-placement="textarea"] {
-    inset-block-end: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    inset-block-end: var(--tx-space-2);
   }
 
   .tx-input-shell__count[data-tx-visible="false"] {
@@ -290,10 +257,7 @@
 
   .tx-field.tx-field--with-count,
   .tx-input-group__control.tx-field--with-count {
-    padding-inline-end: var(
-      --tx-space-12,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 12)
-    );
+    padding-inline-end: var(--tx-space-12);
   }
 
   .tx-sr-only {
@@ -328,18 +292,12 @@
    * it the touch minimum still applies).
    */
   :where([data-tx-input-style="compact"]) {
-    --tx-input-height: var(--tx-size-control-sm, 2rem);
-    --tx-input-padding-inline: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    --tx-input-height: var(--tx-size-control-sm);
+    --tx-input-padding-inline: var(--tx-space-2);
   }
 
   :where([data-tx-input-style="comfortable"]) {
-    --tx-input-height: var(--tx-size-control-lg, 2.75rem);
-    --tx-input-padding-inline: var(
-      --tx-space-4,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)
-    );
+    --tx-input-height: var(--tx-size-control-lg);
+    --tx-input-padding-inline: var(--tx-space-4);
   }
 }

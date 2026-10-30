@@ -2,8 +2,8 @@
  * Carousel styles. Live in `@layer tx.components` so consumer CSS wins.
  * Side-effect import from `carouselVariants` keeps recipe-only usage styled.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the 2.5rem control and 1.5rem dot hit boxes, the 0.5rem and
  * 1.25rem dot marks, the 0.8125rem counter text and the visually-hidden 1px
  * box are fixed geometry; z-index 1 is local stacking inside the stage.
@@ -22,10 +22,7 @@
   }
   .tx-carousel {
     --tx-carousel-sign: 1;
-    --tx-carousel-gap: var(
-      --tx-space-3,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
-    );
+    --tx-carousel-gap: var(--tx-space-3);
     --tx-carousel-control-size: 2.5rem;
     position: relative;
     display: flex;
@@ -33,7 +30,7 @@
     gap: var(--tx-carousel-gap);
     min-inline-size: 0;
     color: var(--tx-foreground, CanvasText);
-    border-radius: var(--tx-carousel-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
+    border-radius: var(--tx-carousel-radius, var(--tx-shape-radius-lg));
     outline: none;
   }
   .tx-carousel:dir(rtl) {
@@ -63,7 +60,7 @@
   .tx-carousel-viewport {
     contain: inline-size;
     overflow: hidden;
-    border-radius: var(--tx-carousel-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
+    border-radius: var(--tx-carousel-radius, var(--tx-shape-radius-lg));
     touch-action: pan-y;
     user-select: none;
   }
@@ -88,15 +85,12 @@
   .tx-carousel-slide {
     flex: 0 0 100%;
     min-inline-size: 0;
-    padding-inline: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
+    padding-inline: calc(var(--tx-space-unit) * 0.5);
   }
 
   .tx-carousel-fallback {
     margin: 0;
-    padding: var(
-      --tx-carousel-fallback-padding,
-      var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4))
-    );
+    padding: var(--tx-carousel-fallback-padding, var(--tx-space-4));
     color: var(--tx-muted-foreground, light-dark(#52525b, #a1a1aa));
   }
 
@@ -109,7 +103,7 @@
 
   .tx-carousel-buttons {
     display: flex;
-    gap: var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1));
+    gap: var(--tx-space-1);
   }
 
   .tx-carousel-button {
@@ -118,9 +112,8 @@
     inline-size: var(--tx-carousel-control-size);
     block-size: var(--tx-carousel-control-size);
     padding: 0;
-    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
-      var(--tx-border-strong, ButtonText);
-    border-radius: var(--tx-carousel-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
+    border: var(--tx-border-width-thin) solid var(--tx-border-strong, ButtonText);
+    border-radius: var(--tx-carousel-radius, var(--tx-shape-radius-lg));
     background: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     cursor: pointer;
@@ -135,11 +128,11 @@
   }
   .tx-carousel-button:disabled {
     cursor: not-allowed;
-    opacity: var(--tx-opacity-disabled, 0.5);
+    opacity: var(--tx-opacity-disabled);
   }
   .tx-carousel-button svg {
-    inline-size: var(--tx-size-icon-sm, 1rem);
-    block-size: var(--tx-size-icon-sm, 1rem);
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
     fill: currentColor;
   }
   .tx-carousel-button .tx-carousel-chevron {
@@ -158,21 +151,15 @@
     inset-block-start: 50%;
     z-index: 1;
     translate: 0 -50%;
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full);
     background: var(--tx-elevated, Canvas);
     box-shadow: var(--tx-shadow-float, 0 2px 8px rgb(0 0 0 / 0.18));
   }
   .tx-carousel-edge[data-edge="start"] {
-    inset-inline-start: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    inset-inline-start: var(--tx-space-2);
   }
   .tx-carousel-edge[data-edge="end"] {
-    inset-inline-end: var(
-      --tx-space-2,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
-    );
+    inset-inline-end: var(--tx-space-2);
   }
 
   /*
@@ -185,7 +172,7 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1));
+    gap: var(--tx-space-1);
     min-inline-size: 0;
   }
   .tx-carousel-dot {
@@ -205,7 +192,7 @@
     inline-size: 0.5rem;
     block-size: 0.5rem;
     translate: -50% -50%;
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full);
     background: var(--tx-muted-foreground, light-dark(#6b6b76, #a1a1aa));
     transition:
       inline-size var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease-out),
@@ -221,7 +208,7 @@
   .tx-carousel-dot:focus-visible {
     outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
     outline-offset: 0;
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full);
   }
 
   .tx-carousel-count {

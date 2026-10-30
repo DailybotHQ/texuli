@@ -2,8 +2,8 @@
  * Styled Combobox / MultiSelect.
  * `@layer tx.components` so consumer CSS wins. Logical properties only.
  * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
- * component tokens (componentVar) or system tokens (systemVar), each with its
- * registry fallback.
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: the fractional field, chip and item paddings (0.1rem to
  * 0.65rem), the 0.55 and 0.45 disabled opacities, the 0.8125rem chip text and
  * the menu inline and block size limits are tuned geometry off the 0.25rem
@@ -33,12 +33,9 @@
     gap: 0.35rem;
     inline-size: 100%;
     min-inline-size: 0;
-    border: var(
-        --tx-combobox-border-width,
-        var(--tx-border-width-thin, var(--tx-border-width, 1px))
-      )
-      solid var(--tx-input, var(--tx-border, ButtonBorder));
-    border-radius: var(--tx-combobox-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)));
+    border: var(--tx-combobox-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-input, var(--tx-border, ButtonBorder));
+    border-radius: var(--tx-combobox-radius, var(--tx-shape-radius-lg));
     background-color: var(--tx-surface, Canvas);
     color: inherit;
     transition:
@@ -56,33 +53,24 @@
   }
 
   .tx-combobox-field--sm {
-    min-block-size: var(--tx-combobox-height-sm, var(--tx-size-control-sm, 2rem));
+    min-block-size: var(--tx-combobox-height-sm, var(--tx-size-control-sm));
     padding-block: 0.15rem;
     padding-inline: 0.4rem;
-    font-size: var(
-      --tx-combobox-font-size-sm,
-      var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem))
-    );
+    font-size: var(--tx-combobox-font-size-sm, var(--tx-type-caption-size));
   }
 
   .tx-combobox-field--md {
-    min-block-size: var(--tx-combobox-height-md, var(--tx-size-control-md, 2.25rem));
+    min-block-size: var(--tx-combobox-height-md, var(--tx-size-control-md));
     padding-block: 0.2rem;
     padding-inline: 0.5rem;
-    font-size: var(
-      --tx-combobox-font-size-md,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
+    font-size: var(--tx-combobox-font-size-md, var(--tx-type-label-size));
   }
 
   .tx-combobox-field--lg {
-    min-block-size: var(--tx-combobox-height-lg, var(--tx-size-control-lg, 2.75rem));
+    min-block-size: var(--tx-combobox-height-lg, var(--tx-size-control-lg));
     padding-block: 0.3rem;
     padding-inline: 0.65rem;
-    font-size: var(
-      --tx-combobox-font-size-lg,
-      var(--tx-type-body-size, var(--tx-font-size-base, 1rem))
-    );
+    font-size: var(--tx-combobox-font-size-lg, var(--tx-type-body-size));
   }
 
   .tx-combobox-field:focus-within,
@@ -118,7 +106,7 @@
     max-inline-size: 100%;
     padding-block: 0.1rem;
     padding-inline: 0.45rem 0.25rem;
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full);
     background: var(--tx-secondary, color-mix(in srgb, CanvasText 10%, Canvas));
     color: var(--tx-secondary-foreground, CanvasText);
     font-size: 0.8125rem;
@@ -139,7 +127,7 @@
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: var(--tx-shape-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full);
     background: transparent;
     color: inherit;
     cursor: pointer;
@@ -156,14 +144,8 @@
     flex: 1 1 6rem;
     min-inline-size: 4rem;
     margin: 0;
-    padding-block: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
-    padding-inline: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    padding-block: var(--tx-space-1);
+    padding-inline: var(--tx-space-1);
     border: 0;
     background: transparent;
     color: inherit;
@@ -186,10 +168,7 @@
     margin: 0;
     padding: 0.15rem;
     border: 0;
-    border-radius: calc(
-      var(--tx-combobox-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))) *
-      0.7
-    );
+    border-radius: calc(var(--tx-combobox-radius, var(--tx-shape-radius-lg)) * 0.7);
     background: transparent;
     color: inherit;
     cursor: pointer;
@@ -201,66 +180,45 @@
   }
 
   .tx-combobox-trigger__icon {
-    inline-size: var(--tx-size-icon-sm, 1rem);
-    block-size: var(--tx-size-icon-sm, 1rem);
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
     opacity: 0.75;
   }
 
   .tx-combobox-content {
     box-sizing: border-box;
-    z-index: var(--tx-z-popover, 50);
+    z-index: var(--tx-z-popover);
     min-inline-size: 12rem;
     max-inline-size: min(24rem, calc(100vw - 1.5rem));
     max-block-size: min(18rem, 50vh);
     overflow: hidden;
-    border: var(
-        --tx-combobox-border-width,
-        var(--tx-border-width-thin, var(--tx-border-width, 1px))
-      )
-      solid var(--tx-border, ButtonBorder);
-    border-radius: var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem));
+    border: var(--tx-combobox-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-shape-radius-lg);
     background-color: var(--tx-elevated, var(--tx-surface, Canvas));
     color: var(--tx-elevated-foreground, var(--tx-foreground, CanvasText));
-    box-shadow: var(--tx-elevation-3, var(--tx-shadow-float, none));
-    padding-block: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    box-shadow: var(--tx-elevation-3);
+    padding-block: var(--tx-space-1);
     font-family: var(--tx-font-sans, system-ui, sans-serif);
-    font-size: var(
-      --tx-combobox-font-size-md,
-      var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))
-    );
+    font-size: var(--tx-combobox-font-size-md, var(--tx-type-label-size));
   }
 
   .tx-combobox-content--sm {
-    font-size: var(
-      --tx-combobox-font-size-sm,
-      var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem))
-    );
+    font-size: var(--tx-combobox-font-size-sm, var(--tx-type-caption-size));
   }
 
   .tx-combobox-content--lg {
-    font-size: var(
-      --tx-combobox-font-size-lg,
-      var(--tx-type-body-size, var(--tx-font-size-base, 1rem))
-    );
+    font-size: var(--tx-combobox-font-size-lg, var(--tx-type-body-size));
   }
 
   .tx-combobox-item {
     display: flex;
     align-items: center;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    margin-inline: var(
-      --tx-space-1,
-      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)
-    );
+    gap: var(--tx-space-2);
+    margin-inline: var(--tx-space-1);
     padding-block: 0.4rem;
     padding-inline: 0.55rem;
-    border-radius: calc(
-      var(--tx-combobox-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))) *
-      0.8
-    );
+    border-radius: calc(var(--tx-combobox-radius, var(--tx-shape-radius-lg)) * 0.8);
     cursor: pointer;
     outline: none;
   }
@@ -281,8 +239,8 @@
   }
 
   .tx-combobox-item__check {
-    inline-size: var(--tx-size-icon-sm, 1rem);
-    block-size: var(--tx-size-icon-sm, 1rem);
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
     flex: none;
     opacity: 0;
   }
@@ -301,18 +259,12 @@
 
   .tx-combobox-error {
     display: grid;
-    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
-    margin: var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1));
+    gap: var(--tx-space-2);
+    margin: var(--tx-space-1);
     padding: 0.65rem 0.75rem;
-    border: var(
-        --tx-combobox-border-width,
-        var(--tx-border-width-thin, var(--tx-border-width, 1px))
-      )
-      solid var(--tx-destructive, Mark);
-    border-radius: calc(
-      var(--tx-combobox-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))) *
-      0.8
-    );
+    border: var(--tx-combobox-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-destructive, Mark);
+    border-radius: calc(var(--tx-combobox-radius, var(--tx-shape-radius-lg)) * 0.8);
     background: color-mix(in srgb, var(--tx-destructive, Mark) 8%, var(--tx-surface, Canvas));
     color: var(--tx-foreground, CanvasText);
     font-size: 0.875rem;

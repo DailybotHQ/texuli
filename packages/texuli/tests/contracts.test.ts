@@ -208,7 +208,7 @@ describe('polish-css', () => {
         'P1-09: PIN cells shrink toward a floor instead of a fixed size': () => {
           const cell = rule(css('number-pin/number-pin.css'), '.tx-pin-input__cell');
           expect(cell).toMatch(/flex:\s*0 1 auto/);
-          expect(cell).toMatch(/min-inline-size:\s*var\(--tx-size-control-sm, 2rem\)/);
+          expect(cell).toMatch(/min-inline-size:\s*var\(--tx-size-control-sm\)/);
         },
         'P1-10: swatches keep their fill in forced colors': () => {
           const source = css('tags-color/tags-color.css');
