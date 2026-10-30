@@ -10,7 +10,13 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { renderRenamesJson, renderTokenTablesDoc } from '../scripts/render.ts';
+import {
+  componentDocPath,
+  componentDocSubpaths,
+  renderRenamesJson,
+  renderTokenTablesDoc,
+  withComponentTokensSection,
+} from '../scripts/render.ts';
 import {
   COMPONENT_IDS,
   COMPONENT_TOKEN_FAMILIES,
@@ -993,6 +999,19 @@ describe('token contract v2: generated surfaces', () => {
     const doc = renderTokenTablesDoc();
     for (const token of COMPONENT_TOKENS) expect(doc).toContain(`\`${token.token}\``);
     for (const token of SYSTEM_TOKENS) expect(doc).toContain(`\`${token.name}\``);
+  });
+
+  it('every texuli component page carries its generated Tokens section', () => {
+    const subpaths = componentDocSubpaths();
+    expect(subpaths.length).toBe(41);
+    for (const subpath of subpaths) {
+      const path = `packages/texuli/docs/${componentDocPath(subpath)}`;
+      const page = read(path);
+      expect(page, path).toBe(withComponentTokensSection(page, subpath));
+      for (const family of COMPONENT_TOKEN_FAMILIES.filter((f) => f.subpath === subpath)) {
+        for (const token of family.tokens) expect(page, path).toContain(`\`${token.token}\``);
+      }
+    }
   });
 
   it('lists no renames yet, in the published rename schema shape', () => {

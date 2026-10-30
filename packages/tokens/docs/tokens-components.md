@@ -42,16 +42,22 @@ component stylesheet in the repository.
 - **Shipped in this package:** the families, the registry, the read helpers
   and guard, `@texuli/tokens/data-viz`
   (complete chart tokens for any theme) and the rename list.
-- **Not adopted yet:** no component stylesheet reads these tokens; the
-  adoption tasks move component CSS onto `componentVar` expressions, each
-  behind a zero-change `pnpm visual` gate. Until then, setting a component
-  token changes nothing.
+- **Adopted in `texuli`:** every styled component stylesheet reads its
+  component tokens (all of them), and the other sizes, spaces, radii,
+  shadows and z-indexes read system tokens where a step matches; layouts
+  and the sortable primitive read system tokens. Each stylesheet lists the
+  literals it keeps and why. The tier-3 hooks set component tokens
+  (`data-tx-button-style`, `data-tx-card-style`, `data-tx-input-style`,
+  `data-tx-focus-ring-style`), and `setDesignDefaults` (`texuli/defaults`)
+  carries default variants and sizes. Each `texuli` component page has a
+  generated Tokens section. The domain packages (charts, data, media, chat,
+  blocks and the rest) are **planned** (the T-adopt-domain task).
 - **Defaults equal today:** every component fallback resolves to the value
   the component renders today under the visual-baseline theme
   (`enterprise-neutral`, density 1), checked by `tests/token-contract-v2.test.ts`.
-  Some components hard-code a value that ignores the theme today (for example
+  Some components hard-coded a value that ignored the theme (for example
   a card radius of `0.75rem`); their default ties it to the theme scale
-  (`--tx-shape-radius-xl`), so other themes can change at adoption time.
+  (`--tx-shape-radius-xl`), so other themes follow their own scale now.
 - **Chart tokens:** `themeVariables` still emits `--tx-chart-*` only for
   themes that carry `charts`. Chart-less themes render with each component's
   own fallbacks today, and those fallbacks disagree, so emitting derived
