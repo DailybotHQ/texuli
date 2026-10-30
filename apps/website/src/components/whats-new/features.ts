@@ -3,11 +3,11 @@
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
  * the page and its tests share one source. Releases: 0.6.0 to 0.9.0 are
- * published on npm, and 0.9.0 is `latest` (the release line in
- * docs/RELEASE.md).
+ * published on npm, and 0.9.0 is `latest`; 0.10.0 is in development on the
+ * release/0.10.0 branch (the release line in docs/RELEASE.md).
  */
 
-export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0' | '0.9.0';
+export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0' | '0.9.0' | '0.10.0';
 
 export interface Release {
   readonly id: ReleaseId;
@@ -18,6 +18,15 @@ export interface Release {
 }
 
 export const RELEASES: readonly Release[] = [
+  {
+    id: '0.10.0',
+    title: '0.10.0: design systems',
+    status:
+      'In development on the release/0.10.0 branch; npm has the 0.9 line until 0.10.0 is published.',
+    published: false,
+    summary:
+      'Design systems integrate on the release branch. Their features join this page as they land; until then, install the 0.9 line.',
+  },
   {
     id: '0.9.0',
     title: '0.9.0: MCP, an agent-ready site and design tokens',

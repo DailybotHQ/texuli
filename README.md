@@ -42,7 +42,8 @@ the same pieces are safe to hand to a machine.
 > `0.9.0` (published by CI with provenance; `latest` and `next` point to
 > the newest), including the first release of `@texuli/mcp`. It is not a
 > stable release: under 0.x a new minor may contain breaking changes, and
-> 1.0.0 will be the first stable release.
+> 1.0.0 will be the first stable release. `0.10.0` is in development and
+> not on npm yet.
 > The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 
 </div>
@@ -194,9 +195,9 @@ every verified command.
 
 - **No stable release yet.** The 26 published packages are on npm in the
   0.9 line, a pre-1.0 release (`npm install texuli`; `latest` and `next` both
-  point to it). Under 0.x a new minor (`0.10.0`) may contain breaking
-  changes, so pin the exact version or use `^0.9.0`; 1.0.0 will be the
-  first stable release.
+  point to it). Under 0.x a new minor (`0.10.0`, in development) may
+  contain breaking changes, so pin the exact version or use `^0.9.0`; 1.0.0
+  will be the first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with
   `pnpm dev`.

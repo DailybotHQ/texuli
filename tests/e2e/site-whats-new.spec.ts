@@ -67,7 +67,7 @@ test('every feature by release, each demo working, links that resolve; axe light
   await page.goto(`${origin()}/whats-new/`);
   await settle(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('What’s new in Texuli');
-  await expect(page.locator('[data-hub-release]')).toHaveCount(4);
+  await expect(page.locator('[data-hub-release]')).toHaveCount(5);
   await expect(page.locator('[data-hub-feature]')).toHaveCount(18);
   await expect(page.locator('[data-hub-release="0.8.0"] .hub__status')).toContainText(
     'Published on npm as 0.8.0'
@@ -81,6 +81,11 @@ test('every feature by release, each demo working, links that resolve; axe light
     'Published on npm as 0.9.0, the current release'
   );
   await expect(page.locator('[data-hub-release="0.9.0"] [data-hub-feature]')).toHaveCount(5);
+  // 0.10.0 is on the hub in development (the release line in docs/RELEASE.md).
+  await expect(page.locator('[data-hub-release="0.10.0"] .hub__status')).toContainText(
+    'In development on the release/0.10.0 branch'
+  );
+  await expect(page.locator('[data-hub-release="0.10.0"] [data-hub-feature]')).toHaveCount(0);
 
   // Every card links to a page that exists.
   const hrefs = await page
