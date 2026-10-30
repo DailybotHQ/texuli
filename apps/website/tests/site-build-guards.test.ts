@@ -45,6 +45,7 @@ import {
   pageRoute,
   reportOnlyPolicy,
 } from '../src/components/security/csp.ts';
+import { apiCatalog as buildApiCatalog } from '../src/components/seo/agent-discovery.ts';
 import { breadcrumbJsonLd, breadcrumbTrail } from '../src/components/seo/breadcrumbs.ts';
 import { gitCommitDateUtc } from '../src/components/seo/integration.ts';
 import { serializeJsonLd } from '../src/components/seo/json-ld.ts';
@@ -314,16 +315,18 @@ describe('SEO helpers', () => {
     expect(xml).toContain('<lastmod>2026-10-25</lastmod>');
     expect(() => buildSitemap([{ loc: `${SITE}/x/`, lastmod: 'not-a-date' }])).toThrow();
 
-    // Every AI crawler is welcomed by name and nothing is disallowed; the
-    // Content-Signal header waits for the request-time rewrite (a static file
-    // cannot vary by user agent), so no directive line names it.
+    // Every AI crawler is welcomed by name and nothing is disallowed; every
+    // group carries the site's Content-Signal and the Agentmap names the ARD
+    // catalog (PLAN_011 T-ar-discovery; the directives are unit-tested in
+    // agent-discovery.test.ts).
     const robots = buildRobots(`${SITE}/sitemap.xml`);
-    expect(robots).toContain('User-agent: *\nAllow: /\n');
+    const signal = 'Content-Signal: ai-train=yes, search=yes, ai-input=yes';
+    expect(robots).toContain(`User-agent: *\nAllow: /\n${signal}\n`);
     expect(robots).toContain(`Sitemap: ${SITE}/sitemap.xml\n`);
+    expect(robots).toContain(`Agentmap: ${SITE}/.well-known/ai-catalog.json\n`);
     for (const crawler of AI_CRAWLERS)
-      expect(robots).toContain(`User-agent: ${crawler}\nAllow: /\n`);
+      expect(robots).toContain(`User-agent: ${crawler}\nAllow: /\n${signal}\n`);
     expect(robots).not.toContain('Disallow');
-    expect(robots).not.toMatch(/^Content-Signal:/m);
   });
 
   it('maps routes to social-art areas, reads page meta, wraps text and escapes hostile titles', () => {
@@ -414,7 +417,7 @@ describe('JSON-LD builders', () => {
   });
 });
 
-describe('agent discovery files (public/.well-known, public/llms.txt)', () => {
+describe('agent discovery files (public/.well-known, the generated API catalog, public/llms.txt)', () => {
   const read = (path: string) =>
     JSON.parse(
       readFileSync(fileURLToPath(new URL(`../public/.well-known/${path}`, import.meta.url)), 'utf8')
@@ -425,7 +428,10 @@ describe('agent discovery files (public/.well-known, public/llms.txt)', () => {
       host: { displayName: string; documentationUrl: string };
       entries: { identifier: string; url: string }[];
     };
-    const apiCatalog = read('api-catalog') as { linkset: { links: { href: string }[] }[] };
+    // The API catalog is generated at build (agent-discovery.ts), not committed.
+    const apiCatalog = buildApiCatalog({ origin: 'https://texuli.com', openapi: true }) as {
+      linkset: { links: { href: string }[] }[];
+    };
     const card = read('mcp/server-card.json') as {
       serverInfo: { name: string; version: string };
       protocolVersion: string;
@@ -440,6 +446,8 @@ describe('agent discovery files (public/.well-known, public/llms.txt)', () => {
     expect(aiCatalog.host.documentationUrl).toBe('https://texuli.com/guides/');
     const identifiers = aiCatalog.entries.map((entry) => entry.identifier);
     expect(identifiers.length).toBeGreaterThanOrEqual(6);
+    // The ARD lists the remote MCP endpoint (PLAN_011 T-ar-discovery).
+    expect(aiCatalog.entries.map((entry) => entry.url)).toContain('https://texuli.com/mcp');
     expect(new Set(identifiers).size).toBe(identifiers.length);
     for (const url of [
       ...aiCatalog.entries.map((entry) => entry.url),

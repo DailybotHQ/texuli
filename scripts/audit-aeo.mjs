@@ -20,8 +20,13 @@
  *              without a manifest entry, a robots policy that forbids).
  *   warning  — visible but by-design gaps (nav-curated llms.txt omitting an
  *              indexed utility route).
- *   planned  — open aeo.md target rows (Content-Signal/Agentmap live at the
- *              request edge, agent-reachability probes). Never fails.
+ *   planned  — open aeo.md target rows (agent-reachability probes against
+ *              the deployed origin). Never fails.
+ *
+ * PLAN_011 T-ar-discovery added the generated discovery documents (OAuth
+ * stubs, A2A card, Personal Agent Protocol manifest) to the parsed set, the
+ * Function routes (`/mcp`) that a catalog may advertise although dist does
+ * not hold them, and the robots `Content-Signal` and `Agentmap` checks.
  */
 
 import { createHash } from 'node:crypto';
@@ -40,7 +45,13 @@ export const AEO_CONFIG = {
     'api-catalog': 'json',
     'mcp/server-card.json': 'json',
     'agent-skills/index.json': 'json',
+    'oauth-authorization-server': 'json',
+    'oauth-protected-resource': 'json',
+    'agent-card.json': 'json',
+    'poppy.json': 'json',
   },
+  /** Paths answered by a Pages Function, not a dist file (the remote MCP). */
+  functionRoutes: ['/mcp', '/.well-known/mcp'],
   /** Off-site hosts an entry may point at (the npm package row). */
   offSiteHosts: ['www.npmjs.com', 'npmjs.com'],
   /** markdown twin families the manifest must cover (T-23/T-24). */
@@ -48,16 +59,6 @@ export const AEO_CONFIG = {
   /** The shipped robots policy names this many AI crawlers + the default. */
   robotsMinGroups: 17,
   planned: [
-    {
-      category: 'Robots',
-      detail:
-        'Content-Signal is per-user-agent and lives at the request edge (the middleware rewrite, T-28); the static policy intentionally omits it — aeo.md §4',
-    },
-    {
-      category: 'Robots',
-      detail:
-        'Agentmap → /.well-known/ai-catalog.json waits for the generator decision recorded in T-20; the manifest is already served and ARD-linked',
-    },
     {
       category: 'Reachability',
       detail:
@@ -187,7 +188,8 @@ export function collectAeo(distDir, config = AEO_CONFIG) {
 /** The whole audit. Pure: the collected surface in, findings out. */
 export function auditAeo(surface, config = AEO_CONFIG) {
   const findings = [];
-  const exists = surface.exists ?? ((path) => distPathExists(surface.distDir, path));
+  const servedFile = surface.exists ?? ((path) => distPathExists(surface.distDir, path));
+  const exists = (path) => (config.functionRoutes ?? []).includes(path) || servedFile(path);
 
   // §1 llms.txt surface.
   const llms = surface.llmsTxt;
@@ -397,6 +399,18 @@ export function auditAeo(surface, config = AEO_CONFIG) {
     if (/Disallow/i.test(robots))
       findings.push(
         finding('critical', 'Robots', '(dist)', 'a Disallow exists (the policy is allow-all)')
+      );
+    if (
+      !/^User-agent: \*\nAllow: \/\nContent-Signal: ai-train=\w+, search=\w+, ai-input=\w+$/m.test(
+        robots
+      )
+    )
+      findings.push(
+        finding('critical', 'Robots', '(dist)', 'the default group declares no Content-Signal')
+      );
+    if (!robots.split('\n').includes(`Agentmap: ${config.site}/.well-known/ai-catalog.json`))
+      findings.push(
+        finding('critical', 'Robots', '(dist)', 'no Agentmap line for the ARD catalog')
       );
     const groups = [...robots.matchAll(/^User-agent: /gm)].length;
     if (groups < config.robotsMinGroups)

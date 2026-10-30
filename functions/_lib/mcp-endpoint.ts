@@ -18,13 +18,19 @@
  * of the request besides the headers named above and the body.
  */
 import { isAgentRequest } from '../../apps/website/src/lib/agent-request.ts';
+import {
+  MCP_BATCH_MAX,
+  MCP_BODY_MAX,
+  MCP_RATE_LIMIT,
+} from '../../apps/website/src/lib/mcp-limits.ts';
 import { isJsonContentType, readBoundedBody } from './umami-proxy.ts';
 
-/** The largest request body the endpoint reads: 256 KB. */
-export const MCP_BODY_MAX = 256 * 1024;
-
-/** The most JSON-RPC messages one batch may carry. */
-export const MCP_BATCH_MAX = 10;
+/**
+ * The largest request body (256 KB) and batch (10 messages): defined with
+ * the rate limit in `apps/website/src/lib/mcp-limits.ts`, the one source
+ * the endpoint and `/auth.md` share.
+ */
+export { MCP_BATCH_MAX, MCP_BODY_MAX };
 
 /** The wall-clock guard around each message (operations may declare less). */
 export const MCP_CALL_TIMEOUT_MS = 5000;
@@ -45,11 +51,7 @@ export interface RatePolicy {
 }
 
 /** 60 messages per client per minute, with bursts up to 60 (per isolate). */
-export const MCP_RATE_POLICY: RatePolicy = Object.freeze({
-  name: 'mcp',
-  capacity: 60,
-  windowSeconds: 60,
-});
+export const MCP_RATE_POLICY: RatePolicy = MCP_RATE_LIMIT;
 
 export interface RateDecision {
   allowed: boolean;

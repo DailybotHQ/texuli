@@ -3,6 +3,7 @@
  * the build integration (social images, sitemap, robots) and the tests.
  * No DOM, no network: everything runs at build time on built files.
  */
+import { agentmapDirective, contentSignalDirective } from './agent-discovery.ts';
 
 export const OG_IMAGE_WIDTH = 1200;
 export const OG_IMAGE_HEIGHT = 630;
@@ -107,11 +108,17 @@ export const AI_CRAWLERS = [
 ] as const;
 
 /**
- * `robots.txt`: default allow, the sitemap, and explicit AI-crawler allows.
- * No `Content-Signal` yet: that is a per-user-agent response header, which a
- * static file cannot serve — it waits for the request-time rewrite.
+ * `robots.txt`: default allow, the sitemap, the ARD `Agentmap`, explicit
+ * AI-crawler allows, and the site's `Content-Signal` in every group (a
+ * crawler that matches a named group reads only that group, RFC 9309
+ * §2.2.1, so the signal sits in each one, never outside a group). The
+ * signals and the Agentmap come from `agent-discovery.ts`; this repository
+ * owns them, so Cloudflare's managed Content Signals stay off (site-aeo.md).
+ * Strict-parser audit tools get a copy without the two non-standard
+ * directives (`src/lib/robots-variants.ts`).
  */
 export function buildRobots(sitemapUrl: string): string {
+  const signal = contentSignalDirective();
   const lines = [
     '# robots.txt for Texuli',
     '# https://texuli.com',
@@ -119,14 +126,16 @@ export function buildRobots(sitemapUrl: string): string {
     '# Default: every crawler may crawl everything public.',
     'User-agent: *',
     'Allow: /',
+    signal,
     '',
     `Sitemap: ${sitemapUrl}`,
     '',
-    '# AI/LLM crawlers: explicitly welcome. Content-Signal needs per-agent',
-    '# responses (request-time middleware, planned); a static file cannot',
-    '# vary by user agent.',
+    '# Agentic resource discovery (ARD) catalog.',
+    agentmapDirective(new URL(sitemapUrl).origin),
+    '',
+    '# AI/LLM crawlers: explicitly welcome, with the same content signals.',
   ];
-  for (const crawler of AI_CRAWLERS) lines.push('', `User-agent: ${crawler}`, 'Allow: /');
+  for (const crawler of AI_CRAWLERS) lines.push('', `User-agent: ${crawler}`, 'Allow: /', signal);
   return `${lines.join('\n')}\n`;
 }
 
