@@ -4,17 +4,17 @@
 
 .tx-editor {
   display: grid;
-  gap: 0.5rem;
+  gap: var(--tx-space-2);
   color: var(--tx-foreground, CanvasText);
   font-family: var(--tx-font-sans, system-ui, sans-serif);
 }
 
 .tx-editor-surface {
   min-block-size: 8rem;
-  padding-block: 0.75rem;
-  padding-inline: 1rem;
-  border: var(--tx-border-width, 1px) solid var(--tx-input, var(--tx-border, ButtonBorder));
-  border-radius: var(--tx-radius, 0.5rem);
+  padding-block: var(--tx-space-3);
+  padding-inline: var(--tx-space-4);
+  border: var(--tx-border-width-thin) solid var(--tx-input, var(--tx-border, ButtonBorder));
+  border-radius: var(--tx-shape-radius-lg);
   background: var(--tx-surface, Canvas);
   color: inherit;
   line-height: 1.6;
@@ -48,7 +48,7 @@
 }
 
 .tx-editor-block {
-  margin-block: 0 0.5rem;
+  margin-block: 0 var(--tx-space-2);
   margin-inline: 0;
   /* Typed spaces stay visible; only text blocks keep white space. */
   white-space: pre-wrap;
@@ -57,7 +57,7 @@
 .tx-editor-heading {
   line-height: 1.25;
   font-weight: 650;
-  margin-block: 0.75rem 0.5rem;
+  margin-block: var(--tx-space-3) var(--tx-space-2);
 }
 
 h1.tx-editor-heading {
@@ -77,9 +77,9 @@ h4.tx-editor-heading {
 }
 
 .tx-editor-pre {
-  padding-block: 0.5rem;
-  padding-inline: 0.75rem;
-  border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+  padding-block: var(--tx-space-2);
+  padding-inline: var(--tx-space-3);
+  border-radius: calc(var(--tx-shape-radius-lg) * 0.75);
   background: var(--tx-muted, color-mix(in oklab, CanvasText 6%, Canvas));
   font-family: var(--tx-font-mono, ui-monospace, monospace);
   font-size: 0.9em;
@@ -89,7 +89,7 @@ h4.tx-editor-heading {
 
 .tx-editor-code {
   padding-inline: 0.25em;
-  border-radius: 0.25rem;
+  border-radius: var(--tx-shape-radius-sm);
   background: var(--tx-muted, color-mix(in oklab, CanvasText 6%, Canvas));
   font-family: var(--tx-font-mono, ui-monospace, monospace);
   font-size: 0.9em;
@@ -107,41 +107,41 @@ h4.tx-editor-heading {
 
 .tx-editor-extension {
   padding-inline: 0.15em;
-  border-radius: 0.25rem;
+  border-radius: var(--tx-shape-radius-sm);
   background: var(--tx-accent, color-mix(in oklab, CanvasText 8%, Canvas));
   color: var(--tx-accent-foreground, inherit);
 }
 
 .tx-editor-quote {
-  margin-block: 0 0.5rem;
+  margin-block: 0 var(--tx-space-2);
   margin-inline: 0;
-  padding-inline-start: 0.875rem;
+  padding-inline-start: calc(var(--tx-space-unit) * 3.5);
   border-inline-start: 3px solid var(--tx-border, GrayText);
   color: var(--tx-muted-foreground, inherit);
 }
 
 .tx-editor-list {
-  margin-block: 0 0.5rem;
-  padding-inline-start: 1.5rem;
+  margin-block: 0 var(--tx-space-2);
+  padding-inline-start: var(--tx-space-6);
 }
 
 .tx-editor-list[data-kind="todo"] {
   list-style: none;
-  padding-inline-start: 0.25rem;
+  padding-inline-start: var(--tx-space-1);
 }
 
 .tx-editor-item {
-  margin-block: 0.125rem;
+  margin-block: calc(var(--tx-space-unit) * 0.5);
 }
 
 .tx-editor-item > .tx-editor-item-body > .tx-editor-block {
-  margin-block-end: 0.125rem;
+  margin-block-end: calc(var(--tx-space-unit) * 0.5);
 }
 
 .tx-editor-list[data-kind="todo"] > .tx-editor-item {
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
+  gap: var(--tx-space-2);
 }
 
 .tx-editor-item-body {
@@ -172,23 +172,23 @@ h4.tx-editor-heading {
 }
 
 .tx-editor-void {
-  border-radius: 0.25rem;
+  border-radius: var(--tx-shape-radius-sm);
   user-select: none;
 }
 
 .tx-editor-divider {
-  margin-block: 0.75rem;
+  margin-block: var(--tx-space-3);
   border: 0;
-  border-block-start: 1px solid var(--tx-border, GrayText);
+  border-block-start: var(--tx-border-width-thin) solid var(--tx-border, GrayText);
 }
 
 .tx-editor-selected {
-  outline: 2px solid var(--tx-ring, Highlight);
+  outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
   outline-offset: 2px;
 }
 
 .tx-editor-media {
-  margin-block: 0 0.5rem;
+  margin-block: 0 var(--tx-space-2);
   margin-inline: 0;
 }
 
@@ -196,15 +196,15 @@ h4.tx-editor-heading {
   display: block;
   max-inline-size: 100%;
   block-size: auto;
-  border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+  border-radius: calc(var(--tx-shape-radius-lg) * 0.75);
 }
 
 .tx-editor-media-fallback {
   display: inline-block;
-  padding-block: 0.5rem;
-  padding-inline: 0.75rem;
-  border: 1px dashed var(--tx-border, GrayText);
-  border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+  padding-block: var(--tx-space-2);
+  padding-inline: var(--tx-space-3);
+  border: var(--tx-border-width-thin) dashed var(--tx-border, GrayText);
+  border-radius: calc(var(--tx-shape-radius-lg) * 0.75);
   color: var(--tx-muted-foreground, GrayText);
 }
 
@@ -244,34 +244,34 @@ h4.tx-editor-heading {
 /* Link dialog */
 .tx-editor-link-form {
   display: grid;
-  gap: 0.5rem;
+  gap: var(--tx-space-2);
 }
 
 .tx-editor-link-dialog {
-  padding: 0.75rem;
-  border: var(--tx-border-width, 1px) solid var(--tx-border, ButtonBorder);
-  border-radius: var(--tx-radius, 0.5rem);
+  padding: var(--tx-space-3);
+  border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+  border-radius: var(--tx-shape-radius-lg);
   background: var(--tx-surface, Canvas);
-  box-shadow: var(--tx-shadow-soft, none);
+  box-shadow: var(--tx-elevation-1);
 }
 
 .tx-editor-link-title {
   margin: 0;
-  font-size: var(--tx-font-size-sm, 0.875rem);
+  font-size: var(--tx-type-label-size);
   font-weight: 600;
 }
 
 .tx-editor-link-field {
   display: grid;
-  gap: 0.25rem;
-  font-size: var(--tx-font-size-sm, 0.875rem);
+  gap: var(--tx-space-1);
+  font-size: var(--tx-type-label-size);
 }
 
 .tx-editor-link-input {
   min-block-size: 2.25rem;
-  padding-inline: 0.625rem;
-  border: var(--tx-border-width, 1px) solid var(--tx-input, var(--tx-border, ButtonBorder));
-  border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+  padding-inline: calc(var(--tx-space-unit) * 2.5);
+  border: var(--tx-border-width-thin) solid var(--tx-input, var(--tx-border, ButtonBorder));
+  border-radius: calc(var(--tx-shape-radius-lg) * 0.75);
   background: var(--tx-surface, Field);
   color: inherit;
   font: inherit;
@@ -290,20 +290,20 @@ h4.tx-editor-heading {
 .tx-editor-link-error {
   margin: 0;
   color: var(--tx-destructive, Mark);
-  font-size: var(--tx-font-size-sm, 0.875rem);
+  font-size: var(--tx-type-label-size);
 }
 
 .tx-editor-link-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--tx-space-2);
 }
 
 .tx-editor-link-button {
   min-block-size: 2.25rem;
-  padding-inline: 0.875rem;
-  border: var(--tx-border-width, 1px) solid var(--tx-border, ButtonBorder);
-  border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+  padding-inline: calc(var(--tx-space-unit) * 3.5);
+  border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+  border-radius: calc(var(--tx-shape-radius-lg) * 0.75);
   background: transparent;
   color: inherit;
   font: inherit;
