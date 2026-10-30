@@ -37,7 +37,7 @@ URL — T-12: no existing route moves) and links `/native/`.
 3. `#portability` — `PortabilityDeepDive` (`portability-content.ts`): what
    moving an interface between runtimes takes
 4. `#what-exists-today` — the release truth (25 packages on npm as
-   `0.8.0`, a pre-1.0 release, nothing on Maven Central, the Compose
+   `0.8.0` (`@texuli/slides` as `0.8.1`, a layout fix), a pre-1.0 release, nothing on Maven Central, the Compose
    renderer consumed from source) and `ParityTable` (`parity-data.ts`),
    one evidence cell per row
 
