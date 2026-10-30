@@ -1,5 +1,6 @@
 <script lang="ts" generics="D">
-import type { Snippet } from 'svelte';
+import { getContext, type Snippet } from 'svelte';
+import type { MotionSettings } from 'texuli/motion';
 import type { Rect } from '../math/types.ts';
 import {
   type ActivePoint,
@@ -110,7 +111,21 @@ function focusExplorer(): void {
   explorerEl?.focus();
 }
 
-const reduceMotion = $derived(prefersReducedMotion());
+/*
+ * Reduced motion follows the enclosing texuli/motion MotionProvider (ADR-013):
+ * `reducedMotion: true` forces it, `false` ignores the reader's preference,
+ * and no override (or no provider) reads `prefers-reduced-motion` (G98). The
+ * settings are read by their shared context key, so the motion module itself
+ * never loads with a chart. Its getters stay live, so a host toggle applies.
+ */
+const motionSettings = getContext<MotionSettings | undefined>(Symbol.for('texuli.motion'));
+const reduceMotion = $derived(
+  motionSettings?.reducedMotion === true
+    ? true
+    : motionSettings?.reducedMotion === false
+      ? false
+      : prefersReducedMotion()
+);
 
 // For horizontal layouts, look points up along y by swapping the axes once per data change.
 const lookup = $derived(

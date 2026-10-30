@@ -11,6 +11,15 @@ visibility changes do not animate, so they honor reduced-motion preferences;
 wheel zoom skips when the user prefers reduced motion and the live region stays
 polite.
 
+**Reduced motion.** `InteractivePlot` reads the enclosing `texuli/motion`
+`MotionProvider` (the same settings the styled components read, ADR-013):
+`reducedMotion={true}` forces reduced motion, `reducedMotion={false}` ignores
+the reader's preference, and no override (or no provider) follows the OS
+`prefers-reduced-motion`. The result is the plot's `data-reduced-motion="true"`
+attribute, and a host toggle on the provider updates a mounted plot. The
+settings are read by their shared context key, so the motion module never
+loads with a chart.
+
 ## Exports
 
 | Export | Role |
