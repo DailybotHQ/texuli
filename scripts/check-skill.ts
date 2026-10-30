@@ -7,8 +7,11 @@
  * 3. Relative Markdown links stay inside the pack
  * 4. Every fenced command is real and offline (root scripts, workspace package
  *    scripts, local binaries, repository paths, setup.sh flags), every
- *    `texuli …` command exists in the CLI usage, JSON snippets parse and
- *    Texuli imports in TS/Svelte snippets name real package exports
+ *    `texuli …` command parses with the generated router
+ *    (`packages/tools/src/cli/router.ts`), every MCP operation the skill
+ *    cites (`catalog.search`, or `catalog.search { "query": "card" }`) is in
+ *    the operations registry with real argument keys, JSON snippets parse
+ *    and Texuli imports in TS/Svelte snippets name real package exports
  * 5. SHA256SUMS matches every file (or `--write-sums` regenerates it)
  * 6. Every SKILL.md carries the router's version, the name and description
  *    stay within the Agent Skills limits, every SKILL.md and entry bundle
@@ -40,6 +43,12 @@ import {
 } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  parseRouterArgs,
+  routerCommandNames,
+  routerOperations,
+} from '../packages/tools/src/cli/router.ts';
+import { texuliOps } from '../packages/tools/src/ops/index.ts';
 
 const SEMVER =
   /^\d+\.\d+\.\d+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
@@ -526,24 +535,24 @@ export function codeBlocks(markdown: string): CodeBlock[] {
   return blocks;
 }
 
-/** Commands a Texuli CLI declares in its usage text (`init`, `theme preview`, …). */
-export function cliCommands(repoRoot: string): Set<string> {
-  const commands = new Set<string>();
-  const cliRoot = join(repoRoot, 'packages', 'tools', 'src');
-  if (!existsSync(cliRoot)) return commands;
-  for (const entry of readdirSync(cliRoot)) {
-    const cli = join(cliRoot, entry, 'cli.ts');
-    if (!existsSync(cli)) continue;
-    for (const match of readFileSync(cli, 'utf8').matchAll(
-      /\btexuli ([a-z][a-z-]*)(?: ([a-z][a-z-]*))?/g
-    )) {
-      const command = match[1] as string;
-      commands.add(command);
-      if (match[2]) commands.add(`${command} ${match[2]}`);
-    }
-  }
-  return commands;
+/**
+ * Commands the `texuli` router accepts (`catalog search`, `deck lint`,
+ * `init`, `theme preview` …), generated from the operations registry plus
+ * the commands kept from 0.8. `repoRoot` is kept for callers; the router is
+ * this repository's.
+ */
+export function cliCommands(_repoRoot?: string): Set<string> {
+  return routerCommandNames();
 }
+
+/** Problems with the arguments after `texuli` (empty when the router accepts them). */
+export function checkRouterArgs(args: readonly string[]): string[] {
+  const parsed = parseRouterArgs(args);
+  return parsed.kind === 'error' ? [`texuli ${args.join(' ')}: ${parsed.message}`] : [];
+}
+
+/** The entry points that run the `texuli` router from a checkout. */
+const ROUTER_SOURCES = new Set(['packages/tools/src/cli/texuli.ts']);
 
 /** True when a command or path is a documented placeholder (`<id>`, `…`). */
 function isPlaceholder(word: string): boolean {
@@ -689,7 +698,11 @@ export function checkCommand(line: string, ctx: CommandContext): string[] {
     case 'pnpm': {
       if (second === 'dlx') return ['pnpm dlx downloads packages; the skill must work offline'];
       if (second === 'exec') {
-        if (third === 'tsx') return pathsExist(ctx, rest.slice(0, 1));
+        if (third === 'tsx') {
+          const missing = pathsExist(ctx, rest.slice(0, 1));
+          if (missing.length > 0) return missing;
+          return rest[0] && ROUTER_SOURCES.has(rest[0]) ? checkRouterArgs(rest.slice(1)) : [];
+        }
         if (!third || !ctx.bins.has(third))
           return [`pnpm exec ${third ?? ''}: no such local binary`];
         return third === 'playwright' || third === 'vitest' ? pathsExist(ctx, rest) : [];
@@ -712,7 +725,9 @@ export function checkCommand(line: string, ctx: CommandContext): string[] {
     case 'npx':
       // `npx -y @texuli/mcp`: the package's own bin, as MCP hosts document it.
       if ((second === '-y' || second === '--yes') && third && ctx.binPackages?.has(third))
-        return [];
+        return third === '@texuli/mcp' ? checkRouterArgs(['mcp', ...rest]) : [];
+      // `npx texuli …` runs the router bin of an installed @texuli/tools.
+      if (second === 'texuli') return checkRouterArgs(words.slice(2));
       return second && ctx.bins.has(second)
         ? pathsExist(
             ctx,
@@ -732,12 +747,8 @@ export function checkCommand(line: string, ctx: CommandContext): string[] {
       return second && LOCAL_GIT.has(second)
         ? []
         : [`git ${second ?? ''}: not an allowed local command`];
-    case 'texuli': {
-      const sub = [second, third].filter(Boolean).join(' ');
-      return ctx.cli.has(sub) || (second && ctx.cli.has(second))
-        ? []
-        : [`texuli ${sub}: not a Texuli CLI command`];
-    }
+    case 'texuli':
+      return checkRouterArgs(words.slice(1));
     case 'cd':
     case 'echo':
     case 'ls':
@@ -771,6 +782,70 @@ export function checkCliReferences(
         message: `\`texuli ${sub}\` is not a Texuli CLI command`,
       });
     }
+  }
+  return problems;
+}
+
+/**
+ * Verbs that make `group.verb` read as an operation (the registry's own
+ * verbs plus the actions an agent would guess), so `theme.light` (a
+ * property) and `example.com` (a host) are not taken for one.
+ */
+function operationVerbs(): Set<string> {
+  return new Set([
+    ...routerOperations().map((entry) => entry.verb),
+    ...['apply', 'check', 'compile', 'convert', 'create', 'delete', 'export', 'find', 'generate'],
+    ...['get', 'import', 'inspect', 'lint', 'list', 'load', 'preview', 'read', 'render', 'run'],
+    ...['save', 'search', 'update', 'validate', 'write'],
+  ]);
+}
+
+/**
+ * MCP operations cited in prose (inline code outside fences) must exist:
+ * `group.verb` for a registry group and an action verb is an operation name, and
+ * `group.verb { … }` is a call whose JSON keys must be input arguments of
+ * the operation (required ones included). Returns problems with line numbers.
+ */
+export function checkOperationReferences(markdown: string): { line: number; message: string }[] {
+  const problems: { line: number; message: string }[] = [];
+  const groups = new Set(routerOperations().map((entry) => entry.group));
+  const verbs = operationVerbs();
+  const outside = markdown.replace(/^\s*```[^\n]*\n[\s\S]*?^\s*```[^\n]*$/gm, (block) =>
+    block.replace(/[^\n]/g, ' ')
+  );
+  const lineOf = (index: number) => outside.slice(0, index).split('\n').length;
+  for (const match of outside.matchAll(/`([a-z][a-z-]*)\.([a-z][a-z-]*)(?:\s+(\{[^`]*\}))?`/g)) {
+    const [, group, verb, args] = match as unknown as [string, string, string, string | undefined];
+    if (!groups.has(group) || !verbs.has(verb)) continue;
+    const name = `${group}.${verb}`;
+    const line = lineOf(match.index ?? 0);
+    const operation = texuliOps.get(name);
+    if (!operation) {
+      problems.push({ line, message: `\`${name}\` is not a Texuli operation` });
+      continue;
+    }
+    if (args === undefined) continue;
+    let input: unknown;
+    try {
+      input = JSON.parse(args);
+    } catch {
+      problems.push({ line, message: `${name} arguments are not JSON: ${args}` });
+      continue;
+    }
+    if (typeof input !== 'object' || input === null || Array.isArray(input)) {
+      problems.push({ line, message: `${name} arguments must be a JSON object` });
+      continue;
+    }
+    const properties = Object.keys((operation.input.properties ?? {}) as object);
+    for (const key of Object.keys(input))
+      if (!properties.includes(key))
+        problems.push({
+          line,
+          message: `${name} has no argument "${key}" (arguments: ${properties.join(', ')})`,
+        });
+    for (const key of (operation.input.required as string[] | undefined) ?? [])
+      if (!Object.hasOwn(input, key))
+        problems.push({ line, message: `${name} needs the argument "${key}"` });
   }
   return problems;
 }
@@ -830,6 +905,9 @@ export function validateSkillCommands(skillRoot: string, repoRoot: string): Skil
     const file = relative(skillRoot, path).split(sep).join('/');
     for (const { line, message } of checkCliReferences(markdown, ctx)) {
       issues.push(issue(file, `cli:${line}`, message));
+    }
+    for (const { line, message } of checkOperationReferences(markdown)) {
+      issues.push(issue(file, `mcp:${line}`, message));
     }
     for (const block of codeBlocks(markdown)) {
       if (['bash', 'sh', 'shell', 'console'].includes(block.lang)) {
