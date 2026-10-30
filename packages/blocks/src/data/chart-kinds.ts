@@ -252,6 +252,8 @@ const cartesianExtras: Fields = {
   interactive: 'bool',
   fullDomain: 'pair',
   visibleDomain: 'pair',
+  xKind: { e: ['linear', 'category', 'time'] },
+  locale: 'text',
 };
 const matrixExtras: Fields = { annotations: annotationsOf('textnum'), interactive: 'bool', ...box };
 const scatterExtras: Fields = {

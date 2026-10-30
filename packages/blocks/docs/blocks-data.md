@@ -71,7 +71,7 @@ family's blueprint extras, validated by the same spec (`INLINE_CHART_PROPS`):
 
 | Kinds | `props` |
 | --- | --- |
-| `line`, `area`, `bar`, `stacked-bar`, `combo` | `annotations`, `renderer` (`svg`, `canvas`, `auto`), `interactive`, `fullDomain` (two numbers) |
+| `line`, `area`, `bar`, `stacked-bar`, `combo` | `annotations`, `renderer` (`svg`, `canvas`, `auto`), `interactive`, `fullDomain` and `visibleDomain` (two numbers), `xKind` (`linear`, `category`, `time`: x in epoch milliseconds shown as dates), `locale` (a language tag) |
 | `heatmap` | `annotations`, `interactive`, `width`, `height` |
 | `scatter`, `bubble` | the heatmap extras plus `series` (≤ 8 `{ id, label, color }` labels) |
 

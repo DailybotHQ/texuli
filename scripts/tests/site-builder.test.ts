@@ -455,7 +455,8 @@ describe('inspector: choice', () => {
         // PLAN_008 T-catalog-player: the v2 deck root adds its transition and motion enums.
         // PLAN_009: the cohort table, notification inbox and filter builder add 8 (5 booleans).
         // PLAN_010 (spec 0.8.0): the dashboard adds density, gap, editable and compaction (1 boolean).
-        expect(CHOICE_PROPS.length).toBe(69);
+        // PLAN_011 T-gaps-96-98 (G97): the six cartesian chart ids add their xKind enum.
+        expect(CHOICE_PROPS.length).toBe(75);
         expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(17);
         const ids = new Set(CHOICE_PROPS.map((entry) => `${entry.id}.${entry.prop.name}`));
         for (const name of [
