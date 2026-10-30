@@ -155,7 +155,7 @@ export const PARITY_ROWS: readonly ParityRow[] = [
     capability: 'Distribution',
     web: {
       status: 'exists',
-      detail: 'All 25 packages are on npm as 0.8.0 (@texuli/slides as 0.8.1), a pre-1.0 release.',
+      detail: 'All 25 packages are on npm in the 0.8 line (see docs/RELEASE.md), pre-1.0.',
       surface: 'packages/texuli/package.json',
     },
     native: {

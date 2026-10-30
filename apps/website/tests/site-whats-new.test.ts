@@ -72,13 +72,14 @@ describe('whats-new hub', () => {
     expect(byId['0.7.0']?.status).toContain('Published on npm as 0.7.0');
     expect(byId['0.8.0']?.published).toBe(true);
     expect(byId['0.8.0']?.status).toContain('Published on npm as 0.8.0, the current release');
-    // 0.8.0 is what npm has (the published packages' versions), the three
-    // packages it publishes for the first time included.
+    // The published packages are on the 0.8 line (0.8.0, or a 0.8.x patch
+    // release such as @texuli/sheets 0.8.1), the three packages 0.8.0
+    // publishes for the first time included.
     for (const name of ['forms', 'canvas', 'sheets', 'document']) {
       const pkg = JSON.parse(readFileSync(resolve(`packages/${name}/package.json`), 'utf8')) as {
         version: string;
       };
-      expect(pkg.version, name).toBe('0.8.0');
+      expect(pkg.version, name).toMatch(/^0\.8\.\d+$/);
     }
     for (const release of RELEASES)
       expect(`${release.title} ${release.status} ${release.summary}`).not.toMatch(

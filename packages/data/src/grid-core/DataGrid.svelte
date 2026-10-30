@@ -2,7 +2,7 @@
 import type { Snippet } from 'svelte';
 import { tick, untrack } from 'svelte';
 import { type ClassValue, cx } from 'texuli/cx';
-import { createListMotion, type MotionProp } from 'texuli/motion';
+import type { MotionProp } from 'texuli/motion';
 import {
   Table,
   TableBody,
@@ -20,6 +20,7 @@ import {
   toggleRow,
 } from '../engines/grid/selection.ts';
 import type { GridSort } from '../engines/grid/sort.ts';
+import { createLazyListMotion } from '../motion/lazy-list-motion.ts';
 import { type DataGridLabels, resolveDataGridLabels } from './labels.ts';
 import {
   ariaSort,
@@ -226,7 +227,7 @@ let anchor: string | null = null;
 let root: HTMLDivElement | undefined = $state();
 
 // Layout motion: measure the rows before the shown order changes, play after.
-const rowMotion = createListMotion({
+const rowMotion = createLazyListMotion({
   motion: () => motion,
   defaults: { layout: true, duration: 'base' },
   items: () =>

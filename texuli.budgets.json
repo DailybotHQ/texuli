@@ -289,20 +289,20 @@
       "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 5,557 B."
     },
     "@texuli/data": {
-      "gzip": 88256,
-      "note": "Root barrel aggregate of every data view (13 views at plan end); first-load cost is per view subpath. Raised from 48 KiB at 60,860 B with 11 views (lead decision 2026-10-23). PLAN_010 T-motion-adopt (ADR-013): 81920 -> 88256 B, measured + 4% rounded up to 64 B after Board and DataGrid layout motion (texuli/motion createListMotion, data-tx-row-id); the barrel also carries T-gaps-48-52 and T-gaps-53-69 grid work in this checkout (82,680 B at HEAD, already over 81,920 B); measured 84,861 B (82,680 B at HEAD)."
+      "gzip": 87680,
+      "note": "Root barrel aggregate of every data view (13 views at plan end); first-load cost is per view subpath. Raised from 48 KiB at 60,860 B with 11 views (lead decision 2026-10-23). PLAN_010 T-motion-adopt (ADR-013): 81920 -> 88256 B, measured + 4% rounded up to 64 B after Board and DataGrid layout motion (texuli/motion createListMotion, data-tx-row-id); the barrel also carries T-gaps-48-52 and T-gaps-53-69 grid work in this checkout (82,680 B at HEAD, already over 81,920 B); measured 84,861 B (82,680 B at HEAD). G86 (Protoyard): list motion loads lazily (2026-10-30): 88256 -> 87680 B, measured + 4% rounded up to 64 B; measured 84,261 B (84,899 B before); the Board, DataGrid and Dashboard take list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change (never with motion={false}, level none or reduced motion)."
     },
     "@texuli/data/*": {
       "gzip": 12288,
       "note": "Default per-view cap (lead decision 2026-10-23): a data view ships its framework-free engine (sort, collation, filter compiler, validation) with its component; measured grid-core 10,342 B."
     },
     "@texuli/data/grid-core": {
-      "gzip": 14016,
-      "note": "PLAN_010 T-gaps-53-69 (G55): pointer row activation, the static table mode, breakpoint column hiding and the query-aware empty snippet, over the shared checkout where T-gaps-48-52 also changed the grid filter engine it bundles; measured 13,416 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B."
+      "gzip": 13632,
+      "note": "PLAN_010 T-gaps-53-69 (G55): pointer row activation, the static table mode, breakpoint column hiding and the query-aware empty snippet, over the shared checkout where T-gaps-48-52 also changed the grid filter engine it bundles; measured 13,416 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B. G86 (Protoyard): list motion loads lazily (2026-10-30): 14016 -> 13632 B, measured + 4% rounded up to 64 B; measured 13,082 B (13,416 B before); the view takes list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change, so the seams, the contract and the provider context leave its initial graph (never loaded with motion={false}, level none or reduced motion)."
     },
     "@texuli/data/board": {
-      "gzip": 13376,
-      "note": "PLAN_010 T-gaps-53-69 (G67, G69): column descriptions, the columnHeader snippet and column-only mode (no getRank); measured 12,833 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B."
+      "gzip": 12864,
+      "note": "PLAN_010 T-gaps-53-69 (G67, G69): column descriptions, the columnHeader snippet and column-only mode (no getRank); measured 12,833 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B. G86 (Protoyard): list motion loads lazily (2026-10-30): 13376 -> 12864 B, measured + 4% rounded up to 64 B; measured 12,339 B (12,833 B before); the view takes list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change, so the seams, the contract and the provider context leave its initial graph (never loaded with motion={false}, level none or reduced motion)."
     },
     "@texuli/data/dashboard": {
       "gzip": 11584,
@@ -325,8 +325,8 @@
       "note": "PLAN_009 (2026-10-28, owner-consented release plan): default 12288 -> 13184 B, measured + 4% after the styled Avatar it renders filters srcset candidates through the URL policy and composes handlers (G10, G26); measured 12,664 B."
     },
     "@texuli/data/grid-editing": {
-      "gzip": 18944,
-      "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 15,360 B to measured 15,808 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 16448 -> 17280 B, measured + 4% after DataGrid paging, rowClass and toolbar/filters/bulkActions snippets (G7); measured 16,601 B. PLAN_010 T-motion-adopt (ADR-013): 17280 -> 18944 B, measured + 4% rounded up to 64 B after DataGrid row layout motion (texuli/motion createListMotion) together with the T-gaps-53-69 DataGrid changes it bundles; measured 18,188 B (16,663 B at HEAD)."
+      "gzip": 18624,
+      "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 15,360 B to measured 15,808 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 16448 -> 17280 B, measured + 4% after DataGrid paging, rowClass and toolbar/filters/bulkActions snippets (G7); measured 16,601 B. PLAN_010 T-motion-adopt (ADR-013): 17280 -> 18944 B, measured + 4% rounded up to 64 B after DataGrid row layout motion (texuli/motion createListMotion) together with the T-gaps-53-69 DataGrid changes it bundles; measured 18,188 B (16,663 B at HEAD). G86 (Protoyard): list motion loads lazily (2026-10-30): 18944 -> 18624 B, measured + 4% rounded up to 64 B; measured 17,889 B (18,224 B before); the DataGrid it bundles takes list motion through a small local shim that loads texuli/motion with import() only once a mounted grid could animate a change (never with motion={false}, level none or reduced motion)."
     },
     "@texuli/data/timeline": {
       "gzip": 11520,

@@ -54,8 +54,9 @@ describe('dashboards page: copy and safety', () => {
     const data = JSON.parse(readFileSync(resolve('packages/data/package.json'), 'utf8')) as {
       version: string;
     };
-    // The subpath ships with @texuli/data from 0.8.0; the copy names that release.
-    expect(data.version).toBe(DASHBOARDS_RELEASE);
+    // The subpath ships with @texuli/data from 0.8.0 (the copy names that
+    // release); the package itself is on the 0.8 line (0.8.1 with G86).
+    expect(data.version).toMatch(/^0\.8\.\d+$/);
     expect(DASHBOARDS_STATUS).toBe(
       'New in 0.8.0: on npm in @texuli/data from 0.8.0, a pre-1.0 release.'
     );

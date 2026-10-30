@@ -61,8 +61,9 @@ describe('sheets page: copy and safety', () => {
       version: string;
       private?: boolean;
     };
-    // First published in 0.8.0; the copy names that release.
-    expect(pkg.version).toBe(SHEETS_RELEASE);
+    // First published in 0.8.0 (the copy names that release); the package
+    // itself is on the 0.8 line (0.8.1, a G86 exact-pin patch release).
+    expect(pkg.version).toMatch(/^0\.8\.\d+$/);
     expect(pkg.private).toBe(true);
     expect(SHEETS_RELEASE).toBe('0.8.0');
     expect(SHEETS_STATUS).toBe('In development, on npm from 0.8.0, a pre-1.0 release.');

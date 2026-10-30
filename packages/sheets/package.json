@@ -1,6 +1,6 @@
 {
   "name": "@texuli/sheets",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "private": true,
   "description": "Spreadsheets for Texuli: an owned formula engine (a linear-time parser, a closed function set, a dependency graph with incremental recalculation and bounded evaluation), a framework-free workbook model, CSV import and export that neutralizes formula injection, and an accessible Svelte 5 sheet view over the data grid.",
   "keywords": [
@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@texuli/core": "0.8.0",
-    "@texuli/data": "0.8.0",
+    "@texuli/data": "0.8.1",
     "@texuli/date": "0.8.0",
     "texuli": "0.8.0"
   },

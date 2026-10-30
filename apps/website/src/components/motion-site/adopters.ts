@@ -161,6 +161,13 @@ export const MOTION_ADOPTERS: readonly MotionAdopter[] = [
     live: '#layout',
   },
   {
+    file: 'packages/data/src/motion/lazy-list-motion.ts',
+    component: 'Board, DataGrid and Dashboard list motion',
+    pkg: '@texuli/data',
+    motion: 'Loads texuli/motion list motion only once a change can animate',
+    live: '#layout',
+  },
+  {
     file: 'packages/forms/src/view/SchemaForm.svelte',
     component: 'SchemaForm',
     pkg: '@texuli/forms',

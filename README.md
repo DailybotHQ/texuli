@@ -38,8 +38,8 @@ the same pieces are safe to hand to a machine.
 
 > **Status: in development, pre-1.0.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 25
-> published packages are released on npm as `0.8.0` (`@texuli/slides` as `0.8.1`, a layout fix) (published by CI with
-> provenance; `latest` and `next` both point to it), including the first
+> published packages are released on npm in the 0.8 line: 16 at `0.8.0`, plus patch releases (`@texuli/slides` `0.8.2`; `0.8.1` for `@texuli/data`, `@texuli/blocks`, `@texuli/catalog`, `@texuli/pages`, `@texuli/player`, `@texuli/sheets`, `@texuli/tools` and `@texuli/astro`) (published by CI with
+> provenance; `latest` and `next` point to the newest), including the first
 > release of `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets`. It is not a stable
 > release: under 0.x a new minor may contain breaking changes, and 1.0.0 will
 > be the first stable release. The workspace packages stay `private: true`

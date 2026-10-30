@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { MotionLevel } from 'texuli/motion';
+import type { MotionLevel, MotionProp } from 'texuli/motion';
 import { MotionProvider } from 'texuli/motion';
 import { Board } from '../../src/board/index.ts';
 import { DataGrid, type DataGridColumn } from '../../src/grid-core/index.ts';
@@ -17,12 +17,14 @@ let {
   sortDir = 'asc',
   level = 'full',
   reducedMotion,
+  motion,
 }: {
   kind: 'grid' | 'board';
   tasks?: Task[];
   sortDir?: 'asc' | 'desc';
   level?: MotionLevel;
   reducedMotion?: boolean;
+  motion?: MotionProp;
 } = $props();
 
 const columns = [
@@ -40,6 +42,7 @@ const gridColumns: DataGridColumn<Task>[] = [{ key: 'title', header: 'Title', ty
       getRowId={(task) => task.id}
       caption="Tasks"
       sort={[{ key: 'title', direction: sortDir }]}
+      {motion}
     />
   {:else}
     <Board
@@ -50,6 +53,7 @@ const gridColumns: DataGridColumn<Task>[] = [{ key: 'title', header: 'Title', ty
       getRank={(task) => task.rank}
       getLabel={(task) => task.title}
       onMove={() => {}}
+      {motion}
     >
       {#snippet card(task)}<span>{task.title}</span>{/snippet}
     </Board>

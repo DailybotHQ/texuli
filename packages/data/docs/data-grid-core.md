@@ -120,5 +120,7 @@ a filter, a row added or removed) they glide to their new place (FLIP through
 `texuli/motion` on `@texuli/core/motion`,
 [ui-motion](../../texuli/docs/ui-motion.md)). Rows carry `data-tx-row-id`
 for it. Nothing plays on the first render; reduced motion, a
-`MotionProvider` level of `none` and `motion={false}` commit at once.
+`MotionProvider` level of `none` and `motion={false}` commit at once. `texuli/motion` loads with `import()` only
+once a mounted grid could animate a change (G86), so it never loads under
+reduced motion, level `none` or `motion={false}`.
 Tests: `packages/data/tests/motion.test.ts`.

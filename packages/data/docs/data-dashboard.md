@@ -39,7 +39,8 @@ A grid of widgets people arrange themselves:
 - **Motion (ADR-013):** widgets glide to their new cell after a change
   through `texuli/motion` (FLIP on the Web Animations API); nothing plays on
   mount or hydration, and under reduced motion or motion level `none` the
-  change commits at once.
+  change commits at once. `texuli/motion` loads with `import()` only once
+  a mounted dashboard could animate a change (G86).
 - **Server rendering:** widgets register while the dashboard renders, so
   server HTML already holds every widget in reading order.
 
