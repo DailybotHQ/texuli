@@ -23,7 +23,7 @@ end to end and native for agents:
   twin in `native/`.
 
 **Status: in development, pre-1.0.** All 25 published packages (all of
-`packages/` except `@texuli/examples`) are released as `0.8.0`, which the
+`packages/` except `@texuli/examples`) are released as `0.8.0` (`@texuli/slides` as `0.8.1`, a layout fix), which the
 publish workflow publishes from `main` after the merge and points `latest`
 and `next` to; `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` are
 published for the first time in `0.8.0` (the previous release, `0.7.0`, had
@@ -205,7 +205,7 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     as planned. Never invent benchmarks, deploy URLs, release status or
     check results. The 25 published packages, including `@texuli/forms`,
     `@texuli/canvas` and `@texuli/sheets` (first published in `0.8.0`), are
-    released on npm as `0.8.0` (dist-tags `latest` and `next`, published by
+    released on npm as `0.8.0` (`@texuli/slides` as `0.8.1`, a layout fix) (dist-tags `latest` and `next`, published by
     CI with provenance); `@texuli/drag`, `@texuli/workflows`,
     `@texuli/deck`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
     `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` are still in

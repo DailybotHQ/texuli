@@ -6,7 +6,10 @@ the intended process; it does not publish packages or grant release authority.
 ## Current npm status
 
 `0.8.0` is the current release of all 25 published packages (owner GO
-2026-10-29): the 22 packages of `0.7.0` plus `@texuli/forms`,
+2026-10-29); `@texuli/slides` has since moved to `0.8.1`, a
+backwards-compatible fix (the untrusted trust badge row wraps instead of
+pushing the toolbar past a phone's edge), published from `main` on the merge
+that bumped it: the 22 packages of `0.7.0` plus `@texuli/forms`,
 `@texuli/canvas` and `@texuli/sheets`, which are published for the first
 time in `0.8.0`. The
 publish workflow publishes from `main` after the merge, from the verified
@@ -30,6 +33,17 @@ published version.
   `scripts/packages.ts`).
 - The apps (`apps/website`, `apps/agent`) and the native twin (`native/`)
   publish nothing.
+
+### @texuli/slides 0.8.1
+
+A backwards-compatible fix; no other package changes version, and no
+published package depends on `@texuli/slides`. At the `untrusted` tier the
+chrome row (`.tx-deck-stage__chrome-row`) now wraps: the toolbar keeps at
+least `min(100%, 16rem)` beside the **Untrusted content** badge and moves
+to its own line when that does not fit, instead of pushing "More" past a
+phone's edge (390 px at a 340 px viewport in `0.8.0`). Covered by
+`tests/e2e/site-motion.spec.ts` at 340 px. Published by the publish
+workflow after the merge that bumped it (publish on merge, PR #17).
 
 ### 0.8.0
 

@@ -120,7 +120,7 @@ describe('site copy honesty', () => {
   });
 
   it('never calls a published package unpublished', () => {
-    // All 25 packages of the 0.8.0 release are on npm, @texuli/forms,
+    // All 25 packages of the 0.8 line are on npm (0.8.0; @texuli/slides 0.8.1), @texuli/forms,
     // @texuli/canvas and @texuli/sheets included (first published in 0.8.0).
     // Not on npm: the private 0.0.0 examples workspace.
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
@@ -128,7 +128,7 @@ describe('site copy honesty', () => {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')
         ) as { version?: string };
-        return pkg.version === '0.8.0';
+        return /^0\.8\.\d+$/.test(pkg.version ?? '');
       } catch {
         return false;
       }
