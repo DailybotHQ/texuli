@@ -144,7 +144,7 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/output-page/',
     reason:
-      'PLAN_010 T-site-080: five lazy islands (client:visible); the email renderer loads when the visitor asks for a render, the PDF writer on the first download and the player after hydration. The email frame and the email lab sit in the first section, so their small islands hydrate at once: 66 KB JS at the ready signal. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (the player and its painters, the texuli controls of the i18n demo). Measured 2026-10-29: 194.7 KB page, 66 KB JS (+4% headroom; a proposal for the owner).',
+      'PLAN_010 T-site-080: five lazy islands (client:visible); the email renderer loads when the visitor asks for a render, the PDF writer on the first download and the player after hydration. The email frame and the email lab sit in the first section, so their small islands hydrate at once: 66 KB JS at the ready signal. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (the player and its painters, the texuli controls of the i18n demo). Measured 2026-10-29: 194.7 KB page, 66 KB JS (+4% headroom; a proposal for the owner). PLAN_011 (token adoption, discovery links): measured 203.2 KB page on 2026-10-30 (+4% headroom).',
     budget: { pageGzipKb: 212, jsGzipKb: 69 },
   },
   {
@@ -334,4 +334,4 @@ export const OUTPUT_ISLANDS: Readonly<Record<string, string>> = Object.freeze({
 export function isOutputIsland(componentUrl: string): boolean {
   const file = componentUrl.split('/').pop() ?? '';
   return Object.keys(OUTPUT_ISLANDS).some((name) => file.startsWith(`${name}.`));
-} PLAN_011 (token adoption, discovery links): measured 203.2 KB page on 2026-10-30 (+4% headroom).
+}
