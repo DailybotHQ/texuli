@@ -5,6 +5,7 @@ import { copyPageIntegration } from './src/components/docs/integration.ts';
 import { cspIntegration } from './src/components/security/csp.ts';
 import { seoIntegration } from './src/components/seo/integration.ts';
 import { agentDiscoveryIntegration } from './src/integrations/agent-discovery.ts';
+import { apiSurfaceIntegration } from './src/integrations/api-surface.ts';
 import { skillPackIntegration } from './src/integrations/skill-pack.ts';
 
 // texuli.com is a static site built with Texuli itself. Pages import the
@@ -41,13 +42,16 @@ export default defineConfig({
   // CSS stays a file, so every page that can lazily load a live demo links it.
   build: { format: 'directory', inlineStylesheets: 'auto' },
   // After the build: "Copy page" Markdown for docs pages, then the sitemap,
-  // robots and per-page social images, then the agent discovery files; the
-  // CSP integration runs last and writes `_headers` for all of them.
+  // robots and per-page social images, then the JSON API and /openapi.json
+  // (after the twins, whose manifest it copies), then the agent discovery
+  // files (which link /openapi.json once it exists); the CSP integration
+  // runs last and writes `_headers` for all of them.
   integrations: [
     svelte(),
     copyPageIntegration(),
     skillPackIntegration(),
     seoIntegration(),
+    apiSurfaceIntegration(),
     agentDiscoveryIntegration(),
     cspIntegration(),
   ],

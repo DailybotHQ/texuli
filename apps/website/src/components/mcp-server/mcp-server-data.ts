@@ -26,6 +26,7 @@ export const MCP_SERVER_DATA = {
         'Search the built, content-addressed Texuli component catalog by text, group and emit tier. Returns the catalog hash and file name, the match count and one summary per component (id, package, label, summary, tier, group, emit tiers).',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 4096,
         items: 100,
@@ -63,6 +64,7 @@ export const MCP_SERVER_DATA = {
         'Validate one candidate catalog manifest, or a set (which also catches duplicate ids), without writing files. Returns valid and a list of diagnostics, each with a code, a JSONPath, a message and a hint.',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 1000000,
         items: 500,
@@ -90,6 +92,7 @@ export const MCP_SERVER_DATA = {
         'Read one component manifest from the catalog by id. Returns { component }: its props with kinds and schemas, events, worked examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it (an empty emit list means agent output may not).',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 1024,
         timeMs: 5000,
@@ -110,6 +113,7 @@ export const MCP_SERVER_DATA = {
         'Find worked manifest examples (props an agent can copy) by component id and/or example id, or search their titles and descriptions. Returns the match count and each example with its component id and package.',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 4096,
         items: 100,
@@ -146,6 +150,7 @@ export const MCP_SERVER_DATA = {
         "Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's draft checks: structure, sinks, tree limits, component ids, tiers and prop schemas, deep block and document schemas, grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with the catalog's stable codes.",
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 270336,
         items: 512,
@@ -180,6 +185,7 @@ export const MCP_SERVER_DATA = {
         'List the content block types the blocks-* components render (table, stat, cta, poll …), optionally for one component or matching words. Returns the match count and, per type, the component that renders it, a label and when to use it; read one shape with block.schema.',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 1024,
         items: 32,
@@ -206,6 +212,7 @@ export const MCP_SERVER_DATA = {
         'Read the shape of one content block type: the component that renders it, its fields as compact text and as a JSON Schema (required fields are the ones the validator refuses a block without), examples that validate in a blueprint, limits, when to use it and whether it can pass blueprint.validate today. Returns what a blocks-* node’s block prop needs.',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 1024,
         timeMs: 5000,
@@ -226,6 +233,7 @@ export const MCP_SERVER_DATA = {
         'Search the Texuli theme library (200+ offline themes) by words, category, collection, mood or tag. Returns the match count and each theme’s metadata: id, name, description, category, collection, mood, tags, contrast level and whether it is dark-first.',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 4096,
         items: 500,
@@ -273,6 +281,7 @@ export const MCP_SERVER_DATA = {
         'Read the full token definition of one library theme by id. Returns { theme }: its id, name, description and every light and dark color, radius, font and chart token, ready to compile or apply.',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 1024,
         timeMs: 5000,
@@ -293,6 +302,7 @@ export const MCP_SERVER_DATA = {
         'Preview one library theme in light or dark mode. Returns its summary, the key tokens of that mode (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes (aa.pass and issue counts).',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 1024,
         timeMs: 5000,
@@ -318,6 +328,7 @@ export const MCP_SERVER_DATA = {
         'Inspect, lint and convert a Texuli deck on the shared v2 model: capabilities, the JSON Schema, layouts, lint, inspect, from-markdown and to-markdown. Pure compute; returns { result } with the command output (ok, issues, deck, markdown …).',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 2100000,
         timeMs: 10000,
@@ -349,6 +360,7 @@ export const MCP_SERVER_DATA = {
         'Create, validate, inspect, patch and convert a Texuli document (spec 0.7.0): capabilities, the JSON Schema, validate, inspect, a bounded RFC 6902 patch (at most 1000 operations), from-markdown, to-markdown and to-blueprint. Returns { result } with the command output; PDF and DOCX are document.export.',
       runtime: 'edge',
       remote: true,
+      local: true,
       limits: {
         inputBytes: 2100000,
         items: 1000,
@@ -396,6 +408,7 @@ export const MCP_SERVER_DATA = {
         'Write a Texuli document as PDF or DOCX bytes with the owned writers, links and media checked at the tier. Returns { result } with ok, mime, byteLength, base64 bytes (no files are written), diagnostics and, for PDF, pageCount. Needs Node.',
       runtime: 'node',
       remote: false,
+      local: true,
       limits: {
         inputBytes: 2100000,
         timeMs: 30000,
@@ -418,6 +431,90 @@ export const MCP_SERVER_DATA = {
         },
       ],
       example: 'A PDF of a short brief',
+    },
+    {
+      name: 'site.pages',
+      title: 'List texuli.com pages',
+      summary:
+        'List the pages of texuli.com from its Markdown twin manifest, in path order, optionally under a path prefix, a page at a time. Returns the total, the offset, the next offset when more follow, and each page’s path, twin path, URL, title and description.',
+      runtime: 'site',
+      remote: true,
+      local: false,
+      limits: {
+        inputBytes: 1024,
+        items: 200,
+        timeMs: 5000,
+      },
+      arguments: [
+        {
+          name: 'prefix',
+          required: false,
+          description:
+            'Keep only pages whose path starts with this, e.g. "/guides/" or "/component-pages/".',
+        },
+        {
+          name: 'offset',
+          required: false,
+          description:
+            "How many pages to skip (0 to 10000); pass the previous answer's nextOffset.",
+        },
+        {
+          name: 'limit',
+          required: false,
+          description: 'How many pages to return (1 to 200, default 50).',
+        },
+      ],
+      example: 'The first guides',
+    },
+    {
+      name: 'site.read',
+      title: 'Read a texuli.com page as Markdown',
+      summary:
+        'Read one texuli.com page as its Markdown twin: the page’s own content with a header block (title, description, canonical URL, last updated). Accepts a route, its .md twin path or a texuli.com URL. Returns the path, twin, URL, title, the Markdown, its size and whether it was cut at the size cap.',
+      runtime: 'site',
+      remote: true,
+      local: false,
+      limits: {
+        inputBytes: 1024,
+        timeMs: 5000,
+      },
+      arguments: [
+        {
+          name: 'path',
+          required: true,
+          description:
+            'The page: a route such as "/guides/theming/" or "/", its twin "/guides/theming.md", or "https://texuli.com/guides/theming/". Find paths with site.pages or site.search.',
+        },
+      ],
+      example: 'The theming guide',
+    },
+    {
+      name: 'site.search',
+      title: 'Search texuli.com pages',
+      summary:
+        'Search texuli.com pages by words in their titles, headings, descriptions and paths, ranked deterministically (more matched words first, then title over path over heading over description). Returns the total and, per hit, the path, twin, URL, title, description, score and up to three matching headings.',
+      runtime: 'site',
+      remote: true,
+      local: false,
+      limits: {
+        inputBytes: 1024,
+        items: 50,
+        timeMs: 5000,
+      },
+      arguments: [
+        {
+          name: 'query',
+          required: true,
+          description:
+            'Words to look for, e.g. "theming dark mode"; case-insensitive, at most 12 words are used.',
+        },
+        {
+          name: 'limit',
+          required: false,
+          description: 'How many hits to return (1 to 50, default 10).',
+        },
+      ],
+      example: 'Pages about theming',
     },
   ],
   deprecatedTools: [

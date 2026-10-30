@@ -18,7 +18,7 @@ import { parseInitArgs, runInitCli } from '../cli-init/cli.ts';
 import { parseUpdateArgs, runUpdateCli } from '../cli-update/cli.ts';
 import { writeLocalFile } from '../internal/local-write.ts';
 import { runMcpCli } from '../mcp/cli.ts';
-import { type OperationRegistry, texuliOps } from '../ops/index.ts';
+import { LOCAL_RUNTIMES, type OperationRegistry, texuliOps } from '../ops/index.ts';
 import type { JsonSchema } from '../ops/schema.ts';
 import type { Operation } from '../ops/types.ts';
 import { parseDeckCliArgs, runDeckCli } from './deck.ts';
@@ -62,9 +62,13 @@ export const LEGACY_COMMANDS: readonly LegacyCommand[] = Object.freeze([
 /** The first word of each kept command. */
 const LEGACY_HEADS = new Set(['deck', 'document', 'mcp', 'init', 'theme', 'add', 'diff', 'update']);
 
-/** Every operation as `{ group, verb }`, in registry order. */
+/**
+ * Every operation the CLI runs as `{ group, verb }`, in registry order: the
+ * local runtimes only (`site` operations read the built texuli.com and are
+ * served by the remote MCP alone).
+ */
 export function routerOperations(registry: OperationRegistry = texuliOps): RouterOperation[] {
-  return registry.list().map((operation) => {
+  return registry.list({ runtimes: LOCAL_RUNTIMES }).map((operation) => {
     const dot = operation.name.indexOf('.');
     return {
       group: operation.name.slice(0, dot),
@@ -436,7 +440,7 @@ export async function runRouter(
   } catch (error) {
     return refuse(error instanceof Error ? error.message : String(error));
   }
-  const outcome = await registry.invoke(operation.name, input);
+  const outcome = await registry.invoke(operation.name, input, { runtimes: LOCAL_RUNTIMES });
   if (!outcome.ok) {
     stdout.write(
       `${JSON.stringify({ ok: false, operation: operation.name, error: outcome.error }, null, 2)}\n`

@@ -170,6 +170,7 @@ export const DOC_SHELL_ROUTES: readonly string[] = [
   '/component-pages/',
   '/primitives-page/',
   '/web-and-native/',
+  '/developers/',
 ];
 
 export function isDocsPath(current: string): boolean {

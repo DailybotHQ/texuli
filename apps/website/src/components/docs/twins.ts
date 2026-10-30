@@ -266,3 +266,61 @@ export function renderTwin(input: TwinInput): string {
   const note = input.note ? `\n\n${input.note.trim()}` : '';
   return absolutizeMarkdownLinks(`${header}${body}${note}\n`, input.origin);
 }
+
+/** One page of the twin manifest's `pages` list (PLAN_011 T-ar-site-mcp). */
+export interface TwinIndexEntry {
+  /** The page route (`/`, `/guides/theming/`). */
+  path: string;
+  /** Its twin (`/index.md`, `/guides/theming.md`). */
+  twin: string;
+  title: string;
+  description: string;
+  /** The twin's h2 and h3 headings, in order, as plain text. */
+  headings: string[];
+}
+
+/** The most headings one manifest entry keeps, and the longest heading. */
+export const TWIN_INDEX_MAX_HEADINGS = 64;
+const TWIN_INDEX_MAX_HEADING = 160;
+
+/** Heading text without Markdown links, code ticks or emphasis marks. */
+function plainHeading(text: string): string {
+  return text
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/[`*_]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, TWIN_INDEX_MAX_HEADING);
+}
+
+/**
+ * The manifest entry of one written twin: the title from its header block,
+ * the page description, and the h2/h3 headings of its body (outside code
+ * fences). The remote MCP's `site.pages` and `site.search` read these. Pure.
+ */
+export function twinIndexEntry(
+  route: string,
+  twin: string,
+  markdown: string,
+  description: string
+): TwinIndexEntry {
+  const parsed = parseTwinHeader(markdown);
+  const title = parsed.ok ? parsed.header.title : (/^# (.+)$/m.exec(markdown)?.[1]?.trim() ?? '');
+  const body = parsed.ok ? parsed.header.body : markdown;
+  const headings: string[] = [];
+  let fenced = false;
+  for (const line of body.split('\n')) {
+    if (/^\s*(?:```|~~~)/.test(line)) fenced = !fenced;
+    if (fenced) continue;
+    const match = /^#{2,3} (.+)$/.exec(line);
+    const text = match?.[1] ? plainHeading(match[1]) : '';
+    if (text && headings.length < TWIN_INDEX_MAX_HEADINGS) headings.push(text);
+  }
+  return {
+    path: route,
+    twin,
+    title: title || route,
+    description: oneLine(description),
+    headings,
+  };
+}
