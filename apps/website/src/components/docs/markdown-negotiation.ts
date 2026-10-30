@@ -1,19 +1,34 @@
 /**
- * Markdown-twin URL negotiation (T-23): the pure half of content
- * negotiation. The build emits a `.md` twin beside every docs page's HTML
- * (`integration.ts`); the request-time wrapper that serves it on
- * `Accept: text/markdown` lands with the middleware slice (T-26), which
- * imports exactly these functions.
+ * Markdown-twin URL negotiation (T-23; every page since PLAN_011
+ * T-ar-twins): the pure half of content negotiation. The build emits a
+ * `.md` twin beside every page's HTML (`integration.ts`); the middleware
+ * (`functions/_middleware.ts`, through `src/lib/md-negotiate.ts`) serves it
+ * on `Accept: text/markdown` with exactly these functions.
  */
 
+/** Paths that are never pages: APIs, discovery files, the MCP, build assets. */
+const NOT_PAGES = /^\/(?:api\/|\.well-known\/|mcp(?:\/|$)|_astro\/)/;
+
 /**
- * The twin URL for a docs page (`/guides/theming/` → `/guides/theming.md`),
- * or `undefined` for anything that has no twin: the root (a landing, not a
- * docs page) and non-directory paths.
+ * The twin URL for a page path (PLAN_011 T-ar-twins: every page has one):
+ * `/` and `/index.html` → `/index.md`, `/guides/theming/` (or its
+ * `index.html`, or `/guides/theming` without the slash) →
+ * `/guides/theming.md`. `undefined` for anything that is not a page path: a
+ * file with an extension (`.md`, `.json`, `.css`…), an API, discovery or MCP
+ * path, or a malformed one. Whether the twin exists is the build's answer
+ * (the middleware falls through when the asset is missing).
  */
 export function markdownTwinFor(pathname: string): string | undefined {
-  if (pathname === '/' || !pathname.startsWith('/') || !pathname.endsWith('/')) return undefined;
-  return `${pathname.slice(0, -1)}.md`;
+  if (!pathname.startsWith('/') || pathname.startsWith('//') || NOT_PAGES.test(pathname))
+    return undefined;
+  if (pathname.includes('/../') || pathname.endsWith('/..')) return undefined;
+  const page = pathname.endsWith('/index.html')
+    ? pathname.slice(0, -'index.html'.length)
+    : pathname;
+  if (page === '/') return '/index.md';
+  if (page.endsWith('/')) return page.length > 2 ? `${page.slice(0, -1)}.md` : undefined;
+  const last = page.slice(page.lastIndexOf('/') + 1);
+  return last && !last.includes('.') ? `${page}.md` : undefined;
 }
 
 /**

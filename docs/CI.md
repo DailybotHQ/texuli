@@ -53,7 +53,8 @@ integration.
   test tests/behavior`. Failed runs upload `test-results/` as an artifact.
 - **`website`** — `pnpm build` (which runs `astro check`, the examples
   catalog prebuild, sitemap/robots/social images and the CSP integration),
-  `pnpm --filter @texuli/website check:csp`, then the browser e2e suite on
+  `pnpm --filter @texuli/website check:csp`, the Markdown twin parity check
+  (`pnpm exec tsx scripts/check-md-parity.ts --strict`), then the browser e2e suite on
   chromium with the site-perf budget tests excluded (the audit job owns
   them). The job is a six-way matrix: each runner builds the site and runs
   one shard of the same suite. `tests/e2e/shards.json` deals the spec files
@@ -61,7 +62,7 @@ integration.
   minutes per shard on four workers); `scripts/tests/e2e-shards.test.ts`
   fails when a spec is in no shard or in two, so a new spec must be added
   to a shard. The a11y page sweep is three files (`a11y-site-1..3.spec.ts`)
-  so it spreads over shards. `check:csp` runs on shard 1. Locally,
+  so it spreads over shards. `check:csp` and the twin parity check run on shard 1. Locally,
   `pnpm exec playwright test tests/e2e` runs every spec.
 - **Runners and browsers:** every job runs on `ubuntu-24.04` with a
   `timeout-minutes` limit. `behavior`, `website` and `audits` run in

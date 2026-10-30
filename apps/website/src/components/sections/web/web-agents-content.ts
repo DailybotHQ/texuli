@@ -125,8 +125,8 @@ export const WEB_AGENTS_SURFACES: readonly AgentsSurface[] = [
     href: '/.well-known/mcp/server-card.json',
     label: 'MCP server card',
     description:
-      'Describes the read-only MCP server you run locally from the repository; there is no ' +
-      'hosted endpoint.',
+      'Describes the read-only Texuli MCP server: local over stdio (npx -y @texuli/mcp) and ' +
+      'hosted at https://texuli.com/mcp, both new in 0.9.0, which is in development.',
   },
   {
     href: '/skill/',

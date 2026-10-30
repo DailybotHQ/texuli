@@ -353,9 +353,12 @@ describe('reading pages', () => {
           expect(physical.test(style)).toBe(false);
         }
       }
-      // Four sanctioned sinks exist today: the no-flash bootstrap, the theme
-      // CSS and the two copy-page body markers.
-      expect(layout.match(/set:html/g) ?? []).toHaveLength(4);
+      // Six sanctioned sinks exist today: the no-flash bootstrap, the theme
+      // CSS and the two fixed body-marker comments in each branch (the docs
+      // shell and, since PLAN_011 T-ar-twins, the landing). Each marker is a
+      // string literal, never data.
+      expect(layout.match(/set:html/g) ?? []).toHaveLength(6);
+      expect(layout.match(/set:html="<!--\/?tx-page-body-->"/g) ?? []).toHaveLength(4);
       expect(breadcrumbTrail('/guides/theming/').map((entry) => entry.name)).toEqual([
         'Home',
         'Get started',

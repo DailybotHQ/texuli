@@ -1,20 +1,29 @@
 /**
- * Build integration for "Copy page" (FIX-site-sidebar-nav) and the markdown
- * twins (T-23). After `astro build`, each docs page's content between the
- * layout's `<!--tx-page-body-->` markers is converted to Markdown and
- * appended, as escaped text, to the page's `<template data-page-markdown>`;
- * the same text is also written as the page's twin (`guides/theming.md`
- * beside `guides/theming/index.html`), with root-relative links made
- * absolute. `md-manifest.json` records every twin for the negotiation
- * slice (T-26). Working on the built HTML keeps the page render single: the
+ * Build integration for "Copy page" (FIX-site-sidebar-nav) and the Markdown
+ * twins (T-23, extended to every page by PLAN_011 T-ar-twins). After
+ * `astro build`, each docs page's content between the layout's
+ * `<!--tx-page-body-->` markers is converted to Markdown and appended, as
+ * escaped text, to the page's `<template data-page-markdown>`. Then every
+ * built HTML page outside the `TWIN_EXEMPTIONS` allowlist gets its twin
+ * beside it (`/` → `index.md`, `guides/theming/index.html` →
+ * `guides/theming.md`): the header block (Language, Canonical, the Markdown
+ * access line, Last Updated from the same git dates as the sitemap), the
+ * page's content, and a "For agents" note on interactive pages
+ * (`twins.ts`, `twin-notes.ts`). `md-manifest.json` maps every page route to
+ * its twin. Working on the built HTML keeps the page render single: the
  * layout never renders its slot twice. Static files only; nothing runs at
  * request time.
  */
-import { readFile, writeFile } from 'node:fs/promises';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { texuliOps } from '@texuli/tools/ops';
 import type { AstroIntegration } from 'astro';
-import { absolutizeMarkdownLinks, htmlToMarkdown } from './markdown.ts';
+import { pageRoute } from '../security/csp.ts';
+import { readPageMeta } from '../seo/seo.ts';
+import { htmlToMarkdown } from './markdown.ts';
+import { agentNoteMarkdown } from './twin-notes.ts';
+import { isRedirectStub, pageLanguage, renderTwin, TWIN_EXEMPTIONS, twinPathFor } from './twins.ts';
 
 const BODY = /<!--tx-page-body-->([\s\S]*?)<!--\/tx-page-body-->/;
 const TEMPLATE = /(<template data-page-markdown=""[^>]*>)([\s\S]*?)(<\/template>)/;
@@ -51,6 +60,19 @@ export function pageMarkdownOf(filledHtml: string): string | null {
   return match ? unescapeTemplateText(match[2] ?? '') : null;
 }
 
+/** Every `.html` file under `dir`, recursively. */
+async function htmlFiles(dir: string): Promise<string[]> {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const files = await Promise.all(
+    entries.map(async (entry) => {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) return htmlFiles(path);
+      return entry.isFile() && entry.name.endsWith('.html') ? [path] : [];
+    })
+  );
+  return files.flat();
+}
+
 export function copyPageIntegration(): AstroIntegration {
   let site: string | undefined;
   return {
@@ -59,35 +81,52 @@ export function copyPageIntegration(): AstroIntegration {
       'astro:config:done': ({ config }) => {
         site = config.site ? new URL(config.site).origin : undefined;
       },
-      'astro:build:done': async ({ dir, pages, logger }) => {
+      'astro:build:done': async ({ dir, logger }) => {
         const out = fileURLToPath(dir);
+        // Loaded here, not at module scope: the SEO integration resolves its
+        // own files from `import.meta.url`, which only a build run provides.
+        const { routeLastmod } = await import('../seo/integration.ts');
         let filled = 0;
+        let exempt = 0;
         const twins: Record<string, string> = {};
-        for (const { pathname } of pages) {
-          const path = pathname.replace(/^\/+|\/+$/g, '');
-          const file = join(out, path ? `${path}/index.html` : 'index.html');
-          let html: string;
-          try {
-            html = await readFile(file, 'utf8');
-          } catch {
+        const operations = texuliOps
+          .list({ runtimes: ['edge'] })
+          .map(({ name, title }) => ({ name, title }));
+        for (const file of (await htmlFiles(out)).sort()) {
+          const route = pageRoute(out, file);
+          const html = await readFile(file, 'utf8');
+          const marked = html.includes('<!--tx-page-body-->');
+          if (marked) {
+            // "Copy page" on docs pages; the markers go either way.
+            const next = fillPageMarkdown(html);
+            if (next) filled += 1;
+            await writeFile(
+              file,
+              next ?? html.replace('<!--tx-page-body-->', '').replace('<!--/tx-page-body-->', '')
+            );
+          }
+          // The twin (T-ar-twins): every page but the allowlist, from the
+          // page's own content (the HTML before the markers were removed).
+          const twin = twinPathFor(route);
+          if (!site || !twin || isRedirectStub(html)) {
+            exempt += 1;
             continue;
           }
-          if (!html.includes('<!--tx-page-body-->')) continue;
-          const next = fillPageMarkdown(html);
-          await writeFile(
-            file,
-            next ?? html.replace('<!--tx-page-body-->', '').replace('<!--/tx-page-body-->', '')
-          );
-          if (!next) continue;
-          filled += 1;
-          // The twin: the exact "Copy page" text, links absolute, written
-          // beside the page (`guides/theming.md`).
-          const markdown = pageMarkdownOf(next);
-          if (markdown && site && path) {
-            const twinRel = `${path}.md`;
-            await writeFile(join(out, twinRel), absolutizeMarkdownLinks(markdown, site), 'utf8');
-            twins[`/${path}/`] = `/${twinRel}`;
-          }
+          const meta = readPageMeta(html);
+          const markdown = renderTwin({
+            route,
+            html,
+            facts: {
+              title: meta.title,
+              description: meta.description,
+              language: pageLanguage(html),
+            },
+            origin: site,
+            lastUpdated: routeLastmod(route),
+            note: agentNoteMarkdown(route, operations, site),
+          });
+          await writeFile(join(out, twin.slice(1)), markdown, 'utf8');
+          twins[route] = twin;
         }
         await writeFile(
           join(out, 'md-manifest.json'),
@@ -95,7 +134,7 @@ export function copyPageIntegration(): AstroIntegration {
           'utf8'
         );
         logger.info(
-          `"Copy page" Markdown written for ${filled} pages (${Object.keys(twins).length} twins).`
+          `"Copy page" Markdown written for ${filled} pages; ${Object.keys(twins).length} Markdown twins written (${exempt} HTML files exempt: ${TWIN_EXEMPTIONS.map((entry) => entry.pattern.source).join(', ')}).`
         );
       },
     },

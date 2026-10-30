@@ -84,7 +84,8 @@ path `/api/umami/script.js` with the collect endpoint `/api/umami`.
   Ad-hoc event names are type errors.
 - **Edge:** the middleware counts AI-bot page hits (`ai_bot_visit`),
   unknown-bot heuristics (`unknown_bot_visit`) and served markdown twins
-  (`markdown_request`) with UA-class + path only, through `waitUntil`,
+  (`markdown_request`: a twin served on `Accept: text/markdown`, or a `.md`
+  URL answered `200`, PLAN_011 T-ar-twins) with UA-class + path only, through `waitUntil`,
   silent unless the website id is provisioned. Bot page hits count only for
   HTML answered `200`: redirects, errors and the HTML 404 (whose path the
   client chose) count nothing. The path is scrubbed with the client's email

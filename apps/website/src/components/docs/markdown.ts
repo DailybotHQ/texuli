@@ -60,11 +60,63 @@ function inline(html: string): string {
     .replace(/[ \t\r\n]+/g, ' ');
 }
 
+/** One attribute of a tag's source, or `''`. */
+function attribute(tag: string, name: string): string {
+  return new RegExp(`\\s${name}="([^"]*)"`, 'i').exec(tag)?.[1] ?? '';
+}
+
+/**
+ * An image as text (PLAN_011 T-ar-twins: no fact may live only in an
+ * image). An informative image (non-empty `alt`, not `aria-hidden`) becomes
+ * `![alt](src)` when its source is a site path or an https URL, or its alt
+ * text alone otherwise; a decorative one (`alt=""`) disappears. A labelled
+ * SVG (`role="img"` with `aria-label`) keeps its label the same way.
+ */
+function imageText(tag: string): string {
+  if (/\saria-hidden="true"/i.test(tag)) return '';
+  const alt = attribute(tag, tag.startsWith('<svg') ? 'aria-label' : 'alt')
+    .replace(/[[\]]/g, '')
+    .trim();
+  if (!alt) return '';
+  const src = attribute(tag, 'src');
+  const linkable = (src.startsWith('/') && !src.startsWith('//')) || src.startsWith('https://');
+  return linkable && !/[\s()]/.test(src) ? ` ![${alt}](${src}) ` : ` ${alt} `;
+}
+
+/**
+ * Layout tables (`role="presentation"`, as email HTML uses them) become plain
+ * blocks, so only data tables turn into Markdown tables. A stack follows the
+ * nesting, so a data table inside a layout table keeps its rows and cells.
+ */
+function unwrapLayoutTables(html: string): string {
+  const stack: boolean[] = [];
+  return html.replace(
+    /<(\/?)(table|thead|tbody|tfoot|tr|td|th)\b([^>]*)>/gi,
+    (tag, close: string, name: string, attributes: string) => {
+      const element = name.toLowerCase();
+      if (element === 'table') {
+        if (close) return stack.pop() ? '</div>' : tag;
+        const layout = /\srole="(?:presentation|none)"/i.test(attributes);
+        stack.push(layout);
+        return layout ? '<div>' : tag;
+      }
+      if (!stack.at(-1)) return tag;
+      if (element === 'td' || element === 'th' || element === 'tr')
+        return close ? '</div>' : '<div>';
+      return '';
+    }
+  );
+}
+
 /** Converts rendered HTML (a page's main content) to Markdown. */
 export function htmlToMarkdown(html: string): string {
-  let text = html
+  let text = unwrapLayoutTables(html)
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/<[^>]+\b(hidden|aria-hidden="true")[^>]*>[\s\S]*?<\/(span|div|p)>/gi, '')
+    .replace(/<img\b[^>]*>/gi, imageText)
+    .replace(/(<svg\b[^>]*\srole="img"[^>]*>)[\s\S]*?<\/svg>/gi, (_m, open: string) =>
+      imageText(open)
+    )
     .replace(DROP, '');
   const blocks: string[] = [];
   // Code blocks first, so their whitespace survives.

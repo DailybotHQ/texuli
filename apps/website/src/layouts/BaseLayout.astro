@@ -133,7 +133,9 @@ const markdownHead = docs
         <>
           <SiteHeader variant="landing" />
           <main id="main" tabindex="-1" class="landing-main">
+            <Fragment set:html="<!--tx-page-body-->" />
             <slot />
+            <Fragment set:html="<!--/tx-page-body-->" />
           </main>
           <SiteFooter />
         </>
