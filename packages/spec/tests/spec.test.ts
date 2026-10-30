@@ -7,7 +7,7 @@ import { projectLiveCatalog } from '../scripts/bootstrap-catalog.ts';
 import { buildSpec, EXTERNAL_SCHEMAS, KOTLIN_OUT, TS_OUT } from '../src/build.ts';
 import { canonicalJson, sha256 } from '../src/canonical.ts';
 import type { SpecCatalog } from '../src/catalog.ts';
-import { kotlinString } from '../src/codegen/kotlin.ts';
+import { kotlinProperty, kotlinString, schemaToKotlin } from '../src/codegen/kotlin.ts';
 import { checkConformance } from '../src/conformance.ts';
 import {
   ACTION_FIELDS,
@@ -289,6 +289,41 @@ describe('generated Kotlin (text artifacts; no Kotlin toolchain here)', () => {
       ...all.matchAll(/(?:^|\n)(?:data class|enum class|typealias)\s+([A-Z]\w*)/g),
     ].map((m) => m[1]);
     expect(new Set(names).size, 'generated Kotlin type names are unique').toBe(names.length);
+  });
+
+  it('turns hyphenated wire names into camelCase properties and keeps the wire name', () => {
+    for (const [wire, property] of [
+      ['height-md', 'heightMd'],
+      ['padding-inline-sm', 'paddingInlineSm'],
+      ['icon-button', 'iconButton'],
+      ['$state', 'state'],
+      ['radius', 'radius'],
+    ] as const) {
+      expect(kotlinProperty(wire), wire).toBe(property);
+    }
+    const schema: Schema = {
+      $schema: DIALECT_URI,
+      title: 'Probe',
+      type: 'object',
+      properties: { 'height-md': { type: 'number' }, 'icon-button': { type: 'string' } },
+      additionalProperties: false,
+    };
+    const text = schemaToKotlin(
+      { source: 'schemas/probe.schema.json', schema, prefix: 'Probe' },
+      build.stamp
+    );
+    expect(text).toContain('val heightMd: Double? = null,');
+    expect(text).toContain('heightMd = fields["height-md"]?.let');
+    expect(text).toContain('val iconButton: String? = null,');
+    expect(text).toContain('private val FIELDS = setOf("height-md", "icon-button")');
+    // Two wire names that camelCase to one property collide and fail generation.
+    const clash: Schema = { ...schema, properties: { 'a-b': {}, aB: {} } };
+    expect(() =>
+      schemaToKotlin(
+        { source: 'schemas/probe.schema.json', schema: clash, prefix: 'Probe' },
+        build.stamp
+      )
+    ).toThrow(/collides/);
   });
 });
 
