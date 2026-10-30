@@ -5,19 +5,29 @@
 
 @layer tx.components {
   .tx-tooltip {
-    z-index: 50;
+    z-index: var(--tx-tooltip-z-index, var(--tx-z-tooltip, 50));
     box-sizing: border-box;
     max-inline-size: min(20rem, 90vw);
     padding-block: 0.35rem;
     padding-inline: 0.6rem;
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.55);
-    border: 1px solid color-mix(in srgb, var(--tx-foreground, CanvasText) 12%, transparent);
+    border-radius: var(
+      --tx-tooltip-radius,
+      calc(var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)) * 0.55)
+    );
+    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
+      color-mix(in srgb, var(--tx-foreground, CanvasText) 12%, transparent);
     background-color: var(--tx-foreground, CanvasText);
     color: var(--tx-background, Canvas);
-    font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1.35;
-    box-shadow: var(--tx-shadow-float, 0 8px 24px color-mix(in srgb, CanvasText 18%, transparent));
+    font-size: var(
+      --tx-tooltip-font-size,
+      var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem))
+    );
+    font-weight: var(
+      --tx-tooltip-font-weight,
+      var(--tx-type-label-weight, var(--tx-font-weight-medium, 500))
+    );
+    line-height: var(--tx-tooltip-line-height, var(--tx-type-caption-line, 1.35));
+    box-shadow: var(--tx-tooltip-elevation, var(--tx-elevation-3, var(--tx-shadow-float, none)));
     pointer-events: auto;
   }
 
