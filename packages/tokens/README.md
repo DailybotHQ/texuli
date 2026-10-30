@@ -90,6 +90,10 @@ const css = compileThemeCss(theme);
 | Style presets | `style-presets` | Shared style presets on top of the contract |
 | Tailwind 4 | `tailwind` | Utilities mapped onto the `--tx-*` contract |
 | Motion tokens | `motion` | New in `0.6.0`: 5 durations, 5 easings and 3 springs as data (`MOTION_DURATIONS`, `MOTION_EASINGS`, `MOTION_SPRINGS`), behind the `--tx-motion-*` properties in `base.css` |
+| System tokens | `system` | Unreleased (token contract v2, ADR-020): 151 system tokens in 11 families (space, size, type roles, elevation, shape, layers, opacity, layout, icons, status, data-viz), with defaults in `base.css` |
+| Component tokens | `components` | Unreleased: the component token registry (48 components, 333 tokens) with default references and a JSON Schema of the vocabulary; no component stylesheet reads it yet |
+| Chart tokens | `data-viz` | Unreleased: `dataVizVariables(theme, mode)` returns all 28 `--tx-chart-*` values for any theme, derived when the theme has no `charts` |
+| Renames | `renames`, `renames.json` | Unreleased: the machine-readable `--tx-*` rename list for codemods (empty: contract v2 renames nothing) |
 
 The root entry (`@texuli/tokens`) re-exports the engine areas; the theme
 libraries and `build` stay behind their subpaths so unused themes are never
@@ -134,6 +138,7 @@ Ships in `0.6.0`; the `0.5.0` release predates it:
   [theming guide](https://texuli.com/guides/theming/)
 - Compiled CSS and scoped themes: [tokens-css.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-css.md)
 - Token contract: [tokens-contract.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-contract.md)
+- Token contract v2 tables (system families and component tokens, generated): [tokens-components.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-components.md)
 - Motion tokens (durations, easings, springs): [tokens-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-motion.md)
 - Theme generator: [tokens-generator.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-generator.md)
 - Theme libraries: [tokens-library-port.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-port.md)

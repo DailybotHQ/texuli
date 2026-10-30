@@ -15,6 +15,22 @@
 
 CSS custom properties use the **`--tx-*`** prefix (`tokenToCssVar`, `semanticTokenToCssVar`).
 
+## Token contract v2 (unreleased, ADR-020)
+
+Contract v2 adds two tiers on top of the three above, additively:
+
+- **System families** (`@texuli/tokens/system`): space, size, type roles,
+  elevation, shape (`--tx-shape-radius-*`), layers, opacity, layout, icons,
+  status and data-viz, 151 tokens. `base.css` declares the defaults, which
+  reproduce today's rendered values.
+- **Component tokens** (`@texuli/tokens/components`): 333 tokens for 48
+  components, each defaulting to a system or theme token.
+
+`THEME_JSON_SCHEMA.definitions.systemTokens` lists the system names, and
+`getComponentTokensJsonSchema()` describes the component vocabulary. No
+component stylesheet reads the new tokens yet; that is the adoption tasks'
+work. The full generated tables are in [tokens-components.md](tokens-components.md).
+
 ## Theme document
 
 Agents emit a JSON theme that `validateTheme` / `defineTheme` accept:

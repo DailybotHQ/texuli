@@ -143,6 +143,530 @@
     --tx-motion-spring-bouncy-duration: 844ms;
   }
 
+  /*
+   * Token contract v2 (ADR-020): system families and component token defaults,
+   * generated from @texuli/tokens/system and @texuli/tokens/components. The
+   * defaults reproduce today's rendered values; no component reads them yet.
+   */
+  /* @generated token-defaults: start (packages/tokens/scripts/generate.ts) */
+  :where(:root, [data-tx-theme], [data-tx-scope]) {
+    /* System: space */
+    --tx-space-unit: calc(0.25rem * var(--tx-density, 1));
+    --tx-space-0: 0px;
+    --tx-space-1: calc(var(--tx-space-unit) * 1);
+    --tx-space-2: calc(var(--tx-space-unit) * 2);
+    --tx-space-3: calc(var(--tx-space-unit) * 3);
+    --tx-space-4: calc(var(--tx-space-unit) * 4);
+    --tx-space-5: calc(var(--tx-space-unit) * 5);
+    --tx-space-6: calc(var(--tx-space-unit) * 6);
+    --tx-space-7: calc(var(--tx-space-unit) * 7);
+    --tx-space-8: calc(var(--tx-space-unit) * 8);
+    --tx-space-9: calc(var(--tx-space-unit) * 9);
+    --tx-space-10: calc(var(--tx-space-unit) * 10);
+    --tx-space-11: calc(var(--tx-space-unit) * 11);
+    --tx-space-12: calc(var(--tx-space-unit) * 12);
+    /* System: size */
+    --tx-size-control-xs: 1.75rem;
+    --tx-size-control-sm: 2rem;
+    --tx-size-control-md: 2.25rem;
+    --tx-size-control-lg: 2.75rem;
+    --tx-size-icon-xs: 0.75rem;
+    --tx-size-icon-sm: 1rem;
+    --tx-size-icon-md: 1.25rem;
+    --tx-size-icon-lg: 1.5rem;
+    --tx-size-target-min: 24px;
+    --tx-size-target-touch: max(2.75rem, 44px);
+    /* System: type roles */
+    --tx-type-display-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
+    --tx-type-display-size: var(--tx-font-size-4xl, 2.25rem);
+    --tx-type-display-line: 1.1;
+    --tx-type-display-weight: var(--tx-font-weight-bold, 700);
+    --tx-type-display-tracking: var(--tx-letter-spacing-heading, 0);
+    --tx-type-title-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
+    --tx-type-title-size: var(--tx-font-size-2xl, 1.5rem);
+    --tx-type-title-line: 1.2;
+    --tx-type-title-weight: var(--tx-font-weight-heading, 600);
+    --tx-type-title-tracking: var(--tx-letter-spacing-heading, 0);
+    --tx-type-heading-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
+    --tx-type-heading-size: var(--tx-font-size-lg, 1.125rem);
+    --tx-type-heading-line: 1.3;
+    --tx-type-heading-weight: var(--tx-font-weight-heading, 600);
+    --tx-type-heading-tracking: var(--tx-letter-spacing-heading, 0);
+    --tx-type-body-family: var(--tx-font-sans, system-ui, sans-serif);
+    --tx-type-body-size: var(--tx-font-size-base, 1rem);
+    --tx-type-body-line: 1.5;
+    --tx-type-body-weight: var(--tx-font-weight-body, 400);
+    --tx-type-body-tracking: var(--tx-letter-spacing-body, 0);
+    --tx-type-label-family: var(--tx-font-sans, system-ui, sans-serif);
+    --tx-type-label-size: var(--tx-font-size-sm, 0.875rem);
+    --tx-type-label-line: 1.25;
+    --tx-type-label-weight: var(--tx-font-weight-medium, 500);
+    --tx-type-label-tracking: var(--tx-letter-spacing-body, 0);
+    --tx-type-caption-family: var(--tx-font-sans, system-ui, sans-serif);
+    --tx-type-caption-size: var(--tx-font-size-xs, 0.75rem);
+    --tx-type-caption-line: 1.35;
+    --tx-type-caption-weight: var(--tx-font-weight-body, 400);
+    --tx-type-caption-tracking: var(--tx-letter-spacing-body, 0);
+    --tx-type-code-family: var(--tx-font-mono, ui-monospace, monospace);
+    --tx-type-code-size: 0.875em;
+    --tx-type-code-line: 1.5;
+    --tx-type-code-weight: var(--tx-font-weight-body, 400);
+    --tx-type-code-tracking: 0;
+    /* System: elevation */
+    --tx-elevation-0: none;
+    --tx-elevation-1: var(--tx-shadow-soft, none);
+    --tx-elevation-2: var(--tx-shadow-soft, none);
+    --tx-elevation-3: var(--tx-shadow-float, none);
+    --tx-elevation-4: var(--tx-shadow-float, none);
+    --tx-elevation-5: var(--tx-shadow-float, none);
+    --tx-surface-glass-alpha: var(--tx-glass-opacity, 82%);
+    --tx-surface-glass-blur: var(--tx-glass-blur, 16px);
+    /* System: shape */
+    --tx-shape-radius-none: 0px;
+    --tx-shape-radius-xs: max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-6, 6px));
+    --tx-shape-radius-sm: max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-4, 4px));
+    --tx-shape-radius-md: max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px));
+    --tx-shape-radius-lg: var(--tx-radius, 0.625rem);
+    --tx-shape-radius-xl: calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px));
+    --tx-shape-radius-full: 9999px;
+    --tx-border-width-thin: var(--tx-border-width, 1px);
+    --tx-border-width-thick: calc(var(--tx-border-width, 1px) * 2);
+    /* System: layers */
+    --tx-z-base: 0;
+    --tx-z-sticky: 40;
+    --tx-z-popover: 50;
+    --tx-z-tooltip: 50;
+    --tx-z-overlay: 60;
+    --tx-z-modal: 60;
+    --tx-z-toast: 60;
+    --tx-z-top: 70;
+    /* System: opacity */
+    --tx-opacity-disabled: 0.5;
+    --tx-opacity-muted: 0.7;
+    --tx-opacity-scrim: 45%;
+    /* System: layout */
+    --tx-layout-content-max: 72ch;
+    --tx-layout-wide-max: 80rem;
+    --tx-layout-full-max: 100%;
+    --tx-layout-breakpoint-sm: 36rem;
+    --tx-layout-breakpoint-md: 56rem;
+    --tx-layout-breakpoint-lg: 72rem;
+    --tx-layout-grid-columns-base: 1;
+    --tx-layout-grid-columns-sm: 2;
+    --tx-layout-grid-columns-md: 3;
+    --tx-layout-grid-columns-lg: 4;
+    --tx-layout-grid-gutter-base: var(--tx-space-4);
+    --tx-layout-grid-gutter-sm: var(--tx-space-4);
+    --tx-layout-grid-gutter-md: var(--tx-space-4);
+    --tx-layout-grid-gutter-lg: var(--tx-space-4);
+    /* System: icons */
+    --tx-icon-stroke: 2;
+    --tx-icon-style: outline;
+    /* System: status */
+    --tx-status-success: var(--tx-success);
+    --tx-status-success-foreground: var(--tx-success-foreground);
+    --tx-status-success-soft: var(--tx-success-soft);
+    --tx-status-success-soft-foreground: var(--tx-success-soft-foreground);
+    --tx-status-warning: var(--tx-warning);
+    --tx-status-warning-foreground: var(--tx-warning-foreground);
+    --tx-status-warning-soft: var(--tx-warning-soft);
+    --tx-status-warning-soft-foreground: var(--tx-warning-soft-foreground);
+    --tx-status-danger: var(--tx-destructive);
+    --tx-status-danger-foreground: var(--tx-destructive-foreground);
+    --tx-status-danger-soft: var(--tx-destructive-soft);
+    --tx-status-danger-soft-foreground: var(--tx-destructive-soft-foreground);
+    --tx-status-info: var(--tx-info);
+    --tx-status-info-foreground: var(--tx-info-foreground);
+    --tx-status-info-soft: var(--tx-info-soft);
+    --tx-status-info-soft-foreground: var(--tx-info-soft-foreground);
+    --tx-status-neutral: var(--tx-secondary);
+    --tx-status-neutral-foreground: var(--tx-secondary-foreground);
+    --tx-status-neutral-soft: var(--tx-muted);
+    --tx-status-neutral-soft-foreground: var(--tx-muted-foreground);
+    /* Component: alert */
+    --tx-alert-radius: var(--tx-shape-radius-lg);
+    --tx-alert-border-width: var(--tx-border-width-thin);
+    --tx-alert-padding-block: var(--tx-space-3);
+    --tx-alert-padding-inline: calc(var(--tx-space-unit) * 3.5);
+    --tx-alert-gap: var(--tx-space-2);
+    --tx-alert-font-size: var(--tx-type-label-size);
+    --tx-alert-icon-size: var(--tx-size-icon-md);
+    /* Component: avatar */
+    --tx-avatar-size-xs: var(--tx-size-icon-md);
+    --tx-avatar-size-sm: var(--tx-size-control-xs);
+    --tx-avatar-size-md: var(--tx-size-control-md);
+    --tx-avatar-size-lg: var(--tx-space-12);
+    --tx-avatar-radius: var(--tx-shape-radius-full);
+    --tx-avatar-font-weight: var(--tx-type-heading-weight);
+    /* Component: badge */
+    --tx-badge-radius: var(--tx-shape-radius-full);
+    --tx-badge-padding-block: calc(var(--tx-space-unit) * 0.5);
+    --tx-badge-padding-inline: var(--tx-space-2);
+    --tx-badge-gap: var(--tx-space-1);
+    --tx-badge-font-size: var(--tx-type-caption-size);
+    --tx-badge-font-weight: var(--tx-type-label-weight);
+    --tx-badge-line-height: var(--tx-type-label-line);
+    --tx-badge-border-width: var(--tx-border-width-thin);
+    /* Component: button */
+    --tx-button-height-sm: var(--tx-size-control-sm);
+    --tx-button-height-md: var(--tx-size-control-md);
+    --tx-button-height-lg: var(--tx-size-control-lg);
+    --tx-button-height-touch: var(--tx-size-target-touch);
+    --tx-button-padding-inline-sm: var(--tx-space-3);
+    --tx-button-padding-inline-md: var(--tx-space-4);
+    --tx-button-padding-inline-lg: var(--tx-space-6);
+    --tx-button-gap: var(--tx-space-2);
+    --tx-button-radius: var(--tx-shape-radius-lg);
+    --tx-button-font-size: var(--tx-type-label-size);
+    --tx-button-font-size-sm: var(--tx-type-caption-size);
+    --tx-button-font-size-lg: var(--tx-type-body-size);
+    --tx-button-font-weight: var(--tx-type-label-weight);
+    --tx-button-line-height: var(--tx-type-label-line);
+    --tx-button-icon-size: var(--tx-size-icon-sm);
+    --tx-button-border-width: var(--tx-border-width-thin);
+    --tx-button-elevation: var(--tx-elevation-1);
+    --tx-button-disabled-opacity: var(--tx-opacity-disabled);
+    /* Component: card */
+    --tx-card-radius: var(--tx-shape-radius-xl);
+    --tx-card-border-width: var(--tx-border-width-thin);
+    --tx-card-elevation: var(--tx-elevation-1);
+    --tx-card-padding-inline: var(--tx-space-5);
+    --tx-card-title-font-size: var(--tx-font-size-base);
+    --tx-card-title-font-weight: var(--tx-type-heading-weight);
+    --tx-card-title-line-height: var(--tx-type-label-line);
+    --tx-card-description-font-size: var(--tx-type-label-size);
+    /* Component: carousel */
+    --tx-carousel-radius: var(--tx-shape-radius-lg);
+    --tx-carousel-fallback-padding: var(--tx-space-4);
+    /* Component: choice */
+    --tx-choice-gap: calc(var(--tx-space-unit) * 2.5);
+    --tx-choice-switch-gap: var(--tx-space-4);
+    --tx-choice-label-font-size: var(--tx-type-label-size);
+    --tx-choice-label-font-weight: var(--tx-type-label-weight);
+    --tx-choice-description-font-size: var(--tx-type-caption-size);
+    --tx-choice-disabled-opacity: var(--tx-opacity-disabled);
+    /* Component: combobox */
+    --tx-combobox-height-sm: var(--tx-size-control-sm);
+    --tx-combobox-height-md: var(--tx-size-control-md);
+    --tx-combobox-height-lg: var(--tx-size-control-lg);
+    --tx-combobox-radius: var(--tx-shape-radius-lg);
+    --tx-combobox-border-width: var(--tx-border-width-thin);
+    --tx-combobox-font-size-sm: var(--tx-type-caption-size);
+    --tx-combobox-font-size-md: var(--tx-type-label-size);
+    --tx-combobox-font-size-lg: var(--tx-type-body-size);
+    /* Component: command */
+    --tx-command-radius: var(--tx-shape-radius-xl);
+    --tx-command-border-width: var(--tx-border-width-thin);
+    --tx-command-font-size-sm: var(--tx-type-caption-size);
+    --tx-command-font-size-md: var(--tx-type-label-size);
+    --tx-command-font-size-lg: var(--tx-type-body-size);
+    --tx-command-input-gap: var(--tx-space-3);
+    --tx-command-input-padding-inline: var(--tx-space-4);
+    /* Component: date */
+    --tx-date-font-size: var(--tx-type-label-size);
+    --tx-date-label-font-weight: var(--tx-type-label-weight);
+    --tx-date-control-radius: var(--tx-shape-radius-lg);
+    --tx-date-control-border-width: var(--tx-border-width-thin);
+    --tx-date-panel-z-index: var(--tx-z-popover);
+    --tx-date-panel-padding: var(--tx-space-3);
+    --tx-date-panel-radius: var(--tx-shape-radius-xl);
+    --tx-date-panel-elevation: var(--tx-elevation-3);
+    --tx-date-description-font-size: var(--tx-type-caption-size);
+    /* Component: dialog */
+    --tx-dialog-z-index: var(--tx-z-modal);
+    --tx-dialog-radius: var(--tx-shape-radius-xl);
+    --tx-dialog-border-width: var(--tx-border-width-thin);
+    --tx-dialog-elevation: var(--tx-elevation-4);
+    --tx-dialog-font-size: var(--tx-font-size-sm);
+    --tx-dialog-line-height: var(--tx-type-body-line);
+    --tx-dialog-title-font-size: var(--tx-type-heading-size);
+    --tx-dialog-title-font-weight: var(--tx-type-heading-weight);
+    --tx-dialog-title-line-height: var(--tx-type-heading-line);
+    --tx-dialog-alert-padding: var(--tx-space-5);
+    --tx-dialog-scrim-opacity: var(--tx-opacity-scrim);
+    /* Component: empty */
+    --tx-empty-gap: var(--tx-space-3);
+    --tx-empty-padding-inline: var(--tx-space-6);
+    --tx-empty-padding-block: calc(var(--tx-space-unit) * 14);
+    --tx-empty-title-font-size: var(--tx-font-size-base);
+    --tx-empty-title-font-weight: var(--tx-type-heading-weight);
+    --tx-empty-description-font-size: var(--tx-type-label-size);
+    /* Component: field */
+    --tx-field-gap: calc(var(--tx-space-unit) * 1.5);
+    --tx-field-label-font-size: var(--tx-type-label-size);
+    --tx-field-label-font-weight: var(--tx-type-label-weight);
+    --tx-field-label-line-height: var(--tx-type-label-line);
+    --tx-field-description-font-size: var(--tx-type-caption-size);
+    --tx-field-description-line-height: var(--tx-type-caption-line);
+    /* Component: file-upload */
+    --tx-file-upload-gap: var(--tx-space-3);
+    --tx-file-upload-zone-padding-block: var(--tx-space-6);
+    --tx-file-upload-zone-padding-inline: var(--tx-space-4);
+    --tx-file-upload-zone-border-width: var(--tx-border-width-thick);
+    --tx-file-upload-zone-radius: var(--tx-shape-radius-lg);
+    --tx-file-upload-browse-height: var(--tx-size-control-md);
+    /* Component: icon */
+    --tx-icon-size-xs: var(--tx-size-icon-xs);
+    --tx-icon-size-sm: var(--tx-size-icon-sm);
+    --tx-icon-size-md: var(--tx-size-icon-md);
+    --tx-icon-size-lg: var(--tx-size-icon-lg);
+    --tx-icon-stroke-width: var(--tx-icon-stroke);
+    /* Component: input */
+    --tx-input-height: var(--tx-size-control-md);
+    --tx-input-height-touch: var(--tx-size-control-lg);
+    --tx-input-padding-block: var(--tx-space-1);
+    --tx-input-padding-inline: var(--tx-space-3);
+    --tx-input-radius: var(--tx-shape-radius-lg);
+    --tx-input-border-width: var(--tx-border-width-thin);
+    --tx-input-elevation: var(--tx-elevation-1);
+    --tx-input-font-size: var(--tx-font-size-sm);
+    --tx-input-font-size-touch: var(--tx-font-size-base);
+    --tx-input-font-weight: var(--tx-type-body-weight);
+    --tx-input-textarea-padding-block: var(--tx-space-2);
+    --tx-input-disabled-opacity: var(--tx-opacity-disabled);
+    /* Component: kbd */
+    --tx-kbd-min-size: var(--tx-size-icon-md);
+    --tx-kbd-padding-block: calc(var(--tx-space-unit) * 0.5);
+    --tx-kbd-radius: calc(var(--tx-shape-radius-lg) * 0.4);
+    --tx-kbd-border-width: var(--tx-border-width-thin);
+    --tx-kbd-font-weight: var(--tx-type-label-weight);
+    /* Component: code */
+    --tx-code-font-size: var(--tx-type-code-size);
+    --tx-code-font-weight: var(--tx-type-code-weight);
+    --tx-code-block-padding-block: var(--tx-space-3);
+    --tx-code-block-padding-inline: var(--tx-space-4);
+    --tx-code-block-radius: var(--tx-shape-radius-lg);
+    --tx-code-block-line-height: var(--tx-type-code-line);
+    --tx-code-block-border-width: var(--tx-border-width-thin);
+    /* Component: menu */
+    --tx-menu-trigger-height-sm: var(--tx-size-control-sm);
+    --tx-menu-trigger-height-md: var(--tx-size-control-md);
+    --tx-menu-trigger-height-lg: var(--tx-size-control-lg);
+    --tx-menu-trigger-radius: var(--tx-shape-radius-lg);
+    --tx-menu-trigger-border-width: var(--tx-border-width-thin);
+    --tx-menu-trigger-font-size: var(--tx-type-label-size);
+    --tx-menu-trigger-font-weight: var(--tx-type-label-weight);
+    --tx-menu-content-z-index: var(--tx-z-popover);
+    --tx-menu-content-padding-block: var(--tx-space-1);
+    --tx-menu-content-radius: var(--tx-shape-radius-lg);
+    --tx-menu-content-elevation: var(--tx-elevation-3);
+    --tx-menu-content-font-size: var(--tx-type-label-size);
+    /* Component: navigation */
+    --tx-navigation-z-index: var(--tx-z-sticky);
+    --tx-navigation-font-size: var(--tx-type-label-size);
+    --tx-navigation-list-gap: var(--tx-space-1);
+    --tx-navigation-trigger-radius: var(--tx-shape-radius-md);
+    --tx-navigation-chevron-opacity: var(--tx-opacity-muted);
+    /* Component: number-field */
+    --tx-number-field-radius: var(--tx-shape-radius-lg);
+    --tx-number-field-border-width: var(--tx-border-width-thin);
+    --tx-number-field-padding-block: var(--tx-space-2);
+    --tx-number-field-padding-inline: var(--tx-space-3);
+    --tx-number-field-stepper-size: var(--tx-size-control-md);
+    /* Component: pin-input */
+    --tx-pin-input-gap: var(--tx-space-2);
+    --tx-pin-input-cell-inline-size: var(--tx-size-control-lg);
+    --tx-pin-input-cell-block-size: var(--tx-space-12);
+    --tx-pin-input-cell-radius: var(--tx-shape-radius-lg);
+    --tx-pin-input-cell-font-size: var(--tx-type-heading-size);
+    /* Component: popover */
+    --tx-popover-z-index: var(--tx-z-popover);
+    --tx-popover-padding-block: var(--tx-space-3);
+    --tx-popover-padding-inline: calc(var(--tx-space-unit) * 3.5);
+    --tx-popover-radius: var(--tx-shape-radius-lg);
+    --tx-popover-border-width: var(--tx-border-width-thin);
+    --tx-popover-elevation: var(--tx-elevation-3);
+    --tx-popover-font-size: var(--tx-type-label-size);
+    --tx-popover-title-font-size: var(--tx-font-size-base);
+    --tx-popover-title-font-weight: var(--tx-type-heading-weight);
+    --tx-popover-title-line-height: var(--tx-type-heading-line);
+    /* Component: progress */
+    --tx-progress-gap: calc(var(--tx-space-unit) * 1.5);
+    --tx-progress-font-size: var(--tx-type-label-size);
+    --tx-progress-radius: var(--tx-shape-radius-full);
+    --tx-progress-track-height-sm: calc(var(--tx-space-unit) * 1.5);
+    --tx-progress-track-height-md: calc(var(--tx-space-unit) * 2.5);
+    --tx-progress-track-height-lg: calc(var(--tx-space-unit) * 3.5);
+    /* Component: rating */
+    --tx-rating-stars-gap: calc(var(--tx-space-unit) * 0.5);
+    --tx-rating-label-font-size: var(--tx-type-label-size);
+    --tx-rating-label-font-weight: var(--tx-type-label-weight);
+    --tx-rating-star-radius: var(--tx-shape-radius-lg);
+    /* Component: resizable */
+    --tx-resizable-radius: var(--tx-shape-radius-xl);
+    --tx-resizable-border-width: var(--tx-border-width-thin);
+    /* Component: scroll-area */
+    --tx-scroll-area-radius: var(--tx-shape-radius-lg);
+    --tx-scroll-area-border-width: var(--tx-border-width-thin);
+    --tx-scroll-area-padding: var(--tx-space-3);
+    --tx-scroll-area-scrollbar-size: calc(var(--tx-space-unit) * 2.5);
+    --tx-scroll-area-scrollbar-radius: var(--tx-shape-radius-full);
+    --tx-scroll-area-thumb-min-size: var(--tx-space-4);
+    /* Component: select */
+    --tx-select-height-sm: var(--tx-size-control-sm);
+    --tx-select-height-md: var(--tx-size-control-md);
+    --tx-select-height-lg: var(--tx-size-control-lg);
+    --tx-select-padding-inline-sm: var(--tx-space-2);
+    --tx-select-padding-inline-md: var(--tx-space-3);
+    --tx-select-padding-inline-lg: calc(var(--tx-space-unit) * 3.5);
+    --tx-select-gap: var(--tx-space-2);
+    --tx-select-radius: var(--tx-shape-radius-lg);
+    --tx-select-border-width: var(--tx-border-width-thin);
+    --tx-select-font-size-sm: var(--tx-type-caption-size);
+    --tx-select-font-size-md: var(--tx-type-label-size);
+    --tx-select-font-size-lg: var(--tx-type-body-size);
+    --tx-select-font-weight: var(--tx-type-body-weight);
+    --tx-select-chevron-size: var(--tx-size-icon-sm);
+    --tx-select-chevron-opacity: var(--tx-opacity-muted);
+    /* Component: separator */
+    --tx-separator-thickness: var(--tx-border-width-thin);
+    /* Component: aspect-ratio */
+    --tx-aspect-ratio-radius: var(--tx-shape-radius-lg);
+    /* Component: sheet */
+    --tx-sheet-z-index: var(--tx-z-overlay);
+    --tx-sheet-gap: var(--tx-space-4);
+    --tx-sheet-padding: var(--tx-space-5);
+    --tx-sheet-border-width: var(--tx-border-width-thin);
+    --tx-sheet-elevation: var(--tx-elevation-4);
+    --tx-sheet-font-size: var(--tx-font-size-sm);
+    --tx-sheet-line-height: var(--tx-type-body-line);
+    --tx-sheet-title-font-size: var(--tx-type-heading-size);
+    --tx-sheet-title-font-weight: var(--tx-type-heading-weight);
+    --tx-sheet-title-line-height: var(--tx-type-heading-line);
+    --tx-sheet-scrim-opacity: var(--tx-opacity-scrim);
+    /* Component: sidebar */
+    --tx-sidebar-font-size: var(--tx-font-size-sm);
+    --tx-sidebar-inset-radius: var(--tx-shape-radius-lg);
+    --tx-sidebar-header-padding-inline: var(--tx-space-3);
+    --tx-sidebar-header-gap: var(--tx-space-2);
+    --tx-sidebar-body-gap: var(--tx-space-4);
+    --tx-sidebar-body-padding-block: var(--tx-space-3);
+    --tx-sidebar-body-padding-inline: var(--tx-space-2);
+    /* Component: skeleton */
+    --tx-skeleton-radius: var(--tx-shape-radius-md);
+    --tx-skeleton-height-sm: var(--tx-space-3);
+    --tx-skeleton-height-md: var(--tx-space-4);
+    --tx-skeleton-height-lg: var(--tx-space-6);
+    --tx-skeleton-circle-size: var(--tx-space-10);
+    /* Component: slider */
+    --tx-slider-thumb-border-width: var(--tx-border-width-thick);
+    --tx-slider-thumb-elevation: var(--tx-elevation-2);
+    --tx-slider-disabled-opacity: var(--tx-opacity-disabled);
+    /* Component: spinner */
+    --tx-spinner-radius: var(--tx-shape-radius-full);
+    /* Component: stat */
+    --tx-stat-gap: var(--tx-space-2);
+    --tx-stat-padding: var(--tx-space-5);
+    --tx-stat-radius: var(--tx-shape-radius-xl);
+    --tx-stat-border-width: var(--tx-border-width-thin);
+    --tx-stat-elevation: var(--tx-elevation-1);
+    --tx-stat-label-font-size: var(--tx-type-label-size);
+    --tx-stat-label-font-weight: var(--tx-type-label-weight);
+    --tx-stat-value-font-size: var(--tx-type-title-size);
+    --tx-stat-value-font-weight: var(--tx-type-heading-weight);
+    --tx-stat-icon-size: var(--tx-size-control-sm);
+    --tx-stat-icon-radius: var(--tx-shape-radius-md);
+    /* Component: stepper */
+    --tx-stepper-gap: var(--tx-space-3);
+    --tx-stepper-trigger-radius: var(--tx-shape-radius-md);
+    --tx-stepper-marker-size: var(--tx-size-control-sm);
+    --tx-stepper-marker-radius: var(--tx-shape-radius-full);
+    --tx-stepper-marker-border-width: var(--tx-border-width-thin);
+    --tx-stepper-marker-font-size: var(--tx-type-caption-size);
+    --tx-stepper-marker-font-weight: var(--tx-type-heading-weight);
+    --tx-stepper-check-size: var(--tx-size-icon-sm);
+    /* Component: table */
+    --tx-table-radius: var(--tx-shape-radius-xl);
+    --tx-table-border-width: var(--tx-border-width-thin);
+    --tx-table-font-size: var(--tx-font-size-sm);
+    --tx-table-head-font-size: var(--tx-type-caption-size);
+    --tx-table-head-font-weight: var(--tx-type-label-weight);
+    /* Component: tabs */
+    --tx-tabs-gap: var(--tx-space-3);
+    --tx-tabs-list-gap: var(--tx-space-1);
+    --tx-tabs-list-radius: var(--tx-shape-radius-lg);
+    --tx-tabs-trigger-gap: var(--tx-space-2);
+    --tx-tabs-trigger-height-touch: var(--tx-size-control-lg);
+    --tx-tabs-trigger-font-size: var(--tx-type-label-size);
+    --tx-tabs-trigger-font-weight: var(--tx-type-label-weight);
+    --tx-tabs-disabled-opacity: var(--tx-opacity-disabled);
+    /* Component: accordion */
+    --tx-accordion-trigger-gap: var(--tx-space-4);
+    --tx-accordion-trigger-padding-block: var(--tx-space-3);
+    --tx-accordion-trigger-font-size: var(--tx-type-label-size);
+    --tx-accordion-trigger-font-weight: var(--tx-type-label-weight);
+    --tx-accordion-disabled-opacity: var(--tx-opacity-disabled);
+    /* Component: tags-input */
+    --tx-tags-input-height: var(--tx-size-control-md);
+    --tx-tags-input-height-touch: var(--tx-size-control-lg);
+    --tx-tags-input-gap: calc(var(--tx-space-unit) * 1.5);
+    --tx-tags-input-padding-inline: var(--tx-space-2);
+    --tx-tags-input-radius: var(--tx-shape-radius-lg);
+    --tx-tags-input-border-width: var(--tx-border-width-thin);
+    --tx-tags-input-elevation: var(--tx-elevation-1);
+    --tx-tags-input-tag-radius: var(--tx-shape-radius-full);
+    --tx-tags-input-tag-font-size: var(--tx-type-label-size);
+    --tx-tags-input-disabled-opacity: var(--tx-opacity-disabled);
+    /* Component: color-picker */
+    --tx-color-picker-gap: var(--tx-space-3);
+    --tx-color-picker-swatch-size: var(--tx-size-icon-lg);
+    --tx-color-picker-swatch-radius: var(--tx-shape-radius-sm);
+    /* Component: timeline */
+    --tx-timeline-marker-size: var(--tx-size-icon-sm);
+    --tx-timeline-marker-radius: var(--tx-shape-radius-full);
+    --tx-timeline-time-font-size: var(--tx-type-caption-size);
+    --tx-timeline-time-font-weight: var(--tx-type-label-weight);
+    /* Component: toast */
+    --tx-toast-z-index: var(--tx-z-toast);
+    --tx-toast-gap: var(--tx-space-3);
+    --tx-toast-padding-block: var(--tx-space-3);
+    --tx-toast-radius: var(--tx-shape-radius-lg);
+    --tx-toast-border-width: var(--tx-border-width-thin);
+    --tx-toast-elevation: var(--tx-elevation-5);
+    --tx-toast-icon-size: var(--tx-size-icon-md);
+    --tx-toast-title-font-size: var(--tx-type-label-size);
+    --tx-toast-title-font-weight: var(--tx-type-label-weight);
+    /* Component: toggle */
+    --tx-toggle-height-sm: var(--tx-size-control-sm);
+    --tx-toggle-height-md: var(--tx-size-control-md);
+    --tx-toggle-height-lg: var(--tx-size-control-lg);
+    --tx-toggle-padding-inline-sm: var(--tx-space-2);
+    --tx-toggle-padding-inline-md: var(--tx-space-3);
+    --tx-toggle-padding-inline-lg: var(--tx-space-4);
+    --tx-toggle-gap: calc(var(--tx-space-unit) * 1.5);
+    --tx-toggle-radius: var(--tx-shape-radius-lg);
+    --tx-toggle-border-width: var(--tx-border-width-thin);
+    --tx-toggle-font-size: var(--tx-type-label-size);
+    --tx-toggle-font-weight: var(--tx-type-label-weight);
+    --tx-toggle-line-height: var(--tx-type-label-line);
+    --tx-toggle-disabled-opacity: var(--tx-opacity-disabled);
+    /* Component: toolbar */
+    --tx-toolbar-gap: var(--tx-space-1);
+    --tx-toolbar-padding: var(--tx-space-1);
+    --tx-toolbar-radius: var(--tx-shape-radius-lg);
+    --tx-toolbar-border-width: var(--tx-border-width-thin);
+    --tx-toolbar-item-height-sm: var(--tx-size-control-xs);
+    --tx-toolbar-item-font-size: var(--tx-type-label-size);
+    --tx-toolbar-item-font-weight: var(--tx-type-label-weight);
+    --tx-toolbar-disabled-opacity: var(--tx-opacity-disabled);
+    /* Component: tooltip */
+    --tx-tooltip-z-index: var(--tx-z-tooltip);
+    --tx-tooltip-radius: calc(var(--tx-shape-radius-lg) * 0.55);
+    --tx-tooltip-font-size: var(--tx-type-caption-size);
+    --tx-tooltip-font-weight: var(--tx-type-label-weight);
+    --tx-tooltip-line-height: var(--tx-type-caption-line);
+    --tx-tooltip-elevation: var(--tx-elevation-3);
+    /* Component: tree */
+    --tx-tree-gap: calc(var(--tx-space-unit) * 0.5);
+    --tx-tree-padding: var(--tx-space-1);
+    --tx-tree-radius: var(--tx-shape-radius-lg);
+    --tx-tree-row-gap: var(--tx-space-2);
+    --tx-tree-row-padding-block: var(--tx-space-1);
+    --tx-tree-checkbox-size: var(--tx-size-icon-sm);
+    --tx-tree-checkbox-radius: var(--tx-shape-radius-xs);
+  }
+  /* @generated token-defaults: end */
+
   :root:dir(rtl),
   :dir(rtl) {
     --tx-safe-area-inline-start: var(--tx-safe-right);

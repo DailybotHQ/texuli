@@ -130,7 +130,7 @@ export const TAILWIND_TYPOGRAPHY: readonly TailwindThemeEntry[] = [
 export const TAILWIND_SPACING_MOTION_SHADOW: readonly TailwindThemeEntry[] = [
   {
     themeVar: '--spacing',
-    tokenVar: '--tx-density',
+    tokenVar: '--tx-space-unit',
     fallback: 'calc(0.25rem * var(--tx-density, 1))',
   },
   { themeVar: '--default-border-width', tokenVar: '--tx-border-width', fallback: '1px' },
@@ -183,7 +183,8 @@ export const TAILWIND_THEME_ENTRIES: readonly TailwindThemeEntry[] = (() => {
 /** Serialize one entry as `var(--tx-…)` or `var(--tx-…, fallback)`. */
 export function themeEntryValue(entry: TailwindThemeEntry): string {
   if (entry.themeVar === '--spacing') {
-    return 'calc(0.25rem * var(--tx-density, 1))';
+    // The unit of the --tx-space-* scale; the fallback keeps the preset working without base.css.
+    return `var(${entry.tokenVar}, ${entry.fallback})`;
   }
   if (
     entry.themeVar.startsWith('--radius-') &&
