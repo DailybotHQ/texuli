@@ -16,9 +16,11 @@ channels, none of which needs CSS of its own:
 
 ## Component tokens
 
-Every styled component reads its own tokens, each with the registry default
-(`@texuli/tokens/components`) as its CSS fallback, so the default themes keep
-their pixels and nothing is declared until a scope sets a token:
+Every styled component reads its own tokens with one fallback level: the
+registry default (`@texuli/tokens/components`), which names a system token
+`@texuli/tokens/base.css` declares (`var(--tx-button-gap, var(--tx-space-2))`).
+Component tokens themselves are never declared, so they cost nothing until a
+scope sets one, and the default themes keep their pixels:
 
 ```css
 [data-tx-scope="acme"] {
@@ -34,7 +36,9 @@ expression is in
 [tokens-components](../../tokens/docs/tokens-components.md#component-tokens).
 Sizes and spaces a component has no token for read the system tokens
 (`--tx-space-*`, `--tx-size-*`, `--tx-shape-radius-*`, `--tx-elevation-*`,
-`--tx-z-*`), so `--tx-density` and the theme radius reach them too. Each
+`--tx-z-*`) plainly (`var(--tx-space-4)`), so `--tx-density` and the theme
+radius reach them too. Import `@texuli/tokens/base.css` (the quick start
+already does): it declares those system defaults. Each
 stylesheet lists the literals it keeps (hit areas, hairlines, layout limits)
 and why, in its header comment.
 
@@ -72,9 +76,11 @@ its own prop is undefined; without a provider it costs one `getContext`.
 </script>
 ```
 
-- **Closed vocabulary:** `DESIGN_DEFAULTS_VOCABULARY` lists, for 46
+- **Closed vocabulary:** `DESIGN_DEFAULTS_VOCABULARY` lists, for 45
   component ids (`button`, `icon-button`, `select`, `menu`, `sheet`…), the
   `variant` and `size` values each accepts; `DesignDefaults` is typed from it.
+  `Table` keeps its built-in `plain` variant for now (**planned**: the read
+  would push `@texuli/data/grid-editing` over its size cap).
 - **Untrusted input:** `validateDesignDefaults(input)` keeps known
   components, props and values and reports the rest with a path and a code
   (`not-object`, `unknown-component`, `unknown-prop`, `unknown-value`);
@@ -89,5 +95,5 @@ its own prop is undefined; without a provider it costs one `getContext`.
 Tests: `packages/texuli/tests/design-defaults.test.ts` (every component with
 a `variant` or `size` prop, the vocabulary against each family's constants,
 hostile input), `packages/tokens/tests/token-contract-v2.test.ts` (every read
-carries the registry fallback, every component page carries its Tokens
-section).
+is in its exact one-level form, `base.css` declares every system default,
+every component page carries its Tokens section).
