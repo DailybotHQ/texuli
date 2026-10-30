@@ -26,6 +26,32 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['api', 'openapi', 'mcp', 'cli', 'rate limit', 'developers', 'json'],
   },
   {
+    id: 'page-mcp-server',
+    title: 'Texuli MCP',
+    description:
+      'The MCP server: remote and npx, setup for every host, tools, resources, prompts and limits.',
+    href: '/mcp-server/',
+    kind: 'page',
+    keywords: ['mcp', 'model context protocol', 'claude', 'cursor', 'codex', 'tools', 'webmcp'],
+  },
+  {
+    id: 'page-tokens',
+    title: 'Design tokens',
+    description:
+      'Token contract v2: system families, the scope model, hooks and setDesignDefaults.',
+    href: '/tokens/',
+    kind: 'page',
+    keywords: ['tokens', 'design tokens', 'design system', 'scope', 'defaults', 'css variables'],
+  },
+  {
+    id: 'page-component-tokens',
+    title: 'Component tokens',
+    description: 'Every component token with the fallback its read carries.',
+    href: '/tokens/components/',
+    kind: 'page',
+    keywords: ['component tokens', 'tokens', 'fallback', 'design system'],
+  },
+  {
     id: 'page-brand',
     title: 'Brand',
     description: 'Brand story, live demos, and why Texuli.',

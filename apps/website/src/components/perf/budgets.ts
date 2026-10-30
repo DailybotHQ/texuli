@@ -150,8 +150,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/whats-new/',
     reason:
-      'PLAN_010 T-site-080 (Amendment 8): the hub of every 0.6.0 to 0.8.0 feature with six lazy islands (client:visible); the first row of cards is static previews, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the five live demos can import (the form, the dashboard, the rating, the motion runtime). Measured 2026-10-29: 160.6 KB page (+4% headroom; a proposal for the owner).',
-    budget: { pageGzipKb: 168 },
+      'PLAN_010 T-site-080 (Amendment 8): the hub of every 0.6.0 to 0.8.0 feature with six lazy islands (client:visible); the first row of cards is static previews, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the five live demos can import (the form, the dashboard, the rating, the motion runtime). Measured 2026-10-29: 160.6 KB page (+4% headroom; a proposal for the owner). PLAN_011 T-site-090 (2026-10-30): the 0.9.0 section (five static cards, the MCP doors snippet and the token counts; no new island) on top of token adoption: measured 167.8 KB page, 0.2 KB under the old cap, limit 175 (+4% headroom).',
+    budget: { pageGzipKb: 175 },
   },
   {
     route: '/live-generation/',
@@ -264,6 +264,24 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
       'The live demo (frame, props panel, the real primitive and its Texuli styles) loads when it scrolls into view, which is at open on a desktop viewport.',
     budget: { pageGzipKb: 160, jsGzipKb: 108 },
   })),
+  {
+    route: '/mcp-server/',
+    reason:
+      'PLAN_011 T-site-090: a static page (no island) whose tables are generated from the operations registry (every tool with its summary, arguments, doors and limits; resources, prompts, WebMCP tools) plus setup snippets for six hosts: 21.2 KB gzip of HTML, inside the HTML budget. The shared docs shell (header, sidebar, search and the token-adopted base CSS) is about 78 KB of the total. Measured 2026-10-30: 100.3 KB page (+4% headroom).',
+    budget: { pageGzipKb: 105 },
+  },
+  {
+    route: '/tokens/',
+    reason:
+      'PLAN_011 T-site-090: the token contract v2 reference, static (no island), generated from the registries: all 151 system tokens with defaults, the hooks and the defaults vocabulary, 21.3 KB gzip of HTML, inside the HTML budget; the component tier is split to /tokens/components/ to keep each document inside it. Measured 2026-10-30: 100.5 KB page (+4% headroom).',
+    budget: { pageGzipKb: 105 },
+  },
+  {
+    route: '/tokens/components/',
+    reason:
+      'PLAN_011 T-site-090: every component token (364 for 57 components) with its fallback, static (no island), compact tables with page-wide styles so no per-cell scope attribute is written: 23.2 KB gzip of HTML, inside the HTML budget. Measured 2026-10-30: 102.8 KB page (+4% headroom).',
+    budget: { pageGzipKb: 107 },
+  },
 ]);
 
 export interface PrefixBudgetOverride {

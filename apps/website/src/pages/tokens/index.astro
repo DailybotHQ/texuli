@@ -1,0 +1,350 @@
+---
+/**
+ * /tokens/ — the token contract v2 reference (PLAN_011 T-site-090, ADR-020):
+ * the scope model, how design systems and agents drive tokens, hooks,
+ * setDesignDefaults and every system family with its tokens and defaults.
+ * The component tier (57 components) is /tokens/components/, split off to
+ * keep each document inside the default HTML budget. Static: no island.
+ * Every row is read at build time from the registries
+ * (`src/components/tokens-page/tokens.ts`).
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import {
+  COMPONENT_TOKENS_PATH,
+  DEFAULTS_EXAMPLE,
+  DEFAULTS_ROWS,
+  EXAMPLE_READ,
+  familyAnchor,
+  HOOKS,
+  SCOPE_EXAMPLE,
+  SYSTEM_TOKEN_FAMILIES,
+  TOKEN_COUNTS,
+  TOKEN_SCOPE_SELECTOR,
+} from '../../components/tokens-page/tokens.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { API_RELEASE_STATUS } from '../../lib/api-surface.ts';
+
+const description = `The Texuli token contract v2: ${TOKEN_COUNTS.system} system tokens in ${TOKEN_COUNTS.systemFamilies} families with their defaults, ${TOKEN_COUNTS.component} component tokens, the scope model, hooks and setDesignDefaults, generated from the registries.`;
+const repo = (path: string) =>
+  safeHref(`https://github.com/DailybotHQ/texuli/blob/main/${path}`, 'developer');
+const adr = repo(
+  'docs/DECISIONS.md#adr-020-token-contract-v2-additive-families-and-a-real-component-tier'
+);
+const designSystemDoc = repo('packages/texuli/docs/design-system.md');
+const released = API_RELEASE_STATUS.state === 'released';
+---
+
+<BaseLayout title="Design tokens" {description}>
+  <div class="tx-tokens-ref">
+  <h1>Design tokens</h1>
+  <p class="lead">
+    Every size, space, radius, shadow, layer and type role a Texuli component paints is a <code>--tx-*</code> custom property. Set them on a scope and the components follow, with no CSS
+    of your own.
+  </p>
+  {
+    !released && (
+      <p class="status" data-tokens-status>
+        <strong>Status:</strong> token contract v2 is in development for 0.9.0, built on the
+        release/0.9.0 branch. The 0.8 line on npm has the theme tokens,
+        without these system families or the component tier.
+      </p>
+    )
+  }
+  <dl class="facts">
+    <dt>System tokens</dt>
+    <dd>
+      <span data-tokens-count-system>{TOKEN_COUNTS.system}</span> in {TOKEN_COUNTS.systemFamilies} families: {TOKEN_COUNTS.base} declared once in <code>@texuli/tokens/base.css</code>, {TOKEN_COUNTS.theme} data-viz tokens emitted per theme
+    </dd>
+    <dt>Component tokens</dt>
+    <dd>
+      <a href={COMPONENT_TOKENS_PATH}>{TOKEN_COUNTS.component} for {TOKEN_COUNTS.components} components</a>, never declared
+    </dd>
+    <dt>Defaults</dt>
+    <dd>{TOKEN_COUNTS.defaults} components take a default variant or size</dd>
+    <dt>Decision</dt>
+    <dd><a href={adr}>ADR-020</a>; additive: nothing existing is renamed</dd>
+  </dl>
+
+  <nav class="jump" aria-label="System families">
+    <p class="jump__title">System families</p>
+    <ul>
+      {
+        SYSTEM_TOKEN_FAMILIES.map((family) => (
+          <li>
+            <a href={`#${familyAnchor(family.id)}`}>{family.title}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <h2 id="scope">The scope model</h2>
+  <ul class="points">
+    <li>
+      <strong>A token scope</strong> is any element matching <code>{TOKEN_SCOPE_SELECTOR}</code>: the document root, an element with a theme, or an element marked <code>data-tx-scope</code>. <code>base.css</code> declares every system default on each scope, inside <code>@layer tx.base</code> with zero specificity, so derived values (space steps, radius
+      steps, type roles) resolve against the nearest theme and its density.
+    </li>
+    <li>
+      <strong>One fallback level.</strong> A system token is read plain
+      (<code>var(--tx-space-4)</code>). A component token carries exactly one fallback, its registry
+      default: <code>{EXAMPLE_READ}</code>.
+    </li>
+    <li>
+      <strong>Component tokens are undeclared</strong> until a theme, design system or host sets one
+      on its scope, so they cost no bytes on a page that does not use them.
+    </li>
+    <li>
+      <strong>Set tokens on a scope, never globally,</strong> so two design systems can share a page.
+    </li>
+  </ul>
+  <pre><code>{SCOPE_EXAMPLE}</code></pre>
+
+  <h2 id="drivers">How design systems and agents drive them</h2>
+  <div class="table-wrap" role="region" aria-label="Channels" tabindex="0">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Channel</th>
+          <th scope="col">Reaches</th>
+          <th scope="col">Set with</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Component tokens</th>
+          <td>Sizes, spaces, radii, borders, shadows, layers and type of each component</td>
+          <td>Custom properties on a scope (<code>--tx-button-radius</code>)</td>
+        </tr>
+        <tr>
+          <th scope="row">System tokens</th>
+          <td>Every component at once: the space scale, control sizes, radii, elevation, type roles</td>
+          <td>Custom properties on a scope (<code>--tx-space-unit</code>, <code>--tx-shape-radius-lg</code>)</td>
+        </tr>
+        <tr>
+          <th scope="row">Hooks</th>
+          <td>A closed look per component (pill buttons, glass cards)</td>
+          <td><code>data-tx-*-style</code> attributes on any ancestor</td>
+        </tr>
+        <tr>
+          <th scope="row">Defaults</th>
+          <td>The default <code>variant</code> and <code>size</code> props</td>
+          <td><code>setDesignDefaults</code> from <code>texuli/defaults</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Agents work from the same closed vocabulary. <code>getComponentTokensJsonSchema()</code> from <code>@texuli/tokens/components</code> is a JSON Schema of every component and key, so a token
+    set an agent writes can be validated before it reaches a page, and <code>validateDesignDefaults</code> drops and reports any default outside the vocabulary. The <a href="/mcp-server/">Texuli MCP</a> serves the themes those tokens sit on. A design-system
+    document that sets all of this from one JSON file is planned.
+  </p>
+
+  <h3 id="hooks">Hooks</h3>
+  <div class="table-wrap" role="region" aria-label="Hooks" tabindex="0">
+    <table data-tokens-hooks>
+      <thead>
+        <tr>
+          <th scope="col">Attribute</th>
+          <th scope="col">Values</th>
+          <th scope="col">Sets</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          HOOKS.map((hook) => (
+            <tr>
+              <th scope="row">
+                <code>{hook.attribute}</code>
+              </th>
+              <td>{hook.values.join(', ')}</td>
+              <td>
+                <code>{hook.effect}</code>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="defaults">setDesignDefaults</h2>
+  <p>
+    CSS cannot choose a default variant or size, so <code>texuli/defaults</code> carries them in a
+    Svelte context. A component uses its design default only when its own prop is undefined; nested
+    providers merge, the inner one winning per component and prop. Pass a function to keep the
+    defaults reactive.
+  </p>
+  <pre><code>{DEFAULTS_EXAMPLE}</code></pre>
+  <div class="table-wrap" role="region" aria-label="Defaults vocabulary" tabindex="0">
+    <table data-tokens-defaults>
+      <caption>The defaults vocabulary</caption>
+      <thead>
+        <tr>
+          <th scope="col">Component</th>
+          <th scope="col">variant</th>
+          <th scope="col">size</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          DEFAULTS_ROWS.map((row) => (
+            <tr>
+              <th scope="row">
+                <code>{row.component}</code>
+              </th>
+              <td>{row.variant.join(', ') || '—'}</td>
+              <td>{row.size.join(', ') || '—'}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p>
+    More on tokens, hooks and defaults together: <a href={designSystemDoc}>the design-system guide</a>.
+  </p>
+
+  <h2 id="system">System families</h2>
+  <p>
+    Each family with its tokens and the default <code>base.css</code> declares. Data-viz is the
+    exception: each theme emits it, and the column names the theme source.
+  </p>
+  {
+    SYSTEM_TOKEN_FAMILIES.map((family) => (
+      <>
+        <h3 id={familyAnchor(family.id)}>
+          {family.title} <span class="count">({family.tokens.length})</span>
+        </h3>
+        <p>{family.description.replaceAll("`", "")}</p>
+        <table class="ref" data-tokens-family={family.id}>
+          <thead>
+            <tr>
+              <th scope="col">Token</th>
+              <th scope="col">{family.emit === 'theme' ? 'Theme source' : 'Default'}</th>
+              <th scope="col">Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            {family.tokens.map((token) => (
+              <tr>
+                <td>{token.name}</td>
+                <td>{token.value}</td>
+                <td>{token.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </>
+    ))
+  }
+  <p>
+    Next: <a href={COMPONENT_TOKENS_PATH}>every component token and its fallback</a>.
+  </p>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  /* Global under one wrapper class: scoped styles stamp an attribute on every table cell. */
+  .tx-tokens-ref h1 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
+  .tx-tokens-ref h2 {
+    margin-block: 2rem 0.75rem;
+    font-size: 1.5rem;
+  }
+  .tx-tokens-ref h3 {
+    margin-block: 1.25rem 0.5rem;
+    font-size: 1.125rem;
+  }
+  .tx-tokens-ref p {
+    max-inline-size: 48rem;
+  }
+  .tx-tokens-ref .lead {
+    font-size: 1.1rem;
+  }
+  .tx-tokens-ref .status {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tx-border);
+    border-inline-start-width: 4px;
+    border-radius: var(--tx-radius, 0.5rem);
+  }
+  .tx-tokens-ref .facts {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.375rem 1rem;
+    margin: 1rem 0;
+  }
+  .tx-tokens-ref .facts dt {
+    color: var(--tx-muted-foreground);
+  }
+  .tx-tokens-ref dd {
+    margin: 0;
+    min-inline-size: 0;
+  }
+  .tx-tokens-ref code {
+    overflow-wrap: anywhere;
+  }
+  .tx-tokens-ref .jump__title {
+    margin: 0 0 0.25rem;
+    font-weight: 600;
+  }
+  .tx-tokens-ref .jump ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tx-tokens-ref .count {
+    color: var(--tx-muted-foreground);
+    font-weight: 400;
+  }
+  .tx-tokens-ref pre {
+    margin: 0 0 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tx-border);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-muted, Canvas);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 0.875rem;
+  }
+  .tx-tokens-ref .table-wrap {
+    overflow-x: auto;
+  }
+  .tx-tokens-ref table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .tx-tokens-ref caption {
+    text-align: start;
+    font-weight: 600;
+    padding-block-end: 0.5rem;
+  }
+  .tx-tokens-ref th,
+  .tx-tokens-ref td {
+    padding: 0.4rem 0.5rem;
+    border-block-end: 1px solid var(--tx-border);
+    text-align: start;
+    vertical-align: top;
+  }
+  .tx-tokens-ref tbody th {
+    font-weight: 400;
+  }
+  .tx-tokens-ref .ref td {
+    overflow-wrap: anywhere;
+  }
+  .tx-tokens-ref .ref td:nth-child(-n + 2) {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.8125rem;
+  }
+  .tx-tokens-ref .points {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0 0 0.75rem;
+    padding-inline-start: 1.25rem;
+  }
+</style>

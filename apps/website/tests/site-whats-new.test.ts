@@ -33,6 +33,7 @@ describe('whats-new hub', () => {
   it('covers every new package and capability, grouped by release', () => {
     expect(FEATURES.map((feature) => feature.id).sort()).toEqual(
       [
+        'agent-ready',
         'agent-service',
         'canvas',
         'contract',
@@ -40,12 +41,16 @@ describe('whats-new hub', () => {
         'documents',
         'forms',
         'i18n',
+        'mcp',
         'motion',
         'output',
         'pages',
+        'portals',
+        'protoyard',
         'sheets',
         'sources',
         'streaming',
+        'tokens',
       ].sort()
     );
     const ids = FEATURES.map((feature) => feature.id);
@@ -78,7 +83,11 @@ describe('whats-new hub', () => {
     const line = releaseLine();
     const current = `${line.published}.0`;
     expect(byId[current]?.status).toContain(`Published on npm as ${current}, the current release`);
-    if (line.development) expect(byId[line.development]?.published ?? false).toBe(false);
+    if (line.development) {
+      expect(byId[line.development]?.published ?? false).toBe(false);
+      // PLAN_011 T-site-090: the version in development is on the hub, marked so.
+      expect(byId[line.development]?.status).toMatch(/^In development/);
+    }
     // The manifests carry a version of the release line, the three packages
     // 0.8.0 publishes for the first time included.
     for (const name of ['forms', 'canvas', 'sheets', 'document']) {

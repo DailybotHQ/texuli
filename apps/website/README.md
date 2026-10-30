@@ -48,6 +48,8 @@ islands (`client:load`, `client:visible`, …).
 | Analytics (Umami, default-off, owner checkpoint) | [site-analytics.md](docs/site-analytics.md) |
 | Agent surfaces (llms.txt, Markdown twins, `.well-known`, middleware) | [site-aeo.md](docs/site-aeo.md) |
 | Public JSON API, `/openapi.json`, rate limits, the `/developers/` portal | [site-api.md](docs/site-api.md) |
+| The `/mcp-server/` page (Texuli MCP, generated from the registry) | [site-mcp-server.md](docs/site-mcp-server.md) |
+| The `/tokens/` and `/tokens/components/` token contract v2 reference | [site-tokens.md](docs/site-tokens.md) |
 | SEO, structured data, social images, sitemap, robots | [site-seo.md](docs/site-seo.md) |
 | Content Security Policy | [site-csp.md](docs/site-csp.md) |
 | Performance budgets | [site-perf.md](docs/site-perf.md) |
