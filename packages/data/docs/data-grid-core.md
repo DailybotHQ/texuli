@@ -30,6 +30,7 @@
 | `caption` | required | The grid's accessible name (`<caption>`); `captionHidden` keeps it for assistive technology only |
 | `sort` | `[]` | `bind:sort`: the engine's `GridSort`, primary key first. `onSortChange` |
 | `search`, `searchable` | `''`, `false` | `bind:search`; `searchable` shows a labelled search field |
+| `searchPredicate` | — | `(row, query) => boolean`: your own match rule for a non-empty `search`, instead of the built-in folded substring over the searchable columns (also a `gridRows` option). It runs after `filter` and before the sort |
 | `filter` | none | A `FilterNode` AST, validated by `compileFilter` (an invalid filter throws) |
 | `selectable`, `selected` | `false`, `[]` | A selection column; `bind:selected` holds row ids in row order. `onSelectionChange` |
 | `rowLabel` | first column's text | Names a row for its checkbox, and a `rowFocusable` row itself (`aria-label` on the `tr`) |

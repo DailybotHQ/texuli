@@ -52,6 +52,11 @@ interface Props {
   search?: string;
   /** Shows a search field above the grid. */
   searchable?: boolean;
+  /**
+   * Your own match rule for a non-empty `search` (instead of the built-in
+   * folded substring over the searchable columns): `(row, query) => boolean`.
+   */
+  searchPredicate?: (row: T, query: string) => boolean;
   /** A filter AST (`FilterNode`), validated against the columns. */
   filter?: unknown;
   /** Adds a selection column. */
@@ -145,6 +150,7 @@ let {
   onSortChange,
   search = $bindable(''),
   searchable = false,
+  searchPredicate,
   filter,
   selectable = false,
   selected = $bindable([]),
@@ -218,7 +224,14 @@ const searchId = `${uid}-search`;
 const instructionsId = `${uid}-instructions`;
 
 const visible = $derived(
-  gridRows(rows, { columns, sort, search, filter, ...(locale ? { locale } : {}) })
+  gridRows(rows, {
+    columns,
+    sort,
+    search,
+    filter,
+    ...(searchPredicate ? { searchPredicate } : {}),
+    ...(locale ? { locale } : {}),
+  })
 );
 const pageCount = $derived(pageSize > 0 ? Math.max(1, Math.ceil(visible.length / pageSize)) : 1);
 const currentPage = $derived(Math.min(Math.max(1, page), pageCount));

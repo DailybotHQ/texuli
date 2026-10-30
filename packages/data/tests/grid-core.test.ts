@@ -721,3 +721,51 @@ describe('DataGrid table mode keyboard row activation (G92)', () => {
     }
   });
 });
+
+describe('DataGrid search predicate (G92 stretch)', () => {
+  afterEach(cleanup);
+
+  // Match the start of any word in the name, or an exact id: a rule the
+  // default substring search over the visible columns cannot express.
+  const byWordStart = (row: Row, query: string) =>
+    row.id === query ||
+    row.name
+      .toLowerCase()
+      .split(/\s+/)
+      .some((word) => word.startsWith(query.toLowerCase()));
+
+  it('gridRows uses searchPredicate instead of the column search, after the filter', () => {
+    expect(gridRows(rows, { columns, search: 'ights' }).map((row) => row.id)).toEqual(['c']);
+    for (const [query, ids] of [
+      ['ights', []],
+      ['li', ['c']],
+      ['b', ['b']],
+      ['', ['a', 'b', 'c']],
+    ] as const) {
+      expect(
+        gridRows(rows, { columns, search: query, searchPredicate: byWordStart }).map(
+          (row) => row.id
+        ),
+        query
+      ).toEqual(ids);
+    }
+  });
+
+  it('DataGrid passes searchPredicate to its search field', async () => {
+    render(DataGrid<Row>, {
+      props: {
+        rows,
+        columns,
+        getRowId: (row: Row) => row.id,
+        caption: 'Places',
+        searchable: true,
+        searchPredicate: byWordStart,
+      },
+    });
+    await fireEvent.input(screen.getByRole('searchbox'), { target: { value: 'ights' } });
+    expect(screen.queryByText('Harbor Lights')).toBeNull();
+    await fireEvent.input(screen.getByRole('searchbox'), { target: { value: 'li' } });
+    expect(screen.getByText('Harbor Lights')).toBeTruthy();
+    expect(screen.queryByText('harbor notes')).toBeNull();
+  });
+});
