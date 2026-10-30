@@ -63,13 +63,19 @@ function greenSurface() {
         tools: texuliOps.list().map((operation) => ({ name: operation.name })),
       }),
       'agent-skills/index.json': JSON.stringify(skills),
+      'oauth-authorization-server': JSON.stringify({ issuer: 'https://texuli.com' }),
+      'oauth-protected-resource': JSON.stringify({ resource: 'https://texuli.com' }),
+      'agent-card.json': JSON.stringify({ name: 'Texuli', url: 'https://texuli.com/mcp' }),
+      'poppy.json': JSON.stringify({ protocol_version: '0.1' }),
     },
     mdManifest: JSON.stringify({ twins }),
     robots: [
       'User-agent: *',
       'Allow: /',
+      'Content-Signal: ai-train=yes, search=yes, ai-input=yes',
       '',
       'Sitemap: https://texuli.com/sitemap.xml',
+      'Agentmap: https://texuli.com/.well-known/ai-catalog.json',
       ...Array.from({ length: 16 }, (_, i) => `User-agent: Crawler${i}\nAllow: /`),
       '',
     ].join('\n'),
@@ -91,22 +97,23 @@ const criticals = (result: {
 }) => result.findings.filter((finding) => finding.severity === 'critical');
 
 describe('auditAeo on a green fixture surface', () => {
-  it('finds zero criticals, three planned rows and counts the surface; renders a green verdict and the planned section; warns on an indexed top route outside the nav-curated llms.txt', () => {
-    // finds zero criticals, three planned rows and counts the surface
+  it('finds zero criticals, one planned row and counts the surface; renders a green verdict and the planned section; warns on an indexed top route outside the nav-curated llms.txt', () => {
+    // finds zero criticals, one planned row and counts the surface
     {
       const result = auditAeo(greenSurface());
       expect(criticals(result).map((finding) => `${finding.category}: ${finding.detail}`)).toEqual(
         []
       );
       expect(result.summary.findings.critical).toBe(0);
-      expect(result.summary.findings.planned).toBe(3);
-      expect(result.summary.surface).toEqual({ topRoutes: 2, twins: 3, wellKnownFiles: 4 });
+      expect(result.summary.findings.planned).toBe(1);
+      expect(result.summary.surface).toEqual({ topRoutes: 2, twins: 3, wellKnownFiles: 8 });
     }
     // renders a green verdict and the planned section
     {
       const report = renderMarkdown(auditAeo(greenSurface()));
       expect(report).toContain('GREEN — the agent surface holds');
-      expect(report).toContain('Content-Signal');
+      expect(report).toContain('Reachability');
+      expect(report).not.toContain('Content-Signal');
     }
     // warns on an indexed top route outside the nav-curated llms.txt
     {
@@ -279,7 +286,38 @@ describe('auditAeo red cases', () => {
           finding.detail.includes('Disallow exists')
         )
       ).toBe(true);
+
+      // PLAN_011 T-ar-discovery: the signals and the Agentmap are required.
+      const unsignalled = greenSurface();
+      unsignalled.robots = greenSurface().robots.replace(/^Content-Signal: .*\n/m, '');
+      expect(
+        criticals(auditAeo(unsignalled)).some((finding) =>
+          finding.detail.includes('no Content-Signal')
+        )
+      ).toBe(true);
+      const unmapped = greenSurface();
+      unmapped.robots = greenSurface().robots.replace(/^Agentmap: .*\n/m, '');
+      expect(
+        criticals(auditAeo(unmapped)).some((finding) => finding.detail.includes('no Agentmap'))
+      ).toBe(true);
     }
+  });
+});
+
+describe('auditAeo and Function routes (PLAN_011 T-ar-discovery)', () => {
+  it('accepts a catalog entry for the remote MCP that dist does not hold, and still flags other missing paths', () => {
+    const surface = greenSurface();
+    surface.wellKnown['ai-catalog.json'] = JSON.stringify({
+      entries: [
+        { identifier: 'urn:air:server:mcp', url: 'https://texuli.com/mcp' },
+        { identifier: 'urn:air:ghost', url: 'https://texuli.com/ghost.json' },
+      ],
+    });
+    surface.exists = () => false;
+    const details = criticals(auditAeo(surface)).map((finding) => finding.page);
+    expect(details).not.toContain('urn:air:server:mcp');
+    expect(details).toContain('urn:air:ghost');
+    expect(AEO_CONFIG.functionRoutes).toEqual(['/mcp', '/.well-known/mcp']);
   });
 });
 
