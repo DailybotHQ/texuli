@@ -24,6 +24,8 @@ type OwnProps = {
   /** Called on activation (client routers); call `event.preventDefault()` to stop the link. */
   onSelect?: (item: BottomNavItem, event: MouseEvent) => void;
   class?: ClassValue;
+  /** The `nav` element (bindable). */
+  ref?: HTMLElement | null;
 };
 type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps>;
 
@@ -34,6 +36,7 @@ let {
   hrefTrust = 'developer',
   onSelect,
   class: className,
+  ref = $bindable(null),
   ...rest
 }: Props = $props();
 const msg = useMessages();
@@ -42,6 +45,7 @@ const label = $derived(labelProp ?? msg('texuli.bottom-nav.label', 'Primary'));
 
 <nav
   {...rest}
+  bind:this={ref}
   class={cx('tx-mobile-tabs', fixed && 'tx-mobile-tabs--fixed', className)}
   aria-label={label}
   data-tx-bottom-nav=""

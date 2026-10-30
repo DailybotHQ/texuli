@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import './mobile.css';
@@ -10,7 +11,7 @@ import './mobile.css';
  * navigation. It fills `--tx-app-height` (default `100dvh`); set that variable
  * on an ancestor to fit a contained frame such as a device preview.
  */
-type Props = {
+type OwnProps = {
   /** Usually a `MobileHeader`; outside the scroll region. */
   header?: Snippet;
   /** Usually a `BottomNav`; outside the scroll region. */
@@ -32,7 +33,11 @@ type Props = {
   resetScrollOnNavigate?: boolean;
   class?: ClassValue;
   mainClass?: ClassValue;
+  /** The frame's root element (bindable). */
+  ref?: HTMLElement | null;
 };
+/** Other attributes (`id`, `aria-*`, `data-*`, `style`, handlers) land on the root element. */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'>;
 
 let {
   header,
@@ -45,6 +50,8 @@ let {
   resetScrollOnNavigate = true,
   class: className,
   mainClass,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
 const msg = useMessages();
 const skipLabel = $derived(
@@ -53,7 +60,7 @@ const skipLabel = $derived(
 
 const uid = $props.id();
 const screenId = $derived(mainId ?? `${uid}-main`);
-let frame = $state<HTMLElement>();
+const frame = $derived(ref ?? undefined);
 let screen = $state<HTMLElement>();
 let nested = $state(false);
 
@@ -102,7 +109,7 @@ function focusScreen(event: MouseEvent): void {
 }
 </script>
 
-<div bind:this={frame} class={cx('tx-mobile-frame', className)} data-tx-mobile-frame="">
+<div {...rest} bind:this={ref} class={cx('tx-mobile-frame', className)} data-tx-mobile-frame="">
   <a class="tx-mobile-frame__skip" href={`#${screenId}`} onclick={focusScreen}>{skipLabel}</a>
   {@render header?.()}
   <svelte:element
