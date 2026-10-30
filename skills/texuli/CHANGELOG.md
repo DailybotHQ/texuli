@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-10-30
+
+### Changes
+
+- chore(deps): release 0.8.0 of all 25 packages, @texuli/forms, @texuli/canvas and @texuli/sheets for the first time
+
 - The packages move to `0.8.0`: 25 published packages, `@texuli/forms`,
   `@texuli/canvas` and `@texuli/sheets` published for the first time. The
   router, components, build-ui and recipes say "on npm as `0.8.0`" and pin
