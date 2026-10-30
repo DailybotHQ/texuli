@@ -109,3 +109,36 @@ export function techArticleJsonLd(headline: string, description: string, path: s
     ],
   };
 }
+
+/**
+ * The WebAPI graph of /developers/ (PLAN_011 T-ar-api): the read-only JSON
+ * API and the MCP server, their machine-readable description (the OpenAPI
+ * document) and the provider. Facts only: the URLs are built paths.
+ */
+export function webApiJsonLd(description: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebAPI',
+        name: 'Texuli public API',
+        description,
+        url: `${SITE_URL}/developers/`,
+        documentation: `${SITE_URL}/openapi.json`,
+        termsOfService: 'https://opensource.org/licenses/MIT',
+        license: 'https://opensource.org/licenses/MIT',
+        isAccessibleForFree: true,
+        inLanguage: 'en',
+        provider: { '@type': 'Organization', name: 'Dailybot, Inc.', url: 'https://dailybot.com/' },
+        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_URL}/` },
+        potentialAction: {
+          '@type': 'ConsumeAction',
+          target: [
+            { '@type': 'EntryPoint', urlTemplate: `${SITE_URL}/api/v1/index.json` },
+            { '@type': 'EntryPoint', urlTemplate: `${SITE_URL}/mcp`, httpMethod: 'POST' },
+          ],
+        },
+      },
+    ],
+  };
+}

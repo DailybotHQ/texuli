@@ -81,6 +81,7 @@ The agent catalog, the sink-free renderer, streaming generation and the agent su
 - [Live generation](https://texuli.com/live-generation/)
 - [Builder](https://texuli.com/builder/)
 - [Agent chat](https://texuli.com/agent-chat/)
+- [Developers](https://texuli.com/developers/)
 
 ## Project
 
@@ -100,6 +101,8 @@ Machine-readable documentation served as static files.
 - [Catalog llms.txt](https://texuli.com/llms/llms.txt): The agent-facing component index.
 - [Catalog llms-full.txt](https://texuli.com/llms/llms-full.txt): Every component doc in one file.
 - [Catalog JSON](https://texuli.com/catalog/catalog.json): The full catalog manifest as JSON.
+- [OpenAPI description](https://texuli.com/openapi.json): OpenAPI 3.1 for the read-only JSON API under /api/v1/ and POST /mcp (in development until 0.9.0).
+- [API index](https://texuli.com/api/v1/index.json): Every JSON endpoint with its operationId, the limits and the versioning policy.
 
 ## Tools
 

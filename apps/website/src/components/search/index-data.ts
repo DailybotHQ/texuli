@@ -18,6 +18,14 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['texuli', 'landing'],
   },
   {
+    id: 'page-developers',
+    title: 'Developers',
+    description: 'The JSON API, OpenAPI, the MCP server, the CLI, limits and versioning.',
+    href: '/developers/',
+    kind: 'page',
+    keywords: ['api', 'openapi', 'mcp', 'cli', 'rate limit', 'developers', 'json'],
+  },
+  {
     id: 'page-brand',
     title: 'Brand',
     description: 'Brand story, live demos, and why Texuli.',

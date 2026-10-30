@@ -134,6 +134,18 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
           href: abs('/catalog/catalog.json'),
           description: 'The full catalog manifest as JSON.',
         },
+        {
+          title: 'OpenAPI description',
+          href: abs('/openapi.json'),
+          description:
+            'OpenAPI 3.1 for the read-only JSON API under /api/v1/ and POST /mcp (in development until 0.9.0).',
+        },
+        {
+          title: 'API index',
+          href: abs('/api/v1/index.json'),
+          description:
+            'Every JSON endpoint with its operationId, the limits and the versioning policy.',
+        },
       ],
     },
   ];
