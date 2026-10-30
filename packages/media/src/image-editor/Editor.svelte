@@ -781,7 +781,7 @@ const filterValue = (name: FilterName) =>
   @layer tx.components {
     .tx-image-editor {
       display: grid;
-      gap: 1rem;
+      gap: var(--tx-space-4);
       /* Preview and controls side by side when there is room, stacked otherwise. */
       grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
       align-items: start;
@@ -794,8 +794,8 @@ const filterValue = (name: FilterName) =>
       position: relative;
       inline-size: 100%;
       overflow: hidden;
-      border: var(--tx-border-width, 1px) solid var(--tx-border, light-dark(#d4d4d8, #3f3f46));
-      border-radius: var(--tx-radius, 0.5rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, light-dark(#d4d4d8, #3f3f46));
+      border-radius: var(--tx-shape-radius-lg);
       background:
         repeating-conic-gradient(var(--tx-muted, light-dark(#f4f4f5, #27272a)) 0 25%, transparent 0 50%) 0 0 /
         1rem 1rem;
@@ -838,8 +838,8 @@ const filterValue = (name: FilterName) =>
       inset-block-end: -0.5rem;
       inline-size: 1rem;
       block-size: 1rem;
-      border: 2px solid var(--tx-image-editor-edge-contrast, #000000);
-      border-radius: 999px;
+      border: var(--tx-border-width-thick) solid var(--tx-image-editor-edge-contrast, #000000);
+      border-radius: var(--tx-shape-radius-full);
       background: var(--tx-image-editor-edge, #ffffff);
       cursor: nwse-resize;
     }
@@ -853,38 +853,38 @@ const filterValue = (name: FilterName) =>
     }
     .tx-ie-panels {
       display: grid;
-      gap: 1rem;
+      gap: var(--tx-space-4);
       align-content: start;
     }
     .tx-ie-group {
       display: grid;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       min-inline-size: 0;
       margin: 0;
-      padding: 0 0 0.75rem;
+      padding: 0 0 var(--tx-space-3);
       border: 0;
-      border-block-end: var(--tx-border-width, 1px) solid var(--tx-border, light-dark(#e4e4e7, #3f3f46));
+      border-block-end: var(--tx-border-width-thin) solid var(--tx-border, light-dark(#e4e4e7, #3f3f46));
     }
     .tx-ie-heading {
       margin: 0;
       padding: 0;
-      font-size: 0.875rem;
-      font-weight: var(--tx-font-weight-heading, 600);
+      font-size: var(--tx-type-label-size);
+      font-weight: var(--tx-type-heading-weight);
     }
     .tx-ie-row {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
     }
     .tx-ie-fields {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
     }
     .tx-ie-field {
       display: grid;
-      gap: 0.25rem;
+      gap: var(--tx-space-1);
       font-size: 0.8125rem;
     }
     .tx-ie-wide {
@@ -893,9 +893,9 @@ const filterValue = (name: FilterName) =>
     .tx-ie-field input,
     .tx-ie-field select {
       min-block-size: 2.25rem;
-      padding-inline: 0.5rem;
-      border: var(--tx-border-width, 1px) solid var(--tx-input, light-dark(#71717a, #a1a1aa));
-      border-radius: var(--tx-radius, 0.375rem);
+      padding-inline: var(--tx-space-2);
+      border: var(--tx-border-width-thin) solid var(--tx-input, light-dark(#71717a, #a1a1aa));
+      border-radius: var(--tx-shape-radius-lg);
       background: var(--tx-background, Field);
       color: var(--tx-foreground, FieldText);
       font: inherit;
@@ -903,14 +903,14 @@ const filterValue = (name: FilterName) =>
     .tx-ie-check {
       display: inline-flex;
       align-items: center;
-      gap: 0.375rem;
+      gap: calc(var(--tx-space-unit) * 1.5);
       font-size: 0.8125rem;
     }
     .tx-ie-slider {
       display: grid;
       grid-template-columns: 6.5rem minmax(0, 1fr) 3.5rem;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       font-size: 0.8125rem;
     }
     .tx-ie-slider input {
@@ -932,7 +932,7 @@ const filterValue = (name: FilterName) =>
     }
     .tx-ie-list {
       display: grid;
-      gap: 0.25rem;
+      gap: var(--tx-space-1);
       margin: 0;
       padding: 0;
       list-style: none;
@@ -940,16 +940,16 @@ const filterValue = (name: FilterName) =>
     .tx-ie-item {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       inline-size: 100%;
       min-block-size: 2.25rem;
-      padding-inline: 0.5rem;
-      border: var(--tx-border-width, 1px) solid transparent;
-      border-radius: var(--tx-radius, 0.375rem);
+      padding-inline: var(--tx-space-2);
+      border: var(--tx-border-width-thin) solid transparent;
+      border-radius: var(--tx-shape-radius-lg);
       background: transparent;
       color: inherit;
       font: inherit;
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
       text-align: start;
       cursor: pointer;
     }
@@ -960,25 +960,25 @@ const filterValue = (name: FilterName) =>
     .tx-ie-swatch {
       inline-size: 0.875rem;
       block-size: 0.875rem;
-      border-radius: 999px;
-      border: 1px solid var(--tx-border-strong, light-dark(#52525b, #a1a1aa));
+      border-radius: var(--tx-shape-radius-full);
+      border: var(--tx-border-width-thin) solid var(--tx-border-strong, light-dark(#52525b, #a1a1aa));
     }
     .tx-ie-selected {
       display: grid;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       justify-items: start;
     }
     .tx-ie-swatches {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.375rem;
+      gap: calc(var(--tx-space-unit) * 1.5);
     }
     .tx-ie-color {
       inline-size: 1.75rem;
       block-size: 1.75rem;
       padding: 0;
-      border: 2px solid var(--tx-border-strong, light-dark(#52525b, #a1a1aa));
-      border-radius: 999px;
+      border: var(--tx-border-width-thick) solid var(--tx-border-strong, light-dark(#52525b, #a1a1aa));
+      border-radius: var(--tx-shape-radius-full);
       cursor: pointer;
     }
     .tx-ie-color[aria-pressed='true'] {
@@ -1006,9 +1006,9 @@ const filterValue = (name: FilterName) =>
       display: none;
     }
     .tx-ie-note {
-      padding: 1rem;
-      border: var(--tx-border-width, 1px) dashed var(--tx-border, light-dark(#a1a1aa, #52525b));
-      border-radius: var(--tx-radius, 0.5rem);
+      padding: var(--tx-space-4);
+      border: var(--tx-border-width-thin) dashed var(--tx-border, light-dark(#a1a1aa, #52525b));
+      border-radius: var(--tx-shape-radius-lg);
     }
     .tx-ie-sr {
       position: absolute;

@@ -1,14 +1,14 @@
 @layer tx.components {
   .tx-composition-animation {
     display: grid;
-    gap: 0.75rem;
+    gap: var(--tx-space-3);
     max-inline-size: 100%;
   }
 
   .tx-composition-animation__stage {
     margin: 0;
-    border: 1px solid var(--tx-border, ButtonBorder);
-    border-radius: var(--tx-radius, 0.5rem);
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-shape-radius-lg);
     overflow: auto;
     background: var(--tx-surface, Canvas);
   }
@@ -16,20 +16,20 @@
   .tx-composition-animation__controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
     align-items: center;
   }
 
   .tx-composition-animation__btn {
     margin: 0;
     min-block-size: 2.25rem;
-    padding-inline: 0.75rem;
-    border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
-    border-radius: var(--tx-radius, 0.5rem);
+    padding-inline: var(--tx-space-3);
+    border: var(--tx-border-width-thin) solid var(--tx-input, var(--tx-border, ButtonBorder));
+    border-radius: var(--tx-shape-radius-lg);
     background: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     font: inherit;
-    font-size: 0.875rem;
+    font-size: var(--tx-type-label-size);
     font-weight: 500;
     cursor: pointer;
   }
@@ -68,16 +68,16 @@
 
   .tx-composition-animation__error {
     margin: 0;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--tx-destructive, Mark);
-    border-radius: var(--tx-radius, 0.5rem);
+    padding: var(--tx-space-3) var(--tx-space-4);
+    border: var(--tx-border-width-thin) solid var(--tx-destructive, Mark);
+    border-radius: var(--tx-shape-radius-lg);
     color: var(--tx-foreground, CanvasText);
   }
 
   @media (forced-colors: active) {
     .tx-composition-animation__btn,
     .tx-composition-animation__stage {
-      border: 1px solid ButtonText;
+      border: var(--tx-border-width-thin) solid ButtonText;
     }
 
     .tx-composition-animation__btn:focus-visible {

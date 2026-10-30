@@ -235,30 +235,30 @@ function onkeydown(event: KeyboardEvent) {
       /* The canvas scales down: its pixel size must not set the column width. */
       grid-template-columns: minmax(0, 1fr);
       min-inline-size: 0;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
     }
     .tx-composition-canvas-surface {
       display: block;
       inline-size: 100%;
       block-size: auto;
-      border-radius: var(--tx-radius-md, 0.5rem);
+      border-radius: var(--tx-shape-radius-lg);
       background: var(--tx-color-surface-sunken, transparent);
     }
     .tx-composition-canvas-controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       justify-content: flex-end;
     }
     .tx-composition-canvas-controls button {
       min-block-size: 2rem;
       min-inline-size: 2rem;
-      padding-inline: 0.75rem;
+      padding-inline: var(--tx-space-3);
       font: inherit;
       color: inherit;
       background: var(--tx-color-surface, transparent);
-      border: 1px solid var(--tx-color-border-strong, currentColor);
-      border-radius: var(--tx-radius-sm, 0.375rem);
+      border: var(--tx-border-width-thin) solid var(--tx-color-border-strong, currentColor);
+      border-radius: var(--tx-shape-radius-md);
       cursor: pointer;
     }
     .tx-composition-canvas-controls button[aria-disabled='true'] {
