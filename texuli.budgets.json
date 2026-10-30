@@ -76,8 +76,8 @@
     },
     "@texuli/forms": {
       "gzip": 83008,
-      "cssGzip": 8832,
-      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B)."
+      "cssGzip": 9792,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 8832 B before adoption): cssGzip 10368 -> 9792 B, measured + 4% (measured 9,403 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/forms/model": {
       "gzip": 19392,
@@ -549,8 +549,8 @@
     },
     "@texuli/tokens/base.css": {
       "gzip": 64,
-      "cssGzip": 1792,
-      "note": "PLAN_011 T-tokens-v2 (ADR-020): new exact row (was the @texuli/tokens/* default, which caps JS only); measured 0 B gzip and 1,680 B CSS gzip. Token contract v2 adds no declaration here: system and component tokens are read with their default as the fallback (systemVar, componentVar), cap = measured + 4% rounded up to 64 B."
+      "cssGzip": 2944,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new exact row (was the @texuli/tokens/* default, which caps JS only); measured 0 B gzip and 1,680 B CSS gzip. Token contract v2 adds no declaration here: system and component tokens are read with their default as the fallback (systemVar, componentVar), cap = measured + 4% rounded up to 64 B. PLAN_011 T-adopt-core (2026-10-30, lead decision): cssGzip 1792 -> 2944 B, measured + 4% (measured 2,781 B): base.css declares the 123 token contract v2 system defaults once per token scope (so every component read carries one fallback level at most) and the focus ring hook rules."
     },
     "@texuli/tokens/components": {
       "gzip": 8768,
@@ -723,8 +723,8 @@
     },
     "@texuli/editor": {
       "gzip": 35456,
-      "cssGzip": 2368,
-      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,086 B (CSS 2,221 B); the Markdown codec is not in the barrel."
+      "cssGzip": 2496,
+      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,086 B (CSS 2,221 B); the Markdown codec is not in the barrel. PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2368 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,376 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/editor/controller": {
       "gzip": 19136,
@@ -732,8 +732,8 @@
     },
     "@texuli/editor/editor": {
       "gzip": 36160,
-      "cssGzip": 2368,
-      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,737 B (CSS 2,221 B)."
+      "cssGzip": 2496,
+      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,737 B (CSS 2,221 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2368 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,376 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/editor/link-dialog": {
       "gzip": 1600,
@@ -750,8 +750,8 @@
     },
     "@texuli/editor/toolbar": {
       "gzip": 7360,
-      "cssGzip": 2304,
-      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,023 B (CSS 2,214 B)."
+      "cssGzip": 2496,
+      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,023 B (CSS 2,214 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2304 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,356 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/astro": {
       "gzip": 19520,
@@ -776,8 +776,8 @@
     },
     "@texuli/astro/styles.css": {
       "gzip": 64,
-      "cssGzip": 2624,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 1,985 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 2112 -> 2624 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 2,488 B."
+      "cssGzip": 3712,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 1,985 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 2112 -> 2624 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 2,488 B. PLAN_011 T-adopt-core (2026-10-30, lead decision): cssGzip 2624 -> 3712 B, measured + 4% (measured 3,560 B): it bundles base.css, which now declares the token contract v2 system defaults."
     },
     "@texuli/astro/layouts/ContentLayout": {
       "gzip": 64,
@@ -925,8 +925,8 @@
     },
     "@texuli/sheets": {
       "gzip": 46528,
-      "cssGzip": 2624,
-      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: the root barrel re-exports formula, model, csv, view and host; consumers import the subpaths. Measured 44,680 B (CSS 2,488 B; the lazy cell editor 6,262 B)."
+      "cssGzip": 2752,
+      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: the root barrel re-exports formula, model, csv, view and host; consumers import the subpaths. Measured 44,680 B (CSS 2,488 B; the lazy cell editor 6,262 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2624 B before adoption): cssGzip 2816 -> 2752 B, measured + 4% (measured 2,635 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/sheets/formula": {
       "gzip": 19392,
@@ -942,8 +942,8 @@
     },
     "@texuli/sheets/view": {
       "gzip": 43264,
-      "cssGzip": 2624,
-      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: SheetView over @texuli/data grid editing (grid core, editing engine) with the workbook model; the cell editor loads lazily (6,262 B). Measured 41,584 B (CSS 2,488 B)."
+      "cssGzip": 2752,
+      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: SheetView over @texuli/data grid editing (grid core, editing engine) with the workbook model; the cell editor loads lazily (6,262 B). Measured 41,584 B (CSS 2,488 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2624 B before adoption): cssGzip 2816 -> 2752 B, measured + 4% (measured 2,635 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
     },
     "@texuli/sheets/host": {
       "gzip": 19584,
@@ -989,8 +989,8 @@
     },
     "@texuli/slides/styles.css": {
       "gzip": 64,
-      "cssGzip": 5440,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 4,741 B CSS gzip on the final PLAN_008 stage, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 4931 -> 5632 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 5,411 B. PLAN_010 T-release-060 (2026-10-29): CSS 5632 -> 5440 B, tightened to measured + 4% (measured 5,216 B)."
+      "cssGzip": 6528,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 4,741 B CSS gzip on the final PLAN_008 stage, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 4931 -> 5632 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 5,411 B. PLAN_010 T-release-060 (2026-10-29): CSS 5632 -> 5440 B, tightened to measured + 4% (measured 5,216 B). PLAN_011 T-adopt-core (2026-10-30, lead decision): cssGzip 5440 -> 6528 B, measured + 4% (measured 6,245 B): it bundles base.css, which now declares the token contract v2 system defaults."
     },
     "@texuli/spec/motion": {
       "gzip": 960,

@@ -18,6 +18,7 @@ import {
   texuliOps,
   validateJson,
 } from '../src/ops/index.ts';
+import { fakeSiteAssets } from './fixtures/site-assets.ts';
 import { scenario } from './scenario.ts';
 
 /**
@@ -40,6 +41,9 @@ const EXPECTED = [
   'deck.run',
   'document.run',
   'document.export',
+  'site.pages',
+  'site.read',
+  'site.search',
 ];
 
 const documentFixture = {
@@ -90,10 +94,16 @@ it('declares every operation once, self-described for agents, in the supported s
     }
   });
   await scenario(
-    'PDF and DOCX writers are node-only; every other operation runs at the edge',
+    'PDF and DOCX writers are node-only; the site readers are site-only; the rest run at the edge',
     () => {
       const node = TEXULI_OPERATIONS.filter((operation) => operation.runtime === 'node');
       expect(node.map((operation) => operation.name)).toEqual(['document.export']);
+      const site = TEXULI_OPERATIONS.filter((operation) => operation.runtime === 'site');
+      expect(site.map((operation) => operation.name)).toEqual([
+        'site.pages',
+        'site.read',
+        'site.search',
+      ]);
     }
   );
   await scenario('the registry refuses a duplicate name or an unsupported schema keyword', () => {
@@ -111,7 +121,12 @@ it('round-trips every example through its input and output schemas', async () =>
     for (const example of operation.examples) {
       await scenario(`${operation.name}: ${example.title}`, async () => {
         expect(validateJson(operation.input, example.input)).toEqual([]);
-        const outcome = await texuliOps.invoke(operation.name, example.input);
+        // Site operations read a built site: the fixture binding stands in for env.ASSETS.
+        const outcome = await texuliOps.invoke(
+          operation.name,
+          example.input,
+          operation.runtime === 'site' ? { site: { assets: fakeSiteAssets() } } : {}
+        );
         if (!outcome.ok) throw new Error(`${outcome.error.code}: ${outcome.error.message}`);
         expect(validateJson(operation.output, outcome.output)).toEqual([]);
       });
@@ -164,7 +179,7 @@ it('refuses invalid input, oversized input and unavailable runtimes with stable 
     );
     expect(outcome).toMatchObject({ ok: false, error: { code: 'runtime-unavailable' } });
     expect(texuliOps.list({ runtimes: ['edge'] }).map((operation) => operation.name)).toEqual(
-      EXPECTED.filter((name) => name !== 'document.export')
+      EXPECTED.filter((name) => name !== 'document.export' && !name.startsWith('site.'))
     );
   });
 });

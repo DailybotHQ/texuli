@@ -19,6 +19,7 @@ import {
 } from './types.ts';
 import { type FileUploadVariant, fileUploadClass } from './variants.ts';
 import './file-upload.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 /**
  * Extra attributes land on the wrapper (`id`, `aria-*`, `data-*`, `onfocus` and
@@ -57,6 +58,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'id'> & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('file-upload');
 let {
   files = $bindable<File[]>([]),
   rejects = $bindable<FileDropRejection[]>([]),
@@ -67,7 +69,7 @@ let {
   disabled = false,
   required = false,
   name,
-  variant = 'default',
+  variant = txDefaults().variant ?? 'default',
   showPreviews = true,
   progress = {},
   status = {},

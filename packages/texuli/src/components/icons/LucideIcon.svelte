@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { SVGAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 import Icon from './Icon.svelte';
 import type { IconComponent, IconSize } from './types.ts';
 
@@ -19,9 +20,10 @@ type Props = OwnProps &
     ref?: SVGSVGElement | null;
   };
 
+const txDefaults = designDefaults('icon');
 let {
   icon,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   strokeWidth = 2,
   label,
   class: className,

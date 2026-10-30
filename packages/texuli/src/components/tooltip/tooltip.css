@@ -1,23 +1,30 @@
 /**
  * Styled tooltip. `@layer tx.components` so consumer CSS wins.
  * Logical properties; inverted surface for contrast on chrome.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: the 20rem measure, the fractional paddings and gaps (0.35rem,
+ * 0.6rem, 0.4rem, 0.2rem) and the shortcut key overrides (1.1rem, 0.65rem) are
+ * tuned geometry off the token steps.
  */
 
 @layer tx.components {
   .tx-tooltip {
-    z-index: 50;
+    z-index: var(--tx-tooltip-z-index, var(--tx-z-tooltip));
     box-sizing: border-box;
     max-inline-size: min(20rem, 90vw);
     padding-block: 0.35rem;
     padding-inline: 0.6rem;
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.55);
-    border: 1px solid color-mix(in srgb, var(--tx-foreground, CanvasText) 12%, transparent);
+    border-radius: var(--tx-tooltip-radius, calc(var(--tx-shape-radius-lg) * 0.55));
+    border: var(--tx-border-width-thin) solid
+      color-mix(in srgb, var(--tx-foreground, CanvasText) 12%, transparent);
     background-color: var(--tx-foreground, CanvasText);
     color: var(--tx-background, Canvas);
-    font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1.35;
-    box-shadow: var(--tx-shadow-float, 0 8px 24px color-mix(in srgb, CanvasText 18%, transparent));
+    font-size: var(--tx-tooltip-font-size, var(--tx-type-caption-size));
+    font-weight: var(--tx-tooltip-font-weight, var(--tx-type-label-weight));
+    line-height: var(--tx-tooltip-line-height, var(--tx-type-caption-line));
+    box-shadow: var(--tx-tooltip-elevation, var(--tx-elevation-3));
     pointer-events: auto;
   }
 

@@ -1,19 +1,27 @@
-/** Styled TreeView — @layer tx.components, logical indentation, system-color fallbacks. */
+/**
+ * Styled TreeView — @layer tx.components, logical indentation, system-color fallbacks.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: the row heights and indents stay in --tx-tree-row-size and
+ * --tx-tree-indent (already multiplied by --tx-density), the 0.875rem check
+ * glyph and 1.125rem node icon are proportional geometry.
+ */
 @layer tx.components {
   .tx-tree {
     --tx-tree-indent: 1.25rem;
     --tx-tree-row-size: calc(2.25rem * var(--tx-density, 1));
     display: grid;
-    gap: 0.125rem;
+    gap: var(--tx-tree-gap, calc(var(--tx-space-unit) * 0.5));
     min-inline-size: 0;
-    padding: 0.25rem;
-    border-radius: var(--tx-radius-md, 0.5rem);
+    padding: var(--tx-tree-padding, var(--tx-space-1));
+    border-radius: var(--tx-tree-radius, var(--tx-shape-radius-lg));
     color: var(--tx-foreground, CanvasText);
     background: var(--tx-background, Canvas);
   }
 
   .tx-tree--bordered {
-    border: 1px solid var(--tx-border, GrayText);
+    border: var(--tx-border-width-thin) solid var(--tx-border, GrayText);
   }
 
   .tx-tree--compact {
@@ -31,7 +39,7 @@
     align-items: center;
     min-inline-size: 0;
     min-block-size: var(--tx-tree-row-size);
-    border-radius: var(--tx-radius-sm, 0.25rem);
+    border-radius: var(--tx-shape-radius-sm);
     outline: none;
     cursor: default;
     color: inherit;
@@ -58,11 +66,11 @@
 
   .tx-tree [data-tree-toggle] {
     display: inline-grid;
-    flex: 0 0 1.25rem;
+    flex: 0 0 var(--tx-size-icon-md);
     place-items: center;
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
-    border-radius: var(--tx-radius-sm, 0.25rem);
+    inline-size: var(--tx-size-icon-md);
+    block-size: var(--tx-size-icon-md);
+    border-radius: var(--tx-shape-radius-sm);
     color: var(--tx-muted-foreground, CanvasText);
     cursor: pointer;
   }
@@ -73,29 +81,29 @@
   }
 
   .tx-tree [data-tree-spacer] {
-    flex: 0 0 1.25rem;
-    inline-size: 1.25rem;
+    flex: 0 0 var(--tx-size-icon-md);
+    inline-size: var(--tx-size-icon-md);
   }
 
   .tx-tree__row {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--tx-tree-row-gap, var(--tx-space-2));
     min-inline-size: 0;
     inline-size: 100%;
-    padding-block: 0.25rem;
+    padding-block: var(--tx-tree-row-padding-block, var(--tx-space-1));
     padding-inline-start: calc(var(--tx-tree-indent) * var(--tx-tree-depth, 0));
-    padding-inline-end: 0.5rem;
+    padding-inline-end: var(--tx-space-2);
   }
 
   .tx-tree__checkbox {
     display: inline-grid;
-    flex: 0 0 1rem;
+    flex: 0 0 var(--tx-tree-checkbox-size, var(--tx-size-icon-sm));
     place-items: center;
-    inline-size: 1rem;
-    block-size: 1rem;
-    border: 1px solid var(--tx-input-border, GrayText);
-    border-radius: var(--tx-radius-xs, 0.125rem);
+    inline-size: var(--tx-tree-checkbox-size, var(--tx-size-icon-sm));
+    block-size: var(--tx-tree-checkbox-size, var(--tx-size-icon-sm));
+    border: var(--tx-border-width-thin) solid var(--tx-input-border, GrayText);
+    border-radius: var(--tx-tree-checkbox-radius, var(--tx-shape-radius-xs));
     color: var(--tx-primary-foreground, HighlightText);
     background: var(--tx-background, Canvas);
   }

@@ -494,6 +494,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | --- | --- |
 | [class-value](../packages/texuli/docs/class-value.md) | `class` prop: Svelte 5 ClassValue |
 | [control-props](../packages/texuli/docs/control-props.md) | Control and wrapper attributes (FIX-choice-aria) |
+| [design-system](../packages/texuli/docs/design-system.md) | Design systems: component tokens, hooks and `texuli/defaults` (0.9.0 workspace) |
 | [i18n](../packages/texuli/docs/i18n.md) | Component messages (i18n, new in `0.8.0`) |
 | [layout-host](../packages/texuli/docs/layout-host.md) | LayoutHost and the layout contract |
 | [layout-register-subpaths](../packages/texuli/docs/layout-register-subpaths.md) | Layout register-only subpaths |

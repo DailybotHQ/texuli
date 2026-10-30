@@ -16,7 +16,7 @@ import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { TOOLS_VERSION, texuliOps } from '@texuli/tools/ops';
+import { REMOTE_RUNTIMES, TOOLS_VERSION, texuliOps } from '@texuli/tools/ops';
 import type { AstroIntegration } from 'astro';
 import {
   DISCOVERY_PATHS,
@@ -37,7 +37,7 @@ export async function discoveryFacts(
   return {
     origin: new URL(site).origin,
     toolsVersion: TOOLS_VERSION,
-    operations: texuliOps.list({ runtimes: ['edge'] }),
+    operations: texuliOps.list({ runtimes: REMOTE_RUNTIMES }),
     securityContact: securityContactFrom(await readFile(SECURITY_POLICY, 'utf8')),
     now,
     openapi: existsSync(join(out, DISCOVERY_PATHS.openapi.slice(1))),

@@ -4,6 +4,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { cx } from '../../internal/cx.ts';
 import { variants } from '../../internal/variants.ts';
 import './empty.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
   /** The rendered root element (bindable). */
@@ -28,12 +29,13 @@ const emptyClass = variants({
   defaultVariants: { size: 'md' },
 });
 
+const txDefaults = designDefaults('empty');
 let {
   title,
   description,
   illustration,
   action,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   class: className,
   ref = $bindable(null),
   ...rest

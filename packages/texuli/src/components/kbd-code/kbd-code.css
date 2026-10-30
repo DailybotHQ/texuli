@@ -1,6 +1,13 @@
 /**
  * Kbd, Code and CopyButton. `@layer tx.components` so consumer CSS wins.
  * Logical properties; colors from `--tx-*`.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: the 0.7rem key text and 0.8125rem code block text, the 2px
+ * key bottom edge, the em-based inline code padding, the 0.35rem copy button
+ * gap and the fractional copy button block paddings are tuned geometry; tab-
+ * size 2 is not a design token.
  */
 
 @layer tx.components {
@@ -8,28 +15,29 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.125rem;
-    min-inline-size: 1.25rem;
-    min-block-size: 1.25rem;
+    gap: calc(var(--tx-space-unit) * 0.5);
+    min-inline-size: var(--tx-kbd-min-size, var(--tx-size-icon-md));
+    min-block-size: var(--tx-kbd-min-size, var(--tx-size-icon-md));
     margin: 0;
-    padding-block: 0.125rem;
+    padding-block: var(--tx-kbd-padding-block, calc(var(--tx-space-unit) * 0.5));
     padding-inline: 0.35rem;
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.4);
-    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-kbd-radius, calc(var(--tx-shape-radius-lg) * 0.4));
+    border: var(--tx-kbd-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, ButtonBorder);
     border-block-end-width: 2px;
     background-color: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
     color: var(--tx-muted-foreground, CanvasText);
     font-family: var(--tx-font-mono, ui-monospace, monospace);
     font-size: 0.7rem;
-    font-weight: 500;
+    font-weight: var(--tx-kbd-font-weight, var(--tx-type-label-weight));
     line-height: 1;
     white-space: nowrap;
   }
 
   .tx-code {
     font-family: var(--tx-font-mono, ui-monospace, monospace);
-    font-size: 0.875em;
-    font-weight: 400;
+    font-size: var(--tx-code-font-size, var(--tx-type-code-size));
+    font-weight: var(--tx-code-font-weight, var(--tx-type-code-weight));
     color: var(--tx-foreground, CanvasText);
   }
 
@@ -37,7 +45,7 @@
     display: inline;
     padding-block: 0.1em;
     padding-inline: 0.35em;
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.35);
+    border-radius: calc(var(--tx-code-block-radius, var(--tx-shape-radius-lg)) * 0.35);
     background-color: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
     color: var(--tx-foreground, CanvasText);
     word-break: break-word;
@@ -45,17 +53,18 @@
 
   .tx-code--block {
     display: block;
-    margin-block: 0.5rem;
+    margin-block: var(--tx-space-2);
     margin-inline: 0;
-    padding-block: 0.75rem;
-    padding-inline: 1rem;
+    padding-block: var(--tx-code-block-padding-block, var(--tx-space-3));
+    padding-inline: var(--tx-code-block-padding-inline, var(--tx-space-4));
     overflow-x: auto;
-    border-radius: var(--tx-radius, 0.625rem);
-    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-code-block-radius, var(--tx-shape-radius-lg));
+    border: var(--tx-code-block-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, ButtonBorder);
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     font-size: 0.8125rem;
-    line-height: 1.5;
+    line-height: var(--tx-code-block-line-height, var(--tx-type-code-line));
     white-space: pre;
     tab-size: 2;
   }
@@ -73,15 +82,15 @@
     gap: 0.35rem;
     margin: 0;
     border-style: solid;
-    border-width: 1px;
+    border-width: var(--tx-border-width-thin);
     border-color: var(--tx-input, var(--tx-border, ButtonBorder));
-    border-radius: var(--tx-radius, 0.625rem);
+    border-radius: var(--tx-shape-radius-lg);
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     font-family: inherit;
     font-size: 0.8125rem;
-    font-weight: 500;
-    line-height: 1.25;
+    font-weight: var(--tx-type-label-weight);
+    line-height: var(--tx-type-label-line);
     cursor: pointer;
     transition-property: color, background-color, border-color, opacity;
     transition-duration: var(--tx-motion-base, 200ms);
@@ -98,21 +107,21 @@
   }
 
   .tx-copy-button:disabled {
-    opacity: 0.5;
+    opacity: var(--tx-opacity-disabled);
     cursor: not-allowed;
   }
 
   .tx-copy-button--sm {
-    min-block-size: 1.75rem;
+    min-block-size: var(--tx-size-control-xs);
     padding-block: 0.15rem;
-    padding-inline: 0.5rem;
-    font-size: 0.75rem;
+    padding-inline: var(--tx-space-2);
+    font-size: var(--tx-type-caption-size);
   }
 
   .tx-copy-button--md {
-    min-block-size: 2.25rem;
+    min-block-size: var(--tx-size-control-md);
     padding-block: 0.35rem;
-    padding-inline: 0.75rem;
+    padding-inline: var(--tx-space-3);
   }
 
   .tx-copy-button[data-state="copied"] {
@@ -121,8 +130,8 @@
   }
 
   .tx-copy-button__icon {
-    inline-size: 1rem;
-    block-size: 1rem;
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
     flex-shrink: 0;
   }
 

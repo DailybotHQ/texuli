@@ -4,6 +4,7 @@ import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type ButtonSize, type ButtonVariant, buttonVariants } from './button-variants.ts';
 import './button.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type ButtonProps = HTMLButtonAttributes &
   HTMLAnchorAttributes & {
@@ -32,10 +33,11 @@ type ButtonProps = HTMLButtonAttributes &
     ref?: HTMLElement | null;
   };
 
+const txDefaults = designDefaults('button');
 let {
   class: className,
-  variant = 'default',
-  size = 'md',
+  variant = txDefaults().variant ?? 'default',
+  size = txDefaults().size ?? 'md',
   href = undefined,
   hrefTrust = 'developer',
   type = 'button',

@@ -1,6 +1,12 @@
 /**
  * Avatar and AvatarGroup — @layer tx.components so consumer utilities win.
  * Logical properties only; status dots use system colors under forced-colors.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: initials font sizes below the type scale (0.55rem, 0.65rem),
+ * status dot sizes, the 2px tone and group rings and the group overlap margins
+ * are proportional geometry of each avatar size, not design tokens.
  */
 @layer tx.components {
   .tx-avatar {
@@ -21,33 +27,33 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border-radius: var(--tx-radius-full, 9999px);
+    border-radius: var(--tx-avatar-radius, var(--tx-shape-radius-full));
     background-color: var(--tx-muted, Canvas);
     color: var(--tx-foreground, CanvasText);
-    font-weight: var(--tx-font-weight-semibold, 600);
+    font-weight: var(--tx-avatar-font-weight, var(--tx-type-heading-weight));
     letter-spacing: 0.02em;
     text-transform: uppercase;
     line-height: 1;
   }
 
   .tx-avatar--xs {
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
+    inline-size: var(--tx-avatar-size-xs, var(--tx-size-icon-md));
+    block-size: var(--tx-avatar-size-xs, var(--tx-size-icon-md));
     font-size: 0.55rem;
   }
   .tx-avatar--sm {
-    inline-size: 1.75rem;
-    block-size: 1.75rem;
+    inline-size: var(--tx-avatar-size-sm, var(--tx-size-control-xs));
+    block-size: var(--tx-avatar-size-sm, var(--tx-size-control-xs));
     font-size: 0.65rem;
   }
   .tx-avatar--md {
-    inline-size: 2.25rem;
-    block-size: 2.25rem;
+    inline-size: var(--tx-avatar-size-md, var(--tx-size-control-md));
+    block-size: var(--tx-avatar-size-md, var(--tx-size-control-md));
     font-size: var(--tx-font-size-xs, 0.75rem);
   }
   .tx-avatar--lg {
-    inline-size: 3rem;
-    block-size: 3rem;
+    inline-size: var(--tx-avatar-size-lg, var(--tx-space-12));
+    block-size: var(--tx-avatar-size-lg, var(--tx-space-12));
     font-size: var(--tx-font-size-base, 1rem);
   }
 
@@ -98,7 +104,7 @@
     inset-inline-end: 0;
     inline-size: 0.5rem;
     block-size: 0.5rem;
-    border-radius: var(--tx-radius-full, 9999px);
+    border-radius: var(--tx-avatar-radius, var(--tx-shape-radius-full));
     border: 2px solid var(--tx-background, Canvas);
     box-sizing: content-box;
     pointer-events: none;
@@ -145,10 +151,10 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    border-radius: var(--tx-radius-full, 9999px);
+    border-radius: var(--tx-avatar-radius, var(--tx-shape-radius-full));
     background-color: var(--tx-muted, Canvas);
     color: var(--tx-muted-foreground, GrayText);
-    font-weight: var(--tx-font-weight-semibold, 600);
+    font-weight: var(--tx-avatar-font-weight, var(--tx-type-heading-weight));
     font-size: var(--tx-font-size-xs, 0.75rem);
     box-shadow: 0 0 0 2px var(--tx-background, Canvas);
     line-height: 1;
@@ -173,22 +179,22 @@
   }
 
   .tx-avatar-group--xs > .tx-avatar-group__overflow {
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
+    inline-size: var(--tx-avatar-size-xs, var(--tx-size-icon-md));
+    block-size: var(--tx-avatar-size-xs, var(--tx-size-icon-md));
     font-size: 0.55rem;
   }
   .tx-avatar-group--sm > .tx-avatar-group__overflow {
-    inline-size: 1.75rem;
-    block-size: 1.75rem;
+    inline-size: var(--tx-avatar-size-sm, var(--tx-size-control-xs));
+    block-size: var(--tx-avatar-size-sm, var(--tx-size-control-xs));
     font-size: 0.65rem;
   }
   .tx-avatar-group--md > .tx-avatar-group__overflow {
-    inline-size: 2.25rem;
-    block-size: 2.25rem;
+    inline-size: var(--tx-avatar-size-md, var(--tx-size-control-md));
+    block-size: var(--tx-avatar-size-md, var(--tx-size-control-md));
   }
   .tx-avatar-group--lg > .tx-avatar-group__overflow {
-    inline-size: 3rem;
-    block-size: 3rem;
+    inline-size: var(--tx-avatar-size-lg, var(--tx-space-12));
+    block-size: var(--tx-avatar-size-lg, var(--tx-space-12));
     font-size: var(--tx-font-size-sm, 0.875rem);
   }
 

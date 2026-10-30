@@ -38,7 +38,11 @@ import {
   MCP_PROTOCOL_VERSION,
   MCP_SUPPORTED_PROTOCOL_VERSIONS,
 } from '../../../packages/tools/src/mcp/protocol.ts';
-import { TOOLS_VERSION, texuliOps } from '../../../packages/tools/src/ops/index.ts';
+import {
+  REMOTE_RUNTIMES,
+  TOOLS_VERSION,
+  texuliOps,
+} from '../../../packages/tools/src/ops/index.ts';
 import {
   ANALYTICS_TRUSTED_TYPES_POLICY,
   pagePolicy,
@@ -476,9 +480,9 @@ describe('agent discovery files (public/.well-known, the generated API and ARD c
     expect(card.capabilities).toContain('tools');
     expect(card.transport.stdio.launch).toBe('npx -y @texuli/mcp');
     // The remote endpoint (functions/mcp.ts) is the Streamable HTTP door; the
-    // card's remote flags match what its edge handler lists.
+    // card's remote flags match what its handler (edge and site operations) lists.
     expect(card.transport.streamableHttp.url).toBe('https://texuli.com/mcp');
-    const listed = (await createMcpHandler({ mode: 'stateless', runtimes: ['edge'] })({
+    const listed = (await createMcpHandler({ mode: 'stateless', runtimes: REMOTE_RUNTIMES })({
       jsonrpc: '2.0',
       id: 1,
       method: 'tools/list',

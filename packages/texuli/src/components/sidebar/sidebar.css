@@ -1,6 +1,13 @@
 /**
  * Sidebar and AppNav — app chrome on sidebar tokens.
  * `@layer tx.components`. Logical properties only.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: the 16rem and 4rem widths (read through --tx-sidebar-width),
+ * the 3.5rem and 3.25rem header heights, the 0.7rem section, icon and badge
+ * texts, the 3px active mark, the fractional section and badge paddings, the
+ * 0.45 disabled opacity and the 20rem drawer sheet are tuned geometry.
  */
 
 @layer tx.components {
@@ -20,20 +27,22 @@
     background: var(--tx-sidebar, var(--tx-surface, Canvas));
     color: var(--tx-sidebar-contrast-foreground);
     font-family: var(--tx-font-sans, system-ui, sans-serif);
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-sidebar-font-size, var(--tx-font-size-sm));
     transition:
       inline-size var(--tx-motion-base, 200ms) var(--tx-motion-easing, ease),
       padding var(--tx-motion-base, 200ms) var(--tx-motion-easing, ease);
   }
 
   .tx-sidebar--default {
-    border-inline-end: 1px solid var(--tx-sidebar-border, var(--tx-border, ButtonBorder));
+    border-inline-end: var(--tx-border-width-thin) solid
+      var(--tx-sidebar-border, var(--tx-border, ButtonBorder));
   }
 
   .tx-sidebar--inset {
-    margin: 0.5rem;
-    border: 1px solid var(--tx-sidebar-border, var(--tx-border, ButtonBorder));
-    border-radius: var(--tx-radius-lg, 0.5rem);
+    margin: var(--tx-space-2);
+    border: var(--tx-border-width-thin) solid
+      var(--tx-sidebar-border, var(--tx-border, ButtonBorder));
+    border-radius: var(--tx-sidebar-inset-radius, var(--tx-shape-radius-lg));
   }
 
   .tx-sidebar:not([data-collapsed]):not([data-drawer]) {
@@ -54,23 +63,23 @@
     flex-shrink: 0;
     align-items: center;
     min-block-size: 3.5rem;
-    padding-inline: 0.75rem;
-    gap: 0.5rem;
+    padding-inline: var(--tx-sidebar-header-padding-inline, var(--tx-space-3));
+    gap: var(--tx-sidebar-header-gap, var(--tx-space-2));
   }
 
   .tx-sidebar[data-drawer] .tx-sidebar__header {
-    padding-inline-end: 3rem;
+    padding-inline-end: var(--tx-space-12);
   }
 
   .tx-sidebar__body {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--tx-sidebar-body-gap, var(--tx-space-4));
     min-block-size: 0;
     overflow-y: auto;
-    padding-block: 0.75rem;
-    padding-inline: 0.5rem;
+    padding-block: var(--tx-sidebar-body-padding-block, var(--tx-space-3));
+    padding-inline: var(--tx-sidebar-body-padding-inline, var(--tx-space-2));
   }
 
   .tx-sidebar__section {
@@ -81,7 +90,7 @@
   .tx-sidebar__section-label {
     margin: 0;
     padding-block: 0.25rem 0.35rem;
-    padding-inline: 0.75rem;
+    padding-inline: var(--tx-space-3);
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -91,9 +100,10 @@
 
   .tx-sidebar__section-rule {
     margin-block: 0.35rem;
-    margin-inline: 0.5rem;
+    margin-inline: var(--tx-space-2);
     border: 0;
-    border-block-start: 1px solid var(--tx-sidebar-border, var(--tx-border, ButtonBorder));
+    border-block-start: var(--tx-border-width-thin) solid
+      var(--tx-sidebar-border, var(--tx-border, ButtonBorder));
   }
 
   .tx-sidebar__list {
@@ -109,14 +119,14 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    min-block-size: 2.25rem;
-    padding-inline: 0.75rem;
-    border-radius: var(--tx-radius, 0.375rem);
+    gap: var(--tx-space-3);
+    min-block-size: var(--tx-size-control-md);
+    padding-inline: var(--tx-space-3);
+    border-radius: var(--tx-shape-radius-lg);
     color: var(--tx-sidebar-contrast-foreground, var(--tx-foreground, CanvasText));
     text-decoration: none;
     font: inherit;
-    font-weight: 500;
+    font-weight: var(--tx-type-label-weight);
     background: transparent;
     border: 0;
     inline-size: 100%;
@@ -174,8 +184,8 @@
     display: inline-grid;
     place-items: center;
     flex: none;
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
+    inline-size: var(--tx-size-icon-md);
+    block-size: var(--tx-size-icon-md);
     font-size: 0.7rem;
     font-weight: 700;
     line-height: 1;
@@ -199,7 +209,7 @@
     margin-inline-start: auto;
     padding-block: 0.05rem;
     padding-inline: 0.4rem;
-    border-radius: var(--tx-radius-full, 9999px);
+    border-radius: var(--tx-shape-radius-full);
     background: color-mix(in srgb, var(--tx-sidebar-foreground, CanvasText) 4%, transparent);
     color: var(--tx-sidebar-contrast-foreground, var(--tx-foreground, CanvasText));
     font-size: 0.7rem;
@@ -214,7 +224,7 @@
     inset-inline-end: 0.35rem;
     inline-size: 0.4rem;
     block-size: 0.4rem;
-    border-radius: 9999px;
+    border-radius: var(--tx-shape-radius-full);
     background: var(--tx-sidebar-primary, var(--tx-primary, Highlight));
   }
 
@@ -222,24 +232,25 @@
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    gap: 0.5rem;
-    border-block-start: 1px solid var(--tx-sidebar-border, var(--tx-border, ButtonBorder));
-    padding: 0.5rem;
+    gap: var(--tx-space-2);
+    border-block-start: var(--tx-border-width-thin) solid
+      var(--tx-sidebar-border, var(--tx-border, ButtonBorder));
+    padding: var(--tx-space-2);
   }
 
   .tx-sidebar__toggle {
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    min-block-size: 2.25rem;
-    padding-inline: 0.75rem;
+    gap: var(--tx-space-3);
+    min-block-size: var(--tx-size-control-md);
+    padding-inline: var(--tx-space-3);
     border: 0;
-    border-radius: var(--tx-radius, 0.375rem);
+    border-radius: var(--tx-shape-radius-lg);
     background: transparent;
     color: inherit;
     font: inherit;
-    font-weight: 500;
+    font-weight: var(--tx-type-label-weight);
     cursor: pointer;
     inline-size: 100%;
   }
@@ -261,8 +272,8 @@
   .tx-sidebar__toggle-icon {
     display: inline-grid;
     place-items: center;
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
+    inline-size: var(--tx-size-icon-md);
+    block-size: var(--tx-size-icon-md);
     flex: none;
   }
 
@@ -308,10 +319,10 @@
     grid-area: head;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
     min-block-size: 3.25rem;
-    padding-inline: 0.75rem;
-    border-block-end: 1px solid var(--tx-border, ButtonBorder);
+    padding-inline: var(--tx-space-3);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
     background: var(--tx-surface, Canvas);
   }
 
@@ -320,19 +331,19 @@
     min-block-size: 0;
     min-inline-size: 0;
     overflow: auto;
-    padding: 1rem;
+    padding: var(--tx-space-4);
   }
 
   .tx-app-nav__menu-btn {
     display: none;
     align-items: center;
     justify-content: center;
-    min-inline-size: 2.25rem;
-    min-block-size: 2.25rem;
+    min-inline-size: var(--tx-size-control-md);
+    min-block-size: var(--tx-size-control-md);
     margin: 0;
     padding: 0;
-    border: 1px solid var(--tx-border, ButtonBorder);
-    border-radius: var(--tx-radius, 0.375rem);
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-shape-radius-lg);
     background: var(--tx-background, Canvas);
     color: inherit;
     cursor: pointer;
@@ -358,7 +369,8 @@
     block-size: 100%;
     padding: 0;
     border: 0;
-    border-inline-end: 1px solid var(--tx-sidebar-border, var(--tx-border, ButtonBorder));
+    border-inline-end: var(--tx-border-width-thin) solid
+      var(--tx-sidebar-border, var(--tx-border, ButtonBorder));
     background: var(--tx-sidebar, var(--tx-surface, Canvas));
     color: var(--tx-sidebar-foreground, var(--tx-foreground, CanvasText));
   }
@@ -369,17 +381,17 @@
 
   .tx-app-nav-sheet__close {
     position: absolute;
-    inset-block-start: 0.75rem;
-    inset-inline-end: 0.75rem;
+    inset-block-start: var(--tx-space-3);
+    inset-inline-end: var(--tx-space-3);
     z-index: 1;
     display: inline-grid;
     place-items: center;
-    min-inline-size: 2.25rem;
-    min-block-size: 2.25rem;
+    min-inline-size: var(--tx-size-control-md);
+    min-block-size: var(--tx-size-control-md);
     margin: 0;
     padding: 0;
-    border: 1px solid var(--tx-border, ButtonBorder);
-    border-radius: var(--tx-radius, 0.375rem);
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-shape-radius-lg);
     background: var(--tx-background, Canvas);
     color: inherit;
     cursor: pointer;
@@ -438,12 +450,12 @@
   }
   /* One nested level under an item; indentation follows the writing direction. */
   .tx-sidebar__list--nested {
-    padding-inline-start: 0.875rem;
+    padding-inline-start: calc(var(--tx-space-unit) * 3.5);
     margin-block-start: 0.15rem;
   }
 
   .tx-sidebar__list--nested .tx-sidebar__item {
-    font-size: 0.875rem;
+    font-size: var(--tx-type-label-size);
   }
 
   /* A parent that only names its children (no page of its own). */

@@ -3,6 +3,7 @@ import { Root as PrimitiveRoot } from '@texuli/primitives/select';
 import type { ComponentProps, Snippet } from 'svelte';
 import type { SelectSize, SelectVariant } from './variants.ts';
 import './select.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = ComponentProps<typeof PrimitiveRoot> & {
   children?: Snippet;
@@ -12,12 +13,13 @@ type Props = ComponentProps<typeof PrimitiveRoot> & {
   variant?: SelectVariant;
 };
 
+const txDefaults = designDefaults('select');
 let {
   children,
   open = $bindable(false),
   value = $bindable(),
-  size = 'md',
-  variant = 'outline',
+  size = txDefaults().size ?? 'md',
+  variant = txDefaults().variant ?? 'outline',
   onOpenChange,
   onValueChange,
   ...rest

@@ -3,6 +3,7 @@ import type { HTMLLabelAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { labelClass } from './variants.ts';
 import './field.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLLabelAttributes & {
   /** Visual required marker (set `required` on the control for semantics). */
@@ -15,10 +16,11 @@ type Props = HTMLLabelAttributes & {
   ref?: HTMLElement | null;
 };
 
+const txDefaults = designDefaults('label');
 let {
   ref = $bindable(null),
   required = false,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   srOnly = false,
   class: className,
   children,

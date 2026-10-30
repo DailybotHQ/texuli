@@ -783,6 +783,66 @@ const discovery: Session = {
 };
 
 // ---------------------------------------------------------------------------
+// Job 5: read the site (remote only): search texuli.com, read the best hit
+// as Markdown, then list its section, against the fixture `env.ASSETS`.
+// ---------------------------------------------------------------------------
+
+const readTheSite: Session = {
+  name: 'read the site: site.search → site.read → site.pages (remote only)',
+  doors: ['remote'],
+  steps: [
+    toolsStep,
+    {
+      label: 'search',
+      method: 'tools/call',
+      params: call('site.search', { query: 'dark mode', limit: 3 }),
+      expect(result) {
+        const hits = result.structuredContent.results;
+        expect(hits.length).toBeGreaterThan(0);
+        expect(hits[0].path).toBe('/guides/dark-mode/');
+        expect(hits[0].url).toBe('https://texuli.com/guides/dark-mode/');
+      },
+    },
+    {
+      label: 'read best hit',
+      method: 'tools/call',
+      // The agent reads the path the search returned, not one it made up.
+      params: (ctx) => call('site.read', { path: ctx.data('search').results[0].path }),
+      expect(result) {
+        expect(result.structuredContent.truncated).toBe(false);
+        expect(result.structuredContent.markdown).toContain('## The no-flash script');
+      },
+    },
+    {
+      label: 'section',
+      method: 'tools/call',
+      params: (ctx) => {
+        const path: string = ctx.data('read best hit').path;
+        return call('site.pages', { prefix: path.slice(0, path.indexOf('/', 1) + 1) });
+      },
+      expect(result) {
+        expect(result.structuredContent.pages.map((page: Json) => page.path)).toContain(
+          '/guides/dark-mode/'
+        );
+      },
+    },
+    {
+      label: 'traversal',
+      method: 'tools/call',
+      params: call('site.read', { path: '/guides/../_headers' }),
+      toolError(failure) {
+        expect(failure.code).toBe('invalid-input');
+        expect(failure.error).toMatch(/traversal/u);
+      },
+    },
+  ],
+  final(ctx) {
+    expect(ctx.data('read best hit').title).toBe(ctx.data('search').results[0].title);
+    expect(ctx.data('section').total).toBe(3);
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Design-system jobs: planned, not runnable yet.
 // ---------------------------------------------------------------------------
 
@@ -808,6 +868,7 @@ export const SESSIONS: readonly Session[] = [
   pricingPage,
   themeBlueprint,
   markdownDeck,
+  readTheSite,
   designSystemDashboard,
   dtcgImport,
 ];

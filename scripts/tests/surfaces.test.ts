@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createMcpHandler } from '../../packages/tools/src/mcp/handler.ts';
 import { MCP_SUPPORTED_PROTOCOL_VERSIONS } from '../../packages/tools/src/mcp/protocol.ts';
-import { TOOLS_VERSION, texuliOps } from '../../packages/tools/src/ops/index.ts';
+import { REMOTE_RUNTIMES, TOOLS_VERSION, texuliOps } from '../../packages/tools/src/ops/index.ts';
 import {
   buildMcpPageData,
   buildOpsTables,
@@ -26,7 +26,7 @@ afterEach(() => {
 });
 
 async function remoteToolNames(): Promise<string[]> {
-  const handler = createMcpHandler({ mode: 'stateless', runtimes: ['edge'] });
+  const handler = createMcpHandler({ mode: 'stateless', runtimes: REMOTE_RUNTIMES });
   const response = (await handler({ jsonrpc: '2.0', id: 1, method: 'tools/list' })) as {
     result: { tools: { name: string }[]; nextCursor?: string };
   };
@@ -60,8 +60,20 @@ describe('generated agent surfaces', () => {
       ...card.deprecatedTools.filter((alias) => alias.remote).map((alias) => alias.name),
     ];
     expect(remote).toEqual(await remoteToolNames());
-    expect(toolNames(texuliOps, ['edge'])).toEqual(await remoteToolNames());
+    expect(toolNames(texuliOps, REMOTE_RUNTIMES)).toEqual(await remoteToolNames());
     expect(remote).not.toContain('document.export');
+    // The site operations are remote-only on the card (T-ar-site-mcp).
+    const site = card.tools.filter((tool) => tool.runtime === 'site');
+    expect(site.map((tool) => tool.name)).toEqual(['site.pages', 'site.read', 'site.search']);
+    for (const tool of site) expect(tool).toMatchObject({ remote: true, local: false });
+    expect(card.tools.filter((tool) => !tool.local).map((tool) => tool.runtime)).toEqual([
+      'site',
+      'site',
+      'site',
+    ]);
+    expect(card.transport.stdio.operations).toBe('edge, node');
+    expect(card.transport.streamableHttp.operations).toBe('edge, site');
+    expect(buildOpsTables()).toContain('| site | remote MCP only | — |');
   });
 
   it('the llms Tools section, the ops.md tables and the /mcp-server/ data list every operation', async () => {

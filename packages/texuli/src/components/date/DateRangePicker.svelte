@@ -23,6 +23,7 @@ import {
 } from './presets.ts';
 import { type DateSize, dateFieldClass } from './variants.ts';
 import './date.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 /**
  * A styled date range picker: start and end date fields, a calendar button,
@@ -82,6 +83,7 @@ type Props = OwnProps &
     ref?: HTMLElement | null;
   };
 
+const txDefaults = designDefaults('date');
 let {
   label,
   hideLabel = false,
@@ -104,7 +106,7 @@ let {
   weekStartsOn,
   maxDays,
   onInvalid,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   labels,
   class: className,
   controlClass,

@@ -15,6 +15,7 @@ import {
   type NavSize,
 } from './variants.ts';
 import './navigation.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type OwnProps = {
   items: readonly BreadcrumbItem[];
@@ -36,10 +37,11 @@ type OwnProps = {
 /** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the root element. */
 type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps | 'children'>;
 
+const txDefaults = designDefaults('breadcrumb');
 let {
   items,
   label: labelProp,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   separatorLabel: separatorLabelProp,
   separator,
   maxItems = 0,

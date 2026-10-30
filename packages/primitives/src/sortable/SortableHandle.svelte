@@ -51,6 +51,8 @@ const attach: Attachment<HTMLElement> = (node) => {
 </button>
 
 <style>
+  /* A headless primitive cannot assume @texuli/tokens/base.css, so the 24px
+     target (WCAG 2.2 minimum) and the 2px currentColor outlines stay literal. */
   .tx-sortable__handle {
     min-inline-size: 24px;
     min-block-size: 24px;

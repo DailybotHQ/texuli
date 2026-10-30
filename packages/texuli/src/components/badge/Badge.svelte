@@ -2,6 +2,7 @@
 import type { HTMLAttributes } from 'svelte/elements';
 import { type BadgeVariant, badgeClass } from './variants.ts';
 import './badge.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLAttributes<HTMLSpanElement> & {
   /** Semantic fill. Filled pairs use token foregrounds for AA on small text. */
@@ -15,9 +16,10 @@ type Props = HTMLAttributes<HTMLSpanElement> & {
   ref?: HTMLElement | null;
 };
 
+const txDefaults = designDefaults('badge');
 let {
   ref = $bindable(null),
-  variant = 'default',
+  variant = txDefaults().variant ?? 'default',
   label,
   class: className,
   children,

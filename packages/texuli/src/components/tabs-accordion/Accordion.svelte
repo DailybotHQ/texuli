@@ -9,6 +9,7 @@ import Chevron from './Chevron.svelte';
 import type { AccordionItemDef } from './types.ts';
 import { type AccordionVariant, accordionRootClass } from './variants.ts';
 import './tabs-accordion.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type OwnProps = {
   items: readonly AccordionItemDef[];
@@ -38,6 +39,7 @@ function asArray(v: string | string[] | undefined): string[] {
   return Array.isArray(v) ? v : v ? [v] : [];
 }
 
+const txDefaults = designDefaults('accordion');
 let {
   items,
   type = 'single',
@@ -45,7 +47,7 @@ let {
   onValueChange,
   collapsible = true,
   headingLevel = 3,
-  variant = 'default',
+  variant = txDefaults().variant ?? 'default',
   disabled = false,
   class: className,
   content,

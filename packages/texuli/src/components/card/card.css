@@ -1,16 +1,21 @@
 /**
  * Card family — surface, media, header, content, footer, grid.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: none besides the 0 resets.
  */
 @layer tx.components {
   .tx-card {
     display: flex;
     flex-direction: column;
-    border-radius: var(--tx-radius-xl, 0.75rem);
-    border: 1px solid var(--tx-border, currentColor);
-    background-color: var(--tx-surface, Canvas);
+    border-radius: var(--tx-card-radius, var(--tx-shape-radius-xl));
+    border: var(--tx-card-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, currentColor);
+    background-color: var(--tx-card-background, var(--tx-surface));
     color: var(--tx-surface-foreground, CanvasText);
-    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 8%, transparent));
+    box-shadow: var(--tx-card-elevation, var(--tx-elevation-1));
     overflow: clip;
   }
 
@@ -25,7 +30,7 @@
 
   .tx-card--interactive:hover {
     border-color: color-mix(in srgb, var(--tx-ring, Highlight) 40%, var(--tx-border, currentColor));
-    box-shadow: var(--tx-shadow-float, 0 4px 16px color-mix(in srgb, CanvasText 12%, transparent));
+    box-shadow: var(--tx-elevation-3);
   }
 
   .tx-card--interactive:focus-visible {
@@ -34,7 +39,7 @@
   }
 
   .tx-card--flat {
-    box-shadow: none;
+    box-shadow: var(--tx-elevation-0);
   }
 
   .tx-card__media {
@@ -54,57 +59,58 @@
 
   .tx-card__header {
     display: grid;
-    gap: 0.375rem;
-    padding-inline: 1.25rem;
-    padding-block-start: 1.25rem;
+    gap: calc(var(--tx-space-unit) * 1.5);
+    padding-inline: var(--tx-card-padding-inline, var(--tx-space-5));
+    padding-block-start: var(--tx-card-padding-block, var(--tx-space-5));
   }
 
   .tx-card__header:last-child {
-    padding-block-end: 1.25rem;
+    padding-block-end: var(--tx-card-padding-block, var(--tx-space-5));
   }
 
   .tx-card__title {
     margin: 0;
     font-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
-    font-size: var(--tx-font-size-base, 1rem);
-    font-weight: var(--tx-font-weight-heading, 600);
+    font-size: var(--tx-card-title-font-size, var(--tx-font-size-base));
+    font-weight: var(--tx-card-title-font-weight, var(--tx-type-heading-weight));
     letter-spacing: var(--tx-letter-spacing-heading, 0);
-    line-height: 1.25;
+    line-height: var(--tx-card-title-line-height, var(--tx-type-label-line));
     text-wrap: balance;
   }
 
   .tx-card__description {
     margin: 0;
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-card-description-font-size, var(--tx-type-label-size));
     color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-card__content {
-    padding-inline: 1.25rem;
-    padding-block: 1rem;
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    padding-inline: var(--tx-card-padding-inline, var(--tx-space-5));
+    padding-block: var(--tx-space-4);
+    font-size: var(--tx-type-label-size);
   }
 
   .tx-card__content:first-child {
-    padding-block-start: 1.25rem;
+    padding-block-start: var(--tx-card-padding-block, var(--tx-space-5));
   }
 
   .tx-card__content:last-child {
-    padding-block-end: 1.25rem;
+    padding-block-end: var(--tx-card-padding-block, var(--tx-space-5));
   }
 
   .tx-card__footer {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
-    border-block-start: 1px solid var(--tx-border, currentColor);
-    padding-inline: 1.25rem;
-    padding-block: 0.75rem;
+    gap: var(--tx-space-2);
+    border-block-start: var(--tx-card-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, currentColor);
+    padding-inline: var(--tx-card-padding-inline, var(--tx-space-5));
+    padding-block: var(--tx-space-3);
   }
 
   .tx-card-grid {
-    --tx-card-grid-gap: 1rem;
+    --tx-card-grid-gap: var(--tx-space-4);
     display: grid;
     gap: var(--tx-card-grid-gap);
     list-style: none;
@@ -113,19 +119,44 @@
   }
 
   .tx-card-grid--gap-sm {
-    --tx-card-grid-gap: 0.5rem;
+    --tx-card-grid-gap: var(--tx-space-2);
   }
   .tx-card-grid--gap-md {
-    --tx-card-grid-gap: 1rem;
+    --tx-card-grid-gap: var(--tx-space-4);
   }
   .tx-card-grid--gap-lg {
-    --tx-card-grid-gap: 1.5rem;
+    --tx-card-grid-gap: var(--tx-space-6);
   }
 
   @media (forced-colors: active) {
     .tx-card {
       border: 1px solid ButtonText;
       forced-color-adjust: none;
+    }
+  }
+
+  /*
+   * Tier-3 hook: `data-tx-card-style` on any ancestor (written on <html> by the
+   * no-flash script and the Astro integration) sets card tokens. `solid` is the
+   * default look; `bordered` drops the shadow; `glass` mixes the fill with
+   * transparency and blurs the backdrop (where supported).
+   */
+  :where([data-tx-card-style="bordered"]) {
+    --tx-card-elevation: var(--tx-elevation-0);
+  }
+
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    :where([data-tx-card-style="glass"]) {
+      --tx-card-background: color-mix(
+        in srgb,
+        var(--tx-surface, Canvas) var(--tx-surface-glass-alpha),
+        transparent
+      );
+    }
+
+    :where([data-tx-card-style="glass"]) .tx-card {
+      backdrop-filter: blur(var(--tx-surface-glass-blur));
+      -webkit-backdrop-filter: blur(var(--tx-surface-glass-blur));
     }
   }
 }

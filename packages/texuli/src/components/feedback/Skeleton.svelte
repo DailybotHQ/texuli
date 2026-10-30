@@ -3,6 +3,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { cx } from '../../internal/cx.ts';
 import { type FeedbackSize, skeletonClass } from './variants.ts';
 import './feedback.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLAttributes<HTMLDivElement> & {
   /** Height preset for text-like bars. */
@@ -13,9 +14,10 @@ type Props = HTMLAttributes<HTMLDivElement> & {
   ref?: HTMLElement | null;
 };
 
+const txDefaults = designDefaults('skeleton');
 let {
   ref = $bindable(null),
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   circle = false,
   class: className,
   ...rest
