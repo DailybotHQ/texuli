@@ -1,6 +1,6 @@
 {
   "name": "@texuli/tokens",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "description": "The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS.",
   "keywords": [

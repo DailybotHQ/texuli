@@ -8,4 +8,4 @@ export * from './editor/index.ts';
 export { documentOutline, type OutlineEntry, PageReader, slugify } from './reader/index.ts';
 
 /** The package version (first published as `0.7.0`). */
-export const PAGES_PACKAGE_VERSION = '0.8.1';
+export const PAGES_PACKAGE_VERSION = '0.9.0';
