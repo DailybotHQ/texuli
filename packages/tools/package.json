@@ -68,6 +68,10 @@
     "./print": {
       "types": "./src/print/index.ts",
       "default": "./src/print/index.ts"
+    },
+    "./ops": {
+      "types": "./src/ops/index.ts",
+      "default": "./src/ops/index.ts"
     }
   },
   "bin": {

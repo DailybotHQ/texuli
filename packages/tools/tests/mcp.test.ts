@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { readFileSync } from 'node:fs';
 import { PassThrough } from 'node:stream';
 import { expect, it } from 'vitest';
 import { createTexuliMcpServer, MCP_PROTOCOL_VERSION, runMcpStdio } from '../src/mcp/index.ts';
@@ -72,6 +73,16 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         annotations: Record<string, unknown>;
       }[];
       expect(tools.map(({ name }) => name)).toEqual([
+        'catalog.search',
+        'catalog.validate',
+        'component.get',
+        'example.search',
+        'theme.search',
+        'theme.get',
+        'theme.preview',
+        'deck.run',
+        'document.run',
+        'document.export',
         'deck',
         'document',
         'catalog',
@@ -80,6 +91,10 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'example',
         'theme',
       ]);
+      const described = tools as unknown as { name: string; description: string }[];
+      for (const legacy of described.slice(10)) {
+        expect(legacy.description, legacy.name).toMatch(/^Deprecated alias of [a-z]+\.[a-z-]+/u);
+      }
       expect(tools.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
       expect(tools.every(({ annotations }) => annotations.destructiveHint === false)).toBe(true);
     }
@@ -156,8 +171,14 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
       const badArgs = await callTool(handle, 'catalog', { limit: 0 });
       expect(badArgs.result?.isError).toBe(true);
       expect(toolData(badArgs).error).toContain('limit');
+      expect(toolData(badArgs).code).toBe('invalid-input');
       const missing = await callTool(handle, 'component', { id: 'not-in-catalog' });
       expect(missing.result?.isError).toBe(true);
+      expect(toolData(missing).code).toBe('not-found');
+      const renamed = await callTool(handle, 'component.get', { id: 'card' });
+      expect(toolData(renamed)).toEqual(
+        toolData(await callTool(handle, 'component', { id: 'card' }))
+      );
       const unknown = await callTool(handle, 'execute', {});
       expect(unknown.error?.code).toBe(-32602);
     }
@@ -190,8 +211,12 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
         .split('\n')
         .map((line) => JSON.parse(line) as Response);
       expect(messages.map(({ id }) => id)).toEqual([1, 2]);
-      expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version: '0.0.0' });
-      expect(messages[1]?.result?.tools).toHaveLength(7);
+      const { version } = JSON.parse(
+        readFileSync(new URL('../package.json', import.meta.url), 'utf8')
+      ) as { version: string };
+      expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version });
+      expect(version).not.toBe('0.0.0');
+      expect(messages[1]?.result?.tools).toHaveLength(17);
     }
   );
 });

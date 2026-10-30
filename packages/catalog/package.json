@@ -105,6 +105,10 @@
       "types": "./src/manifests/workflows/index.ts",
       "default": "./src/manifests/workflows/index.ts"
     },
+    "./manifests/all": {
+      "types": "./src/manifests/all.ts",
+      "default": "./src/manifests/all.ts"
+    },
     "./player": {
       "types": "./src/player/index.ts",
       "default": "./src/player/index.ts"

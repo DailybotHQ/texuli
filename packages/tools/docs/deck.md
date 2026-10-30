@@ -76,6 +76,10 @@ example and theme tools. Its arguments are `command` (one of the seven),
 refused. It answers `{ "result": … }` with the same value as the CLI and
 modifies no files.
 
+In the repository source (in development, not released), the tool is the
+`deck.run` operation of the [operations registry](ops.md), and the CLI runs
+through it too; `deck` stays as a deprecated alias until `0.10.0`.
+
 ```json
 { "command": "lint", "deck": { "formatVersion": 2, "meta": { "title": "Launch" }, "slides": [] } }
 ```
