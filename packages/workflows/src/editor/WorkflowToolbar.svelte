@@ -115,18 +115,18 @@ function onKeydown(event: KeyboardEvent): void {
     .tx-workflow-toolbar {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.25rem;
+      gap: var(--tx-space-1);
     }
 
     .tx-workflow-toolbar__button {
       min-inline-size: 2rem;
       min-block-size: 2rem;
-      padding: 0.25rem 0.5rem;
+      padding: var(--tx-space-1) var(--tx-space-2);
       font: inherit;
       color: inherit;
       background: var(--tx-surface, ButtonFace);
-      border: 1px solid var(--tx-border, ButtonText);
-      border-radius: var(--tx-radius-md, 0.5rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, ButtonText);
+      border-radius: var(--tx-shape-radius-lg);
       cursor: pointer;
     }
 

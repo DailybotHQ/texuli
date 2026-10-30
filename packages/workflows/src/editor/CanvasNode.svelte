@@ -133,12 +133,12 @@ const specPorts = $derived(new Map((spec?.ports ?? []).map((port) => [port.id, p
     .tx-workflow-node {
       position: absolute;
       box-sizing: border-box;
-      padding: 0.5rem 0.75rem;
+      padding: var(--tx-workflow-node-padding-block, var(--tx-space-2)) var(--tx-workflow-node-padding-inline, var(--tx-space-3));
       background: var(--tx-surface, Canvas);
-      border: 1px solid var(--tx-border, CanvasText);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
       border-inline-start: 4px solid var(--tx-workflow-accent, var(--tx-primary, CanvasText));
-      border-radius: var(--tx-radius-md, 0.5rem);
-      box-shadow: var(--tx-shadow-soft, none);
+      border-radius: var(--tx-workflow-node-radius, var(--tx-shape-radius-lg));
+      box-shadow: var(--tx-workflow-node-elevation, var(--tx-elevation-1));
       cursor: grab;
       touch-action: none;
       user-select: none;
@@ -197,7 +197,7 @@ const specPorts = $derived(new Map((spec?.ports ?? []).map((port) => [port.id, p
       block-size: 12px;
       border-radius: 50%;
       background: var(--tx-surface, Canvas);
-      border: 2px solid var(--tx-muted-foreground, CanvasText);
+      border: var(--tx-border-width-thick) solid var(--tx-muted-foreground, CanvasText);
     }
 
     .tx-workflow-port[data-direction='out'] .tx-workflow-port__dot {

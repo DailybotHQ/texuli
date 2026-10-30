@@ -183,11 +183,11 @@ function context(node: WorkflowNode): WorkflowNodeContext {
     .tx-workflow-viewer__node {
       position: absolute;
       box-sizing: border-box;
-      padding: 0.5rem 0.75rem;
+      padding: var(--tx-space-2) var(--tx-space-3);
       background: var(--tx-surface, Canvas);
-      border: 1px solid var(--tx-border, CanvasText);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
       border-inline-start: 4px solid var(--tx-workflow-accent, var(--tx-primary, CanvasText));
-      border-radius: var(--tx-radius-md, 0.5rem);
+      border-radius: var(--tx-shape-radius-lg);
       overflow: hidden;
     }
 
