@@ -12,7 +12,7 @@ import {
 import { type Component, type Snippet, tick, untrack } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import { type ClassValue, cx, variants } from 'texuli/cx';
-import { createListMotion, type MotionProp } from 'texuli/motion';
+import type { MotionProp } from 'texuli/motion';
 import {
   type BoardColumnDef,
   type BoardKeyboardText,
@@ -32,6 +32,7 @@ import {
   rankSequence,
   validateMove,
 } from '../engines/board/index.ts';
+import { createLazyListMotion } from '../motion/lazy-list-motion.ts';
 import {
   DEFAULT_MOVE_MENU_TEXT,
   type MoveMenuDestination,
@@ -150,7 +151,7 @@ let {
 
 const uid = $props.id();
 // Layout motion: measure the cards before `items` changes, play after it.
-const cardMotion = createListMotion({
+const cardMotion = createLazyListMotion({
   motion: () => motion,
   defaults: { layout: true, duration: 'base' },
   items: () =>

@@ -3,7 +3,7 @@
 Every workspace package, its layer and its public entries. Layers point down
 only: a package imports only from lower layers (the repository's
 `scripts/check-layers.ts` enforces it). **All 25 published packages are on
-npm as `0.8.0` (`@texuli/slides` as `0.8.1`, a layout fix)** (published by CI with provenance; `latest` and `next` both
+npm as `0.8.0` (`@texuli/slides` as `0.8.1`, a layout fix; `@texuli/data` as `0.8.1`, lazy list motion)** (published by CI with provenance; `latest` and `next` both
 point to it; pre-1.0, not stable; the workspace packages stay
 `private: true`), so install them plainly (`pnpm add texuli`), import them in
 a Texuli workspace, or copy components with the CLI

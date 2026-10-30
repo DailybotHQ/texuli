@@ -1,9 +1,25 @@
 import { cleanup, render } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { loadMotionRuntime } from 'texuli/motion';
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FakeAnimation } from '../../core/tests/motion-fakes.ts';
+import { createLazyListMotion } from '../src/motion/lazy-list-motion.ts';
 import MotionDataHarness from './fixtures/MotionDataHarness.svelte';
+
+// The real createListMotion, wrapped so a test can see whether a view ever
+// reached it: the views load texuli/motion lazily (G86) and only call it once
+// a layout change could animate.
+const listMotion = vi.hoisted(() => ({ calls: 0 }));
+vi.mock('texuli/motion', async (importOriginal) => {
+  const original = await importOriginal<typeof import('texuli/motion')>();
+  return {
+    ...original,
+    createListMotion: (...args: Parameters<typeof original.createListMotion>) => {
+      listMotion.calls += 1;
+      return original.createListMotion(...args);
+    },
+  };
+});
 
 // Layout motion in @texuli/data (ADR-013): DataGrid rows and Board cards play
 // FLIP through @texuli/core/motion (a Web Animations stand-in here) when their
@@ -131,5 +147,127 @@ describe('Board cards', () => {
       expect(started, JSON.stringify(props)).toHaveLength(0);
       view.unmount();
     }
+  });
+});
+
+describe('list motion loads lazily (G86)', () => {
+  const sorted = { kind: 'grid' as const, tasks: rows };
+  const moved = rows.map((task) => (task.id === 'a' ? { ...task, column: 'doing' } : task));
+  const views = [
+    { first: sorted, next: { ...sorted, sortDir: 'desc' as const } },
+    {
+      first: { kind: 'board' as const, tasks: rows },
+      next: { kind: 'board' as const, tasks: moved },
+    },
+  ];
+
+  async function mountAndChange(extra: Record<string, unknown>): Promise<void> {
+    for (const { first, next } of views) {
+      const view = render(MotionDataHarness, { props: { ...first, ...extra } });
+      await settle();
+      await view.rerender({ ...next, ...extra });
+      await settle();
+      view.unmount();
+    }
+  }
+
+  it('never reaches texuli/motion when a change cannot animate', async () => {
+    const reader = window.matchMedia;
+    for (const [name, extra, readerReduces] of [
+      ['motion={false}', { motion: false }, false],
+      ['layout: false', { motion: { layout: false } }, false],
+      ['level none', { level: 'none' }, false],
+      ['forced reduced motion', { reducedMotion: true }, false],
+      ["the reader's reduced motion", {}, true],
+    ] as const) {
+      listMotion.calls = 0;
+      started = [];
+      window.matchMedia = ((query: string) =>
+        ({
+          matches: readerReduces && query.includes('reduce'),
+          media: query,
+        }) as MediaQueryList) as typeof window.matchMedia;
+      try {
+        await mountAndChange(extra);
+      } finally {
+        window.matchMedia = reader;
+      }
+      expect(listMotion.calls, name).toBe(0);
+      expect(started, name).toHaveLength(0);
+    }
+  });
+
+  it('loads it once the mounted list can animate, also when the provider ignores the reader', async () => {
+    listMotion.calls = 0;
+    await mountAndChange({});
+    expect(listMotion.calls).toBe(views.length);
+    const reader = window.matchMedia;
+    window.matchMedia = ((query: string) =>
+      ({ matches: true, media: query }) as MediaQueryList) as typeof window.matchMedia;
+    try {
+      listMotion.calls = 0;
+      await mountAndChange({ reducedMotion: false });
+      expect(listMotion.calls).toBe(views.length);
+    } finally {
+      window.matchMedia = reader;
+    }
+  });
+
+  it('the shim: mount first, a change before the load commits at once, a failed load retries', async () => {
+    type Inner = { measure: number; play: number; cancel: number };
+    const inner: Inner = { measure: 0, play: 0, cancel: 0 };
+    let fail = 1;
+    let loads = 0;
+    const settings = { level: 'full', reducedMotion: false } as const;
+    let created: unknown;
+    const motion = createLazyListMotion({
+      motion: () => undefined,
+      defaults: { layout: true },
+      items: () => [],
+      settings,
+      load: async () => {
+        loads += 1;
+        if (fail > 0) {
+          fail -= 1;
+          throw new Error('chunk failed');
+        }
+        return {
+          createListMotion: (options) => {
+            created = options.settings;
+            return {
+              measure: () => {
+                inner.measure += 1;
+              },
+              play: () => {
+                inner.play += 1;
+              },
+              cancel: () => {
+                inner.cancel += 1;
+              },
+            };
+          },
+        };
+      },
+    });
+    motion.measure();
+    expect(loads).toBe(0);
+    motion.play();
+    expect(loads).toBe(1);
+    await settle();
+    // The failed load: changes commit at once and never throw.
+    expect(() => {
+      motion.measure();
+      motion.play();
+    }).not.toThrow();
+    expect(loads).toBe(2);
+    await settle();
+    expect(created).toBe(settings);
+    // The list seam's first play() records the mount (nothing plays on it).
+    expect(inner).toEqual({ measure: 0, play: 1, cancel: 0 });
+    motion.measure();
+    motion.play();
+    motion.cancel();
+    expect(inner).toEqual({ measure: 1, play: 2, cancel: 1 });
+    expect(loads).toBe(2);
   });
 });

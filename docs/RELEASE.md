@@ -8,8 +8,9 @@ the intended process; it does not publish packages or grant release authority.
 `0.8.0` is the current release of all 25 published packages (owner GO
 2026-10-29); `@texuli/slides` has since moved to `0.8.1`, a
 backwards-compatible fix (the untrusted trust badge row wraps instead of
-pushing the toolbar past a phone's edge), published from `main` on the merge
-that bumped it: the 22 packages of `0.7.0` plus `@texuli/forms`,
+pushing the toolbar past a phone's edge), and `@texuli/data` to `0.8.1`
+(list motion loads lazily), each published from `main` on the merge that
+bumps it: the 22 packages of `0.7.0` plus `@texuli/forms`,
 `@texuli/canvas` and `@texuli/sheets`, which are published for the first
 time in `0.8.0`. The
 publish workflow publishes from `main` after the merge, from the verified
@@ -33,6 +34,26 @@ published version.
   `scripts/packages.ts`).
 - The apps (`apps/website`, `apps/agent`) and the native twin (`native/`)
   publish nothing.
+
+### @texuli/data 0.8.1
+
+A backwards-compatible fix with no new public API; no other package
+changes version. The Board, the DataGrid and the Dashboard took list motion
+from `texuli/motion` statically, so every consumer paid for its seams, its
+contract and its provider context even with `motion={false}`, reduced motion
+or level `none` (G86, reported by Protoyard). They now go through a small
+internal shim that reads the `MotionProvider` settings at init and loads
+`texuli/motion` with `import()` the first time a mounted list could animate a
+change; with `motion={false}`, `layout: false`, level `none` or reduced
+motion (forced by the provider, or the reader's) it never loads, and a change
+before it has loaded commits at once. Measured gzip of the initial graph:
+`@texuli/data/board` 12,833 to 12,339 B, `@texuli/data/grid-core` 13,416 to
+13,082 B, `@texuli/data/grid-editing` 18,224 to 17,889 B,
+`@texuli/data/dashboard` 11,529 to 11,194 B and the `@texuli/data` barrel
+84,899 to 84,261 B. It still pins `texuli` `0.8.0`, whose motion context key
+it reads. Covered by `packages/data/tests/motion.test.ts` and
+`packages/data/tests/motion-bundle.test.ts`. Published by the publish
+workflow after the merge that bumps it.
 
 ### @texuli/slides 0.8.1
 

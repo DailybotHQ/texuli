@@ -178,5 +178,7 @@ an insert or a removal) the cards glide from where they were to their new
 place (FLIP through `texuli/motion` on `@texuli/core/motion`,
 [ui-motion](../../texuli/docs/ui-motion.md)). Nothing plays on the first
 render; reduced motion, a `MotionProvider` level of `none` and
-`motion={false}` commit at once. Drag previews are not animated by it.
+`motion={false}` commit at once. Drag previews are not animated by it. `texuli/motion` loads with `import()` only
+once a mounted board could animate a change (G86), so it never loads under
+reduced motion, level `none` or `motion={false}`.
 Tests: `packages/data/tests/motion.test.ts`, `tests/behavior/motion.spec.ts`.

@@ -3,7 +3,8 @@ import { bindPointerGesture, createPointerTracker, type GestureEvent } from '@te
 import { type Snippet, tick, untrack } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import { type ClassValue, cx } from 'texuli/cx';
-import { createListMotion, type MotionProp } from 'texuli/motion';
+import type { MotionProp } from 'texuli/motion';
+import { createLazyListMotion } from '../motion/lazy-list-motion.ts';
 import { type DashboardWidgetEntry, setDashboardContext } from './context.ts';
 import {
   addItem,
@@ -178,7 +179,7 @@ const current = $derived(preview ?? resolved);
 const options = $derived({ columns: active.columns, compaction });
 
 // ── Layout motion ──────────────────────────────────────────────────────
-const widgetMotion = createListMotion({
+const widgetMotion = createLazyListMotion({
   motion: () => motion,
   defaults: { layout: true, duration: 'fast' },
   items: () =>
