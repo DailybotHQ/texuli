@@ -37,6 +37,9 @@ same registry. The registry is framework-free.
 | `deck.run` | Run a deck command | edge | local and remote MCP, CLI | `texuli deck run` | Inspect, lint and convert a Texuli deck on the shared v2 model: capabilities, the JSON Schema, layouts, lint, inspect, from-markdown and to-markdown. Pure compute; returns { result } with the command output (ok, issues, deck, markdown …). |
 | `document.run` | Run a document command | edge | local and remote MCP, CLI | `texuli document run` | Create, validate, inspect, patch and convert a Texuli document (spec 0.7.0): capabilities, the JSON Schema, validate, inspect, a bounded RFC 6902 patch (at most 1000 operations), from-markdown, to-markdown and to-blueprint. Returns { result } with the command output; PDF and DOCX are document.export. |
 | `document.export` | Export a document as PDF or DOCX | node | local MCP, CLI | `texuli document export` | Write a Texuli document as PDF or DOCX bytes with the owned writers, links and media checked at the tier. Returns { result } with ok, mime, byteLength, base64 bytes (no files are written), diagnostics and, for PDF, pageCount. Needs Node. |
+| `site.pages` | List texuli.com pages | site | remote MCP only | — | List the pages of texuli.com from its Markdown twin manifest, in path order, optionally under a path prefix, a page at a time. Returns the total, the offset, the next offset when more follow, and each page’s path, twin path, URL, title and description. |
+| `site.read` | Read a texuli.com page as Markdown | site | remote MCP only | — | Read one texuli.com page as its Markdown twin: the page’s own content with a header block (title, description, canonical URL, last updated). Accepts a route, its .md twin path or a texuli.com URL. Returns the path, twin, URL, title, the Markdown, its size and whether it was cut at the size cap. |
+| `site.search` | Search texuli.com pages | site | remote MCP only | — | Search texuli.com pages by words in their titles, headings, descriptions and paths, ranked deterministically (more matched words first, then title over path over heading over description). Returns the total and, per hit, the path, twin, URL, title, description, score and up to three matching headings. |
 
 ### Limits
 
@@ -55,6 +58,9 @@ same registry. The registry is framework-free.
 | `deck.run` | 2,100,000 | — | 10 s | `command` (required), `deck`, `markdown` |
 | `document.run` | 2,100,000 | 1,000 | 10 s | `command` (required), `document`, `markdown`, `patch`, `tier`, `key` |
 | `document.export` | 2,100,000 | — | 30 s | `format` (required), `document` (required), `tier` |
+| `site.pages` | 1,024 | 200 | 5 s | `prefix`, `offset`, `limit` |
+| `site.read` | 1,024 | — | 5 s | `path` (required) |
+| `site.search` | 1,024 | 50 | 5 s | `query` (required), `limit` |
 
 ### Deprecated 0.8 tool names
 
@@ -80,9 +86,11 @@ catalog's 512-node tree cap.
 
 **Runtime classes.** `edge` operations are pure compute and run anywhere.
 `node` operations need Node (here, the PDF and DOCX writers, which are kept
-off the edge on purpose). `site` is reserved for remote-only operations that
-read the built site; there are none yet. A door passes the classes it serves
-(`{ runtimes: ['edge'] }`) and `invoke()` refuses the rest with
+off the edge on purpose). `site` operations read the built texuli.com and
+only the remote MCP serves them (see [Site operations](#site-operations)).
+A door passes the classes it serves (`LOCAL_RUNTIMES`, `['edge', 'node']`,
+for stdio and the CLI; `REMOTE_RUNTIMES`, `['edge', 'site']`, for
+`https://texuli.com/mcp`) and `invoke()` refuses the rest with
 `runtime-unavailable`. The catalog operations read the static manifest list
 of `@texuli/catalog/manifests/all`, so they need no file system.
 
@@ -90,6 +98,54 @@ of `@texuli/catalog/manifests/all`, so they need no file system.
 `destructive: false`, `idempotent: true` and `openWorld: false`; the MCP
 server publishes them as `readOnlyHint`, `destructiveHint`, `idempotentHint`
 and `openWorldHint`.
+
+## Site operations
+
+`site.pages`, `site.read` and `site.search` (PLAN_011 T-ar-site-mcp,
+[ADR-018](../../../docs/DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions))
+read the built site, so they are the `site` runtime class and only the
+remote door serves them. They never fetch the network: a door passes
+`invoke(name, input, { runtimes, site: { assets, origin } })`, where
+`assets` has the shape of Cloudflare's `env.ASSETS` binding
+(`fetch(request) → Response`), and the remote Function passes its own
+binding and the request origin. Without `site`, they answer
+`runtime-unavailable`.
+
+- **The index** is the website build's `md-manifest.json`: besides the
+  `twins` map, its `pages` list gives each page's path, twin path, title,
+  description and h2/h3 headings (at most 64, read from the twin outside
+  code fences). It is parsed once per binding, capped at 4 MiB, and only
+  entries with a plain route and a plain `.md` twin path under the site root
+  are kept.
+- **`site.pages`** lists the pages in path order, optionally under a path
+  `prefix`, with `offset` and `limit` (at most 200) and `nextOffset` while
+  more follow.
+- **`site.read`** returns one page's Markdown twin. The path may be a route
+  (`/guides/theming/`), the same without the slash, the twin
+  (`/guides/theming.md`, `/index.md`), `…/index.html`, or a texuli.com URL
+  (the request origin's host is accepted too). Traversal (`.` or `..`
+  segments), percent-encoded or backslashed paths, `//`, other hosts and
+  schemes and characters no page uses are refused as `invalid-input`; a
+  well-formed path that is not in the manifest is `not-found`. The caller's
+  path only selects a manifest entry: the asset request is always the twin
+  path the manifest names. A twin over 256 KiB is cut at a character and
+  line boundary and returned with `truncated: true`.
+- **`site.search`** ranks pages by the query's words (lowercase letters and
+  digits, at most 12): pages that match more words first, then the score
+  (title word 10, in the title 6, path word 4, in the path 2, heading word
+  3, in a heading 2, in the description 2, plus 8 when the whole phrase is
+  in the title and 4 when it is in a heading), then the shorter path, then
+  the path. The same query always gives the same answer. Each hit names up
+  to three matching headings.
+
+**Local doors do not list them.** The stdio server and the CLI serve `edge`
+and `node` only: they have no built site to read, and an agent working
+locally reads the repository's own pages and docs. A `--site <dir>` reader
+over a local `dist` was considered and left out: it would add a file-system
+reader to the local door for content the remote door and the repository
+already provide. Calling a site operation locally answers
+`runtime-unavailable` (an MCP `isError` result; the CLI has no `site`
+group).
 
 ## Blueprint validation
 
@@ -165,15 +221,15 @@ objects, so the shape is learned from the validator
 ## Library
 
 ```ts
-import { TEXULI_OPERATIONS, texuliOps } from '@texuli/tools/ops';
+import { REMOTE_RUNTIMES, TEXULI_OPERATIONS, texuliOps } from '@texuli/tools/ops';
 
-texuliOps.list({ runtimes: ['edge'] }); // what a remote door may serve
+texuliOps.list({ runtimes: REMOTE_RUNTIMES }); // what the remote door serves: edge and site
 const outcome = await texuliOps.invoke('catalog.search', { query: 'card', tier: 'untrusted', limit: 5 });
 if (outcome.ok) outcome.output; // { hash, fileName, total, entries, limit }
 else outcome.error; // { code, message, issues? }
 ```
 
-`invoke(name, input, { runtimes })` never throws. It checks the input is a
+`invoke(name, input, { runtimes, site })` never throws. It checks the input is a
 plain JSON object within `limits.inputBytes`, validates it against the
 input schema, runs the handler under the time budget, and validates the
 output against the output schema. `createOperationRegistry(operations,
@@ -221,7 +277,9 @@ commands). An alias returns exactly what its target returns.
 
 - **MCP (in the repository source):** `createMcpHandler` ([mcp.md](mcp.md))
   generates `tools/list` from the registry: every operation of the runtime
-  classes the door serves (`edge` and `node` for the local stdio server),
+  classes the door serves (`edge` and `node` for the local stdio server,
+  `edge` and `site` for the remote endpoint, which passes each request's
+  `env.ASSETS` as the site context),
   with `inputSchema`, `outputSchema`, `annotations` and cursor pagination,
   then the aliases. A call goes through `invoke()` and returns
   `structuredContent` plus a text mirror; a failure is an `isError` result
@@ -229,7 +287,7 @@ commands). An alias returns exactly what its target returns.
   unknown tool name is a JSON-RPC `-32602` error. The same handler serves
   the resources, prompts and completions.
 - **CLI:** `texuli <group> <verb>` (`src/cli/router.ts`) runs every
-  operation: the input is one JSON object from stdin, `--json <object>` or
+  `edge` and `node` operation (not the `site` ones): the input is one JSON object from stdin, `--json <object>` or
   `--file <path>`; the output is the operation's JSON on stdout (a refusal
   prints `{ ok: false, operation, error }` and exits 1), or `--out <path>`
   writes it through the local write policy (a new file inside the working
@@ -269,3 +327,9 @@ snapshot (`tests/__snapshots__/texuli-help.txt`).
 `packages/tools/tests/mcp-protocol.test.ts` is the MCP conformance suite, and
 `packages/catalog/tests/manifests-all.test.ts` checks the static manifest
 list builds the same catalog hash as file-system discovery.
+`packages/tools/tests/site-ops.test.ts` checks the `site` operations against
+a fake `env.ASSETS` (`tests/fixtures/site-assets.ts`): that only the remote
+runtimes list them, every accepted path form, traversal and foreign-host
+refusals (and that a refused path never reaches the fetcher), pagination,
+the deterministic ranking and its tie-breaks, the 256 KiB read cap, the
+once-per-binding manifest read and broken manifests.
