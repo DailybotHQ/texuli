@@ -88,6 +88,7 @@ export const blueprintValidate: Operation = defineOperation({
     properties: {
       draft: {
         type: ['object', 'array'],
+        maxItems: MAX_NODES,
         description: `The blueprint: a catalog tree { id, props, children }, an array of trees, or a texuli-blueprint envelope (format, version, id, catalog hash from catalog.search, status, createdAt, updatedAt, generator, tree). At most ${MAX_NODES} nodes. schema-form, canvas and spreadsheet nodes and data-source bindings are refused: this server has no validator for them.`,
       },
       tier: {

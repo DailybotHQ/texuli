@@ -222,7 +222,7 @@ export const componentGet: Operation = defineOperation({
   name: 'component.get',
   title: 'Read a component manifest',
   summary:
-    'Read one component manifest from the catalog: its props with kinds and schemas, events, examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it.',
+    'Read one component manifest from the catalog by id. Returns { component }: its props with kinds and schemas, events, worked examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it (an empty emit list means agent output may not).',
   input: {
     type: 'object',
     properties: { id: componentId },

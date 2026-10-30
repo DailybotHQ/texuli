@@ -140,7 +140,7 @@ Limits: input up to 1000000 bytes, at most 500 items, 5000 ms budget.
 Usage: texuli component get [--json <object> | --file <path>] [--out <path>]
 
 Read a component manifest (component.get, runtime edge)
-Read one component manifest from the catalog: its props with kinds and schemas, events, examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it.
+Read one component manifest from the catalog by id. Returns { component }: its props with kinds and schemas, events, worked examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it (an empty emit list means agent output may not).
 
 Arguments (JSON object keys):
   id (required): string. A catalog component id, e.g. "card" (find ids with catalog.search).
@@ -197,7 +197,7 @@ Example (Violet themes): texuli theme search --json '{"query":"violet","limit":5
 Usage: texuli theme get [--json <object> | --file <path>] [--out <path>]
 
 Read a full theme (theme.get, runtime edge)
-Read the full token definition of one library theme: its id, name and every light and dark color, radius, font and chart token, ready to compile or apply.
+Read the full token definition of one library theme by id. Returns { theme }: its id, name, description and every light and dark color, radius, font and chart token, ready to compile or apply.
 
 Arguments (JSON object keys):
   id (required): string. A theme id from theme.search, e.g. "violet" or "enterprise-neutral".
@@ -209,7 +209,7 @@ Example (The violet theme): texuli theme get --json '{"id":"violet"}'
 Usage: texuli theme preview [--json <object> | --file <path>] [--out <path>]
 
 Preview a theme (theme.preview, runtime edge)
-Preview one library theme in light or dark mode: its key tokens (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes, with issue counts.
+Preview one library theme in light or dark mode. Returns its summary, the key tokens of that mode (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes (aa.pass and issue counts).
 
 Arguments (JSON object keys):
   id (required): string. A theme id from theme.search, e.g. "violet" or "enterprise-neutral".
