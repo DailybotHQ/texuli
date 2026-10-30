@@ -321,6 +321,31 @@ describe('command', () => {
     });
   });
 
+  describe('Command palette search status (G88)', () => {
+    it('shows the polite "Searching…" status and a busy list while search is pending', async () => {
+      const { default: Palette } = await import('../src/components/command/CommandPalette.svelte');
+      let settle: (items: { id: string; label: string }[]) => void = () => {};
+      const search = vi.fn(
+        () =>
+          new Promise<{ id: string; label: string }[]>((resolve) => {
+            settle = resolve;
+          })
+      );
+      render(Palette, { props: { open: true, search } });
+      const dialog = await screen.findByRole('dialog');
+      const input = within(dialog).getByRole('combobox');
+      await fireEvent.input(input, { target: { value: 'inv' } });
+      await waitFor(() => expect(search).toHaveBeenCalledWith('inv'));
+      const status = await within(dialog).findByRole('status');
+      expect(status.textContent).toContain('Searching…');
+      expect(status.getAttribute('aria-live')).toBe('polite');
+      expect(within(dialog).getByRole('listbox').getAttribute('aria-busy')).toBe('true');
+      settle([{ id: 'invite', label: 'Invite member' }]);
+      await waitFor(() => expect(within(dialog).queryByRole('status')).toBeNull());
+      expect(within(dialog).getByRole('option', { name: /Invite member/ })).toBeTruthy();
+    });
+  });
+
   describe('Command.Trigger options', () => {
     it('adds a search glyph and a narrow collapse that keeps the label as the name', async () => {
       const { default: Trigger } = await import('../src/components/command/CommandTrigger.svelte');

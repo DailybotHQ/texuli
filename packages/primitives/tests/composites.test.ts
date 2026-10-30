@@ -517,6 +517,7 @@ describe('command', () => {
   function renderCommand(
     props: {
       debounceMs?: number;
+      loading?: boolean;
       onSearch?: (query: string) => void | Promise<void>;
       onSelect?: (value: string) => void;
     } = {}
@@ -541,6 +542,18 @@ describe('command', () => {
       expect(screen.queryByRole('group', { name: 'Actions' })).toBeNull();
       await fireEvent.input(input, { target: { value: 'missing' } });
       expect(screen.queryByRole('option')).toBeNull();
+      expect(screen.getByText('No results')).toBeTruthy();
+    });
+
+    it('shows Loading and a busy list from a caller-owned loading prop (G88)', async () => {
+      const view = renderCommand({ loading: true });
+      const status = screen.getByRole('status');
+      expect(status.textContent).toContain('Searching…');
+      expect(screen.getByRole('listbox').getAttribute('aria-busy')).toBe('true');
+      await fireEvent.input(screen.getByRole('combobox'), { target: { value: 'missing' } });
+      expect(screen.queryByText('No results')).toBeNull();
+      await view.rerender({ loading: false });
+      expect(screen.queryByRole('status')).toBeNull();
       expect(screen.getByText('No results')).toBeTruthy();
     });
 
