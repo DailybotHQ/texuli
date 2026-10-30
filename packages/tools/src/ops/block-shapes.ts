@@ -79,7 +79,7 @@ const FIXTURES: readonly Fixture[] = [
     examples: [
       {
         type: 'tree',
-        style: 'org',
+        variant: 'org',
         nodes: [
           { id: 'lead', parentId: null, label: 'Example lead' },
           { id: 'eng', parentId: 'lead', label: 'Engineering' },
